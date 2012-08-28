@@ -68,6 +68,14 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
 
 
     layButtons->addWidget(chkDontSaveFitResultMessage, layButtons->rowCount(),0,1,2);
+
+    chkLeaveoutMasked=new QCheckBox(tr("don't fit masked pixels"), this);
+    chkLeaveoutMasked->setToolTip(tr("this improves the speed of saving the project significantly!"));
+    chkLeaveoutMasked->setChecked(false);
+    connect(chkLeaveoutMasked, SIGNAL(toggled(bool)), this, SLOT(leavoutMasked(bool)));
+
+
+    layButtons->addWidget(chkLeaveoutMasked, layButtons->rowCount(),0,1,2);
 }
 
 
@@ -113,6 +121,7 @@ void QFImFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerReco
         dataEventsEnabled=false;
         cmbWeights->setCurrentIndex(eval->getFitDataWeighting());
         chkDontSaveFitResultMessage->setChecked(current->getProperty("dontSaveFitResultMessage", false).toBool());
+        chkLeaveoutMasked->setChecked(current->getProperty("LEAVEOUTMASKED", true).toBool());
         dataEventsEnabled=true;
     }
 }
@@ -681,6 +690,12 @@ void QFImFCSFitEvaluationEditor::dontSaveFitResultMessageChanged(bool checked)
 {
     if (!current) return;
     current->setQFProperty("dontSaveFitResultMessage", checked, false, false);
+}
+
+void QFImFCSFitEvaluationEditor::leavoutMasked(bool checked)
+{
+    if (!current) return;
+    current->setQFProperty("LEAVEOUTMASKED", checked, false, false);
 }
 
 

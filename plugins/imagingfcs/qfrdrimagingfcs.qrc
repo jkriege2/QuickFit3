@@ -51,9 +51,20 @@
         <file alias="video.png">icons/video.png</file>
         <file alias="clearmask.png">icons/clearmask.png</file>
         <file alias="invertmask.png">icons/invertmask.png</file>
-        <file alias="loadmask.png">icons/load_mask.png</file>
         <file alias="mask.png">icons/mask.png</file>
-        <file alias="savemask.png">icons/savemask.png</file>
         <file alias="unmask.png">icons/unmask.png</file>
+        <file alias="loadmask.png">icons/load_mask.png</file>
+        <file alias="savemask.png">icons/savemask.png</file>
+        <file alias="copymask.png">icons/copymask.png</file>
+        <file alias="pastemask.png">icons/pastemask.png</file>
+        <file alias="loadselection.png">icons/loadselection.png</file>
+        <file alias="saveselection.png">icons/saveselection.png</file>
+        <file alias="copyselection.png">icons/copyselection.png</file>
+        <file alias="pasteselection.png">icons/pasteselection.png</file>
+        <file alias="storeselection.png">icons/storeselection.png</file>
+        <file alias="deleteselection.png">icons/deleteselection.png</file>
+        <file alias="dvhor.png">icons/dvhor.png</file>
+        <file alias="dvnone.png">icons/dvnone.png</file>
+        <file alias="dvver.png">icons/dvver.png</file>
     </qresource>
 </RCC>

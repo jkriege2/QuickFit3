@@ -137,12 +137,20 @@ protected:
 
         /** \brief load a mask file as a selection from hard disk */
         void loadMask();
+        /** \brief load a mask file as a selection from the clipboard */
+        void pasteMask();
         /** \brief save mask to harddisk */
         void saveMask();
+        /** \brief copy mask to clipboard */
+        void copyMask();
         /** \brief save selection to harddisk */
         void saveSelection();
         /** \brief load a selection from harddisk */
         void loadSelection();
+        /** \brief copy selection to clipboard */
+        void copySelection();
+        /** \brief paste a selection from clipboard */
+        void pasteSelection();
 
         /** \brief delete mask */
         void includeAll();
@@ -217,6 +225,8 @@ protected:
         void storeSelection();
         void deleteSelection();
         void selectionEdited();
+
+        void dualviewChanged(int mode);
     protected:
         /** \brief map with all available fit functions */
         QMap<QString, QFFitFunction*> m_fitFunctions;
@@ -270,6 +280,8 @@ protected:
         QLabel* labRunOptions;
         /** \brief checkbox to select whether to display key in the graphs */
         QCheckBox* chkKeys;
+        /** \brief combobox to select selection display options for the correlation /table plot */
+        QComboBox* cmbSeletionCorrDisplayMode;
 
 
 
@@ -395,12 +407,23 @@ protected:
         QAction* actSaveSelectionToStored;
         QAction* actDeleteStoredSelection;
 
+        QToolButton* btnCopySelection;
+        QToolButton* btnPasteSelection;
+        QToolButton* btnCopyMask;
+        QToolButton* btnPasteMask;
+        QAction* actCopySelection;
+        QAction* actPasteSelection;
+        QAction* actCopyMask;
+        QAction* actPasteMask;
+
 
 
         /** \brief plotter widget for the parameter histogram */
 
         QFHistogramView* histogram;
+        QFHistogramView* histogram2;
         QCheckBox* chkExcludeExcludedRunsFromHistogram;
+        QCheckBox* chkExcludeExcludedRunsFromHistogram2;
         double* datahist;
         double* datahistsel;
         int32_t datasize;
@@ -421,6 +444,12 @@ protected:
 
         /** \brief set which contains all currently selected runs */
         QSet<int32_t> selected;
+
+        /** \brief returns true, if a given run/pixel is inside the second DualView channel */
+        bool indexIsDualView2(int32_t sel);
+
+        void selectedInsert(int idx);
+        void selectedRemove(int idx);
 
         QString lastSavePath;
 
@@ -461,8 +490,8 @@ protected:
         void createReportDoc(QTextDocument* document);
 
 
-
-
+        QString selectionToString();
+        void loadSelectionFromString(QString sel);
 
 
 
@@ -499,6 +528,8 @@ protected:
         QToolButton* btnCopyDataToMatlab;
         /** \brief action to copy image data as column table (CSV) */
         QToolButton* btnCopyDataAsColumns;
+
+        QComboBox* cmbDualView;
 
 
 

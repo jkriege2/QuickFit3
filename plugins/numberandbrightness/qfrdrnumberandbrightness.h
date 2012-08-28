@@ -36,19 +36,19 @@ class QFRDRNumberAndBrightnessPlugin : public QObject, public QFPluginRawDataRec
         virtual QString getID() const  { return tr("number_and_brightness"); };
 
         /** \brief name for the plugin */
-        virtual QString getName() const  { return tr(""); };
+        virtual QString getName() const  { return tr("Number & Brightness"); };
 
         /** \brief short description for the plugin */
-        virtual QString getDescription() const  { return tr(""); };
+        virtual QString getDescription() const  { return tr("number and brightness data evaluation/record"); };
 
         /** \brief author the plugin */
-        virtual QString getAuthor() const  { return tr(""); };
+        virtual QString getAuthor() const  { return tr("Jan W. Krieger"); };
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr(""); };
+        virtual QString getCopyright() const  { return tr("(c) 2012 by Jan W. Krieger"); };
 
         /** \brief weblink for the plugin */
-        virtual QString getWeblink() const  { return tr(""); };
+        virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); };
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;

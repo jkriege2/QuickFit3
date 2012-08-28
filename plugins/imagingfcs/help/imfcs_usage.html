@@ -94,6 +94,12 @@
 	<p>On the right-hand side you may select different options that change the appearance of the plots (color scales, ranges, ...).</p>
 	<p>The parameters to display are selected above the plots. First you will have to select a fit parameter set. If you use the FCS Fit plugin for fitting, a new set will be created for every differing combination of evaluation item (if you have two, you can distinguish these), fit algorithm and fit function. Then as a second step you may selectthe parameters to display. The parameters can be transformed with some basic mathematical transformations (none reciprocal 1/x, square root, logarithm) before they are displayed. The display settings (transformation, color coding, ...) are stored for every fit parameter and result set separately in the project, so you can switch to and back between different parameters, without loosing the settings.</p>
 	<p>The plots have several <a href="$$mainhelpdir$$jkqtplotter.html">means to interact with the user</a>.</p>
+	<p>Further display options:
+	<ul>
+	  <li><b>general options/DualView mode:</b> If your microscope is equipped with DualView (or OptoSplit) optics, the displayed image will be split in the center into two parts (left/right, top/bottom) which correspond to two detection channels. This option allows to use this information. If the DualView mode is set properly, the e.g. when selecting pixels, they will be selected in both channels. Also the correlation curve display below will display two averaged curves if several pixels are detected to allow for a comparison of the two image channels.</li>
+	  <li><b>Correlation plot styles/Selection Display mode:</b> here you can select what the correlation display should contain if several pixels are selected: Either the curves of all selected pixels are shown (which is possibly slow if you selected many pixels, or an average over these correlation curves is displayed. In that case the parameters table also contains the statistics of all selected fit results. Note that in DualView mode (see above) one average/statistics for every image channel will be displayed!</li>
+	</ul>
+	</p>
 	
 	
 	<h4>Histograms</h4>

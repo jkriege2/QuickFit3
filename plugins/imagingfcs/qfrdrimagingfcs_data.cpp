@@ -20,6 +20,7 @@
 QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     QFRawDataRecord(parent)
 {
+    m_dualview=QFRDRImagingFCSData::dvNone;
     correlations=NULL;
     correlationMean=NULL;
     correlationStdDev=NULL;
@@ -158,6 +159,12 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
 
     width=getProperty("WIDTH", 0).toInt();
     height=getProperty("HEIGHT", 0).toInt();
+    QString dv=getProperty("DUALVIEW_MODE", "none").toString().toLower();
+    m_dualview=QFRDRImagingFCSData::dvNone;
+    if (dv=="none" || dv=="0" || dv=="n") m_dualview=QFRDRImagingFCSData::dvNone;
+    if (dv=="horizontal" || dv=="1" || dv=="h") m_dualview=QFRDRImagingFCSData::dvHorizontal;
+    if (dv=="vertical" || dv=="2" || dv=="v") m_dualview=QFRDRImagingFCSData::dvVertical;
+
     QString filetype=getProperty("FILETYPE", "unknown").toString();
 
     // now also load the data file(s) this record is linked to
@@ -611,6 +618,14 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
                             }
                         }
                     }
+                    bool allZero=true;
+                    for (int p=0; p<NN; p++) {
+                        if (correlations[i*NN+p]!=0) {
+                            allZero=false;
+                            break;
+                        }
+                    }
+                    leaveout[i]=allZero;
                 }
                 QApplication::processEvents();
                 recalcCorrelations();
@@ -683,6 +698,15 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
                     binfileReadDoubleArray(file, &(correlations[p*N]), N);
                     if (corroffset!=0) for (int i=0; i<N; i++) { correlations[p*N+i]=correlations[p*N+i]-corroffset; }
                     if (fsets>1) binfileReadDoubleArray(file, &(sigmas[p*N]), N);
+
+                    bool allZero=true;
+                    for (int i=0; i<N; i++) {
+                        if (correlations[p*N+i]!=0) {
+                            allZero=false;
+                            break;
+                        }
+                    }
+                    leaveout[p]=allZero;
                 }
                 QApplication::processEvents();
             } else {
@@ -692,6 +716,15 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
                             binfileReadDoubleArray(file, &(correlations[p*N]), N);
                             if (corroffset!=0) for (int i=0; i<N; i++) { correlations[p*N+i]=correlations[p*N+i]-corroffset; }
                             if (fsets>1) binfileReadDoubleArray(file, &(sigmas[p*N]), N);
+
+                            bool allZero=true;
+                            for (int i=0; i<N; i++) {
+                                if (correlations[p*N+i]!=0) {
+                                    allZero=false;
+                                    break;
+                                }
+                            }
+                            leaveout[p]=allZero;
                         }
                     } else {
                         file.seek(file.pos()+width*height*N*sizeof(double));
@@ -743,6 +776,15 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
             correlations[i*(cfr->getTotalLagCount()-1)+j-1]=cfr->getVal(i,j);
             sigmas[i*(cfr->getTotalLagCount()-1)+j-1]=0;
         }
+        bool allZero=true;
+        for (int j=0; j<N; j++) {
+            if (correlations[i*N+j]!=0) {
+                allZero=false;
+                break;
+            }
+        }
+        leaveout[i]=allZero;
+
     }
     for(int i=0; i<width*height; i++) {
         overviewF[i]=cfr->getRaw(i,0)/(double(steps)*tau[0])/1.0e3;
@@ -777,6 +819,19 @@ double* QFRDRImagingFCSData::getCorrelation() const {
 
 double* QFRDRImagingFCSData::getCorrelationRunErrors() const {
     return sigmas;
+}
+
+QFRDRImagingFCSData::DualViewMode QFRDRImagingFCSData::dualViewMode() const
+{
+    return m_dualview;
+}
+
+void QFRDRImagingFCSData::setDualViewMode(QFRDRImagingFCSData::DualViewMode mode)
+{
+    m_dualview=mode;
+    if (m_dualview==QFRDRImagingFCSData::dvNone) setQFProperty("DUALVIEW_MODE", "none", false);
+    if (m_dualview==QFRDRImagingFCSData::dvHorizontal) setQFProperty("DUALVIEW_MODE", "horizontal", false);
+    if (m_dualview==QFRDRImagingFCSData::dvVertical) setQFProperty("DUALVIEW_MODE", "vertical", false);
 }
 
 bool QFRDRImagingFCSData::leaveoutRun(int run) const {
@@ -1118,6 +1173,17 @@ void QFRDRImagingFCSData::clearOvrImages() {
 
 
 
+bool QFRDRImagingFCSData::indexIsDualView2(int32_t sel) {
+    int x=runToX(sel);
+    int y=runToY(sel);
+    if (dualViewMode()==QFRDRImagingFCSData::dvHorizontal) {
+        return x>getImageFromRunsWidth()/2;
+    } else if (dualViewMode()==QFRDRImagingFCSData::dvVertical) {
+        return y>getImageFromRunsHeight()/2;
+    }
+    return false;
+}
+
 
 int QFRDRImagingFCSData::getImageFromRunsWidth() const {
     return width;
@@ -1155,33 +1221,44 @@ void QFRDRImagingFCSData::maskLoad(const QString &filename) {
     QFile f(filename);
     if (f.open(QIODevice::ReadOnly)) {
         maskClear();
-        QTextStream str(&f);
-        while (!str.atEnd())  {
-            QVector<double> d=csvReadline(str, ',', '#', -1);
-            if (d.size()==2) {
-                int idx=xyToRun(d[0], d[1]);
-                if (idx>=0 && idx<height*width) leaveout[idx]=true;
-            }
-        }
-
+        maskLoadFromString(f.readAll());
         f.close();
+    }
+}
+
+void QFRDRImagingFCSData::maskLoadFromString(QString maskstring)
+{
+    QTextStream str(&maskstring);
+    while (!str.atEnd())  {
+        QVector<double> d=csvReadline(str, ',', '#', -1);
+        if (d.size()==2) {
+            int idx=xyToRun(d[0], d[1]);
+            if (idx>=0 && idx<height*width) leaveout[idx]=true;
+        }
     }
 }
 
 void QFRDRImagingFCSData::maskSave(const QString &filename) const {
     QFile f(filename);
-    if (f.open(QIODevice::WriteOnly)) {
+    if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
         QTextStream str(&f);
-        for (uint16_t y=0; y<height; y++) {
-            for (uint16_t x=0; x<width; x++) {
-                if (leaveout[y*width+x]) {
-                    str<<x<<", "<<y<<"\n";
-                }
-            }
-        }
-
+        str<<maskToString();
         f.close();
     }
+}
+
+QString QFRDRImagingFCSData::maskToString() const
+{
+    QString res="";
+    QTextStream str(&res);
+    for (uint16_t y=0; y<height; y++) {
+        for (uint16_t x=0; x<width; x++) {
+            if (leaveout[y*width+x]) {
+                str<<x<<", "<<y<<"\n";
+            }
+        }
+    }
+    return res;
 }
 
 void QFRDRImagingFCSData::maskClear() {

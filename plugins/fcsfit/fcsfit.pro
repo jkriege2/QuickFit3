@@ -26,7 +26,8 @@ HEADERS +=  qfpevalfcsfit.h \
     ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h \
     ../interfaces/qfextensiontool.h \
     ../base_classes/qffitresultsbyindexevaluationfitthread.h \
-    optionswidget.h
+    optionswidget.h \
+    ../interfaces/qfrdrrunselection.h
 
 
 SOURCES +=  qfpevalfcsfit.cpp \

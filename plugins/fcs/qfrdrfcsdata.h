@@ -23,6 +23,7 @@
 #include "qftools.h"
 #include "csvtools.h"
 #include "qfrdrfcsfitfunctionsimulator.h"
+#include "qfrdrrunselection.h"
 
 
 /*! \brief manages a FCS dataset (set of correlation curves with multiple runs)
@@ -43,9 +44,9 @@
   account for the correlation average. This may be usefull, if only some few of the runs in a file are damaged
   (e.g. by agregates moving through the focus ...).
 */
-class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRCountRatesInterface {
+class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRCountRatesInterface, public QFRDRRunSelectionsInterface {
         Q_OBJECT
-        Q_INTERFACES(QFRDRFCSDataInterface QFRDRCountRatesInterface)
+        Q_INTERFACES(QFRDRFCSDataInterface QFRDRCountRatesInterface QFRDRRunSelectionsInterface)
     public:
         /** Default constructor */
         QFRDRFCSData(QFProject* parent);

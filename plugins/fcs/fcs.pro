@@ -20,7 +20,8 @@ HEADERS += dlgcsvparameters.h \
 		   ../interfaces/qfrdrfcsdatainterface.h \
 		   ../interfaces/qfrdrcountratesinterface.h \
     ../../../../../LIB/trunk/qt/completertextedit.h \
-    qfrdrfcsfitfunctionsimulator.h
+    qfrdrfcsfitfunctionsimulator.h \
+    ../interfaces/qfrdrrunselection.h
 
 SOURCES += dlgcsvparameters.cpp \
            alv5000tools.cpp \

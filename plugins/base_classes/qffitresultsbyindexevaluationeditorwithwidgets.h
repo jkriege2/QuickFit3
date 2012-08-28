@@ -42,7 +42,7 @@
 #include "qftools.h"
 #include "qfevaluationpropertyeditor.h"
 #include "qffitresultsbyindexevaluationfitthread.h"
-
+#include "qfrdrrunselection.h"
 
 /*! \brief evaluation item editor base class for data fits using QFFitAlgorithm and QFFitFunction where the
            QFRawDataRecord is a dataset with different runs (we can fit to each run). The QFEvaluationItem for

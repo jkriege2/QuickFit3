@@ -24,17 +24,24 @@
 #include "qfrdrimagingfcsoverviewrateeditor.h"
 #include "qfrdrimagestackinterface.h"
 #include "qfrdrimageselectioninterface.h"
-
+#include "qfrdrrunselection.h"
 
 
 /*! \brief QFRawDataRecord implementation
     \ingroup qf3rdrdp_imaging_fcs
 
 */
-class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDROverviewImageInterface, public QFRDRImageStackInterface, public QFRDRSimpleCountRatesInterface, public QFRDRImageSelectionInterface {
+class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDROverviewImageInterface, public QFRDRImageStackInterface, public QFRDRSimpleCountRatesInterface, public QFRDRImageSelectionInterface, public QFRDRRunSelectionsInterface {
         Q_OBJECT
-        Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDROverviewImageInterface QFRDRImageStackInterface QFRDRSimpleCountRatesInterface QFRDRImageSelectionInterface)
+        Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDROverviewImageInterface QFRDRImageStackInterface QFRDRSimpleCountRatesInterface QFRDRImageSelectionInterface QFRDRRunSelectionsInterface)
     public:
+        enum DualViewMode {
+            dvNone=0,
+            dvHorizontal=1,
+            dvVertical=2
+        };
+
+
         /** Default constructor */
         QFRDRImagingFCSData(QFProject* parent);
         /** Default destructor */
@@ -91,7 +98,8 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual double* getCorrelationRunErrors() const ;
 
 
-
+        DualViewMode dualViewMode() const;
+        void setDualViewMode(DualViewMode mode);
 
 
 
@@ -105,7 +113,9 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual void leaveoutClear();
 
         void maskLoad(const QString& filename);
+        void maskLoadFromString(QString maskstring);
         void maskSave(const QString& filename) const ;
+        QString maskToString() const;
         void maskClear();
         void maskSetAll();
         void maskSet(uint16_t x, uint16_t y);
@@ -208,6 +218,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         double getTauMin() const;
 
     private:
+        DualViewMode m_dualview;
         /** \brief width of the image */
         int width;
         /** \brief height of the image */
@@ -322,6 +333,8 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \copydoc QFRDRImageToRunInterface::getImageFromRunsPreview() */
         virtual double* getImageFromRunsPreview() const;
 
+        /** \brief returns true, if a given run/pixel is inside the second DualView channel */
+        bool indexIsDualView2(int32_t sel);
 
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageCount() */
         virtual int getOverviewImageCount() const;

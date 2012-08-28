@@ -1194,6 +1194,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsCurrent() {
     if (!current) return;
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
+    QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     if (!eval) return;
     QFFitFunction* ffunc=eval->getFitFunction();
@@ -1216,22 +1217,25 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsCurrent() {
     QTime time;
     time.start();
     for (int run=runmin; run<=runmax; run++) {
-        falg->setReporter(dlgFitProgressReporter);
-        QString runname=tr("average");
-        if (run>=0) runname=QString::number(run);
-        double runtime=double(time.elapsed())/1.0e3;
-        double timeperfit=runtime/double(run-runmin);
-        double estimatedRuntime=double(runmax-runmin)*timeperfit;
-        double remaining=estimatedRuntime-runtime;
-        dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
+        bool doall=!current->getProperty("leaveoutMasked", false).toBool();
+        if (doall || (!doall && rsel && !rsel->leaveoutRun(run))) {
+            falg->setReporter(dlgFitProgressReporter);
+            QString runname=tr("average");
+            if (run>=0) runname=QString::number(run);
+            double runtime=double(time.elapsed())/1.0e3;
+            double timeperfit=runtime/double(run-runmin);
+            double estimatedRuntime=double(runmax-runmin)*timeperfit;
+            double remaining=estimatedRuntime-runtime;
+            dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
 
-        //doFit(record, run);
-        eval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
+            //doFit(record, run);
+            eval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
 
-        dlgFitProgress->incSuperProgress();
-        QApplication::processEvents();
-        falg->setReporter(NULL);
-        if (dlgFitProgress->isCanceled()) break;
+            dlgFitProgress->incSuperProgress();
+            QApplication::processEvents();
+            falg->setReporter(NULL);
+            if (dlgFitProgress->isCanceled()) break;
+        }
     }
     record->enableEmitResultsChanged(true);
 
@@ -1253,6 +1257,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAll() {
     if (!current) return;
     if (!cmbModel) return;
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(current);
     if (!eval) return;
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
@@ -1286,13 +1291,15 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAll() {
     time.start();
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* record=recs[i];
+        QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
         //std::cout<<"i="<<i<<"   run="<<run<<"   record="<<record<<"   data="<<data<<"\n";
         int runmax=eval->getIndexMax(record);
         int runmin=eval->getIndexMin(record);
 
         if (record) {
             //std::cout<<"   corrN="<<data->getCorrelationN()<<"   corrRuns="<<data->getCorrelationRuns()<<"\n";
-            if (run<=runmax) {
+            bool doall=!current->getProperty("leaveoutMasked", false).toBool();
+            if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
                 falg->setReporter(dlgFitProgressReporter);
                 double runtime=double(time.elapsed())/1.0e3;
                 double timeperfit=runtime/double(jobsDone);
@@ -1368,6 +1375,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsAll() {
     int jobsDone=0;
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* record=recs[i];
+        QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
 
         if (record ) {
             record->setResultsInitSize(qMax(1000, items));
@@ -1375,23 +1383,26 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsAll() {
             int runmax=eval->getIndexMax(record);
             int runmin=eval->getIndexMin(record);
             for (int run=runmin; run<=runmax; run++) {
-                falg->setReporter(dlgFitProgressReporter);
-                QString runname=tr("average");
-                if (run>=0) runname=QString::number(run);
-                double runtime=double(time.elapsed())/1.0e3;
-                double timeperfit=runtime/double(jobsDone);
-                double estimatedRuntime=double(items)*timeperfit;
-                double remaining=estimatedRuntime-runtime;
-                dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
+                bool doall=!current->getProperty("leaveoutMasked", false).toBool();
+                if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
+                    falg->setReporter(dlgFitProgressReporter);
+                    QString runname=tr("average");
+                    if (run>=0) runname=QString::number(run);
+                    double runtime=double(time.elapsed())/1.0e3;
+                    double timeperfit=runtime/double(jobsDone);
+                    double estimatedRuntime=double(items)*timeperfit;
+                    double remaining=estimatedRuntime-runtime;
+                    dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
 
-                //doFit(record, run);
-                eval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
+                    //doFit(record, run);
+                    eval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
 
-                dlgFitProgress->incSuperProgress();
-                QApplication::processEvents();
-                falg->setReporter(NULL);
-                if (dlgFitProgress->isCanceled()) break;
-                jobsDone++;
+                    dlgFitProgress->incSuperProgress();
+                    QApplication::processEvents();
+                    falg->setReporter(NULL);
+                    if (dlgFitProgress->isCanceled()) break;
+                    jobsDone++;
+                }
             }
             record->enableEmitResultsChanged(true);
         }
@@ -1461,6 +1472,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitEverythingThreaded() {
     int thread=0;
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* record=recs[i];
+        QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
 
         if (record ) {
             record->disableEmitResultsChanged();
@@ -1468,9 +1480,12 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitEverythingThreaded() {
             int runmin=eval->getIndexMin(record);
             items=items+runmax-runmin+1;
             for (int run=runmin; run<=runmax; run++) {
-                threads[thread]->addJob(eval, record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()));
-                thread++;
-                if (thread>=threadcount) thread=0;
+                bool doall=!current->getProperty("leaveoutMasked", false).toBool();
+                if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
+                    threads[thread]->addJob(eval, record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()));
+                    thread++;
+                    if (thread>=threadcount) thread=0;
+                }
             }
         }
         QApplication::processEvents();
@@ -1584,6 +1599,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllRunsThreaded() {
     int thread=0;
     //for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* record=eval->getHighlightedRecord();
+        QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
 
         if (record ) {
             record->disableEmitResultsChanged();
@@ -1591,9 +1607,13 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllRunsThreaded() {
             int runmin=eval->getIndexMin(record);
             items=items+runmax-runmin+1;
             for (int run=runmin; run<=runmax; run++) {
-                threads[thread]->addJob(eval, record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()));
-                thread++;
-                if (thread>=threadcount) thread=0;
+                bool doall=!current->getProperty("LEAVEOUTMASKED", false).toBool();
+                qDebug()<<doall;
+                if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
+                    threads[thread]->addJob(eval, record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()));
+                    thread++;
+                    if (thread>=threadcount) thread=0;
+                }
             }
         }
     //}
@@ -1706,14 +1726,18 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllFilesThreaded()
     int thread=0;
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* record=recs[i];
+        QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
 
         if (record ) {
             record->disableEmitResultsChanged();
             items=items+1;
             int run=eval->getCurrentIndex();
-            threads[thread]->addJob(eval, record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()));
-            thread++;
-            if (thread>=threadcount) thread=0;
+            bool doall=!current->getProperty("leaveoutMasked", false).toBool();
+            if (doall || (!doall && rsel && !rsel->leaveoutRun(run))) {
+                threads[thread]->addJob(eval, record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()));
+                thread++;
+                if (thread>=threadcount) thread=0;
+            }
         }
     }
     dlgTFitProgress->setProgressMax(items+5);

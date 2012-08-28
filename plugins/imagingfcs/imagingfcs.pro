@@ -44,7 +44,8 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcsseriesdialog.h \
     qfrdrimagingfcscopydataselectdialog.h \
     ../interfaces/qfrdrimageselectioninterface.h \
-    ../base_classes/qfrdroverviewimagedisplay.h
+    ../base_classes/qfrdroverviewimagedisplay.h \
+    ../interfaces/qfrdrrunselection.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \

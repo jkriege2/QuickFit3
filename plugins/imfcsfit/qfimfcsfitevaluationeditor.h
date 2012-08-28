@@ -81,6 +81,7 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         QComboBox* cmbWeights;
 
         QCheckBox* chkDontSaveFitResultMessage;
+        QCheckBox* chkLeaveoutMasked;
 
 
 
@@ -111,6 +112,8 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
 
 
         void dontSaveFitResultMessageChanged(bool checked);
+        void leavoutMasked(bool checked);
+
 
     private:
         /** \brief create all widgets on the form */
