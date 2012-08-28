@@ -107,6 +107,10 @@ SUBDIRS += plg_numberandbrightness
 plg_numberandbrightness.subdir=./plugins/numberandbrightness
 plg_numberandbrightness.depends = lib libqf3widgets
 
+SUBDIRS += plg_spim_lightsheet_eval
+plg_spim_lightsheet_eval.subdir=./plugins/spim_lightsheet_eval
+plg_spim_lightsheet_eval.depends = lib libqf3widgets
+
 
 
 !macx {

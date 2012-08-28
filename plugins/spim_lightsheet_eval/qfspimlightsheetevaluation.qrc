@@ -1,0 +1,9 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="spim_lightsheet_eval/qfspimlightsheetevaluation.png">./images/qfspimlightsheetevaluation.png</file>
+    <file alias="spim_lightsheet_eval/qfspimlightsheetevaluation_small.png">./images/qfspimlightsheetevaluation_small.png</file>
+    <file alias="spim_lightsheet_eval/qfeval_savereport.png">./images/qfspimlightsheetevaluation_save.png</file>
+    <file alias="spim_lightsheet_eval/qfeval_printreport.png">./images/qfspimlightsheetevaluation_print.png</file>
+    <file alias="spim_lightsheet_eval/qfspimlightsheetevaluation_evaluate.png">./images/qfspimlightsheetevaluation_evaluate.png</file>
+</qresource>
+</RCC>
