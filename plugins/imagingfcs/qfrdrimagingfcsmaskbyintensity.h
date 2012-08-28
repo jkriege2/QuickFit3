@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "jkqtpimageelements.h"
 #include "jkqtpimagetools.h"
+#include "qfrdrimagingfcs_data.h"
 
 namespace Ui {
     class QFRDRImagingFCSMaskByIntensity;
@@ -21,12 +22,13 @@ class QFRDRImagingFCSMaskByIntensity : public QDialog
         explicit QFRDRImagingFCSMaskByIntensity(QWidget *parent = 0);
         ~QFRDRImagingFCSMaskByIntensity();
 
-        void init(bool* mask, double* image, uint16_t width, uint16_t height);
+        void init(bool* mask, double* image, uint16_t width, uint16_t height, int dualView);
 
         int getMaskMode() const;
 
     protected slots:
         void updateMask();
+        void updateDualView();
         
     private:
         Ui::QFRDRImagingFCSMaskByIntensity *ui;

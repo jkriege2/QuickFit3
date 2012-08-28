@@ -1476,7 +1476,7 @@ void QFRDRImagingFCSImageEditor::excludeByImage(double* imageIn) {
             mask[i]=false;
             image[i]=imageIn[i];
         }
-        dialog->init(mask, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        dialog->init(mask, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), cmbDualView->currentIndex());
         if (dialog->exec()==QDialog::Accepted) {
             if (dialog->getMaskMode()==2) {
                 bool* newMask=m->maskGet();
