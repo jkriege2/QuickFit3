@@ -23,6 +23,15 @@ class QFSPIMLightsheetEvaluationItem : public QFEvaluationItem {
         /** Default destructor */
         virtual ~QFSPIMLightsheetEvaluationItem();
 
+        enum Models {
+            Gaussian=0
+        };
+
+        enum Orientation{
+            fitRows,
+            fitColumns
+        };
+
         /** \brief return type (short type string) */
         virtual QString getType() const { return QString("spim_lightsheet_eval"); };
         /** \brief return type (longer type string, user readable) */
@@ -44,15 +53,16 @@ class QFSPIMLightsheetEvaluationItem : public QFEvaluationItem {
 
         
         /** \breif return \c true if an evaluation has been performed for the given record \a r1 */
-        bool hasEvaluation(QFRawDataRecord* r1, int stack, int channel=-1);
+        bool hasEvaluation(QFRawDataRecord* r1, int stack, int channel=-1) const;
 
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
-        QString getEvaluationResultID(int stack, int channel=-1);
+        QString getEvaluationResultID(int stack, int channel=-1) const;
 
 
-    protected:
+        void doEvaluation(QFRawDataRecord *record, int stack, int stack_pos, int channel, double deltaX, double deltaY, Orientation orientation=fitRows, Models model=Gaussian) const;
+protected:
         
         /** \brief write object contents into XML file
          *

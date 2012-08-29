@@ -92,10 +92,7 @@ class QFSPIMLightsheetEvaluationEditor : public QFEvaluationEditor {
         void displayPreview();
         /** \brief display the current evaluation results */
         void displayEvaluationResults();
-        /** \brief save a report of the evaluation results */
-        void saveReport();
-        /** \brief print a report of the evaluation results */
-        void printReport();
+
 
 
 };

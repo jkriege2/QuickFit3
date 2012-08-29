@@ -49,9 +49,6 @@ QFSPIMLightsheetEvaluationEditor::QFSPIMLightsheetEvaluationEditor(QFPluginServi
 
 
 
-
-
-
     
     // create progress dialog for evaluation
     dlgEvaluationProgress=new QProgressDialog(NULL);
@@ -240,6 +237,7 @@ void QFSPIMLightsheetEvaluationEditor::on_spinDeltaZ_valueChanged(double value) 
     displayPreview();
 }
 
+
 void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, double y, Qt::KeyboardModifiers modifiers, Qt::MouseButton button) {
     if (!current) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
@@ -419,31 +417,6 @@ void QFSPIMLightsheetEvaluationEditor::displayPreview() {
 }
 
 
-void QFSPIMLightsheetEvaluationEditor::doEvaluation(QFRawDataRecord* record) {
-    QApplication::processEvents();
-    QApplication::processEvents();
-
-    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record); //if (!data) return;
-    QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-
-    if (!eval) return;
-    
-    if (dlgEvaluationProgress->wasCanceled()) return; // canceled by user ?
-
-    /*
-        DO YOUR EVALUATION HERE
-    */
-    /*
-
-    services->log_text(tr("evaluation complete\n"));
-    
-    // write back fit results to record!
-    record->disableEmitResultsChanged();
-    record->resultsSetBoolean(eval->getEvaluationResultID(), "evaluation_completed", true);
-    record->enableEmitResultsChanged();
-    emit resultsChanged();
-    */
-}
 
 
 
@@ -563,57 +536,51 @@ void QFSPIMLightsheetEvaluationEditor::createReportDoc(QTextDocument* document) 
 
 }
 
-void QFSPIMLightsheetEvaluationEditor::saveReport() {
-    /* it is often a good idea to have a possibility to save or print a report about the fit results.
-       This is implemented in a generic way here.    */
 
-    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
-                                currentSaveDirectory,
-                                tr("PDF File (*.pdf);;PostScript File (*.ps)"));
 
-    if (!fn.isEmpty()) {
-        currentSaveDirectory=QFileInfo(fn).absolutePath();
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-        QFileInfo fi(fn);
-        QPrinter* printer=new QPrinter();
-        printer->setPaperSize(QPrinter::A4);
-        printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-        printer->setOrientation(QPrinter::Portrait);
-        printer->setOutputFormat(QPrinter::PdfFormat);
-        if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
-        printer->setOutputFileName(fn);
-        QTextDocument* doc=new QTextDocument();
-        doc->setTextWidth(printer->pageRect().size().width());
-        createReportDoc(doc);
-        doc->print(printer);
-        delete doc;
-        delete printer;
-        QApplication::restoreOverrideCursor();
+
+
+
+
+
+
+
+
+
+void QFSPIMLightsheetEvaluationEditor::doEvaluation(QFRawDataRecord *record) {
+    if (!current) return;
+    QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    int stack=ui->cmbStack->currentIndex();
+
+    if ((!record)||(!eval)||(!data)) return;
+
+    dlgEvaluationProgress->setRange(0,data->getImageStackChannels(stack)*data->getImageStackFrames(stack));
+    dlgEvaluationProgress->setLabelText(tr("evaluating '%1' ... ").arg(record->getName()));
+    dlgEvaluationProgress->setValue(0);
+
+    for (int channel=0; channel<data->getImageStackChannels(stack); channel++) {
+        QFSPIMLightsheetEvaluationItem::Orientation o=QFSPIMLightsheetEvaluationItem::fitRows;
+        if (ui->cmbOrientation->currentIndex()==1) o=QFSPIMLightsheetEvaluationItem::fitColumns;
+
+        QFSPIMLightsheetEvaluationItem::Models m=QFSPIMLightsheetEvaluationItem::Gaussian;
+
+        for (int stackpos=0; stackpos<data->getImageStackFrames(stack); stackpos++) {
+            if (dlgEvaluationProgress) {
+                dlgEvaluationProgress->setLabelText(tr("evaluating '%1', ch.%2, z=%3 ... ").arg(record->getName()).arg(channel).arg(stackpos));
+                dlgEvaluationProgress->setValue(channel*data->getImageStackFrames(stack)+stackpos);
+                QApplication::processEvents();
+            }
+            eval->doEvaluation(record, stack, stackpos, channel, ui->spinDeltaX->value(), ui->spinDeltaZ->value(), o, m);
+            if (dlgEvaluationProgress) {
+                QApplication::processEvents();
+                if (dlgEvaluationProgress->wasCanceled()) break;
+            }
+        }
+        if (dlgEvaluationProgress) {
+            if (dlgEvaluationProgress->wasCanceled()) break;
+        }
     }
+
 }
-
-void QFSPIMLightsheetEvaluationEditor::printReport() {
-    /* it is often a good idea to have a possibility to save or print a report about the fit results.
-       This is implemented in a generic way here.    */
-    QPrinter* p=new QPrinter();
-
-    p->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-    p->setOrientation(QPrinter::Portrait);
-    QPrintDialog *dialog = new QPrintDialog(p, this);
-    dialog->setWindowTitle(tr("Print Report"));
-    if (dialog->exec() != QDialog::Accepted) {
-        delete p;
-        return;
-    }
-
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QTextDocument* doc=new QTextDocument();
-    doc->setTextWidth(p->pageRect().size().width());
-    createReportDoc(doc);
-    doc->print(p);
-    delete p;
-    delete doc;
-    QApplication::restoreOverrideCursor();
-}
-
