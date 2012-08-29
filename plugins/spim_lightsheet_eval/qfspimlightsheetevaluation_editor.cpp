@@ -34,6 +34,9 @@ QFSPIMLightsheetEvaluationEditor::QFSPIMLightsheetEvaluationEditor(QFPluginServi
     ui->pltBeamPos->get_plotter()->get_xAxis()->set_axisLabel(tr("lightsheet position [µm]"));
     ui->pltBeamPosDifference->get_plotter()->get_xAxis()->set_axisLabel(tr("lightsheet position [µm]"));
     ui->pltBeamWidth->get_plotter()->get_xAxis()->set_axisLabel(tr("lightsheet position [µm]"));
+    ui->pltBeamPos->get_plotter()->get_yAxis()->set_axisLabel(tr("beam center position [µm]"));
+    ui->pltBeamPosDifference->get_plotter()->get_yAxis()->set_axisLabel(tr("beam center distance [µm]"));
+    ui->pltBeamWidth->get_plotter()->get_yAxis()->set_axisLabel(tr("lightsheet width [µm]"));
 
 
 
@@ -184,6 +187,8 @@ void QFSPIMLightsheetEvaluationEditor::updateStack() {
         ui->cmbAlgorithm->setCurrentAlgorithm(record->getProperty(eval->getEvaluationResultID(stack)+"_ALGORITHM", record->getProperty("ALGORITHM", ui->cmbAlgorithm->currentFitAlgorithmID()).toString()).toString());
         ui->spinWidthRangeMin->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_WIDTHRANGEMIN", 0).toDouble());
         ui->spinWidthRangeMax->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_WIDTHRANGEMAX", 5).toDouble());
+        ui->spinRangeMin->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_RANGEMIN", 0).toDouble());
+        ui->spinRangeMax->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_RANGEMAX", 128).toDouble());
 
         updatingData=oldUpdt;
     }
