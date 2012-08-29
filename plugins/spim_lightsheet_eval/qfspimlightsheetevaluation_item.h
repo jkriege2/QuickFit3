@@ -23,9 +23,6 @@ class QFSPIMLightsheetEvaluationItem : public QFEvaluationItem {
         /** Default destructor */
         virtual ~QFSPIMLightsheetEvaluationItem();
 
-        enum Models {
-            Gaussian=0
-        };
 
         enum Orientation{
             fitRows,
@@ -61,8 +58,8 @@ class QFSPIMLightsheetEvaluationItem : public QFEvaluationItem {
         QString getEvaluationResultID(int stack, int channel=-1) const;
 
 
-        void doEvaluation(QFRawDataRecord *record, int stack, int stack_pos, int channel, double deltaX, double deltaY, Orientation orientation=fitRows, Models model=Gaussian) const;
-protected:
+        void doEvaluation(QFRawDataRecord *record, int stack, int stack_pos, int channel, double deltaX, double deltaZ, QFFitFunction* model, QFFitAlgorithm* algorithm, Orientation orientation=fitRows) const;
+    protected:
         
         /** \brief write object contents into XML file
          *
@@ -74,5 +71,7 @@ protected:
         virtual void intReadData(QDomElement* e);
 
 };
+
+double QFSPIMLightsheetEvaluationItem_fGauss( double t, const double *p ) ;
 
 #endif // QFSPIMLIGHTSHEETEVALUATIONITEM_H

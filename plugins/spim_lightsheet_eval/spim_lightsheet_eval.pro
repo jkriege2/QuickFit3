@@ -6,7 +6,6 @@ DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
 include(../plugins.pri)
-include(../../extlibs/lmfit.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 include(../../libquickfitwidgets.pri)
@@ -42,4 +41,9 @@ CONFIG += exceptions rtti stl
 ASSETS_TESTDATA.files = ./assets/test_data/*.*
 ASSETS_TESTDATA.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/test_data/
 INSTALLS += ASSETS_TESTDATA
+
+
+SRC_DISTRIBUTED.files = $$HEADERS \
+                        $$SOURCES \
+                        $$FORMS
 

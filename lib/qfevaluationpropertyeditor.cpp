@@ -260,6 +260,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         compFilterResultsNot->setFilename("");
 
     }
+    if (tabMain->count()>2) tabMain->setCurrentIndex(1);
     checkHelpAvailable();
 }
 

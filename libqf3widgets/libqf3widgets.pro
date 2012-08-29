@@ -89,7 +89,10 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfacquisitionconfigcombobox.h \
     qfacquisitioncombobox.h \
     qfshutterconfigwidgetthread.h \
-    qffilterchangerconfigwidgetthread.h
+    qffilterchangerconfigwidgetthread.h \
+    qffitfunctioncombobox.h \
+    qffitalgorithmcombobox.h \
+    qffitfunctionplottools.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -143,7 +146,10 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfacquisitionconfigcombobox.cpp \
     qfacquisitioncombobox.cpp \
     qfshutterconfigwidgetthread.cpp \
-    qffilterchangerconfigwidgetthread.cpp
+    qffilterchangerconfigwidgetthread.cpp \
+    qffitfunctioncombobox.cpp \
+    qffitalgorithmcombobox.cpp \
+    qffitfunctionplottools.cpp
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \

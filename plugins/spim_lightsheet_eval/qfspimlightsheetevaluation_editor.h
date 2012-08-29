@@ -8,6 +8,9 @@
 #include "qfrdrimagestackinterface.h"
 #include "jkqtplotter.h"
 #include "jkqtpimageelements.h"
+#include "qffitfunctionmanager.h"
+#include "qffitalgorithmmanager.h"
+#include "qffitfunctionplottools.h"
 
 namespace Ui {
     class QFSPIMLightsheetEvaluationEditor;
@@ -37,9 +40,10 @@ class QFSPIMLightsheetEvaluationEditor : public QFEvaluationEditor {
 
         void on_cmbOrientation_currentIndexChanged(int index);
         void on_cmbModel_currentIndexChanged(int index);
+        void on_cmbAlgorithm_currentIndexChanged(int index);
         void on_spinDeltaX_valueChanged(double value);
         void on_spinDeltaZ_valueChanged(double value);
-        void on_pltImage_plotMouseClicked(double x, double y, Qt::KeyboardModifiers modifiers, Qt::MouseButton button);
+        void on_pltImage_plotMouseClicked(double x, double y, Qt::KeyboardModifiers modifiers=Qt::NoModifier, Qt::MouseButton button=Qt::LeftButton);
     protected:
 
         void prepareImagePlotter(JKQtPlotter *pltImage);
@@ -92,6 +96,11 @@ class QFSPIMLightsheetEvaluationEditor : public QFEvaluationEditor {
         void displayPreview();
         /** \brief display the current evaluation results */
         void displayEvaluationResults();
+
+        void paramChanged(int i);
+
+        void updateFitResultRanges();
+
 
 
 

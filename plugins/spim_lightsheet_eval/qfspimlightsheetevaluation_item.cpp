@@ -3,7 +3,6 @@
 #include "qfrdrimagestackinterface.h"
 #include "qftools.h"
 #include "statistics_tools.h"
-#include "lmcurve.h"
 #include <typeinfo>
 
 #include <QtGui>
@@ -71,16 +70,16 @@ QString QFSPIMLightsheetEvaluationItem::getEvaluationResultID(int stack, int cha
 
 
 
-double fGauss( double t, const double *p )
+/*double QFSPIMLightsheetEvaluationItem_fGauss( double t, const double *p )
 {
     const double offset=p[0];
     const double A=p[1];
     const double avg=p[2];
     const double var=p[3];
     return offset+A*exp(-2.0*(t-avg)*(t-avg)/var);
-}
+}*/
 
-void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int stack, int stack_pos, int channel, double deltaX, double deltaY, Orientation orientation, Models model) const {
+void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int stack, int stack_pos, int channel, double deltaX, double deltaZ, QFFitFunction* model, QFFitAlgorithm* algorithm, Orientation orientation) const {
     QString resultID=getEvaluationResultID(stack, channel);
     QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
     if (data) {
@@ -95,7 +94,7 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
             double* m=data->getImageStack(stack, stack_pos, channel);
             for (int x=0; x<w; x++) {
                 for (int y=0; y<h; y++) {
-                    img[x*h+w]=m[y*w+x];
+                    img[x*h+y]=m[y*w+x];
                 }
             }
             wi=h;
@@ -107,7 +106,17 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
             }
         }
 
-        QVector<double> offsets, amplitudes, avgs, widths;
+
+        QStringList paramIDs=model->getParameterIDs();
+        QList<QVector<double> > values, errors, avgValues;
+        QVector<bool> fitOK;
+        while (values.size()<paramIDs.size()) {
+            QVector<double> valEmpty;
+            values.append(valEmpty);
+            errors.append(valEmpty);
+            avgValues.append(valEmpty);
+        }
+
         double* dataX=(double*)malloc(wi*sizeof(double));
         double* dataY=(double*)malloc(wi*sizeof(double));
         for (int i=0; i<wi; i++) dataX[i]=i;
@@ -116,9 +125,11 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
                 dataY[i]=img[f*wi+i];
             }
 
-            lm_control_struct control=lm_control_double;
-            //control.maxcall=500;
-            lm_status_struct status;
+
+            int pcount=model->paramCount();
+            double* parIn=(double*)malloc(pcount*sizeof(double));
+            double* paramOut=(double*)malloc(pcount*sizeof(double));
+            double* paramErrOut=(double*)malloc(pcount*sizeof(double));
 
             double par[4];
             long long maxpos=0;
@@ -126,83 +137,75 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
             par[1]=fabs(statisticsMax(dataY, wi, &maxpos)-par[0]);
             par[2]=maxpos;
             par[3]=double(wi)/10.0;
-            qDebug()<<f<<": offset="<<par[0]<<" A="<<par[1]<<" pos="<<par[2]<<" width="<<par[3];
-            lmcurve_fit(4, par, wi, dataX, dataY, fGauss, &control, &status);
-            offsets.append(par[0]);
+
+            for (int i=0; i<paramIDs.size(); i++) {
+                QFFitFunction::ParameterDescription d=model->getDescription(paramIDs[i]);
+                parIn[i]=d.initialValue;
+                if (paramIDs[i].toUpper()=="OFFSET") parIn[i]=par[0];
+                if (paramIDs[i].toUpper()=="AMPLITUDE") parIn[i]=par[1];
+                if (paramIDs[i].toUpper()=="POSITION") parIn[i]=par[2];
+                if (paramIDs[i].toUpper()=="WIDTH") parIn[i]=par[3];
+
+            }
+
+
+            //lmcurve_fit(4, par, wi, dataX, dataY, QFSPIMLightsheetEvaluationItem_fGauss, &control, &status);
+
+            QFFitAlgorithm::FitResult res=algorithm->fit(paramOut, paramErrOut, dataX, dataY, NULL, wi, model, parIn);
+            fitOK.append(res.fitOK);
+
+            //qDebug()<<f<<res.fitOK<<": offset="<<paramOut[0]<<" A="<<paramOut[1]<<" pos="<<paramOut[2]<<" width="<<paramOut[3];
+
+            for (int i=0; i<paramIDs.size(); i++) {
+                values[i].append(paramOut[i]);
+                errors[i].append(paramErrOut[i]);
+                if (res.fitOK) avgValues[i].append(paramOut[i]);
+            }
+            /*offsets.append(par[0]);
             amplitudes.append(par[1]);
             avgs.append(par[2]);
-            widths.append(sqrt(par[3]));
+            //widths.append(sqrt(par[3]));
+            widths.append(par[3]);*/
+
+            free(parIn);
+            free(paramOut);
+            free(paramErrOut);
         }
 
         QString param;
         QString group=QString("fit_results");
-        qDebug()<<"writing data to record ...";
+        //qDebug()<<"writing data to record ...";
 
-        record->resultsSetNumberList(resultID, param=QString("offset_frame%1").arg(stack_pos), offsets);
-        qDebug()<<1;
-        record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), true);
-        qDebug()<<2;
-        record->resultsSetNumberList(resultID, param=QString("amplitude_frame%1").arg(stack_pos), amplitudes);
-        qDebug()<<3;
-        record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), true);
-        qDebug()<<4;
-        record->resultsSetNumberList(resultID, param=QString("averagepos_frame%1").arg(stack_pos), avgs, tr("pix"));
-        qDebug()<<5;
-        record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), true);
-        qDebug()<<6;
-        record->resultsSetNumberList(resultID, param=QString("width_frame%1").arg(stack_pos), widths, tr("pix"));
-        qDebug()<<7;
-        record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), true);
-        qDebug()<<8;
+        record->resultsSetBooleanList(resultID, param=QString("fitok_frame%1").arg(stack_pos), fitOK);
+        record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, param, "", false);
+        for (int i=0; i<paramIDs.size(); i++) {
+            QFFitFunction::ParameterDescription d=model->getDescription(paramIDs[i]);
+            record->resultsSetNumberErrorList(resultID, param=QString("%2_frame%1").arg(stack_pos).arg(paramIDs[i]), values[i], errors[i], d.unit);
+            record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, QString("%2, frame%1").arg(stack_pos).arg(d.name), QString("%2, frame %1").arg(stack_pos).arg(d.label), true);
 
-        double v=0;
-        double m=qfstatisticsAverageVariance(v, offsets);
-        qDebug()<<9;
-        record->resultsSetInNumberErrorList(resultID, param="offset", stack_pos, m, v, "");
-        qDebug()<<10;
-        record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), true);
-        qDebug()<<11;
-        v=0;
-        m=qfstatisticsAverageVariance(v, amplitudes);
-        record->resultsSetInNumberErrorList(resultID, param="amplitude", stack_pos, m, v, "");
-        record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), true);
-        qDebug()<<12;
-        v=0;
-        m=qfstatisticsAverageVariance(v, avgs);
-        record->resultsSetInNumberErrorList(resultID, param="averagepos", stack_pos, m, v, "pix");
-        record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), true);
-        qDebug()<<13;
-        v=0;
-        m=qfstatisticsAverageVariance(v, widths);
-        record->resultsSetInNumberErrorList(resultID, param="width", stack_pos, m, v, "pix");
-        record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), true);
-        qDebug()<<14;
+            double v=0;
+            double m=qfstatisticsAverageVariance(v, avgValues[i]);
+            record->resultsSetInNumberErrorList(resultID, param=paramIDs[i], stack_pos, m, v, "");
+            record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, d.name, d.label, true);
 
-        for (int i=0; i<avgs.size(); i++) {
-            avgs[i]=avgs[i]*deltaX/1000.0;
+            if ((paramIDs[i].toUpper()=="POSITION")||(paramIDs[i].toUpper()=="WIDTH")) {
+                record->resultsSetInNumberErrorList(resultID, param=paramIDs[i]+QString("_um"), stack_pos, m*deltaX/1000.0, v*deltaX/1000.0, "micron");
+                record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, d.name, d.label, true);
+            }
+
+
         }
-        for (int i=0; i<widths.size(); i++) {
-            widths[i]=widths[i]*deltaX/1000.0;
-        }
-        qDebug()<<15;
-        v=0;
-        m=qfstatisticsAverageVariance(v, avgs);
-        record->resultsSetInNumberErrorList(resultID, param="averagepos_um", stack_pos, m, v, "micron");
-        record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), true);
-        qDebug()<<16;
-        v=0;
-        m=qfstatisticsAverageVariance(v, widths);
-        record->resultsSetInNumberErrorList(resultID, param="width_um", stack_pos, m, v, "micron");
-        record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), true);
-        qDebug()<<17;
-
-
 
         group=QString("fit_properties");
 
-        record->resultsSetString(resultID, param=QString("fit_model"), "gaussian");
+        record->resultsSetString(resultID, param=QString("fit_model"), model->id());
         record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), false);
-        qDebug()<<18;
+        record->resultsSetString(resultID, param=QString("fit_algorithm"), algorithm->id());
+        record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), false);
+        record->resultsSetNumber(resultID, param=QString("deltax"), deltaX, QString("nm"));
+        record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), false);
+        record->resultsSetNumber(resultID, param=QString("deltaz"), deltaZ, QString("nm"));
+        record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), false);
 
         if (orientation==QFSPIMLightsheetEvaluationItem::fitColumns)    {
             record->resultsSetString(resultID, param=QString("fit_orientation"), "fit_columns");
@@ -210,14 +213,9 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
             record->resultsSetString(resultID, param=QString("fit_orientation"), "fit_rows");
         }
         record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), false);
-        qDebug()<<19;
         free(dataX);
-        qDebug()<<20;
         free(dataY);
-        qDebug()<<21;
         free(img);
-        qDebug()<<22;
-        qDebug()<<"data written to record!";
     }
 }
 

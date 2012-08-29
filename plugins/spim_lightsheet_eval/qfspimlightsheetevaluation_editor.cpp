@@ -20,12 +20,20 @@ QFSPIMLightsheetEvaluationEditor::QFSPIMLightsheetEvaluationEditor(QFPluginServi
 
     // setup widgets
     ui->setupUi(this);
+    ui->cmbModel->updateFitFunctions("lightsheet_");
+
+    ui->cmbModel->setCurrentFitFunction("lightsheet_gaussian");
+    ui->cmbAlgorithm->setCurrentAlgorithm("fit_lmfit");
 
     ui->pltFit->get_plotter()->get_xAxis()->set_axisLabel(tr("position [µm]"));
     ui->pltFit->get_plotter()->get_yAxis()->set_axisLabel(tr("intensity [A.U.]"));
     ui->pltFit->get_plotter()->set_plotLabel(tr("image frame cut and fit"));
     ui->pltImage->get_plotter()->set_plotLabel(tr("image frame"));
 
+    ui->pltParam->get_plotter()->get_xAxis()->set_axisLabel(tr("lightsheet position [µm]"));
+    ui->pltBeamPos->get_plotter()->get_xAxis()->set_axisLabel(tr("lightsheet position [µm]"));
+    ui->pltBeamPosDifference->get_plotter()->get_xAxis()->set_axisLabel(tr("lightsheet position [µm]"));
+    ui->pltBeamWidth->get_plotter()->get_xAxis()->set_axisLabel(tr("lightsheet position [µm]"));
 
 
 
@@ -60,6 +68,8 @@ QFSPIMLightsheetEvaluationEditor::QFSPIMLightsheetEvaluationEditor(QFPluginServi
     connect(ui->btnEvaluateCurrent, SIGNAL(clicked()), this, SLOT(evaluateCurrent()));
     
     updatingData=false;
+
+    ui->tabWidget->setCurrentIndex(0);
 }
 
 QFSPIMLightsheetEvaluationEditor::~QFSPIMLightsheetEvaluationEditor()
@@ -163,14 +173,17 @@ void QFSPIMLightsheetEvaluationEditor::updateStack() {
         }
         ui->cmbChannel->setCurrentIndex(0);
 
-        ui->spinStackPos->setRange(0, data->getImageStackFrames(stack));
-        ui->horizontalScrollBar->setRange(0, data->getImageStackFrames(stack));
+        ui->spinStackPos->setRange(0, data->getImageStackFrames(stack)-1);
+        ui->horizontalScrollBar->setRange(0, data->getImageStackFrames(stack)-1);
         ui->spinStackPos->setValue(0);
 
         ui->spinDeltaX->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_DELTAX", record->getProperty("PIXEL_WIDTH", ui->spinDeltaX->value()).toDouble()).toDouble());
         ui->spinDeltaZ->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_DELTAZ", record->getProperty("DELTAZ", ui->spinDeltaZ->value()).toDouble()).toDouble());
         ui->cmbOrientation->setCurrentIndex(record->getProperty(eval->getEvaluationResultID(stack)+"_ORIENTATION", record->getProperty("ORIENTATION", ui->cmbOrientation->currentIndex()).toInt()).toInt());
-        ui->cmbModel->setCurrentIndex(record->getProperty(eval->getEvaluationResultID(stack)+"_MODEL", record->getProperty("MODEL", ui->cmbModel->currentIndex()).toInt()).toInt());
+        ui->cmbModel->setCurrentFitFunction(record->getProperty(eval->getEvaluationResultID(stack)+"_MODEL", record->getProperty("MODEL", ui->cmbModel->currentFitFunctionID()).toString()).toString());
+        ui->cmbAlgorithm->setCurrentAlgorithm(record->getProperty(eval->getEvaluationResultID(stack)+"_ALGORITHM", record->getProperty("ALGORITHM", ui->cmbAlgorithm->currentFitAlgorithmID()).toString()).toString());
+        ui->spinWidthRangeMin->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_WIDTHRANGEMIN", 0).toDouble());
+        ui->spinWidthRangeMax->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_WIDTHRANGEMAX", 5).toDouble());
 
         updatingData=oldUpdt;
     }
@@ -203,12 +216,24 @@ void QFSPIMLightsheetEvaluationEditor::on_cmbModel_currentIndexChanged(int index
     int stack=ui->cmbStack->currentIndex();
 
     if (data && eval) {
-        record->setQFProperty(eval->getEvaluationResultID(stack)+"_MODEL", index, false, false);
+        record->setQFProperty(eval->getEvaluationResultID(stack)+"_MODEL", ui->cmbModel->currentFitFunctionID(), false, false);
     }
     displayEvaluationResults();
     displayPreview();
 }
 
+void QFSPIMLightsheetEvaluationEditor::on_cmbAlgorithm_currentIndexChanged(int index)
+{
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    int stack=ui->cmbStack->currentIndex();
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID(stack)+"_ALGORITHM", ui->cmbAlgorithm->currentFitAlgorithmID(), false, false);
+    }
+}
 void QFSPIMLightsheetEvaluationEditor::on_spinDeltaX_valueChanged(double value) {
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
@@ -242,9 +267,11 @@ void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, do
     if (!current) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
     QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
+    int channel=ui->cmbChannel->currentIndex();
+    int stack_pos=ui->spinStackPos->value();
+    QString resultID=eval->getEvaluationResultID(stack, channel);
 
     if ((!record)||(!eval)||(!data)) return;
 
@@ -256,7 +283,7 @@ void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, do
     ui->pltImage->set_doDrawing(false);
     ui->pltFit->set_doDrawing(false);
 
-    double* img=data->getImageStack(stack, ui->spinStackPos->value(), ui->cmbChannel->currentIndex());
+    double* img=data->getImageStack(stack, stack_pos, ui->cmbChannel->currentIndex());
     int w=data->getImageStackWidth(stack);
     int h=data->getImageStackHeight(stack);
     JKQTPdatastore* ds=ui->pltFit->getDatastore();
@@ -269,6 +296,7 @@ void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, do
     plteLineFitData->set_drawLine(true);
     plteLineFitData->set_symbol(JKQTPcross);
     plteLineFitData->set_symbolSize(5);
+    plteLineFitData->set_xErrorStyle(JKQTPnoError);
     plteLineFitData->set_yErrorStyle(JKQTPerrorPolygons);
     ui->pltFit->addGraph(plteLineFitData);
 
@@ -279,13 +307,15 @@ void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, do
     plteLineFit->set_symbol(JKQTPnoSymbol);
     ui->pltFit->addGraph(plteLineFit);
 
+    int item=-1;
     if(img) {
         if (ui->cmbOrientation->currentIndex()==0) {
             markDataX[0]=0;
             markDataX[1]=w;
             markDataY[0]=markDataY[1]=round(y);
+            item=(int)round(y);
             int c_x=ds->addLinearColumn(w, 0, double(w)*ui->spinDeltaX->value()/1000.0, "dataX");
-            int c_y=ds->addCopiedColumn(&(img[(int)round(y)*w]), w, "dataY");
+            int c_y=ds->addCopiedColumn(&(img[item*w]), w, "dataY");
             plteLineFitData->set_xColumn(c_x);
             plteLineFitData->set_yColumn(c_y);
             plteLineFitData->set_xErrorColumn(-1);
@@ -296,10 +326,11 @@ void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, do
             markDataY[1]=h;
             markDataX[0]=markDataX[1]=round(x);
 
+            item=(int)round(x);
             int c_x=ds->addLinearColumn(h, 0, double(h)*ui->spinDeltaX->value()/1000.0, "dataX");
             double* data=(double*)malloc(h*sizeof(double));
             for (int yy=0; yy<h; yy++) {
-                data[yy]=img[yy*w+(int)round(x)];
+                data[yy]=img[yy*w+item];
             }
             int c_y=ds->addCopiedColumn(data, h, "dataY");
             plteLineFitData->set_xColumn(c_x);
@@ -310,7 +341,47 @@ void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, do
         }
     }
 
+    QString param;
+    if (item>=0 && record->resultsExists(resultID, param=QString("fitok_frame%1").arg(stack_pos))) {
+        bool fitOK=record->resultsGetInBooleanList(resultID, param, item, false);
+        QString modelID=record->resultsGetAsString(resultID, param=QString("fit_model"));
+        QFFitFunction* model=QFFitFunctionManager::getInstance()->createFunction(modelID, this);
+        if (fitOK && model) {
+            QStringList paramIDs=model->getParameterIDs();
+            int pcount=model->paramCount();
+            QVector<double> params;
+            QString parTxt="";
+            for (int i=0; i<paramIDs.size(); i++) {
+                QFFitFunction::ParameterDescription d=model->getDescription(paramIDs[i]);
+                double v=record->resultsGetInNumberList(resultID, param=QString("%2_frame%1").arg(stack_pos).arg(paramIDs[i]), item, d.initialValue);
+                double e=record->resultsGetErrorInNumberErrorList(resultID, param=QString("%2_frame%1").arg(stack_pos).arg(paramIDs[i]), item, 0);
+                params.append(v);
+                parTxt+=QString("<tr>")+QString("<td><i>%1</i></td><td>%2</td><td>%3</td><td>%4</td>").arg(d.label).arg(v).arg(e).arg(d.unitLabel);
+                if (paramIDs[i].toUpper()=="POSITION" || paramIDs[i].toUpper()=="WIDTH") {
+                    parTxt+=QString("<td><i>%1</i></td><td>%2</td><td>&mu;m</td>").arg(v*ui->spinDeltaX->value()/1000.0).arg(e*ui->spinDeltaX->value()/1000.0);
+                }
+                parTxt+=QString("</tr>");
+            }
+            JKQTPxQFFitFunctionLineGraph* lg=new JKQTPxQFFitFunctionLineGraph(ui->pltFit->get_plotter());
+            lg->set_paramsVector(params);
+            lg->set_fitFunction(model, true);
+            lg->set_drawLine(true);
+            lg->set_lineWidth(2);
+            lg->set_scaleX(ui->spinDeltaX->value()/1000.0);
+            ui->pltFit->addGraph(lg);
 
+            QString fitResults=tr("<ul><li>model: <b>%1</b></li><li>fit OK: <b>%3</b></li><li>parameters:<br><table border=\"1\" cellpadding=\"1\"><tr><th>parameter</th><th>value</th><th>error</th><th></th></tr>%2</table></li></ul>").arg(model->name()).arg(parTxt).arg(boolToQString(fitOK));
+
+            ui->labFitResults->setText(fitResults);
+        } else {
+            if (!model) ui->labFitResults->setText(tr("no fit available"));
+            if (!fitOK) ui->labFitResults->setText(tr("fit did not succeed!"));
+            if (model) delete model;
+
+        }
+    } else {
+        ui->labFitResults->setText(tr("no fit available"));
+    }
 
     ui->pltImage->zoomToFit();
     ui->pltFit->zoomToFit();
@@ -328,7 +399,6 @@ void QFSPIMLightsheetEvaluationEditor::highlightingChanged(QFRawDataRecord* form
     // this slot is called when the user selects a new record in the raw data record list on the RHS of this widget in the evaluation dialog
     
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
     QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(currentRecord);
     disconnect(formerRecord, SIGNAL(rawDataChanged()), this, SLOT(displayPreview()));
 
@@ -359,27 +429,263 @@ void QFSPIMLightsheetEvaluationEditor::highlightingChanged(QFRawDataRecord* form
 
 void QFSPIMLightsheetEvaluationEditor::displayEvaluationResults() {
     if (!current) return;
-    QFRawDataRecord* record=current->getHighlightedRecord(); 
-    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
+    QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    if ((!record)||(!eval)/*||(!data)*/) return;
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    int stack=ui->cmbStack->currentIndex();
 
-    /*if (eval->hasEvaluation(record)) {
-        if (record->resultsExists(eval->getEvaluationResultID(), "evaluation_completed")) {
-            ui->labResults->setText(tr("<b>Results:</b><br>evaluation_completed = %1").arg(record->resultsGetAsString(eval->getEvaluationResultID(), "evaluation_completed")));
-        } else {
-            ui->labResults->setText(tr("<b>NO RESULTS STORED</b>"));
+    if ((!record)||(!eval)||(!data)) return;
+
+    bool upd=updatesEnabled();
+    setUpdatesEnabled(false);
+    bool updP=ui->pltParam->get_doDrawing();
+    bool updB=ui->pltBeamPos->get_doDrawing();
+    bool updD=ui->pltBeamPosDifference->get_doDrawing();
+    bool updW=ui->pltBeamWidth->get_doDrawing();
+    ui->pltParam->set_doDrawing(false);
+    ui->pltBeamPos->set_doDrawing(false);
+    ui->pltBeamPosDifference->set_doDrawing(false);
+    ui->pltBeamWidth->set_doDrawing(false);
+
+    ui->pltParam->clearGraphs();
+    ui->pltParam->getDatastore()->clear();
+    JKQTPdatastore* ds=ui->pltParam->getDatastore();
+
+    ui->pltBeamPos->clearGraphs();
+    ui->pltBeamPos->get_plotter()->useExternalDatastore(ds);
+    ui->pltBeamPosDifference->clearGraphs();
+    ui->pltBeamPosDifference->get_plotter()->useExternalDatastore(ds);
+    ui->pltBeamWidth->clearGraphs();
+    ui->pltBeamWidth->get_plotter()->useExternalDatastore(ds);
+
+
+    int z=data->getImageStackFrames(stack);
+    double deltaZ=ui->spinDeltaZ->value()/1000.0;
+    double deltaX=ui->spinDeltaX->value()/1000.0;
+    ui->cmbParameter->clear();
+
+
+    disconnect(ui->cmbParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(paramChanged(int)));
+
+    QString param;
+    int paramItem=-1;
+    QList<QVector<double> > posV, posE;
+    int c_X=ds->addLinearColumn(z, 0, double(z-1)*deltaZ, "lightsheet_pos");
+
+
+    ui->spinRangeMin->setRange(0, z*deltaZ);
+    ui->spinRangeMin->setValue(0);
+    ui->spinRangeMax->setRange(0, z*deltaZ);
+    ui->spinRangeMax->setValue(z*deltaZ);
+
+    updateFitResultRanges();
+
+
+    for (int channel=0; channel<ui->cmbChannel->count(); channel++) {
+        QString resultID=eval->getEvaluationResultID(stack, channel);
+        //qDebug()<<"checking fit model";
+        if (record->resultsExists(resultID, param=QString("fit_model"))) {
+            //qDebug()<<"has fit model";
+            QString modelID=record->resultsGetAsString(resultID, param);
+            QFFitFunction* model=QFFitFunctionManager::getInstance()->createFunction(modelID, this);
+            if (model) {
+                QStringList paramIDs=model->getParameterIDs();
+                int pcount=model->paramCount();
+                int c_WIDTH=-1;
+                int c_POSITION=-1;
+                int ce_WIDTH=-1;
+                int ce_POSITION=-1;
+                for (int i=0; i<paramIDs.size(); i++) {
+                    QFFitFunction::ParameterDescription d=model->getDescription(paramIDs[i]);
+
+
+
+                    QVector<double> v=record->resultsGetAsDoubleList(resultID, param=paramIDs[i]);
+                    QVector<double> e=record->resultsGetErrorAsDoubleList(resultID, param=paramIDs[i]);
+
+                    if (v.size()>0) {
+                        QString unit=d.unit;
+                        if (paramIDs[i].toUpper()=="POSITION" || paramIDs[i].toUpper()=="WIDTH") {
+                            for (int vi=0; vi<v.size(); vi++) {
+                                v[vi]=v[vi]*deltaX;
+                            }
+                            for (int vi=0; vi<e.size(); vi++) {
+                                e[vi]=e[vi]*deltaX;
+                            }
+                            unit=tr("micrometers");
+                        }
+
+                        int cv=ds->addCopiedColumn(v.data(), v.size(), paramIDs[i]);
+                        int ce=ds->addCopiedColumn(e.data(), e.size(), tr("%1_error").arg(paramIDs[i]));
+
+                        if (paramIDs[i].toUpper()=="POSITION") {
+                            c_POSITION=cv;
+                            ce_POSITION=ce;
+                            posV.append(v);
+                            posE.append(e);
+                        } else if (paramIDs[i].toUpper()=="WIDTH") {
+                            c_WIDTH=cv;
+                            ce_WIDTH=ce;
+                        } else {
+                            if (paramItem<0) paramItem=i;
+                        }
+
+                        QList<QVariant> md;
+                        md<<c_X<<cv<<ce;
+                        ui->cmbParameter->addItem(tr("%1, channel %2").arg(d.name).arg(channel), tr("%1 [%2]").arg(d.name).arg(unit));
+
+                        JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(ui->pltParam->get_plotter());
+                        g->set_xColumn(c_X);
+                        g->set_yColumn(cv);
+                        g->set_xErrorColumn(-1);
+                        g->set_yErrorColumn(ce);
+                        g->set_drawLine(false);
+                        g->set_yErrorStyle(JKQTPerrorBars);
+                        g->set_symbol(JKQTPcross);
+                        g->set_xErrorStyle(JKQTPnoError);
+                        g->set_visible(false);
+                        g->set_errorColor(g->get_color().darker());
+                        g->set_title(tr("%2, channel %1").arg(channel+1).arg(d.name));
+                        ui->pltParam->addGraph(g);
+                    }
+
+                }
+
+                JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(ui->pltBeamWidth->get_plotter());
+                g->set_xColumn(c_X);
+                g->set_yColumn(c_WIDTH);
+                g->set_xErrorColumn(-1);
+                g->set_yErrorColumn(ce_WIDTH);
+                g->set_drawLine(false);
+                g->set_yErrorStyle(JKQTPerrorBars);
+                g->set_symbol(JKQTPcross);
+                g->set_xErrorStyle(JKQTPnoError);
+                g->set_visible(true);
+                g->set_errorColor(g->get_color().darker());
+                g->set_title(tr("channel %1").arg(channel+1));
+                ui->pltBeamWidth->addGraph(g);
+
+                g=new JKQTPxyLineErrorGraph(ui->pltBeamPos->get_plotter());
+                g->set_xColumn(c_X);
+                g->set_yColumn(c_POSITION);
+                g->set_xErrorColumn(-1);
+                g->set_yErrorColumn(ce_POSITION);
+                g->set_drawLine(false);
+                g->set_yErrorStyle(JKQTPerrorBars);
+                g->set_symbol(JKQTPcross);
+                g->set_xErrorStyle(JKQTPnoError);
+                g->set_visible(true);
+                g->set_errorColor(g->get_color().darker());
+                g->set_title(tr("channel %1").arg(channel+1));
+                ui->pltBeamPos->addGraph(g);
+
+            }
         }
-    } else {
-        ui->labResults->setText(tr("<b>NO EVALUATION DONE YET</b>"));    
-    }*/
+    }
+
+
+    if (posV.size()>1) {
+        QVector<double> posD, posDE;
+        for (int i=0; i<qMin(posV[0].size(), posV[1].size()); i++) {
+            posD.append(posV[0].value(i,0)-posV[1].value(i,0));
+            posDE.append(sqrt(posE[0].value(i,0)*posE[0].value(i,0)+posE[1].value(i,0)*posE[1].value(i,0)));
+        }
+        int c_POSITIONDIST=ds->addCopiedColumn(posD.data(), posD.size(), tr("position_difference"));
+        int ce_POSITIONDIST=ds->addCopiedColumn(posDE.data(), posDE.size(), tr("position_difference_error"));
+
+        JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(ui->pltBeamPosDifference->get_plotter());
+        g->set_xColumn(c_X);
+        g->set_yColumn(c_POSITIONDIST);
+        g->set_xErrorColumn(-1);
+        g->set_yErrorColumn(ce_POSITIONDIST);
+        g->set_drawLine(false);
+        g->set_yErrorStyle(JKQTPerrorBars);
+        g->set_symbol(JKQTPcross);
+        g->set_errorColor(g->get_color().darker());
+        g->set_xErrorStyle(JKQTPnoError);
+        g->set_visible(true);
+        ui->pltBeamPosDifference->addGraph(g);
+    }
+
+    connect(ui->cmbParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(paramChanged(int)));
+    ui->cmbParameter->setCurrentIndex(paramItem);
+
+
+    ui->pltParam->zoomToFit();
+    ui->pltBeamPos->zoomToFit();
+    ui->pltBeamPosDifference->zoomToFit();
+    ui->pltBeamWidth->zoomToFit();
+    if (updP) {
+        ui->pltParam->set_doDrawing(true);
+        ui->pltParam->update_plot();
+    }
+    if (updB) {
+        ui->pltBeamPos->set_doDrawing(true);
+        ui->pltBeamPos->update_plot();
+    }
+    if (updD) {
+        ui->pltBeamPosDifference->set_doDrawing(true);
+        ui->pltBeamPosDifference->update_plot();
+    }
+    if (updW) {
+        ui->pltBeamWidth->set_doDrawing(true);
+        ui->pltBeamWidth->update_plot();
+    }
+    setUpdatesEnabled(upd);
+}
+
+void QFSPIMLightsheetEvaluationEditor::paramChanged(int i)
+{
+    //QList<QVariant> md=ui->cmbParameter->itemData(i).toList();
+
+
+    //md<<c_X<<cv<<ce;
+    if (updatingData) return;
+    ui->pltParam->getYAxis()->set_axisLabel(ui->cmbParameter->itemData(i).toString());
+    ui->pltParam->get_plotter()->setOnlyGraphVisible(i);
+    ui->pltParam->zoomToFit();
+    ui->pltParam->update_plot();
+}
+
+void QFSPIMLightsheetEvaluationEditor::updateFitResultRanges()
+{
+    if (updatingData) return;
+    ui->pltParam->setAbsoluteX(ui->spinRangeMin->value(), ui->spinRangeMax->value());
+    ui->pltParam->get_plotter()->setGraphsDataRange(ui->spinRangeMin->value()/(ui->spinDeltaZ->value()/1000.0), ui->spinRangeMax->value()/(ui->spinDeltaZ->value()/1000.0));
+    ui->pltParam->zoomToFit();
+    ui->pltParam->update_plot();
+
+    ui->pltBeamPos->setAbsoluteX(ui->spinRangeMin->value(), ui->spinRangeMax->value());
+    ui->pltBeamPos->get_plotter()->setGraphsDataRange(ui->spinRangeMin->value()/(ui->spinDeltaZ->value()/1000.0), ui->spinRangeMax->value()/(ui->spinDeltaZ->value()/1000.0));
+    ui->pltBeamPos->zoomToFit();
+    ui->pltBeamPos->update_plot();
+
+    ui->pltBeamPosDifference->setAbsoluteX(ui->spinRangeMin->value(), ui->spinRangeMax->value());
+    ui->pltBeamPosDifference->get_plotter()->setGraphsDataRange(ui->spinRangeMin->value()/(ui->spinDeltaZ->value()/1000.0), ui->spinRangeMax->value()/(ui->spinDeltaZ->value()/1000.0));
+    ui->pltBeamPosDifference->zoomToFit();
+    ui->pltBeamPosDifference->update_plot();
+
+    ui->pltBeamWidth->setAbsoluteX(ui->spinRangeMin->value(), ui->spinRangeMax->value());
+    ui->pltBeamWidth->setAbsoluteY(ui->spinWidthRangeMin->value(), ui->spinWidthRangeMax->value());
+    ui->pltBeamWidth->get_plotter()->setGraphsDataRange(ui->spinRangeMin->value()/(ui->spinDeltaZ->value()/1000.0), ui->spinRangeMax->value()/(ui->spinDeltaZ->value()/1000.0));
+    ui->pltBeamWidth->zoomToFit();
+    ui->pltBeamWidth->update_plot();
+
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    int stack=ui->cmbStack->currentIndex();
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID(stack)+"_WIDTHRANGEMIN", ui->spinWidthRangeMin->value(), false, false);
+        record->setQFProperty(eval->getEvaluationResultID(stack)+"_WIDTHRANGEMAX", ui->spinWidthRangeMax->value(), false, false);
+    }
 }
 
 void QFSPIMLightsheetEvaluationEditor::displayPreview() {
     if (!current) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
     QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
@@ -442,9 +748,11 @@ void QFSPIMLightsheetEvaluationEditor::evaluateCurrent() {
     // here we call doEvaluation to execute our evaluation for the current record only
     doEvaluation(record);
 
+    dlgEvaluationProgress->setLabelText(tr("updating user interface ..."));
     displayEvaluationResults();
     displayPreview();
     dlgEvaluationProgress->setValue(100);
+    dlgEvaluationProgress->close();
 
     QApplication::restoreOverrideCursor();
 }
@@ -479,9 +787,11 @@ void QFSPIMLightsheetEvaluationEditor::evaluateAll() {
         // check whether the user canceled this evaluation
         if (dlgEvaluationProgress->wasCanceled()) break;
     }
-    dlgEvaluationProgress->setValue(recs.size());
+    dlgEvaluationProgress->setLabelText(tr("updating user interface ..."));
     displayEvaluationResults();
     displayPreview();
+    dlgEvaluationProgress->setValue(recs.size());
+    dlgEvaluationProgress->close();
     QApplication::restoreOverrideCursor();
 }
 
@@ -560,27 +870,36 @@ void QFSPIMLightsheetEvaluationEditor::doEvaluation(QFRawDataRecord *record) {
     dlgEvaluationProgress->setLabelText(tr("evaluating '%1' ... ").arg(record->getName()));
     dlgEvaluationProgress->setValue(0);
 
+    QFFitAlgorithm* alg=ui->cmbAlgorithm->createCurrentInstance(this);
+    QFFitFunction* model=ui->cmbModel->createCurrentInstance(this);
+
     for (int channel=0; channel<data->getImageStackChannels(stack); channel++) {
         QFSPIMLightsheetEvaluationItem::Orientation o=QFSPIMLightsheetEvaluationItem::fitRows;
         if (ui->cmbOrientation->currentIndex()==1) o=QFSPIMLightsheetEvaluationItem::fitColumns;
-
-        QFSPIMLightsheetEvaluationItem::Models m=QFSPIMLightsheetEvaluationItem::Gaussian;
-
+        ui->cmbChannel->setCurrentIndex(channel);
         for (int stackpos=0; stackpos<data->getImageStackFrames(stack); stackpos++) {
             if (dlgEvaluationProgress) {
                 dlgEvaluationProgress->setLabelText(tr("evaluating '%1', ch.%2, z=%3 ... ").arg(record->getName()).arg(channel).arg(stackpos));
                 dlgEvaluationProgress->setValue(channel*data->getImageStackFrames(stack)+stackpos);
                 QApplication::processEvents();
             }
-            eval->doEvaluation(record, stack, stackpos, channel, ui->spinDeltaX->value(), ui->spinDeltaZ->value(), o, m);
+            eval->doEvaluation(record, stack, stackpos, channel, ui->spinDeltaX->value(), ui->spinDeltaZ->value(), model, alg, o);
             if (dlgEvaluationProgress) {
                 QApplication::processEvents();
                 if (dlgEvaluationProgress->wasCanceled()) break;
             }
+            lastMousePreviewX=data->getImageStackWidth(stack)/2;
+            lastMousePreviewY=data->getImageStackHeight(stack)/2;
+            ui->spinStackPos->setValue(stackpos);
+            //displayPreview();
+            displayEvaluationResults();
         }
         if (dlgEvaluationProgress) {
             if (dlgEvaluationProgress->wasCanceled()) break;
         }
     }
+
+    delete alg;
+    delete model;
 
 }
