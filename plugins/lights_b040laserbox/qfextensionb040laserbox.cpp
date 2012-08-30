@@ -11,7 +11,7 @@
 QFExtensionB040LaserBox::QFExtensionB040LaserBox(QObject* parent):
     QObject(parent)
 {
-	logService=NULL;
+    logService=NULL;
 }
 
 QFExtensionB040LaserBox::~QFExtensionB040LaserBox() {
