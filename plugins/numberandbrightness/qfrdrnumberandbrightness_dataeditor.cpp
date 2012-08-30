@@ -171,6 +171,7 @@ void QFRDRNumberAndBrightnessDataEditor::connectWidgets(QFRawDataRecord* current
     }
     QFRDRNumberAndBrightnessData* m=qobject_cast<QFRDRNumberAndBrightnessData*>(current); // check whether we have the right QFRawDataRecord class
     if (m) {
+        m->recalcNumberAndBrightness();
 		// if so (and if current!=NULL anyways), connect to the new record and read some data
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
         loadPlotSettings();

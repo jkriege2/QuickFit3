@@ -328,7 +328,6 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
             if (ok) leaveoutAddRun(lo);
             //qDebug()<<lo<<ok;
         }
-        recalcNumberAndBrightness();
 
         te=e->firstChildElement("selections");
         if (!te.isNull()) {
@@ -362,6 +361,7 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
 
     }
 
+    recalcNumberAndBrightness();
 }
 
 bool QFRDRNumberAndBrightnessData::loadFile(double *target, const QString &filename, QFRDRNumberAndBrightnessData::FileOperations op)
