@@ -152,6 +152,16 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         double *getBackgroundStatisticsT() const;
 
 
+        /** \brief return the number of datapoints in the Uncorrected statistics dataset */
+        uint32_t getUncorrectedStatisticsN() const;
+        /** \brief return the array of average values of the Uncorrected statsitics */
+        double* getUncorrectedStatisticsMean() const;
+        /** \brief return the array of standard deviation values of the Uncorrected statsitics */
+        double* getUncorrectedStatisticsStdDev() const;
+        double* getUncorrectedStatisticsMin() const;
+        double* getUncorrectedStatisticsMax() const;
+        /** \brief return the array of time points [seconds] for the Uncorrected  statsitics */
+        double *getUncorrectedStatisticsT() const;
 
 
 
@@ -213,12 +223,15 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief load the background statistics file */
         bool loadBackgroundStatistics(const QString& filename);
 
+        /** \brief load the uncorrected statistics file */
+        bool loadUncorrectedStatistics(const QString& filename);
+
         void loadQFPropertiesFromB040SPIMSettingsFile(QSettings& settings);
 
         double getTauMin() const;
 
     private:
-        DualViewMode m_dualview;
+        //DualViewMode m_dualview;
         /** \brief width of the image */
         int width;
         /** \brief height of the image */
@@ -258,6 +271,17 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         double* backStatT;
         double* backStatMin;
         double* backStatMax;
+
+        /** \brief uncorrected number of data points in the statistics  */
+        uint32_t ucStatN;
+        /** \brief uncorrected statistics: average vector */
+        double* ucStatAvg;
+        /** \brief uncorrected statistics: standard deviation vector */
+        double* ucStatStdDev;
+        /** \brief uncorrected statistics: time [seconds] vector */
+        double* ucStatT;
+        double* ucStatMin;
+        double* ucStatMax;
 
         bool hasStatistics;
         double statAvgCnt;
@@ -315,6 +339,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual void allocateContents(int x, int y, int N);
         void allocateStatistics(uint32_t N);
         void allocateBackgroundStatistics(uint32_t N);
+        void allocateUncorrectedStatistics(uint32_t N);
 
 
     public:

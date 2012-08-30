@@ -20,7 +20,7 @@
 QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     QFRawDataRecord(parent)
 {
-    m_dualview=QFRDRImagingFCSData::dvNone;
+    //m_dualview=QFRDRImagingFCSData::dvNone;
     correlations=NULL;
     correlationMean=NULL;
     correlationStdDev=NULL;
@@ -44,6 +44,12 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     backStatMax=NULL;
     backStatT=NULL;
     backStatN=0;
+    ucStatAvg=NULL;
+    ucStatStdDev=NULL;
+    ucStatMin=NULL;
+    ucStatMax=NULL;
+    ucStatT=NULL;
+    ucStatN=0;
     video=NULL;
     video_width=0;
     video_height=0;
@@ -160,10 +166,12 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
     width=getProperty("WIDTH", 0).toInt();
     height=getProperty("HEIGHT", 0).toInt();
     QString dv=getProperty("DUALVIEW_MODE", "none").toString().toLower();
+    /*
     m_dualview=QFRDRImagingFCSData::dvNone;
     if (dv=="none" || dv=="0" || dv=="n") m_dualview=QFRDRImagingFCSData::dvNone;
-    if (dv=="horizontal" || dv=="1" || dv=="h") m_dualview=QFRDRImagingFCSData::dvHorizontal;
-    if (dv=="vertical" || dv=="2" || dv=="v") m_dualview=QFRDRImagingFCSData::dvVertical;
+    if (dv=="horizontal" || dv=="1" || dv=="h" || dv=="horicontal") m_dualview=QFRDRImagingFCSData::dvHorizontal;
+    if (dv=="vertical" || dv=="2" || dv=="v" || dv=="vertikal") m_dualview=QFRDRImagingFCSData::dvVertical;
+*/
 
     QString filetype=getProperty("FILETYPE", "unknown").toString();
 
@@ -224,6 +232,8 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                 } else if (ft=="background_statistics") {
                     loadBackgroundStatistics(files[i]);
                     backStatAvgCnt=statisticsAverageVariance(backStatSigmaCnt, backStatAvg, backStatN);
+                } else if (ft=="uncorrected_statistics") {
+                    loadUncorrectedStatistics(files[i]);
                 } else if (ft=="video") {
                     loadVideo(files[i], &video, &video_width, &video_height, &video_frames);
                 } else if (ft=="background") {
@@ -823,14 +833,21 @@ double* QFRDRImagingFCSData::getCorrelationRunErrors() const {
 
 QFRDRImagingFCSData::DualViewMode QFRDRImagingFCSData::dualViewMode() const
 {
+    QString dv=getProperty("DUALVIEW_MODE", "none").toString().toLower();
+
+    QFRDRImagingFCSData::DualViewMode m_dualview=QFRDRImagingFCSData::dvNone;
+    if (dv=="none" || dv=="0" || dv=="n") m_dualview=QFRDRImagingFCSData::dvNone;
+    if (dv=="horizontal" || dv=="1" || dv=="h" || dv=="horicontal") m_dualview=QFRDRImagingFCSData::dvHorizontal;
+    if (dv=="vertical" || dv=="2" || dv=="v" || dv=="vertikal") m_dualview=QFRDRImagingFCSData::dvVertical;
+
     return m_dualview;
 }
 
 void QFRDRImagingFCSData::setDualViewMode(QFRDRImagingFCSData::DualViewMode mode)
 {
-    m_dualview=mode;
+    QFRDRImagingFCSData::DualViewMode m_dualview=mode;
     if (m_dualview==QFRDRImagingFCSData::dvNone) setQFProperty("DUALVIEW_MODE", "none", false);
-    if (m_dualview==QFRDRImagingFCSData::dvHorizontal) setQFProperty("DUALVIEW_MODE", "horizontal", false);
+    if (m_dualview==QFRDRImagingFCSData::dvHorizontal) setQFProperty("DUALVIEW_MODE", "horicontal", false);
     if (m_dualview==QFRDRImagingFCSData::dvVertical) setQFProperty("DUALVIEW_MODE", "vertical", false);
 }
 
@@ -927,6 +944,28 @@ void QFRDRImagingFCSData::allocateStatistics(uint32_t N) {
 #endif
 
 }
+
+void QFRDRImagingFCSData::allocateUncorrectedStatistics(uint32_t N) {
+    if (ucStatAvg) free(ucStatAvg);
+    if (ucStatStdDev) free(ucStatStdDev);
+    if (ucStatT) free(ucStatT);
+    if (ucStatMin) free(ucStatMin);
+    if (ucStatMax) free(ucStatMax);
+    ucStatN=N;
+    ucStatAvg=NULL;
+    ucStatT=NULL;
+    ucStatStdDev=NULL;
+    ucStatMin=NULL;
+    ucStatMax=NULL;
+    if (ucStatN>0) {
+        ucStatAvg=(double*)calloc(ucStatN, sizeof(double));
+        ucStatStdDev=(double*)calloc(ucStatN, sizeof(double));
+        ucStatMin=(double*)calloc(ucStatN, sizeof(double));
+        ucStatMax=(double*)calloc(ucStatN, sizeof(double));
+        ucStatT=(double*)calloc(ucStatN, sizeof(double));
+    }
+}
+
 
 void QFRDRImagingFCSData::allocateBackgroundStatistics(uint32_t N) {
     if (backStatAvg) free(backStatAvg);
@@ -1095,6 +1134,64 @@ bool QFRDRImagingFCSData::loadBackgroundStatistics(const QString &filename) {
 }
 
 
+
+uint32_t QFRDRImagingFCSData::getUncorrectedStatisticsN() const {
+    return ucStatN;
+}
+
+double *QFRDRImagingFCSData::getUncorrectedStatisticsMean() const {
+    return ucStatAvg;
+}
+
+double *QFRDRImagingFCSData::getUncorrectedStatisticsT() const {
+    return ucStatT;
+}
+
+
+double *QFRDRImagingFCSData::getUncorrectedStatisticsStdDev() const {
+    return ucStatStdDev;
+}
+
+double *QFRDRImagingFCSData::getUncorrectedStatisticsMin() const {
+    return ucStatMin;
+}
+
+double *QFRDRImagingFCSData::getUncorrectedStatisticsMax() const {
+    return ucStatMax;
+}
+
+bool QFRDRImagingFCSData::loadUncorrectedStatistics(const QString &filename) {
+    QFile f(filename);
+    if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        QTextStream txt(&f);
+        QVector<double> mean, stddev, min, max, time;
+        while (!txt.atEnd()) {
+            QVector<double> line=csvReadline(txt, ',', '#');
+            if (line.size()>1) {
+                time.append(line[0]);
+                mean.append(line[1]);
+                stddev.append(line.value(2, 0));
+                min.append(line.value(3, 0));
+                max.append(line.value(4, 0));
+            }
+        }
+        //qDebug()<<"line read: "<<time.size();
+        allocateUncorrectedStatistics(time.size());
+
+        for (uint32_t i=0; i<ucStatN; i++) {
+            ucStatT[i]=time[i];
+            ucStatAvg[i]=mean[i];
+            ucStatStdDev[i]=stddev[i];
+            ucStatMin[i]=min[i];
+            ucStatMax[i]=max[i];
+        }
+
+
+        f.close();
+        return true;
+    }
+    return false;
+}
 void QFRDRImagingFCSData::loadQFPropertiesFromB040SPIMSettingsFile(QSettings &settings) {
     if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/duration_milliseconds")) {
         setQFProperty("MEASUREMENT_DURATION_MS", settings.value("acquisition/duration_milliseconds").toDouble(), true, true);
@@ -1122,6 +1219,13 @@ void QFRDRImagingFCSData::loadQFPropertiesFromB040SPIMSettingsFile(QSettings &se
     }
     if (!propertyExists("ROI_Y_END") && settings.contains("acquisition/roi_yend")) {
         setQFProperty("ROI_Y_END", settings.value("acquisition/roi_yend").toInt(), true, true);
+    }
+    if (!propertyExists("DUALVIEW_MODE") && settings.contains("acquisition/dualview_mode")) {
+        setQFProperty("DUALVIEW_MODE", settings.value("acquisition/dualview_mode").toString(), false, true);
+
+    }
+    if (!propertyExists("DUALVIEW_MODE") && settings.contains("acquisition/acquisition/dualview_mode")) {
+        setQFProperty("DUALVIEW_MODE", settings.value("acquisition/acquisition/dualview_mode").toString(), false, true);
     }
     if (!propertyExists("PIXEL_WIDTH") && settings.contains("acquisition/pixel_width")) {
         double mag=settings.value("acquisition/magnification", 1.0).toDouble();

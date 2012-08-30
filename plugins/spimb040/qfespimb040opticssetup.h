@@ -179,8 +179,8 @@ class QFESPIMB040OpticsSetup : public QWidget {
         int camNumFromExtension(QFExtensionCamera* ecam, int camera) const;
     public slots:
         void loadLightpathConfig(const QString& filename, bool waiting=false);
-        void saveLightpathConfig(const QString& filename, const QString &name, const QList<bool> &saveProp=QList<bool>(), bool saveMeasured=false);
-        void saveLightpathConfig(QMap<QString, QVariant>& data, const QString &name, const QString &prefix=QString(""), const QList<bool>& saveProp=QList<bool>(), bool saveMeasured=false);
+        void saveLightpathConfig(const QString& filename, const QString &name, QList<bool> saveProp=QList<bool>(), bool saveMeasured=false);
+        void saveLightpathConfig(QMap<QString, QVariant>& data, const QString &name, const QString &prefix=QString(""), QList<bool> saveProp=QList<bool>(), bool saveMeasured=false);
         void saveCurrentLightpatConfig();
         void deleteCurrentLightpatConfig();
         void emitLighpathesChanged();

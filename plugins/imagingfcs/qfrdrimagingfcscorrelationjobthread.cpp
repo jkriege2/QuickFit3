@@ -284,6 +284,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     QString backgroundFilename="";
                     QString videoFilename="";
                     QString statisticsFilename="";
+                    QString uncorrectedStatisticsFilename="";
                     QString backstatisticsFilename="";
                     QString acfFilename="";
                     QString ccfFilename="";
@@ -702,6 +703,68 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create background statistics plot file '%1': %2!").arg(localFilename).arg(fb1.errorString()));
                             }
+
+                            localFilename=uncorrectedStatisticsFilename=outputFilenameBase+".uncorrstatistics.dat";
+                            QFile fu(localFilename);
+                            if (fu.open(QIODevice::WriteOnly|QIODevice::Text)) {
+                                QTextStream text(&fu);
+                                text.setLocale(outLocale);
+                                emit messageChanged(tr("saving background statistics ..."));
+                                int count=statistics_uncorrected_time.size();
+                                for (int i=0; i<count; i++) {
+                                    text<<statistics_uncorrected_time[i];
+                                    if (i<statistics_uncorrected_mean.size()) text<<", "<<statistics_uncorrected_mean[i];
+                                    else text<<", 0";
+                                    if (i<statistics_uncorrected_std.size()) text<<", "<<statistics_uncorrected_std[i];
+                                    else text<<", 0";
+                                    if (i<statistics_uncorrected_min.size()) text<<", "<<statistics_uncorrected_min[i];
+                                    else text<<", 0";
+                                    if (i<statistics_uncorrected_max.size()) text<<", "<<statistics_uncorrected_max[i];
+                                    else text<<", 0";
+                                    text<<"\n";
+                                }
+                                fu.close();
+                            } else {
+                                m_status=-1; emit statusChanged(m_status);
+                                emit messageChanged(tr("could not create uncorrected statistics file '%1': %2!").arg(localFilename).arg(fu.errorString()));
+                            }
+                            localFilename=outputFilenameBase+".uncorrstatistics.plt";
+                            QFile fu1(localFilename);
+                            if (fu1.open(QIODevice::WriteOnly|QIODevice::Text)) {
+                                QTextStream text(&fu1);
+                                text.setLocale(outLocale);
+                                text<<QString("set xlabel 'time [seconds]'\n");
+                                text<<QString("set ylabel 'pixel grey value'\n");
+                                text<<QString("set title \"Background Statistics '%1'\" noenhanced\n").arg(job.filename);
+                                text<<QString("set style fill transparent solid 0.5 noborder\n");
+                                text<<QString("set multiplot layout 1,2\n");
+                                text<<QString("plot '%1' using 1:(($2)-(($3)/2.0)):(($2)+(($3)/2.0)) title '+/- stddev' with filledcu, '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
+                                text<<QString("plot '%1' using 1:4:5 title 'min/max' with filledcu, '%1' using 1:(($2)-(($3)/2.0)):(($2)+(($3)/2.0)) title '+/- stddev' with filledcu, '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
+                                text<<QString("unset multiplot\n");
+                                text<<QString("pause -1\n");
+                                text<<QString("set multiplot layout 2,2\n");
+                                text<<QString("plot '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
+                                text<<QString("plot '%1' using 1:3 title 'stddev' with lines lt 1\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
+                                text<<QString("plot '%1' using 1:4 title 'min' with lines lt 1\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
+                                text<<QString("plot '%1' using 1:5 title 'max' with lines lt 1\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
+                                text<<QString("unset multiplot\n");
+                                text<<QString("pause -1\n");
+                                text<<QString("f(t)=a0+a1*exp(-t/t1)\n");
+                                text<<QString("t1=50\n");
+                                text<<QString("a0=0\n");
+                                text<<QString("a1=500\n");
+                                text<<QString("fit f(x) '%1' using 1:2 via a0, a1, t1\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
+                                text<<QString("set label sprintf('1exp: a0=%f a1=%f t1=%f', a0, a1, t1) at graph 0.5,0.9\n");
+                                text<<QString("plot '%1' using 1:2 title 'mean' with points, f(x) title 'exponential fit\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
+                                text<<QString("pause -1\n");
+                                text<<QString("\n");
+                                text<<QString("\n");
+                                text<<QString("\n");
+                                fu1.close();
+                            } else {
+                                emit statusChanged(m_status);
+                                emit messageChanged(tr("could not create uncorrected statistics plot file '%1': %2!").arg(localFilename).arg(fu1.errorString()));
+                            }
                         }
                         emit progressIncrement(10);
 
@@ -801,7 +864,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 if (!backstdFilename.isEmpty())         text<<"background stddev           : " << d.relativeFilePath(backstdFilename) << "\n";
                                 if (!videoFilename.isEmpty())           text<<"video file                  : " << d.relativeFilePath(videoFilename) << "\n";
                                 if (!statisticsFilename.isEmpty())      text<<"statistics file             : " << d.relativeFilePath(statisticsFilename) << "\n";
-                                if (!backstatisticsFilename.isEmpty())  text<<"background statistics file  : " << d.relativeFilePath(backstatisticsFilename) << "\n";
+                                if (!backstatisticsFilename.isEmpty())         text<<"background statistics file  : " << d.relativeFilePath(backstatisticsFilename) << "\n";
+                                if (!uncorrectedStatisticsFilename.isEmpty())  text<<"uncorrected statistics file : " << d.relativeFilePath(uncorrectedStatisticsFilename) << "\n";
                                 if (!acfFilename.isEmpty())             text<<"autocorrelation file        : " << d.relativeFilePath(acfFilename) << "\n";
                                 if (!acfFilenameBin.isEmpty())          text<<"bin. autocorrelation file   : " << d.relativeFilePath(acfFilenameBin) << "\n";
                                 if (!ccfFilename.isEmpty())             text<<"crosscorrelation file       : " << d.relativeFilePath(ccfFilename) << "\n";
@@ -1211,6 +1275,24 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
 
     if (!was_canceled) {
         emit messageChanged(tr("reading frames ..."));
+
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_uncorrected;
+        stat_state_uncorrected.sum=0;
+        stat_state_uncorrected.sum2=0;
+        stat_state_uncorrected.sframe_min=0;
+        stat_state_uncorrected.sframe_max=0;
+        stat_state_uncorrected.cnt=0;
+        stat_state_uncorrected.statFirst=true;
+        stat_state_uncorrected.video_frame=NULL;
+        statistics_uncorrected_mean.clear();
+        statistics_uncorrected_std.clear();
+        statistics_uncorrected_min.clear();
+        statistics_uncorrected_max.clear();
+        statistics_uncorrected_time.clear();
+        uint16_t video_frame_num=0;
+        float fframes_min=0;
+        float fframes_max=0;
+
         register uint32_t frame=0;
         //float sframe_min=0;
         //float sframe_max=0;
@@ -1235,6 +1317,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                     m_status=-1; emit statusChanged(m_status);
                     emit messageChanged(tr("error reading frame: %1").arg(reader->lastError()));
                 } else {
+                    contribute_to_statistics(stat_state_uncorrected, frame_data, frame_width, frame_height, frame, frames, NULL, NULL, NULL, video_frame_num, fframes_min, fframes_max, statistics_uncorrected_time, statistics_uncorrected_mean, statistics_uncorrected_std, statistics_uncorrected_min, statistics_uncorrected_max);
+
                     float frame_min=frame_data[0];
                     float frame_max=frame_data[0];
 
@@ -1631,7 +1715,7 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingF
         statistics_mean.append(state.sum/N);
         statistics_min.append(state.sframe_min);
         statistics_max.append(state.sframe_max);
-        if (!isBackground && job.statistics_frames>1) statistics_std.append(sqrt((state.sum2-state.sum*state.sum/N)/(N-1.0)));
+        if (!isBackground && job.statistics_frames>1)         statistics_std.append(sqrt((state.sum2-state.sum*state.sum/N)/(N-1.0)));
         else if (isBackground && job.backstatistics_frames>1) statistics_std.append(sqrt((state.sum2-state.sum*state.sum/N)/(N-1.0)));
         state.sum=0;
         state.sum2=0;
@@ -1689,6 +1773,25 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
     if (!was_canceled) {
         emit messageChanged(tr("reading frames ..."));
         register uint32_t frame=0;
+
+
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_uncorrected;
+        stat_state_uncorrected.sum=0;
+        stat_state_uncorrected.sum2=0;
+        stat_state_uncorrected.sframe_min=0;
+        stat_state_uncorrected.sframe_max=0;
+        stat_state_uncorrected.cnt=0;
+        stat_state_uncorrected.statFirst=true;
+        stat_state_uncorrected.video_frame=NULL;
+        statistics_uncorrected_mean.clear();
+        statistics_uncorrected_std.clear();
+        statistics_uncorrected_min.clear();
+        statistics_uncorrected_max.clear();
+        statistics_uncorrected_time.clear();
+        uint16_t video_frame_num=0;
+        float fframes_min=0;
+        float fframes_max=0;
+
         float* frame_data=(float*)calloc(frame_width*frame_height,sizeof(float));
         for (int64_t i=0; i<frame_width*frame_height; i++)  {
             frame_data[i]=0;
@@ -1704,6 +1807,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                 m_status=-1; emit statusChanged(m_status);
                 emit messageChanged(tr("error reading frame: %1").arg(reader->lastError()));
             } else {
+                contribute_to_statistics(stat_state_uncorrected, frame_data, frame_width, frame_height, frame, frames, NULL, NULL, NULL, video_frame_num, fframes_min, fframes_max, statistics_uncorrected_time, statistics_uncorrected_mean, statistics_uncorrected_std, statistics_uncorrected_min, statistics_uncorrected_max);
+
                 float frame_min=frame_data[0];
                 float frame_max=frame_data[0];
                 for (register uint16 i=0; i<frame_width*frame_height; i++) {

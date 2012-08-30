@@ -310,6 +310,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
     QString filename_backgroundstddev="";
     QString filename_statistics="";
     QString filename_backstatistics="";
+    QString filename_uncorrectedstatistics="";
     QString filename_settings="";
     QString filename_acquisition="";
     QString filename_mask="";
@@ -528,6 +529,8 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                             filename_statistics=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="background statistics file") {
                             filename_backstatistics=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                        } else if (name=="uncorrected statistics file") {
+                            filename_uncorrectedstatistics=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="input description file") {
                             filename_settings=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="input file") {
@@ -586,6 +589,11 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                 files<<filename_backstatistics;
                 files_types<<"background_statistics";
                 files_descriptions<<tr("background statistics data");
+            }
+            if (QFile::exists(filename_uncorrectedstatistics)) {
+                files<<filename_uncorrectedstatistics;
+                files_types<<"uncorrected_statistics";
+                files_descriptions<<tr("uncorrected statistics data");
             }
             if (QFile::exists(filename_mask)) {
                 files<<filename_mask;

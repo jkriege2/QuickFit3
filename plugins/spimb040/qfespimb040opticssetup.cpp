@@ -692,7 +692,7 @@ QString QFESPIMB040OpticsSetup::getCurrentLightpath() const {
 }
 
 
-void QFESPIMB040OpticsSetup::saveLightpathConfig(const QString &filename, const QString& name, const QList<bool>& saveProp, bool saveMeasured) {
+void QFESPIMB040OpticsSetup::saveLightpathConfig(const QString &filename, const QString& name, QList<bool> saveProp, bool saveMeasured) {
     { // this block ensures that set is destroyed (and the file written) before updateItems() is called
         if (QFile::exists(filename)) QFile::remove(filename);
         QSettings set(filename, QSettings::IniFormat);
@@ -788,9 +788,10 @@ void QFESPIMB040OpticsSetup::ensureLightpath() {
 
 
 
-void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, const QString &name, const QString& prefix, const QList<bool>& saveProp, bool saveMeasured) {
+void QFESPIMB040OpticsSetup::saveLightpathConfig(QMap<QString, QVariant> &data, const QString &name, const QString& prefix,  QList<bool> saveProp, bool saveMeasured) {
     data[prefix+"name"]=name;
 
+    //qDebug()<<saveProp;
 
     // SAVE RELEVANT WIDGETS HERE
     if (saveProp.value(0, true) && ui->lsTransmission->getLightSource() && ui->lsTransmission->isLightSourceConnected()) {
@@ -903,6 +904,7 @@ void QFESPIMB040OpticsSetup::saveCurrentLightpatConfig() {
                     if (res==QMessageBox::Yes) {
                         //qDebug()<<dlg->getCheckedItems();
                         QFile::remove(filename);
+                        //qDebug()<<dlg->getCheckedItems();
                         saveLightpathConfig(filename, name, dlg->getCheckedItems());
                         ui->cmbLightpathConfig->setCurrentConfig(name);
                         return;

@@ -417,11 +417,11 @@ data                                                   size [bytes]             
     QVector<float> backstatistics_min;
     QVector<float> backstatistics_max;
 
-    QVector<float> statistics_after_time;
-    QVector<float> statistics_after_mean;
-    QVector<float> statistics_after_std;
-    QVector<float> statistics_after_min;
-    QVector<float> statistics_after_max;
+    QVector<float> statistics_uncorrected_time;
+    QVector<float> statistics_uncorrected_mean;
+    QVector<float> statistics_uncorrected_std;
+    QVector<float> statistics_uncorrected_min;
+    QVector<float> statistics_uncorrected_max;
     double* acf_tau;
     double* acf;
     double* acf_segments;
