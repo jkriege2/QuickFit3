@@ -71,7 +71,7 @@ void QFESPIMB040AcquisitionDescription::on_btnClearAll_clicked() {
 void QFESPIMB040AcquisitionDescription::on_btnNextCell_clicked()
 {
     ui->edtComment->setText("");
-    ui->spinCell->setValue(ui->spinCell->value());
+    ui->spinCell->setValue(ui->spinCell->value()+1);
 }
 
 void QFESPIMB040AcquisitionDescription::updateTime() {

@@ -740,7 +740,10 @@ void QFSPIMLightsheetEvaluationEditor::evaluateCurrent() {
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
     if ((!eval)||(!record)/*||(!data)*/) return;
 
-    
+    if (dlgEvaluationProgress) {
+        delete dlgEvaluationProgress;
+    }
+    dlgEvaluationProgress=new QProgressDialog(this);
     
     dlgEvaluationProgress->setLabelText(tr("evaluate '%1' ...").arg(record->getName()));
     
