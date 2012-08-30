@@ -792,7 +792,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
             if (QFile::exists(filename_settings)) {
                 QFileInfo fi(filename_settings);
-                insertProjectRecord("rdr_settings", fi.fileName()+tr(" - acquisition settings"), filename_settings, description, QFileInfo(filename_settings).baseName());
+                insertProjectRecord("rdr_settings", fi.fileName()+tr(" - acquisition settings"), filename_settings, description, QFileInfo(filename_overview).baseName());
             }
 
             for (int i=0; i<files_types.size(); i++) {

@@ -835,10 +835,12 @@ QFRDRImagingFCSData::DualViewMode QFRDRImagingFCSData::dualViewMode() const
 {
     QString dv=getProperty("DUALVIEW_MODE", "none").toString().toLower();
 
+
     QFRDRImagingFCSData::DualViewMode m_dualview=QFRDRImagingFCSData::dvNone;
     if (dv=="none" || dv=="0" || dv=="n") m_dualview=QFRDRImagingFCSData::dvNone;
     if (dv=="horizontal" || dv=="1" || dv=="h" || dv=="horicontal") m_dualview=QFRDRImagingFCSData::dvHorizontal;
     if (dv=="vertical" || dv=="2" || dv=="v" || dv=="vertikal") m_dualview=QFRDRImagingFCSData::dvVertical;
+    //qDebug()<<dv<<m_dualview;
 
     return m_dualview;
 }
