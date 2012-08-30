@@ -195,9 +195,11 @@ class QFExtensionCamera {
          virtual int getAcquisitionProgress(unsigned int camera)=0;
 
          enum CameraSetting {
-             CamSetExposureTime,
-             CamSetNumberFrames,
-             CamSetGain
+             CamSetExposureTime=0,
+             CamSetNumberFrames=1,
+             CamSetGain=2,
+             CamSetFrametime=3,
+             CamSetEMGAIN=4
          };
 
          /** \brief returns \c true if the given CameraSetting is changable by changeCameraSetting() */

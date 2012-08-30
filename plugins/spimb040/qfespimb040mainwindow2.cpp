@@ -1520,6 +1520,7 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
     //////////////////////////////////////////////////////////////////////////////////////
     if (ok) {
         QMap<QString, QVariant> acqD;
+        QTime time=QTime::currentTime();
         if (ecamera->acquire(camera, buffer, NULL, &acqD)) {
             if (acquisitionDescription) {
                 QMapIterator<QString, QVariant> it(acqD);
@@ -1527,6 +1528,14 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
                     it.next();
                     (*acquisitionDescription)[acquisitionDescriptionPrefix+it.key()]=it.value();
                 }
+                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/dualview_mode"]=optSetup->dualViewMode(ecamera, camera);
+                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/image_width"]=width;
+                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/image_height"]=height;
+                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/exposure_time"]=ecamera->getExposureTime(camera);
+                optSetup->saveLightpathConfig((*acquisitionDescription), optSetup->getCurrentLightpath(), acquisitionDescriptionPrefix+"/lightpath/", QList<bool>(), true);
+                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/timestamp"]=time;
+                getAdditionalCameraSettings(ecamera, camera, acquisitionDescriptionPrefix, (*acquisitionDescription));
+
             }
             QDir().mkpath(QFileInfo(TIFFFIlename.toAscii().data()).absolutePath());
             tiff=TIFFOpen(TIFFFIlename.toAscii().data(), "w");
@@ -2301,8 +2310,11 @@ bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathF
         acquisitionDescription1[imageID+"/image_width"]=ecamera1->getImageWidth(camera1);
         acquisitionDescription1[imageID+"/image_height"]=ecamera1->getImageHeight(camera1);
         acquisitionDescription1[imageID+"/exposure_time"]=ecamera1->getExposureTime(camera1);
-        acquisitionDescription1[imageID+"/timestamp"]=time;
         optSetup->saveLightpathConfig(acquisitionDescription1, lightpathName, imageID+"/lightpath/", QList<bool>(), true);
+        acquisitionDescription1[imageID+"/dualview_mode"]=optSetup->dualViewMode(ecamera1, camera1);
+        acquisitionDescription1[imageID+"/timestamp"]=time;
+        getAdditionalCameraSettings(ecamera1, camera1, imageID, acquisitionDescription1);
+
         QFExtensionCamera::AcquititonFileDescription d;
         d.description=imageDescription;
         d.name=outputFilename;
@@ -2458,15 +2470,46 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
         log_text(tr("  - acquired %1 image from camera 1!\n").arg(imageDescription));
         acquisitionDescription1[imageID+"/timestamp"]=time;
         optSetup->saveLightpathConfig(acquisitionDescription1, lightpathName, imageID+"/lightpath/", QList<bool>(), true);
+        acquisitionDescription1[imageID+"/dualview_mode"]=optSetup->dualViewMode(0);
+        getAdditionalCameraSettings(ecamera1, camera1, imageID, acquisitionDescription1);
     }
     if (ok && useCam2) {
         ecamera2->getAcquisitionDescription(camera2, &moreFiles2, &acquisitionDescription2);
         log_text(tr("  - acquired %1 image from camera 2!\n").arg(imageDescription));
         acquisitionDescription2[imageID+"/timestamp"]=time;
         optSetup->saveLightpathConfig(acquisitionDescription2, lightpathName, imageID+"/lightpath/", QList<bool>(), true);
+        acquisitionDescription2[imageID+"/dualview_mode"]=optSetup->dualViewMode(1);
+        getAdditionalCameraSettings(ecamera2, camera2, imageID, acquisitionDescription2);
     }
 
     return ok;
+}
+
+void QFESPIMB040MainWindow2::getAdditionalCameraSettings(QFExtensionCamera *ecamera, int camera, const QString &prefix, QMap<QString, QVariant> &acquisitionDescription) {
+    acquisitionDescription[prefix+"/camera_pixel_width"]=ecamera->getPixelWidth(camera);
+    acquisitionDescription[prefix+"/camera_pixel_height"]=ecamera->getPixelHeight(camera);
+    acquisitionDescription[prefix+"/camera_model"]=ecamera->getCameraName(camera);
+    acquisitionDescription[prefix+"/sensor_model"]=ecamera->getCameraSensorName(camera);
+    acquisitionDescription[prefix+"/image_width"]=ecamera->getImageWidth(camera);
+    acquisitionDescription[prefix+"/image_height"]=ecamera->getImageHeight(camera);
+    acquisitionDescription[prefix+"/dualview_mode"]=optSetup->dualViewMode(ecamera, camera);
+    optSetup->saveLightpathConfig(acquisitionDescription, "", prefix+"/lightpath/", QList<bool>(), true);
+    QMap<QString, QVariant> setup=optSetup->getSetup(optSetup->camNumFromExtension(ecamera, camera));
+    QMapIterator <QString, QVariant> it(setup);
+    while (it.hasNext()) {
+        it.next();
+        if (!it.value().toString().isEmpty()) {
+            if (it.value().type()==QVariant::List) {
+                acquisitionDescription[prefix+"/setup/"+it.key()]=jkVariantListToString(it.value().toList(), "; ");
+            } else {
+                acquisitionDescription[prefix+"/setup/"+it.key()]=it.value().toString();
+            }
+
+        }
+    }
+
+    //acquisitionDescription[prefix+"/setting"]=ecamera->getCameraSetting();
+
 }
 
 

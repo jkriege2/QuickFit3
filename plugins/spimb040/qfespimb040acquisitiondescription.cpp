@@ -68,6 +68,12 @@ void QFESPIMB040AcquisitionDescription::on_btnClearAll_clicked() {
     ui->spinWell->setValue(1);
 }
 
+void QFESPIMB040AcquisitionDescription::on_btnNextCell_clicked()
+{
+    ui->edtComment->setText("");
+    ui->spinCell->setValue(ui->spinCell->value());
+}
+
 void QFESPIMB040AcquisitionDescription::updateTime() {
     ui->edtDateTime->setDateTime(QDateTime::currentDateTime());
     QTimer::singleShot(1013, this, SLOT(updateTime()));

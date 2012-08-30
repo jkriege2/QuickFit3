@@ -166,6 +166,17 @@ class QFESPIMB040OpticsSetup : public QWidget {
 
         /** \brief collect all available measureable values (laser powers etz.) */
         measuredValues getMeasuredValues();
+
+        /** \brief returns the DualView mode for a given camera (\c "none", \c "horicontal" or \c "vertical" ) */
+        QString dualViewMode(int camera) const;
+        /** \brief returns the DualView mode for a given camera (\c "none", \c "horicontal" or \c "vertical" ) */
+        QString dualViewMode(QFExtensionCamera* ecam, int camera) const;
+
+        /** \brief returns the logical number (0,1) of the specified camera
+          *
+          * This function compares the given data with the two specified cameras and returns the respective ID, if a match is found. If no match is found, the function returns -1.
+          */
+        int camNumFromExtension(QFExtensionCamera* ecam, int camera) const;
     public slots:
         void loadLightpathConfig(const QString& filename, bool waiting=false);
         void saveLightpathConfig(const QString& filename, const QString &name, const QList<bool> &saveProp=QList<bool>(), bool saveMeasured=false);

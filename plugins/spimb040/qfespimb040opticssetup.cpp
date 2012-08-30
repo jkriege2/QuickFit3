@@ -164,6 +164,8 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
     ui->filtDualView2Splitter->loadSettings(settings, prefix+"filters/dv2_splitter");
     ui->chkDualView1->setChecked(settings.value(prefix+"filters/dv1_enabled", false).toBool());
     ui->chkDualView2->setChecked(settings.value(prefix+"filters/dv2_enabled", false).toBool());
+    ui->cmbDualViewOrientation->setCurrentIndex(settings.value(prefix+"filters/dv1_orientation", 0).toInt());
+    ui->cmbDualView2Orientation->setCurrentIndex(settings.value(prefix+"filters/dv2_orientation", 0).toInt());
 
     ui->objDetection->loadSettings(settings, prefix+"objectives/detection");
     ui->objProjection->loadSettings(settings, prefix+"objectives/projection");
@@ -216,6 +218,8 @@ void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) 
     ui->filtDualView2Splitter->saveSettings(settings, prefix+"filters/dv2_splitter");
     settings.setValue(prefix+"filters/dv1_enabled", ui->chkDualView1->isChecked());
     settings.setValue(prefix+"filters/dv2_enabled", ui->chkDualView2->isChecked());
+    settings.setValue(prefix+"filters/dv1_orientation", ui->cmbDualViewOrientation->currentIndex());
+    settings.setValue(prefix+"filters/dv2_orientation", ui->cmbDualView2Orientation->currentIndex());
 
     settings.setValue(prefix+"filterchanger_detection", ui->chkDetectionFilterWheel->isChecked());
 
@@ -260,6 +264,8 @@ QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam) const {
             setup["filters/detection_cam1/manufacturer"]=filter.manufacturer;
         }
         if (ui->chkDualView1->isChecked()) {
+            if (ui->cmbDualViewOrientation->currentIndex()==0) setup["filters/dualview_cam1/orientation"]=QString("horicontal");
+            else setup["filters/dualview_cam1/orientation"]=QString("vertical");
             filter=ui->filtDualView1Long->filter();
             if (filter.isValid) {
                 setup["filters/dualview_cam1/detection_long/name"]=filter.name;
@@ -288,20 +294,22 @@ QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam) const {
             setup["filters/detection_cam2/type"]=filter.type;
             setup["filters/detection_cam2/manufacturer"]=filter.manufacturer;
         }
-        if (ui->chkDualView1->isChecked()) {
-            filter=ui->filtDualView1Long->filter();
+        if (ui->chkDualView2->isChecked()) {
+            if (ui->cmbDualView2Orientation->currentIndex()==0) setup["filters/dualview_cam2/orientation"]=QString("horicontal");
+            else setup["filters/dualview_cam2/orientation"]=QString("vertical");
+            filter=ui->filtDualView2Long->filter();
             if (filter.isValid) {
                 setup["filters/dualview_cam2/detection_long/name"]=filter.name;
                 setup["filters/dualview_cam2/detection_long/type"]=filter.type;
                 setup["filters/dualview_cam2/detection_long/manufacturer"]=filter.manufacturer;
             }
-            filter=ui->filtDualView1Short->filter();
+            filter=ui->filtDualView2Short->filter();
             if (filter.isValid) {
                 setup["filters/dualview_cam2/detection_short/name"]=filter.name;
                 setup["filters/dualview_cam2/detection_short/type"]=filter.type;
                 setup["filters/dualview_cam2/detection_short/manufacturer"]=filter.manufacturer;
             }
-            filter=ui->filtDualView1Splitter->filter();
+            filter=ui->filtDualView2Splitter->filter();
             if (filter.isValid) {
                 setup["filters/dualview_cam2/detection_splitter/name"]=filter.name;
                 setup["filters/dualview_cam2/detection_splitter/type"]=filter.type;
@@ -1057,6 +1065,32 @@ QFESPIMB040OpticsSetup::measuredValues QFESPIMB040OpticsSetup::getMeasuredValues
     //qDebug()<<"measuredValues(): "<<m.data;
 
     return m;
+}
+
+QString QFESPIMB040OpticsSetup::dualViewMode(int camera) const {
+    QString dv="none";
+    if (camera==0 &&  ui->chkDualView1->isChecked()) {
+        if (ui->cmbDualViewOrientation->currentIndex()==0) dv="horicontal";
+        else if (ui->cmbDualViewOrientation->currentIndex()==1) dv="vertical";
+        else dv="unknown";
+    } else if (camera==1 && ui->chkDualView2->isChecked()) {
+        if (ui->cmbDualView2Orientation->currentIndex()==0) dv="horicontal";
+        else if (ui->cmbDualView2Orientation->currentIndex()==1) dv="vertical";
+        else dv="unknown";
+    }
+    return dv;
+}
+
+QString QFESPIMB040OpticsSetup::dualViewMode(QFExtensionCamera *ecam, int camera) const
+{
+    return dualViewMode(camNumFromExtension(ecam, camera));
+}
+
+int QFESPIMB040OpticsSetup::camNumFromExtension(QFExtensionCamera *ecam, int camera) const
+{
+    if (ui->camConfig1->cameraComboBox()->currentExtensionCamera()==ecam && ui->camConfig1->cameraComboBox()->currentCameraID()==camera) return 0;
+    if (ui->camConfig2->cameraComboBox()->currentExtensionCamera()==ecam && ui->camConfig2->cameraComboBox()->currentCameraID()==camera) return 1;
+    return -1;
 }
 
 QString QFESPIMB040OpticsSetup::getAxisNameForStage(QFExtensionLinearStage *stage, int axis)

@@ -190,6 +190,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
          */
         bool acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles2, int frames1=0, int frames2=0, QList<QFESPIMB040OpticsSetup::measuredValues>* measured=NULL, QProgressListDialog* progress=NULL, bool* userCanceled=NULL);
 
+        void getAdditionalCameraSettings(QFExtensionCamera* ecamera, int camera, const QString& prefix, QMap<QString, QVariant>& acquisitionDescription);
     public:
 
         /** \brief log project text message

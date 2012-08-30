@@ -81,5 +81,7 @@
         <file alias="clear_all.png">icons/clear_all.png</file>
         <file alias="clock.png">icons/clock.png</file>
         <file alias="default_config.png">icons/default_config.png</file>
+        <file alias="dvhor.png">icons/dvhor.png</file>
+        <file alias="dvver.png">icons/dvver.png</file>
     </qresource>
 </RCC>

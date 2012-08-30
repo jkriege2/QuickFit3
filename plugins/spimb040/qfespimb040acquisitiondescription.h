@@ -28,6 +28,7 @@ class QFESPIMB040AcquisitionDescription : public QWidget
         QString getComment() const;
     protected slots:
         void on_btnClearAll_clicked();
+        void on_btnNextCell_clicked();
         void updateTime();
         void spinChanged();
     private:

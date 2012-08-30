@@ -102,6 +102,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnNextCell">
+        <property name="text">
+         <string>next cell</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>comment:</string>
