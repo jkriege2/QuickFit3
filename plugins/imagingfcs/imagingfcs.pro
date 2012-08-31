@@ -20,7 +20,6 @@ HEADERS += qfrdrimagingfcs.h \
            ../interfaces/qfrdrfcsdatainterface.h \
     qfrdrimagingfcs_dataeditor_image.h \
     qfrdrimagingfcsrunsmodel.h \
-    ../base_classes/qftablemodel.h \
     qfrdrimagingfcscorrelationdialog.h \
     qfrdrimagingfcsthreadprogress.h \
     qfrdrimagingfcscorrelationjobthread.h \
@@ -30,7 +29,6 @@ HEADERS += qfrdrimagingfcs.h \
     ../../../../../LIB/trunk/shiftregister.h \
     ../../../../../LIB/trunk/multitau-correlator.h \
     ../../../../../LIB/trunk/correlator_multitau.h \
-    ../base_classes/qfhistogramview.h \
     qfrdrimagingfcsdataexplorer.h \
     qfrdrimagingfcsmaskbyintensity.h \
     qfrdrimagingfcscountratedisplay.h \
@@ -53,14 +51,12 @@ SOURCES += qfrdrimagingfcs.cpp \
 		   qfrdrimagingfcs_dataeditor.cpp \
     qfrdrimagingfcs_dataeditor_image.cpp \
     qfrdrimagingfcsrunsmodel.cpp \
-    ../base_classes/qftablemodel.cpp \
     qfrdrimagingfcscorrelationdialog.cpp \
     qfrdrimagingfcsthreadprogress.cpp \
     qfrdrimagingfcscorrelationjobthread.cpp \
     ../../../../../LIB/trunk/tinytiffwriter.cpp \
     ../../../../../LIB/trunk/libtiff_tools.cpp \
     ../../../../../LIB/trunk/statistics_tools.cpp \
-    ../base_classes/qfhistogramview.cpp \
     qfrdrimagingfcsdataexplorer.cpp \
     qfrdrimagingfcsmaskbyintensity.cpp \
     qfrdrimagingfcscountratedisplay.cpp \

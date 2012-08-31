@@ -21,6 +21,7 @@
 #include <QMimeData>
 #include <QClipboard>
 #include <QModelIndex>
+#include "libwid_imexport.h"
 
 /*! \brief this class is used to manage a table of values (QVariant)
     \ingroup qf3rdrdp_table
@@ -43,7 +44,7 @@
      - data is stored in a QFTableModel object which is also externally accessible for data access.
     .
  */
-class QFTableModel : public QAbstractTableModel {
+class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         Q_OBJECT
     protected:
         /** \brief converts a (row, column) adress into a QHash index: (row<<16) | column */

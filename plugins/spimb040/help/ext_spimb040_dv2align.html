@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>SPIM Plugin: Alignment of DualView optics</title>
+  <link rel="contents" href="ext_spimb040.html"> 
+  </head>
+  <body>
+	 $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+	 <h2>Introduction</h2>
+	 In order to perform simultaneous multi-channel imaging for SPIM-fluorescence crosscorrelation spectroscopy (FCCS) a DualView module has to be used which needs to be aligned in a way that the two half-images are aligned on a sub-pixel level. Currently two commercial DUalView modules are known to us (and available):
+	 <ul>
+	   <li><a href="http://www.photometrics.com/products/multichannel/dv2.php">Photometrics DualView DV2</a> (<a href="http://www.photometrics.com/support/pdfs/manuals/dv2_alignment.pdf">Here's a link to the official alignment procedure</a>)</li>
+	   <li><a href="http://www.cairn-research.co.uk/catalogue/detection/image-splitters/product/optosplit-ii-image-splitter">Cairn OptoSplit II</a></li>
+	 </ul>
+	 Both systems limit the field of view to a section of the size of the half CCD sensor. This image region is then split with a dichroic mirror into two color channels, which each may contain another transmission filter. Finally the two color channels are imaged onto the sensor side by side. Both systems provide possibilities to set the size of the image region and to move the images independently. This page explains how special features in the camera (pre-)view window help to perform the alignment.
+	 
+	 <h2>Alignment Procedure</h2>
+	 This procedure was tested with the Photometrics DV2 but should work comparably for the OptoSplit.
+	 <ol>
+	   <li><b>Set the FOV blades:</b> First switch the DualView to transmission/bypass mode, but put in the FOV blades (DualView mode lever on DV2). Illuminate the whole entrance opening evenly. Switch on the grid and set the grid width to 1/4 of the cameras pixel resolution. Then move the blades, so the bright area is (~1-2 pixel) smaller than the dark area on the borders, i.e. the bright area fills the center half of the camera.</li>
+	   <li><b>Roughly align the two images:</b> Switch the DualView optics to DualView mode, i.e. put in the beam splitter and illuminate the whole entrance opening evenly. Now move the two images so they are side by side and do NOT overlap. When the image in the last step was a bit smaller than half of the sensor, you should be able to leave a small dark separating border between the two color channel images. Also make sure that the images are not sheared or rotated.</li>
+	   <li><b>Fine tuning of image position:</b> Image an alignment grid with at least three lines visible in the FOV.  The illumination should be as bright as possible (but don't saturate the sensor). We are using a 1500 lines/inch EM-Grid in conjunction with a 128x128pixel EMCCD camera (pixel size 24µm) and a magnification of 60x (so 400nm pixel size in the object plane). Now switch on the image transfrom feature in the camera preview window. Set it to left-right or top-bottom according to how your DualView splits the image visible on the screen. Here we also encourage you to use a color-palette like Matlab, as it makes the following procedure better observable. You will also get a new image property which is the crosscorrelation coefficient between the two image halfes which may also be drawn as a "Graph" (which you should do now). Now you can finalize the image position alignment by maximizing the crosscorrelation. For a bright illumination we usually reach around 0.98... . In the image you will see dark/bright (or red/blue for the Matlab palette) border at the grid lines when they are not aligned. These should vanish when the alignment is performed properly.
+	   </li>
+	 </ol>
+	 
+  </body>
+</html>

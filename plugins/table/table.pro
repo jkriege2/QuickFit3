@@ -14,7 +14,6 @@ include(../../libquickfitwidgets.pri)
 HEADERS += dlgcsvparameters.h \
            qfrdrtable.h \
            qfrdrtableeditor.h \
-           ../base_classes/qftablemodel.h \
            qfprdrtable.h \
     tableresizedialog.h \
     qfrdrtabledelegate.h \
@@ -29,7 +28,6 @@ HEADERS += dlgcsvparameters.h \
 SOURCES += dlgcsvparameters.cpp \
            qfrdrtable.cpp \
            qfrdrtableeditor.cpp \
-           ../base_classes/qftablemodel.cpp \
            qfprdrtable.cpp \
     tableresizedialog.cpp \
     qfrdrtabledelegate.cpp \

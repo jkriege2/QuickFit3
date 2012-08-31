@@ -26,13 +26,14 @@
 #include <QFormLayout>
 #include <QSettings>
 #include <QTextDocument>
+#include "libwid_imexport.h"
 
 /*! \brief This class displays a histogram together with some statistical data on it
     \ingroup qf3rdrdp_imaging_fcs
 
 
 */
-class QFHistogramView : public QWidget {
+class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         Q_OBJECT
     public:
         struct Histogram {
