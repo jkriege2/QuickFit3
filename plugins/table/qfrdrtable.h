@@ -33,7 +33,9 @@ class QFRDRTable : public QFRawDataRecord {
             gtStepsHorizontal,
             gtStepsVertical,
             gtbarsHorizontal,
-            gtbarsVertical
+            gtbarsVertical,
+            gtImage,
+            gtMaskImage
         };
 
         static QString GraphType2String(GraphType type) {
@@ -47,6 +49,8 @@ class QFRDRTable : public QFRawDataRecord {
                 case gtStepsVertical: return QString("stepsv");
                 case gtbarsHorizontal: return QString("barsh");
                 case gtbarsVertical: return QString("barsv");
+                case gtImage: return QString("image");
+                case gtMaskImage: return QString("maskimage");
             }
             return QString("");
         }
@@ -62,6 +66,8 @@ class QFRDRTable : public QFRawDataRecord {
                 case gtStepsVertical: return QIcon(":/table/icons/plot_vsteps.png");
                 case gtbarsHorizontal: return QIcon(":/table/icons/plot_hbars.png");
                 case gtbarsVertical: return QIcon(":/table/icons/plot_vbars.png");
+                case gtImage: return QIcon(":/table/icons/plot_image.png");
+                case gtMaskImage: return QIcon(":/table/icons/plot_maskimage.png");
             }
             return QIcon();
         }
@@ -77,6 +83,8 @@ class QFRDRTable : public QFRawDataRecord {
             if (s=="stepsv") return gtStepsVertical;
             if (s=="barsh") return gtbarsHorizontal;
             if (s=="barsv") return gtbarsVertical;
+            if (s=="image") return gtImage;
+            if (s=="maskimage") return gtMaskImage;
             return gtLines;
         }
 
@@ -100,6 +108,19 @@ class QFRDRTable : public QFRawDataRecord {
             double symbolSize;
             JKQTPerrorPlotstyle errorStyle;
             bool drawLine;
+
+            QColor imageTrueColor;
+            double imageTrueTransparent;
+            QColor imageFalseColor;
+            double imageFalseTransparent;
+            int imagePixelWidth;
+            double imageX;
+            double imageY;
+            double imageWidth;
+            double imageHeight;
+            JKQTPMathImage::ColorPalette imagePalette;
+            double imageMin;
+            double imageMax;
         };
 
         struct PlotInfo {

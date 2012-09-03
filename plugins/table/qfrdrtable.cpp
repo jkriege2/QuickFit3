@@ -26,6 +26,19 @@ QFRDRTable::GraphInfo::GraphInfo() {
     colorTransparent=1;
     errorColorTransparent=1;
     fillColorTransparent=0.3;
+    fillColor=color.lighter();
+    imageTrueColor=QColor("blue");
+    imageTrueTransparent=0.5;
+    imageFalseColor=QColor("red");
+    imageFalseTransparent=1.0;
+    imagePixelWidth=1;
+    imageX=0;
+    imageY=0;
+    imageWidth=1;
+    imageHeight=1;
+    imagePalette=JKQTPMathImage::MATLAB;
+    imageMin=0;
+    imageMax=0;
 
 }
 
@@ -283,6 +296,21 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.colorTransparent=ge.attribute("color_trans", "1").toDouble();
                     graph.errorColorTransparent=ge.attribute("errorcolor_trans", "1").toDouble();
                     graph.fillColorTransparent=ge.attribute("fillcolor_trans", "0.3").toDouble();
+
+
+                    graph.imageTrueColor=QColor(ge.attribute("image_truecolor", "blue"));
+                    graph.imageTrueTransparent=ge.attribute("image_truecolor_trans", "0.5").toDouble();
+                    graph.imageFalseColor=QColor(ge.attribute("image_falsecolor", "red"));
+                    graph.imageFalseTransparent=ge.attribute("image_falsecolor_trans", "1.0").toDouble();
+                    graph.imagePixelWidth=ge.attribute("image_pixelwidth", "1").toInt();
+                    graph.imageX=ge.attribute("image_x", "0").toDouble();
+                    graph.imageY=ge.attribute("image_y", "0").toDouble();
+                    graph.imageWidth=ge.attribute("image_width", "1").toDouble();
+                    graph.imageHeight=ge.attribute("image_height", "1").toDouble();
+                    graph.imagePalette=JKQTPMathImage::ColorPalette(ge.attribute("image_palette", "8").toInt());
+                    graph.imageMin=ge.attribute("image_min", "0").toDouble();
+                    graph.imageMax=ge.attribute("image_max", "0").toDouble();
+
                     plot.graphs.append(graph);
                     ge = ge.nextSiblingElement("graph");
                 }
@@ -363,6 +391,23 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("color_trans", QString::number(plots[i].graphs[g].colorTransparent));
             w.writeAttribute("errorcolor_trans", QString::number(plots[i].graphs[g].errorColorTransparent));
             w.writeAttribute("fillcolor_trans", QString::number(plots[i].graphs[g].fillColorTransparent));
+
+
+            w.writeAttribute("image_truecolor", QColor2String(plots[i].graphs[g].imageTrueColor));
+            w.writeAttribute("image_truecolor_trans", QString::number(plots[i].graphs[g].imageTrueTransparent));
+            w.writeAttribute("image_falsecolor", QColor2String(plots[i].graphs[g].imageFalseColor));
+            w.writeAttribute("image_falsecolor_trans", QString::number(plots[i].graphs[g].imageFalseTransparent));
+            w.writeAttribute("image_pixelwidth", QString::number(plots[i].graphs[g].imagePixelWidth));
+            w.writeAttribute("image_x", QString::number(plots[i].graphs[g].imageX));
+            w.writeAttribute("image_y", QString::number(plots[i].graphs[g].imageY));
+            w.writeAttribute("image_width", QString::number(plots[i].graphs[g].imageWidth));
+            w.writeAttribute("image_height", QString::number(plots[i].graphs[g].imageHeight));
+            w.writeAttribute("image_palette", QString::number(plots[i].graphs[g].imagePalette));
+            w.writeAttribute("image_min", QString::number(plots[i].graphs[g].imageMin));
+            w.writeAttribute("image_max", QString::number(plots[i].graphs[g].imageMax));
+
+
+
             w.writeEndElement();
         }
         w.writeEndElement();

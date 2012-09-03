@@ -271,7 +271,7 @@ void QFRDRTablePlotWidget::on_btnAddGraph_clicked() {
         g.color=autocolors.value(p.graphs.size()+1, QColor("red"));
         g.linewidth=2;
         g.fillColorTransparent=0.5;
-        g.fillColor=g.color;
+        g.fillColor=g.color.lighter();
         g.errorColor=g.color.darker();
         p.graphs.append(g);
         updating=true;
@@ -345,9 +345,10 @@ void QFRDRTablePlotWidget::reloadColumns(QComboBox *combo) {
 }
 
 void QFRDRTablePlotWidget::graphDataChanged() {
-    qDebug()<<"graphDataChanged    updating="<<updating;
+    //qDebug()<<"graphDataChanged    updating="<<updating;
     if (updating) return;
     if (current) {
+        updating=true;
         if (this->plot<0 || this->plot>=current->getPlotCount()) return;
         int r=ui->listGraphs->currentRow();
         QFRDRTable::PlotInfo p=current->getPlot(this->plot);
@@ -479,9 +480,20 @@ void QFRDRTablePlotWidget::graphDataChanged() {
             graph.ycolumn=qMax(-1, ui->cmbLinesYData->currentIndex()-1);
             graph.yerrorcolumn=qMax(-1, ui->cmbLinesYError->currentIndex()-1);
 
-            graph.errorColor=ui->cmbErrorColor->currentColor();
+            QColor oldColor=graph.color;
+            QColor oldDefaultErrorColor=oldColor.darker();
+            QColor oldDefaultFillColor=oldColor.lighter();
             graph.color=ui->cmbLineColor->currentColor();
-            graph.fillColor=ui->cmbFillColor->currentColor();
+            if (graph.errorColor!=oldDefaultErrorColor) graph.errorColor=ui->cmbErrorColor->currentColor();
+            else {
+                graph.errorColor=graph.color.darker();
+                ui->cmbErrorColor->setCurrentColor(graph.errorColor);
+            }
+            if (graph.fillColor!=oldDefaultFillColor) graph.fillColor=ui->cmbFillColor->currentColor();
+            else {
+                graph.fillColor=graph.color.lighter();
+                ui->cmbFillColor->setCurrentColor(graph.fillColor);
+            }
             graph.errorStyle=ui->cmbErrorStyle->getSymbol();
             graph.symbol=ui->cmbSymbol->getSymbol();
             graph.style=ui->cmbLineStyle->currentLineStyle();
@@ -496,12 +508,13 @@ void QFRDRTablePlotWidget::graphDataChanged() {
             current->setPlot(this->plot, p);
 
         }
+        updating=false;
     }
     updateGraph();
 }
 
 void QFRDRTablePlotWidget::plotDataChanged() {
-    qDebug()<<"plotDataChanged   updating="<<updating;
+    //qDebug()<<"plotDataChanged   updating="<<updating;
     if (updating) return;
     if (current) {
         if (this->plot<0 || this->plot>=current->getPlotCount()) return;
@@ -537,9 +550,9 @@ void QFRDRTablePlotWidget::plotDataChanged() {
 void QFRDRTablePlotWidget::updateGraph() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     if (current) {
-        qDebug()<<"updateGraph  plot="<<this->plot+1<<"/"<<current->getPlotCount();
+        //qDebug()<<"updateGraph  plot="<<this->plot+1<<"/"<<current->getPlotCount();
         if (this->plot<0 || this->plot>=current->getPlotCount()) return;
-        qDebug()<<"updateGraph";
+        //qDebug()<<"updateGraph";
         QFRDRTable::PlotInfo p=current->getPlot(this->plot);
 
         ui->plotter->set_doDrawing(false);
@@ -938,9 +951,11 @@ void QFRDRTablePlotWidget::updateData() {
     }
 }
 
+
+
 void QFRDRTablePlotWidget::connectWidgets()
 {
-    qDebug()<<"connectWidgets";
+    //qDebug()<<"connectWidgets";
     connect(ui->listGraphs, SIGNAL(currentRowChanged(int)), this, SLOT(listGraphs_currentRowChanged(int)));
 
     connect(ui->edtTitle, SIGNAL(textChanged(QString)), this, SLOT(plotDataChanged()));
@@ -985,7 +1000,7 @@ void QFRDRTablePlotWidget::connectWidgets()
 
 void QFRDRTablePlotWidget::disconnectWidgets()
 {
-    qDebug()<<"disconnectWidgets";
+    //qDebug()<<"disconnectWidgets";
     disconnect(ui->listGraphs, SIGNAL(currentRowChanged(int)), this, SLOT(listGraphs_currentRowChanged(int)));
 
     disconnect(ui->edtTitle, SIGNAL(textChanged(QString)), this, SLOT(plotDataChanged()));
