@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="stage_pi_logo.png">stage_pi.png</file>
+    </qresource>
+    <qresource prefix="/stage_pi">
+        <file alias="pi_joystick.png">pi_joystick.png</file>
+    </qresource>
+</RCC>

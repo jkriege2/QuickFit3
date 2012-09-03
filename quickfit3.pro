@@ -170,6 +170,22 @@ plg_fitfunctions_lightsheet.depends = lib libqf3widgets
     SUBDIRS += plg_lights_b040laserbox
     plg_lights_b040laserbox.subdir=./plugins/lights_b040laserbox
     plg_lights_b040laserbox.depends = lib libqf3widgets
+
+    SUBDIRS += plg_b040_ffmcontrol
+    plg_b040_ffmcontrol.subdir=./plugins/b040_ffmcontrol
+    plg_b040_ffmcontrol.depends = lib libqf3widgets
+
+    SUBDIRS += plg_multicontrol_stage
+    plg_multicontrol_stage.subdir=./plugins/multicontrol_stage
+    plg_multicontrol_stage.depends = lib libqf3widgets
+
+    SUBDIRS += plg_alv_autocorrelator5000
+    plg_alv_autocorrelator5000.subdir=./plugins/alv_autocorrelator5000
+    plg_alv_autocorrelator5000.depends = lib libqf3widgets
+
+    SUBDIRS += plg_scanner2000_nicounter
+    plg_scanner2000_nicounter.subdir=./plugins/scanner2000_nicounter
+    plg_scanner2000_nicounter.depends = lib libqf3widgets
 }
 
 

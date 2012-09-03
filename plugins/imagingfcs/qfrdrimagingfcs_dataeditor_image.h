@@ -24,7 +24,7 @@
 #include <QTableView>
 #include "qffitfunction.h"
 #include "qenhancedtableview.h"
-#include "../base_classes/qftablemodel.h"
+#include "qftablemodel.h"
 #include "qfhistogramview.h"
 #include "jkqtptools.h"
 #include <QFrame>
