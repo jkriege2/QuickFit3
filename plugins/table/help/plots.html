@@ -3,10 +3,31 @@
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
   <title>Data Table Online-Help: Plots</title>
+  <link rel="next" href="mathparser.html"> 
+  <link rel="prev" href="table.html"> 
+  <link rel="contents" href="table.html"> 
   </head>
   <body>
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 	<h2>Plots</h2>
-
+	<p>This plugin provides several plotting capabilities for data from the table in the "Plots" tab of the raw data record editor window. First you will have to add a new plot by clicking <img src=":/table/plot_add.png">. Then you can add graphs to this plot. If you created several plots these will be shown as a set of tabs that can also be delete using <img src=":/table/plot_delete.png"> or by clicking the "X" symbol inside the plot's tab.</p>
+	<p>For each plot the window will be split in two halfs (that can be resized by grabbing the separating line with the mouse). On the left you will see the plot itself together with some buttons to save/print/copy the data and the graphis. On the rhs two tabs "Plots" and "System" allow to add graphs to the plot and to change its overall appearance</p>
+	<p>The <b>"System"</b> tab contains several options for the coordinate system and axis properties:<ul>
+	  <li>Plot title and axis labels may be set freely. You can use a <a href="$$mainhelpdir$$jkqtmathtext.html">subset of LaTeX</a> in these to render mathematical expressions.</li>
+	  <li>Axis ranges can either be set by hand or using the two autorange buttons (after plots have been added). If an Autorange button is used, the plot range will be adjusted, so all plots are displayed completely on the graph. So the ranges are a bit larger than the actual datarange.</li>
+	  <li>It is possibly to scale both axes logarithmically (decadic logarithm).</li>
+	  <li>The grid may be switched on or off</li>
+	  <li>The plot may contain a key (usually in the top right corner). For this ky you may choose the position, whether it is displayed at all and several other appearence options.</li>
+	  <li>The plot uses the same font family for all texts (except if you use e.g. \rm or \sf in labels), only the sizes may be set separately for different types of labels.</li>
+	</ul></p>
+	<p>In the <b>"Plots"</b> you may add to or remove plots from the list of graphs using the buttons above the list. Below the list you can specify options for each graph:<ul>
+	  <li>Each graph has a type (lines, bars, image, ...) and a title which is displayed in the key. </li>
+	  <li>Depending on the type of plot you may choose up to four columns (X data and error, Y data and error) from which to take the data for the plot.</li>
+	  <li>For image plots you have to specify the width of the image in pixels. The height of the image in pixels is then the number of rows in the selected column divided by the width (integer division!). The you can position the image and set its size in system coordinates (x, y, image width, image height). For image plot you may also select a colorscale and format the colorbar and a value range on which to scale the colors. For mask image plots, you may specify two colors for true (!=0) and false (equal 0). the bar label will be used as a label for the color bar axis, so do not confuse with the graph title.</li>
+	  <li>For non-image plots several options exist to ste the plot appearance. Depending on the plot trype you may select plot symbols (and their size) whether to draw a line between the data points (and its style), how to fill the plot and how to draw error bars (as bars, lines, polygons etc.)</li>
+	</ul></p>
+	<p></p>
+	<p></p>
+	
 	</body>
 </html>

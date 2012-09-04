@@ -13,19 +13,22 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
 {
     autocolors.append(QColor("red"));
     autocolors.append(QColor("green"));
+    autocolors.append(QColor("blue"));
+    autocolors.append(QColor("magenta"));
+    autocolors.append(QColor("darkcyan"));
+    autocolors.append(QColor("darkred"));
+    autocolors.append(QColor("darkgreen"));
+    autocolors.append(QColor("darkblue"));
+    autocolors.append(QColor("darkmagenta"));
     autocolors.append(QColor("fuchsia"));
     autocolors.append(QColor("darkorange"));
-    autocolors.append(QColor("navy"));
     autocolors.append(QColor("firebrick"));
-    autocolors.append(QColor("darkgreen"));
-    autocolors.append(QColor("darkmagenta"));
     autocolors.append(QColor("darkgreen"));
     autocolors.append(QColor("darkslateblue"));
     autocolors.append(QColor("maroon"));
     autocolors.append(QColor("indianred"));
     autocolors.append(QColor("darkolivegreen"));
     autocolors.append(QColor("mediumpurple"));
-    autocolors.append(QColor("darkcyan"));
 
     updating=true;
     ui->setupUi(this);
@@ -33,6 +36,18 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     ui->edtXMax->setCheckBounds(true, false);
     ui->edtYMin->setCheckBounds(false, true);
     ui->edtYMax->setCheckBounds(true, false);
+    ui->edtImageHeight->setCheckBounds(true, false);
+    ui->edtImageHeight->setRange(0, 1e10);
+    ui->edtImageMax->setCheckBounds(false, false);
+    ui->edtImageMin->setCheckBounds(false, false);
+    ui->edtImageWidth->setCheckBounds(true, false);
+    ui->edtImageWidth->setRange(0, 1e10);
+    ui->edtImageX->setCheckBounds(true, false);
+    ui->edtImageY->setCheckBounds(true, false);
+    ui->edtAxisAspect->setRange(0,1e10);
+    ui->edtAxisAspect->setCheckBounds(true, false);
+    ui->edtDataAspect->setRange(0,1e10);
+    ui->edtDataAspect->setCheckBounds(true, false);
     connect(ui->edtXMin, SIGNAL(valueChanged(double)), ui->edtXMax, SLOT(setMinimum(double)));
     connect(ui->edtXMax, SIGNAL(valueChanged(double)), ui->edtXMin, SLOT(setMaximum(double)));
     connect(ui->edtYMin, SIGNAL(valueChanged(double)), ui->edtYMax, SLOT(setMinimum(double)));
@@ -98,6 +113,10 @@ void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
             ui->spinAxisLabelFontSize->setValue(g.axisLabelFontSize);
             ui->spinTitleFontSize->setValue(g.labelFontSize);
             ui->spinKeyFontSize->setValue(g.keyFontSize);
+            ui->chkKeepAxisAspect->setChecked(g.keepAxisAspectRatio);
+            ui->chkKeepDataAspect->setChecked(g.keepDataAspectRatio);
+            ui->edtAxisAspect->setValue(g.axisAspectRatio);
+            ui->edtDataAspect->setValue(g.dataAspectRatio);
             ui->listGraphs->clear();
             QList<QFRDRTable::GraphInfo> graphs=g.graphs;
             for (int i=0; i<g.graphs.size(); i++) {
@@ -182,6 +201,12 @@ void QFRDRTablePlotWidget::listGraphs_currentRowChanged(int currentRow) {
             case QFRDRTable::gtbarsHorizontal:
                 ui->cmbGraphType->setCurrentIndex(8);
                 break;
+            case QFRDRTable::gtImage:
+                ui->cmbGraphType->setCurrentIndex(9);
+                break;
+            case QFRDRTable::gtMaskImage:
+                ui->cmbGraphType->setCurrentIndex(10);
+                break;
             case QFRDRTable::gtLines:
             default:
                 ui->cmbGraphType->setCurrentIndex(0);
@@ -199,6 +224,29 @@ void QFRDRTablePlotWidget::listGraphs_currentRowChanged(int currentRow) {
         ui->sliderPlotTransparent->setValue(graph.colorTransparent*255.0);
         ui->sliderErrorTransparent->setValue(graph.errorColorTransparent*255.0);
         ui->sliderFillTransparent->setValue(graph.fillColorTransparent*255.0);
+        ui->cmbImageFalseColor->setCurrentColor(graph.imageFalseColor);
+        ui->sliderImageFalseColor->setValue(graph.imageFalseTransparent*255.0);
+        ui->cmbImageTrueColor->setCurrentColor(graph.imageTrueColor);
+        ui->sliderImageTrueColor->setValue(graph.imageTrueTransparent*255.0);
+        ui->edtImageHeight->setValue(graph.imageHeight);
+        ui->edtImageWidth->setValue(graph.imageWidth);
+        ui->edtImageMax->setValue(graph.imageMax);
+        ui->edtImageMin->setValue(graph.imageMin);
+        ui->edtImageX->setValue(graph.imageX);
+        ui->edtImageY->setValue(graph.imageY);
+        ui->spinImageWidth->setValue(graph.imagePixelWidth);
+        ui->cmbColormap->setColorPalette(graph.imagePalette);
+        ui->chkImageAutorange->setChecked(graph.imageAutoRange);
+
+
+        ui->chkImageColorbarRight->setChecked(graph.imageColorbarRight);
+        ui->chkImageColorbarTop->setChecked(graph.imageColorbarTop);
+        ui->edtColorbarLabel->setText(graph.imageLegend);
+        ui->spinColorbarWidth->setValue(graph.colorbarWidth);
+        ui->spinColorbarHeight->setValue(graph.colorbarRelativeHeight*100.0);
+
+
+        updatePlotWidgetVisibility();
     }
     connectWidgets();
 
@@ -358,120 +406,21 @@ void QFRDRTablePlotWidget::graphDataChanged() {
             ui->listGraphs->item(r)->setText(graph.title);
             ui->listGraphs->item(r)->setIcon(ui->cmbGraphType->itemIcon(ui->cmbGraphType->currentIndex()));
 
-
-            ui->cmbErrorColor->setEnabled(true);
-            ui->cmbErrorStyle->setEnabled(true);
-            ui->cmbLinesXError->setEnabled(true);
-            ui->cmbLinesYError->setEnabled(true);
-            ui->chkDrawLine->setEnabled(true);
-            ui->cmbSymbol->setEnabled(true);
-            ui->spinSymbolSize->setEnabled(true);
-            ui->cmbFillColor->setEnabled(true);
-            ui->cmbLineStyle->setEnabled(true);
-            ui->sliderErrorTransparent->setEnabled(true);
-            ui->sliderFillTransparent->setEnabled(true);
-            ui->sliderPlotTransparent->setEnabled(true);
-
             switch(ui->cmbGraphType->currentIndex()) {
-                case 1:
-                    graph.type=QFRDRTable::gtImpulsesVertical;
-                    ui->cmbLinesXError->setEnabled(false);
-                    ui->chkDrawLine->setEnabled(false);
-                    ui->cmbLineStyle->setEnabled(false);
-                    break;
-                case 2:
-                    graph.type=QFRDRTable::gtImpulsesHorizontal;
-                    ui->cmbErrorColor->setEnabled(true);
-                    ui->cmbErrorStyle->setEnabled(true);
-                    ui->cmbLinesXError->setEnabled(false);
-                    ui->cmbLinesYError->setEnabled(true);
-                    ui->chkDrawLine->setEnabled(false);
-                    ui->cmbSymbol->setEnabled(true);
-                    ui->spinSymbolSize->setEnabled(true);
-                    ui->cmbFillColor->setEnabled(true);
-                    ui->cmbLineStyle->setEnabled(false);
-                    break;
-                case 3:
-                    graph.type=QFRDRTable::gtFilledCurveX;
-                    ui->cmbErrorColor->setEnabled(true);
-                    ui->cmbErrorStyle->setEnabled(true);
-                    ui->cmbLinesXError->setEnabled(false);
-                    ui->cmbLinesYError->setEnabled(true);
-                    ui->chkDrawLine->setEnabled(false);
-                    ui->cmbSymbol->setEnabled(false);
-                    ui->spinSymbolSize->setEnabled(false);
-                    ui->cmbFillColor->setEnabled(true);
-                    ui->cmbLineStyle->setEnabled(true);
-                    break;
-                case 4:
-                    graph.type=QFRDRTable::gtFilledCurveY;
-                    ui->cmbErrorColor->setEnabled(true);
-                    ui->cmbErrorStyle->setEnabled(true);
-                    ui->cmbLinesXError->setEnabled(false);
-                    ui->cmbLinesYError->setEnabled(true);
-                    ui->chkDrawLine->setEnabled(false);
-                    ui->cmbSymbol->setEnabled(false);
-                    ui->spinSymbolSize->setEnabled(false);
-                    ui->cmbFillColor->setEnabled(true);
-                    ui->cmbLineStyle->setEnabled(true);
-                    break;
-                case 5:
-                    graph.type=QFRDRTable::gtStepsVertical;
-                    ui->cmbErrorColor->setEnabled(false);
-                    ui->cmbErrorStyle->setEnabled(false);
-                    ui->cmbLinesXError->setEnabled(false);
-                    ui->cmbLinesYError->setEnabled(false);
-                    ui->chkDrawLine->setEnabled(true);
-                    ui->cmbSymbol->setEnabled(false);
-                    ui->spinSymbolSize->setEnabled(false);
-                    ui->cmbFillColor->setEnabled(true);
-                    ui->cmbLineStyle->setEnabled(true);
-                    ui->sliderErrorTransparent->setEnabled(false);
-                    break;
-                case 6:
-                    graph.type=QFRDRTable::gtStepsHorizontal;
-                    ui->cmbErrorColor->setEnabled(false);
-                    ui->cmbErrorStyle->setEnabled(false);
-                    ui->cmbLinesXError->setEnabled(false);
-                    ui->cmbLinesYError->setEnabled(false);
-                    ui->chkDrawLine->setEnabled(true);
-                    ui->cmbSymbol->setEnabled(false);
-                    ui->spinSymbolSize->setEnabled(false);
-                    ui->cmbFillColor->setEnabled(true);
-                    ui->cmbLineStyle->setEnabled(true);
-                    ui->sliderErrorTransparent->setEnabled(false);
-                    break;
-                case 7:
-                    graph.type=QFRDRTable::gtbarsVertical;
-                    ui->cmbErrorColor->setEnabled(false);
-                    ui->cmbErrorStyle->setEnabled(false);
-                    ui->cmbLinesXError->setEnabled(false);
-                    ui->cmbLinesYError->setEnabled(false);
-                    ui->chkDrawLine->setEnabled(false);
-                    ui->cmbSymbol->setEnabled(false);
-                    ui->spinSymbolSize->setEnabled(false);
-                    ui->cmbFillColor->setEnabled(true);
-                    ui->cmbLineStyle->setEnabled(true);
-                    ui->sliderErrorTransparent->setEnabled(false);
-                    break;
-                case 8:
-                    graph.type=QFRDRTable::gtbarsHorizontal;
-                    ui->cmbErrorColor->setEnabled(false);
-                    ui->cmbErrorStyle->setEnabled(false);
-                    ui->cmbLinesXError->setEnabled(false);
-                    ui->cmbLinesYError->setEnabled(false);
-                    ui->chkDrawLine->setEnabled(false);
-                    ui->cmbSymbol->setEnabled(false);
-                    ui->spinSymbolSize->setEnabled(false);
-                    ui->cmbFillColor->setEnabled(true);
-                    ui->cmbLineStyle->setEnabled(true);
-                    ui->sliderErrorTransparent->setEnabled(false);
-                    break;
+                case 1: graph.type=QFRDRTable::gtImpulsesVertical; break;
+                case 2: graph.type=QFRDRTable::gtImpulsesHorizontal; break;
+                case 3: graph.type=QFRDRTable::gtFilledCurveX; break;
+                case 4: graph.type=QFRDRTable::gtFilledCurveY; break;
+                case 5: graph.type=QFRDRTable::gtStepsVertical; break;
+                case 6: graph.type=QFRDRTable::gtStepsHorizontal; break;
+                case 7: graph.type=QFRDRTable::gtbarsVertical; break;
+                case 8: graph.type=QFRDRTable::gtbarsHorizontal; break;
+                case 9: graph.type=QFRDRTable::gtImage; break;
+                case 10: graph.type=QFRDRTable::gtMaskImage; break;
                 case 0:
-                default:
-                    graph.type=QFRDRTable::gtLines;
-                    break;
+                default: graph.type=QFRDRTable::gtLines; break;
             }
+            updatePlotWidgetVisibility();
 
 
 
@@ -503,6 +452,24 @@ void QFRDRTablePlotWidget::graphDataChanged() {
             graph.colorTransparent=double(ui->sliderPlotTransparent->value())/255.0;
             graph.errorColorTransparent=double(ui->sliderErrorTransparent->value())/255.0;
             graph.fillColorTransparent=double(ui->sliderFillTransparent->value())/255.0;
+            graph.imageFalseTransparent=double(ui->sliderImageFalseColor->value())/255.0;
+            graph.imageTrueTransparent=double(ui->sliderImageTrueColor->value())/255.0;
+            graph.imageFalseColor=ui->cmbImageFalseColor->currentColor();
+            graph.imageTrueColor=ui->cmbImageTrueColor->currentColor();
+            graph.imageHeight=ui->edtImageHeight->value();
+            graph.imageWidth=ui->edtImageWidth->value();
+            graph.imageMax=ui->edtImageMax->value();
+            graph.imageMin=ui->edtImageMin->value();
+            graph.imageX=ui->edtImageX->value();
+            graph.imageY=ui->edtImageY->value();
+            graph.imagePixelWidth=ui->spinImageWidth->value();
+            graph.imagePalette=ui->cmbColormap->colorPalette();
+            graph.imageAutoRange=ui->chkImageAutorange->isChecked();
+            graph.imageColorbarRight=ui->chkImageColorbarRight->isChecked();
+            graph.imageColorbarTop=ui->chkImageColorbarTop->isChecked();
+            graph.imageLegend=ui->edtColorbarLabel->text();
+            graph.colorbarWidth=ui->spinColorbarWidth->value();
+            graph.colorbarRelativeHeight=ui->spinColorbarHeight->value()/100.0;
 
             p.graphs[r]=graph;
             current->setPlot(this->plot, p);
@@ -540,6 +507,10 @@ void QFRDRTablePlotWidget::plotDataChanged() {
         p.keyTransparency=double(ui->sliderKeyTransparency->value())/255.0;
         p.keyPosition=ui->cmbKeyPosition->getPosition();
         p.keyLayout=ui->cmbKeyLayout->getKeyLayout();
+        p.dataAspectRatio=ui->edtDataAspect->value();
+        p.axisAspectRatio=ui->edtAxisAspect->value();
+        p.keepAxisAspectRatio=ui->chkKeepAxisAspect->isChecked();
+        p.keepDataAspectRatio=ui->chkKeepDataAspect->isChecked();
 
         current->setPlot(this->plot, p);
         //QFRDRTable::GraphInfo graph=current->getPlot(this->plot).graphs.value(currentRow, QFRDRTable::GraphInfo());
@@ -575,6 +546,10 @@ void QFRDRTablePlotWidget::updateGraph() {
         ui->plotter->get_plotter()->set_plotLabel(p.title);
         ui->plotter->get_plotter()->set_keyFont(p.fontName);
         ui->plotter->get_plotter()->set_keyFontSize(p.keyFontSize);
+        ui->plotter->get_plotter()->set_maintainAspectRatio(p.keepDataAspectRatio);
+        ui->plotter->get_plotter()->set_maintainAxisAspectRatio(p.keepAxisAspectRatio);
+        ui->plotter->get_plotter()->set_aspectRatio(p.dataAspectRatio);
+        ui->plotter->get_plotter()->set_axisAspectRatio(p.axisAspectRatio);
         QFont keyf(p.fontName);
         keyf.setPointSizeF(p.keyFontSize);
         QFontMetricsF keyfm(keyf);
@@ -879,6 +854,60 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_fillColor(fc);
                 pg->set_style(g.style);
                 ui->plotter->addGraph(pg);
+
+            } else if (g.type==QFRDRTable::gtImage) {
+                JKQTPColumnMathImage* pg=new JKQTPColumnMathImage(ui->plotter->get_plotter());
+                pg->set_title(g.title);
+
+                if (g.xcolumn>=0 && g.xcolumn<ui->plotter->getDatastore()->getColumnCount())  pg->set_imageColumn(g.xcolumn);
+                pg->set_autoImageRange(g.imageAutoRange);
+                pg->set_imageMin(g.imageMin);
+                pg->set_imageMax(g.imageMax);
+                pg->set_x(g.imageX);
+                pg->set_y(g.imageY);
+                pg->set_width(g.imageWidth);
+                pg->set_height(g.imageHeight);
+                pg->set_Nx(g.imagePixelWidth);
+                pg->set_palette(g.imagePalette);
+                pg->set_colorBarRightVisible(g.imageColorbarRight);
+                pg->set_colorBarTopVisible(g.imageColorbarTop);
+                pg->set_colorBarRelativeHeight(g.colorbarRelativeHeight);
+                pg->set_colorBarWidth(g.colorbarWidth);
+                /*pg->set_imageName(g.imageLegend);
+                pg->set_imageNameFontName(p.fontName);
+                pg->set_imageNameFontSize(p.axisLabelFontSize);*/
+                pg->get_colorBarRightAxis()->set_tickLabelFont(p.fontName);
+                pg->get_colorBarRightAxis()->set_tickLabelFontSize(p.axisFontSize);
+                pg->get_colorBarRightAxis()->set_axisLabel(g.imageLegend);
+                pg->get_colorBarRightAxis()->set_labelFont(p.fontName);
+                pg->get_colorBarRightAxis()->set_labelFontSize(p.axisFontSize);
+                pg->get_colorBarTopAxis()->set_tickLabelFont(p.fontName);
+                pg->get_colorBarTopAxis()->set_tickLabelFontSize(p.axisFontSize);
+                pg->get_colorBarTopAxis()->set_axisLabel(g.imageLegend);
+                pg->get_colorBarTopAxis()->set_labelFont(p.fontName);
+                pg->get_colorBarTopAxis()->set_labelFontSize(p.axisFontSize);
+
+                ui->plotter->addGraph(pg);
+
+            } else if (g.type==QFRDRTable::gtMaskImage) {
+                JKQTPColumnOverlayImageEnhanced* pg=new JKQTPColumnOverlayImageEnhanced(ui->plotter->get_plotter());
+                pg->set_title(g.title);
+
+                if (g.xcolumn>=0 && g.xcolumn<ui->plotter->getDatastore()->getColumnCount())  pg->set_imageColumn(g.xcolumn);
+                pg->set_x(g.imageX);
+                pg->set_y(g.imageY);
+                pg->set_width(g.imageWidth);
+                pg->set_height(g.imageHeight);
+                pg->set_Nx(g.imagePixelWidth);
+                pg->set_rectanglesAsImageOverlay(true);
+                QColor c=g.imageTrueColor;
+                c.setAlphaF(g.imageTrueTransparent);
+                pg->set_trueColor(c);
+                c=g.imageFalseColor;
+                c.setAlphaF(g.imageFalseTransparent);
+                pg->set_falseColor(c);
+
+                ui->plotter->addGraph(pg);
             } else { // gtLines etc.
                 JKQTPxyLineErrorGraph* pg=new JKQTPxyLineErrorGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
@@ -951,6 +980,256 @@ void QFRDRTablePlotWidget::updateData() {
     }
 }
 
+void QFRDRTablePlotWidget::updatePlotWidgetVisibility() {
+    if (current) {
+        if (this->plot<0 || this->plot>=current->getPlotCount()) return;
+        int r=ui->listGraphs->currentRow();
+        QFRDRTable::PlotInfo p=current->getPlot(this->plot);
+        if (r>=0 && r<p.graphs.size()) {
+            QFRDRTable::GraphInfo graph=p.graphs.at(r);
+
+
+            /*ui->cmbErrorColor->setVisible(true);
+            ui->cmbErrorStyle->setVisible(true);
+            ui->cmbLinesXError->setVisible(true);
+            ui->cmbLinesYError->setVisible(true);
+            ui->chkDrawLine->setVisible(true);
+            ui->cmbSymbol->setVisible(true);
+            ui->spinSymbolSize->setVisible(true);
+            ui->cmbFillColor->setVisible(true);
+            ui->cmbLineStyle->setVisible(true);
+            ui->sliderErrorTransparent->setVisible(true);
+            ui->sliderFillTransparent->setVisible(true);
+            ui->sliderPlotTransparent->setVisible(true);*/
+            ui->widErrorStyle->setVisible(true);
+            ui->widFillColor->setVisible(true);
+            ui->widGraphSettings->setVisible(true);
+            ui->widImage->setVisible(true);
+            ui->widLineStyle->setVisible(true);
+            ui->widSymbol->setVisible(true);
+            ui->labDataX->setVisible(true);
+            ui->labDataY->setVisible(true);
+            ui->labErrorStyle->setVisible(true);
+            ui->labErrorX->setVisible(true);
+            ui->labErrorY->setVisible(true);
+            ui->labFillColor->setVisible(true);
+            ui->labImage->setVisible(true);
+            ui->labLinestyle->setVisible(true);
+            ui->labSymbol->setVisible(true);
+            ui->labTitle->setVisible(true);
+            ui->labType->setVisible(true);
+            ui->chkDrawLine->setVisible(true);
+            ui->cmbLineStyle->setVisible(true);
+            ui->cmbLinesXData->setVisible(true);
+            ui->cmbLinesXError->setVisible(true);
+            ui->cmbLinesYData->setVisible(true);
+            ui->cmbLinesYError->setVisible(true);
+
+            switch(ui->cmbGraphType->currentIndex()) {
+
+
+                case 1:
+                    //graph.type=QFRDRTable::gtImpulsesVertical;
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->labErrorX->setVisible(false);
+                    ui->chkDrawLine->setVisible(false);
+                    ui->cmbLineStyle->setVisible(false);
+                    ui->labImage->setVisible(false);
+                    ui->widImage->setVisible(false);
+
+                    /*ui->widLineStyle->setVisible(false);
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->chkDrawLine->setVisible(false);
+                    ui->cmbLineStyle->setVisible(false);*/
+                    break;
+                case 2:
+                    //graph.type=QFRDRTable::gtImpulsesHorizontal;
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->labErrorX->setVisible(false);
+                    ui->chkDrawLine->setVisible(false);
+                    ui->cmbLineStyle->setVisible(false);
+                    ui->labImage->setVisible(false);
+                    ui->widImage->setVisible(false);
+
+                    /*ui->cmbErrorColor->setVisible(true);
+                    ui->cmbErrorStyle->setVisible(true);
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->cmbLinesYError->setVisible(true);
+                    ui->chkDrawLine->setVisible(false);
+                    ui->cmbSymbol->setVisible(true);
+                    ui->spinSymbolSize->setVisible(true);
+                    ui->cmbFillColor->setVisible(true);
+                    ui->cmbLineStyle->setVisible(false);                */
+
+                    break;
+                case 3:
+                    //graph.type=QFRDRTable::gtFilledCurveX;
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->labErrorX->setVisible(false);
+                    ui->labSymbol->setVisible(false);
+                    ui->widSymbol->setVisible(false);
+                    ui->labImage->setVisible(false);
+                    ui->widImage->setVisible(false);
+
+                    /*ui->cmbErrorColor->setVisible(true);
+                    ui->cmbErrorStyle->setVisible(true);
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->cmbLinesYError->setVisible(true);
+                    ui->chkDrawLine->setVisible(false);
+                    ui->cmbSymbol->setVisible(false);
+                    ui->spinSymbolSize->setVisible(false);
+                    ui->cmbFillColor->setVisible(true);
+                    ui->cmbLineStyle->setVisible(true);*/
+                    break;
+                case 4:
+                    //graph.type=QFRDRTable::gtFilledCurveY;
+                    ui->labImage->setVisible(false);
+                    ui->widImage->setVisible(false);
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->labErrorX->setVisible(false);
+                    ui->labSymbol->setVisible(false);
+                    ui->widSymbol->setVisible(false);
+
+                    /*ui->cmbErrorColor->setVisible(true);
+                    ui->cmbErrorStyle->setVisible(true);
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->cmbLinesYError->setVisible(true);
+                    ui->chkDrawLine->setVisible(false);
+                    ui->cmbSymbol->setVisible(false);
+                    ui->spinSymbolSize->setVisible(false);
+                    ui->cmbFillColor->setVisible(true);
+                    ui->cmbLineStyle->setVisible(true);*/
+                    break;
+                case 5:
+                    //graph.type=QFRDRTable::gtStepsVertical;
+                    ui->labImage->setVisible(false);
+                    ui->widImage->setVisible(false);
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->labErrorX->setVisible(false);
+                    ui->cmbLinesYError->setVisible(false);
+                    ui->labErrorY->setVisible(false);
+                    ui->labSymbol->setVisible(false);
+                    ui->widSymbol->setVisible(false);
+                    ui->widErrorStyle->setVisible(false);
+                    ui->labErrorStyle->setVisible(false);
+
+                    /*ui->cmbErrorColor->setVisible(false);
+                    ui->cmbErrorStyle->setVisible(false);
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->cmbLinesYError->setVisible(false);
+                    ui->cmbSymbol->setVisible(false);
+                    ui->spinSymbolSize->setVisible(false);
+                    ui->sliderErrorTransparent->setVisible(false);*/
+                    break;
+                case 6:
+                    //graph.type=QFRDRTable::gtStepsHorizontal;
+                    ui->labImage->setVisible(false);
+                    ui->widImage->setVisible(false);
+                    ui->labImage->setVisible(false);
+                    ui->widImage->setVisible(false);
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->labErrorX->setVisible(false);
+                    ui->cmbLinesYError->setVisible(false);
+                    ui->labErrorY->setVisible(false);
+                    ui->labSymbol->setVisible(false);
+                    ui->widSymbol->setVisible(false);
+                    ui->widErrorStyle->setVisible(false);
+                    ui->labErrorStyle->setVisible(false);
+/*                    ui->cmbErrorColor->setVisible(false);
+                    ui->cmbErrorStyle->setVisible(false);
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->cmbLinesYError->setVisible(false);
+                    ui->cmbSymbol->setVisible(false);
+                    ui->spinSymbolSize->setVisible(false);
+                    ui->sliderErrorTransparent->setVisible(false);*/
+                    break;
+                case 7:
+                    //graph.type=QFRDRTable::gtbarsVertical;
+                    ui->labImage->setVisible(false);
+                    ui->widImage->setVisible(false);
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->labErrorX->setVisible(false);
+                    ui->cmbLinesYError->setVisible(false);
+                    ui->labErrorY->setVisible(false);
+                    ui->labSymbol->setVisible(false);
+                    ui->widSymbol->setVisible(false);
+                    ui->widErrorStyle->setVisible(false);
+                    ui->labErrorStyle->setVisible(false);
+                    ui->chkDrawLine->setVisible(false);
+
+/*                    ui->cmbErrorColor->setVisible(false);
+                    ui->cmbErrorStyle->setVisible(false);
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->cmbLinesYError->setVisible(false);
+                    ui->chkDrawLine->setVisible(false);
+                    ui->cmbSymbol->setVisible(false);
+                    ui->spinSymbolSize->setVisible(false);
+                    ui->sliderErrorTransparent->setVisible(false);*/
+                    break;
+                case 8:
+                    //graph.type=QFRDRTable::gtbarsHorizontal;
+                    ui->labImage->setVisible(false);
+                    ui->widImage->setVisible(false);
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->labErrorX->setVisible(false);
+                    ui->cmbLinesYError->setVisible(false);
+                    ui->labErrorY->setVisible(false);
+                    ui->labSymbol->setVisible(false);
+                    ui->widSymbol->setVisible(false);
+                    ui->widErrorStyle->setVisible(false);
+                    ui->labErrorStyle->setVisible(false);
+                    ui->chkDrawLine->setVisible(false);
+                    break;
+                case 9:
+                    //graph.type=QFRDRTable::gtImage;
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->labErrorX->setVisible(false);
+                    ui->cmbLinesYData->setVisible(false);
+                    ui->labDataY->setVisible(false);
+                    ui->cmbLinesYError->setVisible(false);
+                    ui->labErrorY->setVisible(false);
+                    ui->labSymbol->setVisible(false);
+                    ui->widSymbol->setVisible(false);
+                    ui->widErrorStyle->setVisible(false);
+                    ui->labErrorStyle->setVisible(false);
+                    ui->widColor->setVisible(false);
+                    ui->labColor->setVisible(false);
+                    ui->widFillColor->setVisible(false);
+                    ui->labFillColor->setVisible(false);
+                    ui->widLineStyle->setVisible(false);
+                    ui->labLinestyle->setVisible(false);
+                    break;
+                case 10:
+                    //graph.type=QFRDRTable::gtMaskImage;
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->labErrorX->setVisible(false);
+                    ui->cmbLinesYData->setVisible(false);
+                    ui->labDataY->setVisible(false);
+                    ui->cmbLinesYError->setVisible(false);
+                    ui->labErrorY->setVisible(false);
+                    ui->labSymbol->setVisible(false);
+                    ui->widSymbol->setVisible(false);
+                    ui->widErrorStyle->setVisible(false);
+                    ui->labErrorStyle->setVisible(false);
+                    ui->widColor->setVisible(false);
+                    ui->labColor->setVisible(false);
+                    ui->widFillColor->setVisible(false);
+                    ui->labFillColor->setVisible(false);
+                    ui->widLineStyle->setVisible(false);
+                    ui->labLinestyle->setVisible(false);
+                    break;
+                case 0:
+                default:
+                    //graph.type=QFRDRTable::gtLines;
+                    ui->labImage->setVisible(false);
+                    ui->widImage->setVisible(false);
+                    break;
+            }
+        }
+    }
+
+}
+
 
 
 void QFRDRTablePlotWidget::connectWidgets()
@@ -977,6 +1256,10 @@ void QFRDRTablePlotWidget::connectWidgets()
     connect(ui->sliderKeyTransparency, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
     connect(ui->cmbKeyLayout, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     connect(ui->cmbKeyPosition, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->edtAxisAspect, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->edtDataAspect, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->chkKeepAxisAspect, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->chkKeepDataAspect, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
 
     connect(ui->edtGraphTitle, SIGNAL(textChanged(QString)), this, SLOT(graphDataChanged()));
     connect(ui->cmbGraphType, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
@@ -996,6 +1279,24 @@ void QFRDRTablePlotWidget::connectWidgets()
     connect(ui->sliderErrorTransparent, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
     connect(ui->sliderFillTransparent, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
     connect(ui->sliderPlotTransparent, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
+    connect(ui->cmbImageFalseColor, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
+    connect(ui->cmbImageTrueColor, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
+    connect(ui->cmbColormap, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
+    connect(ui->spinImageWidth, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
+    connect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    connect(ui->edtImageMax, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    connect(ui->edtImageMin, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    connect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    connect(ui->edtImageX, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    connect(ui->edtImageY, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    connect(ui->sliderImageFalseColor, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
+    connect(ui->sliderImageTrueColor, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
+    connect(ui->edtColorbarLabel, SIGNAL(textChanged(QString)), this, SLOT(graphDataChanged()));
+    connect(ui->spinColorbarWidth, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    connect(ui->spinColorbarHeight, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    connect(ui->chkImageColorbarRight, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
+    connect(ui->chkImageColorbarTop, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
+    connect(ui->chkImageAutorange, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
 }
 
 void QFRDRTablePlotWidget::disconnectWidgets()
@@ -1022,6 +1323,10 @@ void QFRDRTablePlotWidget::disconnectWidgets()
     disconnect(ui->sliderKeyTransparency, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
     disconnect(ui->cmbKeyLayout, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     disconnect(ui->cmbKeyPosition, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->edtAxisAspect, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->edtDataAspect, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->chkKeepAxisAspect, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->chkKeepDataAspect, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
 
 
     disconnect(ui->edtGraphTitle, SIGNAL(textChanged(QString)), this, SLOT(graphDataChanged()));
@@ -1042,4 +1347,23 @@ void QFRDRTablePlotWidget::disconnectWidgets()
     disconnect(ui->sliderErrorTransparent, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
     disconnect(ui->sliderFillTransparent, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
     disconnect(ui->sliderPlotTransparent, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
+    disconnect(ui->cmbImageFalseColor, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
+    disconnect(ui->cmbImageTrueColor, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
+    disconnect(ui->cmbColormap, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
+    disconnect(ui->spinImageWidth, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
+    disconnect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    disconnect(ui->edtImageMax, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    disconnect(ui->edtImageMin, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    disconnect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    disconnect(ui->edtImageX, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    disconnect(ui->edtImageY, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    disconnect(ui->sliderImageFalseColor, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
+    disconnect(ui->sliderImageTrueColor, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
+    disconnect(ui->edtColorbarLabel, SIGNAL(textChanged(QString)), this, SLOT(graphDataChanged()));
+    disconnect(ui->spinColorbarWidth, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    disconnect(ui->spinColorbarHeight, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
+    disconnect(ui->chkImageColorbarRight, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
+    disconnect(ui->chkImageColorbarTop, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
+    disconnect(ui->chkImageAutorange, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
+
 }

@@ -39,6 +39,12 @@ QFRDRTable::GraphInfo::GraphInfo() {
     imagePalette=JKQTPMathImage::MATLAB;
     imageMin=0;
     imageMax=0;
+    imageAutoRange=true;
+    imageLegend="";
+    imageColorbarRight=true;
+    imageColorbarTop=false;
+    colorbarWidth=20;
+    colorbarRelativeHeight=0.75;
 
 }
 
@@ -63,6 +69,10 @@ QFRDRTable::PlotInfo::PlotInfo()
     keyTransparency=0.5;
     keyPosition=JKQTPkeyInsideRight;
     keyLayout=JKQTPkeyLayoutOneColumn;
+    keepAxisAspectRatio=false;
+    keepDataAspectRatio=false;
+    dataAspectRatio=1;
+    axisAspectRatio=1;
 }
 
 
@@ -275,6 +285,11 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 plot.keyPosition=String2JKQTPkeyPosition(te.attribute("keyposition", "inside_right"));
                 plot.keyLayout=String2JKQTPkeyLayout(te.attribute("keylayout", "one_column"));
 
+                plot.keepDataAspectRatio=QStringToBool( te.attribute("keep_dataaspect", "false"));
+                plot.axisAspectRatio=CQStringToDouble(te.attribute("dataaspect", "1"));
+                plot.keepAxisAspectRatio=QStringToBool( te.attribute("keep_axisaspect", "false"));
+                plot.dataAspectRatio=CQStringToDouble(te.attribute("axisaspect", "1"));
+
                 QDomElement ge=te.firstChildElement("graph");
                 while (!ge.isNull()) {
                     GraphInfo graph;
@@ -310,6 +325,14 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.imagePalette=JKQTPMathImage::ColorPalette(ge.attribute("image_palette", "8").toInt());
                     graph.imageMin=ge.attribute("image_min", "0").toDouble();
                     graph.imageMax=ge.attribute("image_max", "0").toDouble();
+                    graph.imageAutoRange=QStringToBool(ge.attribute("image_autorange", "true"));
+
+                    graph.imageColorbarRight=QStringToBool(ge.attribute("image_colorbarright", "true"));
+                    graph.imageColorbarTop=QStringToBool(ge.attribute("image_colorbartop", "false"));
+                    graph.colorbarWidth=ge.attribute("image_colorbarwidth", "20").toDouble();
+                    graph.colorbarRelativeHeight=ge.attribute("image_colorbarrelativeheight", "0.75").toDouble();
+                    graph.imageLegend=ge.attribute("image_legend", "");
+
 
                     plot.graphs.append(graph);
                     ge = ge.nextSiblingElement("graph");
@@ -371,6 +394,11 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
         w.writeAttribute("keyposition", JKQTPkeyPosition2String(plots[i].keyPosition));
         w.writeAttribute("keylayout", JKQTPkeyLayout2String(plots[i].keyLayout));
 
+        w.writeAttribute("keep_dataaspect", boolToQString(plots[i].keepDataAspectRatio));
+        w.writeAttribute("dataaspect", CDoubleToQString(plots[i].axisAspectRatio));
+        w.writeAttribute("keep_axisaspect", boolToQString(plots[i].keepAxisAspectRatio));
+        w.writeAttribute("axisaspect", CDoubleToQString(plots[i].dataAspectRatio));
+
         for (int g=0; g<plots[i].graphs.size(); g++) {
             w.writeStartElement("graph");
             w.writeAttribute("type", GraphType2String(plots[i].graphs[g].type));
@@ -405,7 +433,13 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("image_palette", QString::number(plots[i].graphs[g].imagePalette));
             w.writeAttribute("image_min", QString::number(plots[i].graphs[g].imageMin));
             w.writeAttribute("image_max", QString::number(plots[i].graphs[g].imageMax));
+            w.writeAttribute("image_autorange", boolToQString(plots[i].graphs[g].imageAutoRange));
 
+            w.writeAttribute("image_colorbarright", boolToQString(plots[i].graphs[g].imageColorbarRight));
+            w.writeAttribute("image_colorbartop", boolToQString(plots[i].graphs[g].imageColorbarTop));
+            w.writeAttribute("image_colorbarwidth", QString::number(plots[i].graphs[g].colorbarWidth));
+            w.writeAttribute("image_colorbarrelativeheight", QString::number(plots[i].graphs[g].colorbarRelativeHeight));
+            w.writeAttribute("image_legend", plots[i].graphs[g].imageLegend);
 
 
             w.writeEndElement();

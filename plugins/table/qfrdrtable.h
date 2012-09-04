@@ -121,6 +121,13 @@ class QFRDRTable : public QFRawDataRecord {
             JKQTPMathImage::ColorPalette imagePalette;
             double imageMin;
             double imageMax;
+            bool imageAutoRange;
+            QString imageLegend;
+            bool imageColorbarRight;
+            bool imageColorbarTop;
+            int colorbarWidth;
+            double colorbarRelativeHeight;
+
         };
 
         struct PlotInfo {
@@ -132,6 +139,11 @@ class QFRDRTable : public QFRawDataRecord {
             bool xlog, ylog;
             bool grid;
             bool showKey;
+
+            bool keepAxisAspectRatio;
+            bool keepDataAspectRatio;
+            double dataAspectRatio;
+            double axisAspectRatio;
 
             /*bool showKeyBorder;
             double keyBorderWidth;

@@ -43,6 +43,7 @@ class QFRDRTablePlotWidget : public QWidget
         void plotDataChanged();
         void updateGraph();
         void updateData();
+        void updatePlotWidgetVisibility();
 
         void connectWidgets();
         void disconnectWidgets();

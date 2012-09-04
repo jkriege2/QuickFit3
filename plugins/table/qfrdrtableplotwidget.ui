@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1149</width>
-    <height>623</height>
+    <width>926</width>
+    <height>730</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -126,7 +126,13 @@
             <number>3</number>
            </property>
            <item row="0" column="0">
-            <widget class="QLabel" name="label_3">
+            <widget class="QLabel" name="labType">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Type:</string>
              </property>
@@ -137,6 +143,18 @@
            </item>
            <item row="0" column="1">
             <widget class="QComboBox" name="cmbGraphType">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>120</width>
+               <height>0</height>
+              </size>
+             </property>
              <item>
               <property name="text">
                <string>points/line graph</string>
@@ -222,16 +240,30 @@
               <property name="text">
                <string>image</string>
               </property>
+              <property name="icon">
+               <iconset resource="qfrdrtable.qrc">
+                <normaloff>:/table/icons/plot_image.png</normaloff>:/table/icons/plot_image.png</iconset>
+              </property>
              </item>
              <item>
               <property name="text">
                <string>image mask</string>
               </property>
+              <property name="icon">
+               <iconset resource="qfrdrtable.qrc">
+                <normaloff>:/table/icons/plot_maskimage.png</normaloff>:/table/icons/plot_maskimage.png</iconset>
+              </property>
              </item>
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label_6">
+            <widget class="QLabel" name="labTitle">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>T&amp;itle:</string>
              </property>
@@ -244,7 +276,13 @@
             <widget class="QLineEdit" name="edtGraphTitle"/>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="label">
+            <widget class="QLabel" name="labDataX">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Data column X:</string>
              </property>
@@ -254,10 +292,29 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QComboBox" name="cmbLinesXData"/>
+            <widget class="QComboBox" name="cmbLinesXData">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>120</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
            <item row="3" column="0">
-            <widget class="QLabel" name="label_2">
+            <widget class="QLabel" name="labErrorX">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Error column X:</string>
              </property>
@@ -267,10 +324,29 @@
             </widget>
            </item>
            <item row="3" column="1">
-            <widget class="QComboBox" name="cmbLinesXError"/>
+            <widget class="QComboBox" name="cmbLinesXError">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>120</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
            <item row="4" column="0">
-            <widget class="QLabel" name="label_4">
+            <widget class="QLabel" name="labDataY">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Data column Y:</string>
              </property>
@@ -280,10 +356,29 @@
             </widget>
            </item>
            <item row="4" column="1">
-            <widget class="QComboBox" name="cmbLinesYData"/>
+            <widget class="QComboBox" name="cmbLinesYData">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>120</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
            <item row="5" column="0">
-            <widget class="QLabel" name="label_5">
+            <widget class="QLabel" name="labErrorY">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Error column Y:</string>
              </property>
@@ -293,464 +388,438 @@
             </widget>
            </item>
            <item row="5" column="1">
-            <widget class="QComboBox" name="cmbLinesYError"/>
+            <widget class="QComboBox" name="cmbLinesYError">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>120</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
-           <item row="6" column="1">
-            <widget class="QCheckBox" name="chkDrawLine">
+           <item row="7" column="0">
+            <widget class="QLabel" name="labLinestyle">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
-              <string>draw line</string>
+              <string>line style:</string>
              </property>
             </widget>
            </item>
            <item row="7" column="1">
-            <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,0,1,0" columnminimumwidth="0,0,0,0,0">
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_28">
-               <property name="text">
-                <string>width: </string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-               <property name="buddy">
-                <cstring>spinLineWidth</cstring>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QDoubleSpinBox" name="spinLineWidth">
-               <property name="prefix">
-                <string/>
-               </property>
-               <property name="suffix">
-                <string/>
-               </property>
-               <property name="maximum">
-                <double>100.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>5.000000000000000</double>
-               </property>
-               <property name="value">
-                <double>1.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <widget class="QLabel" name="label_27">
-               <property name="text">
-                <string> style: </string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-               <property name="buddy">
-                <cstring>cmbLineStyle</cstring>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="3" colspan="2">
-              <widget class="LineStyleComboBox" name="cmbLineStyle"/>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_29">
-               <property name="text">
-                <string>color: </string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-               <property name="buddy">
-                <cstring>cmbLineColor</cstring>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="ColorComboBox" name="cmbLineColor"/>
-             </item>
-             <item row="1" column="2">
-              <widget class="QLabel" name="label_35">
-               <property name="text">
-                <string> transparency:</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-               <property name="buddy">
-                <cstring>cmbFillColor</cstring>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="3">
-              <widget class="QSlider" name="sliderPlotTransparent">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="maximum">
-                <number>255</number>
-               </property>
-               <property name="singleStep">
-                <number>5</number>
-               </property>
-               <property name="pageStep">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="invertedAppearance">
-                <bool>true</bool>
-               </property>
-               <property name="invertedControls">
-                <bool>false</bool>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::NoTicks</enum>
-               </property>
-               <property name="tickInterval">
-                <number>50</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="4">
-              <widget class="QSpinBox" name="spinBox_3">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="font">
-                <font>
-                 <pointsize>7</pointsize>
-                </font>
-               </property>
-               <property name="buttonSymbols">
-                <enum>QAbstractSpinBox::NoButtons</enum>
-               </property>
-               <property name="maximum">
-                <number>255</number>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            <widget class="QWidget" name="widLineStyle" native="true">
+             <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,0,0,0">
+              <property name="margin">
+               <number>0</number>
+              </property>
+              <item row="0" column="0" colspan="2">
+               <widget class="QCheckBox" name="chkDrawLine">
+                <property name="font">
+                 <font>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>draw line:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLabel" name="label_28">
+                <property name="text">
+                 <string>width: </string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QDoubleSpinBox" name="spinLineWidth">
+                <property name="prefix">
+                 <string/>
+                </property>
+                <property name="suffix">
+                 <string/>
+                </property>
+                <property name="maximum">
+                 <double>100.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>5.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="4">
+               <widget class="QLabel" name="label_27">
+                <property name="text">
+                 <string> style: </string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="5">
+               <widget class="LineStyleComboBox" name="cmbLineStyle">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </item>
            <item row="8" column="0">
-            <widget class="QLabel" name="label_24">
+            <widget class="QLabel" name="labFillColor">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>fill color:</string>
-             </property>
-             <property name="buddy">
-              <cstring>cmbFillColor</cstring>
              </property>
             </widget>
            </item>
            <item row="8" column="1">
-            <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,1,0">
-             <item>
-              <widget class="ColorComboBox" name="cmbFillColor"/>
-             </item>
-             <item>
-              <widget class="QSlider" name="sliderFillTransparent">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="maximum">
-                <number>255</number>
-               </property>
-               <property name="singleStep">
-                <number>5</number>
-               </property>
-               <property name="pageStep">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="invertedAppearance">
-                <bool>true</bool>
-               </property>
-               <property name="invertedControls">
-                <bool>false</bool>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::NoTicks</enum>
-               </property>
-               <property name="tickInterval">
-                <number>50</number>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSpinBox" name="spinBox_2">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="font">
-                <font>
-                 <pointsize>7</pointsize>
-                </font>
-               </property>
-               <property name="buttonSymbols">
-                <enum>QAbstractSpinBox::NoButtons</enum>
-               </property>
-               <property name="maximum">
-                <number>255</number>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            <widget class="QWidget" name="widFillColor" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,1,0">
+              <property name="margin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="ColorComboBox" name="cmbFillColor">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="sliderFillTransparent">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximum">
+                 <number>255</number>
+                </property>
+                <property name="singleStep">
+                 <number>5</number>
+                </property>
+                <property name="pageStep">
+                 <number>50</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="invertedAppearance">
+                 <bool>true</bool>
+                </property>
+                <property name="invertedControls">
+                 <bool>false</bool>
+                </property>
+                <property name="tickPosition">
+                 <enum>QSlider::NoTicks</enum>
+                </property>
+                <property name="tickInterval">
+                 <number>50</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spinBox_2">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>7</pointsize>
+                 </font>
+                </property>
+                <property name="buttonSymbols">
+                 <enum>QAbstractSpinBox::NoButtons</enum>
+                </property>
+                <property name="maximum">
+                 <number>255</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </item>
            <item row="9" column="0">
-            <widget class="QLabel" name="label_22">
+            <widget class="QLabel" name="labSymbol">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>symbol:</string>
-             </property>
-             <property name="buddy">
-              <cstring>cmbSymbol</cstring>
              </property>
             </widget>
            </item>
            <item row="9" column="1">
-            <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,0,0">
-             <item>
-              <widget class="JKQTPSymbolComboBox" name="cmbSymbol"/>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_30">
-               <property name="text">
-                <string>size: </string>
-               </property>
-               <property name="buddy">
-                <cstring>spinSymbolSize</cstring>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="spinSymbolSize">
-               <property name="prefix">
-                <string/>
-               </property>
-               <property name="suffix">
-                <string/>
-               </property>
-               <property name="maximum">
-                <double>100.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>5.000000000000000</double>
-               </property>
-               <property name="value">
-                <double>1.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item row="12" column="0">
-            <widget class="QLabel" name="label_25">
-             <property name="text">
-              <string>error style:</string>
-             </property>
-             <property name="buddy">
-              <cstring>cmbErrorStyle</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="12" column="1">
-            <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="1,0,1,0,0,0">
-             <item>
-              <widget class="JKQTPerrorPlotstyleComboBox" name="cmbErrorStyle"/>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_31">
-               <property name="text">
-                <string>color: </string>
-               </property>
-               <property name="buddy">
-                <cstring>cmbErrorColor</cstring>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="ColorComboBox" name="cmbErrorColor"/>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_34">
-               <property name="text">
-                <string>   transparency:</string>
-               </property>
-               <property name="buddy">
-                <cstring>cmbFillColor</cstring>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSlider" name="sliderErrorTransparent">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="maximum">
-                <number>255</number>
-               </property>
-               <property name="singleStep">
-                <number>5</number>
-               </property>
-               <property name="pageStep">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="invertedAppearance">
-                <bool>true</bool>
-               </property>
-               <property name="invertedControls">
-                <bool>false</bool>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::NoTicks</enum>
-               </property>
-               <property name="tickInterval">
-                <number>50</number>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSpinBox" name="spinBox">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="font">
-                <font>
-                 <pointsize>7</pointsize>
-                </font>
-               </property>
-               <property name="buttonSymbols">
-                <enum>QAbstractSpinBox::NoButtons</enum>
-               </property>
-               <property name="maximum">
-                <number>255</number>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="label_23">
-             <property name="text">
-              <string>line style:</string>
-             </property>
-             <property name="buddy">
-              <cstring>spinLineWidth</cstring>
-             </property>
+            <widget class="QWidget" name="widSymbol" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,0,0">
+              <property name="margin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="JKQTPSymbolComboBox" name="cmbSymbol">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_30">
+                <property name="text">
+                 <string>size: </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="spinSymbolSize">
+                <property name="prefix">
+                 <string/>
+                </property>
+                <property name="suffix">
+                 <string/>
+                </property>
+                <property name="maximum">
+                 <double>100.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>5.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
            <item row="10" column="0">
-            <widget class="QLabel" name="label_26">
-             <property name="text">
-              <string>image map props.:</string>
+            <widget class="QLabel" name="labErrorStyle">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
              </property>
-             <property name="buddy">
-              <cstring>cmbFillColor</cstring>
+             <property name="text">
+              <string>error style:</string>
              </property>
             </widget>
            </item>
            <item row="10" column="1">
-            <widget class="QWidget" name="widImage" native="true">
-             <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,1,1,1,1,1,1,1">
+            <widget class="QWidget" name="widErrorStyle" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="1,0,1,0,0,0">
               <property name="margin">
                <number>0</number>
               </property>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_39">
-                <property name="text">
-                 <string>color map:</string>
+              <item>
+               <widget class="JKQTPerrorPlotstyleComboBox" name="cmbErrorStyle">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1" colspan="7">
-               <widget class="JKQTPMathImageColorPalette" name="cmbColormap"/>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_41">
-                <property name="text">
-                 <string>image width:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>0</height>
+                 </size>
                 </property>
                </widget>
               </item>
-              <item row="4" column="2">
-               <widget class="QLabel" name="label_42">
+              <item>
+               <widget class="QLabel" name="label_31">
                 <property name="text">
-                 <string>image height:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 <string>color: </string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="4">
-               <widget class="QLabel" name="label_43">
-                <property name="text">
-                 <string>x:</string>
+              <item>
+               <widget class="ColorComboBox" name="cmbErrorColor">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_34">
+                <property name="text">
+                 <string>   transparency:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="sliderErrorTransparent">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximum">
+                 <number>255</number>
+                </property>
+                <property name="singleStep">
+                 <number>5</number>
+                </property>
+                <property name="pageStep">
+                 <number>50</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="invertedAppearance">
+                 <bool>true</bool>
+                </property>
+                <property name="invertedControls">
+                 <bool>false</bool>
+                </property>
+                <property name="tickPosition">
+                 <enum>QSlider::NoTicks</enum>
+                </property>
+                <property name="tickInterval">
+                 <number>50</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spinBox">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>7</pointsize>
+                 </font>
+                </property>
+                <property name="buttonSymbols">
+                 <enum>QAbstractSpinBox::NoButtons</enum>
+                </property>
+                <property name="maximum">
+                 <number>255</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="11" column="0">
+            <widget class="QLabel" name="labImage">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>image map:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="1">
+            <widget class="QWidget" name="widImage" native="true">
+             <layout class="QGridLayout" name="gridLayout_3" rowminimumheight="0,1,0,1,0,1,0,0,0">
+              <property name="margin">
+               <number>0</number>
+              </property>
+              <property name="spacing">
+               <number>3</number>
+              </property>
+              <item row="6" column="1">
+               <widget class="QFDoubleEdit" name="edtImageMin">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="ColorComboBox" name="cmbImageFalseColor">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>0</height>
+                 </size>
                 </property>
                </widget>
               </item>
               <item row="4" column="1">
-               <widget class="QLineEdit" name="edtImageWidth"/>
+               <widget class="QFDoubleEdit" name="edtImageWidth"/>
               </item>
-              <item row="4" column="3">
-               <widget class="QLineEdit" name="edtImageHeight"/>
-              </item>
-              <item row="4" column="5">
-               <widget class="QLineEdit" name="edtImageX"/>
-              </item>
-              <item row="4" column="7">
-               <widget class="QLineEdit" name="edtImageY"/>
-              </item>
-              <item row="4" column="6">
-               <widget class="QLabel" name="label_44">
-                <property name="text">
-                 <string>y:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0">
-               <widget class="QLabel" name="label_45">
-                <property name="text">
-                 <string>image min:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="1">
-               <widget class="QLineEdit" name="edtImageMin"/>
-              </item>
-              <item row="5" column="3">
-               <widget class="QLineEdit" name="edtImageMax"/>
-              </item>
-              <item row="5" column="2">
+              <item row="6" column="2">
                <widget class="QLabel" name="label_46">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>&lt;center&gt;...&lt;/center&gt;</string>
                 </property>
@@ -769,13 +838,119 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="QSpinBox" name="spinImageWidth">
-                <property name="minimum">
-                 <number>1</number>
+              <item row="4" column="3">
+               <widget class="QFDoubleEdit" name="edtImageHeight"/>
+              </item>
+              <item row="3" column="2">
+               <widget class="QLabel" name="label_32">
+                <property name="text">
+                 <string>   transparency:</string>
                 </property>
-                <property name="maximum">
-                 <number>10000</number>
+               </widget>
+              </item>
+              <item row="4" column="2">
+               <widget class="QLabel" name="label_42">
+                <property name="text">
+                 <string>image height:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="3">
+               <widget class="QFDoubleEdit" name="edtImageMax">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="ColorComboBox" name="cmbImageTrueColor">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QLabel" name="label_49">
+                <property name="text">
+                 <string>   transparency:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="3" colspan="3">
+               <layout class="QHBoxLayout" name="horizontalLayout_11">
+                <item>
+                 <widget class="QSlider" name="sliderImageFalseColor">
+                  <property name="minimumSize">
+                   <size>
+                    <width>32</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximum">
+                   <number>255</number>
+                  </property>
+                  <property name="singleStep">
+                   <number>5</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>50</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="invertedAppearance">
+                   <bool>true</bool>
+                  </property>
+                  <property name="invertedControls">
+                   <bool>false</bool>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>50</number>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="spinBox_6">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>7</pointsize>
+                   </font>
+                  </property>
+                  <property name="buttonSymbols">
+                   <enum>QAbstractSpinBox::NoButtons</enum>
+                  </property>
+                  <property name="maximum">
+                   <number>255</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_48">
+                <property name="text">
+                 <string>false color:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
@@ -789,96 +964,281 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="1" colspan="3">
-               <widget class="ColorComboBox" name="cmbImageTrueColor"/>
-              </item>
-              <item row="2" column="5" colspan="2">
-               <widget class="QSlider" name="sliderImageTrueColor">
-                <property name="minimumSize">
-                 <size>
-                  <width>32</width>
-                  <height>0</height>
-                 </size>
+              <item row="0" column="1">
+               <widget class="QSpinBox" name="spinImageWidth">
+                <property name="minimum">
+                 <number>1</number>
                 </property>
                 <property name="maximum">
-                 <number>255</number>
-                </property>
-                <property name="singleStep">
-                 <number>5</number>
-                </property>
-                <property name="pageStep">
-                 <number>50</number>
-                </property>
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="invertedAppearance">
-                 <bool>true</bool>
-                </property>
-                <property name="invertedControls">
-                 <bool>false</bool>
-                </property>
-                <property name="tickPosition">
-                 <enum>QSlider::NoTicks</enum>
-                </property>
-                <property name="tickInterval">
-                 <number>50</number>
+                 <number>10000</number>
                 </property>
                </widget>
               </item>
-              <item row="2" column="4">
-               <widget class="QLabel" name="label_32">
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_39">
                 <property name="text">
-                 <string>   transparency:</string>
-                </property>
-                <property name="buddy">
-                 <cstring>cmbFillColor</cstring>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="7">
-               <widget class="QSpinBox" name="spinBox_5">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>7</pointsize>
-                 </font>
-                </property>
-                <property name="buttonSymbols">
-                 <enum>QAbstractSpinBox::NoButtons</enum>
-                </property>
-                <property name="maximum">
-                 <number>255</number>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_48">
-                <property name="text">
-                 <string>false color:</string>
+                 <string>color map:</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
-              <item row="3" column="1" colspan="3">
-               <widget class="ColorComboBox" name="cmbImageFalseColor"/>
+              <item row="2" column="3" colspan="3">
+               <layout class="QHBoxLayout" name="horizontalLayout_10">
+                <item>
+                 <widget class="QSlider" name="sliderImageTrueColor">
+                  <property name="minimumSize">
+                   <size>
+                    <width>32</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximum">
+                   <number>255</number>
+                  </property>
+                  <property name="singleStep">
+                   <number>5</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>50</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="invertedAppearance">
+                   <bool>true</bool>
+                  </property>
+                  <property name="invertedControls">
+                   <bool>false</bool>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
+                  </property>
+                  <property name="tickInterval">
+                   <number>50</number>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="spinBox_5">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>7</pointsize>
+                   </font>
+                  </property>
+                  <property name="buttonSymbols">
+                   <enum>QAbstractSpinBox::NoButtons</enum>
+                  </property>
+                  <property name="maximum">
+                   <number>255</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
-              <item row="3" column="4">
-               <widget class="QLabel" name="label_49">
-                <property name="text">
-                 <string>   transparency:</string>
+              <item row="1" column="1" colspan="5">
+               <widget class="JKQTPMathImageColorPalette" name="cmbColormap">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
-                <property name="buddy">
-                 <cstring>cmbFillColor</cstring>
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>0</height>
+                 </size>
                 </property>
                </widget>
               </item>
-              <item row="3" column="5" colspan="2">
-               <widget class="QSlider" name="sliderImageFalseColor">
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_43">
+                <property name="text">
+                 <string>x:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QFDoubleEdit" name="edtImageX"/>
+              </item>
+              <item row="5" column="2">
+               <widget class="QLabel" name="label_44">
+                <property name="text">
+                 <string>y:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="3">
+               <widget class="QFDoubleEdit" name="edtImageY"/>
+              </item>
+              <item row="6" column="0">
+               <widget class="QCheckBox" name="chkImageAutorange">
+                <property name="text">
+                 <string>autorange:</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLabel" name="label_41">
+                <property name="text">
+                 <string>bar label:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_45">
+                <property name="text">
+                 <string>image width:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QLineEdit" name="edtColorbarLabel"/>
+              </item>
+              <item row="7" column="0">
+               <widget class="QLabel" name="label_50">
+                <property name="text">
+                 <string>colorbar width:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="1">
+               <widget class="QDoubleSpinBox" name="spinColorbarWidth">
+                <property name="suffix">
+                 <string> pix</string>
+                </property>
+                <property name="decimals">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <double>100000.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="2">
+               <widget class="QLabel" name="label_51">
+                <property name="text">
+                 <string>colorbar pos.:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="3">
+               <layout class="QHBoxLayout" name="horizontalLayout_13">
+                <item>
+                 <widget class="QCheckBox" name="chkImageColorbarRight">
+                  <property name="text">
+                   <string>right</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="chkImageColorbarTop">
+                  <property name="text">
+                   <string>top</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="8" column="0">
+               <widget class="QLabel" name="label_52">
+                <property name="text">
+                 <string>colorbar height:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="1">
+               <widget class="QDoubleSpinBox" name="spinColorbarHeight">
+                <property name="suffix">
+                 <string> %</string>
+                </property>
+                <property name="decimals">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <double>100.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="labColor">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>color:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QWidget" name="widColor" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_12">
+              <property name="margin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="ColorComboBox" name="cmbLineColor">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_35">
+                <property name="text">
+                 <string> transparency:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="sliderPlotTransparent">
                 <property name="minimumSize">
                  <size>
                   <width>32</width>
@@ -911,8 +1271,8 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="7">
-               <widget class="QSpinBox" name="spinBox_6">
+              <item>
+               <widget class="QSpinBox" name="spinBox_3">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -1090,7 +1450,7 @@
           </item>
          </layout>
         </item>
-        <item row="6" column="0">
+        <item row="8" column="0">
          <widget class="QLabel" name="label_16">
           <property name="text">
            <string>grid:</string>
@@ -1100,14 +1460,14 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="1">
+        <item row="8" column="1">
          <widget class="QCheckBox" name="chkGrid">
           <property name="text">
            <string>show grid</string>
           </property>
          </widget>
         </item>
-        <item row="7" column="0">
+        <item row="9" column="0">
          <widget class="QLabel" name="label_15">
           <property name="text">
            <string>key:</string>
@@ -1117,7 +1477,7 @@
           </property>
          </widget>
         </item>
-        <item row="8" column="0">
+        <item row="10" column="0">
          <widget class="QLabel" name="label_17">
           <property name="text">
            <string>font name:</string>
@@ -1127,10 +1487,10 @@
           </property>
          </widget>
         </item>
-        <item row="8" column="1">
+        <item row="10" column="1">
          <widget class="QFontComboBox" name="cmbFontname"/>
         </item>
-        <item row="9" column="0">
+        <item row="11" column="0">
          <widget class="QLabel" name="label_18">
           <property name="text">
            <string>key font size:</string>
@@ -1140,7 +1500,7 @@
           </property>
          </widget>
         </item>
-        <item row="9" column="1">
+        <item row="11" column="1">
          <widget class="QDoubleSpinBox" name="spinKeyFontSize">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1159,7 +1519,7 @@
           </property>
          </widget>
         </item>
-        <item row="10" column="0">
+        <item row="12" column="0">
          <widget class="QLabel" name="label_19">
           <property name="text">
            <string>axis tick font size:</string>
@@ -1169,7 +1529,7 @@
           </property>
          </widget>
         </item>
-        <item row="10" column="1">
+        <item row="12" column="1">
          <widget class="QDoubleSpinBox" name="spinAxisFontSize">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1188,7 +1548,7 @@
           </property>
          </widget>
         </item>
-        <item row="11" column="0">
+        <item row="13" column="0">
          <widget class="QLabel" name="label_20">
           <property name="text">
            <string>axis label font size:</string>
@@ -1198,7 +1558,7 @@
           </property>
          </widget>
         </item>
-        <item row="11" column="1">
+        <item row="13" column="1">
          <widget class="QDoubleSpinBox" name="spinAxisLabelFontSize">
           <property name="decimals">
            <number>1</number>
@@ -1211,7 +1571,7 @@
           </property>
          </widget>
         </item>
-        <item row="12" column="0">
+        <item row="14" column="0">
          <widget class="QLabel" name="label_21">
           <property name="text">
            <string>title font size:</string>
@@ -1221,7 +1581,7 @@
           </property>
          </widget>
         </item>
-        <item row="12" column="1">
+        <item row="14" column="1">
          <widget class="QDoubleSpinBox" name="spinTitleFontSize">
           <property name="decimals">
            <number>1</number>
@@ -1234,7 +1594,7 @@
           </property>
          </widget>
         </item>
-        <item row="7" column="1">
+        <item row="9" column="1">
          <layout class="QFormLayout" name="formLayout_2">
           <property name="fieldGrowthPolicy">
            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
@@ -1353,6 +1713,34 @@
           </item>
          </layout>
         </item>
+        <item row="6" column="0">
+         <widget class="QCheckBox" name="chkKeepAxisAspect">
+          <property name="text">
+           <string>keep axis aspect ratio</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QFDoubleEdit" name="edtAxisAspect">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <widget class="QFDoubleEdit" name="edtDataAspect">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0">
+         <widget class="QCheckBox" name="chkKeepDataAspect">
+          <property name="text">
+           <string>keep data aspect ratio</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </widget>
@@ -1443,9 +1831,6 @@
   <tabstop>cmbLinesXError</tabstop>
   <tabstop>cmbLinesYData</tabstop>
   <tabstop>cmbLinesYError</tabstop>
-  <tabstop>chkDrawLine</tabstop>
-  <tabstop>spinLineWidth</tabstop>
-  <tabstop>cmbLineStyle</tabstop>
   <tabstop>cmbSymbol</tabstop>
   <tabstop>spinSymbolSize</tabstop>
   <tabstop>cmbErrorStyle</tabstop>
@@ -1473,18 +1858,18 @@
  </resources>
  <connections>
   <connection>
-   <sender>sliderPlotTransparent</sender>
+   <sender>sliderKeyTransparency</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>spinBox_3</receiver>
+   <receiver>spinBox_4</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>828</x>
-     <y>407</y>
+     <x>850</x>
+     <y>326</y>
     </hint>
     <hint type="destinationlabel">
-     <x>872</x>
-     <y>408</y>
+     <x>901</x>
+     <y>327</y>
     </hint>
    </hints>
   </connection>
@@ -1495,12 +1880,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>828</x>
-     <y>432</y>
+     <x>866</x>
+     <y>440</y>
     </hint>
     <hint type="destinationlabel">
-     <x>872</x>
-     <y>433</y>
+     <x>894</x>
+     <y>441</y>
     </hint>
    </hints>
   </connection>
@@ -1511,28 +1896,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>800</x>
-     <y>631</y>
+     <x>866</x>
+     <y>486</y>
     </hint>
     <hint type="destinationlabel">
-     <x>870</x>
-     <y>629</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sliderKeyTransparency</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox_4</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>565</x>
-     <y>266</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>862</x>
-     <y>267</y>
+     <x>894</x>
+     <y>487</y>
     </hint>
    </hints>
   </connection>
@@ -1543,12 +1912,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>772</x>
-     <y>526</y>
+     <x>865</x>
+     <y>556</y>
     </hint>
     <hint type="destinationlabel">
-     <x>851</x>
-     <y>525</y>
+     <x>893</x>
+     <y>557</y>
     </hint>
    </hints>
   </connection>
@@ -1559,12 +1928,108 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>773</x>
-     <y>553</y>
+     <x>865</x>
+     <y>581</y>
     </hint>
     <hint type="destinationlabel">
-     <x>837</x>
-     <y>552</y>
+     <x>893</x>
+     <y>582</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkImageAutorange</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtImageMin</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>424</x>
+     <y>650</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>616</x>
+     <y>652</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkImageAutorange</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_46</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>424</x>
+     <y>650</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>696</x>
+     <y>652</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkImageAutorange</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtImageMax</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>424</x>
+     <y>650</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>888</x>
+     <y>652</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkKeepDataAspect</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtDataAspect</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>346</x>
+     <y>243</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>457</x>
+     <y>240</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkKeepAxisAspect</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtAxisAspect</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>314</x>
+     <y>219</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>395</x>
+     <y>219</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliderPlotTransparent</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_3</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>819</x>
+     <y>382</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>881</x>
+     <y>385</y>
     </hint>
    </hints>
   </connection>
