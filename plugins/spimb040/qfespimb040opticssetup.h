@@ -26,6 +26,7 @@
 #include "qftablemodel.h"
 #include "qprogresslistwidget.h"
 #include "qfextensionmeasurementdevice.h"
+#include "../interfaces/qfextensionglobalsettingsreadwrite.h"
 
 
 class QFESPIMB040MainWindow; // forward
@@ -50,6 +51,14 @@ class QFESPIMB040OpticsSetup : public QWidget {
         void loadSettings(QSettings& settings, QString prefix);
         /** \brief save settings */
         void storeSettings(QSettings& settings, QString prefix);
+
+
+
+        void loadPluginGlobalSettings(QSettings& settings, QString prefix);
+        void storePluginGlobalSettings(QSettings& settings, QString prefix) const;
+        void loadPluginGlobalSettings(QSettings& settings, QObject *extensionObject, QString prefix);
+        void storePluginGlobalSettings(QSettings& settings, QObject* extensionObject, QString prefix) const;
+
         /*! \brief lock access to stages: stop the thread used for stage access by this widget
 
             \note call this, if you want to access the stage from any other method outside this widget!!! otherwise concurrent thread accesses are possible!!!

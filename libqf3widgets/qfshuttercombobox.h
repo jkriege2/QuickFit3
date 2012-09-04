@@ -28,6 +28,7 @@ class QFWIDLIB_EXPORT QFShutterComboBox : public QEnhancedComboBox {
         void loadSettings(QSettings& settings, QString prefix=QString(""));
         /** \brief return the currently selected camera extension as QFExtension */
         QFExtension* currentExtension() const;
+        QObject* currentExtensionObject() const;
         /** \brief return the currently selected camera extension as QFExtensionShutter */
         QFExtensionShutter* currentExtensionShutter() const;
         /** \brief return the ID of the current camera device inside a QFExtensionShutter */

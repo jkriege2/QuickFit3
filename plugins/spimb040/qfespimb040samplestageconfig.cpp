@@ -725,6 +725,18 @@ QFExtension* QFESPIMB040SampleStageConfig::getZStageExtension() {
     return cmbStageZ->currentExtension();
 }
 
+QObject *QFESPIMB040SampleStageConfig::getXStageExtensionObject() {
+    return cmbStageX->currentExtensionObject();
+}
+
+QObject *QFESPIMB040SampleStageConfig::getYStageExtensionObject() {
+    return cmbStageY->currentExtensionObject();
+}
+
+QObject *QFESPIMB040SampleStageConfig::getZStageExtensionObject() {
+    return cmbStageZ->currentExtensionObject();
+}
+
 int QFESPIMB040SampleStageConfig::getZStageAxis() {
 
     return cmbStageZ->currentAxisID();

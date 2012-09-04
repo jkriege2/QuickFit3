@@ -46,7 +46,8 @@ HEADERS += spimb040.h \
     qfcameraconfigwidget.h \
     qfespimb040lightpathsavedialog.h \
     ../interfaces/qfextensionmeasurementdevice.h \
-    qfespimb040acquisitiondescription.h
+    qfespimb040acquisitiondescription.h \
+    ../interfaces/qfextensionglobalsettingsreadwrite.h
 
 SOURCES += spimb040.cpp \
            qfespimb040mainwindow.cpp \

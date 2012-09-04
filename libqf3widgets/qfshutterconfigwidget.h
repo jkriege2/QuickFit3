@@ -128,6 +128,7 @@ class QFWIDLIB_EXPORT QFShutterConfigWidget : public QWidget {
 
         /** \brief return a pointer to the ahutter QFExtension class */
         QFExtension* getShutterExtension() const;
+        QObject* getShutterExtensionObject() const;
 
         QPixmap iconOpened;
         QPixmap iconClosed;

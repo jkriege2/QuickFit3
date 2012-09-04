@@ -50,6 +50,18 @@ void QFStageComboBox::findExtensions() {
 
 }
 
+QObject* QFStageComboBox::currentExtensionObject() const {
+    if (currentIndex()<0) {
+        return NULL;
+    }
+
+    QPoint p = itemData(currentIndex()).toPoint();
+    if ((p.x()>=0)&&(p.x()<stages.size())) {
+        return stages[p.x()];
+    }
+    return NULL;
+}
+
 QFExtension* QFStageComboBox::currentExtension() const {
     if (currentIndex()<0) {
         return NULL;

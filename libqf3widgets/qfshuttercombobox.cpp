@@ -71,6 +71,19 @@ QFExtension* QFShutterComboBox::currentExtension() const {
     return extension;
 }
 
+QObject *QFShutterComboBox::currentExtensionObject() const
+{
+    if (currentIndex()<0) {
+        return NULL;
+    }
+
+    QPoint p = itemData(currentIndex()).toPoint();
+    if ((p.x()>=0)&&(p.x()<shutters.size())) {
+        return shutters[p.x()];
+    }
+    return NULL;
+}
+
 QFExtensionShutter* QFShutterComboBox::currentExtensionShutter() const {
     if (currentIndex()<0) {
         return NULL;

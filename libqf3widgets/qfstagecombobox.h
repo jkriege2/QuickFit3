@@ -30,6 +30,7 @@ class QFWIDLIB_EXPORT QFStageComboBox : public QEnhancedComboBox {
         void init(QFExtensionManager* extManager);
         /** \brief currently selected stage as QFExtension */
         QFExtension* currentExtension() const;
+        QObject* currentExtensionObject() const;
         /** \brief currently selected stage as QFExtensionLinearStage */
         QFExtensionLinearStage* currentExtensionLinearStage() const;
         /** \brief currently selected stage axis ID */

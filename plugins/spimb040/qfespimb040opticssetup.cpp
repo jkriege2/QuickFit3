@@ -228,6 +228,60 @@ void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) 
     }
 }
 
+void QFESPIMB040OpticsSetup::loadPluginGlobalSettings(QSettings &settings, QString prefix) {
+    loadPluginGlobalSettings(settings, ui->lsLaser1->getLightSourceExtensionObject(), prefix);
+    loadPluginGlobalSettings(settings, ui->lsLaser2->getLightSourceExtensionObject(), prefix);
+    loadPluginGlobalSettings(settings, ui->lsTransmission->getLightSourceExtensionObject(), prefix);
+    loadPluginGlobalSettings(settings, ui->shutterLaser1->getShutterExtensionObject(), prefix);
+    loadPluginGlobalSettings(settings, ui->shutterLaser2->getShutterExtensionObject(), prefix);
+    loadPluginGlobalSettings(settings, ui->shutterMainIllumination->getShutterExtensionObject(), prefix);
+    loadPluginGlobalSettings(settings, ui->shutterTransmission->getShutterExtensionObject(), prefix);
+    loadPluginGlobalSettings(settings, ui->filtcDetection->getFilterChangerExtensionObject(), prefix);
+    loadPluginGlobalSettings(settings, ui->camConfig1->cameraComboBox()->currentCameraQObject(), prefix);
+    loadPluginGlobalSettings(settings, ui->camConfig2->cameraComboBox()->currentCameraQObject(), prefix);
+    loadPluginGlobalSettings(settings, ui->stageSetup->getXStageExtensionObject(), prefix);
+    loadPluginGlobalSettings(settings, ui->stageSetup->getYStageExtensionObject(), prefix);
+    loadPluginGlobalSettings(settings, ui->stageSetup->getZStageExtensionObject(), prefix);
+}
+
+void QFESPIMB040OpticsSetup::storePluginGlobalSettings(QSettings &settings, QString prefix) const {
+    storePluginGlobalSettings(settings, ui->lsLaser1->getLightSourceExtensionObject(), prefix);
+    storePluginGlobalSettings(settings, ui->lsLaser2->getLightSourceExtensionObject(), prefix);
+    storePluginGlobalSettings(settings, ui->lsTransmission->getLightSourceExtensionObject(), prefix);
+    storePluginGlobalSettings(settings, ui->shutterLaser1->getShutterExtensionObject(), prefix);
+    storePluginGlobalSettings(settings, ui->shutterLaser2->getShutterExtensionObject(), prefix);
+    storePluginGlobalSettings(settings, ui->shutterMainIllumination->getShutterExtensionObject(), prefix);
+    storePluginGlobalSettings(settings, ui->shutterTransmission->getShutterExtensionObject(), prefix);
+    storePluginGlobalSettings(settings, ui->filtcDetection->getFilterChangerExtensionObject(), prefix);
+    storePluginGlobalSettings(settings, ui->camConfig1->cameraComboBox()->currentCameraQObject(), prefix);
+    storePluginGlobalSettings(settings, ui->camConfig2->cameraComboBox()->currentCameraQObject(), prefix);
+    storePluginGlobalSettings(settings, ui->stageSetup->getXStageExtensionObject(), prefix);
+    storePluginGlobalSettings(settings, ui->stageSetup->getYStageExtensionObject(), prefix);
+    storePluginGlobalSettings(settings, ui->stageSetup->getZStageExtensionObject(), prefix);
+}
+
+void QFESPIMB040OpticsSetup::loadPluginGlobalSettings(QSettings &settings, QObject *extensionObject, QString prefix) {
+    QFExtensionGlobalSettingsReadWrite* extensionRW=NULL;
+    QFExtension* extension=NULL;
+
+    extension=qobject_cast<QFExtension*>(extensionObject);
+    extensionRW=qobject_cast<QFExtensionGlobalSettingsReadWrite*>(extensionObject);
+    if (extensionRW) {
+        extensionRW->readGlobalSettings(settings, prefix+extension->getID()+"/");
+    }
+}
+
+void QFESPIMB040OpticsSetup::storePluginGlobalSettings(QSettings &settings, QObject *extensionObject, QString prefix) const {
+    QFExtensionGlobalSettingsReadWrite* extensionRW=NULL;
+    QFExtension* extension=NULL;
+
+    extension=qobject_cast<QFExtension*>(extensionObject);
+    extensionRW=qobject_cast<QFExtensionGlobalSettingsReadWrite*>(extensionObject);
+    if (extensionRW) {
+        extensionRW->writeGlobalSettings(settings, prefix+extension->getID()+"/");
+    }
+}
+
 double QFESPIMB040OpticsSetup::getCameraMagnification(int setup_cam) const {
     if (setup_cam==0) {
         return ui->objDetection->objective().magnification*ui->objTube1->objective().magnification;
@@ -1130,6 +1184,7 @@ void QFESPIMB040OpticsSetup::on_btnLoadSetup_clicked() {
     if (!filename.isEmpty()) {
         QSettings set(filename, QSettings::IniFormat);
         loadSettings(set, "optics_setup/");
+        loadPluginGlobalSettings(set, "plugin_global/");
     }
     ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ExperimentDescription/lastopticssetupdir", dir);
 
@@ -1150,6 +1205,7 @@ void QFESPIMB040OpticsSetup::on_btnSaveSetup_clicked()  {
         if (ok) {
             QSettings set(filename, QSettings::IniFormat);
             storeSettings(set, "optics_setup/");
+            storePluginGlobalSettings(set, "plugin_global/");
         }
     }
     ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ExperimentDescription/lastopticssetupdir", dir);

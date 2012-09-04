@@ -247,6 +247,15 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         /** \brief return a pointer to the z-axis QFExtension class */
         QFExtension* getZStageExtension();
 
+        /** \brief return a pointer to the x-axis QObject class */
+        QObject* getXStageExtensionObject();
+
+        /** \brief return a pointer to the y-axis QObject class */
+        QObject* getYStageExtensionObject();
+
+        /** \brief return a pointer to the z-axis QObject class */
+        QObject* getZStageExtensionObject();
+
 
 
         /** \brief get the axis number of x-axis stage inside its class */

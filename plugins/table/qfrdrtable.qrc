@@ -39,5 +39,7 @@
         <file alias="sort_inc.png">icons/sort_incr.png</file>
         <file>icons/plot_image.png</file>
         <file>icons/plot_maskimage.png</file>
+        <file alias="fileopen.png">icons/fileopen.png</file>
+        <file alias="filesave.png">icons/filesave.png</file>
     </qresource>
 </RCC>

@@ -155,6 +155,7 @@ class QFWIDLIB_EXPORT QFFilterChangerConfigWidget : public QFrame {
 
         /** \brief return a pointer to the ahutter QFExtension class */
         QFExtension* getFilterChangerExtension() const;
+        QObject* getFilterChangerExtensionObject() const;
 
 
         /** \brief get the FilterChanger number of the given axis */

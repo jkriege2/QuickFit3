@@ -50,7 +50,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabPlots">
        <attribute name="title">
@@ -273,7 +273,14 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="edtGraphTitle"/>
+            <widget class="QLineEdit" name="edtGraphTitle">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="labDataX">
@@ -530,6 +537,12 @@
               </item>
               <item>
                <widget class="QSlider" name="sliderFillTransparent">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="minimumSize">
                  <size>
                   <width>32</width>
@@ -714,6 +727,12 @@
               </item>
               <item>
                <widget class="QSlider" name="sliderErrorTransparent">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="minimumSize">
                  <size>
                   <width>32</width>
@@ -782,7 +801,7 @@
            </item>
            <item row="11" column="1">
             <widget class="QWidget" name="widImage" native="true">
-             <layout class="QGridLayout" name="gridLayout_3" rowminimumheight="0,1,0,1,0,1,0,0,0">
+             <layout class="QGridLayout" name="gridLayout_3" rowminimumheight="0,0,0,0,0,0,0,0,0">
               <property name="margin">
                <number>0</number>
               </property>
@@ -813,7 +832,14 @@
                </widget>
               </item>
               <item row="4" column="1">
-               <widget class="QFDoubleEdit" name="edtImageWidth"/>
+               <widget class="QFDoubleEdit" name="edtImageWidth">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
               </item>
               <item row="6" column="2">
                <widget class="QLabel" name="label_46">
@@ -839,7 +865,14 @@
                </widget>
               </item>
               <item row="4" column="3">
-               <widget class="QFDoubleEdit" name="edtImageHeight"/>
+               <widget class="QFDoubleEdit" name="edtImageHeight">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
               </item>
               <item row="3" column="2">
                <widget class="QLabel" name="label_32">
@@ -892,6 +925,12 @@
                <layout class="QHBoxLayout" name="horizontalLayout_11">
                 <item>
                  <widget class="QSlider" name="sliderImageFalseColor">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="minimumSize">
                    <size>
                     <width>32</width>
@@ -966,6 +1005,12 @@
               </item>
               <item row="0" column="1">
                <widget class="QSpinBox" name="spinImageWidth">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="minimum">
                  <number>1</number>
                 </property>
@@ -988,6 +1033,12 @@
                <layout class="QHBoxLayout" name="horizontalLayout_10">
                 <item>
                  <widget class="QSlider" name="sliderImageTrueColor">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="minimumSize">
                    <size>
                     <width>32</width>
@@ -1067,7 +1118,14 @@
                </widget>
               </item>
               <item row="5" column="1">
-               <widget class="QFDoubleEdit" name="edtImageX"/>
+               <widget class="QFDoubleEdit" name="edtImageX">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
               </item>
               <item row="5" column="2">
                <widget class="QLabel" name="label_44">
@@ -1080,7 +1138,14 @@
                </widget>
               </item>
               <item row="5" column="3">
-               <widget class="QFDoubleEdit" name="edtImageY"/>
+               <widget class="QFDoubleEdit" name="edtImageY">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
               </item>
               <item row="6" column="0">
                <widget class="QCheckBox" name="chkImageAutorange">
@@ -1113,7 +1178,14 @@
                </widget>
               </item>
               <item row="0" column="3">
-               <widget class="QLineEdit" name="edtColorbarLabel"/>
+               <widget class="QLineEdit" name="edtColorbarLabel">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
               </item>
               <item row="7" column="0">
                <widget class="QLabel" name="label_50">
@@ -1127,6 +1199,12 @@
               </item>
               <item row="7" column="1">
                <widget class="QDoubleSpinBox" name="spinColorbarWidth">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="suffix">
                  <string> pix</string>
                 </property>
@@ -1178,6 +1256,12 @@
               </item>
               <item row="8" column="1">
                <widget class="QDoubleSpinBox" name="spinColorbarHeight">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="suffix">
                  <string> %</string>
                 </property>
@@ -1239,6 +1323,12 @@
               </item>
               <item>
                <widget class="QSlider" name="sliderPlotTransparent">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="minimumSize">
                  <size>
                   <width>32</width>
@@ -1302,7 +1392,7 @@
         <string>&amp;System</string>
        </attribute>
        <layout class="QFormLayout" name="formLayout_3">
-        <item row="0" column="0">
+        <item row="3" column="0">
          <widget class="QLabel" name="label_9">
           <property name="text">
            <string>&amp;title:</string>
@@ -1312,10 +1402,17 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="edtTitle"/>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="edtTitle">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
-        <item row="1" column="0">
+        <item row="4" column="0">
          <widget class="QLabel" name="label_7">
           <property name="text">
            <string>X axis label:</string>
@@ -1325,10 +1422,17 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="edtXLabel"/>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="edtXLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
-        <item row="2" column="0">
+        <item row="5" column="0">
          <widget class="QLabel" name="label_8">
           <property name="text">
            <string>Y axis label:</string>
@@ -1338,10 +1442,17 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="edtYLabel"/>
+        <item row="5" column="1">
+         <widget class="QLineEdit" name="edtYLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
-        <item row="3" column="0">
+        <item row="6" column="0">
          <widget class="QLabel" name="label_10">
           <property name="text">
            <string>x axis range:</string>
@@ -1351,10 +1462,17 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
+        <item row="6" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QFDoubleEdit" name="edtXMin"/>
+           <widget class="QFDoubleEdit" name="edtXMin">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QLabel" name="label_13">
@@ -1364,7 +1482,14 @@
            </widget>
           </item>
           <item>
-           <widget class="QFDoubleEdit" name="edtXMax"/>
+           <widget class="QFDoubleEdit" name="edtXMax">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="btnAutoscaleX">
@@ -1375,7 +1500,7 @@
           </item>
          </layout>
         </item>
-        <item row="4" column="0">
+        <item row="7" column="0">
          <widget class="QLabel" name="label_11">
           <property name="text">
            <string>y axis range:</string>
@@ -1385,10 +1510,17 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
+        <item row="7" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QFDoubleEdit" name="edtYMin"/>
+           <widget class="QFDoubleEdit" name="edtYMin">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QLabel" name="label_14">
@@ -1398,7 +1530,14 @@
            </widget>
           </item>
           <item>
-           <widget class="QFDoubleEdit" name="edtYMax"/>
+           <widget class="QFDoubleEdit" name="edtYMax">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="btnAutoscaleY">
@@ -1409,7 +1548,7 @@
           </item>
          </layout>
         </item>
-        <item row="5" column="0">
+        <item row="8" column="0">
          <widget class="QLabel" name="label_12">
           <property name="text">
            <string>axis scaling:</string>
@@ -1419,7 +1558,7 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="1">
+        <item row="8" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
            <widget class="QCheckBox" name="chkLogX">
@@ -1450,7 +1589,47 @@
           </item>
          </layout>
         </item>
-        <item row="8" column="0">
+        <item row="9" column="0">
+         <widget class="QCheckBox" name="chkKeepAxisAspect">
+          <property name="text">
+           <string>keep axis aspect ratio</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1">
+         <widget class="QFDoubleEdit" name="edtAxisAspect">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="0">
+         <widget class="QCheckBox" name="chkKeepDataAspect">
+          <property name="text">
+           <string>keep data aspect ratio</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="1">
+         <widget class="QFDoubleEdit" name="edtDataAspect">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="0">
          <widget class="QLabel" name="label_16">
           <property name="text">
            <string>grid:</string>
@@ -1460,14 +1639,14 @@
           </property>
          </widget>
         </item>
-        <item row="8" column="1">
+        <item row="11" column="1">
          <widget class="QCheckBox" name="chkGrid">
           <property name="text">
            <string>show grid</string>
           </property>
          </widget>
         </item>
-        <item row="9" column="0">
+        <item row="12" column="0">
          <widget class="QLabel" name="label_15">
           <property name="text">
            <string>key:</string>
@@ -1477,124 +1656,7 @@
           </property>
          </widget>
         </item>
-        <item row="10" column="0">
-         <widget class="QLabel" name="label_17">
-          <property name="text">
-           <string>font name:</string>
-          </property>
-          <property name="buddy">
-           <cstring>cmbFontname</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="1">
-         <widget class="QFontComboBox" name="cmbFontname"/>
-        </item>
-        <item row="11" column="0">
-         <widget class="QLabel" name="label_18">
-          <property name="text">
-           <string>key font size:</string>
-          </property>
-          <property name="buddy">
-           <cstring>spinKeyFontSize</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="1">
-         <widget class="QDoubleSpinBox" name="spinKeyFontSize">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="decimals">
-           <number>1</number>
-          </property>
-          <property name="minimum">
-           <double>1.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>256.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="12" column="0">
-         <widget class="QLabel" name="label_19">
-          <property name="text">
-           <string>axis tick font size:</string>
-          </property>
-          <property name="buddy">
-           <cstring>spinAxisFontSize</cstring>
-          </property>
-         </widget>
-        </item>
         <item row="12" column="1">
-         <widget class="QDoubleSpinBox" name="spinAxisFontSize">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="decimals">
-           <number>1</number>
-          </property>
-          <property name="minimum">
-           <double>1.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>256.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="13" column="0">
-         <widget class="QLabel" name="label_20">
-          <property name="text">
-           <string>axis label font size:</string>
-          </property>
-          <property name="buddy">
-           <cstring>spinAxisLabelFontSize</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="13" column="1">
-         <widget class="QDoubleSpinBox" name="spinAxisLabelFontSize">
-          <property name="decimals">
-           <number>1</number>
-          </property>
-          <property name="minimum">
-           <double>1.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>256.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="14" column="0">
-         <widget class="QLabel" name="label_21">
-          <property name="text">
-           <string>title font size:</string>
-          </property>
-          <property name="buddy">
-           <cstring>spinTitleFontSize</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="14" column="1">
-         <widget class="QDoubleSpinBox" name="spinTitleFontSize">
-          <property name="decimals">
-           <number>1</number>
-          </property>
-          <property name="minimum">
-           <double>1.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>256.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="1">
          <layout class="QFormLayout" name="formLayout_2">
           <property name="fieldGrowthPolicy">
            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
@@ -1630,6 +1692,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_6">
             <item>
              <widget class="QSlider" name="sliderKeyTransparency">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="minimumSize">
                <size>
                 <width>32</width>
@@ -1696,7 +1764,14 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="JKQTPkeyPositionComboBox" name="cmbKeyPosition"/>
+           <widget class="JKQTPkeyPositionComboBox" name="cmbKeyPosition">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_36">
@@ -1709,37 +1784,179 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="JKQTPkeyLayoutComboBox" name="cmbKeyLayout"/>
+           <widget class="JKQTPkeyLayoutComboBox" name="cmbKeyLayout">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
-        <item row="6" column="0">
-         <widget class="QCheckBox" name="chkKeepAxisAspect">
+        <item row="13" column="0">
+         <widget class="QLabel" name="label_17">
           <property name="text">
-           <string>keep axis aspect ratio</string>
+           <string>font name:</string>
+          </property>
+          <property name="buddy">
+           <cstring>cmbFontname</cstring>
           </property>
          </widget>
         </item>
-        <item row="6" column="1">
-         <widget class="QFDoubleEdit" name="edtAxisAspect">
-          <property name="enabled">
-           <bool>false</bool>
+        <item row="13" column="1">
+         <widget class="QFontComboBox" name="cmbFontname">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
          </widget>
         </item>
-        <item row="7" column="1">
-         <widget class="QFDoubleEdit" name="edtDataAspect">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0">
-         <widget class="QCheckBox" name="chkKeepDataAspect">
+        <item row="14" column="0">
+         <widget class="QLabel" name="label_18">
           <property name="text">
-           <string>keep data aspect ratio</string>
+           <string>key font size:</string>
+          </property>
+          <property name="buddy">
+           <cstring>spinKeyFontSize</cstring>
           </property>
          </widget>
+        </item>
+        <item row="14" column="1">
+         <widget class="QDoubleSpinBox" name="spinKeyFontSize">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="decimals">
+           <number>1</number>
+          </property>
+          <property name="minimum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>256.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="15" column="0">
+         <widget class="QLabel" name="label_19">
+          <property name="text">
+           <string>axis tick font size:</string>
+          </property>
+          <property name="buddy">
+           <cstring>spinAxisFontSize</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="15" column="1">
+         <widget class="QDoubleSpinBox" name="spinAxisFontSize">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="decimals">
+           <number>1</number>
+          </property>
+          <property name="minimum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>256.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="16" column="0">
+         <widget class="QLabel" name="label_20">
+          <property name="text">
+           <string>axis label font size:</string>
+          </property>
+          <property name="buddy">
+           <cstring>spinAxisLabelFontSize</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="16" column="1">
+         <widget class="QDoubleSpinBox" name="spinAxisLabelFontSize">
+          <property name="decimals">
+           <number>1</number>
+          </property>
+          <property name="minimum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>256.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="17" column="0">
+         <widget class="QLabel" name="label_21">
+          <property name="text">
+           <string>title font size:</string>
+          </property>
+          <property name="buddy">
+           <cstring>spinTitleFontSize</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="17" column="1">
+         <widget class="QDoubleSpinBox" name="spinTitleFontSize">
+          <property name="decimals">
+           <number>1</number>
+          </property>
+          <property name="minimum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>256.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_14">
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnLoadSystem">
+            <property name="text">
+             <string>load the system settings from a template</string>
+            </property>
+            <property name="icon">
+             <iconset resource="qfrdrtable.qrc">
+              <normaloff>:/table/fileopen.png</normaloff>:/table/fileopen.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnSaveSystem">
+            <property name="text">
+             <string>save the system settings as a template</string>
+            </property>
+            <property name="icon">
+             <iconset resource="qfrdrtable.qrc">
+              <normaloff>:/table/filesave.png</normaloff>:/table/filesave.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>

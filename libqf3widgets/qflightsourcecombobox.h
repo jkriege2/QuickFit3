@@ -28,6 +28,7 @@ class QFWIDLIB_EXPORT QFLightSourceComboBox : public QEnhancedComboBox {
         void loadSettings(QSettings& settings, QString prefix=QString(""));
         /** \brief return the currently selected camera extension as QFExtension */
         QFExtension* currentExtension() const;
+        QObject* currentExtensionObject() const;
         /** \brief return the currently selected camera extension as QFExtensionLightSource */
         QFExtensionLightSource* currentExtensionLightSource() const;
         /** \brief return the ID of the current camera device inside a QFExtensionLightSource */

@@ -71,6 +71,17 @@ QFExtension* QFFilterChangerComboBox::currentExtension() const {
     return extension;
 }
 
+QObject* QFFilterChangerComboBox::currentExtensionObject() const {
+    if (currentIndex()<0) {
+        return NULL;
+    }
+
+    QPoint p = itemData(currentIndex()).toPoint();
+    if ((p.x()>=0)&&(p.x()<FilterChangers.size())) {
+        return FilterChangers[p.x()];
+    }
+    return NULL;
+}
 QFExtensionFilterChanger* QFFilterChangerComboBox::currentExtensionFilterChanger() const {
     if (currentIndex()<0) {
         return NULL;

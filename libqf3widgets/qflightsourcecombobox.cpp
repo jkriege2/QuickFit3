@@ -73,6 +73,20 @@ QFExtension* QFLightSourceComboBox::currentExtension() const {
     return extension;
 }
 
+QObject *QFLightSourceComboBox::currentExtensionObject() const
+{
+    if (currentIndex()<0) {
+        return NULL;
+    }
+
+    QPoint p = itemData(currentIndex()).toPoint();
+    //int LightSourceIdx=p.y();
+    if ((p.x()>=0)&&(p.x()<LightSources.size())) {
+        return LightSources[p.x()];
+    }
+    return NULL;
+}
+
 QFExtensionLightSource* QFLightSourceComboBox::currentExtensionLightSource() const {
     if (currentIndex()<0) {
         return NULL;

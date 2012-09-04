@@ -178,6 +178,11 @@ QFExtension *QFLightSourceConfigWidget::getLightSourceExtension() const {
     return cmbLightSource->currentExtension();
 }
 
+QObject *QFLightSourceConfigWidget::getLightSourceExtensionObject() const
+{
+    return cmbLightSource->currentExtensionObject();
+}
+
 int QFLightSourceConfigWidget::getLightSourceID() const {
     return cmbLightSource->currentLightSourceID();
 }

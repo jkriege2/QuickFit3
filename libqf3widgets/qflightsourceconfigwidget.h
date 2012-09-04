@@ -83,6 +83,7 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidget : public QFrame {
 
         /** \brief return a pointer to the ahutter QFExtension class */
         QFExtension* getLightSourceExtension() const;
+        QObject* getLightSourceExtensionObject() const;
 
 
         /** \brief get the LightSource number of the given axis */

@@ -95,7 +95,7 @@ void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
     disconnectWidgets();
     if (record) {
         if (graph>=0 && graph<record->getPlotCount()) {
-            ui->tabSystem->setVisible(true);
+            ui->tabSystem->setEnabled(true);
             QFRDRTable::PlotInfo g=record->getPlot(plot);
             ui->edtTitle->setText(g.title);
             ui->edtXLabel->setText(g.xlabel);
@@ -126,7 +126,7 @@ void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
                 ui->listGraphs->addItem(w);
             }
         } else {
-            ui->tabSystem->setVisible(false);
+            ui->tabSystem->setEnabled(false);
         }
     }
     ui->listGraphs->setCurrentRow(0);
@@ -362,6 +362,7 @@ void QFRDRTablePlotWidget::on_plotter_plotMouseMove(double x, double y)
 {
     labPlotPosition->setText(tr("position: (%1, %2)").arg(floattohtmlstr(x).c_str()).arg(floattohtmlstr(y).c_str()));
 }
+
 
 void QFRDRTablePlotWidget::reloadColumns(QComboBox *combo) {
     bool updt=updating;
@@ -1366,4 +1367,77 @@ void QFRDRTablePlotWidget::disconnectWidgets()
     disconnect(ui->chkImageColorbarTop, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
     disconnect(ui->chkImageAutorange, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
 
+}
+
+void QFRDRTablePlotWidget::on_btnSaveSystem_clicked() {
+
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/table/graph_templates/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFRDRTablePlotWidget/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/table/graph_templates/").toString();
+    QString filename=qfGetSaveFileName(this, tr("save graph settings template ..."), dir, tr("graph settings template  (*.gst)"))    ;
+    if (!filename.isEmpty()) {
+        bool ok=true;
+        if (QFile::exists(filename)) {
+            ok=false;
+            if (QMessageBox::question(this, tr("save graph settings template ..."), tr("The file\n  '%1'\nalready exists. Overwrite?").arg(filename), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
+                ok=true;
+            }
+        }
+        if (ok) {
+            QSettings set(filename, QSettings::IniFormat);
+
+            set.setValue("title", ui->edtTitle->text());
+            set.setValue("xlabel",ui->edtXLabel->text());
+            set.setValue("ylabel",ui->edtYLabel->text());
+            set.setValue("grid",ui->chkGrid->isChecked());
+            set.setValue("logx",ui->chkLogX->isChecked());
+            set.setValue("logy",ui->chkLogY->isChecked());
+            set.setValue("showkey",ui->chkShowKey->isChecked());
+            set.setValue("fontname", ui->cmbFontname->currentText());
+            set.setValue("axisfontsize", ui->spinAxisFontSize->value());
+            set.setValue("axislabelfontsize", ui->spinAxisLabelFontSize->value());
+            set.setValue("keyfontsize", ui->spinKeyFontSize->value());
+            set.setValue("titlefontsize", ui->spinTitleFontSize->value());
+            set.setValue("keytransparency", ui->sliderKeyTransparency->value());
+            set.setValue("keylayout", ui->cmbKeyLayout->currentIndex());
+            set.setValue("keyposition", ui->cmbKeyPosition->currentIndex());
+            set.setValue("axisaspect", ui->edtAxisAspect->value());
+            set.setValue("dataaspect", ui->edtDataAspect->value());
+            set.setValue("keepaxisaspect", ui->chkKeepAxisAspect->isChecked());
+            set.setValue("keepdataaspect", ui->chkKeepDataAspect->isChecked());
+        }
+    }
+    ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRTablePlotWidget/lasttemplatedir", dir);
+}
+
+
+void QFRDRTablePlotWidget::on_btnLoadSystem_clicked() {
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/table/graph_templates/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFRDRTablePlotWidget/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/table/graph_templates/").toString();
+    QString filename=qfGetOpenFileName(this, tr("open graph settings template ..."), dir, tr("graph settings template (*.gst)"))    ;
+    if (!filename.isEmpty()) {
+        QSettings set(filename, QSettings::IniFormat);
+
+
+        ui->edtTitle->setText(set.value("title", ui->edtTitle->text()).toString());
+        ui->edtXLabel->setText(set.value("xlabel",ui->edtXLabel->text()).toString());
+        ui->edtYLabel->setText(set.value("ylabel",ui->edtYLabel->text()).toString());
+        ui->chkGrid->setChecked(set.value("grid",ui->chkGrid->isChecked()).toBool());
+        ui->chkLogX->setChecked(set.value("logx",ui->chkLogX->isChecked()).toBool());
+        ui->chkLogY->setChecked(set.value("logy",ui->chkLogY->isChecked()).toBool());
+        ui->chkShowKey->setChecked(set.value("showkey",ui->chkShowKey->isChecked()).toBool());
+        ui->cmbFontname->setCurrentFont(QFont(set.value("fontname", ui->cmbFontname->currentFont().family()).toString()));
+        ui->spinAxisFontSize->setValue(set.value("axisfontsize", ui->spinAxisFontSize->value()).toDouble());
+        ui->spinAxisLabelFontSize->setValue(set.value("axislabelfontsize", ui->spinAxisLabelFontSize->value()).toDouble());
+        ui->spinKeyFontSize->setValue(set.value("keyfontsize", ui->spinKeyFontSize->value()).toDouble());
+        ui->spinTitleFontSize->setValue(set.value("titlefontsize", ui->spinTitleFontSize->value()).toDouble());
+        ui->sliderKeyTransparency->setValue(set.value("keytransparency", ui->sliderKeyTransparency->value()).toDouble());
+        ui->cmbKeyLayout->setCurrentIndex(set.value("keylayout", ui->cmbKeyLayout->currentIndex()).toInt());
+        ui->cmbKeyPosition->setCurrentIndex(set.value("keyposition", ui->cmbKeyPosition->currentIndex()).toInt());
+        ui->edtAxisAspect->setValue(set.value("axisaspect", ui->edtAxisAspect->value()).toDouble());
+        ui->edtDataAspect->setValue(set.value("dataaspect", ui->edtDataAspect->value()).toDouble());
+        ui->chkKeepAxisAspect->setChecked(set.value("keepaxisaspect", ui->chkKeepAxisAspect->isChecked()).toBool());
+        ui->chkKeepDataAspect->setChecked(set.value("keepdataaspect", ui->chkKeepDataAspect->isChecked()).toBool());
+
+    }
+    ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRTablePlotWidget/lasttemplatedir", dir);
 }

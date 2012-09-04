@@ -37,6 +37,8 @@ class QFRDRTablePlotWidget : public QWidget
         void on_btnAutoscaleX_clicked();
         void on_btnAutoscaleY_clicked();
         void on_plotter_plotMouseMove(double x, double y);
+        void on_btnLoadSystem_clicked();
+        void on_btnSaveSystem_clicked();
 
         void reloadColumns(QComboBox* combo);
         void graphDataChanged();

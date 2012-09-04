@@ -238,6 +238,11 @@ QFExtension* QFShutterConfigWidget::getShutterExtension() const {
     return cmbShutter->currentExtension();
 }
 
+QObject *QFShutterConfigWidget::getShutterExtensionObject() const
+{
+    return cmbShutter->currentExtensionObject();
+}
+
 int QFShutterConfigWidget::getShutterID()  const{
 
     return cmbShutter->currentShutterID();

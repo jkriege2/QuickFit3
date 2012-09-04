@@ -342,6 +342,11 @@ QFExtension* QFFilterChangerConfigWidget::getFilterChangerExtension() const {
     return cmbFilterChanger->currentExtension();
 }
 
+QObject *QFFilterChangerConfigWidget::getFilterChangerExtensionObject() const
+{
+    return cmbFilterChanger->currentExtensionObject();
+}
+
 int QFFilterChangerConfigWidget::getFilterChangerID() const {
 
     return cmbFilterChanger->currentFilterChangerID();
