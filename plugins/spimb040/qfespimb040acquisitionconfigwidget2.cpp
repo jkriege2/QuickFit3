@@ -1,6 +1,6 @@
 #include "qfespimb040acquisitionconfigwidget2.h"
 #include "ui_qfespimb040acquisitionconfigwidget2.h"
-#include "qfespimb040mainwindow.h"
+
 #include "qfpluginservices.h"
 #include "qfstagecombobox.h"
 #include "qfextensionmanager.h"
@@ -159,6 +159,14 @@ bool QFESPIMB040AcquisitionConfigWidget2::use2() const {
 
 bool QFESPIMB040AcquisitionConfigWidget2::overview() const {
     return ui->chkOverview->isChecked();
+}
+
+int QFESPIMB040AcquisitionConfigWidget2::frames1() const {
+    return ui->spinFrames->value();
+}
+
+int QFESPIMB040AcquisitionConfigWidget2::frames2() const {
+    return ui->spinFrames2->value();
 }
 
 bool QFESPIMB040AcquisitionConfigWidget2::lightpathActivated() const {
@@ -342,6 +350,16 @@ void QFESPIMB040AcquisitionConfigWidget2::lightpathesChanged(QFESPIMB040OpticsSe
 void QFESPIMB040AcquisitionConfigWidget2::updateReplaces()
 {
     setGlobalReplaces(opticsSetup, expDescription, acqDescription);
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnReset1_clicked()
+{
+    ui->spinFrames->setValue(ui->spinFrames->minimum());
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnReset2_clicked()
+{
+    ui->spinFrames2->setValue(ui->spinFrames2->minimum());
 }
 
 int QFESPIMB040AcquisitionConfigWidget2::repeats() const

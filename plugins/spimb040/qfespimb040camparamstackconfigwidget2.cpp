@@ -1,7 +1,6 @@
 #include "qfespimb040camparamstackconfigwidget2.h"
 #include "ui_qfespimb040camparamstackconfigwidget2.h"
 
-#include "qfespimb040mainwindow.h"
 #include "qfpluginservices.h"
 #include "qfstagecombobox.h"
 #include "qfextensionmanager.h"
@@ -63,6 +62,7 @@ void QFESPIMB040CamParamStackConfigWidget2::loadSettings(QSettings& settings, QS
 
     ui->chkLightpath->setChecked(settings.value(prefix+"lightpath", false).toBool());
     ui->cmbLightpath->setCurrentIndex(settings.value(prefix+"lightpathidx", -1).toInt());
+    ui->chkPreviewMode->setChecked(settings.value(prefix+"chkPreviewMode", false).toBool());
 
     ui->chkSaveMeasurements->setChecked(settings.value(prefix+"savemeasurement", false).toBool());
     on_chkUse1_clicked(true);
@@ -87,7 +87,8 @@ void QFESPIMB040CamParamStackConfigWidget2::storeSettings(QSettings& settings, Q
 
     settings.setValue(prefix+"lightpathidx", ui->cmbLightpath->currentIndex());
     settings.setValue(prefix+"lightpath", ui->chkLightpath->isChecked());
-    settings.setValue(prefix+"savemeasurement", ui->chkSaveMeasurements->isChecked());
+    settings.setValue(prefix+"chkPreviewMode", ui->chkPreviewMode->isChecked());
+    settings.setValue(prefix+"lightpath", ui->chkLightpath->isChecked());
 }
 
 
@@ -285,4 +286,9 @@ void QFESPIMB040CamParamStackConfigWidget2::lightpathesChanged(QFESPIMB040Optics
 
 bool QFESPIMB040CamParamStackConfigWidget2::saveMeasurements() const {
     return ui->chkSaveMeasurements->isChecked();
+}
+
+bool QFESPIMB040CamParamStackConfigWidget2::previewMode() const
+{
+    return ui->chkPreviewMode->isChecked();
 }

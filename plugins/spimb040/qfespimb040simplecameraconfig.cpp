@@ -382,8 +382,8 @@ bool QFESPIMB040SimpleCameraConfig::connectDevice(QFExtension* extension, QFExte
         viewData.camera=cam;
         viewData.measurementDevice=qobject_cast<QFExtensionMeasurementDevice*>(object);
         viewData.usedCamera=camera;
-        cam->setLogging(m_log);
-        bool s=cam->connectDevice(camera);
+        cam->setCameraLogging(m_log);
+        bool s=cam->connectCameraDevice(camera);
         if (!s) {
             //cam->setLogging(NULL);
             viewData.reset();
@@ -404,8 +404,8 @@ void QFESPIMB040SimpleCameraConfig::setLog(QFPluginLogService* logger) {
 void QFESPIMB040SimpleCameraConfig::disconnectDevice() {
     locked=false;
     if (viewData.camera) {
-        if (viewData.camera->isConnected(viewData.usedCamera)) {
-            viewData.camera->disconnectDevice(viewData.usedCamera);
+        if (viewData.camera->isCameraConnected(viewData.usedCamera)) {
+            viewData.camera->disconnectCameraDevice(viewData.usedCamera);
         }
     }
 }
@@ -414,14 +414,14 @@ void QFESPIMB040SimpleCameraConfig::disconnectDevice() {
 bool QFESPIMB040SimpleCameraConfig::acquireSingle() {
     if (viewData.camera) {
         int usedcam=viewData.usedCamera;
-        if (viewData.camera->isConnected(usedcam)) {
-            int dw=viewData.camera->getImageWidth(usedcam);
-            int dh=viewData.camera->getImageHeight(usedcam);
+        if (viewData.camera->isCameraConnected(usedcam)) {
+            int dw=viewData.camera->getCameraImageWidth(usedcam);
+            int dh=viewData.camera->getImageCameraHeight(usedcam);
             uint64_t timestamp=0;
             viewData.rawImage.resize(dw, dh);
-            bool ok=viewData.camera->acquire(usedcam, viewData.rawImage.data(), &timestamp);
+            bool ok=viewData.camera->acquireOnCamera(usedcam, viewData.rawImage.data(), &timestamp);
             viewData.lastAcquisitionTime=QTime::currentTime();
-            double exposure=viewData.camera->getExposureTime(usedcam);
+            double exposure=viewData.camera->getCameraExposureTime(usedcam);
             viewData.timestamp=timestamp;
             viewData.exposureTime=exposure;
             viewData.acqFrames++;
@@ -454,7 +454,7 @@ void QFESPIMB040SimpleCameraConfig::disConnectAcquisitionDevice() {
             // connect to a device
 
             connectDevice(cmbAcquisitionDevice->currentExtension(), cmbAcquisitionDevice->currentExtensionCamera(), cmbAcquisitionDevice->currentCameraID(), cmbAcquisitionDevice->currentCameraQObject());
-            if (!cam->isConnected(camIdx)) {
+            if (!cam->isCameraConnected(camIdx)) {
                 displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
                 if (m_log) m_log->log_error(tr("error connecting to device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
             } else {
@@ -465,8 +465,8 @@ void QFESPIMB040SimpleCameraConfig::disConnectAcquisitionDevice() {
         } else {
             //disconnect from the current device and delete the settings widget
             displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
-            if (cam->isConnected(camIdx))  {
-                cam->disconnectDevice(camIdx);
+            if (cam->isCameraConnected(camIdx))  {
+                cam->disconnectCameraDevice(camIdx);
 
             }
             if (m_log) m_log->log_text(tr("disconnected from device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
@@ -481,7 +481,7 @@ void QFESPIMB040SimpleCameraConfig::previewSingle() {
     if (viewData.camera) {
         int camIdx=viewData.usedCamera;
         QFExtensionCamera* cam=viewData.camera;
-        if (viewData.camera->isConnected(camIdx)) {
+        if (viewData.camera->isCameraConnected(camIdx)) {
             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             QString filename="";
             filename=cmbPreviewConfiguration->currentConfigFilename();
@@ -489,7 +489,7 @@ void QFESPIMB040SimpleCameraConfig::previewSingle() {
             viewData.camera->useCameraSettings(camIdx, *settings);
             if (acquireSingle()) {
                 camView->show();
-                camView->setPixelSize(cam->getPixelWidth(camIdx)/m_magnification, cam->getPixelHeight(camIdx)/m_magnification);
+                camView->setPixelSize(cam->getCameraPixelWidth(camIdx)/m_magnification, cam->getCameraPixelHeight(camIdx)/m_magnification);
                 camView->displayImageComplete(viewData.rawImage, viewData.timestamp, viewData.exposureTime);
             } else {
                 if (m_log) m_log->log_error(tr("could not acquire frame, as device is not connected ...!\n"));
@@ -506,7 +506,7 @@ void QFESPIMB040SimpleCameraConfig::stopPreview() {
     //qDebug()<<"stopPreview()";
     if (viewData.camera) {
         int camIdx=viewData.usedCamera;
-        if (viewData.camera->isConnected(camIdx)) {
+        if (viewData.camera->isCameraConnected(camIdx)) {
             //qDebug()<<"   cam connected";
             viewData.abort_continuous_acquisition=true;
             actStartStopPreview->setChecked(false);
@@ -522,7 +522,7 @@ void QFESPIMB040SimpleCameraConfig::startStopPreview() {
     //qDebug()<<"startStopPreview() actStartSTop="<<actStartStopPreview->isChecked();
     if (viewData.camera) {
         int camIdx=viewData.usedCamera;
-        if (viewData.camera->isConnected(camIdx)) {
+        if (viewData.camera->isCameraConnected(camIdx)) {
             if (actStartStopPreview->isChecked()) {
                 displayStates(QFESPIMB040SimpleCameraConfig::Previewing);
                 viewData.acqFrames=0;
@@ -564,12 +564,12 @@ void QFESPIMB040SimpleCameraConfig::previewContinuous() {
             return;
         }
 
-        if (cam->isConnected(camIdx)) {
+        if (cam->isCameraConnected(camIdx)) {
             if (viewData.continuous_is_first) {
                 viewData.continuous_is_first=false;
             }
             if (acquireSingle()) {
-                camView->setPixelSize(cam->getPixelWidth(camIdx)/m_magnification, cam->getPixelHeight(camIdx)/m_magnification);
+                camView->setPixelSize(cam->getCameraPixelWidth(camIdx)/m_magnification, cam->getCameraPixelHeight(camIdx)/m_magnification);
                 camView->displayImage(viewData.rawImage, viewData.timestamp, viewData.exposureTime);
             }
         } else {
@@ -648,7 +648,7 @@ void QFESPIMB040SimpleCameraConfig::setReadOnly(bool readonly) {
 bool QFESPIMB040SimpleCameraConfig::isCameraConnected() const {
     if (viewData.camera) {
         int camIdx=viewData.usedCamera;
-        return viewData.camera->isConnected(camIdx);
+        return viewData.camera->isCameraConnected(camIdx);
     }
     return false;
 }

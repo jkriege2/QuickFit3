@@ -19,6 +19,8 @@ class QF3ComPortManager {
         QF3ComPortManager();
         ~QF3ComPortManager();
 
+        void clear();
+
         int addCOMPort(QSettings& settings, QString prefix=QString(""));
         void storeCOMPort(int port, QSettings& settings, QString prefix=QString(""));
 

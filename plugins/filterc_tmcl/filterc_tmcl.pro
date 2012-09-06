@@ -16,7 +16,8 @@ HEADERS += qfextensiontmclfilterchanger.h \
     ../interfaces/qfextensionfilterchanger.h \
     ../base_classes/qf3comportmanager.h \
     ../../../../../LIB/trunk/jkserialconnection.h \
-    ../base_classes/qf3tmclprotocolhandler.h
+    ../base_classes/qf3tmclprotocolhandler.h \
+    ../interfaces/qfextensionglobalsettingsreadwrite.h
 
 SOURCES += qfextensiontmclfilterchanger.cpp \
     ../base_classes/qf3comportmanager.cpp \

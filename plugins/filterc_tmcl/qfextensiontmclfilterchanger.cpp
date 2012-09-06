@@ -13,6 +13,7 @@ QFExtensionTMCLFilterChanger::QFExtensionTMCLFilterChanger(QObject* parent):
     QObject(parent)
 {
 	logService=NULL;
+    fcMenu=NULL;
 }
 
 QFExtensionTMCLFilterChanger::~QFExtensionTMCLFilterChanger() {
@@ -37,44 +38,19 @@ void QFExtensionTMCLFilterChanger::initExtension() {
 
     int count=inifile.value("filterwheel_count", 0).toUInt();
 
-    QMenu* fcMenu=NULL;
-    if (count>0) {
-        QMenu* extm=services->getMenu("extensions");
-        //std::cout<<"extensions menu: "<<extm<<std::endl;
-        if (extm) {
-            fcMenu=extm->addMenu(QIcon(getIconFilename()), tr("TMCL filter wheels"));
-        }
 
+    //if (count>0) {
+    QMenu* extm=services->getMenu("extensions");
+    //std::cout<<"extensions menu: "<<extm<<std::endl;
+    if (extm) {
+        fcMenu=extm->addMenu(QIcon(getIconFilename()), tr("TMCL filter wheels"));
+        fcMenu->setVisible(false);
     }
-    //qDebug()<<"FILTERWHEEL_COUNT = "<<count;
-    for (int i=0; i<count; i++) {
-        FILTERWHEEL s;
-        s.port=ports.addCOMPort(inifile, "filterwheel"+QString::number(i+1)+"/");
-        s.id=inifile.value("filterwheel"+QString::number(i+1)+"/id", 1).toInt();
-        s.motor=inifile.value("filterwheel"+QString::number(i+1)+"/axis", 0).toUInt();
-        s.filters=inifile.value("filterwheel"+QString::number(i+1)+"/filter_count", 6).toInt();
-        s.steps_per_revolution=inifile.value("filterwheel"+QString::number(i+1)+"/steps_per_revolution", 200*16).toULongLong();
-        s.fastRFSSpeed=inifile.value("filterwheel"+QString::number(i+1)+"/fast_ref_speed", 1).toULongLong();
-        s.maximumAcceleration=inifile.value("filterwheel"+QString::number(i+1)+"/max_acceleration", 3).toULongLong();
-        s.maximumCurrent=inifile.value("filterwheel"+QString::number(i+1)+"/max_current", 15).toULongLong();
-        s.maximumSpeed=inifile.value("filterwheel"+QString::number(i+1)+"/max_speed", 15).toULongLong();
-        s.slowRFSSpeed=inifile.value("filterwheel"+QString::number(i+1)+"/slow_ref_speed", 1).toULongLong();
-        s.standbyCurrent=inifile.value("filterwheel"+QString::number(i+1)+"/standby_current", 6).toULongLong();
 
-        QString motor=inifile.value("filterwheel"+QString::number(i+1)+"/motor", "none").toString().toLower();
-        if (motor=="pd-108-28" || motor=="pd1-108-28" || motor=="pd3-108-28" || motor=="pdx-108-28") {
-            s.steps_per_revolution=200*16;
-        }
-        s.infoMessage="";
-        s.lastAction=QTime::currentTime();
-        s.tmcl=new QF3TMCLProtocolHandler(ports.getCOMPort(s.port), getName());
-        s.actRealign=new QAction(tr("realign filter changer #%1").arg(i+1), this);
-        connect(s.actRealign, SIGNAL(triggered()), this, SLOT(realignFW()));
-        s.actRealign->setEnabled(false);
-        if (fcMenu) fcMenu->addAction(s.actRealign);
-        wheels.append(s);
-        //qDebug()<<"FILTERWHEEL("<<i<<") ... id="<<s.id;
-    }
+    //}
+
+    readGlobalSettings(inifile);
+
 }
 
 
@@ -293,6 +269,7 @@ QString QFExtensionTMCLFilterChanger::getFilterChangerShortName(unsigned int fil
 void QFExtensionTMCLFilterChanger::showFilterChangerSettingsDialog(unsigned int filterChanger, QWidget *parent) {
 }
 
+
 int QFExtensionTMCLFilterChanger::findActRealign(QAction *realign) {
     for (int i=0; i<wheels.size(); i++) {
         if (wheels[i].actRealign==realign) return i;
@@ -405,6 +382,87 @@ bool QFExtensionTMCLFilterChanger::TMCLRealignFW(int filterChanger) {
     TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 1, 0, wheels[filterChanger].motor), tr("error resetting position (status=%1)\n").arg(status));
     return ok;
 }
+
+
+
+
+
+
+void QFExtensionTMCLFilterChanger::readGlobalSettings(QSettings &inifile, const QString &prefix)
+{
+
+    fcMenu->setVisible(false);
+    fcMenu->clear();
+
+    if (getFilterChangerCount()>0) {
+        for (int i=0; i<getFilterChangerCount(); i++) {
+            if (isFilterChangerConnected(i)) filterChangerDisonnect(i);
+        }
+    }
+
+    /* add code for cleanup here */
+    for (unsigned int i=0; i<wheels.size(); i++) {
+        delete wheels[i].actRealign;
+    }
+    wheels.clear();
+    ports.clear();
+
+    int count=inifile.value(prefix+"filterwheel_count", 0).toUInt();
+
+    for (int i=0; i<count; i++) {
+        FILTERWHEEL s;
+        s.port=ports.addCOMPort(inifile, prefix+"filterwheel"+QString::number(i+1)+"/");
+        s.id=inifile.value(prefix+"filterwheel"+QString::number(i+1)+"/id", 1).toInt();
+        s.motor=inifile.value(prefix+"filterwheel"+QString::number(i+1)+"/axis", 0).toUInt();
+        s.filters=inifile.value(prefix+"filterwheel"+QString::number(i+1)+"/filter_count", 6).toInt();
+        s.steps_per_revolution=inifile.value(prefix+"filterwheel"+QString::number(i+1)+"/steps_per_revolution", 200*16).toULongLong();
+        s.fastRFSSpeed=inifile.value(prefix+"filterwheel"+QString::number(i+1)+"/fast_ref_speed", 1).toULongLong();
+        s.maximumAcceleration=inifile.value(prefix+"filterwheel"+QString::number(i+1)+"/max_acceleration", 3).toULongLong();
+        s.maximumCurrent=inifile.value(prefix+"filterwheel"+QString::number(i+1)+"/max_current", 15).toULongLong();
+        s.maximumSpeed=inifile.value(prefix+"filterwheel"+QString::number(i+1)+"/max_speed", 15).toULongLong();
+        s.slowRFSSpeed=inifile.value(prefix+"filterwheel"+QString::number(i+1)+"/slow_ref_speed", 1).toULongLong();
+        s.standbyCurrent=inifile.value(prefix+"filterwheel"+QString::number(i+1)+"/standby_current", 6).toULongLong();
+
+        QString motor=inifile.value(prefix+"filterwheel"+QString::number(i+1)+"/motor", "none").toString().toLower();
+        s.motorName=motor;
+        if (motor=="pd-108-28" || motor=="pd1-108-28" || motor=="pd3-108-28" || motor=="pdx-108-28") {
+            s.steps_per_revolution=200*16;
+        }
+        s.infoMessage="";
+        s.lastAction=QTime::currentTime();
+        s.tmcl=new QF3TMCLProtocolHandler(ports.getCOMPort(s.port), getName());
+        s.actRealign=new QAction(tr("realign filter changer #%1").arg(i+1), this);
+        connect(s.actRealign, SIGNAL(triggered()), this, SLOT(realignFW()));
+        s.actRealign->setEnabled(false);
+        if (fcMenu) fcMenu->addAction(s.actRealign);
+        wheels.append(s);
+        //qDebug()<<"FILTERWHEEL("<<i<<") ... id="<<s.id;
+    }
+}
+
+void QFExtensionTMCLFilterChanger::writeGlobalSettings(QSettings &inifile, const QString &prefix)
+{
+    if (inifile.isWritable()) {
+        inifile.setValue(prefix+"filterwheel_count", getFilterChangerCount());
+        for (unsigned int i=0; i<wheels.size(); i++) {
+            int p=wheels[i].port;
+            if (ports.getCOMPort(p)) {
+                ports.storeCOMPort(p, inifile, prefix+"filterwheel"+QString::number(i+1)+"/");
+                inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/id", wheels[i].id);
+                inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/axis", wheels[i].motor);
+                inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/filter_count", wheels[i].filters);
+                inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/steps_per_revolution", wheels[i].steps_per_revolution);
+                inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/max_acceleration", wheels[i].maximumAcceleration);
+                inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/max_current", wheels[i].maximumCurrent);
+                inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/max_speed", wheels[i].maximumSpeed);
+                inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/slow_ref_speed", wheels[i].slowRFSSpeed);
+                inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/standbyCurrent", wheels[i].standbyCurrent);
+                inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/motor", wheels[i].motorName);
+            }
+        }
+    }
+}
+
 
 
 

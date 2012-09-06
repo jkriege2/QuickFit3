@@ -25,6 +25,7 @@
 #include "qfespimb040cameraview.h"
 #include "jkqttools.h"
 #include "qvisiblehandlesplitter.h"
+#include "qfespimb040acquisitiontools.h"
 
 
 #include "qtlogfile.h"
@@ -33,7 +34,6 @@
 #include "../interfaces/qfextensionlinearstage.h"
 #include "qfextension.h"
 #include "tools.h"
-#include "qfcameraconfigwidget.h"
 #include "qfespimb040samplestageconfig.h"
 #include "qfespimb040imagestackconfigwidget2.h"
 #include "qfespimb040acquisitionconfigwidget2.h"
@@ -43,6 +43,7 @@
 #include "qftools.h"
 #include "qfespimb040experimentdescription.h"
 #include "qfespimb040acquisitiondescription.h"
+#include "qfespimb040deviceparamstackconfigwidget.h"
 
 /*! \brief new SPIM Control Extension (B040, DKFZ Heidelberg) main window
     \ingroup qf3ext_spimb040
@@ -51,9 +52,9 @@
 
     It also implements QFPluginLogService and may thus be used for logging.
  */
-class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
+class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public QFESPIMB040AcquisitionTools{
         Q_OBJECT
-        Q_INTERFACES(QFPluginLogService)
+        Q_INTERFACES(QFPluginLogService QFESPIMB040AcquisitionTools)
     public:
         QFESPIMB040MainWindow2(QFPluginServices* pluginServices, QWidget* parent=NULL);
         virtual ~QFESPIMB040MainWindow2();
@@ -82,6 +83,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
         QFESPIMB040AcquisitionConfigWidget2* widAcquisition;
         QFESPIMB040ImageStackConfigWidget2* widImageStack;
         QFESPIMB040CamParamStackConfigWidget2* widCamParamScan;
+        QFESPIMB040DeviceParamStackConfigWidget* widDeviceParamScan;
         QFESPIMB040AcquisitionDescription* widAcquisitionDescription;
 
 
@@ -102,35 +104,6 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
         /** \brief Create all widgets on this window, called in the constructor before createActions() */
         void createWidgets(QFExtensionManager* extManager);
 
-        /*! \brief save a description of an acquisition to a QSettings object
-
-            Settings will be stored to the file \c <filenamePrefix>_configuration.ini .
-
-            \param use_cam use camera 0, 1, ... in the setup
-            \param extension QFExtension object describing the used camera (must be castable to QFExtensionCamera)
-            \param camera =0,1 which camera was used?
-            \param filenamePrefix prefix for the acquisition output files
-            \param acquisitionDescription additional key-value-pairs describing the acquisition mode (will be stored under \c [acquisition] heading)
-            \param moreFiles a list of additionally created files
-            \return filename of the settings file
-        */
-        QString saveAcquisitionDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles, QDateTime startDateTime, bool getAcquisitionSettings=true);
-
-        /*! \brief save a description of an acquisition in preview mode to a QSettings object
-
-            Settings will be stored to the file \c <filenamePrefix>_configuration.ini .
-
-            \param use_cam use camera 0, 1, ... in the setup
-            \param extension QFExtension object describing the used camera (must be castable to QFExtensionCamera)
-            \param camera =0,1 which camera was used?
-            \param filenamePrefix prefix for the acquisition output files
-            \param acquisitionDescription additional key-value-pairs describing the acquisition mode (will be stored under \c [acquisition] heading)
-            \param files files that have been stored (see  QFExtensionCamera::AcquititonFileDescription)
-            \return filename of the settings file
-        */
-        QString savePreviewDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& files, QDateTime startDateTime, const QString& lightpathPrefix=QString(""), const QString& prefix=QString(""));
-        QString saveMeasuredData(const QString &filenamePrefix, const QList<QFESPIMB040OpticsSetup::measuredValues> &data);
-
     protected slots:
         /*! \brief runs an image acquisition
 
@@ -147,6 +120,9 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
 
         void doCamParamStack();
 
+        //void doDeviceParamStack();
+
+
         void displayHelp();
 
         /*! \brief switch on/off the laser by opening/closing the main shutter
@@ -157,7 +133,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
         bool setMainIlluminationShutter(bool on_off=true, bool blocking=true);
 
         //acquisitionPrefix1+"_overview.tif"
-    protected:
+    public:
         /*! \brief save an image from the given camera as a 16-bit TIFF image into \a filename
 
             \note This function configures the camera with the preview settings, acquires ONE frame and saves it to the given file.
@@ -181,16 +157,47 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService {
 
             \note THe lightpath is not altered, if lightpathFilename is left empty.
          */
-        bool acquireImageWithLightpath(const QString& lightpathFilename, const QString& lightpathName, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& previewSettingsFilename1, const QString& outputFilename, const QString& imageID, const QString& imageDescription, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles1, QMap<QString, QVariant>& acquisitionDescription1);
+        bool acquireImageWithLightpath(const QString& lightpathFilename, const QString& lightpathName, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& previewSettingsFilename1, const QString& outputFilename, const QString& imageID, const QString& imageDescription, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, QMap<QString, QVariant>& acquisitionDescription1);
 
         /*! \brief do an acquisition on one or two cameras
 
             \note if \a frames \t <=0, the number of frames will NOT be changed, otherwise the number of frames will be set accordingly (if the driver allows it!)
             \note if \a measured is \c NULL no measurements will be stored during acquisition. otherwise they will be stored to this map.
          */
-        bool acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles2, int frames1=0, int frames2=0, QList<QFESPIMB040OpticsSetup::measuredValues>* measured=NULL, QProgressListDialog* progress=NULL, bool* userCanceled=NULL);
+        bool acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles2, int frames1=0, int frames2=0, QList<QFESPIMB040OpticsSetup::measuredValues>* measured=NULL, QProgressListDialog* progress=NULL, bool* userCanceled=NULL);
+        bool acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, QSettings& acquisitionSettings1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, QSettings& acquisitionSettings2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles2, QList<QFESPIMB040OpticsSetup::measuredValues>* measured=NULL, QProgressListDialog* progress=NULL, bool* userCanceled=NULL);
 
         void getAdditionalCameraSettings(QFExtensionCamera* ecamera, int camera, const QString& prefix, QMap<QString, QVariant>& acquisitionDescription);
+
+        /*! \brief save a description of an acquisition to a QSettings object
+
+            Settings will be stored to the file \c <filenamePrefix>_configuration.ini .
+
+            \param use_cam use camera 0, 1, ... in the setup
+            \param extension QFExtension object describing the used camera (must be castable to QFExtensionCamera)
+            \param camera =0,1 which camera was used?
+            \param filenamePrefix prefix for the acquisition output files
+            \param acquisitionDescription additional key-value-pairs describing the acquisition mode (will be stored under \c [acquisition] heading)
+            \param moreFiles a list of additionally created files
+            \return filename of the settings file
+        */
+        QString saveAcquisitionDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles, QDateTime startDateTime, bool getAcquisitionSettings=true);
+
+        /*! \brief save a description of an acquisition in preview mode to a QSettings object
+
+            Settings will be stored to the file \c <filenamePrefix>_configuration.ini .
+
+            \param use_cam use camera 0, 1, ... in the setup
+            \param extension QFExtension object describing the used camera (must be castable to QFExtensionCamera)
+            \param camera =0,1 which camera was used?
+            \param filenamePrefix prefix for the acquisition output files
+            \param acquisitionDescription additional key-value-pairs describing the acquisition mode (will be stored under \c [acquisition] heading)
+            \param files files that have been stored (see  QFExtensionCamera::AcquititonFileDescription)
+            \return filename of the settings file
+        */
+        QString savePreviewDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::CameraAcquititonFileDescription>& files, QDateTime startDateTime, const QString& lightpathPrefix=QString(""), const QString& prefix=QString(""));
+        QString saveMeasuredData(const QString &filenamePrefix, const QList<QFESPIMB040OpticsSetup::measuredValues> &data);
+
     public:
 
         /** \brief log project text message

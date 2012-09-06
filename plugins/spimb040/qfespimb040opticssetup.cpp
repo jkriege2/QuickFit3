@@ -3,7 +3,7 @@
 #include "ui_qfespimb040opticssetup.h"
 #include "objectives.h"
 #include "filters.h"
-#include "qfespimb040mainwindow.h"
+
 #include "qfespimb040shortcutconfigdialog.h"
 #include "qfespimb040lightpathsavedialog.h"
 
@@ -703,6 +703,36 @@ bool QFESPIMB040OpticsSetup::isZStageConnected() const {
     return ui->stageSetup->isZStageConnected();
 }
 
+QFExtensionLightSource *QFESPIMB040OpticsSetup::getLaser1()
+{
+    return ui->lsLaser1->getLightSource();
+}
+
+QFExtensionLightSource *QFESPIMB040OpticsSetup::getLaser2()
+{
+    return ui->lsLaser2->getLightSource();
+}
+
+QFExtensionLightSource *QFESPIMB040OpticsSetup::getTransmissionLightSource()
+{
+    return ui->lsTransmission->getLightSource();
+}
+
+int QFESPIMB040OpticsSetup::getLaser1ID()
+{
+    return ui->lsLaser1->getLightSourceID();
+}
+
+int QFESPIMB040OpticsSetup::getLaser2ID()
+{
+    return ui->lsLaser2->getLightSourceID();
+}
+
+int QFESPIMB040OpticsSetup::getTransmissionLightSourceID()
+{
+    return ui->lsTransmission->getLightSourceID();
+}
+
 bool QFESPIMB040OpticsSetup::isStageConnected(QFExtensionLinearStage* stage, int id, bool& found) {
     found=false;
     if (!stage || id<0) return false;
@@ -728,9 +758,24 @@ QFCameraConfigComboBoxStartResume* QFESPIMB040OpticsSetup::getStopRelease(int ca
     return NULL;
 }
 
-void QFESPIMB040OpticsSetup::setMainIlluminationShutter(bool opened) {
+void QFESPIMB040OpticsSetup::setMainIlluminationShutter(bool opened, bool blocking) {
+    if (!isMainIlluminationShutterAvailable()) return;
+
     ui->shutterMainIllumination->setShutter(opened);
     if (!opened) ui->shutterTransmission->setShutter(false);
+
+    if (blocking) {
+        QTime t;
+        t.start();
+        while (getMainIlluminationShutter()!=opened && t.elapsed()<10000) {
+            QApplication::processEvents();
+        }
+
+        if (t.elapsed()>=10000) {
+            m_log->log_error("main shutter timed out after 10s!\n");
+        }
+    }
+
 }
 
 bool QFESPIMB040OpticsSetup::getMainIlluminationShutter() {
@@ -1014,10 +1059,12 @@ bool QFESPIMB040OpticsSetup::lightpathLoaded(const QString &filename) {
 }
 
 
-void QFESPIMB040OpticsSetup::loadLightpathConfig(const QString &filename, bool waiting) {
+void QFESPIMB040OpticsSetup::loadLightpathConfig(const QString &filename, bool waiting, QString*name) {
     if (!QFile::exists(filename)) return;
     //qDebug()<<"loadLightpathConfig("<<filename<<")";
     QSettings set(filename, QSettings::IniFormat);
+
+    if (name) *name=set.value("name", *name).toString();
 
     // LOAD RELEVANT WIDGETS HERE
     if (set.contains("laser1/shutter/state")) ui->shutterLaser1->setShutter(set.value("laser1/shutter/state").toBool());

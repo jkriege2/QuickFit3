@@ -44,7 +44,7 @@ class QFExtensionCamera {
         virtual ~QFExtensionCamera() {}
 
         /** \brief return the number of cameras managed by this extension */
-        virtual unsigned int getCameraCount()=0;
+        virtual unsigned int getCameraCount() const=0;
 
 
         /*! \brief displays a modal dialog which allows the user to set the properties of a camera
@@ -66,19 +66,19 @@ class QFExtensionCamera {
           */
          virtual void useCameraSettings(unsigned int camera, const QSettings& settings)=0;
          /** \brief return the width of images */
-         virtual int getImageWidth(unsigned int camera)=0;
+         virtual int getCameraImageWidth(unsigned int camera)=0;
          /** \brief return the height of images */
-         virtual int getImageHeight(unsigned int camera)=0;
+         virtual int getImageCameraHeight(unsigned int camera)=0;
          /** \brief return width of a sensor pixel in microns */
-         virtual double getPixelWidth(unsigned int camera)=0;
+         virtual double getCameraPixelWidth(unsigned int camera)=0;
          /** \brief return hieght of a sensor pixel in microns */
-         virtual double getPixelHeight(unsigned int camera)=0;
+         virtual double getCameraPixelHeight(unsigned int camera)=0;
          /** \brief returns the name of the camera */
          virtual QString getCameraName(unsigned int camera)=0;
          /** \brief returns the name of the camera sensor */
          virtual QString getCameraSensorName(unsigned int camera)=0;
          /** \brief returns \c true if the device is connected */
-         virtual bool isConnected(unsigned int camera)=0;
+         virtual bool isCameraConnected(unsigned int camera)=0;
          /*! \brief acquire single frame
 
              \param camera which camera to use for the acquisition
@@ -88,45 +88,45 @@ class QFExtensionCamera {
              \param[out] parameters this map is filled with the acquisition parameters, if \c !=NULL
              \return \c true on success
           */
-         virtual bool acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp=NULL, QMap<QString, QVariant>* parameters=NULL)=0;
+         virtual bool acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t* timestamp=NULL, QMap<QString, QVariant>* parameters=NULL)=0;
          /** \brief connect to the device/activate it */
-         virtual bool connectDevice(unsigned int camera)=0;
+         virtual bool connectCameraDevice(unsigned int camera)=0;
          /** \brief connect to the device/activate it */
-         virtual void disconnectDevice(unsigned int camera)=0;
+         virtual void disconnectCameraDevice(unsigned int camera)=0;
          /** \brief returns the acquisition time (time the camera is open) in seconds */
-         virtual double getExposureTime(unsigned int camera)=0;
+         virtual double getCameraExposureTime(unsigned int camera)=0;
          /** \brief set QFPluginLogServices to use (or \c NULL) for message/error logging */
-         virtual void setLogging(QFPluginLogService* logService)=0;
+         virtual void setCameraLogging(QFPluginLogService* logService)=0;
 
          /*! \brief set camera settings from the specified QSettings object for a subsequent startAcquisition()
              \param[in] camera the camera the settings widget should apply to
              \param[in] settings the acquisition settings to use (may be created using showCameraSettingsDialog() )
              \param[in] filenamePrefix the acquisition result is stored in file(s) based on this baseFilename
           */
-         virtual bool prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix=QString(""))=0;
+         virtual bool prepareCameraAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix=QString(""))=0;
 
          /*! \brief start an acquisition
 
              \param camera start an acquisition for this camera
              \retunr \c true on success
           */
-         virtual bool startAcquisition(unsigned int camera)=0;
+         virtual bool startCameraAcquisition(unsigned int camera)=0;
          /*! \brief cancel an acquisition started with startAcquisition()
 
              \param camera start an acquisition for this camera
           */
-         virtual void cancelAcquisition(unsigned int camera)=0;
+         virtual void cancelCameraAcquisition(unsigned int camera)=0;
          /*! \brief check whether an acquisition started with startAcquisition() is running
 
              \param camera acquisition for this camera
              \param[out] percentageDone may be used (if \c !=NULL ) to return the percentage [0..100] of
                                         acquisition completion
          */
-         virtual bool isAcquisitionRunning(unsigned int camera, double* percentageDone=NULL)=0;
+         virtual bool isCameraAcquisitionRunning(unsigned int camera, double* percentageDone=NULL)=0;
 
 
          /** \brief used by getAcquisitionDescription() to return a description of the output files*/
-         struct AcquititonFileDescription {
+         struct CameraAcquititonFileDescription {
             /** \brief name of the output file */
             QString name;
             /** \brief type of the output file (e.g. RAW16, RAW32, TIFF8, TIFF16, autocorrelations, PNG, JPEG, ...) */
@@ -177,7 +177,7 @@ class QFExtensionCamera {
                - \c emgain EMGain factor on EMCCD cameras (\c double )
              .
           */
-         virtual void getAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::AcquititonFileDescription>* files, QMap<QString, QVariant>* parameters)=0;
+         virtual void getCameraAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::CameraAcquititonFileDescription>* files, QMap<QString, QVariant>* parameters)=0;
          /*! \brief read an intermediate preview image from the currently running acquisition
 
              \param camera which camera to use for the acquisition
@@ -186,20 +186,24 @@ class QFExtensionCamera {
              \param[out] timestamp a timestamp for the acquired image in \a data
              \return \c true on success, or \c false on error or if the camera driver does not provide previews
          */
-         virtual bool getAcquisitionPreview(unsigned int camera, uint32_t* data)=0;
+         virtual bool getCameraAcquisitionPreview(unsigned int camera, uint32_t* data)=0;
          /*! \brief return the progress (0..100) of the current acquisition
 
              \param camera which camera to use for the acquisition
              \return the progress as an integer between 0 and 100
          */
-         virtual int getAcquisitionProgress(unsigned int camera)=0;
+         virtual int getCameraAcquisitionProgress(unsigned int camera)=0;
 
          enum CameraSetting {
              CamSetExposureTime=0,
              CamSetNumberFrames=1,
              CamSetGain=2,
              CamSetFrametime=3,
-             CamSetEMGAIN=4
+             CamSetEMGAIN=4,
+             CamSetHorizontalBinning=5,
+             CamSetVerticalBinning=6,
+             CamSetTemporalBinning=7,
+			 CamSetMaxParam=7
          };
 
          /** \brief returns \c true if the given CameraSetting is changable by changeCameraSetting() */
@@ -211,11 +215,13 @@ class QFExtensionCamera {
          virtual void changeCameraSetting(QSettings& settings, CameraSetting which, QVariant value) =0;
          /** \brief extract the given CameraSetting from the given QSettings object */
          virtual QVariant getCameraSetting(QSettings& settings, CameraSetting which) const =0;
+         /** \brief extract the given CameraSetting from the given camera */
+         virtual QVariant getCurrentCameraSetting(int camera, CameraSetting which) const =0;
 
 
 };
 
 Q_DECLARE_INTERFACE( QFExtensionCamera,
-                     "www.dkfz.de.b040.quickfit3.extensions.QFExtensionCamera/1.0")
+                     "www.dkfz.de.b040.quickfit3.extensions.QFExtensionCamera/1.1")
 
 #endif // QFEXTENSIONCAMERA_H

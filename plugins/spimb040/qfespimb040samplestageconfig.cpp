@@ -1,5 +1,5 @@
 #include "qfespimb040samplestageconfig.h"
-#include "qfespimb040mainwindow.h"
+
 #include <QtGui>
 #include <iostream>
 

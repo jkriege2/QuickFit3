@@ -2,7 +2,7 @@
 #define SPIMB040_H
 
 #include "qfextension.h"
-#include "qfespimb040mainwindow.h"
+
 #include "qfespimb040mainwindow2.h"
 #include <QAction>
 
@@ -46,7 +46,7 @@ class QFESPIMB040 : public QObject, public QFExtensionBase {
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         };
 
 
@@ -58,7 +58,6 @@ class QFESPIMB040 : public QObject, public QFExtensionBase {
         QAction* actStartPluginOld;
 
         QFESPIMB040MainWindow2* main;
-        QFESPIMB040MainWindow* main_old;
 
         /** \copydoc QFExtensionBase::projectChanged() */
         virtual void projectChanged(QFProject* oldProject, QFProject* project);
@@ -73,7 +72,6 @@ class QFESPIMB040 : public QObject, public QFExtensionBase {
         virtual void storeSettings(ProgramOptions* settings);
     protected slots:
         void startPlugin();
-        void startPluginOld();
 };
 
 #endif // SPIMB040_H

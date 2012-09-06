@@ -27,6 +27,7 @@
 #include "qprogresslistwidget.h"
 #include "qfextensionmeasurementdevice.h"
 #include "../interfaces/qfextensionglobalsettingsreadwrite.h"
+#include "qfextensionlightsource.h"
 
 
 class QFESPIMB040MainWindow; // forward
@@ -130,6 +131,13 @@ class QFESPIMB040OpticsSetup : public QWidget {
         bool isYStageConnected() const;
         bool isZStageConnected() const;
 
+        QFExtensionLightSource* getLaser1();
+        QFExtensionLightSource* getLaser2();
+        QFExtensionLightSource* getTransmissionLightSource();
+        int getLaser1ID();
+        int getLaser2ID();
+        int getTransmissionLightSourceID();
+
         QString getAxisNameForStage(QFExtensionLinearStage* stage, int axis);
 
         bool isStageConnected(QFExtensionLinearStage* stage, int id, bool& found);
@@ -149,7 +157,7 @@ class QFESPIMB040OpticsSetup : public QWidget {
         int getZStageAxis();
 
         /** \brief set main illumination shutter state */
-        void setMainIlluminationShutter(bool opened);
+        void setMainIlluminationShutter(bool opened, bool blocking=false);
         /** \brief return \c true, if the main acquisition shutter is available and functional */
         bool isMainIlluminationShutterAvailable();
         /** \brief get main illumination shutter state */
@@ -187,7 +195,7 @@ class QFESPIMB040OpticsSetup : public QWidget {
           */
         int camNumFromExtension(QFExtensionCamera* ecam, int camera) const;
     public slots:
-        void loadLightpathConfig(const QString& filename, bool waiting=false);
+        void loadLightpathConfig(const QString& filename, bool waiting=false, QString *name=NULL);
         void saveLightpathConfig(const QString& filename, const QString &name, QList<bool> saveProp=QList<bool>(), bool saveMeasured=false);
         void saveLightpathConfig(QMap<QString, QVariant>& data, const QString &name, const QString &prefix=QString(""), QList<bool> saveProp=QList<bool>(), bool saveMeasured=false);
         void saveCurrentLightpatConfig();

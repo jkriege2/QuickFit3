@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QFESPIMB040CamParamStackConfigWidget2</class>
- <widget class="QWidget" name="QFESPIMB040CamParamStackConfigWidget2">
+ <class>QFESPIMB040DeviceParamStackConfigWidget</class>
+ <widget class="QWidget" name="QFESPIMB040DeviceParamStackConfigWidget">
   <property name="enabled">
    <bool>true</bool>
   </property>
@@ -98,7 +98,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="18" column="3" colspan="2">
+   <item row="19" column="3" colspan="2">
     <widget class="QPushButton" name="btnAcquire">
      <property name="enabled">
       <bool>false</bool>
@@ -124,7 +124,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="19" column="3">
+   <item row="20" column="3">
     <spacer name="verticalSpacer_3">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -229,42 +229,17 @@ p, li { white-space: pre-wrap; }
         </property>
         <item>
          <property name="text">
-          <string>camera exposure time</string>
+          <string>Laser 1 line 1 intensity</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>number of frames</string>
+          <string>Laser 2 line 1 intensity</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>camera gain</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>frame time (1/frame rate)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>EM gain</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>horizontal binning</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>vertical binning</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>temporal binning</string>
+          <string>Transmission line 1 intensity</string>
          </property>
         </item>
        </widget>
@@ -386,7 +361,7 @@ p, li { white-space: pre-wrap; }
      </layout>
     </widget>
    </item>
-   <item row="13" column="0">
+   <item row="14" column="0">
     <widget class="QLabel" name="label_11">
      <property name="text">
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -400,7 +375,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="15" column="0">
+   <item row="16" column="0">
     <widget class="QCheckBox" name="chkLightpath">
      <property name="font">
       <font>
@@ -413,7 +388,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="15" column="3" colspan="2">
+   <item row="16" column="3" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
       <widget class="QComboBox" name="cmbLightpath">
@@ -440,7 +415,7 @@ p, li { white-space: pre-wrap; }
      </item>
     </layout>
    </item>
-   <item row="13" column="3" colspan="2">
+   <item row="14" column="3" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <widget class="QSpinBox" name="spinImages">
@@ -477,14 +452,14 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="17" column="0" colspan="5">
+   <item row="18" column="0" colspan="5">
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="16" column="0" colspan="5">
+   <item row="17" column="0" colspan="5">
     <widget class="QCheckBox" name="chkSaveMeasurements">
      <property name="font">
       <font>
@@ -509,7 +484,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="12" column="3">
+   <item row="13" column="3">
     <widget class="QCheckBox" name="chkPreviewMode">
      <property name="toolTip">
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -525,6 +500,35 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="text">
       <string>acquire in single-frame/preview mode</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="3">
+    <widget class="QDoubleSpinBox" name="spinDelay">
+     <property name="specialValueText">
+      <string>no delay</string>
+     </property>
+     <property name="suffix">
+      <string>0</string>
+     </property>
+     <property name="maximum">
+      <double>1000.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>delay after setting parameter:</string>
      </property>
     </widget>
    </item>

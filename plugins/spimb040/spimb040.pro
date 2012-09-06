@@ -15,19 +15,16 @@ include(../../libquickfitwidgets.pri)
 
 # Input
 HEADERS += spimb040.h \
-           qfespimb040mainwindow.h \
            qfespimb040cameraview.h \
            qfespimb040samplestageconfig.h \
            ../interfaces/qfextensioncamera.h \
            ../../../../../LIB/trunk/jkimage.h  \
            ../../../../../LIB/trunk/highrestimer.h \
            ../../../../../LIB/trunk/statistics_tools.h \
-           qfespimb040imagestackconfigwidget.h \
            ../../../../../LIB/trunk/tinytiffwriter.h \
            ../../../../../LIB/trunk/libtiff_tools.h \
            ../interfaces/qfextensionlinearstage.h \
            ../interfaces/qfextensionparameterdevice.h \
-    qfespimb040acquisitionconfigwidget.h \
     qfespimb040opticssetup.h \
     qfespimb040simplecameraconfig.h \
     qfespimb00histogrammaskdialog.h \
@@ -43,22 +40,20 @@ HEADERS += spimb040.h \
     qfespimb040shortcutconfigdialog.h \
     qfespimb040camparamstackconfigwidget2.h \
     qfespimb040filenametool.h \
-    qfcameraconfigwidget.h \
     qfespimb040lightpathsavedialog.h \
     ../interfaces/qfextensionmeasurementdevice.h \
     qfespimb040acquisitiondescription.h \
-    ../interfaces/qfextensionglobalsettingsreadwrite.h
+    ../interfaces/qfextensionglobalsettingsreadwrite.h \
+    qfespimb040deviceparamstackconfigwidget.h \
+    qfespimb040acquisitiontools.h
 
 SOURCES += spimb040.cpp \
-           qfespimb040mainwindow.cpp \
            qfespimb040cameraview.cpp \
            qfespimb040samplestageconfig.cpp \
            ../../../../../LIB/trunk/highrestimer.cpp \
            ../../../../../LIB/trunk/statistics_tools.cpp \
-           qfespimb040imagestackconfigwidget.cpp \
            ../../../../../LIB/trunk/tinytiffwriter.cpp \
            ../../../../../LIB/trunk/libtiff_tools.cpp \
-    qfespimb040acquisitionconfigwidget.cpp \
     qfespimb040opticssetup.cpp \
     qfespimb040simplecameraconfig.cpp \
     qfespimb00histogrammaskdialog.cpp \
@@ -73,12 +68,10 @@ SOURCES += spimb040.cpp \
     qfespimb040shortcutconfigdialog.cpp \
     qfespimb040camparamstackconfigwidget2.cpp \
     qfespimb040filenametool.cpp \
-    qfcameraconfigwidget.cpp \
     qfespimb040lightpathsavedialog.cpp \
-    qfespimb040acquisitiondescription.cpp
+    qfespimb040acquisitiondescription.cpp \
+    qfespimb040deviceparamstackconfigwidget.cpp
 FORMS = \
-    qfespimb040imagestackconfigwidget.ui \
-    qfespimb040acquisitionconfigwidget.ui \
     qfespimb040opticssetup.ui \
     qfespimb00histogrammaskdialog.ui \
     qfespimb040experimentdescription.ui \
@@ -88,7 +81,8 @@ FORMS = \
     qfespimb040shortcutconfigdialog.ui \
     qfespimb040camparamstackconfigwidget2.ui \
     qfespimb040lightpathsavedialog.ui \
-    qfespimb040acquisitiondescription.ui
+    qfespimb040acquisitiondescription.ui \
+    qfespimb040deviceparamstackconfigwidget.ui
 
 RESOURCES += spimb040.qrc
 

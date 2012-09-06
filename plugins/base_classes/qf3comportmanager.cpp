@@ -6,6 +6,11 @@ QF3ComPortManager::QF3ComPortManager()
 
 QF3ComPortManager::~QF3ComPortManager()
 {
+    clear();
+}
+
+void QF3ComPortManager::clear()
+{
     for (int i=0; i<coms.size(); i++) {
         coms[i].com->close();
         delete coms[i].com;

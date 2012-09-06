@@ -20,9 +20,9 @@ class QFExtensionGlobalSettingsReadWrite {
         virtual ~QFExtensionGlobalSettingsReadWrite() {}
 
         /** \brief read the global settings from the given QSettings object. Each name is prepended the supplied \a prefix */
-        virtual void readGlobalSettings(QSettings& settings, const QString& prefix=QString("")) const=0;
+        virtual void readGlobalSettings(QSettings& settings, const QString& prefix=QString("")) =0;
         /** \brief save the global settings to the given QSettings object. Each name is prepended the supplied \a prefix */
-        virtual void writeGlobalSettings(QSettings& settings, const QString& prefix=QString("")) const=0;
+        virtual void writeGlobalSettings(QSettings& settings, const QString& prefix=QString("")) =0;
 
 };
 

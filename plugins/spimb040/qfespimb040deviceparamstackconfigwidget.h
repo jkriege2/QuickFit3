@@ -1,5 +1,5 @@
-#ifndef QFESPIMB040CAMPARAMSTACKCONFIGWIDGET2_H
-#define QFESPIMB040CAMPARAMSTACKCONFIGWIDGET2_H
+#ifndef QFESPIMB040DeviceParamStackConfigWidget_H
+#define QFESPIMB040DeviceParamStackConfigWidget_H
 
 #include <QSettings>
 #include <QAction>
@@ -9,25 +9,29 @@
 #include "qfespimb040filenametool.h"
 #include "qtriple.h"
 #include "qfespimb040opticssetup.h"
+#include "libtiff_tools.h"
+#include "qfespimb040acquisitiontools.h"
+
+
 class QFESPIMB040MainWindow; // forward
 class QFPluginServices; // forward
 class QFExtension;
 //class QFESPIMB040OpticsSetup;
 
 namespace Ui {
-    class QFESPIMB040CamParamStackConfigWidget2;
+    class QFESPIMB040DeviceParamStackConfigWidget;
 }
 
 
-/*! \brief widget that allows to configure an image stack acquisition
+/*! \brief widget that allows to configure an device parameter stack acquisition
     \ingroup qf3ext_spimb040
  */
-class QFESPIMB040CamParamStackConfigWidget2 : public QWidget, public QFESPIMB040FilenameTool {
+class QFESPIMB040DeviceParamStackConfigWidget : public QWidget, public QFESPIMB040FilenameTool {
         Q_OBJECT
 
     public:
-        explicit QFESPIMB040CamParamStackConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
-        ~QFESPIMB040CamParamStackConfigWidget2();
+        explicit QFESPIMB040DeviceParamStackConfigWidget(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
+        ~QFESPIMB040DeviceParamStackConfigWidget();
 
         /** \brief return the filename for the currently selected camera configuration */
         QString currentConfigFilename(int camera) const;
@@ -36,11 +40,21 @@ class QFESPIMB040CamParamStackConfigWidget2 : public QWidget, public QFESPIMB040
 
         void updateReplaces();
 
+        /*! \brief set the specified \a parameter (interpreted as in the parameter combobox) to the given \a value
+
+           This function can be used when actually performing the stack
+         */
+        void setDeviceParameter(int parameter, double value);
+
+        double getDeviceParameter(int parameter);
+
     signals:
         void doStack();
 
     public slots:
         void lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes);
+
+        void performStack();
     public:
         void loadSettings(QSettings& settings, QString prefix);
         void storeSettings(QSettings& settings, QString prefix) const;
@@ -53,7 +67,9 @@ class QFESPIMB040CamParamStackConfigWidget2 : public QWidget, public QFESPIMB040
         bool saveMeasurements() const;
         bool previewMode() const;
 
-        int images() const;
+        double delay() const;
+
+        int numImages() const;
 
         int stackParameter() const;
         QString stackParameterName() const;
@@ -80,12 +96,15 @@ protected slots:
 
         void updateLabel();
     private:
-        Ui::QFESPIMB040CamParamStackConfigWidget2 *ui;
+        Ui::QFESPIMB040DeviceParamStackConfigWidget *ui;
         QFPluginServices* m_pluginServices;
         QFESPIMB040OpticsSetup* opticsSetup;
         QFESPIMB040AcquisitionDescription* acqDescription;
         QFESPIMB040ExperimentDescription* expDescription;
 
+        QFPluginLogService* log;
+        QFESPIMB040AcquisitionTools* acqTools;
+
 };
 
-#endif // QFESPIMB040CAMPARAMSTACKCONFIGWIDGET2_H
+#endif // QFESPIMB040DeviceParamStackConfigWidget_H

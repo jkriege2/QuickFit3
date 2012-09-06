@@ -58,6 +58,9 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         bool use2() const;
         bool overview() const;
 
+        int frames1() const;
+        int frames2() const;
+
         bool lightpathActivated() const;
         QString lightpathFilename() const;
         QString lightpath() const;
@@ -85,6 +88,8 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         void on_chkBackground_toggled(bool enabled);
         void updateBackgroundWidgets();
         void updateReplaces();
+        void on_btnReset1_clicked();
+        void on_btnReset2_clicked();
     private:
         QFPluginServices* m_pluginServices;
         Ui::QFESPIMB040AcquisitionConfigWidget2 *ui;
@@ -94,3 +99,4 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
 };
 
 #endif // QFESPIMB040ACQUISITIONCONFIGWIDGET2_H
+

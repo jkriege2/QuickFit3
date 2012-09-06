@@ -11,6 +11,7 @@
 #include "../base_classes/qf3tmclprotocolhandler.h"
 #include "../base_classes/qf3comportmanager.h"
 #include "../../../../../LIB/trunk/jkserialconnection.h"
+#include "qfextensionglobalsettingsreadwrite.h"
 
 /*!
     \defgroup qf3ext_filterc_tmcl QFExtensioFilterChanger test device
@@ -20,9 +21,9 @@
 /*! \brief QFExtensioFilterChanger test device implementation
     \ingroup qf3ext_filterc_tmcl
  */
-class QFExtensionTMCLFilterChanger : public QObject, public QFExtensionBase, public QFExtensionFilterChanger {
+class QFExtensionTMCLFilterChanger : public QObject, public QFExtensionBase, public QFExtensionFilterChanger, public QFExtensionGlobalSettingsReadWrite {
         Q_OBJECT
-        Q_INTERFACES(QFExtension QFExtensionFilterChanger)
+        Q_INTERFACES(QFExtension QFExtensionFilterChanger QFExtensionGlobalSettingsReadWrite)
     public:
         /** Default constructor */
         QFExtensionTMCLFilterChanger(QObject* parent=NULL);
@@ -97,6 +98,16 @@ class QFExtensionTMCLFilterChanger : public QObject, public QFExtensionBase, pub
         virtual QString getFilterChangerShortName(unsigned int filterChanger) ;
         /** \copydoc QFExtensionFilterChanger::showFilterChangerSettingsDialog() */
         virtual void showFilterChangerSettingsDialog(unsigned int filterChanger, QWidget* parent=NULL);
+
+
+
+
+        /** \copydoc QFExtensionGlobalSettingsReadWrite::readGlobalSettings() */
+        virtual void readGlobalSettings(QSettings& settings, const QString& prefix=QString(""));
+        /** \copydoc QFExtensionGlobalSettingsReadWrite::writeGlobalSettings() */
+        virtual void writeGlobalSettings(QSettings& settings, const QString& prefix=QString("")) ;
+
+
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */
         virtual void projectChanged(QFProject* oldProject, QFProject* project);
@@ -125,6 +136,7 @@ class QFExtensionTMCLFilterChanger : public QObject, public QFExtensionBase, pub
 	protected:
         QFPluginLogService* logService;
         QF3ComPortManager ports;
+        QMenu* fcMenu;
 
         struct FILTERWHEEL {
             QF3TMCLProtocolHandler* tmcl;
@@ -140,6 +152,7 @@ class QFExtensionTMCLFilterChanger : public QObject, public QFExtensionBase, pub
             int32_t standbyCurrent;
             int32_t slowRFSSpeed;
             int32_t fastRFSSpeed;
+            QString motorName;
             int currentFilter;
             uint8_t motor;
             QAction* actRealign;

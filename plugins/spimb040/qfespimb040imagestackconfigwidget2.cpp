@@ -1,7 +1,7 @@
 #include "qfespimb040imagestackconfigwidget2.h"
 #include "ui_qfespimb040imagestackconfigwidget2.h"
 
-#include "qfespimb040mainwindow.h"
+
 #include "qfpluginservices.h"
 #include "qfstagecombobox.h"
 #include "qfextensionmanager.h"

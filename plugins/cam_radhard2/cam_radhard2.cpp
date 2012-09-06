@@ -123,7 +123,7 @@ void QFExtensionCameraRadhard2::storeSettings(ProgramOptions* settingspo) {
     settings.setValue("radhard2/retryDelay", retryDelay);
 }
 
-unsigned int QFExtensionCameraRadhard2::getCameraCount() {
+unsigned int QFExtensionCameraRadhard2::getCameraCount() const {
     return 1;
 }
 
@@ -131,13 +131,13 @@ void QFExtensionCameraRadhard2::useCameraSettings(unsigned int camera, const QSe
     iterations=settings.value("radhard2/iterations", 1000).toUInt();
     divider=settings.value("radhard2/divider", 1).toUInt();
     subtractOne=settings.value("radhard2/subtract1", true).toBool();
-    if (isConnected(camera)) {
+    if (isCameraConnected(camera)) {
         sendIterations();
         sendDivider();
      }
 }
 
-bool QFExtensionCameraRadhard2::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
+bool QFExtensionCameraRadhard2::prepareCameraAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
     useCameraSettings(camera, settings);
     return true;
 }
@@ -202,19 +202,19 @@ void QFExtensionCameraRadhard2::showCameraSettingsDialog(unsigned int camera, QS
     spDivider=NULL;
 }
 
-int QFExtensionCameraRadhard2::getImageWidth(unsigned int camera) {
+int QFExtensionCameraRadhard2::getCameraImageWidth(unsigned int camera) {
     return 32;
 }
 
-int QFExtensionCameraRadhard2::getImageHeight(unsigned int camera) {
+int QFExtensionCameraRadhard2::getImageCameraHeight(unsigned int camera) {
     return 32;
 }
 
-bool QFExtensionCameraRadhard2::isConnected(unsigned int camera) {
+bool QFExtensionCameraRadhard2::isCameraConnected(unsigned int camera) {
     return conn;
 }
 
-bool QFExtensionCameraRadhard2::acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
+bool QFExtensionCameraRadhard2::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
     sendIterations();
     sendDivider();
 
@@ -227,7 +227,7 @@ bool QFExtensionCameraRadhard2::acquire(unsigned int camera, uint32_t* data, uin
     }
 
     unsigned int result;
-    int exposureT=getExposureTime(camera);
+    int exposureT=getCameraExposureTime(camera);
 
 	// Ask for the pictures
     radhard2->SendCommand(CMD_START_ACQUISITION);
@@ -243,7 +243,7 @@ bool QFExtensionCameraRadhard2::acquire(unsigned int camera, uint32_t* data, uin
     radhard2->ReadImage(data);
 
     if (subtractOne) {
-        register int imagesize=getImageWidth(camera)*getImageHeight(camera);
+        register int imagesize=getCameraImageWidth(camera)*getImageCameraHeight(camera);
         for(register int j=0; j<imagesize; j++) {
             data[j] =  data[j]-1;
         }
@@ -256,7 +256,7 @@ bool QFExtensionCameraRadhard2::acquire(unsigned int camera, uint32_t* data, uin
     return true;
 }
 
-bool QFExtensionCameraRadhard2::connectDevice(unsigned int camera) {
+bool QFExtensionCameraRadhard2::connectCameraDevice(unsigned int camera) {
     conn=false;
     if (radhard2) delete radhard2;
 
@@ -291,14 +291,14 @@ bool QFExtensionCameraRadhard2::connectDevice(unsigned int camera) {
     return conn;
 }
 
-void QFExtensionCameraRadhard2::disconnectDevice(unsigned int camera) {
+void QFExtensionCameraRadhard2::disconnectCameraDevice(unsigned int camera) {
     if (radhard2) delete radhard2;
     radhard2=NULL;
     log_text(tr("disconnected\n"));
     conn = false;
 }
 
-double QFExtensionCameraRadhard2::getExposureTime(unsigned int camera) {
+double QFExtensionCameraRadhard2::getCameraExposureTime(unsigned int camera) {
 	return calcExposureTime(iterations, divider);
 }
 
@@ -332,25 +332,25 @@ void QFExtensionCameraRadhard2::sendIterations() {
 }
 
 
-bool QFExtensionCameraRadhard2::startAcquisition(unsigned int camera) {
+bool QFExtensionCameraRadhard2::startCameraAcquisition(unsigned int camera) {
     return false;
 }
 
-void QFExtensionCameraRadhard2::cancelAcquisition(unsigned int camera) {
+void QFExtensionCameraRadhard2::cancelCameraAcquisition(unsigned int camera) {
 }
 
-bool QFExtensionCameraRadhard2::isAcquisitionRunning(unsigned int camera, double* percentageDone) {
+bool QFExtensionCameraRadhard2::isCameraAcquisitionRunning(unsigned int camera, double* percentageDone) {
     return false;
 }
 
-void QFExtensionCameraRadhard2::getAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::AcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
+void QFExtensionCameraRadhard2::getCameraAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::CameraAcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
 }
 
-bool QFExtensionCameraRadhard2::getAcquisitionPreview(unsigned int camera, uint32_t* data) {
+bool QFExtensionCameraRadhard2::getCameraAcquisitionPreview(unsigned int camera, uint32_t* data) {
     return false;
 }
 
-int QFExtensionCameraRadhard2::getAcquisitionProgress(unsigned int camera) {
+int QFExtensionCameraRadhard2::getCameraAcquisitionProgress(unsigned int camera) {
     return 0;
 }
 
@@ -377,11 +377,11 @@ void QFExtensionCameraRadhard2::log_error(QString message) {
 }
 
 
-double QFExtensionCameraRadhard2::getPixelWidth(unsigned int camera) {
+double QFExtensionCameraRadhard2::getCameraPixelWidth(unsigned int camera) {
 	return 30;
 }
 
-double QFExtensionCameraRadhard2::getPixelHeight(unsigned int camera) {
+double QFExtensionCameraRadhard2::getCameraPixelHeight(unsigned int camera) {
 	return 30;
 }
 
@@ -394,6 +394,11 @@ void QFExtensionCameraRadhard2::changeCameraSetting(QSettings& settings, QFExten
 }
 
 QVariant QFExtensionCameraRadhard2::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const  {
+    return QVariant();
+}
+
+QVariant QFExtensionCameraRadhard2::getCurrentCameraSetting(int camera, QFExtensionCamera::CameraSetting which) const
+{
     return QVariant();
 }
 

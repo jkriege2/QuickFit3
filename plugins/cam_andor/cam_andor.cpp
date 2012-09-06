@@ -294,7 +294,7 @@ void QFExtensionCameraAndor::storeSettings(ProgramOptions* settingspo) {
     storeGlobalSettings();
 }
 
-unsigned int QFExtensionCameraAndor::getCameraCount() {
+unsigned int QFExtensionCameraAndor::getCameraCount() const {
     at_32 lNumCameras;
     GetAvailableCameras(&lNumCameras);
     return lNumCameras;
@@ -326,7 +326,7 @@ void QFExtensionCameraAndor::showCameraSettingsDialog(unsigned int camera, QSett
         useCameraSettings(camera, settings);
         acquireFullFrame(camera, data);
         useCameraSettings(camera, settings);
-        acquire(camera, data1);
+        acquireOnCamera(camera, data1);
         dlg->setImage(data);
         int oldShutterMode=camGlobalSettings[camera].shutterMode;
         camGlobalSettings[camera].shutterMode=2; // close shutter
@@ -410,18 +410,18 @@ void QFExtensionCameraAndor::useCameraSettings(unsigned int camera, const QSetti
 
 
 
-int QFExtensionCameraAndor::getImageWidth(unsigned int camera) {
-    if (!isConnected(camera)) return 0;
+int QFExtensionCameraAndor::getCameraImageWidth(unsigned int camera) {
+    if (!isCameraConnected(camera)) return 0;
     return (abs(camInfos[camera].subImage_hend-camInfos[camera].subImage_hstart)+1)/camInfos[camera].hbin;
 }
 
-int QFExtensionCameraAndor::getImageHeight(unsigned int camera) {
-    if (!isConnected(camera)) return 0;
+int QFExtensionCameraAndor::getImageCameraHeight(unsigned int camera) {
+    if (!isCameraConnected(camera)) return 0;
     return (abs(camInfos[camera].subImage_vend-camInfos[camera].subImage_vstart)+1)/camInfos[camera].vbin;
 }
 
-double QFExtensionCameraAndor::getPixelWidth(unsigned int camera) {
-    if (!isConnected(camera)) return 1;
+double QFExtensionCameraAndor::getCameraPixelWidth(unsigned int camera) {
+    if (!isCameraConnected(camera)) return 1;
     return camInfos[camera].pixelWidth*(double)(camInfos[camera].hbin);
 }
 
@@ -435,18 +435,18 @@ QString QFExtensionCameraAndor::getCameraSensorName(unsigned int camera) {
     return camInfos[camera].headModel;
 }
 
-double QFExtensionCameraAndor::getPixelHeight(unsigned int camera) {
-    if (!isConnected(camera)) return 1;
+double QFExtensionCameraAndor::getCameraPixelHeight(unsigned int camera) {
+    if (!isCameraConnected(camera)) return 1;
     return camInfos[camera].pixelHeight*(double)(camInfos[camera].vbin);
 }
 
 
-bool QFExtensionCameraAndor::isConnected(unsigned int camera) {
+bool QFExtensionCameraAndor::isCameraConnected(unsigned int camera) {
     return camConnected.contains(camera);
 }
 
-bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
-    if (!isConnected(camera)) return false;
+bool QFExtensionCameraAndor::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
+    if (!isCameraConnected(camera)) return false;
 
     if (!selectCamera(camera)) return false;
 
@@ -482,7 +482,7 @@ bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64
     if (time.elapsed()<=timeout)  {
 
 
-        int imagesize=getImageWidth(camera)*getImageHeight(camera);
+        int imagesize=getCameraImageWidth(camera)*getImageCameraHeight(camera);
         at_32* imageData = (at_32*)malloc(imagesize*sizeof(at_32));
         CHECK_ON_ERROR(GetAcquiredData(imageData,imagesize), tr("error while acquiring frame"), free(imageData));
 
@@ -507,7 +507,7 @@ bool QFExtensionCameraAndor::acquire(unsigned int camera, uint32_t* data, uint64
 
 
 bool QFExtensionCameraAndor::acquireFullFrame(unsigned int camera, uint32_t* data, uint64_t* timestamp) {
-    if (!isConnected(camera)) return false;
+    if (!isCameraConnected(camera)) return false;
 
     if (!selectCamera(camera)) return false;
 
@@ -545,7 +545,7 @@ bool QFExtensionCameraAndor::acquireFullFrame(unsigned int camera, uint32_t* dat
 }
 
 
-bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
+bool QFExtensionCameraAndor::connectCameraDevice(unsigned int camera) {
 
     timer.start();
 
@@ -640,7 +640,7 @@ bool QFExtensionCameraAndor::connectDevice(unsigned int camera) {
     return false;
 }
 
-void QFExtensionCameraAndor::disconnectDevice(unsigned int camera) {
+void QFExtensionCameraAndor::disconnectCameraDevice(unsigned int camera) {
     int i=camera;
     if (getCameraCount()>0) {
         selectCamera(camera);
@@ -685,8 +685,8 @@ void QFExtensionCameraAndor::disconnectDevice(unsigned int camera) {
     camConnected.remove(camera);
 }
 
-double QFExtensionCameraAndor::getExposureTime(unsigned int camera) {
-    if (!isConnected(camera)) return 0;
+double QFExtensionCameraAndor::getCameraExposureTime(unsigned int camera) {
+    if (!isCameraConnected(camera)) return 0;
     return camInfos[camera].expoTime;
 }
 
@@ -695,6 +695,11 @@ bool QFExtensionCameraAndor::isCameraSettingChangable(QFExtensionCamera::CameraS
     if (which==QFExtensionCamera::CamSetExposureTime) return true;
     if (which==QFExtensionCamera::CamSetNumberFrames) return true;
     if (which==QFExtensionCamera::CamSetGain) return true;
+    if (which==QFExtensionCamera::CamSetEMGAIN) return true;
+    if (which==QFExtensionCamera::CamSetFrametime) return true;
+    if (which==QFExtensionCamera::CamSetHorizontalBinning) return true;
+    if (which==QFExtensionCamera::CamSetVerticalBinning) return true;
+    if (which==QFExtensionCamera::CamSetTemporalBinning) return true;
     return false;
 }
 
@@ -702,21 +707,53 @@ void QFExtensionCameraAndor::changeCameraSetting(QSettings& settings, QFExtensio
     QString prefix="cam_andor/";
     if (which==QFExtensionCamera::CamSetExposureTime) settings.setValue(prefix+"exposure_time", value);
     if (which==QFExtensionCamera::CamSetNumberFrames) settings.setValue(prefix+"kinetic_cycles", value);
-    if (which==QFExtensionCamera::CamSetGain) {
+    if (which==QFExtensionCamera::CamSetEMGAIN) {
         settings.setValue(prefix+"emgain", value);
         settings.setValue(prefix+"emgain_enabled", true);
     }
+    if (which==QFExtensionCamera::CamSetGain) settings.setValue(prefix+"preamp_gain", value);
+    if (which==QFExtensionCamera::CamSetFrametime) settings.setValue(prefix+"kinetic_cycle_time", value);
+    if (which==QFExtensionCamera::CamSetHorizontalBinning) settings.setValue(prefix+"horizontal_binning", value);
+    if (which==QFExtensionCamera::CamSetVerticalBinning) settings.setValue(prefix+"vertical_binning", value);
+    if (which==QFExtensionCamera::CamSetTemporalBinning) settings.setValue(prefix+"accumulate_cycles", value);
 }
 
 QVariant QFExtensionCameraAndor::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const  {
     QString prefix="cam_andor/";
     if (which==QFExtensionCamera::CamSetExposureTime) return settings.value(prefix+"exposure_time");
     if (which==QFExtensionCamera::CamSetNumberFrames) return settings.value(prefix+"kinetic_cycles");
-    if (which==QFExtensionCamera::CamSetGain) return settings.value(prefix+"emgain");
+    if (which==QFExtensionCamera::CamSetGain) return settings.value(prefix+"preamp_gain");
+    if (which==QFExtensionCamera::CamSetFrametime) return settings.value(prefix+"kinetic_cycle_time");
+    if (which==QFExtensionCamera::CamSetEMGAIN) return settings.value(prefix+"emgain");
+    if (which==QFExtensionCamera::CamSetHorizontalBinning) return settings.value(prefix+"horizontal_binning");
+    if (which==QFExtensionCamera::CamSetVerticalBinning) return settings.value(prefix+"vertical_binning");
+    if (which==QFExtensionCamera::CamSetTemporalBinning) return settings.value(prefix+"accumulate_cycles");
     return QVariant();
 }
 
-bool QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
+QVariant QFExtensionCameraAndor::getCurrentCameraSetting(int camera, QFExtensionCamera::CameraSetting which) const
+{
+    if (camera<0 || camera>=getCameraCount()) return QVariant();
+
+    if (which==QFExtensionCamera::CamSetExposureTime) return camInfos[camera].expoTime;
+    if (which==QFExtensionCamera::CamSetNumberFrames) return camInfos[camera].numKins;
+    if (which==QFExtensionCamera::CamSetGain) return camInfos[camera].preampGainF;
+    if (which==QFExtensionCamera::CamSetFrametime) return camInfos[camera].kinTime;
+    if (which==QFExtensionCamera::CamSetEMGAIN) {
+        if (camInfos[camera].emgain_enabled)
+            return camInfos[camera].emgain;
+        else
+            return 0;
+    }
+    if (which==QFExtensionCamera::CamSetHorizontalBinning) return camInfos[camera].hbin;
+    if (which==QFExtensionCamera::CamSetVerticalBinning) return camInfos[camera].vbin;
+    if (which==QFExtensionCamera::CamSetTemporalBinning) return camInfos[camera].accTime;
+
+
+    return QVariant();
+}
+
+bool QFExtensionCameraAndor::prepareCameraAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
     useCameraSettings(camera, settings);
 
     CameraInfo info;//=camInfos[camera];
@@ -751,7 +788,7 @@ bool QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSett
     connect(thread, SIGNAL(log_error(QString)), this, SLOT(tlog_error(QString)));
     connect(thread, SIGNAL(log_warning(QString)), this, SLOT(tlog_warning(QString)));
     connect(thread, SIGNAL(log_text(QString)), this, SLOT(tlog_text(QString)));
-    bool ok=thread->init(camera, filenamePrefix, info.fileformat, info.numKins, getImageWidth(camera), getImageHeight(camera), info.expoTime, LOG_PREFIX);
+    bool ok=thread->init(camera, filenamePrefix, info.fileformat, info.numKins, getCameraImageWidth(camera), getImageCameraHeight(camera), info.expoTime, LOG_PREFIX);
     if (!ok) {
         delete thread;
         return false;
@@ -762,14 +799,14 @@ bool QFExtensionCameraAndor::prepareAcquisition(unsigned int camera, const QSett
 }
 
 
-bool QFExtensionCameraAndor::startAcquisition(unsigned int camera) {
+bool QFExtensionCameraAndor::startCameraAcquisition(unsigned int camera) {
     CamAndorAcquisitionThread* thread=camThreads.value(camera, NULL);
     if (!thread) return false;
     thread->start();
     return true;
 }
 
-void QFExtensionCameraAndor::cancelAcquisition(unsigned int camera) {
+void QFExtensionCameraAndor::cancelCameraAcquisition(unsigned int camera) {
     /*if (selectCamera(camera)) {
         CHECK_NO_RETURN(AbortAcquisition(), tr("error while aborting acquisition"));
     }*/
@@ -779,7 +816,7 @@ void QFExtensionCameraAndor::cancelAcquisition(unsigned int camera) {
     }
 }
 
-bool QFExtensionCameraAndor::isAcquisitionRunning(unsigned int camera, double* percentageDone) {
+bool QFExtensionCameraAndor::isCameraAcquisitionRunning(unsigned int camera, double* percentageDone) {
     /*if (selectCamera(camera)) {
         if (percentageDone) *percentageDone=getAcquisitionProgress(camera);
         int status;
@@ -824,8 +861,8 @@ void QFExtensionCameraAndor::internalGetAcquisitionDescription(unsigned int came
     (*parameters)["roi_xend"]=info.subImage_hend;
     (*parameters)["roi_ystart"]=info.subImage_vstart;
     (*parameters)["roi_yend"]=info.subImage_vend;
-    (*parameters)["image_width"]=getImageWidth(camera);
-    (*parameters)["image_height"]=getImageHeight(camera);
+    (*parameters)["image_width"]=getCameraImageWidth(camera);
+    (*parameters)["image_height"]=getImageCameraHeight(camera);
     (*parameters)["sensor_temperature"]=getTemperature(camera);
 
     switch(camGlobalSettings[camera].shutterMode) { //0: auto, 1: open, 2: close
@@ -891,7 +928,7 @@ void QFExtensionCameraAndor::internalGetAcquisitionDescription(unsigned int came
     }
 }
 
-void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::AcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
+void QFExtensionCameraAndor::getCameraAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::CameraAcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
     QStringList fileNames, fileTypes;
     CamAndorAcquisitionThread* thread=camThreads.value(camera, NULL);
     char text[512];
@@ -902,7 +939,7 @@ void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QLis
         duration=thread->getDurationMilliseconds();
     }
     for (int i=0; i<fileNames.size(); i++) {
-        QFExtensionCamera::AcquititonFileDescription d;
+        QFExtensionCamera::CameraAcquititonFileDescription d;
         d.name=fileNames[i];
         d.type=fileTypes[i];
         d.description=tr("Andor camera acquisition image series");
@@ -914,12 +951,12 @@ void QFExtensionCameraAndor::getAcquisitionDescription(unsigned int camera, QLis
 
 }
 
-bool QFExtensionCameraAndor::getAcquisitionPreview(unsigned int camera, uint32_t* data) {
+bool QFExtensionCameraAndor::getCameraAcquisitionPreview(unsigned int camera, uint32_t* data) {
     return false;
 }
 
 
-int QFExtensionCameraAndor::getAcquisitionProgress(unsigned int camera) {
+int QFExtensionCameraAndor::getCameraAcquisitionProgress(unsigned int camera) {
     /*if (selectCamera(camera)) {
         int p=0;
         CHECK(GetSpoolProgress(&p), tr("error acquiring spool progress"));
@@ -1146,13 +1183,13 @@ bool QFExtensionCameraAndor::setGlobalSettings(int cam) {
         while (it.hasNext()) {
             it.next();
             camera=it.key();
-            if (isConnected(camera)) {
+            if (isCameraConnected(camera)) {
                 ok=ok&&setTemperature(camera, it.value().coolerOn, it.value().setTemperature, it.value().fanMode);
                 ok=ok&&setCamShutter(camera, it.value().shutterMode, it.value().shutterClosingTime, it.value().shutterOpeningTime);
             }
         }
     } else {
-        if (camGlobalSettings.contains(camera) && isConnected(camera)) {
+        if (camGlobalSettings.contains(camera) && isCameraConnected(camera)) {
             ok=setTemperature(camera, camGlobalSettings[camera].coolerOn, camGlobalSettings[camera].setTemperature, camGlobalSettings[camera].fanMode);
             ok=ok&&setCamShutter(camera, camGlobalSettings[camera].shutterMode, camGlobalSettings[camera].shutterClosingTime, camGlobalSettings[camera].shutterOpeningTime);
         }
@@ -1172,7 +1209,7 @@ void QFExtensionCameraAndor::updateGlobalSettingsWidgets(bool startTimer) {
             connect(widget, SIGNAL(settingsChanged(int,int,bool,bool,int,int)), this, SLOT(globalSettingsChanged(int,int,bool,bool,int,int)));
         }
 
-        if (isConnected(i)) {
+        if (isCameraConnected(i)) {
             if (widget) {
                 widget->setSettings(camGlobalSettings[i].fanMode, camGlobalSettings[i].coolerOn, camGlobalSettings[i].cooling_wait, camGlobalSettings[i].setTemperature, camGlobalSettings[i].shutterMode);
                 widget->setVisible(true);
@@ -1249,7 +1286,7 @@ void  QFExtensionCameraAndor::shutterDisonnect(unsigned int shutter) {
 }
 
 bool  QFExtensionCameraAndor::isShutterConnected(unsigned int shutter)  {
-    return isConnected(shutter);
+    return isCameraConnected(shutter);
 }
 
 bool  QFExtensionCameraAndor::isShutterOpen(unsigned int shutter)  {
@@ -1291,7 +1328,7 @@ void QFExtensionCameraAndor::showShutterSettingsDialog(unsigned int axis, QWidge
 }
 
 void QFExtensionCameraAndor::setShutterLogging(QFPluginLogService* logService) {
-    setLogging(logService);
+    setCameraLogging(logService);
 }
 
 unsigned int QFExtensionCameraAndor::getMeasurementDeviceCount()
@@ -1305,7 +1342,7 @@ void QFExtensionCameraAndor::showMeasurementDeviceSettingsDialog(unsigned int me
 
 bool QFExtensionCameraAndor::isMeasurementDeviceConnected(unsigned int measurementDevice)
 {
-    return isConnected(measurementDevice);
+    return isCameraConnected(measurementDevice);
 }
 
 void QFExtensionCameraAndor::connectMeasurementDevice(unsigned int measurementDevice)
@@ -1319,7 +1356,7 @@ void QFExtensionCameraAndor::disconnectMeasurementDevice(unsigned int measuremen
 
 void QFExtensionCameraAndor::setMeasurementDeviceLogging(QFPluginLogService *logService)
 {
-    setLogging(logService);
+    setCameraLogging(logService);
 }
 
 unsigned int QFExtensionCameraAndor::getMeasurementDeviceValueCount(unsigned int measurementDevice)

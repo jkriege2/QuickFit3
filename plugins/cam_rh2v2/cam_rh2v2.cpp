@@ -439,19 +439,19 @@ void QFExtensionCameraRh2v2::showCameraSettingsDialog(unsigned int camera, QSett
 	delete dlg;
 }
 
-int QFExtensionCameraRh2v2::getImageWidth(unsigned int camera) {
+int QFExtensionCameraRh2v2::getCameraImageWidth(unsigned int camera) {
   return cameraSetting[camera].yRes;
 }
 
-int QFExtensionCameraRh2v2::getImageHeight(unsigned int camera) {
+int QFExtensionCameraRh2v2::getImageCameraHeight(unsigned int camera) {
   return cameraSetting[camera].xRes;
 }
 
-double QFExtensionCameraRh2v2::getPixelWidth(unsigned int camera) {
+double QFExtensionCameraRh2v2::getCameraPixelWidth(unsigned int camera) {
   return cameraSetting[camera].pixelWidth;
 }
 
-double QFExtensionCameraRh2v2::getPixelHeight(unsigned int camera) {
+double QFExtensionCameraRh2v2::getCameraPixelHeight(unsigned int camera) {
   return cameraSetting[camera].pixelHeight;
 }
 QString QFExtensionCameraRh2v2::getCameraName(unsigned int camera){
@@ -462,11 +462,11 @@ QString QFExtensionCameraRh2v2::getCameraSensorName(unsigned int camera){
   return QString("");
 }
 
-bool QFExtensionCameraRh2v2::isConnected(unsigned int camera) {
+bool QFExtensionCameraRh2v2::isCameraConnected(unsigned int camera) {
     return true;
 }
 
-bool QFExtensionCameraRh2v2::acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
+bool QFExtensionCameraRh2v2::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
     if (timestamp!=NULL) {
         *timestamp=(uint64_t) 0;
     }
@@ -502,7 +502,7 @@ bool QFExtensionCameraRh2v2::flashFPGA(unsigned int camera){
     return true;
 }
 
-bool QFExtensionCameraRh2v2::connectDevice(unsigned int camera) {
+bool QFExtensionCameraRh2v2::connectCameraDevice(unsigned int camera) {
     QDEBUG("")
     if (autoflash && (QFile(autoflashbitfileMaster).exists() || QFile(autoflashbitfileSlave).exists())) {
         QString flashMessage;
@@ -535,7 +535,7 @@ bool QFExtensionCameraRh2v2::connectDevice(unsigned int camera) {
     return true;
 }
 
-void QFExtensionCameraRh2v2::disconnectDevice(unsigned int camera) {
+void QFExtensionCameraRh2v2::disconnectCameraDevice(unsigned int camera) {
     QDEBUG("")
     /* disconnect from the given camera */
   cameraSetting[camera].raw.pc->stop(QString("UI"));
@@ -544,11 +544,11 @@ void QFExtensionCameraRh2v2::disconnectDevice(unsigned int camera) {
   }
 }
 
-double QFExtensionCameraRh2v2::getExposureTime(unsigned int camera) {
+double QFExtensionCameraRh2v2::getCameraExposureTime(unsigned int camera) {
     return cameraSetting[camera].exposureTime;
 }
 
-bool QFExtensionCameraRh2v2::startAcquisition(unsigned int camera) {
+bool QFExtensionCameraRh2v2::startCameraAcquisition(unsigned int camera) {
     QDEBUG("")
     if(cameraSetting[camera].cor.enabled==true){
         if(cameraSetting[camera].cor.pc!=NULL){
@@ -560,11 +560,11 @@ bool QFExtensionCameraRh2v2::startAcquisition(unsigned int camera) {
     return true;
 }
 
-void QFExtensionCameraRh2v2::cancelAcquisition(unsigned int camera) {
+void QFExtensionCameraRh2v2::cancelCameraAcquisition(unsigned int camera) {
     acquisitionFinished(camera);
 }
 
-bool QFExtensionCameraRh2v2::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
+bool QFExtensionCameraRh2v2::prepareCameraAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
     QDEBUG("")
     cameraSetting[camera].raw.pc->stop(QString("UI"));
     if(cameraSetting[camera].cor.pc!=NULL){
@@ -590,7 +590,7 @@ bool QFExtensionCameraRh2v2::prepareAcquisition(unsigned int camera, const QSett
     return result;
 }
 
-bool QFExtensionCameraRh2v2::isAcquisitionRunning(unsigned int camera, double* percentageDone) {
+bool QFExtensionCameraRh2v2::isCameraAcquisitionRunning(unsigned int camera, double* percentageDone) {
     bool result=false;
     result|=cameraSetting[camera].raw.pc->isRunning();
     if(cameraSetting[camera].cor.pc!=NULL){
@@ -599,8 +599,8 @@ bool QFExtensionCameraRh2v2::isAcquisitionRunning(unsigned int camera, double* p
     return result;
 }
 
-void QFExtensionCameraRh2v2::getAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::AcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
-    QFExtensionCamera::AcquititonFileDescription fd;
+void QFExtensionCameraRh2v2::getCameraAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::CameraAcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
+    QFExtensionCamera::CameraAcquititonFileDescription fd;
     QString we;
     bool res;
 
@@ -623,18 +623,18 @@ void QFExtensionCameraRh2v2::getAcquisitionDescription(unsigned int camera, QLis
     }
 
     (*parameters)["sequence_length"]=cameraSetting[camera].raw.settings->value(we+"/config/duration", "").toInt();
-    (*parameters)["image_width"]=getImageWidth(camera);
-    (*parameters)["image_height"]=getImageHeight(camera);
-    (*parameters)["pixel_width"]=getPixelWidth(camera);
-    (*parameters)["pixel_height"]=getPixelHeight(camera);
+    (*parameters)["image_width"]=getCameraImageWidth(camera);
+    (*parameters)["image_height"]=getImageCameraHeight(camera);
+    (*parameters)["pixel_width"]=getCameraPixelWidth(camera);
+    (*parameters)["pixel_height"]=getCameraPixelHeight(camera);
     (*parameters)["frame_time"]=1e-5;
 }
 
-bool QFExtensionCameraRh2v2::getAcquisitionPreview(unsigned int camera, uint32_t* data) {
+bool QFExtensionCameraRh2v2::getCameraAcquisitionPreview(unsigned int camera, uint32_t* data) {
     return false;
 }
 
-int QFExtensionCameraRh2v2::getAcquisitionProgress(unsigned int camera) {
+int QFExtensionCameraRh2v2::getCameraAcquisitionProgress(unsigned int camera) {
     return 0;
 }
 
@@ -647,6 +647,11 @@ void QFExtensionCameraRh2v2::changeCameraSetting(QSettings& settings, QFExtensio
 }
 
 QVariant QFExtensionCameraRh2v2::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const  {
+    return QVariant();
+}
+
+QVariant QFExtensionCameraRh2v2::getCurrentCameraSetting(int camera, QFExtensionCamera::CameraSetting which) const
+{
     return QVariant();
 }
 

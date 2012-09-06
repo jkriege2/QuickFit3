@@ -17,6 +17,7 @@ QFESPIMB040MainWindow2::QFESPIMB040MainWindow2(QFPluginServices* pluginServices,
 {
     widImageStack=NULL;
     widCamParamScan=NULL;
+    widDeviceParamScan=NULL;
     widExperimentDescription=NULL;
     widAcquisition=NULL;
     optSetup=NULL;
@@ -40,6 +41,7 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     if (widImageStack) widImageStack->loadSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
     if (widCamParamScan) widCamParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
+    if (widDeviceParamScan) widDeviceParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/deviceparamscan/");
 }
 
 void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
@@ -51,6 +53,7 @@ void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
     if (widImageStack) widImageStack->storeSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
     if (widCamParamScan) widCamParamScan->storeSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
+    if (widDeviceParamScan) widDeviceParamScan->storeSettings((*settings->getQSettings()), "plugin_spim_b040/deviceparamscan/");
 
 }
 
@@ -152,6 +155,14 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
         connect(widCamParamScan, SIGNAL(doStack()), this, SLOT(doCamParamStack()));
         connect(optSetup, SIGNAL(lightpathesChanged(QFESPIMB040OpticsSetupItems)), widCamParamScan, SLOT(lightpathesChanged(QFESPIMB040OpticsSetupItems)));
 
+
+        //------------------------------------------------------------------------------------------
+        // create tab for device parameter image series acquisition
+        //------------------------------------------------------------------------------------------
+        widDeviceParamScan=new QFESPIMB040DeviceParamStackConfigWidget(this, this, this, m_pluginServices, optSetup, widAcquisitionDescription, widExperimentDescription, m_pluginServices->getConfigFileDirectory());
+        tabMain->addTab(widDeviceParamScan, tr("Acquisition: Device Parameter Series"));
+        connect(widDeviceParamScan, SIGNAL(doStack()), this, SLOT(doDeviceParamStack()));
+        connect(optSetup, SIGNAL(lightpathesChanged(QFESPIMB040OpticsSetupItems)), widDeviceParamScan, SLOT(lightpathesChanged(QFESPIMB040OpticsSetupItems)));
 
 
 
@@ -746,7 +757,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                                     timStart=QDateTime::currentDateTime();
                                 }
                                 if (useCam1) {
-                                    if (ecamera1->acquire(camera1, buffer1)) {
+                                    if (ecamera1->acquireOnCamera(camera1, buffer1)) {
                                         TIFFTWriteUint16from32(tiff1[lp], buffer1, width1, height1);
                                         TIFFWriteDirectory(tiff1[lp]);
                                     } else {
@@ -756,7 +767,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                                 }
                                 //QApplication::processEvents();
                                 if (useCam2) {
-                                    if (ecamera2->acquire(camera2, buffer2)) {
+                                    if (ecamera2->acquireOnCamera(camera2, buffer2)) {
                                         TIFFTWriteUint16from32(tiff2[lp], buffer2, width2, height2);
                                         TIFFWriteDirectory(tiff2[lp]);
                                     } else {
@@ -895,9 +906,9 @@ void QFESPIMB040MainWindow2::doImageStack() {
         //////////////////////////////////////////////////////////////////////////////////////
         if (ok && useCam1) {
             QMap<QString, QVariant> acquisitionDescription1=acquisitionDescription;
-            QList<QFExtensionCamera::AcquititonFileDescription> files;
+            QList<QFExtensionCamera::CameraAcquititonFileDescription> files;
             for (int lp=0; lp<TIFFFIlename1.size(); lp++) {
-                QFExtensionCamera::AcquititonFileDescription d;
+                QFExtensionCamera::CameraAcquititonFileDescription d;
                 d.name=TIFFFIlename1[lp];
                 d.description="image stack from camera 1, lightpath "+QString(lp+1)+" '"+lightpathNames[lp]+"'";
                 d.type="TIFF16";
@@ -910,7 +921,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
             if (posFile.open(QIODevice::WriteOnly)) {
                 posFile.write(positionsCSV.toAscii().data());
                 posFile.close();
-                QFExtensionCamera::AcquititonFileDescription d;
+                QFExtensionCamera::CameraAcquititonFileDescription d;
                 d.name=PositionsFilename;
                 d.description="positions of image stack from camera 1";
                 d.type="CSV";
@@ -921,7 +932,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
 
             QString MeasurementsFilename=saveMeasuredData(acquisitionPrefix1, measured);
             if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
-                QFExtensionCamera::AcquititonFileDescription d;
+                QFExtensionCamera::CameraAcquititonFileDescription d;
                 d.name=MeasurementsFilename;
                 d.description="measureable properties of setup";
                 d.type="CSV";
@@ -934,9 +945,9 @@ void QFESPIMB040MainWindow2::doImageStack() {
         }
         if (ok && useCam2) {
             QMap<QString, QVariant> acquisitionDescription2=acquisitionDescription;
-            QList<QFExtensionCamera::AcquititonFileDescription> files;
+            QList<QFExtensionCamera::CameraAcquititonFileDescription> files;
             for (int lp=0; lp<TIFFFIlename1.size(); lp++) {
-                QFExtensionCamera::AcquititonFileDescription d;
+                QFExtensionCamera::CameraAcquititonFileDescription d;
                 d.name=TIFFFIlename2[lp];
                 d.description="image stack from camera 2, lightpath "+QString(lp+1)+" '"+lightpathNames[lp]+"'";
                 d.type="TIFF16";
@@ -949,7 +960,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
             if (posFile.open(QIODevice::WriteOnly)) {
                 posFile.write(positionsCSV.toAscii().data());
                 posFile.close();
-                QFExtensionCamera::AcquititonFileDescription d;
+                QFExtensionCamera::CameraAcquititonFileDescription d;
                 d.name=PositionsFilename;
                 d.description="positions of image stack from camera 1";
                 d.type="CSV";
@@ -960,7 +971,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
 
             QString MeasurementsFilename=saveMeasuredData(acquisitionPrefix2, measured);
             if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
-                QFExtensionCamera::AcquititonFileDescription d;
+                QFExtensionCamera::CameraAcquititonFileDescription d;
                 d.name=MeasurementsFilename;
                 d.description="measureable properties of setup";
                 d.type="CSV";
@@ -1082,45 +1093,44 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
     //////////////////////////////////////////////////////////////////////////////////////
     // CHECK WHETHER HARDWRAE SUPPORTS CHANGING THE SELECTED PARAMETER
     //////////////////////////////////////////////////////////////////////////////////////
-    int stackParam=widCamParamScan->stackParameter();
+    int stackParamI=widDeviceParamScan->stackParameter();
+    QFExtensionCamera::CameraSetting stackParam=QFExtensionCamera::CameraSetting(stackParamI);
     if (ok) {
-
-        if (stackParam==0) {
-            if (useCam1 && !ecamera1->isCameraSettingChangable(QFExtensionCamera::CamSetExposureTime)) {
+        if (stackParam>=0 && stackParam<=QFExtensionCamera::CamSetMaxParam) {
+            if (useCam1 && !ecamera1->isCameraSettingChangable(stackParam)) {
                 ok=false;
-                CAMPARAMSTACK_ERROR(tr("camera 1 does not support changing the exposure time!\n"));
+                CAMPARAMSTACK_ERROR(tr("camera 1 does not support changing the %1!\n").arg(widDeviceParamScan->stackParameterName()));
             }
-            if (ok && useCam2 && !ecamera2->isCameraSettingChangable(QFExtensionCamera::CamSetExposureTime)) {
+            if (ok && useCam2 && !ecamera2->isCameraSettingChangable(stackParam)) {
                 ok=false;
-                CAMPARAMSTACK_ERROR(tr("camera 2 does not support changing the exposure time!\n"));
+                CAMPARAMSTACK_ERROR(tr("camera 2 does not support changing the %1!\n").arg(widDeviceParamScan->stackParameterName()));
             }
-        } else if (stackParam==1) {
-            if (useCam1 && !ecamera1->isCameraSettingChangable(QFExtensionCamera::CamSetGain)) {
-                ok=false;
-                CAMPARAMSTACK_ERROR(tr("camera 1 does not support changing the gain!\n"));
-            }
-            if (ok && useCam2 && !ecamera2->isCameraSettingChangable(QFExtensionCamera::CamSetGain)) {
-                ok=false;
-                CAMPARAMSTACK_ERROR(tr("camera 2 does not support changing the gain!\n"));
-            }
+        } else {
+            ok=false;
+            CAMPARAMSTACK_ERROR(tr("invalid stack parameter %1 '%2'\n").arg(stackParam).arg(widDeviceParamScan->stackParameterName()));
         }
     }
+
 
 
     if (ok) {
         if (ok && useCam1) log_text(tr("  - storing files with prefix 1: '%1'\n").arg(acquisitionPrefix1));
         if (ok && useCam2) log_text(tr("  - storing files with prefix 2: '%1'\n").arg(acquisitionPrefix2));
 
-        QProgressDialog progress(tr("Parameter Stack Acquisition"), tr("&Cancel"), 0, 100, this);
+        QProgressListDialog progress(tr("Parameter Stack Acquisition"), tr("&Cancel"), 0, 100, this);
+        progress.addItem(tr("preparation"));
+        progress.addItem(tr("acquisition"));
+        progress.addItem(tr("cleanup"));
         progress.setWindowModality(Qt::WindowModal);
-        progress.setMinimumDuration(0);
         progress.setValue(0);
+        progress.start();
 
         //////////////////////////////////////////////////////////////////////////////////////
         // SET LIGHTPATH
         //////////////////////////////////////////////////////////////////////////////////////
         QString oldLightpath=optSetup->getCurrentLightpathFilename();
         QString oldLightpathName=optSetup->getCurrentLightpath();
+        QString lightpathName="unknown";
         if (widCamParamScan->lightpathActivated()) {
             if (!QFile::exists(widCamParamScan->lightpathFilename())) {
                 CAMPARAMSTACK_ERROR(tr("  - acquisition lighpath configuration '%1' does not exist!\n").arg(widCamParamScan->lightpath()));
@@ -1129,7 +1139,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
 
             } else {
                 log_text(tr("  - setting acquisition lightpath settings '%1' ...\n").arg(widCamParamScan->lightpath()));
-                optSetup->loadLightpathConfig(widCamParamScan->lightpathFilename(), true);
+                optSetup->loadLightpathConfig(widCamParamScan->lightpathFilename(), true, &lightpathName);
                 log_text(tr("  - setting acquisition lightpath settings '%1' ... DONE\n").arg(widCamParamScan->lightpath()));
             }
         }
@@ -1144,174 +1154,298 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
             setMainIlluminationShutter(true, true);
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////
-        // OPEN OUTPUT TIFF FILES
-        //////////////////////////////////////////////////////////////////////////////////////
-        progress.setLabelText(tr("opening output files ..."));
-        QApplication::processEvents();
-        if (ok && useCam1) {
-            QDir().mkpath(QFileInfo(TIFFFIlename1.toAscii().data()).absolutePath());
-            tiff1=TIFFOpen(TIFFFIlename1.toAscii().data(), "w");
-            if (!tiff1) {
-                ok=false;
-                CAMPARAMSTACK_ERROR(tr("error opening TIFF file (camera 1) '%1'!").arg(TIFFFIlename1));
-            }
-        }
-        if (ok && useCam2) {
-            QDir().mkpath(QFileInfo(TIFFFIlename2.toAscii().data()).absolutePath());
-            tiff2=TIFFOpen(TIFFFIlename2.toAscii().data(), "w");
-            if (!tiff2) {
-                ok=false;
-                CAMPARAMSTACK_ERROR(tr("error opening TIFF file (camera 2) '%1'!").arg(TIFFFIlename2));
-            }
-        }
-
-
-
-        if (progress.wasCanceled()) {
-            log_warning(tr("canceled by user!\n"));
-            ok=false;
-        }
-
-
-
-        //////////////////////////////////////////////////////////////////////////////////////
-        // CHANGE PARAM, ACQUIRE IMAGE, CHANGE PARAM, ACQUIRE IMAGE, ...
-        //    images are stored in TIFF files using libtiff and they are (possibly) downscaled to 16-bit
-        //////////////////////////////////////////////////////////////////////////////////////
         QList<QVariant> realValues1, realValues2;
         QTime timAcquisition=QTime::currentTime();
         QDateTime timStart;
         double duration=0;
-        if (ok) {
-            progress.setLabelText(tr("acquiring images ..."));
-            bool running=ok;
-            //double newPos=stageStart;
-            int stackIdx=0;
-            int width1=0, height1=0;
-            uint32_t* buffer1=NULL;
-            int width2=0, height2=0;
-            uint32_t* buffer2=NULL;
-            int imageCnt=0;
 
-            measured.append(optSetup->getMeasuredValues());
 
-            while (running && (stackIdx<scanVals.size())) {
+        progress.nextItem();
+        if (widCamParamScan->previewMode()) {
+            log_text(tr("acquiring stack in PREVIEW MODE ...\n"));
 
-                if (ok && useCam1) {
 
-                    //////////////////////////////////////////////////////////////////////////////////////
-                    // PREPARE CAMERA 1
-                    //////////////////////////////////////////////////////////////////////////////////////
-                    if (ok && useCam1) {
-                        progress.setLabelText(tr("preparing camera 1 ..."));
-                        QApplication::processEvents();
-                        QSettings settings(acquisitionSettingsFilename1, QSettings::IniFormat);
-
-                        if (stackParam==0) {
-                            ecamera1->changeCameraSetting(settings, QFExtensionCamera::CamSetExposureTime, scanVals[stackIdx]);
-                        } else if (stackParam==1) {
-                            ecamera1->changeCameraSetting(settings, QFExtensionCamera::CamSetGain, scanVals[stackIdx]);
-                        }
-
-                        ecamera1->useCameraSettings(camera1, settings);
-                        realValues1.append(ecamera1->getExposureTime(camera1));
-                        log_text(tr("  - prepared camer 1!\n"));
-                        width1=ecamera1->getImageWidth(camera1);
-                        height1=ecamera1->getImageHeight(camera1);
-                        buffer1=(uint32_t*)realloc(buffer1, width1*height1*sizeof(uint32_t));
-                        if (!buffer1) {
-                            ok=false;
-                            CAMPARAMSTACK_ERROR(tr("could not allocate image buffer for camera 1!\n"));
-                        }
-                    }
+            //////////////////////////////////////////////////////////////////////////////////////
+            // OPEN OUTPUT TIFF FILES
+            //////////////////////////////////////////////////////////////////////////////////////
+            progress.setLabelText(tr("opening output files ..."));
+            QApplication::processEvents();
+            if (ok && useCam1) {
+                QDir().mkpath(QFileInfo(TIFFFIlename1.toAscii().data()).absolutePath());
+                tiff1=TIFFOpen(TIFFFIlename1.toAscii().data(), "w");
+                if (!tiff1) {
+                    ok=false;
+                    CAMPARAMSTACK_ERROR(tr("error opening TIFF file (camera 1) '%1'!").arg(TIFFFIlename1));
                 }
-
-                if (ok && useCam2) {
-
-                    //////////////////////////////////////////////////////////////////////////////////////
-                    // PREPARE CAMERA 1
-                    //////////////////////////////////////////////////////////////////////////////////////
-                    if (ok && useCam2) {
-                        progress.setLabelText(tr("preparing camera 2 ..."));
-                        QApplication::processEvents();
-                        QSettings settings(acquisitionSettingsFilename2, QSettings::IniFormat);
-
-                        if (stackParam==0) {
-                            ecamera2->changeCameraSetting(settings, QFExtensionCamera::CamSetExposureTime, scanVals[stackIdx]);
-                        } else if (stackParam==1) {
-                            ecamera2->changeCameraSetting(settings, QFExtensionCamera::CamSetGain, scanVals[stackIdx]);
-                        }
-
-                        ecamera2->useCameraSettings(camera2, settings);
-                        realValues2.append(ecamera2->getExposureTime(camera2));
-                        log_text(tr("  - prepared camer 2!\n"));
-                        width2=ecamera2->getImageWidth(camera2);
-                        height2=ecamera2->getImageHeight(camera2);
-                        buffer2=(uint32_t*)realloc(buffer2, width2*height2*sizeof(uint32_t));
-                        if (!buffer2) {
-                            ok=false;
-                            CAMPARAMSTACK_ERROR(tr("could not allocate image buffer for camera 2!\n"));
-                        }
-                    }
-                }
-
-                QApplication::processEvents();
-                if (progress.wasCanceled()) {
-                    running=false;
-                    log_warning(tr("  - acquisition canceled by user!\n"));
-                } else {
-                    for (int img=0; img<widCamParamScan->images(); img++) {
-                        log_text(tr("acquiring images (%1/%2) ...\n").arg(imageCnt+1).arg(images));
-                        progress.setLabelText(tr("acquiring images (%1/%2) ...").arg(imageCnt+1).arg(images));
-                        QApplication::processEvents();
-                        if (progress.wasCanceled()) {
-                            running=false;
-                            log_warning(tr("  - acquisition canceled by user!\n"));
-                            break;
-                        }
-                        if (stackIdx==0) {
-                            timAcquisition.start();
-                            timStart=QDateTime::currentDateTime();
-                        }
-                        if (useCam1) {
-                            if (ecamera1->acquire(camera1, buffer1)) {
-                                TIFFTWriteUint16from32(tiff1, buffer1, width1, height1);
-                                TIFFWriteDirectory(tiff1);
-                            } else {
-                                ok=false;
-                                CAMPARAMSTACK_ERROR(tr("error acquiring image %1/%2 on camera 1!\n").arg(imageCnt+1).arg(images));
-                            }
-                        }
-                        //QApplication::processEvents();
-                        if (useCam2) {
-                            if (ecamera2->acquire(camera2, buffer2)) {
-                                TIFFTWriteUint16from32(tiff2, buffer2, width2, height2);
-                                TIFFWriteDirectory(tiff2);
-                            } else {
-                                ok=false;
-                                CAMPARAMSTACK_ERROR(tr("error acquiring image %1/%2 on camera 2!\n").arg(imageCnt+1).arg(images));
-                            }
-                        }
-                        imageCnt++;
-                    }
-                    if (widCamParamScan->saveMeasurements()) measured.append(optSetup->getMeasuredValues());
-                    //QApplication::processEvents();
-                }
-                if (!ok) running=false;
-
-                stackIdx++;
-                progress.setValue((int)round((double)stackIdx/(double)scanVals.size()*100.0));
-                QApplication::processEvents();
             }
-            duration=timAcquisition.elapsed()/1000.0;
-            if (buffer1) free(buffer1);
-            if (buffer2) free(buffer2);
-            buffer1=buffer2=NULL;
+            if (ok && useCam2) {
+                QDir().mkpath(QFileInfo(TIFFFIlename2.toAscii().data()).absolutePath());
+                tiff2=TIFFOpen(TIFFFIlename2.toAscii().data(), "w");
+                if (!tiff2) {
+                    ok=false;
+                    CAMPARAMSTACK_ERROR(tr("error opening TIFF file (camera 2) '%1'!").arg(TIFFFIlename2));
+                }
+            }
 
+
+
+            if (progress.wasCanceled()) {
+                log_warning(tr("canceled by user!\n"));
+                ok=false;
+            }
+
+
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            // CHANGE PARAM, ACQUIRE IMAGE, CHANGE PARAM, ACQUIRE IMAGE, ...
+            //    images are stored in TIFF files using libtiff and they are (possibly) downscaled to 16-bit
+            //////////////////////////////////////////////////////////////////////////////////////
+            timAcquisition=QTime::currentTime();
+            duration=0;
+            if (ok) {
+                progress.setLabelText(tr("acquiring images ..."));
+                bool running=ok;
+                //double newPos=stageStart;
+                int stackIdx=0;
+                int width1=0, height1=0;
+                uint32_t* buffer1=NULL;
+                int width2=0, height2=0;
+                uint32_t* buffer2=NULL;
+                int imageCnt=0;
+
+                measured.append(optSetup->getMeasuredValues());
+
+                while (running && (stackIdx<scanVals.size())) {
+
+                    if (ok && useCam1) {
+
+                        //////////////////////////////////////////////////////////////////////////////////////
+                        // PREPARE CAMERA 1
+                        //////////////////////////////////////////////////////////////////////////////////////
+                        if (ok && useCam1) {
+                            progress.setLabelText(tr("preparing camera 1 ..."));
+                            QApplication::processEvents();
+
+                            QString tmpName1=QDir::temp().absoluteFilePath("qf3spimb040_cam1tmpsettings.ini");
+
+                            QTemporaryFile file1;
+                            if (file1.open()) {
+                                 tmpName1=file1.fileName();
+                            }
+                            if (QFile::exists(tmpName1)) QFile::remove(tmpName1);
+
+                            if (useCam1) QFile::copy(acquisitionSettingsFilename1, tmpName1);
+
+                            QSettings settings(tmpName1, QSettings::IniFormat);
+
+                            //QSettings settings(acquisitionSettingsFilename1, QSettings::IniFormat);
+
+                            ecamera1->changeCameraSetting(settings, stackParam, scanVals[stackIdx]);
+                            ecamera1->useCameraSettings(camera1, settings);
+                            realValues1.append(ecamera1->getCurrentCameraSetting(camera1, stackParam));
+                            //realValues1.append(ecamera1->getExposureTime(camera1));
+                            log_text(tr("  - prepared camer 1!\n"));
+                            width1=ecamera1->getCameraImageWidth(camera1);
+                            height1=ecamera1->getImageCameraHeight(camera1);
+                            buffer1=(uint32_t*)realloc(buffer1, width1*height1*sizeof(uint32_t));
+                            if (!buffer1) {
+                                ok=false;
+                                CAMPARAMSTACK_ERROR(tr("could not allocate image buffer for camera 1!\n"));
+                            }
+                            if (QFile::exists(tmpName1)) QFile::remove(tmpName1);
+                        }
+                    }
+
+                    if (ok && useCam2) {
+
+                        //////////////////////////////////////////////////////////////////////////////////////
+                        // PREPARE CAMERA 1
+                        //////////////////////////////////////////////////////////////////////////////////////
+                        if (ok && useCam2) {
+                            progress.setLabelText(tr("preparing camera 2 ..."));
+                            QApplication::processEvents();
+                            QString tmpName1=QDir::temp().absoluteFilePath("qf3spimb040_cam2tmpsettings.ini");
+
+                            QTemporaryFile file1;
+                            if (file1.open()) {
+                                 tmpName1=file1.fileName();
+                            }
+                            if (QFile::exists(tmpName1)) QFile::remove(tmpName1);
+
+                            if (useCam2) QFile::copy(acquisitionSettingsFilename2, tmpName1);
+
+                            QSettings settings(tmpName1, QSettings::IniFormat);
+
+                            ecamera2->changeCameraSetting(settings, stackParam, scanVals[stackIdx]);
+                            ecamera2->useCameraSettings(camera2, settings);
+                            realValues2.append(ecamera2->getCurrentCameraSetting(camera2, stackParam));
+                            //realValues2.append(ecamera2->getExposureTime(camera2));
+                            log_text(tr("  - prepared camer 2!\n"));
+                            width2=ecamera2->getCameraImageWidth(camera2);
+                            height2=ecamera2->getImageCameraHeight(camera2);
+                            buffer2=(uint32_t*)realloc(buffer2, width2*height2*sizeof(uint32_t));
+                            if (!buffer2) {
+                                ok=false;
+                                CAMPARAMSTACK_ERROR(tr("could not allocate image buffer for camera 2!\n"));
+                            }
+                            if (QFile::exists(tmpName1)) QFile::remove(tmpName1);
+                        }
+                    }
+
+                    QApplication::processEvents();
+                    if (progress.wasCanceled()) {
+                        running=false;
+                        log_warning(tr("  - acquisition canceled by user!\n"));
+                    } else {
+                        for (int img=0; img<widCamParamScan->images(); img++) {
+                            log_text(tr("acquiring images (%1/%2) ...\n").arg(imageCnt+1).arg(images));
+                            progress.setLabelText(tr("acquiring images (%1/%2) ...").arg(imageCnt+1).arg(images));
+                            QApplication::processEvents();
+                            if (progress.wasCanceled()) {
+                                running=false;
+                                log_warning(tr("  - acquisition canceled by user!\n"));
+                                break;
+                            }
+                            if (stackIdx==0) {
+                                timAcquisition.start();
+                                timStart=QDateTime::currentDateTime();
+                            }
+                            if (useCam1) {
+                                if (ecamera1->acquireOnCamera(camera1, buffer1)) {
+                                    TIFFTWriteUint16from32(tiff1, buffer1, width1, height1);
+                                    TIFFWriteDirectory(tiff1);
+                                } else {
+                                    ok=false;
+                                    CAMPARAMSTACK_ERROR(tr("error acquiring image %1/%2 on camera 1!\n").arg(imageCnt+1).arg(images));
+                                }
+                            }
+                            //QApplication::processEvents();
+                            if (useCam2) {
+                                if (ecamera2->acquireOnCamera(camera2, buffer2)) {
+                                    TIFFTWriteUint16from32(tiff2, buffer2, width2, height2);
+                                    TIFFWriteDirectory(tiff2);
+                                } else {
+                                    ok=false;
+                                    CAMPARAMSTACK_ERROR(tr("error acquiring image %1/%2 on camera 2!\n").arg(imageCnt+1).arg(images));
+                                }
+                            }
+                            imageCnt++;
+                        }
+                        if (widCamParamScan->saveMeasurements()) measured.append(optSetup->getMeasuredValues());
+                        //QApplication::processEvents();
+                    }
+                    if (!ok) running=false;
+
+                    stackIdx++;
+                    progress.setValue((int)round((double)stackIdx/(double)scanVals.size()*100.0));
+                    QApplication::processEvents();
+                }
+                duration=timAcquisition.elapsed()/1000.0;
+                if (buffer1) free(buffer1);
+                if (buffer2) free(buffer2);
+                buffer1=buffer2=NULL;
+
+            }
+        } else {
+            log_text(tr("acquiring stack in ACQUISITION MODE ...\n"));
+
+            if (progress.wasCanceled()) {
+                log_warning(tr("canceled by user!\n"));
+                ok=false;
+            }
+            QMap<QString, QVariant> acquisitionDescription1;
+            QList<QFExtensionCamera::CameraAcquititonFileDescription> moreFiles1;
+            QMap<QString, QVariant> acquisitionDescription2;
+            QList<QFExtensionCamera::CameraAcquititonFileDescription> moreFiles2;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            // CHANGE PARAM, ACQUIRE IMAGE, CHANGE PARAM, ACQUIRE IMAGE, ...
+            //    images are stored in TIFF files using libtiff and they are (possibly) downscaled to 16-bit
+            //////////////////////////////////////////////////////////////////////////////////////
+            timAcquisition=QTime::currentTime();
+            duration=0;
+            if (ok) {
+                progress.setLabelText(tr("acquiring images ..."));
+                bool running=ok;
+                //double newPos=stageStart;
+                int stackIdx=0;
+                int width1=0, height1=0;
+                uint32_t* buffer1=NULL;
+                int width2=0, height2=0;
+                uint32_t* buffer2=NULL;
+                int imageCnt=0;
+                int frames=widCamParamScan->images();
+
+                measured.append(optSetup->getMeasuredValues());
+
+                while (running && (stackIdx<scanVals.size())) {
+                    QString tmpName1=QDir::temp().absoluteFilePath("qf3spimb040_cam1tmpsettings.ini");
+
+                    QTemporaryFile file1;
+                    if (file1.open()) {
+                         tmpName1=file1.fileName();
+                    }
+                    if (QFile::exists(tmpName1)) QFile::remove(tmpName1);
+                    if (useCam1) QFile::copy(acquisitionSettingsFilename1, tmpName1);
+                    QSettings settings1(tmpName1, QSettings::IniFormat);
+                    if (frames>0 && ecamera1->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera1->changeCameraSetting(settings1, QFExtensionCamera::CamSetNumberFrames, frames);
+                    ecamera1->changeCameraSetting(settings1, stackParam, scanVals[stackIdx]);
+
+
+
+
+
+
+                    QString tmpName2=QDir::temp().absoluteFilePath("qf3spimb040_cam2tmpsettings.ini");
+
+                    QTemporaryFile file2;
+                    if (file2.open()) {
+                         tmpName2=file2.fileName();
+                    }
+                    if (QFile::exists(tmpName2)) QFile::remove(tmpName2);
+
+                    if (useCam2) QFile::copy(acquisitionSettingsFilename2, tmpName2);
+
+                    QSettings settings2(tmpName2, QSettings::IniFormat);
+
+                    if (frames>0 && ecamera2->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera2->changeCameraSetting(settings2, QFExtensionCamera::CamSetNumberFrames, frames);
+                    ecamera2->changeCameraSetting(settings2, stackParam, scanVals[stackIdx]);
+
+
+
+
+                    //////////////////////////////////////////////////////////////////////////////////////
+                    // acquire image series
+                    //////////////////////////////////////////////////////////////////////////////////////
+                    ok = acquireSeries(lightpathName, QString("camstack%1").arg(stackIdx,4,10,QLatin1Char('0')), tr("cam parameter stack"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1+QString("__sidx%1").arg(stackIdx,4,10,QLatin1Char('0')), settings1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2+QString("__sidx%1").arg(stackIdx,4,10,QLatin1Char('0')), settings2, acquisitionDescription2, moreFiles2, &measured, &progress, NULL);
+                    if (!ok) {
+                        if (frames>1) {
+                            CAMPARAMSTACK_ERROR(tr("error acquiring image (%1...%2)/%3 !\n").arg(imageCnt+1).arg(imageCnt+1+frames).arg(images));
+                        } else {
+                            CAMPARAMSTACK_ERROR(tr("error acquiring image %1/%2 !\n").arg(imageCnt+1).arg(images));
+                        }
+                    }
+
+                    if (QFile::exists(tmpName1)) QFile::remove(tmpName1);
+                    if (QFile::exists(tmpName2)) QFile::remove(tmpName2);
+
+                    if (!ok) running=false;
+
+                    stackIdx++;
+                    imageCnt+=frames;
+                    progress.setValue((int)round((double)stackIdx/(double)scanVals.size()*100.0));
+                    QApplication::processEvents();
+                }
+                duration=timAcquisition.elapsed()/1000.0;
+                if (buffer1) free(buffer1);
+                if (buffer2) free(buffer2);
+                buffer1=buffer2=NULL;
+
+            }
         }
         progress.setValue(100);
         measured.append(optSetup->getMeasuredValues());
+        progress.nextItem();
 
         //////////////////////////////////////////////////////////////////////////////////////
         // collect lightpath data common to all cameras
@@ -1385,8 +1519,8 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
         //////////////////////////////////////////////////////////////////////////////////////
         if (ok && useCam1) {
             QMap<QString, QVariant> acquisitionDescription1=acquisitionDescription;
-            QList<QFExtensionCamera::AcquititonFileDescription> files;
-            QFExtensionCamera::AcquititonFileDescription d;
+            QList<QFExtensionCamera::CameraAcquititonFileDescription> files;
+            QFExtensionCamera::CameraAcquititonFileDescription d;
             d.name=TIFFFIlename1;
             d.description="image stack from camera 1";
             d.type="TIFF16";
@@ -1408,7 +1542,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
 
             QString MeasurementsFilename=saveMeasuredData(acquisitionPrefix1, measured);
             if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
-                QFExtensionCamera::AcquititonFileDescription d;
+                QFExtensionCamera::CameraAcquititonFileDescription d;
                 d.name=MeasurementsFilename;
                 d.description="measureable properties of setup";
                 d.type="CSV";
@@ -1421,8 +1555,8 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
         }
         if (ok && useCam2) {
             QMap<QString, QVariant> acquisitionDescription2=acquisitionDescription;
-            QList<QFExtensionCamera::AcquititonFileDescription> files;
-            QFExtensionCamera::AcquititonFileDescription d;
+            QList<QFExtensionCamera::CameraAcquititonFileDescription> files;
+            QFExtensionCamera::CameraAcquititonFileDescription d;
             d.name=TIFFFIlename1;
             d.description="image stack from camera 2";
             d.type="TIFF16";
@@ -1444,7 +1578,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
 
             QString MeasurementsFilename=saveMeasuredData(acquisitionPrefix2, measured);
             if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
-                QFExtensionCamera::AcquititonFileDescription d;
+                QFExtensionCamera::CameraAcquititonFileDescription d;
                 d.name=MeasurementsFilename;
                 d.description="measureable properties of setup";
                 d.type="CSV";
@@ -1484,6 +1618,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
 
 
 
+
 bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& previewSettingsFilename, const QString& filename, QString* filename32, QMap<QString, QVariant>* acquisitionDescription, const QString& acquisitionDescriptionPrefix) {
     //////////////////////////////////////////////////////////////////////////////////////
     // INIT variables
@@ -1506,8 +1641,8 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
     if (ok) {
         QSettings settings(previewSettingsFilename, QSettings::IniFormat);
         ecamera->useCameraSettings(camera, settings);
-        width=ecamera->getImageWidth(camera);
-        height=ecamera->getImageHeight(camera);
+        width=ecamera->getCameraImageWidth(camera);
+        height=ecamera->getImageCameraHeight(camera);
         buffer=(uint32_t*)calloc(width*height, sizeof(uint32_t));
         if (!buffer) {
             ok=false;
@@ -1521,7 +1656,7 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
     if (ok) {
         QMap<QString, QVariant> acqD;
         QTime time=QTime::currentTime();
-        if (ecamera->acquire(camera, buffer, NULL, &acqD)) {
+        if (ecamera->acquireOnCamera(camera, buffer, NULL, &acqD)) {
             if (acquisitionDescription) {
                 QMapIterator<QString, QVariant> it(acqD);
                 while (it.hasNext()) {
@@ -1531,7 +1666,7 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
                 (*acquisitionDescription)[acquisitionDescriptionPrefix+"/dualview_mode"]=optSetup->dualViewMode(ecamera, camera);
                 (*acquisitionDescription)[acquisitionDescriptionPrefix+"/image_width"]=width;
                 (*acquisitionDescription)[acquisitionDescriptionPrefix+"/image_height"]=height;
-                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/exposure_time"]=ecamera->getExposureTime(camera);
+                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/exposure_time"]=ecamera->getCameraExposureTime(camera);
                 optSetup->saveLightpathConfig((*acquisitionDescription), optSetup->getCurrentLightpath(), acquisitionDescriptionPrefix+"/lightpath/", QList<bool>(), true);
                 (*acquisitionDescription)[acquisitionDescriptionPrefix+"/timestamp"]=time;
                 getAdditionalCameraSettings(ecamera, camera, acquisitionDescriptionPrefix, (*acquisitionDescription));
@@ -1629,8 +1764,8 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         QMap<QString, QVariant> backgroundDescription1, backgroundDescription2;
         acquisitionDescription1["type"]="acquisition";
         acquisitionDescription2["type"]="acquisition";
-        QList<QFExtensionCamera::AcquititonFileDescription> moreFiles1, moreFiles2;
-        QList<QFExtensionCamera::AcquititonFileDescription> backgroundFiles1, backgroundFiles2;
+        QList<QFExtensionCamera::CameraAcquititonFileDescription> moreFiles1, moreFiles2;
+        QList<QFExtensionCamera::CameraAcquititonFileDescription> backgroundFiles1, backgroundFiles2;
 
 
         //////////////////////////////////////////////////////////////////////////////////////
@@ -1815,7 +1950,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         // acquire image series
         //////////////////////////////////////////////////////////////////////////////////////
         progress.nextItem();
-        ok = acquireSeries(lightpathName, "acquisition", tr("image series"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionSettingsFilename1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionSettingsFilename2, acquisitionDescription2, moreFiles2, 0, 0, &measured, &progress, &userCanceled);
+        ok = acquireSeries(lightpathName, "acquisition", tr("image series"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionSettingsFilename1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionSettingsFilename2, acquisitionDescription2, moreFiles2, widAcquisition->frames1(), widAcquisition->frames2(), &measured, &progress, &userCanceled);
         if (!ok) {
             ACQUISITION_ERROR(tr("  - error acquiring images!\n"));
         } else {
@@ -1890,7 +2025,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             log_text(tr("  - writing acquisition description 1 ..."));
             // add the background stuff to the description, files list
             for (int i=0; i<backgroundFiles1.size(); i++) {
-                QFExtensionCamera::AcquititonFileDescription d=backgroundFiles1[i];
+                QFExtensionCamera::CameraAcquititonFileDescription d=backgroundFiles1[i];
                 d.description="background "+d.description;
                 moreFiles1.append(d);
             }
@@ -1904,7 +2039,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
 
             QString MeasurementsFilename=saveMeasuredData(acquisitionPrefix1, measured);
             if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
-                QFExtensionCamera::AcquititonFileDescription d;
+                QFExtensionCamera::CameraAcquititonFileDescription d;
                 d.name=MeasurementsFilename;
                 d.description="measureable properties of setup";
                 d.type="CSV";
@@ -1918,7 +2053,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             log_text(tr("  - writing acquisition description 2 ..."));
             // add the background stuff to the description, files list
             for (int i=0; i<backgroundFiles2.size(); i++) {
-                QFExtensionCamera::AcquititonFileDescription d=backgroundFiles2[i];
+                QFExtensionCamera::CameraAcquititonFileDescription d=backgroundFiles2[i];
                 d.description="background "+d.description;
                 moreFiles2.append(d);
             }
@@ -1931,7 +2066,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             }
             QString MeasurementsFilename=saveMeasuredData(acquisitionPrefix2, measured);
             if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
-                QFExtensionCamera::AcquititonFileDescription d;
+                QFExtensionCamera::CameraAcquititonFileDescription d;
                 d.name=MeasurementsFilename;
                 d.description="measureable properties of setup";
                 d.type="CSV";
@@ -1965,15 +2100,15 @@ void QFESPIMB040MainWindow2::doAcquisition() {
 }
 
 
-QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles, QDateTime startDateTime, bool getAcquisitionSettings) {
+QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles, QDateTime startDateTime, bool getAcquisitionSettings) {
     QString iniFilename=filenamePrefix+".configuration.ini";
     QSettings settings(iniFilename, QSettings::IniFormat);
 
     double magnification=optSetup->getCameraMagnification(use_cam);
 
-    QList<QFExtensionCamera::AcquititonFileDescription> files;
+    QList<QFExtensionCamera::CameraAcquititonFileDescription> files;
     QMap<QString, QVariant> parameters;
-    if (getAcquisitionSettings) ecamera->getAcquisitionDescription(camera, &files, &parameters);
+    if (getAcquisitionSettings) ecamera->getCameraAcquisitionDescription(camera, &files, &parameters);
 
     // WRITE ACQUISITION SETTINGS
 
@@ -2005,10 +2140,10 @@ QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtens
             }
         }
     }
-    settings.setValue("acquisition/pixel_width", ecamera->getPixelWidth(camera)/magnification);
-    settings.setValue("acquisition/pixel_height", ecamera->getPixelHeight(camera)/magnification);
-    settings.setValue("acquisition/camera_pixel_width", ecamera->getPixelWidth(camera));
-    settings.setValue("acquisition/camera_pixel_height", ecamera->getPixelHeight(camera));
+    settings.setValue("acquisition/pixel_width", ecamera->getCameraPixelWidth(camera)/magnification);
+    settings.setValue("acquisition/pixel_height", ecamera->getCameraPixelHeight(camera)/magnification);
+    settings.setValue("acquisition/camera_pixel_width", ecamera->getCameraPixelWidth(camera));
+    settings.setValue("acquisition/camera_pixel_height", ecamera->getCameraPixelHeight(camera));
     settings.setValue("acquisition/camera_model", ecamera->getCameraName(camera));
     settings.setValue("acquisition/sensor_model", ecamera->getCameraSensorName(camera));
     settings.setValue("acquisition/magnification", magnification);
@@ -2067,7 +2202,7 @@ QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtens
 }
 
 
-QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::AcquititonFileDescription>& files, QDateTime startDateTime, const QString& lightpathPrefix, const QString& prefix) {
+QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::CameraAcquititonFileDescription>& files, QDateTime startDateTime, const QString& lightpathPrefix, const QString& prefix) {
     QString iniFilename=filenamePrefix+".configuration.ini";
     QSettings settings(iniFilename, QSettings::IniFormat);
 
@@ -2091,15 +2226,15 @@ QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension*
 
         }
     }
-    settings.setValue("acquisition/pixel_width", ecamera->getPixelWidth(camera)*magnification);
-    settings.setValue("acquisition/pixel_height", ecamera->getPixelHeight(camera)*magnification);
-    settings.setValue("acquisition/camera_pixel_width", ecamera->getPixelWidth(camera));
-    settings.setValue("acquisition/camera_pixel_height", ecamera->getPixelHeight(camera));
+    settings.setValue("acquisition/pixel_width", ecamera->getCameraPixelWidth(camera)*magnification);
+    settings.setValue("acquisition/pixel_height", ecamera->getCameraPixelHeight(camera)*magnification);
+    settings.setValue("acquisition/camera_pixel_width", ecamera->getCameraPixelWidth(camera));
+    settings.setValue("acquisition/camera_pixel_height", ecamera->getCameraPixelHeight(camera));
     settings.setValue("acquisition/camera_model", ecamera->getCameraName(camera));
     settings.setValue("acquisition/sensor_model", ecamera->getCameraSensorName(camera));
-    settings.setValue("acquisition/exposure", ecamera->getExposureTime(camera));
-    settings.setValue("acquisition/image_width", ecamera->getImageWidth(camera));
-    settings.setValue("acquisition/image_height", ecamera->getImageHeight(camera));
+    settings.setValue("acquisition/exposure", ecamera->getCameraExposureTime(camera));
+    settings.setValue("acquisition/image_width", ecamera->getCameraImageWidth(camera));
+    settings.setValue("acquisition/image_height", ecamera->getImageCameraHeight(camera));
     settings.setValue("acquisition/magnification", magnification);
     // OPTICS SETUP
     QMap<QString, QVariant> setup=optSetup->getSetup(use_cam);
@@ -2247,8 +2382,8 @@ bool QFESPIMB040MainWindow2::prepareCamera(int num, int camera, QFExtensionCamer
     *buffer=NULL;
     QSettings settings(acquisitionSettingsFilename, QSettings::IniFormat);
     ecamera->useCameraSettings(camera, settings);
-    width=ecamera->getImageWidth(camera);
-    height=ecamera->getImageHeight(camera);
+    width=ecamera->getCameraImageWidth(camera);
+    height=ecamera->getImageCameraHeight(camera);
     *buffer=(uint32_t*)calloc(width*height, sizeof(uint32_t));
     if (!(*buffer)) {
         SPIMACQUISITION_ERROR(tr("could not allocate image buffer for camera 1!\n"), acquisitionTitle);
@@ -2286,7 +2421,7 @@ bool QFESPIMB040MainWindow2::connectStageForAcquisition(QFExtensionLinearStage* 
     return ok;
 }
 
-bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathFilename, const QString& lightpathName, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& previewSettingsFilename1, const QString& outputFilename, const QString& imageID, const QString& imageDescription, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles1, QMap<QString, QVariant>& acquisitionDescription1) {
+bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathFilename, const QString& lightpathName, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& previewSettingsFilename1, const QString& outputFilename, const QString& imageID, const QString& imageDescription, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, QMap<QString, QVariant>& acquisitionDescription1) {
 
     if (!lightpathFilename.isEmpty()) {
         if (!QFile::exists(lightpathFilename)) {
@@ -2307,15 +2442,15 @@ bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathF
     bool ok=savePreview(extension1, ecamera1, camera1, previewSettingsFilename1, outputFilename, &filename32, &acquisitionDescription1, imageID+"/");
     if (ok) {
         log_text(tr("  - acquired %1!\n").arg(imageDescription));
-        acquisitionDescription1[imageID+"/image_width"]=ecamera1->getImageWidth(camera1);
-        acquisitionDescription1[imageID+"/image_height"]=ecamera1->getImageHeight(camera1);
-        acquisitionDescription1[imageID+"/exposure_time"]=ecamera1->getExposureTime(camera1);
+        acquisitionDescription1[imageID+"/image_width"]=ecamera1->getCameraImageWidth(camera1);
+        acquisitionDescription1[imageID+"/image_height"]=ecamera1->getImageCameraHeight(camera1);
+        acquisitionDescription1[imageID+"/exposure_time"]=ecamera1->getCameraExposureTime(camera1);
         optSetup->saveLightpathConfig(acquisitionDescription1, lightpathName, imageID+"/lightpath/", QList<bool>(), true);
         acquisitionDescription1[imageID+"/dualview_mode"]=optSetup->dualViewMode(ecamera1, camera1);
         acquisitionDescription1[imageID+"/timestamp"]=time;
         getAdditionalCameraSettings(ecamera1, camera1, imageID, acquisitionDescription1);
 
-        QFExtensionCamera::AcquititonFileDescription d;
+        QFExtensionCamera::CameraAcquititonFileDescription d;
         d.description=imageDescription;
         d.name=outputFilename;
         d.type="TIFF16";
@@ -2330,168 +2465,203 @@ bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathF
     return ok;
 }
 
-bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::AcquititonFileDescription>& moreFiles2, int frames1, int frames2, QList<QFESPIMB040OpticsSetup::measuredValues>* measured, QProgressListDialog* progress, bool* userCanceled )
+bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles2, int frames1, int frames2, QList<QFESPIMB040OpticsSetup::measuredValues>* measured, QProgressListDialog* progress, bool* userCanceled )
+{
+    QString tmpName1=QDir::temp().absoluteFilePath("qf3spimb040_cam1tmpsettings.ini");
+
+    QTemporaryFile file1;
+    if (file1.open()) {
+         tmpName1=file1.fileName();
+    }
+    if (QFile::exists(tmpName1)) QFile::remove(tmpName1);
+
+    if (useCam1) QFile::copy(acquisitionSettingsFilename1, tmpName1);
+
+    QSettings settings1(tmpName1, QSettings::IniFormat);
+
+    if (frames1>0 && ecamera1->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera1->changeCameraSetting(settings1, QFExtensionCamera::CamSetNumberFrames, frames1);
+
+
+
+
+
+
+
+    QString tmpName2=QDir::temp().absoluteFilePath("qf3spimb040_cam2tmpsettings.ini");
+
+    QTemporaryFile file2;
+    if (file2.open()) {
+         tmpName2=file2.fileName();
+    }
+    if (QFile::exists(tmpName2)) QFile::remove(tmpName2);
+
+    if (useCam2) QFile::copy(acquisitionSettingsFilename2, tmpName2);
+
+    QSettings settings2(tmpName2, QSettings::IniFormat);
+
+    if (frames2>0 && ecamera2->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera2->changeCameraSetting(settings2, QFExtensionCamera::CamSetNumberFrames, frames2);
+
+
+
+
+    bool result=acquireSeries(lightpathName, imageID, imageDescription, useCam1, extension1, ecamera1, camera1, acquisitionPrefix1, settings1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2, settings2, acquisitionDescription2, moreFiles2, measured, progress, userCanceled);
+
+
+    if (QFile::exists(tmpName1)) QFile::remove(tmpName1);
+    if (QFile::exists(tmpName2)) QFile::remove(tmpName2);
+
+    return result;
+
+}
+
+bool QFESPIMB040MainWindow2::acquireSeries(const QString &lightpathName, const QString &imageID, const QString &imageDescription, bool useCam1, QFExtension *extension1, QFExtensionCamera *ecamera1, int camera1, const QString &acquisitionPrefix1, QSettings &acquisitionSettings1, QMap<QString, QVariant> &acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription> &moreFiles1, bool useCam2, QFExtension *extension2, QFExtensionCamera *ecamera2, int camera2, const QString &acquisitionPrefix2, QSettings &acquisitionSettings2, QMap<QString, QVariant> &acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription> &moreFiles2, QList<QFESPIMB040OpticsSetup::measuredValues> *measured, QProgressListDialog *progress, bool *userCanceled)
 {
 
-   bool ok=true;
-   QDateTime time;
+    bool ok=true;
+    QDateTime time;
 
-    //////////////////////////////////////////////////////////////////////////////////////
-    // prepare cameras  (set camera settings)
-    //////////////////////////////////////////////////////////////////////////////////////
-    if (ok && useCam1) {
-        if (progress) progress->setLabelText(tr("preparing camera 1 for %1 ...").arg(imageDescription));
-        QApplication::processEvents();
-        QString tmpName=QDir::temp().absoluteFilePath("qf3spimb040_cam1tmpsettings.ini");
-        QTemporaryFile file;
-        if (file.open()) {
-             tmpName=file.fileName();
-        }
-        if (QFile::exists(tmpName)) QFile::remove(tmpName);
-
-        QFile::copy(acquisitionSettingsFilename1, tmpName);
-
-        QSettings settings(tmpName, QSettings::IniFormat);
-        if (frames1>0 && ecamera1->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera1->changeCameraSetting(settings, QFExtensionCamera::CamSetNumberFrames, frames1);
+     //////////////////////////////////////////////////////////////////////////////////////
+     // prepare cameras  (set camera settings)
+     //////////////////////////////////////////////////////////////////////////////////////
+     if (ok && useCam1) {
+         if (progress) progress->setLabelText(tr("preparing camera 1 for %1 ...").arg(imageDescription));
+         QApplication::processEvents();
 
 
-        ok=ecamera1->prepareAcquisition(camera1, settings, acquisitionPrefix1);
+         ok=ecamera1->prepareCameraAcquisition(camera1, acquisitionSettings1, acquisitionPrefix1);
 
-        if (ok) {
-            log_text(tr("  - prepared camer 1 for %1!\n").arg(imageDescription));
-        } else {
-            log_error(tr("  - error preparing camera 1 for %1!\n").arg(imageDescription));
-            ok=false;
-        }
+         if (ok) {
+             log_text(tr("  - prepared camer 1 for %1!\n").arg(imageDescription));
+         } else {
+             log_error(tr("  - error preparing camera 1 for %1!\n").arg(imageDescription));
+             ok=false;
+         }
 
-        if (QFile::exists(tmpName)) QFile::remove(tmpName);
-    }
-    if (ok && useCam2) {
-        if (progress) progress->setLabelText(tr("preparing camera 2 for %1 ...").arg(imageDescription));
-        QApplication::processEvents();
-        QString tmpName=QDir::temp().absoluteFilePath("qf3spimb040_cam2tmpsettings.ini");
+     }
+     if (ok && useCam2) {
+         if (progress) progress->setLabelText(tr("preparing camera 2 for %1 ...").arg(imageDescription));
+         QApplication::processEvents();
 
-        QTemporaryFile file;
-        if (file.open()) {
-             tmpName=file.fileName();
-        }
-        if (QFile::exists(tmpName)) QFile::remove(tmpName);
+         ok=ecamera2->prepareCameraAcquisition(camera2, acquisitionSettings2, acquisitionPrefix2);
 
-        QFile::copy(acquisitionSettingsFilename2, tmpName);
+         if (ok) {
+             log_text(tr("  - prepared camer 2 for %1!\n").arg(imageDescription));
+         } else {
+             log_error(tr("  - error preparing camera 2 for %1!\n").arg(imageDescription));
+             ok=false;
+         }
 
-        QSettings settings(tmpName, QSettings::IniFormat);
+     }
 
-        if (frames2>0 && ecamera2->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera2->changeCameraSetting(settings, QFExtensionCamera::CamSetNumberFrames, frames2);
+     //////////////////////////////////////////////////////////////////////////////////////
+     // start background acquisition and wait until finished
+     //////////////////////////////////////////////////////////////////////////////////////
+     if (ok) {
+         if (progress) progress->setLabelText(tr("acquiring %1 images ...").arg(imageDescription));
+         log_text(tr("  - acquiring %1 frames!\n").arg(imageDescription));
+         time=QDateTime::currentDateTime();
+         if (useCam1) {
+             ok=ecamera1->startCameraAcquisition(camera1);
+             if (!ok) {
+                 log_error(tr("  - error starting acquisition on camera 1 for %1!\n").arg(imageDescription));
+                 ok=false;
+             }
+         }
+         if (ok && useCam2) {
+             ok=ecamera2->startCameraAcquisition(camera2);
+             if (!ok) {
+                 log_error(tr("  - error starting acquisition on camera 2 for %1!\n").arg(imageDescription));
+                 ok=false;
+             }
+         }
+         bool running=ok;
 
-        ok=ecamera2->prepareAcquisition(camera2, settings, acquisitionPrefix2);
+         QTime time1;
+         time1.start();
+         QTime timA;
+         timA.start();
+         while (running) {
+             int prog1=99, prog2=99;
+             if (useCam1) prog1=ecamera1->getCameraAcquisitionProgress(camera1);
+             if (useCam2) prog2=ecamera2->getCameraAcquisitionProgress(camera2);
+             progress->setValue(qMin(prog1,prog2));
 
-        if (ok) {
-            log_text(tr("  - prepared camer 2 for %1!\n").arg(imageDescription));
-        } else {
-            log_error(tr("  - error preparing camera 2 for %1!\n").arg(imageDescription));
-            ok=false;
-        }
+             QString estimation;
+             if (qMin(prog1,prog2)>0) {
+                 double duration=double(timA.elapsed())/1000.0;
+                 double eta=duration/double(qMin(prog1,prog2))*100.0;
+                 double etc=eta-duration;
+                 uint mini=floor(etc/60.0);
+                 uint secs=round(etc-double(mini)*60.0);
+                 estimation=tr("\nest. remaining duration (min:secs): %1:%2 ").arg(mini, 2, 10, QChar('0')).arg(secs, 2, 10, QChar('0'));
+                 if (progress) progress->setLabelText(tr("acquiring images ...\n")+estimation);
+             }
+             if (measured && time1.elapsed()>200) {
+                 measured->append(optSetup->getMeasuredValues());
+                 time1.start();
+             }
+             QApplication::processEvents();
 
-        if (QFile::exists(tmpName)) QFile::remove(tmpName);
+             if (progress && progress->wasCanceled()) {
+                 if (userCanceled) *userCanceled=true;
+                 running=false;
+                 if (useCam1) ecamera1->cancelCameraAcquisition(camera1);
+                 if (useCam2) ecamera2->cancelCameraAcquisition(camera2);
+                 log_warning(tr("  - acquisition canceled by user!\n"));
+             } else {
+                 bool run1=false;
+                 bool run2=false;
+                 if (useCam1) run1=ecamera1->isCameraAcquisitionRunning(camera1);
+                 if (useCam2) run2=ecamera2->isCameraAcquisitionRunning(camera2);
+                 running=run1||run2;
+             }
+         }
+     }
+     if (progress) progress->setValue(100);
 
-    }
+     //////////////////////////////////////////////////////////////////////////////////////
+     // retrieve background acquisition description
+     //////////////////////////////////////////////////////////////////////////////////////
+     if (ok && useCam1) {
+         QMap<QString, QVariant> acquisitionDescription;
+         ecamera1->getCameraAcquisitionDescription(camera1, &moreFiles1, &acquisitionDescription);
+         QMapIterator<QString, QVariant> it(acquisitionDescription);
+         while(it.hasNext()) {
+             it.next();
+             acquisitionDescription1[imageID+"/"+it.key()]=it.value();
+         }
 
-    //////////////////////////////////////////////////////////////////////////////////////
-    // start background acquisition and wait until finished
-    //////////////////////////////////////////////////////////////////////////////////////
-    if (ok) {
-        if (progress) progress->setLabelText(tr("acquiring %1 images ...").arg(imageDescription));
-        log_text(tr("  - acquiring %1 frames!\n").arg(imageDescription));
-        time=QDateTime::currentDateTime();
-        if (useCam1) {
-            ok=ecamera1->startAcquisition(camera1);
-            if (!ok) {
-                log_error(tr("  - error starting acquisition on camera 1 for %1!\n").arg(imageDescription));
-                ok=false;
-            }
-        }
-        if (ok && useCam2) {
-            ok=ecamera2->startAcquisition(camera2);
-            if (!ok) {
-                log_error(tr("  - error starting acquisition on camera 2 for %1!\n").arg(imageDescription));
-                ok=false;
-            }
-        }
-        bool running=ok;
+         log_text(tr("  - acquired %1 image from camera 1!\n").arg(imageDescription));
+         acquisitionDescription1[imageID+"/timestamp"]=time;
+         optSetup->saveLightpathConfig(acquisitionDescription1, lightpathName, imageID+"/lightpath/", QList<bool>(), true);
+         acquisitionDescription1[imageID+"/dualview_mode"]=optSetup->dualViewMode(0);
+         getAdditionalCameraSettings(ecamera1, camera1, imageID, acquisitionDescription1);
+     }
+     if (ok && useCam2) {
+         QMap<QString, QVariant> acquisitionDescription;
+         ecamera2->getCameraAcquisitionDescription(camera2, &moreFiles2, &acquisitionDescription);
+         QMapIterator<QString, QVariant> it(acquisitionDescription);
+         while(it.hasNext()) {
+             it.next();
+             acquisitionDescription1[imageID+"/"+it.key()]=it.value();
+         }
+         log_text(tr("  - acquired %1 image from camera 2!\n").arg(imageDescription));
+         acquisitionDescription2[imageID+"/timestamp"]=time;
+         optSetup->saveLightpathConfig(acquisitionDescription2, lightpathName, imageID+"/lightpath/", QList<bool>(), true);
+         acquisitionDescription2[imageID+"/dualview_mode"]=optSetup->dualViewMode(1);
+         getAdditionalCameraSettings(ecamera2, camera2, imageID, acquisitionDescription2);
+     }
 
-        QTime time1;
-        time1.start();
-        QTime timA;
-        timA.start();
-        while (running) {
-            int prog1=99, prog2=99;
-            if (useCam1) prog1=ecamera1->getAcquisitionProgress(camera1);
-            if (useCam2) prog2=ecamera2->getAcquisitionProgress(camera2);
-            progress->setValue(qMin(prog1,prog2));
-
-            QString estimation;
-            if (qMin(prog1,prog2)>0) {
-                double duration=double(timA.elapsed())/1000.0;
-                double eta=duration/double(qMin(prog1,prog2))*100.0;
-                double etc=eta-duration;
-                uint mini=floor(etc/60.0);
-                uint secs=round(etc-double(mini)*60.0);
-                estimation=tr("\nest. remaining duration (min:secs): %1:%2 ").arg(mini, 2, 10, QChar('0')).arg(secs, 2, 10, QChar('0'));
-                if (progress) progress->setLabelText(tr("acquiring images ...\n")+estimation);
-            }
-            if (measured && time1.elapsed()>200) {
-                measured->append(optSetup->getMeasuredValues());
-                time1.start();
-            }
-            QApplication::processEvents();
-
-            if (progress && progress->wasCanceled()) {
-                if (userCanceled) *userCanceled=true;
-                running=false;
-                if (useCam1) ecamera1->cancelAcquisition(camera1);
-                if (useCam2) ecamera2->cancelAcquisition(camera2);
-                log_warning(tr("  - acquisition canceled by user!\n"));
-            } else {
-                bool run1=false;
-                bool run2=false;
-                if (useCam1) run1=ecamera1->isAcquisitionRunning(camera1);
-                if (useCam2) run2=ecamera2->isAcquisitionRunning(camera2);
-                running=run1||run2;
-            }
-        }
-    }
-    if (progress) progress->setValue(100);
-
-    //////////////////////////////////////////////////////////////////////////////////////
-    // retrieve background acquisition description
-    //////////////////////////////////////////////////////////////////////////////////////
-    if (ok && useCam1) {
-        ecamera1->getAcquisitionDescription(camera1, &moreFiles1, &acquisitionDescription1);
-        log_text(tr("  - acquired %1 image from camera 1!\n").arg(imageDescription));
-        acquisitionDescription1[imageID+"/timestamp"]=time;
-        optSetup->saveLightpathConfig(acquisitionDescription1, lightpathName, imageID+"/lightpath/", QList<bool>(), true);
-        acquisitionDescription1[imageID+"/dualview_mode"]=optSetup->dualViewMode(0);
-        getAdditionalCameraSettings(ecamera1, camera1, imageID, acquisitionDescription1);
-    }
-    if (ok && useCam2) {
-        ecamera2->getAcquisitionDescription(camera2, &moreFiles2, &acquisitionDescription2);
-        log_text(tr("  - acquired %1 image from camera 2!\n").arg(imageDescription));
-        acquisitionDescription2[imageID+"/timestamp"]=time;
-        optSetup->saveLightpathConfig(acquisitionDescription2, lightpathName, imageID+"/lightpath/", QList<bool>(), true);
-        acquisitionDescription2[imageID+"/dualview_mode"]=optSetup->dualViewMode(1);
-        getAdditionalCameraSettings(ecamera2, camera2, imageID, acquisitionDescription2);
-    }
-
-    return ok;
+     return ok;
 }
 
 void QFESPIMB040MainWindow2::getAdditionalCameraSettings(QFExtensionCamera *ecamera, int camera, const QString &prefix, QMap<QString, QVariant> &acquisitionDescription) {
-    acquisitionDescription[prefix+"/camera_pixel_width"]=ecamera->getPixelWidth(camera);
-    acquisitionDescription[prefix+"/camera_pixel_height"]=ecamera->getPixelHeight(camera);
+    acquisitionDescription[prefix+"/camera_pixel_width"]=ecamera->getCameraPixelWidth(camera);
+    acquisitionDescription[prefix+"/camera_pixel_height"]=ecamera->getCameraPixelHeight(camera);
     acquisitionDescription[prefix+"/camera_model"]=ecamera->getCameraName(camera);
     acquisitionDescription[prefix+"/sensor_model"]=ecamera->getCameraSensorName(camera);
-    acquisitionDescription[prefix+"/image_width"]=ecamera->getImageWidth(camera);
-    acquisitionDescription[prefix+"/image_height"]=ecamera->getImageHeight(camera);
+    acquisitionDescription[prefix+"/image_width"]=ecamera->getCameraImageWidth(camera);
+    acquisitionDescription[prefix+"/image_height"]=ecamera->getImageCameraHeight(camera);
     acquisitionDescription[prefix+"/dualview_mode"]=optSetup->dualViewMode(ecamera, camera);
     optSetup->saveLightpathConfig(acquisitionDescription, "", prefix+"/lightpath/", QList<bool>(), true);
     QMap<QString, QVariant> setup=optSetup->getSetup(optSetup->camNumFromExtension(ecamera, camera));

@@ -92,50 +92,50 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
     /////////////////////////////////////////////////////////////////////////////
     public:
         /** \copydoc QFExtensionCamera::getCameraCount() */
-        virtual unsigned int getCameraCount();
+        virtual unsigned int getCameraCount() const;
         /** \copydoc QFExtensionCamera::showCameraSettingsDialog() */
         virtual void showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent=NULL);
         /** \copydoc QFExtensionCamera::useCameraSettings() */
         virtual void useCameraSettings(unsigned int camera, const QSettings& settings);
         /** \copydoc QFExtensionCamera::getImageWidth() */
-        virtual int getImageWidth(unsigned int camera);
+        virtual int getCameraImageWidth(unsigned int camera);
         /** \copydoc QFExtensionCamera::getImageHeight() */
-        virtual int getImageHeight(unsigned int camera);
+        virtual int getImageCameraHeight(unsigned int camera);
         /** \copydoc QFExtensionCamera::isConnected() */
-        virtual bool isConnected(unsigned int camera);
+        virtual bool isCameraConnected(unsigned int camera);
         /** \copydoc QFExtensionCamera::acquire() */
-        virtual bool acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp=NULL, QMap<QString, QVariant>* parameters=NULL);
+        virtual bool acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t* timestamp=NULL, QMap<QString, QVariant>* parameters=NULL);
         /** \copydoc QFExtensionCamera::connectDevice() */
-        virtual bool connectDevice(unsigned int camera);
+        virtual bool connectCameraDevice(unsigned int camera);
         /** \copydoc QFExtensionCamera::disconnectDevice() */
-        virtual void disconnectDevice(unsigned int camera);
+        virtual void disconnectCameraDevice(unsigned int camera);
         /** \copydoc QFExtensionCamera::getExposureTime() */
-        virtual double getExposureTime(unsigned int camera);
+        virtual double getCameraExposureTime(unsigned int camera);
         /** \copydoc QFExtensionCamera::setLogging() */
-        virtual void setLogging(QFPluginLogService* logService) { this->logService=logService; };
+        virtual void setCameraLogging(QFPluginLogService* logService) { this->logService=logService; };
         /** \copydoc QFExtensionCamera::getPixelWidth() */
-        virtual double getPixelWidth(unsigned int camera);
+        virtual double getCameraPixelWidth(unsigned int camera);
         /** \copydoc QFExtensionCamera::getPixelHeight() */
-        virtual double getPixelHeight(unsigned int camera);
+        virtual double getCameraPixelHeight(unsigned int camera);
         /** \copydoc QFExtensionCamera::getCameraName() */
         virtual QString getCameraName(unsigned int camera);
         /** \copydoc QFExtensionCamera::getCameraSensorName() */
         virtual QString getCameraSensorName(unsigned int camera);
 
         /** \copydoc QFExtensionCamera::prepareAcquisition() */
-        virtual bool prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix=QString(""));
+        virtual bool prepareCameraAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix=QString(""));
         /** \copydoc QFExtensionCamera::startAcquisition() */
-        virtual bool startAcquisition(unsigned int camera);
+        virtual bool startCameraAcquisition(unsigned int camera);
         /** \copydoc QFExtensionCamera::cancelAcquisition() */
-        virtual void cancelAcquisition(unsigned int camera);
+        virtual void cancelCameraAcquisition(unsigned int camera);
         /** \copydoc QFExtensionCamera::isAcquisitionRunning() */
-        virtual bool isAcquisitionRunning(unsigned int camera, double* percentageDone=NULL);
+        virtual bool isCameraAcquisitionRunning(unsigned int camera, double* percentageDone=NULL);
         /** \copydoc QFExtensionCamera::getAcquisitionDescription() */
-        virtual void getAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::AcquititonFileDescription>* files, QMap<QString, QVariant>* parameters);
+        virtual void getCameraAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::CameraAcquititonFileDescription>* files, QMap<QString, QVariant>* parameters);
         /** \copydoc QFExtensionCamera::getAcquisitionPreview() */
-        virtual bool getAcquisitionPreview(unsigned int camera, uint32_t* data);
+        virtual bool getCameraAcquisitionPreview(unsigned int camera, uint32_t* data);
         /** \copydoc QFExtensionCamera::getAcquisitionProgress() */
-        virtual int getAcquisitionProgress(unsigned int camera);
+        virtual int getCameraAcquisitionProgress(unsigned int camera);
 
 
         /** \copydoc QFExtensionCamera::isCameraSettingChangable() */
@@ -144,6 +144,8 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
         virtual void changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which, QVariant value);
         /** \copydoc QFExtensionCamera::getCameraSetting() */
         virtual QVariant getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const;
+        /** \copydoc QFExtensionCamera::getCurrentCameraSetting() */
+        virtual QVariant getCurrentCameraSetting(int camera, CameraSetting which) const;
 
         /** \brief log project text message
          *  \param message the message to log

@@ -6,10 +6,12 @@
   </head>
   <body>
      $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-	 <p>This plugin controls cameras connected to the computer and controlled by the <a href="http://www.andor.com/software/sdk/">Andor camera SDK</a>. 
+<h2>Description</h2>
+<p>This plugin controls cameras connected to the computer and controlled by the <a href="http://www.andor.com/software/sdk/">Andor camera SDK</a>. 
 Note that you need to purchase the Andor SDK separately, as this driver will only work together with the SDK. 
-
-<p>On windows: make sure that the required SDK DLLs are in a directory where QUickFit will find them (either the QuickFit base directory, or a directory in the Windows PATH variable, or the Windows system directory!</p>
+<h2>Windows</h2>
+<p>On windows: make sure that the required SDK DLLs are in a directory where QuickFit will find them (either the QuickFit base directory, or a directory in the Windows PATH variable, or the Windows system directory!</p>
+<h2>Linux</h2>
 <p>On Linux after installing the SDK you will have to make the camera known to the system using a udev rules file <code>/etc/udev/rules.d/99-spim.rules</code> with contents like this:
 	 <blockquote><tt>
 SUBSYSTEM=="pci", ATTR{vendor}=="0x149a", ATTR{device}=="0x0005", RUN+="/usr/sbin/andordrvlx_load"
