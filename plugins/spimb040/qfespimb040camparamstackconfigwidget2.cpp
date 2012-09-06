@@ -30,9 +30,9 @@ QFESPIMB040CamParamStackConfigWidget2::QFESPIMB040CamParamStackConfigWidget2(QWi
         ui->cmbCam2Settings->setStopResume(opticsSetup->getStopRelease(1));
         ui->cmbCam2Settings->connectTo(opticsSetup->cameraComboBox(1));
     }
+    updateReplaces();
     bindLineEdit(ui->edtPrefix1);
     bindLineEdit(ui->edtPrefix2);
-    updateReplaces();
 
 }
 
@@ -81,7 +81,7 @@ void QFESPIMB040CamParamStackConfigWidget2::storeSettings(QSettings& settings, Q
     settings.setValue(prefix+"start", ui->spinStart->value());
     settings.setValue(prefix+"delta", ui->spinDelta->value());
     settings.setValue(prefix+"end", ui->spinEnd->value());
-    settings.setValue(prefix+"paramer", ui->cmbParameter->currentIndex());
+    settings.setValue(prefix+"parameter", ui->cmbParameter->currentIndex());
     settings.setValue(prefix+"mode", ui->cmbMode->currentIndex());
     settings.setValue(prefix+"images", ui->spinImages->value());
 

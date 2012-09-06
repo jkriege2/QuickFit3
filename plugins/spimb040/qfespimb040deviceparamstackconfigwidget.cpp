@@ -39,9 +39,9 @@ QFESPIMB040DeviceParamStackConfigWidget::QFESPIMB040DeviceParamStackConfigWidget
         ui->cmbCam2Settings->setStopResume(opticsSetup->getStopRelease(1));
         ui->cmbCam2Settings->connectTo(opticsSetup->cameraComboBox(1));
     }
+    updateReplaces();
     bindLineEdit(ui->edtPrefix1);
     bindLineEdit(ui->edtPrefix2);
-    updateReplaces();
 
 }
 
@@ -91,7 +91,7 @@ void QFESPIMB040DeviceParamStackConfigWidget::storeSettings(QSettings& settings,
     settings.setValue(prefix+"start", ui->spinStart->value());
     settings.setValue(prefix+"delta", ui->spinDelta->value());
     settings.setValue(prefix+"end", ui->spinEnd->value());
-    settings.setValue(prefix+"paramer", ui->cmbParameter->currentIndex());
+    settings.setValue(prefix+"parameter", ui->cmbParameter->currentIndex());
     settings.setValue(prefix+"mode", ui->cmbMode->currentIndex());
     settings.setValue(prefix+"images", ui->spinImages->value());
     settings.setValue(prefix+"delay", ui->spinDelay->value());
@@ -288,12 +288,33 @@ void QFESPIMB040DeviceParamStackConfigWidget::updateReplaces()
 void QFESPIMB040DeviceParamStackConfigWidget::setDeviceParameter(int parameter, double value) {
     if (parameter==0) {
         opticsSetup->getLaser1()->setLightSourcePower(opticsSetup->getLaser1ID(), 0, value);
+        while (!opticsSetup->getLaser1()->isLastLightSourceActionFinished(opticsSetup->getLaser1ID())) {
+            QApplication::processEvents();
+        }
+        opticsSetup->getLaser1()->setLightSourceLineEnabled(opticsSetup->getLaser1ID(), 0, true);
+        while (!opticsSetup->getLaser1()->isLastLightSourceActionFinished(opticsSetup->getLaser1ID())) {
+            QApplication::processEvents();
+        }
     }
     if (parameter==1) {
         opticsSetup->getLaser2()->setLightSourcePower(opticsSetup->getLaser2ID(), 0, value);
+        while (!opticsSetup->getLaser2()->isLastLightSourceActionFinished(opticsSetup->getLaser2ID())) {
+            QApplication::processEvents();
+        }
+        opticsSetup->getLaser2()->setLightSourceLineEnabled(opticsSetup->getLaser2ID(), 0, true);
+        while (!opticsSetup->getLaser2()->isLastLightSourceActionFinished(opticsSetup->getLaser2ID())) {
+            QApplication::processEvents();
+        }
     }
     if (parameter==2) {
         opticsSetup->getTransmissionLightSource()->setLightSourcePower(opticsSetup->getTransmissionLightSourceID(), 0, value);
+        while (!opticsSetup->getTransmissionLightSource()->isLastLightSourceActionFinished(opticsSetup->getTransmissionLightSourceID())) {
+            QApplication::processEvents();
+        }
+        opticsSetup->getTransmissionLightSource()->setLightSourceLineEnabled(opticsSetup->getTransmissionLightSourceID(), 0, true);
+        while (!opticsSetup->getTransmissionLightSource()->isLastLightSourceActionFinished(opticsSetup->getTransmissionLightSourceID())) {
+            QApplication::processEvents();
+        }
     }
 }
 
@@ -413,6 +434,7 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
         progress.setWindowModality(Qt::WindowModal);
         progress.setValue(0);
         progress.start();
+        progress.show();
 
         //////////////////////////////////////////////////////////////////////////////////////
         // SET LIGHTPATH
@@ -514,7 +536,7 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                         setDeviceParameter(stackParam, scanVals[stackIdx]);
                         if (ui->spinDelay->value()>0) {
                             QTime tDelay=QTime::currentTime();
-                            while (double(tDelay.elapsed())<ui->spinDelay->value()*1000.0) {
+                            while (double(tDelay.elapsed())<ui->spinDelay->value()) {
                                 QApplication::processEvents();
                             }
                         }
@@ -675,20 +697,30 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                 measured.append(opticsSetup->getMeasuredValues());
 
                 while (running && (stackIdx<scanVals.size())) {
+                    log->log_text(tr("  - setting device parameter to %1 ... ").arg(scanVals[stackIdx]));
+                    progress.setLabelText(tr("  - setting device parameter to %1 ... ").arg(scanVals[stackIdx]));
+                    //qDebug()<<tr("  - setting device parameter to %1 ... ").arg(scanVals[stackIdx]);
                     //////////////////////////////////////////////////////////////////////////////////////
                     // set device parameter and poosibly wait the set delay
                     //////////////////////////////////////////////////////////////////////////////////////
                     setDeviceParameter(stackParam, scanVals[stackIdx]);
                     if (ui->spinDelay->value()>0) {
+                        log->log_text(tr("waiting ... "));
+                        //qDebug()<<tr("  - waiting");
                         QTime tDelay=QTime::currentTime();
-                        while (double(tDelay.elapsed())<ui->spinDelay->value()*1000.0) {
+                        while (double(tDelay.elapsed())<ui->spinDelay->value()) {
                             QApplication::processEvents();
                         }
                     }
-
+                    log->log_text(tr("DONE!\n"));
+                    log->log_text(tr("  - acquiring image series\n"));
+                    //qDebug()<<tr("  - acquiring image series");
+                    progress.setLabelText(tr("acquiring image series ..."));
                     //////////////////////////////////////////////////////////////////////////////////////
                     // acquire image series
                     //////////////////////////////////////////////////////////////////////////////////////
+                    if (useCam1) QDir().mkpath(QFileInfo(acquisitionPrefix1+QString("__sidx%1.txt").arg(stackIdx,4,10,QLatin1Char('0'))).absolutePath());
+                    if (useCam2) QDir().mkpath(QFileInfo(acquisitionPrefix2+QString("__sidx%1.txt").arg(stackIdx,4,10,QLatin1Char('0'))).absolutePath());
                     ok = acqTools->acquireSeries(lightpathName, QString("paramstack%1").arg(stackIdx,4,10,QLatin1Char('0')), tr("device parameter stack"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1+QString("__sidx%1").arg(stackIdx,4,10,QLatin1Char('0')), acquisitionSettingsFilename1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2+QString("__sidx%1").arg(stackIdx,4,10,QLatin1Char('0')), acquisitionSettingsFilename2, acquisitionDescription2, moreFiles2, frames, frames, &measured, &progress, NULL);
                     if (!ok) {
                         if (frames>1) {
@@ -705,6 +737,10 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                     imageCnt+=frames;
                     progress.setValue((int)round((double)stackIdx/(double)scanVals.size()*100.0));
                     QApplication::processEvents();
+                    if (progress.wasCanceled()) {
+                        running=false;
+                        log->log_error(tr("CANCELED BY USER!\n"));
+                    }
                 }
                 duration=timAcquisition.elapsed()/1000.0;
                 if (buffer1) free(buffer1);

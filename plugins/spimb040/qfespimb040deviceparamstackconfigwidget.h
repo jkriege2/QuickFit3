@@ -55,6 +55,7 @@ class QFESPIMB040DeviceParamStackConfigWidget : public QWidget, public QFESPIMB0
         void lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes);
 
         void performStack();
+
     public:
         void loadSettings(QSettings& settings, QString prefix);
         void storeSettings(QSettings& settings, QString prefix) const;

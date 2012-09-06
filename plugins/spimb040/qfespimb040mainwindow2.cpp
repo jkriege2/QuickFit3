@@ -1435,6 +1435,11 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
                     imageCnt+=frames;
                     progress.setValue((int)round((double)stackIdx/(double)scanVals.size()*100.0));
                     QApplication::processEvents();
+
+                    if (progress.wasCanceled()) {
+                        running=false;
+                        log_error(tr("CANCELED BY USER!\n"));
+                    }
                 }
                 duration=timAcquisition.elapsed()/1000.0;
                 if (buffer1) free(buffer1);
@@ -2479,7 +2484,7 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
 
     QSettings settings1(tmpName1, QSettings::IniFormat);
 
-    if (frames1>0 && ecamera1->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera1->changeCameraSetting(settings1, QFExtensionCamera::CamSetNumberFrames, frames1);
+    if (useCam1 && frames1>0 && ecamera1->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera1->changeCameraSetting(settings1, QFExtensionCamera::CamSetNumberFrames, frames1);
 
 
 
@@ -2499,7 +2504,7 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
 
     QSettings settings2(tmpName2, QSettings::IniFormat);
 
-    if (frames2>0 && ecamera2->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera2->changeCameraSetting(settings2, QFExtensionCamera::CamSetNumberFrames, frames2);
+    if (useCam2 && frames2>0 && ecamera2->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera2->changeCameraSetting(settings2, QFExtensionCamera::CamSetNumberFrames, frames2);
 
 
 
