@@ -240,7 +240,7 @@ bool QFExtensionCameraRh2v2::findGroupByType(const QString &t, QSettings &settin
 }
 
 
-unsigned int QFExtensionCameraRh2v2::getCameraCount() {
+unsigned int QFExtensionCameraRh2v2::getCameraCount() const {
     return 2;
 	/* how man cameras may be accessed by your plugin (e.g. if you use one driver to access several cameras */
 }

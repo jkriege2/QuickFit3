@@ -95,7 +95,7 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
     /////////////////////////////////////////////////////////////////////////////
     public:
         /** \copydoc QFExtensionCamera::getCameraCount() */
-        virtual unsigned int getCameraCount();
+        virtual unsigned int getCameraCount() const;
         /** \copydoc QFExtensionCamera::showCameraSettingsWidget() */
         virtual void showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent=NULL);
         /** \copydoc QFExtensionCamera::useCameraSettings() */

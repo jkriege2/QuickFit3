@@ -1,4 +1,4 @@
-#include "QFESPIMB040DeviceParamStackConfigWidget.h"
+#include "qfespimb040deviceparamstackconfigwidget.h"
 #include "ui_qfespimb040deviceparamstackconfigwidget.h"
 
 #include "qfpluginservices.h"

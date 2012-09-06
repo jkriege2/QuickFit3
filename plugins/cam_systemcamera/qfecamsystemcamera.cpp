@@ -131,7 +131,7 @@ void QFECamSystemcamera::storeSettings(ProgramOptions* settingspo) {
 
 	}
 
-unsigned int QFECamSystemcamera::getCameraCount() {
+unsigned int QFECamSystemcamera::getCameraCount() const {
     return cameras.size();
 }
 

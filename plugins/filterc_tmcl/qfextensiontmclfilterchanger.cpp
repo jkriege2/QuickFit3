@@ -451,7 +451,7 @@ void QFExtensionTMCLFilterChanger::writeGlobalSettings(QSettings &inifile, const
                 inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/id", wheels[i].id);
                 inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/axis", wheels[i].motor);
                 inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/filter_count", wheels[i].filters);
-                inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/steps_per_revolution", wheels[i].steps_per_revolution);
+                inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/steps_per_revolution", qlonglong(wheels[i].steps_per_revolution));
                 inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/max_acceleration", wheels[i].maximumAcceleration);
                 inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/max_current", wheels[i].maximumCurrent);
                 inifile.setValue(prefix+"filterwheel"+QString::number(i+1)+"/max_speed", wheels[i].maximumSpeed);

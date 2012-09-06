@@ -73,7 +73,7 @@ class QFECamSystemcamera : public QObject, public QFExtensionBase, public QFExte
     /////////////////////////////////////////////////////////////////////////////
     public:
         /** \copydoc QFExtensionCamera::getCameraCount() */
-        virtual unsigned int getCameraCount();
+        virtual unsigned int getCameraCount() const;
         /** \copydoc QFExtensionCamera::showCameraSettingsWidget() */
         virtual void showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent=NULL);
         /** \copydoc QFExtensionCamera::useCameraSettings() */
