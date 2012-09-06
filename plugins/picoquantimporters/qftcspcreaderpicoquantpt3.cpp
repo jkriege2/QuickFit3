@@ -6,6 +6,7 @@ QFTCSPCReaderPicoquantPT3::QFTCSPCReaderPicoquantPT3() {
     currentTTTRRecordNum=0;
     ofltime=0;
     overflows=0;
+    duration=0;
 }
 
 QFTCSPCReaderPicoquantPT3::~QFTCSPCReaderPicoquantPT3() {
@@ -58,9 +59,12 @@ bool QFTCSPCReaderPicoquantPT3::open(QString filename) {
         current.microtime_offset=0;
         current.microtime_deltaT=boardHeader.Resolution;
 
+        duration=double(binHeader.Tacq)/1000.0;
+
         return true;
     }
     setLastError(QObject::tr("could not open TTTR file '%1'").arg(filename));
+    duration=0;
     return false;
 }
 
@@ -114,11 +118,13 @@ bool QFTCSPCReaderPicoquantPT3::nextRecord() {
         }
     } while (TTTRrecord.bits.channel==0xF);
 
+
     return (int64_t(currentTTTRRecordNum)<TTTRHeader.Records && !feof(tttrfile));
 }
 
 double QFTCSPCReaderPicoquantPT3::measurementDuration() const {
-    return double(binHeader.Tacq)/1000000.0;
+    //return double(binHeader.Tacq)/1000.0;
+    return duration;
 }
 
 uint16_t QFTCSPCReaderPicoquantPT3::inputChannels() const {

@@ -64,6 +64,8 @@ class QFTCSPCReaderPicoquantPT3: public QFTCSPCReader {
 
         QFTCSPCRecord current;
         QMap<uint16_t, double> cr;
+
+        double duration;
 };
 
 #endif // QFTCSPCREADERPICOQUANTPT3_H
