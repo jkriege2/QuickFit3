@@ -9,6 +9,7 @@
 #include <QtGui>
 #include <QtCore>
 #include "qfespimb040opticssetup.h"
+#include "qfcompleterfromfile.h"
 
 QFESPIMB040CamParamStackConfigWidget2::QFESPIMB040CamParamStackConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* stageConfig, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory) :
     QWidget(parent),
@@ -19,6 +20,14 @@ QFESPIMB040CamParamStackConfigWidget2::QFESPIMB040CamParamStackConfigWidget2(QWi
     this->acqDescription=acqDescription;
     this->expDescription=expDescription;
     ui->setupUi(this);
+
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/");
+    QFCompleterFromFile* c1=new QFCompleterFromFile(this);
+    c1->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/camparamstack_prefix1.txt");
+    QFCompleterFromFile* c2=new QFCompleterFromFile(this);
+    c2->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/camparamstack_prefix2.txt");
+    ui->edtPrefix1->setCompleter(c1);
+    ui->edtPrefix2->setCompleter(c2);
 
     if (stageConfig) {
         ui->cmbCam1Settings->init(configDirectory);
@@ -270,6 +279,8 @@ QString QFESPIMB040CamParamStackConfigWidget2::currentConfigName(int camera) con
 void QFESPIMB040CamParamStackConfigWidget2::updateReplaces()
 {
     setGlobalReplaces(opticsSetup, expDescription, acqDescription);
+    setReplaceValue("acquisition1_name",  cleanStringForFilename(ui->cmbCam1Settings->currentConfigName()));
+    setReplaceValue("acquisition2_name",  cleanStringForFilename(ui->cmbCam2Settings->currentConfigName()));
 }
 
 void QFESPIMB040CamParamStackConfigWidget2::lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes) {

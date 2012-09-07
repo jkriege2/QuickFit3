@@ -8,6 +8,7 @@
 #include "qfextension.h"
 #include <QtGui>
 #include <QtCore>
+#include "qfcompleterfromfile.h"
 
 
 QFESPIMB040AcquisitionConfigWidget2::QFESPIMB040AcquisitionConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory) :
@@ -19,6 +20,15 @@ QFESPIMB040AcquisitionConfigWidget2::QFESPIMB040AcquisitionConfigWidget2(QWidget
     this->acqDescription=acqDescription;
     this->expDescription=expDescription;
     ui->setupUi(this);
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/");
+    QFCompleterFromFile* c1=new QFCompleterFromFile(this);
+    c1->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/acquisition_prefix1.txt");
+    QFCompleterFromFile* c2=new QFCompleterFromFile(this);
+    c2->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/acquisition_prefix2.txt");
+    ui->edtPrefix1->setCompleter(c1);
+    ui->edtPrefix2->setCompleter(c2);
+
+
     if (opticsSetup) {
         ui->cmbAcquisitionSettings1->init(configDirectory);
         ui->cmbAcquisitionSettings1->setStopResume(opticsSetup->getStopRelease(0));
@@ -350,6 +360,8 @@ void QFESPIMB040AcquisitionConfigWidget2::lightpathesChanged(QFESPIMB040OpticsSe
 void QFESPIMB040AcquisitionConfigWidget2::updateReplaces()
 {
     setGlobalReplaces(opticsSetup, expDescription, acqDescription);
+    setReplaceValue("acquisition1_name",  cleanStringForFilename(ui->cmbAcquisitionSettings1->currentConfigName()));
+    setReplaceValue("acquisition2_name",  cleanStringForFilename(ui->cmbAcquisitionSettings2->currentConfigName()));
 }
 
 void QFESPIMB040AcquisitionConfigWidget2::on_btnReset1_clicked()

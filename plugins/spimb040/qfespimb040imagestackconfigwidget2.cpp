@@ -10,6 +10,7 @@
 #include <QtGui>
 #include <QtCore>
 #include "qfespimb040opticssetup.h"
+#include "qfcompleterfromfile.h"
 
 #define STAGE_INTERVAL_MS 1313
 
@@ -22,6 +23,16 @@ QFESPIMB040ImageStackConfigWidget2::QFESPIMB040ImageStackConfigWidget2(QWidget* 
     this->acqDescription=acqDescription;
     this->expDescription=expDescription;
     ui->setupUi(this);
+
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/");
+    QFCompleterFromFile* c1=new QFCompleterFromFile(this);
+    c1->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/stack_prefix1.txt");
+    QFCompleterFromFile* c2=new QFCompleterFromFile(this);
+    c2->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/stack_prefix2.txt");
+    ui->edtPrefix1->setCompleter(c1);
+    ui->edtPrefix2->setCompleter(c2);
+
+
     ui->cmbStage->init(pluginServices->getExtensionManager());
     ui->cmbStage2->init(pluginServices->getExtensionManager());
     ui->cmbStage3->init(pluginServices->getExtensionManager());
@@ -147,6 +158,8 @@ void QFESPIMB040ImageStackConfigWidget2::updateReplaces()
     if (ui->chkStage3->isChecked()) stack=stack+opticsSetup->getAxisNameForStage(ui->cmbStage3->currentExtensionLinearStage(), ui->cmbStage3->currentAxisID());
     setReplaceValue("stack", stack);
     setGlobalReplaces(opticsSetup, expDescription, acqDescription);
+    setReplaceValue("acquisition1_name",  cleanStringForFilename(ui->cmbCam1Settings->currentConfigName()));
+    setReplaceValue("acquisition2_name",  cleanStringForFilename(ui->cmbCam2Settings->currentConfigName()));
 }
 
 

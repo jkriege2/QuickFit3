@@ -9,6 +9,7 @@
 #include <QtGui>
 #include <QtCore>
 #include "qfespimb040opticssetup.h"
+#include "qfcompleterfromfile.h"
 
 
 
@@ -28,6 +29,15 @@ QFESPIMB040DeviceParamStackConfigWidget::QFESPIMB040DeviceParamStackConfigWidget
     this->log=log;
     this->acqTools=acqTools;
     ui->setupUi(this);
+
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/");
+    QFCompleterFromFile* c1=new QFCompleterFromFile(this);
+    c1->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/deviceparamstack_prefix1.txt");
+    QFCompleterFromFile* c2=new QFCompleterFromFile(this);
+    c2->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/deviceparamstack_prefix2.txt");
+    ui->edtPrefix1->setCompleter(c1);
+    ui->edtPrefix2->setCompleter(c2);
+
 
     if (stageConfig) {
         ui->cmbCam1Settings->init(configDirectory);
@@ -283,6 +293,10 @@ QString QFESPIMB040DeviceParamStackConfigWidget::currentConfigName(int camera) c
 void QFESPIMB040DeviceParamStackConfigWidget::updateReplaces()
 {
     setGlobalReplaces(opticsSetup, expDescription, acqDescription);
+    setReplaceValue("acquisition1_name",  cleanStringForFilename(ui->cmbCam1Settings->currentConfigName()));
+    setReplaceValue("acquisition2_name",  cleanStringForFilename(ui->cmbCam2Settings->currentConfigName()));
+    setReplaceValue("parameter",  cleanStringForFilename(ui->cmbParameter->currentText()));
+
 }
 
 void QFESPIMB040DeviceParamStackConfigWidget::setDeviceParameter(int parameter, double value) {
@@ -354,6 +368,9 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
 
     QDateTime startDateTime=QDateTime::currentDateTime();
     QList<QFESPIMB040OpticsSetup::measuredValues> measured;
+    QList<QFExtensionCamera::CameraAcquititonFileDescription> files1, files2;
+    QMap<QString, QVariant> finalAcquisitionDescription1;
+    QMap<QString, QVariant> finalAcquisitionDescription2;
 
 
     bool ok=true;
@@ -664,6 +681,15 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                 buffer1=buffer2=NULL;
 
             }
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            // close tiff files and free buffers
+            //////////////////////////////////////////////////////////////////////////////////////
+            progress.setLabelText(tr("closing output files ..."));
+            QApplication::processEvents();
+            if (tiff1) TIFFClose(tiff1);
+            if (tiff2) TIFFClose(tiff2);
+            tiff1=tiff2=NULL;
         } else {
             log->log_text(tr("acquiring stack in ACQUISITION MODE ...\n"));
 
@@ -671,8 +697,8 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                 log->log_warning(tr("canceled by user!\n"));
                 ok=false;
             }
-            QMap<QString, QVariant> acquisitionDescription1;
             QList<QFExtensionCamera::CameraAcquititonFileDescription> moreFiles1;
+            QMap<QString, QVariant> acquisitionDescription1;
             QMap<QString, QVariant> acquisitionDescription2;
             QList<QFExtensionCamera::CameraAcquititonFileDescription> moreFiles2;
 
@@ -748,6 +774,23 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                 buffer1=buffer2=NULL;
 
             }
+
+            /*QMapIterator<QString, QVariant> it1(acquisitionDescription1), it2(acquisitionDescription2);
+            while (it1.hasNext()) {
+                it1.next();
+                finalAcquisitionDescription1["cam1/"+it1.key()]=it1.value();
+                finalAcquisitionDescription1["cam1/"+it1.key()]=it1.value();
+            }
+            while (it2.hasNext()) {
+                it1.next();
+                finalAcquisitionDescription2["cam2/"+it1.key()]=it1.value();
+                finalAcquisitionDescription2["cam2/"+it1.key()]=it1.value();
+            }*/
+            finalAcquisitionDescription1.unite(acquisitionDescription1);
+            finalAcquisitionDescription2.unite(acquisitionDescription2);
+
+            files1.append(moreFiles1);
+            files2.append(moreFiles2);
         }
         progress.setValue(100);
         measured.append(opticsSetup->getMeasuredValues());
@@ -756,8 +799,8 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
         //////////////////////////////////////////////////////////////////////////////////////
         // collect lightpath data common to all cameras
         //////////////////////////////////////////////////////////////////////////////////////
-        QMap<QString, QVariant> acquisitionDescription;
-        opticsSetup->saveLightpathConfig(acquisitionDescription, "", "lightpath/");
+        opticsSetup->saveLightpathConfig(finalAcquisitionDescription1, "", "lightpath/");
+        opticsSetup->saveLightpathConfig(finalAcquisitionDescription2, "", "lightpath/");
 
         //////////////////////////////////////////////////////////////////////////////////////
         // switch on/off light
@@ -775,34 +818,42 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
             log->log_text(tr("  - resetting to old lightpath settings (%1) ...\n").arg(oldLightpath));//Name));
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////
-        // close tiff files and free buffers
-        //////////////////////////////////////////////////////////////////////////////////////
-        progress.setLabelText(tr("closing output files ..."));
-        QApplication::processEvents();
-        if (tiff1) TIFFClose(tiff1);
-        if (tiff2) TIFFClose(tiff2);
-        tiff1=tiff2=NULL;
 
         //////////////////////////////////////////////////////////////////////////////////////
         // collect acquisition data common to all cameras
         //////////////////////////////////////////////////////////////////////////////////////
         QString scanCSV;
         if (ok) {
-            acquisitionDescription["type"]="parameter stack";
-            acquisitionDescription["stack_parameter"]=stackParameterName();
-            acquisitionDescription["stack_mode"]=stackModeName();
-            acquisitionDescription["stack_start"]=stackStart();
-            acquisitionDescription["stack_delta"]=stackDelta();
-            acquisitionDescription["stack_end"]=stackEnd();
-            acquisitionDescription["sequence_overall_length"]=images;
-            acquisitionDescription["images_per_step"]=numImages();
-            acquisitionDescription["stack_length"]=scanVals.size();
-            acquisitionDescription["start_time"]=timStart;
-            acquisitionDescription["duration"]=duration;
-            acquisitionDescription["stack_value_count"]=scanVals.size();
-            acquisitionDescription["stack_values"]=CDoubleListToQString(scanVals);
-            acquisitionDescription["real_stack_values"]=realValues;
+            finalAcquisitionDescription1["type"]="parameter stack";
+            finalAcquisitionDescription1["stack_parameter"]=stackParameterName();
+            finalAcquisitionDescription1["stack_mode"]=stackModeName();
+            finalAcquisitionDescription1["stack_start"]=stackStart();
+            finalAcquisitionDescription1["stack_delta"]=stackDelta();
+            finalAcquisitionDescription1["stack_end"]=stackEnd();
+            finalAcquisitionDescription1["sequence_overall_length"]=images;
+            finalAcquisitionDescription1["images_per_step"]=numImages();
+            finalAcquisitionDescription1["stack_length"]=scanVals.size();
+            finalAcquisitionDescription1["start_time"]=timStart;
+            finalAcquisitionDescription1["duration"]=duration;
+            finalAcquisitionDescription1["stack_value_count"]=scanVals.size();
+            finalAcquisitionDescription1["stack_values"]=CDoubleListToQString(scanVals);
+            finalAcquisitionDescription1["real_stack_values"]=realValues;
+
+
+            finalAcquisitionDescription2["type"]="parameter stack";
+            finalAcquisitionDescription2["stack_parameter"]=stackParameterName();
+            finalAcquisitionDescription2["stack_mode"]=stackModeName();
+            finalAcquisitionDescription2["stack_start"]=stackStart();
+            finalAcquisitionDescription2["stack_delta"]=stackDelta();
+            finalAcquisitionDescription2["stack_end"]=stackEnd();
+            finalAcquisitionDescription2["sequence_overall_length"]=images;
+            finalAcquisitionDescription2["images_per_step"]=numImages();
+            finalAcquisitionDescription2["stack_length"]=scanVals.size();
+            finalAcquisitionDescription2["start_time"]=timStart;
+            finalAcquisitionDescription2["duration"]=duration;
+            finalAcquisitionDescription2["stack_value_count"]=scanVals.size();
+            finalAcquisitionDescription2["stack_values"]=CDoubleListToQString(scanVals);
+            finalAcquisitionDescription2["real_stack_values"]=realValues;
 
 
 
@@ -819,13 +870,12 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
         // write image stack properties to files, also collects camera specific information
         //////////////////////////////////////////////////////////////////////////////////////
         if (ok && useCam1) {
-            QMap<QString, QVariant> acquisitionDescription1=acquisitionDescription;
-            QList<QFExtensionCamera::CameraAcquititonFileDescription> files;
+            QMap<QString, QVariant> acquisitionDescription1=finalAcquisitionDescription1;
             QFExtensionCamera::CameraAcquititonFileDescription d;
             d.name=TIFFFIlename1;
             d.description="image stack from camera 1";
             d.type="TIFF16";
-            files.append(d);
+            files1.append(d);
 
 
             QString ParamValuesFilename=acquisitionPrefix1+".param.dat";
@@ -836,7 +886,7 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                 d.name=ParamValuesFilename;
                 d.description="parameter values";
                 d.type="CSV";
-                files.append(d);
+                files1.append(d);
             } else {
                 log->log_error(tr("  - could not write parameter values file '%1' for camera 1: %2 ...").arg(ParamValuesFilename).arg(posFile.errorString()));
             }
@@ -847,21 +897,21 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                 d.name=MeasurementsFilename;
                 d.description="measureable properties of setup";
                 d.type="CSV";
-                files.append(d);
+                files1.append(d);
             }
 
             log->log_text(tr("  - writing acquisition description 1 ..."));
-            acqTools->savePreviewDescription(0, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription1, files, startDateTime);
+            acqTools->savePreviewDescription(0, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription1, files1, startDateTime);
             log->log_text(tr(" DONE!\n"));
         }
         if (ok && useCam2) {
-            QMap<QString, QVariant> acquisitionDescription2=acquisitionDescription;
-            QList<QFExtensionCamera::CameraAcquititonFileDescription> files;
+            QMap<QString, QVariant> acquisitionDescription2=finalAcquisitionDescription2;
+
             QFExtensionCamera::CameraAcquititonFileDescription d;
             d.name=TIFFFIlename1;
             d.description="image stack from camera 2";
             d.type="TIFF16";
-            files.append(d);
+            files2.append(d);
 
 
             QString ParamValuesFilename=acquisitionPrefix2+".param.dat";
@@ -872,7 +922,7 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                 d.name=ParamValuesFilename;
                 d.description="parameter values";
                 d.type="CSV";
-                files.append(d);
+                files2.append(d);
             } else {
                 log->log_error(tr("  - could not write parameter values file '%1' for camera 2: %2 ...").arg(ParamValuesFilename).arg(posFile.errorString()));
             }
@@ -883,12 +933,12 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                 d.name=MeasurementsFilename;
                 d.description="measureable properties of setup";
                 d.type="CSV";
-                files.append(d);
+                files2.append(d);
             }
 
 
             log->log_text(tr("  - writing acquisition description 2 ..."));
-            acqTools->savePreviewDescription(1, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription2, files, startDateTime);
+            acqTools->savePreviewDescription(1, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription2, files2, startDateTime);
             log->log_text(tr(" DONE!\n"));
         }
 
