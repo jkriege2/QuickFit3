@@ -24,16 +24,28 @@ void QFRDRSettingsDataEditor::createWidgets() {
     model=new QSettingsModel(this);
     model->setByDepthColoring(true);
     model->setReadOptimizedColoring(true);
-    tree->setModel(model);
+    filterModel=new QSortFilterProxyModel(this);
+    filterModel->setSourceModel(model);
+    filterModel->setDynamicSortFilter(true);
+    tree->setModel(filterModel);
+
+    /*edtFilterName=new QLineEdit(this);
+    edtFilterValue=new QLineEdit(this);
+    connect(edtFilterName, SIGNAL(textChanged(QString)), this, SLOT(nameFilterChanged(QString)));*/
 
     l->addWidget(new QLabel("<b>filename:</b>"), 0,0);
-    l->addWidget(labFilename,0,1);
+    l->addWidget(labFilename,0,1,1,3);
+    /*l->addWidget(new QLabel("<b>filter name:</b>"), 1,0);
+    l->addWidget(edtFilterName,1,1);
+    l->addWidget(new QLabel("<b>filter value:</b>"), 1,2);
+    l->addWidget(edtFilterValue,1,3);*/
     QLabel* lab=new QLabel("<b>contents:</b>");
     lab->setAlignment(Qt::AlignLeft|Qt::AlignTop);
-    l->addWidget(lab, 1,0);
-    l->addWidget(tree, 1,1);
-    l->setRowStretch(1,1);
+    l->addWidget(lab, 2,0);
+    l->addWidget(tree, 2,1,1,3);
+    l->setRowStretch(2,1);
     l->setColumnStretch(1,1);
+    l->setColumnStretch(3,1);
 
 };
 
@@ -54,11 +66,26 @@ void QFRDRSettingsDataEditor::connectWidgets(QFRawDataRecord* current, QFRawData
         tree->header()->setStretchLastSection(true);
         tree->resizeColumnToContents(0);
         tree->resizeColumnToContents(1);
+        /*edtFilterName->setText("");
+        edtFilterValue->setText("");*/
+
+
     } else {
+        /*edtFilterName->setText("");
+        edtFilterValue->setText("");*/
         labFilename->setText("");
         model->setSettings(NULL);
     }
 
+}
+
+void QFRDRSettingsDataEditor::nameFilterChanged(const QString &filter) {
+    QString f=filter;
+    if (!f.startsWith('*')) f="*"+f;
+    if (!f.endsWith('*')) f=f+"*";
+    filterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    filterModel->setFilterWildcard(f);
+    tree->expandAll();
 }
 
 void QFRDRSettingsDataEditor::rawDataChanged() {

@@ -5,6 +5,8 @@
 #include <QLabel>
 #include <QTreeView>
 #include "qsettingsmodel.h"
+#include <QLineEdit>
+#include <QSortFilterProxyModel>
 
 /*! \brief editor for QFRawDataRecord
     \ingroup qf3rdrdp_rdr_settings
@@ -21,6 +23,8 @@ class QFRDRSettingsDataEditor : public QFRawDataEditor {
         virtual void rawDataChanged();
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old);
+
+        void nameFilterChanged(const QString& filter);
     protected:
         /** \brief create widgets on object creation */
         void createWidgets();
@@ -33,6 +37,9 @@ class QFRDRSettingsDataEditor : public QFRawDataEditor {
         QTreeView* tree;
         QLabel* labFilename;
         QSettingsModel* model;
+        QLineEdit* edtFilterName;
+        QLineEdit* edtFilterValue;
+        QSortFilterProxyModel* filterModel;
     private:
 };
 
