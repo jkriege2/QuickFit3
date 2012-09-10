@@ -37,7 +37,7 @@ QVariant QFTableModel::data(const QModelIndex &index, int role) const {
         } else if (role == Qt::EditRole) {
             QVariant v=QVariant();
             if (dataEditMap.contains(a)) v=dataEditMap.value(a, v);
-            else if (dataMap.contains(a)) v=dataMap.value(a, v);
+            if (dataMap.contains(a)) v=dataMap.value(a, v);
             if (!v.isValid()) v=defaultEditValue;
             return v;
         } else if (role == Qt::CheckStateRole) {

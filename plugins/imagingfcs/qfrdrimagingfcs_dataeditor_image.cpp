@@ -3115,13 +3115,13 @@ void QFRDRImagingFCSImageEditor::replotData() {
                         tabFitvals->setCell(row, col+1, sqrt(qfstatisticsVariance(gvalues[ii])));
                         tabFitvals->setCell(row, col+2, unitlabels[ii]);
                         tabFitvals->setCellEditRole(row, col+2, units[ii]);
+
+                        qSort(gvalues[ii]);
                         tabFitvals->setCell(row, col+3, qfstatisticsSortedQuantile(gvalues[ii], 0.25));
                         tabFitvals->setCell(row, col+4, qfstatisticsSortedMedian(gvalues[ii]));
                         tabFitvals->setCell(row, col+5, qfstatisticsSortedQuantile(gvalues[ii], 0.75));
                         tabFitvals->setCell(row, col+6, qfstatisticsSortedMin(gvalues[ii]));
                         tabFitvals->setCell(row, col+7, qfstatisticsSortedMax(gvalues[ii]));
-
-                        qSort(gvalues[ii]);
 
                         QBrush c=QBrush(graphCol.lighter(170));
                         tabFitvals->setCellBackgroundRole(row, col, c);

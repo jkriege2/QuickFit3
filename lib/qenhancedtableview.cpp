@@ -4,11 +4,20 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QKeyEvent>
+#include <QAction>
 
 QEnhancedTableView::QEnhancedTableView(QWidget* parent):
     QTableView(parent)
 {
-    //ctor
+    setContextMenuPolicy(Qt::ActionsContextMenu);
+    QAction* act;
+
+    act=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
+    connect(act, SIGNAL(triggered()), this, SLOT(copySelectionToExcel()));
+    addAction(act);
+    act=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) without header row/column"), this);
+    connect(act, SIGNAL(triggered()), this, SLOT(copySelectionToExcelNoHead()));
+    addAction(act);
 }
 
 QEnhancedTableView::~QEnhancedTableView()
@@ -445,13 +454,6 @@ void QEnhancedTableView::copySelectionAsMedianQuantilesToExcel(int medianrole, i
     }
 }
 
-void QEnhancedTableView::keyPressEvent(QKeyEvent* event) {
-    if (event->matches(QKeySequence::Copy)) {
-        copySelectionToExcel();
-        event->accept();
-    } else QTableView::keyPressEvent(event);
-    emit keyPressed(event->key(), event->modifiers(), event->text());
-}
 
 
 QString QEnhancedTableView::toHtml(int borderWidth, bool non_breaking, int fontSizePt) const {
@@ -503,4 +505,14 @@ QString QEnhancedTableView::toHtml(int borderWidth, bool non_breaking, int fontS
     }
     html+="</table>";
     return html;
+}
+
+
+
+void QEnhancedTableView::keyPressEvent(QKeyEvent* event) {
+    if (event->matches(QKeySequence::Copy)) {
+        copySelectionToExcel(Qt::EditRole, false);
+        event->accept();
+    } else QTableView::keyPressEvent(event);
+    emit keyPressed(event->key(), event->modifiers(), event->text());
 }
