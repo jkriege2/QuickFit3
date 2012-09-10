@@ -735,7 +735,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 text.setLocale(outLocale);
                                 text<<QString("set xlabel 'time [seconds]'\n");
                                 text<<QString("set ylabel 'pixel grey value'\n");
-                                text<<QString("set title \"Background Statistics '%1'\" noenhanced\n").arg(job.filename);
+                                text<<QString("set title \"Uncorrected Statistics '%1'\" noenhanced\n").arg(job.filename);
                                 text<<QString("set style fill transparent solid 0.5 noborder\n");
                                 text<<QString("set multiplot layout 1,2\n");
                                 text<<QString("plot '%1' using 1:(($2)-(($3)/2.0)):(($2)+(($3)/2.0)) title '+/- stddev' with filledcu, '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
