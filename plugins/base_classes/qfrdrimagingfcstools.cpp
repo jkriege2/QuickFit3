@@ -8,11 +8,28 @@
 
 void readB040SPIMExperimentConfigFile(QSettings& set, double& frametime, double& baseline_offset, QString& backgroundfile, int& image_width, int& image_height, bool& hasPixel, double& pixel_width, double& pixel_height ) {
     if (set.contains("acquisition/image_width")) image_width=set.value("acquisition/image_width", image_width).toInt();
+    else if (set.contains("acquisition/camera/image_width")) image_width=set.value("acquisition/camera/image_width", image_width).toInt();
+    else if (set.contains("acquisition/acquisition/image_width")) image_width=set.value("acquisition/acquisition/image_width", image_width).toInt();
+
     if (set.contains("acquisition/image_height")) image_height=set.value("acquisition/image_height", image_height).toInt();
+    else if (set.contains("acquisition/camera/image_height")) image_height=set.value("acquisition/camera/image_height", image_height).toInt();
+    else if (set.contains("acquisition/acquisition/image_height")) image_height=set.value("acquisition/acquisition/image_height", image_height).toInt();
+
     if (set.contains("acquisition/pixel_width")) { hasPixel=true; pixel_width=set.value("acquisition/pixel_width", pixel_width).toDouble()*1000.0;}
+    else if (set.contains("acquisition/camera/pixel_width")) { hasPixel=true; pixel_width=set.value("acquisition/camera/pixel_width", pixel_width).toDouble()*1000.0;}
+    else if (set.contains("acquisition/acquisition/pixel_width")) { hasPixel=true; pixel_width=set.value("acquisition/acquisition/pixel_width", pixel_width).toDouble()*1000.0;}
+
     if (set.contains("acquisition/pixel_height")) { hasPixel=true; pixel_height=set.value("acquisition/pixel_height", pixel_height).toDouble()*1000.0;}
+    else if (set.contains("acquisition/camera/pixel_height")) { hasPixel=true; pixel_height=set.value("acquisition/camera/pixel_height", pixel_height).toDouble()*1000.0;}
+    else if (set.contains("acquisition/acquisition/pixel_height")) { hasPixel=true; pixel_height=set.value("acquisition/acquisition/pixel_height", pixel_height).toDouble()*1000.0;}
+
     if (set.contains("acquisition/frame_time")) frametime=set.value("acquisition/frame_time", frametime).toDouble()*1e6;
     else if (set.contains("acquisition/frame_rate")) frametime=1.0/set.value("acquisition/frame_rate", frametime).toDouble()*1e6;
+    else if (set.contains("acquisition/camera/frame_time")) frametime=set.value("acquisition/camera/frame_time", frametime).toDouble()*1e6;
+    else if (set.contains("acquisition/camera/frame_rate")) frametime=1.0/set.value("acquisition/camera/frame_rate", frametime).toDouble()*1e6;
+    else if (set.contains("acquisition/acquisition/frame_time")) frametime=set.value("acquisition/acquisition/frame_time", frametime).toDouble()*1e6;
+    else if (set.contains("acquisition/acquisition/frame_rate")) frametime=1.0/set.value("acquisition/acquisition/frame_rate", frametime).toDouble()*1e6;
+
     baseline_offset=set.value("acquisition/baseline_offset", baseline_offset).toDouble();
     //backgroundfile="";
     int fcnt=set.value("files/count", 0).toInt();

@@ -5,6 +5,7 @@
 #include <QClipboard>
 #include <QKeyEvent>
 #include <QAction>
+#include "qftools.h"
 
 QEnhancedTableView::QEnhancedTableView(QWidget* parent):
     QTableView(parent)
@@ -88,7 +89,7 @@ void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead) {
         if (storeHead) {
             hrow.append(""); // empty header for first column (vertical headers!)
             for (int c=0; c<colcnt; c++) {
-                hrow.append(QString("\"%1\"").arg(model()->headerData(collist[c], Qt::Horizontal).toString()));
+                hrow.append(QString("\"%1\"").arg(model()->headerData(collist[c], Qt::Horizontal).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " ")));
             }
             data.append(hrow);
         }
@@ -99,7 +100,7 @@ void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead) {
         //  <VER_HEADER> | <EMPTY> | <EMPTY> | ... | <EMPTY>
         for (int r=0; r<rowcnt; r++) {
             QStringList row;
-            if (storeHead) row.append(QString("\"%1\"").arg(model()->headerData(rowlist[r], Qt::Vertical).toString())); // vertical header
+            if (storeHead) row.append(QString("\"%1\"").arg(model()->headerData(rowlist[r], Qt::Vertical).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "))); // vertical header
             for (int c=0; c<colcnt; c++) {
                 row.append(""); // empty columns for data
             }
@@ -190,8 +191,8 @@ void QEnhancedTableView::copySelectionAsValueErrorToExcel(int valuerole, int err
         if (storeHead) {
             hrow.append(""); // empty header for first column (vertical headers!)
             for (int c=0; c<colcnt; c++) {
-                if (collist[c].second==valuerole) hrow.append(QString("\"%1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString()));
-                else hrow.append(QString("\"error: %1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString()));
+                if (collist[c].second==valuerole) hrow.append(QString("\"%1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " ")));
+                else hrow.append(QString("\"error: %1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " ")));
             }
             data.append(hrow);
         }
@@ -203,8 +204,8 @@ void QEnhancedTableView::copySelectionAsValueErrorToExcel(int valuerole, int err
         for (int r=0; r<rowcnt; r++) {
             QStringList row;
             if (storeHead) {
-                if (rowlist[r].second==valuerole) row.append(QString("\"%1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString())); // vertical header
-                else row.append(QString("\"error: %1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString())); // vertical header
+                if (rowlist[r].second==valuerole) row.append(QString("\"%1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "))); // vertical header
+                else row.append(QString("\"error: %1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "))); // vertical header
             }
             for (int c=0; c<colcnt; c++) {
                 row.append(""); // empty columns for data
@@ -335,9 +336,9 @@ void QEnhancedTableView::copySelectionAsMedianQuantilesToExcel(int medianrole, i
         if (storeHead) {
             hrow.append(""); // empty header for first column (vertical headers!)
             for (int c=0; c<colcnt; c++) {
-                if (collist[c].second==medianrole) hrow.append(QString("\"%1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString()));
-                else if  (collist[c].second==q25role) hrow.append(QString("\"25% quantile: %1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString()));
-                else if  (collist[c].second==q75role) hrow.append(QString("\"75% quantile: %1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString()));
+                if (collist[c].second==medianrole) hrow.append(QString("\"%1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " ")));
+                else if  (collist[c].second==q25role) hrow.append(QString("\"25% quantile: %1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " ")));
+                else if  (collist[c].second==q75role) hrow.append(QString("\"75% quantile: %1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " ")));
             }
             data.append(hrow);
         }
@@ -349,9 +350,9 @@ void QEnhancedTableView::copySelectionAsMedianQuantilesToExcel(int medianrole, i
         for (int r=0; r<rowcnt; r++) {
             QStringList row;
             if (storeHead) {
-                if (rowlist[r].second==medianrole) row.append(QString("\"%1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString())); // vertical header
-                else if (rowlist[r].second==q25role) row.append(QString("\"25% quantile: %1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString())); // vertical header
-                else if (rowlist[r].second==q75role) row.append(QString("\"75% quantile: %1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString())); // vertical header
+                if (rowlist[r].second==medianrole) row.append(QString("\"%1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "))); // vertical header
+                else if (rowlist[r].second==q25role) row.append(QString("\"25% quantile: %1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "))); // vertical header
+                else if (rowlist[r].second==q75role) row.append(QString("\"75% quantile: %1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "))); // vertical header
             }
             for (int c=0; c<colcnt; c++) {
                 row.append(""); // empty columns for data
