@@ -29,16 +29,20 @@ void QFRDRSettingsDataEditor::createWidgets() {
     filterModel->setDynamicSortFilter(true);
     tree->setModel(filterModel);
 
-    /*edtFilterName=new QLineEdit(this);
-    edtFilterValue=new QLineEdit(this);
-    connect(edtFilterName, SIGNAL(textChanged(QString)), this, SLOT(nameFilterChanged(QString)));*/
+    edtFilterName=new QFEnhancedLineEdit(this);
+    edtFilterName->setToolTip(tr("enter a phrase and the settings tree will be <b>filtered</b>, so it only contains entries that contain the filter string in either their path or value.<br><br>You may use <b>wildcards</b> <tt>*</tt> to match >=0 and <tt>?</tt> to match exactly one unknown character."));
+    connect(edtFilterName, SIGNAL(textChanged(QString)), this, SLOT(nameFilterChanged(QString)));
+
+    edtFilterName->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterName, edtFilterName));
+    QFCompleterFromFile* cc=new QFCompleterFromFile(this);
+    cc->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"plugins/rdr_settings/completers/filter.txt");
+    edtFilterName->setCompleter(cc);
+
 
     l->addWidget(new QLabel("<b>filename:</b>"), 0,0);
     l->addWidget(labFilename,0,1,1,3);
-    /*l->addWidget(new QLabel("<b>filter name:</b>"), 1,0);
+    l->addWidget(new QLabel("<b>filter:</b>"), 1,0);
     l->addWidget(edtFilterName,1,1);
-    l->addWidget(new QLabel("<b>filter value:</b>"), 1,2);
-    l->addWidget(edtFilterValue,1,3);*/
     QLabel* lab=new QLabel("<b>contents:</b>");
     lab->setAlignment(Qt::AlignLeft|Qt::AlignTop);
     l->addWidget(lab, 2,0);
@@ -66,13 +70,11 @@ void QFRDRSettingsDataEditor::connectWidgets(QFRawDataRecord* current, QFRawData
         tree->header()->setStretchLastSection(true);
         tree->resizeColumnToContents(0);
         tree->resizeColumnToContents(1);
-        /*edtFilterName->setText("");
-        edtFilterValue->setText("");*/
+        edtFilterName->setText("");
 
 
     } else {
-        /*edtFilterName->setText("");
-        edtFilterValue->setText("");*/
+        edtFilterName->setText("");
         labFilename->setText("");
         model->setSettings(NULL);
     }
@@ -81,10 +83,9 @@ void QFRDRSettingsDataEditor::connectWidgets(QFRawDataRecord* current, QFRawData
 
 void QFRDRSettingsDataEditor::nameFilterChanged(const QString &filter) {
     QString f=filter;
-    if (!f.startsWith('*')) f="*"+f;
-    if (!f.endsWith('*')) f=f+"*";
-    filterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    filterModel->setFilterWildcard(f);
+    /*if (!f.startsWith('*')) f="*"+f;
+    if (!f.endsWith('*')) f=f+"*";*/
+    model->setFilter(f, QRegExp::Wildcard);
     tree->expandAll();
 }
 

@@ -7,6 +7,9 @@
 #include "qsettingsmodel.h"
 #include <QLineEdit>
 #include <QSortFilterProxyModel>
+#include "qfenhancedlineedit.h"
+#include "qfcompleterfromfile.h"
+#include "qfstyledbutton.h"
 
 /*! \brief editor for QFRawDataRecord
     \ingroup qf3rdrdp_rdr_settings
@@ -37,8 +40,7 @@ class QFRDRSettingsDataEditor : public QFRawDataEditor {
         QTreeView* tree;
         QLabel* labFilename;
         QSettingsModel* model;
-        QLineEdit* edtFilterName;
-        QLineEdit* edtFilterValue;
+        QFEnhancedLineEdit* edtFilterName;
         QSortFilterProxyModel* filterModel;
     private:
 };
