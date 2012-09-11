@@ -302,9 +302,10 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.yerrorcolumn=ge.attribute("yerrorcolumn", "-1").toInt();
                     graph.linewidth=ge.attribute("linewidth", "1").toDouble();
                     graph.symbolSize=ge.attribute("symbolSize", "1").toDouble();
-                    graph.color=QColor(ge.attribute("color", "blue"));
-                    graph.errorColor=QColor(ge.attribute("errorcolor", "darkblue"));
-                    graph.fillColor=QColor(ge.attribute("fillcolor", "blue"));
+                    graph.color=QStringToQColor(ge.attribute("color", "blue"));
+                    graph.errorColor=QStringToQColor(ge.attribute("errorcolor", "darkblue"));
+                    graph.fillColor=QStringToQColor(ge.attribute("fillcolor", "blue"));
+                    qDebug()<<ge.attribute("type")<<ge.attribute("fillcolor", "blue");
                     graph.style=String2QPenStyle(ge.attribute("style", "solid"));
                     graph.symbol=String2JKQTPgraphSymbols(ge.attribute("symbol", "symbol_cross"));
                     graph.errorStyle=String2JKQTPerrorPlotstyle(ge.attribute("errorStyle", "error_none"));
@@ -313,9 +314,9 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.fillColorTransparent=ge.attribute("fillcolor_trans", "0.3").toDouble();
 
 
-                    graph.imageTrueColor=QColor(ge.attribute("image_truecolor", "blue"));
+                    graph.imageTrueColor=QStringToQColor(ge.attribute("image_truecolor", "blue"));
                     graph.imageTrueTransparent=ge.attribute("image_truecolor_trans", "0.5").toDouble();
-                    graph.imageFalseColor=QColor(ge.attribute("image_falsecolor", "red"));
+                    graph.imageFalseColor=QStringToQColor(ge.attribute("image_falsecolor", "red"));
                     graph.imageFalseTransparent=ge.attribute("image_falsecolor_trans", "1.0").toDouble();
                     graph.imagePixelWidth=ge.attribute("image_pixelwidth", "1").toInt();
                     graph.imageX=ge.attribute("image_x", "0").toDouble();

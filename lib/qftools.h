@@ -195,6 +195,12 @@ QFLIB_EXPORT double CQStringToDouble(QString value);
 */
 QFLIB_EXPORT bool QStringToBool(const QString& data);
 
+/*! \brief convert a string \a data to a QColor
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QColor QStringToQColor(const QString& data);
+
 /*! \brief convert a bool \a data to a string
     \ingroup qf3lib_tools
 

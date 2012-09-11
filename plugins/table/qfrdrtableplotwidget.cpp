@@ -134,8 +134,8 @@ void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
     reloadColumns(ui->cmbLinesXError);
     reloadColumns(ui->cmbLinesYData);
     reloadColumns(ui->cmbLinesYError);
-    connectWidgets();
     updating=false;
+    connectWidgets();
     listGraphs_currentRowChanged(ui->listGraphs->currentRow());
 }
 
@@ -439,6 +439,8 @@ void QFRDRTablePlotWidget::graphDataChanged() {
                 graph.errorColor=graph.color.darker();
                 ui->cmbErrorColor->setCurrentColor(graph.errorColor);
             }
+            qDebug()<<graph.fillColor.name()<<oldDefaultFillColor.name();
+
             if (graph.fillColor!=oldDefaultFillColor) graph.fillColor=ui->cmbFillColor->currentColor();
             else {
                 graph.fillColor=graph.color.lighter();
@@ -785,6 +787,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtStepsHorizontal) {
                 JKQTPstepHorizontalGraph* pg=new JKQTPstepHorizontalGraph(ui->plotter->get_plotter());
+                pg->set_fillCurve(true);
                 pg->set_title(g.title);
                 if (g.xcolumn>=0 && g.xcolumn<ui->plotter->getDatastore()->getColumnCount())  pg->set_yColumn(g.xcolumn);
                 if (g.ycolumn>=0 && g.ycolumn<ui->plotter->getDatastore()->getColumnCount()) pg->set_xColumn(g.ycolumn);
@@ -849,6 +852,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor efc=g.errorColor;
                 efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
                 //pg->set_errorFillColor(efc);
+                pg->set_fillCurve(true);
 
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);

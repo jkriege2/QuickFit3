@@ -262,6 +262,12 @@ bool QStringToBool(const QString& data){
     return false;
 }
 
+QColor QStringToQColor(const QString& data) {
+    QString d=data;
+    if (d.startsWith("#")) d=d.replace(' ', '0');
+    return QColor(d);
+}
+
 bool touchFile(const QString& filename) {
     if (QFile::exists(filename)) return true;
     QFile f(filename);
