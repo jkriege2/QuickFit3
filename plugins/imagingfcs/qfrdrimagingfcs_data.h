@@ -14,6 +14,7 @@
 #include "qfrawdatarecord.h"
 #include "qfrdrimagingfcs_dataeditor.h"
 #include "qfrdrimagingfcs_dataeditor_image.h"
+#include "qfrdrimagingfcs_dataeditor_countrate.h"
 #include "qfrawdatarecordfactory.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
 #include "../interfaces/qfrdrimagetoruninterface.h"
@@ -58,7 +59,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief return a large icon (32x32) */
         virtual QIcon getLargeIcon() const { return QIcon(":/imaging_fcs/qfrdrimagingfcs.png"); }
         /** \brief returns the number of additional editor panes for this record */
-        virtual int getEditorCount() { return 3; }
+        virtual int getEditorCount();
         /** \brief returns the name for the i-th editor pane */
         virtual QString getEditorName(int i);
         /** \brief create an object for the i-th editor pane */
@@ -299,6 +300,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         struct ovrImageData {
             double* image;
             QString name;
+            QString id;
             int width;
             int height;
             QList<QFRDROverviewImageInterface::OverviewImageGeoElement> geoElements;
@@ -306,6 +308,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
             ovrImageData() {
                 image=NULL;
                 name=QString("");
+                id="";
                 width=0;
                 height=0;
             }
@@ -377,6 +380,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual int getOverviewImageHeight(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageName() */
         virtual QString getOverviewImageName(int image) const;
+        virtual QString getOverviewImageID(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImage() */
         virtual double* getOverviewImage(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageGeoElements() */

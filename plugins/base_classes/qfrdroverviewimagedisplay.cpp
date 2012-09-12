@@ -325,6 +325,7 @@ void QFRDROverviewImageDisplay::imageRectangleFinished(double x, double y, doubl
     //qDebug()<<selected;
 
     if (modifiers==Qt::ControlModifier) {
+        //qDebug()<<"ctrl";
         for (int yy=yy1; yy<=yy2; yy++) {
             for (int xx=xx1; xx<=xx2; xx++) {
                 int idx=yy*width+xx;
@@ -332,6 +333,7 @@ void QFRDROverviewImageDisplay::imageRectangleFinished(double x, double y, doubl
             }
         }
     } else if (modifiers==Qt::ShiftModifier) {
+        //qDebug()<<"shift";
         for (int yy=yy1; yy<=yy2; yy++) {
             for (int xx=xx1; xx<=xx2; xx++) {
                 int idx=yy*width+xx;
@@ -339,6 +341,7 @@ void QFRDROverviewImageDisplay::imageRectangleFinished(double x, double y, doubl
             }
         }
     } else {
+        //qDebug()<<"other";
         selected.clear();
         for (int yy=yy1; yy<=yy2; yy++) {
             for (int xx=xx1; xx<=xx2; xx++) {
@@ -347,6 +350,8 @@ void QFRDROverviewImageDisplay::imageRectangleFinished(double x, double y, doubl
             }
         }
     }
+
+    //qDebug()<<"imageRectangleFinished():  "<<selected_width<<selected_height<<width<<height;
     //qDebug()<<selected;
     replotSelection(true);
 }
@@ -585,10 +590,11 @@ void QFRDROverviewImageDisplay::rawDataChanged()
 void QFRDROverviewImageDisplay::showFrame(int frame) {
     pltImage->set_doDrawing(false);
     current->setQFProperty("imfcs_invrimgdisp_playpos", player->getPosition(), false, false);
+    pltImage->getDatastore()->clear();
 
     QFRDROverviewImageInterface* m=qobject_cast<QFRDROverviewImageInterface*>(current);
     QFRDRImageStackInterface* mv=qobject_cast<QFRDRImageStackInterface*>(current);
-    if (m && mv && cmbImage->currentIndex()-m->getOverviewImageCount()<mv->getImageStackCount()) {
+    if (m && mv && cmbImage->currentIndex()-m->getOverviewImageCount()>=0 && cmbImage->currentIndex()-m->getOverviewImageCount()<mv->getImageStackCount()) {
         int idx=cmbImage->currentIndex()-m->getOverviewImageCount();
         int width=mv->getImageStackWidth(idx);
         int height=mv->getImageStackHeight(idx);
@@ -601,6 +607,15 @@ void QFRDROverviewImageDisplay::showFrame(int frame) {
             selected_height=height;
             replotSelection(false);
         }
+
+        int scnt=0;
+        for (int ii=0; ii<selected_width*selected_height; ii++)  {
+            if (plteOverviewSelectedData[ii]) scnt++;
+        }
+        //qDebug()<<idx<<":   "<<mv->getImageStack(idx, frame)<<width<<height<<"   "<<plteOverviewSelectedData<<selected_width<<selected_height<<"    "<<pltImage->getGraphCount()<<plteSelected->get_visible()<<scnt;
+
+        pltImage->getDatastore()->addCopiedColumn(mv->getImageStack(idx, frame), width*height, mv->getImageStackDescription(idx));
+        pltImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, selected_width*selected_height, tr("mask"));
 
         if (chkHistVideo->isChecked()) showHistograms(mv->getImageStack(idx, frame), width*height);
         histogram->setEnabled(chkHistVideo->isChecked());
@@ -641,6 +656,9 @@ void QFRDROverviewImageDisplay::displayImage() {
             selected_height=height;
             replotSelection(false);
         }
+
+        pltImage->getDatastore()->addCopiedColumn(m->getOverviewImage(cmbImage->currentIndex()), width*height, cmbImage->currentText());
+        pltImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, selected_width*selected_height, tr("mask"));
 
         histogram->setEnabled(true);
         showHistograms(m->getOverviewImage(cmbImage->currentIndex()), width*height);
@@ -685,6 +703,16 @@ void QFRDROverviewImageDisplay::displayImage() {
         image->set_data(mv->getImageStack(idx, 0), width, height, JKQTPMathImageBase::DoubleArray);
         image->set_width(rwidth);
         image->set_height(rheight);
+
+        if (selected_width!=width || selected_height!=height) {
+            selected.clear();
+            selected_width=width;
+            selected_height=height;
+            replotSelection(false);
+        }
+
+        pltImage->getDatastore()->addCopiedColumn(mv->getImageStack(idx, 0), width*height, cmbImage->currentText());
+        pltImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, selected_width*selected_height, tr("mask"));
 
         if (chkHistVideo->isChecked()) showHistograms(mv->getImageStack(idx, 0), width*height);
         histogram->setEnabled(chkHistVideo->isChecked());
@@ -752,6 +780,7 @@ void QFRDROverviewImageDisplay::updateSelectionArrays() {
     double* d=(double*)image->get_data();
     int Nx=image->get_Nx();
     int Ny=image->get_Ny();
+    //qDebug()<<"updateSelectionArrays():   "<<d<<Nx<<Ny<<selected_width<<selected_height;
     if (d && Nx>0 && Ny>0) {
         if (selected_width!=Nx || selected_height!=Ny) {
             selected.clear();
@@ -759,7 +788,7 @@ void QFRDROverviewImageDisplay::updateSelectionArrays() {
             selected_height=Ny;
         }
         int siz=selected_width*selected_height;
-        if (plteOverviewSize<siz) {
+        if (plteOverviewSize!=siz) {
             plteOverviewSize=siz;
             plteOverviewSelectedData=(bool*)realloc(plteOverviewSelectedData, plteOverviewSize*sizeof(bool));
         }
@@ -771,11 +800,13 @@ void QFRDROverviewImageDisplay::updateSelectionArrays() {
             plteOverviewSelectedData[i]=false;
         }
     }
+    //qDebug()<<"updateSelectionArrays():   "<<d<<Nx<<Ny<<plteOverviewSelectedData<<selected_width<<selected_height;
 }
 
 void QFRDROverviewImageDisplay::replotSelection(bool replot) {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    //QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    QFRDROverviewImageInterface* m=qobject_cast<QFRDROverviewImageInterface*>(current);
+    QFRDRImageStackInterface* mv=qobject_cast<QFRDRImageStackInterface*>(current);
 
     updateSelectionArrays();
 
@@ -799,13 +830,18 @@ void QFRDROverviewImageDisplay::replotSelection(bool replot) {
         plteSelected->set_height(h);
         plteSelected->set_data(plteOverviewSelectedData, selected_width, selected_height);
 
+        //qDebug()<<"replotSelection("<<replot<<"):   "<<plteOverviewSelectedData<<selected_width<<selected_height;
+
         labImageAvg->setTextFormat(Qt::RichText);
         labImageAvg->setText(tr("avg&plusmn;SD(param img) = %1 &plusmn; %2").arg(ovrAvg).arg(sqrt(ovrVar)));
 
 
     }
 
-    if (replot) displayImage();
+    if (replot) {
+        if (cmbImage->currentIndex()<m->getOverviewImageCount()) displayImage();
+        else showFrame(player->getPosition());
+    }
     QApplication::restoreOverrideCursor();
 }
 

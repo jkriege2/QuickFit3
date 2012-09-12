@@ -449,7 +449,7 @@ void QFRDRImagingFCSCorrelationDialog::updateProgress() {
 
 
 IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
-    updateFromFile(false); // make sure that inputconfigfile cintains the settings file for the input (if it exists)
+    //updateFromFile(false); // make sure that inputconfigfile cintains the settings file for the input (if it exists)
     IMFCSJob job;
     job.progress=NULL;
     job.thread=NULL;

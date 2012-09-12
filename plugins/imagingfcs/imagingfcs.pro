@@ -43,7 +43,8 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcscopydataselectdialog.h \
     ../interfaces/qfrdrimageselectioninterface.h \
     ../base_classes/qfrdroverviewimagedisplay.h \
-    ../interfaces/qfrdrrunselection.h
+    ../interfaces/qfrdrrunselection.h \
+    qfrdrimagingfcs_dataeditor_countrate.h
 
 
 SOURCES += qfrdrimagingfcs.cpp \
@@ -64,7 +65,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     ../base_classes/qfrdrimagingfcstools.cpp \
     qfrdrimagingfcsseriesdialog.cpp \
     qfrdrimagingfcscopydataselectdialog.cpp \
-    ../base_classes/qfrdroverviewimagedisplay.cpp
+    ../base_classes/qfrdroverviewimagedisplay.cpp \
+    qfrdrimagingfcs_dataeditor_countrate.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \

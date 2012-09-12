@@ -81,17 +81,24 @@ QFRDRImagingFCSData::~QFRDRImagingFCSData() {
      videoUncorrected_width=videoUncorrected_height=videoUncorrected_frames=0;
 }
 
+int QFRDRImagingFCSData::getEditorCount()
+{
+    return 4;
+}
+
 QString QFRDRImagingFCSData::getEditorName(int i) {
     if (i==0) return tr("Parameter Image");
     if (i==1) return tr("Correlation Curves");
-    if (i==2) return tr("Images, Videos & Timetrace");
+    if (i==2) return tr("Countrate/Intensity Trace");
+    if (i==3) return tr("Images, Videos & Timetrace");
     return QString("");
 };
 
 QFRawDataEditor* QFRDRImagingFCSData::createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i, QWidget* parent) {
     if (i==0) return new QFRDRImagingFCSImageEditor(services, propEditor, parent);
     if (i==1) return new QFRDRImagingFCSDataEditor(services, propEditor, parent);
-    if (i==2) return new QFRDRImagingFCSOverviewRateEditor(services, propEditor, parent);
+    if (i==2) return new QFRDRImagingFCSDataEditorCountrate(services, propEditor, parent);
+    if (i==3) return new QFRDRImagingFCSOverviewRateEditor(services, propEditor, parent);
     return NULL;
 };
 
@@ -263,22 +270,26 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     loadVideo(files[i], &videoUncorrected, &videoUncorrected_width, &videoUncorrected_height, &videoUncorrected_frames, facA, facOffset);
                 } else if (ft=="background") {
                     QFRDRImagingFCSData::ovrImageData img;
+                    img.id=ft;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=tr("background frame");
                     ovrImages.append(img);
                 } else if (ft=="background_stddev") {
                     QFRDRImagingFCSData::ovrImageData img;
+                    img.id=ft;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=tr("background standard deviation frame");
                     ovrImages.append(img);
                 } else if (ft=="display_image") {
                     QFRDRImagingFCSData::ovrImageData img;
+                    img.id=ft;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=files_desciptions.value(i, tr("image #%1: %2").arg(i+1).arg(QFileInfo(files[i]).fileName()));
                     if (img.name.isEmpty()) img.name=tr("image #%1: %2").arg(i+1).arg(QFileInfo(files[i]).fileName());
                     ovrImages.append(img);
                 } else if (ft=="overview_before") {
                     QFRDRImagingFCSData::ovrImageData img;
+                    img.id=ft;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=tr("overview before acquisition");
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
@@ -294,6 +305,7 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     ovrImages.append(img);
                 } else if (ft=="overview_after") {
                     QFRDRImagingFCSData::ovrImageData img;
+                    img.id=ft;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=tr("overview after acquisition");
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
@@ -309,6 +321,7 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     ovrImages.append(img);
                 } else if (ft=="overview_before_transmission") {
                     QFRDRImagingFCSData::ovrImageData img;
+                    img.id=ft;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=tr("overview before acquisition (transm. illumination)");
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
@@ -324,6 +337,7 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     ovrImages.append(img);
                 } else if (ft=="overview_after_transmission") {
                     QFRDRImagingFCSData::ovrImageData img;
+                    img.id=ft;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=tr("overview after acquisition (transm. illumination)");
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
@@ -339,6 +353,7 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     ovrImages.append(img);
                 } else if (ft.startsWith("overview_")) {
                     QFRDRImagingFCSData::ovrImageData img;
+                    img.id=ft;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=files_desciptions.value(i, ft);
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
@@ -1524,6 +1539,11 @@ QString QFRDRImagingFCSData::getOverviewImageName(int image) const {
     return QString("");
 }
 
+QString QFRDRImagingFCSData::getOverviewImageID(int image) const {
+    if (image>1 && image-1<=ovrImages.size()) return ovrImages[image-2].id;
+    return QString("");
+}
+
 double *QFRDRImagingFCSData::getOverviewImage(int image) const {
     if (image==0) return overviewF;
     //qDebug()<<"overviewFSTD="<<overviewFSTD;
@@ -1573,11 +1593,11 @@ double *QFRDRImagingFCSData::getImageStack(int stack, uint32_t frame, uint32_t c
 }
 
 double QFRDRImagingFCSData::getImageStackXUnitFactor(int stack) const {
-    return getProperty("PIXEL_WIDTH", 1.0).toDouble();
+    return 1;//getProperty("PIXEL_WIDTH", 1.0).toDouble();
 }
 
 QString QFRDRImagingFCSData::getImageStackXUnitName(int stack) const {
-    return QString("micrometer");
+    return tr("pixel"); //QString("micrometer");
 }
 
 QString QFRDRImagingFCSData::getImageStackXName(int stack) const {
@@ -1585,11 +1605,11 @@ QString QFRDRImagingFCSData::getImageStackXName(int stack) const {
 }
 
 double QFRDRImagingFCSData::getImageStackYUnitFactor(int stack) const {
-    return getProperty("PIXEL_HEIGHT", 1.0).toDouble();
+    return 1; //getProperty("PIXEL_HEIGHT", 1.0).toDouble();
 }
 
 QString QFRDRImagingFCSData::getImageStackYUnitName(int stack) const {
-    return QString("micrometer");
+    return tr("pixel"); //QString("micrometer");
 }
 
 QString QFRDRImagingFCSData::getImageStackYName(int stack) const {

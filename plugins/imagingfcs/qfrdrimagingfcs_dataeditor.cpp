@@ -309,7 +309,7 @@ void QFRDRImagingFCSDataEditor::slidersChanged(int userMin, int userMax, int min
         return;
     }
 
-    qDebug()<<"sliderChanged()";
+    //qDebug()<<"sliderChanged()";
     bool dodraw=plotter->get_doDrawing();
     bool doemit=plotter->get_emitSignals();
     plotter->set_doDrawing(false);
@@ -327,7 +327,7 @@ void QFRDRImagingFCSDataEditor::slidersChanged(int userMin, int userMax, int min
     if (dodraw) plotter->set_emitSignals(true);
 
     QApplication::restoreOverrideCursor();
-    qDebug()<<"sliderChanged() ... done";
+    //qDebug()<<"sliderChanged() ... done";
 
 }
 

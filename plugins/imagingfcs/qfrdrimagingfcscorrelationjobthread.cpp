@@ -638,7 +638,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         //************** SAVE VIDEO
                         if ((m_status==1) && !was_canceled && video_uncorrected && real_video_count>0 ) {
                             emit messageChanged(tr("saving uncorrected video ..."));
-                            QString localFilename=videoFilename=outputFilenameBase+".videouncorr.tif";
+                            QString localFilename=videoUncorrectedFilename=outputFilenameBase+".videouncorr.tif";
                             TinyTIFFFile* tif=TinyTIFFWriter_open(localFilename.toAscii().data(), 16, frame_width, frame_height);
                             //TIFF* tif = TIFFOpen(localFilename.toAscii().data(),"w");
                             if (tif) {

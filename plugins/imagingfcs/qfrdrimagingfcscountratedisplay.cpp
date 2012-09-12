@@ -190,9 +190,9 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
 
         int ucolT=ds->addColumn(m->getUncorrectedStatisticsT(), m->getUncorrectedStatisticsN(), "uncorrected time");
         int ucolAvg=ds->addColumn(m->getUncorrectedStatisticsMean(), m->getUncorrectedStatisticsN(), "uncorrected avg");
-        int icolStddev=ds->addColumn(m->getUncorrectedStatisticsStdDev(), m->getUncorrectedStatisticsN(), "uncorrected stddev");
-        int icolMin=ds->addColumn(m->getUncorrectedStatisticsMin(), m->getUncorrectedStatisticsN(), "uncorrected min");
-        int icolMax=ds->addColumn(m->getUncorrectedStatisticsMax(), m->getUncorrectedStatisticsN(), "uncorrected max");
+        int ucolStddev=ds->addColumn(m->getUncorrectedStatisticsStdDev(), m->getUncorrectedStatisticsN(), "uncorrected stddev");
+        int ucolMin=ds->addColumn(m->getUncorrectedStatisticsMin(), m->getUncorrectedStatisticsN(), "uncorrected min");
+        int ucolMax=ds->addColumn(m->getUncorrectedStatisticsMax(), m->getUncorrectedStatisticsN(), "uncorrected max");
 
         double varAvg;
         double meanAvg=statisticsAverageVariance(varAvg, m->getStatisticsMean(), m->getStatisticsN());
@@ -402,35 +402,39 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
             dispMean=bmeanMax; dispStddev=sqrt(bvarMax);
             data=m->getBackgroundStatisticsMax();
             dataN=m->getBackgroundStatisticsN();
+
+
+
+
         } else if (ui->cmbGraph->currentIndex()==12) {
-            avgGraph->set_xColumn(bcolT);
-            avgGraph->set_yColumn(bcolAvg);
-            avgGraph->set_yErrorColumn(bcolStddev);
+            avgGraph->set_xColumn(ucolT);
+            avgGraph->set_yColumn(ucolAvg);
+            avgGraph->set_yErrorColumn(ucolStddev);
             avgGraph->set_title(tr("avg \\pm stddev"));
             minGraph->set_xColumn(-1);
             minGraph->set_yColumn(-1);
             maxGraph->set_xColumn(-1);
             maxGraph->set_yColumn(-1);
-            dispMean=bmeanAvg; dispStddev=sqrt(bvarAvg);
+            dispMean=bmeanAvg; dispStddev=sqrt(uvarAvg);
             data=m->getUncorrectedStatisticsMean();
             dataN=m->getUncorrectedStatisticsN();
         } else if (ui->cmbGraph->currentIndex()==13) {
-            avgGraph->set_xColumn(bcolT);
-            avgGraph->set_yColumn(bcolAvg);
-            avgGraph->set_yErrorColumn(bcolStddev);
-            minGraph->set_xColumn(bcolT);
-            minGraph->set_yColumn(bcolMin);
-            maxGraph->set_xColumn(bcolT);
-            maxGraph->set_yColumn(bcolMax);
+            avgGraph->set_xColumn(ucolT);
+            avgGraph->set_yColumn(ucolAvg);
+            avgGraph->set_yErrorColumn(ucolStddev);
+            minGraph->set_xColumn(ucolT);
+            minGraph->set_yColumn(ucolMin);
+            maxGraph->set_xColumn(ucolT);
+            maxGraph->set_yColumn(ucolMax);
             avgGraph->set_title(tr("avg \\pm stddev"));
             minGraph->set_title(tr("minimum"));
             maxGraph->set_title(tr("maximum"));
-            dispMean=bmeanAvg; dispStddev=sqrt(bvarAvg);
+            dispMean=umeanAvg; dispStddev=sqrt(uvarAvg);
             data=m->getUncorrectedStatisticsMean();
             dataN=m->getUncorrectedStatisticsN();
         } else if (ui->cmbGraph->currentIndex()==14) {
-            avgGraph->set_xColumn(bcolT);
-            avgGraph->set_yColumn(bcolAvg);
+            avgGraph->set_xColumn(ucolT);
+            avgGraph->set_yColumn(ucolAvg);
             avgGraph->set_yErrorColumn(-1);
             minGraph->set_xColumn(-1);
             minGraph->set_yColumn(-1);
@@ -439,12 +443,12 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
             avgGraph->set_title(tr("average"));
             minGraph->set_title("");
             maxGraph->set_title("");
-            dispMean=bmeanAvg; dispStddev=sqrt(bvarAvg);
+            dispMean=umeanAvg; dispStddev=sqrt(uvarAvg);
             data=m->getUncorrectedStatisticsMean();
             dataN=m->getUncorrectedStatisticsN();
         } else if (ui->cmbGraph->currentIndex()==15) {
-            avgGraph->set_xColumn(bcolT);
-            avgGraph->set_yColumn(bcolStddev);
+            avgGraph->set_xColumn(ucolT);
+            avgGraph->set_yColumn(ucolStddev);
             avgGraph->set_yErrorColumn(-1);
             minGraph->set_xColumn(-1);
             minGraph->set_yColumn(-1);
@@ -453,12 +457,12 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
             avgGraph->set_title(tr("stddev"));
             minGraph->set_title("");
             maxGraph->set_title("");
-            dispMean=bmeanStddev; dispStddev=sqrt(bvarStddev);
+            dispMean=umeanStddev; dispStddev=sqrt(uvarStddev);
             data=m->getUncorrectedStatisticsStdDev();
             dataN=m->getUncorrectedStatisticsN();
         } else if (ui->cmbGraph->currentIndex()==16) {
-            avgGraph->set_xColumn(bcolT);
-            avgGraph->set_yColumn(bcolMin);
+            avgGraph->set_xColumn(ucolT);
+            avgGraph->set_yColumn(ucolMin);
             avgGraph->set_yErrorColumn(-1);
             minGraph->set_xColumn(-1);
             minGraph->set_yColumn(-1);
@@ -467,12 +471,12 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
             avgGraph->set_title(tr("minimum"));
             minGraph->set_title("");
             maxGraph->set_title("");
-            dispMean=bmeanMin; dispStddev=sqrt(bvarMin);
+            dispMean=umeanMin; dispStddev=sqrt(uvarMin);
             data=m->getUncorrectedStatisticsMin();
             dataN=m->getUncorrectedStatisticsN();
         } else if (ui->cmbGraph->currentIndex()==17) {
-            avgGraph->set_xColumn(bcolT);
-            avgGraph->set_yColumn(bcolMax);
+            avgGraph->set_xColumn(ucolT);
+            avgGraph->set_yColumn(ucolMax);
             avgGraph->set_yErrorColumn(-1);
             minGraph->set_xColumn(-1);
             minGraph->set_yColumn(-1);
@@ -481,7 +485,7 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
             avgGraph->set_title(tr("maximum"));
             minGraph->set_title("");
             maxGraph->set_title("");
-            dispMean=bmeanMax; dispStddev=sqrt(bvarMax);
+            dispMean=umeanMax; dispStddev=sqrt(uvarMax);
             data=m->getUncorrectedStatisticsMax();
             dataN=m->getUncorrectedStatisticsN();
         }
@@ -504,9 +508,9 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
 
 double ffExp( double t, const double *par )
 {
-    const double tau=par[2];
+    const double tau=par[0];
     const double A=par[1];
-    const double B=par[0];
+    const double B=par[2];
     return B+A*exp(-t/tau);
 
 }
@@ -547,9 +551,9 @@ void QFRDRImagingFCSCountrateDisplay::calcExpFit() {
     double start=statisticsAverage(data, qMin(5,dataN));
     double end=statisticsAverage(&(data[qMax(0,dataN-6)]), qMin(5,dataN));
     double Tmax=dataT[dataN-1];
-    expParam[0]=end;
+    expParam[2]=end;
     expParam[1]=start-end;
-    expParam[2]=Tmax/2;
+    expParam[0]=Tmax/2;
     //lmmin( 3, par, end-start+1, (const void*) &avg[start], fExpC, &control, &status, NULL );
     lmcurve_fit2(3, expParam, dataN, dataT, data, ffExp, &control, &status);
 
@@ -560,9 +564,9 @@ void QFRDRImagingFCSCountrateDisplay::calcExpFit() {
     ui->edtData->setText(result);
     current->setQFProperty("imfcs_crddisplay_fitresults", result);
     current->setQFProperty("imfcs_crddisplay_fitfunc", "exp");
-    current->setQFProperty("imfcs_crddisplay_fitparam_exp_0", expParam[0]);
+    current->setQFProperty("imfcs_crddisplay_fitparam_exp_0", expParam[2]);
     current->setQFProperty("imfcs_crddisplay_fitparam_exp_1", expParam[1]);
-    current->setQFProperty("imfcs_crddisplay_fitparam_exp_2", expParam[2]);
+    current->setQFProperty("imfcs_crddisplay_fitparam_exp_2", expParam[0]);
 
     updateFitFuncPlot();
     QApplication::restoreOverrideCursor();
