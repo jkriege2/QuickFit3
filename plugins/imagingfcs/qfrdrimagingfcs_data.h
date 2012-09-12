@@ -214,8 +214,11 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief load an image file into the given arrays */
         bool loadImage(const QString &filename, double **data, int *width, int *height);
 
-        /** \brief load a TIFF video file into the given arrays */
-        bool loadVideo(const QString &filename, double **data, int *width, int *height, uint32_t *frames);
+        /*! \brief load a TIFF video file into the given arrays
+
+            If the image contains a 16-bit uint image, the video will be scales using the given factor: Iout=scaleOffset+scaleFactor*Iin
+         */
+        bool loadVideo(const QString &filename, double **data, int *width, int *height, uint32_t *frames, double scaleFactor=1, double scaleOffset=0);
 
         /** \brief load the statistics file */
         bool loadStatistics(const QString& filename);
@@ -312,6 +315,11 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         int video_width;
         int video_height;
         uint32_t video_frames;
+
+        double* videoUncorrected;
+        int videoUncorrected_width;
+        int videoUncorrected_height;
+        uint32_t videoUncorrected_frames;
 
         QList<ovrImageData> ovrImages;
 

@@ -770,6 +770,7 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
         QList<QPair<QString,QString> > colnames=rdrCalcMatchingResultsNamesAndLabels(evalFilter);
         QList<QPair<QPointer<QFRawDataRecord>, QString> > records=rdrCalcMatchingResults(evalFilter);
         QLocale loc=QLocale::c();
+        loc.setNumberOptions(QLocale::OmitGroupSeparator);
 
 
         QMap<int, int> subcolumns;

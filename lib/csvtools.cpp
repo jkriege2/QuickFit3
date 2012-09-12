@@ -7,6 +7,7 @@
 QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_char, double non_value) {
     const QString line=f.readLine();
     QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
     //qDebug()<<"line='"<<line;
     QVector<double> result;
     bool done=false;

@@ -30,6 +30,7 @@ class QFRDRImagingFCSCorrelationJobThread; // forward
 #define BLEACH_NONE 0
 #define BLEACH_REMOVEAVG 1
 #define BLEACH_EXP 2
+#define BLEACH_EXPREG 3
 
 /*! \brief job description for correlation
     \ingroup qf3rdrdp_imaging_fcs
@@ -399,7 +400,10 @@ data                                                   size [bytes]             
     uint32_t frame_height;
     float* average_frame;
     float* sqrsum_frame;
+    float* average_uncorrected_frame;
+    float* sqrsum_uncorrected_frame;
     float* video;
+    float* video_uncorrected;
     uint32_t video_count;
     uint32_t real_video_count;
     float frames_min;

@@ -6,6 +6,7 @@
 #include <QKeyEvent>
 #include <QAction>
 #include "qftools.h"
+#include <QLocale>
 
 QEnhancedTableView::QEnhancedTableView(QWidget* parent):
     QTableView(parent)
@@ -35,6 +36,8 @@ void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead) {
     if (!model()) return;
     if (!selectionModel()) return;
     QModelIndexList sel=selectionModel()->selectedIndexes();
+    QLocale loc=QLocale::system();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
     if (sel.size()==1) {
         QVariant vdata=sel[0].data(copyrole);
         QString txt="";
@@ -47,10 +50,10 @@ void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead) {
                 txt=vdata.toString();
                 break;
             case QVariant::Double:
-                txt=QLocale().toString(vdata.toDouble());
+                txt=loc.toString(vdata.toDouble());
                 break;
             case QVariant::PointF:
-                txt=QLocale().toString(vdata.toPointF().x());
+                txt=loc.toString(vdata.toPointF().x());
                 break;
             default:
                 txt=QString("\"%1\"").arg(vdata.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
@@ -120,10 +123,10 @@ void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead) {
                     txt=vdata.toString();
                     break;
                 case QVariant::Double:
-                    txt=QLocale().toString(vdata.toDouble());
+                    txt=loc.toString(vdata.toDouble());
                     break;
                 case QVariant::PointF:
-                    txt=QLocale().toString(vdata.toPointF().x());
+                    txt=loc.toString(vdata.toPointF().x());
                     break;
                 default:
                     txt=QString("\"%1\"").arg(vdata.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
@@ -183,6 +186,8 @@ void QEnhancedTableView::copySelectionAsValueErrorToExcel(int valuerole, int err
         int rowcnt=rowlist.size();
         int colcnt=collist.size();
         QList<QStringList> data;
+        QLocale loc=QLocale::system();
+        loc.setNumberOptions(QLocale::OmitGroupSeparator);
 
         // header row:
         //
@@ -240,10 +245,10 @@ void QEnhancedTableView::copySelectionAsValueErrorToExcel(int valuerole, int err
                     txt=vdata.toString();
                     break;
                 case QVariant::Double:
-                    txt=QLocale().toString(vdata.toDouble());
+                    txt=loc.toString(vdata.toDouble());
                     break;
                 case QVariant::PointF:
-                    txt=QLocale().toString(vdata.toPointF().x());
+                    txt=loc.toString(vdata.toPointF().x());
                     break;
                 default:
                     txt=QString("\"%1\"").arg(vdata.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
@@ -258,10 +263,10 @@ void QEnhancedTableView::copySelectionAsValueErrorToExcel(int valuerole, int err
                     etxt=edata.toString();
                     break;
                 case QVariant::Double:
-                    etxt=QLocale().toString(edata.toDouble());
+                    etxt=loc.toString(edata.toDouble());
                     break;
                 case QVariant::PointF:
-                    etxt=QLocale().toString(edata.toPointF().x());
+                    etxt=loc.toString(edata.toPointF().x());
                     break;
                 default:
                     etxt=QString("\"%1\"").arg(edata.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
@@ -328,6 +333,8 @@ void QEnhancedTableView::copySelectionAsMedianQuantilesToExcel(int medianrole, i
         int rowcnt=rowlist.size();
         int colcnt=collist.size();
         QList<QStringList> data;
+        QLocale loc=QLocale::system();
+        loc.setNumberOptions(QLocale::OmitGroupSeparator);
 
         // header row:
         //
@@ -388,10 +395,10 @@ void QEnhancedTableView::copySelectionAsMedianQuantilesToExcel(int medianrole, i
                     txt=vdata.toString();
                     break;
                 case QVariant::Double:
-                    txt=QLocale().toString(vdata.toDouble());
+                    txt=loc.toString(vdata.toDouble());
                     break;
                 case QVariant::PointF:
-                    txt=QLocale().toString(vdata.toPointF().x());
+                    txt=loc.toString(vdata.toPointF().x());
                     break;
                 default:
                     txt=QString("\"%1\"").arg(vdata.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
@@ -406,10 +413,10 @@ void QEnhancedTableView::copySelectionAsMedianQuantilesToExcel(int medianrole, i
                     q25txt=q25data.toString();
                     break;
                 case QVariant::Double:
-                    q25txt=QLocale().toString(q25data.toDouble());
+                    q25txt=loc.toString(q25data.toDouble());
                     break;
                 case QVariant::PointF:
-                    q25txt=QLocale().toString(q25data.toPointF().x());
+                    q25txt=loc.toString(q25data.toPointF().x());
                     break;
                 default:
                     q25txt=QString("\"%1\"").arg(q25data.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
@@ -424,10 +431,10 @@ void QEnhancedTableView::copySelectionAsMedianQuantilesToExcel(int medianrole, i
                     q75txt=q75data.toString();
                     break;
                 case QVariant::Double:
-                    q75txt=QLocale().toString(q75data.toDouble());
+                    q75txt=loc.toString(q75data.toDouble());
                     break;
                 case QVariant::PointF:
-                    q75txt=QLocale().toString(q75data.toPointF().x());
+                    q75txt=loc.toString(q75data.toPointF().x());
                     break;
                 default:
                     q75txt=QString("\"%1\"").arg(q75data.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));

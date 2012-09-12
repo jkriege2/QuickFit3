@@ -151,6 +151,7 @@ QString QFRDRImagingFCSCorrelationJobThread::replacePostfixSpecials(const QStrin
     QString bleach="none";
     if (job.bleach==BLEACH_REMOVEAVG) bleach="delavg";
     if (job.bleach==BLEACH_EXP) bleach="exp";
+    if (job.bleach==BLEACH_EXPREG) bleach="expreg";
 
     result=result.replace("%backcorrection%", back, Qt::CaseInsensitive);
     result=result.replace("%correlator%", corr, Qt::CaseInsensitive);
@@ -216,6 +217,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     frame_height=reader->frameHeight();
                     average_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
                     sqrsum_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
+                    average_uncorrected_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
+                    sqrsum_uncorrected_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
 
                     baseline=job.backgroundOffset;
 
@@ -257,6 +260,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     video_count=floor(frames/job.video_frames);
                     real_video_count=video_count;
                     video=(float*)calloc(frame_width*frame_height*video_count, sizeof(float));
+                    video_uncorrected=(float*)calloc(frame_width*frame_height*video_count, sizeof(float));
                     bleachOffset=(float*)calloc(frame_width*frame_height, sizeof(float));
                     bleachAmplitude=(float*)calloc(frame_width*frame_height, sizeof(float));
                     bleachTime=(float*)calloc(frame_width*frame_height, sizeof(float));
@@ -279,10 +283,13 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     QString configFilename=outputFilenameBase+".evalsettings.txt";
                     QString averageFilename="";
                     QString stdFilename="";
+                    QString averageUncorrectedFilename="";
+                    QString stdUncorrectedFilename="";
                     QString backstdFilename="";
                     QString averageFilenameF="";
                     QString backgroundFilename="";
                     QString videoFilename="";
+                    QString videoUncorrectedFilename="";
                     QString statisticsFilename="";
                     QString uncorrectedStatisticsFilename="";
                     QString backstatisticsFilename="";
@@ -368,9 +375,9 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                             }
 
                         }
-                        emit progressIncrement(10);
+                        emit progressIncrement(5);
 
-                        //************** SAVE OVERVIEWSTD  IMAGE
+                        //************** SAVE OVERVIEWSTD IMAGE
                         if ((m_status==1) && !was_canceled && sqrsum_frame) {
                             emit messageChanged(tr("saving overview stddev image ..."));
                             QString localFilename=stdFilename=outputFilenameBase+".overviewstd.tif";
@@ -394,12 +401,61 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 free(sd);
                             } else {
                                 m_status=-1; emit statusChanged(m_status);
-                                averageFilenameF="";
+                                stdFilename="";
                                 emit messageChanged(tr("could not create stddev overview image '%1'!").arg(localFilename));
                             }
 
                         }
-                        emit progressIncrement(10);
+                        emit progressIncrement(5);
+
+                        //************** SAVE UNCORRECTED OVERVIEW IMAGE
+                        if ((m_status==1) && !was_canceled && average_uncorrected_frame) {
+                            emit messageChanged(tr("saving uncorrected overview image ..."));
+                            QString localFilename=averageUncorrectedFilename=outputFilenameBase+".overview_uncorrected.tif";
+                            TIFF* tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                            if (tif) {
+
+                                TIFFTWriteFloat(tif, average_uncorrected_frame, frame_width, frame_height);
+                                TIFFClose(tif);
+                            } else {
+                                m_status=-1; emit statusChanged(m_status);
+                                averageUncorrectedFilename="";
+                                emit messageChanged(tr("could not create uncorrected overview image '%1'!").arg(localFilename));
+                            }
+
+                        }
+                        emit progressIncrement(5);
+
+                        //************** SAVE UNCORRECTED OVERVIEWSTD IMAGE
+                        if ((m_status==1) && !was_canceled && sqrsum_uncorrected_frame && average_uncorrected_frame) {
+                            emit messageChanged(tr("saving uncorrected overview stddev image ..."));
+                            QString localFilename=stdUncorrectedFilename=outputFilenameBase+".overviewstd_uncorrected.tif";
+                            TIFF* tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                            if (tif) {
+                                float* sd=(float*)calloc(frame_width*frame_height, sizeof(float));
+
+                                if (frames>1) {
+                                    for (int i=0; i<frame_width*frame_height; i++) {
+                                        sd[i]=sqrt(double(frames)/double(frames-1)*(sqrsum_uncorrected_frame[i]-average_uncorrected_frame[i]*average_uncorrected_frame[i]));
+                                    }
+                                } else {
+                                    for (int i=0; i<frame_width*frame_height; i++) {
+                                        sd[i]=0;
+                                    }
+
+                                }
+
+                                TIFFTWriteFloat(tif, sd, frame_width, frame_height);
+                                TIFFClose(tif);
+                                free(sd);
+                            } else {
+                                m_status=-1; emit statusChanged(m_status);
+                                stdUncorrectedFilename="";
+                                emit messageChanged(tr("could not create uncorrected stddev overview image '%1'!").arg(localFilename));
+                            }
+
+                        }
+                        emit progressIncrement(5);
 
                         //************** SAVE BACKGROUND IMAGE
                         if ((m_status==1) && !was_canceled && backgroundImage) {
@@ -453,7 +509,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
 
                         //************** SAVE BLEACHING PARAMETERS IMAGE
                         if ((m_status==1) && !was_canceled ) {
-                            if (job.bleach==BLEACH_EXP) {
+                            if (job.bleach==BLEACH_EXP || job.bleach==BLEACH_EXPREG) {
                                 emit messageChanged(tr("saving bleach parameter images ..."));
                                 QString localFilename=bleachOffsetFilename=outputFilenameBase+".bleachoffset.tif";
                                 bool error=false;
@@ -573,6 +629,46 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                             } else {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create video '%1'!").arg(localFilename));
+                            }
+
+                        } else emit progressIncrement(100);
+
+                        double videoUncorrectedAvgMin=0;
+                        double videoUncorrectedAvgMax=(float)0xFFFF;
+                        //************** SAVE VIDEO
+                        if ((m_status==1) && !was_canceled && video_uncorrected && real_video_count>0 ) {
+                            emit messageChanged(tr("saving uncorrected video ..."));
+                            QString localFilename=videoFilename=outputFilenameBase+".videouncorr.tif";
+                            TinyTIFFFile* tif=TinyTIFFWriter_open(localFilename.toAscii().data(), 16, frame_width, frame_height);
+                            //TIFF* tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                            if (tif) {
+                                float avgMin=video_uncorrected[0];
+                                float avgMax=video_uncorrected[0];
+                                for (register uint32_t i=0; i<frame_width*frame_height*video_count; i++) {
+                                    avgMin=(video_uncorrected[i]<avgMin)?video_uncorrected[i]:avgMin;
+                                    avgMax=(video_uncorrected[i]>avgMax)?video_uncorrected[i]:avgMax;
+                                }
+                                uint16_t* img=(uint16_t*)malloc(frame_width*frame_height*sizeof(uint16_t));
+                                for (register uint32_t c=0; c<real_video_count; c++) {
+                                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
+                                        img[i]=(uint16_t)round((float)(video_uncorrected[c*frame_width*frame_height+i]-avgMin)*(float)0xFFFF/fabs(avgMax-avgMin));
+                                    }
+                                    TinyTIFFWriter_writeImage(tif, img);
+                                    if (real_video_count/10>0) {
+                                        if (c%(real_video_count/10)==0) {
+                                            emit messageChanged(tr("saving uncorrected video %1/%2...").arg(c+1).arg(video_count));
+                                            progressIncrement(10);
+                                        }
+                                    }
+                                }
+                                if (real_video_count/10<=0) progressIncrement(100);
+                                free(img);
+                                TinyTIFFWriter_close(tif);
+                                videoUncorrectedAvgMin = avgMin;
+                                videoUncorrectedAvgMax = avgMax;
+                            } else {
+                                m_status=-1; emit statusChanged(m_status);
+                                emit messageChanged(tr("could not create uncorrected video '%1'!").arg(localFilename));
                             }
 
                         } else emit progressIncrement(100);
@@ -862,7 +958,10 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 if (!stdFilename.isEmpty())             text<<"overview std image          : " << d.relativeFilePath(stdFilename) << "\n";
                                 if (!backgroundFilename.isEmpty())      text<<"background image file       : " << d.relativeFilePath(backgroundFilename) << "\n";
                                 if (!backstdFilename.isEmpty())         text<<"background stddev           : " << d.relativeFilePath(backstdFilename) << "\n";
+                                if (!averageUncorrectedFilename.isEmpty())         text<<"uncorr. overview image file : " << d.relativeFilePath(averageUncorrectedFilename) << "\n";
+                                if (!stdUncorrectedFilename.isEmpty())             text<<"uncorr. overview std image  : " << d.relativeFilePath(stdUncorrectedFilename) << "\n";
                                 if (!videoFilename.isEmpty())           text<<"video file                  : " << d.relativeFilePath(videoFilename) << "\n";
+                                if (!videoUncorrectedFilename.isEmpty())text<<"uncorrected video file      : " << d.relativeFilePath(videoUncorrectedFilename) << "\n";
                                 if (!statisticsFilename.isEmpty())      text<<"statistics file             : " << d.relativeFilePath(statisticsFilename) << "\n";
                                 if (!backstatisticsFilename.isEmpty())         text<<"background statistics file  : " << d.relativeFilePath(backstatisticsFilename) << "\n";
                                 if (!uncorrectedStatisticsFilename.isEmpty())  text<<"uncorrected statistics file : " << d.relativeFilePath(uncorrectedStatisticsFilename) << "\n";
@@ -913,6 +1012,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     text<<"video frames                : "<<outLocale.toString(real_video_count) << "\n";
                                     text<<"video avgMin                : "<<outLocale.toString(videoAvgMin) << "\n";
                                     text<<"video avgMax                : "<<outLocale.toString(videoAvgMax) << "\n";
+                                    text<<"video uncorrected avgMin    : "<<outLocale.toString(videoUncorrectedAvgMin) << "\n";
+                                    text<<"video uncorrected avgMax    : "<<outLocale.toString(videoUncorrectedAvgMax) << "\n";
                                 }
                                 if (job.statistics) {
                                     text<<"statistics over             : "<<outLocale.toString(job.statistics_frames) << "\n";
@@ -926,10 +1027,16 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 }
                                 text<<"bleach correction           : ";
                                 if (job.bleach==BLEACH_EXP) {
-                                    text<<"remove mono-exponential f(t)=A*exp(-t/tau)\n";
+                                    text<<"remove mono-exponential f(t)=A*exp(-t/tau) using LM-Fit\n";
                                     text<<"bleach average frames       : "<<outLocale.toString(job.bleachAvgFrames) << "\n";
-                                    //text<<"bleach decay constant [s]   : "<<outLocale.toString((double)job.bleachDecay*job.frameTime) << "\n";
-                                    //text<<"bleach amplitude A          : "<<outLocale.toString((double)job.bleachA) << "\n";
+                                    text<<"bleach amplitude file       : "<<d.relativeFilePath(bleachAmplitudeFilename) << "\n";
+                                    text<<"bleach time file            : "<<d.relativeFilePath(bleachTimeFilename) << "\n";
+                                    text<<"bleach fit success          : "<<d.relativeFilePath(bleachFitSuccessFilename) << "\n";
+                                    text<<"bleach timeseries t file    : "<<d.relativeFilePath(bleachtimesFilename) << "\n";
+                                    text<<"bleach timeseries I file    : "<<d.relativeFilePath(bleachframesFilename) << "\n";
+                                } else if (job.bleach==BLEACH_EXPREG) {
+                                    text<<"remove mono-exponential f(t)=A*exp(-t/tau) using linear regression\n";
+                                    text<<"bleach average frames       : "<<outLocale.toString(job.bleachAvgFrames) << "\n";
                                     text<<"bleach amplitude file       : "<<d.relativeFilePath(bleachAmplitudeFilename) << "\n";
                                     text<<"bleach time file            : "<<d.relativeFilePath(bleachTimeFilename) << "\n";
                                     text<<"bleach fit success          : "<<d.relativeFilePath(bleachFitSuccessFilename) << "\n";
@@ -959,6 +1066,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     }
 
                     if (video) free(video);
+                    if (video_uncorrected) free(video_uncorrected);
                     if (fit_frames) free(fit_frames);
                     if (fit_t) free(fit_t);
                     if (bleachOffset) free(bleachOffset);
@@ -1283,7 +1391,10 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         stat_state_uncorrected.sframe_max=0;
         stat_state_uncorrected.cnt=0;
         stat_state_uncorrected.statFirst=true;
-        stat_state_uncorrected.video_frame=NULL;
+        stat_state_uncorrected.video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
+        for (int64_t i=0; i<frame_width*frame_height; i++)  {
+            stat_state_uncorrected.video_frame[i]=0;
+        }
         statistics_uncorrected_mean.clear();
         statistics_uncorrected_std.clear();
         statistics_uncorrected_min.clear();
@@ -1317,7 +1428,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                     m_status=-1; emit statusChanged(m_status);
                     emit messageChanged(tr("error reading frame: %1").arg(reader->lastError()));
                 } else {
-                    contribute_to_statistics(stat_state_uncorrected, frame_data, frame_width, frame_height, frame, frames, NULL, NULL, NULL, video_frame_num, fframes_min, fframes_max, statistics_uncorrected_time, statistics_uncorrected_mean, statistics_uncorrected_std, statistics_uncorrected_min, statistics_uncorrected_max);
+                    contribute_to_statistics(stat_state_uncorrected, frame_data, frame_width, frame_height, frame, frames, &average_uncorrected_frame, &sqrsum_uncorrected_frame, &video_uncorrected, video_frame_num, fframes_min, fframes_max, statistics_uncorrected_time, statistics_uncorrected_mean, statistics_uncorrected_std, statistics_uncorrected_min, statistics_uncorrected_max);
 
                     float frame_min=frame_data[0];
                     float frame_max=frame_data[0];
@@ -1357,6 +1468,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
 
         }
         free(frame_data);
+        free(stat_state_uncorrected.video_frame);
     }
 
     if (m_status==1 && !was_canceled) {
@@ -1412,7 +1524,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
             emit messageChanged(tr("calculating bleach correction parameters ..."));
             calcBleachCorrection(fit_frames, fit_t, NFitFrames);
             emit messageChanged(tr("applying bleach correction ..."));
-            if (job.bleach==BLEACH_EXP) {
+            if (job.bleach==BLEACH_EXP || job.bleach==BLEACH_EXPREG) {
                 for (register uint64_t t=0; t<frames; t++) {
                     for (register uint64_t i=0; i<frame_width*frame_height; i++) {
                         uint64_t idx=t*frame_width*frame_height+i;
@@ -1425,6 +1537,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                         }
                     }
                 }
+
             } else if (job.bleach==BLEACH_REMOVEAVG) {
                 for (register uint64_t t=0; t<frames; t++) {
                     double avg=0;
@@ -1782,7 +1895,10 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
         stat_state_uncorrected.sframe_max=0;
         stat_state_uncorrected.cnt=0;
         stat_state_uncorrected.statFirst=true;
-        stat_state_uncorrected.video_frame=NULL;
+        stat_state_uncorrected.video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
+        for (int64_t i=0; i<frame_width*frame_height; i++)  {
+            stat_state_uncorrected.video_frame[i]=0;
+        }
         statistics_uncorrected_mean.clear();
         statistics_uncorrected_std.clear();
         statistics_uncorrected_min.clear();
@@ -1807,7 +1923,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                 m_status=-1; emit statusChanged(m_status);
                 emit messageChanged(tr("error reading frame: %1").arg(reader->lastError()));
             } else {
-                contribute_to_statistics(stat_state_uncorrected, frame_data, frame_width, frame_height, frame, frames, NULL, NULL, NULL, video_frame_num, fframes_min, fframes_max, statistics_uncorrected_time, statistics_uncorrected_mean, statistics_uncorrected_std, statistics_uncorrected_min, statistics_uncorrected_max);
+                contribute_to_statistics(stat_state_uncorrected, frame_data, frame_width, frame_height, frame, frames, &average_uncorrected_frame, &sqrsum_uncorrected_frame, &video_uncorrected, video_frame_num, fframes_min, fframes_max, statistics_uncorrected_time, statistics_uncorrected_mean, statistics_uncorrected_std, statistics_uncorrected_min, statistics_uncorrected_max);
 
                 float frame_min=frame_data[0];
                 float frame_max=frame_data[0];
@@ -1843,7 +1959,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
             if (was_canceled) break;
         } while (reader->nextFrame() && (m_status==1) && (frame<frames) && (!was_canceled));
 
-
+        free(stat_state_uncorrected.video_frame);
         free(frame_data);
     }
 
@@ -1993,7 +2109,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     avg=avg+frame_data[i]/ ((double)(frame_width*frame_height));
                 }
 
-                if (job.bleach==BLEACH_EXP) {
+                if (job.bleach==BLEACH_EXP || job.bleach==BLEACH_EXPREG) {
                     for (register uint16 i=0; i<frame_width*frame_height; i++) {
                         if (bleachFitOK[i]!=0) {
                             frame_data[i]=frame_data[i]*firstFrames[i]/(bleachOffset[i]+bleachAmplitude[i]*exp(-1.0*(double)frame/bleachTime[i]));
@@ -2099,13 +2215,63 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                 for (int jj=0; jj<NFitFrames; jj++) {
                     fit_I[jj]=log(fit_frames[jj*frame_width*frame_height+i]);
                 }
-                double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
+
+                double pA=0, pB=0;
+                if (!statisticsLinearRegression(fit_t, fit_I, NFitFrames, pA, pB)) {
+                    pA=fit_I[0];
+                    pB=-1.0/(fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2]));
+                }
+
+
+                //double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
+                double par[2]={pA, -1.0/pB};
                 //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
                 lmcurve_fit(2, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpLin, &control, &status);
                 //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 
                 bleachAmplitude[i]=exp(par[0]);
                 bleachTime[i]=par[1];
+                bleachOffset[i]=0;
+                bleachFitOK[i]=1;
+                double t1=fit_t[NFitFrames/2];
+                double t2=fit_t[2*NFitFrames/3];
+                if ( (!QFFloatIsOK(bleachAmplitude[i]))
+                     || (!QFFloatIsOK(bleachOffset[i]))
+                     || (!QFFloatIsOK(bleachTime[i]))
+                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t1/(bleachTime[i]))))
+                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t2/(bleachTime[i]))))
+                     || (bleachTime[i]==0)
+                     || (std::isinf(bleachTime[i]))
+                     || (std::isinf(bleachAmplitude[i]))
+                     || (bleachAmplitude[i]==0) ) {
+                    bleachFitOK[i]=0;
+                }
+                free(fit_I);
+                if (i%(frame_width*frame_height/20)==0) {
+                    emit messageChanged(tr("calculating bleach correction parameters (%1/%2) ...").arg(i+1).arg(frame_width*frame_height));
+                }
+            }
+        } else {
+            for (uint32_t i=0; i<frame_width*frame_height; i++) {
+                bleachAmplitude[i]=0;
+                bleachOffset[i]=0;
+                bleachTime[i]=1;
+                bleachFitOK[i]=0;
+            }
+        }
+    } else if (job.bleach==BLEACH_EXPREG) {
+        if (fit_frames && fit_t && NFitFrames>2) {
+            for (uint32_t i=0; i<frame_width*frame_height; i++) {
+                double* fit_I=(double*)malloc(NFitFrames*sizeof(double));
+                for (int jj=0; jj<NFitFrames; jj++) {
+                    fit_I[jj]=log(fit_frames[jj*frame_width*frame_height+i]);
+                }
+
+                double pA=0, pB=0;
+                statisticsLinearRegression(fit_t, fit_I, NFitFrames, pA, pB);
+
+                bleachAmplitude[i]=exp(pA);
+                bleachTime[i]=-1.0/pB;
                 bleachOffset[i]=0;
                 bleachFitOK[i]=1;
                 double t1=fit_t[NFitFrames/2];

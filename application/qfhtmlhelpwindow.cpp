@@ -807,7 +807,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
 
 
             // interpret $$math:<latex>$$ items
-            QRegExp rxLaTeX("\\$\\$(math|bmath)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxLaTeX("\\$\\$(math|bmath|mathb)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxLaTeX.setMinimal(true);
             count = 0;
             pos = 0;
@@ -815,7 +815,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                 QString command=rxLaTeX.cap(1).toLower().trimmed();
                 QString latex="$"+rxLaTeX.cap(2).trimmed()+"$";
 
-                if (command=="math" || command=="bmath") {
+                if (command=="math" || command=="bmath" || command=="mathb") {
                     QImage pix(300,100,QImage::Format_ARGB32_Premultiplied);
                     QPainter p(&pix);
                     p.setRenderHint(QPainter::Antialiasing);
@@ -825,7 +825,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                     bool ok=false;
                     QString ht=mathParser.toHtml(&ok);
                     if (ok) {
-                        if (command=="bmath") {
+                        if (command=="bmath" || command=="mathb") {
                             result=result.replace(rxLaTeX.cap(0), QString("<blockquote><font size=\"+2\" face=\"%2\"><i>%1</i></font></blockquote>").arg(ht).arg(mathParser.get_fontRoman()));
                         } else {
                             result=result.replace(rxLaTeX.cap(0), QString("<font face=\"%2\"><i>%1</i></font>").arg(ht).arg(mathParser.get_fontRoman()));
@@ -845,7 +845,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                         //qDebug()<<"latex-render: "<<latex<<"\n    size = "<<size<<"  output = "<<texfilename;
                         pix.save(texfilename);
 
-                        if (command=="bmath") {
+                        if (command=="bmath" || command=="mathb") {
                             result=result.replace(rxLaTeX.cap(0), QString("<blockquote><img style=\"vertical-align: middle;\" alt=\"%1\" src=\"%2\"></blockquote>").arg(latex).arg(texfilename));
                         } else {
                             result=result.replace(rxLaTeX.cap(0), QString("<img style=\"vertical-align: middle;\" alt=\"%1\" src=\"%2\">").arg(latex).arg(texfilename));

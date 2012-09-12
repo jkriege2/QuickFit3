@@ -44,7 +44,12 @@
 	  <blockquote>
 	    $$math:I(x,y,t) = \frac{I(x,y,t)}{\sqrt{f(t)/f(0)}} + f(0) \cdot \left[1-\sqrt{f(t)/f(0)}\right]$$
 	  </blockquote>
-      This correction may be used to remove artifacts due to depletion of the reservoir of fluorophores. See references <a href="#references">[5,6]</a> for details on this method.<br>If the fit to $$math:f(t)$$ does not succeed, the correction is simply not performed, i.e. $$math:f(t)=1$$.
+      This correction may be used to remove artifacts due to depletion of the reservoir of fluorophores. See references <a href="#references">[5,6]</a> for details on this method.<br>If the fit to $$math:f(t)$$ does not succeed, the correction is simply not performed, i.e. $$math:f(t)=1$$.<br>
+	  The fit is either performed with the Levenberg-Marquardt Least-Squares routine (<b>LM-Fit</b>) or by calculating a simple <b>linear regression</b> of $$math:f(t)=a+b\cdot t$$ to the data subset $$math:(t_i, y_i=\log(I_i))_{i=1..N=500}$$:
+	      $$mathb:a=\overline{y}-b\cdot\overline{t}$$
+          $$mathb:b=\frac{\sum t_iy_i-N\cdot\overline{t}\cdot\overline{y}}{\sumx_i^2-N\cdot(\overline{t})^2}$$
+	  Here $$math:\overline{x}=\frac{1}{N}\cdot\sum\limits_{i=1}^Nx_i$$ is the simple average. From these parameters the model parameters may be derived:
+	      $$bmath:A=\exp(a)\ \ \ \ \ \tau_{bleach}=-1/b$$
 	  </li>
 
 	</ul>

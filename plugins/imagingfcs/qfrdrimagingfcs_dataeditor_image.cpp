@@ -4064,6 +4064,7 @@ void QFRDRImagingFCSImageEditor::copyDataAsColumns() {
             }
 
             QLocale loc=QLocale::system();
+            loc.setNumberOptions(QLocale::OmitGroupSeparator);
 
             QStringList pim= QString(image.to_csv_column("\n", '.').c_str()).split('\n');
             QStringList gim= QString(gof_image.to_csv_column("\n", '.').c_str()).split('\n');

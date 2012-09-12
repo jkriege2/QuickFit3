@@ -315,6 +315,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
     QString filename_acquisition="";
     QString filename_mask="";
     QString filename_video="";
+    QString filename_videoUncorrected="";
 
     // add all properties in initParams that will be readonly
     QStringList paramsReadonly;
@@ -460,15 +461,6 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         } else if (name=="statistics over") {
                             initParams["STATISTICS_SUMFRAMES"]=value.toInt();
                             paramsReadonly<<"STATISTICS_SUMFRAMES";
-                        } else if (name=="video sum up") {
-                            initParams["VIDEO_AVGFRAMES"]=value.toInt();
-                            paramsReadonly<<"VIDEO_AVGFRAMES";
-                        } else if (name=="video avgmin") {
-                            initParams["VIDEO_AVGMIN"]=value.toDouble();
-                            paramsReadonly<<"VIDEO_AVGMIN";
-                        } else if (name=="video avgmax") {
-                            initParams["VIDEO_AVGMAX"]=value.toDouble();
-                            paramsReadonly<<"VIDEO_AVGMAX";
                         } else if (name=="duration [s]") {
                             initParams["EVALUATION_DURATION"]=value.toInt();
                             paramsReadonly<<"EVALUATION_DURATION";
@@ -502,6 +494,22 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         } else if (name=="bleach amplitude A") {
                             initParams["BLEACH_CORRECTION_FIT_AMPLITUDE"]=value.toInt();
                             paramsReadonly<<"BLEACH_CORRECTION_FIT_AMPLITUDE";
+                        } else if (name=="video uncorrected avgmin") {
+                            initParams["UNCORRECTEDVIDEO_MIN"]=value.toDouble();
+                            paramsReadonly<<"UNCORRECTEDVIDEO_MIN";
+                        } else if (name=="video uncorrected avgmax") {
+                            initParams["UNCORRECTEDVIDEO_MAX"]=value.toDouble();
+                            paramsReadonly<<"UNCORRECTEDVIDEO_MAX";
+                        } else if (name=="video sum up") {
+                            initParams["VIDEO_AVGFRAMES"]=value.toInt();
+                            paramsReadonly<<"VIDEO_AVGFRAMES";
+                        } else if (name=="video avgmin") {
+                            initParams["VIDEO_AVGMIN"]=value.toDouble();
+                            paramsReadonly<<"VIDEO_AVGMIN";
+                        } else if (name=="video avgmax") {
+                            initParams["VIDEO_AVGMAX"]=value.toDouble();
+                            paramsReadonly<<"VIDEO_AVGMAX";
+
                         /*} else if (name=="") {
                             initParams[""]=value.toInt();
                             paramsReadonly<<"";*/
@@ -525,6 +533,8 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                             filename_backgroundstddev=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="video file") {
                             filename_video=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                        } else if (name=="uncorrected video file") {
+                            filename_videoUncorrected=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="statistics file") {
                             filename_statistics=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
                         } else if (name=="background statistics file") {
@@ -578,7 +588,12 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
             if (QFile::exists(filename_video)) {
                 files<<filename_video;
                 files_types<<"video";
-                files_descriptions<<tr("averaged video");
+                files_descriptions<<tr("time-binned video");
+            }
+            if (QFile::exists(filename_videoUncorrected)) {
+                files<<filename_videoUncorrected;
+                files_types<<"video_uncorrected";
+                files_descriptions<<tr("uncorrected time-binned video");
             }
             if (QFile::exists(filename_statistics)) {
                 files<<filename_statistics;

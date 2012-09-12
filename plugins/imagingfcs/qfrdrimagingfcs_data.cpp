@@ -55,6 +55,10 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     video_height=0;
     video_frames=0;
     hasStatistics=false;
+    videoUncorrected=NULL;
+    videoUncorrected_width=0;
+    videoUncorrected_height=0;
+    videoUncorrected_frames=0;
     statAvgCnt=0;
     statSigmaCnt=0;
     backStatAvgCnt=0;
@@ -72,6 +76,9 @@ QFRDRImagingFCSData::~QFRDRImagingFCSData() {
      if (video) free(video);
      video=NULL;
      video_width=video_height=video_frames=0;
+     if (videoUncorrected) free(videoUncorrected);
+     videoUncorrected=NULL;
+     videoUncorrected_width=videoUncorrected_height=videoUncorrected_frames=0;
 }
 
 QString QFRDRImagingFCSData::getEditorName(int i) {
@@ -235,7 +242,25 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                 } else if (ft=="uncorrected_statistics") {
                     loadUncorrectedStatistics(files[i]);
                 } else if (ft=="video") {
-                    loadVideo(files[i], &video, &video_width, &video_height, &video_frames);
+                    double facOffset=0;
+                    double facA=1;
+                    if (propertyExists("VIDEO_AVGMIN") && propertyExists("VIDEO_AVGMAX")) {
+                        double vidMin=getProperty("VIDEO_AVGMIN").toDouble();
+                        double vidMax=getProperty("VIDEO_AVGMAX").toDouble();
+                        facA=(vidMax-vidMin)/double(0xFFFF);
+                        facOffset=vidMin;
+                    }
+                    loadVideo(files[i], &video, &video_width, &video_height, &video_frames, facA, facOffset);
+                } else if (ft=="video_uncorrected") {
+                    double facOffset=0;
+                    double facA=1;
+                    if (propertyExists("UNCORRECTEDVIDEO_MIN") && propertyExists("UNCORRECTEDVIDEO_MAX")) {
+                        double vidMin=getProperty("UNCORRECTEDVIDEO_MIN").toDouble();
+                        double vidMax=getProperty("UNCORRECTEDVIDEO_MAX").toDouble();
+                        facA=(vidMax-vidMin)/double(0xFFFF);
+                        facOffset=vidMin;
+                    }
+                    loadVideo(files[i], &videoUncorrected, &videoUncorrected_width, &videoUncorrected_height, &videoUncorrected_frames, facA, facOffset);
                 } else if (ft=="background") {
                     QFRDRImagingFCSData::ovrImageData img;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
@@ -491,7 +516,7 @@ bool QFRDRImagingFCSData::loadImage(const QString& filename, double** data, int*
     return ok;
 }
 
-bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int* width, int* height, uint32_t* frames) {
+bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int* width, int* height, uint32_t* frames, double scaleFactor, double scaleOffset) {
     bool ok=false;
 
     if (*data) free(*data);
@@ -507,12 +532,22 @@ bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int*
             uint32 nx,ny;
             TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
             TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
+            uint16 bitspersample;
+            uint16 sampleformat = SAMPLEFORMAT_UINT;
+            TIFFGetField(tif, TIFFTAG_SAMPLEFORMAT, &sampleformat);
+            TIFFGetFieldDefaulted(tif,TIFFTAG_BITSPERSAMPLE,&bitspersample);
+
             *width=nx;
             *height=ny;
             *data=(double*)malloc(nx*ny*(*frames)*sizeof(double));
             uint32_t i=0;
             do {
                 ok=ok & TIFFReadFrame<double>(tif, &((*data)[i*nx*ny]));
+                if (sampleformat == SAMPLEFORMAT_UINT && bitspersample==16 && (scaleFactor!=1.0 || scaleOffset!=0.0)) {
+                    for (int jj=0; jj<nx*ny; jj++) {
+                        (*data)[i*nx*ny+jj]=scaleOffset+(*data)[i*nx*ny+jj]*scaleFactor;
+                    }
+                }
                 i++;
             } while (TIFFReadDirectory(tif) && i<=(*frames));
             TIFFClose(tif);
@@ -1194,56 +1229,97 @@ bool QFRDRImagingFCSData::loadUncorrectedStatistics(const QString &filename) {
     }
     return false;
 }
-void QFRDRImagingFCSData::loadQFPropertiesFromB040SPIMSettingsFile(QSettings &settings) {
-    if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/duration_milliseconds")) {
-        setQFProperty("MEASUREMENT_DURATION_MS", settings.value("acquisition/duration_milliseconds").toDouble(), true, true);
-    }
-    if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/duration")) {
-        setQFProperty("MEASUREMENT_DURATION_MS", settings.value("acquisition/duration").toDouble()*1000.0, true, true);
-    }
-    if (!propertyExists("FRAMETIME_MS") && settings.contains("acquisition/frame_time")) {
-        setQFProperty("FRAMETIME_MS", settings.value("acquisition/frame_time").toDouble()*1000.0, true, true);
-    }
-    if (!propertyExists("FRAMETIME_MS") && settings.contains("acquisition/frame_rate")) {
-        setQFProperty("FRAMETIME_MS", 1.0/settings.value("acquisition/frame_rate").toDouble()*1000.0, true, true);
-    }
-    if (!propertyExists("MAGNIFICATION") && settings.contains("acquisition/magnification")) {
-        setQFProperty("MAGNIFICATION", settings.value("acquisition/magnification").toDouble(), true, true);
-    }
-    if (!propertyExists("ROI_X_START") && settings.contains("acquisition/roi_xstart")) {
-        setQFProperty("ROI_X_START", settings.value("acquisition/roi_xstart").toInt(), true, true);
-    }
-    if (!propertyExists("ROI_X_END") && settings.contains("acquisition/roi_xend")) {
-        setQFProperty("ROI_X_END", settings.value("acquisition/roi_xend").toInt(), true, true);
-    }
-    if (!propertyExists("ROI_Y_START") && settings.contains("acquisition/roi_ystart")) {
-        setQFProperty("ROI_Y_START", settings.value("acquisition/roi_ystart").toInt(), true, true);
-    }
-    if (!propertyExists("ROI_Y_END") && settings.contains("acquisition/roi_yend")) {
-        setQFProperty("ROI_Y_END", settings.value("acquisition/roi_yend").toInt(), true, true);
-    }
-    if (!propertyExists("DUALVIEW_MODE") && settings.contains("acquisition/dualview_mode")) {
-        setQFProperty("DUALVIEW_MODE", settings.value("acquisition/dualview_mode").toString(), false, true);
 
-    }
-    if (!propertyExists("DUALVIEW_MODE") && settings.contains("acquisition/acquisition/dualview_mode")) {
-        setQFProperty("DUALVIEW_MODE", settings.value("acquisition/acquisition/dualview_mode").toString(), false, true);
-    }
+void QFRDRImagingFCSData::loadQFPropertiesFromB040SPIMSettingsFile(QSettings &settings) {
+    if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/duration_milliseconds")) setQFProperty("MEASUREMENT_DURATION_MS", settings.value("acquisition/duration_milliseconds").toDouble(), true, true);
+    if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/acquisition/duration_milliseconds")) setQFProperty("MEASUREMENT_DURATION_MS", settings.value("acquisition/acquisition/duration_milliseconds").toDouble(), true, true);
+    if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/camera/duration_milliseconds")) setQFProperty("MEASUREMENT_DURATION_MS", settings.value("acquisition/camera/duration_milliseconds").toDouble(), true, true);
+
+    if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/duration")) setQFProperty("MEASUREMENT_DURATION_MS", settings.value("acquisition/duration").toDouble()*1000.0, true, true);
+    if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/acquisition/duration")) setQFProperty("MEASUREMENT_DURATION_MS", settings.value("acquisition/acquisition/duration").toDouble()*1000.0, true, true);
+    if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/camera/duration")) setQFProperty("MEASUREMENT_DURATION_MS", settings.value("acquisition/camera/duration").toDouble()*1000.0, true, true);
+
+    if (!propertyExists("FRAMETIME_MS") && settings.contains("acquisition/frame_time")) setQFProperty("FRAMETIME_MS", settings.value("acquisition/frame_time").toDouble()*1000.0, true, true);
+    if (!propertyExists("FRAMETIME_MS") && settings.contains("acquisition/acquisition/frame_time")) setQFProperty("FRAMETIME_MS", settings.value("acquisition/acquisition/frame_time").toDouble()*1000.0, true, true);
+    if (!propertyExists("FRAMETIME_MS") && settings.contains("acquisition/camera/frame_time")) setQFProperty("FRAMETIME_MS", settings.value("acquisition/camera/frame_time").toDouble()*1000.0, true, true);
+
+    if (!propertyExists("FRAMETIME_MS") && settings.contains("acquisition/frame_rate")) setQFProperty("FRAMETIME_MS", 1.0/settings.value("acquisition/frame_rate").toDouble()*1000.0, true, true);
+    if (!propertyExists("FRAMETIME_MS") && settings.contains("acquisition/acquisition/frame_rate")) setQFProperty("FRAMETIME_MS", 1.0/settings.value("acquisition/acquisition/frame_rate").toDouble()*1000.0, true, true);
+    if (!propertyExists("FRAMETIME_MS") && settings.contains("acquisition/camera/frame_rate")) setQFProperty("FRAMETIME_MS", 1.0/settings.value("acquisition/camera/frame_rate").toDouble()*1000.0, true, true);
+
+    if (!propertyExists("MAGNIFICATION") && settings.contains("acquisition/magnification")) setQFProperty("MAGNIFICATION", settings.value("acquisition/magnification").toDouble(), true, true);
+    if (!propertyExists("MAGNIFICATION") && settings.contains("acquisition/acquisition/magnification")) setQFProperty("MAGNIFICATION", settings.value("acquisition/acquisition/magnification").toDouble(), true, true);
+    if (!propertyExists("MAGNIFICATION") && settings.contains("acquisition/camera/magnification")) setQFProperty("MAGNIFICATION", settings.value("acquisition/camera/magnification").toDouble(), true, true);
+
+
+
+    if (!propertyExists("ROI_X_START") && settings.contains("acquisition/roi_xstart"))  setQFProperty("ROI_X_START", settings.value("acquisition/roi_xstart").toInt(), true, true);
+    if (!propertyExists("ROI_X_START") && settings.contains("acquisition/acquisition/roi_xstart"))  setQFProperty("ROI_X_START", settings.value("acquisition/acquisition/roi_xstart").toInt(), true, true);
+    if (!propertyExists("ROI_X_START") && settings.contains("acquisition/camera/roi_xstart"))  setQFProperty("ROI_X_START", settings.value("acquisition/camera/roi_xstart").toInt(), true, true);
+
+    if (!propertyExists("ROI_X_END") && settings.contains("acquisition/roi_xend"))  setQFProperty("ROI_X_END", settings.value("acquisition/roi_xend").toInt(), true, true);
+    if (!propertyExists("ROI_X_END") && settings.contains("acquisition/acquisition/roi_xend"))  setQFProperty("ROI_X_END", settings.value("acquisition/acquisition/roi_xend").toInt(), true, true);
+    if (!propertyExists("ROI_X_END") && settings.contains("acquisition/camera/roi_xend"))  setQFProperty("ROI_X_END", settings.value("acquisition/camera/roi_xend").toInt(), true, true);
+
+    if (!propertyExists("ROI_Y_START") && settings.contains("acquisition/roi_ystart"))  setQFProperty("ROI_Y_START", settings.value("acquisition/roi_ystart").toInt(), true, true);
+    if (!propertyExists("ROI_Y_START") && settings.contains("acquisition/acquisition/roi_ystart"))  setQFProperty("ROI_Y_START", settings.value("acquisition/acquisition/roi_ystart").toInt(), true, true);
+    if (!propertyExists("ROI_Y_START") && settings.contains("acquisition/camera/roi_ystart"))  setQFProperty("ROI_Y_START", settings.value("acquisition/camera/roi_ystart").toInt(), true, true);
+
+    if (!propertyExists("ROI_Y_END") && settings.contains("acquisition/roi_yend")) setQFProperty("ROI_Y_END", settings.value("acquisition/roi_yend").toInt(), true, true);
+    if (!propertyExists("ROI_Y_END") && settings.contains("acquisition/acquisition/roi_yend")) setQFProperty("ROI_Y_END", settings.value("acquisition/acquisition/roi_yend").toInt(), true, true);
+    if (!propertyExists("ROI_Y_END") && settings.contains("acquisition/camera/roi_yend")) setQFProperty("ROI_Y_END", settings.value("acquisition/camera/roi_yend").toInt(), true, true);
+
+    if (!propertyExists("DUALVIEW_MODE") && settings.contains("acquisition/dualview_mode"))  setQFProperty("DUALVIEW_MODE", settings.value("acquisition/dualview_mode").toString(), false, true);
+    if (!propertyExists("DUALVIEW_MODE") && settings.contains("acquisition/acquisition/dualview_mode"))  setQFProperty("DUALVIEW_MODE", settings.value("acquisition/acquisition/dualview_mode").toString(), false, true);
+    if (!propertyExists("DUALVIEW_MODE") && settings.contains("acquisition/camera/dualview_mode"))  setQFProperty("DUALVIEW_MODE", settings.value("acquisition/camera/dualview_mode").toString(), false, true);
+
+    if (!propertyExists("DUALVIEW_MODE") && settings.contains("acquisition/dualview_mode")) setQFProperty("DUALVIEW_MODE", settings.value("acquisition/dualview_mode").toString(), false, true);
+    if (!propertyExists("DUALVIEW_MODE") && settings.contains("acquisition/acquisition/acquisition/dualview_mode")) setQFProperty("DUALVIEW_MODE", settings.value("acquisition/acquisition/dualview_mode").toString(), false, true);
+    if (!propertyExists("DUALVIEW_MODE") && settings.contains("acquisition/camera/dualview_mode")) setQFProperty("DUALVIEW_MODE", settings.value("acquisition/camera/dualview_mode").toString(), false, true);
+
     if (!propertyExists("PIXEL_WIDTH") && settings.contains("acquisition/pixel_width")) {
         double mag=settings.value("acquisition/magnification", 1.0).toDouble();
         double cpw=settings.value("acquisition/camera_pixel_width", settings.value("acquisition/pixel_width").toDouble()).toDouble();
         double pw=settings.value("acquisition/pixel_width").toDouble();
         if (fabs(cpw/mag-pw)<0.01*fabs(pw) && (mag>1)) setQFProperty("PIXEL_WIDTH", cpw/mag, true, true);
         else setQFProperty("PIXEL_WIDTH", pw, true, true);
-
     }
+    if (!propertyExists("PIXEL_WIDTH") && settings.contains("acquisition/acquisition/pixel_width")) {
+        double mag=settings.value("acquisition/acquisition/magnification", 1.0).toDouble();
+        double cpw=settings.value("acquisition/acquisition/camera_pixel_width", settings.value("acquisition/acquisition/pixel_width").toDouble()).toDouble();
+        double pw=settings.value("acquisition/acquisition/pixel_width").toDouble();
+        if (fabs(cpw/mag-pw)<0.01*fabs(pw) && (mag>1)) setQFProperty("PIXEL_WIDTH", cpw/mag, true, true);
+        else setQFProperty("PIXEL_WIDTH", pw, true, true);
+    }
+    if (!propertyExists("PIXEL_WIDTH") && settings.contains("acquisition/camera/pixel_width")) {
+        double mag=settings.value("acquisition/camera/magnification", 1.0).toDouble();
+        double cpw=settings.value("acquisition/camera/camera_pixel_width", settings.value("acquisition/camera/pixel_width").toDouble()).toDouble();
+        double pw=settings.value("acquisition/camera/pixel_width").toDouble();
+        if (fabs(cpw/mag-pw)<0.01*fabs(pw) && (mag>1)) setQFProperty("PIXEL_WIDTH", cpw/mag, true, true);
+        else setQFProperty("PIXEL_WIDTH", pw, true, true);
+    }
+
+
     if (!propertyExists("PIXEL_HEIGHT") && settings.contains("acquisition/pixel_height")) {
         double mag=settings.value("acquisition/magnification", 1.0).toDouble();
         double cpw=settings.value("acquisition/camera_pixel_height", settings.value("acquisition/pixel_height").toDouble()).toDouble();
         double pw=settings.value("acquisition/pixel_height").toDouble();
         if (fabs(cpw/mag-pw)<0.01*fabs(pw) && (mag>1)) setQFProperty("PIXEL_HEIGHT", cpw/mag, true, true);
         else setQFProperty("PIXEL_HEIGHT", pw, true, true);
-
+    }
+    if (!propertyExists("PIXEL_HEIGHT") && settings.contains("acquisition/acquisition/pixel_height")) {
+        double mag=settings.value("acquisition/acquisition/magnification", 1.0).toDouble();
+        double cpw=settings.value("acquisition/acquisition/camera_pixel_height", settings.value("acquisition/acquisition/pixel_height").toDouble()).toDouble();
+        double pw=settings.value("acquisition/acquisition/pixel_height").toDouble();
+        if (fabs(cpw/mag-pw)<0.01*fabs(pw) && (mag>1)) setQFProperty("PIXEL_HEIGHT", cpw/mag, true, true);
+        else setQFProperty("PIXEL_HEIGHT", pw, true, true);
+    }
+    if (!propertyExists("PIXEL_HEIGHT") && settings.contains("acquisition/camera/pixel_height")) {
+        double mag=settings.value("acquisition/camera/magnification", 1.0).toDouble();
+        double cpw=settings.value("acquisition/camera/camera_pixel_height", settings.value("acquisition/camera/pixel_height").toDouble()).toDouble();
+        double pw=settings.value("acquisition/camera/pixel_height").toDouble();
+        if (fabs(cpw/mag-pw)<0.01*fabs(pw) && (mag>1)) setQFProperty("PIXEL_HEIGHT", cpw/mag, true, true);
+        else setQFProperty("PIXEL_HEIGHT", pw, true, true);
     }
 
 }
@@ -1463,31 +1539,36 @@ QList<QFRDROverviewImageInterface::OverviewImageGeoElement> QFRDRImagingFCSData:
 }
 
 int QFRDRImagingFCSData::getImageStackCount() const {
-    return 1;
+    return 2;
 }
 
 uint32_t QFRDRImagingFCSData::getImageStackFrames(int stack) const {
     if (stack==0) return video_frames;
+    if (stack==1) return videoUncorrected_frames;
     return 0;
 }
 
 int QFRDRImagingFCSData::getImageStackWidth(int stack) const {
     if (stack==0) return video_width;
+    if (stack==1) return videoUncorrected_width;
     return 0;
 }
 
 int QFRDRImagingFCSData::getImageStackHeight(int stack) const {
     if (stack==0) return video_height;
+    if (stack==1) return videoUncorrected_height;
     return 0;
 }
 
 int QFRDRImagingFCSData::getImageStackChannels(int stack) const {
     if (stack==0) return 1;
+    if (stack==1) return 1;
     return 0;
 }
 
 double *QFRDRImagingFCSData::getImageStack(int stack, uint32_t frame, uint32_t channel) const {
     if (stack==0) return &(video[frame*video_width*video_height]);
+    if (stack==1) return &(videoUncorrected[frame*videoUncorrected_width*videoUncorrected_height]);
     return NULL;
 }
 
@@ -1516,20 +1597,28 @@ QString QFRDRImagingFCSData::getImageStackYName(int stack) const {
 }
 
 double QFRDRImagingFCSData::getImageStackTUnitFactor(int stack) const {
-    if (video_frames<=0) return 1;
-    double stat=1;
-    if (statT) stat=(statT[statN]-statT[0]);
-    return getProperty("MEASUREMENT_DURATION_MS", stat*1000.0).toDouble()/1000.0/double(video_frames);
+    if (stack==0) {
+        if (video_frames<=0) return 1;
+        double stat=1;
+        if (statT) stat=(statT[statN]-statT[0]);
+        return getProperty("MEASUREMENT_DURATION_MS", stat*1000.0).toDouble()/1000.0/double(video_frames);
+    } else if (stack==1) {
+        if (videoUncorrected_frames<=0) return 1;
+        double stat=1;
+        return getProperty("MEASUREMENT_DURATION_MS", stat*1000.0).toDouble()/1000.0/double(videoUncorrected_frames);
+    }
     return 1;
 }
 
 QString QFRDRImagingFCSData::getImageStackTUnitName(int stack) const {
     if (stack==0) return tr("seconds");
+    if (stack==1) return tr("seconds");
     return QString("");
 }
 
 QString QFRDRImagingFCSData::getImageStackTName(int stack) const {
     if (stack==0) return tr("time");
+    if (stack==1) return tr("time");
     return QString("");
 
 }
@@ -1548,7 +1637,8 @@ QString QFRDRImagingFCSData::getImageStackCName(int stack) const
 }
 
 QString QFRDRImagingFCSData::getImageStackDescription(int stack) const {
-    if (stack==0) return tr("averaged video");
+    if (stack==0) return tr("time-binned video (%1 binned frames)").arg(getProperty("VIDEO_AVGFRAMES", "?").toString());
+    if (stack==1) return tr("uncorrected time-binned video (%1 binned frames)").arg(getProperty("VIDEO_AVGFRAMES", "?").toString());
     return QString("");
 }
 

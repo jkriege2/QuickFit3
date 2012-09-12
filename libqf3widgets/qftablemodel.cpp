@@ -1065,6 +1065,7 @@ void QFTableModel::copy(QModelIndexList selection, bool createXMLFragment) {
     QString csv;
     QTextStream out(&csv);
     QLocale loc;
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
     saveCSV(out, "\t", loc.decimalPoint().toLatin1());
     mime->setText(csv);
     QApplication::clipboard()->setMimeData(mime);
@@ -1108,6 +1109,7 @@ void QFTableModel::paste(int row_start, int column_start) {
         QString data=mime->text();
         //qDebug()<<"pasting text: \n"<<data;
         QLocale loc;
+        loc.setNumberOptions(QLocale::OmitGroupSeparator);
         QTextStream in(&data);
         QStringList sl=data.split("\n");
         char sep='\t';
