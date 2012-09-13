@@ -2,18 +2,18 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>SPIM-FCS fit model 1-component diffusion</title>
+		<title>SPIM-FCS fit model 1-component diffusion 1/e² radii</title>
 	</head>
 	<body>
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-		<h2>SPIM-FCS fit model 1-component diffusion</h2>
-		<p>This function implements a 1-component pure-diffusion model for data acquired with a camera in SPIM illumination mode. The model was taken from:
+		<h2>SPIM-FCS fit model 1-component diffusion (1/e<sup>2</sup>-radii)</h2>
+		<p>This function implements a 3-component pure-diffusion model for data acquired with a camera in SPIM illumination mode. The model was modified from:
 		<blockquote>
 		  Wohland T, Shi X, Sankaran J, Stelzer EH (2010): <b>Single plane illumination fluorescence correlation spectroscopy (SPIM-FCS) probes inhomogeneous three-dimensional environments</b>, <i>Optics Express</i> <b>18</b>(10): 10627-10641, doi: 10.1364/OE.18.010627.
 		</blockquote>
 		The fit function is defined as:
-		<blockquote><img src="./pic/form_387.png"></blockquote>
-		The parameters are:
+		<blockquote><img src="./pic/spimfcse2.png"></blockquote>
+		In contrast to the published model, this function uses 1/e<sup>2</sup> radii for the PSF extents. The parameters are:
 		<blockquote><table border=1>
 		  <tr><th>var.</th><th>Parameter</th></tr>
 		  <tr><td><i>G<sub>&infin;</sub></i></td><td>constant offset</td></tr>
@@ -22,7 +22,7 @@
 		  <tr><td><i>&rho;<sub>i</sub></i></td><td>fraction of <i>i</i>-th diffusing component</td></tr>
 		  <tr><td><i>a</i></td><td>width of a (square) pixel in the image plane (i.e. pixel size of camera divided by the magnification)</td></tr>
 		  <tr><td><i>&sigma;<sub>xy</sub></i></td><td>lateral radius of the point-spread function (PSF), 1/e<sup>2</sup>-radius</td></tr>
-		  <tr><td><i>&sigma;<sub>z</sub></i></td><td>longitudinal radius of the point-spread function (PSF), 1/&radic;<span style="border-top: 1px solid black">e</span>-radius</td></tr>
+		  <tr><td><i>&sigma;<sub>z</sub></i></td><td>longitudinal radius of the point-spread function (PSF), 1/e<sup>2</sup>-radius</td></tr>
 		</table>  </blockquote>
 		For the fractions we have in addition:
 		<blockquote> <i>&rho;<sub>1</sub> = 1 - &rho;<sub>2</sub></i> - &rho;<sub>3</sub><br></i>
