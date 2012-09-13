@@ -4,6 +4,7 @@
 #include "dlgcsvparameters.h"
 #include "qfrdrtablesortdialog.h"
 #include <QtAlgorithms>
+#include "qfrdrtableparserfunctions.h"
 
 QFRDRTableEditor::QFRDRTableEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent):
     QFRawDataEditor(services, propEditor, parent)
@@ -704,86 +705,6 @@ void QFRDRTableEditor::slSetColumnValues() {
     }
 }
 
-struct jkMathParserData {
-    QFTablePluginModel* model;
-    int row;
-    int column;
-};
-
-jkMathParser::jkmpResult fQFRDRTableEditor_data(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
-    jkMathParser::jkmpResult res;
-    res.num=NAN;
-    jkMathParserData* d=(jkMathParserData*)p->get_data();
-    if (d) {
-        if (d->model) {
-            res.type=jkMathParser::jkmpDouble;
-            if (n!=2) p->jkmpError("data(row, column) needs 2 argument");
-            if ((params[0].type!=jkMathParser::jkmpDouble)||(params[1].type!=jkMathParser::jkmpDouble)) p->jkmpError("data(row, column) needs two integer arguments");
-            int r=floor(params[0].num);
-            int c=floor(params[1].num);
-            if (r>=0 && c>=0 && r<d->model->rowCount() && c<d->model->columnCount()) {
-                QVariant da= d->model->cell(r,c);
-                switch(da.type()) {
-                    case QVariant::LongLong :
-                    case QVariant::ULongLong :
-                    case QVariant::Int :
-                    case QVariant::UInt :
-                    case QVariant::Double: res.num=da.toDouble(); res.type=jkMathParser::jkmpDouble; break;
-                    case QVariant::Date:
-                    case QVariant::DateTime: res.num=da.toDateTime().toMSecsSinceEpoch(); res.type=jkMathParser::jkmpDouble; break;
-                    case QVariant::Time: res.num=QDateTime(QDate::currentDate(), da.toTime()).toMSecsSinceEpoch(); res.type=jkMathParser::jkmpDouble; break;
-                    case QVariant::Bool: res.boolean=da.toBool(); res.type=jkMathParser::jkmpBool; break;
-                    case QVariant::String:
-                        res.str=da.toString().toStdString(); res.type=jkMathParser::jkmpString; break;
-                    default:
-                        if (da.canConvert(QVariant::Double)) {
-                            res.num=da.toDouble(); res.type=jkMathParser::jkmpDouble; break;
-                        } else {
-                            res.str=da.toString().toStdString(); res.type=jkMathParser::jkmpString; break;
-                        }
-                        break;
-                }
-            }
-        }
-    }
-    return res;
-}
-
-jkMathParser::jkmpResult fQFRDRTableEditor_dataleft(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
-    jkMathParser::jkmpResult res;
-    res.num=NAN;
-    jkMathParserData* d=(jkMathParserData*)p->get_data();
-    if (d) {
-        if (d->model) {
-            res.type=jkMathParser::jkmpDouble;
-            if (n!=1) p->jkmpError("dataleft(delta_column) needs 1 argument");
-            if ((params[0].type!=jkMathParser::jkmpDouble)) p->jkmpError("dataleft(delta_column) needs one integer arguments");
-            int delta=floor(params[0].num);
-            QVariant da= d->model->cell(d->row,d->column-delta);
-            switch(da.type()) {
-                case QVariant::LongLong :
-                case QVariant::ULongLong :
-                case QVariant::Int :
-                case QVariant::UInt :
-                case QVariant::Double: res.num=da.toDouble(); res.type=jkMathParser::jkmpDouble; break;
-                case QVariant::Date:
-                case QVariant::DateTime: res.num=da.toDateTime().toMSecsSinceEpoch(); res.type=jkMathParser::jkmpDouble; break;
-                case QVariant::Time: res.num=QDateTime(QDate::currentDate(), da.toTime()).toMSecsSinceEpoch(); res.type=jkMathParser::jkmpDouble; break;
-                case QVariant::Bool: res.boolean=da.toBool(); res.type=jkMathParser::jkmpBool; break;
-                case QVariant::String:
-                    res.str=da.toString().toStdString(); res.type=jkMathParser::jkmpString; break;
-                default:
-                    if (da.canConvert(QVariant::Double)) {
-                        res.num=da.toDouble(); res.type=jkMathParser::jkmpDouble; break;
-                    } else {
-                        res.str=da.toString().toStdString(); res.type=jkMathParser::jkmpString; break;
-                    }
-                    break;
-            }
-        }
-    }
-    return res;
-}
 
 void QFRDRTableEditor::slCalcColumn() {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
@@ -817,8 +738,7 @@ void QFRDRTableEditor::slCalcColumn() {
 
                             bool ok=true;
                             jkMathParser mp; // instanciate
-                            mp.addFunction("data", fQFRDRTableEditor_data);
-                            mp.addFunction("dataleft", fQFRDRTableEditor_dataleft);
+                            addQFRDRTableFunctions(&mp);
                             mp.addVariableDouble("row", 0.0);
                             mp.addVariableDouble("col", 0.0);
                             mp.addVariableDouble("column", 0.0);

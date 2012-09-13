@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Column Statistics Functions</title>
+  </head>
+  <body> 
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	<a name="functions"/><h2>Column Statistics Functions</h2>
+	<ul>
+		<li><a name="colavg"/><!-- func:colavg -->
+		<b><tt><!-- template -->colavg(column, row_start, row_end)<!-- /template --></tt> - <i>average over rows <tt>row_start</tt> .. <tt>row_end</tt> (inclusive) in the given column</i></b><br>
+		<b><tt><!-- template -->colavg(column)<!-- /template --></tt> - <i>average over all rows in the given column</i></b><br>
+		calculates $$bmath:\overline{data}=\frac{1}{N}\cdot\sum_{i=row\_start}^{row\_end}data(column, i)$$
+		<!-- /func:colavg -->
+		</li>
+		<li><a name="colsum"/><!-- func:colsum -->
+		<b><tt><!-- template -->colsum(column, row_start, row_end)<!-- /template --></tt> - <i>sum over rows <tt>row_start</tt> .. <tt>row_end</tt> (inclusive) in the given column</i></b><br>
+		<b><tt><!-- template -->colsum(column)<!-- /template --></tt> - <i>sum over all rows in the given column</i></b><br>
+		calculates $$bmath:\sum_{i=row\_start}^{row\_end}data(column, i)$$
+		<!-- /func:colsum -->
+		</li>
+		<li><a name="colsum2"/><!-- func:colsum2 -->
+		<b><tt><!-- template -->colsum2(column, row_start, row_end)<!-- /template --></tt> - <i>sum squares over rows <tt>row_start</tt> .. <tt>row_end</tt> (inclusive) in the given column</i></b><br>
+		<b><tt><!-- template -->colsum2(column)<!-- /template --></tt> - <i>sum squares over all rows in the given column</i></b><br>
+		calculates $$bmath:\sum_{i=row\_start}^{row\_end}data(column, i)^2$$
+		<!-- /func:colsum2 -->
+		</li>
+		<li><a name="colvar"/><!-- func:colvar -->
+		<b><tt><!-- template -->colvar(column, row_start, row_end)<!-- /template --></tt> - <i>variance over rows <tt>row_start</tt> .. <tt>row_end</tt> (inclusive) in the given column</i></b><br>
+		<b><tt><!-- template -->colvar(column)<!-- /template --></tt> - <i>variance over all rows in the given column</i></b><br>
+		<!-- /func:colvar -->
+		</li>
+		<li><a name="colstd"/><!-- func:colstd -->
+		<b><tt><!-- template -->colstd(column, row_start, row_end)<!-- /template --></tt> - <i>standard deviation over rows <tt>row_start</tt> .. <tt>row_end</tt> (inclusive) in the given column</i></b><br>
+		<b><tt><!-- template -->colstd(column)<!-- /template --></tt> - <i>standard deviation over all rows in the given column</i></b><br>
+		<!-- /func:colstd -->
+		</li>
+		<li><a name="colmin"/><!-- func:colmin -->
+		<b><tt><!-- template -->colmin(column, row_start, row_end)<!-- /template --></tt> - <i>minimum over rows <tt>row_start</tt> .. <tt>row_end</tt> (inclusive) in the given column</i></b><br>
+		<b><tt><!-- template -->colmin(column)<!-- /template --></tt> - <i>minimum over all rows in the given column</i></b><br>
+		<!-- /func:colmin -->
+		</li>
+		<li><a name="colmax"/><!-- func:colmax -->
+		<b><tt><!-- template -->colmax(column, row_start, row_end)<!-- /template --></tt> - <i>maximum over rows <tt>row_start</tt> .. <tt>row_end</tt> (inclusive) in the given column</i></b><br>
+		<b><tt><!-- template -->colmax(column)<!-- /template --></tt> - <i>maximum over all rows in the given column</i></b><br>
+		<!-- /func:colmax -->
+		</li>
+		<li><a name="colmedian"/><!-- func:colmedian -->
+		<b><tt><!-- template -->colmedian(column, row_start, row_end)<!-- /template --></tt> - <i>median over rows <tt>row_start</tt> .. <tt>row_end</tt> (inclusive) in the given column</i></b><br>
+		<b><tt><!-- template -->colmedian(column)<!-- /template --></tt> - <i>median over all rows in the given column</i></b><br>
+		<!-- /func:colmedian -->
+		</li>
+		<li><a name="colquantile"/><!-- func:colquantile -->
+		<b><tt><!-- template -->colquantile(column, row_start, row_end, quantile)<!-- /template --></tt> - <i>given quantile over rows <tt>row_start</tt> .. <tt>row_end</tt> (inclusive) in the given column</i></b><br>
+		<b><tt><!-- template -->colquantile(column, quantile)<!-- /template --></tt> - <i>given quantile over all rows in the given column</i></b><br>
+		<!-- /func:colquantile -->
+		</li>
+
+
+	</ul>
+	
+	
+  </body>
+</html>

@@ -3,6 +3,7 @@
 #include "programoptions.h"
 #include "jkmathparser.h"
 #include "qfpluginservices.h"
+#include "qfrdrtableparserfunctions.h"
 
 jkMathParser::jkmpResult QFRDRTableFormulaDialog_dummy(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
     jkMathParser::jkmpResult res;
@@ -103,6 +104,10 @@ QFRDRTableFormulaDialog::QFRDRTableFormulaDialog(QWidget *parent) :
     defaultWords<<"data";
     defaultWords<<"dataleft";
 
+    jkMathParser mp; // instanciate
+    addQFRDRTableFunctions(&mp, &defaultWords);
+
+
     for (int i=0; i<defaultWords.size(); i++) {
         if (!sl.contains(defaultWords[i])) sl.append(defaultWords[i]);
     }
@@ -164,8 +169,7 @@ void QFRDRTableFormulaDialog::on_edtFormula_textChanged(QString text) {
     try {
         ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>"));
         jkMathParser mp; // instanciate
-        mp.addFunction("data", QFRDRTableFormulaDialog_dummy);
-        mp.addFunction("dataleft", QFRDRTableFormulaDialog_dummy);
+        addQFRDRTableFunctions(&mp);
         mp.addVariableDouble("row", 0.0);
         mp.addVariableDouble("rows", 1.0);
         mp.addVariableDouble("col", 0.0);
