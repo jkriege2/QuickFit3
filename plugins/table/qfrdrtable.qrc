@@ -41,5 +41,6 @@
         <file>icons/plot_maskimage.png</file>
         <file alias="fileopen.png">icons/fileopen.png</file>
         <file alias="filesave.png">icons/filesave.png</file>
+        <file alias="histogram.png">icons/histogram.png</file>
     </qresource>
 </RCC>

@@ -396,6 +396,21 @@ void QFTableModel::deleteColumn(quint16 c) {
     }
 }
 
+void QFTableModel::emptyColumn(quint16 c)
+{
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
+    if (c>=columns) return;
+
+    for (int r=0; r<rows; r++) {
+        deleteCell(r, c);
+    }
+    doEmitSignals=oldEmit;
+    if (doEmitSignals) {
+        emit dataChanged(index(0, c), index(rows-1, c));
+    }
+}
+
 void QFTableModel::deleteCell(quint16 row, quint16 column) {
     if (readonly) return;
     quint32 a=xyAdressToUInt32(row, column);
@@ -593,6 +608,15 @@ quint16 QFTableModel::getAddRow(quint16 column, QVariant data) {
 void QFTableModel::setDefaultEditValue(QVariant defaultEditValue)
 {
     this->defaultEditValue=defaultEditValue;
+}
+
+QStringList QFTableModel::getColumnTitles() const
+{
+    QStringList sl;
+    for (int i=0; i<columnCount(); i++) {
+        sl.append(headerData(i, Qt::Horizontal).toString());
+    }
+    return sl;
 }
 
 QVariant QFTableModel::cell(quint16 row, quint16 column) const {

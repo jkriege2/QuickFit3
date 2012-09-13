@@ -20,6 +20,7 @@
 #include "qftools.h"
 #include "jkmathparser.h"
 #include "qfrdrtableformuladialog.h"
+#include "qfrdrtablehistogramdialog.h"
 
 /*! \brief editor class for tables
     \ingroup qf3rdrdp_table
@@ -63,6 +64,13 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slSetColumnValues();
         void slCalcColumn();
         void slSort();
+        void slHistogram();
+
+        void setActionsEnabled(bool enabled);
+        void setActionsDisabled(bool disabled);
+    signals:
+        void enableActions(bool enabled);
+        void disableActions(bool enabled);
 
     protected:
         /** \brief table view for the contents */
@@ -95,6 +103,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actCopy;
         QAction* actCut;
         QAction* actPaste;
+        QAction* actHistogram;
 
         QToolBar* tbMain;
     private:

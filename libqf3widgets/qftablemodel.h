@@ -169,6 +169,9 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         /** \brief set the default QVariant value displayed in an editor, if the value does not yet exist */
         void setDefaultEditValue(QVariant defaultEditValue);
 
+        /** \brief return a list of all column titles */
+        QStringList getColumnTitles() const;
+
 
         /** \brief save the contents in a <a href="http://en.wikipedia.org/wiki/SYmbolic_LinK_(SYLK)">SYLK file (SYmbolic LinK)</a>
          *
@@ -254,6 +257,8 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         void deleteRow(quint16 r);
         /** \brief remove the given column */
         void deleteColumn(quint16 c);
+        /** \brief remove all data from given column, but do not remove the column (also does not delete it's header) */
+        void emptyColumn(quint16 c);
         /** \brief delete all contents from the given cell */
         void deleteCell(quint16 r, quint16 column);
         /** \brief delete all contents from the given cells */

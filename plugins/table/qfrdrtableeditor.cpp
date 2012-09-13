@@ -38,6 +38,7 @@ void QFRDRTableEditor::createWidgets() {
     actLoadTable->setToolTip(tr("Load table ..."));
     actLoadTable->setShortcut(QKeySequence::Open);
     connect(actLoadTable, SIGNAL(triggered()), this, SLOT(slLoadTable()));
+    connect(this, SIGNAL(enableActions(bool)), actLoadTable, SLOT(setEnabled(bool)));
 
     actSaveTable=new QAction(QIcon(":/table/table_save.png"), "save table", this);
     actSaveTable->setToolTip(tr("Save table ..."));
@@ -49,9 +50,11 @@ void QFRDRTableEditor::createWidgets() {
     connect(actCopy, SIGNAL(triggered()), this, SLOT(slCopy()));
     actCut=new QAction(QIcon(":/table/cut.png"), tr("Cut"), this);
     actCut->setShortcut(QKeySequence::Cut);
+    connect(this, SIGNAL(enableActions(bool)), actCut, SLOT(setEnabled(bool)));
     connect(actCut, SIGNAL(triggered()), this, SLOT(slCut()));
     actPaste=new QAction(QIcon(":/table/paste.png"), tr("Paste"), this);
     actPaste->setShortcut(QKeySequence::Paste);
+    connect(this, SIGNAL(enableActions(bool)), actPaste, SLOT(setEnabled(bool)));
     connect(actPaste, SIGNAL(triggered()), this, SLOT(slPaste()));
 
 
@@ -64,6 +67,7 @@ void QFRDRTableEditor::createWidgets() {
     actClear=new QAction(QIcon(":/table/table_clear.png"), "clear", this);
     actClear->setToolTip(tr("Clear table ..."));
     connect(actClear, SIGNAL(triggered()), this, SLOT(slClear()));
+    connect(this, SIGNAL(enableActions(bool)), actClear, SLOT(setEnabled(bool)));
 
 
 
@@ -71,59 +75,78 @@ void QFRDRTableEditor::createWidgets() {
     actResize->setToolTip(tr("Resize the table to a new size"));
     actResize->setShortcut(tr("Ctrl+R"));
     connect(actResize, SIGNAL(triggered()), this, SLOT(slResize()));
+    connect(this, SIGNAL(enableActions(bool)), actResize, SLOT(setEnabled(bool)));
 
     actInsertRow=new QAction(QIcon(":/table/row_insert.png"), "insert row", this);
     actInsertRow->setToolTip(tr("Insert a row above of the currently selected cell ..."));
     connect(actInsertRow, SIGNAL(triggered()), this, SLOT(slInsertRow()));
+    connect(this, SIGNAL(enableActions(bool)), actInsertRow, SLOT(setEnabled(bool)));
 
     actAppendRow=new QAction(QIcon(":/table/row_append.png"), "append row", this);
     actAppendRow->setToolTip(tr("Append a row to the table ..."));
     actAppendRow->setShortcut(tr("Ctrl++"));
     connect(actAppendRow, SIGNAL(triggered()), this, SLOT(slAppendRow()));
+    connect(this, SIGNAL(enableActions(bool)), actAppendRow, SLOT(setEnabled(bool)));
 
     actDeleteRow=new QAction(QIcon(":/table/row_delete.png"), "delete row", this);
     actDeleteRow->setToolTip(tr("Delete the currenty selected row(s) ..."));
     connect(actDeleteRow, SIGNAL(triggered()), this, SLOT(slDeleteRow()));
+    connect(this, SIGNAL(enableActions(bool)), actDeleteRow, SLOT(setEnabled(bool)));
 
     actInsertColumn=new QAction(QIcon(":/table/column_insert.png"), "insert column", this);
     actInsertColumn->setToolTip(tr("Insert a column left of the currently selected cell ..."));
     connect(actInsertColumn, SIGNAL(triggered()), this, SLOT(slInsertColumn()));
+    connect(this, SIGNAL(enableActions(bool)), actInsertColumn, SLOT(setEnabled(bool)));
 
     actAppendColumn=new QAction(QIcon(":/table/column_append.png"), "append column", this);
     actAppendColumn->setToolTip(tr("Append a column to the table ..."));
-    actAppendRow->setShortcut(tr("Ctrl+I"));
+    actAppendColumn->setShortcut(tr("Ctrl+I"));
     connect(actAppendColumn, SIGNAL(triggered()), this, SLOT(slAppendColumn()));
+    connect(this, SIGNAL(enableActions(bool)), actAppendColumn, SLOT(setEnabled(bool)));
 
     actDeleteColumn=new QAction(QIcon(":/table/column_delete.png"), "delete column", this);
     actDeleteColumn->setToolTip(tr("Delete the currenty selected column(s) ..."));
     connect(actDeleteColumn, SIGNAL(triggered()), this, SLOT(slDeleteColumn()));
+    connect(this, SIGNAL(enableActions(bool)), actDeleteColumn, SLOT(setEnabled(bool)));
 
     actDelete=new QAction(QIcon(":/table/cell_clear.png"), "delete contents", this);
     actDelete->setToolTip(tr("Delete contents from selected cells ..."));
     actDelete->setShortcut(QKeySequence::Delete);
     connect(actDelete, SIGNAL(triggered()), this, SLOT(slDelete()));
+    connect(this, SIGNAL(enableActions(bool)), actDelete, SLOT(setEnabled(bool)));
 
     actSetDatatype=new QAction(QIcon(":/table/cell_type.png"), "set datatype", this);
     actSetDatatype->setToolTip(tr("set the datatype of the currently selected cells ..."));
     actSetDatatype->setShortcut(tr("Ctrl+T"));
     connect(actSetDatatype, SIGNAL(triggered()), this, SLOT(slSetDatatype()));
+    connect(this, SIGNAL(enableActions(bool)), actSetDatatype, SLOT(setEnabled(bool)));
 
     actSetColumnTitle=new QAction(QIcon(":/table/column_title.png"), "set column title", this);
     actSetColumnTitle->setToolTip(tr("Set column title ..."));
     connect(actSetColumnTitle, SIGNAL(triggered()), this, SLOT(slSetColumnTitle()));
+    connect(this, SIGNAL(enableActions(bool)), actSetColumnTitle, SLOT(setEnabled(bool)));
 
 
     actSetColumnValues=new QAction("set column values (linear, ...)", this);
     actSetColumnValues->setToolTip(tr("init the current column with e.g. linearly increasing numbers ..."));
     connect(actSetColumnValues, SIGNAL(triggered()), this, SLOT(slSetColumnValues()));
+    connect(this, SIGNAL(enableActions(bool)), actSetColumnValues, SLOT(setEnabled(bool)));
 
     actCalculateColumn=new QAction(QIcon(":/table/formula.png"), tr("evaluate math expression"), this);
     actCalculateColumn->setToolTip(tr("set the value of the selected columns by a freely defineable mathematical expression"));
     connect(actCalculateColumn, SIGNAL(triggered()), this, SLOT(slCalcColumn()));
+    connect(this, SIGNAL(enableActions(bool)), actCalculateColumn, SLOT(setEnabled(bool)));
+
+    actHistogram=new QAction(QIcon(":/table/histogram.png"), tr("calculate histogramn"), this);
+    actHistogram->setToolTip(tr("calculate and insert histograms of the selected columns"));
+    actHistogram->setVisible(false);
+    connect(actHistogram, SIGNAL(triggered()), this, SLOT(slHistogram()));
+    connect(this, SIGNAL(enableActions(bool)), actHistogram, SLOT(setEnabled(bool)));
 
     actSort=new QAction(QIcon(":/table/sort_inc.png"), tr("sort selected cells"), this);
     actSort->setToolTip(tr("sort the selected cells"));
     connect(actSort, SIGNAL(triggered()), this, SLOT(slSort()));
+    connect(this, SIGNAL(enableActions(bool)), actSort, SLOT(setEnabled(bool)));
 
 
 
@@ -173,6 +196,7 @@ void QFRDRTableEditor::createWidgets() {
     tvMain->addAction(getSeparatorAction(this));
     tvMain->addAction(actSetColumnValues);
     tvMain->addAction(actCalculateColumn);
+    tvMain->addAction(actHistogram);
     tvMain->addAction(actSort);
 
     l->addWidget(tvMain);
@@ -206,6 +230,7 @@ void QFRDRTableEditor::createWidgets() {
     menuTab->addAction(actSetColumnTitle);
     menuTab->addAction(actSetColumnValues);
     menuTab->addAction(actCalculateColumn);
+    menuTab->addAction(actHistogram);
     menuTab->addAction(actSort);
     menuTab->addSeparator();
     menuTab->addAction(actClear);
@@ -218,19 +243,7 @@ void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord*
     if (old) {
         QFRDRTable* m=qobject_cast<QFRDRTable*>(old);
         if (m && m->model()) {
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actLoadTable, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actClear, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actSetColumnTitle, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actAppendRow, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actAppendColumn, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actInsertRow, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actInsertColumn, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actDeleteColumn, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actDeleteRow, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actSetDatatype, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actResize, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actCut, SLOT(setEnabled(bool)));
-            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actPaste, SLOT(setEnabled(bool)));
+            disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), this, SLOT(setActionsEnabled(bool)));
             disconnect(tvMain->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(slSetColumnTitle(int)));
         }
     }
@@ -240,21 +253,10 @@ void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord*
     //if (m) std::cout<<m->model()<<" ... ";
     if (m && m->model()) {
         tvMain->setModel(m->model());
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actLoadTable, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actClear, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actSetColumnTitle, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actAppendRow, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actAppendColumn, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actInsertRow, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actInsertColumn, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actDeleteColumn, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actDeleteRow, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actSetDatatype, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actResize, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actCut, SLOT(setEnabled(bool)));
-        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), actPaste, SLOT(setEnabled(bool)));
+        connect(m->model(), SIGNAL(notReadonlyChanged(bool)), this, SLOT(setActionsEnabled(bool)));
         connect(tvMain->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(slSetColumnTitle(int)));
         m->model()->setReadonly(m->model()->isReadonly());
+        setActionsEnabled(!m->model()->isReadonly());
     } else {
         tvMain->setModel(NULL);
     }
@@ -1011,6 +1013,86 @@ void QFRDRTableEditor::slSort() {
             }
         }
     }
+}
+
+void QFRDRTableEditor::slHistogram()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            QMap<int, QList<double> > colData;
+            //QMap<int, QString> colNames;
+            QItemSelectionModel* smod=tvMain->selectionModel();
+            if (smod->hasSelection()) {
+                QModelIndexList idxs=smod->selectedIndexes();
+                for (int i=0; i<idxs.size(); i++) {
+                    QVariant v=idxs[i].data();
+                    bool okDouble=false;
+                    double dv=v.toDouble(&okDouble);
+                    if (v.type()==QVariant::Double || v.type()==QVariant::UInt || v.type()==QVariant::Int || v.type()==QVariant::ULongLong || v.type()==QVariant::LongLong || v.type()==QVariant::Bool || v.type()==QVariant::DateTime || v.type()==QVariant::Char || (v.type()==QVariant::String && okDouble)) {
+                        colData[idxs[i].column()].append(dv);
+                        //colNames[idxs[i].column()]=m->model()->headerData(idxs[i].column(), Qt::Horizontal).toString();
+                    }
+                }
+                if (colData.size()>0/* && colNames>0*/) {
+                    QFRDRTableHistogramDialog* dlg=new QFRDRTableHistogramDialog(this);
+                    dlg->setColumnData(colData);
+                    dlg->readProperties(m);
+                    dlg->setColumnTitles(m->model()->getColumnTitles());
+                    dlg->init();
+                    if (dlg->exec()) {
+                        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+                        QItemSelection sel=tvMain->selectionModel()->selection();
+                        QModelIndex cur=tvMain->selectionModel()->currentIndex();
+                        m->model()->disableSignals();
+
+                        QMap<int, QList<double> > histData=dlg->getHistograms();
+                        QMap<int, QString> histNames=dlg->getHeaderNames();
+
+                        QMapIterator<int, QList<double> > itD(histData);
+                        while (itD.hasNext()) {
+                            itD.next();
+                            m->model()->emptyColumn(itD.key());
+                        }
+                        QMapIterator<int, QList<double> > itD1(histData);
+                        while (itD1.hasNext()) {
+                            itD1.next();
+                            QList<double> dat=itD1.value();
+                            int col=itD1.key();
+                            for (int i=0; i<dat.size(); i++) {
+                                m->model()->setCellCreate(i, col, dat[i]);
+                            }
+                        }
+                        QMapIterator<int, QString> itN(histNames);
+                        while (itN.hasNext()) {
+                            itN.next();
+                            m->model()->setColumnTitleCreate(itN.key(), itN.value());
+                        }
+
+
+
+                        m->model()->enableSignals(true);
+                        tvMain->selectionModel()->select(sel, QItemSelectionModel::Select);
+                        tvMain->selectionModel()->setCurrentIndex(cur, QItemSelectionModel::Current);
+                        QApplication::restoreOverrideCursor();
+                    }
+                    delete dlg;
+                }
+            }
+        }
+    }
+}
+
+void QFRDRTableEditor::setActionsEnabled(bool enabled) {
+    emit disableActions(!enabled);
+    emit enableActions(enabled);
+}
+
+void QFRDRTableEditor::setActionsDisabled(bool disabled)
+{
+    emit disableActions(disabled);
+    emit enableActions(!disabled);
 }
 
 
