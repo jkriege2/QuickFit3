@@ -2,7 +2,7 @@
 
 
 include(autoversioning.pri)
-include(quickfit_config.pri)
+include(quickfitconfig.pri)
 
 release {
     message("building QuickFit in RELEASE mode")

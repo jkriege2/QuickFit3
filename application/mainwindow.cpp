@@ -6,7 +6,7 @@
 #include "qfrdrreplacedialog.h"
 #include "statistics_tools.h"
 
-static QtLogFile* appLogFileQDebugWidget=NULL;
+static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
 
 #if defined(Q_OS_WIN)
@@ -736,6 +736,7 @@ void MainWindow::createWidgets() {
     logFileQDebugWidget=new QtLogFile(tabLogs);
     logFileQDebugWidget->set_log_file_append(true);
     logFileQDebugWidget->set_log_date_time(true);
+    qDebug()<<"opening log: "<<QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+"_qdebug.log");
     logFileQDebugWidget->open_logfile(QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+"_qdebug.log"), false);
     appLogFileQDebugWidget=logFileQDebugWidget;
 
@@ -744,6 +745,7 @@ void MainWindow::createWidgets() {
     logFileMainWidget->set_log_date_time(true);
     logFileProjectWidget->set_log_file_append(true);
     tabLogs->addTab(logFileMainWidget, tr("QuickFit Log"));
+    qDebug()<<"opening log: "<<QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log");
     logFileMainWidget->open_logfile(QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log"), false);
     logFileMainWidget->log_text(tr("starting up QuickFit %1 (SVN: %2 COMILEDATE: %3), %4-bit ...\n").arg(VERSION_FULL).arg(SVNVERSION).arg(COMPILEDATE).arg(getApplicationBitDepth()));
     logFileMainWidget->log_text(tr("logging to '%1' ...\n").arg(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log"));

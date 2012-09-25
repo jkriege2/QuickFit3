@@ -6,10 +6,11 @@
 #include <QString>
 #include <QFileInfo>
 
-
+#include <ostream>
 #include <exception>
 #include <cstdio>
 #include <QVector>
+#include <iostream>
 
 #include "tools.h"
 
@@ -72,7 +73,7 @@ class alv_exception : public std::exception {
     private:
         std::string error;
     public:
-        alv_exception(std::string error_desc) throw() { error=error_desc; std::cout<<error<<std::endl; };
+        alv_exception(std::string error_desc) throw() { error=error_desc; std::cout<<error.c_str()<<std::endl; };
         virtual ~alv_exception() throw() {};
         virtual const char* what() const throw() { return error.c_str(); };
 };

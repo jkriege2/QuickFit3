@@ -4,6 +4,7 @@
 #include "qfpluginrawdata.h"
 #include "qmodernprogresswidget.h"
 #include "qfrdrimagingfcstools.h"
+#include "qftools.h"
 
 /*!
     \defgroup qf3rdrdp_number_and_brightness Raw Data Record Plugin
@@ -63,7 +64,7 @@ class QFRDRNumberAndBrightnessPlugin : public QObject, public QFPluginRawDataRec
         void insertImFCSFile(const QString &filename);
 
         /** \brief insert record, if it is not yet contained in the project! */
-        void insertProjectRecord(const QString& type, const QString& name, const QString& filename, const QString& description=QString(""), const QString& directory=QString(""), const QMap<QString,QVariant>& init_params=QMap<QString,QVariant>(), const QStringList& init_params_readonly=QStringList());
+        void insertProjectRecord(const QString& type, const QString& name, const QString& filename, const QString& description=QString(""), const QString& directory=QString(""), const QMap<QString,QVariant>& init_params=QFStringVariantMap(), const QStringList& init_params_readonly=QStringList());
 
         bool parseSPIMSettings(const QString& filename_settings, QString& description, QMap<QString,QVariant>& initParams, QStringList& paramsReadonly, QStringList& files, QStringList& files_types, QStringList& files_descriptions);
 };

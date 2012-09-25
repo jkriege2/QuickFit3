@@ -33,8 +33,8 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     projectWindowStayOnTop=false;
     m_debugLogVisible=false;
 
-    QFileInfo fi(QApplication::applicationFilePath());
-    appDir=QApplication::applicationDirPath();
+    QFileInfo fi(app->applicationFilePath());
+    appDir=app->applicationDirPath();
     #if defined(Q_OS_MAC)
         // get out of /MyApp.app/Contents/MacOS in MacOSX App-Bundle
         QDir aappDir(appDir);
@@ -74,7 +74,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     settings=NULL;
 
     // default values
-    style= QApplication::style()->metaObject()->className();
+    style= app->style()->metaObject()->className();
     stylesheet="default";
     languageID="en";
     maxThreads=2;
@@ -111,7 +111,7 @@ void ProgramOptions::readSettings() {
         if (iniFilename=="native") { // on windows: registry, on Linux/MacOS: default
             settings= new QSettings(this);
         } else if (iniFilename=="native_inifile") { // ensures a INI file at the default location, even on windows
-            settings= new QSettings(QSettings::IniFormat, QSettings::UserScope, QApplication::organizationName(), QApplication::applicationName(), this);
+            settings= new QSettings(QSettings::IniFormat, QSettings::UserScope, app->organizationName(), app->applicationName(), this);
         } else {
             settings= new QSettings(iniFilename, QSettings::IniFormat, this);
         }

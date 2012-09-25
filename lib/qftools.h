@@ -17,6 +17,9 @@
 #include <QString>
 #include <QIcon>
 
+
+typedef QMap<QString, QVariant> QFStringVariantMap;
+
 /*! \brief returns a new separator action
     \ingroup qf3lib_tools
  */

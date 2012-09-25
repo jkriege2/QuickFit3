@@ -253,7 +253,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmSimAnneal::intFit(double* paramsOut, dou
     result.message=QObject::tr("<b>SimAneal</b> returned after %1 iterations and %2 &chi;<sup>2</sup>-function evaluations.<br>reason: %3\nSES = %4  [old_SES = %5]").arg(iterations).arg(chi2EvalCount).arg(reason).arg(currentChi2).arg(initialChi2);
     result.messageSimple=QObject::tr("SimAneal returned after %1 iterations and %2 chi2-function evaluations. reason: %3, SES = %4  [old_SES = %5]").arg(iterations).arg(chi2EvalCount).arg(reason_simple).arg(currentChi2).arg(initialChi2);
 
-    std::cout<<result.messageSimple.toStdString()<<std::endl;
+    //std::cout<<result.messageSimple.toStdString()<<std::endl;
 
     result.fitOK=(error==0);
 

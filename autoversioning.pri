@@ -2,6 +2,9 @@
 # in debug mode: only make sure that the files exist, but do not update them
 
 
+#try to read compiler name and version
+COMPILERVERSION=$$system($$QMAKE_CXX --version)
+
 
 # try to read the SVN version
 SVNVERSION = $$system(svnversion)
@@ -42,6 +45,7 @@ isEmpty(DATESTR) {
 }
 message("RELEASE MODE: svnversion is: $$SVNVERSION")
 message("RELEASE MODE: build date is: $$DATESTR")
+message("RELEASE MODE: compiler: $$COMPILERVERSION")
 
 
 
@@ -51,9 +55,11 @@ message("RELEASE MODE: build date is: $$DATESTR")
 win32 {
     system(echo $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"  > svnversion.h )
     system(echo $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"  > compiledate.h )
+    system(echo $$LITERAL_HASH define COMPILER \"$$COMPILERVERSION"  > compiler.h )
 } else {
     system(echo \'$$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"\'  > svnversion.h )
     system(echo \'$$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"\'  > compiledate.h )
+    system(echo \'$$LITERAL_HASH define COMPILER \"$$COMPILERVERSION"\'  > compiler.h )
 }
 
 
