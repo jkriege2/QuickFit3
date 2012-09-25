@@ -30,6 +30,21 @@ QFFitFunctionDLSG2::QFFitFunctionDLSG2() {
 
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 1,            -10,      10,       0.1  );
     #define DLSG2_offset 8
+
+    addParameter(FloatNumber,  "dls_angle",               "scattering angle",                                      "&Theta;<sub>scatter</sub>", "°",         "°",                      false,     true,        false,              QFFitFunction::EditError,    false, 90,          0,        1e4,      1    );
+    #define DLSG2_angle 9
+    addParameter(FloatNumber,  "refractive_index",        "refractive index",                                      "n",                        "",           "",                       false,     true,        false,              QFFitFunction::EditError,    false, 1.33,        0,        1e4,      1    );
+    #define DLSG2_refractive 10
+    addParameter(FloatNumber,  "wavelength",              "scattering light wavelength",                           "&lambda;",                 "nm",         "nm",                     false,     true,        false,              QFFitFunction::EditError,    false, 488,         0,        1e4,      1    );
+    #define DLSG2_wavelength 11
+
+    addParameter(FloatNumber,  "diff_coeff1",             "diffusion coefficient of species 1",                    "D<sub>1</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    false,    false,        false,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
+    #define DLSG2_diff_coeff1 12
+    addParameter(FloatNumber,  "diff_coeff2",             "diffusion coefficient of species 2",                    "D<sub>2</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    false,    false,        false,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
+    #define DLSG2_diff_coeff2 13
+    addParameter(FloatNumber,  "diff_coeff3",             "diffusion coefficient of species 3",                    "D<sub>3</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    false,    false,        false,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
+    #define DLSG2_diff_coeff3 14
+
 }
 
 double QFFitFunctionDLSG2::evaluate(double t, const double* data) const {
@@ -52,13 +67,46 @@ double QFFitFunctionDLSG2::evaluate(double t, const double* data) const {
 
 
 void QFFitFunctionDLSG2::calcParameter(double* data, double* error) const {
+    const int comp=data[DLSG2_n_components];
+    const double tau1=data[DLSG2_tau1]/1e6;
+    const double tau2=data[DLSG2_tau2]/1e6;
+    const double tau3=data[DLSG2_tau3]/1e6;
+
+    const double n=data[DLSG2_refractive];
+    const double theta=data[DLSG2_angle]/180*M_PI;
+    const double lambda=data[DLSG2_wavelength]/1e3;
+
+    const double q=4.0*M_PI*n/lambda*sin(theta/2.0);
+
+    data[DLSG2_diff_coeff1]=0;
+    data[DLSG2_diff_coeff2]=0;
+    data[DLSG2_diff_coeff3]=0;
+    if (error) {
+        error[DLSG2_diff_coeff1]=0;
+        error[DLSG2_diff_coeff2]=0;
+        error[DLSG2_diff_coeff3]=0;
+    }
+
+    data[DLSG2_diff_coeff1]=1.0/q/q/tau1;
+    if (error) error[DLSG2_diff_coeff1]=0;
+
+    if (comp>1) {
+        data[DLSG2_diff_coeff2]=1.0/q/q/tau2;
+        if (error) error[DLSG2_diff_coeff2]=0;
+
+        if (comp>2) {
+            data[DLSG2_diff_coeff3]=1.0/q/q/tau3;
+            if (error) error[DLSG2_diff_coeff3]=0;
+        }
+    }
+
 }
 
 bool QFFitFunctionDLSG2::isParameterVisible(int parameter, const double* data) const {
     int comp=data[DLSG2_n_components];
     switch(parameter) {
-        case DLSG2_frac2:  case DLSG2_tau2: return comp>1;
-        case DLSG2_frac3:  case DLSG2_tau3: return comp>2;
+        case DLSG2_frac2:  case DLSG2_tau2:  case DLSG2_diff_coeff2: return comp>1;
+        case DLSG2_frac3:  case DLSG2_tau3:  case DLSG2_diff_coeff3: return comp>2;
     }
     return true;
 }

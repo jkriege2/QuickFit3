@@ -114,6 +114,41 @@ bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const
         value=bin*height;
         error=0;
         return true;
+    } else if (paramid=="dls_angle") {
+        if (!r) return false;
+        if (!(r->propertyExists("ANGLE [°]") || r->propertyExists("ANGLE"))) return false;
+        double angle_deg=r->getProperty("ANGLE [°]", r->getProperty("ANGLE", 90.0).toDouble()).toDouble();
+        value=angle_deg;
+        error=0;
+        return true;
+    } else if (paramid=="wavelength") {
+        if (!r) return false;
+        if (!(r->propertyExists("WAVELENGTH [nm]") || r->propertyExists("WAVELENGTH"))) return false;
+        double angle_deg=r->getProperty("WAVELENGTH [nm]", r->getProperty("WAVELENGTH", 532.0).toDouble()).toDouble();
+        value=angle_deg;
+        error=0;
+        return true;
+    } else if (paramid=="refractive_index") {
+        if (!r) return false;
+        if (!(r->propertyExists("REFRACTIVE_INDEX"))) return false;
+        double angle_deg=r->getProperty("REFRACTIVE_INDEX", 1.33).toDouble();
+        value=angle_deg;
+        error=0;
+        return true;
+    } else if (paramid=="viscosity") {
+        if (!r) return false;
+        if (!(r->propertyExists("VISCOSITY [cp]") || r->propertyExists("VISCOSITY"))) return false;
+        double angle_deg=r->getProperty("VISCOSITY [cp]", r->getProperty("VISCOSITY", 0.86).toDouble()).toDouble();
+        value=angle_deg;
+        error=0;
+        return true;
+    } else if (paramid=="temperature") {
+        if (!r) return false;
+        if (!(r->propertyExists("TEMPERATURE [K]") || r->propertyExists("TEMPERATURE"))) return false;
+        double angle_deg=r->getProperty("TEMPERATURE [K]", r->getProperty("TEMPERATURE", 396).toDouble()).toDouble();
+        value=angle_deg;
+        error=0;
+        return true;
     }
 
     return false;
