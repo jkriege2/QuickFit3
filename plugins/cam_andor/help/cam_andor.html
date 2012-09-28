@@ -9,9 +9,56 @@
 <h2>Description</h2>
 <p>This plugin controls cameras connected to the computer and controlled by the <a href="http://www.andor.com/software/sdk/">Andor camera SDK</a>. 
 Note that you need to purchase the Andor SDK separately, as this driver will only work together with the SDK. 
-<h2>Windows</h2>
-<p>On windows: make sure that the required SDK DLLs are in a directory where QuickFit will find them (either the QuickFit base directory, or a directory in the Windows PATH variable, or the Windows system directory!</p>
-<h2>Linux</h2>
+
+<h2>Supported Features</h2>
+<p>This driver supports all Andor cameras accessible by the ver. 2.xx SDK. It was developed using version 2.88.30003.0 of the SDK on windows (32bit, 64bit version never tested) and Linux (64bit). We tested the driver with an Andor iXon X3 860 (DU860_BV). This driver supports these features of the ANdor SDK:
+<ul>
+  <li>camera shutter (global settings over the Extensions menu)</li>
+  <li>sensor cooler (global settings over the Extensions menu)</li>
+  <li>camera fan (global settings over the Extensions menu)</li>
+  <li>EM Gain, but not the extended EM gain</li>
+  <li>region of interest (ROI) and full-frame acquisition</li>
+  <li>horizontal/vertical binning</li>
+  <li>frame transfer mode</li>
+  <li>setting of exposure time</li>
+  <li>image modes:<ul>
+    <li><i>imaging:</i> kinetic image mode (with cycles and accumulations)</li>
+	<li><i>full vertical binning:</i> FVB mode, i.e. all rows in the selected ROI are summed. The ROI has to reside at the bottom of the image/sensor.</li>
+	<li><i>cropped mode:</i> here the whole sensor up to the ROI has to be darkened (e.g. using a slit in an image plane of a microscope) and only the ROI (which has to reside at the bottom of the image/sensor) is read; without blanking out the rest of the sensor.</li>
+  </ul></li>	
+  <li>baseline clamp</li>
+  <li>selecting an ADC channel</li>
+  <li>pre-amplifier gain</li>
+  <li>setting horizontal/vertical shift speed and vertical shift amplitude</li>
+  <li>trigger modes:<ul>
+    <li><i>Internal</i> (default)</li>
+    <li><i>External</i></li>
+    <li><i>External Start</i></li>
+    <li><i>External Exposure (Bulb)</i></li>
+  </ul>In all modes the trigger signals may or may not be inverted.</li>
+  <li>Output filetypes:<ul>
+    <li><i>16-bit TIFF:</i> (default) creates uncompressed multi-frame TIFF files using a hand-woven implementation of the TIFF format ("tinyTIFFWriter"). This allows to write more than 65535 frames into each TIFF file, which is not possible in the Andor-TIFF mode. The TIFF implementation is optimized for speed. The only limitation that applies is the maximum filesize of 4GB for TIFF files (they use 32-bit pointers internally). </li>
+    <li><i>16-bit TIFF (spooling):</i> writes 16-bit TIFF files using the Andor driver's TIFF implementation ("Spooling mode")</li>
+    <li><i>Andor SIF (spooling):</i> writes Andor SIF files using the Andor driver's implementation ("Spooling mode")</li>
+    <li><i>16-bit FITS (spooling):</i> writes 16-bit FITS files using the Andor driver's FITS implementation ("Spooling mode")</li>
+    <li><i>16-bit Raw:</i> writes the images one after the other into a binary file. No header information is stored. The dataformat is 16-bit unsigned integer and the byte order is the same as on your acquisition system. You should be able to easily read this file format with any available software or handwritten program.</li>
+  </ul></li>
+  <li></li>
+</ul>
+</p>
+
+
+
+
+<h2>OS-specific Topics</h2>
+<h3>Windows</h3>
+<p>On windows: make sure that the required SDK DLLs are in a directory where QuickFit will find them (either the QuickFit base directory, or a directory in the Windows PATH variable, or the Windows system directory)! Basically just install the drivers and copy the file <tt>ATMCD32D.DLL</tt> into the same directory as <tt>quickfit3.exe</tt>.</p>
+<p><b>Compiling this driver with MinGW on Windows:</b> As QuickFit 3 relies on <a href="http://www.mingw.org/">MinGW (gcc for Windows)</a> as a compiler, and Andor does not provide link libraries for this compiler, a solution has been created that extracts the link library from the header file directly. This solution uses a bash shell script <tt>create_testcpp.sh</tt> which can be found in the QuickFit 3 <tt>extlibs/andor_win32</tt> directory. In addition you will need the header file <tt>ATMCD32D.H</tt> and DLL <tt>ATMCD32D.DLL</tt> issued with your copy of the Andor SDK, which you have to copy to the same directory as the shell script. You can then call <tt>create_testcpp.sh</tt> manually from a bash shell, as installed in your MinGW trunk by the MSYS tools (also available at the <a href="http://www.mingw.org/">MinGW homepage</a>). The script will "parse" the header file and create a dummy C-program that calls every function in the header with dummy parameters. The error messages that gcc will produce when compiling this script can then be parsed to build a proper link library for the Andor SDK (called <tt>libandor.a</tt>). This rather nasty procedure is necessary, as MinGW and Microsoft compilers have different calling conventions and "decorated names" for functions in DLLs and the Andor DLLs do not allow to use the standard tools to derive link libraries. For an overview see e.g.:<ul>
+  <li><a href="http://unixwiz.net/techtips/win32-callconv.html">http://unixwiz.net/techtips/win32-callconv.html</a></li>
+  <!--<li><a href=""></a></li>
+  <li><a href=""></a></li>-->
+</ul> </p>
+<h3>Linux</h3>
 <p>On Linux after installing the SDK you will have to make the camera known to the system using a udev rules file <code>/etc/udev/rules.d/99-spim.rules</code> with contents like this:
 	 <blockquote><tt>
 SUBSYSTEM=="pci", ATTR{vendor}=="0x149a", ATTR{device}=="0x0005", RUN+="/usr/sbin/andordrvlx_load"
@@ -24,6 +71,8 @@ The command <code>lsmod</code> shall return something like <code>andordrvlx</cod
 </p>
 
 <p>See also the help page on <a href="$$mainhelpdir$$ext_usbdevices_linux.html">Linux hardware enumeration with udev</a> for further information</p>
+
+
 
   </body>
 </html>
