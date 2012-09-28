@@ -51,11 +51,11 @@ QFImageReaderLIBTIFF::~QFImageReaderLIBTIFF() {
 }
 
 QString QFImageReaderLIBTIFF::filter() const {
-    return QObject::tr("TIFF File [libtiff] (*.tiff *.tif)");
+    return QObject::tr("TIFF File [libTIFF] (*.tiff *.tif)");
 }
 
 QString QFImageReaderLIBTIFF::formatName() const {
-    return QObject::tr("TIFF [libtiff]");
+    return QObject::tr("TIFF [libTIFF]");
 }
 
 

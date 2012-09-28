@@ -52,6 +52,44 @@
      </item>
     </layout>
    </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>tinyTIFF:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QCheckBox" name="chkTinyTIFFLogging">
+       <property name="text">
+        <string>logging</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFEnhancedLineEdit" name="edtTinyTIFFLogfile">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnClearTinyTIFFLog">
+       <property name="text">
+        <string>&amp;clear log</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -70,12 +108,28 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>138</x>
-     <y>77</y>
+     <x>121</x>
+     <y>29</y>
     </hint>
     <hint type="destinationlabel">
-     <x>220</x>
-     <y>77</y>
+     <x>308</x>
+     <y>30</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkTinyTIFFLogging</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtTinyTIFFLogfile</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>84</x>
+     <y>50</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>147</x>
+     <y>49</y>
     </hint>
    </hints>
   </connection>

@@ -22,6 +22,7 @@ class QFBasicImageImportersOptionsWidget : public QFPluginOptionsWidget
         void writeSettings(ProgramOptions* options);
     protected slots:
         void on_btnClearLibTIFFLog_clicked();
+        void on_btnClearTinyTIFFLog_clicked();
     private:
         Ui::QFBasicImageImportersOptionsWidget *ui;
 };

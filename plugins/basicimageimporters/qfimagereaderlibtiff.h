@@ -8,7 +8,7 @@
 
 
 
-/*! \brief QFImporter class for fit function
+/*! \brief QFImporter class for TIFF files using libTIFF
     \ingroup qf3importerplugins_importers_basicimages
 
 */

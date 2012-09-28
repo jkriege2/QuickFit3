@@ -4,6 +4,7 @@
 #include "qfpluginimporters.h"
 #include "qfimagereaderlibtiff.h"
 #include "qfpluginoptionsdialog.h"
+#include "qfimagereadertinytiff.h"
 
 /*!
     \defgroup qf3importerplugins_importers_basicimages Importer Plugin
@@ -64,7 +65,7 @@ class QFBasicImageImporters : public QObject, public QFPluginImporters, public Q
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         }
 
         /** \brief return list of plugin IDs */
