@@ -33,10 +33,10 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         virtual QString getID() const  { return tr("fcs"); };
 
         /** \brief name for the plugin */
-        virtual QString getName() const  { return tr("FCS Correlation Curve Plugin"); };
+        virtual QString getName() const  { return tr("FCS/DLS Correlation Curve Plugin"); };
 
         /** \brief short description for the plugin */
-        virtual QString getDescription() const  { return tr("manages Fluorescence Correlations Spectroscopy (FCS) curve data."); };
+        virtual QString getDescription() const  { return tr("manages Fluorescence Correlations Spectroscopy (FCS) and Dynamic Light Scattering (DLS) correlation curve data."); };
 
         /** \brief author the plugin */
         virtual QString getAuthor() const  { return tr("Jan Krieger"); };
@@ -49,7 +49,7 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=1;
+            minor=2;
         };
 
         /** \brief icon for the plugin */

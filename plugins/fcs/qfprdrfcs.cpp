@@ -22,12 +22,12 @@ QFRawDataRecord* QFPRDRFCS::createRecord(QFProject* parent) {
 
 
 void QFPRDRFCS::registerToMenu(QMenu* menu) {
-    QMenu* smenu=menu->addMenu(QIcon(":/fcs_logo.png"), tr("FCS data"));
-    QAction* actFCS=new QAction(QIcon(":/fcs_open.png"), tr("Open FCS Data from File"), parentWidget);
-    actFCS->setStatusTip(tr("Insert a new FCS data item from a specified file (CSV or ALV-5000 format)"));
+    QMenu* smenu=menu->addMenu(QIcon(":/fcs_logo.png"), tr("FCS/DLS data"));
+    QAction* actFCS=new QAction(QIcon(":/fcs_open.png"), tr("Open FCS/DLS Data from File"), parentWidget);
+    actFCS->setStatusTip(tr("Insert a new FCS/DLS data item from a specified file (CSV or ALV-5000 format)"));
     connect(actFCS, SIGNAL(triggered()), this, SLOT(insertFCS()));
     smenu->addAction(actFCS);
-    QAction* actFCSSim=new QAction(QIcon(":/fcs_simulate.png"), tr("FCS Data from Fit Function"), parentWidget);
+    QAction* actFCSSim=new QAction(QIcon(":/fcs_simulate.png"), tr("FCS/DLS data from fit function"), parentWidget);
     connect(actFCSSim, SIGNAL(triggered()), this, SLOT(insertSimulated()));
     smenu->addAction(actFCSSim);
 }
@@ -182,10 +182,10 @@ void QFPRDRFCS::insertSimulated() {
             paramsReadonly<<it.key().toUpper();
         }
 
-        QFRawDataRecord* e=project->addRawData(getID(), tr("Simulated FCS Model"), QStringList(), p, paramsReadonly);
+        QFRawDataRecord* e=project->addRawData(getID(), tr("Simulated FCS/DLS Model"), QStringList(), p, paramsReadonly);
         if (e->error()) {
-            QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing simulated FCS curve:\n%1").arg(e->errorDescription()));
-            services->log_error(tr("Error while importing simulated FCS curve:\n    %1\n").arg(e->errorDescription()));
+            QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing simulated FCS/DLS curve:\n%1").arg(e->errorDescription()));
+            services->log_error(tr("Error while importing simulated FCS/DLS curve:\n    %1\n").arg(e->errorDescription()));
             project->deleteRawData(e->getID());
         }
         services->setProgress(0);

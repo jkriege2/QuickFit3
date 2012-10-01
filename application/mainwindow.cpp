@@ -148,6 +148,8 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.eval"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_evalscreen.html\">Basic Evaluation Dialog Help</a>").arg(settings->getAssetsDirectory()+"/help/")));
     htmlReplaceList.append(qMakePair(QString("qf_ui_eval_helpfile"), tr("%1qf3_evalscreen.html").arg(settings->getAssetsDirectory()+"/help/")));
     htmlReplaceList.append(qMakePair(QString("qf_ui_eval_helpfiletitle"), tr("Basic Evaluation Dialog Help")));
+    htmlReplaceList.append(qMakePair(QString("qf_ui_jkqtplotter_helpfile"), tr("%1jkqtplotter.html").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_ui_jkqtplotter_helpfiletitle"), tr("Plotter/Graphing Component Help")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.extension"), tr("")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitfunc"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_evalscreen.html\">Fit Functions Help</a>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitalg"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_fitalg.html\">Fit Algorithms Help</a>")));

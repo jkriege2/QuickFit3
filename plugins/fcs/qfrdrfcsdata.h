@@ -337,6 +337,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
          * and imports that channel. If this property is not present, the first channel (CH0) will be loaded.
          */
         bool loadFromALV5000(QString filename);
+        bool loadFromALV5000Files(QStringList filenames);
         /** \brief initialisez the data from the project file
          */
         bool loadInternal(QDomElement* e);
