@@ -114,8 +114,10 @@ void QFFitFunctionDLSG2inD::calcParameter(double* data, double* error) const {
 
     data[DLSG2_diff_qsquare]=sqr(q);
     double eq=0;
-    if (error) eq=error[DLSG2_diff_qsquare]=sqrt(sqr(en*8.0*M_PI*q/lambda*sin(theta/2.0))+sqr(elambda*8.0*M_PI*n*q/lambda/lambda*sin(theta/2.0))+sqr(etheta*4.0*M_PI*q/lambda*cos(theta/2.0)));
-
+    if (error) {
+        eq=sqrt(sqr(en*4.0*M_PI/lambda*sin(theta/2.0))+sqr(elambda*4.0*M_PI*n/lambda/lambda*sin(theta/2.0))+sqr(etheta*2.0*M_PI/lambda*cos(theta/2.0)));
+        error[DLSG2_diff_qsquare]=eq*2*q;
+    }
 
     data[DLSG2_tau1]=0;
     data[DLSG2_tau2]=0;
