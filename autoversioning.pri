@@ -55,7 +55,7 @@ message("RELEASE MODE: compiler: $$COMPILERVERSION")
 win32 {
     system(echo $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"  > svnversion.h )
     system(echo $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"  > compiledate.h )
-    system(echo $$LITERAL_HASH define COMPILER \"$$COMPILERVERSION"  > compiler.h )
+    system(echo $$LITERAL_HASH define COMPILER \"$$COMPILERVERSION\"  > compiler.h )
 } else {
     system(echo \'$$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"\'  > svnversion.h )
     system(echo \'$$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"\'  > compiledate.h )

@@ -1013,6 +1013,21 @@ void QFProject::setDataChanged() {
 
 void QFProject::setStructureChanged() {
     emitStructureChanged();
+}
+
+void QFProject::log_text(const QString &message) const
+{
+    if (services) services->log_text(message);
+}
+
+void QFProject::log_warning(const QString &message) const
+{
+    if (services) services->log_warning(message);
+}
+
+void QFProject::log_error(const QString &message) const
+{
+    if (services) services->log_error(message);
 };
 
 

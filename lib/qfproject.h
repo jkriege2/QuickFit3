@@ -303,6 +303,10 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
 
         virtual void setStructureChanged();
 
+        void log_text(const QString& message) const;
+        void log_warning(const QString& message) const;
+        void log_error(const QString& message) const;
+
     protected:
         /** \brief set the internal error flag and description */
         void setError(QString description);

@@ -150,6 +150,11 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void setDescription(const QString& d);
         /** \brief returns a model which may be used to access and edit the properties in this object  */
         QFRDRPropertyModel* getPropertyModel();
+
+        void log_text(const QString& message) const;
+        void log_warning(const QString& message) const;
+        void log_error(const QString& message) const;
+
     signals:
         /** \brief emitted whenever at least one of the properties changes */
         void propertiesChanged(QString property, bool visible);
@@ -710,31 +715,54 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
     public:
         /** \brief return type (short type string) */
-        virtual QString getType() const { return tr("unknown"); };
+        virtual QString getType() const;
         /** \brief return type (longer type string, user readable) */
-        virtual QString getTypeName() const { return tr("unknown"); };
+        virtual QString getTypeName() const;
         /** \brief return a small icon (16x16) */
-        virtual QIcon getSmallIcon() const { return QIcon(":/lib/projecttree_emptyrdr.png"); };
+        virtual QIcon getSmallIcon() const;
         /** \brief return type description */
-        virtual QString getTypeDescription() const { return tr("unknown"); };
+        virtual QString getTypeDescription() const;
         /** \brief return a large icon (32x32) */
-        virtual QIcon getLargeIcon() const { return QIcon(":/lib/projecttree_emptyrdr.png"); };
+        virtual QIcon getLargeIcon() const;
         /** \brief returns the number of additional editor panes for this record */
-        virtual int getEditorCount() { return 0; };
+        virtual int getEditorCount();
         /** \brief returns the name for the i-th editor pane */
-        virtual QString getEditorName(int i) { return QString(""); };
+        virtual QString getEditorName(int i);
         /** \brief create an object for the i-th editor pane */
-        virtual QFRawDataEditor* createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i=0, QWidget* parent=NULL) { return NULL; };
+        virtual QFRawDataEditor* createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i=0, QWidget* parent=NULL);
         /** \brief export the raw data into the specified format */
-        virtual void exportData(const QString& format, const QString& filename) const {};
+        virtual void exportData(const QString& format, const QString& filename) const;
         /** \brief write object contents into XML file */
         void writeXML(QXmlStreamWriter& w);
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportDialogFiletypes() */
-        virtual QStringList getExportFiletypes() { return QStringList(); };
+        virtual QStringList getExportFiletypes();
         /** \brief returns the title of the Export file dialog */
-        virtual QString getExportDialogTitle() { return tr(""); };
+        virtual QString getExportDialogTitle();
         /** \brief returns the filetype of the Export file dialog */
-        virtual QString getExportDialogFiletypes() { return tr(""); };
+        virtual QString getExportDialogFiletypes();
+        /** \brief indicates whether the files list may be edited by the user. In that case the file list editing functions (protected) have to be implemented! */
+        virtual bool isFilesListEditable() const;
+
+    protected:
+        /** \brief this should present the user with a dialog to select a bunch of files to add to the files list. If the user selects "Cancel", return \c false, otherwise
+         *         return \c true. In the second case the files in \a files will be added to the files list of this RDR and reloadFromFiles() will be called immediately afterwards!
+         *
+         *  \note you only have to implement this, when you overwrote isFilesListEditable() to return \c true.
+         */
+        virtual bool selectNewFiles(QStringList& files, QStringList& types, QStringList& descriptions) const;
+        /** \brief use this if not all files may be deleted by the user. It is called before files are removed. Returns \c true by default.
+         *
+         *  \note you only have to implement this, when you overwrote isFilesListEditable() to return \c true.
+         */
+        virtual bool mayDeleteFiles(QStringList& files, QStringList& types, QStringList& descriptions) const;
+        /** \brief reload the RDR contents.
+         *
+         *  \return returns \c true on success and \c false if an error occured.
+         *  \note you only have to implement this, when you overwrote isFilesListEditable() to return \c true.
+         */
+        virtual bool reloadFromFiles();
+
+
 
 };
 

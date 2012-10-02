@@ -349,7 +349,7 @@ void QFRDRFCSData::intReadData(QDomElement* e) {
             setError(tr("there are no files in the FCS record!"));
             return;
         }
-        loadCorrelationCurvesFromALBA(files[0]);
+        loadCorrelationCurvesFromALBA(files);
     } else if (filetype.toUpper()=="INTERNAL") {
         loadInternal(e);
     } else if (filetype.toUpper()=="CSV_CORR") {
@@ -357,25 +357,38 @@ void QFRDRFCSData::intReadData(QDomElement* e) {
             setError(tr("there are no files in the FCS record!"));
             return;
         }
-        loadCorrelationCurvesFromCSV(files[0]);
+        loadCorrelationCurvesFromCSV(files);
     } else if (filetype.toUpper()=="CSV_RATE") {
         if (files.size()<=0) {
             setError(tr("there are no files in the FCS record!"));
             return;
         }
-        loadCountRatesFromCSV(files[0]);
+        loadCountRatesFromCSV(files);
     } else if (filetype.toUpper()=="CSV_CORR_RATE") {
         if (files.size()<=1) {
             setError(tr("there are too few files in the FCS record (2 required)!"));
             return;
         }
-        loadCorrelationCurvesFromCSV(files[0]);
-        loadCountRatesFromCSV(files[1]);
+        QStringList cfiles, rfiles;
+        for (int i=0; i<files.size(); i+=2) {
+            if (i+1<files.size()) {
+                cfiles.append(files[i]);
+                rfiles.append(files[i+1]);
+            }
+        }
+        loadCorrelationCurvesFromCSV(cfiles);
+        loadCountRatesFromCSV(rfiles);
     }
     //std::cout<<"intReadData ended\n";
 }
 
-bool QFRDRFCSData::loadCountRatesFromCSV(QString filename) {
+struct CSVDATA {
+    datatable2* tab;
+    QString filename;
+};
+
+bool QFRDRFCSData::loadCountRatesFromCSV(QStringList filenames) {
+    QList<CSVDATA> data;
     char separatorchar=',';
     char commentchar='#';
     std::string d=getProperty("CSV_SEPARATOR", ",").toString().toStdString();
@@ -384,345 +397,235 @@ bool QFRDRFCSData::loadCountRatesFromCSV(QString filename) {
     double ratefactor=getProperty("CSV_RATEFACTOR", 1.0).toDouble();
     int firstline=getProperty("CSV_FIRSTLINE", 1).toInt();
     if (d.size()>0) separatorchar=d[0];
-    d=getProperty("CSV_COMMENT", ",").toString().toStdString();
+    d=getProperty("CSV_COMMENT", "#").toString().toStdString();
     if (d.size()>0) commentchar=d[0];
-    try {
-        datatable2 tab;                   // instanciate
-        //std::cout<<"opening CSV: "<<filename.toStdString()<<std::endl;
-        tab.load_csv(filename.toStdString(), separatorchar, commentchar, startswith, firstline);        // load some csv file
-        long long lines=tab.get_line_count();
-        long long columns=tab.get_column_count();
-        resizeRates(lines, columns-1, 1);
-        //std::cout<<"resized correlation to: N="<<lines<<", runs="<<columns-1<<std::endl;
-        for (long long l=0; l<lines; l++) {
-            rateT[l]=tab.get(0, l)*timefactor;
-            //std::cout<<correlationT[l]<<", ";
-            for (int c=1; c<columns; c++) {
-                rate[(c-1)*rateN+l]=tab.get(c, l)*ratefactor;
-                //std::cout<<correlation[(c-1)*correlationN+l]<<", ";
-                //std::cout<<"c="<<c<<std::endl;
-            }
-            //std::cout<<std::endl;
+
+    long long rrateN=0;
+    long long rruns=0;
+    bool error=false;
+
+    for (int ii=0; ii<filenames.size(); ii++) {
+        CSVDATA d;
+        d.filename=filenames[ii];
+
+        try {
+            d.tab=new datatable2();
+            d.tab->load_csv(d.filename.toStdString(), separatorchar, commentchar, startswith, firstline);        // load some csv file
+            long long lines=d.tab->get_line_count();
+            long long columns=d.tab->get_column_count();
+            rruns=rruns+columns-1;
+            rrateN=qMax(lines, rrateN);
+        } catch(datatable2_exception& e) {   // error handling with exceptions
+            setError(tr("Error while reading correlation functions from CSV file '%1': %2").arg(d.filename).arg(QString(e.get_message().c_str())));
+            error=true;
+            break;
         }
-        //std::cout<<"recalculating correlations ... ";
-        //std::cout<<"DONE!\n";
-    } catch(datatable2_exception& e) {   // error handling with exceptions
-        setError(tr("Error while reading correlation functions from CSV file '%1': %2").arg(filename).arg(QString(e.get_message().c_str())));
+        data.append(d);
+        if (error) break;
     }
-    //std::cout<<"opening CSV: "<<filename.toStdString()<<" ... DONE!\n";
-    emitRawDataChanged();
-    if (rateN<1000) autoCalcRateN=rateN;
-    calcBinnedRate();
-    return true;
+    if (!error) {
+        resizeRates(rrateN, rruns,1);
+        int run0=0;
+        for (int ii=0; ii<filenames.size(); ii++) {
+            try {
+                long long lines=data[ii].tab->get_line_count();
+                long long columns=data[ii].tab->get_column_count();
+                for (long long l=0; l<lines; l++) {
+                    if (ii==0) rateT[l]=data[ii].tab->get(0, l)*timefactor;
+                    else if (rateT[l]!=data[ii].tab->get(0, l)*timefactor) {
+                        setError(tr("Error while reading countrates from CSV file '%1': time does not match time in file '%2'").arg(data[ii].filename).arg(data[0].filename));
+                        error=true;
+                        break;
+                    }
+                    for (int c=1; c<columns; c++) {
+                        rate[(run0+c-1)*rateN+l]=data[ii].tab->get(c, l)*ratefactor;
+                    }
+                }
+                run0=run0+lines-1;
+            } catch(datatable2_exception& e) {   // error handling with exceptions
+                setError(tr("Error while reading correlation functions from CSV file '%1': %2").arg(data[ii].filename).arg(QString(e.get_message().c_str())));
+                error=true;
+                break;
+            }
+            if (error) break;
+        }
+    }
+
+    for (int ii=0; ii<data.size(); ii++) {
+        delete data[ii].tab;
+    }
+    data.clear();
+
+    if (!error) {
+        emitRawDataChanged();
+        if (rateN<1000) autoCalcRateN=rateN;
+        calcBinnedRate();
+        return true;
+    } else {
+        return false;
+    }
 }
 
-bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QString filename) {
+
+
+
+
+
+bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
+    QList<CSVDATA> data;
     char separatorchar=',';
     char commentchar='#';
-    double timefactor=getProperty("CSV_TIMEFACTOR", 1.0).toDouble();
     std::string d=getProperty("CSV_SEPARATOR", ",").toString().toStdString();
     std::string startswith=getProperty("CSV_STARTSWITH", "").toString().toStdString();
+    double timefactor=getProperty("CSV_TIMEFACTOR", 1.0).toDouble();
     int firstline=getProperty("CSV_FIRSTLINE", 1).toInt();
     if (d.size()>0) separatorchar=d[0];
-    d=getProperty("CSV_COMMENT", ",").toString().toStdString();
+    d=getProperty("CSV_COMMENT", "#").toString().toStdString();
     if (d.size()>0) commentchar=d[0];
-    try {
-        datatable2 tab;                   // instanciate
-        //std::cout<<"opening CSV: "<<filename.toStdString()<<std::endl;
-        //std::cout<<"startswith = "<<startswith<<std::endl;
-        tab.load_csv(filename.toStdString(), separatorchar, commentchar, startswith, firstline);        // load some csv file
-        long long lines=tab.get_line_count();
-        int columns=tab.get_column_count();
-        resizeCorrelations(lines, columns-1);
-        //std::cout<<"resized correlation to: N="<<lines<<", runs="<<columns-1<<std::endl;
-        for (long long l=0; l<lines; l++) {
-            correlationT[l]=tab.get(0, l)*timefactor;
-            //std::cout<<correlationT[l]<<", ";
-            for (int c=1; c<columns; c++) {
-                correlation[(c-1)*correlationN+l]=tab.get(c, l);
-                //std::cout<<correlation[(c-1)*correlationN+l]<<", ";
-                //std::cout<<"c="<<c<<std::endl;
-            }
-            //std::cout<<std::endl;
+
+    long long ccorrN=0;
+    long long rruns=0;
+    bool error=false;
+
+    for (int ii=0; ii<filenames.size(); ii++) {
+        CSVDATA d;
+        d.filename=filenames[ii];
+
+        try {
+            d.tab=new datatable2();
+            d.tab->load_csv(d.filename.toStdString(), separatorchar, commentchar, startswith, firstline);        // load some csv file
+            long long lines=d.tab->get_line_count();
+            long long columns=d.tab->get_column_count();
+            rruns=rruns+columns-1;
+            ccorrN=qMax(lines, ccorrN);
+        } catch(datatable2_exception& e) {   // error handling with exceptions
+            setError(tr("Error while reading correlation functions from CSV file '%1': %2").arg(d.filename).arg(QString(e.get_message().c_str())));
+            error=true;
+            break;
         }
-        //std::cout<<"recalculating correlations ... ";
-        recalculateCorrelations();
-        //std::cout<<"DONE!\n";
-    } catch(datatable2_exception& e) {   // error handling with exceptions
-        setError(tr("Error while reading correlation functions from CSV file '%1': %2").arg(filename).arg(QString(e.get_message().c_str())));
+        data.append(d);
+        if (error) break;
     }
-    //std::cout<<"opening CSV: "<<filename.toStdString()<<" ... DONE!\n";
-    emitRawDataChanged();
-    return true;
+    if (!error) {
+        resizeCorrelations(ccorrN, rruns);
+        int run0=0;
+        for (int ii=0; ii<filenames.size(); ii++) {
+            try {
+                long long lines=data[ii].tab->get_line_count();
+                long long columns=data[ii].tab->get_column_count();
+
+                for (long long l=0; l<lines; l++) {
+                    if (ii==0) correlationT[l]=data[ii].tab->get(0, l)*timefactor;
+                    else if (correlationT[l]!=data[ii].tab->get(0, l)*timefactor) {
+                        setError(tr("Error while reading correlation fucntions from CSV file '%1': time does not match time in file '%2'").arg(data[ii].filename).arg(data[0].filename));
+                        error=true;
+                        break;
+                    }
+                    for (int c=1; c<columns; c++) {
+                        correlation[(run0+c-1)*rateN+l]=data[ii].tab->get(c, l);
+                    }
+                }
+                run0=run0+lines-1;
+            } catch(datatable2_exception& e) {   // error handling with exceptions
+                setError(tr("Error while reading correlation functions from CSV file '%1': %2").arg(data[ii].filename).arg(QString(e.get_message().c_str())));
+                error=true;
+                break;
+            }
+            if (error) break;
+        }
+    }
+
+    for (int ii=0; ii<data.size(); ii++) {
+        delete data[ii].tab;
+    }
+    data.clear();
+
+    if (!error) {
+        recalculateCorrelations();
+        emitRawDataChanged();
+        return true;
+    } else {
+        return false;
+    }
 }
 
-bool QFRDRFCSData::loadCorrelationCurvesFromALBA(QString filename) {
-    QFile f(filename);
-    if (f.open(QIODevice::ReadOnly)) {
-        QTextStream stream(&f);
-        QString line;
-        // search for [Data] in file
-        do {
-            line=stream.readLine().toLower();
-        } while ((!line.isNull()) && (!line.contains("[data]")));
-        if (line.contains("[data]")) {
-            QList<double> tdata, cdata;
+
+
+
+
+struct  ALBADATA {
+    QString filename;
+    QList<double> tdata, cdata;
+};
+
+bool QFRDRFCSData::loadCorrelationCurvesFromALBA(QStringList filenames) {
+    QList<ALBADATA> data;
+    for (int ii=0; ii<filenames.size(); ii++) {
+        ALBADATA d;
+        d.filename=filenames[ii];
+        data.append(d);
+
+        QFile f(data[ii].filename);
+        if (f.open(QIODevice::ReadOnly)) {
+            QTextStream stream(&f);
+            QString line;
+            // search for [Data] in file
             do {
-                line=stream.readLine();
-                QStringList sl=line.split(",");
-                if (sl.size()>=2) {
-                    tdata.append(sl[0].toDouble());
-                    cdata.append(sl[1].toDouble());
-                    //std::cout<<tdata[tdata.size()-1]<<", "<<cdata[cdata.size()-1]<<std::endl;
-                }
-            } while (!line.isNull());
-            resizeCorrelations(qMin(tdata.size(), cdata.size()), 1);
-            for (int i=0; i<qMin(tdata.size(), cdata.size()); i++) {
-                correlationT[i]=tdata[i];
-                correlation[i]=cdata[i];
+                line=stream.readLine().toLower();
+            } while ((!line.isNull()) && (!line.contains("[data]")));
+            if (line.contains("[data]")) {
+                QList<double> tdata, cdata;
+                do {
+                    line=stream.readLine();
+                    QStringList sl=line.split(",");
+                    if (sl.size()>=2) {
+                        tdata.append(sl[0].toDouble());
+                        cdata.append(sl[1].toDouble());
+                        //std::cout<<tdata[tdata.size()-1]<<", "<<cdata[cdata.size()-1]<<std::endl;
+                    }
+                } while (!line.isNull());
+                data[ii].tdata=tdata;
+                data[ii].cdata=cdata;
+            } else {
+                setError(tr("ISS ALBA file '%1' does not contain a [data] section").arg(filenames[ii]));
+                return false;
             }
         } else {
-            setError(tr("ISS ALBA file '%1' does not contain a [data] section").arg(filename));
+            setError(tr("could not open file '%1'").arg(filenames[ii]));
             return false;
         }
-    } else {
-        setError(tr("could not open file '%1'").arg(filename));
-        return false;
     }
+
+    int ccorrN=0;
+    int rrateN=0;
+    int rruns=0;
+    for (int ii=0; ii<data.size(); ii++) {
+        ccorrN=ccorrN+qMin(data[ii].tdata.size(), data[ii].cdata.size());
+        rruns++;
+    }
+    resizeCorrelations(ccorrN, rruns);
+    int run0=0;
+    for (int ii=0; ii<data.size(); ii++) {
+        for (int i=0; i<qMin(data[ii].tdata.size(), data[ii].cdata.size()); i++) {
+            if (ii==0) {
+                correlationT[i]=data[ii].tdata[i];
+            } else {
+                if (correlationT[i]!=data[ii].tdata[i]) {
+                    setError(tr("lag time in file '%2' and file '%1' are unequal (expected %3, but read %4).").arg(data[0].filename).arg(data[ii].filename).arg(correlationT[i]).arg(data[ii].tdata[i]));
+                    return false;
+                }
+            }
+            correlation[run0*correlationN+i]=data[ii].cdata[i];
+
+        }
+        run0=run0+1;
+    }
+
     recalculateCorrelations();
     emitRawDataChanged();
     return true;
 }
 
-bool QFRDRFCSData::loadFromALV5000(QString filename) {
-    //std::cout<<"loadFromALV5000('"<<filename.toStdString()<<"')\n";
-    FILE* alv_file=fopen(filename.toAscii().data(), "r");
-    //std::cout<<"    alv_file = "<<alv_file<<"\n";
-    if (!alv_file) {
-        setError(tr("could not open file '%1'").arg(filename));
-        return false;
-    }
-    if (ferror(alv_file)) {
-        setError(tr("%2").arg(filename).arg(strerror(errno)));
-        return false;
-    }
-
-    int runs=0;
-    bool isDual=false;
-
-    bool readingHeader=true;
-    //bool isCorrelation=false;
-    //bool isCounRate=false;
-    bool findIdentifier=true;
-    ALV_TOKEN token=ALV_getToken(alv_file, readingHeader);
-    // first we parse the header (until we find the first quoted string)
-    // the data from the header is interpeted and the resulting quickfitDataStoreItem are
-    // beeing created.
-    while (token.type!=ALV_EOF && readingHeader) {
-        if (findIdentifier) {
-            if (token.type==ALV_NAME) {
-                if (token.value.contains("ALV-5000", Qt::CaseInsensitive)) {
-                    setQFProperty("ALV_TYPE", token.value, false, true);
-                    findIdentifier=false;
-                } else if (token.type!=ALV_LINEBREAK && token.type!=ALV_EOF) {
-                    setError(tr("did not find file header").arg(filename));
-                    return false;
-                }
-            }
-        } else {
-            if (token.type==ALV_NAME) { // here we parse "<name> : <value>"
-                QString name=token.value; // store <name>
-                QString value;
-                // get next token which has to be a colon':'
-                token=ALV_getToken(alv_file, readingHeader);
-                if (token.type!=ALV_COLON) {
-                    if (name.toLower().startsWith("alv") && name.toLower().endsWith("data")) {
-                        int pnum=1;
-                        while (propertyExists(QString("ALV_TYPE%1").arg(pnum))) pnum++;
-                        setQFProperty(QString("ALV_TYPE%1").arg(pnum), token.value, false, true);
-                    } else {
-                        setError(tr("colon ':' expected, but found '%2'").arg(filename).arg(token.value));
-                        return false;
-                    }
-                } else {
-                    // get next token which has to be a value or a quoted string or a linebreak
-                    token=ALV_getToken(alv_file, readingHeader);
-                    if (token.type==ALV_QUOTED) {
-                        value=token.value;
-                    } else if (token.type==ALV_VALUE) {
-                        value=token.value;
-                    } else if (token.type!=ALV_LINEBREAK) {
-                        setError(tr("linebreak, number or quoted string expected").arg(filename));
-                        return false;
-                    }
-                    // here we check whether this is an interpreted data field (i.e. it is stored in a separate field of item1
-                    if (name.compare("Date",  Qt::CaseInsensitive)==0) {
-                        QDate date=ALV_toDate(value);
-                        if (date.year()<1950) date.setDate(date.year()+100, date.month(), date.day());
-                        setQFProperty("DATE", date, false, true);
-                    } else if (name.compare("Time",  Qt::CaseInsensitive)==0) {
-                        QTime date=ALV_toTime(value);
-                        setQFProperty("TIME", date, false, true);
-                    } else if (name.contains("Duration",  Qt::CaseInsensitive)) {
-                        setQFProperty("DURATION [s]", token.doubleValue, false, true);
-                    } else if (name.compare("Runs",  Qt::CaseInsensitive)==0) {
-                        runs=(int)round(token.doubleValue);
-                    } else if (name.contains("Temperature",  Qt::CaseInsensitive)) {
-                        setQFProperty("TEMPERATURE [K]", token.doubleValue, false, true);
-                    } else if (name.contains("Viscosity",  Qt::CaseInsensitive)) {
-                        setQFProperty("VISCOSITY [cp]", token.doubleValue, false, true);
-                    } else if (name.contains("Refractive Index",  Qt::CaseInsensitive)) {
-                        setQFProperty("REFRACTIVE_INDEX", token.doubleValue, false, true);
-                    } else if (name.contains("Wavelength",  Qt::CaseInsensitive)) {
-                        setQFProperty("WAVELENGTH [nm]", token.doubleValue, false, true);
-                    } else if (name.contains("Angle",  Qt::CaseInsensitive)) {
-                        setQFProperty("ANGLE [°]", token.doubleValue, false, true);
-                    } else if (name.contains("MeanCR",  Qt::CaseInsensitive)) {
-                        // ignore this property, as it is calculated by this class
-                    } else if (name.contains("SampMemo",  Qt::CaseInsensitive)) {
-                        QString text=getProperty("SAMPLE_MEMO", "").toString();
-                        if (!value.isEmpty()) text=text+"\n"+value;
-                        setQFProperty("SAMPLE_MEMO", text, false, true);
-                    } else if (name.compare("Mode",  Qt::CaseInsensitive)==0) {
-                        setQFProperty("MODE", value, false, true);
-                        setQFProperty("CROSS_CORRELATION", (bool)value.contains("CROSS", Qt::CaseInsensitive), false, true);
-                        isDual=value.contains("DUAL", Qt::CaseInsensitive);
-                        setQFProperty("DUAL_CHANNEL", isDual, false, true);
-                    } else {
-                        setQFProperty(name, value, false, true);
-                    }
-                }
-
-            } else if (token.type==ALV_QUOTED) {
-                // we stop reading the header when we meet the first quoted string token
-                // this is possible as every line of the header begins with an unquoted name
-                // token followed by a colon and number/quoted or alineabreak (identifier line!)
-                readingHeader=false;
-            }
-        }
-        if (readingHeader) token=ALV_getToken(alv_file, readingHeader);
-    }
-
-    int channel=0;
-    if (isDual) {
-        if (propertyExists("CHANNEL")) channel=getProperty("CHANNEL", 0).toInt();
-    }
-
-    //std::cout<<"parsing data section ... runs="<<runs<<"  channel="<<channel<<std::endl;
-    while (token.type!=ALV_EOF) {
-        bool getNew=true;
-        if (token.type==ALV_QUOTED && token.value.contains("correlation", Qt::CaseInsensitive)) {
-            //std::cout<<"  parsing correlation section ..."<<std::endl;
-            getNew=false;
-            QVector<QVector<double> > dat;
-            token=ALV_readNumberMatrix(alv_file, &dat);
-            resizeCorrelations(dat.size(), runs);
-            for (long long  i=0; i<dat.size(); i++) {
-                QVector<double>& d=dat[i];
-                if (d.size()<=0) {
-                    setError(tr("too few columns in line %1 of correlation block.").arg(i));
-                    return false;
-                }
-                correlationT[i]=d[0]/1000.0;
-                if (runs==1) {
-                    // one run => there is no average in the file!
-                    if (d.size()<=1+channel)  {
-                        setError(tr("too few columns in line %1 of correlation block.").arg(i));
-                        return false;
-                    }
-                    correlation[i]=d[1+channel];
-                } else if (runs>1) {
-                    // multiple runs -> average is in file -> ignore average column
-                    if (d.size()<=1+channel*(1+runs)+runs) {
-                        setError(tr("too few columns in line %1 of correlation block.").arg(i));
-                        return false;
-                    }
-                    for (long j=0; j<runs; j++) {
-                        correlation[j*correlationN+i]=d[1+channel*(1+runs)+(1+j)];
-                    }
-                }
-            }
-        }
-        if (token.type==ALV_QUOTED && token.value.contains("count", Qt::CaseInsensitive)) {
-            //std::cout<<"  parsing rate section ..."<<std::endl;
-            getNew=false;
-            QVector<QVector<double> > dat;
-            token=ALV_readNumberMatrix(alv_file, &dat);
-            if (getProperty("CROSS_CORRELATION", false).toBool()) resizeRates(dat.size(), runs, 2);
-            else resizeRates(dat.size(), runs, 1);
-            //std::cout<<"  reading in rate section ... lines="<<dat.size()<<" runs="<<runs<<" channel="<<channel<<std::endl;
-            for (long long i=0; i<dat.size(); i++) {
-                QVector<double>& d=dat[i];
-                if (d.size()<1) {
-                    setError(tr("too few columns in line %1 of rate block.").arg(i));
-                    return false;
-                }
-                rateT[i]=d[0];
-                if (rateChannels<=1) {
-                    if (runs==1) {
-                        // one run => there is no average in the file!
-                        if (d.size()<=1+channel)  {
-                            setError(tr("too few columns in line %1 of rate block.").arg(i));
-                            return false;
-                        }
-                        rate[i]=d[1+channel];
-                    } else if (runs>1) {
-                        // multiple runs -> average is in file -> ignore average column
-                        if (d.size()<=1+channel) {
-                            setError(tr("too few columns in line %1 of rate block.").arg(i));
-                            return false;
-                        }
-                        rate[(runs-1)*rateN+i]=d[1+channel];
-                    }
-                } else {
-                    if (runs==1) {
-                        // one run => there is no average in the file!
-                        if (d.size()<=1+channel)  {
-                            setError(tr("too few columns in line %1 of rate block.").arg(i));
-                            return false;
-                        }
-                        if (isDual && channel==1) {
-                            for (int c=0; c<rateChannels; c++) {
-                                rate[c*rateN*rateRuns+i]=d[1+rateChannels-1-c];
-                            }
-                        } else {
-                            for (int c=0; c<rateChannels; c++) {
-                                rate[c*rateN*rateRuns+i]=d[1+c];
-                            }
-                        }
-                    } else if (runs>1) {
-                        // multiple runs -> average is in file -> ignore average column
-                        if (d.size()<=1+channel) {
-                            setError(tr("too few columns in line %1 of rate block.").arg(i));
-                            return false;
-                        }
-                        if (isDual) {
-                            for (int c=0; c<rateChannels; c++) {
-                                rate[c*rateN*rateRuns+(runs-1)*rateN+i]=d[1+rateChannels-1-c];
-                            }
-                        } else {
-                            for (int c=0; c<rateChannels; c++) {
-                                rate[c*rateN*rateRuns+(runs-1)*rateN+i]=d[1+c];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (getNew) token=ALV_getToken(alv_file, false);
-    }
-    fclose(alv_file);
-
-   // std::cout<<"recalc correlations ..."<<std::endl;
-    recalculateCorrelations();
-
-   // std::cout<<"calc binned rates ..."<<std::endl;
-    autoCalcRateN=rateN;
-    calcBinnedRate();
-    //std::cout<<"DONE !!!"<<std::endl;
-    emitRawDataChanged();
-    return true;
-}
 
 struct ALVFILEDATA  {
     FILE* alv_file;
@@ -815,37 +718,73 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
                         if (name.compare("Date",  Qt::CaseInsensitive)==0) {
                             QDate date=ALV_toDate(value);
                             if (date.year()<1950) date.setDate(date.year()+100, date.month(), date.day());
-                            setQFProperty("DATE", date, false, true);
+                            if (i==0) setQFProperty("DATE", date, false, true);
+                            else if (date!=getProperty("DATE").toDate()) setQFProperty(QString("DATE%1").arg(i+1), date, false, true);
                         } else if (name.compare("Time",  Qt::CaseInsensitive)==0) {
                             QTime date=ALV_toTime(value);
-                            setQFProperty("TIME", date, false, true);
+                            if (i==0) setQFProperty("TIME", date, false, true);
+                            else if (date!=getProperty("TIME").toTime()) setQFProperty(QString("TIME%1").arg(i+1), date, false, true);
                         } else if (name.contains("Duration",  Qt::CaseInsensitive)) {
-                            setQFProperty("DURATION [s]", data[i].token.doubleValue, false, true);
+                            QString propN="DURATION [s]";
+                            double propV=data[i].token.doubleValue;
+                            if (i==0) setQFProperty(propN, propV, false, true);
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
                         } else if (name.compare("Runs",  Qt::CaseInsensitive)==0) {
                             data[i].runs=(int)round(data[i].token.doubleValue);
                         } else if (name.contains("Temperature",  Qt::CaseInsensitive)) {
-                            setQFProperty("TEMPERATURE [K]", data[i].token.doubleValue, false, true);
+                            QString propN="TEMPERATURE [K]";
+                            double propV=data[i].token.doubleValue;
+                            if (i==0) setQFPropertyIfNotUserEditable(propN, propV, false, true);
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
                         } else if (name.contains("Viscosity",  Qt::CaseInsensitive)) {
-                            setQFProperty("VISCOSITY [cp]", data[i].token.doubleValue, false, true);
+                            QString propN="VISCOSITY [cp]";
+                            double propV=data[i].token.doubleValue;
+                            if (i==0) setQFPropertyIfNotUserEditable(propN, propV, false, true);
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
                         } else if (name.contains("Refractive Index",  Qt::CaseInsensitive)) {
-                            setQFProperty("REFRACTIVE_INDEX", data[i].token.doubleValue, false, true);
+                            QString propN="REFRACTIVE_INDEX";
+                            double propV=data[i].token.doubleValue;
+                            if (i==0) setQFPropertyIfNotUserEditable(propN, propV, false, true);
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
                         } else if (name.contains("Wavelength",  Qt::CaseInsensitive)) {
-                            setQFProperty("WAVELENGTH [nm]", data[i].token.doubleValue, false, true);
+                            QString propN="WAVELENGTH [nm]";
+                            double propV=data[i].token.doubleValue;
+                            if (i==0) setQFPropertyIfNotUserEditable(propN, propV, false, true);
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
                         } else if (name.contains("Angle",  Qt::CaseInsensitive)) {
-                            setQFProperty("ANGLE [°]", data[i].token.doubleValue, false, true);
+                            QString propN="ANGLE [°]";
+                            double propV=data[i].token.doubleValue;
+                            if (i==0) setQFPropertyIfNotUserEditable(propN, propV, false, true);
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
                         } else if (name.contains("MeanCR",  Qt::CaseInsensitive)) {
                             // ignore this property, as it is calculated by this class
                         } else if (name.contains("SampMemo",  Qt::CaseInsensitive)) {
                             QString text=getProperty("SAMPLE_MEMO", "").toString();
-                            if (!value.isEmpty()) text=text+"\n"+value;
+                            if (!value.isEmpty()) text=text+tr("\nfile %1\n").arg(i+1)+value;
                             setQFProperty("SAMPLE_MEMO", text, false, true);
                         } else if (name.compare("Mode",  Qt::CaseInsensitive)==0) {
-                            setQFProperty("MODE", value, false, true);
-                            setQFProperty("CROSS_CORRELATION", (bool)value.contains("CROSS", Qt::CaseInsensitive), false, true);
-                            data[i].isDual=value.contains("DUAL", Qt::CaseInsensitive);
-                            setQFProperty("DUAL_CHANNEL", data[i].isDual, false, true);
+                            QString propN="MODE";
+                            QString propVS=value;
+                            if (i==0) setQFProperty(propN, propVS, false, true);
+                            else if (propVS!=getProperty(propN).toString()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propVS).arg(propN));
+
+                            propN="CROSS_CORRELATION";
+                            bool propV=(bool)value.contains("CROSS", Qt::CaseInsensitive);
+                            if (i==0) setQFProperty(propN, propV, false, true);
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
+
+                            propN="DUAL_CHANNEL";
+                            propV=value.contains("DUAL", Qt::CaseInsensitive);
+                            data[i].isDual=propV;
+                            if (i==0) setQFProperty(propN, propV, false, true);
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
+
+
                         } else {
-                            setQFProperty(name, value, false, true);
+                            QString propN=name;
+                            QString propVS=value;
+                            if (i==0) setQFProperty(propN, propVS, false, true);
+                            else if (propVS!=getProperty(propN).toString()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propVS).arg(propN));
                         }
                     }
 
@@ -921,7 +860,7 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
                     correlationT[i]=d[0]/1000.0;
                 } else {
                     if (correlationT[i]!=d[0]/1000.0) {
-                        setError(tr("lag time in file '%2' and file '%1' are unequal (expected %3, but read %4).").arg(data[0].filename).arg(data[ii].filename).arg(d[0]/1000.0).arg(correlationT[i]));
+                        setError(tr("lag time in file '%2' and file '%1' are unequal (expected %3, but read %4).").arg(data[0].filename).arg(data[ii].filename).arg(correlationT[i]).arg(d[0]/1000.0));
                         error=true;
                         //qDebug()<<"ERROR 2 !";
                         break;
@@ -967,7 +906,7 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
                     rateT[i]=d[0];
                 } else {
                     if (rateT[i]!=d[0]) {
-                        setError(tr("countrate timepoint in file '%2' and file '%1' are unequal (expected %3, but read %4).").arg(data[0].filename).arg(data[ii].filename).arg(d[0]).arg(rateT[i]));
+                        setError(tr("countrate timepoint in file '%2' and file '%1' are unequal (expected %3, but read %4).").arg(data[0].filename).arg(data[ii].filename).arg(rateT[i]).arg(d[0]));
                         error=true;
                         break;
                     }

@@ -55,6 +55,8 @@ class QFLIB_EXPORT QFProperties {
 
         /** \brief set property to the specified value */
         void setQFProperty(const QString& p, QVariant value, bool usereditable=true, bool visible=true);
+        /** \brief set property to the specified value, if it is not user editable or does not exist */
+        void setQFPropertyIfNotUserEditable(const QString& p, QVariant value, bool usereditable=true, bool visible=true);
         /** \brief set property to the specified value */
         inline void setDoubleProperty(const QString& p, double value, bool usereditable=true, bool visible=true) {
             setQFProperty(p, QVariant(value), usereditable, visible);

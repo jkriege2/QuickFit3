@@ -138,6 +138,25 @@ void QFProperties::setQFProperty(const QString &p, QVariant value, bool useredit
     emitPropertiesChanged(p,visible);
 }
 
+void QFProperties::setQFPropertyIfNotUserEditable(const QString &p, QVariant value, bool usereditable, bool visible)
+{
+    bool ok=true;
+    {
+        QWriteLocker lock(propertyLocker);
+        if (props.contains(p)) {
+            ok = !props[p].usereditable;
+        }
+        if (ok) {
+            propertyItem i;
+            i.data=value;
+            i.usereditable=usereditable;
+            i.visible=visible;
+            props[p]=i;
+        }
+    }
+    if (ok) emitPropertiesChanged(p,visible);
+}
+
 void QFProperties::storeProperties(QXmlStreamWriter& w) const {
     QReadLocker lock(propertyLocker);
     QHashIterator<QString, propertyItem> i(props);

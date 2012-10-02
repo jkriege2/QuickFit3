@@ -102,6 +102,21 @@ QFRDRPropertyModel* QFRawDataRecord::getPropertyModel() {
     return propModel;
 }
 
+void QFRawDataRecord::log_text(const QString &message) const
+{
+    if (project) project->log_text(message);
+}
+
+void QFRawDataRecord::log_warning(const QString &message) const
+{
+    if (project) project->log_warning(message);
+}
+
+void QFRawDataRecord::log_error(const QString &message) const
+{
+    if (project) project->log_error(message);
+}
+
 QFRDRResultsModel* QFRawDataRecord::resultsGetModel() const {
     return resultsmodel;
 };
@@ -822,6 +837,76 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
     intWriteData(w);
     w.writeEndElement();
     w.writeEndElement();
+}
+
+
+QString QFRawDataRecord::getType() const {
+    return tr("unknown");
+}
+
+QString QFRawDataRecord::getTypeName() const {
+    return tr("unknown");
+}
+
+QIcon QFRawDataRecord::getSmallIcon() const {
+    return QIcon(":/lib/projecttree_emptyrdr.png");
+}
+
+QString QFRawDataRecord::getTypeDescription() const {
+    return tr("unknown");
+}
+
+QIcon QFRawDataRecord::getLargeIcon() const {
+    return QIcon(":/lib/projecttree_emptyrdr.png");
+}
+
+int QFRawDataRecord::getEditorCount() {
+    return 0;
+}
+
+QString QFRawDataRecord::getEditorName(int i) {
+    return QString("");
+}
+
+QFRawDataEditor* QFRawDataRecord::createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i, QWidget* parent) {
+    return NULL;
+}
+
+void QFRawDataRecord::exportData(const QString& format, const QString& filename) const {
+
+}
+
+QStringList QFRawDataRecord::getExportFiletypes() {
+    return QStringList();
+}
+
+QString QFRawDataRecord::getExportDialogTitle() {
+    return tr("");
+}
+
+QString QFRawDataRecord::getExportDialogFiletypes() {
+    return tr("");
+}
+
+
+bool QFRawDataRecord::isFilesListEditable() const
+{
+    return false;
+}
+
+bool QFRawDataRecord::selectNewFiles(QStringList &files, QStringList &types, QStringList &descriptions) const
+{
+    return false;
+}
+
+bool QFRawDataRecord::mayDeleteFiles(QStringList &files, QStringList &types, QStringList &descriptions) const
+{
+    return true;
+}
+
+bool QFRawDataRecord::reloadFromFiles()
+{
+    return true;
 }
 
 
