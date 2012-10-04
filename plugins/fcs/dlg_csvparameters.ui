@@ -26,28 +26,7 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0">
-   <item>
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;:/lib/help.png&quot; /&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; Help:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Please specify the parameters used to import correlation curves from a comma separated values (CSV) file into QuickFit.&lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If the data section starts late in the file, you can set this property and the importer will search through all lines in the file until it finds one &lt;span style=&quot; text-decoration: underline;&quot;&gt;containing&lt;/span&gt; the given string and start importing just after it.&lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;It is also possible to start reading in the n-th line (possibly after finding above's  string), i.e. to skip the first n-1 lines&lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The column separator specifies a character that separates the columns in the file. If you input a whitepsace, the columns are separated by whitespaces&lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If comments appear in the file, the should start with a special character which is set in this property&lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If the time column (column 0) does not give the lag time in second you may set this value and the time column values will be multiplied by it. E.g. if the lag time is given in milliseconds then this property has to be &lt;span style=&quot; font-style:italic;&quot;&gt;1e-3&lt;/span&gt;.&lt;/li&gt;&lt;/ul&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0,0">
    <item>
     <widget class="QLabel" name="label_7">
      <property name="font">
@@ -78,121 +57,233 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <layout class="QFormLayout" name="formLayout">
-     <property name="fieldGrowthPolicy">
-      <enum>QFormLayout::ExpandingFieldsGrow</enum>
+    <layout class="QGridLayout" name="gridLayout">
+     <property name="spacing">
+      <number>0</number>
      </property>
      <item row="0" column="0">
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="label_11">
        <property name="text">
-        <string>Data &amp;starts with:</string>
+        <string>Parameter set &amp;name:</string>
        </property>
        <property name="buddy">
-        <cstring>edtStartswith</cstring>
+        <cstring>cmbParamSetName</cstring>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="edtStartswith">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QComboBox" name="cmbParamSetName">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnSave">
+         <property name="toolTip">
+          <string>save the current configuration under a new name in the list on the left, so it can be reloaded easily later.</string>
+         </property>
+         <property name="text">
+          <string>&amp;Save</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../lib/lib.qrc">
+           <normaloff>:/lib/file_add.png</normaloff>:/lib/file_add.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnDelete">
+         <property name="toolTip">
+          <string>delete the currently selected configuration from the list on the left.</string>
+         </property>
+         <property name="text">
+          <string>&amp;Delete</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../lib/lib.qrc">
+           <normaloff>:/lib/file_delete.png</normaloff>:/lib/file_delete.png</iconset>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_8">
-       <property name="text">
-        <string>Start read in line &amp;line:</string>
+     <item row="1" column="0" colspan="2">
+      <layout class="QFormLayout" name="formLayout">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::ExpandingFieldsGrow</enum>
        </property>
-       <property name="buddy">
-        <cstring>spinStartInLine</cstring>
+       <property name="leftMargin">
+        <number>16</number>
        </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QSpinBox" name="spinStartInLine">
-       <property name="minimum">
-        <number>1</number>
+       <property name="topMargin">
+        <number>5</number>
        </property>
-       <property name="maximum">
-        <number>100000</number>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>&amp;Column Separator:</string>
-       </property>
-       <property name="buddy">
-        <cstring>edtColumn</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="edtColumn">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>,</string>
-       </property>
-       <property name="maxLength">
-        <number>1</number>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>C&amp;oment Separator:</string>
-       </property>
-       <property name="buddy">
-        <cstring>edtComment</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="edtComment">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>#</string>
-       </property>
-       <property name="maxLength">
-        <number>1</number>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>&amp;Time Factor [seconds/time unit]:</string>
-       </property>
-       <property name="buddy">
-        <cstring>edtTimefactor</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="edtTimefactor">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>1</string>
-       </property>
-      </widget>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Data &amp;starts with:</string>
+         </property>
+         <property name="buddy">
+          <cstring>edtStartswith</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="edtStartswith">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Data &amp;ends with:</string>
+         </property>
+         <property name="buddy">
+          <cstring>edtEndsWith</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="edtEndsWith">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Start read in line &amp;line:</string>
+         </property>
+         <property name="buddy">
+          <cstring>spinStartInLine</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QSpinBox" name="spinStartInLine">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>100000</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>&amp;Column Separator:</string>
+         </property>
+         <property name="buddy">
+          <cstring>edtColumn</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLineEdit" name="edtColumn">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>,</string>
+         </property>
+         <property name="maxLength">
+          <number>1</number>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>C&amp;oment Separator:</string>
+         </property>
+         <property name="buddy">
+          <cstring>edtComment</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QLineEdit" name="edtComment">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>#</string>
+         </property>
+         <property name="maxLength">
+          <number>1</number>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>&amp;Time Factor [seconds/time unit]:</string>
+         </property>
+         <property name="buddy">
+          <cstring>edtTimefactor</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QLineEdit" name="edtTimefactor">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>1</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>&amp;Mode:</string>
+         </property>
+         <property name="buddy">
+          <cstring>cmbMode</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QComboBox" name="cmbMode">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <item>
+          <property name="text">
+           <string>tau, corr, corr, ...</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>tau, corr, err, corr, err, ...</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
@@ -202,7 +293,7 @@ p, li { white-space: pre-wrap; }
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
@@ -217,7 +308,9 @@ p, li { white-space: pre-wrap; }
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>cmbMode</tabstop>
   <tabstop>edtStartswith</tabstop>
+  <tabstop>edtEndsWith</tabstop>
   <tabstop>spinStartInLine</tabstop>
   <tabstop>edtColumn</tabstop>
   <tabstop>edtComment</tabstop>
@@ -225,7 +318,9 @@ p, li { white-space: pre-wrap; }
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrfcs.qrc"/>
+  <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -251,12 +346,188 @@ p, li { white-space: pre-wrap; }
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>303</x>
-     <y>607</y>
+     <x>312</x>
+     <y>630</y>
     </hint>
     <hint type="destinationlabel">
      <x>500</x>
      <y>500</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>helpRequested()</signal>
+   <receiver>dlgCSVParameters</receiver>
+   <slot>showHelp()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>619</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>563</x>
+     <y>386</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnSave</sender>
+   <signal>clicked()</signal>
+   <receiver>dlgCSVParameters</receiver>
+   <slot>saveConfig()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>551</x>
+     <y>401</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>533</x>
+     <y>381</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnDelete</sender>
+   <signal>clicked()</signal>
+   <receiver>dlgCSVParameters</receiver>
+   <slot>deleteConfig()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>645</x>
+     <y>397</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>633</x>
+     <y>361</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbParamSetName</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>dlgCSVParameters</receiver>
+   <slot>currentConfigChanged(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>338</x>
+     <y>399</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>312</x>
+     <y>25</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbMode</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>dlgCSVParameters</receiver>
+   <slot>dataChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>241</x>
+     <y>434</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>521</x>
+     <y>25</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtStartswith</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>dlgCSVParameters</receiver>
+   <slot>dataChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>210</x>
+     <y>460</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>339</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtEndsWith</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>dlgCSVParameters</receiver>
+   <slot>dataChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>256</x>
+     <y>482</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>486</x>
+     <y>2</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinStartInLine</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>dlgCSVParameters</receiver>
+   <slot>dataChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>198</x>
+     <y>509</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>587</x>
+     <y>6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtColumn</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>dlgCSVParameters</receiver>
+   <slot>dataChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>223</x>
+     <y>539</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>451</x>
+     <y>510</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtComment</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>dlgCSVParameters</receiver>
+   <slot>dataChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>279</x>
+     <y>561</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>527</x>
+     <y>544</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtTimefactor</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>dlgCSVParameters</receiver>
+   <slot>dataChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>222</x>
+     <y>584</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>487</x>
+     <y>578</y>
     </hint>
    </hints>
   </connection>
@@ -278,4 +549,11 @@ p, li { white-space: pre-wrap; }
    <bool>true</bool>
   </property>
  </designerdata>
+ <slots>
+  <slot>showHelp()</slot>
+  <slot>saveConfig()</slot>
+  <slot>deleteConfig()</slot>
+  <slot>currentConfigChanged(QString)</slot>
+  <slot>dataChanged()</slot>
+ </slots>
 </ui>

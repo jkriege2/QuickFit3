@@ -120,23 +120,60 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief set type of i-th file
          *
          *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
+         *  \note Only use this function, when you overwrote isFilesListEditable() to return FilesEditable flag. and try to call reloadFromFiles() after editing the files list.
+         *        This function does not internally call reloadFromFiles(), so you can do more changes before reloading!
          */
         void setFileType(int i, const QString type);
         /** \brief set description of i-th file
          *
          *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
+         *  \note Only use this function, when you overwrote isFilesListEditable() to return FilesEditable flag. and try to call reloadFromFiles() after editing the files list.
+         *        This function does not internally call reloadFromFiles(), so you can do more changes before reloading!
          */
         void setFileDecsription(int i, const QString description);
         /** \brief add a new file
          *
          *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
+         *  \note Only use this function, when you overwrote isFilesListEditable() to return FilesEditable flag. and try to call reloadFromFiles() after editing the files list.
+         *        This function does not internally call reloadFromFiles(), so you can do more changes before reloading!
          */
         void addFile(const QString file, const QString type, const QString description);
         /** \brief delete the i-th file
          *
          *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
+         *  \note Only use this function, when you overwrote isFilesListEditable() to return FilesEditable flag. and try to call reloadFromFiles() after editing the files list.
+         *        This function does not internally call reloadFromFiles(), so you can do more changes before reloading!
          */
         void deleteFile(int i);
+
+        /** \brief move the i-th file one position up in the list
+         *
+         *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
+         *  \note Only use this function, when you overwrote isFilesListEditable() to return FilesEditable flag. and try to call reloadFromFiles() after editing the files list.
+         *        This function does not internally call reloadFromFiles(), so you can do more changes before reloading!
+         */
+        void moveFileUp(int i);
+        /** \brief move the i-th file one position down in the list
+         *
+         *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
+         *  \note Only use this function, when you overwrote isFilesListEditable() to return FilesEditable flag. and try to call reloadFromFiles() after editing the files list.
+         *        This function does not internally call reloadFromFiles(), so you can do more changes before reloading!
+         */
+        void moveFileDown(int i);
+        /** \brief move the specified files one position up in the list
+         *
+         *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
+         *  \note Only use this function, when you overwrote isFilesListEditable() to return FilesEditable flag. and try to call reloadFromFiles() after editing the files list.
+         *        This function does not internally call reloadFromFiles(), so you can do more changes before reloading!
+         */
+        void moveFilesUp(const QList<int>& list);
+        /** \brief move the specified files one position down in the list
+         *
+         *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
+         *  \note Only use this function, when you overwrote isFilesListEditable() to return FilesEditable flag. and try to call reloadFromFiles() after editing the files list.
+         *        This function does not internally call reloadFromFiles(), so you can do more changes before reloading!
+         */
+        void moveFilesDown(const QList<int>& list);
 
 
 
@@ -740,32 +777,49 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         virtual QString getExportDialogTitle();
         /** \brief returns the filetype of the Export file dialog */
         virtual QString getExportDialogFiletypes();
-        /** \brief indicates whether the files list may be edited by the user. In that case the file list editing functions (protected) have to be implemented! */
-        virtual bool isFilesListEditable() const;
 
-    protected:
+
+
+        enum FileListEditOption {
+                 FilesNotEditable = 0x0,
+                 FilesEditable = 0x1,
+                 CustomFilesAddFunction = 0x2
+         };
+         Q_DECLARE_FLAGS(FileListEditOptions, FileListEditOption)
+
+
+        /** \brief indicates whether the files list may be edited by the user. In that case the file list editing functions (protected) have to be implemented! */
+        virtual FileListEditOptions isFilesListEditable() const;
+
         /** \brief this should present the user with a dialog to select a bunch of files to add to the files list. If the user selects "Cancel", return \c false, otherwise
          *         return \c true. In the second case the files in \a files will be added to the files list of this RDR and reloadFromFiles() will be called immediately afterwards!
          *
-         *  \note you only have to implement this, when you overwrote isFilesListEditable() to return \c true.
+         *  \note you only have to implement this, when you overwrote isFilesListEditable() to return the CustomFilesAddFunction and the FilesEditable flags.
          */
         virtual bool selectNewFiles(QStringList& files, QStringList& types, QStringList& descriptions) const;
         /** \brief use this if not all files may be deleted by the user. It is called before files are removed. Returns \c true by default.
          *
-         *  \note you only have to implement this, when you overwrote isFilesListEditable() to return \c true.
+         *  \note you only have to implement this, when you overwrote isFilesListEditable() to return FilesEditable flag.
          */
         virtual bool mayDeleteFiles(QStringList& files, QStringList& types, QStringList& descriptions) const;
         /** \brief reload the RDR contents.
          *
          *  \return returns \c true on success and \c false if an error occured.
-         *  \note you only have to implement this, when you overwrote isFilesListEditable() to return \c true.
+         *  \note you only have to implement this, when you overwrote isFilesListEditable() to return FilesEditable flag.
          */
         virtual bool reloadFromFiles();
+        /** \brief returns a list of possible files types
+         *
+         *  \return returns \c true on success and \c false if an error occured.
+         *  \note you only have to implement this, when you overwrote isFilesListEditable() to return FilesEditable flag.
+         */
+        virtual QStringList getPossibleFilesTypes() const;
 
 
 
 };
 
-
+Q_DECLARE_OPERATORS_FOR_FLAGS(QFRawDataRecord::FileListEditOptions)
 
 #endif // QFRAWDATARECORD_H
+

@@ -1,12 +1,16 @@
 #include "dlgcsvparameters.h"
 #include <QtGui>
 #include <QtDebug>
+#include "qfpluginservices.h"
+#include "programoptions.h"
 
-dlgCSVParameters::dlgCSVParameters(QWidget* parent, QString startswith, QString columnSeparator, QString commentStart, double timefactor, int startInLine):
+dlgCSVParameters::dlgCSVParameters(QWidget* parent, int mode, QString startswith, QString endswith, QString columnSeparator, QString commentStart, double timefactor, int startInLine):
     QDialog(parent)
 {
+    updating=false;
     setupUi(this);
     edtStartswith->setText(startswith);
+    edtEndsWith->setText(endswith);
     QDoubleValidator* validator=new QDoubleValidator(1e-100,1e100,9,edtTimefactor);
     validator->setNotation(QDoubleValidator::ScientificNotation);
     //validator->setDecimals(9);
@@ -14,8 +18,10 @@ dlgCSVParameters::dlgCSVParameters(QWidget* parent, QString startswith, QString 
     edtTimefactor->setText(QString::number(timefactor));
     edtColumn->setText(QString(columnSeparator));
     edtComment->setText(QString(commentStart));
+    cmbMode->setCurrentIndex(mode);
     spinStartInLine->setValue(startInLine);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(checkValues()));
+    loadConfigs();
 }
 
 dlgCSVParameters::~dlgCSVParameters()
@@ -74,9 +80,164 @@ void dlgCSVParameters::checkValues() {
         s=edtComment->text();
         comment_start=(s.size()>0)?s[0].toAscii():'#';
         startswith=edtStartswith->text();
+        endswith=edtEndsWith->text();
         timefactor=edtTimefactor->text().toDouble();
         firstline=spinStartInLine->value();
-
+        mode=qMax(0, cmbMode->currentIndex());
         accept();
     }
+}
+
+void dlgCSVParameters::showHelp()
+{
+    QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("fcs")+"/fcs_fromfiles.html#CSV");
+}
+
+
+
+void dlgCSVParameters::saveConfig() {
+    QString name=tr("my import config name");
+    QStringList items=getNames();
+    bool ok=false;
+    name=QInputDialog::getItem(NULL, tr("save CSV import configuration"), tr("name for new configuration:"), items, items.size()-1, true, &ok);
+    if (ok) {
+
+        setProperty(name, "name", name);
+        setProperty(name, "csv_separator", edtColumn->text());
+        setProperty(name, "csv_comment", edtComment->text());
+        setProperty(name, "csv_startswith", edtStartswith->text());
+        setProperty(name, "csv_endswith", edtEndsWith->text());
+        setProperty(name, "csv_timefactor", edtTimefactor->text().toDouble());
+        setProperty(name, "csv_firstline", spinStartInLine->value());
+        setProperty(name, "csv_mode", cmbMode->currentIndex());
+
+
+        loadConfigs();
+    }
+}
+
+void dlgCSVParameters::deleteConfig() {
+    QString index=cmbParamSetName->currentText();
+    if (!index.isEmpty()) {
+        QDir d;
+        d.mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/qfrdrfcs/");
+        QSettings set(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/qfrdrfcs/imports.ini", QSettings::IniFormat);
+        QStringList groups=set.childGroups();
+        for (int i=0; i<groups.size(); i++) {
+            set.beginGroup(groups[i]);
+            QString n=set.value("name", "").toString();
+            if (!n.isEmpty() && (n==index)) set.remove("");
+            set.endGroup();
+        }
+        loadConfigs();
+    }
+}
+
+void dlgCSVParameters::currentConfigChanged(const QString &name) {
+    if (name.isEmpty()) return;
+    updating=true;
+    edtColumn->setText(getProperty(name, "csv_separator", edtColumn->text()).toString());
+    edtComment->setText(getProperty(name, "csv_comment", edtComment->text()).toString());
+    edtStartswith->setText(getProperty(name, "csv_startswith", edtStartswith->text()).toString());
+    edtEndsWith->setText(getProperty(name, "csv_endswith", edtEndsWith->text()).toString());
+    edtTimefactor->setText(getProperty(name, "csv_timefactor", edtTimefactor->text().toDouble()).toString());
+    spinStartInLine->setValue(getProperty(name, "csv_firstline", spinStartInLine->value()).toInt());
+    cmbMode->setCurrentIndex(getProperty(name, "csv_mode", cmbMode->currentIndex()).toInt());
+    updating=false;
+}
+
+void dlgCSVParameters::dataChanged()
+{
+    if (!updating) cmbParamSetName->setCurrentIndex(-1);
+}
+
+QStringList dlgCSVParameters::getNames()
+{
+    QStringList names;
+    if (QFile::exists(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/qfrdrfcs/imports.ini")) {
+        QSettings set(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/qfrdrfcs/imports.ini", QSettings::IniFormat);
+        QStringList groups=set.childGroups();
+        for (int i=0; i<groups.size(); i++) {
+            set.beginGroup(groups[i]);
+            QString n=set.value("name", "").toString();
+            if (!n.isEmpty() && !names.contains(n)) names<<n;
+            set.endGroup();
+        }
+
+    }
+    QDir d;
+    d.mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/qfrdrfcs/");
+    QSettings set(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/qfrdrfcs/imports.ini", QSettings::IniFormat);
+    QStringList groups=set.childGroups();
+    for (int i=0; i<groups.size(); i++) {
+        set.beginGroup(groups[i]);
+        QString n=set.value("name", "").toString();
+        if (!n.isEmpty() && !names.contains(n)) names<<n;
+        set.endGroup();
+    }
+    return names;
+
+}
+
+QVariant dlgCSVParameters::getProperty(QString index, QString property, QVariant defaultValue)
+{
+    QVariant value;
+    if (QFile::exists(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/qfrdrfcs/imports.ini")) {
+        QSettings set(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/qfrdrfcs/imports.ini", QSettings::IniFormat);
+        QStringList groups=set.childGroups();
+        for (int i=0; i<groups.size(); i++) {
+            set.beginGroup(groups[i]);
+            QString n=set.value("name", "").toString();
+            if (n==index) value=set.value(property, defaultValue);
+            set.endGroup();
+        }
+
+    }
+    QDir d;
+    d.mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/qfrdrfcs/");
+    QSettings set(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/qfrdrfcs/imports.ini", QSettings::IniFormat);
+    QStringList groups=set.childGroups();
+    for (int i=0; i<groups.size(); i++) {
+        set.beginGroup(groups[i]);
+        QString n=set.value("name", "").toString();
+        if (n==index) value=set.value(property, defaultValue);
+        set.endGroup();
+    }
+    return value;
+}
+
+void dlgCSVParameters::setProperty(QString index, QString property, QVariant value) {
+    QDir d;
+    d.mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/qfrdrfcs/");
+    QSettings set(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/qfrdrfcs/imports.ini", QSettings::IniFormat);
+    QStringList groups=set.childGroups();
+    bool setVal=false;
+    int maxGroup=-1;
+    for (int i=0; i<groups.size(); i++) {
+        set.beginGroup(groups[i]);
+        QString n=set.value("name", "").toString();
+        if (n==index) {
+            set.setValue(property, value);
+            setVal=true;
+        }
+        QRegExp rx("group(\\d+)");
+        if (rx.indexIn(n, 0)>=0) {
+            maxGroup=qMax(maxGroup, rx.cap(1).toInt());
+        }
+        set.endGroup();
+    }
+    if (!setVal) {
+        set.setValue(QString("group%1/%2").arg(maxGroup+1).arg(property), value);
+    }
+}
+
+void dlgCSVParameters::loadConfigs()
+{
+    QString name=cmbParamSetName->currentText();
+    disconnect(cmbParamSetName, SIGNAL(currentIndexChanged(QString)), this, SLOT(currentConfigChanged(QString)));
+    cmbParamSetName->clear();
+    cmbParamSetName->addItems(getNames());
+    cmbParamSetName->setCurrentIndex(cmbParamSetName->findText(name));
+    connect(cmbParamSetName, SIGNAL(currentIndexChanged(QString)), this, SLOT(currentConfigChanged(QString)));
+
 }

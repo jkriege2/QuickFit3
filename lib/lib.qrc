@@ -3,8 +3,8 @@
         <file alias="lib/print.png">../images/16x16/document_print.png</file>
         <file alias="lib/save16.png">../images/16x16/filesave.png</file>
         <file alias="lib/refresh16.png">../images/16x16/reload.png</file>
-        <file alias="lib/prop_add.png">./icons/list_add.png</file>
-        <file alias="lib/prop_delete.png">./icons/list_remove.png</file>
+        <file alias="lib/prop_add.png">icons/list_add.png</file>
+        <file alias="lib/prop_delete.png">icons/list_remove.png</file>
         <file alias="lib/prop_next.png">../images/16x16/arrow_right.png</file>
         <file alias="lib/prop_previous.png">../images/16x16/arrow_left.png</file>
         <file alias="lib/projecttree_folder.png">../images/16x16/project_folder.png</file>
@@ -12,10 +12,13 @@
         <file alias="lib/projecttree_emptyrdr.png">../images/16x16/empty.png</file>
         <file alias="lib/projecttree_emptyeval.png">../images/16x16/empty.png</file>
         <file alias="lib/projecttree_project.png">../images/16x16/qf3fileicon.png</file>
-        <file alias="lib/file_add.png">./icons/list_add.png</file>
-        <file alias="lib/file_delete.png">./icons/list_remove.png</file>
-        <file alias="lib/file_edit.png">./icons/edit.png</file>
-        <file alias="lib/file_copy.png">./icons/edit_copy.png</file>
+        <file alias="lib/file_add.png">icons/list_add.png</file>
+        <file alias="lib/file_delete.png">icons/list_remove.png</file>
+        <file alias="lib/file_edit.png">icons/edit.png</file>
+        <file alias="lib/file_copy.png">icons/edit_copy.png</file>
+        <file alias="lib/file_down.png">icons/file_down.png</file>
+        <file alias="lib/file_up.png">icons/file_up.png</file>
+        <file alias="lib/file_opendir.png">icons/fileselect.png</file>
     </qresource>
     <qresource prefix="/lib/help">
         <file alias="help_down.png">icons/help_down.png</file>

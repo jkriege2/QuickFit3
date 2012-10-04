@@ -1,6 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file alias="fcs_open.png">./icons/fcs_open.png</file>
+    <file alias="fcs_multifileopen.png">./icons/fcs_multifileopen.png</file>
     <file alias="fcs_logo.png">./icons/22x22_fcs_open.png</file>
     <file alias="fcs_simulate.png">./icons/fcs_simulate.png</file>
     <file alias="fcs_rawdata.png">./icons/fcs_rawdata.png</file>

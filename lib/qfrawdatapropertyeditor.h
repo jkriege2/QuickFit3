@@ -17,6 +17,7 @@
 #include <QList>
 #include <QPair>
 #include <QTimer>
+#include <QModelIndexList>
 #include "qfenhancedlineedit.h"
 #include "qfstyledbutton.h"
 #include "qfcompleterfromfile.h"
@@ -129,8 +130,12 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         void addFile();
         void removeFile();
         void editFile();
-        void showEditFilesWarning();
+        void showEditFilesWarning(bool activated);
         void copyFile();
+        void moveFilesUp();
+        void moveFilesDown();
+        void openFilesDirectory();
+
     private:
         QTimer* timerResizeProps;
 
@@ -206,8 +211,11 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QAction* actEditFile;
         QAction* actCopyFile;
         QAction* actEnableFileActions;
-
+        QAction* actMoveFilesUp;
+        QAction* actMoveFilesDown;
+        QAction* actOpenFileDirectory;
         QAction* actMakePropertyEditable;
+
 
 
         QMenuBar* menuBar;

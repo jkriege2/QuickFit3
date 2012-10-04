@@ -104,6 +104,7 @@ bool QFRDRPhotonCountsData::loadCountRatesFromCSV(QString filename) {
     char commentchar='#';
     std::string d=getProperty("CSV_SEPARATOR", ",").toString().toStdString();
     std::string startswith=getProperty("CSV_STARTSWITH", "").toString().toStdString();
+    std::string endswith=getProperty("CSV_ENDSWITH", "").toString().toStdString();
     double timefactor=getProperty("CSV_TIMEFACTOR", 1.0).toDouble();
     double ratefactor=getProperty("CSV_RATEFACTOR", 1.0).toDouble();
     int firstline=getProperty("CSV_FIRSTLINE", 1).toInt();
@@ -113,7 +114,7 @@ bool QFRDRPhotonCountsData::loadCountRatesFromCSV(QString filename) {
     try {
         datatable2 tab;                   // instanciate
         //std::cout<<"opening CSV: "<<filename.toStdString()<<std::endl;
-        tab.load_csv(filename.toStdString(), separatorchar, commentchar, startswith, firstline);        // load some csv file
+        tab.load_csv(filename.toStdString(), separatorchar, commentchar, startswith,endswith, firstline);        // load some csv file
         long long lines=tab.get_line_count();
         long long columns=tab.get_column_count();
         resizeRates(lines, columns-1);

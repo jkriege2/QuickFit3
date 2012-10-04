@@ -16,7 +16,7 @@ class QFLIB_EXPORT QFFileEditDialog : public QDialog
         explicit QFFileEditDialog(QWidget *parent = 0);
         ~QFFileEditDialog();
         
-        void init(const QString& file, const QString& type, const QString& description );
+        void init(const QString& file, const QString& type, const QString& description, const QStringList& filesTypes );
         QString getFile() const;
         QString getType() const;
         QString getDescription() const;

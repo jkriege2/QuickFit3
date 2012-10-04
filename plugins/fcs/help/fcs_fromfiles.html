@@ -2,69 +2,42 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-  <title>FCS Online-Help</title>
+  <title>FCS Online-Help: Open Correlation Data from Files</title>
   </head>
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 	 <h2>Open Correlation Data from Files</h2>
-	 <p>This plugin allows to open Fluorescence (Cross-)Correlation Spectroscopy (FCS/FCCS) and Dynamic Light Scattering (DLS) data into QuickFit. These dataformats are readable:
+	 <h3>Opening Files conatins FCS Data</h3>
+	 This plugin allows to create raw data records (RDR) representing measured FCS/DLS data from external files in two modes:
 	 <ul>
-	   <li>ALV-5000</li>
-	   <li>ISS Alba Files</li>
-	   <li>ASCII Data Files (e.g. Comma Separated Values)</li>
+	 <li><img src=":/fcs_open.png"> <tt>Data Items|Insert Raw Data|FCS/DLS data|Open FCS/DLS Data From File</tt>:<br>This function lets you select a bunch of files and a file format (in the dropdown list in the file selection dialog). Then one raw data record is created per selected file and inserted into the current project. For certain filestype you will be presented with a dialog to select the file type properties (see below).</li>
+	 <li><img src=":/fcs_multifileopen.png"> <tt>Data Items|Insert Raw Data|FCS/DLS data|Insert Multi-File FCS/DLS Data</tt>:<br>This function lets you select a bunch of files and a file format (in the dropdown list in the file selection dialog). Then a single raw data record is created linking all the selected files and inserted into the current project. For certain filestype you will be presented with a dialog to select the file type properties (see below).</li>
 	 </ul>
+	 
+	 <h3>What is read from data files?</h3>
 	 From a file this plugin loads (possibly several) <b>runs $$math:(\tau_i, g_i=\hat{g}(\tau_i), \sigma_i)_{i=0..R-1}$$</b> which are a list/table of the correlation function $$math:g_i$$ measured at several lag times $$math:\tau_i$$. Also they may possibly contain an estimation error $$math:\signa_i$$ for each value of the correlation function. The plugin averages over the runs to yield the <b>average run (no. -1) $$bmath:\left(\tau_i, \overline{g}_i=\frac{1}{R}\cdot\sum_{i=0}^Rg_i, \sigma_i=\sqrt{\frac{1}{R-1}\cdot\left[\sum_{i=0}^Rg_i^2-\frac{1}{R}\cdot\left(\sum_{i=0}^Rg_i\right)^2\right]}\right)_{i=0..R-1}$$</b>.
 	 </p>
 	 <p>This plugin also loads intensity traces acquired during the experiments. These may be used to assess the quality of a measurement (have there been agregates, was bleaching present etc.). Also average count rates are extracted that may be used as parameters for some fit models (e.g. to calcuate the counts/molecule in FCS). In principle one count rate curve per correlation run may be loaded, although some file formats (e.g. ALV-5000) only save one curve per measurement. The plugin also performs internal binning to approx. 200 datapoints, if the timetraces have many (>1000) datapoints to improve the speed of display. In that case a binned and the full timetrace may be displayed!</p>
 	 
-	 <br><br><br><br>
 	 
-	 <h2>Raw Data Record User Interface</h2>
-	 <h3>Tab "Correlation Curves"</h3>
-	 In this tab you will see all correlation curves loaded into the current raw data record. On the rhs. you may choose how they are presented to you and see a list of all available runs. There are also buttons to exclude selected runs from the evaluation. These options are available:
+	 <h3>Available Dataformats</h3>
+	 <p>This plugin allows to open Fluorescence (Cross-)Correlation Spectroscopy (FCS/FCCS) and Dynamic Light Scattering (DLS) data into QuickFit. These dataformats are readable:
 	 <ul>
-	   <li><b>display average:</b> select a display style for the average over all runs.</li>
-	   <li><b>display runs:</b> choose how to display the different runs in the file <ul>
-	     <li><i>no runs:</i> displays only the average</li>
-	     <li><i>all runs:</i> displays all runs in different colors</li>
-	     <li><i>all runs (highlighted):</i> displays all runs in gray, and the selected runs in red</li>
-	     <li><i>used runs:</i> displays only those runs that have not been excluded</li>
-	     <li><i>selected run:</i> displays only the currently selected run</li>
-	   </ul></li>
-	   <li><b>run errors:</b> plot styles for the errors</li>
-	   <li><b>select runs to display:</b> a list of all runs in the file. Select a run for the "selected run"/"all runs (highlighted)" display modes or to exlude/include a run</li>
-	   <li><b>exclude/include run:</b> excludes/includes the currently selected run ("select runs to display" list) from the evaluation. Note that the runs won't be deleted physically from the file, but will rather be marked as "do not use" in the project only. So the input data files are NEVER altered.</li>
-	   <li><b>log scale in lag time axis:</b> draws the lag time axis in the plot logarithmically or linearly scaled.</li>
-	   <li><b>lower & upper cut-off</b> Here you may cut some correlation channels (i.e. lag times $$math:\tau_i$$) to have a nicer display. This will have no effect in any other plugin in Quickfit and is used for improved local display only!</li>
-	   <li><b>Info:</b> displays the number of runs and data points per run in the current raw data record</li>
-	   <li><b>Graph/Plot:</b> For information on how to interact with the plot, please see <a href="$$qf_ui_jkqtplotter_helpfile$$">the according online-help page.</a></li>
-	   <li>Also see the page "<a href="$$qf_ui_rdr_helpfile$$">$$qf_ui_rdr_helpfiletitle$$</a>" for futher information about UI elements common to all raw data records.
+	   <li><b>ALV-5000:</b> This will import files as created by the ALV-5000 software from ALV GmbH, Langen. This company produces autocorrelator cards that are widely used for FCS/DLS experiments. ALso the DLS properties (scattering angle, temperature, refractive index, ...) stored in the header of the ALV-files are imported as RDR properties. The ALV files also contain the count rate trace of the last run, which is also loaded into the RDR.</li>
+	   <li><b>ISS Alba Files</b></li>
+	   <li><a name="CSV" /><b>ASCII Data Files (e.g. Comma Separated Values):</b> This is a generic import filter for delimiter separated files (e.g. commma separated). When you import a file of this type, you will be presented with a dialog that allows to set the properties of the CSV file to import. In the upper part the first selected file is shown as an example. Below that you can set the import properties:
+	   <ul>
+	     <li><i>column separator:</i> which character is used to separate two columns?</li>
+	     <li><i>start in line:</i> QuickFit starts to interpret the file form this line on.</li>
+	     <li><i>starts with:</i> QuickFit scans the file until it finds a line containing the given character string and starts reading values only in the next line. NOte that QuickFit first skips the lines specified by <i>start in line</i> and then still searches for this phrase. To skip this, leave this phrase empty.</li>
+	     <li><i>ends with:</i> QuickFit reads values from the file until it encounters the stirng of characters in a line. To skip this, leave this phrase empty.</li>
+	     <li><i>comment character:</i> this character starts comments in the file. All text behind such a character until the end of the line is ignored.</li>
+	     <li><i>time factor:</i> the lag time in the file is multiplied by this factor to convert it to seconds (e.g. if the file contains the lag time in milliseconds, enter 0.001 here).</li>
+		 <li><i>mode:</i> here you can select the layout of the correlation file.
+	   </ul>
+	   Depending on the selected column separator either dot '.' or comma ',' or only dot '.' are treated as a decimal separator: If the column separator is a comma, the decimal separator can not also be, otherwise both are interpreted as decimal separators also if they are mixed in the file!
+	   </li>
 	 </ul>
-	 <h3>Tab "Photon Counts"</h3>
-	 In this tab you will see all intensity time traces loaded into the current raw data record. On the rhs. you may choose how they are presented to you and see a list of all available runs. There are also buttons to exclude selected runs from the evaluation. These options are available:
-	 <ul>
-	   <li><b>data display mode:</b> <ul>
-	     <li><i>binned or none:</i> display the binned timetrace if available or none (does never display the full timetrace)</li>
-	     <li><i>binned or full:</i> displays the binned timetrace of available or the full timetrace as a fallback</li>
-	     <li><i>full or binned:</i> displays the full timetrace if available or the binned as a fallback</li>
-	     <li><i>none:</i> displays no timetrace</li>
-	   </ul></li>
-	   <li><b>runs display mdoe:</b> choose how to display the different runs in the file <ul>
-	     <li><i>all runs:</i> displays all runs in different colors</li>
-	     <li><i>all runs (highlighted):</i> displays all runs in gray, and the selected runs in red</li>
-	     <li><i>used runs:</i> displays only those runs that have not been excluded</li>
-	     <li><i>selected run:</i> displays only the currently selected run</li>
-	   </ul></li>
-	   <li><b>select runs to display:</b> a list of all runs in the file. Select a run for the "selected run"/"all runs (highlighted)" display modes or to exlude/include a run</li>
-	   <li><b>exclude/include run:</b> excludes/includes the currently selected run ("select runs to display" list) from the evaluation. Note that the runs won't be deleted physically from the file, but will rather be marked as "do not use" in the project only. So the input data files are NEVER altered.</li>
-	   <li><b>display statistics:</b> displays timetrace statistics (mean, std. deviation, min/max rate) as a table below the plot.</li>
-	   <li><b>display average in plot:</b> shows average and standard deviation for every countrate curve as a line and translucent range</li>
-	   <li><b>include 0 on rate axis:</b> autoscaling the y-axis always includes 0 counts</li>
-	   <li><b>overlay other count rates:</b>overlays count rate curves from other loaded FCS files.</li>
-	   <li><b>lower & upper cut-off</b> Here you may cut some correlation channels (i.e. lag times $$math:\tau_i$$) to have a nicer display. This will have no effect in any other plugin in Quickfit and is used for improved local display only!</li>
-	   <li><b>Info:</b> displays the number of runs and data points per run in the current raw data record</li>
-	   <li><b>Graph/Plot:</b> For information on how to interact with the plot, please see <a href="$$qf_ui_jkqtplotter_helpfile$$">the according online-help page.</a></li>
-	   <li>Also see the page "<a href="$$qf_ui_rdr_helpfile$$">$$qf_ui_rdr_helpfiletitle$$</a>" for futher information about UI elements common to all raw data records.
-	 </ul>
+	 
   </body>
 </html>

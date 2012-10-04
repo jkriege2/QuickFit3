@@ -183,6 +183,13 @@ int QFRawDataRecord::getFilesCount() const
 void QFRawDataRecord::setFileName(int i, const QString file)
 {
     if (i>=0 && i<files.size()) {
+        #ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        #endif
+         QWriteLocker locker(lock);
+        #ifdef DEBUG_THREAN
+         qDebug()<<Q_FUNC_INFO<<"  locked";
+        #endif
         files[i]=file;
     }
     emit basicPropertiesChanged();
@@ -191,6 +198,13 @@ void QFRawDataRecord::setFileName(int i, const QString file)
 void QFRawDataRecord::setFileType(int i, const QString type)
 {
     if (i>=0 && i<files.size()) {
+        #ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        #endif
+         QWriteLocker locker(lock);
+        #ifdef DEBUG_THREAN
+         qDebug()<<Q_FUNC_INFO<<"  locked";
+        #endif
         while (i>=files_types.size()) files_types.append("");
         files_types[i]=type;
     }
@@ -200,6 +214,13 @@ void QFRawDataRecord::setFileType(int i, const QString type)
 void QFRawDataRecord::setFileDecsription(int i, const QString description)
 {
     if (i>=0 && i<files.size()) {
+        #ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        #endif
+         QWriteLocker locker(lock);
+        #ifdef DEBUG_THREAN
+         qDebug()<<Q_FUNC_INFO<<"  locked";
+        #endif
         while (i>=files_desciptions.size()) files_desciptions.append("");
         files_desciptions[i]=description;
     }
@@ -209,18 +230,121 @@ void QFRawDataRecord::setFileDecsription(int i, const QString description)
 
 void QFRawDataRecord::addFile(const QString file, const QString type, const QString description)
 {
-    files.append(file);
-    setFileType(files.size()-1, type);
-    setFileDecsription(files.size()-1, description);
+    {
+        #ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        #endif
+         QWriteLocker locker(lock);
+        #ifdef DEBUG_THREAN
+         qDebug()<<Q_FUNC_INFO<<"  locked";
+        #endif
+        files.append(file);
+        setFileType(files.size()-1, type);
+        setFileDecsription(files.size()-1, description);
+    }
     emit basicPropertiesChanged();
 }
 
 void QFRawDataRecord::deleteFile(int i)
 {
     if (i>=0 && i<files.size()) {
+        #ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        #endif
+         QWriteLocker locker(lock);
+        #ifdef DEBUG_THREAN
+         qDebug()<<Q_FUNC_INFO<<"  locked";
+        #endif
         files.removeAt(i);
         if (i<files_types.size()) files_types.removeAt(i);
         if (i<files_desciptions.size()) files_desciptions.removeAt(i);
+    }
+    emit basicPropertiesChanged();
+}
+
+void QFRawDataRecord::moveFileUp(int i) {
+    QList<int> list;
+    list<<i;
+    moveFilesUp(list);
+}
+
+void QFRawDataRecord::moveFileDown(int i) {
+    QList<int> list;
+    list<<i;
+    moveFilesDown(list);
+}
+
+void QFRawDataRecord::moveFilesUp(const QList<int> &list) {
+    QList<int> l=list;
+    qSort(l);
+    if (l.size()>0) {
+
+        #ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        #endif
+         QWriteLocker locker(lock);
+        #ifdef DEBUG_THREAN
+         qDebug()<<Q_FUNC_INFO<<"  locked";
+        #endif
+
+        int firstPos=l[0];
+        QStringList f, t, d;
+        for (int i=l.size()-1; i>=0; i--) {
+            f.prepend(files.value(l[i], ""));
+            t.prepend(files_types.value(l[i], ""));
+            d.prepend(files_desciptions.value(l[i], ""));
+            if (l[i]<files.size()) files.removeAt(l[i]);
+            if (l[i]<files_types.size()) files_types.removeAt(l[i]);
+            if (l[i]<files_desciptions.size()) files_desciptions.removeAt(l[i]);
+        }
+        int newPos=qMax(0, firstPos-1);
+        for (int i=l.size()-1; i>=0; i--) {
+            files.insert(newPos, f[i]);
+            files_types.insert(newPos, t[i]);
+            files_desciptions.insert(newPos, d[i]);
+        }
+    }
+    emit basicPropertiesChanged();
+}
+
+void QFRawDataRecord::moveFilesDown(const QList<int> &list) {
+    QList<int> l=list;
+    qSort(l);
+    if (l.size()>0) {
+
+        #ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        #endif
+         QWriteLocker locker(lock);
+        #ifdef DEBUG_THREAN
+         qDebug()<<Q_FUNC_INFO<<"  locked";
+        #endif
+
+        int firstPos=l[0];
+        QStringList f, t, d;
+        for (int i=l.size()-1; i>=0; i--) {
+            f.prepend(files.value(l[i], ""));
+            t.prepend(files_types.value(l[i], ""));
+            d.prepend(files_desciptions.value(l[i], ""));
+            if (l[i]<files.size()) files.removeAt(l[i]);
+            if (l[i]<files_types.size()) files_types.removeAt(l[i]);
+            if (l[i]<files_desciptions.size()) files_desciptions.removeAt(l[i]);
+        }
+        int newPos=qMin(files.size(), firstPos+1);
+        //qDebug()<<firstPos<<newPos<<files.size();
+        if (newPos>=files.size()) {
+            for (int i=0; i<l.size(); i++) {
+                files.append(f[i]);
+                files_types.append(t[i]);
+                files_desciptions.append(d[i]);
+            }
+        } else {
+            for (int i=l.size()-1; i>=0; i--) {
+                files.insert(newPos, f[i]);
+                files_types.insert(newPos, t[i]);
+                files_desciptions.insert(newPos, d[i]);
+            }
+        }
     }
     emit basicPropertiesChanged();
 }
@@ -889,9 +1013,9 @@ QString QFRawDataRecord::getExportDialogFiletypes() {
 }
 
 
-bool QFRawDataRecord::isFilesListEditable() const
+QFRawDataRecord::FileListEditOptions QFRawDataRecord::isFilesListEditable() const
 {
-    return false;
+    return QFRawDataRecord::FilesNotEditable;
 }
 
 bool QFRawDataRecord::selectNewFiles(QStringList &files, QStringList &types, QStringList &descriptions) const
@@ -907,6 +1031,11 @@ bool QFRawDataRecord::mayDeleteFiles(QStringList &files, QStringList &types, QSt
 bool QFRawDataRecord::reloadFromFiles()
 {
     return true;
+}
+
+QStringList QFRawDataRecord::getPossibleFilesTypes() const
+{
+    return QStringList();
 }
 
 

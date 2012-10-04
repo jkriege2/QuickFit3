@@ -229,6 +229,18 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
             }
         }
 
+
+
+
+        /** \copydoc QFRawDataRecord::isFilesListEditable() */
+        virtual QFRawDataRecord::FileListEditOptions isFilesListEditable() const;
+        /** \copydoc QFRawDataRecord::selectNewFiles() */
+        virtual bool selectNewFiles(QStringList& files, QStringList& types, QStringList& descriptions) const;
+        /** \copydoc QFRawDataRecord::mayDeleteFiles() */
+        virtual bool mayDeleteFiles(QStringList& files, QStringList& types, QStringList& descriptions) const;
+        /** \copydoc QFRawDataRecord::reloadFromFiles() */
+        virtual bool reloadFromFiles();
+
     protected:
         /** \brief write the contents of the object to a XML file */
         virtual void intWriteData(QXmlStreamWriter& w);

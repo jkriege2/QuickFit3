@@ -13,13 +13,13 @@ QFFileEditDialog::QFFileEditDialog(QWidget *parent) :
     QFStyledButton* btn=new QFStyledButton(QFStyledButton::SelectFile, ui->edtFile, ui->edtFile);
     ui->edtFile->addButton(btn);
 
-    QFCompleterFromFile* c1=new QFCompleterFromFile(this);
-    c1->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"completers/rdr_fileedit_filetype.txt");
+    /*QFCompleterFromFile* c1=new QFCompleterFromFile(this);
+    c1->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"completers/rdr_fileedit_filetype.txt");*/
     QFCompleterFromFile* c2=new QFCompleterFromFile(this);
     c2->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"completers/rdr_fileedit_filedescription.txt");
 
     ui->edtDescription->setCompleter(c2);
-    ui->edtType->setCompleter(c1);
+    //ui->edtType->setCompleter(c1);
 }
 
 QFFileEditDialog::~QFFileEditDialog()
@@ -27,10 +27,12 @@ QFFileEditDialog::~QFFileEditDialog()
     delete ui;
 }
 
-void QFFileEditDialog::init(const QString &file, const QString &type, const QString &description)
+void QFFileEditDialog::init(const QString &file, const QString &type, const QString &description, const QStringList& filesTypes)
 {
     ui->edtFile->setText(file);
-    ui->edtType->setText(type);
+    ui->cmbType->clear();
+    ui->cmbType->addItems(filesTypes);
+    ui->cmbType->setEditText(type);
     ui->edtDescription->setText(description);
 }
 
@@ -41,7 +43,7 @@ QString QFFileEditDialog::getFile() const
 
 QString QFFileEditDialog::getType() const
 {
-    return ui->edtType->text();
+    return ui->cmbType->currentText();
 }
 
 QString QFFileEditDialog::getDescription() const

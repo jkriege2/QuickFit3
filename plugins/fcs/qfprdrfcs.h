@@ -55,8 +55,10 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         /** \brief icon for the plugin */
         virtual QString getIconFilename() const  { return QString(":/fcs_logo.png"); };
     protected slots:
-        /** \brief insert FCS data from file*/
+        /** \brief insert FCS data from (multiple) file(s) into (multiple) RDRs*/
         void insertFCS();
+        /** \brief insert FCS data from multiple files into one RDR */
+        void insertMultiFileFCS();
 
         void insertSimulated();
     protected:
@@ -66,7 +68,7 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
             \param paramValues values for parameters in paramNames
             \param paramReadonly names of initial parameters that should be declared readonly
         */
-        void insertALV5000File(const QString& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
+        void insertALV5000File(const QStringList &filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
 
         /*! \brief add a CSV file to the current project
 
@@ -74,7 +76,7 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
             \param paramValues values for parameters in paramNames
             \param paramReadonly names of initial parameters that should be declared readonly
         */
-        void insertCSVFile(const QString& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
+        void insertCSVFile(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
 
         /*! \brief add an ALBA file to the current project
 
@@ -82,7 +84,7 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
             \param paramValues values for parameters in paramNames
             \param paramReadonly names of initial parameters that should be declared readonly
         */
-        void insertALBAFile(const QString& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
+        void insertALBAFile(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
     private:
 };
 

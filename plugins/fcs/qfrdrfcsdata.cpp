@@ -57,6 +57,7 @@ QFRDRFCSData::~QFRDRFCSData()
 }
 
 void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
+    qDebug()<<"resizeCorrelations( N="<<N<<",  runs="<<runs<<")";
     if (correlationT) free(correlationT);
     if (correlation) free(correlation);
     if (correlationMean) free(correlationMean);
@@ -83,6 +84,7 @@ void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
 }
 
 void QFRDRFCSData::resizeRates(long long N, int runs, int channels) {
+    //qDebug()<<"resizeRates( N="<<N<<",  runs="<<runs<<",  channels="<<channels<<")";
     if (rateT) free(rateT);
     if (rate) free(rate);
     rateRuns=0;
@@ -104,6 +106,7 @@ void QFRDRFCSData::resizeRates(long long N, int runs, int channels) {
 }
 
 void QFRDRFCSData::resizeBinnedRates(long long N) {
+    //qDebug()<<"resizeBinnedRates( N="<<N<<"),  rateChannels="<<rateChannels<<",  rateRuns="<<rateRuns;
     if (binnedRateT) free(binnedRateT);
     if (binnedRate) free(binnedRate);
     binnedRateN=0;
@@ -148,7 +151,38 @@ void QFRDRFCSData::calcBinnedRate() {
             }
         }
     }
-   emitRawDataChanged();
+    emitRawDataChanged();
+}
+
+QFRawDataRecord::FileListEditOptions QFRDRFCSData::isFilesListEditable() const
+{
+    QString filetype=getProperty("FILETYPE", "unknown").toString().toUpper();
+    if (filetype!="INTERNAL") {
+        return QFRawDataRecord::FilesEditable | QFRawDataRecord::CustomFilesAddFunction;
+    } else {
+        return QFRawDataRecord::FilesNotEditable;
+    }
+}
+
+bool QFRDRFCSData::selectNewFiles(QStringList &files, QStringList &types, QStringList &descriptions) const
+{
+    QString filter=tr("All Files (*.*)");
+    QString filetype=getProperty("FILETYPE", "unknown").toString().toUpper();
+    if (filetype=="ALV5000") filter=tr("ALV-5000 file (*.asc)");
+    if (filetype=="CSV_CORR") filter=tr("ASCII Data Files (*.txt *.dat *.csv)");
+    if (filetype=="ISS_ALBA") filter=tr("ISS Alba Files (*.csv)");
+
+
+    if (filetype!="INTERNAL") {
+        files = qfGetOpenFileNames(NULL,
+                              tr("Select FCS Data File(s) to Import ..."),
+                              ProgramOptions::getInstance()->getCurrentRawDataDir(),
+                              filter);
+        types.clear();
+        descriptions.clear();
+        return (files.size()>0);
+    }
+    return false;
 }
 
 void QFRDRFCSData::recalculateCorrelations() {
@@ -327,58 +361,13 @@ void QFRDRFCSData::intReadData(QDomElement* e) {
             if (ok) leaveout.append(lo);
         }
     }
-
-    autoCalcRateN=getProperty("AUTO_BINNED_RATE_N", autoCalcRateN).toInt();
-
-    QString filetype=getProperty("FILETYPE", "unknown").toString();
-    //std::cout<<"reading data "<<filetype.toStdString()<<" from 1/"<<files.size()<<" '"<<files.join(", ").toStdString()<<"'\n";
-
-    rateMean.clear();
-    rateStdDev.clear();
-    rateMin.clear();
-    rateMax.clear();
-
-    if (filetype.toUpper()=="ALV5000") {
-        if (files.size()<=0) {
-            setError(tr("there are no files in the FCS record!"));
-            return;
-        }
-        loadFromALV5000Files(files);
-    } else if (filetype.toUpper()=="ISS_ALBA") {
-        if (files.size()<=0) {
-            setError(tr("there are no files in the FCS record!"));
-            return;
-        }
-        loadCorrelationCurvesFromALBA(files);
-    } else if (filetype.toUpper()=="INTERNAL") {
+    QString filetype=getProperty("FILETYPE", "unknown").toString().toUpper();
+    if (filetype.toUpper()=="INTERNAL") {
         loadInternal(e);
-    } else if (filetype.toUpper()=="CSV_CORR") {
-        if (files.size()<=0) {
-            setError(tr("there are no files in the FCS record!"));
-            return;
-        }
-        loadCorrelationCurvesFromCSV(files);
-    } else if (filetype.toUpper()=="CSV_RATE") {
-        if (files.size()<=0) {
-            setError(tr("there are no files in the FCS record!"));
-            return;
-        }
-        loadCountRatesFromCSV(files);
-    } else if (filetype.toUpper()=="CSV_CORR_RATE") {
-        if (files.size()<=1) {
-            setError(tr("there are too few files in the FCS record (2 required)!"));
-            return;
-        }
-        QStringList cfiles, rfiles;
-        for (int i=0; i<files.size(); i+=2) {
-            if (i+1<files.size()) {
-                cfiles.append(files[i]);
-                rfiles.append(files[i+1]);
-            }
-        }
-        loadCorrelationCurvesFromCSV(cfiles);
-        loadCountRatesFromCSV(rfiles);
+    } else {
+        reloadFromFiles();
     }
+
     //std::cout<<"intReadData ended\n";
 }
 
@@ -393,6 +382,7 @@ bool QFRDRFCSData::loadCountRatesFromCSV(QStringList filenames) {
     char commentchar='#';
     std::string d=getProperty("CSV_SEPARATOR", ",").toString().toStdString();
     std::string startswith=getProperty("CSV_STARTSWITH", "").toString().toStdString();
+    std::string endswith=getProperty("CSV_ENDSWITH", "").toString().toStdString();
     double timefactor=getProperty("CSV_TIMEFACTOR", 1.0).toDouble();
     double ratefactor=getProperty("CSV_RATEFACTOR", 1.0).toDouble();
     int firstline=getProperty("CSV_FIRSTLINE", 1).toInt();
@@ -410,7 +400,7 @@ bool QFRDRFCSData::loadCountRatesFromCSV(QStringList filenames) {
 
         try {
             d.tab=new datatable2();
-            d.tab->load_csv(d.filename.toStdString(), separatorchar, commentchar, startswith, firstline);        // load some csv file
+            d.tab->load_csv(d.filename.toStdString(), separatorchar, commentchar, startswith, endswith, firstline);        // load some csv file
             long long lines=d.tab->get_line_count();
             long long columns=d.tab->get_column_count();
             rruns=rruns+columns-1;
@@ -477,8 +467,10 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
     char commentchar='#';
     std::string d=getProperty("CSV_SEPARATOR", ",").toString().toStdString();
     std::string startswith=getProperty("CSV_STARTSWITH", "").toString().toStdString();
+    std::string endswith=getProperty("CSV_ENDSWITH", "").toString().toStdString();
     double timefactor=getProperty("CSV_TIMEFACTOR", 1.0).toDouble();
     int firstline=getProperty("CSV_FIRSTLINE", 1).toInt();
+    int mode=getProperty("CSV_MODE", 0).toInt();
     if (d.size()>0) separatorchar=d[0];
     d=getProperty("CSV_COMMENT", "#").toString().toStdString();
     if (d.size()>0) commentchar=d[0];
@@ -493,10 +485,14 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
 
         try {
             d.tab=new datatable2();
-            d.tab->load_csv(d.filename.toStdString(), separatorchar, commentchar, startswith, firstline);        // load some csv file
+            d.tab->load_csv(d.filename.toStdString(), separatorchar, commentchar, startswith, endswith, firstline);        // load some csv file
             long long lines=d.tab->get_line_count();
             long long columns=d.tab->get_column_count();
-            rruns=rruns+columns-1;
+            if (mode==0) { // tau, corr, corr, ...
+                rruns=rruns+columns-1;
+            } else if (mode==1) { // tau, corr, error, corr, error, ...
+                rruns=rruns+(columns-1)/2;
+            }
             ccorrN=qMax(lines, ccorrN);
         } catch(datatable2_exception& e) {   // error handling with exceptions
             setError(tr("Error while reading correlation functions from CSV file '%1': %2").arg(d.filename).arg(QString(e.get_message().c_str())));
@@ -513,6 +509,7 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
             try {
                 long long lines=data[ii].tab->get_line_count();
                 long long columns=data[ii].tab->get_column_count();
+                int runincrement=(columns-1);
 
                 for (long long l=0; l<lines; l++) {
                     if (ii==0) correlationT[l]=data[ii].tab->get(0, l)*timefactor;
@@ -521,11 +518,23 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
                         error=true;
                         break;
                     }
-                    for (int c=1; c<columns; c++) {
-                        correlation[(run0+c-1)*rateN+l]=data[ii].tab->get(c, l);
+                    if (mode==0) { // tau, corr, corr, ...
+                        for (int c=1; c<columns; c++) {
+                            correlation[(run0+c-1)*rateN+l]=data[ii].tab->get(c, l);
+                        }
+                        runincrement=(columns-1);
+                    } else if (mode==1) { // tau, corr, error, corr, error, ...
+                        for (int c=1; c<columns; c+=2) {
+                            if (c+1<columns) {
+                                correlation[(run0+c-1)*rateN+l]=data[ii].tab->get(c, l);
+                                correlationErrors[(run0+c-1)*rateN+l]=data[ii].tab->get(c, l+1);
+                            }
+                        }
+                        runincrement=(columns-1)/2;
                     }
                 }
-                run0=run0+lines-1;
+                run0=run0+runincrement;
+
             } catch(datatable2_exception& e) {   // error handling with exceptions
                 setError(tr("Error while reading correlation functions from CSV file '%1': %2").arg(data[ii].filename).arg(QString(e.get_message().c_str())));
                 error=true;
@@ -728,34 +737,34 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
                             QString propN="DURATION [s]";
                             double propV=data[i].token.doubleValue;
                             if (i==0) setQFProperty(propN, propV, false, true);
-                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
                         } else if (name.compare("Runs",  Qt::CaseInsensitive)==0) {
                             data[i].runs=(int)round(data[i].token.doubleValue);
                         } else if (name.contains("Temperature",  Qt::CaseInsensitive)) {
                             QString propN="TEMPERATURE [K]";
                             double propV=data[i].token.doubleValue;
                             if (i==0) setQFPropertyIfNotUserEditable(propN, propV, false, true);
-                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
                         } else if (name.contains("Viscosity",  Qt::CaseInsensitive)) {
                             QString propN="VISCOSITY [cp]";
                             double propV=data[i].token.doubleValue;
                             if (i==0) setQFPropertyIfNotUserEditable(propN, propV, false, true);
-                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
                         } else if (name.contains("Refractive Index",  Qt::CaseInsensitive)) {
                             QString propN="REFRACTIVE_INDEX";
                             double propV=data[i].token.doubleValue;
                             if (i==0) setQFPropertyIfNotUserEditable(propN, propV, false, true);
-                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
                         } else if (name.contains("Wavelength",  Qt::CaseInsensitive)) {
                             QString propN="WAVELENGTH [nm]";
                             double propV=data[i].token.doubleValue;
                             if (i==0) setQFPropertyIfNotUserEditable(propN, propV, false, true);
-                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
                         } else if (name.contains("Angle",  Qt::CaseInsensitive)) {
                             QString propN="ANGLE [°]";
                             double propV=data[i].token.doubleValue;
                             if (i==0) setQFPropertyIfNotUserEditable(propN, propV, false, true);
-                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
                         } else if (name.contains("MeanCR",  Qt::CaseInsensitive)) {
                             // ignore this property, as it is calculated by this class
                         } else if (name.contains("SampMemo",  Qt::CaseInsensitive)) {
@@ -766,25 +775,25 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
                             QString propN="MODE";
                             QString propVS=value;
                             if (i==0) setQFProperty(propN, propVS, false, true);
-                            else if (propVS!=getProperty(propN).toString()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propVS).arg(propN));
+                            else if (propVS!=getProperty(propN).toString()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propVS).arg(propN));
 
                             propN="CROSS_CORRELATION";
                             bool propV=(bool)value.contains("CROSS", Qt::CaseInsensitive);
                             if (i==0) setQFProperty(propN, propV, false, true);
-                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
 
                             propN="DUAL_CHANNEL";
                             propV=value.contains("DUAL", Qt::CaseInsensitive);
                             data[i].isDual=propV;
                             if (i==0) setQFProperty(propN, propV, false, true);
-                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
+                            else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
 
 
                         } else {
                             QString propN=name;
                             QString propVS=value;
                             if (i==0) setQFProperty(propN, propVS, false, true);
-                            else if (propVS!=getProperty(propN).toString()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propVS).arg(propN));
+                            else if (propVS!=getProperty(propN).toString()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propVS).arg(propN));
                         }
                     }
 
@@ -1083,6 +1092,68 @@ bool QFRDRFCSData::loadInternal(QDomElement* e) {
         }
         recalculateCorrelations();
         return true;
+    }
+    return false;
+}
+
+bool QFRDRFCSData::mayDeleteFiles(QStringList &files, QStringList &types, QStringList &descriptions) const
+{
+    QStringList f=this->files;
+    for (int i=0; i<files.size(); i++) {
+        f.removeAll(files[i]);
+    }
+    return (f.size()>0);
+}
+
+bool QFRDRFCSData::reloadFromFiles() {
+
+    autoCalcRateN=getProperty("AUTO_BINNED_RATE_N", autoCalcRateN).toInt();
+
+    QString filetype=getProperty("FILETYPE", "unknown").toString();
+    //std::cout<<"reading data "<<filetype.toStdString()<<" from 1/"<<files.size()<<" '"<<files.join(", ").toStdString()<<"'\n";
+
+    rateMean.clear();
+    rateStdDev.clear();
+    rateMin.clear();
+    rateMax.clear();
+
+    if (filetype.toUpper()=="ALV5000") {
+        if (files.size()<=0) {
+            setError(tr("there are no files in the FCS record!"));
+            return false;
+        }
+        return loadFromALV5000Files(files);
+    } else if (filetype.toUpper()=="ISS_ALBA") {
+        if (files.size()<=0) {
+            setError(tr("there are no files in the FCS record!"));
+            return false;
+        }
+        return loadCorrelationCurvesFromALBA(files);
+    } else if (filetype.toUpper()=="CSV_CORR") {
+        if (files.size()<=0) {
+            setError(tr("there are no files in the FCS record!"));
+            return false;
+        }
+        return loadCorrelationCurvesFromCSV(files);
+    } else if (filetype.toUpper()=="CSV_RATE") {
+        if (files.size()<=0) {
+            setError(tr("there are no files in the FCS record!"));
+            return false;
+        }
+        return loadCountRatesFromCSV(files);
+    } else if (filetype.toUpper()=="CSV_CORR_RATE") {
+        if (files.size()<=1) {
+            setError(tr("there are too few files in the FCS record (2 required)!"));
+            return false;
+        }
+        QStringList cfiles, rfiles;
+        for (int i=0; i<files.size(); i+=2) {
+            if (i+1<files.size()) {
+                cfiles.append(files[i]);
+                rfiles.append(files[i+1]);
+            }
+        }
+        return loadCorrelationCurvesFromCSV(cfiles) && loadCountRatesFromCSV(rfiles);
     }
     return false;
 }
