@@ -139,6 +139,8 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         void closeProject();
         /** \brief display an open project dialog and open the selected project */
         void openProject();
+        /** \brief reload the current project file */
+        void reloadProject();
         /** \brief load project from recent projects menu */
         void openRecentProject();
         void openRecentProject(const QString &filename);
@@ -257,6 +259,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         QAction *openProjectAct;
         QAction *saveProjectAct;
         QAction *saveProjectAsAct;
+        QAction* actReloadProject;
         QAction *exitAct;
         QAction *aboutAct;
         QAction *aboutQtAct;

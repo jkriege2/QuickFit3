@@ -24,6 +24,7 @@
         <file alias="rawdata_insert.png">../images/22x22/rdr_add.png</file>
         <file alias="evaluation_insert.png">../images/22x22/eval_add.png</file>
         <file alias="qf3fileicon.png">../images/22x22/qf3fileicon.png</file>
+        <file alias="reload_project.png">../images/16x16/reload.png</file>
     </qresource>
     <qresource prefix="/quickfit3">
         <file>optionsdlg_icons/advancedsettings.png</file>

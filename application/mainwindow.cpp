@@ -316,6 +316,15 @@ void MainWindow::openProject() {
     }
 }
 
+void MainWindow::reloadProject() {
+    if (maybeSave()) {
+        if (QFile::exists(curFile)) loadProject(curFile);
+        else QMessageBox::warning(this, tr("QuickFit %1").arg(VERSION_FULL),
+                                  tr("No project loaded that could be reloaded!"),
+                                  QMessageBox::Ok);
+    }
+}
+
 void MainWindow::openRecentProject() {
     if (maybeSave()) {
         QAction *action = qobject_cast<QAction *>(sender());
@@ -790,12 +799,9 @@ void MainWindow::createActions() {
     openProjectAct->setStatusTip(tr("Open an existing project"));
     connect(openProjectAct, SIGNAL(triggered()), this, SLOT(openProject()));
 
-    /*for (int i = 0; i < MaxRecentFiles; ++i) {
-        recentFileActs[i] = new QAction(this);
-        recentFileActs[i]->setVisible(false);
-        connect(recentFileActs[i], SIGNAL(triggered()), this, SLOT(openRecentProject()));
-    }*/
-
+    actReloadProject = new QAction(QIcon(":/reload_project.png"), tr("&Reload Current Project"), this);
+    actReloadProject->setStatusTip(tr("Reload the currently opened project"));
+    connect(actReloadProject, SIGNAL(triggered()), this, SLOT(reloadProject()));
 
     saveProjectAct = new QAction(QIcon(":/project_save.png"), tr("&Save Project"), this);
     saveProjectAct->setShortcuts(QKeySequence::Save);
@@ -894,6 +900,7 @@ void MainWindow::createMenus() {
     recentMenu->readSettings(*s, "mainwindow/recentfilelist");
     connect(recentMenu, SIGNAL(openRecentFile(QString)), this, SLOT(openRecentProject(QString)));
     fileMenu->addMenu(recentMenu);
+    fileMenu->addAction(actReloadProject);
 
     fileMenu->addAction(saveProjectAct);
     fileMenu->addAction(saveProjectAsAct);
