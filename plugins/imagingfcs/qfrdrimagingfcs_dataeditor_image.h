@@ -227,6 +227,8 @@ protected:
         void selectionEdited();
 
         void dualviewChanged(int mode);
+
+        void insertSelectedCorrelationsAsFCSRDR();
     protected:
         /** \brief map with all available fit functions */
         QMap<QString, QFFitFunction*> m_fitFunctions;
@@ -377,6 +379,7 @@ protected:
         QAction* actImagesDrawEllipse;
         QAction* actImagesDrawLine;
         QAction* actImagesScribble;
+        QAction* actInsertSelectedCorrelationsAsFCSRDR;
         QComboBox* cmbMaskEditMode;
 
         /** \brief combobox to select a result group */

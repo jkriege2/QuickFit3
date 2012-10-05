@@ -265,8 +265,9 @@ void QFPRDRFCS::insertSimulated() {
         QMap<QString, QVariant> p;
         p["FILETYPE"]="INTERNAL";
         p["INTERNAL_CSV"]=CSV;
+        p["INTERNAL_CSVMODE"]="tccc";
         QStringList paramsReadonly;
-        paramsReadonly<<"FILETYPE";
+        paramsReadonly<<"FILETYPE"<<"INTERNAL_CSV"<<"INTERNAL_CSVMODE";
 
         QMapIterator<QString, QVariant> it(p_sim);
         while (it.hasNext()) {

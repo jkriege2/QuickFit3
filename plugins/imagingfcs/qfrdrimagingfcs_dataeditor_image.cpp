@@ -911,10 +911,14 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     btnSaveData = createButtonAndActionShowText(actSaveData, QIcon(":/imaging_fcs/preview_savedata.png"), tr("Save &data"), this);
     actSaveData->setToolTip(tr("save the currently displayed images (parameter, mask, goodnes-of-fit, overview)\nas image files (e.g. TIFF), so they can be processed in other programs."));
     connect(actSaveData, SIGNAL(triggered()), this, SLOT(saveData()));
-    btnCopyDataToMatlab = createButtonAndActionShowText(actCopyDataToMatlab, QIcon(":/imaging_fcs/copydatatomatlab.png"), tr("Copy to &Matlab"), this);
+
+    actInsertSelectedCorrelationsAsFCSRDR=new QAction(tr("Insert Correlation Curves as new RDR into Project"), this);
+    connect(actInsertSelectedCorrelationsAsFCSRDR, SIGNAL(triggered()), this, SLOT(insertSelectedCorrelationsAsFCSRDR()));
+
+    btnCopyDataToMatlab = createButtonAndActionShowText(actCopyDataToMatlab, QIcon(":/imaging_fcs/copydatatomatlab.png"), tr("Copy Images to &Matlab"), this);
     actCopyDataToMatlab->setToolTip(tr("copy the currently dispalyed images (parameter, mask, goodnes-of-fit, overview) as a Matlab script."));
     connect(actCopyDataToMatlab, SIGNAL(triggered()), this, SLOT(copyToMatlab()));
-    btnCopyDataAsColumns = createButtonAndActionShowText(actCopyDataAsColumns, QIcon(":/imaging_fcs/copydata.png"), tr("Copy as &Columns"), this);
+    btnCopyDataAsColumns = createButtonAndActionShowText(actCopyDataAsColumns, QIcon(":/imaging_fcs/copydata.png"), tr("Copy Images as &Columns"), this);
     actCopyDataAsColumns->setToolTip(tr("copy the currently dispalyed images (parameter, mask, goodnes-of-fit, overview) as columns of data to the clipboard. The data may be pasted e.g. into a spreadsheet program like Excel"));
     connect(actCopyDataAsColumns, SIGNAL(triggered()), this, SLOT(copyDataAsColumns()));
     grdTop->addWidget(grpTop, 0, 2, 3, 1);
@@ -1116,6 +1120,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuData->addAction(actSaveData);
     menuData->addAction(actCopyDataToMatlab);
     menuData->addAction(actCopyDataAsColumns);
+    menuData->addAction(actInsertSelectedCorrelationsAsFCSRDR);
     menuData->addSeparator();
     menuData->addAction(actSaveReport);
     menuData->addAction(actPrintReport);
@@ -4015,6 +4020,49 @@ void QFRDRImagingFCSImageEditor::dualviewChanged(int mode) {
         else m->setDualViewMode(QFRDRImagingFCSData::dvNone);
         histogram2->setVisible(mode!=QFRDRImagingFCSData::dvNone);
         rawDataChanged();
+    }
+}
+
+void QFRDRImagingFCSImageEditor::insertSelectedCorrelationsAsFCSRDR() {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+
+    if (m) {
+        QStringList CSV;
+        QString runs="";
+        double* tau=m->getCorrelationT();
+        long long N=m->getCorrelationN();
+        for (long long i=0; i<N; i++) {
+            CSV.append(CDoubleToQString(tau[i]));
+        }
+        for (int i=0; i<m->getCorrelationRuns(); i++) {
+            if (selected.contains(i)) {
+                double* c=m->getCorrelationRun(i);
+                double* ce=m->getCorrelationRunError(i);
+                for (int j=0; j<N; j++) {
+                    CSV[j]=CSV[j]+", "+CDoubleToQString(c[j])+", "+CDoubleToQString(ce[j]);
+                }
+                if (!runs.isEmpty()) runs+=", ";
+                runs+=QString::number(i);
+            }
+        }
+        QMap<QString, QVariant> p;
+        p["FILETYPE"]="INTERNAL";
+        p["INTERNAL_CSV"]=CSV.join("\n");
+        p["INTERNAL_CSVMODE"]="tcecece";
+        QStringList paramsReadonly;
+        paramsReadonly<<"FILETYPE"<<"INTERNAL_CSV"<<"INTERNAL_CSVMODE";
+
+
+        QFRawDataRecord* e=m->getProject()->addRawData("fcs", tr("subplot of '%1'").arg(m->getName()), QStringList(), p, paramsReadonly);
+        if (e->error()) {
+            QMessageBox::critical(NULL, tr("QuickFit 3.0"), tr("Error while importing simulated FCS/DLS curve:\n%1").arg(e->errorDescription()));
+            services->log_error(tr("Error while importing simulated FCS/DLS curve:\n    %1\n").arg(e->errorDescription()));
+            m->getProject()->deleteRawData(e->getID());
+        } else {
+            e->setFolder(m->getFolder());
+            e->setDescription(m->getDescription());
+        }
+
     }
 }
 

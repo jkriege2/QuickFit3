@@ -526,8 +526,8 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
                     } else if (mode==1) { // tau, corr, error, corr, error, ...
                         for (int c=1; c<columns; c+=2) {
                             if (c+1<columns) {
-                                correlation[(run0+c-1)*rateN+l]=data[ii].tab->get(c, l);
-                                correlationErrors[(run0+c-1)*rateN+l]=data[ii].tab->get(c, l+1);
+                                correlation[(run0+(c-1)/2)*rateN+l]=data[ii].tab->get(c, l);
+                                correlationErrors[(run0+(c-1)/2)*rateN+l]=data[ii].tab->get(c+1, l);
                             }
                         }
                         runincrement=(columns-1)/2;
@@ -1050,6 +1050,7 @@ void QFRDRFCSData::saveInternal(QXmlStreamWriter& w) const {
         }
         csv=csv+"\n";
     }
+    w.writeAttribute("mode", getProperty("INTERNAL_CSVMODE", "tccc").toString().toLower());
     w.writeCDATA(csv);
     w.writeEndElement();
 
@@ -1057,17 +1058,20 @@ void QFRDRFCSData::saveInternal(QXmlStreamWriter& w) const {
 
 bool QFRDRFCSData::loadInternal(QDomElement* e) {
     QString csv=getProperty("INTERNAL_CSV", "").toString();
+    QString mode=getProperty("INTERNAL_CSVMODE", "tccc").toString().toLower();
     //qDebug()<<csv;
     deleteProperty("INTERNAL_CSV");
     if (e && csv.isEmpty()) {
         QDomElement de=e->firstChildElement("internal_correlations");
         if (!de.isNull()) {
+            mode=de.attribute("mode", mode).toLower();
             csv=de.text();
         }
     }
     //qDebug()<<csv;
+    setQFProperty("INTERNAL_CSVMODE", mode, false, false);
     if (!csv.isEmpty()) {
-       // //qDebug()<<"parsing csv: "<<csv;
+        //qDebug()<<"parsing csv: "<<csv;
 
         QTextStream f(&csv);
         QList<QVector<double> > datalist;
@@ -1079,15 +1083,30 @@ bool QFRDRFCSData::loadInternal(QDomElement* e) {
         } while (data.size()>0);
         int runs=0;
         if (datalist.size()>0) {
-            runs=datalist[0].size()-1;
+            if (mode=="tcecece" || mode=="1") {
+                runs=(datalist[0].size()-1)/2;
+            } else {
+                runs=datalist[0].size()-1;
+            }
         }
-       // //qDebug()<<"  -> "<<datalist.size()<<runs;
-       // //qDebug()<<"  -> "<<datalist;
+        qDebug()<<"  -> "<<mode;
+        qDebug()<<"  -> "<<datalist.size()<<runs;
+        //qDebug()<<"  -> "<<datalist;
         resizeCorrelations(datalist.size(), runs);
         for (int i=0; i<datalist.size(); i++) {
             correlationT[i]=datalist[i].value(0,0.0);
-            for (int j=1; j<datalist[i].size(); j++) {
-                correlation[(j-1)*correlationN+i]=datalist[i].value(j,0.0);
+            if (mode=="tcecece" || mode=="1") {
+                for (int j=1; j<datalist[i].size(); j=j+2) {
+                    if (j+1<datalist[i].size()) {
+                        correlation[(j-1)/2*correlationN+i]=datalist[i].value(j,0.0);
+                        correlationErrors[(j-1)/2*correlationN+i]=datalist[i].value(j+1,0.0);
+                    }
+                }
+            } else {
+                for (int j=1; j<datalist[i].size(); j++) {
+                    correlation[(j-1)*correlationN+i]=datalist[i].value(j,0.0);
+                    correlationErrors[(j-1)*correlationN+i]=0;
+                }
             }
         }
         recalculateCorrelations();
