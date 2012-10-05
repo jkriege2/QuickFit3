@@ -601,7 +601,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEva
         QStringList ff=fcs->getAvailableFitFunctions();
         for (int i=0; i<ff.size(); i++) {
             QString id=ff[i];
-            cmbModel->addItem(fcs->getFitFunction(id)->name(), id);
+            if (fcs->getFitFunction(id)) cmbModel->addItem(fcs->getFitFunction(id)->name(), id);
+            else  cmbModel->addItem(tr("unknown fit function"), id);
         }
         ff=fcs->getAvailableFitAlgorithms();
         for (int i=0; i<ff.size(); i++) {

@@ -160,6 +160,7 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         void filterResultsTextChanged(const QString &text);
         void currentTabChanged(int tab);
         void checkHelpAvailable();
+        void propertiesTextChanged(const QString& text);
 
         void deleteSelectedRecords();
     protected:
@@ -210,6 +211,8 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         QLabel* labAveragedresults;
         /** \brief toolbar to access functions of tvResults */
         QToolBar* tbResults;
+        /** \brief toolbar to access functions of tvResults */
+        QToolBar* tbResultsFilter;
         /** \brief action used to copy selection in tvResults to clipbord */
         QAction* actCopyResults;
         QAction* actCopyResultsNoHead;
@@ -227,6 +230,7 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
         QWidget* widResults;
 
+        QFEnhancedLineEdit* edtDisplayProperties;
         QFEnhancedLineEdit* edtFilterFiles;
         QFEnhancedLineEdit* edtFilterResults;
         QFEnhancedLineEdit* edtFilterFilesNot;

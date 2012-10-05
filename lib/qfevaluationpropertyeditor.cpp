@@ -355,6 +355,20 @@ void QFEvaluationPropertyEditor::checkHelpAvailable()
 
 }
 
+void QFEvaluationPropertyEditor::propertiesTextChanged(const QString &text) {
+    if (!current) return;
+    if (!resultsModel) return;
+    if (text.isEmpty()) {
+        resultsModel->setDisplayProperties(QStringList());
+    } else {
+        QStringList p=text.split(",");
+        for (int i=0; i<p.size(); i++) {
+            p[i]=p[i].trimmed();
+        }
+        resultsModel->setDisplayProperties(p);
+    }
+}
+
 void QFEvaluationPropertyEditor::deleteSelectedRecords() {
     if (!current) return;
     QModelIndexList sel=tvResults->selectionModel()->selectedIndexes();
@@ -530,24 +544,36 @@ void QFEvaluationPropertyEditor::createWidgets() {
     actSaveResultsAveraged=new QAction(tr("Save all results to file, averaged vector/matrix results"), this);
 
     tbResults->addSeparator();
-    tbResults->addWidget(new QLabel(" filter: file contains "));
+    tbResults->addWidget(new QLabel(" display properties: "));
+    edtDisplayProperties=new QFEnhancedLineEdit(this);
+    edtDisplayProperties->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtDisplayProperties, edtDisplayProperties));
+    edtDisplayProperties->setToolTip(tr("put a comma ',' separated list of properties here that should be part of the results table. <br><b>Note:</b> These properties can NOT be filtered with the filters below."));
+    connect(edtDisplayProperties, SIGNAL(textChanged(QString)), this, SLOT(propertiesTextChanged(QString)));
+    tbResults->addWidget(edtDisplayProperties);
+
+
+
+
+    tbResultsFilter=new QToolBar("toolbar_eval_results2", this);
+    rwvlayout->addWidget(tbResultsFilter);
+    tbResultsFilter->addWidget(new QLabel(" filter: file contains "));
     edtFilterFiles=new QFEnhancedLineEdit(this);
     edtFilterFiles->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterFiles, edtFilterFiles));
     edtFilterFiles->setCompleter(new QFCompleterFromFile());
     compFilterFiles=new QFCompleterFromFile(this);
     edtFilterFiles->setCompleter(compFilterFiles);
     connect(edtFilterFiles, SIGNAL(textChanged(QString)), resultsModel, SLOT(setFilesFilter(QString)));
-    tbResults->addWidget(edtFilterFiles);
-    tbResults->addWidget(new QLabel(tr("  and not contains "), this));
+    tbResultsFilter->addWidget(edtFilterFiles);
+    tbResultsFilter->addWidget(new QLabel(tr("  and not contains "), this));
     edtFilterFilesNot=new QFEnhancedLineEdit(this);
     edtFilterFilesNot->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterFilesNot, edtFilterFilesNot));
     compFilterFilesNot=new QFCompleterFromFile(this);
     edtFilterFilesNot->setCompleter(compFilterFilesNot);
     connect(edtFilterFilesNot, SIGNAL(textChanged(QString)), resultsModel, SLOT(setFilesFilterNot(QString)));
-    tbResults->addWidget(edtFilterFilesNot);
+    tbResultsFilter->addWidget(edtFilterFilesNot);
     chkFilterFilesRegExp=new QCheckBox(tr("RegExp"), this);
     chkFilterFilesRegExp->setChecked(false);
-    tbResults->addWidget(chkFilterFilesRegExp);
+    tbResultsFilter->addWidget(chkFilterFilesRegExp);
     connect(chkFilterFilesRegExp, SIGNAL(clicked(bool)), resultsModel, SLOT(setFilesFilterUsesRegExp(bool)));
     edtFilterFiles->setToolTip(tr("use this to filter the contents of the results table<br><br>"
                                        "Simply enter a filter string and the table will only display those"
@@ -564,8 +590,8 @@ void QFEvaluationPropertyEditor::createWidgets() {
                                        "(match a single character), or full regular expressions in the filter string."
                                      "<br><br><font color=\"darkred\">red text</font> means you entered an invalid regular expression"));
 
-    tbResults->addSeparator();
-    tbResults->addWidget(new QLabel(" filter: result contains: "));
+    tbResultsFilter->addSeparator();
+    tbResultsFilter->addWidget(new QLabel(" filter: result contains: "));
     edtFilterResults=new QFEnhancedLineEdit(this);
     edtFilterResults->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterResults, edtFilterResults));
     edtFilterResults->setToolTip(tr("use this to filter the contents of the results table<br><br>"
@@ -578,17 +604,17 @@ void QFEvaluationPropertyEditor::createWidgets() {
     compFilterResults=new QFCompleterFromFile(this);
     edtFilterResults->setCompleter(compFilterResults);
     connect(edtFilterResults, SIGNAL(textChanged(QString)), resultsModel, SLOT(setResultFilter(QString)));
-    tbResults->addWidget(edtFilterResults);
-    tbResults->addWidget(new QLabel(tr("  and not contains "), this));
+    tbResultsFilter->addWidget(edtFilterResults);
+    tbResultsFilter->addWidget(new QLabel(tr("  and not contains "), this));
     edtFilterResultsNot=new QFEnhancedLineEdit(this);
     edtFilterResultsNot->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterResultsNot, edtFilterResultsNot));
     compFilterResultsNot=new QFCompleterFromFile(this);
     edtFilterResultsNot->setCompleter(compFilterResultsNot);
     connect(edtFilterResultsNot, SIGNAL(textChanged(QString)), resultsModel, SLOT(setResultFilterNot(QString)));
-    tbResults->addWidget(edtFilterResultsNot);
+    tbResultsFilter->addWidget(edtFilterResultsNot);
     chkFilterResultsRegExp=new QCheckBox(tr("RegExp"), this);
     chkFilterResultsRegExp->setChecked(false);
-    tbResults->addWidget(chkFilterResultsRegExp);
+    tbResultsFilter->addWidget(chkFilterResultsRegExp);
     connect(chkFilterResultsRegExp, SIGNAL(clicked(bool)), resultsModel, SLOT(setResultFilterUsesRegExp(bool)));
     edtFilterResultsNot->setToolTip(tr("use this to filter the contents of the results table<br><br>"
                                        "Simply enter a filter string and the table will only display those"

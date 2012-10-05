@@ -41,7 +41,7 @@ QFFitFunctionDLSG2inD::QFFitFunctionDLSG2inD() {
     #define DLSG2_refractive 12
     addParameter(FloatNumber,  "wavelength",              "scattering light wavelength",                           "&lambda;",                 "nm",         "nm",                     false,     true,        false,              QFFitFunction::EditError,    false, 488,         0,        1e4,      1    );
     #define DLSG2_wavelength 13
-    addParameter(FloatNumber,  "q_square",                "q square",                                              "q<sup>2</sup>",            "1/nm",       "nm<sup>-1</sup>",        false,    false,        false,              QFFitFunction::DisplayError, false, 500,          -1e50,    1e50,     1    );
+    addParameter(FloatNumber,  "q_square",                "q square",                                              "q<sup>2</sup>",            "1/nm²",       "nm<sup>-2</sup>",        false,    false,        false,              QFFitFunction::DisplayError, false, 500,          -1e50,    1e50,     1    );
     #define DLSG2_diff_qsquare 14
 
     addParameter(FloatNumber,  "tau1",                    "correlation time 1",                                    "&tau;<sub>1</sub>",        "µs",         "&mu;s",                  false,    false,        false,              QFFitFunction::DisplayError, false, 100,          1e-10,    1e50,     1    );

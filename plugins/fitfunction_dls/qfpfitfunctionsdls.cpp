@@ -3,7 +3,7 @@
 
 QStringList QFPFitFunctionsDLS::getIDs() const {
     QStringList res;
-    res<<"dls_g2"<<"dls_g2ind";
+    res<<"dls_g2"<<"dls_g2_ind";
     return res;
 }
 

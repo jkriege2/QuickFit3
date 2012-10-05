@@ -59,6 +59,7 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
         void setFilesFilterNot(QString filter);
         void setFilesFilterUsesRegExp(bool use);
         void setResultFilterUsesRegExp(bool use);
+        void setDisplayProperties(const QStringList& props);
     protected:
         QFEvaluationItem* evaluation;
         QString evalFilter;
@@ -72,6 +73,7 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
         /** \brief current list of all shown result names (updated on model reset, using calcResultNames() */
         QStringList lastResultNames;
         QStringList lastResultLabels;
+        QStringList displayProperties;
         QList<QPair<QPointer<QFRawDataRecord>, QString> > lastResults;
         QMap<QString, QString> resultGroups;
 
