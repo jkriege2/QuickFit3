@@ -19,3 +19,13 @@ QVariant QFTablePluginModel::data(const QModelIndex &index, int role) const
     }
     return QFTableModel::data(index, role);
 }
+
+
+QVariant QFTablePluginModel::headerData(int section, Qt::Orientation orientation, int role) const {
+    QVariant h=QFTableModel::headerData(section, orientation, role);
+     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+         return QString("%1: %2").arg(section+1).arg(h.toString());
+     }
+
+     return h;
+}

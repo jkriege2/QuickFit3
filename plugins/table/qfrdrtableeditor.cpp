@@ -739,9 +739,9 @@ void QFRDRTableEditor::slCalcColumn() {
                             bool ok=true;
                             jkMathParser mp; // instanciate
                             addQFRDRTableFunctions(&mp);
-                            mp.addVariableDouble("row", 0.0);
-                            mp.addVariableDouble("col", 0.0);
-                            mp.addVariableDouble("column", 0.0);
+                            mp.addVariableDouble("row", 1);
+                            mp.addVariableDouble("col", 1);
+                            mp.addVariableDouble("column", 1);
                             mp.addVariableDouble("columns", 1.0);
                             mp.addVariableDouble("rows", 1.0);
 
@@ -767,9 +767,9 @@ void QFRDRTableEditor::slCalcColumn() {
                                         try {
                                             row = idxs[i].row();
                                             column = idxs[i].column();
-                                            mp.addVariableDouble("row", idxs[i].row());
-                                            mp.addVariableDouble("col", idxs[i].column());
-                                            mp.addVariableDouble("column", idxs[i].column());
+                                            mp.addVariableDouble("row", idxs[i].row()+1);
+                                            mp.addVariableDouble("col", idxs[i].column()+1);
+                                            mp.addVariableDouble("column", idxs[i].column()+1);
                                             mp.addVariableDouble("rows", m->model()->rowCount());
                                             mp.addVariableDouble("columns", m->model()->columnCount());
 

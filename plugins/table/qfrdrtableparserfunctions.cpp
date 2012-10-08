@@ -34,8 +34,8 @@ jkMathParser::jkmpResult fQFRDRTableEditor_data(jkMathParser::jkmpResult* params
             res.type=jkMathParser::jkmpDouble;
             if (n!=2) p->jkmpError("data(row, column) needs 2 argument");
             if ((params[0].type!=jkMathParser::jkmpDouble)||(params[1].type!=jkMathParser::jkmpDouble)) p->jkmpError("data(row, column) needs two integer arguments");
-            int r=floor(params[0].num+1);
-            int c=floor(params[1].num+1);
+            int r=floor(params[0].num-1);
+            int c=floor(params[1].num-1);
             if (r>=0 && c>=0 && r<d->model->rowCount() && c<d->model->columnCount()) {
                 QVariant da= d->model->cell(r,c);
                 switch(da.type()) {
