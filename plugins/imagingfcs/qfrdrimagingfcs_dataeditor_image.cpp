@@ -1211,6 +1211,7 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
             connectParameterWidgets(false);
             //histogram->connectParameterWidgets(false);
             plteImage->getDataMinMax(mi, ma);
+            //statisticsMaskedMinMax(plteImage->get_data(), plteOverviewExcludedData, plteImage->get_Nx()+plteImage->get_Ny(), mi, ma, false);
             int d=current->getProperty(QString("imfcs_imed_colorbar_%1_%2").arg(egroup).arg(param),
                                        settings->getQSettings()->value(QString("imfcsimageeditor/colorbar"), cmbColorbar->currentIndex())).toInt();
             if (d>=0) cmbColorbar->setCurrentIndex(d);
@@ -1332,14 +1333,15 @@ void QFRDRImagingFCSImageEditor::paletteChanged() {
     pltImage->set_doDrawing(false);
 
     plteImage->set_palette(cmbColorbar->currentIndex());
-    plteImage->set_autoImageRange(chkImageAutoScale->isChecked());
+    plteImage->set_autoImageRange(false);//chkImageAutoScale->isChecked());
     //plteImage->set_autoImageRange(false);
+    double mi=0, ma=0;
+    if (plteImageData && plteOverviewExcludedData) statisticsMaskedMinMax(plteImageData, plteOverviewExcludedData, plteImageSize, mi, ma, false);
     if (chkImageAutoScale->isChecked() && plteImageData!=NULL && plteOverviewExcludedData!=NULL) {
-        double mi, ma;
-        statisticsMaskedMinMax(plteImageData, plteOverviewExcludedData, plteImageSize, mi, ma, false);
         plteImage->set_imageMin(mi);
         plteImage->set_imageMax(ma);
     }
+    qDebug()<<"paletteChanged():  "<<plteImageData << plteOverviewExcludedData<<":     "<<mi<<"..."<<ma;
     switch(cmbOutOfRangeMode->currentIndex()) {
         case 0:
             plteImage->set_rangeMinFailAction(JKQTPMathImage::LastPaletteColor);
@@ -1384,15 +1386,14 @@ void QFRDRImagingFCSImageEditor::paletteChanged() {
 
     edtColMin->setEnabled(!chkImageAutoScale->isChecked());
     edtColMax->setEnabled(!chkImageAutoScale->isChecked());
-    if (!chkImageAutoScale->isChecked()) {
-        plteImage->set_imageMin(edtColMin->value());
-        plteImage->set_imageMax(edtColMax->value());
-    } else {
-        double mi=0, ma=0;
-        plteImage->getDataMinMax(mi, ma);
+    if (chkImageAutoScale->isChecked()) {
+        //double mi=0, ma=0;
+        //if (mi==ma) plteImage->getDataMinMax(mi, ma);
         edtColMin->setValue(mi);
         edtColMax->setValue(ma);
     }
+    plteImage->set_imageMin(edtColMin->value());
+    plteImage->set_imageMax(edtColMax->value());
     saveImageSettings();
     pltImage->set_doDrawing(oldDoDraw);
     if (oldDoDraw) pltImage->update_plot();
@@ -1407,26 +1408,28 @@ void QFRDRImagingFCSImageEditor::ovrPaletteChanged() {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 
     plteOverview->set_palette(cmbColorbarOverview->currentIndex());
-    plteOverview->set_autoImageRange(chkAutorangeOverview->isChecked());
+    plteOverview->set_autoImageRange(false);//chkAutorangeOverview->isChecked());
+    double ovrmi=0, ovrma=0;
+    if (m && m->getImageFromRunsPreview()!=NULL && plteOverviewExcludedData!=NULL) {
+        statisticsMaskedMinMax(m->getImageFromRunsPreview(), plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), ovrmi, ovrma, false);
+    }
     if (m && chkAutorangeOverview->isChecked() && m->getImageFromRunsPreview()!=NULL && plteOverviewExcludedData!=NULL) {
-        double mi, ma;
-        statisticsMaskedMinMax(m->getImageFromRunsPreview(), plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), mi, ma, false);
-        plteOverview->set_imageMin(mi);
-        plteOverview->set_imageMax(ma);
+        plteOverview->set_imageMin(ovrmi);
+        plteOverview->set_imageMax(ovrma);
     }
 
     edtOvrMin->setEnabled(!chkAutorangeOverview->isChecked());
     edtOvrMax->setEnabled(!chkAutorangeOverview->isChecked());
-    if (!chkAutorangeOverview->isChecked()) {
-        plteOverview->set_imageMin(edtOvrMin->value());
-        plteOverview->set_imageMax(edtOvrMax->value());
-    } else {
-        double mi=0, ma=0;
-        plteOverview->getDataMinMax(mi, ma);
+    if (chkAutorangeOverview->isChecked()) {
+        double mi=ovrmi, ma=ovrma;
+        if (ovrmi==ovrma) plteOverview->getDataMinMax(mi, ma);
+
         //qDebug()<<"ovrPaletteChanged: "<<oldDoDraw<<"   range: "<<mi<<"..."<<ma;
         edtOvrMin->setValue(mi);
         edtOvrMax->setValue(ma);
     }
+    plteOverview->set_imageMin(edtOvrMin->value());
+    plteOverview->set_imageMax(edtOvrMax->value());
     saveImageSettings();
     pltOverview->set_doDrawing(oldDoDraw);
     if (oldDoDraw) pltOverview->update_plot();
@@ -2345,7 +2348,7 @@ void QFRDRImagingFCSImageEditor::replotImage() {
         plteGofImage->set_height(h);
         plteGofImage->set_autoImageRange(false);
         double mi, ma;
-        statisticsMaskedMinMax(plteGofImageData, plteOverviewExcludedData, plteImageSize, mi, ma, false);
+        if (plteGofImageData && plteOverviewExcludedData) statisticsMaskedMinMax(plteGofImageData, plteOverviewExcludedData, plteImageSize, mi, ma, false);
         plteGofImage->set_imageMin(mi);
         plteGofImage->set_imageMax(ma);
 
@@ -2629,10 +2632,10 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
         pltOverview->setXY(0, w, 0, h);
 
         if (m->getImageFromRunsPreview()) {
-            plteOverview->set_autoImageRange(chkAutorangeOverview->isChecked());
+            plteOverview->set_autoImageRange(false);//chkAutorangeOverview->isChecked());
             double mi=0, ma=0;
             updateSelectionArrays();
-            statisticsMaskedMinMax(m->getImageFromRunsPreview(), plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), mi, ma, false);
+            //statisticsMaskedMinMax(m->getImageFromRunsPreview(), plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), mi, ma, false);
             plteOverview->set_data(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::DoubleArray);
             plteOverview->set_palette(cmbColorbarOverview->currentIndex());
             ovrPaletteChanged();
