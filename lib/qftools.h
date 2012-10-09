@@ -16,6 +16,7 @@
 #include <QToolButton>
 #include <QString>
 #include <QIcon>
+#include <QListWidget>
 
 
 typedef QMap<QString, QVariant> QFStringVariantMap;
@@ -277,5 +278,10 @@ QFLIB_EXPORT int getApplicationBitDepth();
     \ingroup qf3lib_tools
 */
 QFLIB_EXPORT QString cleanStringForFilename(const QString& text, int maxLen=127, bool removeDot=true, bool removeSlash=true);
+
+/*! \brief convert the given string to a string suitable for use in filenames
+    \ingroup qf3lib_tools
+*/
+QFLIB_EXPORT QListWidgetItem* addCheckableQListWidgetItem(QListWidget* listWidget, const QString& text, Qt::CheckState checked=Qt::Unchecked, const QVariant& userData=QVariant());
 
 #endif // QFTOOLS_H

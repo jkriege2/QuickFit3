@@ -229,6 +229,8 @@ protected:
         void dualviewChanged(int mode);
 
         void insertSelectedCorrelationsAsFCSRDR();
+        void copyFitResultStatistics();
+
     protected:
         /** \brief map with all available fit functions */
         QMap<QString, QFFitFunction*> m_fitFunctions;
@@ -380,6 +382,7 @@ protected:
         QAction* actImagesDrawLine;
         QAction* actImagesScribble;
         QAction* actInsertSelectedCorrelationsAsFCSRDR;
+        QAction* actCopyFitResultStatistics;
         QComboBox* cmbMaskEditMode;
 
         /** \brief combobox to select a result group */
@@ -462,6 +465,8 @@ protected:
 
 
         void excludeByImage(double *imageIn);
+
+        void getCurrentResultNamesAndLabels(QStringList& names, QStringList& labels);
 
 
         /** \brief create a parameter image with the given evalGroup and fitParam */

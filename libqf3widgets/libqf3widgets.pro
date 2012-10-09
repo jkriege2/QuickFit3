@@ -94,7 +94,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qffitalgorithmcombobox.h \
     qffitfunctionplottools.h \
     qftablemodel.h \
-    qfhistogramview.h
+    qfhistogramview.h \
+    qfselectionlistdialog.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -153,11 +154,13 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qffitalgorithmcombobox.cpp \
     qffitfunctionplottools.cpp \
     qftablemodel.cpp \
-    qfhistogramview.cpp
+    qfhistogramview.cpp \
+    qfselectionlistdialog.cpp
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \
-    qf3filtereditor.ui
+    qf3filtereditor.ui \
+    qfselectionlistdialog.ui
 
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/qspecialtoolbutton.qrc \

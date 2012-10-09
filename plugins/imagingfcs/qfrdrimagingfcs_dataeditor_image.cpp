@@ -14,6 +14,7 @@
 #include "qfrdrimagingfcsmaskbyintensity.h"
 #include "qftools.h"
 #include "qfrawdatapropertyeditor.h"
+#include "qfselectionlistdialog.h"
 
 #define sqr(x) ((x)*(x))
 
@@ -921,6 +922,11 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     btnCopyDataAsColumns = createButtonAndActionShowText(actCopyDataAsColumns, QIcon(":/imaging_fcs/copydata.png"), tr("Copy Images as &Columns"), this);
     actCopyDataAsColumns->setToolTip(tr("copy the currently dispalyed images (parameter, mask, goodnes-of-fit, overview) as columns of data to the clipboard. The data may be pasted e.g. into a spreadsheet program like Excel"));
     connect(actCopyDataAsColumns, SIGNAL(triggered()), this, SLOT(copyDataAsColumns()));
+
+    actCopyFitResultStatistics=new QAction(tr("copy fit result statistics for Excel/Origin..."), this);
+    connect(actCopyFitResultStatistics, SIGNAL(triggered()), this, SLOT(copyFitResultStatistics()));
+
+
     grdTop->addWidget(grpTop, 0, 2, 3, 1);
     grdTop->addWidget(btnSaveData, 0, 0);
     grdTop->addWidget(btnCopyDataToMatlab, 1, 0);
@@ -1121,9 +1127,40 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuData->addAction(actCopyDataToMatlab);
     menuData->addAction(actCopyDataAsColumns);
     menuData->addAction(actInsertSelectedCorrelationsAsFCSRDR);
+    menuData->addAction(actCopyFitResultStatistics);
     menuData->addSeparator();
     menuData->addAction(actSaveReport);
     menuData->addAction(actPrintReport);
+    menuData->addSeparator();
+    QMenu* m;
+    m=menuData->addMenu(tr("parameter image  plot"));
+    m->addAction(pltImage->get_plotter()->get_actSaveData());
+    m->addAction(pltImage->get_plotter()->get_actCopyData());
+    m->addAction(pltImage->get_plotter()->get_actCopyMatlab());
+    m->addAction(pltImage->get_plotter()->get_actCopyPixelImage());
+    m->addAction(pltImage->get_plotter()->get_actSavePlot());
+    m->addAction(pltImage->get_plotter()->get_actPrint());
+    m=menuData->addMenu(tr("overview image plot"));
+    m->addAction(pltOverview->get_plotter()->get_actSaveData());
+    m->addAction(pltOverview->get_plotter()->get_actCopyData());
+    m->addAction(pltOverview->get_plotter()->get_actCopyMatlab());
+    m->addAction(pltOverview->get_plotter()->get_actCopyPixelImage());
+    m->addAction(pltOverview->get_plotter()->get_actSavePlot());
+    m->addAction(pltOverview->get_plotter()->get_actPrint());
+    m=menuData->addMenu(tr("goodness-of-fit plot"));
+    m->addAction(pltGofImage->get_plotter()->get_actSaveData());
+    m->addAction(pltGofImage->get_plotter()->get_actCopyData());
+    m->addAction(pltGofImage->get_plotter()->get_actCopyMatlab());
+    m->addAction(pltGofImage->get_plotter()->get_actCopyPixelImage());
+    m->addAction(pltGofImage->get_plotter()->get_actSavePlot());
+    m->addAction(pltGofImage->get_plotter()->get_actPrint());
+    m=menuData->addMenu(tr("correlation function/residual plot"));
+    m->addAction(plotter->get_plotter()->get_actSaveData());
+    m->addAction(plotter->get_plotter()->get_actCopyData());
+    m->addAction(plotter->get_plotter()->get_actCopyMatlab());
+    m->addAction(plotter->get_plotter()->get_actCopyPixelImage());
+    m->addAction(plotter->get_plotter()->get_actSavePlot());
+    m->addAction(plotter->get_plotter()->get_actPrint());
 
     menuMask=propertyEditor->addMenu("&Mask", 0);
     menuMask->addAction(actUse);
@@ -4066,6 +4103,279 @@ void QFRDRImagingFCSImageEditor::insertSelectedCorrelationsAsFCSRDR() {
             e->setDescription(m->getDescription());
         }
 
+    }
+}
+
+
+void QFRDRImagingFCSImageEditor::getCurrentResultNamesAndLabels(QStringList& names, QStringList& labels) {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (!m) return;
+    if (m->getCorrelationN()<=0) return;
+
+    double* corr1=(double*)calloc(m->getCorrelationN(), sizeof(double));
+    for (int i=0; i<m->getCorrelationRuns(); i++) {
+        //qDebug()<<"r"<<i<<"  "<<indexIsDualView2(i);
+        if (!m->leaveoutRun(i) && !indexIsDualView2(i)) {
+
+            QList<double> values, errors;
+            QList<bool> fix;
+
+            QStringList evals=current->resultsCalcEvaluationsInGroup(currentEvalGroup());
+            QStringList units, unitlabels;
+            bool evalFound=false;
+            bool listEval=false;
+            QString resultID="";
+
+
+            for (register int ev=0; ev<evals.size(); ev++) {
+                //en=evals[i];
+                if (current->resultsGetEvaluationGroupIndex(evals[ev])==i) {
+                    resultID=evals[ev];
+                    evalFound=true;
+                    break;
+                }
+            }
+
+            if (!evalFound) {
+                if (evals.size()>0 && evals.size()<=2) {
+                    for (register int ev=0; ev<evals.size(); ev++) {
+                        if (current->resultsGetEvaluationGroupIndex(evals[ev])>=0) {
+                            resultID=evals[ev];
+                            listEval=true;
+                            evalFound=true;
+                        }
+                    }
+                }
+            }
+
+
+            evaluateFitFunction(m->getCorrelationT(), corr1, m->getCorrelationN(), names, labels, values, errors, fix, units, unitlabels, resultID, i);
+            break;
+        }
+    }
+    free(corr1);
+}
+
+
+
+struct copyFitResultStatistics_data {
+    QList<QList<double> > gvalues;
+    QStringList names, units, unitlabels, namelabels;
+    QList<Qt::CheckState> gfix;
+    int Nfit;
+};
+
+void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (!m) return;
+    if (m->getCorrelationN()<=0) return;
+    QFSelectionListDialog* dlg=new QFSelectionListDialog(this);
+    QSettings* settings=ProgramOptions::getInstance()->getQSettings();
+    QString prefix="imfcsimageeditor/copyFitResultStatistics/";
+
+    QComboBox* cmbSelection=new QComboBox(dlg);
+    cmbSelection->addItem(tr("all non-masked pixels"));
+    cmbSelection->addItem(tr("selected pixels"));
+    cmbSelection->setCurrentIndex((selected.size()<=1)?0:1);
+    dlg->addWidget(tr("pixel range:"), cmbSelection);
+
+
+
+    QListWidget* listMode=new QListWidget(dlg);
+    addCheckableQListWidgetItem(listMode, tr("average"), Qt::CheckState(settings->value(prefix+"copyaverage", Qt::Checked).toInt()));
+    addCheckableQListWidgetItem(listMode, tr("median"), Qt::CheckState(settings->value(prefix+"copymedian", Qt::Unchecked).toInt()));
+    addCheckableQListWidgetItem(listMode, tr("standard deviation"), Qt::CheckState(settings->value(prefix+"copysd", Qt::Checked).toInt()));
+    addCheckableQListWidgetItem(listMode, tr("25% quantile"), Qt::CheckState(settings->value(prefix+"copy25q", Qt::Unchecked).toInt()));
+    addCheckableQListWidgetItem(listMode, tr("75% quantile"), Qt::CheckState(settings->value(prefix+"copy75q", Qt::Unchecked).toInt()));
+    addCheckableQListWidgetItem(listMode, tr("minimum"), Qt::CheckState(settings->value(prefix+"copymin", Qt::Unchecked).toInt()));
+    addCheckableQListWidgetItem(listMode, tr("maximum"), Qt::CheckState(settings->value(prefix+"copymax", Qt::Unchecked).toInt()));
+
+    dlg->addWidget(tr("which statistics?"), listMode);
+
+    QComboBox* cmbMode=new QComboBox(dlg);
+    cmbMode->addItem(tr("horizontal"));
+    cmbMode->addItem(tr("vertical"));
+    cmbMode->setCurrentIndex(settings->value(prefix+"cmbMode", 0).toInt());
+    dlg->addWidget(tr("result table orientation"), cmbMode);
+
+    QList<copyFitResultStatistics_data> data;
+    QStringList labels, names;
+
+    getCurrentResultNamesAndLabels(names, labels);
+
+
+    dlg->init(labels, names, (*settings), prefix+"selections/");
+
+    if (dlg->exec()) {
+
+
+
+        int avgs=1;
+        if (cmbDualView->currentIndex()>0)  avgs=2;
+        for (int avgIdx=0; avgIdx<avgs; avgIdx++) {
+            double* corr=(double*)calloc(m->getCorrelationN(), sizeof(double));
+            double* cerr=(double*)calloc(m->getCorrelationN(), sizeof(double));
+            double* corr1=(double*)calloc(m->getCorrelationN(), sizeof(double));
+            copyFitResultStatistics_data d;
+            for (int i=0; i<m->getCorrelationN(); i++) { corr[i]=0; cerr[i]=0; }
+            double N=0;
+            d.Nfit=0;
+            for (int i=0; i<m->getCorrelationRuns(); i++) {
+                //qDebug()<<"r"<<i<<"  "<<indexIsDualView2(i);
+                if ( ( ((cmbSelection->currentIndex()==1) && selected.contains(i)) || (cmbSelection->currentIndex()==0) )
+                     && !m->leaveoutRun(i)
+                     && ((avgs==1)||(avgIdx==0 && !indexIsDualView2(i)) || (avgIdx==1 && indexIsDualView2(i))))
+                {
+                    double* tmp=m->getCorrelationRun(i);
+                    for (int jj=0; jj<m->getCorrelationN(); jj++) {
+                        corr[jj]=corr[jj]+tmp[jj];
+                        cerr[jj]=cerr[jj]+tmp[jj]*tmp[jj];
+                    }
+
+                    QList<double> values, errors;
+                    QList<bool> fix;
+
+                    QStringList evals=current->resultsCalcEvaluationsInGroup(currentEvalGroup());
+                    bool evalFound=false;
+                    bool listEval=false;
+                    QString resultID="";
+
+
+                    for (register int ev=0; ev<evals.size(); ev++) {
+                        //en=evals[i];
+                        if (current->resultsGetEvaluationGroupIndex(evals[ev])==i) {
+                            resultID=evals[ev];
+                            evalFound=true;
+                            break;
+                        }
+                    }
+
+                    if (!evalFound) {
+                        if (evals.size()>0 && evals.size()<=2) {
+                            for (register int ev=0; ev<evals.size(); ev++) {
+                                if (current->resultsGetEvaluationGroupIndex(evals[ev])>=0) {
+                                    resultID=evals[ev];
+                                    listEval=true;
+                                    evalFound=true;
+                                }
+                            }
+                        }
+                    }
+
+
+                    if (evaluateFitFunction(m->getCorrelationT(), corr1, m->getCorrelationN(), d.names, d.namelabels, values, errors, fix, d.units, d.unitlabels, resultID, i)) {
+                        if (d.Nfit==0) {
+                            for (int jj=0; jj<fix.size(); jj++) {
+                                d.gfix.append(fix[jj]?Qt::Checked:Qt::Unchecked);
+                            }
+                            for (int jj=0; jj<values.size(); jj++) {
+                                QList<double> v;
+                                v.append(values[jj]);
+                                d.gvalues.append(v);
+                            }
+
+                        } else {
+                            for (int jj=0; jj<fix.size(); jj++) {
+                                if (d.gfix[jj]!=fix[jj]) d.gfix[jj]=Qt::PartiallyChecked;
+                            }
+                            for (int jj=0; jj<values.size(); jj++) {
+                                d.gvalues[jj].append(values[jj]);
+                            }
+                        }
+
+                        d.Nfit++;
+                    }
+
+                    N++;
+                }
+            }
+
+
+            free(corr);
+            free(cerr);
+            free(corr1);
+            data.append(d);
+            if (avgIdx==0) {
+                names.append(d.names);
+                labels.append(d.namelabels);
+            }
+        }
+
+
+
+        dlg->writeList(*settings, prefix+"selections/");
+        settings->setValue(prefix+"copyaverage", listMode->item(0)->checkState());
+        settings->setValue(prefix+"copymedian", listMode->item(1)->checkState());
+        settings->setValue(prefix+"copysd", listMode->item(2)->checkState());
+        settings->setValue(prefix+"copy25q", listMode->item(3)->checkState());
+        settings->setValue(prefix+"copy75q", listMode->item(4)->checkState());
+        settings->setValue(prefix+"copymin", listMode->item(5)->checkState());
+        settings->setValue(prefix+"copymax", listMode->item(6)->checkState());
+        settings->setValue(prefix+"cmbMode", cmbMode->currentIndex());
+
+        QList<QList<double> > result;
+        QList<int> items=dlg->getSelectedIndexes();
+        for (int d=0; d<data.size(); d++) {
+            QList<double> r;
+            r.clear();
+            for (int i=0; i<items.size(); i++) {
+                QList<double> gvalues, gvalues_s;
+                gvalues_s=gvalues=data[d].gvalues[items[i]];
+                qSort(gvalues_s);
+                if (listMode->item(0)->checkState()==Qt::Checked) r.append(qfstatisticsAverage(gvalues));
+                if (listMode->item(1)->checkState()==Qt::Checked) r.append(qfstatisticsSortedMedian(gvalues_s));
+                if (listMode->item(2)->checkState()==Qt::Checked) r.append(sqrt(qfstatisticsVariance(gvalues)));
+                if (listMode->item(3)->checkState()==Qt::Checked) r.append(qfstatisticsSortedQuantile(gvalues_s, 0.25));
+                if (listMode->item(4)->checkState()==Qt::Checked) r.append(qfstatisticsSortedQuantile(gvalues_s, 0.75));
+                if (listMode->item(5)->checkState()==Qt::Checked) r.append(qfstatisticsSortedMin(gvalues_s));
+                if (listMode->item(6)->checkState()==Qt::Checked) r.append(qfstatisticsSortedMax(gvalues_s));
+            }
+            result<<r;
+        }
+        QString csv, csvLocale;
+        QLocale loc;
+        loc.setNumberOptions(QLocale::OmitGroupSeparator);
+        int results=0;
+        for (int r=0; r<result.size(); r++) {
+            if (result[r].size()>results) results=result[r].size();
+        }
+
+        if (cmbMode->currentIndex()==0) {
+            for (int r=0; r<result.size(); r++) {
+                for (int c=0; c<results; c++) {
+                    if (c>0) {
+                        csv+=", ";
+                        csvLocale+="; ";
+                    }
+                    csvLocale+=loc.toString(result[r].at(c));
+                    csv+=CDoubleToQString(result[r].at(c));
+                }
+
+                csv+="\n";
+                csvLocale+="\n";
+            }
+        } else {
+             for (int c=0; c<results; c++) {
+                for (int r=0; r<result.size(); r++) {
+                    if (r>0) {
+                        csv+=", ";
+                        csvLocale+="; ";
+                    }
+                    csvLocale+=loc.toString(result[r].at(c));
+                    csv+=CDoubleToQString(result[r].at(c));
+                }
+
+                csv+="\n";
+                csvLocale+="\n";
+            }
+
+        }
+
+        QClipboard *clipboard = QApplication::clipboard();
+        QMimeData* mime=new QMimeData();
+        mime->setText(csvLocale);
+        mime->setData("jkqtplotter/csv", csv.toUtf8());
+        clipboard->setMimeData(mime);
     }
 }
 

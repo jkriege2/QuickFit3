@@ -518,3 +518,15 @@ QString cleanStringForFilename(const QString& text, int maxLen, bool removeDot, 
     //qDebug()<<"cleanStringForFilename("<<text<<") = "<<t;
     return t;
 }
+
+
+
+
+QListWidgetItem* addCheckableQListWidgetItem(QListWidget* listWidget, const QString& text, Qt::CheckState checked, const QVariant& userData) {
+    QListWidgetItem* item=new QListWidgetItem(text, listWidget);
+    item->setCheckState(checked);
+    item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
+    item->setData(Qt::UserRole, userData);
+    listWidget->addItem(item);
+    return item;
+}
