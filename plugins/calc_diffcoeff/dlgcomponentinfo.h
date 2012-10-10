@@ -20,6 +20,7 @@ class DlgComponentInfo : public QDialog
     public slots:
         void setComponent(int component);
         void showHelp();
+        void on_cmbPlot_currentIndexChanged(int index);
     private:
         Ui::DlgComponentInfo *ui;
         QFEDiffusionCoefficientCalculator* plugin;

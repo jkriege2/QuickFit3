@@ -155,9 +155,9 @@ double QFEDiffusionCoefficientCalculator::getSolutionViscosity(int solution, dou
             for (int c=0; c<components.size(); c++) {
                 if (components[c].concentration_molar>0) eta=eta+(evaluateComponentViscosity20degC(components[c].id, components[c].concentration_molar)-eta20W);
             }
-            qDebug()<<"T="<<temperature_K<<"   eta20W="<<eta20W<<"   etaTW="<<etaTW<<"   deta="<<eta;
+            //qDebug()<<"T="<<temperature_K<<"   eta20W="<<eta20W<<"   etaTW="<<etaTW<<"   deta="<<eta;
             eta=(eta+eta20W)*etaTW/eta20W;
-            qDebug()<<"  => eta="<<eta;
+            //qDebug()<<"  => eta="<<eta;
         }
     }
     return eta;
@@ -234,7 +234,7 @@ void QFEDiffusionCoefficientCalculator::loadComponents() {
     components.clear();
     QSettings settings(services->getAssetsDirectory()+"/plugins/"+getID()+"/solutioncomponents.ini", QSettings::IniFormat);
     QStringList groups=settings.childGroups();
-    qDebug()<<services->getAssetsDirectory()+"/plugins/"+getID()+"/solutioncomponents.ini"<<groups;
+    //qDebug()<<services->getAssetsDirectory()+"/plugins/"+getID()+"/solutioncomponents.ini"<<groups;
     for (int g=0; g<groups.size(); g++) {
         settings.beginGroup(groups[g]);
         QFEDiffusionCoefficientCalculator::ComponentData cdata;

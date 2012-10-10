@@ -32,6 +32,7 @@ DlgCalcDiffCoeff::DlgCalcDiffCoeff(QFEDiffusionCoefficientCalculator *plg, QWidg
     QList<int> s;
     s<<ui->splitter->width()/2<<ui->splitter->width()/2;
     ui->splitter->setSizes(s);
+    ui->plotter->get_plotter()->set_keyPosition(JKQTPkeyInsideLeft);
     readComponents();
     readSamples();
     readSettings();
@@ -137,6 +138,8 @@ void DlgCalcDiffCoeff::updateD() {
 void DlgCalcDiffCoeff::updateGivenD() {
     QString filename=QFPluginServices::getInstance()->getAssetsDirectory()+"/plugins/"+plugin->getID()+"/samples.ini";
     QSettings set(filename, QSettings::IniFormat);
+    QString filenameC=QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/mysamples.ini";
+    QSettings setC(filenameC, QSettings::IniFormat);
 
     updating=true;
 
@@ -157,6 +160,20 @@ void DlgCalcDiffCoeff::updateGivenD() {
             break;
         }
     }
+    groups=setC.childGroups();
+    for (int i=0; i<groups.size(); i++) {
+        QString n=setC.value(groups[i]+"/name", "").toString();
+        if (n==name) {
+            ui->spinGivenDT->setValue(setC.value(groups[i]+"/temperature", 20).toDouble());
+            ui->edtGivenD->setValue(setC.value(groups[i]+"/D", 10).toDouble());
+            ui->edtGivenDVisc->setValue(setC.value(groups[i]+"/viscosity", 1).toDouble());
+            //ui->cmbGivenDName->setToolTip(setC.value(groups[i]+"/reference", "").toString());
+            QVariant ref=setC.value(groups[i]+"/reference", "");
+            if (ref.type()==QVariant::StringList) ref=ref.toStringList().join(", ");
+            ui->edtReference->setText(ref.toString());
+            break;
+        }
+    }
 
     updating=false;
     updateD();
@@ -167,34 +184,83 @@ void DlgCalcDiffCoeff::updatePlot()
     updateD();
 }
 
-void DlgCalcDiffCoeff::on_btnSaveGivenD_clicked() {
-    QString filename=QFPluginServices::getInstance()->getAssetsDirectory()+"/plugins/"+plugin->getID()+"/samples.ini";
+void DlgCalcDiffCoeff::on_btnDeleteGivenD_clicked() {
+    QString filenameC=QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/mysamples.ini";
+    QDir().mkpath(QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/");
 
-    QSettings set(filename, QSettings::IniFormat);
+    QSettings set(filenameC, QSettings::IniFormat);
 
-    if (set.isWritable()) {
+    //if (set.isWritable()) {
 
         QString name=ui->cmbGivenDName->currentText();
 
         // search for the name
         QStringList groups=set.childGroups();
         int idx_max=0;
+        int idx_name=-1;
         for (int i=0; i<groups.size(); i++) {
             QRegExp rx("sample(\\d+)", Qt::CaseInsensitive);
             if (rx.indexIn(groups[i])>-1) {
                 idx_max=rx.cap(1).toInt();
+                if (set.value(QString("%1/name").arg(groups[i]), "").toString()==name) idx_name=rx.cap(1).toInt();
+            }
+        }
+
+        bool remove=true;
+        if (idx_name>=0) {
+            if (QMessageBox::question(this, tr("Delete Sample Data?"), tr("Delete the sample with the name '%1'?").arg(name), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
+                remove=false;
+                set.remove(QString("sample%1").arg(idx_max));
+                readSamples();
+            }
+        }
+
+
+}
+
+void DlgCalcDiffCoeff::on_btnSaveGivenD_clicked() {
+    QString filenameC=QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/mysamples.ini";
+    QDir().mkpath(QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/");
+
+    QSettings set(filenameC, QSettings::IniFormat);
+
+    //if (set.isWritable()) {
+
+        QString name=ui->cmbGivenDName->currentText();
+
+        // search for the name
+        QStringList groups=set.childGroups();
+        int idx_max=0;
+        int idx_name=-1;
+        for (int i=0; i<groups.size(); i++) {
+            QRegExp rx("sample(\\d+)", Qt::CaseInsensitive);
+            if (rx.indexIn(groups[i])>-1) {
+                idx_max=rx.cap(1).toInt();
+                if (set.value(QString("%1/name").arg(groups[i]), "").toString()==name) idx_name=rx.cap(1).toInt();
             }
         }
 
         idx_max++;
-        set.setValue(QString("sample%1/name").arg(idx_max), name);
-        set.setValue(QString("sample%1/D").arg(idx_max), ui->edtGivenD->value());
-        set.setValue(QString("sample%1/viscosity").arg(idx_max), ui->edtGivenDVisc->value());
-        set.setValue(QString("sample%1/temperature").arg(idx_max), ui->spinGivenDT->value());
-        set.setValue(QString("sample%1/reference").arg(idx_max), ui->edtReference->text());
-        ui->cmbGivenDName->addItem(name);
-    }
+        bool write=true;
+        if (idx_name>=0) {
+            if (QMessageBox::question(this, tr("Overwrite Sample Data?"), tr("A sample with the name '%1' already exists. Overwrite?").arg(name), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::No) {
+                write=false;
+            } else {
+                idx_max=idx_name;
+                write=true;
+            }
+        }
+        if (write) {
+            set.setValue(QString("sample%1/name").arg(idx_max), name);
+            set.setValue(QString("sample%1/D").arg(idx_max), ui->edtGivenD->value());
+            set.setValue(QString("sample%1/viscosity").arg(idx_max), ui->edtGivenDVisc->value());
+            set.setValue(QString("sample%1/temperature").arg(idx_max), ui->spinGivenDT->value());
+            set.setValue(QString("sample%1/reference").arg(idx_max), ui->edtReference->text());
+            readSamples();
+        }
+    //} else {
 
+    //}
 }
 
 void DlgCalcDiffCoeff::redoPlot()
@@ -321,25 +387,35 @@ void DlgCalcDiffCoeff::writeSettings() {
 
 void DlgCalcDiffCoeff::readSamples() {
     QString filename=QFPluginServices::getInstance()->getAssetsDirectory()+"/plugins/"+plugin->getID()+"/samples.ini";
+    QString filenameC=QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/mysamples.ini";
     //qDebug()<<"reading samples.ini: "<<filename;
     QSettings set(filename, QSettings::IniFormat);
+    QSettings setC(filenameC, QSettings::IniFormat);
 
     updating=true;
 
+    QString ct=ui->cmbGivenDName->currentText();
 
     ui->cmbGivenDName->clear();
     // search for the name
     QStringList groups=set.childGroups();
-//    qDebug()<<"reading samples.ini: groups: "<<groups;
     for (int i=0; i<groups.size(); i++) {
         set.beginGroup(groups[i]);
         QString n=set.value("name", "").toString();
-        //qDebug()<<i<<n;
         ui->cmbGivenDName->addItem(n);
         set.endGroup();
     }
 
+    groups=setC.childGroups();
+    for (int i=0; i<groups.size(); i++) {
+        setC.beginGroup(groups[i]);
+        QString n=setC.value("name", "").toString();
+        ui->cmbGivenDName->addItem(n);
+        setC.endGroup();
+    }
+
     updating=false;
+    ui->cmbGivenDName->setCurrentIndex(ui->cmbGivenDName->findText(ct));
     updateD();
 }
 

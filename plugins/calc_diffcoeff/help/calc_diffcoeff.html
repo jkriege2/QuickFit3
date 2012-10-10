@@ -7,7 +7,18 @@
 	<body>
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
 		<h2>Description &amp; Usage</h2>
-		<p>This plugin allows to calculate the diffusion coefficient of a sample in a given solution. Simply select the sample on the left and the solution on the right. The table and graph will show the solution properties and the diffusion coefficient over the specified temperature range.</p>
+		<p>This plugin allows to calculate the diffusion coefficient of a sample in a given solution. Simply select the sample on the left and the solution on the right. The table and graph will show the solution properties and the diffusion coefficient over the specified temperature range (0°C...100°C max).</p>
+		<p>Using the plugin is simple: <ul>
+		  <li>To open the plugin window, click on "Tools|Diffusion Coefficient Calculator". The plugin main window looks like this:
+		  <center><img src="./pic/screenshot.png"></center>
+		  </li>
+		  
+		  <li>It may also be possible that other plugins have buttons to show this window (e.g. in the focal volumne calibration of the default FCS plugin). If you started this tool from one of the later, you may usually take over a value (e.g. the diffusion coefficient) from the tool into your plugin, by double-clicking the value in the table or by clicking <img src=":/lib/edit_copy.png"> .</li>
+		  <li>Now you can select the reference data for the diffusion coefficient you want to calculate in the tabs at the top-left corner. You may estimate the diffusion coefficient $$math:D$$ for a sphere, or if $$math:D_{\eta,T}$$ at a certain temperature $$math:T$$ and viscosity $$math:\eta$$ is known. In the <b>"given D"</b> tab you may enter the parameters $$math:D_{\eta,T}$$, $$math:\eta$$ and $$math:T$$ or select them from a database issued together with QuickFit. It is also possible to extend this database, by clicking <img src=":/lib/file_save.png"> after you entered all data <u>and</u> a name for your molecule. Note that the additional data will be saved in your local configuration directory, so if you feel that you have some D-data that should be part of QuickFit, please send it to the authors. In the tab <b>"Sphere"</b> you may enter the hydrodynamic radius of a sphere and in the tab <b>"given D[20,W]"</b> you may enter the $$math:D_{20,W}$$ value, i.e. the diffusion coefficient at 20°C in water of you sample.</li>
+		  <li>In the next step you will have to define your buffer/solution. This can be done in the top right. First choose a solvent (currently only water) and the add several solutes to your buffer (component 1, component2, ...). Solutes may be NaCl, glucose etc. For each solute you also have to specify the molar concentration. By clicking on the help-button next to the component drop-down list, a new window will open where you can view the solute's properties used to estimate the solution/buffer viscosity.</li>
+		  <li>Finally you can specify the range of temperature values to show in the table and plot below.</li>
+		  <li>Now the plugin will calculate the solution viscosity and the diffusion coefficient of your sample according to the method described below. The results will be shown in the table at the bottom left and in the graph at the bottom right. In the graph you may select several different plots from the drop-down list above it. If your experiment has specific temperature conditions, you may enter them above the table and read the viscosity and diffusion coefficient for your experiment below that.</li>
+		</ul></p>
 		
 		<h2>Calculating the Diffusion Coefficient models</h2>
 		<p>The plugin uses several approximations to calculate the properties (especially the dynamic viscosity $$math:\eta$$) of a solution, which are described in the next section. Then the diffusion coefficient $$math:D$$ may be calculated as follows:

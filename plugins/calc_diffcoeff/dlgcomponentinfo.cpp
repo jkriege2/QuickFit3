@@ -55,6 +55,18 @@ void DlgComponentInfo::setComponent(int component) {
 
     ui->tableView->resizeColumnsToContents();
 
+    on_cmbPlot_currentIndexChanged(ui->cmbPlot->currentIndex());
+
+}
+
+
+void DlgComponentInfo::showHelp()
+{
+    QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelp(plugin->getID()));
+}
+
+void DlgComponentInfo::on_cmbPlot_currentIndexChanged(int index)
+{
     ui->plotter->set_doDrawing(false);
     ui->plotter->getDatastore()->clear();
     ui->plotter->clearGraphs(true);
@@ -62,43 +74,51 @@ void DlgComponentInfo::setComponent(int component) {
 
     double cMin=0;
     double cMax=1;
-    QString filename=plugin->getComponentDatafile(component);
+    QString filename=plugin->getComponentDatafile(ui->comboBox->currentIndex());
     if (QFile::exists(filename)) {
         datatable2 tab;
-        QVector<double> dc, deta;
+        QVector<double> dc, deta, drho, dn;
         tab.load_csv(filename.toStdString(), ',', '#');
         if (tab.get_line_count()>0 && tab.get_column_count()>=4) {
             for (int r=0; r<tab.get_line_count(); r++) {
                 double c=tab.get(0,r);
                 dc.append(c*1000.0);
                 deta.append(tab.get(3,r));
+                drho.append(tab.get(1,r));
+                dn.append(tab.get(2,r));
                 if (c<cMin) cMin=c;
                 if (c>cMax) cMax=c;
             }
             int c_c=ui->plotter->getDatastore()->addCopiedColumn(dc.data(), dc.size(), tr("c_datafile [nM]"));
             int c_eta=ui->plotter->getDatastore()->addCopiedColumn(deta.data(), deta.size(), tr("viscosity_datafile [mPa*s]"));
+            int c_rho=ui->plotter->getDatastore()->addCopiedColumn(drho.data(), drho.size(), tr("density [g/cm^3]"));
+            int c_n=ui->plotter->getDatastore()->addCopiedColumn(dn.data(), dn.size(), tr("refractive index "));
 
-            ui->plotter->get_plotter()->addGraph(c_c, c_eta, tr("reference data"), JKQTPpoints, QColor("blue"), JKQTPcross);
+            if (index==0) {
+                ui->plotter->get_plotter()->addGraph(c_c, c_eta, tr("reference data"), JKQTPpoints, QColor("blue"), JKQTPcross);
+                ui->plotter->getYAxis()->set_axisLabel(tr("viscosity $\\eta_{20}$ @ 20°C [mPa\\cdot s]"));
+            } else if (index==1) {
+                ui->plotter->get_plotter()->addGraph(c_c, c_rho, tr("reference data"), JKQTPpoints, QColor("blue"), JKQTPcross);
+                ui->plotter->getYAxis()->set_axisLabel(tr("density $\\rho_{20}$ @ 20°C [g/cm^3]"));
+            } else if (index==2) {
+                ui->plotter->get_plotter()->addGraph(c_c, c_n, tr("reference data"), JKQTPpoints, QColor("blue"), JKQTPcross);
+                ui->plotter->getYAxis()->set_axisLabel(tr("refractive index $n_{20}$ @ 20°C"));
+            }
         }
     }
 
-    QVector<double> dc, deta;
-    for (double c=cMin; c<cMax; c=c+(cMax-cMin)/1000.0) {
-        dc.append(c*1000.0);
-        deta.append(plugin->evaluateComponentViscosity20degC(component, c)*1000.0);
-    }
-    int c_c=ui->plotter->getDatastore()->addCopiedColumn(dc.data(), dc.size(), tr("c [nM]"));
-    int c_eta=ui->plotter->getDatastore()->addCopiedColumn(deta.data(), deta.size(), tr("viscosity [mPa*s]"));
+    if (index==0) {
+        QVector<double> dc, deta;
+        for (double c=cMin; c<cMax; c=c+(cMax-cMin)/1000.0) {
+            dc.append(c*1000.0);
+            deta.append(plugin->evaluateComponentViscosity20degC(ui->comboBox->currentIndex(), c)*1000.0);
+        }
+        int c_c=ui->plotter->getDatastore()->addCopiedColumn(dc.data(), dc.size(), tr("c [nM]"));
+        int c_eta=ui->plotter->getDatastore()->addCopiedColumn(deta.data(), deta.size(), tr("viscosity [mPa*s]"));
 
-    ui->plotter->get_plotter()->addGraph(c_c, c_eta, tr("fit model"), JKQTPlines, QColor("red"), JKQTPnoSymbol);
-    ui->plotter->getXAxis()->set_axisLabel(tr("solute concentration $c$ [nM]"));
-    ui->plotter->getYAxis()->set_axisLabel(tr("viscosity @ 20°C $\\eta_{20}$ [mPa\\cdot s]"));
+        ui->plotter->get_plotter()->addGraph(c_c, c_eta, tr("fit model"), JKQTPlines, QColor("red"), JKQTPnoSymbol);
+        ui->plotter->getXAxis()->set_axisLabel(tr("solute concentration $c$ [nM]"));
+    }
     ui->plotter->set_doDrawing(true);
     ui->plotter->zoomToFit();
-}
-
-
-void DlgComponentInfo::showHelp()
-{
-    QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelp(plugin->getID()));
 }

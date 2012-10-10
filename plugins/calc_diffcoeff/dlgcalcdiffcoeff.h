@@ -28,6 +28,7 @@ class DlgCalcDiffCoeff : public QDialog
         void updateGivenD();
         void updatePlot();
         void on_btnSaveGivenD_clicked();
+        void on_btnDeleteGivenD_clicked();
         void redoPlot();
         void readSettings();
         void writeSettings();

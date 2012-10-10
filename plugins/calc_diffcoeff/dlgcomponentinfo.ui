@@ -2,9 +2,6 @@
 <ui version="4.0">
  <class>DlgComponentInfo</class>
  <widget class="QDialog" name="DlgComponentInfo">
-  <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
-  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -20,7 +17,7 @@
    <iconset resource="qfediffusioncoefficientcalculator.qrc">
     <normaloff>:/calc_diffcoeff/qfediffusioncoefficientcalculator.png</normaloff>:/calc_diffcoeff/qfediffusioncoefficientcalculator.png</iconset>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,2,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,2,0">
    <item>
     <widget class="QComboBox" name="comboBox"/>
    </item>
@@ -39,6 +36,36 @@
       <bool>false</bool>
      </attribute>
     </widget>
+   </item>
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="1">
+      <widget class="QComboBox" name="cmbPlot">
+       <item>
+        <property name="text">
+         <string>viscosity</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>density</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>refractive index</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>plot data:</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="JKQtPlotter" name="plotter" native="true"/>
