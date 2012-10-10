@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>480</height>
+    <width>942</width>
+    <height>647</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -23,13 +23,13 @@
    <iconset resource="qfediffusioncoefficientcalculator.qrc">
     <normaloff>:/calc_diffcoeff/qfediffusioncoefficientcalculator.png</normaloff>:/calc_diffcoeff/qfediffusioncoefficientcalculator.png</iconset>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0">
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
+  <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,1,0">
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0" rowspan="2">
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab">
         <attribute name="title">
@@ -80,6 +80,44 @@
          <string>given D</string>
         </attribute>
         <layout class="QFormLayout" name="formLayout">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>name:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QComboBox" name="cmbGivenDName">
+             <property name="editable">
+              <bool>true</bool>
+             </property>
+             <property name="insertPolicy">
+              <enum>QComboBox::NoInsert</enum>
+             </property>
+             <property name="duplicatesEnabled">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnSaveGivenD">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="qfediffusioncoefficientcalculator.qrc">
+               <normaloff>:/calc_diffcoeff/filesave.png</normaloff>:/calc_diffcoeff/filesave.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
          <item row="3" column="0">
           <widget class="QLabel" name="label_7">
            <property name="text">
@@ -129,7 +167,7 @@
          <item row="6" column="0">
           <widget class="QLabel" name="label_11">
            <property name="text">
-            <string>=&gt; D20,W [μm2/s] = </string>
+            <string>=&gt; D20,W [μm²/s] = </string>
            </property>
           </widget>
          </item>
@@ -137,41 +175,6 @@
           <widget class="QLabel" name="labGivenDD20W">
            <property name="text">
             <string>TextLabel</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QComboBox" name="cmbGivenDName">
-             <property name="editable">
-              <bool>true</bool>
-             </property>
-             <property name="insertPolicy">
-              <enum>QComboBox::NoInsert</enum>
-             </property>
-             <property name="duplicatesEnabled">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QToolButton" name="btnSaveGivenD">
-             <property name="text">
-              <string>...</string>
-             </property>
-             <property name="icon">
-              <iconset resource="qfediffusioncoefficientcalculator.qrc">
-               <normaloff>:/calc_diffcoeff/filesave.png</normaloff>:/calc_diffcoeff/filesave.png</iconset>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_12">
-           <property name="text">
-            <string>name:</string>
            </property>
           </widget>
          </item>
@@ -213,16 +216,16 @@
        </widget>
       </widget>
      </item>
-     <item>
+     <item row="0" column="1">
       <widget class="QGroupBox" name="groupBox">
        <property name="title">
-        <string> Solution </string>
+        <string> Buffer </string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>name:</string>
+           <string>solvent:</string>
           </property>
          </widget>
         </item>
@@ -236,65 +239,165 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QLabel" name="label_2">
+         <widget class="QLabel" name="label_14">
           <property name="text">
-           <string>temperature range:</string>
+           <string>component 1:</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="2">
-         <widget class="QLabel" name="label_5">
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_15">
           <property name="text">
-           <string> ... </string>
+           <string>component 2:</string>
           </property>
          </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>component 3:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" colspan="2">
+         <widget class="QComboBox" name="cmbCType1"/>
         </item>
         <item row="1" column="4">
-         <widget class="QDoubleSpinBox" name="spinSolutionTemperatureEnd">
-          <property name="suffix">
-           <string> °C</string>
-          </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="minimum">
-           <double>-274.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>1000.000000000000000</double>
-          </property>
-          <property name="value">
-           <double>30.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="5">
-         <widget class="QLabel" name="label_6">
+         <widget class="QLabel" name="label_17">
           <property name="text">
-           <string>ΔTemp=</string>
+           <string>concentration</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="6">
-         <widget class="QDoubleSpinBox" name="spinSolutionTemperatureDelta">
+        <item row="1" column="5" colspan="2">
+         <widget class="QDoubleSpinBox" name="spinCConcentration1">
           <property name="suffix">
-           <string> °C</string>
+           <string> mM</string>
           </property>
           <property name="decimals">
            <number>3</number>
           </property>
           <property name="minimum">
-           <double>-274.000000000000000</double>
+           <double>0.000000000000000</double>
           </property>
           <property name="maximum">
-           <double>1000.000000000000000</double>
+           <double>100000.000000000000000</double>
           </property>
           <property name="value">
-           <double>0.500000000000000</double>
+           <double>0.000000000000000</double>
           </property>
          </widget>
+        </item>
+        <item row="2" column="1" colspan="2">
+         <widget class="QComboBox" name="cmbCType2"/>
+        </item>
+        <item row="2" column="4">
+         <widget class="QLabel" name="label_18">
+          <property name="text">
+           <string>concentration</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="5" colspan="2">
+         <widget class="QDoubleSpinBox" name="spinCConcentration2">
+          <property name="suffix">
+           <string> mM</string>
+          </property>
+          <property name="decimals">
+           <number>3</number>
+          </property>
+          <property name="minimum">
+           <double>0.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>100000.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>0.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="5" colspan="2">
+         <widget class="QDoubleSpinBox" name="spinCConcentration3">
+          <property name="suffix">
+           <string> mM</string>
+          </property>
+          <property name="decimals">
+           <number>3</number>
+          </property>
+          <property name="minimum">
+           <double>0.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>100000.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>0.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="4">
+         <widget class="QLabel" name="label_19">
+          <property name="text">
+           <string>concentration</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1" colspan="2">
+         <widget class="QComboBox" name="cmbCType3"/>
         </item>
         <item row="1" column="3">
+         <widget class="QToolButton" name="btnCHelp1">
+          <property name="toolTip">
+           <string>open a dialog with extended info on the selected component</string>
+          </property>
+          <property name="text">
+           <string>show component info</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../lib/lib.qrc">
+            <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QToolButton" name="btnCHelp2">
+          <property name="toolTip">
+           <string>open a dialog with extended info on the selected component</string>
+          </property>
+          <property name="text">
+           <string>show component info</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../lib/lib.qrc">
+            <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3">
+         <widget class="QToolButton" name="btnCHelp3">
+          <property name="toolTip">
+           <string>open a dialog with extended info on the selected component</string>
+          </property>
+          <property name="text">
+           <string>show component info</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../lib/lib.qrc">
+            <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="title">
+        <string> Plot Settings </string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="1">
          <widget class="QDoubleSpinBox" name="spinSolutionTemperature">
           <property name="suffix">
            <string> °C</string>
@@ -313,32 +416,214 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="3">
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+        <item row="0" column="3">
+         <widget class="QDoubleSpinBox" name="spinSolutionTemperatureEnd">
+          <property name="suffix">
+           <string> °C</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
+          <property name="decimals">
+           <number>3</number>
           </property>
-         </spacer>
+          <property name="minimum">
+           <double>-274.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1000.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>30.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_27">
+          <property name="text">
+           <string>temperature range:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4">
+         <widget class="QLabel" name="label_29">
+          <property name="text">
+           <string>ΔTemp=</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_28">
+          <property name="text">
+           <string> ... </string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <widget class="QDoubleSpinBox" name="spinSolutionTemperatureDelta">
+          <property name="suffix">
+           <string> °C</string>
+          </property>
+          <property name="decimals">
+           <number>3</number>
+          </property>
+          <property name="minimum">
+           <double>-274.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1000.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>0.500000000000000</double>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
      </item>
     </layout>
    </item>
-   <item>
-    <widget class="QVisibleHandleSplitter" name="splitter">
+   <item row="1" column="0">
+    <widget class="QSplitter" name="splitter">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QTableView" name="tableView"/>
      <widget class="QWidget" name="layoutWidget">
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QFormLayout" name="formLayout_4">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>experiment temperature:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QDoubleSpinBox" name="spinExperimentTemperature">
+           <property name="suffix">
+            <string> °C</string>
+           </property>
+           <property name="decimals">
+            <number>3</number>
+           </property>
+           <property name="minimum">
+            <double>-274.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>30.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="font">
+            <font>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>diffusion coefficient:</string>
+           </property>
+           <property name="indent">
+            <number>16</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="font">
+            <font>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>viscosity:</string>
+           </property>
+           <property name="indent">
+            <number>16</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QFDoubleEdit" name="edtExperimentD">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_20">
+             <property name="text">
+              <string>µm²/s</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnUseD">
+             <property name="toolTip">
+              <string>use this value (equals double click in table)</string>
+             </property>
+             <property name="text">
+              <string>use this value</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../lib/lib.qrc">
+               <normaloff>:/lib/file_copy.png</normaloff>:/lib/file_copy.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QFDoubleEdit" name="edtExperimentVisc">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_21">
+             <property name="text">
+              <string>mPa s</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnUseVisc">
+             <property name="toolTip">
+              <string>use this value (equals double click in table)</string>
+             </property>
+             <property name="text">
+              <string>use this value</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../lib/lib.qrc">
+               <normaloff>:/lib/file_copy.png</normaloff>:/lib/file_copy.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTableView" name="tableView"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="verticalLayoutWidget">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
         <widget class="QComboBox" name="cmbPlot">
          <item>
@@ -365,13 +650,13 @@
      </widget>
     </widget>
    </item>
-   <item>
+   <item row="2" column="0">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Close</set>
+      <set>QDialogButtonBox::Close|QDialogButtonBox::Help</set>
      </property>
     </widget>
    </item>
@@ -385,12 +670,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QVisibleHandleSplitter</class>
-   <extends>QSplitter</extends>
-   <header>qvisiblehandlesplitter.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
    <header>qfdoubleedit.h</header>
@@ -400,7 +679,9 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfediffusioncoefficientcalculator.qrc"/>
+  <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -410,8 +691,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>266</x>
-     <y>470</y>
+     <x>275</x>
+     <y>637</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -426,8 +707,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>334</x>
-     <y>470</y>
+     <x>343</x>
+     <y>637</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -442,8 +723,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>212</x>
-     <y>60</y>
+     <x>200</x>
+     <y>43</y>
     </hint>
     <hint type="destinationlabel">
      <x>1</x>
@@ -468,66 +749,18 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinSolutionTemperature</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>DlgCalcDiffCoeff</receiver>
-   <slot>updateD()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>429</x>
-     <y>78</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>5</x>
-     <y>132</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>cmbPlot</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>DlgCalcDiffCoeff</receiver>
    <slot>updatePlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>629</x>
-     <y>215</y>
+     <x>843</x>
+     <y>241</y>
     </hint>
     <hint type="destinationlabel">
      <x>721</x>
      <y>228</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinSolutionTemperatureEnd</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>DlgCalcDiffCoeff</receiver>
-   <slot>updateD()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>501</x>
-     <y>78</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>6</x>
-     <y>163</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinSolutionTemperatureDelta</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>DlgCalcDiffCoeff</receiver>
-   <slot>updateD()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>619</x>
-     <y>78</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>2</x>
-     <y>211</y>
     </hint>
    </hints>
   </connection>
@@ -539,10 +772,10 @@
    <hints>
     <hint type="sourcelabel">
      <x>102</x>
-     <y>49</y>
+     <y>48</y>
     </hint>
     <hint type="destinationlabel">
-     <x>-1</x>
+     <x>0</x>
      <y>70</y>
     </hint>
    </hints>
@@ -555,7 +788,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>102</x>
-     <y>52</y>
+     <y>51</y>
     </hint>
     <hint type="destinationlabel">
      <x>2</x>
@@ -571,7 +804,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>102</x>
-     <y>56</y>
+     <y>54</y>
     </hint>
     <hint type="destinationlabel">
      <x>2</x>
@@ -603,7 +836,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>95</x>
-     <y>62</y>
+     <y>61</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -628,18 +861,194 @@
    </hints>
   </connection>
   <connection>
+   <sender>spinSolutionTemperature</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updatePlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>625</x>
+     <y>185</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>484</x>
+     <y>187</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinSolutionTemperatureEnd</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updatePlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>787</x>
+     <y>199</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>477</x>
+     <y>215</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinSolutionTemperatureDelta</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updatePlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>893</x>
+     <y>187</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>479</x>
+     <y>245</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbCType1</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>631</x>
+     <y>63</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinCConcentration1</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>858</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>480</x>
+     <y>3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbCType2</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>651</x>
+     <y>96</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>389</x>
+     <y>4</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinCConcentration2</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>808</x>
+     <y>95</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>322</x>
+     <y>4</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbCType3</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>669</x>
+     <y>119</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>258</x>
+     <y>3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinCConcentration3</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>838</x>
+     <y>125</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>193</x>
+     <y>3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>tableView</sender>
    <signal>doubleClicked(QModelIndex)</signal>
    <receiver>DlgCalcDiffCoeff</receiver>
    <slot>updateReport(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>366</x>
-     <y>277</y>
+     <x>367</x>
+     <y>334</y>
     </hint>
     <hint type="destinationlabel">
      <x>2</x>
      <y>361</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinExperimentTemperature</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>363</x>
+     <y>240</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>940</x>
+     <y>268</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>helpRequested()</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>showHelp()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>484</x>
+     <y>618</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>7</x>
+     <y>451</y>
     </hint>
    </hints>
   </connection>
@@ -649,5 +1058,6 @@
   <slot>updatePlot()</slot>
   <slot>updateGivenD()</slot>
   <slot>updateReport(QModelIndex)</slot>
+  <slot>showHelp()</slot>
  </slots>
 </ui>

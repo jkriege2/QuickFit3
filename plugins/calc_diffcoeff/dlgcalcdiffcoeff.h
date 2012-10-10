@@ -7,6 +7,7 @@
 #include "qfpluginservices.h"
 #include <QSettings>
 #include <QRegExp>
+#include "dlgcomponentinfo.h"
 
 class QFEDiffusionCoefficientCalculator;
 
@@ -25,21 +26,31 @@ class DlgCalcDiffCoeff : public QDialog
     protected slots:
         void updateD();
         void updateGivenD();
-        void on_btnSaveGivenD_clicked();
         void updatePlot();
+        void on_btnSaveGivenD_clicked();
+        void redoPlot();
         void readSettings();
         void writeSettings();
         void readSamples();
+        void readComponents();
         void updateReport(const QModelIndex& index);
-    private:
+        void on_btnUseVisc_clicked();
+        void on_btnUseD_clicked();
+        void on_btnCHelp1_clicked();
+        void on_btnCHelp2_clicked();
+        void on_btnCHelp3_clicked();
+        void showHelp();
+    protected:
         Ui::DlgCalcDiffCoeff *ui;
         QFEDiffusionCoefficientCalculator *plugin;
+        DlgComponentInfo* dlgInfo;
 
         QFTableModel* tab;
-        int c_temp, c_D, c_visc, c_density;
-        QVector<double> temp, D, visc, density;
+        int c_temp, c_D, c_visc, c_density, c_Dwater, c_Dsolution;
+        QVector<double> temp, D, visc, density, Dwater, Dsolution;
 
         bool updating;
+
 };
 
 #endif // DLGCALCDIFFCOEFF_H

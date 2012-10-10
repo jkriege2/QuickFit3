@@ -30,35 +30,151 @@ void QFEDiffusionCoefficientCalculator::deinit() {
     }
 }
 
-double QFEDiffusionCoefficientCalculator::getSolutionDensity(int solution, double temperature_K) {
+int QFEDiffusionCoefficientCalculator::getComponentCount() const
+{
+    return components.size();
+}
+
+QString QFEDiffusionCoefficientCalculator::getComponentName(int index) const {
+    if (index>=0 && index<components.size()) return components[index].name;
+    return "";
+}
+QStringList QFEDiffusionCoefficientCalculator::getComponentNames() const {
+    QStringList result;
+    for (int i=0; i<components.size(); i++)
+        result.append(components[i].name);
+    return result;
+}
+
+QString QFEDiffusionCoefficientCalculator::getComponentReference(int index) const {
+    if (index>=0 && index<components.size()) return components[index].reference;
+    return "";
+}
+
+QString QFEDiffusionCoefficientCalculator::getComponentDatafile(int index) const {
+    if (index>=0 && index<components.size()) return components[index].datafile;
+    return "";
+}
+
+double QFEDiffusionCoefficientCalculator::getComponentMolarMass(int index) const {
+    if (index>=0 && index<components.size()) return components[index].molar_mass;
+    return 0.0;
+}
+
+double QFEDiffusionCoefficientCalculator::evaluateComponentViscosity20degC(int index, double concentration) const {
+    if (index>=0 && index<components.size()) {
+        switch (components[index].model) {
+            case 1: return 1e-3*(components[index].parameters.value(0,0.0)+
+                        components[index].parameters.value(1,0.0)*1e-3*sqrt(concentration)+
+                        components[index].parameters.value(2,0.0)*1e-2*concentration+
+                        components[index].parameters.value(3,0.0)*1e-3*concentration*concentration+
+                        components[index].parameters.value(4,0.0)*1e-3*concentration*concentration*concentration); break;
+            case 2: return 1e-3*(components[index].parameters.value(0,0.0)+
+                        components[index].parameters.value(1,0.0)*1e-3*sqrt(concentration)+
+                        components[index].parameters.value(2,0.0)*1e-2*concentration+
+                        components[index].parameters.value(3,0.0)*1e-3*concentration*concentration+
+                        components[index].parameters.value(4,0.0)*1e-3*concentration*concentration*concentration+
+                        components[index].parameters.value(5,0.0)*1e-3*concentration*concentration*concentration*concentration+
+                        components[index].parameters.value(6,0.0)*1e-3*concentration*concentration*concentration*concentration*concentration+
+                        components[index].parameters.value(7,0.0)*1e-3*concentration*concentration*concentration*concentration*concentration*concentration+
+                        components[index].parameters.value(8,0.0)*1e-3*concentration*concentration*concentration*concentration*concentration*concentration*concentration); break;
+            default: return 0.0;
+        }
+    }
+    return 0.0;
+}
+
+QString QFEDiffusionCoefficientCalculator::getViscosityModelFunction(int index, bool HTML) const {
+    if (index>=0 && index<components.size()) {
+        if (HTML) {
+            switch (components[index].model) {
+                case 1: return QString("m<sub>1</sub>(c) = %1 + %2&middot;10<sup>-3</sup>&middot;sqrt(c) + %3&middot;10<sup>-2</sup>&middot;c + %4&middot;10<sup>-3</sup>&middot;c<sup>2</sup> + %5&middot;10<sup>-3</sup>&middot;c<sup>3</sup>")
+                            .arg(components[index].parameters.value(0,0.0))
+                            .arg(components[index].parameters.value(1,0.0))
+                            .arg(components[index].parameters.value(2,0.0))
+                            .arg(components[index].parameters.value(3,0.0))
+                            .arg(components[index].parameters.value(4,0.0)); break;
+                case 2: return QString("m<sub>2</sub>(c) = %1 + %2&middot;10<sup>-3</sup>&middot;sqrt(c) + %3&middot;10<sup>-2</sup>&middot;c + %4&middot;10<sup>-3</sup>&middot;c<sup>2</sup> + %5&middot;10<sup>-3</sup>&middot;c<sup>3</sup>+ %6&middot;10<sup>-3</sup>&middot;c<sup>4</sup>+ %7&middot;10<sup>-5</sup>&middot;c<sup>3</sup>+ %8&middot;10<sup>-6</sup>&middot;c<sup>3</sup>+ %9&middot;10<sup>-7</sup>&middot;c<sup>7</sup>")
+                            .arg(components[index].parameters.value(0,0.0))
+                            .arg(components[index].parameters.value(1,0.0))
+                            .arg(components[index].parameters.value(2,0.0))
+                            .arg(components[index].parameters.value(3,0.0))
+                            .arg(components[index].parameters.value(4,0.0))
+                            .arg(components[index].parameters.value(5,0.0))
+                            .arg(components[index].parameters.value(6,0.0))
+                            .arg(components[index].parameters.value(7,0.0))
+                            .arg(components[index].parameters.value(8,0.0)); break;
+                default: return QString("???");
+            }
+        } else {
+            switch (components[index].model) {
+                case 1: return QString("m1(c) = %1 + %2*1e-3*sqrt(c) + %3*1e-2*c + %4*1e-3*c^2 + %5*1e-3*c^3")
+                            .arg(components[index].parameters.value(0,0.0))
+                            .arg(components[index].parameters.value(1,0.0))
+                            .arg(components[index].parameters.value(2,0.0))
+                            .arg(components[index].parameters.value(3,0.0))
+                            .arg(components[index].parameters.value(4,0.0)); break;
+                case 2: return QString("m1(c) = %1 + %2*1e-3*sqrt(c) + %3*1e-2*c + %4*1e-3*c^2 + %5*1e-3*c^3 + %6*1e-3*c^4 + %7*1e-3*c^5 + %8*1e-3*c^6 + %9*1e-3*c^7")
+                            .arg(components[index].parameters.value(0,0.0))
+                            .arg(components[index].parameters.value(1,0.0))
+                            .arg(components[index].parameters.value(2,0.0))
+                            .arg(components[index].parameters.value(3,0.0))
+                            .arg(components[index].parameters.value(4,0.0))
+                            .arg(components[index].parameters.value(5,0.0))
+                            .arg(components[index].parameters.value(6,0.0))
+                            .arg(components[index].parameters.value(7,0.0))
+                            .arg(components[index].parameters.value(8,0.0)); break;
+                default: return QString("???");
+            }
+        }
+    }
+    return QString("???");
+}
+
+double QFEDiffusionCoefficientCalculator::getSolutionDensity(int solution, double temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components) {
     if (solution==0) {
     }
     return 0;
 }
 
-double QFEDiffusionCoefficientCalculator::getSolutionViscosity(int solution, double temperature_K) {
-    if (solution==0) { // WATER
-        const double A=2.41e-5;
-        const double B=247.8;
-        const double C=140;
+double QFEDiffusionCoefficientCalculator::getSolutionViscosity(int solution, double temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components) {
+    double eta=0;
+    if (components.size()==0) {
+        if (solution==0) { // WATER
+            const double A=2.41e-5;
+            const double B=247.8;
+            const double C=140;
 
-        return A*pow(10.0, B/(temperature_K-C));
+            eta= A*pow(10.0, B/(temperature_K-C));
+        }
+    } else if (components.size()>0) {
+        if (solution==0) {
+            double etaTW=getSolutionViscosity(0, temperature_K);
+            double eta20W=getSolutionViscosity(0, 293.15);
+            eta=0;
+            for (int c=0; c<components.size(); c++) {
+                if (components[c].concentration_molar>0) eta=eta+(evaluateComponentViscosity20degC(components[c].id, components[c].concentration_molar)-eta20W);
+            }
+            qDebug()<<"T="<<temperature_K<<"   eta20W="<<eta20W<<"   etaTW="<<etaTW<<"   deta="<<eta;
+            eta=(eta+eta20W)*etaTW/eta20W;
+            qDebug()<<"  => eta="<<eta;
+        }
     }
-    return 0;
+    return eta;
 }
 
-double QFEDiffusionCoefficientCalculator::getSphereDCoeff(int solution, double diameter, double at_temperature_K)
+double QFEDiffusionCoefficientCalculator::getSphereDCoeff(int solution, double diameter, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components)
 {
-    double eta=getSolutionViscosity(solution, at_temperature_K);
+    double eta=getSolutionViscosity(solution, at_temperature_K, components);
     return K_BOLTZ*at_temperature_K/(6.0*M_PI*eta*diameter/2.0);
 }
 
-double QFEDiffusionCoefficientCalculator::getDCoeff_from_D20W(int solution, double D20W, double at_temperature_K) {
-    return getDCoeff_from_D(solution, D20W, 1.002e-3, 20.0+273.15, at_temperature_K);
+double QFEDiffusionCoefficientCalculator::getDCoeff_from_D20W(int solution, double D20W, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components) {
+    return getDCoeff_from_D(solution, D20W, 1.002e-3, 20.0+273.15, at_temperature_K, components);
 }
 
-double QFEDiffusionCoefficientCalculator::getDCoeff_from_D(int solution, double D, double viscosity, double temp_K, double at_temperature_K) {
-    double eta=getSolutionViscosity(solution, at_temperature_K);
+double QFEDiffusionCoefficientCalculator::getDCoeff_from_D(int solution, double D, double viscosity, double temp_K, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components) {
+    double eta=getSolutionViscosity(solution, at_temperature_K, components);
     return D*(at_temperature_K/temp_K)*viscosity/eta;
 }
 
@@ -76,6 +192,8 @@ void QFEDiffusionCoefficientCalculator::projectChanged(QFProject* oldProject, QF
 void QFEDiffusionCoefficientCalculator::initExtension() {
     /* do initializations here but do not yet connect to the camera! */
     
+    loadComponents();
+
     actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Diffusion Coefficient Calculator"), this);
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
     QMenu* extm=services->getMenu("tools");
@@ -97,7 +215,7 @@ void QFEDiffusionCoefficientCalculator::loadSettings(ProgramOptions* settingspo)
 	if (settingspo->getQSettings()==NULL) return;
     QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
-	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+    // QSettings settings(services->getConfigFileDirectory()+"/plugins/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
 
 }
 
@@ -108,8 +226,36 @@ void QFEDiffusionCoefficientCalculator::storeSettings(ProgramOptions* settingspo
     QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
 
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
-	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+    // QSettings settings(services->getConfigFileDirectory()+"/plugins/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
 
+}
+
+void QFEDiffusionCoefficientCalculator::loadComponents() {
+    components.clear();
+    QSettings settings(services->getAssetsDirectory()+"/plugins/"+getID()+"/solutioncomponents.ini", QSettings::IniFormat);
+    QStringList groups=settings.childGroups();
+    qDebug()<<services->getAssetsDirectory()+"/plugins/"+getID()+"/solutioncomponents.ini"<<groups;
+    for (int g=0; g<groups.size(); g++) {
+        settings.beginGroup(groups[g]);
+        QFEDiffusionCoefficientCalculator::ComponentData cdata;
+        cdata.name=settings.value("name", tr("component '%1'").arg(groups[g])).toString();
+        cdata.reference=settings.value("reference", tr("---")).toString();
+        QDir d(services->getAssetsDirectory()+"/plugins/"+getID()+"/");
+        cdata.datafile=d.absoluteFilePath(settings.value("datafile", "").toString());
+        cdata.model=settings.value("model", 1).toInt();
+        cdata.molar_mass=settings.value("molar_mass", 0).toDouble();
+        QStringList keys=settings.childKeys();
+        QString key="p1";
+        int id=1;
+        cdata.parameters.clear();
+        while (keys.contains(key)) {
+            cdata.parameters.append(settings.value(key, 0.0).toDouble());
+            id++;
+            key=QString("p%1").arg(id);
+        }
+        components.append(cdata);
+        settings.endGroup();
+    }
 }
 
 void QFEDiffusionCoefficientCalculator::log_text(QString message) {

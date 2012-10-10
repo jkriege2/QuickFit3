@@ -7,6 +7,8 @@
 #include "dlgcalcdiffcoeff.h"
 #include "qfextensiontool.h"
 #include "qfextensionreportingtool.h"
+#include <QList>
+#include <QStringList>
 /*!
     \defgroup qf3ext_qfe_calc_diffcoeff QFExtension implementation
     \ingroup qf3extensionplugins
@@ -45,16 +47,31 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         };
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
 
-        double getSolutionDensity(int solution, double temperature_K);
-        double getSolutionViscosity(int solution, double temperature_K);
-        double getSphereDCoeff(int solution, double diameter, double at_temperature_K);
-        double getDCoeff_from_D20W(int solution, double D20W, double at_temperature_K);
-        double getDCoeff_from_D(int solution, double D, double viscosity, double temp_K, double at_temperature_K);
+
+        int getComponentCount() const;
+        QString getComponentName(int index) const;
+        QString getComponentReference(int index) const;
+        double getComponentMolarMass(int index) const;
+        double evaluateComponentViscosity20degC(int index, double concentration) const;
+        QString getViscosityModelFunction(int index, bool HTML=false) const;
+        QString getComponentDatafile(int index) const;
+        QStringList getComponentNames() const;
+
+        struct Component {
+            int id;
+            double concentration_molar;
+        };
+
+        double getSolutionDensity(int solution, double temperature_K, QList<Component> components=QList<Component>());
+        double getSolutionViscosity(int solution, double temperature_K, QList<Component> components=QList<Component>());
+        double getSphereDCoeff(int solution, double diameter, double at_temperature_K, QList<Component> components=QList<Component>());
+        double getDCoeff_from_D20W(int solution, double D20W, double at_temperature_K, QList<Component> components=QList<Component>());
+        double getDCoeff_from_D(int solution, double D, double viscosity, double temp_K, double at_temperature_K, QList<Component> components=QList<Component>());
 
         virtual QAction* getToolStartAction();
         virtual void startTool();
@@ -74,6 +91,7 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         virtual void storeSettings(ProgramOptions* settings);
 
 
+        void loadComponents();
 
         /** \brief log project text message
          *  \param message the message to log
@@ -93,6 +111,16 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         DlgCalcDiffCoeff* dlg;
         QAction* actStartPlugin;
         QMap<QString, QVariant> reportVals;
+
+        struct ComponentData {
+            QString name;
+            QString reference;
+            double molar_mass;
+            QString datafile;
+            int model;
+            QVector<double> parameters;
+        };
+        QList<ComponentData> components;
 		
 	protected slots:
 	    /** \brief target, used in example code in initExtension() */

@@ -16,13 +16,16 @@ DESTDIR = $${QFOUTPUT}/plugins/
 HEADERS += qfediffusioncoefficientcalculator.h \
     dlgcalcdiffcoeff.h \
     ../interfaces/qfextensiontool.h \
-    ../interfaces/qfextensionreportingtool.h
+    ../interfaces/qfextensionreportingtool.h \
+    dlgcomponentinfo.h
 
 SOURCES += qfediffusioncoefficientcalculator.cpp \
-    dlgcalcdiffcoeff.cpp
+    dlgcalcdiffcoeff.cpp \
+    dlgcomponentinfo.cpp
 
 FORMS = \
-    dlgcalcdiffcoeff.ui
+    dlgcalcdiffcoeff.ui \
+    dlgcomponentinfo.ui
 
 RESOURCES += qfediffusioncoefficientcalculator.qrc
 

@@ -33,6 +33,22 @@
 		    $$bmath:\eta(T)=A\cdot10^{B/(T-C)}$$
 			where $$math:T$$ is the absolute temperature in Kelvin and $$math:A=2.41\cdot10^{-5} \rm{Pa\cdot s}$$, $$math:B=247.8 \rm{K}$$ and $$math:C=140 \rm{K}$$.
 			<center><img src="./pic/viscosity_water.png"></center>
+			In addition a number of dissolved components can be taken into account when calculating the viscosity of an aqueous solution. To estimate the viscosity of the solution, this plugin uses the same method as the program Sednterp (see <a href="http://bitcwiki.sr.unh.edu/index.php/Calculating_Viscosity">http://bitcwiki.sr.unh.edu/index.php/Calculating_Viscosity</a>): First a viscosity increment is calculated for each component of the solution at 20°C (where measured data for several solutes is available):
+			$$bmath: \Delta\eta_i(c_i)=m(c_i; \vec{p})-\eta_{Water, 20}$$
+			Here the function $$math:m(c_i; \vec{p})$$ is a model function fitted to experimental viscosity data of the respective solution. It models the viscosity of the solut in water at a molar concentration $$math:c_i$$ and a temperature of 20°C. Finally the solution viscosity at the target temperature $$math:T$$ is estimated as:
+			$$bmath:\eta(T, c_1,...,c_n)=\left(\eta_{20,water}+\sum_{i=1}^n\Delta\eta_i(c_i)\right)\cdot\frac{\eta_{T,water}}{\eta_{20,water}}$$
+			Here $$math:\eta_{T,water}$$ and $$math:\eta_{20,water}$$ are the viscosity of water at an arbitrary temperature T and at 20°C respectively.<br>
+			<b>Note:</b> This method assumes a low concentration of the solute, so that the solution basically behaves like water. Therefore the temperature scaling is the same as in water and hence the simple factor $$math:\eta_{T,water}/\eta_{20,water}$$.<br><br>
+			
+			Model functions implemented in this plugin are:
+			<ol>
+			   <li>The same simple empirical fit function as in <a href="http://bitcwiki.sr.unh.edu/index.php/Calculating_Viscosity">Sednterp</a>: 
+			   $$bmath:m_1(c; p_1,p_2,p_3,p_4,p_5) = p_1 + p_2\cdot10^{-3}\cdot\sqrt{c} + p_3\cdot10^{-2}\cdot c + p_4\cdot10^{-3}\cdot c^2 + p_5\cdot10^{-3}\cdot c^3$$</li>
+			   <li>An extended empirical fit function (e.g. used for glucose data): 
+			   $$bmath:m_1(c; p_1,p_2,p_3,p_4,p_5,p_6,p_7,p_8,p_9) = p_1 + p_2\cdot10^{-3}\cdot\sqrt{c} + p_3\cdot10^{-2}\cdot c + p_4\cdot10^{-3}\cdot c^2 + p_5\cdot10^{-3}\cdot c^3 + p_6\cdot10^{-3}\cdot c^4 + p_7\cdot10^{-3}\cdot c^5 + p_8\cdot10^{-3}\cdot c^6 + p_9\cdot10^{-3}\cdot c^7$$</li>
+			</ol>
+			The parameters for these functions were obtained by the author from fits to model data taken from respected sources (e.g. CRC handbook of chemistry). The reference for each fit and the parameter values can be found in the file <tt>$$local_plugin_assets$$solutioncomponents.ini</tt>. In the same directory there are data files with the solution data at 20°C and a GnuPlot script to perform the fit.
+			<br><b>Note:</b> The calculation of solution viscosities is currently only available for acqeous solutions!
 		  </li>
 		</ul>
 		</p>
