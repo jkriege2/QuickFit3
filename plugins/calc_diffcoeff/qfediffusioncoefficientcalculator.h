@@ -3,6 +3,7 @@
 
 #include <time.h>
 #include <QObject>
+#include <cmath>
 #include "qfextension.h"
 #include "dlgcalcdiffcoeff.h"
 #include "qfextensiontool.h"
@@ -57,21 +58,38 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         QString getComponentName(int index) const;
         QString getComponentReference(int index) const;
         double getComponentMolarMass(int index) const;
+        double getComponentCMax(int index) const;
         double evaluateComponentViscosity20degC(int index, double concentration) const;
         QString getViscosityModelFunction(int index, bool HTML=false) const;
         QString getComponentDatafile(int index) const;
+        QString getComponentComment(int index, bool html=false) const;
+        int getComponentModelID(int index) const;
         QStringList getComponentNames() const;
+        QVector<double> getComponentModelParamaters(int index) const;
 
         struct Component {
             int id;
             double concentration_molar;
         };
 
+        enum SpheroidType {
+            Ellipsoid=0,
+            Cylinder=1
+        };
+
+
+        /** \brief returns the density of the specified solution im kg/l */
         double getSolutionDensity(int solution, double temperature_K, QList<Component> components=QList<Component>());
+        /** \brief returns the viscosity of the specified solution im Pa*s */
         double getSolutionViscosity(int solution, double temperature_K, QList<Component> components=QList<Component>());
-        double getSphereDCoeff(int solution, double diameter, double at_temperature_K, QList<Component> components=QList<Component>());
+        /** \brief returns the diffusion coefficient in m^2/s */
+        double getSphereDCoeff(int solution, double diameter_meter, double at_temperature_K, QList<Component> components=QList<Component>());
+        /** \brief returns the diffusion coefficient in m^2/s */
         double getDCoeff_from_D20W(int solution, double D20W, double at_temperature_K, QList<Component> components=QList<Component>());
+        /** \brief returns the diffusion coefficient in m^2/s */
         double getDCoeff_from_D(int solution, double D, double viscosity, double temp_K, double at_temperature_K, QList<Component> components=QList<Component>());
+        /** \brief returns the diffusion coefficient in m^2/s */
+        double getShapeDCoeff(int solution, double rotation_axis_or_length_meter, double second_axis_or_diameter_meter, SpheroidType type, double at_temperature_K, QList<Component> components=QList<Component>(), double* Dsphere=NULL, double* volume=NULL);
 
         virtual QAction* getToolStartAction();
         virtual void startTool();
@@ -91,6 +109,7 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         virtual void storeSettings(ProgramOptions* settings);
 
 
+        void loadComponents(QSettings &settings, bool clear=true);
         void loadComponents();
 
         /** \brief log project text message
@@ -117,7 +136,10 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
             QString reference;
             double molar_mass;
             QString datafile;
+            QString comment;
+            QString comment_html;
             int model;
+            double c_max;
             QVector<double> parameters;
         };
         QList<ComponentData> components;

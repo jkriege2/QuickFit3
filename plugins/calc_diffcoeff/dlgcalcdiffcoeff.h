@@ -40,15 +40,19 @@ class DlgCalcDiffCoeff : public QDialog
         void on_btnCHelp1_clicked();
         void on_btnCHelp2_clicked();
         void on_btnCHelp3_clicked();
+        void on_btnCHelp4_clicked();
+        void on_btnCHelp5_clicked();
+        void on_cmbShapeType_currentIndexChanged(int index);
         void showHelp();
+        void on_btnSendEmailGivenD_clicked();
     protected:
         Ui::DlgCalcDiffCoeff *ui;
         QFEDiffusionCoefficientCalculator *plugin;
         DlgComponentInfo* dlgInfo;
 
         QFTableModel* tab;
-        int c_temp, c_D, c_visc, c_density, c_Dwater, c_Dsolution;
-        QVector<double> temp, D, visc, density, Dwater, Dsolution;
+        int c_temp, c_D, c_visc, c_density, c_Dwater, c_Dsolution, c_Dsphere;
+        QVector<double> temp, D, visc, density, Dwater, Dsolution, Dsphere;
 
         bool updating;
 

@@ -20,7 +20,7 @@
 		  <li>Now the plugin will calculate the solution viscosity and the diffusion coefficient of your sample according to the method described below. The results will be shown in the table at the bottom left and in the graph at the bottom right. In the graph you may select several different plots from the drop-down list above it. If your experiment has specific temperature conditions, you may enter them above the table and read the viscosity and diffusion coefficient for your experiment below that.</li>
 		</ul></p>
 		
-		<h2>Calculating the Diffusion Coefficient models</h2>
+		<h2>Calculating the Diffusion Coefficient</h2>
 		<p>The plugin uses several approximations to calculate the properties (especially the dynamic viscosity $$math:\eta$$) of a solution, which are described in the next section. Then the diffusion coefficient $$math:D$$ may be calculated as follows:
 		<ul>
 		  <li><b>Sphere of given Diameter $$math:d$$:</b> The diffusion coefficient is given by the relation 
@@ -34,7 +34,20 @@
 		  <li><b>from any given diffusion coefficient $$math:D_R$$ at reference conditions $$math:T_R$$ and $$math:\eta_R$$:</b> The same as inthe case of given $$math:D_{20,W}$$:
 		  $$bmath:D=D_R\cdot\frac{T}{T_R}\cdot\frac{\eta_R}{\eta}$$
 		  </li>
+		  <li><b>An ellipsoid with rotation axis diameter $$math:a$$ and other axes diameter $$math:b$$:</b> The diffusion coefficient is given by the relation 
+		    $$bmath:D=\frac{k_B T}{6\pi\eta R_e\dot F_t}$$ where $$math:R_e$$ is the equivalent radius of a sphere of the same volume and $$math:F_t$$ is the translational Perrin factor:
+			$$bmath:R_e=(ab^2)^{1/3}$$
+			Depending on the axial ration $$math:p=a/b$$ ($$math:\Rightarrow q=1/p$$), the Perrin factor is:<ul>
+			<li>for a prolate ellipsoid ($$math:p>1$$): $$bmath:F_t=\frac{\sqrt{1-q^2}}{q^{2/3}\cdot\ln\frac{1+\sqrt{1-q^2}}{q}}$$</li>
+			<li>for a oblate ellipsoid ($$math:p<1$$): $$bmath:F_t=\frac{\sqrt{q^2-1}}{q^{2/3}\cdot\atan\sqrt{q^2-1}}$$</li>
+			</ul></li>
+		  <li><b>A cylinder of diameter $$math:d$$ and length $$math:L$$:</b> The diffusion coefficient is given by the relation 
+		    $$bmath:D=\frac{k_B T}{6\pi\eta R_e\dot F_t}$$ where $$math:R_e$$ is the equivalent radius of a sphere of the same volume and $$math:F_t$$ is the translational Perrin factor:
+			$$bmath:R_e=\left(\frac{3}{2p^2}\right)^{1/3}\cdot\frac{L}{2}
+			$$bmath:F_t=\frac{(2p^2/3)^{1/3}}{\ln(p)+\gamma},   \gamma=0.312+\frac{0.565}{p}+\frac{0.100}{p^2}
+			Here the parameter $$math:p$$ is defined as: $$math:p=L/d$$</li>
 		</ul>
+		
 		</p>
 
 		<h2>Solutin Models</h2>
@@ -63,5 +76,85 @@
 		  </li>
 		</ul>
 		</p>
+		
+		<h2>Adding Custom Solutes to the Database</h2>
+		<p><ol>
+		  <li>Create and/or open a file <tt>solutioncomponents.ini</tt> in your user-config directory (<tt>$$local_plugin_config$$</tt>). You may also edit the same file in the assets directory (<tt>$$local_plugin_assets$$</tt>), but note that this file will be overwritten during a QuickFit update!</li>
+		  <li>Add a new section to this file with a number, 1 higher than the last section and enter all data there:<br><blockquote><tt>
+			[component<font color="blue"><i>N</i></font>]<br>
+			name=<font color="blue"><i>name of your component</i></font><br>
+			molar_mass=<font color="blue"><i>molar mass of your component in g/mol</i></font><br>
+			reference=<font color="blue"><i>reference where your data/model coefficients was taken from</i></font><br>
+			datafile=<font color="blue"><i>file containing measured data for your compound</i></font><br>
+			comment=<font color="blue"><i>an arbitrary comment, if you want to use HTML, use comment_html instead</i></font><br>
+			comment_html=<font color="blue"><i>an arbitrary commentusing HTML highlighting</i></font><br>
+			model=<font color="blue"><i>which model to use (see above)</i></font><br>
+			c_max=<font color="blue"><i>maximum concentration in Molar at which the model is still valid</i></font><br>
+			p1=<font color="blue"><i>first model parameter</i></font><br>
+			p2=<font color="blue"><i>second model parameter</i></font><br>
+			<font color="blue"><i>...</i></font>
+			</tt></blockquote></li>
+		  <li>Now you will have to determine the model parameters. To do so, you will need a dataset containing the viscosity of your solute in water at 20°C for different concentrations. Store this dataset in a new comma-separated values file, which you wil have to enter as "datafile". Here is an example of data taken from the CRC handbook for NaCl:<br><blockquote><tt>
+		    # name: sodium chloride (NaCl)<br>
+			# molar mass: 58.44<br>
+			# temperature: 20°C<br>
+			# reference: CRC handbook, p. 8-71<br>
+			#! concentration [M], density [g/cm^3], refractive index, viscosity [mPa*s]<br>
+			0,   	0.9982,	1.3339,	1.0016<br>
+			0.086,	1.0018,	1.3339,	1.011<br>
+			0.172,	1.0053,	1.3347,	1.020<br>
+			0.346,	1.0125,	1.3365,	1.036<br>
+			0.523,	1.0196,	1.3383,	1.052<br>
+			0.703,	1.0268,	1.3400,	1.068<br>
+			0.885,	1.0340,	1.3418,	1.085<br>
+			1.069,	1.0413,	1.3435,	1.104<br>
+			1.256,	1.0486,	1.3453,	1.124<br>
+			1.445,	1.0559,	1.3470,	1.145<br>
+			1.637,	1.0633,	1.3488,	1.168<br>
+			1.832,	1.0707,	1.3505,	1.193<br>
+			2.229,	1.0857,	1.3541,	1.250<br>
+			2.637,	1.1008,	1.3576,	1.317<br>
+			3.056,	1.1162,	1.3612,	1.388<br>
+			3.486,	1.1319,	1.3648,	1.463<br>
+			3.928,	1.1478,	1.3684,	1.557<br>
+			4.382,	1.1640,	1.3721,	1.676<br>
+			4.847,	1.1804,	1.3757,	1.821<br>
+			5.326,	1.1972,	1.3795,	1.990<br>
+		  </tt></blockquote>The first line can be kept like in this example, as it simply contains the data of water! Note, the #-lines are just comments and will be ignored. Please give the data in the same units as above. If you do not have data for one of the column, just leave it empty. The data won't be displayed in QuickFit then, but for the fit you only need the first and last columns.<br>With this data you will have to perform a fit to the selected model function. This can be done using e.g. <a href="http://www.gnuplot.info">GnuPlot</a> with a script like this (for model 1):<blockquote><tt>
+		    reset<br>
+			set xlabel 'concentration [M]'<br>
+			set ylabel 'viscosity [Pa*s]'<br>
+			a=1.002<br>
+			b=1<br>
+			c=1<br>
+			d=1<br>
+			e=1<br>
+			model1(conc,a,b,c,d,e)=a+b*1e-3*sqrt(conc)+c*1e-2*conc+d*1e-3*conc*conc+e*1e-3*conc*conc*conc<br>
+			fit model1(x,a,b,c,d,e) 'solutioncomponent001.dat' using 1:4 via a,b,c,d,e<br>
+			fit model1(x,a,b,c,d,e) 'solutioncomponent001.dat' using 1:4 via a,b,c,d,e<br>
+			fit model1(x,a,b,c,d,e) 'solutioncomponent001.dat' using 1:4 via a,b,c,d,e<br>
+			set multiplot layout 3,1<br>
+			set origin 0,0.33<br>
+			set size 1,0.66<br>
+			plot 'solutioncomponent001.dat' using 1:4 title 'data', model1(x,a,b,c,d,e) title sprintf('fit p1=%f, p2=%f, p3=%f, p4=%f, p5=%f', a,b,c,d,e) with lines<br>
+			set size 1,0.33<br>
+			set origin 0,0<br>
+			set xzeroaxis<br>
+			set ylabel 'rel. residuals [%]'<br>
+			plot 'solutioncomponent001.dat' using ($1):((($4)-model1(($1),a,b,c,d,e))*100.0/($4)) title 'rel. residuals [%]' with linespoints<br>
+			unset multiplot<br>
+		  </tt></blockquote></li>
+		  The residuals should be below 1% and if they are much too high, you should use a different model or fit the model data to a smaller range of concentrations.<br>Finally take the parameters p1 ... p5 and put them in your new section in <tt>solutioncomponents.ini</tt>.
+		  <li>The new data should be available after a restart. If you feel that you have good data that should be available to all QUickFit users, just email it to the QuickFit authors (A button for this is provided in the component info window!).</li>
+		  </li>
+		  <li></li>
+		</ol></p>
+		<h2>References</h2>
+		<ul>
+		  <li>Perrin, F. (1934): "Mouvement brownien d’un ellipsoide (I). Dispersion dielectrique pour des molecules ellipsoidales", J. Phys. Radium [7] 5, 497-511. <a href="http://hal.archives-ouvertes.fr/docs/00/23/32/65/PDF/ajp-jphysrad_1934_5_10_497_0.pdf">[Online]</a></li>
+		  <li>Tirado, M.M. and J. Garca de la Torre (1979): "Translational friction coefficients of rigid, symmetric top macromolecules". Application to circular cylinders, J. Chem Phys. 71: 2581-2588.</li>
+		  <li>S. Hansen (2004): "Translational friction coefficients for cylinders of arbitrary axial ratios estimated by Monte Carlo simulation", J CHem Phys 121(18), 9111-9115. <a href="http://www.matfys.kvl.dk/~steen/Hansen%20JCP%202004.pdf">[Online]</a></li>
+		  <li>Bloomfield, VA (2000): "Chapter 1. Survey of Biomolecular Hydrodynamics" in: On-Line Biophysics Textbook. Separations and Hydrodynamics./Edited by TM Schuster. <a href="http://www.biophysics.org/portals/1/pdfs/education/vbloomfield.pdf">[Online]</a></li>
+		</ul>
 	</body>
 </html>

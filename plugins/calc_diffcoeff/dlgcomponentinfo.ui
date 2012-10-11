@@ -17,7 +17,7 @@
    <iconset resource="qfediffusioncoefficientcalculator.qrc">
     <normaloff>:/calc_diffcoeff/qfediffusioncoefficientcalculator.png</normaloff>:/calc_diffcoeff/qfediffusioncoefficientcalculator.png</iconset>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,2,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,2,0,0">
    <item>
     <widget class="QComboBox" name="comboBox"/>
    </item>
@@ -71,6 +71,34 @@
     <widget class="JKQtPlotter" name="plotter" native="true"/>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnMailData">
+       <property name="text">
+        <string>send component data to QuickFit authors</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/mail.png</normaloff>:/lib/mail.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -96,7 +124,9 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfediffusioncoefficientcalculator.qrc"/>
+  <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
   <connection>

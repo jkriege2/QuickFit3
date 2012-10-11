@@ -21,6 +21,7 @@ class DlgComponentInfo : public QDialog
         void setComponent(int component);
         void showHelp();
         void on_cmbPlot_currentIndexChanged(int index);
+        void on_btnMailData_clicked();
     private:
         Ui::DlgComponentInfo *ui;
         QFEDiffusionCoefficientCalculator* plugin;

@@ -618,6 +618,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_dllsuffix"), pluginList->at(i).pluginDLLSuffix));
                 if (m_pluginServices) {
                     fromHTML_replaces.append(qMakePair(QString("local_plugin_assets"), m_pluginServices->getAssetsDirectory()+"/plugins/"+pluginList->at(i).pluginDLLbasename+"/"));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_config"), m_pluginServices->getConfigFileDirectory()+"/plugins/"+pluginList->at(i).pluginDLLbasename+"/"));
                 }
                 if (!pluginList->at(i).tutorial.isEmpty()) {
                     fromHTML_replaces.append(qMakePair(QString("local_plugin_tutorial_file"), pluginList->at(i).tutorial));

@@ -115,6 +115,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("thanksto"), QString(QF_THANKS_TO)));
     htmlReplaceList.append(qMakePair(QString("copyright"), QString(QF_COPYRIGHT)));
     htmlReplaceList.append(qMakePair(QString("author"), QString(QF_AUTHOR)));
+    htmlReplaceList.append(qMakePair(QString("email"), QString(QF_EMAIL)));
     htmlReplaceList.append(qMakePair(QString("weblink"), QString(QF_WEBLINK)));
     htmlReplaceList.append(qMakePair(QString("license"), tr(QF_LICENSE)));
     htmlReplaceList.append(qMakePair(QString("plugin_list"), createPluginDoc(true)));
@@ -375,7 +376,7 @@ void MainWindow::about() {
     QLabel* ui_label = qFindChild<QLabel*>(widget, "labSplash");
     QLabel* ui_labelLic = qFindChild<QLabel*>(widget, "labLicense");
     ui_label->setPixmap(splashPix);
-    ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>libraries, used by QuickFit:</b><ul><li>QuickFit library v%4.%5</li><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul><b>many thanks to:</b><blockquote>%2</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR));
+    ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>contact the authors:</b><blockquote><a href=\"mailto:%6\">%6</a></blockquote><b>libraries, used by QuickFit:</b><ul><li>QuickFit library v%4.%5</li><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul><b>many thanks to:</b><blockquote>%2</blockquote><b>compiler used for this version:</b><blockquote>%7</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR).arg(QF_EMAIL).arg(Qt::escape(COMPILER)));
     ui_labelLic->setText(tr(QF_LICENSE));
     widget->exec();
     delete widget;

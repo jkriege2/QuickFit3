@@ -4,6 +4,7 @@
 #include "datatable2.h"
 #include "qfediffusioncoefficientcalculator.h"
 #include  <QTextDocument>
+#include "qfversion.h"
 
 DlgComponentInfo::DlgComponentInfo(QFEDiffusionCoefficientCalculator *plugin, int component, QWidget *parent) :
     QDialog(parent),
@@ -40,8 +41,20 @@ void DlgComponentInfo::setComponent(int component) {
     model->setCellCreate(row,0,tr("<b>molar mass:</b>"));
     model->setCellCreate(row,1,tr("%1 g/mol").arg(plugin->getComponentMolarMass(component)));
     row++;
+    QString comment=plugin->getComponentComment(component, true);
+    QString c1=Qt::escape(plugin->getComponentComment(component, false));
+    if (!comment.isEmpty() && !c1.isEmpty()) comment=comment+"<br><br>"+c1;
+
+    if (!comment.isEmpty()) {
+        model->setCellCreate(row,0,tr("<b>comment:</b>"));
+        model->setCellCreate(row,1,comment);
+        row++;
+    }
     model->setCellCreate(row,0,tr("<b>model function:</b>"));
     model->setCellCreate(row,1,tr("%1").arg(plugin->getViscosityModelFunction(component, true)));
+    row++;
+    model->setCellCreate(row,0,tr("<b>model valid:</b>"));
+    model->setCellCreate(row,1,tr("c = 0 ... %1 M").arg(plugin->getComponentCMax(component)));
     row++;
     model->setCellCreate(row,0,tr("<b>reference:</b>"));
     model->setCellCreate(row,1,Qt::escape(plugin->getComponentReference(component)));
@@ -60,8 +73,7 @@ void DlgComponentInfo::setComponent(int component) {
 }
 
 
-void DlgComponentInfo::showHelp()
-{
+void DlgComponentInfo::showHelp() {
     QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelp(plugin->getID()));
 }
 
@@ -73,7 +85,7 @@ void DlgComponentInfo::on_cmbPlot_currentIndexChanged(int index)
     ui->plotter->get_plotter()->set_keyPosition(JKQTPkeyInsideLeft);
 
     double cMin=0;
-    double cMax=1;
+    double cMax=plugin->getComponentCMax(ui->comboBox->currentIndex());
     QString filename=plugin->getComponentDatafile(ui->comboBox->currentIndex());
     if (QFile::exists(filename)) {
         datatable2 tab;
@@ -109,7 +121,7 @@ void DlgComponentInfo::on_cmbPlot_currentIndexChanged(int index)
 
     if (index==0) {
         QVector<double> dc, deta;
-        for (double c=cMin; c<cMax; c=c+(cMax-cMin)/1000.0) {
+        for (double c=cMin; c<cMax; c=c+(cMax-cMin)/2000.0) {
             dc.append(c*1000.0);
             deta.append(plugin->evaluateComponentViscosity20degC(ui->comboBox->currentIndex(), c)*1000.0);
         }
@@ -121,4 +133,26 @@ void DlgComponentInfo::on_cmbPlot_currentIndexChanged(int index)
     }
     ui->plotter->set_doDrawing(true);
     ui->plotter->zoomToFit();
+}
+
+void DlgComponentInfo::on_btnMailData_clicked() {
+    int component=ui->comboBox->currentIndex();
+    QString datafilename=QFileInfo(plugin->getComponentDatafile(component)).fileName();
+    QFile f(plugin->getComponentDatafile(component));
+    QString filecontents;
+    if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        filecontents=f.readAll();
+        f.close();
+    }
+
+    QString inisection=QString("[component%1]\nname=%2\nmolar_mass=%3\nreference=\"%4\"\ndatafile=%5\ncomment=\"%6\"\ncomment_html=\"%7\"\nmodel=%8\nmodel_expression=\"%9\"\n").arg(component).arg(plugin->getComponentName(component)).arg(plugin->getComponentMolarMass(component)).arg(plugin->getComponentReference(component)).arg(datafilename).arg(plugin->getComponentComment(component, false)).arg(plugin->getComponentComment(component, true)).arg(plugin->getComponentModelID(component)).arg(plugin->getViscosityModelFunction(component, false));
+    QVector<double> params=plugin->getComponentModelParamaters(component);
+    for (int i=0; i<params.size(); i++) {
+        inisection+=QString("p%1=%2\n").arg(i+1).arg(params[i]);
+    }
+    QString mailcontents=tr("Dear authors,\nfind attatched my component data for inclusion in the next QuickFit release,\n\nBest,\n\n\nDATA:\n---------------------------------------------------------------------\n%1\n---------------------------------------------------------------------\n%3:\n%2\n---------------------------------------------------------------------\n").arg(inisection).arg(filecontents).arg(datafilename);
+
+    QUrl url=QUrl(QByteArray("mailto:")+QByteArray(QF_EMAIL)+"?subject="+QUrl::toPercentEncoding("QuickFit3/calc_diffcoeff: new component data")+
+                  "&body="+QUrl::toPercentEncoding(mailcontents));
+    QDesktopServices::openUrl(url);
 }

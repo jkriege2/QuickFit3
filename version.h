@@ -4,6 +4,7 @@
 #include <QtGlobal>
 #include "compiledate.h"
 #include "svnversion.h"
+#include "compiler.h"
 
 #define VERSION_FULL "3.0"
 #define QF_VERSION VERSION_FULL
@@ -15,6 +16,8 @@
 #define QF_COPYRIGHT "&copy; 2010-2012 by Jan Krieger"
 
 #define QF_AUTHOR "Jan Krieger"
+
+#define QF_EMAIL "j.krieger@dkfz.de"
 
 #define QF_WEBLINK "http://www.dkfz.de/Macromol/quickfit/"
 

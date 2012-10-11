@@ -51,13 +51,34 @@ QString QFEDiffusionCoefficientCalculator::getComponentReference(int index) cons
     return "";
 }
 
+QVector<double> QFEDiffusionCoefficientCalculator::getComponentModelParamaters(int index) const {
+    if (index>=0 && index<components.size()) return components[index].parameters;
+    return QVector<double>();
+}
+
 QString QFEDiffusionCoefficientCalculator::getComponentDatafile(int index) const {
     if (index>=0 && index<components.size()) return components[index].datafile;
     return "";
 }
 
+QString QFEDiffusionCoefficientCalculator::getComponentComment(int index, bool html) const {
+    if (!html && index>=0 && index<components.size()) return components[index].comment;
+    if (html && index>=0 && index<components.size()) return components[index].comment_html;
+    return "";
+}
+
+int QFEDiffusionCoefficientCalculator::getComponentModelID(int index) const {
+    if (index>=0 && index<components.size()) return components[index].model;
+    return -1;
+}
+
 double QFEDiffusionCoefficientCalculator::getComponentMolarMass(int index) const {
     if (index>=0 && index<components.size()) return components[index].molar_mass;
+    return 0.0;
+}
+
+double QFEDiffusionCoefficientCalculator::getComponentCMax(int index) const {
+    if (index>=0 && index<components.size()) return components[index].c_max;
     return 0.0;
 }
 
@@ -163,11 +184,6 @@ double QFEDiffusionCoefficientCalculator::getSolutionViscosity(int solution, dou
     return eta;
 }
 
-double QFEDiffusionCoefficientCalculator::getSphereDCoeff(int solution, double diameter, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components)
-{
-    double eta=getSolutionViscosity(solution, at_temperature_K, components);
-    return K_BOLTZ*at_temperature_K/(6.0*M_PI*eta*diameter/2.0);
-}
 
 double QFEDiffusionCoefficientCalculator::getDCoeff_from_D20W(int solution, double D20W, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components) {
     return getDCoeff_from_D(solution, D20W, 1.002e-3, 20.0+273.15, at_temperature_K, components);
@@ -176,6 +192,44 @@ double QFEDiffusionCoefficientCalculator::getDCoeff_from_D20W(int solution, doub
 double QFEDiffusionCoefficientCalculator::getDCoeff_from_D(int solution, double D, double viscosity, double temp_K, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components) {
     double eta=getSolutionViscosity(solution, at_temperature_K, components);
     return D*(at_temperature_K/temp_K)*viscosity/eta;
+}
+
+double QFEDiffusionCoefficientCalculator::getSphereDCoeff(int solution, double diameter_meter, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components) {
+    double eta=getSolutionViscosity(solution, at_temperature_K, components);
+    return K_BOLTZ*at_temperature_K/(6.0*M_PI*eta*diameter_meter/2.0);
+}
+
+double QFEDiffusionCoefficientCalculator::getShapeDCoeff(int solution, double rotation_axis_or_length_meter, double second_axis_or_diameter_meter, QFEDiffusionCoefficientCalculator::SpheroidType type, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components, double* Dsphere, double* volume) {
+    double eta=getSolutionViscosity(solution, at_temperature_K, components);
+
+    double Re=0;
+    double Ft=1;
+    double p=rotation_axis_or_length_meter/second_axis_or_diameter_meter;
+    double q=1.0/p;
+    if (type==QFEDiffusionCoefficientCalculator::Ellipsoid) {
+        Re=pow(second_axis_or_diameter_meter/2.0*second_axis_or_diameter_meter/2.0*rotation_axis_or_length_meter/2.0, 1.0/3.0);
+        if (p<1) { // oblate, p<1 => q>1
+            Ft=sqrt(q*q-1.0)/(pow(q, 2.0/3.0)*atan(sqrt(q*q-1.0)));
+        } else if (p>1) { // prolate, p>1 => q<1
+            Ft=sqrt(1.0-q*q)/(pow(q, 2.0/3.0)*log((1.0+sqrt(1.0-q*q))/q));
+        } else if (p==1) { // sphere
+            if (volume) *volume=4.0/3.0*M_PI*rotation_axis_or_length_meter*rotation_axis_or_length_meter*rotation_axis_or_length_meter/8.0;
+            double DDD=getSphereDCoeff(solution, rotation_axis_or_length_meter, at_temperature_K, components);
+            if (Dsphere) *Dsphere=DDD;
+            return DDD;
+        }
+    } else if (type==QFEDiffusionCoefficientCalculator::Cylinder){
+        double gamma=0.312+0.565/p+0.100/p/p;
+        Re=pow(3.0/(2.0*p*p), 1.0/3.0)*rotation_axis_or_length_meter/2.0;
+        Ft=pow(2.0*p*p/3.0, 1.0/3.0)/(log(p)+gamma);
+    }
+    if (volume) *volume=4.0/3.0*M_PI*Re*Re*Re;
+
+    double fperrin=6.0*M_PI*eta*Re*Ft;
+
+    if (Dsphere) *Dsphere=K_BOLTZ*at_temperature_K/(6.0*M_PI*eta*Re);
+
+    return K_BOLTZ*at_temperature_K/fperrin;
 }
 
 QAction *QFEDiffusionCoefficientCalculator::getToolStartAction()
@@ -231,8 +285,14 @@ void QFEDiffusionCoefficientCalculator::storeSettings(ProgramOptions* settingspo
 }
 
 void QFEDiffusionCoefficientCalculator::loadComponents() {
-    components.clear();
-    QSettings settings(services->getAssetsDirectory()+"/plugins/"+getID()+"/solutioncomponents.ini", QSettings::IniFormat);
+    QSettings set1(services->getAssetsDirectory()+"/plugins/"+getID()+"/solutioncomponents.ini", QSettings::IniFormat);
+    QSettings set2(services->getConfigFileDirectory()+"/plugins/"+getID()+"/solutioncomponents.ini", QSettings::IniFormat);
+    loadComponents(set1, true);
+    loadComponents(set2, false);
+}
+
+void QFEDiffusionCoefficientCalculator::loadComponents(QSettings& settings, bool clear) {
+    if (clear) components.clear();
     QStringList groups=settings.childGroups();
     //qDebug()<<services->getAssetsDirectory()+"/plugins/"+getID()+"/solutioncomponents.ini"<<groups;
     for (int g=0; g<groups.size(); g++) {
@@ -240,10 +300,13 @@ void QFEDiffusionCoefficientCalculator::loadComponents() {
         QFEDiffusionCoefficientCalculator::ComponentData cdata;
         cdata.name=settings.value("name", tr("component '%1'").arg(groups[g])).toString();
         cdata.reference=settings.value("reference", tr("---")).toString();
-        QDir d(services->getAssetsDirectory()+"/plugins/"+getID()+"/");
+        QDir d=QFileInfo(settings.fileName()).absoluteDir();
         cdata.datafile=d.absoluteFilePath(settings.value("datafile", "").toString());
         cdata.model=settings.value("model", 1).toInt();
         cdata.molar_mass=settings.value("molar_mass", 0).toDouble();
+        cdata.c_max=settings.value("c_max", 0).toDouble();
+        cdata.comment=settings.value("comment", "").toString();
+        cdata.comment_html=settings.value("comment_html", "").toString();
         QStringList keys=settings.childKeys();
         QString key="p1";
         int id=1;
