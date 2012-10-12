@@ -54,6 +54,7 @@ protected slots:
     void on_cmbCorrelator_currentIndexChanged(int idx);
     void on_cmbBackground_currentIndexChanged(int idx);
     void on_cmbBleachType_currentIndexChanged(int idx);
+    void on_cmbDualView_currentIndexChanged(int index);
 
     void frameTimeChanged(double value);
     void frameRateChanged(double value);
@@ -68,12 +69,14 @@ protected slots:
     void on_chkLastFrame_clicked(bool checked);
     void setEditControlsEnabled(bool enabled);
     void on_btnDataExplorer_clicked();
+
 protected:
     void done(int status);
     bool allThreadsDone() const;
     int runningThreads() const;
     int waitingThreads() const;
     IMFCSJob initJob();
+    void addJob(IMFCSJob jobin, bool ignoreDualView=false);
 private:
     QFPluginServices* pluginServices;
     Ui::QFRDRImagingFCSCorrelationDialog *ui;

@@ -133,6 +133,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnDataExplorer_clicked() {
     delete explorer;
 }
 
+
 bool QFRDRImagingFCSCorrelationDialog::allThreadsDone() const  {
     for (int i=0; i<jobs.size(); i++) {
         if ((jobs[i].thread->isRunning()) || (jobs[i].thread->status()==1)) return false;
@@ -260,6 +261,18 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbBackground_currentIndexChanged(int 
 
 void QFRDRImagingFCSCorrelationDialog::on_cmbBleachType_currentIndexChanged(int idx) {
     //ui->widBleach->setEnabled(ui->cmbBleachType->currentIndex()>=2);
+}
+
+void QFRDRImagingFCSCorrelationDialog::on_cmbDualView_currentIndexChanged(int index) {
+    if (index==0) {
+        ui->labDualView->setText("");
+        ui->chkCrop->setEnabled(true);
+    } else if (index==1 || index==2) {
+        ui->labDualView->setText(tr("an ACF-calculation results in 2 RDRs"));
+        ui->chkCrop->setChecked(false);
+        ui->chkCrop->setEnabled(false);
+
+    }
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_chkFirstFrame_clicked(bool checked) {
@@ -501,6 +514,7 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
     job.cameraSettingsGiven=ui->chkCamera->isChecked();
     job.cameraPixelWidth=ui->spinPixelWidth->value();
     job.cameraPixelHeight=ui->spinPixelHeight->value();
+    job.dualViewSideID="";
     //job.bleachDecay=ui->spinDecay->value();
     //job.bleachA=ui->edtDecayA->value();
     //job.bleachDecay2=ui->spinDecay2->value();
@@ -511,25 +525,67 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
     return job;
 }
 
+void QFRDRImagingFCSCorrelationDialog::addJob(IMFCSJob jobin, bool ignoreDualView) {
+    IMFCSJob job=jobin;
+
+    if (ignoreDualView || (ui->cmbDualView->currentIndex()==0)) {
+
+        job.progress=new QFRDRImagingFCSThreadProgress(this);
+        job.thread=new QFRDRImagingFCSCorrelationJobThread(pluginServices, this);
+        connect(job.thread, SIGNAL(messageChanged(QString)), job.progress, SLOT(setMessage(QString)));
+        connect(job.thread, SIGNAL(statusChanged(int)), job.progress, SLOT(setStatus(int)));
+        connect(job.thread, SIGNAL(rangeChanged(int, int)), job.progress, SLOT(setRange(int, int)));
+        connect(job.thread, SIGNAL(progressChanged(int)), job.progress, SLOT(setProgress(int)));
+        connect(job.thread, SIGNAL(progressIncrement(int)), job.progress, SLOT(incProgress(int)));
+        connect(job.progress, SIGNAL(cancelClicked()), job.thread, SLOT(cancel()));
+
+
+        setEditControlsEnabled(false);
+        ui->layProgress->insertWidget(0, job.progress);
+
+        job.progress->setName(tr("correlating '%1'").arg(job.filename));
+        job.thread->init(job);
+        jobs.append(job);
+    } else if (!ignoreDualView) {
+        if (ui->cmbDualView->currentIndex()==1) {
+            job.use_cropping=true;
+            job.crop_x0=0;
+            job.crop_x1=image_width/2-1;
+            job.crop_y0=0;
+            job.crop_y1=image_height-1;
+            job.dualViewSideID=tr("left");
+            addJob(job, true);
+            IMFCSJob job2=jobin;
+            job2.use_cropping=true;
+            job2.crop_x0=image_width/2;
+            job2.crop_x1=image_width-1;
+            job2.crop_y0=0;
+            job2.crop_y1=image_height-1;
+            job2.dualViewSideID=tr("right");
+            addJob(job2);
+        } else if (ui->cmbDualView->currentIndex()==2) {
+            job.use_cropping=true;
+            job.crop_x0=0;
+            job.crop_x1=image_width-1;
+            job.crop_y0=0;
+            job.crop_y1=image_height/2-1;
+            job.dualViewSideID=tr("bottom");
+            addJob(job, true);
+            IMFCSJob job2=jobin;
+            job2.use_cropping=true;
+            job2.crop_x0=0;
+            job2.crop_x1=image_width-1;
+            job2.crop_y0=image_height/2;
+            job2.crop_y1=image_height-1;
+            job.dualViewSideID=tr("top");
+            addJob(job2);
+        }
+    }
+}
+
 void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     IMFCSJob job=initJob();
-
-    job.progress=new QFRDRImagingFCSThreadProgress(this);
-    job.thread=new QFRDRImagingFCSCorrelationJobThread(pluginServices, this);
-    connect(job.thread, SIGNAL(messageChanged(QString)), job.progress, SLOT(setMessage(QString)));
-    connect(job.thread, SIGNAL(statusChanged(int)), job.progress, SLOT(setStatus(int)));
-    connect(job.thread, SIGNAL(rangeChanged(int, int)), job.progress, SLOT(setRange(int, int)));
-    connect(job.thread, SIGNAL(progressChanged(int)), job.progress, SLOT(setProgress(int)));
-    connect(job.thread, SIGNAL(progressIncrement(int)), job.progress, SLOT(incProgress(int)));
-    connect(job.progress, SIGNAL(cancelClicked()), job.thread, SLOT(cancel()));
-
-
-    setEditControlsEnabled(false);
-    ui->layProgress->insertWidget(0, job.progress);
-
-    job.progress->setName(tr("correlating '%1'").arg(job.filename));
-    job.thread->init(job);
-    jobs.append(job);
+    addJob(job);
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_btnAddSeriesJob_clicked() {
@@ -547,20 +603,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddSeriesJob_clicked() {
             }
 
 
-            job.progress=new QFRDRImagingFCSThreadProgress(this);
-            job.thread=new QFRDRImagingFCSCorrelationJobThread(pluginServices, this);
-            connect(job.thread, SIGNAL(messageChanged(QString)), job.progress, SLOT(setMessage(QString)));
-            connect(job.thread, SIGNAL(statusChanged(int)), job.progress, SLOT(setStatus(int)));
-            connect(job.thread, SIGNAL(rangeChanged(int, int)), job.progress, SLOT(setRange(int, int)));
-            connect(job.thread, SIGNAL(progressChanged(int)), job.progress, SLOT(setProgress(int)));
-            connect(job.thread, SIGNAL(progressIncrement(int)), job.progress, SLOT(incProgress(int)));
-            connect(job.progress, SIGNAL(cancelClicked()), job.thread, SLOT(cancel()));
-
-            ui->layProgress->insertWidget(0, job.progress);
-
-            job.progress->setName(tr("correlating '%1'").arg(job.filename));
-            job.thread->init(job);
-            jobs.append(job);
+            addJob(job);
         }
     }
     delete dlg;

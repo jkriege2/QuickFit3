@@ -1,0 +1,43 @@
+date/time                   : 2012/10/12 17:05:38
+input file                  : ../beads_no9_0.86nM_5mW_000.tif
+input description file      : ../beads_no9_0.86nM_5mW_000.configuration.ini
+overview image file         : beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.overview.tif
+overview image file real    : beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.overview_float.tif
+overview std image          : beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.overviewstd.tif
+background image file       : beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.background.tif
+background stddev           : beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.backgroundstd.tif
+uncorr. overview image file : beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.overview_uncorrected.tif
+uncorr. overview std image  : beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.overviewstd_uncorrected.tif
+video file                  : beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.video.tif
+uncorrected video file      : beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.videouncorr.tif
+statistics file             : beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.statistics.dat
+background statistics file  : beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.backstatistics.dat
+uncorrected statistics file : beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.uncorrstatistics.dat
+autocorrelation file        : beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.autocorrelation.dat
+bin. autocorrelation file   : beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.autocorrelation.bin
+width                       : 20
+height                      : 4
+binning                     : 1
+interleaved binning         : false
+averaging binning           : false
+frame count in file         : 20000
+frame count                 : 20000
+first frame                 : 0
+last frame                  : 19999
+correlator S                : 8
+correlator m                : 2
+correlator P                : 16
+correlator type             : 2
+correlator type name        : direct with averaging
+smallest tau [s]            : 0.00056
+baseline                    : 0
+video sum up                : 20
+video frames                : 1000
+video avgMin                : 65.04
+video avgMax                : 1108.86
+video uncorrected avgMin    : 160.95
+video uncorrected avgMax    : 1203.15
+statistics over             : 10
+bleach correction           : remove frame average
+bleach average frames       : 8
+duration [s]                : 2.052

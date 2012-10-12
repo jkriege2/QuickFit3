@@ -132,6 +132,9 @@ struct IMFCSJob {
     /** \brief height of camera+microscope pixels (in image plane) in nm */
     double cameraPixelHeight;
 
+    /** \brief a short ID describing which side of the image this plugin worked on in DualView mode */
+    QString dualViewSideID;
+
 };
 
 /*! \brief this thread does all the correlation work

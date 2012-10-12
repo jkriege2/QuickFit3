@@ -14,20 +14,105 @@
 	 <h2>Tutorial</h2>
 	 <h3>1. Correlating Data</h3>
 	 <ol>
-	   <li>Perform an imagingFCS measurements (e.g. SPIM-FCS) of some sample of interest in solution. Store the acquired image series as TIFF file and note these acquisition parameters (this will be saved and automatically read from the image metadata if you use the QuickFit SPIM- or a compatible plugin!): <i>pixel size in nanometers, framerate or frametime</i><br>Also perform a background measurement, i.e. a measurement with the same settings (but fewer frames) with the excitation lasers switched off. Usually one such measurement per settings and day is enough, but better perform one right before each measurement to ensure compensation for changing lab illumination and camera drift over the whole day.<br>If you don't have an imagingFCS setup (yet), you may also use the testdata provided under <tt></tt> for this tutorial.</li>
+	   <li>Perform an imagingFCS measurements (e.g. SPIM-FCS) of some sample of interest in solution. Store the acquired image series as TIFF file and note these acquisition parameters (this will be saved and automatically read from the image metadata if you use the QuickFit SPIM- or a compatible plugin!): <i>pixel size in nanometers, framerate or frametime</i><br>Also perform a background measurement, i.e. a measurement with the same settings (but fewer frames) with the excitation lasers switched off. Usually one such measurement per settings and day is enough, but better perform one right before each measurement to ensure compensation for changing lab illumination and camera drift over the whole day.<br><br>If you don't have an imagingFCS setup (yet), you may also use the testdata provided under <tt>$$assetsdir$$/plugins/imaging_fcs/imfcs_testdata/beads_no9_0.86nM_5mW_000.tif</tt> for this tutorial. The acquisition data of this dataset was:
+	   <ul>
+         <li>acquired on a SPIM. The lightsheet had an 1/e2-halfwidth of 1.2µm. </li>
+         <li>pixelsize: 400nm (in the object plane, i.e. using a 60x/NA1 detection objective and an Andor iXon X3 860 camera with 24µm pixels)</li>
+         <li>framerate of 1785.7fps (i.e. a frametaime of 560µs)</li>
+		 <li>The sample were 100nm diameter FluoSpheres YG (green fluorescent microspheres) in water @25°C</li>
+	   </ul><br>
+	   <i>For this tutorial we will assume that you use this dataset and all the images shown are from this dataset</i>.</li>
 	   <li>start a new QuickFit project (e.g. by starting a new instance of QuickFit).</li>
-	   <li>Click on "Data Items|Insert Raw Data|imFCS|correlate images and insert"</li>
+	   <li>Click on "Data Items|Insert Raw Data|imFCS|correlate images and insert". A Dialog like this will pop up:<center><img src="./pic/tutorial_solution1.png"></center>In the top right corner click on <img src=":/imaging_fcs/fileopen.png"> to select an input file. and select the file <tt>$$assetsdir$$/plugins/imaging_fcs/imfcs_testdata/beads_no9_0.86nM_5mW_000.tif</tt>. In the file-selection dialog, select the "libtiff" filter.</li>
+	   <li>Now the imagingFCS plugin will analyse the file and read some metadata (pixel size, framerate, ...) which is stored in the file <tt>beads_no9_0.86nM_5mW_000.ini</tt> in the same directory. This file is created by the B040SPIM plugin along with the measurement. If you use a different data acquisition software, you will have to enter this metadata by hand:<ol>
+	     <li>activate "camera description" and enter the pixel size (in the object/sample plane) in nanometers</li>
+	     <li>enter either the framerate in frames/second (fps) or the frametime (1/framerate) in microseconds. If you enter the second, do NOT simply enter the exposure time, as usual cameras need additional time to read the frame.</li>
+	   </ol>
+	   Now the dialog should look like this:<center><img src="./pic/tutorial_solution2.png"></center>	   
+	   </li>
+	   <li>In this step we will have to configure the correlator to perform the tasks we want. To do so, follow these steps:<ol>
+	     <li><b>file format:</b> First we have to check whether the correct file reader is choosen: We have a TIFF image series, so we can choose from libtiff (which is able to read also compressed TIFF files, but at most 65000 frames) or tinyTIFF (which reads an arbitrary number of frames, but only from simple files without compression). For this tutorial, choose: libTIFF.</li>
+	     <li><b>output filenames:</b> The correlator will create a bunch of output files: several overview/average images, a binned video, correlation data, configuration files ... These will be saved under a directory and names that you can specify in the <b>output</b> line of options using the "prefix" and "postfix" fields. The output filenames will be composed as follows:<blockquote><tt><prefix><input_filename_without_extension><postfix></tt></blockquote>
+		 A usual choice (also for this tutorial) is:
+		 <blockquote>prefix: <tt>./results/</tt><br>postfix: <tt>_corr%correlator%_back%backcorrection%_bin%binning%_bleach%bleach%_seg%segments%_%COUNTER%</tt></blockquote>
+		 So all files will be created in a subdirectory <tt>results</tt> of the directory, the input file resides in. To the input filename, some additional information is attatched: All the strings between <tt>%</tt> will be replaced with appropriate information (here the correlator type, the type of background correction, the binning, the type of bleach correction and the number of segments the measurement is split into. The <tt>%COUNTER%</tt> will be replaced by an increasing number, i.e. the correlator searches the output directory for any file with the same name and then increases the counter until no match is found. This prevents you from erroneously overwriting data. In the prefix, you can enter any number of directories, they will all be created by the correlator, if they do not exist!<br>In this example the output filename after the correlation might be:
+		 <blockquote><tt>./results/<font color="red">beads_no9_0.86nM_5mW_000</font>_corr<font color="blue">directavg</font>_back<font color="blue">imgoffset</font>_bin<font color="blue">01</font>_bleach<font color="blue">none</font>_seg<font color="blue">3</font>_<font color="magenta">001</font><font color="green">.autocorrelation.bin</font></tt></blockquote>
+		 You see the <font color="red">red</font> input filename, the <font color="blue">blue</font> metadata from the <tt>%...%</tt>-strings (explanation of the settings, see below), the <font color="magenta">magenta</font> counter value and the <font color="green">green</font> part that distinguishes different output files.
+		 </li>
+	     <li><b>frame range:</b> We want to correlate all 20000 frames in the file, so we activate both checkboxes in the <b>"frame range"</b> line. If you want to correlate only a subrange, uncheck on and enter the first and last frame you want to correlate.</li>
+	     <li></li>
+	     <li><b>cropping:</b> Here you can enter a subregion of the full image, if you want to correlate only that. For this tutorial, just deactivate it.</li>
+	     <li><b>binning:</b> As we do not want binning, we enter 1 pixel binning, i.e. no binning. If you want binning, you can specify your type of binning here.</li>
+	     <li><b>background correction:</b> The plugin already selected the correct background file (<tt>beads_no9_0.86nM_5mW_000_background.tif</tt>) and entered it for us. If not, select an appropriate background file (i.e. a short measurement of 100-2000 frames with the acquisition settings, but the illumination switched off). This will be used to correct for a varying background signal over the sensor. Also select <b>remove background image &amp; offset</b> from the drop-down list, but enter an offset of 0, as the background frame already contains this offset. The offset is added by the camera to prevent &lt;0 ADU values. If you do not have a background file, just enter the offset of your camera, but note that a varying background is not corrected then.</li>
+	     <li><b>bleach correction:</b> For this measurement we do not need bleach correction, so choose <b>none</b></li>
+	     <li><b>DualView:</b> Also we didn't use a DualView, so select <b>none</b> here.</li>
+	     <li><b>correlation functions:</b> Here we have to select, which correlations the correlator should calculate: Fot his tutorial we only select <b>ACF</b>, which calculates an autocorrelation function for each pixel. The other options will calculate pixel-pixel crosscorrelations: To the neighboring 4 pixels or over a given distance &Delta;x, &Delta;y. Here you can also choose into how many runs/segments the correlator should split the input data. For this tutorial, select 3, which will cut the 20000 input frames into three segment with 6666 frames each. The correlator will calculate one ACF per segment and then average over all three ACFs. So for every pixel we will use this average and the according standard deviation as measured data.</li>
+	     <li><b>correlator:</b> Now you will have to choose the appropriate correlator. For nearly all cases, the <b>Direct Correlation, with Averaging</b> is the right choice. It resembles a standard multi-&tau; correlator with intrinsic triangular smoothing. The parameters P should be set to 16 and the parameter m to 2. Then you can choose the parameter S to get a still meaningful maximum lag time. In this example, settings S=8 will result in a lag time range of 560µs...2.2848s, which well covers the segment length of 3.73s. Lag times longer than the segment length will be cut automatically and a rule of thumb says that if your desired maximum lang time is $$math:\tau_{max}$$, your measurement should be at least $$math:10\cdot\tau_{max}$$ long.</li>
+	     <li><b>statistics/background statistics:</b> Enter 10 frames in both cases for this tutorial, so the plugin will average over 50 frames to create some additional overview statistics (average frame intensity, ...)</li>
+	     <li><b>video:</b> activate this function and enter 20 frames. This wilöl cause the plugin to create a video in which every frame is an average over 20 input frames.</li>
+	     <li><b>finally make sure that "add to project" is checked</b>, if not you will have to load the correlation result into QuickFit manually later.</li>
+	   </ol>
+	   </li>
+	   <li>Now we are left with clicking on "add job", to start the process of correlation. Our job will be added to the list at the bottom and will be processed in the background. You can now define your next job and also add it to the list ... You can also specify the maximum number of jobs to process by changing "max. parallel jobs" on the rhs. After the job finished without errors, a green check symbol will appear next to it:<center><img src="./pic/tutorial_solution3.png"></center>	   
+	   Now we can click on "Close" and the plugin will add the correlation result to the current (new) project:
+	   <center><img src="./pic/tutorial_solution4.png"></center>	 
+	   If this is the first data you add to a new project, QuickFit will now ask you to save the project. Do so to prevent any dataloss.<br>The project now contains four records: <ol>
+	   <li>The autocorrelation data: <tt>"beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.autocorrelation.bin - <b>ACF</b>"</tt></li>
+	   <li>A number&amp;brightness record: <tt>"beads_no9_0.86nM_5mW_000_corrdirectavg_backimgoffset_bin01_bleachnone_seg3_.overview_float.tif - <b>number & brightness</b>"</tt></li>
+	   <li>The acquisition settings: <tt>"beads_no9_0.86nM_5mW_000.configuration.ini - <b>acquisition settings</b>"</tt> (only present if you had the file <tt>beads_no9_0.86nM_5mW_000.ini</tt>)</li>
+	   <li>The measured data: <tt>"beads_no9_0.86nM_5mW_000.measured.dat"</tt> (only present if you activated this option in the B040SPIM plugin during acquisition)</li>
+	   </ol>
+	   For this tutorial we will only need the first record, containing the autocorrelation curves.
+	   </li>
 	 </ol>  
 	 <h3>2. Inspecting Data</h3>
 	 <ol>
+	   <li>One remark, before we start: We will see plots in several places in QuickFit. These are created usually using the same type of widget, so you can interact with them generally in the same way (sometimes, some functions might be switched off, so don't wonder in those cases ;-). The most important features are:<ul>
+	     <li>You can zoom by dragging open a rectangle or by using the mouse-wheel.</li>
+		 <li>If you move the mouse over the plot, the current position is usually displayed on the top-left corner of the plot (in some plugins this display is moved somewhere else on the screen, but usually close to the plot).</li>
+		 <li>If you move the mouse over the top left corner area of the plot (also above the top of the position display), a submenu will pop up:<center><img src="./pic/tutorial_solution8.png"></center>Here you can save, print and copy the current plot as images, save/copy/inspect the data used for the plot and zoom into/out of it.
+		 </li>
+	   </ul></li>
+	   <li><b>Double-click on the ACF-record</b> in the main window. A new window "Raw Data ..." will open up. On the first page you can see the name, folder and description, which you can also edit any way you want. The name is the name also displayed in the project tree and in "folder" you can enter any (hirarchy of) folder(s), separated by a slash '/'. The record will be displayed in this subfolder in the project tree. For now we leave everythig as it is.<br><br>Below these input widgets, you see the list of files loaded into this record. At the top there are a bunch of files in the <tt>./results/</tt> subfolder that we created. These are the correlation output files created by the correlator. A right-click will open a submenu that allows you to go to the folder in which any of the files resides. If you do so for a file in the <tt>./results/</tt> folder, you will see something like this list of files:<center><img src="./pic/tutorial_solution5.png"></center>	
+	   The <tt>.autocorrelation.*</tt> files contain the ACFs, the <tt>.back*</tt> files contain the averaged background frame and background statistics, the <tt>.overview*</tt> files contain the same for the input image series average. The file <tt>.statistics.dat</tt> contains the frame statistics as CSV and the files <tt>.video.tif</tt> and  <tt>.videouncorr.tif</tt> contain the video after and before background&amp;bleach correction. Finally the file  <tt>.evalsettings.txt</tt> summarizes the settings you used for the correlator (see major step 1 of this tutorial).</li>
+	   <li>Now open the tab <b>"Images, Videos, Timetraces":</b><center><img src="./pic/tutorial_solution6.png"></center>Here you can inspect several overview images and videos on the left (e.g. the time-binned video), the averaged background series, possibly overview images taken before and after the acquisition, ... Just select the image you want to see from the drop-down list "image/video" and it will be displayed in the sub-tab "Image/Video". If you switch to the tab "Histogram" you will see a histogram of the data in the image. You can also select a subregion in the first tab (using the rectangle, circle, ... buttons above the image). The histogram of the selection will be overlayn to the complete histogram. On the right hand side you can inspect the statistics created by the correlator. Note that the average and standard deviationn displayed here are the statistics calculated over ALL pixels in the frame and then over the selected number of frames (was 10 here). So the standard deviation is NOT the standard deviation of a single pixel, but tells you how the pixel intensity is distributed over a single image! If you want to know the standard deviation of a single-pixel timeseries, select the standard deviation overview image. Here every pixel represents the stadard deviation of the timeseries of this pixel.
+	   </li>
+	   <li>Now open the tab <b>"Countrate/Intensity Trace":</b><center><img src="./pic/tutorial_solution7.png"></center> Here you can inspect the (averaged, as in the video ... this is actually the video data) timetrace of each pixel, by selecting it in the overview image in the bottom right corner, or in the list above. To select several pixels, keep the key Ctrl pressed and click on the pixels one after the other. If you find pixels here that are erroneous (e.g. because there was an aggregate), you can select them and click on "exclude sel." to exclude them from the evaluation. We do this now for the two brightest pixels, where we can easily see the aggregate peaks in the timetrace (see the two circles in the screenshot above).</li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
 	   <li></li>
 	 </ol>  
 	 <h3>3. Fitting Data</h3>
 	 <ol>
 	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
 	 </ol>  
 	 <h3>4. Inspecting Fit Results</h3>
 	 <ol>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
+	   <li></li>
 	   <li></li>
 	 </ol>  
   </body>
