@@ -91,6 +91,8 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         virtual QList<QFPluginServices::HelpDirectoryInfo>* getPluginHelpList();
         /** \copydoc QFPluginServices::getAssetsDirectory() */
         virtual QString getAssetsDirectory();
+        /** \copydoc QFPluginServices::getMainHelpDirectory() */
+        virtual QString getMainHelpDirectory();
         /** \copydoc QFPluginServices::getPluginsDirectory() */
         virtual QString getPluginsDirectory();
 
@@ -114,6 +116,8 @@ class MainWindow : public QMainWindow, public QFPluginServices {
 
         /** \brief QFPluginServices::displayHelpWindow() */
         virtual void displayHelpWindow(const QString& helpfile=QString(""));
+        /** \brief QFPluginServices::displayHelpWindow() */
+        virtual void displayMainHelpWindow(const QString& helpfile=QString(""));
 
         /** \brief QFPluginServices::getPluginHelp() */
         virtual QString getPluginHelp(const QString& pluginID);
@@ -131,6 +135,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         virtual void registerSettingsPane(QFPluginOptionsDialogInterface* plugin);
     protected:
         void closeEvent(QCloseEvent *event);
+        virtual void showEvent(QShowEvent* event);
 
     private slots:
         /** \brief create a new project */
@@ -210,6 +215,9 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         void rdrUndoReplace();
 
         void projectPerformanceTest();
+
+        void contactAuhtors();
+        void contactMailinglist();
     private:
         void createWidgets();
         void createActions();
@@ -271,6 +279,8 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         QAction* helpPluginCopyrightAct;
         QAction* helpTutorialsAct;
         QAction* helpPluginAct;
+        QAction* helpContactAuthors;
+        QAction* helpContactMaillinglist;
 
 
         QAction* optionsAct;

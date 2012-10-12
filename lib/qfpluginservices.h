@@ -121,6 +121,8 @@ class QFLIB_EXPORT QFPluginServices {
         virtual QString getGlobalConfigFileDirectory()=0;
         /** \brief return a base path where to find assets files */
         virtual QString getAssetsDirectory()=0;
+        /** \brief return a base path where to find QuickFits main help files */
+        virtual QString getMainHelpDirectory()=0;
         /** \brief return a base path where to find plugins */
         virtual QString getPluginsDirectory()=0;
         /** \brief a list of replacements for the online help system.
@@ -135,6 +137,9 @@ class QFLIB_EXPORT QFPluginServices {
 
         /** \brief display the help window and open the given file. If no file is given, des QuickFit main help page is shown. */
         virtual void displayHelpWindow(const QString& helpfile=QString(""))=0;
+
+        /** \brief display the help window and open the given file. If no file is given, des QuickFit main help page is shown. */
+        virtual void displayMainHelpWindow(const QString& helpfile=QString(""))=0;
 
         /** \brief return the directory of the online help for the given plugin ID */
         virtual QString getPluginHelpDirectory(const QString& pluginID)=0;

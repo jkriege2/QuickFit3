@@ -5,6 +5,8 @@
 #include "qftools.h"
 #include "qfrdrreplacedialog.h"
 #include "statistics_tools.h"
+#include "dlgcontactauthors.h"
+#include "dlgnewversion.h"
 
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
@@ -116,6 +118,8 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("copyright"), QString(QF_COPYRIGHT)));
     htmlReplaceList.append(qMakePair(QString("author"), QString(QF_AUTHOR)));
     htmlReplaceList.append(qMakePair(QString("email"), QString(QF_EMAIL)));
+    htmlReplaceList.append(qMakePair(QString("maillist"), QString(QF_MAILLIST)));
+    htmlReplaceList.append(qMakePair(QString("maillistrequest"), QString(QF_MAILLIST_REQUEST)));
     htmlReplaceList.append(qMakePair(QString("weblink"), QString(QF_WEBLINK)));
     htmlReplaceList.append(qMakePair(QString("license"), tr(QF_LICENSE)));
     htmlReplaceList.append(qMakePair(QString("plugin_list"), createPluginDoc(true)));
@@ -123,8 +127,9 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("plugintutorials_list"), createPluginDocTutorials()));
     htmlReplaceList.append(qMakePair(QString("pluginsettings_list"), createPluginDocSettings()));
     htmlReplaceList.append(qMakePair(QString("plugincopyright_list"), createPluginDocCopyrights()));
-    htmlReplaceList.append(qMakePair(QString("mainhelpdir"), settings->getAssetsDirectory()+QString("/help/")));
+    htmlReplaceList.append(qMakePair(QString("mainhelpdir"), settings->getMainHelpDirectory()));
     htmlReplaceList.append(qMakePair(QString("assetsdir"), settings->getAssetsDirectory()));
+    htmlReplaceList.append(qMakePair(QString("configdir"), settings->getConfigFileDirectory()));
     htmlReplaceList.append(qMakePair(QString("tutorials_contents"), QString("<ul>")+createPluginDocTutorials("<li>%1 tutorial:<ul>", "</ul></li>")+QString("/<ul>")));
     htmlReplaceList.append(qMakePair(QString("settings_contents"), QString("<ul>")+createPluginDocSettings("<li>%1 settings:<ul>", "</ul></li>")+QString("/<ul>")));
     htmlReplaceList.append(qMakePair(QString("help_contents"), QString("<ul>")+createPluginDocHelp("<li>%1 help:<ul>", "</ul></li>")+QString("</ul>")));
@@ -141,15 +146,15 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end"), tr("$$qf_commondoc_header.end_notitle$$ <h1>$$title$$</h1>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.separator"), QString(" | ")));
 
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.default_links"), tr("<a href=\"%1quickfit.html\">QuickFit</a> $$local_plugin_typehelp_link$$ $$local_plugin_mainhelp_link$$ $$local_plugin_tutorial_link$$").arg(settings->getAssetsDirectory()+"/help/")));
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.simplest"), tr("back: <a href=\"%1quickfit.html\">QuickFit Basics</a>").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.default_links"), tr("<a href=\"%1quickfit.html\">QuickFit</a> $$local_plugin_typehelp_link$$ $$local_plugin_mainhelp_link$$ $$local_plugin_tutorial_link$$").arg(settings->getMainHelpDirectory())));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.simplest"), tr("back: <a href=\"%1quickfit.html\">QuickFit Basics</a>").arg(settings->getMainHelpDirectory())));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.rdr"), tr("$$qf_commondoc_header.separator$$ <a href=\"$$qf_ui_rdr_helpfil$$\">$$qf_ui_rdr_helpfiletitle$$</a>")));
-    htmlReplaceList.append(qMakePair(QString("qf_ui_rdr_helpfile"), tr("%1qf3_rdrscreen.html").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_ui_rdr_helpfile"), tr("%1qf3_rdrscreen.html").arg(settings->getMainHelpDirectory())));
     htmlReplaceList.append(qMakePair(QString("qf_ui_rdr_helpfiletitle"), tr("Basic Raw Data Record Dialog Help")));
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.eval"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_evalscreen.html\">Basic Evaluation Dialog Help</a>").arg(settings->getAssetsDirectory()+"/help/")));
-    htmlReplaceList.append(qMakePair(QString("qf_ui_eval_helpfile"), tr("%1qf3_evalscreen.html").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.eval"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_evalscreen.html\">Basic Evaluation Dialog Help</a>").arg(settings->getMainHelpDirectory())));
+    htmlReplaceList.append(qMakePair(QString("qf_ui_eval_helpfile"), tr("%1qf3_evalscreen.html").arg(settings->getMainHelpDirectory())));
     htmlReplaceList.append(qMakePair(QString("qf_ui_eval_helpfiletitle"), tr("Basic Evaluation Dialog Help")));
-    htmlReplaceList.append(qMakePair(QString("qf_ui_jkqtplotter_helpfile"), tr("%1jkqtplotter.html").arg(settings->getAssetsDirectory()+"/help/")));
+    htmlReplaceList.append(qMakePair(QString("qf_ui_jkqtplotter_helpfile"), tr("%1jkqtplotter.html").arg(settings->getMainHelpDirectory())));
     htmlReplaceList.append(qMakePair(QString("qf_ui_jkqtplotter_helpfiletitle"), tr("Plotter/Graphing Component Help")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.extension"), tr("")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitfunc"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_evalscreen.html\">Fit Functions Help</a>")));
@@ -239,10 +244,23 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         extensionManager->deinit();
         newProjectTimer.stop();
         helpWindow->close();
+        ProgramOptions::setConfigValue("quickfit/lastrunsvn", SVNVERSION);
         event->accept();
         QApplication::exit();
     } else {
         event->ignore();
+    }
+}
+
+void MainWindow::showEvent(QShowEvent *event) {
+    QString SVN=SVNVERSION;
+    QString lastSVN=ProgramOptions::getConfigValue("quickfit/lastrunsvn", "").toString();
+
+    if (SVN!=lastSVN && !ProgramOptions::getConfigValue("quickfit/nosvncheck", false).toBool()) {
+        DlgNewVersion* dlg=new DlgNewVersion(this);
+        dlg->exec();
+        delete dlg;
+        ProgramOptions::setConfigValue("quickfit/lastrunsvn", SVNVERSION);
     }
 }
 
@@ -372,12 +390,18 @@ void MainWindow::about() {
     QDialog *widget = new QDialog(this);
     Ui::About ui;
     ui.setupUi(widget);
-    QTextEdit* ui_textEdit = qFindChild<QTextEdit*>(widget, "edtInfo");
+    QTextBrowser* ui_textEdit = qFindChild<QTextBrowser*>(widget, "edtInfo");
+    QTextBrowser* ui_releasenotes = qFindChild<QTextBrowser*>(widget, "edtReleaseNotes");
     QLabel* ui_label = qFindChild<QLabel*>(widget, "labSplash");
     QLabel* ui_labelLic = qFindChild<QLabel*>(widget, "labLicense");
     ui_label->setPixmap(splashPix);
-    ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>contact the authors:</b><blockquote><a href=\"mailto:%6\">%6</a></blockquote><b>libraries, used by QuickFit:</b><ul><li>QuickFit library v%4.%5</li><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul><b>many thanks to:</b><blockquote>%2</blockquote><b>compiler used for this version:</b><blockquote>%7</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR).arg(QF_EMAIL).arg(Qt::escape(COMPILER)));
+    ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>contact the authors:</b><blockquote><a href=\"mailto:%6\">%6</a></blockquote><b>mailing list:</b><blockquote><a href=\"mailto:%8\">%8</a> (<a href=\"%9\">subscribe</a>)</blockquote><b>libraries, used by QuickFit:</b><ul><li>QuickFit library v%4.%5</li><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul><b>many thanks to:</b><blockquote>%2</blockquote><b>compiler used for this version:</b><blockquote>%7</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR).arg(QF_EMAIL).arg(Qt::escape(COMPILER)).arg(QF_MAILLIST).arg(QF_MAILLIST_REQUEST));
     ui_labelLic->setText(tr(QF_LICENSE));
+    QFile f(":/quickfit3/releasenotes.html");
+    if (f.open(QIODevice::ReadOnly|QIODevice::Text))
+        ui_releasenotes->setText(f.readAll());
+    else
+        ui_releasenotes->setPlainText(tr("none available :-((("));
     widget->exec();
     delete widget;
 }
@@ -837,6 +861,10 @@ void MainWindow::createActions() {
     connect(helpTutorialsAct, SIGNAL(triggered()), this, SLOT(displayHelpTutorials()));
     helpPluginAct=new QAction(QIcon(":/lib/help/help_contents.png"), tr("&Plugin Help"), this);
     connect(helpPluginAct, SIGNAL(triggered()), this, SLOT(displayPluginHelp()));
+    helpContactAuthors=new QAction(QIcon(":/lib/mail.png"), tr("&Contact Authors (bugreport, question, ...)"), this);
+    connect(helpContactAuthors, SIGNAL(triggered()), this, SLOT(contactAuhtors()));
+    helpContactMaillinglist=new QAction(QIcon(":/lib/mail.png"), tr("&Contact QuickFit Mailinglist"), this);
+    connect(helpContactMaillinglist, SIGNAL(triggered()), this, SLOT(contactMailinglist()));
 
     helpActList.append(helpAct);
     helpActList.append(helpCopyrightAct);
@@ -944,6 +972,9 @@ void MainWindow::createMenus() {
     helpMenu->addAction(aboutAct);
     helpMenu->addAction(aboutPluginsAct);
     helpMenu->addAction(aboutQtAct);
+    helpMenu->addSeparator();
+    helpMenu->addAction(helpContactAuthors);
+    helpMenu->addAction(helpContactMaillinglist);
 
     menus["file"]=fileMenu;
     menus["data"]=dataMenu;
@@ -1580,6 +1611,11 @@ void MainWindow::displayHelpWindow(const QString& helpfile) {
 
 }
 
+void MainWindow::displayMainHelpWindow(const QString &helpfile)
+{
+    displayHelpWindow(settings->getAssetsDirectory()+QString("/help/")+helpfile);
+}
+
 void MainWindow::displayHelp() {
     displayHelpWindow("");
 }
@@ -1645,6 +1681,10 @@ QString MainWindow::getGlobalConfigFileDirectory() {
 }
 QString MainWindow::getAssetsDirectory() {
     return settings->getAssetsDirectory();
+}
+
+QString MainWindow::getMainHelpDirectory() {
+    return settings->getMainHelpDirectory();
 }
 
 QString MainWindow::getPluginsDirectory() {
@@ -1952,6 +1992,20 @@ void MainWindow::projectPerformanceTest() {
         log_text(tr("\n\n-----------------------------------------------------------------\n-- QFProject PERFORMANCE TEST FINISHED\n-----------------------------------------------------------------\n"));
         QApplication::restoreOverrideCursor();
     }
+}
+
+void MainWindow::contactAuhtors()
+{
+    DlgContactAuthors* dlg=new DlgContactAuthors(this);
+    dlg->exec();
+    delete dlg;
+}
+
+void MainWindow::contactMailinglist()
+{
+    DlgContactAuthors* dlg=new DlgContactAuthors(this, true);
+    dlg->exec();
+    delete dlg;
 }
 
 QList<QPair<QString, QString> >* MainWindow::getHTMLReplacementList() {

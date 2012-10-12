@@ -185,6 +185,11 @@ QString ProgramOptions::getAssetsDirectory() const {
     return assetsDir;
 }
 
+QString ProgramOptions::getMainHelpDirectory() const
+{
+    return assetsDir+"/help/";
+}
+
 QString ProgramOptions::getApplicationDirectory() const {
     return appDir;
 }
