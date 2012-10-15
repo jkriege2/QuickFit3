@@ -10,9 +10,18 @@
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 	 
-	 <h2>Introduction</h2>
+	 <h2>Contents</h2>
+	 <ol>
+	   <li><a href="#1">Correlating Data</a></li>
+	   <li><a href="#2">Inspecting Data</a></li>
+	   <li><a href="#3">Fitting Data</a></li>
+	   <li><a href="#4">Inspecting Fit Results</a></li>
+	   <li><a href="#5">Getting fit results into other applications</a></li>
+	   <li><a href="#6">Performing an alternative fit</a></li>
+	 </ol>
+	 $$qf_commondoc_backtop$$
 	 <h2>Tutorial</h2>
-	 <h3>1. Correlating Data</h3>
+	 <a name="1"><h3>1. Correlating Data</h3>
 	 <ol>
 	   <li>Perform an imagingFCS measurements (e.g. SPIM-FCS) of some sample of interest in solution. Store the acquired image series as TIFF file and note these acquisition parameters (this will be saved and automatically read from the image metadata if you use the QuickFit SPIM- or a compatible plugin!): <i>pixel size in nanometers, framerate or frametime</i><br>Also perform a background measurement, i.e. a measurement with the same settings (but fewer frames) with the excitation lasers switched off. Usually one such measurement per settings and day is enough, but better perform one right before each measurement to ensure compensation for changing lab illumination and camera drift over the whole day.<br><br>If you don't have an imagingFCS setup (yet), you may also use the testdata provided under <tt>$$assetsdir$$/plugins/imaging_fcs/imfcs_testdata/beads_no9_0.86nM_5mW_000.tif</tt> for this tutorial. The acquisition data of this dataset was:
 	   <ul>
@@ -65,7 +74,8 @@
 	   For this tutorial we will only need the first record, containing the autocorrelation curves.
 	   </li>
 	 </ol>  
-	 <h3>2. Inspecting Data</h3>
+	 $$qf_commondoc_backtop$$
+	 <a name="2"><h3>2. Inspecting Data</h3>
 	 <ol>
 	   <li>One remark, before we start: We will see plots in several places in QuickFit. These are created usually using the same type of widget, so you can interact with them generally in the same way (sometimes, some functions might be switched off, so don't wonder in those cases ;-). The most important features are:<ul>
 	     <li>You can zoom by dragging open a rectangle or by using the mouse-wheel.</li>
@@ -77,43 +87,117 @@
 	   The <tt>.autocorrelation.*</tt> files contain the ACFs, the <tt>.back*</tt> files contain the averaged background frame and background statistics, the <tt>.overview*</tt> files contain the same for the input image series average. The file <tt>.statistics.dat</tt> contains the frame statistics as CSV and the files <tt>.video.tif</tt> and  <tt>.videouncorr.tif</tt> contain the video after and before background&amp;bleach correction. Finally the file  <tt>.evalsettings.txt</tt> summarizes the settings you used for the correlator (see major step 1 of this tutorial).</li>
 	   <li>Now open the tab <b>"Images, Videos, Timetraces":</b><center><img src="./pic/tutorial_solution6.png"></center>Here you can inspect several overview images and videos on the left (e.g. the time-binned video), the averaged background series, possibly overview images taken before and after the acquisition, ... Just select the image you want to see from the drop-down list "image/video" and it will be displayed in the sub-tab "Image/Video". If you switch to the tab "Histogram" you will see a histogram of the data in the image. You can also select a subregion in the first tab (using the rectangle, circle, ... buttons above the image). The histogram of the selection will be overlayn to the complete histogram. On the right hand side you can inspect the statistics created by the correlator. Note that the average and standard deviationn displayed here are the statistics calculated over ALL pixels in the frame and then over the selected number of frames (was 10 here). So the standard deviation is NOT the standard deviation of a single pixel, but tells you how the pixel intensity is distributed over a single image! If you want to know the standard deviation of a single-pixel timeseries, select the standard deviation overview image. Here every pixel represents the stadard deviation of the timeseries of this pixel.
 	   </li>
-	   <li>Now open the tab <b>"Countrate/Intensity Trace":</b><center><img src="./pic/tutorial_solution7.png"></center> Here you can inspect the (averaged, as in the video ... this is actually the video data) timetrace of each pixel, by selecting it in the overview image in the bottom right corner, or in the list above. To select several pixels, keep the key Ctrl pressed and click on the pixels one after the other. If you find pixels here that are erroneous (e.g. because there was an aggregate), you can select them and click on "exclude sel." to exclude them from the evaluation. We do this now for the two brightest pixels, where we can easily see the aggregate peaks in the timetrace (see the two circles in the screenshot above).</li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
+	   <li>Now open the tab <b>"Countrate/Intensity Trace":</b><center><img src="./pic/tutorial_solution7.png"></center> Here you can inspect the (averaged, as in the video ... this is actually the video data) timetrace of each pixel, by selecting it in the overview image in the bottom right corner, or in the list above. To select several pixels, keep the key Ctrl pressed and click on the pixels one after the other. If you find pixels here that are erroneous (e.g. because there was an aggregate), you can select them and click on "exclude sel." to exclude them from the evaluation. <i>We do this now for the two brightest pixels, where we can easily see the aggregate peaks in the timetrace (see the two circles in the screenshot above).</i></li>
+	   <li>The final tab that can be used to inspect data is <b>"Correlation Curves":</b><center><img src="./pic/tutorial_solution9.png"></center>This tab is used the same way as the "Countrate/Intensity Trace" tab, but it shows the correlation curves acquired for each pixel.<br>
+	   In blue you see the average (and standard deviation) of all non-excluded correlation curves. The two curves we excluded in the last step are marked blue. If you click on one of these two pixels, you will see that the curve really deviates much from the average:
+	   <center><img src="./pic/tutorial_solution11.png"></center>
+	   By inspecting the other pixels surrounding the xcluded pixels, we find more that are deviating. We will now select all these pixels keeping Ctrl pressed (blue in aboves screenshot) and also exclude them. Doing this the average is changed significantly:
+	   <center><img src="./pic/tutorial_solution10.png"></center>
+	   To find the reason for these deviations, we can go back to the "Images, Videos, Timetraces" tab and once again inspect the video. There we observe two large aggregates moving through the region with the deviating pixels around t=4s and t=5s. They are also visible in the intensity timetrace on the right of the video.
+	   </li>
 	 </ol>  
-	 <h3>3. Fitting Data</h3>
+	 $$qf_commondoc_backtop$$
+	 <a name="3"><h3>3. Fitting Data</h3>
 	 <ol>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	 </ol>  
-	 <h3>4. Inspecting Fit Results</h3>
+	   <li>So we excluded all (on a first view) unusable pixels. So we can step on to fitting a model to the data. To do so, we close the raw data record window and click "Data Items|Insert Evaluation|imagingFCS Curve Fitting" in the main window. A new entry in the project tree appears under "evaluation items". Double click this entry:
+	   <center><img src="./pic/tutorial_solution12.png"></center>
+	   </li>
+	   <li>A new window "imagingFCS Fit" appears:
+	   <center><img src="./pic/tutorial_solution13.png"></center>
+	   Here you can perform a fit to all pixels of the image and inspect the fit results. The basic functions you can perform are:
+		   <ul>
+			   <li>view the correlation function in each pixel and select a pixel with the "run" field.</li>
+			   <li>below the correlation plot you see the residuals for the current fit and on the rhs the fit parameters. These can also be edited by the user.</li>
+			   <li>below the resdiuals plot you can set the range from the correlation function that should be used for the fit ("lower &amp; upper cut-off").</li>
+			   <li>on the bottom the fit and resdiuals are further evaluated to yield several fit statistics.</li>
+			   <li>above the plot there are several buttons to print/save and copy the plots (and it's data).</li>
+		   </ul>
+	   </li>
+	   <li>First we select a <b>fit algorithm and model</b>. As algorithm, <i>lmfit</i> is a good choice, as it is reasonably fast and yields good convergence. As model, we choos <i>SPIM-FCS: Diffusion</i> which describes the FCS correlation function for a rectangular pixel. Click on "Model Help" to get more information on the fit model.</li>
+	   <li>Now we have to select the <b>weight model</b> <i>per run errors</i>, which takes the errors from the standard deviation calculated from the segements we cut the image series into in step 1.5.10. The other options are: <i>equal weights</i> uses no weighting for the fit and <i>standard deviation</i> uses the standard deviation calculated from all pixels as weight (so the weights are the same for all pixels!).</li>
+	   <li>The next step is to find good <b>estimates for the parameters of the fit model</b>. This can be done in the fit parameters list on the rhs of the correlation function plot. The model we choose has six free parameters (particle number N, diffusion coefficient D<sub>1</sub>, the offset G<sub>&infin;</sub>, the lateral and logitudinal PSF half-widths (1/&radic;e width) &sigma;<sub>x,y</sub>, &sigma;<sub>z</sub> and the pixel size a). Each parameter can be fixed with the check box in its row. For the purpose of this tutorial we fix all parameters except N and D<sub>1</sub>. The values of the other parameters has to be estimated by a <a href="tutorial_calibration.html">calibration</a>. Here we use these paramaters:
+	   <ul>
+		   <li>a=400nm is obtained from <i>pixel_size/magnification = 24µm/60 = 400nm</i>. Note that this value is read from the PIXEL_WIDTH or PIXEL_HEIGHT properties of the selected raw data record.</li>
+		   <li>The values <i>&sigma;<sub>x,y</sub>=340nm, &sigma;<sub>z</sub>=600nm</i> were obtained from a calibration for this microscope.</li>
+	   </ul>
+	   The initial parameters for N and D<sub>1</sub> can einther be entered by hand, or be estimated by a fit to the current (average) run. We choose the second option, so we:
+	   <ol>
+		   <li>Click on <b>"Fit Current"</b>, which starts the fit using the current parameter values as starting values. The parameter widgets will be updated with the results of the fit:<center><img src="./pic/tutorial_solution14.png"></center>
+		   Note that the label above the parameters now reads <i>"Local Fit Paramaters"</i>, which means that we have a fit result for this run/pixel. Before it read "Global Fit Paramaters". If you cange the run from -1/"average" to 1, it will change back to the global parameters and also the parameters will be back to the ones we choose before.
+		   </li>
+		   <li>So we have to copy the fit results to these global settings, as these will be used as start values for the other pixels. This can be done by clicking <b>"Copy to Initial"</b> (make sure the run is again -1/average).</li>
+	   </ol>
+	   </li>
+	   <li>Now we can fit the Rest of the pixels by clicking "Fit All Runs (MT)" (MT stands for multi-threaded, so the fit will use two or more parallel threads to make use of modern computers with several CPU cores!).</li>
+	   </li>
+
+	 </ol> 
+	 $$qf_commondoc_backtop$$ 
+	 <a name="4"><h3>4. Inspecting Fit Results</h3>
 	 <ol>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
-	   <li></li>
+	   <li>Now the data fitting is complete and we can inspect the fit results. Of course this is also possible in the "imagingFCS Fit" window on a per pixel basis, but as we want to do imagingFCS, we want to look at the fit parameters as an image. This can be done by opening the raw data record window again (see chapter 2) and the opening the <b>"Parameter Image"</b> tab:
+	   <center><img src="./pic/tutorial_solution15.png"></center>
+	   </li>
+	   <li>First we have to choose the parameter, we want to view in the field "parameter" at the top (here <i>diffusion coefficient of species 1</i>). Then we see several image plots in the first row:<ul>
+		   <li>"parameter image" is an image of the selected parameter</li>
+		   <li>"goodnes of fit" (can be switched off wit the checkbox on the rhs) shows the "goodness of fit parameter" selected below the fit parameter, usually the fitalg_error_sum, which is the sum over all squared residuals or as it is often refered to &chi;2. This parameter helps to find out where fits went wrong</li>
+		   <li>"Mask/Selected" (can be switched off wit the checkbox on the rhs) shows which pixels are currently excluded/masked and which pixels are selected</li>
+		   <li>"overview" shows the average intensity during the measurement</li>
+	   </ul>
+	   </li>
+	   <li><b>Plot options:</b> You can choose how the plots look on the rhs of the plots. Several options (color palettes, ranges, ...) allow to alter the appearance of the plots. These settings will be saved per parameter, so if you choose to select the particle number as parameter, set something there and return to the diffusion coefficient, the settings you last used for this parameter will be restored.</li>
+	   <li><b>Pixel Selection:</b> As we already excluded some pixels in chapter 2, these are "black" in the parameter image plot and marked blue in the overlay. The currently selected pixels are marked red. Below the parameter image the correlation curve and fit results for the currently selected pixels is shown. To select another pixel, just click on the pixel in any of the images. You can also select a larger set if pixels by choosing one of the selection tools above the images, or by clicking several pixels and keeping Ctrl pressed.<br>If you have selected a few pixels (e.g. on the left of the image), the plot below will show an average over the selected correlation curves and the fit result will disappear. The table now shows the statistics of the fit parameters in the selected region. If you want to see all single pixel correlation curves, you can change the setting of the "selection display" dropdown list (see bottom right of the screenshot above). NOte that the fit parameter statistics are calculated from all pixels that are selected, only omitting those that were masked/excluded before!</li>
+	   <li>If you are interested in the <b>distribution of the fit parameters</b> in more detail, switch to the <b>Histogram</b> tab above the parameter image. The plot there contains the histograms of all pixels ("complete") and the selected pixels ("selection"). Also boxplots are shown to indicate the statistics, as noted in the table on the right of the plot:<center><img src="./pic/tutorial_solution16.png"></center>
+	   Note that these histograms are calculated for all non-excluded/non-masked pixels. So if you masked some pixels they will be omitted when calculating the complete <u>and</u> the selection histogram!
+	   </li>
+	   <li><b>Changing the masked pixels:</b> We now want to see how the pixels that we initially excluded/masked look like. So far they are not visible, so we will clear the mask. As we maybe want to restore this mask lateron, we first copy it to the clipboard by clicking "Mask|copy" in the menu bar. Now we can use the entry "Mask|clear" to clear the mask. The resulting parameter image should look something like this:<center><img src="./pic/tutorial_solution17.png"></center>
+	   The pixels that were masked before show a much too high diffusion coefficient and if we click on them/select one of them, the failed fit can be seen in the plot below. Again we now select those pixels that seem erroneous to us (click and keep Ctrl pressed). They are now marked red and selected, but not yet masked. This can be done by clicking "Mask|mask sel." in the menubar. Note how the colorscale immeadiatley adapts to the new selection. We can also go back to the old selection, by pasting it ("Mask|paste").</li>
+	   <li>There are several more options to change the mask and selection, so just play with them to get used to them.</li>
+	   <li><b>back to fitting:</b> If you are not happy with a fit, or want to change some parameters, you can always go back to the imagingFCS Fit evaluation window and redo the fit. The old results will the be overwritten with the new ones. Note that in these cases it sometimes makes sense to delete the old fit results and start all over. This can be done in the imagingFCS fit by choosing "Parameters|Clear all Runs" to clear all results in the current file or "Parameters|Clear all" to delete all results from this evaluation item in all files.</li>
 	 </ol>  
+	 
+	 
+	$$qf_commondoc_backtop$$
+	 <a name="5"><h3>5. Getting fit results into other applications</h3>
+	 This last chapter will explain how you can copy/save to fit results and images in QuickFit to use them in other programs: E.g. PowerPoint to prepare a talk or Matlab/Origin/Excel to perform further evaluations. All data is stored in the QuickFit project file, so loading an old project will bring all your data back, but this project file can not easily be read by other applications, so QuickFit provides several functions to copy data somehwere else:
+	 <ol>
+	   <li>In the toolbar of each plot (appears if the mouse hovers above the to of the plot), you can save or copy the data used to draw this plot. Saving is possible to CSV (Comma-Separated Values) and e.g. SYLK which are both formats that can be imported into virtually any scientific plotting or spreadsheet program. It is also possible to save the data as Matlab script, which will create a textfile that can be evaluated by Matlab and will contain the data columns as vectors, e.g.:
+	   <blockquote><tt>
+         % data from columne 1 ('fit results: diffusion coefficient of species 1')<br>
+         fitresultsdiffusioncoefficientofspecies1 = [ 4.32028 5.40306 4.70707 2.92556 6.96055 9.03536 1.59554 6.17108 6.46627 4.2663 4.40336 8.42656 47.0388 42.5537 15.1165 4.68732 9.12941 6.00953 8.17989 8.79819 4.0093 4.86159 3.68723 3.38523 4.49103 5.42139 6.43546 6.86087 12.8799 3.63282 4.34538 4.3388 6.51969 21.612 25.4556 6.6003 5.84281 12.1432 10.5204 1.74603 3.81107 1.88962 2.33165 3.8804 4.40322 6.6043 9.31004 9.35882 9.38462 15.7091 17.689 3.52824 9.45614 16.8878 23.3494 7.45894 8.06272 11.3493 11.4806 10.4379 3.73272 3.4115 5.8331 4.27815 6.86177 12.1073 9.26225 3.69538 5.01276 9.08805 9.59082 8.04201 12.6439 7.42807 9.25678 7.4055 6.18671 8.83876 14.4249 8.67576 ];<br><br>
+         % data from columne 2 ('selection')<br>
+         selection = [ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 ];<br><br>
+         % data from columne 3 ('mask')<br>
+         mask = [ 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 ];
+	   </tt></blockquote></li>
+	   <li>Data can be copied from the tables used in QuickFit by selecting the cells of interest and the clicking the right mouse button. This will open a context menu where you can choose how to copy the data (either with row/column headers, the default, or without).</li>
+	   <li>The "Parameter Image" tab of the imFCS raw data record has additional options available in the menubar:
+	   <ul>
+		   <li><b>Data|Save Data:</b> saves the four data images in different file format. You enter a filename <tt>&lt;name&gt;.&lt;ext&gt;</tt> and the images will be saved as <tt>&lt;name&gt;.param.&lt;ext&gt;</tt> for the parameter image, <tt>&lt;name&gt;.gof.&lt;ext&gt;</tt> for the goodnes of fit image, <tt>&lt;name&gt;.mask.&lt;ext&gt;</tt> for the mask and <tt>&lt;name&gt;.overview.&lt;ext&gt;</tt> for the overview image. These files can then be used in other applications.</li>
+		   <li><b>Data|Copy Images to Matlab:</b> copies the four data images as Matlab script to the clipboard </li>
+		   <li><b>Data|Copy Images as Columns:</b> copies the data for the four images as a four column table to the clipboard. Use this to e.g. create a correlation plot, by plotting two of the columns of two parameters against each other.</li>
+		   <li><b>Data|Copy Fit results statistics:</b> When actiavted a dialog allows you to select some parameters and some statistical parameters to calculate for these. After choosing "OK", the parameter statistics will be calculated and copied in the specified format as table to the clipboard.</li>
+		   <li><b>Data|Insert Correlation Curves as new RDR into project:</b> This option will take the currently selected correlation curves and create a new FCS raw data record in the project that will contain only these curves as runs. This option allows you to evaluate a sub-selection of curves from the image separately</li>
+	   </ul>
+	   </li>
+	   <li><b>Evaluation Results Tables:</b> The fit results are summarized as Evaluation Result Tables in the tab "Evaluation Results" of the raw data record (listing all results from all evaluation for the current raw data record) and the evaluatio item (listing the results created by the item for all raw data records):<ul>
+	     <li><i>raw data record:</i> each row contains one result and the columns are the sets of results (note that the imagingFCS fit will create two columns, one for the average over all pixels (ends with <tt>_runavg</tt>) and one for the single-pixel results. The latter contains contains a "... vector" for each parameter (i.e. one value per pixel as a list). When you select some cells and choose one of the options in the "Results" menu, the selected cells will be copied to the clipboard. Note that the "vector" cells will only be copied if you select "value+error pairs" or "median+g25+g75". If you want to get a table containing all values of the vectors, you have to use "Results|Save all Results to File".</li>
+	     <li><i>evaluation item:</i> This table works the same as the raw data record table, except for the selection of data, as described above. Also here the columns contain the fit results and the rows the raw data records/files evaluated for them.</li>
+	   </ul>
+	   NOte, you can filter both tables by entering phrases (e.g. "diffusion" to show only thise rows/columns containing the word "diffusion" in their header) into the filter widgets above the tables.</li>
+	 </ol>  
+
+	 $$qf_commondoc_backtop$$
+	 <a name="6"><h3>6. Performing an alternative fit</h3>
+	 Sometimes you might want to compare fit results of different models. This is also possible with the imagingFCS plugin, as the results of a fit are stored on a per evaluation item basis. To demonstrate this, follow these steps:
+	<ol>
+	  <li>add another "imaging FCS Fit" evaluation item to the project and open it.</li>
+	  <li>choose the model "FCS: Normal Diffuson, 3D" now, which is a model assuming a gaussian focus, not the PSF of a rectangular pixel.</li>
+	  <li>The parameter estimates axial ratio <i>&gamma;=2</i> and lateral half-width <i>w<sub>x,y</sub>=700nm</i> are good for this dataset. Also you can choose 0 non-fluorescent vomponents, as we did not observe any photophysics or reactions in our sample (just simple beads in solution).</li>
+	  <li>After performing the fit, return to the raw data record. Now you can select the second set of fit results at the top of the "Parameter Image" tab:
+	  <center><img src="./pic/tutorial_solution18.png"></center>
+	  This new set of results will also appear in the "Evaluation Results" tab!
+	  </li>
+	</ol>
   </body>
 </html>
