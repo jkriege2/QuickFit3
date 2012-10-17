@@ -4315,24 +4315,26 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
 
         QList<QList<double> > result;
         QList<int> items=dlg->getSelectedIndexes();
-        QStringList colNames;
-        colNames<<tr("tau [s]");
+        QStringList colNames, rowNames;
         for (int d=0; d<data.size(); d++) {
-            QList<double> r;
-            r.clear();
             for (int i=0; i<items.size(); i++) {
+                if (d==0) {
+                    rowNames.append(names.value(items[i], ""));
+                }
+                QList<double> r;
+                r.clear();
                 QList<double> gvalues, gvalues_s;
                 gvalues_s=gvalues=data[d].gvalues[items[i]];
                 qSort(gvalues_s);
-                if (listMode->item(0)->checkState()==Qt::Checked) { r.append(qfstatisticsAverage(gvalues)); colNames<<tr("average"); }
-                if (listMode->item(1)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMedian(gvalues_s)); colNames<<tr("median"); }
-                if (listMode->item(2)->checkState()==Qt::Checked) { r.append(sqrt(qfstatisticsVariance(gvalues))); colNames<<tr("stdDev"); }
-                if (listMode->item(3)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.25)); colNames<<tr("quantile25"); }
-                if (listMode->item(4)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.75)); colNames<<tr("quantile75"); }
-                if (listMode->item(5)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMin(gvalues_s)); colNames<<tr("minimum"); }
-                if (listMode->item(6)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMax(gvalues_s)); colNames<<tr("maximum"); }
+                if (listMode->item(0)->checkState()==Qt::Checked) { r.append(qfstatisticsAverage(gvalues)); if (i==0) colNames<<tr("average"); }
+                if (listMode->item(1)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMedian(gvalues_s)); if (i==0) colNames<<tr("median"); }
+                if (listMode->item(2)->checkState()==Qt::Checked) { r.append(sqrt(qfstatisticsVariance(gvalues))); if (i==0) colNames<<tr("stdDev"); }
+                if (listMode->item(3)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.25)); if (i==0) colNames<<tr("quantile25"); }
+                if (listMode->item(4)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.75)); if (i==0) colNames<<tr("quantile75"); }
+                if (listMode->item(5)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMin(gvalues_s)); if (i==0) colNames<<tr("minimum"); }
+                if (listMode->item(6)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMax(gvalues_s)); if (i==0) colNames<<tr("maximum"); }
+                result<<r;
             }
-            result<<r;
         }
         /*QString csv, csvLocale;
         QLocale loc;
@@ -4343,7 +4345,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
         }*/
 
         if (cmbMode->currentIndex()==0) {
-            csvCopy(result, colNames);
+            csvCopy(csvDataRotate(result), colNames, rowNames);
             /*for (int r=0; r<result.size(); r++) {
                 for (int c=0; c<results; c++) {
                     if (c>0) {
@@ -4358,7 +4360,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                 csvLocale+="\n";
             }*/
         } else {
-            csvCopy(csvDataRotate(result), QStringList(), colNames);
+            csvCopy(result, rowNames, colNames);
              /*for (int c=0; c<results; c++) {
                 for (int r=0; r<result.size(); r++) {
                     if (r>0) {

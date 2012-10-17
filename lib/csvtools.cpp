@@ -136,19 +136,19 @@ void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames,
     if (columnsNames.size()>0) {
         csv+="#! ";
         if (rowNames.size()>0) {
-            csv+=csv+QObject::tr("row name, ");
+            csv+=csv+QObject::tr("\"row name\", ");
             csvLocale+=csvLocale+"; ";
-            excel+=excel+"; ";
+            excel+=excel+"\t";
         }
         for (int i=0; i<columnsNames.size(); i++) {
             if (i>0) {
                 csv+=", ";
                 csvLocale+="; ";
-                excel+="; ";
+                excel+="\t";
             }
-            if (!columnsNames[i].isEmpty()) {
+            if (!columnsNames.value(i, "").isEmpty()) {
 
-                QString strans=columnsNames[i];
+                QString strans=columnsNames.value(i, "");
                 strans=strans.replace("\"", "\\\"").replace("'", "\\\'").replace("\n", " ").replace("\r", " ");
                 strans=QString("\"%1\"").arg(strans);
                 csv+=strans;
@@ -156,21 +156,24 @@ void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames,
                 excel+=strans;
             }
         }
+        csv+="\n";
+        csvLocale+="\n";
+        excel+="\n";
     }
     for (int r=0; r<datas; r++) {
         if (rowNames.size()>0) {
-            QString strans=rowNames[r];
+            QString strans=rowNames.value(r, "");
             strans=strans.replace("\"", "\\\"").replace("'", "\\\'").replace("\n", " ").replace("\r", " ");
             strans=QString("\"%1\"").arg(strans);
             csv+=strans+", ";
             csvLocale+=strans+"; ";
-            excel+=strans+"; ";
+            excel+=strans+"\t";
         }
         for (int c=0; c<data.size(); c++) {
             if (c>0) {
                 csv+=", ";
-                csvLocale+=", ";
-                excel+="; ";
+                csvLocale+="; ";
+                excel+="\t";
             }
             if (r<data[c].size()) {
                 double d=data[c].at(r);
@@ -182,18 +185,19 @@ void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames,
         }
         csv+="\n";
         csvLocale+="\n";
+        excel+="\n";
     }
 
 
 
     QClipboard *clipboard = QApplication::clipboard();
     QMimeData* mime=new QMimeData();
-    mime->setText(csvLocale);
+    mime->setText(excel);
     mime->setData("jkqtplotter/csv", csv.toUtf8());
+    mime->setData("application/vnd.ms-excel", excel.toLocal8Bit());
     mime->setData("quickfit/csv", csv.toUtf8());
     mime->setData("text/csv", csv.toLocal8Bit());
     mime->setData("text/comma-separated-values", csv.toLocal8Bit());
-    mime->setData("application/vnd.ms-excel", excel.toLocal8Bit());
     clipboard->setMimeData(mime);
 }
 
