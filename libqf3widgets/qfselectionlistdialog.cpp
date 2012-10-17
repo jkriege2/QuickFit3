@@ -16,6 +16,24 @@ QFSelectionListDialog::~QFSelectionListDialog()
 }
 
 void QFSelectionListDialog::init(QStringList itemNames, QStringList itemData, QSettings& settings, const QString &prefix) {
+    QList<QVariant> itData;
+    for (int i=0; i<itemData.size(); i++) {
+        itData<<itemData[i];
+    }
+    init(itemNames, itData, QList<QColor>(), settings, prefix);
+}
+
+void QFSelectionListDialog::init(QStringList itemNames, QStringList itemData, QList<QColor> colors, QSettings &settings, const QString &prefix)
+{
+    init(itemNames, itemData, settings, prefix);
+    for (int i=0; i<itemNames.size(); i++) {
+        QListWidgetItem* item=ui->listWidget->item(i);
+        item->setTextColor(colors.value(i, item->textColor()));
+    }
+}
+
+void QFSelectionListDialog::init(QStringList itemNames, QList<QVariant> itemData, QList<QColor> colors, QSettings &settings, const QString &prefix)
+{
     for (int i=0; i<itemNames.size(); i++) {
         QListWidgetItem* item=new QListWidgetItem(itemNames[i], ui->listWidget);
         item->setCheckState(Qt::Checked);
@@ -63,10 +81,19 @@ void QFSelectionListDialog::writeList(QSettings &settings, const QString &prefix
     settings.endGroup();
 }
 
-QStringList QFSelectionListDialog::getSelected() const {
+QStringList QFSelectionListDialog::getSelectedDataStrings() const {
     QStringList data;
     for (int i=0; i<ui->listWidget->count(); i++) {
         if (ui->listWidget->item(i)->checkState()==Qt::Checked) data.append(ui->listWidget->item(i)->data(Qt::UserRole).toString());
+    }
+    return data;
+}
+
+QList<QVariant> QFSelectionListDialog::getSelected() const
+{
+    QList<QVariant> data;
+    for (int i=0; i<ui->listWidget->count(); i++) {
+        if (ui->listWidget->item(i)->checkState()==Qt::Checked) data.append(ui->listWidget->item(i)->data(Qt::UserRole));
     }
     return data;
 }
@@ -82,6 +109,13 @@ QList<int> QFSelectionListDialog::getSelectedIndexes() const {
 void QFSelectionListDialog::addWidget(const QString& label, QWidget *widget)
 {
     ui->formLayout->addRow(label, widget);
+}
+
+void QFSelectionListDialog::selectItems(QList<bool> items)
+{
+    for (int i=0; i<ui->listWidget->count(); i++) {
+        ui->listWidget->item(i)->setCheckState(items.value(i, ui->listWidget->item(i)->checkState()==Qt::Checked)?(Qt::Checked):(Qt::Unchecked));
+    }
 }
 
 void QFSelectionListDialog::on_btnSave_clicked() {

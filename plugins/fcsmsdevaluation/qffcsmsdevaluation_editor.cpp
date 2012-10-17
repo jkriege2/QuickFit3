@@ -2,6 +2,8 @@
 #include "qfrawdatarecord.h"
 #include "qfevaluationitem.h"
 #include "qffcsmsdevaluation_item.h"
+#include "qfselectionlistdialog.h"
+#include "csvtools.h"
 
 /////////////
 #include <QGridLayout>
@@ -296,6 +298,14 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     connect(actAverageFirstFrames, SIGNAL(triggered()), this, SLOT(averageFirstFewFrames()));
     menuParameters->insertAction(actFirst, actAverageFirstFrames);
     menuParameters->insertSeparator(actFirst);
+
+    actCopyAverageData=new QAction(tr("&copy runs-average of MSD"), this);
+    connect(actCopyAverageData, SIGNAL(triggered()), this, SLOT(copyAverageData()));
+    actCopyAverageDataFiles=new QAction(tr("&copy files-average of MSD"), this);
+    connect(actCopyAverageDataFiles, SIGNAL(triggered()), this, SLOT(copyAverageDataFiles()));
+
+    menuResults->addAction(actCopyAverageData);
+    menuResults->addAction(actCopyAverageDataFiles);
 
     /////
     connect(pltDistribution, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMove(double,double)));
@@ -1128,6 +1138,190 @@ void QFFCSMSDEvaluationEditor::averageFirstFewFrames() {
     widFitParams->updateWidgetValues();
     fitParamChanged();
 
+}
+
+void QFFCSMSDEvaluationEditor::copyAverageData() {
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFFCSMSDEvaluationItem* eval=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    if ((!eval)||(!record)||(!data)) return;
+
+    QStringList resultLabels;
+    QList<QVariant> resultNames;
+    QList<QColor> resultColors;
+    QList<bool> selected;
+
+    for (int run=0; run<data->getCorrelationRuns(); run++) {
+        QString evalID=eval->getEvaluationResultID(run, eval->getCurrentModel());
+        if (record->resultsExists(evalID, "msd") && record->resultsExists(evalID, "msd_tau")) {
+            resultLabels.append(tr("run %1").arg(run));
+            resultNames.append(run);
+            if (data->isCorrelationRunVisible(run)) {
+                selected<<true;
+                resultColors<<palette().color(QPalette::WindowText);
+            } else {
+                selected<<true;
+                resultColors<<palette().color(QPalette::WindowText).lighter();
+            }
+        }
+    }
+
+    QFSelectionListDialog* dlg=new QFSelectionListDialog(this);
+    dlg->init(resultLabels, resultNames, resultColors, *(ProgramOptions::getInstance()->getQSettings()), "fcsmsdevaleditor/copysel/");
+    dlg->setLabel(tr("Select the runs you want to average over (gray runs are excluded!)\nand then below the averaging options!"));
+    dlg->selectItems(selected);
+
+    QCheckBox* chkCopyDofTau=new QCheckBox("", dlg);
+    chkCopyDofTau->setChecked(ProgramOptions::getInstance()->getQSettings()->value("fcsmsdevaleditor/copysel/copyDofTau", false).toBool());
+    dlg->addWidget(tr("copy <i>D(&tau;)</i> curve:"), chkCopyDofTau);
+    QCheckBox* chkCopyAlphaTau=new QCheckBox("", dlg);
+    chkCopyAlphaTau->setChecked(ProgramOptions::getInstance()->getQSettings()->value("fcsmsdevaleditor/copysel/copyAlphaTau", false).toBool());
+    dlg->addWidget(tr("copy <i>&alpha;(&tau;)</i> curve:"), chkCopyAlphaTau);
+    QCheckBox* chkCopyRaw=new QCheckBox("", dlg);
+    chkCopyRaw->setChecked(ProgramOptions::getInstance()->getQSettings()->value("fcsmsdevaleditor/copysel/copyRaw", false).toBool());
+    dlg->addWidget(tr("copy also single runs:"), chkCopyRaw);
+
+    dlg->setWindowTitle(tr("copy averaged MSD data"));
+
+    if (dlg->exec()) {
+        ProgramOptions::getInstance()->getQSettings()->setValue("fcsmsdevaleditor/copysel/copyDofTau", chkCopyDofTau->isChecked());
+        ProgramOptions::getInstance()->getQSettings()->setValue("fcsmsdevaleditor/copysel/copyAlphaTau", chkCopyAlphaTau->isChecked());
+        ProgramOptions::getInstance()->getQSettings()->setValue("fcsmsdevaleditor/copysel/copyRaw", chkCopyRaw->isChecked());
+        dlg->writeList(*(ProgramOptions::getInstance()->getQSettings()), "fcsmsdevaleditor/copysel/");
+
+        QList<QVariant> sel=dlg->getSelected();
+        QList<double> tau, sum, sum2, fitTau, Dsum, Dsum2, Asum, Asum2;
+        QList<QVector<double> > AA, DD;
+        double Ncnt=0;
+        QString errorMessage="";
+        for (int i=0; i<sel.size(); i++) {
+            Ncnt++;
+            int run=sel[i].toInt();
+            QString evalID=eval->getEvaluationResultID(run, eval->getCurrentModel());
+            QVector<double> t=eval->getMSDTaus(record, run, eval->getCurrentModel());
+            QVector<double> d=eval->getMSD(record, run, eval->getCurrentModel());
+            QVector<double> taus_out, alpha_out, D_out;
+            eval->calcMSDFits(taus_out, alpha_out, D_out, record, run, eval->getCurrentModel(), spinFitWidth->value(), qMax(1, spinFitWidth->value()/7), sliderDist->get_userMin());
+            AA.append(alpha_out);
+            DD.append(D_out);
+
+            if (record->resultsExists(evalID, "msd"))
+            if (i==0) {
+                sum=d.toList();
+                tau=t.toList();
+                fitTau=taus_out.toList();
+                Dsum=D_out.toList();
+                Asum=alpha_out.toList();
+                for (int c=0; c<sum.size(); c++) {
+                    sum2.append(sum[i]*sum[i]);
+                }
+                for (int c=0; c<Dsum.size(); c++) {
+                    Dsum2.append(Dsum[i]*Dsum[i]);
+                    Asum2.append(Asum[i]*Asum[i]);
+                }
+            } else {
+                if (tau.size()!=d.size() || sum.size()!=d.size() || sum2.size()!=d.size()) {
+                    errorMessage=tr("Can not average over runs: MSD was calculated for run %1 with a different tau-scale!").arg(run);
+                } else {
+                    for (int c=0; c<d.size(); c++) {
+                        if (tau[c] != t[c]) {
+                            errorMessage=tr("Can not average over runs: MSD was calculated for run %1 with a different tau-scale!").arg(run);
+                        } else {
+                            sum[c]=sum[c]+d[c];
+                            sum2[c]=sum2[c]+d[c]*d[c];
+                        }
+                    }
+                    if (errorMessage.isEmpty()) {
+                        for (int c=0; c<D_out.size(); c++) {
+                            Dsum[c]=Dsum[c]+(D_out[i]);
+                            Asum[c]=Asum[c]+(alpha_out[i]);
+                            Dsum2[c]=Dsum2[c]+(D_out[i]*D_out[i]);
+                            Asum2[c]=Asum2[c]+(alpha_out[i]*alpha_out[i]);
+                        }
+                    }
+                }
+            }
+            if (!errorMessage.isEmpty()) break;
+        }
+        if (errorMessage.isEmpty()) {
+            QList<QList<double> > data;
+            QStringList colNames;
+            colNames<<tr("tau [s]")<<tr("avg(msd) [µm²]")<<tr("SD(msd) [µm²]");
+            data.append(tau);
+            for (int i=0; i<sum.size(); i++) {
+                double s=sum[i];
+                double s2=sum2[i];
+                sum[i]=s/Ncnt;
+                if (Ncnt>=2) sum2[i]=sqrt((s2-s*s/Ncnt)/(Ncnt-1.0));
+                else sum2[i]=0;
+            }
+            data.append(sum);
+            data.append(sum2);
+
+            if (chkCopyRaw->isChecked()) {
+                for (int i=0; i<sel.size(); i++) {
+                    int run=sel[i].toInt();
+                    QVector<double> d=eval->getMSD(record, run, eval->getCurrentModel());
+                    colNames<<tr("msd_run%1 [µm²]").arg(run);
+                    data.append(d.toList());
+                }
+            }
+
+            if (chkCopyDofTau->isChecked()||chkCopyAlphaTau->isChecked()) {
+                colNames<<tr("tauDA [s]");
+                data.append(fitTau);
+            }
+            if (chkCopyDofTau->isChecked()) {
+                if (chkCopyRaw->isChecked()) {
+                    for (int i=0; i<sel.size(); i++) {
+                        int run=sel[i].toInt();
+                        colNames<<tr("D_run%1 [µm²/s]").arg(run);
+                        data.append(DD[i].toList());
+                    }
+                }
+                colNames<<tr("avg(D(tauDA)) [µm²/s]")<<tr("SD(D(tauDA)) [µm²/s]");
+                for (int i=0; i<Dsum.size(); i++) {
+                    double s=Dsum[i];
+                    double s2=Dsum2[i];
+                    Dsum[i]=s/Ncnt;
+                    if (Ncnt>=2) Dsum2[i]=sqrt((s2-s*s/Ncnt)/(Ncnt-1.0));
+                    else Dsum2[i]=0;
+                }
+                data.append(Dsum);
+                data.append(Dsum2);
+            }
+            if (chkCopyAlphaTau->isChecked()) {
+                if (chkCopyRaw->isChecked()) {
+                    for (int i=0; i<sel.size(); i++) {
+                        int run=sel[i].toInt();
+                        colNames<<tr("alpha_run%1").arg(run);
+                        data.append(AA[i].toList());
+                    }
+                }
+                colNames<<tr("avg(alpha(tauDA))")<<tr("SD(alpha(tauDA))");
+                for (int i=0; i<Asum.size(); i++) {
+                    double s=Asum[i];
+                    double s2=Asum2[i];
+                    Asum[i]=s/Ncnt;
+                    if (Ncnt>=2) Asum2[i]=sqrt((s2-s*s/Ncnt)/(Ncnt-1.0));
+                    else Asum2[i]=0;
+                }
+                data.append(Asum);
+                data.append(Asum2);
+            }
+
+            csvCopy(data, colNames);
+        } else {
+            QMessageBox::critical(this, tr("copy averaged MSD data"), tr("ERROR:\n%1").arg(errorMessage), QMessageBox::Ok, QMessageBox::Ok);
+        }
+
+    }
+    delete dlg;
+}
+
+void QFFCSMSDEvaluationEditor::copyAverageDataFiles()
+{
 }
 
 

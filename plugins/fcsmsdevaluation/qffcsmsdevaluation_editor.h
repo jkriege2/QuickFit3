@@ -112,6 +112,8 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         void distzoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender);
 
         void averageFirstFewFrames();
+        void copyAverageData();
+        void copyAverageDataFiles();
 
     protected:       
         /*! \brief create an evaluation report for the current record */
@@ -153,6 +155,8 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         QCheckBox* chkFitRange;
 
         QAction* actAverageFirstFrames;
+        QAction* actCopyAverageData;
+        QAction* actCopyAverageDataFiles;
 
 
     private:

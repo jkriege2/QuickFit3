@@ -32,11 +32,15 @@ class QFWIDLIB_EXPORT QFSelectionListDialog : public QDialog
         ~QFSelectionListDialog();
 
         void init(QStringList itemNames, QStringList itemData, QSettings &settings, const QString &prefix=QString());
+        void init(QStringList itemNames, QStringList itemData, QList<QColor> colors, QSettings &settings, const QString &prefix=QString());
+        void init(QStringList itemNames, QList<QVariant> itemData, QList<QColor> colors, QSettings &settings, const QString &prefix=QString());
         void setLabel(const QString& text);
         void writeList(QSettings& settings, const QString& prefix=QString());
-        QStringList getSelected() const;
+        QStringList getSelectedDataStrings() const;
+        QList<QVariant> getSelected() const;
         QList<int> getSelectedIndexes() const;
         void addWidget(const QString &label, QWidget *widget);
+        void selectItems(QList<bool> items);
         
     protected slots:
         void on_btnSave_clicked();

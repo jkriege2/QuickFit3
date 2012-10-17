@@ -95,6 +95,8 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
           */
         QVector<double> getMSDTaus(QFRawDataRecord* record, int index, int model) const;
 
+        void calcMSDFits(QVector<double>& taus_out, QVector<double>& alpha_out, QVector<double>& D_out, QFRawDataRecord* record, int index, int model, int evalWidth=10, int evalShift=2, int first=0);
+
 
         /*! \brief calculates fit statistics for the given fit function and dataset.
 

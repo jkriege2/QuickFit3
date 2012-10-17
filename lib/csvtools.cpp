@@ -3,6 +3,10 @@
 #include <math.h>
 #include <QDebug>
 #include <QChar>
+#include "qftools.h"
+#include <QApplication>
+#include <QMimeData>
+#include <QClipboard>
 
 QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_char, double non_value) {
     const QString line=f.readLine();
@@ -113,5 +117,127 @@ QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_
         result.append(loc.toDouble(num, &ok));
     }
     if (result.size()<=0 && isComment) return csvReadline(f, separator_char, comment_char, non_value);
+    return result;
+}
+
+
+
+
+void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames, const QStringList& rowNames) {
+
+    QString csv, csvLocale, excel;
+    QLocale loc;
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    int datas=0;
+    for (int r=0; r<data.size(); r++) {
+        if (data[r].size()>datas) datas=data[r].size();
+    }
+
+    if (columnsNames.size()>0) {
+        csv+="#! ";
+        if (rowNames.size()>0) {
+            csv+=csv+QObject::tr("row name, ");
+            csvLocale+=csvLocale+"; ";
+            excel+=excel+"; ";
+        }
+        for (int i=0; i<columnsNames.size(); i++) {
+            if (i>0) {
+                csv+=", ";
+                csvLocale+="; ";
+                excel+="; ";
+            }
+            if (!columnsNames[i].isEmpty()) {
+
+                QString strans=columnsNames[i];
+                strans=strans.replace("\"", "\\\"").replace("'", "\\\'").replace("\n", " ").replace("\r", " ");
+                strans=QString("\"%1\"").arg(strans);
+                csv+=strans;
+                csvLocale+=strans;
+                excel+=strans;
+            }
+        }
+    }
+    for (int r=0; r<datas; r++) {
+        if (rowNames.size()>0) {
+            QString strans=rowNames[r];
+            strans=strans.replace("\"", "\\\"").replace("'", "\\\'").replace("\n", " ").replace("\r", " ");
+            strans=QString("\"%1\"").arg(strans);
+            csv+=strans+", ";
+            csvLocale+=strans+"; ";
+            excel+=strans+"; ";
+        }
+        for (int c=0; c<data.size(); c++) {
+            if (c>0) {
+                csv+=", ";
+                csvLocale+=", ";
+                excel+="; ";
+            }
+            if (r<data[c].size()) {
+                double d=data[c].at(r);
+
+                excel+=loc.toString(d);
+                csvLocale+=loc.toString(d);
+                csv+=CDoubleToQString(d);
+            }
+        }
+        csv+="\n";
+        csvLocale+="\n";
+    }
+
+
+
+    QClipboard *clipboard = QApplication::clipboard();
+    QMimeData* mime=new QMimeData();
+    mime->setText(csvLocale);
+    mime->setData("jkqtplotter/csv", csv.toUtf8());
+    mime->setData("quickfit/csv", csv.toUtf8());
+    mime->setData("text/csv", csv.toLocal8Bit());
+    mime->setData("text/comma-separated-values", csv.toLocal8Bit());
+    mime->setData("application/vnd.ms-excel", excel.toLocal8Bit());
+    clipboard->setMimeData(mime);
+}
+
+void csvCopy(const QList<QVector<double> >& data, const QStringList& columnsNames, const QStringList& rowNames) {
+    QList<QList<double> > d;
+    for (int i=0; i<data.size(); i++) {
+        d.append(data[i].toList());
+    }
+    csvCopy(d, columnsNames, rowNames);
+}
+
+QList<QVector<double> > csvDataRotate(const QList<QVector<double> >& data) {
+    QList<QVector<double> > result;
+    int cols=0;
+    for (int i=0; i<data.size(); i++) {
+        if (cols<data[i].size()) cols=data[i].size();
+    }
+    QVector<double> dEmpty(data.size(), NAN);
+    for (int i=0; i<cols; i++) {
+        result<<dEmpty;
+    }
+    for (int i=0; i<data.size(); i++) {
+        for (int r=0; r<data[i].size(); r++) {
+            result[r].operator[](i)=data[i].at(r);
+        }
+    }
+    return result;
+}
+
+QList<QList<double> > csvDataRotate(const QList<QList<double> >& data) {
+    QList<QList<double> > result;
+    int cols=0;
+    for (int i=0; i<data.size(); i++) {
+        if (cols<data[i].size()) cols=data[i].size();
+    }
+    QList<double> dEmpty;
+    for (int i=0; i<data.size(); i++) dEmpty<<NAN;
+    for (int i=0; i<cols; i++) {
+        result<<dEmpty;
+    }
+    for (int i=0; i<data.size(); i++) {
+        for (int r=0; r<data[i].size(); r++) {
+            result[r].operator[](i)=data[i].at(r);
+        }
+    }
     return result;
 }

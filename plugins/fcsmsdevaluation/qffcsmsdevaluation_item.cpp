@@ -225,6 +225,64 @@ QVector<double> QFFCSMSDEvaluationItem::getMSDTaus(QFRawDataRecord *record, int 
     return res;
 }
 
+double QFFCSMSDEvaluationItemfMSD( double t, const double *p )
+{
+    const double D=p[0];
+    const double a=p[1];
+    return 6.0*D*pow(t, a);
+}
+
+double QFFCSMSDEvaluationItemfMSD_lin( double t, const double *p )
+{
+    const double D=p[0];
+    const double a=p[1];
+    return log(6.0*D)+a*log(t);
+}
+
+void QFFCSMSDEvaluationItem::calcMSDFits(QVector<double> &taus_out, QVector<double> &alpha_out, QVector<double> &D_out, QFRawDataRecord *record, int index, int model, int evalWidth, int evalShift, int first)
+{
+    QVector<double> distTau=getMSDTaus(record, index, model);
+    QVector<double> dist=getMSD(record, index, model);
+    taus_out.clear();
+    alpha_out.clear();
+    D_out.clear();
+    if (distTau.size()>1 && dist.size()>1 && evalWidth>=3) {
+        for (int i=first; i<=distTau.size()-1 ; i+=qMax(1,evalShift)) {
+            double* t=(double*)calloc(evalWidth, sizeof(double));
+            double* d=(double*)calloc(evalWidth, sizeof(double));
+            int cnt=0;
+            for (int j=i; j<=qMin(distTau.size()-1, i+evalWidth-1); j++) {
+                t[cnt]=distTau[j];
+                d[cnt]=log(dist[j]);
+                cnt++;
+            }
+
+            if (cnt>=evalWidth) {
+                taus_out.append(t[cnt/2]);
+
+                double pout[2];
+                int n_par = 2; // number of parameters
+                int m_dat = evalWidth; // number of data pairs
+                pout[1]=(d[0]-d[cnt-1])/(log(t[0])-log(t[cnt-1]));
+                pout[0]=(d[0]-pout[1]*log(t[0]))/6.0;
+                lm_status_struct status;
+                lm_control_struct control = lm_control_double;
+                control.maxcall=500;
+                control.printflags = 0; // monitor status (+1) and parameters (+2)
+                lmcurve_fit( n_par, pout, m_dat, t, d, QFFCSMSDEvaluationItemfMSD_lin, &control, &status );
+
+                D_out.append(pout[0]);
+                alpha_out.append(pout[1]);
+
+
+            }
+
+            free(t);
+            free(d);
+        }
+    }
+}
+
 
 
 
