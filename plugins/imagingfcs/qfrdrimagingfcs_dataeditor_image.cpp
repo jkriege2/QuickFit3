@@ -538,7 +538,6 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     lpltOverview->addWidget(pltOverview, 1);
     pltOverview->get_plotter()->set_plotLabel(tr("\\textbf{Overview}"));
     pltOverview->get_plotter()->set_plotLabelFontSize(10);
-    pltOverview->set_zoomByDoubleAndRightMouseClick(false);
     pltOverview->set_displayMousePosition(false);
     pltOverview->set_displayToolbar(true);
     pltOverview->get_plotter()->set_maintainAspectRatio(true);
@@ -601,8 +600,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     //lpltMask->addWidget(new QLabel(tr("Mask/Selected:")));
     lpltMask->addWidget(pltMask, 1);
-    pltMask->set_zoomByDoubleAndRightMouseClick(false);
-    pltMask->set_displayMousePosition(false);
+
     pltMask->set_displayToolbar(true);
     pltMask->get_plotter()->set_maintainAspectRatio(true);
     pltMask->get_plotter()->set_aspectRatio(1);
@@ -664,7 +662,6 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     //lpltImage->addWidget((labParamImage=new QLabel(tr("Parameter Image:"))));
     lpltImage->addWidget(pltImage, 1);
 
-    pltImage->set_zoomByDoubleAndRightMouseClick(false);
     pltImage->set_displayMousePosition(false);
     pltImage->set_displayToolbar(true);
     pltImage->get_plotter()->set_maintainAspectRatio(true);
@@ -731,7 +728,6 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     //lpltGofImage->addWidget((labParamImage=new QLabel(tr("\"Goodnes of Fit\" Image:"))));
     lpltGofImage->addWidget(pltGofImage, 1);
 
-    pltGofImage->set_zoomByDoubleAndRightMouseClick(false);
     pltGofImage->set_displayMousePosition(false);
     pltGofImage->set_displayToolbar(true);
     pltGofImage->get_plotter()->set_maintainAspectRatio(true);

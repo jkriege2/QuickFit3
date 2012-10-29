@@ -81,7 +81,7 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         void weightsChanged(int weights);
         void NdistChanged(int Ndist);
         void NumIterChanged(int NumIter);
-        void chkShowDChanged(bool checked);
+        void chkShowDChanged();
 
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old);
@@ -129,7 +129,7 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         QToolBar* tbPlotDistribution;
 
         QFDoubleEdit* edtWxy;
-        QCheckBox* chkDiffusionCoefficient;
+        QComboBox* cmbXAxisType;
 
 
     private:

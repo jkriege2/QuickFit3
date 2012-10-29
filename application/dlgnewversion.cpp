@@ -21,10 +21,14 @@ DlgNewVersion::DlgNewVersion(QWidget *parent) :
     ui->labMailinglist->setText(tr("<a href=\"mailto:%1\">%1</a> (<a href=\"%2\">subscribe</a>)<br><a href=\"%3\">%3</a>").arg(QF_MAILLIST).arg(QF_MAILLIST_REQUEST).arg(QF_WEBLINK));
     ui->labLicense->setText(QF_LICENSE);
     QFile f(":/quickfit3/releasenotes.html");
-    if (f.open(QIODevice::ReadOnly|QIODevice::Text))
-        ui->edtReleaseNotes->setText(f.readAll());
-    else
+    if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        QString text=f.readAll();
+        text=text.replace("$$SVN$$", SVNVERSION);
+        text=text.replace("$$COMPILEDATE$$", COMPILEDATE);
+        ui->edtReleaseNotes->setText(text);
+    } else {
         ui->edtReleaseNotes->setPlainText(tr("none available :-((("));
+    }
     ui->labVersion->setText(tr("version %1 (SVN: %2 COMPILEDATE: %3)").arg(QF_VERSION).arg(SVNVERSION).arg(COMPILEDATE));
 }
 

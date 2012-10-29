@@ -43,7 +43,6 @@ void QFRDRNumberAndBrightnessDataEditor::addPlotter(JKQtPlotter *&plotter, JKQTP
 
     plotter->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     plotter->get_plotter()->set_plotLabelFontSize(10);
-    plotter->set_zoomByDoubleAndRightMouseClick(false);
     plotter->set_displayMousePosition(false);
     plotter->set_displayToolbar(true);
     plotter->get_plotter()->set_maintainAspectRatio(true);
@@ -123,7 +122,6 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
     pltCorrelation->get_plotter()->useExternalDatastore(pltNumber->getDatastore());
     pltCorrelation->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltCorrelation->get_plotter()->set_plotLabelFontSize(10);
-    pltCorrelation->set_zoomByDoubleAndRightMouseClick(false);
     pltCorrelation->set_displayMousePosition(false);
     pltCorrelation->set_displayToolbar(true);
     pltCorrelation->setXY(0,0,1,1);

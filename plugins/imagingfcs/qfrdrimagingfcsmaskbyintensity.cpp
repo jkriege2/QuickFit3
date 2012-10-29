@@ -50,7 +50,6 @@ void QFRDRImagingFCSMaskByIntensity::init(bool *mask, double *image, uint16_t wi
     plteImage->set_colorBarRightVisible(true);
     plteImage->set_colorBarTopVisible(false);
 
-    ui->pltMain->set_zoomByDoubleAndRightMouseClick(false);
     ui->pltMain->set_displayMousePosition(false);
     ui->pltMain->set_displayToolbar(true);
     ui->pltMain->get_plotter()->set_maintainAspectRatio(true);

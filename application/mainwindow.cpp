@@ -398,10 +398,14 @@ void MainWindow::about() {
     ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>contact the authors:</b><blockquote><a href=\"mailto:%6\">%6</a></blockquote><b>mailing list:</b><blockquote><a href=\"mailto:%8\">%8</a> (<a href=\"%9\">subscribe</a>)</blockquote><b>libraries, used by QuickFit:</b><ul><li>QuickFit library v%4.%5</li><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul><b>many thanks to:</b><blockquote>%2</blockquote><b>compiler used for this version:</b><blockquote>%7</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR).arg(QF_EMAIL).arg(Qt::escape(COMPILER)).arg(QF_MAILLIST).arg(QF_MAILLIST_REQUEST));
     ui_labelLic->setText(tr(QF_LICENSE));
     QFile f(":/quickfit3/releasenotes.html");
-    if (f.open(QIODevice::ReadOnly|QIODevice::Text))
-        ui_releasenotes->setText(f.readAll());
-    else
+    if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        QString text=f.readAll();
+        text=text.replace("$$SVN$$", SVNVERSION);
+        text=text.replace("$$COMPILEDATE$$", COMPILEDATE);
+        ui_releasenotes->setText(text);
+    } else {
         ui_releasenotes->setPlainText(tr("none available :-((("));
+    }
     widget->exec();
     delete widget;
 }
@@ -865,6 +869,8 @@ void MainWindow::createActions() {
     connect(helpContactAuthors, SIGNAL(triggered()), this, SLOT(contactAuhtors()));
     helpContactMaillinglist=new QAction(QIcon(":/lib/mail.png"), tr("&Contact QuickFit Mailinglist"), this);
     connect(helpContactMaillinglist, SIGNAL(triggered()), this, SLOT(contactMailinglist()));
+    helpOpenWebpageAct=new QAction(QIcon(":/lib/help/www.png"), tr("QuickFit &Webpage"), this);
+    connect(helpOpenWebpageAct, SIGNAL(triggered()), this, SLOT(openWebpage()));
 
     helpActList.append(helpAct);
     helpActList.append(helpCopyrightAct);
@@ -973,6 +979,7 @@ void MainWindow::createMenus() {
     helpMenu->addAction(aboutPluginsAct);
     helpMenu->addAction(aboutQtAct);
     helpMenu->addSeparator();
+    helpMenu->addAction(helpOpenWebpageAct);
     helpMenu->addAction(helpContactAuthors);
     helpMenu->addAction(helpContactMaillinglist);
 
@@ -2006,6 +2013,11 @@ void MainWindow::contactMailinglist()
     DlgContactAuthors* dlg=new DlgContactAuthors(this, true);
     dlg->exec();
     delete dlg;
+}
+
+void MainWindow::openWebpage()
+{
+    QDesktopServices::openUrl(QUrl(QF_WEBLINK));
 }
 
 QList<QPair<QString, QString> >* MainWindow::getHTMLReplacementList() {

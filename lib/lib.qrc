@@ -35,6 +35,7 @@
         <file alias="exit.png">icons/exit.png</file>
         <file alias="print.png">../images/16x16/document_print.png</file>
         <file alias="help_help.png">icons/help_help.png</file>
+        <file alias="www.png">icons/www.png</file>
     </qresource>
     <qresource prefix="/lib">
         <file alias="delete16.png">icons/delete16.png</file>

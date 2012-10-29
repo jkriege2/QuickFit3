@@ -218,6 +218,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
 
         void contactAuhtors();
         void contactMailinglist();
+        void openWebpage();
     private:
         void createWidgets();
         void createActions();
@@ -281,6 +282,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         QAction* helpPluginAct;
         QAction* helpContactAuthors;
         QAction* helpContactMaillinglist;
+        QAction* helpOpenWebpageAct;
 
 
         QAction* optionsAct;

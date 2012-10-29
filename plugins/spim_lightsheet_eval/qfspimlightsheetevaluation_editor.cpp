@@ -83,7 +83,6 @@ QFSPIMLightsheetEvaluationEditor::~QFSPIMLightsheetEvaluationEditor()
 
 void QFSPIMLightsheetEvaluationEditor::prepareImagePlotter(JKQtPlotter* pltImage) {
     pltImage->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
-    pltImage->set_zoomByDoubleAndRightMouseClick(false);
     pltImage->set_displayMousePosition(true);
     pltImage->set_displayToolbar(false);
     pltImage->get_plotter()->set_maintainAspectRatio(true);

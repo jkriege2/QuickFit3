@@ -137,9 +137,12 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomAll());
     tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomIn());
     tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomOut());
-    chkDiffusionCoefficient=new QCheckBox(tr("show D-axis"));
+    cmbXAxisType=new QComboBox(this);//(tr("show D-axis"));
+    cmbXAxisType->addItem(tr("time-axis"));
+    cmbXAxisType->addItem(tr("FCS diffusion coefficient"));
     tbPlotDistribution->addSeparator();
-    tbPlotDistribution->addWidget(chkDiffusionCoefficient);
+    tbPlotDistribution->addWidget(new QLabel("x-axis: "));
+    tbPlotDistribution->addWidget(cmbXAxisType);
 
 
     QWidget* wPltDist=new QWidget(this);
@@ -155,7 +158,7 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
 
     /////
     connect(pltDistribution, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMove(double,double)));
-    connect(chkDiffusionCoefficient, SIGNAL(toggled(bool)), this, SLOT(chkShowDChanged(bool)));
+    connect(cmbXAxisType, SIGNAL(currentIndexChanged(int)), this, SLOT(chkShowDChanged()));
     /////
 
 }
@@ -201,7 +204,7 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         connect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
 
 
-        chkDiffusionCoefficient->setChecked(current->getProperty("show_daxis", false).toBool());
+        cmbXAxisType->setCurrentIndex(current->getProperty("show_daxis", 0).toInt());
 
 
         dataEventsEnabled=true;
@@ -693,12 +696,12 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                     c_distD=dsdist->addCopiedColumn(mem_D.data(), mem_D.size(), "maxent_D");
                     c_dist=dsdist->addCopiedColumn(mem_dist.data(), mem_dist.size(), "maxent_dist");;
                 } else {
-                    if (!chkDiffusionCoefficient->isChecked()) pltDistribution->setXY(pltData->getXMin(), pltData->getXMax(), pltData->getYMin(), pltData->getYMax());
+                    if (cmbXAxisType->currentIndex()==0) pltDistribution->setXY(pltData->getXMin(), pltData->getXMax(), pltData->getYMin(), pltData->getYMax());
                 }
                 JKQTPxyLineGraph* g_dist=new JKQTPxyLineGraph(pltDistribution->get_plotter());
                 g_dist->set_drawLine(true);
                 g_dist->set_title("MaxEnt distribution");
-                if (chkDiffusionCoefficient->isChecked()) {
+                if (cmbXAxisType->currentIndex()==1) {
                     g_dist->set_xColumn(c_distD);
                     pltDistribution->getXAxis()->set_axisLabel(tr("diffusion coefficient $D$ [µm²/s]"));
                 } else {
@@ -721,7 +724,7 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 //qDebug()<<"    g "<<t.elapsed()<<" ms";
                 t.start();
 
-                if (chkDiffusionCoefficient->isChecked()) pltDistribution->zoomToFit();
+                if (cmbXAxisType->currentIndex()==1) pltDistribution->zoomToFit();
 
 
                 /////////////////////////////////////////////////////////////////////////////////
@@ -1073,11 +1076,11 @@ void QFFCSMaxEntEvaluationEditor::NumIterChanged(int NumIter) {
     if (data) data->setNumIter(NumIter);
 }
 
-void QFFCSMaxEntEvaluationEditor::chkShowDChanged(bool checked) {
+void QFFCSMaxEntEvaluationEditor::chkShowDChanged() {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
-    current->setQFProperty("show_daxis", chkDiffusionCoefficient->isChecked(), false, false);
+    current->setQFProperty("show_daxis", cmbXAxisType->currentIndex(), false, false);
     displayData();
     QApplication::restoreOverrideCursor();
 }
