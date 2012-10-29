@@ -1,5 +1,78 @@
 <li><a name="$$SVN$$"><b>$$COMPILEDATE$$ (SVN: $$SVN$$)</b>
-<!--<li><a name="1823"><b>2012-09-25 (SVN: 1823)</b>-->
+<!--
+		<li><a name="1856"><b>2012-10-29 (SVN: 1856)</b>-->
+		<ul>
+
+		  <li><b>QuickFit3:</b><ul>
+		    <li>plotter widgets now display a context menu on a right-click</li>
+		    <li>improved about-box</li>
+		    <li>added dialog that is shown whenever a new QuickFit version is started and updates the user on news and the release notes.</li>
+		    <li>added help menu entries to contact the authors and write to the mailinglist</li>
+		    <li>updated online help</li>
+		    <li>pushed library version from 1.2 to 1.3 (to summarize some API-changes since the last release)</li>
+		    <li>added option to display property values in the evaluation results table</li>
+		    <li> added "reload current project" function to the File menu</li>
+		    <li>if RDR files are editable, they may now be moved up/down and all the features of the new editable files list API are used for the UI ...</li>
+
+		  </ul></li>
+		  
+		  <li><b>QuickFit3/jkqtplotter:</b><ul>
+		    <li>added button/action to display a table with the plot data in a separate (modal) window</li>
+		    <li>shows a settings dialog when copying to the clipboard</li>
+
+		  </ul></li>
+
+		  <li><b>QuickFit3/msd:</b><ul>
+		    <li>added function to copy run average to clipboard</li>
+
+		  </ul></li>
+
+		  <li><b>QuickFit3/calc_difcoeff:</b><ul>
+		    <li>improved plugin with the possibility to estimate acqeous solution viscosity with a set of solutes (1..5).  (same method as in Sednterp ... values fit quite accurately with small deviations due to different fits to viscosity reference data!)</li>
+		    <li>dded possibility to calculate ellipsoid and cylinder diffusion coefficients</li>
+		    <li>improved documentation</li>
+		    <li>givenD data may be deleted now</li>
+		    <li>givenD user data is stored in config directory now.</li>
+		    <li>you may view different plots (viscosity, density, refractive index) for solutes</li>
+
+		  </ul></li>
+
+		  <li><b>QuickFit3/imagingFCS:</b><ul>
+		    <li>bugfix: selection/mask overlays in the countrate and correlation curve displays work now correctly, i.e. colors are displayed, not just blach and white (problem with alpha blending in the plotter!!!)</li>
+		    <li>added DualView mode</li>
+		    <li>replaced example data</li>
+		    <li>added tutorial for beads data</li>
+		    <li>added option to copy fit result statistics (over selected/non-masked pixels) as a table to the clipboard</li>
+		    <li>added copy/print/save actions for all subplots to the Data menu</li>
+		    <li>bugfix: color scaling is now correctly done for masked images/overview</li>
+		    <li>added menu entry to copy currently selected correlation curves into a new fcs raw data record and add it to the current project.</li>
+		    <li>new tinyTIFF importer can import more than 65000 frames from a TIFF file, but with very limited feature support.</li>
+
+		  </ul></li>
+		  <li><b>QuickFit3/table:</b><ul>
+		    <li>bugfixed the data access functions (accessed the wrong columns!)</li>
+		    <li>added numbers to the column titles in the table ... data access functions work on these numbers as row/column number!!!</li>
+		  </ul></li>
+
+		  <li><b>QuickFit3/fcs:</b><ul>
+		    <li>parsing internal fcs in formats tccc or tcecece according to parameterChanged</li>
+		    <li>bugfix when reading CSV files in mode tcecece</li>
+		    <li>improved CSV import (allows to specify start/end line string), possibility to save presets in CSV dialog</li>
+		    <li>fully supports loading of multiple files into one RDR (including menu item!)</li>
+		    <li>improved online help</li>
+		  </ul></li>
+
+		  <li><b>QuickFit3/DLS fit functions:</b><ul>
+		    <li>bugfix that caused crash due to new DLS fit function</li>
+		    <li>corrected unit of scattering vector q^2 from 1/nm to 1/nm²</li>
+		    <li>added fit models expressed in terms of D and not tau</li>
+		  </ul></li>
+
+		
+		</ul>
+		</li> 
+
+<li><a name="1823"><b>2012-09-25 (SVN: 1823)</b>
 		<ul>
 
 		  <li><b>imFCS:</b><ul>
