@@ -34,17 +34,17 @@
 		  <li><b>from any given diffusion coefficient $$math:D_R$$ at reference conditions $$math:T_R$$ and $$math:\eta_R$$:</b> The same as inthe case of given $$math:D_{20,W}$$:
 		  $$bmath:D=D_R\cdot\frac{T}{T_R}\cdot\frac{\eta_R}{\eta}$$
 		  </li>
-		  <li><b>An ellipsoid with rotation axis diameter $$math:a$$ and other axes diameter $$math:b$$:</b> The diffusion coefficient is given by the relation 
+                  <li><b>An ellipsoid with rotation axis diameter $$math:a$$ and other axes diameter $$math:b$$:</b> The diffusion coefficient is given by the relation [2-5]
 		    $$bmath:D=\frac{k_B T}{6\pi\eta R_e\dot F_t}$$ where $$math:R_e$$ is the equivalent radius of a sphere of the same volume and $$math:F_t$$ is the translational Perrin factor:
 			$$bmath:R_e=(ab^2)^{1/3}$$
 			Depending on the axial ration $$math:p=a/b$$ ($$math:\Rightarrow q=1/p$$), the Perrin factor is:<ul>
 			<li>for a prolate ellipsoid ($$math:p>1$$): $$bmath:F_t=\frac{\sqrt{1-q^2}}{q^{2/3}\cdot\ln\frac{1+\sqrt{1-q^2}}{q}}$$</li>
 			<li>for a oblate ellipsoid ($$math:p<1$$): $$bmath:F_t=\frac{\sqrt{q^2-1}}{q^{2/3}\cdot\atan\sqrt{q^2-1}}$$</li>
 			</ul></li>
-		  <li><b>A cylinder of diameter $$math:d$$ and length $$math:L$$:</b> The diffusion coefficient is given by the relation 
+                  <li><b>A cylinder of diameter $$math:d$$ and length $$math:L$$:</b> The diffusion coefficient is given by the relation [3,4]
 		    $$bmath:D=\frac{k_B T}{6\pi\eta R_e\dot F_t}$$ where $$math:R_e$$ is the equivalent radius of a sphere of the same volume and $$math:F_t$$ is the translational Perrin factor:
-			$$bmath:R_e=\left(\frac{3}{2p^2}\right)^{1/3}\cdot\frac{L}{2}
-			$$bmath:F_t=\frac{(2p^2/3)^{1/3}}{\ln(p)+\gamma},   \gamma=0.312+\frac{0.565}{p}+\frac{0.100}{p^2}
+                        $$bmath:R_e=\left(\frac{3}{2p^2}\right)^{1/3}\cdot\frac{L}{2}$$
+                        $$bmath:F_t=\frac{(2p^2/3)^{1/3}}{\ln(p)+\gamma},   \gamma=0.312+\frac{0.565}{p}+\frac{0.100}{p^2}$$
 			Here the parameter $$math:p$$ is defined as: $$math:p=L/d$$</li>
 		</ul>
 		
@@ -57,7 +57,7 @@
 		    $$bmath:\eta(T)=A\cdot10^{B/(T-C)}$$
 			where $$math:T$$ is the absolute temperature in Kelvin and $$math:A=2.41\cdot10^{-5} \rm{Pa\cdot s}$$, $$math:B=247.8 \rm{K}$$ and $$math:C=140 \rm{K}$$.
 			<center><img src="./pic/viscosity_water.png"></center>
-			In addition a number of dissolved components can be taken into account when calculating the viscosity of an aqueous solution. To estimate the viscosity of the solution, this plugin uses the same method as the program Sednterp (see <a href="http://bitcwiki.sr.unh.edu/index.php/Calculating_Viscosity">http://bitcwiki.sr.unh.edu/index.php/Calculating_Viscosity</a>): First a viscosity increment is calculated for each component of the solution at 20°C (where measured data for several solutes is available):
+                        In addition a number of dissolved components can be taken into account when calculating the viscosity of an aqueous solution. To estimate the viscosity of the solution, this plugin uses the same method as the program Sednterp (see <a href="http://bitcwiki.sr.unh.edu/index.php/Calculating_Viscosity">http://bitcwiki.sr.unh.edu/index.php/Calculating_Viscosity</a> and chapters 1 and 2 in [1]): First a viscosity increment is calculated for each component of the solution at 20°C (where measured data for several solutes is available):
 			$$bmath: \Delta\eta_i(c_i)=m(c_i; \vec{p})-\eta_{Water, 20}$$
 			Here the function $$math:m(c_i; \vec{p})$$ is a model function fitted to experimental viscosity data of the respective solution. It models the viscosity of the solut in water at a molar concentration $$math:c_i$$ and a temperature of 20°C. Finally the solution viscosity at the target temperature $$math:T$$ is estimated as:
 			$$bmath:\eta(T, c_1,...,c_n)=\left(\eta_{20,water}+\sum_{i=1}^n\Delta\eta_i(c_i)\right)\cdot\frac{\eta_{T,water}}{\eta_{20,water}}$$
@@ -151,10 +151,11 @@
 		</ol></p>
 		<h2>References</h2>
 		<ul>
-		  <li>Perrin, F. (1934): "Mouvement brownien d’un ellipsoide (I). Dispersion dielectrique pour des molecules ellipsoidales", J. Phys. Radium [7] 5, 497-511. <a href="http://hal.archives-ouvertes.fr/docs/00/23/32/65/PDF/ajp-jphysrad_1934_5_10_497_0.pdf">[Online]</a></li>
-		  <li>Tirado, M.M. and J. Garca de la Torre (1979): "Translational friction coefficients of rigid, symmetric top macromolecules". Application to circular cylinders, J. Chem Phys. 71: 2581-2588.</li>
-		  <li>S. Hansen (2004): "Translational friction coefficients for cylinders of arbitrary axial ratios estimated by Monte Carlo simulation", J CHem Phys 121(18), 9111-9115. <a href="http://www.matfys.kvl.dk/~steen/Hansen%20JCP%202004.pdf">[Online]</a></li>
-		  <li>Bloomfield, VA (2000): "Chapter 1. Survey of Biomolecular Hydrodynamics" in: On-Line Biophysics Textbook. Separations and Hydrodynamics./Edited by TM Schuster. <a href="http://www.biophysics.org/portals/1/pdfs/education/vbloomfield.pdf">[Online]</a></li>
+                  <li>[1] T. Svedberg and K.O. Pederson (eds.) (1940): <i>'The Ultracentrifuge'</i> , Johnson Reprint Corporation, New York, 1940. </li>
+                  <li>[2] Perrin, F. (1934): "Mouvement brownien d'un ellipsoide (I). Dispersion dielectrique pour des molecules ellipsoidales", J. Phys. Radium [7] 5, 497-511. <a href="http://hal.archives-ouvertes.fr/docs/00/23/32/65/PDF/ajp-jphysrad_1934_5_10_497_0.pdf">[Online]</a></li>
+                  <li>[3] Tirado, M.M. and J. Garca de la Torre (1979): "Translational friction coefficients of rigid, symmetric top macromolecules". Application to circular cylinders, J. Chem Phys. 71: 2581-2588.</li>
+                  <li>[4] S. Hansen (2004): "Translational friction coefficients for cylinders of arbitrary axial ratios estimated by Monte Carlo simulation", J CHem Phys 121(18), 9111-9115. <a href="http://www.matfys.kvl.dk/~steen/Hansen%20JCP%202004.pdf">[Online]</a></li>
+                  <li>[5] Bloomfield, VA (2000): "Chapter 1. Survey of Biomolecular Hydrodynamics" in: On-Line Biophysics Textbook. Separations and Hydrodynamics./Edited by TM Schuster. <a href="http://www.biophysics.org/portals/1/pdfs/education/vbloomfield.pdf">[Online]</a></li>
 		</ul>
 	</body>
 </html>
