@@ -279,6 +279,12 @@ void QFCameraConfigComboBox::setCurrentDefault()
     rereadConfigFiles();
 }
 
+void QFCameraConfigComboBox::gotoCurrentDefault()
+{
+    setCurrentConfig(defaultConfig);
+
+}
+
 void QFCameraConfigComboBox::setDefaultConfig(QString defConfig)
 {
     defaultConfig=defConfig;
@@ -318,9 +324,12 @@ QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QWidget* parent, QString 
     actDelete = new QAction(QIcon(":/libqf3widgets/config_delete.png"), tr("&Delete Camera Configuration"), this);
     connect(actDelete, SIGNAL(triggered()), combobox, SLOT(deleteCurrent()));
 
-    actSetDefault = new QAction(QIcon(":/libqf3widgets/default_config.png"), tr("&Set current configuration as startup default"), this);
+    actSetDefault = new QAction(QIcon(":/libqf3widgets/default_config_set.png"), tr("&Set current configuration as startup default"), this);
     connect(actSetDefault, SIGNAL(triggered()), combobox, SLOT(setCurrentDefault()));
     actSetDefault->setVisible(false);
+
+    actGotoDefault = new QAction(QIcon(":/libqf3widgets/default_config.png"), tr("&Use default startup configuration"), this);
+    connect(actGotoDefault, SIGNAL(triggered()), combobox, SLOT(gotoCurrentDefault()));
 
     layout->addSpacing(5);
 
@@ -342,12 +351,16 @@ QFCameraConfigEditorWidget::QFCameraConfigEditorWidget(QWidget* parent, QString 
     btnSetDefault=new QToolButton(this);
     btnSetDefault->setDefaultAction(actSetDefault);
 
+    btnGotoDefault=new QToolButton(this);
+    btnGotoDefault->setDefaultAction(actGotoDefault);
+
     layout->addWidget(btnConfig, 0);
     layout->addSpacing(5);
     layout->addWidget(btnAdd, 0);
     layout->addWidget(btnRename, 0);
     layout->addWidget(btnSaveAs, 0);
     layout->addWidget(btnDelete, 0);
+    layout->addWidget(btnGotoDefault, 0);
     layout->addWidget(btnSetDefault, 0);
     layout->addStretch(1);
 

@@ -96,6 +96,7 @@ class QFWIDLIB_EXPORT QFCameraConfigComboBox : public QEnhancedComboBox {
 
         void setCurrentDefault();
 
+        void gotoCurrentDefault();
     protected slots:
         void directoryChanged(const QString& path);
     protected:
@@ -182,6 +183,7 @@ class QFWIDLIB_EXPORT QFCameraConfigEditorWidget : public QWidget {
         /** \brief button to rename the current preview configuration as a different name */
         QToolButton* btnRename;
         QToolButton* btnSetDefault;
+        QToolButton* btnGotoDefault;
 
 
         QAction* actAdd;
@@ -190,6 +192,7 @@ class QFWIDLIB_EXPORT QFCameraConfigEditorWidget : public QWidget {
         QAction* actSaveAs;
         QAction* actRename;
         QAction* actSetDefault;
+        QAction* actGotoDefault;
 };
 
 #endif // QFCAMERACONFIGCOMBOBOX_H
