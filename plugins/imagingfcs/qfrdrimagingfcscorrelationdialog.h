@@ -75,6 +75,7 @@ protected:
     bool allThreadsDone() const;
     int runningThreads() const;
     int waitingThreads() const;
+    void ensureTiffReader();
     IMFCSJob initJob();
     void addJob(IMFCSJob jobin, bool ignoreDualView=false);
 private:

@@ -157,6 +157,17 @@ int QFRDRImagingFCSCorrelationDialog::waitingThreads() const  {
     return cnt;
 }
 
+void QFRDRImagingFCSCorrelationDialog::ensureTiffReader() {
+    if (!ui->cmbFileformat->currentText().toUpper().contains("TIFF")) {
+        for (int i=0; i<ui->cmbFileformat->currentIndex(); i++) {
+            if (ui->cmbFileformat->itemText(i).toUpper().contains("TIFF")) {
+                ui->cmbFileformat->setCurrentIndex(i);
+                break;
+            }
+        }
+    }
+}
+
 
 void QFRDRImagingFCSCorrelationDialog::startNextWaitingThread()   {
     for (int i=0; i<jobs.size(); i++) {
@@ -782,7 +793,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
                     //qDebug()<<"fn="<<fn<<"  fnAbs="<<fnAbs<<"  fn(filename)="<<QFileInfo(filename).fileName()<<"  fn(fnAbs)="<<QFileInfo(fnAbs).fileName();
                     if (fnAbs==filenameDisplayed) {
                         hasFirst=true;
-                        if (ft.toLower().simplified().startsWith("tiff")) ui->cmbFileformat->setCurrentIndex(0);
+                        if (ft.toLower().simplified().startsWith("tiff")) ensureTiffReader();
                     } else if (QFileInfo(fnAbs).fileName()==QFileInfo(filenameDisplayed).fileName()) {
                         foundSecond=true;
                         if (ft.toLower().simplified().startsWith("tiff")) sIsTiff=true;
@@ -833,7 +844,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
         frametime=sframetime;
         baseline_offset=sbaseline_offset;
         backgroundF=sbackgroundF;
-        if (sIsTiff) ui->cmbFileformat->setCurrentIndex(0);
+        if (sIsTiff) ensureTiffReader();//ui->cmbFileformat->setCurrentIndex(0);
     }
 
 
