@@ -681,13 +681,13 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 QVector<double> mem_D=eval->getDistributionDs(record, index, model);
                 QVector<double> mem_dist=eval->getDistribution(record, index, model);
 
-                if (mem_D.size()<mem_tau.size()) {
+                //if (mem_D.size()<mem_tau.size()) {
                     mem_D=mem_tau;
                     double wxy=eval->getWXY();
                     for (int i=0; i<mem_tau.size(); i++) {
                         mem_D[i]=wxy*wxy/1000000.0/4.0/mem_tau[i];
                     }
-                }
+                //}
                 int c_disttau=-1;
                 int c_distD=-1;
                 int c_dist=-1;
@@ -1059,6 +1059,9 @@ void QFFCSMaxEntEvaluationEditor::wxyChanged(double wxy) {
     if (!current->getHighlightedRecord()) return;
     QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
     if (data) data->setWXY(wxy);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    displayData();
+    QApplication::restoreOverrideCursor();
 }
 void QFFCSMaxEntEvaluationEditor::NdistChanged(int Ndist) {
     if (!dataEventsEnabled) return;
