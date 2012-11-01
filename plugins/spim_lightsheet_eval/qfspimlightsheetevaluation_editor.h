@@ -44,6 +44,8 @@ class QFSPIMLightsheetEvaluationEditor : public QFEvaluationEditor {
         void on_spinDeltaX_valueChanged(double value);
         void on_spinDeltaZ_valueChanged(double value);
         void on_pltImage_plotMouseClicked(double x, double y, Qt::KeyboardModifiers modifiers=Qt::NoModifier, Qt::MouseButton button=Qt::LeftButton);
+        void on_chkErrorsParam_toggled(bool checked);
+        void on_chkErrorsBeamPos_toggled(bool checked);
     protected:
 
         void prepareImagePlotter(JKQtPlotter *pltImage);

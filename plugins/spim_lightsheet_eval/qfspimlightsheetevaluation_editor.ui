@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>978</width>
+    <width>1009</width>
     <height>662</height>
    </rect>
   </property>
@@ -115,35 +115,9 @@
       <attribute name="title">
        <string>Stack Fit Results</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,1,0,1">
-       <item row="3" column="0">
-        <widget class="QComboBox" name="cmbParameter">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_10">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>beam width:</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="JKQtPlotter" name="pltBeamWidth" native="true">
+      <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,1,0,0,1" columnstretch="1,1">
+       <item row="5" column="0">
+        <widget class="JKQtPlotter" name="pltParam" native="true">
          <property name="minimumSize">
           <size>
            <width>200</width>
@@ -178,34 +152,8 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QLabel" name="label_11">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>beam position difference:</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <widget class="JKQtPlotter" name="pltBeamPosDifference" native="true">
-         <property name="minimumSize">
-          <size>
-           <width>200</width>
-           <height>200</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="JKQtPlotter" name="pltParam" native="true">
          <property name="minimumSize">
           <size>
            <width>200</width>
@@ -315,6 +263,87 @@
           </item>
          </layout>
         </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>beam width:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="JKQtPlotter" name="pltBeamWidth" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>200</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0">
+         <item>
+          <widget class="QLabel" name="label_16">
+           <property name="text">
+            <string>parameter:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cmbParameter">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkErrorsParam">
+           <property name="text">
+            <string>show errors</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,0">
+         <item>
+          <widget class="QLabel" name="label_11">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>beam position difference:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkErrorsBeamPos">
+           <property name="text">
+            <string>show errors</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>

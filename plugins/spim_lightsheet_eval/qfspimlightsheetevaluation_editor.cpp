@@ -188,6 +188,8 @@ void QFSPIMLightsheetEvaluationEditor::updateStack() {
         ui->spinWidthRangeMax->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_WIDTHRANGEMAX", 5).toDouble());
         ui->spinRangeMin->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_RANGEMIN", 0).toDouble());
         ui->spinRangeMax->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_RANGEMAX", 128).toDouble());
+        ui->chkErrorsParam->setChecked(record->getProperty(eval->getEvaluationResultID(stack)+"_PARAMERRORS", true).toBool());
+        ui->chkErrorsBeamPos->setChecked(record->getProperty(eval->getEvaluationResultID(stack)+"_BEAMPOSERRORS", false).toBool());
 
         updatingData=oldUpdt;
     }
@@ -195,6 +197,37 @@ void QFSPIMLightsheetEvaluationEditor::updateStack() {
     displayEvaluationResults();
     displayPreview();
 }
+
+void QFSPIMLightsheetEvaluationEditor::on_chkErrorsParam_toggled(bool checked)
+{
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    int stack=ui->cmbStack->currentIndex();
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID(stack)+"_PARAMERRORS", checked, false, false);
+    }
+    displayEvaluationResults();
+    displayPreview();
+}
+
+void QFSPIMLightsheetEvaluationEditor::on_chkErrorsBeamPos_toggled(bool checked)
+{
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    int stack=ui->cmbStack->currentIndex();
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID(stack)+"_BEAMPOSERRORS", checked, false, false);
+    }
+    displayEvaluationResults();
+    displayPreview();
+}
+
 
 void QFSPIMLightsheetEvaluationEditor::on_cmbOrientation_currentIndexChanged(int index)
 {
@@ -399,6 +432,7 @@ void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, do
     }
 }
 
+
 void QFSPIMLightsheetEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
     // this slot is called when the user selects a new record in the raw data record list on the RHS of this widget in the evaluation dialog
     
@@ -542,7 +576,10 @@ void QFSPIMLightsheetEvaluationEditor::displayEvaluationResults() {
                         g->set_xColumn(c_X);
                         g->set_yColumn(cv);
                         g->set_xErrorColumn(-1);
-                        g->set_yErrorColumn(ce);
+                        if (ui->chkErrorsParam->isChecked())
+                            g->set_yErrorColumn(ce);
+                        else
+                            g->set_yErrorColumn(-1);
                         g->set_drawLine(false);
                         g->set_yErrorStyle(JKQTPerrorBars);
                         g->set_symbol(JKQTPcross);
@@ -601,7 +638,10 @@ void QFSPIMLightsheetEvaluationEditor::displayEvaluationResults() {
         g->set_xColumn(c_X);
         g->set_yColumn(c_POSITIONDIST);
         g->set_xErrorColumn(-1);
-        g->set_yErrorColumn(ce_POSITIONDIST);
+        if (ui->chkErrorsBeamPos->isChecked())
+            g->set_yErrorColumn(ce_POSITIONDIST);
+        else
+            g->set_yErrorColumn(-1);
         g->set_drawLine(false);
         g->set_yErrorStyle(JKQTPerrorBars);
         g->set_symbol(JKQTPcross);
