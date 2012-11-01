@@ -2,6 +2,7 @@
 #include "../version.h"
 #include "../lib/programoptions.h"
 #include "../lib/qftools.h"
+#include "jkqtpbaseplotter.h"
 
 
 #include <QtGui>
@@ -60,6 +61,8 @@ int main(int argc, char * argv[])
     app.processEvents();
 
     ProgramOptions* settings=new ProgramOptions("", &app, &app);
+
+    JKQtBasePlotter::setDefaultJKQtBasePrinterUserSettings(settings->getIniFilename(), "JKQtBasePlotterUserSettings/");
 
     qRegisterMetaType<QTextCursor>("QTextCursor");
     MainWindow win(settings, &splash);

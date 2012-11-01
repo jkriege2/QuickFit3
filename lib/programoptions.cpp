@@ -89,6 +89,12 @@ ProgramOptions::~ProgramOptions()
     if (inst==this) inst=NULL;
 }
 
+void ProgramOptions::setCurrentRawDataDir(QString d)
+{
+    currentRawDataDir=d;
+    writeSettings();
+}
+
 
 void ProgramOptions::writeSettings() {
     settings->setValue("quickfit/language", languageID);
@@ -202,6 +208,7 @@ bool ProgramOptions::getUserSaveAfterFirstEdit() const
 void ProgramOptions::setUserSaveAfterFirstEdit(bool set)
 {
     userSaveAfterFirstEdit=set;
+    writeSettings();
 }
 
 bool ProgramOptions::getChildWindowsStayOnTop() const
@@ -212,6 +219,7 @@ bool ProgramOptions::getChildWindowsStayOnTop() const
 void ProgramOptions::setChildWindowsStayOnTop(bool set)
 {
     childWindowsStayOnTop=set;
+    writeSettings();
 }
 
 bool ProgramOptions::getHelpWindowsStayOnTop() const
@@ -222,6 +230,7 @@ bool ProgramOptions::getHelpWindowsStayOnTop() const
 void ProgramOptions::setHelpWindowsStayOnTop(bool set)
 {
     helpWindowsStayOnTop=set;
+    writeSettings();
 }
 
 bool ProgramOptions::getProjectWindowsStayOnTop() const
@@ -232,6 +241,7 @@ bool ProgramOptions::getProjectWindowsStayOnTop() const
 void ProgramOptions::setProjectWindowsStayOnTop(bool set)
 {
     projectWindowStayOnTop=set;
+    writeSettings();
 }
 
 bool ProgramOptions::debugLogVisible() const
@@ -242,16 +252,32 @@ bool ProgramOptions::debugLogVisible() const
 void ProgramOptions::setDebugLogVisible(bool visible)
 {
     m_debugLogVisible=visible;
+    writeSettings();
 }
 
 void ProgramOptions::setLanguageID(QString id) {
     languageID=id;
+    writeSettings();
 }
 
 void ProgramOptions::setStylesheet(QString st) {
     stylesheet=st;
+    writeSettings();
 }
 
 void ProgramOptions::setStyle(QString st) {
     style=st;
+    writeSettings();
+}
+
+void ProgramOptions::setMaxThreads(int threads)
+{
+    maxThreads=threads;
+    writeSettings();
+}
+
+void ProgramOptions::setAutosave(int interval)
+{
+    autosave=interval;
+    writeSettings();
 }

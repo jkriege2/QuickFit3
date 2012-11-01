@@ -44,7 +44,7 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         int getMaxThreads() { return maxThreads; }
 
         inline QString getCurrentRawDataDir() { return currentRawDataDir; }
-        inline void setCurrentRawDataDir(QString d) { currentRawDataDir=d; }
+        void setCurrentRawDataDir(QString d);
 
 
         /** \brief set languageID (which language to use for display) */
@@ -57,12 +57,12 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         void setStyle(QString st);
 
         /** \brief set the maximum number of threds */
-        void setMaxThreads(int threads) { maxThreads=threads; }
+        void setMaxThreads(int threads);
 
         /** \brief autosave project every X minutes */
         int getAutosave() { return autosave; }
         /** \brief autosave project every X minutes (0 == off) */
-        void setAutosave(int interval) { autosave=interval; }
+        void setAutosave(int interval);
 
         /** \brief the directory in which to save configuration data, see \ref qf3whereiswhat */
         QString getConfigFileDirectory() const;
@@ -170,6 +170,7 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         static QVariant getConfigValue(const QString& name, QVariant defaultValue=QVariant()) {
             if (!inst) return QVariant();
             if (!inst->getQSettings()) return QVariant();
+            inst->getQSettings()->sync();
             return inst->getQSettings()->value(name, defaultValue);
         }
 
@@ -177,7 +178,8 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         static void setConfigValue(const QString& name, QVariant value) {
             if (!inst) return ;
             if (!inst->getQSettings()) return;
-            return inst->getQSettings()->setValue(name, value);
+            inst->getQSettings()->setValue(name, value);
+            inst->getQSettings()->sync();
         }
 
 };

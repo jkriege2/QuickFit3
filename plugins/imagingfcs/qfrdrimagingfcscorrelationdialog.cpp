@@ -562,7 +562,7 @@ void QFRDRImagingFCSCorrelationDialog::addJob(IMFCSJob jobin, bool ignoreDualVie
             job2.crop_y0=0;
             job2.crop_y1=image_height-1;
             job2.dualViewSideID=tr("right");
-            addJob(job2);
+            addJob(job2, true);
         } else if (ui->cmbDualView->currentIndex()==2) {
             job.use_cropping=true;
             job.crop_x0=0;
@@ -578,7 +578,7 @@ void QFRDRImagingFCSCorrelationDialog::addJob(IMFCSJob jobin, bool ignoreDualVie
             job2.crop_y0=image_height/2;
             job2.crop_y1=image_height-1;
             job.dualViewSideID=tr("top");
-            addJob(job2);
+            addJob(job2, true);
         }
     }
 }

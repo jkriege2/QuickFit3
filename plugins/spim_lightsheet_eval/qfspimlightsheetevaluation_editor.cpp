@@ -190,12 +190,35 @@ void QFSPIMLightsheetEvaluationEditor::updateStack() {
         ui->spinRangeMax->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_RANGEMAX", 128).toDouble());
         ui->chkErrorsParam->setChecked(record->getProperty(eval->getEvaluationResultID(stack)+"_PARAMERRORS", true).toBool());
         ui->chkErrorsBeamPos->setChecked(record->getProperty(eval->getEvaluationResultID(stack)+"_BEAMPOSERRORS", false).toBool());
+        ui->cmbParameter->setCurrentIndex(record->getProperty(eval->getEvaluationResultID(stack)+"_PARAMETER", record->getProperty("PARAMETER", ui->cmbParameter->currentIndex()).toInt()).toInt());
 
         updatingData=oldUpdt;
     }
     // ensure that data of new highlighted record is displayed
     displayEvaluationResults();
     displayPreview();
+}
+
+void QFSPIMLightsheetEvaluationEditor::paramChanged(int i)
+{
+    //QList<QVariant> md=ui->cmbParameter->itemData(i).toList();
+
+
+    //md<<c_X<<cv<<ce;
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    int stack=ui->cmbStack->currentIndex();
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID(stack)+"_PARAMETER", i, false, false);
+    }
+    ui->pltParam->getYAxis()->set_axisLabel(ui->cmbParameter->itemData(i).toString());
+    //ui->pltParam->get_plotter()->setOnlyGraphVisible(i);
+    ui->pltParam->get_plotter()->setOnlyNthGraphsVisible(i, ui->cmbParameter->count());
+    ui->pltParam->zoomToFit();
+    ui->pltParam->update_plot();
 }
 
 void QFSPIMLightsheetEvaluationEditor::on_chkErrorsParam_toggled(bool checked)
@@ -500,13 +523,13 @@ void QFSPIMLightsheetEvaluationEditor::displayEvaluationResults() {
     int z=data->getImageStackFrames(stack);
     double deltaZ=ui->spinDeltaZ->value()/1000.0;
     double deltaX=ui->spinDeltaX->value()/1000.0;
+
+    int paramItem=ui->cmbParameter->currentIndex();
+    disconnect(ui->cmbParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(paramChanged(int)));
     ui->cmbParameter->clear();
 
 
-    disconnect(ui->cmbParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(paramChanged(int)));
-
     QString param;
-    int paramItem=-1;
     QList<QVector<double> > posV, posE;
     int c_X=ds->addLinearColumn(z, 0, double(z-1)*deltaZ, "lightsheet_pos");
 
@@ -570,21 +593,26 @@ void QFSPIMLightsheetEvaluationEditor::displayEvaluationResults() {
 
                         QList<QVariant> md;
                         md<<c_X<<cv<<ce;
-                        ui->cmbParameter->addItem(tr("%1, channel %2").arg(d.name).arg(channel), tr("%1 [%2]").arg(d.name).arg(unit));
+                        if (channel==0) {
+                            ui->cmbParameter->addItem(tr("%1").arg(d.name), tr("%1 [%2]").arg(d.name).arg(unit));
+                        }
 
                         JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(ui->pltParam->get_plotter());
                         g->set_xColumn(c_X);
                         g->set_yColumn(cv);
                         g->set_xErrorColumn(-1);
-                        if (ui->chkErrorsParam->isChecked())
-                            g->set_yErrorColumn(ce);
-                        else
-                            g->set_yErrorColumn(-1);
                         g->set_drawLine(false);
-                        g->set_yErrorStyle(JKQTPerrorBars);
+                        if (ui->chkErrorsParam->isChecked()) {
+                            g->set_yErrorColumn(ce);
+                            g->set_yErrorStyle(JKQTPerrorBars);
+                        } else {
+                            g->set_yErrorColumn(-1);
+                            g->set_yErrorStyle(JKQTPnoError);
+                        }
+
                         g->set_symbol(JKQTPcross);
                         g->set_xErrorStyle(JKQTPnoError);
-                        g->set_visible(false);
+                        g->set_visible((i%paramIDs.size())==paramItem);
                         g->set_errorColor(g->get_color().darker());
                         g->set_title(tr("%2, channel %1").arg(channel+1).arg(d.name));
                         ui->pltParam->addGraph(g);
@@ -678,18 +706,6 @@ void QFSPIMLightsheetEvaluationEditor::displayEvaluationResults() {
     setUpdatesEnabled(upd);
 }
 
-void QFSPIMLightsheetEvaluationEditor::paramChanged(int i)
-{
-    //QList<QVariant> md=ui->cmbParameter->itemData(i).toList();
-
-
-    //md<<c_X<<cv<<ce;
-    if (updatingData) return;
-    ui->pltParam->getYAxis()->set_axisLabel(ui->cmbParameter->itemData(i).toString());
-    ui->pltParam->get_plotter()->setOnlyGraphVisible(i);
-    ui->pltParam->zoomToFit();
-    ui->pltParam->update_plot();
-}
 
 void QFSPIMLightsheetEvaluationEditor::updateFitResultRanges()
 {
@@ -939,8 +955,9 @@ void QFSPIMLightsheetEvaluationEditor::doEvaluation(QFRawDataRecord *record) {
             lastMousePreviewY=data->getImageStackHeight(stack)/2;
             ui->spinStackPos->setValue(stackpos);
             //displayPreview();
-            displayEvaluationResults();
+            if (stackpos%(data->getImageStackFrames(stack)/10)==0) displayEvaluationResults();
         }
+        displayEvaluationResults();
         if (dlgEvaluationProgress) {
             if (dlgEvaluationProgress->wasCanceled()) break;
         }
