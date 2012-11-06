@@ -7,6 +7,7 @@
 #include "statistics_tools.h"
 #include "dlgcontactauthors.h"
 #include "dlgnewversion.h"
+#include "dlgrdrsetproperty.h"
 
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
@@ -908,6 +909,8 @@ void MainWindow::createActions() {
     connect(actRDRReplace, SIGNAL(triggered()), this, SLOT(rdrReplace()));
     actRDRUndoReplace=new QAction(tr("undo last find/replace"), this);
     connect(actRDRUndoReplace, SIGNAL(triggered()), this, SLOT(rdrUndoReplace()));
+    actRDRSetProperty=new QAction(tr("set property in multiple RDRs"), this);
+    connect(actRDRSetProperty, SIGNAL(triggered()), this, SLOT(rdrSetProperty()));
 
     actPerformanceTest=new QAction(tr("test QFProject performance"), this);
     connect(actPerformanceTest, SIGNAL(triggered()), this, SLOT(projectPerformanceTest()));
@@ -960,6 +963,8 @@ void MainWindow::createMenus() {
     projectToolsMenu=toolsMenu->addMenu(tr("project tools"));
     projectToolsMenu->addAction(actRDRReplace);
     projectToolsMenu->addAction(actRDRUndoReplace);
+    projectToolsMenu->addSeparator();
+    projectToolsMenu->addAction(actRDRSetProperty);
     debugToolsMenu=toolsMenu->addMenu(tr("debug tools"));
     debugToolsMenu->addAction(actPerformanceTest);
     toolsMenu->addSeparator();
@@ -1740,6 +1745,35 @@ void MainWindow::rdrUndoReplace() {
         QFRawDataRecord* rec=project->getRawDataByNum(i);
         rec->setName(rec->getProperty("LAST_REPLACENAME", rec->getName()).toString());
         rec->setFolder(rec->getProperty("LAST_REPLACEFOLDER", rec->getFolder()).toString());
+    }
+}
+
+void MainWindow::rdrSetProperty()
+{
+    if (project) {
+        dlgRDRSetProperty* dlg=new dlgRDRSetProperty(this);
+
+        dlg->init(project);
+
+        if (dlg->exec()) {
+            QList<QPointer<QFRawDataRecord> > rdrs=dlg->getSelectedRDRs();
+            QStringList propNames=dlg->getNewPropNames();
+            QList<QVariant> propValues=dlg->getNewPropValues();
+
+            for (int i=0; i<rdrs.size(); i++) {
+                rdrs[i]->disableEmitPropertiesChanged();
+                for (int j=0; j<propNames.size(); j++) {
+                    //qDebug()<<rdrs[i]->getName()<<"\n   set "<<propNames[j]<<" = "<<propValues.value(j, QVariant(QString("")));
+                    if (!propNames.value(j, "").isEmpty()) {
+                        bool ex=rdrs[i]->propertyExists(propNames.value(j));
+                        if ((ex && dlg->doOverwrite()) || (!ex && dlg->doCreateNew())) rdrs[i]->setQFProperty(propNames[j], propValues.value(j, QVariant(QString(""))), true, true);
+                    }
+                }
+                rdrs[i]->enableEmitPropertiesChanged(true);
+            }
+        }
+
+        delete dlg;
     }
 }
 

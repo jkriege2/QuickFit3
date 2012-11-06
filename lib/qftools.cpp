@@ -242,6 +242,16 @@ double CQStringToDouble(QString value) {
     return loc.toDouble(value) ;
 }
 
+double QStringToDouble(QString value) {
+    QString v=value;
+    if (value.contains(',')) {
+        v=value.replace(',', '.');
+    }
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    return loc.toDouble(v) ;
+}
+
 QString boolToQString(bool data) {
     if (data) return QString("true");
     return QString("false");

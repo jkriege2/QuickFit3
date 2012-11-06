@@ -4189,8 +4189,10 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
     dlg->addWidget(tr("which statistics?"), listMode);
 
     QComboBox* cmbMode=new QComboBox(dlg);
-    cmbMode->addItem(tr("data in columns"));
-    cmbMode->addItem(tr("data in rows"));
+    cmbMode->addItem(tr("one column per parameter"));
+    cmbMode->addItem(tr("one row per parameter"));
+    cmbMode->addItem(tr("all parameters in one row"));
+    cmbMode->addItem(tr("all parameters in one column"));
     cmbMode->setCurrentIndex(settings->value(prefix+"cmbMode", 0).toInt());
     dlg->addWidget(tr("result table orientation"), cmbMode);
 
@@ -4312,73 +4314,62 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
         QList<QList<double> > result;
         QList<int> items=dlg->getSelectedIndexes();
         QStringList colNames, rowNames;
-        for (int d=0; d<data.size(); d++) {
-            for (int i=0; i<items.size(); i++) {
-                if (d==0) {
-                    rowNames.append(names.value(items[i], ""));
+        if (cmbMode->currentIndex()<=1) {
+            for (int d=0; d<data.size(); d++) {
+                for (int i=0; i<items.size(); i++) {
+                    if (d==0) {
+                        rowNames.append(names.value(items[i], ""));
+                    }
+                    QList<double> r;
+                    r.clear();
+                    QList<double> gvalues, gvalues_s;
+                    gvalues_s=gvalues=data[d].gvalues[items[i]];
+                    qSort(gvalues_s);
+                    if (listMode->item(0)->checkState()==Qt::Checked) { r.append(qfstatisticsAverage(gvalues)); if (i==0) colNames<<tr("average"); }
+                    if (listMode->item(1)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMedian(gvalues_s)); if (i==0) colNames<<tr("median"); }
+                    if (listMode->item(2)->checkState()==Qt::Checked) { r.append(sqrt(qfstatisticsVariance(gvalues))); if (i==0) colNames<<tr("stdDev"); }
+                    if (listMode->item(3)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.25)); if (i==0) colNames<<tr("quantile25"); }
+                    if (listMode->item(4)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.75)); if (i==0) colNames<<tr("quantile75"); }
+                    if (listMode->item(5)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMin(gvalues_s)); if (i==0) colNames<<tr("minimum"); }
+                    if (listMode->item(6)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMax(gvalues_s)); if (i==0) colNames<<tr("maximum"); }
+                    result<<r;
                 }
-                QList<double> r;
-                r.clear();
-                QList<double> gvalues, gvalues_s;
-                gvalues_s=gvalues=data[d].gvalues[items[i]];
-                qSort(gvalues_s);
-                if (listMode->item(0)->checkState()==Qt::Checked) { r.append(qfstatisticsAverage(gvalues)); if (i==0) colNames<<tr("average"); }
-                if (listMode->item(1)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMedian(gvalues_s)); if (i==0) colNames<<tr("median"); }
-                if (listMode->item(2)->checkState()==Qt::Checked) { r.append(sqrt(qfstatisticsVariance(gvalues))); if (i==0) colNames<<tr("stdDev"); }
-                if (listMode->item(3)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.25)); if (i==0) colNames<<tr("quantile25"); }
-                if (listMode->item(4)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.75)); if (i==0) colNames<<tr("quantile75"); }
-                if (listMode->item(5)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMin(gvalues_s)); if (i==0) colNames<<tr("minimum"); }
-                if (listMode->item(6)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMax(gvalues_s)); if (i==0) colNames<<tr("maximum"); }
-                result<<r;
+            }
+
+
+            if (cmbMode->currentIndex()==0) {
+                csvCopy(csvDataRotate(result), colNames, rowNames);
+            } else {
+                csvCopy(result, rowNames, colNames);
+
+            }
+        } else if (cmbMode->currentIndex()<=3) {
+            QList<double> r;
+            r.clear();
+            for (int d=0; d<data.size(); d++) {
+                for (int i=0; i<items.size(); i++) {
+                    QList<double> gvalues, gvalues_s;
+                    gvalues_s=gvalues=data[d].gvalues[items[i]];
+                    qSort(gvalues_s);
+                    if (listMode->item(0)->checkState()==Qt::Checked) { r.append(qfstatisticsAverage(gvalues)); colNames<<tr("average(%1)").arg(names.value(items[i], "")); }
+                    if (listMode->item(1)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMedian(gvalues_s)); colNames<<tr("median(%1)").arg(names.value(items[i], "")); }
+                    if (listMode->item(2)->checkState()==Qt::Checked) { r.append(sqrt(qfstatisticsVariance(gvalues))); colNames<<tr("stdDev(%1)").arg(names.value(items[i], "")); }
+                    if (listMode->item(3)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.25));  colNames<<tr("quantile25(%1)").arg(names.value(items[i], "")); }
+                    if (listMode->item(4)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.75)); colNames<<tr("quantile75(%1)").arg(names.value(items[i], "")); }
+                    if (listMode->item(5)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMin(gvalues_s)); colNames<<tr("minimum(%1)").arg(names.value(items[i], "")); }
+                    if (listMode->item(6)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMax(gvalues_s)); colNames<<tr("maximum(%1)").arg(names.value(items[i], "")); }
+                }
+            }
+            result<<r;
+
+
+            if (cmbMode->currentIndex()==2) {
+                csvCopy(csvDataRotate(result), colNames, rowNames);
+            } else {
+                csvCopy(result, rowNames, colNames);
+
             }
         }
-        /*QString csv, csvLocale;
-        QLocale loc;
-        loc.setNumberOptions(QLocale::OmitGroupSeparator);
-        int results=0;
-        for (int r=0; r<result.size(); r++) {
-            if (result[r].size()>results) results=result[r].size();
-        }*/
-
-        if (cmbMode->currentIndex()==0) {
-            csvCopy(csvDataRotate(result), colNames, rowNames);
-            /*for (int r=0; r<result.size(); r++) {
-                for (int c=0; c<results; c++) {
-                    if (c>0) {
-                        csv+=", ";
-                        csvLocale+="; ";
-                    }
-                    csvLocale+=loc.toString(result[r].at(c));
-                    csv+=CDoubleToQString(result[r].at(c));
-                }
-
-                csv+="\n";
-                csvLocale+="\n";
-            }*/
-        } else {
-            csvCopy(result, rowNames, colNames);
-             /*for (int c=0; c<results; c++) {
-                for (int r=0; r<result.size(); r++) {
-                    if (r>0) {
-                        csv+=", ";
-                        csvLocale+="; ";
-                    }
-                    csvLocale+=loc.toString(result[r].at(c));
-                    csv+=CDoubleToQString(result[r].at(c));
-                }
-
-                csv+="\n";
-                csvLocale+="\n";
-            }*/
-
-        }
-
-        /*QClipboard *clipboard = QApplication::clipboard();
-        QMimeData* mime=new QMimeData();
-        mime->setText(csvLocale);
-        mime->setData("jkqtplotter/csv", csv.toUtf8());
-        mime->setData("quickfit/csv", csv.toUtf8());
-        clipboard->setMimeData(mime);*/
     }
 }
 

@@ -38,7 +38,8 @@ HEADERS += mainwindow.h \
     qfrdrreplacedialog.h \
     qfhtmlhelpwindow.h \
     dlgcontactauthors.h \
-    dlgnewversion.h
+    dlgnewversion.h \
+    dlgrdrsetproperty.h
 
 SOURCES += main.cpp \
            mainwindow.cpp \
@@ -46,14 +47,16 @@ SOURCES += main.cpp \
     qfrdrreplacedialog.cpp \
     qfhtmlhelpwindow.cpp \
     dlgcontactauthors.cpp \
-    dlgnewversion.cpp
+    dlgnewversion.cpp \
+    dlgrdrsetproperty.cpp
 
 FORMS =    optionsdialog.ui \
            about.ui \
            aboutplugins.ui \
     qfrdrreplacedialog.ui \
     dlgcontactauthors.ui \
-    dlgnewversion.ui
+    dlgnewversion.ui \
+    dlgrdrsetproperty.ui
 
 RESOURCES += quickfit3.qrc
 

@@ -213,6 +213,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
 
         void rdrReplace();
         void rdrUndoReplace();
+        void rdrSetProperty();
 
         void projectPerformanceTest();
 
@@ -289,6 +290,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         QAction* actRDRReplace;
         QAction* actRDRUndoReplace;
         QAction* actPerformanceTest;
+        QAction* actRDRSetProperty;
         QProgressBar* prgMainProgress;
 
         /** \brief length of the list of recently opened files */

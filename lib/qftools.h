@@ -193,6 +193,12 @@ QFLIB_EXPORT QString CDoubleListToQString(const QList<double> values, const QStr
 */
 QFLIB_EXPORT double CQStringToDouble(QString value);
 
+/*! \brief convert a QString to a double and accept ',' and '.' as decimal separator
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT double QStringToDouble(QString value);
+
 /*! \brief convert a string \a data to a boolean
     \ingroup qf3lib_tools
 
