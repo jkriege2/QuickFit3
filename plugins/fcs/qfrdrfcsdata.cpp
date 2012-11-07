@@ -520,14 +520,14 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
                     }
                     if (mode==0) { // tau, corr, corr, ...
                         for (int c=1; c<columns; c++) {
-                            correlation[(run0+c-1)*rateN+l]=data[ii].tab->get(c, l);
+                            correlation[(run0+c-1)*correlationN+l]=data[ii].tab->get(c, l);
                         }
                         runincrement=(columns-1);
                     } else if (mode==1) { // tau, corr, error, corr, error, ...
                         for (int c=1; c<columns; c+=2) {
                             if (c+1<columns) {
-                                correlation[(run0+(c-1)/2)*rateN+l]=data[ii].tab->get(c, l);
-                                correlationErrors[(run0+(c-1)/2)*rateN+l]=data[ii].tab->get(c+1, l);
+                                correlation[(run0+(c-1)/2)*correlationN+l]=data[ii].tab->get(c, l);
+                                correlationErrors[(run0+(c-1)/2)*correlationN+l]=data[ii].tab->get(c+1, l);
                             }
                         }
                         runincrement=(columns-1)/2;
