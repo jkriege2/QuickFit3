@@ -105,10 +105,7 @@ void QFESPIMB040SimpleCameraConfig::closeEvent ( QCloseEvent * event ) {
         camView->hide();
     }
     // disconnect devices and close camera view:
-    if (actDisConnect->isChecked()) {
-        disconnectDevice();
-        actDisConnect->setChecked(false);
-    }
+    disconnectDevice();
     //qDebug()<<"closed";
 }
 

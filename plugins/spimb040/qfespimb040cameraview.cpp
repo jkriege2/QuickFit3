@@ -401,6 +401,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     QFont f=font();
     f.setPointSizeF(1.3*f.pointSizeF());
     labGraphMean->setFont(f);
+    labGraphMean->setWordWrap(true);
     ggl->addWidget(labGraphMean);
 
     QWidget* wgset=new QWidget(w);
