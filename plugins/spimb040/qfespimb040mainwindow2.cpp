@@ -2651,7 +2651,7 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString &lightpathName, const Q
          QMapIterator<QString, QVariant> it(acquisitionDescription);
          while(it.hasNext()) {
              it.next();
-             acquisitionDescription1[imageID+"/"+it.key()]=it.value();
+             acquisitionDescription2[imageID+"/"+it.key()]=it.value();
          }
          log_text(tr("  - acquired %1 image from camera 2!\n").arg(imageDescription));
          acquisitionDescription2[imageID+"/timestamp"]=time;

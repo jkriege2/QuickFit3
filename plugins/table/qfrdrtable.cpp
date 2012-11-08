@@ -18,8 +18,8 @@ QFRDRTable::GraphInfo::GraphInfo() {
     color=QColor("red");
     errorColor=color.darker();
     linewidth=1;
-    symbol=JKQTPplus;
-    symbolSize=10;
+    symbol=JKQTPfilledCircle;
+    symbolSize=15;
     errorStyle=JKQTPnoError;
     drawLine=true;
     errorStyle=JKQTPerrorBars;
