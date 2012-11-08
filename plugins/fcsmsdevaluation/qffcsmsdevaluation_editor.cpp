@@ -1572,7 +1572,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
 
     JKQTPdatastore* dsdist=pltDistResults->get_plotter()->getDatastore();
 
-    bool updt=pltDistResults->get_doDrawing();
+    bool updt=true;//pltDistResults->get_doDrawing();
     pltDistResults->set_doDrawing(false);
     pltDistResults->clearGraphs();
     pltDistResults->get_plotter()->set_showKey(chkShowKeyDistResults->isChecked());
@@ -1591,55 +1591,63 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
 
     QVector<double> fitTau;
     QVector<double> fitD, fitA;
-    if (distTau.size()>1 && dist.size()>1 && wid>=3) {
+    if (distTau.size()>1 && dist.size()>1 && wid>=3 && eval->hasResults()) {
         for (int i=first; i<=qMin(last, distTau.size()-1) ; i+=qMax(1,wid/7)) {
         //for (int i=data_start; i<data_end; i+=qMax(1,wid/5)) {
             double* t=(double*)calloc(wid, sizeof(double));
             double* d=(double*)calloc(wid, sizeof(double));
             int cnt=0;
+            bool ok=true;
             for (int j=i; j<=qMin(qMin(last, distTau.size()-1), i+wid-1); j++) {
                 t[cnt]=distTau[j];
                 d[cnt]=log(dist[j]);
+                ok=ok&&QFFloatIsOK(d[cnt])&&QFFloatIsOK(t[cnt])&&(dist[j]>0);
                 cnt++;
             }
 
             if (cnt>=wid) {
-                //qDebug()<<"fit "<<cnt<<" datapoints ...";
-                fitTau.append(t[cnt/2]);
+                if (ok) {
+                    //qDebug()<<"fit "<<cnt<<" datapoints ...";
 
-                double pout[2];
-                int n_par = 2; // number of parameters
-                int m_dat = cnt; // number of data pairs
-                //pout[0]=eval->getTheoryD(0);
-                //pout[1]=eval->getTheoryAlpha(0);
-                pout[1]=(d[0]-d[cnt-1])/(log(t[0])-log(t[cnt-1]));
-                pout[0]=(d[0]-pout[1]*log(t[0]))/6.0;
-                lm_status_struct status;
-                lm_control_struct control = lm_control_double;
-                control.maxcall=500;
-                control.printflags = 0; // monitor status (+1) and parameters (+2)
-                lmcurve_fit( n_par, pout, m_dat, t, d, fMSD_lin, &control, &status );
+                    double pout[2];
+                    int n_par = 2; // number of parameters
+                    int m_dat = cnt; // number of data pairs
+                    //pout[0]=eval->getTheoryD(0);
+                    //pout[1]=eval->getTheoryAlpha(0);
+                    pout[1]=(d[0]-d[cnt-1])/(log(t[0])-log(t[cnt-1]));
+                    pout[0]=(d[0]-pout[1]*log(t[0]))/6.0;
+                    //qDebug()<<"fit "<<cnt<<" datapoints ...   t[0]="<<t[0]<<"   t[cnt-1]="<<t[cnt-1]<<"   d[0]="<<d[0]<<"   p_initial = ["<<pout[0]<<"; "<<pout[1]<<"]";
+                    lm_status_struct status;
+                    lm_control_struct control = lm_control_double;
+                    control.maxcall=300;
+                    control.printflags = 0; // monitor none (0) monitor status (+1) and parameters (+2)
+                    lmcurve_fit( n_par, pout, m_dat, t, d, fMSD_lin, &control, &status );
+                    //qDebug()<<"      p_result = ["<<pout[0]<<"; "<<pout[1]<<"]";
 
-                fitD.append(pout[0]);
-                fitA.append(pout[1]);
-                //qDebug()<<"    fit results  D="<<pout[0]<<"  a="<<pout[1];
+                    if (QFFloatIsOK(t[cnt/2]) && QFFloatIsOK(pout[0]) && QFFloatIsOK(pout[1]) && QString(lm_infmsg[status.info]).contains("success")) {
+                        fitTau.append(t[cnt/2]);
+                        fitD.append(pout[0]);
+                        fitA.append(pout[1]);
+                    }
+                    //qDebug()<<"    fit results  D="<<pout[0]<<"  a="<<pout[1];
 
-                /*for (int z=0; z<cnt; z++) {
-                    d[z]=exp(fMSD_lin(t[z], pout));
+                    /*for (int z=0; z<cnt; z++) {
+                        d[z]=exp(fMSD_lin(t[z], pout));
+                    }
+
+                    size_t ct=pltDistribution->getDatastore()->addCopiedColumn(t, cnt);
+                    size_t cf=pltDistribution->getDatastore()->addCopiedColumn(d, cnt);
+                    JKQTPxyLineGraph* g_msdfit=new JKQTPxyLineGraph(pltDistribution->get_plotter());
+                    g_msdfit->set_drawLine(true);
+                    g_msdfit->set_title("");
+                    g_msdfit->set_xColumn(ct);
+                    g_msdfit->set_yColumn(cf);
+                    g_msdfit->set_symbol(JKQTPnoSymbol);
+                    g_msdfit->set_symbolSize(7);
+                    g_msdfit->set_color(QColor("black"));
+                    g_msdfit->set_lineWidth(0.5);
+                    pltDistribution->addGraph(g_msdfit);*/
                 }
-
-                size_t ct=pltDistribution->getDatastore()->addCopiedColumn(t, cnt);
-                size_t cf=pltDistribution->getDatastore()->addCopiedColumn(d, cnt);
-                JKQTPxyLineGraph* g_msdfit=new JKQTPxyLineGraph(pltDistribution->get_plotter());
-                g_msdfit->set_drawLine(true);
-                g_msdfit->set_title("");
-                g_msdfit->set_xColumn(ct);
-                g_msdfit->set_yColumn(cf);
-                g_msdfit->set_symbol(JKQTPnoSymbol);
-                g_msdfit->set_symbolSize(7);
-                g_msdfit->set_color(QColor("black"));
-                g_msdfit->set_lineWidth(0.5);
-                pltDistribution->addGraph(g_msdfit);*/
 
             }
 
@@ -1704,6 +1712,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
         // ensure replot, if we have to
         pltDistResults->set_doDrawing(true);
         pltDistResults->update_plot();
+        qDebug()<<"pltDistResults->update_plot(): "<<pltDistResults->get_xAxis()->getMin()<<" ... "<<pltDistResults->get_xAxis()->getMax()<<",     "<<pltDistResults->get_yAxis()->getMin()<<" ... "<<pltDistResults->get_yAxis()->getMax();
     }
     QApplication::restoreOverrideCursor();
 }
