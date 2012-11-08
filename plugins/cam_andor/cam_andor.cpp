@@ -573,7 +573,7 @@ bool QFExtensionCameraAndor::connectCameraDevice(unsigned int camera) {
 
         // initialize camera, if init fails, call ShutDown and the Initialize again ... if this also fails -> exit with an error!
         strcpy(path, detectorsIniPath.toStdString().c_str());
-        progress.setLabelText(tr("initializing camera %1 ...<br>&nbsp;&nbsp;&nbsp;&nbsp;detectorsIniPath='%2'").arg(camera).arg(detectorsIniPath));
+        progress.setLabelText(tr("initializing camera %1 ...<br>&nbsp;&nbsp;&nbsp;&nbsp;detectorsIniPath='%2'<br>&nbsp;&nbsp;&nbsp;&nbsp;<b>Note:</b> The program screen may freeze during this step ... in that case, please be patient, the program didn't crash!").arg(camera).arg(detectorsIniPath));
 
         QApplication::processEvents();
         QApplication::processEvents();
@@ -587,6 +587,8 @@ bool QFExtensionCameraAndor::connectCameraDevice(unsigned int camera) {
         }
 
 
+        progress.setLabelText(tr("initializing camera %1 ...<br>&nbsp;&nbsp;&nbsp;&nbsp;detectorsIniPath='%2'<br>&nbsp;&nbsp;&nbsp;&nbsp;acquiring camera configuration ...").arg(camera).arg(detectorsIniPath));
+
 
         // wait for >2 seconds and call QApplication::processEvents(); here and there,
         // so the widgets are updated
@@ -598,6 +600,8 @@ bool QFExtensionCameraAndor::connectCameraDevice(unsigned int camera) {
                 return false;
             }
         }
+
+
 
 
         // init CameraInfo object

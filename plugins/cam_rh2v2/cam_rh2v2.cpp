@@ -24,6 +24,7 @@ QFExtensionCameraRh2v2::QFExtensionCameraRh2v2(QObject* parent):
     autoflash=false;
     retries =10;
     retryDelay=1000;
+    connected=false;
   cameraSetting=(QFExtensionCameraRh2v2::cameraSettings*)calloc(2,sizeof(struct cameraSettings));
 
   cameraSetting[0].prefix=new QString("Radhard2");
@@ -463,7 +464,7 @@ QString QFExtensionCameraRh2v2::getCameraSensorName(unsigned int camera){
 }
 
 bool QFExtensionCameraRh2v2::isCameraConnected(unsigned int camera) {
-    return true;
+    return connected;
 }
 
 bool QFExtensionCameraRh2v2::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
@@ -514,7 +515,7 @@ bool QFExtensionCameraRh2v2::connectCameraDevice(unsigned int camera) {
                 log_text(tr("  %3\nflashing Radhard2 Master FPGA (%1) ... DONE!\n").arg(autoflashbitfileMaster).arg(flashMessage));
             } else {
                 log_error(tr("  %3\nflashing Radhard2 Master FPGA (%1) ... ERROR!\n").arg(autoflashbitfileMaster).arg(flashMessage));
-                return false;
+                return connected=false;
             }
         }
         if (QFile(autoflashbitfileSlave).exists()) {
@@ -525,14 +526,14 @@ bool QFExtensionCameraRh2v2::connectCameraDevice(unsigned int camera) {
                 log_text(tr("  %3\nflashing Radhard2 Slave FPGA (%1) ... DONE!\n").arg(autoflashbitfileSlave).arg(flashMessage));
             } else {
                 log_error(tr("  %3\nflashing Radhard2 Slave FPGA (%1) ... ERROR!\n").arg(autoflashbitfileSlave).arg(flashMessage));
-                return false;
+                return connected=false;
             }
 
         }
     } else {
         if (autoflash) log_warning(tr("could not flash Radhard2 FPGAs, as bit file '%1' or '%2' does not exist!\n").arg(autoflashbitfileMaster).arg(autoflashbitfileSlave));
     }
-    return true;
+    return connected=true;
 }
 
 void QFExtensionCameraRh2v2::disconnectCameraDevice(unsigned int camera) {
@@ -542,6 +543,7 @@ void QFExtensionCameraRh2v2::disconnectCameraDevice(unsigned int camera) {
   if(cameraSetting[camera].cor.pc!=NULL){
       cameraSetting[camera].cor.pc->stop(QString("UI"));
   }
+  connected=false;
 }
 
 double QFExtensionCameraRh2v2::getCameraExposureTime(unsigned int camera) {

@@ -106,8 +106,8 @@ void QFESPIMB040SimpleCameraConfig::closeEvent ( QCloseEvent * event ) {
     }
     // disconnect devices and close camera view:
     if (actDisConnect->isChecked()) {
-        actDisConnect->setChecked(false);
         disconnectDevice();
+        actDisConnect->setChecked(false);
     }
     //qDebug()<<"closed";
 }
@@ -450,7 +450,7 @@ void QFESPIMB040SimpleCameraConfig::disConnectAcquisitionDevice() {
     //std::cout<<"disConnectAcquisitionDevice()  dev="<<p.x()<<" cam="<<p.y()<<"  cam*="<<cam<<" extension*="<<extension<<std::endl;
 
     if (cam && extension) {
-        if (actDisConnect->isChecked()) {
+        if (!cam->isCameraConnected(camIdx)) {
             // connect to a device
 
             connectDevice(cmbAcquisitionDevice->currentExtension(), cmbAcquisitionDevice->currentExtensionCamera(), cmbAcquisitionDevice->currentCameraID(), cmbAcquisitionDevice->currentCameraQObject());
@@ -465,10 +465,10 @@ void QFESPIMB040SimpleCameraConfig::disConnectAcquisitionDevice() {
         } else {
             //disconnect from the current device and delete the settings widget
             displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
-            if (cam->isCameraConnected(camIdx))  {
+            //if (cam->isCameraConnected(camIdx))  {
                 cam->disconnectCameraDevice(camIdx);
 
-            }
+            //}
             if (m_log) m_log->log_text(tr("disconnected from device %1, camera %2!\n").arg(extension->getName()).arg(camIdx));
         }
     }

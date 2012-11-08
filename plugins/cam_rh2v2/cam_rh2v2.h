@@ -189,6 +189,7 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         bool autoflash;
         int retries;
         int retryDelay;
+        bool connected;
 				
 	public:
         bool reconfigure(unsigned int camera, const QSettings &settings, const QString& setName);
