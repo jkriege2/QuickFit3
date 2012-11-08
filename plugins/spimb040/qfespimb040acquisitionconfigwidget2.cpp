@@ -104,6 +104,8 @@ void QFESPIMB040AcquisitionConfigWidget2::loadSettings(QSettings& settings, QStr
     ui->cmbLightpathPreview3->setCurrentIndex(settings.value(prefix+"lightpathidx_preview3", -1).toInt());
     ui->chkLightpathPreview4->setChecked(settings.value(prefix+"lightpath_preview4", false).toBool());
     ui->cmbLightpathPreview4->setCurrentIndex(settings.value(prefix+"lightpathidx_preview4", -1).toInt());
+    ui->chkOnlyAcquisition1->setChecked(settings.value(prefix+"chkOnlyAcquisition1", false).toBool());
+    ui->chkOnlyAcquisition2->setChecked(settings.value(prefix+"chkOnlyAcquisition2", false).toBool());
 
     //qDebug()<<settings.value(prefix+"prevsettings1", "default").toString();
     on_chkUse1_toggled(ui->chkUse1->isChecked());
@@ -140,6 +142,8 @@ void QFESPIMB040AcquisitionConfigWidget2::storeSettings(QSettings& settings, QSt
     settings.setValue(prefix+"lightpath_preview3", ui->chkLightpathPreview3->isChecked());
     settings.setValue(prefix+"lightpathidx_preview4", ui->cmbLightpathPreview4->currentIndex());
     settings.setValue(prefix+"lightpath_preview4", ui->chkLightpathPreview4->isChecked());
+    settings.setValue(prefix+"chkOnlyAcquisition1", ui->chkOnlyAcquisition1->isChecked());
+    settings.setValue(prefix+"chkOnlyAcquisition2", ui->chkOnlyAcquisition2->isChecked());
 }
 
 
@@ -169,6 +173,16 @@ bool QFESPIMB040AcquisitionConfigWidget2::use2() const {
 
 bool QFESPIMB040AcquisitionConfigWidget2::overview() const {
     return ui->chkOverview->isChecked();
+}
+
+bool QFESPIMB040AcquisitionConfigWidget2::onlyAcquisition1() const
+{
+    return ui->chkOnlyAcquisition1->isChecked();
+}
+
+bool QFESPIMB040AcquisitionConfigWidget2::onlyAcquisition2() const
+{
+    return ui->chkOnlyAcquisition2->isChecked();
 }
 
 int QFESPIMB040AcquisitionConfigWidget2::frames1() const {

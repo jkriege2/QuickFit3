@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1123</width>
-    <height>664</height>
+    <height>743</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -180,50 +180,40 @@ p, li { white-space: pre-wrap; }
       <property name="margin">
        <number>0</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_9">
-        <property name="text">
-         <string>Ac&amp;quisition Settings:</string>
-        </property>
-        <property name="buddy">
-         <cstring>cmbAcquisitionSettings2</cstring>
-        </property>
-       </widget>
+      <item row="2" column="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_13">
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings2_2" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_12">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="labPreview2">
+      <item row="4" column="0">
+       <widget class="QLabel" name="labPreview2_4">
         <property name="text">
-         <string>Previe&amp;w Settings 1:</string>
-        </property>
-        <property name="buddy">
-         <cstring>cmbPreviewSettings2_1</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="labPreviewFrames2">
-        <property name="text">
-         <string># background fra&amp;mes:</string>
-        </property>
-        <property name="buddy">
-         <cstring>spinBackgroundFrames2</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="labPreview2_2">
-        <property name="text">
-         <string>Previe&amp;w Settings 2:</string>
-        </property>
-        <property name="buddy">
-         <cstring>cmbPreviewSettings2_1</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="labPreview2_3">
-        <property name="text">
-         <string>Previe&amp;w Settings 3:</string>
+         <string>Previe&amp;w Settings 4:</string>
         </property>
         <property name="buddy">
          <cstring>cmbPreviewSettings2_1</cstring>
@@ -323,65 +313,45 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </item>
-      <item row="2" column="2">
-       <layout class="QHBoxLayout" name="horizontalLayout_13">
-        <item>
-         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings2_2" native="true">
-          <property name="minimumSize">
-           <size>
-            <width>150</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::TabFocus</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_12">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labPreview2">
+        <property name="text">
+         <string>Previe&amp;w Settings 1:</string>
+        </property>
+        <property name="buddy">
+         <cstring>cmbPreviewSettings2_1</cstring>
+        </property>
+       </widget>
       </item>
-      <item row="3" column="2">
-       <layout class="QHBoxLayout" name="horizontalLayout_14">
-        <item>
-         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings2_3" native="true">
-          <property name="minimumSize">
-           <size>
-            <width>150</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::TabFocus</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_13">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Ac&amp;quisition Settings:</string>
+        </property>
+        <property name="buddy">
+         <cstring>cmbAcquisitionSettings2</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="labPreviewFrames2">
+        <property name="text">
+         <string># background fra&amp;mes:</string>
+        </property>
+        <property name="buddy">
+         <cstring>spinBackgroundFrames2</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="labPreview2_2">
+        <property name="text">
+         <string>Previe&amp;w Settings 2:</string>
+        </property>
+        <property name="buddy">
+         <cstring>cmbPreviewSettings2_1</cstring>
+        </property>
+       </widget>
       </item>
       <item row="5" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -416,15 +386,45 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="labPreview2_4">
+      <item row="3" column="0">
+       <widget class="QLabel" name="labPreview2_3">
         <property name="text">
-         <string>Previe&amp;w Settings 4:</string>
+         <string>Previe&amp;w Settings 3:</string>
         </property>
         <property name="buddy">
          <cstring>cmbPreviewSettings2_1</cstring>
         </property>
        </widget>
+      </item>
+      <item row="3" column="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_14">
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings2_3" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_13">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
       <item row="4" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout_15">
@@ -456,6 +456,16 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </item>
+      <item row="6" column="0" colspan="3">
+       <widget class="QCheckBox" name="chkOnlyAcquisition2">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;use these checkboxes to deactivate the preview/background images for a camera. Some cameras (e.g. the Rh2V2 driver) do not support the single-frame polling acquisition mode well. In those cases make sure this checkbox is checked.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;The acquisition will proceed as usual for any non-checked camera. For the checked cameras, the background and preview acquisition will be omitted, i.e. also any switch to the single-frame acquisition mode of the driver!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>only acquisition, no background/previews</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -468,55 +478,35 @@ p, li { white-space: pre-wrap; }
       <property name="margin">
        <number>0</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Acquisition Se&amp;ttings:</string>
-        </property>
-        <property name="buddy">
-         <cstring>cmbAcquisitionSettings1</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="labPreview1">
-        <property name="text">
-         <string>&amp;Preview Settings 1:</string>
-        </property>
-        <property name="buddy">
-         <cstring>cmbPreviewSettings1_1</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="labPreviewFrames1">
-        <property name="text">
-         <string># background &amp;frames:</string>
-        </property>
-        <property name="buddy">
-         <cstring>spinBackgroundFrames1</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="labPreview1_2">
-        <property name="text">
-         <string>&amp;Preview Settings 2:</string>
-        </property>
-        <property name="buddy">
-         <cstring>cmbPreviewSettings1_1</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="labPreview1_3">
-        <property name="text">
-         <string>&amp;Preview Settings 3:</string>
-        </property>
-        <property name="buddy">
-         <cstring>cmbPreviewSettings1_1</cstring>
-        </property>
-       </widget>
+      <item row="4" column="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_10">
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_4" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_14">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
       <item row="3" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -548,23 +538,26 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </item>
-      <item row="2" column="2">
-       <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item row="5" column="2">
+       <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_2" native="true">
-          <property name="minimumSize">
+         <widget class="QSpinBox" name="spinBackgroundFrames1">
+          <property name="maximumSize">
            <size>
             <width>150</width>
-            <height>0</height>
+            <height>16777215</height>
            </size>
           </property>
-          <property name="focusPolicy">
-           <enum>Qt::TabFocus</enum>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>10000000</number>
           </property>
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_8">
+         <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -578,35 +571,15 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </item>
-      <item row="1" column="2">
-       <layout class="QHBoxLayout" name="horizontalLayout_8">
-        <item>
-         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_1" native="true">
-          <property name="minimumSize">
-           <size>
-            <width>150</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::TabFocus</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_6">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Acquisition Se&amp;ttings:</string>
+        </property>
+        <property name="buddy">
+         <cstring>cmbAcquisitionSettings1</cstring>
+        </property>
+       </widget>
       </item>
       <item row="0" column="2">
        <widget class="QWidget" name="horizontalWidget_4" native="true">
@@ -682,53 +655,40 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </item>
-      <item row="5" column="2">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QSpinBox" name="spinBackgroundFrames1">
-          <property name="maximumSize">
-           <size>
-            <width>150</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>10000000</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="labPreview1_4">
+      <item row="5" column="0">
+       <widget class="QLabel" name="labPreviewFrames1">
         <property name="text">
-         <string>&amp;Preview Settings 4:</string>
+         <string># background &amp;frames:</string>
+        </property>
+        <property name="buddy">
+         <cstring>spinBackgroundFrames1</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labPreview1">
+        <property name="text">
+         <string>&amp;Preview Settings 1:</string>
         </property>
         <property name="buddy">
          <cstring>cmbPreviewSettings1_1</cstring>
         </property>
        </widget>
       </item>
-      <item row="4" column="2">
-       <layout class="QHBoxLayout" name="horizontalLayout_10">
+      <item row="3" column="0">
+       <widget class="QLabel" name="labPreview1_3">
+        <property name="text">
+         <string>&amp;Preview Settings 3:</string>
+        </property>
+        <property name="buddy">
+         <cstring>cmbPreviewSettings1_1</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
         <item>
-         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_4" native="true">
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_2" native="true">
           <property name="minimumSize">
            <size>
             <width>150</width>
@@ -741,7 +701,7 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_14">
+         <spacer name="horizontalSpacer_8">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -754,6 +714,66 @@ p, li { white-space: pre-wrap; }
          </spacer>
         </item>
        </layout>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="labPreview1_2">
+        <property name="text">
+         <string>&amp;Preview Settings 2:</string>
+        </property>
+        <property name="buddy">
+         <cstring>cmbPreviewSettings1_1</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="labPreview1_4">
+        <property name="text">
+         <string>&amp;Preview Settings 4:</string>
+        </property>
+        <property name="buddy">
+         <cstring>cmbPreviewSettings1_1</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_1" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="6" column="0" colspan="3">
+       <widget class="QCheckBox" name="chkOnlyAcquisition1">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;use these checkboxes to deactivate the preview/background images for a camera. Some cameras (e.g. the Rh2V2 driver) do not support the single-frame polling acquisition mode well. In those cases make sure this checkbox is checked.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;The acquisition will proceed as usual for any non-checked camera. For the checked cameras, the background and preview acquisition will be omitted, i.e. also any switch to the single-frame acquisition mode of the driver!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>only acquisition, no background/previews</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

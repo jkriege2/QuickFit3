@@ -1735,6 +1735,9 @@ void QFESPIMB040MainWindow2::doAcquisition() {
     int repeatCnt=0;
     bool userCanceled=false;
 
+    bool doOverviewA1=!widAcquisition->onlyAcquisition1();
+    bool doOverviewA2=!widAcquisition->onlyAcquisition2();
+
 
     QProgressListDialog progress(tr("Image Series Acquisition"), tr("&Cancel"), 0, 100, this);
     progress.setWindowModality(Qt::WindowModal);
@@ -1870,7 +1873,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             //////////////////////////////////////////////////////////////////////////////////////
             // pacquire background series
             //////////////////////////////////////////////////////////////////////////////////////
-            ok = acquireSeries(lightpathName, "", tr("background image series"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1+"_background", acquisitionSettingsFilename1, backgroundDescription1, backgroundFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2+"_background", acquisitionSettingsFilename2, backgroundDescription2, backgroundFiles2, widAcquisition->currentBackgroundFrames(0), widAcquisition->currentBackgroundFrames(1), NULL, &progress, &userCanceled);
+            ok = acquireSeries(lightpathName, "", tr("background image series"), useCam1&&doOverviewA1, extension1, ecamera1, camera1, acquisitionPrefix1+"_background", acquisitionSettingsFilename1, backgroundDescription1, backgroundFiles1, useCam2&&doOverviewA2, extension2, ecamera2, camera2, acquisitionPrefix2+"_background", acquisitionSettingsFilename2, backgroundDescription2, backgroundFiles2, widAcquisition->currentBackgroundFrames(0), widAcquisition->currentBackgroundFrames(1), NULL, &progress, &userCanceled);
             if (!ok) {
                 ACQUISITION_ERROR(tr("  - error acquiring background image series!\n"));
             } else {
@@ -1900,7 +1903,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         for (int ovrImgI=0; ovrImgI<prevs.size(); ovrImgI++) {
             int ovrImg=prevs[ovrImgI];
             if (ok && widAcquisition->lightpathActivatedPreview(ovrImg)) {
-                if (ok && useCam1) {
+                if (ok && useCam1 && doOverviewA1) {
                     progress.setLabelText(tr("acquiring overview image from camera 1, lightpath %1 ...").arg(ovrImg+1));
                     QApplication::processEvents();
                     QString acquisitionPrefix=acquisitionPrefix1+QString("_overviewlp%1.tif").arg(ovrImg+1);
@@ -1917,7 +1920,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
                     }
 
                 }
-                if (ok && useCam2) {
+                if (ok && useCam2 && doOverviewA2) {
                     progress.setLabelText(tr("acquiring overview image from camera 2, lightpath %1 ...").arg(ovrImg+1));
                     QApplication::processEvents();
                     QString acquisitionPrefix=acquisitionPrefix1+QString("_overviewlp%1.tif").arg(ovrImg+1);
@@ -1977,7 +1980,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         for (int ovrImgI=0; ovrImgI<prevs.size(); ovrImgI++) {
             int ovrImg=prevs[ovrImgI];
             if (ok && widAcquisition->lightpathActivatedPreview(ovrImg)) {
-                if (ok && useCam1) {
+                if (ok && useCam1 && doOverviewA1) {
                     progress.setLabelText(tr("acquiring overview image from camera 1, lightpath %1 ...").arg(ovrImg+1));
                     QApplication::processEvents();
                     QString acquisitionPrefix=acquisitionPrefix1+QString("_overview_afterlp%1.tif").arg(ovrImg+1);
@@ -1994,7 +1997,7 @@ void QFESPIMB040MainWindow2::doAcquisition() {
                     }
 
                 }
-                if (ok && useCam2) {
+                if (ok && useCam2 && doOverviewA2) {
                     progress.setLabelText(tr("acquiring overview image from camera 2, lightpath %1 ...").arg(ovrImg+1));
                     QApplication::processEvents();
                     QString acquisitionPrefix=acquisitionPrefix1+QString("_overview_afterlp%1.tif").arg(ovrImg+1);

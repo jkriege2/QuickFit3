@@ -71,12 +71,22 @@ void QFESPIMB040FilenameTool::setGlobalReplaces(QFESPIMB040OpticsSetup *setup, Q
         setReplaceValue("experimenter", cleanStringForFilename(exp->getExperimenter()));
     }
     if (acq) {
-        setReplaceValue("cell0000", QString("%1").arg(acq->getCell(), 4, 10, QChar('0')));
-        setReplaceValue("well0000", QString("%1").arg(acq->getWell(), 4, 10, QChar('0')));
-        setReplaceValue("plate0000", QString("%1").arg(acq->getPlate(), 4, 10, QChar('0')));
         setReplaceValue("cell", QString::number(acq->getCell()));
+        setReplaceValue("cell00", QString("%1").arg(acq->getCell(), 2, 10, QChar('0')));
+        setReplaceValue("cell000", QString("%1").arg(acq->getCell(), 3, 10, QChar('0')));
+        setReplaceValue("cell0000", QString("%1").arg(acq->getCell(), 4, 10, QChar('0')));
+        setReplaceValue("sample", QString::number(acq->getCell()));
+        setReplaceValue("sample00", QString("%1").arg(acq->getCell(), 2, 10, QChar('0')));
+        setReplaceValue("sample000", QString("%1").arg(acq->getCell(), 3, 10, QChar('0')));
+        setReplaceValue("sample0000", QString("%1").arg(acq->getCell(), 4, 10, QChar('0')));
         setReplaceValue("well", QString::number(acq->getWell()));
+        setReplaceValue("well00", QString("%1").arg(acq->getWell(), 2, 10, QChar('0')));
+        setReplaceValue("well000", QString("%1").arg(acq->getWell(), 3, 10, QChar('0')));
+        setReplaceValue("well0000", QString("%1").arg(acq->getWell(), 4, 10, QChar('0')));
         setReplaceValue("plate", QString::number(acq->getPlate()));
+        setReplaceValue("plate00", QString("%1").arg(acq->getPlate(), 2, 10, QChar('0')));
+        setReplaceValue("plate000", QString("%1").arg(acq->getPlate(), 3, 10, QChar('0')));
+        setReplaceValue("plate0000", QString("%1").arg(acq->getPlate(), 4, 10, QChar('0')));
         setReplaceValue("comment", cleanStringForFilename(acq->getComment()));
     }
     setReplaceValue("today", QDate::currentDate().toString("yyyy_MM_dd"));
