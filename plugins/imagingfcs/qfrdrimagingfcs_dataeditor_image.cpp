@@ -4323,7 +4323,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                     QList<double> r;
                     r.clear();
                     QList<double> gvalues, gvalues_s;
-                    gvalues_s=gvalues=data[d].gvalues[items[i]];
+                    gvalues_s=gvalues=data[d].gvalues.value(items[i], QList<double>());
                     qSort(gvalues_s);
                     if (listMode->item(0)->checkState()==Qt::Checked) { r.append(qfstatisticsAverage(gvalues)); if (i==0) colNames<<tr("average"); }
                     if (listMode->item(1)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMedian(gvalues_s)); if (i==0) colNames<<tr("median"); }
@@ -4349,7 +4349,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
             for (int d=0; d<data.size(); d++) {
                 for (int i=0; i<items.size(); i++) {
                     QList<double> gvalues, gvalues_s;
-                    gvalues_s=gvalues=data[d].gvalues[items[i]];
+                    gvalues_s=gvalues=data[d].gvalues.value(items[i], QList<double>());
                     qSort(gvalues_s);
                     if (listMode->item(0)->checkState()==Qt::Checked) { r.append(qfstatisticsAverage(gvalues)); colNames<<tr("average(%1)").arg(names.value(items[i], "")); }
                     if (listMode->item(1)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMedian(gvalues_s)); colNames<<tr("median(%1)").arg(names.value(items[i], "")); }
