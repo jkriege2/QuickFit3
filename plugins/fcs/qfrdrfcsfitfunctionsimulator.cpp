@@ -618,6 +618,11 @@ void QFRDRFCSFitFunctionSimulator::updateNoiseEnabled()
     ui->spinMeasDuration->setEnabled(ui->cmbNoiseModel->currentIndex()==0);
 }
 
+void QFRDRFCSFitFunctionSimulator::showHelp()
+{
+    QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("fcs")+"/fcs_simulator.html");
+}
+
 
 
 

@@ -7,6 +7,8 @@
 #include <QLocale>
 #include <QDebug>
 #include <QElapsedTimer>
+#include <QSysInfo>
+#include <QProcess>
 
 QAction* getSeparatorAction(QObject* parent) {
     QAction* a=new QAction(parent);
@@ -481,6 +483,58 @@ int getApplicationBitDepth() {
     return 8*sizeof(void*);
 }
 
+QString getOSName() {
+    QString result="unknown OS";
+
+
+#ifdef Q_WS_X11
+    result=QObject::tr("Linux operating system");
+    QProcess uname;
+    uname.start("uname", QStringList() << "-r");
+    if (uname.waitForStarted(500)) {
+        if (uname.waitForFinished(500)) {
+            QByteArray ba=uname.readAllStandardOutput();
+            if (!ba.isEmpty()) result+=QString(" (%1)").arg(QString::fromLocal8Bit(ba));
+        }
+    }
+#endif
+
+#ifdef Q_WS_WIN
+    switch (QSysInfo::windowsVersion()) {
+        case QSysInfo::WV_32s: result=QObject::tr("Windows 3.1 with Win 32s"); break;
+        case QSysInfo::WV_95: result=QObject::tr("Windows 95"); break;
+        case QSysInfo::WV_98: result=QObject::tr("Windows 98"); break;
+        case QSysInfo::WV_Me: result=QObject::tr("Windows Me"); break;
+        case QSysInfo::WV_NT: result=QObject::tr("Windows NT 4.0"); break;
+        case QSysInfo::WV_2000: result=QObject::tr("Windows 2000"); break;
+        case QSysInfo::WV_XP: result=QObject::tr("Windows XP"); break;
+        case QSysInfo::WV_2003: result=QObject::tr("Windows Server 2003 or Windows Xp Professional 64-bit"); break;
+        case QSysInfo::WV_VISTA: result=QObject::tr("Windows Vista or Server 2008"); break;
+        case QSysInfo::WV_WINDOWS7: result=QObject::tr("Windows 7 or Server 2008 R2"); break;
+
+        default: result=QObject::tr("unknown Windows version"); break;
+    }
+#endif
+
+#ifdef Q_WS_MAC
+    switch (QSysInfo::MacintoshVersion) {
+        case QSysInfo::MV_10_3: result=QObject::tr("Mac OS X 10.3 (Panther)"); break;
+        case QSysInfo::MV_10_4: result=QObject::tr("Mac OS X 10.4 (Tiger)"); break;
+        case QSysInfo::MV_10_5: result=QObject::tr("Mac OS X 10.5 (Leopard)"); break;
+        case QSysInfo::MV_10_6: result=QObject::tr("Mac OS X 10.6 (Snowleopard)"); break;
+        case QSysInfo::MV_10_7: result=QObject::tr("Mac OS X 10.7 (Lion)"); break;
+        case QSysInfo::MV_Unknown: result=QObject::tr("unknown MacOS version"); break;
+        case QSysInfo::MV_9: result=QObject::tr("Mac OS 9 ); break;
+        case QSysInfo::MV_10_0: result=QObject::tr("Mac OS X 10.0 (Cheetah)"); break;
+        case QSysInfo::MV_10_1: result=QObject::tr("Mac OS X 10.1 (Puma)"); break;
+        case QSysInfo::MV_10_2: result=QObject::tr("Mac OS X 10.2 (Jaguar)"); break;
+
+        default: result=QObject::tr("unknown Windows version"); break;
+    }
+#endif
+
+    return result;
+}
 
 QString cleanStringForFilename(const QString& text, int maxLen, bool removeDot, bool removeSlash) {
     QString t=text.simplified();

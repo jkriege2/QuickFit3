@@ -396,7 +396,14 @@ void MainWindow::about() {
     QLabel* ui_label = qFindChild<QLabel*>(widget, "labSplash");
     QLabel* ui_labelLic = qFindChild<QLabel*>(widget, "labLicense");
     ui_label->setPixmap(splashPix);
-    ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote><b>contact the authors:</b><blockquote><a href=\"mailto:%6\">%6</a></blockquote><b>mailing list:</b><blockquote><a href=\"mailto:%8\">%8</a> (<a href=\"%9\">subscribe</a>)</blockquote><b>libraries, used by QuickFit:</b><ul><li>QuickFit library v%4.%5</li><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul><b>many thanks to:</b><blockquote>%2</blockquote><b>compiler used for this version:</b><blockquote>%7</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR).arg(QF_EMAIL).arg(Qt::escape(COMPILER)).arg(QF_MAILLIST).arg(QF_MAILLIST_REQUEST));
+    ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote>"
+                            "<b>many thanks to:</b><blockquote>%2</blockquote>"
+                            "<b>contact the authors:</b><blockquote><a href=\"mailto:%6\">%6</a></blockquote>"
+                            "<b>mailing list:</b><blockquote><a href=\"mailto:%8\">%8</a> (<a href=\"%9\">subscribe</a>)</blockquote>"
+                            "<b>QuickFit version:</b><blockquote>version %10 (%11) %14-bit, SVN: %12, COMPILEDATE: %13</blockquote>"
+                            "<b>libraries, used by QuickFit:</b><ul><li>QuickFit library v%4.%5</li><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul>"
+                            "<b>compiler used for this version:</b><blockquote>%7</blockquote>"
+                            "<b>operating system:</b><blockquote>%15</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR).arg(QF_EMAIL).arg(Qt::escape(COMPILER)).arg(QF_MAILLIST).arg(QF_MAILLIST_REQUEST).arg(QF_VERSION).arg(VERSION_STATUS).arg(SVNVERSION).arg(COMPILEDATE).arg(getApplicationBitDepth()).arg(getOSName()));
     ui_labelLic->setText(tr(QF_LICENSE));
     QFile f(":/quickfit3/releasenotes.html");
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {

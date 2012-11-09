@@ -2,18 +2,22 @@
 #include <QtGui>
 #include "qfrdrfcsdata.h"
 #include "dlgcsvparameters.h"
-#include "qfrdrfcsfitfunctionsimulator.h"
 #include <QtXml>
 
 QFPRDRFCS::QFPRDRFCS(QObject* parent):
     QObject(parent)
 {
     //ctor
+    dlgSimulator=NULL;
 }
 
 QFPRDRFCS::~QFPRDRFCS()
 {
-    //dtor
+    if (dlgSimulator) {
+        dlgSimulator->reject();
+        delete dlgSimulator;
+        dlgSimulator=NULL;
+    }
 }
 
 QFRawDataRecord* QFPRDRFCS::createRecord(QFProject* parent) {
@@ -32,7 +36,7 @@ void QFPRDRFCS::registerToMenu(QMenu* menu) {
     connect(actMultiFCS, SIGNAL(triggered()), this, SLOT(insertMultiFileFCS()));
     smenu->addAction(actMultiFCS);
     QAction* actFCSSim=new QAction(QIcon(":/fcs_simulate.png"), tr("FCS/DLS data from fit function"), parentWidget);
-    connect(actFCSSim, SIGNAL(triggered()), this, SLOT(insertSimulated()));
+    connect(actFCSSim, SIGNAL(triggered()), this, SLOT(openSimulator()));
     smenu->addAction(actFCSSim);
 }
 
@@ -256,12 +260,22 @@ void QFPRDRFCS::insertMultiFileFCS()
     }
 }
 
-void QFPRDRFCS::insertSimulated() {
-    QFRDRFCSFitFunctionSimulator* dlg=new QFRDRFCSFitFunctionSimulator(services, NULL);
-    if (dlg->exec()==QDialog::Accepted) {
-        QString CSV=dlg->getCSV();
+void QFPRDRFCS::openSimulator()
+{
+    if (!dlgSimulator) {
+        dlgSimulator=new QFRDRFCSFitFunctionSimulator(services, NULL);
+        connect(dlgSimulator, SIGNAL(accepted()), this, SLOT(insertSimulated()));
+    }
+    dlgSimulator->show();
+    dlgSimulator->raise();
 
-        QMap<QString, QVariant> p_sim=dlg->getParams();
+}
+
+void QFPRDRFCS::insertSimulated() {
+    if (dlgSimulator) {
+        QString CSV=dlgSimulator->getCSV();
+
+        QMap<QString, QVariant> p_sim=dlgSimulator->getParams();
         QMap<QString, QVariant> p;
         p["FILETYPE"]="INTERNAL";
         p["INTERNAL_CSV"]=CSV;

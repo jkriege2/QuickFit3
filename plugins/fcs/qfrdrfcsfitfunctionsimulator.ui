@@ -371,7 +371,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
@@ -442,14 +442,33 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>212</x>
-     <y>288</y>
+     <x>266</x>
+     <y>101</y>
     </hint>
     <hint type="destinationlabel">
-     <x>351</x>
-     <y>286</y>
+     <x>625</x>
+     <y>201</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>helpRequested()</signal>
+   <receiver>QFRDRFCSFitFunctionSimulator</receiver>
+   <slot>showHelp()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>452</x>
+     <y>470</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>313</y>
     </hint>
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>showHelp()</slot>
+ </slots>
 </ui>

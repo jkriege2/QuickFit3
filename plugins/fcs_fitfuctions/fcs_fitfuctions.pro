@@ -19,7 +19,8 @@ HEADERS += fcs_fitfuctions.h \
            qffitfunctionfcssimplediff.h \
     qffitfunctionfcsflow.h \
     qffitfunctionfcsrot.h \
-    qffitfunctionfcsoscillation.h
+    qffitfunctionfcsoscillation.h \
+    qffitfunctionfcsdiffD.h
 
 SOURCES += fcs_fitfuctions.cpp\
            qffitfunctionfcsmultidiffusion.cpp \
@@ -28,7 +29,8 @@ SOURCES += fcs_fitfuctions.cpp\
            qffitfunctionfcssimplediff.cpp \
     qffitfunctionfcsflow.cpp \
     qffitfunctionfcsrot.cpp \
-    qffitfunctionfcsoscillation.cpp
+    qffitfunctionfcsoscillation.cpp \
+    qffitfunctionfcsdiffD.cpp
 
 FORMS +=
 

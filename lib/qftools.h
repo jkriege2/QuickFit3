@@ -280,6 +280,11 @@ QFLIB_EXPORT QString qfGetSaveFileName ( QWidget * parent = 0, const QString & c
  */
 QFLIB_EXPORT int getApplicationBitDepth();
 
+/*! \brief returns the operating system's name as a QString
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QString getOSName();
+
 /*! \brief convert the given string to a string suitable for use in filenames
     \ingroup qf3lib_tools
 */

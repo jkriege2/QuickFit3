@@ -167,6 +167,7 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
         void replotFitFunction();
         void on_cmbNoiseModel_currentIndexChanged(int index);
         void updateNoiseEnabled();
+        void showHelp();
 };
 
 #endif // QFRDRFCSFITFUNCTIONSIMULATOR_H

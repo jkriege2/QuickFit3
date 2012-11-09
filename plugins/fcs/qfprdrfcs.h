@@ -2,6 +2,8 @@
 #define QFPRDRFCS_H
 
 #include "qfpluginrawdata.h"
+#include "qfrdrfcsfitfunctionsimulator.h"
+
 /*!
     \defgroup qf3rdrdp_fcs FCS Raw Data Record Plugin
     \ingroup qf3rawdataplugins
@@ -60,8 +62,11 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         /** \brief insert FCS data from multiple files into one RDR */
         void insertMultiFileFCS();
 
+        void openSimulator();
         void insertSimulated();
     protected:
+        QFRDRFCSFitFunctionSimulator* dlgSimulator;
+
         /*! \brief add a ALV5000 file to the current project
 
             \param filename filename of the ALV5000 file

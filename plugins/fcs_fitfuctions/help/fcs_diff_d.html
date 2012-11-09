@@ -5,7 +5,7 @@ $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$
 This plugin implements a 3D diffusion model for the fitting routines in QuickFit. The model may be denoted as: 
 <blockquote><img alt="\[ G(\tau)=G_\infty+\frac{1}{N}\cdot\left(\frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}\right)\cdot\left[(1-\rho_2-\rho_3)\cdot g_1(\tau)+\rho_2\cdot g_2(\tau)+\rho_3\cdot g_3(\tau)\right] \]" src="./pic/form_790.png"/></blockquote>
 with
-<blockquote><img alt="\[ g_i(\tau)=\left(1+\frac{\tau}{\tau_{diff,i}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff,i}}\right)^{-1/2} \]" src="./pic/form_200.png"/></blockquote>
+$$bmath:g_i(\tau)=\left(1+\frac{4D_i\cdot\tau}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{4D_i\cdot\tau}{\gamma^2w_{xy}^2}\right)^{-1/2}$$
 
 
 The parameters are:
@@ -23,9 +23,9 @@ The parameters are:
 <li><i>cps</i>: average background corrected intensity during the measurement, i.e. <i>cps=I</i><sub>measured</sub><i>-b</b> </li>
 
 </ul>
-This model also calculates the diffusion coefficient, if the width <img alt="$ w_{xy} $" src="./pic/form_300.png"/> of the laser focus (xy plane) is known, as: 
-<blockquote><img alt="\[ D=\frac{w_{xy}^2}{4\tau_D} \]" src="./pic/form_400.png"/></blockquote>
-where <img alt="$ \tau_D $" src="./pic/form_500.png"/> is the diffusion time. Also the effective focal volume <img alt="$ V_{eff} $" src="./pic/form_600.png"/> is calculated: </p>
+This model also calculates the diffusion time (retention time in the focus), if the width <img alt="$ w_{xy} $" src="./pic/form_300.png"/> of the laser focus (xy plane) is known, as: 
+$$bmath:\tau_D=\frac{w_{xy}^2}{4D}$$
+where $$math:D$$ is the diffusion coefficient. Also the effective focal volume <img alt="$ V_{eff} $" src="./pic/form_600.png"/> is calculated: </p>
 <blockquote><img alt="\[ V_{eff}=\pi^{3/2}\cdot\gamma\cdot w_{xy}^3 \]" src="./pic/form_700.png"/></blockquote>
 
 Given this focal volume, the plugin may also calculate the particle concentration in the sample: </p>
@@ -36,25 +36,10 @@ Given the count rate cps and the background count rate <i>b</i>, we can calculat
 The plugin also calculates some parameter errors: 
 <blockquote>
 	<img alt="\[ \Delta \left(\frac{1}{N}\right)=\left|\frac{\Delta N}{N^2}\right| \]" src="./pic/form_900.png"/><br>
-	<img alt="\[ \Delta D=\sqrt{\left(\Delta w_{xy}\cdot\frac{w_{xy}}{2\tau_D}\right)^2+\left(\Delta \tau_D\cdot\frac{w_{xy}^2}{4\tau_D^2}\right)^2} \]" src="./pic/form_100.png"/><br>
+        $$math:\Delta\tau_D=\sqrt{\left(\Delta w_{xy}\cdot\frac{w_{xy}}{2D}\right)^2+\left(\Delta D\cdot\frac{w_{xy}^2}{4D^2}\right)^2}$$<br>
 	<img alt="\[ \Delta V_{eff}=\sqrt{\left(\Delta\gamma\cdot\pi^{3/2}\cdot w_{xy}^3\right)^2+\left(\Delta w_{xy}\cdot 3\pi^{3/2}\cdot \gamma\cdot w_{xy}^2\right)^2} \]" src="./pic/form_110.png"/><br>
 	<img alt="\[ \Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^{3}}\right)^2+\left(\Delta\gamma\cdot\frac{N}{\pi^{3/2}\cdot w{xy}^3\cdot\gamma^2}\right)^2+\left(\Delta w_{xy}\cdot\frac{3\cdot N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^4}\right)^2} \]" src="./pic/form_120.png"/><br>
         <img  src="./pic/form_417.png">
 </blockquote>
 
-Here are some example sketches of correlation functions together with their interpretation:
-<table>
-  <tr>
-    <td><img src="./pic/acf_simplediffusion.png"></td>
-	<td><b>Interpretation of the parameters particle number <i>N</i> and diffusion time <i>&tau;</i><sub>D</sub> on the correlation function</b></td>
-  </tr>
-  <tr>
-    <td><img src="./pic/acf_multidiffusion.png"></td>
-	<td><b>Influence of two diffusing components on the correlation function</b></td>
-  </tr>
-  <tr>
-    <td><img src="./pic/acf_tripletdiffusion.png"></td>
-	<td><b>Influence of a triplet (non-fluorescenct) fraction on the autocorrelation function</b></td>
-  </tr>
-</table>
 </body></html>
