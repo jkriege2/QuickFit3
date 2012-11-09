@@ -507,6 +507,7 @@ void AndorSettingsDialog::calcTiming() {
 
     m_calcTiming=old_m_calcTiming;
     //qDebug()<<"calcTiming() ... done";
+    updateDuration();
 }
 
 
@@ -669,6 +670,11 @@ void AndorSettingsDialog::on_spinKineticCycleTime_valueChanged(double value) {
 void AndorSettingsDialog::on_spinAccCycleTime_valueChanged(double value) {
     if (m_updatingSubregion || m_updatingSensorSetup || m_calcTiming) return;
     calcTiming();
+}
+
+void AndorSettingsDialog::updateDuration()
+{
+    ui->labDuration->setText(QString("%1 s").arg(double(ui->spinKineticCycles->value())*ui->spinKineticCycleTime->value()/1000.0));
 }
 
 void AndorSettingsDialog::on_chkBaselineClamp_toggled(bool value) {

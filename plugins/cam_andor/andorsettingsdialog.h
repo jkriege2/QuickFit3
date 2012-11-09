@@ -122,6 +122,8 @@ private slots:
     void on_spinKineticCycleTime_valueChanged(double value);
     void on_spinAccCycleTime_valueChanged(double value);
 
+    void updateDuration();
+
 };
 
 #endif // ANDORSETTINGSDIALOG_H
