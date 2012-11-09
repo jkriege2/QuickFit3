@@ -263,6 +263,11 @@ bool QFRDRImagingFCSPlugin::parseSPIMSettings(const QString& filename_settings, 
             initParams["EXPOSURE_TIME"]=settings.value("acquisition/exposure_time").toDouble();
             paramsReadonly<<"EXPOSURE_TIME";
         }
+
+        if (settings.contains("acquisition/duration")) {
+            initParams["DURATION"]=settings.value("acquisition/duration").toDouble();
+            paramsReadonly<<"DURATION";
+        }
         if (settings.contains("acquisition/frame_time")) {
             initParams["FRAME_TIME"]=settings.value("acquisition/frame_time").toDouble();
             paramsReadonly<<"FRAME_TIME";
@@ -846,7 +851,22 @@ void QFRDRImagingFCSPlugin::insertRH2CorFile(const QString& filename) {
 
     bool ok=true, okk=true;
 
-    int height=QInputDialog::getInt(NULL, tr("Radhard2 image properties"), tr("Height [ROI]= "), 32, 1, 100000, 1, &okk);
+    int roi_height=32;
+
+    QString configFile=findB040ExperimentDescriptionForData(filename);
+    if (QFile::exists(configFile)) {
+        QSettings settings(configFile, QSettings::IniFormat);
+        int roi_start=settings.value("acquisition/acquisition/roi_ystart", settings.value("acquisition/acquisition/roi_xstart", settings.value("acquisition/roi_ystart", settings.value("acquisition/roi_xstart", 0)))).toInt();
+        int roi_end=settings.value("acquisition/acquisition/roi_yend", settings.value("acquisition/acquisition/roi_xend", settings.value("acquisition/roi_yend", settings.value("acquisition/roi_xend", 31)))).toInt();
+        roi_height=roi_end-roi_start+1;
+        if (roi_height<=0) roi_height=32;
+        /*qDebug()<<"read RH2 config: "<<configFile;
+        qDebug()<<"roi_start:  "<<roi_start;
+        qDebug()<<"roi_end:  "<<roi_end;
+        qDebug()<<"roi_height:  "<<roi_height;*/
+    }
+
+    int height=QInputDialog::getInt(NULL, tr("Radhard2 image properties"), tr("Height [ROI]= "), roi_height, 1, 100000, 1, &okk);
     ok=ok&&okk;
     int width=32;
     ok=ok&&okk;
@@ -887,7 +907,7 @@ void QFRDRImagingFCSPlugin::insertRH2CorFile(const QString& filename) {
         files_types<<"acf";
         files_descriptions<<tr("correlation data from SPAD array");
         QString description="";
-        QString filename_settings=findB040ExperimentDescriptionForData(filename);
+        QString filename_settings=configFile;
         if (QFile::exists(filename_settings)) parseSPIMSettings(filename_settings,  description,  initParams,  paramsReadonly,  files,  files_types,  files_descriptions);
 
 
