@@ -393,7 +393,8 @@ void QFLightSourceConfigWidget::updateLSLinesWidgets() {
             linesLayout->addWidget(w.labPower, line, 2);
             lineWidgets.append(w);
             connect(w.chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
-            connect(w.spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+            //connect(w.spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+            connect(w.spinPower, SIGNAL(editingFinished ()), this, SLOT(setPowerEditingFinished()));
         }
     }
 
@@ -403,7 +404,8 @@ void QFLightSourceConfigWidget::updateLSLinesWidgets() {
         double max=0;
         lightSource->getLightSourceLinePowerRange(id, i, min, max);
         disconnect(lineWidgets[i].chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
-        disconnect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+        //disconnect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+        disconnect(lineWidgets[i].spinPower, SIGNAL(editingFinished ()), this, SLOT(setPowerEditingFinished()));
         lineWidgets[i].spinPower->setRange(min, max);
         lineWidgets[i].spinPower->setValue(lightSource->getLightSourceCurrentSetPower(id, i));
         lineWidgets[i].spinPower->setSuffix(QString(" ")+lightSource->getLightSourceLinePowerUnit(id, i));
@@ -411,7 +413,8 @@ void QFLightSourceConfigWidget::updateLSLinesWidgets() {
         lineWidgets[i].chkEnable->setChecked(lightSource->getLightSourceLineEnabled(id, i));
         lineWidgets[i].labPower->setText(QString("%1 %2").arg(lightSource->getLightSourceCurrentMeasuredPower(id, i)).arg(lightSource->getLightSourceLinePowerUnit(id, i)));
         connect(lineWidgets[i].chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
-        connect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+        //connect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+        connect(lineWidgets[i].spinPower, SIGNAL(editingFinished ()), this, SLOT(setPowerEditingFinished()));
     }
 
     linesLayoutWidget->setVisible(newLines>0);
@@ -443,13 +446,14 @@ void QFLightSourceConfigWidget::displayStates() {
         bool enabled=!moving && LightSource->isLastLightSourceActionFinished(LightSourceID);
         for (int i=0; i<lineWidgets.size(); i++) {
             disconnect(lineWidgets[i].chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
-            disconnect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+            //disconnect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+            disconnect(lineWidgets[i].spinPower, SIGNAL(editingFinished ()), this, SLOT(setPowerEditingFinished()));
             if (enabled) {
                 lineWidgets[i].chkEnable->setChecked(LightSource->getLightSourceLineEnabled(LightSourceID, i));
             }
 
             double setP=LightSource->getLightSourceCurrentSetPower(LightSourceID, i);
-            if (enabled && (lineWidgets[i].spinPower->value()!=setP)) lineWidgets[i].spinPower->setValue(setP);
+            if (enabled && (lineWidgets[i].spinPower->value()!=setP) && !lineWidgets[i].spinPower->hasFocus()) lineWidgets[i].spinPower->setValue(setP);
 
             lineWidgets[i].labPower->setText(QString("%1 %2").arg(LightSource->getLightSourceCurrentMeasuredPower(LightSourceID, i)).arg(LightSource->getLightSourceLinePowerUnit(LightSourceID, i)));
             lineWidgets[i].chkEnable->setText(LightSource->getLightSourceLineDescription(LightSourceID, i));
@@ -459,7 +463,8 @@ void QFLightSourceConfigWidget::displayStates() {
             lineWidgets[i].labPower->setEnabled(enabled);
 
             connect(lineWidgets[i].chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
-            connect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+            //connect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+            connect(lineWidgets[i].spinPower, SIGNAL(editingFinished ()), this, SLOT(setPowerEditingFinished()));
         }
     }
 
@@ -522,7 +527,8 @@ void QFLightSourceConfigWidget::linesChanged(QTime time, QList<bool> lineenabled
     for (int i=0; i<lineWidgets.size(); i++) {
         if (i<lineenabled.size()) {
             disconnect(lineWidgets[i].chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
-            disconnect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+            //disconnect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+            disconnect(lineWidgets[i].spinPower, SIGNAL(editingFinished ()), this, SLOT(setPowerEditingFinished()));
 
             bool enabled=widgetsEnabled.value(i, false);
 
@@ -530,7 +536,7 @@ void QFLightSourceConfigWidget::linesChanged(QTime time, QList<bool> lineenabled
             if (en!=lineWidgets[i].chkEnable->isEnabled()) lineWidgets[i].chkEnable->setChecked(en);
 
             double setP=setValues.value(i, lineWidgets[i].spinPower->value());
-            if (enabled && (lineWidgets[i].spinPower->value()!=setP)) lineWidgets[i].spinPower->setValue(setP);
+            if (enabled && (lineWidgets[i].spinPower->value()!=setP) && !lineWidgets[i].spinPower->hasFocus()) lineWidgets[i].spinPower->setValue(setP);
 
             QString txt=QString("%1 %2").arg(measuredValues.value(i, 0.0)).arg(powerUnits.value(i, ""));
             if (lineWidgets[i].labPower->text()!=txt) lineWidgets[i].labPower->setText(txt);
@@ -542,11 +548,20 @@ void QFLightSourceConfigWidget::linesChanged(QTime time, QList<bool> lineenabled
             if (lineWidgets[i].labPower->isEnabled()!=enabled) lineWidgets[i].labPower->setEnabled(enabled);
 
             connect(lineWidgets[i].chkEnable, SIGNAL(toggled(bool)), this, SLOT(lineEnabledToggled(bool)));
-            connect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+            //connect(lineWidgets[i].spinPower, SIGNAL(valueChanged(double)), this, SLOT(setPowerChanged(double)));
+            connect(lineWidgets[i].spinPower, SIGNAL(editingFinished ()), this, SLOT(setPowerEditingFinished()));
         }
     }
     updateStates();
     setUpdatesEnabled(updt);
+}
+
+void QFLightSourceConfigWidget::setPowerEditingFinished() {
+    QDoubleSpinBox* spin=qobject_cast<QDoubleSpinBox*>(sender());
+    if (spin) {
+        setPowerChanged(spin->value());
+    }
+
 }
 
 QString QFLightSourceConfigWidget::getLightsoureConfigForFilename() const

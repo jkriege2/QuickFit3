@@ -460,7 +460,7 @@ QString QFExtensionCameraRh2v2::getCameraName(unsigned int camera){
 }
 
 QString QFExtensionCameraRh2v2::getCameraSensorName(unsigned int camera){
-  return QString("");
+  return *cameraSetting[camera].prefix;
 }
 
 bool QFExtensionCameraRh2v2::isCameraConnected(unsigned int camera) {
@@ -589,6 +589,21 @@ bool QFExtensionCameraRh2v2::prepareCameraAcquisition(unsigned int camera, const
         }
     }
     reconfigure2(camera,settings,"acquisition");
+
+
+    double frametime=settings.value("rh2v2/frameTime", 10.0).toFloat()*1e-6;
+    unsigned int binning=settings.value("rh2v2/binning", 1).toUInt();
+    unsigned int duration=settings.value("rh2v2/duration", 1024).toUInt();
+    cameraSetting[camera].params["sequence_length"]=duration;
+    cameraSetting[camera].params["duration"]=double(duration)*double(binning)*frametime;
+    cameraSetting[camera].params["roi_xstart"]=settings.value("rh2v2/ROIstart", 0).toUInt();
+    cameraSetting[camera].params["roi_xend"]=settings.value("rh2v2/ROIend", 31).toUInt();
+    cameraSetting[camera].params["frame_time"]=frametime*double(binning);
+    cameraSetting[camera].params["pre_binning_frame_time"]=frametime;
+    cameraSetting[camera].params["temporal_binning"]=binning;
+    cameraSetting[camera].params["do_correlation"]=settings.value("rh2v2/doCorrelation", false).toBool();
+    cameraSetting[camera].params["pixel_units"]="photons";
+    cameraSetting[camera].params["readout_mode"]="rolling shutter";
     return result;
 }
 
@@ -630,6 +645,15 @@ void QFExtensionCameraRh2v2::getCameraAcquisitionDescription(unsigned int camera
     (*parameters)["pixel_width"]=getCameraPixelWidth(camera);
     (*parameters)["pixel_height"]=getCameraPixelHeight(camera);
     (*parameters)["frame_time"]=1e-5;
+
+    QMap<QString, QVariant> p=cameraSetting[camera].params;
+    QMapIterator<QString, QVariant> pi(p);
+    while (pi.hasNext()) {
+        pi.next();
+        (*parameters)[pi.key()]=pi.value();
+    }
+
+
 }
 
 bool QFExtensionCameraRh2v2::getCameraAcquisitionPreview(unsigned int camera, uint32_t* data) {

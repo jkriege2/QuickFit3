@@ -27,6 +27,8 @@ protected slots:
     void on_cbBinning_currentIndexChanged(int index);
     void on_cbCorr_stateChanged(int state);
 
+    void updateRuntime();
+
 private:
     Ui::cam_rh2v2_cfgdlg *ui;
 

@@ -8,6 +8,7 @@ cam_rh2v2_cfgdlg::cam_rh2v2_cfgdlg(QWidget *parent) :
 {
     ui->setupUi(this);
     isCalculating=false;
+    updateRuntime();
 }
 
 cam_rh2v2_cfgdlg::~cam_rh2v2_cfgdlg()
@@ -25,6 +26,7 @@ void cam_rh2v2_cfgdlg::checkUpdate(){
         int roi=ui->sbRoiLast->value()-ui->sbRoiFirst->value()+1;
         ui->dsbFrameTime->setMinimum(roi*4.0/48.0);
     }
+    updateRuntime();
 }
 
 void cam_rh2v2_cfgdlg::on_sbRoiFirst_valueChanged(int value)
@@ -35,6 +37,7 @@ void cam_rh2v2_cfgdlg::on_sbRoiFirst_valueChanged(int value)
         checkUpdate();
         isCalculating=false;
     }
+    updateRuntime();
 }
 
 void cam_rh2v2_cfgdlg::on_sbRoiLast_valueChanged(int value)
@@ -45,10 +48,12 @@ void cam_rh2v2_cfgdlg::on_sbRoiLast_valueChanged(int value)
         checkUpdate();
         isCalculating=false;
     }
+    updateRuntime();
 }
 
 void cam_rh2v2_cfgdlg::on_sbFrameTime_valueChanged(double value)
 {
+    updateRuntime();
 }
 
 void cam_rh2v2_cfgdlg::on_cbBinning_currentIndexChanged(int index)
@@ -58,6 +63,7 @@ void cam_rh2v2_cfgdlg::on_cbBinning_currentIndexChanged(int index)
         checkUpdate();
         isCalculating=false;
     }
+    updateRuntime();
 }
 
 void cam_rh2v2_cfgdlg::on_cbCorr_stateChanged(int state){
@@ -66,6 +72,15 @@ void cam_rh2v2_cfgdlg::on_cbCorr_stateChanged(int state){
         checkUpdate();
         isCalculating=false;
     }
+    updateRuntime();
+}
+
+void cam_rh2v2_cfgdlg::updateRuntime()
+{
+    double runtime=double(ui->sbFrameCnt->value())*ui->dsbFrameTime->value()/1000.0;
+    double lag=ui->dsbFrameTime->value();
+    if (ui->cbBinning->currentIndex()==1) { runtime=runtime*3.0; lag=lag*3.0; }
+    ui->labRuntime->setText(tr("runtime = %1 s = %2 ms<br>correlator min. lagtime = %3 µs").arg(runtime/1000.0).arg(runtime).arg(lag));
 }
 
 int cam_rh2v2_cfgdlg::getAccumulationCount()
@@ -86,6 +101,7 @@ int cam_rh2v2_cfgdlg::getFrameCount()
 void cam_rh2v2_cfgdlg::setFrameCount(int value)
 {
     ui->sbFrameCnt->setValue(value);
+    updateRuntime();
 }
 
 int cam_rh2v2_cfgdlg::getRoiFirst()
@@ -96,6 +112,7 @@ int cam_rh2v2_cfgdlg::getRoiFirst()
 void cam_rh2v2_cfgdlg::setRoiFirst(int value)
 {
     ui->sbRoiFirst->setValue(value);
+    updateRuntime();
 }
 
 float cam_rh2v2_cfgdlg::getFrameTime()
@@ -106,6 +123,7 @@ float cam_rh2v2_cfgdlg::getFrameTime()
 void cam_rh2v2_cfgdlg::setFrameTime(float value)
 {
     ui->dsbFrameTime->setValue(value);
+    updateRuntime();
 }
 
 int cam_rh2v2_cfgdlg::getBinning()
@@ -116,11 +134,13 @@ int cam_rh2v2_cfgdlg::getBinning()
 void cam_rh2v2_cfgdlg::setBinning(int value)
 {
     ui->cbBinning->setCurrentIndex(ui->cbBinning->findText(QString::number(value)));
+    updateRuntime();
 }
 
 void cam_rh2v2_cfgdlg::setEditMode()
 {
     isEditing=true;
+    updateRuntime();
 }
 
 void cam_rh2v2_cfgdlg::unsetEditMode()
@@ -137,6 +157,7 @@ int cam_rh2v2_cfgdlg::getRoiLast()
 void cam_rh2v2_cfgdlg::setRoiLast(int value)
 {
     ui->sbRoiLast->setValue(value);
+    updateRuntime();
 }
 
 bool cam_rh2v2_cfgdlg::getCorrEnable(){
@@ -145,4 +166,5 @@ bool cam_rh2v2_cfgdlg::getCorrEnable(){
 
 void cam_rh2v2_cfgdlg::setCorrEnable(bool value){
     ui->cbCorr->setChecked(value);
+    updateRuntime();
 }

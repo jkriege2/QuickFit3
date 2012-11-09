@@ -47,6 +47,7 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
           float pixelWidth,pixelHeight;
           float exposureTime;
           cam_rh2v2_cordlg *cordlg;
+          QMap<QString, QVariant> params;
         };
 
 
