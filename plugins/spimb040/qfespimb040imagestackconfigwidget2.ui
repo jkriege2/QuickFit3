@@ -364,19 +364,36 @@ p, li { white-space: pre-wrap; }
       <property name="spacing">
        <number>2</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QFStageComboBox" name="cmbStage2">
-        <property name="minimumSize">
+      <item row="0" column="13">
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
          <size>
-          <width>0</width>
-          <height>22</height>
+          <width>40</width>
+          <height>20</height>
          </size>
         </property>
-        <property name="maximumSize">
+       </spacer>
+      </item>
+      <item row="0" column="7">
+       <widget class="QToolButton" name="btnGetCurrentAround2">
+        <property name="minimumSize">
          <size>
-          <width>250</width>
-          <height>16777215</height>
+          <width>24</width>
+          <height>24</height>
          </size>
+        </property>
+        <property name="toolTip">
+         <string>get start from the current position, so we scan symmetrically around it.</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="spimb040.qrc">
+          <normaloff>:/spimb040/get_current_pos_around.png</normaloff>:/spimb040/get_current_pos_around.png</iconset>
         </property>
        </widget>
       </item>
@@ -403,41 +420,41 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QToolButton" name="btnConfig2">
-        <property name="minimumSize">
-         <size>
-          <width>24</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>configure stage</string>
-        </property>
+      <item row="1" column="5" colspan="8">
+       <widget class="QLabel" name="labStage2">
         <property name="text">
-         <string>...</string>
+         <string/>
         </property>
-        <property name="icon">
-         <iconset resource="spimb040.qrc">
-          <normaloff>:/spimb040/stagesettings.png</normaloff>:/spimb040/stagesettings.png</iconset>
+        <property name="wordWrap">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="0" column="11">
+       <widget class="QSpinBox" name="spinSteps2">
+        <property name="minimum">
+         <number>1</number>
         </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
+        <property name="maximum">
+         <number>100000</number>
         </property>
-        <property name="sizeHint" stdset="0">
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QFStageComboBox" name="cmbStage2">
+        <property name="minimumSize">
          <size>
-          <width>32</width>
-          <height>20</height>
+          <width>0</width>
+          <height>22</height>
          </size>
         </property>
-       </spacer>
+        <property name="maximumSize">
+         <size>
+          <width>250</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
       </item>
       <item row="0" column="4">
        <widget class="QLabel" name="label_12">
@@ -495,6 +512,42 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
+      <item row="0" column="2">
+       <widget class="QToolButton" name="btnConfig2">
+        <property name="minimumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>configure stage</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="spimb040.qrc">
+          <normaloff>:/spimb040/stagesettings.png</normaloff>:/spimb040/stagesettings.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>32</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
       <item row="0" column="9">
        <widget class="QDoubleSpinBox" name="spinDelta2">
         <property name="suffix">
@@ -521,56 +574,16 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="0" column="11">
-       <widget class="QSpinBox" name="spinSteps2">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>100000</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="13">
-       <spacer name="horizontalSpacer_4">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="1" column="5" colspan="8">
-       <widget class="QLabel" name="labStage2">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="7">
-       <widget class="QToolButton" name="btnGetCurrentAround2">
-        <property name="minimumSize">
-         <size>
-          <width>24</width>
-          <height>24</height>
-         </size>
-        </property>
+      <item row="0" column="14">
+       <widget class="QCheckBox" name="chkCycling2">
         <property name="toolTip">
-         <string>get start from the current position, so we scan symmetrically around it.</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deactivate this option if you want to prevent the stages from returning home after each scan. &lt;/p&gt;&lt;p&gt;If activated (default), scans will be:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-style:italic;&quot;&gt;stage 1:&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; 1&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;2&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;3 ...&lt;/span&gt;&lt;br/&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-style:italic;&quot;&gt;stage 2:&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; 1 2 3 4&amp;nbsp;&amp;nbsp;&amp;nbsp;1 2 3 4&amp;nbsp;&amp;nbsp;&amp;nbsp;1 ...&lt;/span&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If deactivated , scans will be:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-style:italic;&quot;&gt;stage 1:&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; 1&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;2&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;3 ...&lt;/span&gt;&lt;br/&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-style:italic;&quot;&gt;stage 2:&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; 1 2 3 4&amp;nbsp;&amp;nbsp;&amp;nbsp;5 6 7 8&amp;nbsp;&amp;nbsp;&amp;nbsp;9 ...&lt;/span&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string>...</string>
+         <string>cycling</string>
         </property>
-        <property name="icon">
-         <iconset resource="spimb040.qrc">
-          <normaloff>:/spimb040/get_current_pos_around.png</normaloff>:/spimb040/get_current_pos_around.png</iconset>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -625,19 +638,75 @@ p, li { white-space: pre-wrap; }
       <property name="spacing">
        <number>2</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QFStageComboBox" name="cmbStage3">
+      <item row="0" column="9">
+       <widget class="QDoubleSpinBox" name="spinDelta3">
+        <property name="suffix">
+         <string> µm</string>
+        </property>
+        <property name="minimum">
+         <double>-10000000.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>10000000.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>10.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="QDoubleSpinBox" name="spinStart3">
+        <property name="suffix">
+         <string> µm</string>
+        </property>
+        <property name="minimum">
+         <double>-10000000.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>10000000.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>10.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="7">
+       <widget class="QToolButton" name="btnGetCurrentAround3">
         <property name="minimumSize">
          <size>
-          <width>0</width>
-          <height>22</height>
+          <width>24</width>
+          <height>24</height>
          </size>
         </property>
-        <property name="maximumSize">
+        <property name="toolTip">
+         <string>get start from the current position, so we scan symmetrically around it.</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="spimb040.qrc">
+          <normaloff>:/spimb040/get_current_pos_around.png</normaloff>:/spimb040/get_current_pos_around.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QToolButton" name="btnConfig3">
+        <property name="minimumSize">
          <size>
-          <width>250</width>
-          <height>16777215</height>
+          <width>24</width>
+          <height>24</height>
          </size>
+        </property>
+        <property name="toolTip">
+         <string>configure stage</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="spimb040.qrc">
+          <normaloff>:/spimb040/stagesettings.png</normaloff>:/spimb040/stagesettings.png</iconset>
         </property>
        </widget>
       </item>
@@ -664,23 +733,13 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QToolButton" name="btnConfig3">
-        <property name="minimumSize">
-         <size>
-          <width>24</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>configure stage</string>
-        </property>
+      <item row="0" column="4">
+       <widget class="QLabel" name="label_16">
         <property name="text">
-         <string>...</string>
+         <string>&amp;start:</string>
         </property>
-        <property name="icon">
-         <iconset resource="spimb040.qrc">
-          <normaloff>:/spimb040/stagesettings.png</normaloff>:/spimb040/stagesettings.png</iconset>
+        <property name="buddy">
+         <cstring>spinStart3</cstring>
         </property>
        </widget>
       </item>
@@ -700,78 +759,6 @@ p, li { white-space: pre-wrap; }
         </property>
        </spacer>
       </item>
-      <item row="0" column="4">
-       <widget class="QLabel" name="label_16">
-        <property name="text">
-         <string>&amp;start:</string>
-        </property>
-        <property name="buddy">
-         <cstring>spinStart3</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="5">
-       <widget class="QDoubleSpinBox" name="spinStart3">
-        <property name="suffix">
-         <string> µm</string>
-        </property>
-        <property name="minimum">
-         <double>-10000000.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>10000000.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>10.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="6">
-       <widget class="QToolButton" name="btnGetCurrent3">
-        <property name="minimumSize">
-         <size>
-          <width>24</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>get the current position</string>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset resource="spimb040.qrc">
-          <normaloff>:/spimb040/get_current_pos.png</normaloff>:/spimb040/get_current_pos.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="8">
-       <widget class="QLabel" name="label_17">
-        <property name="text">
-         <string>   &amp;delta:</string>
-        </property>
-        <property name="buddy">
-         <cstring>spinDelta3</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="9">
-       <widget class="QDoubleSpinBox" name="spinDelta3">
-        <property name="suffix">
-         <string> µm</string>
-        </property>
-        <property name="minimum">
-         <double>-10000000.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>10000000.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>10.000000000000000</double>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="10">
        <widget class="QLabel" name="label_18">
         <property name="text">
@@ -779,16 +766,6 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="buddy">
          <cstring>spinSteps3</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="11">
-       <widget class="QSpinBox" name="spinSteps3">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>100000</number>
         </property>
        </widget>
       </item>
@@ -815,8 +792,44 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="0" column="7">
-       <widget class="QToolButton" name="btnGetCurrentAround3">
+      <item row="0" column="11">
+       <widget class="QSpinBox" name="spinSteps3">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>100000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QFStageComboBox" name="cmbStage3">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>22</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>250</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="8">
+       <widget class="QLabel" name="label_17">
+        <property name="text">
+         <string>   &amp;delta:</string>
+        </property>
+        <property name="buddy">
+         <cstring>spinDelta3</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6">
+       <widget class="QToolButton" name="btnGetCurrent3">
         <property name="minimumSize">
          <size>
           <width>24</width>
@@ -824,14 +837,27 @@ p, li { white-space: pre-wrap; }
          </size>
         </property>
         <property name="toolTip">
-         <string>get start from the current position, so we scan symmetrically around it.</string>
+         <string>get the current position</string>
         </property>
         <property name="text">
          <string>...</string>
         </property>
         <property name="icon">
          <iconset resource="spimb040.qrc">
-          <normaloff>:/spimb040/get_current_pos_around.png</normaloff>:/spimb040/get_current_pos_around.png</iconset>
+          <normaloff>:/spimb040/get_current_pos.png</normaloff>:/spimb040/get_current_pos.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="14">
+       <widget class="QCheckBox" name="chkCycling3">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deactivate this option if you want to prevent the stages from returning home after each scan. &lt;/p&gt;&lt;p&gt;If activated (default), scans will be:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-style:italic;&quot;&gt;stage 1:&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; 1&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;2&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;3 ...&lt;/span&gt;&lt;br/&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-style:italic;&quot;&gt;stage 2:&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; 1 2 3 4&amp;nbsp;&amp;nbsp;&amp;nbsp;1 2 3 4&amp;nbsp;&amp;nbsp;&amp;nbsp;1 ...&lt;/span&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If deactivated , scans will be:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-style:italic;&quot;&gt;stage 1:&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; 1&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;2&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;3 ...&lt;/span&gt;&lt;br/&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-style:italic;&quot;&gt;stage 2:&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; 1 2 3 4&amp;nbsp;&amp;nbsp;&amp;nbsp;5 6 7 8&amp;nbsp;&amp;nbsp;&amp;nbsp;9 ...&lt;/span&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>cycling</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

@@ -54,6 +54,9 @@ class QFESPIMB040ImageStackConfigWidget2 : public QWidget, public QFESPIMB040Fil
         bool useStage2() const;
         bool useStage3() const;
 
+        bool stage2Cycling() const;
+        bool stage3Cycling() const;
+
         int delay() const;
         QFExtensionLinearStage* stage() const;
         QFExtension* stageExtension() const;

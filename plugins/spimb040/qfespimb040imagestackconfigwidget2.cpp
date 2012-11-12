@@ -193,6 +193,16 @@ bool QFESPIMB040ImageStackConfigWidget2::useStage3() const {
     return ui->chkStage3->isChecked();
 }
 
+bool QFESPIMB040ImageStackConfigWidget2::stage2Cycling() const
+{
+    return ui->chkCycling2->isChecked();
+}
+
+bool QFESPIMB040ImageStackConfigWidget2::stage3Cycling() const
+{
+    return ui->chkCycling3->isChecked();
+}
+
 
 int QFESPIMB040ImageStackConfigWidget2::currentAxisID() const {
     return ui->cmbStage->currentAxisID();

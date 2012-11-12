@@ -521,10 +521,12 @@ void QFESPIMB040MainWindow2::doImageStack() {
         double stageStart2=widImageStack->stackStart2();
         double stageDelta2=widImageStack->stackDelta2();
         int stageCount2=widImageStack->stackCount2();
+        bool stageReturn2=widImageStack->stage2Cycling();
 
         double stageStart3=widImageStack->stackStart3();
         double stageDelta3=widImageStack->stackDelta3();
         int stageCount3=widImageStack->stackCount3();
+        bool stageReturn3=widImageStack->stage3Cycling();
 
         QList<QTriple<double, double, double> > moveTo;
 
@@ -536,8 +538,9 @@ void QFESPIMB040MainWindow2::doImageStack() {
             }
         } else if (axisCount==2) {
             double pos=stageStart;
+            double pos2=stageStart2;
             for (int x=0; x<stageCount; x++) {
-                double pos2=stageStart2;
+                if (stageReturn2) pos2=stageStart2;
                 for (int y=0; y<stageCount2; y++) {
                     moveTo.append(qMakeTriple(pos, pos2, 0.0));
                     pos2=pos2+stageDelta2;
@@ -546,10 +549,12 @@ void QFESPIMB040MainWindow2::doImageStack() {
             }
         } else if (axisCount==3) {
             double pos=stageStart;
+            double pos2=stageStart2;
+            double pos3=stageStart3;
             for (int x=0; x<stageCount; x++) {
-                double pos2=stageStart2;
+                if (stageReturn2) pos2=stageStart2;
                 for (int y=0; y<stageCount2; y++) {
-                    double pos3=stageStart3;
+                    if (stageReturn3) pos3=stageStart3;
                     for (int z=0; z<stageCount3; z++) {
                         moveTo.append(qMakeTriple(pos, pos2, pos3));
                         pos3=pos3+stageDelta3;

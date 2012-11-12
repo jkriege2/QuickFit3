@@ -43,6 +43,7 @@ QFExtensionCameraRh2v2::QFExtensionCameraRh2v2(QObject* parent):
   cameraSetting[0].exposureTime=0.000010;
   cameraSetting[0].cordlg=new cam_rh2v2_cordlg(NULL);
   cameraSetting[0].cordlg->setCamera(0);
+  cameraSetting[0].params=new QMap<QString, QVariant>;
 
   QObject::connect(cameraSetting[0].raw.pc, SIGNAL(log_txt(QString)), this, SLOT(logger_txt(QString)));
   QObject::connect(cameraSetting[0].raw.pc, SIGNAL(log_wrn(QString)), this, SLOT(logger_wrn(QString)));
@@ -70,6 +71,7 @@ QFExtensionCameraRh2v2::QFExtensionCameraRh2v2(QObject* parent):
   cameraSetting[1].exposureTime=0.0001;
   cameraSetting[1].cordlg=new cam_rh2v2_cordlg(NULL);
   cameraSetting[1].cordlg->setCamera(1);
+  cameraSetting[1].params=new QMap<QString, QVariant>;
 
   QObject::connect(cameraSetting[1].raw.pc, SIGNAL(log_txt(QString)), this, SLOT(logger_txt(QString)));
   QObject::connect(cameraSetting[1].raw.pc, SIGNAL(log_wrn(QString)), this, SLOT(logger_wrn(QString)));
@@ -80,7 +82,11 @@ QFExtensionCameraRh2v2::QFExtensionCameraRh2v2(QObject* parent):
 }
 
 QFExtensionCameraRh2v2::~QFExtensionCameraRh2v2() {
-
+    delete cameraSetting[0].prefix;
+    delete cameraSetting[0].params;
+    delete cameraSetting[1].prefix;
+    delete cameraSetting[1].params;
+    free(cameraSetting);
 }
 
 
@@ -149,7 +155,7 @@ void QFExtensionCameraRh2v2::acquisitionFinished(int camera){
         }
         if(cameraSetting[camera].cor.pc!=NULL){
             if(cameraSetting[camera].cor.pc->isRunning()){
-                sleep(2);
+                sleep(5);
                 cameraSetting[camera].cor.pc->stop(QString("UI"));
             }
         }
@@ -286,6 +292,7 @@ bool QFExtensionCameraRh2v2::setConfiguration(unsigned int camera, const QSettin
         cameraSetting[camera].raw.settings->setValue(we+"/config/duration",duration*binning);
     }
 
+
     res = cameraSetting[camera].raw.pc->findGroupByType(QString("we_frame_analyzer"),*(cameraSetting[camera].raw.settings), we, setRaw);
     result&=res;
     if(res==true){
@@ -330,6 +337,16 @@ bool QFExtensionCameraRh2v2::setConfiguration(unsigned int camera, const QSettin
         if(res==true){
             cameraSetting[camera].cor.settings->setValue(we+"/config/init",cfg_cor);
         }
+
+        res = cameraSetting[camera].cor.pc->findGroupByType("we_writer", *(cameraSetting[camera].cor.settings), we, setCor);
+        result&=res;
+        if(res==true){
+
+            cameraSetting[camera].cor.settings->setValue(we+"/config/duration",duration*roi*2/1024);
+            qDebug()<<"set "<<we<<"/config/duration";
+        }
+        qDebug()<<we<<"/config/duration="<<cameraSetting[camera].cor.settings->value(we+"/config/duration", -1).toULongLong();
+        qDebug()<<we<<"/config/filename="<<cameraSetting[camera].cor.settings->value(we+"/config/filename", "none").toString();
     }
 
     if(result!=true)qDebug()<<__FILE__<<"@"<<__LINE__<<":"<<"Something failed!!!";
@@ -594,16 +611,16 @@ bool QFExtensionCameraRh2v2::prepareCameraAcquisition(unsigned int camera, const
     double frametime=settings.value("rh2v2/frameTime", 10.0).toFloat()*1e-6;
     unsigned int binning=settings.value("rh2v2/binning", 1).toUInt();
     unsigned int duration=settings.value("rh2v2/duration", 1024).toUInt();
-    cameraSetting[camera].params["sequence_length"]=duration;
-    cameraSetting[camera].params["duration"]=double(duration)*double(binning)*frametime;
-    cameraSetting[camera].params["roi_xstart"]=settings.value("rh2v2/ROIstart", 0).toUInt();
-    cameraSetting[camera].params["roi_xend"]=settings.value("rh2v2/ROIend", 31).toUInt();
-    cameraSetting[camera].params["frame_time"]=frametime*double(binning);
-    cameraSetting[camera].params["pre_binning_frame_time"]=frametime;
-    cameraSetting[camera].params["temporal_binning"]=binning;
-    cameraSetting[camera].params["do_correlation"]=settings.value("rh2v2/doCorrelation", false).toBool();
-    cameraSetting[camera].params["pixel_units"]="photons";
-    cameraSetting[camera].params["readout_mode"]="rolling shutter";
+    (*cameraSetting[camera].params)["sequence_length"]=duration;
+    (*cameraSetting[camera].params)["duration"]=double(duration)*double(binning)*frametime;
+    (*cameraSetting[camera].params)["roi_ystart"]=settings.value("rh2v2/ROIstart", 0).toUInt();
+    (*cameraSetting[camera].params)["roi_yend"]=settings.value("rh2v2/ROIend", 31).toUInt();
+    (*cameraSetting[camera].params)["frame_time"]=frametime*double(binning);
+    (*cameraSetting[camera].params)["pre_binning_frame_time"]=frametime;
+    (*cameraSetting[camera].params)["temporal_binning"]=binning;
+    (*cameraSetting[camera].params)["do_correlation"]=settings.value("rh2v2/doCorrelation", false).toBool();
+    (*cameraSetting[camera].params)["pixel_units"]="photons";
+    (*cameraSetting[camera].params)["readout_mode"]="rolling shutter";
     return result;
 }
 
@@ -646,7 +663,7 @@ void QFExtensionCameraRh2v2::getCameraAcquisitionDescription(unsigned int camera
     (*parameters)["pixel_height"]=getCameraPixelHeight(camera);
     (*parameters)["frame_time"]=1e-5;
 
-    QMap<QString, QVariant> p=cameraSetting[camera].params;
+    QMap<QString, QVariant> p=*cameraSetting[camera].params;
     QMapIterator<QString, QVariant> pi(p);
     while (pi.hasNext()) {
         pi.next();

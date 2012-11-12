@@ -26,7 +26,6 @@ void cam_rh2v2_cfgdlg::checkUpdate(){
         int roi=ui->sbRoiLast->value()-ui->sbRoiFirst->value()+1;
         ui->dsbFrameTime->setMinimum(roi*4.0/48.0);
     }
-    updateRuntime();
 }
 
 void cam_rh2v2_cfgdlg::on_sbRoiFirst_valueChanged(int value)
@@ -51,7 +50,7 @@ void cam_rh2v2_cfgdlg::on_sbRoiLast_valueChanged(int value)
     updateRuntime();
 }
 
-void cam_rh2v2_cfgdlg::on_sbFrameTime_valueChanged(double value)
+void cam_rh2v2_cfgdlg::on_dsbFrameTime_valueChanged(double value)
 {
     updateRuntime();
 }
@@ -72,6 +71,11 @@ void cam_rh2v2_cfgdlg::on_cbCorr_stateChanged(int state){
         checkUpdate();
         isCalculating=false;
     }
+    updateRuntime();
+}
+
+void cam_rh2v2_cfgdlg::on_sbFrameCnt_valueChanged(int value)
+{
     updateRuntime();
 }
 
