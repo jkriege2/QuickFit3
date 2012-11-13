@@ -84,5 +84,14 @@
         <file alias="dvhor.png">icons/dvhor.png</file>
         <file alias="dvver.png">icons/dvver.png</file>
         <file alias="default_config_set.png">icons/default_config_set.png</file>
+        <file alias="script_copy.png">icons/script_copy.png</file>
+        <file alias="script_cut.png">icons/script_cut.png</file>
+        <file alias="script_new.png">icons/script_new.png</file>
+        <file alias="script_open.png">icons/script_open.png</file>
+        <file alias="script_paste.png">icons/script_paste.png</file>
+        <file alias="script_redo.png">icons/script_redo.png</file>
+        <file alias="script_save.png">icons/script_save.png</file>
+        <file alias="script_syntaxcheck.png">icons/script_syntaxcheck.png</file>
+        <file alias="script_undo.png">icons/script_undo.png</file>
     </qresource>
 </RCC>

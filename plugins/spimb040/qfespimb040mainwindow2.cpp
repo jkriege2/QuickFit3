@@ -16,6 +16,7 @@ QFESPIMB040MainWindow2::QFESPIMB040MainWindow2(QFPluginServices* pluginServices,
     QWidget(parent, Qt::Dialog|Qt::WindowMaximizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowSystemMenuHint)
 {
     widImageStack=NULL;
+    widScriptedAcquisition=NULL;
     widCamParamScan=NULL;
     widDeviceParamScan=NULL;
     widExperimentDescription=NULL;
@@ -38,6 +39,7 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     if (optSetup) optSetup->loadSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
     if (widExperimentDescription) widExperimentDescription->loadSettings((*settings->getQSettings()), "plugin_spim_b040/expdescription/");
     if (widAcquisitionDescription) widAcquisitionDescription->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acqdescription/");
+    if (widScriptedAcquisition) widScriptedAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acqscripted/");
     if (widImageStack) widImageStack->loadSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
     if (widCamParamScan) widCamParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
@@ -50,6 +52,7 @@ void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
     if (optSetup) optSetup->storeSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
     if (widExperimentDescription) widExperimentDescription->storeSettings((*settings->getQSettings()), "plugin_spim_b040/expdescription/");
     if (widAcquisitionDescription) widAcquisitionDescription->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acqdescription/");
+    if (widScriptedAcquisition) widScriptedAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acqscripted/");
     if (widImageStack) widImageStack->storeSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
     if (widCamParamScan) widCamParamScan->storeSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
@@ -163,6 +166,14 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
         tabMain->addTab(widDeviceParamScan, tr("Acquisition: Device Parameter Series"));
         connect(widDeviceParamScan, SIGNAL(doStack()), this, SLOT(doDeviceParamStack()));
         connect(optSetup, SIGNAL(lightpathesChanged(QFESPIMB040OpticsSetupItems)), widDeviceParamScan, SLOT(lightpathesChanged(QFESPIMB040OpticsSetupItems)));
+
+
+        //------------------------------------------------------------------------------------------
+        // create tab for scripted acquisition
+        //------------------------------------------------------------------------------------------
+        widScriptedAcquisition=new QFESPIMB040ScriptedAcquisition(this, this, this, this, m_pluginServices, optSetup, widAcquisitionDescription, widExperimentDescription, m_pluginServices->getConfigFileDirectory());
+        tabMain->addTab(widScriptedAcquisition, tr("Scripted Acquisition"));
+        //connect(optSetup, SIGNAL(lightpathesChanged(QFESPIMB040OpticsSetupItems)), widDeviceParamScan, SLOT(lightpathesChanged(QFESPIMB040OpticsSetupItems)));
 
 
 
@@ -1622,6 +1633,12 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
     optSetup->ensureLightpath();
 
 }
+
+void QFESPIMB040MainWindow2::doDeviceParameterStack()
+{
+    widDeviceParamScan->performStack();
+}
+
 
 
 

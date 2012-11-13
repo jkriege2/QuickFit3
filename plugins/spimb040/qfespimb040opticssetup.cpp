@@ -703,6 +703,16 @@ bool QFESPIMB040OpticsSetup::isZStageConnected() const {
     return ui->stageSetup->isZStageConnected();
 }
 
+QFExtensionFilterChanger *QFESPIMB040OpticsSetup::getFilterChangerDetection() const
+{
+    return ui->filtcDetection->getFilterChanger();
+}
+
+int QFESPIMB040OpticsSetup::getFilterChangerDetectionID() const
+{
+    return ui->filtcDetection->getFilterChangerID();
+}
+
 QFExtensionLightSource *QFESPIMB040OpticsSetup::getLaser1()
 {
     return ui->lsLaser1->getLightSource();
@@ -777,6 +787,60 @@ void QFESPIMB040OpticsSetup::setMainIlluminationShutter(bool opened, bool blocki
     }
 
 }
+
+void QFESPIMB040OpticsSetup::setShutter(QFESPIMB040OpticsSetup::Shutters shutter, bool opened, bool blocking)
+{
+    if (shutter==QFESPIMB040OpticsSetup::ShutterMain) {
+        setMainIlluminationShutter(opened, blocking);
+    } else if (shutter==QFESPIMB040OpticsSetup::ShutterLaser1) {
+        ui->shutterLaser1->setShutter(opened);
+        if (!opened) ui->shutterLaser1->setShutter(false);
+
+        if (blocking) {
+            QTime t;
+            t.start();
+            while (ui->shutterLaser1->getShutterState()!=opened && t.elapsed()<10000) {
+                QApplication::processEvents();
+            }
+
+            if (t.elapsed()>=10000) {
+                m_log->log_error("laser 1 shutter timed out after 10s!\n");
+            }
+        }
+    } else if (shutter==QFESPIMB040OpticsSetup::ShutterLaser2) {
+        ui->shutterLaser2->setShutter(opened);
+        if (!opened) ui->shutterLaser2->setShutter(false);
+
+        if (blocking) {
+            QTime t;
+            t.start();
+            while (ui->shutterLaser2->getShutterState()!=opened && t.elapsed()<10000) {
+                QApplication::processEvents();
+            }
+
+            if (t.elapsed()>=10000) {
+                m_log->log_error("laser 2 shutter timed out after 10s!\n");
+            }
+        }
+    } else if (shutter==QFESPIMB040OpticsSetup::ShutterTransmission) {
+        ui->shutterTransmission->setShutter(opened);
+        if (!opened) ui->shutterTransmission->setShutter(false);
+
+        if (blocking) {
+            QTime t;
+            t.start();
+            while (ui->shutterTransmission->getShutterState()!=opened && t.elapsed()<10000) {
+                QApplication::processEvents();
+            }
+
+            if (t.elapsed()>=10000) {
+                m_log->log_error("transmission shutter timed out after 10s!\n");
+            }
+        }
+    }
+}
+
+
 
 bool QFESPIMB040OpticsSetup::getMainIlluminationShutter() {
     return ui->shutterMainIllumination->getShutterState();

@@ -1,0 +1,37 @@
+setShutter("main", false);
+setShutter("laser1", false);
+setShutter("laser2", false);
+sleepMS(100);
+
+
+setShutter("main", true);
+sleepMS(100);
+setShutter("main", false);
+sleepMS(400);
+setShutter("laser1", true);
+sleepMS(200);
+setShutter("laser1", false);
+sleepMS(200);
+setShutter("main", true);
+sleepMS(100);
+setShutter("main", false);
+sleepMS(400);
+setShutter("laser1", true);
+sleepMS(200);
+setShutter("laser1", false);
+sleepMS(200);
+setShutter("main", true);
+sleepMS(100);
+setShutter("main", false);
+sleepMS(200);
+setShutter("laser1", true);
+sleepMS(200);
+setShutter("laser1", false);
+sleepMS(200);
+setShutter("laser2", true);
+sleepMS(200);
+setShutter("laser2", false);
+sleepMS(200);
+setShutter("laser2", true);
+sleepMS(200);
+setShutter("laser2", false);

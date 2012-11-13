@@ -44,6 +44,7 @@
 #include "qfespimb040experimentdescription.h"
 #include "qfespimb040acquisitiondescription.h"
 #include "qfespimb040deviceparamstackconfigwidget.h"
+#include "qfespimb040scriptedacquisition.h"
 
 /*! \brief new SPIM Control Extension (B040, DKFZ Heidelberg) main window
     \ingroup qf3ext_spimb040
@@ -85,6 +86,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
         QFESPIMB040CamParamStackConfigWidget2* widCamParamScan;
         QFESPIMB040DeviceParamStackConfigWidget* widDeviceParamScan;
         QFESPIMB040AcquisitionDescription* widAcquisitionDescription;
+        QFESPIMB040ScriptedAcquisition* widScriptedAcquisition;
 
 
         QTabWidget* tabMain;
@@ -104,7 +106,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
         /** \brief Create all widgets on this window, called in the constructor before createActions() */
         void createWidgets(QFExtensionManager* extManager);
 
-    protected slots:
+    public slots:
         /*! \brief runs an image acquisition
 
             This function starts an image acquisition for every of the cameras. Then it waits until the acquisitions are completed.
@@ -120,7 +122,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
 
         void doCamParamStack();
 
-        //void doDeviceParamStack();
+        void doDeviceParameterStack();
 
 
         void displayHelp();

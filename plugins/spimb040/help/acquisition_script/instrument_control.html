@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>SPIM Control: Scripted Acquisition: Instrument Control Function Reference</title>
+  </head>
+  <body> 
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	<h2>Illumination Control</h2>
+	<ul>
+		<li><a name="setLaserIntensity"/><!-- func:setLaserIntensity -->
+		<b><tt><!-- template -->setLaserIntensity(laser, line, intensity)<!-- /template --></tt> - <i>sets the laser intensity </i>:</b><br>
+		This function sets the intensity of the specified laser (either 1 or 2). Each laser may have several lines (the first one is 0) and you may set the power in device units (usually milliwats) as a floating point value.
+		<!-- /func:setLaserIntensity -->
+		</li>
+		<li><a name="setTransmissionIntensity"/><!-- func:setTransmissionIntensity -->
+		<b><tt><!-- template -->setTransmissionIntensity(line, intensity)<!-- /template --></tt> - <i>sets the transmission illumination intensity </i>:</b><br>
+		This function sets the intensity of the transmission illumination. The illumination device may have several lines (the first one is 0) and you may set the power in device units as a floating point value.
+		<!-- /func:setTransmissionIntensity -->
+		</li>
+	</ul>
+	<h2>Shutter Control</h2>
+	<ul>
+		<li><a name="setShutter"/><!-- func:setShutter -->
+		<b><tt><!-- template -->setShutter(shutter, state)<!-- /template --></tt> - <i>sets the state (boolean) of the specified shutter </i>:</b><br>
+		These shutters are defined:
+		  <ul>
+                    <li>"main": the main shutter</li>
+                    <li>"laser1": the laser 1 shutter</li>
+                    <li>"laser1": the laser 2 shutter</li>
+                    <li>"transmission": the transmission illumination shutter</li>
+                  </ul>
+		<!-- /func:setShutter -->
+		</li>
+
+
+	</ul>
+	
+  </body>
+</html>

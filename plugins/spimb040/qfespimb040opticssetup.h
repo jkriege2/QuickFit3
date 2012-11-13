@@ -28,7 +28,7 @@
 #include "qfextensionmeasurementdevice.h"
 #include "../interfaces/qfextensionglobalsettingsreadwrite.h"
 #include "qfextensionlightsource.h"
-
+#include "qfextensionfilterchanger.h"
 
 class QFESPIMB040MainWindow; // forward
 namespace Ui {
@@ -131,6 +131,9 @@ class QFESPIMB040OpticsSetup : public QWidget {
         bool isYStageConnected() const;
         bool isZStageConnected() const;
 
+        QFExtensionFilterChanger* getFilterChangerDetection() const;
+        int getFilterChangerDetectionID() const;
+
         QFExtensionLightSource* getLaser1();
         QFExtensionLightSource* getLaser2();
         QFExtensionLightSource* getTransmissionLightSource();
@@ -155,6 +158,17 @@ class QFESPIMB040OpticsSetup : public QWidget {
 
         /** \brief get the axis number of z-axis stage inside its class */
         int getZStageAxis();
+
+        enum Shutters  {
+            ShutterMain,
+            ShutterLaser1,
+            ShutterLaser2,
+            ShutterTransmission
+        };
+
+        /** \brief set main illumination shutter state */
+        void setShutter(Shutters shutter, bool opened, bool blocking=false);
+
 
         /** \brief set main illumination shutter state */
         void setMainIlluminationShutter(bool opened, bool blocking=false);

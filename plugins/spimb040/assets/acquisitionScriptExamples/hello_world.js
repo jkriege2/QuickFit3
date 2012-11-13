@@ -1,0 +1,1 @@
+logText("Hello World!");

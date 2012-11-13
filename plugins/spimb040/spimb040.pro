@@ -45,7 +45,8 @@ HEADERS += spimb040.h \
     qfespimb040acquisitiondescription.h \
     ../interfaces/qfextensionglobalsettingsreadwrite.h \
     qfespimb040deviceparamstackconfigwidget.h \
-    qfespimb040acquisitiontools.h
+    qfespimb040acquisitiontools.h \
+    qfespimb040scriptedacquisition.h
 
 SOURCES += spimb040.cpp \
            qfespimb040cameraview.cpp \
@@ -70,7 +71,8 @@ SOURCES += spimb040.cpp \
     qfespimb040filenametool.cpp \
     qfespimb040lightpathsavedialog.cpp \
     qfespimb040acquisitiondescription.cpp \
-    qfespimb040deviceparamstackconfigwidget.cpp
+    qfespimb040deviceparamstackconfigwidget.cpp \
+    qfespimb040scriptedacquisition.cpp
 FORMS = \
     qfespimb040opticssetup.ui \
     qfespimb00histogrammaskdialog.ui \
@@ -82,7 +84,8 @@ FORMS = \
     qfespimb040camparamstackconfigwidget2.ui \
     qfespimb040lightpathsavedialog.ui \
     qfespimb040acquisitiondescription.ui \
-    qfespimb040deviceparamstackconfigwidget.ui
+    qfespimb040deviceparamstackconfigwidget.ui \
+    qfespimb040scriptedacquisition.ui
 
 RESOURCES += spimb040.qrc
 
@@ -94,13 +97,23 @@ INCLUDEPATH += . \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
-QT += gui xml svg opengl
+QT += gui xml svg opengl script
 
 CONFIG += exceptions rtti stl
 
 
 
+ASSETSScriptTemplates_FILES.files = ./assets/acquisitionScriptTemplates/*.*
+ASSETSScriptTemplates_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/acquisitionScriptTemplates
 
+ASSETSScriptExamples_FILES.files = ./assets/acquisitionScriptExamples/*.*
+ASSETSScriptExamples_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/acquisitionScriptExamples
+
+HELPACQS_FILES.files = ./help/acquisition_script/*.*
+HELPACQS_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/acquisition_script/
+
+
+INSTALLS += ASSETSScriptTemplates_FILES ASSETSScriptExamples_FILES HELPACQS_FILES
 
 
 
