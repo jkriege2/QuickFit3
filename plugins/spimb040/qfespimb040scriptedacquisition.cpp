@@ -337,7 +337,8 @@ QString QFESPIMB040ScriptedAcquisition::getScript() const
 
 void QFESPIMB040ScriptedAcquisition::loadSettings(QSettings &settings, QString prefix)
 {
-    ui->edtScript->setPlainText(settings.value(prefix+"script", tr("logText(\"Hello World!\\n\");")).toString());
+    lastScript=settings.value(prefix+"script", tr("logText(\"Hello World!\\n\");")).toString();
+    ui->edtScript->setPlainText(lastScript);
 }
 
 void QFESPIMB040ScriptedAcquisition::storeSettings(QSettings &settings, QString prefix) const
@@ -370,6 +371,7 @@ void QFESPIMB040ScriptedAcquisition::on_btnNew_clicked()
     if (maybeSave()) {
         ui->edtScript->setPlainText("");
         setScriptFilename(tr("new_acquisition_script.js"));
+        lastScript=ui->edtScript->toPlainText();
     }
 }
 
@@ -397,6 +399,7 @@ void QFESPIMB040ScriptedAcquisition::on_btnSave_clicked()
             if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
                 QTextStream s(&f);
                 s<<ui->edtScript->toPlainText().toUtf8();
+                lastScript=ui->edtScript->toPlainText();
                 f.close();
                 setScriptFilename(filename);
             }
@@ -484,12 +487,12 @@ void QFESPIMB040ScriptedAcquisition::on_btnSyntaxCheck_clicked()
 
 void QFESPIMB040ScriptedAcquisition::on_btnOpenExample_clicked()
 {
-    openScript(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/ext_spimb040/acquisitionScriptExamples/", false);
+    openScript(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/spimb040/acquisitionScriptExamples/", false);
 }
 
 void QFESPIMB040ScriptedAcquisition::on_btnOpenTemplate_clicked()
 {
-    openScript(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/ext_spimb040/acquisitionScriptTemplates/", false);
+    openScript(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/spimb040/acquisitionScriptTemplates/", false);
 }
 
 void QFESPIMB040ScriptedAcquisition::on_edtScript_cursorPositionChanged()
@@ -505,12 +508,18 @@ void QFESPIMB040ScriptedAcquisition::on_edtScript_cursorPositionChanged()
     }
 }
 
+void QFESPIMB040ScriptedAcquisition::on_btnHelp_clicked()
+{
+    m_pluginServices->displayHelpWindow(m_pluginServices->getPluginHelpDirectory("ext_spimb040")+"/acquisition_script.html");
+}
+
 bool QFESPIMB040ScriptedAcquisition::maybeSave() {
     if (ui->edtScript->toPlainText().isEmpty()) return true;
-    int r=QMessageBox::question(this, tr("save acquisition script ..."), tr("The current script has not been saved.\n  Delete?\n    Yes: Any changes will be lost.\n    No: You will be asked for a filename for the script.    Cancel: return to editing the script."), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::No);
+    if (ui->edtScript->toPlainText()==lastScript) return true;
+    int r=QMessageBox::question(this, tr("save acquisition script ..."), tr("The current script has not been saved.\n  Delete?\n    Yes: Any changes will be lost.\n    No: You will be asked for a filename for the script.\n    Cancel: return to editing the script."), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::No);
     if (r==QMessageBox::Yes) {
         return true;
-    } else if (r==QMessageBox::Yes) {
+    } else if (r==QMessageBox::No) {
         on_btnSave_clicked();
         return true;
     }
@@ -537,8 +546,10 @@ QString QFESPIMB040ScriptedAcquisition::getFunctionHelp(QString name)
 
 void QFESPIMB040ScriptedAcquisition::openScript(QString dir, bool saveDir) {
     if (maybeSave()) {
-        QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acquisitionScripts/");
-        if (dir=="last") dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ScriptedAcquisition/lastScriptDir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acquisitionScripts/").toString();
+        if (dir=="last") {
+            QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acquisitionScripts/");
+            dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ScriptedAcquisition/lastScriptDir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acquisitionScripts/").toString();
+        }
         QString filename=qfGetOpenFileName(this, tr("open script ..."), dir, tr("acquisition script (*.js)"))    ;
         if (QFile::exists(filename)) {
             QFile f(filename);
@@ -546,6 +557,7 @@ void QFESPIMB040ScriptedAcquisition::openScript(QString dir, bool saveDir) {
                 ui->edtScript->setPlainText(QString::fromUtf8(f.readAll()));
                 setScriptFilename(filename);
                 f.close();
+                lastScript=ui->edtScript->toPlainText();
             }
         }
         if (saveDir) ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ScriptedAcquisition/lastScriptDir", dir);

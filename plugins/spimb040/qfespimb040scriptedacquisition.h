@@ -85,6 +85,7 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
         void on_btnOpenExample_clicked();
         void on_btnOpenTemplate_clicked();
         void on_edtScript_cursorPositionChanged();
+        void on_btnHelp_clicked();
 
         void openScript(QString dir, bool saveDir=true);
 
@@ -116,6 +117,7 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
         QList<QFESPIMB040ScriptedAcquisitionDocSearchThread*> threads;
         QStringListModel helpModel;
         QStringList defaultWords;
+        QString lastScript;
 
 };
 
