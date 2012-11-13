@@ -8,23 +8,23 @@
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 	<h2>Illumination Control</h2>
 	<ul>
-		<li><a name="setLaserIntensity"/><!-- func:setLaserIntensity -->
-		<b><tt><!-- template -->setLaserIntensity(laser, line, intensity)<!-- /template --></tt> - <i>sets the laser intensity </i>:</b><br>
+		<li><a name="instrument.setLaserIntensity"/><!-- func:instrument.setLaserIntensity -->
+		<b><tt><!-- template -->instrument.setLaserIntensity(laser, line, intensity)<!-- /template --></tt> - <i>sets the laser intensity </i>:</b><br>
 		This function sets the intensity of the specified laser (either 1 or 2). Each laser may have several lines (the first one is 0) and you may set the power in device units (usually milliwats) as a floating point value.
-		<!-- /func:setLaserIntensity -->
+		<!-- /func:instrument.setLaserIntensity -->
 		</li>
 
-		<li><a name="setTransmissionIntensity"/><!-- func:setTransmissionIntensity -->
-		<b><tt><!-- template -->setTransmissionIntensity(line, intensity)<!-- /template --></tt> - <i>sets the transmission illumination intensity </i>:</b><br>
+		<li><a name="instrument.setTransmissionIntensity"/><!-- func:instrument.setTransmissionIntensity -->
+		<b><tt><!-- template -->instrument.setTransmissionIntensity(line, intensity)<!-- /template --></tt> - <i>sets the transmission illumination intensity </i>:</b><br>
 		This function sets the intensity of the transmission illumination. The illumination device may have several lines (the first one is 0) and you may set the power in device units as a floating point value.<br>
 		Currently this function does NOT block, so use sleepMS() to wait a sufficient time until the new intensity is settled.
-		<!-- /func:setTransmissionIntensity -->
+		<!-- /func:instrument.setTransmissionIntensity -->
 		</li>
 	</ul>
 	<h2>Shutter Control</h2>
 	<ul>
-		<li><a name="setShutter"/><!-- func:setShutter -->
-		<b><tt><!-- template -->setShutter(shutter, state)<!-- /template --></tt> - <i>sets the state (boolean) of the specified shutter </i>:</b><br>
+		<li><a name="instrument.setShutter"/><!-- func:instrument.setShutter -->
+		<b><tt><!-- template -->instrument.setShutter(shutter, state)<!-- /template --></tt> - <i>sets the state (boolean) of the specified shutter </i>:</b><br>
 		These shutters are defined:
 		  <ul>
                     <li>"main": the main shutter</li>
@@ -33,15 +33,29 @@
                     <li>"transmission": the transmission illumination shutter</li>
                   </ul>
 		This function blocks until the shutter has reached its final position.
-		<!-- /func:setShutter -->
+		<!-- /func:instrument.setShutter -->
+		</li>
+
+
+	</ul>
+	<h2>Filter Changer Control</h2>
+	<ul>
+		<li><a name="instrument.setFilterWheel"/><!-- func:instrument.setFilterWheel -->
+		<b><tt><!-- template -->instrument.setFilterWheel(wheel, filter)<!-- /template --></tt> - <i>sets the filter (integer) of the specified wheel </i>:</b><br>
+		These wheels are defined:
+		  <ul>
+                    <li>"detection": the detection arm filter wheel</li>
+                  </ul>
+		This function blocks until the wheel has reached its final position.
+		<!-- /func:instrument.setFilterWheel -->
 		</li>
 
 
 	</ul>
 	<h2>Stage Control</h2>
 	<ul>
-		<li><a name="moveStageRel"/><!-- func:moveStageRel -->
-		<b><tt><!-- template -->moveStageRel(stage, delta)<!-- /template --></tt> - <i>move the specified stage by a given distance <tt>delta</tt> </i>:</b><br>
+		<li><a name="instrument.moveStageRel"/><!-- func:instrument.moveStageRel -->
+		<b><tt><!-- template -->instrument.moveStageRel(stage, delta)<!-- /template --></tt> - <i>move the specified stage by a given distance <tt>delta</tt> </i>:</b><br>
 		These stages are defined:
 		  <ul>
                     <li>"x": sample translation stage: x-direction</li>
@@ -49,10 +63,10 @@
                     <li>"z": sample translation stage: z-direction</li>
                   </ul>
                 The new stage position is a displacement relative to the current position (<tt>current_position + delta</tt>) and has to be given in micrometers. This function blocks until the stage stops moving.
-		<!-- /func:moveStageRel -->
+		<!-- /func:instrument.moveStageRel -->
 		</li>
-		<li><a name="moveStageAbs"/><!-- func:moveStageAbs -->
-		<b><tt><!-- template -->moveStageAbs(stage, new_position)<!-- /template --></tt> - <i>move the specified stage to the given position </i>:</b><br>
+		<li><a name="instrument.moveStageAbs"/><!-- func:instrument.moveStageAbs -->
+		<b><tt><!-- template -->instrument.moveStageAbs(stage, new_position)<!-- /template --></tt> - <i>move the specified stage to the given position </i>:</b><br>
 		These stages are defined:
 		  <ul>
                     <li>"x": sample translation stage: x-direction</li>
@@ -60,14 +74,14 @@
                     <li>"z": sample translation stage: z-direction</li>
                   </ul>
                 The stage position is an absolute value and has to be given in micrometers. This function blocks until the stage stops moving.
-		<!-- /func:moveStageAbs -->
+		<!-- /func:instrument.moveStageAbs -->
 		</li>
 	</ul>
 	<h2>Acquisition Control</h2>
 	<ul>
-		<li><a name="doAcquisition"/><!-- func:doAcquisition -->
-		<b><tt><!-- template -->doAcquisition()<!-- /template --></tt> - <i>perform an acquisition with the settings currently specified in the <a href="../ext_spimb040_acquisition.html">Acquisition tab</a>. </i>:</b><br>
-		<!-- /func:doAcquisition -->
+		<li><a name="acquisition.doAcquisition"/><!-- func:acquisition.doAcquisition -->
+		<b><tt><!-- template -->acquisition.doAcquisition()<!-- /template --></tt> - <i>perform an acquisition with the settings currently specified in the <a href="../ext_spimb040_acquisition.html">Acquisition tab</a>. </i>:</b><br>
+		<!-- /func:acquisition.doAcquisition -->
 		</li>
 
 

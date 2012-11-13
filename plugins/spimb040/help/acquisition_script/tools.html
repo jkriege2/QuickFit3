@@ -8,24 +8,25 @@
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 	<h2>Logging Functionsl</h2>
 	<ul>
-		<li><a name="logText"/><!-- func:logText -->
-		<b><tt><!-- template -->logText(data1[, data2, ...])<!-- /template --></tt> - <i>write normal text to the logging pane</i>:</b><br>
-		you may specify several parameters that will all be converted to strings and written out one after the other.
-		<!-- /func:logText -->
+		<li><a name="tools.setStatus"/><!-- func:tools.setStatus -->
+		<b><tt><!-- template -->tools.setStatus(message)<!-- /template --></tt> - <i>write text (ncluding HTML markup!) to the status line below the script editor</i>:</b><br>
+		<!-- /func:tools.setStatus -->
 		</li>
-		<li><a name="logWarning"/><!-- func:logWarning -->
-		<b><tt><!-- template -->logWarning(data1[, data2, ...])<!-- /template --></tt> - <i>write a warning to the logging pane</i>:</b><br>
-		you may specify several parameters that will all be converted to strings and written out one after the other.
-		<!-- /func:logWarning -->
+		<li><a name="tools.logText"/><!-- func:tools.logText -->
+		<b><tt><!-- template -->tools.logText(message)<!-- /template --></tt> - <i>write normal text to the logging pane</i>:</b><br>
+		<!-- /func:tools.logText -->
 		</li>
-		<li><a name="logError"/><!-- func:logError -->
-		<b><tt><!-- template -->logError(data1[, data2, ...])<!-- /template --></tt> - <i>write an error messaget to the logging pane</i>:</b><br>
-		you may specify several parameters that will all be converted to strings and written out one after the other.
-		<!-- /func:logError -->
+		<li><a name="tools.logWarning"/><!-- func:tools.logWarning -->
+		<b><tt><!-- template -->tools.logWarning(message)<!-- /template --></tt> - <i>write a warning to the logging pane</i>:</b><br>
+		<!-- /func:tools.logWarning -->
 		</li>
-		<li><a name="sleepMS"/><!-- func:sleepMS -->
-		<b><tt><!-- template -->sleepMS(milliseconds)<!-- /template --></tt> - <i>sleep for the specified number of milliseconds</i>:</b><br>
-		<!-- /func:sleepMS -->
+		<li><a name="tools.logError"/><!-- func:tools.logError -->
+		<b><tt><!-- template -->tools.logError(message)<!-- /template --></tt> - <i>write an error messaget to the logging pane</i>:</b><br>
+		<!-- /func:tools.logError -->
+		</li>
+		<li><a name="tools.sleepMS"/><!-- func:tools.sleepMS -->
+		<b><tt><!-- template -->tools.sleepMS(milliseconds)<!-- /template --></tt> - <i>sleep for the specified number of milliseconds</i>:</b><br>
+		<!-- /func:tools.sleepMS -->
 		</li>
 	</ul>
 	

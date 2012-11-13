@@ -10,6 +10,7 @@
 #include <QtCore>
 #include "qfcompleterfromfile.h"
 #include "qfespimb040mainwindow2.h"
+#include "qfespimb040scriptedacquisitiontools.h"
 
 
 
@@ -21,180 +22,6 @@
 
 
 
-
-
-
-static QFPluginServices* QFESPIMB040ScriptedAcquisition_pluginServices;
-static QFESPIMB040OpticsSetup* QFESPIMB040ScriptedAcquisition_opticsSetup;
-static QFESPIMB040AcquisitionDescription* QFESPIMB040ScriptedAcquisition_acqDescription;
-static QFESPIMB040ExperimentDescription* QFESPIMB040ScriptedAcquisition_expDescription;
-static QFPluginLogService* QFESPIMB040ScriptedAcquisition_log;
-static QFESPIMB040AcquisitionTools* QFESPIMB040ScriptedAcquisition_acqTools;
-static QFESPIMB040MainWindow2* QFESPIMB040ScriptedAcquisition_mainWindow;
-
-QScriptValue myDoAcquisition(QScriptContext *context, QScriptEngine *engine) {
-    QFESPIMB040ScriptedAcquisition_mainWindow->doAcquisition();
-    return engine->undefinedValue();
-}
-
-QScriptValue myLogText(QScriptContext *context, QScriptEngine *engine) {
-    for (int i=0; i<context->argumentCount(); i++) {
-        QFESPIMB040ScriptedAcquisition_log->log_text(context->argument(i).toString());
-    }
-    return engine->undefinedValue();
-}
-
-QScriptValue myLogError(QScriptContext *context, QScriptEngine *engine) {
-    for (int i=0; i<context->argumentCount(); i++) {
-        QFESPIMB040ScriptedAcquisition_log->log_error(context->argument(i).toString());
-    }
-    return engine->undefinedValue();
-}
-
-QScriptValue myLogWarning(QScriptContext *context, QScriptEngine *engine) {
-    for (int i=0; i<context->argumentCount(); i++) {
-        QFESPIMB040ScriptedAcquisition_log->log_warning(context->argument(i).toString());
-    }
-    return engine->undefinedValue();
-}
-
-QScriptValue mySetLaserIntensity(QScriptContext *context, QScriptEngine *engine) {
-    int laser=context->argument(0).toInteger();
-    uint32_t line=context->argument(1).toUInt32();
-    double power=context->argument(2).toNumber();
-    if (laser==1)  {
-        QFESPIMB040ScriptedAcquisition_opticsSetup->getLaser1()->setLightSourcePower(QFESPIMB040ScriptedAcquisition_opticsSetup->getLaser1ID(), line, power);
-    } else if (laser==2)  {
-        QFESPIMB040ScriptedAcquisition_opticsSetup->getLaser2()->setLightSourcePower(QFESPIMB040ScriptedAcquisition_opticsSetup->getLaser2ID(), line, power);
-    } else {
-        return context->throwError(QObject::tr("setLaserIntensity(laser=%1, %2, %3): unknown laser!").arg(laser).arg(line).arg(power));
-    }
-    return engine->undefinedValue();
-}
-
-QScriptValue mySetTransmissionIntensity(QScriptContext *context, QScriptEngine *engine) {
-    uint32_t line=context->argument(0).toUInt32();
-    double power=context->argument(1).toNumber();
-    QFESPIMB040ScriptedAcquisition_opticsSetup->getTransmissionLightSource()->setLightSourcePower(QFESPIMB040ScriptedAcquisition_opticsSetup->getTransmissionLightSourceID(), line, power);
-    return engine->undefinedValue();
-}
-
-QScriptValue mySetShutter(QScriptContext *context, QScriptEngine *engine) {
-    QString shutter=context->argument(0).toString().toLower();
-    bool state=context->argument(1).toBool();
-    if (shutter=="main") {
-        QFESPIMB040ScriptedAcquisition_opticsSetup->setMainIlluminationShutter(state, true);
-    } else if (shutter=="laser1") {
-        QFESPIMB040ScriptedAcquisition_opticsSetup->setShutter(QFESPIMB040OpticsSetup::ShutterLaser1, state, true);
-    } else if (shutter=="laser2") {
-        QFESPIMB040ScriptedAcquisition_opticsSetup->setShutter(QFESPIMB040OpticsSetup::ShutterLaser2, state, true);
-    } else if (shutter=="transmission") {
-        QFESPIMB040ScriptedAcquisition_opticsSetup->setShutter(QFESPIMB040OpticsSetup::ShutterTransmission, state, true);
-    } else {
-        return context->throwError(QObject::tr("setShutter('%1'): unknown shutter!").arg(shutter));
-    }
-    return engine->undefinedValue();
-}
-
-QScriptValue mySetFilterWheel(QScriptContext *context, QScriptEngine *engine) {
-    QString wheel="detection";
-    int filter=context->argument(0).toInteger();
-    if (context->argumentCount()>1) {
-        wheel=context->argument(0).toString().toLower();
-        filter=context->argument(1).toInteger();
-    }
-    QFExtensionFilterChanger* changer=NULL;
-    int ID=0;
-    if (wheel=="detection") {
-        changer=QFESPIMB040ScriptedAcquisition_opticsSetup->getFilterChangerDetection();
-        ID=QFESPIMB040ScriptedAcquisition_opticsSetup->getFilterChangerDetectionID();
-    } else {
-        return context->throwError(QObject::tr("setFilterWheel('%1', %2): unknown filter wheel!").arg(wheel).arg(filter));
-    }
-    changer->setFilterChangerFilter(ID, filter);
-    QElapsedTimer t;
-    t.start();
-    while (!changer->isLastFilterChangerActionFinished(ID) && t.elapsed()<20000) {
-
-    }
-    if (t.elapsed()>=20000) {
-        return context->throwError(QObject::tr("setFilterWheel('%1', %2): move timed out after 20s!").arg(wheel).arg(filter));
-    }
-    return engine->undefinedValue();
-}
-
-QScriptValue myMoveStageAbs(QScriptContext *context, QScriptEngine *engine) {
-    QString stage=context->argument(0).toString().toLower();
-    bool newPos=context->argument(1).toNumber();
-    QFExtensionLinearStage*  stageE=NULL;
-    int axis=0;
-    if (stage=="x") {
-        stageE=QFESPIMB040ScriptedAcquisition_opticsSetup->getXStage();
-        axis=QFESPIMB040ScriptedAcquisition_opticsSetup->getXStageAxis();
-    } else if (stage=="y") {
-        stageE=QFESPIMB040ScriptedAcquisition_opticsSetup->getYStage();
-        axis=QFESPIMB040ScriptedAcquisition_opticsSetup->getYStageAxis();
-    } else if (stage=="z") {
-        stageE=QFESPIMB040ScriptedAcquisition_opticsSetup->getZStage();
-        axis=QFESPIMB040ScriptedAcquisition_opticsSetup->getZStageAxis();
-    } else {
-        return context->throwError(QObject::tr("moveStageAbs('%1', %2): unknown stage!").arg(stage).arg(newPos));
-    }
-
-    stageE->move(axis, newPos);
-    QElapsedTimer t;
-    t.start();
-    while (stageE->getAxisState(axis)==QFExtensionLinearStage::Moving && t.elapsed()<20000) {
-        QApplication::processEvents();
-    }
-    if (t.elapsed()>=20000) {
-        return context->throwError(QObject::tr("moveStageAbs('%1', %2): move timed out after 20s!").arg(stage).arg(newPos));
-    }
-
-    return engine->undefinedValue();
-}
-
-
-QScriptValue myMoveStageRel(QScriptContext *context, QScriptEngine *engine) {
-    QString stage=context->argument(0).toString().toLower();
-    bool newPos=context->argument(1).toNumber();
-    QFExtensionLinearStage*  stageE=NULL;
-    int axis=0;
-    if (stage=="x") {
-        stageE=QFESPIMB040ScriptedAcquisition_opticsSetup->getXStage();
-        axis=QFESPIMB040ScriptedAcquisition_opticsSetup->getXStageAxis();
-    } else if (stage=="y") {
-        stageE=QFESPIMB040ScriptedAcquisition_opticsSetup->getYStage();
-        axis=QFESPIMB040ScriptedAcquisition_opticsSetup->getYStageAxis();
-    } else if (stage=="z") {
-        stageE=QFESPIMB040ScriptedAcquisition_opticsSetup->getZStage();
-        axis=QFESPIMB040ScriptedAcquisition_opticsSetup->getZStageAxis();
-    } else {
-        return context->throwError(QObject::tr("moveStageRel('%1', %2): unknown stage!").arg(stage).arg(newPos));
-    }
-
-    stageE->move(axis, stageE->getPosition(axis)+newPos);
-    QElapsedTimer t;
-    t.start();
-    while (stageE->getAxisState(axis)==QFExtensionLinearStage::Moving && t.elapsed()<20000) {
-        QApplication::processEvents();
-    }
-    if (t.elapsed()>=20000) {
-        return context->throwError(QObject::tr("moveStageRel('%1', %2): move timed out after 20s!").arg(stage).arg(newPos));
-    }
-
-    return engine->undefinedValue();
-}
-
-QScriptValue mySleep(QScriptContext *context, QScriptEngine *engine) {
-    int duration=context->argument(0).toInteger();
-    QElapsedTimer t;
-    t.start();
-    while (t.elapsed()<duration) {
-        QApplication::processEvents();
-    }
-    return engine->undefinedValue();
-}
 
 
 
@@ -231,7 +58,7 @@ void QFESPIMB040ScriptedAcquisitionDocSearchThread::run()
             QString contents=f.readAll();
             f.close();
             int pos=0;
-            QRegExp rx("<!--\\s*func:([\\w]*)\\s*-->(.*)<!--\\s*/func:\\1\\s*-->");
+            QRegExp rx("<!--\\s*func:([\\w\\.\\_]*)\\s*-->(.*)<!--\\s*/func:\\1\\s*-->");
             while ((pos = rx.indexIn(contents, pos)) != -1) {
                 QString name=rx.cap(1).trimmed();
                 QString help=rx.cap(2).trimmed();
@@ -267,13 +94,6 @@ QFESPIMB040ScriptedAcquisition::QFESPIMB040ScriptedAcquisition(QFESPIMB040MainWi
     QWidget(parent),
     ui(new Ui::QFESPIMB040ScriptedAcquisition)
 {
-    QFESPIMB040ScriptedAcquisition_pluginServices=pluginServices;
-    QFESPIMB040ScriptedAcquisition_opticsSetup=opticsSetup;
-    QFESPIMB040ScriptedAcquisition_acqDescription=acqDescription;
-    QFESPIMB040ScriptedAcquisition_expDescription=expDescription;
-    QFESPIMB040ScriptedAcquisition_log=log;
-    QFESPIMB040ScriptedAcquisition_acqTools=acqTools;
-    QFESPIMB040ScriptedAcquisition_mainWindow=mainWindow;
 
     this->m_pluginServices=pluginServices;
     this->opticsSetup=opticsSetup;
@@ -283,14 +103,27 @@ QFESPIMB040ScriptedAcquisition::QFESPIMB040ScriptedAcquisition(QFESPIMB040MainWi
     this->acqTools=acqTools;
     this->mainWindow=mainWindow;
 
+    acquisitionTools=new QFESPIMB040ScriptedAcquisitionTools(this, mainWindow, acqTools, log, this, pluginServices, opticsSetup, acqDescription, expDescription);
+    instrumentControl=new QFESPIMB040ScriptedAcquisitionInstrumentControl(this, mainWindow, acqTools, log, this, pluginServices, opticsSetup, acqDescription, expDescription);
+    acquisitionControl=new QFESPIMB040ScriptedAcquisitionAcquisitionControl(this, mainWindow, acqTools, log, this, pluginServices, opticsSetup, acqDescription, expDescription);
+
+
     engine=new QScriptEngine();
 
 
     ui->setupUi(this);
+    recentMaskFiles=new QRecentFilesMenu(this);
+    recentMaskFiles->setUseSystemFileIcons(false);
+    recentMaskFiles->setAlwaysEnabled(true);
+    connect(recentMaskFiles, SIGNAL(openRecentFile(QString)), this, SLOT(openScriptNoAsk(QString)));
+    ui->btnOpen->setMenu(recentMaskFiles);
+
+
     updateReplaces();
     //bindLineEdit(ui->edtPrefix1);
     ui->btnCancel->setVisible(false);
     ui->widProgress->setVisible(false);
+    ui->labStatus->setVisible(false);
     setScriptFilename(tr("new_acquisition_script.js"));
 
 
@@ -337,13 +170,15 @@ QString QFESPIMB040ScriptedAcquisition::getScript() const
 
 void QFESPIMB040ScriptedAcquisition::loadSettings(QSettings &settings, QString prefix)
 {
-    lastScript=settings.value(prefix+"script", tr("logText(\"Hello World!\\n\");")).toString();
+    lastScript=settings.value(prefix+"script", tr("tools.logText(\"Hello World!\\n\");")).toString();
     ui->edtScript->setPlainText(lastScript);
+    recentMaskFiles->readSettings(settings, prefix+"recentScripts/");
 }
 
 void QFESPIMB040ScriptedAcquisition::storeSettings(QSettings &settings, QString prefix) const
 {
     settings.setValue(prefix+"script", ui->edtScript->toPlainText());
+    recentMaskFiles->storeSettings(settings, prefix+"recentScripts/");
 }
 
 
@@ -388,12 +223,12 @@ void QFESPIMB040ScriptedAcquisition::on_btnSave_clicked()
     QString filename=qfGetSaveFileName(this, tr("save acquisition script ..."), d.absoluteFilePath(currentScript), tr("acquisition script (*.js)"));
     if (!filename.isEmpty()) {
         bool ok=true;
-        if (QFile::exists(filename)) {
+        /*if (QFile::exists(filename)) {
             ok=false;
             if (QMessageBox::question(this, tr("save acquisition script ..."), tr("The file\n  '%1'\nalready exists. Overwrite?").arg(filename), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
                 ok=true;
             }
-        }
+        }*/
         if (ok) {
             QFile f(filename);
             if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
@@ -414,6 +249,15 @@ void QFESPIMB040ScriptedAcquisition::on_btnSave_clicked()
     QScriptValue fun = engine->newFunction(function); \
     engine->globalObject().setProperty(name, fun); \
   }
+#define ADD_SCRIPT_QOBJECT(engine, someObject, name) { \
+     QScriptValue objectValue = engine->newQObject(someObject);\
+     engine->globalObject().setProperty(name, objectValue);\
+   }
+#define ADD_SCRIPT_QFOBJECT(engine, someObject, name) { \
+    someObject->setEngine(engine); \
+     QScriptValue objectValue = engine->newQObject(someObject);\
+     engine->globalObject().setProperty(name, objectValue);\
+   }
 
 void QFESPIMB040ScriptedAcquisition::performAcquisition()
 {
@@ -421,6 +265,12 @@ void QFESPIMB040ScriptedAcquisition::performAcquisition()
     ui->widProgress->setVisible(true);
     ui->btnExecute->setEnabled(false);
     ui->widProgress->setSpin(true);
+    ui->edtScript->setEnabled(false);
+    ui->btnNew->setEnabled(false);
+    ui->btnOpen->setEnabled(false);
+    ui->btnOpenExample->setEnabled(false);
+    ui->btnOpenTemplate->setEnabled(false);
+    ui->labStatus->setVisible(true);
     ui->widProgress->setMode(QModernProgressWidget::GradientRing);
     QString script=ui->edtScript->toPlainText();
     log->log_text(tr("\n\n====================================================================================\n"));
@@ -431,27 +281,22 @@ void QFESPIMB040ScriptedAcquisition::performAcquisition()
     QScriptSyntaxCheckResult checkResult=QScriptEngine::checkSyntax(script);
     if (checkResult.state()==QScriptSyntaxCheckResult::Valid) {
         log->log_text(tr("  - script syntax check OK\n"));
+        ui->labStatus->setText(tr("script syntax check OK ..."));
         log->log_text(tr("  - initializing script engine\n"));
+        ui->labStatus->setText(tr("initializing script engine ..."));
         delete engine;
         engine=new QScriptEngine();
         engine->setProcessEventsInterval(50);
         engine->clearExceptions();
         engine->collectGarbage();
         log->log_text(tr("  - registering script objects\n"));
+        ui->labStatus->setText(tr("registering script objects ..."));
 
-        ADD_SCRIPT_FUNCTION(engine, myDoAcquisition, "doAcquisition");
-        ADD_SCRIPT_FUNCTION(engine, myLogText, "logText");
-        ADD_SCRIPT_FUNCTION(engine, myLogError, "logError");
-        ADD_SCRIPT_FUNCTION(engine, myLogWarning, "logWarning");
-        ADD_SCRIPT_FUNCTION(engine, mySetLaserIntensity, "setLaserIntensity");
-        ADD_SCRIPT_FUNCTION(engine, mySetTransmissionIntensity, "setTransmissionIntensity");
-        ADD_SCRIPT_FUNCTION(engine, mySetShutter, "setShutter");
-        ADD_SCRIPT_FUNCTION(engine, mySleep, "sleepMS");
-        ADD_SCRIPT_FUNCTION(engine, myMoveStageAbs, "moveStageAbs");
-        ADD_SCRIPT_FUNCTION(engine, myMoveStageRel, "moveStageRel");
-        ADD_SCRIPT_FUNCTION(engine, mySetFilterWheel, "setFilterWheel");
-        ADD_SCRIPT_FUNCTION(engine, mySetFilterWheel, "setFilterChanger");
+        ADD_SCRIPT_QFOBJECT(engine, acquisitionTools, "tools");
+        ADD_SCRIPT_QFOBJECT(engine, instrumentControl, "instrument");
+        ADD_SCRIPT_QFOBJECT(engine, acquisitionControl, "acquisition");
 
+        ui->labStatus->setText(tr("running script ..."));
         log->log_text(tr("  - running script\n"));
         QScriptValue result = engine->evaluate(script);
         if (engine->hasUncaughtException()) {
@@ -470,6 +315,17 @@ void QFESPIMB040ScriptedAcquisition::performAcquisition()
     ui->btnCancel->setVisible(false);
     ui->widProgress->setVisible(false);
     ui->btnExecute->setEnabled(true);
+    ui->edtScript->setEnabled(true);
+    ui->btnNew->setEnabled(true);
+    ui->btnOpen->setEnabled(true);
+    ui->btnOpenExample->setEnabled(true);
+    ui->btnOpenTemplate->setEnabled(true);
+    ui->labStatus->setVisible(false);
+}
+
+void QFESPIMB040ScriptedAcquisition::setStatus(const QString &text)
+{
+    ui->labStatus->setText(text);
 }
 
 
@@ -498,13 +354,38 @@ void QFESPIMB040ScriptedAcquisition::on_btnOpenTemplate_clicked()
 void QFESPIMB040ScriptedAcquisition::on_edtScript_cursorPositionChanged()
 {
     QTextCursor tc = ui->edtScript->textCursor();
+    /*
     tc.select(QTextCursor::WordUnderCursor);
     QString text=tc.selectedText();
 
-    QString word=text.toLower();
+    QString word=text.toLower();*/
+
+
+    QString text=ui->edtScript->toPlainText();
+    QString word;
+    int newPos=tc.position();
+    if (newPos>=0 && newPos<text.size()) {
+        word+=text[newPos];
+        int p=newPos-1;
+        while (p>=0 && (text[p].isLetterOrNumber()||text[p]=='_'||text[p]=='.')) {
+            word=text[p]+word;
+            p--;
+        }
+        p=newPos+1;
+        while (p<text.size() && (text[p].isLetterOrNumber()||text[p]=='_'||text[p]=='.')) {
+            word=word+text[p];
+            p++;
+        }
+        word=word.toLower();
+    }
+
+
+
     if (functionhelp.contains(word)) {
         ui->labHelp->setText(getFunctionHelp(word));
         //ui->labTemplate->setText(tr("<tt>%1</tt>").arg(getFunctionTemplate(word)));
+    } else {
+        ui->labHelp->setText(tr("no help for '%1'' available ...").arg(word));
     }
 }
 
@@ -530,6 +411,7 @@ bool QFESPIMB040ScriptedAcquisition::maybeSave() {
 void QFESPIMB040ScriptedAcquisition::setScriptFilename(QString filename)
 {
     currentScript=filename;
+    recentMaskFiles->addRecentFile(filename);
     ui->labScriptFilename->setText(tr("current script: <tt><i>%1</i></tt>").arg(QFileInfo(filename).fileName()));
 }
 
@@ -563,6 +445,21 @@ void QFESPIMB040ScriptedAcquisition::openScript(QString dir, bool saveDir) {
         if (saveDir) ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ScriptedAcquisition/lastScriptDir", dir);
     }
 
+}
+
+void QFESPIMB040ScriptedAcquisition::openScriptNoAsk(QString filename)
+{
+    if (maybeSave()) {
+        if (QFile::exists(filename)) {
+            QFile f(filename);
+            if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+                ui->edtScript->setPlainText(QString::fromUtf8(f.readAll()));
+                setScriptFilename(filename);
+                f.close();
+                lastScript=ui->edtScript->toPlainText();
+            }
+        }
+    }
 }
 
 void QFESPIMB040ScriptedAcquisition::threadFinished()

@@ -242,7 +242,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,1,0">
      <item>
       <widget class="QPushButton" name="btnExecute">
        <property name="text">
@@ -251,6 +251,17 @@
        <property name="icon">
         <iconset resource="spimb040.qrc">
          <normaloff>:/spimb040/acquisitionsingle.png</normaloff>:/spimb040/acquisitionsingle.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCancel">
+       <property name="text">
+        <string>&amp;Cancel Script</string>
+       </property>
+       <property name="icon">
+        <iconset resource="spimb040.qrc">
+         <normaloff>:/spimb040/stage_error.png</normaloff>:/spimb040/stage_error.png</iconset>
        </property>
       </widget>
      </item>
@@ -277,13 +288,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnCancel">
+      <widget class="QLabel" name="labStatus">
        <property name="text">
-        <string>&amp;Cancel Script</string>
-       </property>
-       <property name="icon">
-        <iconset resource="spimb040.qrc">
-         <normaloff>:/spimb040/stage_error.png</normaloff>:/spimb040/stage_error.png</iconset>
+        <string/>
        </property>
       </widget>
      </item>

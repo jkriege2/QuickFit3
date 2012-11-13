@@ -46,7 +46,8 @@ HEADERS += spimb040.h \
     ../interfaces/qfextensionglobalsettingsreadwrite.h \
     qfespimb040deviceparamstackconfigwidget.h \
     qfespimb040acquisitiontools.h \
-    qfespimb040scriptedacquisition.h
+    qfespimb040scriptedacquisition.h \
+    qfespimb040scriptedacquisitiontools.h
 
 SOURCES += spimb040.cpp \
            qfespimb040cameraview.cpp \
@@ -72,7 +73,8 @@ SOURCES += spimb040.cpp \
     qfespimb040lightpathsavedialog.cpp \
     qfespimb040acquisitiondescription.cpp \
     qfespimb040deviceparamstackconfigwidget.cpp \
-    qfespimb040scriptedacquisition.cpp
+    qfespimb040scriptedacquisition.cpp \
+    qfespimb040scriptedacquisitiontools.cpp
 FORMS = \
     qfespimb040opticssetup.ui \
     qfespimb00histogrammaskdialog.ui \

@@ -12,7 +12,7 @@
 #include "qfespimb040filenametool.h"
 #include "qtriple.h"
 #include "qfespimb040acquisitiontools.h"
-
+#include "qrecentfilesmenu.h"
 
 
 class QFESPIMB040ScriptedAcquisitionDocSearchThread: public QThread {
@@ -33,6 +33,9 @@ class QFESPIMB040ScriptedAcquisitionDocSearchThread: public QThread {
 
 class QFESPIMB040MainWindow2; // forward
 class QFPluginServices; // forward
+class QFESPIMB040ScriptedAcquisitionTools; // forward
+class QFESPIMB040ScriptedAcquisitionInstrumentControl; // forward
+class QFESPIMB040ScriptedAcquisitionAcquisitionControl; // forward
 
 namespace Ui {
     class QFESPIMB040ScriptedAcquisition;
@@ -73,6 +76,7 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
 
     public slots:
         void performAcquisition();
+        void setStatus(const QString& text);
 
     protected slots:
         void on_btnExecute_clicked();
@@ -88,6 +92,7 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
         void on_btnHelp_clicked();
 
         void openScript(QString dir, bool saveDir=true);
+        void openScriptNoAsk(QString filename);
 
         void threadFinished();
         void delayedStartSearchThreads();
@@ -95,6 +100,7 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
     protected:
         bool maybeSave();
         void setScriptFilename(QString filename);
+
         QString currentScript;
     private:
         Ui::QFESPIMB040ScriptedAcquisition *ui;
@@ -106,6 +112,7 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
         QFESPIMB040AcquisitionTools* acqTools;
         QFESPIMB040MainWindow2* mainWindow;
         QScriptEngine* engine;
+        QRecentFilesMenu* recentMaskFiles;
 
         QMap<QString, QPair<QString, QString> > functionhelp;
 
@@ -118,7 +125,18 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
         QStringListModel helpModel;
         QStringList defaultWords;
         QString lastScript;
+        QFESPIMB040ScriptedAcquisitionTools* acquisitionTools;
+        QFESPIMB040ScriptedAcquisitionInstrumentControl* instrumentControl;
+        QFESPIMB040ScriptedAcquisitionAcquisitionControl* acquisitionControl;
 
 };
+
+
+
+
+
+
+
+
 
 #endif // QFESPIMB040SCRIPTEDACQUISITION_H
