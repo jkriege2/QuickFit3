@@ -16,28 +16,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 QFESPIMB040ScriptedAcquisitionDocSearchThread::QFESPIMB040ScriptedAcquisitionDocSearchThread(QStringList files, QObject *parent):
     QThread(parent)
 {
@@ -326,6 +304,25 @@ void QFESPIMB040ScriptedAcquisition::performAcquisition()
 void QFESPIMB040ScriptedAcquisition::setStatus(const QString &text)
 {
     ui->labStatus->setText(text);
+}
+
+void QFESPIMB040ScriptedAcquisition::setStatusProgressRange(double minimum, double maximum)
+{
+    ui->progress->setRange(minimum, maximum);
+}
+
+void QFESPIMB040ScriptedAcquisition::setStatusProgress(double value)
+{
+    ui->progress->setPercentageMode(QModernProgressWidget::Percent);
+    ui->progress->setDisplayPercent(true);
+    ui->progress->setValue(value);
+}
+
+void QFESPIMB040ScriptedAcquisition::incStatusProgress()
+{
+    ui->progress->setPercentageMode(QModernProgressWidget::Percent);
+    ui->progress->setDisplayPercent(true);
+    ui->progress->setValue(ui->progress->value()+1);
 }
 
 

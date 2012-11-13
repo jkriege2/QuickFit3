@@ -77,6 +77,11 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
     public slots:
         void performAcquisition();
         void setStatus(const QString& text);
+        void setStatusProgressRange(double minimum, double maximum);
+        void setStatusProgress(double value);
+
+        void incStatusProgress();
+        void incStatusProgress(double value);
 
     protected slots:
         void on_btnExecute_clicked();

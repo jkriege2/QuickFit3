@@ -29,21 +29,25 @@ QFESPIMB040ScriptedAcquisitionTools::QFESPIMB040ScriptedAcquisitionTools(QFESPIM
 void QFESPIMB040ScriptedAcquisitionTools::logText(const QString &text)
 {
     log->log_text(text);
+    QApplication::processEvents();
 }
 
 void QFESPIMB040ScriptedAcquisitionTools::logError(const QString &text)
 {
     log->log_error(text);
+    QApplication::processEvents();
 }
 
 void QFESPIMB040ScriptedAcquisitionTools::logWarning(const QString &text)
 {
     log->log_warning(text);
+    QApplication::processEvents();
 }
 
 void QFESPIMB040ScriptedAcquisitionTools::setStatus(const QString &text)
 {
     widAcquisition->setStatus(text);
+    QApplication::processEvents();
 }
 
 void QFESPIMB040ScriptedAcquisitionTools::sleepMS(int duration)
@@ -217,4 +221,9 @@ QFESPIMB040ScriptedAcquisitionAcquisitionControl::QFESPIMB040ScriptedAcquisition
 void QFESPIMB040ScriptedAcquisitionAcquisitionControl::doAcquisition()
 {
     mainWindow->doAcquisition();
+}
+
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::doImageStack()
+{
+    mainWindow->doImageStack();
 }
