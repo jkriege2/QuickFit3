@@ -96,6 +96,7 @@ class QFESPIMB040ScriptedAcquisitionAcquisitionControl : public QObject, public 
 
     public slots:
         void doAcquisition();
+        void doImageStack();
 
     private:
         QFPluginServices* m_pluginServices;

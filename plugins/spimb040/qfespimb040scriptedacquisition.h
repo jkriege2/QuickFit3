@@ -79,7 +79,6 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
         void setStatus(const QString& text);
         void setStatusProgressRange(double minimum, double maximum);
         void setStatusProgress(double value);
-
         void incStatusProgress();
         void incStatusProgress(double value);
 

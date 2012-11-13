@@ -322,7 +322,14 @@ void QFESPIMB040ScriptedAcquisition::incStatusProgress()
 {
     ui->progress->setPercentageMode(QModernProgressWidget::Percent);
     ui->progress->setDisplayPercent(true);
-    ui->progress->setValue(ui->progress->value()+1);
+    ui->progress->setValue(ui->progress->value()+1.0);
+}
+
+void QFESPIMB040ScriptedAcquisition::incStatusProgress(double value)
+{
+    ui->progress->setPercentageMode(QModernProgressWidget::Percent);
+    ui->progress->setDisplayPercent(true);
+    ui->progress->setValue(ui->progress->value()+value);
 }
 
 
