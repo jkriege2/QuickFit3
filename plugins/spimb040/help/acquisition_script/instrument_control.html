@@ -16,7 +16,8 @@
 
 		<li><a name="setTransmissionIntensity"/><!-- func:setTransmissionIntensity -->
 		<b><tt><!-- template -->setTransmissionIntensity(line, intensity)<!-- /template --></tt> - <i>sets the transmission illumination intensity </i>:</b><br>
-		This function sets the intensity of the transmission illumination. The illumination device may have several lines (the first one is 0) and you may set the power in device units as a floating point value.
+		This function sets the intensity of the transmission illumination. The illumination device may have several lines (the first one is 0) and you may set the power in device units as a floating point value.<br>
+		Currently this function does NOT block, so use sleepMS() to wait a sufficient time until the new intensity is settled.
 		<!-- /func:setTransmissionIntensity -->
 		</li>
 	</ul>
@@ -31,7 +32,42 @@
                     <li>"laser1": the laser 2 shutter</li>
                     <li>"transmission": the transmission illumination shutter</li>
                   </ul>
+		This function blocks until the shutter has reached its final position.
 		<!-- /func:setShutter -->
+		</li>
+
+
+	</ul>
+	<h2>Stage Control</h2>
+	<ul>
+		<li><a name="moveStageRel"/><!-- func:moveStageRel -->
+		<b><tt><!-- template -->moveStageRel(stage, delta)<!-- /template --></tt> - <i>move the specified stage by a given distance <tt>delta</tt> </i>:</b><br>
+		These stages are defined:
+		  <ul>
+                    <li>"x": sample translation stage: x-direction</li>
+                    <li>"y": sample translation stage: y-direction</li>
+                    <li>"z": sample translation stage: z-direction</li>
+                  </ul>
+                The new stage position is a displacement relative to the current position (<tt>current_position + delta</tt>) and has to be given in micrometers. This function blocks until the stage stops moving.
+		<!-- /func:moveStageRel -->
+		</li>
+		<li><a name="moveStageAbs"/><!-- func:moveStageAbs -->
+		<b><tt><!-- template -->moveStageAbs(stage, new_position)<!-- /template --></tt> - <i>move the specified stage to the given position </i>:</b><br>
+		These stages are defined:
+		  <ul>
+                    <li>"x": sample translation stage: x-direction</li>
+                    <li>"y": sample translation stage: y-direction</li>
+                    <li>"z": sample translation stage: z-direction</li>
+                  </ul>
+                The stage position is an absolute value and has to be given in micrometers. This function blocks until the stage stops moving.
+		<!-- /func:moveStageAbs -->
+		</li>
+	</ul>
+	<h2>Acquisition Control</h2>
+	<ul>
+		<li><a name="doAcquisition"/><!-- func:doAcquisition -->
+		<b><tt><!-- template -->doAcquisition()<!-- /template --></tt> - <i>perform an acquisition with the settings currently specified in the <a href="../ext_spimb040_acquisition.html">Acquisition tab</a>. </i>:</b><br>
+		<!-- /func:doAcquisition -->
 		</li>
 
 
