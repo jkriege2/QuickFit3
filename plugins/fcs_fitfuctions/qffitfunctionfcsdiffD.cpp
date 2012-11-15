@@ -8,7 +8,7 @@
 
 #define NAVOGADRO (6.02214179e23)
 
-QFFitFunctionFCSDiffD::QFFitFunctionFCSDiffD() {
+QFFitFunctionFCSDiffD::QFFitFunctionFCSDiffD(bool hasGamma) {
     //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(IntCombo,     "n_nonfluorescent",        "number of nonfluorescent components (triplet ...)",     "# non-fluorescent",        "",            "",                      false,     true,         false,             QFFitFunction::NoError,      false, 1,            0,        2,        1,   0,      2);
     #define FCSDiff_n_nonfluorescent 0
@@ -40,28 +40,51 @@ QFFitFunctionFCSDiffD::QFFitFunctionFCSDiffD() {
     #define FCSDiff_diff_coeff3 13
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
     #define FCSDiff_offset 14
-    addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                  "",           "",                       true,      true,         true,              QFFitFunction::EditError,    true, 6,            0.01,     100,      0.5  );
-    #define FCSDiff_focus_struct_fac 15
-    addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    false, 250,          0,        1e4,      1    );
-    #define FCSDiff_focus_width 16
+
+    this->hasGamma=hasGamma;
+    if (hasGamma) {
+        addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                  "",           "",                       true,      true,         true,              QFFitFunction::EditError,    true, 6,            0.01,     100,      0.5  );
+        #define FCSDiff_focus_struct_fac 15
+        addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    false, 250,          0,        1e4,      1    );
+        #define FCSDiff_focus_width 16
+        addParameter(FloatNumber,  "focus_height",            "focus: longitudinal radius",                            "w<sub>z</sub>",          "nm",         "nm",                     false,      false,         false,              QFFitFunction::DisplayError,    false, 6*250,          0,        1e4,      1    );
+        #define FCSDiff_focus_height 17
+    } else {
+        addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                  "",           "",                       false,      false,         false,              QFFitFunction::DisplayError,    true, 6,            0.01,     100,      0.5  );
+        #define FCSDiff_focus_struct_fac 15
+        addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    false, 250,          0,        1e4,      1    );
+        #define FCSDiff_focus_width 16
+        addParameter(FloatNumber,  "focus_height",            "focus: longitudinal radius",                            "w<sub>z</sub>",          "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    false, 6*250,          0,        1e4,      1    );
+        #define FCSDiff_focus_height 17
+    }
+
     addParameter(FloatNumber,  "focus_volume",            "focus: effective colume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSDiff_focus_volume 17
+    #define FCSDiff_focus_volume 18
     addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSDiff_concentration 18
+    #define FCSDiff_concentration 19
     addParameter(FloatNumber,  "diff_tau1",               "diffusion time of first component",                     "&tau;<sub>D,1</sub>",      "usec",        "&mu;s",                 false,    false,        false,              QFFitFunction::DisplayError, false, 30,           1,        1e5,      1,   0        );
-    #define FCSDiff_diff_tau1 19
+    #define FCSDiff_diff_tau1 20
     addParameter(FloatNumber,  "diff_tau2",               "diffusion time of second component",                    "&tau;<sub>D,2</sub>",      "usec",        "&mu;s",                 false,    false,        false,              QFFitFunction::DisplayError, false, 300,          1,        1e8,      1,   0    );
-    #define FCSDiff_diff_tau2 20
+    #define FCSDiff_diff_tau2 21
     addParameter(FloatNumber,  "diff_tau3",               "diffusion time of third component",                     "&tau;<sub>D,3</sub>",      "usec",        "&mu;s",                 false,    false,        false,              QFFitFunction::DisplayError, false, 300,          1,        1e8,      1    );
-    #define FCSDiff_diff_tau3 21
+    #define FCSDiff_diff_tau3 22
     addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
-    #define FCSDiff_count_rate 22
+    #define FCSDiff_count_rate 23
     addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
-    #define FCSDiff_background 23
+    #define FCSDiff_background 24
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0,            0,        1e50,     1    );
-    #define FCSDiff_cpm 24
+    #define FCSDiff_cpm 25
 }
 
+QString QFFitFunctionFCSDiffD::id() const {
+    if (hasGamma) return QString("fcs_diff_d");
+    return QString("fcs_diff_d_wz");
+}
+
+QString QFFitFunctionFCSDiffD::name() const {
+    if (hasGamma) return  QString("FCS: Normal Diffusion 3D, D and gamma as parameter");
+    return QString("FCS: Normal Diffusion 3D, D and wz as parameter");
+}
 double QFFitFunctionFCSDiffD::evaluate(double t, const double* data) const {
     const int comp=data[FCSDiff_n_components];
     const int nonfl_comp=data[FCSDiff_n_nonfluorescent];
@@ -76,11 +99,15 @@ double QFFitFunctionFCSDiffD::evaluate(double t, const double* data) const {
     const double rho3=data[FCSDiff_diff_rho3];
     const double D3=data[FCSDiff_diff_coeff3]*1.0e6;
     const double wxy=data[FCSDiff_focus_width];
+    const double wz=data[FCSDiff_focus_height];
     const double background=data[FCSDiff_background];
     const double cr=data[FCSDiff_count_rate];
     double backfactor=sqr(cr-background)/sqr(cr);
     if (fabs(cr)<1e-15) backfactor=1;
     double gamma=data[FCSDiff_focus_struct_fac];
+    if (!hasGamma) {
+        gamma=wz/wxy;
+    }
     if (gamma==0) gamma=1;
     const double gamma2=sqr(gamma);
     const double wxy2=sqr(wxy);
@@ -147,6 +174,8 @@ void QFFitFunctionFCSDiffD::calcParameter(double* data, double* error) const {
     //double gamma2=sqr(gamma);
     double wxy=data[FCSDiff_focus_width]/1.0e3; // in µm
     double ewxy=0;
+    double wz=data[FCSDiff_focus_height]/1.0e3; // in µm
+    double ewz=0;
     //double offset=data[FCSDiff_offset];
     double eoffset=0;
     double cps=data[FCSDiff_count_rate];
@@ -170,6 +199,7 @@ void QFFitFunctionFCSDiffD::calcParameter(double* data, double* error) const {
         eD3=error[FCSDiff_diff_coeff3];
         egamma=error[FCSDiff_focus_struct_fac];
         ewxy=error[FCSDiff_focus_width]/1.0e3;
+        ewz=error[FCSDiff_focus_height]/1.0e3;
         eoffset=error[FCSDiff_offset];
         ecps=error[FCSDiff_count_rate];
         ecpm=error[FCSDiff_cpm];
@@ -250,6 +280,18 @@ void QFFitFunctionFCSDiffD::calcParameter(double* data, double* error) const {
         eD2=error[FCSDiff_diff_coeff2];
         //erho3=error[FCSDiff_diff_rho3];
         eD3=error[FCSDiff_diff_coeff3];
+    }
+
+    if (hasGamma) {
+        wz=gamma*wxy;
+        ewz=sqrt(sqr(ewxy*gamma)+sqr(egamma*wxy));
+        data[FCSDiff_focus_height]=wz*1000.0;
+        if (error) error[FCSDiff_focus_height]=ewz*1000.0;
+    } else {
+        gamma=wz/wxy;
+        egamma=sqrt(sqr(ewz/wxy)+sqr(wz*ewxy/sqr(wxy)));
+        data[FCSDiff_focus_struct_fac]=gamma;
+        if (error) error[FCSDiff_focus_struct_fac]=egamma;
     }
 
     // calculate 1/N

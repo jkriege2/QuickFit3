@@ -13,7 +13,9 @@
 #include "qtriple.h"
 #include "qfespimb040acquisitiontools.h"
 #include "qrecentfilesmenu.h"
-
+#include "qfqtscripthighlighter.h"
+#include "finddialog.h"
+#include "replacedialog.h"
 
 class QFESPIMB040ScriptedAcquisitionDocSearchThread: public QThread {
        Q_OBJECT
@@ -92,7 +94,7 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
         void on_btnSyntaxCheck_clicked();
         void on_btnOpenExample_clicked();
         void on_btnOpenTemplate_clicked();
-        void on_edtScript_cursorPositionChanged();
+        void edtScript_cursorPositionChanged();
         void on_btnHelp_clicked();
 
         void openScript(QString dir, bool saveDir=true);
@@ -101,6 +103,38 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
         void threadFinished();
         void delayedStartSearchThreads();
         void addFunction(QString name, QString templ, QString help);
+
+
+
+
+
+
+        /** \brief slot: find the first occurence of the text */
+        void findFirst();
+
+        /** \brief slot: find the next occurence of the text */
+        void findNext();
+
+        /** \brief slot: replace the first occurence of the text */
+        void replaceFirst();
+
+        /** \brief slot: replace the next occurence of the text */
+        void replaceNext();
+
+        /** \brief slot: goto a user selectable line in the text */
+        void gotoLine();
+
+        /** \brief slot: print the SDFF document */
+        void print();
+
+        /** \brief slot: preview print of the SDFF document */
+        void printPreviewClick();
+
+        /** \brief slot: used by printPreview() */
+        void printPreview(QPrinter *printer);
+        /** \brief set the "find next", ... actions to disabled (this is called whenever a new file is loaded or created) */
+        void clearFindActions();
+
     protected:
         bool maybeSave();
         void setScriptFilename(QString filename);
@@ -119,6 +153,7 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
         QRecentFilesMenu* recentMaskFiles;
 
         QMap<QString, QPair<QString, QString> > functionhelp;
+        QStringList specialFunctions;
 
         QString getFunctionTemplate(QString name);
         QString getFunctionHelp(QString name);
@@ -133,6 +168,44 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
         QFESPIMB040ScriptedAcquisitionInstrumentControl* instrumentControl;
         QFESPIMB040ScriptedAcquisitionAcquisitionControl* acquisitionControl;
 
+        QFQtScriptHighlighter* highlighter;
+        QAction *cutAct;
+        /** \brief action object: copy the currently selected text */
+        QAction *copyAct;
+        /** \brief action object: paste some text */
+        QAction *pasteAct;
+        /** \brief action object: undo text changes */
+        QAction *undoAct;
+        /** \brief action object: redo text changes */
+        QAction *redoAct;
+        /** \brief action object: find text */
+        QAction *findAct;
+        /** \brief action object: find next occurence text */
+        QAction *findNextAct;
+        /** \brief action object: find and replace text */
+        QAction *replaceAct;
+        /** \brief action object: find and replace text next */
+        QAction *replaceNextAct;
+        /** \brief action object: run current SDFF script */
+        QAction *runSDFFAct;
+        /** \brief action object: comment text */
+        QAction *commentAct;
+        /** \brief action object: uncomment text */
+        QAction *unCommentAct;
+        /** \brief action object: incease indention */
+        QAction *indentAct;
+        /** \brief action object: decrease indention */
+        QAction *unindentAct;
+        /** \brief action object: goto line */
+        QAction *gotoLineAct;
+        /** \brief action object: print */
+        QAction *printAct;
+
+
+        /** \brief the "Find ..." dialog object */
+        FindDialog* findDlg;
+        /** \brief the "Find & Replace..." dialog object */
+        ReplaceDialog* replaceDlg;
 };
 
 

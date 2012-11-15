@@ -95,7 +95,11 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qffitfunctionplottools.h \
     qftablemodel.h \
     qfhistogramview.h \
-    qfselectionlistdialog.h
+    qfselectionlistdialog.h \
+    qfcompletertextedit.h \
+    qfqtscripthighlighter.h \
+    qfcompletertextedit.h \
+    qfqtscripthighlighter.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -155,7 +159,9 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qffitfunctionplottools.cpp \
     qftablemodel.cpp \
     qfhistogramview.cpp \
-    qfselectionlistdialog.cpp
+    qfselectionlistdialog.cpp \
+    qfqtscripthighlighter.cpp \
+    qfcompletertextedit.cpp
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \
@@ -180,3 +186,9 @@ INCLUDEPATH += ../../../../LIB/trunk/ \
 CONFIG += dll lib_bundle exceptions rtti stl create_prl
 
 DEFINES += QFWIDLIB_LIBRARY LIB_IN_DLL LIB_EXPORT_LIBRARY
+
+
+ASSETSScript_FILES.files = ./assets/qtscript/*.*
+ASSETSScript_FILES.path = $${QFOUTPUT}/assets/qtscript
+
+INSTALLS += ASSETSScript_FILES

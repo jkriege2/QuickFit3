@@ -20,7 +20,7 @@
 
 QStringList QFPFitFunctionFCS::getIDs() const {
     QStringList res;
-    res<<"fcs_diff"<<"fcs_diff_d"<<"fcs_diff1"<<"fcs_adiff"<<"fcs_multidiff"<<"fcs_diffflow"<<"fcs_diffrot"<<"fcs_oscillation";
+    res<<"fcs_diff"<<"fcs_diff_d"<<"fcs_diff_d_wz"<<"fcs_diff1"<<"fcs_adiff"<<"fcs_multidiff"<<"fcs_diffflow"<<"fcs_diffrot"<<"fcs_oscillation";
     return res;
 }
 
@@ -28,7 +28,9 @@ QFFitFunction* QFPFitFunctionFCS::get(QString id, QObject* parent) const  {
     if (id=="fcs_diff") {
         return new QFFitFunctionFCSDiff();
     } else if (id=="fcs_diff_d") {
-            return new QFFitFunctionFCSDiffD();
+        return new QFFitFunctionFCSDiffD();
+    } else if (id=="fcs_diff_d_wz") {
+        return new QFFitFunctionFCSDiffD(false);
     } else if (id=="fcs_diff1") {
         return new QFFitFunctionFCSSimpleDiff();
     } else if (id=="fcs_adiff") {

@@ -93,5 +93,14 @@
         <file alias="script_save.png">icons/script_save.png</file>
         <file alias="script_syntaxcheck.png">icons/script_syntaxcheck.png</file>
         <file alias="script_undo.png">icons/script_undo.png</file>
+        <file alias="script_print.png">icons/script_document-print.png</file>
+        <file alias="script_printpreview.png">icons/script_document-print-preview.png</file>
+        <file alias="script_find.png">icons/script_edit-find.png</file>
+        <file alias="script_find_next.png">icons/script_edit-find-next.png</file>
+        <file alias="script_find_replace.png">icons/script_edit-find-replace.png</file>
+        <file alias="script_find_replace_next.png">icons/script_edit-find-replace-next.png</file>
+        <file alias="script_selectall.png">icons/script_edit-select-all.png</file>
+        <file alias="script_unindent.png">icons/script_format-indent-less.png</file>
+        <file alias="script_indent.png">icons/script_format-indent-more.png</file>
     </qresource>
 </RCC>

@@ -90,11 +90,126 @@ QFESPIMB040ScriptedAcquisition::QFESPIMB040ScriptedAcquisition(QFESPIMB040MainWi
 
 
     ui->setupUi(this);
+    findDlg=new FindDialog(this);
+    replaceDlg=new ReplaceDialog(this);
+
+    highlighter=new QFQtScriptHighlighter("", ui->edtScript->getEditor()->document());
     recentMaskFiles=new QRecentFilesMenu(this);
     recentMaskFiles->setUseSystemFileIcons(false);
     recentMaskFiles->setAlwaysEnabled(true);
     connect(recentMaskFiles, SIGNAL(openRecentFile(QString)), this, SLOT(openScriptNoAsk(QString)));
     ui->btnOpen->setMenu(recentMaskFiles);
+    connect(ui->edtScript->getEditor(), SIGNAL(cursorPositionChanged()), this, SLOT(edtScript_cursorPositionChanged()));
+
+
+
+    cutAct = new QAction(QIcon(":/spimb040/script_cut.png"), tr("Cu&t"), this);
+    cutAct->setShortcut(tr("Ctrl+X"));
+    cutAct->setStatusTip(tr("Cut the current selection's contents to the "
+                            "clipboard"));
+    connect(cutAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(cut()));
+
+    copyAct = new QAction(QIcon(":/spimb040/script_copy.png"), tr("&Copy"), this);
+    copyAct->setShortcut(tr("Ctrl+C"));
+    copyAct->setStatusTip(tr("Copy the current selection's contents to the "
+                             "clipboard"));
+    connect(copyAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(copy()));
+
+    pasteAct = new QAction(QIcon(":/spimb040/script_paste.png"), tr("&Paste"), this);
+    pasteAct->setShortcut(tr("Ctrl+V"));
+    pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
+                              "selection"));
+    connect(pasteAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(paste()));
+
+    undoAct = new QAction(QIcon(":/spimb040/script_editundo.png"), tr("&Undo"), this);
+    undoAct->setShortcut(tr("Ctrl+Z"));
+    undoAct->setStatusTip(tr("Undo the last change "));
+    connect(undoAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(undo()));
+
+    redoAct = new QAction(QIcon(":/spimb040/script_editredo.png"), tr("&Redo"), this);
+    redoAct->setShortcut(tr("Ctrl+Shift+Z"));
+    redoAct->setStatusTip(tr("Redo the last undone change "));
+    connect(redoAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(redo()));
+
+    findAct = new QAction(QIcon(":/spimb040/script_find.png"), tr("&Find ..."), this);
+    findAct->setShortcut(tr("Ctrl+F"));
+    findAct->setStatusTip(tr("Find a string in sequence "));
+    connect(findAct, SIGNAL(triggered()), this, SLOT(findFirst()));
+
+    findNextAct = new QAction(QIcon(":/spimb040/script_find_next.png"), tr("Find &next"), this);
+    findNextAct->setShortcut(tr("F3"));
+    findNextAct->setStatusTip(tr("Find the next occurence "));
+    connect(findNextAct, SIGNAL(triggered()), this, SLOT(findNext()));
+    findNextAct->setEnabled(false);
+
+    replaceAct = new QAction(QIcon(":/spimb040/script_find_replace.png"), tr("Find && &replace ..."), this);
+    replaceAct->setShortcut(tr("Ctrl+R"));
+    replaceAct->setStatusTip(tr("Find a string in sequence and replace it with another string "));
+    connect(replaceAct, SIGNAL(triggered()), this, SLOT(replaceFirst()));
+
+    commentAct = new QAction(tr("&Comment text"), this);
+    commentAct->setShortcut(tr("Ctrl+B"));
+    commentAct->setStatusTip(tr("add (single line) comment at the beginning of each line "));
+    connect(commentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(comment()));
+
+    unCommentAct = new QAction(tr("&Uncomment text"), this);
+    unCommentAct->setShortcut(tr("Ctrl+Shift+B"));
+    unCommentAct->setStatusTip(tr("remove (single line) comment at the beginning of each line "));
+    connect(unCommentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(uncomment()));
+
+    indentAct = new QAction(QIcon(":/spimb040/script_indent.png"), tr("&Increase indention"), this);
+    commentAct->setShortcut(tr("Ctrl+I"));
+    indentAct->setStatusTip(tr("increase indention "));
+    connect(indentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(indentInc()));
+
+    unindentAct = new QAction(QIcon(":/spimb040/script_unindent.png"), tr("&Decrease indention"), this);
+    unindentAct->setShortcut(tr("Ctrl+Shift+I"));
+    unindentAct->setStatusTip(tr("decrease indention "));
+    connect(unindentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(indentDec()));
+
+    gotoLineAct = new QAction(tr("&Goto line ..."), this);
+    gotoLineAct->setShortcut(tr("Alt+G"));
+    gotoLineAct->setStatusTip(tr("goto a line in the opened file "));
+    connect(gotoLineAct, SIGNAL(triggered()), this, SLOT(gotoLine()));
+
+    printAct = new QAction(QIcon(":/spimb040/script_print.png"), tr("&Print ..."), this);
+    printAct->setStatusTip(tr("print the current SDFF file "));
+    connect(printAct, SIGNAL(triggered()), this, SLOT(print()));
+
+    cutAct->setEnabled(false);
+    copyAct->setEnabled(false);
+    undoAct->setEnabled(false);
+    redoAct->setEnabled(false);
+    connect(ui->edtScript->getEditor(), SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
+    connect(ui->edtScript->getEditor(), SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
+    connect(ui->edtScript->getEditor(), SIGNAL(undoAvailable(bool)), undoAct, SLOT(setEnabled(bool)));
+    connect(ui->edtScript->getEditor(), SIGNAL(redoAvailable(bool)), redoAct, SLOT(setEnabled(bool)));
+    connect(ui->edtScript->getEditor(), SIGNAL(findNextAvailable(bool)), findNextAct, SLOT(setEnabled(bool)));
+
+
+    QMenu* menuMore=new QMenu(ui->tbMoreOptions);
+    menuMore->addAction(indentAct);
+    menuMore->addAction(unindentAct);
+    menuMore->addAction(commentAct);
+    menuMore->addAction(unCommentAct);
+    menuMore->addSeparator();
+    menuMore->addAction(gotoLineAct);
+    menuMore->addAction(findAct);
+    menuMore->addAction(findNextAct);
+    menuMore->addAction(replaceAct);
+    menuMore->addAction(replaceNextAct);
+    ui->tbMoreOptions->setMenu(menuMore);
+    ui->tbFind->setDefaultAction(findAct);
+    ui->tbFindNext->setDefaultAction(findNextAct);
+    ui->tbReplace->setDefaultAction(replaceAct);
+    ui->tbReplaceNext->setDefaultAction(replaceNextAct);
+    ui->tbPrint->setDefaultAction(printAct);
+    ui->tbCopy->setDefaultAction(copyAct);
+    ui->tbCut->setDefaultAction(cutAct);
+    ui->tbPaste->setDefaultAction(pasteAct);
+    ui->tbRedo->setDefaultAction(redoAct);
+    ui->tbUndo->setDefaultAction(undoAct);
+
 
 
     updateReplaces();
@@ -143,20 +258,22 @@ QFESPIMB040ScriptedAcquisition::~QFESPIMB040ScriptedAcquisition()
 
 QString QFESPIMB040ScriptedAcquisition::getScript() const
 {
-    return ui->edtScript->toPlainText();
+    return ui->edtScript->getEditor()->toPlainText();
 }
 
 void QFESPIMB040ScriptedAcquisition::loadSettings(QSettings &settings, QString prefix)
 {
     lastScript=settings.value(prefix+"script", tr("tools.logText(\"Hello World!\\n\");")).toString();
-    ui->edtScript->setPlainText(lastScript);
+    ui->edtScript->getEditor()->setPlainText(lastScript);
     recentMaskFiles->readSettings(settings, prefix+"recentScripts/");
+    loadSplitter(settings, ui->splitter, prefix+"splitter");
 }
 
 void QFESPIMB040ScriptedAcquisition::storeSettings(QSettings &settings, QString prefix) const
 {
-    settings.setValue(prefix+"script", ui->edtScript->toPlainText());
+    settings.setValue(prefix+"script", ui->edtScript->getEditor()->toPlainText());
     recentMaskFiles->storeSettings(settings, prefix+"recentScripts/");
+    saveSplitter(settings, ui->splitter, prefix+"splitter");
 }
 
 
@@ -182,9 +299,9 @@ void QFESPIMB040ScriptedAcquisition::updateReplaces()
 void QFESPIMB040ScriptedAcquisition::on_btnNew_clicked()
 {
     if (maybeSave()) {
-        ui->edtScript->setPlainText("");
+        ui->edtScript->getEditor()->setPlainText("");
         setScriptFilename(tr("new_acquisition_script.js"));
-        lastScript=ui->edtScript->toPlainText();
+        lastScript=ui->edtScript->getEditor()->toPlainText();
     }
 }
 
@@ -211,8 +328,8 @@ void QFESPIMB040ScriptedAcquisition::on_btnSave_clicked()
             QFile f(filename);
             if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
                 QTextStream s(&f);
-                s<<ui->edtScript->toPlainText().toUtf8();
-                lastScript=ui->edtScript->toPlainText();
+                s<<ui->edtScript->getEditor()->toPlainText().toUtf8();
+                lastScript=ui->edtScript->getEditor()->toPlainText();
                 f.close();
                 setScriptFilename(filename);
             }
@@ -243,14 +360,14 @@ void QFESPIMB040ScriptedAcquisition::performAcquisition()
     ui->widProgress->setVisible(true);
     ui->btnExecute->setEnabled(false);
     ui->widProgress->setSpin(true);
-    ui->edtScript->setEnabled(false);
+    ui->edtScript->getEditor()->setEnabled(false);
     ui->btnNew->setEnabled(false);
     ui->btnOpen->setEnabled(false);
     ui->btnOpenExample->setEnabled(false);
     ui->btnOpenTemplate->setEnabled(false);
     ui->labStatus->setVisible(true);
     ui->widProgress->setMode(QModernProgressWidget::GradientRing);
-    QString script=ui->edtScript->toPlainText();
+    QString script=ui->edtScript->getEditor()->toPlainText();
     log->log_text(tr("\n\n====================================================================================\n"));
     log->log_text(tr("== SCRIPTED ACQUISITION                                                           ==\n"));
     log->log_text(tr("====================================================================================\n"));
@@ -284,8 +401,11 @@ void QFESPIMB040ScriptedAcquisition::performAcquisition()
             log->log_text(tr("\n\n  - SCRIPT FINISHED SUCCESSFULLY: result %1\n").arg(result.toString()));
         }
     } else {
-        if (checkResult.state()==QScriptSyntaxCheckResult::Error) log->log_error(tr("Error in script (l. %1, col. %2): %3").arg(checkResult.errorLineNumber()).arg(checkResult.errorColumnNumber()).arg(checkResult.errorMessage()));
-        else  log->log_error(tr("Incomplete script (l. %1, col. %2): %3").arg(checkResult.errorLineNumber()).arg(checkResult.errorColumnNumber()).arg(checkResult.errorMessage()));
+        if (checkResult.state()==QScriptSyntaxCheckResult::Error) {
+            log->log_error(tr("Error in script (l. %1, col. %2): %3").arg(checkResult.errorLineNumber()).arg(checkResult.errorColumnNumber()).arg(checkResult.errorMessage()));
+        } else  {
+            log->log_error(tr("Incomplete script (l. %1, col. %2): %3").arg(checkResult.errorLineNumber()).arg(checkResult.errorColumnNumber()).arg(checkResult.errorMessage()));
+        }
     }
     log->log_text(tr("====================================================================================\n"));
     log->log_text(tr("== SCRIPTED ACQUISITION ... DONE!!!                                               ==\n"));
@@ -293,7 +413,7 @@ void QFESPIMB040ScriptedAcquisition::performAcquisition()
     ui->btnCancel->setVisible(false);
     ui->widProgress->setVisible(false);
     ui->btnExecute->setEnabled(true);
-    ui->edtScript->setEnabled(true);
+    ui->edtScript->getEditor()->setEnabled(true);
     ui->btnNew->setEnabled(true);
     ui->btnOpen->setEnabled(true);
     ui->btnOpenExample->setEnabled(true);
@@ -335,7 +455,7 @@ void QFESPIMB040ScriptedAcquisition::incStatusProgress(double value)
 
 void QFESPIMB040ScriptedAcquisition::on_btnSyntaxCheck_clicked()
 {
-    QString script=ui->edtScript->toPlainText();
+    QString script=ui->edtScript->getEditor()->toPlainText();
     QScriptSyntaxCheckResult checkResult=QScriptEngine::checkSyntax(script);
     if (checkResult.state()==QScriptSyntaxCheckResult::Valid) {
         log->log_text(tr("\n\nScript syntax check OK\n"));
@@ -355,9 +475,9 @@ void QFESPIMB040ScriptedAcquisition::on_btnOpenTemplate_clicked()
     openScript(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/spimb040/acquisitionScriptTemplates/", false);
 }
 
-void QFESPIMB040ScriptedAcquisition::on_edtScript_cursorPositionChanged()
+void QFESPIMB040ScriptedAcquisition::edtScript_cursorPositionChanged()
 {
-    QTextCursor tc = ui->edtScript->textCursor();
+    QTextCursor tc = ui->edtScript->getEditor()->textCursor();
     /*
     tc.select(QTextCursor::WordUnderCursor);
     QString text=tc.selectedText();
@@ -365,7 +485,7 @@ void QFESPIMB040ScriptedAcquisition::on_edtScript_cursorPositionChanged()
     QString word=text.toLower();*/
 
 
-    QString text=ui->edtScript->toPlainText();
+    QString text=ui->edtScript->getEditor()->toPlainText();
     QString word;
     int newPos=tc.position();
     if (newPos>=0 && newPos<text.size()) {
@@ -391,6 +511,8 @@ void QFESPIMB040ScriptedAcquisition::on_edtScript_cursorPositionChanged()
     } else {
         ui->labHelp->setText(tr("no help for '%1'' available ...").arg(word));
     }
+
+    ui->labCursorPos->setText(tr("Line %1, Column %2").arg(ui->edtScript->getEditor()->getLineNumber()).arg(ui->edtScript->getEditor()->getColumnNumber()));
 }
 
 void QFESPIMB040ScriptedAcquisition::on_btnHelp_clicked()
@@ -399,8 +521,8 @@ void QFESPIMB040ScriptedAcquisition::on_btnHelp_clicked()
 }
 
 bool QFESPIMB040ScriptedAcquisition::maybeSave() {
-    if (ui->edtScript->toPlainText().isEmpty()) return true;
-    if (ui->edtScript->toPlainText()==lastScript) return true;
+    if (ui->edtScript->getEditor()->toPlainText().isEmpty()) return true;
+    if (ui->edtScript->getEditor()->toPlainText()==lastScript) return true;
     int r=QMessageBox::question(this, tr("save acquisition script ..."), tr("The current script has not been saved.\n  Delete?\n    Yes: Any changes will be lost.\n    No: You will be asked for a filename for the script.\n    Cancel: return to editing the script."), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::No);
     if (r==QMessageBox::Yes) {
         return true;
@@ -440,10 +562,10 @@ void QFESPIMB040ScriptedAcquisition::openScript(QString dir, bool saveDir) {
         if (QFile::exists(filename)) {
             QFile f(filename);
             if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
-                ui->edtScript->setPlainText(QString::fromUtf8(f.readAll()));
+                ui->edtScript->getEditor()->setPlainText(QString::fromUtf8(f.readAll()));
                 setScriptFilename(filename);
                 f.close();
-                lastScript=ui->edtScript->toPlainText();
+                lastScript=ui->edtScript->getEditor()->toPlainText();
             }
         }
         if (saveDir) ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ScriptedAcquisition/lastScriptDir", dir);
@@ -457,10 +579,10 @@ void QFESPIMB040ScriptedAcquisition::openScriptNoAsk(QString filename)
         if (QFile::exists(filename)) {
             QFile f(filename);
             if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
-                ui->edtScript->setPlainText(QString::fromUtf8(f.readAll()));
+                ui->edtScript->getEditor()->setPlainText(QString::fromUtf8(f.readAll()));
                 setScriptFilename(filename);
                 f.close();
-                lastScript=ui->edtScript->toPlainText();
+                lastScript=ui->edtScript->getEditor()->toPlainText();
             }
         }
     }
@@ -474,6 +596,7 @@ void QFESPIMB040ScriptedAcquisition::threadFinished()
         ui->progress->setVisible(false);
         ui->labProgress->setVisible(false);
     }
+    highlighter->setSpecialFunctions(specialFunctions);
 }
 
 void QFESPIMB040ScriptedAcquisition::delayedStartSearchThreads()
@@ -491,6 +614,7 @@ void QFESPIMB040ScriptedAcquisition::delayedStartSearchThreads()
 void QFESPIMB040ScriptedAcquisition::addFunction(QString name, QString templ, QString help)
 {
     functionhelp[name.toLower()]=qMakePair(templ, help);
+    specialFunctions<<name;
     QStringList sl;
     /*sl=compExpression->stringlistModel()->stringList();
     if (!sl.contains(name)) sl.append(name);
@@ -503,6 +627,119 @@ void QFESPIMB040ScriptedAcquisition::addFunction(QString name, QString templ, QS
     sl.append(templ);
     sl.sort();
     helpModel.setStringList(sl);
+}
+
+void QFESPIMB040ScriptedAcquisition::findFirst()
+{
+    if (ui->edtScript->getEditor()->hasSelection()) findDlg->setPhrase(ui->edtScript->getEditor()->getSelection());
+    if (findDlg->exec()==QDialog::Accepted) {
+        // enable "Find next" action
+        findNextAct->setEnabled(true);
+        findNextAct->setIcon(QIcon(":/spimb040/script_find_next.png"));
+        findNextAct->setText(tr("Find &next"));
+        findNextAct->setStatusTip(tr("Find the next occurence "));
+        disconnect(findNextAct, SIGNAL(triggered()), this, 0);
+        connect(findNextAct, SIGNAL(triggered()), this, SLOT(findNext()));
+
+        if (!ui->edtScript->getEditor()->findFirst(findDlg->getPhrase(), findDlg->getSearchFromStart(), findDlg->getMatchCase(), findDlg->getWholeWords())) {
+            QMessageBox::information(this, tr("Find ..."),
+                             tr("Did not find '%1' ...")
+                             .arg(ui->edtScript->getEditor()->getPhrase()));
+            findNextAct->setEnabled(false);
+        }
+    }
+}
+
+void QFESPIMB040ScriptedAcquisition::findNext()
+{
+    if (!ui->edtScript->getEditor()->findNext()) {
+        QMessageBox::information(this, tr("Find ..."),
+                         tr("Did not find '%1' ...")
+                         .arg(ui->edtScript->getEditor()->getPhrase()));
+    }
+}
+
+void QFESPIMB040ScriptedAcquisition::replaceFirst()
+{
+    if (ui->edtScript->getEditor()->hasSelection()) replaceDlg->setPhrase(ui->edtScript->getEditor()->getSelection());
+    if (replaceDlg->exec()==QDialog::Accepted) {
+        // enable "Find next" action
+        findNextAct->setEnabled(true);
+        findNextAct->setIcon(QIcon(":/spimb040/script_find_replace_next.png"));
+        findNextAct->setText(tr("Replace &next"));
+        findNextAct->setStatusTip(tr("Replace the next occurence "));
+        disconnect(findNextAct, SIGNAL(triggered()), this, 0);
+        connect(findNextAct, SIGNAL(triggered()), this, SLOT(replaceNext()));
+
+        if (!ui->edtScript->getEditor()->replaceFirst(replaceDlg->getPhrase(), replaceDlg->getReplace(), replaceDlg->getSearchFromStart(), replaceDlg->getMatchCase(), replaceDlg->getWholeWords(), replaceDlg->getReplaceAll(), replaceDlg->getAskBeforeReplace())) {
+            QMessageBox::information(this, tr("Find & Replace..."),
+                             tr("Did not find '%1' ...")
+                             .arg(ui->edtScript->getEditor()->getPhrase()));
+        }
+    }
+}
+
+void QFESPIMB040ScriptedAcquisition::replaceNext()
+{
+    if (! ui->edtScript->getEditor()->replaceNext()) {
+        QMessageBox::information(this, tr("Find & Replace ..."),
+                                 tr("Did not find '%1' ...")
+                                 .arg(ui->edtScript->getEditor()->getPhrase()));
+    }
+
+}
+
+void QFESPIMB040ScriptedAcquisition::gotoLine()
+{
+    int maxLine=ui->edtScript->getEditor()->document()->blockCount();
+    bool ok;
+    unsigned long line = QInputDialog::getInteger(this, tr("Goto Line ..."),
+                              tr("Enter a line number (1 - %2):").arg(maxLine), 1, 1, maxLine, 1, &ok);
+    if (ok) {
+        ui->edtScript->getEditor()->gotoLine(line);
+        ui->edtScript->getEditor()->setFocus();
+    }
+
+}
+
+void QFESPIMB040ScriptedAcquisition::print()
+{
+#ifndef QT_NO_PRINTER
+   QPrinter printer;
+
+   QPrintDialog *dialog = new QPrintDialog(&printer, this);
+   dialog->setWindowTitle(tr("Print Document"));
+   if (ui->edtScript->getEditor()->textCursor().hasSelection())
+       dialog->addEnabledOption(QAbstractPrintDialog::PrintSelection);
+   if (dialog->exec() != QDialog::Accepted)
+       return;
+
+   ui->edtScript->getEditor()->print(&printer);
+#endif
+
+}
+
+void QFESPIMB040ScriptedAcquisition::printPreviewClick()
+{
+#ifndef QT_NO_PRINTER
+    QPrinter printer(QPrinter::HighResolution);
+    QPrintPreviewDialog preview(&printer, this);
+    connect(&preview, SIGNAL(paintRequested(QPrinter *)), SLOT(printPreview(QPrinter *)));
+    preview.exec();
+#endif
+}
+
+void QFESPIMB040ScriptedAcquisition::printPreview(QPrinter *printer)
+{
+#ifndef QT_NO_PRINTER
+    ui->edtScript->getEditor()->print(printer);
+#endif
+
+}
+
+void QFESPIMB040ScriptedAcquisition::clearFindActions()
+{
+    findNextAct->setEnabled(false);
 }
 
 

@@ -38,7 +38,7 @@
 
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QWidget with a set of controls that allow to control a shutter
-    \ingroup qf3ext_spimb040
+    \ingroup qf3lib_widgets
 
 
  */

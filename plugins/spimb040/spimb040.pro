@@ -47,7 +47,9 @@ HEADERS += spimb040.h \
     qfespimb040deviceparamstackconfigwidget.h \
     qfespimb040acquisitiontools.h \
     qfespimb040scriptedacquisition.h \
-    qfespimb040scriptedacquisitiontools.h
+    qfespimb040scriptedacquisitiontools.h \
+    replacedialog.h \
+    finddialog.h
 
 SOURCES += spimb040.cpp \
            qfespimb040cameraview.cpp \
@@ -74,7 +76,9 @@ SOURCES += spimb040.cpp \
     qfespimb040acquisitiondescription.cpp \
     qfespimb040deviceparamstackconfigwidget.cpp \
     qfespimb040scriptedacquisition.cpp \
-    qfespimb040scriptedacquisitiontools.cpp
+    qfespimb040scriptedacquisitiontools.cpp \
+    replacedialog.cpp \
+    finddialog.cpp
 FORMS = \
     qfespimb040opticssetup.ui \
     qfespimb00histogrammaskdialog.ui \
@@ -87,7 +91,9 @@ FORMS = \
     qfespimb040lightpathsavedialog.ui \
     qfespimb040acquisitiondescription.ui \
     qfespimb040deviceparamstackconfigwidget.ui \
-    qfespimb040scriptedacquisition.ui
+    qfespimb040scriptedacquisition.ui \
+    replacedialog.ui \
+    finddialog.ui
 
 RESOURCES += spimb040.qrc
 
@@ -111,8 +117,8 @@ ASSETSScriptTemplates_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/acquis
 ASSETSScriptExamples_FILES.files = ./assets/acquisitionScriptExamples/*.*
 ASSETSScriptExamples_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/acquisitionScriptExamples
 
-HELPACQS_FILES.files = ./help/acquisition_script/*.*
-HELPACQS_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/acquisition_script/
+HELPACQS_FILES.files = ./help/qtscript/*.*
+HELPACQS_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/qtscript/
 
 
 INSTALLS += ASSETSScriptTemplates_FILES ASSETSScriptExamples_FILES HELPACQS_FILES

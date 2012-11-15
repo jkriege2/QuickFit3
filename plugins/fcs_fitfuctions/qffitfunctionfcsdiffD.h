@@ -44,12 +44,13 @@
 */
 class QFFitFunctionFCSDiffD: public QFFitFunction {
     public:
-        QFFitFunctionFCSDiffD();
-        virtual ~QFFitFunctionFCSDiffD() {}
+    QFFitFunctionFCSDiffD(bool hasGamma=true);
+    virtual ~QFFitFunctionFCSDiffD() {}
+
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS: Normal Diffusion 3D, D as parameter"); };
+        virtual QString name() const;
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("fcs_diff_d"); };
+        virtual QString id() const;
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;
@@ -65,7 +66,8 @@ class QFFitFunctionFCSDiffD: public QFFitFunction {
         /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
         virtual QString transformParametersForAdditionalPlot(int plot, double* params);
 
-
+    protected:
+        bool hasGamma;
 
 };
 
