@@ -184,8 +184,6 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
         QAction *findNextAct;
         /** \brief action object: find and replace text */
         QAction *replaceAct;
-        /** \brief action object: find and replace text next */
-        QAction *replaceNextAct;
         /** \brief action object: run current SDFF script */
         QAction *runSDFFAct;
         /** \brief action object: comment text */
@@ -201,11 +199,18 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
         /** \brief action object: print */
         QAction *printAct;
 
+        QCompleter* completer;
+
 
         /** \brief the "Find ..." dialog object */
         FindDialog* findDlg;
         /** \brief the "Find & Replace..." dialog object */
         ReplaceDialog* replaceDlg;
+        QStringListModel* completermodel;
+
+        /** \brief load a completer model from a file */
+        QStringListModel* modelFromFile(const QString& fileName);
+
 };
 
 

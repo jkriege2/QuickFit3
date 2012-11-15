@@ -9,13 +9,13 @@
 	<h2>Illumination Control</h2>
 	<ul>
 		<li><a name="instrument.setLaserIntensity"/><!-- func:instrument.setLaserIntensity -->
-		<b><tt><!-- template -->instrument.setLaserIntensity(laser, line, intensity)<!-- /template --></tt> - <i>sets the laser intensity </i>:</b><br>
+		<b><tt><!-- template -->instrument.setLaserIntensity(<!--°-->laser<!--°-->, line, intensity)<!-- /template --></tt> - <i>sets the laser intensity </i>:</b><br>
 		This function sets the intensity of the specified laser (either 1 or 2). Each laser may have several lines (the first one is 0) and you may set the power in device units (usually milliwats) as a floating point value.
 		<!-- /func:instrument.setLaserIntensity -->
 		</li>
 
 		<li><a name="instrument.setTransmissionIntensity"/><!-- func:instrument.setTransmissionIntensity -->
-		<b><tt><!-- template -->instrument.setTransmissionIntensity(line, intensity)<!-- /template --></tt> - <i>sets the transmission illumination intensity </i>:</b><br>
+		<b><tt><!-- template -->instrument.setTransmissionIntensity(<!--°-->line<!--°-->, intensity)<!-- /template --></tt> - <i>sets the transmission illumination intensity </i>:</b><br>
 		This function sets the intensity of the transmission illumination. The illumination device may have several lines (the first one is 0) and you may set the power in device units as a floating point value.<br>
 		Currently this function does NOT block, so use sleepMS() to wait a sufficient time until the new intensity is settled.
 		<!-- /func:instrument.setTransmissionIntensity -->
@@ -24,7 +24,7 @@
 	<h2>Shutter Control</h2>
 	<ul>
 		<li><a name="instrument.setShutter"/><!-- func:instrument.setShutter -->
-		<b><tt><!-- template -->instrument.setShutter(shutter, state)<!-- /template --></tt> - <i>sets the state (boolean) of the specified shutter </i>:</b><br>
+		<b><tt><!-- template -->instrument.setShutter("<!--°-->shutter<!--°-->", state)<!-- /template --></tt> - <i>sets the state (boolean) of the specified shutter </i>:</b><br>
 		These shutters are defined:
 		  <ul>
                     <li>"main": the main shutter</li>
@@ -41,7 +41,7 @@
 	<h2>Filter Changer Control</h2>
 	<ul>
 		<li><a name="instrument.setFilterWheel"/><!-- func:instrument.setFilterWheel -->
-		<b><tt><!-- template -->instrument.setFilterWheel(wheel, filter)<!-- /template --></tt> - <i>sets the filter (integer) of the specified wheel </i>:</b><br>
+		<b><tt><!-- template -->instrument.setFilterWheel("<!--°-->wheel<!--°-->", filter)<!-- /template --></tt> - <i>sets the filter (integer) of the specified wheel </i>:</b><br>
 		These wheels are defined:
 		  <ul>
                     <li>"detection": the detection arm filter wheel</li>
@@ -55,7 +55,7 @@
 	<h2>Stage Control</h2>
 	<ul>
 		<li><a name="instrument.moveStageRel"/><!-- func:instrument.moveStageRel -->
-		<b><tt><!-- template -->instrument.moveStageRel(stage, delta)<!-- /template --></tt> - <i>move the specified stage by a given distance <tt>delta</tt> </i>:</b><br>
+		<b><tt><!-- template -->instrument.moveStageRel("<!--°-->stage<!--°-->", delta)<!-- /template --></tt> - <i>move the specified stage by a given distance <tt>delta</tt> </i>:</b><br>
 		These stages are defined:
 		  <ul>
                     <li>"x": sample translation stage: x-direction</li>
@@ -66,7 +66,7 @@
 		<!-- /func:instrument.moveStageRel -->
 		</li>
 		<li><a name="instrument.moveStageAbs"/><!-- func:instrument.moveStageAbs -->
-		<b><tt><!-- template -->instrument.moveStageAbs(stage, new_position)<!-- /template --></tt> - <i>move the specified stage to the given position </i>:</b><br>
+		<b><tt><!-- template -->instrument.moveStageAbs("<!--°-->stage<!--°-->", new_position)<!-- /template --></tt> - <i>move the specified stage to the given position </i>:</b><br>
 		These stages are defined:
 		  <ul>
                     <li>"x": sample translation stage: x-direction</li>

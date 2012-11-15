@@ -117,11 +117,14 @@ ASSETSScriptTemplates_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/acquis
 ASSETSScriptExamples_FILES.files = ./assets/acquisitionScriptExamples/*.*
 ASSETSScriptExamples_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/acquisitionScriptExamples
 
-HELPACQS_FILES.files = ./help/qtscript/*.*
-HELPACQS_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/qtscript/
+ASSETSScriptHELP_FILES.files = ./help/acquisition_script/*.*
+ASSETSScriptHELP_FILES.path =    $${QFOUTPUT}/assets/plugins/help/$${TARGET}/acquisition_script
+
+ASSETSScriptHELPPIC_FILES.files = ./help/acquisition_script/pic/*.*
+ASSETSScriptHELPPIC_FILES.path =    $${QFOUTPUT}/assets/plugins/help/$${TARGET}/acquisition_script/pic
 
 
-INSTALLS += ASSETSScriptTemplates_FILES ASSETSScriptExamples_FILES HELPACQS_FILES
+INSTALLS += ASSETSScriptTemplates_FILES ASSETSScriptExamples_FILES ASSETSScriptHELP_FILES ASSETSScriptHELPPIC_FILES
 
 
 

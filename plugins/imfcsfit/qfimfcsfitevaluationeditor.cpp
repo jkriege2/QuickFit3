@@ -673,7 +673,7 @@ void QFImFCSFitEvaluationEditor::weightsChanged(int model) {
     if (!current) return;
     if (!current->getHighlightedRecord()) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    current->getHighlightedRecord()->setQFProperty("weights", cmbWeights->currentIndex(), false, false);
+    current->setQFProperty("weights", cmbWeights->currentIndex(), false, false);
     QFImFCSFitEvaluation* data=qobject_cast<QFImFCSFitEvaluation*>(current);
     if (data) {
         if (cmbWeights->currentIndex()==0) data->setFitDataWeighting(QFImFCSFitEvaluation::EqualWeighting);

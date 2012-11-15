@@ -476,7 +476,7 @@ void QFFCSFitEvaluationEditor::weightsChanged(int model) {
     if (!current) return;
     if (!current->getHighlightedRecord()) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    current->getHighlightedRecord()->setQFProperty("weights", cmbWeights->currentIndex(), false, false);
+    current->setQFProperty("weights", cmbWeights->currentIndex(), false, false);
     QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     if (data) {
         if (cmbWeights->currentIndex()==0) data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);

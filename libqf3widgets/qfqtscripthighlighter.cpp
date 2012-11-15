@@ -50,6 +50,7 @@
      QStringList keywordPatterns=settings.value(prefix+"lists/keywords", "null,true,false,break,case,catch,continue,debugger,default,delete,do,else,finally,for,function,if,in,instanceof,new,return,switch,this,throw,try,typeof,var,void,while,with").toString().split(",");
      foreach (QString pattern, keywordPatterns) {
          rule.pattern = QRegExp("\\b"+pattern.trimmed()+"\\b");
+         //qDebug()<<"keyword: "<<rule.pattern.pattern();
          rule.format = keywordFormat;
          highlightingRules.append(rule);
      }
@@ -57,7 +58,8 @@
      // create a list of all valid operators (just the same as above)
      QStringList operatorPatterns=settings.value(prefix+"lists/operators", "+,*,/,-,~,!,%,<<,>>,>>>,<,>,<=,>=,==,!=,++,--,+=,-=,/=,*=,^,^=,|,|=,||,&,&&,&=,>>>=,%=").toString().split(",");
      foreach (QString pattern, operatorPatterns) {
-         rule.pattern = QRegExp(pattern.trimmed());
+         rule.pattern = QRegExp(pattern.trimmed().replace("+", "\\+").replace("*", "\\*").replace("^", "\\^").replace("$", "\\$").replace("?", "\\?").replace("|", "\\|").replace("%", "\\%").replace("&", "\\&").replace("!", "\\!").replace("/", "\\/").replace("~", "\\~"));
+         //qDebug()<<"operator: "<<rule.pattern.pattern();
          rule.format = operatorFormat;
          highlightingRules.append(rule);
      }
@@ -83,19 +85,18 @@
  void QFQtScriptHighlighter::setSpecialFunctions(const QStringList &specialfunctions)
  {
 
-     for (int i=highlightingRules.size()-1; i>=0; i--) {
-         if (highlightingRules[i].format==specialfunctionFormat) {
-             highlightingRules.remove(i);
-         }
-     }
+    sfhighlightingRules.clear();
      // recognizes special functions
-     QString rx="\\b(";
-     rx+=specialfunctions.join("|").replace('.', "\\.").replace('(', "\\(").replace(')', "\\)");
-     rx+=")(?=\\()";
-     HighlightingRule rule;
-     rule.pattern = QRegExp(rx);
-     rule.format = specialfunctionFormat;
-     highlightingRules.append(rule);
+     if (specialfunctions.size()>0) {
+         QString rx="\\b(";
+         rx+=specialfunctions.join("|").replace('.', "\\.").replace('(', "\\(").replace(')', "\\)");
+         rx+=")(?=\\()";
+         HighlightingRule rule;
+         rule.pattern = QRegExp(rx);
+         //qDebug()<<"specfunc: "<<rule.pattern.pattern();
+         rule.format = specialfunctionFormat;
+         sfhighlightingRules.append(rule);
+     }
  }
 
  void QFQtScriptHighlighter::loadFormat(QSettings& settings, QString key, QTextCharFormat& format, QString default_fcolor, bool default_bold, bool default_italic, bool default_underlined){
@@ -115,8 +116,11 @@
 
  void QFQtScriptHighlighter::highlightBlock(const QString &text)
  {
+     if (text.isEmpty() || text.size()<2) return;
      // test all rules whether (and where) they apply
-     foreach (HighlightingRule rule, highlightingRules) {
+     QVector<HighlightingRule> hr=highlightingRules;
+     hr<<sfhighlightingRules;
+     foreach (HighlightingRule rule, hr) {
          QRegExp expression(rule.pattern);
          int index = text.indexOf(expression);
          while (index >= 0) {

@@ -94,6 +94,15 @@ QFESPIMB040ScriptedAcquisition::QFESPIMB040ScriptedAcquisition(QFESPIMB040MainWi
     replaceDlg=new ReplaceDialog(this);
 
     highlighter=new QFQtScriptHighlighter("", ui->edtScript->getEditor()->document());
+
+    completer = new QCompleter(ui->edtScript->getEditor());
+    completermodel=modelFromFile(ProgramOptions::getInstance()->getAssetsDirectory()+"/qtscript/completer.txt");
+    completer->setModel(completermodel);
+    completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setWrapAround(false);
+    ui->edtScript->getEditor()->setCompleter(completer);
+
     recentMaskFiles=new QRecentFilesMenu(this);
     recentMaskFiles->setUseSystemFileIcons(false);
     recentMaskFiles->setAlwaysEnabled(true);
@@ -121,12 +130,12 @@ QFESPIMB040ScriptedAcquisition::QFESPIMB040ScriptedAcquisition(QFESPIMB040MainWi
                               "selection"));
     connect(pasteAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(paste()));
 
-    undoAct = new QAction(QIcon(":/spimb040/script_editundo.png"), tr("&Undo"), this);
+    undoAct = new QAction(QIcon(":/spimb040/script_undo.png"), tr("&Undo"), this);
     undoAct->setShortcut(tr("Ctrl+Z"));
     undoAct->setStatusTip(tr("Undo the last change "));
     connect(undoAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(undo()));
 
-    redoAct = new QAction(QIcon(":/spimb040/script_editredo.png"), tr("&Redo"), this);
+    redoAct = new QAction(QIcon(":/spimb040/script_redo.png"), tr("&Redo"), this);
     redoAct->setShortcut(tr("Ctrl+Shift+Z"));
     redoAct->setStatusTip(tr("Redo the last undone change "));
     connect(redoAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(redo()));
@@ -195,14 +204,12 @@ QFESPIMB040ScriptedAcquisition::QFESPIMB040ScriptedAcquisition(QFESPIMB040MainWi
     menuMore->addSeparator();
     menuMore->addAction(gotoLineAct);
     menuMore->addAction(findAct);
-    menuMore->addAction(findNextAct);
     menuMore->addAction(replaceAct);
-    menuMore->addAction(replaceNextAct);
+    menuMore->addAction(findNextAct);
     ui->tbMoreOptions->setMenu(menuMore);
     ui->tbFind->setDefaultAction(findAct);
     ui->tbFindNext->setDefaultAction(findNextAct);
     ui->tbReplace->setDefaultAction(replaceAct);
-    ui->tbReplaceNext->setDefaultAction(replaceNextAct);
     ui->tbPrint->setDefaultAction(printAct);
     ui->tbCopy->setDefaultAction(copyAct);
     ui->tbCut->setDefaultAction(cutAct);
@@ -551,6 +558,28 @@ QString QFESPIMB040ScriptedAcquisition::getFunctionHelp(QString name)
     return functionhelp.value(name.toLower(), qMakePair(QString(""), tr("<b><tt>%1(...)</tt></b> - <i>function </i>:<br>no help available").arg(name))).second;
 }
 
+QStringListModel *QFESPIMB040ScriptedAcquisition::modelFromFile(const QString &fileName)
+{
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly))
+     return new QStringListModel(completer);
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QStringList words;
+
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine();
+        if (!line.isEmpty()) {
+            //QMessageBox::information(this, "", line.trimmed());
+            words << line.trimmed();
+        }
+    }
+    words.sort();
+    //QMessageBox::information(this, "", words.join(", "));
+    QApplication::restoreOverrideCursor();
+    return new QStringListModel(words, completer);
+}
+
 
 void QFESPIMB040ScriptedAcquisition::openScript(QString dir, bool saveDir) {
     if (maybeSave()) {
@@ -613,20 +642,35 @@ void QFESPIMB040ScriptedAcquisition::delayedStartSearchThreads()
 
 void QFESPIMB040ScriptedAcquisition::addFunction(QString name, QString templ, QString help)
 {
-    functionhelp[name.toLower()]=qMakePair(templ, help);
+    QString templ1=templ;
+    templ1=templ1.replace("<!--°-->", "");
+    functionhelp[name.toLower()]=qMakePair(templ1, help);
     specialFunctions<<name;
+    QStringList csl=completermodel->stringList();
+
+    if (templ.size()>0) {
+        QString t=templ;
+        t=t.replace("<!--°-->", "°");
+        csl<<t;
+    } else {
+        csl<<QString(name+"(°)");
+    }
+
     QStringList sl;
     /*sl=compExpression->stringlistModel()->stringList();
     if (!sl.contains(name)) sl.append(name);
     if (!sl.contains(templ)) sl.append(templ);
     sl.sort();
     compExpression->stringlistModel()->setStringList(sl);*/
+
+    completermodel->setStringList(csl);
     sl=helpModel.stringList();
     sl.removeAll(name);
-    sl.removeAll(templ);
-    sl.append(templ);
+    sl.removeAll(templ1);
+    sl.append(templ1);
     sl.sort();
     helpModel.setStringList(sl);
+    //qDebug()<<csl;
 }
 
 void QFESPIMB040ScriptedAcquisition::findFirst()

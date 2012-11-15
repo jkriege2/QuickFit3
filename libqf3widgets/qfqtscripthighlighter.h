@@ -67,6 +67,7 @@ class QFWIDLIB_EXPORT QFQtScriptHighlighter : public QSyntaxHighlighter {
 
         /** \brief this vector contains all available highlighting rules */
         QVector<HighlightingRule> highlightingRules;
+        QVector<HighlightingRule> sfhighlightingRules;
 
         /** \brief this regular expression defines the start of a comment in SDFF */
         QRegExp commentStartExpression;

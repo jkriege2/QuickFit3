@@ -101,13 +101,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="tbReplaceNext">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QToolButton" name="tbCopy">
        <property name="text">
         <string>...</string>
