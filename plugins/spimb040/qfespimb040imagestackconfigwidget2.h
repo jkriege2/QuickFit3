@@ -101,8 +101,8 @@ public slots:
         void on_spinStart_valueChanged(double value);
         void on_spinDelta_valueChanged(double value);
         void on_spinSteps_valueChanged(int value);
-        void on_btnGetCurrent_clicked();
-        void on_btnGetCurrentAround_clicked();
+        void actGetCurrent_clicked();
+        void actGetCurrentAround_clicked();
         void on_btnConfig_clicked();
         void on_btnConnect_clicked();
 
@@ -112,18 +112,20 @@ public slots:
         void on_spinStart2_valueChanged(double value);
         void on_spinDelta2_valueChanged(double value);
         void on_spinSteps2_valueChanged(int value);
-        void on_btnGetCurrent2_clicked();
-        void on_btnGetCurrentAround2_clicked();
+        void actGetCurrent2_clicked();
+        void actGetCurrentAround2_clicked();
         void on_btnConfig2_clicked();
         void on_btnConnect2_clicked();
 
         void on_spinStart3_valueChanged(double value);
         void on_spinDelta3_valueChanged(double value);
         void on_spinSteps3_valueChanged(int value);
-        void on_btnGetCurrent3_clicked();
-        void on_btnGetCurrentAround3_clicked();
+        void actGetCurrent3_clicked();
+        void actGetCurrentAround3_clicked();
         void on_btnConfig3_clicked();
         void on_btnConnect3_clicked();
+
+        void on_chkStackRelative_toggled(bool checked);
 
         void checkStage();
         void updateLabel();
@@ -136,6 +138,17 @@ public slots:
         QFESPIMB040AcquisitionDescription* acqDescription;
         QFESPIMB040ExperimentDescription* expDescription;
 
+        QAction* actGetCurrent;
+        QAction* actGetCurrentAround;
+        QAction* actGetCurrent2;
+        QAction* actGetCurrentAround2;
+        QAction* actGetCurrent3;
+        QAction* actGetCurrentAround3;
+        QActionGroup* actGetCurrentG;
+        QActionGroup* actGetCurrentG2;
+        QActionGroup* actGetCurrentG3;
+
+        bool lastGetC, lastGetC2, lastGetC3;
 
 };
 

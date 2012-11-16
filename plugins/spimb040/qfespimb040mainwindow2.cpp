@@ -256,7 +256,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
         if (widImageStack->useStage2()) {
             progress.setProgressText(tr("locking stage 2 ..."));
             ok=connectStageForAcquisition(stage2, stageAxis2, stageInitialPos2, tr("B040SPIM: Image Stack Acquisition"),2);
-
+            if (ok) axisCount++;
 /*            if (!stage2) {
                 IMAGESTACK_ERROR(tr("no stage 2 selected"));
                 QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No stage 2 selected!"));
@@ -274,7 +274,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
             }
             if (ok) {
                 stage2->setJoystickActive(stageAxis2, false);
-                axisCount++;
+
                 stageInitialPos2=stage2->getPosition(stageAxis2);
             }*/
         }
@@ -294,7 +294,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
         if (widImageStack->useStage3()) {
             progress.setProgressText(tr("locking stage 3 ..."));
             ok=connectStageForAcquisition(stage3, stageAxis3, stageInitialPos3, tr("B040SPIM: Image Stack Acquisition"),3);
-
+            if (ok) axisCount++;
             /*if (!stage3) {
                 IMAGESTACK_ERROR(tr("no stage 3 selected"));
                 QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No stage 3 selected!"));
@@ -312,7 +312,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
             }
             if (ok) {
                 stage3->setJoystickActive(stageAxis3, false);
-                axisCount++;
+
                 stageInitialPos3=stage3->getPosition(stageAxis3);
             }*/
         }

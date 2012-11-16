@@ -24,6 +24,37 @@ QFESPIMB040ImageStackConfigWidget2::QFESPIMB040ImageStackConfigWidget2(QWidget* 
     this->expDescription=expDescription;
     ui->setupUi(this);
 
+    actGetCurrent=new QAction(QIcon(":/spimb040/get_current_pos.png"), tr("stage 1: scan starts at current position"), this);
+    actGetCurrentAround=new QAction(QIcon(":/spimb040/get_current_pos_around.png"), tr("stage 1: scan around current position"), this);
+    actGetCurrent2=new QAction(QIcon(":/spimb040/get_current_pos.png"), tr("stage 1: scan starts at current position"), this);
+    actGetCurrentAround2=new QAction(QIcon(":/spimb040/get_current_pos_around.png"), tr("stage 1: scan around current position"), this);
+    actGetCurrent3=new QAction(QIcon(":/spimb040/get_current_pos.png"), tr("stage 1: scan starts at current position"), this);
+    actGetCurrentAround3=new QAction(QIcon(":/spimb040/get_current_pos_around.png"), tr("stage 1: scan around current position"), this);
+
+    actGetCurrentG=new QActionGroup(this);
+    actGetCurrentG->setExclusive(false);
+    actGetCurrentG2=new QActionGroup(this);
+    actGetCurrentG2->setExclusive(false);
+    actGetCurrentG3=new QActionGroup(this);
+    actGetCurrentG3->setExclusive(false);
+    actGetCurrent->setActionGroup(actGetCurrentG);
+    actGetCurrentAround->setActionGroup(actGetCurrentG);
+    actGetCurrent2->setActionGroup(actGetCurrentG2);
+    actGetCurrentAround2->setActionGroup(actGetCurrentG2);
+    actGetCurrent3->setActionGroup(actGetCurrentG3);
+    actGetCurrentAround3->setActionGroup(actGetCurrentG3);
+
+
+    ui->btnGetCurrent->setDefaultAction(actGetCurrent);
+    ui->btnGetCurrentAround->setDefaultAction(actGetCurrentAround);
+    ui->btnGetCurrent2->setDefaultAction(actGetCurrent2);
+    ui->btnGetCurrentAround2->setDefaultAction(actGetCurrentAround2);
+    ui->btnGetCurrent3->setDefaultAction(actGetCurrent3);
+    ui->btnGetCurrentAround3->setDefaultAction(actGetCurrentAround3);
+
+
+    on_chkStackRelative_toggled(false);
+
     QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/");
     QFCompleterFromFile* c1=new QFCompleterFromFile(this);
     c1->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/stack_prefix1.txt");
@@ -50,6 +81,13 @@ QFESPIMB040ImageStackConfigWidget2::QFESPIMB040ImageStackConfigWidget2(QWidget* 
     updateReplaces();
     bindLineEdit(ui->edtPrefix1);
     bindLineEdit(ui->edtPrefix2);
+
+    connect(actGetCurrent, SIGNAL(triggered()), this, SLOT(actGetCurrent_clicked()));
+    connect(actGetCurrentAround, SIGNAL(triggered()), this, SLOT(actGetCurrentAround_clicked()));
+    connect(actGetCurrent2, SIGNAL(triggered()), this, SLOT(actGetCurrent2_clicked()));
+    connect(actGetCurrentAround2, SIGNAL(triggered()), this, SLOT(actGetCurrentAround2_clicked()));
+    connect(actGetCurrent3, SIGNAL(triggered()), this, SLOT(actGetCurrent3_clicked()));
+    connect(actGetCurrentAround3, SIGNAL(triggered()), this, SLOT(actGetCurrentAround3_clicked()));
 
     QTimer::singleShot(STAGE_INTERVAL_MS, this, SLOT(checkStage()));
 }
@@ -99,6 +137,20 @@ void QFESPIMB040ImageStackConfigWidget2::loadSettings(QSettings& settings, QStri
     ui->cmbLightpath2->setCurrentIndex(settings.value(prefix+"lightpath2idx", -1).toInt());
     ui->cmbLightpath3->setCurrentIndex(settings.value(prefix+"lightpath3idx", -1).toInt());
 
+    ui->chkCycling2->setChecked(settings.value(prefix+"cycling2", false).toBool());
+    ui->chkCycling3->setChecked(settings.value(prefix+"cycling3", false).toBool());
+
+    ui->chkStackRelative->setChecked(settings.value(prefix+"stacks_relative", false).toBool());
+
+    on_chkStackRelative_toggled(ui->chkStackRelative->isChecked());
+
+    actGetCurrent->setChecked(lastGetC=settings.value(prefix+"getCurrent", false).toBool());
+    actGetCurrentAround->setChecked(!lastGetC);
+    actGetCurrent2->setChecked(lastGetC2=settings.value(prefix+"getCurrent2", false).toBool());
+    actGetCurrentAround2->setChecked(!lastGetC2);
+    actGetCurrent3->setChecked(lastGetC3=settings.value(prefix+"getCurrent3", false).toBool());
+    actGetCurrentAround3->setChecked(!lastGetC3);
+
     ui->chkSaveMeasurements->setChecked(settings.value(prefix+"savemeasurements", false).toBool());
     ui->spinImages->setValue(settings.value(prefix+"images", 1).toInt());
     on_chkUse1_clicked(true);
@@ -145,6 +197,15 @@ void QFESPIMB040ImageStackConfigWidget2::storeSettings(QSettings& settings, QStr
     settings.setValue(prefix+"lightpath2", ui->chkLightpath2->isChecked());
     settings.setValue(prefix+"lightpath3", ui->chkLightpath3->isChecked());
     settings.setValue(prefix+"savemeasurements", ui->chkSaveMeasurements->isChecked());
+
+    settings.setValue(prefix+"stacks_relative", ui->chkStackRelative->isChecked());
+    settings.setValue(prefix+"getCurrent", lastGetC);
+    settings.setValue(prefix+"getCurrent2", lastGetC2);
+    settings.setValue(prefix+"getCurrent3", lastGetC3);
+
+    settings.setValue(prefix+"cycling2", ui->chkCycling2->isChecked());
+    settings.setValue(prefix+"cycling3", ui->chkCycling3->isChecked());
+
 }
 
 int QFESPIMB040ImageStackConfigWidget2::images() const {
@@ -221,6 +282,13 @@ int QFESPIMB040ImageStackConfigWidget2::stackCount() const {
 }
 
 double QFESPIMB040ImageStackConfigWidget2::stackStart() const {
+    if (ui->chkStackRelative->isChecked() && stage() && stage()->isConnected(currentAxisID())) {
+        if (actGetCurrent->isChecked()) {
+            return stage()->getPosition(currentAxisID());
+        } else {
+            return stage()->getPosition(currentAxisID())-(ui->spinDelta->value()*double(ui->spinSteps->value()))/2.0;
+        }
+    }
     return ui->spinStart->value();
 }
 
@@ -236,24 +304,28 @@ void QFESPIMB040ImageStackConfigWidget2::on_btnAcquire_clicked() {
     emit doStack();
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_btnGetCurrent_clicked() {
-    if (opticsSetup) opticsSetup->lockStages();
+void QFESPIMB040ImageStackConfigWidget2::actGetCurrent_clicked() {
+    if (ui->chkStackRelative->isChecked()) { lastGetC=actGetCurrent->isChecked(); updateLabel(); return; }
+
+    //if (opticsSetup) opticsSetup->lockStages();
     if (stage()!=NULL) {
         if (stage()->isConnected(currentAxisID())) {
             ui->spinStart->setValue(stage()->getPosition(currentAxisID()));
         }
     }
-    if (opticsSetup) opticsSetup->unlockStages();
+    //if (opticsSetup) opticsSetup->unlockStages();
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_btnGetCurrentAround_clicked() {
-    if (opticsSetup) opticsSetup->lockStages();
+void QFESPIMB040ImageStackConfigWidget2::actGetCurrentAround_clicked() {
+    if (ui->chkStackRelative->isChecked()) { lastGetC=actGetCurrent->isChecked(); updateLabel(); return; }
+
+    //if (opticsSetup) opticsSetup->lockStages();
     if (stage()!=NULL) {
         if (stage()->isConnected(currentAxisID())) {
             ui->spinStart->setValue(stage()->getPosition(currentAxisID())-ui->spinDelta->value()*(double)ui->spinSteps->value()/2.0);
         }
     }
-    if (opticsSetup) opticsSetup->unlockStages();
+    //if (opticsSetup) opticsSetup->unlockStages();
 }
 
 void QFESPIMB040ImageStackConfigWidget2::on_spinStart_valueChanged(double value) {
@@ -365,6 +437,9 @@ void QFESPIMB040ImageStackConfigWidget2::checkStage() {
             ui->btnConnect->setChecked(true);
             ui->btnConnect->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
             ui->btnConnect->setToolTip(tr("Disconnect from axis ..."));
+            if (ui->chkStackRelative->isChecked()) {
+                ui->spinStart->setValue(stackStart());
+            }
         } else {
             ui->btnConnect->setChecked(false);
             ui->btnConnect->setIcon(QIcon(":/spimb040/stageconnect.png"));
@@ -382,6 +457,9 @@ void QFESPIMB040ImageStackConfigWidget2::checkStage() {
             ui->btnConnect2->setChecked(true);
             ui->btnConnect2->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
             ui->btnConnect2->setToolTip(tr("Disconnect from axis ..."));
+            if (ui->chkStackRelative->isChecked()) {
+                ui->spinStart2->setValue(stackStart2());
+            }
         } else {
             ui->btnConnect2->setChecked(false);
             ui->btnConnect2->setIcon(QIcon(":/spimb040/stageconnect.png"));
@@ -399,6 +477,10 @@ void QFESPIMB040ImageStackConfigWidget2::checkStage() {
             ui->btnConnect3->setChecked(true);
             ui->btnConnect3->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
             ui->btnConnect3->setToolTip(tr("Disconnect from axis ..."));
+            if (ui->chkStackRelative->isChecked()) {
+                ui->spinStart3->setValue(stackStart3());
+            }
+
         } else {
             ui->btnConnect3->setChecked(false);
             ui->btnConnect3->setIcon(QIcon(":/spimb040/stageconnect.png"));
@@ -436,6 +518,13 @@ int QFESPIMB040ImageStackConfigWidget2::stackCount2() const {
 }
 
 double QFESPIMB040ImageStackConfigWidget2::stackStart2() const {
+    if (ui->chkStackRelative->isChecked() && stage2() && stage2()->isConnected(currentAxisID2())) {
+        if (actGetCurrent2->isChecked()) {
+            return stage2()->getPosition(currentAxisID2());
+        } else {
+            return stage2()->getPosition(currentAxisID2())-(ui->spinDelta2->value()*double(ui->spinSteps2->value()))/2.0;
+        }
+    }
     return ui->spinStart2->value();
 }
 
@@ -444,24 +533,26 @@ double QFESPIMB040ImageStackConfigWidget2::stackDelta2() const {
 }
 
 
-void QFESPIMB040ImageStackConfigWidget2::on_btnGetCurrent2_clicked() {
-    if (opticsSetup) opticsSetup->lockStages();
+void QFESPIMB040ImageStackConfigWidget2::actGetCurrent2_clicked() {
+    if (ui->chkStackRelative->isChecked()) { lastGetC2=actGetCurrent2->isChecked(); updateLabel(); return; }
+    //if (opticsSetup) opticsSetup->lockStages();
     if (stage2()!=NULL) {
         if (stage2()->isConnected(currentAxisID2())) {
             ui->spinStart2->setValue(stage2()->getPosition(currentAxisID2()));
         }
     }
-    if (opticsSetup) opticsSetup->unlockStages();
+    //if (opticsSetup) opticsSetup->unlockStages();
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_btnGetCurrentAround2_clicked() {
-    if (opticsSetup) opticsSetup->lockStages();
+void QFESPIMB040ImageStackConfigWidget2::actGetCurrentAround2_clicked() {
+    if (ui->chkStackRelative->isChecked()) { lastGetC2=actGetCurrent2->isChecked(); updateLabel(); return; }
+    //if (opticsSetup) opticsSetup->lockStages();
     if (stage2()!=NULL) {
         if (stage2()->isConnected(currentAxisID2())) {
             ui->spinStart2->setValue(stage2()->getPosition(currentAxisID2())-ui->spinDelta2->value()*(double)ui->spinSteps2->value()/2.0);
         }
     }
-    if (opticsSetup) opticsSetup->unlockStages();
+    //if (opticsSetup) opticsSetup->unlockStages();
 }
 void QFESPIMB040ImageStackConfigWidget2::on_spinStart2_valueChanged(double value) {
     updateLabel();
@@ -519,6 +610,13 @@ int QFESPIMB040ImageStackConfigWidget2::stackCount3() const {
 }
 
 double QFESPIMB040ImageStackConfigWidget2::stackStart3() const {
+    if (ui->chkStackRelative->isChecked() && stage3() && stage3()->isConnected(currentAxisID3())) {
+        if (actGetCurrent3->isChecked()) {
+            return stage3()->getPosition(currentAxisID3());
+        } else {
+            return stage3()->getPosition(currentAxisID3())-(ui->spinDelta3->value()*double(ui->spinSteps3->value()))/2.0;
+        }
+    }
     return ui->spinStart3->value();
 }
 
@@ -562,24 +660,27 @@ QString QFESPIMB040ImageStackConfigWidget2::lightpath3Filename() const {
     return ui->cmbLightpath3->itemData(ui->cmbLightpath3->currentIndex()).toString();
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_btnGetCurrent3_clicked() {
-    if (opticsSetup) opticsSetup->lockStages();
+void QFESPIMB040ImageStackConfigWidget2::actGetCurrent3_clicked() {
+    if (ui->chkStackRelative->isChecked()) { lastGetC2=actGetCurrent3->isChecked(); updateLabel(); return; }
+    //if (opticsSetup) opticsSetup->lockStages();
     if (stage3()!=NULL) {
         if (stage3()->isConnected(currentAxisID3())) {
             ui->spinStart3->setValue(stage3()->getPosition(currentAxisID3()));
         }
     }
-    if (opticsSetup) opticsSetup->unlockStages();
+    //if (opticsSetup) opticsSetup->unlockStages();
 }
 
-void QFESPIMB040ImageStackConfigWidget2::on_btnGetCurrentAround3_clicked() {
-    if (opticsSetup) opticsSetup->lockStages();
+void QFESPIMB040ImageStackConfigWidget2::actGetCurrentAround3_clicked() {
+    if (ui->chkStackRelative->isChecked()) { lastGetC2=actGetCurrent3->isChecked(); updateLabel(); return; }
+
+    //if (opticsSetup) opticsSetup->lockStages();
     if (stage3()!=NULL) {
         if (stage3()->isConnected(currentAxisID3())) {
             ui->spinStart3->setValue(stage3()->getPosition(currentAxisID3())-ui->spinDelta3->value()*(double)ui->spinSteps3->value()/2.0);
         }
     }
-    if (opticsSetup) opticsSetup->unlockStages();
+    //if (opticsSetup) opticsSetup->unlockStages();
 }
 
 void QFESPIMB040ImageStackConfigWidget2::on_spinStart3_valueChanged(double value) {
@@ -610,6 +711,32 @@ void QFESPIMB040ImageStackConfigWidget2::on_btnConnect3_clicked() {
         }
     }
     if (opticsSetup) opticsSetup->unlockStages();
+}
+
+void QFESPIMB040ImageStackConfigWidget2::on_chkStackRelative_toggled(bool checked) {
+    ui->spinStart->setEnabled(!checked);
+    ui->spinStart2->setEnabled(!checked);
+    ui->spinStart3->setEnabled(!checked);
+
+    actGetCurrentG->setExclusive(checked);
+    actGetCurrentG2->setExclusive(checked);
+    actGetCurrentG3->setExclusive(checked);
+    actGetCurrent->setCheckable(checked);
+    actGetCurrentAround->setCheckable(checked);
+    actGetCurrent2->setCheckable(checked);
+    actGetCurrentAround2->setCheckable(checked);
+    actGetCurrent3->setCheckable(checked);
+    actGetCurrentAround3->setCheckable(checked);
+
+    if (checked)  {
+        actGetCurrent->setChecked(lastGetC);
+        actGetCurrentAround->setChecked(!lastGetC);
+        actGetCurrent2->setChecked(lastGetC2);
+        actGetCurrentAround2->setChecked(!lastGetC2);
+        actGetCurrent3->setChecked(lastGetC3);
+        actGetCurrentAround3->setChecked(!lastGetC3);
+    }
+
 }
 
 QString QFESPIMB040ImageStackConfigWidget2::currentConfigFilename(int camera) const {
