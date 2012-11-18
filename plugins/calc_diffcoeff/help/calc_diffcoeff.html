@@ -57,7 +57,7 @@
 		    $$bmath:\eta(T)=A\cdot10^{B/(T-C)}$$
 			where $$math:T$$ is the absolute temperature in Kelvin and $$math:A=2.41\cdot10^{-5} \rm{Pa\cdot s}$$, $$math:B=247.8 \rm{K}$$ and $$math:C=140 \rm{K}$$.
 			<center><img src="./pic/viscosity_water.png"></center>
-                        In addition a number of dissolved components can be taken into account when calculating the viscosity of an aqueous solution. To estimate the viscosity of the solution, this plugin uses the same method as the program Sednterp (see <a href="http://bitcwiki.sr.unh.edu/index.php/Calculating_Viscosity">http://bitcwiki.sr.unh.edu/index.php/Calculating_Viscosity</a> and chapters 1 and 2 in [1]): First a viscosity increment is calculated for each component of the solution at 20°C (where measured data for several solutes is available):
+                        In addition a number of dissolved components can be taken into account when calculating the viscosity of an aqueous solution. To estimate the viscosity of the solution, this plugin uses the same method as the program Sednterp (see <a href="http://bitcwiki.sr.unh.edu/index.php/Calculating_Viscosity">http://bitcwiki.sr.unh.edu/index.php/Calculating_Viscosity</a> and chapters 1 and 2 in [1], as well as [6]): First a viscosity increment is calculated for each component of the solution at 20°C (where measured data for several solutes is available):
 			$$bmath: \Delta\eta_i(c_i)=m(c_i; \vec{p})-\eta_{Water, 20}$$
 			Here the function $$math:m(c_i; \vec{p})$$ is a model function fitted to experimental viscosity data of the respective solution. It models the viscosity of the solut in water at a molar concentration $$math:c_i$$ and a temperature of 20°C. Finally the solution viscosity at the target temperature $$math:T$$ is estimated as:
 			$$bmath:\eta(T, c_1,...,c_n)=\left(\eta_{20,water}+\sum_{i=1}^n\Delta\eta_i(c_i)\right)\cdot\frac{\eta_{T,water}}{\eta_{20,water}}$$
@@ -145,7 +145,7 @@
 			unset multiplot<br>
 		  </tt></blockquote></li>
 		  The residuals should be below 1% and if they are much too high, you should use a different model or fit the model data to a smaller range of concentrations.<br>Finally take the parameters p1 ... p5 and put them in your new section in <tt>solutioncomponents.ini</tt>.
-		  <li>The new data should be available after a restart. If you feel that you have good data that should be available to all QUickFit users, just email it to the QuickFit authors (A button for this is provided in the component info window!).</li>
+		  <li>The new data should be available after a restart. If you feel that you have good data that should be available to all QuickFit users, just email it to the QuickFit authors (A button for this is provided in the component info window!).</li>
 		  </li>
 		  <li></li>
 		</ol></p>
@@ -156,6 +156,7 @@
                   <li>[3] Tirado, M.M. and J. Garca de la Torre (1979): "Translational friction coefficients of rigid, symmetric top macromolecules". Application to circular cylinders, J. Chem Phys. 71: 2581-2588.</li>
                   <li>[4] S. Hansen (2004): "Translational friction coefficients for cylinders of arbitrary axial ratios estimated by Monte Carlo simulation", J CHem Phys 121(18), 9111-9115. <a href="http://www.matfys.kvl.dk/~steen/Hansen%20JCP%202004.pdf">[Online]</a></li>
                   <li>[5] Bloomfield, VA (2000): "Chapter 1. Survey of Biomolecular Hydrodynamics" in: On-Line Biophysics Textbook. Separations and Hydrodynamics./Edited by TM Schuster. <a href="http://www.biophysics.org/portals/1/pdfs/education/vbloomfield.pdf">[Online]</a></li>
+                  <li>[6] TM Laue, BD Shah, TM Ridgeway, SL Pelletier (1992): "Computer-Aided Interpretation of Analytical Sedimentation data for Proteins" in: <i>Analytical Ultracentrifugation in Biochemistry and Polymer Science</i> (Eds Harding, S. E., Rowe, A.J. & Horton, J.C.) 90−125 (Royal Society of Chemistry, Cambridge, 1992)</li>
 		</ul>
 	</body>
 </html>

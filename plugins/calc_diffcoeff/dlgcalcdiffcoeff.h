@@ -55,6 +55,7 @@ class DlgCalcDiffCoeff : public QDialog
         QVector<double> temp, D, visc, density, Dwater, Dsolution, Dsphere;
 
         bool updating;
+        QString userDDescriptor;
 
 };
 

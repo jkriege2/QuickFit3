@@ -10,6 +10,7 @@ DlgCalcDiffCoeff::DlgCalcDiffCoeff(QFEDiffusionCoefficientCalculator *plg, QWidg
     ui(new Ui::DlgCalcDiffCoeff)
 {
     updating=false;
+    userDDescriptor=tr(" (user)");
     dlgInfo=NULL;
     this->plugin=plg;
     tab=new QFTableModel(this);
@@ -183,6 +184,7 @@ void DlgCalcDiffCoeff::updateGivenD() {
     updating=true;
 
     QString name=ui->cmbGivenDName->currentText();
+    if (name.endsWith(userDDescriptor)) name=name.left(name.size()-userDDescriptor.size());
     //ui->cmbGivenDName->clear();
     // search for the name
     QStringList groups=set.childGroups();
@@ -196,6 +198,9 @@ void DlgCalcDiffCoeff::updateGivenD() {
             QVariant ref=set.value(groups[i]+"/reference", "");
             if (ref.type()==QVariant::StringList) ref=ref.toStringList().join(", ");
             ui->edtReference->setText(ref.toString());
+            ui->edtGivenDError->setValue(set.value(groups[i]+"/D_error", 0).toDouble());
+            ui->edtBuffer->setText(set.value(groups[i]+"/solvent", set.value(groups[i]+"/buffer", "").toString()).toString());
+            ui->edtMethod->setText(set.value(groups[i]+"/method", "").toString());
             break;
         }
     }
@@ -210,6 +215,9 @@ void DlgCalcDiffCoeff::updateGivenD() {
             QVariant ref=setC.value(groups[i]+"/reference", "");
             if (ref.type()==QVariant::StringList) ref=ref.toStringList().join(", ");
             ui->edtReference->setText(ref.toString());
+            ui->edtGivenDError->setValue(set.value(groups[i]+"/D_error", 0).toDouble());
+            ui->edtBuffer->setText(set.value(groups[i]+"/solvent", set.value(groups[i]+"/buffer", "").toString()).toString());
+            ui->edtMethod->setText(set.value(groups[i]+"/method", "").toString());
             break;
         }
     }
@@ -232,6 +240,7 @@ void DlgCalcDiffCoeff::on_btnDeleteGivenD_clicked() {
     //if (set.isWritable()) {
 
         QString name=ui->cmbGivenDName->currentText();
+        if (name.endsWith(userDDescriptor)) name=name.left(name.size()-userDDescriptor.size());
 
         // search for the name
         QStringList groups=set.childGroups();
@@ -264,6 +273,7 @@ void DlgCalcDiffCoeff::on_btnSaveGivenD_clicked() {
     //if (set.isWritable()) {
 
         QString name=ui->cmbGivenDName->currentText();
+        if (name.endsWith(userDDescriptor)) name=name.left(name.size()-userDDescriptor.size());
 
         // search for the name
         QStringList groups=set.childGroups();
@@ -293,6 +303,9 @@ void DlgCalcDiffCoeff::on_btnSaveGivenD_clicked() {
             set.setValue(QString("sample%1/viscosity").arg(idx_max), ui->edtGivenDVisc->value());
             set.setValue(QString("sample%1/temperature").arg(idx_max), ui->spinGivenDT->value());
             set.setValue(QString("sample%1/reference").arg(idx_max), ui->edtReference->text());
+            set.setValue(QString("sample%1/D_error").arg(idx_max), ui->edtGivenDError->value());
+            set.setValue(QString("sample%1/solvent").arg(idx_max), ui->edtBuffer->text());
+            set.setValue(QString("sample%1/method").arg(idx_max), ui->edtMethod->text());
             readSamples();
         }
     //} else {
@@ -434,9 +447,12 @@ void DlgCalcDiffCoeff::writeSettings() {
             set->setValue(plugin->getID()+"/temperature_delta", ui->spinSolutionTemperatureDelta->value());
             set->setValue(plugin->getID()+"/diameter", ui->spinSPhereDiameter->value());
             set->setValue(plugin->getID()+"/givenD/D", ui->edtGivenD->value());
+            set->setValue(plugin->getID()+"/givenD/D_error", ui->edtGivenDError->value());
             set->setValue(plugin->getID()+"/givenD/visc", ui->edtGivenDVisc->value());
             set->setValue(plugin->getID()+"/givenD/Temp", ui->spinGivenDT->value());
             set->setValue(plugin->getID()+"/givenD/name", ui->cmbGivenDName->currentIndex());
+            set->setValue(plugin->getID()+"/givenD/buffer", ui->edtBuffer->text());
+            set->setValue(plugin->getID()+"/givenD/method", ui->edtMethod->text());
             set->setValue(plugin->getID()+"/shape/rot", ui->spinRotationAxis->value());
             set->setValue(plugin->getID()+"/shape/other", ui->spinOtherAxis->value());
             set->setValue(plugin->getID()+"/shape/type", ui->cmbShapeType->currentIndex());
@@ -469,14 +485,15 @@ void DlgCalcDiffCoeff::readSamples() {
     updating=true;
 
     QString ct=ui->cmbGivenDName->currentText();
+    QStringList items;
 
-    ui->cmbGivenDName->clear();
     // search for the name
     QStringList groups=set.childGroups();
     for (int i=0; i<groups.size(); i++) {
         set.beginGroup(groups[i]);
         QString n=set.value("name", "").toString();
-        ui->cmbGivenDName->addItem(n);
+        //ui->cmbGivenDName->addItem(n);
+        items<<n;
         set.endGroup();
     }
 
@@ -484,9 +501,13 @@ void DlgCalcDiffCoeff::readSamples() {
     for (int i=0; i<groups.size(); i++) {
         setC.beginGroup(groups[i]);
         QString n=setC.value("name", "").toString();
-        ui->cmbGivenDName->addItem(n);
+        //ui->cmbGivenDName->addItem(n);
+        items<<n+userDDescriptor;
+
         setC.endGroup();
     }
+    ui->cmbGivenDName->clear();
+    ui->cmbGivenDName->addItems(items);
 
     updating=false;
     ui->cmbGivenDName->setCurrentIndex(ui->cmbGivenDName->findText(ct));

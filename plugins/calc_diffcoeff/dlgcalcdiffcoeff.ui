@@ -29,7 +29,7 @@
      <item row="0" column="0" rowspan="2">
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>3</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab">
         <attribute name="title">
@@ -135,16 +135,6 @@
            </item>
           </layout>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>D [µm²/s] = </string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QFDoubleEdit" name="edtGivenD"/>
-         </item>
          <item row="4" column="0">
           <widget class="QLabel" name="label_8">
            <property name="text">
@@ -195,17 +185,17 @@
            </property>
           </widget>
          </item>
-         <item row="7" column="0">
+         <item row="9" column="0">
           <widget class="QLabel" name="label_13">
            <property name="text">
             <string>reference:</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
+         <item row="9" column="1">
           <widget class="QLineEdit" name="edtReference"/>
          </item>
-         <item row="8" column="1">
+         <item row="10" column="1">
           <widget class="QPushButton" name="btnSendEmailGivenD">
            <property name="text">
             <string>send my &quot;given D&quot; data to QuickFit authors</string>
@@ -215,6 +205,53 @@
              <normaloff>:/lib/mail.png</normaloff>:/lib/mail.png</iconset>
            </property>
           </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_32">
+           <property name="text">
+            <string>method:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QLineEdit" name="edtMethod"/>
+         </item>
+         <item row="2" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QFDoubleEdit" name="edtGivenD"/>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_33">
+             <property name="text">
+              <string>&amp;plusmn;</string>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::RichText</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFDoubleEdit" name="edtGivenDError"/>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>D [µm²/s] = </string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_31">
+           <property name="text">
+            <string>buffer:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="edtBuffer"/>
          </item>
         </layout>
        </widget>
