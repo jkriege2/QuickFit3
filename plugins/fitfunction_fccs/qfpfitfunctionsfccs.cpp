@@ -9,7 +9,7 @@ QStringList QFPFitFunctionsFCCS::getIDs() const {
 QFFitFunction* QFPFitFunctionsFCCS::get(QString id, QObject* parent) const  {
     if (id=="fccs_diff3d") {
         return new QFFitFunctionFCCSNormalDiff3D();
-    } 
+    }
     return NULL;
 }
 

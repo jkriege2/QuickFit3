@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Fit Function: FCCS 3D Diffusion</title>
+	</head>
+	<body>
+		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+		<p>This plugin implements a 3D diffusion FCS fit function for a dual-focus setting, as described in:
+		<ul>
+		  <li>Petra Schwille, Franz-Josef Meyer-Almes, and Rudolf Rigler (1997): <strong>"<a href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC1184381/pdf/biophysj00037-0394.pdf">Dual-Color Fluorescence Cross-Correlation Spectroscopy for Multicomponent Diffusional Analysis in Solution</a>"</string>, <i>Biophysical Journal</i> <b>72</b>, 1878-1886</li>
+		  <li>Ries, Jonas; Petrášek, Zdeněk; García-Sáez, Anna J.; Schwille, Petra (2010): <strong>"A comprehensive framework for fluorescence cross-correlation spectroscopy"</strong>, <i>New Journal of Physics</i>, <b>12</b>(11), pp. 113009, DOI: 10.1088/1367-2630/12/11/113009</li>
+		</ul>
+		
+		The model function is:
+		  $$bmath:g(\tau)=\left(\frac{1-\Theta_R-\Theta_T+\Theta_R\cdot\exp(-\tau/\tau_R)+\Theta_T\cdot\exp(-\tau/\tau_T)}{1-\Theta_R-\Theta_T}\right)\cdot \frac{1}{N} \cdot\left(1+\frac{8\cdot D_{ab}\cdot\tau}{\omega_R^2+\omega_G^2}\right)^{-1} \cdot \left(1+\frac{8\cdot D_{ab}\cdot\tau}{\gamma_R^2\cdot\omega_R^2+\gamma_G^2\cdot\omega_G^2}\right)^{-1/2}\cdot \exp\left(-2\cdot\frac{d_{RG}^2}{8\cdot D_{ab}\cdot\tau+\gamma_R^2\cdot\omega_R^2+\gamma_G^2\cdot\omega_G^2}\right)+G_\infty$$
+		  
+		Here the parameters are defined as follows:
+		<ul>
+			<li>$$math:\Theta_T$$: fraction of particles in triplet state</li>
+			<li>$$math:\tau_T$$: correlation time of triplet state dynamics</li>
+			<li>$$math:\Theta_R$$: fraction of particles undergoing a reaction</li>
+			<li>$$math:\tau_R$$: correlation time of reaction kinetics</li>
+			<li>$$math:\eta_G=\frac{CR_G-B_G}{N_a+N_{ab}}$$: quantum efficiency in green channel (in counts per molecule and second)</li>
+			<li>$$math:\eta_R=\frac{CR_R-B_R+\kappa\cdot(CR_G-B_G)}{N_b+N_{ab}}$$: quantum efficiency in red channel (in counts per molecule and second)</li>
+			<li>$$math:CR_G, CR_R$$: count rates in green and red channel </li>
+			<li>$$math:B_G, B_R$$: background count rates in green and red channel </li>
+			<li>$$math:\kappa$$: crosstalk factor [0..1]</li>
+			<li>$$math:N_a+N_{ab}$$: apparent particle number in the green channel ACF</li>
+			<li>$$math:N_b+N_{ab}$$: apparent particle number in the red channel ACF</li>
+			<li>$$math:N_a$$: real particle number of species a, as measured in the green focal volume</li>
+			<li>$$math:N_b$$: real particle number of species b, as measured in the red focal volume</li>
+			<li>$$math:N_{ab}$$: particle number of the species ab</li>
+			<li>$$math:D_{ab}$$: diffusion coefficient of species ab</li>
+			<li>$$math:w_G, \gamma_G$$: 1/e<sup>2</sup> radius and axial ratio of the green focus</li>
+			<li>$$math:w_R, \gamma_R$$: 1/e<sup>2</sup> radius and axial ratio of the red focus</li>
+			<li>$$math:d_{rg}$$: distance of red and green focus</li>
+			<li>$$math:K=\frac{C_{ab}}{C_a\cdot C_b}$$: reaction equilibrium constant of an assumed reaction $$math:a+b\leftrightarrow ab$$</li>
+			<li>$$math:C_{ab}=N_{ab}/V_{eff}$$: particle concentration of species ab</li>
+			<li>$$math:C_{a}=N_{a}/V_{g}$$: particle concentration of species a</li>
+			<li>$$math:C_{b}=N_{b}/V_{r}$$: particle concentration of species a</li>
+			<li>$$math:V_{eff}=\left(\frac{\pi}{2}\right)^{3/2}\cdot (w_r^2+w_g^2)\cdot\sqrt{w_g^2\gamma_g^2+w_r^2\gamma_r^2}$$: effective volume for crosscorrelation curve</li>
+			<li>$$math:V_{r,g}=\pi^{3/2}\cdot w_{r,g}^3\gamma_{r,g}$$: effective volume for autocorrelation curves</li>
+			<li>$$G_\infty$$: offset of correlation function (usually fixed to 0 or 1)</li>
+			
+		</ul>
+		</p>
+	</body>
+</html>

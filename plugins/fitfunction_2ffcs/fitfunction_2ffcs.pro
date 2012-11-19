@@ -1,24 +1,24 @@
 TEMPLATE = lib
 CONFIG += plugin
 
-TARGET = fitfunctions_fccs
+TARGET = fitfunctions_2ffcs
 DEPENDPATH += ./
 
 include(../plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
 # Input
-HEADERS += qfpfitfunctionsfccs.h \
-           qffitfunctionfccsnormaldiff3d.h
+HEADERS += qfpfitfunctions2ffcs.h \
+           qffitfunction2ffccsnormaldiff3d.h
 
-SOURCES += qfpfitfunctionsfccs.cpp\
-           qffitfunctionfccsnormaldiff3d.cpp
+SOURCES += qfpfitfunctions2ffcs.cpp\
+           qffitfunction2ffccsnormaldiff3d.cpp
 
 FORMS =
 
 RESOURCES +=
 
-TRANSLATIONS= ./translations/de.fitfunctions_fccs.ts
+TRANSLATIONS= ./translations/de.fitfunctions_2ffcs.ts
 
 
 INCLUDEPATH += ../../lib/
