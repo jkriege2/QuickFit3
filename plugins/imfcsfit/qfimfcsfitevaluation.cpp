@@ -2,6 +2,7 @@
 #include "qfimfcsfitevaluationeditor.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
 #include "qffitfunction.h"
+#include "qftools.h"
 
 
 QFImFCSFitEvaluation::QFImFCSFitEvaluation(QFProject* parent):
@@ -72,7 +73,26 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
             error=scrintf->getSimpleCountrateVariance(index)*1000.0;
         }
         if (crintf||scrintf) return true;
-
+    } else if (paramid=="count_rate1") {
+        QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
+        value=0;
+        error=0;
+        if (crintf && crintf->getRateChannels()>0) {
+            error=crintf->getRateStdDev(index, 0)*1000.0;
+            value=crintf->getRateMean(index, 0)*1000.0;
+            //qDebug()<<"getRateMean(run="<<run<<", ch=0) = "<<value<<" +/- "<<error;
+            return true;
+        }
+    } else if (paramid=="count_rate2") {
+        QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
+        value=0;
+        error=0;
+        if (crintf && crintf->getRateChannels()>1) {
+            error=crintf->getRateStdDev(index, 1)*1000.0;
+            value=crintf->getRateMean(index, 1)*1000.0;
+            //qDebug()<<"getRateMean(run="<<run<<", ch=1) = "<<value<<" +/- "<<error;
+            return true;
+        }
     } else if (paramid=="pixel_width") {
         if (!r) return false;
         double bin=r->getProperty("BINNING", 1.0).toDouble();
@@ -87,6 +107,35 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
         double height=r->getProperty("PIXEL_HEIGHT", -1).toDouble();
         if (height<=0) return false;
         value=bin*height;
+        error=0;
+        return true;
+    } else if (paramid=="focus_distance") {
+        if (!r) return false;
+        double deltax=r->getProperty("DCCF_DELTAX", 0.0).toDouble();
+        double deltay=r->getProperty("DCCF_DELTAY", 0.0).toDouble();
+        double bin=r->getProperty("BINNING", 1.0).toDouble();
+        double width=r->getProperty("PIXEL_WIDTH", -1).toDouble();
+        double height=r->getProperty("PIXEL_HEIGHT", -1).toDouble();
+        if (width<=0 || height<=0) return false;
+        value=sqrt(qfSqr(bin*width*deltax)+qfSqr(bin*height*deltay));
+        error=0;
+        return true;
+    } else if (paramid=="focus_distancex") {
+        if (!r) return false;
+        double deltax=r->getProperty("DCCF_DELTAX", 0.0).toDouble();
+        double bin=r->getProperty("BINNING", 1.0).toDouble();
+        double width=r->getProperty("PIXEL_WIDTH", -1).toDouble();
+        if (width<=0) return false;
+        value=bin*width*deltax;
+        error=0;
+        return true;
+    } else if (paramid=="focus_distancey") {
+        if (!r) return false;
+        double deltay=r->getProperty("DCCF_DELTAY", 0.0).toDouble();
+        double bin=r->getProperty("BINNING", 1.0).toDouble();
+        double height=r->getProperty("PIXEL_HEIGHT", -1).toDouble();
+        if (height<=0) return false;
+        value=bin*height*deltay;
         error=0;
         return true;
     }

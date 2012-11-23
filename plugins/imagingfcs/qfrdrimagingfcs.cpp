@@ -96,6 +96,10 @@ void QFRDRImagingFCSPlugin::importCorrelationsFromDialog() {
 
 void QFRDRImagingFCSPlugin::insertRecord() {
     if (project) {
+        QRegExp rxdccf("\\.dccf(\\d+)?\\.(dat|bin)");
+        rxdccf.setCaseSensitivity(Qt::CaseInsensitive);
+        rxdccf.setMinimal(true);
+
         // file format to import
         QString format_binVideoCorrelator=tr("binary imFCS Correlations (*.autocorrelation.bin *.acf.bin *.crosscorrelation.bin *.ccf.bin *.dccf.bin)");
         QString format_binVideoCorrelator_short=tr("binary imFCS correlation data");
@@ -143,7 +147,7 @@ void QFRDRImagingFCSPlugin::insertRecord() {
                 }
                 if (!QFile::exists(overview)) {
                     overview=filename;
-                    overview=overview.replace(".dccf.dat", ".overview.tif");
+                    overview=overview.replace(rxdccf, ".overview.tif");
                 }
                 if (!QFile::exists(overview)) {
                     overview=filename;
@@ -165,7 +169,7 @@ void QFRDRImagingFCSPlugin::insertRecord() {
                 }
                 if (!QFile::exists(overview)) {
                     overview=filename;
-                    overview=overview.replace(".dccf.bin", ".overview.tif");
+                    overview=overview.replace(rxdccf, ".overview.tif");
                 }
                 if (!QFile::exists(overview)) {
                     overview=filename;
@@ -307,6 +311,10 @@ bool QFRDRImagingFCSPlugin::parseSPIMSettings(const QString& filename_settings, 
 }
 
 void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, const QString& filename_overvieww, bool binary) {
+    QRegExp rxdccf("\\.dccf(\\d+)?\\.(dat|bin)");
+    rxdccf.setCaseSensitivity(Qt::CaseInsensitive);
+    rxdccf.setMinimal(true);
+
     // here we store some initial parameters
     QMap<QString, QVariant> initParams;
     QString filename_overview=filename_overvieww;
@@ -321,6 +329,8 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
     QString filename_mask="";
     QString filename_video="";
     QString filename_videoUncorrected="";
+
+    int dccfid=-1;
 
     // add all properties in initParams that will be readonly
     QStringList paramsReadonly;
@@ -356,10 +366,11 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
         evalFilename=filename;
         evalFilename=evalFilename.replace(".qf.dat", ".evalsettings.txt");
         isJanBFile=true;
-    } else if (filename.endsWith(".dccf.dat")) {
-        evalFilename=filename;
-        evalFilename=evalFilename.replace(".dccf.dat", ".evalsettings.txt");
+    } else if (rxdccf.indexIn(filename)>=0) {//filename.endsWith(".dccf.dat")) {
         isDCCF=true;
+        if (rxdccf.cap(1).size()>0) dccfid=rxdccf.cap(1).toInt();
+        evalFilename=filename;
+        evalFilename=evalFilename.replace(rxdccf, ".evalsettings.txt");
     } else if (filename.endsWith(".autocorrelation.bin")) {
         evalFilename=filename;
         evalFilename=evalFilename.replace(".autocorrelation.bin", ".evalsettings.txt");
@@ -374,10 +385,10 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
         evalFilename=filename;
         evalFilename=evalFilename.replace(".ccf.bin", ".evalsettings.txt");
         isCross=true;
-    } else if (filename.endsWith(".dccf.bin")) {
-        evalFilename=filename;
-        evalFilename=evalFilename.replace(".dccf.bin", ".evalsettings.txt");
+    /*} else if (filename.endsWith(".dccf.bin")) {
         isDCCF=true;
+        evalFilename=filename;
+        evalFilename=evalFilename.replace(".dccf.bin", ".evalsettings.txt");*/
     }
     //qDebug()<<filename<<isJanBFile;
 
@@ -399,6 +410,13 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         QString value=reg.cap(3);
 
                         //qDebug()<<name <<"  =  "<<value;
+                        QRegExp rxdccfp("dccf\\s+(\\d+\\s+)?(delta x|delta y|frame width|frame height)");
+                        rxdccfp.setMinimal(true);
+                        rxdccfp.setCaseSensitivity(Qt::CaseInsensitive);
+                        bool isDCCFParam=rxdccfp.indexIn(name)>=0;
+                        QString dccfParam=rxdccfp.cap(2).toLower();
+                        int dccfParamID=-1;
+                        if (!rxdccfp.cap(1).isEmpty()) dccfParamID=rxdccfp.cap(1).toInt();
 
                         if (name=="width") {
                             if (!isDCCF) {
@@ -412,13 +430,13 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                                 height=value.toInt();
                                 paramsReadonly<<"HEIGHT";
                             }
-                        } else if (name=="dccf frame width") {
+                        } else if (isDCCFParam && dccfParamID==dccfid && dccfParam=="frame width"){ //(name=="dccf frame width") {
                             if (isDCCF) {
                                 initParams["WIDTH"]=value.toInt();
                                 width=value.toInt();
                                 paramsReadonly<<"WIDTH";
                             }
-                        } else if (name=="dccf frame height") {
+                        } else if (isDCCFParam && dccfParamID==dccfid && dccfParam=="frame height"){ //(name=="dccf frame height") {
                             if (isDCCF) {
                                 initParams["HEIGHT"]=value.toInt();
                                 height=value.toInt();
@@ -433,10 +451,10 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         } else if (name=="reading frame count") {
                             initParams["FRAME_COUNT"]=value.toInt();
                             paramsReadonly<<"FRAME_COUNT";
-                        } else if (name=="dccf delta x") {
+                        } else if (isDCCFParam && dccfParamID==dccfid && dccfParam=="delta x"){ //(name=="dccf delta x") {
                             initParams["DCCF_DELTAX"]=value.toInt();
                             paramsReadonly<<"DCCF_DELTAX";
-                        } else if (name=="dccf delta y") {
+                        } else if (isDCCFParam && dccfParamID==dccfid && dccfParam=="delta y"){ //(name=="dccf delta y") {
                             initParams["DCCF_DELTAY"]=value.toInt();
                             paramsReadonly<<"DCCF_DELTAY";
                         } else if (name=="frame count") {

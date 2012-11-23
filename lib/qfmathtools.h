@@ -17,6 +17,16 @@
  */
 #define QFFloatIsOK(v) (std::isfinite(v) && (!std::isinf(v)) && (!std::isnan(v)))
 
+/*! \brief squares the argument
+    \ingroup qf3lib_mathtools
+ */
+#define qfSqr(x) ((x)*(x))
+
+/*! \brief takes the argument to the third power
+    \ingroup qf3lib_mathtools
+ */
+#define qfCube(x) ((x)*(x)*(x))
+
 /*! \brief calculate the average and variance of a given array
     \ingroup qf3lib_mathtools
 

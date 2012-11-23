@@ -114,9 +114,9 @@ struct IMFCSJob {
     /** \brief indicates whether distance-CCF is activated */
     bool distanceCCF;
     /** \brief distanceCCF Delta x */
-    int DCCFDeltaX;
+    QList<int> DCCFDeltaX;
     /** \brief distanceCCF Delta y */
-    int DCCFDeltaY;
+    QList<int> DCCFDeltaY;
     /** \brief bleach correction, 0: none, 1: remove frame average, 2: remove mono-exponential */
     int bleach;
 
@@ -448,13 +448,18 @@ data                                                   size [bytes]             
     double* ccf3_std;
     double* ccf4_std;
     uint32_t ccf_N;
-    double* dccf_tau;
-    double* dccf;
-    double* dccf_segments;
-    double* dccf_std;
-    uint32_t dccf_N;
-    uint32_t dccfframe_width;
-    uint32_t dccfframe_height;
+
+    struct DCCFRecord {
+        double* dccf_tau;
+        double* dccf;
+        double* dccf_segments;
+        double* dccf_std;
+        uint32_t dccf_N;
+        uint32_t dccfframe_width;
+        uint32_t dccfframe_height;
+    };
+    QList<DCCFRecord> dccf;
+
     QLocale outLocale;
     QStringList addFiles;
     QString outputFilenameBase;

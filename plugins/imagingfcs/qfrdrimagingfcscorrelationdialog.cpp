@@ -20,6 +20,8 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     lastImagefileDir="";
     filenameDisplayed="";
     ui->setupUi(this);
+    QRegExp rxv("\\s*([\\+\\-]?\\d+\\s*\\,\\s*[\\+\\-]?\\d+(\\s*;\\s*[\\+\\-]?\\d+\\s*\\,\\s*[\\+\\-]?\\d+)*)");
+    ui->edtDCCF->setValidator(new QRegExpValidator(rxv, ui->edtDCCF));
     ui->edtFrameTime->setRange(1e-10,1e10);
     ui->edtFrameTime->setValue(10000);
     ui->edtFrameRate->setRange(1e-10,1e10);
@@ -366,8 +368,9 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop_y0", ui->spinYFirst->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/crop_y1", ui->spinYLast->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleach_frames", ui->spinBleachAvgFrames->value());
-    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf_deltax", ui->spinDistanceCCFDeltaX->value());
-    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf_deltay", ui->spinDistanceCCFDeltaY->value());
+    //options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf_deltax", ui->spinDistanceCCFDeltaX->value());
+    //options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf_deltay", ui->spinDistanceCCFDeltaY->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf_exp", ui->edtDCCF->text());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/dccf", ui->chkDistanceCCD->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleach", ui->cmbBleachType->currentIndex());
     //options->getQSettings()->setValue("imaging_fcs/dlg_correlate/bleachConst", ui->spinDecay->value());
@@ -410,8 +413,9 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->spinYFirst->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop_y0", ui->spinYFirst->value()).toInt());
     ui->spinYLast->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/crop_y1", ui->spinYLast->value()).toInt());
     ui->spinBleachAvgFrames->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleach_frames", ui->spinBleachAvgFrames->value()).toInt());
-    ui->spinDistanceCCFDeltaX->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf_deltax", ui->spinDistanceCCFDeltaX->value()).toInt());
-    ui->spinDistanceCCFDeltaY->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf_deltay", ui->spinDistanceCCFDeltaY->value()).toInt());
+    //ui->spinDistanceCCFDeltaX->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf_deltax", ui->spinDistanceCCFDeltaX->value()).toInt());
+    //ui->spinDistanceCCFDeltaY->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf_deltay", ui->spinDistanceCCFDeltaY->value()).toInt());
+    ui->edtDCCF->setText(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf_exp", ui->edtDCCF->text()).toString());
     ui->chkDistanceCCD->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/dccf", ui->chkDistanceCCD->isChecked()).toBool());
     ui->cmbBleachType->setCurrentIndex(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleach", ui->cmbBleachType->currentIndex()).toInt());
     //ui->spinDecay->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/bleachConst", ui->spinDecay->value()).toDouble());
@@ -518,8 +522,25 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
     job.crop_y0=ui->spinYFirst->value();
     job.crop_y1=ui->spinYLast->value();
     job.distanceCCF=ui->chkDistanceCCD->isChecked();
-    job.DCCFDeltaX=ui->spinDistanceCCFDeltaX->value();
-    job.DCCFDeltaY=ui->spinDistanceCCFDeltaY->value();
+    job.DCCFDeltaX.clear();
+    job.DCCFDeltaY.clear();
+    //job.DCCFDeltaX.append(ui->spinDistanceCCFDeltaX->value());
+    //job.DCCFDeltaY.append(ui->spinDistanceCCFDeltaY->value());
+    QString dccfs=ui->edtDCCF->text();
+    QRegExp rxdccf("([\\+\\-]?\\d+)\\s*\\,\\s*([\\+\\-]?\\d+)");
+    rxdccf.setCaseSensitivity(Qt::CaseInsensitive);
+    int pos = 0;
+
+    while ((pos = rxdccf.indexIn(dccfs, pos)) != -1) {
+        int dx=rxdccf.cap(1).toInt();
+        int dy=rxdccf.cap(2).toInt();
+        if (dx<image_width && dy<image_height) {
+            job.DCCFDeltaX << dx;
+            job.DCCFDeltaY << dy;
+            qDebug()<<"DCCF: "<<dx<<", "<<dy;
+        }
+        pos += rxdccf.matchedLength();
+    }
     job.bleach=ui->cmbBleachType->currentIndex();
     job.bleachAvgFrames=ui->spinBleachAvgFrames->value();
     job.cameraSettingsGiven=ui->chkCamera->isChecked();
@@ -651,8 +672,8 @@ void QFRDRImagingFCSCorrelationDialog::updateImageSize() {
     if (image_width-1>0) ui->spinXLast->setMaximum(image_width-1);
     if (image_height-1>0) ui->spinYFirst->setMaximum(image_height-1);
     if (image_height-1>0) ui->spinYLast->setMaximum(image_height-1);
-    if (image_width>0) ui->spinDistanceCCFDeltaX->setRange(-1*image_width, image_width);
-    if (image_height>0) ui->spinDistanceCCFDeltaY->setRange(-1*image_height, image_height);
+    //if (image_width>0) ui->spinDistanceCCFDeltaX->setRange(-1*image_width, image_width);
+    //if (image_height>0) ui->spinDistanceCCFDeltaY->setRange(-1*image_height, image_height);
 
     if (ui->chkCrop->isChecked()) {
         w=fabs(ui->spinXLast->value()-ui->spinXFirst->value())+1;

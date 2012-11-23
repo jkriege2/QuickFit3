@@ -2,6 +2,9 @@
 #define QFRDRIMAGINGFCSTHREADPROGRESS_H
 
 #include <QWidget>
+#include <QTimer>
+#include <QTime>
+#include <QElapsedTimer>
 
 namespace Ui {
     class QFRDRImagingFCSThreadProgress;
@@ -37,6 +40,7 @@ class QFRDRImagingFCSThreadProgress : public QWidget {
         void setProgress(int p);
         void incProgress(int pi);
         void setRange(int min, int max);
+        void updateTime();
     signals:
         void cancelClicked();
         void closeClicked();
@@ -47,6 +51,10 @@ class QFRDRImagingFCSThreadProgress : public QWidget {
         bool m_wasCanceled;
         bool m_isDone;
         int m_status;
+        QElapsedTimer started;
+        qint64 runMins;
+        qint64 runSecs;
+        QTimer* timer;
 };
 
 #endif // QFRDRIMAGINGFCSTHREADPROGRESS_H

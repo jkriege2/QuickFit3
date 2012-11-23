@@ -1,5 +1,5 @@
-#ifndef QFFitFunctionFCCSNormalDiff3D2Focus_H
-#define QFFitFunctionFCCSNormalDiff3D2Focus_H
+#ifndef QFFitFunctionFCCSNormalDiff3DFlow2Focus_H
+#define QFFitFunctionFCCSNormalDiff3DFlow2Focus_H
 #include "qfpluginfitfunction.h"
 
 
@@ -9,10 +9,10 @@
     \ingroup qf3fitfunp_fitfunctions_2ffcs
 
 */
-class QFFitFunctionFCCSNormalDiff3D2Focus: public QFFitFunction {
+class QFFitFunctionFCCSNormalDiff3DFlow2Focus: public QFFitFunction {
     public:
-        QFFitFunctionFCCSNormalDiff3D2Focus(bool hasGamma);
-        virtual ~QFFitFunctionFCCSNormalDiff3D2Focus() {}
+        QFFitFunctionFCCSNormalDiff3DFlow2Focus(bool hasGamma);
+        virtual ~QFFitFunctionFCCSNormalDiff3DFlow2Focus() {}
 
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const;
@@ -40,4 +40,4 @@ class QFFitFunctionFCCSNormalDiff3D2Focus: public QFFitFunction {
         bool hasGamma;
 };
 
-#endif // QFFitFunctionFCCSNormalDiff3D2Focus_H
+#endif // QFFitFunctionFCCSNormalDiff3DFlow2Focus_H

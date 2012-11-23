@@ -19,7 +19,7 @@ QFImageReaderRadhard::~QFImageReaderRadhard() {
 }
 
 QString QFImageReaderRadhard::filter() const {
-    return QObject::tr("raw Radhard file (*.rrh *.dat)");
+    return QObject::tr("raw Radhard file (*.rrh *.raw.dat)");
 }
 
 QString QFImageReaderRadhard::formatName() const {
