@@ -10,12 +10,16 @@ QFTablePluginModel::QFTablePluginModel(QObject* parent):
 QVariant QFTablePluginModel::data(const QModelIndex &index, int role) const
 {
     if (role==Qt::ToolTipRole) {
+        QString tt=QFTableModel::data(index, role).toString();
         QString exp=index.data(QFRDRTable::TableExpressionRole).toString();
+        QString comment=index.data(QFRDRTable::TableCommentRole).toString();
         if (!exp.isEmpty()) {
-            QString tt=QFTableModel::data(index, role).toString();
             tt+=tr("<font color=\"darkblue\"><br>expression: <i>%1</i></font>").arg(exp);
-            return tt;
         }
+        if (!comment.isEmpty()) {
+            tt+=tr("<font color=\"black\"><br>comment: <i>%1</i></font>").arg(comment);
+        }
+        return tt;
     }
     return QFTableModel::data(index, role);
 }

@@ -233,6 +233,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 while (!re.isNull()) {
                     QString t=re.attribute("type").toLower();
                     QString ex=re.attribute("expression");
+                    QString comment=re.attribute("comment");
                     if (r+1>rows) {
                         rows=r+1;
                         //std::cout<<"resize("<<rows<<", "<<columns<<")\n";
@@ -243,6 +244,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     //std::cout<<"setCell("<<r<<", "<<columns-1<<", '"<<v.toString().toStdString()<<"' ["<<v.typeName()<<"])\n";
                     datamodel->setCell(r, columns-1, v);
                     if (!ex.isEmpty()) datamodel->setCellUserRole(QFRDRTable::TableExpressionRole, r, columns-1, ex);
+                    if (!comment.isEmpty()) datamodel->setCellUserRole(QFRDRTable::TableCommentRole, r, columns-1, comment);
 
 
                     re = re.nextSiblingElement("row");
@@ -368,6 +370,8 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
                 w.writeAttribute("value", getQVariantData(datamodel->cell(r, c)));
                 QString ex=datamodel->cellUserRole(QFRDRTable::TableExpressionRole, r, c).toString();
                 if (!ex.isEmpty()) w.writeAttribute("expression", ex);
+                QString comment=datamodel->cellUserRole(QFRDRTable::TableCommentRole, r, c).toString();
+                if (!comment.isEmpty()) w.writeAttribute("comment", comment);
                 w.writeEndElement();
             }
             w.writeEndElement();
