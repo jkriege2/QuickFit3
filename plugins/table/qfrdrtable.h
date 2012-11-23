@@ -35,7 +35,8 @@ class QFRDRTable : public QFRawDataRecord {
             gtbarsHorizontal,
             gtbarsVertical,
             gtImage,
-            gtMaskImage
+            gtMaskImage,
+            gtFunction
         };
 
         static QString GraphType2String(GraphType type) {
@@ -51,6 +52,7 @@ class QFRDRTable : public QFRawDataRecord {
                 case gtbarsVertical: return QString("barsv");
                 case gtImage: return QString("image");
                 case gtMaskImage: return QString("maskimage");
+                case gtFunction: return QString("function");
             }
             return QString("");
         }
@@ -68,6 +70,7 @@ class QFRDRTable : public QFRawDataRecord {
                 case gtbarsVertical: return QIcon(":/table/icons/plot_vbars.png");
                 case gtImage: return QIcon(":/table/icons/plot_image.png");
                 case gtMaskImage: return QIcon(":/table/icons/plot_maskimage.png");
+                case gtFunction: return QIcon(":/table/icons/plot_function.png");
             }
             return QIcon();
         }
@@ -85,6 +88,7 @@ class QFRDRTable : public QFRawDataRecord {
             if (s=="barsv") return gtbarsVertical;
             if (s=="image") return gtImage;
             if (s=="maskimage") return gtMaskImage;
+            if (s=="function") return gtFunction;
             return gtLines;
         }
 
@@ -127,6 +131,8 @@ class QFRDRTable : public QFRawDataRecord {
             bool imageColorbarTop;
             int colorbarWidth;
             double colorbarRelativeHeight;
+
+            QString function;
 
         };
 

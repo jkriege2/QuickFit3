@@ -4,6 +4,7 @@
 #include "qfrdrtable.h"
 #include "qftools.h"
 #include "qfdoubleedit.h"
+#include "jkqtpparsedfunctionelements.h"
 
 
 
@@ -207,6 +208,9 @@ void QFRDRTablePlotWidget::listGraphs_currentRowChanged(int currentRow) {
             case QFRDRTable::gtMaskImage:
                 ui->cmbGraphType->setCurrentIndex(10);
                 break;
+            case QFRDRTable::gtFunction:
+                ui->cmbGraphType->setCurrentIndex(11);
+                break;
             case QFRDRTable::gtLines:
             default:
                 ui->cmbGraphType->setCurrentIndex(0);
@@ -244,6 +248,7 @@ void QFRDRTablePlotWidget::listGraphs_currentRowChanged(int currentRow) {
         ui->edtColorbarLabel->setText(graph.imageLegend);
         ui->spinColorbarWidth->setValue(graph.colorbarWidth);
         ui->spinColorbarHeight->setValue(graph.colorbarRelativeHeight*100.0);
+        ui->edtFunction->setText(graph.function);
 
 
         updatePlotWidgetVisibility();
@@ -271,6 +276,7 @@ void QFRDRTablePlotWidget::on_btnDeleteGraph_clicked()
             if (r>=p.graphs.size()) r=p.graphs.size()-1;
             connectWidgets();
             ui->listGraphs->setCurrentRow(r);
+            listGraphs_currentRowChanged(ui->listGraphs->currentRow());
         }
     }
 }
@@ -418,6 +424,7 @@ void QFRDRTablePlotWidget::graphDataChanged() {
                 case 8: graph.type=QFRDRTable::gtbarsHorizontal; break;
                 case 9: graph.type=QFRDRTable::gtImage; break;
                 case 10: graph.type=QFRDRTable::gtMaskImage; break;
+                case 11: graph.type=QFRDRTable::gtFunction; break;
                 case 0:
                 default: graph.type=QFRDRTable::gtLines; break;
             }
@@ -439,7 +446,7 @@ void QFRDRTablePlotWidget::graphDataChanged() {
                 graph.errorColor=graph.color.darker();
                 ui->cmbErrorColor->setCurrentColor(graph.errorColor);
             }
-            qDebug()<<graph.fillColor.name()<<oldDefaultFillColor.name();
+            //qDebug()<<graph.fillColor.name()<<oldDefaultFillColor.name();
 
             if (graph.fillColor!=oldDefaultFillColor) graph.fillColor=ui->cmbFillColor->currentColor();
             else {
@@ -473,6 +480,26 @@ void QFRDRTablePlotWidget::graphDataChanged() {
             graph.imageLegend=ui->edtColorbarLabel->text();
             graph.colorbarWidth=ui->spinColorbarWidth->value();
             graph.colorbarRelativeHeight=ui->spinColorbarHeight->value()/100.0;
+            graph.function=ui->edtFunction->text();
+
+            if (ui->edtXLabel->text()=="x" && ui->cmbLinesXData->currentIndex()>0) {
+                QString txt=ui->cmbLinesXData->currentText();
+                int idx=txt.indexOf(':');
+                if (idx>=0) txt=txt.right(txt.size()-(idx+1));
+                ui->edtXLabel->setText(txt);
+            }
+            if (ui->edtYLabel->text()=="y" && ui->cmbLinesYData->currentIndex()>0) {
+                QString txt=ui->cmbLinesYData->currentText();
+                int idx=txt.indexOf(':');
+                if (idx>=0) txt=txt.right(txt.size()-(idx+1));
+                ui->edtYLabel->setText(txt);
+            }
+            if (ui->edtTitle->text().isEmpty() && ui->cmbLinesYData->currentIndex()>0) {
+                QString txt=ui->cmbLinesYData->currentText();
+                int idx=txt.indexOf(':');
+                if (idx>=0) txt=txt.right(txt.size()-(idx+1));
+                ui->edtYLabel->setText(txt);
+            }
 
             p.graphs[r]=graph;
             current->setPlot(this->plot, p);
@@ -913,6 +940,30 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_falseColor(c);
 
                 ui->plotter->addGraph(pg);
+            } else if (g.type==QFRDRTable::gtFunction) {
+                JKQTPxParsedFunctionLineGraph* pg=new JKQTPxParsedFunctionLineGraph(ui->plotter->get_plotter());
+                pg->set_title(g.title);
+                pg->set_function(g.function);
+                //qDebug()<<"adding function plot "<<g.function;
+                if (g.ycolumn>=0 && g.ycolumn<ui->plotter->getDatastore()->getColumnCount()) {
+                    pg->set_parameterColumn(g.ycolumn);
+                }
+                pg->set_drawLine(true);
+                pg->set_lineWidth(g.linewidth);
+                QColor c=g.color;
+                c.setAlphaF(g.colorTransparent);
+                pg->set_color(c);
+                QColor ec=g.errorColor;
+                ec.setAlphaF(g.errorColorTransparent);
+                pg->set_errorColor(ec);
+                QColor efc=g.errorColor;
+                efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
+                pg->set_errorFillColor(efc);
+                QColor fc=g.fillColor;
+                fc.setAlphaF(g.fillColorTransparent);
+                pg->set_fillColor(fc);
+                pg->set_style(g.style);
+                ui->plotter->addGraph(pg);
             } else { // gtLines etc.
                 JKQTPxyLineErrorGraph* pg=new JKQTPxyLineErrorGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
@@ -1029,6 +1080,8 @@ void QFRDRTablePlotWidget::updatePlotWidgetVisibility() {
             ui->cmbLinesXError->setVisible(true);
             ui->cmbLinesYData->setVisible(true);
             ui->cmbLinesYError->setVisible(true);
+            ui->edtFunction->setVisible(false);
+            ui->labFuction->setVisible(false);
 
             switch(ui->cmbGraphType->currentIndex()) {
 
@@ -1223,6 +1276,29 @@ void QFRDRTablePlotWidget::updatePlotWidgetVisibility() {
                     ui->widLineStyle->setVisible(false);
                     ui->labLinestyle->setVisible(false);
                     break;
+                case 11:
+                    //graph.type=QFRDRTable::gtFunction;
+                    ui->labImage->setVisible(false);
+                    ui->widImage->setVisible(false);
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->labErrorX->setVisible(false);
+                    ui->cmbLinesXData->setVisible(false);
+                    ui->labDataX->setVisible(false);
+                    ui->cmbLinesYError->setVisible(false);
+                    ui->labErrorY->setVisible(false);
+                    ui->labImage->setVisible(false);
+                    ui->widImage->setVisible(false);
+                    ui->edtFunction->setVisible(true);
+                    ui->labFuction->setVisible(true);
+                    ui->labSymbol->setVisible(false);
+                    ui->widSymbol->setVisible(false);
+
+                    /*ui->widLineStyle->setVisible(false);
+                    ui->cmbLinesXError->setVisible(false);
+                    ui->chkDrawLine->setVisible(false);
+                    ui->cmbLineStyle->setVisible(false);*/
+                    break;
+
                 case 0:
                 default:
                     //graph.type=QFRDRTable::gtLines;
@@ -1242,9 +1318,9 @@ void QFRDRTablePlotWidget::connectWidgets()
     //qDebug()<<"connectWidgets";
     connect(ui->listGraphs, SIGNAL(currentRowChanged(int)), this, SLOT(listGraphs_currentRowChanged(int)));
 
-    connect(ui->edtTitle, SIGNAL(textChanged(QString)), this, SLOT(plotDataChanged()));
-    connect(ui->edtXLabel, SIGNAL(textChanged(QString)), this, SLOT(plotDataChanged()));
-    connect(ui->edtYLabel, SIGNAL(textChanged(QString)), this, SLOT(plotDataChanged()));
+    connect(ui->edtTitle, SIGNAL(editingFinished()), this, SLOT(plotDataChanged()));
+    connect(ui->edtXLabel, SIGNAL(editingFinished()), this, SLOT(plotDataChanged()));
+    connect(ui->edtYLabel, SIGNAL(editingFinished()), this, SLOT(plotDataChanged()));
     connect(ui->chkGrid, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     connect(ui->chkLogX, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     connect(ui->chkLogY, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
@@ -1266,7 +1342,8 @@ void QFRDRTablePlotWidget::connectWidgets()
     connect(ui->chkKeepAxisAspect, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     connect(ui->chkKeepDataAspect, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
 
-    connect(ui->edtGraphTitle, SIGNAL(textChanged(QString)), this, SLOT(graphDataChanged()));
+    connect(ui->edtFunction, SIGNAL(editingFinished()), this, SLOT(graphDataChanged()));
+    connect(ui->edtGraphTitle, SIGNAL(editingFinished()), this, SLOT(graphDataChanged()));
     connect(ui->cmbGraphType, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
     connect(ui->cmbLinesXData, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
     connect(ui->cmbLinesXError, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
@@ -1296,7 +1373,7 @@ void QFRDRTablePlotWidget::connectWidgets()
     connect(ui->edtImageY, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
     connect(ui->sliderImageFalseColor, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
     connect(ui->sliderImageTrueColor, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->edtColorbarLabel, SIGNAL(textChanged(QString)), this, SLOT(graphDataChanged()));
+    connect(ui->edtColorbarLabel, SIGNAL(editingFinished()), this, SLOT(graphDataChanged()));
     connect(ui->spinColorbarWidth, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
     connect(ui->spinColorbarHeight, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
     connect(ui->chkImageColorbarRight, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
@@ -1309,9 +1386,9 @@ void QFRDRTablePlotWidget::disconnectWidgets()
     //qDebug()<<"disconnectWidgets";
     disconnect(ui->listGraphs, SIGNAL(currentRowChanged(int)), this, SLOT(listGraphs_currentRowChanged(int)));
 
-    disconnect(ui->edtTitle, SIGNAL(textChanged(QString)), this, SLOT(plotDataChanged()));
-    disconnect(ui->edtXLabel, SIGNAL(textChanged(QString)), this, SLOT(plotDataChanged()));
-    disconnect(ui->edtYLabel, SIGNAL(textChanged(QString)), this, SLOT(plotDataChanged()));
+    disconnect(ui->edtTitle, SIGNAL(editingFinished()), this, SLOT(plotDataChanged()));
+    disconnect(ui->edtXLabel, SIGNAL(editingFinished()), this, SLOT(plotDataChanged()));
+    disconnect(ui->edtYLabel, SIGNAL(editingFinished()), this, SLOT(plotDataChanged()));
     disconnect(ui->chkGrid, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     disconnect(ui->chkLogX, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     disconnect(ui->chkLogY, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
@@ -1334,7 +1411,8 @@ void QFRDRTablePlotWidget::disconnectWidgets()
     disconnect(ui->chkKeepDataAspect, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
 
 
-    disconnect(ui->edtGraphTitle, SIGNAL(textChanged(QString)), this, SLOT(graphDataChanged()));
+    disconnect(ui->edtFunction, SIGNAL(editingFinished()), this, SLOT(graphDataChanged()));
+    disconnect(ui->edtGraphTitle, SIGNAL(editingFinished()), this, SLOT(graphDataChanged()));
     disconnect(ui->cmbGraphType, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
     disconnect(ui->cmbLinesXData, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
     disconnect(ui->cmbLinesXError, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
@@ -1364,7 +1442,7 @@ void QFRDRTablePlotWidget::disconnectWidgets()
     disconnect(ui->edtImageY, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
     disconnect(ui->sliderImageFalseColor, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
     disconnect(ui->sliderImageTrueColor, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->edtColorbarLabel, SIGNAL(textChanged(QString)), this, SLOT(graphDataChanged()));
+    disconnect(ui->edtColorbarLabel, SIGNAL(editingFinished()), this, SLOT(graphDataChanged()));
     disconnect(ui->spinColorbarWidth, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
     disconnect(ui->spinColorbarHeight, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
     disconnect(ui->chkImageColorbarRight, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));

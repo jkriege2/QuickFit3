@@ -45,6 +45,7 @@ QFRDRTable::GraphInfo::GraphInfo() {
     imageColorbarTop=false;
     colorbarWidth=20;
     colorbarRelativeHeight=0.75;
+    function="";
 
 }
 
@@ -62,10 +63,10 @@ QFRDRTable::PlotInfo::PlotInfo()
     showKey=true;
     grid=true;
     fontName=QApplication::font().family();
-    keyFontSize=10;
-    axisFontSize=10;
-    axisLabelFontSize=12;
-    labelFontSize=16;
+    keyFontSize=12;
+    axisFontSize=14;
+    axisLabelFontSize=18;
+    labelFontSize=18;
     keyTransparency=0.5;
     keyPosition=JKQTPkeyInsideRight;
     keyLayout=JKQTPkeyLayoutOneColumn;
@@ -333,6 +334,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.colorbarWidth=ge.attribute("image_colorbarwidth", "20").toDouble();
                     graph.colorbarRelativeHeight=ge.attribute("image_colorbarrelativeheight", "0.75").toDouble();
                     graph.imageLegend=ge.attribute("image_legend", "");
+                    graph.function=ge.attribute("function", "");
 
 
                     plot.graphs.append(graph);
@@ -441,6 +443,7 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("image_colorbarwidth", QString::number(plots[i].graphs[g].colorbarWidth));
             w.writeAttribute("image_colorbarrelativeheight", QString::number(plots[i].graphs[g].colorbarRelativeHeight));
             w.writeAttribute("image_legend", plots[i].graphs[g].imageLegend);
+            w.writeAttribute("function", plots[i].graphs[g].function);
 
 
             w.writeEndElement();

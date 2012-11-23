@@ -50,7 +50,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabPlots">
        <attribute name="title">
@@ -254,6 +254,11 @@
                 <normaloff>:/table/icons/plot_maskimage.png</normaloff>:/table/icons/plot_maskimage.png</iconset>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>function</string>
+              </property>
+             </item>
             </widget>
            </item>
            <item row="1" column="0">
@@ -282,7 +287,7 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
+           <item row="3" column="0">
             <widget class="QLabel" name="labDataX">
              <property name="font">
               <font>
@@ -298,7 +303,7 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
+           <item row="3" column="1">
             <widget class="QComboBox" name="cmbLinesXData">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -314,7 +319,7 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
+           <item row="4" column="0">
             <widget class="QLabel" name="labErrorX">
              <property name="font">
               <font>
@@ -330,7 +335,7 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
+           <item row="4" column="1">
             <widget class="QComboBox" name="cmbLinesXError">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -346,7 +351,7 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="0">
+           <item row="5" column="0">
             <widget class="QLabel" name="labDataY">
              <property name="font">
               <font>
@@ -362,7 +367,7 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="1">
+           <item row="5" column="1">
             <widget class="QComboBox" name="cmbLinesYData">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -378,7 +383,7 @@
              </property>
             </widget>
            </item>
-           <item row="5" column="0">
+           <item row="6" column="0">
             <widget class="QLabel" name="labErrorY">
              <property name="font">
               <font>
@@ -394,7 +399,7 @@
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
+           <item row="6" column="1">
             <widget class="QComboBox" name="cmbLinesYError">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -410,7 +415,7 @@
              </property>
             </widget>
            </item>
-           <item row="7" column="0">
+           <item row="8" column="0">
             <widget class="QLabel" name="labLinestyle">
              <property name="font">
               <font>
@@ -423,7 +428,7 @@
              </property>
             </widget>
            </item>
-           <item row="7" column="1">
+           <item row="8" column="1">
             <widget class="QWidget" name="widLineStyle" native="true">
              <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,0,0,0">
               <property name="margin">
@@ -500,7 +505,7 @@
              </layout>
             </widget>
            </item>
-           <item row="8" column="0">
+           <item row="9" column="0">
             <widget class="QLabel" name="labFillColor">
              <property name="font">
               <font>
@@ -513,7 +518,7 @@
              </property>
             </widget>
            </item>
-           <item row="8" column="1">
+           <item row="9" column="1">
             <widget class="QWidget" name="widFillColor" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,1,0">
               <property name="margin">
@@ -596,7 +601,7 @@
              </layout>
             </widget>
            </item>
-           <item row="9" column="0">
+           <item row="10" column="0">
             <widget class="QLabel" name="labSymbol">
              <property name="font">
               <font>
@@ -609,7 +614,7 @@
              </property>
             </widget>
            </item>
-           <item row="9" column="1">
+           <item row="10" column="1">
             <widget class="QWidget" name="widSymbol" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,0,0">
               <property name="margin">
@@ -660,7 +665,7 @@
              </layout>
             </widget>
            </item>
-           <item row="10" column="0">
+           <item row="11" column="0">
             <widget class="QLabel" name="labErrorStyle">
              <property name="font">
               <font>
@@ -673,7 +678,7 @@
              </property>
             </widget>
            </item>
-           <item row="10" column="1">
+           <item row="11" column="1">
             <widget class="QWidget" name="widErrorStyle" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="1,0,1,0,0,0">
               <property name="margin">
@@ -786,7 +791,7 @@
              </layout>
             </widget>
            </item>
-           <item row="11" column="0">
+           <item row="12" column="0">
             <widget class="QLabel" name="labImage">
              <property name="font">
               <font>
@@ -799,7 +804,7 @@
              </property>
             </widget>
            </item>
-           <item row="11" column="1">
+           <item row="12" column="1">
             <widget class="QWidget" name="widImage" native="true">
              <layout class="QGridLayout" name="gridLayout_3" rowminimumheight="0,0,0,0,0,0,0,0,0">
               <property name="margin">
@@ -1276,7 +1281,7 @@
              </layout>
             </widget>
            </item>
-           <item row="6" column="0">
+           <item row="7" column="0">
             <widget class="QLabel" name="labColor">
              <property name="font">
               <font>
@@ -1289,7 +1294,7 @@
              </property>
             </widget>
            </item>
-           <item row="6" column="1">
+           <item row="7" column="1">
             <widget class="QWidget" name="widColor" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_12">
               <property name="margin">
@@ -1380,6 +1385,32 @@
                </widget>
               </item>
              </layout>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="labFuction">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Function:</string>
+             </property>
+             <property name="buddy">
+              <cstring>cmbLinesXData</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="edtFunction">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
             </widget>
            </item>
           </layout>
@@ -1985,6 +2016,14 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QFDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfdoubleedit.h</header>
+   <slots>
+    <signal>valueChanged(double)</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
    <class>JKQtPlotter</class>
    <extends>QWidget</extends>
    <header>jkqtplotter.h</header>
@@ -1995,11 +2034,6 @@
    <extends>QSplitter</extends>
    <header>qvisiblehandlesplitter.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QFDoubleEdit</class>
-   <extends>QLineEdit</extends>
-   <header>qfdoubleedit.h</header>
   </customwidget>
   <customwidget>
    <class>LineStyleComboBox</class>
@@ -2081,12 +2115,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>850</x>
-     <y>326</y>
+     <x>873</x>
+     <y>368</y>
     </hint>
     <hint type="destinationlabel">
      <x>901</x>
-     <y>327</y>
+     <y>369</y>
     </hint>
    </hints>
   </connection>
@@ -2097,7 +2131,7 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>866</x>
+     <x>710</x>
      <y>440</y>
     </hint>
     <hint type="destinationlabel">
@@ -2129,7 +2163,7 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>865</x>
+     <x>800</x>
      <y>556</y>
     </hint>
     <hint type="destinationlabel">
@@ -2145,7 +2179,7 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>865</x>
+     <x>800</x>
      <y>581</y>
     </hint>
     <hint type="destinationlabel">
@@ -2165,7 +2199,7 @@
      <y>650</y>
     </hint>
     <hint type="destinationlabel">
-     <x>616</x>
+     <x>527</x>
      <y>652</y>
     </hint>
    </hints>
@@ -2197,7 +2231,7 @@
      <y>650</y>
     </hint>
     <hint type="destinationlabel">
-     <x>888</x>
+     <x>799</x>
      <y>652</y>
     </hint>
    </hints>
@@ -2209,12 +2243,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>346</x>
-     <y>243</y>
+     <x>378</x>
+     <y>292</y>
     </hint>
     <hint type="destinationlabel">
-     <x>457</x>
-     <y>240</y>
+     <x>827</x>
+     <y>295</y>
     </hint>
    </hints>
   </connection>
@@ -2225,12 +2259,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>314</x>
-     <y>219</y>
+     <x>375</x>
+     <y>266</y>
     </hint>
     <hint type="destinationlabel">
-     <x>395</x>
-     <y>219</y>
+     <x>765</x>
+     <y>269</y>
     </hint>
    </hints>
   </connection>
@@ -2241,12 +2275,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>819</x>
-     <y>382</y>
+     <x>748</x>
+     <y>394</y>
     </hint>
     <hint type="destinationlabel">
-     <x>881</x>
-     <y>385</y>
+     <x>894</x>
+     <y>395</y>
     </hint>
    </hints>
   </connection>

@@ -99,7 +99,9 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfcompletertextedit.h \
     qfqtscripthighlighter.h \
     qfcompletertextedit.h \
-    qfqtscripthighlighter.h
+    qfqtscripthighlighter.h \
+    ../../../../LIB/trunk/qt/jkqtpparsedfunctionelements.h \
+    ../../../../LIB/trunk/jkmathparser.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -161,7 +163,11 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfhistogramview.cpp \
     qfselectionlistdialog.cpp \
     qfqtscripthighlighter.cpp \
-    qfcompletertextedit.cpp
+    qfcompletertextedit.cpp \
+    ../../../../LIB/trunk/qt/jkqtpparsedfunctionelements.cpp \
+    ../../../../LIB/trunk/jkmathparser.cpp
+
+
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \
