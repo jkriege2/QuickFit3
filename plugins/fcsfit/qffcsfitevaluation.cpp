@@ -353,6 +353,7 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
         double* params=allocFillParameters(record, run);
         double* initialparams=allocFillParameters(record, run);
         double* errors=allocFillParameterErrors(record, run);
+        double* errorsI=allocFillParameterErrors(record, run);
         double* paramsMin=allocFillParametersMin();
         double* paramsMax=allocFillParametersMax();
         bool* paramsFix=allocFillFix(record, run);
@@ -430,7 +431,7 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
 
 
                 if (OK) {
-                    //record->disableEmitResultsChanged();
+                    //record->disableEmitResultsChanged();                    
 
                     QFFitAlgorithm::FitResult result=doFitThread->getResult();
                     ffunc->calcParameter(params, errors);
@@ -442,6 +443,8 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
                             if (!oparams.isEmpty()) oparams=oparams+";  ";
 
                             oparams=oparams+QString("%1 = %2+/-%3").arg(ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
+                        } else {
+                            errors[i]=errorsI[i];
                         }
                         //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
                     }
@@ -563,6 +566,7 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
         free(params);
         free(initialparams);
         free(errors);
+        free(errorsI);
         free(paramsFix);
         free(paramsMax);
         free(paramsMin);

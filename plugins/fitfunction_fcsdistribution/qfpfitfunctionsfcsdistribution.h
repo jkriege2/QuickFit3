@@ -2,7 +2,6 @@
 #define QFPFITFUNCTIONSFCSDISTRIBUTION_H
 
 #include "qfpluginfitfunction.h"
-#include "qffitfunctionfcsdistributionloggaussian.h"
 
 /*!
     \defgroup qf3fitfunp_fitfunctions_fcsdistribution Fit Function Plugin
@@ -42,7 +41,7 @@ class QFPFitFunctionsFCSDistribution : public QObject, public QFPluginFitFunctio
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("(c) 2011 by Jan Krieger");
+            return tr("(c) 2011-2012 by Jan Krieger");
         };
 
         /** \brief weblink for the plugin */
@@ -64,7 +63,7 @@ class QFPFitFunctionsFCSDistribution : public QObject, public QFPluginFitFunctio
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=1;
+            minor=2;
         };
 
         /** \brief return list of plugin IDs */

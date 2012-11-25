@@ -9,10 +9,14 @@ DESTDIR = $$QFOUTPUT/plugins
 
 # Input
 HEADERS += qfpfitfunctionsfcsdistribution.h \
-           qffitfunctionfcsdistributionloggaussian.h
+           qffitfunctionfcsdistributionloggaussian.h \
+    qffitfunctionfcsdistributiongaussianD.h \
+    qffitfunctionfcsdistributiongaussian.h
 
 SOURCES += qfpfitfunctionsfcsdistribution.cpp\
-           qffitfunctionfcsdistributionloggaussian.cpp
+           qffitfunctionfcsdistributionloggaussian.cpp \
+    qffitfunctionfcsdistributiongaussianD.cpp \
+    qffitfunctionfcsdistributiongaussian.cpp
 
 FORMS =
 

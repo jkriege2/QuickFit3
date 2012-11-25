@@ -1,4 +1,4 @@
-#include "qffitfunctionfcsdistributionloggaussian.h"
+#include "qffitfunctionfcsdistributiongaussianD.h"
 
 #include <cmath>
 #define sqr(x) ((x)*(x))
@@ -8,7 +8,7 @@
 #define NAVOGADRO (6.02214179e23)
 
 
-QFFitFunctionFCSDistributionLogGaussian::QFFitFunctionFCSDistributionLogGaussian() {
+QFFitFunctionFCSDistributionGaussianD::QFFitFunctionFCSDistributionGaussianD() {
     //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(IntCombo,     "n_nonfluorescent",        "number of nonfluorescent components (triplet ...)",     "# non-fluorescent",        "",            "",                      false,     true,         false,             QFFitFunction::NoError,      false, 1,            0,        2,        1,   0,      2);
     #define FCSDLG_n_nonfluorescent 0
@@ -24,10 +24,10 @@ QFFitFunctionFCSDistributionLogGaussian::QFFitFunctionFCSDistributionLogGaussian
     #define FCSDLG_n_particle 5
     addParameter(FloatNumber,  "1n_particle",             "1/Particle number N",                                   "1/N",                      "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, false, 0.1,          1e-10,    1e5,      0.1, 0);
     #define FCSDLG_1n_particle 6
-    addParameter(FloatNumber,  "diff_tau1",               "center diffusion time of distribution",                 "&tau;<sub>D,c</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, false, 30,           1,        1e10,     1,   0        );
-    #define FCSDLG_diff_tau1 7
-    addParameter(FloatNumber,  "b",                       "width parameter distribution",                          "b",                        "ln(sec)",    "ln(sec)",                true,      true,         true,              QFFitFunction::DisplayError, false, 1,            1e-10,    1e10,     1,   0);
-    #define FCSDLG_b 8
+    addParameter(FloatNumber,  "diff_coeff1",             "center diffusion coefficient of distriubution",         "D<sub>c</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
+    #define FCSDLG_diff_coeff1 7
+    addParameter(FloatNumber,  "diff_coeff_sigma",        "width of D distribution",                               "&sigma;(D)",               "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e10,     1,   0);
+    #define FCSDLG_diff_coeff_sigma 8
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
     #define FCSDLG_offset 9
     addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                  "",           "",                       true,      true,         true,              QFFitFunction::EditError,    true, 6,            0.01,     100,      0.5  );
@@ -36,49 +36,43 @@ QFFitFunctionFCSDistributionLogGaussian::QFFitFunctionFCSDistributionLogGaussian
     #define FCSDLG_focus_width 11
     addParameter(FloatNumber,  "focus_volume",            "focus: effective colume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
     #define FCSDLG_focus_volume 12
-    addParameter(FloatNumber,  "tau_range_min",           "smallest evaluated diffusion time",                     "&tau;<sub>min</sub>",      "usec",       "&mu;s",                  false,    false,        false,              QFFitFunction::NoError,      false, 1,            0,        1e50,     10,  0    );
-    #define FCSDLG_tau_range_min 13
-    addParameter(FloatNumber,  "tau_range_max",           "largest evaluated diffusion time",                      "&tau;<sub>max</sub>",      "usec",       "&mu;s",                  false,    false,        false,              QFFitFunction::NoError,      false, 1e7,          0,        1e50,     10,  0    );
-    #define FCSDLG_tau_range_max 14
+    addParameter(FloatNumber,  "D_range_min",           "smallest D in distribution",                              "D<sub>min</sub>",      "micron^2/s", "&mu;m<sup>2</sup>/s",        false,    true,        false,              QFFitFunction::NoError,      false, 1,            0,        1e50,     10,  0    );
+    #define FCSDLG_D_range_min 13
+    addParameter(FloatNumber,  "D_range_max",           "largest D in distribution",                               "D<sub>max</sub>",      "micron^2/s", "&mu;m<sup>2</sup>/s",        false,    true,        false,              QFFitFunction::NoError,      false, 1e7,          0,        1e50,     10,  0    );
+    #define FCSDLG_D_range_max 14
+    addParameter(IntNumber,  "D_values_per_decade",   "D samples per decade in distribution",                      "K<sub>D</sub>",              "",           "",                     false,    true,        false,              QFFitFunction::NoError,      false, 100,           1,        10000,     10,  0    );
+    #define FCSDLG_K 15
     addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSDLG_concentration 15
-    addParameter(FloatNumber,  "diff_coeff1",             "center diffusion coefficient of distriubution",         "D<sub>c</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    false,    false,        false,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
-    #define FCSDLG_diff_coeff1 16
+    #define FCSDLG_concentration 16
+    addParameter(FloatNumber,  "diff_tau1",               "center diffusion time of distribution",                 "&tau;<sub>D,c</sub>",      "usec",        "&mu;s",                 false,    false,        false,              QFFitFunction::DisplayError, false, 30,           1,        1e10,     1,   0        );
+    #define FCSDLG_diff_tau1 17
     addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
-    #define FCSDLG_count_rate 17
+    #define FCSDLG_count_rate 18
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0,            0,        1e50,     1    );
-    #define FCSDLG_cpm 18
-    /*last_tau_min=0;
-    last_tau_max=0;
-    last_logc=0;
-    last_b=0;*/
+    #define FCSDLG_cpm 19
 }
 
-QVector<QPair<double, double> >  QFFitFunctionFCSDistributionLogGaussian::fillTauVal(double tau_min, double tau_max, double logc, double b) const {
+QVector<QPair<double, double> >  QFFitFunctionFCSDistributionGaussianD::fillDVal(double Dmin, double Dmax, uint32_t Dvalues, double Dc, double Dsigma) const {
     //if (last_tau_min==tau_min && last_tau_max==tau_max && last_logc==logc && last_b==b) return;
     //tau_val.clear();
     QVector<QPair<double, double> >  tau_val;
-    /*last_tau_min=tau_min;
-    last_tau_max=tau_max;
-    last_logc=logc;
-    last_b=b;*/
-    int L=16;
-    double m=2;
-    double tau=tau_min;
-    int cnt=0;
-    double add=tau_min;
+    const double l10=log(10.0);
+    double lDmax=log(Dmax)/l10;
+    const double Dinc=1.0/double(Dvalues);//(log(Dmax)-log(Dmin))/(l10*Dvalues);
+    const double Dsigma2=Dsigma*Dsigma;
+
     double sum=0;
-    while (tau<=tau_max) {
-        if (cnt==L) {
-            add=add*m;
-            cnt=0;
-        }
-        const double val=exp(-0.5*sqr((log(tau)-logc)/b));
+    for (double D=log(Dmin)/l10; D<=lDmax; D+=Dinc) {
+        const double DD=pow(10.0, D);
+        const double val=exp(-0.5*sqr(DD-Dc)/Dsigma2);
         sum=sum+val;
-        tau_val.append(qMakePair(tau, val));
-        tau=tau+add;
-        cnt++;
+        tau_val.append(qMakePair(DD, val));
     }
+    const double DD=pow(10.0, Dc);
+    const double val=1;
+    sum=sum+val;
+    tau_val.append(qMakePair(DD, val));
+
 
     // normalize distribution
     for (int i=0; i<tau_val.size(); i++) {
@@ -91,17 +85,21 @@ QVector<QPair<double, double> >  QFFitFunctionFCSDistributionLogGaussian::fillTa
 
 
 
-double QFFitFunctionFCSDistributionLogGaussian::evaluate(double t, const double* data) const {
+double QFFitFunctionFCSDistributionGaussianD::evaluate(double t, const double* data) const {
     const int nonfl_comp=data[FCSDLG_n_nonfluorescent];
     const double N=data[FCSDLG_n_particle];
     const double nf_tau1=data[FCSDLG_nonfl_tau1]/1.0e6;
     const double nf_theta1=data[FCSDLG_nonfl_theta1];
     const double nf_tau2=data[FCSDLG_nonfl_tau2]/1.0e6;
     const double nf_theta2=data[FCSDLG_nonfl_theta2];
-    const double tauD1=data[FCSDLG_diff_tau1]/1.0e6;
-    const double b=data[FCSDLG_b];
-    const double tau_min=data[FCSDLG_tau_range_min]/1.0e6;
-    const double tau_max=data[FCSDLG_tau_range_max]/1.0e6;
+    const double D1=data[FCSDLG_diff_coeff1];
+    const double Dsigma=data[FCSDLG_diff_coeff_sigma];
+    const double Dmin=data[FCSDLG_D_range_min];
+    const double Dmax=data[FCSDLG_D_range_max];
+    const double wxy=data[FCSDLG_focus_width]/1.0e3;
+    const double wxy2=wxy*wxy;
+    uint32_t Dvalues=data[FCSDLG_K];
+    if (data[FCSDLG_K]<=0) Dvalues=10;
 
     double gamma=data[FCSDLG_focus_struct_fac];
     if (gamma==0) gamma=1;
@@ -111,11 +109,11 @@ double QFFitFunctionFCSDistributionLogGaussian::evaluate(double t, const double*
 
 
     if (N>0) {
-        QVector<QPair<double, double> >  tau_val=fillTauVal(tau_min, tau_max, log(tauD1), b);
+        QVector<QPair<double, double> >  tau_val=fillDVal(Dmin, Dmax, Dvalues, D1, Dsigma);
         register double diff=0;
         for (int i=0; i<tau_val.size(); i++) {
             const QPair<double, double>& p=tau_val[i];
-            register double reltau1=t/p.first;
+            register double reltau1=4.0*p.first*t/wxy2;
             diff=diff+p.second/(1.0+reltau1)/sqrt(1.0+reltau1/gamma2);
         }
 
@@ -129,11 +127,12 @@ double QFFitFunctionFCSDistributionLogGaussian::evaluate(double t, const double*
         }
         return offset+pre/N*diff;
     } else {
-        return -1.0*exp(-0.5*sqr((log(t)-log(tauD1))/b))/N;
+        const double DD=wxy2/4.0/t;
+        return -1.0*exp(-0.5*sqr(DD-D1)/Dsigma/Dsigma)/N;
     }
 }
 
-void QFFitFunctionFCSDistributionLogGaussian::calcParameter(double* data, double* error) const {
+void QFFitFunctionFCSDistributionGaussianD::calcParameter(double* data, double* error) const {
     //int comp=data[FCSDLG_n_components];
     //int nonfl_comp=data[FCSDLG_n_nonfluorescent];
     double N=data[FCSDLG_n_particle];
@@ -146,10 +145,8 @@ void QFFitFunctionFCSDistributionLogGaussian::calcParameter(double* data, double
     double enf_tau2=0;
     double nf_theta2=data[FCSDLG_nonfl_theta2];
     double enf_theta2=0;
-    double tauD1=data[FCSDLG_diff_tau1]/1.0e6;
-    double etauD1=0;
-    //double b=data[FCSDLG_b];
-    double eb=0;
+    double D1=data[FCSDLG_diff_coeff1]/1.0e6;
+    double eD1=0;
     double gamma=data[FCSDLG_focus_struct_fac];
     double egamma=0;
     //double gamma2=sqr(gamma);
@@ -168,8 +165,7 @@ void QFFitFunctionFCSDistributionLogGaussian::calcParameter(double* data, double
         enf_theta1=error[FCSDLG_nonfl_theta1];
         enf_tau2=error[FCSDLG_nonfl_tau2]/1.0e6;
         enf_theta2=error[FCSDLG_nonfl_theta2];
-        etauD1=error[FCSDLG_diff_tau1]/1.0e6;
-        eb=error[FCSDLG_b];
+        eD1=error[FCSDLG_diff_tau1]/1.0e6;
         egamma=error[FCSDLG_focus_struct_fac];
         ewxy=error[FCSDLG_focus_width]/1.0e3;
         eoffset=error[FCSDLG_offset];
@@ -205,10 +201,10 @@ void QFFitFunctionFCSDistributionLogGaussian::calcParameter(double* data, double
     }
 
     // calculate D1 = wxy^2 / (4*tauD1)
-    if (tauD1!=0) data[FCSDLG_diff_coeff1]=sqr(wxy)/4.0/tauD1; else data[FCSDLG_diff_coeff1]=0;
+    if (D1!=0) data[FCSDLG_diff_tau1]=sqr(wxy)/4.0/D1; else data[FCSDLG_diff_tau1]=0;
     if (error) {
-        if (tauD1!=0) error[FCSDLG_diff_coeff1]=sqrt( sqr(etauD1*sqr(wxy)/sqr(tauD1)/4.0) + sqr(ewxy*2.0*wxy/tauD1/4.0) );
-        else error[FCSDLG_diff_coeff1]=0;
+        if (D1!=0) error[FCSDLG_diff_tau1]=sqrt( sqr(eD1*sqr(wxy)/sqr(D1)/4.0) + sqr(ewxy*2.0*wxy/D1/4.0) );
+        else error[FCSDLG_diff_tau1]=0;
     }
 
     // calculate CPM = CPS/N
@@ -216,7 +212,7 @@ void QFFitFunctionFCSDistributionLogGaussian::calcParameter(double* data, double
     error[FCSDLG_cpm]=sqrt(sqr(ecps/N)+sqr(eN*cps/sqr(N)));
 }
 
-bool QFFitFunctionFCSDistributionLogGaussian::isParameterVisible(int parameter, const double* data) const {
+bool QFFitFunctionFCSDistributionGaussianD::isParameterVisible(int parameter, const double* data) const {
     int nonfl_comp=data[FCSDLG_n_nonfluorescent];
     switch(parameter) {
         case FCSDLG_nonfl_tau1: case FCSDLG_nonfl_theta1: return nonfl_comp>0;
@@ -225,11 +221,11 @@ bool QFFitFunctionFCSDistributionLogGaussian::isParameterVisible(int parameter, 
     return true;
 }
 
-unsigned int QFFitFunctionFCSDistributionLogGaussian::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCSDistributionGaussianD::getAdditionalPlotCount(const double* params) {
     return 2;
 }
 
-QString QFFitFunctionFCSDistributionLogGaussian::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCSDistributionGaussianD::transformParametersForAdditionalPlot(int plot, double* params) {
     if (plot==0) {
         params[FCSDLG_n_nonfluorescent]=0;
         return "without non-fluorescent";

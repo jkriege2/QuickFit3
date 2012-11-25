@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>FCS SD: Normal Diffuion 3D with gaussian diffusion coefficient distribution</title>
+	</head>
+	<body>
+		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+
+<p>This model function implements a 3D normal diffusion FCS model, where the diffusion times (and therefore also the hydrodynamic radii) are distributed according to a gaussian distribution. It also supports up to two non-fluorescent species.: </p>
+$$bmath:g(\tau)=G_\infty+\frac{1}{N}\cdot X_{nf}(\tau)\cdot\sum_{k=0}^{K\cdot N_{decades}}\cdot\exp\left[-\frac{1}{2}\cdot\left(\frac{D_{k}-D_c}{\sigma(D)}\right)^2\right]\left(1+\frac{4D\cdot\tau}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{4D\cdot\tau}{\gamma^2w_{xy}2}\right)^{-1/2}$$
+<p> with </p>
+$$math:N_{nf}(\tau)= \frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}.$$
+<p>The parameters are:</p>
+<ul>
+<li><img class="formulaInl" alt="$ G_\infty $" src="./pic/form_4.png">: offset of the correlation function</li>
+<li><img class="formulaInl" alt="$ N $" src="./pic/form_5.png">: overall particle number (including currently dark particles, e.g. in triplet state)</li>
+<li><img class="formulaInl" alt="$ \Theta_{trip}, \Theta_{non} $" src="./pic/form_6.png">: fraction of the particles in one of the first two non-fluorescent states (priplet, ...)</li>
+<li><img class="formulaInl" alt="$ \tau_{trip}, \tau_{non} $" src="./pic/form_7.png">: decay time of the first two non-fluorescent states (triplet, ...)</li>
+<li>$$math:D_c$$: center diffusion coefficient</li>
+<li>$$math:\sigma(D)$$: width of the diffusion coefficient distribution</li>
+<li><img class="formulaInl" alt="$ \gamma=\frac{z_0}{w_{xy}} $" src="./pic/form_11.png">: aspect ratio of the gaussian used to approximate the focus</li>
+<li><img class="formulaInl" alt="$ w_{xy} $" src="./pic/form_12.png">: lateral half axis of the focus gaussian</li>
+<li><img class="formulaInl" alt="$ z_0 $" src="./pic/form_13.png">: longitudinal half axis of the focus gaussian</li>
+<li>$$math:K\cdot N_{decades}$$: number of $$math:\tau_k$$-values sampled, where $$math:N_{decades}$$ is the number of decades between $$math:\tau_{min}$$ and $$math:\tau_{max}$$ and $$math:K$$ is the number of samples per decade</li>
+</ul>
+<p>The values $$math:D_k$$ used in the sum of this fitting function are logarithmically spaced between the given minimum and maximum values $$math:D_{min}$$ and $$math:D_{max}$$, i.e. $$bmath:D_k={10^{\log_{10}(D_{min})+k/K}</p>
+<p><b>Note:</b> This model is relatively complex, as for every evaluation a sum has to be calculated. So it is wise to use a fast fit algorithm in conjunction with this model, like e.g. <i>lmfit</i>.</p>
+<p>This model also calculates the diffusion coefficient, if the width <img class="formulaInl" alt="$ w_{xy} $" src="./pic/form_12.png"> of the laser focus (xy plane) is known, as: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ D=\frac{w_{xy}^2}{4\tau_D} \]" src="./pic/form_20.png">
+</p>
+<p> where <img class="formulaInl" alt="$ \tau_D $" src="./pic/form_21.png"> is the diffusion time. Also the effective focal volume <img class="formulaInl" alt="$ V_{eff} $" src="./pic/form_22.png"> is calculated: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ V_{eff}=\pi^{3/2}\cdot\gamma\cdot w_{xy}^3 \]" src="./pic/form_14.png">
+</p>
+<p> Given this focal volume, the plugin may also calculate the particle concentration in the sample: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ C=\frac{N}{V_{eff}} \]" src="./pic/form_15.png">
+</p>
+<p>The plugin also calculates some parameter errors: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \Delta \left(\frac{1}{N}\right)=\left|\frac{\Delta N}{N^2}\right| \]" src="./pic/form_16.png">
+</p>
+ <p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \Delta D=\sqrt{\left(\Delta w_{xy}\cdot\frac{w_{xy}}{2\tau_D}\right)^2+\left(\Delta \tau_D\cdot\frac{w_{xy}^2}{4\tau_D^2}\right)^2} \]" src="./pic/form_23.png">
+</p>
+ <p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \Delta V_{eff}=\sqrt{\left(\Delta\gamma\cdot\pi^{3/2}\cdot w_{xy}^3\right)^2+\left(\Delta w_{xy}\cdot 3\pi^{3/2}\cdot \gamma\cdot w_{xy}^2\right)^2} \]" src="./pic/form_17.png">
+</p>
+ <p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^{3}}\right)^2+\left(\Delta\gamma\cdot\frac{N}{\pi^{3/2}\cdot w{xy}^3\cdot\gamma^2}\right)^2+\left(\Delta w_{xy}\cdot\frac{3\cdot N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^4}\right)^2} \]" src="./pic/form_18.png">
+</p>
+
+
+<p>This model is based on ideas in the paper:<ul><li>Nibedita Pal, Sachin Dev Verma, Moirangthem Kiran Singh, and Sobhan Sen (2011): <b>Fluorescence Correlation Spectroscopy: An Efficient Tool for Measuring Size, Size-Distribution and Polydispersity of Microemulsion Droplets in Solution.</b> Anal. Chem., 83(20), pp 7736–7744, DOI: 10.1021/ac2012637</li></ul></p>
+	</body>
+</html>

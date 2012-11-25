@@ -6,7 +6,7 @@
 
 
 
-/*! \brief QFFitFunction class for FCS fit with an assumed log-normal distribution of diffusion coefficients
+/*! \brief QFFitFunction class for FCS fit with an assumed log-normal distribution of diffusion correlation times
     \ingroup qf3fitfunp_fitfunctions_fcsdistribution
 
     This QFFitFunction implements a 3D normal diffusion FCS model, where the diffusion times are
