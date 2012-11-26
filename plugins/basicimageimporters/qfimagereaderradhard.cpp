@@ -64,11 +64,18 @@ bool QFImageReaderRadhard::open(QString filename) {
   this->filename=filename;
   frameSize=calculateFrameSize();
   fprintf(stderr,"FRAMESIZE: %i",frameSize);
-  switch(frameSize) {
-    case   134: width=   32; height= 32; break; //RH2
-    case  2058: width=  128; height=128; break; //MS
-    case 32778: width= 1024; height= 32; break; //RH2 CORR
-    default: frameSize=0; break;
+  if (frameSize<=134) {
+      height=(frameSize-6)/4;
+      width=32;
+  } else {
+      switch(frameSize) {
+        case   134: width=   32; height= 32; break; //RH2
+        case  2058: width=  128; height=128; break; //MS
+        case 32778: width= 1024; height= 32; break; //RH2 CORR
+        default: {
+          frameSize=0;
+        } break;
+      }
   }
   if(width==0||height==0) {
       setLastError(QObject::tr("could not determine frame size: framesize=%1  with=%2  height=%3").arg(frameSize).arg(width).arg(height));

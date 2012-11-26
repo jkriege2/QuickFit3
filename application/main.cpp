@@ -64,6 +64,11 @@ int main(int argc, char * argv[])
 
     JKQtBasePlotter::setDefaultJKQtBasePrinterUserSettings(settings->getIniFilename(), "JKQtBasePlotterUserSettings/");
 
+    if (settings->debugLogVisible()) {
+        settings->setDebugLogVisible(false);
+        QMessageBox::warning(NULL, QObject::tr("debug messages"), QObject::tr("You activated the debug message output in the last run of QuickFit. As this function is known to be instable and cause crashes in multi-threaded applications, it is now deactivated. If you absolutely need this function and know what you are doing, please reactivate it in the settinsg dialog!"));
+    }
+
     qRegisterMetaType<QTextCursor>("QTextCursor");
     MainWindow win(settings, &splash);
     win.show();

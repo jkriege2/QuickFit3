@@ -38,7 +38,8 @@ void QFRDRImageStackData::intReadData(QDomElement* e) {
 	*/
 
     QString stacktype=getProperty("STACKTYPE", "ONEFILEPERCHANNEL").toString().toUpper();
-    QString maskS=e->attribute("mask", "").simplified().trimmed();
+    QString maskS="";
+    if (e) maskS=e->attribute("mask", "").simplified().trimmed();
     //qDebug()<<maskS;
     clearMemory();
     stacks.clear();

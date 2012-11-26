@@ -615,8 +615,8 @@ bool QFExtensionCameraRh2v2::prepareCameraAcquisition(unsigned int camera, const
     (*cameraSetting[camera].params)["duration"]=double(duration)*double(binning)*frametime;
     (*cameraSetting[camera].params)["roi_ystart"]=settings.value("rh2v2/ROIstart", 0).toUInt();
     (*cameraSetting[camera].params)["roi_yend"]=settings.value("rh2v2/ROIend", 31).toUInt();
-    (*cameraSetting[camera].params)["frame_time"]=frametime*double(binning);
-    (*cameraSetting[camera].params)["pre_binning_frame_time"]=frametime;
+    (*cameraSetting[camera].params)["minimum_lag_time"]=frametime*double(binning);
+    (*cameraSetting[camera].params)["frame_time"]=frametime;
     (*cameraSetting[camera].params)["temporal_binning"]=binning;
     (*cameraSetting[camera].params)["do_correlation"]=settings.value("rh2v2/doCorrelation", false).toBool();
     (*cameraSetting[camera].params)["pixel_units"]="photons";
