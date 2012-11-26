@@ -26,15 +26,17 @@
 #include "qfrdrimagestackinterface.h"
 #include "qfrdrimageselectioninterface.h"
 #include "qfrdrrunselection.h"
+#include "qfrdrimagemask.h"
+#include "qfrdrimagemasktools.h"
 
 
 /*! \brief QFRawDataRecord implementation
     \ingroup qf3rdrdp_imaging_fcs
 
 */
-class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDROverviewImageInterface, public QFRDRImageStackInterface, public QFRDRSimpleCountRatesInterface, public QFRDRImageSelectionInterface, public QFRDRRunSelectionsInterface {
+class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDROverviewImageInterface, public QFRDRImageStackInterface, public QFRDRSimpleCountRatesInterface, public QFRDRImageSelectionInterface, public QFRDRRunSelectionsInterface, public QFRDRImageMaskTools {
         Q_OBJECT
-        Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDROverviewImageInterface QFRDRImageStackInterface QFRDRSimpleCountRatesInterface QFRDRImageSelectionInterface QFRDRRunSelectionsInterface)
+        Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDROverviewImageInterface QFRDRImageStackInterface QFRDRSimpleCountRatesInterface QFRDRImageSelectionInterface QFRDRRunSelectionsInterface QFRDRImageMaskInterface)
     public:
         enum DualViewMode {
             dvNone=0,
@@ -113,18 +115,6 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief clear all leaveouts */
         virtual void leaveoutClear();
 
-        void maskLoad(const QString& filename);
-        void maskLoadFromString(QString maskstring);
-        void maskSave(const QString& filename) const ;
-        QString maskToString() const;
-        void maskClear();
-        void maskSetAll();
-        void maskSet(uint16_t x, uint16_t y);
-        void maskUnset(uint16_t x, uint16_t y, bool value=true);
-        void maskToggle(uint16_t x, uint16_t y);
-        void maskInvert();
-        bool maskGet(uint16_t x, uint16_t y) const ;
-        bool* maskGet() const;
 
         /** \brief recalculate the averages/std. deviations */
         void recalcCorrelations();

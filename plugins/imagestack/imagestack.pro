@@ -16,15 +16,19 @@ include(../../libquickfitwidgets.pri)
 HEADERS += qfrdrimagestack.h \
            qfrdrimagestack_data.h \
 		   qfrdrimagestack_dataeditor.h \
-    ../interfaces/qfrdrimagestackinterface.h
+    ../interfaces/qfrdrimagestackinterface.h \
+    ../interfaces/qfrdrimagemask.h \
+    ../base_classes/qfrdrimagemasktools.h
 
 SOURCES += qfrdrimagestack.cpp \
            qfrdrimagestack_data.cpp \
-		   qfrdrimagestack_dataeditor.cpp
+		   qfrdrimagestack_dataeditor.cpp \
+    ../base_classes/qfrdrimagemasktools.cpp
 
 FORMS = 
 
-RESOURCES += qfrdrimagestack.qrc
+RESOURCES += qfrdrimagestack.qrc \
+    ../base_classes/qfrdrmaskeditor.qrc
 
 TRANSLATIONS= ./translations/de.image_stack.ts
 
@@ -39,6 +43,9 @@ INSTALLS += ASSETS_TESTDATA
 
 QT += gui xml core
 CONFIG += exceptions rtti stl
+
+OTHER_FILES += \
+    ../base_classes/mask*
 
 
 

@@ -20,14 +20,15 @@
 #include "qfimporterimageseries.h"
 #include "qfimportermanager.h"
 #include "tools.h"
+#include "qfrdrimagemasktools.h"
 
 /*! \brief QFRawDataRecord implementation that manages a set of 4D image stacks (implemeting QFRDRImageStackInterface)
     \ingroup qf3rdrdp_image_stack
 
 */
-class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterface {
+class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterface, public QFRDRImageMaskTools {
         Q_OBJECT
-        Q_INTERFACES(QFRDRImageStackInterface)
+        Q_INTERFACES(QFRDRImageStackInterface QFRDRImageMaskInterface)
     public:
         /** Default constructor */
         QFRDRImageStackData(QFProject* parent);

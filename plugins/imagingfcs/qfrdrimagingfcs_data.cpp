@@ -941,13 +941,14 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
     if (tau) free(tau);
     if (overviewF) free(overviewF);
     if (overviewFSTD) free(overviewFSTD);
-    if (leaveout) free(leaveout);
+    //if (leaveout) free(leaveout);
     correlations=NULL;
     correlationMean=NULL;
     correlationStdDev=NULL;
     sigmas=NULL;
     tau=NULL;
     overviewF=NULL;
+    maskDelete();
     leaveout=NULL;
     overviewFSTD=NULL;
     //qDebug()<<"freed overviewFSTD="<<overviewFSTD;
@@ -959,7 +960,9 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
         overviewF=(double*)calloc(x*y,sizeof(double));
         overviewFSTD=(double*)calloc(x*y,sizeof(double));
         //qDebug()<<"alloced: overviewFSTD="<<overviewFSTD;
-        leaveout=(bool*)calloc(x*y,sizeof(bool));
+        //leaveout=(bool*)calloc(x*y,sizeof(bool));
+        maskInit(x,y);
+        leaveout=maskGet();
         tau=(double*)calloc(N,sizeof(double));
         width=x;
         height=y;
@@ -1414,63 +1417,6 @@ void QFRDRImagingFCSData::leaveoutClear() {
     maskClear();
 }
 
-void QFRDRImagingFCSData::maskLoad(const QString &filename) {
-    QFile f(filename);
-    if (f.open(QIODevice::ReadOnly)) {
-        maskClear();
-        maskLoadFromString(f.readAll());
-        f.close();
-    }
-}
-
-void QFRDRImagingFCSData::maskLoadFromString(QString maskstring)
-{
-    QTextStream str(&maskstring);
-    while (!str.atEnd())  {
-        QVector<double> d=csvReadline(str, ',', '#', -1);
-        if (d.size()==2) {
-            int idx=xyToRun(d[0], d[1]);
-            if (idx>=0 && idx<height*width) leaveout[idx]=true;
-        }
-    }
-}
-
-void QFRDRImagingFCSData::maskSave(const QString &filename) const {
-    QFile f(filename);
-    if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
-        QTextStream str(&f);
-        str<<maskToString();
-        f.close();
-    }
-}
-
-QString QFRDRImagingFCSData::maskToString() const
-{
-    QString res="";
-    QTextStream str(&res);
-    for (uint16_t y=0; y<height; y++) {
-        for (uint16_t x=0; x<width; x++) {
-            if (leaveout[y*width+x]) {
-                str<<x<<", "<<y<<"\n";
-            }
-        }
-    }
-    return res;
-}
-
-void QFRDRImagingFCSData::maskClear() {
-    if (!leaveout) return;
-    for (uint16_t i=0; i<width*height; i++) {
-        leaveout[i]=false;
-    }
-}
-
-void QFRDRImagingFCSData::maskSetAll() {
-    if (!leaveout) return;
-    for (uint16_t i=0; i<width*height; i++) {
-        leaveout[i]=true;
-    }
-}
 
 void QFRDRImagingFCSData::leaveoutRemoveRun(int run) {
     if (run>=0 && run<width*height) leaveout[run]=false;
@@ -1480,34 +1426,6 @@ void QFRDRImagingFCSData::leaveoutAddRun(int run) {
     if (run>=0 && run<width*height) leaveout[run]=true;
 }
 
-bool *QFRDRImagingFCSData::maskGet() const {
-    return leaveout;
-}
-
-bool QFRDRImagingFCSData::maskGet(uint16_t x, uint16_t y) const {
-    return leaveout[y*width+x];
-}
-
-void QFRDRImagingFCSData::maskUnset(uint16_t x, uint16_t y, bool value) {
-    if (!leaveout) return;
-    leaveout[y*width+x]=value;
-}
-
-void QFRDRImagingFCSData::maskToggle(uint16_t x, uint16_t y) {
-    leaveout[y*width+x]=!leaveout[y*width+x];
-}
-
-void QFRDRImagingFCSData::maskInvert() {
-    if (!leaveout) return;
-    for (uint16_t i=0; i<width*height; i++) {
-        leaveout[i]=!leaveout[i];
-    }
-}
-
-void QFRDRImagingFCSData::maskSet(uint16_t x, uint16_t y) {
-    if (!leaveout) return;
-    leaveout[y*width+x]=false;
-}
 
 
 

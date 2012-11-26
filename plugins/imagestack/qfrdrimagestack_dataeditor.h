@@ -18,6 +18,7 @@
 #include "qvisiblehandlesplitter.h"
 #include "qftools.h"
 #include "statistics_tools.h"
+#include "colorcombobox.h"
 
 /*! \brief editor for QFRawDataRecord
     \ingroup qf3rdrdp_image_stack
@@ -42,6 +43,23 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         void channelModeChanged();
 
 
+
+        /** \brief load a mask file as a selection from hard disk */
+        void loadMask();
+        /** \brief load a mask file as a selection from the clipboard */
+        void pasteMask();
+        /** \brief save mask to harddisk */
+        void saveMask();
+        /** \brief copy mask to clipboard */
+        void copyMask();
+        /** \brief delete mask */
+        void includeAll();
+        /** \brief invert mask */
+        void invertMask();
+        /** \brief signal: emitted whenever the mouse was clicked over the plot */
+        void plotMouseClicked(double x, double y, Qt::KeyboardModifiers modifiers, Qt::MouseButton button);
+
+
     signals:
         void displayedFrame(double time);
     protected slots:
@@ -56,10 +74,21 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         QComboBox* cmbChannelG;
         QComboBox* cmbChannelB;
         QComboBox* cmbChannelMode;
+        ColorComboBox* cmbMaskColor;
         QSpinBox* spinBins;
         QLabel* labTAxis;
         QLabel* labFrame;
         QVisibleHandleSplitter* splitter;
+        QAction* actEditMask;
+        QAction* actCopyMask;
+        QAction* actPasteMask;
+        QAction* actInvertMask;
+        QAction* actLoadMask;
+        QAction* actSaveMask;
+        QAction* actClearMask;
+        QMenu* menuMask;
+
+        QString lastMaskDir;
 
         //JKQTPbarHorizontalGraph* plteHistogram;
         //JKQTPxyLineGraph* plteLine;
@@ -78,6 +107,9 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
 
         JKQTPMathImage* image;
         JKQTPRGBMathImage* imageRGB;
+        /** \brief plot for the excluded runs in pltOverview, plot plteOverviewSelectedData */
+        JKQTPOverlayImageEnhanced* plteOverviewExcluded;
+
         /** \brief create widgets on object creation */
         void createWidgets();
         /** \brief read the settings */
@@ -85,7 +117,7 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         /** \brief write the settings */
         virtual void writeSettings();
 
-        void addDataHistogram(double* data, int size, const QString& title, const QString& colX, const QString& colY, QColor col=QColor("darkblue"), double shift=0, double width=0.9);
+        void addDataHistogram(double* data, bool *mask, int size, const QString& title, const QString& colX, const QString& colY, QColor col=QColor("darkblue"), double shift=0, double width=0.9);
 };
 
 #endif // QFRDRIMAGESTACKEDITOR_H

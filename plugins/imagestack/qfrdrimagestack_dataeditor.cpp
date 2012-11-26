@@ -1,5 +1,6 @@
 #include "qfrdrimagestack_dataeditor.h"
 #include "qfrdrimagestack_data.h"
+#include "qfrawdatapropertyeditor.h"
 
 QFRDRImageStackDataEditor::QFRDRImageStackDataEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent):
     QFRawDataEditor(services, propEditor, parent)
@@ -47,6 +48,12 @@ void QFRDRImageStackDataEditor::createWidgets() {
     cmbChannelB=new QComboBox(this);
     layTop->addWidget(cmbChannelB);
     layTop->addStretch();
+
+    layTop->addWidget(new QLabel(tr("<b>mask color:</b>")));
+    cmbMaskColor=new ColorComboBox(this);
+    layTop->addWidget(cmbMaskColor);
+    layTop->addStretch();
+
 
     toolbar=new QToolBar("", this);
     mainLay->addWidget(toolbar);
@@ -134,6 +141,39 @@ void QFRDRImageStackDataEditor::createWidgets() {
     imageRGB->get_colorBarRightAxis()->set_labelDigits(2);
     imageRGB->get_colorBarRightAxis()->set_minTicks(3);
 
+    QColor ovlExCol=QColor("black");
+    //ovlExCol.setAlphaF(0.5);
+    plteOverviewExcluded=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlExCol, pltImage->get_plotter());
+    plteOverviewExcluded->set_rectanglesAsImageOverlay(true);
+
+    actEditMask=new QAction(QIcon(":/qfrdrmaskeditor/maskedit.png"), tr("edit mask"), this);
+    actEditMask->setToolTip(tr("If this option is activated, you may click on the image plot and this way edit the mask. Clicking a single pixel will toggle whether it is masked or not."));
+    actEditMask->setCheckable(true);
+    actEditMask->setChecked(false);
+
+    actClearMask=new QAction(QIcon(":/qfrdrmaskeditor/clearmask.png"), tr("&clear "), this);
+    actClearMask->setToolTip(tr("clear the mask and recalculate the average correlation curve accordingly"));
+    connect(actClearMask, SIGNAL(triggered()), this, SLOT(includeAll()));
+    actInvertMask=new QAction(QIcon(":/qfrdrmaskeditor/invertmask.png"), tr("&invert mask"), this);
+    actInvertMask->setToolTip(tr("invert the current mask (all masked pixel are unmasked and vice versa)\nand recalculate the average correlation curve accordingly"));
+    connect(actInvertMask, SIGNAL(triggered()), this, SLOT(invertMask()));
+    actSaveMask=new QAction(QIcon(":/qfrdrmaskeditor/savemask.png"), tr("&save"), this);
+    actSaveMask->setToolTip(tr("save the mask to harddisk"));
+    connect(actSaveMask, SIGNAL(triggered()), this, SLOT(saveMask()));
+    actLoadMask=new QAction(QIcon(":/qfrdrmaskeditor/loadmask.png"), tr("&load"), this);
+    actLoadMask->setToolTip(tr("load a mask from harddisk"));
+    connect(actLoadMask, SIGNAL(triggered()), this, SLOT(loadMask()));
+    actCopyMask=new QAction(QIcon(":/qfrdrmaskeditor/copymask.png"), tr("&copy"), this);
+    actCopyMask->setToolTip(tr("copy the mask to clipboard"));
+    connect(actCopyMask, SIGNAL(triggered()), this, SLOT(copyMask()));
+    actPasteMask=new QAction(QIcon(":/qfrdrmaskeditor/pastemask.png"), tr("&paste"), this);
+    actPasteMask->setToolTip(tr("paste a mask from clipboard"));
+    connect(actPasteMask, SIGNAL(triggered()), this, SLOT(pasteMask()));
+
+
+
+
+
     player->setSingleShot(true);
 
     toolbar->addAction(pltImage->get_plotter()->get_actSavePlot());
@@ -143,6 +183,20 @@ void QFRDRImageStackDataEditor::createWidgets() {
     toolbar->addAction(pltImage->get_plotter()->get_actZoomAll());
     toolbar->addAction(pltImage->get_plotter()->get_actZoomIn());
     toolbar->addAction(pltImage->get_plotter()->get_actZoomOut());
+    toolbar->addSeparator();
+    toolbar->addAction(actEditMask);
+
+
+    menuMask=propertyEditor->addMenu("&Mask", 0);
+    menuMask->addAction(actClearMask);
+    menuMask->addAction(actInvertMask);
+    menuMask->addAction(actEditMask);
+    menuMask->addSeparator();
+    menuMask->addAction(actSaveMask);
+    menuMask->addAction(actLoadMask);
+    menuMask->addSeparator();
+    menuMask->addAction(actCopyMask);
+    menuMask->addAction(actPasteMask);
 
 };
 
@@ -150,6 +204,7 @@ void QFRDRImageStackDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
     disconnect(cmbImageStack, SIGNAL(currentIndexChanged(int)), this, SLOT(stackChanged()));
     disconnect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
     disconnect(cmbChannelMode, SIGNAL(currentIndexChanged(int)), this, SLOT(channelModeChanged()));
+    disconnect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)));
 
     if (old) {
         this->current=NULL;
@@ -173,9 +228,11 @@ void QFRDRImageStackDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
     dataMode=QFRDRImageStackDataEditor::dmFullHistogram;
 
     player->setPosition(current->getProperty("imstack_invrimgdisp_playpos", 0).toInt());
+    cmbMaskColor->setCurrentColor(QStringToQColor(current->getProperty("imstack_invrimgdisp_maskcolor", "black").toString()));
     connect(cmbImageStack, SIGNAL(currentIndexChanged(int)), this, SLOT(stackChanged()));
     connect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
     connect(cmbChannelMode, SIGNAL(currentIndexChanged(int)), this, SLOT(channelModeChanged()));
+    connect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)));
     channelModeChanged();
     stackChanged();
 };
@@ -209,13 +266,14 @@ void QFRDRImageStackDataEditor::writeSettings() {
     saveSplitter(*(settings->getQSettings()), splitter, prefix);
 }
 
-void QFRDRImageStackDataEditor::addDataHistogram(double *data, int size, const QString &title, const QString &colX, const QString &colY, QColor col, double shift, double width) {
+void QFRDRImageStackDataEditor::addDataHistogram(double *data, bool* mask, int size, const QString &title, const QString &colX, const QString &colY, QColor col, double shift, double width) {
     JKQTPdatastore* dsData=pltData->getDatastore();
 
     double* histX=(double*)calloc(spinBins->value(), sizeof(double));
     double* histY=(double*)calloc(spinBins->value(), sizeof(double));
 
-    statisticsHistogram(data, size, histX, histY, spinBins->value(), false);
+    if (mask) statisticsHistogramMasked(data, mask, size, histX, histY, spinBins->value(), false, false);
+    else statisticsHistogram(data, size, histX, histY, spinBins->value(), false);
     size_t chx=dsData->addCopiedColumn(histX, spinBins->value(), colX);
     size_t chy=dsData->addCopiedColumn(histY, spinBins->value(), colY);
 
@@ -240,7 +298,7 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
     bool ddd=pltData->get_doDrawing();
     pltData->set_doDrawing(false);
     current->setQFProperty("imstack_invrimgdisp_playpos", player->getPosition(), false, false);
-
+    current->setQFProperty("imstack_invrimgdisp_maskcolor", cmbMaskColor->currentColor().name());
     pltImage->clearGraphs(false);
     pltData->clearGraphs(true);
     JKQTPdatastore* dsData=pltData->getDatastore();
@@ -263,11 +321,23 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
             //qDebug()<<"frame="<<frame<<"   "<<ir;
 
             image->set_data(ir, width, height, JKQTPMathImageBase::DoubleArray);
+
+            if (mv->maskGet()) {
+                double cmin=0;
+                double cmax=0;
+                statisticsMaskedMinMax(ir, mv->maskGet(), width*height, cmin, cmax, false);
+                image->set_imageMin(cmin);
+                image->set_imageMax(cmax);
+                image->set_autoImageRange(false);
+            } else {
+                image->set_autoImageRange(true);
+            }
+
             pltImage->addGraph(image);
 
 
             if (dataMode==QFRDRImageStackDataEditor::dmFullHistogram && ir) {
-                addDataHistogram(ir, width*height, tr("full histogram"), tr("histogram_x"), tr("histogram_y"));
+                addDataHistogram(ir, mv->maskGet(), width*height, tr("full histogram"), tr("histogram_x"), tr("histogram_y"));
             }
         } else {
             double* ir=NULL;
@@ -282,16 +352,54 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
             imageRGB->set_data(ir, ig, ib, width, height, JKQTPMathImageBase::DoubleArray);
             imageRGB->set_width(width);
             imageRGB->set_height(height);
+
+            if (mv->maskGet()) {
+                double cmin=0;
+                double cmax=0;
+                if (ir) {
+                    statisticsMaskedMinMax(ir, mv->maskGet(), width*height, cmin, cmax, false);
+                    imageRGB->set_imageMin(cmin);
+                    imageRGB->set_imageMax(cmax);
+                }
+
+                if (ig) {
+                    cmin=cmax=0;
+                    statisticsMaskedMinMax(ig, mv->maskGet(), width*height, cmin, cmax, false);
+                    imageRGB->set_imageMinG(cmin);
+                    imageRGB->set_imageMaxG(cmax);
+                }
+
+                if (ib) {
+                    cmin=cmax=0;
+                    statisticsMaskedMinMax(ib, mv->maskGet(), width*height, cmin, cmax, false);
+                    imageRGB->set_imageMinB(cmin);
+                    imageRGB->set_imageMaxB(cmax);
+                }
+
+                imageRGB->set_autoImageRange(false);
+            } else {
+                imageRGB->set_autoImageRange(true);
+            }
+
+
             pltImage->addGraph(imageRGB);
             if (dataMode==QFRDRImageStackDataEditor::dmFullHistogram) {
-                if (ir) addDataHistogram(ir, width*height, tr("red histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("darkred"), 0, 0.3);
-                if (ig) addDataHistogram(ig, width*height, tr("green histogram"), tr("histogram_green_x"), tr("histogram_green_y"), QColor("darkgreen"),0.33, 0.3);
-                if (ib) addDataHistogram(ib, width*height, tr("blue histogram"), tr("histogram_blue_x"), tr("histogram_blue_y"), QColor("darkblue"), 0.66, 0.3);
+                if (ir) addDataHistogram(ir, mv->maskGet(), width*height, tr("red histogram"), tr("histogram_red_x"), tr("histogram_red_y"), QColor("darkred"), 0, 0.3);
+                if (ig) addDataHistogram(ig, mv->maskGet(), width*height, tr("green histogram"), tr("histogram_green_x"), tr("histogram_green_y"), QColor("darkgreen"),0.33, 0.3);
+                if (ib) addDataHistogram(ib, mv->maskGet(), width*height, tr("blue histogram"), tr("histogram_blue_x"), tr("histogram_blue_y"), QColor("darkblue"), 0.66, 0.3);
             }
         }
+
+        plteOverviewExcluded->set_data(mv->maskGet(), mv->maskGetWidth(), mv->maskGetHeight());
+        plteOverviewExcluded->set_width(width);
+        plteOverviewExcluded->set_height(height);
+        plteOverviewExcluded->set_trueColor(cmbMaskColor->currentColor());
+        pltImage->addGraph(plteOverviewExcluded);
+
         emit displayedFrame((double)frame*mv->getImageStackTUnitFactor(idx));
         labFrame->setText(tr("<b>frame:</b> %1/%2 (%3 %4)").arg(frame+1).arg(mv->getImageStackFrames(idx)).arg(frame*mv->getImageStackTUnitFactor(idx)).arg(mv->getImageStackTUnitName(idx)));
     }
+
 
 
     if (dd) {
@@ -395,5 +503,109 @@ void QFRDRImageStackDataEditor::channelModeChanged() {
 
     connect(cmbChannelR, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     displayImage();
+}
+
+
+
+
+
+void QFRDRImageStackDataEditor::loadMask()
+{
+    if (!current) return;
+    QFRDRImageMaskInterface* m=qobject_cast<QFRDRImageMaskInterface*>(current);
+    if (!m) return;
+    QString filename= qfGetOpenFileName(this, tr("select mask file to open ..."), lastMaskDir, tr("mask files (*.msk)"));
+    if (QFile::exists(filename)) {
+        if (m) {
+            m->maskLoad(filename);
+        }
+        rawDataChanged();
+        displayImage();
+        showFrame(player->getPosition(), false);
+    }
+
+}
+
+void QFRDRImageStackDataEditor::pasteMask()
+{
+    if (!current) return;
+    QFRDRImageMaskInterface* m=qobject_cast<QFRDRImageMaskInterface*>(current);
+    if (!m) return;
+
+    QClipboard* clipboard=QApplication::clipboard();
+
+    const QMimeData* mime=clipboard->mimeData();
+    if (mime->hasFormat("quickfit3/pixelselection")) {
+        m->maskLoadFromString(QString::fromUtf8(mime->data("quickfit3/pixelselection")));
+        rawDataChanged();
+        displayImage();
+        showFrame(player->getPosition(), false);
+    }
+
+}
+
+
+void QFRDRImageStackDataEditor::saveMask()
+{
+    if (!current) return;
+    QFRDRImageMaskInterface* m=qobject_cast<QFRDRImageMaskInterface*>(current);
+    if (!m) return;
+    QString filename= qfGetSaveFileName(this, tr("save mask as ..."), lastMaskDir, tr("mask files (*.msk)"));
+    if (!filename.isEmpty()) {
+        m->maskSave(filename);
+    }
+}
+
+void QFRDRImageStackDataEditor::copyMask()
+{
+    if (!current) return;
+    QFRDRImageMaskInterface* m=qobject_cast<QFRDRImageMaskInterface*>(current);
+    if (!m) return;
+    QString mask=m->maskToString();
+    QClipboard* clipboard=QApplication::clipboard();
+    QMimeData* mime=new QMimeData();
+    mime->setText(mask);
+    mime->setData("quickfit3/pixelselection", mask.toUtf8());
+    clipboard->setMimeData(mime);
+}
+
+void QFRDRImageStackDataEditor::includeAll()
+{
+
+    if (!current) return;
+    QFRDRImageMaskInterface* m=qobject_cast<QFRDRImageMaskInterface*>(current);
+    if (m) {
+        m->maskClear();
+        rawDataChanged();
+        displayImage();
+
+        showFrame(player->getPosition(), false);
+    }
+}
+
+void QFRDRImageStackDataEditor::invertMask()
+{
+    if (!current) return;
+    QFRDRImageMaskInterface* m=qobject_cast<QFRDRImageMaskInterface*>(current);
+    if (m) {
+        m->maskInvert();
+        rawDataChanged();
+        displayImage();
+        showFrame(player->getPosition(), false);
+    }
+}
+
+void QFRDRImageStackDataEditor::plotMouseClicked(double x, double y, Qt::KeyboardModifiers modifiers, Qt::MouseButton button)
+{
+    if (!current) return;
+    QFRDRImageMaskInterface* m=qobject_cast<QFRDRImageMaskInterface*>(current);
+    if (m) {
+        if (actEditMask->isChecked() && button==Qt::LeftButton && modifiers==Qt::NoModifier) {
+            m->maskToggle(floor(x), floor(y));
+        }
+        rawDataChanged();
+        displayImage();
+        showFrame(player->getPosition(), false);
+    }
 }
 

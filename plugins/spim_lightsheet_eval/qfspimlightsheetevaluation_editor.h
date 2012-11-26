@@ -46,6 +46,7 @@ class QFSPIMLightsheetEvaluationEditor : public QFEvaluationEditor {
         void on_pltImage_plotMouseClicked(double x, double y, Qt::KeyboardModifiers modifiers=Qt::NoModifier, Qt::MouseButton button=Qt::LeftButton);
         void on_chkErrorsParam_toggled(bool checked);
         void on_chkErrorsBeamPos_toggled(bool checked);
+        void on_chkUseMask_toggled(bool checked);
     protected:
 
         void prepareImagePlotter(JKQtPlotter *pltImage);
@@ -85,6 +86,8 @@ class QFSPIMLightsheetEvaluationEditor : public QFEvaluationEditor {
         
         /*! \brief create an evaluation report for the current record */
         void createReportDoc(QTextDocument* document);
+
+        bool* getCurrentMask();
 
     protected slots:
         /** \brief activated when the highlighted record changed */

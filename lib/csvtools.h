@@ -12,7 +12,7 @@
            Returns its contents as a vector of doubles.
 
  */
-QFLIB_EXPORT QVector<double> csvReadline(QTextStream& f, QChar separator_char=',', QChar comment_char='#', double non_value=0);
+QFLIB_EXPORT QVector<double> csvReadline(QTextStream& f, QChar separator_char=',', QChar comment_char='#', double non_value=0, const QString& eolChars=QString("\n"), const QString& ignoreChars=QString("\r"));
 
 
 /*! \brief copy the given data columns as CSV to the clipboard */

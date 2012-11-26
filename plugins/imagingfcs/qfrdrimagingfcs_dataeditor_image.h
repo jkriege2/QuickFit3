@@ -548,7 +548,7 @@ protected:
         /** \brief a button which includes the selected runs to the evaluation */
         QAction* actUse;
         /** \brief a button which includes all runs to the evaluation */
-        QAction* actUseAll;
+        QAction* actClearMask;
         /** \brief a button which inverts the mask */
         QAction* actInvertMask;
         /** \brief button to mask pixels by intensity */

@@ -6,6 +6,7 @@
 
 #include "qfevaluationitem.h"
 #include "qfevaluationitemfactory.h"
+#include "qfrdrimagemask.h"
 
 /*! \brief evaluation item class 
     \ingroup qf3rdrdp_GROUPNAME
@@ -58,7 +59,7 @@ class QFSPIMLightsheetEvaluationItem : public QFEvaluationItem {
         QString getEvaluationResultID(int stack, int channel=-1) const;
 
 
-        void doEvaluation(QFRawDataRecord *record, int stack, int stack_pos, int channel, double deltaX, double deltaZ, QFFitFunction* model, QFFitAlgorithm* algorithm, Orientation orientation=fitRows) const;
+        void doEvaluation(QFRawDataRecord *record, int stack, int stack_pos, int channel, double deltaX, double deltaZ, QFFitFunction* model, QFFitAlgorithm* algorithm, Orientation orientation=fitRows, bool useMask=true) const;
     protected:
         
         /** \brief write object contents into XML file

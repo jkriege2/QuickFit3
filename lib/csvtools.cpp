@@ -8,8 +8,15 @@
 #include <QMimeData>
 #include <QClipboard>
 
-QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_char, double non_value) {
-    const QString line=f.readLine();
+QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_char, double non_value, const QString& eolChars, const QString& ignoreChars) {
+    //const QString line=f.readLine();
+    QString line="";
+    QString ch=f.read(1);
+    while (!f.atEnd() && !eolChars.contains(ch)) {
+        line.append(ch);
+        ch=f.read(1);
+    }
+    if (!eolChars.contains(ch)) line.append(ch);
     QLocale loc=QLocale::c();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
     //qDebug()<<"line='"<<line;
@@ -45,14 +52,14 @@ QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_
                 case 'f':
                     num=num+ch;
                     break;
-                case '\r': break;
+                /*case '\r': break;
                 case '\n':
                     done=true;
                     if (num.size()>0) {
                         result.append(loc.toDouble(num, &ok));
                     }
                     num="";
-                    break;
+                    break;*/
                 case 'N':
                     num=num+'n';
                     break;
@@ -69,7 +76,17 @@ QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_
                     num=num+'e';
                     break;
                 default:
-                    if (ch=='.' && separator_char!='.') {
+                    if (ignoreChars.contains(ch)) {
+                         // ignore this character ;-)
+                    } else if (eolChars.contains(ch)) {
+                        // found an end of line character
+                        done=true;
+                        if (num.size()>0) {
+                            result.append(loc.toDouble(num, &ok));
+                        }
+                        num="";
+
+                    } else if (ch=='.' && separator_char!='.') {
                         num=num+'.';
                     } else if (ch==',' && separator_char!=',') {
                         num=num+'.';
@@ -105,7 +122,7 @@ QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_
                     break;
             }
         } else {
-            if (ch=='\n') {
+            if (eolChars.contains(ch)) {
                 done=true;
             }
             break;

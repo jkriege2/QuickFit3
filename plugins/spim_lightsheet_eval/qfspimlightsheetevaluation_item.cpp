@@ -79,16 +79,23 @@ QString QFSPIMLightsheetEvaluationItem::getEvaluationResultID(int stack, int cha
     return offset+A*exp(-2.0*(t-avg)*(t-avg)/var);
 }*/
 
-void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int stack, int stack_pos, int channel, double deltaX, double deltaZ, QFFitFunction* model, QFFitAlgorithm* algorithm, Orientation orientation) const {
+void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int stack, int stack_pos, int channel, double deltaX, double deltaZ, QFFitFunction* model, QFFitAlgorithm* algorithm, Orientation orientation, bool useMask) const {
     QString resultID=getEvaluationResultID(stack, channel);
     QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageMaskInterface* dataM=qobject_cast<QFRDRImageMaskInterface*>(record);
     if (data) {
         int w=data->getImageStackWidth(stack);
         int h=data->getImageStackHeight(stack);
         double* img=(double*)malloc(w*h*sizeof(double));
+        bool* mask=(bool*)malloc(w*h*sizeof(bool));
+        for (int i=0; i<w*h; i++) mask[i]=false;
+        bool* maskD=NULL;
+        if (useMask && dataM) {
+            maskD=dataM->maskGet();
+        }
         int wi=w;
         int hi=h;
-
+        qDebug()<<useMask<<dataM<<maskD;
         if (orientation==QFSPIMLightsheetEvaluationItem::fitColumns) {
             // rotate image by 90°
             double* m=data->getImageStack(stack, stack_pos, channel);
@@ -97,12 +104,24 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
                     img[x*h+y]=m[y*w+x];
                 }
             }
+            if (maskD) {
+                for (int x=0; x<w; x++) {
+                    for (int y=0; y<h; y++) {
+                        mask[x*h+y]=maskD[y*w+x];
+                    }
+                }
+            }
             wi=h;
             hi=w;
         } else {
             double* m=data->getImageStack(stack, stack_pos, channel);
             for (int x=0; x<w*h; x++) {
                 img[x]=m[x];
+            }
+            if (maskD) {
+                for (int x=0; x<w*h; x++) {
+                    mask[x]=maskD[x];
+                }
             }
         }
 
@@ -119,11 +138,16 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
 
         double* dataX=(double*)malloc(wi*sizeof(double));
         double* dataY=(double*)malloc(wi*sizeof(double));
-        for (int i=0; i<wi; i++) dataX[i]=i;
         for (int f=0; f<hi; f++) {
+            int data_count=0;
             for (int i=0; i<wi; i++) {
-                dataY[i]=img[f*wi+i];
+                if (!mask[f*wi+i]) {
+                    dataX[data_count]=i;
+                    dataY[data_count]=img[f*wi+i];
+                    data_count++;
+                }
             }
+            qDebug()<<data_count<<wi;
 
 
             int pcount=model->paramCount();
@@ -133,8 +157,8 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
 
             double par[4];
             long long maxpos=0;
-            par[0]=statisticsMin(dataY, wi);
-            par[1]=fabs(statisticsMax(dataY, wi, &maxpos)-par[0]);
+            par[0]=statisticsMin(dataY, data_count);
+            par[1]=fabs(statisticsMax(dataY, data_count, &maxpos)-par[0]);
             par[2]=maxpos;
             par[3]=double(wi)/10.0;
 
@@ -151,7 +175,7 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
 
             //lmcurve_fit(4, par, wi, dataX, dataY, QFSPIMLightsheetEvaluationItem_fGauss, &control, &status);
 
-            QFFitAlgorithm::FitResult res=algorithm->fit(paramOut, paramErrOut, dataX, dataY, NULL, wi, model, parIn);
+            QFFitAlgorithm::FitResult res=algorithm->fit(paramOut, paramErrOut, dataX, dataY, NULL, data_count, model, parIn);
             fitOK.append(res.fitOK);
 
             //qDebug()<<f<<res.fitOK<<": offset="<<paramOut[0]<<" A="<<paramOut[1]<<" pos="<<paramOut[2]<<" width="<<paramOut[3];

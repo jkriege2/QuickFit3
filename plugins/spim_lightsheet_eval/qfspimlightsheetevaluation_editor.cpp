@@ -181,6 +181,7 @@ void QFSPIMLightsheetEvaluationEditor::updateStack() {
 
         ui->spinDeltaX->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_DELTAX", record->getProperty("PIXEL_WIDTH", ui->spinDeltaX->value()).toDouble()).toDouble());
         ui->spinDeltaZ->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_DELTAZ", record->getProperty("DELTAZ", ui->spinDeltaZ->value()).toDouble()).toDouble());
+        ui->chkUseMask->setChecked(record->getProperty(eval->getEvaluationResultID(stack)+"_USEMASK", record->getProperty("USEMASK", ui->chkUseMask->isChecked()).toBool()).toBool());
         ui->cmbOrientation->setCurrentIndex(record->getProperty(eval->getEvaluationResultID(stack)+"_ORIENTATION", record->getProperty("ORIENTATION", ui->cmbOrientation->currentIndex()).toInt()).toInt());
         ui->cmbModel->setCurrentFitFunction(record->getProperty(eval->getEvaluationResultID(stack)+"_MODEL", record->getProperty("MODEL", ui->cmbModel->currentFitFunctionID()).toString()).toString());
         ui->cmbAlgorithm->setCurrentAlgorithm(record->getProperty(eval->getEvaluationResultID(stack)+"_ALGORITHM", record->getProperty("ALGORITHM", ui->cmbAlgorithm->currentFitAlgorithmID()).toString()).toString());
@@ -246,6 +247,21 @@ void QFSPIMLightsheetEvaluationEditor::on_chkErrorsBeamPos_toggled(bool checked)
 
     if (data && eval) {
         record->setQFProperty(eval->getEvaluationResultID(stack)+"_BEAMPOSERRORS", checked, false, false);
+    }
+    displayEvaluationResults();
+    displayPreview();
+}
+
+void QFSPIMLightsheetEvaluationEditor::on_chkUseMask_toggled(bool checked)
+{
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    int stack=ui->cmbStack->currentIndex();
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID(stack)+"_USEMASK", checked, false, false);
     }
     displayEvaluationResults();
     displayPreview();
@@ -368,18 +384,41 @@ void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, do
     ui->pltFit->addGraph(plteLineFit);
 
     int item=-1;
+    bool*mask=getCurrentMask();
     if(img) {
         if (ui->cmbOrientation->currentIndex()==0) {
             markDataX[0]=0;
             markDataX[1]=w;
             markDataY[0]=markDataY[1]=round(y);
             item=(int)round(y);
-            int c_x=ds->addLinearColumn(w, 0, double(w)*ui->spinDeltaX->value()/1000.0, "dataX");
-            int c_y=ds->addCopiedColumn(&(img[item*w]), w, "dataY");
+            double* data=(double*)malloc(h*sizeof(double));
+            double* dataX=(double*)malloc(h*sizeof(double));
+            int data_count=0;
+            if (mask) {
+                for (int yy=0; yy<w; yy++) {
+                    if (!mask[item*w+yy]) {
+                        data[data_count]=img[item*w+yy];
+                        dataX[data_count]=double(yy)*ui->spinDeltaX->value()/1000.0;
+                        data_count++;
+                    }
+                }
+            } else {
+                for (int yy=0; yy<w; yy++) {
+                    data[data_count]=img[item*w+yy];
+                    dataX[data_count]=double(yy)*ui->spinDeltaX->value()/1000.0;
+                    data_count++;
+                }
+            }
+
+            //int c_x=ds->addLinearColumn(w, 0, double(w)*ui->spinDeltaX->value()/1000.0, "dataX");
+            int c_x=ds->addCopiedColumn(dataX, data_count, "dataX");
+            int c_y=ds->addCopiedColumn(data/*&(img[item*w])*/, data_count, "dataY");
             plteLineFitData->set_xColumn(c_x);
             plteLineFitData->set_yColumn(c_y);
             plteLineFitData->set_xErrorColumn(-1);
             plteLineFitData->set_yErrorColumn(-1);
+            free(data);
+            free(dataX);
 
         } else {
             markDataY[0]=0;
@@ -387,17 +426,36 @@ void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, do
             markDataX[0]=markDataX[1]=round(x);
 
             item=(int)round(x);
-            int c_x=ds->addLinearColumn(h, 0, double(h)*ui->spinDeltaX->value()/1000.0, "dataX");
             double* data=(double*)malloc(h*sizeof(double));
-            for (int yy=0; yy<h; yy++) {
-                data[yy]=img[yy*w+item];
+            double* dataX=(double*)malloc(h*sizeof(double));
+
+            int data_count=0;
+            if (mask) {
+                for (int yy=0; yy<h; yy++) {
+                    if (!mask[item*w+yy]) {
+                        data[yy]=img[yy*w+item];
+                        dataX[data_count]=double(yy)*ui->spinDeltaX->value()/1000.0;
+                        data_count++;
+                    }
+                }
+            } else {
+                for (int yy=0; yy<h; yy++) {
+                    data[data_count]=img[yy*w+item];
+                    dataX[data_count]=double(yy)*ui->spinDeltaX->value()/1000.0;
+                    data_count++;
+                }
             }
+
+
+            //int c_x=ds->addLinearColumn(h, 0, double(h)*ui->spinDeltaX->value()/1000.0, "dataX");
+            int c_x=ds->addCopiedColumn(dataX, h, "dataX");
             int c_y=ds->addCopiedColumn(data, h, "dataY");
             plteLineFitData->set_xColumn(c_x);
             plteLineFitData->set_yColumn(c_y);
             plteLineFitData->set_xErrorColumn(-1);
             plteLineFitData->set_yErrorColumn(-1);
             free(data);
+            free(dataX);
         }
     }
 
@@ -909,6 +967,15 @@ void QFSPIMLightsheetEvaluationEditor::createReportDoc(QTextDocument* document) 
 
 }
 
+bool *QFSPIMLightsheetEvaluationEditor::getCurrentMask()
+{
+    if (!current) return NULL;
+    bool* res=NULL;
+    QFRDRImageMaskInterface* dataM=qobject_cast<QFRDRImageMaskInterface*>(current->getHighlightedRecord());
+    if (dataM) return dataM->maskGet();
+    return res;
+}
+
 
 
 
@@ -946,7 +1013,7 @@ void QFSPIMLightsheetEvaluationEditor::doEvaluation(QFRawDataRecord *record) {
                 dlgEvaluationProgress->setValue(channel*data->getImageStackFrames(stack)+stackpos);
                 QApplication::processEvents();
             }
-            eval->doEvaluation(record, stack, stackpos, channel, ui->spinDeltaX->value(), ui->spinDeltaZ->value(), model, alg, o);
+            eval->doEvaluation(record, stack, stackpos, channel, ui->spinDeltaX->value(), ui->spinDeltaZ->value(), model, alg, o, ui->chkUseMask->isChecked());
             if (dlgEvaluationProgress) {
                 QApplication::processEvents();
                 if (dlgEvaluationProgress->wasCanceled()) break;

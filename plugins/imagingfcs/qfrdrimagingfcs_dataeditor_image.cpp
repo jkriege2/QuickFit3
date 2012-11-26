@@ -205,10 +205,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(actUse, SIGNAL(triggered()), this, SLOT(includeRuns()));
     glmask->addWidget(btnUse, mskgrpRow, 1);
 
-    btnUseAll=createButtonAndActionShowText(actUseAll, QIcon(":/imaging_fcs/clearmask.png"), tr("&clear "), w);
-    actUseAll->setToolTip(tr("clear the mask and recalculate the average correlation curve accordingly"));
+    btnUseAll=createButtonAndActionShowText(actClearMask, QIcon(":/imaging_fcs/clearmask.png"), tr("&clear "), w);
+    actClearMask->setToolTip(tr("clear the mask and recalculate the average correlation curve accordingly"));
     glmask->addWidget(btnUseAll, mskgrpRow, 2);
-    connect(actUseAll, SIGNAL(triggered()), this, SLOT(includeAll()));
+    connect(actClearMask, SIGNAL(triggered()), this, SLOT(includeAll()));
     btnInvertMask=createButtonAndActionShowText(actInvertMask, QIcon(":/imaging_fcs/invertmask.png"), tr("&invert mask"), w);
     actInvertMask->setToolTip(tr("invert the current mask (all masked pixel are unmasked and vice versa)\nand recalculate the average correlation curve accordingly"));
     glmask->addWidget(btnInvertMask, mskgrpRow, 3);
@@ -1161,7 +1161,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuMask=propertyEditor->addMenu("&Mask", 0);
     menuMask->addAction(actUse);
     menuMask->addAction(actDontUse);
-    menuMask->addAction(actUseAll);
+    menuMask->addAction(actClearMask);
     menuMask->addAction(actInvertMask);
     menuMask->addAction(actMaskByIntensity);
     menuMask->addAction(actMaskByGofIntensity);

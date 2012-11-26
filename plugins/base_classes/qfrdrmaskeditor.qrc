@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/qfrdrmaskeditor">
+        <file alias="clearmask.png">icons/clearmask.png</file>
+        <file alias="invertmask.png">icons/invertmask.png</file>
+        <file alias="mask.png">icons/mask.png</file>
+        <file alias="unmask.png">icons/unmask.png</file>
+        <file alias="loadmask.png">icons/load_mask.png</file>
+        <file alias="savemask.png">icons/savemask.png</file>
+        <file alias="copymask.png">icons/copymask.png</file>
+        <file alias="pastemask.png">icons/pastemask.png</file>
+        <file alias="maskedit.png">icons/maskedit.png</file>
+    </qresource>
+</RCC>

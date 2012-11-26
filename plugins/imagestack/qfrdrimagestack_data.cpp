@@ -24,6 +24,7 @@ void QFRDRImageStackData::intWriteData(QXmlStreamWriter& w) {
     w.writeAttribute("imagestack", "123456789");
     w.writeEndElement();
     */
+    w.writeAttribute(QString("mask"), maskToListString(", ", "; "));
 }
 
 void QFRDRImageStackData::intReadData(QDomElement* e) {
@@ -37,6 +38,8 @@ void QFRDRImageStackData::intReadData(QDomElement* e) {
 	*/
 
     QString stacktype=getProperty("STACKTYPE", "ONEFILEPERCHANNEL").toString().toUpper();
+    QString maskS=e->attribute("mask", "").simplified().trimmed();
+    //qDebug()<<maskS;
     clearMemory();
     stacks.clear();
     if (stacktype=="ONEFILEPERSTACK") {
@@ -96,6 +99,9 @@ void QFRDRImageStackData::intReadData(QDomElement* e) {
                         }
                     }
                 }
+                if (maskS.size()>0) getProject()->getServices()->log_text(tr("    * loading image mask (%1) ...\n").arg(maskS));
+                maskClear();
+                maskLoadFromListString(maskS,',', ';');
             } else setError(tr("Error allocating %1 of memory!").arg(bytestostr(memsize).c_str()));
         } else setError(tr("there are no files in the %1 record!").arg(getName()));
     } else if (stacktype=="ONEFILEPERCHANNEL") {
@@ -170,6 +176,9 @@ void QFRDRImageStackData::intReadData(QDomElement* e) {
                         }
                     }
                 }
+                if (maskS.size()>0) getProject()->getServices()->log_text(tr("    * loading image mask (%1) ...\n").arg(maskS));
+                maskClear();
+                maskLoadFromListString(maskS,',', ';');
             } else setError(tr("Error allocating %1 of memory!").arg(bytestostr(memsize).c_str()));
         } else setError(tr("there are no files in the %1 record!").arg(getName()));
     } else {
@@ -232,6 +241,8 @@ bool QFRDRImageStackData::allocateMemory() {
         }
     }
     if (!ok) clearMemory();
+    if (ok && stacks.size()>0) maskInit(stacks[0].width, stacks[0].height);
+    else maskDelete();
     return ok;
 }
 
@@ -241,6 +252,7 @@ void QFRDRImageStackData::clearMemory() {
         stacks[i].data=NULL;
     }
     memsize=0;
+    maskDelete();
 }
 
 QVariant QFRDRImageStackData::getEnumeratedProperty(const QString &prop, int stack, QVariant defaultValue) const {
