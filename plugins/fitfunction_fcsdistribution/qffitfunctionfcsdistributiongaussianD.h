@@ -3,6 +3,7 @@
 #include "qfpluginfitfunction.h"
 #include <QVector>
 #include <QPair>
+#include <stdint.h>
 
 
 

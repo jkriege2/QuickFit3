@@ -4,6 +4,7 @@
 #include <QVector>
 #include <QPair>
 
+#include <stdint.h>
 
 
 /*! \brief QFFitFunction class for FCS fit with an assumed log-normal distribution of diffusion correlation times
