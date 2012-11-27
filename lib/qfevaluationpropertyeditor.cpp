@@ -814,6 +814,7 @@ void QFEvaluationPropertyEditor::setFilesListFilteres(bool filtered)
     } else {
         current->setNameNameNotFilter(edtFilterRecords->text(), edtFilterRecordsNot->text(), chkFilterRecordsRegExp->isChecked(), chkFilterRecordsRegExp->isChecked());
     }
+    rdrProxy->invalidate();
 }
 
 bool QFEvaluationPropertyEditor::isFilesListFiltered() const
