@@ -23,7 +23,7 @@ bool QFEvaluationRawDataModelProxy::filterAcceptsRow(int sourceRow, const QModel
     if ((eval!=NULL) && (ID>=0)) {
         QFRawDataRecord* record=eval->getProject()->getRawDataByID(ID);
         if (record==NULL) return false;
-        return eval->isApplicable(record);
+        else return eval->isFilteredAndApplicable(record);
     }
     return false;
 }
@@ -63,11 +63,13 @@ Qt::ItemFlags QFEvaluationRawDataModelProxy::flags(const QModelIndex &index) con
     return def;
 }
 
+
 void QFEvaluationRawDataModelProxy::setEvaluation(QFEvaluationItem* eval) {
     if (eval!=NULL) {
         disconnect(eval, SIGNAL(selectionChanged(QList<QPointer<QFRawDataRecord> >)), this, SLOT(selectionChanged(QList<QPointer<QFRawDataRecord> >)));
     }
     this->eval=eval;
+
     connect(eval, SIGNAL(selectionChanged(QList<QPointer<QFRawDataRecord> >)), this, SLOT(selectionChanged(QList<QPointer<QFRawDataRecord> >)));
     invalidateFilter();
 }
@@ -75,6 +77,7 @@ void QFEvaluationRawDataModelProxy::setEvaluation(QFEvaluationItem* eval) {
 void QFEvaluationRawDataModelProxy::setEditor(QFEvaluationPropertyEditor* editor) {
     this->editor=editor;
 }
+
 
 void QFEvaluationRawDataModelProxy::selectionChanged(QList<QPointer<QFRawDataRecord> > selectedRecords) {
     //std::cout<<"QFEvaluationRawDataModelProxy::selectionChanged()\n";
@@ -109,6 +112,7 @@ QFEvaluationPropertyEditor::QFEvaluationPropertyEditor(QFPluginServices* service
     rdrProxy->setSourceModel(rdrModel);
     lstRawData=NULL;
     splitMain=NULL;
+    filesListFiltered=true;
 
     resize(400,300);
     move(5,5);
@@ -160,6 +164,9 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         disconnect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
         disconnect(current, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), this, SLOT(resultsChanged(QFRawDataRecord*,QString,QString)));
         disconnect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
+        disconnect(edtFilterRecords, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsChanged()));
+        disconnect(edtFilterRecordsNot, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsChanged()));
+        disconnect(chkFilterRecordsRegExp, SIGNAL(toggled(bool)), this, SLOT(filterRecordsChanged()));
         if (c) {
             if (c->getType()!=oldType) {
                 /*for (int i=oldEditorCount; i>=0; i--) {
@@ -215,6 +222,16 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         setWindowTitle(current->getName());
         setWindowIcon(current->getSmallIcon());
 
+        if (filesListFiltered) {
+            edtFilterRecords->setText(current->getNameFilter());
+            edtFilterRecordsNot->setText(current->getNameNotFilter());
+            chkFilterRecordsRegExp->setChecked(current->getNameFilterRegExp());
+            setFilesListFilteres(true);
+        } else {
+            setFilesListFilteres(false);
+        }
+
+
         labType->setText(current->getTypeDescription());
         labTypeIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
         lstRawData->setModel(rdrProxy);
@@ -227,14 +244,27 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         connect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
         connect(current, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), this, SLOT(resultsChanged(QFRawDataRecord*,QString,QString)));
         connect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
+        connect(edtFilterRecords, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsChanged()));
+        connect(edtFilterRecordsNot, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsChanged()));
+        connect(chkFilterRecordsRegExp, SIGNAL(toggled(bool)), this, SLOT(filterRecordsChanged()));
         lstRawData->selectionModel()->select(rdrProxy->index(0,0), QItemSelectionModel::SelectCurrent);
         selectionChanged(rdrProxy->index(0,0), rdrProxy->index(0,0));//std::cout<<"new connected ...\n";
+
 
         QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/");
         compFilterFiles->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterfiles.txt");
         compFilterFilesNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterfilesnot.txt");
         compFilterResults->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterresults.txt");
         compFilterResultsNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterresults_not.txt");
+        compFilterRecords->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterrecords.txt");
+        compFilterRecordsNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterrecordsnot.txt");
+
+        edtFilterFiles->setText(current->getProperty("FILES_FILTER", "").toString());
+        edtFilterFilesNot->setText(current->getProperty("FILES_FILTERNOT", "").toString());
+        chkFilterFilesRegExp->setChecked(current->getProperty("FILES_FILTER_REGEXP", false).toBool());
+        edtFilterResults->setText(current->getProperty("RESULTS_FILTER", "").toString());
+        edtFilterResultsNot->setText(current->getProperty("RESULTS_FILTERNOT", "").toString());
+        chkFilterResultsRegExp->setChecked(current->getProperty("RESULTS_FILTER_REGEXP", false).toBool());
 
         /*helpWidget->clear();
         QString dll=current->getProject()->getEvaluationItemFactory()->getPluginHelp(current->getType());
@@ -369,6 +399,11 @@ void QFEvaluationPropertyEditor::propertiesTextChanged(const QString &text) {
     }
 }
 
+void QFEvaluationPropertyEditor::filterRecordsChanged()
+{
+    setFilesListFilteres(filesListFiltered);
+}
+
 void QFEvaluationPropertyEditor::deleteSelectedRecords() {
     if (!current) return;
     QModelIndexList sel=tvResults->selectionModel()->selectedIndexes();
@@ -491,6 +526,45 @@ void QFEvaluationPropertyEditor::createWidgets() {
     QVBoxLayout* lstvbl=new QVBoxLayout(splitMain);
     QWidget* lstvblw=new QWidget(splitMain);
     lstvblw->setLayout(lstvbl);
+
+    widFilterRecords=new QWidget(this);
+    QHBoxLayout* lFilterRecords=new QHBoxLayout(this);
+    widFilterRecords->setLayout(lFilterRecords);
+    lFilterRecords->addWidget(new QLabel("filter: "));
+    edtFilterRecords=new QFEnhancedLineEdit(this);
+    edtFilterRecords->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterRecords, edtFilterRecords));
+    edtFilterRecords->setCompleter(new QFCompleterFromFile());
+    compFilterRecords=new QFCompleterFromFile(this);
+    edtFilterRecords->setCompleter(compFilterRecords);
+    lFilterRecords->addWidget(edtFilterRecords);
+    lFilterRecords->addWidget(new QLabel(tr(" <span style=\"text-decoration: overline\">filter</span>: "), this));
+    edtFilterRecordsNot=new QFEnhancedLineEdit(this);
+    edtFilterRecordsNot->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterRecordsNot, edtFilterRecordsNot));
+    compFilterRecordsNot=new QFCompleterFromFile(this);
+    edtFilterRecordsNot->setCompleter(compFilterRecordsNot);
+    lFilterRecords->addWidget(edtFilterRecordsNot);
+    chkFilterRecordsRegExp=new QCheckBox(tr("RegExp"), this);
+    chkFilterRecordsRegExp->setChecked(false);
+    lFilterRecords->addWidget(chkFilterRecordsRegExp);
+    edtFilterRecords->setToolTip(tr("use this to filter the contents of the rdr list<br><br>"
+                                       "Simply enter a filter string and the list will only display those"
+                                       "rows where the raw data record name contains a match to the filter string."
+                                       "Depending on whether <i>RegExp</i> is checked or not, you can use"
+                                       "either simple text with wildcards '<tt>*</tt>' (match any characters) and '<tt>?</tt>'"
+                                       "(match a single character), or full regular expressions in the filter string."
+                                  "<br><br><font color=\"darkred\">red text</font> means you entered an invalid regular expression"));
+    edtFilterRecordsNot->setToolTip(tr("use this to filter the contents of the rdr list<br><br>"
+                                       "Simply enter a filter string and the list will only display those"
+                                       "rows where the raw data record name contains NO match to the filter string."
+                                       "Depending on whether <i>RegExp</i> is checked or not, you can use"
+                                       "either simple text with wildcards '<tt>*</tt>' (match any characters) and '<tt>?</tt>'"
+                                       "(match a single character), or full regular expressions in the filter string."
+                                     "<br><br><font color=\"darkred\">red text</font> means you entered an invalid regular expression"));
+    connect(edtFilterRecordsNot, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsTextChanged(QString)));
+    connect(edtFilterRecords, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsTextChanged(QString)));
+
+    lstvbl->addWidget(widFilterRecords);
+
     lstvbl->addWidget(lstRawData, 10);
     btnRemoveRawData=new QPushButton(QIcon(":/lib/item_delete.png"), tr("remove record"), lstvblw);
     btnRemoveRawData->setToolTip(tr("remove the current raw data record from the project"));
@@ -728,6 +802,23 @@ void QFEvaluationPropertyEditor::setSettings(ProgramOptions* settings) {
         }
     }
     readSettings();
+}
+
+void QFEvaluationPropertyEditor::setFilesListFilteres(bool filtered)
+{
+    if (!current) return;
+    filesListFiltered=filtered;
+    widFilterRecords->setVisible(filtered);
+    if (!filtered) {
+        current->setNameNameNotFilter("", "", false, false);
+    } else {
+        current->setNameNameNotFilter(edtFilterRecords->text(), edtFilterRecordsNot->text(), chkFilterRecordsRegExp->isChecked(), chkFilterRecordsRegExp->isChecked());
+    }
+}
+
+bool QFEvaluationPropertyEditor::isFilesListFiltered() const
+{
+    return filesListFiltered;
 }
 
 
@@ -999,11 +1090,11 @@ void QFEvaluationPropertyEditor::removeRawData() {
 
 void QFEvaluationPropertyEditor::recordAboutToBeDeleted(QFRawDataRecord* record) {
     if (current) {
-        if (current->isApplicable(record)) {
+        if (current->isFilteredAndApplicable(record)) {
             int cnt=0;
             QList<QFRawDataRecord*> list=current->getProject()->getRawDataList();
             for (int i=0; i<list.size(); i++) {
-                if ((record!=list[i])&&(current->isApplicable(list[i]))) {
+                if ((record!=list[i])&&(current->isFilteredAndApplicable(list[i]))) {
                     cnt++;
                 }
             }
@@ -1055,6 +1146,25 @@ void QFEvaluationPropertyEditor::filterResultsTextChanged(const QString &text)
 {
     bool error=false;
     if (chkFilterResultsRegExp->isChecked()) {
+        QRegExp rx(text);
+        error=!rx.isValid();
+    }
+    QWidget* s=qobject_cast<QWidget*>(sender());
+    if (s) {
+       QPalette p=s->palette();
+       if (error) {
+           p.setColor(QPalette::Text, QColor("darkred"));
+       } else {
+           p.setColor(QPalette::Text, edtName->palette().color(QPalette::Text));
+       }
+       s->setPalette(p);
+    }
+}
+
+void QFEvaluationPropertyEditor::filterRecordsTextChanged(const QString &text)
+{
+    bool error=false;
+    if (chkFilterRecordsRegExp->isChecked()) {
         QRegExp rx(text);
         error=!rx.isValid();
     }

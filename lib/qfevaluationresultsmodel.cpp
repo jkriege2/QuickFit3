@@ -50,7 +50,7 @@ void QFEvaluationResultsModel::resultsChanged(QFRawDataRecord* record, const QSt
     if ( (column<0) || (row<0) ) {
         QTime t;
         t.start();
-        qDebug()<<"--- QFEvaluationResultsModel::resultsChanged()";
+        //qDebug()()<<"--- QFEvaluationResultsModel::resultsChanged()";
         if (evaluation) {
             //lastResultNames=evaluation->getProject()->rdrCalcMatchingResultsNames(evalFilter);
             lastResults=evaluation->getProject()->rdrCalcMatchingResults(evalFilter);
@@ -109,7 +109,7 @@ void QFEvaluationResultsModel::resultsChanged(QFRawDataRecord* record, const QSt
         }
 
         reset();
-        qDebug()<<"--- QFEvaluationResultsModel::resultsChanged() DONE: "<<t.elapsed();
+        //qDebug()()<<"--- QFEvaluationResultsModel::resultsChanged() DONE: "<<t.elapsed();
     }
 
 }
@@ -117,36 +117,44 @@ void QFEvaluationResultsModel::resultsChanged(QFRawDataRecord* record, const QSt
 void QFEvaluationResultsModel::setResultFilter(QString filter)
 {
     resultFilter=filter;
+
+    if (evaluation) evaluation->setQFProperty("RESULTS_FILTER", filter);
+
     resultsChanged();
 }
 
 void QFEvaluationResultsModel::setFilesFilter(QString filter)
 {
     filesFilter=filter;
+    if (evaluation) evaluation->setQFProperty("FILES_FILTER", filter);
     resultsChanged();
 }
 
 void QFEvaluationResultsModel::setResultFilterNot(QString filter)
 {
     resultFilterNot=filter;
+    if (evaluation) evaluation->setQFProperty("RESULTS_FILTERNOT", filter);
     resultsChanged();
 }
 
 void QFEvaluationResultsModel::setFilesFilterNot(QString filter)
 {
     filesFilterNot=filter;
+    if (evaluation) evaluation->setQFProperty("FILES_FILTERNOT", filter);
     resultsChanged();
 }
 
 void QFEvaluationResultsModel::setFilesFilterUsesRegExp(bool use)
 {
     filesFilterRegExp=use;
+    if (evaluation) evaluation->setQFProperty("FILES_FILTER_REGEXP", use);
     resultsChanged();
 }
 
 void QFEvaluationResultsModel::setResultFilterUsesRegExp(bool use)
 {
     resultFilterRegExp=use;
+    if (evaluation) evaluation->setQFProperty("RESULTS_FILTER_REGEXP", use);
     resultsChanged();
 }
 

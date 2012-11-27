@@ -38,9 +38,6 @@ class QFEVALItem : public QFEvaluationItem {
         virtual QString getEditorName() { return QString("Evaluation"); };
         /** \brief create an object for the i-th editor pane */
         virtual QFEvaluationEditor* createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent=NULL);
-        /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
-         *         list of raw data records presented to the user */
-        virtual bool isApplicable(QFRawDataRecord* record);
 
         
         /** \breif return \c true if an evaluation has been performed for the given record \a r1 */
@@ -55,6 +52,9 @@ class QFEVALItem : public QFEvaluationItem {
 
 
     protected:
+        /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
+         *         list of raw data records presented to the user */
+        virtual bool isApplicable(QFRawDataRecord* record);
         
         /** \brief write object contents into XML file
          *

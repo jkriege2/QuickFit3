@@ -56,9 +56,6 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation {
         virtual QString getEditorName() { return QString("Fit"); }
         /** \brief create an object for the i-th editor pane */
         virtual QFEvaluationEditor* createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent=NULL);
-        /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
-         *         list of raw data records presented to the user */
-        virtual bool isApplicable(QFRawDataRecord* record);
 
 
         /** \brief set the current fitting algorithm */
@@ -99,6 +96,10 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation {
         virtual double* allocWeights(bool* weightsOK=NULL, QFRawDataRecord* record=NULL, int run=-100, int data_start=-1, int data_end=-1)const ;
 
     protected:
+        /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
+         *         list of raw data records presented to the user */
+        virtual bool isApplicable(QFRawDataRecord* record);
+
         /*! \copydoc QFFitResultsEvaluation::intWriteDataAlgorithm()      */
         virtual void intWriteDataAlgorithm(QXmlStreamWriter& w) const;
 

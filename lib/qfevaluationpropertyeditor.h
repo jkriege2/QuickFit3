@@ -46,7 +46,10 @@ class QFLIB_EXPORT QFEvaluationRawDataModelProxy : public QSortFilterProxyModel 
 
         virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
         virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+
         virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+
+
 
     protected slots:
         /** \brief called when the selection in the currently set evaluation changed */
@@ -81,6 +84,10 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         virtual ~QFEvaluationPropertyEditor();
         /** \brief set a ProgramOptions object to use for storing application settings */
         void setSettings(ProgramOptions* settings);
+        /** \brief switches the filtering of the files list on/off */
+        void setFilesListFilteres(bool filtered);
+        bool isFilesListFiltered() const;
+
         /** \brief write the settings */
         virtual void writeSettings();
         /** \brief return widget ID */
@@ -158,9 +165,12 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
 
         void filterFilesTextChanged(const QString &text);
         void filterResultsTextChanged(const QString &text);
+        void filterRecordsTextChanged(const QString &text);
         void currentTabChanged(int tab);
         void checkHelpAvailable();
         void propertiesTextChanged(const QString& text);
+
+        void filterRecordsChanged();
 
         void deleteSelectedRecords();
     protected:
@@ -241,6 +251,14 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         QFCompleterFromFile* compFilterResultsNot;
         QCheckBox* chkFilterFilesRegExp;
         QCheckBox* chkFilterResultsRegExp;
+
+        QFEnhancedLineEdit* edtFilterRecords;
+        QFEnhancedLineEdit* edtFilterRecordsNot;
+        QFCompleterFromFile* compFilterRecords;
+        QFCompleterFromFile* compFilterRecordsNot;
+        QCheckBox* chkFilterRecordsRegExp;
+        QWidget* widFilterRecords;
+        bool filesListFiltered;
 
 
         /** \brief points to a settings object that is used to store application settings */

@@ -45,9 +45,6 @@ class QFSPIMLightsheetEvaluationItem : public QFEvaluationItem {
         virtual QString getEditorName() { return QString("Lightsheet Analysis"); };
         /** \brief create an object for the i-th editor pane */
         virtual QFEvaluationEditor* createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent=NULL);
-        /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
-         *         list of raw data records presented to the user */
-        virtual bool isApplicable(QFRawDataRecord* record);
 
         
         /** \breif return \c true if an evaluation has been performed for the given record \a r1 */
@@ -61,7 +58,10 @@ class QFSPIMLightsheetEvaluationItem : public QFEvaluationItem {
 
         void doEvaluation(QFRawDataRecord *record, int stack, int stack_pos, int channel, double deltaX, double deltaZ, QFFitFunction* model, QFFitAlgorithm* algorithm, Orientation orientation=fitRows, bool useMask=true) const;
     protected:
-        
+        /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
+         *         list of raw data records presented to the user */
+        virtual bool isApplicable(QFRawDataRecord* record);
+
         /** \brief write object contents into XML file
          *
          *  this function saves the id of the current fit function and algorithm, as well as the contents of parameterStore to

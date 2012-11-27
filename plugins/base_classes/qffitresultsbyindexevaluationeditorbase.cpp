@@ -30,7 +30,7 @@ void QFFitResultsByIndexEvaluationEditorBase::copyUserMinToAll(int userMin) {
     QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();
 
     for (int i=0; i<recs.size(); i++) {
-        if (current->isApplicable(recs[i])) {
+        if (current->isFilteredAndApplicable(recs[i])) {
             QFRawDataRecord* rdr=recs[i];
             rdr->disableEmitPropertiesChanged();
             for (int r=data->getIndexMin(rdr); r<=data->getIndexMax(rdr); r++) {
@@ -53,7 +53,7 @@ void QFFitResultsByIndexEvaluationEditorBase::copyUserMaxToAll(int userMax) {
     QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();
 
     for (int i=0; i<recs.size(); i++) {
-        if (current->isApplicable(recs[i])) {
+        if (current->isFilteredAndApplicable(recs[i])) {
             QFRawDataRecord* rdr=recs[i];
             rdr->disableEmitPropertiesChanged();
             for (int r=data->getIndexMin(rdr); r<=data->getIndexMax(rdr); r++) {
@@ -77,7 +77,7 @@ void QFFitResultsByIndexEvaluationEditorBase::copyUserMinMaxToAll(int userMin, i
     QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();
 
     for (int i=0; i<recs.size(); i++) {
-        if (current->isApplicable(recs[i])) {
+        if (current->isFilteredAndApplicable(recs[i])) {
             QFRawDataRecord* rdr=recs[i];
             rdr->disableEmitPropertiesChanged();
             for (int r=data->getIndexMin(rdr); r<=data->getIndexMax(rdr); r++) {

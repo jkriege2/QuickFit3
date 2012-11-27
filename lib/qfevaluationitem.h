@@ -117,6 +117,10 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         /** \brief initialize from QDomElement */
         void init(QDomElement& e);
 
+        /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
+         *         list of raw data records presented to the user */
+        bool isFilteredAndApplicable(QFRawDataRecord* record);
+
 
         /** \brief return the next sibling rawdata record in the project */
         inline QFEvaluationItem* getNext() { return project->getNextEvaluation(this); };
@@ -144,10 +148,6 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
 
 
 
-
-        /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
-         *         list of raw data records presented to the user */
-        virtual bool isApplicable(QFRawDataRecord* record) { return true; };
 
         /** \brief returns whether the user may select a set of records (\c true ) or not (\c false ). */
         bool getUseSelection() const { return useSelection; };
@@ -235,7 +235,19 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         inline void set_doEmitPropertiesChanged(bool enable) {
             doEmitPropertiesChanged=enable;
         }
+
+        QString getNameFilter() const;
+        bool getNameFilterRegExp() const;
+        QString getNameNotFilter() const;
+        bool getNameNotFilterRegExp() const;
+
     public slots:
+        /** \brief set a wildcard/regexp filter string to filter records according to their name (each record containing the filter string will match)*/
+        void setNameFilter(QString filter, bool regexp=false);
+        /** \brief set a wildcard/regexp filter string to filter records according to their name (each NOT record containing the filter string will match)*/
+        void setNameNotFilter(QString filter, bool regexp=false);
+        /** \brief set a wildcard/regexp filter string to filter records according to their name (each NOT record containing the filter string will match)*/
+        void setNameNameNotFilter(QString filter, QString filterNot, bool regexp=false, bool regexpNot=false);
         /** \brief set the name */
         void setName(const QString n);
         /** \brief set the description  */
@@ -266,6 +278,12 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         void recordAboutToBeDeleted(QFRawDataRecord* r);
 
     protected:
+
+        /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
+         *         list of raw data records presented to the user */
+        virtual bool isApplicable(QFRawDataRecord* record) { return true; };
+
+
         /** \brief ID of the raw data record */
         int ID;
         /** \brief name of the raw data record */
@@ -282,6 +300,9 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         bool doEmitResultsChanged;
         /** \brief en-/disable emiting of propertiesChanged() signal */
         bool doEmitPropertiesChanged;
+
+        QRegExp nameFilter;
+        QRegExp nameNotFilter;
 
         /** \brief read object contents from QDomElement */
         void readXML(QDomElement& e);

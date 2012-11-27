@@ -124,6 +124,10 @@ QFRDRTableFormulaDialog::QFRDRTableFormulaDialog(QWidget *parent) :
     QStringList files=d.entryList(filter, QDir::Files);
     threadsFinished=0;
     maxThreads=2;
+
+    d=QDir(QFPluginServices::getInstance()->getMainHelpDirectory()+"parserreference/");
+    files.append(d.entryList(filter, QDir::Files));
+
     QList<QStringList> absFiles;
 
     for (int i=0; i<maxThreads; i++) {

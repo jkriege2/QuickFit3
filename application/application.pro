@@ -88,4 +88,11 @@ macx{
 ASSETSSTYLESHEET_FILES.files = ./assets/stylesheets/*.*
 ASSETSSTYLESHEET_FILES.path = $${QFOUTPUT}/assets/stylesheets/
 
-INSTALLS += ASSETSSTYLESHEET_FILES
+
+HELPREF_FILES.files = ./help/parserreference/*.*
+HELPREF_FILES.path = $${QFOUTPUT}/assets/help/parserreference/
+
+HELPREFPIC_FILES.files = ./help/parserreference/pic/*.*
+HELPREFPIC_FILES.path = $${QFOUTPUT}/assets/help/parserreference/pic/
+
+INSTALLS += ASSETSSTYLESHEET_FILES HELPREF_FILES HELPREFPIC_FILES

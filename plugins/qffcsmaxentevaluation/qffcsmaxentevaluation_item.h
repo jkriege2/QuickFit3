@@ -43,9 +43,6 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation,
         virtual QString getEditorName() { return QString("Evaluation"); }
         /** \brief create an object for the i-th editor pane */
         virtual QFEvaluationEditor* createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent=NULL);
-        /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
-         *         list of raw data records presented to the user */
-        virtual bool isApplicable(QFRawDataRecord* record);
 
         /** \brief do the evaluation */
         virtual void doFit(QFRawDataRecord* record, int index, int model, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, int runAvgWidth=11, int residualHistogramBins=25);
@@ -126,7 +123,10 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation,
         virtual QString getEvaluationResultID(int currentIndex, int model) const;
         using QFUsesResultsByIndexAndModelEvaluation::getEvaluationResultID;
 protected:
-        
+        /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
+         *         list of raw data records presented to the user */
+        virtual bool isApplicable(QFRawDataRecord* record);
+
         /** \brief write object contents into XML file
          *
          *  this function saves the id of the current fit function and algorithm, as well as the contents of parameterStore to

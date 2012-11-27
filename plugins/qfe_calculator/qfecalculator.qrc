@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="qfe_calculator/qfecalculator.png">./icons/qfecalculator.png</file>
+</qresource>
+</RCC>

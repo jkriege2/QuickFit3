@@ -102,6 +102,10 @@ SUBDIRS += plg_calc_diffcoeff
 plg_calc_diffcoeff.subdir=./plugins/calc_diffcoeff
 plg_calc_diffcoeff.depends = lib libqf3widgets
 
+SUBDIRS += plg_qfe_calculator
+plg_qfe_calculator.subdir=./plugins/qfe_calculator
+plg_qfe_calculator.depends = lib libqf3widgets
+
 SUBDIRS += plg_qfe_acquisitiontest
 plg_qfe_acquisitiontest.subdir=./plugins/qfe_acquisitiontest
 plg_qfe_acquisitiontest.depends = lib libqf3widgets

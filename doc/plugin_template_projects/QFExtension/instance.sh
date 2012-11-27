@@ -1,8 +1,8 @@
 #! /bin/bash
 
 function replace_in_all {
-	echo "replace: " $1 
-	for i in ./$FNAME/*.cpp ./$FNAME/*.h ./$FNAME/*.pro ./$FNAME/*.qrc ./$FNAME/help/*.html; do 
+	echo "replace: " $1
+	for i in ./$FNAME/*.cpp ./$FNAME/*.h ./$FNAME/*.pro ./$FNAME/*.qrc ./$FNAME/help/*.html; do
 	  echo "  -> " $i
 	  sed $1 $i > $i.temp | mv $i.temp $i
 	done
@@ -12,7 +12,7 @@ CLASSNAME=$1
 TARGETNAME=$2
 BASENAME=qfextension_imp
 
-echo "This script will create a set of usable files from this template. 
+echo "This script will create a set of usable files from this template.
 In this course you will be asked for some information (e.g. class names ...)!
 
 "
@@ -40,8 +40,8 @@ echo -n "file name for QFExtension implementation: " $FNAME ".*
 "
 mkdir -p $FNAME
 
-for i in ${BASENAME}.*; do 
-  cp -v "$i" "./$FNAME/${FNAME}${i/$BASENAME}"; 
+for i in ${BASENAME}.*; do
+  cp -v "$i" "./$FNAME/${FNAME}${i/$BASENAME}";
 done
 
 mkdir -p $FNAME/translations

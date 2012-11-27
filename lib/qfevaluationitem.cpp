@@ -16,6 +16,8 @@ QFEvaluationItem::QFEvaluationItem(QFProject* parent, bool showRDRList, bool use
     errorDesc="";
     name="";
     description="";
+    nameFilter=QRegExp();
+    nameNotFilter=QRegExp();
     if (project) connect(project, SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
 }
 
@@ -39,6 +41,15 @@ void QFEvaluationItem::init(QDomElement& e) {
     //std::cout<<"created QFEvaluationItem\n";
 }
 
+bool QFEvaluationItem::isFilteredAndApplicable(QFRawDataRecord *record)
+{
+    if (!record) return false;
+    return isApplicable(record)
+            && (nameFilter.pattern().isEmpty() || record->getName().indexOf(nameFilter)>=0)
+            && (nameNotFilter.pattern().isEmpty() || record->getName().indexOf(nameNotFilter)<0);
+
+}
+
 QFEvaluationItem::~QFEvaluationItem() {
     //std::cout<<"deleting QFEvaluationItem\n";
     //std::cout<<"deleting QFEvaluationItem ... OK\n";
@@ -58,6 +69,10 @@ void QFEvaluationItem::readXML(QDomElement& e) {
 
     te=e.firstChildElement("properties");
     readProperties(te);
+    nameFilter.setPattern(getProperty("RECORD_FILTER", "").toString());
+    nameNotFilter.setPattern(getProperty("RECORD_FILTERNOT", "").toString());
+    nameFilter.setPatternSyntax(getProperty("RECORD_FILTER_REGEXP", false).toBool()?QRegExp::RegExp:QRegExp::Wildcard);
+    nameNotFilter.setPatternSyntax(getProperty("RECORD_FILTERNOT_REGEXP", false).toBool()?QRegExp::RegExp:QRegExp::Wildcard);
 
     //std::cout<<"    reading XML: data\n";
 
@@ -116,7 +131,7 @@ void QFEvaluationItem::writeXML(QXmlStreamWriter& w) {
 }
 
 void QFEvaluationItem::setHighlightedRecord(QFRawDataRecord* record) {
-    if (isApplicable(record)) {
+    if (isFilteredAndApplicable(record)) {
         QFRawDataRecord* old=highlightedRecord;
         //disconnect(old, NULL, this, NULL);
         highlightedRecord=record;
@@ -128,7 +143,7 @@ void QFEvaluationItem::setHighlightedRecord(QFRawDataRecord* record) {
 
 void QFEvaluationItem::setSelectedRecords(QList<QPointer<QFRawDataRecord> > records) {
     for (int i=records.size()-1; i>=0; i--) {
-        if (!isApplicable(records[i])) records.removeAt(i);
+        if (!isFilteredAndApplicable(records[i])) records.removeAt(i);
         //disconnect(selectedRecords[i], NULL, this, NULL);
     }
     selectedRecords=records;
@@ -138,7 +153,7 @@ void QFEvaluationItem::setSelectedRecords(QList<QPointer<QFRawDataRecord> > reco
 }
 
 void QFEvaluationItem::selectRecord(QFRawDataRecord* record) {
-    if ((record!=NULL) && isApplicable(record)) {
+    if ((record!=NULL) && isFilteredAndApplicable(record)) {
         if (!selectedRecords.contains(record)) {
             selectedRecords.append(record);
             //qDebug()<<"QFEvaluationItem ("<<name<<") emits selectionChanged("<<selectedRecords.size()<<")";
@@ -187,7 +202,7 @@ void QFEvaluationItem::selectAllAplicableRecords() {
         bool added=false;
         for (int i=0; i<project->getRawDataCount(); i++) {
             QFRawDataRecord* rec=project->getRawDataByNum(i);
-            if (isApplicable(rec) && (!selectedRecords.contains(rec))) {
+            if (isFilteredAndApplicable(rec) && (!selectedRecords.contains(rec))) {
                 added=true;
                 selectedRecords.append(rec);
             }
@@ -204,7 +219,7 @@ QList<QPointer<QFRawDataRecord> > QFEvaluationItem::getApplicableRecords() {
     QList<QPointer<QFRawDataRecord> > recs;
     for (int i=0; i<project->getRawDataCount(); i++) {
         QPointer<QFRawDataRecord> rec=project->getRawDataByNum(i);
-        if (isApplicable(rec)) recs.append(rec);
+        if (isFilteredAndApplicable(rec)) recs.append(rec);
     }
     return recs;
 }
@@ -259,4 +274,62 @@ void QFEvaluationItem::emitPropertiesChanged(const QString& property, bool visib
         //qDebug()<<"QFEvaluationItem ("<<name<<") emits propertiesChanged()";
         emit propertiesChanged(property, visible);
     }
+}
+
+void QFEvaluationItem::setNameFilter(QString filter, bool regexp)
+{
+    nameFilter.setPattern(filter);
+    nameFilter.setCaseSensitivity(Qt::CaseInsensitive);
+    if (regexp) nameFilter.setPatternSyntax(QRegExp::RegExp);
+    else nameFilter.setPatternSyntax(QRegExp::Wildcard);
+    setQFProperty("RECORD_FILTER", filter, false, false);
+    setQFProperty("RECORD_FILTER_REGEXP", regexp, false, false);
+}
+
+void QFEvaluationItem::setNameNotFilter(QString filter, bool regexp)
+{
+    nameNotFilter.setPattern(filter);
+    nameNotFilter.setCaseSensitivity(Qt::CaseInsensitive);
+    if (regexp) nameNotFilter.setPatternSyntax(QRegExp::RegExp);
+    else nameNotFilter.setPatternSyntax(QRegExp::Wildcard);
+    setQFProperty("RECORD_FILTERNOT", filter, false, false);
+    setQFProperty("RECORD_FILTERNOT_REGEXP", regexp, false, false);
+}
+
+void QFEvaluationItem::setNameNameNotFilter(QString filter, QString filterNot, bool regexp, bool regexpNot)
+{
+    nameFilter.setPattern(filter);
+    nameFilter.setCaseSensitivity(Qt::CaseInsensitive);
+    if (regexp) nameFilter.setPatternSyntax(QRegExp::RegExp);
+    else nameFilter.setPatternSyntax(QRegExp::Wildcard);
+    nameNotFilter.setPattern(filterNot);
+    nameNotFilter.setCaseSensitivity(Qt::CaseInsensitive);
+    if (regexpNot) nameNotFilter.setPatternSyntax(QRegExp::RegExp);
+    else nameNotFilter.setPatternSyntax(QRegExp::Wildcard);
+    setQFProperty("RECORD_FILTER", filter, false, false);
+    setQFProperty("RECORD_FILTERNOT", filterNot, false, false);
+    setQFProperty("RECORD_FILTER_REGEXP", regexp, false, false);
+    setQFProperty("RECORD_FILTERNOT_REGEXP", regexpNot, false, false);
+
+}
+
+
+QString QFEvaluationItem::getNameFilter() const
+{
+    return nameFilter.pattern();
+}
+
+bool QFEvaluationItem::getNameFilterRegExp() const
+{
+    return nameFilter.patternSyntax()==QRegExp::RegExp;
+}
+
+QString QFEvaluationItem::getNameNotFilter() const
+{
+    return nameNotFilter.pattern();
+}
+
+bool QFEvaluationItem::getNameNotFilterRegExp() const
+{
+    return nameNotFilter.patternSyntax()==QRegExp::RegExp;
 }
