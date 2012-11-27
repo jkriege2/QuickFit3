@@ -230,6 +230,7 @@ protected:
 
         void insertSelectedCorrelationsAsFCSRDR();
         void copyFitResultStatistics();
+        void copyMaskToAll();
 
     protected:
         /** \brief map with all available fit functions */
@@ -384,6 +385,7 @@ protected:
         QAction* actInsertSelectedCorrelationsAsFCSRDR;
         QAction* actCopyFitResultStatistics;
         QComboBox* cmbMaskEditMode;
+        QAction* actCopyMaskToAll;
 
         /** \brief combobox to select a result group */
         QComboBox* cmbResultGroup;

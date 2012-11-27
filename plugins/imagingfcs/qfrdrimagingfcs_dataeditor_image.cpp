@@ -261,6 +261,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     glmask->addWidget(btnMaskByParamIntensity, mskgrpRow, 2);
     connect(actMaskByParamIntensity, SIGNAL(triggered()), this, SLOT(excludeByParamIntensity()));
 
+    actCopyMaskToAll=new QAction(tr("copy mask to files"), this);
+    connect(actCopyMaskToAll, SIGNAL(triggered()), this, SLOT(copyMaskToAll()));
+
 
     QGroupBox* wsel=new QGroupBox(tr(" selection options "), this);
     wsel->setFlat(true);
@@ -1159,6 +1162,14 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     m->addAction(plotter->get_plotter()->get_actPrint());
 
     menuMask=propertyEditor->addMenu("&Mask", 0);
+    menuMask->addAction(actSaveMask);
+    menuMask->addAction(actLoadMask);
+    menuMask->addSeparator();
+    menuMask->addAction(actCopyMask);
+    menuMask->addAction(actCopyMaskToAll);
+    menuMask->addSeparator();
+    menuMask->addAction(actPasteMask);
+    menuMask->addSeparator();
     menuMask->addAction(actUse);
     menuMask->addAction(actDontUse);
     menuMask->addAction(actClearMask);
@@ -1166,12 +1177,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuMask->addAction(actMaskByIntensity);
     menuMask->addAction(actMaskByGofIntensity);
     menuMask->addAction(actMaskByParamIntensity);
-    menuMask->addSeparator();
-    menuMask->addAction(actSaveMask);
-    menuMask->addAction(actLoadMask);
-    menuMask->addSeparator();
-    menuMask->addAction(actCopyMask);
-    menuMask->addAction(actPasteMask);
+
 
     menuSelection=propertyEditor->addMenu("&Selection", 0);
     menuSelection->addAction(actSaveSelection);
@@ -4370,6 +4376,48 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
 
             }
         }
+    }
+}
+
+void QFRDRImagingFCSImageEditor::copyMaskToAll() {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+
+    if (m) {
+        QStringList names;
+        QList<QVariant> ids;
+        for (int i=0; i<m->getProject()->getRawDataCount(); i++) {
+            QFRawDataRecord* rdr=m->getProject()->getRawDataByNum(i);
+            if (rdr && rdr->getType()==m->getType()) {
+                names<<rdr->getName();
+                ids<<QVariant(rdr->getID());
+            }
+        }
+        if (names.size()>0) {
+            QFSelectionListDialog* dlg=new QFSelectionListDialog(this, false);
+            QCheckBox* chkClearMask=new QCheckBox(tr("clear old mask"));
+            dlg->init(names, ids, QList<QColor>(), *(ProgramOptions::getInstance()->getQSettings()), QString("QFRDRImagingFCSImageEditor/copyMaskToAll/"));
+            dlg->addWidget("", chkClearMask);
+            if (dlg->exec()) {
+                QString mask=m->maskToString();
+                QList<QVariant> sel=dlg->getSelected();
+                QProgressDialog progress(this);
+                progress.setLabelText(tr("copying mask to all selected files"));
+                progress.setRange(0,sel.size()-1);
+                progress.show();
+                for (int i=0; i<sel.size(); i++) {
+                    QFRDRImagingFCSData* rdr=qobject_cast<QFRDRImagingFCSData*>(m->getProject()->getRawDataByID(sel[i].toInt()));
+                    if (rdr) {
+                        if (chkClearMask->isChecked()) rdr->maskClear();
+                        rdr->maskLoadFromString(mask);
+                    }
+                    progress.setValue(i);
+                    QApplication::processEvents();
+                    if (progress.wasCanceled()) break;
+                }
+            }
+            delete dlg;
+        }
+
     }
 }
 

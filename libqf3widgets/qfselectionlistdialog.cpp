@@ -3,11 +3,14 @@
 #include <QInputDialog>
 #include "qfhtmldelegate.h"
 
-QFSelectionListDialog::QFSelectionListDialog(QWidget *parent) :
+QFSelectionListDialog::QFSelectionListDialog(QWidget *parent, bool selection_saveable) :
     QDialog(parent),
     ui(new Ui::QFSelectionListDialog)
 {
+    this->selection_saveable=selection_saveable;
     ui->setupUi(this);
+    ui->btnSave->setVisible(selection_saveable);
+    ui->comboBox->setVisible(selection_saveable);
 }
 
 QFSelectionListDialog::~QFSelectionListDialog()
@@ -112,13 +115,14 @@ void QFSelectionListDialog::addWidget(const QString& label, QWidget *widget)
 }
 
 void QFSelectionListDialog::selectItems(QList<bool> items)
-{
+{    
     for (int i=0; i<ui->listWidget->count(); i++) {
         ui->listWidget->item(i)->setCheckState(items.value(i, ui->listWidget->item(i)->checkState()==Qt::Checked)?(Qt::Checked):(Qt::Unchecked));
     }
 }
 
 void QFSelectionListDialog::on_btnSave_clicked() {
+    if (!selection_saveable) return;
     QString name=tr("my selection name");
     QStringList items=getDataColumnsByUserSaved.keys();
     items<<name;
@@ -152,6 +156,7 @@ void QFSelectionListDialog::on_btnSelectAll_clicked() {
 }
 
 void QFSelectionListDialog::getDataColumnsByUserComboBoxSelected(int index) {
+    if (!selection_saveable) return;
     QString name=ui->comboBox->itemText(index);
     QStringList newItems=getDataColumnsByUserSaved.value(name, QStringList());
     if (getDataColumnsByUserSaved.contains(name)) {
@@ -167,6 +172,7 @@ void QFSelectionListDialog::getDataColumnsByUserComboBoxSelected(int index) {
 
 
 void QFSelectionListDialog::getDataColumnsByUserItemChanged(QListWidgetItem *widgetitem) {
+    if (!selection_saveable) return;
     if (!ui->listWidget) return;
     QStringList data;
     for (int i=0; i<ui->listWidget->count(); i++) {

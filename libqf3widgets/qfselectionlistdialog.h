@@ -28,7 +28,7 @@ class QFWIDLIB_EXPORT QFSelectionListDialog : public QDialog
         Q_OBJECT
         
     public:
-        explicit QFSelectionListDialog(QWidget *parent = 0);
+        explicit QFSelectionListDialog(QWidget *parent = 0, bool selection_saveable=true);
         ~QFSelectionListDialog();
 
         void init(QStringList itemNames, QStringList itemData, QSettings &settings, const QString &prefix=QString());
@@ -52,6 +52,7 @@ class QFWIDLIB_EXPORT QFSelectionListDialog : public QDialog
         QMap<QString, QStringList> getDataColumnsByUserSaved;
     private:
         Ui::QFSelectionListDialog *ui;
+        bool selection_saveable;
 };
 
 #endif // QFSELECTIONLISTDIALOG_H
