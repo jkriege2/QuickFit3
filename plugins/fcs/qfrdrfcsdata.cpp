@@ -154,6 +154,11 @@ void QFRDRFCSData::calcBinnedRate() {
     emitRawDataChanged();
 }
 
+int QFRDRFCSData::leaveoutGetRunCount() const
+{
+    return getCorrelationRuns();
+}
+
 QFRawDataRecord::FileListEditOptions QFRDRFCSData::isFilesListEditable() const
 {
     QString filetype=getProperty("FILETYPE", "unknown").toString().toUpper();

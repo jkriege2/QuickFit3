@@ -1,6 +1,7 @@
 #include "qfrdrimagingfcs_dataeditor.h"
 #include "qfrdrimagingfcs_data.h"
 #include <QDebug>
+#include "qfrawdatapropertyeditor.h"
 
 
 void QFRDRImagingFCSDataEditor::excludeRuns() {
@@ -51,6 +52,11 @@ QFRDRImagingFCSDataEditor::~QFRDRImagingFCSDataEditor()
 }
 
 void QFRDRImagingFCSDataEditor::createWidgets() {
+
+    correlationMaskTools=new QFCorrelationMaskTools(this);
+    connect(correlationMaskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChangedRecalc()));
+
+
     int row=0;
     QLabel* l;
     QVBoxLayout* lb=new QVBoxLayout(this);
@@ -231,6 +237,12 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     splitter->setStretchFactor(0,5);
     splitter->setStretchFactor(1,1);
 
+
+    menuMask=propertyEditor->addMenu("&Mask", 1);
+    correlationMaskTools->registerMaskToolsToMenu(menuMask);
+    menuMask->addSeparator();
+    correlationMaskTools->registerCorrelationToolsToMenu(menuMask);
+
 };
 
 void QFRDRImagingFCSDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
@@ -239,6 +251,7 @@ void QFRDRImagingFCSDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
         disconnect(old, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
     }
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    correlationMaskTools->setRDR(current);
     if (m) {
         runs.setCurrent(current);
         sliders->disableSliderSignals();
@@ -292,6 +305,13 @@ void QFRDRImagingFCSDataEditor::runsModeChanged(int c) {
 }
 
 void QFRDRImagingFCSDataEditor::rawDataChanged() {
+    replotData();
+}
+
+void QFRDRImagingFCSDataEditor::rawDataChangedRecalc()
+{
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (m) m->recalcCorrelations();
     replotData();
 }
 

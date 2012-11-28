@@ -31,6 +31,7 @@
 #include <QFile>
 #include <QToolBar>
 #include "jkverticalscrollarea.h"
+#include "qfcorrelationmasktools.h"
 
 /*! \brief editor for FCS fit parameter images, created from QFRDRImagingFCSData
     \ingroup qf3rdrdp_imaging_fcs
@@ -135,14 +136,6 @@ protected:
         /** \brief exclude runs by intensity in the gof image */
         void excludeByGOFIntensity();
 
-        /** \brief load a mask file as a selection from hard disk */
-        void loadMask();
-        /** \brief load a mask file as a selection from the clipboard */
-        void pasteMask();
-        /** \brief save mask to harddisk */
-        void saveMask();
-        /** \brief copy mask to clipboard */
-        void copyMask();
         /** \brief save selection to harddisk */
         void saveSelection();
         /** \brief load a selection from harddisk */
@@ -421,8 +414,6 @@ protected:
         QToolButton* btnPasteMask;
         QAction* actCopySelection;
         QAction* actPasteSelection;
-        QAction* actCopyMask;
-        QAction* actPasteMask;
 
 
 
@@ -561,9 +552,7 @@ protected:
         QAction* actMaskByParamIntensity;
 
         QAction* actLoadSelection;
-        QAction* actLoadMask;
         QAction* actSaveSelection;
-        QAction* actSaveMask;
         /** \brief action to print a report */
         QAction* actPrintReport;
 
@@ -579,6 +568,8 @@ protected:
         QMenu* menuData;
         QMenu* menuMask;
         QMenu* menuSelection;
+
+        QFCorrelationMaskTools* correlationMaskTools;
 };
 
 #endif // QFRDRIMAGINGFCSEDITORIMAGE_H

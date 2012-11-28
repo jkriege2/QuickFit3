@@ -54,6 +54,12 @@ QToolButton* createButtonAndAction(QAction*& action, const QIcon& icon, const QS
     return button;
 }
 
+QToolButton* createButtonForAction(QAction* action, QWidget* parent) {
+    QToolButton* button=new QToolButton(parent);
+    button->setDefaultAction(action);
+    return button;
+}
+
 QToolButton* createButtonAndActionShowText(QAction*& action, QWidget* parent) {
     QToolButton* button= createButtonAndAction(action, QIcon(), QString(), parent);
     button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -79,6 +85,17 @@ QToolButton* createButtonAndActionShowText(QAction*& action, const QString& text
 
 QToolButton* createButtonAndActionShowText(QAction*& action, const QIcon& icon, const QString& text, QWidget* parent) {
     QToolButton* button= createButtonAndAction(action, icon, text, parent);
+    button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    QSizePolicy p=button->sizePolicy();
+    p.setControlType(QSizePolicy::PushButton);
+    p.setHorizontalPolicy(QSizePolicy::Minimum);
+    button->setSizePolicy(p);
+    button->setFocusPolicy(Qt::StrongFocus);
+    return button;
+}
+
+QToolButton* createButtonForActionShowText(QAction* action, QWidget* parent) {
+    QToolButton* button= createButtonForAction(action, parent);
     button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     QSizePolicy p=button->sizePolicy();
     p.setControlType(QSizePolicy::PushButton);
@@ -593,4 +610,33 @@ QListWidgetItem* addCheckableQListWidgetItem(QListWidget* listWidget, const QStr
     item->setData(Qt::UserRole, userData);
     listWidget->addItem(item);
     return item;
+}
+
+
+
+QString doubleToUnitString(double value, int past_comma, bool remove_trail0, QChar decimalSeparator, bool HTMLout ) {
+  if (value==0) return "0";
+  QString res=doubleToQString(value, past_comma, 'f', decimalSeparator);
+  if (fabs(value)>=1e3) res=doubleToQString(value/1e3, past_comma, 'f', decimalSeparator)+"k";
+  if (fabs(value)>=1e6) res=doubleToQString(value/1e6, past_comma, 'f', decimalSeparator)+"M";
+  if (fabs(value)>=1e9) res=doubleToQString(value/1e9, past_comma, 'f', decimalSeparator)+"G";
+  if (fabs(value)>=1e12) res=doubleToQString(value/1e12, past_comma, 'f', decimalSeparator)+"T";
+  if (fabs(value)>=1e15) res=doubleToQString(value/1e15, past_comma, 'f', decimalSeparator)+"P";
+  if (fabs(value)<1) res=doubleToQString(value/1e-3, past_comma, 'f', decimalSeparator)+"m";
+  if (fabs(value)<1e-3) res=doubleToQString(value/1e-6, past_comma, 'f', decimalSeparator)+QString((HTMLout)?QString("&mu;"):QString("u"));
+  if (fabs(value)<1e-6) res=doubleToQString(value/1e-9, past_comma, 'f', decimalSeparator)+"n";
+  if (fabs(value)<1e-9) res=doubleToQString(value/1e-12, past_comma, 'f', decimalSeparator)+"f";
+  if (fabs(value)==0) res=doubleToQString(value, past_comma, 'f', decimalSeparator);
+  if (remove_trail0) {
+      if (value==0) return "0";
+      if (res.indexOf(decimalSeparator)<0) return res;
+      int i=res.lastIndexOf(QRegExp("\\d"));
+      int ilast=i+1;
+      while (i>0 && res[i]=='0') {
+          i--;
+      }
+      if (res[i]==decimalSeparator) i--; // remove decimal divider
+      return res.left(i+1)+res.right(res.size()-ilast);
+  }
+  return res;
 }

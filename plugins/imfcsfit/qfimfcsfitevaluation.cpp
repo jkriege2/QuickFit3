@@ -392,6 +392,13 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                     //record->disableEmitResultsChanged();
 
                     QFFitAlgorithm::FitResult result=doFitThread->getResult();
+
+                    for (int i=0; i<ffunc->paramCount(); i++) {
+                        if (!(ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit)) {
+                            errors[i]=errorsI[i];
+                        }
+                    }
+
                     ffunc->calcParameter(params, errors);
                     ffunc->sortParameter(params, errors);
                     ffunc->calcParameter(params, errors);
@@ -401,8 +408,6 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                             if (!oparams.isEmpty()) oparams=oparams+";  ";
 
                             oparams=oparams+QString("%1 = %2+/-%3").arg(ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
-                        } else {
-                            errors[i]=errorsI[i];
                         }
                         //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
                     }
@@ -733,6 +738,7 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
         double* params=allocFillParameters(record, run);
         double* initialparams=allocFillParameters(record, run);
         double* errors=allocFillParameterErrors(record, run);
+        double* errorsI=allocFillParameterErrors(record, run);
         double* paramsMin=allocFillParametersMin();
         double* paramsMax=allocFillParametersMax();
         bool* paramsFix=allocFillFix(record, run);
@@ -775,6 +781,13 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
                     double deltaTime=double(tstart.elapsed());
                 #endif
 
+                for (int i=0; i<ffunc->paramCount(); i++) {
+                    if (!(ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit)) {
+                        errors[i]=errorsI[i];
+                    }
+                    //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
+                }
+
                 ffunc->calcParameter(params, errors);
                 ffunc->sortParameter(params, errors);
                 ffunc->calcParameter(params, errors);
@@ -784,6 +797,8 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
                         if (!oparams.isEmpty()) oparams=oparams+";  ";
 
                         oparams=oparams+QString("%1 = %2+/-%3").arg(ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
+                    } else {
+                        errors[i]=errorsI[i];
                     }
                     //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
                 }
@@ -1050,6 +1065,7 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
         free(params);
         free(initialparams);
         free(errors);
+        free(errorsI);
         free(paramsFix);
         free(paramsMax);
         free(paramsMin);

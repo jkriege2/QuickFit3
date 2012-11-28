@@ -205,6 +205,9 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
          *         depending on the value of autoCalcRateN. */
         virtual void calcBinnedRate();
 
+        /** \brief returns the number of runs in the record */
+        virtual int leaveoutGetRunCount() const;
+
         /** \brief returns whether to leave out a run */
         inline virtual bool leaveoutRun(int run) const { return leaveout.contains(run); };
         /** \brief add a run to the leaveouts */

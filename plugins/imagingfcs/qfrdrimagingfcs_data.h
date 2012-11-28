@@ -105,7 +105,8 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         void setDualViewMode(DualViewMode mode);
 
 
-
+        /** \brief returns the number of runs in the record */
+        virtual int leaveoutGetRunCount() const;
         /** \brief returns whether to leave out a run */
         virtual bool leaveoutRun(int run) const ;
         /** \brief add a run to the leaveouts */

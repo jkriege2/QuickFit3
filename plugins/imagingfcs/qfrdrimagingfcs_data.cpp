@@ -903,6 +903,11 @@ void QFRDRImagingFCSData::setDualViewMode(QFRDRImagingFCSData::DualViewMode mode
     if (m_dualview==QFRDRImagingFCSData::dvVertical) setQFProperty("DUALVIEW_MODE", "vertical", false);
 }
 
+int QFRDRImagingFCSData::leaveoutGetRunCount() const
+{
+    return getCorrelationRuns();
+}
+
 bool QFRDRImagingFCSData::leaveoutRun(int run) const {
     return maskGet(runToX(run), runToY(run));
 }

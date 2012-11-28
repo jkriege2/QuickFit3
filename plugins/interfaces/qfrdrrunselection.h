@@ -12,6 +12,8 @@ class QFRDRRunSelectionsInterface {
         virtual ~QFRDRRunSelectionsInterface() {};
 
 
+        /** \brief returns the number of runs in the record */
+        virtual int leaveoutGetRunCount() const=0;
         /** \brief returns whether to leave out a run */
         virtual bool leaveoutRun(int run) const=0 ;
         /** \brief add a run to the leaveouts */

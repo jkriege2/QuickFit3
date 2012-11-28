@@ -80,6 +80,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     ovlExCol.setAlphaF(0.5);
     excludedColor=ovlExCol;
 
+    correlationMaskTools=new QFCorrelationMaskTools(this);
+    connect(correlationMaskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
+
 
     ///////////////////////////////////////////////////////////////
     // GROUPBOX: parameter selection group box
@@ -215,6 +218,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(actInvertMask, SIGNAL(triggered()), this, SLOT(invertMask()));
     mskgrpRow++;
 
+    /*
     btnSaveMask=createButtonAndActionShowText(actSaveMask, QIcon(":/imaging_fcs/savemask.png"), tr("&save"), w);
     actSaveMask->setToolTip(tr("save the mask to harddisk"));
     glmask->addWidget(btnSaveMask, mskgrpRow, 0);
@@ -231,6 +235,15 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     actPasteMask->setToolTip(tr("paste a mask from clipboard"));
     glmask->addWidget(btnPasteMask, mskgrpRow, 3);
     connect(actPasteMask, SIGNAL(triggered()), this, SLOT(pasteMask()));
+*/
+    btnSaveMask=createButtonForActionShowText(correlationMaskTools->get_actSaveMask(), w);
+    glmask->addWidget(btnSaveMask, mskgrpRow, 0);
+    btnLoadMask=createButtonForActionShowText(correlationMaskTools->get_actLoadMask(), w);
+    glmask->addWidget(btnLoadMask, mskgrpRow, 1);
+    btnCopyMask=createButtonForActionShowText(correlationMaskTools->get_actCopyMask(), w);
+    glmask->addWidget(btnCopyMask, mskgrpRow, 2);
+    btnPasteMask=createButtonForActionShowText(correlationMaskTools->get_actPasteMask(), w);
+    glmask->addWidget(btnPasteMask, mskgrpRow, 3);
 
 
     mskgrpRow++;
@@ -1162,13 +1175,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     m->addAction(plotter->get_plotter()->get_actPrint());
 
     menuMask=propertyEditor->addMenu("&Mask", 0);
-    menuMask->addAction(actSaveMask);
-    menuMask->addAction(actLoadMask);
+    correlationMaskTools->registerMaskToolsToMenu(menuMask);
     menuMask->addSeparator();
-    menuMask->addAction(actCopyMask);
     menuMask->addAction(actCopyMaskToAll);
-    menuMask->addSeparator();
-    menuMask->addAction(actPasteMask);
     menuMask->addSeparator();
     menuMask->addAction(actUse);
     menuMask->addAction(actDontUse);
@@ -1177,6 +1186,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuMask->addAction(actMaskByIntensity);
     menuMask->addAction(actMaskByGofIntensity);
     menuMask->addAction(actMaskByParamIntensity);
+    correlationMaskTools->registerCorrelationToolsToMenu(menuMask);
 
 
     menuSelection=propertyEditor->addMenu("&Selection", 0);
@@ -1554,59 +1564,6 @@ void QFRDRImagingFCSImageEditor::excludeByGOFIntensity() {
     excludeByImage(plteGofImageData);
 }
 
-void QFRDRImagingFCSImageEditor::loadMask() {
-    if (!current) return;
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    if (!m) return;
-    QString filename= qfGetOpenFileName(this, tr("select mask file to open ..."), lastMaskDir, tr("mask files (*.msk)"));
-    if (QFile::exists(filename)) {
-        if (m) {
-            m->maskLoad(filename);
-            m->recalcCorrelations();
-        }
-    }
-
-    rawDataChanged();
-}
-
-void QFRDRImagingFCSImageEditor::saveMask() {
-    if (!current) return;
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    if (!m) return;
-    QString filename= qfGetSaveFileName(this, tr("save mask as ..."), lastMaskDir, tr("mask files (*.msk)"));
-    if (!filename.isEmpty()) {
-        m->maskSave(filename);
-    }
-}
-
-void QFRDRImagingFCSImageEditor::pasteMask() {
-    if (!current) return;
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    if (!m) return;
-
-    QClipboard* clipboard=QApplication::clipboard();
-
-    const QMimeData* mime=clipboard->mimeData();
-    if (mime->hasFormat("quickfit3/pixelselection")) {
-        m->maskLoadFromString(QString::fromUtf8(mime->data("quickfit3/pixelselection")));
-        m->recalcCorrelations();
-    }
-
-    rawDataChanged();
-}
-
-
-void QFRDRImagingFCSImageEditor::copyMask() {
-    if (!current) return;
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    if (!m) return;
-    QString mask=m->maskToString();
-    QClipboard* clipboard=QApplication::clipboard();
-    QMimeData* mime=new QMimeData();
-    mime->setText(mask);
-    mime->setData("quickfit3/pixelselection", mask.toUtf8());
-    clipboard->setMimeData(mime);
-}
 
 QString QFRDRImagingFCSImageEditor::selectionToString()  {
     if (!current) return "";
@@ -1734,6 +1691,7 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         disconnect(old, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
         disconnect(cmbDualView, SIGNAL(currentIndexChanged(int)), this, SLOT(dualviewChanged(int)));
     }
+    correlationMaskTools->setRDR(current);
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
         sliders->disableSliderSignals();

@@ -20,6 +20,10 @@
 
 
 typedef QMap<QString, QVariant> QFStringVariantMap;
+/*! \brief returns a new QToolButton for the specified QAction
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QToolButton* createButtonForAction(QAction* action, QWidget* parent);
 
 /*! \brief returns a new separator action
     \ingroup qf3lib_tools
@@ -83,7 +87,10 @@ QFLIB_EXPORT QToolButton* createButtonAndActionShowText(QAction*& action, const 
  */
 QFLIB_EXPORT QToolButton* createButtonAndActionShowText(QAction*& action, const QIcon& icon, const QString& text, QWidget* parent=NULL);
 
-
+/*! \brief creates a toolbutton for a QAction
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QToolButton* createButtonForActionShowText(QAction* action, QWidget* parent);
 
 
 /*! \brief store the geometry of a given widget to a QSettings
@@ -174,6 +181,11 @@ QFLIB_EXPORT QVariant getQVariantFromString(const QString& type, const QString& 
 
 */
 QFLIB_EXPORT QString doubleToQString(double value, int prec = 10, char f = 'g', QChar decimalSeparator='.' );
+/*! \brief convert a number to a QString with a given decimalSeparator
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString doubleToUnitString(double value, int past_comma=5, bool remove_trail0=false, QChar decimalSeparator='.', bool HTMLout=false );
 
 /*! \brief convert a number to a QString with the c-locale (and without group separator)
     \ingroup qf3lib_tools
