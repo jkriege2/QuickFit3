@@ -138,6 +138,7 @@ void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
     updating=false;
     connectWidgets();
     listGraphs_currentRowChanged(ui->listGraphs->currentRow());
+    updateGraph();
 }
 
 void QFRDRTablePlotWidget::rawDataChanged() {
@@ -148,7 +149,7 @@ void QFRDRTablePlotWidget::rawDataChanged() {
     reloadColumns(ui->cmbLinesYData);
     reloadColumns(ui->cmbLinesYError);
     connectWidgets();
-    updateData();
+    updateGraph();
 }
 
 void QFRDRTablePlotWidget::readSettings(QSettings &settings, const QString &prefix)
@@ -980,6 +981,8 @@ void QFRDRTablePlotWidget::updateGraph() {
                 } else {
                     pg->set_yErrorStyle(JKQTPnoError);
                 }
+
+                //qDebug()<<g.title<<pg->get_xColumn()<<pg->get_yColumn();
                 pg->set_drawLine(g.drawLine);
                 pg->set_symbol(g.symbol);
                 pg->set_symbolSize(g.symbolSize);
@@ -1462,6 +1465,7 @@ void QFRDRTablePlotWidget::disconnectWidgets()
 
 int QFRDRTablePlotWidget::getColumnWithStride(int column, const QFRDRTable::GraphInfo& g)
 {
+    //qDebug()<<"getColumnWithStride  column="<<column<<"    strided: "<<g.isStrided<<" stride="<<g.stride<<" strideStart="<<g.strideStart;
     if (column>=0 && column<ui->plotter->getDatastore()->getColumnCount()) {
         if (g.isStrided) {
             return ui->plotter->getDatastore()->copyColumn(column, g.strideStart-1, g.stride, tr("(%2,%3)-strided \"%1\"").arg(ui->plotter->getDatastore()->getColumnNames().at(column)).arg(g.strideStart).arg(g.stride));
