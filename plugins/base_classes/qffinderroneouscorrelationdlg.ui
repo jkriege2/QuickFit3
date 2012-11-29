@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>475</width>
-    <height>193</height>
+    <width>426</width>
+    <height>396</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
-   <item row="0" column="0">
+   <item row="2" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>lag time range to look at:</string>
@@ -24,7 +24,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
+   <item row="2" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QSpinBox" name="spinLagMin"/>
@@ -61,7 +61,7 @@
      </item>
     </layout>
    </item>
-   <item row="1" column="0">
+   <item row="3" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>cut lowest pixels</string>
@@ -71,7 +71,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="3" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <widget class="QDoubleSpinBox" name="spinLowQuantile">
@@ -104,7 +104,7 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="0">
+   <item row="4" column="0">
     <widget class="QLabel" name="label_4">
      <property name="text">
       <string>cut highest pixels:</string>
@@ -114,7 +114,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="4" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QDoubleSpinBox" name="spinHighQuantile">
@@ -147,21 +147,21 @@
      </item>
     </layout>
    </item>
-   <item row="3" column="0">
+   <item row="5" column="0">
     <widget class="QLabel" name="label_5">
      <property name="text">
       <string>cut statistics:</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
+   <item row="5" column="1">
     <widget class="QLabel" name="labStatistics">
      <property name="text">
       <string/>
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
+   <item row="8" column="1">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -171,7 +171,7 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0">
+   <item row="8" column="0">
     <widget class="QCheckBox" name="chkPreview">
      <property name="text">
       <string>preview</string>
@@ -181,14 +181,14 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
+   <item row="6" column="0">
     <widget class="QLabel" name="label_6">
      <property name="text">
       <string>clear old mask:</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
+   <item row="7" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -201,12 +201,39 @@
      </property>
     </spacer>
    </item>
-   <item row="4" column="1">
+   <item row="6" column="1">
     <widget class="QCheckBox" name="chkClearMask">
      <property name="text">
       <string/>
      </property>
     </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>This function will filter out all correlation curves that can be classified as outliers. To do so, the average correlation amplitude in a given lag time interval &amp;tau;&lt;sub&gt;min&lt;/sub&gt;...&amp;tau;&lt;sub&gt;max&lt;/sub&gt; is averaged for each curve separately:
+&lt;blockquote&gt;&lt;span style=&quot;text-decoration: overline&quot;&gt;g&lt;/span&gt;&lt;sub&gt;i&lt;/sub&gt;=&amp;int;&lt;sub&gt;&amp;tau;&lt;sub&gt;min&lt;/sub&gt;...&amp;tau;&lt;sub&gt;max&lt;/sub&gt;&lt;/sub&gt;g&lt;sub&gt;i&lt;/sub&gt;(&amp;tau;) d&amp;tau;&lt;/blockquote&gt;
+Then those curves are masked where the &lt;span style=&quot;text-decoration: overline&quot;&gt;g&lt;/span&gt;&lt;sub&gt;i&lt;/sub&gt; is smaller than the the q&lt;sub&gt;low&lt;/sub&gt; or higher than the q&lt;sub&gt;heigh&lt;/sub&gt; quantile of the distribution of all curves. The quantiles are given as &quot;cut lowest/highst pixels&quot; below.
+
+</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
