@@ -774,8 +774,8 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
 
 
 
-            // interpret $$list:<list_name>:<filter>$$ items
-            QRegExp rxInsert("\\$\\$(insert|insertglobal)\\:([^\\$\\s]*)\\$\\$", Qt::CaseInsensitive);
+            // interpret $$insert:<filename>$$ and $$insertglobal:<filename>$$ items
+            QRegExp rxInsert("\\$\\$(insert|insertglobal)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxInsert.setMinimal(true);
             count = 0;
             pos = 0;
@@ -805,6 +805,8 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                 ++count;
                 pos += rxInsert.matchedLength();
             }
+
+
 
 
             // interpret $$math:<latex>$$ items

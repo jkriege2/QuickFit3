@@ -34,17 +34,33 @@ void QFRDRPlotEditor::createWidgets() {
     connect(actAddPlot, SIGNAL(triggered()), this, SLOT(addPlot()));
     actDeletePlot=new QAction(QIcon(":/table/plot_delete.png"), tr("delete current plot"), this);
     connect(actDeletePlot, SIGNAL(triggered()), this, SLOT(deleteCurrentPlot()));
+    actDuplicatePlot=new QAction(QIcon(":/table/copy.png"), tr("duplicate the current plot"), this);
+    connect(actDuplicatePlot, SIGNAL(triggered()), this, SLOT(duplicatePlot()));
+    actMovePlotLeft=new QAction(QIcon(":/table/leftarrow.png"), tr("move current plot to the left"), this);
+    connect(actMovePlotLeft, SIGNAL(triggered()), this, SLOT(movePlotUp()));
+    actMovePlotRight=new QAction(QIcon(":/table/rightarrow.png"), tr("move current plot to the right"), this);
+    connect(actMovePlotRight, SIGNAL(triggered()), this, SLOT(movePlotDown()));
 
     tbMain->addAction(actAddPlot);
+    tbMain->addAction(actDuplicatePlot);
+    tbMain->addSeparator();
     tbMain->addAction(actDeletePlot);
+    tbMain->addSeparator();
+    tbMain->addAction(actMovePlotLeft);
+    tbMain->addAction(actMovePlotRight);
 
 
     menuEdit=propertyEditor->addMenu("&Edit", 1);
 
 
-    menuPlot=propertyEditor->addMenu("&Plot", 1);
+    menuPlot=propertyEditor->addMenu("&Plots", 1);
     menuPlot->addAction(actAddPlot);
+    menuPlot->addAction(actDuplicatePlot);
+    menuPlot->addSeparator();
     menuPlot->addAction(actDeletePlot);
+    menuPlot->addSeparator();
+    menuPlot->addAction(actMovePlotLeft);
+    menuPlot->addAction(actMovePlotRight);
 
 }
 
@@ -104,7 +120,7 @@ void QFRDRPlotEditor::addPlot() {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
         updating=true;
-        qDebug()<<"adding plot";
+        //qDebug()<<"adding plot";
         m->addPlot();
         rebuildPlotWidgets();
         updating=false;
@@ -114,7 +130,49 @@ void QFRDRPlotEditor::addPlot() {
 
 void QFRDRPlotEditor::deleteCurrentPlot() {
     deletePlot(tabPlots->currentIndex());
+}
 
+void QFRDRPlotEditor::duplicatePlot()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        updating=true;
+        QFRDRTable::PlotInfo p=m->getPlot(tabPlots->currentIndex());
+        p.title=tr("copy of \"%1\"").arg(p.title);
+        m->addPlot(p);
+        rebuildPlotWidgets();
+        updating=false;
+    }
+}
+
+void QFRDRPlotEditor::movePlotUp()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        updating=true;
+        int current=tabPlots->currentIndex();
+        if (current>0) {
+            m->swapPlots(current, current-1);
+            rebuildPlotWidgets();
+            tabPlots->setCurrentIndex(current-1);
+        }
+        updating=false;
+    }
+}
+
+void QFRDRPlotEditor::movePlotDown()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        updating=true;
+        int current=tabPlots->currentIndex();
+        if (current<m->getPlotCount()-1) {
+            m->swapPlots(current, current+1);
+            rebuildPlotWidgets();
+            tabPlots->setCurrentIndex(current+1);
+        }
+        updating=false;
+    }
 }
 
 void QFRDRPlotEditor::deletePlot(int i) {
@@ -128,13 +186,13 @@ void QFRDRPlotEditor::deletePlot(int i) {
 }
 
 void QFRDRPlotEditor::rebuildPlotWidgets(bool keepPosition) {
-    qDebug()<<"rebuilding plot widgets";
+    //qDebug()<<"rebuilding plot widgets";
     bool updt=updating;
     updating=true;
     int pos=tabPlots->currentIndex();
 
     if (!current) {
-        qDebug()<<"   clearPlotWIdgets";
+        //qDebug()<<"   clearPlotWIdgets";
         clearPlotWidgets();
     } else {
         while (plotWidgets.size()<current->getPlotCount()) {

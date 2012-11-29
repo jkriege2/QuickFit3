@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>926</width>
+    <width>841</width>
     <height>730</height>
    </rect>
   </property>
@@ -54,7 +54,7 @@
       </property>
       <widget class="QWidget" name="tabPlots">
        <attribute name="title">
-        <string>&amp;Plots</string>
+        <string>&amp;Graphs</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">
@@ -87,11 +87,47 @@
           <item>
            <widget class="QToolButton" name="btnCloneGraph">
             <property name="text">
-             <string>clone plots</string>
+             <string>clone graphs</string>
             </property>
             <property name="icon">
              <iconset resource="qfrdrtable.qrc">
               <normaloff>:/table/copy.png</normaloff>:/table/copy.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnMoveUp">
+            <property name="text">
+             <string>move graph one position up in the list</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../lib/lib.qrc">
+              <normaloff>:/lib/file_up.png</normaloff>:/lib/file_up.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnMoveDown">
+            <property name="text">
+             <string>move graph one position down in the list</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../lib/lib.qrc">
+              <normaloff>:/lib/file_down.png</normaloff>:/lib/file_down.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnResetColoring">
+            <property name="text">
+             <string>reset coloring</string>
             </property>
            </widget>
           </item>
@@ -151,7 +187,7 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>120</width>
+               <width>80</width>
                <height>0</height>
               </size>
              </property>
@@ -287,6 +323,32 @@
              </property>
             </widget>
            </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="labFuction">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Function:</string>
+             </property>
+             <property name="buddy">
+              <cstring>cmbLinesXData</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="edtFunction">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
            <item row="3" column="0">
             <widget class="QLabel" name="labDataX">
              <property name="font">
@@ -313,7 +375,7 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>120</width>
+               <width>80</width>
                <height>0</height>
               </size>
              </property>
@@ -345,7 +407,7 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>120</width>
+               <width>80</width>
                <height>0</height>
               </size>
              </property>
@@ -377,7 +439,7 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>120</width>
+               <width>80</width>
                <height>0</height>
               </size>
              </property>
@@ -409,13 +471,132 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>120</width>
+               <width>80</width>
                <height>0</height>
               </size>
              </property>
             </widget>
            </item>
+           <item row="7" column="0">
+            <widget class="QCheckBox" name="chkSTrided">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>strided data:</string>
+             </property>
+            </widget>
+           </item>
            <item row="8" column="0">
+            <widget class="QLabel" name="labColor">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>color:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1">
+            <widget class="QWidget" name="widColor" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_12">
+              <property name="margin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="ColorComboBox" name="cmbLineColor">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>80</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_35">
+                <property name="text">
+                 <string> transparency:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="sliderPlotTransparent">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximum">
+                 <number>255</number>
+                </property>
+                <property name="singleStep">
+                 <number>5</number>
+                </property>
+                <property name="pageStep">
+                 <number>50</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="invertedAppearance">
+                 <bool>true</bool>
+                </property>
+                <property name="invertedControls">
+                 <bool>false</bool>
+                </property>
+                <property name="tickPosition">
+                 <enum>QSlider::NoTicks</enum>
+                </property>
+                <property name="tickInterval">
+                 <number>50</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spinBox_3">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>7</pointsize>
+                 </font>
+                </property>
+                <property name="buttonSymbols">
+                 <enum>QAbstractSpinBox::NoButtons</enum>
+                </property>
+                <property name="maximum">
+                 <number>255</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="9" column="0">
             <widget class="QLabel" name="labLinestyle">
              <property name="font">
               <font>
@@ -428,7 +609,7 @@
              </property>
             </widget>
            </item>
-           <item row="8" column="1">
+           <item row="9" column="1">
             <widget class="QWidget" name="widLineStyle" native="true">
              <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,0,0,0">
               <property name="margin">
@@ -496,7 +677,7 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>120</width>
+                  <width>80</width>
                   <height>0</height>
                  </size>
                 </property>
@@ -505,7 +686,7 @@
              </layout>
             </widget>
            </item>
-           <item row="9" column="0">
+           <item row="10" column="0">
             <widget class="QLabel" name="labFillColor">
              <property name="font">
               <font>
@@ -518,7 +699,7 @@
              </property>
             </widget>
            </item>
-           <item row="9" column="1">
+           <item row="10" column="1">
             <widget class="QWidget" name="widFillColor" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,1,0">
               <property name="margin">
@@ -534,7 +715,7 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>120</width>
+                  <width>80</width>
                   <height>0</height>
                  </size>
                 </property>
@@ -601,7 +782,7 @@
              </layout>
             </widget>
            </item>
-           <item row="10" column="0">
+           <item row="11" column="0">
             <widget class="QLabel" name="labSymbol">
              <property name="font">
               <font>
@@ -614,7 +795,7 @@
              </property>
             </widget>
            </item>
-           <item row="10" column="1">
+           <item row="11" column="1">
             <widget class="QWidget" name="widSymbol" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,0,0">
               <property name="margin">
@@ -630,7 +811,7 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>120</width>
+                  <width>80</width>
                   <height>0</height>
                  </size>
                 </property>
@@ -665,7 +846,7 @@
              </layout>
             </widget>
            </item>
-           <item row="11" column="0">
+           <item row="12" column="0">
             <widget class="QLabel" name="labErrorStyle">
              <property name="font">
               <font>
@@ -678,7 +859,7 @@
              </property>
             </widget>
            </item>
-           <item row="11" column="1">
+           <item row="12" column="1">
             <widget class="QWidget" name="widErrorStyle" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="1,0,1,0,0,0">
               <property name="margin">
@@ -694,7 +875,7 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>120</width>
+                  <width>80</width>
                   <height>0</height>
                  </size>
                 </property>
@@ -717,7 +898,7 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>120</width>
+                  <width>80</width>
                   <height>0</height>
                  </size>
                 </property>
@@ -791,7 +972,7 @@
              </layout>
             </widget>
            </item>
-           <item row="12" column="0">
+           <item row="13" column="0">
             <widget class="QLabel" name="labImage">
              <property name="font">
               <font>
@@ -804,7 +985,7 @@
              </property>
             </widget>
            </item>
-           <item row="12" column="1">
+           <item row="13" column="1">
             <widget class="QWidget" name="widImage" native="true">
              <layout class="QGridLayout" name="gridLayout_3" rowminimumheight="0,0,0,0,0,0,0,0,0">
               <property name="margin">
@@ -830,7 +1011,7 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>120</width>
+                  <width>80</width>
                   <height>0</height>
                  </size>
                 </property>
@@ -913,7 +1094,7 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>120</width>
+                  <width>80</width>
                   <height>0</height>
                  </size>
                 </property>
@@ -1106,7 +1287,7 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>120</width>
+                  <width>80</width>
                   <height>0</height>
                  </size>
                 </property>
@@ -1281,136 +1462,63 @@
              </layout>
             </widget>
            </item>
-           <item row="7" column="0">
-            <widget class="QLabel" name="labColor">
-             <property name="font">
-              <font>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>color:</string>
-             </property>
-            </widget>
-           </item>
            <item row="7" column="1">
-            <widget class="QWidget" name="widColor" native="true">
-             <layout class="QHBoxLayout" name="horizontalLayout_12">
+            <widget class="QWidget" name="widStride" native="true">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_15">
               <property name="margin">
                <number>0</number>
               </property>
               <item>
-               <widget class="ColorComboBox" name="cmbLineColor">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>120</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_35">
+               <widget class="QLabel" name="label">
                 <property name="text">
-                 <string> transparency:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 <string>start row:</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QSlider" name="sliderPlotTransparent">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>32</width>
-                  <height>0</height>
-                 </size>
+               <widget class="QSpinBox" name="spinStrideStart">
+                <property name="minimum">
+                 <number>1</number>
                 </property>
                 <property name="maximum">
-                 <number>255</number>
+                 <number>99999999</number>
                 </property>
-                <property name="singleStep">
-                 <number>5</number>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>row stride:</string>
                 </property>
-                <property name="pageStep">
-                 <number>50</number>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spinStride">
+                <property name="minimum">
+                 <number>1</number>
                 </property>
+                <property name="maximum">
+                 <number>99999999</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_4">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
-                <property name="invertedAppearance">
-                 <bool>true</bool>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
                 </property>
-                <property name="invertedControls">
-                 <bool>false</bool>
-                </property>
-                <property name="tickPosition">
-                 <enum>QSlider::NoTicks</enum>
-                </property>
-                <property name="tickInterval">
-                 <number>50</number>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QSpinBox" name="spinBox_3">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>7</pointsize>
-                 </font>
-                </property>
-                <property name="buttonSymbols">
-                 <enum>QAbstractSpinBox::NoButtons</enum>
-                </property>
-                <property name="maximum">
-                 <number>255</number>
-                </property>
-               </widget>
+               </spacer>
               </item>
              </layout>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="labFuction">
-             <property name="font">
-              <font>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Function:</string>
-             </property>
-             <property name="buddy">
-              <cstring>cmbLinesXData</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="edtFunction">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
             </widget>
            </item>
           </layout>
@@ -1420,7 +1528,7 @@
       </widget>
       <widget class="QWidget" name="tabSystem">
        <attribute name="title">
-        <string>&amp;System</string>
+        <string>Coordinate &amp;System</string>
        </attribute>
        <layout class="QFormLayout" name="formLayout_3">
         <item row="3" column="0">
@@ -2105,7 +2213,9 @@
   <tabstop>spinTitleFontSize</tabstop>
  </tabstops>
  <resources>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
+  <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -2115,11 +2225,11 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>873</x>
+     <x>852</x>
      <y>368</y>
     </hint>
     <hint type="destinationlabel">
-     <x>901</x>
+     <x>880</x>
      <y>369</y>
     </hint>
    </hints>
@@ -2135,7 +2245,7 @@
      <y>440</y>
     </hint>
     <hint type="destinationlabel">
-     <x>894</x>
+     <x>809</x>
      <y>441</y>
     </hint>
    </hints>
@@ -2147,11 +2257,11 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>866</x>
+     <x>781</x>
      <y>486</y>
     </hint>
     <hint type="destinationlabel">
-     <x>894</x>
+     <x>809</x>
      <y>487</y>
     </hint>
    </hints>
@@ -2163,11 +2273,11 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>800</x>
+     <x>780</x>
      <y>556</y>
     </hint>
     <hint type="destinationlabel">
-     <x>893</x>
+     <x>808</x>
      <y>557</y>
     </hint>
    </hints>
@@ -2179,11 +2289,11 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>800</x>
+     <x>780</x>
      <y>581</y>
     </hint>
     <hint type="destinationlabel">
-     <x>893</x>
+     <x>808</x>
      <y>582</y>
     </hint>
    </hints>
@@ -2195,7 +2305,7 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>424</x>
+     <x>413</x>
      <y>650</y>
     </hint>
     <hint type="destinationlabel">
@@ -2211,11 +2321,11 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>424</x>
+     <x>413</x>
      <y>650</y>
     </hint>
     <hint type="destinationlabel">
-     <x>696</x>
+     <x>648</x>
      <y>652</y>
     </hint>
    </hints>
@@ -2227,7 +2337,7 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>424</x>
+     <x>413</x>
      <y>650</y>
     </hint>
     <hint type="destinationlabel">
@@ -2243,7 +2353,7 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>378</x>
+     <x>357</x>
      <y>292</y>
     </hint>
     <hint type="destinationlabel">
@@ -2259,7 +2369,7 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>375</x>
+     <x>354</x>
      <y>266</y>
     </hint>
     <hint type="destinationlabel">
@@ -2279,8 +2389,24 @@
      <y>394</y>
     </hint>
     <hint type="destinationlabel">
-     <x>894</x>
+     <x>809</x>
      <y>395</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkSTrided</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>widStride</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>295</x>
+     <y>359</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>620</x>
+     <y>351</y>
     </hint>
    </hints>
   </connection>

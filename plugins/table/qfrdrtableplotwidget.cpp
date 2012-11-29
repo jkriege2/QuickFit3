@@ -249,7 +249,9 @@ void QFRDRTablePlotWidget::listGraphs_currentRowChanged(int currentRow) {
         ui->spinColorbarWidth->setValue(graph.colorbarWidth);
         ui->spinColorbarHeight->setValue(graph.colorbarRelativeHeight*100.0);
         ui->edtFunction->setText(graph.function);
-
+        ui->chkSTrided->setChecked(graph.isStrided);
+        ui->spinStride->setValue(graph.stride);
+        ui->spinStrideStart->setValue(graph.strideStart);
 
         updatePlotWidgetVisibility();
     }
@@ -322,11 +324,9 @@ void QFRDRTablePlotWidget::on_btnAddGraph_clicked() {
         QFRDRTable::PlotInfo p=current->getPlot(this->plot);
         QFRDRTable::GraphInfo g;
         g.title=tr("graph %1").arg(p.graphs.size()+1);
-        g.color=autocolors.value(p.graphs.size()+1, QColor("red"));
+        autoColorGraph(g, p.graphs.size()+1);
         g.linewidth=2;
         g.fillColorTransparent=0.5;
-        g.fillColor=g.color.lighter();
-        g.errorColor=g.color.darker();
         p.graphs.append(g);
         updating=true;
         QListWidgetItem* w=new QListWidgetItem( ui->listGraphs);
@@ -481,6 +481,9 @@ void QFRDRTablePlotWidget::graphDataChanged() {
             graph.colorbarWidth=ui->spinColorbarWidth->value();
             graph.colorbarRelativeHeight=ui->spinColorbarHeight->value()/100.0;
             graph.function=ui->edtFunction->text();
+            graph.isStrided=ui->chkSTrided->isChecked();
+            graph.stride=ui->spinStride->value();
+            graph.strideStart=ui->spinStrideStart->value();
 
             if (ui->edtXLabel->text()=="x" && ui->cmbLinesXData->currentIndex()>0) {
                 QString txt=ui->cmbLinesXData->currentText();
@@ -599,16 +602,17 @@ void QFRDRTablePlotWidget::updateGraph() {
             if (g.type==QFRDRTable::gtImpulsesVertical) {
                 JKQTPimpulsesVerticalErrorGraph* pg=new JKQTPimpulsesVerticalErrorGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
-                if (g.xcolumn>=0 && g.xcolumn<ui->plotter->getDatastore()->getColumnCount())  pg->set_xColumn(g.xcolumn);
-                if (g.ycolumn>=0 && g.ycolumn<ui->plotter->getDatastore()->getColumnCount()) pg->set_yColumn(g.ycolumn);
-                /*if (g.xerrorcolumn>=0 && g.xerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_xErrorColumn(g.xerrorcolumn);
+                pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
+                pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
+                if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
                 }*/
-                if (g.yerrorcolumn>=0 && g.yerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_yErrorColumn(g.yerrorcolumn);
+
+                pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
+                if (pg->get_yErrorColumn()>=0) {
                     pg->set_yErrorStyle(g.errorStyle);
                 } else {
                     pg->set_yErrorStyle(JKQTPnoError);
@@ -635,20 +639,20 @@ void QFRDRTablePlotWidget::updateGraph() {
             } else if (g.type==QFRDRTable::gtImpulsesHorizontal) {
                 JKQTPimpulsesHorizontalErrorGraph* pg=new JKQTPimpulsesHorizontalErrorGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
-                if (g.xcolumn>=0 && g.xcolumn<ui->plotter->getDatastore()->getColumnCount())  pg->set_yColumn(g.xcolumn);
-                if (g.ycolumn>=0 && g.ycolumn<ui->plotter->getDatastore()->getColumnCount()) pg->set_xColumn(g.ycolumn);
-                /*if (g.xerrorcolumn>=0 && g.xerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_xErrorColumn(g.xerrorcolumn);
-                    pg->set_xErrorStyle(g.errorStyle);
-                } else {
-                    pg->set_xErrorStyle(JKQTPnoError);
-                }*/
-                if (g.yerrorcolumn>=0 && g.yerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_xErrorColumn(g.yerrorcolumn);
+                pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
+                pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                pg->set_xErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
+                if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
                 }
+                /*pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
+                if (pg->get_yErrorColumn()>=0) {
+                    pg->set_yErrorStyle(g.errorStyle);
+                } else {
+                    pg->set_yErrorStyle(JKQTPnoError);
+                }*/
                 //pg->set_drawLine(g.drawLine);
                 //pg->set_symbol(g.symbol);
                 //pg->set_symbolSize(g.symbolSize);
@@ -671,16 +675,16 @@ void QFRDRTablePlotWidget::updateGraph() {
             } else if (g.type==QFRDRTable::gtbarsHorizontal) {
                 JKQTPbarVerticalGraph* pg=new JKQTPbarVerticalGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
-                if (g.xcolumn>=0 && g.xcolumn<ui->plotter->getDatastore()->getColumnCount())  pg->set_yColumn(g.xcolumn);
-                if (g.ycolumn>=0 && g.ycolumn<ui->plotter->getDatastore()->getColumnCount()) pg->set_xColumn(g.ycolumn);
-                /*if (g.xerrorcolumn>=0 && g.xerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_xErrorColumn(g.xerrorcolumn);
+                pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
+                pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
+                if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
                 }*/
-                /*if (g.yerrorcolumn>=0 && g.yerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_yErrorColumn(g.yerrorcolumn);
+                /*pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
+                if (pg->get_yErrorColumn()>=0) {
                     pg->set_yErrorStyle(g.errorStyle);
                 } else {
                     pg->set_yErrorStyle(JKQTPnoError);
@@ -707,16 +711,16 @@ void QFRDRTablePlotWidget::updateGraph() {
             } else if (g.type==QFRDRTable::gtbarsVertical) {
                 JKQTPbarHorizontalGraph* pg=new JKQTPbarHorizontalGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
-                if (g.xcolumn>=0 && g.xcolumn<ui->plotter->getDatastore()->getColumnCount())  pg->set_xColumn(g.xcolumn);
-                if (g.ycolumn>=0 && g.ycolumn<ui->plotter->getDatastore()->getColumnCount()) pg->set_yColumn(g.ycolumn);
-                /*if (g.xerrorcolumn>=0 && g.xerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_xErrorColumn(g.xerrorcolumn);
+                pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
+                pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
+                if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
                 }*/
-                /*if (g.yerrorcolumn>=0 && g.yerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_yErrorColumn(g.yerrorcolumn);
+                /*pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
+                if (pg->get_yErrorColumn()>=0) {
                     pg->set_yErrorStyle(g.errorStyle);
                 } else {
                     pg->set_yErrorStyle(JKQTPnoError);
@@ -743,16 +747,16 @@ void QFRDRTablePlotWidget::updateGraph() {
             } else if (g.type==QFRDRTable::gtFilledCurveX) {
                 JKQTPfilledCurveXErrorGraph* pg=new JKQTPfilledCurveXErrorGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
-                if (g.xcolumn>=0 && g.xcolumn<ui->plotter->getDatastore()->getColumnCount())  pg->set_xColumn(g.xcolumn);
-                if (g.ycolumn>=0 && g.ycolumn<ui->plotter->getDatastore()->getColumnCount()) pg->set_yColumn(g.ycolumn);
-                /*if (g.xerrorcolumn>=0 && g.xerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_xErrorColumn(g.xerrorcolumn);
+                pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
+                pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
+                if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
                 }*/
-                if (g.yerrorcolumn>=0 && g.yerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_yErrorColumn(g.yerrorcolumn);
+                pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
+                if (pg->get_yErrorColumn()>=0) {
                     pg->set_yErrorStyle(g.errorStyle);
                 } else {
                     pg->set_yErrorStyle(JKQTPnoError);
@@ -779,20 +783,15 @@ void QFRDRTablePlotWidget::updateGraph() {
             } else if (g.type==QFRDRTable::gtFilledCurveY) {
                 JKQTPfilledCurveYErrorGraph* pg=new JKQTPfilledCurveYErrorGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
-                if (g.xcolumn>=0 && g.xcolumn<ui->plotter->getDatastore()->getColumnCount())  pg->set_yColumn(g.xcolumn);
-                if (g.ycolumn>=0 && g.ycolumn<ui->plotter->getDatastore()->getColumnCount()) pg->set_xColumn(g.ycolumn);
-                /*if (g.xerrorcolumn>=0 && g.xerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_xErrorColumn(g.xerrorcolumn);
-                    pg->set_xErrorStyle(g.errorStyle);
-                } else {
-                    pg->set_xErrorStyle(JKQTPnoError);
-                }*/
-                if (g.yerrorcolumn>=0 && g.yerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_xErrorColumn(g.yerrorcolumn);
+                pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
+                pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                pg->set_xErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
+                if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
                 }
+
                 pg->set_drawLine(g.drawLine);
                 //pg->set_symbol(g.symbol);
                 //pg->set_symbolSize(g.symbolSize);
@@ -816,16 +815,16 @@ void QFRDRTablePlotWidget::updateGraph() {
                 JKQTPstepHorizontalGraph* pg=new JKQTPstepHorizontalGraph(ui->plotter->get_plotter());
                 pg->set_fillCurve(true);
                 pg->set_title(g.title);
-                if (g.xcolumn>=0 && g.xcolumn<ui->plotter->getDatastore()->getColumnCount())  pg->set_yColumn(g.xcolumn);
-                if (g.ycolumn>=0 && g.ycolumn<ui->plotter->getDatastore()->getColumnCount()) pg->set_xColumn(g.ycolumn);
-                /*if (g.xerrorcolumn>=0 && g.xerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_xErrorColumn(g.xerrorcolumn);
+                pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
+                pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
+                if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
                 }*/
-                /*if (g.yerrorcolumn>=0 && g.yerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_yErrorColumn(g.yerrorcolumn);
+                /*pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
+                if (pg->get_yErrorColumn()>=0) {
                     pg->set_yErrorStyle(g.errorStyle);
                 } else {
                     pg->set_yErrorStyle(JKQTPnoError);
@@ -852,16 +851,16 @@ void QFRDRTablePlotWidget::updateGraph() {
             } else if (g.type==QFRDRTable::gtStepsVertical) {
                 JKQTPstepVerticalGraph* pg=new JKQTPstepVerticalGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
-                if (g.xcolumn>=0 && g.xcolumn<ui->plotter->getDatastore()->getColumnCount())  pg->set_xColumn(g.xcolumn);
-                if (g.ycolumn>=0 && g.ycolumn<ui->plotter->getDatastore()->getColumnCount()) pg->set_yColumn(g.ycolumn);
-                /*if (g.xerrorcolumn>=0 && g.xerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_xErrorColumn(g.xerrorcolumn);
+                pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
+                pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
+                if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
                 }*/
-                /*if (g.yerrorcolumn>=0 && g.yerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_yErrorColumn(g.yerrorcolumn);
+                /*pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
+                if (pg->get_yErrorColumn()>=0) {
                     pg->set_yErrorStyle(g.errorStyle);
                 } else {
                     pg->set_yErrorStyle(JKQTPnoError);
@@ -967,16 +966,16 @@ void QFRDRTablePlotWidget::updateGraph() {
             } else { // gtLines etc.
                 JKQTPxyLineErrorGraph* pg=new JKQTPxyLineErrorGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
-                if (g.xcolumn>=0 && g.xcolumn<ui->plotter->getDatastore()->getColumnCount())  pg->set_xColumn(g.xcolumn);
-                if (g.ycolumn>=0 && g.ycolumn<ui->plotter->getDatastore()->getColumnCount()) pg->set_yColumn(g.ycolumn);
-                if (g.xerrorcolumn>=0 && g.xerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_xErrorColumn(g.xerrorcolumn);
+                pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
+                pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
+                if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
                 }
-                if (g.yerrorcolumn>=0 && g.yerrorcolumn<ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_yErrorColumn(g.yerrorcolumn);
+                pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
+                if (pg->get_yErrorColumn()>=0) {
                     pg->set_yErrorStyle(g.errorStyle);
                 } else {
                     pg->set_yErrorStyle(JKQTPnoError);
@@ -1082,6 +1081,8 @@ void QFRDRTablePlotWidget::updatePlotWidgetVisibility() {
             ui->cmbLinesYError->setVisible(true);
             ui->edtFunction->setVisible(false);
             ui->labFuction->setVisible(false);
+            ui->chkSTrided->setVisible(true);
+            ui->widStride->setVisible(true);
 
             switch(ui->cmbGraphType->currentIndex()) {
 
@@ -1292,6 +1293,8 @@ void QFRDRTablePlotWidget::updatePlotWidgetVisibility() {
                     ui->labFuction->setVisible(true);
                     ui->labSymbol->setVisible(false);
                     ui->widSymbol->setVisible(false);
+                    ui->chkSTrided->setVisible(false);
+                    ui->widStride->setVisible(false);
 
                     /*ui->widLineStyle->setVisible(false);
                     ui->cmbLinesXError->setVisible(false);
@@ -1379,6 +1382,9 @@ void QFRDRTablePlotWidget::connectWidgets()
     connect(ui->chkImageColorbarRight, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
     connect(ui->chkImageColorbarTop, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
     connect(ui->chkImageAutorange, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
+    connect(ui->chkSTrided, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
+    connect(ui->spinStride, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
+    connect(ui->spinStrideStart, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
 }
 
 void QFRDRTablePlotWidget::disconnectWidgets()
@@ -1448,7 +1454,29 @@ void QFRDRTablePlotWidget::disconnectWidgets()
     disconnect(ui->chkImageColorbarRight, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
     disconnect(ui->chkImageColorbarTop, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
     disconnect(ui->chkImageAutorange, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
+    disconnect(ui->chkSTrided, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
+    disconnect(ui->spinStride, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
+    disconnect(ui->spinStrideStart, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
 
+}
+
+int QFRDRTablePlotWidget::getColumnWithStride(int column, const QFRDRTable::GraphInfo& g)
+{
+    if (column>=0 && column<ui->plotter->getDatastore()->getColumnCount()) {
+        if (g.isStrided) {
+            return ui->plotter->getDatastore()->copyColumn(column, g.strideStart-1, g.stride, tr("(%2,%3)-strided \"%1\"").arg(ui->plotter->getDatastore()->getColumnNames().at(column)).arg(g.strideStart).arg(g.stride));
+        } else {
+            return column;
+        }
+    }
+    return -1;
+}
+
+void QFRDRTablePlotWidget::autoColorGraph(QFRDRTable::GraphInfo &g, int autocolor)
+{
+    g.color=autocolors.value(autocolor%autocolors.size(), QColor("red"));
+    g.fillColor=g.color.lighter();
+    g.errorColor=g.color.darker();
 }
 
 void QFRDRTablePlotWidget::on_btnSaveSystem_clicked() {
@@ -1489,6 +1517,65 @@ void QFRDRTablePlotWidget::on_btnSaveSystem_clicked() {
         }
     }
     ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRTablePlotWidget/lasttemplatedir", dir);
+}
+
+void QFRDRTablePlotWidget::on_btnMoveUp_clicked()
+{
+    int r=ui->listGraphs->currentRow();
+    if (r>0) {
+        disconnectWidgets();
+        updating=true;
+        QFRDRTable::PlotInfo p=current->getPlot(this->plot);
+        p.graphs.swap(r, r-1);
+        QListWidgetItem * currentItem = ui->listGraphs->takeItem(r);
+        ui->listGraphs->insertItem(r -1, currentItem);
+        ui->listGraphs->setCurrentRow(r - 1);
+
+        current->setPlot(this->plot, p);
+        updating=false;
+        connectWidgets();
+        ui->listGraphs->setCurrentRow(r-1);
+        ui->edtGraphTitle->setFocus();
+
+    }
+}
+
+void QFRDRTablePlotWidget::on_btnMoveDown_clicked()
+{
+    int r=ui->listGraphs->currentRow();
+    if (r<ui->listGraphs->count()-1) {
+        disconnectWidgets();
+        updating=true;
+        QFRDRTable::PlotInfo p=current->getPlot(this->plot);
+        p.graphs.swap(r, r+1);
+        QListWidgetItem * currentItem = ui->listGraphs->takeItem(r);
+        ui->listGraphs->insertItem(r +1, currentItem);
+        ui->listGraphs->setCurrentRow(r + 1);
+
+        current->setPlot(this->plot, p);
+        updating=false;
+        connectWidgets();
+        ui->listGraphs->setCurrentRow(r+1);
+        ui->edtGraphTitle->setFocus();
+
+    }
+}
+
+void QFRDRTablePlotWidget::on_btnResetColoring_clicked()
+{
+    int oldidx=ui->listGraphs->currentRow();
+    disconnectWidgets();
+    updating=true;
+    QFRDRTable::PlotInfo p=current->getPlot(this->plot);
+    for (int i=0; i<p.graphs.size(); i++) {
+        autoColorGraph(p.graphs[i], i);
+    }
+    current->setPlot(this->plot, p);
+    updating=false;
+    listGraphs_currentRowChanged(oldidx);
+    connectWidgets();
+    ui->listGraphs->setCurrentRow(oldidx);
+    ui->edtGraphTitle->setFocus();
 }
 
 

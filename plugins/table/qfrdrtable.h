@@ -114,6 +114,10 @@ class QFRDRTable : public QFRawDataRecord {
             JKQTPerrorPlotstyle errorStyle;
             bool drawLine;
 
+            int stride;
+            int strideStart;
+            bool isStrided;
+
             QColor imageTrueColor;
             double imageTrueTransparent;
             QColor imageFalseColor;
@@ -192,6 +196,7 @@ class QFRDRTable : public QFRawDataRecord {
         void addPlot(PlotInfo plotInfo);
         void setPlot(int i, PlotInfo plotInfo);
         void deletePlot(int i);
+        void swapPlots(int i, int j);
 
 
         /** \brief return type (short type string) */

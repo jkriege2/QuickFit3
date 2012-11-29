@@ -42,5 +42,9 @@
         <file alias="fileopen.png">icons/fileopen.png</file>
         <file alias="filesave.png">icons/filesave.png</file>
         <file alias="histogram.png">icons/histogram.png</file>
+        <file alias="uparrow.png">icons/1downarrow.png</file>
+        <file alias="downarrow.png">icons/1downarrow1.png</file>
+        <file alias="leftarrow.png">icons/1leftarrow.png</file>
+        <file alias="rightarrow.png">icons/1rightarrow.png</file>
     </qresource>
 </RCC>

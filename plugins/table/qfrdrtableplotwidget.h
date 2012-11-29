@@ -6,11 +6,11 @@
 #include "qfrawdatarecord.h"
 #include <cmath>
 #include "tools.h"
+#include "qfrdrtable.h"
 
 namespace Ui {
     class QFRDRTablePlotWidget;
 }
-class QFRDRTable;
 class QFRDRTablePlotWidget : public QWidget
 {
         Q_OBJECT
@@ -39,6 +39,9 @@ class QFRDRTablePlotWidget : public QWidget
         void on_plotter_plotMouseMove(double x, double y);
         void on_btnLoadSystem_clicked();
         void on_btnSaveSystem_clicked();
+        void on_btnMoveUp_clicked();
+        void on_btnMoveDown_clicked();
+        void on_btnResetColoring_clicked();
 
         void reloadColumns(QComboBox* combo);
         void graphDataChanged();
@@ -49,6 +52,9 @@ class QFRDRTablePlotWidget : public QWidget
 
         void connectWidgets();
         void disconnectWidgets();
+    protected:
+        int getColumnWithStride(int column, const QFRDRTable::GraphInfo &g);
+        void autoColorGraph(QFRDRTable::GraphInfo& g, int autocolor=0);
 
     private:
         Ui::QFRDRTablePlotWidget *ui;

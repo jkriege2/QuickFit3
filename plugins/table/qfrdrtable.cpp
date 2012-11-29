@@ -9,6 +9,9 @@
 
 QFRDRTable::GraphInfo::GraphInfo() {
     title="";
+    isStrided=false;
+    stride=1;
+    strideStart=1;
     type=QFRDRTable::gtLines;
     xcolumn=-1;
     ycolumn=-1;
@@ -151,6 +154,14 @@ void QFRDRTable::deletePlot(int i)
 {
     if (i>=0 && i<plots.size()) {
         plots.removeAt(i);
+        trawDataChanged();
+    }
+}
+
+void QFRDRTable::swapPlots(int i, int j)
+{
+    if (i>=0 && i<plots.size() && j>=0 && j<plots.size()) {
+        plots.swap(i, j);
         trawDataChanged();
     }
 }
@@ -316,6 +327,9 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.errorColorTransparent=ge.attribute("errorcolor_trans", "1").toDouble();
                     graph.fillColorTransparent=ge.attribute("fillcolor_trans", "0.3").toDouble();
 
+                    graph.stride=ge.attribute("stride", "1").toInt();
+                    graph.strideStart=ge.attribute("stride_start", "1").toInt();
+                    graph.isStrided=QStringToBool(ge.attribute("is_strided", "false"));
 
                     graph.imageTrueColor=QStringToQColor(ge.attribute("image_truecolor", "blue"));
                     graph.imageTrueTransparent=ge.attribute("image_truecolor_trans", "0.5").toDouble();
@@ -449,6 +463,9 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("image_legend", plots[i].graphs[g].imageLegend);
             w.writeAttribute("function", plots[i].graphs[g].function);
 
+            w.writeAttribute("stride", QString::number(plots[i].graphs[g].stride));
+            w.writeAttribute("stride_start", QString::number(plots[i].graphs[g].strideStart));
+            w.writeAttribute("is_strided", boolToQString(plots[i].graphs[g].isStrided));
 
             w.writeEndElement();
         }

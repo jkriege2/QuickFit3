@@ -22,9 +22,24 @@
 	</ul></p>
 	<p>In the <b>"Plots"</b> you may add to or remove plots from the list of graphs using the buttons above the list. Below the list you can specify options for each graph:<ul>
 	  <li>Each graph has a type (lines, bars, image, ...) and a title which is displayed in the key. </li>
-	  <li>Depending on the type of plot you may choose up to four columns (X data and error, Y data and error) from which to take the data for the plot.</li>
-	  <li>For image plots you have to specify the width of the image in pixels. The height of the image in pixels is then the number of rows in the selected column divided by the width (integer division!). The you can position the image and set its size in system coordinates (x, y, image width, image height). For image plot you may also select a colorscale and format the colorbar and a value range on which to scale the colors. For mask image plots, you may specify two colors for true (!=0) and false (equal 0). the bar label will be used as a label for the color bar axis, so do not confuse with the graph title.</li>
-	  <li>For non-image plots several options exist to set the plot appearance. Depending on the plot trype you may select plot symbols (and their size) whether to draw a line between the data points (and its style), how to fill the plot and how to draw error bars (as bars, lines, polygons etc.)</li>
+	  <li>Depending on the type of plot you may choose up to four columns (X data and error, Y data and error) from which to take the data for the plot. You may also use only a subset of datapoints from the colmun(s) by a method called "striding". If this is activated, the graph will use the row "strid start" as first data element and then only every stride-th row from the column. So if start=1 and stride=2 the plot will only show the data from rows 1,3,5,7,... For start=2 and stride=3 the used rows are 2,5,8,...</li>
+	  <li>For image plots you have to specify the width of the image in pixels. The height of the image in pixels is then the number of rows in the selected column divided by the width (integer division!). Here is an example of a column containing 30 rows. with an image width of 10, the resulting image will be 10 pixels wide and 3 pixels high, with the ordering as given here:<blockquote>
+<pre>
++--------+
+| row 1  | +
+| row 2  | + image 
+| ...    | + row 1
+| row 10 | +
+| row 11 |    +
+| ...    |    + image row 2
+| row 20 |    +
+| row 21 |       + 
+| ...    |       + image row 3
+| row 30 |       +
++--------+
+</pre></blockquote>Then you can position the image and set its size in system coordinates (x, y, image width, image height). For image plot you may also select a colorscale and format the colorbar and a value range on which to scale the colors. For mask image plots, you may specify two colors for true (!=0) and false (equal 0). the bar label will be used as a label for the color bar axis, so do not confuse with the graph title.</li>
+	  <li>For non-image plots several options exist to set the plot appearance. Depending on the plot type you may select plot symbols (and their size) whether to draw a line between the data points (and its style), how to fill the plot and how to draw error bars (as bars, lines, polygons etc.)</li>
+	  <li>The plot type "function" is special: It does not rely on data in a column, but plots a user-specifyable function. You may use all simple math functions (except table functions of course) of the <a href="$$mainhelpdir$$mathparser.html">parser</a>, also used for table cell calculations. These functions and constants are available:<small><ul>$$insertglobal:paerserref.inc$$</ul></small></li>
 	</ul></p>
 	<p></p>
 	<p></p>

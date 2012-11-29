@@ -44,6 +44,9 @@ class QFRDRPlotEditor : public QFRawDataEditor {
 
         void addPlot();
         void deleteCurrentPlot();
+        void duplicatePlot();
+        void movePlotUp();
+        void movePlotDown();
         void deletePlot(int i);
         void rebuildPlotWidgets(bool keepPosition=false);
         void clearPlotWidgets();
@@ -54,6 +57,9 @@ class QFRDRPlotEditor : public QFRawDataEditor {
         QTabWidget* tabPlots;
         QAction* actAddPlot;
         QAction* actDeletePlot;
+        QAction* actDuplicatePlot;
+        QAction* actMovePlotLeft;
+        QAction* actMovePlotRight;
         QString currentPlotDir;
         QToolBar* tbMain;
         QMenu* menuEdit;
