@@ -25,7 +25,8 @@ HEADERS += dlgcsvparameters.h \
     qfrdrtableformuladialog.h \
     qfrdrtablesortdialog.h \
     qfrdrtablehistogramdialog.h \
-    qfrdrtableparserfunctions.h
+    qfrdrtableparserfunctions.h \
+    ../base_classes/qffunctionreferencetool.h
 
 SOURCES += dlgcsvparameters.cpp \
            qfrdrtable.cpp \
@@ -41,7 +42,8 @@ SOURCES += dlgcsvparameters.cpp \
     qfrdrtableformuladialog.cpp \
     qfrdrtablesortdialog.cpp \
     qfrdrtablehistogramdialog.cpp \
-    qfrdrtableparserfunctions.cpp
+    qfrdrtableparserfunctions.cpp \
+    ../base_classes/qffunctionreferencetool.cpp
 
 FORMS = dlg_csvparameters.ui \
     tableresizedialog.ui \

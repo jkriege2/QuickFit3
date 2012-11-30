@@ -4,6 +4,7 @@
 #include <QDialog>
 #include "jkmathparser.h"
 #include "qftools.h"
+#include "qffunctionreferencetool.h"
 
 class QFECalculator;
 
@@ -22,11 +23,14 @@ class QFECalculatorDialog : public QDialog {
         void showCache();
         void on_btnEvaluate_clicked();
         void on_btnClearHistory_clicked();
-        void on_btnCLearCache_clicked();
+        void on_btnClearCache_clicked();
+        void delayedStartSearch();
+        void on_edtExpression_textChanged(QString text);
     private:
         Ui::QFECalculatorDialog *ui;
         jkMathParser* parser;
         QFECalculator* calc;
+        QFFunctionReferenceTool* functionRef;
 };
 
 #endif // QFECALCULATORDIALOG_H

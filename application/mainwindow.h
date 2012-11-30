@@ -265,6 +265,7 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         QToolBar *fileToolBar;
         QToolBar *dataToolBar;
         QToolBar* extensionToolBar;
+        QToolBar* toolsToolBar;
         QAction *newProjectAct;
         QAction *openProjectAct;
         QAction *saveProjectAct;

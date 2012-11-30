@@ -7,23 +7,10 @@
 #include <QThread>
 #include "qftablemodel.h"
 #include <QStringListModel>
+#include "qffunctionreferencetool.h"
 
 
 
-class QFRDRTableFormulaDialogDocSearchThread: public QThread {
-       Q_OBJECT
-   public:
-       QFRDRTableFormulaDialogDocSearchThread(QStringList files, QObject* parent=NULL);
-
-       void stopThread();
-   protected:
-       void run();
-   signals:
-       void foundFunction(QString name, QString templ, QString help);
-   protected:
-       QStringList files;
-       bool stopped;
-};
 
 namespace Ui {
     class QFRDRTableFormulaDialog;
@@ -64,30 +51,19 @@ class QFRDRTableFormulaDialog : public QDialog
 
    protected slots:
         void on_edtFormula_textChanged(QString text);
-        void on_edtFormula_cursorPositionChanged(int old, int newPos);
         void on_btnHelp_clicked();
         void on_lstFunctions_doubleClicked(const QModelIndex& index);
         void on_lstFunctions_clicked(const QModelIndex& index);
 
-        void threadFinished();
-        void delayedStartSearchThreads();
-
-        void addFunction(QString name, QString templ, QString help);
-
+        void delayedStartSearch();
     protected:
         Ui::QFRDRTableFormulaDialog *ui;
-        QFCompleterFromFile* compExpression;
 
-        QMap<QString, QPair<QString, QString> > functionhelp;
+        QFFunctionReferenceTool* functionRef;
 
         QString getFunctionTemplate(QString name);
         QString getFunctionHelp(QString name);
 
-        int threadsFinished;
-        int maxThreads;
-        QList<QFRDRTableFormulaDialogDocSearchThread*> threads;
-        QStringListModel helpModel;
-        QStringList defaultWords;
 };
 
 

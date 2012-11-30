@@ -72,9 +72,10 @@ class QFLIB_EXPORT QFDoubleEdit : public QLineEdit {
         void setDecimals(int decimals) { m_decimals=decimals; setValue(value()); }
         void stepUp();
         void stepDown();
-        void setIncrement(double inc) { m_increment=inc; };
-        void setSingleStep(double inc) { setIncrement(inc); };
+        void setIncrement(double inc) { m_increment=inc; }
+        void setSingleStep(double inc) { setIncrement(inc); }
         void setShowUpDown(bool showUpDown);
+        void setUpDownKeyEnabled(bool enabled);
     signals:
         /** \brief emited whenever a entered value changed */
         void valueChanged(double value);
@@ -82,6 +83,7 @@ class QFLIB_EXPORT QFDoubleEdit : public QLineEdit {
         void focusOut(double value);
         /** \brief emitted when a key event matches */
         void keyEventMatches(int key, Qt::KeyboardModifiers modifiers);
+        void enterPressed();
     protected:
         /** \brief used to store the key events */
         QList<QPair<int, Qt::KeyboardModifiers> > m_keyEvents;
@@ -110,6 +112,7 @@ class QFLIB_EXPORT QFDoubleEdit : public QLineEdit {
         bool m_showUpDown;
         QToolButton* m_btnUp;
         QToolButton* m_btnDown;
+        bool m_updownKeyEnabled;
         double m_current;
         virtual void contextMenuEvent(QContextMenuEvent* event);
     protected slots:

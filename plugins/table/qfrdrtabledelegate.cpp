@@ -22,16 +22,19 @@ QWidget *QFRDRTableDelegate::createEditor(QWidget *parent, const QStyleOptionVie
      if ( !index.isValid() || dat.type() == QVariant::Double ) {
          QFDoubleEdit* editor=new QFDoubleEdit(parent);
          editor->setCheckBounds(false, false);
+         editor->setShowUpDown(false);
          return editor;
      }
      if ( dat.type() == QVariant::Int || dat.type() == QVariant::LongLong ) {
          QSpinBox* editor=new QSpinBox(parent);
          editor->setRange(INT_MIN, INT_MAX);
+         editor->setButtonSymbols(QAbstractSpinBox::NoButtons);
          return editor;
      }
      if ( dat.type() == QVariant::UInt || dat.type() == QVariant::ULongLong ) {
          QSpinBox* editor=new QSpinBox(parent);
          editor->setRange(0, UINT_MAX);
+         editor->setButtonSymbols(QAbstractSpinBox::NoButtons);
          return editor;
      }
      if ( dat.type() == QVariant::Bool) {
@@ -163,4 +166,17 @@ void QFRDRTableDelegate::commitAndCloseEditor()
     QLineEdit *editor = qobject_cast<QLineEdit *>(sender());
     emit commitData(editor);
     emit closeEditor(editor);
+}
+
+bool QFRDRTableDelegate::eventFilter(QObject *editor, QEvent *event) {
+    /*QWidget* w=qobject_cast<QWidget*>(editor);
+    QKeyEvent* key=dynamic_cast<QKeyEvent*>(event);
+    if (w && key && event->type()==QEvent::KeyPress) {
+        if (key->modifiers()==Qt::NoModifier && (key->key()==Qt::Key_Enter || key->key()==Qt::Key_Return)) {
+            emit commitData(editor);
+            emit closeEditor(editor, QAbstractItemDelegate::EditNextItem);
+            return true;
+        }
+    }*/
+    return QItemDelegate::eventFilter(editor, event);
 }

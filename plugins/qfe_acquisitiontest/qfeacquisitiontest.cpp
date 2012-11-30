@@ -38,10 +38,10 @@ void QFEAcquisitionTest::initExtension() {
     if (exttb) {
         exttb->addAction(actStartPlugin);
     }
-    QMenu* extm=services->getMenu("extensions");
+    /*QMenu* extm=services->getMenu("extensions");
     if (extm) {
         extm->addAction(actStartPlugin);
-    }
+    }*/
 }
 
 void QFEAcquisitionTest::startPlugin() {

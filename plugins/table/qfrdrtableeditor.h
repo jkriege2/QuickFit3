@@ -63,6 +63,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
 
         void slSetColumnValues();
         void slCalcColumn();
+        void slRecalcAll();
         void slSort();
         void slHistogram();
 
@@ -98,6 +99,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
 
         QAction* actSetColumnValues;
         QAction* actCalculateColumn;
+        QAction* actRecalcAll;
         QAction* actSort;
 
         QAction* actCopy;
@@ -106,6 +108,8 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actHistogram;
 
         QToolBar* tbMain;
+
+        QVariant evaluateExpression(jkMathParser& mp, jkMathParser::jkmpNode* node, QModelIndex cell, bool* ok, const QString& expression=QString("? ? ?"));
     private:
 };
 

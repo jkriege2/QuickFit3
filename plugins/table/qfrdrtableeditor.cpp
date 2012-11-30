@@ -138,6 +138,11 @@ void QFRDRTableEditor::createWidgets() {
     connect(actCalculateColumn, SIGNAL(triggered()), this, SLOT(slCalcColumn()));
     connect(this, SIGNAL(enableActions(bool)), actCalculateColumn, SLOT(setEnabled(bool)));
 
+    actRecalcAll=new QAction(QIcon(":/table/formularecalc.png"), tr("reevaluate all/selected math expression"), this);
+    actRecalcAll->setToolTip(tr("reevaluate all math expressions ..."));
+    connect(actRecalcAll, SIGNAL(triggered()), this, SLOT(slRecalcAll()));
+    connect(this, SIGNAL(enableActions(bool)), actRecalcAll, SLOT(setEnabled(bool)));
+
     actHistogram=new QAction(QIcon(":/table/histogram.png"), tr("calculate histogramn"), this);
     actHistogram->setToolTip(tr("calculate and insert histograms of the selected columns"));
     actHistogram->setVisible(false);
@@ -197,6 +202,7 @@ void QFRDRTableEditor::createWidgets() {
     tvMain->addAction(getSeparatorAction(this));
     tvMain->addAction(actSetColumnValues);
     tvMain->addAction(actCalculateColumn);
+    tvMain->addAction(actRecalcAll);
     tvMain->addAction(actHistogram);
     tvMain->addAction(actSort);
 
@@ -231,6 +237,7 @@ void QFRDRTableEditor::createWidgets() {
     menuTab->addAction(actSetColumnTitle);
     menuTab->addAction(actSetColumnValues);
     menuTab->addAction(actCalculateColumn);
+    menuTab->addAction(actRecalcAll);
     menuTab->addAction(actHistogram);
     menuTab->addAction(actSort);
     menuTab->addSeparator();
@@ -760,53 +767,17 @@ void QFRDRTableEditor::slCalcColumn() {
                                 }
 
                                 if (ok && n) {
-                                    int row=-1;
-                                    int column=-1;
                                     for (int i=0; i<idxs.size(); i++) {
                                         ok=true;
-                                        try {
-                                            row = idxs[i].row();
-                                            column = idxs[i].column();
-                                            mp.addVariableDouble("row", idxs[i].row()+1);
-                                            mp.addVariableDouble("col", idxs[i].column()+1);
-                                            mp.addVariableDouble("column", idxs[i].column()+1);
-                                            mp.addVariableDouble("rows", m->model()->rowCount());
-                                            mp.addVariableDouble("columns", m->model()->columnCount());
-
-                                            jkMathParserData d;
-                                            d.column=column;
-                                            d.row=row;
-                                            d.model=m->model();
-                                            mp.set_data(&d);
-
-                                            jkMathParser::jkmpResult r;
-                                            r=n->evaluate();
 
 
-                                            if (r.isValid) {
-                                                if (r.type==jkMathParser::jkmpBool) {
-                                                    m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), r.boolean);
-                                                } else if (r.type==jkMathParser::jkmpDouble) {
-                                                    if (QFFloatIsOK(r.num))
-                                                        m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), r.num);
-                                                    else
-                                                        m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), QVariant());
-                                                } else if (r.type==jkMathParser::jkmpString) {
-                                                    m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), QString(r.str.c_str()));
-                                                } else {
-                                                    m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), QVariant());
-                                                }
-                                            } else {
-                                                m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), QVariant());
-                                            }
-                                            m->model()->setCellUserRoleCreate(QFRDRTable::TableExpressionRole, idxs[i].row(), idxs[i].column(), dlgMathExpression->getExpression());
-
-                                            mp.set_data(NULL);
-                                        } catch(std::exception& E) {
-                                           ok= QMessageBox::critical(this, tr("QuickFit-table"),
-                                                                     tr("An error occured while parsing the expression '%1' in cell (row, column)=(%3, %4):\n%2\n\n\"OK\" will still go on evaluating\n\"Cancel\" will cancel evaluation for the rest of the cells.").arg(dlgMathExpression->getExpression()).arg(E.what()).arg(row).arg(column),
-                                                                        QMessageBox::Ok|QMessageBox::Cancel, QMessageBox::Ok)==QMessageBox::Ok;
+                                        QVariant nv=evaluateExpression(mp, n, idxs[i], &ok, exp);
+                                        if (ok) {
+                                            m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), nv);
+                                        } else {
+                                            m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), QVariant());
                                         }
+                                        m->model()->setCellUserRoleCreate(QFRDRTable::TableExpressionRole, idxs[i].row(), idxs[i].column(), dlgMathExpression->getExpression());
                                         if (!ok) break;
 
                                     }
@@ -825,6 +796,135 @@ void QFRDRTableEditor::slCalcColumn() {
                 }
 
             }
+        }
+    }
+}
+
+QVariant QFRDRTableEditor::evaluateExpression(jkMathParser& mp, jkMathParser::jkmpNode *n, QModelIndex cell, bool* ok, const QString& expression)
+{
+    QVariant result;
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    int row = cell.row();
+    int column = cell.column();
+    if (m) {
+        try {
+            mp.addVariableDouble("row", cell.row()+1);
+            mp.addVariableDouble("col", cell.column()+1);
+            mp.addVariableDouble("column", cell.column()+1);
+            mp.addVariableDouble("rows", m->model()->rowCount());
+            mp.addVariableDouble("columns", m->model()->columnCount());
+
+            jkMathParserData d;
+            d.column=column;
+            d.row=row;
+            d.model=m->model();
+            mp.set_data(&d);
+
+            jkMathParser::jkmpResult r;
+            r=n->evaluate();
+
+
+            if (r.isValid) {
+                if (r.type==jkMathParser::jkmpBool) {
+                    result=QVariant(r.boolean);
+                } else if (r.type==jkMathParser::jkmpDouble) {
+                    if (QFFloatIsOK(r.num))
+                        result=QVariant(r.num);
+                    else
+                        result=QVariant();
+                } else if (r.type==jkMathParser::jkmpString) {
+                    result=QVariant(QString(r.str.c_str()));
+                } else {
+                    result=QVariant();
+                }
+            } else {
+                result=QVariant();
+            }
+
+            mp.set_data(NULL);
+        } catch(std::exception& E) {
+           *ok= QMessageBox::critical(this, tr("QuickFit-table"),
+                                     tr("An error occured while parsing the expression '%1' in cell (row, column)=(%3, %4):\n%2\n\n\"OK\" will still go on evaluating\n\"Cancel\" will cancel evaluation for the rest of the cells.").arg(expression).arg(E.what()).arg(row).arg(column),
+                                        QMessageBox::Ok|QMessageBox::Cancel, QMessageBox::Ok)==QMessageBox::Ok;
+           return QVariant();
+        }
+    }
+
+    return result;
+}
+
+void QFRDRTableEditor::slRecalcAll()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            QModelIndex cur=tvMain->currentIndex();
+            QItemSelectionModel* smod=tvMain->selectionModel();
+            QItemSelection sel=smod->selection();
+            if (!smod->hasSelection()) {
+                tvMain->selectAll();
+            }
+            QModelIndexList idxs=smod->selectedIndexes();
+
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+            m->model()->disableSignals();
+
+
+            bool ok=true;
+            jkMathParser mp; // instanciate
+            addQFRDRTableFunctions(&mp);
+            mp.addVariableDouble("row", 1);
+            mp.addVariableDouble("col", 1);
+            mp.addVariableDouble("column", 1);
+            mp.addVariableDouble("columns", 1.0);
+            mp.addVariableDouble("rows", 1.0);
+
+            QMap<QString, jkMathParser::jkmpNode*> nodes;
+            int changes=1;
+            int iterations=0;
+            int maxIterations=20;
+            while (iterations<maxIterations && changes>0) {
+                changes=0;
+                for (int i=0; i<idxs.size(); i++) {
+                    QString lexp=m->model()->cellUserRole(QFRDRTable::TableExpressionRole, idxs[i].row(), idxs[i].column()).toString();
+                    if (!lexp.isEmpty()) {
+                        QVariant ov=m->model()->cell(idxs[i].row(), idxs[i].column());
+                        //qDebug()<<"     reeval "<<lexp;
+                        if (!nodes.contains(lexp)) {
+                            try {
+                                nodes[lexp]=mp.parse(lexp.toStdString());
+                            } catch(std::exception& E) {
+                                QMessageBox::critical(this, tr("QuickFit-table"), tr("An error occured while parsing the expression '%1':\n%2").arg(dlgMathExpression->getExpression()).arg(E.what()));
+                                ok=false;
+                            }
+                        }
+
+                        //qDebug()<<"     reeval "<<nodes[lexp]<<ok;
+                        ok=nodes[lexp];
+                        if (ok) {
+                            QVariant nv=evaluateExpression(mp, nodes[lexp], idxs[i], &ok, lexp);
+                            //qDebug()<<"     reeval("<<idxs[i].row()<<idxs[i].column()<<ov<<") <= "<<nv;
+                            if (ok && ov!=nv) {
+                                changes++;
+                                m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), nv);
+                                m->model()->setCellUserRoleCreate(QFRDRTable::TableExpressionRole, idxs[i].row(), idxs[i].column(), lexp);
+                            }
+                        }
+                        if (!ok) break;
+                    }
+                }
+                if (!ok) break;
+                iterations++;
+                //qDebug()<<"** reeval: "<<iterations<<changes;
+            }
+            if (iterations>=maxIterations) {
+                QMessageBox::critical(this, tr("QuickFit-table"), tr("Stopped reevaluating expressions after %1 iterations!\n  Changes were detected after %1 iterations, this might point to circular references in expression.\n  So results might not be reliable, rerun!").arg(maxIterations));
+            }
+
+            m->model()->enableSignals(true);
+            tvMain->selectionModel()->select(sel, QItemSelectionModel::Select);
+            tvMain->selectionModel()->setCurrentIndex(cur, QItemSelectionModel::Current);
+            QApplication::restoreOverrideCursor();
         }
     }
 }
@@ -1014,6 +1114,7 @@ void QFRDRTableEditor::setActionsDisabled(bool disabled)
     emit disableActions(disabled);
     emit enableActions(!disabled);
 }
+
 
 
 

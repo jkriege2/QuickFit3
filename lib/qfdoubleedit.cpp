@@ -20,6 +20,7 @@ QFDoubleEdit::QFDoubleEdit(QWidget* parent):
     m_decimals=6;
     m_increment=true;
     m_current=1;
+    m_updownKeyEnabled=true;
 
     m_btnUp=new QToolButton(this);
     m_btnUp->setText("+");
@@ -169,12 +170,15 @@ void QFDoubleEdit::keyPressEvent ( QKeyEvent * event )  {
         QKeyEvent key(QEvent::KeyPress, 0, Qt::NoModifier, QString(QLocale::system().decimalPoint()));
         QLineEdit::keyPressEvent(&key);
         event->accept();
-    } else if ((event->modifiers()==Qt::NoModifier)&&(event->key()==Qt::Key_Up)) {
+    } else if (m_updownKeyEnabled && (event->modifiers()==Qt::NoModifier)&&(event->key()==Qt::Key_Up)) {
         stepUp();
         event->accept();
-    } else if ((event->modifiers()==Qt::NoModifier)&&(event->key()==Qt::Key_Down)) {
+    } else if (m_updownKeyEnabled && (event->modifiers()==Qt::NoModifier)&&(event->key()==Qt::Key_Down)) {
         stepDown();
         event->accept();
+    } else if ((event->modifiers()==Qt::NoModifier)&&(event->key()==Qt::Key_Return || event->key()==Qt::Key_Enter)) {
+        emit enterPressed();
+        QLineEdit::keyPressEvent(event);
     } else {
         QLineEdit::keyPressEvent(event);
     }
@@ -188,6 +192,11 @@ void QFDoubleEdit::setShowUpDown(bool showUpDown) {
     m_showUpDown=showUpDown;
     m_btnUp->setVisible(m_showUpDown);
     m_btnDown->setVisible(m_showUpDown);
+}
+
+void QFDoubleEdit::setUpDownKeyEnabled(bool enabled)
+{
+    m_updownKeyEnabled=enabled;
 }
 
 void QFDoubleEdit::resizeEvent ( QResizeEvent * event ) {

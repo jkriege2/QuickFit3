@@ -8,7 +8,29 @@ QFECalculatorDialog::QFECalculatorDialog(QFECalculator *calc, QWidget *parent) :
 {
     this->calc=calc;
     parser=new jkMathParser();
+
+    functionRef=new QFFunctionReferenceTool(NULL);
+    functionRef->setCompleterFile(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+calc->getID()+"/table_expression.txt");
+    functionRef->setDefaultWordsMathExpression();
+
     ui->setupUi(this);
+
+    functionRef->registerEditor(ui->edtExpression);
+    functionRef->setCurrentHelpButton(ui->btnFunctionHelp);
+    functionRef->setLabHelp(ui->labHelp);
+    functionRef->setDefaultHelp(QFPluginServices::getInstance()->getPluginHelp(calc->getID()));
+    //functionRef->setLabProgress(ui->labProgress);
+    //functionRef->setLabTemplate(ui->labTemplate);
+    //functionRef->setProgress(ui->progress);
+
+
+
+    QStringList defaultWords;
+
+
+    functionRef->addDefaultWords(defaultWords);
+
+    QTimer::singleShot(10, this, SLOT(delayedStartSearch()));
 }
 
 QFECalculatorDialog::~QFECalculatorDialog()
@@ -46,7 +68,7 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
 {
     std::string expression=ui->edtExpression->text().toStdString();
     QTextCursor cur(ui->edtHistory->document());
-    cur.movePosition(QTextCursor::End);
+    cur.movePosition(QTextCursor::Start);
     cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&gt;&gt; <i>%1</i></tt><br>").arg(expression.c_str())));
     try {
         jkMathParser::jkmpResult r=parser->evaluate(expression);
@@ -60,7 +82,7 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
             } else if (r.type==jkMathParser::jkmpString) {
                 result=tr("<font color=\"blue\">[string] %1</font>").arg(r.str.c_str());
             } else {
-                result=tr("<font color=\"red\">[unknown] ???</font>");
+                result=tr("<font color=\"red\">[unknown] ? ? ?</font>");
             }
         } else {
             result=tr("<font color=\"red\">invalid result</font>");
@@ -71,9 +93,25 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
         cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;&nbsp; <font color=\"red\">ERROR: %1</font></tt><br>").arg(E.what())));
     }
     calc->setHistory(ui->edtHistory->document()->toHtml("UTF-8"));
-    ui->edtHistory->moveCursor(QTextCursor::End);
+    ui->edtHistory->moveCursor(QTextCursor::Start);
     showCache();
     ui->edtExpression->setFocus();
+}
+
+void QFECalculatorDialog::on_edtExpression_textChanged(QString text) {
+    try {
+        ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>"));
+        jkMathParser mp; // instanciate
+        jkMathParser::jkmpNode* n;
+        // parse some numeric expression
+        n=mp.parse(text.toStdString());
+        delete n;
+        ui->btnEvaluate->setEnabled(true);
+    } catch(std::exception& E) {
+        ui->labError->setText(tr("<font color=\"red\">ERROR:</font> %1").arg(E.what()));
+        ui->btnEvaluate->setEnabled(false);
+    }
+
 }
 
 void QFECalculatorDialog::on_btnClearHistory_clicked()
@@ -82,9 +120,19 @@ void QFECalculatorDialog::on_btnClearHistory_clicked()
     calc->setHistory(ui->edtHistory->document()->toHtml("UTF-8"));
 }
 
-void QFECalculatorDialog::on_btnCLearCache_clicked()
+void QFECalculatorDialog::on_btnClearCache_clicked()
 {
     delete parser;
     parser=new jkMathParser();
     showCache();
+}
+
+void QFECalculatorDialog::delayedStartSearch()
+{
+    QStringList sl;
+
+    sl<<QFPluginServices::getInstance()->getPluginHelpDirectory(calc->getID())+"parserreference/";
+    sl<<QFPluginServices::getInstance()->getPluginHelpDirectory(calc->getID());
+    sl<<QFPluginServices::getInstance()->getMainHelpDirectory()+"/parserreference/";
+    functionRef->startSearch(sl);
 }

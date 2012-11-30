@@ -1064,10 +1064,13 @@ void MainWindow::createToolBars()
     dataToolBar->setObjectName("toolbar_data");
     extensionToolBar=addToolBar(tr("Extensions"));
     extensionToolBar->setObjectName("toolbar_extensions");
+    toolsToolBar=addToolBar(tr("Tools"));
+    toolsToolBar->setObjectName("toolbar_tools");
 
     toolbars["file"]=fileToolBar;
     toolbars["data"]=dataToolBar;
     toolbars["extensions"]=extensionToolBar;
+    toolbars["tools"]=toolsToolBar;
 
 }
 

@@ -6,22 +6,45 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>754</width>
-    <height>404</height>
+    <width>944</width>
+    <height>530</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="1">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>&amp;expression:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="buddy">
+      <cstring>edtExpression</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
     <widget class="QLineEdit" name="edtExpression">
      <property name="placeholderText">
       <string>enter expression to evaluate</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item row="0" column="3">
+    <widget class="QPushButton" name="btnEvaluate">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>e&amp;valuate</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>&amp;History/results:</string>
@@ -34,7 +57,14 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
+   <item row="2" column="2">
+    <widget class="QPlainTextEdit" name="edtHistory">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QPushButton" name="btnClearHistory">
@@ -61,27 +91,10 @@
      </item>
     </layout>
    </item>
-   <item row="1" column="1">
-    <widget class="QPlainTextEdit" name="edtHistory">
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QPushButton" name="btnEvaluate">
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_4">
      <property name="text">
-      <string>e&amp;valuate</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>&amp;expression:</string>
+      <string>Help:</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -91,50 +104,81 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QListWidget" name="lstCache"/>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>&amp;Cache:</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-     <property name="buddy">
-      <cstring>edtExpression</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item row="3" column="2" rowspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="6,0,0,0,4">
      <item>
-      <widget class="QPushButton" name="btnClearCache">
-       <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+      <widget class="QLabel" name="labHelp">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
        </property>
        <property name="text">
-        <string>clear &amp;cache</string>
+        <string/>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
        </property>
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer_2">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QToolButton" name="btnFunctionHelp">
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../lib/lib.qrc">
+           <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="Line" name="line">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>&amp;Cache:</string>
        </property>
-      </spacer>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <property name="buddy">
+        <cstring>edtExpression</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QListWidget" name="lstCache"/>
      </item>
     </layout>
    </item>
-   <item row="3" column="0" colspan="3">
+   <item row="5" column="0" colspan="4">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="pushButton">
@@ -179,14 +223,49 @@
      </item>
     </layout>
    </item>
+   <item row="3" column="3" rowspan="2">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QPushButton" name="btnClearCache">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="text">
+        <string>clear &amp;cache</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="2" colspan="2">
+    <widget class="QLabel" name="labError">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::RichText</enum>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <tabstops>
   <tabstop>edtExpression</tabstop>
   <tabstop>edtHistory</tabstop>
   <tabstop>btnClearHistory</tabstop>
-  <tabstop>lstCache</tabstop>
-  <tabstop>btnClearCache</tabstop>
  </tabstops>
  <resources>
   <include location="../../lib/lib.qrc"/>
@@ -200,8 +279,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>713</x>
-     <y>381</y>
+     <x>933</x>
+     <y>519</y>
     </hint>
     <hint type="destinationlabel">
      <x>708</x>
@@ -216,12 +295,28 @@
    <slot>showHelp()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>77</x>
-     <y>382</y>
+     <x>84</x>
+     <y>519</y>
     </hint>
     <hint type="destinationlabel">
      <x>270</x>
      <y>379</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtExpression</sender>
+   <signal>returnPressed()</signal>
+   <receiver>QFECalculatorDialog</receiver>
+   <slot>on_btnEvaluate_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>441</x>
+     <y>15</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>597</x>
+     <y>34</y>
     </hint>
    </hints>
   </connection>

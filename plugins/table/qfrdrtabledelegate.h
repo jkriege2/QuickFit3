@@ -4,6 +4,8 @@
 #include <QItemDelegate>
 #include <climits>
 #include "qfrdrtable.h"
+#include <QEvent>
+#include <QKeyEvent>
 
 class QFRDRTableDelegate : public QItemDelegate
 {
@@ -18,6 +20,9 @@ class QFRDRTableDelegate : public QItemDelegate
          void paint(QPainter* painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
      private slots:
          void commitAndCloseEditor();
+
+    protected:
+         virtual bool eventFilter(QObject* editor, QEvent* event);
 };
 
 #endif // QFRDRTABLEDELEGATE_H

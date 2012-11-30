@@ -47,6 +47,11 @@ void QFECalculator::initExtension() {
         extm->addAction(actStartPlugin);
     }
 
+    QToolBar* tb=services->getToolbar("tools");
+    if (tb) {
+        tb->addAction(actStartPlugin);
+    }
+
 }
 
 void QFECalculator::startPlugin() {
