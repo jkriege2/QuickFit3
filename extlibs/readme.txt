@@ -84,3 +84,9 @@ MersenneTwister.h:
 ~~~~~~~~~~~~~~~~~~
   An implementation of the mersenne twister random number generator, lightweight in a single header file
     * http://www-personal.umich.edu/~wagnerr/MersenneTwister.h
+
+
+Minizip: Zip and UnZip additionnal library:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  code that extends zlib with methods to create and read .zip-files
+    * http://www.winimage.com/zLibDll/minizip.html

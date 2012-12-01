@@ -13,7 +13,7 @@
 #include <QInputDialog>
 #include <QHeaderView>
 #include "qfrawdataeditor.h"
-#include "qenhancedtableview.h"
+#include "qfrdrtableenhancedtableview.h"
 #include "qfrawdatapropertyeditor.h"
 #include "tableresizedialog.h"
 #include "qfrdrtabledelegate.h"
@@ -63,19 +63,22 @@ class QFRDRTableEditor : public QFRawDataEditor {
 
         void slSetColumnValues();
         void slCalcColumn();
+        void slClearExpression();
         void slRecalcAll();
         void slSort();
         void slHistogram();
 
         void setActionsEnabled(bool enabled);
         void setActionsDisabled(bool disabled);
+
+        void editExpression(const QModelIndex& index);
     signals:
         void enableActions(bool enabled);
         void disableActions(bool enabled);
 
     protected:
         /** \brief table view for the contents */
-        QEnhancedTableView* tvMain;
+        QFRDRTableEnhancedTableView* tvMain;
         QFRDRTableFormulaDialog* dlgMathExpression;
 
         QString currentTableDir;
@@ -99,6 +102,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
 
         QAction* actSetColumnValues;
         QAction* actCalculateColumn;
+        QAction* actClearExpression;
         QAction* actRecalcAll;
         QAction* actSort;
 

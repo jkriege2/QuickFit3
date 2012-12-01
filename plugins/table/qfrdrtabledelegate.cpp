@@ -2,61 +2,95 @@
 #include <QtGui>
 #include "qfdoubleedit.h"
 #include "qfrdrtable.h"
+#include "qftools.h"
 
 QFRDRTableDelegate::QFRDRTableDelegate(QObject *parent) :
     QItemDelegate(parent)
 {
+    qRegisterMetaType<QFRDRTableDelegate::SpecialEndEditHint>("QFRDRTableDelegate::SpecialEndEditHint");
 }
 
 QWidget *QFRDRTableDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const {
     QVariant dat=index.data(Qt::DisplayRole);
-    if (dat.type()==QVariant::Invalid) {
-        dat=index.data(Qt::EditRole);
+    QString expression=index.data(QFRDRTable::TableExpressionRole).toString();
+    if (expression.isEmpty()) {
+        if (dat.type()==QVariant::Invalid) {
+            dat=index.data(Qt::EditRole);
+        }
+         if ( dat.type() == QVariant::DateTime || dat.type() == QVariant::Time || dat.type() == QVariant::Date ) {
+             QDateTimeEdit *editor = new QDateTimeEdit(parent);
+             //editor->setDisplayFormat("dd/M/yyyy");
+             editor->setCalendarPopup(true);
+             return editor;
+         }
+         if ( !index.isValid() || dat.type() == QVariant::Double ) {
+             QFDoubleEdit* editor=new QFDoubleEdit(parent);
+             editor->setCheckBounds(false, false);
+             editor->setShowUpDown(false);
+             return editor;
+         }
+         if ( dat.type() == QVariant::Int || dat.type() == QVariant::LongLong ) {
+             QSpinBox* editor=new QSpinBox(parent);
+             editor->setRange(INT_MIN, INT_MAX);
+             editor->setButtonSymbols(QAbstractSpinBox::NoButtons);
+             return editor;
+         }
+         if ( dat.type() == QVariant::UInt || dat.type() == QVariant::ULongLong ) {
+             QSpinBox* editor=new QSpinBox(parent);
+             editor->setRange(0, UINT_MAX);
+             editor->setButtonSymbols(QAbstractSpinBox::NoButtons);
+             return editor;
+         }
+         if ( dat.type() == QVariant::Bool) {
+             QCheckBox* editor=new QCheckBox(parent);
+             return editor;
+         }
+
+         QLineEdit *editor = new QLineEdit(parent);
+
+         // create a completer with the strings in the column as model
+         QStringList allStrings;
+         for (int i = 1; i<index.model()->rowCount(); i++) {
+             QString strItem(index.model()->data(index.sibling(i, index.column()),
+                 Qt::EditRole).toString());
+
+             if (!allStrings.contains(strItem))
+                 allStrings.append(strItem);
+         }
+
+         QCompleter *autoComplete = new QCompleter(allStrings);
+         editor->setCompleter(autoComplete);
+         connect(editor, SIGNAL(editingFinished()), this, SLOT(commitAndCloseEditor()));
+         return editor;
+    } else {
+        QWidget* widExpression=new QWidget(parent);
+        widExpression->setFocusPolicy(Qt::StrongFocus);
+        widExpression->setAutoFillBackground(true);
+        QHBoxLayout* layout=new QHBoxLayout(widExpression);
+        layout->setContentsMargins(0,0,0,0);
+        layout->setSpacing(1);
+        widExpression->setLayout(layout);
+        QLabel* label=new QLabel(widExpression);
+        layout->addWidget(label, 1);
+        label->setTextFormat(Qt::RichText);
+        label->setText(tr("<b><font color=\"blue\">&Sigma;:</font> %1</b><i>&nbsp;&nbsp;= %2</i>").arg(expression).arg(dat.toString()));
+        label->setAutoFillBackground(true);
+        QFont f=label->font();
+        f.setPointSizeF(f.pointSizeF()*0.9);
+        label->setFont(f);
+        QAction* actEdtExp;        
+        QToolButton* btnEdtExp=createButtonAndAction(actEdtExp, QIcon(":/table/formula.png"), tr("edit expression ..."), widExpression);
+        actEdtExp->setParent(widExpression);
+        connect(actEdtExp, SIGNAL(triggered()), this, SLOT(doEditExpression()));
+        layout->addWidget(btnEdtExp);
+        QAction* actClearExp;
+        QToolButton* btnClearExp=createButtonAndAction(actClearExp, QIcon(":/table/formulaclear.png"), tr("clear expression ..."), widExpression);
+        actClearExp->setParent(widExpression);
+        connect(actClearExp, SIGNAL(triggered()), this, SLOT(doClearExpression()));
+        layout->addWidget(btnClearExp);
+        widExpression->setFocus();
+        return widExpression;
     }
-     if ( dat.type() == QVariant::DateTime || dat.type() == QVariant::Time || dat.type() == QVariant::Date ) {
-         QDateTimeEdit *editor = new QDateTimeEdit(parent);
-         //editor->setDisplayFormat("dd/M/yyyy");
-         editor->setCalendarPopup(true);
-         return editor;
-     }
-     if ( !index.isValid() || dat.type() == QVariant::Double ) {
-         QFDoubleEdit* editor=new QFDoubleEdit(parent);
-         editor->setCheckBounds(false, false);
-         editor->setShowUpDown(false);
-         return editor;
-     }
-     if ( dat.type() == QVariant::Int || dat.type() == QVariant::LongLong ) {
-         QSpinBox* editor=new QSpinBox(parent);
-         editor->setRange(INT_MIN, INT_MAX);
-         editor->setButtonSymbols(QAbstractSpinBox::NoButtons);
-         return editor;
-     }
-     if ( dat.type() == QVariant::UInt || dat.type() == QVariant::ULongLong ) {
-         QSpinBox* editor=new QSpinBox(parent);
-         editor->setRange(0, UINT_MAX);
-         editor->setButtonSymbols(QAbstractSpinBox::NoButtons);
-         return editor;
-     }
-     if ( dat.type() == QVariant::Bool) {
-         QCheckBox* editor=new QCheckBox(parent);
-         return editor;
-     }
-     QLineEdit *editor = new QLineEdit(parent);
-
-     // create a completer with the strings in the column as model
-     QStringList allStrings;
-     for (int i = 1; i<index.model()->rowCount(); i++) {
-         QString strItem(index.model()->data(index.sibling(i, index.column()),
-             Qt::EditRole).toString());
-
-         if (!allStrings.contains(strItem))
-             allStrings.append(strItem);
-     }
-
-     QCompleter *autoComplete = new QCompleter(allStrings);
-     editor->setCompleter(autoComplete);
-     connect(editor, SIGNAL(editingFinished()), this, SLOT(commitAndCloseEditor()));
-     return editor;
 }
 
 void QFRDRTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
@@ -168,15 +202,43 @@ void QFRDRTableDelegate::commitAndCloseEditor()
     emit closeEditor(editor);
 }
 
+void QFRDRTableDelegate::doClearExpression()
+{
+    QAction *act = qobject_cast<QAction *>(sender());
+    QWidget* editor=qobject_cast<QWidget *>(act->parent());
+    emit closeEditorEnhanced(editor, QFRDRTableDelegate::EditClearExpression);
+}
+
+void QFRDRTableDelegate::doEditExpression()
+{
+    QAction *act = qobject_cast<QAction *>(sender());
+    QWidget* editor=qobject_cast<QWidget *>(act->parent());
+    emit closeEditorEnhanced(editor, QFRDRTableDelegate::EditEditExpression);
+}
+
 bool QFRDRTableDelegate::eventFilter(QObject *editor, QEvent *event) {
-    /*QWidget* w=qobject_cast<QWidget*>(editor);
+    QWidget* w=qobject_cast<QWidget*>(editor);
     QKeyEvent* key=dynamic_cast<QKeyEvent*>(event);
+    qDebug()<<"QFRDRTableDelegate::eventFilter(event="<<event->type()<<")";
     if (w && key && event->type()==QEvent::KeyPress) {
+        qDebug()<<"QFRDRTableDelegate::eventFilter(event=QEvent::KeyPress): key_modifiers="<<key->modifiers()<<"   key="<<key->key();
         if (key->modifiers()==Qt::NoModifier && (key->key()==Qt::Key_Enter || key->key()==Qt::Key_Return)) {
-            emit commitData(editor);
-            emit closeEditor(editor, QAbstractItemDelegate::EditNextItem);
+            emit commitData(w);
+            emit closeEditorEnhanced(w, QFRDRTableDelegate::EditNextRow);
+            return true;
+        } else if (key->modifiers()==Qt::ControlModifier && (key->key()==Qt::Key_Enter || key->key()==Qt::Key_Return)) {
+            emit commitData(w);
+            emit closeEditorEnhanced(w, QFRDRTableDelegate::EditPreviousRow);
+            return true;
+        } else if (key->modifiers()==Qt::NoModifier && (key->key()==Qt::Key_Down)) {
+            emit commitData(w);
+            emit closeEditorEnhanced(w, QFRDRTableDelegate::EditOneRowDown);
+            return true;
+        } else if (key->modifiers()==Qt::NoModifier && (key->key()==Qt::Key_Up)) {
+            emit commitData(w);
+            emit closeEditorEnhanced(w, QFRDRTableDelegate::EditOneRowUp);
             return true;
         }
-    }*/
+    }
     return QItemDelegate::eventFilter(editor, event);
 }

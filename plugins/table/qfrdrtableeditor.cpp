@@ -26,11 +26,8 @@ void QFRDRTableEditor::createWidgets() {
 
 
 
-    tvMain=new QEnhancedTableView(this);
-    QFontMetrics fm(font());
-    tvMain->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
-    tvMain->setContextMenuPolicy(Qt::ActionsContextMenu);
-    tvMain->setItemDelegate(new QFRDRTableDelegate(tvMain));
+    tvMain=new QFRDRTableEnhancedTableView(this);
+    connect(tvMain, SIGNAL(editExpression(QModelIndex)), this, SLOT(editExpression(QModelIndex)));
 
     tbMain=new QToolBar("tbtablemain", this);
     l->addWidget(tbMain);
@@ -138,6 +135,11 @@ void QFRDRTableEditor::createWidgets() {
     connect(actCalculateColumn, SIGNAL(triggered()), this, SLOT(slCalcColumn()));
     connect(this, SIGNAL(enableActions(bool)), actCalculateColumn, SLOT(setEnabled(bool)));
 
+    actClearExpression=new QAction(QIcon(":/table/formulaclear.png"), tr("clear math expression"), this);
+    actClearExpression->setToolTip(tr("clear any expressions from the selected cells"));
+    connect(actClearExpression, SIGNAL(triggered()), this, SLOT(slClearExpression()));
+    connect(this, SIGNAL(enableActions(bool)), actCalculateColumn, SLOT(setEnabled(bool)));
+
     actRecalcAll=new QAction(QIcon(":/table/formularecalc.png"), tr("reevaluate all/selected math expression"), this);
     actRecalcAll->setToolTip(tr("reevaluate all math expressions ..."));
     connect(actRecalcAll, SIGNAL(triggered()), this, SLOT(slRecalcAll()));
@@ -177,6 +179,8 @@ void QFRDRTableEditor::createWidgets() {
     tbMain->addAction(actSetColumnTitle);
     tbMain->addSeparator();
     tbMain->addAction(actCalculateColumn);
+    tbMain->addAction(actClearExpression);
+    tbMain->addAction(actRecalcAll);
     tbMain->addAction(actSort);
 
 
@@ -202,6 +206,7 @@ void QFRDRTableEditor::createWidgets() {
     tvMain->addAction(getSeparatorAction(this));
     tvMain->addAction(actSetColumnValues);
     tvMain->addAction(actCalculateColumn);
+    tvMain->addAction(actClearExpression);
     tvMain->addAction(actRecalcAll);
     tvMain->addAction(actHistogram);
     tvMain->addAction(actSort);
@@ -800,6 +805,26 @@ void QFRDRTableEditor::slCalcColumn() {
     }
 }
 
+void QFRDRTableEditor::slClearExpression()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            QItemSelectionModel* smod=tvMain->selectionModel();
+            if (smod && smod->hasSelection()) {
+                int answer = QMessageBox::question(this, tr("Clear Table Expressions"), tr("Are you sure that you want to clear all expressions from the selected table cells?"), QMessageBox::Yes | QMessageBox::No);
+                if (answer == QMessageBox::Yes) {
+                    QModelIndexList idxs=smod->selectedIndexes();
+                    for (int i=0; i<idxs.size(); i++) {
+                        m->model()->setCellUserRoleCreate(QFRDRTable::TableExpressionRole, idxs[i].row(), idxs[i].column(), QVariant());
+                    }
+                }
+            }
+        }
+    }
+
+}
+
 QVariant QFRDRTableEditor::evaluateExpression(jkMathParser& mp, jkMathParser::jkmpNode *n, QModelIndex cell, bool* ok, const QString& expression)
 {
     QVariant result;
@@ -851,6 +876,12 @@ QVariant QFRDRTableEditor::evaluateExpression(jkMathParser& mp, jkMathParser::jk
     }
 
     return result;
+}
+
+void QFRDRTableEditor::editExpression(const QModelIndex &index)
+{
+    tvMain->setCurrentIndex(index);
+    slCalcColumn();
 }
 
 void QFRDRTableEditor::slRecalcAll()
@@ -1114,6 +1145,7 @@ void QFRDRTableEditor::setActionsDisabled(bool disabled)
     emit disableActions(disabled);
     emit enableActions(!disabled);
 }
+
 
 
 

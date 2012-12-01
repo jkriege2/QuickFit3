@@ -294,6 +294,10 @@
               <property name="text">
                <string>function</string>
               </property>
+              <property name="icon">
+               <iconset resource="qfrdrtable.qrc">
+                <normaloff>:/table/icons/plot_function.png</normaloff>:/table/icons/plot_function.png</iconset>
+              </property>
              </item>
             </widget>
            </item>

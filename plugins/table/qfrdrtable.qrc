@@ -46,5 +46,8 @@
         <file alias="downarrow.png">icons/1downarrow1.png</file>
         <file alias="leftarrow.png">icons/1leftarrow.png</file>
         <file alias="rightarrow.png">icons/1rightarrow.png</file>
+        <file alias="formularecalc.png">icons/formularecalc.png</file>
+        <file>icons/plot_function.png</file>
+        <file alias="formulaclear.png">icons/formulaclear.png</file>
     </qresource>
 </RCC>

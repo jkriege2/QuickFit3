@@ -34,14 +34,14 @@ void QFEAcquisitionTest::initExtension() {
     
     QAction* actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Test Acquisitions"), this);
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
-    QToolBar* exttb=services->getToolbar("extensions");
+    /*QToolBar* exttb=services->getToolbar("extensions");
     if (exttb) {
         exttb->addAction(actStartPlugin);
-    }
-    /*QMenu* extm=services->getMenu("extensions");
+    }*/
+    QMenu* extm=services->getMenu("extensions");
     if (extm) {
         extm->addAction(actStartPlugin);
-    }*/
+    }
 }
 
 void QFEAcquisitionTest::startPlugin() {
