@@ -343,16 +343,6 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="edtFunction">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-           </item>
            <item row="3" column="0">
             <widget class="QLabel" name="labDataX">
              <property name="font">
@@ -1521,6 +1511,42 @@
                  </size>
                 </property>
                </spacer>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QWidget" name="widFunction" native="true">
+             <layout class="QGridLayout" name="gridLayout_2">
+              <property name="margin">
+               <number>0</number>
+              </property>
+              <property name="spacing">
+               <number>1</number>
+              </property>
+              <item row="0" column="0" colspan="2">
+               <widget class="QLineEdit" name="edtFunction"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="labFunctionOK">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="indent">
+                 <number>16</number>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QToolButton" name="btnFunctionHelp">
+                <property name="text">
+                 <string>show function parser help</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="../../lib/lib.qrc">
+                  <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>

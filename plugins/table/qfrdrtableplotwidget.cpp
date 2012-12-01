@@ -31,8 +31,14 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     autocolors.append(QColor("darkolivegreen"));
     autocolors.append(QColor("mediumpurple"));
 
+    functionRef=new QFFunctionReferenceTool(NULL);
+    functionRef->setCompleterFile(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/table/table_expression.txt");
+    functionRef->setDefaultWordsMathExpression();
+
+
     updating=true;
     ui->setupUi(this);
+    functionRef->registerEditor(ui->edtFunction);
     ui->edtXMin->setCheckBounds(false, true);
     ui->edtXMax->setCheckBounds(true, false);
     ui->edtYMin->setCheckBounds(false, true);
@@ -1082,7 +1088,7 @@ void QFRDRTablePlotWidget::updatePlotWidgetVisibility() {
             ui->cmbLinesXError->setVisible(true);
             ui->cmbLinesYData->setVisible(true);
             ui->cmbLinesYError->setVisible(true);
-            ui->edtFunction->setVisible(false);
+            ui->widFunction->setVisible(false);
             ui->labFuction->setVisible(false);
             ui->chkSTrided->setVisible(true);
             ui->widStride->setVisible(true);
@@ -1292,7 +1298,7 @@ void QFRDRTablePlotWidget::updatePlotWidgetVisibility() {
                     ui->labErrorY->setVisible(false);
                     ui->labImage->setVisible(false);
                     ui->widImage->setVisible(false);
-                    ui->edtFunction->setVisible(true);
+                    ui->widFunction->setVisible(true);
                     ui->labFuction->setVisible(true);
                     ui->labSymbol->setVisible(false);
                     ui->widSymbol->setVisible(false);
@@ -1580,6 +1586,26 @@ void QFRDRTablePlotWidget::on_btnResetColoring_clicked()
     connectWidgets();
     ui->listGraphs->setCurrentRow(oldidx);
     ui->edtGraphTitle->setFocus();
+}
+
+void QFRDRTablePlotWidget::on_edtFunction_textChanged(const QString &text)
+{
+    try {
+        ui->labFunctionOK->setText(tr("<font color=\"darkgreen\">function OK</font>"));
+        jkMathParser mp; // instanciate
+        jkMathParser::jkmpNode* n;
+        // parse some numeric expression
+        n=mp.parse(text.toStdString());
+        delete n;
+    } catch(std::exception& E) {
+        ui->labFunctionOK->setText(tr("<font color=\"red\">ERROR in function:</font> %1").arg(E.what()));
+    }
+}
+
+void QFRDRTablePlotWidget::on_btnFunctionHelp_clicked()
+{
+     if (current)
+         QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("table")+"/mathparser.html");
 }
 
 

@@ -228,6 +228,10 @@ void QFRDRTableEditor::createWidgets() {
     menuEdit->addSeparator();
     menuEdit->addAction(actDelete);
     menuEdit->addAction(actSetDatatype);
+    menuEdit->addAction(actClearExpression);
+    menuEdit->addSeparator();
+    menuEdit->addAction(actSetDatatype);
+    menuEdit->addAction(actCalculateColumn);
 
     QMenu* menuTab=propertyEditor->addMenu("&Table", 0);
     menuTab->addAction(actAppendRow);
@@ -242,6 +246,7 @@ void QFRDRTableEditor::createWidgets() {
     menuTab->addAction(actSetColumnTitle);
     menuTab->addAction(actSetColumnValues);
     menuTab->addAction(actCalculateColumn);
+    menuTab->addAction(actClearExpression);
     menuTab->addAction(actRecalcAll);
     menuTab->addAction(actHistogram);
     menuTab->addAction(actSort);
