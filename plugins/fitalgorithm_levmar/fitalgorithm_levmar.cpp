@@ -113,7 +113,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
     };
     result.addString("stop_reason", reason_simple);
 
-    printf("Levenberg-Marquardt returned in %g iter, reason %s, sumsq %g [%g]\n", info[5], reason.toStdString().c_str(), info[1], info[0]);
+    //printf("Levenberg-Marquardt returned in %g iter, reason %s, sumsq %g [%g]\n", info[5], reason.toStdString().c_str(), info[1], info[0]);
 
     result.message=QObject::tr("<b>levmar</b> returned after %1 iterations.<br>reason: %2\nSES = %3  [old_SES = %4]").arg(info[5]).arg(reason).arg(info[1]).arg(info[0]);
     result.messageSimple=QObject::tr("levmar returned after %1 iterations. reason: '%2' new_SES = %3  [old_SES = %4]").arg(info[5]).arg(reason_simple).arg(info[1]).arg(info[0]);
