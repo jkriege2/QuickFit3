@@ -13,9 +13,9 @@ bool PT3ReadConfiguration(FILE* fpin, PT3TxtHdr* txtHeader, PT3BinHdr* binHeader
         return false;
     }
 
-    qDebug()<<"Format version: "<<txtHeader->FormatVersion;
-    qDebug()<<"creating software: "<<txtHeader->CreatorName;
-    qDebug()<<"creating software version: "<<txtHeader->CreatorVersion;
+    //qDebug()<<"Format version: "<<txtHeader->FormatVersion;
+    //qDebug()<<"creating software: "<<txtHeader->CreatorName;
+    //qDebug()<<"creating software version: "<<txtHeader->CreatorVersion;
 
     if(strncmp(txtHeader->Ident,"PicoHarp 300",3)) {
         error=QObject::tr("Input file is not a PicoHarp 300 file ");

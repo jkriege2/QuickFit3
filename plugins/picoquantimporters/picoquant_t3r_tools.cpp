@@ -12,8 +12,8 @@ bool TTTRReadConfiguration(FILE* fpin, TTTRTxtHdr* txtHeader, TTTRBinHdr* binHea
         return false;
     }
 
-    if(strncmp(txtHeader->SoftwareVersion,"5.0",3)) {
-        error=QObject::tr("Input file version is %1. This program is for v5.0 only").arg(txtHeader->SoftwareVersion);
+    if(strncmp(txtHeader->SoftwareVersion,"5.",2)) {
+        error=QObject::tr("Input file version is %1. This program is for v5.x only").arg(txtHeader->SoftwareVersion);
         return false;
     }
 
