@@ -541,7 +541,7 @@ QString getOSName() {
         case QSysInfo::MV_10_6: result=QObject::tr("Mac OS X 10.6 (Snowleopard)"); break;
         case QSysInfo::MV_10_7: result=QObject::tr("Mac OS X 10.7 (Lion)"); break;
         case QSysInfo::MV_Unknown: result=QObject::tr("unknown MacOS version"); break;
-        case QSysInfo::MV_9: result=QObject::tr("Mac OS 9 ); break;
+        case QSysInfo::MV_9: result=QObject::tr("Mac OS 9"); break;
         case QSysInfo::MV_10_0: result=QObject::tr("Mac OS X 10.0 (Cheetah)"); break;
         case QSysInfo::MV_10_1: result=QObject::tr("Mac OS X 10.1 (Puma)"); break;
         case QSysInfo::MV_10_2: result=QObject::tr("Mac OS X 10.2 (Jaguar)"); break;
@@ -639,4 +639,11 @@ QString doubleToUnitString(double value, int past_comma, bool remove_trail0, QCh
       return res.left(i+1)+res.right(res.size()-ilast);
   }
   return res;
+}
+
+void removeAllActions(QWidget* widget) {
+    QList<QAction*> act=widget->actions();
+    for (int i=0; i<act.size(); i++) {
+        if (act[i]) widget->removeAction(act[i]);
+    }
 }

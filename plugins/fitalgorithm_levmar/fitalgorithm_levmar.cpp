@@ -155,5 +155,10 @@ bool QFFitAlgorithmLevmar::displayConfig() {
     }
 }
 
+bool QFFitAlgorithmLevmar::isThreadSafe() const
+{
+    return false;
+}
+
 
 Q_EXPORT_PLUGIN2(fitalgorithm_levmar, QFPFitAlgorithmLevmar)

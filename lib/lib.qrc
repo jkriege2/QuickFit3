@@ -40,6 +40,7 @@
     <qresource prefix="/lib">
         <file alias="delete16.png">icons/delete16.png</file>
         <file alias="fitalg_icon.png">icons/fitalg_icon.png</file>
+        <file alias="fitalg_icon_mt.png">icons/fitalg_icon_mt.png</file>
         <file alias="fitfunc_icon.png">icons/fitfunc_icon.png</file>
         <file alias="item_delete.png">icons/item_delete.png</file>
         <file alias="printreport.png">icons/fcs_printreport.png</file>

@@ -296,5 +296,10 @@ bool QFFitAlgorithmSimAnneal::displayConfig() {
     }
 }
 
+bool QFFitAlgorithmSimAnneal::isThreadSafe() const
+{
+    return true;
+}
+
 
 Q_EXPORT_PLUGIN2(fitalgorithm_simanneal, QFPFitAlgorithmSimAnneal)

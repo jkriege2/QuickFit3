@@ -306,6 +306,9 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double* paramsOut, double* paramEr
     }
 
     QFFitAlgorithm::FitQFFitFunctionFunctor fm(model, initialParams, pparamsFix, dataX, dataY, ddataWeight, N);
+
+    //qDebug()<<"fm.get_paramcount()="<<fm.get_paramcount();
+
     double* tparamsMin=fm.createMappedArrayForFunctor(pparamsMin);
     double* tparamsMax=fm.createMappedArrayForFunctor(pparamsMax);
     double* tparamsOut=(double*)calloc(fm.get_paramcount(), sizeof(double));

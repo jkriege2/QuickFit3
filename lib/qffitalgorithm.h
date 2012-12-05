@@ -438,6 +438,15 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
         /** \brief \c true if the algorithm supports bounded optimization with box constraints and \c false else */
         virtual bool get_supportsBoxConstraints() const =0;
+        /** \brief \c true if the algorithm may be used in a multi-threaded environment, i.e. it is threadsafe.
+         *
+         *  QuickFit will never use the same instance of this class from multiple threads at the same time. Nevertheless it is
+         *  possible, that your fit library uses some global datastructures that are the same for all threads. These might
+         *  still render it improssible to use a fit library in a multi-threaded way!
+         *
+         *  \note better return \c false if you are unsure!
+         */
+        virtual bool isThreadSafe() const =0;
 
 
 };

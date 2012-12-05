@@ -205,6 +205,9 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /** \brief width of the checkboxes in the parameter widgets */
         int m_parameterCheckboxWidth;
 
+        bool m_multithreadPriority;
+        bool m_hasMultithread;
+
 
         /** \brief when \c false the events that read the data from the widgets and write it to the QFEvaluationItem current are disabled */
         bool dataEventsEnabled;
@@ -213,6 +216,8 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
 
     protected:
+        void populateFitButtons(bool mulThreadEnabledInModel=true);
+
         /** \brief to fit current file */
         QToolButton* btnFitCurrent;
         /** \brief to fit all runs in current file */

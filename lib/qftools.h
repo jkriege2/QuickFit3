@@ -307,4 +307,10 @@ QFLIB_EXPORT QString cleanStringForFilename(const QString& text, int maxLen=127,
 */
 QFLIB_EXPORT QListWidgetItem* addCheckableQListWidgetItem(QListWidget* listWidget, const QString& text, Qt::CheckState checked=Qt::Unchecked, const QVariant& userData=QVariant());
 
+
+/*! \brief remove all actions from a QWidget
+    \ingroup qf3lib_tools
+*/
+QFLIB_EXPORT void removeAllActions(QWidget* widget);
+
 #endif // QFTOOLS_H

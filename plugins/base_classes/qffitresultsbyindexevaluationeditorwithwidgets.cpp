@@ -23,6 +23,8 @@ QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEdi
     dataEventsEnabled=true;
     m_parameterWidgetWidth=75;
     m_parameterCheckboxWidth=32;
+    m_multithreadPriority=multiThreadPriority;
+    m_hasMultithread=hasMultiThreaded;
     fitStatisticsReport="";
 
 
@@ -545,15 +547,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     connect (actFitAllRunsThreaded, SIGNAL(triggered()), this, SLOT(fitAllRunsThreaded()));
 
     if (hasMultiThreaded) {
-        if (multiThreadPriority) {
-            btnFitAll->setDefaultAction(actFitAllFilesThreaded);
-            btnFitRunsAll->setDefaultAction(actFitAllThreaded);
-            btnFitRunsCurrent->setDefaultAction(actFitAllRunsThreaded);
-        } else {
-            btnFitAll->addAction(actFitAllFilesThreaded);
-            btnFitRunsAll->addAction(actFitAllThreaded);
-            btnFitRunsCurrent->addAction(actFitAllRunsThreaded);
-        }
+        populateFitButtons();
 
         menuFit->insertSeparator(actFitRunsCurrent);
         menuFit->insertAction(actFitRunsCurrent, actFitAllRunsThreaded);
@@ -621,6 +615,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEva
         } else {
             cmbAlgorithm->setCurrentIndex(-1);
         }
+        algorithmChanged(cmbAlgorithm->currentIndex());
         dataEventsEnabled=true;
     }
 
@@ -722,6 +717,43 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::updateParameterValues()
     if (eval->hasFit()) labFitParameters->setText(tr("<b><u>Local</u> Fit Parameters:</b>"));
     else labFitParameters->setText(tr("<b><u>Global</u> Fit Parameters:</b>"));
     //qDebug()<<"QFFitResultsByIndexEvaluationEditor::updateParameterValues() ... done "<<t.elapsed()<<" ms";
+
+}
+
+void QFFitResultsByIndexEvaluationEditorWithWidgets::populateFitButtons(bool mulThreadEnabledInModel)
+{
+    removeAllActions(btnFitAll); btnFitAll->setDefaultAction(NULL);
+    removeAllActions(btnFitRunsAll); btnFitRunsAll->setDefaultAction(NULL);
+    removeAllActions(btnFitRunsCurrent); btnFitRunsCurrent->setDefaultAction(NULL);
+    if (m_hasMultithread && mulThreadEnabledInModel) {
+        btnFitAll->setPopupMode(QToolButton::MenuButtonPopup);
+        btnFitRunsAll->setPopupMode(QToolButton::MenuButtonPopup);
+        btnFitRunsCurrent->setPopupMode(QToolButton::MenuButtonPopup);
+
+        if (m_multithreadPriority) {
+            btnFitAll->setDefaultAction(actFitAllFilesThreaded);
+            btnFitRunsAll->setDefaultAction(actFitAllThreaded);
+            btnFitRunsCurrent->setDefaultAction(actFitAllRunsThreaded);
+            btnFitAll->addAction(actFitAll);
+            btnFitRunsAll->addAction(actFitRunsAll);
+            btnFitRunsCurrent->addAction(actFitRunsCurrent);
+
+        } else {
+            btnFitAll->setDefaultAction(actFitAll);
+            btnFitRunsAll->setDefaultAction(actFitRunsAll);
+            btnFitRunsCurrent->setDefaultAction(actFitRunsCurrent);
+            btnFitAll->addAction(actFitAllFilesThreaded);
+            btnFitRunsAll->addAction(actFitAllThreaded);
+            btnFitRunsCurrent->addAction(actFitAllRunsThreaded);
+        }
+    } else {
+        btnFitAll->setPopupMode(QToolButton::DelayedPopup);
+        btnFitRunsAll->setPopupMode(QToolButton::DelayedPopup);
+        btnFitRunsCurrent->setPopupMode(QToolButton::DelayedPopup);
+        btnFitAll->setDefaultAction(actFitAll);
+        btnFitRunsAll->setDefaultAction(actFitRunsAll);
+        btnFitRunsCurrent->setDefaultAction(actFitRunsCurrent);
+    }
 
 }
 
@@ -1049,6 +1081,10 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::algorithmChanged(int model)
     QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     QString alg=cmbAlgorithm->itemData(cmbAlgorithm->currentIndex()).toString();
     data->setFitAlgorithm(alg);
+    populateFitButtons(data->getFitAlgorithm()->isThreadSafe());
+    actFitAllThreaded->setEnabled(data->getFitAlgorithm()->isThreadSafe());
+    actFitAllFilesThreaded->setEnabled(data->getFitAlgorithm()->isThreadSafe());
+    actFitAllRunsThreaded->setEnabled(data->getFitAlgorithm()->isThreadSafe());
     QApplication::restoreOverrideCursor();
 }
 
@@ -1438,6 +1474,10 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitEverythingThreaded() {
     if (!eval) return;
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if (!falg->isThreadSafe()) {
+        fitRunsAll();
+        return;
+    }
     if ((!ffunc)||(!falg)) return;
 
     dlgQFProgressDialog* dlgTFitProgress=new dlgQFProgressDialog(this);
@@ -1569,6 +1609,10 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllRunsThreaded() {
     if (!eval) return;
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if (!falg->isThreadSafe()) {
+        fitRunsCurrent();
+        return;
+    }
     if ((!ffunc)||(!falg)) return;
 
     dlgQFProgressDialog* dlgTFitProgress=new dlgQFProgressDialog(this);
@@ -1696,6 +1740,10 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllFilesThreaded()
     if (!eval) return;
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if (!falg->isThreadSafe()) {
+        fitAll();
+        return;
+    }
     if ((!ffunc)||(!falg)) return;
 
     dlgQFProgressDialog* dlgTFitProgress=new dlgQFProgressDialog(this);

@@ -30,6 +30,9 @@ class QFFitAlgorithmLMFit: public QFFitAlgorithm {
         virtual bool get_supportsBoxConstraints() const { return true; };
         /** \copydoc QFFitAlgorithm::displayConfig() */
         virtual bool displayConfig();
+        /** \copydoc QFFitAlgorithm::isThreadSafe() */
+        virtual bool isThreadSafe() const ;
+
 };
 
 

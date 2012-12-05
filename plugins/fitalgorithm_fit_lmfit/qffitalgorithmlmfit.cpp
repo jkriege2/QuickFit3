@@ -98,3 +98,8 @@ bool QFFitAlgorithmLMFit::displayConfig() {
     }
 }
 
+bool QFFitAlgorithmLMFit::isThreadSafe() const
+{
+    return true;
+}
+

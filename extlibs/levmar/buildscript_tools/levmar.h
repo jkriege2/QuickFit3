@@ -39,7 +39,7 @@
  * Bellow, an attempt is made to issue a warning if this option is turned on and OpenMP
  * is being used (note that this will work only if omp.h is included before levmar.h)
  */
-#define LINSOLVERS_RETAIN_MEMORY
+//#define LINSOLVERS_RETAIN_MEMORY
 #if (defined(_OPENMP))
 # ifdef LINSOLVERS_RETAIN_MEMORY
 #  ifdef _MSC_VER

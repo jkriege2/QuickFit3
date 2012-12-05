@@ -35,7 +35,8 @@ void QFFitAlgorithmComboBox::updateFitAlgorithms()
     QStringList m_ids=manager->getIDList();
     for (int i=0; i<m_ids.size(); i++) {
         QFFitAlgorithm* a=manager->createAlgorithm(m_ids[i], this);
-        addItem(QIcon(":/lib/fitalg_icon.png"), a->name() , m_ids[i]);
+        if (a->isThreadSafe()) addItem(QIcon(":/lib/fitalg_icon_mt.png"), a->name() , m_ids[i]);
+        else addItem(QIcon(":/lib/fitalg_icon.png"), a->name() , m_ids[i]);
         delete a;
     }
     setUpdatesEnabled(upd);

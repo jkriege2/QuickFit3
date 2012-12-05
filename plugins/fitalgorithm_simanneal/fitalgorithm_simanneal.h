@@ -125,6 +125,10 @@ class QFFitAlgorithmSimAnneal: public QFFitAlgorithm {
         /** \copydoc QFFitAlgorithm::displayConfig() */
         virtual bool displayConfig();
 
+        /** \copydoc QFFitAlgorithm::isThreadSafe() */
+        virtual bool isThreadSafe() const ;
+
+
 
     protected:
 
