@@ -260,19 +260,19 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param index index in \a r this applies to
          *  \param param parameter vector to fill
          */
-        virtual void fillParameters(QFRawDataRecord* r, int index, double* param) const;
+        virtual void fillParameters(QFRawDataRecord* r, int index, double* param, QFFitFunction* function=NULL) const;
         /** \brief fill the given array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
          *  \param r record this appplies to
          *  \param index index in \a r this applies to
          *  \param param parameter error vector to fill
         */
-        virtual void fillParameterErrors(QFRawDataRecord* r, int index, double* param) const;
+        virtual void fillParameterErrors(QFRawDataRecord* r, int index, double* param, QFFitFunction* function=NULL) const;
         /** \brief fill the given array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
          *  \param r record this appplies to
          *  \param index index in \a r this applies to
          *  \param param parameter fix vector to fill
         */
-        virtual void fillFix(QFRawDataRecord* r, int index, bool* param) const ;
+        virtual void fillFix(QFRawDataRecord* r, int index, bool* param, QFFitFunction* function=NULL) const ;
 
         /*! \brief fill a newly allocated array of doubles with the current parameter values, as appropriate to use together with QFFitFunction
             \param r record this appplies to
@@ -280,21 +280,21 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
             \return parameter vector
             \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
         */
-        virtual double* allocFillParameters(QFRawDataRecord* r, int index) const ;
+        virtual double* allocFillParameters(QFRawDataRecord* r, int index, QFFitFunction* function=NULL) const ;
         /*! \brief fill a newly allocated array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
             \param r record this appplies to
             \param index index in \a r this applies to
             \return parameter error vector
             \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
         */
-        virtual double* allocFillParameterErrors(QFRawDataRecord* r, int index) const;
+        virtual double* allocFillParameterErrors(QFRawDataRecord* r, int index, QFFitFunction* function=NULL) const;
         /*! \brief fill a newly allocated array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
             \param r record this appplies to
             \param index index in \a r this applies to
             \return parameter fix vector
             \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
         */
-        virtual bool* allocFillFix(QFRawDataRecord* r, int index) const ;
+        virtual bool* allocFillFix(QFRawDataRecord* r, int index, QFFitFunction* function=NULL) const ;
 
         /** \brief determine whether a fit has been carried out for the given record and index
          *

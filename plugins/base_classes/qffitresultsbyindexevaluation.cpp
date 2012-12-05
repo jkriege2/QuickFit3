@@ -155,28 +155,28 @@ bool QFFitResultsByIndexEvaluation::getFitFix(QFRawDataRecord* r, int index, con
     return getFitFix(r, getEvaluationResultID(index), id);
 }
 
-void QFFitResultsByIndexEvaluation::fillParameters(QFRawDataRecord* r, int index, double* param) const {
-    fillParameters(r, getEvaluationResultID(index), param);
+void QFFitResultsByIndexEvaluation::fillParameters(QFRawDataRecord* r, int index, double* param, QFFitFunction* function) const {
+    fillParameters(r, getEvaluationResultID(index), param, function);
 }
 
-void QFFitResultsByIndexEvaluation::fillParameterErrors(QFRawDataRecord* r, int index, double* param) const {
-    fillParameterErrors(r, getEvaluationResultID(index), param);
+void QFFitResultsByIndexEvaluation::fillParameterErrors(QFRawDataRecord* r, int index, double* param, QFFitFunction* function) const {
+    fillParameterErrors(r, getEvaluationResultID(index), param, function);
 }
 
-void QFFitResultsByIndexEvaluation::fillFix(QFRawDataRecord* r, int index, bool* param) const {
-    fillFix(r, getEvaluationResultID(index), param);
+void QFFitResultsByIndexEvaluation::fillFix(QFRawDataRecord* r, int index, bool* param, QFFitFunction* function) const {
+    fillFix(r, getEvaluationResultID(index), param, function);
 }
 
-double* QFFitResultsByIndexEvaluation::allocFillParameters(QFRawDataRecord* r, int index) const {
-    return allocFillParameters(r, getEvaluationResultID(index));
+double* QFFitResultsByIndexEvaluation::allocFillParameters(QFRawDataRecord* r, int index, QFFitFunction* function) const {
+    return allocFillParameters(r, getEvaluationResultID(index), function);
 }
 
-double* QFFitResultsByIndexEvaluation::allocFillParameterErrors(QFRawDataRecord* r, int index) const {
-    return allocFillParameterErrors(r, getEvaluationResultID(index));
+double* QFFitResultsByIndexEvaluation::allocFillParameterErrors(QFRawDataRecord* r, int index, QFFitFunction* function) const {
+    return allocFillParameterErrors(r, getEvaluationResultID(index), function);
 }
 
-bool* QFFitResultsByIndexEvaluation::allocFillFix(QFRawDataRecord* r, int index) const {
-    return allocFillFix(r, getEvaluationResultID(index));
+bool* QFFitResultsByIndexEvaluation::allocFillFix(QFRawDataRecord* r, int index, QFFitFunction* function) const {
+    return allocFillFix(r, getEvaluationResultID(index), function);
 }
 
 void QFFitResultsByIndexEvaluation::setCurrentIndex(int index) {

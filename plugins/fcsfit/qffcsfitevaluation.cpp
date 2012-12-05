@@ -720,13 +720,13 @@ void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, i
 
         // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
         // we are working with a complete set of parameters
-        double* params=allocFillParameters(record, run);
-        double* initialparams=allocFillParameters(record, run);
-        double* errors=allocFillParameterErrors(record, run);
-        double* errorsI=allocFillParameterErrors(record, run);
-        double* paramsMin=allocFillParametersMin();
-        double* paramsMax=allocFillParametersMax();
-        bool* paramsFix=allocFillFix(record, run);
+        double* params=allocFillParameters(record, run, ffunc);
+        double* initialparams=allocFillParameters(record, run, ffunc);
+        double* errors=allocFillParameterErrors(record, run, ffunc);
+        double* errorsI=allocFillParameterErrors(record, run, ffunc);
+        double* paramsMin=allocFillParametersMin(ffunc);
+        double* paramsMax=allocFillParametersMax(ffunc);
+        bool* paramsFix=allocFillFix(record, run, ffunc);
         locker.unlock();
 
 

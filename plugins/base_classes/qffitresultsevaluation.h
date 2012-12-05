@@ -563,49 +563,49 @@ public:
     /** \brief fill the given array of doubles with the current parameter values, as appropriate to use together with QFFitFunction
      *  \param param parameter vector to fill
      */
-    virtual void fillParameters(double* param) const;
+    virtual void fillParameters(double* param, QFFitFunction* function=NULL) const;
     /** \brief fill the given array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
      *  \param param parameter error vector to fill
     */
-    virtual void fillParameterErrors(double* param) const ;
+    virtual void fillParameterErrors(double* param, QFFitFunction* function=NULL) const ;
     /** \brief fill the given array of doubles with the current parameter lower bounds, as appropriate to use together with QFFitFunction
      *  \param param parameter minimums vector to fill
     */
-    virtual void fillParametersMin(double* param) const;
+    virtual void fillParametersMin(double* param, QFFitFunction* function=NULL) const;
     /** \brief fill the given array of doubles with the current parameter upper bounds, as appropriate to use together with QFFitFunction
      *  \param param parameter maximums vector to fill
     */
-    virtual void fillParametersMax(double* param) const;
+    virtual void fillParametersMax(double* param, QFFitFunction* function=NULL) const;
     /** \brief fill the given array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
      *  \param param parameter fix vector to fill
     */
-    virtual void fillFix(bool* param) const ;
+    virtual void fillFix(bool* param, QFFitFunction* function=NULL) const ;
 
     /*! \brief fill a newly allocated array of doubles with the current parameter values, as appropriate to use together with QFFitFunction
         \return parameter vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
     */
-    virtual double* allocFillParameters() const;
+    virtual double* allocFillParameters(QFFitFunction* function=NULL) const;
     /*! \brief fill a newly allocated array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
         \return parameter error vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
     */
-    virtual double* allocFillParameterErrors() const ;
+    virtual double* allocFillParameterErrors(QFFitFunction* function=NULL) const ;
     /*! \brief fill a newly allocated array of doubles with the current parameter lower bounds, as appropriate to use together with QFFitFunction
         \return parameter minimums vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
     */
-    virtual double* allocFillParametersMin() const;
+    virtual double* allocFillParametersMin(QFFitFunction* function=NULL) const;
     /*! \brief fill a newly allocated array of doubles with the current parameter upper bounds, as appropriate to use together with QFFitFunction
         \return parameter maximums vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
     */
-    virtual double* allocFillParametersMax() const ;
+    virtual double* allocFillParametersMax(QFFitFunction* function=NULL) const ;
     /*! \brief fill a newly allocated array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
         \return parameter fix vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
     */
-    virtual bool* allocFillFix() const;
+    virtual bool* allocFillFix(QFFitFunction* function=NULL) const;
 
 
 
@@ -616,19 +616,19 @@ public:
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param param parameter vector to fill
      */
-    virtual void fillParameters(QFRawDataRecord* r,  const QString& resultID, double* param) const;
+    virtual void fillParameters(QFRawDataRecord* r,  const QString& resultID, double* param, QFFitFunction* function=NULL) const;
     /** \brief fill the given array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
      *  \param r record this appplies to
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param param parameter error vector to fill
     */
-    virtual void fillParameterErrors(QFRawDataRecord* r,  const QString& resultID, double* param) const ;
+    virtual void fillParameterErrors(QFRawDataRecord* r,  const QString& resultID, double* param, QFFitFunction* function=NULL) const ;
     /** \brief fill the given array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
      *  \param r record this appplies to
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param param parameter fix vector to fill
     */
-    virtual void fillFix(QFRawDataRecord* r,  const QString& resultID, bool* param) const;
+    virtual void fillFix(QFRawDataRecord* r,  const QString& resultID, bool* param, QFFitFunction* function=NULL) const;
 
     /*! \brief fill a newly allocated array of doubles with the current parameter values, as appropriate to use together with QFFitFunction
         \param r record this appplies to
@@ -636,21 +636,21 @@ public:
         \return parameter vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
     */
-    virtual double* allocFillParameters(QFRawDataRecord* r,  const QString& resultID) const ;
+    virtual double* allocFillParameters(QFRawDataRecord* r,  const QString& resultID, QFFitFunction* function=NULL) const ;
     /*! \brief fill a newly allocated array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
         \param r record this appplies to
         \param resultID the result ID which to access in the raw data records result store
         \return parameter error vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
     */
-    virtual double* allocFillParameterErrors(QFRawDataRecord* r,  const QString& resultID) const ;
+    virtual double* allocFillParameterErrors(QFRawDataRecord* r,  const QString& resultID, QFFitFunction* function=NULL) const ;
     /*! \brief fill a newly allocated array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
         \param r record this appplies to
         \param resultID the result ID which to access in the raw data records result store
         \return parameter fix vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
     */
-    virtual bool* allocFillFix(QFRawDataRecord* r,  const QString& resultID) const ;
+    virtual bool* allocFillFix(QFRawDataRecord* r,  const QString& resultID, QFFitFunction* function=NULL) const ;
 
 
     /*! \brief reset the given parameter \a id to the initial/global/default value */

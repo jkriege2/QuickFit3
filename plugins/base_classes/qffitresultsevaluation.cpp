@@ -791,34 +791,32 @@ bool QFFitResultsEvaluation::getFitFix(const QString& id) const {
     return getFitFix(getHighlightedRecord(), getEvaluationResultID(), id);
 }
 
-void QFFitResultsEvaluation::fillParameters(double* param) const {
-    fillParameters(getHighlightedRecord(), getEvaluationResultID(), param);
+void QFFitResultsEvaluation::fillParameters(double* param, QFFitFunction *function) const {
+    fillParameters(getHighlightedRecord(), getEvaluationResultID(), param, function);
 }
 
-void QFFitResultsEvaluation::fillParameterErrors(double* param) const {
-    fillParameterErrors(getHighlightedRecord(), getEvaluationResultID(), param);
+void QFFitResultsEvaluation::fillParameterErrors(double* param, QFFitFunction *function) const {
+    fillParameterErrors(getHighlightedRecord(), getEvaluationResultID(), param, function);
 }
 
-void QFFitResultsEvaluation::fillFix(bool* param) const {
-    fillFix(getHighlightedRecord(), getEvaluationResultID(), param);
-}
-
-
-double* QFFitResultsEvaluation::allocFillParameters() const {
-    return allocFillParameters(getHighlightedRecord(), getEvaluationResultID());
-
-}
-
-double* QFFitResultsEvaluation::allocFillParameterErrors() const {
-    return allocFillParameterErrors(getHighlightedRecord(), getEvaluationResultID());
-
-}
-
-bool* QFFitResultsEvaluation::allocFillFix() const {
-    return allocFillFix(getHighlightedRecord(), getEvaluationResultID());
+void QFFitResultsEvaluation::fillFix(bool* param, QFFitFunction* function) const {
+    fillFix(getHighlightedRecord(), getEvaluationResultID(), param, function);
 }
 
 
+double* QFFitResultsEvaluation::allocFillParameters(QFFitFunction *function) const {
+    return allocFillParameters(getHighlightedRecord(), getEvaluationResultID(), function);
+
+}
+
+double* QFFitResultsEvaluation::allocFillParameterErrors(QFFitFunction* function) const {
+    return allocFillParameterErrors(getHighlightedRecord(), getEvaluationResultID(), function);
+
+}
+
+bool* QFFitResultsEvaluation::allocFillFix(QFFitFunction* function) const {
+    return allocFillFix(getHighlightedRecord(), getEvaluationResultID(), function);
+}
 
 
 
@@ -832,8 +830,11 @@ bool* QFFitResultsEvaluation::allocFillFix() const {
 
 
 
-void QFFitResultsEvaluation::fillParameters(QFRawDataRecord* r, const QString& resultID, double* param) const {
-    QFFitFunction* f=getFitFunction();
+
+
+void QFFitResultsEvaluation::fillParameters(QFRawDataRecord* r, const QString& resultID, double* param, QFFitFunction *function) const {
+    QFFitFunction* f=function;
+    if (!f) f=getFitFunction();
     if (f!=NULL) {
         for (int i=0; i<f->paramCount(); i++) {
             QString id=f->getParameterID(i);
@@ -842,8 +843,9 @@ void QFFitResultsEvaluation::fillParameters(QFRawDataRecord* r, const QString& r
     }
 }
 
-void QFFitResultsEvaluation::fillParameterErrors(QFRawDataRecord* r, const QString& resultID, double* param) const {
-    QFFitFunction* f=getFitFunction();
+void QFFitResultsEvaluation::fillParameterErrors(QFRawDataRecord* r, const QString& resultID, double* param, QFFitFunction *function) const {
+    QFFitFunction* f=function;
+    if (!f) f=getFitFunction();
     if (f!=NULL) {
         for (int i=0; i<f->paramCount(); i++) {
             QString id=f->getParameterID(i);
@@ -853,8 +855,9 @@ void QFFitResultsEvaluation::fillParameterErrors(QFRawDataRecord* r, const QStri
 }
 
 
-void QFFitResultsEvaluation::fillFix(QFRawDataRecord* r, const QString& resultID, bool* param) const {
-    QFFitFunction* f=getFitFunction();
+void QFFitResultsEvaluation::fillFix(QFRawDataRecord* r, const QString& resultID, bool* param, QFFitFunction *function) const {
+    QFFitFunction* f=function;
+    if (!f) f=getFitFunction();
     if (f!=NULL) {
         for (int i=0; i<f->paramCount(); i++) {
             QString id=f->getParameterID(i);
@@ -864,8 +867,9 @@ void QFFitResultsEvaluation::fillFix(QFRawDataRecord* r, const QString& resultID
 }
 
 
-double* QFFitResultsEvaluation::allocFillParameters(QFRawDataRecord* r, const QString& resultID) const {
-    QFFitFunction* f=getFitFunction();
+double* QFFitResultsEvaluation::allocFillParameters(QFRawDataRecord* r, const QString& resultID, QFFitFunction *function) const {
+    QFFitFunction* f=function;
+    if (!f) f=getFitFunction();
     if (f!=NULL) {
         double* res=(double*)calloc(f->paramCount(), sizeof(double));
         fillParameters(r, resultID, res);
@@ -874,8 +878,9 @@ double* QFFitResultsEvaluation::allocFillParameters(QFRawDataRecord* r, const QS
     return NULL;
 }
 
-double* QFFitResultsEvaluation::allocFillParameterErrors(QFRawDataRecord* r, const QString& resultID) const {
-    QFFitFunction* f=getFitFunction();
+double* QFFitResultsEvaluation::allocFillParameterErrors(QFRawDataRecord* r, const QString& resultID, QFFitFunction *function) const {
+    QFFitFunction* f=function;
+    if (!f) f=getFitFunction();
     if (f!=NULL) {
         double* res=(double*)calloc(f->paramCount(), sizeof(double));
         fillParameterErrors(r, resultID, res);
@@ -887,8 +892,9 @@ double* QFFitResultsEvaluation::allocFillParameterErrors(QFRawDataRecord* r, con
 
 
 
-bool* QFFitResultsEvaluation::allocFillFix(QFRawDataRecord* r, const QString& resultID) const {
-    QFFitFunction* f=getFitFunction();
+bool* QFFitResultsEvaluation::allocFillFix(QFRawDataRecord* r, const QString& resultID, QFFitFunction *function) const {
+    QFFitFunction* f=function;
+    if (!f) f=getFitFunction();
     if (f!=NULL) {
         bool* res=(bool*)calloc(f->paramCount(), sizeof(bool));
         fillFix(r, resultID, res);
@@ -898,8 +904,10 @@ bool* QFFitResultsEvaluation::allocFillFix(QFRawDataRecord* r, const QString& re
 }
 
 
-double* QFFitResultsEvaluation::allocFillParametersMin() const {
-    QFFitFunction* f=getFitFunction();
+double* QFFitResultsEvaluation::allocFillParametersMin(QFFitFunction *function) const {
+    QFFitFunction* f=function;
+    if (!f) f=getFitFunction();
+
     if (f!=NULL) {
         double* res=(double*)calloc(f->paramCount(), sizeof(double));
         fillParametersMin(res);
@@ -908,8 +916,10 @@ double* QFFitResultsEvaluation::allocFillParametersMin() const {
     return NULL;
 }
 
-double* QFFitResultsEvaluation::allocFillParametersMax() const {
-    QFFitFunction* f=getFitFunction();
+double* QFFitResultsEvaluation::allocFillParametersMax(QFFitFunction *function) const {
+    QFFitFunction* f=function;
+    if (!f) f=getFitFunction();
+
     if (f!=NULL) {
         double* res=(double*)calloc(f->paramCount(), sizeof(double));
         fillParametersMax(res);
@@ -918,8 +928,9 @@ double* QFFitResultsEvaluation::allocFillParametersMax() const {
     return NULL;
 }
 
-void QFFitResultsEvaluation::fillParametersMin(double* param) const {
-    QFFitFunction* f=getFitFunction();
+void QFFitResultsEvaluation::fillParametersMin(double* param, QFFitFunction* function) const {
+    QFFitFunction* f=function;
+    if (!f) f=getFitFunction();
     if (f!=NULL) {
         for (int i=0; i<f->paramCount(); i++) {
             QString id=f->getParameterID(i);
@@ -928,8 +939,10 @@ void QFFitResultsEvaluation::fillParametersMin(double* param) const {
     }
 }
 
-void QFFitResultsEvaluation::fillParametersMax(double* param) const {
-    QFFitFunction* f=getFitFunction();
+void QFFitResultsEvaluation::fillParametersMax(double* param, QFFitFunction* function) const {
+    QFFitFunction* f=function;
+    if (!f) f=getFitFunction();
+
     if (f!=NULL) {
         for (int i=0; i<f->paramCount(); i++) {
             QString id=f->getParameterID(i);
