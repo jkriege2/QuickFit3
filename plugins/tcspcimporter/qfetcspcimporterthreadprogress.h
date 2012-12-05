@@ -2,6 +2,8 @@
 #define QFETCSPCImporterTHREADPROGRESS_H
 
 #include <QWidget>
+#include <QTimer>
+#include <QElapsedTimer>
 
 namespace Ui {
     class QFETCSPCImporterThreadProgress;
@@ -42,11 +44,17 @@ class QFETCSPCImporterThreadProgress : public QWidget {
         void closeClicked();
     protected slots:
         void on_btnCancel_clicked();
+        void updateTime();
     private:
         Ui::QFETCSPCImporterThreadProgress *ui;
         bool m_wasCanceled;
         bool m_isDone;
         int m_status;
+        QElapsedTimer started;
+        qint64 runMins;
+        qint64 runSecs;
+        QTimer* timer;
+
 };
 
 #endif // QFETCSPCImporterTHREADPROGRESS_H

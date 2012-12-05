@@ -9,16 +9,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>878</width>
+    <width>879</width>
     <height>624</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>imFCS: Correlator</string>
+   <string>TCSPC importer</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../imagingfcs/qfrdrimagingfcs.qrc">
-    <normaloff>:/imaging_fcs/qfrdrimagingfcs_correlate.png</normaloff>:/imaging_fcs/qfrdrimagingfcs_correlate.png</iconset>
+   <iconset resource="qfetcspcimporter.qrc">
+    <normaloff>:/tcspcimporter/tcspcimporter.png</normaloff>:/tcspcimporter/tcspcimporter.png</iconset>
   </property>
   <property name="modal">
    <bool>false</bool>
@@ -39,7 +39,11 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>&lt;b&gt;&amp;Image File:&lt;/b&gt;</string>
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&amp;amp;Input TCSPC File:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="buddy">
          <cstring>edtTCSPCFile</cstring>
@@ -989,7 +993,7 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>838</width>
+           <width>839</width>
            <height>69</height>
           </rect>
          </property>
@@ -1105,7 +1109,6 @@ p, li { white-space: pre-wrap; }
  </tabstops>
  <resources>
   <include location="../../lib/lib.qrc"/>
-  <include location="../imagingfcs/qfrdrimagingfcs.qrc"/>
   <include location="qfetcspcimporter.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
@@ -1117,8 +1120,8 @@ p, li { white-space: pre-wrap; }
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>920</x>
-     <y>709</y>
+     <x>868</x>
+     <y>612</y>
     </hint>
     <hint type="destinationlabel">
      <x>719</x>
@@ -1149,12 +1152,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>129</x>
-     <y>407</y>
+     <x>195</x>
+     <y>317</y>
     </hint>
     <hint type="destinationlabel">
-     <x>285</x>
-     <y>400</y>
+     <x>487</x>
+     <y>392</y>
     </hint>
    </hints>
   </connection>
