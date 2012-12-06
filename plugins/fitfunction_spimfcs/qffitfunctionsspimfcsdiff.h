@@ -20,7 +20,7 @@ class QFFitFunctionsSPIMFCSDiff: public QFFitFunction {
         QFFitFunctionsSPIMFCSDiff();
         virtual ~QFFitFunctionsSPIMFCSDiff() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCS: Diffusion"); };
+        virtual QString name() const { return QString("SPIM-FCS: Diffusion (1/sqrt(e) radii)"); };
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return QObject::tr("SPIM-FCS: Diffusion (1/sqrt(e) radii)"); };
         /*! \copydoc QFFitFunction::id()   */

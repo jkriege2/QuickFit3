@@ -120,7 +120,7 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
         value=sqrt(qfSqr(bin*width*deltax)+qfSqr(bin*height*deltay));
         error=0;
         return true;
-    } else if (paramid=="focus_distancex") {
+    } else if (paramid=="focus_distancex"||paramid=="focus_distance_x") {
         if (!r) return false;
         double deltax=r->getProperty("DCCF_DELTAX", 0.0).toDouble();
         double bin=r->getProperty("BINNING", 1.0).toDouble();
@@ -129,7 +129,7 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
         value=bin*width*deltax;
         error=0;
         return true;
-    } else if (paramid=="focus_distancey") {
+    } else if (paramid=="focus_distancey"||paramid=="focus_distance_y") {
         if (!r) return false;
         double deltay=r->getProperty("DCCF_DELTAY", 0.0).toDouble();
         double bin=r->getProperty("BINNING", 1.0).toDouble();

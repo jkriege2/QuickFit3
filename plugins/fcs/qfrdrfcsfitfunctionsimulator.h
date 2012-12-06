@@ -168,6 +168,7 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
         void on_cmbNoiseModel_currentIndexChanged(int index);
         void updateNoiseEnabled();
         void showHelp();
+        void on_btnModelHelp_clicked();
 };
 
 #endif // QFRDRFCSFITFUNCTIONSIMULATOR_H

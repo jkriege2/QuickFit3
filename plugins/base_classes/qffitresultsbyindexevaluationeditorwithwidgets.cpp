@@ -595,13 +595,14 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEva
         QStringList ff=fcs->getAvailableFitFunctions();
         for (int i=0; i<ff.size(); i++) {
             QString id=ff[i];
-            if (fcs->getFitFunction(id)) cmbModel->addItem(fcs->getFitFunction(id)->name(), id);
-            else  cmbModel->addItem(tr("unknown fit function"), id);
+            if (fcs->getFitFunction(id)) cmbModel->addItem(QIcon(":/lib/fitfunc_icon.png"), fcs->getFitFunction(id)->name(), id);
+            else  cmbModel->addItem(QIcon(":/lib/fitfunc_icon.png"), tr("unknown fit function"), id);
         }
         ff=fcs->getAvailableFitAlgorithms();
         for (int i=0; i<ff.size(); i++) {
             QString id=ff[i];
-            cmbAlgorithm->addItem(fcs->getFitAlgorithm(id)->name(), id);
+            if (fcs->getFitAlgorithm(id)->isThreadSafe()) cmbAlgorithm->addItem(QIcon(":/lib/fitalg_icon_mt.png"), fcs->getFitAlgorithm(id)->name(), id);
+            else cmbAlgorithm->addItem(QIcon(":/lib/fitalg_icon.png"), fcs->getFitAlgorithm(id)->name(), id);
         }
 
 

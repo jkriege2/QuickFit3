@@ -31,7 +31,7 @@ QFFitFunctionsSPIMFCSADiff::QFFitFunctionsSPIMFCSADiff() {
 
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
     #define FCSSDiff_offset 9
-    addParameter(FloatNumber,  "focus_hieght",            "PSF: axial radius (1/e^2)",                             "&sigma;<sub>z</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 620,         0.01,     1e5,      10  );
+    addParameter(FloatNumber,  "focus_hieght",            "PSF: axial radius (1/sqrt(e))",                         "&sigma;<sub>z</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 620,         0.01,     1e5,      10  );
     #define FCSSDiff_focus_height 10
     addParameter(FloatNumber,  "focus_width",             "PSF: lateral radius (1/sqrt(e))",                       "&sigma;<sub>x,y</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 300,          0,        1e4,      10    );
     #define FCSSDiff_focus_width 11

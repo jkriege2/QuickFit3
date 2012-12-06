@@ -22,7 +22,7 @@ QFFitFunctionFCCSNormalDiff3DFlow2Focus::QFFitFunctionFCCSNormalDiff3DFlow2Focus
     #define FCSDiff_1n_particle 2
     addParameter(FloatNumber,  "vflowx",                  "flow speed of species in x-direction",                  "v<sub>flow, x</sub>",      "micron/s", "&mu;m/s",                  true,    true,        true,                 QFFitFunction::EditError, false, 500,          0,        1e50,     1    );
     #define FCSDiff_vflowx 3
-    addParameter(FloatNumber,  "vflowy",                  "flow speed of species in y-direction",                  "v<sub>flow, x</sub>",      "micron/s", "&mu;m/s",                  true,    true,        true,                 QFFitFunction::EditError, false, 0,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "vflowy",                  "flow speed of species in y-direction",                  "v<sub>flow, y</sub>",      "micron/s", "&mu;m/s",                  true,    true,        true,                 QFFitFunction::EditError, false, 0,          0,        1e50,     1    );
     #define FCSDiff_vflowy 4
     addParameter(FloatNumber,  "vflow",                   "flow speed of species 1",                               "v<sub>flow</sub>",         "micron/s", "&mu;m/s",                  false,    false,        false,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
     #define FCSDiff_vflow 5
@@ -41,9 +41,9 @@ QFFitFunctionFCCSNormalDiff3DFlow2Focus::QFFitFunctionFCCSNormalDiff3DFlow2Focus
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
     #define FCSDiff_offset 12
 
-    addParameter(FloatNumber,  "focus_distance_x",         "foci: lateral distance in x-direction",                 "d<sub>x</sub>",            "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 1000,           0,     1e6,      10  );
+    addParameter(FloatNumber,  "focus_distance_x",         "foci: lateral distance in x-direction",                 "d<sub>x</sub>",            "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 1000,        -1e6,     1e6,      10  );
     #define FCSDiff_focus_distancex 13
-    addParameter(FloatNumber,  "focus_distance_y",         "foci: lateral distance in y-direction",                 "d<sub>y</sub>",            "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 0,              0,     1e6,      10  );
+    addParameter(FloatNumber,  "focus_distance_y",         "foci: lateral distance in y-direction",                 "d<sub>y</sub>",            "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 0,           -1e6,     1e6,      10  );
     #define FCSDiff_focus_distancey 14
 
     addParameter(FloatNumber,  "focus_distance",         "foci: lateral distance",                                  "d<sub>xy</sub>",            "nm",         "nm",                     false,      false,         false,              QFFitFunction::DisplayError,    true, 1000,              0,     1e6,      10  );

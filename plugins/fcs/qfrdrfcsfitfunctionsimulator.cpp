@@ -623,6 +623,21 @@ void QFRDRFCSFitFunctionSimulator::showHelp()
     QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("fcs")+"/fcs_simulator.html");
 }
 
+void QFRDRFCSFitFunctionSimulator::on_btnModelHelp_clicked()
+{
+    QFFitFunction* ffunc=getFitFunction();
+    int id=services->getFitFunctionManager()->getPluginForID(ffunc->id());
+    QString help="";
+    if (ffunc) {
+        help=services->getFitFunctionManager()->getPluginHelp(id, ffunc->id());
+    }
+    if (QFile::exists(help)) {
+        QFPluginServices::getInstance()->displayHelpWindow(help);
+    } else {
+        QMessageBox::information(this, tr("FCS Simulator"), tr("No Online-Help for this fit function available."));
+    }
+}
+
 
 
 

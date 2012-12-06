@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>867</width>
-    <height>497</height>
+    <width>956</width>
+    <height>658</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,7 +38,7 @@
         <height>32</height>
        </size>
       </property>
-      <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,1" columnstretch="0,1">
+      <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,1" columnstretch="0,0">
        <item row="0" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
@@ -315,9 +315,6 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QComboBox" name="cmbFunction"/>
-       </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_4">
          <property name="text">
@@ -361,6 +358,24 @@
          </item>
         </layout>
        </item>
+       <item row="3" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QComboBox" name="cmbFunction"/>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnModelHelp">
+           <property name="text">
+            <string>show fit model help</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../lib/lib.qrc">
+             <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -400,7 +415,9 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrfcs.qrc"/>
+  <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
   <connection>

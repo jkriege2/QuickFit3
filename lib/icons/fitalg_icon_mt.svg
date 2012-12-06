@@ -12,9 +12,9 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    inkscape:export-ydpi="11.25"
    inkscape:export-xdpi="11.25"
-   inkscape:export-filename="fitalg_icon.png"
+   inkscape:export-filename="fitalg_icon_mt.png"
    inkscape:output_extension="org.inkscape.output.svgz.inkscape"
-   sodipodi:docname="fitalg_icon.svg"
+   sodipodi:docname="fitalg_icon_mt.svg"
    version="1.0"
    inkscape:version="0.48.1 "
    sodipodi:version="0.32"
@@ -28,9 +28,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2"
-     inkscape:cx="178.5626"
-     inkscape:cy="-5.795776"
+     inkscape:zoom="0.5"
+     inkscape:cx="957.33689"
+     inkscape:cy="-230.56579"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      width="128px"
@@ -1367,5 +1367,17 @@
            id="tspan3194"
            sodipodi:role="line">2</tspan></text>
     </g>
+    <text
+       xml:space="preserve"
+       style="font-size:64.64208221px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="-1.2039077"
+       y="50.135212"
+       id="text3184"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3187"
+         x="-1.2039077"
+         y="50.135212"
+         style="font-style:normal;fill:#0000ff;-inkscape-font-specification:Sans">MT</tspan></text>
   </g>
 </svg>

@@ -32,22 +32,22 @@ class QFPFitFunctionsSPIMFCS : public QObject, public QFPluginFitFunction {
 
         /** \brief name for the plugin */
         virtual QString getName() const {
-            return tr("SPIMFCS: Fit Functions");
+            return tr("SPIM-FCS/SPIM-FCCS: Fit Functions");
         };
 
         /** \brief short description for the plugin */
         virtual QString getDescription() const {
-            return tr("This plugin implements a set of fit functions used for imaging FCS using the SPIM imaging mode");
+            return tr("This plugin implements a set of fit functions used for imaging FCS/FCCS using the SPIM imaging mode");
         };
 
         /** \brief author the plugin */
         virtual QString getAuthor() const {
-            return QString("Jan Krieger");
+            return QString("Jan W. Krieger");
         };
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("(c) 2011 by Jan Krieger");
+            return tr("(c) 2011-2012 by Jan W. Krieger");
         };
 
         /** \brief weblink for the plugin */
@@ -69,7 +69,7 @@ class QFPFitFunctionsSPIMFCS : public QObject, public QFPluginFitFunction {
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=1;
+            minor=2;
         };
 
         /** \brief return list of plugin IDs */
