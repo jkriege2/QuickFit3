@@ -1,0 +1,484 @@
+#include "qfehelpeditorwidget.h".h"
+#include "ui_qfehelpeditorwidget.h"
+
+#include "qfpluginservices.h"
+#include "qfextension.h"
+#include <QtGui>
+#include <QtCore>
+#include "qfcompleterfromfile.h"
+#include <QTemporaryFile>
+#include "qftools.h"
+
+
+
+
+
+
+
+
+
+QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
+    QWidget(parent),
+    ui(new Ui::QFEHelpEditorWidget)
+{
+    ui->setupUi(this);
+    findDlg=new FindDialog(this);
+    replaceDlg=new ReplaceDialog(this);
+
+    //highlighter=new QFQtScriptHighlighter("", ui->edtScript->getEditor()->document());
+
+    completer = new QCompleter(ui->edtScript->getEditor());
+    completermodel=modelFromFile(ProgramOptions::getInstance()->getAssetsDirectory()+"/qtscript/completer.txt");
+    completer->setModel(completermodel);
+    completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setWrapAround(false);
+    ui->edtScript->getEditor()->setCompleter(completer);
+
+    recentHelpFiles=new QRecentFilesMenu(this);
+    recentHelpFiles->setUseSystemFileIcons(false);
+    recentHelpFiles->setAlwaysEnabled(true);
+    connect(recentHelpFiles, SIGNAL(openRecentFile(QString)), this, SLOT(openScriptNoAsk(QString)));
+    ui->btnOpen->setMenu(recentHelpFiles);
+    connect(ui->edtScript->getEditor(), SIGNAL(cursorPositionChanged()), this, SLOT(edtScript_cursorPositionChanged()));
+
+
+
+    cutAct = new QAction(QIcon(":/qfe_helpeditor/script_cut.png"), tr("Cu&t"), this);
+    cutAct->setShortcut(tr("Ctrl+X"));
+    cutAct->setStatusTip(tr("Cut the current selection's contents to the "
+                            "clipboard"));
+    connect(cutAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(cut()));
+
+    copyAct = new QAction(QIcon(":/qfe_helpeditor/script_copy.png"), tr("&Copy"), this);
+    copyAct->setShortcut(tr("Ctrl+C"));
+    copyAct->setStatusTip(tr("Copy the current selection's contents to the "
+                             "clipboard"));
+    connect(copyAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(copy()));
+
+    pasteAct = new QAction(QIcon(":/qfe_helpeditor/script_paste.png"), tr("&Paste"), this);
+    pasteAct->setShortcut(tr("Ctrl+V"));
+    pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
+                              "selection"));
+    connect(pasteAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(paste()));
+
+    undoAct = new QAction(QIcon(":/qfe_helpeditor/script_undo.png"), tr("&Undo"), this);
+    undoAct->setShortcut(tr("Ctrl+Z"));
+    undoAct->setStatusTip(tr("Undo the last change "));
+    connect(undoAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(undo()));
+
+    redoAct = new QAction(QIcon(":/qfe_helpeditor/script_redo.png"), tr("&Redo"), this);
+    redoAct->setShortcut(tr("Ctrl+Shift+Z"));
+    redoAct->setStatusTip(tr("Redo the last undone change "));
+    connect(redoAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(redo()));
+
+    findAct = new QAction(QIcon(":/qfe_helpeditor/script_find.png"), tr("&Find ..."), this);
+    findAct->setShortcut(tr("Ctrl+F"));
+    findAct->setStatusTip(tr("Find a string in sequence "));
+    connect(findAct, SIGNAL(triggered()), this, SLOT(findFirst()));
+
+    findNextAct = new QAction(QIcon(":/qfe_helpeditor/script_find_next.png"), tr("Find &next"), this);
+    findNextAct->setShortcut(tr("F3"));
+    findNextAct->setStatusTip(tr("Find the next occurence "));
+    connect(findNextAct, SIGNAL(triggered()), this, SLOT(findNext()));
+    findNextAct->setEnabled(false);
+
+    replaceAct = new QAction(QIcon(":/qfe_helpeditor/script_find_replace.png"), tr("Find && &replace ..."), this);
+    replaceAct->setShortcut(tr("Ctrl+R"));
+    replaceAct->setStatusTip(tr("Find a string in sequence and replace it with another string "));
+    connect(replaceAct, SIGNAL(triggered()), this, SLOT(replaceFirst()));
+
+    commentAct = new QAction(tr("&Comment text"), this);
+    commentAct->setShortcut(tr("Ctrl+B"));
+    commentAct->setStatusTip(tr("add (single line) comment at the beginning of each line "));
+    connect(commentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(comment()));
+
+    unCommentAct = new QAction(tr("&Uncomment text"), this);
+    unCommentAct->setShortcut(tr("Ctrl+Shift+B"));
+    unCommentAct->setStatusTip(tr("remove (single line) comment at the beginning of each line "));
+    connect(unCommentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(uncomment()));
+
+    indentAct = new QAction(QIcon(":/qfe_helpeditor/script_indent.png"), tr("&Increase indention"), this);
+    commentAct->setShortcut(tr("Ctrl+I"));
+    indentAct->setStatusTip(tr("increase indention "));
+    connect(indentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(indentInc()));
+
+    unindentAct = new QAction(QIcon(":/qfe_helpeditor/script_unindent.png"), tr("&Decrease indention"), this);
+    unindentAct->setShortcut(tr("Ctrl+Shift+I"));
+    unindentAct->setStatusTip(tr("decrease indention "));
+    connect(unindentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(indentDec()));
+
+    gotoLineAct = new QAction(tr("&Goto line ..."), this);
+    gotoLineAct->setShortcut(tr("Alt+G"));
+    gotoLineAct->setStatusTip(tr("goto a line in the opened file "));
+    connect(gotoLineAct, SIGNAL(triggered()), this, SLOT(gotoLine()));
+
+    printAct = new QAction(QIcon(":/qfe_helpeditor/script_print.png"), tr("&Print ..."), this);
+    printAct->setStatusTip(tr("print the current SDFF file "));
+    connect(printAct, SIGNAL(triggered()), this, SLOT(print()));
+
+    cutAct->setEnabled(false);
+    copyAct->setEnabled(false);
+    undoAct->setEnabled(false);
+    redoAct->setEnabled(false);
+    connect(ui->edtScript->getEditor(), SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
+    connect(ui->edtScript->getEditor(), SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
+    connect(ui->edtScript->getEditor(), SIGNAL(undoAvailable(bool)), undoAct, SLOT(setEnabled(bool)));
+    connect(ui->edtScript->getEditor(), SIGNAL(redoAvailable(bool)), redoAct, SLOT(setEnabled(bool)));
+    connect(ui->edtScript->getEditor(), SIGNAL(findNextAvailable(bool)), findNextAct, SLOT(setEnabled(bool)));
+
+
+    QMenu* menuMore=new QMenu(ui->tbMoreOptions);
+    menuMore->addAction(indentAct);
+    menuMore->addAction(unindentAct);
+    menuMore->addAction(commentAct);
+    menuMore->addAction(unCommentAct);
+    menuMore->addSeparator();
+    menuMore->addAction(gotoLineAct);
+    menuMore->addAction(findAct);
+    menuMore->addAction(replaceAct);
+    menuMore->addAction(findNextAct);
+    ui->tbMoreOptions->setMenu(menuMore);
+    ui->tbFind->setDefaultAction(findAct);
+    ui->tbFindNext->setDefaultAction(findNextAct);
+    ui->tbReplace->setDefaultAction(replaceAct);
+    ui->tbPrint->setDefaultAction(printAct);
+    ui->tbCopy->setDefaultAction(copyAct);
+    ui->tbCut->setDefaultAction(cutAct);
+    ui->tbPaste->setDefaultAction(pasteAct);
+    ui->tbRedo->setDefaultAction(redoAct);
+    ui->tbUndo->setDefaultAction(undoAct);
+
+
+
+    setScriptFilename(tr("new_help.html"));
+
+}
+
+QFEHelpEditorWidget::~QFEHelpEditorWidget()
+{
+    delete ui;
+
+}
+
+QString QFEHelpEditorWidget::getScript() const
+{
+    return ui->edtScript->getEditor()->toPlainText();
+}
+
+void QFEHelpEditorWidget::loadSettings(QSettings &settings, QString prefix)
+{
+    recentHelpFiles->readSettings(settings, prefix+"recentScripts/");
+}
+
+void QFEHelpEditorWidget::storeSettings(QSettings &settings, QString prefix) const
+{
+    recentHelpFiles->storeSettings(settings, prefix+"recentScripts/");
+}
+
+
+void QFEHelpEditorWidget::on_btnExecute_clicked()
+{
+    QTemporaryFile f;
+    if (f.open()) {
+        QTextStream txt(&f);
+        txt<<ui->edtScript->getEditor()->toPlainText();
+        f.close();
+
+        QFPluginServices::getInstance()->displayHelpWindow(f.fileName());
+    }
+}
+
+
+
+void QFEHelpEditorWidget::on_btnNew_clicked()
+{
+    if (maybeSave()) {
+        ui->edtScript->getEditor()->setPlainText("");
+        setScriptFilename(tr("new_help.html"));
+        lastScript=ui->edtScript->getEditor()->toPlainText();
+    }
+}
+
+void QFEHelpEditorWidget::on_btnOpen_clicked()
+{
+    openScript("last", true);
+}
+
+void QFEHelpEditorWidget::on_btnSave_clicked()
+{
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acquisitionScripts/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastScriptDir", ProgramOptions::getInstance()->getMainHelpDirectory()).toString();
+    QDir d(dir);
+    QString filename=qfGetSaveFileName(this, tr("save acquisition script ..."), d.absoluteFilePath(currentScript), tr("help (*.html)"));
+    if (!filename.isEmpty()) {
+        bool ok=true;
+        /*if (QFile::exists(filename)) {
+            ok=false;
+            if (QMessageBox::question(this, tr("save acquisition script ..."), tr("The file\n  '%1'\nalready exists. Overwrite?").arg(filename), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
+                ok=true;
+            }
+        }*/
+        if (ok) {
+            QFile f(filename);
+            if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
+                QTextStream s(&f);
+                s<<ui->edtScript->getEditor()->toPlainText().toUtf8();
+                lastScript=ui->edtScript->getEditor()->toPlainText();
+                f.close();
+                setScriptFilename(filename);
+            }
+
+        }
+    }
+    ProgramOptions::getInstance()->getQSettings()->setValue("QFEHelpEditorWidget/lasttemplatedir", dir);
+}
+
+
+
+void QFEHelpEditorWidget::on_btnOpenExample_clicked()
+{
+    openScript(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/qfe_helpeditor/examples/", false);
+}
+
+void QFEHelpEditorWidget::on_btnOpenTemplate_clicked()
+{
+    openScript(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/qfe_helpeditor/templates/", false);
+}
+
+void QFEHelpEditorWidget::edtScript_cursorPositionChanged()
+{
+    QTextCursor tc = ui->edtScript->getEditor()->textCursor();
+    /*
+    tc.select(QTextCursor::WordUnderCursor);
+    QString text=tc.selectedText();
+
+    QString word=text.toLower();*/
+
+
+    QString text=ui->edtScript->getEditor()->toPlainText();
+    QString word;
+    int newPos=tc.position();
+    if (newPos>=0 && newPos<text.size()) {
+        word+=text[newPos];
+        int p=newPos-1;
+        while (p>=0 && (text[p].isLetterOrNumber()||text[p]=='_'||text[p]=='.')) {
+            word=text[p]+word;
+            p--;
+        }
+        p=newPos+1;
+        while (p<text.size() && (text[p].isLetterOrNumber()||text[p]=='_'||text[p]=='.')) {
+            word=word+text[p];
+            p++;
+        }
+        word=word.toLower();
+    }
+
+
+
+
+    ui->labCursorPos->setText(tr("Line %1, Column %2").arg(ui->edtScript->getEditor()->getLineNumber()).arg(ui->edtScript->getEditor()->getColumnNumber()));
+}
+
+void QFEHelpEditorWidget::on_btnHelp_clicked()
+{
+    QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getMainHelpDirectory()+"/qf3_helpref.html");
+}
+
+bool QFEHelpEditorWidget::maybeSave() {
+    if (ui->edtScript->getEditor()->toPlainText().isEmpty()) return true;
+    if (ui->edtScript->getEditor()->toPlainText()==lastScript) return true;
+    int r=QMessageBox::question(this, tr("save help file ..."), tr("The current script has not been saved.\n  Delete?\n    Yes: Any changes will be lost.\n    No: You will be asked for a filename for the script.\n    Cancel: return to editing the script."), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::No);
+    if (r==QMessageBox::Yes) {
+        return true;
+    } else if (r==QMessageBox::No) {
+        on_btnSave_clicked();
+        return true;
+    }
+
+    return false;
+}
+
+void QFEHelpEditorWidget::setScriptFilename(QString filename)
+{
+    currentScript=filename;
+    recentHelpFiles->addRecentFile(filename);
+    ui->labScriptFilename->setText(tr("current file: <tt><i>%1</i></tt>").arg(QFileInfo(filename).fileName()));
+}
+
+
+QStringListModel *QFEHelpEditorWidget::modelFromFile(const QString &fileName)
+{
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly))
+     return new QStringListModel(completer);
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QStringList words;
+
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine();
+        if (!line.isEmpty()) {
+            //QMessageBox::information(this, "", line.trimmed());
+            words << line.trimmed();
+        }
+    }
+    words.sort();
+    //QMessageBox::information(this, "", words.join(", "));
+    QApplication::restoreOverrideCursor();
+    return new QStringListModel(words, completer);
+}
+
+
+void QFEHelpEditorWidget::openScript(QString dir, bool saveDir) {
+    if (maybeSave()) {
+        if (dir=="last") {
+            QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/qfe_helpeditor/scripts/");
+            dir=ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastScriptDir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acquisitionScripts/").toString();
+        }
+        QString filename=qfGetOpenFileName(this, tr("open help file ..."), dir, tr("help (*.html)"))    ;
+        if (QFile::exists(filename)) {
+            QFile f(filename);
+            if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+                ui->edtScript->getEditor()->setPlainText(QString::fromUtf8(f.readAll()));
+                setScriptFilename(filename);
+                f.close();
+                lastScript=ui->edtScript->getEditor()->toPlainText();
+            }
+        }
+        if (saveDir) ProgramOptions::getInstance()->getQSettings()->setValue("QFEHelpEditorWidget/lastScriptDir", dir);
+    }
+
+}
+
+void QFEHelpEditorWidget::openScriptNoAsk(QString filename)
+{
+    if (maybeSave()) {
+        if (QFile::exists(filename)) {
+            QFile f(filename);
+            if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+                ui->edtScript->getEditor()->setPlainText(QString::fromUtf8(f.readAll()));
+                setScriptFilename(filename);
+                f.close();
+                lastScript=ui->edtScript->getEditor()->toPlainText();
+            }
+        }
+    }
+}
+
+
+
+void QFEHelpEditorWidget::findFirst()
+{
+    if (ui->edtScript->getEditor()->hasSelection()) findDlg->setPhrase(ui->edtScript->getEditor()->getSelection());
+    if (findDlg->exec()==QDialog::Accepted) {
+        // enable "Find next" action
+        findNextAct->setEnabled(true);
+        findNextAct->setIcon(QIcon(":/qfe_helpeditor/script_find_next.png"));
+        findNextAct->setText(tr("Find &next"));
+        findNextAct->setStatusTip(tr("Find the next occurence "));
+        disconnect(findNextAct, SIGNAL(triggered()), this, 0);
+        connect(findNextAct, SIGNAL(triggered()), this, SLOT(findNext()));
+
+        if (!ui->edtScript->getEditor()->findFirst(findDlg->getPhrase(), findDlg->getSearchFromStart(), findDlg->getMatchCase(), findDlg->getWholeWords())) {
+            QMessageBox::information(this, tr("Find ..."),
+                             tr("Did not find '%1' ...")
+                             .arg(ui->edtScript->getEditor()->getPhrase()));
+            findNextAct->setEnabled(false);
+        }
+    }
+}
+
+void QFEHelpEditorWidget::findNext()
+{
+    if (!ui->edtScript->getEditor()->findNext()) {
+        QMessageBox::information(this, tr("Find ..."),
+                         tr("Did not find '%1' ...")
+                         .arg(ui->edtScript->getEditor()->getPhrase()));
+    }
+}
+
+void QFEHelpEditorWidget::replaceFirst()
+{
+    if (ui->edtScript->getEditor()->hasSelection()) replaceDlg->setPhrase(ui->edtScript->getEditor()->getSelection());
+    if (replaceDlg->exec()==QDialog::Accepted) {
+        // enable "Find next" action
+        findNextAct->setEnabled(true);
+        findNextAct->setIcon(QIcon(":/qfe_helpeditor/script_find_replace_next.png"));
+        findNextAct->setText(tr("Replace &next"));
+        findNextAct->setStatusTip(tr("Replace the next occurence "));
+        disconnect(findNextAct, SIGNAL(triggered()), this, 0);
+        connect(findNextAct, SIGNAL(triggered()), this, SLOT(replaceNext()));
+
+        if (!ui->edtScript->getEditor()->replaceFirst(replaceDlg->getPhrase(), replaceDlg->getReplace(), replaceDlg->getSearchFromStart(), replaceDlg->getMatchCase(), replaceDlg->getWholeWords(), replaceDlg->getReplaceAll(), replaceDlg->getAskBeforeReplace())) {
+            QMessageBox::information(this, tr("Find & Replace..."),
+                             tr("Did not find '%1' ...")
+                             .arg(ui->edtScript->getEditor()->getPhrase()));
+        }
+    }
+}
+
+void QFEHelpEditorWidget::replaceNext()
+{
+    if (! ui->edtScript->getEditor()->replaceNext()) {
+        QMessageBox::information(this, tr("Find & Replace ..."),
+                                 tr("Did not find '%1' ...")
+                                 .arg(ui->edtScript->getEditor()->getPhrase()));
+    }
+
+}
+
+void QFEHelpEditorWidget::gotoLine()
+{
+    int maxLine=ui->edtScript->getEditor()->document()->blockCount();
+    bool ok;
+    unsigned long line = QInputDialog::getInteger(this, tr("Goto Line ..."),
+                              tr("Enter a line number (1 - %2):").arg(maxLine), 1, 1, maxLine, 1, &ok);
+    if (ok) {
+        ui->edtScript->getEditor()->gotoLine(line);
+        ui->edtScript->getEditor()->setFocus();
+    }
+
+}
+
+void QFEHelpEditorWidget::print()
+{
+#ifndef QT_NO_PRINTER
+   QPrinter printer;
+
+   QPrintDialog *dialog = new QPrintDialog(&printer, this);
+   dialog->setWindowTitle(tr("Print Document"));
+   if (ui->edtScript->getEditor()->textCursor().hasSelection())
+       dialog->addEnabledOption(QAbstractPrintDialog::PrintSelection);
+   if (dialog->exec() != QDialog::Accepted)
+       return;
+
+   ui->edtScript->getEditor()->print(&printer);
+#endif
+
+}
+
+void QFEHelpEditorWidget::printPreviewClick()
+{
+#ifndef QT_NO_PRINTER
+    QPrinter printer(QPrinter::HighResolution);
+    QPrintPreviewDialog preview(&printer, this);
+    connect(&preview, SIGNAL(paintRequested(QPrinter *)), SLOT(printPreview(QPrinter *)));
+    preview.exec();
+#endif
+}
+
+void QFEHelpEditorWidget::printPreview(QPrinter *printer)
+{
+#ifndef QT_NO_PRINTER
+    ui->edtScript->getEditor()->print(printer);
+#endif
+
+}
+
+void QFEHelpEditorWidget::clearFindActions()
+{
+    findNextAct->setEnabled(false);
+}
+
+
