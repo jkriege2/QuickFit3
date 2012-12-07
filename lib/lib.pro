@@ -78,7 +78,8 @@ HEADERS += dlgnewproperty.h \
     qfpropertyitemdelegate.h \
     qfdoubleedit.h \
     dlg_qffileeditdialog.h \
-    qfversion.h
+    qfversion.h \
+    qfhistogramservice.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -126,7 +127,8 @@ SOURCES += dlgnewproperty.cpp \
     qfxmlstreamwriter.cpp \
     qfpropertyitemdelegate.cpp \
     qfdoubleedit.cpp \
-    dlg_qffileeditdialog.cpp
+    dlg_qffileeditdialog.cpp \
+    qfhistogramservice.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

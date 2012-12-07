@@ -24,13 +24,15 @@
 #include "../version.h"
 #include "qvisiblehandlesplitter.h"
 #include "qrecentfilesmenu.h"
+#include "qfhistogramservice.h"
+#include "qfhistogramview.h"
 
 
 
 /*! \brief main widget for QuickFit
     \ingroup qf3app
 */
-class MainWindow : public QMainWindow, public QFPluginServices {
+class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogramService {
         Q_OBJECT
         Q_INTERFACES(QFPluginServices)
     public:
@@ -133,6 +135,14 @@ class MainWindow : public QMainWindow, public QFPluginServices {
 
         /** \brief register a configuration pane for a plugin in the main options dialog */
         virtual void registerSettingsPane(QFPluginOptionsDialogInterface* plugin);
+
+
+
+
+
+        virtual QWidget* getCreateView(const QString& name, const QString& title);
+        virtual void clearView(const QString& name);
+        virtual void addHistogramToView(const QString& name, const Histogram& histogram);
     protected:
         void closeEvent(QCloseEvent *event);
         virtual void showEvent(QShowEvent* event);
@@ -250,6 +260,8 @@ class MainWindow : public QMainWindow, public QFPluginServices {
         QList<QFPluginServices::HelpDirectoryInfo> pluginHelpList;
 
         QList<QFPluginOptionsDialogInterface*> pluginOptionDialogs;
+        QMap<QString, QFHistogramView*> histograms;
+        QString lastHistogram;
 
         QTimer newProjectTimer;
 

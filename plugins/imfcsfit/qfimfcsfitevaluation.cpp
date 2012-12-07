@@ -116,7 +116,7 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
         double bin=r->getProperty("BINNING", 1.0).toDouble();
         double width=r->getProperty("PIXEL_WIDTH", -1).toDouble();
         double height=r->getProperty("PIXEL_HEIGHT", -1).toDouble();
-        if (width<=0 || height<=0) return false;
+        if (width<=0 || height<=0 || !(r->propertyExists("DCCF_DELTAX") && r->propertyExists("DCCF_DELTAY"))) return false;
         value=sqrt(qfSqr(bin*width*deltax)+qfSqr(bin*height*deltay));
         error=0;
         return true;
@@ -125,7 +125,7 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
         double deltax=r->getProperty("DCCF_DELTAX", 0.0).toDouble();
         double bin=r->getProperty("BINNING", 1.0).toDouble();
         double width=r->getProperty("PIXEL_WIDTH", -1).toDouble();
-        if (width<=0) return false;
+        if (width<=0 || !(r->propertyExists("DCCF_DELTAX"))) return false;
         value=bin*width*deltax;
         //qDebug()<<deltax<<bin<<width;
         error=0;
@@ -135,7 +135,7 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
         double deltay=r->getProperty("DCCF_DELTAY", 0.0).toDouble();
         double bin=r->getProperty("BINNING", 1.0).toDouble();
         double height=r->getProperty("PIXEL_HEIGHT", -1).toDouble();
-        if (height<=0) return false;
+        if (height<=0 || !(r->propertyExists("DCCF_DELTAY"))) return false;
         //qDebug()<<deltay<<bin<<height;
         value=bin*height*deltay;
         error=0;

@@ -137,6 +137,9 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         void openFilesDirectory();
         void showAvgClicked(bool checked);
 
+        void showStatistics();
+        void showStatisticsComparing();
+
     private:
         QTimer* timerResizeProps;
 
@@ -239,6 +242,8 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QAction* actDeleteResults;
         QAction* actCopyMedianQuantilesResults;
         QAction* actCopyMedianQuantilesNoHead;
+        QAction* actStatistics;
+        QAction* actStatisticsComparing;
 
         QFEnhancedLineEdit* edtFilterEvaluation;
         QFEnhancedLineEdit* edtFilterResults;

@@ -2735,6 +2735,26 @@ QVector<double> QFRawDataRecord::resultsGetAsDoubleList(const QString& evalName,
     const evaluationResult r=resultsGet(evalName, resultName);
     if (ok) *ok=true;
     switch(r.type) {
+        case qfrdreNumber:
+        case qfrdreNumberError: {
+                QVector<double> v;
+                v.append(r.dvalue);
+                return v;
+            }
+            break;
+        case qfrdreInteger: {
+                QVector<double> v;
+                v.append(r.ivalue);
+                return v;
+            }
+            break;
+        case qfrdreBoolean: {
+                QVector<double> v;
+                v.append(r.bvalue?1:0);
+                return v;
+            }
+            break;
+
         case qfrdreNumberVector:
         case qfrdreNumberMatrix:
         case qfrdreNumberErrorVector:
@@ -2770,6 +2790,18 @@ QVector<qlonglong> QFRawDataRecord::resultsGetAsIntegerList(const QString& evalN
     const evaluationResult r=resultsGet(evalName, resultName);
     if (ok) *ok=true;
     switch(r.type) {
+        case qfrdreInteger: {
+                QVector<qlonglong> v;
+                v.append(r.ivalue);
+                return v;
+            }
+            break;
+        case qfrdreBoolean: {
+                QVector<qlonglong> v;
+                v.append(r.bvalue?1:0);
+                return v;
+            }
+            break;
         case qfrdreIntegerVector:
         case qfrdreIntegerMatrix:
             return r.ivec;

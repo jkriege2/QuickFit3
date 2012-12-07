@@ -125,7 +125,8 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
         /*! \brief reset the all parameters to the initial/global/default fix in current files */
         virtual void resetAllFitFixCurrent() {};
 
-
+    signals:
+        void insertRecord();
     private:
         Ui::QFRDRFCSFitFunctionSimulator *ui;
         QTabBar* tbEditRanges;
@@ -169,6 +170,7 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
         void updateNoiseEnabled();
         void showHelp();
         void on_btnModelHelp_clicked();
+        void on_btnAddRecord_clicked();
 };
 
 #endif // QFRDRFCSFITFUNCTIONSIMULATOR_H

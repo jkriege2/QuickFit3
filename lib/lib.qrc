@@ -69,6 +69,9 @@
         <file alias="help_findinall.png">icons/help_findinall.png</file>
         <file alias="help_help.png">icons/help_help.png</file>
         <file alias="mail.png">icons/mail.png</file>
+        <file alias="result_statistics.png">icons/result_statistics.png</file>
+        <file alias="result_statistics_compare.png">icons/result_statistics_compare.png</file>
+        <file alias="result_statistics_icon.png">icons/result_statistics_icon.png</file>
     </qresource>
     <qresource prefix="/lib/qfstyledbutton">
         <file alias="network.png">icons/network.png</file>

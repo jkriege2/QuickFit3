@@ -17,6 +17,7 @@
 #include "qfstyledbutton.h"
 #include "qfcompleterfromfile.h"
 #include "qfproject.h"
+#include "qfhistogramservice.h"
 
 class QFEvaluationPropertyEditor; // forward
 
@@ -175,6 +176,10 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         void deleteSelectedRecords();
 
         void showAvgClicked(bool checked);
+
+        void showStatistics();
+        void showStatisticsComparing();
+
     protected:
         /** \brief points to the record currently displayed */
         QPointer<QFEvaluationItem> current;
@@ -241,6 +246,8 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         QAction* actDeleteResults;
         /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
         QWidget* widResults;
+        QAction* actStatistics;
+        QAction* actStatisticsComparing;
 
         QFEnhancedLineEdit* edtDisplayProperties;
         QFEnhancedLineEdit* edtFilterFiles;

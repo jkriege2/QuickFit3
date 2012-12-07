@@ -194,6 +194,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
 
 
 MainWindow::~MainWindow() {
+
     //std::cout<<"deleting MainWindow\n";
     if (project) delete project;
     //std::cout<<"deleting MainWindow ... OK\n";
@@ -245,6 +246,14 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         extensionManager->deinit();
         newProjectTimer.stop();
         helpWindow->close();
+        QMapIterator<QString, QFHistogramView*> ii(histograms);
+        while (ii.hasNext()) {
+            ii.next();
+            QString name=ii.key();
+            histograms[name]->writeSettings(*(ProgramOptions::getInstance()->getQSettings()), "histograms/"+cleanStringForFilename(name)+"/");
+            histograms[name]->close();
+            histograms[name]->deleteLater();
+        }
         ProgramOptions::setConfigValue("quickfit/lastrunsvn", SVNVERSION);
         event->accept();
         QApplication::exit();
@@ -1593,6 +1602,59 @@ QString MainWindow::getPluginHelpDirectory(const QString& pluginID) {
 void MainWindow::registerSettingsPane(QFPluginOptionsDialogInterface *plugin)
 {
     pluginOptionDialogs.append(plugin);
+}
+
+QWidget *MainWindow::getCreateView(const QString &name, const QString &title)
+{
+    if (!histograms.contains(name)) {
+        histograms[name]=new QFHistogramView(NULL);
+    }
+    histograms[name]->setWindowTitle(title);
+    histograms[name]->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+    histograms[name]->setWindowIcon(QIcon(":/lib/result_statistics_icon.png"));
+    histograms[name]->show();
+    histograms[name]->raise();
+    //histograms[name]->setAttribute(Qt::WA_DeleteOnClose);
+    if (histograms.size()>1) {
+        QSize s=QSize(500,300);
+        QPoint p=histograms[name]->pos();
+        if (histograms.contains(lastHistogram)) {
+            p=histograms[lastHistogram]->pos();
+            s=histograms[lastHistogram]->size();
+        }
+
+        histograms[name]->move(p+QPoint(32,32));
+        histograms[name]->resize(s);
+    } else {
+        histograms[name]->resize(QSize(500,300));
+    }
+    histograms[name]->readSettings(*(ProgramOptions::getInstance()->getQSettings()), "histograms/"+cleanStringForFilename(name)+"/");
+    histograms[name]->setAutorange(true);
+    histograms[name]->setNormalized(true);
+    histograms[name]->setLog(false);
+    lastHistogram=name;
+    return histograms[name];
+}
+
+
+void MainWindow::clearView(const QString &name)
+{
+    if (histograms.contains(name)) {
+        histograms[name]->clear();
+        histograms[name]->updateHistogram(true);
+    }
+}
+
+void MainWindow::addHistogramToView(const QString &name, const QFHistogramService::Histogram &histogram)
+{
+    if (histograms.contains(name)) {
+        double* d=(double*)malloc(histogram.data.size()*sizeof(double));
+        for (int i=0; i<histogram.data.size(); i++) {
+            d[i]=histogram.data[i];
+        }
+        histograms[name]->addHistogram(histogram.name, d, histogram.data.size());
+        histograms[name]->updateHistogram(true);
+    }
 }
 
 QString MainWindow::getPluginHelp(const QString& pluginID) {

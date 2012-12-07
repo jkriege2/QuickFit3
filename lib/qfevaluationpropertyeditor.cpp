@@ -72,6 +72,7 @@ void QFEvaluationRawDataModelProxy::setEvaluation(QFEvaluationItem* eval) {
 
     connect(eval, SIGNAL(selectionChanged(QList<QPointer<QFRawDataRecord> >)), this, SLOT(selectionChanged(QList<QPointer<QFRawDataRecord> >)));
     invalidateFilter();
+
 }
 
 void QFEvaluationRawDataModelProxy::setEditor(QFEvaluationPropertyEditor* editor) {
@@ -266,6 +267,8 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         edtFilterResultsNot->setText(current->getProperty("RESULTS_FILTERNOT", "").toString());
         chkFilterResultsRegExp->setChecked(current->getProperty("RESULTS_FILTER_REGEXP", false).toBool());
 
+        filterRecordsChanged();
+
         /*helpWidget->clear();
         QString dll=current->getProject()->getEvaluationItemFactory()->getPluginHelp(current->getType());
         helpWidget->updateHelp(dll);*/
@@ -442,6 +445,113 @@ void QFEvaluationPropertyEditor::showAvgClicked(bool checked)
     if (current && resultsModel) {
         resultsModel->setShowVectorMatrixAvg(checked);
     }
+}
+
+void QFEvaluationPropertyEditor::showStatistics()
+{
+
+    QFHistogramService* hs=QFHistogramService::getInstance();
+    if (hs&&current) {
+        QModelIndexList idxs=tvResults->selectionModel()->selectedIndexes();
+        QMap<int, QFHistogramService::Histogram> hists;
+        for (int i=0; i<idxs.size(); i++) {
+            QFHistogramService::Histogram h;
+            int col=idxs[i].column();
+            if (!hists.contains(col)) {
+                h.name=resultsModel->headerData(col, Qt::Horizontal).toString();
+                hists[col]=h;
+            }
+            QString ename=resultsModel->data(idxs[i], QFEvaluationResultsModel::EvalNameRole).toString();
+            QString rname=resultsModel->data(idxs[i], QFEvaluationResultsModel::ResultNameRole).toString();
+            int rid=resultsModel->data(idxs[i], QFEvaluationResultsModel::ResultIDRole).toInt();
+
+            QFRawDataRecord* record=current->getProject()->getRawDataByID(rid);
+
+            if (record) hists[col].data<<record->resultsGetAsDoubleList(ename, rname);
+        }
+
+        bool onePerCol=true;
+        if (hists.size()>1) {
+            onePerCol=QMessageBox::question(this, tr("Data histogram"), tr("You selected %1 columns.\nShould QuickFit open\n   [Yes] one histogram window per column, or\n   [No]  combine all data into one window?").arg(hists.size()), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
+        }
+
+        if (onePerCol) {
+            QMapIterator<int, QFHistogramService::Histogram> ii(hists);
+            while (ii.hasNext()) {
+                ii.next();
+                QString histID=QString("hist")+current->getType()+QString::number(current->getID())+"_"+QString::number(ii.key());
+                hs->getCreateView(histID, tr("Histogram from %1").arg(current->getName()));
+                hs->clearView(histID);
+                hs->addHistogramToView(histID, ii.value());
+            }
+        } else {
+            QString histID=QString("hist")+current->getType()+QString::number(current->getID());
+            hs->getCreateView(histID, tr("Histogram from %1").arg(current->getName()));
+            hs->clearView(histID);
+            QMapIterator<int, QFHistogramService::Histogram> ii(hists);
+            while (ii.hasNext()) {
+                ii.next();
+                hs->addHistogramToView(histID, ii.value());
+            }
+        }
+    }
+
+}
+
+void QFEvaluationPropertyEditor::showStatisticsComparing()
+{
+
+    QFHistogramService* hs=QFHistogramService::getInstance();
+    if (hs&&current) {
+        QModelIndexList idxs=tvResults->selectionModel()->selectedIndexes();
+        QMap<int, QList<QFHistogramService::Histogram> > hists;
+        for (int i=0; i<idxs.size(); i++) {
+            QFHistogramService::Histogram h;
+            int col=idxs[i].column();
+            if (!hists.contains(col)) {
+                QList<QFHistogramService::Histogram> l;
+                hists[col]=l;
+            }
+            QString ename=resultsModel->data(idxs[i], QFEvaluationResultsModel::EvalNameRole).toString();
+            QString rname=resultsModel->data(idxs[i], QFEvaluationResultsModel::ResultNameRole).toString();
+            int rid=resultsModel->data(idxs[i], QFEvaluationResultsModel::ResultIDRole).toInt();
+            QFRawDataRecord* record=current->getProject()->getRawDataByID(rid);
+
+            h.name=resultsModel->headerData(col, Qt::Vertical).toString();
+            if (record) h.data<<record->resultsGetAsDoubleList(ename, rname);
+            hists[col].append(h);
+        }
+
+        bool onePerCol=true;
+        if (hists.size()>1) {
+            onePerCol=QMessageBox::question(this, tr("Data histogram"), tr("You selected %1 columns.\nShould QuickFit open\n   [Yes] one histogram window per column, or\n   [No]  combine all data into one window?").arg(hists.size()), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
+        }
+
+        if (onePerCol) {
+            QMapIterator<int, QList<QFHistogramService::Histogram> > ii(hists);
+            while (ii.hasNext()) {
+                ii.next();
+                QString histID=QString("hist")+current->getType()+QString::number(current->getID())+"_"+QString::number(ii.key());
+                hs->getCreateView(histID, tr("Histogram from %1").arg(current->getName()));
+                hs->clearView(histID);
+                for (int i=0; i<ii.value().size(); i++) {
+                    hs->addHistogramToView(histID, ii.value().at(i));
+                }
+            }
+        } else {
+            QString histID=QString("hist")+current->getType()+QString::number(current->getID());
+            hs->getCreateView(histID, tr("Histogram from %1").arg(current->getName()));
+            hs->clearView(histID);
+            QMapIterator<int,  QList<QFHistogramService::Histogram> > ii(hists);
+            while (ii.hasNext()) {
+                ii.next();
+                for (int i=0; i<ii.value().size(); i++) {
+                    hs->addHistogramToView(histID, ii.value().at(i));
+                }
+            }
+        }
+    }
+
 }
 
 void QFEvaluationPropertyEditor::nameChanged(const QString& text) {
@@ -626,6 +736,12 @@ void QFEvaluationPropertyEditor::createWidgets() {
     actSaveResultsAveraged=new QAction(tr("Save all results to file, averaged vector/matrix results"), this);
 
     tbResults->addSeparator();
+    actStatistics=new QAction(QIcon(":/lib/result_statistics.png"), tr("Result statistics, summarizing cells"), this);
+    tbResults->addAction(actStatistics);
+    actStatisticsComparing=new QAction(QIcon(":/lib/result_statistics_compare.png"), tr("Result statistics, comparing cells"), this);
+    tbResults->addAction(actStatisticsComparing);
+
+    tbResults->addSeparator();
     chkShowAvg=new QCheckBox(tr("show Avg+/-SD for vector/matrix resuts"), this);
     tbResults->addWidget(chkShowAvg);
     chkShowAvg->setChecked(true);
@@ -733,6 +849,8 @@ void QFEvaluationPropertyEditor::createWidgets() {
     tvResults->addAction(actSaveResultsAveraged);
     tvResults->addAction(actRefreshResults);
     tvResults->addAction(actDeleteResults);
+    tvResults->addAction(actStatistics);
+    tvResults->addAction(actStatisticsComparing);
     rwvlayout->addWidget(tvResults);
     labAveragedresults=new QLabel(widResults);
     labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);
@@ -752,6 +870,8 @@ void QFEvaluationPropertyEditor::createWidgets() {
     connect(actSaveResultsAveraged, SIGNAL(triggered()), this, SLOT(saveResultsAveraged()));
     connect(actRefreshResults, SIGNAL(triggered()), this, SLOT(refreshResults()));
     connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedRecords()));
+    connect(actStatistics, SIGNAL(triggered()), this, SLOT(showStatistics()));
+    connect(actStatisticsComparing, SIGNAL(triggered()), this, SLOT(showStatisticsComparing()));
 
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 
@@ -802,6 +922,9 @@ void QFEvaluationPropertyEditor::createWidgets() {
     menuResults->addAction(actCopyValErrResultsNoHead);
     menuResults->addAction(actCopyMedianQuantilesResults);
     menuResults->addAction(actCopyMedianQuantilesNoHead);
+    menuResults->addSeparator();
+    menuResults->addAction(actStatistics);
+    menuResults->addAction(actStatisticsComparing);
 
     currentTabChanged(0);
 }

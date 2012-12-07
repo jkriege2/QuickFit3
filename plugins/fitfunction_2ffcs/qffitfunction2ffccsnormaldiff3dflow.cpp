@@ -174,9 +174,9 @@ void QFFitFunctionFCCSNormalDiff3DFlow2Focus::calcParameter(double* data, double
     //double gamma2=sqr(gamma);
     double wxy=data[FCSDiff_focus_width]/1.0e3; // in µm
     double ewxy=0;
-    double dx=data[FCSDiff_focus_distancex]/1.0e3; // in µm
+    double dx=data[FCSDiff_focus_distancex]; // in µm
     double edx=0;
-    double dy=data[FCSDiff_focus_distancey]/1.0e3; // in µm
+    double dy=data[FCSDiff_focus_distancey]; // in µm
     double edy=0;
     double vx=data[FCSDiff_vflowx];
     double evx=0;
@@ -207,8 +207,8 @@ void QFFitFunctionFCCSNormalDiff3DFlow2Focus::calcParameter(double* data, double
         eD3=error[FCSDiff_diff_coeff3];
         egamma=error[FCSDiff_focus_struct_fac];
         ewxy=error[FCSDiff_focus_width]/1.0e3;
-        edx=error[FCSDiff_focus_distancex]/1.0e3;
-        edy=error[FCSDiff_focus_distancey]/1.0e3;
+        edx=error[FCSDiff_focus_distancex];
+        edy=error[FCSDiff_focus_distancey];
         evx=error[FCSDiff_vflowx];
         evy=error[FCSDiff_vflowy];
         ewz=error[FCSDiff_focus_height]/1.0e3;

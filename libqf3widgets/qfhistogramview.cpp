@@ -273,7 +273,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
         ds->clear();
         for (int r=0; r<tabHistogramParameters->rowCount(); r++) {
             for (int c=0; c<histograms.size(); c++)  {
-                tabHistogramParameters->setCell(r, c+1, QVariant());
+                tabHistogramParameters->setCellCreate(r, c+1, QVariant());
             }
         }
     } else if (which<histograms.size()){
@@ -286,7 +286,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
         QString prefix=QString("hist%1_").arg(which);
         ds->deleteAllPrefixedColumns(prefix);
         for (int r=0; r<tabHistogramParameters->rowCount(); r++) {
-            tabHistogramParameters->setCell(r, which+1, QVariant());
+            tabHistogramParameters->setCellCreate(r, which+1, QVariant());
         }
     }
 
@@ -304,6 +304,37 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
     if (which>=0) {
         histStart=which;
         histEnd=which+1;
+    }
+    double amin=0;
+    double amax=0;
+    bool first=true;
+    for (int hh=histStart; hh<histEnd; hh++) {
+        //qDebug()<<hh<<histograms.size();
+        if (hh>=0 && hh<histograms.size()) {
+            QFHistogramView::Histogram hist=histograms[hh];
+            if (hist.data && (hist.size>0)) {
+                int imageSize=hist.size;
+                double* datahist=(double*)malloc(imageSize*sizeof(double));
+                int32_t datasize=0;
+                for (register int32_t i=0; i<imageSize; i++) {
+                    datahist[i]=hist.data[i];
+                    datasize++;
+                }
+                double dmin, dmax;
+                statisticsSort(datahist, datasize);
+                dmin=statisticsSortedMin(datahist, datasize);
+                dmax=statisticsSortedMax(datahist, datasize);
+                if (first) {
+                    amin=dmin;
+                    amax=dmax;
+                } else {
+                    amin=qMin(amin, dmin);
+                    amax=qMin(amax, dmax);
+                }
+                first=false;
+                free(datahist);
+            }
+        }
     }
     for (int hh=histStart; hh<histEnd; hh++) {
         //qDebug()<<hh<<histograms.size();
@@ -339,20 +370,20 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 dmedian=statisticsSortedMedian(datahist, datasize);
                 dq25=statisticsSortedQuantile(datahist, datasize, 0.25);
                 dq75=statisticsSortedQuantile(datahist, datasize, 0.75);
-                tabHistogramParameters->setCell(0, hh+1, datasize);
-                tabHistogramParameters->setCell(1, hh+1, dmean);
-                tabHistogramParameters->setCell(2, hh+1, dmedian);
-                tabHistogramParameters->setCell(3, hh+1, dstd);
-                tabHistogramParameters->setCell(4, hh+1, dmin);
-                tabHistogramParameters->setCell(5, hh+1, dq25);
-                tabHistogramParameters->setCell(6, hh+1, dq75);
-                tabHistogramParameters->setCell(7, hh+1, dmax);
+                tabHistogramParameters->setCellCreate(0, hh+1, datasize);
+                tabHistogramParameters->setCellCreate(1, hh+1, dmean);
+                tabHistogramParameters->setCellCreate(2, hh+1, dmedian);
+                tabHistogramParameters->setCellCreate(3, hh+1, dstd);
+                tabHistogramParameters->setCellCreate(4, hh+1, dmin);
+                tabHistogramParameters->setCellCreate(5, hh+1, dq25);
+                tabHistogramParameters->setCellCreate(6, hh+1, dq75);
+                tabHistogramParameters->setCellCreate(7, hh+1, dmax);
                 tabHistogramParameters->setColumnTitle(hh+1, hist.name);
 
                 if (chkHistogramRangeAuto->isChecked() && hh==0) {
                     connectParameterWidgets(false);
-                    edtHistogramMin->setValue(dmin);
-                    edtHistogramMax->setValue(dmax);
+                    edtHistogramMin->setValue(amin);
+                    edtHistogramMax->setValue(amax);
                     connectParameterWidgets(true);
                 }
 
@@ -362,9 +393,10 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
 
 
                 if (chkHistogramRangeAuto->isChecked() && hh==0) {
-                    statisticsHistogram<double, double>(datahist, datasize, histX, histY, histBins, chkNormalizedHistograms->isChecked());
+                    //statisticsHistogram<double, double>(datahist, datasize, histX, histY, histBins, chkNormalizedHistograms->isChecked());
+                    statisticsHistogramRanged<double, double>(datahist, datasize, amin, amax, histX, histY, histBins, chkNormalizedHistograms->isChecked());
                 } else {
-                    statisticsHistogramRanged<double, double>(datahist, datasize, edtHistogramMin->value(), edtHistogramMax->value(), histX, histY, histBins, chkNormalizedHistograms->isChecked());
+                    statisticsHistogramRanged<double, double>(datahist, datasize, mmin, mmax, histX, histY, histBins, chkNormalizedHistograms->isChecked());
                 }
 
                 if (hh==0) mainHistogramMax=statisticsMax(histY, histBins);

@@ -156,7 +156,7 @@ bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const
         double bin=r->getProperty("BINNING", 1.0).toDouble();
         double width=r->getProperty("PIXEL_WIDTH", -1).toDouble();
         double height=r->getProperty("PIXEL_HEIGHT", -1).toDouble();
-        if (width<=0 || height<=0) return false;
+        if (width<=0 || height<=0 || !(r->propertyExists("DCCF_DELTAX") && r->propertyExists("DCCF_DELTAY"))) return false;
         value=sqrt(qfSqr(bin*width*deltax)+qfSqr(bin*height*deltay));
         error=0;
         return true;
@@ -165,7 +165,7 @@ bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const
         double deltax=r->getProperty("DCCF_DELTAX", 0.0).toDouble();
         double bin=r->getProperty("BINNING", 1.0).toDouble();
         double width=r->getProperty("PIXEL_WIDTH", -1).toDouble();
-        if (width<=0) return false;
+        if (width<=0 || !(r->propertyExists("DCCF_DELTAX"))) return false;
         value=bin*width*deltax;
         error=0;
         return true;
@@ -174,7 +174,7 @@ bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const
         double deltay=r->getProperty("DCCF_DELTAY", 0.0).toDouble();
         double bin=r->getProperty("BINNING", 1.0).toDouble();
         double height=r->getProperty("PIXEL_HEIGHT", -1).toDouble();
-        if (height<=0) return false;
+        if (height<=0 || !(r->propertyExists("DCCF_DELTAY"))) return false;
         value=bin*height*deltay;
         error=0;
         return true;

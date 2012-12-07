@@ -6,7 +6,9 @@
 #include "qfstyleditemdelegate.h"
 #include <QModelIndex>
 #include <QModelIndexList>
-
+#include "qfhistogramservice.h"
+#include <QItemSelectionModel>
+#include <QItemSelection>
 
 // TODO: add some more options to the fit results display: store column under different name
 
@@ -352,6 +354,11 @@ void QFRawDataPropertyEditor::createWidgets() {
     actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), this);
     actSaveResultsAveraged=new QAction(tr("Save all results to file with averaged vector/matrix results"), this);
     tbResults->addAction(actSaveResults);
+    tbResults->addSeparator();
+    actStatistics=new QAction(QIcon(":/lib/result_statistics.png"), tr("Result statistics, summarizing cells"), this);
+    tbResults->addAction(actStatistics);
+    actStatisticsComparing=new QAction(QIcon(":/lib/result_statistics_compare.png"), tr("Result statistics, comparing cells"), this);
+    tbResults->addAction(actStatisticsComparing);
 
     tbResults->addSeparator();
     actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete selected records"), this);
@@ -444,6 +451,8 @@ void QFRawDataPropertyEditor::createWidgets() {
     tvResults->addAction(actSaveResults);
     tvResults->addAction(actSaveResultsAveraged);
     tvResults->addAction(actDeleteResults);
+    tvResults->addAction(actStatistics);
+    tvResults->addAction(actStatisticsComparing);
     rwvlayout->addWidget(tvResults);
     labAveragedresults=new QLabel(widResults);
     labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);
@@ -463,6 +472,9 @@ void QFRawDataPropertyEditor::createWidgets() {
     connect(actCopyMedianQuantilesResults, SIGNAL(triggered()), this, SLOT(copyMedianQuantilesResults()));
     connect(actCopyMedianQuantilesNoHead, SIGNAL(triggered()), this, SLOT(copyMedianQuantilesResultsNoHead()));
 
+    connect(actStatistics, SIGNAL(triggered()), this, SLOT(showStatistics()));
+    connect(actStatisticsComparing, SIGNAL(triggered()), this, SLOT(showStatisticsComparing()));
+
     menuResults->addAction(actSaveResults);
     menuResults->addAction(actSaveResultsAveraged);
     menuResults->addSeparator();
@@ -474,6 +486,9 @@ void QFRawDataPropertyEditor::createWidgets() {
     menuResults->addAction(actCopyValErrResultsNoHead);
     menuResults->addAction(actCopyMedianQuantilesResults);
     menuResults->addAction(actCopyMedianQuantilesNoHead);
+    menuResults->addSeparator();
+    menuResults->addAction(actStatistics);
+    menuResults->addAction(actStatisticsComparing);
 
 
     tabMain->addTab(widResults, tr("Evaluation &Results"));
@@ -616,8 +631,8 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         connect(chkFilterResultsRegExp, SIGNAL(clicked(bool)), current->resultsGetModel(), SLOT(setResultFilterUsesRegExp(bool)));
         connect(edtFilterEvaluation, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setEvaluationFilter(QString)));
         connect(chkFilterEvaluationRegExp, SIGNAL(clicked(bool)), current->resultsGetModel(), SLOT(setEvaluationFilterUsesRegExp(bool)));
-        connect(edtFilterResultsNot, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setResultFilterNot(QString)));
-        connect(edtFilterEvaluationNot, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setEvaluationFilterNot(QString)));
+        connect(edtFilterResultsNot, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setResultFilterNot(QString)));
+        connect(edtFilterEvaluationNot, SIGNAL(textChanged(QString)), current->resultsGetModel(), SLOT(setEvaluationFilterNot(QString)));
         connect(chkShowAvg, SIGNAL(toggled(bool)), this, SLOT(showAvgClicked(bool)));
         QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/");
         compFilterEvaluation->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_rdrfilterevals.txt");
@@ -637,6 +652,12 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         actMoveFilesUp->setEnabled(actEnableFileActions->isChecked());
         actMoveFilesDown->setEnabled(actEnableFileActions->isChecked());
         connect(actEnableFileActions, SIGNAL(triggered(bool)), this, SLOT(showEditFilesWarning(bool)));
+        current->resultsGetModel()->setResultFilter(edtFilterResults->text());
+        current->resultsGetModel()->setResultFilterUsesRegExp(chkFilterResultsRegExp->isChecked());
+        current->resultsGetModel()->setEvaluationFilter(edtFilterEvaluation->text());
+        current->resultsGetModel()->setEvaluationFilterUsesRegExp(chkFilterEvaluationRegExp->isChecked());
+        current->resultsGetModel()->setResultFilterNot(edtFilterResultsNot->text());
+        current->resultsGetModel()->setEvaluationFilterNot(edtFilterEvaluationNot->text());
 
         /*QPoint pos;
         pos.setX(current->getProject()->getProperty(QString("rawdatapropeditor%1/posx").arg(id), 20).toInt());
@@ -1447,6 +1468,104 @@ void QFRawDataPropertyEditor::showAvgClicked(bool checked)
 {
     if (current) {
         current->resultsGetModel()->setShowVectorMatrixAvg(checked);
+    }
+}
+
+void QFRawDataPropertyEditor::showStatistics()
+{
+    QFHistogramService* hs=QFHistogramService::getInstance();
+    if (hs&&current) {
+        QModelIndexList idxs=tvResults->selectionModel()->selectedIndexes();
+        QMap<int, QFHistogramService::Histogram> hists;
+        for (int i=0; i<idxs.size(); i++) {
+            QFHistogramService::Histogram h;
+            int col=idxs[i].row();
+            if (!hists.contains(col)) {
+                h.name=current->resultsGetModel()->headerData(col, Qt::Vertical).toString();
+                hists[col]=h;
+            }
+            QString ename=current->resultsGetModel()->data(idxs[i], QFRDRResultsModel::EvalNameRole).toString();
+            QString rname=current->resultsGetModel()->data(idxs[i], QFRDRResultsModel::ResultNameRole).toString();
+
+            hists[col].data<<current->resultsGetAsDoubleList(ename, rname);
+        }
+
+        bool onePerCol=true;
+        if (hists.size()>1) {
+            onePerCol=QMessageBox::question(this, tr("Data histogram"), tr("You selected %1 rows.\nShould QuickFit open\n   [Yes] one histogram window per row, or\n   [No]  combine all data into one window?").arg(hists.size()), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
+        }
+
+        if (onePerCol) {
+            QMapIterator<int, QFHistogramService::Histogram> ii(hists);
+            while (ii.hasNext()) {
+                ii.next();
+                QString histID=QString("hist")+current->getType()+QString::number(current->getID())+"_"+QString::number(ii.key());
+                hs->getCreateView(histID, tr("Histogram from %1: %2").arg(current->getName()).arg(ii.value().name));
+                hs->clearView(histID);
+                hs->addHistogramToView(histID, ii.value());
+            }
+        } else {
+            QString histID=QString("hist")+current->getType()+QString::number(current->getID());
+            hs->getCreateView(histID, tr("Histogram from %1").arg(current->getName()));
+            hs->clearView(histID);
+            QMapIterator<int, QFHistogramService::Histogram> ii(hists);
+            while (ii.hasNext()) {
+                ii.next();
+                hs->addHistogramToView(histID, ii.value());
+            }
+        }
+    }
+}
+
+void QFRawDataPropertyEditor::showStatisticsComparing()
+{
+    QFHistogramService* hs=QFHistogramService::getInstance();
+    if (hs&&current) {
+        QModelIndexList idxs=tvResults->selectionModel()->selectedIndexes();
+        QMap<int, QList<QFHistogramService::Histogram> > hists;
+        for (int i=0; i<idxs.size(); i++) {
+            QFHistogramService::Histogram h;
+            int col=idxs[i].row();
+            if (!hists.contains(col)) {
+                QList<QFHistogramService::Histogram> l;
+                hists[col]=l;
+            }
+            QString ename=current->resultsGetModel()->data(idxs[i], QFRDRResultsModel::EvalNameRole).toString();
+            QString rname=current->resultsGetModel()->data(idxs[i], QFRDRResultsModel::ResultNameRole).toString();
+
+            h.name=current->resultsGetModel()->headerData(col, Qt::Vertical).toString();
+            h.data<<current->resultsGetAsDoubleList(ename, rname);
+            hists[col].append(h);
+        }
+
+        bool onePerCol=true;
+        if (hists.size()>1) {
+            onePerCol=QMessageBox::question(this, tr("Data histogram"), tr("You selected %1 rows.\nShould QuickFit open\n   [Yes] one histogram window per row, or\n   [No]  combine all data into one window?").arg(hists.size()), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
+        }
+
+        if (onePerCol) {
+            QMapIterator<int, QList<QFHistogramService::Histogram> > ii(hists);
+            while (ii.hasNext()) {
+                ii.next();
+                QString histID=QString("hist")+current->getType()+QString::number(current->getID())+"_"+QString::number(ii.key());
+                hs->getCreateView(histID, tr("Histogram from %1").arg(current->getName()));
+                hs->clearView(histID);
+                for (int i=0; i<ii.value().size(); i++) {
+                    hs->addHistogramToView(histID, ii.value().at(i));
+                }
+            }
+        } else {
+            QString histID=QString("hist")+current->getType()+QString::number(current->getID());
+            hs->getCreateView(histID, tr("Histogram from %1").arg(current->getName()));
+            hs->clearView(histID);
+            QMapIterator<int,  QList<QFHistogramService::Histogram> > ii(hists);
+            while (ii.hasNext()) {
+                ii.next();
+                for (int i=0; i<ii.value().size(); i++) {
+                    hs->addHistogramToView(histID, ii.value().at(i));
+                }
+            }
+        }
     }
 }
 

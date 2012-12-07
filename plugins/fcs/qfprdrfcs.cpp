@@ -265,6 +265,7 @@ void QFPRDRFCS::openSimulator()
     if (!dlgSimulator) {
         dlgSimulator=new QFRDRFCSFitFunctionSimulator(services, NULL);
         connect(dlgSimulator, SIGNAL(accepted()), this, SLOT(insertSimulated()));
+        connect(dlgSimulator, SIGNAL(insertRecord()), this, SLOT(insertSimulated()));
     }
     dlgSimulator->show();
     dlgSimulator->raise();
@@ -282,21 +283,27 @@ void QFPRDRFCS::insertSimulated() {
         p["INTERNAL_CSVMODE"]="tccc";
         QStringList paramsReadonly;
         paramsReadonly<<"FILETYPE"<<"INTERNAL_CSV"<<"INTERNAL_CSVMODE";
+        QString title=tr("Simulated FCS/DLS Model: %1").arg(p_sim["model_function"].toString());
 
+        bool ok=true;
+        title=QInputDialog::getText(NULL, tr("FCS/DLS simulator"), tr("enter a name for the new record ..."), QLineEdit::Normal, title, &ok);
+
+        if (ok) {
         QMapIterator<QString, QVariant> it(p_sim);
-        while (it.hasNext()) {
-            it.next();
-            p[it.key().toUpper()]=it.value();
-            paramsReadonly<<it.key().toUpper();
-        }
+            while (it.hasNext()) {
+                it.next();
+                p[it.key().toUpper()]=it.value();
+                paramsReadonly<<it.key().toUpper();
+            }
 
-        QFRawDataRecord* e=project->addRawData(getID(), tr("Simulated FCS/DLS Model"), QStringList(), p, paramsReadonly);
-        if (e->error()) {
-            QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing simulated FCS/DLS curve:\n%1").arg(e->errorDescription()));
-            services->log_error(tr("Error while importing simulated FCS/DLS curve:\n    %1\n").arg(e->errorDescription()));
-            project->deleteRawData(e->getID());
+            QFRawDataRecord* e=project->addRawData(getID(), title, QStringList(), p, paramsReadonly);
+            if (e->error()) {
+                QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing simulated FCS/DLS curve:\n%1").arg(e->errorDescription()));
+                services->log_error(tr("Error while importing simulated FCS/DLS curve:\n    %1\n").arg(e->errorDescription()));
+                project->deleteRawData(e->getID());
+            }
+            services->setProgress(0);
         }
-        services->setProgress(0);
     }
 }
 

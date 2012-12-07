@@ -502,6 +502,7 @@ void QFRDRFCSFitFunctionSimulator::replotFitFunction() {
             used_params["tau_max"]=ui->edtMaxTau->value();
             used_params["runs"]=ui->spinRuns->value();
             used_params["noise_enabled"]=ui->chkNoise->isChecked();
+            used_params["model_function"]=ffunc->id();
 
             csv="";
 
@@ -642,4 +643,9 @@ void QFRDRFCSFitFunctionSimulator::on_btnModelHelp_clicked()
 
 
 
+
+void QFRDRFCSFitFunctionSimulator::on_btnAddRecord_clicked()
+{
+    emit insertRecord();
+}
 

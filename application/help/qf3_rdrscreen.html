@@ -42,7 +42,15 @@ Features of the <b>evaluation screen</b> tab:
 <li>The <b>results filer</b> allows to filter the rows, the same way as the filename filter filters the rows. If "RegExp" is activated you may use full <a href="qf3_qtregexp.html">regular expressions</a> instead of the simple wildcards.</li>
 <li>All functions are also accessible over the windows main menu and the tables context menu.</li>
 <li>Results may also be in vector or matrix form. For these two display modes are available, which may be changed with the checkbox "show avg+/-SD for vector/matrix results": If it is activated, the average and standard deviation over the full vector/matrix is displayed (in blue and italic). Also the datatype is named in the second line in each cell. If this option is deactivated, only the type name is displayed if more than 10 entries are present. Otherwise the entries are displayed as a list. </li>
-
+<li>You may view the contents of selected cells as histogram using these functions:<ol>
+  <li><img src=":/lib/result_statistics.png"> opens a histogram window that summarizes all selected values (vectors/matrizes are linearized) for each evaluation into one histogram. So if you select the diffusion coefficients of species 1 and 2 from several runs, the window will contain two histograms, one for D1 and one for D2 overlayed. If you select data from several evaluations (e.g. D1 and D2), QuickFit will ask whether to display all histograms in one window or to open one window per evaluation.<br>Look at this example:<br>
+  <img src="./pic/hist_rdr.png"><br>
+  This function will open one or two windows containing the histograms over each row. Here's an example for one window (in the two-window case, the green and blue histograms will be displayed in one window each):<br>
+  <img src="./pic/hist_rdr_res_no.png">
+   </li>
+  <li><img src=":/lib/result_statistics_compare.png"> works the same as above, but does not summarize the data from several runs. This is useful, if you get vectors/matrizes as evaluations, where you want to compare the distributions in each of them. If you select single-number evaluations, no histogram will be displayed, as it makes not much sense for one datapoint only.</li>
+</ol>
+</li>
 </ul>
 </p>
 
