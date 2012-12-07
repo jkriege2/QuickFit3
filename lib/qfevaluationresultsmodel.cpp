@@ -13,6 +13,7 @@ QFEvaluationResultsModel::QFEvaluationResultsModel(QObject* parent):
     resultFilterRegExp=false;
     filesFilterRegExp=false;
     displayProperties.clear();
+    showVectorMatrixAvg=true;
 }
 
 QFEvaluationResultsModel::~QFEvaluationResultsModel()
@@ -182,6 +183,12 @@ QVariant QFEvaluationResultsModel::headerData(int section, Qt::Orientation orien
     }
     return QVariant();
 }
+
+void QFEvaluationResultsModel::setShowVectorMatrixAvg(bool show)
+{
+    showVectorMatrixAvg=show;
+    reset();
+}
 int QFEvaluationResultsModel::rowCount(const QModelIndex &parent) const {
     if (!evaluation) {
         return 0;
@@ -232,28 +239,20 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                              (r.type!=QFRawDataRecord::qfrdreIntegerVector) && (r.type!=QFRawDataRecord::qfrdreIntegerMatrix) &&
                              (r.type!=QFRawDataRecord::qfrdreStringVector) && (r.type!=QFRawDataRecord::qfrdreStringMatrix) &&
                              (r.type!=QFRawDataRecord::qfrdreBooleanVector) && (r.type!=QFRawDataRecord::qfrdreBooleanMatrix) ) {
-                            return QVariant(record->resultsGetAsString(en, rname).replace("+/-", "&plusmn;").replace(" um", " &mu;m").replace(" usecs", " &mu;s").replace(" usec", " &mu;s"));
+                            return QVariant(record->resultsGetAsString(en, rname).replace("+/-", "&plusmn;").replace(" micron/s", " &mu;m/s").replace(" um", " &mu;m").replace(" usecs", " &mu;s").replace(" usec", " &mu;s"));
                         } else {
-                            if (r.getVectorMatrixItems()<=10) {
-                                return QVariant(record->resultsGetAsString(en,rname).replace("+/-", "&plusmn;").replace(" um", " &mu;m").replace(" usecs", " &mu;s").replace(" usec", " &mu;s"));
+                            if (showVectorMatrixAvg && r.isNumberType()) {
+                                QString u=r.unit;
+                                return QVariant(QString("<font color=\"darkblue\"><i>(%2&plusmn;%3) %4</i></font><br><font size\"-2\">[%1]</font>").arg(QFRawDataRecord::evaluationResultType2String(r.type))
+                                                .arg(data(index, QFEvaluationResultsModel::AvgRole).toDouble()).arg(data(index, QFEvaluationResultsModel::SDRole).toDouble())
+                                                .arg(u.replace(" um", " &mu;m").replace(" micron/s", " &mu;m/s").replace(" usecs", " &mu;s").replace(" usec", " &mu;s")));
                             } else {
-                                /*if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
-                                    || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
-                                    double var=0;
-                                    double mean=qfstatisticsAverageVariance(var, r.dvec);
-                                    return QVariant(QString("(%1 &plusmn; %2) %3<br>[").arg(mean).arg(sqrt(var)).arg(r.unit)+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]"));
-                                } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
-                                    double var=0;
-                                    double mean=qfstatisticsAverageVariance(var, r.ivec);
-                                    return QVariant(QString("(%1 &plusmn; %2) %3<br>[").arg(mean).arg(sqrt(var)).arg(r.unit)+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]"));
-                                } else {*/
+                                if (r.getVectorMatrixItems()<=10) {
+                                    return QVariant(record->resultsGetAsString(en,rname).replace("+/-", "&plusmn;").replace(" um", " &mu;m").replace(" usecs", " &mu;s").replace(" usec", " &mu;s"));
+                                } else {
                                     return QVariant(QString("[")+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]"));
-                                //}
+                                }
                             }
-
-
-                            //QString s= QString("[")+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]");
-                            //return s;
                         }
                     }
                 }else if (resI==lastResults.size()) {

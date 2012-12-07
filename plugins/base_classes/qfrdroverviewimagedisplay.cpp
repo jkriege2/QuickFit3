@@ -77,6 +77,9 @@ void QFRDROverviewImageDisplay::createWidgets() {
 
 
     mainLay->addWidget(pltImage, 1);
+    labStackPosition=new QLabel("", this);
+    mainLay->addWidget(labStackPosition);
+    labStackPosition->setAlignment(Qt::AlignRight);
 
 
     histogram=new QFHistogramView(tabMain);
@@ -619,6 +622,8 @@ void QFRDROverviewImageDisplay::showFrame(int frame) {
         if (chkHistVideo->isChecked()) showHistograms(mv->getImageStack(idx, frame), width*height);
         histogram->setEnabled(chkHistVideo->isChecked());
         histogram->setHistogramXLabel(tr("intensity [A.U. or kHz]"));
+
+        labStackPosition->setText(mv->getImageStackTimepointName(idx, frame));
     }
 
 
@@ -686,6 +691,7 @@ void QFRDROverviewImageDisplay::displayImage() {
         player->setVisible(false);
         chkHistVideo->setVisible(false);
         labDescription->setText(tr("<b>image size:</b> %1 &times; %2").arg(width).arg(height));
+        labStackPosition->setText("");
         //qDebug()<<"6";
     } else if (mv && cmbImage->currentIndex()-m->getOverviewImageCount()<mv->getImageStackCount()) {
         int idx=cmbImage->currentIndex()-m->getOverviewImageCount();

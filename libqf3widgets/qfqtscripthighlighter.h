@@ -1,16 +1,3 @@
-/*
-  Name: sdffhighlighter.h
-  Copyright: (c) 2008
-  Author: Jan krieger <jan@jkrieger.de>, http://www.jkrieger.de/
-
-*/
-
-
-/** \file sdffhighlighter.h
-  * \ingroup sdff_editor
-  *
-  * This file implements a Qt Highlighter for the SDFF language.
-  */
 #ifndef SDFFHIGHLIGHTER_H
 #define SDFFHIGHLIGHTER_H
 

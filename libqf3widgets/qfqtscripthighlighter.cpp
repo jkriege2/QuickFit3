@@ -18,7 +18,7 @@
      // open the sdff-editor ini file and load the highlighting formats
      QString sd=settingsDir;
      if (sd.isEmpty()) {
-         sd=ProgramOptions::getInstance()->getAssetsDirectory()+"/qtscript/";
+         sd=ProgramOptions::getInstance()->getAssetsDirectory()+"/highlighter/qtscript/";
      }
      QSettings settings(sd+"/highlight.ini", QSettings::IniFormat);
      loadFormat(settings, prefix+"style/keywords", keywordFormat, "blue", true, false, false);
@@ -109,6 +109,7 @@
      format.setFontItalic(italic);
      format.setFontWeight((bold)?(QFont::Bold):(QFont::Normal));
      format.setFontUnderline(underlined);
+     format.setFontFixedPitch(settings.value("editor/fixedpitch", true).toBool());
      format.setFontFamily(settings.value("editor/fontname", "Courier New").toString());
      format.setFontPointSize(settings.value("editor/fontsize", 10).toDouble());
 

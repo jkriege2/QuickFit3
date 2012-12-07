@@ -173,6 +173,8 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         void filterRecordsChanged();
 
         void deleteSelectedRecords();
+
+        void showAvgClicked(bool checked);
     protected:
         /** \brief points to the record currently displayed */
         QPointer<QFEvaluationItem> current;
@@ -258,6 +260,7 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         QFCompleterFromFile* compFilterRecordsNot;
         QCheckBox* chkFilterRecordsRegExp;
         QWidget* widFilterRecords;
+        QCheckBox* chkShowAvg;
         bool filesListFiltered;
 
 

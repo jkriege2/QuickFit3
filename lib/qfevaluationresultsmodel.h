@@ -34,6 +34,7 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
         QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
         QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
+
         enum {
             ValueRole=Qt::UserRole,        /**< returns the value as a string, the way it should be displayed in the table (i.e. with shortened lists/matrices ...) */
             NameRole=Qt::UserRole+1,       /**< same as ResultNameRole, i.e. returns the resultName of the result displayed in the cell */
@@ -60,6 +61,7 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
         void setFilesFilterUsesRegExp(bool use);
         void setResultFilterUsesRegExp(bool use);
         void setDisplayProperties(const QStringList& props);
+        void setShowVectorMatrixAvg(bool show);
     protected:
         QFEvaluationItem* evaluation;
         QString evalFilter;
@@ -76,6 +78,7 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
         QStringList displayProperties;
         QList<QPair<QPointer<QFRawDataRecord>, QString> > lastResults;
         QMap<QString, QString> resultGroups;
+        bool showVectorMatrixAvg;
 
         QString resultFilter;
         QString filesFilter;

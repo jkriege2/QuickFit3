@@ -20,9 +20,9 @@ QFFitFunctionFCCSNormalDiff3DFlow2Focus::QFFitFunctionFCCSNormalDiff3DFlow2Focus
     #define FCSDiff_n_particle 1
     addParameter(FloatNumber,  "1n_particle",             "1/Particle number N",                                   "1/N",                      "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, false, 0.1,          1e-10,    1e5,      0.1, 0);
     #define FCSDiff_1n_particle 2
-    addParameter(FloatNumber,  "vflowx",                  "flow speed of species in x-direction",                  "v<sub>flow, x</sub>",      "micron/s", "&mu;m/s",                  true,    true,        true,                 QFFitFunction::EditError, false, 500,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "vflowx",                  "flow speed of species in x-direction",                  "v<sub>flow, x</sub>",      "micron/s", "&mu;m/s",                  true,    true,        true,                 QFFitFunction::EditError, false, 100,          -1e50,        1e50,     1    );
     #define FCSDiff_vflowx 3
-    addParameter(FloatNumber,  "vflowy",                  "flow speed of species in y-direction",                  "v<sub>flow, y</sub>",      "micron/s", "&mu;m/s",                  true,    true,        true,                 QFFitFunction::EditError, false, 0,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "vflowy",                  "flow speed of species in y-direction",                  "v<sub>flow, y</sub>",      "micron/s", "&mu;m/s",                  true,    true,        true,                 QFFitFunction::EditError, false, 0,          -1e50,        1e50,     1    );
     #define FCSDiff_vflowy 4
     addParameter(FloatNumber,  "vflow",                   "flow speed of species 1",                               "v<sub>flow</sub>",         "micron/s", "&mu;m/s",                  false,    false,        false,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
     #define FCSDiff_vflow 5

@@ -8,6 +8,7 @@
 // forward declaration
 class QFRawDataRecord;
 
+
 /*! \brief class to display the results stored in QFRawDataRecord
     \ingroup qf3lib_project
 
@@ -53,6 +54,7 @@ class QFLIB_EXPORT QFRDRResultsModel : public QAbstractTableModel {
         void setEvaluationFilterNot(QString filter);
         void setEvaluationFilterUsesRegExp(bool use);
         void setResultFilterUsesRegExp(bool use);
+        void setShowVectorMatrixAvg(bool show);
     private slots:
         void resultsChanged(const QString &evalName=QString(""), const QString &resultName=QString(""), bool deleted=false);
     protected:
@@ -75,6 +77,7 @@ class QFLIB_EXPORT QFRDRResultsModel : public QAbstractTableModel {
         QString evaluationFilterNot;
         bool resultFilterRegExp;
         bool evaluationFilterRegExp;
+        bool showVectorMatrixAvg;
 
         /** ßbrief checks whether the specified result is visible, also returns (optionally) the row/column header label for the result */
         bool fulfillsFilters(const QString& en, const QString& resultName, QString* enLabel=NULL, QString* rnLabel=NULL);

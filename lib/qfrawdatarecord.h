@@ -345,6 +345,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             bool sortPriority; /**< this result should appear towards the start of tables */
 
             int getVectorMatrixItems() const;
+            bool isNumberType() const;
         };
 
         /*! \brief initial size for results hash

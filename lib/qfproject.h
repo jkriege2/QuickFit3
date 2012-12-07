@@ -217,7 +217,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /** \brief returns \c true when the project has changed */
         inline bool hasChanged() { return dataChange; };
         /** \brief returns a data model which may be used to display a list of all
-         *         contained raw data items. This model is dragf-enabled! */
+         *         contained raw data items. This model is drag-enabled! */
         QFProjectRawDataModel* getRawDataModel();
         /** \brief data model representing the items in the model as a tree.
          * This model is used to display the project tree */

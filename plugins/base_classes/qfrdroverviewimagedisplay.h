@@ -59,6 +59,7 @@ class QFRDROverviewImageDisplay : public QWidget
         QLabel* labDescription;
         QLabel* labValue;
         QLabel* labImageAvg;
+        QLabel* labStackPosition;
         QComboBox* cmbImage;
         JKQtPlotter* pltImage;
         QToolBar* toolbar;

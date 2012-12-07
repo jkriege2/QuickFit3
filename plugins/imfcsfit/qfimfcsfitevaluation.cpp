@@ -127,6 +127,7 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
         double width=r->getProperty("PIXEL_WIDTH", -1).toDouble();
         if (width<=0) return false;
         value=bin*width*deltax;
+        //qDebug()<<deltax<<bin<<width;
         error=0;
         return true;
     } else if (paramid=="focus_distancey"||paramid=="focus_distance_y") {
@@ -135,6 +136,7 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
         double bin=r->getProperty("BINNING", 1.0).toDouble();
         double height=r->getProperty("PIXEL_HEIGHT", -1).toDouble();
         if (height<=0) return false;
+        //qDebug()<<deltay<<bin<<height;
         value=bin*height*deltay;
         error=0;
         return true;

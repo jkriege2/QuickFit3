@@ -291,6 +291,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
 
     }
     if (tabMain->count()>2) tabMain->setCurrentIndex(1);
+    showAvgClicked(chkShowAvg->isChecked());
     checkHelpAvailable();
 }
 
@@ -433,6 +434,13 @@ void QFEvaluationPropertyEditor::deleteSelectedRecords() {
                 i.next()->enableEmitResultsChanged(true);
             }
         }
+    }
+}
+
+void QFEvaluationPropertyEditor::showAvgClicked(bool checked)
+{
+    if (current && resultsModel) {
+        resultsModel->setShowVectorMatrixAvg(checked);
     }
 }
 
@@ -617,6 +625,11 @@ void QFEvaluationPropertyEditor::createWidgets() {
     tbResults->addAction(actSaveResults);
     actSaveResultsAveraged=new QAction(tr("Save all results to file, averaged vector/matrix results"), this);
 
+    tbResults->addSeparator();
+    chkShowAvg=new QCheckBox(tr("show Avg+/-SD for vector/matrix resuts"), this);
+    tbResults->addWidget(chkShowAvg);
+    chkShowAvg->setChecked(true);
+    connect(chkShowAvg, SIGNAL(toggled(bool)), this, SLOT(showAvgClicked(bool)));
     tbResults->addSeparator();
     tbResults->addWidget(new QLabel(" display properties: "));
     edtDisplayProperties=new QFEnhancedLineEdit(this);

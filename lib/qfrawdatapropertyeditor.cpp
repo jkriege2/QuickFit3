@@ -359,6 +359,13 @@ void QFRawDataPropertyEditor::createWidgets() {
     tbResults->addAction(actDeleteResults);
 
     tbResults->addSeparator();
+
+    chkShowAvg=new QCheckBox(tr("show Avg+/-SD for vector/matrrix results"), tbResults);
+    chkShowAvg->setChecked(true);
+    tbResults->addWidget(chkShowAvg);
+
+    tbResults=new QToolBar("toolbar_rdr_results_filter", this);
+    rwvlayout->addWidget(tbResults);
     tbResults->addWidget(new QLabel("  evaluation filter: "));
     edtFilterEvaluation=new QFEnhancedLineEdit(this);
     edtFilterEvaluation->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterEvaluation, edtFilterEvaluation));
@@ -512,6 +519,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         disconnect(chkFilterEvaluationRegExp, SIGNAL(clicked(bool)), current->resultsGetModel(), SLOT(setEvaluationFilterUsesRegExp(bool)));
         disconnect(edtFilterResultsNot, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setResultFilterNot(QString)));
         disconnect(edtFilterEvaluationNot, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setEvaluationFilterNot(QString)));
+        disconnect(chkShowAvg, SIGNAL(toggled(bool)), this, SLOT(showAvgClicked(bool)));
 
 
 
@@ -610,6 +618,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         connect(chkFilterEvaluationRegExp, SIGNAL(clicked(bool)), current->resultsGetModel(), SLOT(setEvaluationFilterUsesRegExp(bool)));
         connect(edtFilterResultsNot, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setResultFilterNot(QString)));
         connect(edtFilterEvaluationNot, SIGNAL(textChanged(QString)), tvResults->model(), SLOT(setEvaluationFilterNot(QString)));
+        connect(chkShowAvg, SIGNAL(toggled(bool)), this, SLOT(showAvgClicked(bool)));
         QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/");
         compFilterEvaluation->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_rdrfilterevals.txt");
         compFilterEvaluationNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_rdrfilterevalsnot.txt");
@@ -672,6 +681,7 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         compFilterResults->setFilename("");
         compFilterResultsNot->setFilename("");
     }
+    showAvgClicked(chkShowAvg->isChecked());
     checkHelpAvailable();
     //std::cout<<"creating new editors ... DONE!\n";
 }
@@ -1430,6 +1440,13 @@ void QFRawDataPropertyEditor::openFilesDirectory() {
         if (i>=0 && i<current->getFilesCount()) {
             QDesktopServices::openUrl(QUrl(QFileInfo(current->getFileName(i)).absolutePath()));
         }
+    }
+}
+
+void QFRawDataPropertyEditor::showAvgClicked(bool checked)
+{
+    if (current) {
+        current->resultsGetModel()->setShowVectorMatrixAvg(checked);
     }
 }
 

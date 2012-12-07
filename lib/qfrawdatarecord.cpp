@@ -4037,4 +4037,23 @@ int QFRawDataRecord::evaluationResult::getVectorMatrixItems() const {
     return 0;
 }
 
+bool QFRawDataRecord::evaluationResult::isNumberType() const
+{
+    switch (type) {
+        case QFRawDataRecord::qfrdreNumber:
+        case QFRawDataRecord::qfrdreNumberError:
+        case QFRawDataRecord::qfrdreInteger:
+        case QFRawDataRecord::qfrdreNumberVector:
+        case QFRawDataRecord::qfrdreNumberMatrix:
+        case QFRawDataRecord::qfrdreNumberErrorVector:
+        case QFRawDataRecord::qfrdreNumberErrorMatrix:
+        case QFRawDataRecord::qfrdreIntegerVector:
+        case QFRawDataRecord::qfrdreIntegerMatrix:
+            return true;
+        default:
+            return false;
+    }
+    return false;
+}
+
 

@@ -180,7 +180,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
     } else {
         m_status=1;
         emit statusChanged(m_status);
-        emit rangeChanged(0,4780);
+        emit rangeChanged(0,3780+1000*job.DCCFDeltaX.size());
 
 
         reader=NULL;
@@ -906,8 +906,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         if ((m_status==1) && !was_canceled && job.distanceCCF) {
                             for (int id=0; id<job.DCCFDeltaX.size(); id++) {
                                 if (dccf[id].dccf && dccf[id].dccf_tau && dccf[id].dccf_N>0) {
-                                    QString localFilename=outputFilenameBase+QString(".dccf%1.dat").arg(id);
-                                    QString localFilename1=outputFilenameBase+QString(".dccf%1.bin").arg(id);;
+                                    QString localFilename=outputFilenameBase+QString(".dccf%1.dat").arg(id,3,10,QLatin1Char('0'));
+                                    QString localFilename1=outputFilenameBase+QString(".dccf%1.bin").arg(id,3,10,QLatin1Char('0'));;
                                     dccfFilename.append(localFilename);
                                     dccfFilenameBin.append(localFilename1);
 
@@ -1677,7 +1677,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
             }
 
         } else {
-            emit progressIncrement(1000);
+            emit progressIncrement(1000*job.DCCFDeltaX.size());
         }
     }
 

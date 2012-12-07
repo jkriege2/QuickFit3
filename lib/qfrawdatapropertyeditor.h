@@ -135,6 +135,7 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         void moveFilesUp();
         void moveFilesDown();
         void openFilesDirectory();
+        void showAvgClicked(bool checked);
 
     private:
         QTimer* timerResizeProps;
@@ -249,6 +250,7 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QFCompleterFromFile* compFilterResultsNot;
         QCheckBox* chkFilterEvaluationRegExp;
         QCheckBox* chkFilterResultsRegExp;
+        QCheckBox* chkShowAvg;
 
         //QSortFilterProxyModel* paramFilterProxy;
 

@@ -17,6 +17,7 @@
 
 
 
+
 QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     QWidget(parent),
     ui(new Ui::QFEHelpEditorWidget)
@@ -25,7 +26,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     findDlg=new FindDialog(this);
     replaceDlg=new ReplaceDialog(this);
 
-    //highlighter=new QFQtScriptHighlighter("", ui->edtScript->getEditor()->document());
+    highlighter=new QFHTMLHighlighter("", ui->edtScript->getEditor()->document());
 
     completer = new QCompleter(ui->edtScript->getEditor());
     completermodel=modelFromFile(ProgramOptions::getInstance()->getAssetsDirectory()+"/qtscript/completer.txt");
@@ -152,6 +153,86 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
 
 
     setScriptFilename(tr("new_help.html"));
+    QMenu* menu;
+    menu=new QMenu(tr("version/copyright info"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "$$mainhelpdir$$");
+    addInsertAction(menu, "$$version.svnrevision$$");
+    addInsertAction(menu, "$$version.status$$");
+    addInsertAction(menu, "$$version.date$$");
+    addInsertAction(menu, "$$version$$");
+    addInsertAction(menu, "$$version_full$$");
+    menu->addSeparator();
+    addInsertAction(menu, "$$thanksto$$");
+    addInsertAction(menu, "$$copyright$$");
+    addInsertAction(menu, "$$author$$");
+    addInsertAction(menu, "$$weblink$$");
+
+
+    menu=new QMenu(tr("page header/footer"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "$$qf_commondoc_backtop$$");
+    menu->addSeparator();
+    addInsertAction(menu, "$$qf_commondoc_footer.start$$");
+    addInsertAction(menu, "$$qf_commondoc_footer.end$$");
+    menu->addSeparator();
+    addInsertAction(menu, "$$qf_commondoc_header.start$$");
+    addInsertAction(menu, "$$qf_commondoc_header.end$$");
+    addInsertAction(menu, "$$qf_commondoc_header.end_notitle$$");
+    addInsertAction(menu, "$$qf_commondoc_header.rdr$$");
+    addInsertAction(menu, "$$qf_commondoc_header.eval$$");
+    addInsertAction(menu, "$$qf_commondoc_header.extension$$");
+    addInsertAction(menu, "$$qf_commondoc_header.fitfunc$$");
+    addInsertAction(menu, "$$qf_commondoc_header.fitalg$$");
+    addInsertAction(menu, "$$qf_commondoc_header.separator$$");
+
+
+    menu=new QMenu(tr("plugin info"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "$$local_plugin_icon$$");
+    addInsertAction(menu, "$$local_plugin_iconfilename$$");
+    addInsertAction(menu, "$$local_plugin_name$$");
+    addInsertAction(menu, "$$local_plugin_author$$");
+    addInsertAction(menu, "$$local_plugin_copyright$$");
+    addInsertAction(menu, "$$local_plugin_weblink_url$$");
+    addInsertAction(menu, "$$local_plugin_weblink$$");
+    addInsertAction(menu, "$$local_plugin_id$$");
+    addInsertAction(menu, "$$local_plugin_tutorial_file$$");
+    addInsertAction(menu, "$$local_plugin_tutorial_link$$");
+    addInsertAction(menu, "$$local_plugin_mainhelp_file$$");
+    addInsertAction(menu, "$$local_plugin_mainhelp_link$$");
+    addInsertAction(menu, "$$local_plugin_version$$");
+    addInsertAction(menu, "$$local_plugin_typehelp_link$$");
+    addInsertAction(menu, "$$local_plugin_typehelp_file$$");
+    menu->addSeparator();
+    addInsertAction(menu, "$$plugin_info:help:PLUGINID$$");
+    addInsertAction(menu, "$$plugin_info:tutorial:PLUGINID$$");
+
+
+    menu=new QMenu(tr("plugin lists"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "$$list:extension:INTERFACENAME$$");
+    addInsertAction(menu, "$$list:fitfunc:STARTSWITH$$");
+    addInsertAction(menu, "$$list:fitalg:$$");
+
+
+    menu=new QMenu(tr("help lists"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "$$tutorials_contents$$");
+    addInsertAction(menu, "$$help_contents$$");
+
+
+    menu=new QMenu(tr("insert files"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "$$insert:FILENAME$$");
+    addInsertAction(menu, "$$insertglobal:FILENAME$$");
+
+
+    menu=new QMenu(tr("insert LaTeX"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "$$math:LATEX$$");
+    addInsertAction(menu, "$$bmath:LATEX$$");
+    //addInsertAction(menu, "$$$$");
 
 }
 
@@ -329,6 +410,35 @@ QStringListModel *QFEHelpEditorWidget::modelFromFile(const QString &fileName)
     return new QStringListModel(words, completer);
 }
 
+void QFEHelpEditorWidget::addInsertAction(const QString &insert)
+{
+    addInsertAction(tr("insert \"%1\"").arg(insert), insert);
+}
+
+void QFEHelpEditorWidget::addInsertAction(const QString &label, const QString &insert)
+{
+    QAction* act=new QAction(label, this);
+    connect(act, SIGNAL(triggered()), this, SLOT(insertActionClicked()));
+    insertmap[act]=insert;
+    ui->edtScript->getEditor()->addAction(act);
+    ui->edtScript->getEditor()->setContextMenuPolicy(Qt::ActionsContextMenu);
+}
+
+void QFEHelpEditorWidget::addInsertAction(QMenu *menu, const QString &insert)
+{
+    addInsertAction(menu, tr("insert \"%1\"").arg(insert), insert);
+}
+
+void QFEHelpEditorWidget::addInsertAction(QMenu *menu, const QString &label, const QString &insert)
+{
+    QAction* act=new QAction(label, this);
+    connect(act, SIGNAL(triggered()), this, SLOT(insertActionClicked()));
+    insertmap[act]=insert;
+    //ui->edtScript->getEditor()->addAction(act);
+    menu->addAction(act);
+    ui->edtScript->getEditor()->setContextMenuPolicy(Qt::ActionsContextMenu);
+}
+
 
 void QFEHelpEditorWidget::openScript(QString dir, bool saveDir) {
     if (maybeSave()) {
@@ -479,6 +589,17 @@ void QFEHelpEditorWidget::printPreview(QPrinter *printer)
 void QFEHelpEditorWidget::clearFindActions()
 {
     findNextAct->setEnabled(false);
+}
+
+void QFEHelpEditorWidget::insertActionClicked()
+{
+    QAction* act=qobject_cast<QAction*>(sender());
+    if (act) {
+        QString txt=insertmap.value(act, "");
+        if (!txt.isEmpty()) {
+            ui->edtScript->getEditor()->insertPlainText(txt);
+        }
+    }
 }
 
 

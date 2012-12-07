@@ -101,7 +101,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfcompletertextedit.h \
     qfqtscripthighlighter.h \
     ../../../../LIB/trunk/qt/jkqtpparsedfunctionelements.h \
-    ../../../../LIB/trunk/jkmathparser.h
+    ../../../../LIB/trunk/jkmathparser.h \
+    qfhtmlhighlighter.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -165,7 +166,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfqtscripthighlighter.cpp \
     qfcompletertextedit.cpp \
     ../../../../LIB/trunk/qt/jkqtpparsedfunctionelements.cpp \
-    ../../../../LIB/trunk/jkmathparser.cpp
+    ../../../../LIB/trunk/jkmathparser.cpp \
+    qfhtmlhighlighter.cpp
 
 
 
@@ -194,7 +196,11 @@ CONFIG += dll lib_bundle exceptions rtti stl create_prl
 DEFINES += QFWIDLIB_LIBRARY LIB_IN_DLL LIB_EXPORT_LIBRARY
 
 
-ASSETSScript_FILES.files = ./assets/qtscript/*.*
-ASSETSScript_FILES.path = $${QFOUTPUT}/assets/qtscript
+ASSETSScript_FILES.files = ./assets/highlighter/qtscript/*.*
+ASSETSScript_FILES.path = $${QFOUTPUT}/assets/highlighter/qtscript
+ASSETSSHTML_FILES.files = ./assets/highlighter/html/*.*
+ASSETSSHTML_FILES.path = $${QFOUTPUT}/assets/highlighter/html
+ASSETSShigh_FILES.files = ./assets/highlighter/*.*
+ASSETSShigh_FILES.path = $${QFOUTPUT}/assets/highlighter
 
-INSTALLS += ASSETSScript_FILES
+INSTALLS += ASSETSScript_FILES ASSETSSHTML_FILES ASSETSShigh_FILES

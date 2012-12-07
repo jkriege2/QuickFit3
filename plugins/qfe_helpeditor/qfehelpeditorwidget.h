@@ -11,7 +11,7 @@
 #include "finddialog.h"
 #include "replacedialog.h"
 #include <QStringListModel>
-
+#include "qfhtmlhighlighter.h"
 namespace Ui {
     class QFEHelpEditorWidget;
 }
@@ -76,6 +76,8 @@ class QFEHelpEditorWidget : public QWidget {
         /** \brief set the "find next", ... actions to disabled (this is called whenever a new file is loaded or created) */
         void clearFindActions();
 
+        void insertActionClicked();
+
     protected:
         bool maybeSave();
         void setScriptFilename(QString filename);
@@ -88,7 +90,7 @@ class QFEHelpEditorWidget : public QWidget {
         QStringList defaultWords;
         QString lastScript;
 
-        //QFQtScriptHighlighter* highlighter;
+        QFHTMLHighlighter* highlighter;
         QAction *cutAct;
         /** \brief action object: copy the currently selected text */
         QAction *copyAct;
@@ -130,6 +132,12 @@ class QFEHelpEditorWidget : public QWidget {
 
         /** \brief load a completer model from a file */
         QStringListModel* modelFromFile(const QString& fileName);
+
+        void addInsertAction(const QString& insert);
+        void addInsertAction(const QString& label, const QString& insert);
+        void addInsertAction(QMenu* menu, const QString& insert);
+        void addInsertAction(QMenu* menu, const QString& label, const QString& insert);
+        QMap<QAction*, QString> insertmap;
 
 };
 
