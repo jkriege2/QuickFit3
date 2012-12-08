@@ -497,6 +497,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
 
     JKQTmathText mathParser(this);
     mathParser.set_fontSize(13);
+    /*
     if (fonts.contains("Times New Roman")) {
         //qDebug()<<"using Times New Roman";
         mathParser.set_fontRoman("Times New Roman");
@@ -523,6 +524,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
         mathParser.set_fontTypewriter("Courier");
     }
     //qDebug()<<fonts;
+    */
 
     // read HTML file
     QFile file(QFileInfo(filename).absoluteFilePath());
@@ -580,6 +582,118 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
 
         ++count;
         pos += rxLink.matchedLength();
+    }
+
+    // extract table of contents from header tags
+    QRegExp rxHeader("<\\s*h([123456789]).*>(.*)<\\/\\s*h\\1\\s*>", Qt::CaseInsensitive);
+    rxHeader.setMinimal(true);
+    count = 0;
+    pos = 0;
+    int minHeaderLevel=0;
+    QList<QFHTMLHelpWindow::ContentsEntry> contents;
+    bool first=true;
+    while ((pos = rxHeader.indexIn(result, pos)) != -1) {
+
+        int level=rxHeader.cap(1).toInt();
+        QString text=rxHeader.cap(2);
+
+        QFHTMLHelpWindow::ContentsEntry h;
+        if (contents.size()>0) h=contents.value(contents.size()-1);
+
+        h.header=text;
+        if (first) {
+            for (int i=1; i<=level; i++) {
+                h.num.append(1);
+            }
+        } else {
+            if (level==h.num.size()) {
+                h.num[h.num.size()-1]=h.num[h.num.size()-1]+1;
+            } else if (level>h.num.size()) {
+                for (int i=h.num.size(); i<level; i++) {
+                    h.num.append(1);
+                }
+            } else if (level<h.num.size()) {
+                for (int i=h.num.size(); i>=level; i--) {
+                    h.num.removeAt(i);
+                }
+                h.num[h.num.size()-1]=h.num[h.num.size()-1]+1;
+            }
+        }
+
+        QString id="";
+        QString tid="";
+        for (int i=0; i<h.num.size(); i++) {
+            if (!id.isEmpty()) id+="_";
+            if (!tid.isEmpty()) tid+=".";
+            id+=QString::number(h.num[i]);
+            tid+=QString::number(h.num[i]);
+        }
+        if (first) {
+            minHeaderLevel=h.num.size();
+        } else if (h.num.size()<minHeaderLevel) {
+            minHeaderLevel=h.num.size();
+        }
+        //qDebug()<<h.num.size()<<"(min: "<<minHeaderLevel<<")"<<tid<<h.header;
+        first=false;
+        h.id=id;
+        h.prefix=tid;
+
+        contents.append(h);
+        ++count;
+        pos += rxHeader.matchedLength();
+
+    }
+    // improve header tags
+    QRegExp rxHeader1("(<\\s*h[123456789].*)>", Qt::CaseInsensitive);
+    rxHeader1.setMinimal(true);
+    count = 0;
+    pos = 0;
+    while ((pos = rxHeader.indexIn(result, pos)) != -1) {
+
+        QString prefix="";
+        for (int j=minHeaderLevel-1; j<contents[count].num.size(); j++) {
+            if (!prefix.isEmpty()) prefix+=".";
+            prefix+=QString::number(contents[count].num[j]);
+        }
+        contents[count].prefix=prefix;
+        QString header=contents[count].header;
+        QString newmatch=rxHeader.cap(0);
+        newmatch=newmatch.replace(header, QString("<i>")+contents[count].prefix+QString(".</i>&nbsp;&nbsp;&nbsp;")+header);
+        QString insert=QString("<a name=\"%1\">%2").arg(contents[count].id).arg(newmatch);
+
+        //qDebug()<<rxHeader.cap(0)<<header<<newmatch;
+
+        if (count>0 && minHeaderLevel==contents[count].num.size()) {
+            insert=QString("$$qf_commondoc_backtop$$<br><br><br>")+insert;
+        }
+
+        if (rxHeader1.indexIn(insert, 0)!=-1) {
+            insert=insert.replace(rxHeader1.cap(1), rxHeader1.cap(1)+QString(" style=\"background-color: azure;\" "));
+        }
+
+        result=result.replace(rxHeader.cap(0), insert);
+
+        ++count;
+        pos += insert.size();
+
+    }
+    // compute table of contents
+    QString contentsHTML;
+    if (contents.size()>0) {
+        contentsHTML="<div style=\"background-color: azure;  border-color: midnightblue; border-style: solid; padding-top:5px; padding-left:5px; padding-right:5px; padding-bottom:5px; margin: 5px;\"><a name=\"table_of_contents\"><b>Table of Contents:</b><br>";
+        for (int i=0; i<contents.size(); i++) {
+            QString spaces="";
+            QString prefix="";
+            for (int j=minHeaderLevel-1; j<contents[i].num.size(); j++) {
+                spaces+="&nbsp;&nbsp;&nbsp;";
+                if (!prefix.isEmpty()) prefix+=".";
+                prefix+=QString::number(contents[i].num[j]);
+            }
+            contentsHTML+=QString("%4<a href=\"#%1\">%2 %3</a><br>").arg(contents[i].id).arg(contents[i].prefix).arg(contents[i].header).arg(spaces);
+        }
+        contentsHTML+="</div>";
+        //qDebug()<<contentsHTML;
+        fromHTML_replaces.append(qMakePair(QString("contents"), contentsHTML));
     }
 
     QString basepath=QFileInfo(filename).absolutePath();
@@ -663,6 +777,9 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
         }
         if (!result.contains("$$qf_commondoc_header")) {
             result=result.replace(QString("<body>"), QString("<body>$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$"));
+        }
+        if (!result.contains("$$contents") && contents.size()>1) {
+            result=result.replace(QString("$$qf_commondoc_header.end$$"), QString("$$qf_commondoc_header.end$$\n<br><hr><br>$$contents$$<br><hr><br>"));
         }
         bool replaced=true;
         int cnt=0;
@@ -1112,4 +1229,12 @@ void QFHTMLHelpWindow::searchAllItemDoubleClicked(QListWidgetItem *item) {
     cur.setPosition(selStart);
     cur.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, selEnd-selStart);
     descriptionBrowser->setTextCursor(cur);
+}
+
+QFHTMLHelpWindow::ContentsEntry::ContentsEntry()
+{
+    num.clear();
+    header="";
+    id="";
+    prefix="";
 }

@@ -170,6 +170,14 @@ class QFHTMLHelpWindow : public QWidget {
 
         void searchHelpDir(const QDir& dir, QStringList& files);
 
+        struct ContentsEntry {
+            QList<int> num;
+            QString header;
+            QString id;
+            QString prefix;
+            ContentsEntry();
+        };
+
     private slots:
         void displayTitle();
         void anchorClicked(const QUrl& link);
