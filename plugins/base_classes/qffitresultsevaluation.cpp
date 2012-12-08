@@ -1029,7 +1029,7 @@ void QFFitResultsEvaluation::resetDefaultFitFix(const QString& id) {
 
 /*! \brief reset the given parameter \a id to the initial/global/default value */
 void QFFitResultsEvaluation::resetDefaultFitValue(QFRawDataRecord* r, const QString& resultID, const QString& id) {
-    if (hasFit()) {
+    if (hasFit(r)) {
         QString en=transformResultID(resultID);
         QString pid=getFitParamID(id);
         bool doEmit=r->isEmitResultsChangedEnabled();
@@ -1041,7 +1041,7 @@ void QFFitResultsEvaluation::resetDefaultFitValue(QFRawDataRecord* r, const QStr
 
 /*! \brief reset the given parameter \a id to the initial/global/default fix */
 void QFFitResultsEvaluation::resetDefaultFitFix(QFRawDataRecord* r, const QString& resultID, const QString& id) {
-    if (hasFit()) {
+    if (hasFit(r)) {
         QString en=transformResultID(resultID);
         QString pid=getFitParamFixID(id);
         bool doEmit=r->isEmitResultsChangedEnabled();

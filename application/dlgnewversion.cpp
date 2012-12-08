@@ -13,7 +13,7 @@ DlgNewVersion::DlgNewVersion(QWidget *parent) :
                             "<br><code><pre>\n"
                             "@misc{quickfit3,\n"
                             "  author={Jan Wolfgang Krieger and Jörg Langowski},\n"
-                            "  title={QuickFit $$version$$ (compiled: %2, SVN: %3): A data evaluation application for biophysics},\n"
+                            "  title={QuickFit %1 (compiled: %2, SVN: %3): A data evaluation application for biophysics},\n"
                             "  howpublished={[web page] \verb+%4+},\n"
                             "  year={%2},\n"
                             "  note={[Accessed on %5]},\n"

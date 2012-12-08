@@ -37,7 +37,7 @@ void QFFitResultsByIndexAsVectorEvaluation::resetDefaultFitValue(const QString& 
 void QFFitResultsByIndexAsVectorEvaluation::resetDefaultFitValue(QFRawDataRecord* r, const QString& resultID, const QString& id) {
     int index=getIndexFromEvaluationResultID(resultID);
     if (index<0) {
-        QFFitResultsByIndexEvaluation::resetDefaultFitValue(id);
+        QFFitResultsEvaluation::resetDefaultFitValue(r, resultID, id);
     } else {
         QString en=transformResultID(resultID);
         QString pid=getFitParamID(id);
@@ -60,7 +60,7 @@ void QFFitResultsByIndexAsVectorEvaluation::resetDefaultFitFix(const QString& id
 void QFFitResultsByIndexAsVectorEvaluation::resetDefaultFitFix(QFRawDataRecord* r, const QString& resultID, const QString& id) {
     int index=getIndexFromEvaluationResultID(resultID);
     if (index<0) {
-        QFFitResultsByIndexEvaluation::resetDefaultFitFix(id);
+        QFFitResultsEvaluation::resetDefaultFitFix(r, resultID, id);
     } else {
         QString en=transformResultID(resultID);
         QString pid=getFitParamFixID(id);
