@@ -84,6 +84,16 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
             } else {
                 result=tr("<font color=\"red\">[unknown] ? ? ?</font>");
             }
+            jkMathParser::jkmpResult r1=parser->getVariableOrInvalid("ans");
+            jkMathParser::jkmpResult r2=parser->getVariableOrInvalid("ans1");
+            if (r1.isValid) {
+                parser->addVariable("ans1", r1);
+            }
+            if (r2.isValid) {
+                parser->addVariable("ans2", r2);
+            }
+            parser->addVariable("ans", r);
+            parser->addVariable("answer", r);
         } else {
             result=tr("<font color=\"red\">invalid result</font>");
         }

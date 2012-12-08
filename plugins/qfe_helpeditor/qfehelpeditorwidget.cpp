@@ -1,4 +1,4 @@
-#include "qfehelpeditorwidget.h".h"
+#include "qfehelpeditorwidget.h"
 #include "ui_qfehelpeditorwidget.h"
 
 #include "qfpluginservices.h"
@@ -261,6 +261,10 @@ void QFEHelpEditorWidget::storeSettings(QSettings &settings, QString prefix) con
 void QFEHelpEditorWidget::on_btnExecute_clicked()
 {
     QTemporaryFile f;
+    QFileInfo fi(currentScript);
+    if (QFile::exists(currentScript)) {
+        f.setFileTemplate(fi.absolutePath()+"/qfe_helpeditor_temp_XXXXXX.html.tmp");
+    }
     if (f.open()) {
         QTextStream txt(&f);
         txt<<ui->edtScript->getEditor()->toPlainText();
@@ -288,7 +292,6 @@ void QFEHelpEditorWidget::on_btnOpen_clicked()
 
 void QFEHelpEditorWidget::on_btnSave_clicked()
 {
-    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acquisitionScripts/");
     QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastScriptDir", ProgramOptions::getInstance()->getMainHelpDirectory()).toString();
     QDir d(dir);
     QString filename=qfGetSaveFileName(this, tr("save acquisition script ..."), d.absoluteFilePath(currentScript), tr("help (*.html)"));
@@ -308,6 +311,7 @@ void QFEHelpEditorWidget::on_btnSave_clicked()
                 lastScript=ui->edtScript->getEditor()->toPlainText();
                 f.close();
                 setScriptFilename(filename);
+                dir=QFileInfo(filename).absolutePath();
             }
 
         }
@@ -443,10 +447,9 @@ void QFEHelpEditorWidget::addInsertAction(QMenu *menu, const QString &label, con
 void QFEHelpEditorWidget::openScript(QString dir, bool saveDir) {
     if (maybeSave()) {
         if (dir=="last") {
-            QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/qfe_helpeditor/scripts/");
-            dir=ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastScriptDir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acquisitionScripts/").toString();
+            dir=ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastScriptDir", ProgramOptions::getInstance()->getMainHelpDirectory()).toString();
         }
-        QString filename=qfGetOpenFileName(this, tr("open help file ..."), dir, tr("help (*.html)"))    ;
+        QString filename=qfGetOpenFileName(this, tr("Open help file ..."), dir, tr("help (*.html)"))    ;
         if (QFile::exists(filename)) {
             QFile f(filename);
             if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
@@ -454,6 +457,7 @@ void QFEHelpEditorWidget::openScript(QString dir, bool saveDir) {
                 setScriptFilename(filename);
                 f.close();
                 lastScript=ui->edtScript->getEditor()->toPlainText();
+                dir=QFileInfo(filename).absolutePath();
             }
         }
         if (saveDir) ProgramOptions::getInstance()->getQSettings()->setValue("QFEHelpEditorWidget/lastScriptDir", dir);

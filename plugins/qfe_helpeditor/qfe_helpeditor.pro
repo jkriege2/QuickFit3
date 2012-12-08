@@ -36,6 +36,14 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
+ASSETSe_FILES.files = ./assets/examples/*.*
+ASSETSe_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/examples
+
+ASSETSt_FILES.files = ./assets/tutorials/*.*
+ASSETSt_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/tutorials
+
+INSTALLS += ASSETSe_FILES ASSETSt_FILES
+
 QT += gui xml svg
 CONFIG += exceptions rtti stl
 

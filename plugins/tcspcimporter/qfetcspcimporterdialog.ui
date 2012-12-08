@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>879</width>
+    <width>911</width>
     <height>624</height>
    </rect>
   </property>
@@ -117,7 +117,7 @@ p, li { white-space: pre-wrap; }
          <property name="margin">
           <number>0</number>
          </property>
-         <item row="0" column="0">
+         <item row="1" column="0">
           <widget class="QLabel" name="label_21">
            <property name="font">
             <font>
@@ -129,58 +129,12 @@ p, li { white-space: pre-wrap; }
             <string>&amp;output:</string>
            </property>
            <property name="buddy">
-            <cstring>cmbFileformat</cstring>
+            <cstring>edtPrefix</cstring>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,0,0,1,0,0,2">
-           <item>
-            <widget class="QLabel" name="label_5">
-             <property name="text">
-              <string>file &amp;format:</string>
-             </property>
-             <property name="buddy">
-              <cstring>cmbFileformat</cstring>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="cmbFileformat">
-             <property name="maximumSize">
-              <size>
-               <width>250</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <item>
-              <property name="text">
-               <string>none</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>TIFF</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_9">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,1,0,0,2">
            <item>
             <widget class="QLabel" name="label_4">
              <property name="text">
@@ -233,7 +187,7 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QLabel" name="label_18">
            <property name="font">
             <font>
@@ -249,7 +203,7 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="2" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_10">
            <item>
             <widget class="QLabel" name="label_19">
@@ -396,7 +350,7 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="2" column="0">
+         <item row="3" column="0">
           <widget class="QCheckBox" name="chkFCS">
            <property name="font">
             <font>
@@ -412,7 +366,7 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="5" column="0">
           <widget class="QCheckBox" name="chkCountrate">
            <property name="font">
             <font>
@@ -428,14 +382,14 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="6" column="1">
           <widget class="Line" name="line">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
           </widget>
          </item>
-         <item row="7" column="0">
+         <item row="8" column="0">
           <widget class="QLabel" name="label_17">
            <property name="text">
             <string/>
@@ -445,7 +399,7 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
+         <item row="8" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <property name="spacing">
             <number>2</number>
@@ -501,7 +455,7 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="2" column="1">
+         <item row="3" column="1">
           <widget class="QWidget" name="widFCS" native="true">
            <layout class="QVBoxLayout" name="verticalLayout">
             <property name="margin">
@@ -803,7 +757,7 @@ p, li { white-space: pre-wrap; }
            </layout>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="5" column="1">
           <widget class="QWidget" name="widCountrate" native="true">
            <layout class="QVBoxLayout" name="verticalLayout_4">
             <property name="margin">
@@ -873,6 +827,69 @@ p, li { white-space: pre-wrap; }
             </item>
            </layout>
           </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_23">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>input:</string>
+           </property>
+           <property name="buddy">
+            <cstring>cmbFileformat</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_11">
+           <item>
+            <widget class="QLabel" name="label_5">
+             <property name="text">
+              <string>file &amp;format:</string>
+             </property>
+             <property name="buddy">
+              <cstring>cmbFileformat</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="cmbFileformat">
+             <property name="maximumSize">
+              <size>
+               <width>250</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <item>
+              <property name="text">
+               <string>none</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>TIFF</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
@@ -993,7 +1010,7 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>839</width>
+           <width>871</width>
            <height>69</height>
           </rect>
          </property>
@@ -1085,7 +1102,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>edtTCSPCFile</tabstop>
   <tabstop>btnSelectFile</tabstop>
   <tabstop>btnLoad</tabstop>
-  <tabstop>cmbFileformat</tabstop>
   <tabstop>edtPrefix</tabstop>
   <tabstop>edtPostfix</tabstop>
   <tabstop>chkFirstFrame</tabstop>

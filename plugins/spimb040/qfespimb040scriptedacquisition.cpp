@@ -339,6 +339,8 @@ void QFESPIMB040ScriptedAcquisition::on_btnSave_clicked()
                 lastScript=ui->edtScript->getEditor()->toPlainText();
                 f.close();
                 setScriptFilename(filename);
+                dir=QFileInfo(filename).absolutePath();
+
             }
 
         }
@@ -595,6 +597,8 @@ void QFESPIMB040ScriptedAcquisition::openScript(QString dir, bool saveDir) {
                 setScriptFilename(filename);
                 f.close();
                 lastScript=ui->edtScript->getEditor()->toPlainText();
+                dir=QFileInfo(filename).absolutePath();
+
             }
         }
         if (saveDir) ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ScriptedAcquisition/lastScriptDir", dir);
