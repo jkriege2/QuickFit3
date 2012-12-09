@@ -7,6 +7,9 @@
 #include <QAction>
 #include "qftools.h"
 #include <QLocale>
+#include "matlabtools.h"
+#include "qftextdocumentprintpreview.h"
+#include "programoptions.h"
 
 QEnhancedTableView::QEnhancedTableView(QWidget* parent):
     QTableView(parent)
@@ -14,12 +17,19 @@ QEnhancedTableView::QEnhancedTableView(QWidget* parent):
     setContextMenuPolicy(Qt::ActionsContextMenu);
     QAction* act;
 
-    act=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
-    connect(act, SIGNAL(triggered()), this, SLOT(copySelectionToExcel()));
-    addAction(act);
-    act=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) without header row/column"), this);
-    connect(act, SIGNAL(triggered()), this, SLOT(copySelectionToExcelNoHead()));
-    addAction(act);
+    actCopyExcel=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
+    connect(actCopyExcel, SIGNAL(triggered()), this, SLOT(copySelectionToExcel()));
+    addAction(actCopyExcel);
+    actCopyExcelNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) without header row/column"), this);
+    connect(actCopyExcelNoHead, SIGNAL(triggered()), this, SLOT(copySelectionToExcelNoHead()));
+    addAction(actCopyExcelNoHead);
+    actCopyMatlab=new QAction(QIcon(":/lib/copy16_matlab.png"), tr("Copy Selection to clipboard (Matlab)"), this);
+    connect(actCopyMatlab, SIGNAL(triggered()), this, SLOT(copySelectionToMatlabNoHead()));
+    addAction(actCopyMatlab);
+    actPrint=new QAction(QIcon(":/lib/print.png"), tr("&Print Table"), this);
+    actPrint->setShortcut(QKeySequence::Print);
+    connect(actPrint, SIGNAL(triggered()), this, SLOT(printTable()));
+    addAction(actPrint);
 }
 
 QEnhancedTableView::~QEnhancedTableView()
@@ -31,6 +41,72 @@ QEnhancedTableView::~QEnhancedTableView()
 void QEnhancedTableView::copySelectionToExcelNoHead(int copyrole) {
     copySelectionToExcel(copyrole, false);
 }
+
+void QEnhancedTableView::copySelectionToMatlabNoHead(int copyrole)
+{
+    if (!model()) return;
+    if (!selectionModel()) return;
+    QModelIndexList sel=selectionModel()->selectedIndexes();
+    QLocale loc=QLocale::system();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    if (sel.size()==1) {
+        QVariant vdata=sel[0].data(copyrole);
+        QList<QList<QVariant> > data;
+        QList<QVariant> l;
+        l<<vdata;
+        data.append(l);
+
+        matlabCopy(data);
+    } else {
+        QSet<int> rows, cols;
+        int colmin=0;
+        int rowmin=0;
+        for (int i=0; i<sel.size(); i++) {
+            int r=sel[i].row();
+            int c=sel[i].column();
+            rows.insert(r);
+            cols.insert(c);
+            if (i==0) {
+                colmin=c;
+                rowmin=r;
+            } else {
+                if (c<colmin) colmin=c;
+                if (r<rowmin) rowmin=r;
+            }
+        }
+        QList<int> rowlist=QList<int>::fromSet(rows);
+        qSort(rowlist.begin(), rowlist.end());
+        QList<int> collist=QList<int>::fromSet(cols);
+        qSort(collist.begin(), collist.end());
+        int rowcnt=rowlist.size();
+        int colcnt=collist.size();
+        QList<QList<QVariant> > data;
+
+
+
+        // now add dta rows:
+        //
+        //               <~~~~~~~~~ colcnt times ~~~~~~~~~~>
+        //                <EMPTY> | <EMPTY> | ... | <EMPTY>
+        for (int r=0; r<rowcnt; r++) {
+            QList<QVariant> row;
+            for (int c=0; c<colcnt; c++) {
+                row.append(QVariant()); // empty columns for data
+            }
+            data.append(row);
+        }
+        for (int i=0; i<sel.size(); i++) {
+            int r=rowlist.indexOf(sel[i].row());
+            int c=collist.indexOf(sel[i].column());
+            QVariant vdata=sel[i].data(copyrole);
+
+            if ((r>=0) && (c>=0) && (r<=data.size()) && (c<=colcnt)) data[r][c]=vdata;
+        }
+
+        matlabCopy(data);
+    }
+}
+
 
 void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead) {
     if (!model()) return;
@@ -475,7 +551,7 @@ QString QEnhancedTableView::toHtml(int borderWidth, bool non_breaking, int fontS
         html+="<tr>";
         if (row==-1) {
             for (int col=-1; col<model()->columnCount(); col++) {
-                html+=QString("<th style=\"white-space: nowrap;%1\"><nobr>").arg(fsstyle);
+                html+=QString("<th style=\"white-space: nowrap;%1 \"><nobr>").arg(fsstyle);
                 if (col>=0) {
                     html+=model()->headerData(col, Qt::Horizontal).toString();
                 }
@@ -484,17 +560,17 @@ QString QEnhancedTableView::toHtml(int borderWidth, bool non_breaking, int fontS
         } else {
             for (int col=-1; col<model()->columnCount(); col++) {
                 if (col==-1) {
-                    html+=QString("<th style=\"white-space: nowrap;%1\"><nobr>").arg(fsstyle);
+                    html+=QString("<th style=\"white-space: nowrap;%1 \"><nobr>").arg(fsstyle);
                     html+=model()->headerData(row, Qt::Vertical).toString();
                     html+="</nobr></th>";
                 } else {
                     QModelIndex index=model()->index(row, col);
                     QVariant check=index.data(Qt::CheckStateRole);
                     QBrush back=index.data(Qt::BackgroundRole).value<QBrush>();
-                    QString style=fsstyle+"white-space: nowrap; ";
+                    QString style=fsstyle+" white-space: nowrap; ";
                     //qDebug()<<"r="<<row<<"\tc="<<col<<"\tcolor="<<back.color().name();
-                    if (back.color()!=QColor(0,0,0) && index.data(Qt::BackgroundRole).isValid()) style=QString("background: %1;").arg(back.color().name());
-                    if (style.isEmpty()) html+=QString("<td style=\"%1\"><nobr>").arg(fsstyle);
+                    if (back.color()!=QColor(0,0,0) && index.data(Qt::BackgroundRole).isValid()) style+=QString(" background: %1;").arg(back.color().name());
+                    if (style.isEmpty()) html+=QString("<td style=\"%1 \"><nobr>").arg(fsstyle);
                     else html+=QString("<td style=\"%1\"><nobr>").arg(style);
                     if (check.isValid()) {
                         if (check.toInt()!=0) {
@@ -515,6 +591,44 @@ QString QEnhancedTableView::toHtml(int borderWidth, bool non_breaking, int fontS
     return html;
 }
 
+QAction *QEnhancedTableView::getActCopyExcel() const
+{
+    return actCopyExcel;
+}
+
+QAction *QEnhancedTableView::getActCopyExcelNoHead() const
+{
+    return actCopyExcelNoHead;
+}
+
+QAction *QEnhancedTableView::getActCopyMatlab() const
+{
+    return actCopyMatlab;
+}
+
+QAction *QEnhancedTableView::getActPrint() const
+{
+    return actPrint;
+}
+
+void QEnhancedTableView::addActionsToToolbar(QToolBar *tb) const
+{
+    tb->addAction(actCopyExcel);
+    tb->addAction(actCopyExcelNoHead);
+    tb->addAction(actCopyMatlab);
+    tb->addSeparator();
+    tb->addAction(actPrint);
+}
+
+void QEnhancedTableView::addActionsToMenu(QMenu *tb) const
+{
+    tb->addAction(actCopyExcel);
+    tb->addAction(actCopyExcelNoHead);
+    tb->addAction(actCopyMatlab);
+    tb->addSeparator();
+    tb->addAction(actPrint);
+}
+
 
 
 void QEnhancedTableView::keyPressEvent(QKeyEvent* event) {
@@ -523,4 +637,37 @@ void QEnhancedTableView::keyPressEvent(QKeyEvent* event) {
         event->accept();
     } else QTableView::keyPressEvent(event);
     emit keyPressed(event->key(), event->modifiers(), event->text());
+}
+
+void QEnhancedTableView::changeHTMLFontSize(QTextDocument *txt, double fontSize)
+{
+    txt->setHtml(toHtml(1, false, round(fontSize)));
+}
+
+void QEnhancedTableView::printTable()
+{
+    QTextDocument txt;
+    txt.setHtml(toHtml());
+    QPrinter* p=new QPrinter();
+    p->setPrinterName(ProgramOptions::getConfigValue("QEnhancedTableView/lastPrinter", p->printerName()).toString());
+
+    QPrintDialog *dialog = new QPrintDialog(p, NULL);
+    dialog->setWindowTitle(tr("Print Table"));
+    if (dialog->exec() != QDialog::Accepted) {
+        delete p;
+        return;
+    }
+    ProgramOptions::setConfigValue("QEnhancedTableView/lastPrinter", p->printerName());
+
+    p->setPageMargins(10,10,10,10,QPrinter::Millimeter);
+
+
+    QFTextDocumentPrintPreview* dlg=new QFTextDocumentPrintPreview(p, &txt, this, true);
+    connect(dlg, SIGNAL(setDocumentFontSize(QTextDocument*,double)), this, SLOT(changeHTMLFontSize(QTextDocument*,double)));
+    dlg->setWindowTitle(tr("Print Table: Preview"));
+    if (dlg->exec()) {
+        dlg->print();
+    }
+    delete dlg;
+    delete p;
 }

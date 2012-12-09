@@ -257,13 +257,13 @@ protected:
         int channel1;
         int channel2;
 
-        QString filenameCR;
+        QStringList filenameCR;
 
         ccfFileConfig() {
             channel1=0;
             channel2=0;
             filename="";
-            filenameCR="";
+            filenameCR.clear();
         }
     };
 };

@@ -20,9 +20,10 @@ For the FCS/FCCS functionality you may set several options:
   <li><b>Correlator properties:</b> The correlators have to be parametrized, mostly setting their temporal resolution (minimum lag time &tau;<sub>min</sub>) and how the lags are distributed over time. Usually the latter is done semi-logarithmically, using the parameter S, P and m:<ol>
     <li>P correlation channels with lag times  &tau;<sub>min</sub>, 2 &tau;<sub>min</sub>, 3 &tau;<sub>min</sub>, ..., P &tau;<sub>min</sub> are used.</li>
     <li>Then &tau;<sub>min</sub> is multiplied by m and the next channels are: P&tau;<sub>min</sub>+m&tau;<sub>min</sub>, P&tau;<sub>min</sub>+2m&tau;<sub>min</sub>, ..., P&tau;<sub>min</sub>+Pm&tau;<sub>min</sub></li>
-    <li>This scheme is repewated S times.</li>
+    <li>This scheme is repeated S times.</li>
   </ol>
   </li>
+  <li><b>FCS countrate binning:</b> This plugin saves a binned countrate together with the correlation function. This is used to present a rough overview of the countrate during the experiment to the user. It has no influence on the data processing! Set this bining to an intermediate level such as 10-100ms, which will result an intermediate number of datapoints to the user. A finer resolution usually does not contain more information, but will slow down the display routines.</li>
 </ul>
 
 $$qf_commondoc_backtop$$

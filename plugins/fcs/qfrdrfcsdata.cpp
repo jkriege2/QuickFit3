@@ -381,7 +381,7 @@ struct CSVDATA {
     QString filename;
 };
 
-bool QFRDRFCSData::loadCountRatesFromCSV(QStringList filenames) {
+bool QFRDRFCSData::loadCountRatesFromCSV(QStringList filenames, int rateChannels) {
     QList<CSVDATA> data;
     char separatorchar=',';
     char commentchar='#';
@@ -419,7 +419,7 @@ bool QFRDRFCSData::loadCountRatesFromCSV(QStringList filenames) {
         if (error) break;
     }
     if (!error) {
-        resizeRates(rrateN, rruns,1);
+        resizeRates(rrateN, rruns/rateChannels, rateChannels);
         int run0=0;
         for (int ii=0; ii<filenames.size(); ii++) {
             try {
@@ -436,7 +436,7 @@ bool QFRDRFCSData::loadCountRatesFromCSV(QStringList filenames) {
                         rate[(run0+c-1)*rateN+l]=data[ii].tab->get(c, l)*ratefactor;
                     }
                 }
-                run0=run0+lines-1;
+                run0=run0+columns-1;
             } catch(datatable2_exception& e) {   // error handling with exceptions
                 setError(tr("Error while reading correlation functions from CSV file '%1': %2").arg(data[ii].filename).arg(QString(e.get_message().c_str())));
                 error=true;
@@ -1171,13 +1171,34 @@ bool QFRDRFCSData::reloadFromFiles() {
             return false;
         }
         QStringList cfiles, rfiles;
-        for (int i=0; i<files.size(); i+=2) {
-            if (i+1<files.size()) {
+        bool ok=true;
+        int channels=1;
+        for (int i=0; i<files.size(); i+=1) {
+            QString t=files_types.value(i, "");
+            if (t.toUpper()=="CORR"||t.toUpper()=="ACF") {
                 cfiles.append(files[i]);
-                rfiles.append(files[i+1]);
+            } else if (t.toUpper()=="CCF") {
+                cfiles.append(files[i]);
+                channels=2;
+            } else if (t.toUpper()=="RATE") {
+                rfiles.append(files[i]);
+            } else {
+                ok=false;
+            }
+            if (!ok) break;
+        }
+
+        if (!ok) {
+            cfiles.clear();
+            rfiles.clear();
+            for (int i=0; i<files.size(); i+=2) {
+                if (i+1<files.size()) {
+                    cfiles.append(files[i]);
+                    rfiles.append(files[i+1]);
+                }
             }
         }
-        return loadCorrelationCurvesFromCSV(cfiles) && loadCountRatesFromCSV(rfiles);
+        return loadCorrelationCurvesFromCSV(cfiles) && loadCountRatesFromCSV(rfiles, channels);
     }
     return false;
 }

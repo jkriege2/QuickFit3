@@ -341,7 +341,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         double* binnedRate;
 
         /** \brief load a CSV file containing a count rate curve */
-        bool loadCountRatesFromCSV(QStringList filenames);
+        bool loadCountRatesFromCSV(QStringList filenames, int rateChannels=1);
         /** \brief load a CSV file containing a correlation curve */
         bool loadCorrelationCurvesFromCSV(QStringList filenames);
         /** \brief load an ISS ALBA file containing a correlation curve */

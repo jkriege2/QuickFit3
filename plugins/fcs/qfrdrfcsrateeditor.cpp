@@ -310,7 +310,11 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
                     if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
                         JKQTPxyLineGraph* g=new JKQTPxyLineGraph(plotter->get_plotter());
                         g->set_lineWidth(1);
-                        g->set_color(QColor("red"));
+                        if (channel==0) {
+                            g->set_color(QColor("red"));
+                        } else {
+                            g->set_color(QColor("orange"));
+                        }
                         g->set_xColumn(c_tau);
                         g->set_yColumn(c_run);
                         g->set_title(tr("\\verb{%3}:%4 %2run %1").arg(i).arg(binned).arg(name).arg(channelName));

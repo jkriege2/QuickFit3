@@ -72,6 +72,7 @@
         <file alias="result_statistics.png">icons/result_statistics.png</file>
         <file alias="result_statistics_compare.png">icons/result_statistics_compare.png</file>
         <file alias="result_statistics_icon.png">icons/result_statistics_icon.png</file>
+        <file alias="copy16_matlab.png">icons/copy16_matlab.png</file>
     </qresource>
     <qresource prefix="/lib/qfstyledbutton">
         <file alias="network.png">icons/network.png</file>

@@ -62,9 +62,38 @@ void QFETCSPCImporter::startPlugin() {
 }
 
 void QFETCSPCImporter::insertFCSCSVFile(const QString& filenameFCS, const QString &filenameCR, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly) {
-    QStringList sl;
-    sl<<filenameFCS<<filenameCR;
-    QFRawDataRecord* e=project->addRawData("fcs", QFileInfo(filenameFCS).fileName(), sl, paramValues, paramReadonly);
+    QStringList sl, types;
+    sl<<filenameFCS;
+    types<<"ACF";
+    if (QFile::exists(filenameCR)) {
+        sl<<filenameCR;
+        types<<"RATE";
+    }
+
+    QFRawDataRecord* e=project->addRawData("fcs", QFileInfo(filenameFCS).fileName(), sl, paramValues, paramReadonly, types);
+    if (e->error()) {
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filenameFCS).arg(e->errorDescription()));
+        services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filenameFCS).arg(e->errorDescription()));
+        project->deleteRawData(e->getID());
+    }
+}
+
+void QFETCSPCImporter::insertFCCSCSVFile(const QString& filenameFCS, const QString &filenameCR1, const QString &filenameCR2, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly) {
+    QStringList sl, types;
+
+    sl<<filenameFCS;
+    types<<"CCF";
+    if (QFile::exists(filenameCR1)) {
+        sl<<filenameCR1;
+        types<<"RATE";
+    }
+    if (QFile::exists(filenameCR2)) {
+        sl<<filenameCR2;
+        types<<"RATE";
+    }
+
+
+    QFRawDataRecord* e=project->addRawData("fcs", QFileInfo(filenameFCS).fileName(), sl, paramValues, paramReadonly, types);
     if (e->error()) {
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filenameFCS).arg(e->errorDescription()));
         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filenameFCS).arg(e->errorDescription()));
@@ -128,7 +157,8 @@ void QFETCSPCImporter::correlationDialogClosed() {
             initParams["CSV_COMMENT"]=QString("#");
             initParams["CROSS_CORRELATION"]=true;
             paramsReadonly<<"FILETYPE"<<"CSV_COMMENT"<<"CSV_SEPARATOR"<<"CROSS_CORRELATION";
-            insertFCSCSVFile(filename, it->first.value(1,""), initParams, paramsReadonly);
+
+            insertFCCSCSVFile(filename, it->first.value(1,""), it->first.value(2,""), initParams, paramsReadonly);
         }
         //insertVideoCorrelatorFile(filename, overview, filename.toLower().endsWith(".bin"));
         settings->setCurrentRawDataDir(QFileInfo(filename).dir().absolutePath());

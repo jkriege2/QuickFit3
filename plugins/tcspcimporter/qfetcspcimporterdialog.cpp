@@ -198,17 +198,17 @@ void QFETCSPCImporterDialog::on_spinFCSTauMin_valueChanged(double val) {
     updateCorrelator();
 }
 
-void QFETCSPCImporterDialog::on_spinSegments_value_changed(int val) {
+void QFETCSPCImporterDialog::on_spinSegments_valueChanged(int val) {
     updateDuration();
     updateCorrelator();
 }
 
-void QFETCSPCImporterDialog::on_spinRangeStart_value_changed(int val) {
+void QFETCSPCImporterDialog::on_spinRangeStart_valueChanged(double val) {
     updateDuration();
     updateCorrelator();
 }
 
-void QFETCSPCImporterDialog::on_spinRangeEnd_value_changed(int val) {
+void QFETCSPCImporterDialog::on_spinRangeEnd_valueChanged(double val) {
     updateDuration();
     updateCorrelator();
 }
@@ -376,7 +376,8 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
     job.fcs_segments=ui->spinSegments->value();
     job.doFCS=ui->chkFCS->isChecked();
     job.doCountrate=ui->chkCountrate->isChecked();
-    job.fcs_crbinning=1e-2;
+    //job.fcs_crbinning=1e-2;
+    job.fcs_crbinning=ui->spinFCSCRBinning->value()/1000.0;
 
     job.fcs_correlate.clear();
     for (int i=0; i<channels; i++) {

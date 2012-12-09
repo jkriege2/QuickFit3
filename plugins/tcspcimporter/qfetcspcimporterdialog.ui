@@ -455,6 +455,140 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
+         <item row="5" column="1">
+          <widget class="QWidget" name="widCountrate" native="true">
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <widget class="QDoubleSpinBox" name="spinCountrateBinning">
+                <property name="suffix">
+                 <string> µs</string>
+                </property>
+                <property name="maximum">
+                 <double>1000000.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>10.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>10.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_23">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="labStatistics">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::RichText</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QTableView" name="tabCR">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>64</height>
+               </size>
+              </property>
+              <property name="editTriggers">
+               <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+              </property>
+              <attribute name="horizontalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_23">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>input:</string>
+           </property>
+           <property name="buddy">
+            <cstring>cmbFileformat</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_11">
+           <item>
+            <widget class="QLabel" name="label_5">
+             <property name="text">
+              <string>file &amp;format:</string>
+             </property>
+             <property name="buddy">
+              <cstring>cmbFileformat</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="cmbFileformat">
+             <property name="maximumSize">
+              <size>
+               <width>250</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <item>
+              <property name="text">
+               <string>none</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>TIFF</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
          <item row="3" column="1">
           <widget class="QWidget" name="widFCS" native="true">
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -754,35 +888,39 @@ p, li { white-space: pre-wrap; }
               </item>
              </layout>
             </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QWidget" name="widCountrate" native="true">
-           <layout class="QVBoxLayout" name="verticalLayout_4">
-            <property name="margin">
-             <number>0</number>
-            </property>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <layout class="QHBoxLayout" name="horizontalLayout_13">
               <item>
-               <widget class="QDoubleSpinBox" name="spinCountrateBinning">
-                <property name="suffix">
-                 <string> µs</string>
+               <widget class="QLabel" name="label_11">
+                <property name="text">
+                 <string>FCS countrate binning for display:</string>
                 </property>
-                <property name="maximum">
-                 <double>1000000.000000000000000</double>
-                </property>
-                <property name="singleStep">
-                 <double>10.000000000000000</double>
-                </property>
-                <property name="value">
-                 <double>10.000000000000000</double>
+                <property name="buddy">
+                 <cstring>spinFCSCRBinning</cstring>
                 </property>
                </widget>
               </item>
               <item>
-               <spacer name="horizontalSpacer_23">
+               <widget class="QDoubleSpinBox" name="spinFCSCRBinning">
+                <property name="toolTip">
+                 <string>The plugin will write a binned countrate with this binning time to a faile. It will be used as a countrate display in FCS records.</string>
+                </property>
+                <property name="suffix">
+                 <string> ms</string>
+                </property>
+                <property name="minimum">
+                 <double>0.010000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1000000.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>20.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_2">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
@@ -794,102 +932,10 @@ p, li { white-space: pre-wrap; }
                 </property>
                </spacer>
               </item>
-              <item>
-               <widget class="QLabel" name="labStatistics">
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="textFormat">
-                 <enum>Qt::RichText</enum>
-                </property>
-               </widget>
-              </item>
              </layout>
-            </item>
-            <item>
-             <widget class="QTableView" name="tabCR">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>64</height>
-               </size>
-              </property>
-              <property name="editTriggers">
-               <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
-              </property>
-              <attribute name="horizontalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="verticalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-             </widget>
             </item>
            </layout>
           </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_23">
-           <property name="font">
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>input:</string>
-           </property>
-           <property name="buddy">
-            <cstring>cmbFileformat</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_11">
-           <item>
-            <widget class="QLabel" name="label_5">
-             <property name="text">
-              <string>file &amp;format:</string>
-             </property>
-             <property name="buddy">
-              <cstring>cmbFileformat</cstring>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="cmbFileformat">
-             <property name="maximumSize">
-              <size>
-               <width>250</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <item>
-              <property name="text">
-               <string>none</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>TIFF</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
          </item>
         </layout>
        </widget>
@@ -1102,6 +1148,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>edtTCSPCFile</tabstop>
   <tabstop>btnSelectFile</tabstop>
   <tabstop>btnLoad</tabstop>
+  <tabstop>cmbFileformat</tabstop>
   <tabstop>edtPrefix</tabstop>
   <tabstop>edtPostfix</tabstop>
   <tabstop>chkFirstFrame</tabstop>
@@ -1110,12 +1157,16 @@ p, li { white-space: pre-wrap; }
   <tabstop>spinRangeEnd</tabstop>
   <tabstop>chkFCS</tabstop>
   <tabstop>spinSegments</tabstop>
+  <tabstop>tvFCS</tabstop>
   <tabstop>cmbCorrelator</tabstop>
   <tabstop>spinS</tabstop>
   <tabstop>spinP</tabstop>
   <tabstop>spinM</tabstop>
   <tabstop>spinFCSTauMin</tabstop>
+  <tabstop>spinFCSCRBinning</tabstop>
   <tabstop>chkCountrate</tabstop>
+  <tabstop>spinCountrateBinning</tabstop>
+  <tabstop>tabCR</tabstop>
   <tabstop>chkAddToProject</tabstop>
   <tabstop>btnAddJob</tabstop>
   <tabstop>scrollArea</tabstop>
@@ -1152,12 +1203,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>128</y>
+     <x>164</x>
+     <y>156</y>
     </hint>
     <hint type="destinationlabel">
-     <x>341</x>
-     <y>121</y>
+     <x>543</x>
+     <y>261</y>
     </hint>
    </hints>
   </connection>

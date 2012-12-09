@@ -79,7 +79,9 @@ HEADERS += dlgnewproperty.h \
     qfdoubleedit.h \
     dlg_qffileeditdialog.h \
     qfversion.h \
-    qfhistogramservice.h
+    qfhistogramservice.h \
+    matlabtools.h \
+    qftextdocumentprintpreview.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -128,7 +130,9 @@ SOURCES += dlgnewproperty.cpp \
     qfpropertyitemdelegate.cpp \
     qfdoubleedit.cpp \
     dlg_qffileeditdialog.cpp \
-    qfhistogramservice.cpp
+    qfhistogramservice.cpp \
+    matlabtools.cpp \
+    qftextdocumentprintpreview.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

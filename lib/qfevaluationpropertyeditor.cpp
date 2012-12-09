@@ -705,9 +705,24 @@ void QFEvaluationPropertyEditor::createWidgets() {
 
     tabMain->addTab(splitMain, tr("&Evaluation"));
 
+
+
+
     widResults=new QWidget(this);
     QVBoxLayout* rwvlayout=new QVBoxLayout(this);
     widResults->setLayout(rwvlayout);
+
+    tvResults=new QEnhancedTableView(widResults);
+    actCopyResults=tvResults->getActCopyExcel();
+    actCopyResultsNoHead=tvResults->getActCopyExcelNoHead();
+    tvResults->setAlternatingRowColors(true);
+    tvResults->setItemDelegate(new QFHTMLDelegate(tvResults));
+    QFontMetrics fm(font());
+    tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
+    tvResults->setModel(resultsModel);
+    tvResults->setContextMenuPolicy(Qt::ActionsContextMenu);
+
+
     tbResults=new QToolBar("toolbar_eval_results", this);
     rwvlayout->addWidget(tbResults);
     actRefreshResults=new QAction(QIcon(":/lib/refresh16.png"), tr("Refresh results ..."), this);
@@ -719,10 +734,11 @@ void QFEvaluationPropertyEditor::createWidgets() {
     tbResults->addAction(actDeleteResults);
     tbResults->addSeparator();
 
-    actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to clipboard (for Excel ...)"), this);
+    /*actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to clipboard (for Excel ...)"), this);
     tbResults->addAction(actCopyResults);
     actCopyResultsNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy Selection without header"), this);
-    tbResults->addAction(actCopyResultsNoHead);
+    tbResults->addAction(actCopyResultsNoHead);*/
+    tvResults->addActionsToToolbar(tbResults);
     actCopyValErrResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as value+error pairs"), this);
     tbResults->addAction(actCopyValErrResults);
     actCopyValErrResultsNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as value+error pairs, w/o header"), this);
@@ -834,23 +850,7 @@ void QFEvaluationPropertyEditor::createWidgets() {
     connect(edtFilterFiles, SIGNAL(textChanged(QString)), this, SLOT(filterFilesTextChanged(QString)));
     connect(edtFilterFilesNot, SIGNAL(textChanged(QString)), this, SLOT(filterFilesTextChanged(QString)));
 
-    tvResults=new QEnhancedTableView(widResults);
-    tvResults->setAlternatingRowColors(true);
-    tvResults->setItemDelegate(new QFHTMLDelegate(tvResults));
-    QFontMetrics fm(font());
-    tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
-    tvResults->setModel(resultsModel);
-    tvResults->setContextMenuPolicy(Qt::ActionsContextMenu);
-    tvResults->addAction(actCopyResults);
-    tvResults->addAction(actCopyResultsNoHead);
-    tvResults->addAction(actCopyValErrResults);
-    tvResults->addAction(actCopyValErrResultsNoHead);
-    tvResults->addAction(actSaveResults);
-    tvResults->addAction(actSaveResultsAveraged);
-    tvResults->addAction(actRefreshResults);
-    tvResults->addAction(actDeleteResults);
-    tvResults->addAction(actStatistics);
-    tvResults->addAction(actStatisticsComparing);
+
     rwvlayout->addWidget(tvResults);
     labAveragedresults=new QLabel(widResults);
     labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);
@@ -860,8 +860,8 @@ void QFEvaluationPropertyEditor::createWidgets() {
     labAveragedresults->setSizePolicy(QSizePolicy::Ignored, labAveragedresults->sizePolicy().verticalPolicy());
     rwvlayout->addWidget(labAveragedresults);
 
-    connect(actCopyResults, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcel()));
-    connect(actCopyResultsNoHead, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcelNoHead()));
+    //connect(actCopyResults, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcel()));
+    //connect(actCopyResultsNoHead, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcelNoHead()));
     connect(actCopyValErrResults, SIGNAL(triggered()), this, SLOT(copyValErrResults()));
     connect(actCopyValErrResultsNoHead, SIGNAL(triggered()), this, SLOT(copyValErrResultsNoHead()));
     connect(actCopyMedianQuantilesResults, SIGNAL(triggered()), this, SLOT(copyMedianQuantilesResults()));
@@ -909,6 +909,15 @@ void QFEvaluationPropertyEditor::createWidgets() {
 
     connect(tabMain, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
 
+    tvResults->addAction(actCopyValErrResults);
+    tvResults->addAction(actCopyValErrResultsNoHead);
+    tvResults->addAction(actSaveResults);
+    tvResults->addAction(actSaveResultsAveraged);
+    tvResults->addAction(actRefreshResults);
+    tvResults->addAction(actDeleteResults);
+    tvResults->addAction(actStatistics);
+    tvResults->addAction(actStatisticsComparing);
+
     menuResults->addAction(actRefreshResults);
     menuResults->addSeparator();
     menuResults->addAction(actDeleteResults);
@@ -916,8 +925,10 @@ void QFEvaluationPropertyEditor::createWidgets() {
     menuResults->addAction(actSaveResults);
     menuResults->addAction(actSaveResultsAveraged);
     menuResults->addSeparator();
-    menuResults->addAction(actCopyResults);
-    menuResults->addAction(actCopyResultsNoHead);
+    tvResults->addActionsToMenu(menuResults);
+    menuResults->addSeparator();
+    //menuResults->addAction(actCopyResults);
+    //menuResults->addAction(actCopyResultsNoHead);
     menuResults->addAction(actCopyValErrResults);
     menuResults->addAction(actCopyValErrResultsNoHead);
     menuResults->addAction(actCopyMedianQuantilesResults);

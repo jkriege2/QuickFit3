@@ -77,6 +77,7 @@ class QFETCSPCImporter : public QObject, public QFExtensionBase {
         virtual void log_error(QString message);
 
         void insertFCSCSVFile(const QString &filenameFCS, const QString& filenameCR, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly);
+        void insertFCCSCSVFile(const QString& filenameFCS, const QString &filenameCR1, const QString &filenameCR2, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly);
         void insertCountRate(const QString &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly);
 
         QFETCSPCImporterDialog* dlgCorrelate;

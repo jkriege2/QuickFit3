@@ -296,10 +296,10 @@ void QFETCSPCImporterJobThread::run() {
                                      text<<"\n";
                                  }
                              }
-                             QString localFilenameCR= "";
+                             QStringList localFilenameCR;
                              if (ccf.first==ccf.second) {
-                                 localFilenameCR=outputFilenameBase+QString(".fcscnt%1.csv").arg(ccf.first);
-                                 QFile f(localFilenameCR);
+                                 localFilenameCR<<outputFilenameBase+QString(".fcscnt%1.csv").arg(ccf.first);
+                                 QFile f(localFilenameCR[0]);
                                  if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
                                      QTextStream text(&f);
                                      text.setLocale(outLocale);
@@ -318,7 +318,56 @@ void QFETCSPCImporterJobThread::run() {
                                          text<<"\n";
                                      }
                                  } else {
-                                     localFilenameCR="";
+                                     localFilenameCR.clear();
+                                 }
+                             } else {
+                                 localFilenameCR<<outputFilenameBase+QString(".fcscnt%1_%2_1.csv").arg(ccf.first).arg(ccf.second);
+                                 localFilenameCR<<outputFilenameBase+QString(".fcscnt%1_%2_2.csv").arg(ccf.first).arg(ccf.second);
+                                 {
+                                     QFile f(localFilenameCR[0]);
+                                     if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
+                                         QTextStream text(&f);
+                                         text.setLocale(outLocale);
+                                         int items=0;
+                                         for (int r=0; r<job.fcs_segments; r++) {
+                                             uint32_t id=xyAdressToUInt32(r, ccf.first);
+                                             if (r==0) items=fcs_crs[id].size();
+                                             else items=qMax(items, fcs_crs[id].size());
+                                         }
+                                         for (int i=0; i<items; i++) {
+                                             text<<outLocale.toString(double(i)*job.fcs_crbinning);
+                                             for (int r=0; r<job.fcs_segments; r++) {
+                                                 uint32_t id=xyAdressToUInt32(r, ccf.first);
+                                                 text<<", "<<outLocale.toString(fcs_crs[id].value(i, 0));
+                                             }
+                                             text<<"\n";
+                                         }
+                                     } else {
+                                         localFilenameCR.removeAt(0);
+                                     }
+                                 }
+                                 {
+                                     QFile f(localFilenameCR[localFilenameCR.size()-1]);
+                                     if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
+                                         QTextStream text(&f);
+                                         text.setLocale(outLocale);
+                                         int items=0;
+                                         for (int r=0; r<job.fcs_segments; r++) {
+                                             uint32_t id=xyAdressToUInt32(r, ccf.second);
+                                             if (r==0) items=fcs_crs[id].size();
+                                             else items=qMax(items, fcs_crs[id].size());
+                                         }
+                                         for (int i=0; i<items; i++) {
+                                             text<<outLocale.toString(double(i)*job.fcs_crbinning);
+                                             for (int r=0; r<job.fcs_segments; r++) {
+                                                 uint32_t id=xyAdressToUInt32(r, ccf.second);
+                                                 text<<", "<<outLocale.toString(fcs_crs[id].value(i, 0));
+                                             }
+                                             text<<"\n";
+                                         }
+                                     } else {
+                                         localFilenameCR.removeAt(localFilenameCR.size()-1);
+                                     }
                                  }
                              }
 
@@ -337,7 +386,9 @@ void QFETCSPCImporterJobThread::run() {
                                      addFiles.append(qMakePair(sl, QString("fcs_csv")));
                                  }
                              } else {
-                                 addFiles.append(qMakePair(QStringList(localFilename), QString("fcs_cross_csv")));
+                                 QStringList sl;
+                                 sl<<localFilename<<localFilenameCR;
+                                 addFiles.append(qMakePair(sl, QString("fcs_cross_csv")));
                              }
 
                         }
@@ -383,8 +434,11 @@ void QFETCSPCImporterJobThread::run() {
                                         else text<<QString("FCS: ccf %1 %2 file          : ").arg(ccfFilenames[i].channel1,4).arg(ccfFilenames[i].channel2,4)<<ccfFilenames[i].filename << "\n";
                                     }
                                     if (!ccfFilenames[i].filenameCR.isEmpty()) {
-                                        if (ccfFilenames[i].channel1==ccfFilenames[i].channel2) text<<QString("FCS: acf %1 countrate file     : ").arg(ccfFilenames[i].channel1,4)<<ccfFilenames[i].filenameCR << "\n";
-                                        else text<<QString("FCS: ccf %1 %2 countrate file: ").arg(ccfFilenames[i].channel1,4).arg(ccfFilenames[i].channel2,4)<<ccfFilenames[i].filenameCR << "\n";
+                                        if (ccfFilenames[i].channel1==ccfFilenames[i].channel2) text<<QString("FCS: acf %1 countrate file     : ").arg(ccfFilenames[i].channel1,4)<<ccfFilenames[i].filenameCR.value(0, "") << "\n";
+                                        else{
+                                            text<<QString("FCS: ccf %1 %2 countrate file 1: ").arg(ccfFilenames[i].channel1,4).arg(ccfFilenames[i].channel2,4)<<ccfFilenames[i].filenameCR.value(0, "") << "\n";
+                                            text<<QString("FCS: ccf %1 %2 countrate file 2: ").arg(ccfFilenames[i].channel1,4).arg(ccfFilenames[i].channel2,4)<<ccfFilenames[i].filenameCR.value(1, "") << "\n";
+                                        }
                                     }
                                 }
                             }
