@@ -1616,7 +1616,7 @@ QWidget *MainWindow::getCreateView(const QString &name, const QString &title)
     histograms[name]->raise();
     //histograms[name]->setAttribute(Qt::WA_DeleteOnClose);
     if (histograms.size()>1) {
-        QSize s=QSize(500,300);
+        QSize s=ProgramOptions::getConfigValue("QFHistogramView/size", QSize(800,600)).toSize();
         QPoint p=histograms[name]->pos();
         if (histograms.contains(lastHistogram)) {
             p=histograms[lastHistogram]->pos();

@@ -497,6 +497,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
 
     JKQTmathText mathParser(this);
     mathParser.set_fontSize(13);
+    mathParser.useXITS();
     /*
     if (fonts.contains("Times New Roman")) {
         //qDebug()<<"using Times New Roman";

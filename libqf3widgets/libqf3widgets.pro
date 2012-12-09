@@ -184,7 +184,8 @@ RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/numberedit.qrc \
              libqf3widgets.qrc \
     ../../../../LIB/trunk/qt/qprogresslistwidget.qrc \
-    ../../../../LIB/trunk/qt/qtlogfile.qrc
+    ../../../../LIB/trunk/qt/qtlogfile.qrc \
+    ../extlibs/xits.qrc
 
 TRANSLATIONS= ./translations/de.quickfit3widgets.ts
 
@@ -193,7 +194,8 @@ INCLUDEPATH += ../../../../LIB/trunk/ \
 
 CONFIG += dll lib_bundle exceptions rtti stl create_prl
 
-DEFINES += QFWIDLIB_LIBRARY LIB_IN_DLL LIB_EXPORT_LIBRARY
+DEFINES += QFWIDLIB_LIBRARY LIB_IN_DLL LIB_EXPORT_LIBRARY USE_XITS_FONTS
+#AUTOLOAD_XITS_FONTS
 
 
 ASSETSScript_FILES.files = ./assets/highlighter/qtscript/*.*

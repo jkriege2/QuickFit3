@@ -69,6 +69,24 @@ int main(int argc, char * argv[])
         QMessageBox::warning(NULL, QObject::tr("debug messages"), QObject::tr("You activated the debug message output in the last run of QuickFit. As this function is known to be instable and cause crashes in multi-threaded applications, it is now deactivated. If you absolutely need this function and know what you are doing, please reactivate it in the settinsg dialog!"));
     }
 
+    QFontDatabase fdb;
+    splash.showMessage("loading XITS fonts ...");
+    app.processEvents();
+    app.processEvents();
+    app.processEvents();
+    //if (!fdb.families().contains("XITS")) {
+        if (QFile::exists(":/JKQTmathText/fonts/xits-bold.otf")) { QFontDatabase::addApplicationFont(":/JKQTmathText/fonts/xits-bold.otf"); }
+        if (QFile::exists(":/JKQTmathText/fonts/xits-bolditalic.otf")) { QFontDatabase::addApplicationFont(":/JKQTmathText/fonts/xits-bolditalic.otf"); }
+        if (QFile::exists(":/JKQTmathText/fonts/xits-italic.otf")) { QFontDatabase::addApplicationFont(":/JKQTmathText/fonts/xits-italic.otf"); }
+        if (QFile::exists(":/JKQTmathText/fonts/xits-math.otf")) { QFontDatabase::addApplicationFont(":/JKQTmathText/fonts/xits-math.otf"); }
+        if (QFile::exists(":/JKQTmathText/fonts/xits-mathbold.otf")) { QFontDatabase::addApplicationFont(":/JKQTmathText/fonts/xits-mathbold.otf"); }
+        if (QFile::exists(":/JKQTmathText/fonts/xits-regular.otf")) { QFontDatabase::addApplicationFont(":/JKQTmathText/fonts/xits-regular.otf"); }
+    //}
+    splash.showMessage("initializing ...");
+    app.processEvents();
+    app.processEvents();
+    app.processEvents();
+
     qRegisterMetaType<QTextCursor>("QTextCursor");
     MainWindow win(settings, &splash);
     win.show();

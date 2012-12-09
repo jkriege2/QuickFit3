@@ -90,3 +90,7 @@ Minizip: Zip and UnZip additionnal library:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   code that extends zlib with methods to create and read .zip-files
     * http://www.winimage.com/zLibDll/minizip.html
+
+XITS math fonts:
+~~~~~~~~~~~~~~~~
+    * https://github.com/khaledhosny/xits-math/downloads
