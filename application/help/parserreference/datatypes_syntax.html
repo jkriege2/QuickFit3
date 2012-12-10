@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Trigonometric Functions</title>
+  </head>
+  <body> 
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	<a name="#syntax"><a name="syntax"><h2>Syntax</h2>
+	<h3>Introduction</h3>
+	The Syntax used by this expression parser is a simple subset of what is allowed in many programming languages (like C or Pascal). It can handle several operators (e.g. <code>+, *, /, -, ^, ...</code>), named constants (e.g. <code>pi, kB, ...</code>), function calls (e.g. <code>sin(x), ...</code>) and uses parentheses <code>(...)</code> to group sub-expressions. Here is a more advanced example:
+	<blockquote>the expression <code> (a * 3 + 2.34^2) * sin(pi * sqrt(x))</code><br>will evaluate $$math:(a\cdot 3+2.34^2)\cdot\sin(\pi\cdot\sqrt{x])$$</blockquote>
+	
+
+	<a name="#datatypes"><a name="datatypes"><h3>Datatypes</h3>
+	The parser supports these datatypes:
+	<ul>
+	  <li>numbers: all numbers are treated as floating point numbers. </li>
+	  <li>boolean values are used to express true and false (e.g. the result of comparisons is true (3<4) or false (5<3))</li>
+	  <li>string: text</li>
+	</ul>
+	
+	
+	<h3>Constant Expressions</h3>
+	Different types of constant values are possible:
+	<ul>
+	  <li>numbers: e.g. <code>3.5, 4.34, 3.1415e-5, ...</code>, so the dot '.' is used as decimal separator and exponents may be added using the letter 'e' (<code>3.1415e-5, ...</code> = $$math:3.1415\cdot 10^{-5}$$). </li>
+	  <li>boolean: <code>true, false</code></li>
+	  <li>string: <code>'text'</code> or <code>"text"</code></li>
+	</ul>
+	
+	<h3>Named Constants/Variables</h3>
+	Instead of literally writing a constant into the expression, it is also possible to use a name (variable) instead. The parser defines a large set of these constants, see <a href="./parserreference/constants.html">common math/physics constants</a>.
+
+	<h3>Extended Backus–Naur Form</h3>
+	The complete syntax may be summarized, using the <a href="http://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form">Extended Backus–Naur Form</a>:
+<blockquote>	
+<pre> logical_expression ->  logical_term
+                      | logical_expression <b>or</b> logical_term
+                      | logical_expression <b>||</b> logical_term</pre>
+<pre> logical_term    ->  comp_expression
+                      | logical_term <b>and</b> comp_expression
+                      | logical_term <b>&amp;&amp;</b> comp_expression</pre>
+<pre> comp_expression  ->  math_expression
+                      | expression <b>==</b> math_expression
+                      | expression <b>!=</b> math_expression
+                      | expression <b>&gt;=</b> math_expression
+                      | expression <b>&lt;=</b> math_expression
+                      | expression <b>&gt;</b> math_expression
+                      | expression <b>&lt;</b> math_expression</pre>
+<pre>  math_expression ->  term
+                      | math_expression <b>+</b> math_term
+                      | math_expression <b>-</b> math_term</pre>
+<pre>  math_term       ->  primary
+                      | term <b>*</b> primary
+                      | term <b>/</b> primary
+                      | term ( <b>%</b> | <b>mod</b> ) primary</pre>
+<pre>  primary         ->  <b>true</b> | <b>false</b>
+                      | string_constant
+                      | NUMBER
+                      | NAME
+                      | NAME <b>=</b> logical_expression
+                      | <b>+</b> primary | <b>-</b> primary | <b>!</b> primary | <b>not</b> primary
+                      | <b>(</b> logical_expression <b>)</b>
+                      | NAME<b>(</b> parameter_list <b>)</b>
+                      | primary <b>^</b> primary</pre>
+<pre>  string_constant -> <b>&quot;</b> STRING <b>&quot;</b> | <b>&apos;</b> STRING <b>&apos;</b></pre>
+<pre>  parameter_list  ->  &lambda; | logical_expression | logical_expression <b>,</b> parameter_list</pre>
+</blockquote>	
+	
+
+	
+  </body>
+</html>
