@@ -19,48 +19,48 @@
 		    <li>improved about-box with OS information and more detailed QF version. added License tab.</li>
 
 		  </ul></li>
-		  <li><b>QuickFit3/calc_diffcoeff:</b><ul>
+		  <li><b>calc_diffcoeff:</b><ul>
 		    <li>added more diffusion coefficients to database and more information to each dye (buffer, method, error, ...)</li>
 		  </ul></li>
-		  <li><b>QuickFit3/imagingFCS-Fit:</b><ul>
+		  <li><b>imagingFCS-Fit:</b><ul>
 		    <li>bugfix: crahsed when reseting a value to initial</li>
 
 		  </ul></li>
-		  <li><b>QuickFit3/imagingFCS:</b><ul>
+		  <li><b>imagingFCS:</b><ul>
 		    <li>added function to filter the correlation functions for outliers (amplitude outside a range defined by two quantiles</li>
 		    <li>added option to copy the current mask to all files (as selected from a list)</li>
 		    <li>correlator now creates multi-distance FCCS from a list of distances given in the configuration dialog</li>
 		    <li>now properly recognisez ROI-size for RH2 files</li>
 
 		  </ul></li>
-		  <li><b>QuickFit3/fcs:</b><ul>
+		  <li><b>fcs:</b><ul>
 		    <li>improved FCS simulator (added button to add a record with current settings, but does not close the window)</li>
 		    <li>simulator got a Help button and is now a floating (non-modal) window.</li>
 
 		  </ul></li>
-		  <li><b>QuickFit3/fitfunction_2ffcs:</b><ul>
+		  <li><b>fitfunction_2ffcs:</b><ul>
 		    <li>added fit functions for 3D diffusion + flow in 2fFCS</li>
 		    <li>added fit functions for 3D diffusion in 2fFCS</li>
 
 		  </ul></li>
-		  <li><b>QuickFit3/tcspcimporter:</b><ul>
+		  <li><b>tcspcimporter:</b><ul>
 		    <li>added spin box to change FCS countrate binning</li>
 		    <li>bugfix: importing CCFs into project didn't work correctly due to missing countrate files</li>
 		    <li>improved online-help</li>
 
 		  </ul></li>
-		  <li><b>QuickFit3/fitfunction_spimfcs</b><ul>
+		  <li><b>fitfunction_spimfcs</b><ul>
 		    <li>added SPIM-crosscorrelation fit function with flow</li>
 		    <li>fixed some bugs in online-help (confusion on definition ot &sigma;<sub>xy</sub>, &sigma;<sub>z</sub>, w<sub>xy</sub> and w<sub>z</sub>, but: Models were not changed and the model names (1/e² or 1/&radic;e were correct!!!)</li>
 
 		  </ul></li>
-		  <li><b>QuickFit3/fitfunction_fcs</b><ul>
+		  <li><b>fitfunction_fcs</b><ul>
 		    <li>fcs_diff_d now calculates wz</li>
 		    <li>added model fcs_diff_d_wz where the focus is parametrized by wxy and wz (gamma is calculated), the diffusion is parametrized by the diffusion coefficient D</li>
 		    <li>added model with diffusion coefficient as parameter (not tauD)</li>
 
 		  </ul></li>
-		  <li><b>QuickFit3/table</b><ul>
+		  <li><b>table</b><ul>
 		    <li>added editor widget for expressions to table cells (opened, when double-clicking a cell): basically two buttons that allow to edit and to clear the expression</li>
 		    <li>improved editing: pressing return will move the cursor to the first cell in the next line</li>
 		    <li>added function to clear the expressions in selected cells</li>
@@ -73,28 +73,28 @@
 		    <li>now supports comments for each cell</li>
 		    <li>now supports function plots from a parsed function</li>
 		  </ul></li>
-		  <li><b>QuickFit3/image_stack: </b><ul>
+		  <li><b>image_stack: </b><ul>
 		    <li>now supports masks</li>
 
 		  </ul></li>
-		  <li><b>QuickFit3/eval_spim_lightsheet: </b><ul>
+		  <li><b>eval_spim_lightsheet: </b><ul>
 		    <li>now supports masked pixels</li>
 
 		  </ul></li>
-		  <li><b>QuickFit3/fitfunction_fcsdistribution</b><ul>
+		  <li><b>fitfunction_fcsdistribution</b><ul>
 		    <li>added new fit function with gaussian diffusion coefficient distribution</li>
 		    <li>added new fit function with gaussian diffusion time/hydrodyn. radius distribution</li>
 
 		  </ul></li>
-		  <li><b>QuickFit3/picoquantimporters</b><ul>
+		  <li><b>picoquantimporters</b><ul>
 		    <li>now work with any TimeHarp 200 5.x file (t3r-mode)</li>
 
 		  </ul></li>
-		  <li><b>QuickFit3/several fit functions:</b><ul>
+		  <li><b>several fit functions:</b><ul>
 		    <li>minor corrections in parameter names (no expressions were changed!!!)</li>
 
 		  </ul></li>
-		  <li><b>QuickFit3/SPIMB040</b><ul>
+		  <li><b>SPIMB040</b><ul>
 		    <li>image stack acquisition may be choosen to be relative to current position (not fixed position) now. The old fixed scans are still available</li>
 		    <li> bugfixes in scripting editor + improvements in code completion</li>
 		    <li> added better editor for scripted acquisition (highlighting, line-numbers, ...)</li>
@@ -106,10 +106,10 @@
 		    <li>camera confg widget now works properly on connect-disconnect-connect sequence!</li>
 		    <li></li>
 		  </ul>improved text in progress dialog when connecting to camera</li>
-		  <li><b>QuickFit3/cam_andor</b><ul>
+		  <li><b>cam_andor</b><ul>
 		    <li>config dialog now shows the acquisition duration</li>
 		  </ul></li>
-		  <li><b>QuickFit3/rh2v2</b><ul>
+		  <li><b>rh2v2</b><ul>
 		    <li>now has label in config dialog that shows calculated info</li>
 		    <li>now outputs additional info in acquisition</li>
 		    <li>now support larger number of frames to acquire</li>
@@ -123,13 +123,13 @@
 		  <li><b>QuickFit3:</b><ul>
 		    <li>added function to set/change properties in several RDRs at once (see Tools|project tools")</li>
 		  </ul></li>
-		  <li><b>QuickFit3/imagingFCS:</b><ul>
+		  <li><b>imagingFCS:</b><ul>
 		    <li>added more options for statistics copying</li>
 		  </ul></li>
-		  <li><b>QuickFit3/fcs:</b><ul>
+		  <li><b>fcs:</b><ul>
 		    <li>bugfix: CSV import was broken ... works again now!</li>
 		  </ul></li>
-		  <li><b>QuickFit3/fcsMsd:</b><ul>
+		  <li><b>fcsMsd:</b><ul>
 		    <li>bugfix: alpha/D display more robust now</li>
 		  </ul></li>
 		</ul>  
@@ -150,18 +150,18 @@
 
 		  </ul></li>
 		  
-		  <li><b>QuickFit3/jkqtplotter:</b><ul>
+		  <li><b>jkqtplotter:</b><ul>
 		    <li>added button/action to display a table with the plot data in a separate (modal) window</li>
 		    <li>shows a settings dialog when copying to the clipboard</li>
 
 		  </ul></li>
 
-		  <li><b>QuickFit3/msd:</b><ul>
+		  <li><b>msd:</b><ul>
 		    <li>added function to copy run average to clipboard</li>
 
 		  </ul></li>
 
-		  <li><b>QuickFit3/calc_difcoeff:</b><ul>
+		  <li><b>calc_difcoeff:</b><ul>
 		    <li>improved plugin with the possibility to estimate acqeous solution viscosity with a set of solutes (1..5).  (same method as in Sednterp ... values fit quite accurately with small deviations due to different fits to viscosity reference data!)</li>
 		    <li>dded possibility to calculate ellipsoid and cylinder diffusion coefficients</li>
 		    <li>improved documentation</li>
@@ -171,7 +171,7 @@
 
 		  </ul></li>
 
-		  <li><b>QuickFit3/imagingFCS:</b><ul>
+		  <li><b>imagingFCS:</b><ul>
 		    <li>bugfix: selection/mask overlays in the countrate and correlation curve displays work now correctly, i.e. colors are displayed, not just blach and white (problem with alpha blending in the plotter!!!)</li>
 		    <li>added DualView mode</li>
 		    <li>replaced example data</li>
@@ -183,12 +183,12 @@
 		    <li>new tinyTIFF importer can import more than 65000 frames from a TIFF file, but with very limited feature support.</li>
 
 		  </ul></li>
-		  <li><b>QuickFit3/table:</b><ul>
+		  <li><b>table:</b><ul>
 		    <li>bugfixed the data access functions (accessed the wrong columns!)</li>
 		    <li>added numbers to the column titles in the table ... data access functions work on these numbers as row/column number!!!</li>
 		  </ul></li>
 
-		  <li><b>QuickFit3/fcs:</b><ul>
+		  <li><b>fcs:</b><ul>
 		    <li>parsing internal fcs in formats tccc or tcecece according to parameterChanged</li>
 		    <li>bugfix when reading CSV files in mode tcecece</li>
 		    <li>improved CSV import (allows to specify start/end line string), possibility to save presets in CSV dialog</li>
@@ -196,7 +196,7 @@
 		    <li>improved online help</li>
 		  </ul></li>
 
-		  <li><b>QuickFit3/DLS fit functions:</b><ul>
+		  <li><b>DLS fit functions:</b><ul>
 		    <li>bugfix that caused crash due to new DLS fit function</li>
 		    <li>corrected unit of scattering vector q^2 from 1/nm to 1/nm²</li>
 		    <li>added fit models expressed in terms of D and not tau</li>
