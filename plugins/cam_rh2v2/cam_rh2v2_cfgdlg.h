@@ -26,6 +26,7 @@ protected slots:
     void on_dsbFrameTime_valueChanged(double value);
     void on_cbBinning_currentIndexChanged(int index);
     void on_cbCorr_stateChanged(int state);
+    void on_cbRaw_stateChanged(int state);
     void on_sbFrameCnt_valueChanged(int value);
 
     void updateRuntime();
@@ -51,6 +52,8 @@ public:
     void checkUpdate();
     bool getCorrEnable();
     void setCorrEnable(bool value);
+    bool getRawEnable();
+    void setRawEnable(bool value);
 };
 
 #endif // CAM_RH2V2_CFGDLG_H

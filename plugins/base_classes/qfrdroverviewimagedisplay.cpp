@@ -563,24 +563,26 @@ void QFRDROverviewImageDisplay::connectWidgets(QFRawDataRecord *current, QFRawDa
     QFRDROverviewImageInterface* m=qobject_cast<QFRDROverviewImageInterface*>(current);
     cmbImage->clear();
     this->current=current;
-    connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
-    if (m) {
-        for (int i=0; i<m->getOverviewImageCount(); i++) {
-            cmbImage->addItem(QIcon(":/imaging_fcs/image.png"), m->getOverviewImageName(i));
+    if (m&&current) {
+        connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
+        if (m) {
+            for (int i=0; i<m->getOverviewImageCount(); i++) {
+                cmbImage->addItem(QIcon(":/imaging_fcs/image.png"), m->getOverviewImageName(i));
+            }
         }
-    }
 
-    QFRDRImageStackInterface* mv=qobject_cast<QFRDRImageStackInterface*>(current);
-    if (mv) {
-        for (int i=0; i<mv->getImageStackCount(); i++) {
-            cmbImage->addItem(QIcon(":/imaging_fcs/video.png"), mv->getImageStackDescription(i));
+        QFRDRImageStackInterface* mv=qobject_cast<QFRDRImageStackInterface*>(current);
+        if (mv) {
+            for (int i=0; i<mv->getImageStackCount(); i++) {
+                cmbImage->addItem(QIcon(":/imaging_fcs/video.png"), mv->getImageStackDescription(i));
+            }
         }
-    }
 
-    cmbImage->setCurrentIndex(current->getProperty("imfcs_invrimgdisp_image", 0).toInt());
-    player->setPosition(current->getProperty("imfcs_invrimgdisp_playpos", 0).toInt());
-    connect(cmbImage, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
-    connect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
+        cmbImage->setCurrentIndex(current->getProperty("imfcs_invrimgdisp_image", 0).toInt());
+        player->setPosition(current->getProperty("imfcs_invrimgdisp_playpos", 0).toInt());
+        connect(cmbImage, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+        connect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
+    }
     displayImage();
 
 }
@@ -634,6 +636,7 @@ void QFRDROverviewImageDisplay::showFrame(int frame) {
 
 void QFRDROverviewImageDisplay::displayImage() {
     if (!image) return;
+    if (!current) return;
     player->pause();
     current->setQFProperty("imfcs_invrimgdisp_image", cmbImage->currentIndex(), false, false);
     QFRDROverviewImageInterface* m=qobject_cast<QFRDROverviewImageInterface*>(current);
@@ -643,42 +646,49 @@ void QFRDROverviewImageDisplay::displayImage() {
     player->pause();
     pltImage->set_doDrawing(false);
     clearOverlays();
+    updateSelectionArrays();
     if (m && cmbImage->currentIndex()<m->getOverviewImageCount()) {
-        //qDebug()<<"1:    idx="<<cmbImage->currentIndex();
+        QString images="";
+        for (int jj=0; jj<cmbImage->currentIndex(); jj++) {
+            images+=cmbImage->itemText(jj)+" / ";
+        }
+        qDebug()<<"1:    idx="<<cmbImage->currentIndex()<<images;
         int width=m->getOverviewImageWidth(cmbImage->currentIndex());
         int height=m->getOverviewImageHeight(cmbImage->currentIndex());
-        //qDebug()<<"2:    w="<<width<<"   h="<<height;
+        qDebug()<<"2:    w="<<width<<"   h="<<height;
         QList<QFRDROverviewImageInterface::OverviewImageGeoElement> overlayElements=m->getOverviewImageAnnotations(cmbImage->currentIndex());
-        //qDebug()<<"3:    data="<<m->getPreviewImage(cmbImage->currentIndex());
-        image->set_data(m->getOverviewImage(cmbImage->currentIndex()), width, height, JKQTPMathImageBase::DoubleArray);
-        image->set_width(width);
-        image->set_height(height);
+        qDebug()<<"3:    data="<<m->getOverviewImage(cmbImage->currentIndex());
+        if (m->getOverviewImage(cmbImage->currentIndex())) {
+            image->set_data(m->getOverviewImage(cmbImage->currentIndex()), width, height, JKQTPMathImageBase::DoubleArray);
+            image->set_width(width);
+            image->set_height(height);
 
-        if (selected_width!=width || selected_height!=height) {
-            selected.clear();
-            selected_width=width;
-            selected_height=height;
-            replotSelection(false);
-        }
+            if (selected_width!=width || selected_height!=height) {
+                selected.clear();
+                selected_width=width;
+                selected_height=height;
+                replotSelection(false);
+            }
 
-        pltImage->getDatastore()->addCopiedColumn(m->getOverviewImage(cmbImage->currentIndex()), width*height, cmbImage->currentText());
-        pltImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, selected_width*selected_height, tr("mask"));
+            pltImage->getDatastore()->addCopiedColumn(m->getOverviewImage(cmbImage->currentIndex()), width*height, cmbImage->currentText());
+            pltImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, selected_width*selected_height, tr("mask"));
 
-        histogram->setEnabled(true);
-        showHistograms(m->getOverviewImage(cmbImage->currentIndex()), width*height);
+            histogram->setEnabled(true);
+            showHistograms(m->getOverviewImage(cmbImage->currentIndex()), width*height);
 
-        //qDebug()<<"4";
-        QList<QColor> cols;
-        cols<<QColor("red")<<QColor("orange")<<QColor("green")<<QColor("deeppink");
-        cols<<QColor("dodgerblue")<<QColor("mediumpurple")<<QColor("brown")<<QColor("salmon");
+            qDebug()<<"4";
+            QList<QColor> cols;
+            cols<<QColor("red")<<QColor("orange")<<QColor("green")<<QColor("deeppink");
+            cols<<QColor("dodgerblue")<<QColor("mediumpurple")<<QColor("brown")<<QColor("salmon");
 
-        for (int i=0; i<overlayElements.size(); i++) {
-            if (overlayElements[i].type==QFRDROverviewImageInterface::PIGErectangle) {
-                JKQTPgeoRectangle* elem=new JKQTPgeoRectangle(pltImage->get_plotter(), overlayElements[i].x, overlayElements[i].y, overlayElements[i].width, overlayElements[i].height, cols[i%8]);
-                elem->set_bottomleftrectangle(overlayElements[i].x, overlayElements[i].y, overlayElements[i].width, overlayElements[i].height);
-                elem->set_title(overlayElements[i].title);
-                overlayGraphs.append(elem);
-                pltImage->addGraph(elem);
+            for (int i=0; i<overlayElements.size(); i++) {
+                if (overlayElements[i].type==QFRDROverviewImageInterface::PIGErectangle) {
+                    JKQTPgeoRectangle* elem=new JKQTPgeoRectangle(pltImage->get_plotter(), overlayElements[i].x, overlayElements[i].y, overlayElements[i].width, overlayElements[i].height, cols[i%8]);
+                    elem->set_bottomleftrectangle(overlayElements[i].x, overlayElements[i].y, overlayElements[i].width, overlayElements[i].height);
+                    elem->set_title(overlayElements[i].title);
+                    overlayGraphs.append(elem);
+                    pltImage->addGraph(elem);
+                }
             }
         }
         //qDebug()<<"5";

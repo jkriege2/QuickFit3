@@ -74,6 +74,16 @@ void cam_rh2v2_cfgdlg::on_cbCorr_stateChanged(int state){
     updateRuntime();
 }
 
+void cam_rh2v2_cfgdlg::on_cbRaw_stateChanged(int state)
+{
+    if((!isCalculating)&&(!isEditing)){
+        isCalculating=true;
+        checkUpdate();
+        isCalculating=false;
+    }
+    updateRuntime();
+}
+
 void cam_rh2v2_cfgdlg::on_sbFrameCnt_valueChanged(int value)
 {
     updateRuntime();
@@ -168,7 +178,14 @@ bool cam_rh2v2_cfgdlg::getCorrEnable(){
     return ui->cbCorr->isChecked();
 }
 
+bool cam_rh2v2_cfgdlg::getRawEnable(){
+    return ui->cbRaw->isChecked();
+}
 void cam_rh2v2_cfgdlg::setCorrEnable(bool value){
     ui->cbCorr->setChecked(value);
+    updateRuntime();
+}
+void cam_rh2v2_cfgdlg::setRawEnable(bool value){
+    ui->cbRaw->setChecked(value);
     updateRuntime();
 }

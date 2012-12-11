@@ -537,7 +537,7 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
         if (dx<image_width && dy<image_height) {
             job.DCCFDeltaX << dx;
             job.DCCFDeltaY << dy;
-            qDebug()<<"DCCF: "<<dx<<", "<<dy;
+            //qDebug()<<"DCCF: "<<dx<<", "<<dy;
         }
         pos += rxdccf.matchedLength();
     }

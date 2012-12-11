@@ -443,6 +443,7 @@ void QFExtensionCameraRh2v2::showCameraSettingsDialog(unsigned int camera, QSett
     dlg->setFrameTime(settings.value("rh2v2/frameTime", 10.0).toFloat());
     dlg->setBinning(settings.value("rh2v2/binning",1).toUInt());
     dlg->setCorrEnable(settings.value("rh2v2/doCorrelation",true).toBool());
+    dlg->setRawEnable(settings.value("rh2v2/doRaw",true).toBool());
     dlg->unsetEditMode();
 
 	if ( dlg->exec()==QDialog::Accepted ) {
@@ -453,6 +454,7 @@ void QFExtensionCameraRh2v2::showCameraSettingsDialog(unsigned int camera, QSett
             settings.setValue(QString("rh2v2/frameTime"),dlg->getFrameTime());
             settings.setValue(QString("rh2v2/binning"),dlg->getBinning());
             settings.setValue(QString("rh2v2/doCorrelation"),dlg->getCorrEnable());
+            settings.setValue(QString("rh2v2/doRaw"),dlg->getRawEnable());
     }
 	delete dlg;
 }
@@ -596,7 +598,8 @@ bool QFExtensionCameraRh2v2::prepareCameraAcquisition(unsigned int camera, const
     res=cameraSetting[camera].raw.pc->findGroupByType("we_writer",*(cameraSetting[camera].raw.settings),we,*cameraSetting[camera].prefix+QString("_acquisition"));
     result&=res;
     if(res==true){
-        cameraSetting[camera].raw.settings->setValue(we+"/config/filename",filenamePrefix+".raw.dat");
+        if (settings.value("rh2v2/doRaw", true).toBool()) cameraSetting[camera].raw.settings->setValue(we+"/config/filename",filenamePrefix+".raw.dat");
+        else cameraSetting[camera].raw.settings->setValue(we+"/config/filename","/dev/null");
     }
     if(cameraSetting[camera].cor.pc!=NULL){
         res=cameraSetting[camera].cor.pc->findGroupByType("we_writer",*(cameraSetting[camera].cor.settings),we,*cameraSetting[camera].prefix+QString("_acquisition"));
@@ -619,6 +622,7 @@ bool QFExtensionCameraRh2v2::prepareCameraAcquisition(unsigned int camera, const
     (*cameraSetting[camera].params)["frame_time"]=frametime;
     (*cameraSetting[camera].params)["temporal_binning"]=binning;
     (*cameraSetting[camera].params)["do_correlation"]=settings.value("rh2v2/doCorrelation", false).toBool();
+    (*cameraSetting[camera].params)["do_raw"]=settings.value("rh2v2/doRaw", true).toBool();
     (*cameraSetting[camera].params)["pixel_units"]="photons";
     (*cameraSetting[camera].params)["readout_mode"]="rolling shutter";
     return result;
@@ -639,7 +643,7 @@ void QFExtensionCameraRh2v2::getCameraAcquisitionDescription(unsigned int camera
     bool res;
 
     res=cameraSetting[camera].raw.pc->findGroupByType("we_writer",*(cameraSetting[camera].raw.settings),we,*cameraSetting[camera].prefix+QString("_acquisition"));
-    if(res==true){
+    if(res==true && (*cameraSetting[camera].params)["do_raw"].toBool() ){
         fd.name=cameraSetting[camera].raw.settings->value(we+"/config/filename", "").toString();
         fd.type=QString("RADHARD2RAW");
         fd.description=tr("raw data from Radhard2");

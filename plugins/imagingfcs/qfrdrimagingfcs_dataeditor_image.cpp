@@ -1390,7 +1390,7 @@ void QFRDRImagingFCSImageEditor::paletteChanged() {
         plteImage->set_imageMin(mi);
         plteImage->set_imageMax(ma);
     }
-    qDebug()<<"paletteChanged():  "<<plteImageData << plteOverviewExcludedData<<":     "<<mi<<"..."<<ma;
+    //qDebug()<<"paletteChanged():  "<<plteImageData << plteOverviewExcludedData<<":     "<<mi<<"..."<<ma;
     switch(cmbOutOfRangeMode->currentIndex()) {
         case 0:
             plteImage->set_rangeMinFailAction(JKQTPMathImage::LastPaletteColor);
