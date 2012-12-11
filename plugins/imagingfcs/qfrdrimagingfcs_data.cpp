@@ -816,17 +816,21 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
 }
 
 bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
-    int height=getProperty("HEIGHT", 0).toInt();
-    int width=getProperty("WIDTH", 0).toInt();
-    int steps=getProperty("STEPS", 0).toInt();
+    int64_t height=getProperty("HEIGHT", 0).toInt();
+    int64_t width=getProperty("WIDTH", 0).toInt();
+    int64_t steps=getProperty("STEPS", 0).toInt();
 
     if (!propertyExists("IS_OVERVIEW_SCALED")) setQFProperty("IS_OVERVIEW_SCALED", false, false, true);
+
+    qDebug()<<"loadRadhard2File("<<sizeof(int)<<height<<width<<steps<<height*width*steps;
 
     if((height*width*steps)==0)return false;
 
     // LOAD FILE
     yaid_rh::corFileReader *cfr=new yaid_rh::corFileReader(filename.toLocal8Bit().constData(),width,height,steps);
     cfr->processFrames(1);
+
+    qDebug()<<"loadRadhard2File("<<cfr->getTotalLagCount();
 
     allocateContents(width,height,cfr->getTotalLagCount()-1);
     //load correlation data
