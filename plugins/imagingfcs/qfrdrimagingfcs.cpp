@@ -902,14 +902,18 @@ void QFRDRImagingFCSPlugin::insertRH2CorFile(const QString& filename) {
     //First we check the file
     if(QFile::exists(filename)){
         yaid_rh::frameAnalyzer *fa=new yaid_rh::frameAnalyzer(filename.toLocal8Bit().constData());
-        fa->findFrames(0,1024*16,NULL,1);
+        fa->findFrames(0,1024*1024,NULL,1);
         fa->findGhostFrames(1);
         if(QFile::exists(filenameValid)){
-            QMessageBox::critical(NULL,tr("RH2 Correlation File Importer"),tr("The analyzed file %1 already exists.\nPlease delete it!").arg(filenameValid));
-            return;
-        }else{
-            fa->writeFileFromMem(filenameValid.toLocal8Bit().constData(),1);
+            QMessageBox::StandardButtons res=QMessageBox::critical(NULL,tr("RH2 Correlation File Importer"),tr("The analyzed file %1 already exists.\nDelete?").arg(filenameValid), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+            if (res==QMessageBox::Yes) {
+                if (!QFile::remove(filenameValid)) {
+                    QMessageBox::critical(NULL,tr("RH2 Correlation File Importer"),tr("Could not delete the file %1!\nPlease delete by hand.").arg(filenameValid));
+                    return;
+                }
+            }
         }
+            fa->writeFileFromMem(filenameValid.toLocal8Bit().constData(),1);
 
         int steps=fa->getSteps();
         delete fa;
