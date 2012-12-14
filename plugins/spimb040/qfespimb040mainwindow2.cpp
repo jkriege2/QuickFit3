@@ -60,6 +60,11 @@ void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
 
 }
 
+QFESPIMB040AcquisitionConfigWidget2 *QFESPIMB040MainWindow2::getWidAcquisition() const
+{
+    return widAcquisition;
+}
+
 void QFESPIMB040MainWindow2::closeEvent ( QCloseEvent * event ) {
     optSetup->close();
 }
@@ -1895,7 +1900,12 @@ void QFESPIMB040MainWindow2::doAcquisition() {
             //////////////////////////////////////////////////////////////////////////////////////
             // pacquire background series
             //////////////////////////////////////////////////////////////////////////////////////
-            ok = acquireSeries(lightpathName, "", tr("background image series"), useCam1&&doOverviewA1, extension1, ecamera1, camera1, acquisitionPrefix1+"_background", acquisitionSettingsFilename1, backgroundDescription1, backgroundFiles1, useCam2&&doOverviewA2, extension2, ecamera2, camera2, acquisitionPrefix2+"_background", acquisitionSettingsFilename2, backgroundDescription2, backgroundFiles2, widAcquisition->currentBackgroundFrames(0), widAcquisition->currentBackgroundFrames(1), NULL, &progress, &userCanceled);
+            QMap<QFExtensionCamera::CameraSetting, QVariant> camset1, camset2;
+            camset1=widAcquisition->getCameraSettings1();
+            camset2=widAcquisition->getCameraSettings2();
+            camset1[QFExtensionCamera::CamSetNumberFrames]=widAcquisition->currentBackgroundFrames(0);
+            camset2[QFExtensionCamera::CamSetNumberFrames]=widAcquisition->currentBackgroundFrames(1);
+            ok = acquireSeries(lightpathName, "", tr("background image series"), useCam1&&doOverviewA1, extension1, ecamera1, camera1, acquisitionPrefix1+"_background", acquisitionSettingsFilename1, backgroundDescription1, backgroundFiles1, useCam2&&doOverviewA2, extension2, ecamera2, camera2, acquisitionPrefix2+"_background", acquisitionSettingsFilename2, backgroundDescription2, backgroundFiles2, camset1, camset2, NULL, &progress, &userCanceled);
             if (!ok) {
                 ACQUISITION_ERROR(tr("  - error acquiring background image series!\n"));
             } else {
@@ -1980,7 +1990,10 @@ void QFESPIMB040MainWindow2::doAcquisition() {
         // acquire image series
         //////////////////////////////////////////////////////////////////////////////////////
         progress.nextItem();
-        ok = acquireSeries(lightpathName, "acquisition", tr("image series"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionSettingsFilename1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionSettingsFilename2, acquisitionDescription2, moreFiles2, widAcquisition->frames1(), widAcquisition->frames2(), &measured, &progress, &userCanceled);
+        QMap<QFExtensionCamera::CameraSetting, QVariant> camset1, camset2;
+        camset1=widAcquisition->getCameraSettings1();
+        camset2=widAcquisition->getCameraSettings2();
+        ok = acquireSeries(lightpathName, "acquisition", tr("image series"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionSettingsFilename1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionSettingsFilename2, acquisitionDescription2, moreFiles2, camset1, camset2, &measured, &progress, &userCanceled);
         if (!ok) {
             ACQUISITION_ERROR(tr("  - error acquiring images!\n"));
         } else {
@@ -2495,7 +2508,7 @@ bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathF
     return ok;
 }
 
-bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles2, int frames1, int frames2, QList<QFESPIMB040OpticsSetup::measuredValues>* measured, QProgressListDialog* progress, bool* userCanceled )
+bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles2, const QMap<QFExtensionCamera::CameraSetting, QVariant>& camsettings1, const QMap<QFExtensionCamera::CameraSetting, QVariant>& camsettings2, QList<QFESPIMB040OpticsSetup::measuredValues>* measured, QProgressListDialog* progress, bool* userCanceled )
 {
     QString tmpName1=QDir::temp().absoluteFilePath("qf3spimb040_cam1tmpsettings.ini");
 
@@ -2509,7 +2522,16 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
 
     QSettings settings1(tmpName1, QSettings::IniFormat);
 
-    if (useCam1 && frames1>0 && ecamera1->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera1->changeCameraSetting(settings1, QFExtensionCamera::CamSetNumberFrames, frames1);
+    //if (useCam1 && frames1>0 && ecamera1->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera1->changeCameraSetting(settings1, QFExtensionCamera::CamSetNumberFrames, frames1);
+    if (useCam1) {
+        QMapIterator<QFExtensionCamera::CameraSetting, QVariant> it(camsettings1);
+        while (it.hasNext()) {
+            it.next();
+            if (it.value().isValid() && ecamera1->isCameraSettingChangable(it.key())) {
+                ecamera1->changeCameraSetting(settings1, it.key(), it.value());
+            }
+        }
+    }
 
 
 
@@ -2529,7 +2551,16 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
 
     QSettings settings2(tmpName2, QSettings::IniFormat);
 
-    if (useCam2 && frames2>0 && ecamera2->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera2->changeCameraSetting(settings2, QFExtensionCamera::CamSetNumberFrames, frames2);
+    //if (useCam2 && frames2>0 && ecamera2->isCameraSettingChangable(QFExtensionCamera::CamSetNumberFrames)) ecamera2->changeCameraSetting(settings2, QFExtensionCamera::CamSetNumberFrames, frames2);
+    if (useCam2) {
+        QMapIterator<QFExtensionCamera::CameraSetting, QVariant> it(camsettings2);
+        while (it.hasNext()) {
+            it.next();
+            if (it.value().isValid() && ecamera2->isCameraSettingChangable(it.key())) {
+                ecamera2->changeCameraSetting(settings2, it.key(), it.value());
+            }
+        }
+    }
 
 
 

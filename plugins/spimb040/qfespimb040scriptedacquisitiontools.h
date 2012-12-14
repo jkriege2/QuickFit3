@@ -97,6 +97,13 @@ class QFESPIMB040ScriptedAcquisitionAcquisitionControl : public QObject, public 
     public slots:
         void doAcquisition();
         void doImageStack();
+        void setAcquisitionCamera1Setting(const QString which, QVariant value);
+        void clearAcquisitionCamera1Settings();
+        QVariant getAcquisitionCamera1Setting(const QString which);
+
+        void setAcquisitionCamera2Setting(const QString which, QVariant value);
+        void clearAcquisitionCamera2Settings();
+        QVariant getAcquisitionCamera2Setting(const QString which);
 
     private:
         QFPluginServices* m_pluginServices;

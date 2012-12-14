@@ -193,6 +193,57 @@ int QFESPIMB040AcquisitionConfigWidget2::frames2() const {
     return ui->spinFrames2->value();
 }
 
+QVariant QFESPIMB040AcquisitionConfigWidget2::getCameraSetting1(QFExtensionCamera::CameraSetting which) const
+{
+    if (which==QFExtensionCamera::CamSetNumberFrames) return frames1();
+    else return camset1.value(which, QVariant());
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::setCameraSetting1(QFExtensionCamera::CameraSetting which, QVariant value)
+{
+    if (which==QFExtensionCamera::CamSetNumberFrames) ui->spinFrames->setValue(value.toInt());
+    else camset1[which]=value;
+}
+
+QVariant QFESPIMB040AcquisitionConfigWidget2::getCameraSetting2(QFExtensionCamera::CameraSetting which) const
+{
+    if (which==QFExtensionCamera::CamSetNumberFrames) return frames2();
+    else return camset2.value(which, QVariant());
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::setCameraSetting2(QFExtensionCamera::CameraSetting which, QVariant value)
+{
+    if (which==QFExtensionCamera::CamSetNumberFrames) ui->spinFrames2->setValue(value.toInt());
+    else camset2[which]=value;
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::clearCameraSettings1()
+{
+    camset1.clear();
+    ui->spinFrames->setValue(ui->spinFrames->minimum());
+}
+
+QMap<QFExtensionCamera::CameraSetting, QVariant> QFESPIMB040AcquisitionConfigWidget2::getCameraSettings1() const
+{
+    QMap<QFExtensionCamera::CameraSetting, QVariant> c=camset1;
+    if (frames1()>0) c[QFExtensionCamera::CamSetNumberFrames]=frames1();
+    return c;
+}
+QMap<QFExtensionCamera::CameraSetting, QVariant> QFESPIMB040AcquisitionConfigWidget2::getCameraSettings2() const
+{
+    QMap<QFExtensionCamera::CameraSetting, QVariant> c=camset2;
+    if (frames2()>0) c[QFExtensionCamera::CamSetNumberFrames]=frames2();
+    return c;
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::clearCameraSettings2()
+{
+    camset2.clear();
+    ui->spinFrames2->setValue(ui->spinFrames2->minimum());
+}
+
+
+
 bool QFESPIMB040AcquisitionConfigWidget2::lightpathActivated() const {
     return true; //ui->chkLightpath->isChecked();
 }
@@ -437,3 +488,4 @@ int QFESPIMB040AcquisitionConfigWidget2::previewCount()
 {
     return 4;
 }
+

@@ -203,7 +203,9 @@ class QFExtensionCamera {
              CamSetHorizontalBinning=5,
              CamSetVerticalBinning=6,
              CamSetTemporalBinning=7,
-			 CamSetMaxParam=7
+             CamSetMaxParam=CamSetTemporalBinning,
+
+             CamSetUnknown=CamSetMaxParam+1
          };
 
          /** \brief returns \c true if the given CameraSetting is changable by changeCameraSetting() */

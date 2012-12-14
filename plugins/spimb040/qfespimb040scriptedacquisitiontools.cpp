@@ -227,3 +227,64 @@ void QFESPIMB040ScriptedAcquisitionAcquisitionControl::doImageStack()
 {
     mainWindow->doImageStack();
 }
+
+QFExtensionCamera::CameraSetting QStringToSetting(const QString& which) {
+    QString whichl=which.toLower().trimmed();
+    if (whichl=="exposuretime") return QFExtensionCamera::CamSetExposureTime;
+    else if (whichl=="frames") return QFExtensionCamera::CamSetNumberFrames;
+    else if (whichl=="gain") return QFExtensionCamera::CamSetGain;
+    else if (whichl=="frametime") return QFExtensionCamera::CamSetFrametime;
+    else if (whichl=="emgain") return QFExtensionCamera::CamSetEMGAIN;
+    else if (whichl=="hbinning") return QFExtensionCamera::CamSetHorizontalBinning;
+    else if (whichl=="vbinning") return QFExtensionCamera::CamSetVerticalBinning;
+    else if (whichl=="tbinning") return QFExtensionCamera::CamSetTemporalBinning;
+    return QFExtensionCamera::CamSetUnknown;
+}
+
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setAcquisitionCamera1Setting(const QString which, QVariant value)
+{
+    QFExtensionCamera::CameraSetting set=QStringToSetting(which);
+    if (set!=QFExtensionCamera::CamSetUnknown) {
+        mainWindow->getWidAcquisition()->setCameraSetting1(set, value);
+    }
+
+}
+
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::clearAcquisitionCamera1Settings()
+{
+    mainWindow->getWidAcquisition()->clearCameraSettings1();
+}
+
+QVariant QFESPIMB040ScriptedAcquisitionAcquisitionControl::getAcquisitionCamera1Setting(const QString which)
+{
+    QFExtensionCamera::CameraSetting set=QStringToSetting(which);
+    if (set!=QFExtensionCamera::CamSetUnknown) {
+        return mainWindow->getWidAcquisition()->getCameraSetting1(set);
+    }
+    return QVariant();
+}
+
+
+
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setAcquisitionCamera2Setting(const QString which, QVariant value)
+{
+    QFExtensionCamera::CameraSetting set=QStringToSetting(which);
+    if (set!=QFExtensionCamera::CamSetUnknown) {
+        mainWindow->getWidAcquisition()->setCameraSetting2(set, value);
+    }
+
+}
+
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::clearAcquisitionCamera2Settings()
+{
+    mainWindow->getWidAcquisition()->clearCameraSettings2();
+}
+
+QVariant QFESPIMB040ScriptedAcquisitionAcquisitionControl::getAcquisitionCamera2Setting(const QString which)
+{
+    QFExtensionCamera::CameraSetting set=QStringToSetting(which);
+    if (set!=QFExtensionCamera::CamSetUnknown) {
+        return mainWindow->getWidAcquisition()->getCameraSetting2(set);
+    }
+    return QVariant();
+}

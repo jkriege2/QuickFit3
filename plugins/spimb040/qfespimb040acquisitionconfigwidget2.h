@@ -65,6 +65,15 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         int frames1() const;
         int frames2() const;
 
+        QVariant getCameraSetting1(QFExtensionCamera::CameraSetting which)const;
+        void setCameraSetting1(QFExtensionCamera::CameraSetting which, QVariant value);
+        QVariant getCameraSetting2(QFExtensionCamera::CameraSetting which)const;
+        void setCameraSetting2(QFExtensionCamera::CameraSetting which, QVariant value);
+        void clearCameraSettings1();
+        void clearCameraSettings2();
+        QMap<QFExtensionCamera::CameraSetting, QVariant> getCameraSettings1() const;
+        QMap<QFExtensionCamera::CameraSetting, QVariant> getCameraSettings2() const;
+
         bool lightpathActivated() const;
         QString lightpathFilename() const;
         QString lightpath() const;
@@ -100,6 +109,7 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         QFESPIMB040OpticsSetup* opticsSetup;
         QFESPIMB040AcquisitionDescription* acqDescription;
         QFESPIMB040ExperimentDescription* expDescription;
+        QMap<QFExtensionCamera::CameraSetting, QVariant> camset1, camset2;
 };
 
 #endif // QFESPIMB040ACQUISITIONCONFIGWIDGET2_H
