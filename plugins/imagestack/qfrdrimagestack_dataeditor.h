@@ -19,6 +19,7 @@
 #include "qftools.h"
 #include "statistics_tools.h"
 #include "colorcombobox.h"
+#include "qfrdrimagemaskedittools.h"
 
 /*! \brief editor for QFRawDataRecord
     \ingroup qf3rdrdp_image_stack
@@ -42,24 +43,6 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         void stackChanged();
         void channelModeChanged();
 
-
-
-        /** \brief load a mask file as a selection from hard disk */
-        void loadMask();
-        /** \brief load a mask file as a selection from the clipboard */
-        void pasteMask();
-        /** \brief save mask to harddisk */
-        void saveMask();
-        /** \brief copy mask to clipboard */
-        void copyMask();
-        /** \brief delete mask */
-        void includeAll();
-        /** \brief invert mask */
-        void invertMask();
-        /** \brief signal: emitted whenever the mouse was clicked over the plot */
-        void plotMouseClicked(double x, double y, Qt::KeyboardModifiers modifiers, Qt::MouseButton button);
-
-
     signals:
         void displayedFrame(double time);
     protected slots:
@@ -79,13 +62,6 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         QLabel* labTAxis;
         QLabel* labFrame;
         QVisibleHandleSplitter* splitter;
-        QAction* actEditMask;
-        QAction* actCopyMask;
-        QAction* actPasteMask;
-        QAction* actInvertMask;
-        QAction* actLoadMask;
-        QAction* actSaveMask;
-        QAction* actClearMask;
         QMenu* menuMask;
 
         QString lastMaskDir;
@@ -109,6 +85,8 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         JKQTPRGBMathImage* imageRGB;
         /** \brief plot for the excluded runs in pltOverview, plot plteOverviewSelectedData */
         JKQTPOverlayImageEnhanced* plteOverviewExcluded;
+
+        QFRDRImageMaskEditTools* maskTools;
 
         /** \brief create widgets on object creation */
         void createWidgets();

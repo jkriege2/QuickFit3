@@ -139,6 +139,7 @@ void QFRDRImageMaskTools::maskInvert()
     for (uint32_t i=0; i<mask_w*mask_h; i++) {
         mask[i]=!mask[i];
     }
+    //qDebug()<<"maskInverted: "<<maskToString();
 }
 
 bool QFRDRImageMaskTools::maskGet(uint16_t x, uint16_t y) const
@@ -161,6 +162,16 @@ uint16_t QFRDRImageMaskTools::maskGetWidth() const
 uint16_t QFRDRImageMaskTools::maskGetHeight() const
 {
     return mask_h;
+}
+
+long QFRDRImageMaskTools::maskGetCount() const
+{
+    long result=0;
+    if (!mask) return 0;
+    for (uint32_t i=0; i<mask_w*mask_h; i++) {
+        if (mask[i]) result++;
+    }
+    return result;
 }
 
 

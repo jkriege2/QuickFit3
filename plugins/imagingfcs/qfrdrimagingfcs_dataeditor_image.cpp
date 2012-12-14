@@ -43,9 +43,11 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     timUpdateAfterClick->setSingleShot(true);
     timUpdateAfterClick->setInterval(CLICK_UPDATE_TIMEOUT);
     timUpdateAfterClick->stop();
-    connect(timUpdateAfterClick, SIGNAL(timeout()), this, SLOT(updateAfterClick()));
+    correlationMaskTools=new QFCorrelationMaskTools(this);
     createWidgets();
     //QTimer::singleShot(500, this, SLOT(debugInfo()));
+    connect(timUpdateAfterClick, SIGNAL(timeout()), this, SLOT(updateAfterClick()));
+    connect(correlationMaskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
 }
 
 QFRDRImagingFCSImageEditor::~QFRDRImagingFCSImageEditor()
@@ -80,8 +82,6 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     ovlExCol.setAlphaF(0.5);
     excludedColor=ovlExCol;
 
-    correlationMaskTools=new QFCorrelationMaskTools(this);
-    connect(correlationMaskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
 
 
     ///////////////////////////////////////////////////////////////
@@ -2163,6 +2163,7 @@ void QFRDRImagingFCSImageEditor::updateAfterClick() {
 }
 
 void QFRDRImagingFCSImageEditor::rawDataChanged() {
+    qDebug()<<"QFRDRImagingFCSImageEditor::rawDataChanged()";
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     updateSelectionCombobox();
     replotSelection(false);

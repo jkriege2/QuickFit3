@@ -6,7 +6,9 @@ QFRDRImageStackDataEditor::QFRDRImageStackDataEditor(QFPluginServices* services,
     QFRawDataEditor(services, propEditor, parent)
 {
     dataMode=QFRDRImageStackDataEditor::dmFullHistogram;
+    maskTools=new QFRDRImageMaskEditTools(this, QString("imagestackeditor/"));
     createWidgets();
+    connect(maskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
 }
 
 QFRDRImageStackDataEditor::~QFRDRImageStackDataEditor()
@@ -88,6 +90,7 @@ void QFRDRImageStackDataEditor::createWidgets() {
     pltImage->get_plotter()->set_useAntiAliasingForGraphs(true);
     pltImage->set_userActionCompositionMode(QPainter::CompositionMode_Xor);
 
+    maskTools->registerPlotter(pltImage);
 
 
 
@@ -146,32 +149,6 @@ void QFRDRImageStackDataEditor::createWidgets() {
     plteOverviewExcluded=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlExCol, pltImage->get_plotter());
     plteOverviewExcluded->set_rectanglesAsImageOverlay(true);
 
-    actEditMask=new QAction(QIcon(":/qfrdrmaskeditor/maskedit.png"), tr("edit mask"), this);
-    actEditMask->setToolTip(tr("If this option is activated, you may click on the image plot and this way edit the mask. Clicking a single pixel will toggle whether it is masked or not."));
-    actEditMask->setCheckable(true);
-    actEditMask->setChecked(false);
-
-    actClearMask=new QAction(QIcon(":/qfrdrmaskeditor/clearmask.png"), tr("&clear "), this);
-    actClearMask->setToolTip(tr("clear the mask and recalculate the average correlation curve accordingly"));
-    connect(actClearMask, SIGNAL(triggered()), this, SLOT(includeAll()));
-    actInvertMask=new QAction(QIcon(":/qfrdrmaskeditor/invertmask.png"), tr("&invert mask"), this);
-    actInvertMask->setToolTip(tr("invert the current mask (all masked pixel are unmasked and vice versa)\nand recalculate the average correlation curve accordingly"));
-    connect(actInvertMask, SIGNAL(triggered()), this, SLOT(invertMask()));
-    actSaveMask=new QAction(QIcon(":/qfrdrmaskeditor/savemask.png"), tr("&save"), this);
-    actSaveMask->setToolTip(tr("save the mask to harddisk"));
-    connect(actSaveMask, SIGNAL(triggered()), this, SLOT(saveMask()));
-    actLoadMask=new QAction(QIcon(":/qfrdrmaskeditor/loadmask.png"), tr("&load"), this);
-    actLoadMask->setToolTip(tr("load a mask from harddisk"));
-    connect(actLoadMask, SIGNAL(triggered()), this, SLOT(loadMask()));
-    actCopyMask=new QAction(QIcon(":/qfrdrmaskeditor/copymask.png"), tr("&copy"), this);
-    actCopyMask->setToolTip(tr("copy the mask to clipboard"));
-    connect(actCopyMask, SIGNAL(triggered()), this, SLOT(copyMask()));
-    actPasteMask=new QAction(QIcon(":/qfrdrmaskeditor/pastemask.png"), tr("&paste"), this);
-    actPasteMask->setToolTip(tr("paste a mask from clipboard"));
-    connect(actPasteMask, SIGNAL(triggered()), this, SLOT(pasteMask()));
-
-
-
 
 
     player->setSingleShot(true);
@@ -184,11 +161,12 @@ void QFRDRImageStackDataEditor::createWidgets() {
     toolbar->addAction(pltImage->get_plotter()->get_actZoomIn());
     toolbar->addAction(pltImage->get_plotter()->get_actZoomOut());
     toolbar->addSeparator();
-    toolbar->addAction(actEditMask);
+    //toolbar->addAction(actEditMask);
+    maskTools->registerPlotterMaskToolsToToolbar(toolbar);
 
 
     menuMask=propertyEditor->addMenu("&Mask", 0);
-    menuMask->addAction(actClearMask);
+    /*menuMask->addAction(actClearMask);
     menuMask->addAction(actInvertMask);
     menuMask->addAction(actEditMask);
     menuMask->addSeparator();
@@ -196,7 +174,8 @@ void QFRDRImageStackDataEditor::createWidgets() {
     menuMask->addAction(actLoadMask);
     menuMask->addSeparator();
     menuMask->addAction(actCopyMask);
-    menuMask->addAction(actPasteMask);
+    menuMask->addAction(actPasteMask);*/
+    maskTools->registerMaskToolsToMenu(menuMask);
 
 };
 
@@ -204,12 +183,13 @@ void QFRDRImageStackDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
     disconnect(cmbImageStack, SIGNAL(currentIndexChanged(int)), this, SLOT(stackChanged()));
     disconnect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
     disconnect(cmbChannelMode, SIGNAL(currentIndexChanged(int)), this, SLOT(channelModeChanged()));
-    disconnect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)));
+    //disconnect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)));
 
     if (old) {
         this->current=NULL;
         disconnect(old, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
     }
+    maskTools->setRDR(current);
     QFRDRImageStackData* m=qobject_cast<QFRDRImageStackData*>(current);
     cmbImageStack->clear();
     this->current=current;
@@ -232,7 +212,7 @@ void QFRDRImageStackDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
     connect(cmbImageStack, SIGNAL(currentIndexChanged(int)), this, SLOT(stackChanged()));
     connect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
     connect(cmbChannelMode, SIGNAL(currentIndexChanged(int)), this, SLOT(channelModeChanged()));
-    connect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)));
+    //connect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)));
     channelModeChanged();
     stackChanged();
 };
@@ -241,6 +221,8 @@ void QFRDRImageStackDataEditor::rawDataChanged() {
 	// emitted when the raw data changes 
 	QFRDRImageStackData* m=qobject_cast<QFRDRImageStackData*>(current);
     //labTest->setText(tr("loaded record with files<br><i>%1</i>").arg(m->getFiles().join("<br>")));
+    displayImage();
+    qDebug()<<"QFRDRImageStackDataEditor::rawDataChanged()";
 };
 
 void QFRDRImageStackDataEditor::readSettings() {
@@ -397,7 +379,7 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
         pltImage->addGraph(plteOverviewExcluded);
 
         emit displayedFrame((double)frame*mv->getImageStackTUnitFactor(idx));
-        labFrame->setText(tr("<b>frame:</b> %1/%2 (%3 %4)").arg(frame+1).arg(mv->getImageStackFrames(idx)).arg(frame*mv->getImageStackTUnitFactor(idx)).arg(mv->getImageStackTUnitName(idx)));
+        labFrame->setText(tr("<b>frame:</b> %1/%2 (%3 %4), masked: %5").arg(frame+1).arg(mv->getImageStackFrames(idx)).arg(frame*mv->getImageStackTUnitFactor(idx)).arg(mv->getImageStackTUnitName(idx)).arg(mv->maskGetCount()));
     }
 
 
@@ -452,7 +434,8 @@ void QFRDRImageStackDataEditor::displayImage() {
         player->setRange(0,100);
     }
     pltImage->set_doDrawing(true);
-    pltImage->zoomToFit();
+    //pltImage->zoomToFit();
+    pltImage->update_plot();
 }
 
 void QFRDRImageStackDataEditor::stackChanged() {
@@ -489,6 +472,8 @@ void QFRDRImageStackDataEditor::stackChanged() {
     connect(cmbChannelG, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     connect(cmbChannelB, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     displayImage();
+    pltImage->zoomToFit();
+    pltImage->update_plot();
 }
 
 void QFRDRImageStackDataEditor::channelModeChanged() {
@@ -506,106 +491,4 @@ void QFRDRImageStackDataEditor::channelModeChanged() {
 }
 
 
-
-
-
-void QFRDRImageStackDataEditor::loadMask()
-{
-    if (!current) return;
-    QFRDRImageMaskInterface* m=qobject_cast<QFRDRImageMaskInterface*>(current);
-    if (!m) return;
-    QString filename= qfGetOpenFileName(this, tr("select mask file to open ..."), lastMaskDir, tr("mask files (*.msk)"));
-    if (QFile::exists(filename)) {
-        if (m) {
-            m->maskLoad(filename);
-        }
-        rawDataChanged();
-        displayImage();
-        showFrame(player->getPosition(), false);
-    }
-
-}
-
-void QFRDRImageStackDataEditor::pasteMask()
-{
-    if (!current) return;
-    QFRDRImageMaskInterface* m=qobject_cast<QFRDRImageMaskInterface*>(current);
-    if (!m) return;
-
-    QClipboard* clipboard=QApplication::clipboard();
-
-    const QMimeData* mime=clipboard->mimeData();
-    if (mime->hasFormat("quickfit3/pixelselection")) {
-        m->maskLoadFromString(QString::fromUtf8(mime->data("quickfit3/pixelselection")));
-        rawDataChanged();
-        displayImage();
-        showFrame(player->getPosition(), false);
-    }
-
-}
-
-
-void QFRDRImageStackDataEditor::saveMask()
-{
-    if (!current) return;
-    QFRDRImageMaskInterface* m=qobject_cast<QFRDRImageMaskInterface*>(current);
-    if (!m) return;
-    QString filename= qfGetSaveFileName(this, tr("save mask as ..."), lastMaskDir, tr("mask files (*.msk)"));
-    if (!filename.isEmpty()) {
-        m->maskSave(filename);
-    }
-}
-
-void QFRDRImageStackDataEditor::copyMask()
-{
-    if (!current) return;
-    QFRDRImageMaskInterface* m=qobject_cast<QFRDRImageMaskInterface*>(current);
-    if (!m) return;
-    QString mask=m->maskToString();
-    QClipboard* clipboard=QApplication::clipboard();
-    QMimeData* mime=new QMimeData();
-    mime->setText(mask);
-    mime->setData("quickfit3/pixelselection", mask.toUtf8());
-    clipboard->setMimeData(mime);
-}
-
-void QFRDRImageStackDataEditor::includeAll()
-{
-
-    if (!current) return;
-    QFRDRImageMaskInterface* m=qobject_cast<QFRDRImageMaskInterface*>(current);
-    if (m) {
-        m->maskClear();
-        rawDataChanged();
-        displayImage();
-
-        showFrame(player->getPosition(), false);
-    }
-}
-
-void QFRDRImageStackDataEditor::invertMask()
-{
-    if (!current) return;
-    QFRDRImageMaskInterface* m=qobject_cast<QFRDRImageMaskInterface*>(current);
-    if (m) {
-        m->maskInvert();
-        rawDataChanged();
-        displayImage();
-        showFrame(player->getPosition(), false);
-    }
-}
-
-void QFRDRImageStackDataEditor::plotMouseClicked(double x, double y, Qt::KeyboardModifiers modifiers, Qt::MouseButton button)
-{
-    if (!current) return;
-    QFRDRImageMaskInterface* m=qobject_cast<QFRDRImageMaskInterface*>(current);
-    if (m) {
-        if (actEditMask->isChecked() && button==Qt::LeftButton && modifiers==Qt::NoModifier) {
-            m->maskToggle(floor(x), floor(y));
-        }
-        rawDataChanged();
-        displayImage();
-        showFrame(player->getPosition(), false);
-    }
-}
 
