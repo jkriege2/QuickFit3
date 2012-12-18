@@ -1626,7 +1626,7 @@ QString QFRDRImagingFCSData::getImageStackTimepointName(int stack, int t) const 
 
 double QFRDRImagingFCSData::getSimpleCountrateAverage(int run) const {
     if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF) {
-        if (run>=0) return overviewF[run];
+        if (run>=0) return overviewF[run]/getTauMin()/1000.0;
     }
     if (run==-2) return  backStatAvgCnt/getTauMin()/1000.0;
     if (hasStatistics) return statAvgCnt/getTauMin()/1000.0;
@@ -1635,7 +1635,7 @@ double QFRDRImagingFCSData::getSimpleCountrateAverage(int run) const {
 
 double QFRDRImagingFCSData::getSimpleCountrateVariance(int run) const {
     if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewFSTD) {
-        if (run>=0 && run<width*height) return overviewFSTD[run];
+        if (run>=0 && run<width*height) return overviewFSTD[run]/getTauMin()/1000.0;
     }
     if (run==-2) return sqrt(backStatSigmaCnt)/getTauMin()/1000.0;
     if (hasStatistics) return sqrt(statSigmaCnt)/getTauMin()/1000.0;
