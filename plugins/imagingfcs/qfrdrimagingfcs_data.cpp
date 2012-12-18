@@ -475,6 +475,13 @@ bool QFRDRImagingFCSData::loadOverview(const QString& filename) {
             overviewF[i]=0;
         }
     }
+    double crscaling=getProperty("OVERVIEW_SCALING", 1.0).toDouble();
+    if (crscaling!=1.0 && overviewF) {
+        for (int i=0; i<width*height; i++) {
+            overviewF[i]=overviewF[i]*crscaling;
+        }
+
+    }
     return ok;
 }
 
@@ -504,6 +511,13 @@ bool QFRDRImagingFCSData::loadOverviewSTD(const QString& filename) {
             overviewFSTD[i]=0;
         }
     }
+    double crscaling=getProperty("OVERVIEW_SCALING", 1.0).toDouble();
+    if (crscaling!=1.0 && overviewFSTD) {
+        for (int i=0; i<width*height; i++) {
+            overviewFSTD[i]=overviewFSTD[i]*crscaling;
+        }
+
+    }
     return ok;
 }
 
@@ -527,6 +541,13 @@ bool QFRDRImagingFCSData::loadImage(const QString& filename, double** data, int*
             ok=TIFFReadFrame<double>(tif, *data);
             TIFFClose(tif);
         }
+    }
+    double crscaling=getProperty("OVERVIEW_SCALING", 1.0).toDouble();
+    if (crscaling!=1.0 && (*data)) {
+        for (int i=0; i<(*width)*(*height); i++) {
+            (*data)[i]=(*data)[i]*crscaling;
+        }
+
     }
     return ok;
 }
@@ -1109,14 +1130,16 @@ bool QFRDRImagingFCSData::loadStatistics(const QString &filename) {
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
         QTextStream txt(&f);
         QVector<double> mean, stddev, min, max, time;
+        double timescaling=getProperty("STATISTICS_TIME_SCALING", 1.0).toDouble();
+        double crscaling=getProperty("STATISTICS_COUNTRATE_SCALING", 1.0).toDouble();
         while (!txt.atEnd()) {
             QVector<double> line=csvReadline(txt, ',', '#');
             if (line.size()>1) {
-                time.append(line[0]);
-                mean.append(line[1]);
-                stddev.append(line.value(2, 0));
-                min.append(line.value(3, 0));
-                max.append(line.value(4, 0));
+                time.append(line[0]*timescaling);
+                mean.append(line[1]*crscaling);
+                stddev.append(line.value(2, 0)*crscaling);
+                min.append(line.value(3, 0)*crscaling);
+                max.append(line.value(4, 0)*crscaling);
             }
         }
         //qDebug()<<"line read: "<<time.size();
@@ -1169,14 +1192,16 @@ bool QFRDRImagingFCSData::loadBackgroundStatistics(const QString &filename) {
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
         QTextStream txt(&f);
         QVector<double> mean, stddev, min, max, time;
+        double timescaling=getProperty("OVERVIEW_TIME_SCALING", 1.0).toDouble();
+        double crscaling=getProperty("OVERVIEW_COUNTRATE_SCALING", 1.0).toDouble();
         while (!txt.atEnd()) {
             QVector<double> line=csvReadline(txt, ',', '#');
             if (line.size()>1) {
-                time.append(line[0]);
-                mean.append(line[1]);
-                stddev.append(line.value(2, 0));
-                min.append(line.value(3, 0));
-                max.append(line.value(4, 0));
+                time.append(line[0]*timescaling);
+                mean.append(line[1]*crscaling);
+                stddev.append(line.value(2, 0)*crscaling);
+                min.append(line.value(3, 0)*crscaling);
+                max.append(line.value(4, 0)*crscaling);
             }
         }
         //qDebug()<<"line read: "<<time.size();
@@ -1229,14 +1254,16 @@ bool QFRDRImagingFCSData::loadUncorrectedStatistics(const QString &filename) {
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
         QTextStream txt(&f);
         QVector<double> mean, stddev, min, max, time;
+        double timescaling=getProperty("STATISTICS_TIME_SCALING", 1.0).toDouble();
+        double crscaling=getProperty("STATISTICS_COUNTRATE_SCALING", 1.0).toDouble();
         while (!txt.atEnd()) {
             QVector<double> line=csvReadline(txt, ',', '#');
             if (line.size()>1) {
-                time.append(line[0]);
-                mean.append(line[1]);
-                stddev.append(line.value(2, 0));
-                min.append(line.value(3, 0));
-                max.append(line.value(4, 0));
+                time.append(line[0]*timescaling);
+                mean.append(line[1]*crscaling);
+                stddev.append(line.value(2, 0)*crscaling);
+                min.append(line.value(3, 0)*crscaling);
+                max.append(line.value(4, 0)*crscaling);
             }
         }
         //qDebug()<<"line read: "<<time.size();
