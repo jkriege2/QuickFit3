@@ -29,6 +29,7 @@ QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactor
     errorDesc="";
     rdModel=NULL;
     treeModel=NULL;
+    reading=false;
 }
 
 
@@ -214,6 +215,7 @@ void QFProject::deleteEvaluation(int ID) {
 
 void QFProject::writeXML(const QString& file, bool resetDataChanged) {
 
+    if (reading) return;
     bool namechanged=(file!=this->file);
     this->file=file;
     /*QFile f(file);
@@ -298,6 +300,7 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
 }
 
 void QFProject::readXML(const QString& file) {
+    this->reading=true;
     bool namechanged=(file!=this->file);
     this->file=file;
 
@@ -309,6 +312,7 @@ void QFProject::readXML(const QString& file) {
     QFile f(file);
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
         setError(tr("Could no open file '%1' for input!\n Error description: %2.").arg(file).arg(f.errorString()));
+        this->reading=false;
         return;
     }
     QDomDocument d("quickfitproject");
@@ -325,6 +329,7 @@ void QFProject::readXML(const QString& file) {
             QString v=e.attribute("quickfit_version");
             if (v.toDouble()>3.0) {
                 setError(tr("Error while parsing project file '%1'!\n Error description: The project file was written by a newer version of QuickFit than this one (writer version: %1).").arg(file).arg(v));
+                this->reading=false;
                 return;
             } else {
                 name=e.attribute("name");
@@ -399,10 +404,12 @@ void QFProject::readXML(const QString& file) {
             }
         } else {
             setError(tr("Error while parsing project file '%1'!\n Error description: This is not a QuickFit 3.0 project file.").arg(file));
+            this->reading=false;
             return;
         }
     } else {
         setError(tr("Error while parsing project file '%1'!\n Error description: %2.").arg(file).arg(errorm));
+        this->reading=false;
         return;
     }
     if (!errorOcc) {
@@ -420,6 +427,7 @@ void QFProject::readXML(const QString& file) {
 #endif
     }
 
+    this->reading=false;
 }
 
 QFRawDataRecord* QFProject::addRawData(QString type, QString name, QStringList inputFiles, QMap<QString, QVariant> initParams, QStringList initParamsReadonly, QStringList inputFilesTypes, QStringList inputFilesDescriptions) {

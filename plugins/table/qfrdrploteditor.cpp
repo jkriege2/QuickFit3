@@ -129,6 +129,7 @@ void QFRDRPlotEditor::addPlot() {
 }
 
 void QFRDRPlotEditor::deleteCurrentPlot() {
+
     deletePlot(tabPlots->currentIndex());
 }
 
@@ -178,10 +179,12 @@ void QFRDRPlotEditor::movePlotDown()
 void QFRDRPlotEditor::deletePlot(int i) {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
-        updating=true;
-        m->deletePlot(i);
-        rebuildPlotWidgets();
-        updating=false;
+        if (QMessageBox::question(this, tr("table plugin"), tr("Do you really want to delete the current graph?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
+            updating=true;
+            m->deletePlot(i);
+            rebuildPlotWidgets();
+            updating=false;
+        }
     }
 }
 
@@ -197,9 +200,9 @@ void QFRDRPlotEditor::rebuildPlotWidgets(bool keepPosition) {
     } else {
         while (plotWidgets.size()<current->getPlotCount()) {
             QFRDRTablePlotWidget* w=new QFRDRTablePlotWidget(tabPlots);
-            connect(w, SIGNAL(plotTitleChanged(int,QString)), this, SLOT(updatePlotName(int,QString)));
             plotWidgets.append(w);
             tabPlots->addTab(plotWidgets[plotWidgets.size()-1], "plot");
+            connect(w, SIGNAL(plotTitleChanged(int,QString)), this, SLOT(updatePlotName(int,QString)));
         }
         while (plotWidgets.size()>current->getPlotCount()) {
             int idx=tabPlots->indexOf(plotWidgets.last());
@@ -207,6 +210,7 @@ void QFRDRPlotEditor::rebuildPlotWidgets(bool keepPosition) {
                 tabPlots->removeTab(idx);
             }
             if (plotWidgets.last()) delete plotWidgets.last();
+            plotWidgets.removeLast();
         }
         for (int i=0; i<current->getPlotCount(); i++) {
             //qDebug()<<"   setRecord "<<i;

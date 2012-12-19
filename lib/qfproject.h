@@ -85,6 +85,8 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         QFRawDataRecordFactory* rdrFactory;
         QFPluginServices* services;
 
+        bool reading;
+
     public:
         /** Default constructor */
         QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent=NULL);

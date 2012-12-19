@@ -65,7 +65,11 @@ QFRDRTable::PlotInfo::PlotInfo()
     ymax=10;
     showKey=true;
     grid=true;
+    QStringList fdb=QFontDatabase().families();
     fontName=QApplication::font().family();
+    if (fdb.contains("DejaVu Sans")) fontName="DejaVu Sans";
+    else if (fdb.contains("Arial")) fontName="Arial";
+    else if (fdb.contains("Helvetica")) fontName="Helvetica";
     keyFontSize=12;
     axisFontSize=14;
     axisLabelFontSize=18;
