@@ -90,6 +90,7 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
 
 QFRDRTablePlotWidget::~QFRDRTablePlotWidget()
 {
+    updating=true;
     if (ProgramOptions::getInstance() && ProgramOptions::getInstance()->getQSettings()) writeSettings(*(ProgramOptions::getInstance()->getQSettings()), "table/QFRDRTablePlotWidget/");
     delete ui;
 }
