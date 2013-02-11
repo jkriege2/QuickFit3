@@ -448,8 +448,8 @@ void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, do
 
 
             //int c_x=ds->addLinearColumn(h, 0, double(h)*ui->spinDeltaX->value()/1000.0, "dataX");
-            int c_x=ds->addCopiedColumn(dataX, h, "dataX");
-            int c_y=ds->addCopiedColumn(data, h, "dataY");
+            int c_x=ds->addCopiedColumn(dataX, data_count, "dataX");
+            int c_y=ds->addCopiedColumn(data, data_count, "dataY");
             plteLineFitData->set_xColumn(c_x);
             plteLineFitData->set_yColumn(c_y);
             plteLineFitData->set_xErrorColumn(-1);
