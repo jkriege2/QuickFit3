@@ -1,6 +1,7 @@
 #include "qfespimb040simplecameraconfig.h"
 #include <QtGui>
 #include <iostream>
+#include "qfespimb040opticssetup.h"
 
 QFESPIMB040SimpleCameraConfig::viewDataStruct::viewDataStruct() {
     reset();
@@ -44,7 +45,7 @@ QFESPIMB040SimpleCameraConfig::QFESPIMB040SimpleCameraConfig(QWidget* parent):
     createActions();
     displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
     if (cmbAcquisitionDevice->count()<=0) displayStates(QFESPIMB040SimpleCameraConfig::Inactive);
-    init(0, NULL, "");
+    init(0, NULL, "", NULL);
     setCheckable(true);
     setChecked(true);
 }
@@ -64,7 +65,7 @@ void QFESPIMB040SimpleCameraConfig::setMagnification(double mag) {
     m_magnification=mag;
 }
 
-void QFESPIMB040SimpleCameraConfig::init(int camViewID, QFPluginServices* pluginServices, QString configDirectory) {
+void QFESPIMB040SimpleCameraConfig::init(int camViewID, QFPluginServices* pluginServices, QString configDirectory, QFESPIMB040OpticsSetup* opticsSetup) {
     m_camViewID=camViewID;
     m_pluginServices=pluginServices;
     m_extManager=NULL;
@@ -74,7 +75,7 @@ void QFESPIMB040SimpleCameraConfig::init(int camViewID, QFPluginServices* plugin
     if (m_pluginServices) {
         cmbPreviewConfiguration->init(m_pluginServices->getConfigFileDirectory());
     }
-    camView->init(camViewID, this);
+    camView->init(camViewID, this, opticsSetup);
     setTitle(tr(" Camera %1: ").arg(camViewID+1));
     displayStates(QFESPIMB040SimpleCameraConfig::Disconnected);
     if (cmbAcquisitionDevice->count()<=0) displayStates(QFESPIMB040SimpleCameraConfig::Inactive);

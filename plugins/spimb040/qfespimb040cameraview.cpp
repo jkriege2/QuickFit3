@@ -1,9 +1,10 @@
-#include "qfespimb040cameraview.h" 
+#include "qfespimb040cameraview.h"
 #include "qftools.h"
 #include "statistics_tools.h"
 #include "lmcurve.h"
 #include "qmoretextobject.h"
 #include "datatable2.h"
+#include "qfespimb040opticssetup.h"
 #include <typeinfo>
 
 #include <QtGui>
@@ -45,11 +46,12 @@ double fSigmoid( double t, const double *p )
 #define MARGINAL_FIT_SIZE_FACTOR 3
 #define MARGINAL_FIT_MINVALUES 100
 
-QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCameraConfigComboBoxStartResume* stopresume):
+QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCameraConfigComboBoxStartResume* stopresume, QFESPIMB040OpticsSetup* opticsSetup):
     QWidget(parent)
 {
     setWindowTitle(tr("Preview Camera %1").arg(cameraID+1));
     setWindowIcon(QIcon(":/spimb040_logo.png"));
+    this->cameraID=cameraID;
 
     chkCountsRangeAutoHigh=NULL;
     chkCountsRangeAutoLow=NULL;
@@ -61,6 +63,7 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
     measureY[0]=measureY[1]=0;
     measureFirst=true;
     m_stopresume=stopresume;
+    this->opticsSetup=opticsSetup;
 
     MarginalLeftWidth=0;
     MarginalTopWidth=0;
@@ -122,9 +125,11 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
 
 }
 
-void QFESPIMB040CameraView::init(int cameraID, QFCameraConfigComboBoxStartResume* stopresume) {
+void QFESPIMB040CameraView::init(int cameraID, QFCameraConfigComboBoxStartResume* stopresume, QFESPIMB040OpticsSetup *opticsSetup) {
     setWindowTitle(tr("Preview Camera %1").arg(cameraID+1));
     m_stopresume=stopresume;
+    this->opticsSetup=opticsSetup;
+    this->cameraID=cameraID;
 }
 
 QFESPIMB040CameraView::~QFESPIMB040CameraView()
@@ -524,6 +529,8 @@ void QFESPIMB040CameraView::createActions() {
 
     actSaveTransformed = new QAction(QIcon(":/spimb040/savetransformed.png"), tr("Save &transformed image as ..."), this);
     connect(actSaveTransformed, SIGNAL(triggered()), this, SLOT(saveTransformedImage()));
+    actSaveMulti = new QAction(QIcon(":/spimb040/savemulti.png"), tr("Save &raw image as ..."), this);
+    connect(actSaveMulti, SIGNAL(triggered()), this, SLOT(saveMulti()));
 
     actMaskClear = new QAction(QIcon(":/spimb040/maskclear.png"), tr("&Clear mask (broken pixels)"), this);
     connect(actMaskClear, SIGNAL(triggered()), this, SLOT(clearMask()));
@@ -566,6 +573,7 @@ void QFESPIMB040CameraView::createActions() {
     toolbar->addAction(actSaveRaw);
     toolbar->addAction(actSaveData);
     toolbar->addAction(actSaveTransformed);
+    toolbar->addAction(actSaveMulti);
     toolbar->addSeparator();
     toolbar->addAction(actSaveReport);
     toolbar->addAction(actPrintReport);
@@ -1508,9 +1516,105 @@ void QFESPIMB040CameraView::saveRaw() {
     if (m_stopresume) m_stopresume->resume();
 }
 
+
+void QFESPIMB040CameraView::saveMulti() {
+    if (m_stopresume) m_stopresume->stop();
+    //saveJKImage(rawImage, tr("Save Raw Image ..."));
+
+
+
+    QString fileName = qfGetSaveFileName(this, tr("Save current image ..."),
+                            lastImagepath,
+                            "TIFF (*.tif)");
+
+    if (fileName.isEmpty()) {
+        if (m_stopresume) m_stopresume->resume();
+        return;
+    }
+    QFile file(fileName);
+    if (!file.open(QFile::WriteOnly | QFile::Text)) {
+        QMessageBox::warning(this, tr("QuickFit SPIM Control: Save current image ..."),
+                          tr("Cannot write file '%1':\nreason: %2.")
+                          .arg(fileName)
+                          .arg(file.errorString()));
+        if (m_stopresume) m_stopresume->resume();
+        return;
+    }
+    file.close();
+    file.remove();
+    lastImagepath=QFileInfo(fileName).absolutePath();
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+
+    QFileInfo fi(fileName);
+    QString fn=fi.absolutePath()+"/"+fi.completeBaseName();
+
+    rawImage.save_tiffuint16(QString(fn+"_uint16.tif").toStdString());
+    rawImage.save_tiffuint32(QString(fn+".tif").toStdString());
+    rawImage.save_tifffloat(QString(fn+"_float.tif").toStdString());
+    image.save_tiffuint16(QString(fn+"_transformed_uint16.tif").toStdString());
+    image.save_tiffuint32(QString(fn+"_transformed.tif").toStdString());
+    image.save_tifffloat(QString(fn+"_transformed_float.tif").toStdString());
+
+    QImage imgo;
+    JKQTFPimagePlot_array2image<QFESPIMB040CameraView_internalImageType>(image.data(), image.width(), image.height(), imgo, (JKQTFPColorPalette)cmbColorscale->currentIndex(), spinCountsLower->value(), spinCountsUpper->value());
+    imgo.save(QString(fn+"_transformed.tif"), "PNG");
+
+    QImage imgo1;
+    JKQTFPimagePlot_array2image<uint32_t>(rawImage.data(), rawImage.width(), rawImage.height(), imgo1, (JKQTFPColorPalette)cmbColorscale->currentIndex(), spinCountsLower->value(), spinCountsUpper->value());
+    imgo1.save(QString(fn+".tif"), "PNG");
+
+    QSettings setting(QString(fn+".configuration.ini"), QSettings::IniFormat);
+    storeCameraConfig(setting);
+
+
+    if (m_stopresume) m_stopresume->resume();
+}
+void QFESPIMB040CameraView::storeCameraConfig(QSettings& setting) {
+    QFExtensionCamera* cam=NULL;
+    int camID=-1;
+    if (opticsSetup) cam=opticsSetup->cameraComboBox(cameraID)->currentExtensionCamera();
+    if (opticsSetup) camID=opticsSetup->cameraComboBox(cameraID)->currentCameraID();
+    setting.setValue("acquisition/type", "preview");
+    setting.setValue("acquisition/exposure", imageExposureTime);
+    setting.setValue("acquisition/start_time", QDateTime::currentDateTime());
+    setting.setValue("acquisition/image_width", rawImage.width());
+    setting.setValue("acquisition/image_height", rawImage.height());
+    setting.setValue("acquisition/pixel_width", pixelWidth);
+    setting.setValue("acquisition/pixel_height", pixelHeight);
+    setting.setValue("acquisition/transformation", cmbImageMode->currentText());
+    setting.setValue("acquisition/rotation", cmbRotation->currentIndex()*90);
+    setting.setValue("acquisition/color_palette", cmbColorscale->currentText());
+    if (opticsSetup) setting.setValue("acquisition/magnification", opticsSetup->getCameraMagnification(cameraID));
+    if (cam) setting.setValue("acquisition/camera_model", cam->getCameraSensorName(camID));
+    if (cam) setting.setValue("acquisition/sensor_model", cam->getCameraName(camID));
+
+    setting.setValue("evaluation/imageBrokenPixels", imageBrokenPixels);
+    setting.setValue("evaluation/imageSum", imageSum);
+    setting.setValue("evaluation/imageMean", imageMean);
+    setting.setValue("evaluation/imageStddev", imageStddev);
+    setting.setValue("evaluation/imageImin", qlonglong(imageImin));
+    setting.setValue("evaluation/imageImax", qlonglong(imageImax));
+    setting.setValue("evaluation/correlationCoefficient", correlationCoefficient);
+
+    QMap<QString, QVariant> acqD;
+    QString acquisitionDescriptionPrefix="setup/";
+    if (opticsSetup) {
+        acqD=opticsSetup->getSetup(cameraID);
+    }
+    if (acqD.size()>0) {
+        QMapIterator<QString, QVariant> it(acqD);
+        while (it.hasNext()) {
+            it.next();
+            setting.setValue(acquisitionDescriptionPrefix+it.key(), it.value());
+        }
+    }
+}
+
 void QFESPIMB040CameraView::saveTransformedImage() {
     if (m_stopresume) m_stopresume->stop();
     saveJKImage(image, tr("Save Transformed Image ..."));
+
     if (m_stopresume) m_stopresume->resume();
 }
 

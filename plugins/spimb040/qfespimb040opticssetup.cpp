@@ -19,9 +19,9 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     m_pluginMainWidget=pluginMainWidget;
     m_log=log;
     ui->setupUi(this);
-    ui->camConfig1->init(0, m_pluginServices, m_pluginServices->getGlobalConfigFileDirectory());
+    ui->camConfig1->init(0, m_pluginServices, m_pluginServices->getGlobalConfigFileDirectory(), this);
     ui->camConfig1->setLog(m_log);
-    ui->camConfig2->init(1, m_pluginServices, m_pluginServices->getGlobalConfigFileDirectory());
+    ui->camConfig2->init(1, m_pluginServices, m_pluginServices->getGlobalConfigFileDirectory(), this);
     ui->camConfig2->setLog(m_log);
     ui->stageSetup->init(m_log, m_pluginServices);
     ui->filtTransmission->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");

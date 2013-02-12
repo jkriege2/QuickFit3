@@ -32,6 +32,9 @@
 #include "qrecentfilesmenu.h"
 #include "qftools.h"
 
+class QFESPIMB040OpticsSetup; // forward
+
+
 /** \brief defines the type of the internal image representation of QFESPIMB040CameraView::image, may be uint32_t OR double OR float (nothing else!!!)  */
 #define QFESPIMB040CameraView_internalImageType int64_t
 //uint32_t
@@ -57,10 +60,10 @@ class QFESPIMB040CameraView : public QWidget {
             \param stopresume (if supplied) allows to stop/resume a preview in order to save an image
             \param parent the parent widget
          */
-        QFESPIMB040CameraView(QWidget* parent=NULL, int cameraID=0, QFCameraConfigComboBoxStartResume* stopresume=NULL);
+        QFESPIMB040CameraView(QWidget* parent=NULL, int cameraID=0, QFCameraConfigComboBoxStartResume* stopresume=NULL, QFESPIMB040OpticsSetup* opticsSetup=NULL);
         virtual ~QFESPIMB040CameraView();
 
-        void init(int cameraID, QFCameraConfigComboBoxStartResume* stopresume);
+        void init(int cameraID, QFCameraConfigComboBoxStartResume* stopresume, QFESPIMB040OpticsSetup* opticsSetup);
         /** \brief load settings */
         void loadSettings(QSettings&, QString prefix);
         /** \brief save settings */
@@ -121,6 +124,8 @@ class QFESPIMB040CameraView : public QWidget {
 
         void hideEvent(QHideEvent * event);
 
+        void storeCameraConfig(QSettings& setting);
+
 
         QVisibleHandleSplitter* splitHor;
         QVisibleHandleSplitter* splitVert;
@@ -128,7 +133,10 @@ class QFESPIMB040CameraView : public QWidget {
         QTabWidget* tabSettings;
         QTabWidget* tabResults;
 
+        QFESPIMB040OpticsSetup* opticsSetup;
+
         QFCameraConfigComboBoxStartResume* m_stopresume;
+        int cameraID;
 
 
 
@@ -286,6 +294,8 @@ class QFESPIMB040CameraView : public QWidget {
 
         /** \brief action to save the current raw image */
         QAction* actSaveRaw;
+        /** \brief action to save the current raw image */
+        QAction* actSaveMulti;
         /** \brief action to save the current transformed image */
         QAction* actSaveTransformed;
         /** \brief action to activate/disactivate mask editing mode */
@@ -436,6 +446,7 @@ class QFESPIMB040CameraView : public QWidget {
         void loadMask(const QString &filename);
         /** \brief save the current raw image (rawImage) */
         void saveRaw();
+        void saveMulti();
         /** \brief save the current transformed image (image) */
         void saveTransformedImage();
         void histogramMask();
@@ -519,6 +530,11 @@ class QFESPIMB040CameraView : public QWidget {
             } else {
                 img.save_tiffuint16(fileName.toStdString());
             }
+            QFileInfo fi(fileName);
+            QString fn=fi.absolutePath()+"/"+fi.completeBaseName();
+            QSettings setting(QString(fn+".configuration.ini"), QSettings::IniFormat);
+            storeCameraConfig(setting);
+
             QApplication::restoreOverrideCursor();
         }
 
