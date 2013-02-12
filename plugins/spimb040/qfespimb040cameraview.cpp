@@ -1577,7 +1577,7 @@ void QFESPIMB040CameraView::storeCameraConfig(QSettings& setting) {
     if (opticsSetup) camID=opticsSetup->cameraComboBox(cameraID)->currentCameraID();
     setting.setValue("acquisition/type", "preview");
     setting.setValue("acquisition/exposure", imageExposureTime);
-    setting.setValue("acquisition/start_time", QDateTime::currentDateTime());
+    setting.setValue("acquisition/start_time", QDateTime::currentDateTime().toString(Qt::ISODate));
     setting.setValue("acquisition/image_width", rawImage.width());
     setting.setValue("acquisition/image_height", rawImage.height());
     setting.setValue("acquisition/pixel_width", pixelWidth);
