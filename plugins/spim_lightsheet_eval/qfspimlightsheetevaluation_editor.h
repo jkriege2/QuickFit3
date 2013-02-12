@@ -11,6 +11,9 @@
 #include "qffitfunctionmanager.h"
 #include "qffitalgorithmmanager.h"
 #include "qffitfunctionplottools.h"
+#include "qftablemodel.h"
+
+class QFSPIMLightsheetEvaluationItem; // forward
 
 namespace Ui {
     class QFSPIMLightsheetEvaluationEditor;
@@ -51,6 +54,8 @@ class QFSPIMLightsheetEvaluationEditor : public QFEvaluationEditor {
 
         void prepareImagePlotter(JKQtPlotter *pltImage);
 
+        void showImageCut(QFSPIMLightsheetEvaluationItem *eval, QFRawDataRecord* record, QFRDRImageStackInterface *data, int stack, int stack_pos, double x, double y, int channel=-1);
+
 
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFSPIMLightsheetEvaluationEditor *ui;
@@ -64,6 +69,8 @@ class QFSPIMLightsheetEvaluationEditor : public QFEvaluationEditor {
 
         double lastMousePreviewX;
         double lastMousePreviewY;
+
+        QFTableModel* tableFitResults;
 
         /** \brief progress dialog used by the fits */
         QProgressDialog* dlgEvaluationProgress;

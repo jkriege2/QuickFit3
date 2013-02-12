@@ -38,6 +38,9 @@ QFSPIMLightsheetEvaluationEditor::QFSPIMLightsheetEvaluationEditor(QFPluginServi
     ui->pltBeamPosDifference->get_plotter()->get_yAxis()->set_axisLabel(tr("beam center distance [µm]"));
     ui->pltBeamWidth->get_plotter()->get_yAxis()->set_axisLabel(tr("lightsheet width [µm]"));
 
+    tableFitResults=new QFTableModel(ui->tabFitResults);
+    ui->tabFitResults->setModel(tableFitResults);
+
 
 
     prepareImagePlotter(ui->pltImage);
@@ -339,6 +342,179 @@ void QFSPIMLightsheetEvaluationEditor::on_spinDeltaZ_valueChanged(double value) 
 }
 
 
+void QFSPIMLightsheetEvaluationEditor::showImageCut(QFSPIMLightsheetEvaluationItem* eval, QFRawDataRecord* record, QFRDRImageStackInterface* data, int stack, int stack_pos, double x, double y, int chan) {
+    int channel=chan;
+    if (chan<0) channel=ui->cmbChannel->currentIndex();
+    JKQTPdatastore* ds=ui->pltFit->getDatastore();
+    double* img=data->getImageStack(stack, stack_pos, channel);
+    int w=data->getImageStackWidth(stack);
+    int h=data->getImageStackHeight(stack);
+    QString resultID=eval->getEvaluationResultID(stack, channel);
+
+    QVector<QColor> cols;
+    cols<<QColor("blue")<<QColor("red")<<QColor("green")<<QColor("magenta");
+
+
+    JKQTPxyLineErrorGraph* plteLineFitData=new JKQTPxyLineErrorGraph(ui->pltFit->get_plotter());
+    plteLineFitData->set_title(tr("%1: data").arg(ui->cmbChannel->itemText(channel)));
+    plteLineFitData->set_drawLine(true);
+    plteLineFitData->set_symbol(JKQTPcross);
+    plteLineFitData->set_symbolSize(5);
+    plteLineFitData->set_xErrorStyle(JKQTPnoError);
+    plteLineFitData->set_yErrorStyle(JKQTPerrorPolygons);
+    plteLineFitData->set_color(cols[channel%cols.size()]);
+    ui->pltFit->addGraph(plteLineFitData);
+
+
+    int item=-1;
+    bool*mask=getCurrentMask();
+    if(img) {
+        if (ui->cmbOrientation->currentIndex()==0) {
+            markDataX[0]=0;
+            markDataX[1]=w;
+            markDataY[0]=markDataY[1]=round(y);
+            item=(int)round(y);
+            double* data=(double*)malloc(h*sizeof(double));
+            double* dataX=(double*)malloc(h*sizeof(double));
+            int data_count=0;
+            int start_offset=0;
+            if (mask) {
+                for (int yy=0; yy<w; yy++) {
+                    if (!mask[item*w+yy]) {
+                        data[data_count]=img[item*w+yy];
+                        dataX[data_count]=double(yy)*ui->spinDeltaX->value()/1000.0;
+                        data_count++;
+                    } else {
+                        if (data_count<=0) start_offset++;
+                    }
+                }
+            } else {
+                for (int yy=0; yy<w; yy++) {
+                    data[data_count]=img[item*w+yy];
+                    dataX[data_count]=double(yy)*ui->spinDeltaX->value()/1000.0;
+                    data_count++;
+                }
+            }
+
+            if (data_count>0) {
+                //int c_x=ds->addLinearColumn(w, 0, double(w)*ui->spinDeltaX->value()/1000.0, "dataX");
+                int c_x=ds->addCopiedColumn(dataX, data_count, tr("X: %1").arg(ui->cmbChannel->itemText(channel)));
+                int c_y=ds->addCopiedColumn(&(data[start_offset]), data_count, tr("I: %1").arg(ui->cmbChannel->itemText(channel)));
+                plteLineFitData->set_xColumn(c_x);
+                plteLineFitData->set_yColumn(c_y);
+                plteLineFitData->set_xErrorColumn(-1);
+                plteLineFitData->set_yErrorColumn(-1);
+            }
+            free(data);
+            free(dataX);
+
+        } else {
+            markDataY[0]=0;
+            markDataY[1]=h;
+            markDataX[0]=markDataX[1]=round(x);
+
+            item=(int)round(x);
+            double* data=(double*)malloc(h*sizeof(double));
+            double* dataX=(double*)malloc(h*sizeof(double));
+
+            int data_count=0;
+            int start_offset=0;
+            if (mask) {
+                for (int yy=0; yy<h; yy++) {
+                    if (!mask[item*w+yy]) {
+                        data[yy]=img[yy*w+item];
+                        dataX[data_count]=double(yy)*ui->spinDeltaX->value()/1000.0;
+                        data_count++;
+                    } else {
+                        if (data_count<=0) start_offset++;
+                    }
+                }
+            } else {
+                for (int yy=0; yy<h; yy++) {
+                    data[data_count]=img[yy*w+item];
+                    dataX[data_count]=double(yy)*ui->spinDeltaX->value()/1000.0;
+                    data_count++;
+                }
+            }
+
+
+            //int c_x=ds->addLinearColumn(h, 0, double(h)*ui->spinDeltaX->value()/1000.0, "dataX");
+            int c_x=ds->addCopiedColumn(dataX, data_count, tr("X: %1").arg(ui->cmbChannel->itemText(channel)));
+            int c_y=ds->addCopiedColumn(&(data[start_offset]), data_count, tr("I: %1").arg(ui->cmbChannel->itemText(channel)));
+            plteLineFitData->set_xColumn(c_x);
+            plteLineFitData->set_yColumn(c_y);
+            plteLineFitData->set_xErrorColumn(-1);
+            plteLineFitData->set_yErrorColumn(-1);
+            free(data);
+            free(dataX);
+        }
+    }
+
+    tableFitResults->disableSignals();
+    QString param;
+    if (item>=0 && record->resultsExists(resultID, param=QString("fitok_frame%1").arg(stack_pos))) {
+        bool fitOK=record->resultsGetInBooleanList(resultID, param, item, false);
+        QString modelID=record->resultsGetAsString(resultID, param=QString("fit_model"));
+        QFFitFunction* model=QFFitFunctionManager::getInstance()->createFunction(modelID, this);
+        if (fitOK && model) {
+            QStringList paramIDs=model->getParameterIDs();
+            int pcount=model->paramCount();
+            QVector<double> params;
+            QString parTxt="";
+            for (int i=0; i<paramIDs.size(); i++) {
+                QFFitFunction::ParameterDescription d=model->getDescription(paramIDs[i]);
+                double v=record->resultsGetInNumberList(resultID, param=QString("%2_frame%1").arg(stack_pos).arg(paramIDs[i]), item, d.initialValue);
+                double e=record->resultsGetErrorInNumberErrorList(resultID, param=QString("%2_frame%1").arg(stack_pos).arg(paramIDs[i]), item, 0);
+                params.append(v);
+
+
+                tableFitResults->setCellCreate(i, 0, d.label);
+                tableFitResults->setCellCreate(i, 1+channel*6+0, v);
+                tableFitResults->setCellCreate(i, 1+channel*6+1, e);
+                tableFitResults->setCellCreate(i, 1+channel*6+2, d.unitLabel);
+                tableFitResults->setColumnTitle(1+channel*6+0, tr("%1: value").arg(ui->cmbChannel->itemText(channel)));
+                tableFitResults->setColumnTitle(1+channel*6+1, tr("error"));
+
+                parTxt+=QString("<tr>")+QString("<td><i>%1</i></td><td>%2</td><td>%3</td><td>%4</td>").arg(d.label).arg(v).arg(e).arg(d.unitLabel);
+                if (paramIDs[i].toUpper()=="POSITION" || paramIDs[i].toUpper()=="WIDTH") {
+                    parTxt+=QString("<td><i>%1</i></td><td>%2</td><td>&mu;m</td>").arg(v*ui->spinDeltaX->value()/1000.0).arg(e*ui->spinDeltaX->value()/1000.0);
+                    tableFitResults->setCellCreate(i, 1+channel*6+3, v*ui->spinDeltaX->value()/1000.0);
+                    tableFitResults->setCellCreate(i, 1+channel*6+4, e*ui->spinDeltaX->value()/1000.0);
+                    tableFitResults->setCellCreate(i, 1+channel*6+5, tr("&mu;m"));
+                    tableFitResults->setColumnTitle(1+channel*6+3, tr("value"));
+                    tableFitResults->setColumnTitle(1+channel*6+4, tr("error"));
+                }
+                parTxt+=QString("</tr>");
+            }
+            JKQTPxQFFitFunctionLineGraph* lg=new JKQTPxQFFitFunctionLineGraph(ui->pltFit->get_plotter());
+            lg->set_paramsVector(params);
+            lg->set_fitFunction(model, true);
+            lg->set_drawLine(true);
+            lg->set_lineWidth(2);
+            lg->set_scaleX(ui->spinDeltaX->value()/1000.0);
+            lg->set_title(tr("%1: fit").arg(ui->cmbChannel->itemText(channel)));
+            lg->set_color(plteLineFitData->get_color().darker());
+
+            ui->pltFit->addGraph(lg);
+
+            QString fitResults=tr("<ul><li>model: <b>%1</b></li><li>fit OK: <b>%2</b></li></ul>" ).arg(model->name()).arg(boolToQString(fitOK));
+            /*<li>parameters:<br><table border=\"1\" cellpadding=\"1\"><tr><th>parameter</th><th>value</th><th>error</th><th></th></tr>%2</table></li></ul>"*/
+
+            ui->labFitResults->setText(fitResults);
+        } else {
+            if (!model) ui->labFitResults->setText(tr("no fit available"));
+            if (!fitOK) ui->labFitResults->setText(tr("fit did not succeed!"));
+            if (model) delete model;
+
+        }
+    } else {
+        ui->labFitResults->setText(tr("no fit available"));
+    }
+    tableFitResults->enableSignals(true);
+
+}
+
+
 void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, double y, Qt::KeyboardModifiers modifiers, Qt::MouseButton button) {
     if (!current) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
@@ -359,147 +535,20 @@ void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, do
     ui->pltImage->set_doDrawing(false);
     ui->pltFit->set_doDrawing(false);
 
-    double* img=data->getImageStack(stack, stack_pos, ui->cmbChannel->currentIndex());
-    int w=data->getImageStackWidth(stack);
-    int h=data->getImageStackHeight(stack);
     JKQTPdatastore* ds=ui->pltFit->getDatastore();
     ui->pltFit->clearGraphs(true);
     ds->clear();
+    tableFitResults->setReadonly(false);
+    tableFitResults->clear();
 
-
-    JKQTPxyLineErrorGraph* plteLineFitData=new JKQTPxyLineErrorGraph(ui->pltFit->get_plotter());
-    plteLineFitData->set_title("raw data");
-    plteLineFitData->set_drawLine(true);
-    plteLineFitData->set_symbol(JKQTPcross);
-    plteLineFitData->set_symbolSize(5);
-    plteLineFitData->set_xErrorStyle(JKQTPnoError);
-    plteLineFitData->set_yErrorStyle(JKQTPerrorPolygons);
-    ui->pltFit->addGraph(plteLineFitData);
-
-
-    JKQTPxyLineGraph* plteLineFit=new JKQTPxyLineGraph(ui->pltFit->get_plotter());
-    plteLineFit->set_title("fit");
-    plteLineFit->set_drawLine(true);
-    plteLineFit->set_symbol(JKQTPnoSymbol);
-    ui->pltFit->addGraph(plteLineFit);
-
-    int item=-1;
-    bool*mask=getCurrentMask();
-    if(img) {
-        if (ui->cmbOrientation->currentIndex()==0) {
-            markDataX[0]=0;
-            markDataX[1]=w;
-            markDataY[0]=markDataY[1]=round(y);
-            item=(int)round(y);
-            double* data=(double*)malloc(h*sizeof(double));
-            double* dataX=(double*)malloc(h*sizeof(double));
-            int data_count=0;
-            if (mask) {
-                for (int yy=0; yy<w; yy++) {
-                    if (!mask[item*w+yy]) {
-                        data[data_count]=img[item*w+yy];
-                        dataX[data_count]=double(yy)*ui->spinDeltaX->value()/1000.0;
-                        data_count++;
-                    }
-                }
-            } else {
-                for (int yy=0; yy<w; yy++) {
-                    data[data_count]=img[item*w+yy];
-                    dataX[data_count]=double(yy)*ui->spinDeltaX->value()/1000.0;
-                    data_count++;
-                }
-            }
-
-            //int c_x=ds->addLinearColumn(w, 0, double(w)*ui->spinDeltaX->value()/1000.0, "dataX");
-            int c_x=ds->addCopiedColumn(dataX, data_count, "dataX");
-            int c_y=ds->addCopiedColumn(data/*&(img[item*w])*/, data_count, "dataY");
-            plteLineFitData->set_xColumn(c_x);
-            plteLineFitData->set_yColumn(c_y);
-            plteLineFitData->set_xErrorColumn(-1);
-            plteLineFitData->set_yErrorColumn(-1);
-            free(data);
-            free(dataX);
-
-        } else {
-            markDataY[0]=0;
-            markDataY[1]=h;
-            markDataX[0]=markDataX[1]=round(x);
-
-            item=(int)round(x);
-            double* data=(double*)malloc(h*sizeof(double));
-            double* dataX=(double*)malloc(h*sizeof(double));
-
-            int data_count=0;
-            if (mask) {
-                for (int yy=0; yy<h; yy++) {
-                    if (!mask[item*w+yy]) {
-                        data[yy]=img[yy*w+item];
-                        dataX[data_count]=double(yy)*ui->spinDeltaX->value()/1000.0;
-                        data_count++;
-                    }
-                }
-            } else {
-                for (int yy=0; yy<h; yy++) {
-                    data[data_count]=img[yy*w+item];
-                    dataX[data_count]=double(yy)*ui->spinDeltaX->value()/1000.0;
-                    data_count++;
-                }
-            }
-
-
-            //int c_x=ds->addLinearColumn(h, 0, double(h)*ui->spinDeltaX->value()/1000.0, "dataX");
-            int c_x=ds->addCopiedColumn(dataX, data_count, "dataX");
-            int c_y=ds->addCopiedColumn(data, data_count, "dataY");
-            plteLineFitData->set_xColumn(c_x);
-            plteLineFitData->set_yColumn(c_y);
-            plteLineFitData->set_xErrorColumn(-1);
-            plteLineFitData->set_yErrorColumn(-1);
-            free(data);
-            free(dataX);
-        }
+    for (int channel=0; channel<ui->cmbChannel->count(); channel++) {
+        showImageCut(eval, record, data, stack, stack_pos, x, y, channel);
     }
+    tableFitResults->setReadonly(true);
+    tableFitResults->enableSignals(true);
+    ui->tabFitResults->setModel(tableFitResults);
+    ui->tabFitResults->resizeColumnsToContents();
 
-    QString param;
-    if (item>=0 && record->resultsExists(resultID, param=QString("fitok_frame%1").arg(stack_pos))) {
-        bool fitOK=record->resultsGetInBooleanList(resultID, param, item, false);
-        QString modelID=record->resultsGetAsString(resultID, param=QString("fit_model"));
-        QFFitFunction* model=QFFitFunctionManager::getInstance()->createFunction(modelID, this);
-        if (fitOK && model) {
-            QStringList paramIDs=model->getParameterIDs();
-            int pcount=model->paramCount();
-            QVector<double> params;
-            QString parTxt="";
-            for (int i=0; i<paramIDs.size(); i++) {
-                QFFitFunction::ParameterDescription d=model->getDescription(paramIDs[i]);
-                double v=record->resultsGetInNumberList(resultID, param=QString("%2_frame%1").arg(stack_pos).arg(paramIDs[i]), item, d.initialValue);
-                double e=record->resultsGetErrorInNumberErrorList(resultID, param=QString("%2_frame%1").arg(stack_pos).arg(paramIDs[i]), item, 0);
-                params.append(v);
-                parTxt+=QString("<tr>")+QString("<td><i>%1</i></td><td>%2</td><td>%3</td><td>%4</td>").arg(d.label).arg(v).arg(e).arg(d.unitLabel);
-                if (paramIDs[i].toUpper()=="POSITION" || paramIDs[i].toUpper()=="WIDTH") {
-                    parTxt+=QString("<td><i>%1</i></td><td>%2</td><td>&mu;m</td>").arg(v*ui->spinDeltaX->value()/1000.0).arg(e*ui->spinDeltaX->value()/1000.0);
-                }
-                parTxt+=QString("</tr>");
-            }
-            JKQTPxQFFitFunctionLineGraph* lg=new JKQTPxQFFitFunctionLineGraph(ui->pltFit->get_plotter());
-            lg->set_paramsVector(params);
-            lg->set_fitFunction(model, true);
-            lg->set_drawLine(true);
-            lg->set_lineWidth(2);
-            lg->set_scaleX(ui->spinDeltaX->value()/1000.0);
-            ui->pltFit->addGraph(lg);
-
-            QString fitResults=tr("<ul><li>model: <b>%1</b></li><li>fit OK: <b>%3</b></li><li>parameters:<br><table border=\"1\" cellpadding=\"1\"><tr><th>parameter</th><th>value</th><th>error</th><th></th></tr>%2</table></li></ul>").arg(model->name()).arg(parTxt).arg(boolToQString(fitOK));
-
-            ui->labFitResults->setText(fitResults);
-        } else {
-            if (!model) ui->labFitResults->setText(tr("no fit available"));
-            if (!fitOK) ui->labFitResults->setText(tr("fit did not succeed!"));
-            if (model) delete model;
-
-        }
-    } else {
-        ui->labFitResults->setText(tr("no fit available"));
-    }
 
     ui->pltImage->zoomToFit();
     ui->pltFit->zoomToFit();
