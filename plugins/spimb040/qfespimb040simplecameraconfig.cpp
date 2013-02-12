@@ -417,7 +417,9 @@ bool QFESPIMB040SimpleCameraConfig::acquireSingle() {
             int dh=viewData.camera->getImageCameraHeight(usedcam);
             uint64_t timestamp=0;
             viewData.rawImage.resize(dw, dh);
-            bool ok=viewData.camera->acquireOnCamera(usedcam, viewData.rawImage.data(), &timestamp);
+            QMap<QString, QVariant> parameters;
+            bool ok=viewData.camera->acquireOnCamera(usedcam, viewData.rawImage.data(), &timestamp, &parameters);
+            viewData.parameters=parameters;
             viewData.lastAcquisitionTime=QTime::currentTime();
             double exposure=viewData.camera->getCameraExposureTime(usedcam);
             viewData.timestamp=timestamp;
@@ -488,7 +490,7 @@ void QFESPIMB040SimpleCameraConfig::previewSingle() {
             if (acquireSingle()) {
                 camView->show();
                 camView->setPixelSize(cam->getCameraPixelWidth(camIdx)/m_magnification, cam->getCameraPixelHeight(camIdx)/m_magnification);
-                camView->displayImageComplete(viewData.rawImage, viewData.timestamp, viewData.exposureTime);
+                camView->displayImageComplete(viewData.rawImage, viewData.timestamp, viewData.exposureTime, viewData.parameters);
             } else {
                 if (m_log) m_log->log_error(tr("could not acquire frame, as device is not connected ...!\n"));
             }
@@ -568,7 +570,7 @@ void QFESPIMB040SimpleCameraConfig::previewContinuous() {
             }
             if (acquireSingle()) {
                 camView->setPixelSize(cam->getCameraPixelWidth(camIdx)/m_magnification, cam->getCameraPixelHeight(camIdx)/m_magnification);
-                camView->displayImage(viewData.rawImage, viewData.timestamp, viewData.exposureTime);
+                camView->displayImage(viewData.rawImage, viewData.timestamp, viewData.exposureTime, viewData.parameters);
             }
         } else {
             if (m_log) m_log->log_error(tr("could not acquire frame, as device is not connected ...!\n"));

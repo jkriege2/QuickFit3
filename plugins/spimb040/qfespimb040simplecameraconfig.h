@@ -155,6 +155,8 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
             QFExtensionMeasurementDevice* measurementDevice;
             /** \brief which cmera of the QFExtensionCamera is used? */
             int usedCamera;
+            /** \brief acquisition parameters */
+            QMap<QString, QVariant> parameters;
 
         };
 

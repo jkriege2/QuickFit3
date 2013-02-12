@@ -84,7 +84,7 @@ class QFESPIMB040CameraView : public QWidget {
             \note This does NOT guarantee that the statistics are calculated for every frame (to increase frame rate!). If you need
                   the statistics, call displayImageComplete() instead.
         */
-        void displayImage(JKImage<uint32_t>& imageInput, double timeindex, double exposuretime);
+        void displayImage(JKImage<uint32_t>& imageInput, double timeindex, double exposuretime, QMap<QString, QVariant> parameters);
         /** \brief display a new image in the widget, in comparison to displayImage() this guarantees an update of the statistics!
 
             \param imageInput points to the data of the image to be displayed This points to a 1D array with the size \c width*height*sizeof(unit32_t)
@@ -93,7 +93,7 @@ class QFESPIMB040CameraView : public QWidget {
             \param timeindex time index of image \a image in seconds
             \param exposuretime exposure time of the image in seconds (used to calculate count rates in units of kHz).
         */
-        void displayImageComplete(JKImage<uint32_t>& imageInput, double timeindex, double exposuretime);
+        void displayImageComplete(JKImage<uint32_t>& imageInput, double timeindex, double exposuretime, QMap<QString, QVariant> parameters);
         /** \brief clear the display */
         void clearImage();
         /*! \brief display the current camera data/config
@@ -137,6 +137,7 @@ class QFESPIMB040CameraView : public QWidget {
 
         QFCameraConfigComboBoxStartResume* m_stopresume;
         int cameraID;
+        QMap<QString, QVariant> imageParameters;
 
 
 

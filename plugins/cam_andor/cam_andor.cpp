@@ -860,7 +860,7 @@ void QFExtensionCameraAndor::internalGetAcquisitionDescription(unsigned int came
 
     (*parameters)["sensor_width"]=info.width;
     (*parameters)["sensor_height"]=info.height;
-    (*parameters)["exposure_time"]=info.expoTime;
+    (*parameters)["exposure_time"]=(double)info.expoTime;
     (*parameters)["roi_xstart"]=info.subImage_hstart;
     (*parameters)["roi_xend"]=info.subImage_hend;
     (*parameters)["roi_ystart"]=info.subImage_vstart;
@@ -891,15 +891,15 @@ void QFExtensionCameraAndor::internalGetAcquisitionDescription(unsigned int came
     (*parameters)["output_amplifier"]=QString(text);
 
     (*parameters)["sequence_length"]=info.numAccs;
-    (*parameters)["frame_time"]=info.kinTime;
-    (*parameters)["accumulation_time"]=info.accTime;
+    (*parameters)["frame_time"]=(double)info.kinTime;
+    (*parameters)["accumulation_time"]=(double)info.accTime;
     (*parameters)["spooling"]=info.spooling;
-    (*parameters)["readout_time"]=info.readoutTime;
-    (*parameters)["horizontal_shift_speed"]=info.horizontalSpeed;
+    (*parameters)["readout_time"]=(double)info.readoutTime;
+    (*parameters)["horizontal_shift_speed"]=(double)info.horizontalSpeed;
     (*parameters)["vertical_shift_speed"]=info.verticalSpeed;
-    (*parameters)["pixel_width"]=info.pixelWidth*info.hbin;
-    (*parameters)["pixel_height"]=info.pixelHeight*info.vbin;
-    (*parameters)["preamplifier_gain"]=info.preampGainF;
+    (*parameters)["pixel_width"]=(double)info.pixelWidth*(double)info.hbin;
+    (*parameters)["pixel_height"]=(double)info.pixelHeight*(double)info.vbin;
+    (*parameters)["preamplifier_gain"]=double(info.preampGainF);
     (*parameters)["bit_depth"]=info.bitDepth;
     (*parameters)["camera_serial_number"]=info.serialNumber;
     (*parameters)["camera_controller_card"]=info.controllerCard;
@@ -917,7 +917,7 @@ void QFExtensionCameraAndor::internalGetAcquisitionDescription(unsigned int came
     (*parameters)["spooling_mode"]=info.spool;
     (*parameters)["binning_vertical"]=info.vbin;
     (*parameters)["binning_horizontal"]=info.hbin;
-    (*parameters)["kinetic_time"]=info.kinTime;
+    (*parameters)["kinetic_time"]=(double)info.kinTime;
     (*parameters)["accumulations"]=info.numAccs;
     (*parameters)["images"]=info.numKins;
     (*parameters)["trigger_invert"]=info.trigInvert;

@@ -1549,8 +1549,8 @@ void QFESPIMB040CameraView::saveMulti() {
     QFileInfo fi(fileName);
     QString fn=fi.absolutePath()+"/"+fi.completeBaseName();
 
-    rawImage.save_tiffuint16(QString(fn+"_uint16.tif").toStdString());
-    rawImage.save_tiffuint32(QString(fn+".tif").toStdString());
+    rawImage.save_tiffuint16(QString(fn+".tif").toStdString());
+    rawImage.save_tiffuint32(QString(fn+"_uint32.tif").toStdString());
     rawImage.save_tifffloat(QString(fn+"_float.tif").toStdString());
     image.save_tiffuint16(QString(fn+"_transformed_uint16.tif").toStdString());
     image.save_tiffuint32(QString(fn+"_transformed.tif").toStdString());
@@ -1558,11 +1558,11 @@ void QFESPIMB040CameraView::saveMulti() {
 
     QImage imgo;
     JKQTFPimagePlot_array2image<QFESPIMB040CameraView_internalImageType>(image.data(), image.width(), image.height(), imgo, (JKQTFPColorPalette)cmbColorscale->currentIndex(), spinCountsLower->value(), spinCountsUpper->value());
-    imgo.save(QString(fn+"_transformed.tif"), "PNG");
+    imgo.save(QString(fn+"_transformed.png"), "PNG");
 
     QImage imgo1;
-    JKQTFPimagePlot_array2image<uint32_t>(rawImage.data(), rawImage.width(), rawImage.height(), imgo1, (JKQTFPColorPalette)cmbColorscale->currentIndex(), spinCountsLower->value(), spinCountsUpper->value());
-    imgo1.save(QString(fn+".tif"), "PNG");
+    JKQTFPimagePlot_array2image<uint32_t>(rawImage.data(), rawImage.width(), rawImage.height(), imgo1, (JKQTFPColorPalette)cmbColorscale->currentIndex(), 0,0);
+    imgo1.save(QString(fn+".png"), "PNG");
 
     QSettings setting(QString(fn+".configuration.ini"), QSettings::IniFormat);
     storeCameraConfig(setting);
@@ -1609,6 +1609,15 @@ void QFESPIMB040CameraView::storeCameraConfig(QSettings& setting) {
             setting.setValue(acquisitionDescriptionPrefix+it.key(), it.value());
         }
     }
+
+    {
+        QMapIterator<QString, QVariant> it(imageParameters);
+        acquisitionDescriptionPrefix="acquisition/";
+        while (it.hasNext()) {
+            it.next();
+            setting.setValue(acquisitionDescriptionPrefix+it.key(), it.value());
+        }
+    }
 }
 
 void QFESPIMB040CameraView::saveTransformedImage() {
@@ -1619,19 +1628,21 @@ void QFESPIMB040CameraView::saveTransformedImage() {
 }
 
 
-void QFESPIMB040CameraView::displayImage(JKImage<uint32_t>& imageInput, double timeindex, double exposuretime) {
+void QFESPIMB040CameraView::displayImage(JKImage<uint32_t>& imageInput, double timeindex, double exposuretime, QMap<QString, QVariant> parameters) {
     rawImage.assign(imageInput);
     imageTimeindex=timeindex;
     imageExposureTime=exposuretime;
     imageStatisticsCalculated=false;
+    imageParameters=parameters;
     redrawFrameRecalc(false);
 }
 
-void QFESPIMB040CameraView::displayImageComplete(JKImage<uint32_t>& imageInput, double timeindex, double exposuretime) {
+void QFESPIMB040CameraView::displayImageComplete(JKImage<uint32_t>& imageInput, double timeindex, double exposuretime, QMap<QString, QVariant> parameters) {
     rawImage.assign(imageInput);
     imageTimeindex=timeindex;
     imageExposureTime=exposuretime;
     imageStatisticsCalculated=false;
+    imageParameters=parameters;
     redrawFrameRecalc(true);
 }
 

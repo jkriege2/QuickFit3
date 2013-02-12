@@ -591,7 +591,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
         //////////////////////////////////////////////////////////////////////////////////////
         progress.nextItem();
 
-        QMap<QString, QVariant> acquisitionDescription;
+        QMap<QString, QVariant> acquisitionDescription, acquisitionDescription1, acquisitionDescription2;
         QList<QVariant> positions, positions2, positions3;
         QTime timAcquisition=QTime::currentTime();
         QDateTime timStart;
@@ -777,8 +777,9 @@ void QFESPIMB040MainWindow2::doImageStack() {
                                     timAcquisition.start();
                                     timStart=QDateTime::currentDateTime();
                                 }
+                                uint64_t timestampDummy=0;
                                 if (useCam1) {
-                                    if (ecamera1->acquireOnCamera(camera1, buffer1)) {
+                                    if (ecamera1->acquireOnCamera(camera1, buffer1, NULL, &acquisitionDescription1)) {
                                         TIFFTWriteUint16from32(tiff1[lp], buffer1, width1, height1);
                                         TIFFWriteDirectory(tiff1[lp]);
                                     } else {
@@ -788,7 +789,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                                 }
                                 //QApplication::processEvents();
                                 if (useCam2) {
-                                    if (ecamera2->acquireOnCamera(camera2, buffer2)) {
+                                    if (ecamera2->acquireOnCamera(camera2, buffer2, NULL, &acquisitionDescription2)) {
                                         TIFFTWriteUint16from32(tiff2[lp], buffer2, width2, height2);
                                         TIFFWriteDirectory(tiff2[lp]);
                                     } else {
@@ -926,7 +927,8 @@ void QFESPIMB040MainWindow2::doImageStack() {
         // write image stack properties to files, also collects camera specific information
         //////////////////////////////////////////////////////////////////////////////////////
         if (ok && useCam1) {
-            QMap<QString, QVariant> acquisitionDescription1=acquisitionDescription;
+            QMap<QString, QVariant> acquisitionDescription11=acquisitionDescription;
+            acquisitionDescription11=acquisitionDescription11.unite(acquisitionDescription1);
             QList<QFExtensionCamera::CameraAcquititonFileDescription> files;
             for (int lp=0; lp<TIFFFIlename1.size(); lp++) {
                 QFExtensionCamera::CameraAcquititonFileDescription d;
@@ -961,11 +963,12 @@ void QFESPIMB040MainWindow2::doImageStack() {
             }
 
             log_text(tr("  - writing acquisition description 1 ..."));
-            savePreviewDescription(0, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription1, files, startDateTime);
+            savePreviewDescription(0, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription11, files, startDateTime);
             log_text(tr(" DONE!\n"));
         }
         if (ok && useCam2) {
-            QMap<QString, QVariant> acquisitionDescription2=acquisitionDescription;
+            QMap<QString, QVariant> acquisitionDescription22=acquisitionDescription;
+            acquisitionDescription22=acquisitionDescription22.unite(acquisitionDescription2);
             QList<QFExtensionCamera::CameraAcquititonFileDescription> files;
             for (int lp=0; lp<TIFFFIlename1.size(); lp++) {
                 QFExtensionCamera::CameraAcquititonFileDescription d;
@@ -1000,7 +1003,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
             }
 
             log_text(tr("  - writing acquisition description 2 ..."));
-            savePreviewDescription(1, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription2, files, startDateTime);
+            savePreviewDescription(1, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription22, files, startDateTime);
             log_text(tr(" DONE!\n"));
         }
 
