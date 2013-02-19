@@ -85,16 +85,26 @@ void QFPRDRFCS::insertALBAFile(const QStringList& filename, const QMap<QString, 
     }
 }
 
+void QFPRDRFCS::insertDiffusion4File(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
+    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename.value(0, "")).fileName(), filename, paramValues, paramReadonly);
+    if (e->error()) {
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename.value(0, "")).arg(e->errorDescription()));
+        services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));
+        project->deleteRawData(e->getID());
+    }
+}
+
 void QFPRDRFCS::insertFCS() {
     if (project) {
         QString alvf=tr("ALV-5000 file (*.asc)");
         QString asciif=tr("ASCII Data Files (*.txt *.dat *.csv)");
         QString albaf=tr("ISS Alba Files (*.csv)");
+        QString diff4f=tr("diffusion4 correlation (*corr.dat)");
         QString currentFCSFileFormatFilter=settings->getQSettings()->value("fcs/current_fcs_format_filter", alvf).toString();
         QStringList files = qfGetOpenFileNames(parentWidget,
                               tr("Select FCS Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
-                              alvf+";;"+asciif+";;"+albaf, &currentFCSFileFormatFilter);
+                              alvf+";;"+asciif+";;"+albaf+";;"+diff4f, &currentFCSFileFormatFilter);
         //std::cout<<"filter: "<<currentFCSFileFormatFilter.toStdString()<<std::endl;
         if (files.size()>0) {
             settings->getQSettings()->setValue("fcs/current_fcs_format_filter", currentFCSFileFormatFilter);
@@ -143,6 +153,10 @@ void QFPRDRFCS::insertFCS() {
                 }
             } else if (currentFCSFileFormatFilter==albaf) {
                 p["FILETYPE"]="ISS_ALBA";
+            } else if (currentFCSFileFormatFilter==diff4f) {
+                p["FILETYPE"]="DIFFUSION4_SIMRESULTS";
+                p["CSV_SEPARATOR"]=",";
+                p["CSV_COMMENT"]="#";
             }
             QStringList paramsReadonly;
             paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT"<<"CSV_STARTSWITH"<<"CSV_MODE"<<"CSV_FIRSTLINE"<<"CSV_ENDSWITH"<<"CSV_TIMEFACTOR";
@@ -160,6 +174,8 @@ void QFPRDRFCS::insertFCS() {
                         insertALV5000File(QStringList(*it), p, paramsReadonly);
                     } else if (currentFCSFileFormatFilter==albaf) {
                         insertALBAFile(QStringList(*it), p, paramsReadonly);
+                    } else if (currentFCSFileFormatFilter==diff4f) {
+                        insertDiffusion4File(QStringList(*it), p, paramsReadonly);
                     } else {
                         insertCSVFile(QStringList(*it), p, paramsReadonly);
                     }
@@ -185,11 +201,12 @@ void QFPRDRFCS::insertMultiFileFCS()
         QString alvf=tr("ALV-5000 file (*.asc)");
         QString asciif=tr("ASCII Data Files (*.txt *.dat *.csv)");
         QString albaf=tr("ISS Alba Files (*.csv)");
+        QString diff4f=tr("diffusion4 correlation (*corr.dat)");
         QString currentFCSFileFormatFilter=settings->getQSettings()->value("fcs/current_fcs_format_filter", alvf).toString();
         QStringList files = qfGetOpenFileNames(parentWidget,
                               tr("Select FCS Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
-                              alvf+";;"+asciif+";;"+albaf, &currentFCSFileFormatFilter);
+                              alvf+";;"+asciif+";;"+albaf+";;"+diff4f, &currentFCSFileFormatFilter);
         //std::cout<<"filter: "<<currentFCSFileFormatFilter.toStdString()<<std::endl;
         if (files.size()>0) {
             settings->getQSettings()->setValue("fcs/current_fcs_format_filter", currentFCSFileFormatFilter);
@@ -238,6 +255,11 @@ void QFPRDRFCS::insertMultiFileFCS()
                 }
             } else if (currentFCSFileFormatFilter==albaf) {
                 p["FILETYPE"]="ISS_ALBA";
+            } else if (currentFCSFileFormatFilter==diff4f) {
+                p["FILETYPE"]="DIFFUSION4_SIMRESULTS";
+                p["CSV_SEPARATOR"]=",";
+                p["CSV_COMMENT"]="#";
+
             }
             QStringList paramsReadonly;
             paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT"<<"CSV_STARTSWITH"<<"CSV_MODE"<<"CSV_FIRSTLINE"<<"CSV_ENDSWITH"<<"CSV_TIMEFACTOR";
@@ -247,6 +269,8 @@ void QFPRDRFCS::insertMultiFileFCS()
                 insertALV5000File(files, p, paramsReadonly);
             } else if (currentFCSFileFormatFilter==albaf) {
                 insertALBAFile(files, p, paramsReadonly);
+            } else if (currentFCSFileFormatFilter==diff4f) {
+                insertDiffusion4File(files, p, paramsReadonly);
             } else {
                 insertCSVFile(files, p, paramsReadonly);
             }

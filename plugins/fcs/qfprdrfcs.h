@@ -44,14 +44,14 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         virtual QString getAuthor() const  { return tr("Jan Krieger"); };
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2010-2012 by Jan Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2010-2013 by Jan Krieger"); };
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const  { return tr(""); };
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=2;
+            minor=3;
         };
 
         /** \brief icon for the plugin */
@@ -90,6 +90,7 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
             \param paramReadonly names of initial parameters that should be declared readonly
         */
         void insertALBAFile(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
+        void insertDiffusion4File(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
     private:
 };
 

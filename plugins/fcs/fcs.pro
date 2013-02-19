@@ -21,7 +21,9 @@ HEADERS += dlgcsvparameters.h \
 		   ../interfaces/qfrdrcountratesinterface.h \
     ../../../../../LIB/trunk/qt/completertextedit.h \
     qfrdrfcsfitfunctionsimulator.h \
-    ../interfaces/qfrdrrunselection.h
+    ../interfaces/qfrdrrunselection.h \
+    ../../../../../LIB/trunk/jkmathparser.h \
+    ../../../../../LIB/trunk/jkiniparser2.h
 
 SOURCES += dlgcsvparameters.cpp \
            alv5000tools.cpp \
@@ -30,7 +32,9 @@ SOURCES += dlgcsvparameters.cpp \
            qfrdrfcsrateeditor.cpp \
 		   qfprdrfcs.cpp \
     ../../../../../LIB/trunk/qt/completertextedit.cpp \
-    qfrdrfcsfitfunctionsimulator.cpp
+    qfrdrfcsfitfunctionsimulator.cpp \
+    ../../../../../LIB/trunk/jkmathparser.cpp \
+    ../../../../../LIB/trunk/jkiniparser2.cpp
 
 FORMS = dlg_csvparameters.ui \
     qfrdrfcsfitfunctionsimulator.ui

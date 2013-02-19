@@ -1,6 +1,7 @@
 #include "qfrdrfcsdata.h"
 #include <errno.h>
 #include <QtXml>
+#include "jkiniparser2.h"
 
 QFRDRFCSData::QFRDRFCSData(QFProject* parent):
     QFRawDataRecord(parent)
@@ -176,6 +177,7 @@ bool QFRDRFCSData::selectNewFiles(QStringList &files, QStringList &types, QStrin
     if (filetype=="ALV5000") filter=tr("ALV-5000 file (*.asc)");
     if (filetype=="CSV_CORR") filter=tr("ASCII Data Files (*.txt *.dat *.csv)");
     if (filetype=="ISS_ALBA") filter=tr("ISS Alba Files (*.csv)");
+    if (filetype=="DIFFUSION4_SIMRESULTS") filter=tr("Diffusion4 simulation results (*corr.dat *bts.dat)");
 
 
     if (filetype!="INTERNAL") {
@@ -1153,6 +1155,67 @@ bool QFRDRFCSData::reloadFromFiles() {
             return false;
         }
         return loadCorrelationCurvesFromALBA(files);
+    } else if (filetype.toUpper()=="DIFFUSION4_SIMRESULTS") {
+        if (files.size()<=0) {
+            setError(tr("there are no files in the FCS record!"));
+            return false;
+        }
+        bool ok=false;
+        QStringList cfiles, pfiles;
+        for (int i=0; i<files.size(); i++) {
+            QString aft=files_types.value(i, "ACF").toUpper();
+            if (aft=="ACF" || aft.isEmpty()) cfiles<<files[i];
+            if (aft=="RATE") pfiles<<files[i];
+        }
+        qDebug()<<"----------------------------------------------------\ncfiles="<<cfiles;
+        qDebug()<<"pfiles="<<pfiles;
+        // now try to find additional files and data
+        if (!(getProperty("SEARCHED_MORE_FILES", false).toBool()) && cfiles.size()>0) {
+            QRegExp rxFCS("(.*)\\_(fcs.+)corr\\.dat");
+            rxFCS.setMinimal(true);
+            qDebug()<<"matching "<<cfiles[0]<<" against "<<rxFCS.pattern();
+            if (rxFCS.exactMatch(cfiles[0])) {
+                QString objectname=rxFCS.cap(2);
+                QString basename=rxFCS.cap(1)+"_"+objectname;
+                QString btsfile=basename+"bts.dat";
+                QString configfile=rxFCS.cap(1)+"_config.ini";
+                QString description="";
+                double bintime=0;
+                if (QFile::exists(configfile)) {
+                    jkINIParser2 ini;
+                    try {
+                        ini.readFile(QDir::toNativeSeparators(configfile).toStdString()); // read in an INI file
+                        description=ini.getAsString((objectname+".description").toStdString(), "").c_str();
+                        bintime=ini.getAsDouble((objectname+".save_binning_time").toStdString(), ini.getAsDouble("fcs.save_binning_time", 0));
+                    } catch (std::exception& e) { // error handling
+                    }
+                    if (description.size()>0 && !getName().contains(description)) {
+                        setName(description+" ("+QFileInfo(cfiles[0]).fileName()+")");
+                    }
+                }
+                qDebug()<<"----------------------------------------------------\nobjectname="<<objectname;
+                qDebug()<<"basename="<<basename;
+                qDebug()<<"description="<<description;
+                qDebug()<<"new_name="<<getName();
+                qDebug()<<"btsfile="<<btsfile;
+                qDebug()<<"configfile="<<configfile;
+                qDebug()<<"bintime="<<bintime;
+                if (bintime>0) {
+                    setQFProperty("CSV_RATEFACTOR", 1.0/bintime/1000.0, false, false);
+                }
+                if (QFile::exists(btsfile)) {
+                    pfiles<<btsfile;
+                    files<<btsfile;
+                    setFileType(files.size()-1, "RATE");
+
+                }
+                setQFProperty("SEARCHED_MORE_FILES", true, false, false);
+            }
+        }
+
+        ok=loadCorrelationCurvesFromCSV(cfiles);
+        ok=ok&&loadCountRatesFromCSV(pfiles);
+        return ok;
     } else if (filetype.toUpper()=="CSV_CORR") {
         if (files.size()<=0) {
             setError(tr("there are no files in the FCS record!"));
@@ -1202,6 +1265,7 @@ bool QFRDRFCSData::reloadFromFiles() {
     }
     return false;
 }
+
 
 
 
