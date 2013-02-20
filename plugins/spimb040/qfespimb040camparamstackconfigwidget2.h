@@ -68,7 +68,9 @@ class QFESPIMB040CamParamStackConfigWidget2 : public QWidget, public QFESPIMB040
         QString lightpathFilename() const;
 
         QString lightpath() const;
-protected slots:
+    protected slots:
+        void on_btnLoadTemplate_clicked();
+        void on_btnSaveTemplate_clicked();
         void on_spinEnd_valueChanged(double value);
         void on_btnAcquire_clicked();
         void on_chkUse1_clicked(bool enabled);

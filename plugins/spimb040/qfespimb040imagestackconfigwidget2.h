@@ -127,6 +127,9 @@ public slots:
 
         void on_chkStackRelative_toggled(bool checked);
 
+        void on_btnSaveTemplate_clicked();
+        void on_btnLoadTemplate_clicked();
+
         void checkStage();
         void updateLabel();
 

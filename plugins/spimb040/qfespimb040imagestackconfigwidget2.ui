@@ -1221,6 +1221,57 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
+   <item row="0" column="0" colspan="5">
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <item>
+      <spacer name="horizontalSpacer_13">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSaveTemplate">
+       <property name="text">
+        <string>&amp;save as template</string>
+       </property>
+       <property name="icon">
+        <iconset resource="spimb040.qrc">
+         <normaloff>:/spimb040/template_save.png</normaloff>:/spimb040/template_save.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnLoadTemplate">
+       <property name="text">
+        <string>&amp;load template</string>
+       </property>
+       <property name="icon">
+        <iconset resource="spimb040.qrc">
+         <normaloff>:/spimb040/template_open.png</normaloff>:/spimb040/template_open.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <customwidgets>

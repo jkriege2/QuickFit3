@@ -99,6 +99,7 @@ void QFESPIMB040ExperimentDescription::on_btnSaveTemplate_clicked() {
         if (ok) {
             QSettings set(filename, QSettings::IniFormat);
             storeSettings(set, "experiment_settings/");
+            dir=QFileInfo(filename).absolutePath();
         }
     }
     ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ExperimentDescription/lasttemplatedir", dir);
@@ -111,6 +112,7 @@ void QFESPIMB040ExperimentDescription::on_btnLoadTemplate_clicked() {
     if (!filename.isEmpty()) {
         QSettings set(filename, QSettings::IniFormat);
         loadSettings(set, "experiment_settings/");
+        dir=QFileInfo(filename).absolutePath();
     }
     ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ExperimentDescription/lasttemplatedir", dir);
 

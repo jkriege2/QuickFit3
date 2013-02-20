@@ -95,6 +95,9 @@ protected slots:
         void on_spinDelta_valueChanged(double value);
         void on_cmbMode_currentIndexChanged(int index);
 
+        void on_btnSaveTemplate_clicked();
+        void on_btnLoadTemplate_clicked();
+
         void updateLabel();
     private:
         Ui::QFESPIMB040DeviceParamStackConfigWidget *ui;

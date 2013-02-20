@@ -980,3 +980,39 @@ double QFESPIMB040DeviceParamStackConfigWidget::delay() const
 {
     return ui->spinDelay->value();
 }
+
+
+void QFESPIMB040DeviceParamStackConfigWidget::on_btnSaveTemplate_clicked()
+{
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040DeviceParamStackConfigWidget/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/").toString();
+    QString filename=qfGetSaveFileName(this, tr("save as template ..."), dir, tr("device parameter stack configuration (*.dpsc)"))    ;
+    if (!filename.isEmpty()) {
+        bool ok=true;
+        if (QFile::exists(filename)) {
+            ok=false;
+            if (QMessageBox::question(this, tr("save as template ..."), tr("The file\n  '%1'\nalready exists. Overwrite?").arg(filename), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
+                ok=true;
+            }
+        }
+        if (ok) {
+            QSettings set(filename, QSettings::IniFormat);
+            storeSettings(set, "device_param_stack_settings/");
+            dir=QFileInfo(filename).absolutePath();
+        }
+    }
+    ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040DeviceParamStackConfigWidget/lasttemplatedir", dir);
+}
+
+void QFESPIMB040DeviceParamStackConfigWidget::on_btnLoadTemplate_clicked()
+{
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040DeviceParamStackConfigWidget/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/").toString();
+    QString filename=qfGetOpenFileName(this, tr("open template ..."), dir, tr("device parameter stack configuration (*.dpsc)"))    ;
+    if (!filename.isEmpty()) {
+        QSettings set(filename, QSettings::IniFormat);
+        loadSettings(set, "device_param_stack_settings/");
+        dir=QFileInfo(filename).absolutePath();
+    }
+    ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040DeviceParamStackConfigWidget/lasttemplatedir", dir);
+}

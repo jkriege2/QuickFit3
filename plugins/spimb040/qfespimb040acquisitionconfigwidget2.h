@@ -95,6 +95,8 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         bool lightpathActivatedPreview3() const;
         bool lightpathActivatedPreview4() const;
     protected slots:
+        void on_btnSaveTemplate_clicked();
+        void on_btnLoadTemplate_clicked();
         void on_btnAcquire_clicked();
         void on_chkUse1_toggled(bool enabled);
         void on_chkUse2_toggled(bool enabled);

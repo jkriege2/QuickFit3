@@ -739,6 +739,41 @@ void QFESPIMB040ImageStackConfigWidget2::on_chkStackRelative_toggled(bool checke
 
 }
 
+void QFESPIMB040ImageStackConfigWidget2::on_btnSaveTemplate_clicked()
+{
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ImageStackConfigWidget2/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/").toString();
+    QString filename=qfGetSaveFileName(this, tr("save as template ..."), dir, tr("image stack configuration (*.isc)"))    ;
+    if (!filename.isEmpty()) {
+        bool ok=true;
+        if (QFile::exists(filename)) {
+            ok=false;
+            if (QMessageBox::question(this, tr("save as template ..."), tr("The file\n  '%1'\nalready exists. Overwrite?").arg(filename), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
+                ok=true;
+            }
+        }
+        if (ok) {
+            QSettings set(filename, QSettings::IniFormat);
+            storeSettings(set, "image_stack_settings/");
+            dir=QFileInfo(filename).absolutePath();
+        }
+    }
+    ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ImageStackConfigWidget2/lasttemplatedir", dir);
+}
+
+void QFESPIMB040ImageStackConfigWidget2::on_btnLoadTemplate_clicked()
+{
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ImageStackConfigWidget2/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/").toString();
+    QString filename=qfGetOpenFileName(this, tr("open template ..."), dir, tr("image stack configuration (*.isc)"))    ;
+    if (!filename.isEmpty()) {
+        QSettings set(filename, QSettings::IniFormat);
+        loadSettings(set, "image_stack_settings/");
+        dir=QFileInfo(filename).absolutePath();
+    }
+    ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ImageStackConfigWidget2/lasttemplatedir", dir);
+}
+
 QString QFESPIMB040ImageStackConfigWidget2::currentConfigFilename(int camera) const {
     if (camera==0) return ui->cmbCam1Settings->currentConfigFilename();
     if (camera==1) return ui->cmbCam2Settings->currentConfigFilename();
