@@ -10,6 +10,8 @@
 #include "qfespimb040opticssetup.h"
 #include "qfespimb040filenametool.h"
 #include "qtriple.h"
+#include "qfespimb040acquisitiontools.h"
+#include "libtiff_tools.h"
 
 class QFESPIMB040MainWindow; // forward
 class QFPluginServices; // forward
@@ -26,7 +28,7 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         Q_OBJECT
 
     public:
-        explicit QFESPIMB040AcquisitionConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
+        explicit QFESPIMB040AcquisitionConfigWidget2(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
         ~QFESPIMB040AcquisitionConfigWidget2();
 
         /** \brief return the filename for the currently selected camera configuration */
@@ -43,6 +45,8 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         bool saveBackground() const;
     public slots:
         void lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes);
+
+        void performAcquisition();
 
     signals:
         void doAcquisition();
@@ -112,6 +116,9 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         QFESPIMB040AcquisitionDescription* acqDescription;
         QFESPIMB040ExperimentDescription* expDescription;
         QMap<QFExtensionCamera::CameraSetting, QVariant> camset1, camset2;
+
+        QFPluginLogService* log;
+        QFESPIMB040AcquisitionTools* acqTools;
 };
 
 #endif // QFESPIMB040ACQUISITIONCONFIGWIDGET2_H

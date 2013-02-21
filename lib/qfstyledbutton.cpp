@@ -75,6 +75,18 @@ void QFStyledButton::openBuddyContents() {
         if (edt) {
             edt->clear();
         }
+    } else if (m_actionmode==SelectFromCompleter) {
+        QLineEdit* edt=qobject_cast<QLineEdit*>(m_buddy);
+        if (edt) {
+            QCompleter* comp=edt->completer();
+            if (comp) {
+                disconnect(comp, SIGNAL(activated(QString)), edt, SLOT(setText(QString)));
+                connect(comp, SIGNAL(activated(QString)), edt, SLOT(setText(QString)));
+                comp->setCompletionPrefix("");
+                comp->setCompletionMode(QCompleter::PopupCompletion);
+                comp->complete();
+            }
+        }
     } else if (m_actionmode==SelectFile) {
         static QString dir="";
         QString fileName = QFileDialog::getOpenFileName(this, tr("Select File ..."), dir, tr("All Files (*.*)"));
@@ -115,26 +127,37 @@ void QFStyledButton::setBuddyWithDefaultIcon(QWidget* b, ActionMode mode) {
         i.addFile(":/lib/qfstyledbutton/network_disabled.png", QSize(), QIcon::Disabled);
         i.addFile(":/lib/qfstyledbutton/network_hover.png", QSize(), QIcon::Selected);
         i.addFile(":/lib/qfstyledbutton/network_pressed.png", QSize(), QIcon::Active);
+        setToolTip(tr("open weblink in line edit"));
     } else if (mode==ExecuteFile) {
         i=QIcon(":/lib/qfstyledbutton/execute.png");
         i.addFile(":/lib/qfstyledbutton/execute_disabled.png", QSize(), QIcon::Disabled);
         i.addFile(":/lib/qfstyledbutton/execute_hover.png", QSize(), QIcon::Selected);
         i.addFile(":/lib/qfstyledbutton/execute_pressed.png", QSize(), QIcon::Active);
+        setToolTip(tr("execute file in line edit"));
     } else if (mode==SelectFile) {
         i=QIcon(":/lib/qfstyledbutton/selectfile.png");
         i.addFile(":/lib/qfstyledbutton/selectfile_disabled.png", QSize(), QIcon::Disabled);
         i.addFile(":/lib/qfstyledbutton/selectfile_hover.png", QSize(), QIcon::Selected);
         i.addFile(":/lib/qfstyledbutton/selectfile_pressed.png", QSize(), QIcon::Active);
+        setToolTip(tr("select a filename for thw line edit"));
     } else if (mode==OpenFile) {
         i=QIcon(":/lib/qfstyledbutton/openfile.png");
         i.addFile(":/lib/qfstyledbutton/openfile_disabled.png", QSize(), QIcon::Disabled);
         i.addFile(":/lib/qfstyledbutton/openfile_hover.png", QSize(), QIcon::Selected);
         i.addFile(":/lib/qfstyledbutton/openfile_pressed.png", QSize(), QIcon::Active);
+        setToolTip(tr("open file in line edit"));
     } else if (mode==ClearLineEdit) {
         i=QIcon(":/lib/qfstyledbutton/clear_edt.png");
         i.addFile(":/lib/qfstyledbutton/clear_edt_disabled.png", QSize(), QIcon::Disabled);
         i.addFile(":/lib/qfstyledbutton/clear_edt_hover.png", QSize(), QIcon::Selected);
         i.addFile(":/lib/qfstyledbutton/clear_edt_pressed.png", QSize(), QIcon::Active);
+        setToolTip(tr("clear line edits contents"));
+    } else if (mode==SelectFromCompleter) {
+        i=QIcon(":/lib/qfstyledbutton/complete_edt.png");
+        i.addFile(":/lib/qfstyledbutton/complete_edt_disabled.png", QSize(), QIcon::Disabled);
+        i.addFile(":/lib/qfstyledbutton/complete_edt_hover.png", QSize(), QIcon::Selected);
+        i.addFile(":/lib/qfstyledbutton/complete_edt_pressed.png", QSize(), QIcon::Active);
+        setToolTip(tr("select text from autocompleter"));
     }
 
     setIcon(i);

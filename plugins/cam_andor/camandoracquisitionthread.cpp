@@ -172,7 +172,12 @@ void CamAndorAcquisitionThread::run() {
             duration.start();
             QTime ttimer;
             ttimer.start();
-            while ((!canceled) && ok && (status==DRV_ACQUIRING)) {
+            QTime lastWritten;
+            lastWritten.start();
+            bool timedout=false;
+            int lastWrittenTimeout=10000;
+            int maxMissingFrames=20;
+            while ((!canceled) && ok && (status==DRV_ACQUIRING) && !timedout) {
                 selectCamera(m_camera);
                 CHECK_NO_RETURN_OK(ok, GetStatus(&status), tr("error while reading status"));
                 if (status==DRV_ACQUIRING) duration_msecs=duration.elapsed();
@@ -183,6 +188,7 @@ void CamAndorAcquisitionThread::run() {
                         raw->write((char*)imageBuffer, m_width*m_height*sizeof(uint16_t));
                     }
                     imageCount++;
+                    lastWritten.start();
                 }
                 if (m_numKinetics>1000) {
                     if (imageCount%(m_numKinetics/1000)==0) progress=100.0*(double)imageCount/(double)m_numKinetics;
@@ -193,6 +199,13 @@ void CamAndorAcquisitionThread::run() {
                     GetTemperatureF(&temperature);
                     ttimer.start();
                 }
+                timedout= (lastWritten.elapsed()>lastWrittenTimeout) && ((m_numKinetics-imageCount)<maxMissingFrames);
+            }
+
+            if (timedout) {
+                QString msg=tr("\n%1: tinyTIFF acquisition timed out ... acquired %2 of %3 frames with %4s timeout").arg(m_log_prefix).arg(imageCount).arg(m_numKinetics).arg(double(lastWrittenTimeout)/1000.0);
+                qDebug()<<msg;
+                emit log_warning(msg);
             }
 
             if (m_fileformat==0) {

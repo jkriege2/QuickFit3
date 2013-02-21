@@ -2,6 +2,7 @@
 #include "ui_qfespimb040imagestackconfigwidget2.h"
 
 
+#include "qfstyledbutton.h"
 #include "qfpluginservices.h"
 #include "qfstagecombobox.h"
 #include "qfextensionmanager.h"
@@ -11,6 +12,7 @@
 #include <QtCore>
 #include "qfespimb040opticssetup.h"
 #include "qfcompleterfromfile.h"
+#include "qfstyledbutton.h"
 
 #define STAGE_INTERVAL_MS 1313
 
@@ -62,6 +64,8 @@ QFESPIMB040ImageStackConfigWidget2::QFESPIMB040ImageStackConfigWidget2(QWidget* 
     c2->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/stack_prefix2.txt");
     ui->edtPrefix1->setCompleter(c1);
     ui->edtPrefix2->setCompleter(c2);
+    ui->edtPrefix1->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->edtPrefix1, ui->edtPrefix1));
+    ui->edtPrefix2->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->edtPrefix2, ui->edtPrefix2));
 
 
     ui->cmbStage->init(pluginServices->getExtensionManager());

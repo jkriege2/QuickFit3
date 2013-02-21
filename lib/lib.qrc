@@ -95,5 +95,9 @@
         <file alias="clear_edt_disabled.png">icons/clear_edt_disabled.png</file>
         <file alias="clear_edt_hover.png">icons/clear_edt_hover.png</file>
         <file alias="clear_edt_pressed.png">icons/clear_edt_pressed.png</file>
+        <file alias="complete_edt.png">icons/complete_edt.png</file>
+        <file alias="complete_edt_disabled.png">icons/complete_edt_disabled.png</file>
+        <file alias="complete_edt_hover.png">icons/complete_edt_hover.png</file>
+        <file alias="complete_edt_pressed.png">icons/complete_edt_pressed.png</file>
     </qresource>
 </RCC>

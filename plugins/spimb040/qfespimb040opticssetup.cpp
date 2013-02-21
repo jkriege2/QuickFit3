@@ -768,8 +768,8 @@ QFCameraConfigComboBoxStartResume* QFESPIMB040OpticsSetup::getStopRelease(int ca
     return NULL;
 }
 
-void QFESPIMB040OpticsSetup::setMainIlluminationShutter(bool opened, bool blocking) {
-    if (!isMainIlluminationShutterAvailable()) return;
+bool QFESPIMB040OpticsSetup::setMainIlluminationShutter(bool opened, bool blocking) {
+    if (!isMainIlluminationShutterAvailable()) return false;
 
     ui->shutterMainIllumination->setShutter(opened);
     if (!opened) ui->shutterTransmission->setShutter(false);
@@ -783,10 +783,13 @@ void QFESPIMB040OpticsSetup::setMainIlluminationShutter(bool opened, bool blocki
 
         if (t.elapsed()>=10000) {
             m_log->log_error("main shutter timed out after 10s!\n");
+            return false;
         }
+        return true;
     }
-
+    return true;
 }
+
 
 void QFESPIMB040OpticsSetup::setShutter(QFESPIMB040OpticsSetup::Shutters shutter, bool opened, bool blocking)
 {

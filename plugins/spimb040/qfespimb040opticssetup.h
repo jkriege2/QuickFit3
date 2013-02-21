@@ -171,7 +171,7 @@ class QFESPIMB040OpticsSetup : public QWidget {
 
 
         /** \brief set main illumination shutter state */
-        void setMainIlluminationShutter(bool opened, bool blocking=false);
+        bool setMainIlluminationShutter(bool opened, bool blocking=false);
         /** \brief return \c true, if the main acquisition shutter is available and functional */
         bool isMainIlluminationShutterAvailable();
         /** \brief get main illumination shutter state */

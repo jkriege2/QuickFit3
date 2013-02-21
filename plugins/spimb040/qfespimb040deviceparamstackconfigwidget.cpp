@@ -11,6 +11,7 @@
 #include "qfespimb040opticssetup.h"
 #include "qfcompleterfromfile.h"
 
+#include "qfstyledbutton.h"
 
 
 #define CAMPARAMSTACK_ERROR(message) \
@@ -37,6 +38,8 @@ QFESPIMB040DeviceParamStackConfigWidget::QFESPIMB040DeviceParamStackConfigWidget
     c2->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/deviceparamstack_prefix2.txt");
     ui->edtPrefix1->setCompleter(c1);
     ui->edtPrefix2->setCompleter(c2);
+    ui->edtPrefix1->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->edtPrefix1, ui->edtPrefix1));
+    ui->edtPrefix2->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->edtPrefix2, ui->edtPrefix2));
 
 
     if (stageConfig) {

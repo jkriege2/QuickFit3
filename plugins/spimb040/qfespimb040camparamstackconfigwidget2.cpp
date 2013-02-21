@@ -1,6 +1,7 @@
 #include "qfespimb040camparamstackconfigwidget2.h"
 #include "ui_qfespimb040camparamstackconfigwidget2.h"
 
+#include "qfstyledbutton.h"
 #include "qfpluginservices.h"
 #include "qfstagecombobox.h"
 #include "qfextensionmanager.h"
@@ -28,6 +29,8 @@ QFESPIMB040CamParamStackConfigWidget2::QFESPIMB040CamParamStackConfigWidget2(QWi
     c2->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/camparamstack_prefix2.txt");
     ui->edtPrefix1->setCompleter(c1);
     ui->edtPrefix2->setCompleter(c2);
+    ui->edtPrefix1->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->edtPrefix1, ui->edtPrefix1));
+    ui->edtPrefix2->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->edtPrefix2, ui->edtPrefix2));
 
     if (stageConfig) {
         ui->cmbCam1Settings->init(configDirectory);
