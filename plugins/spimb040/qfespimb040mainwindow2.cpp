@@ -702,7 +702,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                                 uint64_t timestampDummy=0;
                                 if (useCam1) {
                                     if (ecamera1->acquireOnCamera(camera1, buffer1, NULL, &acquisitionDescription1)) {
-                                        TIFFTWriteUint16from32(tiff1[lp], buffer1, width1, height1);
+                                        TIFFTWriteUint16from32(tiff1[lp], buffer1, width1, height1, false);
                                         TIFFWriteDirectory(tiff1[lp]);
                                     } else {
                                         ok=false;
@@ -712,7 +712,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
                                 //QApplication::processEvents();
                                 if (useCam2) {
                                     if (ecamera2->acquireOnCamera(camera2, buffer2, NULL, &acquisitionDescription2)) {
-                                        TIFFTWriteUint16from32(tiff2[lp], buffer2, width2, height2);
+                                        TIFFTWriteUint16from32(tiff2[lp], buffer2, width2, height2, false);
                                         TIFFWriteDirectory(tiff2[lp]);
                                     } else {
                                         ok=false;
@@ -1258,7 +1258,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
                             }
                             if (useCam1) {
                                 if (ecamera1->acquireOnCamera(camera1, buffer1)) {
-                                    TIFFTWriteUint16from32(tiff1, buffer1, width1, height1);
+                                    TIFFTWriteUint16from32(tiff1, buffer1, width1, height1, false);
                                     TIFFWriteDirectory(tiff1);
                                 } else {
                                     ok=false;
@@ -1268,7 +1268,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
                             //QApplication::processEvents();
                             if (useCam2) {
                                 if (ecamera2->acquireOnCamera(camera2, buffer2)) {
-                                    TIFFTWriteUint16from32(tiff2, buffer2, width2, height2);
+                                    TIFFTWriteUint16from32(tiff2, buffer2, width2, height2, false);
                                     TIFFWriteDirectory(tiff2);
                                 } else {
                                     ok=false;
@@ -1634,7 +1634,7 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
             if (!tiff) {
                 ok=false;
             } else {
-                TIFFTWriteUint16from32(tiff, buffer, width, height);
+                TIFFTWriteUint16from32(tiff, buffer, width, height, false);
                 TIFFClose(tiff);
             }
             bool is32bit=false;

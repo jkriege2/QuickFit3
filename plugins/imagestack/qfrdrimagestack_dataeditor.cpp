@@ -208,7 +208,7 @@ void QFRDRImageStackDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
     dataMode=QFRDRImageStackDataEditor::dmFullHistogram;
 
     player->setPosition(current->getProperty("imstack_invrimgdisp_playpos", 0).toInt());
-    cmbMaskColor->setCurrentColor(QStringToQColor(current->getProperty("imstack_invrimgdisp_maskcolor", "black").toString()));
+    cmbMaskColor->setCurrentColor(QStringToQColor(current->getProperty("imstack_invrimgdisp_maskcolor", "gray").toString()));
     connect(cmbImageStack, SIGNAL(currentIndexChanged(int)), this, SLOT(stackChanged()));
     connect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
     connect(cmbChannelMode, SIGNAL(currentIndexChanged(int)), this, SLOT(channelModeChanged()));
@@ -465,8 +465,8 @@ void QFRDRImageStackDataEditor::stackChanged() {
 
     }
     cmbChannelR->setCurrentIndex(current->getProperty("imstack_invrimgdisp_channelr", 0).toInt());
-    cmbChannelG->setCurrentIndex(current->getProperty("imstack_invrimgdisp_channelg", cmbChannelG->count()-1).toInt());
-    cmbChannelB->setCurrentIndex(current->getProperty("imstack_invrimgdisp_channelb", cmbChannelG->count()-1).toInt());
+    cmbChannelG->setCurrentIndex(current->getProperty("imstack_invrimgdisp_channelg", 1).toInt());
+    cmbChannelB->setCurrentIndex(current->getProperty("imstack_invrimgdisp_channelb", 2).toInt());
 
     connect(cmbChannelR, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     connect(cmbChannelG, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));

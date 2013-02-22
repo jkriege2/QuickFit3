@@ -354,17 +354,25 @@ void QFESPIMB040ImageStackConfigWidget2::updateLabel() {
     ui->labStage->setText(tr("scan end = %1 microns     scan length = %2 microns").arg(end).arg(end-start));
 
 
-    start=stackStart2();
-    delta=stackDelta2();
-    steps=stackCount2()-1;
-    end=start+delta*(double)steps;
-    ui->labStage2->setText(tr("scan end = %1 microns     scan length = %2 microns").arg(end).arg(end-start));
+    if (useStage2()) {
+        start=stackStart2();
+        delta=stackDelta2();
+        steps=stackCount2()-1;
+        end=start+delta*(double)steps;
+        ui->labStage2->setText(tr("scan end = %1 microns     scan length = %2 microns").arg(end).arg(end-start));
+    } else {
+        ui->labStage2->setText(tr("---"));
+    }
 
-    start=stackStart3();
-    delta=stackDelta3();
-    steps=stackCount3()-1;
-    end=start+delta*(double)steps;
-    ui->labStage3->setText(tr("scan end = %1 microns     scan length = %2 microns").arg(end).arg(end-start));
+    if (useStage3()) {
+        start=stackStart3();
+        delta=stackDelta3();
+        steps=stackCount3()-1;
+        end=start+delta*(double)steps;
+        ui->labStage3->setText(tr("scan end = %1 microns     scan length = %2 microns").arg(end).arg(end-start));
+    } else {
+        ui->labStage3->setText(tr("---"));
+    }
     setUpdatesEnabled(updt);
 }
 
@@ -522,7 +530,7 @@ int QFESPIMB040ImageStackConfigWidget2::stackCount2() const {
 }
 
 double QFESPIMB040ImageStackConfigWidget2::stackStart2() const {
-    if (ui->chkStackRelative->isChecked() && stage2() && stage2()->isConnected(currentAxisID2())) {
+    if (ui->chkStackRelative->isChecked() && useStage2() && stage2() && stage2()->isConnected(currentAxisID2())) {
         if (actGetCurrent2->isChecked()) {
             return stage2()->getPosition(currentAxisID2());
         } else {
@@ -541,7 +549,7 @@ void QFESPIMB040ImageStackConfigWidget2::actGetCurrent2_clicked() {
     if (ui->chkStackRelative->isChecked()) { lastGetC2=actGetCurrent2->isChecked(); updateLabel(); return; }
     //if (opticsSetup) opticsSetup->lockStages();
     if (stage2()!=NULL) {
-        if (stage2()->isConnected(currentAxisID2())) {
+        if (stage2()->isConnected(currentAxisID2()) && useStage2()) {
             ui->spinStart2->setValue(stage2()->getPosition(currentAxisID2()));
         }
     }
@@ -552,7 +560,7 @@ void QFESPIMB040ImageStackConfigWidget2::actGetCurrentAround2_clicked() {
     if (ui->chkStackRelative->isChecked()) { lastGetC2=actGetCurrent2->isChecked(); updateLabel(); return; }
     //if (opticsSetup) opticsSetup->lockStages();
     if (stage2()!=NULL) {
-        if (stage2()->isConnected(currentAxisID2())) {
+        if (stage2()->isConnected(currentAxisID2()) && useStage2()) {
             ui->spinStart2->setValue(stage2()->getPosition(currentAxisID2())-ui->spinDelta2->value()*(double)ui->spinSteps2->value()/2.0);
         }
     }
@@ -614,7 +622,7 @@ int QFESPIMB040ImageStackConfigWidget2::stackCount3() const {
 }
 
 double QFESPIMB040ImageStackConfigWidget2::stackStart3() const {
-    if (ui->chkStackRelative->isChecked() && stage3() && stage3()->isConnected(currentAxisID3())) {
+    if (ui->chkStackRelative->isChecked() && useStage3() && stage3() && stage3()->isConnected(currentAxisID3())) {
         if (actGetCurrent3->isChecked()) {
             return stage3()->getPosition(currentAxisID3());
         } else {
@@ -668,7 +676,7 @@ void QFESPIMB040ImageStackConfigWidget2::actGetCurrent3_clicked() {
     if (ui->chkStackRelative->isChecked()) { lastGetC2=actGetCurrent3->isChecked(); updateLabel(); return; }
     //if (opticsSetup) opticsSetup->lockStages();
     if (stage3()!=NULL) {
-        if (stage3()->isConnected(currentAxisID3())) {
+        if (stage3()->isConnected(currentAxisID3()) && useStage3()) {
             ui->spinStart3->setValue(stage3()->getPosition(currentAxisID3()));
         }
     }
@@ -680,7 +688,7 @@ void QFESPIMB040ImageStackConfigWidget2::actGetCurrentAround3_clicked() {
 
     //if (opticsSetup) opticsSetup->lockStages();
     if (stage3()!=NULL) {
-        if (stage3()->isConnected(currentAxisID3())) {
+        if (stage3()->isConnected(currentAxisID3()) && useStage3()) {
             ui->spinStart3->setValue(stage3()->getPosition(currentAxisID3())-ui->spinDelta3->value()*(double)ui->spinSteps3->value()/2.0);
         }
     }

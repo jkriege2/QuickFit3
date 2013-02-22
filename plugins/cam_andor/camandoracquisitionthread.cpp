@@ -199,7 +199,7 @@ void CamAndorAcquisitionThread::run() {
                     GetTemperatureF(&temperature);
                     ttimer.start();
                 }
-                timedout= (lastWritten.elapsed()>lastWrittenTimeout) && ((m_numKinetics-imageCount)<maxMissingFrames);
+                timedout= false; //(lastWritten.elapsed()>lastWrittenTimeout) && ((m_numKinetics-imageCount)<maxMissingFrames);
             }
 
             if (timedout) {

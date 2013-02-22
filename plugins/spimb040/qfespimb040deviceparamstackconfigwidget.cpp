@@ -649,7 +649,7 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                             }
                             if (useCam1) {
                                 if (ecamera1->acquireOnCamera(camera1, buffer1)) {
-                                    TIFFTWriteUint16from32(tiff1, buffer1, width1, height1);
+                                    TIFFTWriteUint16from32(tiff1, buffer1, width1, height1, false);
                                     TIFFWriteDirectory(tiff1);
                                 } else {
                                     ok=false;
@@ -659,7 +659,7 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                             //QApplication::processEvents();
                             if (useCam2) {
                                 if (ecamera2->acquireOnCamera(camera2, buffer2)) {
-                                    TIFFTWriteUint16from32(tiff2, buffer2, width2, height2);
+                                    TIFFTWriteUint16from32(tiff2, buffer2, width2, height2, false);
                                     TIFFWriteDirectory(tiff2);
                                 } else {
                                     ok=false;
