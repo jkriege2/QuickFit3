@@ -109,6 +109,6 @@ void QFESPIMB040ConfigTabWidget::reloadStylesheets(bool forSure)
         ui->cmbStylesheet->setUpdatesEnabled(true);
     }
 
-    QTimer::singleShot(120000, this, SLOT(reloadStylesheets())); // rescan directory every 2 minutes
+    //QTimer::singleShot(120000, this, SLOT(reloadStylesheets())); // rescan directory every 2 minutes
 }
 
