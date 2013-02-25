@@ -45,6 +45,7 @@
 #include "qfespimb040acquisitiondescription.h"
 #include "qfespimb040deviceparamstackconfigwidget.h"
 #include "qfespimb040scriptedacquisition.h"
+#include "qfespimb040configtabwidget.h"
 
 /*! \brief new SPIM Control Extension (B040, DKFZ Heidelberg) main window
     \ingroup qf3ext_spimb040
@@ -88,6 +89,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
         QFESPIMB040DeviceParamStackConfigWidget* widDeviceParamScan;
         QFESPIMB040AcquisitionDescription* widAcquisitionDescription;
         QFESPIMB040ScriptedAcquisition* widScriptedAcquisition;
+        QFESPIMB040ConfigTabWidget* widConfig;
 
 
         QTabWidget* tabMain;
@@ -215,6 +217,13 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
          *  \param message the error message to log
          */
         virtual void log_error(QString message);
+
+    protected slots:
+        void styleChanged(const QString& style, const QString& stylesheet);
+    private:
+        /** \brief loads the given style and stylesheet and sets the given widget to it */
+        void setStyleAndStylesheet(QWidget *widget, const QString &style, const QString &stylesheet);
+
 };
 
 #endif // QFESPIMB040MAINWINDOW2_H

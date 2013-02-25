@@ -71,6 +71,7 @@ void QFESPIMB040FilenameTool::setGlobalReplaces(QFESPIMB040OpticsSetup *setup, Q
         setReplaceValue("experimenter", cleanStringForFilename(exp->getExperimenter()));
     }
     if (acq) {
+        setReplaceValue("prefix", acq->getPrefix());
         setReplaceValue("cell", QString::number(acq->getCell()));
         setReplaceValue("cell00", QString("%1").arg(acq->getCell(), 2, 10, QChar('0')));
         setReplaceValue("cell000", QString("%1").arg(acq->getCell(), 3, 10, QChar('0')));

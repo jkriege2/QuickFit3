@@ -1,0 +1,31 @@
+ 
+QWidget {
+    background: #333;
+}
+
+QLineEdit {
+    background: #444;
+    padding: 1px;
+    border-style: solid;
+    border: 1px solid gray;
+    border-radius: 2px;
+}
+
+QLineEdit:enabled   {
+    background: #888;
+}
+
+QLineEdit:focus  {
+    border-color: cornflower;
+}
+
+QPushButton {
+    background: #444;
+    border-style: solid;
+    border: 1px solid gray;
+    border-radius: 3px;
+}
+
+QPushButton:float {
+    border-color: orange;
+}

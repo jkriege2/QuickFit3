@@ -49,7 +49,8 @@ HEADERS += spimb040.h \
     qfespimb040scriptedacquisition.h \
     qfespimb040scriptedacquisitiontools.h \
     replacedialog.h \
-    finddialog.h
+    finddialog.h \
+    qfespimb040configtabwidget.h
 
 SOURCES += spimb040.cpp \
            qfespimb040cameraview.cpp \
@@ -78,7 +79,8 @@ SOURCES += spimb040.cpp \
     qfespimb040scriptedacquisition.cpp \
     qfespimb040scriptedacquisitiontools.cpp \
     replacedialog.cpp \
-    finddialog.cpp
+    finddialog.cpp \
+    qfespimb040configtabwidget.cpp
 FORMS = \
     qfespimb040opticssetup.ui \
     qfespimb00histogrammaskdialog.ui \
@@ -93,7 +95,8 @@ FORMS = \
     qfespimb040deviceparamstackconfigwidget.ui \
     qfespimb040scriptedacquisition.ui \
     replacedialog.ui \
-    finddialog.ui
+    finddialog.ui \
+    qfespimb040configtabwidget.ui
 
 RESOURCES += spimb040.qrc
 
@@ -123,8 +126,14 @@ ASSETSScriptHELP_FILES.path =    $${QFOUTPUT}/assets/plugins/help/$${TARGET}/acq
 ASSETSScriptHELPPIC_FILES.files = ./help/acquisition_script/pic/*.*
 ASSETSScriptHELPPIC_FILES.path =    $${QFOUTPUT}/assets/plugins/help/$${TARGET}/acquisition_script/pic
 
+ASSETSSTYLESHEETS_FILES.files = ./assets/stylesheets/*.*
+ASSETSSTYLESHEETS_FILES.path =    $${QFOUTPUT}/assets/plugins/$${TARGET}/stylesheets
 
-INSTALLS += ASSETSScriptTemplates_FILES ASSETSScriptExamples_FILES ASSETSScriptHELP_FILES ASSETSScriptHELPPIC_FILES
+ASSETSSTYLESHEETSDO_FILES.files = ./assets/stylesheets/dark_orange/*.*
+ASSETSSTYLESHEETSDO_FILES.path =    $${QFOUTPUT}/assets/plugins/$${TARGET}/stylesheets/dark_orange
+
+
+INSTALLS += ASSETSScriptTemplates_FILES ASSETSScriptExamples_FILES ASSETSScriptHELP_FILES ASSETSScriptHELPPIC_FILES ASSETSSTYLESHEETS_FILES ASSETSSTYLESHEETSDO_FILES
 
 
 

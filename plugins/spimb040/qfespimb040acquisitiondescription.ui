@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>917</width>
-    <height>44</height>
+    <width>1275</width>
+    <height>73</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -34,81 +34,17 @@
      <property name="checkable">
       <bool>true</bool>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QGridLayout" name="gridLayout">
       <property name="topMargin">
-       <number>3</number>
+       <number>2</number>
       </property>
       <property name="bottomMargin">
-       <number>3</number>
+       <number>2</number>
       </property>
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>plate/experiment:</string>
-        </property>
-        <property name="buddy">
-         <cstring>spinPlate</cstring>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="spinPlate">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>9999</number>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>well:</string>
-        </property>
-        <property name="buddy">
-         <cstring>spinWell</cstring>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="spinWell">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>9999</number>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>sample/cell:</string>
-        </property>
-        <property name="buddy">
-         <cstring>spinCell</cstring>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="spinCell">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>9999</number>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnNextCell">
-        <property name="text">
-         <string>next cell</string>
-        </property>
-       </widget>
-      </item>
-      <item>
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <item row="1" column="7">
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>comment:</string>
@@ -118,20 +54,69 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QLineEdit" name="edtComment">
+      <item row="1" column="2">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>well:</string>
+        </property>
+        <property name="buddy">
+         <cstring>spinWell</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="11">
+       <widget class="QPushButton" name="btnClearAll">
+        <property name="text">
+         <string>reset</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="6">
+       <widget class="QPushButton" name="btnNextCell">
+        <property name="text">
+         <string>next cell</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="8">
+       <widget class="QEnhancedLineEdit" name="edtComment">
         <property name="placeholderText">
          <string>comment ...</string>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QLabel" name="label_5">
-        <property name="font">
-         <font>
-          <pointsize>7</pointsize>
-         </font>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>plate/experiment:</string>
         </property>
+        <property name="buddy">
+         <cstring>spinPlate</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>common prefix:</string>
+        </property>
+        <property name="buddy">
+         <cstring>spinPlate</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>sample/cell:</string>
+        </property>
+        <property name="buddy">
+         <cstring>spinCell</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="9">
+       <widget class="QLabel" name="label_5">
         <property name="text">
          <string>date/time:</string>
         </property>
@@ -140,7 +125,37 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="spinPlate">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QSpinBox" name="spinWell">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="5">
+       <widget class="QSpinBox" name="spinCell">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="10">
        <widget class="QDateTimeEdit" name="edtDateTime">
         <property name="font">
          <font>
@@ -152,10 +167,10 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QPushButton" name="btnClearAll">
-        <property name="text">
-         <string>reset</string>
+      <item row="0" column="1" colspan="11">
+       <widget class="QEnhancedLineEdit" name="edtPrefix">
+        <property name="placeholderText">
+         <string>prefix ...</string>
         </property>
        </widget>
       </item>
@@ -164,6 +179,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QEnhancedLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qenhancedlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

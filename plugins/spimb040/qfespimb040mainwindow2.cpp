@@ -21,6 +21,7 @@ QFESPIMB040MainWindow2::QFESPIMB040MainWindow2(QFPluginServices* pluginServices,
     widDeviceParamScan=NULL;
     widExperimentDescription=NULL;
     widAcquisition=NULL;
+    widConfig=NULL;
     optSetup=NULL;
     m_pluginServices=pluginServices;
     // create widgets and actions
@@ -44,6 +45,7 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     if (widAcquisition) widAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
     if (widCamParamScan) widCamParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
     if (widDeviceParamScan) widDeviceParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/deviceparamscan/");
+    if (widConfig) widConfig->loadSettings((*settings->getQSettings()), "plugin_spim_b040/config/");
 }
 
 void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
@@ -57,6 +59,7 @@ void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
     if (widAcquisition) widAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
     if (widCamParamScan) widCamParamScan->storeSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
     if (widDeviceParamScan) widDeviceParamScan->storeSettings((*settings->getQSettings()), "plugin_spim_b040/deviceparamscan/");
+    if (widConfig) widConfig->storeSettings((*settings->getQSettings()), "plugin_spim_b040/config/");
 
 }
 
@@ -180,6 +183,13 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
         tabMain->addTab(widScriptedAcquisition, tr("Scripted Acquisition"));
         //connect(optSetup, SIGNAL(lightpathesChanged(QFESPIMB040OpticsSetupItems)), widDeviceParamScan, SLOT(lightpathesChanged(QFESPIMB040OpticsSetupItems)));
 
+
+        //------------------------------------------------------------------------------------------
+        // create configuration tab
+        //------------------------------------------------------------------------------------------
+        widConfig=new QFESPIMB040ConfigTabWidget(this);
+        tabMain->addTab(widConfig, tr("&Configuration"));
+        connect(widConfig, SIGNAL(styleChanged(QString,QString)), this, SLOT(styleChanged(QString,QString)));
 
 
         optSetup->emitLighpathesChanged();
@@ -2322,7 +2332,25 @@ void QFESPIMB040MainWindow2::log_warning(QString message) {
 void QFESPIMB040MainWindow2::log_error(QString message) {
     logMain->log_error(message);
     //optSetup->log_error(message);
-};
+}
+
+void QFESPIMB040MainWindow2::setStyleAndStylesheet(QWidget* widget, const QString &style, const QString &stylesheet) {
+    widget->setStyle(QStyleFactory::create(style));
+    widget->setPalette(widget->style()->standardPalette());
+
+    QFile f(stylesheet);
+    f.open(QFile::ReadOnly);
+    QTextStream s(&f);
+    QString qss=s.readAll();
+    f.close();
+    widget->setStyleSheet(qss);
+
+}
+
+void QFESPIMB040MainWindow2::styleChanged(const QString &style, const QString &stylesheet)
+{
+    setStyleAndStylesheet(this, style, stylesheet);
+}
 
 bool QFESPIMB040MainWindow2::setMainIlluminationShutter(bool on_off, bool blocking) {
     /*if (optSetup->isMainIlluminationShutterAvailable()) {

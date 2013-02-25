@@ -68,7 +68,7 @@ void OptionsDialog::open(ProgramOptions* options) {
         QString s=sl[i];
         int idx=s.indexOf(".");
         if (cmbLanguage->findText(s.left(idx))<0) {
-            cmbLanguage->addItem(s.left(idx), Qt::CaseInsensitive);
+            cmbLanguage->addItem(s.left(idx));
         }
     }
     cmbLanguage->setCurrentIndex( cmbLanguage->findText(options->getLanguageID()));
@@ -89,7 +89,7 @@ void OptionsDialog::open(ProgramOptions* options) {
     cmbStylesheet->clear();
     sl=dir.entryList(filters, QDir::Files);
     for (int i=0; i<sl.size(); i++) {
-        cmbStylesheet->addItem(sl[i].remove(".qss"), Qt::CaseInsensitive);
+        cmbStylesheet->addItem(sl[i].remove(".qss", Qt::CaseInsensitive));
     }
     cmbStylesheet->setCurrentIndex( cmbStylesheet->findText(options->getStylesheet()));
 

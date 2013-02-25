@@ -26,6 +26,7 @@ class QFESPIMB040AcquisitionDescription : public QWidget
         int getWell() const;
         int getPlate() const;
         QString getComment() const;
+        QString getPrefix() const;
     protected slots:
         void on_btnClearAll_clicked();
         void on_btnNextCell_clicked();
