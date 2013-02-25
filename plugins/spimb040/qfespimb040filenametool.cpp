@@ -9,8 +9,10 @@ QFESPIMB040FilenameTool::QFESPIMB040FilenameTool()
 QString QFESPIMB040FilenameTool::transformFilename(const QString &filename) const
 {
     QString data=filename;
-    foreach(QString item, replaceValues.keys()) {
-        data=data.replace("%"+item+"%", replaceValues[item], Qt::CaseInsensitive);
+    for (int i=0; i<5; i++) {
+        foreach(QString item, replaceValues.keys()) {
+            data=data.replace("%"+item+"%", replaceValues[item], Qt::CaseInsensitive);
+        }
     }
     if (data.toLower().contains("%counter%")) {
         bool ok=false;
