@@ -228,6 +228,10 @@ void MainWindow::searchAndRegisterPlugins() {
 
     // init extensions
     extensionManager->init(this, this);
+
+    // init other plugins
+    evaluationFactory->init();
+    rawDataFactory->init();
 }
 
 void MainWindow::showLogMessage(const QString& message) {

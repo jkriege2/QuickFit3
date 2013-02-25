@@ -4,7 +4,7 @@
 #include "qfrdrtableeditor.h"
 #include "qfrdrploteditor.h"
 #include "qftools.h"
-
+#include "qfrdrtableparserfunctions.h"
 #define DEFAULT_EDITVAL double(0.0)
 
 QFRDRTable::GraphInfo::GraphInfo() {
@@ -123,6 +123,271 @@ QVariant QFRDRTable::getModelData(quint16 row, quint16 column) {
     return datamodel->data(datamodel->index(row, column), Qt::DisplayRole);
 }
 
+
+
+QVariant QFRDRTable::tableGetData(quint16 row, quint16 column) const
+{
+    if (datamodel) return datamodel->data(datamodel->index(row, column), Qt::DisplayRole);
+    else return QVariant();
+}
+
+void QFRDRTable::tableSetData(quint16 row, quint16 column, const QVariant &data) {
+    //qDebug()<<"tableSetData("<<row<<", "<<column<<",    "<<data<<")";
+    if (datamodel)  {
+        datamodel->setData(datamodel->index(row, column), data, Qt::EditRole);
+    }
+}
+
+void QFRDRTable::tableSetColumnTitle(quint16 column, const QString &data)
+{
+    //qDebug()<<"tableSetColumnTitle("<<column<<",    "<<data<<")";
+    if (datamodel)  {
+        datamodel->setColumnTitleCreate(column, data);
+    }
+
+
+}
+
+QString QFRDRTable::tableGetColumnTitle(quint16 column) const
+{
+    if (datamodel) return datamodel->getColumnTitles().value(column, "");
+    else return QString("");
+}
+
+bool QFRDRTable::tableSupportsExpressions() const
+{
+    return true;
+}
+
+void QFRDRTable::tableSetExpression(quint16 row, quint16 column, const QString &expression)
+{
+    if (datamodel)  {
+        datamodel->setData(datamodel->index(row, column), expression, QFRDRTable::TableExpressionRole);
+    }
+
+}
+
+QString QFRDRTable::tableGetExpression(quint16 row, quint16 column) const
+{
+    if (datamodel) return datamodel->data(datamodel->index(row, column), QFRDRTable::TableExpressionRole).toString();
+    else return QString("");
+}
+
+void QFRDRTable::tableReevaluateExpressions()
+{
+    QFRDRTable* m=this;
+    if (m) {
+        if (m->model()) {
+            m->model()->setReadonly(false);
+            QModelIndexList idxs;
+            for (int c=0; c<m->model()->columnCount(); c++) {
+                for (int r=0; r<m->model()->rowCount(); r++) {
+                    idxs<<m->model()->index(r, c);
+                }
+
+            }
+
+            m->model()->disableSignals();
+
+
+            bool ok=true;
+            jkMathParser mp; // instanciate
+            addQFRDRTableFunctions(&mp);
+            mp.addVariableDouble("row", 1);
+            mp.addVariableDouble("col", 1);
+            mp.addVariableDouble("column", 1);
+            mp.addVariableDouble("columns", 1.0);
+            mp.addVariableDouble("rows", 1.0);
+
+            QMap<QString, jkMathParser::jkmpNode*> nodes;
+            int changes=1;
+            int iterations=0;
+            int maxIterations=20;
+            while (iterations<maxIterations && changes>0) {
+                changes=0;
+                for (int i=0; i<idxs.size(); i++) {
+                    QString lexp=m->model()->cellUserRole(QFRDRTable::TableExpressionRole, idxs[i].row(), idxs[i].column()).toString();
+                    if (!lexp.isEmpty()) {
+                        QVariant ov=m->model()->cell(idxs[i].row(), idxs[i].column());
+                        //qDebug()<<"     reeval "<<lexp;
+                        if (!nodes.contains(lexp)) {
+                            try {
+                                nodes[lexp]=mp.parse(lexp.toStdString());
+                            } catch(std::exception& E) {
+                                //QMessageBox::critical(this, tr("QuickFit-table"), tr("An error occured while parsing the expression '%1':\n%2").arg(dlgMathExpression->getExpression()).arg(E.what()));
+                                ok=false;
+                            }
+                        }
+
+                        //qDebug()<<"     reeval "<<nodes[lexp]<<ok;
+                        ok=nodes[lexp];
+                        if (ok) {
+                            QVariant nv=evaluateExpression(mp, nodes[lexp], idxs[i], &ok, lexp, NULL);
+                            //qDebug()<<"     reeval("<<idxs[i].row()<<idxs[i].column()<<ov<<") <= "<<nv;
+                            if (ok && ov!=nv) {
+                                changes++;
+                                m->model()->setCellCreate(idxs[i].row(), idxs[i].column(), nv);
+                                m->model()->setCellUserRoleCreate(QFRDRTable::TableExpressionRole, idxs[i].row(), idxs[i].column(), lexp);
+                            }
+                        }
+                        if (!ok) break;
+                    }
+                }
+                if (!ok) break;
+                iterations++;
+                //qDebug()<<"** reeval: "<<iterations<<changes;
+            }
+            if (iterations>=maxIterations) {
+                //QMessageBox::critical(this, tr("QuickFit-table"), tr("Stopped reevaluating expressions after %1 iterations!\n  Changes were detected after %1 iterations, this might point to circular references in expression.\n  So results might not be reliable, rerun!").arg(maxIterations));
+            }
+
+            m->model()->enableSignals(true);
+        }
+    }
+}
+
+int QFRDRTable::tableGetColumnCount() const
+{
+    if (datamodel) return datamodel->columnCount();
+    return 0;
+}
+
+int QFRDRTable::tableGetRowCount() const
+{
+    if (datamodel) return datamodel->rowCount();
+    return 0;
+}
+
+void QFRDRTable::colgraphAddPlot(int graph, int columnX, int columnY, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        QFRDRTable::GraphInfo g;
+        g.xcolumn=columnX;
+        g.ycolumn=columnY;
+        switch (type) {
+        case QFRDRColumnGraphsInterface::cgtLines:
+            g.type=gtLines;
+            g.drawLine=true;
+            g.symbol=JKQTPnoSymbol;
+            break;
+        case QFRDRColumnGraphsInterface::cgtPoints:
+            g.type=gtLines;
+            g.drawLine=false;
+            break;
+        case QFRDRColumnGraphsInterface::cgtLinesPoints:
+            g.type=gtLines;
+            g.drawLine=true;
+            break;
+        }
+        g.title=title;
+        plt.graphs.append(g);
+
+        setPlot(graph, plt);
+    }
+}
+
+void QFRDRTable::colgraphAddErrorPlot(int graph, int columnX, int columnXError, int columnY, int columnYError, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title)
+{
+    if (graph>=0 && graph<plots.size()) {
+
+        colgraphAddPlot(graph, columnX, columnY, type, title);
+
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        plt.graphs.last().xerrorcolumn=columnXError;
+        plt.graphs.last().yerrorcolumn=columnYError;
+        setPlot(graph, plt);
+    }
+
+}
+
+void QFRDRTable::colgraphAddGraph(const QString &title, const QString &xLabel, const QString &yLabel, bool logX, bool logY)
+{
+    PlotInfo info;
+    info.title=title;
+    info.xlabel=xLabel;
+    info.ylabel=yLabel;
+    info.xlog=logX;
+    info.ylog=logY;
+    addPlot(info);
+}
+
+int QFRDRTable::colgraphGetPlotCount(int graph) const
+{
+    if (graph>=0 && graph<plots.size()) {
+        return plots[graph].graphs.size();
+    }
+    return 0;
+}
+
+int QFRDRTable::colgraphGetGraphCount() const
+{
+    return getPlotCount();
+}
+
+void QFRDRTable::colgraphRemoveGraph(int graph)
+{
+    deletePlot(graph);
+}
+
+void QFRDRTable::colgraphRemovePlot(int graph, int plot)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        plt.graphs.removeAt(plot);
+        setPlot(graph, plt);
+    }
+}
+
+void QFRDRTable::colgraphSetGraphProps(int graph, const QString &title)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        plt.title=title;
+        setPlot(graph, plt);
+    }
+}
+
+void QFRDRTable::colgraphSetGraphXAxisProps(int graph, const QString &xLabel, bool logX)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        plt.xlabel=xLabel;
+        plt.xlog=logX;
+        setPlot(graph, plt);
+    }
+
+}
+
+void QFRDRTable::colgraphSetGraphYAxisProps(int graph, const QString &yLabel, bool logY)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        plt.ylabel=yLabel;
+        plt.ylog=logY;
+        setPlot(graph, plt);
+    }
+}
+
+void QFRDRTable::colgraphsetXRange(int graph, double xmin, double xmax)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        plt.xmin=xmin;
+        plt.xmax=xmax;
+        setPlot(graph, plt);
+    }
+}
+
+void QFRDRTable::colgraphsetYRange(int graph, double xmin, double xmax)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        plt.ymin=xmin;
+        plt.ymax=xmax;
+        setPlot(graph, plt);
+    }}
+
 int QFRDRTable::getPlotCount() const
 {
     return plots.size();
@@ -169,6 +434,65 @@ void QFRDRTable::swapPlots(int i, int j)
         trawDataChanged();
     }
 }
+
+
+
+
+
+QVariant QFRDRTable::evaluateExpression(jkMathParser& mp, jkMathParser::jkmpNode *n, QModelIndex cell, bool* ok, const QString& expression, QString* error)
+{
+    QVariant result;
+    QFRDRTable* m=this;
+    int row = cell.row();
+    int column = cell.column();
+    if (m) {
+        try {
+            mp.addVariableDouble("row", cell.row()+1);
+            mp.addVariableDouble("col", cell.column()+1);
+            mp.addVariableDouble("column", cell.column()+1);
+            mp.addVariableDouble("rows", m->model()->rowCount());
+            mp.addVariableDouble("columns", m->model()->columnCount());
+
+            jkMathParserData d;
+            d.column=column;
+            d.row=row;
+            d.model=m->model();
+            mp.set_data(&d);
+
+            jkMathParser::jkmpResult r;
+            r=n->evaluate();
+
+
+            if (r.isValid) {
+                if (r.type==jkMathParser::jkmpBool) {
+                    result=QVariant(r.boolean);
+                } else if (r.type==jkMathParser::jkmpDouble) {
+                    if (QFFloatIsOK(r.num))
+                        result=QVariant(r.num);
+                    else
+                        result=QVariant();
+                } else if (r.type==jkMathParser::jkmpString) {
+                    result=QVariant(QString(r.str.c_str()));
+                } else {
+                    result=QVariant();
+                }
+            } else {
+                result=QVariant();
+            }
+
+            mp.set_data(NULL);
+        } catch(std::exception& E) {
+            if (*ok) *ok=false;
+           if (error) *error=tr("An error occured while parsing the expression '%1' in cell (row, column)=(%3, %4):\n%2\n\n\"OK\" will still go on evaluating\n\"Cancel\" will cancel evaluation for the rest of the cells.").arg(expression).arg(E.what()).arg(row).arg(column);
+           return QVariant();
+        }
+    }
+
+    if (*ok) *ok=true;
+    return result;
+}
+
+
 
 int QFRDRTable::getEditorCount()
 {
@@ -477,3 +801,4 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
     }
     w.writeEndElement();
 }
+

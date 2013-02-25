@@ -8,6 +8,9 @@
 #include "jkqtplotter.h"
 #include "jkqtptools.h"
 #include "qftools.h"
+#include "qfrdrtableinterface.h"
+#include "qfrdrcolumngraphsinterface.h"
+#include "jkmathparser.h"
 
 
 /*! \brief this class is used to manage a table of values (strings/numbers)
@@ -16,8 +19,9 @@
     The data is stored in a QFTablePluginModel object which is also externally accessible for data access.
  */
 
-class QFRDRTable : public QFRawDataRecord {
+class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QFRDRColumnGraphsInterface {
         Q_OBJECT
+        Q_INTERFACES(QFRDRTableInterface QFRDRColumnGraphsInterface)
     public:
         enum {
             TableExpressionRole = Qt::UserRole+1,
@@ -190,6 +194,42 @@ class QFRDRTable : public QFRawDataRecord {
         /** \brief returns the table contents at the given position */
         QVariant getModelData(quint16 row, quint16 column);
 
+
+        virtual QVariant tableGetData(quint16 row, quint16 column) const;
+        virtual void tableSetData(quint16 row, quint16 column, const QVariant& data);
+        virtual void tableSetColumnTitle( quint16 column, const QString& data);
+        virtual QString tableGetColumnTitle(quint16 column) const;
+        virtual bool tableSupportsExpressions() const;
+        virtual void tableSetExpression(quint16 row, quint16 column, const QString& expression=QString(""));
+        virtual QString tableGetExpression(quint16 row, quint16 column) const;
+        virtual void tableReevaluateExpressions();
+        virtual int tableGetColumnCount() const;
+        virtual int tableGetRowCount() const;
+
+
+
+
+
+
+
+        virtual void colgraphAddPlot(int graph, int columnX, int columnY, ColumnGraphTypes type, const QString&  title);
+        virtual void colgraphAddErrorPlot(int graph, int columnX, int columnXError, int columnY, int columnYError, ColumnGraphTypes type, const QString&  title);
+        virtual void colgraphAddGraph(const QString&  title, const QString& xLabel=QString("x"), const QString& yLabel=QString("y"), bool logX=false, bool logY=false);
+        virtual int colgraphGetPlotCount(int graph) const;
+        virtual int colgraphGetGraphCount() const;
+        virtual void colgraphRemoveGraph(int graph) ;
+        virtual void colgraphRemovePlot(int graph, int plot);
+        virtual void colgraphSetGraphProps(int graph, const QString&  title);
+        virtual void colgraphSetGraphXAxisProps(int graph, const QString& xLabel=QString("x"), bool logX=false);
+        virtual void colgraphSetGraphYAxisProps(int graph, const QString& yLabel=QString("y"), bool logY=false);
+        virtual void colgraphsetXRange(int graph, double xmin, double xmax);
+        virtual void colgraphsetYRange(int graph, double xmin, double xmax);
+
+
+
+
+
+
         int getPlotCount() const;
         PlotInfo getPlot(int i) const;
         void addPlot();
@@ -227,6 +267,8 @@ class QFRDRTable : public QFRawDataRecord {
         QString getExportDialogTitle() { return tr("Export Data Table ..."); };
         /** \brief returns the filetype of the Export file dialog */
         QString getExportDialogFiletypes() { return tr("Comma Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files [german Excel] (*.csv, *.txt);;SYLK File (*.sylk, *.slk)"); };
+
+        QVariant evaluateExpression(jkMathParser &mp, jkMathParser::jkmpNode *n, QModelIndex cell, bool *ok, const QString &expression, QString *error);
     protected slots:
         void tdataChanged( const QModelIndex & tl, const QModelIndex & br ) {
             emit rawDataChanged();
@@ -246,6 +288,7 @@ class QFRDRTable : public QFRawDataRecord {
         /** \brief stores a table of QVariants */
         QFTablePluginModel* datamodel;
         QList<PlotInfo> plots;
+
     private:
 };
 

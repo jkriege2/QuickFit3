@@ -36,6 +36,8 @@ class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase, publi
         */
         virtual void registerToMenu(QMenu* menu);
 
+        virtual void init();
+
         /** \brief short ID for the plugin */
         virtual QString getID() const  { return tr("imfcs_fit"); }
 
@@ -60,7 +62,7 @@ class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase, publi
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=1;
+            minor=2;
         }
 
         QString pluginOptionsName() const;
@@ -70,6 +72,10 @@ class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase, publi
         /** \brief insert FCS data from file*/
         void insertFCSFit();
         void insertFCSFitForCalibration();
+
+        void imFCSCalibrationTool1();
+        void imFCSCalibrationTool2();
+
 
     private:
 };

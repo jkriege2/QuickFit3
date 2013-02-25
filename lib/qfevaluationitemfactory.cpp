@@ -74,6 +74,13 @@ void QFEvaluationItemFactory::deinit() {
     }
 }
 
+void QFEvaluationItemFactory::init()
+{
+    for (int i=0; i<getIDList().size(); i++) {
+        items[getIDList().at(i)]->init();
+    }
+}
+
 int QFEvaluationItemFactory::getMajorVersion(QString id) {
     int ma, mi;
     if (items.contains(id)) {

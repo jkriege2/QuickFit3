@@ -10,6 +10,7 @@ ImFCSCalibrationDialog::ImFCSCalibrationDialog(QWidget *parent) :
     ui->setupUi(this);
     if (ProgramOptions::getInstance()) {
         ui->edtValues->setPlainText(ProgramOptions::getInstance()->getQSettings()->value("ImFCSCalibrationDialog/values", ui->edtValues->toPlainText()).toString());
+        ui->spinFocusHeight->setValue(ProgramOptions::getInstance()->getQSettings()->value("ImFCSCalibrationDialog/focusheight", ui->spinFocusHeight->value()).toDouble());
     }
 }
 
@@ -21,6 +22,7 @@ ImFCSCalibrationDialog::~ImFCSCalibrationDialog()
 void ImFCSCalibrationDialog::closeEvent(QCloseEvent *event) {
     if (ProgramOptions::getInstance()) {
         ProgramOptions::getInstance()->getQSettings()->setValue("ImFCSCalibrationDialog/values", ui->edtValues->toPlainText());
+        ProgramOptions::getInstance()->getQSettings()->setValue("ImFCSCalibrationDialog/focusheight", ui->spinFocusHeight->value());
 
     }
 }
@@ -39,4 +41,9 @@ QList<double> ImFCSCalibrationDialog::getValues() const {
         }
     }
     return vals;
+}
+
+double ImFCSCalibrationDialog::getFocusHeight() const
+{
+    return ui->spinFocusHeight->value();
 }

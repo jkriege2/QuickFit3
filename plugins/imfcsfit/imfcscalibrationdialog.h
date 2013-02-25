@@ -17,6 +17,7 @@ public:
     ~ImFCSCalibrationDialog();
 
     QList<double> getValues() const;
+    double getFocusHeight() const;
 protected:
     void closeEvent(QCloseEvent *event);
 private:

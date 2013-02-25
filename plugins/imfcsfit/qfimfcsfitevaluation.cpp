@@ -663,6 +663,14 @@ bool QFImFCSFitEvaluation::overrideFitFunctionPreset(QString paramid, double &va
             return true;
         }
     }
+    if (paramid=="diff_coeff1") {
+        if (propertyExists("PRESET_D1")) {
+            double D=getProperty("PRESET_D1", 0).toDouble();
+            if (D<=0) return false;
+            value=D;
+            return true;
+        }
+    }
     return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPreset(paramid, value);
 }
 

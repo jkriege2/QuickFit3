@@ -27,7 +27,9 @@ HEADERS += dlgcsvparameters.h \
     qfrdrtablehistogramdialog.h \
     qfrdrtableparserfunctions.h \
     ../base_classes/qffunctionreferencetool.h \
-    qfrdrtableenhancedtableview.h
+    qfrdrtableenhancedtableview.h \
+    ../interfaces/qfrdrtableinterface.h \
+    ../interfaces/qfrdrcolumngraphsinterface.h
 
 SOURCES += dlgcsvparameters.cpp \
            qfrdrtable.cpp \

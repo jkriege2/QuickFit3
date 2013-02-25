@@ -6,6 +6,7 @@
 #include <QtAlgorithms>
 #include "qfrdrtableparserfunctions.h"
 
+
 QFRDRTableEditor::QFRDRTableEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent):
     QFRawDataEditor(services, propEditor, parent)
 {
@@ -832,12 +833,20 @@ void QFRDRTableEditor::slClearExpression()
 
 QVariant QFRDRTableEditor::evaluateExpression(jkMathParser& mp, jkMathParser::jkmpNode *n, QModelIndex cell, bool* ok, const QString& expression)
 {
-    QVariant result;
+   QVariant result;
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     int row = cell.row();
     int column = cell.column();
     if (m) {
-        try {
+        QString error="";
+        bool rOK=true;
+        result=m->evaluateExpression(mp, n, cell, &rOK, expression, &error);
+        if (!rOK) {
+            *ok= QMessageBox::critical(this, tr("QuickFit-table"), error,
+                                      QMessageBox::Ok|QMessageBox::Cancel, QMessageBox::Ok)==QMessageBox::Ok;
+            return QVariant();
+        }
+/*         try {
             mp.addVariableDouble("row", cell.row()+1);
             mp.addVariableDouble("col", cell.column()+1);
             mp.addVariableDouble("column", cell.column()+1);
@@ -877,10 +886,12 @@ QVariant QFRDRTableEditor::evaluateExpression(jkMathParser& mp, jkMathParser::jk
                                      tr("An error occured while parsing the expression '%1' in cell (row, column)=(%3, %4):\n%2\n\n\"OK\" will still go on evaluating\n\"Cancel\" will cancel evaluation for the rest of the cells.").arg(expression).arg(E.what()).arg(row).arg(column),
                                         QMessageBox::Ok|QMessageBox::Cancel, QMessageBox::Ok)==QMessageBox::Ok;
            return QVariant();
-        }
+        }*/
     }
 
     return result;
+
+
 }
 
 void QFRDRTableEditor::editExpression(const QModelIndex &index)

@@ -54,6 +54,9 @@ class QFLIB_EXPORT QFEvaluationItemFactory : public QObject {
         /** \brief deinitialize all plugins */
         void deinit();
 
+        /** \brief initialize all plugins */
+        void init();
+
         /** \brief returns a list of the IDs of all available QFEvaluationItems. */
         QStringList getIDList();
 

@@ -52,6 +52,8 @@ class QFLIB_EXPORT QFRawDataRecordFactory : public QObject {
 
         /** \brief deinitialize all plugins */
         void deinit();
+        /** \brief deinitialize all plugins */
+        void init();
 
 
         /** \brief returns a list of the IDs of all available QFRawDataRecords. */

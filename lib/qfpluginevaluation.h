@@ -34,6 +34,9 @@ class QFPluginEvaluationItem: public QFPlugin {
         /** \brief deinit plugin, this function is guaranteed to be called once, before  */
         virtual void deinit()=0;
 
+        /** \brief init plugin, this function is guaranteed to be called once, before  */
+        virtual void init()=0;
+
 
         /** \brief set current project */
         virtual void setProject(QFProject* project)=0;
@@ -64,6 +67,8 @@ class QFLIB_EXPORT QFPluginEvaluationItemBase: public QFPluginEvaluationItem {
 
         /** \brief deinit plugin, this function is guaranteed to be called once, before  */
         virtual void deinit() {};
+        /** \brief init plugin, this function is guaranteed to be called once, before  */
+        virtual void init() {};
 
     protected:
         QFPluginServices* services;
