@@ -37,8 +37,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             gtFilledCurveY,
             gtStepsHorizontal,
             gtStepsVertical,
-            gtbarsHorizontal,
-            gtbarsVertical,
+            gtBarsHorizontal,
+            gtBarsVertical,
             gtImage,
             gtMaskImage,
             gtFunction
@@ -53,8 +53,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
                 case gtFilledCurveY: return QString("filledy");
                 case gtStepsHorizontal: return QString("stepsh");
                 case gtStepsVertical: return QString("stepsv");
-                case gtbarsHorizontal: return QString("barsh");
-                case gtbarsVertical: return QString("barsv");
+                case gtBarsHorizontal: return QString("barsh");
+                case gtBarsVertical: return QString("barsv");
                 case gtImage: return QString("image");
                 case gtMaskImage: return QString("maskimage");
                 case gtFunction: return QString("function");
@@ -71,8 +71,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
                 case gtFilledCurveY: return QIcon(":/table/icons/plot_yfilledcurve.png");
                 case gtStepsHorizontal: return QIcon(":/table/icons/plot_hsteps.png");
                 case gtStepsVertical: return QIcon(":/table/icons/plot_vsteps.png");
-                case gtbarsHorizontal: return QIcon(":/table/icons/plot_hbars.png");
-                case gtbarsVertical: return QIcon(":/table/icons/plot_vbars.png");
+                case gtBarsHorizontal: return QIcon(":/table/icons/plot_hbars.png");
+                case gtBarsVertical: return QIcon(":/table/icons/plot_vbars.png");
                 case gtImage: return QIcon(":/table/icons/plot_image.png");
                 case gtMaskImage: return QIcon(":/table/icons/plot_maskimage.png");
                 case gtFunction: return QIcon(":/table/icons/plot_function.png");
@@ -89,8 +89,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             if (s=="filledy") return gtFilledCurveY;
             if (s=="stepsh") return gtStepsHorizontal;
             if (s=="stepsv") return gtStepsVertical;
-            if (s=="barsh") return gtbarsHorizontal;
-            if (s=="barsv") return gtbarsVertical;
+            if (s=="barsh") return gtBarsHorizontal;
+            if (s=="barsv") return gtBarsVertical;
             if (s=="image") return gtImage;
             if (s=="maskimage") return gtMaskImage;
             if (s=="function") return gtFunction;
@@ -219,7 +219,10 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual int colgraphGetGraphCount() const;
         virtual void colgraphRemoveGraph(int graph) ;
         virtual void colgraphRemovePlot(int graph, int plot);
-        virtual void colgraphSetGraphProps(int graph, const QString&  title);
+        virtual void colgraphSetPlotColor(int graph,  int plot, QColor color);
+        virtual void colgraphSetPlotColor(int graph,  int plot, QColor  color, QColor  fillColor);
+        virtual void colgraphSetPlotColor(int graph,  int plot, QColor  color, QColor  fillColor, QColor errorColor);
+        virtual void colgraphSetGraphTitle(int graph, const QString&  title);
         virtual void colgraphSetGraphXAxisProps(int graph, const QString& xLabel=QString("x"), bool logX=false);
         virtual void colgraphSetGraphYAxisProps(int graph, const QString& yLabel=QString("y"), bool logY=false);
         virtual void colgraphsetXRange(int graph, double xmin, double xmax);
@@ -288,6 +291,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         /** \brief stores a table of QVariants */
         QFTablePluginModel* datamodel;
         QList<PlotInfo> plots;
+        QList<QColor> autocolors;
 
     private:
 };

@@ -204,10 +204,10 @@ void QFRDRTablePlotWidget::listGraphs_currentRowChanged(int currentRow) {
             case QFRDRTable::gtStepsHorizontal:
                 ui->cmbGraphType->setCurrentIndex(6);
                 break;
-            case QFRDRTable::gtbarsVertical:
+            case QFRDRTable::gtBarsVertical:
                 ui->cmbGraphType->setCurrentIndex(7);
                 break;
-            case QFRDRTable::gtbarsHorizontal:
+            case QFRDRTable::gtBarsHorizontal:
                 ui->cmbGraphType->setCurrentIndex(8);
                 break;
             case QFRDRTable::gtImage:
@@ -428,8 +428,8 @@ void QFRDRTablePlotWidget::graphDataChanged() {
                 case 4: graph.type=QFRDRTable::gtFilledCurveY; break;
                 case 5: graph.type=QFRDRTable::gtStepsVertical; break;
                 case 6: graph.type=QFRDRTable::gtStepsHorizontal; break;
-                case 7: graph.type=QFRDRTable::gtbarsVertical; break;
-                case 8: graph.type=QFRDRTable::gtbarsHorizontal; break;
+                case 7: graph.type=QFRDRTable::gtBarsVertical; break;
+                case 8: graph.type=QFRDRTable::gtBarsHorizontal; break;
                 case 9: graph.type=QFRDRTable::gtImage; break;
                 case 10: graph.type=QFRDRTable::gtMaskImage; break;
                 case 11: graph.type=QFRDRTable::gtFunction; break;
@@ -680,7 +680,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 //pg->set_fillColor(fc);
                 //pg->set_style(g.style);
                 ui->plotter->addGraph(pg);
-            } else if (g.type==QFRDRTable::gtbarsHorizontal) {
+            } else if (g.type==QFRDRTable::gtBarsHorizontal) {
                 JKQTPbarVerticalGraph* pg=new JKQTPbarVerticalGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
@@ -716,7 +716,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_fillColor(fc);
                 pg->set_style(g.style);
                 ui->plotter->addGraph(pg);
-            } else if (g.type==QFRDRTable::gtbarsVertical) {
+            } else if (g.type==QFRDRTable::gtBarsVertical) {
                 JKQTPbarHorizontalGraph* pg=new JKQTPbarHorizontalGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));

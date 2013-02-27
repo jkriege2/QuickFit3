@@ -1,9 +1,9 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file alias="qfe_helpeditor/qfehelpeditor.png">qfehelpeditor.png</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file alias="qfe_helpeditor/qfehelpeditor.png">qfehelpeditor.png</file>
+        <file>icons/insert_listitem.png</file>
+    </qresource>
     <qresource prefix="/qfe_helpeditor">
-
         <file alias="script_copy.png">icons/script_copy.png</file>
         <file alias="script_cut.png">icons/script_cut.png</file>
         <file alias="script_new.png">icons/script_new.png</file>
@@ -22,6 +22,35 @@
         <file alias="script_selectall.png">icons/script_edit-select-all.png</file>
         <file alias="script_unindent.png">icons/script_format-indent-less.png</file>
         <file alias="script_indent.png">icons/script_format-indent-more.png</file>
-        </qresource>
-
+        <file>icons/format_indent_less.png</file>
+        <file>icons/format_indent_more.png</file>
+        <file>icons/format_justify_center.png</file>
+        <file>icons/format_justify_fill.png</file>
+        <file>icons/format_justify_left.png</file>
+        <file>icons/format_justify_right.png</file>
+        <file>icons/format_line_spacing_double.png</file>
+        <file>icons/format_line_spacing_normal.png</file>
+        <file>icons/format_line_spacing_triple.png</file>
+        <file>icons/format_list_ordered.png</file>
+        <file>icons/format_list_unordered.png</file>
+        <file>icons/format_text_bold.png</file>
+        <file>icons/format_text_italic.png</file>
+        <file>icons/format_text_strikethrough.png</file>
+        <file>icons/format_text_subscript.png</file>
+        <file>icons/format_text_superscript.png</file>
+        <file>icons/format_text_underline.png</file>
+        <file>icons/frame_image.png</file>
+        <file>icons/insert_anchor.png</file>
+        <file>icons/insert_image.png</file>
+        <file>icons/insert_table.png</file>
+        <file>icons/insert_weblink.png</file>
+        <file>icons/note2.png</file>
+        <file>icons/insert_h1.png</file>
+        <file>icons/insert_h2.png</file>
+        <file>icons/insert_h3.png</file>
+        <file>icons/insert_h4.png</file>
+        <file>icons/insert_paragraph.png</file>
+        <file>icons/insert_listitem.png</file>
+        <file>icons/paste_image.png</file>
+    </qresource>
 </RCC>

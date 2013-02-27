@@ -76,6 +76,14 @@
       - go back to top bar:    
          - \c $$qf_commondoc_backtop$$ displays a blue bar with an upward arrow that allows to jump back to the top of the page
         .
+	  - literature reference tags:	
+         - \c $$ref:ID:REFERENCE TEXT$$ will be relaced by a bracketed reference number [2] that links to the references list, introduced by $$references$$ into the document. Both parameters are strictly optional: If ID is missing the reference is single, if REFERENCE TEXT is missing, but an already defined ID is present, the ref will link to the specified (and predefined) reference.
+         - \c $$invisibleref:ID:REFERENCE TEXT$$ works like above, but no bracketed number is introduced. The referenced literature will still be introduced into the referneces list.
+		 .
+	  - List of used references:
+         - \c $$references$$ will introduce a list of references into the document.
+		 .
+	  
     .  
     In the default header some of the metadata from the HTML page are used to display buttons to go to the next, previous and contents page:
     \code

@@ -11,11 +11,18 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Scripted Acquisition</string>
+   <string>Online-Help Editor</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../../lib/lib.qrc">
+    <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>3</number>
+     </property>
      <item>
       <widget class="QToolButton" name="btnNew">
        <property name="toolTip">
@@ -66,20 +73,6 @@
        <property name="icon">
         <iconset resource="qfehelpeditor.qrc">
          <normaloff>:/qfe_helpeditor/script_print.png</normaloff>:/qfe_helpeditor/script_print.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnSyntaxCheck">
-       <property name="toolTip">
-        <string>perform syntax check for current script</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="qfehelpeditor.qrc">
-         <normaloff>:/qfe_helpeditor/script_syntaxcheck.png</normaloff>:/qfe_helpeditor/script_syntaxcheck.png</iconset>
        </property>
       </widget>
      </item>
@@ -203,6 +196,250 @@
         <string/>
        </property>
       </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <property name="spacing">
+      <number>1</number>
+     </property>
+     <item>
+      <widget class="QToolButton" name="btnBold">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>bold</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/format_text_bold.png</normaloff>:/qfe_helpeditor/icons/format_text_bold.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnItalic">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>itailc</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/format_text_italic.png</normaloff>:/qfe_helpeditor/icons/format_text_italic.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnUnderline">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>underline</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/format_text_underline.png</normaloff>:/qfe_helpeditor/icons/format_text_underline.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnImage">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert image</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/insert_image.png</normaloff>:/qfe_helpeditor/icons/insert_image.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnPasteImage">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert image</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/paste_image.png</normaloff>:/qfe_helpeditor/icons/paste_image.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnAnchor">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert anchor</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/insert_anchor.png</normaloff>:/qfe_helpeditor/icons/insert_anchor.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnLink">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert link</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/insert_weblink.png</normaloff>:/qfe_helpeditor/icons/insert_weblink.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnBlockquote">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert blockquote</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/format_indent_more.png</normaloff>:/qfe_helpeditor/icons/format_indent_more.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnNumberedList">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert numbered list</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/format_list_ordered.png</normaloff>:/qfe_helpeditor/icons/format_list_ordered.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnBulletList">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert bullet list</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/format_list_unordered.png</normaloff>:/qfe_helpeditor/icons/format_list_unordered.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnInsertListItem">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert new list item</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/insert_listitem.png</normaloff>:/qfe_helpeditor/icons/insert_listitem.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnInsertH1">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert header, level 1</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/insert_h1.png</normaloff>:/qfe_helpeditor/icons/insert_h1.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnInsertH2">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert header, level 2</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/insert_h2.png</normaloff>:/qfe_helpeditor/icons/insert_h2.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnInsertH3">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert header, level 3</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/insert_h3.png</normaloff>:/qfe_helpeditor/icons/insert_h3.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnInsertH4">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert header, level 4</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/insert_h4.png</normaloff>:/qfe_helpeditor/icons/insert_h4.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnInsertParagraph">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert new paragraph</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/insert_paragraph.png</normaloff>:/qfe_helpeditor/icons/insert_paragraph.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>

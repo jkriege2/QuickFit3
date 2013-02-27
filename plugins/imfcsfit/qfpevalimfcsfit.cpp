@@ -227,7 +227,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool1()
             graph->colgraphAddGraph("title");
             i++;
         }
-        graph->colgraphSetGraphProps(0, tr("pixel size vs. diffusion coefficient"));
+        graph->colgraphSetGraphTitle(0, tr("pixel size vs. diffusion coefficient"));
         graph->colgraphSetGraphXAxisProps(0, tr("pixel size [nm]"));
         graph->colgraphSetGraphYAxisProps(0, tr("diffusion coefficient [µm²/s]"));
         while (graph->colgraphGetPlotCount(0)>0){
@@ -365,7 +365,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
                 }
                 if (graph) {
                     graph->colgraphAddGraph(tr("pixel size vs. lat. focus size"));
-                    graph->colgraphSetGraphProps(1, tr("pixel size vs. lat. focus size"));
+                    graph->colgraphSetGraphTitle(1, tr("pixel size vs. lat. focus size"));
                     graph->colgraphSetGraphXAxisProps(1, tr("pixel size [nm]"));
                     graph->colgraphSetGraphYAxisProps(1, tr("lateral focus size w_{xy} [nm]"));
                     graph->colgraphAddErrorPlot(1, cols, -1, cols+1, cols+2, QFRDRColumnGraphsInterface::cgtLinesPoints, tr("calibration D=%1µm²/s").arg(Dcalib));

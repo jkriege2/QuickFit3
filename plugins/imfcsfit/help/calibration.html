@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>ImFCS Calibration</title>
+  </head>
+  <body>
+    $$invisibleref:Bag2012:N. Bag, J. Sankaran, A. Paul, R. S. Kraut, and T. Wohland (2012): <b>"Calibration and limits of camera-based fluorescence correlation spectroscopy: a supported lipid bilayer study."</b> <i>Chemphyschem</i> 13, 2784-94$$
+    $$invisibleref:singh2013:Anand Pratap Singh, Jan Wolfgang Kriege, Jan Buchholz, Edoardo Charbon, J&ouml;rg Langowski, Thorsten Wohland (2013): <b>The performance of 2D array detectors for light sheet based fluorescence correlation spectroscopy</b>, <i>Optics Express, submitted</i>$$
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$  
+     
+     <h2>Introduction</h2>
+    <p>In typical imFCS settings (e.g. using a Selective Plane Illumination Microscope, SPIM or a Total Internal Reflection Microscope, TIRF), the focus size is described by the Molecular Detection Function (MDF), which is in turn determined by three variables:
+     <ul>
+       <li>The axial PSF extent $$math:\sigma_z$$ or $$math:w_z$$, which has to be measured independently, e.g. by a bead scan.</li>
+       <li>The pixel size $$math:a$$ which is determined by the size of the detector pixels and the magnification of the microscope and thus very well known.</li>
+       <li>The lateral PSF size $$math:\sigma_{xy}$$ or $$math:w_{xy}$$, which is determined by this calibration </li>
+     </ul>
+     With these variables the Molecular Detection Function (MDF) can be written as a convolution of the rectangular pixel with the PSF (parameterized by $$math:w_z$$ and $$math:w_{xy}$$):
+      $$bmath:MDF(x,y,z)=Pixel(x,y,z)\ast PSF(x,y,z)=\int_{-a/2}^{a/2}\int_{-a/2}^{a/2} PSF(x-\xi, y-\mu, z)\;d\xi d\mu$$
+     The actual form of the PSF (gaussian, gaussian beam, ...) is another question, but the above definition holds for all rectangular detectors. Still: Usually the PSF is assumed to be a 3D gaussian, as then the FCS correlation curves can usually be written in a closed form.</p>
+     
+     <p>After predetermining $$math:w_z$$, we can then use the known pixel size to determine $$math:w_{xy}$$. This method is described in $$ref:Bag2012:$$ and $$ref:singh2013:$$ and works as follows:
+     
+    <ol>
+        <li>ACF curves are created for increasing pixel-binnings, i.e. increasing pixels sizes $$math:a$$. </li>
+        <li>For each binning a diffusion coefficient $$math:D_a$$ is determined from a fit. For $$math:a\gg w_{xy}$$ the measured diffusion coefficient should get independent of $$math:w_{xy}$$, as the pixel size $$math:a$$ dominates the MDF size. So the diffusion coefficient measured at very high binnings can be assumed to be the true diffusion coefficient (if $$math:a$$ and $$mathw_z$$ are known with good accuracy).</li>
+        <li>Finally $$math:w_{xy}$$ can be determined from a fit with the diffusion coefficient fixed to the value determined in step 2.</li>
+    </ol>
+    In order to determine the true diffusion coefficient in step 2, we need an estimate for $$math:w_{xy}$$, as this is a parameter of the model function for the ACF. As this measure is not known, one tries several different values for $$math:w_{xy}$$. The typically results as these are obtained:
+    <center>
+	<a name="calibration_pic000"><img src="./pic/calibration_pic000.png" border="1">
+</center>
+  Then one can get the $$math:D$$ for the final fit by averaging over the results at large $$math:a$$. The final fit with $$math:D$$ fixed and $$math:w_{xy}$$ a free parameter then typically resembles a result like this:
+<center>
+	<a name="calibration_pic001"><img src="./pic/calibration_pic001.png" border="1">
+</center>
+  The $$math:w_{xy}$$ value at the smalles binning, or an average over all values can be used as final calibration value.
+     </p>
+     <p>The rest of this pages describes a step-by-step instruction to perform an imFCS calibration.</p>
+ 
+     
+
+<h2>Step-by-Step Instructions</h2>
+    
+     <h3>Acquiring Data</h3>
+     <p>First perform a measurement of the calibration sample, e.g. 0.5nM fluorescent latex spheres (diameter 100nm) in water with your microscope. Also determine the axial PSF-size$$math:w_z$$,  e.g. by a bead scan.</p>
+     <h3>Image Series Correlation</h3>
+     <p>Then create an empty project and use the <a href="../imaging_fcs/imfcs_usage.html#correlating">imFCS correlation tool</a> to calculate the ACFs of the acquired image series for different binnings. In this tool the "Add Series" button allows to add several binnings with one click. Finally return to your QuickFit project and check the imported data. If everything is fine (good curves, few outliers, mask the outliers, ...) you may proceed with the next step.</p>
+     <h3>Calibration</h3>
+     <p>
+      <ol>
+         <li>Now you'll have to add imFCS fit objects that fits $$math:D(a, w_{xy})$$: Use <code>Data Items|Insert Evaluation| imagingFCS Calibration</code> and enter a seires of test-$$math:w_{xy}$$ values surrounding the expected $$math:w_{xy}$$ value (e.g. if we expect $$math:w_{xy}\approx 300nm$$, you could use $$math:w_{xy}= 150nm, 200nm, 250nm, 300nm, 350nm, 400nm, 450nm$$. Also enter the value of $$math:w_z$$ you determined before. Then a click on "OK" will create one imFCS fit object for each $$math:w_{xy}$$ you entered. Now you'll have to fit every run/pixel in each of these fit evaluations. Check in each that a proper model is selected and $$math:w_{xy}$$ and $$math:a$$ are set properly and fixed.</li>
+         <li>Now you can use <code>Tools|imagingFCS Calibration Tool|1 Collect D data</code> to create <a href="#calibration_pic000">the plot</a> of  $$math:D(a, w_{xy})$$. The plot will be inserted as <a href="../qfrdrtable/table.html">table object</a> with an associated plot. The tool will then give you the possibility to select a binning at which to take the average $$math:D$$ for the final fit and insert an object for the final $$math:w_{xy}$$-fit.</li>
+         <li>Now you need to open the fit object created at the end of the last step and make sure that $$math:D, a$$ are fixed and $$math:w_{xy}$$ is free. Then fit all runs/pixels again. A final click on <code>Tools|imagingFCS Calibration Tool|2 Collect wxy data</code> will then create the <a href="#calibration_pic001">second plot</a> and add it and its data to the table object created above. From this object you can then read the calibrated $$math_w_{xy}$$.</li>
+      </ol>
+      </p>
+      <p>The two tools used above will scan the currently opened project and find those evaluation objects and raw data records used for the calibration. Tool 1 (step 2) extracts the average and standard deviation of the $$math:D$$ extracted from the fit. It also leaves out masked pixels! To offer a list of binnings to choose from the true $$math:D$$ it then averages the $$math:D$$ resulting from the fits at different binnings. The second tool averages over the $$math:w_{xy}$$ obtained from the last fits. It also ignores the masked pixels.
+      </p>
+     <h2>Reference</h2>
+     $$references$$
+  </body>
+</html>

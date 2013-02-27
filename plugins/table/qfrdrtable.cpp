@@ -93,6 +93,24 @@ QFRDRTable::QFRDRTable(QFProject* parent/*, QString name, QString inputFile*/):
     QFRawDataRecord(parent)//, name, QStringList(inputFile))
 {
     datamodel=NULL;
+    autocolors.append(QColor("red"));
+    autocolors.append(QColor("green"));
+    autocolors.append(QColor("blue"));
+    autocolors.append(QColor("magenta"));
+    autocolors.append(QColor("darkcyan"));
+    autocolors.append(QColor("darkred"));
+    autocolors.append(QColor("darkgreen"));
+    autocolors.append(QColor("darkblue"));
+    autocolors.append(QColor("darkmagenta"));
+    autocolors.append(QColor("fuchsia"));
+    autocolors.append(QColor("darkorange"));
+    autocolors.append(QColor("firebrick"));
+    autocolors.append(QColor("darkgreen"));
+    autocolors.append(QColor("darkslateblue"));
+    autocolors.append(QColor("maroon"));
+    autocolors.append(QColor("indianred"));
+    autocolors.append(QColor("darkolivegreen"));
+    autocolors.append(QColor("mediumpurple"));
 }
 
 
@@ -265,20 +283,32 @@ void QFRDRTable::colgraphAddPlot(int graph, int columnX, int columnY, QFRDRColum
         QFRDRTable::GraphInfo g;
         g.xcolumn=columnX;
         g.ycolumn=columnY;
+        g.color=autocolors.value((plt.graphs.size()-1)%autocolors.size(), QColor("red"));
+        g.errorColor=g.color.darker();
+        g.fillColor=g.color.lighter();
         switch (type) {
-        case QFRDRColumnGraphsInterface::cgtLines:
-            g.type=gtLines;
-            g.drawLine=true;
-            g.symbol=JKQTPnoSymbol;
-            break;
-        case QFRDRColumnGraphsInterface::cgtPoints:
-            g.type=gtLines;
-            g.drawLine=false;
-            break;
-        case QFRDRColumnGraphsInterface::cgtLinesPoints:
-            g.type=gtLines;
-            g.drawLine=true;
-            break;
+            case QFRDRColumnGraphsInterface::cgtLines:
+                g.type=gtLines;
+                g.drawLine=true;
+                g.symbol=JKQTPnoSymbol;
+                break;
+            case QFRDRColumnGraphsInterface::cgtPoints:
+                g.type=gtLines;
+                g.drawLine=false;
+                break;
+            case QFRDRColumnGraphsInterface::cgtLinesPoints:
+                g.type=gtLines;
+                g.drawLine=true;
+                break;
+            case QFRDRColumnGraphsInterface::cgtBars:
+                g.type=gtBarsVertical;
+                break;
+            case QFRDRColumnGraphsInterface::cgtSteps:
+                g.type=gtStepsVertical;
+                break;
+            case QFRDRColumnGraphsInterface::cgtImpulses:
+                g.type=gtImpulsesVertical;
+                break;
         }
         g.title=title;
         plt.graphs.append(g);
@@ -339,7 +369,49 @@ void QFRDRTable::colgraphRemovePlot(int graph, int plot)
     }
 }
 
-void QFRDRTable::colgraphSetGraphProps(int graph, const QString &title)
+void QFRDRTable::colgraphSetPlotColor(int graph, int plot, QColor color)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            plt.graphs[plot].color=color;
+            plt.graphs[plot].errorColor=plt.graphs[plot].color.darker();
+            plt.graphs[plot].fillColor=plt.graphs[plot].color.lighter();
+        }
+        plt.graphs[plot];
+        setPlot(graph, plt);
+    }
+}
+
+void QFRDRTable::colgraphSetPlotColor(int graph, int plot, QColor color, QColor fillColor)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            plt.graphs[plot].color=color;
+            plt.graphs[plot].errorColor=plt.graphs[plot].color.darker();
+            plt.graphs[plot].fillColor=fillColor;
+        }
+        plt.graphs[plot];
+        setPlot(graph, plt);
+    }
+}
+
+void QFRDRTable::colgraphSetPlotColor(int graph, int plot, QColor color, QColor fillColor, QColor errorColor)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            plt.graphs[plot].color=color;
+            plt.graphs[plot].errorColor=errorColor;
+            plt.graphs[plot].fillColor=fillColor;
+        }
+        plt.graphs[plot];
+        setPlot(graph, plt);
+    }
+}
+
+void QFRDRTable::colgraphSetGraphTitle(int graph, const QString &title)
 {
     if (graph>=0 && graph<plots.size()) {
         QFRDRTable::PlotInfo plt=getPlot(graph);
@@ -347,6 +419,7 @@ void QFRDRTable::colgraphSetGraphProps(int graph, const QString &title)
         setPlot(graph, plt);
     }
 }
+
 
 void QFRDRTable::colgraphSetGraphXAxisProps(int graph, const QString &xLabel, bool logX)
 {

@@ -265,89 +265,11 @@ void QFHTMLHelpWindow::writeSettings(QSettings& settings, QString prefix) {
      saveSplitter(settings, splitterSearch, prefix);
 }
 
-/*void QFHTMLHelpWindow::updateHelp(QString title, QString filename1) {
-    QString filename=filename1;
-    QString fragment="";
-    int hashpos=filename1.indexOf("#");
-    if (hashpos>=0) {
-        filename=filename1.left(hashpos);
-        fragment=filename1.mid(hashpos);
-    }
-    //qDebug()<<filename<<fragment;
-
-    m_home=filename;
-    searchPath=QFileInfo(filename).canonicalPath();
-    //std::cout<<"updateHelp("<<filename.toStdString()<<")   sp="<<searchPath.toStdString()<<"  src="<<QFileInfo(filename).fileName().toStdString()<<"\n";
-    disconnect(descriptionBrowser, SIGNAL(textChanged()), this, SLOT(displayTitle()));
-    labelTitle->setFont(m_titleFont);
-    labelTitle->setText(title);
-    actHome->setText(tr("&Home: '%1'").arg(title));
-    labelTitle->setVisible(!title.isEmpty());
-    descriptionBrowser->setOpenLinks(false);
-    descriptionBrowser->setOpenExternalLinks(true);
-    descriptionBrowser->setSearchPaths(QStringList(searchPath)<<"./");
-    descriptionBrowser->setFrameShape(QFrame::Box);
-    descriptionBrowser->setReadOnly(true);
-    descriptionBrowser->clearHistory();
-    history.clear();
-    history_idx=0;
-    history.append(HistoryEntry(filename, title));
-    updateButtons();
-    //history.clear();
-    descriptionBrowser->setHtml(loadHTML(QFileInfo(filename).absoluteFilePath()));
-    if (!fragment.isEmpty()) {
-        descriptionBrowser->scrollToAnchor(fragment);
-    }
-
-
-    //descriptionBrowser->setSource(QFileInfo(filename).fileName());
-    //descriptionBrowser->reload();
-    connect(descriptionBrowser, SIGNAL(textChanged()), this, SLOT(displayTitle()));
-}*/
 
 
 void QFHTMLHelpWindow::updateHelp(QString filename1) {
     anchorClicked(filename1);
 
-    /*QString filename=filename1;
-    QString fragment="";
-    int hashpos=filename1.indexOf("#");
-    if (hashpos>=0) {
-        filename=filename1.left(hashpos);
-        fragment=filename1.mid(hashpos);
-    }
-    //qDebug()<<filename<<fragment;
-
-    m_home=filename;
-    searchPath=QFileInfo(filename).canonicalPath();
-    //qDebug()<<searchPath;
-    //std::cout<<"updateHelp("<<filename.toStdString()<<")   sp="<<searchPath.toStdString()<<"  src="<<QFileInfo(filename).fileName().toStdString()<<"\n";
-    disconnect(descriptionBrowser, SIGNAL(textChanged()), this, SLOT(displayTitle()));
-    descriptionBrowser->setOpenLinks(false);
-    descriptionBrowser->setOpenExternalLinks(true);
-    descriptionBrowser->setSearchPaths(QStringList(searchPath)<<"./");
-    descriptionBrowser->setFrameShape(QFrame::Box);
-    descriptionBrowser->setReadOnly(true);
-    //descriptionBrowser->setSource(QFileInfo(filename).fileName());
-    //descriptionBrowser->reload();
-    descriptionBrowser->setHtml(loadHTML(QFileInfo(filename).absoluteFilePath()));
-
-    descriptionBrowser->clearHistory();
-    history.clear();
-    history_idx=0;
-    history.append(HistoryEntry(filename, descriptionBrowser->documentTitle()));
-    updateButtons();
-
-    QString title=descriptionBrowser->documentTitle();
-    labelTitle->setFont(m_titleFont);
-    labelTitle->setText(title);
-    actHome->setText(tr("&Home: '%1'").arg(title));
-    labelTitle->setVisible(!title.isEmpty());
-    if (!fragment.isEmpty()) {
-        descriptionBrowser->scrollToAnchor(QString("#")+fragment);
-    }
-
-    connect(descriptionBrowser, SIGNAL(textChanged()), this, SLOT(displayTitle()));*/
 }
 
 void QFHTMLHelpWindow::clear() {
@@ -373,17 +295,11 @@ void QFHTMLHelpWindow::displayTitle() {
     QString title=descriptionBrowser->documentTitle();
     labelTitle->setFont(m_titleFont);
     labelTitle->setText(title);
-    //actHome->setText(tr("&Home: '%1'").arg(title));
     labelTitle->setVisible(!title.isEmpty());
     updateButtons();
-    //QStringList sp;
-    //std::cout<<descriptionBrowser->source().toString().toStdString()<<std::endl;
-    //descriptionBrowser->setSearchPaths(sp);
 }
 
 void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
-    //std::cout<<"scheme = "<<link.scheme().toStdString()<<std::endl;
-    //qDebug()<<link.toString();
     QString linkstr=link.toString();
     QString scheme=link.scheme().toLower();
 
@@ -400,14 +316,7 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
         QString cl=spd.cleanPath(spd.absoluteFilePath(filename));
         QString s=spd.absoluteFilePath(cl); //absoluteFilePath
         searchPath=QFileInfo(s).absolutePath();
-        //qDebug()<<QFileInfo(s).absoluteFilePath()<<searchPath;
-        //qDebug()<<filename<<fragment;
-
-        //std::cout<<"anchorClicked("<<link.toString().toStdString()<<")   spd="<<spd.canonicalPath().toStdString()<<"   cl="<<cl.toStdString()<<"   s="<<s.toStdString()<<"   searchPath="<<searchPath.toStdString()<<"  src="<<QFileInfo(s).fileName().toStdString()<<"\n";
         descriptionBrowser->setSearchPaths(QStringList(searchPath)<<"./");
-        //qDebug()<<QFileInfo(s).absoluteFilePath()<<searchPath;
-        //descriptionBrowser->setSource(QFileInfo(s).fileName());
-        //descriptionBrowser->reload();
         descriptionBrowser->setHtml(loadHTML(QFileInfo(s).absoluteFilePath()));
         for (int i=history.size()-1; i>=qMax(0,history_idx)+1; i--) {
             history.pop();
@@ -708,6 +617,57 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
     } else {
         fromHTML_replaces.append(qMakePair(QString("rel_tutorial"), QString(" ")));
     }
+
+
+    // extract references tags $$ref:<ID>:Text$$
+    QStringList refList;
+    QMap<QString, int> refIDMap;
+    QRegExp rxRef("\\$\\$(invisibleref|ref)\\:(\\w*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+    rxRef.setMinimal(true);
+    count = 0;
+    pos = 0;
+    while ((pos = rxRef.indexIn(result, pos)) != -1) {
+
+        QString inst=rxRef.cap(1).toLower();
+        QString ID=rxRef.cap(2).toLower();
+        QString ref=rxRef.cap(3);
+        int refNum=-1;
+
+        if (!ID.isEmpty()) {
+            if (refIDMap.contains(ID)) {
+                refNum=refIDMap[ID];
+                ref=refList.value(refNum, ref);
+            } else {
+                refList.append(ref);
+                refNum=refIDMap[ID]=refList.size()-1;
+            }
+        } else {
+            refList.append(ref);
+            refNum=refList.size()-1;
+        }
+
+        QString rep=QString("<a href=\"#ref%1\">[%2]</a>").arg(refNum+1).arg(refNum+1);
+        if (inst=="invisibleref") {
+            rep="";
+        }
+
+        result=result.replace(rxRef.cap(0), rep);
+
+        ++count;
+        pos += rep.size();
+
+    }
+    QString referencesHTML="";
+    for (int i=0; i<refList.size(); i++) {
+        referencesHTML=referencesHTML+QString("<li><a name=\"ref%1\">%2</li>").arg(i+1).arg(refList[i]);
+    }
+    if (refList.size()>0) {
+        referencesHTML=QString("<ol>%1</ol>").arg(referencesHTML);
+    }
+    fromHTML_replaces.append(qMakePair(QString("references"), referencesHTML));
+
+
+
 
 
     // collectspecial replaces based on current directory

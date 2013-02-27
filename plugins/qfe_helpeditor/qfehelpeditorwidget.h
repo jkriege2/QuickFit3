@@ -44,6 +44,27 @@ class QFEHelpEditorWidget : public QWidget {
         void openScript(QString dir, bool saveDir=true);
         void openScriptNoAsk(QString filename);
 
+        void on_btnBold_clicked();
+        void on_btnItalic_clicked();
+        void on_btnUnderline_clicked();
+        void on_btnImage_clicked();
+        void on_btnAnchor_clicked();
+        void on_btnLink_clicked();
+        void on_btnBlockquote_clicked();
+        void on_btnNumberedList_clicked();
+        void on_btnBulletList_clicked();
+        void on_btnInsertH1_clicked();
+        void on_btnInsertH2_clicked();
+        void on_btnInsertH3_clicked();
+        void on_btnInsertH4_clicked();
+        void on_btnInsertParagraph_clicked();
+        void on_btnInsertListItem_clicked();
+        void on_btnPasteImage_clicked();
+        //void on__clicked();
+
+        /** \brief replaces the currently selected text by newText, hwere %1 is replaced by the selected text*/
+        void insertAroundOld(const QString& newText);
+
 
 
 

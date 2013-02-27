@@ -2,6 +2,7 @@
 #define QFRDRCOLUMNGRAPHINTERFACE_H
 
 #include <QtPlugin>
+#include <QColor>
 
 /*! \brief interface for column oriented graphs
     \ingroup qf3rdrdp_fcs
@@ -14,7 +15,10 @@ class QFRDRColumnGraphsInterface {
         enum ColumnGraphTypes {
             cgtLines,
             cgtLinesPoints,
-            cgtPoints
+            cgtPoints,
+            cgtBars,
+            cgtSteps,
+            cgtImpulses
         };
 
         /** \brief add a plot of  columnX against columnY to the given graph */
@@ -31,8 +35,15 @@ class QFRDRColumnGraphsInterface {
         virtual void colgraphRemoveGraph(int graph) =0;
         /** \brief remove a graph */
         virtual void colgraphRemovePlot(int graph, int plot) =0;
-        /** \brief set graph properties */
-        virtual void colgraphSetGraphProps(int graph, const QString&  title)=0;
+        /** \brief set graph title */
+        virtual void colgraphSetGraphTitle(int graph, const QString&  title)=0;
+        /** \brief set the color of the graph, the fill and error color are determined automatically */
+        virtual void colgraphSetPlotColor(int graph,  int plot,  QColor  color)=0;
+        /** \brief set the color of the graph, the error color is determined automatically */
+        virtual void colgraphSetPlotColor(int graph,  int plot,  QColor  color, QColor  fillColor)=0;
+        /** \brief set the color of the graph */
+        virtual void colgraphSetPlotColor(int graph,  int plot,  QColor  color, QColor  fillColor, QColor errorColor)=0;
+
         /** \brief set a graph's x-axis properties */
         virtual void colgraphSetGraphXAxisProps(int graph, const QString& xLabel=QString("x"), bool logX=false)=0;
         /** \brief set a graph's y-axis properties */

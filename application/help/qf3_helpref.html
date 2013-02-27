@@ -7,6 +7,115 @@
 </head>
 <body>
 $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+
+<h2>The Help System</h2>
+<p>
+The Online-Help system of QuickFit is based on HTML. A <a href="http://qt-project.org/doc/qt-4.8/richtext-html-subset.html">subset of the full HTML spectrum</a> of tags is supported. Some special "tags" are replaced before the page is displayed and some formatting and a table of contents is created automatically. The replaced "tags" are always enclosed in double-dollars, e.g. <code>&#36;&#36;references&#36;&#36;</code> will be replaced by a reference list. After all replacements have been performed, the remaining  <code>&#36;&#36;TAGS&#36;&#36;</code> are removed. You may use the HTML-entity sequence <code>&amp;#36;&amp;#36;</code> to escape <code>&#36;&#36;</code>. This help page contains a list of all available replace tags.
+</p>
+
+
+
+<h2>Tag Reference</h2>
+
+<h3>useful information:</h3><ul>
+<li><code>&#36;&#36;mainhelpdir&#36;&#36;</code> the path (including a trainiling slash) to the main help directory</li>
+</ul>
+
+
+<h3>version information:</h3>
+<ul>
+<li><code>&#36;&#36;version.svnrevision&#36;&#36;</code> will be replaced by the SVN revision of the QuickFit</li>
+<li><code>&#36;&#36;version.status&#36;&#36;</code> will be replaced by the application status (beta, alpha, final, ...)</li>
+<li><code>&#36;&#36;version.date&#36;&#36;</code> will be replaced by the compile date</li>
+<li><code>&#36;&#36;version&#36;&#36;</code> will be replaced by the version number (e.g. 3.0)</li>
+<li><code>&#36;&#36;version_full&#36;&#36;</code> will be replaced by the full version string</li>
+</ul>
+<h3>copyright information:</h3><ul>
+<li><code>&#36;&#36;thanksto&#36;&#36;</code> will be replaced by a list of people that our thanks go to for helping with QuickFit</li>
+<li><code>&#36;&#36;copyright&#36;&#36;</code> will be replaced by a copyright note</li>
+<li><code>&#36;&#36;author&#36;&#36;</code> will be replaced by QuickFit's author</li>
+<li><code>&#36;&#36;weblink&#36;&#36;</code> will be replaced by the QuickFit webpage</li>
+</ul>
+
+<h3>page footer:</h3><ul>
+<li><code>&#36;&#36;qf_commondoc_footer.start&#36;&#36;</code> starts the page footer</li>
+<li><code>&#36;&#36;qf_commondoc_footer.end&#36;&#36;</code> ends the page footer</li>
+</ul>
+
+<h3>page header:</h3><ul>
+<li><code>&#36;&#36;qf_commondoc_header.start&#36;&#36;</code> starts the page header</li>
+<li><code>&#36;&#36;qf_commondoc_header.end&#36;&#36;</code> ends the page header and adds a heading with the title-tag contents</li>
+<li><code>&#36;&#36;qf_commondoc_header.end_notitle&#36;&#36;</code> ends the page header</li>
+<li><code>&#36;&#36;qf_commondoc_header.rdr&#36;&#36;</code> link to basic info about raw data records</li>
+<li><code>&#36;&#36;qf_commondoc_header.eval&#36;&#36;</code> link to basic info about evaluations</li>
+<li><code>&#36;&#36;qf_commondoc_header.extension&#36;&#36;</code> link to basic info about extensions</li>
+<li><code>&#36;&#36;qf_commondoc_header.fitfunc&#36;&#36;</code> link to basic info about fit functions</li>
+<li><code>&#36;&#36;qf_commondoc_header.fitalg&#36;&#36;</code> link to basic info about fit algorithms</li>
+<li><code>&#36;&#36;qf_commondoc_header.separator&#36;&#36;</code> separator between two entries in the header</li>
+</ul>
+
+<h3>plugin info: If in a plugin directory, these infos are available:</h3><ul>
+<li><code>&#36;&#36;local_plugin_icon&#36;&#36;</code> displays plugin icon</li>
+<li><code>&#36;&#36;local_plugin_iconfilename&#36;&#36;</code> displays plugin icon filename</li>
+<li><code>&#36;&#36;local_plugin_name&#36;&#36;</code> displays plugin name</li>
+<li><code>&#36;&#36;local_plugin_author&#36;&#36;</code> displays plugin author</li>
+<li><code>&#36;&#36;local_plugin_copyright&#36;&#36;</code> displays plugin copyright message</li>
+<li><code>&#36;&#36;local_plugin_weblink_url&#36;&#36;</code> displays plugin weblink url</li>
+<li><code>&#36;&#36;local_plugin_weblink&#36;&#36;</code> displays plugin weblink as a link</li>
+<li><code>&#36;&#36;local_plugin_id&#36;&#36;</code> displays plugin id</li>
+<li><code>&#36;&#36;local_plugin_tutorial_file&#36;&#36;</code> displays plugin tutorial filename</li>
+<li><code>&#36;&#36;local_plugin_tutorial_link&#36;&#36;</code> displays a link to the plugin tutorial</li>
+<li><code>&#36;&#36;local_plugin_mainhelp_file&#36;&#36;</code> displays plugin main help page filename</li>
+<li><code>&#36;&#36;local_plugin_mainhelp_link&#36;&#36;</code> displays a link to the plugin main help page</li>
+<li><code>&#36;&#36;local_plugin_version&#36;&#36;</code> displays plugin version (major and minor)</li>
+<li><code>&#36;&#36;local_plugin_typehelp_link&#36;&#36;</code> link to a helppage covering the basic plugin type</li>
+<li><code>&#36;&#36;local_plugin_typehelp_file&#36;&#36;</code> file containing a helppage covering the basic plugin type</li>
+</ul>
+<h3>other plugins info:</h3><ul>
+<li><code>&#36;&#36;plugin_info:help:PLUGINID&#36;&#36;</code> the path of the help file for plugin with ID <em>PLUGINID</em></li>
+<li><code>&#36;&#36;plugin_info:tutorial:PLUGINID&#36;&#36;</code> the path of the tutorial file for plugin with ID <em>PLUGINID</em></li>
+</ul>
+<h3>lists of available plugins</h3><ul>
+<li><code>&#36;&#36;list:extension:INTERFACENAME&#36;&#36; </code> makes a list (unordered HTML list) of all available extensions of type <code>INTERFACENAME</code> (can also be empty, then the list contains all extensions)</li>
+<li><code>&#36;&#36;list:fitfunc:STARTSWITH&#36;&#36; </code> makes a list (unordered HTML list) of all fit functions that start with <code>STARTSWITH</code> (can also be empty, then the list contains all fit functions)</li>
+<li><code>&#36;&#36;list:fitalg:&#36;&#36; </code> (<b>note the second colon!!!</b>) makes a list (unorder HTML list) of all fit algorithms</li>
+<li><code>&#36;&#36;tutorials_contents&#36;&#36;</code> will be replaced by a list of plugin tutorials (complete with links as unordered list!)</li>
+<li><code>&#36;&#36;help_contents&#36;&#36;</code> will be replaced by a list of plugin main help files (complete with links as unordered list!)</li>
+</ul>
+<h3>insert file's contents</h3><ul>
+<li><code>&#36;&#36;insert:FILENAME&#36;&#36; </code> insert the contents (complete !!!) of the given file <code>FILENAME</code> (path relative to current directory)</li>
+<li><code>&#36;&#36;insertglobal:FILENAME&#36;&#36; </code> insert the contents (complete !!!) of the given file <code>FILENAME</code> in the global help directory</li>
+</ul>
+<h3>insert LaTeX formulas</h3><ul>
+<li><code>&#36;&#36;math:LATEX&#36;&#36; </code> renders the given LaTeX fragment using <a href="jkqtmathtext.html" >a LaTeX parser</a> and displays the result. Note that the rendering quality of this is not nearly as good as the quality output by LaTeX. So if you want high-quality output, or don't like a formula rendered with <code>&#36;&#36;math:...&#36;&#36;</code>
+ or need a LaTeX feature not supported by this, please include a direct LaTeX rendering result as PNG. </li>
+ <li><code>&#36;&#36;bmath:LATEX&#36;&#36;</code> displays an indented block of rendered LaTeX.</li>
+</ul>
+<h3>go back to top bar:</h3><ul>
+<li><code>&#36;&#36;qf_commondoc_backtop&#36;&#36;</code> displays a blue bar with an upward arrow that allows to jump back to the top of the page</li>
+</ul>
+<h3>literature reference tags:</h3>
+<ul>
+<li><code>&#36;&#36;ref:ID:REFERENCE TEXT&#36;&#36;</code> will be relaced by a bracketed reference number [2] that links to the references list, introduced by &#36;&#36;references&#36;&#36; into the document. Both parameters are strictly optional: If ID is missing the reference is single, if REFERENCE TEXT is missing, but an already defined ID is present, the ref will link to the specified (and predefined) reference.</li>
+<li><code>&#36;&#36;invisibleref:ID:REFERENCE TEXT&#36;&#36;</code> works like above, but no bracketed number is introduced. The referenced literature will still be introduced into the referneces list.</li>
+<li><code>&#36;&#36;references&#36;&#36;</code> will introduce a list of references into the document.</li>
+</ul>
+<h3>Metadata</h3>
+<p>In the default header some of the metadata from the HTML page are used to display buttons to go to the next, previous and contents page: </p>
+
+<blockquote>
+<code>&lt;title&gt;SPIM Plugin: Preview Windows&lt;/title&gt;<br>
+&lt;link rel=<span class="stringliteral">&quot;prev&quot;</span> href=<span class="stringliteral">&quot;ext_spimb040_camconfig.html&quot;</span>&gt; <br>
+&lt;link rel=<span class="stringliteral">&quot;next&quot;</span> href=<span class="stringliteral">&quot;ext_spimb040_stageconfig.html&quot;</span>&gt; <br>
+&lt;link rel=<span class="stringliteral">&quot;contents&quot;</span> href=<span class="stringliteral">&quot;ext_spimb040.html&quot;</span>&gt;     <br>
+</code>
+</blockquote>
+
+
+
+
+
 </body>
 </html>
 

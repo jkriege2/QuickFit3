@@ -16,16 +16,19 @@ DESTDIR = $${QFOUTPUT}/plugins/
 HEADERS += qfehelpeditor.h \
            qfehelpeditorwidget.h \
     replacedialog.h \
-    finddialog.h
+    finddialog.h \
+    pasteimagedlg.h
 
 SOURCES += qfehelpeditor.cpp \
            qfehelpeditorwidget.cpp \
     replacedialog.cpp \
-    finddialog.cpp
+    finddialog.cpp \
+    pasteimagedlg.cpp
 
 FORMS =    qfehelpeditorwidget.ui \
     replacedialog.ui \
-    finddialog.ui
+    finddialog.ui \
+    pasteimagedlg.ui
 
 RESOURCES += qfehelpeditor.qrc
 

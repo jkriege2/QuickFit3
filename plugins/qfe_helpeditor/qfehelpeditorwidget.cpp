@@ -8,7 +8,7 @@
 #include "qfcompleterfromfile.h"
 #include <QTemporaryFile>
 #include "qftools.h"
-
+#include "pasteimagedlg.h"
 
 
 
@@ -480,6 +480,122 @@ void QFEHelpEditorWidget::openScriptNoAsk(QString filename)
     }
 }
 
+void QFEHelpEditorWidget::on_btnBold_clicked()
+{
+    insertAroundOld("<b>%1</b>");
+}
+
+void QFEHelpEditorWidget::on_btnItalic_clicked()
+{
+    insertAroundOld("<i>%1</i>");
+}
+
+void QFEHelpEditorWidget::on_btnUnderline_clicked()
+{
+    insertAroundOld("<u>%1</U>");
+}
+
+void QFEHelpEditorWidget::on_btnImage_clicked()
+{
+    insertAroundOld("<img src=\"image.png\">%1");
+
+}
+
+void QFEHelpEditorWidget::on_btnAnchor_clicked()
+{
+    insertAroundOld("<a name=\"\">%1");
+}
+
+void QFEHelpEditorWidget::on_btnLink_clicked()
+{
+    bool ok=false;
+    QStringList links;
+    links<<"http://";
+    QString txt=ui->edtScript->getEditor()->toPlainText();
+    QRegExp rxLink("<a\\s*[^>]*name\\s*=\\s*\"\#([^\"']*)\"[^>]*>", Qt::CaseInsensitive);
+    rxLink.setMinimal(false);
+    int count = 0;
+    int pos = 0;
+    while ((pos = rxLink.indexIn(txt, pos)) != -1) {
+
+        QString name=rxLink.cap(1).toLower();
+        links<<QString("#"+name);
+        ++count;
+        pos += rxLink.matchedLength();
+    }
+
+    links<<"$$mainhelpdir$$/";
+    links<<"$$assetsdir$$/";
+    links<<"$$configdir$$/";
+    //links<<"$$$$/";
+    links<<"mailto:$$email$$";
+    links<<"mailto:$$maillist$$";
+    links<<"$$weblink$$";
+    //links<<"";
+
+
+
+    QString link=QInputDialog::getItem(this, tr("insert link"), tr("link target:"), links, 0, true,&ok);
+    if (ok) {
+        insertAroundOld(QString("<a href=\"%1\">").arg(link)+QString("%1</a>"));
+    }
+}
+
+void QFEHelpEditorWidget::on_btnBlockquote_clicked()
+{
+    insertAroundOld("\n<blockquote>\n\t%1\n</blockquote>\n");
+}
+
+void QFEHelpEditorWidget::on_btnNumberedList_clicked()
+{
+    insertAroundOld("\n<ol>\n\t<li>%1</li>\n</ol>");
+
+}
+
+void QFEHelpEditorWidget::on_btnBulletList_clicked()
+{
+    insertAroundOld("\n<ul>\n\t<li>%1</li>\n</ul>");
+}
+
+void QFEHelpEditorWidget::on_btnInsertH1_clicked()
+{
+    insertAroundOld("\n\n<h1></h1>\n<p>\n\t%1\n</p>\n");
+}
+
+void QFEHelpEditorWidget::on_btnInsertH2_clicked()
+{
+    insertAroundOld("\n\n<h2></h2>\n<p>\n\t%1\n</p>\n");
+}
+
+void QFEHelpEditorWidget::on_btnInsertH3_clicked()
+{
+    insertAroundOld("\n\n<h3></h3>\n<p>\n\t%1\n</p>\n");
+}
+
+void QFEHelpEditorWidget::on_btnInsertH4_clicked()
+{
+    insertAroundOld("\n\n<h4></h4>\n<p>\n\t%1\n</p>\n");
+}
+
+void QFEHelpEditorWidget::on_btnInsertParagraph_clicked()
+{
+    insertAroundOld("\n<p>\n\t%1\n</p>\n");
+}
+
+void QFEHelpEditorWidget::on_btnInsertListItem_clicked()
+{
+    insertAroundOld("\n<li>%1</li>");
+}
+
+void QFEHelpEditorWidget::on_btnPasteImage_clicked()
+{
+    PasteImageDlg* dlg=new PasteImageDlg(QFileInfo(currentScript).absolutePath(), this, QString("./pic/%1").arg(QFileInfo(currentScript).baseName())+QString("_pic%1.png") );
+    if (dlg->exec()) {
+        insertAroundOld(dlg->saveImage()+"%1");
+    }
+    delete dlg;
+}
+
 
 
 void QFEHelpEditorWidget::findFirst()
@@ -604,6 +720,15 @@ void QFEHelpEditorWidget::insertActionClicked()
             ui->edtScript->getEditor()->insertPlainText(txt);
         }
     }
+}
+
+void QFEHelpEditorWidget::insertAroundOld(const QString &newText)
+{
+    QString txt=newText.arg(ui->edtScript->getEditor()->getSelection());
+    if (!txt.isEmpty()) {
+        ui->edtScript->getEditor()->insertPlainText(txt);
+    }
+
 }
 
 
