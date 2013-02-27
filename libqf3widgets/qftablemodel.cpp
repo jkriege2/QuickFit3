@@ -9,6 +9,8 @@ QFTableModel::QFTableModel(QObject * parent):
     doEmitSignals=true;
     defaultEditValue=QVariant();
     verticalHeaderShowRowNumbers=false;
+    rows=1;
+    columns=1;
     //quint32 a=xyAdressToUInt32(5, 5);
     //std::cout<<"adress test: "<<a<<" => row="<<UInt32ToRow(a)<<", column="<<UInt32ToColumn(a)<<"\n";
 }

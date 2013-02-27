@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>947</width>
-    <height>741</height>
+    <height>756</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -991,7 +991,7 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="9" column="0">
+         <item row="10" column="0">
           <widget class="QLabel" name="label_39">
            <property name="text">
             <string>&amp;bleach correction:</string>
@@ -1001,7 +1001,7 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="9" column="1">
+         <item row="10" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_20">
            <item>
             <widget class="QComboBox" name="cmbBleachType">
@@ -1087,7 +1087,7 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="10" column="0">
+         <item row="11" column="0">
           <widget class="QLabel" name="label_47">
            <property name="text">
             <string>&amp;DualView mode:</string>
@@ -1097,7 +1097,7 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="10" column="1">
+         <item row="11" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_22">
            <item>
             <widget class="QComboBox" name="cmbDualView">
@@ -1152,7 +1152,7 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="11" column="0">
+         <item row="12" column="0">
           <widget class="QLabel" name="label_26">
            <property name="text">
             <string>correlation &amp;functions:</string>
@@ -1162,7 +1162,7 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="11" column="1">
+         <item row="12" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_12">
            <item>
             <widget class="QCheckBox" name="chkACF">
@@ -1264,7 +1264,7 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="12" column="1">
+         <item row="13" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_16">
            <item>
             <widget class="QCheckBox" name="chkDistanceCCD">
@@ -1314,7 +1314,7 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="13" column="0">
+         <item row="14" column="0">
           <widget class="QLabel" name="label_8">
            <property name="text">
             <string>&amp;correlator:</string>
@@ -1324,7 +1324,7 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="13" column="1">
+         <item row="14" column="1">
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -1501,7 +1501,7 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="14" column="0">
+         <item row="15" column="0">
           <widget class="QLabel" name="label_27">
            <property name="text">
             <string>&amp;statistics:</string>
@@ -1511,7 +1511,7 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="14" column="1">
+         <item row="15" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_13">
            <item>
             <widget class="QLabel" name="label_29">
@@ -1571,14 +1571,14 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="15" column="0">
+         <item row="16" column="0">
           <widget class="QLabel" name="label_44">
            <property name="text">
             <string>background &amp;statistics:</string>
            </property>
           </widget>
          </item>
-         <item row="15" column="1">
+         <item row="16" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_21">
            <item>
             <widget class="QLabel" name="label_45">
@@ -1638,7 +1638,7 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="16" column="0">
+         <item row="17" column="0">
           <widget class="QLabel" name="label_23">
            <property name="text">
             <string>&amp;video:</string>
@@ -1648,7 +1648,7 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="16" column="1">
+         <item row="17" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_11">
            <item>
             <widget class="QCheckBox" name="chkVideo">
@@ -1731,14 +1731,14 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="17" column="1">
+         <item row="18" column="1">
           <widget class="Line" name="line">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
           </widget>
          </item>
-         <item row="18" column="0">
+         <item row="19" column="0">
           <widget class="QLabel" name="label_17">
            <property name="text">
             <string/>
@@ -1748,7 +1748,7 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="18" column="1">
+         <item row="19" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <property name="spacing">
             <number>2</number>
@@ -1846,6 +1846,16 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="buddy">
             <cstring>cmbFileformat</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="1">
+          <widget class="QLabel" name="labBackgroundProps">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>

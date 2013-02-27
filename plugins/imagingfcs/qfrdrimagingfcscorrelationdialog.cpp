@@ -135,6 +135,54 @@ void QFRDRImagingFCSCorrelationDialog::on_btnDataExplorer_clicked() {
     delete explorer;
 }
 
+void QFRDRImagingFCSCorrelationDialog::readBackgroundFramesize()
+{
+    QModernProgressDialog prg(this);
+    prg.setWindowTitle(tr("imFCS: Correlator"));
+    prg.setLabelText(tr("Reading background image series information ... reading config file ..."));
+    prg.open();
+    QApplication::processEvents();
+    QApplication::processEvents();
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+    QString backgroundF=ui->edtBackgroundFile->text();
+
+    //////////////////////////////////////////////////////////////////////////////////
+    // we also try to open the file with an appropriate reader and read th number of frames in it
+    //////////////////////////////////////////////////////////////////////////////////
+    prg.setLabelText(tr("Reading background image series information ... counting frames ..."));
+    QApplication::processEvents();
+    QApplication::processEvents();
+    QFImporterImageSeries* reader=NULL;
+    bool OK=false;
+    if (ui->cmbFileformat->currentIndex()>=0 && ui->cmbFileformat->currentIndex()<QFRDRImagingFCSCorrelationJobThread::getImageReaderCount(pluginServices)) {
+        reader=QFRDRImagingFCSCorrelationJobThread::getImageReader(ui->cmbFileformat->currentIndex(), pluginServices);
+    }
+    if (reader && QFile::exists(backgroundF)) {
+        OK=reader->open(backgroundF);
+        if (OK)  {
+            QApplication::processEvents();
+            background_width=reader->frameWidth();
+            background_height=reader->frameHeight();
+            background_frame_count=reader->countFrames();
+            QString err="";
+            if ((image_width!=background_width) || (image_height!=background_height)) {
+                err=tr("<br><font color=\"red\"><b>background and image file have different sizes!!!</b></font>");
+            }
+            ui->labBackgroundProps->setText(tr("size: %1&times;%2 pixels, frames: %3%4").arg(background_width).arg(background_height).arg(background_frame_count).arg(err));
+
+        } else {
+            ui->labBackgroundProps->setText("");
+        }
+        reader->close();
+        delete reader;
+    }
+
+
+    prg.close();
+    QApplication::restoreOverrideCursor();
+}
+
 
 bool QFRDRImagingFCSCorrelationDialog::allThreadsDone() const  {
     for (int i=0; i<jobs.size(); i++) {
@@ -319,6 +367,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnSelectBackgroundFile_clicked() {
         ui->edtBackgroundFile->setText(fileName);
         ui->edtBackgroundFile->setFocus(Qt::MouseFocusReason);
         writeSettings();
+        readBackgroundFramesize();
     }
 }
 
@@ -918,8 +967,10 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
                 }
             }
             reader->close();
-            delete reader;
+
         }
+
+        readBackgroundFramesize();
     }
 
     prg.close();

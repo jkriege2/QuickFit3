@@ -249,7 +249,7 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
         //for (int i=0; i<rawData.keys().size(); i++) {
         while (ir.hasNext()) {
             ir.next();
-            qDebug()<<"writing rdr "<<ir.key();
+            //qDebug()<<"writing rdr "<<ir.key();
             //int k=rawData.keys().at(i);
             ir.value()->writeXML(w);
             qDebug()<<"   DONE!";
@@ -260,7 +260,7 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
         //for (int i=0; i<evaluations.keys().size(); i++) {
         while (i.hasNext()) {
             i.next();
-            qDebug()<<"writing eval "<<i.key();
+            //qDebug()<<"writing eval "<<i.key();
             //int k=evaluations.keys().at(i);
             i.value()->writeXML(w);
             qDebug()<<"   DONE!";
