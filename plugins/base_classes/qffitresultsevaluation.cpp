@@ -589,6 +589,10 @@ double QFFitResultsEvaluation::getFitError(QFRawDataRecord* r, const QString& re
 
     //if (specials.contains(parameterID)) return specials[parameterID];
     double sval=0, serr=0;
+
+    double value=0;
+    if (overrideFitFunctionPresetError(parameterID, value)) serr=value;
+
     if (hasFit(r, resultID)) {
         if (r!=NULL) {
             return r->resultsGetErrorAsDouble(transformResultID(resultID), getFitParamID(parameterID));
@@ -604,7 +608,7 @@ double QFFitResultsEvaluation::getFitError(QFRawDataRecord* r, const QString& re
         }
     }
 
-    return 0.0;
+    return serr;
 }
 
 void QFFitResultsEvaluation::setFitFix(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, bool fix) {
@@ -648,6 +652,9 @@ bool QFFitResultsEvaluation::getFitFix(QFRawDataRecord* r, const QString& result
 
     int pid=f->getParameterNum(parameterID);
     if (pid>-1) res=f->getDescription(pid).initialFix;
+
+    bool value=0;
+    if (overrideFitFunctionPresetFix(parameterID, value)) res=value;
 
     res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+parameterID+"_fix"), res).toBool();
     res=fitParamSettings->value(QString(m_fitFunction+"/"+parameterID+"_fix"), res).toBool();
@@ -1229,6 +1236,16 @@ double QFFitResultsEvaluation::getFitMax(const QString& id) const {
 }
 
 bool QFFitResultsEvaluation::overrideFitFunctionPreset(QString paramName, double &value) const
+{
+    return false;
+}
+
+bool QFFitResultsEvaluation::overrideFitFunctionPresetError(QString paramName, double &value) const
+{
+    return false;
+}
+
+bool QFFitResultsEvaluation::overrideFitFunctionPresetFix(QString paramName, bool &value) const
 {
     return false;
 }

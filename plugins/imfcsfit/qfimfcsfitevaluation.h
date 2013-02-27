@@ -117,6 +117,8 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation {
         DataWeight m_weighting;
 
         virtual bool overrideFitFunctionPreset(QString paramName, double &value) const ;
+        virtual bool overrideFitFunctionPresetError(QString paramName, double &value) const ;
+        virtual bool overrideFitFunctionPresetFix(QString paramName, bool &value) const ;
 
     public:
 

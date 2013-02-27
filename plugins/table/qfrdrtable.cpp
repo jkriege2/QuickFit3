@@ -145,14 +145,14 @@ QVariant QFRDRTable::getModelData(quint16 row, quint16 column) {
 
 QVariant QFRDRTable::tableGetData(quint16 row, quint16 column) const
 {
-    if (datamodel) return datamodel->data(datamodel->index(row, column), Qt::DisplayRole);
+    if (datamodel) return datamodel->cell(row, column);
     else return QVariant();
 }
 
 void QFRDRTable::tableSetData(quint16 row, quint16 column, const QVariant &data) {
     //qDebug()<<"tableSetData("<<row<<", "<<column<<",    "<<data<<")";
     if (datamodel)  {
-        datamodel->setData(datamodel->index(row, column), data, Qt::EditRole);
+        datamodel->setCellCreate(row, column, data);
     }
 }
 

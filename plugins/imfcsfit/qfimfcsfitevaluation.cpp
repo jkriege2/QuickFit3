@@ -674,6 +674,58 @@ bool QFImFCSFitEvaluation::overrideFitFunctionPreset(QString paramid, double &va
     return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPreset(paramid, value);
 }
 
+bool QFImFCSFitEvaluation::overrideFitFunctionPresetError(QString paramid, double &value) const
+{
+    if (paramid=="focus_width") {
+        if (propertyExists("PRESET_FOCUS_WIDTH_ERROR")) {
+            double fw=getProperty("PRESET_FOCUS_WIDTH_ERROR", 0).toDouble();
+            if (fw<=0) return false;
+            value=fw;
+            return true;
+        }
+    }
+    if (paramid=="focus_height" || paramid=="focus_hieght") {
+        if (propertyExists("PRESET_FOCUS_HEIGHT_ERROR")) {
+            double fw=getProperty("PRESET_FOCUS_HEIGHT_ERROR", 0).toDouble();
+            if (fw<=0) return false;
+            value=fw;
+            return true;
+        }
+    }
+    if (paramid=="diff_coeff1") {
+        if (propertyExists("PRESET_D1_ERROR")) {
+            double D=getProperty("PRESET_D1_ERROR", 0).toDouble();
+            if (D<=0) return false;
+            value=D;
+            return true;
+        }
+    }
+    return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetError(paramid, value);
+}
+
+bool QFImFCSFitEvaluation::overrideFitFunctionPresetFix(QString paramid, bool &value) const
+{
+    if (paramid=="focus_width") {
+        if (propertyExists("PRESET_FOCUS_WIDTH_FIX")) {
+            value=getProperty("PRESET_FOCUS_WIDTH_FIX", 0).toDouble();
+            return true;
+        }
+    }
+    if (paramid=="focus_height" || paramid=="focus_hieght") {
+        if (propertyExists("PRESET_FOCUS_HEIGHT_FIX")) {
+            value=getProperty("PRESET_FOCUS_HEIGHT_FIX", 0).toDouble();
+            return true;
+        }
+    }
+    if (paramid=="diff_coeff1") {
+        if (propertyExists("PRESET_D1_FIX")) {
+            value=getProperty("PRESET_D1_FIX", 0).toDouble();
+            return true;
+        }
+    }
+    return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetFix(paramid, value);
+}
+
 
 
 

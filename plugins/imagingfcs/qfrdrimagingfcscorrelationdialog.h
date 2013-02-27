@@ -69,6 +69,7 @@ protected slots:
     void on_chkLastFrame_clicked(bool checked);
     void setEditControlsEnabled(bool enabled);
     void on_btnDataExplorer_clicked();
+    void readBackgroundFramesize();
 
 protected:
     void done(int status);
@@ -91,14 +92,18 @@ private:
     //QList<Job> jobsToAdd;
     QStringList filesToAdd;
     bool closing;
-    int32_t frame_count;
     QString inputconfigfile;
 
 
 
     int image_width;
     int image_height;
+    int32_t frame_count;
     QString filenameDisplayed;
+
+    int background_width;
+    int background_height;
+    int32_t background_frame_count;
 
     int getIDForProgress(const QFRDRImagingFCSThreadProgress* w) const;
     int getLayoutIDForProgress(const QWidget* w) const;

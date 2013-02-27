@@ -711,6 +711,10 @@ public slots:
 protected:
     /*! \brief implement this function and return \c true, if you want to override the fit functions preset */
     virtual bool overrideFitFunctionPreset(QString paramName, double&value) const;
+    /*! \brief implement this function and return \c true, if you want to override the fit functions preset error */
+    virtual bool overrideFitFunctionPresetError(QString paramName, double &value) const ;
+    /*! \brief implement this function and return \c true, if you want to override the fit functions preset fix */
+    virtual bool overrideFitFunctionPresetFix(QString paramName, bool &value) const ;
 
 
     /*! \brief struct used to locally store fit parameter properties

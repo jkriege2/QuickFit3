@@ -92,7 +92,11 @@ void QFPEvalIMFCSFit::insertFCSFitForCalibration() {
                 QFEvaluationItem* e=project->addEvaluation(getID(), "imagingFCS Fit");
                 e->setQFProperty("PRESET_FOCUS_WIDTH", vals[i], false, false);
                 e->setQFProperty("PRESET_FOCUS_HEIGHT", dlg->getFocusHeight(), false, false);
+                e->setQFProperty("PRESET_FOCUS_WIDTH_FIX", true, false, false);
+                e->setQFProperty("PRESET_FOCUS_HEIGHT_FIX", true, false, false);
+                e->setQFProperty("PRESET_D1_FIX", false, false, false);
                 e->setQFProperty("IMFCS_CALIBRATION_FOCUSWIDTH", vals[i], false, false);
+                e->setQFProperty("IMFCS_CALIBRATION_FOCUSHIEGHT", dlg->getFocusHeight(), false, false);
                 e->setName(tr("wxy=%1 nm").arg(vals[i]));
             }
             QFRawDataRecord* et=project->addRawData("table", "imagingFCS Calibration results");
@@ -144,7 +148,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool1()
     int counter=0;
     bool first=true;
     QList<QFRawDataRecord*> rdrs;
-    QList<double> focus_widths, Ds, pixel_sizes;
+    QList<double> focus_widths, Ds, Ds2, pixel_sizes;
     double focus_height;
     double xmin=0;
     double xmax=0;
@@ -177,6 +181,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool1()
 
                             rcounter++;
                             Ds<<0;
+                            Ds2<<0;
                             pixel_sizes<<bin*width;
                         }
                     }
@@ -210,6 +215,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool1()
                     tab->tableSetData(ri, 1+counter*2, Dmean);
                     tab->tableSetData(ri, 1+counter*2+1, sqrt(Dvar));
                     Ds[ri]=Ds[ri]+Dmean;
+                    Ds2[ri]=Ds2[ri]+Dmean*Dmean;
                 }
 
                 tab->tableSetColumnTitle(1+counter*2, colName);
@@ -247,8 +253,10 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool1()
 
     QStringList DsNames;
     for (int ri=0; ri<Ds.size(); ri++) {
+        if (counter>1) Ds2[ri]=sqrt((Ds2[ri]-Ds[ri]*Ds[ri]/double(counter))/double(counter-1));
+        else Ds2[ri]=0;
         Ds[ri]=Ds[ri]/double(counter);
-        DsNames<<tr("a=%1nm:  D=%2µm²/s").arg(pixel_sizes[ri]).arg(Ds[ri]);
+        DsNames<<tr("a=%1nm:  D= (%2 +/- %3) µm²/s").arg(pixel_sizes[ri]).arg(Ds[ri]).arg(Ds2[ri]);
     }
 
     bool dlgOK=false;
@@ -257,10 +265,15 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool1()
     if (dlgOK) {
 
         double Dcalib=Ds.value(DItem, 0);
+        double DcalibE=Ds2.value(DItem, 0);
         QFEvaluationItem* e=project->addEvaluation(getID(), tr("calibration D=%1µm²/s").arg(Dcalib));
         e->setQFProperty("PRESET_D1", Dcalib, false, false);
+        e->setQFProperty("PRESET_D1_ERROR", DcalibE, false, false);
+        e->setQFProperty("PRESET_D1_FIX", true, false, false);
+        e->setQFProperty("PRESET_FOCUS_WIDTH_FIX", false, false, false);
         e->setQFProperty("PRESET_FOCUS_HEIGHT", focus_height, false, false);
         e->setQFProperty("IMFCS_CALIBRATION_D", Dcalib, false, false);
+        e->setQFProperty("IMFCS_CALIBRATION_D_ERROR", DcalibE, false, false);
         e->setQFProperty("IMFCS_CALIBRATION_FITWXY", true, false, false);
         e->setName(tr("calibration D=%1µm²/s").arg(Dcalib));
     }
@@ -308,21 +321,25 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
     double ymin=0;
     double ymax=0;
     double Dcalib=0;
+    double DcalibE=0;
+    double wxymean=0, wxyvar=0;
     for (int i=0; i<project->getEvaluationCount(); i++) {
         QFEvaluationItem* e=project->getEvaluationByNum(i);
         QFImFCSFitEvaluation* imFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
         if (e) {
             bool fitwxy=e->getProperty("IMFCS_CALIBRATION_FITWXY", false).toBool();
-            Dcalib=e->getProperty("IMFCS_CALIBRATION_D", -1.0).toDouble();
+            Dcalib=e->getProperty("IMFCS_CALIBRATION_D", Dcalib).toDouble();
+            DcalibE=e->getProperty("IMFCS_CALIBRATION_D_ERROR", DcalibE).toDouble();
             QString colName=tr("wxy [nm]");
             QString colNameE=tr("wxy_error [nm]");
             if (fitwxy) {
                 int cols=tab->tableGetColumnCount();
-                qDebug()<<"cols="<<cols;
+                //qDebug()<<"cols="<<cols;
                 int rcounter=0;
                 tab->tableSetColumnTitle(cols, tr("pixel size [nm]"));
                 tab->tableSetColumnTitle(cols+1, colName);
                 tab->tableSetColumnTitle(cols+2, colNameE);
+                QVector<double> wxyvec;
                 for (int ri=0; ri<project->getRawDataCount(); ri++) {
                     QFRawDataRecord* r=project->getRawDataByNum(ri);
                     if (imFCS->isFilteredAndApplicable(r)) {
@@ -337,7 +354,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
                         QString erid=imFCS->getEvaluationResultID(0);
                         QString en=imFCS->transformResultID(erid);
                         QVector<double> wxy=r->resultsGetAsDoubleList(en,  "fitparam_focus_width");
-                        if (r->resultsExists(en,  "fitparam_diff_coeff1"))  Dcalib=r->resultsGetAsDouble(en,  "fitparam_diff_coeff1");
+                        //if (r->resultsExists(en,  "fitparam_diff_coeff1"))  Dcalib=r->resultsGetAsDouble(en,  "fitparam_diff_coeff1");
 
                         QFRDRRunSelectionsInterface* runsel=qobject_cast<QFRDRRunSelectionsInterface*>(r);
                         if (runsel) {
@@ -354,23 +371,31 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
                         if (dmax>ymax) ymax=dmax*1.1;
                         if (dmin<ymin) ymin=dmin*1.1;
 
-                        double wxyvar=0;
-                        double wxymean=qfstatisticsAverageVariance(wxyvar, wxy);
+                        wxyvar=0;
+                        wxymean=qfstatisticsAverageVariance(wxyvar, wxy);
                         tab->tableSetData(rcounter, cols+1, wxymean);
                         tab->tableSetData(rcounter, cols+2, sqrt(wxyvar));
-                        qDebug()<<rcounter<<cols+1<<wxymean<<sqrt(wxyvar);
+                        wxyvec<<wxymean;
+                        //qDebug()<<rcounter<<cols+1<<wxymean<<sqrt(wxyvar);
 
                         rcounter++;
                     }
                 }
-                if (graph) {
-                    graph->colgraphAddGraph(tr("pixel size vs. lat. focus size"));
-                    graph->colgraphSetGraphTitle(1, tr("pixel size vs. lat. focus size"));
-                    graph->colgraphSetGraphXAxisProps(1, tr("pixel size [nm]"));
-                    graph->colgraphSetGraphYAxisProps(1, tr("lateral focus size w_{xy} [nm]"));
-                    graph->colgraphAddErrorPlot(1, cols, -1, cols+1, cols+2, QFRDRColumnGraphsInterface::cgtLinesPoints, tr("calibration D=%1µm²/s").arg(Dcalib));
-                    graph->colgraphsetXRange(1, xmin, xmax);
+                if (rcounter>0) {
+                    tab->tableSetData(0, cols+3, qfstatisticsAverage(wxyvec));
+                    tab->tableSetData(0, cols+4, sqrt(qfstatisticsVariance(wxyvec)));
+                    tab->tableSetData(rcounter-1, cols+3, qfstatisticsAverage(wxyvec));
+                    tab->tableSetData(rcounter-1, cols+4, sqrt(qfstatisticsVariance(wxyvec)));
+                    if (graph) {
+                        graph->colgraphAddGraph(tr("pixel size vs. lat. focus size, D=%2µm²/s").arg(Dcalib));
+                        graph->colgraphSetGraphTitle(graph->colgraphGetGraphCount()-1, tr("pixel size vs. lat. focus size"));
+                        graph->colgraphSetGraphXAxisProps(graph->colgraphGetGraphCount()-1, tr("pixel size [nm]"));
+                        graph->colgraphSetGraphYAxisProps(graph->colgraphGetGraphCount()-1, tr("lateral focus size w_{xy} [nm]"));
+                        graph->colgraphAddErrorPlot(graph->colgraphGetGraphCount()-1, cols, -1, cols+1, cols+2, QFRDRColumnGraphsInterface::cgtLinesPoints, tr("calibration D=(%1\pm %2)µm²/s").arg(Dcalib).arg(DcalibE));
+                        graph->colgraphAddPlot(graph->colgraphGetGraphCount()-1, cols+3, cols+4, QFRDRColumnGraphsInterface::cgtLines, tr("w_{xy}=(%1\pm %2)nm").arg(wxymean).arg(wxyvar));
+                        graph->colgraphsetXRange(graph->colgraphGetGraphCount()-1, xmin, xmax);
 
+                    }
                 }
             }
         }
