@@ -97,6 +97,8 @@ public:
     /** \brief get the current fitting algorithm */
     virtual QFFitFunction* getFitFunction() const;
 
+    /** \brief get the current fitting algorithm */
+    virtual QString getFitFunctionID() const;
 
 
     /** \brief create a new instance of the current fit algorithm ... the user has to destroy the instance */

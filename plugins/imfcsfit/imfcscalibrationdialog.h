@@ -18,6 +18,10 @@ public:
 
     QList<double> getValues() const;
     double getFocusHeight() const;
+    double getFocusHeightError() const;
+
+    void setFitModels(const QStringList& models, const QString& defaultModel);
+    QString getFitModel() const;
 protected:
     void closeEvent(QCloseEvent *event);
 private:

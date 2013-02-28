@@ -101,6 +101,11 @@ QFFitFunction* QFFitResultsEvaluation::getFitFunction() const {
     return getFitFunction(m_fitFunction);
 }
 
+QString QFFitResultsEvaluation::getFitFunctionID() const
+{
+    return m_fitFunction;
+}
+
 QFFitAlgorithm *QFFitResultsEvaluation::createFitAlgorithm(QObject* parent) const
 {
     return QFFitAlgorithmManager::getInstance()->createAlgorithm(m_fitAlgorithm, parent);

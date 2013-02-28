@@ -2,6 +2,8 @@
 #include "qfpluginservices.h"
 #include "programoptions.h"
 #include "ui_imfcscalibrationdialog.h"
+#include "qffitfunction.h"
+#include "qffitfunctionmanager.h"
 
 ImFCSCalibrationDialog::ImFCSCalibrationDialog(QWidget *parent) :
     QDialog(parent),
@@ -46,4 +48,24 @@ QList<double> ImFCSCalibrationDialog::getValues() const {
 double ImFCSCalibrationDialog::getFocusHeight() const
 {
     return ui->spinFocusHeight->value();
+}
+
+double ImFCSCalibrationDialog::getFocusHeightError() const
+{
+    return ui->spinFocusHeightError->value();
+}
+
+void ImFCSCalibrationDialog::setFitModels(const QStringList& models, const QString& defaultModel)
+{
+    ui->cmbFitModel->clear();
+    for (int i=0; i<models.size(); i++) {
+        QFFitFunction* f=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(models[i], NULL);
+        ui->cmbFitModel->addItem(f->name(), models[i]);
+    }
+    ui->cmbFitModel->setCurrentIndex(ui->cmbFitModel->findData(defaultModel));
+}
+
+QString ImFCSCalibrationDialog::getFitModel() const
+{
+    return ui->cmbFitModel->itemData(ui->cmbFitModel->currentIndex()).toString();
 }
