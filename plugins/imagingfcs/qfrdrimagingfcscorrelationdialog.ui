@@ -1854,6 +1854,9 @@ p, li { white-space: pre-wrap; }
            <property name="text">
             <string/>
            </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
@@ -2061,17 +2064,17 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QEnhancedLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>qenhancedlineedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
    <header>qfdoubleedit.h</header>
    <slots>
     <signal>valueChanged(double)</signal>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>QEnhancedLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qenhancedlineedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
