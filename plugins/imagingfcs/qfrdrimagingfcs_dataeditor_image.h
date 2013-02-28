@@ -89,6 +89,8 @@ protected:
 
         /** \brief connected to the rawDataChanged() signal of the current record */
         virtual void rawDataChanged();
+
+        virtual void maskChanged();
         /** \brief update selection etz. after click on image */
         void updateAfterClick();
         /** \brief connect widgets to current data record */

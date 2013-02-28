@@ -58,7 +58,7 @@ QFRDRFCSData::~QFRDRFCSData()
 }
 
 void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
-    qDebug()<<"resizeCorrelations( N="<<N<<",  runs="<<runs<<")";
+    //qDebug()<<"resizeCorrelations( N="<<N<<",  runs="<<runs<<")";
     if (correlationT) free(correlationT);
     if (correlation) free(correlation);
     if (correlationMean) free(correlationMean);
@@ -1096,8 +1096,8 @@ bool QFRDRFCSData::loadInternal(QDomElement* e) {
                 runs=datalist[0].size()-1;
             }
         }
-        qDebug()<<"  -> "<<mode;
-        qDebug()<<"  -> "<<datalist.size()<<runs;
+        //qDebug()<<"  -> "<<mode;
+        //qDebug()<<"  -> "<<datalist.size()<<runs;
         //qDebug()<<"  -> "<<datalist;
         resizeCorrelations(datalist.size(), runs);
         for (int i=0; i<datalist.size(); i++) {
@@ -1167,8 +1167,8 @@ bool QFRDRFCSData::reloadFromFiles() {
             if (aft=="ACF" || aft.isEmpty()) cfiles<<files[i];
             if (aft=="RATE") pfiles<<files[i];
         }
-        qDebug()<<"----------------------------------------------------\ncfiles="<<cfiles;
-        qDebug()<<"pfiles="<<pfiles;
+        //qDebug()<<"----------------------------------------------------\ncfiles="<<cfiles;
+        //qDebug()<<"pfiles="<<pfiles;
         // now try to find additional files and data
         if (!(getProperty("SEARCHED_MORE_FILES", false).toBool()) && cfiles.size()>0) {
             QRegExp rxFCS("(.*)\\_(fcs.+)corr\\.dat");
@@ -1193,13 +1193,13 @@ bool QFRDRFCSData::reloadFromFiles() {
                         setName(description+" ("+QFileInfo(cfiles[0]).fileName()+")");
                     }
                 }
-                qDebug()<<"----------------------------------------------------\nobjectname="<<objectname;
-                qDebug()<<"basename="<<basename;
-                qDebug()<<"description="<<description;
-                qDebug()<<"new_name="<<getName();
-                qDebug()<<"btsfile="<<btsfile;
-                qDebug()<<"configfile="<<configfile;
-                qDebug()<<"bintime="<<bintime;
+                //qDebug()<<"----------------------------------------------------\nobjectname="<<objectname;
+                //qDebug()<<"basename="<<basename;
+                //qDebug()<<"description="<<description;
+                //qDebug()<<"new_name="<<getName();
+                //qDebug()<<"btsfile="<<btsfile;
+                //qDebug()<<"configfile="<<configfile;
+                //qDebug()<<"bintime="<<bintime;
                 if (bintime>0) {
                     setQFProperty("CSV_RATEFACTOR", 1.0/bintime/1000.0, false, false);
                 }

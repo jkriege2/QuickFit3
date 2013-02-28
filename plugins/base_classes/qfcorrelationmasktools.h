@@ -24,8 +24,6 @@ class QFCorrelationMaskTools : public QFRDRImageMaskEditTools
 
         virtual void setRDR(QFRawDataRecord* rdr);
 
-    signals:
-        void rawDataChanged();
     public slots:
         /** \brief mask ACF runs according to statistics (find erroneous pixels) */
         void findErroneousPixels();

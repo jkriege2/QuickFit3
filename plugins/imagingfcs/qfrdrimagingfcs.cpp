@@ -809,7 +809,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
             if (QFile::exists(filename_overview) && QFile::exists(filename_overviewstd) && QFile::exists(filename_background) && QFile::exists(filename_backgroundstddev)) {
                 QFileInfo fi(filename_overview);
-                qDebug()<<fi.fileName();
+                //qDebug()<<fi.fileName();
                 QStringList ffiles, ffile_types, ffiles_descriptions;
                 ffiles<<filename_overview<<filename_overviewstd<<filename_background<<filename_backgroundstddev;
                 ffile_types<<"image"<<"image_std"<<"background"<<"background_stddev";
@@ -818,9 +818,9 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                 ffile_types<<more_files_types;
                 ffiles_descriptions<<more_files_descriptions;
 
-                qDebug()<<ffiles.size()<<"::: "<<ffiles;
-                qDebug()<<ffile_types.size()<<"::: "<<ffile_types;
-                qDebug()<<ffiles_descriptions.size()<<"::: "<<ffiles_descriptions;
+                //qDebug()<<ffiles.size()<<"::: "<<ffiles;
+                //qDebug()<<ffile_types.size()<<"::: "<<ffile_types;
+                //qDebug()<<ffiles_descriptions.size()<<"::: "<<ffiles_descriptions;
                 QMap<QString,QVariant>& init_params=initParams;
                 QStringList init_params_readonly=paramsReadonly;
                 init_params["BACKGROUND_CORRECTED"]=true;

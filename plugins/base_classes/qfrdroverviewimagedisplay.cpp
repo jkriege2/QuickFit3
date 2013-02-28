@@ -652,12 +652,12 @@ void QFRDROverviewImageDisplay::displayImage() {
         for (int jj=0; jj<cmbImage->currentIndex(); jj++) {
             images+=cmbImage->itemText(jj)+" / ";
         }
-        qDebug()<<"1:    idx="<<cmbImage->currentIndex()<<images;
+        //qDebug()<<"1:    idx="<<cmbImage->currentIndex()<<images;
         int width=m->getOverviewImageWidth(cmbImage->currentIndex());
         int height=m->getOverviewImageHeight(cmbImage->currentIndex());
-        qDebug()<<"2:    w="<<width<<"   h="<<height;
+        //qDebug()<<"2:    w="<<width<<"   h="<<height;
         QList<QFRDROverviewImageInterface::OverviewImageGeoElement> overlayElements=m->getOverviewImageAnnotations(cmbImage->currentIndex());
-        qDebug()<<"3:    data="<<m->getOverviewImage(cmbImage->currentIndex());
+        //qDebug()<<"3:    data="<<m->getOverviewImage(cmbImage->currentIndex());
         if (m->getOverviewImage(cmbImage->currentIndex())) {
             image->set_data(m->getOverviewImage(cmbImage->currentIndex()), width, height, JKQTPMathImageBase::DoubleArray);
             image->set_width(width);
@@ -676,7 +676,7 @@ void QFRDROverviewImageDisplay::displayImage() {
             histogram->setEnabled(true);
             showHistograms(m->getOverviewImage(cmbImage->currentIndex()), width*height);
 
-            qDebug()<<"4";
+            //qDebug()<<"4";
             QList<QColor> cols;
             cols<<QColor("red")<<QColor("orange")<<QColor("green")<<QColor("deeppink");
             cols<<QColor("dodgerblue")<<QColor("mediumpurple")<<QColor("brown")<<QColor("salmon");

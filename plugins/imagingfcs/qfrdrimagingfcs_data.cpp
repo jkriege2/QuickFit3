@@ -843,7 +843,7 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
 
     if (!propertyExists("IS_OVERVIEW_SCALED")) setQFProperty("IS_OVERVIEW_SCALED", false, false, true);
 
-    qDebug()<<"loadRadhard2File("<<sizeof(int)<<height<<width<<steps<<height*width*steps;
+    //qDebug()<<"loadRadhard2File("<<sizeof(int)<<height<<width<<steps<<height*width*steps;
 
     if((height*width*steps)==0)return false;
 
@@ -851,7 +851,7 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
     yaid_rh::corFileReader *cfr=new yaid_rh::corFileReader(filename.toLocal8Bit().constData(),width,height,steps);
     cfr->processFrames(1);
 
-    qDebug()<<"loadRadhard2File("<<cfr->getTotalLagCount();
+    //qDebug()<<"loadRadhard2File("<<cfr->getTotalLagCount();
 
     allocateContents(width,height,cfr->getTotalLagCount()-1);
     //load correlation data

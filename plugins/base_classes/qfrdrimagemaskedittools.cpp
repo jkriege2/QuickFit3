@@ -193,7 +193,7 @@ void QFRDRImageMaskEditTools::signalMaskChanged(bool delayed, bool updateUndoRed
         timUpdateAfterClick->stop();
         timUpdateAfterClick->start(CLICK_UPDATE_TIMEOUT);
     } else {
-        //qDebug()<<"emitting QFRDRImageMaskEditTools::rawDataChanged()";
+        //qDebug()<<"###### emitting QFRDRImageMaskEditTools::rawDataChanged()";
         emit rawDataChanged();
     }
 }
@@ -206,7 +206,7 @@ void QFRDRImageMaskEditTools::updateUndoActions()
 
 void QFRDRImageMaskEditTools::updateAfterClick()
 {
-    //qDebug()<<"emitting QFRDRImageMaskEditTools::rawDataChanged()";
+    //qDebug()<<"### emitting QFRDRImageMaskEditTools::rawDataChanged()";
     emit rawDataChanged();
 }
 

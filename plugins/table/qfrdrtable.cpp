@@ -720,7 +720,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.color=QStringToQColor(ge.attribute("color", "blue"));
                     graph.errorColor=QStringToQColor(ge.attribute("errorcolor", "darkblue"));
                     graph.fillColor=QStringToQColor(ge.attribute("fillcolor", "blue"));
-                    qDebug()<<ge.attribute("type")<<ge.attribute("fillcolor", "blue");
+                    //qDebug()<<ge.attribute("type")<<ge.attribute("fillcolor", "blue");
                     graph.style=String2QPenStyle(ge.attribute("style", "solid"));
                     graph.symbol=String2JKQTPgraphSymbols(ge.attribute("symbol", "symbol_cross"));
                     graph.errorStyle=String2JKQTPerrorPlotstyle(ge.attribute("errorStyle", "error_none"));

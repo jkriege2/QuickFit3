@@ -132,7 +132,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool1()
     for (int i=0; i<project->getRawDataCount(); i++) {
         QFRawDataRecord* e=project->getRawDataByNum(i);
         QFRDRTableInterface* eetab=qobject_cast<QFRDRTableInterface*>(e);
-        qDebug()<<i<<e<<eetab;
+        //qDebug()<<i<<e<<eetab;
         if (e && eetab) {
             if (e->getProperty("IMFCS_CALIBRATION_RESULTTABLE", false).toBool()) {
                 etab=e;
@@ -313,7 +313,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
     for (int i=0; i<project->getRawDataCount(); i++) {
         QFRawDataRecord* e=project->getRawDataByNum(i);
         QFRDRTableInterface* eetab=qobject_cast<QFRDRTableInterface*>(e);
-        qDebug()<<i<<e<<eetab;
+        //qDebug()<<i<<e<<eetab;
         if (e && eetab) {
             if (e->getProperty("IMFCS_CALIBRATION_RESULTTABLE", false).toBool()) {
                 etab=e;

@@ -128,7 +128,7 @@ void QFRDRTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     if (dEditor) {
         QVariant v( dEditor->value());
         v.convert(QVariant::Double);
-        qDebug()<<v;
+        //qDebug()<<v;
         model->setData(index, v);
     } else {
         QLineEdit *edit = qobject_cast<QLineEdit*>(editor);
@@ -219,9 +219,9 @@ void QFRDRTableDelegate::doEditExpression()
 bool QFRDRTableDelegate::eventFilter(QObject *editor, QEvent *event) {
     QWidget* w=qobject_cast<QWidget*>(editor);
     QKeyEvent* key=dynamic_cast<QKeyEvent*>(event);
-    qDebug()<<"QFRDRTableDelegate::eventFilter(event="<<event->type()<<")";
+    //qDebug()<<"QFRDRTableDelegate::eventFilter(event="<<event->type()<<")";
     if (w && key && event->type()==QEvent::KeyPress) {
-        qDebug()<<"QFRDRTableDelegate::eventFilter(event=QEvent::KeyPress): key_modifiers="<<key->modifiers()<<"   key="<<key->key();
+        //qDebug()<<"QFRDRTableDelegate::eventFilter(event=QEvent::KeyPress): key_modifiers="<<key->modifiers()<<"   key="<<key->key();
         if (key->modifiers()==Qt::NoModifier && (key->key()==Qt::Key_Enter || key->key()==Qt::Key_Return)) {
             emit commitData(w);
             emit closeEditorEnhanced(w, QFRDRTableDelegate::EditNextRow);

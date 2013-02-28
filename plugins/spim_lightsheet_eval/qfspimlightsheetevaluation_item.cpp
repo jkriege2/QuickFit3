@@ -95,7 +95,7 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
         }
         int wi=w;
         int hi=h;
-        qDebug()<<useMask<<dataM<<maskD;
+        //qDebug()<<useMask<<dataM<<maskD;
         if (orientation==QFSPIMLightsheetEvaluationItem::fitColumns) {
             // rotate image by 90°
             double* m=data->getImageStack(stack, stack_pos, channel);
@@ -147,7 +147,7 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
                     data_count++;
                 }
             }
-            qDebug()<<data_count<<wi;
+            //qDebug()<<data_count<<wi;
 
 
             int pcount=model->paramCount();

@@ -222,7 +222,7 @@ void QFRDRImageStackDataEditor::rawDataChanged() {
 	QFRDRImageStackData* m=qobject_cast<QFRDRImageStackData*>(current);
     //labTest->setText(tr("loaded record with files<br><i>%1</i>").arg(m->getFiles().join("<br>")));
     displayImage();
-    qDebug()<<"QFRDRImageStackDataEditor::rawDataChanged()";
+    //qDebug()<<"QFRDRImageStackDataEditor::rawDataChanged()";
 };
 
 void QFRDRImageStackDataEditor::readSettings() {

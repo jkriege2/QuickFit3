@@ -47,7 +47,7 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     createWidgets();
     //QTimer::singleShot(500, this, SLOT(debugInfo()));
     connect(timUpdateAfterClick, SIGNAL(timeout()), this, SLOT(updateAfterClick()));
-    connect(correlationMaskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
+    connect(correlationMaskTools, SIGNAL(rawDataChanged()), this, SLOT(maskChanged()));
 }
 
 QFRDRImagingFCSImageEditor::~QFRDRImagingFCSImageEditor()
@@ -2163,7 +2163,7 @@ void QFRDRImagingFCSImageEditor::updateAfterClick() {
 }
 
 void QFRDRImagingFCSImageEditor::rawDataChanged() {
-    qDebug()<<"QFRDRImagingFCSImageEditor::rawDataChanged()";
+    //qDebug()<<"QFRDRImagingFCSImageEditor::rawDataChanged()";
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     updateSelectionCombobox();
     replotSelection(false);
@@ -2175,6 +2175,16 @@ void QFRDRImagingFCSImageEditor::rawDataChanged() {
     /*if (!chkAutorangeOverview->isChecked()) */ovrPaletteChanged();
     updateHistogram();
     QApplication::restoreOverrideCursor();
+}
+
+void QFRDRImagingFCSImageEditor::maskChanged()
+{
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    //qDebug()<<":maskChanged()  m="<<m;
+    if (m) {
+        m->recalcCorrelations();
+    }
+    rawDataChanged();
 };
 
 void QFRDRImagingFCSImageEditor::resultsChanged(const QString& evalName, const QString& resultName,bool deleted) {

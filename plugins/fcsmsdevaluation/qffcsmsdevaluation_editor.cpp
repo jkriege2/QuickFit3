@@ -1712,7 +1712,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
         // ensure replot, if we have to
         pltDistResults->set_doDrawing(true);
         pltDistResults->update_plot();
-        qDebug()<<"pltDistResults->update_plot(): "<<pltDistResults->get_xAxis()->getMin()<<" ... "<<pltDistResults->get_xAxis()->getMax()<<",     "<<pltDistResults->get_yAxis()->getMin()<<" ... "<<pltDistResults->get_yAxis()->getMax();
+        //qDebug()<<"pltDistResults->update_plot(): "<<pltDistResults->get_xAxis()->getMin()<<" ... "<<pltDistResults->get_xAxis()->getMax()<<",     "<<pltDistResults->get_yAxis()->getMin()<<" ... "<<pltDistResults->get_yAxis()->getMax();
     }
     QApplication::restoreOverrideCursor();
 }

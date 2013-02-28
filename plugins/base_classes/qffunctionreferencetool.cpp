@@ -129,7 +129,7 @@ void QFFunctionReferenceTool::delayedStartSearchThreads()
     threadsFinished=0;
     searching=true;
     for (int i=0; i<threads.size(); i++) {
-        qDebug()<<"starting thread "<<i+1;
+        //qDebug()<<"starting thread "<<i+1;
         threads[i]->start();
     }
 }

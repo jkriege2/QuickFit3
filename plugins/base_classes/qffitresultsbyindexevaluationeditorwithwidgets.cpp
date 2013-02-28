@@ -1654,7 +1654,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllRunsThreaded() {
             items=items+runmax-runmin+1;
             for (int run=runmin; run<=runmax; run++) {
                 bool doall=!current->getProperty("LEAVEOUTMASKED", false).toBool();
-                qDebug()<<doall;
+                //qDebug()<<doall;
                 if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
                     threads[thread]->addJob(eval, record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()));
                     thread++;

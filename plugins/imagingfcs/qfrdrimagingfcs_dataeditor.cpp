@@ -247,7 +247,7 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
 
 void QFRDRImagingFCSDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
     if (old) {
-        disconnect(old, 0, this, 0);
+        //disconnect(old, 0, this, 0);
         disconnect(old, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
     }
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
@@ -311,6 +311,7 @@ void QFRDRImagingFCSDataEditor::rawDataChanged() {
 void QFRDRImagingFCSDataEditor::rawDataChangedRecalc()
 {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    //qDebug()<<"rawDataChangedRecalc()  m="<<m;
     if (m) m->recalcCorrelations();
     replotData();
 }
