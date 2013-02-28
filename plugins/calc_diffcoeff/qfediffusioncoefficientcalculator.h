@@ -74,7 +74,8 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
 
         enum SpheroidType {
             Ellipsoid=0,
-            Cylinder=1
+            Cylinder=1,
+            Sphere=2
         };
 
 

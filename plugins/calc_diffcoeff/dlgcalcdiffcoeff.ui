@@ -29,52 +29,8 @@
      <item row="0" column="0" rowspan="2">
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
-       <widget class="QWidget" name="tab">
-        <attribute name="title">
-         <string>Sphere</string>
-        </attribute>
-        <layout class="QFormLayout" name="formLayout_2">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>diameter:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QDoubleSpinBox" name="spinSPhereDiameter">
-           <property name="suffix">
-            <string> nm</string>
-           </property>
-           <property name="minimum">
-            <double>0.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>100000.000000000000000</double>
-           </property>
-           <property name="value">
-            <double>100.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>diffusion coefficient:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLabel" name="labSphereD">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
          <string>given D</string>
@@ -301,6 +257,11 @@
            <item>
             <property name="text">
              <string>zylinder</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>sphere</string>
             </property>
            </item>
           </widget>
@@ -976,22 +937,6 @@
     <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinSPhereDiameter</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>DlgCalcDiffCoeff</receiver>
-   <slot>updateD()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>102</x>
-     <y>43</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1</x>
-     <y>104</y>
     </hint>
    </hints>
   </connection>

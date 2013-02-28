@@ -222,6 +222,9 @@ double QFEDiffusionCoefficientCalculator::getShapeDCoeff(int solution, double ro
         double gamma=0.312+0.565/p+0.100/p/p;
         Re=pow(3.0/(2.0*p*p), 1.0/3.0)*rotation_axis_or_length_meter/2.0;
         Ft=pow(2.0*p*p/3.0, 1.0/3.0)/(log(p)+gamma);
+    } else if (type==QFEDiffusionCoefficientCalculator::Sphere){
+        Ft=1;
+        Re=rotation_axis_or_length_meter/2.0;
     }
     if (volume) *volume=4.0/3.0*M_PI*Re*Re*Re;
 

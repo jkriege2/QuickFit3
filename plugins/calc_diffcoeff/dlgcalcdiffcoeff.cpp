@@ -119,18 +119,14 @@ void DlgCalcDiffCoeff::updateD() {
         visc.append(plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+T, comps)*1000.0);
         density.append(plugin->getSolutionDensity(ui->cmbSolutionName->currentIndex(), 273.15+T, comps));
         if (ui->tabWidget->currentIndex()==0) {
-            D.append(plugin->getSphereDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinSPhereDiameter->value()*1e-9, 273.15+T, comps)*1e12);
-            Dsolution.append(plugin->getSphereDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinSPhereDiameter->value()*1e-9, 273.15+T)*1e12);
-            Dwater.append(plugin->getSphereDCoeff(0, ui->spinSPhereDiameter->value()*1e-9, 273.15+T)*1e12);
-        } else if (ui->tabWidget->currentIndex()==1) {
             D.append(plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15, 273.15+T, comps)*1e12);
             Dsolution.append(plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15, 273.15+T)*1e12);
             Dwater.append(plugin->getDCoeff_from_D(0, ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15, 273.15+T)*1e12);
-        } else if (ui->tabWidget->currentIndex()==2) {
+        } else if (ui->tabWidget->currentIndex()==1) {
             D.append(plugin->getDCoeff_from_D20W(ui->cmbSolutionName->currentIndex(), ui->spinGivenD20W->value()/1e12, 273.15+T, comps)*1e12);
             Dsolution.append(plugin->getDCoeff_from_D20W(ui->cmbSolutionName->currentIndex(), ui->spinGivenD20W->value()/1e12, 273.15+T)*1e12);
             Dwater.append(plugin->getDCoeff_from_D20W(0, ui->spinGivenD20W->value()/1e12, 273.15+T)*1e12);
-        } else if (ui->tabWidget->currentIndex()==3) {
+        } else if (ui->tabWidget->currentIndex()==2) {
             double DS=0;
             D.append(plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, comps, &DS)*1e12);
             Dsolution.append(plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T)*1e12);
@@ -149,14 +145,11 @@ void DlgCalcDiffCoeff::updateD() {
     }
     double T=ui->spinExperimentTemperature->value();
     if (ui->tabWidget->currentIndex()==0) {
-        ui->labSphereD->setText(tr("D<sub>20,W</sub> = %1 &mu;m<sup>2</sup>/s").arg(plugin->getSphereDCoeff(0, ui->spinSPhereDiameter->value()*1e-9, 293.15)*1e12));
-        DD=plugin->getSphereDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinSPhereDiameter->value()*1e-9, 273.15+T, comps)*1e12;
-    } else if (ui->tabWidget->currentIndex()==1) {
         ui->labGivenDD20W->setText(tr("D<sub>20,W</sub> = %1 &mu;m<sup>2</sup>/s").arg(plugin->getDCoeff_from_D(0, ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15, 293.15)*1e12));
         DD=plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15, 273.15+T, comps)*1e12;
-    } else if (ui->tabWidget->currentIndex()==2) {
+    } else if (ui->tabWidget->currentIndex()==1) {
         DD=plugin->getDCoeff_from_D20W(ui->cmbSolutionName->currentIndex(), ui->spinGivenD20W->value()/1e12, 273.15+T, comps)*1e12;
-    } else if (ui->tabWidget->currentIndex()==3) {
+    } else if (ui->tabWidget->currentIndex()==2) {
         DD=plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, comps)*1e12;
         double D20Wsphere=0;
         double volume=0;
@@ -333,7 +326,7 @@ void DlgCalcDiffCoeff::redoPlot()
         JKQTPxyLineGraph* g;
 
 
-        if (ui->tabWidget->currentIndex()==3) {
+        if (ui->tabWidget->currentIndex()==2) {
             g=new JKQTPxyLineGraph(ui->plotter->get_plotter());
             g->set_drawLine(true);
             g->set_xColumn(c_temp);
@@ -401,7 +394,6 @@ void DlgCalcDiffCoeff::readSettings() {
             ui->spinSolutionTemperature->setValue(set->value(plugin->getID()+"/temperature", 10).toDouble());
             ui->spinSolutionTemperatureEnd->setValue(set->value(plugin->getID()+"/temperature_end", 40).toDouble());
             ui->spinSolutionTemperatureDelta->setValue(set->value(plugin->getID()+"/temperature_delta", 0.5).toDouble());
-            ui->spinSPhereDiameter->setValue(set->value(plugin->getID()+"/diameter", 100).toDouble());
             //ui->edtGivenD->setValue(set->value(plugin->getID()+"/givenD/D", 100).toDouble());
             //ui->edtGivenDVisc->setValue(set->value(plugin->getID()+"/givenD/visc", 1).toDouble());
             //ui->spinGivenDT->setValue(set->value(plugin->getID()+"/givenD/Temp", 20).toDouble());
@@ -445,7 +437,6 @@ void DlgCalcDiffCoeff::writeSettings() {
             set->setValue(plugin->getID()+"/temperature", ui->spinSolutionTemperature->value());
             set->setValue(plugin->getID()+"/temperature_end", ui->spinSolutionTemperatureEnd->value());
             set->setValue(plugin->getID()+"/temperature_delta", ui->spinSolutionTemperatureDelta->value());
-            set->setValue(plugin->getID()+"/diameter", ui->spinSPhereDiameter->value());
             set->setValue(plugin->getID()+"/givenD/D", ui->edtGivenD->value());
             set->setValue(plugin->getID()+"/givenD/D_error", ui->edtGivenDError->value());
             set->setValue(plugin->getID()+"/givenD/visc", ui->edtGivenDVisc->value());
@@ -620,10 +611,20 @@ void DlgCalcDiffCoeff::on_cmbShapeType_currentIndexChanged(int index) {
         else  ui->labShapePic->setPixmap(QPixmap(":/calc_diffcoeff/prolate.png"));
         ui->labRotAxis->setText(tr("rotation axis diameter a:"));
         ui->labOtherAxis->setText(tr("other axes diameter b:"));
-    } else {
+        ui->labOtherAxis->setVisible(true);
+        ui->spinOtherAxis->setVisible(true);
+    } else if (index==1) {
         ui->labShapePic->setPixmap(QPixmap(":/calc_diffcoeff/cylinder.png"));
         ui->labRotAxis->setText(tr("cylinder length L:"));
         ui->labOtherAxis->setText(tr("diameter d:"));
+        ui->labOtherAxis->setVisible(true);
+        ui->spinOtherAxis->setVisible(true);
+    } else {
+        ui->labShapePic->setPixmap(QPixmap(":/calc_diffcoeff/sphere.png"));
+        ui->labRotAxis->setText(tr("diameter d:"));
+        ui->labOtherAxis->setText(tr("---"));
+        ui->labOtherAxis->setVisible(false);
+        ui->spinOtherAxis->setVisible(false);
     }
 }
 
