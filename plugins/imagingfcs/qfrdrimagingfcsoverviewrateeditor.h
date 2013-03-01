@@ -34,6 +34,7 @@ class QFRDRImagingFCSOverviewRateEditor : public QFRawDataEditor
         QFRDROverviewImageDisplay* imEditor1;
 
         QVisibleHandleSplitter* mainSplitter;
+
 };
 
 #endif // QFRDRIMAGINGFCSOVERVIEWRATEEDITOR_H

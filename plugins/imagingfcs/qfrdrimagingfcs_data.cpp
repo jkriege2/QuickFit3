@@ -116,6 +116,76 @@ QString QFRDRImagingFCSData::getExportDialogFiletypes() {
     return tr("");
 }
 
+int QFRDRImagingFCSData::getSegmentCount() const
+{
+    return getProperty("SEGMENTS", 0).toInt();
+}
+
+double QFRDRImagingFCSData::getSegmentDuration() const
+{
+    return getProperty("MEASUREMENT_DURATION_MS", 0.0).toDouble()/1000.0/double(getSegmentCount());
+}
+
+bool QFRDRImagingFCSData::segmentUsed(int segment) const
+{
+    QStringList segs=getProperty("SEGMENTS_EXCLUDED", "").toString().split(";");
+    for (int i=0; i<segs.size(); i++) {
+        bool ok=false;
+        if (segment==segs[i].toInt(&ok)) {
+            if (ok) return false;
+        }
+    }
+    return true;
+}
+
+bool QFRDRImagingFCSData::allSegmentsUsed() const
+{
+    if (!getProperty("SEGMENTS_USABLE", false).toBool()) return true;
+    for (int i=0; i<getSegmentCount(); i++) {
+        if (!segmentUsed(i)) return false;
+    }
+    return true;
+}
+
+void QFRDRImagingFCSData::setSegmentUsed(int segment, bool used)
+{
+    if (!getProperty("SEGMENTS_USABLE", false).toBool()) return;
+    QStringList segs=getProperty("SEGMENTS_EXCLUDED", "").toString().split(";");
+    if (!used) {
+        if (!segs.contains(QString::number(segment))) segs.append(QString::number(segment));
+    } else {
+        segs.removeAll(QString::number(segment));
+    }
+
+    setQFProperty("SEGMENTS_EXCLUDED", segs.join(";"));
+
+    //qDebug()<<"setSegmentUsed("<<segment<<", "<<used<<"):   "<<segs.join(";");
+}
+
+void QFRDRImagingFCSData::recalcSegmentedAverages()
+{
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    log_text(tr("recalculating segmented CF averages ... \n"));
+    QString filetype=getProperty("FILETYPE", "unknown").toString();
+    for (int i=0; i<files.size(); i++) {
+        if (i<files_types.size()) {
+            QString ft=files_types[i].toLower().trimmed();
+            if (ft=="acf" || ft=="ccf" || ft=="dccf") {
+                if (filetype.toUpper()=="VIDEO_CORRELATOR_BIN") {
+                    log_text(tr("   reloading %2 file: %1\n").arg(QFileInfo(files[i]).fileName()).arg(ft));
+                    loadVideoCorrelatorFileBin(files[i]);
+                }
+            }
+        }
+    }
+
+    recalcCorrelations();
+
+    emitRawDataChanged();
+    log_text(tr("recalculating segmented CF averages ... DONE!\n"));
+    QApplication::restoreOverrideCursor();
+}
+
 void QFRDRImagingFCSData::exportData(const QString& format, const QString& filename)const  {
 	// here you may export the data of the record into the specified format (see getExportFiletypes() )
 	// THIS IS OPTIONAL
@@ -761,7 +831,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
         //qDebug()<<"opened file     "<<time.elapsed()<<"ms"; time.start();
 #endif
         QByteArray file_id=file.read(10);
-        if (file_id=="QF3.0imFCS") {
+        if (file_id=="QF3.0imFCS" || file_id=="QF3.1imFCS") {
             uint32_t fwidth=binfileReadUint32(file);
             uint32_t fheight=binfileReadUint32(file);
             uint32_t fcorrN=binfileReadUint32(file);
@@ -770,6 +840,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
 
             setQFProperty("WIDTH", fwidth, false, true);
             setQFProperty("HEIGHT", fwidth, false, true);
+            setQFProperty("SEGMENTS_USABLE", file_id!="QF3.0imFCS", false, true);
             allocateContents(fwidth, fheight, fN);
 
             binfileReadDoubleArray(file, tau, N);
@@ -791,9 +862,9 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
                 }
                 QApplication::processEvents();
             } else {
-                for (uint32_t cf=0; cf<fcorrN; cf++) {
-                    if (cf==corr_set) {
-                        for (long long p=0; p<width*height; p++) {
+                for (long long p=0; p<width*height; p++) {
+                    for (uint32_t cf=0; cf<fcorrN; cf++) {
+                        if (cf==corr_set) {
                             binfileReadDoubleArray(file, &(correlations[p*N]), N);
                             if (corroffset!=0) for (int i=0; i<N; i++) { correlations[p*N+i]=correlations[p*N+i]-corroffset; }
                             if (fsets>1) binfileReadDoubleArray(file, &(sigmas[p*N]), N);
@@ -806,14 +877,81 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
                                 }
                             }
                             leaveout[p]=allZero;
+                        } else {
+                            file.seek(file.pos()+N*sizeof(double));
+                            if (fsets>1) file.seek(file.pos()+N*sizeof(double));
                         }
-                    } else {
-                        file.seek(file.pos()+width*height*N*sizeof(double));
-                        if (fsets>1) file.seek(file.pos()+width*height*N*sizeof(double));
                     }
                     QApplication::processEvents();
                 }
             }
+
+            long long errorFilesizeFactor=1;
+            if (fsets>1) errorFilesizeFactor=2;
+            //qDebug()<<"filepos before segments: "<<file.pos()<<"  ==  "<<10 + 5*4 + N*sizeof(double) + width*height*N*sizeof(double)*fcorrN*errorFilesizeFactor;
+            file.seek(10 + 5*4 + N*sizeof(double) + width*height*N*sizeof(double)*fcorrN*errorFilesizeFactor);
+            if (!file.atEnd()) {
+                uint32_t segments=binfileReadUint32(file);
+                setQFProperty("SEGMENTS", segments, false, true);
+                //qDebug()<<"segments="<<segments;
+                if (!allSegmentsUsed() && segments>0) {
+                    //qDebug()<<"reloading segments ...";
+                    for (long long p=0; p<width*height*N; p++) {
+                        correlations[p]=sigmas[p]=0;
+                    }
+
+                    double* dummy=(double*)calloc(N, sizeof(double));
+
+                    for (long long p=0; p<width*height; p++) {
+                        double count=0;
+                        for (long long seg=0; seg<segments; seg++) {
+                            if (segmentUsed(seg)) {
+                                for (uint32_t cf=0; cf<fcorrN; cf++) {
+                                    if (cf==corr_set) {
+                                        binfileReadDoubleArray(file, dummy, N); //&(correlations[p*N]), N);
+                                        if (corroffset!=0) for (int i=0; i<N; i++) { dummy[i]=dummy[i]-corroffset; }
+
+                                        for (int i=0; i<N; i++) {
+                                            correlations[p*N+i]=correlations[p*N+i]+dummy[i];
+                                            sigmas[p*N+i]=sigmas[p*N+i]+dummy[i]*dummy[i];
+                                        }
+                                        count++;
+
+                                    } else {
+                                        file.seek(file.pos()+N*sizeof(double));
+                                        if (fsets>1) file.seek(file.pos()+N*sizeof(double));
+                                    }
+                                }
+                            } else {
+                                //qDebug()<<"excluding segment "<<seg;
+                                file.seek(file.pos()+N*fcorrN*sizeof(double));
+                                if (fsets>1) file.seek(file.pos()+N*fcorrN*sizeof(double));
+                            }
+                        }
+
+                        for (int i=0; i<N; i++) {
+                            if (count>1) sigmas[p*N+i]=sqrt((sigmas[p*N+i]-correlations[p*N+i]*correlations[p*N+i]/count)/(count-1.0));
+                            else sigmas[p*N+i]=0;
+                            correlations[p*N+i]=correlations[p*N+i]/count;
+                        }
+
+                        bool allZero=true;
+                        for (int i=0; i<N; i++) {
+                            if (correlations[p*N+i]!=0) {
+                                allZero=false;
+                                break;
+                            }
+                        }
+                        leaveout[p]=allZero;
+
+                        QApplication::processEvents();
+                    }
+
+                    free(dummy);
+
+                }
+            }
+
             QApplication::processEvents();
             recalcCorrelations();
             QApplication::processEvents();
@@ -823,7 +961,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
             }
         } else {
             ok=false;
-            errorDescription=tr("binary file '%3' did not start with the correct file id: found '%1' but expected '%2'").arg(QString(file_id)).arg(QString("QF3.0imFCS")).arg(filename);
+            errorDescription=tr("binary file '%3' did not start with the correct file id: found '%1' but expected '%2'").arg(QString(file_id)).arg(QString("QF3.0imFCS' or 'QF3.1imFCS'")).arg(filename);
         }
         file.close();
 
@@ -964,6 +1102,7 @@ bool QFRDRImagingFCSData::isCorrelationRunVisible(int run) const {
 }
 
 void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
+    if (x==width && y==height && N==this->N) return;
     if (correlations) free(correlations);
     if (correlationMean) free(correlationMean);
     if (correlationStdDev) free(correlationStdDev);

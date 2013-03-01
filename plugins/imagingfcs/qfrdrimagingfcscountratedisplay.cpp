@@ -157,6 +157,7 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
     data=NULL;
     dataN=0;
     dataT=NULL;
+    ui->pltIntensity->get_plotter()->clearOverlayElement(true);
     if (!current || !m) {
         ds->clear();
         ui->pltIntensity->set_doDrawing(false);
@@ -177,6 +178,11 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
         JKQTPdatastore* ds=ui->pltIntensity->get_plotter()->getDatastore();
         ds->clear();
         ui->pltIntensity->set_doDrawing(false);
+        double duration=m->getProperty("MEASUREMENT_DURATION_MS", 0).toDouble()/1000.0;
+        double exposure=m->getProperty("FRAMETIME_MS", 0).toDouble();
+        int segments=m->getSegmentCount();
+        int sumframes=m->getProperty("VIDEO_AVGFRAMES", 0).toInt();
+
         int colT=ds->addColumn(m->getStatisticsT(), m->getStatisticsN(), "time");
         int colAvg=ds->addColumn(m->getStatisticsMean(), m->getStatisticsN(), "avg");
         int colStddev=ds->addColumn(m->getStatisticsStdDev(), m->getStatisticsN(), "stddev");
@@ -490,6 +496,30 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
             dataN=m->getUncorrectedStatisticsN();
         }
 
+        if (duration>0 && segments>0) {
+
+            for (int i=0; i<segments; i++) {
+                double t=double(i)*duration/double(segments);
+                if (m->segmentUsed(i)) {
+                    JKQTPoverlayVerticalLine* ovl=new JKQTPoverlayVerticalLine(t, tr("seg.%1  t=%2s").arg(i+1).arg(t), ui->pltIntensity->get_plotter());
+                    ovl->set_color(QColor("black"));
+                    ovl->set_lineWidth(2);
+                    ovl->set_lineStyle(Qt::DotLine);
+                    ovl->set_fontSize(9);
+                    ui->pltIntensity->get_plotter()->addOverlayElement(ovl);
+                } else {
+                    JKQTPoverlayVerticalRange* ovl=new JKQTPoverlayVerticalRange(t, t+duration/double(segments), tr("seg.%1  t=%2s").arg(i+1).arg(t), ui->pltIntensity->get_plotter());
+                    QColor fill=QColor("darkgray");
+                    fill.setAlphaF(0.6);
+                    ovl->set_color(QColor("darkgray"));
+                    ovl->set_fillColor(fill);
+                    ovl->set_lineWidth(2);
+                    ovl->set_lineStyle(Qt::DotLine);
+                    ovl->set_fontSize(9);
+                    ui->pltIntensity->get_plotter()->addOverlayElement(ovl);
+                }
+            }
+        }
 
         rangeGraph->set_rangeCenter(dispMean);
         rangeGraph->set_rangeMin(dispMean-dispStddev);
@@ -499,7 +529,8 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
         ui->pltIntensity->update_plot();
         ui->edtData->setText(current->getProperty("imfcs_crddisplay_fitresults", QString("")).toString());
         ui->labInfo->setText(tr("<table width=\"95%\"><tr><td>average of graph: %2</td><td>data points: %1</td></tr>"
-                                "<tr><td>stddev of graph: %3</td><td>measurement duration: %4 seconds</td></tr></table>").arg(m->getStatisticsN()).arg(dispMean).arg(dispStddev).arg(current->getProperty("MEASUREMENT_DURATION_MS", 0).toDouble()/1000.0));
+                                "<tr><td>stddev of graph: %3</td><td>measurement duration: %4 seconds</td></tr>"
+                                "<tr><td></td><td>segments: %5 à %6s</td></tr></table>").arg(m->getStatisticsN()).arg(dispMean).arg(dispStddev).arg(duration).arg(segments).arg(duration/double(segments)));
     }
     updateFitFuncPlot();
     QApplication::restoreOverrideCursor();

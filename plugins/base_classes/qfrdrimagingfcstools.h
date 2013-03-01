@@ -8,12 +8,17 @@
 #include <QStringList>
 #include <QList>
 #include <stdint.h>
+#include <QToolBar>
+#include <QMenu>
+#include <QAction>
 #include "binarydatatools.h"
+
 
 /** \brief extract some informations from a configuration file, as created by the B040 SPIM plugin
  *  \ingroup qf3rdrdp_imaging_fcs
  */
 void readB040SPIMExperimentConfigFile(QSettings& set, double& frametime, double& baseline_offset, QString& backgroundfile, int& image_width, int& image_height, bool& hasPixel, double& pixel_width, double& pixel_height);
+
 
 /** \brief extract some informations from a configuration file, as created by the B040 SPIM plugin
  *  \ingroup qf3rdrdp_imaging_fcs
@@ -27,4 +32,7 @@ void readB040SPIMExperimentConfigFileAssociatedFiles(QSettings& set, QStringList
 void appendCategorizedFilesFromB040SPIMConfig(QSettings& settings, QStringList& files, QStringList& files_types, QStringList &files_descriptions);
 
 QString findB040ExperimentDescriptionForData(const QString& filename);
+
+
+
 #endif // QFRDRIMAGINGFCSTOOLS_H

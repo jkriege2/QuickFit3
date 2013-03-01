@@ -18,24 +18,7 @@ QFSelectionListDialog::~QFSelectionListDialog()
     delete ui;
 }
 
-void QFSelectionListDialog::init(QStringList itemNames, QStringList itemData, QSettings& settings, const QString &prefix) {
-    QList<QVariant> itData;
-    for (int i=0; i<itemData.size(); i++) {
-        itData<<itemData[i];
-    }
-    init(itemNames, itData, QList<QColor>(), settings, prefix);
-}
-
-void QFSelectionListDialog::init(QStringList itemNames, QStringList itemData, QList<QColor> colors, QSettings &settings, const QString &prefix)
-{
-    init(itemNames, itemData, settings, prefix);
-    for (int i=0; i<itemNames.size(); i++) {
-        QListWidgetItem* item=ui->listWidget->item(i);
-        item->setTextColor(colors.value(i, item->textColor()));
-    }
-}
-
-void QFSelectionListDialog::init(QStringList itemNames, QList<QVariant> itemData, QList<QColor> colors, QSettings &settings, const QString &prefix)
+void QFSelectionListDialog::init(QStringList itemNames, QList<QVariant> itemData)
 {
     for (int i=0; i<itemNames.size(); i++) {
         QListWidgetItem* item=new QListWidgetItem(itemNames[i], ui->listWidget);
@@ -45,6 +28,57 @@ void QFSelectionListDialog::init(QStringList itemNames, QList<QVariant> itemData
         ui->listWidget->addItem(item);
     }
     ui->listWidget->setItemDelegate(new QFHTMLDelegate(ui->listWidget));
+}
+void QFSelectionListDialog::init(QStringList itemNames, QList<QVariant> itemData, QList<QColor> colors)
+{
+    init(itemNames, itemData);
+    for (int i=0; i<itemNames.size(); i++) {
+        QListWidgetItem* item=ui->listWidget->item(i);
+        item->setTextColor(colors.value(i, item->textColor()));
+    }
+}
+
+
+void QFSelectionListDialog::init(QStringList itemNames, QList<QVariant> itemData, QList<QColor> colors, QSettings &settings, const QString &prefix)
+{
+    init(itemNames, itemData, settings, prefix);
+    for (int i=0; i<itemNames.size(); i++) {
+        QListWidgetItem* item=ui->listWidget->item(i);
+        item->setTextColor(colors.value(i, item->textColor()));
+    }
+}
+
+void QFSelectionListDialog::init(QStringList itemNames, QStringList itemData, QList<QColor> colors)
+{
+    QList<QVariant> var;
+    for (int i=0; i<itemData.size(); i++) var<<itemData[i];
+    init(itemNames, var, colors);
+}
+
+void QFSelectionListDialog::init(QStringList itemNames, QStringList itemData)
+{
+    QList<QVariant> var;
+    for (int i=0; i<itemData.size(); i++) var<<itemData[i];
+    init(itemNames, var);
+}
+
+void QFSelectionListDialog::init(QStringList itemNames, QStringList itemData, QSettings &settings, const QString &prefix)
+{
+    QList<QVariant> var;
+    for (int i=0; i<itemData.size(); i++) var<<itemData[i];
+    init(itemNames, var, settings, prefix);
+}
+
+void QFSelectionListDialog::init(QStringList itemNames, QStringList itemData, QList<QColor> colors, QSettings &settings, const QString &prefix)
+{
+    QList<QVariant> var;
+    for (int i=0; i<itemData.size(); i++) var<<itemData[i];
+    init(itemNames, var, colors, settings, prefix);
+}
+
+void QFSelectionListDialog::init(QStringList itemNames, QList<QVariant> itemData, QSettings &settings, const QString &prefix)
+{
+     init(itemNames, itemData);
 
      settings.beginGroup(prefix+"selections");
      int count=settings.value("count", 0).toInt();
@@ -97,6 +131,16 @@ QList<QVariant> QFSelectionListDialog::getSelected() const
     QList<QVariant> data;
     for (int i=0; i<ui->listWidget->count(); i++) {
         if (ui->listWidget->item(i)->checkState()==Qt::Checked) data.append(ui->listWidget->item(i)->data(Qt::UserRole));
+    }
+    return data;
+}
+
+QList<bool> QFSelectionListDialog::getSelectedBoolList() const
+{
+    QList<bool> data;
+    for (int i=0; i<ui->listWidget->count(); i++) {
+        if (ui->listWidget->item(i)->checkState()==Qt::Checked) data.append(true);
+        else data.append(false);
     }
     return data;
 }

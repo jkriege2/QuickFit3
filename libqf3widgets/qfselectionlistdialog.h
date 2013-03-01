@@ -31,13 +31,21 @@ class QFWIDLIB_EXPORT QFSelectionListDialog : public QDialog
         explicit QFSelectionListDialog(QWidget *parent = 0, bool selection_saveable=true);
         ~QFSelectionListDialog();
 
+        void init(QStringList itemNames, QList<QVariant> itemData, QList<QColor> colors);
+        void init(QStringList itemNames, QList<QVariant> itemData=QList<QVariant>());
+        void init(QStringList itemNames, QList<QVariant> itemData, QSettings &settings, const QString &prefix=QString());
+        void init(QStringList itemNames, QList<QVariant> itemData, QList<QColor> colors, QSettings &settings, const QString &prefix=QString());
+
+        void init(QStringList itemNames, QStringList itemData, QList<QColor> colors);
+        void init(QStringList itemNames, QStringList itemData);
         void init(QStringList itemNames, QStringList itemData, QSettings &settings, const QString &prefix=QString());
         void init(QStringList itemNames, QStringList itemData, QList<QColor> colors, QSettings &settings, const QString &prefix=QString());
-        void init(QStringList itemNames, QList<QVariant> itemData, QList<QColor> colors, QSettings &settings, const QString &prefix=QString());
+
         void setLabel(const QString& text);
         void writeList(QSettings& settings, const QString& prefix=QString());
         QStringList getSelectedDataStrings() const;
         QList<QVariant> getSelected() const;
+        QList<bool> getSelectedBoolList() const;
         QList<int> getSelectedIndexes() const;
         void addWidget(const QString &label, QWidget *widget);
         void selectItems(QList<bool> items);

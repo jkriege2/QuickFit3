@@ -208,7 +208,7 @@ void binfileWriteUint32(QFile& file, uint32_t data) {
 }
 
 uint32_t binfileReadUint32(QFile& file) {
-    uint32_t d;
+    uint32_t d=0;
     file.read((char*)&d, sizeof(d));
     return qFromLittleEndian(d);
 }

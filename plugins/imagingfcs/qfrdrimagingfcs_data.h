@@ -75,6 +75,19 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief returns the filetype of the Export file dialog */
         QString getExportDialogFiletypes();
 
+        /** \brief returns the number of segments contained in the correlation data */
+        int getSegmentCount() const;
+        /** \brief returns the length of a segment in seconds */
+        double getSegmentDuration() const;
+        /** \brief returns \c true, if the specified segment is used in the per-pixel-avg. */
+        bool segmentUsed(int segment) const;
+        /** \brief returns \c true if all segments are used (non excluded) */
+        bool allSegmentsUsed() const;
+        /** \brief sets whether the given segment should be used, call recalcSegmentedAverages() so these changes take effect! */
+        void setSegmentUsed(int segment, bool used);
+        /** \brief reread correlation curves and recalculate the pixel averages caring for excluded segments */
+        void recalcSegmentedAverages();
+
 
 
         /** \copydoc QFRDRFCSDataInterface::getCorrelationRuns() */

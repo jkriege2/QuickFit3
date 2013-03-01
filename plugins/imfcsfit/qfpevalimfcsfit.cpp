@@ -125,6 +125,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool1()
         QMessageBox::critical(parentWidget, tr("imFCS Calibration"), tr("No project loaded!"));
         return;
     }
+     log_text(tr("imFCS calibration tool 1: collecting D data ... \n"));
 
     // find table for resultsQFRDRRunSelectionsInterface
     QFRawDataRecord* etab=NULL;
@@ -298,6 +299,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool1()
         if (eimFCS && (!model.isEmpty())) eimFCS->setFitFunction(model);
     }
 
+    log_text(tr("imFCS calibration tool 1: collecting D data ... DONE!\n"));
 }
 
 void QFPEvalIMFCSFit::imFCSCalibrationTool2()
@@ -306,6 +308,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
         QMessageBox::critical(parentWidget, tr("imFCS Calibration"), tr("No project loaded!"));
         return;
     }
+    log_text(tr("imFCS calibration tool 2: collecting wxy data ... \n"));
 
     // find table for resultsQFRDRRunSelectionsInterface
     QFRawDataRecord* etab=NULL;
@@ -428,6 +431,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
 
     }
 
+    log_text(tr("imFCS calibration tool 2: collecting wxy data ... DONE!\n"));
 
 }
 

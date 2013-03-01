@@ -66,47 +66,38 @@
 	 <ul>
 	   <li><b>display average:</b> select a display style for the average over all runs.</li>
 	   <li><b>display runs:</b> choose how to display the different runs in the file <ul>
-	     <li><i>no runs:</i> displays only the average</li>
-	     <li><i>all runs:</i> displays all runs in different colors</li>
-	     <li><i>all runs (highlighted):</i> displays all runs in gray, and the selected runs in red</li>
-	     <li><i>used runs:</i> displays only those runs that have not been excluded</li>
-	     <li><i>selected run:</i> displays only the currently selected run</li>
+	     <li><i>no pixels:</i> displays only the average</li>
+	     <li><i>all pixels:</i> displays all runs in different colors</li>
+	     <li><i>all pixels (highlighted):</i> displays all runs in gray, and the selected runs in red</li>
+	     <li><i>selected pixels:</i> displays only the currently selected run</li>
 	   </ul></li>
-	   <li><b>run errors:</b> plot styles for the errors</li>
-	   <li><b>select runs to display:</b> a list of all runs in the file. Select a run for the "selected run"/"all runs (highlighted)" display modes or to exlude/include a run</li>
-	   <li><b>exclude/include run:</b> excludes/includes the currently selected run ("select runs to display" list) from the evaluation. Note that the runs won't be deleted physically from the file, but will rather be marked as "do not use" in the project only. So the input data files are NEVER altered.</li>
-	   <li><b>log scale in lag time axis:</b> draws the lag time axis in the plot logarithmically or linearly scaled.</li>
-	   <li><b>lower & upper cut-off</b> Here you may cut some correlation channels (i.e. lag times $$math:\tau_i$$) to have a nicer display. This will have no effect in any other plugin in Quickfit and is used for improved local display only!</li>
-	   <li><b>Info:</b> displays the number of runs and data points per run in the current raw data record</li>
+	   <li><b>select pixels to display:</b> a list of all pixels in the image (row-major ordered). Select a pixel to display its intensity trace</li>
+	   <li><b>exclude/include pixel:</b> excludes/includes the currently selected pixel ("select runs to display" list or overview image) from the evaluation. Note that the runs won't be deleted physically from the file, but will rather be marked as "do not use" in the project only. So the input data files are NEVER altered.</li>
+	   <li><b>overview:</b> overview image (time-averaged image stack) of the measurement. Klicking a pixel selects the pixel. Excluded and selected pixels are displayed in blue/red.</li>
 	   <li><b>Graph/Plot:</b> For information on how to interact with the plot, please see <a href="$$qf_ui_jkqtplotter_helpfile$$">the according online-help page.</a></li>
 	   <li>Also see the page "<a href="$$qf_ui_rdr_helpfile$$">$$qf_ui_rdr_helpfiletitle$$</a>" for futher information about UI elements common to all raw data records.
 	 </ul>
-	 <h3>Tab "Photon Counts"</h3>
-	 In this tab you will see all intensity time traces loaded into the current raw data record. On the rhs. you may choose how they are presented to you and see a list of all available runs. There are also buttons to exclude selected runs from the evaluation. These options are available:
+	 <h3>Tab "Countrate/Intensity Trace"</h3>
+	 In this tab you can look at the intensity time traces of each pixel. 
+  On the rhs you may choose how they are presented to you and see a list of all available pixels and a time-averaged overview intensity image in which pixels may be selected by clicking. There are also buttons to exclude selected pixels from the evaluation. These options are available:
 	 <ul>
 	   <li><b>data display mode:</b> <ul>
-	     <li><i>binned or none:</i> display the binned timetrace if available or none (does never display the full timetrace)</li>
-	     <li><i>binned or full:</i> displays the binned timetrace of available or the full timetrace as a fallback</li>
-	     <li><i>full or binned:</i> displays the full timetrace if available or the binned as a fallback</li>
-	     <li><i>none:</i> displays no timetrace</li>
+	     <li><i>time-binned video:</i> display the binned timetrace as calculated as "video" in the imagingFCS correlator tool after background and bleach correction</li>
+	     <li><i>uncorrected time-binned video:</i> display the binned timetrace as calculated as "video" in the imagingFCS correlator tool</li>
 	   </ul></li>
-	   <li><b>runs display mdoe:</b> choose how to display the different runs in the file <ul>
-	     <li><i>all runs:</i> displays all runs in different colors</li>
-	     <li><i>all runs (highlighted):</i> displays all runs in gray, and the selected runs in red</li>
-	     <li><i>used runs:</i> displays only those runs that have not been excluded</li>
-	     <li><i>selected run:</i> displays only the currently selected run</li>
-	   </ul></li>
-	   <li><b>select runs to display:</b> a list of all runs in the file. Select a run for the "selected run"/"all runs (highlighted)" display modes or to exlude/include a run</li>
-	   <li><b>exclude/include run:</b> excludes/includes the currently selected run ("select runs to display" list) from the evaluation. Note that the runs won't be deleted physically from the file, but will rather be marked as "do not use" in the project only. So the input data files are NEVER altered.</li>
-	   <li><b>display statistics:</b> displays timetrace statistics (mean, std. deviation, min/max rate) as a table below the plot.</li>
-	   <li><b>display average in plot:</b> shows average and standard deviation for every countrate curve as a line and translucent range</li>
-	   <li><b>include 0 on rate axis:</b> autoscaling the y-axis always includes 0 counts</li>
-	   <li><b>overlay other count rates:</b>overlays count rate curves from other loaded FCS files.</li>
-	   <li><b>lower & upper cut-off</b> Here you may cut some correlation channels (i.e. lag times $$math:\tau_i$$) to have a nicer display. This will have no effect in any other plugin in Quickfit and is used for improved local display only!</li>
-	   <li><b>Info:</b> displays the number of runs and data points per run in the current raw data record</li>
+	   <li><b>select pixels to display:</b> a list of all pixels in the image (row-major ordered). Select a pixel to display its intensity trace</li>
+	   <li><b>exclude/include pixel:</b> excludes/includes the currently selected pixel ("select runs to display" list or overview image) from the evaluation. Note that the runs won't be deleted physically from the file, but will rather be marked as "do not use" in the project only. So the input data files are NEVER altered.</li>
+	   <li><b>overview:</b> overview image (time-averaged image stack) of the measurement. Klicking a pixel selects the pixel. Excluded and selected pixels are displayed in blue/red.</li>
 	   <li><b>Graph/Plot:</b> For information on how to interact with the plot, please see <a href="$$qf_ui_jkqtplotter_helpfile$$">the according online-help page.</a></li>
 	   <li>Also see the page "<a href="$$qf_ui_rdr_helpfile$$">$$qf_ui_rdr_helpfiletitle$$</a>" for futher information about UI elements common to all raw data records.
 	 </ul>
+  
+                           <h3>Tab "Images, Videos, Timetrace"</h3>
+                           <ul>
+                           
+                              <li>This tab displays the overview images and videos stored together with the data. In the "image/video" combobox you can select the image or video, which is then displayed below. If a video is selected, control elements are accessible below. For each currently displayed image the according intensity histogram is available in the "Histogram" tab.</li>
+                              <li>Also the countrate statistics (averaged over the whole image frame) is displayed (rhs). </li>
+                           </ul>
 	</body>
 </html>
 

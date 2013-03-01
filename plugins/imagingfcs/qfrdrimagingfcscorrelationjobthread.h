@@ -267,11 +267,20 @@ protected:
     bool saveCorrelationCSV(const QString& filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double input_length, QString& error, int progress_steps=0) ;
     /*! \brief store a set of correlation functions as a binary file
 
+        Format description:
+          - This format may store several (corrN) different correlation curves for several pixel (e.g. crosscorrelations to four neighbor pixels),
+            but usually this feature is not used and corrN=1
+          - all correlation curves have to have the same time axis ("lag times in seconds") and all curves have to have the same number N of values
+          - the file will contain data for width*height pixels, ordered in row-major form
+          - The file is split into two parts: The first part contains a complete set of correlation curves + (if sets=2) errors.
+            The second part may contain the single-segment curves the averages in the first part are calculated from
+        .
+
         The binary file has this data layout:
 \verbatim
 data                                                   size [bytes]                    datatype
 +---------------------------------------------------+
-| "QF3.0imFCS"                    file id           |  10                              string
+| "QF3.1imFCS" or "QF3.0imFCS"               file id|  10                              string
 +---------------------------------------------------+
 | width                               width of image|  4                               uint
 | height                             height of image|  4                               uint
@@ -319,6 +328,10 @@ data                                                   size [bytes]             
 \endverbatim
         This data format may also store all the intermedate correlation curves that are averaged to yield avg+/-stddev. These are stored after the above
         described data and their presence is indicatedsimply by an ongoing file.
+        Here the data is organized pixel-by-pixel (row-major), where each pixel is a record containing the segments one after the other, where each
+        segemnt contains the corrN correlation functions of length N.
+
+        The data in the second part of the file is only readable, if the file ID is \c "QF3.1imFCS"!!!
 
 \verbatim
 data                                                   size [bytes]                   datatype
@@ -329,34 +342,34 @@ data                                                   size [bytes]             
 | segments                   segments/runs per pixel|  4
 +---------------------------------------------------+
 | segment[0] cf[0] of pixel[0]                      |  8*N                             double
-| segment[1] cf[0] of pixel[0]                      |  8*N                             double
-| ...                                               |
-| segment[segments-1] cf[0] of pixel[0]             |  8*N                             double
-+---------------------------------------------------+
 | segment[0] cf[1] of pixel[0]                      |  8*N                             double
+| ...                                               |
+| segment[0] cf[corN-1] of pixel[0]                 |  8*N                             double
++---------------------------------------------------+
+| segment[1] cf[0] of pixel[0]                      |  8*N                             double
 | segment[1] cf[1] of pixel[0]                      |  8*N                             double
 | ...                                               |
-| segment[segments-1] cf[1] of pixel[0]             |  8*N                             double
-+---------------------------------------------------+
-.                                                   .
-.                                                   .
-.                                                   .
-+---------------------------------------------------+
-| segment[0] cf[corN-1] of pixel[0]                 |  8*N                             double
 | segment[1] cf[corN-1] of pixel[0]                 |  8*N                             double
++---------------------------------------------------+
+.                                                   .
+.                                                   .
+.                                                   .
++---------------------------------------------------+
+| segment[segments-1] cf[0] of pixel[0]             |  8*N                             double
+| segment[segments-1] cf[1] of pixel[0]             |  8*N                             double
 | ...                                               |
 | segment[segments-1] cf[corN-1] of pixel[0]        |  8*N                             double
 +---------------------------------------------------+
 +---------------------------------------------------+
 | segment[0] cf[0] of pixel[1]                      |  8*N                             double
-| segment[1] cf[0] of pixel[1]                      |  8*N                             double
-| ...                                               |
-| segment[segments-1] cf[0] of pixel[1]             |  8*N                             double
-+---------------------------------------------------+
 | segment[0] cf[1] of pixel[1]                      |  8*N                             double
+| ...                                               |
+| segment[0] cf[corN-1] of pixel[1]                 |  8*N                             double
++---------------------------------------------------+
+| segment[1] cf[0] of pixel[1]                      |  8*N                             double
 | segment[1] cf[1] of pixel[1]                      |  8*N                             double
 | ...                                               |
-| segment[segments-1] cf[1] of pixel[1]             |  8*N                             double
+| segment[1] cf[corN-1] of pixel[1]                 |  8*N                             double
 +---------------------------------------------------+
 .                                                   .
 .                                                   .
@@ -365,13 +378,15 @@ data                                                   size [bytes]             
 .                                                   .
 .                                                   .
 +---------------------------------------------------+
-| segment[0] cf[corN-1] of pixel[width*height-1]    |  8*N                             double
-| segment[1] cf[corN-1] of pixel[width*height-1]    |  8*N                             double
+| segment[segments-1] cf[0] of pixel[width*height-1]|  8*N                             double
+| segment[segments-1] cf[1] of pixel[width*height-1]|  8*N                             double
 | ...                                               |
 | segment[segments-1] cf[corN-1] of pixel[width*height-1] |  8*N                       double
 +---------------------------------------------------+
 \endverbatim
         \note All numbers are stored in little-endian form!!! and the pixel order is always row major!
+        \note There was a bug in older QuickFit 3 versions so the second part of the file is scrambled. This is ONLY the case
+              for file version \c "QF3.0imFCS" files with the version tag \c "QF3.1imFCS" can be read completely!
     */
     bool saveCorrelationBIN(const QString& filename, double *corrTau, double** corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double **corrSegments, QString& error, int progress_steps=0) ;
 

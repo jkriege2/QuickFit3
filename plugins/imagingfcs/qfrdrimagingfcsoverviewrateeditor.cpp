@@ -1,4 +1,6 @@
 #include "qfrdrimagingfcsoverviewrateeditor.h"
+#include "qfrdrimagingfcsedittools.h"
+#include "qfrawdatapropertyeditor.h"
 
 QFRDRImagingFCSOverviewRateEditor::QFRDRImagingFCSOverviewRateEditor(QFPluginServices *services, QFRawDataPropertyEditor *propEditor, QWidget *parent) :
     QFRawDataEditor(services, propEditor, parent)
@@ -32,6 +34,8 @@ void QFRDRImagingFCSOverviewRateEditor::writeSettings() {
 }
 
 void QFRDRImagingFCSOverviewRateEditor::createWidgets() {
+
+
     QHBoxLayout* mainLay=new QHBoxLayout(this);
     setLayout(mainLay);
 

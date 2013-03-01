@@ -11,8 +11,12 @@
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 	<a name="#formats"><h2>Fileformat Descriptions</h2>
 	<p>This plugin reads in a video (e.g. in the TIFF file format) and outputs several files that contain auto- and crosscorrelation functions of different type calculated from the video data. Also a variety of statistics are written to the harddisk. Usually if you input an image series <tt><i>BASENAME</i><b>.tiff</b></tt>, some of these files will be output:
-	<ul>
-	    <li><a name="#formats_acf"><b>CSV autocorrelation data</b>&nbsp;&nbsp;<tt><i>BASENAME</i><b>.autocorrelation.dat</b></tt>: contains the single-pixel autocorrelation functions.<br> They are stored as a <a href="http://en.wikipedia.org/wiki/Comma-separated_values">comma-separated values file</a> with two or three columns. The first column contains the lag time <i>&tau;</i> in seconds, the second column the ACF amplitude <i>g(&tau;)</i>. These two columns are strictly required. If a third column is present, it is interpreted as measurement errors (e.g. the standard deviation) of the ACF <i>&Delta;g(&tau;)</i>:
+<a name="#formats_acf"><h3>CSV autocorrelation data</h3>
+
+<blockquote>
+	<tt><i>BASENAME</i><b>.autocorrelation.dat</b></tt>: contains the single-pixel autocorrelation functions.
+</blockquote>
+ They are stored as a <a href="http://en.wikipedia.org/wiki/Comma-separated_values">comma-separated values file</a> with two or three columns. The first column contains the lag time <i>&tau;</i> in seconds, the second column the ACF amplitude <i>g(&tau;)</i>. These two columns are strictly required. If a third column is present, it is interpreted as measurement errors (e.g. the standard deviation) of the ACF <i>&Delta;g(&tau;)</i>:
 		<blockquote><i>&tau;, g(&tau;), &Delta;g(&tau;)</i></blockquote>
 		The ACF of the single pixels are ordered into "datasets" separated by two empty lines. The datasets are ordered in row-major order, i.e. first of these datasets is assigned to pixel (x,y)=(0,0), the second to (1,0) and on until (width-1,0). Then comes pixels (0,1), (1,1), (2,1) ... (width-1, height-1). This format has the advantage, that it can be loaded conventiently using the <tt>index</tt> keyword of <a href="http://www.gnuplot.info">gnuplot</a>, but comes at the cost of repeating the lag times column for every dataset. Also the single segments are not saved to this file, only the average and standard deviation calculated from these.
 		</li>
@@ -23,13 +27,27 @@
 		   <i>&tau;, g<sub>left</sub>(&tau;), g<sub>right</sub>(&tau;), g<sub>up</sub>(&tau;), g<sub>down</sub>(&tau;), &Delta;g<sub>left</sub>(&tau;), &Delta;g<sub>right</sub>(&tau;), &Delta;g<sub>up</sub>(&tau;), &Delta;g<sub>down</sub>(&tau;)</i>
 		</blockquote>
 		Here again the errors <i>&Delta;g(&tau;)</i> are optional.
-		</li>
-		
-	    <li><a name="#formats_binacf"><b>binary autocorrelation data</b>&nbsp;&nbsp;<tt><i>BASENAME</i><b>.autocorrelation.bin</b></tt>: also contains the single-pixel autocorrelation functions, like the CSV autocorrelation file, but including all segments' data.<br> They are stored as a binary file with this organization (<tt>cf[<i>i</i>]</tt> is the average correlation function at lag time $$math:\tau_i$$, <tt>errcf[<i>i</i>]</tt> is the standard deviation for <tt>cf[<i>i</i>]</tt>):
- <pre>
+
+<a name="#formats_binacf"><h3>binary autocorrelation data</h3>
+<blockquote>
+	<tt><i>BASENAME</i><b>.autocorrelation.bin</b></tt>: also contains the single-pixel autocorrelation functions, like the CSV autocorrelation file, but including all segments' data.
+</blockquote>
+
+     They are stored as a binary file with these general properties:
+     
+<ul>
+  <li>This format may store several (corrN) different correlation curves for several pixel (e.g. crosscorrelations to four neighbor pixels), but usually this feature is not used and corrN=1</li>
+  <li>all correlation curves have to have the same time axis ("lag times in seconds") and all curves have to have the same number N of values</li>
+  <li>the file will contain data for width*height pixels, ordered in row-major form</li>
+  <li>The file is split into two parts: The first part contains a complete set of correlation curves + (if sets=2) errors. The second part may contain the single-segment curves the averages in the first part are calculated from</li>
+</ul>
+      with this organization (<tt>cf[<i>i</i>]</tt> is the average correlation function at lag time $$math:\tau_i$$, <tt>errcf[<i>i</i>]</tt> is the standard deviation for <tt>cf[<i>i</i>]</tt>):
+ 
+<blockquote>
+	<pre>
 data                                                   size [bytes]                    datatype
 +---------------------------------------------------+
-| "QF3.0imFCS"                    file id           |  10                              string
+| "QF3.1imFCS" or "QF3.0imFCS"               file id|  10                              string
 +---------------------------------------------------+
 | width                               width of image|  4                               uint
 | height                             height of image|  4                               uint
@@ -74,9 +92,14 @@ data                                                   size [bytes]             
 | ...                                               |       | or sets==4               double
 | errcf[corN-1]  of pixel[width*height-1]           |  8*N  |                          double
 +---------------------------------------------------+     --+
-</pre><p> This data format may also store each segment's correlation curves that are averaged to yield avg+/-stddev. These are stored after the above described data and their presence is indicated simply by an ongoing file.</p>
-<pre>
-data                                                   size [bytes]                    datatype
+</pre>
+</blockquote>
+<p> This data format may also store all the intermedate correlation curves that are averaged to yield avg+/-stddev. These are stored after the above described data and their presence is indicatedsimply by an ongoing file. Here the data is organized pixel-by-pixel (row-major), where each pixel is a record containing the segments one after the other, where each segemnt contains the corrN correlation functions of length N.
+The data in the second part of the file is only readable, if the file ID is <code>"QF3.1imFCS"</code>!!! </p>
+
+<blockquote>
+	<pre>
+data                                                   size [bytes]                   datatype
 .                                                   .
 . ...   START OF FILE                               .
 .                                                   .
@@ -84,34 +107,34 @@ data                                                   size [bytes]             
 | segments                   segments/runs per pixel|  4
 +---------------------------------------------------+
 | segment[0] cf[0] of pixel[0]                      |  8*N                             double
-| segment[1] cf[0] of pixel[0]                      |  8*N                             double
-| ...                                               |
-| segment[segments-1] cf[0] of pixel[0]             |  8*N                             double
-+---------------------------------------------------+
 | segment[0] cf[1] of pixel[0]                      |  8*N                             double
+| ...                                               |
+| segment[0] cf[corN-1] of pixel[0]                 |  8*N                             double
++---------------------------------------------------+
+| segment[1] cf[0] of pixel[0]                      |  8*N                             double
 | segment[1] cf[1] of pixel[0]                      |  8*N                             double
 | ...                                               |
-| segment[segments-1] cf[1] of pixel[0]             |  8*N                             double
-+---------------------------------------------------+
-.                                                   .
-.                                                   .
-.                                                   .
-+---------------------------------------------------+
-| segment[0] cf[corN-1] of pixel[0]                 |  8*N                             double
 | segment[1] cf[corN-1] of pixel[0]                 |  8*N                             double
++---------------------------------------------------+
+.                                                   .
+.                                                   .
+.                                                   .
++---------------------------------------------------+
+| segment[segments-1] cf[0] of pixel[0]             |  8*N                             double
+| segment[segments-1] cf[1] of pixel[0]             |  8*N                             double
 | ...                                               |
 | segment[segments-1] cf[corN-1] of pixel[0]        |  8*N                             double
 +---------------------------------------------------+
 +---------------------------------------------------+
 | segment[0] cf[0] of pixel[1]                      |  8*N                             double
-| segment[1] cf[0] of pixel[1]                      |  8*N                             double
-| ...                                               |
-| segment[segments-1] cf[0] of pixel[1]             |  8*N                             double
-+---------------------------------------------------+
 | segment[0] cf[1] of pixel[1]                      |  8*N                             double
+| ...                                               |
+| segment[0] cf[corN-1] of pixel[1]                 |  8*N                             double
++---------------------------------------------------+
+| segment[1] cf[0] of pixel[1]                      |  8*N                             double
 | segment[1] cf[1] of pixel[1]                      |  8*N                             double
 | ...                                               |
-| segment[segments-1] cf[1] of pixel[1]             |  8*N                             double
+| segment[1] cf[corN-1] of pixel[1]                 |  8*N                             double
 +---------------------------------------------------+
 .                                                   .
 .                                                   .
@@ -120,18 +143,31 @@ data                                                   size [bytes]             
 .                                                   .
 .                                                   .
 +---------------------------------------------------+
-| segment[0] cf[corN-1] of pixel[width*height-1]    |  8*N                             double
-| segment[1] cf[corN-1] of pixel[width*height-1]    |  8*N                             double
+| segment[segments-1] cf[0] of pixel[width*height-1]|  8*N                             double
+| segment[segments-1] cf[1] of pixel[width*height-1]|  8*N                             double
 | ...                                               |
 | segment[segments-1] cf[corN-1] of pixel[width*height-1] |  8*N                       double
 +---------------------------------------------------+
-</pre> <blockquote><b>Note:</b> All numbers are stored in little-endian form!!! and the pixel order is always row major! </blockquote>
+</pre>
+</blockquote>
+ <blockquote><b>Note:</b>
+<ul>
+<li> All numbers are stored in little-endian form!!! and the pixel order is always row major! </li> 
+<li>There was a bug in older QuickFit 3 versions so the second part of the file is scrambled. This is ONLY the case for file version "QF3.0imFCS" files with the version tag "QF3.1imFCS" can be read completely!</li>
+</ul></blockquote>
 
-		</li>
 		
-		<li><a name="#formats_binccf"><b>binary crosscorrelation data</b>&nbsp;&nbsp;<tt><i>BASENAME</i><b>.crosscorrelation.bin</b></tt>: crosscorrelation data including all segments in the binary format describes above for autocorrelation data.</li>
-		
-		<li><a name="#formats_evalsettings"><b>evaluation settings report</b>&nbsp;&nbsp;<tt><i>BASENAME</i><b>.evalsettings.txt</b></tt>: contains the settings of the program that created the correlation data.<br>This file is again a text file and organized in a simple fashion. Every line of the format <blockquote><tt>DESCRIPTION : VALUE</tt></blockquote> is interpreted by this plugin. It looks for a certain <tt>DESCRIPTION</tt> and the used the supplied <tt>VALUE</tt>. Any additional whitespace characters will be ignored. These <tt>DESCRIPTION</tt>s are read and interpreted:  
+  
+  <a name="#formats_binccf"><h3>binary crosscorrelation data</h3>
+<blockquote>
+	<tt><i>BASENAME</i><b>.crosscorrelation.bin</b></tt>: crosscorrelation data including all segments in the binary format describes above for autocorrelation data.
+</blockquote>
+
+<a name="#formats_evalsettings"><h3>evaluation settings report</h3>
+<blockquote>
+	<tt><i>BASENAME</i><b>.evalsettings.txt</b></tt>: contains the settings of the program that created the correlation data.
+</blockquote>
+This file is again a text file and organized in a simple fashion. Every line of the format <blockquote><tt>DESCRIPTION : VALUE</tt></blockquote> is interpreted by this plugin. It looks for a certain <tt>DESCRIPTION</tt> and the used the supplied <tt>VALUE</tt>. Any additional whitespace characters will be ignored. These <tt>DESCRIPTION</tt>s are read and interpreted:  
 		<table border="1" cellspacing="0">
 		  <tr><th align="left"><tt>DESCRIPTION</tt></th><th align="left">value/usage</th><th align="left">stored in property</th></tr>
 		  <tr><td align="left"><tt>width</tt></td><td align="left"> width of the imaging FCS data in pixels </td><td align="left"> WIDTH </td></tr>
@@ -151,11 +187,7 @@ data                                                   size [bytes]             
 		
 	</ul>
 	</p>
-	<p></p>
-	$$qf_commondoc_backtop$$
-	<p></p>
-	<p></p>
-	<p></p>
+
 	<a name="#formats_other_software"><h2>Usage of Fileformats in other Software</h2>
 	<p>The above described dataformats can also be used by other software (e.g. Matlab or <a href="http://www.gnuplot.info">gnuplot</a>). This section contains some sample scripts to make it easier for you to reuse the data:
 	<ul>

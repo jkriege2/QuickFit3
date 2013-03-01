@@ -75,7 +75,18 @@ class QFLIB_EXPORT QFPluginEvaluationItemBase: public QFPluginEvaluationItem {
         QFProject* project;
         ProgramOptions* settings;
         QWidget* parentWidget;
+
+        virtual void log_text(const QString& message) {
+            if (services) services->log_text(message);
+        }
+        virtual void log_warning(const QString& message) {
+            if (services) services->log_warning(message);
+        }
+        virtual void log_error(const QString& message) {
+            if (services) services->log_error(message);
+        }
 };
+
 
 Q_DECLARE_INTERFACE(QFPluginEvaluationItem,
                      "www.dkfz.de.b040.quickfit3.QFPluginEvaluationItem/1.0")

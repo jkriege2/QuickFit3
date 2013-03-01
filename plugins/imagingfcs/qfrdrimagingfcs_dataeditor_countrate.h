@@ -16,7 +16,7 @@
 #include "datacutslider.h"
 #include "qt/jkqtfastplotter.h"
 #include "qfrdrimagingfcsrunsmodel.h"
-
+#include "qfrdrimagingfcsedittools.h"
 
 /*! \brief editor for ACFs in QFRDRImagingFCSData
     \ingroup qf3rdrdp_imaging_fcs
@@ -89,6 +89,10 @@ class QFRDRImagingFCSDataEditorCountrate : public QFRawDataEditor {
         QLabel* labRuns;
         /** \brief label for the number of points in the correlation function */
         QLabel* labCorrelationPoints;
+        /** \brief label for the number of points in the correlation function */
+        QLabel* labSegments;
+        /** \brief label for the number of points in the correlation function */
+        QLabel* labDuration;
         /** \brief label for the run options */
         QLabel* labRunOptions;
 
@@ -106,6 +110,9 @@ class QFRDRImagingFCSDataEditorCountrate : public QFRawDataEditor {
         bool* plteOverviewExcludedData;
         /** \brief size of plteOverviewSelectedData */
         int plteOverviewSelectedSize;
+
+        QFRDRImagingFCSEditTools* imFCSTools;
+        QMenu* menuImagingFCSTools;
 };
 
 #endif // QFRDRIMAGINGFCSEDITORCOUNTRATE_H

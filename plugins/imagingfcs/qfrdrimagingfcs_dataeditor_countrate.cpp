@@ -1,7 +1,7 @@
 #include "qfrdrimagingfcs_dataeditor_countrate.h"
 #include "qfrdrimagingfcs_data.h"
 #include <QDebug>
-
+#include "qfrawdatapropertyeditor.h"
 
 void QFRDRImagingFCSDataEditorCountrate::excludeRuns() {
     if (!current) return;
@@ -51,6 +51,10 @@ QFRDRImagingFCSDataEditorCountrate::~QFRDRImagingFCSDataEditorCountrate()
 }
 
 void QFRDRImagingFCSDataEditorCountrate::createWidgets() {
+    imFCSTools=new QFRDRImagingFCSEditTools(this);
+    menuImagingFCSTools=propertyEditor->addMenu(tr("ImagingFCS Tools"));
+    imFCSTools->registerToMenu(menuImagingFCSTools);
+
     int row=0;
     QLabel* l;
     QVBoxLayout* lb=new QVBoxLayout(this);
@@ -158,9 +162,15 @@ void QFRDRImagingFCSDataEditorCountrate::createWidgets() {
     ggl->addWidget(new QLabel(tr("# Pixels = ")), 0, 0);
     labRuns=new QLabel(grpInfo);
     ggl->addWidget(labRuns, 0,1);
-    ggl->addWidget(new QLabel(tr("# Points = ")), 1, 0);
+    ggl->addWidget(new QLabel(tr("# Intensity Samples = ")), 1, 0);
     labCorrelationPoints=new QLabel(grpInfo);
     ggl->addWidget(labCorrelationPoints, 1,1);
+    ggl->addWidget(new QLabel(tr("# Segments = ")), 2, 0);
+    labSegments=new QLabel(grpInfo);
+    ggl->addWidget(labSegments, 2,1);
+    ggl->addWidget(new QLabel(tr("# Measurement Duration = ")), 3, 0);
+    labDuration=new QLabel(grpInfo);
+    ggl->addWidget(labDuration, 3,1);
     gl->addWidget(grpInfo, row,0,1,3);
 
     QWidget* wp=new QWidget(this);
@@ -182,6 +192,8 @@ void QFRDRImagingFCSDataEditorCountrate::createWidgets() {
     splitter->setCollapsible(1, false);
     splitter->setStretchFactor(0,5);
     splitter->setStretchFactor(1,1);
+
+
 
 };
 
@@ -206,6 +218,7 @@ void QFRDRImagingFCSDataEditorCountrate::connectWidgets(QFRawDataRecord* current
     } else {
 //        runs.setCurrent(current);
     }
+    imFCSTools->setRDR(current);
 
     //readSettings();
 
@@ -330,19 +343,54 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
     plotter->set_doDrawing(false);
     plotter->set_emitSignals(false);
     plotter->clearGraphs();
+    plotter->get_plotter()->clearOverlayElement(true);
     ds->clear();
 
 
     int vidW=m->getImageStackWidth(cmbVideo->currentIndex());
     int vidH=m->getImageStackHeight(cmbVideo->currentIndex());
     int frames=m->getImageStackFrames(cmbVideo->currentIndex());
+    double duration=m->getProperty("MEASUREMENT_DURATION_MS", 0).toDouble()/1000.0;
+    double exposure=m->getProperty("FRAMETIME_MS", 0).toDouble();
+    int segments=m->getProperty("SEGMENTS", 0).toInt();
+    int sumframes=m->getProperty("VIDEO_AVGFRAMES", 0).toInt();
 
     //qDebug()<<cmbVideo->currentIndex()<<cmbVideo->currentText()<<vidW<<vidH<<frames;
 
-    labRuns->setText(QString::number(m->getCorrelationRuns()));
-    labCorrelationPoints->setText(QString::number(frames));
+    labRuns->setText(QString("%1x%2 = %3").arg(vidW).arg(vidH).arg(m->getCorrelationRuns()));
+    labCorrelationPoints->setText(tr("%1 à exp: %2ms (=%3frames)").arg(frames).arg(exposure*double(sumframes)).arg(sumframes));
+    labSegments->setText(tr("%1 à %2s").arg(segments).arg(duration/double(segments)));
+    labDuration->setText(QString("%1s").arg(duration));
 
     if (vidW*vidH==m->getCorrelationRuns()) {
+        if (duration>0 && segments>0) {
+
+            for (int i=0; i<segments; i++) {
+                double t=double(i)*duration/double(segments);
+                if (m->segmentUsed(i)) {
+                    JKQTPoverlayVerticalLine* ovl=new JKQTPoverlayVerticalLine(t, tr("seg.%1  t=%2s").arg(i+1).arg(t), plotter->get_plotter());
+                    ovl->set_color(QColor("black"));
+                    ovl->set_lineWidth(2);
+                    ovl->set_lineStyle(Qt::DotLine);
+                    ovl->set_fontSize(12);
+                    plotter->get_plotter()->addOverlayElement(ovl);
+                } else {
+                    JKQTPoverlayVerticalRange* ovl=new JKQTPoverlayVerticalRange(t, t+duration/double(segments), tr("seg.%1  t=%2s").arg(i+1).arg(t), plotter->get_plotter());
+                    QColor fill=QColor("darkgray");
+                    fill.setAlphaF(0.6);
+                    ovl->set_color(QColor("darkgray"));
+                    ovl->set_fillColor(fill);
+                    ovl->set_lineWidth(2);
+                    ovl->set_lineStyle(Qt::DotLine);
+                    ovl->set_fontSize(12);
+                    plotter->get_plotter()->addOverlayElement(ovl);
+                }
+            }
+        }
+
+
+
+
         JKQTPerrorPlotstyle runerrorstyle=JKQTPnoError;
         switch (cmbRunErrorStyle->currentIndex()) {
             case 1: runerrorstyle=JKQTPerrorBars; break;

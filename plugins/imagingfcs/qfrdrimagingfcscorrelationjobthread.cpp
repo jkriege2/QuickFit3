@@ -1008,6 +1008,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 text<<"frame count                 : "<<outLocale.toString(frames) << "\n";
                                 text<<"first frame                 : "<<outLocale.toString(first_frame) << "\n";
                                 text<<"last frame                  : "<<outLocale.toString(first_frame+frames-1) << "\n";
+                                text<<"correlation segments        : "<<outLocale.toString(job.segments) << "\n";
                                 text<<"correlator S                : "<<outLocale.toString(job.S) << "\n";
                                 text<<"correlator m                : "<<outLocale.toString(job.m) << "\n";
                                 text<<"correlator P                : "<<outLocale.toString(job.P) << "\n";
@@ -1208,7 +1209,7 @@ bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationBIN(const QString &file
     int progem=0;
     bool ok=true;
     if (f.open(QIODevice::WriteOnly)) {
-        f.write("QF3.0imFCS"); // write header
+        f.write("QF3.1imFCS"); // write header
         binfileWriteUint32(f, width);
         binfileWriteUint32(f, height);
         binfileWriteUint32(f, corrN);
@@ -1243,7 +1244,7 @@ bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationBIN(const QString &file
             for (register uint32_t p=0; p<width*height; p++) {
                 for (int seg=0; seg<job.segments; seg++) {
                     for (uint32_t j=0; j<corrN; j++) {
-                        binfileWriteDoubleArrayMinus1(f, &((corrSegments[j])[seg*corrN*N+p*N]), N);
+                        binfileWriteDoubleArrayMinus1(f, &((corrSegments[j])[seg*width*height*N+p*N]), N);
                         /*for (register uint32_t i=0; i<N; i++) {
                             const double d=qToLittleEndian((corrSegments[j])[seg*corrN*N+p*N+i]-1.0);  f.write((char*)(&d), sizeof(d));
                         }*/

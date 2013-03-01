@@ -469,6 +469,9 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         } else if (name=="summing over # frames") {
                             initParams["SUMMED_FRAMES"]=value.toInt();
                             paramsReadonly<<"SUMMED_FRAMES";
+                        } else if (name=="correlation segments") {
+                            initParams["SEGMENTS"]=value.toInt();
+                            paramsReadonly<<"SEGMENTS";
                         } else if (name=="correlator s") {
                             initParams["CORR_S"]=value.toInt();
                             paramsReadonly<<"CORR_S";
