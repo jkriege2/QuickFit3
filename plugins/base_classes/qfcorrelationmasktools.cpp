@@ -9,6 +9,8 @@ QFCorrelationMaskTools::QFCorrelationMaskTools(QWidget *parentWidget, const QStr
     actFindErroneousPixels=new QAction(tr("Filter CFs for &outliers ..."), this);
     connect(actFindErroneousPixels, SIGNAL(triggered()), this, SLOT(findErroneousPixels()));
 
+    actMaskAllZero=new QAction(tr("mask CFs that are all 0 ..."), this);
+    connect(actMaskAllZero, SIGNAL(triggered()), this, SLOT(maskAllZeroCorrelations()));
 }
 
 void QFCorrelationMaskTools::setRDR(QFRawDataRecord *rdr)
@@ -34,6 +36,27 @@ void QFCorrelationMaskTools::findErroneousPixels()
         disconnect(dlg, SIGNAL(setSelection(QList<int>,bool)), this, SLOT(setLeaveout(QList<int>,bool)));
         delete dlg;
     }
+}
+
+void QFCorrelationMaskTools::maskAllZeroCorrelations()
+{
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    if (runselection && fcs) {
+        int N=fcs->getCorrelationN();
+        for (int r=0; r<fcs->getCorrelationRuns(); r++) {
+            double* cf=fcs->getCorrelationRun(r);
+            bool allZero=true;
+            for (int i=0; i<N; i++) {
+                if (cf[i]!=0) {
+                    allZero=false;
+                    break;
+                }
+            }
+            if (allZero) runselection->leaveoutAddRun(r);
+            else runselection->leaveoutRemoveRun(r);
+        }
+    }
+    QApplication::restoreOverrideCursor();
 }
 
 

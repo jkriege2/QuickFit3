@@ -871,7 +871,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
 
                             bool allZero=true;
                             for (int i=0; i<N; i++) {
-                                if (correlations[p*N+i]!=0) {
+                                if (correlations[p*N+i]!=0 && correlations[p*N+i]!=-1) {
                                     allZero=false;
                                     break;
                                 }
@@ -889,11 +889,13 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
             long long errorFilesizeFactor=1;
             if (fsets>1) errorFilesizeFactor=2;
             //qDebug()<<"filepos before segments: "<<file.pos()<<"  ==  "<<10 + 5*4 + N*sizeof(double) + width*height*N*sizeof(double)*fcorrN*errorFilesizeFactor;
-            file.seek(10 + 5*4 + N*sizeof(double) + width*height*N*sizeof(double)*fcorrN*errorFilesizeFactor);
+            //file.seek(10 + 5*4 + N*sizeof(double) + width*height*N*sizeof(double)*fcorrN*errorFilesizeFactor);
             if (!file.atEnd()) {
                 uint32_t segments=binfileReadUint32(file);
                 setQFProperty("SEGMENTS", segments, false, true);
-                //qDebug()<<"segments="<<segments;
+                long long expSize=10 + 5*4 + N*sizeof(double) + width*height*N*sizeof(double)*fcorrN*errorFilesizeFactor+segments*width*height*N*fcorrN*sizeof(double)+4;
+                //qDebug()<<"filesize="<<file.size()<<"   expected size="<<expSize<<"   DELTA="<<file.size()-expSize;
+                //qDebug()<<QFileInfo(filename).fileName()<<":\n    segments="<<segments<<"   width="<<width<<"   height="<<height<<"   fcorrN="<<fcorrN<<"   fN="<<fN<<"   fsets="<<fsets<<"   corr_set="<<corr_set<<"   corroffset="<<corroffset;
                 if (!allSegmentsUsed() && segments>0) {
                     //qDebug()<<"reloading segments ...";
                     for (long long p=0; p<width*height*N; p++) {
@@ -910,6 +912,9 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
                                     if (cf==corr_set) {
                                         binfileReadDoubleArray(file, dummy, N); //&(correlations[p*N]), N);
                                         if (corroffset!=0) for (int i=0; i<N; i++) { dummy[i]=dummy[i]-corroffset; }
+                                        //QString txt="";
+                                        //for (int i=0; i<5; i++) txt=txt+QString("%1, ").arg(dummy[i]);
+                                        //qDebug()<<"p="<<p<<" seg="<<seg<<":  "<<txt;
 
                                         for (int i=0; i<N; i++) {
                                             correlations[p*N+i]=correlations[p*N+i]+dummy[i];
@@ -919,15 +924,15 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
 
                                     } else {
                                         file.seek(file.pos()+N*sizeof(double));
-                                        if (fsets>1) file.seek(file.pos()+N*sizeof(double));
                                     }
                                 }
                             } else {
                                 //qDebug()<<"excluding segment "<<seg;
                                 file.seek(file.pos()+N*fcorrN*sizeof(double));
-                                if (fsets>1) file.seek(file.pos()+N*fcorrN*sizeof(double));
                             }
                         }
+
+                        //qDebug()<<"p="<<p<<"   count="<<count<<"   eof:"<<file.atEnd();
 
                         for (int i=0; i<N; i++) {
                             if (count>1) sigmas[p*N+i]=sqrt((sigmas[p*N+i]-correlations[p*N+i]*correlations[p*N+i]/count)/(count-1.0));
@@ -937,7 +942,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
 
                         bool allZero=true;
                         for (int i=0; i<N; i++) {
-                            if (correlations[p*N+i]!=0) {
+                            if (correlations[p*N+i]!=0 && correlations[p*N+i]!=-1) {
                                 allZero=false;
                                 break;
                             }

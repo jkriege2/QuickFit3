@@ -27,8 +27,10 @@ class QFCorrelationMaskTools : public QFRDRImageMaskEditTools
     public slots:
         /** \brief mask ACF runs according to statistics (find erroneous pixels) */
         void findErroneousPixels();
+        void maskAllZeroCorrelations();
     protected:
         QAction* actFindErroneousPixels;
+        QAction* actMaskAllZero;
         QFRDRFCSDataInterface* fcs;
 
         
