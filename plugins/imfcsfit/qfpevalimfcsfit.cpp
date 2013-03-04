@@ -15,6 +15,7 @@ QFPEvalIMFCSFit::QFPEvalIMFCSFit(QObject* parent):
 {
     //ctor
     QFPluginServices::getInstance()->registerSettingsPane(this);
+    menuCalibration=NULL;
 }
 
 QFPEvalIMFCSFit::~QFPEvalIMFCSFit()

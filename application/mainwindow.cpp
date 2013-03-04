@@ -215,6 +215,13 @@ void MainWindow::searchAndRegisterPlugins() {
     evaluationFactory->distribute(project, settings, this, this);
     extensionManager->distribute(project);
 
+    // init other plugins
+    evaluationFactory->init();
+    rawDataFactory->init();
+
+    // init extensions
+    extensionManager->init(this, this);
+
     // register plugins to menus
     QStringList sl=getRawDataRecordFactory()->getIDList();
     for (int i=0; i<sl.size(); i++) {
@@ -226,12 +233,6 @@ void MainWindow::searchAndRegisterPlugins() {
         getEvaluationItemFactory()->registerMenu(sl[i], evaluationMenu);
     }
 
-    // init extensions
-    extensionManager->init(this, this);
-
-    // init other plugins
-    evaluationFactory->init();
-    rawDataFactory->init();
 }
 
 void MainWindow::showLogMessage(const QString& message) {

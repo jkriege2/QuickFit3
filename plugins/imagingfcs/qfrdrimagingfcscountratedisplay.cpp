@@ -158,6 +158,7 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
     dataN=0;
     dataT=NULL;
     ui->pltIntensity->get_plotter()->clearOverlayElement(true);
+    avgIndicator=new JKQTPoverlayVerticalLine(0, ui->pltIntensity->get_plotter());
     if (!current || !m) {
         ds->clear();
         ui->pltIntensity->set_doDrawing(false);
