@@ -156,6 +156,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool1()
             if (eedt && e->getName().toLower().contains("wxy")) {
                 eedt->fitEverythingThreaded();
             }
+            if (pedt) pedt->close();
             log_text(tr("        DONE!\n"));
         }
     }
