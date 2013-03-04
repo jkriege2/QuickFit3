@@ -1050,6 +1050,11 @@ QMenu *QFEvaluationPropertyEditor::getHelpMenu() const
     return menuHelp;
 }
 
+QPointer<QFEvaluationEditor> QFEvaluationPropertyEditor::getEditor() const
+{
+    return editor;
+}
+
 void QFEvaluationPropertyEditor::selectionChanged(const QModelIndex& index, const QModelIndex& oldindex) {
     if (rdrProxy!=NULL) {
         QFRawDataRecord* rec=current->getProject()->getRawDataByID(rdrProxy->data(index, Qt::UserRole).toInt());

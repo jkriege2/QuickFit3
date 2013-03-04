@@ -217,7 +217,7 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     QWidget* wp=new QWidget(this);
     QVBoxLayout* lp=new QVBoxLayout(this);
     wp->setLayout(lp);
-    plotter = new JKQtPlotter(true, this);
+    plotter = new QFPlotter(true, this);
     plotter->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     plotter->get_plotter()->set_showKey(false);
     plotter->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));

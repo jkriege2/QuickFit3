@@ -1608,6 +1608,34 @@ void MainWindow::registerSettingsPane(QFPluginOptionsDialogInterface *plugin)
     pluginOptionDialogs.append(plugin);
 }
 
+QFEvaluationPropertyEditor *MainWindow::openEvaluationEditor(QFEvaluationItem *rec)
+{
+     Qt::WindowFlags f=Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint;
+    if (rec) {
+        QFEvaluationPropertyEditor* edt=new QFEvaluationPropertyEditor(this, settings, rec, evaluationPropEditors.size(), NULL, f);
+        edt->setAttribute(Qt::WA_DeleteOnClose);
+        evaluationPropEditors.append(edt);
+        edt->show();
+        edt->activateWindow();
+        return edt;
+    }
+    return NULL;
+}
+
+QFRawDataPropertyEditor *MainWindow::openRawDataEditor(QFRawDataRecord *rec)
+{
+     Qt::WindowFlags f=Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint;
+    if (rec) {
+        QFRawDataPropertyEditor* edt=new QFRawDataPropertyEditor(this, settings, rec, rawDataPropEditors.size(), NULL, f);
+        edt->setAttribute(Qt::WA_DeleteOnClose);
+        rawDataPropEditors.append(edt);
+        edt->show();
+        edt->activateWindow();
+        return edt;
+    }
+    return NULL;
+}
+
 QWidget *MainWindow::getCreateView(const QString &name, const QString &title)
 {
     if (!histograms.contains(name)) {

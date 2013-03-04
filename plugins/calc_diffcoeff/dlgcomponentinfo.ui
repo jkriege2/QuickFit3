@@ -68,7 +68,7 @@
     </layout>
    </item>
    <item>
-    <widget class="JKQtPlotter" name="plotter" native="true"/>
+    <widget class="QFPlotter" name="plotter" native="true"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -112,9 +112,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>JKQtPlotter</class>
+   <class>QFPlotter</class>
    <extends>QWidget</extends>
-   <header>jkqtplotter.h</header>
+   <header>qfplotter.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

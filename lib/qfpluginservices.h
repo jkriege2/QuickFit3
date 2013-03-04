@@ -15,6 +15,10 @@ class ProgramOptions;
 class QFPlugin;
 class QFPluginOptionsDialogInterface;
 class QFImporterManager;
+class QFEvaluationItem;
+class QFEvaluationPropertyEditor;
+class QFRawDataRecord;
+class QFRawDataPropertyEditor;
 
 
 /*! \brief wrapper class that allows plugins to access basic logging services
@@ -211,6 +215,11 @@ class QFLIB_EXPORT QFPluginServices {
 
         /** \brief register a configuration pane for a plugin in the main options dialog */
         virtual void registerSettingsPane(QFPluginOptionsDialogInterface* plugin)=0;
+
+        /** \brief open a new evaluation editor window for the given record */
+        virtual QFEvaluationPropertyEditor* openEvaluationEditor(QFEvaluationItem* eval)=0;
+        /** \brief open a new raw data record editor window for the given record */
+        virtual QFRawDataPropertyEditor* openRawDataEditor(QFRawDataRecord* rdr)=0;
     private:
         static QFPluginServices* inst;
 };

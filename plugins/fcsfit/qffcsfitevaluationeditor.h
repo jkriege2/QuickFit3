@@ -3,7 +3,7 @@
 
 #include "qfevaluationeditor.h"
 #include "qfrawdatarecord.h"
-#include "qt/jkqtplotter.h"
+#include "qfplotter.h"
 #include "tools.h"
 #include <QComboBox>
 #include <QLabel>

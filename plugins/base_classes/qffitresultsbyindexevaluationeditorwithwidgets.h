@@ -2,7 +2,7 @@
 #define QFFITRESULTSBYINDEXEVALUATIONEDITORWITHWIDGETS_H
 #include "qfevaluationeditor.h"
 #include "qfrawdatarecord.h"
-#include "qt/jkqtplotter.h"
+#include "qfplotter.h"
 #include "tools.h"
 #include <QComboBox>
 #include <QLabel>
@@ -85,9 +85,9 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QHBoxLayout* layModel;
 
         /** \brief ploter for the data&curves */
-        JKQtPlotter* pltData;
+        QFPlotter* pltData;
         /** \brief ploter for the residuals */
-        JKQtPlotter* pltResiduals;
+        QFPlotter* pltResiduals;
         /** \brief DataCutSliders */
         DataCutSliders* datacut;
         /** \brief Splitter between Plots  */
@@ -125,9 +125,9 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QTabBar* tbEditRanges;
         //QToolButton* btnEditRanges;
         /** \brief plotter for residual distribution histogram */
-        JKQtPlotter* pltResidualHistogram;
+        QFPlotter* pltResidualHistogram;
         /** \brief plotter for residual autocorrelation */
-        JKQtPlotter* pltResidualCorrelation;
+        QFPlotter* pltResidualCorrelation;
         /** \brief label for fit statistics */
         QTextEdit* txtFitStatistics;
         /** \brief label for fit statistics */
@@ -311,7 +311,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /** \brief executed when a parameter range is changed by the user */
         void parameterRangeChanged();
 
-
+    public slots:
         /*! \brief fit model to current data
          */
         void fitCurrent();

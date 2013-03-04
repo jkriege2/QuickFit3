@@ -657,6 +657,7 @@ bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int*
                 i++;
             } while (TIFFReadDirectory(tif) && i<=(*frames));
             TIFFClose(tif);
+            qDebug()<<"loading video "<<filename<<"   siez="<<*width<<"x"<<*height<<"   frames="<<*frames;
         }
     }
     return ok;

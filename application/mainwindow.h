@@ -135,7 +135,10 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
         /** \brief register a configuration pane for a plugin in the main options dialog */
         virtual void registerSettingsPane(QFPluginOptionsDialogInterface* plugin);
-
+        /** \brief open a new evaluation editor window for the given record */
+        virtual QFEvaluationPropertyEditor* openEvaluationEditor(QFEvaluationItem* eval);
+        /** \brief open a new raw data record editor window for the given record */
+        virtual QFRawDataPropertyEditor* openRawDataEditor(QFRawDataRecord* rdr);
 
 
 

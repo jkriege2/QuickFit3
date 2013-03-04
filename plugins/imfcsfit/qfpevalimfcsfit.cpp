@@ -7,6 +7,8 @@
 #include "qftools.h"
 #include "qfrdrcolumngraphsinterface.h"
 #include "qfrdrrunselection.h"
+#include "qfevaluationeditor.h"
+#include "qfimfcsfitevaluationeditor.h"
 
 QFPEvalIMFCSFit::QFPEvalIMFCSFit(QObject* parent):
     QObject(parent)
@@ -31,10 +33,11 @@ void QFPEvalIMFCSFit::registerToMenu(QMenu* menu) {
     connect(actFCS, SIGNAL(triggered()), this, SLOT(insertFCSFit()));
     menu->addAction(actFCS);
 
-    QAction* actFCSCalib=new QAction(QIcon(":/imfcsfit/imfcs_fitcalib.png"), tr("imagingFCS Calibration"), parentWidget);
+    /*QAction* actFCSCalib=new QAction(QIcon(":/imfcsfit/imfcs_fitcalib.png"), tr("imagingFCS Calibration"), parentWidget);
     actFCSCalib->setStatusTip(tr("Insert a set of imagingFCS least-squares fit evaluations for a SPIM calibration"));
     connect(actFCSCalib, SIGNAL(triggered()), this, SLOT(insertFCSFitForCalibration()));
-    menu->addAction(actFCSCalib);
+    menu->addAction(actFCSCalib);*/
+    menu->addMenu(menuCalibration);
 
 
 }
@@ -44,18 +47,33 @@ void QFPEvalIMFCSFit::init()
     if (services) {
         QMenu* menu=new QMenu(tr("imagingFCS &Calibration Tool"));
         menu->setIcon(QIcon(":/imfcsfit/imfcs_fitcalib.png"));
-        QAction* actImFCSCalib=new QAction(tr("&1: Collect D Data"), this);
+
+        QAction* actHelp=new QAction(QIcon(":/lib/help.png"), tr("Calbration Tutorial"), this);
+        connect(actHelp, SIGNAL(triggered()), this, SLOT(showCalibrationTutorial()));
+        menu->addAction(actHelp);
+        menu->addSeparator();
+
+        QAction* actFCSCalib=new QAction(QIcon(":/imfcsfit/imfcs_fitcalib.png"), tr("&0: add imFCS Calibration Fits"), this);
+        actFCSCalib->setStatusTip(tr("Insert a set of imagingFCS least-squares fit evaluations for a SPIM calibration"));
+        connect(actFCSCalib, SIGNAL(triggered()), this, SLOT(insertFCSFitForCalibration()));
+        menu->addAction(actFCSCalib);
+
+        QAction* actImFCSCalibFit=new QAction(tr("&1: Fit D's"), this);
+        menu->addAction(actImFCSCalibFit);
+        connect(actImFCSCalibFit, SIGNAL(triggered()), this, SLOT(imFCSCalibrationTool1()));
+        QAction* actImFCSCalib=new QAction(tr("&2: Collect D Data"), this);
         menu->addAction(actImFCSCalib);
-        connect(actImFCSCalib, SIGNAL(triggered()), this, SLOT(imFCSCalibrationTool1()));
-        QAction* actImFCSCalib2=new QAction(tr("&2: Collect wxy Data"), this);
+        connect(actImFCSCalib, SIGNAL(triggered()), this, SLOT(imFCSCalibrationTool2()));
+        QAction* actImFCSCalib2=new QAction(tr("&3: Collect wxy Data"), this);
         menu->addAction(actImFCSCalib2);
-        connect(actImFCSCalib2, SIGNAL(triggered()), this, SLOT(imFCSCalibrationTool2()));
+        connect(actImFCSCalib2, SIGNAL(triggered()), this, SLOT(imFCSCalibrationTool3()));
 
         QMenu* extm=services->getMenu("tools");
         if (extm) {
             //extm->addAction(actImFCSCalib);
             extm->addMenu(menu);
         }
+        menuCalibration=menu;
     }
 }
 
@@ -121,11 +139,35 @@ void QFPEvalIMFCSFit::insertFCSFitForCalibration() {
 
 void QFPEvalIMFCSFit::imFCSCalibrationTool1()
 {
+    if (!project || !services) {
+        QMessageBox::critical(parentWidget, tr("imFCS Calibration"), tr("No project loaded!"));
+        return;
+    }
+    log_text(tr("imFCS calibration tool 1: fitting D's ... \n"));
+    for (int i=0; i<project->getEvaluationCount(); i++) {
+        QFEvaluationItem* e=project->getEvaluationByNum(i);
+        QFImFCSFitEvaluation* imFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
+        if (imFCS) {
+            log_text(tr("   - fitting %1 \n").arg(e->getName()));
+            QFEvaluationPropertyEditor* pedt=services->openEvaluationEditor(e);
+            QFEvaluationEditor* edt=pedt->getEditor();
+            QFImFCSFitEvaluationEditor* eedt=qobject_cast<QFImFCSFitEvaluationEditor*>(edt);
+            if (eedt && e->getName().toLower().contains("wxy")) {
+                eedt->fitEverythingThreaded();
+            }
+            log_text(tr("        DONE!\n"));
+        }
+    }
+    log_text(tr("imFCS calibration tool 1: fitting D's ... DONE!\n"));
+}
+
+void QFPEvalIMFCSFit::imFCSCalibrationTool2()
+{
     if (!project)  {
         QMessageBox::critical(parentWidget, tr("imFCS Calibration"), tr("No project loaded!"));
         return;
     }
-     log_text(tr("imFCS calibration tool 1: collecting D data ... \n"));
+     log_text(tr("imFCS calibration tool 2: collecting D data ... \n"));
 
     // find table for resultsQFRDRRunSelectionsInterface
     QFRawDataRecord* etab=NULL;
@@ -299,16 +341,16 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool1()
         if (eimFCS && (!model.isEmpty())) eimFCS->setFitFunction(model);
     }
 
-    log_text(tr("imFCS calibration tool 1: collecting D data ... DONE!\n"));
+    log_text(tr("imFCS calibration tool 2: collecting D data ... DONE!\n"));
 }
 
-void QFPEvalIMFCSFit::imFCSCalibrationTool2()
+void QFPEvalIMFCSFit::imFCSCalibrationTool3()
 {
     if (!project)  {
         QMessageBox::critical(parentWidget, tr("imFCS Calibration"), tr("No project loaded!"));
         return;
     }
-    log_text(tr("imFCS calibration tool 2: collecting wxy data ... \n"));
+    log_text(tr("imFCS calibration tool 3: collecting wxy data ... \n"));
 
     // find table for resultsQFRDRRunSelectionsInterface
     QFRawDataRecord* etab=NULL;
@@ -431,8 +473,15 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
 
     }
 
-    log_text(tr("imFCS calibration tool 2: collecting wxy data ... DONE!\n"));
+    log_text(tr("imFCS calibration tool 3: collecting wxy data ... DONE!\n"));
 
+}
+
+void QFPEvalIMFCSFit::showCalibrationTutorial()
+{
+    if (services) {
+        services->displayHelpWindow(services->getPluginHelpDirectory(getID())+"/calibration.html");
+    }
 }
 
 

@@ -547,7 +547,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QVBoxLayout* lpltOverview=new QVBoxLayout();
     lpltOverview->setSpacing(2);
     wpltOverview->setLayout(lpltOverview);
-    pltOverview=new JKQtPlotter(wpltOverview);
+    pltOverview=new QFPlotter(wpltOverview);
     pltOverview->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltOverview->setObjectName("pltOverview");
     //lpltOverview->addWidget(new QLabel(tr("Overview:")));
@@ -608,7 +608,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     wpltMask->setVisible(false);
     QVBoxLayout* lpltMask=new QVBoxLayout();
     wpltMask->setLayout(lpltMask);
-    pltMask=new JKQtPlotter(wpltMask);
+    pltMask=new QFPlotter(wpltMask);
     pltMask->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltMask->setObjectName("pltMask");
     pltMask->get_plotter()->set_plotLabel(tr("\\textbf{Mask/Selected}"));
@@ -669,7 +669,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QWidget* wpltImage=new QWidget(this);
     QVBoxLayout* lpltImage=new QVBoxLayout();
     wpltImage->setLayout(lpltImage);
-    pltImage=new JKQtPlotter(wpltImage);
+    pltImage=new QFPlotter(wpltImage);
     pltImage->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltImage->setObjectName("pltImage");
     pltImage->get_plotter()->set_plotLabel(tr("\\textbf{Parameter Image}"));
@@ -735,7 +735,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QWidget* wpltGofImage=new QWidget(this);
     QVBoxLayout* lpltGofImage=new QVBoxLayout();
     wpltGofImage->setLayout(lpltGofImage);
-    pltGofImage=new JKQtPlotter(wpltGofImage);
+    pltGofImage=new QFPlotter(wpltGofImage);
     pltGofImage->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltGofImage->setObjectName("pltGofImage");
     pltGofImage->get_plotter()->set_plotLabel(tr("\\textbf{\"Goodnes of Fit\" Image}"));
@@ -797,12 +797,12 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     // WIDGET: correlation&residuals plot
     ///////////////////////////////////////////////////////////////
 
-    plotter = new JKQtPlotter(true, this);
+    plotter = new QFPlotter(true, this);
     plotter->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     plotter->setObjectName("plotter");
 
     plotter->get_plotter()->set_showKey(true);
-    plotterResid = new JKQtPlotter(true, this);
+    plotterResid = new QFPlotter(true, this);
     plotterResid->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     plotterResid->setObjectName("plotterResid");
 

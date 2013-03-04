@@ -4,7 +4,7 @@
 #include <QWidget>
 
 #include <QLabel>
-#include "qt/jkqtplotter.h"
+#include "qfplotter.h"
 #include <QCheckBox>
 #include <QPushButton>
 #include <QListWidget>
@@ -107,7 +107,7 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         int connectParameterWidgetsCounter;
 
         /** \brief plotter widget for the parameter histogram */
-        JKQtPlotter* pltParamHistogram;
+        QFPlotter* pltParamHistogram;
         QCheckBox* chkLogHistogram;
         QSpinBox* spinHistogramBins;
         QGroupBox* grpHistogramSettings;

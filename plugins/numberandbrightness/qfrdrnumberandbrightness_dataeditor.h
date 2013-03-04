@@ -3,7 +3,7 @@
 
 #include "qfrawdataeditor.h"
 #include <QLabel>
-#include "qt/jkqtplotter.h"
+#include "qfplotter.h"
 #include <QCheckBox>
 #include <QPushButton>
 #include <QListWidget>
@@ -57,7 +57,7 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
         void loadPlotSettings();
         void savePlotSettings();
 
-        void addPlotter( JKQtPlotter*& plotter, JKQTPMathImage*& plot, JKQTPOverlayImage*& plteSelected, JKQTPOverlayImage*& plteExcluded);
+        void addPlotter( QFPlotter*& plotter, JKQTPMathImage*& plot, JKQTPOverlayImage*& plteSelected, JKQTPOverlayImage*& plteExcluded);
 
         void reallocMem(int size);
 
@@ -69,13 +69,13 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
 
 
         /** \brief plotter widget for the brightness image */
-        JKQtPlotter* pltBrightness;
+        QFPlotter* pltBrightness;
         /** \brief plotter widget for the particle number image */
-        JKQtPlotter* pltNumber;
+        QFPlotter* pltNumber;
         /** \brief plotter widget for the overview image */
-        JKQtPlotter* pltOverview;
+        QFPlotter* pltOverview;
         /** \brief plotter widget for the overview image */
-        JKQtPlotter* pltCorrelation;
+        QFPlotter* pltCorrelation;
 
         JKQTPMathImage* plteNumber;
         JKQTPOverlayImage* plteNumberSelected;

@@ -3,7 +3,7 @@
 
 #include "qfrawdataeditor.h"
 #include <QLabel>
-#include "qt/jkqtplotter.h"
+#include "qfplotter.h"
 #include <QCheckBox>
 #include <QPushButton>
 #include <QListWidget>
@@ -85,9 +85,9 @@ protected slots:
         QString addItemToPlot(double *rateT, double *rate, unsigned long rateN, long datarange_start, long datarange_end, unsigned int rateRuns, QString binned, QFRDRPhotonCountsData *m, JKQtPlotter *parent, bool showAvg=true);
 
         /** \brief plotter widget for the count rate curve */
-        JKQtPlotter* plotterBinned;
+        QFPlotter* plotterBinned;
         /** \brief plotter widget for the count rate curve */
-        JKQtPlotter* plotterDetail;
+        QFPlotter* plotterDetail;
         /** \brief splitter between plot and other widgets */
         QVisibleHandleSplitter* splitter;
         /** \brief splitter between plot and other widgets */

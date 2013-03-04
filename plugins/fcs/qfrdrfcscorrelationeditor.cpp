@@ -170,7 +170,7 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     QWidget* wp=new QWidget(this);
     QVBoxLayout* lp=new QVBoxLayout(this);
     wp->setLayout(lp);
-    plotter = new JKQtPlotter(true, this);
+    plotter = new QFPlotter(true, this);
     plotter->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     lp->addWidget(plotter);
     sliders=new DataCutSliders(this);

@@ -3,7 +3,7 @@
 
 #include "qfrawdataeditor.h"
 #include <QLabel>
-#include "qt/jkqtplotter.h"
+#include "qfplotter.h"
 #include <QCheckBox>
 #include <QPushButton>
 #include <QListWidget>

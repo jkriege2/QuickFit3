@@ -165,7 +165,7 @@ void QFRDRPhotonCountsDataEditor::createWidgets() {
     glOptionsRHS->addItem(new QSpacerItem(5,10,QSizePolicy::Minimum, QSizePolicy::Expanding), glRowCount, 0);
     glRowCount++;
 
-    plotterBinned = new JKQtPlotter(true, this);
+    plotterBinned = new QFPlotter(true, this);
     plotterBinned->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     ovlRange=new JKQTPoverlayVerticalRange(0,0,plotterBinned->get_plotter());
     ovlRange->set_color(QColor("red"));
@@ -190,7 +190,7 @@ void QFRDRPhotonCountsDataEditor::createWidgets() {
     labScrollRange->setMaximumWidth(120);
     hbPlotterDetailControl->addWidget(labScrollRange);
     vbPlotterDetail->addLayout(hbPlotterDetailControl);
-    plotterDetail = new JKQtPlotter(true, this);
+    plotterDetail = new QFPlotter(true, this);
     plotterDetail->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     vbPlotterDetail->addWidget(plotterDetail);
 

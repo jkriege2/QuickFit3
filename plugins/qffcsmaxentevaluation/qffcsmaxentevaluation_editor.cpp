@@ -104,7 +104,7 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     plotLayout->insertWidget(0, tbPlot);
 
 
-    pltDistribution=new JKQtPlotter(true, this);
+    pltDistribution=new QFPlotter(true, this);
     pltDistribution->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltDistribution->useExternalDatastore(pltData->getDatastore());
     pltDistribution->set_displayToolbar(false);

@@ -8,7 +8,7 @@
 #include "statistics_tools.h"
 #include "qfevaluationeditor.h"
 #include "qfrawdatarecord.h"
-#include "qt/jkqtplotter.h"
+#include "qfplotter.h"
 #include "tools.h"
 #include <QComboBox>
 #include <QLabel>
@@ -135,13 +135,13 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         /** \brief combobox to select a model for the weighting */
         QComboBox* cmbWeights;
         /** \brief ploter for the MaxEnt Distribution */
-        JKQtPlotter* pltDistribution;
+        QFPlotter* pltDistribution;
         QToolBar* tbPlot;
         QToolBar* tbPlotDistribution;
         QToolBar* tbPlotDistResults;
         QVisibleHandleSplitter* splitterDist;
         DataCutSliders* sliderDist;
-        JKQtPlotter* pltDistResults;
+        QFPlotter* pltDistResults;
         QComboBox* cmbDistResultsMode;
 
         QFDoubleEdit* numPre[4];

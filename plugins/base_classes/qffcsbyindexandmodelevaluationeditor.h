@@ -8,7 +8,7 @@
 
 #include "qfevaluationeditor.h"
 #include "qfrawdatarecord.h"
-#include "qt/jkqtplotter.h"
+#include "qfplotter.h"
 #include "tools.h"
 #include <QComboBox>
 #include <QLabel>
@@ -128,9 +128,9 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
         /** \brief combobox to select a model */
         QComboBox* cmbModel;
         /** \brief ploter for the data&curves */
-        JKQtPlotter* pltData;
+        QFPlotter* pltData;
         /** \brief ploter for the residuals */
-        JKQtPlotter* pltResiduals;
+        QFPlotter* pltResiduals;
         /** \brief DataCutSliders */
         DataCutSliders* datacut;
         /** \brief Splitter between Plots  */
@@ -169,9 +169,9 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
         /** \brief label that displays whether the current fit parameters are global or local */
         QLabel* labFitParameters;
         /** \brief plotter for residual distribution histogram */
-        JKQtPlotter* pltResidualHistogram;
+        QFPlotter* pltResidualHistogram;
         /** \brief plotter for residual autocorrelation */
-        JKQtPlotter* pltResidualCorrelation;
+        QFPlotter* pltResidualCorrelation;
         /** \brief label for fit statistics */
         QTextEdit* txtFitStatistics;
         /** \brief label for fit statistics */

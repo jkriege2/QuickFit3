@@ -2,7 +2,7 @@
 #define QFRDRFCSCorrelationEditor_H
 
 #include "qfrawdataeditor.h"
-#include "qt/jkqtplotter.h"
+#include "qfplotter.h"
 #include <QCheckBox>
 #include <QPushButton>
 #include <QListWidget>
@@ -73,7 +73,7 @@ class QFRDRFCSCorrelationEditor : public QFRawDataEditor {
         virtual void writeSettings();
 
         /** \brief plotter widget for the correlation curve */
-        JKQtPlotter* plotter;
+        QFPlotter* plotter;
         /** \brief sliders to set the cut of the correlation curve */
         DataCutSliders* sliders;
         /** \brief splitter between plot and rhs widgets */

@@ -482,22 +482,22 @@ void QFEHelpEditorWidget::openScriptNoAsk(QString filename)
 
 void QFEHelpEditorWidget::on_btnBold_clicked()
 {
-    insertAroundOld("<b>%1</b>");
+    insertAroundOld("<b>%1°</b>");
 }
 
 void QFEHelpEditorWidget::on_btnItalic_clicked()
 {
-    insertAroundOld("<i>%1</i>");
+    insertAroundOld("<i>%1°</i>");
 }
 
 void QFEHelpEditorWidget::on_btnUnderline_clicked()
 {
-    insertAroundOld("<u>%1</U>");
+    insertAroundOld("<u>%1°</u>");
 }
 
 void QFEHelpEditorWidget::on_btnImage_clicked()
 {
-    insertAroundOld("<img src=\"image.png\">%1");
+    insertAroundOld("<img src=\"image.png\">%1°");
 
 }
 
@@ -537,54 +537,54 @@ void QFEHelpEditorWidget::on_btnLink_clicked()
 
     QString link=QInputDialog::getItem(this, tr("insert link"), tr("link target:"), links, 0, true,&ok);
     if (ok) {
-        insertAroundOld(QString("<a href=\"%1\">").arg(link)+QString("%1</a>"));
+        insertAroundOld(QString("<a href=\"%1\">").arg(link)+QString("%1°</a>"));
     }
 }
 
 void QFEHelpEditorWidget::on_btnBlockquote_clicked()
 {
-    insertAroundOld("\n<blockquote>\n\t%1\n</blockquote>\n");
+    insertAroundOld("\n<blockquote>\n    %1\n</blockquote>\n");
 }
 
 void QFEHelpEditorWidget::on_btnNumberedList_clicked()
 {
-    insertAroundOld("\n<ol>\n\t<li>%1</li>\n</ol>");
+    insertAroundOld("\n<ol>\n    <li>%1</li>\n</ol>");
 
 }
 
 void QFEHelpEditorWidget::on_btnBulletList_clicked()
 {
-    insertAroundOld("\n<ul>\n\t<li>%1</li>\n</ul>");
+    insertAroundOld("\n<ul>\n    <li>%1</li>\n</ul>");
 }
 
 void QFEHelpEditorWidget::on_btnInsertH1_clicked()
 {
-    insertAroundOld("\n\n<h1></h1>\n<p>\n\t%1\n</p>\n");
+    insertAroundOld("\n\n<h1>%1°</h1>\n<p></p>\n");
 }
 
 void QFEHelpEditorWidget::on_btnInsertH2_clicked()
 {
-    insertAroundOld("\n\n<h2></h2>\n<p>\n\t%1\n</p>\n");
+    insertAroundOld("\n\n<h2>%1°</h2>\n<p></p>\n");
 }
 
 void QFEHelpEditorWidget::on_btnInsertH3_clicked()
 {
-    insertAroundOld("\n\n<h3></h3>\n<p>\n\t%1\n</p>\n");
+    insertAroundOld("\n\n<h3>%1°</h3>\n<p></p>\n");
 }
 
 void QFEHelpEditorWidget::on_btnInsertH4_clicked()
 {
-    insertAroundOld("\n\n<h4></h4>\n<p>\n\t%1\n</p>\n");
+    insertAroundOld("\n\n<h4>%1°</h4>\n<p></p>\n");
 }
 
 void QFEHelpEditorWidget::on_btnInsertParagraph_clicked()
 {
-    insertAroundOld("\n<p>\n\t%1\n</p>\n");
+    insertAroundOld("\n<p>\n    %1\n</p>\n");
 }
 
 void QFEHelpEditorWidget::on_btnInsertListItem_clicked()
 {
-    insertAroundOld("\n<li>%1</li>");
+    insertAroundOld("\n<li>%1°</li>");
 }
 
 void QFEHelpEditorWidget::on_btnPasteImage_clicked()
@@ -594,6 +594,21 @@ void QFEHelpEditorWidget::on_btnPasteImage_clicked()
         insertAroundOld(dlg->saveImage()+"%1");
     }
     delete dlg;
+}
+
+void QFEHelpEditorWidget::on_btnInsertCode_clicked()
+{
+    insertAroundOld("<code>%1°</code>");
+}
+
+void QFEHelpEditorWidget::on_btnInsertMath_clicked()
+{
+    insertAroundOld("$$math:°$$%1");
+}
+
+void QFEHelpEditorWidget::on_btnInsertBMath_clicked()
+{
+    insertAroundOld("$$bmath:°$$%1");
 }
 
 
@@ -726,7 +741,16 @@ void QFEHelpEditorWidget::insertAroundOld(const QString &newText)
 {
     QString txt=newText.arg(ui->edtScript->getEditor()->getSelection());
     if (!txt.isEmpty()) {
+        int pos=txt.indexOf('°');
+        if (pos>=0) txt=txt.remove('°');
+        int textpos=ui->edtScript->getEditor()->textCursor().position();
         ui->edtScript->getEditor()->insertPlainText(txt);
+        if (pos>=0) {
+            for (int i=0; i<txt.length()-pos; i++) {
+                ui->edtScript->getEditor()->moveCursor(QTextCursor::Left, QTextCursor::MoveAnchor);
+            }
+        }
+
     }
 
 }

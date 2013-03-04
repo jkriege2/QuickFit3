@@ -38,7 +38,7 @@ void QFRDROverviewImageDisplay::createWidgets() {
     labValue=new QLabel("", this);
     mainLay->addWidget(labValue);
 
-    pltImage=new JKQtPlotter(this);
+    pltImage=new QFPlotter(this);
     pltImage->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltImage->set_displayMousePosition(false);
     pltImage->set_displayToolbar(false);

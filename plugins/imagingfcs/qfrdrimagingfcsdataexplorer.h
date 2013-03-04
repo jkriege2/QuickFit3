@@ -4,7 +4,7 @@
 #include <QDialog>
 #include "qfimporterimageseries.h"
 #include "qmodernprogresswidget.h"
-#include "jkqtplotter.h"
+#include "qfplotter.h"
 #include "jkqtpimageelements.h"
 #include "jkqtpgeoelements.h"
 #include "jkqtpelements.h"

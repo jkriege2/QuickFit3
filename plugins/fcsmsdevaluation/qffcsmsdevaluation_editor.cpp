@@ -174,7 +174,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     plotLayout->insertWidget(0, tbPlot);
 
 
-    pltDistribution=new JKQtPlotter(true, this);
+    pltDistribution=new QFPlotter(true, this);
     pltDistribution->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltDistribution->useExternalDatastore(pltData->getDatastore());
     pltDistribution->set_displayToolbar(false);
@@ -217,7 +217,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     sliderDist=new DataCutSliders(this);
 
 
-    pltDistResults=new JKQtPlotter(true, this);
+    pltDistResults=new QFPlotter(true, this);
     pltDistResults->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltDistResults->useExternalDatastore(pltData->getDatastore());
     pltDistResults->set_displayToolbar(false);

@@ -9,7 +9,7 @@
 #include <QToolBar>
 #include "qfrawdatarecord.h"
 #include "qfrawdataeditor.h"
-#include "jkqtplotter.h"
+#include "qfplotter.h"
 #include "jkqtpelements.h"
 #include "jkqtpimageelements.h"
 #include "jkqttools.h"
@@ -49,8 +49,8 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
 
     protected:
         QLabel* labDescription;
-        JKQtPlotter* pltImage;
-        JKQtPlotter* pltData;
+        QFPlotter* pltImage;
+        QFPlotter* pltData;
         QToolBar* toolbar;
         QComboBox* cmbImageStack;
         QComboBox* cmbChannelR;

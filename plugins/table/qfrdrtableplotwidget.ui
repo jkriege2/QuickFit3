@@ -25,7 +25,7 @@
      <widget class="QWidget" name="verticalLayoutWidget">
       <layout class="QVBoxLayout" name="layPlot">
        <item>
-        <widget class="JKQtPlotter" name="plotter" native="true">
+        <widget class="QFPlotter" name="plotter" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -2162,9 +2162,9 @@
    </slots>
   </customwidget>
   <customwidget>
-   <class>JKQtPlotter</class>
+   <class>QFPlotter</class>
    <extends>QWidget</extends>
-   <header>jkqtplotter.h</header>
+   <header>qfplotter.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

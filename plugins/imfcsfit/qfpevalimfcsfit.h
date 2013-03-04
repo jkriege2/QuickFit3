@@ -75,9 +75,12 @@ class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase, publi
 
         void imFCSCalibrationTool1();
         void imFCSCalibrationTool2();
+        void imFCSCalibrationTool3();
+        void showCalibrationTutorial();
 
 
     private:
+        QMenu* menuCalibration;
 };
 
 #endif // QFPEVALIMFCSFIT_H

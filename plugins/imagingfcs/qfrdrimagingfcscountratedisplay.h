@@ -4,7 +4,7 @@
 #include <QWidget>
 #include "qfrawdatarecord.h"
 #include "qfrawdataeditor.h"
-#include "jkqtplotter.h"
+#include "qfplotter.h"
 #include "jkqtpelements.h"
 #include "jkqtpimageelements.h"
 #include "jkqttools.h"

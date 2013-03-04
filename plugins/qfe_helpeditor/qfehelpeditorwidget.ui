@@ -429,6 +429,48 @@
       </widget>
      </item>
      <item>
+      <widget class="QToolButton" name="btnInsertCode">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert &lt;code&gt;...&lt;/code&gt;</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/insert_code.png</normaloff>:/qfe_helpeditor/icons/insert_code.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnInsertMath">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert equation</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/formula.png</normaloff>:/qfe_helpeditor/icons/formula.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnInsertBMath">
+       <property name="toolTip">
+        <string>start new script</string>
+       </property>
+       <property name="text">
+        <string>insert equation block</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/bformula.png</normaloff>:/qfe_helpeditor/icons/bformula.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>

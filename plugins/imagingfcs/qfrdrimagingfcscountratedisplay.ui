@@ -66,7 +66,7 @@ p, li { white-space: pre-wrap; }
         </layout>
        </item>
        <item>
-        <widget class="JKQtPlotter" name="pltIntensity" native="true">
+        <widget class="QFPlotter" name="pltIntensity" native="true">
          <property name="minimumSize">
           <size>
            <width>200</width>
@@ -147,9 +147,9 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>JKQtPlotter</class>
+   <class>QFPlotter</class>
    <extends>QWidget</extends>
-   <header>jkqtplotter.h</header>
+   <header>qfplotter.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

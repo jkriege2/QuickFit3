@@ -3,7 +3,7 @@
 
 #include "qfrawdataeditor.h"
 #include <QLabel>
-#include "qt/jkqtplotter.h"
+#include "qfplotter.h"
 #include <QCheckBox>
 #include <QPushButton>
 #include <QListWidget>
@@ -243,9 +243,9 @@ protected:
 
 
         /** \brief plotter widget for the correlation curve */
-        JKQtPlotter* plotter;
+        QFPlotter* plotter;
         /** \brief plotter widget for the correlation curve residuals */
-        JKQtPlotter* plotterResid;
+        QFPlotter* plotterResid;
         /** \brief sliders to set the cut of the correlation curve */
         DataCutSliders* sliders;
         /** \brief splitter between top plots */
@@ -290,7 +290,7 @@ protected:
         QLabel* labParamImage;
 
         /** \brief  plotter for overview image */
-        JKQtPlotter* pltOverview;
+        QFPlotter* pltOverview;
         /** \brief plot for the overview image in pltOverview */
         JKQTPMathImage* plteOverview;
         /** \brief plot for the selected runs in pltOverview, plot plteOverviewSelectedData */
@@ -305,14 +305,14 @@ protected:
         int plteOverviewSize;
 
         /** \brief  plotter for mask image */
-        JKQtPlotter* pltMask;
+        QFPlotter* pltMask;
         /** \brief plot for the mask image in pltMask */
         JKQTPOverlayImage* plteMask;
         /** \brief plot for the selected runs in pltOverview, plot plteOverviewSelectedData */
         JKQTPOverlayImageEnhanced* plteMaskSelected;
 
         /** \brief  plotter for parameter image */
-        JKQtPlotter* pltImage;
+        QFPlotter* pltImage;
         /** \brief plot for the parameter image in pltImage */
         JKQTPMathImage* plteImage;
         double* plteImageData;
@@ -325,7 +325,7 @@ protected:
 
 
         /** \brief  plotter for goodnes of fit image */
-        JKQtPlotter* pltGofImage;
+        QFPlotter* pltGofImage;
         /** \brief plot for the  goodnes of fit image in pltOverview */
         JKQTPMathImage* plteGofImage;
         double* plteGofImageData;

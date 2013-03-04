@@ -66,7 +66,7 @@ void QFHistogramView::createWidgets() {
 
     // HISTOGRAM PLOTS ///////////////////////////////////////////////////////////////////////
     splitterHistogram=new QVisibleHandleSplitter(this);
-    pltParamHistogram=new JKQtPlotter(this);
+    pltParamHistogram=new QFPlotter(this);
     pltParamHistogram->setMinimumWidth(100);
     pltParamHistogram->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     tvHistogramParameters=new QEnhancedTableView(this);

@@ -23,7 +23,7 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="JKQtPlotter" name="pltFunction" native="true">
+     <widget class="QFPlotter" name="pltFunction" native="true">
       <property name="minimumSize">
        <size>
         <width>100</width>
@@ -454,18 +454,18 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>JKQtPlotter</class>
-   <extends>QWidget</extends>
-   <header>jkqtplotter.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
    <header>qfdoubleedit.h</header>
    <slots>
     <signal>valueChanged(double)</signal>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>QFPlotter</class>
+   <extends>QWidget</extends>
+   <header>qfplotter.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>QVisibleHandleSplitter</class>

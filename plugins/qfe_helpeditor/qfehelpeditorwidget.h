@@ -60,6 +60,9 @@ class QFEHelpEditorWidget : public QWidget {
         void on_btnInsertParagraph_clicked();
         void on_btnInsertListItem_clicked();
         void on_btnPasteImage_clicked();
+        void on_btnInsertCode_clicked();
+        void on_btnInsertMath_clicked();
+        void on_btnInsertBMath_clicked();
         //void on__clicked();
 
         /** \brief replaces the currently selected text by newText, hwere %1 is replaced by the selected text*/

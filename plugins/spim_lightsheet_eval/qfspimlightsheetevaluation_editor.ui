@@ -83,7 +83,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="JKQtPlotter" name="pltFit" native="true">
+        <widget class="QFPlotter" name="pltFit" native="true">
          <property name="minimumSize">
           <size>
            <width>200</width>
@@ -103,7 +103,7 @@
         <widget class="QEnhancedTableView" name="tabFitResults"/>
        </item>
        <item row="1" column="0" rowspan="3">
-        <widget class="JKQtPlotter" name="pltImage" native="true">
+        <widget class="QFPlotter" name="pltImage" native="true">
          <property name="minimumSize">
           <size>
            <width>200</width>
@@ -120,7 +120,7 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,1,0,0,1" columnstretch="1,1">
        <item row="5" column="0">
-        <widget class="JKQtPlotter" name="pltParam" native="true">
+        <widget class="QFPlotter" name="pltParam" native="true">
          <property name="minimumSize">
           <size>
            <width>200</width>
@@ -146,7 +146,7 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="JKQtPlotter" name="pltBeamPos" native="true">
+        <widget class="QFPlotter" name="pltBeamPos" native="true">
          <property name="minimumSize">
           <size>
            <width>200</width>
@@ -156,7 +156,7 @@
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="JKQtPlotter" name="pltBeamPosDifference" native="true">
+        <widget class="QFPlotter" name="pltBeamPosDifference" native="true">
          <property name="minimumSize">
           <size>
            <width>200</width>
@@ -284,7 +284,7 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="JKQtPlotter" name="pltBeamWidth" native="true">
+        <widget class="QFPlotter" name="pltBeamWidth" native="true">
          <property name="minimumSize">
           <size>
            <width>200</width>
@@ -580,10 +580,15 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>JKQtPlotter</class>
+   <class>QFPlotter</class>
    <extends>QWidget</extends>
-   <header>jkqtplotter.h</header>
+   <header>qfplotter.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QEnhancedTableView</class>
+   <extends>QTableView</extends>
+   <header>qenhancedtableview.h</header>
   </customwidget>
   <customwidget>
    <class>QFFitFunctionComboBox</class>
@@ -594,11 +599,6 @@ p, li { white-space: pre-wrap; }
    <class>QFFitAlgorithmComboBox</class>
    <extends>QComboBox</extends>
    <header>qffitalgorithmcombobox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QEnhancedTableView</class>
-   <extends>QTableView</extends>
-   <header>qenhancedtableview.h</header>
   </customwidget>
  </customwidgets>
  <resources>

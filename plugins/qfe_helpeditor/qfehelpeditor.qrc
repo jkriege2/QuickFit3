@@ -52,5 +52,8 @@
         <file>icons/insert_paragraph.png</file>
         <file>icons/insert_listitem.png</file>
         <file>icons/paste_image.png</file>
+        <file>icons/bformula.png</file>
+        <file>icons/formula.png</file>
+        <file>icons/insert_code.png</file>
     </qresource>
 </RCC>

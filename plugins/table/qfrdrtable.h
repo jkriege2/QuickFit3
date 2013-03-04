@@ -5,7 +5,7 @@
 
 #include "qfrawdatarecord.h"
 #include "qfrawdatarecordfactory.h"
-#include "jkqtplotter.h"
+#include "qfplotter.h"
 #include "jkqtptools.h"
 #include "qftools.h"
 #include "qfrdrtableinterface.h"

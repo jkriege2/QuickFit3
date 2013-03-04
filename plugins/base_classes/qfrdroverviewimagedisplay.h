@@ -7,7 +7,7 @@
 #include <QToolBar>
 #include "qfrawdatarecord.h"
 #include "qfrawdataeditor.h"
-#include "jkqtplotter.h"
+#include "qfplotter.h"
 #include "jkqtpelements.h"
 #include "jkqtpimageelements.h"
 #include "jkqttools.h"
@@ -61,7 +61,7 @@ class QFRDROverviewImageDisplay : public QWidget
         QLabel* labImageAvg;
         QLabel* labStackPosition;
         QComboBox* cmbImage;
-        JKQtPlotter* pltImage;
+        QFPlotter* pltImage;
         QToolBar* toolbar;
         QFHistogramView* histogram;
         QCheckBox* chkHistVideo;

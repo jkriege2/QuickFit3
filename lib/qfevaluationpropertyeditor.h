@@ -107,6 +107,8 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         void registerMenu(QMenu* menu, int editor=-1);
         /** \brief returns a pointer to the help menu of this editor */
         QMenu* getHelpMenu() const;
+
+        QPointer<QFEvaluationEditor> getEditor() const;
     private slots:
         /** \brief called when the name editor changes its contents */
         void nameChanged(const QString& text);

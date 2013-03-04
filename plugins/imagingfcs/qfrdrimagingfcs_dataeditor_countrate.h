@@ -3,7 +3,7 @@
 
 #include "qfrawdataeditor.h"
 #include <QLabel>
-#include "qt/jkqtplotter.h"
+#include "qfplotter.h"
 #include <QCheckBox>
 #include <QPushButton>
 #include <QListWidget>
@@ -65,7 +65,7 @@ class QFRDRImagingFCSDataEditorCountrate : public QFRawDataEditor {
     protected:
 
         /** \brief plotter widget for the correlation curve */
-        JKQtPlotter* plotter;
+        QFPlotter* plotter;
         /** \brief splitter between plot and rhs widgets */
         QVisibleHandleSplitter* splitter;
         /** \brief splitter between plot and bottom widgets */

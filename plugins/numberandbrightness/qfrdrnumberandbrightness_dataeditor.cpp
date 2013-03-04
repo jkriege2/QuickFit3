@@ -31,9 +31,9 @@ QFRDRNumberAndBrightnessDataEditor::~QFRDRNumberAndBrightnessDataEditor()
 }
 
 
-void QFRDRNumberAndBrightnessDataEditor::addPlotter(JKQtPlotter *&plotter, JKQTPMathImage *&plot, JKQTPOverlayImage *&plteSelected, JKQTPOverlayImage *&plteExcluded)
+void QFRDRNumberAndBrightnessDataEditor::addPlotter(QFPlotter *&plotter, JKQTPMathImage *&plot, JKQTPOverlayImage *&plteSelected, JKQTPOverlayImage *&plteExcluded)
 {
-    plotter=new JKQtPlotter(this);
+    plotter=new QFPlotter(this);
     plot=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::MATLAB, plotter->get_plotter());
     plotter->addGraph(plot);
     plteExcluded=new JKQTPOverlayImage(0,0,1,1,NULL, 0, 0, selectionColor, plotter->get_plotter());
@@ -118,7 +118,7 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
     layPlots->addWidget(pltOverview, 1,0);
     pltOverview->get_plotter()->useExternalDatastore(pltNumber->getDatastore());
 
-    pltCorrelation=new JKQtPlotter(this);
+    pltCorrelation=new QFPlotter(this);
     pltCorrelation->get_plotter()->useExternalDatastore(pltNumber->getDatastore());
     pltCorrelation->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltCorrelation->get_plotter()->set_plotLabelFontSize(10);

@@ -14,7 +14,7 @@
 #include "qfrawdataeditor.h"
 #include "qenhancedtableview.h"
 #include "qfrawdatapropertyeditor.h"
-#include "jkqtplotter.h"
+#include "qfplotter.h"
 #include "qfrdrtableplotwidget.h"
 
 

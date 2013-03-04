@@ -2,7 +2,7 @@
 #define QFRDRFCSRateEditor_H
 
 #include "qfrawdataeditor.h"
-#include "qt/jkqtplotter.h"
+#include "qfplotter.h"
 #include <QCheckBox>
 #include <QPushButton>
 #include <QListWidget>
@@ -75,7 +75,7 @@ class QFRDRFCSRateEditor : public QFRawDataEditor {
         QString plotItem(QFRDRFCSData* m);
 
         /** \brief plotter widget for the count rate curve */
-        JKQtPlotter* plotter;
+        QFPlotter* plotter;
         /** \brief sliders to set the cut of the count rate curve */
         //DataCutSliders* sliders;
         /** \brief splitter between plot and other widgets */

@@ -8,7 +8,7 @@
 
 #include "qfevaluationeditor.h"
 #include "qfrawdatarecord.h"
-#include "qt/jkqtplotter.h"
+#include "qfplotter.h"
 #include "tools.h"
 #include <QComboBox>
 #include <QLabel>
@@ -124,7 +124,7 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         /** \brief combobox to select a model for the weighting */
         QComboBox* cmbWeights;
         /** \brief ploter for the MaxEnt Distribution */
-        JKQtPlotter* pltDistribution;
+        QFPlotter* pltDistribution;
         QToolBar* tbPlot;
         QToolBar* tbPlotDistribution;
 
