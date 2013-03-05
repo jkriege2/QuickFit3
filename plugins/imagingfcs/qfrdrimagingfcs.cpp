@@ -11,6 +11,7 @@ QFRDRImagingFCSPlugin::QFRDRImagingFCSPlugin(QObject* parent):
 {
     //constructor
     dlgCorrelate=NULL;
+    dlgSimulate=NULL;
 }
 
 QFRDRImagingFCSPlugin::~QFRDRImagingFCSPlugin()
@@ -48,7 +49,7 @@ void QFRDRImagingFCSPlugin::registerToMenu(QMenu* menu) {
     actSimulate->setStatusTip(tr("Simulates an image series for ImFCS that can afterwards be correlated"));
     connect(actSimulate, SIGNAL(triggered()), this, SLOT(simulateForCorrelation()));
     m->addAction(actSimulate);
-    actSimulate->setEnabled(false);
+    //actSimulate->setEnabled(false);
 
 }
 
@@ -122,6 +123,8 @@ void QFRDRImagingFCSPlugin::importCorrelationsFromSimulation()
     correlateAndInsert();
     if (dlgCorrelate) {
         dlgCorrelate->openFile(dlgSimulate->getSimulationFilename());
+        dlgSimulate->deleteLater();
+        dlgSimulate=NULL;
     }
 }
 

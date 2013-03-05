@@ -51,7 +51,9 @@ HEADERS += qfrdrimagingfcs.h \
     ../base_classes/qffinderroneouscorrelationdlg.h \
     ../base_classes/qfrdrimagemaskedittools.h \
     qfrdrimagingfcsedittools.h \
-    qfrdrimagingfcssimulator.h
+    qfrdrimagingfcssimulator.h \
+    qfrdrimagingfcssimulationthread.h \
+    ../../extlibs/MersenneTwister.h
 
 
 
@@ -80,7 +82,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     ../base_classes/qffinderroneouscorrelationdlg.cpp \
     ../base_classes/qfrdrimagemaskedittools.cpp \
     qfrdrimagingfcsedittools.cpp \
-    qfrdrimagingfcssimulator.cpp
+    qfrdrimagingfcssimulator.cpp \
+    qfrdrimagingfcssimulationthread.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \
