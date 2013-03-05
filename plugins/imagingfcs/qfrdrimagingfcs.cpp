@@ -4,6 +4,7 @@
 #include "qmodernprogresswidget.h"
 #include "qfrdrimagingfcstools.h"
 #include "yaid_rh.h"
+#include "qfrdrimagingfcssimulator.h"
 
 QFRDRImagingFCSPlugin::QFRDRImagingFCSPlugin(QObject* parent):
     QObject(parent), QFPluginRawDataRecordBase()
@@ -43,11 +44,18 @@ void QFRDRImagingFCSPlugin::registerToMenu(QMenu* menu) {
     connect(actCorrelate, SIGNAL(triggered()), this, SLOT(correlateAndInsert()));
     m->addAction(actCorrelate);
 
+    QAction* actSimulate=new QAction(QIcon(":/imaging_fcs/qfrdrimagingfcs_simulate.png"), tr("&simulate images for correlation"), parentWidget);
+    actSimulate->setStatusTip(tr("Simulates an image series for ImFCS that can afterwards be correlated"));
+    connect(actSimulate, SIGNAL(triggered()), this, SLOT(simulateForCorrelation()));
+    m->addAction(actSimulate);
+
 }
 
 void QFRDRImagingFCSPlugin::correlateAndInsert() {
-    if (dlgCorrelate) dlgCorrelate->show();
-    else if (project && settings) {
+    if (dlgCorrelate) {
+        dlgCorrelate->show();
+        dlgCorrelate->setProject(project);
+    } else if (project && settings) {
         dlgCorrelate=new QFRDRImagingFCSCorrelationDialog(services, settings, parentWidget);
         dlgCorrelate->setProject(project);
         dlgCorrelate->setWindowModality(Qt::NonModal);
@@ -91,6 +99,31 @@ void QFRDRImagingFCSPlugin::importCorrelationsFromDialog() {
 
     dlgCorrelate->deleteLater();
     dlgCorrelate=NULL;
+}
+
+void QFRDRImagingFCSPlugin::simulateForCorrelation()
+{
+    QFRDRImagingFCSSimulator* sim=new QFRDRImagingFCSSimulator(parentWidget);
+    if (dlgSimulate) {
+        dlgSimulate->setProject(project);
+        dlgSimulate->show();
+    }else if (project && settings) {
+        dlgSimulate=new QFRDRImagingFCSSimulator(services, settings, parentWidget);
+        dlgSimulate->setProject(project);
+        dlgSimulate->setWindowModality(Qt::NonModal);
+        //qDebug()<<parentWidget,
+        dlgSimulate->show();
+
+        connect(dlgSimulate, SIGNAL(accepted()), this, SLOT(importCorrelationsFromSimulation()));
+    }
+}
+
+void QFRDRImagingFCSPlugin::importCorrelationsFromSimulation()
+{
+    correlateAndInsert();
+    if (dlgCorrelate) {
+        dlgCorrelate->openFile(dlgSimulate->getSimulationFilename());
+    }
 }
 
 

@@ -50,7 +50,8 @@ HEADERS += qfrdrimagingfcs.h \
     ../base_classes/qfcorrelationmasktools.h \
     ../base_classes/qffinderroneouscorrelationdlg.h \
     ../base_classes/qfrdrimagemaskedittools.h \
-    qfrdrimagingfcsedittools.h
+    qfrdrimagingfcsedittools.h \
+    qfrdrimagingfcssimulator.h
 
 
 
@@ -78,7 +79,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     ../base_classes/qfcorrelationmasktools.cpp \
     ../base_classes/qffinderroneouscorrelationdlg.cpp \
     ../base_classes/qfrdrimagemaskedittools.cpp \
-    qfrdrimagingfcsedittools.cpp
+    qfrdrimagingfcsedittools.cpp \
+    qfrdrimagingfcssimulator.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \
@@ -88,7 +90,8 @@ FORMS = \
     qfrdrimagingfcscountratedisplay.ui \
     qfrdrimagingfcsseriesdialog.ui \
     qfrdrimagingfcscopydataselectdialog.ui \
-    ../base_classes/qffinderroneouscorrelationdlg.ui
+    ../base_classes/qffinderroneouscorrelationdlg.ui \
+    qfrdrimagingfcssimulator.ui
 
 RESOURCES += qfrdrimagingfcs.qrc \
     ../base_classes/qfrdrmaskeditor.qrc

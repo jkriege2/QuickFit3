@@ -988,3 +988,9 @@ QStringList QFRDRImagingFCSCorrelationDialog::getFilesToAdd() const {
     return filesToAdd;
 }
 
+void QFRDRImagingFCSCorrelationDialog::openFile(const QString &file)
+{
+    ui->edtImageFile->setText(file);
+    on_btnLoad_clicked();
+}
+

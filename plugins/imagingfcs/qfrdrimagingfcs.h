@@ -3,6 +3,8 @@
 #include "qftools.h"
 #include "qfpluginrawdata.h"
 #include "qfrdrimagingfcscorrelationdialog.h"
+#include "qfrdrimagingfcssimulator.h"
+
 #include <QPointer>
 /*!
     \defgroup qf3rdrdp_imaging_fcs Raw Data Record Plugin
@@ -68,6 +70,10 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
         void correlateAndInsert();
         /** \brief called when the correlation dialog was accepted by the user */
         void importCorrelationsFromDialog();
+        /** \brief simulates an image series from a 2D random walk */
+        void simulateForCorrelation();
+
+        void importCorrelationsFromSimulation();
     protected:
         /*! \brief add a video_correlator file to the current project
 
@@ -85,6 +91,7 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
         int checkColumns(QString filename);
 
         QFRDRImagingFCSCorrelationDialog* dlgCorrelate;
+        QFRDRImagingFCSSimulator* dlgSimulate;
 
         /** \brief insert record, if it is not yet contained in the project! */
         void insertProjectRecord(const QString& type, const QString& name, const QString& filename, const QString& description=QString(""), const QString& directory=QString(""), const QMap<QString,QVariant>& init_params=QFStringVariantMap(), const QStringList& init_params_readonly=QStringList());

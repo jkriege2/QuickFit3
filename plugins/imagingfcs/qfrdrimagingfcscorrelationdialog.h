@@ -23,90 +23,91 @@ namespace Ui {
     Finally getFilesToAdd() returns a list of file constaining ACFs and CCFs to be added to the
     project, by calling QFRDRImagingFCSPlugin::insertVideoCorrelatorFile().
 */
-class QFRDRImagingFCSCorrelationDialog : public QDialog
-{
-    Q_OBJECT
+class QFRDRImagingFCSCorrelationDialog : public QDialog {
+        Q_OBJECT
 
-public:
+    public:
 
-    QFRDRImagingFCSCorrelationDialog(QFPluginServices* pluginservices, ProgramOptions* opt, QWidget *parent = 0);
-    ~QFRDRImagingFCSCorrelationDialog();
+        QFRDRImagingFCSCorrelationDialog(QFPluginServices* pluginservices, ProgramOptions* opt, QWidget *parent = 0);
+        ~QFRDRImagingFCSCorrelationDialog();
 
-    void setProject(QFProject* project);
+        void setProject(QFProject* project);
 
-    void writeSettings();
-    void readSettings();
+        void writeSettings();
+        void readSettings();
 
-    QStringList getFilesToAdd() const;
+        QStringList getFilesToAdd() const;
+    public slots:
+            void openFile(const QString& file);
 
-protected slots:
-    void on_btnSelectImageFile_clicked();
-    void on_btnSelectBackgroundFile_clicked();
-    void on_btnAddJob_clicked();
-    void on_btnAddSeriesJob_clicked();
-    void on_btnLoad_clicked();
-    void on_btnHelp_clicked();
-    void on_spinP_valueChanged(int val);
-    void on_spinS_valueChanged(int val);
-    void on_spinM_valueChanged(int val);
-    void on_spinDecay_valueChanged(double val);
-    void on_spinDecay2_valueChanged(double val);
-    void on_cmbCorrelator_currentIndexChanged(int idx);
-    void on_cmbBackground_currentIndexChanged(int idx);
-    void on_cmbBleachType_currentIndexChanged(int idx);
-    void on_cmbDualView_currentIndexChanged(int index);
+    protected slots:
+        void on_btnSelectImageFile_clicked();
+        void on_btnSelectBackgroundFile_clicked();
+        void on_btnAddJob_clicked();
+        void on_btnAddSeriesJob_clicked();
+        void on_btnLoad_clicked();
+        void on_btnHelp_clicked();
+        void on_spinP_valueChanged(int val);
+        void on_spinS_valueChanged(int val);
+        void on_spinM_valueChanged(int val);
+        void on_spinDecay_valueChanged(double val);
+        void on_spinDecay2_valueChanged(double val);
+        void on_cmbCorrelator_currentIndexChanged(int idx);
+        void on_cmbBackground_currentIndexChanged(int idx);
+        void on_cmbBleachType_currentIndexChanged(int idx);
+        void on_cmbDualView_currentIndexChanged(int index);
 
-    void frameTimeChanged(double value);
-    void frameRateChanged(double value);
-    void updateProgress();
-    void updateFromFile(bool readFrameCount=true);
-    void updateCorrelator();
-    void updateFrameCount();
-    void updateImageSize();
-    void updateBleach();
-    void startNextWaitingThread();
-    void on_chkFirstFrame_clicked(bool checked);
-    void on_chkLastFrame_clicked(bool checked);
-    void setEditControlsEnabled(bool enabled);
-    void on_btnDataExplorer_clicked();
-    void readBackgroundFramesize();
+        void frameTimeChanged(double value);
+        void frameRateChanged(double value);
+        void updateProgress();
+        void updateFromFile(bool readFrameCount=true);
+        void updateCorrelator();
+        void updateFrameCount();
+        void updateImageSize();
+        void updateBleach();
+        void startNextWaitingThread();
+        void on_chkFirstFrame_clicked(bool checked);
+        void on_chkLastFrame_clicked(bool checked);
+        void setEditControlsEnabled(bool enabled);
+        void on_btnDataExplorer_clicked();
+        void readBackgroundFramesize();
 
-protected:
-    void done(int status);
-    bool allThreadsDone() const;
-    int runningThreads() const;
-    int waitingThreads() const;
-    void ensureTiffReader();
-    IMFCSJob initJob();
-    void addJob(IMFCSJob jobin, bool ignoreDualView=false);
-private:
-    QFPluginServices* pluginServices;
-    Ui::QFRDRImagingFCSCorrelationDialog *ui;
-    QPointer<QFProject> project;
-    ProgramOptions* options;
-    QString lastImagefileDir;
-    QString lastImagefileFilter;
-    QStringList imageFilters;
-    QStringList imageFormatNames;
-    QList<IMFCSJob> jobs;
-    //QList<Job> jobsToAdd;
-    QStringList filesToAdd;
-    bool closing;
-    QString inputconfigfile;
+    protected:
+        void done(int status);
+        bool allThreadsDone() const;
+        int runningThreads() const;
+        int waitingThreads() const;
+        void ensureTiffReader();
+        IMFCSJob initJob();
+        void addJob(IMFCSJob jobin, bool ignoreDualView=false);
+    private:
+        QFPluginServices* pluginServices;
+        Ui::QFRDRImagingFCSCorrelationDialog *ui;
+        QPointer<QFProject> project;
+        ProgramOptions* options;
+        QString lastImagefileDir;
+        QString lastImagefileFilter;
+        QStringList imageFilters;
+        QStringList imageFormatNames;
+        QList<IMFCSJob> jobs;
+        //QList<Job> jobsToAdd;
+        QStringList filesToAdd;
+        bool closing;
+        QString inputconfigfile;
 
 
 
-    int image_width;
-    int image_height;
-    int32_t frame_count;
-    QString filenameDisplayed;
+        int image_width;
+        int image_height;
+        int32_t frame_count;
+        QString filenameDisplayed;
 
-    int background_width;
-    int background_height;
-    int32_t background_frame_count;
+        int background_width;
+        int background_height;
+        int32_t background_frame_count;
 
-    int getIDForProgress(const QFRDRImagingFCSThreadProgress* w) const;
-    int getLayoutIDForProgress(const QWidget* w) const;
+        int getIDForProgress(const QFRDRImagingFCSThreadProgress* w) const;
+        int getLayoutIDForProgress(const QWidget* w) const;
 };
 
 #endif // QFRDRIMAGINGFCSCORRELATIONDIALOG_H
