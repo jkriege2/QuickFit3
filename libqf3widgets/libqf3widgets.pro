@@ -103,7 +103,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/qt/jkqtpparsedfunctionelements.h \
     ../../../../LIB/trunk/jkmathparser.h \
     qfhtmlhighlighter.h \
-    qfplotter.h
+    qfplotter.h \
+    qfplotterprivate.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -169,7 +170,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     ../../../../LIB/trunk/qt/jkqtpparsedfunctionelements.cpp \
     ../../../../LIB/trunk/jkmathparser.cpp \
     qfhtmlhighlighter.cpp \
-    qfplotter.cpp
+    qfplotter.cpp \
+    qfplotterprivate.cpp
 
 
 

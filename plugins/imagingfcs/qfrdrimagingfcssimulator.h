@@ -16,6 +16,10 @@ class QFRDRImagingFCSSimulator : public QDialog
         ~QFRDRImagingFCSSimulator();
         
         QString getSimulationFilename() const;
+    protected slots:
+        void on_btnHelp_clicked();
+        void writeSettings() const;
+        void readSettings();
     private:
         Ui::QFRDRImagingFCSSimulator *ui;
 };

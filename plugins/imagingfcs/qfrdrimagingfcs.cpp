@@ -48,6 +48,7 @@ void QFRDRImagingFCSPlugin::registerToMenu(QMenu* menu) {
     actSimulate->setStatusTip(tr("Simulates an image series for ImFCS that can afterwards be correlated"));
     connect(actSimulate, SIGNAL(triggered()), this, SLOT(simulateForCorrelation()));
     m->addAction(actSimulate);
+    actSimulate->setEnabled(false);
 
 }
 
@@ -105,11 +106,9 @@ void QFRDRImagingFCSPlugin::simulateForCorrelation()
 {
     QFRDRImagingFCSSimulator* sim=new QFRDRImagingFCSSimulator(parentWidget);
     if (dlgSimulate) {
-        dlgSimulate->setProject(project);
         dlgSimulate->show();
     }else if (project && settings) {
-        dlgSimulate=new QFRDRImagingFCSSimulator(services, settings, parentWidget);
-        dlgSimulate->setProject(project);
+        dlgSimulate=new QFRDRImagingFCSSimulator(parentWidget);
         dlgSimulate->setWindowModality(Qt::NonModal);
         //qDebug()<<parentWidget,
         dlgSimulate->show();

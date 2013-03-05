@@ -4,11 +4,13 @@
 #include "jkqtplotter.h"
 #include "libwid_imexport.h"
 
+class QFPlotterPrivate; // forward
 
 class QFWIDLIB_EXPORT QFPlotter : public JKQtPlotter
 {
         Q_OBJECT
     public:
+        friend class QFPlotterPrivate;
         explicit QFPlotter(bool datastore_internal, QWidget* parent=NULL, JKQTPdatastore* datast=NULL);
         explicit QFPlotter(QWidget *parent = 0);
         
@@ -16,6 +18,7 @@ class QFWIDLIB_EXPORT QFPlotter : public JKQtPlotter
         
     public slots:
     protected:
+        QFPlotterPrivate* p;
         
 };
 

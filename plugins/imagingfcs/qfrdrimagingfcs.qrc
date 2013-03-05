@@ -66,5 +66,6 @@
         <file alias="dvhor.png">icons/dvhor.png</file>
         <file alias="dvnone.png">icons/dvnone.png</file>
         <file alias="dvver.png">icons/dvver.png</file>
+        <file alias="qfrdrimagingfcs_simulate.png">icons/qfrdrimagingfcs_simulate.png</file>
     </qresource>
 </RCC>
