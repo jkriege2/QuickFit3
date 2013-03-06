@@ -330,10 +330,14 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbDualView_currentIndexChanged(int in
     if (index==0) {
         ui->labDualView->setText("");
         ui->chkCrop->setEnabled(true);
+        ui->chk2cFCCS->setEnabled(false);
+        ui->lab2cFCCS->setText("");
     } else if (index==1 || index==2) {
         ui->labDualView->setText(tr("an ACF-calculation results in 2 RDRs"));
         ui->chkCrop->setChecked(false);
         ui->chkCrop->setEnabled(false);
+        ui->chk2cFCCS->setEnabled(true);
+        ui->lab2cFCCS->setText(tr("<b>Distance CCFs will only apply to color channels separately!</b>"));
 
     }
 }
@@ -462,6 +466,7 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/pixel_width", ui->spinPixelWidth->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/pixel_height", ui->spinPixelHeight->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/camera", ui->chkCamera->isChecked());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/FCCS_2color", ui->chk2cFCCS->isChecked());
 }
 
 void QFRDRImagingFCSCorrelationDialog::readSettings() {
@@ -507,6 +512,7 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->spinPixelWidth->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/pixel_width", ui->spinPixelWidth->value()).toDouble());
     ui->spinPixelHeight->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/pixel_height", ui->spinPixelHeight->value()).toDouble());
     ui->chkCamera->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/camera", ui->chkCamera->isChecked()).toBool());
+    ui->chk2cFCCS->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/FCCS_2color", ui->chk2cFCCS->isChecked()).toBool());
 
 }
 
