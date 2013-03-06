@@ -104,6 +104,11 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     //flAlgorithmParams->addRow(tr("MSD 2:"), createSlopeWidgets(1));
     //flAlgorithmParams->addRow(tr("MSD 3:"), createSlopeWidgets(2));
     //flAlgorithmParams->addRow(tr("MSD 4:"), createSlopeWidgets(3));
+    cmbFitType=new QComboBox(this);
+    cmbFitType->addItem("LM line-fit");
+    cmbFitType->addItem("linear regression");
+    cmbFitType->addItem("robust regression (IRLS)");
+    flAlgorithmParams->addRow(tr("fit type:"), cmbFitType);
 
     spinFitWidth=new QSpinBox(this);
     spinFitWidth->setRange(5, INT_MAX);
@@ -424,6 +429,7 @@ void QFFCSMSDEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
         disconnect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
         disconnect(sliderDist, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersDistChanged(int, int, int, int)));
         disconnect(spinFitWidth, SIGNAL(valueChanged(int)),this,SLOT(fitWidthChanged(int)));
+        disconnect(cmbFitType, SIGNAL(currentIndexChanged(int)),this,SLOT(fitTypeChanged(int)));
         disconnect(chkFitRange, SIGNAL(toggled(bool)),this,SLOT(fitRangeChanged(bool)));
         //disconnect(edtNumIter, SIGNAL(valueChanged(int)),this,SLOT(NumIterChanged(int)));
     }
@@ -446,6 +452,9 @@ void QFFCSMSDEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
 
         edtNumIter->setValue(item->getNumIter());
         connect(edtNumIter, SIGNAL(valueChanged(int)), this, SLOT(NumIterChanged(int)));*/
+
+        cmbFitType->setCurrentIndex(item->getFitType());
+        connect(cmbFitType, SIGNAL(currentIndexChanged(int)), this, SLOT(fitTypeChanged(int)));
 
         spinFitWidth->setValue(item->getFitWidth());
         connect(spinFitWidth, SIGNAL(valueChanged(int)), this, SLOT(fitWidthChanged(int)));
@@ -500,6 +509,7 @@ void QFFCSMSDEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
         dataEventsEnabled=false;
         //edtAlpha->setValue(eval->getAlpha());
         cmbWeights->setCurrentIndex(eval->getCurrentWeights());
+        cmbFitType->setCurrentIndex(eval->getFitType());
         spinFitWidth->setValue(eval->getFitWidth());
         //edtNumIter->setRange(1,10000); //qMax(0,data->getCorrelationN())
         //edtNumIter->setValue(eval->getNumIter());
@@ -1056,6 +1066,7 @@ void QFFCSMSDEvaluationEditor::displayParameters() {
     bool oldde=dataEventsEnabled;
     dataEventsEnabled=false;
     spinFitWidth->setValue(eval->getFitWidth());
+    cmbFitType->setCurrentIndex(eval->getFitType());
     chkFitRange->setChecked(eval->getFitRangeLimited());
     //edtNumIter->setValue(eval->getNumIter());
     dataEventsEnabled=oldde;
@@ -1212,7 +1223,7 @@ void QFFCSMSDEvaluationEditor::copyAverageData() {
             QVector<double> d=eval->getMSD(record, run, eval->getCurrentModel());
             QVector<double> taus_out, alpha_out, D_out;
             if (chkCopyDofTau->isChecked()||chkCopyAlphaTau->isChecked()) {
-                eval->calcMSDFits(taus_out, alpha_out, D_out, record, run, eval->getCurrentModel(), spinFitWidth->value(), qMax(1, spinFitWidth->value()/7), sliderDist->get_userMin());
+                eval->calcMSDFits(taus_out, alpha_out, D_out, record, run, eval->getCurrentModel(), spinFitWidth->value(), qMax(1, spinFitWidth->value()/7), sliderDist->get_userMin(), cmbFitType->currentIndex());
                 AA.append(alpha_out);
                 DD.append(D_out);
             }
@@ -1592,7 +1603,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
     QVector<double> fitTau;
     QVector<double> fitD, fitA;
     if (distTau.size()>1 && dist.size()>1 && wid>=3 && eval->hasResults()) {
-        for (int i=first; i<=qMin(last, distTau.size()-1) ; i+=qMax(1,wid/7)) {
+        /*for (int i=first; i<=qMin(last, distTau.size()-1) ; i+=qMax(1,wid/7)) {
         //for (int i=data_start; i<data_end; i+=qMax(1,wid/5)) {
             double* t=(double*)calloc(wid, sizeof(double));
             double* d=(double*)calloc(wid, sizeof(double));
@@ -1631,29 +1642,16 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
                     }
                     //qDebug()<<"    fit results  D="<<pout[0]<<"  a="<<pout[1];
 
-                    /*for (int z=0; z<cnt; z++) {
-                        d[z]=exp(fMSD_lin(t[z], pout));
-                    }
 
-                    size_t ct=pltDistribution->getDatastore()->addCopiedColumn(t, cnt);
-                    size_t cf=pltDistribution->getDatastore()->addCopiedColumn(d, cnt);
-                    JKQTPxyLineGraph* g_msdfit=new JKQTPxyLineGraph(pltDistribution->get_plotter());
-                    g_msdfit->set_drawLine(true);
-                    g_msdfit->set_title("");
-                    g_msdfit->set_xColumn(ct);
-                    g_msdfit->set_yColumn(cf);
-                    g_msdfit->set_symbol(JKQTPnoSymbol);
-                    g_msdfit->set_symbolSize(7);
-                    g_msdfit->set_color(QColor("black"));
-                    g_msdfit->set_lineWidth(0.5);
-                    pltDistribution->addGraph(g_msdfit);*/
                 }
 
             }
 
             free(t);
             free(d);
-        }
+        }*/
+        eval->calcMSDFits(fitTau, fitA, fitD, eval->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel(), spinFitWidth->value(), qMax(1, spinFitWidth->value()/7), sliderDist->get_userMin(), cmbFitType->currentIndex());
+
         int c_msdtau=dsdist->addCopiedColumn(fitTau.data(), fitTau.size(), "msdfit_tau");
         int c_msdD=dsdist->addCopiedColumn(fitD.data(), fitD.size(), "msdfit_D");
         int c_msdA=dsdist->addCopiedColumn(fitA.data(), fitA.size(), "msdfit_alpha");
@@ -1807,6 +1805,23 @@ void QFFCSMSDEvaluationEditor::fitWidthChanged(int width) {
     data->set_doEmitResultsChanged(false);
     data->set_doEmitPropertiesChanged(false);
     if (data) data->setFitWidth(width);
+    data->set_doEmitResultsChanged(rc);
+    data->set_doEmitPropertiesChanged(pc);
+    updateDistributionResults();
+}
+
+void QFFCSMSDEvaluationEditor::fitTypeChanged(int type)
+{
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+
+    bool rc=data->get_doEmitResultsChanged();
+    bool pc=data->get_doEmitPropertiesChanged();
+    data->set_doEmitResultsChanged(false);
+    data->set_doEmitPropertiesChanged(false);
+    if (data) data->setFitType(type);
     data->set_doEmitResultsChanged(rc);
     data->set_doEmitPropertiesChanged(pc);
     updateDistributionResults();

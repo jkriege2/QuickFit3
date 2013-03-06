@@ -112,6 +112,16 @@ void QFFCSMSDEvaluationItem::setFitRangeLimited(bool rangeLimit) {
     setFitValue(QString("msd_fitlimitedrange"), rangeLimit);
 }
 
+int QFFCSMSDEvaluationItem::getFitType() const
+{
+    return getFitValue(QString("msd_fittype"));
+}
+
+void QFFCSMSDEvaluationItem::setFitType(int type)
+{
+    setFitValue(QString("msd_fittype"), type);
+}
+
 void QFFCSMSDEvaluationItem::setFitWidth(int width) {
     setFitValue(QString("msd_fitwidth"), width);
 }
@@ -239,7 +249,7 @@ double QFFCSMSDEvaluationItemfMSD_lin( double t, const double *p )
     return log(6.0*D)+a*log(t);
 }
 
-void QFFCSMSDEvaluationItem::calcMSDFits(QVector<double> &taus_out, QVector<double> &alpha_out, QVector<double> &D_out, QFRawDataRecord *record, int index, int model, int evalWidth, int evalShift, int first)
+void QFFCSMSDEvaluationItem::calcMSDFits(QVector<double> &taus_out, QVector<double> &alpha_out, QVector<double> &D_out, QFRawDataRecord *record, int index, int model, int evalWidth, int evalShift, int first, int fit_type) const
 {
     QVector<double> distTau=getMSDTaus(record, index, model);
     QVector<double> dist=getMSD(record, index, model);
@@ -249,34 +259,49 @@ void QFFCSMSDEvaluationItem::calcMSDFits(QVector<double> &taus_out, QVector<doub
     if (distTau.size()>1 && dist.size()>1 && evalWidth>=3) {
         for (int i=first; i<=distTau.size()-1 ; i+=qMax(1,evalShift)) {
             double* t=(double*)calloc(evalWidth, sizeof(double));
+            double* lt=(double*)calloc(evalWidth, sizeof(double));
             double* d=(double*)calloc(evalWidth, sizeof(double));
             int cnt=0;
             for (int j=i; j<=qMin(distTau.size()-1, i+evalWidth-1); j++) {
                 t[cnt]=distTau[j];
+                lt[cnt]=log(distTau[j]);
                 d[cnt]=log(dist[j]);
                 cnt++;
             }
 
             if (cnt>=evalWidth) {
                 taus_out.append(t[cnt/2]);
+                if (fit_type==0) { // lm fit
 
-                double pout[2];
-                int n_par = 2; // number of parameters
-                int m_dat = evalWidth; // number of data pairs
-                pout[1]=(d[0]-d[cnt-1])/(log(t[0])-log(t[cnt-1]));
-                pout[0]=(d[0]-pout[1]*log(t[0]))/6.0;
-                lm_status_struct status;
-                lm_control_struct control = lm_control_double;
-                control.maxcall=500;
-                control.printflags = 0; // monitor status (+1) and parameters (+2)
-                lmcurve_fit( n_par, pout, m_dat, t, d, QFFCSMSDEvaluationItemfMSD_lin, &control, &status );
+                    double pout[2];
+                    int n_par = 2; // number of parameters
+                    int m_dat = evalWidth; // number of data pairs
+                    pout[1]=(d[0]-d[cnt-1])/(log(t[0])-log(t[cnt-1]));
+                    pout[0]=(d[0]-pout[1]*log(t[0]))/6.0;
+                    lm_status_struct status;
+                    lm_control_struct control = lm_control_double;
+                    control.maxcall=500;
+                    control.printflags = 0; // monitor status (+1) and parameters (+2)
+                    lmcurve_fit( n_par, pout, m_dat, t, d, QFFCSMSDEvaluationItemfMSD_lin, &control, &status );
 
-                D_out.append(pout[0]);
-                alpha_out.append(pout[1]);
+                    D_out.append(pout[0]);
+                    alpha_out.append(pout[1]);
+                } else if (fit_type==1) { // simple regression
+                    double a=0, b=0;
+                    statisticsLinearRegression(lt, d, evalWidth, a, b);
+                    D_out.append(exp(a)/6.0);
+                    alpha_out.append(b);
+                } else if (fit_type==2) { // robust regression
+                    double a=0, b=0;
+                    statisticsLinearWeightedRegression(lt, d, evalWidth, a, b, 2.5, 100);
+                    D_out.append(exp(a)/6.0);
+                    alpha_out.append(b);
+                }
 
 
             }
 
+            free(lt);
             free(t);
             free(d);
         }
@@ -507,6 +532,10 @@ bool QFFCSMSDEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QStri
     }
     if (parameterID==QString("msd_fitwidth")) {
         defaultValue.value=10;
+        return true;
+    }
+    if (parameterID==QString("msd_fittype")) {
+        defaultValue.value=0;
         return true;
     }
     if (parameterID==QString("msd_fitlimitedrange")) {

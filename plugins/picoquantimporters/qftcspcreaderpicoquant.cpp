@@ -139,6 +139,8 @@ bool QFTCSPCReaderPicoquant::nextRecord() {
         // calculate the true time of the photon
         double truetime = double(ofltime + TTTRrecord.TimeTag) * TTTRHeader.Globclock/1000000000.0 ; /* convert to seconds */
 
+        current.isPhoton=true;
+        current.marker_type=0;
         if(TTTRrecord.Valid) {
             current.macrotime=truetime;
             current.input_channel=TTTRrecord.Route;

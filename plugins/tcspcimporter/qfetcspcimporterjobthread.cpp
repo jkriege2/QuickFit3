@@ -509,7 +509,7 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
         const register double t=record.absoluteTime()-starttime;
         const register int c=record.input_channel;
         //qDebug()<<c<<t;
-        if (t>=0 && t<=range_duration) {
+        if (record.isPhoton && t>=0 && t<=range_duration) {
             real_duration=t;
 
             // PROCESS COUNTRATE

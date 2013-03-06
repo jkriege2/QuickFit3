@@ -79,6 +79,7 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
 
     protected slots:
         void fitWidthChanged(int width);
+        void fitTypeChanged(int type);
         void fitRangeChanged(bool range);
         void weightsChanged(int weights);
         void updateDistributionResults();
@@ -143,6 +144,7 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         DataCutSliders* sliderDist;
         QFPlotter* pltDistResults;
         QComboBox* cmbDistResultsMode;
+        QComboBox* cmbFitType;
 
         QFDoubleEdit* numPre[4];
         QFDoubleEdit* numD[4];

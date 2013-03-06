@@ -38,6 +38,8 @@ bool QFTCSPCReaderPicoquantPT3::open(QString filename) {
         currentTTTRRecordNum=0;
         current.microtime_offset=0;
         current.microtime_deltaT=boardHeader.Resolution;
+        current.isPhoton=true;
+        current.marker_type=0;
         nextRecord();
 
         // read some photons to estimate a countrate

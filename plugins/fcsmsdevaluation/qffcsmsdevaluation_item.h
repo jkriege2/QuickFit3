@@ -92,7 +92,7 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
           */
         QVector<double> getMSDTaus(QFRawDataRecord* record, int index, int model) const;
 
-        void calcMSDFits(QVector<double>& taus_out, QVector<double>& alpha_out, QVector<double>& D_out, QFRawDataRecord* record, int index, int model, int evalWidth=10, int evalShift=2, int first=0);
+        void calcMSDFits(QVector<double>& taus_out, QVector<double>& alpha_out, QVector<double>& D_out, QFRawDataRecord* record, int index, int model, int evalWidth=10, int evalShift=2, int first=0, int fit_type=0) const;
 
 
         /*! \brief calculates fit statistics for the given fit function and dataset.
@@ -118,6 +118,8 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
         void setFitWidth(int width);
         bool getFitRangeLimited() const;
         void setFitRangeLimited(bool rangeLimit);
+        int getFitType() const;
+        void setFitType(int type);
     protected:
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
