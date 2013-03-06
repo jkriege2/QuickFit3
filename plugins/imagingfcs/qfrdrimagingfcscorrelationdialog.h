@@ -42,10 +42,12 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
 
     protected slots:
         void on_btnSelectImageFile_clicked();
+        void on_btnSelectImageFileNoCount_clicked();
         void on_btnSelectBackgroundFile_clicked();
         void on_btnAddJob_clicked();
         void on_btnAddSeriesJob_clicked();
         void on_btnLoad_clicked();
+        void on_btnLoadNoCount_clicked();
         void on_btnHelp_clicked();
         void on_spinP_valueChanged(int val);
         void on_spinS_valueChanged(int val);
@@ -60,7 +62,7 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         void frameTimeChanged(double value);
         void frameRateChanged(double value);
         void updateProgress();
-        void updateFromFile(bool readFrameCount=true);
+        void updateFromFile(bool readFiles=true, bool countFrames=true);
         void updateCorrelator();
         void updateFrameCount();
         void updateImageSize();

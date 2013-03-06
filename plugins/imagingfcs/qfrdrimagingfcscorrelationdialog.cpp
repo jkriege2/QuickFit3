@@ -73,6 +73,8 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     if (opt) readSettings();
     filesToAdd.clear();
     setEditControlsEnabled(false);
+    ui->btnLoadNoCount->setEnabled(false);
+    ui->btnSelectImageFileNoCount->setEnabled(false);
     QTimer::singleShot(UPDATE_TIMEOUT, this, SLOT(updateProgress()));
 
 
@@ -360,6 +362,19 @@ void QFRDRImagingFCSCorrelationDialog::on_btnSelectImageFile_clicked() {
     }
 }
 
+void QFRDRImagingFCSCorrelationDialog::on_btnSelectImageFileNoCount_clicked()
+{
+    QString fileName = qfGetOpenFileName(this, tr("Select Image Series File ..."), lastImagefileDir, imageFilters.join(";;"), &lastImagefileFilter);
+    if (!fileName.isEmpty()) {
+        lastImagefileDir=QFileInfo(fileName).dir().absolutePath();
+        ui->cmbFileformat->setCurrentIndex(imageFilters.indexOf(lastImagefileFilter));
+        ui->edtImageFile->setText(fileName);
+        ui->edtImageFile->setFocus(Qt::MouseFocusReason);
+        on_btnLoadNoCount_clicked();
+        writeSettings();
+    }
+}
+
 void QFRDRImagingFCSCorrelationDialog::on_btnSelectBackgroundFile_clicked() {
     QString fileName = qfGetOpenFileName(this, tr("Select Background Image Series File ..."), lastImagefileDir, imageFilters.join(";;"), &lastImagefileFilter);
     if (!fileName.isEmpty()) {
@@ -379,7 +394,24 @@ void QFRDRImagingFCSCorrelationDialog::on_btnLoad_clicked() {
     QString oldFilename=filenameDisplayed;
     QString filename=ui->edtImageFile->text();
     if (QFile::exists(filename)) {
-        if (oldFilename!=filename) updateFromFile();
+        if (oldFilename!=filename) updateFromFile(true, true);
+        setEditControlsEnabled(true);
+        ui->btnLoadNoCount->setEnabled(true);
+        ui->btnSelectImageFileNoCount->setEnabled(true);
+
+    } else {
+        setEditControlsEnabled(false);
+        QMessageBox::critical(this, tr("imFCS Correlator"), tr("The file '%1' does not exist.\nPlease select an existing file!").arg(filename));
+    }
+    writeSettings();
+}
+
+void QFRDRImagingFCSCorrelationDialog::on_btnLoadNoCount_clicked()
+{
+    QString oldFilename=filenameDisplayed;
+    QString filename=ui->edtImageFile->text();
+    if (QFile::exists(filename)) {
+        if (oldFilename!=filename) updateFromFile(true, false);
         setEditControlsEnabled(true);
     } else {
         setEditControlsEnabled(false);
@@ -810,7 +842,7 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator() {
 
 
 
-void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
+void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool countFrames) {
     QModernProgressDialog prg(this);
     prg.setWindowTitle(tr("imFCS: Correlator"));
     prg.setLabelText(tr("Reading image series information ... reading config file ..."));
@@ -929,7 +961,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
 
 
 
-    if (readFrameCount) {
+    if (readFiles) {
 
         //////////////////////////////////////////////////////////////////////////////////
         // we also try to open the file with an appropriate reader and read th number of frames in it
@@ -948,7 +980,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFrameCount) {
                 QApplication::processEvents();
                 image_width=reader->frameWidth();
                 image_height=reader->frameHeight();
-                frame_count=reader->countFrames();
+                if (countFrames) frame_count=reader->countFrames();
                 if (frame_count>0) {
                     ui->spinLastFrame->setMaximum(frame_count-1);
                     ui->spinFirstFrame->setMaximum(frame_count-1);

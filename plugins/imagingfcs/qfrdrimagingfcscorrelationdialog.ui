@@ -83,6 +83,40 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QToolButton" name="btnSelectImageFileNoCount">
+          <property name="toolTip">
+           <string>select an image series file to correlate</string>
+          </property>
+          <property name="text">
+           <string>don't count frames</string>
+          </property>
+          <property name="icon">
+           <iconset resource="qfrdrimagingfcs.qrc">
+            <normaloff>:/imaging_fcs/fileopen.png</normaloff>:/imaging_fcs/fileopen.png</iconset>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextBesideIcon</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnLoadNoCount">
+          <property name="toolTip">
+           <string>read metadata from the given image series file</string>
+          </property>
+          <property name="text">
+           <string>don't count frames</string>
+          </property>
+          <property name="icon">
+           <iconset resource="qfrdrimagingfcs.qrc">
+            <normaloff>:/imaging_fcs/use_file.png</normaloff>:/imaging_fcs/use_file.png</iconset>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextBesideIcon</enum>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item row="2" column="0">
