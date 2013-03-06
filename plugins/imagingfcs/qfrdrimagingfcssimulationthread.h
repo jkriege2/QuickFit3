@@ -28,6 +28,8 @@ class QFRDRImagingFCSSimulationThread : public QThread
         GetSetMacro(int, height);
         GetSetMacro(double, brightnessG);
         GetSetMacro(double, brightnessR);
+        GetSetMacro(double, background);
+        GetSetMacro(double, backgroundNoise);
         GetSetMacro(int, walkersG);
         GetSetMacro(int, walkersR);
         GetSetMacro(int, walkersRG);
@@ -67,6 +69,8 @@ class QFRDRImagingFCSSimulationThread : public QThread
         int walkersG;
         int walkersR;
         int walkersRG;
+        double background;
+        double backgroundNoise;
 
 
         MTRand rng;

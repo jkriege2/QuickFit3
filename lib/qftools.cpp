@@ -456,6 +456,13 @@ QStringList deescapifyList(const QString& text) {
     return result;
 }
 
+QString	qfGetExistingDirectory ( QWidget * parent, const QString & caption, const QString & dir, QFileDialog::Options options ) {
+#ifdef Q_OS_UNIX
+    return QFileDialog::getExistingDirectory(parent, caption, dir, QFileDialog::DontUseNativeDialog|options);
+#else
+    return QFileDialog::getExistingDirectory(parent, caption, dir, options);
+#endif
+}
 
 QString	qfGetOpenFileName ( QWidget * parent, const QString & caption, const QString & dir, const QString & filter, QString * selectedFilter, QFileDialog::Options options ) {
 #ifdef Q_OS_UNIX

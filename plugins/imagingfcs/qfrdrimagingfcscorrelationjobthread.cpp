@@ -1674,7 +1674,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                 dccf[di].dccfframe_width=frame_width;//-abs(job.DCCFDeltaX);
                 dccf[di].dccfframe_height=frame_height;//-abs(job.DCCFDeltaY);
 
-                correlate_series(image_series, frame_width, frame_height, job.DCCFDeltaX[di], job.DCCFDeltaY[di], frames, &(dccf[di].dccf_tau), &(dccf[di].dccf), &(dccf[di].dccf_std), dccf[di].dccf_N, tr("calculating left crosscorrelation"), 1000, &(dccf[di].dccf_segments));
+                correlate_series(image_series, frame_width, frame_height, job.DCCFDeltaX[di], job.DCCFDeltaY[di], frames, &(dccf[di].dccf_tau), &(dccf[di].dccf), &(dccf[di].dccf_std), dccf[di].dccf_N, tr("calculating distance crosscorrelation (%1,%2)").arg(job.DCCFDeltaX[di]).arg(job.DCCFDeltaY[di]), 1000, &(dccf[di].dccf_segments));
             }
 
         } else {

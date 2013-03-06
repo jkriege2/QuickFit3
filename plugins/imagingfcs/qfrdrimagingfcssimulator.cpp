@@ -2,6 +2,7 @@
 #include "ui_qfrdrimagingfcssimulator.h"
 #include "qfpluginservices.h"
 #include "programoptions.h"
+#include "qfstyledbutton.h"
 
 
 QFRDRImagingFCSSimulator::QFRDRImagingFCSSimulator(QWidget *parent) :
@@ -18,13 +19,14 @@ QFRDRImagingFCSSimulator::QFRDRImagingFCSSimulator(QWidget *parent) :
     connect(sim, SIGNAL(statusMessage(QString)), ui->labProgress, SLOT(setText(QString)));
     connect(sim, SIGNAL(finished()), this, SLOT(threadFinished()));
     ui->edtFilename->addInsertContextMenuEntry(tr("insert %counter%"), QString("%counter%"));
+    ui->edtFilename->addButton(new QFStyledButton(QFStyledButton::SelectNewFile, ui->edtFilename, ui->edtFilename));
 }
 
 QFRDRImagingFCSSimulator::~QFRDRImagingFCSSimulator()
 {
     sim->cancel();
     sim->waitForFinish();
-    writeSettings();
+    //writeSettings();
     delete ui;
 }
 
@@ -55,6 +57,10 @@ void QFRDRImagingFCSSimulator::writeSettings() const {
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/VY", ui->spinVY->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/DualView", ui->chkDualView->isChecked());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/filename", ui->edtFilename->text());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/brightnessG", ui->spinBrightnessG->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/brightnessR", ui->spinBrigthnessR->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/background", ui->spinBackground->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/backgroundNoise", ui->spinBackgroundNoise->value());
 }
 
 void QFRDRImagingFCSSimulator::readSettings()
@@ -65,17 +71,20 @@ void QFRDRImagingFCSSimulator::readSettings()
     ui->spinDRG->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DRG", 5).toDouble());
     ui->spinHeight->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/height", 10).toInt());
     ui->spinWidth->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/width", 10).toInt());
-    ui->spinPixelSize->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/pixel_size", 400).toDouble());
+    ui->spinPixelSize->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/pixel_size", 0.4).toDouble());
     ui->spinWalkersR->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/walkersR", 20).toInt());
     ui->spinWalkersG->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/walkersG", 20).toInt());
     ui->spinWalkersRG->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/walkersRG", 20).toInt());
     ui->spinFrames->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/frames", 10000).toInt());
     ui->spinFrametime->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/frametime", 20).toDouble());
-    ui->spinPSFSize->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/psfSize", 600).toDouble());
+    ui->spinPSFSize->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/psfSize", 0.6).toDouble());
     ui->spinVX->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/VX", 0).toDouble());
     ui->spinVY->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/VY", 0).toDouble());
     ui->chkDualView->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DualView", false).toBool());
-
+    ui->spinBrightnessG->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/brightnessG", 20).toDouble());
+    ui->spinBrigthnessR->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/brightnessR", 20).toDouble());
+    ui->spinBackground->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/background", 100).toDouble());
+    ui->spinBackgroundNoise->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/backgroundNoise", 2).toDouble());
 }
 
 void QFRDRImagingFCSSimulator::on_btnRun_clicked()
@@ -101,18 +110,25 @@ void QFRDRImagingFCSSimulator::on_btnRun_clicked()
         sim->set_DRG(ui->spinDRG->value());
         sim->set_VX(ui->spinVX->value());
         sim->set_VY(ui->spinVY->value());
+        sim->set_brightnessG(ui->spinBrightnessG->value());
+        sim->set_brightnessR(ui->spinBrigthnessR->value());
+        sim->set_background(ui->spinBackground->value());
+        sim->set_backgroundNoise(ui->spinBackgroundNoise->value());
         sim->start();
+        writeSettings();
         setState(dsRunning);
-    } else if (dstate==dsFinished) {  setState(dsParameterInput); accept(); }
+    } else if (dstate==dsFinished) { writeSettings(); setState(dsParameterInput); accept(); }
 }
 
 void QFRDRImagingFCSSimulator::on_btnCancel_clicked()
 {
-    if (dstate==dsParameterInput) { lastSimFile=""; reject(); }
-    else if (dstate==dsFinished) {  lastSimFile=""; setState(dsParameterInput); reject(); }
+    if (dstate==dsParameterInput) { writeSettings(); lastSimFile=""; reject(); }
+    else if (dstate==dsFinished) {  writeSettings(); lastSimFile=""; setState(dsParameterInput); reject(); }
     else if (dstate==dsRunning) {
+        writeSettings();
         sim->cancel();
         sim->waitForFinish();
+        setState(dsParameterInput);
     }
 }
 

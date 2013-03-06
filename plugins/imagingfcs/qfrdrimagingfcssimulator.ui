@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>831</width>
+    <width>885</width>
     <height>653</height>
    </rect>
   </property>
@@ -174,7 +174,11 @@
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QSpinBox" name="spinWalkersG"/>
+         <widget class="QSpinBox" name="spinWalkersG">
+          <property name="value">
+           <number>10</number>
+          </property>
+         </widget>
         </item>
         <item row="1" column="2">
          <widget class="QSpinBox" name="spinWalkersR">
@@ -250,6 +254,54 @@
           </property>
           <property name="value">
            <double>5.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_19">
+          <property name="text">
+           <string>brightness:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QDoubleSpinBox" name="spinBrightnessG">
+          <property name="suffix">
+           <string/>
+          </property>
+          <property name="decimals">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <double>10000.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>20.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QDoubleSpinBox" name="spinBrigthnessR">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="suffix">
+           <string/>
+          </property>
+          <property name="decimals">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <double>10000.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>20.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -354,7 +406,7 @@ p, li { white-space: pre-wrap; }
         <item>
          <widget class="QDoubleSpinBox" name="spinPixelSize">
           <property name="suffix">
-           <string> nm</string>
+           <string> µm</string>
           </property>
           <property name="decimals">
            <number>1</number>
@@ -363,10 +415,10 @@ p, li { white-space: pre-wrap; }
            <double>1000.000000000000000</double>
           </property>
           <property name="singleStep">
-           <double>10.000000000000000</double>
+           <double>0.100000000000000</double>
           </property>
           <property name="value">
-           <double>400.000000000000000</double>
+           <double>0.400000000000000</double>
           </property>
          </widget>
         </item>
@@ -380,7 +432,7 @@ p, li { white-space: pre-wrap; }
         <item>
          <widget class="QDoubleSpinBox" name="spinPSFSize">
           <property name="suffix">
-           <string> nm</string>
+           <string> µm</string>
           </property>
           <property name="decimals">
            <number>1</number>
@@ -389,10 +441,10 @@ p, li { white-space: pre-wrap; }
            <double>1000.000000000000000</double>
           </property>
           <property name="singleStep">
-           <double>10.000000000000000</double>
+           <double>0.100000000000000</double>
           </property>
           <property name="value">
-           <double>400.000000000000000</double>
+           <double>0.600000000000000</double>
           </property>
          </widget>
         </item>
@@ -457,6 +509,75 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <spacer name="horizontalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="label_20">
+        <property name="text">
+         <string>background:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QDoubleSpinBox" name="spinBackground">
+          <property name="suffix">
+           <string> /step</string>
+          </property>
+          <property name="decimals">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <double>10000.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>100.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_21">
+          <property name="text">
+           <string>   noise (S.D.):</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="spinBackgroundNoise">
+          <property name="suffix">
+           <string> /step</string>
+          </property>
+          <property name="decimals">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <double>10000.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>2.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_6">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -594,12 +715,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>670</x>
-     <y>150</y>
+     <x>774</x>
+     <y>188</y>
     </hint>
     <hint type="destinationlabel">
-     <x>631</x>
-     <y>165</y>
+     <x>632</x>
+     <y>208</y>
     </hint>
    </hints>
   </connection>
@@ -610,12 +731,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>169</x>
-     <y>149</y>
+     <x>273</x>
+     <y>188</y>
     </hint>
     <hint type="destinationlabel">
-     <x>661</x>
-     <y>170</y>
+     <x>810</x>
+     <y>208</y>
     </hint>
    </hints>
   </connection>
@@ -626,12 +747,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>111</x>
-     <y>146</y>
+     <x>215</x>
+     <y>188</y>
     </hint>
     <hint type="destinationlabel">
-     <x>563</x>
-     <y>190</y>
+     <x>632</x>
+     <y>234</y>
     </hint>
    </hints>
   </connection>
@@ -642,12 +763,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>137</x>
-     <y>148</y>
+     <x>241</x>
+     <y>188</y>
     </hint>
     <hint type="destinationlabel">
-     <x>698</x>
-     <y>189</y>
+     <x>810</x>
+     <y>234</y>
     </hint>
    </hints>
   </connection>
@@ -658,12 +779,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>158</x>
-     <y>147</y>
+     <x>262</x>
+     <y>188</y>
     </hint>
     <hint type="destinationlabel">
-     <x>505</x>
-     <y>219</y>
+     <x>632</x>
+     <y>260</y>
     </hint>
    </hints>
   </connection>
@@ -674,12 +795,28 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>240</x>
-     <y>142</y>
+     <x>344</x>
+     <y>188</y>
     </hint>
     <hint type="destinationlabel">
-     <x>681</x>
-     <y>214</y>
+     <x>810</x>
+     <y>260</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkDualView</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinBrigthnessR</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>427</x>
+     <y>187</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>553</x>
+     <y>279</y>
     </hint>
    </hints>
   </connection>

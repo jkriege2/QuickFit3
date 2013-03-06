@@ -1,6 +1,6 @@
 #include "qfstyledbutton.h"
 #include <QtGui>
-
+#include "qftools.h"
 #include <iostream>
 
 QFStyledButton::QFStyledButton(const QIcon& icon, QWidget* parent):
@@ -16,6 +16,7 @@ QFStyledButton::QFStyledButton(const QIcon& icon, QWidget* parent):
     hover=false;
     m_prependURL="";
     m_action=NULL;
+    m_filter=tr("All Files (*.*)");
 }
 
 QFStyledButton::QFStyledButton(QAction *action, QWidget *parent):
@@ -29,6 +30,7 @@ QFStyledButton::QFStyledButton(QAction *action, QWidget *parent):
     hover=false;
     m_prependURL="";
     m_action=NULL;
+    m_filter=tr("All Files (*.*)");
     setAction(action);
 }
 
@@ -45,6 +47,7 @@ QFStyledButton::QFStyledButton(ActionMode mode, QWidget* buddy, QWidget* parent)
     resize(iconSize()+QSize(2,2));
     m_prependURL="";
     m_action=NULL;
+    m_filter=tr("All Files (*.*)");
 }
 
 QFStyledButton::~QFStyledButton()
@@ -89,10 +92,25 @@ void QFStyledButton::openBuddyContents() {
         }
     } else if (m_actionmode==SelectFile) {
         static QString dir="";
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Select File ..."), dir, tr("All Files (*.*)"));
+        QString fileName = qfGetOpenFileName(this, tr("Select File ..."), dir, m_filter);
         if (!fileName.isEmpty()) {
             dir=QFileInfo(fileName).dir().absolutePath();
             m_buddy->metaObject()->userProperty().write(m_buddy, QDir((m_basepath.isEmpty())?QDir::currentPath():m_basepath).relativeFilePath(fileName));
+            m_buddy->setFocus(Qt::MouseFocusReason);
+        }
+    } else if (m_actionmode==SelectNewFile) {
+        static QString dir="";
+        QString fileName = qfGetSaveFileName(this, tr("Select New File ..."), dir, m_filter);
+        if (!fileName.isEmpty()) {
+            dir=QFileInfo(fileName).dir().absolutePath();
+            m_buddy->metaObject()->userProperty().write(m_buddy, QDir((m_basepath.isEmpty())?QDir::currentPath():m_basepath).relativeFilePath(fileName));
+            m_buddy->setFocus(Qt::MouseFocusReason);
+        }
+    } else if (m_actionmode==SelectDirectory) {
+        static QString dir="";
+        QString fileName = qfGetExistingDirectory(this, tr("Select Directory ..."), dir);
+        if (!fileName.isEmpty()) {
+            m_buddy->metaObject()->userProperty().write(m_buddy, fileName);
             m_buddy->setFocus(Qt::MouseFocusReason);
         }
     }
@@ -134,7 +152,7 @@ void QFStyledButton::setBuddyWithDefaultIcon(QWidget* b, ActionMode mode) {
         i.addFile(":/lib/qfstyledbutton/execute_hover.png", QSize(), QIcon::Selected);
         i.addFile(":/lib/qfstyledbutton/execute_pressed.png", QSize(), QIcon::Active);
         setToolTip(tr("execute file in line edit"));
-    } else if (mode==SelectFile) {
+    } else if (mode==SelectFile || mode==SelectNewFile || mode==SelectDirectory) {
         i=QIcon(":/lib/qfstyledbutton/selectfile.png");
         i.addFile(":/lib/qfstyledbutton/selectfile_disabled.png", QSize(), QIcon::Disabled);
         i.addFile(":/lib/qfstyledbutton/selectfile_hover.png", QSize(), QIcon::Selected);
@@ -228,6 +246,11 @@ void QFStyledButton::leaveEvent(QEvent* e) {
 
 void QFStyledButton::setPrependURL(QString prepend) {
     m_prependURL=prepend;
+}
+
+void QFStyledButton::setFilter(const QString &filter)
+{
+    m_filter=filter;
 }
 
 void QFStyledButton::setAction(QAction *action) {
