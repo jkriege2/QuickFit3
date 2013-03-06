@@ -277,8 +277,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     bleachAmplitude=(float*)calloc(frame_width*frame_height, sizeof(float));
                     bleachTime=(float*)calloc(frame_width*frame_height, sizeof(float));
                     bleachFitOK=(uint8_t*)calloc(frame_width*frame_height, sizeof(uint8_t));
-                    firstFrames=(float*)calloc(frame_width*frame_height, sizeof(float));
-                    lastFrames=(float*)calloc(frame_width*frame_height, sizeof(float));
+                    //firstFrames=(float*)calloc(frame_width*frame_height, sizeof(float));
+                    //lastFrames=(float*)calloc(frame_width*frame_height, sizeof(float));
 
                     ////////////////////////////////////////////////////////////////////////////////////////////
                     // CREATE FILENAMES FOR RESULTS AND MAKE SURE THE DIRECTORY FOR THE FILES EXISTS (mkpath() )
@@ -341,7 +341,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         } else {
                             correlate_loadall();
                         }
-
+                        reader->close();
 
 
 
@@ -1138,7 +1138,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     emit messageChanged(tr("no frames in file/selected"));
                 }
 
-                reader->close();
+
             }
             delete reader;
         } else {
