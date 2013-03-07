@@ -293,7 +293,7 @@ void QFFCSMSDEvaluationItem::calcMSDFits(QVector<double> &taus_out, QVector<doub
                     alpha_out.append(b);
                 } else if (fit_type==2) { // robust regression
                     double a=0, b=0;
-                    statisticsLinearWeightedRegression(lt, d, evalWidth, a, b, 2.5, 100);
+                    statisticsIterativelyReweightedLeastSquaresRegression(lt, d, evalWidth, a, b, 1.1, 100);
                     D_out.append(exp(a)/6.0);
                     alpha_out.append(b);
                 }
