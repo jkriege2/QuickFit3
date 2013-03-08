@@ -249,12 +249,14 @@ double QFRDRFCSData::getRateMean(int run, int channel) const {
                 cnt++;
             }
         }
-        return sum/cnt;
+        double r= sum/cnt;
+        if (QFFloatIsOK(r)) return r; else return 0;
     }
     if (!rateMean.contains(channel*rateRuns+run)) {
         rateMean[channel*rateRuns+run]=calcRateMean(run, channel);
     }
-    return rateMean[channel*rateRuns+run];
+    double r=rateMean[channel*rateRuns+run];
+    if (QFFloatIsOK(r)) return r; else return 0;
 }
 
 double QFRDRFCSData::getRateStdDev(int run, int channel) const {
@@ -271,12 +273,14 @@ double QFRDRFCSData::getRateStdDev(int run, int channel) const {
                 cnt++;
             }
         }
-        return sum/cnt;
+        double r=sum/cnt;
+        if (QFFloatIsOK(r)) return r; else return 0;
     }
     if (!rateStdDev.contains(channel*rateRuns+run)) {
         rateStdDev[channel*rateRuns+run]=calcRateStdDev(run, channel);
     }
-    return rateStdDev[channel*rateRuns+run];
+    double r=rateStdDev[channel*rateRuns+run];
+    if (QFFloatIsOK(r)) return r; else return 0;
 }
 
 double QFRDRFCSData::calcRateStdDev(int run, int channel) const {

@@ -608,10 +608,10 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
                 }
             }
         }
-        if (reader->percentCompleted()-pos>0.1) {
+        /*if (reader->percentCompleted()-pos>0.1) {
             emit progressIncrement(1);
             pos=reader->percentCompleted();
-        }
+        }*/
 
         if (t>nextReporterStep) {
             emit progressIncrement(1);
