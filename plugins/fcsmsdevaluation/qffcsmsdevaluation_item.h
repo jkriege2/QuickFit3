@@ -57,7 +57,8 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
         void setCurrentWeights(int index);
         int getCurrentWeights() const;
 
-
+        /** \brief returns a list of the possible fit types for calcMSDFits() and calcMSDFit() */
+        static QStringList getFitTypes();
 
 
         /** \brief return the name for the given parameter in the given model in either HTML richtext or plain text */
@@ -92,7 +93,11 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
           */
         QVector<double> getMSDTaus(QFRawDataRecord* record, int index, int model) const;
 
-        void calcMSDFits(QVector<double>& taus_out, QVector<double>& alpha_out, QVector<double>& D_out, QFRawDataRecord* record, int index, int model, int evalWidth=10, int evalShift=2, int first=0, int fit_type=0) const;
+        /*! \brief fit a power-law to subsections of the specified MSD (from record, index, model) */
+        void calcMSDFits(QVector<double>& taus_out, QVector<double>& alpha_out, QVector<double>& D_out, QFRawDataRecord* record, int index, int model, int evalWidth=10, int evalShift=2, int first=0, int fit_type=0, QVector<double>*tau_start=NULL, QVector<double>*tau_end=NULL) const;
+
+        /*! \brief fit a power-law to the specified MSD (from record, index, model) */
+        void calcMSDFit(double& alpha_out, bool fixAlpha, double& D_out, bool fixD, QFRawDataRecord* record, int index, int model, double prefactor, int range_min, int range_max, int fit_type=0) const;
 
 
         /*! \brief calculates fit statistics for the given fit function and dataset.
@@ -112,6 +117,9 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
         double getTheoryAlpha(int i) const;
         double getTheoryD(int i) const;
         double getTheoryPre(int i) const;
+        QString getTheoryAlphaName(int i) const;
+        QString getTheoryDName(int i) const;
+        QString getTheoryPreName(int i) const;
         bool getTheoryEnabled(int i) const;
         void setTheory(int i, bool enabled, double pre, double D, double alpha);
         int getFitWidth() const;

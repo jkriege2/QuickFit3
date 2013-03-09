@@ -7,7 +7,7 @@ QFProjectRawDataModel::QFProjectRawDataModel(QFProject* parent):
 {
     item = parent;
     defaultMimeType="application/qf2.ids.int.list";
-    connect(item, SIGNAL(structureChanged()), this , SLOT(projectChanged()));
+    if (item) connect(item, SIGNAL(structureChanged()), this , SLOT(projectChanged()));
     //connect(item, SIGNAL(wasChanged(bool)), this , SLOT(projectChanged(bool)));
 }
 

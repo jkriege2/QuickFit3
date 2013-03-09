@@ -25,8 +25,10 @@ void QFProjectTreeModel::init(QFProject* p) {
     if (current) disconnect(current, SIGNAL(propertiesChanged()), this , SLOT(projectDataChanged()));
     current=p;
     createModelTree();
-    connect(current, SIGNAL(structureChanged()), this , SLOT(projectStructureChanged()));
-    connect(current, SIGNAL(propertiesChanged()), this , SLOT(projectDataChanged()));
+    if (current) {
+        connect(current, SIGNAL(structureChanged()), this , SLOT(projectStructureChanged()));
+        connect(current, SIGNAL(propertiesChanged()), this , SLOT(projectDataChanged()));
+    }
     reset();
 }
 

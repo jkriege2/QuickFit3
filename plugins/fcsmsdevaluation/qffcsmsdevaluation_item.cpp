@@ -93,6 +93,15 @@ int QFFCSMSDEvaluationItem::getCurrentWeights() const
     return currentWeights;
 }
 
+QStringList QFFCSMSDEvaluationItem::getFitTypes()
+{
+    QStringList sl;
+    sl<<tr("LM line-fit");
+    sl<<tr("linear regression");
+    sl<<tr("robust regression (IRLS)");
+    return sl;
+}
+
 void QFFCSMSDEvaluationItem::setTheory(int i, bool enabled, double pre, double D, double alpha) {
     setFitValue(QString("msd_theory%1_en").arg(i), (enabled)?1:0);
     setFitValue(QString("msd_theory%1_pre").arg(i), pre);
@@ -131,15 +140,30 @@ bool QFFCSMSDEvaluationItem::getTheoryEnabled(int i) const {
 }
 
 double QFFCSMSDEvaluationItem::getTheoryPre(int i) const {
-    return getFitValue(QString("msd_theory%1_pre").arg(i));
+    return getFitValue(getTheoryPreName(i));
+}
+
+QString QFFCSMSDEvaluationItem::getTheoryAlphaName(int i) const
+{
+    return QString("msd_theory%1_alpha").arg(i);
+}
+
+QString QFFCSMSDEvaluationItem::getTheoryDName(int i) const
+{
+    return QString("msd_theory%1_d").arg(i);
+}
+
+QString QFFCSMSDEvaluationItem::getTheoryPreName(int i) const
+{
+    return QString("msd_theory%1_pre").arg(i);
 }
 
 double QFFCSMSDEvaluationItem::getTheoryD(int i) const {
-    return getFitValue(QString("msd_theory%1_d").arg(i));
+    return getFitValue(getTheoryDName(i));
 }
 
 double QFFCSMSDEvaluationItem::getTheoryAlpha(int i) const {
-    return getFitValue(QString("msd_theory%1_alpha").arg(i));
+    return getFitValue(getTheoryAlphaName(i));
 }
 
 
@@ -249,7 +273,106 @@ double QFFCSMSDEvaluationItemfMSD_lin( double t, const double *p )
     return log(6.0*D)+a*log(t);
 }
 
-void QFFCSMSDEvaluationItem::calcMSDFits(QVector<double> &taus_out, QVector<double> &alpha_out, QVector<double> &D_out, QFRawDataRecord *record, int index, int model, int evalWidth, int evalShift, int first, int fit_type) const
+double QFFCSMSDEvaluationItemfMSD_D=0;
+double QFFCSMSDEvaluationItemfMSD_alpha=0;
+
+double QFFCSMSDEvaluationItemfMSD_linfixD( double t, const double *p )
+{
+    const double D=QFFCSMSDEvaluationItemfMSD_D;
+    const double a=p[0];
+    return log(6.0*D)+a*log(t);
+}
+
+double QFFCSMSDEvaluationItemfMSD_linfixalpha( double t, const double *p )
+{
+    const double D=p[0];
+    const double a=QFFCSMSDEvaluationItemfMSD_alpha;
+    return log(6.0*D)+a*log(t);
+}
+
+
+void QFFCSMSDEvaluationItem::calcMSDFit(double &alpha_out_param, bool fixAlpha, double &D_out_param, bool fixD, QFRawDataRecord *record, int index, int model, double prefactor, int range_min, int range_max, int fit_type) const
+{
+    double alpha_out=alpha_out_param;
+    double D_out=D_out_param;
+    QVector<double> distTau=getMSDTaus(record, index, model);
+    QVector<double> dist=getMSD(record, index, model);
+    QVector<double> ldist, ltau;
+    for (int i=0; i<dist.size(); i++) {
+        ldist<<log(dist[i]);
+        ltau<<log(distTau[i]);
+    }
+
+    if (distTau.size()>1 && dist.size()>1 ) {
+        distTau=distTau.mid(range_min, range_max-range_min+1);
+        dist=dist.mid(range_min, range_max-range_min+1);
+        ldist=ldist.mid(range_min, range_max-range_min+1);
+        ltau=ltau.mid(range_min, range_max-range_min+1);
+        for (int i=ltau.size()-1; i>=0; i--) {
+            if (!(QFFloatIsOK(ltau[i]) && QFFloatIsOK(ldist[i]) && QFFloatIsOK(dist[i]) && QFFloatIsOK(distTau[i]))) {
+                distTau.remove(i);
+                dist.remove(i);
+                ldist.remove(i);
+                ltau.remove(i);
+            }
+        }
+
+
+        if (fit_type==0) { // lm fit
+
+            if (!fixAlpha && !fixD) {
+                double pout[2];
+                int n_par = 2; // number of parameters
+                pout[1]=alpha_out;
+                pout[0]=D_out;
+                lm_status_struct status;
+                lm_control_struct control = lm_control_double;
+                control.maxcall=500;
+                control.printflags = 0; // monitor status (+1) and parameters (+2)
+                lmcurve_fit( n_par, pout, dist.size(), distTau.data(), ldist.data(), QFFCSMSDEvaluationItemfMSD_lin, &control, &status );
+                alpha_out=pout[1];
+                D_out=pout[0];
+            } else if (fixAlpha && !fixD) {
+                double pout[1];
+                int n_par = 1; // number of parameters
+                pout[0]=D_out;
+                QFFCSMSDEvaluationItemfMSD_alpha=alpha_out;
+                lm_status_struct status;
+                lm_control_struct control = lm_control_double;
+                control.maxcall=500;
+                control.printflags = 0; // monitor status (+1) and parameters (+2)
+                lmcurve_fit( n_par, pout, dist.size(), distTau.data(), ldist.data(), QFFCSMSDEvaluationItemfMSD_linfixalpha, &control, &status );
+                D_out=pout[0];
+            } else if (!fixAlpha && fixD) {
+                double pout[1];
+                int n_par = 1; // number of parameters
+                pout[0]=alpha_out;
+                QFFCSMSDEvaluationItemfMSD_D=D_out;
+                lm_status_struct status;
+                lm_control_struct control = lm_control_double;
+                control.maxcall=500;
+                control.printflags = 0; // monitor status (+1) and parameters (+2)
+                lmcurve_fit( n_par, pout, dist.size(), distTau.data(), ldist.data(), QFFCSMSDEvaluationItemfMSD_linfixD, &control, &status );
+                alpha_out=pout[0];
+            }
+
+        } else if (fit_type==1) { // simple regression
+            double a=log(6.0*D_out), b=alpha_out;
+            statisticsLinearRegression(ltau.data(), ldist.data(), ldist.size(), a, b, fixD, fixAlpha);
+            D_out=exp(a)/6.0;
+            alpha_out=b;
+        } else if (fit_type==2) { // robust regression
+            double a=log(6.0*D_out), b=alpha_out;
+            statisticsIterativelyReweightedLeastSquaresRegression(ltau.data(), ldist.data(), ldist.size(), a, b, 1.1, 200, fixD, fixAlpha);
+            D_out=exp(a)/6.0;
+            alpha_out=b;
+        }
+    }
+    if (QFFloatIsOK(D_out)) D_out_param=D_out;
+    if (QFFloatIsOK(alpha_out)) alpha_out_param=alpha_out;
+}
+
+void QFFCSMSDEvaluationItem::calcMSDFits(QVector<double> &taus_out, QVector<double> &alpha_out, QVector<double> &D_out, QFRawDataRecord *record, int index, int model, int evalWidth, int evalShift, int first, int fit_type, QVector<double>*tau_start, QVector<double>*tau_end) const
 {
     QVector<double> distTau=getMSDTaus(record, index, model);
     QVector<double> dist=getMSD(record, index, model);
@@ -270,7 +393,6 @@ void QFFCSMSDEvaluationItem::calcMSDFits(QVector<double> &taus_out, QVector<doub
             }
 
             if (cnt>=evalWidth) {
-                taus_out.append(t[cnt/2]);
                 if (fit_type==0) { // lm fit
 
                     double pout[2];
@@ -284,18 +406,33 @@ void QFFCSMSDEvaluationItem::calcMSDFits(QVector<double> &taus_out, QVector<doub
                     control.printflags = 0; // monitor status (+1) and parameters (+2)
                     lmcurve_fit( n_par, pout, m_dat, t, d, QFFCSMSDEvaluationItemfMSD_lin, &control, &status );
 
-                    D_out.append(pout[0]);
-                    alpha_out.append(pout[1]);
+                    if (QFFloatIsOK(pout[0]) && QFFloatIsOK(pout[1])) {
+                        taus_out.append(t[cnt/2]);
+                        D_out.append(pout[0]);
+                        alpha_out.append(pout[1]);
+                        if (tau_start) tau_start->append(t[0]);
+                        if (tau_end) tau_end->append(t[evalWidth-1]);
+                    }
                 } else if (fit_type==1) { // simple regression
                     double a=0, b=0;
                     statisticsLinearRegression(lt, d, evalWidth, a, b);
-                    D_out.append(exp(a)/6.0);
-                    alpha_out.append(b);
+                    if (QFFloatIsOK(exp(a)/6.0) && QFFloatIsOK(b)) {
+                        taus_out.append(t[cnt/2]);
+                        D_out.append(exp(a)/6.0);
+                        alpha_out.append(b);
+                        if (tau_start) tau_start->append(t[0]);
+                        if (tau_end) tau_end->append(t[evalWidth-1]);
+                    }
                 } else if (fit_type==2) { // robust regression
                     double a=0, b=0;
                     statisticsIterativelyReweightedLeastSquaresRegression(lt, d, evalWidth, a, b, 1.1, 100);
-                    D_out.append(exp(a)/6.0);
-                    alpha_out.append(b);
+                    if (QFFloatIsOK(exp(a)/6.0) && QFFloatIsOK(b)) {
+                        taus_out.append(t[cnt/2]);
+                        D_out.append(exp(a)/6.0);
+                        alpha_out.append(b);
+                        if (tau_start) tau_start->append(t[0]);
+                        if (tau_end) tau_end->append(t[evalWidth-1]);
+                    }
                 }
 
 
@@ -307,6 +444,7 @@ void QFFCSMSDEvaluationItem::calcMSDFits(QVector<double> &taus_out, QVector<doub
         }
     }
 }
+
 
 
 
@@ -511,19 +649,22 @@ bool QFFCSMSDEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QStri
 
     for (int i=0; i<MSDTHEORYCOUNT; i++) {
         if (parameterID==QString("msd_theory%1_en").arg(i)) {
-            defaultValue.value=0;
+            defaultValue.value=0;            
             return true;
         }
         if (parameterID==QString("msd_theory%1_pre").arg(i)) {
             defaultValue.value=6;
+            defaultValue.fix=true;
             return true;
         }
         if (parameterID==QString("msd_theory%1_d").arg(i)) {
             defaultValue.value=10;
+            defaultValue.fix=false;
             return true;
         }
         if (parameterID==QString("msd_theory%1_alpha").arg(i)) {
             defaultValue.value=1;
+            defaultValue.fix=false;
             if (i==1) defaultValue.value=0.75;
             if (i==2) defaultValue.value=0.5;
             if (i==3) defaultValue.value=0.66;

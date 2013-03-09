@@ -22,7 +22,8 @@ HEADERS += qffcsmsdevaluation.h \
     ../base_classes/qfusesresultsbyindexandmodelevaluation.h \
     ../base_classes/qfusesresultsbyindexevaluationeditor.h \
     ../base_classes/qffcsbyindexandmodelevaluationeditor.h \ 
-    ../../../../../LIB/trunk/statistics_tools.h
+    ../../../../../LIB/trunk/statistics_tools.h \
+    qffcsmsdevaluationfitmsddialog.h
 
 SOURCES += qffcsmsdevaluation.cpp \
            qffcsmsdevaluation_item.cpp \
@@ -32,9 +33,11 @@ SOURCES += qffcsmsdevaluation.cpp \
     ../base_classes/qfusesresultsbyindexandmodelevaluation.cpp \
     ../base_classes/qfusesresultsbyindexevaluationeditor.cpp \
     ../base_classes/qffcsbyindexandmodelevaluationeditor.cpp \
-    ../../../../../LIB/trunk/statistics_tools.cpp
+    ../../../../../LIB/trunk/statistics_tools.cpp \
+    qffcsmsdevaluationfitmsddialog.cpp
 
-FORMS =   
+FORMS = \   
+    qffcsmsdevaluationfitmsddialog.ui
 
 RESOURCES += fcsmsdevaluation.qrc
 

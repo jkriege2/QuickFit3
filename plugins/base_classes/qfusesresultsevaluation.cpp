@@ -351,6 +351,19 @@ double QFUsesResultsEvaluation::getFitValue(QFRawDataRecord *r, const QString &r
     return res;
 }
 
+bool QFUsesResultsEvaluation::fitValueExists(QFRawDataRecord *r, const QString &resultID, const QString &parameterID) const
+{
+    if (r && hasResults(r, resultID)) {
+        QString tresultID=transformResultID(resultID);
+        QString pid=getFitParamID(parameterID);
+        if (r->resultsExists(tresultID, pid)) {
+            return true;
+        }
+    }
+    //qDebug()<<"  getFitValue("<<resultID<<", "<<parameterID<<") = "<<res;
+    return false;
+}
+
 
 double QFUsesResultsEvaluation::getFitError(QFRawDataRecord *r, const QString &resultID, const QString &parameterID) const {
     double sval=0, serr=0;

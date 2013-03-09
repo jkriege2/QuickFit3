@@ -60,6 +60,7 @@
 #include "qffitfunctionmanager.h"
 #include "qffitalgorithmmanager.h"
 ////////////
+#include "qffcsmsdevaluation_item.h"
 
 
 
@@ -92,12 +93,15 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         /** \brief write the settings */
         virtual void writeSettings();
 
+        void plotDistMouseMoved(double x, double y);
+
 
         /** \brief activated when the highlighted record changed */
         virtual void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
         void slidersDistChanged(int userMin, int userMax, int min, int max);
         void updateSliders();
         void theoryChanged();
+        void fitMSD();
 
         /** \brief evaluate all files */
         virtual void fitRunsAll();
@@ -146,10 +150,11 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         QComboBox* cmbDistResultsMode;
         QComboBox* cmbFitType;
 
-        QFDoubleEdit* numPre[4];
-        QFDoubleEdit* numD[4];
-        QFDoubleEdit* numAlpha[4];
-        QCheckBox* chkSlope[4];
+        QFDoubleEdit* numPre[MSDTHEORYCOUNT];
+        QFDoubleEdit* numD[MSDTHEORYCOUNT];
+        QFDoubleEdit* numAlpha[MSDTHEORYCOUNT];
+        QCheckBox* chkSlope[MSDTHEORYCOUNT];
+        QToolButton* btnFitMSD[MSDTHEORYCOUNT];
         QSpinBox* spinFitWidth;
         QCheckBox* chkShowKeyDist;
         QCheckBox* chkShowKeyDistResults;
@@ -158,7 +163,8 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
 
         QAction* actAverageFirstFrames;
         QAction* actCopyAverageData;
-
+        JKQTPoverlayVerticalRange* ovlDistRange;
+        JKQTPoverlayLine* ovlModel;
 
     private:
         void createWidgets();

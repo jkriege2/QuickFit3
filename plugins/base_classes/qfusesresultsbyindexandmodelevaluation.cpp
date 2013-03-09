@@ -144,6 +144,11 @@ double QFUsesResultsByIndexAndModelEvaluation::getFitValue(QFRawDataRecord *r, i
     return getFitValue(r, getEvaluationResultID(index, model), parameterID);
 }
 
+bool QFUsesResultsByIndexAndModelEvaluation::fitValueExists(QFRawDataRecord *r, int index, int model, const QString &parameterID) const
+{
+    return fitValueExists(r, getEvaluationResultID(index, model), parameterID);
+}
+
 double QFUsesResultsByIndexAndModelEvaluation::getFitError(QFRawDataRecord *r, int index, int model, const QString &parameterID) const {
     return getFitError(r, getEvaluationResultID(index, model), parameterID);
 }

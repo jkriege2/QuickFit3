@@ -9,6 +9,8 @@ class QFPlotterPrivate; // forward
 class QFWIDLIB_EXPORT QFPlotter : public JKQtPlotter
 {
         Q_OBJECT
+    protected:
+        QFPlotterPrivate* p;
     public:
         friend class QFPlotterPrivate;
         explicit QFPlotter(bool datastore_internal, QWidget* parent=NULL, JKQTPdatastore* datast=NULL);
@@ -17,8 +19,6 @@ class QFWIDLIB_EXPORT QFPlotter : public JKQtPlotter
     signals:
         
     public slots:
-    protected:
-        QFPlotterPrivate* p;
         
 };
 

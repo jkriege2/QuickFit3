@@ -65,13 +65,14 @@ Qt::ItemFlags QFEvaluationRawDataModelProxy::flags(const QModelIndex &index) con
 
 
 void QFEvaluationRawDataModelProxy::setEvaluation(QFEvaluationItem* eval) {
-    if (eval!=NULL) {
-        disconnect(eval, SIGNAL(selectionChanged(QList<QPointer<QFRawDataRecord> >)), this, SLOT(selectionChanged(QList<QPointer<QFRawDataRecord> >)));
+    if (this->eval!=NULL) {
+        disconnect(this->eval, SIGNAL(selectionChanged(QList<QPointer<QFRawDataRecord> >)), this, SLOT(selectionChanged(QList<QPointer<QFRawDataRecord> >)));
     }
     this->eval=eval;
-
-    connect(eval, SIGNAL(selectionChanged(QList<QPointer<QFRawDataRecord> >)), this, SLOT(selectionChanged(QList<QPointer<QFRawDataRecord> >)));
-    invalidateFilter();
+    if (eval!=NULL) {
+        connect(eval, SIGNAL(selectionChanged(QList<QPointer<QFRawDataRecord> >)), this, SLOT(selectionChanged(QList<QPointer<QFRawDataRecord> >)));
+        invalidateFilter();
+    }
 
 }
 

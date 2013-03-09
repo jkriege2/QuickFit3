@@ -217,6 +217,12 @@ class QFUsesResultsByIndexAndModelEvaluation : public QFUsesResultsByIndexEvalua
             .
         */
         virtual double getFitValue(QFRawDataRecord* r, int index, int model, const QString& parameterID) const;
+        /*! \brief returns true, if the given fit results exists as a result (i.e. not in the default store)
+            \param r the record to adress
+            \param resultID the result ID which to access in the raw data records result store
+            \param parameterID the parameter id
+        */
+        virtual bool fitValueExists(QFRawDataRecord* r, int index, int model, const QString& parameterID) const;
         /*! \brief return the fit error of a given parameter
             \param r the record to adress
             \param index the index to access
@@ -302,6 +308,7 @@ class QFUsesResultsByIndexAndModelEvaluation : public QFUsesResultsByIndexEvalua
         using QFUsesResultsByIndexEvaluation::setFitResultValueBool;
         using QFUsesResultsByIndexEvaluation::setFitResultError;
         using QFUsesResultsByIndexEvaluation::getFitValue;
+        using QFUsesResultsByIndexEvaluation::fitValueExists;
         using QFUsesResultsByIndexEvaluation::getFitError;
         using QFUsesResultsByIndexEvaluation::setFitError;
         using QFUsesResultsByIndexEvaluation::setFitFix;

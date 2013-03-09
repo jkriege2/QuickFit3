@@ -240,6 +240,7 @@ void MainWindow::showLogMessage(const QString& message) {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
+    //qDebug()<<"main: closeEvent";
     if (maybeSave()) {
         writeSettings();
         closeProject();
@@ -261,8 +262,10 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         }
         ProgramOptions::setConfigValue("quickfit/lastrunsvn", SVNVERSION);
         event->accept();
+        //qDebug()<<"main: exiting application";
         QApplication::exit();
     } else {
+        //qDebug()<<"main: ingoring close event";
         event->ignore();
     }
 }

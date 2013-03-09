@@ -2,6 +2,7 @@
 #include "qfrawdatarecord.h"
 #include "qfevaluationitem.h"
 #include "qffcsmsdevaluation_item.h"
+#include "qffcsmsdevaluationfitmsddialog.h"
 #include "qfselectionlistdialog.h"
 #include "csvtools.h"
 
@@ -62,22 +63,26 @@ QWidget* QFFCSMSDEvaluationEditor::createSlopeWidgets(int i) {
     numD[i]=new QFDoubleEdit(this);
     numD[i]->setRange(0, DBL_MAX);
     numD[i]->setCheckBounds(true, false);
-    numD[i]->setDecimals(2);
+    numD[i]->setDecimals(6);
     numD[i]->setValue(10);
     connect(numD[i], SIGNAL(valueChanged(double)), this, SLOT(theoryChanged()));
 
     numAlpha[i]=new QFDoubleEdit(this);
     numAlpha[i]->setRange(0, DBL_MAX);
     numAlpha[i]->setCheckBounds(true, false);
-    numAlpha[i]->setDecimals(2);
+    numAlpha[i]->setDecimals(6);
     numAlpha[i]->setValue(1);
     connect(numAlpha[i], SIGNAL(valueChanged(double)), this, SLOT(theoryChanged()));
+
+    QAction* actFit=createActionAndButton(btnFitMSD[i],QIcon(":/fcsmsdevaluation/fit_fitcurrent.png"), tr("fit MSD law %1 ...").arg(i+1), this);
+    connect(actFit, SIGNAL(triggered()), this, SLOT(fitMSD()));
 
     lay1->addWidget(numPre[i]);
     lay1->addWidget(new QLabel("*"));
     lay1->addWidget(numD[i]);
     lay1->addWidget(new QLabel(tr("*t^")));
     lay1->addWidget(numAlpha[i]);
+    lay1->addWidget(btnFitMSD[i]);
     chkSlope[i]=new QCheckBox(this);
     chkSlope[i]->setChecked(false);
     w1->setEnabled(false);
@@ -99,15 +104,11 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     flAlgorithmParams->addRow(tr("Theory:"), new QLabel(tr("<font size=\"+1\"><i>&lang;r<sup>2</sup>&rang; = f&middot;D&middot;t<sup>&alpha;<&sup></i> [&mu;m<sup>2</sup>]</size>")));
 
     for (int i=0; i<MSDTHEORYCOUNT; i++) {
-        flAlgorithmParams->addRow(chkSlope[i], createSlopeWidgets(i));
+        QWidget* wsl=createSlopeWidgets(i);
+        flAlgorithmParams->addRow(chkSlope[i], wsl);
     }
-    //flAlgorithmParams->addRow(tr("MSD 2:"), createSlopeWidgets(1));
-    //flAlgorithmParams->addRow(tr("MSD 3:"), createSlopeWidgets(2));
-    //flAlgorithmParams->addRow(tr("MSD 4:"), createSlopeWidgets(3));
     cmbFitType=new QComboBox(this);
-    cmbFitType->addItem("LM line-fit");
-    cmbFitType->addItem("linear regression");
-    cmbFitType->addItem("robust regression (IRLS)");
+    cmbFitType->addItems(QFFCSMSDEvaluationItem::getFitTypes());
     flAlgorithmParams->addRow(tr("fit type:"), cmbFitType);
 
     spinFitWidth=new QSpinBox(this);
@@ -120,21 +121,6 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     flAlgorithmParams->addRow(tr("fit range:"), chkFitRange);
 
 
-  /*  edtAlpha=new QFDoubleEdit(this);
-    edtAlpha->setRange(0, DBL_MAX);
-    edtAlpha->setCheckBounds(true, false);
-    edtAlpha->setDecimals(10);
-    flAlgorithmParams->addRow(tr("MaxEnt: <i>&alpha; = </i>"), edtAlpha);
-
-////////////////////////////////////////
-    edtNdist=new QSpinBox(this);
-    edtNdist->setRange(10, INT_MAX);
-    flAlgorithmParams->addRow(tr("MaxEnt: <i>&Ndist = </i>"), edtNdist);
-    edtNumIter=new QSpinBox(this);
-    edtNumIter->setRange(10, INT_MAX);
-    flAlgorithmParams->addRow(tr("MaxEnt: <i>&Iterations/Step = </i>"), edtNumIter);
-////////////////////////////////////////
-*/
 
 
 
@@ -201,6 +187,24 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     pltDistribution->get_plotter()->set_keyYMargin(2);
     pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideLeft);
 
+    ovlDistRange=new JKQTPoverlayVerticalRange(0,0, pltDistribution->get_plotter());
+    ovlDistRange->set_inverted(true);
+    QColor fillRange=QColor("grey");
+    fillRange.setAlphaF(0.2);
+    ovlDistRange->set_fillColor(fillRange);
+    ovlDistRange->set_visible(false);
+    ovlDistRange->set_color(fillRange);
+    pltDistribution->get_plotter()->addOverlayElement(ovlDistRange);
+
+    ovlModel=new JKQTPoverlayLine(0,0,0,0,pltDistribution->get_plotter());
+    ovlModel->set_visible(false);
+    ovlModel->set_color(QColor("darkgrey"));
+    ovlModel->set_lineStyle(Qt::DotLine);
+    ovlModel->set_lineWidth(2);
+    ovlModel->set_infinite(true);
+    pltDistribution->get_plotter()->addOverlayElement(ovlModel);
+
+
 
     tbPlotDistribution=new QToolBar(QString("tbPlotDistribution"), this);
     tbPlotDistribution->setIconSize(QSize(16,16));
@@ -243,6 +247,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     pltDistResults->useExternalDatastore(pltDistribution->getDatastore());
     pltDistResults->set_displayMousePosition(false);
     pltDistResults->synchronizeToMaster(pltDistribution, true, false);
+    connect(pltDistResults, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotDistMouseMoved(double,double)));
 
     tbPlotDistResults=new QToolBar(QString("tbPlotDistributionResults"), this);
     tbPlotDistResults->setIconSize(QSize(16,16));
@@ -493,6 +498,65 @@ void QFFCSMSDEvaluationEditor::writeSettings() {
     settings->getQSettings()->setValue("fcsmsdevaleditor/showkey", chkShowKey->isChecked());
     settings->getQSettings()->setValue("fcsmsdevaleditor/showkeydist", chkShowKeyDist->isChecked());
     settings->getQSettings()->setValue("fcsmsdevaleditor/showkeydistresults", chkShowKeyDistResults->isChecked());
+}
+
+void QFFCSMSDEvaluationEditor::plotDistMouseMoved(double x, double y)
+{
+    ovlDistRange->set_visible(false);
+    ovlModel->set_visible(false);
+    int colI=pltDistResults->getDatastore()->getColumnNum("msdfit_tau");
+    int colSI=pltDistResults->getDatastore()->getColumnNum("msdfit_tau_start");
+    int colEI=pltDistResults->getDatastore()->getColumnNum("msdfit_tau_end");
+    int colDI=pltDistResults->getDatastore()->getColumnNum("msdfit_D");
+    int colAI=pltDistResults->getDatastore()->getColumnNum("msdfit_alpha");
+    if (colI>=0 && colEI>=0 && colSI>=0) {
+        JKQTPcolumn col=pltDistResults->getDatastore()->getColumn(colI);
+        JKQTPcolumn colS=pltDistResults->getDatastore()->getColumn(colSI);
+        JKQTPcolumn colE=pltDistResults->getDatastore()->getColumn(colEI);
+        if (col.isValid()&&colS.isValid()&&colE.isValid()) {
+            double* tau=col.getPointer(0);
+            double* tauS=colS.getPointer(0);
+            double* tauE=colE.getPointer(0);
+            int count=qMin(qMin(col.getRows(), colS.getRows()), colE.getRows());
+            int idx=-1;
+            if (count>0 && x>=tau[0] && x<=tau[count-1]) {
+                for (int i=0; i<count; i++) {
+                    if (x<tau[i]) {
+                        idx=i-1;
+                        break;
+                    }
+                }
+            }
+            //qDebug()<<x<<idx;
+            /*for (int i=0; i<count; i++) {
+                qDebug()<<"   "<<i<<"  "<<tau[i];
+            }*/
+            if (idx>0) {
+                //qDebug()<<x<<idx<<tauS[idx]<<tauE[idx];
+                ovlDistRange->set_position(tauS[idx]);
+                ovlDistRange->set_position2(tauE[idx]);
+                ovlDistRange->set_visible(true);
+                if (colDI>=0 && colAI>=0) {
+                    double pre=6;
+                    JKQTPcolumn colD=pltDistResults->getDatastore()->getColumn(colDI);
+                    JKQTPcolumn colA=pltDistResults->getDatastore()->getColumn(colAI);
+                    if (colD.isValid()&&colA.isValid()&&idx<=colD.getRows() && idx<=colA.getRows()) {
+                        double D=colD.getValue(idx)*pre;
+                        double alpha=colA.getValue(idx);
+                        double r1=D*pow(tauS[idx], alpha);
+                        double r2=D*pow(tauE[idx], alpha);
+                        //qDebug()<<D/pre<<alpha<<tauS[idx]<<r1<<tauE[idx]<<r2;
+                        ovlModel->set_x1(tauS[idx]);
+                        ovlModel->set_x2(tauE[idx]);
+                        ovlModel->set_y1(r1);
+                        ovlModel->set_y2(r2);
+                        ovlModel->set_visible(true);
+                    }
+                }
+            }
+        }
+    }
+    pltDistribution->update_overlays();
 }
 
 
@@ -1600,61 +1664,20 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
         last=sliderDist->get_userMax();
     }
 
-    QVector<double> fitTau;
+    QVector<double> fitTau, fitTauStart, fitTauEnd;
     QVector<double> fitD, fitA;
     if (distTau.size()>1 && dist.size()>1 && wid>=3 && eval->hasResults()) {
-        /*for (int i=first; i<=qMin(last, distTau.size()-1) ; i+=qMax(1,wid/7)) {
-        //for (int i=data_start; i<data_end; i+=qMax(1,wid/5)) {
-            double* t=(double*)calloc(wid, sizeof(double));
-            double* d=(double*)calloc(wid, sizeof(double));
-            int cnt=0;
-            bool ok=true;
-            for (int j=i; j<=qMin(qMin(last, distTau.size()-1), i+wid-1); j++) {
-                t[cnt]=distTau[j];
-                d[cnt]=log(dist[j]);
-                ok=ok&&QFFloatIsOK(d[cnt])&&QFFloatIsOK(t[cnt])&&(dist[j]>0);
-                cnt++;
-            }
 
-            if (cnt>=wid) {
-                if (ok) {
-                    //qDebug()<<"fit "<<cnt<<" datapoints ...";
-
-                    double pout[2];
-                    int n_par = 2; // number of parameters
-                    int m_dat = cnt; // number of data pairs
-                    //pout[0]=eval->getTheoryD(0);
-                    //pout[1]=eval->getTheoryAlpha(0);
-                    pout[1]=(d[0]-d[cnt-1])/(log(t[0])-log(t[cnt-1]));
-                    pout[0]=(d[0]-pout[1]*log(t[0]))/6.0;
-                    //qDebug()<<"fit "<<cnt<<" datapoints ...   t[0]="<<t[0]<<"   t[cnt-1]="<<t[cnt-1]<<"   d[0]="<<d[0]<<"   p_initial = ["<<pout[0]<<"; "<<pout[1]<<"]";
-                    lm_status_struct status;
-                    lm_control_struct control = lm_control_double;
-                    control.maxcall=300;
-                    control.printflags = 0; // monitor none (0) monitor status (+1) and parameters (+2)
-                    lmcurve_fit( n_par, pout, m_dat, t, d, fMSD_lin, &control, &status );
-                    //qDebug()<<"      p_result = ["<<pout[0]<<"; "<<pout[1]<<"]";
-
-                    if (QFFloatIsOK(t[cnt/2]) && QFFloatIsOK(pout[0]) && QFFloatIsOK(pout[1]) && QString(lm_infmsg[status.info]).contains("success")) {
-                        fitTau.append(t[cnt/2]);
-                        fitD.append(pout[0]);
-                        fitA.append(pout[1]);
-                    }
-                    //qDebug()<<"    fit results  D="<<pout[0]<<"  a="<<pout[1];
-
-
-                }
-
-            }
-
-            free(t);
-            free(d);
-        }*/
-        eval->calcMSDFits(fitTau, fitA, fitD, eval->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel(), spinFitWidth->value(), qMax(1, spinFitWidth->value()/7), sliderDist->get_userMin(), cmbFitType->currentIndex());
+        eval->calcMSDFits(fitTau, fitA, fitD, eval->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel(), spinFitWidth->value(), qMax(1, spinFitWidth->value()/7), sliderDist->get_userMin(), cmbFitType->currentIndex(), &fitTauStart, &fitTauEnd);
 
         int c_msdtau=dsdist->addCopiedColumn(fitTau.data(), fitTau.size(), "msdfit_tau");
         int c_msdD=dsdist->addCopiedColumn(fitD.data(), fitD.size(), "msdfit_D");
         int c_msdA=dsdist->addCopiedColumn(fitA.data(), fitA.size(), "msdfit_alpha");
+        dsdist->addCopiedColumn(fitTauStart.data(), fitTauStart.size(), "msdfit_tau_start");
+        dsdist->addCopiedColumn(fitTauEnd.data(), fitTauEnd.size(), "msdfit_tau_end");
+        //qDebug()<<fitTau.size()<<fitTau;
+        //qDebug()<<fitD.size()<<fitD;
+        //qDebug()<<fitA.size()<<fitA;
 
         double t_start=distTau.value(data_start, distTau.first());
         double t_end=distTau.value(data_end, distTau.last());
@@ -1766,18 +1789,14 @@ void QFFCSMSDEvaluationEditor::updateDistribution() {
         if (chkSlope[i]->isChecked()) {
             const double D=numPre[i]->value()*numD[i]->value();
             const double a=numAlpha[i]->value();
-            for (int x=0; x<distTau.size(); x++) {
-                theo.append(D*pow(distTau[x], a));
-            }
-            dsdist->deleteAllColumns(QString("theory%1").arg(i+1));
-            int c_theo=dsdist->addCopiedColumn(theo.data(), theo.size(), QString("theory%1").arg(i+1));
-            JKQTPxyLineGraph* g_dist=new JKQTPxyLineGraph(pltDistribution->get_plotter());
+
+            JKQTPxFunctionLineGraph* g_dist=new JKQTPxFunctionLineGraph(pltDistribution->get_plotter());
             g_dist->set_drawLine(true);
             g_dist->set_title(tr("MSD %1, D=%2µm²/s, \\alpha=%3").arg(i+1).arg(numD[i]->value()).arg(numAlpha[i]->value()));
-            g_dist->set_xColumn(c_disttau);
-            g_dist->set_yColumn(c_theo);
-            g_dist->set_datarange_start(sliderDist->get_userMin());
-            g_dist->set_datarange_end(sliderDist->get_userMax());
+            g_dist->setSpecialFunction(JKQTPxFunctionLineGraph::PowerLaw);
+            QVector<double> vecP;
+            vecP<<D<<a;
+            g_dist->set_params(vecP);
             g_dist->set_lineWidth(1);
             g_dist->set_style(Qt::DashLine);
 
@@ -1873,6 +1892,40 @@ void QFFCSMSDEvaluationEditor::theoryChanged() {
     }
     data->set_doEmitResultsChanged(rc);
     data->set_doEmitPropertiesChanged(pc);
+
+    updateDistribution();
+}
+
+void QFFCSMSDEvaluationEditor::fitMSD()
+{
+    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    if (!dataEventsEnabled) return;
+    if (!data) return;
+
+    // find the ID of the MSD to fit
+    QAction* act=qobject_cast<QAction*>(sender());
+    int btnID=-1;
+    for (int i=0; i<MSDTHEORYCOUNT; i++) {
+        if (act==btnFitMSD[i]->defaultAction()) {
+            btnID=i;
+            break;
+        }
+    }
+    qDebug()<<"fitMSD: "<<btnID<<act;
+    if (btnID<0) return;
+
+    QFFCSMSDEvaluationFitMSDDialog* dlg=new QFFCSMSDEvaluationFitMSDDialog(data, btnID, this);
+
+    dlg->exec();
+
+    for (int i=0; i<4; i++)     {
+        chkSlope[i]->setChecked(data->getTheoryEnabled(i));
+        numPre[i]->setValue(data->getTheoryPre(i));
+        numD[i]->setValue(data->getTheoryD(i));
+        numAlpha[i]->setValue(data->getTheoryAlpha(i));
+    }
+
+    delete dlg;
 
     updateDistribution();
 }
