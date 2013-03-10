@@ -19,6 +19,7 @@ class QFEvaluationItem;
 class QFEvaluationPropertyEditor;
 class QFRawDataRecord;
 class QFRawDataPropertyEditor;
+class QFProject;
 
 
 /*! \brief wrapper class that allows plugins to access basic logging services
@@ -220,6 +221,8 @@ class QFLIB_EXPORT QFPluginServices {
         virtual QFEvaluationPropertyEditor* openEvaluationEditor(QFEvaluationItem* eval)=0;
         /** \brief open a new raw data record editor window for the given record */
         virtual QFRawDataPropertyEditor* openRawDataEditor(QFRawDataRecord* rdr)=0;
+        /** \brief returns a pointer to the currently loaded QFProject */
+        virtual QFProject* getCurrentProject() const=0;
     private:
         static QFPluginServices* inst;
 };

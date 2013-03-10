@@ -1640,6 +1640,11 @@ QFRawDataPropertyEditor *MainWindow::openRawDataEditor(QFRawDataRecord *rec)
     return NULL;
 }
 
+QFProject *MainWindow::getCurrentProject() const
+{
+    return project;
+}
+
 QWidget *MainWindow::getCreateView(const QString &name, const QString &title)
 {
     if (!histograms.contains(name)) {

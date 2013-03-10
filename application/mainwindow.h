@@ -139,7 +139,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual QFEvaluationPropertyEditor* openEvaluationEditor(QFEvaluationItem* eval);
         /** \brief open a new raw data record editor window for the given record */
         virtual QFRawDataPropertyEditor* openRawDataEditor(QFRawDataRecord* rdr);
-
+        virtual QFProject* getCurrentProject() const;
 
 
 

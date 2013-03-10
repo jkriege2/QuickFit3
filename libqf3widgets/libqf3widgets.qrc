@@ -67,5 +67,6 @@
         <file alias="shutter_open.png">icons/shutter_open.png</file>
         <file alias="default_config.png">icons/default_config.png</file>
         <file alias="default_config_set.png">icons/default_config_set.png</file>
+        <file alias="qfplotter_copytotable.png">icons/qfplotter_copytotable.png</file>
     </qresource>
 </RCC>

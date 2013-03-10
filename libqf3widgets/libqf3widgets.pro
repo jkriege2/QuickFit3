@@ -104,7 +104,10 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/jkmathparser.h \
     qfhtmlhighlighter.h \
     qfplotter.h \
-    qfplotterprivate.h
+    qfplotterprivate.h \
+    qfselectrdrdialog.h \
+    ../plugins/interfaces/qfrdrtableinterface.h \
+    ../plugins/interfaces/qfrdrcolumngraphsinterface.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -171,14 +174,16 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     ../../../../LIB/trunk/jkmathparser.cpp \
     qfhtmlhighlighter.cpp \
     qfplotter.cpp \
-    qfplotterprivate.cpp
+    qfplotterprivate.cpp \
+    qfselectrdrdialog.cpp
 
 
 
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \
     qf3filtereditor.ui \
-    qfselectionlistdialog.ui
+    qfselectionlistdialog.ui \
+    qfselectrdrdialog.ui
 
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/qspecialtoolbutton.qrc \

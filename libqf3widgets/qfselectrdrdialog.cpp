@@ -1,0 +1,204 @@
+#include "qfselectrdrdialog.h"
+#include "ui_qfselectrdrdialog.h"
+#include "qfpluginservices.h"
+#include <QDebug>
+
+QFSelectRDRDialogMatchFunctor::QFSelectRDRDialogMatchFunctor()
+{
+    //qDebug()<<"QFSelectRDRDialogMatchFunctor:constructor ";
+}
+
+QFSelectRDRDialogMatchFunctor::~QFSelectRDRDialogMatchFunctor()
+{
+}
+
+
+QFSelectRDRDialogMatchFunctorSelectAll::QFSelectRDRDialogMatchFunctorSelectAll():
+    QFSelectRDRDialogMatchFunctor()
+{
+    //qDebug()<<"QFSelectRDRDialogMatchFunctorSelectAll:constructor ";
+}
+
+bool QFSelectRDRDialogMatchFunctorSelectAll::matches(const QFRawDataRecord *record) const
+{
+    //qDebug()<<"QFSelectRDRDialogMatchFunctorSelectAll";
+    return true;
+}
+
+
+
+QList<QPointer<QFRawDataRecord > > QFSelectRDRDialogMatchFunctor::getFilteredList(QFProject *project)
+{
+    QList<QPointer<QFRawDataRecord > >  rdrList;
+    if (project) {
+        for (int i=0; i<project->getRawDataCount(); i++) {
+            QFRawDataRecord* r=project->getRawDataByNum(i);
+            if (r && matches(r)) {
+                rdrList<<r;
+            }
+        }
+    }
+    return rdrList;
+}
+
+QFSelectRDRDialog::QFSelectRDRDialog(QFSelectRDRDialogMatchFunctor *matchFunctor, QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::QFSelectRDRDialog)
+{
+    ui->setupUi(this);
+    this->matchFunctor=matchFunctor;
+    this->project=project;
+    functorPrivate=false;
+    setAllowCreateNew(true);
+    setAllowMultiSelect(false);
+    setDescription("");
+    setProject(NULL);
+}
+
+QFSelectRDRDialog::QFSelectRDRDialog(QFSelectRDRDialogMatchFunctor *matchFunctor, bool functorPrivate, QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::QFSelectRDRDialog)
+{
+    ui->setupUi(this);
+    this->matchFunctor=matchFunctor;
+    this->project=project;
+    this->functorPrivate=functorPrivate;
+    setAllowCreateNew(true);
+    setAllowMultiSelect(false);
+    setDescription("");
+    setProject(NULL);
+}
+
+QFSelectRDRDialog::QFSelectRDRDialog(QWidget *parent):
+    QDialog(parent),
+    ui(new Ui::QFSelectRDRDialog)
+{
+    ui->setupUi(this);
+    this->matchFunctor=new QFSelectRDRDialogMatchFunctorSelectAll();
+    functorPrivate=true;
+    this->project=project;
+    setAllowCreateNew(true);
+    setAllowMultiSelect(false);
+    setDescription("");
+    setProject(NULL);
+}
+
+QFSelectRDRDialog::~QFSelectRDRDialog()
+{
+    delete ui;
+    if (functorPrivate && matchFunctor) delete matchFunctor;
+    matchFunctor=NULL;
+}
+
+void QFSelectRDRDialog::addWidget(const QString &label, QWidget *widget)
+{
+    ui->formLayout->addRow(label, widget);
+}
+
+void QFSelectRDRDialog::addWidget(QLabel *label, QWidget *widget)
+{
+    ui->formLayout->addRow(label, widget);
+}
+
+void QFSelectRDRDialog::setAllowCreateNew(bool allowNew)
+{
+    if (allowNew) {
+        ui->radNew->setEnabled(true);
+        ui->radSelect->setEnabled(true);
+    } else {
+        ui->radNew->setEnabled(false);
+        ui->radSelect->setEnabled(false);
+        ui->radSelect->setChecked(true);
+    }
+}
+
+void QFSelectRDRDialog::setAllowMultiSelect(bool allowMulti)
+{
+    if (allowMulti) {
+        ui->listWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    } else {
+        ui->listWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    }
+}
+
+void QFSelectRDRDialog::selectRDR(QFRawDataRecord *rdr)
+{
+    int idx=-1;
+    for (int i=0; i<rdrList.size(); i++) {
+        if (rdrList[i]==rdr) {
+            idx=i;
+            break;
+        }
+    }
+    if (idx>=0) {
+        ui->listWidget->setCurrentRow(idx);
+    }
+}
+
+void QFSelectRDRDialog::setDescription(const QString &text)
+{
+    ui->labDescription->setText(text);
+    ui->labDescription->setVisible(!text.isEmpty());
+}
+
+void QFSelectRDRDialog::setProject(QFProject *project)
+{
+    this->project=project;
+    updateRdrList();
+}
+
+QList<QPointer<QFRawDataRecord> > QFSelectRDRDialog::getAllRDRs() const
+{
+    return rdrList;
+}
+
+QList<QPointer<QFRawDataRecord> > QFSelectRDRDialog::getSelectedRDRs() const
+{
+    QList<QPointer<QFRawDataRecord> > list;
+    QList<QListWidgetItem *> l=ui->listWidget->selectedItems();
+    for (int i=0; i<l.size(); i++) {
+        QFRawDataRecord* r=rdrList.value(l[i]->data(Qt::UserRole).toInt(), NULL);
+        if (r) list<<r;
+    }
+    return list;
+}
+
+QPointer<QFRawDataRecord> QFSelectRDRDialog::getSelectedRDR() const
+{
+    return rdrList.value(ui->listWidget->currentItem()->data(Qt::UserRole).toInt(), NULL);
+}
+
+bool QFSelectRDRDialog::doCreateNew() const
+{
+    return ui->radNew->isChecked();
+}
+
+void QFSelectRDRDialog::updateRdrList()
+{
+    QFProject* project=this->project;
+    if (!project) project=QFPluginServices::getInstance()->getCurrentProject();
+
+    if (matchFunctor) rdrList=matchFunctor->getFilteredList(project);
+    else rdrList.clear();
+
+    QString sel="";
+    if (ui->listWidget->currentItem()) ui->listWidget->currentItem()->text();
+    int selI=0;
+    ui->listWidget->clear();
+    for (int i=0; i<rdrList.size(); i++) {
+        if (rdrList[i]) {
+            QListWidgetItem* item=new QListWidgetItem(rdrList[i]->getSmallIcon(), rdrList[i]->getName(), ui->listWidget);
+            item->setData(Qt::UserRole, i);
+            ui->listWidget->addItem(item);
+            if (item->text()==sel) selI=ui->listWidget->count()-1;
+        }
+    }
+    ui->listWidget->setCurrentRow(selI);
+
+    if (ui->listWidget->count()<=0 && ui->radNew->isEnabled()) {
+        ui->radNew->setChecked(true);
+        ui->radSelect->setEnabled(false);
+    }
+
+}
+

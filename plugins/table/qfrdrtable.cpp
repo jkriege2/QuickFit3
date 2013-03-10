@@ -276,6 +276,12 @@ int QFRDRTable::tableGetRowCount() const
     return 0;
 }
 
+bool QFRDRTable::tableIsReadonly() const
+{
+    if (!datamodel) return true;
+    return datamodel->isReadonly();
+}
+
 void QFRDRTable::colgraphAddPlot(int graph, int columnX, int columnY, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title)
 {
     if (graph>=0 && graph<plots.size()) {

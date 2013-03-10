@@ -19,6 +19,9 @@ class QFWIDLIB_EXPORT QFPlotter : public JKQtPlotter
     signals:
         
     public slots:
+    protected:
+        void initQFPlotter();
+        virtual void modifyContextMenu(QMenu* menu);
         
 };
 

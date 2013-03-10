@@ -205,7 +205,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual void tableReevaluateExpressions();
         virtual int tableGetColumnCount() const;
         virtual int tableGetRowCount() const;
-
+        virtual bool tableIsReadonly() const;
 
 
 

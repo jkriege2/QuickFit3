@@ -32,6 +32,8 @@ class QFRDRTableInterface {
         virtual int tableGetColumnCount() const=0;
         /** \brief returns the number of rows in the table */
         virtual int tableGetRowCount() const=0;
+        /** \brief returns \c true if the table is read-only */
+        virtual bool tableIsReadonly() const=0;
 
 };
 
