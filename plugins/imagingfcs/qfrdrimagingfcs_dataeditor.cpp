@@ -170,14 +170,18 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     row+=2;
 
     plteOverview=new JKQTFPimagePlot(pltOverview, NULL, JKQTFP_uint16, 1, 1, 0, 1, 0, 1, JKQTFP_GRAY);
+    plteOverview->setVisible(true);
     pltOverview->addPlot(plteOverview);
+    plteOverviewRGB=new JKQTFPRGBImageOverlayPlot(pltOverview, NULL, JKQTFP_uint16, 1, 1, 0, 1, 0, 1);
+    plteOverviewRGB->setVisible(false);
+    pltOverview->addPlot(plteOverviewRGB);
 
-    QColor col("red");
+    QColor col("orange");
     col.setAlphaF(0.5);
     plteOverviewSelected=new JKQTFPimageOverlayPlot(pltOverview, NULL, 1, 1, 0, 1, 0, 1, col);
     pltOverview->addPlot(plteOverviewSelected);
 
-    col=QColor("blue");
+    col=QColor("darkblue");
     col.setAlphaF(0.5);
     plteOverviewExcluded=new JKQTFPimageOverlayPlot(pltOverview, NULL, 1, 1, 0, 1, 0, 1, col);
     pltOverview->addPlot(plteOverviewExcluded);
@@ -243,7 +247,7 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     menuMask->addSeparator();
     correlationMaskTools->registerCorrelationToolsToMenu(menuMask);
 
-};
+}
 
 void QFRDRImagingFCSDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
     if (old) {
@@ -361,10 +365,13 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
 
     if (!m) {
         plteOverview->set_image(NULL, JKQTFP_uint16, 1, 1);
+        plteOverviewRGB->set_image(NULL, JKQTFP_uint16, 1, 1);
         plteOverviewSelected->set_data(NULL, 0, 0);
         plteOverviewExcluded->set_data(NULL, 0, 0);
     } else {
         double* ov=m->getImageFromRunsPreview();
+        double* ov2=m->getImageFromRunsPreview(1);
+        int channels=m->getImageFromRunsChannels();
         double w=m->getImageFromRunsWidth();
         double h=m->getImageFromRunsHeight();
         double dx=1;
@@ -394,7 +401,17 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
         plteOverviewExcluded->set_data(plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         plteOverviewExcluded->set_xmax(w);
         plteOverviewExcluded->set_ymax(h);
-        plteOverview->set_image(ov, JKQTFP_double, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        //plteOverview->set_image(ov, JKQTFP_double, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        if (channels==1) {
+            plteOverview->set_image(ov, JKQTFP_double, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+            plteOverviewRGB->setVisible(false);
+            plteOverview->setVisible(true);
+        } else if (channels>1) {
+            plteOverviewRGB->set_image(ov2, JKQTFP_double, ov, JKQTFP_double, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+            plteOverview->setVisible(false);
+            plteOverviewRGB->setVisible(true);
+
+        }
         plteOverview->set_xmax(w);
         plteOverview->set_ymax(h);
         if (plteOverviewSelectedData && plteOverviewExcludedData) {

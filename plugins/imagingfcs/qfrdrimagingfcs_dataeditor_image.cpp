@@ -583,7 +583,11 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(pltOverview, SIGNAL(userLineFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageLineFinished(double,double,double,double,Qt::KeyboardModifiers)));
 
     plteOverview=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::UInt16Array, NULL, 0,0, JKQTPMathImage::GRAY, pltOverview->get_plotter());
+    plteOverview->set_visible(true);
     pltOverview->addGraph(plteOverview);
+    plteOverviewRGB=new JKQTPRGBMathImage(0,0,1,1,JKQTPMathImageBase::UInt16Array, NULL, 0,0, pltOverview->get_plotter());
+    plteOverviewRGB->set_visible(false);
+    pltOverview->addGraph(plteOverviewRGB);
 
     plteOverviewSelected=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlSelCol, pltOverview->get_plotter());
     plteOverviewSelected->set_rectanglesAsImageOverlay(OverlayRectanglesAsImageOverlay);
@@ -1294,7 +1298,15 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
                 histogram2->setMax(current->getProperty(QString("imfcs_imed_hist2rmax_%1_%2").arg(egroup).arg(param), 10).toDouble());
             }
             mi=0, ma=1;
-            plteOverview->getDataMinMax(mi, ma);
+            double mi2=0, ma2=1;
+            if (plteOverview->get_visible()) plteOverview->getDataMinMax(mi, ma);
+            else {
+                plteOverview->getDataMinMax(mi, ma);
+                plteOverviewRGB->getDataMinMaxG(mi2,ma2);
+                if (mi2<mi) mi=mi2;
+                if (ma2>ma) ma=ma2;
+            }
+
             d=current->getProperty(QString("imfcs_imed_ovrcolorbar_%1").arg(egroup),
                                        settings->getQSettings()->value(QString("imfcsimageeditor/ovrcolorbar"), cmbColorbarOverview->currentIndex())).toInt();
             if (d>=0) cmbColorbarOverview->setCurrentIndex(d);
@@ -1458,13 +1470,22 @@ void QFRDRImagingFCSImageEditor::ovrPaletteChanged() {
 
     plteOverview->set_palette(cmbColorbarOverview->currentIndex());
     plteOverview->set_autoImageRange(false);//chkAutorangeOverview->isChecked());
-    double ovrmi=0, ovrma=0;
-    if (m && m->getImageFromRunsPreview()!=NULL && plteOverviewExcludedData!=NULL) {
-        statisticsMaskedMinMax(m->getImageFromRunsPreview(), plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), ovrmi, ovrma, false);
+    double ovrmi=0, ovrma=0, ovrmi2=0, ovrma2=0;
+    if (m && m->getImageFromRunsPreview(0)!=NULL && plteOverviewExcludedData!=NULL) {
+        statisticsMaskedMinMax(m->getImageFromRunsPreview(0), plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), ovrmi, ovrma, false);
+    }
+    if (m && m->getImageFromRunsChannels()>1 && m->getImageFromRunsPreview(1)!=NULL && plteOverviewExcludedData!=NULL) {
+        statisticsMaskedMinMax(m->getImageFromRunsPreview(1), plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), ovrmi2, ovrma2, false);
+        if (ovrmi2<ovrmi) ovrmi=ovrmi2;
+        if (ovrma2>ovrma) ovrma=ovrma2;
     }
     if (m && chkAutorangeOverview->isChecked() && m->getImageFromRunsPreview()!=NULL && plteOverviewExcludedData!=NULL) {
         plteOverview->set_imageMin(ovrmi);
         plteOverview->set_imageMax(ovrma);
+        plteOverviewRGB->set_imageMinG(ovrmi);
+        plteOverviewRGB->set_imageMaxG(ovrma);
+        plteOverviewRGB->set_imageMin(ovrmi);
+        plteOverviewRGB->set_imageMax(ovrma);
     }
 
     edtOvrMin->setEnabled(!chkAutorangeOverview->isChecked());
@@ -1479,6 +1500,10 @@ void QFRDRImagingFCSImageEditor::ovrPaletteChanged() {
     }
     plteOverview->set_imageMin(edtOvrMin->value());
     plteOverview->set_imageMax(edtOvrMax->value());
+    plteOverviewRGB->set_imageMinG(edtOvrMin->value());
+    plteOverviewRGB->set_imageMaxG(edtOvrMax->value());
+    plteOverviewRGB->set_imageMin(edtOvrMin->value());
+    plteOverviewRGB->set_imageMax(edtOvrMax->value());
     saveImageSettings();
     pltOverview->set_doDrawing(oldDoDraw);
     if (oldDoDraw) pltOverview->update_plot();
@@ -2611,12 +2636,16 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
 
     if (!m) {
         plteOverview->set_data(NULL, 1, 1, JKQTPMathImageBase::UInt16Array);
+        plteOverviewRGB->set_data(NULL, 1, 1, JKQTPMathImageBase::UInt16Array);
         plteOverviewSelected->set_data(NULL, 1, 1);
         plteOverviewExcluded->set_data(NULL, 1, 1);
+        plteOverviewRGB->set_visible(false);
+        plteOverview->set_visible(false);
     } else {
         //uint16_t* ov=m->getDataImagePreview();
         double w=m->getImageFromRunsWidth();
         double h=m->getImageFromRunsHeight();
+        int channels=m->getImageFromRunsChannels();
         if ((w==0) || (h==0)) {
             w=h=1;
         }
@@ -2638,18 +2667,29 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
             plteOverview->get_colorBarTopAxis()->set_minTicks(3);
         }
         pltOverview->setXY(0, w, 0, h);
+        plteOverviewRGB->set_visible(false);
+        plteOverview->set_visible(false);
+        if (m->getImageFromRunsPreview(0)) {
+            if (channels==1) {
+                plteOverview->set_visible(true);
+                plteOverview->set_autoImageRange(false);//chkAutorangeOverview->isChecked());
+                updateSelectionArrays();
+                plteOverview->set_data(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::DoubleArray);
+                plteOverview->set_palette(cmbColorbarOverview->currentIndex());
+                ovrPaletteChanged();
+            } else if (channels>1) {
+                plteOverviewRGB->set_visible(true);
+                plteOverviewRGB->set_autoImageRange(false);//chkAutorangeOverview->isChecked());
+                updateSelectionArrays();
+                plteOverviewRGB->set_data(m->getImageFromRunsPreview(1), m->getImageFromRunsPreview(0), NULL, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::DoubleArray);
+                ovrPaletteChanged();
 
-        if (m->getImageFromRunsPreview()) {
-            plteOverview->set_autoImageRange(false);//chkAutorangeOverview->isChecked());
-            double mi=0, ma=0;
-            updateSelectionArrays();
-            //statisticsMaskedMinMax(m->getImageFromRunsPreview(), plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), mi, ma, false);
-            plteOverview->set_data(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::DoubleArray);
-            plteOverview->set_palette(cmbColorbarOverview->currentIndex());
-            ovrPaletteChanged();
-            //qDebug()<<"image range:"<<mi<<" ... "<<ma<<"  imgsize="<<plteImageSize<<"   fromRunsSize="<<m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
+            }
 
-        } else plteOverview->set_data(NULL, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::UInt16Array);
+        } else {
+            plteOverview->set_data(NULL, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::UInt16Array);
+            plteOverviewRGB->set_data(NULL, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::UInt16Array);
+        }
         plteOverview->set_width(w);
         plteOverview->set_height(h);
 
@@ -4532,6 +4572,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
         QString fileNameGof=path+base+".gof."+ext;
         QString fileNameMask=path+base+".mask."+ext;
         QString fileNameOverview=path+base+".overview."+ext;
+        QString fileNameOverview2=path+base+".overview2."+ext;
         QString fileNameMatlab=path+base+".m";
 
         bool saveParam=true;
@@ -4552,6 +4593,9 @@ void QFRDRImagingFCSImageEditor::saveData() {
             if (QFile::exists(fileNameOverview)) {
                 saveOverview=(QMessageBox::question(this, tr("imFCS: Save Overview Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameOverview), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
             }
+            if (m->getImageFromRunsChannels()>1 && QFile::exists(fileNameOverview2)) {
+                saveOverview=(QMessageBox::question(this, tr("imFCS: Save Overview Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameOverview2), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
+            }
         } else {
             if (QFile::exists(fileNameMatlab)) {
                 saveMatlab=(QMessageBox::question(this, tr("imFCS: Save Images to Matlab script"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameMatlab), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
@@ -4562,9 +4606,11 @@ void QFRDRImagingFCSImageEditor::saveData() {
         JKImage<double> gof_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         JKImage<uint16_t> mask_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         JKImage<double> overview_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        JKImage<double> overview_image2(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         readParameterImage(image.data(), gof_image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone, currentGofParameter(), QFRDRImagingFCSImageEditor::itNone);
         //mask_image.assign(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
-        overview_image.assign(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        overview_image.assign(m->getImageFromRunsPreview(0), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        if (m->getImageFromRunsChannels()>1) overview_image2.assign(m->getImageFromRunsPreview(1), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         for (int32_t i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
             mask_image(i)=(plteOverviewExcludedData[i])?1:0;
         }
@@ -4572,37 +4618,58 @@ void QFRDRImagingFCSImageEditor::saveData() {
             if (saveParam) image.save_csv(fileNameParam.toStdString(), ", ", '.');
             if (saveGof) gof_image.save_csv(fileNameGof.toStdString(), ", ", '.');
             if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), ", ", '.');
-            if (saveOverview) overview_image.save_csv(fileNameOverview.toStdString(), ", ", '.');
+            if (saveOverview) {
+                overview_image.save_csv(fileNameOverview.toStdString(), ", ", '.');
+                if (m->getImageFromRunsChannels()>1) overview_image2.save_csv(fileNameOverview2.toStdString(), ", ", '.');
+            }
         } else if (selFilter==filters[1]) {
             if (saveParam) image.save_csv(fileNameParam.toStdString(), "; ", ',');
             if (saveGof) gof_image.save_csv(fileNameGof.toStdString(), "; ", ',');
             if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), "; ", ',');
-            if (saveOverview) overview_image.save_csv(fileNameOverview.toStdString(), "; ", ',');
+            if (saveOverview) {
+                overview_image.save_csv(fileNameOverview.toStdString(), "; ", ',');
+                if (m->getImageFromRunsChannels()>1) overview_image2.save_csv(fileNameOverview2.toStdString(), "; ", ',');
+            }
         } else if (selFilter==filters[7]) {
             if (saveParam) image.save_csv(fileNameParam.toStdString(), "\t", '.');
             if (saveGof) gof_image.save_csv(fileNameGof.toStdString(), "\t", '.');
             if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), "\t", '.');
-            if (saveOverview) overview_image.save_csv(fileNameOverview.toStdString(), "\t", '.');
+            if (saveOverview) {
+                overview_image.save_csv(fileNameOverview.toStdString(), "\t", '.');
+                if (m->getImageFromRunsChannels()>1) overview_image2.save_csv(fileNameOverview2.toStdString(), "\t", '.');
+            }
         } else if (selFilter==filters[8]) {
             if (saveParam) image.save_csv(fileNameParam.toStdString(), "; ", '.');
             if (saveGof) gof_image.save_csv(fileNameGof.toStdString(), "; ", '.');
             if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), "; ", '.');
-            if (saveOverview) overview_image.save_csv(fileNameOverview.toStdString(), "; ", '.');
+            if (saveOverview) {
+                overview_image.save_csv(fileNameOverview.toStdString(), "; ", '.');
+                if (m->getImageFromRunsChannels()>1) overview_image2.save_csv(fileNameOverview2.toStdString(), "; ", '.');
+            }
         } else if (selFilter==filters[2]) {
             if (saveParam)  image.save_sylk(fileNameParam.toStdString());
             if (saveGof) gof_image.save_sylk(fileNameGof.toStdString());
             if (saveMask) mask_image.save_sylk(fileNameMask.toStdString());
-            if (saveOverview) overview_image.save_sylk(fileNameOverview.toStdString());
+            if (saveOverview) {
+                overview_image.save_sylk(fileNameOverview.toStdString());
+                if (m->getImageFromRunsChannels()>1) overview_image2.save_sylk(fileNameOverview2.toStdString());
+            }
         } else if (selFilter==filters[3]) {
             if (saveParam) image.save_tifffloat(fileNameParam.toStdString());
             if (saveGof) gof_image.save_tifffloat(fileNameGof.toStdString());
             if (saveMask) mask_image.save_tifffloat(fileNameMask.toStdString());
-            if (saveOverview) overview_image.save_tifffloat(fileNameOverview.toStdString());
+            if (saveOverview) {
+                overview_image.save_tifffloat(fileNameOverview.toStdString());
+                if (m->getImageFromRunsChannels()>1) overview_image2.save_tifffloat(fileNameOverview2.toStdString());
+            }
         } else if (selFilter==filters[4]) {
             if (saveParam) image.save_tiffuint16(fileNameParam.toStdString());
             if (saveGof) gof_image.save_tiffuint16(fileNameGof.toStdString());
             if (saveMask) mask_image.save_tiffuint16(fileNameMask.toStdString());
-            if (saveOverview) overview_image.save_tiffuint16(fileNameOverview.toStdString());
+            if (saveOverview) {
+                overview_image.save_tiffuint16(fileNameOverview.toStdString());
+                if (m->getImageFromRunsChannels()>1) overview_image2.save_tiffuint16(fileNameOverview2.toStdString());
+            }
         } else if (selFilter==filters[6]) {
             if (saveMatlab) {
                 QString data="";
@@ -4610,6 +4677,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
                 data.append(gof_image.to_matlab("goodnesOfFit").c_str());
                 data.append(mask_image.to_matlab("mask").c_str());
                 data.append(overview_image.to_matlab("overview").c_str());
+                if (m->getImageFromRunsChannels()>1) data.append(overview_image2.to_matlab("overview2").c_str());
                 QFile file(fileNameMatlab);
                 if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                     QTextStream out(&file);
@@ -4621,7 +4689,10 @@ void QFRDRImagingFCSImageEditor::saveData() {
             if (saveParam) plteImage->drawImage().save(fileNameParam, "PNG");
             if (saveGof) plteGofImage->drawImage().save(fileNameGof, "PNG");
             if (saveMask) plteMask->drawImage().save(fileNameMask, "PNG");
-            if (saveOverview) plteOverview->drawImage().save(fileNameOverview, "PNG");
+            if (saveOverview) {
+                if (plteOverview->get_visible()) plteOverview->drawImage().save(fileNameOverview, "PNG");
+                else if (plteOverviewRGB->get_visible()) plteOverviewRGB->drawImage().save(fileNameOverview, "PNG");
+            }
         }
 
 
@@ -4973,30 +5044,34 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
 
 void QFRDRImagingFCSImageEditor::moveColorbarsAuto() {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    bool rightVIsible=false;
+    bool rightVisible=false;
     if (m && m->getImageFromRunsHeight() < m->getImageFromRunsWidth()) { // wider than high, i.e. "landscape"
-        rightVIsible=!rightVIsible;
+        rightVisible=!rightVisible;
     }
     if ((double)pltImage->width()<=(double)pltImage->height()) {
-        plteImage->set_colorBarRightVisible(rightVIsible);
-        plteImage->set_colorBarTopVisible(!rightVIsible);
+        plteImage->set_colorBarRightVisible(rightVisible);
+        plteImage->set_colorBarTopVisible(!rightVisible);
     } else {
-        plteImage->set_colorBarRightVisible(!rightVIsible);
-        plteImage->set_colorBarTopVisible(rightVIsible);
+        plteImage->set_colorBarRightVisible(!rightVisible);
+        plteImage->set_colorBarTopVisible(rightVisible);
     }
     if ((double)pltGofImage->width()<=(double)pltGofImage->height()) {
-        plteGofImage->set_colorBarRightVisible(rightVIsible);
-        plteGofImage->set_colorBarTopVisible(!rightVIsible);
+        plteGofImage->set_colorBarRightVisible(rightVisible);
+        plteGofImage->set_colorBarTopVisible(!rightVisible);
     } else {
-        plteGofImage->set_colorBarRightVisible(!rightVIsible);
-        plteGofImage->set_colorBarTopVisible(rightVIsible);
+        plteGofImage->set_colorBarRightVisible(!rightVisible);
+        plteGofImage->set_colorBarTopVisible(rightVisible);
     }
     if ((double)pltOverview->width()<=(double)pltOverview->height()) {
-        plteOverview->set_colorBarRightVisible(rightVIsible);
-        plteOverview->set_colorBarTopVisible(!rightVIsible);
+        plteOverview->set_colorBarRightVisible(rightVisible);
+        plteOverview->set_colorBarTopVisible(!rightVisible);
+        plteOverviewRGB->set_colorBarRightVisible(rightVisible);
+        plteOverviewRGB->set_colorBarTopVisible(!rightVisible);
     } else {
-        plteOverview->set_colorBarRightVisible(!rightVIsible);
-        plteOverview->set_colorBarTopVisible(rightVIsible);
+        plteOverview->set_colorBarRightVisible(!rightVisible);
+        plteOverview->set_colorBarTopVisible(rightVisible);
+        plteOverviewRGB->set_colorBarRightVisible(!rightVisible);
+        plteOverviewRGB->set_colorBarTopVisible(rightVisible);
     }
 }
 

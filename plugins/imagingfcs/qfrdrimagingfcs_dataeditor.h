@@ -109,6 +109,9 @@ class QFRDRImagingFCSDataEditor : public QFRawDataEditor {
         JKQTFastPlotter* pltOverview;
         /** \brief plot for the overview image in pltOverview */
         JKQTFPimagePlot* plteOverview;
+        /** \brief plot for the 2-channel overview image in pltOverview */
+        JKQTFPRGBImageOverlayPlot* plteOverviewRGB;
+
         /** \brief plot for the selected runs in pltOverview, plot plteOverviewSelectedData */
         JKQTFPimageOverlayPlot* plteOverviewSelected;
         /** \brief plot for the excluded runs in pltOverview, plot plteOverviewSelectedData */

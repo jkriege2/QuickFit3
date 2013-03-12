@@ -73,8 +73,8 @@ bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const
         }
         QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);
         if (scrintf && value==0) {
-            value=scrintf->getSimpleCountrateAverage(run)*1000.0;
-            error=scrintf->getSimpleCountrateVariance(run)*1000.0;
+            value=scrintf->getSimpleCountrateAverage(run,0)*1000.0;
+            error=scrintf->getSimpleCountrateVariance(run,0)*1000.0;
             return true;
         }
 
@@ -88,6 +88,12 @@ bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const
             //qDebug()<<"getRateMean(run="<<run<<", ch=0) = "<<value<<" +/- "<<error;
             return true;
         }
+        QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);
+        if (scrintf && value==0) {
+            value=scrintf->getSimpleCountrateAverage(run,0)*1000.0;
+            error=scrintf->getSimpleCountrateVariance(run,0)*1000.0;
+            return true;
+        }
     } else if (paramid=="count_rate2") {
         QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
         value=0;
@@ -98,6 +104,13 @@ bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const
             //qDebug()<<"getRateMean(run="<<run<<", ch=1) = "<<value<<" +/- "<<error;
             return true;
         }
+        QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);
+        if (scrintf && value==0 && scrintf->getSimpleCountrateChannels()>1) {
+            value=scrintf->getSimpleCountrateAverage(run,1)*1000.0;
+            error=scrintf->getSimpleCountrateVariance(run,1)*1000.0;
+            return true;
+        }
+
     } else if (paramid=="pixel_width") {
         if (!r) return false;
         double bin=r->getProperty("BINNING", 1.0).toDouble();

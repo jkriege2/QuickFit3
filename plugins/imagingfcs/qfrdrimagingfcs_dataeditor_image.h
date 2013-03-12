@@ -293,6 +293,7 @@ protected:
         QFPlotter* pltOverview;
         /** \brief plot for the overview image in pltOverview */
         JKQTPMathImage* plteOverview;
+        JKQTPRGBMathImage* plteOverviewRGB;
         /** \brief plot for the selected runs in pltOverview, plot plteOverviewSelectedData */
         JKQTPOverlayImageEnhanced* plteOverviewSelected;
         /** \brief plot for the excluded runs in pltOverview, plot plteOverviewSelectedData */

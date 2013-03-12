@@ -362,6 +362,8 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual int getImageFromRunsWidth() const;
         /** \copydoc QFRDRImageToRunInterface::getImageFromRunsHeight() */
         virtual int getImageFromRunsHeight() const;
+        /** \copydoc QFRDRImageToRunInterface::getImageFromRunsChannels() */
+        virtual int getImageFromRunsChannels() const;
         /** \copydoc QFRDRImageToRunInterface::xyToRun() */
         virtual int xyToRun(int x, int y) const;
         /** \copydoc QFRDRImageToRunInterface::runToX() */
@@ -371,7 +373,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \copydoc QFRDRImageToRunInterface::xyToIndex() */
         virtual int xyToIndex(int x, int y) const;
         /** \copydoc QFRDRImageToRunInterface::getImageFromRunsPreview() */
-        virtual double* getImageFromRunsPreview() const;
+        virtual double* getImageFromRunsPreview(int channel=0) const;
 
         /** \brief returns true, if a given run/pixel is inside the second DualView channel */
         bool indexIsDualView2(int32_t sel);
@@ -437,9 +439,11 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual QString getImageStackTimepointName(int stack, int t) const;
 
         /** \copydoc QFRDRCountRatesInterface::getSimpleCountrateAverage() */
-        virtual double getSimpleCountrateAverage(int run=-1) const ;
+        virtual double getSimpleCountrateAverage(int run=-1, int channel=0) const ;
         /** \copydoc QFRDRCountRatesInterface::getSimpleCountrateVariance() */
-        virtual double getSimpleCountrateVariance(int run=-1) const ;
+        virtual double getSimpleCountrateVariance(int run=-1, int channel=0) const ;
+        /** \copydoc QFRDRCountRatesInterface::getSimpleCountrateChannels() */
+        virtual int getSimpleCountrateChannels() const ;
 
 };
 

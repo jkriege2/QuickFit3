@@ -83,6 +83,12 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
             //qDebug()<<"getRateMean(run="<<run<<", ch=0) = "<<value<<" +/- "<<error;
             return true;
         }
+        QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);
+        if (scrintf && value==0) {
+            value=scrintf->getSimpleCountrateAverage(index)*1000.0;
+            error=scrintf->getSimpleCountrateVariance(index)*1000.0;
+            return true;
+        }
     } else if (paramid=="count_rate2") {
         QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
         value=0;
@@ -91,6 +97,12 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
             error=crintf->getRateStdDev(index, 1)*1000.0;
             value=crintf->getRateMean(index, 1)*1000.0;
             //qDebug()<<"getRateMean(run="<<run<<", ch=1) = "<<value<<" +/- "<<error;
+            return true;
+        }
+        QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);
+        if (scrintf && value==0 && scrintf->getSimpleCountrateChannels()>1) {
+            value=scrintf->getSimpleCountrateAverage(index,1)*1000.0;
+            error=scrintf->getSimpleCountrateVariance(index,1)*1000.0;
             return true;
         }
     } else if (paramid=="pixel_width") {

@@ -16,6 +16,8 @@ class QFRDRImageToRunInterface {
         virtual int getImageFromRunsWidth() const=0;
         /** \brief return height of the image */
         virtual int getImageFromRunsHeight() const=0;
+        /** \brief return the number of color channels */
+        virtual int getImageFromRunsChannels() const=0;
 
         /*! \brief return a pointer to a uint16_t image of size getDataImageWidth() * getDataImageHeight()
 
@@ -24,7 +26,7 @@ class QFRDRImageToRunInterface {
 
             \return  a uint16_t image of size getDataImageWidth() * getDataImageHeight(), or NULL if no image is available
          */
-        virtual double* getImageFromRunsPreview() const=0;
+        virtual double* getImageFromRunsPreview(int channel=0) const=0;
         /** \brief convert a pixel coordinate to a run index */
         virtual int xyToRun(int x, int y) const=0;
         /** \brief convert a run to a pixel x-coordinate */

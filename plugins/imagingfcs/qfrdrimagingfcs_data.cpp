@@ -361,7 +361,8 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     QFRDRImagingFCSData::ovrImageData img;
                     img.id=ft;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
-                    img.name=tr("overview before acquisition");
+                    //img.name=tr("overview before acquisition");
+                    img.name=tr("overview #%1 before: %2").arg(i+1).arg(files_desciptions.value(i, QFileInfo(files[i]).fileName()));
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
                         QFRDROverviewImageInterface::OverviewImageGeoElement rect;
                         rect.title=tr("ROI");
@@ -377,7 +378,8 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     QFRDRImagingFCSData::ovrImageData img;
                     img.id=ft;
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
-                    img.name=tr("overview after acquisition");
+                    //img.name=tr("overview after acquisition");
+                    img.name=tr("overview #%1 after: %2").arg(i+1).arg(files_desciptions.value(i, QFileInfo(files[i]).fileName()));
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
                         QFRDROverviewImageInterface::OverviewImageGeoElement rect;
                         rect.title=tr("ROI");
@@ -1574,6 +1576,11 @@ int QFRDRImagingFCSData::getImageFromRunsHeight() const {
     return height;
 }
 
+int QFRDRImagingFCSData::getImageFromRunsChannels() const
+{
+    return 1;
+}
+
 int QFRDRImagingFCSData::xyToRun(int x, int y) const {
     return y*width+x;
 }
@@ -1590,7 +1597,7 @@ int QFRDRImagingFCSData::xyToIndex(int x, int y) const {
     return (y*width+x)*N;
 }
 
-double* QFRDRImagingFCSData::getImageFromRunsPreview() const {
+double* QFRDRImagingFCSData::getImageFromRunsPreview(int channel) const {
     return overviewF;
 }
 
@@ -1769,7 +1776,7 @@ QString QFRDRImagingFCSData::getImageStackTimepointName(int stack, int t) const 
     return QString("%1%2").arg(getImageStackTUnitFactor(stack)*t).arg(getImageStackTUnitName(stack));
 }
 
-double QFRDRImagingFCSData::getSimpleCountrateAverage(int run) const {
+double QFRDRImagingFCSData::getSimpleCountrateAverage(int run, int channel) const {
     if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF) {
         if (run>=0) return overviewF[run]/getTauMin()/1000.0;
     }
@@ -1778,13 +1785,18 @@ double QFRDRImagingFCSData::getSimpleCountrateAverage(int run) const {
     return 0;
 }
 
-double QFRDRImagingFCSData::getSimpleCountrateVariance(int run) const {
+double QFRDRImagingFCSData::getSimpleCountrateVariance(int run, int channel) const {
     if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewFSTD) {
         if (run>=0 && run<width*height) return overviewFSTD[run]/getTauMin()/1000.0;
     }
     if (run==-2) return sqrt(backStatSigmaCnt)/getTauMin()/1000.0;
     if (hasStatistics) return sqrt(statSigmaCnt)/getTauMin()/1000.0;
     return 0;
+}
+
+int QFRDRImagingFCSData::getSimpleCountrateChannels() const
+{
+    return getImageFromRunsChannels();
 }
 
 
