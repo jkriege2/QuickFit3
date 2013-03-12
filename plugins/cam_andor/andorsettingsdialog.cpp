@@ -184,9 +184,10 @@ void AndorSettingsDialog::readSettings(QSettings& settings) {
     ui->chkFrameTransfer->setChecked(settings.value(prefix+"frame_transfer", true).toBool());
     ui->chkBaselineClamp->setChecked(settings.value(prefix+"baseline_clamp", true).toBool());
     ui->spinBaselineOffset->setValue(settings.value(prefix+"baseline_offset", 0).toInt());
+    ui->chkEnableExtendedEMGAIN->setChecked(settings.value(prefix+"advanced_emgain", false).toBool());
+    on_chkEnableExtendedEMGAIN_toggled(ui->chkEnableExtendedEMGAIN->isChecked());
     ui->spinEMGain->setValue(settings.value(prefix+"emgain", 1).toInt());
     ui->chkEMGain->setChecked(settings.value(prefix+"emgain_enabled", true).toBool());
-    ui->chkEnableExtendedEMGAIN->setChecked(settings.value(prefix+"advanced_emgain", false).toBool());
     ui->cmbPreampGain->setCurrentIndex(settings.value(prefix+"preamp_gain", 0).toInt());
     ui->cmbVerticalShiftSpeed->setCurrentIndex(settings.value(prefix+"vertical_shift_speed", 0).toInt());
     ui->cmbVerticalShiftAmplitude->setCurrentIndex(settings.value(prefix+"vertical_shift_amplitude", 0).toInt());
