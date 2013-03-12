@@ -11,7 +11,7 @@
     <x>0</x>
     <y>0</y>
     <width>880</width>
-    <height>792</height>
+    <height>811</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -998,7 +998,7 @@ p, li { white-space: pre-wrap; }
       <attribute name="title">
        <string>&amp;Extended Setup</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_5" rowstretch="0,1" columnstretch="0,1">
+      <layout class="QGridLayout" name="gridLayout_5" rowstretch="0,0,1" columnstretch="0,1">
        <item row="0" column="0">
         <widget class="QGroupBox" name="groupBox_4">
          <property name="title">
@@ -1073,7 +1073,7 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="2" column="0">
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1098,6 +1098,22 @@ p, li { white-space: pre-wrap; }
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="groupBox_5">
+         <property name="title">
+          <string> Extended EM-Gain </string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QCheckBox" name="chkEnableExtendedEMGAIN">
+            <property name="text">
+             <string>enable extended EM-Gain</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </item>
       </layout>
      </widget>

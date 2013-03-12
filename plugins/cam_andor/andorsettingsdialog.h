@@ -121,6 +121,7 @@ private slots:
     void on_spinExposure_valueChanged(double value);
     void on_spinKineticCycleTime_valueChanged(double value);
     void on_spinAccCycleTime_valueChanged(double value);
+    void on_chkEnableExtendedEMGAIN_toggled(bool value);
 
     void updateDuration();
 

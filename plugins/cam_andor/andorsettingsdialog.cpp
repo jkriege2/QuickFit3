@@ -87,6 +87,7 @@ void AndorSettingsDialog::setupWidgets() {
 
     int i1, i2;
     float f1;
+    SetEMAdvanced((ui->chkEnableExtendedEMGAIN->isChecked())?1:0);
     GetEMGainRange(&i1, &i2);
     ui->spinEMGain->setRange(i1, i2);
 
@@ -185,6 +186,7 @@ void AndorSettingsDialog::readSettings(QSettings& settings) {
     ui->spinBaselineOffset->setValue(settings.value(prefix+"baseline_offset", 0).toInt());
     ui->spinEMGain->setValue(settings.value(prefix+"emgain", 1).toInt());
     ui->chkEMGain->setChecked(settings.value(prefix+"emgain_enabled", true).toBool());
+    ui->chkEnableExtendedEMGAIN->setChecked(settings.value(prefix+"advanced_emgain", false).toBool());
     ui->cmbPreampGain->setCurrentIndex(settings.value(prefix+"preamp_gain", 0).toInt());
     ui->cmbVerticalShiftSpeed->setCurrentIndex(settings.value(prefix+"vertical_shift_speed", 0).toInt());
     ui->cmbVerticalShiftAmplitude->setCurrentIndex(settings.value(prefix+"vertical_shift_amplitude", 0).toInt());
@@ -234,7 +236,7 @@ void AndorSettingsDialog::writeSettings(QSettings& settings) const {
     settings.setValue(prefix+"frame_transfer", ui->chkFrameTransfer->isChecked());
     settings.setValue(prefix+"baseline_clamp", ui->chkBaselineClamp->isChecked());
     settings.setValue(prefix+"baseline_offset", ui->spinBaselineOffset->value());
-    settings.setValue(prefix+"advanced_emgain", false); // no advanced EM gain
+    settings.setValue(prefix+"advanced_emgain", ui->chkEnableExtendedEMGAIN->isChecked()); // no advanced EM gain
     settings.setValue(prefix+"emgain", ui->spinEMGain->value());
     settings.setValue(prefix+"emgain_enabled", ui->chkEMGain->isChecked());
     //qDebug()<<"SettingsDialog: EMGAIN_en="<<ui->chkEMGain->isChecked()<<"   from settings="<<settings.value(prefix+"emgain_enabled", "not there").toString();
@@ -672,6 +674,14 @@ void AndorSettingsDialog::on_spinAccCycleTime_valueChanged(double value) {
     calcTiming();
 }
 
+void AndorSettingsDialog::on_chkEnableExtendedEMGAIN_toggled(bool value)
+{
+    int i1, i2;
+    SetEMAdvanced((ui->chkEnableExtendedEMGAIN->isChecked())?1:0);
+    GetEMGainRange(&i1, &i2);
+    ui->spinEMGain->setRange(i1, i2);
+}
+
 void AndorSettingsDialog::updateDuration()
 {
     ui->labDuration->setText(QString("%1 s").arg(double(ui->spinKineticCycles->value())*ui->spinKineticCycleTime->value()/1000.0));
@@ -684,3 +694,4 @@ void AndorSettingsDialog::on_chkBaselineClamp_toggled(bool value) {
 void AndorSettingsDialog::on_chkEMGain_toggled(bool value) {
     ui->spinEMGain->setEnabled(value);
 }
+
