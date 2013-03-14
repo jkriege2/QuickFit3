@@ -12,6 +12,8 @@ class QFRDRImageMaskTools : public QFRDRImageMaskInterface {
         virtual void maskLoadFromString(const QString &maskstring);
         virtual void maskSave(const QString& filename) const ;
         virtual QString maskToString() const;
+        virtual QString maskToIndexString(QChar separator=QChar(',')) const;
+        virtual void maskLoadFromIndexString(const QString& data, QChar separator=QChar(','));
         virtual void maskClear();
         virtual void maskSetAll();
         virtual void maskSet(uint16_t x, uint16_t y);
@@ -23,6 +25,8 @@ class QFRDRImageMaskTools : public QFRDRImageMaskInterface {
         virtual uint16_t maskGetWidth() const;
         virtual uint16_t maskGetHeight() const;
         virtual long maskGetCount() const;
+        virtual void maskSetIdx(uint16_t idx, bool value=true);
+        virtual bool maskGetIdx(uint16_t idx) const;
     protected:
         virtual void maskInit(uint16_t w, uint16_t h);
         virtual void maskDelete();

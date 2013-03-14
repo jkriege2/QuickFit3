@@ -68,6 +68,9 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         void nameChanged(const QString& text);
         /** \brief called when the folder editor changes its contents */
         void folderChanged(const QString& text);
+        /** \brief called when the role editor changes its contents */
+        void roleChanged(const QString& text);
+
         /** \brief called when the description editor changes its contents */
         void descriptionChanged();
         /** \brief this will be connected to the project to indicate when  the currently
@@ -149,6 +152,8 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         QLineEdit* edtName;
         /** \brief QLineEdit for the folder */
         QLineEdit* edtFolder;
+        /** \brief combobox for roles */
+        QComboBox* cmbRole;
         /** \brief QPlainTextEdit for the description */
         QPlainTextEdit* pteDescription;
         /** \brief list of files associated with this rawdatarecord */

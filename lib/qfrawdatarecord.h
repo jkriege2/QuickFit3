@@ -81,6 +81,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         inline int getID() const { return ID; }
         /** \brief return the name */
         inline QString getName() const { return name; }
+        /** \brief return the role */
+        inline QString getRole() const { return role; }
         /** \brief return the description  */
         inline QString getDescription() const { return description; }
         /** \brief return the list of linked files */
@@ -183,6 +185,9 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void setName(const QString& n);
         /** \brief set the folder */
         void setFolder(const QString& n);
+        /** \brief set the RDRs role */
+        void setRole(const QString& n);
+
         /** \brief set the description  */
         void setDescription(const QString& d);
         /** \brief returns a model which may be used to access and edit the properties in this object  */
@@ -232,6 +237,11 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void enableEmitPropertiesChanged(bool emitnow=true);
         /** \brief returns whether resultsChanged() signals are currently to be emitted */
         bool isEmitPropertiesChangedEnabled() const;
+
+        /** \brief returns a list of the allowed RDR roles, default: an emplty list */
+        virtual QStringList getAvailableRoles() const;
+        /** \brief if this returns \c true, the user may change the RDRs role in the QFRawDataPropertyEditor, default: \c false */
+        virtual bool isRoleUserEditable() const;
     protected:
         /** \copybrief QFProperties::setPropertiesError() */
         virtual void setPropertiesError(const QString& message) { setError(message); }
@@ -248,6 +258,14 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         QString description;
         /** \brief folder for grouing in prject tree */
         QString folder;
+        /*! \brief the role of the current record (basically a string that may be interpreted any way
+                   by a QFRawDataRecord implementation to distinguish betwen different applications of
+                   the same RDR, e.g. an FCS-record may contain autocorrelations or crosscorrelations
+
+            The role string is not free, each class may implement getAvailableRoles() which returns a list of the allowed roles.
+            Implementing areRolesUserChangeable() to return \c true will allow the user to change a files role in the QFRawDataPropertyEditor
+        */
+        QString role;
         /** \brief list of files connected with this record */
         QStringList files;
         /** \brief list of the types of the files connected with this record (see files) */

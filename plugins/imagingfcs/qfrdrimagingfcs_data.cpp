@@ -21,6 +21,7 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     QFRawDataRecord(parent)
 {
     //m_dualview=QFRDRImagingFCSData::dvNone;
+    role="correlation";
     correlations=NULL;
     correlationMean=NULL;
     correlationStdDev=NULL;
@@ -29,27 +30,50 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     N=0;
     width=0;
     height=0;
+    widthOvr=0;
+    heightOvr=0;
     overviewF=NULL;
     overviewFSTD=NULL;
-    leaveout=NULL;
-    statAvg=NULL;
-    statStdDev=NULL;
-    statMin=NULL;
-    statMax=NULL;
-    statT=NULL;
-    statN=0;
-    backStatAvg=NULL;
-    backStatStdDev=NULL;
-    backStatMin=NULL;
-    backStatMax=NULL;
-    backStatT=NULL;
-    backStatN=0;
-    ucStatAvg=NULL;
-    ucStatStdDev=NULL;
-    ucStatMin=NULL;
-    ucStatMax=NULL;
-    ucStatT=NULL;
-    ucStatN=0;
+    overviewF2=NULL;
+    overviewF2STD=NULL;
+    stat.Avg=NULL;
+    stat.StdDev=NULL;
+    stat.Min=NULL;
+    stat.Max=NULL;
+    stat.T=NULL;
+    stat.N=0;
+    backStat.Avg=NULL;
+    backStat.StdDev=NULL;
+    backStat.Min=NULL;
+    backStat.Max=NULL;
+    backStat.T=NULL;
+    backStat.N=0;
+    ucStat.Avg=NULL;
+    ucStat.StdDev=NULL;
+    ucStat.Min=NULL;
+    ucStat.Max=NULL;
+    ucStat.T=NULL;
+    ucStat.N=0;
+
+    stat2.Avg=NULL;
+    stat2.StdDev=NULL;
+    stat2.Min=NULL;
+    stat2.Max=NULL;
+    stat2.T=NULL;
+    stat2.N=0;
+    backStat2.Avg=NULL;
+    backStat2.StdDev=NULL;
+    backStat2.Min=NULL;
+    backStat2.Max=NULL;
+    backStat2.T=NULL;
+    backStat2.N=0;
+    ucStat2.Avg=NULL;
+    ucStat2.StdDev=NULL;
+    ucStat2.Min=NULL;
+    ucStat2.Max=NULL;
+    ucStat2.T=NULL;
+    ucStat2.N=0;
+
     video=NULL;
     video_width=0;
     video_height=0;
@@ -59,18 +83,27 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     videoUncorrected_width=0;
     videoUncorrected_height=0;
     videoUncorrected_frames=0;
-    statAvgCnt=0;
-    statSigmaCnt=0;
-    backStatAvgCnt=0;
-    backStatSigmaCnt=0;
+    stat.avgCnt=0;
+    stat.sigmaCnt=0;
+    stat2.avgCnt=0;
+    stat2.sigmaCnt=0;
+    backStat.avgCnt=0;
+    backStat.sigmaCnt=0;
+    backStat2.avgCnt=0;
+    backStat2.sigmaCnt=0;
     setResultsInitSize(1000);
     setEvaluationIDMetadataInitSize(1000);
 }
 
 QFRDRImagingFCSData::~QFRDRImagingFCSData() {
      allocateContents(0,0,0);
-     allocateStatistics(0);
-     allocateBackgroundStatistics(0);
+     allocateOverviews(0,0);
+     allocateStatistics(stat, 0);
+     allocateStatistics(stat2, 0);
+     allocateStatistics(ucStat, 0);
+     allocateStatistics(ucStat2, 0);
+     allocateStatistics(backStat, 0);
+     allocateStatistics(backStat2, 0);
      clearOvrImages();
      clearSelections();
      if (video) free(video);
@@ -92,7 +125,7 @@ QString QFRDRImagingFCSData::getEditorName(int i) {
     if (i==2) return tr("Countrate/Intensity Trace");
     if (i==3) return tr("Images, Videos & Timetrace");
     return QString("");
-};
+}
 
 QFRawDataEditor* QFRDRImagingFCSData::createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i, QWidget* parent) {
     if (i==0) return new QFRDRImagingFCSImageEditor(services, propEditor, parent);
@@ -100,13 +133,13 @@ QFRawDataEditor* QFRDRImagingFCSData::createEditor(QFPluginServices* services,  
     if (i==2) return new QFRDRImagingFCSDataEditorCountrate(services, propEditor, parent);
     if (i==3) return new QFRDRImagingFCSOverviewRateEditor(services, propEditor, parent);
     return NULL;
-};
+}
 
 
 QStringList QFRDRImagingFCSData::getExportFiletypes() {
     QStringList sl;
     return sl;
-};
+}
 
 QString QFRDRImagingFCSData::getExportDialogTitle() {
     return tr("");
@@ -159,7 +192,7 @@ void QFRDRImagingFCSData::setSegmentUsed(int segment, bool used)
 
     setQFProperty("SEGMENTS_EXCLUDED", segs.join(";"));
 
-    //qDebug()<<"setSegmentUsed("<<segment<<", "<<used<<"):   "<<segs.join(";");
+    //qDebug()<<getID()<<"setSegmentUsed("<<segment<<", "<<used<<"):   "<<segs.join(";");
 }
 
 void QFRDRImagingFCSData::recalcSegmentedAverages()
@@ -167,6 +200,7 @@ void QFRDRImagingFCSData::recalcSegmentedAverages()
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     log_text(tr("recalculating segmented CF averages ... \n"));
     QString filetype=getProperty("FILETYPE", "unknown").toString();
+    bool loaded=false;
     for (int i=0; i<files.size(); i++) {
         if (i<files_types.size()) {
             QString ft=files_types[i].toLower().trimmed();
@@ -174,9 +208,14 @@ void QFRDRImagingFCSData::recalcSegmentedAverages()
                 if (filetype.toUpper()=="VIDEO_CORRELATOR_BIN") {
                     log_text(tr("   reloading %2 file: %1\n").arg(QFileInfo(files[i]).fileName()).arg(ft));
                     loadVideoCorrelatorFileBin(files[i]);
+                    loaded=true;
                 }
             }
         }
+    }
+
+    if (loaded && internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+        splitCFsForDualView();
     }
 
     recalcCorrelations();
@@ -194,29 +233,12 @@ void QFRDRImagingFCSData::exportData(const QString& format, const QString& filen
 
 void QFRDRImagingFCSData::intWriteData(QXmlStreamWriter& w) {
 	// write data to the project XML file using the QXmlStreamWriter
-    /*if (leaveout.size()>0) {
-        QString l="";
-        for (int i=0; i<leaveout.size(); i++) {
-            if (!l.isEmpty()) l=l+",";
-            l=l+QString::number(leaveout[i]);
-        }
+    QString l=maskToIndexString(',');
+
+    if (l.size()>0) {
         w.writeStartElement("leaveout");
         w.writeAttribute("list", l);
         w.writeEndElement();
-    }*/
-    if (leaveout) {
-        QString l="";
-        for (int i=0; i<width*height; i++) {
-            if (leaveout[i]!=0) {
-                if (!l.isEmpty()) l=l+",";
-                l=l+QString::number(i);
-            }
-        }
-        if (l.size()>0) {
-            w.writeStartElement("leaveout");
-            w.writeAttribute("list", l);
-            w.writeEndElement();
-        }
     }
     if (selections.size()>0) {
         w.writeStartElement("selections");
@@ -247,15 +269,8 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
 
 
 
-    width=getProperty("WIDTH", 0).toInt();
-    height=getProperty("HEIGHT", 0).toInt();
-    QString dv=getProperty("DUALVIEW_MODE", "none").toString().toLower();
-    /*
-    m_dualview=QFRDRImagingFCSData::dvNone;
-    if (dv=="none" || dv=="0" || dv=="n") m_dualview=QFRDRImagingFCSData::dvNone;
-    if (dv=="horizontal" || dv=="1" || dv=="h" || dv=="horicontal") m_dualview=QFRDRImagingFCSData::dvHorizontal;
-    if (dv=="vertical" || dv=="2" || dv=="v" || dv=="vertikal") m_dualview=QFRDRImagingFCSData::dvVertical;
-*/
+    width=getExpectedFileWidth();//getProperty("FULL_DV_WIDTH", getProperty("WIDTH", 0).toInt()).toInt();
+    height=getExpectedFileHeight();//getProperty("FULL_DV_HEIGHT", getProperty("HEIGHT", 0).toInt()).toInt();
 
     QString filetype=getProperty("FILETYPE", "unknown").toString();
 
@@ -270,15 +285,15 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
     if (files.size()>0) {
         // now we check whether the experiment config file contains additional files, that may be useful for this object and load them
         // (more overview images ...)
-        //qDebug()<<"opening qcquisition settings "<<acquisitionSettingsFile;
+        //qDebug()<<getID()<<"opening qcquisition settings "<<acquisitionSettingsFile;
         if (QFile::exists(acquisitionSettingsFile)) {
             QSettings settings(acquisitionSettingsFile, QSettings::IniFormat);
-            //qDebug()<<"  ... success!!!";
+            //qDebug()<<getID()<<"  ... success!!!";
             loadQFPropertiesFromB040SPIMSettingsFile(settings);
 
             QStringList lfiles, lfiles_types, lfiles_descriptions;
             appendCategorizedFilesFromB040SPIMConfig(settings, lfiles, lfiles_types, lfiles_descriptions);
-            //qDebug()<<lfiles<<"\n"<<lfiles_types;
+            //qDebug()<<getID()<<lfiles<<"\n"<<lfiles_types;
             for (int i=0; i<lfiles.size(); i++) {
                 // now we have to do a really thorough check of all files in files, as the file pathes may be a bit
                 // different although they point to the same file.
@@ -300,24 +315,68 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
             }
         }
 
-        // finally we load all known and useful associated files into memory:
+        // first we load the correlation curves:
+        // so far we do not care about the internal dualView mode. For now all data is loaded and it will be split/discarded afterwards.
+        QString loadRH2Overview="";
+        for (int i=0; i<files.size(); i++) {
+            if (i<files_types.size()) {
+                QString ft=files_types[i].toLower().trimmed();
+                if (ft=="acf" || ft=="ccf" || ft=="dccf") {
+                    if (!dataLoaded) {
+                        if (filetype.toUpper()=="VIDEO_CORRELATOR_BIN") {
+                            loadVideoCorrelatorFileBin(files[i]);
+                            dataLoaded=true;
+                            qDebug()<<getID()<<"loaded vidcorbin "<<width<<"x"<<height<<" x "<<N;
+                        } else if (filetype.toUpper()=="VIDEO_CORRELATOR") {
+                            loadVideoCorrelatorFile(files[i]);
+                            dataLoaded=true;
+                            qDebug()<<getID()<<"loaded vidcorn "<<width<<"x"<<height<<" x "<<N;
+                        } else if (filetype.toUpper()=="RADHARD2") {
+                            loadRadhard2File(files[i], false);
+                            loadRH2Overview=files[i];
+                            dataLoaded=true;
+                        } else {
+                          setError(tr("filetype '%1' is unknown for Imaging FCS data files (file is '%2')").arg(filetype).arg(files[i]));
+                          break;
+                        }
+                    } else {
+                        setError(tr("correlation data has already been loaded for Imaging FCS (filetype: %2, this data file is '%1')").arg(files[i]).arg(ft));
+                        break;
+                    }
+                }
+            }
+        }
+        // if in internal dualview mode, we have now loaded the full size data
+        // and have to split it and resize the internal datastructures
+        // Note: afterwards width/height will be changed!
+        if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+            splitCFsForDualView();
+            qDebug()<<getID()<<"split "<<width<<"x"<<height<<" x "<<N;
+        }
+
+        if (!dataLoaded) {
+            setError(tr("did not find a correlation data file (acf, ccf, dccf, ...) for record"));
+            return;
+        }
+
+        // now we know the final size of the data:
+        allocateOverviews(width, height);
+
+        if (!loadRH2Overview.isEmpty()) {
+            loadRadhard2File(loadRH2Overview, true);
+        }
+
+
+        // finally we load all other known and useful associated files into memory:
+        // NOTE At this point width and height are determined and may no longer be changed!!!
         hasStatistics=false;
         for (int i=0; i<files.size(); i++) {
             if (i<files_types.size()) {
                 QString ft=files_types[i].toLower().trimmed();
                 if (ft=="overview") {
-                    loadOverview(files[i]);
+                    loadOverview(overviewF, overviewF2, files[i]);
                 } else if (ft=="overview_std") {
-                    loadOverviewSTD(files[i]);
-                } else if (ft=="statistics") {
-                    loadStatistics(files[i]);
-                    hasStatistics=true;
-                    statAvgCnt=statisticsAverageVariance(statSigmaCnt, statAvg, statN);
-                } else if (ft=="background_statistics") {
-                    loadBackgroundStatistics(files[i]);
-                    backStatAvgCnt=statisticsAverageVariance(backStatSigmaCnt, backStatAvg, backStatN);
-                } else if (ft=="uncorrected_statistics") {
-                    loadUncorrectedStatistics(files[i]);
+                    loadOverview(overviewFSTD, overviewF2STD, files[i]);
                 } else if (ft=="video") {
                     double facOffset=0;
                     double facA=1;
@@ -440,30 +499,49 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     }
                     ovrImages.append(img);
 
-                } else if (ft=="acf" || ft=="ccf" || ft=="dccf") {
-                    if (!dataLoaded) {
-                        if (filetype.toUpper()=="VIDEO_CORRELATOR_BIN") {
-                            loadVideoCorrelatorFileBin(files[i]);
-                            //qDebug()<<i<<ft<<"loading binary Video correlator file '"<<files[i]<<"'\n";
-                            dataLoaded=true;
-                        } else if (filetype.toUpper()=="VIDEO_CORRELATOR") {
-                            loadVideoCorrelatorFile(files[i]);
-                            //qDebug()<<i<<ft<<"loading Video correlator file '"<<files[i]<<"'\n";
-                            dataLoaded=true;
-                        } else if (filetype.toUpper()=="RADHARD2") {
-                            loadRadhard2File(files[i]);
-                            width=getProperty("WIDTH", 0).toInt();
-                            height=getProperty("HEIGHT", 0).toInt();
-                            //qDebug()<<i<<ft<<"loading Radhard2 file '"<<files[i]<<"'\n";
-                            dataLoaded=true;
-                        } else {
-                          setError(tr("filetype '%1' is unknown for Imaging FCS data files (file is '%2')").arg(filetype).arg(files[i]));
-                          break;
+
+                } else {
+                    if (internalDualViewMode()==QFRDRImagingFCSData::dvNone) {
+                        if (ft=="statistics") {
+                            loadStatistics(stat, files[i]);
+                            hasStatistics=true;
+                        } else if (ft=="background_statistics") {
+                            loadStatistics(backStat, files[i]);
+                        } else if (ft=="uncorrected_statistics") {
+                            loadStatistics(ucStat, files[i]);
                         }
                     } else {
-                        //qDebug()<<i<<ft<<tr("correlation data has already been loaded for Imaging FCS (filetype: %2, this data file is '%1')").arg(files[i]).arg(ft);
-                        setError(tr("correlation data has already been loaded for Imaging FCS (filetype: %2, this data file is '%1')").arg(files[i]).arg(ft));
-                        break;
+                        if (ft=="statistics_dv1") {
+                            loadStatistics(stat, files[i]);
+                            hasStatistics=true;
+                        } else if (ft=="background_statistics_dv1") {
+                            loadStatistics(backStat, files[i]);
+                        } else if (ft=="uncorrected_statistics_dv1") {
+                            loadStatistics(ucStat, files[i]);
+                        } else if (ft=="statistics_dv2") {
+                            loadStatistics(stat2, files[i]);
+                            hasStatistics=true;
+                        } else if (ft=="background_statistics_dv2") {
+                            loadStatistics(backStat2, files[i]);
+                        } else if (ft=="uncorrected_statistics_dv2") {
+                            loadStatistics(ucStat2, files[i]);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!hasStatistics && !hasStatistics2 && internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+            for (int i=0; i<files.size(); i++) {
+                if (i<files_types.size()) {
+                    QString ft=files_types[i].toLower().trimmed();
+                    if (ft=="statistics") {
+                        loadStatistics(stat, files[i]);
+                        hasStatistics=true;
+                    } else if (ft=="background_statistics") {
+                        loadStatistics(backStat, files[i]);
+                    } else if (ft=="uncorrected_statistics") {
+                        loadStatistics(ucStat, files[i]);
                     }
                 }
             }
@@ -476,12 +554,10 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
         QDomElement te=e->firstChildElement("leaveout");
         QString l=te.attribute("list");
         QStringList li=l.split(",");
-        //qDebug()<<li;
         for (int i=0; i<li.size(); i++) {
             bool ok=false;
             int lo=li[i].toUInt(&ok);
             if (ok) leaveoutAddRun(lo);
-            //qDebug()<<lo<<ok;
         }
         recalcCorrelations();
 
@@ -522,29 +598,38 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
     }
 }
 
-bool QFRDRImagingFCSData::loadOverview(const QString& filename) {
+bool QFRDRImagingFCSData::loadOverview(double* overviewF, double* overviewF2, const QString& filename) {
     bool ok=false;
 
-    if (!overviewF) return false;
+    if (!overviewF && !overviewF2) return false;
 
+    qDebug()<<getID()<<"loadedOverview "<<filename;
     if (QFile::exists(filename)) {
         TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
         if (tif) {
             uint32 nx,ny;
             TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
             TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
-            if (nx!=width || ny!=height) {
-                ok=false;
-            } else {
-                ok=TIFFReadFrame<double>(tif, overviewF);
-            }
+            double* tmp=(double*)malloc(nx*ny*sizeof(double));
+            ok=TIFFReadFrame<double>(tif, tmp);
             TIFFClose(tif);
+
+            if (ok) {
+
+                splitImage(overviewF, overviewF2, tmp, nx, ny);
+            }
+            free(tmp);
         }
     }
 
     if (!ok && overviewF) {
         for (int i=0; i<width*height; i++) {
             overviewF[i]=0;
+        }
+    }
+    if (!ok && overviewF2) {
+        for (int i=0; i<width*height; i++) {
+            overviewF2[i]=0;
         }
     }
     double crscaling=getProperty("OVERVIEW_SCALING", 1.0).toDouble();
@@ -554,44 +639,16 @@ bool QFRDRImagingFCSData::loadOverview(const QString& filename) {
         }
 
     }
+    if (crscaling!=1.0 && overviewF2) {
+        for (int i=0; i<width*height; i++) {
+            overviewF2[i]=overviewF2[i]*crscaling;
+        }
+
+    }
+    qDebug()<<getID()<<"loadedOverview "<<filename<<"   OK="<<ok;
     return ok;
 }
 
-bool QFRDRImagingFCSData::loadOverviewSTD(const QString& filename) {
-    bool ok=false;
-    //qDebug()<<"load: overviewFSTD="<<overviewFSTD<<filename;
-
-    if (!overviewFSTD) return false;
-
-    if (QFile::exists(filename)) {
-        TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
-        if (tif) {
-            uint32 nx,ny;
-            TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
-            TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
-            if (nx!=width || ny!=height) {
-                ok=false;
-            } else {
-                ok=TIFFReadFrame<double>(tif, overviewFSTD);
-            }
-            TIFFClose(tif);
-        }
-    }
-
-    if (!ok && overviewFSTD) {
-        for (int i=0; i<width*height; i++) {
-            overviewFSTD[i]=0;
-        }
-    }
-    double crscaling=getProperty("OVERVIEW_SCALING", 1.0).toDouble();
-    if (crscaling!=1.0 && overviewFSTD) {
-        for (int i=0; i<width*height; i++) {
-            overviewFSTD[i]=overviewFSTD[i]*crscaling;
-        }
-
-    }
-    return ok;
-}
 
 bool QFRDRImagingFCSData::loadImage(const QString& filename, double** data, int* width, int* height) {
     bool ok=false;
@@ -659,7 +716,7 @@ bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int*
                 i++;
             } while (TIFFReadDirectory(tif) && i<=(*frames));
             TIFFClose(tif);
-            qDebug()<<"loading video "<<filename<<"   siez="<<*width<<"x"<<*height<<"   frames="<<*frames;
+            qDebug()<<getID()<<"loading video "<<filename<<"   siez="<<*width<<"x"<<*height<<"   frames="<<*frames;
         }
     }
     return ok;
@@ -693,12 +750,12 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
         QByteArray dataFromFile=file.readAll();
         file.close();
 #ifdef DEBUG_TIMING
-        //qDebug()<<"opened file     "<<time.elapsed()<<"ms"; time.start();
+        //qDebug()<<getID()<<"opened file     "<<time.elapsed()<<"ms"; time.start();
 #endif
         //QTextStream stream(&file);
         QTextStream stream(&dataFromFile);
 #ifdef DEBUG_TIMING
-        //qDebug()<<"read file contents into memory buffer     "<<time.elapsed()<<"ms"; time.start();
+        //qDebug()<<getID()<<"read file contents into memory buffer     "<<time.elapsed()<<"ms"; time.start();
 #endif
         bool last_empty, empty=true;
         QList<QList<QTriple<double, double, double> > > data_matrix;
@@ -719,7 +776,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
                 } else  {
                     if (current_set.size()>0 || (current_set.size()<=0 && data[taucolumn]>0))
                         current_set.append(qMakeTriple(data[taucolumn]*taufactor, data[corrcolumn]-corroffset, 0.0));
-                    //qDebug()<<"  tau="<<data[0]<<"   c="<<data[1];
+                    //qDebug()<<getID()<<"  tau="<<data[0]<<"   c="<<data[1];
                 }
             }
             if (((last_empty&&empty)||(stream.atEnd()))&&(!current_set.isEmpty())) {
@@ -735,16 +792,16 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
 
                 data_matrix.append(current_set);
                 if (NN<current_set.size()) NN=current_set.size();
-                //qDebug()<<"runs="<<runs<<"     NN="<<NN<<"     current_set.size()="<<current_set.size()<<"     data_matrix.size()="<<data_matrix.size()<<"    all0="<<all0<<"    all1="<<all1;
+                //qDebug()<<getID()<<"runs="<<runs<<"     NN="<<NN<<"     current_set.size()="<<current_set.size()<<"     data_matrix.size()="<<data_matrix.size()<<"    all0="<<all0<<"    all1="<<all1;
                 current_set.clear();
                 runs++;
                 if (runs%50==0) QApplication::processEvents();
             }
-            //if (stream.atEnd()) //qDebug()<<"runs="<<runs<<"     NN="<<NN<<"     width*height="<<width*height<<"     stream.atEnd()="<<stream.atEnd()<<"    data="<<data;
+            //if (stream.atEnd()) //qDebug()<<getID()<<"runs="<<runs<<"     NN="<<NN<<"     width*height="<<width*height<<"     stream.atEnd()="<<stream.atEnd()<<"    data="<<data;
 
         }
 #ifdef DEBUG_TIMING
-        //qDebug()<<"parsed CSV     "<<time.elapsed()<<"ms"; time.start();
+        //qDebug()<<getID()<<"parsed CSV     "<<time.elapsed()<<"ms"; time.start();
 #endif
         dataFromFile.clear();
         width=getProperty("WIDTH").toInt();
@@ -779,7 +836,8 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
                             break;
                         }
                     }
-                    leaveout[i]=allZero;
+                    //mask[i]=allZero;
+                    maskSetIdx(i, allZero);
                 }
                 QApplication::processEvents();
                 recalcCorrelations();
@@ -794,7 +852,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
         }
 	}
 #ifdef DEBUG_TIMING
-        //qDebug()<<"read into internal arrays     "<<time.elapsed()<<"ms"; time.start();
+        //qDebug()<<getID()<<"read into internal arrays     "<<time.elapsed()<<"ms"; time.start();
 #endif
 
 	if (!ok) setError(tr("Error while reading file '%1': %2").arg(filename).arg(errorDescription));
@@ -831,7 +889,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
         double taufactor=getProperty("TAU_FACTOR", 1).toDouble();
         double corroffset=getProperty("CORR_OFFSET", 0).toDouble();
 #ifdef DEBUG_TIMING
-        //qDebug()<<"opened file     "<<time.elapsed()<<"ms"; time.start();
+        //qDebug()<<getID()<<"opened file     "<<time.elapsed()<<"ms"; time.start();
 #endif
         QByteArray file_id=file.read(10);
         if (file_id=="QF3.0imFCS" || file_id=="QF3.1imFCS") {
@@ -861,7 +919,9 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
                             break;
                         }
                     }
-                    leaveout[p]=allZero;
+                    //mask[p]=allZero;
+                    maskSetIdx(p, allZero);
+
                 }
                 QApplication::processEvents();
             } else {
@@ -879,7 +939,8 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
                                     break;
                                 }
                             }
-                            leaveout[p]=allZero;
+                            //mask[p]=allZero;
+                            maskSetIdx(p, allZero);
                         } else {
                             file.seek(file.pos()+N*sizeof(double));
                             if (fsets>1) file.seek(file.pos()+N*sizeof(double));
@@ -891,16 +952,16 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
 
             long long errorFilesizeFactor=1;
             if (fsets>1) errorFilesizeFactor=2;
-            //qDebug()<<"filepos before segments: "<<file.pos()<<"  ==  "<<10 + 5*4 + N*sizeof(double) + width*height*N*sizeof(double)*fcorrN*errorFilesizeFactor;
+            //qDebug()<<getID()<<"filepos before segments: "<<file.pos()<<"  ==  "<<10 + 5*4 + N*sizeof(double) + width*height*N*sizeof(double)*fcorrN*errorFilesizeFactor;
             //file.seek(10 + 5*4 + N*sizeof(double) + width*height*N*sizeof(double)*fcorrN*errorFilesizeFactor);
             if (!file.atEnd()) {
                 uint32_t segments=binfileReadUint32(file);
                 setQFProperty("SEGMENTS", segments, false, true);
                 long long expSize=10 + 5*4 + N*sizeof(double) + width*height*N*sizeof(double)*fcorrN*errorFilesizeFactor+segments*width*height*N*fcorrN*sizeof(double)+4;
-                //qDebug()<<"filesize="<<file.size()<<"   expected size="<<expSize<<"   DELTA="<<file.size()-expSize;
-                //qDebug()<<QFileInfo(filename).fileName()<<":\n    segments="<<segments<<"   width="<<width<<"   height="<<height<<"   fcorrN="<<fcorrN<<"   fN="<<fN<<"   fsets="<<fsets<<"   corr_set="<<corr_set<<"   corroffset="<<corroffset;
+                //qDebug()<<getID()<<"filesize="<<file.size()<<"   expected size="<<expSize<<"   DELTA="<<file.size()-expSize;
+                //qDebug()<<getID()<<QFileInfo(filename).fileName()<<":\n    segments="<<segments<<"   width="<<width<<"   height="<<height<<"   fcorrN="<<fcorrN<<"   fN="<<fN<<"   fsets="<<fsets<<"   corr_set="<<corr_set<<"   corroffset="<<corroffset;
                 if (!allSegmentsUsed() && segments>0) {
-                    //qDebug()<<"reloading segments ...";
+                    //qDebug()<<getID()<<"reloading segments ...";
                     for (long long p=0; p<width*height*N; p++) {
                         correlations[p]=sigmas[p]=0;
                     }
@@ -917,7 +978,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
                                         if (corroffset!=0) for (int i=0; i<N; i++) { dummy[i]=dummy[i]-corroffset; }
                                         //QString txt="";
                                         //for (int i=0; i<5; i++) txt=txt+QString("%1, ").arg(dummy[i]);
-                                        //qDebug()<<"p="<<p<<" seg="<<seg<<":  "<<txt;
+                                        //qDebug()<<getID()<<"p="<<p<<" seg="<<seg<<":  "<<txt;
 
                                         for (int i=0; i<N; i++) {
                                             correlations[p*N+i]=correlations[p*N+i]+dummy[i];
@@ -930,12 +991,12 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
                                     }
                                 }
                             } else {
-                                //qDebug()<<"excluding segment "<<seg;
+                                //qDebug()<<getID()<<"excluding segment "<<seg;
                                 file.seek(file.pos()+N*fcorrN*sizeof(double));
                             }
                         }
 
-                        //qDebug()<<"p="<<p<<"   count="<<count<<"   eof:"<<file.atEnd();
+                        //qDebug()<<getID()<<"p="<<p<<"   count="<<count<<"   eof:"<<file.atEnd();
 
                         for (int i=0; i<N; i++) {
                             if (count>1) sigmas[p*N+i]=sqrt((sigmas[p*N+i]-correlations[p*N+i]*correlations[p*N+i]/count)/(count-1.0));
@@ -950,7 +1011,8 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
                                 break;
                             }
                         }
-                        leaveout[p]=allZero;
+                        //mask[p]=allZero;
+                        maskSetIdx(p, allZero);
 
                         QApplication::processEvents();
                     }
@@ -975,21 +1037,21 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
 
     }
 #ifdef DEBUG_TIMING
-    //qDebug()<<"read into internal arrays     "<<time.elapsed()<<"ms"; time.start();
+    //qDebug()<<getID()<<"read into internal arrays     "<<time.elapsed()<<"ms"; time.start();
 #endif
 
     if (!ok) setError(tr("Error while reading file '%1': %2").arg(filename).arg(errorDescription));
     return ok;
 }
 
-bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
-    int64_t height=getProperty("HEIGHT", 0).toInt();
-    int64_t width=getProperty("WIDTH", 0).toInt();
+bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename, bool loadOverview) {
+    int64_t height=getExpectedFileHeight();
+    int64_t width=getExpectedFileWidth();
     int64_t steps=getProperty("STEPS", 0).toInt();
 
     if (!propertyExists("IS_OVERVIEW_SCALED")) setQFProperty("IS_OVERVIEW_SCALED", false, false, true);
 
-    //qDebug()<<"loadRadhard2File("<<sizeof(int)<<height<<width<<steps<<height*width*steps;
+    //qDebug()<<getID()<<"loadRadhard2File("<<sizeof(int)<<height<<width<<steps<<height*width*steps;
 
     if((height*width*steps)==0)return false;
 
@@ -997,37 +1059,46 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename) {
     yaid_rh::corFileReader *cfr=new yaid_rh::corFileReader(filename.toLocal8Bit().constData(),width,height,steps);
     cfr->processFrames(1);
 
-    //qDebug()<<"loadRadhard2File("<<cfr->getTotalLagCount();
-
-    allocateContents(width,height,cfr->getTotalLagCount()-1);
-    //load correlation data
-    for(int i=0; i<width*height; i++) {
-        for (int j=1; j<cfr->getTotalLagCount(); j++) {
-            tau[j-1]=cfr->getTau(i,j)*1e-6;
-            correlations[i*(cfr->getTotalLagCount()-1)+j-1]=cfr->getVal(i,j);
-            sigmas[i*(cfr->getTotalLagCount()-1)+j-1]=0;
-        }
-        bool allZero=true;
-        for (int j=0; j<N; j++) {
-            if (correlations[i*N+j]!=0) {
-                allZero=false;
-                break;
+    //qDebug()<<getID()<<"loadRadhard2File("<<cfr->getTotalLagCount();
+    if (loadOverview) {
+        allocateContents(width,height,cfr->getTotalLagCount()-1);
+        //load correlation data
+        for(int i=0; i<width*height; i++) {
+            for (int j=1; j<cfr->getTotalLagCount(); j++) {
+                tau[j-1]=cfr->getTau(i,j)*1e-6;
+                correlations[i*(cfr->getTotalLagCount()-1)+j-1]=cfr->getVal(i,j);
+                sigmas[i*(cfr->getTotalLagCount()-1)+j-1]=0;
             }
-        }
-        leaveout[i]=allZero;
+            bool allZero=true;
+            for (int j=0; j<N; j++) {
+                if (correlations[i*N+j]!=0) {
+                    allZero=false;
+                    break;
+                }
+            }
+            //mask[i]=allZero;
+            maskSetIdx(i, allZero);
 
-    }
-    for(int i=0; i<width*height; i++) {
-        overviewF[i]=cfr->getRaw(i,0)/(double(steps)*tau[0])/1.0e3;
-        overviewFSTD[i]=0;
+        }
+
+        QApplication::processEvents();
+        recalcCorrelations();
+        QApplication::processEvents();
+    } else {
+        double* tmp=(double*)malloc(width*height*sizeof(double));
+        double* tmpStd=(double*)malloc(width*height*sizeof(double));
+        for(int i=0; i<width*height; i++) {
+            tmp[i]=cfr->getRaw(i,0)/(double(steps)*tau[0])/1.0e3;
+            tmpStd[i]=0;
+        }
+        splitImage(overviewF, overviewF2, tmp, width, height);
+        splitImage(overviewFSTD, overviewF2STD, tmpStd, width, height);
+        free(tmp);
+        free(tmpStd);
     }
     delete cfr;
 
     //Sfree(corValues);
-
-    QApplication::processEvents();
-    recalcCorrelations();
-    QApplication::processEvents();
 
     return true;
 }
@@ -1061,7 +1132,7 @@ QFRDRImagingFCSData::DualViewMode QFRDRImagingFCSData::dualViewMode() const
     if (dv=="none" || dv=="0" || dv=="n") m_dualview=QFRDRImagingFCSData::dvNone;
     if (dv=="horizontal" || dv=="1" || dv=="h" || dv=="horicontal") m_dualview=QFRDRImagingFCSData::dvHorizontal;
     if (dv=="vertical" || dv=="2" || dv=="v" || dv=="vertikal") m_dualview=QFRDRImagingFCSData::dvVertical;
-    //qDebug()<<dv<<m_dualview;
+    //qDebug()<<getID()<<dv<<m_dualview;
 
     return m_dualview;
 }
@@ -1116,113 +1187,87 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
     if (correlationStdDev) free(correlationStdDev);
     if (sigmas) free(sigmas);
     if (tau) free(tau);
-    if (overviewF) free(overviewF);
-    if (overviewFSTD) free(overviewFSTD);
-    //if (leaveout) free(leaveout);
+    maskDelete();
+
     correlations=NULL;
     correlationMean=NULL;
     correlationStdDev=NULL;
     sigmas=NULL;
     tau=NULL;
-    overviewF=NULL;
-    maskDelete();
-    leaveout=NULL;
-    overviewFSTD=NULL;
-    //qDebug()<<"freed overviewFSTD="<<overviewFSTD;
+    qDebug()<<getID()<<"allocateContents "<<x<<"*"<<y<<"  *"<<N;
     if ((x>0) && (y>0) && (N>0)) {
+        maskInit(x,y);
         correlations=(double*)calloc(x*y*N,sizeof(double));
         sigmas=(double*)calloc(x*y*N,sizeof(double));
         correlationMean=(double*)calloc(N,sizeof(double));
         correlationStdDev=(double*)calloc(N,sizeof(double));
-        overviewF=(double*)calloc(x*y,sizeof(double));
-        overviewFSTD=(double*)calloc(x*y,sizeof(double));
-        //qDebug()<<"alloced: overviewFSTD="<<overviewFSTD;
-        //leaveout=(bool*)calloc(x*y,sizeof(bool));
-        maskInit(x,y);
-        leaveout=maskGet();
-        tau=(double*)calloc(N,sizeof(double));
         width=x;
         height=y;
+        tau=(double*)calloc(N,sizeof(double));
         this->N=N;
         setQFProperty("WIDTH", x, false, true);
         setQFProperty("HEIGHT", y, false, true);
     }
 #ifdef DEBUG_SIZES
-    //qDebug()<<"allocateContents( x="<<x<<" y="<<y<<" N="<<N<<"):  "<<bytestostr(N*x*y*2*sizeof(double)+x*y*sizeof(bool)+x*y*sizeof(double)+x*y*sizeof(uint16_t)+N*3*sizeof(double)).c_str();
+    qDebug()<<getID()<<"allocateContents( x="<<x<<" y="<<y<<" N="<<N<<"):  "<<bytestostr(N*x*y*2*sizeof(double)+x*y*sizeof(bool)+x*y*sizeof(double)+x*y*sizeof(uint16_t)+N*3*sizeof(double)).c_str();
 #endif
 }
 
-void QFRDRImagingFCSData::allocateStatistics(uint32_t N) {
-    if (statAvg) free(statAvg);
-    if (statStdDev) free(statStdDev);
-    if (statT) free(statT);
-    if (statMin) free(statMin);
-    if (statMax) free(statMax);
-    statN=N;
-    statAvg=NULL;
-    statT=NULL;
-    statStdDev=NULL;
-    statMin=NULL;
-    statMax=NULL;
-    if (statN>0) {
-        statAvg=(double*)calloc(statN, sizeof(double));
-        statStdDev=(double*)calloc(statN, sizeof(double));
-        statMin=(double*)calloc(statN, sizeof(double));
-        statMax=(double*)calloc(statN, sizeof(double));
-        statT=(double*)calloc(statN, sizeof(double));
+void QFRDRImagingFCSData::allocateOverviews(int x, int y) {
+    if (x==widthOvr && y==heightOvr) return;
+    if (overviewF) free(overviewF);
+    if (overviewFSTD) free(overviewFSTD);
+    if (overviewF2) free(overviewF2);
+    if (overviewF2STD) free(overviewF2STD);
+    overviewF=NULL;
+    overviewF2=NULL;
+    overviewFSTD=NULL;
+    overviewF2STD=NULL;
+    widthOvr=0;
+    heightOvr=0;
+
+    qDebug()<<getID()<<"allocateOverviews "<<x<<"*"<<y;
+    if ((x>0) && (y>0)) {
+        widthOvr=x;
+        heightOvr=y;
+
+
+        overviewF=(double*)calloc(x*y,sizeof(double));
+        overviewFSTD=(double*)calloc(x*y,sizeof(double));
+        if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+            overviewF2=(double*)calloc(x*y,sizeof(double));
+            overviewF2STD=(double*)calloc(x*y,sizeof(double));
+        }
+    }
+}
+
+void QFRDRImagingFCSData::allocateStatistics(QFRDRImagingFCSData::statisticsData &stat, uint32_t N)
+{
+    if (stat.Avg) free(stat.Avg);
+    if (stat.StdDev) free(stat.StdDev);
+    if (stat.T) free(stat.T);
+    if (stat.Min) free(stat.Min);
+    if (stat.Max) free(stat.Max);
+    stat.N=N;
+    stat.Avg=NULL;
+    stat.T=NULL;
+    stat.StdDev=NULL;
+    stat.Min=NULL;
+    stat.Max=NULL;
+    stat.avgCnt=0;
+    stat.sigmaCnt=0;
+    if (stat.N>0) {
+        stat.Avg=(double*)calloc(N, sizeof(double));
+        stat.StdDev=(double*)calloc(N, sizeof(double));
+        stat.Min=(double*)calloc(N, sizeof(double));
+        stat.Max=(double*)calloc(N, sizeof(double));
+        stat.T=(double*)calloc(N, sizeof(double));
     }
 #ifdef DEBUG_SIZES
-    //qDebug()<<"allocateStatistics( N="<<N<<"):  "<<bytestostr(statN*5*sizeof(double)).c_str();
+    qDebug()<<getID()<<"allocateStatistics( N="<<N<<"):  "<<bytestostr(statN*5*sizeof(double)).c_str();
 #endif
-
 }
 
-void QFRDRImagingFCSData::allocateUncorrectedStatistics(uint32_t N) {
-    if (ucStatAvg) free(ucStatAvg);
-    if (ucStatStdDev) free(ucStatStdDev);
-    if (ucStatT) free(ucStatT);
-    if (ucStatMin) free(ucStatMin);
-    if (ucStatMax) free(ucStatMax);
-    ucStatN=N;
-    ucStatAvg=NULL;
-    ucStatT=NULL;
-    ucStatStdDev=NULL;
-    ucStatMin=NULL;
-    ucStatMax=NULL;
-    if (ucStatN>0) {
-        ucStatAvg=(double*)calloc(ucStatN, sizeof(double));
-        ucStatStdDev=(double*)calloc(ucStatN, sizeof(double));
-        ucStatMin=(double*)calloc(ucStatN, sizeof(double));
-        ucStatMax=(double*)calloc(ucStatN, sizeof(double));
-        ucStatT=(double*)calloc(ucStatN, sizeof(double));
-    }
-}
-
-
-void QFRDRImagingFCSData::allocateBackgroundStatistics(uint32_t N) {
-    if (backStatAvg) free(backStatAvg);
-    if (backStatStdDev) free(backStatStdDev);
-    if (backStatT) free(backStatT);
-    if (backStatMin) free(backStatMin);
-    if (backStatMax) free(backStatMax);
-    backStatN=N;
-    backStatAvg=NULL;
-    backStatT=NULL;
-    backStatStdDev=NULL;
-    backStatMin=NULL;
-    backStatMax=NULL;
-    if (backStatN>0) {
-        backStatAvg=(double*)calloc(backStatN, sizeof(double));
-        backStatStdDev=(double*)calloc(backStatN, sizeof(double));
-        backStatMin=(double*)calloc(backStatN, sizeof(double));
-        backStatMax=(double*)calloc(backStatN, sizeof(double));
-        backStatT=(double*)calloc(backStatN, sizeof(double));
-    }
-#ifdef DEBUG_SIZES
-    //qDebug()<<"allocatebackStatistics( N="<<N<<"):  "<<bytestostr(backStatN*5*sizeof(double)).c_str();
-#endif
-
-}
 void QFRDRImagingFCSData::recalcCorrelations() {
     if (correlations && correlationMean && correlationStdDev) {
         for (int i=0; i<N; i++) {
@@ -1231,7 +1276,7 @@ void QFRDRImagingFCSData::recalcCorrelations() {
             double sum2=0;
             for (int j=0; j<width*height; j++) {
                 const double& v=correlations[j*N+i];
-                if (QFFloatIsOK(v) && !leaveout[j]) {
+                if (QFFloatIsOK(v) && !maskGetIdx(j)) {
                     sum+=v;
                     sum2+=v*v;
                     norm++;
@@ -1248,32 +1293,45 @@ void QFRDRImagingFCSData::recalcCorrelations() {
     }
 }
 
-uint32_t QFRDRImagingFCSData::getStatisticsN() const {
-    return statN;
+uint32_t QFRDRImagingFCSData::getStatisticsN(int channel) const {
+    if (channel==0) return stat.N;
+    if (channel==1) return stat2.N;
+    return 0;
 }
 
-double *QFRDRImagingFCSData::getStatisticsMean() const {
-    return statAvg;
+double *QFRDRImagingFCSData::getStatisticsMean(int channel) const {
+    if (channel==0) return stat.Avg;
+    if (channel==1) return stat2.Avg;
+    return NULL;
 }
 
-double *QFRDRImagingFCSData::getStatisticsT() const {
-    return statT;
+double *QFRDRImagingFCSData::getStatisticsT(int channel) const {
+    if (channel==0) return stat.T;
+    if (channel==1) return stat2.T;
+    return NULL;
 }
 
-double *QFRDRImagingFCSData::getStatisticsStdDev() const {
-    return statStdDev;
+double *QFRDRImagingFCSData::getStatisticsStdDev(int channel) const {
+    if (channel==0) return stat.StdDev;
+    if (channel==1) return stat2.StdDev;
+    return NULL;
 }
 
-double *QFRDRImagingFCSData::getStatisticsMin() const {
-    return statMin;
+double *QFRDRImagingFCSData::getStatisticsMin(int channel) const {
+    if (channel==0) return stat.Min;
+    if (channel==1) return stat2.Min;
+    return NULL;
 }
 
-double *QFRDRImagingFCSData::getStatisticsMax() const {
-    return statMax;
+double *QFRDRImagingFCSData::getStatisticsMax(int channel) const {
+    if (channel==0) return stat.Max;
+    if (channel==1) return stat2.Max;
+    return NULL;
 }
 
-bool QFRDRImagingFCSData::loadStatistics(const QString &filename) {
+bool QFRDRImagingFCSData::loadStatistics(statisticsData &stat, const QString &filename) {
     QFile f(filename);
+    bool ok=false;
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
         QTextStream txt(&f);
         QVector<double> mean, stddev, min, max, time;
@@ -1289,147 +1347,106 @@ bool QFRDRImagingFCSData::loadStatistics(const QString &filename) {
                 max.append(line.value(4, 0)*crscaling);
             }
         }
-        //qDebug()<<"line read: "<<time.size();
-        allocateStatistics(time.size());
+        //qDebug()<<getID()<<"line read: "<<time.size();
+        allocateStatistics(stat, time.size());
 
-        for (uint32_t i=0; i<statN; i++) {
-            statT[i]=time[i];
-            statAvg[i]=mean[i];
-            statStdDev[i]=stddev[i];
-            statMin[i]=min[i];
-            statMax[i]=max[i];
+        for (uint32_t i=0; i<stat.N; i++) {
+            stat.T[i]=time[i];
+            stat.Avg[i]=mean[i];
+            stat.StdDev[i]=stddev[i];
+            stat.Min[i]=min[i];
+            stat.Max[i]=max[i];
         }
 
 
         f.close();
-        return true;
+        ok=true;
     }
-    return false;
+    if (stat.N>0) stat.avgCnt=statisticsAverageVariance(stat.sigmaCnt, stat.Avg, stat.N);
+    return ok;
 }
 
 
 
-uint32_t QFRDRImagingFCSData::getBackgroundStatisticsN() const {
-    return backStatN;
+uint32_t QFRDRImagingFCSData::getBackgroundStatisticsN(int channel) const {
+    if (channel==0) return backStat.N;
+    if (channel==1) return backStat2.N;
+    return 0;
 }
 
-double *QFRDRImagingFCSData::getBackgroundStatisticsMean() const {
-    return backStatAvg;
+double *QFRDRImagingFCSData::getBackgroundStatisticsMean(int channel) const {
+    if (channel==0) return backStat.Avg;
+    if (channel==1) return backStat2.Avg;
+    return 0;
+
 }
 
-double *QFRDRImagingFCSData::getBackgroundStatisticsT() const {
-    return backStatT;
+double *QFRDRImagingFCSData::getBackgroundStatisticsT(int channel) const {
+    if (channel==0) return backStat.T;
+    if (channel==1) return backStat2.T;
+    return 0;
 }
 
 
-double *QFRDRImagingFCSData::getBackgroundStatisticsStdDev() const {
-    return backStatStdDev;
+double *QFRDRImagingFCSData::getBackgroundStatisticsStdDev(int channel) const {
+    if (channel==0) return backStat.StdDev;
+    if (channel==1) return backStat2.StdDev;
+    return 0;
 }
 
-double *QFRDRImagingFCSData::getBackgroundStatisticsMin() const {
-    return backStatMin;
+double *QFRDRImagingFCSData::getBackgroundStatisticsMin(int channel) const {
+    if (channel==0) return backStat.Min;
+    if (channel==1) return backStat2.Min;
+    return 0;
 }
 
-double *QFRDRImagingFCSData::getBackgroundStatisticsMax() const {
-    return backStatMax;
-}
+double *QFRDRImagingFCSData::getBackgroundStatisticsMax(int channel) const {
+    if (channel==0) return backStat.Max;
+    if (channel==1) return backStat2.Max;
+    return 0;
 
-bool QFRDRImagingFCSData::loadBackgroundStatistics(const QString &filename) {
-    QFile f(filename);
-    if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
-        QTextStream txt(&f);
-        QVector<double> mean, stddev, min, max, time;
-        double timescaling=getProperty("OVERVIEW_TIME_SCALING", 1.0).toDouble();
-        double crscaling=getProperty("OVERVIEW_COUNTRATE_SCALING", 1.0).toDouble();
-        while (!txt.atEnd()) {
-            QVector<double> line=csvReadline(txt, ',', '#');
-            if (line.size()>1) {
-                time.append(line[0]*timescaling);
-                mean.append(line[1]*crscaling);
-                stddev.append(line.value(2, 0)*crscaling);
-                min.append(line.value(3, 0)*crscaling);
-                max.append(line.value(4, 0)*crscaling);
-            }
-        }
-        //qDebug()<<"line read: "<<time.size();
-        allocateBackgroundStatistics(time.size());
-
-        for (uint32_t i=0; i<backStatN; i++) {
-            backStatT[i]=time[i];
-            backStatAvg[i]=mean[i];
-            backStatStdDev[i]=stddev[i];
-            backStatMin[i]=min[i];
-            backStatMax[i]=max[i];
-        }
-
-
-        f.close();
-        return true;
-    }
-    return false;
 }
 
 
 
-uint32_t QFRDRImagingFCSData::getUncorrectedStatisticsN() const {
-    return ucStatN;
+
+uint32_t QFRDRImagingFCSData::getUncorrectedStatisticsN(int channel) const {
+    if (channel==0) return ucStat.N;
+    if (channel==1) return ucStat2.N;
+    return 0;
 }
 
-double *QFRDRImagingFCSData::getUncorrectedStatisticsMean() const {
-    return ucStatAvg;
+double *QFRDRImagingFCSData::getUncorrectedStatisticsMean(int channel) const {
+    if (channel==0) return ucStat.Avg;
+    if (channel==1) return ucStat2.Avg;
+    return 0;
 }
 
-double *QFRDRImagingFCSData::getUncorrectedStatisticsT() const {
-    return ucStatT;
+double *QFRDRImagingFCSData::getUncorrectedStatisticsT(int channel) const {
+    if (channel==0) return ucStat.T;
+    if (channel==1) return ucStat2.T;
+    return 0;
 }
 
 
-double *QFRDRImagingFCSData::getUncorrectedStatisticsStdDev() const {
-    return ucStatStdDev;
+double *QFRDRImagingFCSData::getUncorrectedStatisticsStdDev(int channel) const {
+    if (channel==0) return ucStat.StdDev;
+    if (channel==1) return ucStat2.StdDev;
+    return 0;
 }
 
-double *QFRDRImagingFCSData::getUncorrectedStatisticsMin() const {
-    return ucStatMin;
+double *QFRDRImagingFCSData::getUncorrectedStatisticsMin(int channel) const {
+    if (channel==0) return ucStat.Min;
+    if (channel==1) return ucStat2.Min;
+    return 0;
 }
 
-double *QFRDRImagingFCSData::getUncorrectedStatisticsMax() const {
-    return ucStatMax;
+double *QFRDRImagingFCSData::getUncorrectedStatisticsMax(int channel) const {
+    if (channel==0) return ucStat.Max;
+    if (channel==1) return ucStat2.Max;
+    return 0;
 }
 
-bool QFRDRImagingFCSData::loadUncorrectedStatistics(const QString &filename) {
-    QFile f(filename);
-    if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
-        QTextStream txt(&f);
-        QVector<double> mean, stddev, min, max, time;
-        double timescaling=getProperty("STATISTICS_TIME_SCALING", 1.0).toDouble();
-        double crscaling=getProperty("STATISTICS_COUNTRATE_SCALING", 1.0).toDouble();
-        while (!txt.atEnd()) {
-            QVector<double> line=csvReadline(txt, ',', '#');
-            if (line.size()>1) {
-                time.append(line[0]*timescaling);
-                mean.append(line[1]*crscaling);
-                stddev.append(line.value(2, 0)*crscaling);
-                min.append(line.value(3, 0)*crscaling);
-                max.append(line.value(4, 0)*crscaling);
-            }
-        }
-        //qDebug()<<"line read: "<<time.size();
-        allocateUncorrectedStatistics(time.size());
-
-        for (uint32_t i=0; i<ucStatN; i++) {
-            ucStatT[i]=time[i];
-            ucStatAvg[i]=mean[i];
-            ucStatStdDev[i]=stddev[i];
-            ucStatMin[i]=min[i];
-            ucStatMax[i]=max[i];
-        }
-
-
-        f.close();
-        return true;
-    }
-    return false;
-}
 
 void QFRDRImagingFCSData::loadQFPropertiesFromB040SPIMSettingsFile(QSettings &settings) {
     if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/duration_milliseconds")) setQFProperty("MEASUREMENT_DURATION_MS", settings.value("acquisition/duration_milliseconds").toDouble(), true, true);
@@ -1539,6 +1556,54 @@ void QFRDRImagingFCSData::clearOvrImages() {
     ovrImages.clear();
 }
 
+int QFRDRImagingFCSData::getExpectedFileWidth() const
+{
+    return getProperty("FULL_DV_WIDTH", getProperty("WIDTH", 0).toInt()).toInt();
+}
+int QFRDRImagingFCSData::getExpectedFileHeight() const
+{
+    return getProperty("FULL_DV_HEIGHT", getProperty("HEIGHT", 0).toInt()).toInt();
+}
+
+void QFRDRImagingFCSData::splitImage(double* overviewF, double* overviewF2, const double* inputImage, uint32_t nx, uint32_t ny) const
+{
+    qDebug()<<getID()<<"splitImage(overviewF="<<overviewF<<",  overviewF2="<<overviewF2<<",  nx="<<nx<<",  ny="<<ny<<")   width*height = "<<width<<"*"<<height<<"   intDV2,channel="<<internalDualViewMode()<<","<<internalDualViewModeChannel();
+    if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && nx>=2*width && ny==height) {
+        int shift=0;
+        double* out=overviewF;
+        if (internalDualViewModeChannel()==1) { shift=width; out=overviewF2; }
+        if (out) {
+            for (int y=0; y<height; y++) {
+                for (int x=0; x<width; x++) {
+                    const int idxIn=y*nx+x+shift;
+                    const int idxOut=y*width+x;
+                    out[idxOut]=inputImage[idxIn];
+                }
+            }
+        }
+    } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && nx==width && ny>=2*height) {
+        int shift=0;
+        double* out=overviewF;
+        if (internalDualViewModeChannel()==1) { shift=height; out=overviewF2; }
+        if (out) {
+            for (int y=0; y<height; y++) {
+                for (int x=0; x<width; x++) {
+                    const int idxIn=(y+shift)*nx+x;
+                    const int idxOut=y*width+x;
+                    out[idxOut]=inputImage[idxIn];
+                }
+            }
+        }
+    } else {
+        if (nx==width && ny==height) {
+            if (overviewF) { memcpy(overviewF, inputImage, nx*ny*sizeof(double)); qDebug()<<"  !!!copied overviewF!!!"; }
+            if (overviewF2) { memcpy(overviewF2, inputImage, nx*ny*sizeof(double)); qDebug()<<"  !!!copied overviewF2!!!"; }
+        } else {
+            qDebug()<<"  !!!didn't copy!!!";
+        }
+    }
+}
+
 
 
 
@@ -1559,9 +1624,9 @@ void QFRDRImagingFCSData::clearOvrImages() {
 bool QFRDRImagingFCSData::indexIsDualView2(int32_t sel) {
     int x=runToX(sel);
     int y=runToY(sel);
-    if (dualViewMode()==QFRDRImagingFCSData::dvHorizontal) {
+    if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal) {
         return x>getImageFromRunsWidth()/2;
-    } else if (dualViewMode()==QFRDRImagingFCSData::dvVertical) {
+    } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical) {
         return y>getImageFromRunsHeight()/2;
     }
     return false;
@@ -1578,7 +1643,11 @@ int QFRDRImagingFCSData::getImageFromRunsHeight() const {
 
 int QFRDRImagingFCSData::getImageFromRunsChannels() const
 {
-    return 1;
+    if (internalDualViewMode()==QFRDRImagingFCSData::dvNone) {
+        return 1;
+    } else {
+        return 2;
+    }
 }
 
 int QFRDRImagingFCSData::xyToRun(int x, int y) const {
@@ -1598,7 +1667,9 @@ int QFRDRImagingFCSData::xyToIndex(int x, int y) const {
 }
 
 double* QFRDRImagingFCSData::getImageFromRunsPreview(int channel) const {
-    return overviewF;
+    if (channel==0) return overviewF;
+    if (channel==1) return overviewF2;
+    return NULL;
 }
 
 void QFRDRImagingFCSData::leaveoutClear() {
@@ -1607,11 +1678,13 @@ void QFRDRImagingFCSData::leaveoutClear() {
 
 
 void QFRDRImagingFCSData::leaveoutRemoveRun(int run) {
-    if (run>=0 && run<width*height) leaveout[run]=false;
+    maskSetIdx(run, false);
+    //if (run>=0 && run<width*height) mask[run]=false;
 }
 
 void QFRDRImagingFCSData::leaveoutAddRun(int run) {
-    if (run>=0 && run<width*height) leaveout[run]=true;
+    maskSetIdx(run, true);
+    //if (run>=0 && run<width*height) mask[run]=true;
 }
 
 
@@ -1621,12 +1694,21 @@ void QFRDRImagingFCSData::leaveoutAddRun(int run) {
 
 
 int QFRDRImagingFCSData::getOverviewImageCount() const {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+        return 4+ovrImages.size();
+    }
     return 2+ovrImages.size();
 }
 
 int QFRDRImagingFCSData::getOverviewImageWidth(int image) const {
     if (image==0) return getImageFromRunsWidth();
     if (image==1) return getImageFromRunsWidth();
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+        if (image==2) return getImageFromRunsWidth();
+        if (image==3) return getImageFromRunsWidth();
+        if (image-3<=ovrImages.size()) return ovrImages[image-4].width;
+        return 0;
+    }
     if (image-1<=ovrImages.size()) return ovrImages[image-2].width;
     return 0;
 }
@@ -1634,11 +1716,36 @@ int QFRDRImagingFCSData::getOverviewImageWidth(int image) const {
 int QFRDRImagingFCSData::getOverviewImageHeight(int image) const {
     if (image==0) return getImageFromRunsHeight();
     if (image==1) return getImageFromRunsHeight();
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+        if (image==2) return getImageFromRunsHeight();
+        if (image==3) return getImageFromRunsHeight();
+        if (image-3<=ovrImages.size()) return ovrImages[image-4].height;
+        return 0;
+
+    }
     if (image-1<=ovrImages.size()) return ovrImages[image-2].height;
     return 0;
 }
 
 QString QFRDRImagingFCSData::getOverviewImageName(int image) const {
+    if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical) {
+        if (image==0) return tr("top overview image (time average)");
+        if (image==1) return tr("top standard deviation overview image (time average)");
+        if (image==2) return tr("bottom overview image (time average)");
+        if (image==3) return tr("bottom standard deviation overview image (time average)");
+        if (image-3<=ovrImages.size()) return ovrImages[image-4].name;
+        return QString("");
+
+    }
+    if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal) {
+        if (image==0) return tr("left overview image (time average)");
+        if (image==1) return tr("left standard deviation overview image (time average)");
+        if (image==2) return tr("right overview image (time average)");
+        if (image==3) return tr("right standard deviation overview image (time average)");
+        if (image-3<=ovrImages.size()) return ovrImages[image-4].name;
+        return QString("");
+
+    }
     if (image==0) return tr("overview image (time average)");
     if (image==1) return tr("standard deviation overview image (time average)");
     if (image-1<=ovrImages.size()) return ovrImages[image-2].name;
@@ -1646,21 +1753,34 @@ QString QFRDRImagingFCSData::getOverviewImageName(int image) const {
 }
 
 QString QFRDRImagingFCSData::getOverviewImageID(int image) const {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+        if (image>3 && image-3<=ovrImages.size()) return ovrImages[image-4].id;
+        return QString("");
+    }
     if (image>1 && image-1<=ovrImages.size()) return ovrImages[image-2].id;
     return QString("");
 }
 
 double *QFRDRImagingFCSData::getOverviewImage(int image) const {
     if (image==0) return overviewF;
-    //qDebug()<<"overviewFSTD="<<overviewFSTD;
     if (image==1) return overviewFSTD;
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+        if (image==2) return overviewF2;
+        if (image==3) return overviewF2STD;
+        if (image-3<=ovrImages.size()) return ovrImages[image-4].image;
+        return NULL;
+    }
     if (image-1<=ovrImages.size()) return ovrImages[image-2].image;
     return NULL;
 }
 
 QList<QFRDROverviewImageInterface::OverviewImageGeoElement> QFRDRImagingFCSData::getOverviewImageAnnotations(int image) const {
     QList<QFRDROverviewImageInterface::OverviewImageGeoElement> result;
-    if (image>1 && image-2<ovrImages.size()) return ovrImages[image-2].geoElements;
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+        if (image>3 && image-4<ovrImages.size()) return ovrImages[image-4].geoElements;
+    } else {
+        if (image>1 && image-2<ovrImages.size()) return ovrImages[image-2].geoElements;
+    }
     return result;
 }
 
@@ -1725,9 +1845,9 @@ QString QFRDRImagingFCSData::getImageStackYName(int stack) const {
 double QFRDRImagingFCSData::getImageStackTUnitFactor(int stack) const {
     if (stack==0) {
         if (video_frames<=0) return 1;
-        double stat=1;
-        if (statT) stat=(statT[statN]-statT[0]);
-        return getProperty("MEASUREMENT_DURATION_MS", stat*1000.0).toDouble()/1000.0/double(video_frames);
+        double s=1;
+        if (stat.T) s=(stat.T[stat.N]-stat.T[0]); // TODO: CHECK THIS
+        return getProperty("MEASUREMENT_DURATION_MS", s*1000.0).toDouble()/1000.0/double(video_frames);
     } else if (stack==1) {
         if (videoUncorrected_frames<=0) return 1;
         double stat=1;
@@ -1777,20 +1897,37 @@ QString QFRDRImagingFCSData::getImageStackTimepointName(int stack, int t) const 
 }
 
 double QFRDRImagingFCSData::getSimpleCountrateAverage(int run, int channel) const {
-    if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF) {
-        if (run>=0) return overviewF[run]/getTauMin()/1000.0;
+    if (channel==0) {
+        if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF) {
+            if (run>=0) return overviewF[run]/getTauMin()/1000.0;
+        }
+        if (run==-2) return  backStat.avgCnt/getTauMin()/1000.0;
+        if (hasStatistics) return stat.avgCnt/getTauMin()/1000.0;
     }
-    if (run==-2) return  backStatAvgCnt/getTauMin()/1000.0;
-    if (hasStatistics) return statAvgCnt/getTauMin()/1000.0;
+    if (channel==1) {
+        if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF2) {
+            if (run>=0) return overviewF2[run]/getTauMin()/1000.0;
+        }
+        if (run==-2) return  backStat2.avgCnt/getTauMin()/1000.0;
+        if (hasStatistics2) return stat2.avgCnt/getTauMin()/1000.0;
+    }
     return 0;
 }
 
 double QFRDRImagingFCSData::getSimpleCountrateVariance(int run, int channel) const {
-    if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewFSTD) {
-        if (run>=0 && run<width*height) return overviewFSTD[run]/getTauMin()/1000.0;
+    if (channel==0) {
+        if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewFSTD) {
+            if (run>=0 && run<width*height) return overviewFSTD[run]/getTauMin()/1000.0;
+        }
+        if (run==-2) return sqrt(backStat.sigmaCnt)/getTauMin()/1000.0;
+        if (hasStatistics) return sqrt(stat.sigmaCnt)/getTauMin()/1000.0;
+    } else if (channel==1) {
+        if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF2STD) {
+            if (run>=0 && run<width*height) return overviewF2STD[run]/getTauMin()/1000.0;
+        }
+        if (run==-2) return sqrt(backStat2.sigmaCnt)/getTauMin()/1000.0;
+        if (hasStatistics2) return sqrt(stat2.sigmaCnt)/getTauMin()/1000.0;
     }
-    if (run==-2) return sqrt(backStatSigmaCnt)/getTauMin()/1000.0;
-    if (hasStatistics) return sqrt(statSigmaCnt)/getTauMin()/1000.0;
     return 0;
 }
 
@@ -1860,6 +1997,49 @@ int QFRDRImagingFCSData::getImageSelectionHeight() const
     return getImageFromRunsHeight();
 }
 
+QStringList QFRDRImagingFCSData::getAvailableRoles() const {
+    QStringList sl;
+    sl<<"correlation";
+    sl<<"acf";
+    sl<<"ccf";
+    sl<<"dccf";
+    sl<<"fcs_red";
+    sl<<"fcs_green";
+    sl<<"fccs";
+    sl<<"ccf(-1,0)";
+    sl<<"ccf(1,0)";
+    sl<<"ccf(0,-1)";
+    sl<<"ccf(0,1)";
+    return sl;
+}
+
+bool QFRDRImagingFCSData::isRoleUserEditable() const
+{
+    return false;
+}
+
+QFRDRImagingFCSData::DualViewMode QFRDRImagingFCSData::internalDualViewMode() const
+{
+    QString dv=getProperty("INTERNAL_DUALVIEW_MODE", "none").toString().toLower();
+
+
+    QFRDRImagingFCSData::DualViewMode m_dualview=QFRDRImagingFCSData::dvNone;
+    if (dv=="none" || dv=="0" || dv=="n") m_dualview=QFRDRImagingFCSData::dvNone;
+    if (dv=="horizontal" || dv=="1" || dv=="h" || dv=="horicontal") m_dualview=QFRDRImagingFCSData::dvHorizontal;
+    if (dv=="vertical" || dv=="2" || dv=="v" || dv=="vertikal") m_dualview=QFRDRImagingFCSData::dvVertical;
+
+    return m_dualview;
+}
+
+void QFRDRImagingFCSData::setInternalDualViewMode(QFRDRImagingFCSData::DualViewMode mode)
+{
+    QFRDRImagingFCSData::DualViewMode m_dualview=mode;
+    if (m_dualview==QFRDRImagingFCSData::dvNone) setQFProperty("INTERNAL_DUALVIEW_MODE", "none", false);
+    if (m_dualview==QFRDRImagingFCSData::dvHorizontal) setQFProperty("INTERNAL_DUALVIEW_MODE", "horicontal", false);
+    if (m_dualview==QFRDRImagingFCSData::dvVertical) setQFProperty("INTERNAL_DUALVIEW_MODE", "vertical", false);
+}
+
+
 int QFRDRImagingFCSData::getImageSelectionWidth() const
 {
     return getImageFromRunsWidth();
@@ -1871,6 +2051,53 @@ void QFRDRImagingFCSData::clearSelections()
         if (selections[i].selection) delete selections[i].selection;
     }
     selections.clear();
+}
+
+int QFRDRImagingFCSData::internalDualViewModeChannel() const
+{
+    return getProperty("INTERNAL_DUALVIEW_MODE_CHANNEL", "0").toInt();
+}
+
+void QFRDRImagingFCSData::splitCFsForDualView() {
+    double* oldC=duplicateArray(correlations, width*height*N);
+    double* oldS=duplicateArray(sigmas, width*height*N);
+    bool* oldL=duplicateArray(maskGet(), width*height);
+    uint32_t oldWidth=width;
+    uint32_t oldHeight=height;
+    if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal) {
+        allocateContents(width/2, height, N);
+        int shift=0;
+        if (internalDualViewModeChannel()==1) { shift=width; }
+        for (int y=0; y<height; y++) {
+            for (int x=0; x<width; x++) {
+                const int idxIn=y*oldWidth*N+(x+shift)*N;
+                const int idxOut=y*width*N+x*N;
+                memcpy(&(correlations[idxOut]), &(oldC[idxIn]), N*sizeof(double));
+                memcpy(&(sigmas[idxOut]), &(oldS[idxIn]), N*sizeof(double));
+                //mask[y*width+x]=oldL[y*oldWidth+x+shift];
+                maskUnset(x, y, oldL[y*oldWidth+x+shift]);
+            }
+        }
+    } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical) {
+        allocateContents(width, height/2, N);
+        int shift=0;
+        if (internalDualViewModeChannel()==1) { shift=height; }
+        for (int y=0; y<height; y++) {
+            for (int x=0; x<width; x++) {
+                const int idxIn=(y+shift)*oldWidth*N + x*N;
+                const int idxOut=y*width*N+x*N;
+                memcpy(&(correlations[idxOut]), &(oldC[idxIn]), N*sizeof(double));
+                memcpy(&(sigmas[idxOut]), &(oldS[idxIn]), N*sizeof(double));
+                //mask[y*width+x]=oldL[(y+shift)*oldWidth+x];
+                maskUnset(x, y, oldL[y*oldWidth+x+shift]);
+            }
+        }
+    }
+    setQFProperty("WIDTH", width, false, true);
+    setQFProperty("HEIGHT", height, false, true);
+    free(oldC);
+    free(oldS);
+    free(oldL);
 }
 
 

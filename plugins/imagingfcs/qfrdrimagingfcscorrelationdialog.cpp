@@ -6,6 +6,8 @@
 #include "qmodernprogresswidget.h"
 #include "qfrdrimagingfcsdataexplorer.h"
 #include "qfrdrimagingfcstools.h"
+#include "qfstyledbutton.h"
+#include "qfcompleterfromfile.h"
 
 #define UPDATE_TIMEOUT 250
 
@@ -51,6 +53,16 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     ui->edtPostfix->addInsertContextMenuEntry(tr("insert %correlator%"), QString("%correlator%"));
     ui->edtPostfix->addInsertContextMenuEntry(tr("insert %bleach%"), QString("%bleach%"));
     //ui->edtPostfix->addInsertContextMenuEntry(tr("insert %%"), QString("%%"));
+
+    ui->edtDCCF->addInsertContextMenuEntry(tr("4 neighbors"), QString("1,0;-1,0;0,1;0,-1;"));
+    ui->edtDCCF->addInsertContextMenuEntry(tr("8 neighbors"), QString("1,0;1,1;0,1;-1,1;-1,0;-1,-1;0,-1;1,-1;"));
+    ui->edtDCCF->addInsertContextMenuEntry(tr("4 to the right"), QString("1,0;2,0;3,0;4,0;"));
+    ui->edtDCCF->addInsertContextMenuEntry(tr("8 to the right"), QString("1,0;2,0;3,0;4,0;5,0;6,0;7,0;8,0;"));
+    ui->edtDCCF->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->edtDCCF, ui->edtDCCF));
+    ui->edtDCCF->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, ui->edtDCCF, ui->edtDCCF));
+    QFCompleterFromFile* cc=new QFCompleterFromFile(ui->edtDCCF);
+    cc->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"plugins/imaging_fcs/completers/dccf.txt");
+    ui->edtDCCF->setCompleter(cc);
 
     imageFilters.clear();
     ui->cmbFileformat->clear();
@@ -613,7 +625,7 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
     job.DCCFDeltaY.clear();
     //job.DCCFDeltaX.append(ui->spinDistanceCCFDeltaX->value());
     //job.DCCFDeltaY.append(ui->spinDistanceCCFDeltaY->value());
-    QString dccfs=ui->edtDCCF->text();
+    QString dccfs=ui->edtDCCF->text()+";";
     QRegExp rxdccf("([\\+\\-]?\\d+)\\s*\\,\\s*([\\+\\-]?\\d+)");
     rxdccf.setCaseSensitivity(Qt::CaseInsensitive);
     int pos = 0;

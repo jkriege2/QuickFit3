@@ -344,4 +344,15 @@ QVector<T> removeQListDouplicates(const QVector<T>& list) {
     }
     return out;
 }
+
+/*! \brief duplicate a memory array, i.e. reserve the data of the array a second time using malloc() and copy the contents
+    \ingroup qf3lib_tools
+
+*/
+template <class T>
+T* duplicateArray(const T* input, long long N) {
+    T* out=(T*)malloc(N*sizeof(T));
+    memcpy(out, input, N*sizeof(T));
+    return out;
+}
 #endif // QFTOOLS_H

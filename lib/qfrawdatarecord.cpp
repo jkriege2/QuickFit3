@@ -65,6 +65,7 @@ QFRawDataRecord::QFRawDataRecord(QFProject* parent):
     name="";
     folder="";
     description="";
+    role="";
     resultsmodel=NULL;
     propModel=NULL;
     doEmitResultsChanged=true;
@@ -388,6 +389,26 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
     }
     if (em) emit basicPropertiesChanged();
 }
+
+void QFRawDataRecord::setRole(const QString &n)
+{
+    bool em=false;
+    {
+
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (role!=n) {
+            role=n;
+            em=true;
+        }
+    }
+    if (em) emit basicPropertiesChanged();
+}
 /** \brief set the description  */
 void QFRawDataRecord::setDescription(const QString& d) {
     bool em=false;
@@ -420,6 +441,7 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 #endif
         bool ok=true;
         name=e.attribute("name", "rawdatarecord");
+        role=e.attribute("role", "");
         ID=e.attribute("id", "-1").toInt(&ok);
         if (ID==-1) { setError(tr("invalid ID in <rawdatarecord name=\"%1\" ...>!").arg(name)); return; }
         if (!project->checkID(ID)) {
@@ -786,10 +808,13 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
     w.writeAttribute("type", getType());
     w.writeAttribute("id", QString::number(ID));
     w.writeAttribute("name", name);
-    w.writeAttribute("folder", folder);
-    w.writeStartElement("description");
-    w.writeCDATA(description);
-    w.writeEndElement();
+    if (!folder.isEmpty()) w.writeAttribute("folder", folder);
+    if (!role.isEmpty()) w.writeAttribute("role", role);
+    if (!description.isEmpty()) {
+        w.writeStartElement("description");
+        w.writeCDATA(description);
+        w.writeEndElement();
+    }
     w.writeStartElement("properties");
     storeProperties(w);
     w.writeEndElement();
@@ -801,9 +826,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
         w.writeStartElement("evaluation");
         QString n=i.key();
         w.writeAttribute("name", n);
-        w.writeAttribute("group", i.value()->group);
+        if (!i.value()->group.isEmpty()) w.writeAttribute("group", i.value()->group);
         w.writeAttribute("groupindex", QString::number(i.value()->groupIndex));
-        w.writeAttribute("description", i.value()->description);
+        if (!i.value()->description.isEmpty()) w.writeAttribute("description", i.value()->description);
         QFRawDataRecordPrivate::ResultsResultsIterator  j(i.value()->results);
         //for (int j=0; j<i.value().size(); j++) {
         while (j.hasNext()) {
@@ -3847,6 +3872,16 @@ void QFRawDataRecord::enableEmitPropertiesChanged(bool emitnow) {
 
 bool QFRawDataRecord::isEmitPropertiesChangedEnabled() const {
     return doEmitPropertiesChanged;
+}
+
+QStringList QFRawDataRecord::getAvailableRoles() const
+{
+    return QStringList();
+}
+
+bool QFRawDataRecord::isRoleUserEditable() const
+{
+    return false;
 }
 
 QString QFRawDataRecord::resultsGetInStringMatrix(const QString &evaluationName, const QString &resultName, int row, int column, const QString &defaultValue) const {

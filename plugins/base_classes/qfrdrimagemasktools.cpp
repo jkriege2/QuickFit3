@@ -100,6 +100,33 @@ QString QFRDRImageMaskTools::maskToString() const
     return maskToListString(", ", "\n");
 }
 
+QString QFRDRImageMaskTools::maskToIndexString(QChar separator) const
+{
+    if (!mask) return "";
+    QString res="";
+    bool first=true;
+    for (uint16_t i=0; i<mask_w*mask_h; i++) {
+        if (mask[i]) {
+            if (!first) res+=separator;
+            res+=QString::number(i);
+            first=false;
+        }
+    }
+    return res;
+}
+
+void QFRDRImageMaskTools::maskLoadFromIndexString(const QString &data, QChar separator)
+{
+    if (!mask) return;
+    QStringList sl=data.split(separator);
+
+    for (int i=0; i<sl.size(); i++) {
+        bool ok=false;
+        uint16_t idx=sl[i].toUInt(&ok);
+        if (ok) maskSetIdx(idx, true);
+    }
+}
+
 void QFRDRImageMaskTools::maskClear()
 {
     if (!mask) return;
@@ -172,6 +199,17 @@ long QFRDRImageMaskTools::maskGetCount() const
         if (mask[i]) result++;
     }
     return result;
+}
+
+void QFRDRImageMaskTools::maskSetIdx(uint16_t idx, bool value)
+{
+    if (idx>=0 && idx<mask_w*mask_h) mask[idx]=value;
+}
+
+bool QFRDRImageMaskTools::maskGetIdx(uint16_t idx) const
+{
+    if (idx>=0 && idx<mask_w*mask_h) return mask[idx];
+    return false;
 }
 
 

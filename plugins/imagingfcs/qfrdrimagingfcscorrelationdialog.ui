@@ -1369,7 +1369,7 @@ p, li { white-space: pre-wrap; }
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="edtDCCF">
+            <widget class="QEnhancedLineEdit" name="edtDCCF">
              <property name="enabled">
               <bool>false</bool>
              </property>

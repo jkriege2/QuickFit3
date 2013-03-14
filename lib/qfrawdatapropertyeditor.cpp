@@ -193,7 +193,20 @@ void QFRawDataPropertyEditor::createWidgets() {
     fl->addWidget((l=new QLabel(tr("&Name:"), w)), 2, 0);
     l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
     l->setBuddy(edtName);
-    fl->addWidget(edtName, 2, 1);
+    QHBoxLayout* ntl=new QHBoxLayout(this);
+    ntl->setContentsMargins(0,0,0,0);
+    ntl->addWidget(edtName, 1);
+    ntl->addStretch();
+
+    cmbRole=new QComboBox(this);
+    cmbRole->setEditable(true);
+    cmbRole->setEnabled(false);
+    ntl->addWidget(l=new QLabel(tr("&role:"), this));
+    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    l->setBuddy(cmbRole);
+    ntl->addWidget(cmbRole);
+
+    fl->addLayout(ntl, 2, 1);
     fl->setRowStretch(2,1);
 
     edtFolder=new QLineEdit(w);
@@ -529,6 +542,8 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         disconnect(pteDescription, SIGNAL(textChanged()), this, SLOT(descriptionChanged()));
         disconnect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         disconnect(edtFolder, SIGNAL(textChanged(const QString&)), this, SLOT(folderChanged(const QString&)));
+        disconnect(cmbRole, SIGNAL(currentIndexChanged(QString)), this, SLOT(roleChanged(QString)));
+        disconnect(cmbRole, SIGNAL(editTextChanged(QString)), this, SLOT(roleChanged(QString)));
         disconnect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
         disconnect(current, SIGNAL(basicPropertiesChanged()), this, SLOT(basicPropsChanged()));
         disconnect(current->getPropertyModel(), SIGNAL(modelReset()), this, SLOT(resizePropertiesLater()));
@@ -599,6 +614,13 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         edtName->setEnabled(true);
         edtFolder->setText(current->getFolder());
         edtFolder->setEnabled(true);
+        cmbRole->clear();
+        cmbRole->addItems(current->getAvailableRoles());
+        cmbRole->setEditable(cmbRole->count()<=0);
+        cmbRole->setEnabled(current->isRoleUserEditable());
+        cmbRole->setEditText(current->getRole());
+        if (cmbRole->count()>0) cmbRole->setCurrentIndex(cmbRole->findText(current->getRole()));
+
         propDelegate->setProject(current->getProject());
 
         pteDescription->setPlainText(current->getDescription());
@@ -629,6 +651,8 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         connect(pteDescription, SIGNAL(textChanged()), this, SLOT(descriptionChanged()));
         connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
         connect(edtFolder, SIGNAL(textChanged(const QString&)), this, SLOT(folderChanged(const QString&)));
+        connect(cmbRole, SIGNAL(editTextChanged(QString)), this, SLOT(roleChanged(QString)));
+        connect(cmbRole, SIGNAL(currentIndexChanged(QString)), this, SLOT(roleChanged(QString)));
         connect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
         connect(current, SIGNAL(basicPropertiesChanged()), this, SLOT(basicPropsChanged()));
         connect(current->getPropertyModel(), SIGNAL(modelReset()), this, SLOT(resizePropertiesLater()));
@@ -692,6 +716,11 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
         edtName->setEnabled(false);
         edtFolder->setText("");
         edtFolder->setEnabled(false);
+        cmbRole->setEnabled(false);
+        cmbRole->clear();
+        cmbRole->setEditable(true);
+        cmbRole->setEditText("");
+        cmbRole->setCurrentIndex(-1);
         pteDescription->setPlainText("");
         pteDescription->setEnabled(false);
         labTopIcon->setText("");
@@ -868,6 +897,13 @@ void QFRawDataPropertyEditor::folderChanged(const QString& text) {
     }
 }
 
+void QFRawDataPropertyEditor::roleChanged(const QString &text)
+{
+    if (current && current->isRoleUserEditable()) {
+        current->setRole(text);
+    }
+}
+
 void QFRawDataPropertyEditor::descriptionChanged() {
     if (current) {
         current->setDescription(pteDescription->toPlainText());
@@ -917,36 +953,7 @@ void QFRawDataPropertyEditor::deleteRecord() {
         }
     }
 }
-/*
-void QFRawDataPropertyEditor::propsChanged(const QString& property, bool visible) {
-    if (current && (visible || property.isEmpty())) {
-        if (current->getName()!=edtName->text()) {
-            edtName->setText(current->getName());
-        }
-        if (current->getFolder()!=edtFolder->text()) {
-            edtFolder->setText(current->getFolder());
-        }
-        if (current->getDescription()!=pteDescription->toPlainText()) {
-            pteDescription->setPlainText(current->getDescription());
-        }
-        labTopIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
-        labTop->setText(tr("current record:<br /><b>%1</b>").arg(current->getName()));
-        labID->setText(QString::number(current->getID()));
-        labType->setText(current->getTypeDescription());
-        labTypeIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
-        lstFiles->clear();
-        QStringList f=current->getFiles();
-        QStringList t=current->getFilesTypes();
-        for (int i=0; i<f.size(); i++) {
-            if (i<t.size()) {
-                if (!t[i].isEmpty()) f[i]=f[i]+QString(" [%1]").arg(t[i]);
-            }
-        }
-        lstFiles->addItems(f);
-        //paramFilterProxy->sort(0);
-    }
-}
-*/
+
 void QFRawDataPropertyEditor::basicPropsChanged() {
     if (current->getName()!=edtName->text()) {
         edtName->setText(current->getName());
@@ -956,6 +963,10 @@ void QFRawDataPropertyEditor::basicPropsChanged() {
     }
     if (current->getDescription()!=pteDescription->toPlainText()) {
         pteDescription->setPlainText(current->getDescription());
+    }
+    if (current->getRole()!=cmbRole->currentText()) {
+        if (cmbRole->count()>0) cmbRole->setCurrentIndex(cmbRole->findText(current->getRole()));
+        if (cmbRole->isEditable()) cmbRole->setEditText(current->getRole());
     }
     labTopIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
     labTop->setText(tr("current record:<br /><b>%1</b>").arg(current->getName()));

@@ -31,7 +31,18 @@
 class QFLIB_EXPORT QFStyledButton : public QAbstractButton {
         Q_OBJECT
     public:
-        enum ActionMode { None=0, OpenURL=1, ExecuteFile=2, SelectFile=3, OpenPrependedURL=4, ClearLineEdit=5, OpenFile=6, SelectFromCompleter=7, SelectDirectory=8, SelectNewFile=9  };
+        enum ActionMode {
+            None=0,
+            OpenURL=1,
+            ExecuteFile=2,
+            SelectFile=3,
+            OpenPrependedURL=4,
+            ClearLineEdit=5,
+            OpenFile=6,
+            SelectFromCompleter=7,
+            SelectDirectory=8,
+            SelectNewFile=9
+        };
 
         QFStyledButton(const QIcon& icon, QWidget* parent=NULL);
         QFStyledButton(QAction* action, QWidget* parent=NULL);

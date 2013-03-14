@@ -73,6 +73,9 @@ class QFLIB_EXPORT QFProperties {
         inline void setStringProperty(const QString& p, QString value, bool usereditable=true, bool visible=true) {
             setQFProperty(p, QVariant(value), usereditable, visible);
         }
+
+        /** \brief add all properties from another QFProperties object to this object */
+        void addProperties(const QFProperties& other);
     protected:
         /** \brief struct to store a property */
         struct propertyItem {

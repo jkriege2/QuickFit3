@@ -118,6 +118,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         void setDualViewMode(DualViewMode mode);
 
 
+
         /** \brief returns the number of runs in the record */
         virtual int leaveoutGetRunCount() const;
         /** \brief returns whether to leave out a run */
@@ -135,38 +136,38 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
 
         /** \brief return the number of datapoints in the statistics dataset */
-        uint32_t getStatisticsN() const;
+        uint32_t getStatisticsN(int channel=0) const;
         /** \brief return the array of average values of the statsitics */
-        double* getStatisticsMean() const;
+        double* getStatisticsMean(int channel=0) const;
         /** \brief return the array of standard deviation values of the statsitics */
-        double* getStatisticsStdDev() const;
-        double* getStatisticsMin() const;
-        double* getStatisticsMax() const;
+        double* getStatisticsStdDev(int channel=0) const;
+        double* getStatisticsMin(int channel=0) const;
+        double* getStatisticsMax(int channel=0) const;
         /** \brief return the array of time points [seconds] for the statsitics */
-        double *getStatisticsT() const;
+        double *getStatisticsT(int channel=0) const;
 
         /** \brief return the number of datapoints in the background statistics dataset */
-        uint32_t getBackgroundStatisticsN() const;
+        uint32_t getBackgroundStatisticsN(int channel=0) const;
         /** \brief return the array of average values of the background statsitics */
-        double* getBackgroundStatisticsMean() const;
+        double* getBackgroundStatisticsMean(int channel=0) const;
         /** \brief return the array of standard deviation values of the background statsitics */
-        double* getBackgroundStatisticsStdDev() const;
-        double* getBackgroundStatisticsMin() const;
-        double* getBackgroundStatisticsMax() const;
+        double* getBackgroundStatisticsStdDev(int channel=0) const;
+        double* getBackgroundStatisticsMin(int channel=0) const;
+        double* getBackgroundStatisticsMax(int channel=0) const;
         /** \brief return the array of time points [seconds] for the background  statsitics */
-        double *getBackgroundStatisticsT() const;
+        double *getBackgroundStatisticsT(int channel=0) const;
 
 
         /** \brief return the number of datapoints in the Uncorrected statistics dataset */
-        uint32_t getUncorrectedStatisticsN() const;
+        uint32_t getUncorrectedStatisticsN(int channel=0) const;
         /** \brief return the array of average values of the Uncorrected statsitics */
-        double* getUncorrectedStatisticsMean() const;
+        double* getUncorrectedStatisticsMean(int channel=0) const;
         /** \brief return the array of standard deviation values of the Uncorrected statsitics */
-        double* getUncorrectedStatisticsStdDev() const;
-        double* getUncorrectedStatisticsMin() const;
-        double* getUncorrectedStatisticsMax() const;
+        double* getUncorrectedStatisticsStdDev(int channel=0) const;
+        double* getUncorrectedStatisticsMin(int channel=0) const;
+        double* getUncorrectedStatisticsMax(int channel=0) const;
         /** \brief return the array of time points [seconds] for the Uncorrected  statsitics */
-        double *getUncorrectedStatisticsT() const;
+        double *getUncorrectedStatisticsT(int channel=0) const;
 
 
 
@@ -191,8 +192,19 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
 
 
+        /** \brief returns a list of the allowed RDR roles, default: an emplty list */
+        virtual QStringList getAvailableRoles() const;
+        /** \brief if this returns \c true, the user may change the RDRs role in the QFRawDataPropertyEditor, default: \c false */
+        virtual bool isRoleUserEditable() const;
 
     protected:
+
+        /** \brief indicates whether the internal data representation is "dual view", this is independent of dualViewMode() and setDualViewMode() which only influences the data display! */
+        DualViewMode internalDualViewMode() const;
+        /** \brief returns which channel of the full dataset to use */
+        int internalDualViewModeChannel() const;
+        void setInternalDualViewMode(DualViewMode mode);
+
         /** \brief write the contents of the object to a XML file */
         virtual void intWriteData(QXmlStreamWriter& w);
         /** \brief read in external data files <b>and</b> data stored in the project file <b>IMPLEMENT IN CHILD CLASSES!</b>
@@ -208,13 +220,10 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         bool loadVideoCorrelatorFileBin(const QString &filename);
 
         /** \brief load data file from Radhard2 array */
-        bool loadRadhard2File(const QString& filename);
+        bool loadRadhard2File(const QString& filename, bool loadOverview=false);
 
         /** \brief load overview image file */
-        bool loadOverview(const QString& filename);
-
-        /** \brief load standard deviation overview image file */
-        bool loadOverviewSTD(const QString& filename);
+        bool loadOverview(double *overviewF, double *overviewF2, const QString &filename);
 
         /** \brief load an image file into the given arrays */
         bool loadImage(const QString &filename, double **data, int *width, int *height);
@@ -225,81 +234,79 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
          */
         bool loadVideo(const QString &filename, double **data, int *width, int *height, uint32_t *frames, double scaleFactor=1, double scaleOffset=0);
 
-        /** \brief load the statistics file */
-        bool loadStatistics(const QString& filename);
-
-        /** \brief load the background statistics file */
-        bool loadBackgroundStatistics(const QString& filename);
-
-        /** \brief load the uncorrected statistics file */
-        bool loadUncorrectedStatistics(const QString& filename);
-
         void loadQFPropertiesFromB040SPIMSettingsFile(QSettings& settings);
 
         double getTauMin() const;
 
-    private:
-        //DualViewMode m_dualview;
+        /*! \brief selects a subpart of a full DV image.
+         */
+        void splitCFsForDualView();
+
+
+    protected:
         /** \brief width of the image */
         int width;
         /** \brief height of the image */
         int height;
+        /** \brief width of the overview image */
+        int widthOvr;
+        /** \brief height of the overview image */
+        int heightOvr;
         /** \brief number of points in correlation curve */
         int N;
         /** \brief points to the correlation curves */
         double* correlations;
+        /** \brief points to the correlation curve erorrs */
+        double* sigmas;
         /** \brief average over all correlation curves */
         double* correlationMean;
         /** \brief average over all correlation curves */
         double* correlationStdDev;
-        /** \brief points to the correlation curve erorrs */
-        double* sigmas;
         /** \brief time axis [seconds] */
         double* tau;
 
+        struct statisticsData {
+            /** \brief number of data points in the statistics  */
+            uint32_t N;
+            /** \brief statistics: average vector */
+            double* Avg;
+            /** \brief statistics: standard deviation vector */
+            double* StdDev;
+            /** \brief statistics: time [seconds] vector */
+            double* T;
+            double* Min;
+            double* Max;
 
-        /** \brief number of data points in the statistics  */
-        uint32_t statN;
-        /** \brief statistics: average vector */
-        double* statAvg;
-        /** \brief statistics: standard deviation vector */
-        double* statStdDev;
-        /** \brief statistics: time [seconds] vector */
-        double* statT;
-        double* statMin;
-        double* statMax;
+            double avgCnt;
+            double sigmaCnt;
+        };
 
-        /** \brief background number of data points in the statistics  */
-        uint32_t backStatN;
-        /** \brief background statistics: average vector */
-        double* backStatAvg;
-        /** \brief background statistics: standard deviation vector */
-        double* backStatStdDev;
-        /** \brief background statistics: time [seconds] vector */
-        double* backStatT;
-        double* backStatMin;
-        double* backStatMax;
+        /** \brief load the statistics file */
+        bool loadStatistics(statisticsData& stat, const QString& filename);
 
-        /** \brief uncorrected number of data points in the statistics  */
-        uint32_t ucStatN;
-        /** \brief uncorrected statistics: average vector */
-        double* ucStatAvg;
-        /** \brief uncorrected statistics: standard deviation vector */
-        double* ucStatStdDev;
-        /** \brief uncorrected statistics: time [seconds] vector */
-        double* ucStatT;
-        double* ucStatMin;
-        double* ucStatMax;
-
+        /** \brief statistics */
+        statisticsData stat;
+        /** \brief background statistics */
+        statisticsData backStat;
+        /** \brief uncorrected statistics */
+        statisticsData ucStat;
         bool hasStatistics;
-        double statAvgCnt;
-        double statSigmaCnt;
-        double backStatAvgCnt;
-        double backStatSigmaCnt;
+
+        /** \brief statistics 2 */
+        statisticsData stat2;
+        /** \brief background statistics 2 */
+        statisticsData backStat2;
+        /** \brief uncorrected statistics 2 */
+        statisticsData ucStat2;
+        bool hasStatistics2;
+
+
 
         /** \brief overview image */
         double* overviewF;
         double* overviewFSTD;
+        double* overviewF2;
+        double* overviewF2STD;
 
         struct ovrImageData {
             double* image;
@@ -346,17 +353,17 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
         void clearOvrImages();
 
-        /** \brief the leaveout list */
-        bool* leaveout;
-        //QList<int> leaveout;
+        int getExpectedFileWidth() const;
+        int getExpectedFileHeight() const;
+
+        void splitImage(double *overviewF, double *overviewF2, const double *inputImage, uint32_t nx, uint32_t ny) const;
+
     protected:
         /** \brief allocate memory to store a \a x by \a y set of correlation curves (+ additional data, like average and sigmas) with \a N datapoints each */
         virtual void allocateContents(int x, int y, int N);
-        void allocateStatistics(uint32_t N);
-        void allocateBackgroundStatistics(uint32_t N);
-        void allocateUncorrectedStatistics(uint32_t N);
-
-
+        /** \brief allocate memory for overview images */
+        virtual void allocateOverviews(int x, int y);
+        void allocateStatistics(statisticsData& stat, uint32_t N);
     public:
         /** \copydoc QFRDRImageToRunInterface::getImageFromRunsWidth() */
         virtual int getImageFromRunsWidth() const;
