@@ -65,6 +65,16 @@ class QFLIB_EXPORT QFProjectTreeModelNode : public QObject {
         QFProject* project() const;
         void setProject(QFProject* project);
 
+        /** \brief returns a list of all QFRawDataRecords that can be found below the current node (i.e. flattens the full subtree!!!) */
+        QList<QFProjectTreeModelNode*> getAllChildRawDataRecords() ;
+        /** \brief returns a list of all childrennodes (i.e. flattens the full subtree!!!) */
+        QList<QFProjectTreeModelNode*> getAllChildren() ;
+        /** \brief returns a list of all children nodes that are RDRs or EvaluationItems (i.e. flattens the full subtree!!!) */
+        QList<QFProjectTreeModelNode*> getAllChildrenRDRandEval() ;
+
+        /** \brief returns the path to the current record (as it may be found in QFRawdataRecord::getFolder()) */
+        QString getPath() ;
+
         QFProjectTreeModelNode* addChild(nodeType type, const QString& title=QString(""));
         QFProjectTreeModelNode* addChild(QFRawDataRecord* rdr);
         QFProjectTreeModelNode* addChild(QFEvaluationItem* item);

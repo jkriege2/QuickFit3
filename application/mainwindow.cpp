@@ -766,6 +766,8 @@ void MainWindow::createWidgets() {
     spMain->setOrientation(Qt::Vertical);
     tvMain=new QTreeView(this);
     tvMain->setHeaderHidden(true);
+    tvMain->setContextMenuPolicy(Qt::ActionsContextMenu);
+    tvMain->setEditTriggers(QAbstractItemView::SelectedClicked);
     connect(tvMain, SIGNAL(doubleClicked ( const QModelIndex &)), this, SLOT(projectElementDoubleClicked(const QModelIndex&)));
     spCenter->addWidget(tvMain);
     QShortcut* shortcut = new QShortcut(QKeySequence(tr("Del")), tvMain);
@@ -1467,6 +1469,21 @@ void MainWindow::deleteItem() {
                 QApplication::processEvents();
                 tvMain->selectionModel()->select(project->getTreeModel()->index(nrec), QItemSelectionModel::Current|QItemSelectionModel::Select);
                 //qDebug()<<"    index "<<project->getTreeModel()->index(nrec);
+            }
+        } else if (nt==QFProjectTreeModelNode::qfpntDirectory) {
+            QFProjectTreeModelNode* dir=project->getTreeModel()->getTreeNodeByIndex(tvMain->selectionModel()->currentIndex());
+            if (dir) {
+                QList<QFProjectTreeModelNode*> children=dir->getAllChildrenRDRandEval();
+                bool ok=true;
+                if (children.size()>1) {
+                    ok = (QMessageBox::question(this, tr("QuickFit 3.0"), tr("Dou you really want to delete all %1 child items of the selected node?").arg(children.size()), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
+                }
+                if (ok) {
+                    for (int i=0; i<children.size(); i++) {
+                        if (children[i]->type()==QFProjectTreeModelNode::qfpntEvaluationRecord && children[i]->evaluationItem()) project->deleteEvaluation(children[i]->evaluationItem()->getID());
+                        if (children[i]->type()==QFProjectTreeModelNode::qfpntRawDataRecord && children[i]->rawDataRecord()) project->deleteRawData(children[i]->rawDataRecord()->getID());
+                    }
+                }
             }
         }
     }

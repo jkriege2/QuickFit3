@@ -59,6 +59,10 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         QMap<int, QFEvaluationItem*> evaluations;
         /** \brief stores all raw data records that belong to the project */
         QSet<int> IDs;
+        /** \brief sort order of the RDRs, this is a list of the IDs of all RDRs in the order they should appear in an item view */
+        QList<int> rawDataOrder;
+        /** \brief sort order of the evaluations, this is a list of the IDs of all evaluations in the order they should appear in an item view */
+        QList<int> evaluationsOrder;
         /** \brief name of the project */
         QString name;
         /** \brief description of the project */
@@ -87,6 +91,8 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
 
         bool reading;
 
+        bool m_signalsEnabled;
+
     public:
         /** Default constructor */
         QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent=NULL);
@@ -94,6 +100,9 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         virtual ~QFProject();
 
         QFPluginServices* getServices() { return services; };
+
+        void setSignalsEnabled(bool enabled=true, bool emitChange=false);
+        bool areSignalsEnabled() const;
 
         /** \brief return a new unused ID (stores the returned ID as currently highestID, so the next call will return a higher ID!) */
         int getNewID();
@@ -280,9 +289,52 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         */
         bool rdrResultsSaveToSYLK(const QString& evalFilter, QString filename, bool vectorsToAvg=false, bool flipTable=false);
 
+        /** \brief returns a pointer to the projects RDR factory object */
+        QFRawDataRecordFactory* getRawDataRecordFactory();
+        /** \brief returns a pointer to the projects evaluation factory object */
+        QFEvaluationItemFactory* getEvaluationItemFactory();
 
-        QFRawDataRecordFactory* getRawDataRecordFactory() { return rdrFactory; };
-        QFEvaluationItemFactory* getEvaluationItemFactory() { return evalFactory; };
+        enum RecordInsertModes {
+            insertRecordBefore,
+            insertRecordAfter,
+            swapRecods
+        };
+
+        /** \brief move the given RDR from its current position to the specified position */
+        void moveRawDataRecordToPosition(QFRawDataRecord* rec, int positionIndex);
+        /** \brief move the given RDR from its current position to the specified position */
+        void moveRawDataRecordToPosition(int recID, int positionIndex);
+        /** \brief move the given RDR from its current position to the position of the given second record \a rec2. The record \a rec2 is moved according to the parameter \a mode */
+        void moveRawDataRecord(QFRawDataRecord* rec, QFRawDataRecord* rec2, RecordInsertModes moveMode=insertRecordBefore);
+        /** \brief move the given RDR from its current position to the position of the given second record \a recID2. The record \a recID2 is moved according to the parameter \a mode */
+        void moveRawDataRecord(int recID, int recID2, RecordInsertModes moveMode=insertRecordBefore);
+        /** \brief move the given RDR one position up */
+        void moveRawDataRecordUp(QFRawDataRecord* rec);
+        /** \brief move the given RDR one position up */
+        void moveRawDataRecordUp(int recID);
+        /** \brief move the given RDR one position up */
+        void moveRawDataRecordDown(QFRawDataRecord* rec);
+        /** \brief move the given RDR one position up */
+        void moveRawDataRecordDown(int recID);
+
+
+        /** \brief move the given evaluation from its current position to the specified position */
+        void moveEvaluationToPosition(QFEvaluationItem* rec, int positionIndex);
+        /** \brief move the given evaluation from its current position to the specified position */
+        void moveEvaluationToPosition(int recID, int positionIndex);
+        /** \brief move the given evaluation from its current position to the position of the given second evaluation \a rec2. The evaluation \a rec2 is moved according to the parameter \a mode */
+        void moveEvaluation(QFEvaluationItem* rec, QFEvaluationItem* rec2, RecordInsertModes moveMode=insertRecordBefore);
+        /** \brief move the given evaluation from its current position to the position of the given second evaluation \a recID2. The evaluation \a recID2 is moved according to the parameter \a mode */
+        void moveEvaluation(int recID, int recID2, RecordInsertModes moveMode=insertRecordBefore);
+        /** \brief move the given evaluation one position up */
+        void moveEvaluationUp(QFEvaluationItem* rec);
+        /** \brief move the given evaluation one position up */
+        void moveEvaluationUp(int recID);
+        /** \brief move the given evaluation one position up */
+        void moveEvaluationDown(QFEvaluationItem* rec);
+        /** \brief move the given evaluation one position up */
+        void moveEvaluationDown(int recID);
+
     signals:
         /** \brief emitted when the data changed state of the project is modified */
         void wasChanged(bool changed);
@@ -297,8 +349,6 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /** \bief emitted when the project structure changes (i.e. a record is added, or renamed) */
         void structureChanged();
 
-        /** \brief emitted when the data in a record changes */
-        //void rdDataChanged(QFRawDataRecord* record);
     public slots:
         /** \brief tell the project that the data contained in it has changed ... and it needs to be saved */
         void setDataChanged();

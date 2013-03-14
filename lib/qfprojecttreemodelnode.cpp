@@ -93,6 +93,58 @@ void QFProjectTreeModelNode::setProject(QFProject* project) {
     m_project=project;
 }
 
+QList<QFProjectTreeModelNode *> QFProjectTreeModelNode::getAllChildRawDataRecords()
+{
+    QList<QFProjectTreeModelNode *> list;
+    if (m_type==QFProjectTreeModelNode::qfpntRawDataRecord) list<<this;
+    for (int i=0; i<childItems.size(); i++) {
+        if (childItems[i]) list.append(childItems[i]->getAllChildRawDataRecords());
+    }
+    list=removeQListDouplicates(list);
+    return list;
+}
+
+QList<QFProjectTreeModelNode *> QFProjectTreeModelNode::getAllChildren()
+{
+    QList<QFProjectTreeModelNode *> list;
+    list<<this;
+    for (int i=0; i<childItems.size(); i++) {
+        if (childItems[i]) list.append(childItems[i]->getAllChildRawDataRecords());
+    }
+    list=removeQListDouplicates(list);
+    return list;
+}
+
+QList<QFProjectTreeModelNode *> QFProjectTreeModelNode::getAllChildrenRDRandEval()
+{
+    QList<QFProjectTreeModelNode *> list;
+    if (m_type==QFProjectTreeModelNode::qfpntRawDataRecord) list<<this;
+    if (m_type==QFProjectTreeModelNode::qfpntEvaluationRecord) list<<this;
+    for (int i=0; i<childItems.size(); i++) {
+        if (childItems[i]) list.append(childItems[i]->getAllChildRawDataRecords());
+    }
+    list=removeQListDouplicates(list);
+    return list;
+}
+
+QString QFProjectTreeModelNode::getPath()
+{
+    QFProjectTreeModelNode* n=this;
+    QString path="";
+    if (type()==QFProjectTreeModelNode::qfpntDirectory) path=m_title;
+    while (n->parent()) {
+        n=n->parent();
+        if (n->type()==QFProjectTreeModelNode::qfpntDirectory
+            && n->parent() && n->parent()->type()!=QFProjectTreeModelNode::qfpntProject
+                           && n->parent()->type()!=QFProjectTreeModelNode::qfpntRoot
+                           && n->parent()->type()!=QFProjectTreeModelNode::qfpntUnknown) path=n->title()+"/"+path;
+        if (n->type()==QFProjectTreeModelNode::qfpntProject) break;
+        if (n->type()==QFProjectTreeModelNode::qfpntRoot) break;
+        if (n->type()==QFProjectTreeModelNode::qfpntUnknown) break;
+    }
+    return path;
+}
+
 
 QIcon QFProjectTreeModelNode::icon() const {
     if (m_type==QFProjectTreeModelNode::qfpntProject) {

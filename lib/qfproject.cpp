@@ -30,6 +30,7 @@ QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactor
     rdModel=NULL;
     treeModel=NULL;
     reading=false;
+    m_signalsEnabled=true;
 }
 
 
@@ -43,6 +44,7 @@ QFProject::~QFProject()
         delete i.value();
     }
     rawData.clear();
+    rawDataOrder.clear();
 
     QMapIterator<int, QFEvaluationItem*> j(evaluations);
     while (j.hasNext()) {
@@ -51,7 +53,18 @@ QFProject::~QFProject()
         delete j.value();
     }
     evaluations.clear();
+    evaluationsOrder.clear();
     //std::cout<<"deleting QFProject ... OK\n";
+}
+
+void QFProject::setSignalsEnabled(bool enabled, bool emitChange)
+{
+    m_signalsEnabled=enabled;
+    if (emitChange) {
+        emit structureChanged();
+        emit wasChanged(dataChange);
+        emit propertiesChanged();
+    }
 }
 
 QFProjectRawDataModel* QFProject::getRawDataModel() {
@@ -71,35 +84,57 @@ QFProjectTreeModel* QFProject::getTreeModel() {
 };
 
 QFRawDataRecord* QFProject::getNextRawData(QFRawDataRecord* current) {
-    if ( (!current) || (rawData.size()<=0) ) return NULL;
-    int i=rawData.values().indexOf(current);
+    if ( (!current) || (rawData.size()<=0) || rawDataOrder.isEmpty() ) return NULL;
+    /*int i=rawData.values().indexOf(current);
     if ((i+1>0) && (i+1<rawData.size())) return rawData.values().at(i+1);
     if (i==rawData.size()-1) return rawData.values().at(0);
+    return NULL;*/
+    int i=rawDataOrder.indexOf(current->getID());
+    int newI=i+1;
+    if ((newI>=0) && newI<rawDataOrder.size()) return rawData.value(rawDataOrder[newI], NULL);
+    if (newI>=rawDataOrder.size()) return rawData.value(rawDataOrder.first(), NULL);
     return NULL;
 }
 
 QFRawDataRecord* QFProject::getPreviousRawData(QFRawDataRecord* current) {
-    if ( (!current) || (rawData.size()<=0) ) return NULL;
-    int i=rawData.values().indexOf(current);
+    if ( (!current) || (rawData.size()<=0) || rawDataOrder.isEmpty() ) return NULL;
+    /*int i=rawData.values().indexOf(current);
     if ((i-1>=0) && (i-1<rawData.size()) ) return rawData.values().at(i-1);
     if (i==0) return rawData.values().at(rawData.size()-1);
+    return NULL;*/
+    int i=rawDataOrder.indexOf(current->getID());
+    int newI=i-1;
+    if ((newI>=0) && newI<rawDataOrder.size()) return rawData.value(rawDataOrder[newI], NULL);
+    if (newI<=0) return rawData.value(rawDataOrder.last(), NULL);
     return NULL;
+
 }
 
 QFRawDataRecord* QFProject::getNextRawDataOfSameType(QFRawDataRecord* current) {
-    if (!current || rawData.size()<=0) return NULL;
+    /*if (!current || rawData.size()<=0) return NULL;
     int i=rawData.values().indexOf(current);
     QString t=current->getType();
     int cnt=rawData.size();
     for (int k=i+1; k<i+cnt; k++) {
         int l=k%cnt;
         if (rawData.values().at(l)->getType()==t) return rawData.values().at(l);
+    }
+    return current;*/
+    if ( (!current) || (rawData.size()<=0) || rawDataOrder.isEmpty() ) return NULL;
+    int i=rawDataOrder.indexOf(current->getID());
+    int newI=i+1;
+    QString t=current->getType();
+    int cnt=rawDataOrder.size();
+    for (int k=newI; k<i+cnt; k++) {
+        int l=k%cnt;
+        QFRawDataRecord* rec=rawData[rawDataOrder[l]];
+        if (rec->getType()==t) return rec;
     }
     return current;
 }
 
 QFRawDataRecord* QFProject::getPreviousRawDataOfSameType(QFRawDataRecord* current) {
-    if (!current || rawData.size()<=0) return NULL;
+    /*if (!current || rawData.size()<=0) return NULL;
     int i=rawData.values().indexOf(current);
     QString t=current->getType();
     int cnt=rawData.size();
@@ -107,27 +142,51 @@ QFRawDataRecord* QFProject::getPreviousRawDataOfSameType(QFRawDataRecord* curren
         int l=k%cnt;
         if (rawData.values().at(l)->getType()==t) return rawData.values().at(l);
     }
+    return current;*/
+    if ( (!current) || (rawData.size()<=0) || rawDataOrder.isEmpty() ) return NULL;
+    int i=rawDataOrder.indexOf(current->getID());
+    int newI=i-1;
+    QString t=current->getType();
+    int cnt=rawDataOrder.size();
+    for (int k=newI+cnt; k>i; k--) {
+        int l=k%cnt;
+        QFRawDataRecord* rec=rawData[rawDataOrder[l]];
+        if (rec->getType()==t) return rec;
+    }
     return current;
 }
 
 QFEvaluationItem* QFProject::getNextEvaluation(QFEvaluationItem* current) {
-    if (!current || evaluations.size()<=0) return NULL;
+    /*if (!current || evaluations.size()<=0) return NULL;
     int i=evaluations.values().indexOf(current);
     if (i+1>=0 && i+1<evaluations.size()) return evaluations.values().at(i+1);
     if (i==evaluations.size()-1) return evaluations.values().at(0);
+    return NULL;*/
+    if ( (!current) || (evaluations.size()<=0) || evaluationsOrder.isEmpty() ) return NULL;
+    int i=evaluationsOrder.indexOf(current->getID());
+    int newI=i+1;
+    if ((newI>=0) && newI<evaluationsOrder.size()) return evaluations.value(evaluationsOrder[newI], NULL);
+    if (newI>=evaluationsOrder.size()) return evaluations.value(evaluationsOrder.first(), NULL);
     return NULL;
+
 }
 
 QFEvaluationItem* QFProject::getPreviousEvaluation(QFEvaluationItem* current) {
-    if (!current || evaluations.size()<=0) return NULL;
+    /*if (!current || evaluations.size()<=0) return NULL;
     int i=evaluations.values().indexOf(current);
     if (i-1>=0 && i-1<evaluations.size()) return evaluations.values().at(i-1);
     if (i==0) return evaluations.values().at(evaluations.size()-1);
+    return NULL;*/
+    if ( (!current) || (evaluations.size()<=0) || evaluationsOrder.isEmpty() ) return NULL;
+    int i=evaluationsOrder.indexOf(current->getID());
+    int newI=i-1;
+    if ((newI>=0) && newI<evaluationsOrder.size()) return evaluations.value(evaluationsOrder[newI], NULL);
+    if (newI<=0) return evaluations.value(evaluationsOrder.last(), NULL);
     return NULL;
 }
 
 QFEvaluationItem* QFProject::getNextEvaluationOfSameType(QFEvaluationItem* current) {
-    if (!current || evaluations.size()<=0) return NULL;
+    /*if (!current || evaluations.size()<=0) return NULL;
     int i=evaluations.values().indexOf(current);
     QString t=current->getType();
     int cnt=evaluations.size();
@@ -135,17 +194,39 @@ QFEvaluationItem* QFProject::getNextEvaluationOfSameType(QFEvaluationItem* curre
         int l=k%cnt;
         if (evaluations.values().at(l)->getType()==t) return evaluations.values().at(l);
     }
+    return current;*/
+    if ( (!current) || (evaluations.size()<=0) || evaluationsOrder.isEmpty() ) return NULL;
+    int i=evaluationsOrder.indexOf(current->getID());
+    int newI=i+1;
+    QString t=current->getType();
+    int cnt=evaluationsOrder.size();
+    for (int k=newI; k<i+cnt; k++) {
+        int l=k%cnt;
+        QFEvaluationItem* rec=evaluations[evaluationsOrder[l]];
+        if (rec->getType()==t) return rec;
+    }
     return current;
 }
 
 QFEvaluationItem* QFProject::getPreviousEvaluationOfSameType(QFEvaluationItem* current) {
-    if (!current || evaluations.size()<=0) return NULL;
+    /*if (!current || evaluations.size()<=0) return NULL;
     int i=evaluations.values().indexOf(current);
     QString t=current->getType();
     int cnt=evaluations.size();
     for (int k=i-1+cnt; k>i; k--) {
         int l=k%cnt;
         if (evaluations.values().at(l)->getType()==t) return evaluations.values().at(l);
+    }
+    return current;*/
+    if ( (!current) || (evaluations.size()<=0) || evaluationsOrder.isEmpty() ) return NULL;
+    int i=evaluationsOrder.indexOf(current->getID());
+    int newI=i-1;
+    QString t=current->getType();
+    int cnt=evaluationsOrder.size();
+    for (int k=newI+cnt; k>i; k--) {
+        int l=k%cnt;
+        QFEvaluationItem* rec=evaluations[evaluationsOrder[l]];
+        if (rec->getType()==t) return rec;
     }
     return current;
 }
@@ -163,6 +244,7 @@ bool QFProject::registerRawDataRecord(QFRawDataRecord* rec) {
     if (newID>highestID) highestID=newID;
     //rawData[newID]=rec;
     rawData.insert(newID, rec);
+    rawDataOrder.append(newID);
     IDs.insert(newID);
     dataChange=true;
     connect(rec, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(setDataChanged()));
@@ -181,6 +263,7 @@ bool QFProject::registerEvaluation(QFEvaluationItem* rec) {
     if (newID>highestID) highestID=newID;
     //evaluations[rec->getID()]=rec;
     evaluations.insert(newID, rec);
+    evaluationsOrder.append(newID);
     IDs.insert(newID);
     connect(rec, SIGNAL(basicPropertiesChanged()), this, SLOT(setStructureChanged()));
     connect(rec, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), this, SLOT(setDataChanged()));
@@ -195,6 +278,7 @@ void QFProject::deleteRawData(int ID) {
         emit recordAboutToBeDeleted(rec);
         rec->disconnect();
         rawData.remove(ID);
+        rawDataOrder.removeAll(ID);
         IDs.remove(ID);
         delete rec;
         emitStructureChanged();
@@ -207,6 +291,7 @@ void QFProject::deleteEvaluation(int ID) {
         emit evaluationAboutToBeDeleted(rec);
         rec->disconnect();
         evaluations.remove(ID);
+        evaluationsOrder.removeAll(ID);
         IDs.remove(ID);
         delete rec;
         emitStructureChanged();
@@ -245,25 +330,33 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
         storeProperties(w);
         w.writeEndElement();
         w.writeStartElement("rawdata");
-        QMapIterator<int, QFRawDataRecord*> ir(rawData);
+        /*QMapIterator<int, QFRawDataRecord*> ir(rawData);
         //for (int i=0; i<rawData.keys().size(); i++) {
         while (ir.hasNext()) {
             ir.next();
             //qDebug()<<"writing rdr "<<ir.key();
             //int k=rawData.keys().at(i);
             ir.value()->writeXML(w);
-            qDebug()<<"   DONE!";
+            //qDebug()<<"   DONE!";
+        }*/
+        for (int i=0; i<rawDataOrder.size(); i++) {
+            QFRawDataRecord* rec=getRawDataByID(rawDataOrder[i]);
+            if (rec) rec->writeXML(w);
         }
         w.writeEndElement();
         w.writeStartElement("evaluations");
-        QMapIterator<int, QFEvaluationItem*> i(evaluations);
+        /*QMapIterator<int, QFEvaluationItem*> i(evaluations);
         //for (int i=0; i<evaluations.keys().size(); i++) {
         while (i.hasNext()) {
             i.next();
             //qDebug()<<"writing eval "<<i.key();
             //int k=evaluations.keys().at(i);
             i.value()->writeXML(w);
-            qDebug()<<"   DONE!";
+            //qDebug()<<"   DONE!";
+        }*/
+        for (int i=0; i<evaluationsOrder.size(); i++) {
+            QFEvaluationItem* rec=getEvaluationByID(evaluationsOrder[i]);
+            if (rec) rec->writeXML(w);
         }
         w.writeEndElement();
 
@@ -972,6 +1065,17 @@ bool QFProject::rdrResultsSaveToSYLK(const QString& evalFilter, QString filename
     return true;
 }
 
+QFRawDataRecordFactory *QFProject::getRawDataRecordFactory()
+{
+    return rdrFactory;
+}
+
+QFEvaluationItemFactory *QFProject::getEvaluationItemFactory()
+{
+    return evalFactory;
+}
+
+
 
 bool rdrCalcMatchingResults_compare(const QPair<QPointer<QFRawDataRecord>, QString> &s1, const QPair<QPointer<QFRawDataRecord>, QString> &s2) {
     QString ss1=s1.first->getName()+": "+s1.second;
@@ -1016,7 +1120,7 @@ void QFProject::setDataChanged() {
     if (dataChange) return;
     dataChange=true;
     //qDebug()<<"QFProject emit wasChanged(dataChange="<<dataChange<<")";
-    emit wasChanged(dataChange);
+    if (m_signalsEnabled) emit wasChanged(dataChange);
 }
 
 void QFProject::setStructureChanged() {
@@ -1047,13 +1151,13 @@ void QFProject::setError(QString description) {
 
 void QFProject::emitPropertiesChanged() {
     //qDebug()<<"QFProject emit propertiesChanged()";
-    emit propertiesChanged();
+    if (m_signalsEnabled) emit propertiesChanged();
 };
 
 void QFProject::emitStructureChanged() {
     setDataChanged();
     //qDebug()<<"QFProject emit structureChanged()";
-    emit structureChanged();
+    if (m_signalsEnabled) emit structureChanged();
 };
 
 void QFProject::setPropertiesError(QString message) {
@@ -1132,9 +1236,13 @@ QFRawDataRecord* QFProject::getRawDataByID(int ID) {
 }
 
 QFRawDataRecord* QFProject::getRawDataByNum(int i) const {
-    QList<int> keys=rawData.keys();
+    /*QList<int> keys=rawData.keys();
     if ((i>=keys.size()) || (i<0)) return NULL;
     int ID=keys.at(i);
+    if (rawData.contains(ID)) return rawData[ID];
+    else return NULL;*/
+    if ((i>=rawDataOrder.size()) || (i<0) || (rawDataOrder.size()<=0)) return NULL;
+    int ID=rawDataOrder.value(i, -1);
     if (rawData.contains(ID)) return rawData[ID];
     else return NULL;
 }
@@ -1146,11 +1254,16 @@ QFEvaluationItem* QFProject::getEvaluationByID(int ID) const {
 }
 
 QFEvaluationItem* QFProject::getEvaluationByNum(int i) const {
-    QList<int> keys=evaluations.keys();
+    /*QList<int> keys=evaluations.keys();
     if ((i>=keys.size()) || (i<0)) return NULL;
     int ID=keys.at(i);
     if (evaluations.contains(ID)) { return evaluations[ID]; }
+    else return NULL;*/
+    if ((i>=evaluationsOrder.size()) || (i<0) || (evaluationsOrder.size()<=0)) return NULL;
+    int ID=evaluationsOrder.value(i, -1);
+    if (evaluations.contains(ID)) return evaluations[ID];
     else return NULL;
+
 }
 
 bool QFProject::checkID(int ID)const {
@@ -1160,4 +1273,144 @@ bool QFProject::checkID(int ID)const {
 QString QFProject::getName()const {
     return name;
 }
+
+void QFProject::moveRawDataRecordToPosition(QFRawDataRecord *rec, int positionIndex)
+{
+    if (!rec) return;
+    int ID=rec->getID();
+    int idx=rawDataOrder.indexOf(ID);
+    if (idx<0) return;
+    rawDataOrder.move(idx, positionIndex);
+    emitStructureChanged();
+}
+
+void QFProject::moveRawDataRecord(int recID, int recID2, QFProject::RecordInsertModes moveMode)
+{
+    moveRawDataRecord(getRawDataByID(recID), getRawDataByID(recID2), moveMode);
+}
+
+void QFProject::moveRawDataRecordUp(QFRawDataRecord *rec)
+{
+    if (!rec) return;
+    int ID=rec->getID();
+    int pos=rawDataOrder.indexOf(ID);
+    if (pos<=0) return;
+    moveRawDataRecordToPosition(rec, pos-1);
+}
+
+void QFProject::moveRawDataRecordToPosition(int recID, int positionIndex)
+{
+    moveRawDataRecordToPosition(getRawDataByID(recID), positionIndex);
+}
+
+void QFProject::moveRawDataRecord(QFRawDataRecord *rec, QFRawDataRecord *rec2, QFProject::RecordInsertModes moveMode)
+{
+    if (!rec || !rec2) return;
+    int ID=rec->getID();
+    int pos=rawDataOrder.indexOf(ID);
+    if (pos<=0 || pos>rawDataOrder.size()) return;
+    int ID2=rec->getID();
+    int pos2=rawDataOrder.indexOf(ID2);
+    if (pos2<=0 || pos2>rawDataOrder.size()) return;
+    if (moveMode==QFProject::swapRecods) {
+        rawDataOrder.swap(pos, pos2);
+    } else if (moveMode==QFProject::insertRecordBefore) {
+        rawDataOrder.move(pos, pos2);
+    } else if (moveMode==QFProject::insertRecordBefore) {
+        if (pos2+1<rawDataOrder.size()) rawDataOrder.move(pos, pos2+1);
+    }
+    emitStructureChanged();
+}
+
+void QFProject::moveRawDataRecordUp(int recID)
+{
+    moveRawDataRecordUp(getRawDataByID(recID));
+}
+
+void QFProject::moveRawDataRecordDown(QFRawDataRecord *rec)
+{
+    if (!rec) return;
+    int ID=rec->getID();
+    int pos=rawDataOrder.indexOf(ID);
+    if (pos>=rawDataOrder.size()-1) return;
+    moveRawDataRecordToPosition(rec, pos+1);
+}
+
+void QFProject::moveRawDataRecordDown(int recID)
+{
+    moveRawDataRecordDown(getRawDataByID(recID));
+}
+
+void QFProject::moveEvaluationToPosition(QFEvaluationItem *rec, int positionIndex)
+{
+    if (!rec) return;
+    int ID=rec->getID();
+    int idx=evaluationsOrder.indexOf(ID);
+    if (idx<0) return;
+    evaluationsOrder.move(idx, positionIndex);
+    emitStructureChanged();
+}
+
+void QFProject::moveEvaluationToPosition(int recID, int positionIndex)
+{
+    moveEvaluationToPosition(getEvaluationByID(recID), positionIndex);
+}
+
+void QFProject::moveEvaluation(QFEvaluationItem *rec, QFEvaluationItem *rec2, QFProject::RecordInsertModes moveMode)
+{
+    if (!rec || !rec2) return;
+    int ID=rec->getID();
+    int pos=evaluationsOrder.indexOf(ID);
+    if (pos<=0 || pos>evaluationsOrder.size()) return;
+    int ID2=rec->getID();
+    int pos2=evaluationsOrder.indexOf(ID2);
+    if (pos2<=0 || pos2>evaluationsOrder.size()) return;
+    if (moveMode==QFProject::swapRecods) {
+        evaluationsOrder.swap(pos, pos2);
+    } else if (moveMode==QFProject::insertRecordBefore) {
+        evaluationsOrder.move(pos, pos2);
+    } else if (moveMode==QFProject::insertRecordBefore) {
+        if (pos2+1<evaluationsOrder.size()) evaluationsOrder.move(pos, pos2+1);
+    }
+    emitStructureChanged();
+}
+
+void QFProject::moveEvaluation(int recID, int recID2, QFProject::RecordInsertModes moveMode)
+{
+    moveEvaluation(getEvaluationByID(recID), getEvaluationByID(recID2), moveMode);
+}
+
+void QFProject::moveEvaluationUp(QFEvaluationItem *rec)
+{
+    if (!rec) return;
+    int ID=rec->getID();
+    int pos=evaluationsOrder.indexOf(ID);
+    if (pos<=0) return;
+    moveEvaluationToPosition(rec, pos-1);
+}
+
+void QFProject::moveEvaluationUp(int recID)
+{
+    moveEvaluationUp(getEvaluationByID(recID));
+}
+
+void QFProject::moveEvaluationDown(QFEvaluationItem *rec)
+{
+    if (!rec) return;
+    int ID=rec->getID();
+    int pos=evaluationsOrder.indexOf(ID);
+    if (pos>=evaluationsOrder.size()-1) return;
+    moveEvaluationToPosition(rec, pos+1);
+}
+
+void QFProject::moveEvaluationDown(int recID)
+{
+    moveEvaluationDown(getEvaluationByID(recID));
+}
+
+bool QFProject::areSignalsEnabled() const
+{
+    return m_signalsEnabled;
+}
+
 

@@ -50,6 +50,7 @@ class QFLIB_EXPORT QFProjectTreeModel : public QAbstractItemModel {
         virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
         virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
+        QFProjectTreeModelNode* getTreeNodeByIndex(const QModelIndex& index) const;
         /** \brief return the raw data record specified by the given QModelIndex */
         QFRawDataRecord* getRawDataByIndex(const QModelIndex& index) const;
 

@@ -317,4 +317,31 @@ QFLIB_EXPORT QListWidgetItem* addCheckableQListWidgetItem(QListWidget* listWidge
 */
 QFLIB_EXPORT void removeAllActions(QWidget* widget);
 
+/*! \brief remove all duplicates from a list
+    \ingroup qf3lib_tools
+
+    This copies the input list to the return argument omitting all duplicates. This should have complexity \f$ \mathcal{O}(N^2) \f$ but preserves the sorting order!
+*/
+template <class T>
+QList<T> removeQListDouplicates(const QList<T>& list) {
+    QList<T> out;
+    for (int i=0; i<list.size(); i++) {
+        if (out.indexOf(list[i])<0) out<<list[i];
+    }
+    return out;
+}
+
+/*! \brief remove all duplicates from a list
+    \ingroup qf3lib_tools
+
+    This copies the input list to the return argument omitting all duplicates. This should have complexity \f$ \mathcal{O}(N^2) \f$ but preserves the sorting order!
+*/
+template <class T>
+QVector<T> removeQListDouplicates(const QVector<T>& list) {
+    QVector<T> out;
+    for (int i=0; i<list.size(); i++) {
+        if (out.indexOf(list[i])<0) out<<list[i];
+    }
+    return out;
+}
 #endif // QFTOOLS_H

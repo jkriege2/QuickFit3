@@ -95,6 +95,19 @@ Qt::ItemFlags QFProjectTreeModel::flags(const QModelIndex &index) const {
             return 0;
         case QFProjectTreeModelNode::qfpntRoot:
             return 0;
+        case QFProjectTreeModelNode::qfpntProject:
+            return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+        case QFProjectTreeModelNode::qfpntRawDataRecord:
+            return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+        case QFProjectTreeModelNode::qfpntEvaluationRecord:
+            return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+        case QFProjectTreeModelNode::qfpntDirectory: {
+                QFProjectTreeModelNode* node=getTreeNodeByIndex(index.parent());
+                if (node && node->type()!=QFProjectTreeModelNode::qfpntProject && node->type()!=QFProjectTreeModelNode::qfpntRoot) {
+                    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+                }
+                return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+            }
         default:
             return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
     }
@@ -123,7 +136,57 @@ QVariant QFProjectTreeModel::data ( const QModelIndex & index, int role ) const 
 }
 
 bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &value, int role) {
+    if (!current || !rootItem) return false;
+
+    QFProjectTreeModelNode::nodeType nt=classifyIndex(index);
+    if (nt==QFProjectTreeModelNode::qfpntProject && role==Qt::EditRole) {
+        current->setName(value.toString());
+        return true;
+    }
+    if (nt==QFProjectTreeModelNode::qfpntRawDataRecord && role==Qt::EditRole) {
+        QFRawDataRecord* rec=getRawDataByIndex(index);
+        if (rec) {
+            rec->setName(value.toString());
+            return true;
+        }
+    }
+    if (nt==QFProjectTreeModelNode::qfpntEvaluationRecord && role==Qt::EditRole) {
+        QFEvaluationItem* rec=getEvaluationByIndex(index);
+        if (rec) {
+            rec->setName(value.toString());
+            return true;
+        }
+    }
+    if (nt==QFProjectTreeModelNode::qfpntDirectory && role==Qt::EditRole) {
+        QFProjectTreeModelNode* dirNode=getTreeNodeByIndex(index);
+        dirNode->setTitle(value.toString());
+        QList<QFProjectTreeModelNode*> l=dirNode->getAllChildRawDataRecords();
+        QMap<QFRawDataRecord*, QString> m;
+        for (int i=0; i<l.size(); i++) {
+            if (l[i] && l[i]->type()==QFProjectTreeModelNode::qfpntRawDataRecord) {
+                QFRawDataRecord* rec=l[i]->rawDataRecord();
+                if (rec) m[rec]=l[i]->getPath();
+            }
+        }
+        bool sigEn=current->areSignalsEnabled();
+        current->setSignalsEnabled(false, false);
+        QMapIterator<QFRawDataRecord*, QString> mIt(m);
+        while (mIt.hasNext()) {
+            mIt.next();
+            mIt.key()->setFolder(mIt.value());
+            //qDebug()<<mIt.key()->getName()<<": set folder: "<<mIt.value();
+        }
+        current->setSignalsEnabled(sigEn, true);
+        return true;
+    }
     return false;
+}
+
+QFProjectTreeModelNode *QFProjectTreeModel::getTreeNodeByIndex(const QModelIndex &index) const
+{
+    if (!current || !rootItem) return NULL;
+    QFProjectTreeModelNode *item = static_cast<QFProjectTreeModelNode*>(index.internalPointer());
+    return item;
 }
 
 

@@ -170,7 +170,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         void about();
         /** \brief display information about plugins */
         void aboutPlugins();
-        /** \brief emitted when a project element (in the treeview) is doubl-clicked
+        /** \brief emitted when a project element (in the treeview) is double-clicked
          *
          * This will open a new window containing the elements properties and data.
          */
