@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>947</width>
-    <height>771</height>
+    <width>1046</width>
+    <height>790</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -89,7 +89,7 @@
            <string>select an image series file to correlate</string>
           </property>
           <property name="text">
-           <string>don't count frames</string>
+           <string>don't count</string>
           </property>
           <property name="icon">
            <iconset resource="qfrdrimagingfcs.qrc">
@@ -106,11 +106,28 @@
            <string>read metadata from the given image series file</string>
           </property>
           <property name="text">
-           <string>don't count frames</string>
+           <string>don't count</string>
           </property>
           <property name="icon">
            <iconset resource="qfrdrimagingfcs.qrc">
             <normaloff>:/imaging_fcs/use_file.png</normaloff>:/imaging_fcs/use_file.png</iconset>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextBesideIcon</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnSimulate">
+          <property name="toolTip">
+           <string>read metadata from the given image series file</string>
+          </property>
+          <property name="text">
+           <string>simulate</string>
+          </property>
+          <property name="icon">
+           <iconset resource="qfrdrimagingfcs.qrc">
+            <normaloff>:/imaging_fcs/qfrdrimagingfcs_simulate.png</normaloff>:/imaging_fcs/qfrdrimagingfcs_simulate.png</iconset>
           </property>
           <property name="toolButtonStyle">
            <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -1132,8 +1149,8 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="11" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_22">
-           <item>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="0">
             <widget class="QComboBox" name="cmbDualView">
              <item>
               <property name="text">
@@ -1164,7 +1181,7 @@ p, li { white-space: pre-wrap; }
              </item>
             </widget>
            </item>
-           <item>
+           <item row="0" column="1">
             <spacer name="horizontalSpacer_33">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -1180,7 +1197,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </spacer>
            </item>
-           <item>
+           <item row="0" column="2">
             <widget class="QCheckBox" name="chk2cFCCS">
              <property name="enabled">
               <bool>false</bool>
@@ -1193,7 +1210,23 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item>
+           <item row="0" column="3">
+            <widget class="QCheckBox" name="chkSeparateColorChannels">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="toolTip">
+              <string>if this option is checked and the image is taken with a DualView, the two separate color channels are each loaded as a separate raw data record into the project. If this option is not checked, the ACFs will end up as a side-by-side image in one RDR.</string>
+             </property>
+             <property name="text">
+              <string>insert color channels separately</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="4">
             <spacer name="horizontalSpacer_34">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -1206,10 +1239,16 @@ p, li { white-space: pre-wrap; }
              </property>
             </spacer>
            </item>
-           <item>
+           <item row="1" column="0" colspan="5">
             <widget class="QLabel" name="labDualView">
              <property name="text">
               <string/>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::RichText</enum>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -1930,6 +1969,12 @@ p, li { white-space: pre-wrap; }
            <property name="text">
             <string/>
            </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
         </layout>
@@ -2051,7 +2096,7 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>907</width>
+           <width>1006</width>
            <height>69</height>
           </rect>
          </property>
@@ -2203,11 +2248,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>271</x>
-     <y>508</y>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
      <x>443</x>
-     <y>510</y>
+     <y>540</y>
     </hint>
    </hints>
   </connection>
@@ -2219,11 +2264,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>271</x>
-     <y>508</y>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
      <x>512</x>
-     <y>510</y>
+     <y>540</y>
     </hint>
    </hints>
   </connection>
@@ -2331,7 +2376,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>327</x>
-     <y>377</y>
+     <y>397</y>
     </hint>
     <hint type="destinationlabel">
      <x>473</x>
@@ -2347,7 +2392,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>936</x>
-     <y>729</y>
+     <y>759</y>
     </hint>
     <hint type="destinationlabel">
      <x>725</x>
@@ -2378,8 +2423,8 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>236</x>
-     <y>380</y>
+     <x>327</x>
+     <y>397</y>
     </hint>
     <hint type="destinationlabel">
      <x>529</x>

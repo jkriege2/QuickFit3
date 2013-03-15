@@ -1727,6 +1727,7 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         sliders->enableSliderSignals();
         selected.clear();
         cmbDualView->setCurrentIndex(int(m->dualViewMode()));
+        cmbDualView->setEnabled(m->dualViewModeUserEditable());
         selectedInsert(0);
         selectionEdited();
         connect(current, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(resultsChanged(QString,QString,bool)));

@@ -43,7 +43,7 @@ double QFRDRImagingFCSCorrelationJobThread::durationS() const {
     return duration;
 }
 
-QStringList QFRDRImagingFCSCorrelationJobThread::getAddFiles() const {
+QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> QFRDRImagingFCSCorrelationJobThread::getAddFiles() const {
     return addFiles;
 }
 
@@ -895,8 +895,18 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create binary autocorrelation file '%1': %2!").arg(localFilename1).arg(error));
                             }
-                            if (QFile::exists(localFilename1)) addFiles.append(localFilename1);
-                            else addFiles.append(localFilename);
+                            if (job.addFCCSSeparately && job.dualViewMode!=0) {
+                                if (QFile::exists(localFilename1)) {
+                                    addFiles.append(getFileInfo(localFilename1, "ACF0", 0));
+                                    addFiles.append(getFileInfo(localFilename1, "ACF1", 1));
+                                } else {
+                                    addFiles.append(getFileInfo(localFilename, "ACF0", 0));
+                                    addFiles.append(getFileInfo(localFilename, "ACF1", 1));
+                                }
+                            } else {
+                                if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, "ACF"));
+                                else addFiles.append(getFileInfo(localFilename, "ACF"));
+                            }
 
                         }
                         emit progressIncrement(250);
@@ -924,8 +934,14 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                         m_status=-1; emit statusChanged(m_status);
                                         emit messageChanged(tr("could not create binary distance crosscorrelation file '%1': %2!").arg(localFilename1).arg(error));
                                     }
-                                    if (QFile::exists(localFilename1)) addFiles.append(localFilename1);
-                                    else addFiles.append(localFilename);
+                                    QString role=job.DCCFrole.value(id, "DCCF");
+                                    if (role.toLower()=="fccs") {
+                                        if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, role, 0));
+                                        else addFiles.append(getFileInfo(localFilename, role, 0));
+                                    } else {
+                                        if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, role));
+                                        else addFiles.append(getFileInfo(localFilename, role));
+                                    }
                                 }
                             }
                         }
@@ -950,8 +966,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create binary crosscorrelation file '%1': %2!").arg(localFilename1).arg(error));
                             }
-                            if (QFile::exists(localFilename1)) addFiles.append(localFilename1);
-                            else addFiles.append(localFilename);
+                            if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, QString("CCF")));
+                            else addFiles.append(getFileInfo((localFilename), "CCF"));
 
                         }
                         emit progressIncrement(10);
@@ -2484,5 +2500,33 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
 
     emit progressIncrement(100);
 
+}
+
+QFRDRImagingFCSCorrelationJobThread::Fileinfo::Fileinfo(const QString &filename, const QString &role, int internalDualViewMode, int dualViewID)
+{
+    this->filename=filename;
+    this->role=role;
+    this->internalDualViewMode=internalDualViewMode;
+    this->dualViewID=dualViewID;
+}
+
+QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThread::getFileInfo(const QString &filename, const QString &role)
+{
+    QFRDRImagingFCSCorrelationJobThread::Fileinfo i;
+    i.filename=filename;
+    i.role=role;
+    i.dualViewID=0;
+    i.internalDualViewMode=0;
+    return i;
+}
+
+QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThread::getFileInfo(const QString &filename, const QString &role, int dualViewID)
+{
+    QFRDRImagingFCSCorrelationJobThread::Fileinfo i;
+    i.filename=filename;
+    i.role=role;
+    i.dualViewID=dualViewID;
+    i.internalDualViewMode=job.dualViewMode;
+    return i;
 }
 

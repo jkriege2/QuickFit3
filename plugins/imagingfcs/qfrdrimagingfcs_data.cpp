@@ -1123,8 +1123,17 @@ double* QFRDRImagingFCSData::getCorrelationRunErrors() const {
     return sigmas;
 }
 
+bool QFRDRImagingFCSData::dualViewModeUserEditable() const
+{
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) return false;
+    return true;
+}
+
 QFRDRImagingFCSData::DualViewMode QFRDRImagingFCSData::dualViewMode() const
 {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) return QFRDRImagingFCSData::dvNone;
+
+
     QString dv=getProperty("DUALVIEW_MODE", "none").toString().toLower();
 
 
@@ -1139,6 +1148,7 @@ QFRDRImagingFCSData::DualViewMode QFRDRImagingFCSData::dualViewMode() const
 
 void QFRDRImagingFCSData::setDualViewMode(QFRDRImagingFCSData::DualViewMode mode)
 {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) return;
     QFRDRImagingFCSData::DualViewMode m_dualview=mode;
     if (m_dualview==QFRDRImagingFCSData::dvNone) setQFProperty("DUALVIEW_MODE", "none", false);
     if (m_dualview==QFRDRImagingFCSData::dvHorizontal) setQFProperty("DUALVIEW_MODE", "horicontal", false);
@@ -1999,17 +2009,19 @@ int QFRDRImagingFCSData::getImageSelectionHeight() const
 
 QStringList QFRDRImagingFCSData::getAvailableRoles() const {
     QStringList sl;
-    sl<<"correlation";
+    /*sl<<"correlation";
     sl<<"acf";
     sl<<"ccf";
     sl<<"dccf";
     sl<<"fcs_red";
     sl<<"fcs_green";
+    sl<<"fcs0";
+    sl<<"fcs1";
     sl<<"fccs";
     sl<<"ccf(-1,0)";
     sl<<"ccf(1,0)";
     sl<<"ccf(0,-1)";
-    sl<<"ccf(0,1)";
+    sl<<"ccf(0,1)";*/
     return sl;
 }
 
@@ -2018,6 +2030,10 @@ bool QFRDRImagingFCSData::isRoleUserEditable() const
     return false;
 }
 
+int QFRDRImagingFCSData::internalDualViewModeChannel() const
+{
+    return getProperty("INTERNAL_DUALVIEW_MODE_CHANNEL", 0).toInt();
+}
 QFRDRImagingFCSData::DualViewMode QFRDRImagingFCSData::internalDualViewMode() const
 {
     QString dv=getProperty("INTERNAL_DUALVIEW_MODE", "none").toString().toLower();
@@ -2053,10 +2069,6 @@ void QFRDRImagingFCSData::clearSelections()
     selections.clear();
 }
 
-int QFRDRImagingFCSData::internalDualViewModeChannel() const
-{
-    return getProperty("INTERNAL_DUALVIEW_MODE_CHANNEL", "0").toInt();
-}
 
 void QFRDRImagingFCSData::splitCFsForDualView() {
     double* oldC=duplicateArray(correlations, width*height*N);

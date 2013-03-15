@@ -114,6 +114,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual double* getCorrelationRunErrors() const ;
 
 
+        bool dualViewModeUserEditable() const;
         DualViewMode dualViewMode() const;
         void setDualViewMode(DualViewMode mode);
 

@@ -65,6 +65,7 @@ void QFRDRImagingFCSPlugin::correlateAndInsert() {
         dlgCorrelate->show();
 
         connect(dlgCorrelate, SIGNAL(finished(int)), this, SLOT(importCorrelationsFromDialog()));
+        connect(dlgCorrelate, SIGNAL(runSimulation()), this, SLOT(simulateForCorrelation()));
 
     }
 }
@@ -73,9 +74,9 @@ void QFRDRImagingFCSPlugin::importCorrelationsFromDialog() {
 
     disconnect(dlgCorrelate, SIGNAL(finished(int)), this, SLOT(importCorrelationsFromDialog()));
 
-    QStringList list=dlgCorrelate->getFilesToAdd();
+    QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> list=dlgCorrelate->getFilesToAdd();
 
-    QStringList::Iterator it = list.begin();
+    QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo>::Iterator it = list.begin();
     services->setProgressRange(0, list.size());
     services->setProgress(0);
     int i=0;
@@ -85,13 +86,13 @@ void QFRDRImagingFCSPlugin::importCorrelationsFromDialog() {
     progress.open();
     while(it != list.end()) {
         i++;
-        services->log_text(tr("loading '%1' ...\n").arg(*it));
-        progress.setLabelText(tr("loading '%1' ...\n").arg(*it));
-        QString filename=*it;
+        services->log_text(tr("loading '%1' [%2] ...\n").arg(it->filename).arg(it->role));
+        progress.setLabelText(tr("loading '%1' [%2] ...\n").arg(it->filename).arg(it->role));
+        QString filename=it->filename;
         QString overview="";
         QApplication::processEvents();
-        insertVideoCorrelatorFile(filename, overview, filename.toLower().endsWith(".bin"));
-        settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
+        insertVideoCorrelatorFile(filename, overview, filename.toLower().endsWith(".bin"), it->role, it->internalDualViewMode, it->dualViewID);
+        settings->setCurrentRawDataDir(QFileInfo(it->filename).dir().absolutePath());
         services->setProgress(i);
         QApplication::processEvents();
         ++it;
@@ -218,7 +219,7 @@ void QFRDRImagingFCSPlugin::insertRecord() {
                 insertVideoCorrelatorFile(filename, overview, true);
             } else if (current_format_name==format_RH2Cor) {
                 QString filename=*it;
-                insertRH2CorFile(filename);
+                insertRH2CorFile(filename, "ACF");
             }
             settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
             services->setProgress(i);
@@ -244,7 +245,7 @@ int QFRDRImagingFCSPlugin::checkColumns(QString filename) {
     return result;
 }
 
-void QFRDRImagingFCSPlugin::insertProjectRecord(const QString &type, const QString &name, const QString &filename, const QString &description, const QString &directory, const QMap<QString,QVariant>& init_params, const QStringList& init_params_readonly) {
+void QFRDRImagingFCSPlugin::insertProjectRecord(const QString &type, const QString &name, const QString &filename, const QString& role, const QString &description, const QString &directory, const QMap<QString,QVariant>& init_params, const QStringList& init_params_readonly) {
     bool found=false;
     for (int i=0; i<project->getRawDataCount(); i++) {
         QFRawDataRecord*  r=project->getRawDataByNum(i);
@@ -258,7 +259,7 @@ void QFRDRImagingFCSPlugin::insertProjectRecord(const QString &type, const QStri
         files<<filename;
 
         // insert new record:                  type ID, name for record,                                  list of files,    initial parameters, which parameters are readonly?
-        QFRawDataRecord* e=project->addRawData(type, name, files,  init_params, init_params_readonly, QStringList(), QStringList());
+        QFRawDataRecord* e=project->addRawData(type, name, role, files,  init_params, init_params_readonly, QStringList(), QStringList());
         e->setFolder(directory);
         e->setDescription(description);
         if (e->error()) { // when an error occured: remove record and output an error message
@@ -269,7 +270,7 @@ void QFRDRImagingFCSPlugin::insertProjectRecord(const QString &type, const QStri
     }
 }
 
-void QFRDRImagingFCSPlugin::insertProjectRecordFiles(const QString &type, const QString &name, const QStringList &files, const QStringList &filetypes, const QStringList &filedescriptions, const QString &description, const QString &directory, const QMap<QString,QVariant>& init_params, const QStringList& init_params_readonly) {
+void QFRDRImagingFCSPlugin::insertProjectRecordFiles(const QString &type, const QString &name, const QStringList &files, const QString& role, const QStringList &filetypes, const QStringList &filedescriptions, const QString &description, const QString &directory, const QMap<QString,QVariant>& init_params, const QStringList& init_params_readonly) {
     bool found=false;
     for (int i=0; i<project->getRawDataCount(); i++) {
         QFRawDataRecord*  r=project->getRawDataByNum(i);
@@ -281,7 +282,7 @@ void QFRDRImagingFCSPlugin::insertProjectRecordFiles(const QString &type, const 
     if (!found && project->getRawDataRecordFactory()->contains(type)) {
 
         // insert new record:                  type ID, name for record,                                  list of files,    initial parameters, which parameters are readonly?
-        QFRawDataRecord* e=project->addRawData(type, name, files,  init_params, init_params_readonly, filetypes, filedescriptions);
+        QFRawDataRecord* e=project->addRawData(type, name, role, files,  init_params, init_params_readonly, filetypes, filedescriptions);
         e->setFolder(directory);
         e->setDescription(description);
         if (e->error()) { // when an error occured: remove record and output an error message
@@ -345,7 +346,7 @@ bool QFRDRImagingFCSPlugin::parseSPIMSettings(const QString& filename_settings, 
     return false;
 }
 
-void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, const QString& filename_overvieww, bool binary) {
+void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, const QString& filename_overvieww, bool binary, const QString& role, int internalDualViewMode, int dualViewID) {
     QRegExp rxdccf("\\.dccf(\\d+)?\\.(dat|bin)");
     rxdccf.setCaseSensitivity(Qt::CaseInsensitive);
     rxdccf.setMinimal(true);
@@ -369,13 +370,17 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
     // add all properties in initParams that will be readonly
     QStringList paramsReadonly;
-    paramsReadonly<<"FILETYPE"<<"IS_OVERVIEW_SCALED";
+    paramsReadonly<<"FILETYPE"<<"IS_OVERVIEW_SCALED"<<"INTERNAL_DUALVIEW_MODE"<<"INTERNAL_DUALVIEW_MODE_CHANNEL";
 
     bool ok=true;
     bool isJanBFile=false;
 
     QStringList more_files, more_files_types, more_files_descriptions;
 
+    initParams["INTERNAL_DUALVIEW_MODE"]="none";
+    if (internalDualViewMode==1) initParams["INTERNAL_DUALVIEW_MODE"]="horizontal";
+    if (internalDualViewMode==2) initParams["INTERNAL_DUALVIEW_MODE"]="vertical";
+    initParams["INTERNAL_DUALVIEW_MODE_CHANNEL"]=dualViewID;
 
     // set whatever you want (FILETYPE is just an example)!
     if (binary) initParams["FILETYPE"]="VIDEO_CORRELATOR_BIN";
@@ -771,7 +776,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     initParams["CORRELATION_ERROR_COLUMN"]=2;
                 }
                 // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
-                QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - ACF"), files, initParams, paramsReadonly, files_types, files_descriptions);
+                QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - %1").arg(role), role, files, initParams, paramsReadonly, files_types, files_descriptions);
                 if (!filename_acquisition.isEmpty()) {
                     e->setFolder(QFileInfo(filename_acquisition).baseName());
                 }
@@ -791,7 +796,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
                     if (columns>4) initParams["CORRELATION_ERROR_COLUMN"]=c+4;
                     // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
-                    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - CCF %1").arg(c), files, initParams, paramsReadonly, files_types, files_descriptions);
+                    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - %1").arg(role), role, files, initParams, paramsReadonly, files_types, files_descriptions);
                     if (!filename_acquisition.isEmpty()) {
                         e->setFolder(QFileInfo(filename_acquisition).baseName());
                     }
@@ -812,7 +817,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     initParams["CORRELATION_SET"]=c-1;
 
                     // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
-                    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - CCF %1").arg(c), files, initParams, paramsReadonly, files_types, files_descriptions);
+                    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - %1").arg(role), role, files, initParams, paramsReadonly, files_types, files_descriptions);
                     if (!filename_acquisition.isEmpty()) {
                         e->setFolder(QFileInfo(filename_acquisition).baseName());
                     }
@@ -832,7 +837,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
                 if (columns>2 && !binary) initParams["CORRELATION_ERROR_COLUMN"]=2;
                 // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
-                QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - DCCF"), files, initParams, paramsReadonly, files_types, files_descriptions);
+                QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - %1").arg(role), role, files, initParams, paramsReadonly, files_types, files_descriptions);
                 if (!filename_acquisition.isEmpty()) {
                     e->setFolder(QFileInfo(filename_acquisition).baseName());
                 }
@@ -863,7 +868,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                 QStringList init_params_readonly=paramsReadonly;
                 init_params["BACKGROUND_CORRECTED"]=true;
                 init_params_readonly<<"BACKGROUND_CORRECTED";
-                insertProjectRecordFiles("number_and_brightness", fi.fileName()+tr(" - number & brightness"), ffiles, ffile_types, ffiles_descriptions, description, QFileInfo(filename_acquisition).baseName(), init_params, init_params_readonly);
+                insertProjectRecordFiles("number_and_brightness", fi.fileName()+tr(" - number & brightness"), ffiles, "", ffile_types, ffiles_descriptions, description, QFileInfo(filename_acquisition).baseName(), init_params, init_params_readonly);
             }
 
             if (QFile::exists(filename_settings)) {
@@ -882,7 +887,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
                     QStringList roParams;
                     roParams<<"column_separator"<<"decimal_separator"<<"comment_start"<<"header_start";
-                    insertProjectRecord("table", fi.fileName(), files[i], description, QFileInfo(filename_acquisition).baseName(), p, roParams);
+                    insertProjectRecord("table", fi.fileName(), files[i], "", description, QFileInfo(filename_acquisition).baseName(), p, roParams);
                 }
             }
 
@@ -897,7 +902,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
 
 
-void QFRDRImagingFCSPlugin::insertRH2CorFile(const QString& filename) {
+void QFRDRImagingFCSPlugin::insertRH2CorFile(const QString& filename, const QString& role) {
     // here we store some initial parameters
     QMap<QString, QVariant> initParams;
 
@@ -972,7 +977,7 @@ void QFRDRImagingFCSPlugin::insertRH2CorFile(const QString& filename) {
 
 
         // insert new record:                  type ID, name for record,                                  list of files,    initial parameters, which parameters are readonly?
-        QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - ACF"), files,            initParams,         paramsReadonly, files_types);
+        QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - %1").arg(role), role, files,            initParams,         paramsReadonly, files_types);
         if (e->error()) { // when an error occured: remove record and output an error message
             QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
             services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));

@@ -80,12 +80,12 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
             \param filename filename of the input file
             \param filename_overview filename of a file containing an overview image
         */
-        void insertVideoCorrelatorFile(const QString& filename, const QString& filename_overview=QString(""), bool binary=false);
+        void insertVideoCorrelatorFile(const QString& filename, const QString& filename_overview=QString(""), bool binary=false, const QString& role="", int internalDualViewMode=0, int dualViewID=0);
         /*! \brief add a Radhard2 file to the current project
 
             \param filename filename of the input file
         */
-        void insertRH2CorFile(const QString& filename);
+        void insertRH2CorFile(const QString& filename, const QString &role=QString(""));
 
         /** \brief returns the number of columns of the supplied CSV file (searches for the first row with more than 0 columns!) */
         int checkColumns(QString filename);
@@ -94,8 +94,8 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
         QFRDRImagingFCSSimulator* dlgSimulate;
 
         /** \brief insert record, if it is not yet contained in the project! */
-        void insertProjectRecord(const QString& type, const QString& name, const QString& filename, const QString& description=QString(""), const QString& directory=QString(""), const QMap<QString,QVariant>& init_params=QFStringVariantMap(), const QStringList& init_params_readonly=QStringList());
-        void insertProjectRecordFiles(const QString &type, const QString &name, const QStringList &filename, const QStringList &filetypes, const QStringList &filedescriptions, const QString &description=QString(""), const QString &directory=QString(""), const QMap<QString,QVariant>& init_params=QFStringVariantMap(), const QStringList& init_params_readonly=QStringList());
+        void insertProjectRecord(const QString& type, const QString& name, const QString& filename, const QString& role, const QString& description=QString(""), const QString& directory=QString(""), const QMap<QString,QVariant>& init_params=QFStringVariantMap(), const QStringList& init_params_readonly=QStringList());
+        void insertProjectRecordFiles(const QString &type, const QString &name, const QStringList &filename, const QString& role, const QStringList &filetypes, const QStringList &filedescriptions, const QString &description=QString(""), const QString &directory=QString(""), const QMap<QString,QVariant>& init_params=QFStringVariantMap(), const QStringList& init_params_readonly=QStringList());
 
         bool parseSPIMSettings(const QString& filename_settings, QString& description, QMap<QString,QVariant>& initParams, QStringList& paramsReadonly, QStringList& files, QStringList& files_types, QStringList& files_descriptions);
 

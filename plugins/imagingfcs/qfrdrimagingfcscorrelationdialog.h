@@ -8,8 +8,8 @@
 #include "qfpluginservices.h"
 #include "qfrdrimagingfcsseriesdialog.h"
 #include <stdint.h>
+#include "qfrdrimagingfcscorrelationjobthread.h"
 
-class QFRDRImagingFCSCorrelationJobThread; // forward
 struct IMFCSJob; // forward
 namespace Ui {
     class QFRDRImagingFCSCorrelationDialog; // forward
@@ -27,7 +27,6 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         Q_OBJECT
 
     public:
-
         QFRDRImagingFCSCorrelationDialog(QFPluginServices* pluginservices, ProgramOptions* opt, QWidget *parent = 0);
         ~QFRDRImagingFCSCorrelationDialog();
 
@@ -36,9 +35,11 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         void writeSettings();
         void readSettings();
 
-        QStringList getFilesToAdd() const;
+        QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> getFilesToAdd() const;
+    signals:
+        void runSimulation();
     public slots:
-            void openFile(const QString& file);
+        void openFile(const QString& file);
 
     protected slots:
         void on_btnSelectImageFile_clicked();
@@ -58,6 +59,8 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         void on_cmbBackground_currentIndexChanged(int idx);
         void on_cmbBleachType_currentIndexChanged(int idx);
         void on_cmbDualView_currentIndexChanged(int index);
+        void on_chkSeparateColorChannels_toggled(bool value);
+        void on_btnSimulate_clicked();
 
         void frameTimeChanged(double value);
         void frameRateChanged(double value);
@@ -92,8 +95,7 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         QStringList imageFilters;
         QStringList imageFormatNames;
         QList<IMFCSJob> jobs;
-        //QList<Job> jobsToAdd;
-        QStringList filesToAdd;
+        QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> filesToAdd;
         bool closing;
         QString inputconfigfile;
 

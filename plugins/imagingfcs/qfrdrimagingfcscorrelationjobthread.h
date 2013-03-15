@@ -117,6 +117,8 @@ struct IMFCSJob {
     QList<int> DCCFDeltaX;
     /** \brief distanceCCF Delta y */
     QList<int> DCCFDeltaY;
+    /** \brief role names for DCCFs */
+    QStringList DCCFrole;
     /** \brief bleach correction, 0: none, 1: remove frame average, 2: remove mono-exponential */
     int bleach;
 
@@ -132,8 +134,8 @@ struct IMFCSJob {
     /** \brief height of camera+microscope pixels (in image plane) in nm */
     double cameraPixelHeight;
 
-    /** \brief a short ID describing which side of the image this plugin worked on in DualView mode */
-    QString dualViewSideID;
+    int dualViewMode;
+    bool addFCCSSeparately;
 
 };
 
@@ -188,95 +190,105 @@ struct IMFCSJob {
 
 
 */
-class QFRDRImagingFCSCorrelationJobThread : public QThread
-{
-    Q_OBJECT
-public:
-    explicit QFRDRImagingFCSCorrelationJobThread(QFPluginServices* services, QObject *parent = 0);
-    ~QFRDRImagingFCSCorrelationJobThread();
-    int status() const;
-    void init(IMFCSJob job);
-    static QStringList getImageFilterList(QFPluginServices* pluginservices);
-    static QStringList getImageFormatNameList(QFPluginServices *pluginservices);
-    static QFImporterImageSeries* getImageReader(int idx, QFPluginServices* pluginservices);
-    static int getImageReaderCount(QFPluginServices* pluginservices);
-    QStringList getAddFiles() const;
-    IMFCSJob getJob() const;
-    double durationMS() const;
-    double durationS() const;
-signals:
-    void messageChanged(QString message);
-    void progressChanged(int progress);
-    void progressIncrement(int progress_inc);
-    void rangeChanged(int min, int max);
-    void statusChanged(int status);
-public slots:
-    void cancel();
-protected:
-    /*! \brief replace some special substrings in the output filename pre- and postfix
+class QFRDRImagingFCSCorrelationJobThread : public QThread {
+        Q_OBJECT
+    public:
+        struct Fileinfo{                
+            Fileinfo(const QString& filename=QString(""), const QString& role=QString(""), int internalDualViewMode=0, int dualViewID=0);
+            QString filename;
+            QString role;
+            int internalDualViewMode;
+            int dualViewID;
+        };
 
-        These sequences are replaced (case-insensitive):
-          - \c %counter% by the value of \a counter, if this value is >0, or by an empty string
-          - \c %S% S parameter of the correlator
-          - \c %P% P parameter of the correlator
-          - \c %M% m parameter of the correlator
-          - \c %framerate% framerate in Herz
-          - \c %frametime% frametime in microseconds
-          - \c %first% first used frame
-          - \c %last% last used frame
-          - \c %backoffset% offset of background correction
-          - \c %backcorrection% background correction mode
-          - \c %backcorrectionid% background correction mode as number
-          - \c %segments% segments the image series is cut into
-          - \c %correlator% correlator type used
-          - \c %correlatorid% correlator type used as number
-          - \c %bleach% bleach correction type
-        .
-      */
-    QString replacePostfixSpecials(const QString& input, int counter=-1) const;
+        Fileinfo getFileInfo(const QString& filename, const QString& role="");
+        Fileinfo getFileInfo(const QString& filename, const QString& role, int dualViewID);
 
+        explicit QFRDRImagingFCSCorrelationJobThread(QFPluginServices* services, QObject *parent = 0);
+        ~QFRDRImagingFCSCorrelationJobThread();
+        int status() const;
+        void init(IMFCSJob job);
+        static QStringList getImageFilterList(QFPluginServices* pluginservices);
+        static QStringList getImageFormatNameList(QFPluginServices *pluginservices);
+        static QFImporterImageSeries* getImageReader(int idx, QFPluginServices* pluginservices);
+        static int getImageReaderCount(QFPluginServices* pluginservices);
+        QList<Fileinfo> getAddFiles() const;
+        IMFCSJob getJob() const;
+        double durationMS() const;
+        double durationS() const;
+    signals:
+        void messageChanged(QString message);
+        void progressChanged(int progress);
+        void progressIncrement(int progress_inc);
+        void rangeChanged(int min, int max);
+        void statusChanged(int status);
+    public slots:
+        void cancel();
+    protected:
+        /*! \brief replace some special substrings in the output filename pre- and postfix
 
-    /** \brief the run method of the thread */
-    void run();
-
-    /** \brief calculate correlation functions, statistics, video, ... by loading the whole sequence into memory */
-    void correlate_loadall();
-    /** \brief calculate correlation functions, statistics, video, ... by loading the whole sequence into memory */
-    void correlate_loadsingle();
-    /** \brief calculate the background correction from the data gathered from a first run through the data */
-    void calcBackgroundCorrection();
-    void calcBleachCorrection(float* fit_frames, double *fit_t, int NFitFrames=0);
-
-    /*! \brief calculate the CCF between the given timeseries
-
-        This function calculates the CCF between the two positions in the given image series that are shifted by (shiftX, shiftY).
-        A CCF for every pixel is calculated and stored in ccf, ccf_tau and ccf_std, if the pixels and its shifted counterpart are
-        both inside the image area.
-     */
-    void correlate_series(float* image_series, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frames, double** ccf_tau, double** ccf, double** ccf_std, uint32_t& ccf_N, const QString& message, uint32_t increment_progress=250, double **ccf_segments_io=NULL);
+            These sequences are replaced (case-insensitive):
+              - \c %counter% by the value of \a counter, if this value is >0, or by an empty string
+              - \c %S% S parameter of the correlator
+              - \c %P% P parameter of the correlator
+              - \c %M% m parameter of the correlator
+              - \c %framerate% framerate in Herz
+              - \c %frametime% frametime in microseconds
+              - \c %first% first used frame
+              - \c %last% last used frame
+              - \c %backoffset% offset of background correction
+              - \c %backcorrection% background correction mode
+              - \c %backcorrectionid% background correction mode as number
+              - \c %segments% segments the image series is cut into
+              - \c %correlator% correlator type used
+              - \c %correlatorid% correlator type used as number
+              - \c %bleach% bleach correction type
+            .
+          */
+        QString replacePostfixSpecials(const QString& input, int counter=-1) const;
 
 
-    /*! \brief contribute the data in the given image to the given correlators
+        /** \brief the run method of the thread */
+        void run();
 
-    */
-    void contribute_to_correlations(QList<MultiTauCorrelator<double, double> *> &ccfjk, QList<correlatorjb<double, double> *> &ccfjb, float *frame_data, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frame, uint64_t segment_frames, double *ccf_tau, double *ccf, double *ccf_std, uint64_t ccf_N);
-    void average_ccfs(double **acf, double **acf_std, uint32_t acf_N, uint32_t frame_width, uint32_t frame_height, uint32_t segments);
-    void prepare_ccfs(QList<MultiTauCorrelator<double, double> *> &acfjk, QList<correlatorjb<double, double> *> &acfjb, double **acf, double **acf_std, double** acf_t, uint32_t& acf_N, uint32_t frame_width, uint32_t frame_height, uint32_t segments);
+        /** \brief calculate correlation functions, statistics, video, ... by loading the whole sequence into memory */
+        void correlate_loadall();
+        /** \brief calculate correlation functions, statistics, video, ... by loading the whole sequence into memory */
+        void correlate_loadsingle();
+        /** \brief calculate the background correction from the data gathered from a first run through the data */
+        void calcBackgroundCorrection();
+        void calcBleachCorrection(float* fit_frames, double *fit_t, int NFitFrames=0);
 
-    /*! \brief store a set of correlation functions as a CSV file */
-    bool saveCorrelationCSV(const QString& filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double input_length, QString& error, int progress_steps=0) ;
-    /*! \brief store a set of correlation functions as a binary file
+        /*! \brief calculate the CCF between the given timeseries
 
-        Format description:
-          - This format may store several (corrN) different correlation curves for several pixel (e.g. crosscorrelations to four neighbor pixels),
-            but usually this feature is not used and corrN=1
-          - all correlation curves have to have the same time axis ("lag times in seconds") and all curves have to have the same number N of values
-          - the file will contain data for width*height pixels, ordered in row-major form
-          - The file is split into two parts: The first part contains a complete set of correlation curves + (if sets=2) errors.
-            The second part may contain the single-segment curves the averages in the first part are calculated from
-        .
+            This function calculates the CCF between the two positions in the given image series that are shifted by (shiftX, shiftY).
+            A CCF for every pixel is calculated and stored in ccf, ccf_tau and ccf_std, if the pixels and its shifted counterpart are
+            both inside the image area.
+         */
+        void correlate_series(float* image_series, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frames, double** ccf_tau, double** ccf, double** ccf_std, uint32_t& ccf_N, const QString& message, uint32_t increment_progress=250, double **ccf_segments_io=NULL);
 
-        The binary file has this data layout:
+
+        /*! \brief contribute the data in the given image to the given correlators
+
+        */
+        void contribute_to_correlations(QList<MultiTauCorrelator<double, double> *> &ccfjk, QList<correlatorjb<double, double> *> &ccfjb, float *frame_data, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frame, uint64_t segment_frames, double *ccf_tau, double *ccf, double *ccf_std, uint64_t ccf_N);
+        void average_ccfs(double **acf, double **acf_std, uint32_t acf_N, uint32_t frame_width, uint32_t frame_height, uint32_t segments);
+        void prepare_ccfs(QList<MultiTauCorrelator<double, double> *> &acfjk, QList<correlatorjb<double, double> *> &acfjb, double **acf, double **acf_std, double** acf_t, uint32_t& acf_N, uint32_t frame_width, uint32_t frame_height, uint32_t segments);
+
+        /*! \brief store a set of correlation functions as a CSV file */
+        bool saveCorrelationCSV(const QString& filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double input_length, QString& error, int progress_steps=0) ;
+        /*! \brief store a set of correlation functions as a binary file
+
+            Format description:
+              - This format may store several (corrN) different correlation curves for several pixel (e.g. crosscorrelations to four neighbor pixels),
+                but usually this feature is not used and corrN=1
+              - all correlation curves have to have the same time axis ("lag times in seconds") and all curves have to have the same number N of values
+              - the file will contain data for width*height pixels, ordered in row-major form
+              - The file is split into two parts: The first part contains a complete set of correlation curves + (if sets=2) errors.
+                The second part may contain the single-segment curves the averages in the first part are calculated from
+            .
+
+            The binary file has this data layout:
 \verbatim
 data                                                   size [bytes]                    datatype
 +---------------------------------------------------+
@@ -326,12 +338,12 @@ data                                                   size [bytes]             
 | errcf[corN-1]  of pixel[width*height-1]           |  8*N  |                          double
 +---------------------------------------------------+     --+
 \endverbatim
-        This data format may also store all the intermedate correlation curves that are averaged to yield avg+/-stddev. These are stored after the above
-        described data and their presence is indicatedsimply by an ongoing file.
-        Here the data is organized pixel-by-pixel (row-major), where each pixel is a record containing the segments one after the other, where each
-        segemnt contains the corrN correlation functions of length N.
+            This data format may also store all the intermedate correlation curves that are averaged to yield avg+/-stddev. These are stored after the above
+            described data and their presence is indicatedsimply by an ongoing file.
+            Here the data is organized pixel-by-pixel (row-major), where each pixel is a record containing the segments one after the other, where each
+            segemnt contains the corrN correlation functions of length N.
 
-        The data in the second part of the file is only readable, if the file ID is \c "QF3.1imFCS"!!!
+            The data in the second part of the file is only readable, if the file ID is \c "QF3.1imFCS"!!!
 
 \verbatim
 data                                                   size [bytes]                   datatype
@@ -384,117 +396,117 @@ data                                                   size [bytes]             
 | segment[segments-1] cf[corN-1] of pixel[width*height-1] |  8*N                       double
 +---------------------------------------------------+
 \endverbatim
-        \note All numbers are stored in little-endian form!!! and the pixel order is always row major!
-        \note There was a bug in older QuickFit 3 versions so the second part of the file is scrambled. This is ONLY the case
-              for file version \c "QF3.0imFCS" files with the version tag \c "QF3.1imFCS" can be read completely!
-    */
-    bool saveCorrelationBIN(const QString& filename, double *corrTau, double** corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double **corrSegments, QString& error, int progress_steps=0) ;
+            \note All numbers are stored in little-endian form!!! and the pixel order is always row major!
+            \note There was a bug in older QuickFit 3 versions so the second part of the file is scrambled. This is ONLY the case
+                  for file version \c "QF3.0imFCS" files with the version tag \c "QF3.1imFCS" can be read completely!
+        */
+        bool saveCorrelationBIN(const QString& filename, double *corrTau, double** corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double **corrSegments, QString& error, int progress_steps=0) ;
 
-    struct contribute_to_statistics_state {
-        float sum;
-        float sum2;
-        bool statFirst;
-        float* video_frame;
-        float sframe_max;
-        float sframe_min;
-        uint64_t cnt;
-    };
+        struct contribute_to_statistics_state {
+            float sum;
+            float sum2;
+            bool statFirst;
+            float* video_frame;
+            float sframe_max;
+            float sframe_min;
+            uint64_t cnt;
+        };
 
-    void contribute_to_statistics(contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** sqrsum_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, QVector<float>& statistics_time, QVector<float>& statistics_mean, QVector<float>& statistics_std, QVector<float>& statistics_min, QVector<float>& statistics_max, bool isBackground=false);
+        void contribute_to_statistics(contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** sqrsum_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, QVector<float>& statistics_time, QVector<float>& statistics_mean, QVector<float>& statistics_std, QVector<float>& statistics_min, QVector<float>& statistics_max, bool isBackground=false);
 
 
-    int m_status;
-    bool was_canceled;
+        int m_status;
+        bool was_canceled;
 
-    /** \brief the Job object to work on */
-    IMFCSJob job;
-    double duration;
+        /** \brief the Job object to work on */
+        IMFCSJob job;
+        double duration;
 
-    /** \brief this reader object is used to read the frames from the file */
-    QFImporterImageSeries* reader;
-    uint32_t frames;
-    uint32_t first_frame;
-    uint32_t frame_width;
-    uint32_t frame_height;
-    float* average_frame;
-    float* sqrsum_frame;
-    float* average_uncorrected_frame;
-    float* sqrsum_uncorrected_frame;
-    float* video;
-    float* video_uncorrected;
-    uint32_t video_count;
-    uint32_t real_video_count;
-    float frames_min;
-    float frames_max;
-    float baseline;
-    QVector<float> statistics_time;
-    QVector<float> statistics_mean;
-    QVector<float> statistics_std;
-    QVector<float> statistics_min;
-    QVector<float> statistics_max;
+        /** \brief this reader object is used to read the frames from the file */
+        QFImporterImageSeries* reader;
+        uint32_t frames;
+        uint32_t first_frame;
+        uint32_t frame_width;
+        uint32_t frame_height;
+        float* average_frame;
+        float* sqrsum_frame;
+        float* average_uncorrected_frame;
+        float* sqrsum_uncorrected_frame;
+        float* video;
+        float* video_uncorrected;
+        uint32_t video_count;
+        uint32_t real_video_count;
+        float frames_min;
+        float frames_max;
+        float baseline;
+        QVector<float> statistics_time;
+        QVector<float> statistics_mean;
+        QVector<float> statistics_std;
+        QVector<float> statistics_min;
+        QVector<float> statistics_max;
 
-    QVector<float> backstatistics_time;
-    QVector<float> backstatistics_mean;
-    QVector<float> backstatistics_std;
-    QVector<float> backstatistics_min;
-    QVector<float> backstatistics_max;
+        QVector<float> backstatistics_time;
+        QVector<float> backstatistics_mean;
+        QVector<float> backstatistics_std;
+        QVector<float> backstatistics_min;
+        QVector<float> backstatistics_max;
 
-    QVector<float> statistics_uncorrected_time;
-    QVector<float> statistics_uncorrected_mean;
-    QVector<float> statistics_uncorrected_std;
-    QVector<float> statistics_uncorrected_min;
-    QVector<float> statistics_uncorrected_max;
-    double* acf_tau;
-    double* acf;
-    double* acf_segments;
-    double* acf_std;
-    uint32_t acf_N;
-    double* ccf_tau;
-    double* ccf1;
-    double* ccf2;
-    double* ccf3;
-    double* ccf4;
-    double* ccf1_segments;
-    double* ccf2_segments;
-    double* ccf3_segments;
-    double* ccf4_segments;
-    double* ccf1_std;
-    double* ccf2_std;
-    double* ccf3_std;
-    double* ccf4_std;
-    uint32_t ccf_N;
+        QVector<float> statistics_uncorrected_time;
+        QVector<float> statistics_uncorrected_mean;
+        QVector<float> statistics_uncorrected_std;
+        QVector<float> statistics_uncorrected_min;
+        QVector<float> statistics_uncorrected_max;
+        double* acf_tau;
+        double* acf;
+        double* acf_segments;
+        double* acf_std;
+        uint32_t acf_N;
+        double* ccf_tau;
+        double* ccf1;
+        double* ccf2;
+        double* ccf3;
+        double* ccf4;
+        double* ccf1_segments;
+        double* ccf2_segments;
+        double* ccf3_segments;
+        double* ccf4_segments;
+        double* ccf1_std;
+        double* ccf2_std;
+        double* ccf3_std;
+        double* ccf4_std;
+        uint32_t ccf_N;
 
-    struct DCCFRecord {
-        double* dccf_tau;
-        double* dccf;
-        double* dccf_segments;
-        double* dccf_std;
-        uint32_t dccf_N;
-        uint32_t dccfframe_width;
-        uint32_t dccfframe_height;
-    };
-    QList<DCCFRecord> dccf;
+        struct DCCFRecord {
+            double* dccf_tau;
+            double* dccf;
+            double* dccf_segments;
+            double* dccf_std;
+            uint32_t dccf_N;
+            uint32_t dccfframe_width;
+            uint32_t dccfframe_height;
+        };
+        QList<DCCFRecord> dccf;
 
-    QLocale outLocale;
-    QStringList addFiles;
-    QString outputFilenameBase;
+        QLocale outLocale;
+        QList<Fileinfo> addFiles;
+        QString outputFilenameBase;
 
-    float* backgroundImage;
-    float* backgroundImageStd;
-    float* bleachOffset;
-    float* bleachAmplitude;
-    float* bleachTime;
-    uint8_t* bleachFitOK;
-    float* firstFrames;
-    float* lastFrames;
+        float* backgroundImage;
+        float* backgroundImageStd;
+        float* bleachOffset;
+        float* bleachAmplitude;
+        float* bleachTime;
+        uint8_t* bleachFitOK;
+        float* firstFrames;
+        float* lastFrames;
 
-    float* fit_frames;
-    double* fit_t;
-    int NFitFrames;
+        float* fit_frames;
+        double* fit_t;
+        int NFitFrames;
 
-    static QMutex* mutexFilename;
+        static QMutex* mutexFilename;
 
-    QFPluginServices* pluginservices;
+        QFPluginServices* pluginservices;
 
 };
 

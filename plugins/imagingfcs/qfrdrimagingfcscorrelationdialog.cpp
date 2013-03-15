@@ -87,6 +87,7 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     setEditControlsEnabled(false);
     ui->btnLoadNoCount->setEnabled(false);
     ui->btnSelectImageFileNoCount->setEnabled(false);
+    on_cmbDualView_currentIndexChanged(ui->cmbDualView->currentIndex());
     QTimer::singleShot(UPDATE_TIMEOUT, this, SLOT(updateProgress()));
 
 
@@ -341,18 +342,36 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbBleachType_currentIndexChanged(int 
 void QFRDRImagingFCSCorrelationDialog::on_cmbDualView_currentIndexChanged(int index) {
     if (index==0) {
         ui->labDualView->setText("");
-        ui->chkCrop->setEnabled(true);
+        ui->labDualView->setVisible(false);
+        //ui->chkCrop->setEnabled(true);
         ui->chk2cFCCS->setEnabled(false);
+        ui->chkSeparateColorChannels->setEnabled(false);
         ui->lab2cFCCS->setText("");
+        ui->lab2cFCCS->setVisible(false);
     } else if (index==1 || index==2) {
-        ui->labDualView->setText(tr("an ACF-calculation results in 2 RDRs"));
-        ui->chkCrop->setChecked(false);
-        ui->chkCrop->setEnabled(false);
+        QString colChannels=tr("an ACF-calculation results in 1 RDR");
+        if (ui->chkSeparateColorChannels->isChecked()) colChannels=tr("an ACF-calculation results in 2 RDRs");
+        ui->labDualView->setText(tr("DualView mode actiavted:&nbsp;&nbsp;&nbsp;&bull; %1&nbsp;&nbsp;&nbsp;&bull; cropping should be done symmetrically").arg(colChannels));
+        ui->labDualView->setVisible(true);
+        //ui->chkCrop->setChecked(false);
+        //ui->chkCrop->setEnabled(false);
         ui->chk2cFCCS->setEnabled(true);
-        ui->lab2cFCCS->setText(tr("<b>Distance CCFs will only apply to color channels separately!</b>"));
-
+        ui->chkSeparateColorChannels->setEnabled(true);
+        ui->lab2cFCCS->setText(tr("<b>Distance CCFs will be calculated for the full DualView image!</b>"));
+        ui->lab2cFCCS->setVisible(true);
     }
 }
+
+void QFRDRImagingFCSCorrelationDialog::on_chkSeparateColorChannels_toggled(bool value)
+{
+    on_cmbDualView_currentIndexChanged(ui->cmbDualView->currentIndex());
+}
+
+void QFRDRImagingFCSCorrelationDialog::on_btnSimulate_clicked()
+{
+    emit runSimulation();
+}
+
 
 void QFRDRImagingFCSCorrelationDialog::on_chkFirstFrame_clicked(bool checked) {
     ui->spinFirstFrame->setEnabled(!checked);
@@ -479,6 +498,7 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/pixel_height", ui->spinPixelHeight->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/camera", ui->chkCamera->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/FCCS_2color", ui->chk2cFCCS->isChecked());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/chkSeparateColorChannels", ui->chkSeparateColorChannels->isChecked());
 }
 
 void QFRDRImagingFCSCorrelationDialog::readSettings() {
@@ -525,6 +545,7 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->spinPixelHeight->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/pixel_height", ui->spinPixelHeight->value()).toDouble());
     ui->chkCamera->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/camera", ui->chkCamera->isChecked()).toBool());
     ui->chk2cFCCS->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/FCCS_2color", ui->chk2cFCCS->isChecked()).toBool());
+    ui->chkSeparateColorChannels->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/chkSeparateColorChannels", ui->chkSeparateColorChannels->isChecked()).toBool());
 
 }
 
@@ -623,29 +644,49 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
     job.distanceCCF=ui->chkDistanceCCD->isChecked();
     job.DCCFDeltaX.clear();
     job.DCCFDeltaY.clear();
-    //job.DCCFDeltaX.append(ui->spinDistanceCCFDeltaX->value());
-    //job.DCCFDeltaY.append(ui->spinDistanceCCFDeltaY->value());
-    QString dccfs=ui->edtDCCF->text()+";";
-    QRegExp rxdccf("([\\+\\-]?\\d+)\\s*\\,\\s*([\\+\\-]?\\d+)");
-    rxdccf.setCaseSensitivity(Qt::CaseInsensitive);
-    int pos = 0;
+    job.DCCFrole.clear();
 
-    while ((pos = rxdccf.indexIn(dccfs, pos)) != -1) {
-        int dx=rxdccf.cap(1).toInt();
-        int dy=rxdccf.cap(2).toInt();
-        if (dx<image_width && dy<image_height) {
-            job.DCCFDeltaX << dx;
-            job.DCCFDeltaY << dy;
-            //qDebug()<<"DCCF: "<<dx<<", "<<dy;
+    if (ui->chk2cFCCS->isChecked()) {
+        if (ui->cmbDualView->currentIndex()==1) {
+            job.DCCFDeltaX << image_width/2;
+            job.DCCFDeltaY << image_height;
+            job.DCCFrole<<QString("FCCS");
+            job.distanceCCF=true;
+            qDebug()<<"added DV_H FCCS";
+        } else if (ui->cmbDualView->currentIndex()==2) {
+            job.DCCFDeltaX << image_width;
+            job.DCCFDeltaY << image_height/2;
+            job.DCCFrole<<QString("FCCS");
+            job.distanceCCF=true;
+            qDebug()<<"added DV_V FCCS";
         }
-        pos += rxdccf.matchedLength();
+    }
+
+    if (ui->chkDistanceCCD->isChecked()) {
+        QString dccfs=ui->edtDCCF->text()+";";
+        QRegExp rxdccf("([\\+\\-]?\\d+)\\s*\\,\\s*([\\+\\-]?\\d+)");
+        rxdccf.setCaseSensitivity(Qt::CaseInsensitive);
+        int pos = 0;
+
+        while ((pos = rxdccf.indexIn(dccfs, pos)) != -1) {
+            int dx=rxdccf.cap(1).toInt();
+            int dy=rxdccf.cap(2).toInt();
+            if (dx<image_width && dy<image_height) {
+                job.DCCFDeltaX << dx;
+                job.DCCFDeltaY << dy;
+                job.DCCFrole<<QString("DCCF(%1,%2)").arg(dx).arg(dy);
+                //qDebug()<<"DCCF: "<<dx<<", "<<dy;
+            }
+            pos += rxdccf.matchedLength();
+        }
     }
     job.bleach=ui->cmbBleachType->currentIndex();
     job.bleachAvgFrames=ui->spinBleachAvgFrames->value();
     job.cameraSettingsGiven=ui->chkCamera->isChecked();
     job.cameraPixelWidth=ui->spinPixelWidth->value();
     job.cameraPixelHeight=ui->spinPixelHeight->value();
-    job.dualViewSideID="";
+    job.addFCCSSeparately=ui->chkSeparateColorChannels->isChecked();
+    job.dualViewMode=ui->cmbDualView->currentIndex();
     //job.bleachDecay=ui->spinDecay->value();
     //job.bleachA=ui->edtDecayA->value();
     //job.bleachDecay2=ui->spinDecay2->value();
@@ -658,8 +699,23 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
 
 void QFRDRImagingFCSCorrelationDialog::addJob(IMFCSJob jobin, bool ignoreDualView) {
     IMFCSJob job=jobin;
+    job.progress=new QFRDRImagingFCSThreadProgress(this);
+    job.thread=new QFRDRImagingFCSCorrelationJobThread(pluginServices, this);
+    connect(job.thread, SIGNAL(messageChanged(QString)), job.progress, SLOT(setMessage(QString)));
+    connect(job.thread, SIGNAL(statusChanged(int)), job.progress, SLOT(setStatus(int)));
+    connect(job.thread, SIGNAL(rangeChanged(int, int)), job.progress, SLOT(setRange(int, int)));
+    connect(job.thread, SIGNAL(progressChanged(int)), job.progress, SLOT(setProgress(int)));
+    connect(job.thread, SIGNAL(progressIncrement(int)), job.progress, SLOT(incProgress(int)));
+    connect(job.progress, SIGNAL(cancelClicked()), job.thread, SLOT(cancel()));
 
-    if (ignoreDualView || (ui->cmbDualView->currentIndex()==0)) {
+    setEditControlsEnabled(false);
+    ui->layProgress->insertWidget(0, job.progress);
+
+    job.progress->setName(tr("correlating '%1'").arg(job.filename));
+    job.thread->init(job);
+    jobs.append(job);
+
+    /*if (ignoreDualView || (ui->cmbDualView->currentIndex()==0)) {
 
         job.progress=new QFRDRImagingFCSThreadProgress(this);
         job.thread=new QFRDRImagingFCSCorrelationJobThread(pluginServices, this);
@@ -684,7 +740,7 @@ void QFRDRImagingFCSCorrelationDialog::addJob(IMFCSJob jobin, bool ignoreDualVie
             job.crop_x1=image_width/2-1;
             job.crop_y0=0;
             job.crop_y1=image_height-1;
-            job.dualViewSideID=tr("left");
+            job.role=tr("left");
             addJob(job, true);
             IMFCSJob job2=jobin;
             job2.use_cropping=true;
@@ -692,7 +748,7 @@ void QFRDRImagingFCSCorrelationDialog::addJob(IMFCSJob jobin, bool ignoreDualVie
             job2.crop_x1=image_width-1;
             job2.crop_y0=0;
             job2.crop_y1=image_height-1;
-            job2.dualViewSideID=tr("right");
+            job2.role=tr("right");
             addJob(job2, true);
         } else if (ui->cmbDualView->currentIndex()==2) {
             job.use_cropping=true;
@@ -700,7 +756,7 @@ void QFRDRImagingFCSCorrelationDialog::addJob(IMFCSJob jobin, bool ignoreDualVie
             job.crop_x1=image_width-1;
             job.crop_y0=0;
             job.crop_y1=image_height/2-1;
-            job.dualViewSideID=tr("bottom");
+            job.role=tr("bottom");
             addJob(job, true);
             IMFCSJob job2=jobin;
             job2.use_cropping=true;
@@ -708,10 +764,10 @@ void QFRDRImagingFCSCorrelationDialog::addJob(IMFCSJob jobin, bool ignoreDualVie
             job2.crop_x1=image_width-1;
             job2.crop_y0=image_height/2;
             job2.crop_y1=image_height-1;
-            job.dualViewSideID=tr("top");
+            job.role=tr("top");
             addJob(job2, true);
         }
-    }
+    }*/
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
@@ -1034,7 +1090,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool count
 }
 
 
-QStringList QFRDRImagingFCSCorrelationDialog::getFilesToAdd() const {
+QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> QFRDRImagingFCSCorrelationDialog::getFilesToAdd() const {
     return filesToAdd;
 }
 

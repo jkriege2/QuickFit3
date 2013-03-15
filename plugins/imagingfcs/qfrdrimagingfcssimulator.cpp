@@ -140,6 +140,7 @@ void QFRDRImagingFCSSimulator::threadFinished()
         setState(dsParameterInput);
     }
     lastSimFile=sim->get_filename();
+    accept();
 }
 
 void QFRDRImagingFCSSimulator::setState(QFRDRImagingFCSSimulator::DialogState new_dstate)
