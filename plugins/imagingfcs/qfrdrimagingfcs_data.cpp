@@ -326,11 +326,11 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                         if (filetype.toUpper()=="VIDEO_CORRELATOR_BIN") {
                             loadVideoCorrelatorFileBin(files[i]);
                             dataLoaded=true;
-                            qDebug()<<getID()<<"loaded vidcorbin "<<width<<"x"<<height<<" x "<<N;
+                            //qDebug()<<getID()<<"loaded vidcorbin "<<width<<"x"<<height<<" x "<<N;
                         } else if (filetype.toUpper()=="VIDEO_CORRELATOR") {
                             loadVideoCorrelatorFile(files[i]);
                             dataLoaded=true;
-                            qDebug()<<getID()<<"loaded vidcorn "<<width<<"x"<<height<<" x "<<N;
+                            //qDebug()<<getID()<<"loaded vidcorn "<<width<<"x"<<height<<" x "<<N;
                         } else if (filetype.toUpper()=="RADHARD2") {
                             loadRadhard2File(files[i], false);
                             loadRH2Overview=files[i];
@@ -351,7 +351,7 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
         // Note: afterwards width/height will be changed!
         if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
             splitCFsForDualView();
-            qDebug()<<getID()<<"split "<<width<<"x"<<height<<" x "<<N;
+            //qDebug()<<getID()<<"split "<<width<<"x"<<height<<" x "<<N;
         }
 
         if (!dataLoaded) {
@@ -520,7 +520,7 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                             loadStatistics(ucStat, files[i]);
                         } else if (ft=="statistics_dv2") {
                             loadStatistics(stat2, files[i]);
-                            hasStatistics=true;
+                            hasStatistics2=true;
                         } else if (ft=="background_statistics_dv2") {
                             loadStatistics(backStat2, files[i]);
                         } else if (ft=="uncorrected_statistics_dv2") {
@@ -596,6 +596,8 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
     if (!dataLoaded) {
         setError(tr("did not find a correlation data file (acf, ccf, dccf, ...) for record"));
     }
+
+    //qDebug()<<"loaded:   "<<width<<"x"<<height<<"  N="<<N<<"   correlations="<<correlations<<"    c[0]="<<correlations[0]<<"    c[N-1]="<<correlations[N-1];
 }
 
 bool QFRDRImagingFCSData::loadOverview(double* overviewF, double* overviewF2, const QString& filename) {
@@ -603,7 +605,7 @@ bool QFRDRImagingFCSData::loadOverview(double* overviewF, double* overviewF2, co
 
     if (!overviewF && !overviewF2) return false;
 
-    qDebug()<<getID()<<"loadedOverview "<<filename;
+    //qDebug()<<getID()<<"loadedOverview "<<filename;
     if (QFile::exists(filename)) {
         TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
         if (tif) {
@@ -645,7 +647,7 @@ bool QFRDRImagingFCSData::loadOverview(double* overviewF, double* overviewF2, co
         }
 
     }
-    qDebug()<<getID()<<"loadedOverview "<<filename<<"   OK="<<ok;
+    //qDebug()<<getID()<<"loadedOverview "<<filename<<"   OK="<<ok;
     return ok;
 }
 
@@ -716,7 +718,7 @@ bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int*
                 i++;
             } while (TIFFReadDirectory(tif) && i<=(*frames));
             TIFFClose(tif);
-            qDebug()<<getID()<<"loading video "<<filename<<"   siez="<<*width<<"x"<<*height<<"   frames="<<*frames;
+            //qDebug()<<getID()<<"loading video "<<filename<<"   siez="<<*width<<"x"<<*height<<"   frames="<<*frames;
         }
     }
     return ok;
@@ -1155,6 +1157,17 @@ void QFRDRImagingFCSData::setDualViewMode(QFRDRImagingFCSData::DualViewMode mode
     if (m_dualview==QFRDRImagingFCSData::dvVertical) setQFProperty("DUALVIEW_MODE", "vertical", false);
 }
 
+bool QFRDRImagingFCSData::isFCCS() const
+{
+    bool fccs=getRole().toLower().startsWith("fccs");
+    if (!fccs &&
+            ((internalDualViewMode()!=QFRDRImagingFCSData::dvHorizontal && getProperty("DCCF_DELTAX",1).toInt()==getProperty("WIDTH", 0).toInt())
+            ||(internalDualViewMode()!=QFRDRImagingFCSData::dvVertical && getProperty("DCCF_DELTAY",1).toInt()==getProperty("HEIGHT", 0).toInt()))) {
+        fccs=true;
+    }
+    return fccs;
+}
+
 int QFRDRImagingFCSData::leaveoutGetRunCount() const
 {
     return getCorrelationRuns();
@@ -1204,7 +1217,7 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
     correlationStdDev=NULL;
     sigmas=NULL;
     tau=NULL;
-    qDebug()<<getID()<<"allocateContents "<<x<<"*"<<y<<"  *"<<N;
+    //qDebug()<<getID()<<"allocateContents "<<x<<"*"<<y<<"  *"<<N;
     if ((x>0) && (y>0) && (N>0)) {
         maskInit(x,y);
         correlations=(double*)calloc(x*y*N,sizeof(double));
@@ -1219,7 +1232,7 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
         setQFProperty("HEIGHT", y, false, true);
     }
 #ifdef DEBUG_SIZES
-    qDebug()<<getID()<<"allocateContents( x="<<x<<" y="<<y<<" N="<<N<<"):  "<<bytestostr(N*x*y*2*sizeof(double)+x*y*sizeof(bool)+x*y*sizeof(double)+x*y*sizeof(uint16_t)+N*3*sizeof(double)).c_str();
+    //qDebug()<<getID()<<"allocateContents( x="<<x<<" y="<<y<<" N="<<N<<"):  "<<bytestostr(N*x*y*2*sizeof(double)+x*y*sizeof(bool)+x*y*sizeof(double)+x*y*sizeof(uint16_t)+N*3*sizeof(double)).c_str();
 #endif
 }
 
@@ -1236,7 +1249,7 @@ void QFRDRImagingFCSData::allocateOverviews(int x, int y) {
     widthOvr=0;
     heightOvr=0;
 
-    qDebug()<<getID()<<"allocateOverviews "<<x<<"*"<<y;
+    //qDebug()<<getID()<<"allocateOverviews "<<x<<"*"<<y;
     if ((x>0) && (y>0)) {
         widthOvr=x;
         heightOvr=y;
@@ -1244,7 +1257,7 @@ void QFRDRImagingFCSData::allocateOverviews(int x, int y) {
 
         overviewF=(double*)calloc(x*y,sizeof(double));
         overviewFSTD=(double*)calloc(x*y,sizeof(double));
-        if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+        if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && !getRole().toLower().startsWith("acf")) {
             overviewF2=(double*)calloc(x*y,sizeof(double));
             overviewF2STD=(double*)calloc(x*y,sizeof(double));
         }
@@ -1577,39 +1590,80 @@ int QFRDRImagingFCSData::getExpectedFileHeight() const
 
 void QFRDRImagingFCSData::splitImage(double* overviewF, double* overviewF2, const double* inputImage, uint32_t nx, uint32_t ny) const
 {
-    qDebug()<<getID()<<"splitImage(overviewF="<<overviewF<<",  overviewF2="<<overviewF2<<",  nx="<<nx<<",  ny="<<ny<<")   width*height = "<<width<<"*"<<height<<"   intDV2,channel="<<internalDualViewMode()<<","<<internalDualViewModeChannel();
+    //qDebug()<<getID()<<"splitImage(overviewF="<<overviewF<<",  overviewF2="<<overviewF2<<",  nx="<<nx<<",  ny="<<ny<<")   width*height = "<<width<<"*"<<height<<"   intDV2,channel="<<internalDualViewMode()<<","<<internalDualViewModeChannel();
     if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && nx>=2*width && ny==height) {
-        int shift=0;
-        double* out=overviewF;
-        if (internalDualViewModeChannel()==1) { shift=width; out=overviewF2; }
-        if (out) {
+        int shift1=0;
+        int shift2=width;
+        double* out1=overviewF;
+        double* out2=overviewF2;
+        if (!isFCCS()) {
+            out2=NULL;
+            if (internalDualViewModeChannel()==0) {
+                shift1=0;
+                shift2=0;
+            } else {
+                shift1=width;
+                shift2=0;
+            }
+        }
+        if (out1) {
             for (int y=0; y<height; y++) {
                 for (int x=0; x<width; x++) {
-                    const int idxIn=y*nx+x+shift;
+                    const int idxIn=y*nx+x+shift1;
                     const int idxOut=y*width+x;
-                    out[idxOut]=inputImage[idxIn];
+                    out1[idxOut]=inputImage[idxIn];
+                }
+            }
+        }
+        if (out2) {
+            for (int y=0; y<height; y++) {
+                for (int x=0; x<width; x++) {
+                    const int idxIn=y*nx+x+shift2;
+                    const int idxOut=y*width+x;
+                    out2[idxOut]=inputImage[idxIn];
                 }
             }
         }
     } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && nx==width && ny>=2*height) {
-        int shift=0;
-        double* out=overviewF;
-        if (internalDualViewModeChannel()==1) { shift=height; out=overviewF2; }
-        if (out) {
+        int shift1=0;
+        int shift2=height;
+        double* out1=overviewF;
+        double* out2=overviewF2;
+        if (!isFCCS()) {
+            out2=NULL;
+            if (internalDualViewModeChannel()==0) {
+                shift1=0;
+                shift2=0;
+            } else {
+                shift1=height;
+                shift2=0;
+            }
+        }
+        if (out1) {
             for (int y=0; y<height; y++) {
                 for (int x=0; x<width; x++) {
-                    const int idxIn=(y+shift)*nx+x;
+                    const int idxIn=(y+shift1)*nx+x;
                     const int idxOut=y*width+x;
-                    out[idxOut]=inputImage[idxIn];
+                    out1[idxOut]=inputImage[idxIn];
                 }
             }
         }
+        if (out2) {
+            for (int y=0; y<height; y++) {
+                for (int x=0; x<width; x++) {
+                    const int idxIn=(y+shift2)*nx+x;
+                    const int idxOut=y*width+x;
+                    out2[idxOut]=inputImage[idxIn];
+                }
+            }
+        }
+
     } else {
         if (nx==width && ny==height) {
-            if (overviewF) { memcpy(overviewF, inputImage, nx*ny*sizeof(double)); qDebug()<<"  !!!copied overviewF!!!"; }
-            if (overviewF2) { memcpy(overviewF2, inputImage, nx*ny*sizeof(double)); qDebug()<<"  !!!copied overviewF2!!!"; }
+            if (overviewF) { memcpy(overviewF, inputImage, nx*ny*sizeof(double)); }//qDebug()<<"  !!!copied overviewF!!!"; }
+            if (overviewF2) { memcpy(overviewF2, inputImage, nx*ny*sizeof(double)); }//qDebug()<<"  !!!copied overviewF2!!!"; }
         } else {
-            qDebug()<<"  !!!didn't copy!!!";
+            //qDebug()<<"  !!!didn't copy!!!";
         }
     }
 }
@@ -1656,7 +1710,8 @@ int QFRDRImagingFCSData::getImageFromRunsChannels() const
     if (internalDualViewMode()==QFRDRImagingFCSData::dvNone) {
         return 1;
     } else {
-        return 2;
+        if (isFCCS()) return 2;
+        return 1;
     }
 }
 
@@ -2074,19 +2129,22 @@ void QFRDRImagingFCSData::splitCFsForDualView() {
     double* oldC=duplicateArray(correlations, width*height*N);
     double* oldS=duplicateArray(sigmas, width*height*N);
     bool* oldL=duplicateArray(maskGet(), width*height);
+    double* oldTau=duplicateArray(tau, N);
+    //qDebug()<<oldC<<correlations;
     uint32_t oldWidth=width;
     uint32_t oldHeight=height;
     if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal) {
         allocateContents(width/2, height, N);
         int shift=0;
         if (internalDualViewModeChannel()==1) { shift=width; }
+        //qDebug()<<"### splitCFsForDualView:    width="<<width<<"  height="<<height<<"  shiftX="<<shift;
         for (int y=0; y<height; y++) {
             for (int x=0; x<width; x++) {
-                const int idxIn=y*oldWidth*N+(x+shift)*N;
-                const int idxOut=y*width*N+x*N;
+                const int idxIn=(y*oldWidth+(x+shift))*N;
+                const int idxOut=(y*width+x)*N;
                 memcpy(&(correlations[idxOut]), &(oldC[idxIn]), N*sizeof(double));
                 memcpy(&(sigmas[idxOut]), &(oldS[idxIn]), N*sizeof(double));
-                //mask[y*width+x]=oldL[y*oldWidth+x+shift];
+                //qDebug()<<"("<<x<<","<<y<<"):   idxIn="<<idxIn<<"  =>  idxOut="<<idxOut<<"   N="<<N<<"   out="<<correlations[idxOut]<<"  <- "<<oldC[idxIn];
                 maskUnset(x, y, oldL[y*oldWidth+x+shift]);
             }
         }
@@ -2094,22 +2152,25 @@ void QFRDRImagingFCSData::splitCFsForDualView() {
         allocateContents(width, height/2, N);
         int shift=0;
         if (internalDualViewModeChannel()==1) { shift=height; }
+        //qDebug()<<"### splitCFsForDualView:    width="<<width<<"  height="<<height<<"  shiftY="<<shift;
         for (int y=0; y<height; y++) {
             for (int x=0; x<width; x++) {
                 const int idxIn=(y+shift)*oldWidth*N + x*N;
                 const int idxOut=y*width*N+x*N;
                 memcpy(&(correlations[idxOut]), &(oldC[idxIn]), N*sizeof(double));
                 memcpy(&(sigmas[idxOut]), &(oldS[idxIn]), N*sizeof(double));
-                //mask[y*width+x]=oldL[(y+shift)*oldWidth+x];
                 maskUnset(x, y, oldL[y*oldWidth+x+shift]);
             }
         }
     }
+    memcpy(tau, oldTau, N*sizeof(double));
     setQFProperty("WIDTH", width, false, true);
     setQFProperty("HEIGHT", height, false, true);
     free(oldC);
     free(oldS);
     free(oldL);
+    free(oldTau);
+    recalcCorrelations();
 }
 
 

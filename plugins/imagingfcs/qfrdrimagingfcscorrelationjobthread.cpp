@@ -303,8 +303,14 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     QString videoFilename="";
                     QString videoUncorrectedFilename="";
                     QString statisticsFilename="";
+                    QString statisticsFilename_dv1="";
+                    QString statisticsFilename_dv2="";
                     QString uncorrectedStatisticsFilename="";
+                    QString uncorrectedStatisticsFilename_dv1="";
+                    QString uncorrectedStatisticsFilename_dv2="";
                     QString backstatisticsFilename="";
+                    QString backstatisticsFilename_dv1="";
+                    QString backstatisticsFilename_dv2="";
                     QString acfFilename="";
                     QString ccfFilename="";
                     QStringList dccfFilename;
@@ -354,36 +360,18 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         if ((m_status==1) && !was_canceled && average_frame) {
                             emit messageChanged(tr("saving overview image ..."));
                             QString localFilename=averageFilename=outputFilenameBase+".overview.tif";
-                            TIFF* tif = TIFFOpen(localFilename.toAscii().data(),"w");
-                            if (tif) {
-                                float avgMin=average_frame[0];
-                                float avgMax=average_frame[0];
-                                for (uint32_t i=0; i<frame_width*frame_height; i++) {
-                                    avgMin=(average_frame[i]<avgMin)?average_frame[i]:avgMin;
-                                    avgMax=(average_frame[i]>avgMax)?average_frame[i]:avgMax;
-                                }
-                                uint16_t* img=(uint16_t*)malloc(frame_width*frame_height*sizeof(uint16_t));
-                                for (uint32_t i=0; i<frame_width*frame_height; i++) {
-                                    img[i]=(uint16_t)round((double)(average_frame[i]-avgMin)*(double)0xFFFF/fabs(avgMax-avgMin));
-                                }
-                                TIFFTWriteUint16(tif, img, frame_width, frame_height);
-                                free(img);
-                                TIFFClose(tif);
-                            } else {
+                            QString error="";
+                            if (!SaveTIFFUInt16_scaled(localFilename, average_frame, frame_width, frame_height, tr("UInt16 overview image"), &error)) {
                                 m_status=-1; emit statusChanged(m_status);
                                 averageFilename="";
-                                emit messageChanged(tr("could not create overview image '%1'!").arg(localFilename));
+                                emit messageChanged(error);
                             }
-                            localFilename=averageFilenameF=outputFilenameBase+".overview_float.tif";
-                            tif = TIFFOpen(localFilename.toAscii().data(),"w");
-                            if (tif) {
 
-                                TIFFTWriteFloat(tif, average_frame, frame_width, frame_height);
-                                TIFFClose(tif);
-                            } else {
+                            localFilename=averageFilenameF=outputFilenameBase+".overview_float.tif";
+                            if (!SaveTIFFFloat(localFilename, average_frame, frame_width, frame_height, tr("float overview image"), &error)) {
                                 m_status=-1; emit statusChanged(m_status);
                                 averageFilenameF="";
-                                emit messageChanged(tr("could not create float overview image '%1'!").arg(localFilename));
+                                emit messageChanged(error);
                             }
 
                         }
@@ -393,30 +381,13 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         if ((m_status==1) && !was_canceled && sqrsum_frame) {
                             emit messageChanged(tr("saving overview stddev image ..."));
                             QString localFilename=stdFilename=outputFilenameBase+".overviewstd.tif";
-                            TIFF* tif = TIFFOpen(localFilename.toAscii().data(),"w");
-                            if (tif) {
-                                float* sd=(float*)calloc(frame_width*frame_height, sizeof(float));
 
-                                if (frames>1) {
-                                    for (int i=0; i<frame_width*frame_height; i++) {
-                                        sd[i]=sqrt(double(frames)/double(frames-1)*(sqrsum_frame[i]-average_frame[i]*average_frame[i]));
-                                    }
-                                } else {
-                                    for (int i=0; i<frame_width*frame_height; i++) {
-                                        sd[i]=0;
-                                    }
-
-                                }
-
-                                TIFFTWriteFloat(tif, sd, frame_width, frame_height);
-                                TIFFClose(tif);
-                                free(sd);
-                            } else {
+                            QString error="";
+                            if (!SaveSDTIFF(localFilename, average_frame, sqrsum_frame, frame_width, frame_height, frames, tr("stddev overview image"), &error)) {
                                 m_status=-1; emit statusChanged(m_status);
                                 stdFilename="";
-                                emit messageChanged(tr("could not create stddev overview image '%1'!").arg(localFilename));
+                                emit messageChanged(error);
                             }
-
                         }
                         emit progressIncrement(5);
 
@@ -424,15 +395,12 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         if ((m_status==1) && !was_canceled && average_uncorrected_frame) {
                             emit messageChanged(tr("saving uncorrected overview image ..."));
                             QString localFilename=averageUncorrectedFilename=outputFilenameBase+".overview_uncorrected.tif";
-                            TIFF* tif = TIFFOpen(localFilename.toAscii().data(),"w");
-                            if (tif) {
 
-                                TIFFTWriteFloat(tif, average_uncorrected_frame, frame_width, frame_height);
-                                TIFFClose(tif);
-                            } else {
+                            QString error="";
+                            if (!SaveTIFFFloat(localFilename, average_uncorrected_frame, frame_width, frame_height, tr("uncorrected overview image"), &error)) {
                                 m_status=-1; emit statusChanged(m_status);
                                 averageUncorrectedFilename="";
-                                emit messageChanged(tr("could not create uncorrected overview image '%1'!").arg(localFilename));
+                                emit messageChanged(error);
                             }
 
                         }
@@ -442,30 +410,13 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         if ((m_status==1) && !was_canceled && sqrsum_uncorrected_frame && average_uncorrected_frame) {
                             emit messageChanged(tr("saving uncorrected overview stddev image ..."));
                             QString localFilename=stdUncorrectedFilename=outputFilenameBase+".overviewstd_uncorrected.tif";
-                            TIFF* tif = TIFFOpen(localFilename.toAscii().data(),"w");
-                            if (tif) {
-                                float* sd=(float*)calloc(frame_width*frame_height, sizeof(float));
 
-                                if (frames>1) {
-                                    for (int i=0; i<frame_width*frame_height; i++) {
-                                        sd[i]=sqrt(double(frames)/double(frames-1)*(sqrsum_uncorrected_frame[i]-average_uncorrected_frame[i]*average_uncorrected_frame[i]));
-                                    }
-                                } else {
-                                    for (int i=0; i<frame_width*frame_height; i++) {
-                                        sd[i]=0;
-                                    }
-
-                                }
-
-                                TIFFTWriteFloat(tif, sd, frame_width, frame_height);
-                                TIFFClose(tif);
-                                free(sd);
-                            } else {
+                            QString error="";
+                            if (!SaveSDTIFF(localFilename, average_uncorrected_frame, sqrsum_uncorrected_frame, frame_width, frame_height, frames, tr("uncorrected overview stddev image"), &error)) {
                                 m_status=-1; emit statusChanged(m_status);
                                 stdUncorrectedFilename="";
-                                emit messageChanged(tr("could not create uncorrected stddev overview image '%1'!").arg(localFilename));
+                                emit messageChanged(error);
                             }
-
                         }
                         emit progressIncrement(5);
 
@@ -481,15 +432,14 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                             if (doSave) {
                                 emit messageChanged(tr("saving background image ..."));
                                 QString localFilename=backgroundFilename=outputFilenameBase+".background.tif";
-                                TIFF* tif = TIFFOpen(localFilename.toAscii().data(),"w");
-                                if (tif) {
-                                    TIFFTWriteFloat(tif, backgroundImage, frame_width, frame_height);
-                                    TIFFClose(tif);
-                                } else {
+
+                                QString error="";
+                                if (!SaveTIFFFloat(localFilename, backgroundImage, frame_width, frame_height, tr("background image"), &error)) {
                                     m_status=-1; emit statusChanged(m_status);
                                     backgroundFilename="";
-                                    emit messageChanged(tr("could not create background image '%1'!").arg(localFilename));
+                                    emit messageChanged(error);
                                 }
+
                             }
 
                         }
@@ -505,19 +455,17 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                             if (doSave) {
                                 emit messageChanged(tr("saving background S.D. image ..."));
                                 QString localFilename=backstdFilename=outputFilenameBase+".backgroundstd.tif";
-                                TIFF* tif = TIFFOpen(localFilename.toAscii().data(),"w");
-                                if (tif) {
-                                    TIFFTWriteFloat(tif, backgroundImageStd, frame_width, frame_height);
-                                    TIFFClose(tif);
-                                } else {
+
+                                QString error="";
+                                if (!SaveTIFFFloat(localFilename, backgroundImageStd, frame_width, frame_height, tr("background S.D. image"), &error)) {
                                     m_status=-1; emit statusChanged(m_status);
                                     backstdFilename="";
-                                    emit messageChanged(tr("could not create background S.D. image '%1'!").arg(localFilename));
+                                    emit messageChanged(error);
                                 }
                             }
-
                         }
                         emit progressIncrement(10);
+
 
                         //************** SAVE BLEACHING PARAMETERS IMAGE
                         if ((m_status==1) && !was_canceled ) {
@@ -687,290 +635,67 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
 
                         //************** SAVE STATISTICS
                         if ((m_status==1) && !was_canceled && job.statistics) {
+                            QString error="";
                             emit messageChanged(tr("saving statistics ..."));
-                            QString localFilename=statisticsFilename=outputFilenameBase+".statistics.dat";
-                            QFile f(localFilename);
-                            if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
-                                QTextStream text(&f);
-                                text.setLocale(outLocale);
-                                emit messageChanged(tr("saving statistics ..."));
-                                int count=statistics_time.size();//qMin(statistics_time.size(), statistics_mean.size());
-                                for (int i=0; i<count; i++) {
-                                    text<<statistics_time[i];
-                                    if (i<statistics_mean.size()) text<<", "<<statistics_mean[i];
-                                    else text<<", 0";
-                                    if (i<statistics_std.size()) text<<", "<<statistics_std[i];
-                                    else text<<", 0";
-                                    if (i<statistics_min.size()) text<<", "<<statistics_min[i];
-                                    else text<<", 0";
-                                    if (i<statistics_max.size()) text<<", "<<statistics_max[i];
-                                    else text<<", 0";
-                                    text<<"\n";
-                                }
-                                f.close();
-                            } else {
+                            if (!saveStatistics(statisticsFilename=outputFilenameBase+".statistics.dat", outputFilenameBase+".statistics.plt", statistics, tr("Corrected Statistics"), &error)) {
                                 m_status=-1; emit statusChanged(m_status);
-                                emit messageChanged(tr("could not create statistics file '%1': %2!").arg(localFilename).arg(f.errorString()));
-                            }
-                            localFilename=outputFilenameBase+".statistics.plt";
-                            QFile f1(localFilename);
-                            if (f1.open(QIODevice::WriteOnly|QIODevice::Text)) {
-                                QTextStream text(&f1);
-                                text.setLocale(outLocale);
-                                text<<QString("set xlabel 'time [seconds]'\n");
-                                text<<QString("set ylabel 'pixel grey value'\n");
-                                text<<QString("set title \"Statistics '%1'\" noenhanced\n").arg(job.filename);
-                                text<<QString("set style fill transparent solid 0.5 noborder\n");
-                                text<<QString("set multiplot layout 1,2\n");
-                                text<<QString("plot '%1' using 1:(($2)-(($3)/2.0)):(($2)+(($3)/2.0)) title '+/- stddev' with filledcu, '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(statisticsFilename).fileName());
-                                text<<QString("plot '%1' using 1:4:5 title 'min/max' with filledcu, '%1' using 1:(($2)-(($3)/2.0)):(($2)+(($3)/2.0)) title '+/- stddev' with filledcu, '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(statisticsFilename).fileName());
-                                text<<QString("unset multiplot\n");
-                                text<<QString("pause -1\n");
-                                text<<QString("set multiplot layout 2,2\n");
-                                text<<QString("plot '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(statisticsFilename).fileName());
-                                text<<QString("plot '%1' using 1:3 title 'stddev' with lines lt 1\n").arg(QFileInfo(statisticsFilename).fileName());
-                                text<<QString("plot '%1' using 1:4 title 'min' with lines lt 1\n").arg(QFileInfo(statisticsFilename).fileName());
-                                text<<QString("plot '%1' using 1:5 title 'max' with lines lt 1\n").arg(QFileInfo(statisticsFilename).fileName());
-                                text<<QString("unset multiplot\n");
-                                text<<QString("pause -1\n");
-                                text<<QString("f(t)=a0+a1*exp(-t/t1)\n");
-                                text<<QString("t1=50\n");
-                                text<<QString("a0=0\n");
-                                text<<QString("a1=500\n");
-                                text<<QString("fit f(x) '%1' using 1:2 via a0, a1, t1\n").arg(QFileInfo(statisticsFilename).fileName());
-                                text<<QString("set label sprintf('1exp: a0=%f a1=%f t1=%f', a0, a1, t1) at graph 0.5,0.9\n");
-                                text<<QString("plot '%1' using 1:2 title 'mean' with points, f(x) title 'exponential fit\n").arg(QFileInfo(statisticsFilename).fileName());
-                                text<<QString("pause -1\n");
-                                text<<QString("\n");
-                                text<<QString("\n");
-                                text<<QString("\n");
-                                f1.close();
-                            } else {
-                                emit statusChanged(m_status);
-                                emit messageChanged(tr("could not create statistics plot file '%1': %2!").arg(localFilename).arg(f1.errorString()));
+                                emit messageChanged(tr("could not create statistics file %1!").arg(error));
                             }
 
-                            localFilename=backstatisticsFilename=outputFilenameBase+".backstatistics.dat";
-                            QFile fb(localFilename);
-                            if (fb.open(QIODevice::WriteOnly|QIODevice::Text)) {
-                                QTextStream text(&fb);
-                                text.setLocale(outLocale);
-                                emit messageChanged(tr("saving background statistics ..."));
-                                int count=backstatistics_time.size();
-                                for (int i=0; i<count; i++) {
-                                    text<<backstatistics_time[i];
-                                    if (i<backstatistics_mean.size()) text<<", "<<backstatistics_mean[i];
-                                    else text<<", 0";
-                                    if (i<backstatistics_std.size()) text<<", "<<backstatistics_std[i];
-                                    else text<<", 0";
-                                    if (i<backstatistics_min.size()) text<<", "<<backstatistics_min[i];
-                                    else text<<", 0";
-                                    if (i<backstatistics_max.size()) text<<", "<<backstatistics_max[i];
-                                    else text<<", 0";
-                                    text<<"\n";
-                                }
-                                fb.close();
-                            } else {
+                            emit messageChanged(tr("saving background statistics ..."));
+                            if (!saveStatistics(backstatisticsFilename=outputFilenameBase+".backstatistics.dat", outputFilenameBase+".backstatistics.plt", backstatistics, tr("Background Statistics"), &error)) {
                                 m_status=-1; emit statusChanged(m_status);
-                                emit messageChanged(tr("could not create background statistics file '%1': %2!").arg(localFilename).arg(fb.errorString()));
-                            }
-                            localFilename=outputFilenameBase+".backstatistics.plt";
-                            QFile fb1(localFilename);
-                            if (fb1.open(QIODevice::WriteOnly|QIODevice::Text)) {
-                                QTextStream text(&fb1);
-                                text.setLocale(outLocale);
-                                text<<QString("set xlabel 'time [seconds]'\n");
-                                text<<QString("set ylabel 'pixel grey value'\n");
-                                text<<QString("set title \"Background Statistics '%1'\" noenhanced\n").arg(job.filename);
-                                text<<QString("set style fill transparent solid 0.5 noborder\n");
-                                text<<QString("set multiplot layout 1,2\n");
-                                text<<QString("plot '%1' using 1:(($2)-(($3)/2.0)):(($2)+(($3)/2.0)) title '+/- stddev' with filledcu, '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(backstatisticsFilename).fileName());
-                                text<<QString("plot '%1' using 1:4:5 title 'min/max' with filledcu, '%1' using 1:(($2)-(($3)/2.0)):(($2)+(($3)/2.0)) title '+/- stddev' with filledcu, '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(backstatisticsFilename).fileName());
-                                text<<QString("unset multiplot\n");
-                                text<<QString("pause -1\n");
-                                text<<QString("set multiplot layout 2,2\n");
-                                text<<QString("plot '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(backstatisticsFilename).fileName());
-                                text<<QString("plot '%1' using 1:3 title 'stddev' with lines lt 1\n").arg(QFileInfo(backstatisticsFilename).fileName());
-                                text<<QString("plot '%1' using 1:4 title 'min' with lines lt 1\n").arg(QFileInfo(backstatisticsFilename).fileName());
-                                text<<QString("plot '%1' using 1:5 title 'max' with lines lt 1\n").arg(QFileInfo(backstatisticsFilename).fileName());
-                                text<<QString("unset multiplot\n");
-                                text<<QString("pause -1\n");
-                                text<<QString("f(t)=a0+a1*exp(-t/t1)\n");
-                                text<<QString("t1=50\n");
-                                text<<QString("a0=0\n");
-                                text<<QString("a1=500\n");
-                                text<<QString("fit f(x) '%1' using 1:2 via a0, a1, t1\n").arg(QFileInfo(backstatisticsFilename).fileName());
-                                text<<QString("set label sprintf('1exp: a0=%f a1=%f t1=%f', a0, a1, t1) at graph 0.5,0.9\n");
-                                text<<QString("plot '%1' using 1:2 title 'mean' with points, f(x) title 'exponential fit\n").arg(QFileInfo(backstatisticsFilename).fileName());
-                                text<<QString("pause -1\n");
-                                text<<QString("\n");
-                                text<<QString("\n");
-                                text<<QString("\n");
-                                fb1.close();
-                            } else {
-                                emit statusChanged(m_status);
-                                emit messageChanged(tr("could not create background statistics plot file '%1': %2!").arg(localFilename).arg(fb1.errorString()));
+                                emit messageChanged(tr("could not create backgrond statistics file %1!").arg(error));
                             }
 
-                            localFilename=uncorrectedStatisticsFilename=outputFilenameBase+".uncorrstatistics.dat";
-                            QFile fu(localFilename);
-                            if (fu.open(QIODevice::WriteOnly|QIODevice::Text)) {
-                                QTextStream text(&fu);
-                                text.setLocale(outLocale);
-                                emit messageChanged(tr("saving background statistics ..."));
-                                int count=statistics_uncorrected_time.size();
-                                for (int i=0; i<count; i++) {
-                                    text<<statistics_uncorrected_time[i];
-                                    if (i<statistics_uncorrected_mean.size()) text<<", "<<statistics_uncorrected_mean[i];
-                                    else text<<", 0";
-                                    if (i<statistics_uncorrected_std.size()) text<<", "<<statistics_uncorrected_std[i];
-                                    else text<<", 0";
-                                    if (i<statistics_uncorrected_min.size()) text<<", "<<statistics_uncorrected_min[i];
-                                    else text<<", 0";
-                                    if (i<statistics_uncorrected_max.size()) text<<", "<<statistics_uncorrected_max[i];
-                                    else text<<", 0";
-                                    text<<"\n";
-                                }
-                                fu.close();
-                            } else {
+                            emit messageChanged(tr("saving uncorrected statistics ..."));
+                            if (!saveStatistics(uncorrectedStatisticsFilename=outputFilenameBase+".uncorrstatistics.dat", outputFilenameBase+".uncorrstatistics.plt", statistics_uncorrected, tr("Uncorrected Statistics"), &error)) {
                                 m_status=-1; emit statusChanged(m_status);
-                                emit messageChanged(tr("could not create uncorrected statistics file '%1': %2!").arg(localFilename).arg(fu.errorString()));
+                                emit messageChanged(tr("could not create uncorrected statistics file %1!").arg(error));
                             }
-                            localFilename=outputFilenameBase+".uncorrstatistics.plt";
-                            QFile fu1(localFilename);
-                            if (fu1.open(QIODevice::WriteOnly|QIODevice::Text)) {
-                                QTextStream text(&fu1);
-                                text.setLocale(outLocale);
-                                text<<QString("set xlabel 'time [seconds]'\n");
-                                text<<QString("set ylabel 'pixel grey value'\n");
-                                text<<QString("set title \"Uncorrected Statistics '%1'\" noenhanced\n").arg(job.filename);
-                                text<<QString("set style fill transparent solid 0.5 noborder\n");
-                                text<<QString("set multiplot layout 1,2\n");
-                                text<<QString("plot '%1' using 1:(($2)-(($3)/2.0)):(($2)+(($3)/2.0)) title '+/- stddev' with filledcu, '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
-                                text<<QString("plot '%1' using 1:4:5 title 'min/max' with filledcu, '%1' using 1:(($2)-(($3)/2.0)):(($2)+(($3)/2.0)) title '+/- stddev' with filledcu, '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
-                                text<<QString("unset multiplot\n");
-                                text<<QString("pause -1\n");
-                                text<<QString("set multiplot layout 2,2\n");
-                                text<<QString("plot '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
-                                text<<QString("plot '%1' using 1:3 title 'stddev' with lines lt 1\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
-                                text<<QString("plot '%1' using 1:4 title 'min' with lines lt 1\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
-                                text<<QString("plot '%1' using 1:5 title 'max' with lines lt 1\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
-                                text<<QString("unset multiplot\n");
-                                text<<QString("pause -1\n");
-                                text<<QString("f(t)=a0+a1*exp(-t/t1)\n");
-                                text<<QString("t1=50\n");
-                                text<<QString("a0=0\n");
-                                text<<QString("a1=500\n");
-                                text<<QString("fit f(x) '%1' using 1:2 via a0, a1, t1\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
-                                text<<QString("set label sprintf('1exp: a0=%f a1=%f t1=%f', a0, a1, t1) at graph 0.5,0.9\n");
-                                text<<QString("plot '%1' using 1:2 title 'mean' with points, f(x) title 'exponential fit\n").arg(QFileInfo(uncorrectedStatisticsFilename).fileName());
-                                text<<QString("pause -1\n");
-                                text<<QString("\n");
-                                text<<QString("\n");
-                                text<<QString("\n");
-                                fu1.close();
-                            } else {
-                                emit statusChanged(m_status);
-                                emit messageChanged(tr("could not create uncorrected statistics plot file '%1': %2!").arg(localFilename).arg(fu1.errorString()));
+
+                            if (job.dualViewMode!=0) {
+                                emit messageChanged(tr("saving DV 1 statistics ..."));
+                                if (!saveStatistics(statisticsFilename_dv1=outputFilenameBase+".statistics_dv1.dat", outputFilenameBase+".statistics_dv1.plt", dv_statistics[0], tr("Corrected Statistics, DV 1"), &error)) {
+                                    m_status=-1; emit statusChanged(m_status);
+                                    emit messageChanged(tr("could not create DV 1 statistics file %1!").arg(error));
+                                }
+                                emit messageChanged(tr("saving DV 2 statistics ..."));
+                                if (!saveStatistics(statisticsFilename_dv2=outputFilenameBase+".statistics_dv2.dat", outputFilenameBase+".statistics_dv2.plt", dv_statistics[1], tr("Corrected Statistics, DV 2"), &error)) {
+                                    m_status=-1; emit statusChanged(m_status);
+                                    emit messageChanged(tr("could not create DV 2 statistics file %1!").arg(error));
+                                }
+
+
+                                emit messageChanged(tr("saving DV 1 background statistics ..."));
+                                if (!saveStatistics(backstatisticsFilename_dv1=outputFilenameBase+".backstatistics_dv1.dat", outputFilenameBase+".backstatistics_dv1.plt", dv_backstatistics[0], tr("Background Statistics, DV 1"), &error)) {
+                                    m_status=-1; emit statusChanged(m_status);
+                                    emit messageChanged(tr("could not create DV 1 background statistics file %1!").arg(error));
+                                }
+                                emit messageChanged(tr("saving DV 2 background statistics ..."));
+                                if (!saveStatistics(backstatisticsFilename_dv2=outputFilenameBase+".backstatistics_dv2.dat", outputFilenameBase+".backstatistics_dv2.plt", dv_backstatistics[1], tr("Background Statistics, DV 2"), &error)) {
+                                    m_status=-1; emit statusChanged(m_status);
+                                    emit messageChanged(tr("could not create DV 2 background statistics file %1!").arg(error));
+                                }
+
+
+                                emit messageChanged(tr("saving DV 1 uncorrected statistics ..."));
+                                if (!saveStatistics(uncorrectedStatisticsFilename_dv1=outputFilenameBase+".uncorrstatistics_dv1.dat", outputFilenameBase+".uncorrstatistics_dv1.plt", dv_statistics_uncorrected[0], tr("Background Statistics, DV 1"), &error)) {
+                                    m_status=-1; emit statusChanged(m_status);
+                                    emit messageChanged(tr("could not create DV 1 uncorrected statistics file %1!").arg(error));
+                                }
+                                emit messageChanged(tr("saving DV 2 uncorrected statistics ..."));
+                                if (!saveStatistics(uncorrectedStatisticsFilename_dv2=outputFilenameBase+".uncorrstatistics_dv2.dat", outputFilenameBase+".uncorrstatistics_dv2.plt", dv_statistics_uncorrected[1], tr("Background Statistics, DV 2"), &error)) {
+                                    m_status=-1; emit statusChanged(m_status);
+                                    emit messageChanged(tr("could not create DV 2 uncorrected statistics file %1!").arg(error));
+                                }
+
                             }
+
                         }
                         emit progressIncrement(10);
 
-                        //************** SAVE ACF
-                        if ((m_status==1) && !was_canceled && job.acf && acf && acf_tau && acf_N>0) {
-                            QString localFilename=acfFilename=outputFilenameBase+".autocorrelation.dat";
-                            QString localFilename1=acfFilenameBin=outputFilenameBase+".autocorrelation.bin";
 
-                            emit messageChanged(tr("saving autocorrelation ..."));
-                            double* ccf[1]={acf};
-                            double* ccferr[1]={acf_std};
-                            double* ccfsegments[1]={acf_segments};
-                            QString error;
-                            //qDebug()<<"acf = "<<acf<<"  acf_std = "<<acf_std;
-                            if (!saveCorrelationCSV(localFilename, acf_tau, ccf, ccferr, 1, acf_N, frame_width, frame_height, input_length, error,125)) {
-                                m_status=-1; emit statusChanged(m_status);
-                                emit messageChanged(tr("could not create autocorrelation file '%1': %2!").arg(localFilename).arg(error));
-                            }
-                            if (!saveCorrelationBIN(localFilename1, acf_tau, ccf, ccferr, 1, acf_N, frame_width, frame_height, ccfsegments, error,125)) {
-                                m_status=-1; emit statusChanged(m_status);
-                                emit messageChanged(tr("could not create binary autocorrelation file '%1': %2!").arg(localFilename1).arg(error));
-                            }
-                            if (job.addFCCSSeparately && job.dualViewMode!=0) {
-                                if (QFile::exists(localFilename1)) {
-                                    addFiles.append(getFileInfo(localFilename1, "ACF0", 0));
-                                    addFiles.append(getFileInfo(localFilename1, "ACF1", 1));
-                                } else {
-                                    addFiles.append(getFileInfo(localFilename, "ACF0", 0));
-                                    addFiles.append(getFileInfo(localFilename, "ACF1", 1));
-                                }
-                            } else {
-                                if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, "ACF"));
-                                else addFiles.append(getFileInfo(localFilename, "ACF"));
-                            }
-
-                        }
-                        emit progressIncrement(250);
-
-
-                        //************** SAVE DCCF
-                        if ((m_status==1) && !was_canceled && job.distanceCCF) {
-                            for (int id=0; id<job.DCCFDeltaX.size(); id++) {
-                                if (dccf[id].dccf && dccf[id].dccf_tau && dccf[id].dccf_N>0) {
-                                    QString localFilename=outputFilenameBase+QString(".dccf%1.dat").arg(id,3,10,QLatin1Char('0'));
-                                    QString localFilename1=outputFilenameBase+QString(".dccf%1.bin").arg(id,3,10,QLatin1Char('0'));;
-                                    dccfFilename.append(localFilename);
-                                    dccfFilenameBin.append(localFilename1);
-
-                                    emit messageChanged(tr("saving distance distance crosscorrelation ..."));
-                                    double* ccf[1]={dccf[id].dccf};
-                                    double* ccferr[1]={dccf[id].dccf_std};
-                                    double* ccfsegments[1]={dccf[id].dccf_segments};
-                                    QString error;
-                                    if (!saveCorrelationCSV(localFilename, dccf[id].dccf_tau, ccf, ccferr, 1, dccf[id].dccf_N, frame_width, frame_height, input_length, error,125)) {
-                                        m_status=-1; emit statusChanged(m_status);
-                                        emit messageChanged(tr("could not create distance crosscorrelation file '%1': %2!").arg(localFilename).arg(error));
-                                    }
-                                    if (!saveCorrelationBIN(localFilename1, dccf[id].dccf_tau, ccf, ccferr, 1, dccf[id].dccf_N, frame_width, frame_height, ccfsegments, error,125)) {
-                                        m_status=-1; emit statusChanged(m_status);
-                                        emit messageChanged(tr("could not create binary distance crosscorrelation file '%1': %2!").arg(localFilename1).arg(error));
-                                    }
-                                    QString role=job.DCCFrole.value(id, "DCCF");
-                                    if (role.toLower()=="fccs") {
-                                        if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, role, 0));
-                                        else addFiles.append(getFileInfo(localFilename, role, 0));
-                                    } else {
-                                        if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, role));
-                                        else addFiles.append(getFileInfo(localFilename, role));
-                                    }
-                                }
-                            }
-                        }
-                        emit progressIncrement(250);
-
-
-                        //************** SAVE CCF
-                        if ((m_status==1) && !was_canceled && job.ccf && ccf_tau && ccf1 && ccf2 && ccf3 && ccf4 && ccf_N>0) {
-                            QString localFilename=ccfFilename=outputFilenameBase+".crosscorrelation.dat";
-                            QString localFilename1=ccfFilenameBin=outputFilenameBase+".crosscorrelation.bin";
-
-                            emit messageChanged(tr("saving distance crosscorrelation ..."));
-                            double* ccf[4]={ccf1, ccf2, ccf3, ccf4};
-                            double* ccferr[4]={ccf1_std, ccf2_std, ccf3_std, ccf4_std};
-                            double* ccfsegments[4]={ccf1_segments, ccf2_segments, ccf3_segments, ccf4_segments};
-                            QString error;
-                            if (!saveCorrelationCSV(localFilename, ccf_tau, ccf, ccferr, 4, ccf_N, frame_width, frame_height, input_length, error)) {
-                                m_status=-1; emit statusChanged(m_status);
-                                emit messageChanged(tr("could not create crosscorrelation file '%1': %2!").arg(localFilename).arg(error));
-                            }
-                            if (!saveCorrelationBIN(localFilename1, ccf_tau, ccf, ccferr, 4, ccf_N, frame_width, frame_height, ccfsegments, error)) {
-                                m_status=-1; emit statusChanged(m_status);
-                                emit messageChanged(tr("could not create binary crosscorrelation file '%1': %2!").arg(localFilename1).arg(error));
-                            }
-                            if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, QString("CCF")));
-                            else addFiles.append(getFileInfo((localFilename), "CCF"));
-
-                        }
-                        emit progressIncrement(10);
 
                         //************** SAVE SETTINGS
                         if ((m_status==1) && !was_canceled) {
@@ -997,6 +722,14 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 if (!statisticsFilename.isEmpty())      text<<"statistics file             : " << d.relativeFilePath(statisticsFilename) << "\n";
                                 if (!backstatisticsFilename.isEmpty())         text<<"background statistics file  : " << d.relativeFilePath(backstatisticsFilename) << "\n";
                                 if (!uncorrectedStatisticsFilename.isEmpty())  text<<"uncorrected statistics file : " << d.relativeFilePath(uncorrectedStatisticsFilename) << "\n";
+
+                                if (!statisticsFilename_dv1.isEmpty())      text<<"statistics file DV1         : " << d.relativeFilePath(statisticsFilename_dv1) << "\n";
+                                if (!backstatisticsFilename_dv1.isEmpty())         text<<"background statistics file DV1 : " << d.relativeFilePath(backstatisticsFilename_dv1) << "\n";
+                                if (!uncorrectedStatisticsFilename_dv1.isEmpty())  text<<"uncorrected statistics file DV1 : " << d.relativeFilePath(uncorrectedStatisticsFilename_dv1) << "\n";
+                                if (!statisticsFilename_dv2.isEmpty())      text<<"statistics file DV2         : " << d.relativeFilePath(statisticsFilename_dv2) << "\n";
+                                if (!backstatisticsFilename_dv2.isEmpty())         text<<"background statistics file DV2 : " << d.relativeFilePath(backstatisticsFilename_dv2) << "\n";
+                                if (!uncorrectedStatisticsFilename_dv2.isEmpty())  text<<"uncorrected statistics file DV2 : " << d.relativeFilePath(uncorrectedStatisticsFilename_dv2) << "\n";
+
                                 if (!acfFilename.isEmpty())             text<<"autocorrelation file        : " << d.relativeFilePath(acfFilename) << "\n";
                                 if (!acfFilenameBin.isEmpty())          text<<"bin. autocorrelation file   : " << d.relativeFilePath(acfFilenameBin) << "\n";
                                 if (!ccfFilename.isEmpty())             text<<"crosscorrelation file       : " << d.relativeFilePath(ccfFilename) << "\n";
@@ -1011,6 +744,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     text<<"pixel width                 : "<<outLocale.toString(job.cameraPixelWidth) << "\n";
                                     text<<"pixel height                : "<<outLocale.toString(job.cameraPixelHeight) << "\n";
                                 }
+                                text<<"dualview mode               : "<<job.dualViewMode << "\n";
                                 text<<"binning                     : "<<outLocale.toString(reader->getBinning()) << "\n";
                                 text<<"interleaved binning         : "<< QString((reader->getInterleavedBinning())?"true":"false") << "\n";
                                 text<<"averaging binning           : "<< QString((reader->getAverageBinning())?"true":"false") << "\n";
@@ -1055,6 +789,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 }
                                 if (job.distanceCCF) {
                                     for (int id=0; id<job.DCCFDeltaX.size(); id++) {
+                                        text<<QString("DCCF %1 role                   : ").arg(id)<<job.DCCFrole[id] << "\n";
                                         text<<QString("DCCF %1 Delta x                : ").arg(id)<<outLocale.toString(job.DCCFDeltaX[id]) << "\n";
                                         text<<QString("DCCF %1 Delta y                : ").arg(id)<<outLocale.toString(job.DCCFDeltaY[id]) << "\n";
                                         text<<QString("DCCF %1 frame width            : ").arg(id)<<outLocale.toString(dccf[id].dccfframe_width) << "\n";
@@ -1096,6 +831,122 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
 
                         }
                         emit progressIncrement(10);
+
+
+                        //************** SAVE ACF
+                        if ((m_status==1) && !was_canceled && job.acf && acf && acf_tau && acf_N>0) {
+                            QString localFilename=acfFilename=outputFilenameBase+".autocorrelation.dat";
+                            QString localFilename1=acfFilenameBin=outputFilenameBase+".autocorrelation.bin";
+
+                            emit messageChanged(tr("saving autocorrelation ..."));
+                            double* ccf[1]={acf};
+                            double* ccferr[1]={acf_std};
+                            double* ccfsegments[1]={acf_segments};
+                            QString error;
+                            //qDebug()<<"acf = "<<acf<<"  acf_std = "<<acf_std;
+                            if (!saveCorrelationCSV(localFilename, acf_tau, ccf, ccferr, 1, acf_N, frame_width, frame_height, input_length, error,125)) {
+                                m_status=-1; emit statusChanged(m_status);
+                                emit messageChanged(tr("could not create autocorrelation file '%1': %2!").arg(localFilename).arg(error));
+                            }
+                            if (!saveCorrelationBIN(localFilename1, acf_tau, ccf, ccferr, 1, acf_N, frame_width, frame_height, ccfsegments, error,125)) {
+                                m_status=-1; emit statusChanged(m_status);
+                                emit messageChanged(tr("could not create binary autocorrelation file '%1': %2!").arg(localFilename1).arg(error));
+                            }
+                            if (job.addFCCSSeparately && job.dualViewMode!=0) {
+                                if (QFile::exists(localFilename1)) {
+                                    addFiles.append(getFileInfo(localFilename1, configFilename, "ACF0", 0));
+                                    addFiles.append(getFileInfo(localFilename1, configFilename, "ACF1", 1));
+                                } else {
+                                    addFiles.append(getFileInfo(localFilename, configFilename, "ACF0", 0));
+                                    addFiles.append(getFileInfo(localFilename, configFilename, "ACF1", 1));
+                                }
+                            } else {
+                                if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, configFilename, "ACF"));
+                                else addFiles.append(getFileInfo(localFilename, configFilename, "ACF"));
+                            }
+
+                        }
+                        emit progressIncrement(250);
+
+
+                        //************** SAVE DCCF
+                        if ((m_status==1) && !was_canceled && job.distanceCCF) {
+                            for (int id=0; id<job.DCCFDeltaX.size(); id++) {
+                                if (dccf[id].dccf && dccf[id].dccf_tau && dccf[id].dccf_N>0) {
+                                    QString localFilename=outputFilenameBase+QString(".dccf%1.dat").arg(id,3,10,QLatin1Char('0'));
+                                    QString localFilename1=outputFilenameBase+QString(".dccf%1.bin").arg(id,3,10,QLatin1Char('0'));;
+                                    dccfFilename.append(localFilename);
+                                    dccfFilenameBin.append(localFilename1);
+
+                                    emit messageChanged(tr("saving distance distance crosscorrelation ..."));
+                                    double* ccf[1]={dccf[id].dccf};
+                                    double* ccferr[1]={dccf[id].dccf_std};
+                                    double* ccfsegments[1]={dccf[id].dccf_segments};
+                                    QString error;
+                                    if (!saveCorrelationCSV(localFilename, dccf[id].dccf_tau, ccf, ccferr, 1, dccf[id].dccf_N, frame_width, frame_height, input_length, error,125)) {
+                                        m_status=-1; emit statusChanged(m_status);
+                                        emit messageChanged(tr("could not create distance crosscorrelation file '%1': %2!").arg(localFilename).arg(error));
+                                    }
+                                    if (!saveCorrelationBIN(localFilename1, dccf[id].dccf_tau, ccf, ccferr, 1, dccf[id].dccf_N, frame_width, frame_height, ccfsegments, error,125)) {
+                                        m_status=-1; emit statusChanged(m_status);
+                                        emit messageChanged(tr("could not create binary distance crosscorrelation file '%1': %2!").arg(localFilename1).arg(error));
+                                    }
+                                    QString role=job.DCCFrole.value(id, "DCCF");
+                                    if (role.toLower()=="fccs") {
+                                        if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, configFilename, role, 0));
+                                        else addFiles.append(getFileInfo(localFilename, configFilename, role, 0));
+                                    } else {
+                                        if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, configFilename, role));
+                                        else addFiles.append(getFileInfo(localFilename, configFilename, role));
+                                    }
+                                }
+                            }
+                        }
+                        emit progressIncrement(250);
+
+
+                        //************** SAVE CCF
+                        if ((m_status==1) && !was_canceled && job.ccf && ccf_tau && ccf1 && ccf2 && ccf3 && ccf4 && ccf_N>0) {
+                            QString localFilename=ccfFilename=outputFilenameBase+".crosscorrelation.dat";
+                            QString localFilename1=ccfFilenameBin=outputFilenameBase+".crosscorrelation.bin";
+
+                            emit messageChanged(tr("saving distance crosscorrelation ..."));
+                            double* ccf[4]={ccf1, ccf2, ccf3, ccf4};
+                            double* ccferr[4]={ccf1_std, ccf2_std, ccf3_std, ccf4_std};
+                            double* ccfsegments[4]={ccf1_segments, ccf2_segments, ccf3_segments, ccf4_segments};
+                            QString error;
+                            if (!saveCorrelationCSV(localFilename, ccf_tau, ccf, ccferr, 4, ccf_N, frame_width, frame_height, input_length, error)) {
+                                m_status=-1; emit statusChanged(m_status);
+                                emit messageChanged(tr("could not create crosscorrelation file '%1': %2!").arg(localFilename).arg(error));
+                            }
+                            if (!saveCorrelationBIN(localFilename1, ccf_tau, ccf, ccferr, 4, ccf_N, frame_width, frame_height, ccfsegments, error)) {
+                                m_status=-1; emit statusChanged(m_status);
+                                emit messageChanged(tr("could not create binary crosscorrelation file '%1': %2!").arg(localFilename1).arg(error));
+                            }
+                            if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, configFilename, QString("CCF")));
+                            else addFiles.append(getFileInfo((localFilename), configFilename, "CCF"));
+
+                        }
+                        emit progressIncrement(10);
+
+
+
+                        //qDebug()<<job.addNandB<< QFile::exists(averageFilenameF)<< QFile::exists(stdFilename)<< QFile::exists(backgroundFilename)<< QFile::exists(backstdFilename);
+
+                        //************** CREATE N&B job
+                        if (job.addNandB
+                                && QFile::exists(averageFilenameF)
+                                && QFile::exists(stdFilename)
+                                /*&& QFile::exists(backgroundFilename)
+                                && QFile::exists(backstdFilename)*/) {
+
+                            if (job.addFCCSSeparately && job.dualViewMode!=0) {
+                                addFiles.append(getFileInfoNandB(averageFilenameF, stdFilename, backgroundFilename, backstdFilename, configFilename, "N&B1", 0));
+                                addFiles.append(getFileInfoNandB(averageFilenameF, stdFilename, backgroundFilename, backstdFilename, configFilename, "N&B2", 1));
+                            } else {
+                                addFiles.append(getFileInfoNandB(averageFilenameF, stdFilename, backgroundFilename, backstdFilename, configFilename, "N&B", 0));
+                            }
+                        }
                     } else {
                         if (mutexFilename) mutexFilename->unlock();
                         m_status=-1; emit statusChanged(m_status);
@@ -1424,22 +1275,12 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
     if (!was_canceled) {
         emit messageChanged(tr("reading frames ..."));
 
-        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_uncorrected;
-        stat_state_uncorrected.sum=0;
-        stat_state_uncorrected.sum2=0;
-        stat_state_uncorrected.sframe_min=0;
-        stat_state_uncorrected.sframe_max=0;
-        stat_state_uncorrected.cnt=0;
-        stat_state_uncorrected.statFirst=true;
-        stat_state_uncorrected.video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
-        for (int64_t i=0; i<frame_width*frame_height; i++)  {
-            stat_state_uncorrected.video_frame[i]=0;
-        }
-        statistics_uncorrected_mean.clear();
-        statistics_uncorrected_std.clear();
-        statistics_uncorrected_min.clear();
-        statistics_uncorrected_max.clear();
-        statistics_uncorrected_time.clear();
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_uncorrected(frame_width*frame_height);
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_uncorrected_dv0(frame_width*frame_height/2);
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_uncorrected_dv1(frame_width*frame_height/2);
+        statistics_uncorrected.clear();
+        dv_statistics_uncorrected[0].clear();
+        dv_statistics_uncorrected[1].clear();
         uint16_t video_frame_num=0;
         float fframes_min=0;
         float fframes_max=0;
@@ -1468,7 +1309,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                     m_status=-1; emit statusChanged(m_status);
                     emit messageChanged(tr("error reading frame: %1").arg(reader->lastError()));
                 } else {
-                    contribute_to_statistics(stat_state_uncorrected, frame_data, frame_width, frame_height, frame, frames, &average_uncorrected_frame, &sqrsum_uncorrected_frame, &video_uncorrected, video_frame_num, fframes_min, fframes_max, statistics_uncorrected_time, statistics_uncorrected_mean, statistics_uncorrected_std, statistics_uncorrected_min, statistics_uncorrected_max);
+                    contribute_to_statistics(stat_state_uncorrected, frame_data, frame_width, frame_height, frame, frames, &average_uncorrected_frame, &sqrsum_uncorrected_frame, &video_uncorrected, video_frame_num, fframes_min, fframes_max, statistics_uncorrected);
+                    contribute_to_dv2_statistics(stat_state_uncorrected_dv0, stat_state_uncorrected_dv1, frame_data, frame_width, frame_height, frame, frames, dv_statistics_uncorrected[0], dv_statistics_uncorrected[1]);
 
                     float frame_min=frame_data[0];
                     float frame_max=frame_data[0];
@@ -1508,7 +1350,6 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
 
         }
         free(frame_data);
-        free(stat_state_uncorrected.video_frame);
     }
 
     if (m_status==1 && !was_canceled) {
@@ -1602,28 +1443,19 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
 
 
         emit messageChanged(tr("calculating statistics/video ..."));
-        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state;
-        stat_state.sum=0;
-        stat_state.sum2=0;
-        stat_state.sframe_min=0;
-        stat_state.sframe_max=0;
-        stat_state.cnt=0;
-        stat_state.statFirst=true;
-        stat_state.video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
-        for (int64_t i=0; i<frame_width*frame_height; i++)  {
-            stat_state.video_frame[i]=0;
-        }
-        statistics_mean.clear();
-        statistics_std.clear();
-        statistics_min.clear();
-        statistics_max.clear();
-        statistics_time.clear();
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state(frame_width*frame_height);
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_dv1(frame_width*frame_height/2);
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_dv2(frame_width*frame_height/2);
+        statistics.clear();
+        dv_statistics[0].clear();
+        dv_statistics[1].clear();
         uint16_t video_frame_num=0;
 
         //bool statFirst=true;
         for(register uint32_t frame=0; frame<frames; frame++) {
             float* frame_data=&(image_series[frame*frame_width*frame_height]);
-            contribute_to_statistics(stat_state, frame_data, frame_width, frame_height, frame, frames, &average_frame, &sqrsum_frame, &video, video_frame_num, frames_min, frames_max, statistics_time, statistics_mean, statistics_std, statistics_min, statistics_max);
+            contribute_to_statistics(stat_state, frame_data, frame_width, frame_height, frame, frames, &average_frame, &sqrsum_frame, &video, video_frame_num, frames_min, frames_max, statistics);
+            contribute_to_dv2_statistics(stat_state_dv1, stat_state_dv2, frame_data, frame_width, frame_height, frame, frames, dv_statistics[0], dv_statistics[1]);
 
             if (frames<500) {
                 emit messageChanged(tr("calculating statistics/video (%1/%2)...").arg(frame).arg(frames)); emit progressIncrement(500/frames);
@@ -1638,7 +1470,6 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         }
 
 
-        free(stat_state.video_frame);
 
     }
 
@@ -1831,7 +1662,9 @@ void QFRDRImagingFCSCorrelationJobThread::prepare_ccfs(QList<MultiTauCorrelator<
 }
 
 
-void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** sqrsum_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, QVector<float>& statistics_time, QVector<float>& statistics_mean, QVector<float>& statistics_std, QVector<float>& statistics_min, QVector<float>& statistics_max, bool isBackground) {
+
+void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state &state, float *frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float **average_frame, float **sqrsum_frame, float **video, uint16_t &video_frame_num, float &frames_min, float &frames_max, QFRDRImagingFCSCorrelationJobThread::StatisticsDataset &statistics, bool isBackground)
+{
 
     float frame_min=frame_data[0];
     float frame_max=frame_data[0];
@@ -1867,12 +1700,12 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingF
         || (isBackground && job.statistics && ((frame+1)%job.backstatistics_frames==0))){
         float N=state.cnt;//frame_width*frame_height*job.statistics_frames;
         if (N==0) N=2;
-        statistics_time.append((float)frame*job.frameTime);
-        statistics_mean.append(state.sum/N);
-        statistics_min.append(state.sframe_min);
-        statistics_max.append(state.sframe_max);
-        if (!isBackground && job.statistics_frames>1)         statistics_std.append(sqrt((state.sum2-state.sum*state.sum/N)/(N-1.0)));
-        else if (isBackground && job.backstatistics_frames>1) statistics_std.append(sqrt((state.sum2-state.sum*state.sum/N)/(N-1.0)));
+        statistics.time.append((float)frame*job.frameTime);
+        statistics.mean.append(state.sum/N);
+        statistics.min.append(state.sframe_min);
+        statistics.max.append(state.sframe_max);
+        if (!isBackground && job.statistics_frames>1)         statistics.std.append(sqrt((state.sum2-state.sum*state.sum/N)/(N-1.0)));
+        else if (isBackground && job.backstatistics_frames>1) statistics.std.append(sqrt((state.sum2-state.sum*state.sum/N)/(N-1.0)));
         state.sum=0;
         state.sum2=0;
         state.sframe_min=0;
@@ -1887,7 +1720,179 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingF
         }
         video_frame_num++;
     }
+}
 
+void QFRDRImagingFCSCorrelationJobThread::contribute_to_dv2_statistics(QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state &state1, QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state &state2, float *frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, QFRDRImagingFCSCorrelationJobThread::StatisticsDataset &statistics1, QFRDRImagingFCSCorrelationJobThread::StatisticsDataset &statistics2, bool isBackground)
+{
+    uint16_t dummyUI16;
+    float dummyF;
+    int dv_width=frame_width;
+    int dv_height=frame_height;
+    int shiftX1=0;
+    int shiftY1=0;
+    if (job.dualViewMode==1) {
+        dv_width=dv_width/2;
+        shiftX1=dv_width/2;
+    } else if (job.dualViewMode==2) {
+        dv_height=dv_height/2;
+        shiftY1=dv_height/2;
+    } else {
+        //qDebug()<<"contribute_to_dv2_statistics job.dualViewMode="<<job.dualViewMode;
+        return;
+    }
+    //qDebug()<<"contribute_to_dv2_statistics "<<dv_width<<"x"<<dv_height<<"   shift=("<<shiftX1<<","<<shiftY1<<")";
+    float* frame_data1=(float*)malloc(dv_width*dv_height*sizeof(float));
+    // copy frame 1
+    for (uint16 y=0; y<dv_height; y++) {
+        for (uint16 x=0; x<dv_width; x++) {
+            frame_data1[y*dv_width+x]=frame_data[y*frame_width+x];
+        }
+    }
+    // calc frame 1 statistics
+    contribute_to_statistics(state1, frame_data1, dv_width, dv_height, frame, frames, NULL, NULL, NULL, dummyUI16, dummyF, dummyF, statistics1, isBackground);
+
+    // copy frame 2
+    for (uint16 y=0; y<dv_height; y++) {
+        for (uint16 x=0; x<dv_width; x++) {
+            frame_data1[y*dv_width+x]=frame_data[(y+shiftY1)*frame_width+(x+shiftX1)];
+        }
+    }
+    // calc frame 2 statistics
+    contribute_to_statistics(state2, frame_data1, dv_width, dv_height, frame, frames, NULL, NULL, NULL, dummyUI16, dummyF, dummyF, statistics2, isBackground);
+
+    free(frame_data1);
+}
+
+
+
+
+bool QFRDRImagingFCSCorrelationJobThread::saveStatistics(const QString &filename, const QString& filename_plot, const QFRDRImagingFCSCorrelationJobThread::StatisticsDataset &statistics, const QString &title, QString *error)
+{
+    bool ok=true;
+    QFile f(filename);
+    if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
+        QTextStream text(&f);
+        text.setLocale(outLocale);
+        int count=statistics.time.size();
+        for (int i=0; i<count; i++) {
+            text<<statistics.time[i];
+            if (i<statistics.mean.size()) text<<", "<<statistics.mean[i];
+            else text<<", 0";
+            if (i<statistics.std.size()) text<<", "<<statistics.std[i];
+            else text<<", 0";
+            if (i<statistics.min.size()) text<<", "<<statistics.min[i];
+            else text<<", 0";
+            if (i<statistics.max.size()) text<<", "<<statistics.max[i];
+            else text<<", 0";
+            text<<"\n";
+        }
+        f.close();
+    } else {
+        if (error) *error=QString("'%1': \n   %2").arg(filename).arg(f.errorString());
+        ok=false;
+    }
+    QFile f1(filename_plot);
+    if (f1.open(QIODevice::WriteOnly|QIODevice::Text)) {
+        QTextStream text(&f1);
+        text.setLocale(outLocale);
+        text<<QString("set xlabel 'time [seconds]'\n");
+        text<<QString("set ylabel 'pixel grey value'\n");
+        text<<QString("set title \"%2 '%1'\" noenhanced\n").arg(job.filename).arg(title);
+        text<<QString("set style fill transparent solid 0.5 noborder\n");
+        text<<QString("set multiplot layout 1,2\n");
+        text<<QString("plot '%1' using 1:(($2)-(($3)/2.0)):(($2)+(($3)/2.0)) title '+/- stddev' with filledcu, '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(filename).fileName());
+        text<<QString("plot '%1' using 1:4:5 title 'min/max' with filledcu, '%1' using 1:(($2)-(($3)/2.0)):(($2)+(($3)/2.0)) title '+/- stddev' with filledcu, '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(filename).fileName());
+        text<<QString("unset multiplot\n");
+        text<<QString("pause -1\n");
+        text<<QString("set multiplot layout 2,2\n");
+        text<<QString("plot '%1' using 1:2 title 'mean' with lines lt 1\n").arg(QFileInfo(filename).fileName());
+        text<<QString("plot '%1' using 1:3 title 'stddev' with lines lt 1\n").arg(QFileInfo(filename).fileName());
+        text<<QString("plot '%1' using 1:4 title 'min' with lines lt 1\n").arg(QFileInfo(filename).fileName());
+        text<<QString("plot '%1' using 1:5 title 'max' with lines lt 1\n").arg(QFileInfo(filename).fileName());
+        text<<QString("unset multiplot\n");
+        text<<QString("pause -1\n");
+        text<<QString("f(t)=a0+a1*exp(-t/t1)\n");
+        text<<QString("t1=50\n");
+        text<<QString("a0=0\n");
+        text<<QString("a1=500\n");
+        text<<QString("fit f(x) '%1' using 1:2 via a0, a1, t1\n").arg(QFileInfo(filename).fileName());
+        text<<QString("set label sprintf('1exp: a0=%f a1=%f t1=%f', a0, a1, t1) at graph 0.5,0.9\n");
+        text<<QString("plot '%1' using 1:2 title 'mean' with points, f(x) title 'exponential fit\n").arg(QFileInfo(filename).fileName());
+        text<<QString("pause -1\n");
+        text<<QString("\n");
+        text<<QString("\n");
+        text<<QString("\n");
+        f1.close();
+    } else {
+        ok=false;
+        if (error) *error=tr(" (plot) '%1': \n   %2").arg(filename_plot).arg(f1.errorString());
+    }
+    return ok;
+}
+
+bool QFRDRImagingFCSCorrelationJobThread::SaveSDTIFF(const QString &filename, float *average_frame, float *sqrsum_frame, int frame_width, int frame_height, int frames, const QString &title, QString *error)
+{
+    TIFF* tif = TIFFOpen(filename.toAscii().data(),"w");
+    if (tif) {
+        float* sd=(float*)calloc(frame_width*frame_height, sizeof(float));
+
+        if (frames>1) {
+            for (int i=0; i<frame_width*frame_height; i++) {
+                sd[i]=sqrt(float(frames)/float(frames-1)*(sqrsum_frame[i]-average_frame[i]*average_frame[i]));
+            }
+        } else {
+            for (int i=0; i<frame_width*frame_height; i++) {
+                sd[i]=0;
+            }
+
+        }
+
+        TIFFTWriteFloat(tif, sd, frame_width, frame_height);
+        TIFFClose(tif);
+        free(sd);
+        return true;
+    } else {
+        if (error) *error=tr("could not create %2 '%1'!").arg(filename).arg(title);
+        return false;
+    }
+}
+
+bool QFRDRImagingFCSCorrelationJobThread::SaveTIFFFloat(const QString &filename, float *average_frame, int frame_width, int frame_height, const QString &title, QString *error)
+{
+    TIFF* tif = TIFFOpen(filename.toAscii().data(),"w");
+    if (tif) {
+
+        TIFFTWriteFloat(tif, average_frame, frame_width, frame_height);
+        TIFFClose(tif);
+        return true;
+    } else {
+        if (error) *error=tr("could not create %2 image '%1'!").arg(filename).arg(title);
+        return false;
+    }
+}
+
+bool QFRDRImagingFCSCorrelationJobThread::SaveTIFFUInt16_scaled(const QString &filename, float *average_frame, int frame_width, int frame_height, const QString &title, QString *error)
+{
+    TIFF* tif = TIFFOpen(filename.toAscii().data(),"w");
+    if (tif) {
+        float avgMin=average_frame[0];
+        float avgMax=average_frame[0];
+        for (uint32_t i=0; i<frame_width*frame_height; i++) {
+            avgMin=(average_frame[i]<avgMin)?average_frame[i]:avgMin;
+            avgMax=(average_frame[i]>avgMax)?average_frame[i]:avgMax;
+        }
+        uint16_t* img=(uint16_t*)malloc(frame_width*frame_height*sizeof(uint16_t));
+        for (uint32_t i=0; i<frame_width*frame_height; i++) {
+            img[i]=(uint16_t)round((double)(average_frame[i]-avgMin)*(double)0xFFFF/fabs(avgMax-avgMin));
+        }
+        TIFFTWriteUint16(tif, img, frame_width, frame_height);
+        free(img);
+        TIFFClose(tif);
+        return true;
+    } else {
+        if (error) *error=tr("could not create %2 '%1'!").arg(filename).arg(title);
+        return false;
+    }
 }
 
 
@@ -1935,22 +1940,12 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
         register uint32_t frame=0;
 
 
-        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_uncorrected;
-        stat_state_uncorrected.sum=0;
-        stat_state_uncorrected.sum2=0;
-        stat_state_uncorrected.sframe_min=0;
-        stat_state_uncorrected.sframe_max=0;
-        stat_state_uncorrected.cnt=0;
-        stat_state_uncorrected.statFirst=true;
-        stat_state_uncorrected.video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
-        for (int64_t i=0; i<frame_width*frame_height; i++)  {
-            stat_state_uncorrected.video_frame[i]=0;
-        }
-        statistics_uncorrected_mean.clear();
-        statistics_uncorrected_std.clear();
-        statistics_uncorrected_min.clear();
-        statistics_uncorrected_max.clear();
-        statistics_uncorrected_time.clear();
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_uncorrected(frame_width*frame_height);
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_uncorrected_dv1(frame_width*frame_height/2);
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_uncorrected_dv2(frame_width*frame_height/2);
+        statistics_uncorrected.clear();
+        dv_statistics_uncorrected[0].clear();
+        dv_statistics_uncorrected[1].clear();
         uint16_t video_frame_num=0;
         float fframes_min=0;
         float fframes_max=0;
@@ -1970,7 +1965,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                 m_status=-1; emit statusChanged(m_status);
                 emit messageChanged(tr("error reading frame: %1").arg(reader->lastError()));
             } else {
-                contribute_to_statistics(stat_state_uncorrected, frame_data, frame_width, frame_height, frame, frames, &average_uncorrected_frame, &sqrsum_uncorrected_frame, &video_uncorrected, video_frame_num, fframes_min, fframes_max, statistics_uncorrected_time, statistics_uncorrected_mean, statistics_uncorrected_std, statistics_uncorrected_min, statistics_uncorrected_max);
+                contribute_to_statistics(stat_state_uncorrected, frame_data, frame_width, frame_height, frame, frames, &average_uncorrected_frame, &sqrsum_uncorrected_frame, &video_uncorrected, video_frame_num, fframes_min, fframes_max, statistics_uncorrected);
+                contribute_to_dv2_statistics(stat_state_uncorrected_dv1, stat_state_uncorrected_dv2, frame_data, frame_width, frame_height, frame, frames, dv_statistics_uncorrected[0], dv_statistics_uncorrected[1]);
 
                 float frame_min=frame_data[0];
                 float frame_max=frame_data[0];
@@ -2006,7 +2002,6 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
             if (was_canceled) break;
         } while (reader->nextFrame() && (m_status==1) && (frame<frames) && (!was_canceled));
 
-        free(stat_state_uncorrected.video_frame);
         free(frame_data);
     }
 
@@ -2125,22 +2120,12 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
 
         uint16_t video_frame_num=0;
 
-        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state;
-        stat_state.sum=0;
-        stat_state.sum2=0;
-        stat_state.sframe_min=0;
-        stat_state.sframe_max=0;
-        stat_state.statFirst=true;
-        stat_state.cnt=0;
-        stat_state.video_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
-        for (int64_t i=0; i<frame_width*frame_height; i++)  {
-            stat_state.video_frame[i]=0;
-        }
-        statistics_mean.clear();
-        statistics_std.clear();
-        statistics_min.clear();
-        statistics_max.clear();
-        statistics_time.clear();
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state(frame_width*frame_height);
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_dv1(frame_width*frame_height);
+        QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_dv2(frame_width*frame_height);
+        statistics.clear();
+        dv_statistics[0].clear();
+        dv_statistics[1].clear();
 
 
         //bool videoFirst=true;
@@ -2171,7 +2156,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                 }
 
                 // CALCULATE STATISTICS AND VIDEO
-                contribute_to_statistics(stat_state, frame_data, frame_width, frame_height, frame, frames, &average_frame, &sqrsum_frame, &video, video_frame_num, frames_min, frames_max, statistics_time, statistics_mean, statistics_std, statistics_min, statistics_max);
+                contribute_to_statistics(stat_state, frame_data, frame_width, frame_height, frame, frames, &average_frame, &sqrsum_frame, &video, video_frame_num, frames_min, frames_max, statistics);
+                contribute_to_dv2_statistics(stat_state_dv1, stat_state_dv2, frame_data, frame_width, frame_height, frame, frames, dv_statistics[0], dv_statistics[1]);
 
 
 
@@ -2229,7 +2215,6 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
             }
         }
         free(frame_data);
-        free(stat_state.video_frame);
     }
 
     qDeleteAll(acfjk);
@@ -2400,19 +2385,12 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
     }
 
 
-    QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state;
-    stat_state.sum=0;
-    stat_state.sum2=0;
-    stat_state.sframe_min=0;
-    stat_state.sframe_max=0;
-    stat_state.cnt=0;
-    stat_state.statFirst=true;
-    stat_state.video_frame=NULL;
-    backstatistics_mean.clear();
-    backstatistics_std.clear();
-    backstatistics_min.clear();
-    backstatistics_max.clear();
-    backstatistics_time.clear();
+    QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state(frame_width*frame_height);
+    QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_dv0(frame_width*frame_height/2);
+    QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_dv1(frame_width*frame_height/2);
+    backstatistics.clear();
+    dv_backstatistics[0].clear();
+    dv_backstatistics[1].clear();
     uint16_t vidfnum=0;
     float bframes_min=0;
     float bframes_max=0;
@@ -2463,7 +2441,8 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
                                     backgroundImageStd[i]=backgroundImageStd[i]+frame_data[i]*frame_data[i];
                                 }
 
-                                contribute_to_statistics(stat_state, frame_data, frame_width, frame_height, frames, backFrames, NULL, NULL, NULL, vidfnum, bframes_min, bframes_max, backstatistics_time, backstatistics_mean, backstatistics_std, backstatistics_min, backstatistics_max, true);
+                                contribute_to_statistics(stat_state, frame_data, frame_width, frame_height, frames, backFrames, NULL, NULL, NULL, vidfnum, bframes_min, bframes_max, backstatistics, true);
+                                contribute_to_dv2_statistics(stat_state_dv0, stat_state_dv1, frame_data, frame_width, frame_height, frames, backFrames, dv_backstatistics[0], dv_backstatistics[1], true);
 
                                 if (frames%1000==0) {
                                     emit messageChanged(tr("reading frames in background file (%1)...").arg(frames));
@@ -2502,31 +2481,81 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
 
 }
 
-QFRDRImagingFCSCorrelationJobThread::Fileinfo::Fileinfo(const QString &filename, const QString &role, int internalDualViewMode, int dualViewID)
+QFRDRImagingFCSCorrelationJobThread::Fileinfo::Fileinfo(const QString &filename, const QString &role, int internalDualViewMode, int dualViewID, bool isNandB)
 {
     this->filename=filename;
+    this->filenameVar="";
+    this->filenameBack="";
+    this->filenameBackVar="";
     this->role=role;
     this->internalDualViewMode=internalDualViewMode;
     this->dualViewID=dualViewID;
+    this->filetype=QFRDRImagingFCSCorrelationJobThread::ftCorrelation;
 }
 
-QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThread::getFileInfo(const QString &filename, const QString &role)
+QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThread::getFileInfo(const QString &filename, const QString& filenameEvalSettings, const QString &role)
 {
     QFRDRImagingFCSCorrelationJobThread::Fileinfo i;
     i.filename=filename;
+    i.filenameEvalSettings=filenameEvalSettings;
     i.role=role;
     i.dualViewID=0;
     i.internalDualViewMode=0;
     return i;
 }
 
-QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThread::getFileInfo(const QString &filename, const QString &role, int dualViewID)
+QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThread::getFileInfo(const QString &filename, const QString &filenameEvalSettings, const QString &role, int dualViewID)
 {
     QFRDRImagingFCSCorrelationJobThread::Fileinfo i;
     i.filename=filename;
+    i.filenameEvalSettings=filenameEvalSettings;
     i.role=role;
     i.dualViewID=dualViewID;
     i.internalDualViewMode=job.dualViewMode;
     return i;
+}
+
+QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThread::getFileInfoNandB(const QString &filename, const QString &filenameVar, const QString &filenameBack, const QString &filenameBackVar, const QString& filenameEvalSettings, const QString &role, int dualViewID)
+{
+    QFRDRImagingFCSCorrelationJobThread::Fileinfo i;
+    i.filename=filename;
+    i.filenameVar=filenameVar;
+    i.filenameBack=filenameBack;
+    i.filenameBackVar=filenameBackVar;
+    i.filenameEvalSettings=filenameEvalSettings;
+    i.role=role;
+    i.dualViewID=dualViewID;
+    i.internalDualViewMode=job.dualViewMode;
+    i.filetype=QFRDRImagingFCSCorrelationJobThread::ftNandB;
+    qDebug()<<"getFileInfoNandB:"<<filename<<filenameVar<<filenameBack<<filenameBackVar;
+    return i;
+}
+
+void QFRDRImagingFCSCorrelationJobThread::StatisticsDataset::clear()
+{
+    time.clear();
+    min.clear();
+    max.clear();
+    mean.clear();
+    std.clear();
+}
+
+QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state::contribute_to_statistics_state(int size)
+{
+    sum=0;
+    sum2=0;
+    sframe_min=0;
+    sframe_max=0;
+    cnt=0;
+    statFirst=true;
+    video_frame=(float*)calloc(size, sizeof(float));
+    for (int64_t i=0; i<size; i++)  {
+        video_frame[i]=0;
+    }
+}
+
+QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state::~contribute_to_statistics_state()
+{
+    free(video_frame);
 }
 

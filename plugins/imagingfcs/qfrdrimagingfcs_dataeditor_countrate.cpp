@@ -323,6 +323,8 @@ void QFRDRImagingFCSDataEditorCountrate::replotOverview() {
         }
         plteOverview->set_xmax(w);
         plteOverview->set_ymax(h);
+        plteOverviewRGB->set_xmax(w);
+        plteOverviewRGB->set_ymax(h);
         if (plteOverviewSelectedData && plteOverviewExcludedData) {
             for (int i=0; i<m->getCorrelationRuns(); i++) {
                 int x=m->runToX(i);

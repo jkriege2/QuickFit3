@@ -61,6 +61,7 @@ class QFRDRImagingFCSSimulationThread : public QThread
         long frames;
         bool dualView;
         QString filename;
+
         int width;
         int height;
         int currentFrame;

@@ -14,10 +14,13 @@
 #include "binarydatatools.h"
 
 
+int stringToDualViewMode(const QString& dv);
+
+
 /** \brief extract some informations from a configuration file, as created by the B040 SPIM plugin
  *  \ingroup qf3rdrdp_imaging_fcs
  */
-void readB040SPIMExperimentConfigFile(QSettings& set, double& frametime, double& baseline_offset, QString& backgroundfile, int& image_width, int& image_height, bool& hasPixel, double& pixel_width, double& pixel_height);
+void readB040SPIMExperimentConfigFile(QSettings& set, double& frametime, double& baseline_offset, QString& backgroundfile, int& image_width, int& image_height, bool& hasPixel, double& pixel_width, double& pixel_height, int &dualViewMode);
 
 
 /** \brief extract some informations from a configuration file, as created by the B040 SPIM plugin

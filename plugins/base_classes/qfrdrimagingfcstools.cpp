@@ -5,8 +5,16 @@
 #include <QDebug>
 #include <QtEndian>
 
+int stringToDualViewMode(const QString& dvin) {
+    QString dv=dvin.trimmed().toLower();
+    if (dv=="none" || dv=="0" || dv=="n") return 0;
+    if (dv=="horizontal" || dv=="1" || dv=="h" || dv=="horicontal") return 1;
+    if (dv=="vertical" || dv=="2" || dv=="v" || dv=="vertikal") return 2;
 
-void readB040SPIMExperimentConfigFile(QSettings& set, double& frametime, double& baseline_offset, QString& backgroundfile, int& image_width, int& image_height, bool& hasPixel, double& pixel_width, double& pixel_height ) {
+    return 0;
+}
+
+void readB040SPIMExperimentConfigFile(QSettings& set, double& frametime, double& baseline_offset, QString& backgroundfile, int& image_width, int& image_height, bool& hasPixel, double& pixel_width, double& pixel_height, int& dualViewMode ) {
     if (set.contains("acquisition/image_width")) image_width=set.value("acquisition/image_width", image_width).toInt();
     else if (set.contains("acquisition/camera/image_width")) image_width=set.value("acquisition/camera/image_width", image_width).toInt();
     else if (set.contains("acquisition/acquisition/image_width")) image_width=set.value("acquisition/acquisition/image_width", image_width).toInt();
@@ -29,6 +37,8 @@ void readB040SPIMExperimentConfigFile(QSettings& set, double& frametime, double&
     else if (set.contains("acquisition/camera/frame_rate")) frametime=1.0/set.value("acquisition/camera/frame_rate", frametime).toDouble()*1e6;
     else if (set.contains("acquisition/acquisition/frame_time")) frametime=set.value("acquisition/acquisition/frame_time", frametime).toDouble()*1e6;
     else if (set.contains("acquisition/acquisition/frame_rate")) frametime=1.0/set.value("acquisition/acquisition/frame_rate", frametime).toDouble()*1e6;
+
+    if (set.contains("acquisition/dualview_mode")) dualViewMode=stringToDualViewMode(set.value("acquisition/dualview_mode", "n").toString());
 
     baseline_offset=set.value("acquisition/baseline_offset", baseline_offset).toDouble();
     //backgroundfile="";

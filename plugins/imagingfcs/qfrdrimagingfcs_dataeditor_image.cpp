@@ -2693,6 +2693,8 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
         }
         plteOverview->set_width(w);
         plteOverview->set_height(h);
+        plteOverviewRGB->set_width(w);
+        plteOverviewRGB->set_height(h);
 
     }
     setCopyableData();

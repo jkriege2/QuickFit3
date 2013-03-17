@@ -136,6 +136,7 @@ struct IMFCSJob {
 
     int dualViewMode;
     bool addFCCSSeparately;
+    bool addNandB;
 
 };
 
@@ -193,16 +194,27 @@ struct IMFCSJob {
 class QFRDRImagingFCSCorrelationJobThread : public QThread {
         Q_OBJECT
     public:
+        enum FileTypes {
+            ftCorrelation=0,
+            ftNandB=1
+        };
+
         struct Fileinfo{                
-            Fileinfo(const QString& filename=QString(""), const QString& role=QString(""), int internalDualViewMode=0, int dualViewID=0);
+            Fileinfo(const QString& filename=QString(""), const QString& role=QString(""), int internalDualViewMode=0, int dualViewID=0, bool isNandB=true);
             QString filename;
+            QString filenameVar;
+            QString filenameBack;
+            QString filenameBackVar;
+            QString filenameEvalSettings;
             QString role;
             int internalDualViewMode;
             int dualViewID;
+            FileTypes filetype;
         };
 
-        Fileinfo getFileInfo(const QString& filename, const QString& role="");
-        Fileinfo getFileInfo(const QString& filename, const QString& role, int dualViewID);
+        Fileinfo getFileInfo(const QString& filename, const QString& filenameEvalSettings, const QString& role="");
+        Fileinfo getFileInfo(const QString& filename, const QString& filenameEvalSettings, const QString& role, int dualViewID);
+        Fileinfo getFileInfoNandB(const QString& filename, const QString& filenameVar, const QString& filenameBack, const QString &filenameBackVar, const QString &filenameEvalSettings, const QString &role, int dualViewID);
 
         explicit QFRDRImagingFCSCorrelationJobThread(QFPluginServices* services, QObject *parent = 0);
         ~QFRDRImagingFCSCorrelationJobThread();
@@ -402,6 +414,16 @@ data                                                   size [bytes]             
         */
         bool saveCorrelationBIN(const QString& filename, double *corrTau, double** corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double **corrSegments, QString& error, int progress_steps=0) ;
 
+        struct StatisticsDataset {
+                QVector<float> time;
+                QVector<float> mean;
+                QVector<float> std;
+                QVector<float> min;
+                QVector<float> max;
+
+                void clear();
+
+        };
         struct contribute_to_statistics_state {
             float sum;
             float sum2;
@@ -410,10 +432,19 @@ data                                                   size [bytes]             
             float sframe_max;
             float sframe_min;
             uint64_t cnt;
+
+            explicit contribute_to_statistics_state(int size);
+            ~contribute_to_statistics_state();
+
         };
 
-        void contribute_to_statistics(contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** sqrsum_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, QVector<float>& statistics_time, QVector<float>& statistics_mean, QVector<float>& statistics_std, QVector<float>& statistics_min, QVector<float>& statistics_max, bool isBackground=false);
+        void contribute_to_statistics(contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** sqrsum_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, StatisticsDataset& statistics, bool isBackground=false);
+        void contribute_to_dv2_statistics(contribute_to_statistics_state& state1, contribute_to_statistics_state& state2, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, StatisticsDataset &statistics1, StatisticsDataset &statistics2, bool isBackground=false);
 
+        bool saveStatistics(const QString& filename, const QString& filename_plot, const StatisticsDataset& statistics, const QString& title=QString("Statistics"), QString* error=NULL);
+        bool SaveSDTIFF(const QString &filename, float *average_frame, float *sqrsum_frame, int frame_width, int frame_height, int frames, const QString& title=QString("Standard Deviation File"), QString* error=NULL);
+        bool SaveTIFFFloat(const QString &filename, float *average_frame, int frame_width, int frame_height, const QString &title=QString("Overview File"), QString *error=NULL);
+        bool SaveTIFFUInt16_scaled(const QString &filename, float *average_frame, int frame_width, int frame_height, const QString &title=QString("Overview File"), QString *error=NULL);
 
         int m_status;
         bool was_canceled;
@@ -439,23 +470,17 @@ data                                                   size [bytes]             
         float frames_min;
         float frames_max;
         float baseline;
-        QVector<float> statistics_time;
-        QVector<float> statistics_mean;
-        QVector<float> statistics_std;
-        QVector<float> statistics_min;
-        QVector<float> statistics_max;
 
-        QVector<float> backstatistics_time;
-        QVector<float> backstatistics_mean;
-        QVector<float> backstatistics_std;
-        QVector<float> backstatistics_min;
-        QVector<float> backstatistics_max;
 
-        QVector<float> statistics_uncorrected_time;
-        QVector<float> statistics_uncorrected_mean;
-        QVector<float> statistics_uncorrected_std;
-        QVector<float> statistics_uncorrected_min;
-        QVector<float> statistics_uncorrected_max;
+
+        StatisticsDataset statistics;
+        StatisticsDataset backstatistics;
+        StatisticsDataset statistics_uncorrected;
+        StatisticsDataset dv_statistics[2];
+        StatisticsDataset dv_backstatistics[2];
+        StatisticsDataset dv_statistics_uncorrected[2];
+
+
         double* acf_tau;
         double* acf;
         double* acf_segments;

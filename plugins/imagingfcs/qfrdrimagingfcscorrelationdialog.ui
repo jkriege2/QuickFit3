@@ -164,6 +164,19 @@
          <property name="margin">
           <number>0</number>
          </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_38">
+           <property name="text">
+            <string>input:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+           <property name="buddy">
+            <cstring>cmbFileformat</cstring>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_19">
            <item>
@@ -1042,6 +1055,19 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
+         <item row="9" column="1">
+          <widget class="QLabel" name="labBackgroundProps">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
          <item row="10" column="0">
           <widget class="QLabel" name="label_39">
            <property name="text">
@@ -1416,7 +1442,7 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="15" column="0">
+         <item row="14" column="0">
           <widget class="QLabel" name="label_8">
            <property name="text">
             <string>&amp;correlator:</string>
@@ -1426,7 +1452,7 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="15" column="1">
+         <item row="14" column="1">
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -1602,6 +1628,26 @@ p, li { white-space: pre-wrap; }
             </layout>
            </item>
           </layout>
+         </item>
+         <item row="15" column="0">
+          <widget class="QLabel" name="label_48">
+           <property name="text">
+            <string>number &amp;&amp; brightness:</string>
+           </property>
+           <property name="buddy">
+            <cstring>cmbCorrelator</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="15" column="1">
+          <widget class="QCheckBox" name="chkAddNB">
+           <property name="text">
+            <string>add N&amp;&amp;B record to project</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
          <item row="16" column="0">
           <widget class="QLabel" name="label_27">
@@ -1937,45 +1983,6 @@ p, li { white-space: pre-wrap; }
             </widget>
            </item>
           </layout>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_38">
-           <property name="text">
-            <string>input:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
-           <property name="buddy">
-            <cstring>cmbFileformat</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="1">
-          <widget class="QLabel" name="labBackgroundProps">
-           <property name="text">
-            <string/>
-           </property>
-           <property name="textFormat">
-            <enum>Qt::RichText</enum>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="14" column="1">
-          <widget class="QLabel" name="lab2cFCCS">
-           <property name="text">
-            <string/>
-           </property>
-           <property name="textFormat">
-            <enum>Qt::RichText</enum>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-          </widget>
          </item>
         </layout>
        </widget>

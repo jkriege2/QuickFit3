@@ -70,6 +70,7 @@ void QFRDRImagingFCSSimulationThread::run()
     }
 
     QString inifilename=QFileInfo(filename).path()+"/"+QFileInfo(filename).completeBaseName()+".configuration.ini";
+    QString filenameBackground=QFileInfo(filename).path()+"/"+QFileInfo(filename).completeBaseName()+".background.tif";
     QSettings config(inifilename, QSettings::IniFormat);
     config.setValue("acquisition/pixel_width", pixel_size);
     config.setValue("acquisition/pixel_height", pixel_size);
@@ -83,10 +84,13 @@ void QFRDRImagingFCSSimulationThread::run()
     config.setValue("acquisition/baseline_offset", background);
     if (dualView) config.setValue("acquisition/dualview_mode", "h");
     else config.setValue("acquisition/dualview_mode", "none");
-    config.setValue("files/count", 1);
+    config.setValue("files/count", 2);
     config.setValue("files/name0", QFileInfo(filename).fileName());
     config.setValue("files/type0", "TIFF16");
     config.setValue("files/description0", tr("simulation result"));
+    config.setValue("files/name1", QFileInfo(filenameBackground).fileName());
+    config.setValue("files/type1", "TIFF16");
+    config.setValue("files/description1", tr("background"));
 
     config.setValue("simulation/type", tr("2D random walk simulation"));
     config.setValue("simulation/DG", DG);
@@ -116,6 +120,19 @@ void QFRDRImagingFCSSimulationThread::run()
     QVector<QFRDRImagingFCSSimulationThread::WalkerData> wg=createWalkers(walkersG);
     QVector<QFRDRImagingFCSSimulationThread::WalkerData> wr=createWalkers(walkersR);
     QVector<QFRDRImagingFCSSimulationThread::WalkerData> wrg=createWalkers(walkersRG);
+    TinyTIFFFile* tifBack=TinyTIFFWriter_open(filenameBackground.toLatin1().data(), 16, realwidth, height);
+    if (tifBack) {
+        emit statusMessage(tr("creating background files ..."));
+        for (currentFrame=0; currentFrame<50; currentFrame++) {
+
+            //memset(frame, 0, framesize*sizeof(uint16_t));
+            for (int i=0; i<framesize; i++) {
+                frame[i]=round(rng.randNorm(background, backgroundNoise*backgroundNoise));
+            }
+            TinyTIFFWriter_writeImage(tifBack, frame);
+        }
+         TinyTIFFWriter_close(tifBack);
+    }
 
     if (tif) {
         emit statusMessage(tr("running simulation ..."));

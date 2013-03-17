@@ -346,8 +346,8 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbDualView_currentIndexChanged(int in
         //ui->chkCrop->setEnabled(true);
         ui->chk2cFCCS->setEnabled(false);
         ui->chkSeparateColorChannels->setEnabled(false);
-        ui->lab2cFCCS->setText("");
-        ui->lab2cFCCS->setVisible(false);
+        //ui->lab2cFCCS->setText("");
+        //ui->lab2cFCCS->setVisible(false);
     } else if (index==1 || index==2) {
         QString colChannels=tr("an ACF-calculation results in 1 RDR");
         if (ui->chkSeparateColorChannels->isChecked()) colChannels=tr("an ACF-calculation results in 2 RDRs");
@@ -357,8 +357,8 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbDualView_currentIndexChanged(int in
         //ui->chkCrop->setEnabled(false);
         ui->chk2cFCCS->setEnabled(true);
         ui->chkSeparateColorChannels->setEnabled(true);
-        ui->lab2cFCCS->setText(tr("<b>Distance CCFs will be calculated for the full DualView image!</b>"));
-        ui->lab2cFCCS->setVisible(true);
+        //ui->lab2cFCCS->setText(tr("<b>Distance CCFs will be calculated for the full DualView image!</b>"));
+        //ui->lab2cFCCS->setVisible(true);
     }
 }
 
@@ -499,6 +499,7 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/camera", ui->chkCamera->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/FCCS_2color", ui->chk2cFCCS->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/chkSeparateColorChannels", ui->chkSeparateColorChannels->isChecked());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/chkAddNB", ui->chkAddNB->isChecked());
 }
 
 void QFRDRImagingFCSCorrelationDialog::readSettings() {
@@ -546,6 +547,7 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->chkCamera->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/camera", ui->chkCamera->isChecked()).toBool());
     ui->chk2cFCCS->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/FCCS_2color", ui->chk2cFCCS->isChecked()).toBool());
     ui->chkSeparateColorChannels->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/chkSeparateColorChannels", ui->chkSeparateColorChannels->isChecked()).toBool());
+    ui->chkAddNB->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/chkAddNB", ui->chkAddNB->isChecked()).toBool());
 
 }
 
@@ -649,16 +651,16 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
     if (ui->chk2cFCCS->isChecked()) {
         if (ui->cmbDualView->currentIndex()==1) {
             job.DCCFDeltaX << image_width/2;
-            job.DCCFDeltaY << image_height;
+            job.DCCFDeltaY << 0;
             job.DCCFrole<<QString("FCCS");
             job.distanceCCF=true;
-            qDebug()<<"added DV_H FCCS";
+            //qDebug()<<"added DV_H FCCS";
         } else if (ui->cmbDualView->currentIndex()==2) {
-            job.DCCFDeltaX << image_width;
+            job.DCCFDeltaX << 0;
             job.DCCFDeltaY << image_height/2;
             job.DCCFrole<<QString("FCCS");
             job.distanceCCF=true;
-            qDebug()<<"added DV_V FCCS";
+            //qDebug()<<"added DV_V FCCS";
         }
     }
 
@@ -687,6 +689,7 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
     job.cameraPixelHeight=ui->spinPixelHeight->value();
     job.addFCCSSeparately=ui->chkSeparateColorChannels->isChecked();
     job.dualViewMode=ui->cmbDualView->currentIndex();
+    job.addNandB=ui->chkAddNB->isChecked();
     //job.bleachDecay=ui->spinDecay->value();
     //job.bleachA=ui->edtDecayA->value();
     //job.bleachDecay2=ui->spinDecay2->value();
@@ -934,6 +937,8 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool count
     double pixel_height=ui->spinPixelHeight->value();
     bool hasPixel=ui->chkCamera->isChecked();
 
+    int dualViewMode=0;
+
     //////////////////////////////////////////////////////////////////////////////////
     // now we search for a .configuration.ini file describing the selected file
     //////////////////////////////////////////////////////////////////////////////////
@@ -978,10 +983,10 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool count
             }
 
             if (hasFirst) {
-                readB040SPIMExperimentConfigFile(set, frametime, baseline_offset, backgroundF, image_width, image_height, hasPixel, pixel_width, pixel_height);
+                readB040SPIMExperimentConfigFile(set, frametime, baseline_offset, backgroundF, image_width, image_height, hasPixel, pixel_width, pixel_height, dualViewMode);
                 //qDebug()<<"read first  "<<frametime<<baseline_offset<<backgroundF<<image_width<<image_height;
             } else if (foundSecond) {
-                readB040SPIMExperimentConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height, hasPixel, pixel_width, pixel_height);
+                readB040SPIMExperimentConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height, hasPixel, pixel_width, pixel_height, dualViewMode);
                 //qDebug()<<"read second  "<<sframetime<<sbaseline_offset<<sbackgroundF<<image_width<<image_height;
                 hasSecond=true;
             }
@@ -1006,7 +1011,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool count
             cfgname=filenameDisplayed.left(filenameDisplayed.size()-suffix.size())+newsuffix[i];
             if (QFile::exists(cfgname)) {
                 QSettings set(cfgname, QSettings::IniFormat);
-                readB040SPIMExperimentConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height, hasPixel, pixel_width, pixel_height);
+                readB040SPIMExperimentConfigFile(set, sframetime, sbaseline_offset, sbackgroundF, image_width, image_height, hasPixel, pixel_width, pixel_height, dualViewMode);
                 //qDebug()<<"read third  "<<sframetime<<sbaseline_offset<<sbackgroundF<<image_width<<image_height;
                 break;
             }
@@ -1032,6 +1037,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool count
     ui->spinPixelWidth->setValue(pixel_width);
     ui->spinPixelHeight->setValue(pixel_height);
     ui->chkCamera->setChecked(!hasPixel);
+    ui->cmbDualView->setCurrentIndex(dualViewMode);
 
 
 

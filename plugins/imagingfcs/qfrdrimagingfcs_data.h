@@ -117,6 +117,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         bool dualViewModeUserEditable() const;
         DualViewMode dualViewMode() const;
         void setDualViewMode(DualViewMode mode);
+        bool isFCCS() const;
 
 
 

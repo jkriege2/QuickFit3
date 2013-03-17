@@ -414,6 +414,8 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
         }
         plteOverview->set_xmax(w);
         plteOverview->set_ymax(h);
+        plteOverviewRGB->set_xmax(w);
+        plteOverviewRGB->set_ymax(h);
         if (plteOverviewSelectedData && plteOverviewExcludedData) {
             if (cmbRunDisplay->currentIndex()<=1) {
                 for (int i=0; i<m->getCorrelationRuns(); i++) {

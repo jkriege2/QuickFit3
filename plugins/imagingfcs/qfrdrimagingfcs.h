@@ -75,12 +75,20 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
 
         void importCorrelationsFromSimulation();
     protected:
-        /*! \brief add a video_correlator file to the current project
+        /*! \brief add correlations from a video_correlator file to the current project
 
             \param filename filename of the input file
             \param filename_overview filename of a file containing an overview image
         */
-        void insertVideoCorrelatorFile(const QString& filename, const QString& filename_overview=QString(""), bool binary=false, const QString& role="", int internalDualViewMode=0, int dualViewID=0);
+        void insertVideoCorrelatorFile(const QString& filename, const QString& filename_overview=QString(""), const QString &filename_evalsettings=QString(""), bool binary=false, const QString &role=QString(""), int internalDualViewMode=0, int dualViewID=0, bool addCorrelations=true, bool adNandB=true);
+        /*! \brief add a number and brightness record from a video_correlator file to the current project */
+        void insertNandBFromVideoCorrelatorFile(const QString& evalFilename, const QString& filename_overvieww, const QString& filename_overviewstdw, const QString& filenameBack, const QString &filenameBackStd=QString(""), int internalDualViewMode=0, int dualViewID=0, const QString &role=QString(""));
+        /*! \brief find the evaluation seetinsg file for the give data file ... also returns some additional data from filename heuristics */
+        void filenameHeuristics(const QString& filename, QString *evalFilename, bool* isCross, bool* isDCCF, int *dccfid, bool *isJanBFile, QString *role);
+
+        /*! \brief read the \c .evalsettings.txt file */
+        bool readEvalSettings(const QString& evalFilename, bool isDCCF, QMap<QString, QVariant> &initParams, QStringList &paramsReadonly, int& width, int &height, QStringList& files, QStringList& files_types, QStringList &files_descriptions, QString& description, QString &filename_settings, QString &filename_acquisition, QString filename_overview, QString &filename_overviewstd, QString &filename_background, QString &filename_backgroundstddev, QString &role, int dccfid=-1);
+
         /*! \brief add a Radhard2 file to the current project
 
             \param filename filename of the input file
