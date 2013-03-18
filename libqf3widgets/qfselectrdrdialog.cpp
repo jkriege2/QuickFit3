@@ -3,45 +3,9 @@
 #include "qfpluginservices.h"
 #include <QDebug>
 
-QFSelectRDRDialogMatchFunctor::QFSelectRDRDialogMatchFunctor()
-{
-    //qDebug()<<"QFSelectRDRDialogMatchFunctor:constructor ";
-}
-
-QFSelectRDRDialogMatchFunctor::~QFSelectRDRDialogMatchFunctor()
-{
-}
 
 
-QFSelectRDRDialogMatchFunctorSelectAll::QFSelectRDRDialogMatchFunctorSelectAll():
-    QFSelectRDRDialogMatchFunctor()
-{
-    //qDebug()<<"QFSelectRDRDialogMatchFunctorSelectAll:constructor ";
-}
-
-bool QFSelectRDRDialogMatchFunctorSelectAll::matches(const QFRawDataRecord *record) const
-{
-    //qDebug()<<"QFSelectRDRDialogMatchFunctorSelectAll";
-    return true;
-}
-
-
-
-QList<QPointer<QFRawDataRecord > > QFSelectRDRDialogMatchFunctor::getFilteredList(QFProject *project)
-{
-    QList<QPointer<QFRawDataRecord > >  rdrList;
-    if (project) {
-        for (int i=0; i<project->getRawDataCount(); i++) {
-            QFRawDataRecord* r=project->getRawDataByNum(i);
-            if (r && matches(r)) {
-                rdrList<<r;
-            }
-        }
-    }
-    return rdrList;
-}
-
-QFSelectRDRDialog::QFSelectRDRDialog(QFSelectRDRDialogMatchFunctor *matchFunctor, QWidget *parent) :
+QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QFSelectRDRDialog)
 {
@@ -55,7 +19,7 @@ QFSelectRDRDialog::QFSelectRDRDialog(QFSelectRDRDialogMatchFunctor *matchFunctor
     setProject(NULL);
 }
 
-QFSelectRDRDialog::QFSelectRDRDialog(QFSelectRDRDialogMatchFunctor *matchFunctor, bool functorPrivate, QWidget *parent) :
+QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, bool functorPrivate, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QFSelectRDRDialog)
 {
@@ -74,7 +38,7 @@ QFSelectRDRDialog::QFSelectRDRDialog(QWidget *parent):
     ui(new Ui::QFSelectRDRDialog)
 {
     ui->setupUi(this);
-    this->matchFunctor=new QFSelectRDRDialogMatchFunctorSelectAll();
+    this->matchFunctor=new QFMatchRDRFunctorSelectAll();
     functorPrivate=true;
     this->project=project;
     setAllowCreateNew(true);

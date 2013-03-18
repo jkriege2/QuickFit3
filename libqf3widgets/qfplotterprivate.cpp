@@ -5,9 +5,9 @@
 #include "qfpluginservices.h"
 #include <QDebug>
 
-class MyQFSelectRDRDialogMatchFunctor: public QFSelectRDRDialogMatchFunctor {
+class MyQFSelectRDRDialogMatchFunctor: public QFMatchRDRFunctor {
     public:
-        explicit MyQFSelectRDRDialogMatchFunctor(): QFSelectRDRDialogMatchFunctor() {
+        explicit MyQFSelectRDRDialogMatchFunctor(): QFMatchRDRFunctor() {
             //qDebug()<<"MyQFSelectRDRDialogMatchFunctor:constructor ";
         }
 

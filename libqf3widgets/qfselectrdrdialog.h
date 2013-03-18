@@ -7,31 +7,8 @@
 #include "qfproject.h"
 #include <QList>
 #include <QPointer>
+#include "qfmatchrdrfunctor.h"
 
-/*! \brief tool for QFSelectRDRDialog: derive a functor from this class which specifies which QFRawDataRecords are selectable in a QFSelectRDRDialog
-    \ingroup qf3lib_widgets
-
-  */
-class QFWIDLIB_EXPORT QFSelectRDRDialogMatchFunctor {
-    public:
-        explicit QFSelectRDRDialogMatchFunctor();
-        virtual ~QFSelectRDRDialogMatchFunctor();
-        /** \brief reimplement this function to check whether a QFRawDataRecord* is contained in a QFSelectRDRDialog. the default implementation always returns \c true . */
-        virtual bool matches(const QFRawDataRecord* record) const =0;
-        /** \brief returns a list of all QFRawDataRecords that match this functor in a project */
-        QList<QPointer<QFRawDataRecord> > getFilteredList(QFProject* project);
-};
-
-/*! \brief tool for QFSelectRDRDialog: QFSelectRDRDialogMatchFunctor that select all records
-    \ingroup qf3lib_widgets
-
-  */
-class QFWIDLIB_EXPORT QFSelectRDRDialogMatchFunctorSelectAll: public QFSelectRDRDialogMatchFunctor {
-    public:
-        explicit QFSelectRDRDialogMatchFunctorSelectAll();
-        /** \brief reimplement this function to check whether a QFRawDataRecord* is contained in a QFSelectRDRDialog. the default implementation always returns \c true . */
-        virtual bool matches(const QFRawDataRecord* record) const ;
-};
 
 namespace Ui {
     class QFSelectRDRDialog;
@@ -60,9 +37,9 @@ class QFWIDLIB_EXPORT QFSelectRDRDialog : public QDialog
     public:
         /** \brief class constructor
          *  \note the given functor pointer is NOT private, i.e. the functor is not destroyed together with this object */
-        explicit QFSelectRDRDialog(QFSelectRDRDialogMatchFunctor* matchFunctor, QWidget *parent = 0);
+        explicit QFSelectRDRDialog(QFMatchRDRFunctor* matchFunctor, QWidget *parent = 0);
         /** \brief class constructor. the user may select whether the functor is private or not*/
-        explicit QFSelectRDRDialog(QFSelectRDRDialogMatchFunctor* matchFunctor, bool functorPrivate, QWidget *parent = 0);
+        explicit QFSelectRDRDialog(QFMatchRDRFunctor* matchFunctor, bool functorPrivate, QWidget *parent = 0);
         /** \brief class constructor which displays a dialog that shows all records (i.e. default functor) */
         explicit QFSelectRDRDialog(QWidget *parent = 0);
         virtual ~QFSelectRDRDialog();
@@ -87,7 +64,7 @@ class QFWIDLIB_EXPORT QFSelectRDRDialog : public QDialog
 
     protected:
         Ui::QFSelectRDRDialog *ui;
-        QFSelectRDRDialogMatchFunctor* matchFunctor;
+        QFMatchRDRFunctor* matchFunctor;
         bool functorPrivate;
         QPointer<QFProject> project;
         QList<QPointer<QFRawDataRecord> > rdrList;
