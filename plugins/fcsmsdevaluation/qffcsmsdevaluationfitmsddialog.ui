@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>590</width>
+    <width>686</width>
     <height>583</height>
    </rect>
   </property>
@@ -38,7 +38,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="">
+    <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string> Power-law fit </string>
      </property>
@@ -298,28 +298,12 @@ p, li { white-space: pre-wrap; }
    <slot>showHelp()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>47</x>
-     <y>481</y>
+     <x>57</x>
+     <y>572</y>
     </hint>
     <hint type="destinationlabel">
      <x>69</x>
      <y>353</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_2</sender>
-   <signal>clicked()</signal>
-   <receiver>QFFCSMSDEvaluationFitMSDDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>584</x>
-     <y>480</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>520</x>
-     <y>356</y>
     </hint>
    </hints>
   </connection>
@@ -330,12 +314,28 @@ p, li { white-space: pre-wrap; }
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>670</x>
-     <y>477</y>
+     <x>601</x>
+     <y>571</y>
     </hint>
     <hint type="destinationlabel">
-     <x>618</x>
+     <x>591</x>
      <y>357</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>QFFCSMSDEvaluationFitMSDDialog</receiver>
+   <slot>saveResults()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>548</x>
+     <y>565</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>510</x>
+     <y>305</y>
     </hint>
    </hints>
   </connection>
