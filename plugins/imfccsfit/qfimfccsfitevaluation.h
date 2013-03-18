@@ -1,8 +1,7 @@
-#ifndef QFFCSMAXENTEVALUATION_H
-#define QFFCSMAXENTEVALUATION_H
+#ifndef QFIMFCCSFITEVALUATION_H
+#define QFIMFCCSFITEVALUATION_H
 
 #include "qfpluginevaluation.h"
-#include "qffitresultsbyindexevaluationfittools.h"
 /*!
     \defgroup qf3rdrdp_GROUPNAME Evaluation Item Plugin
     \ingroup qf3evaluationplugins
@@ -10,14 +9,14 @@
 /*! \brief Evaluation Item Plugin class
     \ingroup qf3rdrdp_GROUPNAME
 */
-class QFFCSMaxEntEvaluation : public QObject, public QFPluginEvaluationItemBase {
+class QFImFCCSFitEvaluation : public QObject, public QFPluginEvaluationItemBase {
         Q_OBJECT
         Q_INTERFACES(QFPluginEvaluationItem)
     public:
         /** Default constructor */
-        QFFCSMaxEntEvaluation(QObject* parent=NULL);
+        QFImFCCSFitEvaluation(QObject* parent=NULL);
         /** Default destructor */
-        virtual ~QFFCSMaxEntEvaluation();
+        virtual ~QFImFCCSFitEvaluation();
 
         /** \brief Create a new QFEvaluationItem in the given project \a parent. Also adds the record to the project. */
         virtual QFEvaluationItem* createRecord(QFProject* parent);
@@ -29,31 +28,31 @@ class QFFCSMaxEntEvaluation : public QObject, public QFPluginEvaluationItemBase 
         virtual void registerToMenu(QMenu* menu);
 
         /** \brief short ID for the plugin */
-        virtual QString getID() const  { return tr("fcs_maxent"); }
+        virtual QString getID() const  { return tr("imfccs_fit"); };
 
         /** \brief name for the plugin */
-        virtual QString getName() const  { return tr("FCS: MaxEnt"); }
+        virtual QString getName() const  { return tr("ImagingFCCS Fit Plugin"); };
 
         /** \brief short description for the plugin */
-        virtual QString getDescription() const  { return tr("maximum entropy data evaluation plugin for FCS data"); }
+        virtual QString getDescription() const  { return tr("Plugin for fitting imaging Fluorescence Crosscorrelation Spectroscopy (imFCCS) data"); };
 
         /** \brief author the plugin */
-        virtual QString getAuthor() const  { return tr("Niko Schnellbächer"); }
+        virtual QString getAuthor() const  { return tr("Jan W. Krieger"); };
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2012 by Niko Schnellbächer"); }
+        virtual QString getCopyright() const  { return tr("(c) 2013 by Jan W. Krieger"); };
 
         /** \brief weblink for the plugin */
-        virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); }
+        virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); };
 
         /** \brief icon file for the plugin (from resource system or a separate file) */
-        virtual QString getIconFilename() const  { return QString(":/fcs_maxent/qffcsmaxentevaluation.png"); }
+        virtual QString getIconFilename() const  { return QString(":/imfccs_fit_logo.png"); };
 
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
             minor=0;
-        }
+        };
 
     protected slots:
         /** \brief insert FCS data from file*/
@@ -62,4 +61,4 @@ class QFFCSMaxEntEvaluation : public QObject, public QFPluginEvaluationItemBase 
     private:
 };
 
-#endif // QFFCSMAXENTEVALUATION_H
+#endif // QFIMFCCSFITEVALUATION_H

@@ -22,7 +22,8 @@ HEADERS += qffcsmaxentevaluation.h \
     ../base_classes/qfusesresultsbyindexandmodelevaluation.h \
     ../base_classes/qfusesresultsbyindexevaluationeditor.h \
     ../base_classes/qffcsbyindexandmodelevaluationeditor.h \
-    libb040mem.h
+    libb040mem.h \
+    ../base_classes/qffcsweightingtools.h
 
 SOURCES += qffcsmaxentevaluation.cpp \
            qffcsmaxentevaluation_item.cpp \
@@ -32,7 +33,8 @@ SOURCES += qffcsmaxentevaluation.cpp \
     ../base_classes/qfusesresultsbyindexandmodelevaluation.cpp \
     ../base_classes/qfusesresultsbyindexevaluationeditor.cpp \
     ../base_classes/qffcsbyindexandmodelevaluationeditor.cpp \
-    libb040mem.cpp
+    libb040mem.cpp \
+    ../base_classes/qffcsweightingtools.cpp
 
 FORMS =   
 

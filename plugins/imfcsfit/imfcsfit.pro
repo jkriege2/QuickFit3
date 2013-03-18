@@ -28,7 +28,9 @@ HEADERS += qfpevalimfcsfit.h \
     imfcscalibrationdialog.h \
     ../base_classes/qffitresultsbyindexevaluationfitthread.h \
     optionswidget.h \
-    ../interfaces/qfrdrrunselection.h
+    ../interfaces/qfrdrrunselection.h \
+    ../base_classes/qffcsweightingtools.h \
+    ../base_classes/qffitresultsbyindexevaluationfittools.h
 
 
 SOURCES += qfpevalimfcsfit.cpp \
@@ -43,7 +45,9 @@ SOURCES += qfpevalimfcsfit.cpp \
     ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.cpp \
     imfcscalibrationdialog.cpp \
     ../base_classes/qffitresultsbyindexevaluationfitthread.cpp \
-    optionswidget.cpp
+    optionswidget.cpp \
+    ../base_classes/qffcsweightingtools.cpp \
+    ../base_classes/qffitresultsbyindexevaluationfittools.cpp
 
 
 FORMS = \    

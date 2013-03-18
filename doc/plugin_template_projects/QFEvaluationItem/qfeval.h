@@ -46,7 +46,7 @@ class QFEVAL : public QObject, public QFPluginEvaluationItemBase {
         virtual QString getWeblink() const  { return tr(""); };
 
         /** \brief icon file for the plugin (from resource system or a separate file) */
-        virtual QString getIconFilename() const  { return QString(":/target_id/qfeval.png"); };
+        virtual QString getIconFilename() const  { return QString(":/target_id/target_id.png"); };
 
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {

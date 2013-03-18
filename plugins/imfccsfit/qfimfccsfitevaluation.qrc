@@ -1,0 +1,8 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="imfccs_fit/qfimfccsfitevaluation.png">./images/imfccs_fit_22.png</file>
+    <file alias="imfccs_fit/qfimfccsfitevaluation_small.png">./images/imfccs_fit.png</file>
+    <file alias="imfccs_fit.png">./images/imfccs_fit.png</file>
+    <file alias="imfccs_fit_logo.png">./images/imfccs_fit_22.png</file>
+</qresource>
+</RCC>

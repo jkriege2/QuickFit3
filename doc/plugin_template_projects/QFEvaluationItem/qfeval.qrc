@@ -1,7 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-    <file alias="target_id/qfeval.png">./images/qfeval.png</file>
-    <file alias="target_id/qfeval_small.png">./images/qfeval_small.png</file>
+    <file alias="target_id/target_id.png">./images/target_id.png</file>
+    <file alias="target_id/target_id_small.png">./images/target_id_small.png</file>
     <file alias="target_id/qfeval_savereport.png">./images/qfeval_save.png</file>
     <file alias="target_id/qfeval_printreport.png">./images/qfeval_print.png</file>
     <file alias="target_id/qfeval_evaluate.png">./images/qfeval_evaluate.png</file>

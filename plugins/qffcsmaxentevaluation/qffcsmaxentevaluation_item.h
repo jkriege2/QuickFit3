@@ -5,11 +5,12 @@
 #include <QSettings>
 #include "qftools.h"
 #include "qfmathtools.h"
-
+#include "qffcsweightingtools.h"
 #include "qfevaluationitem.h"
 #include "qfevaluationitemfactory.h"
 #include "../base_classes/qfusesresultsbyindexevaluation.h"
 #include "../base_classes/qfusesresultsbyindexandmodelevaluation.h"
+#include "qffitresultsbyindexevaluationfittools.h"
 
 /*! \brief evaluation item class 
     \ingroup qf3rdrdp_GROUPNAME
@@ -18,7 +19,7 @@
     
     
 */
-class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, public QFSimpleFitParameterEnumeratorInterface {
+class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, public QFSimpleFitParameterEnumeratorInterface, public QFFCSWeightingTools {
         Q_OBJECT
         Q_INTERFACES(QFSimpleFitParameterEnumeratorInterface)
     public:
@@ -51,8 +52,6 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation,
         virtual int getIndexMax(QFRawDataRecord* r) const;
         virtual int getModelCount(QFRawDataRecord* r, int index) const;
 
-        void setCurrentWeights(int index);
-        int getCurrentWeights() const;
         /** \brief set the current alpha value */
         void setAlpha(double alpha);
         /** \brief return the current alpha value */
@@ -116,10 +115,6 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation,
          */
         QFFitStatistics calcFitStatistics(QFRawDataRecord* record, int index, int model, double* taus, double* modelVals, uint32_t N, uint32_t MaxEntParams, int datacut_min, int datacut_max, int runAvgWidth, int residualHistogramBins);
 
-        /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill
-         *         it with the appropriate values, according to the current settings */
-        virtual double* allocWeights(bool* weightsOK=NULL, QFRawDataRecord* record=NULL, int run=-100, int data_start=-1, int data_end=-1) const;
-
         virtual QString getEvaluationResultID(int currentIndex, int model) const;
         using QFUsesResultsByIndexAndModelEvaluation::getEvaluationResultID;
 protected:
@@ -137,7 +132,6 @@ protected:
         virtual void intReadData(QDomElement* e);
 
 
-        int currentWeights;
 
         /** \brief returns default values for a parameter */
         virtual bool getParameterDefault(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, QFUsesResultsEvaluation::FitParameterDefault& defaultValue) const;

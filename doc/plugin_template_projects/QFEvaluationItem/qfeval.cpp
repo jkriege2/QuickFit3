@@ -19,7 +19,7 @@ QFEvaluationItem* QFEVAL::createRecord(QFProject* parent) {
 
 
 void QFEVAL::registerToMenu(QMenu* menu) {
-    QAction* actAddEval=new QAction(QIcon(":/target_id/qfeval_small.png"), getName(), parentWidget);
+    QAction* actAddEval=new QAction(QIcon(getIconFilename()), getName(), parentWidget);
     actAddEval->setStatusTip(getDescription());
     connect(actAddEval, SIGNAL(triggered()), this, SLOT(insertEvaluation()));
     menu->addAction(actAddEval);

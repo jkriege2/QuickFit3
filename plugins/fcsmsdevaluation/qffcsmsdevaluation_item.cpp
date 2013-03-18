@@ -12,7 +12,6 @@ QFFCSMSDEvaluationItem::QFFCSMSDEvaluationItem(QFProject* parent):
 {
     currentIndex=-1;
     currentModel=1;
-    currentWeights=0;
 }
 
 QFFCSMSDEvaluationItem::~QFFCSMSDEvaluationItem() {
@@ -29,7 +28,7 @@ QString QFFCSMSDEvaluationItem::getEvaluationResultID(int currentIndex, int mode
 void QFFCSMSDEvaluationItem::intWriteData(QXmlStreamWriter& w) {
     QFUsesResultsByIndexAndModelEvaluation::intWriteData(w);
     w.writeStartElement("msd_config");
-    w.writeAttribute("current_weights", QString::number(currentWeights));
+    w.writeAttribute("current_weights", QString::number(m_weighting));
     w.writeEndElement();
 
 }
@@ -38,7 +37,7 @@ void QFFCSMSDEvaluationItem::intReadData(QDomElement* e) {
     QFUsesResultsByIndexAndModelEvaluation::intReadData(e);
 
     QDomElement e1=e->firstChildElement("msd_config");
-    currentWeights=e1.attribute("current_weights", "0").toInt();
+    m_weighting=indexToWeight( e1.attribute("current_weights", "0").toInt());
 
 
 }
@@ -72,10 +71,6 @@ int QFFCSMSDEvaluationItem::getIndexMax(QFRawDataRecord *r) const {
 
 
 
-void QFFCSMSDEvaluationItem::setCurrentWeights(int index)
-{
-    currentWeights=index;
-}
 
 
 
@@ -88,10 +83,6 @@ QString QFFCSMSDEvaluationItem::getCurrentModelName() const
 
 
 
-int QFFCSMSDEvaluationItem::getCurrentWeights() const
-{
-    return currentWeights;
-}
 
 QStringList QFFCSMSDEvaluationItem::getFitTypes()
 {
@@ -174,71 +165,6 @@ double QFFCSMSDEvaluationItem::getTheoryAlpha(int i) const {
 // FITTING AND READING DATA FOR FIT, FIT STATISTICS
 /////////////////////////////////////////////////////////////////////
 
-double* QFFCSMSDEvaluationItem::allocWeights(bool* weightsOKK, QFRawDataRecord* record_in, int run_in, int data_start, int data_end) const {
-    if (weightsOKK) *weightsOKK=false;
-    QFRawDataRecord* record=record_in;
-    if (!record_in) record=getHighlightedRecord();
-    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
-    //JKQTPdatastore* ds=pltData->getDatastore();
-    //JKQTPdatastore* dsres=pltResiduals->getDatastore();
-    //QFFitFunction* ffunc=getFitFunction();
-    int run=run_in;
-    if (run<=-100) run=getCurrentIndex();
-
-    int N=data->getCorrelationN();
-
-
-    double* weights=(double*)malloc(N*sizeof(double));
-    bool weightsOK=false;
-    if (currentWeights==1) {
-        double* std=data->getCorrelationStdDev();
-        weightsOK=true;
-        for (int i=0; i<N; i++) {
-            weights[i]=std[i];
-            if ((data_start>=0) && (data_end>=0)) {
-                if ((i>=data_start)&&(i<=data_end)) {
-                    if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                        weightsOK=false;
-                        break;
-                    }
-                };
-            } else {
-                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                    weightsOK=false;
-                    break;
-                };
-            }
-        }
-    }
-    if (currentWeights==2) {
-        double* std=NULL;
-        if (run>=0) std=data->getCorrelationRunError(run);
-        else std=data->getCorrelationStdDev();
-        weightsOK=true;
-        for (int i=0; i<N; i++) {
-            weights[i]=std[i];
-            if ((data_start>=0) && (data_end>=0)) {
-                if ((i>=data_start)&&(i<=data_end)) {
-                    if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                        weightsOK=false;
-                        break;
-                    }
-                };
-            } else {
-                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                    weightsOK=false;
-                    break;
-                };
-            }
-        }
-    }
-    if (!weightsOK) {
-        for (int i=0; i<N; i++) weights[i]=1;
-        if (currentWeights==0) weightsOK=true;
-    }
-    if (weightsOKK) *weightsOKK=weightsOK;
-    return weights;
-}
 
 
 QVector<double> QFFCSMSDEvaluationItem::getMSD(QFRawDataRecord *record, int index, int model) const {

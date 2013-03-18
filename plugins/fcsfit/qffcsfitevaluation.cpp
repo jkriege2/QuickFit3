@@ -38,17 +38,13 @@ QString QFFCSFitEvaluation::getIndexName(QFRawDataRecord *rec, int index) const 
 }
 
 void QFFCSFitEvaluation::intWriteDataAlgorithm(QXmlStreamWriter& w) const {
-    if (m_weighting==EqualWeighting) w.writeAttribute("weighting", "equal");
-    if (m_weighting==StdDevWeighting) w.writeAttribute("weighting", "stddev");
-    if (m_weighting==RunErrorWeighting) w.writeAttribute("weighting", "runerror");
+    w.writeAttribute("weighting", dataWeightToString(getFitDataWeighting()));
 }
 
 void QFFCSFitEvaluation::intReadDataAlgorithm(QDomElement& e) {
     if (e.hasAttribute("weighting")) {
         QString a=e.attribute("weighting").toLower();
-        m_weighting=EqualWeighting;
-        if (a=="stddev") m_weighting=StdDevWeighting;
-        if (a=="runerror") m_weighting=RunErrorWeighting;
+        setFitDataWeighting(stringToDataWeight(a));
     }
 }
 
@@ -230,71 +226,6 @@ int QFFCSFitEvaluation::getIndexMax(QFRawDataRecord* r) const {
 // FITTING AND READING DATA FOR FIT, FIT STATISTICS
 /////////////////////////////////////////////////////////////////////
 
-double* QFFCSFitEvaluation::allocWeights(bool* weightsOKK, QFRawDataRecord* record_in, int run_in, int data_start, int data_end) const {
-    if (weightsOKK) *weightsOKK=false;
-    QFRawDataRecord* record=record_in;
-    if (!record_in) record=getHighlightedRecord();
-    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
-    //JKQTPdatastore* ds=pltData->getDatastore();
-    //JKQTPdatastore* dsres=pltResiduals->getDatastore();
-    //QFFitFunction* ffunc=getFitFunction();
-    int run=run_in;
-    if (run<=-100) run=getCurrentIndex();
-
-    int N=data->getCorrelationN();
-
-    QFFCSFitEvaluation::DataWeight weighting=getFitDataWeighting();
-    double* weights=(double*)malloc(N*sizeof(double));
-    bool weightsOK=false;
-    if (weighting==QFFCSFitEvaluation::StdDevWeighting) {
-        double* std=data->getCorrelationStdDev();
-        weightsOK=true;
-        for (int i=0; i<N; i++) {
-            weights[i]=std[i];
-            if ((data_start>=0) && (data_end>=0)) {
-                if ((i>=data_start)&&(i<=data_end)) {
-                    if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                        weightsOK=false;
-                        break;
-                    }
-                };
-            } else {
-                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                    weightsOK=false;
-                    break;
-                };
-            }
-        }
-    }
-    if (weighting==QFFCSFitEvaluation::RunErrorWeighting) {
-        double* std=NULL;
-        if (run>=0) std=data->getCorrelationRunError(run);
-        else std=data->getCorrelationStdDev();
-        weightsOK=true;
-        for (int i=0; i<N; i++) {
-            weights[i]=std[i];
-            if ((data_start>=0) && (data_end>=0)) {
-                if ((i>=data_start)&&(i<=data_end)) {
-                    if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                        weightsOK=false;
-                        break;
-                    }
-                };
-            } else {
-                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                    weightsOK=false;
-                    break;
-                };
-            }
-        }
-    }
-    if (!weightsOK) {
-        for (int i=0; i<N; i++) weights[i]=1;
-        if (weighting==QFFCSFitEvaluation::EqualWeighting) weightsOK=true;
-    }
-    if (weightsOKK) *weightsOKK=weightsOK;
-    return weights;
-}
 
 void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFFitAlgorithmReporter* dlgFitProgress, bool doLog) {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);

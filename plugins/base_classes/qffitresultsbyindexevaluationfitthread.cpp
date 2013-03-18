@@ -1,5 +1,6 @@
 #include "qffitresultsbyindexevaluationfitthread.h"
 #include "qffitresultsbyindexevaluation.h"
+#include "qffitresultsbyindexevaluationfittools.h"
 
 QFFitResultsByIndexEvaluationFitThread::QFFitResultsByIndexEvaluationFitThread(bool stopWhenEmpty, QObject *parent) :
     QThread(parent)
@@ -35,8 +36,9 @@ void QFFitResultsByIndexEvaluationFitThread::run() {
         }
 
         // if we found a valid job: perform it
-        if (jobIsValid) {
-            job.evaluation->doFitForMultithread(job.record, job.run, job.userMin, job.userMax, this);
+        QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(job.evaluation);
+        if (jobIsValid&&feval) {
+            feval->doFitForMultithread(job.record, job.run, job.userMin, job.userMax, this);
 
             {
                 QWriteLocker locker(lock);

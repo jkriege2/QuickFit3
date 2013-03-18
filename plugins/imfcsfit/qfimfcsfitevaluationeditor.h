@@ -39,6 +39,7 @@
 #include "../interfaces/qfrdrimagetoruninterface.h"
 #include "qffitresultsbyindexevaluationfitthread.h"
 #include "dlgqfprogressdialog.h"
+#include "qffcsweightingtools.h"
 
 
 /*! \brief editor class for imaging FCS least-square fits
@@ -78,7 +79,7 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
 
 
         /** \brief combobox to select a model for the weighting */
-        QComboBox* cmbWeights;
+        QFFCDWeightingCombobox* cmbWeights;
 
         QCheckBox* chkDontSaveFitResultMessage;
         QCheckBox* chkLeaveoutMasked;

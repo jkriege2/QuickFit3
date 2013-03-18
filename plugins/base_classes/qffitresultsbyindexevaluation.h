@@ -336,23 +336,6 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         virtual bool hasSpecial(QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error) const ;
 
 
-        /*! \brief perform a fit for the given \a record and \a run
-
-            The parameters \a defaultMinDatarange and \a defaultMaxDatarange set the range of data points taken for the fit.
-            If both are -1, the full range is used
-
-            The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
-          */
-        virtual void doFit(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFFitAlgorithmReporter* dlgFitProgress=NULL, bool doLog=false)=0;
-        /*! \brief perform a fit for the given \a record and \a run
-
-            The parameters \a defaultMinDatarange and \a defaultMaxDatarange set the range of data points taken for the fit.
-            If both are -1, the full range is used
-
-            The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
-          */
-        virtual void doFitForMultithread(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const {};
-
     public slots:
         /** \brief set the current index to use */
         virtual void setCurrentIndex(int index);
@@ -362,8 +345,6 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
     protected:
         /** \brief current index to use */
         int m_currentIndex;
-
-        mutable QMutex* mutexThreadedFit;
 
 
 

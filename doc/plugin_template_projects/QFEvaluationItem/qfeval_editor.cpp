@@ -202,7 +202,7 @@ void QFEVALEditor::evaluateAll() {
     if (!eval) return;
 
     // get a list of all raw data records this evaluation is applicable to
-    QList<QFRawDataRecord*> recs=eval->getApplicableRecords();
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
     dlgEvaluationProgress->setRange(0,recs.size());
     dlgEvaluationProgress->setValue(0);
     dlgEvaluationProgress->open();

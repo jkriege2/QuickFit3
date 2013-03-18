@@ -12,7 +12,6 @@ QFFCSMaxEntEvaluationItem::QFFCSMaxEntEvaluationItem(QFProject* parent):
 {
     currentIndex=-1;
     currentModel=0;
-    currentWeights=0;
 }
 
 QFFCSMaxEntEvaluationItem::~QFFCSMaxEntEvaluationItem() {
@@ -29,7 +28,7 @@ QString QFFCSMaxEntEvaluationItem::getEvaluationResultID(int currentIndex, int m
 void QFFCSMaxEntEvaluationItem::intWriteData(QXmlStreamWriter& w) {
     QFUsesResultsByIndexAndModelEvaluation::intWriteData(w);
     w.writeStartElement("maxent_config");
-    w.writeAttribute("current_weights", QString::number(currentWeights));
+    w.writeAttribute("current_weights", QString::number(m_weighting));
     w.writeEndElement();
 
 }
@@ -38,7 +37,7 @@ void QFFCSMaxEntEvaluationItem::intReadData(QDomElement* e) {
     QFUsesResultsByIndexAndModelEvaluation::intReadData(e);
 
     QDomElement e1=e->firstChildElement("maxent_config");
-    currentWeights=e1.attribute("current_weights", "0").toInt();
+    m_weighting=indexToWeight(e1.attribute("current_weights", "0").toInt());
 
 
 }
@@ -72,11 +71,6 @@ int QFFCSMaxEntEvaluationItem::getIndexMax(QFRawDataRecord *r) const {
 
 
 
-void QFFCSMaxEntEvaluationItem::setCurrentWeights(int index)
-{
-    currentWeights=index;
-}
-
 
 
 
@@ -88,10 +82,7 @@ QString QFFCSMaxEntEvaluationItem::getCurrentModelName() const
 
 
 
-int QFFCSMaxEntEvaluationItem::getCurrentWeights() const
-{
-    return currentWeights;
-}
+
 
 void QFFCSMaxEntEvaluationItem::setAlpha(double alpha) {
     setFitValue("maxent_alpha", alpha);
@@ -141,71 +132,6 @@ double QFFCSMaxEntEvaluationItem::getWXY() const {
 // FITTING AND READING DATA FOR FIT, FIT STATISTICS
 /////////////////////////////////////////////////////////////////////
 
-double* QFFCSMaxEntEvaluationItem::allocWeights(bool* weightsOKK, QFRawDataRecord* record_in, int run_in, int data_start, int data_end) const {
-    if (weightsOKK) *weightsOKK=false;
-    QFRawDataRecord* record=record_in;
-    if (!record_in) record=getHighlightedRecord();
-    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
-    //JKQTPdatastore* ds=pltData->getDatastore();
-    //JKQTPdatastore* dsres=pltResiduals->getDatastore();
-    //QFFitFunction* ffunc=getFitFunction();
-    int run=run_in;
-    if (run<=-100) run=getCurrentIndex();
-
-    int N=data->getCorrelationN();
-
-
-    double* weights=(double*)malloc(N*sizeof(double));
-    bool weightsOK=false;
-    if (currentWeights==1) {
-        double* std=data->getCorrelationStdDev();
-        weightsOK=true;
-        for (int i=0; i<N; i++) {
-            weights[i]=std[i];
-            if ((data_start>=0) && (data_end>=0)) {
-                if ((i>=data_start)&&(i<=data_end)) {
-                    if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                        weightsOK=false;
-                        break;
-                    }
-                };
-            } else {
-                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                    weightsOK=false;
-                    break;
-                };
-            }
-        }
-    }
-    if (currentWeights==2) {
-        double* std=NULL;
-        if (run>=0) std=data->getCorrelationRunError(run);
-        else std=data->getCorrelationStdDev();
-        weightsOK=true;
-        for (int i=0; i<N; i++) {
-            weights[i]=std[i];
-            if ((data_start>=0) && (data_end>=0)) {
-                if ((i>=data_start)&&(i<=data_end)) {
-                    if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                        weightsOK=false;
-                        break;
-                    }
-                };
-            } else {
-                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                    weightsOK=false;
-                    break;
-                };
-            }
-        }
-    }
-    if (!weightsOK) {
-        for (int i=0; i<N; i++) weights[i]=1;
-        if (currentWeights==0) weightsOK=true;
-    }
-    if (weightsOKK) *weightsOKK=weightsOK;
-    return weights;
-}
 
 
 QVector<double> QFFCSMaxEntEvaluationItem::getDistribution(QFRawDataRecord *record, int index, int model) const {
@@ -748,7 +674,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
 
         distDs=(double*)calloc(Ndist, sizeof(double));
         double wxy=getWXY();
-        for (int i=0; i<Ndist; i++) {
+        for (uint32_t i=0; i<Ndist; i++) {
             distDs[i]=wxy*wxy/1000000.0/(4.0*distTaus[i]);
         }
 

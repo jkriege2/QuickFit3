@@ -29,13 +29,13 @@ QFEvaluationItem* QFPEvalIMFCSFit::createRecord(QFProject* parent) {
 
 
 void QFPEvalIMFCSFit::registerToMenu(QMenu* menu) {
-    QAction* actFCS=new QAction(QIcon(":/imfcs_fit.png"), tr("imagingFCS Curve Fitting"), parentWidget);
-    actFCS->setStatusTip(tr("Insert a new imagingFCS least-squares fit evaluation"));
+    QAction* actFCS=new QAction(QIcon(":/imfcs_fit.png"), tr("imFCS Curve Fitting"), parentWidget);
+    actFCS->setStatusTip(tr("Insert a new imFCS least-squares fit evaluation"));
     connect(actFCS, SIGNAL(triggered()), this, SLOT(insertFCSFit()));
     menu->addAction(actFCS);
 
-    /*QAction* actFCSCalib=new QAction(QIcon(":/imfcsfit/imfcs_fitcalib.png"), tr("imagingFCS Calibration"), parentWidget);
-    actFCSCalib->setStatusTip(tr("Insert a set of imagingFCS least-squares fit evaluations for a SPIM calibration"));
+    /*QAction* actFCSCalib=new QAction(QIcon(":/imfcsfit/imfcs_fitcalib.png"), tr("imFCS Calibration"), parentWidget);
+    actFCSCalib->setStatusTip(tr("Insert a set of imFCS least-squares fit evaluations for a SPIM calibration"));
     connect(actFCSCalib, SIGNAL(triggered()), this, SLOT(insertFCSFitForCalibration()));
     menu->addAction(actFCSCalib);*/
     menu->addMenu(menuCalibration);
@@ -46,7 +46,7 @@ void QFPEvalIMFCSFit::registerToMenu(QMenu* menu) {
 void QFPEvalIMFCSFit::init()
 {
     if (services) {
-        QMenu* menu=new QMenu(tr("imagingFCS &Calibration Tool"));
+        QMenu* menu=new QMenu(tr("imFCS &Calibration Tool"));
         menu->setIcon(QIcon(":/imfcsfit/imfcs_fitcalib.png"));
 
         QAction* actHelp=new QAction(QIcon(":/lib/help.png"), tr("Calbration Tutorial"), this);
@@ -55,7 +55,7 @@ void QFPEvalIMFCSFit::init()
         menu->addSeparator();
 
         QAction* actFCSCalib=new QAction(QIcon(":/imfcsfit/imfcs_fitcalib.png"), tr("&0: add imFCS Calibration Fits"), this);
-        actFCSCalib->setStatusTip(tr("Insert a set of imagingFCS least-squares fit evaluations for a SPIM calibration"));
+        actFCSCalib->setStatusTip(tr("Insert a set of imFCS least-squares fit evaluations for a SPIM calibration"));
         connect(actFCSCalib, SIGNAL(triggered()), this, SLOT(insertFCSFitForCalibration()));
         menu->addAction(actFCSCalib);
 
@@ -97,7 +97,7 @@ QFPluginOptionsWidget *QFPEvalIMFCSFit::createOptionsWidget(QWidget *parent)
 
 void QFPEvalIMFCSFit::insertFCSFit() {
     if (project) {
-        project->addEvaluation(getID(), "imagingFCS Fit");
+        project->addEvaluation(getID(), "imFCS Fit");
     }
 }
 
@@ -105,14 +105,14 @@ void QFPEvalIMFCSFit::insertFCSFitForCalibration() {
     if (project) {
 
         ImFCSCalibrationDialog* dlg=new ImFCSCalibrationDialog(NULL);
-        QFEvaluationItem* edummy=project->addEvaluation(getID(), "imagingFCS Fit");
+        QFEvaluationItem* edummy=project->addEvaluation(getID(), "imFCS Fit");
         QFImFCSFitEvaluation* imFCS=qobject_cast<QFImFCSFitEvaluation*>(edummy);
         if (imFCS) dlg->setFitModels(imFCS->getAvailableFitFunctions(), imFCS->getFitFunctionID());
         if (dlg->exec()) {
             QList<double> vals=dlg->getValues();
             for (int i=0; i<vals.size(); i++) {
                 QFEvaluationItem* e=edummy;
-                if (i>0) e=project->addEvaluation(getID(), "imagingFCS Fit");
+                if (i>0) e=project->addEvaluation(getID(), "imFCS Fit");
                 QFImFCSFitEvaluation* eimFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
                 e->setQFProperty("PRESET_FOCUS_WIDTH", vals[i], false, false);
                 e->setQFProperty("PRESET_FOCUS_HEIGHT", dlg->getFocusHeight(), false, false);
@@ -128,7 +128,7 @@ void QFPEvalIMFCSFit::insertFCSFitForCalibration() {
                 if (eimFCS) eimFCS->setFitFunction(dlg->getFitModel());
             }
             if (vals.size()<=0) delete edummy;
-            QFRawDataRecord* et=project->addRawData("table", "imagingFCS Calibration results");
+            QFRawDataRecord* et=project->addRawData("table", "imFCS Calibration results");
             et->setQFProperty("IMFCS_CALIBRATION_RESULTTABLE", true, false, false);
 
          } else {
@@ -186,7 +186,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
         }
     }
     if (!etab || !tab) {
-        etab=project->addRawData("table", "imagingFCS Calibration results");
+        etab=project->addRawData("table", "imFCS Calibration results");
         if (etab) {
             etab->setQFProperty("IMFCS_CALIBRATION_RESULTTABLE", true, false, false);
         }
@@ -322,7 +322,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
     }
 
     bool dlgOK=false;
-    int DItem=DsNames.indexOf(QInputDialog::getItem(parentWidget, tr("ImagingFCS Calibration"), tr("Please choose the binning at which to measure the \"true\" diffusion coefficient for the calibration:"), DsNames, 4, false, &dlgOK));
+    int DItem=DsNames.indexOf(QInputDialog::getItem(parentWidget, tr("imFCS Calibration"), tr("Please choose the binning at which to measure the \"true\" diffusion coefficient for the calibration:"), DsNames, 4, false, &dlgOK));
 
     if (dlgOK) {
 
@@ -369,7 +369,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool3()
         }
     }
     if (!etab || !tab) {
-        etab=project->addRawData("table", "imagingFCS Calibration results");
+        etab=project->addRawData("table", "imFCS Calibration results");
         if (etab) {
             etab->setQFProperty("IMFCS_CALIBRATION_RESULTTABLE", true, false, false);
         }

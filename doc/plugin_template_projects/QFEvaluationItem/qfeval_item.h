@@ -28,11 +28,11 @@ class QFEVALItem : public QFEvaluationItem {
         /** \brief return type (longer type string, user readable) */
         virtual QString getTypeName() const { return tr(""); };
         /** \brief return a small icon (16x16) */
-        virtual QIcon getSmallIcon() const { return QIcon(":/target_id/qfeval_small.png"); };
+        virtual QIcon getSmallIcon() const { return QIcon(":/target_id/target_id_small.png"); };
         /** \brief return type description */
         virtual QString getTypeDescription() const { return tr(""); };
         /** \brief return a large icon (32x32) */
-        virtual QIcon getLargeIcon() const { return QIcon(":/target_id/qfeval.png"); };
+        virtual QIcon getLargeIcon() const { return QIcon(":/target_id/target_id.png"); };
         /** \brief returns the number of additional editor panes for this record */
         /** \brief returns the name for the i-th editor pane */
         virtual QString getEditorName() { return QString("Evaluation"); };

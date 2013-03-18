@@ -15,6 +15,8 @@
 #include "../base_classes/qffitresultsevaluation.h"
 #include "../base_classes/qffitresultsbyindexevaluation.h"
 #include "qffitalgorithm.h"
+#include "qffcsweightingtools.h"
+#include "qffitresultsbyindexevaluationfittools.h"
 
 /*! \brief evaluation item class for FCS least square fits
     \ingroup qf3evalp_fcsfit
@@ -26,15 +28,9 @@
     \note If a fit function has a parameter with name count_rate this is filled with the count rate stored in the FCS dataset (if
           implemented, i.e. if the QFRawDataset also implements QFRDRCountRatesInterface)
 */
-class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation {
+class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation, public QFFCSWeightingTools, public QFFitResultsByIndexEvaluationFitTools {
         Q_OBJECT
     public:
-        /** \brief which data weighting should be applied */
-        enum DataWeight {
-            EqualWeighting=0,
-            StdDevWeighting=1,
-            RunErrorWeighting=2
-        };
 
         /** Default constructor */
         QFFCSFitEvaluation(QFProject* parent);
@@ -57,11 +53,6 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation {
         /** \brief create an object for the i-th editor pane */
         virtual QFEvaluationEditor* createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent=NULL);
 
-
-        /** \brief set the current fitting algorithm */
-        void setFitDataWeighting(DataWeight weighting) { m_weighting=weighting; }
-        /** \brief get the current fitting algorithm */
-        DataWeight getFitDataWeighting() const { return m_weighting; }
 
 
 
@@ -91,10 +82,6 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation {
         /** \brief calculates fit statistics for the given fit function and dataset. */
         QFFitStatistics calcFitStatistics(bool saveAsresults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
 
-        /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill
-         *         it with the appropriate values, according to the current settings */
-        virtual double* allocWeights(bool* weightsOK=NULL, QFRawDataRecord* record=NULL, int run=-100, int data_start=-1, int data_end=-1)const ;
-
     protected:
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
@@ -108,9 +95,6 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation {
 
         virtual bool hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const;
 
-
-        /** \brief type of data weighting */
-        DataWeight m_weighting;
 
 
     public:

@@ -15,6 +15,7 @@
 #include "qffitfunctionmanager.h"
 #include "qffitalgorithmmanager.h"
 #include "dlgqfprogressdialog.h"
+#include "qffitresultsbyindexevaluationfittools.h"
 
 QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent, bool hasMultiThreaded, bool multiThreadPriority) :
     QFFitResultsByIndexEvaluationEditorBase(iniPrefix, propEditor, services, parent)
@@ -1183,7 +1184,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitCurrent() {
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    if (!eval) return;
+    QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(current.data());
+    if (!eval || !feval) return;
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
     if ((!ffunc)||(!falg)) return;
@@ -1202,7 +1204,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitCurrent() {
     QApplication::processEvents();
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-    eval->doFit(record, eval->getCurrentIndex(), getUserMin(record, eval->getCurrentIndex(), datacut->get_userMin()), getUserMax(record, eval->getCurrentIndex(), datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
+
+    feval->doFit(record, eval->getCurrentIndex(), getUserMin(record, eval->getCurrentIndex(), datacut->get_userMin()), getUserMax(record, eval->getCurrentIndex(), datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
     record->enableEmitResultsChanged(true);
 
     QTime tim;
@@ -1234,7 +1237,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsCurrent() {
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    if (!eval) return;
+    QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(current.data());
+    if (!eval || !feval) return;
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
     if ((!ffunc)||(!eval)||(!falg)) return;
@@ -1267,7 +1271,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsCurrent() {
             dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
 
             //doFit(record, run);
-            eval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
+            feval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
 
             dlgFitProgress->incSuperProgress();
             QApplication::processEvents();
@@ -1296,7 +1300,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAll() {
     if (!cmbModel) return;
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(current);
-    if (!eval) return;
+    QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(current.data());
+    if (!eval || !feval) return;
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
     if ((!ffunc)||(!falg)) return;
@@ -1346,7 +1351,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAll() {
                 dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(uint(int(runtime)%60)),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
 
                 //doFit(record, run);
-                eval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
+                feval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
 
                 falg->setReporter(NULL);
                 QApplication::processEvents();
@@ -1376,7 +1381,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsAll() {
     if (!current) return;
     if (!cmbModel) return;
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    if (!eval) return;
+    QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(current.data());
+    if (!eval || !feval) return;
     QFFitFunction* ffunc=eval->getFitFunction();
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
     if ((!ffunc)||(!falg)) return;
@@ -1433,7 +1439,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsAll() {
                     dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
 
                     //doFit(record, run);
-                    eval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
+                    feval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
 
                     dlgFitProgress->incSuperProgress();
                     QApplication::processEvents();

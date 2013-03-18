@@ -124,12 +124,9 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
 
 
 
-    cmbWeights=new QComboBox(this);
+    cmbWeights=new QFFCDWeightingCombobox(this);
     cmbWeights->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     cmbWeights->setEditable(false);
-    cmbWeights->addItem(tr("equal weights"));
-    cmbWeights->addItem(tr("standard deviation"));
-    cmbWeights->addItem(tr("per run errors"));
     cmbWeights->setMaximumWidth(150);
     cmbWeights->setMinimumWidth(150);
     QLabel* l=new QLabel(tr("&Weight Model: "), this);
@@ -463,7 +460,7 @@ void QFFCSMSDEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
 
         spinFitWidth->setValue(item->getFitWidth());
         connect(spinFitWidth, SIGNAL(valueChanged(int)), this, SLOT(fitWidthChanged(int)));
-        cmbWeights->setCurrentIndex(current->getProperty("weights", 0).toInt());
+        cmbWeights->setCurrentIndex(item->getFitDataWeighting() );//current->getProperty("weights", 0).toInt());
         connect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
         connect(sliderDist, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersDistChanged(int, int, int, int)));
         chkFitRange->setChecked(item->getFitRangeLimited());
@@ -572,7 +569,7 @@ void QFFCSMSDEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
         bool oldde=dataEventsEnabled;
         dataEventsEnabled=false;
         //edtAlpha->setValue(eval->getAlpha());
-        cmbWeights->setCurrentIndex(eval->getCurrentWeights());
+        cmbWeights->setCurrentWeight(eval->getFitDataWeighting());
         cmbFitType->setCurrentIndex(eval->getFitType());
         spinFitWidth->setValue(eval->getFitWidth());
         //edtNumIter->setRange(1,10000); //qMax(0,data->getCorrelationN())
@@ -704,7 +701,7 @@ void QFFCSMSDEvaluationEditor::displayData() {
                 if (eval->getCurrentIndex()<(int)data->getCorrelationRuns()) {
                     c_mean=ds->addColumn(data->getCorrelationRun(eval->getCurrentIndex()), data->getCorrelationN(), QString("run"+QString::number(eval->getCurrentIndex())));
                     graphName=tr("\\verb{%1} %2").arg(record->getName()).arg(data->getCorrelationRunName(eval->getCurrentIndex()));
-                    if (eval->getCurrentWeights()==2) {
+                    if (eval->getFitDataWeighting()==QFFCSWeightingTools::RunErrorWeighting) {
                         c_std=ds->addColumn(data->getCorrelationRunError(eval->getCurrentIndex()), data->getCorrelationN(), "cperrunerror");
                         errorName=tr("per run");
                     } else {
@@ -1871,7 +1868,7 @@ void QFFCSMSDEvaluationEditor::weightsChanged(int weights) {
     if (!current->getHighlightedRecord()) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
-    data->setCurrentWeights(weights);
+    data->setFitDataWeighting(weights);
     displayParameters();
     displayData();
     QApplication::restoreOverrideCursor();

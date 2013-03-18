@@ -59,6 +59,7 @@
 #include "qffitfunctionmanager.h"
 #include "qffitalgorithmmanager.h"
 #include "qfdoubleedit.h"
+#include "qffcsweightingtools.h"
 ////////////
 
 
@@ -122,7 +123,7 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         /** \brief number edit to change NumIter */
         QSpinBox* edtNumIter;
         /** \brief combobox to select a model for the weighting */
-        QComboBox* cmbWeights;
+        QFFCDWeightingCombobox* cmbWeights;
         /** \brief ploter for the MaxEnt Distribution */
         QFPlotter* pltDistribution;
         QToolBar* tbPlot;

@@ -47,11 +47,7 @@ int QFImFCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord *rec, int index)
 }
 
 void QFImFCSFitEvaluationEditor::createWidgets() {
-    cmbWeights=new QComboBox(this);
-    cmbWeights->setEditable(false);
-    cmbWeights->addItem(tr("equal weights"));
-    cmbWeights->addItem(tr("standard deviation"));
-    cmbWeights->addItem(tr("per run errors"));
+    cmbWeights=new QFFCDWeightingCombobox(this);
     cmbWeights->setMaximumWidth(150);
     cmbWeights->setMinimumWidth(150);
     QLabel* l=new QLabel(tr("&Weight Model: "), this);
@@ -119,7 +115,7 @@ void QFImFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerReco
     QFImFCSFitEvaluation* eval=qobject_cast<QFImFCSFitEvaluation*>(currentRecord);
     if (eval) {
         dataEventsEnabled=false;
-        cmbWeights->setCurrentIndex(eval->getFitDataWeighting());
+        cmbWeights->setCurrentWeight(eval->getFitDataWeighting());
         chkDontSaveFitResultMessage->setChecked(current->getProperty("dontSaveFitResultMessage", false).toBool());
         chkLeaveoutMasked->setChecked(current->getProperty("LEAVEOUTMASKED", true).toBool());
         dataEventsEnabled=true;
@@ -676,10 +672,11 @@ void QFImFCSFitEvaluationEditor::weightsChanged(int model) {
     current->setQFProperty("weights", cmbWeights->currentIndex(), false, false);
     QFImFCSFitEvaluation* data=qobject_cast<QFImFCSFitEvaluation*>(current);
     if (data) {
-        if (cmbWeights->currentIndex()==0) data->setFitDataWeighting(QFImFCSFitEvaluation::EqualWeighting);
+        data->setFitDataWeighting(cmbWeights->currentWeight());
+        /*if (cmbWeights->currentIndex()==0) data->setFitDataWeighting(QFImFCSFitEvaluation::EqualWeighting);
         else if (cmbWeights->currentIndex()==1) data->setFitDataWeighting(QFImFCSFitEvaluation::StdDevWeighting);
         else if (cmbWeights->currentIndex()==2) data->setFitDataWeighting(QFImFCSFitEvaluation::RunErrorWeighting);
-        else data->setFitDataWeighting(QFImFCSFitEvaluation::EqualWeighting);
+        else data->setFitDataWeighting(QFImFCSFitEvaluation::EqualWeighting);*/
     }
     displayModel(true);
     replotData();

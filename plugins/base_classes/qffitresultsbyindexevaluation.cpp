@@ -4,12 +4,10 @@ QFFitResultsByIndexEvaluation::QFFitResultsByIndexEvaluation(const QString& fitF
     QFFitResultsEvaluation(fitFunctionPrefix, parent)
 {
     m_currentIndex=0;
-    mutexThreadedFit=new QMutex(QMutex::Recursive);
 }
 
 
 QFFitResultsByIndexEvaluation::~QFFitResultsByIndexEvaluation() {
-    delete mutexThreadedFit;
 }
 
 QString QFFitResultsByIndexEvaluation::getEvaluationResultID(QString fitFunction, int currentIndex) const {
