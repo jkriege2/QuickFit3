@@ -42,7 +42,7 @@ QString QFFitResultsByIndexEvaluation::getEvaluationResultID(int currentIndex) c
     return getEvaluationResultID(m_fitFunction, currentIndex);
 }
 
-bool QFFitResultsByIndexEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QString &paramid, double &value, double &error) const {
+bool QFFitResultsByIndexEvaluation::hasSpecial(const QFRawDataRecord *r, int index, const QString &paramid, double &value, double &error) const {
     return false;
 }
 

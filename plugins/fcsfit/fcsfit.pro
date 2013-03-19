@@ -29,7 +29,8 @@ HEADERS +=  qfpevalfcsfit.h \
     optionswidget.h \
     ../interfaces/qfrdrrunselection.h \
     ../base_classes/qffcsweightingtools.h \
-    ../base_classes/qffitresultsbyindexevaluationfittools.h
+    ../base_classes/qffitresultsbyindexevaluationfittools.h \
+    ../base_classes/qffcstools.h
 
 
 SOURCES +=  qfpevalfcsfit.cpp \
@@ -45,7 +46,8 @@ SOURCES +=  qfpevalfcsfit.cpp \
     ../base_classes/qffitresultsbyindexevaluationfitthread.cpp \
     optionswidget.cpp \
     ../base_classes/qffcsweightingtools.cpp \
-    ../base_classes/qffitresultsbyindexevaluationfittools.cpp
+    ../base_classes/qffitresultsbyindexevaluationfittools.cpp \
+    ../base_classes/qffcstools.cpp
 
 
 FORMS =    estimatefocalvolumedlg.ui \

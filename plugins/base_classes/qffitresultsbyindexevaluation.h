@@ -333,7 +333,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         virtual QString getEvaluationResultID(int currentIndex) const;
 
 
-        virtual bool hasSpecial(QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error) const ;
+        virtual bool hasSpecial(const QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error) const ;
 
 
     public slots:

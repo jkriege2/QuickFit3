@@ -3,7 +3,7 @@
 #include "../interfaces/qfrdrfcsdatainterface.h"
 #include "qffitfunction.h"
 #include "qftools.h"
-
+#include "qffcstools.h"
 
 QFImFCSFitEvaluation::QFImFCSFitEvaluation(QFProject* parent):
     QFFitResultsByIndexAsVectorEvaluation("fcs_,dls_,fccs_", parent)
@@ -49,13 +49,14 @@ bool QFImFCSFitEvaluation::isApplicable(QFRawDataRecord* record) {
     return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
 }
 
-bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const {
+bool QFImFCSFitEvaluation::hasSpecial(const QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const {
     int run=getIndexFromEvaluationResultID(id);
     return hasSpecial(r, run, paramid, value, error);
 }
 
-bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QString &paramid, double &value, double &error) const {
-    if (paramid=="count_rate") {
+bool QFImFCSFitEvaluation::hasSpecial(const QFRawDataRecord *r, int index, const QString &paramid, double &value, double &error) const {
+    return qfFCSHasSpecial(r, index, paramid, value, error);
+    /*if (paramid=="count_rate") {
         QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
         value=0;
         error=0;
@@ -149,7 +150,7 @@ bool QFImFCSFitEvaluation::hasSpecial(QFRawDataRecord *r, int index, const QStri
         error=0;
         return true;
     }
-    return false;
+    return false;*/
 }
 
 int QFImFCSFitEvaluation::getIndexMin(QFRawDataRecord* r) const {
@@ -345,7 +346,7 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                     }
 
                     ffunc->calcParameter(params, errors);
-                    ffunc->sortParameter(params, errors);
+                    ffunc->sortParameter(params, errors, paramsFix);
                     ffunc->calcParameter(params, errors);
 
                     for (int i=0; i<ffunc->paramCount(); i++) {
@@ -590,7 +591,11 @@ QFFitStatistics QFImFCSFitEvaluation::calcFitStatistics(bool storeAsResults, QFF
 }
 
 bool QFImFCSFitEvaluation::overrideFitFunctionPreset(QString paramid, double &value) const {
-    if (paramid=="focus_width") {
+    if (qfFCSOverrideFitFunctionPreset(this, paramid, value)) {
+        return true;
+    }
+    return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPreset(paramid, value);
+    /*if (paramid=="focus_width") {
         if (propertyExists("PRESET_FOCUS_WIDTH")) {
             double fw=getProperty("PRESET_FOCUS_WIDTH", 0).toDouble();
             if (fw<=0) return false;
@@ -614,12 +619,11 @@ bool QFImFCSFitEvaluation::overrideFitFunctionPreset(QString paramid, double &va
             return true;
         }
     }
-    return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPreset(paramid, value);
+    return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPreset(paramid, value);*/
 }
 
-bool QFImFCSFitEvaluation::overrideFitFunctionPresetError(QString paramid, double &value) const
-{
-    if (paramid=="focus_width") {
+bool QFImFCSFitEvaluation::overrideFitFunctionPresetError(QString paramid, double &value) const {
+    /*if (paramid=="focus_width") {
         if (propertyExists("PRESET_FOCUS_WIDTH_ERROR")) {
             double fw=getProperty("PRESET_FOCUS_WIDTH_ERROR", 0).toDouble();
             if (fw<=0) return false;
@@ -643,12 +647,16 @@ bool QFImFCSFitEvaluation::overrideFitFunctionPresetError(QString paramid, doubl
             return true;
         }
     }
+    return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetError(paramid, value);*/
+    if (qfFCSOverrideFitFunctionPresetError(this, paramid, value)) {
+        return true;
+    }
     return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetError(paramid, value);
 }
 
 bool QFImFCSFitEvaluation::overrideFitFunctionPresetFix(QString paramid, bool &value) const
 {
-    if (paramid=="focus_width") {
+    /*if (paramid=="focus_width") {
         if (propertyExists("PRESET_FOCUS_WIDTH_FIX")) {
             value=getProperty("PRESET_FOCUS_WIDTH_FIX", 0).toDouble();
             return true;
@@ -666,7 +674,12 @@ bool QFImFCSFitEvaluation::overrideFitFunctionPresetFix(QString paramid, bool &v
             return true;
         }
     }
+    return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetFix(paramid, value);*/
+    if (qfFCSOverrideFitFunctionPresetFix(this, paramid, value)) {
+        return true;
+    }
     return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetFix(paramid, value);
+
 }
 
 
@@ -794,7 +807,7 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
                 }
 
                 ffunc->calcParameter(params, errors);
-                ffunc->sortParameter(params, errors);
+                ffunc->sortParameter(params, errors, paramsFix);
                 ffunc->calcParameter(params, errors);
 
                 for (int i=0; i<ffunc->paramCount(); i++) {

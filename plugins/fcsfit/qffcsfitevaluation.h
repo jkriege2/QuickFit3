@@ -80,7 +80,7 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation, public QFFCSWei
         virtual void doFitForMultithread(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const;
 
         /** \brief calculates fit statistics for the given fit function and dataset. */
-        QFFitStatistics calcFitStatistics(bool saveAsresults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
+        //QFFitStatistics calcFitStatistics(bool saveAsresults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
 
     protected:
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
@@ -93,8 +93,11 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation, public QFFCSWei
         /*! \copydoc QFFitResultsEvaluation::intReadDataAlgorithm()      */
         virtual void intReadDataAlgorithm(QDomElement& e);
 
-        virtual bool hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const;
+        virtual bool hasSpecial(const QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const;
 
+        virtual bool overrideFitFunctionPreset(QString paramName, double &value) const ;
+        virtual bool overrideFitFunctionPresetError(QString paramName, double &value) const ;
+        virtual bool overrideFitFunctionPresetFix(QString paramName, bool &value) const ;
 
 
     public:

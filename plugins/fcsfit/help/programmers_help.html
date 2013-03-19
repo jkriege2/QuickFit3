@@ -26,6 +26,12 @@
 		   <li><tt>focus_distancey</tt> the distance of two foci in y-direction in a 2fFCS/DCCFmeasurement in nanometers.</li>
 		 </ul>
 	   </li>
+	   <li>It is possible to overwrite the QFFitFunction given initial parameter values with the QFEvaluationItem's QFProperties interface, by setting a property of the following names to the desired initial value/err/fix:
+	   <ul>
+	     <li><tt>PRESET_<i>PARAMID</i></tt>: overwrites the initial values of the parameter <tt><i>PARAMID</i></tt> (in all upper-case letters).</li>
+	     <li><tt>PRESET_<i>PARAMID</i>_ERROR</tt>: overwrites the initial error of the parameter <tt><i>PARAMID</i></tt> (in all upper-case letters).</li>
+	     <li><tt>PRESET_<i>PARAMID</i>_FIX</tt>: overwrites the initial fix state of the parameter <tt><i>PARAMID</i></tt> (in all upper-case letters).</li>
+	   </ul>
 	 </ul>
 
 	 <p></p>

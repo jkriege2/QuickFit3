@@ -15,7 +15,7 @@
 
 
 /*! \brief evaluation item class 
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3rdrdp_imfccsfit
 
 
     
@@ -81,18 +81,27 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
 
 
     protected:
+
+
+
+
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
         virtual bool isApplicable(QFRawDataRecord* record);
-        
-        /** \brief write object contents into XML file
-         *
-         *  this function saves the id of the current fit function and algorithm, as well as the contents of parameterStore to
-         *  the given XML file.
-         */
-        virtual void intWriteData(QXmlStreamWriter& w);
-        /** \brief read back the data stored by intWriteXML() */
-        virtual void intReadData(QDomElement* e);
+
+        /*! \copydoc QFFitResultsEvaluation::intWriteDataAlgorithm()      */
+        virtual void intWriteDataAlgorithm(QXmlStreamWriter& w) const;
+
+        /*! \copydoc QFFitResultsEvaluation::intReadDataAlgorithm()      */
+        virtual void intReadDataAlgorithm(QDomElement& e);
+
+        virtual bool hasSpecial(const QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const;
+        virtual bool hasSpecial(const QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error) const ;
+
+
+        virtual bool overrideFitFunctionPreset(QString paramName, double &value) const ;
+        virtual bool overrideFitFunctionPresetError(QString paramName, double &value) const ;
+        virtual bool overrideFitFunctionPresetFix(QString paramName, bool &value) const ;
 
 };
 

@@ -545,7 +545,7 @@ signals:
             \return \c true if a special value is found. In that case it returns the value in \a value and \a error
 
          */
-        virtual bool hasSpecial(QFRawDataRecord* r, const QString& resultID, const QString& paramid, double& value, double& error) const;
+        virtual bool hasSpecial(const QFRawDataRecord* r, const QString& resultID, const QString& paramid, double& value, double& error) const;
         /*! \brief struct used to describe fit parameter default values */
         struct FitParameterDefault {
             double value;

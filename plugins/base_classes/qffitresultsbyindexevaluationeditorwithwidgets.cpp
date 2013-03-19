@@ -1502,7 +1502,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitEverythingThreaded() {
     QList<QFFitResultsByIndexEvaluationFitThread*> threads;
     int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
     if (ProgramOptions::getConfigValue(eval->getType()+"/overrule_threads", false).toBool()) {
-        threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/thrads", 1).toInt());
+        threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
     }
     for (int i=0; i<threadcount; i++) {
         QFFitResultsByIndexEvaluationFitThread* t=new QFFitResultsByIndexEvaluationFitThread(true, this);
@@ -1637,7 +1637,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllRunsThreaded() {
     QList<QFFitResultsByIndexEvaluationFitThread*> threads;
     int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
     if (ProgramOptions::getConfigValue(eval->getType()+"/overrule_threads", false).toBool()) {
-        threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/thrads", 1).toInt());
+        threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
     }
     for (int i=0; i<threadcount; i++) {
         threads.append(new QFFitResultsByIndexEvaluationFitThread(true, this));
@@ -1768,7 +1768,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllFilesThreaded()
     QList<QFFitResultsByIndexEvaluationFitThread*> threads;
     int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
     if (ProgramOptions::getConfigValue(eval->getType()+"/overrule_threads", false).toBool()) {
-        threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/thrads", 1).toInt());
+        threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
     }
     for (int i=0; i<threadcount; i++) {
         threads.append(new QFFitResultsByIndexEvaluationFitThread(true, this));

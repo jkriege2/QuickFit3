@@ -2,16 +2,19 @@
 #define QFIMFCCSFITEVALUATION_H
 
 #include "qfpluginevaluation.h"
+#include "qfpluginoptionsdialog.h"
+#include "qfpluginservices.h"
+
 /*!
-    \defgroup qf3rdrdp_GROUPNAME Evaluation Item Plugin
+    \defgroup qf3rdrdp_imfccsfit Evaluation Item Plugin for imaging Fluorescence Crosscorrelation Spectroscopy Fits
     \ingroup qf3evaluationplugins
 */
-/*! \brief Evaluation Item Plugin class
-    \ingroup qf3rdrdp_GROUPNAME
+/*! \brief imFCCS Evaluation Item Plugin class
+    \ingroup qf3rdrdp_imfccsfit
 */
-class QFImFCCSFitEvaluation : public QObject, public QFPluginEvaluationItemBase {
+class QFImFCCSFitEvaluation : public QObject, public QFPluginEvaluationItemBase, public QFPluginOptionsDialogInterface {
         Q_OBJECT
-        Q_INTERFACES(QFPluginEvaluationItem)
+        Q_INTERFACES(QFPluginEvaluationItem QFPluginOptionsDialogInterface)
     public:
         /** Default constructor */
         QFImFCCSFitEvaluation(QObject* parent=NULL);
@@ -54,9 +57,17 @@ class QFImFCCSFitEvaluation : public QObject, public QFPluginEvaluationItemBase 
             minor=0;
         };
 
+
+
+
+        QString pluginOptionsName() const;
+        QIcon pluginOptionsIcon() const;
+        QFPluginOptionsWidget *createOptionsWidget(QWidget *parent);
+
     protected slots:
         /** \brief insert FCS data from file*/
         void insertEvaluation();
+
 
     private:
 };

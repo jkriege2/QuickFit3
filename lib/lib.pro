@@ -82,7 +82,9 @@ HEADERS += dlgnewproperty.h \
     qfhistogramservice.h \
     matlabtools.h \
     qftextdocumentprintpreview.h \
-    qfmatchrdrfunctor.h
+    qfmatchrdrfunctor.h \
+    qfpreprocessormagic.h \
+    qfpreprocessormagic_private.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \

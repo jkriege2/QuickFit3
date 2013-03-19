@@ -20,4 +20,6 @@ SOURCES += main.cpp \
     ../../qftools.cpp
 
 HEADERS += \
-    ../../qftools.h
+    ../../qftools.h \
+    ../../qfpreprocessormagic_private.h \
+    ../../qfpreprocessormagic.h

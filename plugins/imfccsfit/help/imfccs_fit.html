@@ -2,10 +2,31 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-  <title>Plugin Online-Help</title>
+  <title>Imaging Fluorescence Crosscorrelation Spectroscopy (imFCCS) Fit Online-Help</title>
   </head>
   <body>
-		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$  
+	 <p>
+	 This plugin allows to perform fits for imaging FCCS data. <br>
+	 This plugin allows to perform fits on several processor cores in parallel (multi-threaded). Set the maximum number of processors to use in the <a href="$$mainhelpdir$$qf3_settings.html">general settings dialog</a>.
+	 <ol>
+	   <li><a href="./ui.html">imFCS Curve Fit User Interface</a></li>
+	   <li><a href="./fit_statistics.html">Explanation of Fit Statistics</a></li>
+	   <li><a href="./configuration.html">Configuration (global fit parameter presets ...)</a></li>
+	   <li><a href="./options.html">Configuration options in the mains ettings dialog</a></li>
+	   <li><a href="./programmers_help.html"><small>Hints for fit model programmers</small></a></li>
+	 </ol>
+	 </p>
+	 <p>
+	 This plugin uses any of the available <a href="$$mainhelpdir$$qf3_fitalg.html">Fit Algorithm Plugins</a> to execute the model fit:
+	 $$list:fitalg:$$ 
+	 </p>
+	 <p>
+	 Models have to be implemented as <a href="$$mainhelpdir$$qf3_fitfunc.html">Fit Function Plugins</a>. Models that may be used with this plugin are:
+	 $$list:fitfunc:fcs_$$
+	 $$list:fitfunc:fccs_$$
+	 $$list:fitfunc:dls_$$
+	 </p>
   </body>
+
 </html>

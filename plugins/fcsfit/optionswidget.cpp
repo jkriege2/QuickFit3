@@ -20,7 +20,7 @@ void OptionsWidget::readSettings(ProgramOptions *options)
 {
     ui->chkLog->setChecked(options->getConfigValue("fcs_fit/log", false).toBool());
     ui->chkOverrule->setChecked(options->getConfigValue("fcs_fit/overrule_threads", false).toBool());
-    ui->spinThreads->setValue(options->getConfigValue("fcs_fit/thrads", 1).toInt());
+    ui->spinThreads->setValue(options->getConfigValue("fcs_fit/threads", 1).toInt());
 }
 
 void OptionsWidget::writeSettings(ProgramOptions *options)
@@ -28,5 +28,5 @@ void OptionsWidget::writeSettings(ProgramOptions *options)
 
     options->setConfigValue("fcs_fit/log", ui->chkLog->isChecked());
     options->setConfigValue("fcs_fit/overrule_threads", ui->chkOverrule->isChecked());
-    options->setConfigValue("fcs_fit/thrads", ui->spinThreads->value());
+    options->setConfigValue("fcs_fit/threads", ui->spinThreads->value());
 }

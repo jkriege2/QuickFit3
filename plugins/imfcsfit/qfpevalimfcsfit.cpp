@@ -34,10 +34,6 @@ void QFPEvalIMFCSFit::registerToMenu(QMenu* menu) {
     connect(actFCS, SIGNAL(triggered()), this, SLOT(insertFCSFit()));
     menu->addAction(actFCS);
 
-    /*QAction* actFCSCalib=new QAction(QIcon(":/imfcsfit/imfcs_fitcalib.png"), tr("imFCS Calibration"), parentWidget);
-    actFCSCalib->setStatusTip(tr("Insert a set of imFCS least-squares fit evaluations for a SPIM calibration"));
-    connect(actFCSCalib, SIGNAL(triggered()), this, SLOT(insertFCSFitForCalibration()));
-    menu->addAction(actFCSCalib);*/
     menu->addMenu(menuCalibration);
 
 

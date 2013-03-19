@@ -2,7 +2,7 @@
 #include "qffcsfitevaluationeditor.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
 #include "qffitfunction.h"
-
+#include "qffcstools.h"
 
 QFFCSFitEvaluation::QFFCSFitEvaluation(QFProject* parent):
     QFFitResultsByIndexEvaluation("fcs_,dls_,fccs_", parent)
@@ -56,9 +56,10 @@ bool QFFCSFitEvaluation::isApplicable(QFRawDataRecord* record) {
     return record->inherits("QFRDRFCSDataInterface");
 }
 
-bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const {
+bool QFFCSFitEvaluation::hasSpecial(const QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const {
     int run=getIndexFromEvaluationResultID(id);
-    if (paramid=="count_rate") {
+    return qfFCSHasSpecial(r, run, paramid, value, error);
+    /*if (paramid=="count_rate") {
         QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
         value=0;
         error=0;
@@ -189,7 +190,31 @@ bool QFFCSFitEvaluation::hasSpecial(QFRawDataRecord* r, const QString& id, const
         return true;
     }
 
-    return false;
+    return false;*/
+}
+
+bool QFFCSFitEvaluation::overrideFitFunctionPreset(QString paramName, double &value) const
+{
+    if (qfFCSOverrideFitFunctionPreset(this, paramName, value)) {
+        return true;
+    }
+    return QFFitResultsByIndexEvaluation::overrideFitFunctionPreset(paramName, value);
+}
+
+bool QFFCSFitEvaluation::overrideFitFunctionPresetError(QString paramName, double &value) const
+{
+    if (qfFCSOverrideFitFunctionPresetError(this, paramName, value)) {
+        return true;
+    }
+    return QFFitResultsByIndexEvaluation::overrideFitFunctionPresetError(paramName, value);
+}
+
+bool QFFCSFitEvaluation::overrideFitFunctionPresetFix(QString paramName, bool &value) const
+{
+    if (qfFCSOverrideFitFunctionPresetFix(this, paramName, value)) {
+        return true;
+    }
+    return QFFitResultsByIndexEvaluation::overrideFitFunctionPresetFix(paramName, value);
 }
 
 int QFFCSFitEvaluation::getIndexMin(QFRawDataRecord* r) const {
@@ -386,7 +411,7 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
                     }
 
                     ffunc->calcParameter(params, errors);
-                    ffunc->sortParameter(params, errors);
+                    ffunc->sortParameter(params, errors, paramsFix);
                     ffunc->calcParameter(params, errors);
 
                     for (int i=0; i<ffunc->paramCount(); i++) {
@@ -529,7 +554,7 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
 }
 
 
-QFFitStatistics QFFCSFitEvaluation::calcFitStatistics(bool saveAsResults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record, int run) {
+/*QFFitStatistics QFFCSFitEvaluation::calcFitStatistics(bool saveAsResults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record, int run) {
     QFFitStatistics result= ffunc->calcFitStatistics(N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins);
 
     if (record) {
@@ -584,7 +609,7 @@ QFFitStatistics QFFCSFitEvaluation::calcFitStatistics(bool saveAsResults, QFFitF
     }
 
     return result;
-}
+}*/
 
 
 
@@ -717,7 +742,7 @@ void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, i
                 }
 
                 ffunc->calcParameter(params, errors);
-                ffunc->sortParameter(params, errors);
+                ffunc->sortParameter(params, errors, paramsFix);
                 ffunc->calcParameter(params, errors);
 
                 for (int i=0; i<ffunc->paramCount(); i++) {

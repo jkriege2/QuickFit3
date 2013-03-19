@@ -508,7 +508,7 @@ QString QFUsesResultsEvaluation::getFitParamFixID(QString fitparam) const {
     return QString("%1_fix").arg(fitparam);
 }
 
-bool QFUsesResultsEvaluation::hasSpecial(QFRawDataRecord *r, const QString &resultID, const QString &paramid, double &value, double &error) const {
+bool QFUsesResultsEvaluation::hasSpecial(const QFRawDataRecord *r, const QString &resultID, const QString &paramid, double &value, double &error) const {
     return false;
 }
 

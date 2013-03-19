@@ -47,7 +47,7 @@ class QFFitFunctionsSPIMFCSDiffE2: public QFFitFunction {
         virtual void evaluateDerivatives(double* derivatives, double t, const double* parameters) const ;
 
         /*! \copydoc QFFitFunction::sortParameter()   */
-        virtual void sortParameter(double* parameterValues, double* error=NULL) const;
+        virtual void sortParameter(double* parameterValues, double* error=NULL , bool *fix=NULL) const;
 };
 
 #endif // QFFitFunctionsSPIMFCSDiffE2E2_H

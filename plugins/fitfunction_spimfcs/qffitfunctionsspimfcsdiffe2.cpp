@@ -108,8 +108,8 @@ double QFFitFunctionsSPIMFCSDiffE2::evaluate(double t, const double* data) const
 void QFFitFunctionsSPIMFCSDiffE2::evaluateDerivatives(double* derivatives, double t, const double* data) const {
 }
 
-void QFFitFunctionsSPIMFCSDiffE2::sortParameter(double *parameterValues, double *error) const {
-    const int comp=parameterValues[FCSSDiff_n_components];
+void QFFitFunctionsSPIMFCSDiffE2::sortParameter(double *parameterValues, double *error, bool *fix) const {
+    /*const int comp=parameterValues[FCSSDiff_n_components];
     const double N=parameterValues[FCSSDiff_n_particle];
     const double D1=parameterValues[FCSSDiff_diff_coeff1];
     const double rho1=parameterValues[FCSSDiff_diff_rho1];
@@ -232,14 +232,9 @@ void QFFitFunctionsSPIMFCSDiffE2::sortParameter(double *parameterValues, double 
            }
         }
 
-        /*if (parameterValues[FCSSDiff_diff_coeff3]>parameterValues[FCSSDiff_diff_coeff2]) {
-            qSwap(parameterValues[FCSSDiff_diff_coeff3], parameterValues[FCSSDiff_diff_coeff2]);
-            qSwap(parameterValues[FCSSDiff_diff_rho3], parameterValues[FCSSDiff_diff_rho2]);
-            qSwap(error[FCSSDiff_diff_coeff3], error[FCSSDiff_diff_coeff2]);
-            qSwap(error[FCSSDiff_diff_rho3], error[FCSSDiff_diff_rho2]);
-        }*/
 
-    }
+
+    }*/
 
 
 }

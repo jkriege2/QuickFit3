@@ -11,7 +11,7 @@ namespace Ui {
 }
 
 /*! \brief editor for QFImFCCSFitEvaluationItem
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3rdrdp_imfccsfit
 */
 class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         Q_OBJECT

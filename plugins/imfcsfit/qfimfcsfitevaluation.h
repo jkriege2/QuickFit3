@@ -98,8 +98,8 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation, publi
         /*! \copydoc QFFitResultsEvaluation::intReadDataAlgorithm()      */
         virtual void intReadDataAlgorithm(QDomElement& e);
 
-        virtual bool hasSpecial(QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const;
-        virtual bool hasSpecial(QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error) const ;
+        virtual bool hasSpecial(const QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const;
+        virtual bool hasSpecial(const QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error) const ;
 
 
         virtual bool overrideFitFunctionPreset(QString paramName, double &value) const ;

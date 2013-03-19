@@ -88,15 +88,6 @@ double QFFitFunctionsSPIMFCCSDiffFlow::evaluate(double t, const double* data) co
     return offset+pre/N*cfac*backfactor;
 }
 
-void QFFitFunctionsSPIMFCCSDiffFlow::evaluateDerivatives(double* derivatives, double t, const double* data) const {
-}
-
-void QFFitFunctionsSPIMFCCSDiffFlow::sortParameter(double *parameterValues, double *error) const {
-
-
-
-}
-
 void QFFitFunctionsSPIMFCCSDiffFlow::calcParameter(double* data, double* error) const {
     double N=data[FCCSDiff_n_particle];
     double eN=0;

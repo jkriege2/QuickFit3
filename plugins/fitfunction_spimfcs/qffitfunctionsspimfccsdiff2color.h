@@ -1,23 +1,23 @@
-#ifndef QFFitFunctionsSPIMFCCSDiffFlow_H
-#define QFFitFunctionsSPIMFCCSDiffFlow_H
+#ifndef QFFitFunctionsSPIMFCCSDiff2Color_H
+#define QFFitFunctionsSPIMFCCSDiff2Color_H
 #include "qfpluginfitfunction.h"
 
 
 
 
-/*! \brief QFFitFunction class for a SPIM-FCCS fit model with pure diffusion and flow and 1/sqrt(e) lateral width
+/*! \brief QFFitFunction class for a SPIM-FCCS fit model with pure diffusion for 2-color crosscorrelation and 1/sqrt(e) lateral width
     \ingroup qf3fitfunp_fitfunctions_spimfcs
 */
-class QFFitFunctionsSPIMFCCSDiffFlow: public QFFitFunction {
+class QFFitFunctionsSPIMFCCSDiff2Color: public QFFitFunction {
     public:
-        QFFitFunctionsSPIMFCCSDiffFlow();
-        virtual ~QFFitFunctionsSPIMFCCSDiffFlow() {}
+        QFFitFunctionsSPIMFCCSDiff2Color();
+        virtual ~QFFitFunctionsSPIMFCCSDiff2Color() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCCS: Diffusion+Flow, 2-pixel crosscorrelation (1/sqrt(e) radii)"); };
+        virtual QString name() const { return QString("SPIM-FCCS: Diffusion 2-color crosscorrelation (1/sqrt(e) radii)"); };
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("SPIM-FCCS: Diffusion+Flow (1/sqrt(e) radii)"); };
+        virtual QString shortName() const { return QObject::tr("SPIM-FCCS: Diffusion 2-color (1/sqrt(e) radii)"); };
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("fccs_spim_diffflow"); };
+        virtual QString id() const { return QString("fccs_spim_diff2color"); };
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
@@ -34,7 +34,7 @@ class QFFitFunctionsSPIMFCCSDiffFlow: public QFFitFunction {
         virtual QString transformParametersForAdditionalPlot(int plot, double* params);
 
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
-        virtual bool get_implementsDerivatives() { return false; };
+        virtual bool get_implementsDerivatives() { return false; }
 };
 
-#endif // QFFitFunctionsSPIMFCCSDiffFlow_H
+#endif // QFFitFunctionsSPIMFCCSDiff2Color_H

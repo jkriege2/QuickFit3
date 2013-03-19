@@ -1,11 +1,13 @@
 #include "qfimfccsfitevaluation.h"
 #include <QtGui>
 #include "qfimfccsfitevaluation_item.h"
+#include "qffcstools.h"
+#include "optionswidget.h"
 
 QFImFCCSFitEvaluation::QFImFCCSFitEvaluation(QObject* parent):
     QObject(parent)
 {
-    //ctor
+    QFPluginServices::getInstance()->registerSettingsPane(this);
 }
 
 QFImFCCSFitEvaluation::~QFImFCCSFitEvaluation()
@@ -25,6 +27,21 @@ void QFImFCCSFitEvaluation::registerToMenu(QMenu* menu) {
     menu->addAction(actAddEval);
 }
 
+QString QFImFCCSFitEvaluation::pluginOptionsName() const
+{
+    return getName();
+}
+
+QIcon QFImFCCSFitEvaluation::pluginOptionsIcon() const
+{
+    return QIcon(getIconFilename());
+}
+
+QFPluginOptionsWidget *QFImFCCSFitEvaluation::createOptionsWidget(QWidget *parent)
+{
+    return new OptionsWidget(this, parent);
+}
+
 
 
 
@@ -33,5 +50,6 @@ void QFImFCCSFitEvaluation::insertEvaluation() {
         project->addEvaluation(getID(), getName());
     }
 }
+
 
 Q_EXPORT_PLUGIN2(imfccs_fit, QFImFCCSFitEvaluation)

@@ -22,7 +22,9 @@ HEADERS += qfimfccsfitevaluation.h \
     ../base_classes/qffitresultsbyindexevaluation.h \
     ../base_classes/qffitresultsevaluation.h \
     ../base_classes/qffitresultsbyindexevaluationfittools.h \
-    ../base_classes/qffcsweightingtools.h
+    ../base_classes/qffcsweightingtools.h \
+    ../base_classes/qffcstools.h \
+    optionswidget.h
 
 SOURCES += qfimfccsfitevaluation.cpp \
            qfimfccsfitevaluation_item.cpp \
@@ -31,9 +33,12 @@ SOURCES += qfimfccsfitevaluation.cpp \
     ../base_classes/qffitresultsbyindexevaluation.cpp \
     ../base_classes/qffitresultsevaluation.cpp \
     ../base_classes/qffitresultsbyindexevaluationfittools.cpp \
-    ../base_classes/qffcsweightingtools.cpp
+    ../base_classes/qffcsweightingtools.cpp \
+    ../base_classes/qffcstools.cpp \
+    optionswidget.cpp
 
-FORMS = qfimfccsfitevaluation_editor.ui   
+FORMS = qfimfccsfitevaluation_editor.ui \   
+    optionswidget.ui
 
 RESOURCES += qfimfccsfitevaluation.qrc
 
@@ -44,7 +49,7 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
-QT += gui xml core
+QT += gui xml svg core
 CONFIG += exceptions rtti stl
 
 

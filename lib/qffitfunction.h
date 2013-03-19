@@ -181,7 +181,7 @@ class QFLIB_EXPORT QFFitFunction {
             \param[in,out] error if \c !=NULL this contains the errors to be sorted
             \see calcParameter()
         */
-        virtual void sortParameter(double* parameterValues, double* error=NULL) const {};
+        virtual void sortParameter(double* parameterValues, double* error=NULL, bool* fix=NULL) const {};
 
         /*! \brief returns \c true if the given parameter is currently visible (which could e.g. depend on the setting of the other parameters)
             \param parameter which parameter to test
