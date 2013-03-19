@@ -9,23 +9,25 @@
 		<h2>SPIM-FCCS fit model: anomalous diffusion, 1/&radic;<span style="border-top: 1px solid black">e</span>-radii</h2>
 		<p>This function implements a 1..3-component anomalous diffusion model for data acquired with a camera in SPIM illumination mode. 
 		The fit function is defined as:
-		$$bmath:g(\tau)=G_\infty+\frac{1}{N}\cdot\frac{1}{4a^2\sqrt{\pi}}\cdot\sum\limits_{i=1}^3\rho_i\cdot\left[2a\cdot\mbox{erf}\left(\frac{a}{2\cdot\sqrt{\Gamma_i\tau^{\alpha_i}+\sigma_{xy}^2}}\right)+\frac{4\cdot\sqrt{\Gamma_i\tau^{\alpha_i}+\sigma_{xy}^2}}{\sqrt{\pi}}\cdot\left(\exp\left(-\frac{a^2}{4\cdot(\Gamma_i\tau^{\alpha_i}+\sigma_{xy}^2)}\right)-1\right)\right]^2\cdot\left[1+\frac{\Gamma_i\tau^{\alpha_i}}{\sigma_z^2}\right]^{-1/2}$$
+		$$bmath:g(\tau)=G_\infty+\frac{(I-B)^2}{I^2}\cdot\frac{1}{N}\cdot\frac{1}{4a^2\sqrt{\pi}}\cdot\sum_{i=1}^3\rho_i\cdot\left[2a\cdot\mbox{erf}\left(\frac{a}{2\cdot\sqrt{\Gamma_i\tau^{\alpha_i}+\sigma_{xy}^2}}\right)+\frac{4\cdot\sqrt{\Gamma_i\tau^{\alpha_i}+\sigma_{xy}^2}}{\sqrt{\pi}}\cdot\left(\exp\left(-\frac{a^2}{4\cdot(\Gamma_i\tau^{\alpha_i}+\sigma_{xy}^2)}\right)-1\right)\right]^2\cdot\left[1+\frac{\Gamma_i\tau^{\alpha_i}}{\sigma_z^2}\right]^{-1/2}$$
 		The parameters are:
 		<blockquote><table border=1>
 		  <tr><th>var.</th><th>Parameter</th></tr>
 		  <tr><td><i>G<sub>&infin;</sub></i></td><td>constant offset</td></tr>
 		  <tr><td><i>N</i></td><td>particle number in the observation volume</td></tr>
-		  <tr><td><i>&Gamma;<sub>i</sub></i></td><td><i>i</i>-th anomalous diffusion coefficient: $$math:\langle r^2(\tau)\rangle=6\cdot\Gamma_i\cdot\tau^{\alpha_i}=6\cdot\frac{K_i\cdot\tau^{\alpha_i}}{\Gamma(1+\alpha)} $$</td></tr>
+		  <tr><td><i>&Gamma;<sub>i</sub></i></td><td><i>i</i>-th anomalous diffusion coefficient: $$math:\langle r^2(\tau)\rangle=6\cdot\Gamma\cdot\tau^\alpha=6\cdot\frac{K}{\Gamma (1+\alpha )} \cdot\tau^{\alpha} $$</td></tr>
 		  <tr><td><i>&alpha;<sub>i</sub></i></td><td><i>i</i>-th anomality parameter</td></tr>
 		  <tr><td><i>&rho;<sub>i</sub></i></td><td>fraction of <i>i</i>-th diffusing component</td></tr>
 		  <tr><td><i>a</i></td><td>width of a (square) pixel in the image plane (i.e. pixel size of camera divided by the magnification)</td></tr>
 		  <tr><td><i>&sigma;<sub>xy</sub></i></td><td>lateral radius of the point-spread function (PSF), 1/&radic;<span style="border-top: 1px solid black">e</span>-radius</td></tr>
 		  <tr><td><i>&sigma;<sub>z</sub></i></td><td>longitudinal radius of the point-spread function (PSF), 1/&radic;<span style="border-top: 1px solid black">e</span>-radius</td></tr>
+		  <tr><td>$$math:I$$</td><td>average measured intensity in focus during measurement</td></tr>
+    		  <tr><td>$$math:B$$</td><td>average background intenisty in focus during measurement</td></tr>
 		</table>  </blockquote>
 		For the fractions we have in addition:
-		<blockquote> <i>&rho;<sub>1</sub> = 1 - &rho;<sub>2</sub></i> - &rho;<sub>3</sub><br></i>
-		             <i>&Delta;&rho;<sub>1</sub> = &radic;<span style="border-top: 1px solid black">(&Delta;&rho;<sub>2</sub><sup>2</sup> + &Delta;&rho;<sub>3</sub><sup>2</sup>)</span></i>
-		</blockquote>
+		$$bmath:\rho_1=1-\rho_2-\rho_3$$
+                                                                                    $$bmath:\Delta\rho_1=\sqrt{\Delta\rho_2^2+\Delta\rho_3^2}$$
+		
 		</p>
 		<p>The focal volume is calculated as:
 		<blockquote><img src="./pic/form_388.png"><br><img src="./pic/form_389.png"></blockquote>

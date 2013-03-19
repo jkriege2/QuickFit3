@@ -36,7 +36,8 @@ class QFWIDLIB_EXPORT QFHTMLHighlighter : public QSyntaxHighlighter
         enum State {
                     NormalState = -1,
                     InComment,
-                    InTag
+                    InTag,
+                    Text
                 };
         QTextCharFormat m_formats[LastConstruct + 1];
 

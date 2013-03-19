@@ -12,7 +12,7 @@
 		  Wohland T, Shi X, Sankaran J, Stelzer EH (2010): <b>Single plane illumination fluorescence correlation spectroscopy (SPIM-FCS) probes inhomogeneous three-dimensional environments</b>, <i>Optics Express</i> <b>18</b>(10): 10627-10641, doi: 10.1364/OE.18.010627.
 		</blockquote>
 		The fit function is defined as:
-		$$bmath:g(\tau)=G_\infty + \frac{1}{4a^2N}\cdot\left(1+\frac{D\tau}{\sigma_z^2}\right)^{-1/2}\cdot g_{xy}(\tau; d_x, v_x)\cdot g_{xy}(\tau; d_y, v_y)$$
+		$$bmath:g(\tau)=G_\infty + \frac{(I-B)^2}{I^2}\cdot\frac{1}{4a^2N}\cdot\left(1+\frac{D\tau}{\sigma_z^2}\right)^{-1/2}\cdot g_{xy}(\tau; d_x, v_x)\cdot g_{xy}(\tau; d_y, v_y)$$
 		$$bmath:\mathrm{with:} g_{xy}(\tau;v,d)=\frac{2\sqrt{D\tau+\sigma_{xy}^2}}{\sqrt{\pi}}\cdot\left(\exp\left[-\frac{(a+d-v\tau)^2}{4(D\tau+\sigma_{xy}^2)}\right]+\exp\left[-\frac{(a-d+v\tau)^2}{4(D\tau+\sigma_{xy}^2)}\right] -2\cdot\exp\left[-\frac{(d-v\tau)^2}{4(D\tau+\sigma_{xy}^2)}\right]  \right)+(a+d+v\tau)\cdot\text{erf}\left(\frac{a+d-v\tau}{2\sqrt{D\tau+\sigma_{xy}^2}}\right) +(a-d+v\tau)\cdot\text{erf}\left(\frac{a-d+v\tau}{2\sqrt{D\tau+\sigma_{xy}^2}}\right)-2(d-v\tau)\cdot\text{erf}\left(\frac{d-v\tau}{2\sqrt{D\tau+\sigma_{xy}^2}}\right)$$
 		The parameters are:
 		<blockquote><table border=1>
@@ -27,6 +27,8 @@
 		  <tr><td><i>&sigma;<sub>z</sub></i></td><td>longitudinal radius of the point-spread function (PSF), 1/&radic;<span style="border-top: 1px solid black">e</span>-radius</td></tr>
     		  <tr><td>$$math:d_x$$</td><td> distance between pixels in x-direction</td></tr>
     		  <tr><td>$$math:d_y$$</td><td> distance between pixels in y-direction </td></tr>
+		  <tr><td>$$math:I$$</td><td>average measured intensity in focus during measurement</td></tr>
+    		  <tr><td>$$math:B$$</td><td>average background intenisty in focus during measurement</td></tr>
 		</table>  </blockquote>
 		</p>
 		<p>The focal volume is calculated as:

@@ -15,6 +15,7 @@ QFHTMLHighlighter::QFHTMLHighlighter(const QString& settingsDir, QTextDocument *
     m_formats[QFHTMLHighlighter::Entity]=loadFormat(settings, prefix+"style/entity",  "darkgreen", false, false, false);
     m_formats[QFHTMLHighlighter::Tag]=loadFormat(settings, prefix+"style/tag",  "darkred", true, false, false);
     m_formats[QFHTMLHighlighter::Comment]=loadFormat(settings, prefix+"style/comment",  "darkgray", false, true, false);
+    m_formats[QFHTMLHighlighter::Text]=loadFormat(settings, prefix+"style/text",  "black", false, false, false);
 
 
 
@@ -40,6 +41,8 @@ void QFHTMLHighlighter::highlightBlock(const QString &text)
                     }
                     break;
                 } else if (ch == '&') {
+                    setFormat(start, pos - start,
+                              m_formats[Text]);
                     start = pos;
                     while (pos < len
                            && text.at(pos++) != ';')
@@ -48,6 +51,10 @@ void QFHTMLHighlighter::highlightBlock(const QString &text)
                               m_formats[Entity]);
                 } else {
                     ++pos;
+                }
+                if (state==NormalState) {
+                    setFormat(start, pos - start, m_formats[Text]);
+
                 }
             }
             break;

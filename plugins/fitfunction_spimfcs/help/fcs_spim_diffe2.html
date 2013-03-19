@@ -12,7 +12,8 @@
 		  Wohland T, Shi X, Sankaran J, Stelzer EH (2010): <b>Single plane illumination fluorescence correlation spectroscopy (SPIM-FCS) probes inhomogeneous three-dimensional environments</b>, <i>Optics Express</i> <b>18</b>(10): 10627-10641, doi: 10.1364/OE.18.010627.
 		</blockquote>
 		The fit function is defined as:
-		<blockquote><img src="./pic/form_387.png"></blockquote>
+		<!--<blockquote><img src="./pic/form_387.png"></blockquote>-->
+                                                      $$math:g(\tau)=G_\infty+\frac{(I-B)^2}{I^2}\cdot\frac{1}{N}\cdot\frac{1}{4a^2\cdot\sqrt{\pi}}\cdot\sum_{i=1}^3\rho_i\cdot\left[a\cdot\sqrt{\pi}\cdot\mbox{erf}\left(\frac{a}{2\cdot\sqrt{D_i\tau+w_{xy}^2}}\right)+\frac{4\cdot\sqrt{D_i\tau+w_{xy}^2}}{\sqrt{\pi}}\cdot\left[\exp\left(-\frac{a^2}{4\cdot(D_i\tau+w_{xy}^2)}\right)-1\right]\right]^2\cdot\left[1+\frac{D_i\tau}{w_z^2}\right]^{-1/2}$$
 		The parameters are:
 		<blockquote><table border=1>
 		  <tr><th>var.</th><th>Parameter</th></tr>
@@ -21,9 +22,11 @@
 		  <tr><td><i>D<sub>i</sub></i></td><td><i>i</i>-th diffusion coefficient</td></tr>
 		  <tr><td><i>&rho;<sub>i</sub></i></td><td>fraction of <i>i</i>-th diffusing component</td></tr>
 		  <tr><td><i>a</i></td><td>width of a (square) pixel in the image plane (i.e. pixel size of camera divided by the magnification)</td></tr>
-		  <tr><td><i>&sigma;<sub>xy</sub></i></td><td>lateral radius of the point-spread function (PSF), 1/e<sup>2</sup>-radius</td></tr>
-		  <tr><td><i>&sigma;<sub>z</sub></i></td><td>longitudinal radius of the point-spread function (PSF), 1/e<sup>2</sup>-radius</td></tr>
-		</table>  </blockquote>
+		  <tr><td><i>w<sub>xy</sub></i></td><td>lateral radius of the point-spread function (PSF), 1/e<sup>2</sup>-radius</td></tr>
+		  <tr><td><i>w<sub>z</sub></i></td><td>longitudinal radius of the point-spread function (PSF), 1/e<sup>2</sup>-radius</td></tr>
+		  <tr><td>$$math:I$$</td><td>average measured intensity in focus during measurement</td></tr>
+    		  <tr><td>$$math:B$$</td><td>average background intenisty in focus during measurement</td></tr>
+        		</table>  </blockquote>
 		For the fractions we have in addition:
 		<blockquote> <i>&rho;<sub>1</sub> = 1 - &rho;<sub>2</sub></i> - &rho;<sub>3</sub><br></i>
 		             <i>&Delta;&rho;<sub>1</sub> = &radic;<span style="border-top: 1px solid black">(&Delta;&rho;<sub>2</sub><sup>2</sup> + &Delta;&rho;<sub>3</sub><sup>2</sup>)</span></i>

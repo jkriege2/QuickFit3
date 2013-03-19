@@ -1,31 +1,40 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>SPIM-FCS fit model anomalous diffusion, 1/sqrt(e) radii</title>
-	</head>
-	<body>
-		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-		<h2>SPIM-FCCS fit model:  Diffusion 2-color crosscorrelation (1/$$math:\sqrt(e)$$ radii)</h2>
-		<p>This function implements a 1-component diffusion model for 2-color crosscorrelation data acquired with a camera in SPIM illumination mode. 
-		The fit function is defined as:
-		$$bmath:g(\tau)=G_\infty+\frac{1}{N}\cdot\frac{1}{4a^2\sqrt{\pi}}\cdot\sum\limits_{i=1}^3\rho_i\cdot\left[2a\cdot\mbox{erf}\left(\frac{a}{2\cdot\sqrt{\Gamma_i\tau^{\alpha_i}+\sigma_{xy}^2}}\right)+\frac{4\cdot\sqrt{\Gamma_i\tau^{\alpha_i}+\sigma_{xy}^2}}{\sqrt{\pi}}\cdot\left(\exp\left(-\frac{a^2}{4\cdot(\Gamma_i\tau^{\alpha_i}+\sigma_{xy}^2)}\right)-1\right)\right]^2\cdot\left[1+\frac{\Gamma_i\tau^{\alpha_i}}{\sigma_z^2}\right]^{-1/2}$$
-		The parameters are:
-		<blockquote><table border=1>
-		  <tr><th>var.</th><th>Parameter</th></tr>
-		  <tr><td><i>G<sub>&infin;</sub></i></td><td>constant offset</td></tr>
-		  <tr><td>$$math:N_{ab}$$</td><td>particle number of the crosscorrelating species the observation volume</td></tr>
-		  <tr><td>$$math:D_{ab}$$</i></td><td>diffusion coefficient of the crosscorrelating species</td></tr>
-		  <tr><td>$$math:a$$</td><td>width of a (square) pixel in the image plane (i.e. pixel size of camera divided by the magnification)</td></tr>
-		  <tr><td>$$math:\sigma_{1,xy}$$</td><td>lateral radius of the point-spread function (PSF) of the first focus (e.g. green), $$math:1/\sqrt(e)$$-radius</td></tr>
-		  <tr><td>$$math:\sigma_{1,z}$$</td><td>longitudinal radius of the point-spread function (PSF) of the first focus (e.g. green), $$math:1/\sqrt(e)$$-radius</td></tr>
-		  <tr><td>$$math:\sigma_{2,xy}$$</td><td>lateral radius of the point-spread function (PSF) of the second focus (e.g. green), $$math:1/\sqrt(e)$$-radius</td></tr>
-		  <tr><td>$$math:\sigma_{2,z}$$</i></td><td>longitudinal radius of the point-spread function (PSF) of the first second (e.g. green), $$math:1/\sqrt(e)$$-radius</td></tr>
-		  <tr><td>$$math:d_x$$</i></td><td>lateral displacement in x-direction of the foci</td></tr>
-		  <tr><td>$$math:d_y$$</i></td><td>lateral displacement in y-direction of the foci</td></tr>
-		  <tr><td>$$math:d_z$$</i></td><td>longitudinal displacement in z-direction of the foci</td></tr>
-		</table>  </blockquote>
-		
-		
-	</body>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>SPIM-FCS fit model 2-color crosscorrelation, 1/sqrt(e) radii</title>
+  </head>
+<body>
+  $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+  <h2>SPIM-FCCS fit model:  Diffusion 2-color crosscorrelation (1/$$math:\sqrt{e}$$ radii)</h2>
+  <p>This function implements a 1-component diffusion model for 2-color crosscorrelation data acquired with a camera in SPIM illumination mode. 
+  The fit function is defined as:
+    $$bmath:g(\tau)=G_\infty+\frac{(I_1-B_1)\cdot(I_2-B_2)}{I_1\cdot I_2}\cdot\frac{1}{c_{ab}} \cdot \mbox{PCF}(\tau, D_{ab}, a, \sigma_{1,xy}, \sigma_{2,xy}, d_x) \cdot \mbox{PCF}(\tau, D_{ab}, a, \sigma_{1,xy}, \sigma_{2,xy}, d_y) \cdot \mbox{GCF}(\tau, D_{ab}, \sigma_{1,z}, \sigma_{2,z}, d_z)$$
+  where the lateral "pixel correlation factor" is defined as:
+    $$bmath:\mbox{PCF}(\tau, D, a, \sigma_1, \sigma_2, d) = \frac{1}{2a^2}\cdot\left\{ (a-d)\cdot\erf\left(\frac{a-d}{\sqrt{2}\cdot\sqrt{2D\tau+\sigma_1^2+\sigma_2^2}}\right) - 2d\cdot\erf\left(\frac{d}{\sqrt{2}\cdot\sqrt{2D\tau+\sigma_1^2+\sigma_2^2}}\right) + (a+d)\cdot\erf\left(\frac{a+d}{\sqrt{2}\cdot\sqrt{2D\tau+\sigma_1^2+\sigma_2^2}}\right) + \right.$$
+    $$bmath:\left. + \frac{\sqrt{2}\cdot\sqrt{2D\tau+\sigma_1^2+\sigma_2^2}}{\sqrt{\pi}}\cdot\left[ \exp\left(-\frac{(a-d)^2}{2\cdot(2D\tau+\sigma_1^2+\sigma_2^2)}\right) -2\cdot\exp\left(-\frac{d^2}{2\cdot(2D\tau+\sigma_1^2+\sigma_2^2)}\right) + \exp\left(-\frac{(a+d)^2}{2\cdot(2D\tau+\sigma_1^2+\sigma_2^2)}\right) \right] \right}$$
+  and the longitudinal "gaussian correlation factor" as:
+    $$bmath:\mbox{GCF}(\tau, D, \sigma_1, \sigma_2, d) = \frac{1}{\sqrt{2\pi}}\cdot\left(2D\tau+w_1^2+w_2^2\right)^{-1/2}\cdot\exp\left(-\frac{d^2}{2\sqrt{2D\tau+\sigma_1^2+\sigma_2^2}}\right)$$
+  The parameters are:
+  <blockquote><table border=1>
+    <tr><th>var.</th><th>Parameter</th></tr>
+    <tr><td><i>G<sub>&infin;</sub></i></td><td>constant offset</td></tr>
+    <tr><td>$$math:c_{ab}$$</td><td>particle concentration of the crosscorrelating species the observation volume</td></tr>
+    <tr><td>$$math:D_{ab}$$</i></td><td>diffusion coefficient of the crosscorrelating species</td></tr>
+    <tr><td>$$math:a$$</td><td>width of a (square) pixel in the image plane (i.e. pixel size of camera divided by the magnification)</td></tr>
+    <tr><td>$$math:\sigma_{1,xy}$$</td><td>lateral radius of the point-spread function (PSF) of the first focus (e.g. green), $$math:1/\sqrt{e}$$-radius</td></tr>
+    <tr><td>$$math:\sigma_{1,z}$$</td><td>longitudinal radius of the point-spread function (PSF) of the first focus (e.g. green), $$math:1/\sqrt{e}$$-radius</td></tr>
+    <tr><td>$$math:\sigma_{2,xy}$$</td><td>lateral radius of the point-spread function (PSF) of the second focus (e.g. green), $$math:1/\sqrt{e}$$-radius</td></tr>
+    <tr><td>$$math:\sigma_{2,z}$$</i></td><td>longitudinal radius of the point-spread function (PSF) of the first second (e.g. green), $$math:1/\sqrt{e}$$-radius</td></tr>
+    <tr><td>$$math:d_x$$</i></td><td>lateral displacement in x-direction of the foci</td></tr>
+    <tr><td>$$math:d_y$$</i></td><td>lateral displacement in y-direction of the foci</td></tr>
+    <tr><td>$$math:d_z$$</i></td><td>longitudinal displacement in z-direction of the foci</td></tr>
+    <tr><td>$$math:I_1$$</td><td>average measured intensity in focus 1 during measurement</td></tr>
+    <tr><td>$$math:B_1$$</td><td>average background intenisty in focus 1 during measurement</td></tr>
+    <tr><td>$$math:I_2$$</td><td>average measured intensity in focus 2 during measurement</td></tr>
+    <tr><td>$$math:B_2$$</td><td>average background intenisty in focus 2 during measurement</td></tr>
+</table>  </blockquote>
+
+
+</body>
 </html>

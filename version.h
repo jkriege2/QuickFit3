@@ -13,9 +13,9 @@
 
 #define QF_THANKS_TO "Jan Buchholz, Tabea Elbel, Dr. Nicolas Dross, Dr. György Vámosi, Dr. Vera Böhm, Prof. Jörg Langowski, Dr. Katalin Tòth"
 
-#define QF_COPYRIGHT "&copy; 2010-2012 by Jan Krieger"
+#define QF_COPYRIGHT "&copy; 2010-2013 by Jan W. Krieger"
 
-#define QF_AUTHOR "Jan Krieger"
+#define QF_AUTHOR "Jan W. Krieger"
 
 #define QF_EMAIL "j.krieger@dkfz.de"
 

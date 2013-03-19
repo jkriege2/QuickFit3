@@ -13,14 +13,16 @@ HEADERS += qfpfitfunctionsspimfcs.h \
     qffitfunctionsspimfcsadiff.h \
     qffitfunctionsspimfcsdiffe2.h \
     qffitfunctionsspimfccsdiffflow.h \
-    qffitfunctionsspimfccsdiff2color.h
+    qffitfunctionsspimfccsdiff2color.h \
+    qffitfunctionsspimfcsdiffc.h
 
 SOURCES += qfpfitfunctionsspimfcs.cpp\
            qffitfunctionsspimfcsdiff.cpp \
     qffitfunctionsspimfcsadiff.cpp \
     qffitfunctionsspimfcsdiffe2.cpp \
     qffitfunctionsspimfccsdiffflow.cpp \
-    qffitfunctionsspimfccsdiff2color.cpp
+    qffitfunctionsspimfccsdiff2color.cpp \
+    qffitfunctionsspimfcsdiffc.cpp
 
 FORMS =
 

@@ -12,6 +12,16 @@
 #include <QFileDialog>
 #include <cstdlib>
 
+/*! \brief Avogadro's number \f$ N_A=6.022\cdot10^{23} \f$
+    \ingroup qf3lib_mathtools
+ */
+#define QF_NAVOGADRO (6.02214179e23)
+
+/*! \brief square root of pi \f$ \sqrt{\pi}=1.772453851 \f$
+    \ingroup qf3lib_mathtools
+ */
+#define QF_SQRTPI (1.772453851)
+
 /*! \brief check whether the dlotaing point number is OK (i.e. non-inf, non-NAN)
     \ingroup qf3lib_mathtools
  */
@@ -20,12 +30,20 @@
 /*! \brief squares the argument
     \ingroup qf3lib_mathtools
  */
-#define qfSqr(x) ((x)*(x))
+inline double qfSqr(double x) { return x*x; }
+inline float qfSqr(float x) { return x*x; }
 
 /*! \brief takes the argument to the third power
     \ingroup qf3lib_mathtools
  */
-#define qfCube(x) ((x)*(x)*(x))
+inline double qfCube(double x) { return x*x*x; }
+inline float qfCube(float x) { return x*x*x; }
+
+/*! \brief takes the argument to the fourth power
+    \ingroup qf3lib_mathtools
+ */
+inline double qfPow4(double x) { double x2=x*x; return x2*x2; }
+inline float qfPow4(float x) { float x2=x*x; return x2*x2; }
 
 /*! \brief calculate the average and variance of a given array
     \ingroup qf3lib_mathtools
