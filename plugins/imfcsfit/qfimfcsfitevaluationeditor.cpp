@@ -72,6 +72,10 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
 
 
     layButtons->addWidget(chkLeaveoutMasked, layButtons->rowCount(),0,1,2);
+
+    pltOverview=new QFRDRImageToRunPreview(this);
+    tabResidulas->insertTab(0, pltOverview, tr("Overview"));
+    tabResidulas->setCurrentIndex(0);
 }
 
 
@@ -112,12 +116,18 @@ void QFImFCSFitEvaluationEditor::writeSettings() {
 
 void QFImFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
     QFFitResultsByIndexEvaluationEditorWithWidgets::highlightingChanged(formerRecord, currentRecord);
-    QFImFCSFitEvaluation* eval=qobject_cast<QFImFCSFitEvaluation*>(currentRecord);
+    QFImFCSFitEvaluation* eval=qobject_cast<QFImFCSFitEvaluation*>(current);
+    disconnect(pltOverview, SIGNAL(currentRunChanged(int)), this, SLOT(overviewRunChanged(int)));
+    disconnect(spinRun, SIGNAL(valueChanged(int)), pltOverview, SLOT(setCurrentRun(int)));
     if (eval) {
         dataEventsEnabled=false;
         cmbWeights->setCurrentWeight(eval->getFitDataWeighting());
         chkDontSaveFitResultMessage->setChecked(current->getProperty("dontSaveFitResultMessage", false).toBool());
         chkLeaveoutMasked->setChecked(current->getProperty("LEAVEOUTMASKED", true).toBool());
+        pltOverview->setRDR(currentRecord);
+        connect(pltOverview, SIGNAL(currentRunChanged(int)), this, SLOT(overviewRunChanged(int)));
+        connect(spinRun, SIGNAL(valueChanged(int)), pltOverview, SLOT(setCurrentRun(int)));
+
         dataEventsEnabled=true;
     }
 }
@@ -693,6 +703,11 @@ void QFImFCSFitEvaluationEditor::leavoutMasked(bool checked)
 {
     if (!current) return;
     current->setQFProperty("LEAVEOUTMASKED", checked, false, false);
+}
+
+void QFImFCSFitEvaluationEditor::overviewRunChanged(int run)
+{
+    spinRun->setValue(run);
 }
 
 

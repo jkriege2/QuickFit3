@@ -42,7 +42,7 @@ class QFLIB_EXPORT QFProjectRawDataModel : public QAbstractListModel {
 
     protected:
         /** \brief pointer to the owning evaluation item */
-        QFProject* item;
+        QPointer<QFProject> item;
         /** \brief name of the MIME type used for Drag&Drop actions */
         QString defaultMimeType;
     protected slots:

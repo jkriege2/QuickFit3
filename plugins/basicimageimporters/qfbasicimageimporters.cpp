@@ -31,7 +31,7 @@ QString QFBasicImageImporters::pluginOptionsName() const
 
 QIcon QFBasicImageImporters::pluginOptionsIcon() const
 {
-    return QIcon(getIconFilename());
+    return QIcon(QIcon(":/importers_basicimages/icon_large.png"));
 }
 
 QFPluginOptionsWidget *QFBasicImageImporters::createOptionsWidget(QWidget *parent)

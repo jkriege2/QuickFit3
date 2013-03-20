@@ -102,15 +102,15 @@ QMap<QString,QVariant> QFRDRFCSFitFunctionSimulator::getParams()
     return used_params;
 }
 
-void QFRDRFCSFitFunctionSimulator::setFitValue(const QString &id, double value)
+void QFRDRFCSFitFunctionSimulator::setFitValue(const QString &id, double value, QFRawDataRecord *r)
 {
     params[id].value=value;
     params[id].valueset=true;
 }
 
-double QFRDRFCSFitFunctionSimulator::getFitValue(const QString &id) const
+double QFRDRFCSFitFunctionSimulator::getFitValue(const QString &id, QFRawDataRecord* r) const
 {
-    QFFitFunction* ffunc=getFitFunction();
+    QFFitFunction* ffunc=getFitFunction(r);
 
     if (ffunc) {
         for (int p=0; p<ffunc->paramCount(); p++) {
@@ -129,9 +129,9 @@ double QFRDRFCSFitFunctionSimulator::getFitValue(const QString &id) const
     return 0;
 }
 
-double QFRDRFCSFitFunctionSimulator::getFitError(const QString &id) const
+double QFRDRFCSFitFunctionSimulator::getFitError(const QString &id, QFRawDataRecord *r) const
 {
-    QFFitFunction* ffunc=getFitFunction();
+    QFFitFunction* ffunc=getFitFunction(r);
 
     if (ffunc) {
         for (int p=0; p<ffunc->paramCount(); p++) {
@@ -146,17 +146,17 @@ double QFRDRFCSFitFunctionSimulator::getFitError(const QString &id) const
     return 0;
 }
 
-void QFRDRFCSFitFunctionSimulator::setFitError(const QString &id, double error)
+void QFRDRFCSFitFunctionSimulator::setFitError(const QString &id, double error, QFRawDataRecord *r)
 {
     params[id].error=error;
 }
 
-bool QFRDRFCSFitFunctionSimulator::getFitFix(const QString &id) const
+bool QFRDRFCSFitFunctionSimulator::getFitFix(const QString &id, QFRawDataRecord *r) const
 {
     return false;
 }
 
-void QFRDRFCSFitFunctionSimulator::setFitRange(const QString &id, double min, double max)
+void QFRDRFCSFitFunctionSimulator::setFitRange(const QString &id, double min, double max, QFRawDataRecord *r)
 {
     params[id].min=min;
     params[id].max=max;
@@ -164,7 +164,7 @@ void QFRDRFCSFitFunctionSimulator::setFitRange(const QString &id, double min, do
     params[id].maxset=true;
 }
 
-void QFRDRFCSFitFunctionSimulator::setInitFitValue(const QString &id, double value, double error)
+void QFRDRFCSFitFunctionSimulator::setInitFitValue(const QString &id, double value, double error, QFRawDataRecord *r)
 {
 }
 
@@ -172,8 +172,8 @@ void QFRDRFCSFitFunctionSimulator::resetDefaultFitFix(const QString &id)
 {
 }
 
-double QFRDRFCSFitFunctionSimulator::getDefaultFitValue(const QString &id) const {
-    QFFitFunction* ffunc=getFitFunction();
+double QFRDRFCSFitFunctionSimulator::getDefaultFitValue(const QString &id, QFRawDataRecord *r) const {
+    QFFitFunction* ffunc=getFitFunction(r);
 
     if (ffunc) {
         for (int p=0; p<ffunc->paramCount(); p++) {
@@ -190,11 +190,11 @@ double QFRDRFCSFitFunctionSimulator::getDefaultFitValue(const QString &id) const
     return 0;
 }
 
-bool QFRDRFCSFitFunctionSimulator::getDefaultFitFix(const QString &id) const {
+bool QFRDRFCSFitFunctionSimulator::getDefaultFitFix(const QString &id, QFRawDataRecord *r) const {
     return false;
 }
 
-QFFitFunction *QFRDRFCSFitFunctionSimulator::getFitFunction() const {
+QFFitFunction *QFRDRFCSFitFunctionSimulator::getFitFunction(QFRawDataRecord *r) const {
     return m_fitFunctions.value(ui->cmbFunction->itemData(ui->cmbFunction->currentIndex()).toString(), NULL);
 }
 
@@ -229,7 +229,7 @@ void QFRDRFCSFitFunctionSimulator::updateTau() {
 
 
 void QFRDRFCSFitFunctionSimulator::displayModel(bool newWidget){
-    QFFitFunction* ffunc=getFitFunction();
+    QFFitFunction* ffunc=getFitFunction(NULL);
 
 
     if (!ffunc) {
@@ -344,7 +344,7 @@ void QFRDRFCSFitFunctionSimulator::updateFitFunction() {
 }
 
 void QFRDRFCSFitFunctionSimulator::updateParameterValues() {
-    QFFitFunction* ffunc=getFitFunction();
+    QFFitFunction* ffunc=getFitFunction(NULL);
 
     if (!ffunc) return;
 
@@ -393,9 +393,9 @@ void QFRDRFCSFitFunctionSimulator::modelChanged(int index) {
     QApplication::restoreOverrideCursor();
 }
 
-double QFRDRFCSFitFunctionSimulator::getFitMax(const QString &id) const
+double QFRDRFCSFitFunctionSimulator::getFitMax(const QString &id, QFRawDataRecord* r) const
 {
-    QFFitFunction* ffunc=getFitFunction();
+    QFFitFunction* ffunc=getFitFunction(r);
 
     if (ffunc) {
         for (int p=0; p<ffunc->paramCount(); p++) {
@@ -411,9 +411,9 @@ double QFRDRFCSFitFunctionSimulator::getFitMax(const QString &id) const
     return 0;
 }
 
-double QFRDRFCSFitFunctionSimulator::getFitMin(const QString &id) const
+double QFRDRFCSFitFunctionSimulator::getFitMin(const QString &id, QFRawDataRecord *r) const
 {
-    QFFitFunction* ffunc=getFitFunction();
+    QFFitFunction* ffunc=getFitFunction(r);
 
     if (ffunc) {
         for (int p=0; p<ffunc->paramCount(); p++) {
@@ -429,13 +429,13 @@ double QFRDRFCSFitFunctionSimulator::getFitMin(const QString &id) const
     return 0;
 }
 
-void QFRDRFCSFitFunctionSimulator::setFitMax(const QString &id, double max)
+void QFRDRFCSFitFunctionSimulator::setFitMax(const QString &id, double max, QFRawDataRecord *r)
 {
     params[id].max=max;
     params[id].maxset=true;
 }
 
-void QFRDRFCSFitFunctionSimulator::setFitMin(const QString &id, double min)
+void QFRDRFCSFitFunctionSimulator::setFitMin(const QString &id, double min, QFRawDataRecord* r)
 {
     params[id].min=min;
     params[id].minset=true;
@@ -444,7 +444,7 @@ void QFRDRFCSFitFunctionSimulator::setFitMin(const QString &id, double min)
 
 void QFRDRFCSFitFunctionSimulator::replotFitFunction() {
     JKQTPdatastore* ds=ui->pltFunction->getDatastore();
-    QFFitFunction* ffunc=getFitFunction();
+    QFFitFunction* ffunc=getFitFunction(NULL);
 
     if (!ffunc) return;
 
@@ -626,7 +626,7 @@ void QFRDRFCSFitFunctionSimulator::showHelp()
 
 void QFRDRFCSFitFunctionSimulator::on_btnModelHelp_clicked()
 {
-    QFFitFunction* ffunc=getFitFunction();
+    QFFitFunction* ffunc=getFitFunction(NULL);
     int id=services->getFitFunctionManager()->getPluginForID(ffunc->id());
     QString help="";
     if (ffunc) {

@@ -95,9 +95,9 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation, public QFFCSWei
 
         virtual bool hasSpecial(const QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const;
 
-        virtual bool overrideFitFunctionPreset(QString paramName, double &value) const ;
-        virtual bool overrideFitFunctionPresetError(QString paramName, double &value) const ;
-        virtual bool overrideFitFunctionPresetFix(QString paramName, bool &value) const ;
+        virtual bool overrideFitFunctionPreset(QFRawDataRecord* r, QString paramName, double &value) const ;
+        virtual bool overrideFitFunctionPresetError(QFRawDataRecord* r, QString paramName, double &value) const ;
+        virtual bool overrideFitFunctionPresetFix(QFRawDataRecord* r, QString paramName, bool &value) const ;
 
 
     public:

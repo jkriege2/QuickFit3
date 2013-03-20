@@ -34,7 +34,8 @@ SOURCES += qfbasicimageimporters.cpp\
 FORMS = \
     qfbasicimageimportersoptionswidget.ui
 
-RESOURCES +=
+RESOURCES += \
+    basicimageimporters.qrc
 
 TRANSLATIONS= ./translations/de.importers_basicimages.ts
 

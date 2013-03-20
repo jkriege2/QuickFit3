@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/importers_basicimages">
+        <file alias="icon.png">icons/image_importer_icon.png</file>
+        <file alias="icon_large.png">icons/image_importer_icon_large.png</file>
+    </qresource>
+</RCC>

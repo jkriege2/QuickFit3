@@ -242,6 +242,8 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         bool getNameNotFilterRegExp() const;
 
     public slots:
+        /** \brief call this to tell the class that data has changed and the project has to be saved! */
+        void setDataChanged();
         /** \brief set a wildcard/regexp filter string to filter records according to their name (each record containing the filter string will match)*/
         void setNameFilter(QString filter, bool regexp=false);
         /** \brief set a wildcard/regexp filter string to filter records according to their name (each NOT record containing the filter string will match)*/

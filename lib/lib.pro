@@ -84,7 +84,8 @@ HEADERS += dlgnewproperty.h \
     qftextdocumentprintpreview.h \
     qfmatchrdrfunctor.h \
     qfpreprocessormagic.h \
-    qfpreprocessormagic_private.h
+    qfpreprocessormagic_private.h \
+    qfautooutputtimer.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -136,7 +137,8 @@ SOURCES += dlgnewproperty.cpp \
     qfhistogramservice.cpp \
     matlabtools.cpp \
     qftextdocumentprintpreview.cpp \
-    qfmatchrdrfunctor.cpp
+    qfmatchrdrfunctor.cpp \
+    qfautooutputtimer.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

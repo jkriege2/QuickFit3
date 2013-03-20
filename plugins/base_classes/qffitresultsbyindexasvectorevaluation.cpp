@@ -1,7 +1,7 @@
 #include "qffitresultsbyindexasvectorevaluation.h"
 
-QFFitResultsByIndexAsVectorEvaluation::QFFitResultsByIndexAsVectorEvaluation(const QString &fitFunctionPrefix, QFProject *parent):
-    QFFitResultsByIndexEvaluation(fitFunctionPrefix, parent)
+QFFitResultsByIndexAsVectorEvaluation::QFFitResultsByIndexAsVectorEvaluation(const QString &fitFunctionPrefix, QFProject *parent, bool showRDRList, bool useSelection):
+    QFFitResultsByIndexEvaluation(fitFunctionPrefix, parent, showRDRList, useSelection)
 {
 }
 
@@ -606,13 +606,13 @@ double QFFitResultsByIndexAsVectorEvaluation::getFitValue(QFRawDataRecord* r, co
         if (pid>-1) res=f->getDescription(pid).initialValue;
 
         double value=0;
-        if (overrideFitFunctionPreset(parameterID, value)) res=value;
+        if (overrideFitFunctionPreset(r, parameterID, value)) res=value;
 
         res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
         res=fitParamSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
 
 
-        QString psID=getParameterStoreID(parameterID);
+        QString psID=getParameterStoreID(r, parameterID);
         if (parameterStore.contains(psID)) {
             if (parameterStore[psID].valueSet) {
                 res=parameterStore[psID].value;
@@ -656,12 +656,12 @@ double QFFitResultsByIndexAsVectorEvaluation::getFitError(QFRawDataRecord* r, co
         if (pid>-1) res=f->getDescription(pid).initialValue;
 
         double value=0;
-        if (overrideFitFunctionPresetError(parameterID, value)) res=value;
+        if (overrideFitFunctionPresetError(r, parameterID, value)) res=value;
 
         res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
         res=fitParamSettings->value(QString(m_fitFunction+"/"+parameterID), res).toDouble();
 
-        QString psID=getParameterStoreID(parameterID);
+        QString psID=getParameterStoreID(r, parameterID);
         if (parameterStore.contains(psID)) {
             if (parameterStore[psID].errorSet) {
                 res=parameterStore[psID].error;
@@ -706,11 +706,11 @@ bool QFFitResultsByIndexAsVectorEvaluation::getFitFix(QFRawDataRecord* r, const 
         if (pid>-1) res=f->getDescription(pid).initialFix;
 
         bool value=0;
-        if (overrideFitFunctionPresetFix(parameterID, value)) res=value;
+        if (overrideFitFunctionPresetFix(r, parameterID, value)) res=value;
 
         res=fitParamGlobalSettings->value(QString(m_fitFunction+"/"+parameterID+"_fix"), res).toBool();
         res=fitParamSettings->value(QString(m_fitFunction+"/"+parameterID+"_fix"), res).toBool();
-        QString psID=getParameterStoreID(parameterID);
+        QString psID=getParameterStoreID(r, parameterID);
         if (parameterStore.contains(psID)) {
             if (parameterStore[psID].fixSet) {
                 res=parameterStore[psID].fix;

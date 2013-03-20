@@ -213,6 +213,8 @@ void QFRDRFCSData::recalculateCorrelations() {
         else correlationMean[i]=m/cnt;
         if (cnt<=1) correlationStdDev[i]=0;
         else correlationStdDev[i]=sqrt(s/cnt-m*m/cnt/cnt);
+        if (!QFFloatIsOK(correlationStdDev[i])) correlationStdDev[i]=0;
+        if (!QFFloatIsOK(correlationMean[i])) correlationMean[i]=0;
     }
     emitRawDataChanged();
 }
@@ -229,6 +231,7 @@ double QFRDRFCSData::calcRateMean(int run, int channel) const {
         }
     }
     double me= m/(double)rateN;
+    if (!QFFloatIsOK(me)) me=0;
     rateMean[channel*rateRuns+run]=me;
     return me;
 }
@@ -298,6 +301,7 @@ double QFRDRFCSData::calcRateStdDev(int run, int channel) const {
         }
     }
     double sd=sqrt(s/(double)rateN-m*m/(double)rateN/(double)rateN);
+    if (!QFFloatIsOK(sd)) sd=0;
     rateStdDev[channel*rateRuns+run]=sd;
     return sd;
 }
@@ -317,6 +321,7 @@ void QFRDRFCSData::calcRateMinMax(int run, double& min, double& max, int channel
             if (r<min) min=r;
         }
     }
+
     rateMin[channel*rateRuns+run]=min;
     rateMax[channel*rateRuns+run]=max;
 }

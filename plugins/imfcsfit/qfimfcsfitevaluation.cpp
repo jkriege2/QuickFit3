@@ -590,11 +590,11 @@ QFFitStatistics QFImFCSFitEvaluation::calcFitStatistics(bool storeAsResults, QFF
     return result;
 }
 
-bool QFImFCSFitEvaluation::overrideFitFunctionPreset(QString paramid, double &value) const {
-    if (qfFCSOverrideFitFunctionPreset(this, paramid, value)) {
+bool QFImFCSFitEvaluation::overrideFitFunctionPreset(QFRawDataRecord* r, QString paramid, double &value) const {
+    if (qfFCSOverrideFitFunctionPreset(this, r, paramid, value)) {
         return true;
     }
-    return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPreset(paramid, value);
+    return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPreset(r, paramid, value);
     /*if (paramid=="focus_width") {
         if (propertyExists("PRESET_FOCUS_WIDTH")) {
             double fw=getProperty("PRESET_FOCUS_WIDTH", 0).toDouble();
@@ -622,7 +622,7 @@ bool QFImFCSFitEvaluation::overrideFitFunctionPreset(QString paramid, double &va
     return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPreset(paramid, value);*/
 }
 
-bool QFImFCSFitEvaluation::overrideFitFunctionPresetError(QString paramid, double &value) const {
+bool QFImFCSFitEvaluation::overrideFitFunctionPresetError(QFRawDataRecord* r, QString paramid, double &value) const {
     /*if (paramid=="focus_width") {
         if (propertyExists("PRESET_FOCUS_WIDTH_ERROR")) {
             double fw=getProperty("PRESET_FOCUS_WIDTH_ERROR", 0).toDouble();
@@ -648,13 +648,13 @@ bool QFImFCSFitEvaluation::overrideFitFunctionPresetError(QString paramid, doubl
         }
     }
     return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetError(paramid, value);*/
-    if (qfFCSOverrideFitFunctionPresetError(this, paramid, value)) {
+    if (qfFCSOverrideFitFunctionPresetError(this, r, paramid, value)) {
         return true;
     }
-    return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetError(paramid, value);
+    return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetError(r, paramid, value);
 }
 
-bool QFImFCSFitEvaluation::overrideFitFunctionPresetFix(QString paramid, bool &value) const
+bool QFImFCSFitEvaluation::overrideFitFunctionPresetFix(QFRawDataRecord* r, QString paramid, bool &value) const
 {
     /*if (paramid=="focus_width") {
         if (propertyExists("PRESET_FOCUS_WIDTH_FIX")) {
@@ -675,10 +675,10 @@ bool QFImFCSFitEvaluation::overrideFitFunctionPresetFix(QString paramid, bool &v
         }
     }
     return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetFix(paramid, value);*/
-    if (qfFCSOverrideFitFunctionPresetFix(this, paramid, value)) {
+    if (qfFCSOverrideFitFunctionPresetFix(this, r, paramid, value)) {
         return true;
     }
-    return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetFix(paramid, value);
+    return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetFix(r, paramid, value);
 
 }
 

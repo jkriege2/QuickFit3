@@ -223,6 +223,8 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         QHBoxLayout* layWidgets;
         /** \brief remove the currently selected QFRawDataRecord */
         QPushButton* btnRemoveRawData;
+        /** \brief widget containing the RDR list on the rhs */
+        QWidget* widRDRList;
 
         /** \brief tabel display the evaluation results associated with this file  */
         QEnhancedTableView* tvResults;

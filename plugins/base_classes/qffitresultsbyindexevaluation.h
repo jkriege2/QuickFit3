@@ -25,7 +25,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
           \param fitFunctionPrefix only fit functions with this prefix will be used by this object, leave empty to use all, you may supply a list, separated by commas
           \param parent project this object belongs to
         */
-        QFFitResultsByIndexEvaluation(const QString& fitFunctionPrefix, QFProject* parent);
+        QFFitResultsByIndexEvaluation(const QString& fitFunctionPrefix, QFProject* parent, bool showRDRList=true, bool useSelection=false);
 
         /** \brief class destructor */
         virtual ~QFFitResultsByIndexEvaluation();

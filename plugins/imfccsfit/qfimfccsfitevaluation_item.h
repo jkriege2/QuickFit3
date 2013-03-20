@@ -12,6 +12,8 @@
 #include "../interfaces/qfrdrcountratesinterface.h"
 #include "qffitresultsbyindexevaluationfittools.h"
 #include "qffcsweightingtools.h"
+#include "qfevaluationpropertyeditor.h"
+#include "qfimfccsparameterinputtable.h"
 
 
 /*! \brief evaluation item class 
@@ -23,6 +25,8 @@
 */
 class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, public QFFitResultsByIndexEvaluationFitTools, public QFFCSWeightingTools {
         Q_OBJECT
+    signals:
+        void parameterStructureChanged();
     public:
         /** \brief which data weighting should be applied */
         /** Default constructor */
@@ -79,9 +83,55 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
 
 
+        QFEvaluationRawDataModelProxy* getRawDataProxyModel() const;
 
+        virtual QFRawDataRecord* getFitFile(int num) const;
+        virtual QFFitFunction* getFitFunction(int num) const;
+        virtual QFFitFunction* getFitFunctionForID(QString id) const;
+        virtual QString getFitFunctionID(int num) const;
+        virtual QString getFitFunctionID() const;
+
+        virtual QFFitFunction* getFitFunction(QFRawDataRecord* rdr) const;
+        virtual QString getFitFunctionID(QFRawDataRecord* rdr) const;
+
+        /** \brief if this returns a non-empty string (default: empty string), the result is added to the getParameterStoreID() to make the store specific to the given \a rdr */
+        virtual QString rdrPointerToParameterStoreID(QFRawDataRecord* rdr) const;
+
+        QFImFCCSParameterInputTable* getParameterInputTableModel() const;
+
+        int getNumberOfFitFiles() const;
+    public slots:
+        void setFitFile(int num, QFRawDataRecord *record);
+        virtual void setFitFunction(int num, QString fitFunction);
+        virtual void setFitFunction(QString fitFunction);
+        virtual int addFitFile();
+        virtual void removeFitFile();
     protected:
 
+        /** \brief proxy model to filter rdrModel */
+        QFEvaluationRawDataModelProxy* rdrProxy;
+
+        QFImFCCSParameterInputTable* paramTable;
+
+
+        /** \brief this list stores the several fit functions selected in the editor */
+        QMap<int, QString> m_multiFitFunctions;
+        /** \brief files for a fit */
+        QList<QPointer<QFRawDataRecord> > fitFilesList;
+
+
+        /** \brief makes sure that at least one fit file is in the list */
+        void ensureFitFiles();
+
+
+        /** \brief write object contents into XML file
+        *
+        *  this function saves the id of the current fit function and algorithm, as well as the contents of parameterStore to
+        *  the given XML file.
+        */
+        virtual void intWriteData(QXmlStreamWriter& w);
+        /** \brief read back the data stored by intWriteXML() */
+        virtual void intReadData(QDomElement* e);
 
 
 
@@ -99,9 +149,19 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         virtual bool hasSpecial(const QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error) const ;
 
 
-        virtual bool overrideFitFunctionPreset(QString paramName, double &value) const ;
-        virtual bool overrideFitFunctionPresetError(QString paramName, double &value) const ;
-        virtual bool overrideFitFunctionPresetFix(QString paramName, bool &value) const ;
+        virtual bool overrideFitFunctionPreset(QFRawDataRecord* r, QString paramName, double &value) const ;
+        virtual bool overrideFitFunctionPresetError(QFRawDataRecord* r, QString paramName, double &value) const ;
+        virtual bool overrideFitFunctionPresetFix(QFRawDataRecord* r, QString paramName, bool &value) const ;
+    protected:
+
+        /* explicitly make some functions visible again, as the C++ compiler hides function definitions
+           from a base class that are also declared in the derived class, but with different parameter sets!
+
+           see http://www.parashift.com/c++-faq-lite/strange-inheritance.html#faq-23.9
+         */
+
+
+        using QFFitResultsByIndexAsVectorEvaluation::getFitFunction;
 
 };
 

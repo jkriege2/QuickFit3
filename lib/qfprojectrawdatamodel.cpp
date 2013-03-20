@@ -13,7 +13,7 @@ QFProjectRawDataModel::QFProjectRawDataModel(QFProject* parent):
 
 QFProjectRawDataModel::~QFProjectRawDataModel()
 {
-    disconnect(item, SIGNAL(structureChanged()), this , SLOT(projectChanged()));
+    if (item) disconnect(item, SIGNAL(structureChanged()), this , SLOT(projectChanged()));
     //disconnect(item, SIGNAL(wasChanged(bool)), this , SLOT(projectChanged(bool)));
 }
 

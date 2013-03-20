@@ -85,7 +85,7 @@ void QFEvaluationRawDataModelProxy::selectionChanged(QList<QPointer<QFRawDataRec
     //std::cout<<"QFEvaluationRawDataModelProxy::selectionChanged()\n";
     invalidateFilter();
     //qDebug()<<rowCount()<<editor;
-    if ((rowCount()<=0)&& editor) editor->close();
+    if (editor && (rowCount()<=0)) editor->close();
 }
 
 
@@ -195,6 +195,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         rdrProxy->setEvaluation(current);
         rdrProxy->setEditor(this);
         resultsModel->init(current, current->getResultsDisplayFilter());
+        widRDRList->setVisible(current->getShowRDRList());
         if (current->getType()!=oldType) {
             //editorList.clear();
             //for (int i=0; i<current->getEditorCount(); i++) {
@@ -224,7 +225,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         setWindowTitle(current->getName());
         setWindowIcon(current->getSmallIcon());
 
-        if (filesListFiltered) {
+        if (filesListFiltered && current->getShowRDRList()) {
             edtFilterRecords->setText(current->getNameFilter());
             edtFilterRecordsNot->setText(current->getNameNotFilter());
             chkFilterRecordsRegExp->setChecked(current->getNameFilterRegExp());
@@ -242,15 +243,17 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         connect(current->getProject(), SIGNAL(evaluationAboutToBeDeleted(QFEvaluationItem*)), this, SLOT(evaluationAboutToBeDeleted(QFEvaluationItem*)));
         connect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
         connect(current, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(propsChanged(QString,bool)));
+        if (current->getShowRDRList()) {
+            connect(edtFilterRecords, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsChanged()));
+            connect(edtFilterRecordsNot, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsChanged()));
+            connect(chkFilterRecordsRegExp, SIGNAL(toggled(bool)), this, SLOT(filterRecordsChanged()));
+            lstRawData->selectionModel()->select(rdrProxy->index(0,0), QItemSelectionModel::SelectCurrent);
+            selectionChanged(rdrProxy->index(0,0), rdrProxy->index(0,0));//std::cout<<"new connected ...\n";
+        }
         connect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
         connect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
         connect(current, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), this, SLOT(resultsChanged(QFRawDataRecord*,QString,QString)));
         connect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
-        connect(edtFilterRecords, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsChanged()));
-        connect(edtFilterRecordsNot, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsChanged()));
-        connect(chkFilterRecordsRegExp, SIGNAL(toggled(bool)), this, SLOT(filterRecordsChanged()));
-        lstRawData->selectionModel()->select(rdrProxy->index(0,0), QItemSelectionModel::SelectCurrent);
-        selectionChanged(rdrProxy->index(0,0), rdrProxy->index(0,0));//std::cout<<"new connected ...\n";
 
 
         QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/");
@@ -643,8 +646,8 @@ void QFEvaluationPropertyEditor::createWidgets() {
     splitMain->addWidget(wl);
     //splitMain->addWidget(lstRawData);
     QVBoxLayout* lstvbl=new QVBoxLayout(splitMain);
-    QWidget* lstvblw=new QWidget(splitMain);
-    lstvblw->setLayout(lstvbl);
+    widRDRList=new QWidget(splitMain);
+    widRDRList->setLayout(lstvbl);
 
     widFilterRecords=new QWidget(this);
     QHBoxLayout* lFilterRecords=new QHBoxLayout(this);
@@ -685,12 +688,12 @@ void QFEvaluationPropertyEditor::createWidgets() {
     lstvbl->addWidget(widFilterRecords);
 
     lstvbl->addWidget(lstRawData, 10);
-    btnRemoveRawData=new QPushButton(QIcon(":/lib/item_delete.png"), tr("remove record"), lstvblw);
+    btnRemoveRawData=new QPushButton(QIcon(":/lib/item_delete.png"), tr("remove record"), widRDRList);
     btnRemoveRawData->setToolTip(tr("remove the current raw data record from the project"));
     connect(btnRemoveRawData, SIGNAL(clicked()), this, SLOT(removeRawData()));
     lstvbl->addWidget(btnRemoveRawData);
 
-    splitMain->addWidget(lstvblw);
+    splitMain->addWidget(widRDRList);
 
     splitMain->setCollapsible(0, false);
     splitMain->setCollapsible(1, false);

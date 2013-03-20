@@ -6,73 +6,102 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>437</width>
-    <height>300</height>
+    <width>936</width>
+    <height>587</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>imFCCS Editor</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
-   <property name="margin">
-    <number>0</number>
-   </property>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0,0,1">
-     <item>
-      <widget class="QLabel" name="labRecord">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="Line" name="line">
+  <layout class="QGridLayout" name="gridLayout" columnstretch="1,0">
+   <item row="1" column="0">
+    <widget class="QVisibleHandleSplitter" name="splitter_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <widget class="QVisibleHandleSplitter" name="splitter_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QVisibleHandleSplitter" name="splitter">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Vertical</enum>
+       </property>
+       <widget class="QFPlotter" name="pltData" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>100</height>
+         </size>
+        </property>
+       </widget>
+       <widget class="QFPlotter" name="pltResidual" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>100</height>
+         </size>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFRDRImageToRunPreview" name="pltOverview" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>100</height>
+        </size>
        </property>
       </widget>
-     </item>
-     <item>
-      <layout class="QFormLayout" name="formLayout">
-       <property name="fieldGrowthPolicy">
-        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-       </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Evaluation Parameter:</string>
-         </property>
-        </widget>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QTableView" name="tableView"/>
        </item>
-       <item row="0" column="1">
-        <widget class="QSpinBox" name="spinEvaluationParameter"/>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QPushButton" name="btnAddFile">
+           <property name="text">
+            <string>add file</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../lib/lib.qrc">
+             <normaloff>:/lib/file_add.png</normaloff>:/lib/file_add.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnRemoveFile">
+           <property name="text">
+            <string>remove file</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../lib/lib.qrc">
+             <normaloff>:/lib/file_delete.png</normaloff>:/lib/file_delete.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
       </layout>
-     </item>
-     <item>
-      <widget class="Line" name="line_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="labResults">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
+     </widget>
+    </widget>
    </item>
-   <item>
+   <item row="1" column="1">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QPushButton" name="btnEvaluateCurrent">
@@ -80,7 +109,7 @@
         <string>Evaluate &amp;Current</string>
        </property>
        <property name="icon">
-        <iconset resource="qfimfccsfitevaluation.qrc">
+        <iconset>
          <normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</iconset>
        </property>
       </widget>
@@ -91,7 +120,7 @@
         <string>Evaluate &amp;All</string>
        </property>
        <property name="icon">
-        <iconset resource="qfimfccsfitevaluation.qrc">
+        <iconset>
          <normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</iconset>
        </property>
       </widget>
@@ -109,7 +138,7 @@
         <string>Save &amp;Report</string>
        </property>
        <property name="icon">
-        <iconset resource="qfimfccsfitevaluation.qrc">
+        <iconset>
          <normaloff>:/imfccs_fit/qfeval_savereport.png</normaloff>:/imfccs_fit/qfeval_savereport.png</iconset>
        </property>
       </widget>
@@ -120,7 +149,7 @@
         <string>&amp;Print Report</string>
        </property>
        <property name="icon">
-        <iconset resource="qfimfccsfitevaluation.qrc">
+        <iconset>
          <normaloff>:/imfccs_fit/qfeval_printreport.png</normaloff>:/imfccs_fit/qfeval_printreport.png</iconset>
        </property>
       </widget>
@@ -140,10 +169,135 @@
      </item>
     </layout>
    </item>
+   <item row="0" column="0" colspan="2">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="1">
+      <widget class="QFFitAlgorithmComboBox" name="cmbFitAlgorithm"/>
+     </item>
+     <item row="0" column="4">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Fit algorithm: </string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QPushButton" name="btnAlgorithmConfig">
+       <property name="text">
+        <string>&amp;Config</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QPushButton" name="btnAlgorithmHelp">
+       <property name="text">
+        <string>&amp;Description</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFPlotter</class>
+   <extends>QWidget</extends>
+   <header>qfplotter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QVisibleHandleSplitter</class>
+   <extends>QSplitter</extends>
+   <header>qvisiblehandlesplitter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFRDRImageToRunPreview</class>
+   <extends>QWidget</extends>
+   <header>qfrdrimagetorunpreview.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFFitAlgorithmComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qffitalgorithmcombobox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
-  <include location="qfimfccsfitevaluation.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cmbFitAlgorithm</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFImFCCSFitEvaluationEditor</receiver>
+   <slot>fitAlgorithmChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>128</x>
+     <y>27</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>113</x>
+     <y>39</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAlgorithmConfig</sender>
+   <signal>clicked()</signal>
+   <receiver>QFImFCCSFitEvaluationEditor</receiver>
+   <slot>configFitAlgorithm()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>184</x>
+     <y>26</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>172</x>
+     <y>37</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAlgorithmHelp</sender>
+   <signal>clicked()</signal>
+   <receiver>QFImFCCSFitEvaluationEditor</receiver>
+   <slot>showFitAlgorithmHelp()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>262</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>242</x>
+     <y>36</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>fitAlgorithmChanged(int)</slot>
+  <slot>configFitAlgorithm()</slot>
+  <slot>showFitAlgorithmHelp()</slot>
+ </slots>
 </ui>

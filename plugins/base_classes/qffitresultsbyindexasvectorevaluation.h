@@ -27,7 +27,7 @@
 class QFFitResultsByIndexAsVectorEvaluation : public QFFitResultsByIndexEvaluation {
         Q_OBJECT
     public:
-        QFFitResultsByIndexAsVectorEvaluation(const QString& fitFunctionPrefix, QFProject* parent);
+        QFFitResultsByIndexAsVectorEvaluation(const QString& fitFunctionPrefix, QFProject* parent, bool showRDRList=true, bool useSelection=false);
         virtual ~QFFitResultsByIndexAsVectorEvaluation();
 
 

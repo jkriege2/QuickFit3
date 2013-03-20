@@ -31,7 +31,8 @@ HEADERS += qfpevalimfcsfit.h \
     ../interfaces/qfrdrrunselection.h \
     ../base_classes/qffcsweightingtools.h \
     ../base_classes/qffitresultsbyindexevaluationfittools.h \
-    ../base_classes/qffcstools.h
+    ../base_classes/qffcstools.h \
+    ../base_classes/qfrdrimagetorunpreview.h
 
 
 SOURCES += qfpevalimfcsfit.cpp \
@@ -49,7 +50,8 @@ SOURCES += qfpevalimfcsfit.cpp \
     optionswidget.cpp \
     ../base_classes/qffcsweightingtools.cpp \
     ../base_classes/qffitresultsbyindexevaluationfittools.cpp \
-    ../base_classes/qffcstools.cpp
+    ../base_classes/qffcstools.cpp \
+    ../base_classes/qfrdrimagetorunpreview.cpp
 
 
 FORMS = \    
@@ -66,5 +68,5 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
-QT += gui xml svg core
+QT += gui xml svg core opengl
 CONFIG += exceptions rtti stl

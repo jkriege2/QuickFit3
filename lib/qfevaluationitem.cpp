@@ -333,3 +333,8 @@ bool QFEvaluationItem::getNameNotFilterRegExp() const
 {
     return nameNotFilter.patternSyntax()==QRegExp::RegExp;
 }
+
+void QFEvaluationItem::setDataChanged()
+{
+    if (project) project->setDataChanged();
+}

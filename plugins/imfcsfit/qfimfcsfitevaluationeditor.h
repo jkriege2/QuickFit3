@@ -40,6 +40,7 @@
 #include "qffitresultsbyindexevaluationfitthread.h"
 #include "dlgqfprogressdialog.h"
 #include "qffcsweightingtools.h"
+#include "qfrdrimagetorunpreview.h"
 
 
 /*! \brief editor class for imaging FCS least-square fits
@@ -84,6 +85,8 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         QCheckBox* chkDontSaveFitResultMessage;
         QCheckBox* chkLeaveoutMasked;
 
+        QFRDRImageToRunPreview* pltOverview;
+
 
 
 
@@ -114,6 +117,8 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
 
         void dontSaveFitResultMessageChanged(bool checked);
         void leavoutMasked(bool checked);
+
+        void overviewRunChanged(int run);
 
 
     private:

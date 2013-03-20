@@ -1,7 +1,7 @@
 #include "qffitresultsbyindexevaluation.h"
 
-QFFitResultsByIndexEvaluation::QFFitResultsByIndexEvaluation(const QString& fitFunctionPrefix, QFProject* parent) :
-    QFFitResultsEvaluation(fitFunctionPrefix, parent)
+QFFitResultsByIndexEvaluation::QFFitResultsByIndexEvaluation(const QString& fitFunctionPrefix, QFProject* parent, bool showRDRList, bool useSelection) :
+    QFFitResultsEvaluation(fitFunctionPrefix, parent, showRDRList, useSelection)
 {
     m_currentIndex=0;
 }

@@ -193,28 +193,28 @@ bool QFFCSFitEvaluation::hasSpecial(const QFRawDataRecord* r, const QString& id,
     return false;*/
 }
 
-bool QFFCSFitEvaluation::overrideFitFunctionPreset(QString paramName, double &value) const
+bool QFFCSFitEvaluation::overrideFitFunctionPreset(QFRawDataRecord *r, QString paramName, double &value) const
 {
-    if (qfFCSOverrideFitFunctionPreset(this, paramName, value)) {
+    if (qfFCSOverrideFitFunctionPreset(this, r, paramName, value)) {
         return true;
     }
-    return QFFitResultsByIndexEvaluation::overrideFitFunctionPreset(paramName, value);
+    return QFFitResultsByIndexEvaluation::overrideFitFunctionPreset(r, paramName, value);
 }
 
-bool QFFCSFitEvaluation::overrideFitFunctionPresetError(QString paramName, double &value) const
+bool QFFCSFitEvaluation::overrideFitFunctionPresetError(QFRawDataRecord *r, QString paramName, double &value) const
 {
-    if (qfFCSOverrideFitFunctionPresetError(this, paramName, value)) {
+    if (qfFCSOverrideFitFunctionPresetError(this, r, paramName, value)) {
         return true;
     }
-    return QFFitResultsByIndexEvaluation::overrideFitFunctionPresetError(paramName, value);
+    return QFFitResultsByIndexEvaluation::overrideFitFunctionPresetError(r, paramName, value);
 }
 
-bool QFFCSFitEvaluation::overrideFitFunctionPresetFix(QString paramName, bool &value) const
+bool QFFCSFitEvaluation::overrideFitFunctionPresetFix(QFRawDataRecord *r, QString paramName, bool &value) const
 {
-    if (qfFCSOverrideFitFunctionPresetFix(this, paramName, value)) {
+    if (qfFCSOverrideFitFunctionPresetFix(this, r, paramName, value)) {
         return true;
     }
-    return QFFitResultsByIndexEvaluation::overrideFitFunctionPresetFix(paramName, value);
+    return QFFitResultsByIndexEvaluation::overrideFitFunctionPresetFix(r, paramName, value);
 }
 
 int QFFCSFitEvaluation::getIndexMin(QFRawDataRecord* r) const {

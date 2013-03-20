@@ -38,57 +38,57 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
             \param value value to be stored
 
          */
-        virtual void setFitValue(const QString& id, double value);
+        virtual void setFitValue(const QString& id, double value, QFRawDataRecord* r=NULL);
         /*! \brief return the value of a given parameter        */
-        virtual double getFitValue(const QString& id) const;
+        virtual double getFitValue(const QString& id, QFRawDataRecord* r=NULL) const;
         /*! \brief return the fit error of a given parameter
             \return the error associated with the given parameter.
                     The error may only be stored in the QFRawDataRecord, if it is not available or accessible, then \c 0 is returned
         */
-        virtual double getFitError(const QString& id) const;
+        virtual double getFitError(const QString& id, QFRawDataRecord* r=NULL) const;
         /*! \brief set the error of a given parameter
 
             \param id set the value of the parameter with this id (see QFFitFunction)
             \param error error to be set
         */
-        virtual void setFitError(const QString& id, double error);
+        virtual void setFitError(const QString& id, double error, QFRawDataRecord* r=NULL);
 
         /*! \brief set the fix property of a fit parameter of the current fit function
             \param id set the value of the parameter with this id (see QFFitFunction)
             \param fix value to be stored
          */
-        virtual void setFitFix(const QString& id, bool fix) {};
+        virtual void setFitFix(const QString& id, bool fix, QFRawDataRecord* r=NULL) {};
         /*! \brief return the fix property of a given parameter
             \param id set the value of the parameter with this id (see QFFitFunction)
         */
-        virtual bool getFitFix(const QString& id) const;
+        virtual bool getFitFix(const QString& id, QFRawDataRecord* r=NULL) const;
         /*! \brief set the value range of a fit parameter
             \param id set the value of the parameter with this id (see QFFitFunction)
             \param min lower bound for the value
             \param max upper bound for the value
 
          */
-        virtual void setFitRange(const QString& id, double min, double max);
+        virtual void setFitRange(const QString& id, double min, double max, QFRawDataRecord* r=NULL);
 
         /*! \brief set the value range of a fit parameter
             \param id set the value of the parameter with this id (see QFFitFunction)
             \param min lower bound for the value
          */
-        virtual void setFitMin(const QString& id, double min);
+        virtual void setFitMin(const QString& id, double min, QFRawDataRecord* r=NULL);
 
         /*! \brief set the value range of a fit parameter
             \param id set the value of the parameter with this id (see QFFitFunction)
             \param max upper bound for the value
          */
-        virtual void setFitMax(const QString& id, double max);
+        virtual void setFitMax(const QString& id, double max, QFRawDataRecord* r=NULL);
         /*! \brief return the lower value bound of a given parameter
             \param id set the value of the parameter with this id (see QFFitFunction)
         */
-        virtual double getFitMin(const QString& id) const ;
+        virtual double getFitMin(const QString& id, QFRawDataRecord* r=NULL) const ;
         /*! \brief return the upper value bound of a given parameter
             \param id set the value of the parameter with this id (see QFFitFunction)
         */
-        virtual double getFitMax(const QString& id) const;
+        virtual double getFitMax(const QString& id, QFRawDataRecord* r=NULL) const;
 
 
         /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value in the initial parameters
@@ -97,12 +97,12 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
             \param error error assigned to the given \a value
 
          */
-        virtual void setInitFitValue(const QString& id, double value, double error=0.0);
+        virtual void setInitFitValue(const QString& id, double value, double error=0.0, QFRawDataRecord* r=NULL);
         /*! \brief set the fix property of a fit parameter in the initial parameters
             \param id set the value of the parameter with this id (see QFFitFunction)
             \param fix value to be stored
          */
-        virtual void setInitFitFix(const QString& id, bool fix) {};
+        virtual void setInitFitFix(const QString& id, bool fix, QFRawDataRecord* r=NULL) {};
 
         /*! \brief set the given parameter \a id to the given value (and error) in all files */
         virtual void setAllFitValues(const QString& id, double value, double error=0.0, bool currentFileOnly=false) {};
@@ -113,17 +113,17 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
         /*! \brief reset the given parameter \a id to the initial/global/default fix */
         virtual void resetDefaultFitFix(const QString& id);
         /*! \brief return the default/initial/global value of a given parameter        */
-        virtual double getDefaultFitValue(const QString& id) const;
+        virtual double getDefaultFitValue(const QString& id, QFRawDataRecord* r=NULL) const;
         /*! \brief return the default/initial/global fix of a given parameter        */
-        virtual bool getDefaultFitFix(const QString& id)  const;
+        virtual bool getDefaultFitFix(const QString& id, QFRawDataRecord* r=NULL)  const;
         /*! \brief reset the all parameters to the initial/global/default value in all files */
         virtual void resetAllFitValue() {};
         /*! \brief reset the all parameters to the initial/global/default fix in all files */
         virtual void resetAllFitFix() {};
         /*! \brief reset the all parameters to the initial/global/default value in current files */
-        virtual void resetAllFitValueCurrent() {};
+        virtual void resetAllFitValueCurrent(QFRawDataRecord* r=NULL) {};
         /*! \brief reset the all parameters to the initial/global/default fix in current files */
-        virtual void resetAllFitFixCurrent() {};
+        virtual void resetAllFitFixCurrent(QFRawDataRecord* r=NULL) {};
 
     signals:
         void insertRecord();
@@ -135,7 +135,7 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
         QFPluginServices *services;
         QMap<QString, QFFitFunction*> m_fitFunctions;
         QList<QPointer<QFFitParameterWidgetWrapper> > m_fitParameters;
-        QFFitFunction* getFitFunction() const;
+        QFFitFunction* getFitFunction(QFRawDataRecord* r) const;
         struct paramvalue {
             double value;
             bool valueset;

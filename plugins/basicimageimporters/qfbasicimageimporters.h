@@ -59,7 +59,7 @@ class QFBasicImageImporters : public QObject, public QFPluginImporters, public Q
 
         /** \copydoc QFPlugin::getIconFilename()  */
         virtual QString getIconFilename() const {
-            return ":/lib/importer_icon.png";
+            return ":/importers_basicimages/icon.png";
         }
 
         /** \brief plugin version  */

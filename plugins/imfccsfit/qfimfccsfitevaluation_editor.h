@@ -12,6 +12,9 @@ namespace Ui {
 
 /*! \brief editor for QFImFCCSFitEvaluationItem
     \ingroup qf3rdrdp_imfccsfit
+
+    The main part of this editor is a QTableView which allows to edit the fit parameters of several files.
+    A special item delegate is used to create special editing widgets for the values and to select fit functions and RDRs.
 */
 class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         Q_OBJECT
@@ -29,6 +32,13 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         virtual void readSettings();
         /** \brief write the settings */
         virtual void writeSettings();
+
+        /** \brief display fit algorithm help */
+        void showFitAlgorithmHelp();
+        /** \brief configure the fitting algorithm */
+        void configFitAlgorithm();
+        /** \brief called when the fit algorithm changes */
+        void fitAlgorithmChanged(int model);
     protected:
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFImFCCSFitEvaluationEditor *ui;
@@ -58,6 +68,9 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
     protected slots:
         /** \brief activated when the highlighted record changed */
         void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
+
+        /** ßbrief ensures that the parameter table model is displayed properly */
+        void ensureCorrectParamaterModelDisplay();
     
         /** \brief evaluate all files */
         void evaluateAll();

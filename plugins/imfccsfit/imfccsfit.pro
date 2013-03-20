@@ -24,7 +24,10 @@ HEADERS += qfimfccsfitevaluation.h \
     ../base_classes/qffitresultsbyindexevaluationfittools.h \
     ../base_classes/qffcsweightingtools.h \
     ../base_classes/qffcstools.h \
-    optionswidget.h
+    optionswidget.h \
+    ../base_classes/qfrdrimagetorunpreview.h \
+    qfimfccsparameterinputtable.h \
+    qfimfccsparameterinputdelegate.h
 
 SOURCES += qfimfccsfitevaluation.cpp \
            qfimfccsfitevaluation_item.cpp \
@@ -35,12 +38,16 @@ SOURCES += qfimfccsfitevaluation.cpp \
     ../base_classes/qffitresultsbyindexevaluationfittools.cpp \
     ../base_classes/qffcsweightingtools.cpp \
     ../base_classes/qffcstools.cpp \
-    optionswidget.cpp
+    optionswidget.cpp \
+    ../base_classes/qfrdrimagetorunpreview.cpp \
+    qfimfccsparameterinputtable.cpp \
+    qfimfccsparameterinputdelegate.cpp
 
 FORMS = qfimfccsfitevaluation_editor.ui \   
     optionswidget.ui
 
-RESOURCES += qfimfccsfitevaluation.qrc
+RESOURCES += qfimfccsfitevaluation.qrc \
+    ../base_classes/qfrdrmaskeditor.qrc
 
 TRANSLATIONS= ./translations/de.imfccs_fit.ts
 
@@ -49,7 +56,7 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
-QT += gui xml svg core
+QT += gui xml svg core opengl
 CONFIG += exceptions rtti stl
 
 

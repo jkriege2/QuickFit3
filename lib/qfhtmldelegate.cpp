@@ -6,6 +6,7 @@
 #include <QPainter>
 #include <QApplication>
 #include <QBrush>
+#include <QPixmapCache>
 
 QFHTMLDelegate::QFHTMLDelegate(QObject* parent):
     QStyledItemDelegate(parent)
@@ -68,7 +69,13 @@ void QFHTMLDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
     }
     if (data.type()==QVariant::String) {
 
-
+        QVariant fv=index.data(Qt::FontRole);
+        QFont f=painter->font();
+        if (fv.isValid()) f=fv.value<QFont>();
+        QVariant iv=index.data(Qt::DecorationRole);
+        QPixmap img=QPixmap();
+        if (iv.isValid() && iv.type()==QVariant::Icon) img=iv.value<QIcon>().pixmap(16);
+        if (iv.isValid() && iv.type()==QVariant::Pixmap) img=iv.value<QPixmap>();
         QString pre, post;
         pre="<font color=\""+option.palette.text().color().name()+"\">";
         post="</font>";
@@ -77,20 +84,49 @@ void QFHTMLDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
             pre="<font color=\""+option.palette.highlightedText().color().name()+"\">";
             post="</font>";
         }
+        if (f.bold()) {
+            pre=pre+"<b>";
+            post="</b>"+post;
+        }
+        if (f.italic()) {
+            pre=pre+"<i>";
+            post="</i>"+post;
+        }
 
-        QTextDocument doc;
-        //std::cout<<"drawing "<<QString(pre+data.toString()+post).toStdString()<<std::endl;
-        doc.setHtml(pre+data.toString()+post);
-        painter->save();
+
 
         if (check.isValid()) {
             drawCheck(painter, option, QRect(option.rect.left(),option.rect.top(),option.rect.height(),option.rect.height()), check.toInt()!=0?Qt::Checked:Qt::Unchecked);
         }
 
+        if (!img.isNull()) {
+            painter->drawPixmap(option.rect.topLeft()+offset, img);
+            offset.setX(offset.x()+img.width()+2);
+        }
+
+        painter->save();
         painter->translate(option.rect.topLeft()+offset);
         QRect r(QPoint(0, 0), option.rect.size()-QSize(offset.x(), 0));
-        doc.drawContents(painter, r);
+        QString id=QString::number(r.width())+"_"+QString::number(r.height())+"_"+pre+data.toString()+post;
+        QPixmap pix;
+        if (!QPixmapCache::find(id, &pix)) {
+            {
+                QImage img=QImage(r.width(), r.height(), QImage::Format_ARGB32_Premultiplied);
+                img.fill(Qt::transparent);
+                QPainter pixp;
+                pixp.begin(&img);
+                QTextDocument doc;
+                //std::cout<<"drawing "<<QString(pre+data.toString()+post).toStdString()<<std::endl;
+                doc.setHtml(pre+data.toString()+post);
+                doc.drawContents(&pixp, r);
+                pixp.end();
+                pix=QPixmap::fromImage(img);
+            }
+            bool ok=QPixmapCache::insert(id, pix);;
+            //qDebug()<<" inserted pixmap: "<<ok<<"   cache_limit="<<QPixmapCache::cacheLimit();
+        }
 
+        painter->drawPixmap(0,0, pix);
 
         painter->restore();
 

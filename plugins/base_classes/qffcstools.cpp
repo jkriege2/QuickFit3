@@ -144,7 +144,7 @@ bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid
 
 
 
-bool qfFCSOverrideFitFunctionPreset(const QFEvaluationItem* eval, QString paramid, double &value, bool checkPositive)  {
+bool qfFCSOverrideFitFunctionPreset(const QFEvaluationItem* eval, const QFRawDataRecord* r, QString paramid, double &value, bool checkPositive)  {
     QString param=paramid.toUpper();
     QString preset=QString("PRESET_")+param;
     if (eval->propertyExists(preset)) {
@@ -180,7 +180,7 @@ bool qfFCSOverrideFitFunctionPreset(const QFEvaluationItem* eval, QString parami
     return false;
 }
 
-bool qfFCSOverrideFitFunctionPresetError(const QFEvaluationItem* eval, QString paramid, double &value, bool checkPositive)  {
+bool qfFCSOverrideFitFunctionPresetError(const QFEvaluationItem* eval, const QFRawDataRecord* r, QString paramid, double &value, bool checkPositive)  {
     QString param=paramid.toUpper();
     QString preset=QString("PRESET_")+param+QString("_ERROR");
     if (eval->propertyExists(preset)) {
@@ -217,7 +217,7 @@ bool qfFCSOverrideFitFunctionPresetError(const QFEvaluationItem* eval, QString p
 
 }
 
-bool qfFCSOverrideFitFunctionPresetFix(const QFEvaluationItem* eval, QString paramid, bool &value)  {
+bool qfFCSOverrideFitFunctionPresetFix(const QFEvaluationItem* eval, const QFRawDataRecord* r, QString paramid, bool &value)  {
     QString param=paramid.toUpper();
     QString preset=QString("PRESET_")+param+QString("_FIX");
     if (param=="DIFF_COEFF1") {
