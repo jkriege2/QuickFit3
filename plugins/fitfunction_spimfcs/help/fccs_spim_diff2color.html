@@ -9,16 +9,18 @@
   <h2>SPIM-FCCS fit model:  Diffusion 2-color crosscorrelation (1/$$math:\sqrt{e}$$ radii)</h2>
   <p>This function implements a 1-component diffusion model for 2-color crosscorrelation data acquired with a camera in SPIM illumination mode. 
   The fit function is defined as:
-    $$bmath:g(\tau)=G_\infty+\frac{(I_1-B_1)\cdot(I_2-B_2)}{I_1\cdot I_2}\cdot\frac{1}{c_{ab}} \cdot \mbox{PCF}(\tau, D_{ab}, a, \sigma_{1,xy}, \sigma_{2,xy}, d_x) \cdot \mbox{PCF}(\tau, D_{ab}, a, \sigma_{1,xy}, \sigma_{2,xy}, d_y) \cdot \mbox{GCF}(\tau, D_{ab}, \sigma_{1,z}, \sigma_{2,z}, d_z)$$
+    $$bmath:g(\tau)=G_\infty+\frac{(I_1-B_1)\cdot(I_2-B_2)}{I_1\cdot I_2}\cdot\frac{c_{ab}}{c_a\cdot c_b} \cdot \mbox{PCF}(\tau, D_{ab}, a, \sigma_{1,xy}, \sigma_{2,xy}, d_x) \cdot \mbox{PCF}(\tau, D_{ab}, a, \sigma_{1,xy}, \sigma_{2,xy}, d_y) \cdot \mbox{GCF}(\tau, D_{ab}, \sigma_{1,z}, \sigma_{2,z}, d_z)$$
   where the lateral "pixel correlation factor" is defined as:
     $$bmath:\mbox{PCF}(\tau, D, a, \sigma_1, \sigma_2, d) = \frac{1}{2a^2}\cdot\left\{ (a-d)\cdot\erf\left(\frac{a-d}{\sqrt{2}\cdot\sqrt{2D\tau+\sigma_1^2+\sigma_2^2}}\right) - 2d\cdot\erf\left(\frac{d}{\sqrt{2}\cdot\sqrt{2D\tau+\sigma_1^2+\sigma_2^2}}\right) + (a+d)\cdot\erf\left(\frac{a+d}{\sqrt{2}\cdot\sqrt{2D\tau+\sigma_1^2+\sigma_2^2}}\right) + \right.$$
     $$bmath:\left. + \frac{\sqrt{2}\cdot\sqrt{2D\tau+\sigma_1^2+\sigma_2^2}}{\sqrt{\pi}}\cdot\left[ \exp\left(-\frac{(a-d)^2}{2\cdot(2D\tau+\sigma_1^2+\sigma_2^2)}\right) -2\cdot\exp\left(-\frac{d^2}{2\cdot(2D\tau+\sigma_1^2+\sigma_2^2)}\right) + \exp\left(-\frac{(a+d)^2}{2\cdot(2D\tau+\sigma_1^2+\sigma_2^2)}\right) \right] \right}$$
   and the longitudinal "gaussian correlation factor" as:
-    $$bmath:\mbox{GCF}(\tau, D, \sigma_1, \sigma_2, d) = \frac{1}{\sqrt{2\pi}}\cdot\left(2D\tau+w_1^2+w_2^2\right)^{-1/2}\cdot\exp\left(-\frac{d^2}{2\sqrt{2D\tau+\sigma_1^2+\sigma_2^2}}\right)$$
+    $$bmath:\mbox{GCF}(\tau, D, \sigma_1, \sigma_2, d) = \frac{1}{\sqrt{2\pi}}\cdot\left(2D\tau+\sigma_1^2+\sigma_2^2\right)^{-1/2}\cdot\exp\left(-\frac{d^2}{2\sqrt{2D\tau+\sigma_1^2+\sigma_2^2}}\right)$$
   The parameters are:
   <blockquote><table border=1>
     <tr><th>var.</th><th>Parameter</th></tr>
     <tr><td><i>G<sub>&infin;</sub></i></td><td>constant offset</td></tr>
+    <tr><td>$$math:c_{a}$$</td><td>particle concentration of species a the observation volume</td></tr>
+    <tr><td>$$math:c_{b}$$</td><td>particle concentration of species b the observation volume</td></tr>
     <tr><td>$$math:c_{ab}$$</td><td>particle concentration of the crosscorrelating species the observation volume</td></tr>
     <tr><td>$$math:D_{ab}$$</i></td><td>diffusion coefficient of the crosscorrelating species</td></tr>
     <tr><td>$$math:a$$</td><td>width of a (square) pixel in the image plane (i.e. pixel size of camera divided by the magnification)</td></tr>

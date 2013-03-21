@@ -18,6 +18,14 @@
 #include "qfpluginservices.h"
 #include "qffcsweightingtools.h"
 #include "qffitresultsbyindexevaluationfittools.h"
+#include "qfmatchrdrfunctor.h"
+
+class QFImFCSMatchRDRFunctor: public QFMatchRDRFunctor {
+    public:
+        explicit QFImFCSMatchRDRFunctor(): QFMatchRDRFunctor() {};
+        /** \brief reimplement this function to check whether a QFRawDataRecord* is contained in a QFSelectRDRDialog. the default implementation always returns \c true . */
+        virtual bool matches(const QFRawDataRecord* record) const ;
+};
 
 
 /*! \brief evaluation item class for imaging FCS least square fits
@@ -86,8 +94,9 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation, publi
         /** \brief calculates fit statistics for the given fit function and dataset. */
         QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
 
-
+        QFImFCSMatchRDRFunctor* getMatchFunctor() const;
     protected:
+        QFImFCSMatchRDRFunctor* matchFunctor;
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
         virtual bool isApplicable(QFRawDataRecord* record);

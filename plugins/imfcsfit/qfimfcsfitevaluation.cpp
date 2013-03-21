@@ -9,6 +9,7 @@ QFImFCSFitEvaluation::QFImFCSFitEvaluation(QFProject* parent):
     QFFitResultsByIndexAsVectorEvaluation("fcs_,dls_,fccs_", parent)
 {
 
+    matchFunctor=new QFImFCSMatchRDRFunctor();
     m_weighting=EqualWeighting;
     m_currentIndex=-1;
     //mutexThreadedFit=new QMutex(QMutex::Recursive);
@@ -27,6 +28,7 @@ QFImFCSFitEvaluation::QFImFCSFitEvaluation(QFProject* parent):
 
 QFImFCSFitEvaluation::~QFImFCSFitEvaluation() {
     //delete mutexThreadedFit;
+    delete matchFunctor;
 }
 
 
@@ -46,7 +48,8 @@ QFEvaluationEditor* QFImFCSFitEvaluation::createEditor(QFPluginServices* service
 };
 
 bool QFImFCSFitEvaluation::isApplicable(QFRawDataRecord* record) {
-    return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
+    //return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
+    return matchFunctor->matches(record);
 }
 
 bool QFImFCSFitEvaluation::hasSpecial(const QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const {
@@ -590,6 +593,11 @@ QFFitStatistics QFImFCSFitEvaluation::calcFitStatistics(bool storeAsResults, QFF
     return result;
 }
 
+QFImFCSMatchRDRFunctor *QFImFCSFitEvaluation::getMatchFunctor() const
+{
+    return matchFunctor;
+}
+
 bool QFImFCSFitEvaluation::overrideFitFunctionPreset(QFRawDataRecord* r, QString paramid, double &value) const {
     if (qfFCSOverrideFitFunctionPreset(this, r, paramid, value)) {
         return true;
@@ -1092,4 +1100,11 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
     if (ffunc) delete ffunc;
     if (falg) delete falg;
 
+}
+
+
+bool QFImFCSMatchRDRFunctor::matches(const QFRawDataRecord *record) const
+{
+    if (!record) return false;
+    return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
 }

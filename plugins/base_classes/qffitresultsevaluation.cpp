@@ -493,6 +493,34 @@ void QFFitResultsEvaluation::setFitResultValue(QFRawDataRecord* r, const QString
     }
 }
 
+void QFFitResultsEvaluation::setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QVector<double> error, QString unit)
+{
+    if (r!=NULL) {
+        QFFitFunction* f=getFitFunction(r);
+        QString unit="";
+        if (f) {
+            int pid=f->getParameterNum(parameterID);
+            if (pid>-1) unit=f->getDescription(pid).unit;
+        }
+        r->resultsSetNumberErrorList(transformResultID(resultID), getFitParamID(parameterID), value, error, unit);
+        emitResultsChanged(r, resultID, getFitParamID(parameterID));
+    }
+}
+
+void QFFitResultsEvaluation::setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QString unit)
+{
+    if (r!=NULL) {
+        QFFitFunction* f=getFitFunction(r);
+        QString unit="";
+        if (f) {
+            int pid=f->getParameterNum(parameterID);
+            if (pid>-1) unit=f->getDescription(pid).unit;
+        }
+        r->resultsSetNumberList(transformResultID(resultID), getFitParamID(parameterID), value, unit);
+        emitResultsChanged(r, resultID, getFitParamID(parameterID));
+    }
+}
+
 void QFFitResultsEvaluation::setFitResultError(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double error)  {
     if (r!=NULL) {
         QFFitFunction* f=getFitFunction(r);

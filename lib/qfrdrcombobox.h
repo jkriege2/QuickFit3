@@ -24,6 +24,8 @@ class QFLIB_EXPORT QFRDRComboBox : public QComboBox
         void currentRDRChanged(QFRawDataRecord* record);
     public slots:
         void setCurrentRDR(const QFRawDataRecord* record);
+    protected slots:
+        void myCurrentIndexChanged(int i);
     protected:
         QFProject* project;
         QFMatchRDRFunctor* matchFunctor;

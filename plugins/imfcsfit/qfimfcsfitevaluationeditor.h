@@ -87,6 +87,9 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
 
         QFRDRImageToRunPreview* pltOverview;
 
+        QMenu* menuTools;
+        QAction* actSetParameterFromFile;
+
 
 
 
@@ -97,6 +100,8 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         virtual void createReportDoc(QTextDocument* document);
 
     protected slots:
+        void setFitParameterFromFile();
+
         /** \brief display all data and parameters describing the current record */
         virtual void displayModel(bool newWidget);
         virtual void highlightingChanged(QFRawDataRecord *formerRecord, QFRawDataRecord *currentRecord);

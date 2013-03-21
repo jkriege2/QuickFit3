@@ -3710,6 +3710,57 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
     return listp;
 }
 
+QList<QTriple<QString, QString, QString> > QFRawDataRecord::resultsCalcNamesEvalIDsAndLabels(const QString &evalName, const QString &group, const QString &evalgroup) const
+{
+
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+#endif
+ QReadLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+    QStringList l;
+    QList<QTriple<QString, QString, QString> > list, listp;
+    QFRawDataRecordPrivate::ResultsIterator i(dstore->results);
+    while (i.hasNext()) {
+        i.next();
+        QString en=i.key();
+        QString egrp=i.value()->group;
+        if ((evalName.isEmpty() || (en==evalName)) && (evalgroup.isEmpty() || (egrp==evalgroup))) {
+            QFRawDataRecordPrivate::ResultsResultsIterator j(i.value()->results);
+            while (j.hasNext()) {
+                j.next();
+                QString rn=j.key();
+                QString g=j.value().group;
+                QString lab=j.value().label;
+                if (lab.isEmpty()) lab=rn;
+                //resultsGetLabel(en, rn);
+                if ((group.isEmpty() || (group==g)) && (!l.contains(lab))) {
+                    l.append(lab);
+                    if (j.value().sortPriority) {
+                        if (g.isEmpty()) listp.append(qMakeTriple(lab, rn, en));
+                        else listp.append(qMakeTriple(g+QString(": ")+lab, rn, en));
+                    } else {
+                        if (g.isEmpty()) list.append(qMakeTriple(lab, rn, en));
+                        else list.append(qMakeTriple(g+QString(": ")+lab, rn, en));
+                    }
+                }
+            }
+        }
+    }
+    if (list.size()>0) {
+        qSort(list.begin(), list.end(), QFRawDataRecord_StringTripleCaseInsensitiveCompareSecond);
+    }
+    if (listp.size()>0) {
+        qSort(listp.begin(), listp.end(), QFRawDataRecord_StringTripleCaseInsensitiveCompareSecond);
+    }
+
+    listp.append(list);
+
+    return listp;
+}
+
 
 QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichtext(const QString& evalName, const QString& group, const QString& evalgroup) const {
     

@@ -266,6 +266,10 @@ public:
      */
     virtual void setFitResultValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value, double error)  ;
 
+    virtual void setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QVector<double> error, QString unit=QString(""))  ;
+    virtual void setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QVector<double> value, QString unit=QString(""))  ;
+
+
     /** \brief stores the given error as a fit result, i.e. into the currently highlighted QFRawDataRecord
      *  \param r the record to adress
      *  \param resultID the result ID which to access in the raw data records result store

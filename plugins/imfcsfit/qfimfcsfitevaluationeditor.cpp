@@ -16,8 +16,9 @@
 #include "qmodernprogresswidget.h"
 #include "qffitfunctionmanager.h"
 #include "qffitalgorithmmanager.h"
-
-
+#include "qfimfcssetparamfromfiledialog.h"
+#include "statistics_tools.h"
+#include "qfmathtools.h"
 
 
 
@@ -26,7 +27,10 @@
 QFImFCSFitEvaluationEditor::QFImFCSFitEvaluationEditor(QFPluginServices *services, QFEvaluationPropertyEditor *propEditor, QWidget *parent):
     QFFitResultsByIndexEvaluationEditorWithWidgets("imfcsfitevaleditor/", propEditor, services, parent, true, true)
 {
+    menuTools=propEditor->addMenu("Tools", 0);
     createWidgets();
+
+
 }
 
 QFImFCSFitEvaluationEditor::~QFImFCSFitEvaluationEditor()
@@ -47,6 +51,7 @@ int QFImFCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord *rec, int index)
 }
 
 void QFImFCSFitEvaluationEditor::createWidgets() {
+
     cmbWeights=new QFFCDWeightingCombobox(this);
     cmbWeights->setMaximumWidth(150);
     cmbWeights->setMinimumWidth(150);
@@ -76,6 +81,11 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
     pltOverview=new QFRDRImageToRunPreview(this);
     tabResidulas->insertTab(0, pltOverview, tr("Overview"));
     tabResidulas->setCurrentIndex(0);
+
+
+    actSetParameterFromFile=new QAction(tr("set fit parameter from file ..."), this)    ;
+    connect(actSetParameterFromFile, SIGNAL(triggered()), this, SLOT(setFitParameterFromFile()));
+    menuTools->addAction(actSetParameterFromFile);
 }
 
 
@@ -1002,6 +1012,44 @@ void QFImFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     htmlBot.replace("width=\"95%\"", "");
     cursor.insertFragment(QTextDocumentFragment::fromHtml(htmlBot));
 
+}
+
+void QFImFCSFitEvaluationEditor::setFitParameterFromFile()
+{
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+
+    QFImFCSFitEvaluation* data=qobject_cast<QFImFCSFitEvaluation*>(current);
+    if (data) {
+        QFFitFunction* ff=data->getFitFunction();
+        double* d=data->allocFillParameters(data->getHighlightedRecord(), data->getCurrentIndex(), ff);
+        if (ff) {
+            QStringList params;
+            QStringList paramIDs;
+            QStringList sl=ff->getParameterIDs();
+            for (int i=0; i<sl.size(); i++) {
+                if (ff->isParameterVisible(i, d)) {
+                    params.append(ff->getDescription(sl[i]).name);
+                    paramIDs<<sl[i];
+                }
+            }
+            QFImFCSSetParamFromFileDialog* dlg=new QFImFCSSetParamFromFileDialog(data, params, paramIDs, this);
+            if (dlg->exec()) {
+                bool ok=false;
+                QVector<double> d=dlg->getData(&ok);
+                double avg=qfstatisticsAverage(d);
+                QString param=dlg->getParameter();
+                //qDebug()<<ok<<param<<avg<<d.size()-1<<data->getIndexMax(current->getHighlightedRecord())<<d.value(0,0);
+                if (ok && d.size()-1==data->getIndexMax(current->getHighlightedRecord())) {
+                    data->setFitResultValue(data->getHighlightedRecord(),data->getEvaluationResultID(0), param, d);
+                    data->setFitResultValue(data->getHighlightedRecord(),data->getEvaluationResultID(-1), param, avg);
+                }
+            }
+            delete dlg;
+        }
+        if (d) free(d);
+    }
 }
 
 

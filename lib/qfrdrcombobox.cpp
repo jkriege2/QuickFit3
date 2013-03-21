@@ -5,6 +5,7 @@ QFRDRComboBox::QFRDRComboBox(QWidget *parent) :
 {
     project=NULL;
     matchFunctor=NULL;
+    connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(myCurrentIndexChanged(int)));
 }
 
 void QFRDRComboBox::init(QFProject *project, QFMatchRDRFunctor *matchFunctor)
@@ -56,4 +57,9 @@ void QFRDRComboBox::setCurrentRDR(const QFRawDataRecord *record)
         int idx=findData(record->getID());
         setCurrentIndex(idx);
     }
+}
+
+void QFRDRComboBox::myCurrentIndexChanged(int i)
+{
+    emit currentRDRChanged(currentRDR());
 }

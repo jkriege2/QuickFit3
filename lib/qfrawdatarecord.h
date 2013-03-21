@@ -745,6 +745,14 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
          */
         QList<QPair<QString, QString> > resultsCalcNamesAndLabels(const QString& evalName=QString(""), const QString& group=QString(""), const QString& evalgroup=QString("")) const;
 
+        /*! \brief return a list of all result labels (first field) for this raw data record, together ith the parameter IDs (second field) and the according evaluation ID (third field)
+
+            If \a evalName is non-empty, this restricts the list to results from the given evaluation \a evalName.
+            If \a group is non-empty the resultant list is filtered by result groups.
+            If \a evalgroup is non-empty the list is restricted to evaluations from the given evalGroup
+         */
+        QList<QTriple<QString, QString, QString> > resultsCalcNamesEvalIDsAndLabels(const QString& evalName=QString(""), const QString& group=QString(""), const QString& evalgroup=QString("")) const;
+
         /*! \brief return a list of all richtexted result labels (first field) for this raw data record, together ith the parameter IDs (second field)
 
             If \a evalName is non-empty, this restricts the list to results from the given evaluation \a evalName.
