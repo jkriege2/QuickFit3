@@ -85,7 +85,8 @@ HEADERS += dlgnewproperty.h \
     qfmatchrdrfunctor.h \
     qfpreprocessormagic.h \
     qfpreprocessormagic_private.h \
-    qfautooutputtimer.h
+    qfautooutputtimer.h \
+    qfrdrcombobox.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -138,7 +139,8 @@ SOURCES += dlgnewproperty.cpp \
     matlabtools.cpp \
     qftextdocumentprintpreview.cpp \
     qfmatchrdrfunctor.cpp \
-    qfautooutputtimer.cpp
+    qfautooutputtimer.cpp \
+    qfrdrcombobox.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

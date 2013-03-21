@@ -71,6 +71,9 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
         /** ßbrief ensures that the parameter table model is displayed properly */
         void ensureCorrectParamaterModelDisplay();
+
+
+
     
         /** \brief evaluate all files */
         void evaluateAll();

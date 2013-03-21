@@ -14,7 +14,14 @@
 #include "qffcsweightingtools.h"
 #include "qfevaluationpropertyeditor.h"
 #include "qfimfccsparameterinputtable.h"
+#include "qfmatchrdrfunctor.h"
 
+class QFImFCCSMatchRDRFunctor: public QFMatchRDRFunctor {
+    public:
+        explicit QFImFCCSMatchRDRFunctor();
+        /** \brief reimplement this function to check whether a QFRawDataRecord* is contained in a QFSelectRDRDialog. the default implementation always returns \c true . */
+        virtual bool matches(const QFRawDataRecord* record) const ;
+};
 
 /*! \brief evaluation item class 
     \ingroup qf3rdrdp_imfccsfit
@@ -100,6 +107,7 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         QFImFCCSParameterInputTable* getParameterInputTableModel() const;
 
         int getNumberOfFitFiles() const;
+        QFMatchRDRFunctor* getMatchFunctor() const;
     public slots:
         void setFitFile(int num, QFRawDataRecord *record);
         virtual void setFitFunction(int num, QString fitFunction);
@@ -108,6 +116,7 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         virtual void removeFitFile();
     protected:
 
+        QFImFCCSMatchRDRFunctor* matchFunctor;
         /** \brief proxy model to filter rdrModel */
         QFEvaluationRawDataModelProxy* rdrProxy;
 

@@ -10,6 +10,7 @@
 QFImFCCSFitEvaluationItem::QFImFCCSFitEvaluationItem(QFProject* parent):
     QFFitResultsByIndexAsVectorEvaluation("fcs_,dls_,fccs_", parent, false, false)
 {
+    matchFunctor=new QFImFCCSMatchRDRFunctor();
     m_weighting=EqualWeighting;
     m_currentIndex=-1;
     m_multiFitFunctions.clear();
@@ -39,6 +40,7 @@ QFImFCCSFitEvaluationItem::QFImFCCSFitEvaluationItem(QFProject* parent):
 }
 
 QFImFCCSFitEvaluationItem::~QFImFCCSFitEvaluationItem() {
+    delete matchFunctor;
 }
 
 
@@ -222,7 +224,8 @@ void QFImFCCSFitEvaluationItem::intReadData(QDomElement *e)
 
 bool QFImFCCSFitEvaluationItem::isApplicable(QFRawDataRecord *record)
 {
-    return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
+    //return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
+    return matchFunctor->matches(record);
 }
 
 void QFImFCCSFitEvaluationItem::intWriteDataAlgorithm(QXmlStreamWriter &w) const
@@ -315,3 +318,17 @@ int QFImFCCSFitEvaluationItem::getNumberOfFitFiles() const
     return fitFilesList.size();
 }
 
+QFMatchRDRFunctor *QFImFCCSFitEvaluationItem::getMatchFunctor() const
+{
+    return matchFunctor;
+}
+
+
+QFImFCCSMatchRDRFunctor::QFImFCCSMatchRDRFunctor()
+{
+}
+
+bool QFImFCCSMatchRDRFunctor::matches(const QFRawDataRecord *record) const
+{
+    return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
+}

@@ -30,6 +30,8 @@ class QFImFCCSFitEvaluation : public QObject, public QFPluginEvaluationItemBase,
         */
         virtual void registerToMenu(QMenu* menu);
 
+        virtual void init();
+
         /** \brief short ID for the plugin */
         virtual QString getID() const  { return tr("imfccs_fit"); };
 
@@ -68,6 +70,8 @@ class QFImFCCSFitEvaluation : public QObject, public QFPluginEvaluationItemBase,
         /** \brief insert FCS data from file*/
         void insertEvaluation();
 
+        /** \brief calculates the fraction of CCF amplitude */
+        void calcRelativeCCF();
 
     private:
 };

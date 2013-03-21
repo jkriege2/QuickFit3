@@ -27,7 +27,8 @@ HEADERS += qfimfccsfitevaluation.h \
     optionswidget.h \
     ../base_classes/qfrdrimagetorunpreview.h \
     qfimfccsparameterinputtable.h \
-    qfimfccsparameterinputdelegate.h
+    qfimfccsparameterinputdelegate.h \
+    qfimfccsrelativeccfdialog.h
 
 SOURCES += qfimfccsfitevaluation.cpp \
            qfimfccsfitevaluation_item.cpp \
@@ -41,10 +42,12 @@ SOURCES += qfimfccsfitevaluation.cpp \
     optionswidget.cpp \
     ../base_classes/qfrdrimagetorunpreview.cpp \
     qfimfccsparameterinputtable.cpp \
-    qfimfccsparameterinputdelegate.cpp
+    qfimfccsparameterinputdelegate.cpp \
+    qfimfccsrelativeccfdialog.cpp
 
 FORMS = qfimfccsfitevaluation_editor.ui \   
-    optionswidget.ui
+    optionswidget.ui \
+    qfimfccsrelativeccfdialog.ui
 
 RESOURCES += qfimfccsfitevaluation.qrc \
     ../base_classes/qfrdrmaskeditor.qrc
