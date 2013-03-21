@@ -39,6 +39,7 @@ void readB040SPIMExperimentConfigFile(QSettings& set, double& frametime, double&
     else if (set.contains("acquisition/acquisition/frame_rate")) frametime=1.0/set.value("acquisition/acquisition/frame_rate", frametime).toDouble()*1e6;
 
     if (set.contains("acquisition/dualview_mode")) dualViewMode=stringToDualViewMode(set.value("acquisition/dualview_mode", "n").toString());
+    else if (set.contains("acquisition/acquisition/dualview_mode")) dualViewMode=stringToDualViewMode(set.value("acquisition/acquisition/dualview_mode", "n").toString());
 
     baseline_offset=set.value("acquisition/baseline_offset", baseline_offset).toDouble();
     //backgroundfile="";
