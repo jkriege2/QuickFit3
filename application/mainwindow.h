@@ -120,6 +120,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual void displayHelpWindow(const QString& helpfile=QString(""));
         /** \brief QFPluginServices::displayHelpWindow() */
         virtual void displayMainHelpWindow(const QString& helpfile=QString(""));
+        /** \brief QFPluginServices::displayPluginHelpWindow() */
+        virtual void displayPluginHelpWindow(const QString& plugin_id, const QString& helpfile=QString(""));
 
         /** \brief QFPluginServices::getPluginHelp() */
         virtual QString getPluginHelp(const QString& pluginID);

@@ -3,6 +3,8 @@
 QFRDRComboBox::QFRDRComboBox(QWidget *parent) :
     QComboBox(parent)
 {
+    project=NULL;
+    matchFunctor=NULL;
 }
 
 void QFRDRComboBox::init(QFProject *project, QFMatchRDRFunctor *matchFunctor)
@@ -18,7 +20,7 @@ void QFRDRComboBox::init(QFProject *project, QFMatchRDRFunctor *matchFunctor)
     this->matchFunctor=matchFunctor;
 
     QList<QPointer<QFRawDataRecord> > lst;
-    if (matchFunctor) lst=matchFunctor->getFilteredList(project);
+    if (matchFunctor && project) lst=matchFunctor->getFilteredList(project);
     else if (project) {
         QList<QFRawDataRecord*> rl=project->getRawDataList();
         for (int i=0; i<rl.size(); i++) {
@@ -48,6 +50,10 @@ QFRawDataRecord *QFRDRComboBox::currentRDR() const
 
 void QFRDRComboBox::setCurrentRDR(const QFRawDataRecord *record)
 {
-    int idx=findData(record->getID());
-    setCurrentIndex(idx);
+    if (!record) {
+        setCurrentIndex(-1);
+    } else {
+        int idx=findData(record->getID());
+        setCurrentIndex(idx);
+    }
 }

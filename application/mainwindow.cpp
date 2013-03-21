@@ -1758,6 +1758,12 @@ void MainWindow::displayMainHelpWindow(const QString &helpfile)
     displayHelpWindow(settings->getAssetsDirectory()+QString("/help/")+helpfile);
 }
 
+void MainWindow::displayPluginHelpWindow(const QString &plugin_id, const QString &helpfile)
+{
+    if (helpfile.isEmpty()) displayHelpWindow(getPluginHelp(plugin_id));
+    else displayHelpWindow(getPluginHelpDirectory(plugin_id)+helpfile);
+}
+
 void MainWindow::displayHelp() {
     displayHelpWindow("");
 }

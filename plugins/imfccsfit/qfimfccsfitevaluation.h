@@ -5,6 +5,8 @@
 #include "qfpluginoptionsdialog.h"
 #include "qfpluginservices.h"
 
+class QFImFCCSRelativeCCFDialog;//forward
+
 /*!
     \defgroup qf3rdrdp_imfccsfit Evaluation Item Plugin for imaging Fluorescence Crosscorrelation Spectroscopy Fits
     \ingroup qf3evaluationplugins
@@ -74,6 +76,8 @@ class QFImFCCSFitEvaluation : public QObject, public QFPluginEvaluationItemBase,
         void calcRelativeCCF();
 
     private:
+
+        QPointer<QFImFCCSRelativeCCFDialog> dlgRelCCF;
 };
 
 #endif // QFIMFCCSFITEVALUATION_H

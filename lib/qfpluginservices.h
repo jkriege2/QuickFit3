@@ -143,6 +143,9 @@ class QFLIB_EXPORT QFPluginServices {
         /** \brief display the help window and open the given file. If no file is given, des QuickFit main help page is shown. */
         virtual void displayHelpWindow(const QString& helpfile=QString(""))=0;
 
+        /** \brief display the help window and open the given file inside the given plugin's help directory, or the plugins main help page, if \a helpfile is left blank. */
+        virtual void displayPluginHelpWindow(const QString& plugin_id, const QString& helpfile=QString(""))=0;
+
         /** \brief display the help window and open the given file. If no file is given, des QuickFit main help page is shown. */
         virtual void displayMainHelpWindow(const QString& helpfile=QString(""))=0;
 

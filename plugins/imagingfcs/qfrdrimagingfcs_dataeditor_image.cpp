@@ -95,6 +95,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     int row=0;
     cmbResultGroup=new QComboBox(this);
+    cmbResultGroup->setMaximumWidth(700);
+    cmbResultGroup->view()->setTextElideMode(Qt::ElideMiddle);
     cmbResultGroup->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     topgrid->addWidget((l=new QLabel(tr("&result set:"))), row, 0);
     l->setBuddy(cmbResultGroup);
@@ -3355,6 +3357,10 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
         //QStringList egroup=m->resultsCalcEvalGroups();
         QString egroup=currentEvalGroup();
         QList<QPair<QString, QString> > params=m->resultsCalcNamesAndLabels("", "fit results", egroup);
+        QList<QPair<QString, QString> > params1=m->resultsCalcNamesAndLabels("", "results", egroup);
+        QList<QPair<QString, QString> > params2=m->resultsCalcNamesAndLabels("", "evaluation results", egroup);
+        params.append(params1);
+        params.append(params2);
         cmbParameter->clear();
         cmbGofParameter->clear();
         for (int i=0; i<params.size(); i++) {
@@ -4421,6 +4427,7 @@ void QFRDRImagingFCSImageEditor::copyMaskToAll() {
                     if (rdr) {
                         if (chkClearMask->isChecked()) rdr->maskClear();
                         rdr->maskLoadFromString(mask);
+                        rdr->recalcCorrelations();
                     }
                     progress.setValue(i);
                     QApplication::processEvents();

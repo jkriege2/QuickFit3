@@ -22,6 +22,9 @@ public:
 
     void setFitModels(const QStringList& models, const QString& defaultModel);
     QString getFitModel() const;
+protected slots:
+
+    void on_btnHelp_clicked();
 protected:
     void closeEvent(QCloseEvent *event);
 private:

@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>imFCCS Tool: Calculate relative CCF amplitude</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$  
+     
+
+<h2>Function</h2>
+
+     <p>
+     This tool allows to calculate the relative CCF amplitude for imagingFCS raw data records in the project, i.e. it calculates an image where each pixel $$math:(x,y)$$ contain this information:
+    $$bmath:\mbox{RCCF}(x,y)=\frac{\sum_{i=0}^{N-1} g_{\mbox{CCF}, (x,y)}(\tau_i)}{\sum_{i=0}^{N-1} g_{\mbox{ACF}, (x,y)}(\tau_i)}=:\frac{C}{A}$$
+    where $$math:g_{\mbox{CCF}, (x,y)}(\tau_i)$$ is the crosscorrelation amplitude at time lag $$math:\tau_i$$ and $$math:g_{\mbox{ACF}, (x,y)}(\tau_i)$$ is the autocorrelation amplitude at time lag $$math:\tau_i$$. 
+    The number $$math:N$$ gives the number of correlation channels over which to average in each pixel. The plugin also estimates an error for this quantity:
+    $$bmath:\Delta\mbox{RCCF}(x,y)=\sqrt{\left(\Delta A\cdot\frac{C}{A^2}\right)^2+\left(\frac{\Delta C}{A}\right)^2}$$
+    Here the errors are defined as the average of the correlation functions' standard deviation:
+    $$bmath:\Delta A=\frac{1}{N}\cdot\sum_{i=0}^{N-1}\sigma_{\mbox{CCF}, (x,y)}(\tau_i) $$
+    In all of these equations $$math:\tau_0$$ is the minimal lag time of the measured correlation functions.
+     </p>
+     
+     
+
+<h2>User Interface</h2>
+<p>The tool can be opened by clicking in the main window on the menu entry <tt>Tools|imFCCS|calculate relative CCF amplitude</tt>.
+Subsequently a window will open up where a file for the autocorrelation and a file for the crosscorrelation can be selected, Buttons next to these file-selection comboboxes alles to move on to the next file to process. When a new ACF is selected the dialog tries to determine the fitting CCF file automatically.
+If both files are selected, overview images of the files are displayed below. A third plot shows the $$math:\mbox{RCCF}(x,y)$$ image calculated from the selected files.
+</p>
+<p>The function of the single buttons:
+<ul>
+    <li>"<b>store result</b>" will save the RCCF image in the CCF file.</li>
+    <li>"<b>store all results</b>" will walk through all files (basically by clicking "next ACF" and stores the resulting RCCF map. If  for every measurement one CCF and two ACFs are present in the project, this will calculate two RCCFs (one for each ACF).</li>
+    <li>"<b>store all results, same role</b>" will do the same as above, but it will rather use "next file, same role". This function is useful,, when for every measurement one CCF and two ACFs are present in the project. Then </li>
+    
+<li>"<b>next ACF</b>": will select the next ACF file in the list (and the fitting CCF file</li>
+<li>"<b>next file</b>": will select the next file in the list, without caring whether it contains an ACF or not (and the fitting CCF file</li>
+<li>"<b>next file, same role</b>": will select the next file in the list with the same role, as the current file</li></ul>
+</p>
+
+  </body>
+
+</html>

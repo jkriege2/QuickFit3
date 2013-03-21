@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "qfimfccsfitevaluation_item.h"
+#include "qfplotter.h"
 
 namespace Ui {
     class QFImFCCSRelativeCCFDialog;
@@ -19,11 +20,30 @@ class QFImFCCSRelativeCCFDialog : public QDialog
         QFRawDataRecord* getACF() const;
         QFRawDataRecord* getCCF() const;
 
+        static bool calculateRelCCF(QFRawDataRecord* acf, QFRawDataRecord* ccf, double** rel, double** rel_error, int &w, int &h, int avgCount, bool showErrorMessage=false);
+
     protected slots:
         void on_cmbACF_currentIndexChanged(int index);
+        void on_cmbCCF_currentIndexChanged(int index);
+        void replotImages();
+        void addResult();
+        void on_btnNextACF_clicked();
+        void on_btnNextFile_clicked();
+        void on_btnNextFileSameRole_clicked();
+        void on_btnStoreDataAllSameRole_clicked();
+        void on_btnStoreDataAll_clicked();
+        void on_btnHelp_clicked();
     private:
         Ui::QFImFCCSRelativeCCFDialog *ui;
         QFImFCCSMatchRDRFunctor* matchFunctor;
+        JKQTPColumnMathImage* plt;
+
+        bool nextACF();
+        bool nextFile();
+        bool nextFileSameRole();
+
+        bool isACF(const QFRawDataRecord* rec);
+        bool isCCF(const QFRawDataRecord* rec);
 };
 
 #endif // QFIMFCCSRELATIVECCFDIALOG_H

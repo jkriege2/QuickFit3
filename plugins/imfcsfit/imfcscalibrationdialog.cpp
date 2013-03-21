@@ -69,3 +69,9 @@ QString ImFCSCalibrationDialog::getFitModel() const
 {
     return ui->cmbFitModel->itemData(ui->cmbFitModel->currentIndex()).toString();
 }
+
+void ImFCSCalibrationDialog::on_btnHelp_clicked()
+{
+        QFPluginServices::getInstance()->displayPluginHelpWindow("imfcs_fit", "calibration.html");
+
+}
