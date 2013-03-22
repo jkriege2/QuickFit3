@@ -1,7 +1,7 @@
 #ifndef QFRESULTSGROUPCOMBOBOX_H
 #define QFRESULTSGROUPCOMBOBOX_H
 
-#include <QCombobox>
+#include <QComboBox>
 #include "qfrawdatarecord.h"
 #include "lib_imexport.h"
 
