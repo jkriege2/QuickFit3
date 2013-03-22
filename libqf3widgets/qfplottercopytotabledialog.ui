@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>775</width>
-    <height>234</height>
+    <height>252</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -235,8 +235,8 @@
      <y>93</y>
     </hint>
     <hint type="destinationlabel">
-     <x>49</x>
-     <y>111</y>
+     <x>69</x>
+     <y>186</y>
     </hint>
    </hints>
   </connection>
@@ -251,8 +251,8 @@
      <y>158</y>
     </hint>
     <hint type="destinationlabel">
-     <x>184</x>
-     <y>141</y>
+     <x>337</x>
+     <y>177</y>
     </hint>
    </hints>
   </connection>
@@ -263,12 +263,28 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>92</x>
-     <y>148</y>
+     <x>146</x>
+     <y>174</y>
     </hint>
     <hint type="destinationlabel">
      <x>162</x>
      <y>125</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbRDR</sender>
+   <signal>currentColumnGraphicsChanged(QFRDRColumnGraphsInterface*)</signal>
+   <receiver>cmbGraph</receiver>
+   <slot>setColumnGraphs(QFRDRColumnGraphsInterface*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>93</x>
+     <y>26</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>300</x>
+     <y>126</y>
     </hint>
    </hints>
   </connection>
