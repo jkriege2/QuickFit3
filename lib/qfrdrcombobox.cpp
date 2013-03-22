@@ -5,20 +5,73 @@ QFRDRComboBox::QFRDRComboBox(QWidget *parent) :
 {
     project=NULL;
     matchFunctor=NULL;
+    functorPrivate=false;
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(myCurrentIndexChanged(int)));
 }
 
-void QFRDRComboBox::init(QFProject *project, QFMatchRDRFunctor *matchFunctor)
+QFRDRComboBox::~QFRDRComboBox()
 {
+    if (functorPrivate && matchFunctor) delete matchFunctor;
+}
+
+void QFRDRComboBox::init(QFProject *project, QFMatchRDRFunctor *matchFunctor, bool functorPrivate)
+{
+
+    this->project=project;
+    if (this->functorPrivate &&this->matchFunctor) delete this->matchFunctor;
+    this->matchFunctor=matchFunctor;
+    this->functorPrivate=functorPrivate;
+
+    refill();
+
+}
+
+QFRawDataRecord *QFRDRComboBox::currentRDR() const
+{
+    int ID=itemData(currentIndex()).toInt();
+    if (project) {
+        return project->getRawDataByID(ID);
+    }
+    return NULL;
+}
+
+int QFRDRComboBox::currentRDRID() const
+{
+    int ID=itemData(currentIndex()).toInt();
+    if (project && currentIndex()>=0) return ID;
+    return -1;
+}
+
+
+void QFRDRComboBox::setCurrentRDR(const QFRawDataRecord *record)
+{
+    if (!record) {
+        setCurrentIndex(-1);
+    } else {
+        int idx=findData(record->getID());
+        setCurrentIndex(idx);
+    }
+}
+
+void QFRDRComboBox::setCurrentRDRID(int record)
+{
+    int idxFound=findData(record);
+    if (idxFound>=0) setCurrentIndex(idxFound);
+
+}
+
+void QFRDRComboBox::refill()
+{
+    QFRawDataRecord *rdr=currentRDR();
+
     bool idxOK=true;
     int rdrID=itemData(currentIndex()).toInt(&idxOK);
     if (currentIndex()<0) idxOK=false;
     setUpdatesEnabled(false);
 
     clear();
-
-    this->project=project;
-    this->matchFunctor=matchFunctor;
+    if (project) disconnect(project, SIGNAL(structureChanged()), this, SLOT(refill()));
+    disconnect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(myCurrentIndexChanged(int)));
 
     QList<QPointer<QFRawDataRecord> > lst;
     if (matchFunctor && project) lst=matchFunctor->getFilteredList(project);
@@ -37,26 +90,12 @@ void QFRDRComboBox::init(QFProject *project, QFMatchRDRFunctor *matchFunctor)
     if (idxOK && (idxFound>=0)) setCurrentIndex(idxFound);
     else setCurrentIndex(0);
     setUpdatesEnabled(true);
-}
-
-QFRawDataRecord *QFRDRComboBox::currentRDR() const
-{
-    int ID=itemData(currentIndex()).toInt();
-    if (project) {
-        return project->getRawDataByID(ID);
-    }
-    return NULL;
-}
-
-
-void QFRDRComboBox::setCurrentRDR(const QFRawDataRecord *record)
-{
-    if (!record) {
-        setCurrentIndex(-1);
-    } else {
-        int idx=findData(record->getID());
-        setCurrentIndex(idx);
-    }
+    if (this->project) connect(this->project, SIGNAL(structureChanged()), this, SLOT(refill()));
+    setCurrentRDR(rdr);
+    connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(myCurrentIndexChanged(int)));
+    if (currentRDR()!=rdr) emit currentRDRChanged(currentRDR());
+    if (count()<=0) emit refilledEmpty();
+    emit refilled(count()>0);
 }
 
 void QFRDRComboBox::myCurrentIndexChanged(int i)

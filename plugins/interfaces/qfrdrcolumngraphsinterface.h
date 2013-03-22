@@ -37,6 +37,8 @@ class QFRDRColumnGraphsInterface {
         virtual void colgraphRemovePlot(int graph, int plot) =0;
         /** \brief set graph title */
         virtual void colgraphSetGraphTitle(int graph, const QString&  title)=0;
+        /** \brief returns the graph title */
+        virtual QString colgraphGetGraphTitle(int graph)=0;
         /** \brief set the color of the graph, the fill and error color are determined automatically */
         virtual void colgraphSetPlotColor(int graph,  int plot,  QColor  color)=0;
         /** \brief set the color of the graph, the error color is determined automatically */

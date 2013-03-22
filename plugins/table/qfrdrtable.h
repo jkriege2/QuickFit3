@@ -197,6 +197,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
         virtual QVariant tableGetData(quint16 row, quint16 column) const;
         virtual void tableSetData(quint16 row, quint16 column, const QVariant& data);
+        virtual void tableSetColumnData(quint16 column, QList<QVariant> data);
         virtual void tableSetColumnTitle( quint16 column, const QString& data);
         virtual QString tableGetColumnTitle(quint16 column) const;
         virtual bool tableSupportsExpressions() const;
@@ -223,6 +224,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual void colgraphSetPlotColor(int graph,  int plot, QColor  color, QColor  fillColor);
         virtual void colgraphSetPlotColor(int graph,  int plot, QColor  color, QColor  fillColor, QColor errorColor);
         virtual void colgraphSetGraphTitle(int graph, const QString&  title);
+        virtual QString colgraphGetGraphTitle(int graph);
         virtual void colgraphSetGraphXAxisProps(int graph, const QString& xLabel=QString("x"), bool logX=false);
         virtual void colgraphSetGraphYAxisProps(int graph, const QString& yLabel=QString("y"), bool logY=false);
         virtual void colgraphsetXRange(int graph, double xmin, double xmax);

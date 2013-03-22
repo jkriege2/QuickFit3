@@ -499,6 +499,22 @@ void QFTableModel::setCell(quint16 row, quint16 column, QVariant value) {
     if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
+void QFTableModel::setColumn(quint16 column, QList<QVariant>& value)
+{
+    //std::cout<<"setCell("<<row<<", "<<column<<", '"<<value.toString().toStdString()<<"' ["<<value.typeName()<<"])\n";
+    if (readonly || (column>=columns)) return;
+    quint16 row=0;
+    for (int i=0; i<value.size(); i++) {
+        if (row<rows) {
+            quint32 a=xyAdressToUInt32(row, column);
+            dataMap[a]=value[i];
+        }
+        row++;
+    }
+    if (doEmitSignals) emit dataChanged(index(0, column), index(row-1, column));
+}
+
+
 void QFTableModel::copyCell(quint16 row, quint16 column, quint16 row_old, quint16 column_old)
 {
     if (readonly || (row>=rows) || (column>=columns) || (row_old>=rows) || (column_old>=columns)) return;
@@ -538,6 +554,17 @@ void QFTableModel::setCellCreate(quint16 row, quint16 column, QVariant value) {
     if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
+void QFTableModel::setColumnCreate(quint16 column, QList<QVariant>& value)
+{
+    if (readonly) return;
+    if ((value.size()>rows) || (column>=columns)) {
+        resize(qMax(rows, quint16(value.size())), qMax(columns, quint16(column+1)));
+    }
+
+    setColumn(column, value);
+
+
+}
 void QFTableModel::setCellEditRole(quint16 row, quint16 column, QVariant value) {
     //std::cout<<"setCell("<<row<<", "<<column<<", '"<<value.toString().toStdString()<<"' ["<<value.typeName()<<"])\n";
     if (readonly || (row>=rows) || (column>=columns)) return;

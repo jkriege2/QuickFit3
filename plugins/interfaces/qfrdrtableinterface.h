@@ -16,6 +16,8 @@ class QFRDRTableInterface {
         virtual QVariant tableGetData(quint16 row, quint16 column) const=0;
         /** \brief sets the data in the table at a given position, if the cell does not exist, the table is expanded! */
         virtual void tableSetData(quint16 row, quint16 column, const QVariant& data)=0;
+        /** \brief sets a whole column in a table  */
+        virtual void tableSetColumnData(quint16 column, QList<QVariant> data)=0;
         /** \brief sets the column title */
         virtual void tableSetColumnTitle( quint16 column, const QString& data)=0;
         /** \brief returns a column's title */

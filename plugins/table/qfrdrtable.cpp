@@ -156,6 +156,13 @@ void QFRDRTable::tableSetData(quint16 row, quint16 column, const QVariant &data)
     }
 }
 
+void QFRDRTable::tableSetColumnData(quint16 column, QList<QVariant> data)
+{
+    if (datamodel)  {
+        datamodel->setColumnCreate(column, data);
+    }
+}
+
 void QFRDRTable::tableSetColumnTitle(quint16 column, const QString &data)
 {
     //qDebug()<<"tableSetColumnTitle("<<column<<",    "<<data<<")";
@@ -424,6 +431,14 @@ void QFRDRTable::colgraphSetGraphTitle(int graph, const QString &title)
         plt.title=title;
         setPlot(graph, plt);
     }
+}
+
+QString QFRDRTable::colgraphGetGraphTitle(int graph)
+{
+    if (graph>=0 && graph<plots.size()) {
+        return getPlot(graph).title;
+    }
+    return "";
 }
 
 

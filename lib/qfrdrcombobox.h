@@ -17,18 +17,30 @@ class QFLIB_EXPORT QFRDRComboBox : public QComboBox
         Q_OBJECT
     public:
         explicit QFRDRComboBox(QWidget *parent = 0);
+        ~QFRDRComboBox();
         
-        void init(QFProject* project, QFMatchRDRFunctor* matchFunctor=NULL);
+        /** \brief initialises/fills the combobox from the given project and using the given functor.
+          *
+          * If \a functorPrivate is \c true the functor belongs to this object and will be deleted if no longer needed
+          */
+        virtual void init(QFProject* project, QFMatchRDRFunctor* matchFunctor, bool functorPrivate=false);
         QFRawDataRecord* currentRDR() const;
+        int currentRDRID() const;
     signals:
         void currentRDRChanged(QFRawDataRecord* record);
+        void refilledEmpty();
+        void refilled(bool full);
     public slots:
         void setCurrentRDR(const QFRawDataRecord* record);
+        void setCurrentRDRID(int record);
+        void refill();
+
     protected slots:
-        void myCurrentIndexChanged(int i);
+        virtual void myCurrentIndexChanged(int i);
     protected:
         QFProject* project;
         QFMatchRDRFunctor* matchFunctor;
+        bool functorPrivate;
         
 };
 

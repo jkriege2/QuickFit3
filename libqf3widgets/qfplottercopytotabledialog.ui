@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFPlotterCopyToTableDialog</class>
+ <widget class="QDialog" name="QFPlotterCopyToTableDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>775</width>
+    <height>234</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Add plot data to table ...</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>file:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFRDRTableComboBox" name="cmbRDR"/>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkNewTable">
+       <property name="text">
+        <string>create new:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="edtNewTableName">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string> Add to graph? </string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QRadioButton" name="radAddDataOnly">
+        <property name="text">
+         <string>only add data to table</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radAlsoAddGraphs">
+        <property name="text">
+         <string>also add graphs</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="widGraph" native="true">
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="3">
+          <widget class="QFRDRColumnGraphsComboBox" name="cmbGraph"/>
+         </item>
+         <item row="1" column="3">
+          <widget class="QLineEdit" name="edtNewGraphName">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>graph to add to:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="1" column="1">
+          <widget class="QCheckBox" name="chCreateNewGraph">
+           <property name="text">
+            <string>create new</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFRDRTableComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qfrdrtablecombobox.h</header>
+   <slots>
+    <signal>currentColumnGraphicsChanged(QFRDRColumnGraphsInterface*)</signal>
+    <signal>currentTableChanged(QFRDRTableInterface*)</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>QFRDRColumnGraphsComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qfrdrtablecombobox.h</header>
+   <slots>
+    <slot>setColumnGraphs(QFRDRColumnGraphsInterface*)</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>QFPlotterCopyToTableDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>227</x>
+     <y>216</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>233</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>QFPlotterCopyToTableDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>295</x>
+     <y>222</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>233</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkNewTable</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbRDR</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>189</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>80</x>
+     <y>19</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkNewTable</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtNewTableName</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>189</x>
+     <y>18</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>293</x>
+     <y>17</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radAlsoAddGraphs</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>widGraph</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>69</x>
+     <y>93</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>49</x>
+     <y>111</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chCreateNewGraph</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtNewGraphName</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>132</x>
+     <y>158</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>184</x>
+     <y>141</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chCreateNewGraph</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbGraph</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>92</x>
+     <y>148</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>162</x>
+     <y>125</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

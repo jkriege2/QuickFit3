@@ -107,7 +107,9 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfplotterprivate.h \
     qfselectrdrdialog.h \
     ../plugins/interfaces/qfrdrtableinterface.h \
-    ../plugins/interfaces/qfrdrcolumngraphsinterface.h
+    ../plugins/interfaces/qfrdrcolumngraphsinterface.h \
+    qfrdrtablecombobox.h \
+    qfplottercopytotabledialog.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -175,7 +177,9 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfhtmlhighlighter.cpp \
     qfplotter.cpp \
     qfplotterprivate.cpp \
-    qfselectrdrdialog.cpp
+    qfselectrdrdialog.cpp \
+    qfrdrtablecombobox.cpp \
+    qfplottercopytotabledialog.cpp
 
 
 
@@ -183,7 +187,8 @@ FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \
     qf3filtereditor.ui \
     qfselectionlistdialog.ui \
-    qfselectrdrdialog.ui
+    qfselectrdrdialog.ui \
+    qfplottercopytotabledialog.ui
 
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/qspecialtoolbutton.qrc \
