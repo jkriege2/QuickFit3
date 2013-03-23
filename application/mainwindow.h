@@ -26,6 +26,7 @@
 #include "qrecentfilesmenu.h"
 #include "qfhistogramservice.h"
 #include "qfhistogramview.h"
+#include "qfelidedlabel.h"
 
 
 
@@ -152,6 +153,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         void closeEvent(QCloseEvent *event);
         virtual void showEvent(QShowEvent* event);
 
+        QString projectFileFilter;
+        QString projectSaveFileFilter;
+
     private slots:
         /** \brief create a new project */
         void newProject();
@@ -159,6 +163,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         void closeProject();
         /** \brief display an open project dialog and open the selected project */
         void openProject();
+
+        /** \brief display an open project dialog and open the selected project, but let the user first select a subset of nodes to load */
+        void openProjectSubset();
         /** \brief reload the current project file */
         void reloadProject();
         /** \brief load project from recent projects menu */
@@ -253,7 +260,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QString createPluginDocHelp(QString mainitem_before=QObject::tr("<h2>%1 Help:</h2><ul>"), QString mainitem_after=QString("</ul>"));
         /** \brief create one item in the plugin listing, created in createPluginDoc(). Provide all the basic data. If you want additional row, supply them in additional where line i contains the i-th addition name and line i+1 contains the i-th addition value */
         QString createPluginDocItem(bool docLink, QString id, QString name, QString description, QString iconfilename, QString author, QString copyright, QString weblink, QString file, int verMajor, int verMinor, QStringList additional);
-        void loadProject(const QString &fileName);
+        void loadProject(const QString &fileName, bool subsetMode=false, const QSet<int>& rdrSelected=QSet<int>(), const QSet<int>& evalSelected=QSet<int>());
         bool saveProject(const QString &fileName);
         void setCurrentProject(const QString &fileName);
         QString strippedName(const QString &fullFileName);
@@ -274,6 +281,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QMenu *projectToolsMenu;
         QMenu *debugToolsMenu;
         QMenu *fileMenu;
+        QMenu* projectSpecialMenu;
         QMenu *dataMenu;
         QMenu *evaluationMenu;
         QMenu *helpMenu;
@@ -285,6 +293,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QToolBar* toolsToolBar;
         QAction *newProjectAct;
         QAction *openProjectAct;
+        QAction *openProjectSubsetAct;
         QAction *saveProjectAct;
         QAction *saveProjectAsAct;
         QAction* actReloadProject;
@@ -327,7 +336,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QVisibleHandleSplitter* spMain;
         QVisibleHandleSplitter* spCenter;
 
-        QLabel* labFile;
+        QFElidedLabel* labFile;
         QPlainTextEdit* pteDescription;
         QLineEdit* edtName;
         QLineEdit* edtCreator;

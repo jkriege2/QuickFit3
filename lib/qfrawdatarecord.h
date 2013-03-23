@@ -64,8 +64,11 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
         /** \brief initialize the object with the given data */
         void init(const QString& name=QString(""), QStringList inputFiles=QStringList(), QStringList inputFilesTypes=QStringList(), QStringList inputFileDescriptions=QStringList());
-        /** \brief initialize from QDomElement */
-        void init(QDomElement& e);
+        /** \brief initialize from QDomElement, if \a loadAsDummy is \c true this method won't load the data in the record, but only the common descrption of the record.
+         *
+         * The property \a loadAsSummy is used by QFProject::readXMLDummy() in order to build a dummy project tree. For more information \see QFProject::readXMLDummy()
+         */
+        void init(QDomElement& e, bool loadAsDummy=false);
 
 
         /** \brief return the next sibling rawdata record in the project */
@@ -280,9 +283,12 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         QFProject* project;
 
         /** \brief read object contents from QDomElement
-         *  \see
+         *
+         * If the property \a loadAsDummy is \c true this method will only read the basic properties from XML, i.e. name, description,
+         * id, ... but not the results and not the actual data. This function can be used to build a dummy project tree.
+         *  \see QFProject::readXMLDummy() for more information on the property \a loadAsDummy
          */
-        void readXML(QDomElement& e);
+        void readXML(QDomElement& e, bool loadAsDummy=false);
         /** \brief write data contents to QXmlStreamWriter (data tag) <b>IMPLEMENT IN CHILD CLASSES!</b> */
         virtual void intWriteData(QXmlStreamWriter& w) {}
         /** \brief read in external data files <b>and</b> data stored in the project file <b>IMPLEMENT IN CHILD CLASSES!</b>

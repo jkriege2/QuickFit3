@@ -31,6 +31,7 @@ QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactor
     treeModel=NULL;
     reading=false;
     m_signalsEnabled=true;
+    m_dummy=false;
 }
 
 
@@ -392,7 +393,48 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
     }*/
 }
 
-void QFProject::readXML(const QString& file) {
+void QFProject::readXML(const QString &file)
+{
+    m_dummy=false;
+    m_subset=false;
+    subsetRDR.clear();
+    subsetEval.clear();
+    internalReadXML(file);
+}
+
+void QFProject::readXMLSubSet(const QString &file, const QSet<int> &rdrSelected, const QSet<int> &evalSelected)
+{
+    m_dummy=false;
+    m_subset=true;
+    subsetRDR=rdrSelected;
+    subsetEval=evalSelected;
+    internalReadXML(file);
+
+    // change filename, so old project does not get overwritten!
+    QFileInfo fi=QFileInfo(this->file);
+    QDir d=fi.dir();
+    QString newFN=fi.completeBaseName()+QString("_subset.")+fi.suffix();
+    int i=1;
+    while (d.exists(newFN)) {
+        newFN=fi.completeBaseName()+QString("_subset%1.").arg(i, 2, 10, QLatin1Char('0'))+fi.suffix();
+    }
+    this->file=newFN;
+    setDataChanged();
+
+    setName(tr("subset of '%1'").arg(getName()));
+}
+
+void QFProject::readXMLDummy(const QString &file)
+{
+    m_dummy=true;
+    m_subset=false;
+    subsetRDR.clear();
+    subsetEval.clear();
+    internalReadXML(file);
+}
+
+
+void QFProject::internalReadXML(const QString& file) {
     this->reading=true;
     bool namechanged=(file!=this->file);
     this->file=file;
@@ -451,12 +493,22 @@ void QFProject::readXML(const QString& file) {
                             QApplication::processEvents(QEventLoop::AllEvents, 50);
                         }
                         QString t=rd.attribute("type", "invalid").toLower();
+                        bool IDok=false;
+                        bool loadRec=true;
+                        int ID=rd.attribute("id", "-1").toInt(&IDok);
                         //std::cout<<t.toStdString()<<std::endl;
-                        try {
-                            QFRawDataRecord* e=getRawDataRecordFactory()->createRecord(t, this);
-                            e->init(rd);
-                        } catch(std::exception& E) {
-                            setError(tr("Error while opening raw data element: %2").arg(E.what()));
+
+                        if (m_subset) {
+                            loadRec=false;
+                            if (IDok && subsetRDR.contains(ID)) loadRec=true;
+                        }
+                        if (loadRec) {
+                            try {
+                                QFRawDataRecord* e=getRawDataRecordFactory()->createRecord(t, this);
+                                e->init(rd, m_dummy);
+                            } catch(std::exception& E) {
+                                setError(tr("Error while opening raw data element: %2").arg(E.what()));
+                            }
                         }
                         rd=rd.nextSiblingElement("rawdataelement");
 #ifdef DEBUG_TIMING
@@ -477,12 +529,23 @@ void QFProject::readXML(const QString& file) {
                             QApplication::processEvents(QEventLoop::AllEvents, 50);
                         }
                         QString t=rd.attribute("type", "invalid").toLower();
+                        bool IDok=false;
+                        bool loadRec=true;
+                        int ID=rd.attribute("id", "-1").toInt(&IDok);
+                        //std::cout<<t.toStdString()<<std::endl;
 
-                        try {
-                            QFEvaluationItem* e=getEvaluationItemFactory()->createRecord(t, services, this);
-                            e->init(rd);
-                        } catch(std::exception& E) {
-                            setError(tr("Error while opening raw data element: %2").arg(E.what()));
+                        if (m_subset) {
+                            loadRec=false;
+                            if (IDok && subsetEval.contains(ID)) loadRec=true;
+                        }
+                        if (loadRec) {
+
+                            try {
+                                QFEvaluationItem* e=getEvaluationItemFactory()->createRecord(t, services, this);
+                                e->init(rd, m_dummy);
+                            } catch(std::exception& E) {
+                                setError(tr("Error while opening raw data element: %2").arg(E.what()));
+                            }
                         }
 
                         rd=rd.nextSiblingElement("evaluationelement");
@@ -1417,6 +1480,11 @@ void QFProject::moveEvaluationDown(int recID)
 bool QFProject::areSignalsEnabled() const
 {
     return m_signalsEnabled;
+}
+
+bool QFProject::isDummy() const
+{
+    return m_dummy;
 }
 
 

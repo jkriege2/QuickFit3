@@ -24,12 +24,39 @@ void QFProjectTreeModel::init(QFProject* p) {
     if (current) disconnect(current, SIGNAL(structureChanged(bool)), this , SLOT(projectStructureChanged()));
     if (current) disconnect(current, SIGNAL(propertiesChanged()), this , SLOT(projectDataChanged()));
     current=p;
+    rdrUnchecked.clear();
+    evaluationUnchecked.clear();
     createModelTree();
     if (current) {
         connect(current, SIGNAL(structureChanged()), this , SLOT(projectStructureChanged()));
         connect(current, SIGNAL(propertiesChanged()), this , SLOT(projectDataChanged()));
     }
     reset();
+}
+
+QSet<int> QFProjectTreeModel::getSelectedRDR() const
+{
+    QSet<int> res;
+    if (current) {
+        QList<int> ids=current->getRawDataIDList();
+        for (int i=0; i<ids.size(); i++) {
+            if (!rdrUnchecked.contains(ids[i])) res<<ids[i];
+        }
+    }
+    return res;
+}
+
+QSet<int> QFProjectTreeModel::getSelectedEvaluations() const
+{
+    QSet<int> res;
+    if (current) {
+        QList<int> ids=current->getEvaluationIDList();
+        for (int i=0; i<ids.size(); i++) {
+            if (!evaluationUnchecked.contains(ids[i])) res<<ids[i];
+        }
+    }
+    return res;
+
 }
 
 void QFProjectTreeModel::createModelTree() {
@@ -96,17 +123,20 @@ Qt::ItemFlags QFProjectTreeModel::flags(const QModelIndex &index) const {
         case QFProjectTreeModelNode::qfpntRoot:
             return 0;
         case QFProjectTreeModelNode::qfpntProject:
-            return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+            if (current && !current->isDummy()) return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+            else return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
         case QFProjectTreeModelNode::qfpntRawDataRecord:
-            return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+            if (current && !current->isDummy()) return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+            else return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
         case QFProjectTreeModelNode::qfpntEvaluationRecord:
-            return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+            if (current && !current->isDummy()) return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+            else return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
         case QFProjectTreeModelNode::qfpntDirectory: {
                 QFProjectTreeModelNode* node=getTreeNodeByIndex(index.parent());
-                if (node && node->type()!=QFProjectTreeModelNode::qfpntProject && node->type()!=QFProjectTreeModelNode::qfpntRoot) {
+                if (current && !current->isDummy() && node && node->type()!=QFProjectTreeModelNode::qfpntProject && node->type()!=QFProjectTreeModelNode::qfpntRoot) {
                     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
                 }
-                return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+                return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
             }
         default:
             return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
@@ -130,55 +160,146 @@ QVariant QFProjectTreeModel::data ( const QModelIndex & index, int role ) const 
             return item->icon();
         } else if (role == Qt::ToolTipRole || role == Qt::StatusTipRole) {
             return item->toolHelp();
+        } else if (role == Qt::CheckStateRole && current->isDummy()) {
+            if (nt==QFProjectTreeModelNode::qfpntEvaluationRecord) {
+                if (evaluationUnchecked.contains(item->evaluationItem()->getID())) return Qt::Unchecked;
+                else return Qt::Checked;
+            }
+            if (nt==QFProjectTreeModelNode::qfpntRawDataRecord) {
+                if (rdrUnchecked.contains(item->rawDataRecord()->getID())) return Qt::Unchecked;
+                else return Qt::Checked;
+            }
+            if (nt==QFProjectTreeModelNode::qfpntDirectory) {
+                QFProjectTreeModelNode* dirNode=getTreeNodeByIndex(index);
+                QList<QFProjectTreeModelNode*> l=dirNode->getAllChildRawDataRecords();
+                QMap<QFRawDataRecord*, QString> m;
+                Qt::CheckState s=Qt::PartiallyChecked;
+                bool allUnchecked=true;
+                bool someChecked=false;
+                bool allChecked=true;
+                for (int i=0; i<l.size(); i++) {
+                    if (l[i] && l[i]->type()==QFProjectTreeModelNode::qfpntRawDataRecord) {
+                        QFRawDataRecord* rec=l[i]->rawDataRecord();
+                        if (rec){
+                            if (!rdrUnchecked.contains(rec->getID())) {
+                                allUnchecked=false;
+                                someChecked=true;
+                            } else {
+                                allChecked=false;
+                            }
+                        }
+                    }
+                }
+                if (allChecked) return Qt::Checked;
+                if (allUnchecked) return  Qt::Unchecked;
+                return Qt::PartiallyChecked;
+            }
         }
     }
     return QVariant();
 }
 
 bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &value, int role) {
+
+    //qDebug()<<"QFProjectTreeModel::setData("<<index<<value<<role<<")";
     if (!current || !rootItem) return false;
 
     QFProjectTreeModelNode::nodeType nt=classifyIndex(index);
     if (nt==QFProjectTreeModelNode::qfpntProject && role==Qt::EditRole) {
         current->setName(value.toString());
+        emit dataChanged(index, index);
         return true;
     }
-    if (nt==QFProjectTreeModelNode::qfpntRawDataRecord && role==Qt::EditRole) {
-        QFRawDataRecord* rec=getRawDataByIndex(index);
-        if (rec) {
-            rec->setName(value.toString());
-            return true;
-        }
-    }
-    if (nt==QFProjectTreeModelNode::qfpntEvaluationRecord && role==Qt::EditRole) {
-        QFEvaluationItem* rec=getEvaluationByIndex(index);
-        if (rec) {
-            rec->setName(value.toString());
-            return true;
-        }
-    }
-    if (nt==QFProjectTreeModelNode::qfpntDirectory && role==Qt::EditRole) {
-        QFProjectTreeModelNode* dirNode=getTreeNodeByIndex(index);
-        dirNode->setTitle(value.toString());
-        QList<QFProjectTreeModelNode*> l=dirNode->getAllChildRawDataRecords();
-        QMap<QFRawDataRecord*, QString> m;
-        for (int i=0; i<l.size(); i++) {
-            if (l[i] && l[i]->type()==QFProjectTreeModelNode::qfpntRawDataRecord) {
-                QFRawDataRecord* rec=l[i]->rawDataRecord();
-                if (rec) m[rec]=l[i]->getPath();
+    if (nt==QFProjectTreeModelNode::qfpntRawDataRecord) {
+        if (role==Qt::EditRole) {
+            QFRawDataRecord* rec=getRawDataByIndex(index);
+            if (rec) {
+                rec->setName(value.toString());
+                emit dataChanged(index, index);
+                return true;
+            }
+        } else if (role==Qt::CheckStateRole) {
+            QFRawDataRecord* rec=getRawDataByIndex(index);
+            if (rec) {
+                if (value.toBool()) {
+                    rdrUnchecked.remove(rec->getID());
+                } else {
+                    rdrUnchecked.insert(rec->getID());
+                }
+                emit dataChanged(index, index);
+                return true;
             }
         }
-        bool sigEn=current->areSignalsEnabled();
-        current->setSignalsEnabled(false, false);
-        QMapIterator<QFRawDataRecord*, QString> mIt(m);
-        while (mIt.hasNext()) {
-            mIt.next();
-            mIt.key()->setFolder(mIt.value());
-            //qDebug()<<mIt.key()->getName()<<": set folder: "<<mIt.value();
-        }
-        current->setSignalsEnabled(sigEn, true);
-        return true;
     }
+    if (nt==QFProjectTreeModelNode::qfpntEvaluationRecord) {
+        if (role==Qt::EditRole) {
+            QFEvaluationItem* rec=getEvaluationByIndex(index);
+            if (rec) {
+                rec->setName(value.toString());
+                emit dataChanged(index, index);
+                return true;
+            }
+        } else if (role==Qt::CheckStateRole) {
+            QFEvaluationItem* rec=getEvaluationByIndex(index);
+            if (rec) {
+                if (value.toBool()) {
+                    evaluationUnchecked.remove(rec->getID());
+                } else {
+                    evaluationUnchecked.insert(rec->getID());
+                }
+                emit dataChanged(index, index);
+                return true;
+            }
+
+        }
+    }
+    if (nt==QFProjectTreeModelNode::qfpntDirectory) {
+        if (role==Qt::EditRole) {
+            QFProjectTreeModelNode* dirNode=getTreeNodeByIndex(index);
+            dirNode->setTitle(value.toString());
+            QList<QFProjectTreeModelNode*> l=dirNode->getAllChildRawDataRecords();
+            QMap<QFRawDataRecord*, QString> m;
+            for (int i=0; i<l.size(); i++) {
+                if (l[i] && l[i]->type()==QFProjectTreeModelNode::qfpntRawDataRecord) {
+                    QFRawDataRecord* rec=l[i]->rawDataRecord();
+                    if (rec) m[rec]=l[i]->getPath();
+                }
+            }
+            bool sigEn=current->areSignalsEnabled();
+            current->setSignalsEnabled(false, false);
+            QMapIterator<QFRawDataRecord*, QString> mIt(m);
+            while (mIt.hasNext()) {
+                mIt.next();
+                mIt.key()->setFolder(mIt.value());
+                emit dataChanged(this->index(mIt.key()), this->index(mIt.key()));
+                //qDebug()<<mIt.key()->getName()<<": set folder: "<<mIt.value();
+            }
+            emit dataChanged(index, index);
+            current->setSignalsEnabled(sigEn, true);
+            return true;
+        } else if (role==Qt::CheckStateRole) {
+            QFProjectTreeModelNode* dirNode=getTreeNodeByIndex(index);
+            QList<QFProjectTreeModelNode*> l=dirNode->getAllChildRawDataRecords();
+            for (int i=0; i<l.size(); i++) {
+                if (l[i] && l[i]->type()==QFProjectTreeModelNode::qfpntRawDataRecord) {
+                    QFRawDataRecord* rec=l[i]->rawDataRecord();
+                    if (rec){
+                        if(value.toBool()) rdrUnchecked.remove(rec->getID());
+                        else rdrUnchecked.insert(rec->getID());
+                    }
+                }
+                emit dataChanged(this->index(l[i]), this->index(l[i]));
+            }
+            emit dataChanged(index, index);
+            QModelIndex idx=index;
+            while (idx.parent().isValid()) {
+                emit dataChanged(idx.parent(), idx.parent());
+                idx=idx.parent();
+            }
+            return true;
+        }
+    }
+
     return false;
 }
 

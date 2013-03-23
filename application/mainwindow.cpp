@@ -8,6 +8,7 @@
 #include "dlgcontactauthors.h"
 #include "dlgnewversion.h"
 #include "dlgrdrsetproperty.h"
+#include "dlgselectprojectsubset.h"
 
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
@@ -52,6 +53,8 @@ void myMessageOutput(QtMsgType type, const char *msg)
 MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     QMainWindow(NULL)
 {
+    projectFileFilter=tr("QuickFit Project (*.qfp);;QuickFit Project Autosave (*.qfp.autosave *.qfp.autosave.backup);;QuickFit Project backup (*.qfp.backup)");
+    projectSaveFileFilter=tr("QuickFit Project (*.qfp)");
     settings=s;
     splashPix=splash->pixmap();
     project=NULL;
@@ -343,12 +346,57 @@ void MainWindow::newProject() {
 
 void MainWindow::openProject() {
     if (maybeSave()) {
-        QString fileName = qfGetOpenFileName(this, tr("Open Project ..."), currentProjectDir, tr("QuickFit Project (*.qfp);;QuickFit Project Autosave (*.qfp.autosave *.qfp.autosave.backup);;QuickFit Project backup (*.qfp.backup)"));
+        QString fileName = qfGetOpenFileName(this, tr("Open Project ..."), currentProjectDir, projectFileFilter);
         if (!fileName.isEmpty()) {
             currentProjectDir=QFileInfo(fileName).dir().absolutePath();
             QApplication::setOverrideCursor(Qt::WaitCursor);
             loadProject(fileName);
             QApplication::restoreOverrideCursor();
+        }
+    }
+}
+
+void MainWindow::openProjectSubset()
+{
+    if (maybeSave()) {
+        QString fileName = qfGetOpenFileName(this, tr("Open Project ..."), currentProjectDir, projectFileFilter);
+        if (!fileName.isEmpty()) {
+            QApplication::setOverrideCursor(Qt::WaitCursor);
+            log_indent();
+            log_text(tr("---------------------------------------------------------------------------\n"));
+            log_text(tr("-- loading project '%1' in dummy mode!!! \n").arg(fileName));
+            log_text(tr("---------------------------------------------------------------------------\n\n"));
+            QFProject* dummy=new QFProject(getEvaluationItemFactory(), getRawDataRecordFactory(), this, this);
+            dummy->readXMLDummy(fileName);
+            bool load=false;
+            QSet<int> rdrSel, evalSel;
+            QApplication::restoreOverrideCursor();
+            if (!dummy->error()) {
+                DlgSelectProjectSubset* dlg=new DlgSelectProjectSubset(dummy, this);
+                if (dlg->exec()) {
+                    load=true;
+                    rdrSel=dummy->getTreeModel()->getSelectedRDR();
+                    evalSel=dummy->getTreeModel()->getSelectedEvaluations();
+                    log_indent();
+                    log_text(tr("- loading only %1 raw data records\n").arg(rdrSel.size()));
+                    log_text(tr("- loading only %1 evaluation data records\n").arg(evalSel.size()));
+                    log_text(tr("\n"));
+                    log_unindent();
+                }
+                delete dlg;
+            } else {
+                QMessageBox::critical(this, tr("QuickFit %1").arg(VERSION_FULL), dummy->errorDescription());
+                logFileProjectWidget->log_error(dummy->errorDescription()+"\n");
+                load=false;
+            }
+            delete dummy;
+            log_unindent();
+            //currentProjectDir=QFileInfo(fileName).dir().absolutePath();
+            if (load) {
+                QApplication::setOverrideCursor(Qt::WaitCursor);
+                loadProject(fileName, true, rdrSel, evalSel);
+                QApplication::restoreOverrideCursor();
+            }
         }
     }
 }
@@ -392,7 +440,7 @@ bool MainWindow::saveProject() {
 }
 
 bool MainWindow::saveProjectAs() {
-    QString fileName = qfGetSaveFileName(this, tr("Save Project As ..."), currentProjectDir, tr("QuickFit Project (*.qfp)"));
+    QString fileName = qfGetSaveFileName(this, tr("Save Project As ..."), currentProjectDir, projectSaveFileFilter);
     if (fileName.isEmpty())
         return false;
     currentProjectDir=QFileInfo(fileName).dir().absolutePath();
@@ -783,7 +831,7 @@ void MainWindow::createWidgets() {
     edtName=new QLineEdit(w);
     fl->addRow(tr("Project &Name:"), edtName);
     connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(projectNameChanged(const QString&)));
-    labFile=new QLabel(w);
+    labFile=new QFElidedLabel(w);
     labFile->setWordWrap(true);
     labFile->setTextInteractionFlags(Qt::TextSelectableByMouse);
     labFile->setSizePolicy(QSizePolicy::Ignored, labFile->sizePolicy().verticalPolicy());
@@ -854,6 +902,10 @@ void MainWindow::createActions() {
     openProjectAct->setShortcuts(QKeySequence::Open);
     openProjectAct->setStatusTip(tr("Open an existing project"));
     connect(openProjectAct, SIGNAL(triggered()), this, SLOT(openProject()));
+
+    openProjectSubsetAct = new QAction(tr("&Open Project Subset"), this);
+    openProjectSubsetAct->setStatusTip(tr("Let the user select a subset of records and evaluations to load from a project"));
+    connect(openProjectSubsetAct, SIGNAL(triggered()), this, SLOT(openProjectSubset()));
 
     actReloadProject = new QAction(QIcon(":/reload_project.png"), tr("&Reload Current Project"), this);
     actReloadProject->setStatusTip(tr("Reload the currently opened project"));
@@ -950,6 +1002,7 @@ void MainWindow::createMenus() {
 
     fileMenu->addAction(openProjectAct);
 
+
     /*recentMenu=fileMenu->addMenu(QIcon(":/project_open_recent.png"), tr("&Recent Files"));
     for (int i = 0; i < MaxRecentFiles; ++i)
         recentMenu->addAction(recentFileActs[i]);
@@ -965,6 +1018,8 @@ void MainWindow::createMenus() {
     connect(recentMenu, SIGNAL(openRecentFile(QString)), this, SLOT(openRecentProject(QString)));
     fileMenu->addMenu(recentMenu);
     fileMenu->addAction(actReloadProject);
+    projectSpecialMenu=fileMenu->addMenu(tr("&Special Project Tools ..."));
+    projectSpecialMenu->addAction(openProjectSubsetAct);
 
     fileMenu->addAction(saveProjectAct);
     fileMenu->addAction(saveProjectAsAct);
@@ -1219,7 +1274,7 @@ bool MainWindow::maybeSave() {
     return true;
 }
 
-void MainWindow::loadProject(const QString &fileName) {
+void MainWindow::loadProject(const QString &fileName, bool subsetMode, const QSet<int> &rdrSelected, const QSet<int> &evalSelected) {
     newProjectTimer.stop();
     tabLogs->setCurrentWidget(logFileProjectWidget);
     logFileProjectWidget->close_logfile();
@@ -1249,7 +1304,11 @@ void MainWindow::loadProject(const QString &fileName) {
     logFileProjectWidget->clearLogStore();
     //project=new QFProject(fn, getEvaluationItemFactory(), getRawDataRecordFactory(), this, this);
     project=new QFProject(getEvaluationItemFactory(), getRawDataRecordFactory(), this, this);
-    project->readXML(fn);
+    if (subsetMode) {
+        project->readXMLSubSet(fn, rdrSelected, evalSelected);
+    } else {
+        project->readXML(fn);
+    }
     prgMainProgress->reset();
     prgMainProgress->setRange(0,1);
     prgMainProgress->setValue(0);
@@ -1269,9 +1328,9 @@ void MainWindow::loadProject(const QString &fileName) {
     extensionManager->distribute(project);
     QApplication::restoreOverrideCursor();
 
-    setCurrentProject(fileName);
-    statusBar()->showMessage(tr("Project file '%1' loaded!").arg(fileName), 2000);
-    logFileProjectWidget->log_text(tr("loading project file '%1' ... DONE!\n").arg(fileName));
+    setCurrentProject(project->getFile());
+    statusBar()->showMessage(tr("Project file '%1' loaded!").arg(project->getFile()), 2000);
+    logFileProjectWidget->log_text(tr("loading project file '%1' ... DONE!\n").arg(project->getFile()));
     logFileProjectWidget->log_line();
 }
 

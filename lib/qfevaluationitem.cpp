@@ -30,7 +30,7 @@ void QFEvaluationItem::init(QString name) {
 }
 
 
-void QFEvaluationItem::init(QDomElement& e) {
+void QFEvaluationItem::init(QDomElement& e, bool loadAsDummy) {
     //std::cout<<"creating QFEvaluationItem\n";
     name="";;
     description="";
@@ -55,7 +55,7 @@ QFEvaluationItem::~QFEvaluationItem() {
     //std::cout<<"deleting QFEvaluationItem ... OK\n";
 }
 
-void QFEvaluationItem::readXML(QDomElement& e) {
+void QFEvaluationItem::readXML(QDomElement& e, bool loadAsDummy) {
     bool ok=true;
     name=e.attribute("name", "evaluation");
     ID=e.attribute("id", "-1").toInt(&ok);
@@ -92,7 +92,7 @@ void QFEvaluationItem::readXML(QDomElement& e) {
     }
 
     te=e.firstChildElement("data");
-    intReadData(&te);
+    if (!loadAsDummy) intReadData(&te);
     //std::cout<<"reading XML: done!\n";
     if (!errorOcc) {
         emitPropertiesChanged("", true);

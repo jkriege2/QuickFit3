@@ -161,27 +161,31 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         static  ProgramOptions* inst;
 
    public:
-        /** \brief returns an sinatnce to the main object of this type in the current QuickFit 3  instance */
+
         static ProgramOptions* getInstance() {
             return inst;
+        }
+
+        static QSettings* staticGetQSettings() {
+            if (!inst) return NULL;
+            return inst->settings;
         }
 
         /** \brief read a value from the main QSettings object */
         static QVariant getConfigValue(const QString& name, QVariant defaultValue=QVariant()) {
             if (!inst) return QVariant();
-            if (!inst->getQSettings()) return QVariant();
-            inst->getQSettings()->sync();
-            return inst->getQSettings()->value(name, defaultValue);
+            if (!inst->settings) return QVariant();
+            inst->settings->sync();
+            return inst->settings->value(name, defaultValue);
         }
 
         /** \brief set a value in the main QSettings object */
         static void setConfigValue(const QString& name, QVariant value) {
             if (!inst) return ;
-            if (!inst->getQSettings()) return;
-            inst->getQSettings()->setValue(name, value);
-            inst->getQSettings()->sync();
+            if (!inst->settings) return;
+            inst->settings->setValue(name, value);
+            inst->settings->sync();
         }
-
 };
 
 #endif // PROGRAMOPTIONS_H

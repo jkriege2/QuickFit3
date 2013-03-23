@@ -26,7 +26,7 @@ ProgramOptions* ProgramOptions::inst=NULL;
 ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app  ):
     QObject(parent)
 {
-    if (inst==NULL) inst=this;
+
     userSaveAfterFirstEdit=true;
     childWindowsStayOnTop=true;
     helpWindowsStayOnTop=true;
@@ -81,6 +81,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     autosave=5;
 
     readSettings();
+    if (inst==NULL) inst=this;
 }
 
 ProgramOptions::~ProgramOptions()
@@ -281,3 +282,5 @@ void ProgramOptions::setAutosave(int interval)
     autosave=interval;
     writeSettings();
 }
+
+

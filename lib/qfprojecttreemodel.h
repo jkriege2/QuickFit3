@@ -6,6 +6,7 @@
 #include "qfevaluationitem.h"
 #include "lib_imexport.h"
 #include "qfprojecttreemodelnode.h"
+#include <QMap>
 
 // forward declaration
 class QFProject;
@@ -22,6 +23,9 @@ class QFLIB_EXPORT QFProjectTreeModel : public QAbstractItemModel {
         virtual ~QFProjectTreeModel();
         /** \brief initialize the model with a given project */
         void init(QFProject* p);
+
+        QSet<int> getSelectedRDR() const;
+        QSet<int> getSelectedEvaluations() const;
     protected:
         /** \brief the project represented by this data model */
         QFProject* current;
@@ -29,6 +33,9 @@ class QFLIB_EXPORT QFProjectTreeModel : public QAbstractItemModel {
         QFProjectTreeModelNode* projectItem;
         QFProjectTreeModelNode* rdrFolderItem;
         QFProjectTreeModelNode* evalFolderItem;
+
+        QSet<int> rdrUnchecked;
+        QSet<int> evaluationUnchecked;
 
         void createModelTree();
         /** \brief returns a QModelIndex which points to the specified record */

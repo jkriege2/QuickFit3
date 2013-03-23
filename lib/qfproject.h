@@ -93,6 +93,11 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
 
         bool m_signalsEnabled;
 
+        bool m_dummy;
+        bool m_subset;
+        QSet<int> subsetRDR;
+        QSet<int> subsetEval;
+
     public:
         /** Default constructor */
         QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent=NULL);
@@ -236,6 +241,24 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         void writeXML(const QString& file, bool resetDataChanged=true);
         /** \brief open XML project file, sets error and errorDescription, as well as \c dataChange=false */
         void readXML(const QString& file);
+        /** \brief open XML project file, but read only the RDRs and evaluation items where the IDs are contained in the given sets, sets error and errorDescription, as well as \c dataChange=false
+         *
+         * \note This function will change the filename from \c dir/dir/project.qfp to \c dir/dir/project_subsetI.qfp where \c I is replaced by a number
+         *       that makes the filename unique!
+         */
+        void readXMLSubSet(const QString& file, const QSet<int>& rdrSelected, const QSet<int>& evalSelected);
+        /** \brief open XML project file in dummy mode, sets error and errorDescription, as well as \c dataChange=false
+         *
+         * In dummy mode all records in the file (RDR and evaluations) are created, but initialized only with the basic properties (e.g. folder, name, type, ID, ...)
+         * No actual data or results are loaded. This allows to inspect the structure of a project without having to load the full dataset. It may be used
+         * to create a mode where the user may look at the project, but not use its contents (e.g. to allow him to select a subset of records to actually load).
+         * If this method is used, the method isDummy() will return \c true.
+         */
+        void readXMLDummy(const QString& file);
+
+        /** \brief returns \c true, if the project was loaded using readXMLDummy(). */
+        bool isDummy() const;
+
         /** \brief returns \c true when the project has changed */
         inline bool hasChanged() { return dataChange; };
         /** \brief returns a data model which may be used to display a list of all
@@ -380,6 +403,8 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /** \copybrief QFProperties::setPropertiesError() */
         virtual void setPropertiesError(QString message);
 
+        /** \brief open XML project file, sets error and errorDescription, as well as \c dataChange=false */
+        void internalReadXML(const QString& file);
 
 };
 

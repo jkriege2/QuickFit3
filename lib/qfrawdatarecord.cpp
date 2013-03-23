@@ -136,7 +136,7 @@ void QFRawDataRecord::init(const QString& name, QStringList inputFiles, QStringL
 }
 
 
-void QFRawDataRecord::init(QDomElement& e) {
+void QFRawDataRecord::init(QDomElement& e, bool loadAsDummy) {
     //std::cout<<"creating QFRawDataRecord\n";
     name="";;
     description="";
@@ -429,7 +429,7 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
     if (em) emit basicPropertiesChanged();
 };
 
-void QFRawDataRecord::readXML(QDomElement& e) {
+void QFRawDataRecord::readXML(QDomElement& e, bool loadAsDummy) {
     {
         
 #ifdef DEBUG_THREAN
@@ -472,7 +472,7 @@ qDebug()<<Q_FUNC_INFO<<"relock";
  qDebug()<<Q_FUNC_INFO<<"  relocked";
 #endif
         te=e.firstChildElement("results");
-        if (!te.isNull()) {
+        if (!loadAsDummy && !te.isNull()) {
             te=te.firstChildElement("evaluation");
             while (!te.isNull()) {
                 QString en=te.attribute("name");
@@ -729,7 +729,7 @@ qDebug()<<Q_FUNC_INFO<<"relock";
         //std::cout<<"    reading XML: files\n";
         te=e.firstChildElement("evalgrouplabels");
         dstore->evalGroupLabels.clear();
-        if (!te.isNull()) {
+        if (!loadAsDummy && !te.isNull()) {
             QDomElement fe=te.firstChildElement("group");
             while (!fe.isNull()) {
                 dstore->evalGroupLabels[fe.attribute("id")]=fe.attribute("label");
@@ -759,7 +759,7 @@ qDebug()<<Q_FUNC_INFO<<"relock";
         }
         //std::cout<<"    reading XML: data\n";
         te=e.firstChildElement("data");
-        intReadData(&te);
+        if (!loadAsDummy) intReadData(&te);
 
     }
     //std::cout<<"reading XML: done!\n";

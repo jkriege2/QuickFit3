@@ -88,7 +88,8 @@ HEADERS += dlgnewproperty.h \
     qfautooutputtimer.h \
     qfrdrcombobox.h \
     qfresultsgroupcombobox.h \
-    qfrawdataresultscombobox.h
+    qfrawdataresultscombobox.h \
+    qfelidedlabel.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -144,7 +145,8 @@ SOURCES += dlgnewproperty.cpp \
     qfautooutputtimer.cpp \
     qfrdrcombobox.cpp \
     qfresultsgroupcombobox.cpp \
-    qfrawdataresultscombobox.cpp
+    qfrawdataresultscombobox.cpp \
+    qfelidedlabel.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

@@ -114,8 +114,13 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         /** \brief initialize the object with the given data */
         void init(QString name=QString(""));
 
-        /** \brief initialize from QDomElement */
-        void init(QDomElement& e);
+        /** \brief initialize from QDomElement
+         *
+         * If the property \a loadAsDummy is \c true this method will only read the basic properties from XML, i.e. name, description,
+         * id, ... but not the results and not the actual data. This function can be used to build a dummy project tree.
+         *  \see QFProject::readXMLDummy() for more information on the property \a loadAsDummy
+         */
+        void init(QDomElement& e, bool loadAsDummy=false);
 
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
@@ -306,8 +311,13 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         QRegExp nameFilter;
         QRegExp nameNotFilter;
 
-        /** \brief read object contents from QDomElement */
-        void readXML(QDomElement& e);
+        /** \brief read object contents from QDomElement
+         *
+         * If the property \a loadAsDummy is \c true this method will only read the basic properties from XML, i.e. name, description,
+         * id, ... but not the results and not the actual data. This function can be used to build a dummy project tree.
+         *  \see QFProject::readXMLDummy() for more information on the property \a loadAsDummy
+         */
+        void readXML(QDomElement& e, bool loadAsDummy=false);
         /** \brief write contents to QXmlStreamWriter (data tag) <b>IMPLEMENT IN CHILD CLASSES!</b>
          *
          * This method may be used to store additional data (like algorithm configuration ...) from the project file
