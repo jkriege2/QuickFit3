@@ -1,0 +1,19 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Raw Data Record: Results Tools</title>
+	</head>
+	<body>
+		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$
+		<h2>Description</h2>
+		This plugin assembles a set of tools that work with evaluation results. It is e.g. possible to calculate new results from already existing results.
+		
+		<a name="calctool"><h2>Results Calculator</h2>
+		This tool allows to calculate a new result from existing results. You can select any two results A and B from the project and give an arbitrary math expression, containing A and B, which is then evaluated. The expression parser uses a standard syntax for math expressions, which is defined in <a href="$$mainhelpdir$$mathparser.html">expression parser docuemntation</a>. <ul>
+		  <li>If both results are vectors then a new vector is created by calculating the expression item-wise.</li>
+		  <li>If both results are numbers the result is calculated by evaluating the expression once.</li>
+		  </ul>
+		The result of this calculation is stored in the FIRST selected record  and under the name entered at the bottom of the dialog.
+	</body>
+</html>

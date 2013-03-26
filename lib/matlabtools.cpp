@@ -95,7 +95,7 @@ QString toMatlab(const QList<QList<QVariant> >& data, bool noVarDef) {
             if (r<data[c].size()) {
                 QVariant d=data[c].at(r);
                 QString s=d.toString();
-                s=s.replace('\'', '\'\'');
+                s=s.replace('\'', "\'\'");
                 if (!d.isValid()) {
                     matlab+="[]";
                 } else {

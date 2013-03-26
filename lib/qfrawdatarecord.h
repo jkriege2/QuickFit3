@@ -335,7 +335,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
               - evaluationResultType::qfrdreNumberMatrix: data stored in dvec [double], in row-major order, number of columns is stored in columns
             .
          */
-        struct evaluationResult {
+        struct QFLIB_EXPORT evaluationResult {
             evaluationResult() {
                 type=qfrdreInvalid;
                 columns=0;
@@ -370,6 +370,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
             int getVectorMatrixItems() const;
             bool isNumberType() const;
+            double getAsDouble() const;
+            QVector<double> getAsDoubleVector() const;
         };
 
         /*! \brief initial size for results hash

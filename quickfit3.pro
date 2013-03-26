@@ -2,7 +2,7 @@
 
 
 include(autoversioning.pri)
-include(quickfitconfig.pri)
+include(quickfit_config.pri)
 
 release {
     message("building QuickFit in RELEASE mode")
@@ -113,6 +113,10 @@ plg_qfe_calculator.depends = lib libqf3widgets
 SUBDIRS += plg_qfe_acquisitiontest
 plg_qfe_acquisitiontest.subdir=./plugins/qfe_acquisitiontest
 plg_qfe_acquisitiontest.depends = lib libqf3widgets
+
+SUBDIRS += plg_qfe_resultstools
+plg_qfe_resultstools.subdir=./plugins/qfe_resultstools
+plg_qfe_resultstools.depends = lib libqf3widgets
 
 SUBDIRS += plg_numberandbrightness
 plg_numberandbrightness.subdir=./plugins/numberandbrightness

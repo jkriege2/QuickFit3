@@ -108,7 +108,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	export LDFLAGS="${LDFLAGS} -fPIC "
         export CFLAGS="${CFLAGS} -fPIC "
         export CPPFLAGS="${CPPFLAGS} -fPIC"
-	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit 
+	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit  CFLAGS="-m128bit-long-double -mtune=generic -msse -mfpmath=sse" CPPFLAGS="-m128bit-long-double -mtune=generic -msse -mfpmath=sse"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
@@ -342,7 +342,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir build
 	tar xvf gsl-1.15.tar.gz -C ./build/
 	cd build/gsl-1.15
-	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/gsl
+	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/gsl CFLAGS="-m128bit-long-double -mtune=generic -msse -mfpmath=sse" CPPFLAGS="-m128bit-long-double -mtune=generic -msse -mfpmath=sse"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}

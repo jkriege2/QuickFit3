@@ -99,6 +99,7 @@ QFRDRImagingFCSCorrelationDialog::~QFRDRImagingFCSCorrelationDialog() {
 
 void  QFRDRImagingFCSCorrelationDialog::setEditControlsEnabled(bool enabled) {
     ui->widDetails->setEnabled(enabled);
+    ui->widAddJob->setEnabled(enabled);
     ui->labDetails->setEnabled(enabled);
     ui->spinFirstFrame->setEnabled(enabled && !ui->chkFirstFrame->isChecked());
     ui->spinLastFrame->setEnabled(enabled && !ui->chkLastFrame->isChecked());

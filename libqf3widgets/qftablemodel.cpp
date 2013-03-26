@@ -900,7 +900,7 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
                     setColumnTitleCreate(c, n);
                 }
                 hasTitle=true;
-            } else if (line.startsWith(comment_start) && &hasTitle && !hasData) {
+            } else if (line.startsWith(comment_start) && !hasTitle && !hasData) {
                 header_read=true;
                 line=line.right(line.size()-1);
                 QStringList sl=line.split(QString(column_separator));

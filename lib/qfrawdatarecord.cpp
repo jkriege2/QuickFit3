@@ -4174,4 +4174,45 @@ bool QFRawDataRecord::evaluationResult::isNumberType() const
     return false;
 }
 
+double QFRawDataRecord::evaluationResult::getAsDouble() const
+{
+    switch (type) {
+        case QFRawDataRecord::qfrdreNumber:
+            return dvalue;
+        case QFRawDataRecord::qfrdreInteger:
+            return ivalue;
+        default:
+            return 0;
+    }
+    return 0;
+}
+
+QVector<double> QFRawDataRecord::evaluationResult::getAsDoubleVector() const
+{
+    QVector<double> res;
+    switch (type) {
+        case QFRawDataRecord::qfrdreNumber:
+        case QFRawDataRecord::qfrdreNumberError:
+            res<<dvalue;
+            return res;
+        case QFRawDataRecord::qfrdreInteger:
+            res<<ivalue;
+            return res;
+        case QFRawDataRecord::qfrdreNumberVector:
+        case QFRawDataRecord::qfrdreNumberMatrix:
+        case QFRawDataRecord::qfrdreNumberErrorVector:
+        case QFRawDataRecord::qfrdreNumberErrorMatrix:
+            return dvec;
+        case QFRawDataRecord::qfrdreIntegerVector:
+        case QFRawDataRecord::qfrdreIntegerMatrix:
+            {
+                for(int i=0; i<ivec.size(); i++) res<<ivec[i];
+                return res;
+            }
+        default:
+            return res;
+    }
+    return res;
+}
+
 

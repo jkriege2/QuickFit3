@@ -84,9 +84,9 @@ void QFRDRTableComboBox::setRequireNotReadonly(bool require)
 void QFRDRTableComboBox::myCurrentIndexChanged(int i)
 {
     QFRDRComboBox::myCurrentIndexChanged(i);
-    qDebug()<<"emitting currentColumnGraphicsChanged("<<currentColumnGraphics()<<")";
+    //Debug()<<"emitting currentColumnGraphicsChanged("<<currentColumnGraphics()<<")";
     emit currentColumnGraphicsChanged(currentColumnGraphics());
-    qDebug()<<"emitting currentTableChanged("<<currentTable()<<")";
+    //qDebug()<<"emitting currentTableChanged("<<currentTable()<<")";
     emit currentTableChanged(currentTable());
 
 }

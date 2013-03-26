@@ -69,13 +69,11 @@ bool QFImFCCSRelativeCCFDialog::calculateRelCCF(QFRawDataRecord *acf, QFRawDataR
     QFRDRFCSDataInterface* ccfFCS=dynamic_cast<QFRDRFCSDataInterface*>(ccf);
     QFRDRImageToRunInterface* ccfRUNIMAGE=dynamic_cast<QFRDRImageToRunInterface*>(ccf);
     if (acfFCS && acfRUNIMAGE && ccfFCS && ccfRUNIMAGE) {
-        if (   acfRUNIMAGE->getImageFromRunsWidth()==ccfRUNIMAGE->getImageFromRunsWidth()
-            && acfRUNIMAGE->getImageFromRunsHeight()==ccfRUNIMAGE->getImageFromRunsHeight() )
+        if (   acfRUNIMAGE->getImageFromRunsWidth()>0 && acfRUNIMAGE->getImageFromRunsWidth()==ccfRUNIMAGE->getImageFromRunsWidth()
+            && acfRUNIMAGE->getImageFromRunsHeight()>0 && acfRUNIMAGE->getImageFromRunsHeight()==ccfRUNIMAGE->getImageFromRunsHeight() )
         {
             w=acfRUNIMAGE->getImageFromRunsWidth();
             h=acfRUNIMAGE->getImageFromRunsHeight();
-            double* rel=(double*)malloc(w*h*sizeof(double));
-            double* rel_error=(double*)malloc(w*h*sizeof(double));
 
             double* acfD=acfFCS->getCorrelation();
             double* acfS=acfFCS->getCorrelationStdDev();
@@ -84,47 +82,56 @@ bool QFImFCCSRelativeCCFDialog::calculateRelCCF(QFRawDataRecord *acf, QFRawDataR
             double* ccfS=ccfFCS->getCorrelationStdDev();
             int ccfN=ccfFCS->getCorrelationN();
 
-            uint64_t idxA=0;
-            uint64_t idxC=0;
-            for (int i=0; i<w*h; i++) {
+            if (acfD && acfS && ccfD && ccfS) {
+                double* rel=(double*)malloc(w*h*sizeof(double));
+                double* rel_error=(double*)malloc(w*h*sizeof(double));
+                uint64_t idxA=0;
+                uint64_t idxC=0;
+                for (int i=0; i<w*h; i++) {
 
-                double D=ccfD[idxC];
-                double A=acfD[idxA];
-                double eD=ccfS[idxC];
-                double eA=acfS[idxA];
+                    double D=ccfD[idxC];
+                    double A=acfD[idxA];
+                    double eD=ccfS[idxC];
+                    double eA=acfS[idxA];
 
-                if (avgCount>1) {
-                    int avgA=qMin(avgCount, acfN);
-                    int avgC=qMin(avgCount, acfN);
-                    for (int j=1; j<avgA; j++) {
-                        A=A+acfD[idxA+j];
-                        eA=eA+acfS[idxA+j];
+                    if (avgCount>1) {
+                        int avgA=qMin(avgCount, acfN);
+                        int avgC=qMin(avgCount, ccfN);
+                        for (int j=1; j<avgA; j++) {
+                            A=A+acfD[idxA+j];
+                            eA=eA+acfS[idxA+j];
+                        }
+                        A=A/double(avgA);
+                        eA=eA/double(avgA);
+                        for (int j=1; j<avgC; j++) {
+                            D=D+ccfD[idxC+j];
+                            eD=eD+ccfS[idxC+j];
+                        }
+                        D=D/double(avgC);
+                        eD=eD/double(avgC);
                     }
-                    A=A/double(avgA);
-                    eA=eA/double(avgA);
-                    for (int j=1; j<avgC; j++) {
-                        D=D+ccfD[idxC+j];
-                        eD=eD+ccfS[idxC+j];
-                    }
-                    D=D/double(avgC);
-                    eD=eD/double(avgC);
+
+                    rel[i]=D/A;
+                    rel_error[i]=0;
+                    if (acfS && ccfS) rel_error[i]=sqrt(qfSqr(eA*D/qfSqr(A)) + qfSqr(eD/A));
+                    if (!QFFloatIsOK(rel_error[i])) rel_error[i]=0;
+                    idxA=idxA+acfN;
+                    idxC=idxC+ccfN;
+                    //qDebug()<<i<<A<<D<<rel[i]<<rel_error[i];
                 }
+                if (rel_out) *rel_out=rel;
+                else free(rel);
+                if (rel_error_out) *rel_error_out=rel_error;
+                else free(rel_error);
 
-                rel[i]=D/A;
-                rel_error[i]=0;
-                if (acfS && ccfS) rel_error[i]=sqrt(qfSqr(eA*D/qfSqr(A)) + qfSqr(eD/A));
-                if (!QFFloatIsOK(rel_error[i])) rel_error[i]=0;
-                idxA=idxA+acfN;
-                idxC=idxC+ccfN;
-                //qDebug()<<i<<A<<D<<rel[i]<<rel_error[i];
+                QApplication::restoreOverrideCursor();
+                return true;
+            } else {
+                if (showErrorMessage) QMessageBox::critical(NULL, tr("Calculate Relative CCF"), tr("Can't calculate relative CCFs: Memory access error."));
+                QApplication::restoreOverrideCursor();
+                return false;
             }
-            if (rel_out) *rel_out=rel;
-            else free(rel);
-            if (rel_error_out) *rel_error_out=rel_error;
-            else free(rel_error);
 
-            QApplication::restoreOverrideCursor();
-            return true;
         } else {
             if (showErrorMessage) QMessageBox::critical(NULL, tr("Calculate Relative CCF"), tr("Can't calculate relative CCFs: The two selected files contain images of different size."));
             QApplication::restoreOverrideCursor();
