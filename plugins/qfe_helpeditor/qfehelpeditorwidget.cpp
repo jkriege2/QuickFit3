@@ -161,7 +161,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$version.status$$");
     addInsertAction(menu, "$$version.date$$");
     addInsertAction(menu, "$$version$$");
-    addInsertAction(menu, "$$version_full$$");
+    addInsertAction(menu, "$$qfInfoVersionFull()$$");
     menu->addSeparator();
     addInsertAction(menu, "$$thanksto$$");
     addInsertAction(menu, "$$copyright$$");

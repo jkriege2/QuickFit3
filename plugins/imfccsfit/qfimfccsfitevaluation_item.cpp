@@ -156,6 +156,8 @@ void QFImFCCSFitEvaluationItem::setFitFile(int num, QFRawDataRecord *record)
     else fitFilesList[num]=record;
     emit parameterStructureChanged();
     setDataChanged();
+    emit fileChanged(num, record);
+
 }
 
 

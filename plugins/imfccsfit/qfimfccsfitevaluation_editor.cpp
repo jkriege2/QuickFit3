@@ -8,6 +8,8 @@
 #include "qfimfccsparameterinputdelegate.h"
 #include <QtGui>
 #include <QtCore>
+#include "tools.h"
+
 
 QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent):
     QFEvaluationEditor(services, propEditor, parent),
@@ -20,6 +22,7 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     // setup widgets
     ui->setupUi(this);
     ui->pltOverview->setRunSelectWidgetActive(true);
+    connect(ui->pltOverview, SIGNAL(currentRunChanged(int)), this, SLOT(setCurrentRun(int)));
     ui->splitter->setChildrenCollapsible(false);
     ui->splitter->setStretchFactor(0,3);
     ui->splitter->setStretchFactor(1,1);
@@ -33,6 +36,49 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     ui->tableView->setModel(NULL);
     ui->tableView->setItemDelegate(new QFImFCCSParameterInputDelegate(ui->tableView));
     ui->tableView->setTextElideMode(Qt::ElideMiddle);
+
+
+
+    // set correlation/residual plots:
+    ui->pltData->get_plotter()->set_gridPrinting(true);
+    ui->pltData->get_plotter()->addGridPrintingPlotter(0,1,ui->pltResiduals->get_plotter());
+    ui->pltData->set_displayToolbar(false);
+    ui->pltResiduals->set_displayToolbar(false);
+    ui->pltResiduals->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
+    ui->pltResiduals->getXAxis()->set_labelFontSize(11);
+    ui->pltResiduals->getXAxis()->set_tickLabelFontSize(10);
+    ui->pltResiduals->getYAxis()->set_axisLabel(tr("residuals"));
+    ui->pltResiduals->getYAxis()->set_labelFontSize(11);
+    ui->pltResiduals->getYAxis()->set_tickLabelFontSize(10);
+    ui->pltData->getXAxis()->set_axisLabel("");
+    ui->pltData->getYAxis()->set_axisLabel(tr("correlation function $g(\\tau)$"));
+    ui->pltData->getYAxis()->set_labelFontSize(11);
+    ui->pltData->getYAxis()->set_tickLabelFontSize(10);
+    ui->pltData->getXAxis()->set_drawMode1(JKQTPCADMticks);
+    ui->pltData->getXAxis()->set_tickLabelFontSize(10);
+    ui->pltResiduals->getXAxis()->set_drawMode1(JKQTPCADMcomplete);
+    ui->pltResiduals->get_plotter()->setBorder(1,1,1,1);
+    ui->pltData->get_plotter()->setBorder(1,1,1,1);
+    ui->pltResiduals->synchronizeToMaster(ui->pltData, true, false);
+    ui->pltData->get_plotter()->set_useAntiAliasingForSystem(true);
+    ui->pltData->get_plotter()->set_useAntiAliasingForGraphs(true);
+    ui->pltResiduals->get_plotter()->set_useAntiAliasingForSystem(true);
+    ui->pltResiduals->get_plotter()->set_useAntiAliasingForGraphs(true);
+    ui->pltResiduals->set_displayMousePosition(false);
+    ui->pltData->set_displayMousePosition(false);
+    ui->pltData->get_plotter()->set_keyFontSize(9);
+    ui->pltData->get_plotter()->set_keyXMargin(2);
+    ui->pltData->get_plotter()->set_keyYMargin(2);
+    ui->pltResiduals->get_plotter()->set_keyFontSize(9);
+    ui->pltResiduals->get_plotter()->set_keyXMargin(2);
+    ui->pltResiduals->get_plotter()->set_keyYMargin(2);
+    ui->pltResiduals->useExternalDatastore(ui->pltData->getDatastore());
+    ui->pltResiduals->setMinimumHeight(75);
+    ui->pltData->setMinimumHeight(75);
+    connect(ui->pltData, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMoved(double,double)));
+    connect(ui->pltResiduals, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMoved(double,double)));
+    connect(ui->pltData->get_plotter()->get_actZoomAll(), SIGNAL(triggered()), ui->pltResiduals, SLOT(zoomToFit()));
+
 
 
     
@@ -54,6 +100,13 @@ QFImFCCSFitEvaluationEditor::~QFImFCCSFitEvaluationEditor()
     delete dlgEvaluationProgress;
 }
 
+void QFImFCCSFitEvaluationEditor::zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender) {
+    if (sender==ui->pltData) {
+        ui->pltResiduals->setX(newxmin, newxmax);
+        ui->pltResiduals->update_plot();
+    }
+}
+
 void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old) {
     // called when this widget should be connected to a new QFEvaluationItem
 
@@ -69,6 +122,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         disconnect(item_old, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
         disconnect(ui->btnAddFile, SIGNAL(clicked()), item_old, SLOT(addFitFile()));
         disconnect(ui->btnRemoveFile, SIGNAL(clicked()), item_old, SLOT(removeFitFile()));
+        disconnect(item, SIGNAL(fileChanged(int,QFRawDataRecord*)), this, SLOT(fileChanged(int,QFRawDataRecord*)));
     }
 
 
@@ -83,7 +137,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         connect(item, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
         connect(ui->btnAddFile, SIGNAL(clicked()), item, SLOT(addFitFile()));
         connect(ui->btnRemoveFile, SIGNAL(clicked()), item, SLOT(removeFitFile()));
-
+        connect(item, SIGNAL(fileChanged(int,QFRawDataRecord*)), this, SLOT(fileChanged(int,QFRawDataRecord*)));
         updatingData=false;
     }
 
@@ -168,6 +222,20 @@ void QFImFCCSFitEvaluationEditor::fitAlgorithmChanged(int model)
     QApplication::restoreOverrideCursor();
 }
 
+void QFImFCCSFitEvaluationEditor::setCurrentRun(int run)
+{
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QString pid=ui->cmbFitAlgorithm->currentFitAlgorithmID();
+    current->getHighlightedRecord()->setQFProperty("algorithm", pid, false, false);
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    data->setCurrentIndex(run);
+    displayData();
+    displayEvaluation();
+    QApplication::restoreOverrideCursor();
+}
+
 void QFImFCCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
     // this slot is called when the user selects a new record in the raw data record list on the RHS of this widget in the evaluation dialog
     
@@ -246,24 +314,103 @@ void QFImFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
 
 }
 
+void QFImFCCSFitEvaluationEditor::fileChanged(int num, QFRawDataRecord *file)
+{
+    if (num==0) ui->pltOverview->setRDR(file);
+}
+
+void QFImFCCSFitEvaluationEditor::plotMouseMoved(double x, double y)
+{
+    ui->labPosition->setText(tr("current position: (%1s, %2)").arg(floattohtmlstr(x, 3, true, 1e-18).c_str()).arg(y));
+}
+
 void QFImFCCSFitEvaluationEditor::displayEvaluation() {
 }
 
 void QFImFCCSFitEvaluationEditor::displayData() {
     if (!current) return;
-    QFRawDataRecord* record=current->getHighlightedRecord(); 
-    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
     QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
-    if ((!record)||(!eval)/*||(!data)*/) return;
 
 
-    if ((!eval)/*||(!data)*/) {
-        //ui->labRecord->setText(tr("no record selected!"));
-        return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    JKQTPdatastore* ds=ui->pltData->getDatastore();
+    ui->pltData->set_doDrawing(false);
+    ui->pltResiduals->set_doDrawing(false);
+    ui->pltData->clearGraphs();
+    ui->pltResiduals->clearGraphs();
+    if (eval) {
+        for (int file=0; file<eval->getNumberOfFitFiles(); file++) {
+            QFFitFunction* ff=eval->getFitFunction(file);
+            QFRawDataRecord* rec=eval->getFitFile(file);
+
+            QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(rec);
+            QFRDRImageToRunInterface* runintf=dynamic_cast<QFRDRImageToRunInterface*>(rec);
+
+            double* data=fcs->getCorrelationRun(eval->getCurrentIndex());
+            double* tau=fcs->getCorrelationT();
+            double* sigma=fcs->getCorrelationRunError(eval->getCurrentIndex());
+            long N=fcs->getCorrelationN();
+            if (data && tau) {
+                int c_tau=ds->addCopiedColumn(tau, N, tr("file%1: tau [s]").arg(file+1));
+                int c_data=ds->addCopiedColumn(data, N, tr("file%1: g(tau)").arg(file+1));
+                int c_error=-1;
+                if (sigma) c_error=c_data=ds->addCopiedColumn(sigma, N, tr("file%1: errors").arg(file+1));
+                JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(ui->pltData->get_plotter());
+                QString plotname=rec->getName()+QString(": ")+fcs->getCorrelationRunName(eval->getCurrentIndex());
+                g->set_title(plotname);
+                g->set_xColumn(c_tau);
+                g->set_yColumn(c_data);
+                g->set_yErrorColumn(c_error);
+                ui->pltData->get_plotter()->addGraph(g);
+
+                double* params=eval->allocFillParameters(rec, eval->getCurrentIndex(), ff);
+                double* err=eval->allocFillParameterErrors(rec, eval->getCurrentIndex(), ff);
+                bool* fix=eval->allocFillFix(rec, eval->getCurrentIndex(), ff);
+                QVector<double> paramsV;
+                for (int i=0; i<ff->paramCount(); i++) {
+                    paramsV<<params[i];
+                }
+                JKQTPxQFFitFunctionLineGraph* g_fit=new JKQTPxQFFitFunctionLineGraph();
+                g_fit->set_title(tr("fit: %1").arg(plotname));
+                g_fit->set_fitFunction(ff, false);
+                g_fit->set_paramsVector(paramsV);
+                g_fit->set_color(g->get_color());
+                ui->pltData->get_plotter()->addGraph(g_fit);
+
+                QFFitStatistics fstat=ff->calcFitStatistics(N, tau, data, sigma, 0, N-1, params, err, fix, 3, 100);
+
+                int c_resid=ds->addCopiedColumn(fstat.residuals, N, tr("file%1: residuals").arg(file+1));
+                int c_residw=ds->addCopiedColumn(fstat.residuals_weighted, N, tr("file%1: weighted residuals").arg(file+1));
+                int c_residat=ds->addCopiedColumn(fstat.tau_runavg, fstat.runAvgN, tr("file%1: tau for avg. res.").arg(file+1));
+                int c_resida=ds->addCopiedColumn(fstat.residuals_runavg, N, tr("file%1: avg. residuals").arg(file+1));
+                int c_residaw=ds->addCopiedColumn(fstat.residuals_runavg_weighted, N, tr("file%1: weighted avg. residuals").arg(file+1));
+                JKQTPxyLineErrorGraph* g_res=new JKQTPxyLineErrorGraph();
+                g_res->set_xColumn(c_tau);
+                g_res->set_yColumn(c_resid);
+                g_res->set_color(g->get_color());
+                ui->pltResiduals->get_plotter()->addGraph(g_res);
+                JKQTPxyLineErrorGraph* g_resa=new JKQTPxyLineErrorGraph();
+                g_resa->set_xColumn(c_residat);
+                g_resa->set_yColumn(c_resida);
+                g_resa->set_color(g->get_color());
+                ui->pltResiduals->get_plotter()->addGraph(g_resa);
+
+
+                free(params);
+                free(err);
+                free(fix);
+            }
+
+            ui->pltData->zoomToFit();
+            ui->pltResiduals->zoomToFit();
+        }
+
     }
-
-    //ui->labRecord->setText(tr("<b>selected record:</b> %1<br>&nbsp;&nbsp;<i>files: </i><br>&nbsp;&nbsp;&nbsp;&nbsp;%2").arg(record->getName()).arg(record->getFiles().join("<br>&nbsp;&nbsp;&nbsp;&nbsp;")));
-
+    ui->pltData->set_doDrawing(true);
+    ui->pltResiduals->set_doDrawing(true);
+    ui->pltData->update_plot();
+    ui->pltResiduals->update_plot();
+    QApplication::restoreOverrideCursor();
 }
 
 

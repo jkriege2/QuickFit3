@@ -138,7 +138,7 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
 
 
         /** \brief combobox to select a model for the weighting */
-        QFFCDWeightingCombobox* cmbWeights;
+        QFFCSWeightingCombobox* cmbWeights;
         /** \brief ploter for the MaxEnt Distribution */
         QFPlotter* pltDistribution;
         QToolBar* tbPlot;

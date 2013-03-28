@@ -53,10 +53,10 @@ class QFFCSWeightingTools
     \ingroup qf3evaluationplugins
 
 */
-class QFFCDWeightingCombobox: public QComboBox {
+class QFFCSWeightingCombobox: public QComboBox {
         Q_OBJECT
     public:
-        QFFCDWeightingCombobox(QWidget *parent);
+        QFFCSWeightingCombobox(QWidget *parent);
 
         QFFCSWeightingTools::DataWeight currentWeight() const;
         void setCurrentWeight(QFFCSWeightingTools::DataWeight weight);

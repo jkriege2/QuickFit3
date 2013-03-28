@@ -21,7 +21,7 @@
 #include "qfextensionmanager.h"
 #include "qfimportermanager.h"
 #include "qfextension.h"
-#include "../version.h"
+#include "qfversion.h"
 #include "qvisiblehandlesplitter.h"
 #include "qrecentfilesmenu.h"
 #include "qfhistogramservice.h"

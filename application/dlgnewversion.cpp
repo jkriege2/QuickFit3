@@ -17,19 +17,19 @@ DlgNewVersion::DlgNewVersion(QWidget *parent) :
                             "  howpublished={[web page] \verb+%4+},\n"
                             "  year={%2},\n"
                             "  note={[Accessed on %5]},\n"
-                            "}</pre></code>").arg(QF_VERSION).arg(COMPILEDATE).arg(SVNVERSION).arg(QF_WEBLINK).arg(QDate::currentDate().toString("yyyy-MM-dd")));
-    ui->labMailinglist->setText(tr("<a href=\"mailto:%1\">%1</a> (<a href=\"%2\">subscribe</a>)<br><a href=\"%3\">%3</a>").arg(QF_MAILLIST).arg(QF_MAILLIST_REQUEST).arg(QF_WEBLINK));
-    ui->labLicense->setText(QF_LICENSE);
+                            "}</pre></code>").arg(qfInfoVersion()).arg(qfInfoCompiler()).arg(qfInfoSVNVersion()).arg(qfInfoWeblink()).arg(QDate::currentDate().toString("yyyy-MM-dd")));
+    ui->labMailinglist->setText(tr("<a href=\"mailto:%1\">%1</a> (<a href=\"%2\">subscribe</a>)<br><a href=\"%3\">%3</a>").arg(qfInfoMaillist()).arg(qfInfoMaillistRequest()).arg(qfInfoWeblink()));
+    ui->labLicense->setText(qfInfoLicense());
     QFile f(":/quickfit3/releasenotes.html");
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
         QString text=f.readAll();
-        text=text.replace("$$SVN$$", SVNVERSION);
-        text=text.replace("$$COMPILEDATE$$", COMPILEDATE);
+        text=text.replace("$$SVN$$", qfInfoSVNVersion());
+        text=text.replace("$$qfInfoCompileDate()$$", qfInfoCompiler());
         ui->edtReleaseNotes->setText(text);
     } else {
         ui->edtReleaseNotes->setPlainText(tr("none available :-((("));
     }
-    ui->labVersion->setText(tr("version %1 (SVN: %2 COMPILEDATE: %3)").arg(QF_VERSION).arg(SVNVERSION).arg(COMPILEDATE));
+    ui->labVersion->setText(tr("version %1 (SVN: %2 qfInfoCompileDate(): %3)").arg(qfInfoVersion()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()));
 }
 
 DlgNewVersion::~DlgNewVersion()

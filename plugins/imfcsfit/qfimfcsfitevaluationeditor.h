@@ -80,7 +80,7 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
 
 
         /** \brief combobox to select a model for the weighting */
-        QFFCDWeightingCombobox* cmbWeights;
+        QFFCSWeightingCombobox* cmbWeights;
 
         QCheckBox* chkDontSaveFitResultMessage;
         QCheckBox* chkLeaveoutMasked;

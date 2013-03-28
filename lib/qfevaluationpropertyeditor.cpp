@@ -1,7 +1,7 @@
 #include "qfevaluationpropertyeditor.h"
 #include "qfprojectrawdatamodel.h"
 #include "qfevaluationitemfactory.h"
-#include "../version.h"
+#include "qfversion.h"
 #include "qfproject.h"
 
 
@@ -417,7 +417,7 @@ void QFEvaluationPropertyEditor::deleteSelectedRecords() {
     QModelIndexList sel=tvResults->selectionModel()->selectedIndexes();
     if (sel.size()>0) {
         QMessageBox::StandardButton ret;
-        ret = QMessageBox::question(this, tr("QuickFit %1").arg(QF_VERSION),
+        ret = QMessageBox::question(this, tr("QuickFit %1").arg(qfInfoVersion()),
                      tr("Do you really want to delete the selected results?"),
                      QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
         if (ret == QMessageBox::Yes) {
@@ -1233,7 +1233,7 @@ void QFEvaluationPropertyEditor::removeRawData() {
     if (current) {
         QFRawDataRecord* r=current->getHighlightedRecord();
         if (r) {
-            int ret = QMessageBox::question(this, tr("QuickFit %1").arg(VERSION_FULL),
+            int ret = QMessageBox::question(this, tr("QuickFit %1").arg(qfInfoVersionFull()),
                                     tr("Do you really want to delete the current record?\n   '%1'").arg(r->getName()),
                                     QMessageBox::Yes | QMessageBox::No,
                                     QMessageBox::No);

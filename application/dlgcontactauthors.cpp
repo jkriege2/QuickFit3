@@ -10,8 +10,8 @@ DlgContactAuthors::DlgContactAuthors(QWidget *parent, bool contactMailinglist) :
     ui(new Ui::DlgContactAuthors)
 {
     ui->setupUi(this);
-    ui->labWebpage->setText(tr("for further information and new versions, go to: <a href=\"%1\">%1</a>.</small>").arg(QF_WEBLINK));
-    ui->edtVersion->setText(QString("QuickFit v%1 (SVN%2 COMPILEDATE: %3), %4 bits").arg(QF_VERSION).arg(SVNVERSION).arg(COMPILEDATE).arg(getApplicationBitDepth()));
+    ui->labWebpage->setText(tr("for further information and new versions, go to: <a href=\"%1\">%1</a>.</small>").arg(qfInfoWeblink()));
+    ui->edtVersion->setText(QString("QuickFit v%1 (SVN%2 COMPILEDATE: %3), %4 bits").arg(qfInfoVersion()).arg(qfInfoSVNVersion()).arg(qfInfoCompiler()).arg(getApplicationBitDepth()));
     if (contactMailinglist) ui->cmbSendTo->setCurrentIndex(1);
     ui->edtEMail->setText(ProgramOptions::getConfigValue("DlgContactAuthors/email", "").toString());
     ui->edtName->setText(ProgramOptions::getConfigValue("DlgContactAuthors/name", "").toString());
@@ -25,8 +25,8 @@ DlgContactAuthors::~DlgContactAuthors()
 
 void DlgContactAuthors::acceptDialog() {
     QString subject=ui->cmbSubject->currentText();
-    QByteArray email=QF_EMAIL;
-    if (ui->cmbSendTo->currentIndex()==1) email=QF_MAILLIST;
+    QByteArray email=qfInfoEmail().toLocal8Bit();
+    if (ui->cmbSendTo->currentIndex()==1) email=qfInfoMaillist().toLocal8Bit();
     QString mailcontents=tr("%1\n\n\nsender: %2 <%3>\nQuickFit version: %4").arg(ui->edtMessage->toPlainText()).arg(ui->edtName->text()).arg(ui->edtEMail->text()).arg(ui->edtVersion->text());
 
     QUrl url=QUrl(QByteArray("mailto:")+email+"?subject="+QUrl::toPercentEncoding(subject)+
@@ -53,9 +53,9 @@ void DlgContactAuthors::openHelp()
 void DlgContactAuthors::on_cmbSendTo_currentIndexChanged(int index)
 {
     if (index==1) {
-        ui->labMailingList->setText(tr("<small><b>Note:</b> You have to first <a href=\"%1\">subscribe to the mailinglist</a> to be allowed to send messages to it!</small>").arg(QF_MAILLIST_REQUEST));
+        ui->labMailingList->setText(tr("<small><b>Note:</b> You have to first <a href=\"%1\">subscribe to the mailinglist</a> to be allowed to send messages to it!</small>").arg(qfInfoMaillistRequest()));
     } else if (index==0) {
-        ui->labMailingList->setText(tr("<small>mail goes to: <a href=\"mailto:%1\">%1</a>.</small>").arg(QF_EMAIL));
+        ui->labMailingList->setText(tr("<small>mail goes to: <a href=\"mailto:%1\">%1</a>.</small>").arg(qfInfoEmail()));
     } else {
         ui->labMailingList->setText("");
     }

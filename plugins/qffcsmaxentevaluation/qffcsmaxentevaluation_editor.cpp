@@ -63,7 +63,7 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
 
 
 
-    cmbWeights=new QFFCDWeightingCombobox(this);
+    cmbWeights=new QFFCSWeightingCombobox(this);
     cmbWeights->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     cmbWeights->setEditable(false);
     cmbWeights->setMaximumWidth(150);

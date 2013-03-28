@@ -1,4 +1,5 @@
 #include "qfhtmldelegate.h"
+#include <QElapsedTimer>
 #include <QDebug>
 #include <QTextEdit>
 #include <QVariant>
@@ -7,11 +8,16 @@
 #include <QApplication>
 #include <QBrush>
 #include <QPixmapCache>
+#include <QTime>
+#include <QDate>
+#include <QDateTime>
 
 QFHTMLDelegate::QFHTMLDelegate(QObject* parent):
     QStyledItemDelegate(parent)
 {
     m_displayRichTextEditor=true;
+    rxHTML=QRegExp("(<\\s*\\w+.*>)|(<\\s*/\\s*\\w+\\s*>)|(\\&\\w+\\;)");
+    rxHTML.setMinimal(true);
 }
 
 QFHTMLDelegate::~QFHTMLDelegate()
@@ -54,83 +60,162 @@ void QFHTMLDelegate::drawCheck(QPainter *painter,
     style->drawPrimitive(QStyle::PE_IndicatorViewItemCheck, &opt, painter, NULL);
 }
 
-
-void QFHTMLDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+QString QFHTMLDelegate::calcDisplayedText(const QModelIndex &index, const QStyleOptionViewItem &option, QPoint& offset, bool& isHTML, QPixmap* imgOut) const {
     QVariant data=index.data(Qt::DisplayRole).toString();
     QVariant check=index.data(Qt::CheckStateRole);
-    QBrush back=index.data(Qt::BackgroundRole).value<QBrush>();
-    QPoint offset=QPoint(0,0);
+    QPixmap img=QPixmap();
+    QVariant iv=index.data(Qt::DecorationRole);
+    if (iv.isValid() && iv.type()==QVariant::Icon) img=iv.value<QIcon>().pixmap(16);
+    if (iv.isValid() && iv.type()==QVariant::Pixmap) img=iv.value<QPixmap>();
+    offset=QPoint(2,0);
     //qDebug()<<option.palette.base()<<option.palette.background();
     if (check.isValid()) {
         offset=QPoint(option.rect.height()+2, 0);
     }
+
+    if (!img.isNull()) {
+        offset.setX(offset.x()+img.width()+2);
+        if (imgOut) *imgOut=img;
+    }
+    isHTML=false;
+
+    if (data.type()==QVariant::String || data.type()==QVariant::StringList) {
+        if (data.toString().contains(rxHTML)) {
+            QVariant fv=index.data(Qt::FontRole);
+            QFont f=option.font;
+            if (fv.isValid()) f=fv.value<QFont>();
+            QString pre, post;
+            pre="<font color=\""+option.palette.text().color().name()+"\">";
+            post="</font>";
+            if (option.state & QStyle::State_Selected) {
+                pre="<font color=\""+option.palette.highlightedText().color().name()+"\">";
+                post="</font>";
+            }
+            if (f.bold()) {
+                pre=pre+"<b>";
+                post="</b>"+post;
+            }
+            if (f.italic()) {
+                pre=pre+"<i>";
+                post="</i>"+post;
+            }
+            if (f.underline()) {
+                pre=pre+"<u>";
+                post="</u>"+post;
+            }
+
+            isHTML=true;
+            return pre+data.toString()+post;
+        } else {
+
+            return data.toString();
+        }
+    } else if (data.type()==QVariant::String) {
+        return data.toString();
+    } else if (data.type()==QVariant::Double) {
+        return QLocale::system().toString(data.toDouble(),'g', 6);
+    } else if (data.type()==QVariant::UInt || data.type()==QVariant::ULongLong) {
+        return QLocale::system().toString(data.toULongLong());
+    } else if (data.type()==QVariant::Int || data.type()==QVariant::LongLong) {
+        return QLocale::system().toString(data.toLongLong());
+    } else if (data.type()==QVariant::Time) {
+        return QLocale::system().toString(data.toTime());
+    } else if (data.type()==QVariant::Date) {
+        return QLocale::system().toString(data.toDate());
+    } else if (data.type()==QVariant::DateTime) {
+        return QLocale::system().toString(data.toDateTime());
+    } else {
+        return "";
+    }
+}
+
+
+void QFHTMLDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+    QElapsedTimer et;
+    et.start();
+    QVariant data=index.data(Qt::DisplayRole).toString();
+    //qDebug()<<"   get data dT="<<double(et.nsecsElapsed())/1000000.0<<"ms";
+    QVariant check=index.data(Qt::CheckStateRole);
+    //qDebug()<<"   get check dT="<<double(et.nsecsElapsed())/1000000.0<<"ms";
+    QBrush back=index.data(Qt::BackgroundRole).value<QBrush>();
+    //qDebug()<<"   get back dT="<<double(et.nsecsElapsed())/1000000.0<<"ms";
+    QPoint offset=QPoint(2,0);
+    //qDebug()<<option.palette.base()<<option.palette.background();
     if (index.data(Qt::BackgroundRole).isValid()) {
+        //qDebug()<<"   fill back dT="<<double(et.nsecsElapsed())/1000000.0<<"ms";
         painter->fillRect(option.rect, back);
     }
-    if (data.type()==QVariant::String) {
+    QPixmap img=QPixmap();
+    bool isHTML=false;
+    QString text=calcDisplayedText(index, option, offset, isHTML, &img);
+    //qDebug()<<"   calcDisplayedText dT="<<double(et.nsecsElapsed())/1000000.0<<"ms";
 
-        QVariant fv=index.data(Qt::FontRole);
-        QFont f=painter->font();
-        if (fv.isValid()) f=fv.value<QFont>();
-        QVariant iv=index.data(Qt::DecorationRole);
-        QPixmap img=QPixmap();
-        if (iv.isValid() && iv.type()==QVariant::Icon) img=iv.value<QIcon>().pixmap(16);
-        if (iv.isValid() && iv.type()==QVariant::Pixmap) img=iv.value<QPixmap>();
-        QString pre, post;
-        pre="<font color=\""+option.palette.text().color().name()+"\">";
-        post="</font>";
-        if (option.state & QStyle::State_Selected) {
-            painter->fillRect(option.rect, option.palette.highlight());
-            pre="<font color=\""+option.palette.highlightedText().color().name()+"\">";
-            post="</font>";
-        }
-        if (f.bold()) {
-            pre=pre+"<b>";
-            post="</b>"+post;
-        }
-        if (f.italic()) {
-            pre=pre+"<i>";
-            post="</i>"+post;
-        }
+    //qDebug()<<"    text="<<text<<" offset="<<offset<<" isHTML="<<isHTML<<" img-size="<<img.size();
 
-
-
-        if (check.isValid()) {
-            drawCheck(painter, option, QRect(option.rect.left(),option.rect.top(),option.rect.height(),option.rect.height()), check.toInt()!=0?Qt::Checked:Qt::Unchecked);
-        }
-
-        if (!img.isNull()) {
-            painter->drawPixmap(option.rect.topLeft()+offset, img);
-            offset.setX(offset.x()+img.width()+2);
-        }
-
+    if (option.state & QStyle::State_Selected) {
+        //qDebug()<<"   fill rect dT="<<double(et.nsecsElapsed())/1000000.0<<"ms";
+        painter->fillRect(option.rect, option.palette.highlight());
+    }
+    if (check.isValid()) {
+        //qDebug()<<"   draw check dT="<<double(et.nsecsElapsed())/1000000.0<<"ms";
+        drawCheck(painter, option, QRect(option.rect.left(),option.rect.top(),option.rect.height(),option.rect.height()), check.toInt()!=0?Qt::Checked:Qt::Unchecked);
+    }
+    if (!img.isNull()) {
+        //qDebug()<<"   draw pixmap dT="<<double(et.nsecsElapsed())/1000000.0<<"ms";
+        painter->drawPixmap(option.rect.topLeft()+QPoint(2,0), img);
+    }
+    if (isHTML) {
+        //qDebug()<<"   draw html dT="<<double(et.nsecsElapsed())/1000000.0<<"ms";
         painter->save();
         painter->translate(option.rect.topLeft()+offset);
         QRect r(QPoint(0, 0), option.rect.size()-QSize(offset.x(), 0));
-        QString id=QString::number(r.width())+"_"+QString::number(r.height())+"_"+pre+data.toString()+post;
+        QString id=QString::number(r.width())+"_"+QString::number(r.height())+"_"+text;
         QPixmap pix;
         if (!QPixmapCache::find(id, &pix)) {
+            //qDebug()<<"   draw html: create pixmap dT="<<double(et.nsecsElapsed())/1000000.0<<"ms";
             {
                 QImage img=QImage(r.width(), r.height(), QImage::Format_ARGB32_Premultiplied);
                 img.fill(Qt::transparent);
                 QPainter pixp;
                 pixp.begin(&img);
                 QTextDocument doc;
-                //std::cout<<"drawing "<<QString(pre+data.toString()+post).toStdString()<<std::endl;
-                doc.setHtml(pre+data.toString()+post);
+                doc.setHtml(text);
                 doc.drawContents(&pixp, r);
                 pixp.end();
                 pix=QPixmap::fromImage(img);
             }
-            bool ok=QPixmapCache::insert(id, pix);;
+            /*bool ok=*/
+            QPixmapCache::insert(id, pix);;
             //qDebug()<<" inserted pixmap: "<<ok<<"   cache_limit="<<QPixmapCache::cacheLimit();
         }
 
         painter->drawPixmap(0,0, pix);
-
         painter->restore();
 
-    } else {
+    } else if (!text.isEmpty()) {
+        //qDebug()<<"   draw text dT="<<double(et.nsecsElapsed())/1000000.0<<"ms";
+        painter->save();
+        QRect r=option.rect;
+        r.setLeft(r.left()+offset.x());
+        QVariant fv=index.data(Qt::FontRole);
+        QVariant fc=index.data(Qt::TextColorRole);
+        QFont f=option.font;
+        if (fv.isValid()) f=fv.value<QFont>();
+        painter->setFont(f);
+        QColor textcol=option.palette.text().color();
+        if (fc.isValid()) textcol=fc.value<QColor>();
+        painter->setPen(textcol);
+        int flags=Qt::AlignLeft|Qt::AlignVCenter|Qt::TextSingleLine;
+        if (option.textElideMode==Qt::ElideNone) {
+            painter->drawText(r, flags, text);
+        } else {
+            QFontMetrics fm(f);
+            QString txtEl=fm.elidedText(text, option.textElideMode, r.width(), flags);
+            painter->drawText(r, flags, txtEl);
+        }
+        painter->restore();
+    } else if (data.isValid() && !data.isNull() && !(text.isEmpty() && (data.type()==QVariant::String || QVariant::StringList))){
+        //qDebug()<<"   !!!QStyledItemDelegate::paint!!! dT="<<double(et.nsecsElapsed())/1000000.0<<"ms";
         QStyledItemDelegate::paint(painter, option, index);
     }
 }
@@ -138,10 +223,26 @@ void QFHTMLDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
 QSize QFHTMLDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
     //qDebug()<<" QFHTMLDelegate::sizeHint()";
     QVariant data=index.data(Qt::DisplayRole).toString();
-    if (data.type()==QVariant::String) {
+
+    bool isHTML=false;
+    QPoint offset(0,0);
+    QString text=calcDisplayedText(index, option, offset, isHTML);
+
+
+    if (isHTML) {
         QTextDocument doc;
         doc.setHtml(data.toString());
         return doc.size().toSize();
+    } else if (!text.isEmpty()){
+        QVariant fv=index.data(Qt::FontRole);
+        QFont f=option.font;
+        if (fv.isValid()) f=fv.value<QFont>();
+        QFontMetrics fm(f);
+        return fm.size(Qt::TextSingleLine, text);
+    } else if (data.type()==QVariant::String || data.type()==QVariant::StringList) {
+        return QSize(0,0);
+    } else if (!data.isValid() || data.isNull()) {
+        return QSize(0,0);
     }
     return QStyledItemDelegate::sizeHint(option, index);
 }

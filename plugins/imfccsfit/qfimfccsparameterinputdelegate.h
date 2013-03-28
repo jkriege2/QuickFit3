@@ -20,7 +20,7 @@ class QFImFCCSParameterInputDelegate : public QFHTMLDelegate {
     public slots:
 
     protected:
-        QRegExp rxHTML;
+        //QRegExp rxHTML;
         
 };
 

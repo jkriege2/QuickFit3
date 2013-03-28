@@ -11,14 +11,15 @@
 QFImFCCSParameterInputDelegate::QFImFCCSParameterInputDelegate(QObject *parent) :
     QFHTMLDelegate(parent)
 {
-    rxHTML=QRegExp("(<\\s*\\w+.*>)|(<\\s*/\\s*\\w+\\s*>)|(\\&\\w+\\;)");
-    rxHTML.setMinimal(true);
+    //rxHTML=QRegExp("(<\\s*\\w+.*>)|(<\\s*/\\s*\\w+\\s*>)|(\\&\\w+\\;)");
+    //rxHTML.setMinimal(true);
 }
 
 void QFImFCCSParameterInputDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    QFAutoOutputTimer t(QString("QFImFCCSParameterInputDelegate::paint(%1, %2, [%3] %4)").arg(index.row()).arg(index.column()).arg(index.data().typeName()).arg(index.data().toString()));
-    //static int htmlCount=0;
+    //QFAutoOutputTimer t(QString("QFImFCCSParameterInputDelegate::paint(%1, %2, [%3] %4)").arg(index.row()).arg(index.column()).arg(index.data().typeName()).arg(index.data().toString()));
+    QFHTMLDelegate::paint(painter, option, index);
+/*    //static int htmlCount=0;
     if (index.data().toString().contains(rxHTML)) {
         QFAutoOutputTimer t(QString("QFImFCCSParameterInputDelegate::paint_html(%1, %2)").arg(index.row()).arg(index.column()));
 
@@ -31,11 +32,14 @@ void QFImFCCSParameterInputDelegate::paint(QPainter *painter, const QStyleOption
         QFAutoOutputTimer t(QString("QFImFCCSParameterInputDelegate::paint_styled(%1, %2)").arg(index.row()).arg(index.column()));
         QStyledItemDelegate::paint(painter, option, index);
     }
+    */
 }
 
 QSize QFImFCCSParameterInputDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    QFAutoOutputTimer t(QString("QFImFCCSParameterInputDelegate::sizeHint(%1, %2)").arg(index.row()).arg(index.column()));
+    //QFAutoOutputTimer t(QString("QFImFCCSParameterInputDelegate::sizeHint(%1, %2)").arg(index.row()).arg(index.column()));
+    return QFHTMLDelegate::sizeHint(option, index);
+    /*
     static int htmlCount=0;
     static int styleCount=0;
     if (index.data().toString().contains(rxHTML)) {
@@ -43,17 +47,18 @@ QSize QFImFCCSParameterInputDelegate::sizeHint(const QStyleOptionViewItem &optio
         QElapsedTimer t;
         t.start();
         QSize s=QFHTMLDelegate::sizeHint(option, index);
-        qDebug()<<htmlCount+1<<". call to QFHTMLDelegate::sizeHint() "<<t.elapsed()<<" ms";
+        //qDebug()<<htmlCount+1<<". call to QFHTMLDelegate::sizeHint() "<<t.elapsed()<<" ms";
         htmlCount++;
         return s;
     } else {
         QElapsedTimer t;
         t.start();
         QSize s= QStyledItemDelegate::sizeHint(option, index);
-        qDebug()<<styleCount+1<<". call to QStyledItemDelegate::sizeHint() "<<t.elapsed()<<" ms";
+        //qDebug()<<styleCount+1<<". call to QStyledItemDelegate::sizeHint() "<<t.elapsed()<<" ms";
         styleCount++;
         return s;
     }
+    */
 }
 
 
@@ -84,7 +89,7 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
             for (int i=0; i<sl.size(); i++) {
                 if (sl[i]) cmb->addItem(sl[i]->getSmallIcon(), sl[i]->getName(), sl[i]->getID());
             }
-            qDebug()<<"   created rdrcombo "<<t.elapsed()<<"ms";
+            //qDebug()<<"   created rdrcombo "<<t.elapsed()<<"ms";
 
             cmb->view()->setMinimumWidth(450);
             return cmb;
@@ -96,7 +101,7 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
                 cmb->addItem(QIcon(":/lib/fitfunc_icon.png"), imfccs->getFitFunctionForID(sl[i])->name(), sl[i]);
             }
 
-            qDebug()<<"   created ffcombo "<<t.elapsed()<<"ms";
+            //qDebug()<<"   created ffcombo "<<t.elapsed()<<"ms";
             cmb->view()->setMinimumWidth(450);
             return cmb;
         }
@@ -109,18 +114,18 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
         if (imfccs && fpID.isValid() && widgetType.toInt()==QFImFCCSParameterInputTable::wtValueDoubleEdit) {
             QFDoubleEdit* edt=new QFDoubleEdit(parent);
             edt->setRange(imfccs->getFitMin(fpID.toString(), rdr), imfccs->getFitMax(fpID.toString(), rdr));
-            qDebug()<<"   created valuedoubleedit "<<t.elapsed()<<"ms";
+            //qDebug()<<"   created valuedoubleedit "<<t.elapsed()<<"ms";
             return edt;
         }
         if (imfccs && fpID.isValid() && widgetType.toInt()==QFImFCCSParameterInputTable::wtErrorEdit) {
             QFDoubleEdit* edt=new QFDoubleEdit(parent);
-            qDebug()<<"   created erroredit "<<t.elapsed()<<"ms";
+            //qDebug()<<"   created erroredit "<<t.elapsed()<<"ms";
             return edt;
         }
         if (imfccs && fpID.isValid() && widgetType.toInt()==QFImFCCSParameterInputTable::wtValueIntEdit) {
             QSpinBox* edt=new QSpinBox(parent);
             edt->setRange(imfccs->getFitMin(fpID.toString(), rdr), imfccs->getFitMax(fpID.toString(), rdr));
-            qDebug()<<"   created valuedoubleedit "<<t.elapsed()<<"ms";
+            //qDebug()<<"   created valuedoubleedit "<<t.elapsed()<<"ms";
             return edt;
         }
         if (ff && imfccs && fpID.isValid() && widgetType.toInt()==QFImFCCSParameterInputTable::wtValueComboBox) {
@@ -132,14 +137,14 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
                 cnt++;
             }
             //edt->setRange(imfccs->getFitMin(fpID.toString(), rdr), imfccs->getFitMax(fpID.toString(), rdr));
-            qDebug()<<"   created valuedoubleedit "<<t.elapsed()<<"ms";
+            //qDebug()<<"   created valuedoubleedit "<<t.elapsed()<<"ms";
             return edt;
         }
-        qDebug()<<"   created NOTHING "<<t.elapsed()<<"ms";
+        //qDebug()<<"   created NOTHING "<<t.elapsed()<<"ms";
         return NULL;
     }
     //return QFHTMLDelegate::createEditor(parent, option, index);
-    qDebug()<<"   created NOTHING "<<t.elapsed()<<"ms";
+    //qDebug()<<"   created NOTHING "<<t.elapsed()<<"ms";
     return NULL;
 }
 

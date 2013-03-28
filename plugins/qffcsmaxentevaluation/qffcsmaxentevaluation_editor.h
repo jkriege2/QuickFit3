@@ -123,7 +123,7 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         /** \brief number edit to change NumIter */
         QSpinBox* edtNumIter;
         /** \brief combobox to select a model for the weighting */
-        QFFCDWeightingCombobox* cmbWeights;
+        QFFCSWeightingCombobox* cmbWeights;
         /** \brief ploter for the MaxEnt Distribution */
         QFPlotter* pltDistribution;
         QToolBar* tbPlot;

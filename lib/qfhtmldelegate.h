@@ -29,10 +29,13 @@ class QFLIB_EXPORT QFHTMLDelegate : public QStyledItemDelegate {
         void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     private:
         bool m_displayRichTextEditor;
-
+        QRegExp rxHTML;
+    protected:
         void drawCheck(QPainter *painter,
                        const QStyleOptionViewItem &option,
                        const QRect &rect, Qt::CheckState state) const;
+
+        QString calcDisplayedText(const QModelIndex& index, const QStyleOptionViewItem &option, QPoint &offset, bool &isHTML, QPixmap *img=NULL) const;
 };
 
 #endif // QFHTMLDELEGATE_H

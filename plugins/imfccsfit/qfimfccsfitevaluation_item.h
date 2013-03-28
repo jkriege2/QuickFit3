@@ -114,6 +114,9 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         virtual void setFitFunction(QString fitFunction);
         virtual int addFitFile();
         virtual void removeFitFile();
+
+    signals:
+        void fileChanged(int num, QFRawDataRecord* record);
     protected:
 
         QFImFCCSMatchRDRFunctor* matchFunctor;

@@ -113,19 +113,19 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
 
     splash->showMessage(tr("%1 Plugins loaded successfully").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()+importerManager->pluginCount()));
 
-    htmlReplaceList.append(qMakePair(QString("version.svnrevision"), QString(SVNVERSION).trimmed()));
-    htmlReplaceList.append(qMakePair(QString("version.status"), QString(VERSION_STATUS)));
-    htmlReplaceList.append(qMakePair(QString("version.date"), QString(COMPILEDATE).trimmed()));
-    htmlReplaceList.append(qMakePair(QString("version"), QString(VERSION_FULL)));
-    htmlReplaceList.append(qMakePair(QString("version_full"), QApplication::applicationVersion()));
-    htmlReplaceList.append(qMakePair(QString("thanksto"), QString(QF_THANKS_TO)));
-    htmlReplaceList.append(qMakePair(QString("copyright"), QString(QF_COPYRIGHT)));
-    htmlReplaceList.append(qMakePair(QString("author"), QString(QF_AUTHOR)));
-    htmlReplaceList.append(qMakePair(QString("email"), QString(QF_EMAIL)));
-    htmlReplaceList.append(qMakePair(QString("maillist"), QString(QF_MAILLIST)));
-    htmlReplaceList.append(qMakePair(QString("maillistrequest"), QString(QF_MAILLIST_REQUEST)));
-    htmlReplaceList.append(qMakePair(QString("weblink"), QString(QF_WEBLINK)));
-    htmlReplaceList.append(qMakePair(QString("license"), tr(QF_LICENSE)));
+    htmlReplaceList.append(qMakePair(QString("version.svnrevision"), QString(qfInfoSVNVersion()).trimmed()));
+    htmlReplaceList.append(qMakePair(QString("version.status"), QString(qfInfoVersionStatus())));
+    htmlReplaceList.append(qMakePair(QString("version.date"), QString(qfInfoCompileDate()).trimmed()));
+    htmlReplaceList.append(qMakePair(QString("version"), QString(qfInfoVersionFull())));
+    htmlReplaceList.append(qMakePair(QString("qfInfoVersionFull()"), QApplication::applicationVersion()));
+    htmlReplaceList.append(qMakePair(QString("thanksto"), QString(qfInfoThanksTo())));
+    htmlReplaceList.append(qMakePair(QString("copyright"), QString(qfInfoCopyright())));
+    htmlReplaceList.append(qMakePair(QString("author"), QString(qfInfoAuthor())));
+    htmlReplaceList.append(qMakePair(QString("email"), QString(qfInfoEmail())));
+    htmlReplaceList.append(qMakePair(QString("maillist"), QString(qfInfoMaillist())));
+    htmlReplaceList.append(qMakePair(QString("maillistrequest"), QString(qfInfoMaillistRequest())));
+    htmlReplaceList.append(qMakePair(QString("weblink"), QString(qfInfoWeblink())));
+    htmlReplaceList.append(qMakePair(QString("license"), qfInfoLicense()));
     htmlReplaceList.append(qMakePair(QString("plugin_list"), createPluginDoc(true)));
     htmlReplaceList.append(qMakePair(QString("pluginhelp_list"), createPluginDocHelp()));
     htmlReplaceList.append(qMakePair(QString("plugintutorials_list"), createPluginDocTutorials()));
@@ -263,7 +263,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
             histograms[name]->close();
             histograms[name]->deleteLater();
         }
-        ProgramOptions::setConfigValue("quickfit/lastrunsvn", SVNVERSION);
+        ProgramOptions::setConfigValue("quickfit/lastrunsvn", qfInfoSVNVersion());
         event->accept();
         //qDebug()<<"main: exiting application";
         QApplication::exit();
@@ -274,14 +274,14 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 void MainWindow::showEvent(QShowEvent *event) {
-    QString SVN=SVNVERSION;
+    QString SVN=qfInfoSVNVersion();
     QString lastSVN=ProgramOptions::getConfigValue("quickfit/lastrunsvn", "").toString();
 
     if (SVN!=lastSVN && !ProgramOptions::getConfigValue("quickfit/nosvncheck", false).toBool()) {
         DlgNewVersion* dlg=new DlgNewVersion(this);
         dlg->exec();
         delete dlg;
-        ProgramOptions::setConfigValue("quickfit/lastrunsvn", SVNVERSION);
+        ProgramOptions::setConfigValue("quickfit/lastrunsvn", qfInfoSVNVersion());
     }
 }
 
@@ -385,7 +385,7 @@ void MainWindow::openProjectSubset()
                 }
                 delete dlg;
             } else {
-                QMessageBox::critical(this, tr("QuickFit %1").arg(VERSION_FULL), dummy->errorDescription());
+                QMessageBox::critical(this, tr("QuickFit %1").arg(qfInfoVersionFull()), dummy->errorDescription());
                 logFileProjectWidget->log_error(dummy->errorDescription()+"\n");
                 load=false;
             }
@@ -404,7 +404,7 @@ void MainWindow::openProjectSubset()
 void MainWindow::reloadProject() {
     if (maybeSave()) {
         if (QFile::exists(curFile)) loadProject(curFile);
-        else QMessageBox::warning(this, tr("QuickFit %1").arg(VERSION_FULL),
+        else QMessageBox::warning(this, tr("QuickFit %1").arg(qfInfoVersionFull()),
                                   tr("No project loaded that could be reloaded!"),
                                   QMessageBox::Ok);
     }
@@ -465,16 +465,16 @@ void MainWindow::about() {
                             "<b>many thanks to:</b><blockquote>%2</blockquote>"
                             "<b>contact the authors:</b><blockquote><a href=\"mailto:%6\">%6</a></blockquote>"
                             "<b>mailing list:</b><blockquote><a href=\"mailto:%8\">%8</a> (<a href=\"%9\">subscribe</a>)</blockquote>"
-                            "<b>QuickFit version:</b><blockquote>version %10 (%11) %14-bit, SVN: %12, COMPILEDATE: %13</blockquote>"
+                            "<b>QuickFit version:</b><blockquote>version %10 (%11) %14-bit, SVN: %12, qfInfoCompileDate(): %13</blockquote>"
                             "<b>libraries, used by QuickFit:</b><ul><li>QuickFit library v%4.%5</li><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul>"
                             "<b>compiler used for this version:</b><blockquote>%7</blockquote>"
-                            "<b>operating system:</b><blockquote>%15</blockquote>").arg(QT_VERSION_STR).arg(QF_THANKS_TO).arg(QF_COPYRIGHT).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR).arg(QF_EMAIL).arg(Qt::escape(COMPILER)).arg(QF_MAILLIST).arg(QF_MAILLIST_REQUEST).arg(QF_VERSION).arg(VERSION_STATUS).arg(SVNVERSION).arg(COMPILEDATE).arg(getApplicationBitDepth()).arg(getOSName()));
-    ui_labelLic->setText(tr(QF_LICENSE));
+                            "<b>operating system:</b><blockquote>%15</blockquote>").arg(QT_VERSION_STR).arg(qfInfoThanksTo()).arg(qfInfoCopyright()).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR).arg(qfInfoEmail()).arg(Qt::escape(qfInfoCompiler())).arg(qfInfoMaillist()).arg(qfInfoMaillistRequest()).arg(qfInfoVersion()).arg(qfInfoVersionStatus()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()).arg(getApplicationBitDepth()).arg(getOSName()));
+    ui_labelLic->setText(qfInfoLicense());
     QFile f(":/quickfit3/releasenotes.html");
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
         QString text=f.readAll();
-        text=text.replace("$$SVN$$", SVNVERSION);
-        text=text.replace("$$COMPILEDATE$$", COMPILEDATE);
+        text=text.replace("$$SVN$$", qfInfoSVNVersion());
+        text=text.replace("$$qfInfoCompileDate()$$", qfInfoCompileDate());
         ui_releasenotes->setText(text);
     } else {
         ui_releasenotes->setPlainText(tr("none available :-((("));
@@ -862,7 +862,7 @@ void MainWindow::createWidgets() {
     tabLogs->addTab(logFileMainWidget, tr("QuickFit Log"));
     qDebug()<<"opening log: "<<QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log");
     logFileMainWidget->open_logfile(QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log"), false);
-    logFileMainWidget->log_text(tr("starting up QuickFit %1 (SVN: %2 COMILEDATE: %3), %4-bit ...\n").arg(VERSION_FULL).arg(SVNVERSION).arg(COMPILEDATE).arg(getApplicationBitDepth()));
+    logFileMainWidget->log_text(tr("starting up QuickFit %1 (SVN: %2 COMILEDATE: %3), %4-bit ...\n").arg(qfInfoVersionFull()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()).arg(getApplicationBitDepth()));
     logFileMainWidget->log_text(tr("logging to '%1' ...\n").arg(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log"));
     logFileMainWidget->log_text(tr("configuration directory: '%1' ...\n").arg(settings->getConfigFileDirectory()));
     logFileMainWidget->log_text(tr("global configuration directory: '%1' ...\n").arg(settings->getGlobalConfigFileDirectory()));
@@ -1262,7 +1262,7 @@ bool MainWindow::maybeSave() {
     if (!project) return true;
     if (project->hasChanged()) {
         QMessageBox::StandardButton ret;
-        ret = QMessageBox::warning(this, tr("QuickFit %1").arg(VERSION_FULL),
+        ret = QMessageBox::warning(this, tr("QuickFit %1").arg(qfInfoVersionFull()),
                      tr("The project or the data in it has been modified.\n"
                         "Do you want to save your changes?"),
                      QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
@@ -1285,7 +1285,7 @@ void MainWindow::loadProject(const QString &fileName, bool subsetMode, const QSe
     statusBar()->showMessage(tr("loading project file '%1' ...").arg(fileName), 2000);
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        QMessageBox::critical(this, tr("QuickFit %1").arg(VERSION_FULL),
+        QMessageBox::critical(this, tr("QuickFit %1").arg(qfInfoVersionFull()),
                              tr("Cannot access project file %1:\n%2.")
                              .arg(fileName)
                              .arg(file.errorString()));
@@ -1317,7 +1317,7 @@ void MainWindow::loadProject(const QString &fileName, bool subsetMode, const QSe
     connect(project, SIGNAL(wasChanged(bool)), this, SLOT(setWindowModified(bool)));
     connect(project, SIGNAL(structureChanged()), this, SLOT(modelReset()));
     if (project->error()) {
-        QMessageBox::critical(this, tr("QuickFit %1").arg(VERSION_FULL), project->errorDescription());
+        QMessageBox::critical(this, tr("QuickFit %1").arg(qfInfoVersionFull()), project->errorDescription());
         logFileProjectWidget->log_error(project->errorDescription()+"\n");
     }
     tvMain->setModel(project->getTreeModel());
@@ -1366,7 +1366,7 @@ bool MainWindow::saveProject(const QString &fileName) {
         elapsed=double(time.elapsed())/1000.0;
         readProjectProperties();
         if (project->error()) {
-            QMessageBox::critical(this, tr("QuickFit %1").arg(VERSION_FULL), project->errorDescription());
+            QMessageBox::critical(this, tr("QuickFit %1").arg(qfInfoVersionFull()), project->errorDescription());
             logFileProjectWidget->log_error(project->errorDescription()+"\n");
         }
         tvMain->setModel(project->getTreeModel());
@@ -1392,7 +1392,7 @@ void MainWindow::setCurrentProject(const QString &fileName) {
     else
         shownName = strippedName(curFile);
 
-    setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("QuickFit %1").arg(VERSION_FULL)));
+    setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("QuickFit %1").arg(qfInfoVersionFull())));
 
     // update recent files list in ini file
     recentMenu->addRecentFile(fileName);
@@ -1903,7 +1903,7 @@ void MainWindow::saveProjectFirstTime() {
     if (!project) return;
     if (project->getRawDataCount()+project->getEvaluationCount()>0) {
         newProjectTimer.stop();
-        int ret = QMessageBox::question(this, tr("QuickFit %1").arg(VERSION_FULL),
+        int ret = QMessageBox::question(this, tr("QuickFit %1").arg(qfInfoVersionFull()),
                                 tr("You added the first data or evaluation item to an empty project.\n"
                                    "Do you want to save your project now (no further reminders will be shown)?"),
                                 QMessageBox::Yes | QMessageBox::No,
@@ -2246,7 +2246,7 @@ void MainWindow::contactMailinglist()
 
 void MainWindow::openWebpage()
 {
-    QDesktopServices::openUrl(QUrl(QF_WEBLINK));
+    QDesktopServices::openUrl(QUrl(qfInfoWeblink()));
 }
 
 QList<QPair<QString, QString> >* MainWindow::getHTMLReplacementList() {

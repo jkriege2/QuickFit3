@@ -52,7 +52,7 @@ int QFImFCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord *rec, int index)
 
 void QFImFCSFitEvaluationEditor::createWidgets() {
 
-    cmbWeights=new QFFCDWeightingCombobox(this);
+    cmbWeights=new QFFCSWeightingCombobox(this);
     cmbWeights->setMaximumWidth(150);
     cmbWeights->setMinimumWidth(150);
     QLabel* l=new QLabel(tr("&Weight Model: "), this);

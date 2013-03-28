@@ -152,7 +152,7 @@ void DlgComponentInfo::on_btnMailData_clicked() {
     }
     QString mailcontents=tr("Dear authors,\nfind attatched my component data for inclusion in the next QuickFit release,\n\nBest,\n\n\nDATA:\n---------------------------------------------------------------------\n%1\n---------------------------------------------------------------------\n%3:\n%2\n---------------------------------------------------------------------\n").arg(inisection).arg(filecontents).arg(datafilename);
 
-    QUrl url=QUrl(QByteArray("mailto:")+QByteArray(QF_EMAIL)+"?subject="+QUrl::toPercentEncoding("QuickFit3/calc_diffcoeff: new component data")+
+    QUrl url=QUrl(QByteArray("mailto:")+qfInfoEmail().toLocal8Bit()+"?subject="+QUrl::toPercentEncoding("QuickFit3/calc_diffcoeff: new component data")+
                   "&body="+QUrl::toPercentEncoding(mailcontents));
     QDesktopServices::openUrl(url);
 }

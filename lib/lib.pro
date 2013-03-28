@@ -57,7 +57,6 @@ HEADERS += dlgnewproperty.h \
            csvtools.h \
     qtriple.h \
     qvisiblehandlesplitter.h \
-    ../version.h \
     lib_imexport.h \
     qfhtmldelegate.h \
     qfprojecttreemodelnode.h \
@@ -146,7 +145,8 @@ SOURCES += dlgnewproperty.cpp \
     qfrdrcombobox.cpp \
     qfresultsgroupcombobox.cpp \
     qfrawdataresultscombobox.cpp \
-    qfelidedlabel.cpp
+    qfelidedlabel.cpp \
+    qfversion.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

@@ -6,7 +6,7 @@
 #include "qfevaluationitemfactory.h"
 #include "qfrawdatarecordfactory.h"
 #include "qfpluginservices.h"
-#include "../version.h"
+#include "qfversion.h"
 
 #include <QTemporaryFile>
 #include <QElapsedTimer>
@@ -319,9 +319,9 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
         w.setAutoFormatting(false);
         w.writeStartDocument();
         w.writeStartElement("quickfitproject");
-        w.writeAttribute("quickfit_version", VERSION_FULL);
-        w.writeAttribute("quickfit_svn", SVNVERSION);
-        w.writeAttribute("quickfit_compiledate", COMPILEDATE);
+        w.writeAttribute("quickfit_version", qfInfoVersionFull());
+        w.writeAttribute("quickfit_svn", qfInfoSVNVersion());
+        w.writeAttribute("quickfit_qfInfoCompileDate()", qfInfoCompileDate());
         w.writeAttribute("name", name);
         w.writeAttribute("creator", creator);
         w.writeStartElement("description");

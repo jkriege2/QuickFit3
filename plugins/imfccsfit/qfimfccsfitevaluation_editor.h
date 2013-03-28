@@ -5,7 +5,8 @@
 #include "qfrawdatarecord.h"
 #include <QProgressDialog>
 #include <QTextDocument>
-
+#include "qffitfunctionplottools.h"
+#include "jkqtplotter.h"
 namespace Ui {
     class QFImFCCSFitEvaluationEditor;
 }
@@ -24,6 +25,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         /** Default destructor */
         virtual ~QFImFCCSFitEvaluationEditor();
     protected slots:
+        void zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender);
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old);
         /** \brief connected to the rawDataChanged() signal of the current record */
@@ -39,6 +41,8 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void configFitAlgorithm();
         /** \brief called when the fit algorithm changes */
         void fitAlgorithmChanged(int model);
+
+        void setCurrentRun(int run);
     protected:
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFImFCCSFitEvaluationEditor *ui;
@@ -72,7 +76,9 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         /** ßbrief ensures that the parameter table model is displayed properly */
         void ensureCorrectParamaterModelDisplay();
 
+        void fileChanged(int num, QFRawDataRecord* file);
 
+        void plotMouseMoved(double x, double y);
 
     
         /** \brief evaluate all files */

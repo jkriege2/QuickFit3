@@ -128,7 +128,7 @@ QFFCSWeightingTools::DataWeight QFFCSWeightingTools::indexToWeight(int index)
 
 
 
-QFFCDWeightingCombobox::QFFCDWeightingCombobox(QWidget *parent):
+QFFCSWeightingCombobox::QFFCSWeightingCombobox(QWidget *parent):
     QComboBox(parent)
 {
     setEditable(false);
@@ -139,22 +139,22 @@ QFFCDWeightingCombobox::QFFCDWeightingCombobox(QWidget *parent):
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIdxChanged(int)));
 }
 
-QFFCSWeightingTools::DataWeight QFFCDWeightingCombobox::currentWeight() const
+QFFCSWeightingTools::DataWeight QFFCSWeightingCombobox::currentWeight() const
 {
     return indexToWeight(currentIndex());
 }
 
-void QFFCDWeightingCombobox::setCurrentWeight(QFFCSWeightingTools::DataWeight weight)
+void QFFCSWeightingCombobox::setCurrentWeight(QFFCSWeightingTools::DataWeight weight)
 {
     setCurrentIndex((int)weight);
 }
 
-QFFCSWeightingTools::DataWeight QFFCDWeightingCombobox::indexToWeight(int index)
+QFFCSWeightingTools::DataWeight QFFCSWeightingCombobox::indexToWeight(int index)
 {
     return QFFCSWeightingTools::indexToWeight(index);
 }
 
-void QFFCDWeightingCombobox::currentIdxChanged(int idx)
+void QFFCSWeightingCombobox::currentIdxChanged(int idx)
 {
     emit currentWeightChanged(indexToWeight(idx));
 }

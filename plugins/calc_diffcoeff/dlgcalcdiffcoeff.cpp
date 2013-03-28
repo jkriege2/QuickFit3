@@ -642,7 +642,7 @@ void DlgCalcDiffCoeff::on_btnSendEmailGivenD_clicked() {
         f.close();
     }
 
-    QUrl url=QUrl(QByteArray("mailto:")+QByteArray(QF_EMAIL)+"?subject="+QUrl::toPercentEncoding("QuickFit3/calc_diffcoeff: new given D data")+
+    QUrl url=QUrl(QByteArray("mailto:")+qfInfoEmail().toLocal8Bit()+"?subject="+QUrl::toPercentEncoding("QuickFit3/calc_diffcoeff: new given D data")+
                   "&body="+QUrl::toPercentEncoding(QString("Dear authors,\nfind attatched my given D data for inclusion in the next QuickFit release,\n\nBest,\n\n\nDATA:\n---------------------------------------------------------------------\n%1\n---------------------------------------------------------------------\n").arg(filecontents)));
     QDesktopServices::openUrl(url);
 }

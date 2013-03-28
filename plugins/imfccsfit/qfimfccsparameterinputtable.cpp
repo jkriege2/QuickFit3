@@ -21,7 +21,7 @@ int QFImFCCSParameterInputTable::columnCount(const QModelIndex &parent) const
 
 Qt::ItemFlags QFImFCCSParameterInputTable::flags(const QModelIndex &index) const
 {
-    QFAutoOutputTimer(QString("flags(%1, %2, %3)").arg(index.row()).arg(index.column()));
+    //QFAutoOutputTimer(QString("flags(%1, %2, %3)").arg(index.row()).arg(index.column()));
     Qt::ItemFlags f=Qt::ItemIsEnabled|Qt::ItemIsSelectable;
     int col=index.column();
     int row=index.row();
@@ -50,7 +50,7 @@ Qt::ItemFlags QFImFCCSParameterInputTable::flags(const QModelIndex &index) const
 
 QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) const
 {
-    QFAutoOutputTimer(QString("data(%1, %2, %3)").arg(index.row()).arg(index.column()).arg(role));
+    //QFAutoOutputTimer(QString("data(%1, %2, %3)").arg(index.row()).arg(index.column()).arg(role));
     int col=index.column();
     int row=index.row();
 
@@ -110,10 +110,10 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
             //double* p=item->allocFillParameters(rdr, item->getCurrentIndex(), ff);
             if (fp.isValid() && ff && ff->hasParameter(fp.id) /*&& ff->isParameterVisible(ff->getParameterNum(fp.id), p)*/) {
                 QFFitFunction::ParameterDescription desc=ff->getDescription(fp.id);
-                double* p=item->allocFillParameters(rdr, item->getCurrentIndex(), ff);
+                /*double* p=item->allocFillParameters(rdr, item->getCurrentIndex(), ff);
                 bool visible=ff->isParameterVisible(ff->getParameterNum(fp.id), p);
                 free(p);
-                if (visible) {
+                if (visible) {*/
                     if (coli==0) {
                         if (role==Qt::DisplayRole || role==Qt::EditRole) return item->getFitValue(fp.id, rdr);
                         if (role==widgetTypeRole && desc.userEditable) {
@@ -136,7 +136,7 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
                             return Qt::Unchecked;
                         }
                     }
-                }
+                //}
             } else {
                 if (role==Qt::BackgroundRole) return QBrush(QApplication::palette().color(QPalette::Window).darker());
             }
@@ -176,7 +176,7 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
     int col=index.column();
     int row=index.row();
 
-    QFAutoOutputTimer(QString("setData(%1, %2, %3, r=%4)").arg(index.row()).arg(index.column()).arg(value.toString()).arg(role));
+    //QFAutoOutputTimer(QString("setData(%1, %2, %3, r=%4)").arg(index.row()).arg(index.column()).arg(value.toString()).arg(role));
 
     if (role==Qt::EditRole && col>0) {
         int cols=(col-1)/colsPerRDR;

@@ -7,7 +7,7 @@ COMPILERVERSION=$$system($$QMAKE_CXX --version)
 
 
 # try to read the SVN version
-SVNVERSION = $$system(svnversion)
+SVNVERSION = $$system(SVNVERSION)
 contains(SVNVERSION,exported):SVNVERSION=
 isEmpty(SVNVERSION){
     # if SVN does not work, try git svn
@@ -43,7 +43,7 @@ win32 {
 isEmpty(DATESTR) {
     DATESTR = ---
 }
-message("RELEASE MODE: svnversion is: $$SVNVERSION")
+message("RELEASE MODE: SVNVERSION is: $$SVNVERSION")
 message("RELEASE MODE: build date is: $$DATESTR")
 message("RELEASE MODE: compiler: $$COMPILERVERSION")
 
@@ -53,12 +53,12 @@ message("RELEASE MODE: compiler: $$COMPILERVERSION")
 
 
 win32 {
-    system(echo $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"  > svnversion.h )
-    system(echo $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"  > compiledate.h )
+    system(echo $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"  > SVNVERSION.h )
+    system(echo $$LITERAL_HASH define qfInfoCompileDate() \"$$DATESTR\"  > qfInfoCompileDate().h )
     system(echo $$LITERAL_HASH define COMPILER \"$$COMPILERVERSION\"  > compiler.h )
 } else {
-    system(echo \'$$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"\'  > svnversion.h )
-    system(echo \'$$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"\'  > compiledate.h )
+    system(echo \'$$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"\'  > SVNVERSION.h )
+    system(echo \'$$LITERAL_HASH define qfInfoCompileDate() \"$$DATESTR\"\'  > qfInfoCompileDate().h )
     system(echo \'$$LITERAL_HASH define COMPILER \"$$COMPILERVERSION\"\'  > compiler.h )
 }
 

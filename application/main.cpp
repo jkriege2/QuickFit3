@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "../version.h"
+#include "qfversion.h"
 #include "../lib/programoptions.h"
 #include "../lib/qftools.h"
 #include "jkqtpbaseplotter.h"
@@ -37,15 +37,15 @@ int main(int argc, char * argv[])
     QApplication app(argc, argv);
 
     app.setOrganizationName("German Cancer Research Center: B040 (Biophysics of Macromolecules)");
-    app.setApplicationName(QString("QuickFit %1 (SVN %2 DATE %3)").arg(VERSION_FULL).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()));
+    app.setApplicationName(QString("QuickFit %1 (SVN %2 DATE %3)").arg(qfInfoVersionFull()).arg(QString(qfInfoSVNVersion()).trimmed()).arg(QString(qfInfoCompileDate()).trimmed()));
     app.setOrganizationDomain("http://www.dkfz.de/Macromol");
-    app.setApplicationVersion(QString("%1 (%2 SVN %3 DATE %4)").arg(VERSION_FULL).arg(VERSION_STATUS).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()));
+    app.setApplicationVersion(QString("%1 (%2 SVN %3 DATE %4)").arg(qfInfoVersionFull()).arg(qfInfoVersionStatus()).arg(QString(qfInfoSVNVersion()).trimmed()).arg(QString(qfInfoCompileDate()).trimmed()));
     app.setWindowIcon(QIcon(":/icon_large.png"));
 
     QPixmap pixmap(":/splash.png");
     QPainter* painter=new QPainter(&pixmap);
     painter->setFont(QFont("Arial", 9));
-    painter->drawText(QPoint(5,290), QString("version %1 (%2 SVN %3 DATE %4), %5-bit").arg(VERSION_FULL).arg(VERSION_STATUS).arg(QString(SVNVERSION).trimmed()).arg(QString(COMPILEDATE).trimmed()).arg(getApplicationBitDepth()));
+    painter->drawText(QPoint(5,290), QString("version %1 (%2 SVN %3 DATE %4), %5-bit").arg(qfInfoVersionFull()).arg(qfInfoVersionStatus()).arg(QString(qfInfoSVNVersion()).trimmed()).arg(QString(qfInfoCompileDate()).trimmed()).arg(getApplicationBitDepth()));
     delete painter;
     painter=NULL;
     QSplashScreen splash(pixmap);//,Qt::WindowStaysOnTopHint);
