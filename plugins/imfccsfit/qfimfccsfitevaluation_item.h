@@ -108,13 +108,14 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
 
         int getNumberOfFitFiles() const;
         QFMatchRDRFunctor* getMatchFunctor() const;
+        /** \brief set the current index to use */
+        virtual int getCurrentIndex() const;
     public slots:
         void setFitFile(int num, QFRawDataRecord *record);
         virtual void setFitFunction(int num, QString fitFunction);
         virtual void setFitFunction(QString fitFunction);
         virtual int addFitFile();
         virtual void removeFitFile();
-    public slots:
         /** \brief set the current index to use */
         virtual void setCurrentIndex(int index);
 

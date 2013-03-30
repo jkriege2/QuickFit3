@@ -139,8 +139,9 @@ void QFImFCCSFitEvaluationItem::removeFitFile()
 
 void QFImFCCSFitEvaluationItem::setCurrentIndex(int index)
 {
+    m_currentIndex=index;
     QFRawDataRecord* r=getFitFile(0);
-    if ((r!=NULL)) {
+    if (r) {
         if (index<=getIndexMin(r)) m_currentIndex=getIndexMin(r);
         if (index<=getIndexMax(r)) m_currentIndex=index;
         if (index>getIndexMax(r)) m_currentIndex=getIndexMax(r);
@@ -334,6 +335,22 @@ int QFImFCCSFitEvaluationItem::getNumberOfFitFiles() const
 QFMatchRDRFunctor *QFImFCCSFitEvaluationItem::getMatchFunctor() const
 {
     return matchFunctor;
+}
+
+int QFImFCCSFitEvaluationItem::getCurrentIndex() const
+{
+    QFRawDataRecord* r=getFitFile(0);
+    int index=m_currentIndex;
+    if (r!=NULL) {
+        /*m_currentIndex=*/index=r->getProperty(QString(getType()+QString::number(getID())+"_last_index"), index).toInt();
+    }
+    if (index<getIndexMin(r)) {
+        /*m_currentIndex=*/index=getIndexMin(r);
+    }
+    if (index>getIndexMax(r)) {
+        /*m_currentIndex=*/index=getIndexMax(r);
+    }
+    return index;
 }
 
 

@@ -47,7 +47,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         virtual int getIndexMax(QFRawDataRecord* r) const=0;
 
         /** \brief set the current index to use */
-        int getCurrentIndex() const;
+        virtual int getCurrentIndex() const;
 
         /** \brief return a name for the given index */
         virtual QString getIndexName(QFRawDataRecord *rec, int index) const;

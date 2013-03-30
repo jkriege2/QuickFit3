@@ -801,14 +801,16 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeStartElement("column");
             w.writeAttribute("title", datamodel->columnTitle(c));
             for (quint16 r=0; r<datamodel->rowCount(); r++) {
-                w.writeStartElement("row");
-                w.writeAttribute("type", getQVariantType(datamodel->cell(r, c)));
-                w.writeAttribute("value", getQVariantData(datamodel->cell(r, c)));
-                QString ex=datamodel->cellUserRole(QFRDRTable::TableExpressionRole, r, c).toString();
-                if (!ex.isEmpty()) w.writeAttribute("expression", ex);
-                QString comment=datamodel->cellUserRole(QFRDRTable::TableCommentRole, r, c).toString();
-                if (!comment.isEmpty()) w.writeAttribute("comment", comment);
-                w.writeEndElement();
+                if (datamodel->cell(r, c).isValid()) {
+                    w.writeStartElement("row");
+                    w.writeAttribute("type", getQVariantType(datamodel->cell(r, c)));
+                    w.writeAttribute("value", getQVariantData(datamodel->cell(r, c)));
+                    QString ex=datamodel->cellUserRole(QFRDRTable::TableExpressionRole, r, c).toString();
+                    if (!ex.isEmpty()) w.writeAttribute("expression", ex);
+                    QString comment=datamodel->cellUserRole(QFRDRTable::TableCommentRole, r, c).toString();
+                    if (!comment.isEmpty()) w.writeAttribute("comment", comment);
+                    w.writeEndElement();
+                }
             }
             w.writeEndElement();
         }
