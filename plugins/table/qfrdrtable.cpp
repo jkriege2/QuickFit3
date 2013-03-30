@@ -75,7 +75,7 @@ QFRDRTable::PlotInfo::PlotInfo()
     axisLabelFontSize=18;
     labelFontSize=18;
     keyTransparency=0.5;
-    keyPosition=JKQTPkeyInsideRight;
+    keyPosition=JKQTPkeyInsideTopRight;
     keyLayout=JKQTPkeyLayoutOneColumn;
     keepAxisAspectRatio=false;
     keepDataAspectRatio=false;

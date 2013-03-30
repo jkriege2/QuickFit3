@@ -42,11 +42,15 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     // set correlation/residual plots:
     ui->pltData->get_plotter()->set_gridPrinting(true);
     ui->pltData->get_plotter()->addGridPrintingPlotter(0,1,ui->pltResiduals->get_plotter());
-    ui->pltData->set_displayToolbar(false);
+    ui->pltData->set_displayToolbar(true);
+    ui->pltData->set_toolbarAlwaysOn(true);
+    ui->pltData->getXAxis()->set_logAxis(true);
+
     ui->pltResiduals->set_displayToolbar(false);
     ui->pltResiduals->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
     ui->pltResiduals->getXAxis()->set_labelFontSize(11);
     ui->pltResiduals->getXAxis()->set_tickLabelFontSize(10);
+    ui->pltResiduals->getXAxis()->set_logAxis(true);
     ui->pltResiduals->getYAxis()->set_axisLabel(tr("residuals"));
     ui->pltResiduals->getYAxis()->set_labelFontSize(11);
     ui->pltResiduals->getYAxis()->set_tickLabelFontSize(10);
@@ -116,6 +120,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         disconnect(ui->tableView->model(), 0, this, 0);
     }
     ui->tableView->setModel(NULL);
+    ui->pltOverview->setRDR(0);
 
     if (old!=NULL && item_old!=NULL) {
         /* disconnect item_old and clear all widgets here */
@@ -130,6 +135,13 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
     if (item) {
         updatingData=true;
 
+        ui->cmbFitAlgorithm->setCurrentAlgorithm(item->getFitAlgorithm()->id());
+        ui->cmbWeight->setCurrentWeight(item->getFitDataWeighting());
+        ui->cmbDisplayData->setCurrentIndex(item->getProperty("imFCCSFit/datadisplay", 1).toInt());
+        ui->cmbErrorDisplay->setCurrentIndex(item->getProperty("imFCCSFit/errordisplay", 0).toInt());
+        ui->chkGrid->setChecked(item->getProperty("imFCCSFit/grid", true).toBool());
+        ui->chkKey->setChecked(item->getProperty("imFCCSFit/key", true).toBool());
+
         ui->tableView->setModel(item->getParameterInputTableModel());
         connect(item->getParameterInputTableModel(), SIGNAL(modelRebuilt()), this, SLOT(ensureCorrectParamaterModelDisplay()));
 
@@ -138,6 +150,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         connect(ui->btnAddFile, SIGNAL(clicked()), item, SLOT(addFitFile()));
         connect(ui->btnRemoveFile, SIGNAL(clicked()), item, SLOT(removeFitFile()));
         connect(item, SIGNAL(fileChanged(int,QFRawDataRecord*)), this, SLOT(fileChanged(int,QFRawDataRecord*)));
+        ui->pltOverview->setRDR(item->getFitFile(0));
         updatingData=false;
     }
 
@@ -209,10 +222,8 @@ void QFImFCCSFitEvaluationEditor::configFitAlgorithm()
 void QFImFCCSFitEvaluationEditor::fitAlgorithmChanged(int model)
 {
     if (!current) return;
-    if (!current->getHighlightedRecord()) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QString pid=ui->cmbFitAlgorithm->currentFitAlgorithmID();
-    current->getHighlightedRecord()->setQFProperty("algorithm", pid, false, false);
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     data->setFitAlgorithm(pid);
     /*populateFitButtons(data->getFitAlgorithm()->isThreadSafe());
@@ -222,15 +233,29 @@ void QFImFCCSFitEvaluationEditor::fitAlgorithmChanged(int model)
     QApplication::restoreOverrideCursor();
 }
 
+void QFImFCCSFitEvaluationEditor::displayOptionsChanged()
+{
+    if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QString pid=ui->cmbFitAlgorithm->currentFitAlgorithmID();
+
+    current->setQFProperty("imFCCSFit/datadisplay", ui->cmbDisplayData->currentIndex());
+    current->setQFProperty("imFCCSFit/errordisplay",ui->cmbErrorDisplay->currentIndex());
+    current->setQFProperty("imFCCSFit/grid",ui->chkGrid->isChecked());
+    current->setQFProperty("imFCCSFit/key",ui->chkKey->isChecked());
+
+    displayData();
+    QApplication::restoreOverrideCursor();
+}
+
 void QFImFCCSFitEvaluationEditor::setCurrentRun(int run)
 {
     if (!current) return;
-    if (!current->getHighlightedRecord()) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QString pid=ui->cmbFitAlgorithm->currentFitAlgorithmID();
-    current->getHighlightedRecord()->setQFProperty("algorithm", pid, false, false);
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    qDebug()<<data->getCurrentIndex();
     data->setCurrentIndex(run);
+    qDebug()<<run<<data->getCurrentIndex();
     displayData();
     displayEvaluation();
     QApplication::restoreOverrideCursor();
@@ -262,7 +287,7 @@ void QFImFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
 {
     QElapsedTimer t;
     t.start();
-    qDebug()<<"ensureCorrectParamaterModelDisplay";
+    //qDebug()<<"ensureCorrectParamaterModelDisplay";
     QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     setUpdatesEnabled(false);
     ui->tableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
@@ -284,21 +309,21 @@ void QFImFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
        //ui->tableView->resizeColumnsToContents();
        for (int i=0; i<h->count(); i++) {
            if (i==0) {
-               qDebug()<<"  resizing h"<<i<<" to contents "<<t.elapsed()<<"ms";
+               //qDebug()<<"  resizing h"<<i<<" to contents "<<t.elapsed()<<"ms";
                ui->tableView->resizeColumnToContents(i);
                h->setResizeMode(i, QHeaderView::Interactive);
-               qDebug()<<"  resizing h"<<i<<" to contents done "<<t.elapsed()<<"ms";
+               //qDebug()<<"  resizing h"<<i<<" to contents done "<<t.elapsed()<<"ms";
            }
            //h->setResizeMode(i, QHeaderView::Interactive);
            if (i>0 && eval) {
                int ii=(i-1)%(eval->getParameterInputTableModel()->getColsPerRDR());
-               qDebug()<<"  resizing h"<<i<<" to contents "<<t.elapsed()<<"ms";
+               //qDebug()<<"  resizing h"<<i<<" to contents "<<t.elapsed()<<"ms";
                if (ii==0) h->resizeSection(i, 250);
                else if (ii==1) h->resizeSection(i, 75);
                else if (ii==2) h->resizeSection(i, 50);
                else if (ii==3) h->resizeSection(i, 24);
                else if (ii==4) h->resizeSection(i, 75);
-               qDebug()<<"  resizing h"<<i<<" to contents done "<<t.elapsed()<<"ms";
+               //qDebug()<<"  resizing h"<<i<<" to contents done "<<t.elapsed()<<"ms";
                //h->setResizeMode(i, QHeaderView::Interactive);
                /*
                if (ii==3)  h->resizeSection(i, 20);
@@ -310,7 +335,7 @@ void QFImFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
        }
    }
    setUpdatesEnabled(true);
-   qDebug()<<"ensureCorrectParamaterModelDisplay done "<<t.elapsed()<<"ms";
+   //qDebug()<<"ensureCorrectParamaterModelDisplay done "<<t.elapsed()<<"ms";
 
 }
 
@@ -338,6 +363,14 @@ void QFImFCCSFitEvaluationEditor::displayData() {
     ui->pltResiduals->set_doDrawing(false);
     ui->pltData->clearGraphs();
     ui->pltResiduals->clearGraphs();
+    ui->pltData->get_plotter()->set_showKey(ui->chkKey->isChecked());
+    ui->pltResiduals->get_plotter()->set_showKey(ui->chkKey->isChecked());
+    ui->pltData->get_plotter()->get_xAxis()->set_drawGrid(ui->chkGrid->isChecked());
+    ui->pltData->get_plotter()->get_yAxis()->set_drawGrid(ui->chkGrid->isChecked());
+    ui->pltResiduals->get_plotter()->get_xAxis()->set_drawGrid(ui->chkGrid->isChecked());
+    ui->pltResiduals->get_plotter()->get_yAxis()->set_drawGrid(ui->chkGrid->isChecked());
+    QList<QColor> cols;
+    cols<<QColor("darkgreen")<<QColor("red")<<QColor("blue")<<QColor("darkorange")<<QColor("purple")<<QColor("maroon");
     if (eval) {
         for (int file=0; file<eval->getNumberOfFitFiles(); file++) {
             QFFitFunction* ff=eval->getFitFunction(file);
@@ -356,11 +389,19 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 int c_error=-1;
                 if (sigma) c_error=c_data=ds->addCopiedColumn(sigma, N, tr("file%1: errors").arg(file+1));
                 JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(ui->pltData->get_plotter());
-                QString plotname=rec->getName()+QString(": ")+fcs->getCorrelationRunName(eval->getCurrentIndex());
+                QString plotname=QString("\\verb{")+rec->getName()+QString(": ")+fcs->getCorrelationRunName(eval->getCurrentIndex())+QString("}");
                 g->set_title(plotname);
                 g->set_xColumn(c_tau);
                 g->set_yColumn(c_data);
                 g->set_yErrorColumn(c_error);
+                g->set_color(cols.value(file, g->get_color()));
+                QColor ec=g->get_color().lighter();
+                g->set_errorColor(ec);
+                ec.setAlphaF(0.5);
+                g->set_errorFillColor(ec);
+                g->set_symbol(ui->cmbDisplayData->getSymbol());
+                g->set_drawLine(ui->cmbDisplayData->getDrawLine());
+                g->set_yErrorStyle(ui->cmbErrorDisplay->getErrorStyle());
                 ui->pltData->get_plotter()->addGraph(g);
 
                 double* params=eval->allocFillParameters(rec, eval->getCurrentIndex(), ff);
@@ -375,6 +416,8 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 g_fit->set_fitFunction(ff, false);
                 g_fit->set_paramsVector(paramsV);
                 g_fit->set_color(g->get_color());
+                g_fit->set_style(Qt::DashLine);
+                g_fit->set_lineWidth(1);
                 ui->pltData->get_plotter()->addGraph(g_fit);
 
                 QFFitStatistics fstat=ff->calcFitStatistics(N, tau, data, sigma, 0, N-1, params, err, fix, 3, 100);
@@ -384,15 +427,19 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 int c_residat=ds->addCopiedColumn(fstat.tau_runavg, fstat.runAvgN, tr("file%1: tau for avg. res.").arg(file+1));
                 int c_resida=ds->addCopiedColumn(fstat.residuals_runavg, N, tr("file%1: avg. residuals").arg(file+1));
                 int c_residaw=ds->addCopiedColumn(fstat.residuals_runavg_weighted, N, tr("file%1: weighted avg. residuals").arg(file+1));
-                JKQTPxyLineErrorGraph* g_res=new JKQTPxyLineErrorGraph();
+                JKQTPxyLineGraph* g_res=new JKQTPxyLineGraph();
                 g_res->set_xColumn(c_tau);
                 g_res->set_yColumn(c_resid);
                 g_res->set_color(g->get_color());
+                g_res->set_symbol(ui->cmbDisplayData->getSymbol());
+                g_res->set_drawLine(ui->cmbDisplayData->getDrawLine());
                 ui->pltResiduals->get_plotter()->addGraph(g_res);
-                JKQTPxyLineErrorGraph* g_resa=new JKQTPxyLineErrorGraph();
+                JKQTPxyLineGraph* g_resa=new JKQTPxyLineGraph();
                 g_resa->set_xColumn(c_residat);
                 g_resa->set_yColumn(c_resida);
                 g_resa->set_color(g->get_color());
+                g_resa->set_drawLine(true);
+                g_resa->set_symbol(JKQTPnoSymbol);
                 ui->pltResiduals->get_plotter()->addGraph(g_resa);
 
 
@@ -607,6 +654,18 @@ void QFImFCCSFitEvaluationEditor::printReport() {
     doc->print(p);
     delete p;
     delete doc;
+    QApplication::restoreOverrideCursor();
+}
+
+void QFImFCCSFitEvaluationEditor::on_cmbWeight_currentWeightChanged(QFFCSWeightingTools::DataWeight weight)
+{
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QString pid=ui->cmbFitAlgorithm->currentFitAlgorithmID();
+    current->getHighlightedRecord()->setQFProperty("algorithm", pid, false, false);
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    data->setFitDataWeighting(weight);
     QApplication::restoreOverrideCursor();
 }
 

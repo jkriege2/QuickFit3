@@ -461,7 +461,7 @@ void QFRDRTablePlotWidget::graphDataChanged() {
                 graph.fillColor=graph.color.lighter();
                 ui->cmbFillColor->setCurrentColor(graph.fillColor);
             }
-            graph.errorStyle=ui->cmbErrorStyle->getSymbol();
+            graph.errorStyle=ui->cmbErrorStyle->getErrorStyle();
             graph.symbol=ui->cmbSymbol->getSymbol();
             graph.style=ui->cmbLineStyle->currentLineStyle();
             graph.linewidth=ui->spinLineWidth->value();

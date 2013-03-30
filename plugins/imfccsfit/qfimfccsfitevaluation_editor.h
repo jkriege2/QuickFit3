@@ -7,6 +7,8 @@
 #include <QTextDocument>
 #include "qffitfunctionplottools.h"
 #include "jkqtplotter.h"
+#include "qffcsweightingtools.h"
+
 namespace Ui {
     class QFImFCCSFitEvaluationEditor;
 }
@@ -41,6 +43,10 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void configFitAlgorithm();
         /** \brief called when the fit algorithm changes */
         void fitAlgorithmChanged(int model);
+
+        void displayOptionsChanged();
+
+        void on_cmbWeight_currentWeightChanged(QFFCSWeightingTools::DataWeight weight);
 
         void setCurrentRun(int run);
     protected:
@@ -79,6 +85,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void fileChanged(int num, QFRawDataRecord* file);
 
         void plotMouseMoved(double x, double y);
+
 
     
         /** \brief evaluate all files */

@@ -17,8 +17,8 @@ class QFImFCCSParameterInputDelegate : public QFHTMLDelegate {
 
     signals:
         
-    public slots:
-
+    protected slots:
+        void onEditorFinished();
     protected:
         //QRegExp rxHTML;
         

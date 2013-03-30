@@ -114,6 +114,9 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         virtual void setFitFunction(QString fitFunction);
         virtual int addFitFile();
         virtual void removeFitFile();
+    public slots:
+        /** \brief set the current index to use */
+        virtual void setCurrentIndex(int index);
 
     signals:
         void fileChanged(int num, QFRawDataRecord* record);

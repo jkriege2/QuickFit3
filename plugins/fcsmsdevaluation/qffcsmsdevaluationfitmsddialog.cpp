@@ -98,11 +98,11 @@ void QFFCSMSDEvaluationFitMSDDialog::replotGraph()
     ui->pltDistribution->get_plotter()->set_keyFontSize(9);
     ui->pltDistribution->get_plotter()->set_keyXMargin(2);
     ui->pltDistribution->get_plotter()->set_keyYMargin(2);
-    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideLeft);
+    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
     QColor cb("white");
     cb.setAlphaF(0.5);
     ui->pltDistribution->get_plotter()->set_keyBackgroundColor(cb);
-    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideLeft);
+    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
 
 
     ui->pltDistribution->get_plotter()->clearGraphs(true);

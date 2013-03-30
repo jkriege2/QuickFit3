@@ -3,6 +3,7 @@
 
 #include "jkqtplotter.h"
 #include "libwid_imexport.h"
+#include <QToolBar>
 
 class QFPlotterPrivate; // forward
 
@@ -15,6 +16,8 @@ class QFWIDLIB_EXPORT QFPlotter : public JKQtPlotter
         friend class QFPlotterPrivate;
         explicit QFPlotter(bool datastore_internal, QWidget* parent=NULL, JKQTPdatastore* datast=NULL);
         explicit QFPlotter(QWidget *parent = 0);
+
+        QToolBar* createToolbar(QWidget* parent=NULL, const QString& name=QString(""));
         
     signals:
         
@@ -22,6 +25,8 @@ class QFWIDLIB_EXPORT QFPlotter : public JKQtPlotter
     protected:
         void initQFPlotter();
         virtual void modifyContextMenu(QMenu* menu);
+        virtual void populateToolbar(QToolBar* toolbar) const;
+
         
 };
 

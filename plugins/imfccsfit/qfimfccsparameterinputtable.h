@@ -2,6 +2,7 @@
 #define QFIMFCCSPARAMETERINPUTTABLE_H
 
 #include <QAbstractTableModel>
+#include "qfrawdatarecord.h"
 class QFImFCCSFitEvaluationItem; //forward
 
 class QFImFCCSParameterInputTable : public QAbstractTableModel
@@ -53,9 +54,11 @@ class QFImFCCSParameterInputTable : public QAbstractTableModel
         int colsPerRDR;
         struct FitParam {
             FitParam();
+            bool isFit;
             QString id;
             QString label;
             QString tooltip;
+            QSet<QFRawDataRecord*> visibleIn;
             bool isValid() const;
 
             bool operator==(const FitParam& other)const;
@@ -63,7 +66,7 @@ class QFImFCCSParameterInputTable : public QAbstractTableModel
 
         QList<FitParam> fitparamids;
 
-        static bool fitParamListContainsID(const QString& id, const QList<FitParam>& fitparamids);
+        static bool fitParamListContainsID(const QString& id, const QList<FitParam>& fitparamids, int* found=NULL);
         
 };
 

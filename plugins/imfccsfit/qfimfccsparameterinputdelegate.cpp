@@ -92,6 +92,7 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
             //qDebug()<<"   created rdrcombo "<<t.elapsed()<<"ms";
 
             cmb->view()->setMinimumWidth(450);
+            connect(cmb, SIGNAL(currentIndexChanged(int)), this, SLOT(onEditorFinished()));
             return cmb;
         }
         if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtFitFunctionCombobox) {
@@ -103,6 +104,7 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
 
             //qDebug()<<"   created ffcombo "<<t.elapsed()<<"ms";
             cmb->view()->setMinimumWidth(450);
+            connect(cmb, SIGNAL(currentIndexChanged(int)), this, SLOT(onEditorFinished()));
             return cmb;
         }
         /*if (imfccs && fpID.isValid() && widgetType.toInt()==QFImFCCSParameterInputTable::wtFixCheck) {
@@ -130,6 +132,7 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
         }
         if (ff && imfccs && fpID.isValid() && widgetType.toInt()==QFImFCCSParameterInputTable::wtValueComboBox) {
             QComboBox* edt=new QComboBox(parent);
+            connect(edt, SIGNAL(currentIndexChanged(int)), this, SLOT(onEditorFinished()));
             QFFitFunction::ParameterDescription desc=ff->getDescription(fpID.toString());
             int cnt=0;
             for (int i=imfccs->getFitMin(fpID.toString(), rdr); i<=imfccs->getFitMax(fpID.toString(), rdr); i++) {
@@ -222,7 +225,7 @@ void QFImFCCSParameterInputDelegate::setEditorData(QWidget *editor, const QModel
 
 void QFImFCCSParameterInputDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    QFAutoOutputTimer ta(QString("QFImFCCSParameterInputDelegate::setModelData(%1, %2)").arg(index.row()).arg(index.column()));
+    //QFAutoOutputTimer ta(QString("QFImFCCSParameterInputDelegate::setModelData(%1, %2)").arg(index.row()).arg(index.column()));
     QVariant widgetType=index.data(QFImFCCSParameterInputTable::widgetTypeRole);
     QVariant rdrID=index.data(QFImFCCSParameterInputTable::rdrIDRole);
     QVariant ffID=index.data(QFImFCCSParameterInputTable::fitFunctionIDRole);
@@ -231,7 +234,7 @@ void QFImFCCSParameterInputDelegate::setModelData(QWidget *editor, QAbstractItem
     QVariant fileID=index.data(QFImFCCSParameterInputTable::fitFileIDRole);
     QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
 
-    qDebug()<<"setModelData: project="<<project<<" eID="<<eID<<" widgetType="<<widgetType<<" fileID="<<fileID<<"  index="<<index;
+    //qDebug()<<"setModelData: project="<<project<<" eID="<<eID<<" widgetType="<<widgetType<<" fileID="<<fileID<<"  index="<<index;
     if (project && eID.isValid() && widgetType.isValid() && fileID.isValid()) {
         QFEvaluationItem* eval=project->getEvaluationByID(eID.toInt());
         QFImFCCSFitEvaluationItem* imfccs=qobject_cast<QFImFCCSFitEvaluationItem*>(eval);
@@ -295,7 +298,7 @@ void QFImFCCSParameterInputDelegate::setModelData(QWidget *editor, QAbstractItem
 
 void QFImFCCSParameterInputDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    QFAutoOutputTimer ta(QString("QFImFCCSParameterInputDelegate::updateEditorGeometry(%1, %2)").arg(index.row()).arg(index.column()));
+    //QFAutoOutputTimer ta(QString("QFImFCCSParameterInputDelegate::updateEditorGeometry(%1, %2)").arg(index.row()).arg(index.column()));
     QPoint offset(0,0);
     /*QComboBox *cmb=qobject_cast<QComboBox*>(editor);
     QCheckBox *chk=qobject_cast<QCheckBox*>(editor);
@@ -308,4 +311,13 @@ void QFImFCCSParameterInputDelegate::updateEditorGeometry(QWidget *editor, const
     }*/
     editor->setGeometry(QRect(offset+option.rect.topLeft(), QSize(option.rect.width()-offset.x(), option.rect.height())));
     //QFHTMLDelegate::updateEditorGeometry(editor, option, index);
+}
+
+void QFImFCCSParameterInputDelegate::onEditorFinished()
+{
+    QWidget * widEditor = static_cast<QWidget *>(sender());
+    if (widEditor) {
+        emit commitData(widEditor);
+        emit closeEditor(widEditor);
+    }
 }

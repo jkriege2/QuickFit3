@@ -82,7 +82,7 @@ void DlgComponentInfo::on_cmbPlot_currentIndexChanged(int index)
     ui->plotter->set_doDrawing(false);
     ui->plotter->getDatastore()->clear();
     ui->plotter->clearGraphs(true);
-    ui->plotter->get_plotter()->set_keyPosition(JKQTPkeyInsideLeft);
+    ui->plotter->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
 
     double cMin=0;
     double cMax=plugin->getComponentCMax(ui->comboBox->currentIndex());

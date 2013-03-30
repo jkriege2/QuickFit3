@@ -69,7 +69,7 @@ class QFFitResultsByIndexAsVectorEvaluation : public QFFitResultsByIndexEvaluati
         virtual void setAllFitValues(const QString &id, double value, double error, bool currentFileOnly);
         virtual void setAllFitFixes(const QString &id, bool fix, bool currentFileOnly);
         virtual void resetAllFitResultsAllFiles();
-protected:
+    protected:
         virtual QString getParamNameLocalStore(const QString& paramID) const;
         virtual bool isParamNameLocalStore(const QString& paramID) const;
 

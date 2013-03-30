@@ -14,7 +14,7 @@
    <string>imFCCS Editor</string>
   </property>
   <layout class="QGridLayout" name="gridLayout" columnstretch="1,0">
-   <item row="1" column="1">
+   <item row="2" column="1">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QPushButton" name="btnEvaluateCurrent">
@@ -103,7 +103,7 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Fit algorithm: </string>
+        <string>&lt;b&gt;Fit algorithm: &lt;/b&gt;</string>
        </property>
       </widget>
      </item>
@@ -128,16 +128,29 @@
      <item row="0" column="5">
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>weighting:</string>
+        <string>&lt;b&gt;weighting:&lt;/b&gt;</string>
        </property>
       </widget>
      </item>
      <item row="0" column="6">
       <widget class="QFFCSWeightingCombobox" name="cmbWeight"/>
      </item>
+     <item row="0" column="7">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
     </layout>
    </item>
-   <item row="1" column="0">
+   <item row="2" column="0">
     <widget class="QVisibleHandleSplitter" name="splitter_3">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -237,6 +250,64 @@
      </widget>
     </widget>
    </item>
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>&lt;b&gt;display options:&lt;/b&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>data:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="JKQTPLinePlotStyleComboBox" name="cmbDisplayData"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>errors:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="JKQTPerrorPlotstyleComboBox" name="cmbErrorDisplay"/>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkGrid">
+       <property name="text">
+        <string>grid</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkKey">
+       <property name="text">
+        <string>key</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -267,6 +338,16 @@
    <class>QFFCSWeightingCombobox</class>
    <extends>QComboBox</extends>
    <header>qffcsweightingtools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>JKQTPLinePlotStyleComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>JKQTPerrorPlotstyleComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
   </customwidget>
  </customwidgets>
  <resources>
@@ -323,10 +404,75 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cmbDisplayData</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>QFImFCCSFitEvaluationEditor</receiver>
+   <slot>displayOptionsChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>146</x>
+     <y>57</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>178</x>
+     <y>65</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbErrorDisplay</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>QFImFCCSFitEvaluationEditor</receiver>
+   <slot>displayOptionsChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>310</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>329</x>
+     <y>66</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkGrid</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFImFCCSFitEvaluationEditor</receiver>
+   <slot>displayOptionsChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>356</x>
+     <y>58</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>65</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkKey</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFImFCCSFitEvaluationEditor</receiver>
+   <slot>displayOptionsChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>383</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>618</x>
+     <y>64</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>fitAlgorithmChanged(int)</slot>
   <slot>configFitAlgorithm()</slot>
   <slot>showFitAlgorithmHelp()</slot>
+  <slot>displayOptionsChanged()</slot>
  </slots>
 </ui>

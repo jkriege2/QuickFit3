@@ -112,10 +112,11 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
                 QFFitFunction::ParameterDescription desc=ff->getDescription(fp.id);
                 /*double* p=item->allocFillParameters(rdr, item->getCurrentIndex(), ff);
                 bool visible=ff->isParameterVisible(ff->getParameterNum(fp.id), p);
-                free(p);
-                if (visible) {*/
+                free(p);*/
+                bool visible=fp.visibleIn.contains(rdr);
+                if (visible) {
                     if (coli==0) {
-                        if (role==Qt::DisplayRole || role==Qt::EditRole) return item->getFitValue(fp.id, rdr);
+                        if (role==Qt::DisplayRole || role==Qt::EditRole) return roundWithError(item->getFitValue(fp.id, rdr), item->getFitError(fp.id, rdr));
                         if (role==widgetTypeRole && desc.userEditable) {
                             if (desc.type==QFFitFunction::FloatNumber) return wtValueDoubleEdit;
                             if (desc.type==QFFitFunction::IntNumber) return wtValueIntEdit;
@@ -123,7 +124,7 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
                         }
                         if (role==Qt::BackgroundRole && !desc.userEditable) return QBrush(QApplication::palette().color(QPalette::Window));
                     } if (coli==1) {
-                        if ((role==Qt::DisplayRole || role==Qt::EditRole)  && desc.displayError!=QFFitFunction::NoError) return item->getFitError(fp.id, rdr);
+                        if ((role==Qt::DisplayRole || role==Qt::EditRole)  && desc.displayError!=QFFitFunction::NoError) return roundError(item->getFitError(fp.id, rdr));
                         if (role==widgetTypeRole) {
                             if (desc.displayError==QFFitFunction::EditError) return wtErrorEdit;
                         }
@@ -136,7 +137,9 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
                             return Qt::Unchecked;
                         }
                     }
-                //}
+                } else {
+                    if (role==Qt::BackgroundRole) return QBrush(QApplication::palette().color(QPalette::Window).darker());
+                }
             } else {
                 if (role==Qt::BackgroundRole) return QBrush(QApplication::palette().color(QPalette::Window).darker());
             }
@@ -277,13 +280,25 @@ bool QFImFCCSParameterInputTable::checkRebuildModel(bool alwaysreset)
                     fprec.id=fpids[fi];
                     fprec.label=desc.label;
                     fprec.tooltip=desc.name;
-                    if (!fitParamListContainsID(fprec.id, fitparamids_new)) fitparamids_new<<fprec;
+                    fprec.visibleIn.insert(rdr);
+                    fprec.isFit=desc.fit;
+                    int found=-1;
+                    if (!fitParamListContainsID(fprec.id, fitparamids_new, &found)) fitparamids_new<<fprec;
+                    else if (found>=0 && found<fitparamids_new.size()) {
+                        fitparamids_new[found].visibleIn.insert(rdr);
+                        if (desc.fit) fitparamids_new[found].isFit=true;
+                    }
                     //qDebug()<<"   added "<<fprec.id<<"  "<<fprec.label;
                 }
             }
             free(p);
         }
     }
+    /*if (fitparamids_new.size()>1) {
+        for (int i=1; i<fitparamids_new.size(); i++) {
+            if (fitparamids_new[i].isFit && !fitparamids_new[i-1].isFit) fitparamids_new.swap(i-1, i);
+        }
+    }*/
 
     if (fitparamids_new!=fitparamids) {
         fitparamids=fitparamids_new;
@@ -296,10 +311,13 @@ bool QFImFCCSParameterInputTable::checkRebuildModel(bool alwaysreset)
     return ok;
 }
 
-bool QFImFCCSParameterInputTable::fitParamListContainsID(const QString &id, const QList<QFImFCCSParameterInputTable::FitParam> &fitparamids)
+bool QFImFCCSParameterInputTable::fitParamListContainsID(const QString &id, const QList<QFImFCCSParameterInputTable::FitParam> &fitparamids, int* found)
 {
     for (int i=0; i<fitparamids.size(); i++) {
-        if (fitparamids[i].isValid() && fitparamids[i].id==id ) return true;
+        if (fitparamids[i].isValid() && fitparamids[i].id==id ) {
+            if (found) *found=i;
+            return true;
+        }
     }
     return false;
 }
@@ -307,6 +325,7 @@ bool QFImFCCSParameterInputTable::fitParamListContainsID(const QString &id, cons
 QFImFCCSParameterInputTable::FitParam::FitParam()
 {
     id="";
+    isFit=false;
     label="";
     tooltip="";
 }
@@ -318,5 +337,5 @@ bool QFImFCCSParameterInputTable::FitParam::isValid() const
 
 bool QFImFCCSParameterInputTable::FitParam::operator==(const QFImFCCSParameterInputTable::FitParam &other) const
 {
-    return (id==other.id)&&(label==other.label);
+    return (id==other.id)&&(label==other.label)&&(visibleIn==other.visibleIn);
 }

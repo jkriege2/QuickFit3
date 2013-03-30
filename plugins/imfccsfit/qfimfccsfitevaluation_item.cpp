@@ -137,6 +137,17 @@ void QFImFCCSFitEvaluationItem::removeFitFile()
 
 }
 
+void QFImFCCSFitEvaluationItem::setCurrentIndex(int index)
+{
+    QFRawDataRecord* r=getFitFile(0);
+    if ((r!=NULL)) {
+        if (index<=getIndexMin(r)) m_currentIndex=getIndexMin(r);
+        if (index<=getIndexMax(r)) m_currentIndex=index;
+        if (index>getIndexMax(r)) m_currentIndex=getIndexMax(r);
+        r->setQFProperty(QString(getType()+QString::number(getID())+"_last_index"), m_currentIndex, false, false);
+    }
+}
+
 void QFImFCCSFitEvaluationItem::ensureFitFiles()
 {
     if (fitFilesList.size()<=0)  {

@@ -34,7 +34,7 @@ DlgCalcDiffCoeff::DlgCalcDiffCoeff(QFEDiffusionCoefficientCalculator *plg, QWidg
     QList<int> s;
     s<<ui->splitter->width()/2<<ui->splitter->width()/2;
     ui->splitter->setSizes(s);
-    ui->plotter->get_plotter()->set_keyPosition(JKQTPkeyInsideLeft);
+    ui->plotter->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
     readComponents();
     readSamples();
     readSettings();
