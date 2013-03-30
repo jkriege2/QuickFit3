@@ -1,4 +1,5 @@
 #include "qffitfunctionlightsheetslit.h"
+#include "qfmathtools.h"
 
 #include <cmath>
 #define sqr(x) ((x)*(x))
@@ -27,7 +28,7 @@ double QFFitFunctionLightsheetSlit::evaluate(double t, const double* data) const
     const double width=data[PARAM_WIDTH];
 
     const double x=M_PI*(t-position)/width;
-    const double s=sin(x)/x;
+    const double s=qfSinc(x);
     return offset+amplitude*s*s;
 }
 

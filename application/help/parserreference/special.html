@@ -1,0 +1,140 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Special Functions</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+
+  <h2>Special Functions</h2>
+  <ul>
+  <li><a name="sigmoid"/><!-- func:sigmoid -->
+  <b><tt><!-- template -->sigmoid(x)<!-- /template --></tt> - <i>sigmoidal function </i>:</b><br>
+  $$bmath:\mathrm{sigmoid}(x)=\frac{1}{1+\exp(-x)}$$
+  <!-- /func:sigmoid -->
+  </li>
+  
+  <li><a name="sign"/><!-- func:sign -->
+  <b><tt><!-- template -->sign(x)<!-- /template --></tt> - <i>sign function </i>:</b><br>
+  $$bmath:\mbox{sign}(x)=\begin{cases}-1 & x<0\\0 & x\equiv 0\\+1 & x>0\end{cases}$$
+  <!-- /func:sign -->
+  </li>
+  
+  <li><a name="theta"/><!-- func:theta -->
+  <b><tt><!-- template -->theta(x)<!-- /template --></tt> - <i>theta step function </i>:</b><br>
+  $$bmath:\Theta(x)=\begin{cases}-1 & x<0\\0 & x\equiv 0\\+1 & x>0\end{cases}$$
+  <!-- /func:theta -->
+  </li>
+  
+  <li><a name="tanc"/><!-- func:tanc -->
+  <b><tt><!-- template -->tanc(x)<!-- /template --></tt> - <i>tanc function </i>:</b><br>
+  $$bmath:\mbox{tanc}(x)=\begin{cases}1 & x\equiv0\\\frac{\tan(x)}{x}&\mathrm{elsewhere}\end{cases}$$
+  <!-- /func:tanc -->
+  </li>
+  
+  
+  <li><a name="slit"/><!-- func:slit -->
+  <b><tt><!-- template -->slit(x,a)<!-- /template --></tt> - <i>slit function (two step function) </i>:</b><br>
+  $$bmath:\mbox{slit}(x,a)=\begin{cases}1 & -a/2 \geq x\geq a/2 \\0 & \text{elsewhere}\end{cases}$$
+  <!-- /func:slit -->
+  </li>
+  
+  <li><a name="gauss"/><!-- func:gauss -->
+  <b><tt><!-- template -->gauss(x, sigma)<!-- /template --></tt> - <i>gaussian function </i>:</b><br>
+  $$bmath:\mbox{gauss}(x,\sigma)=\exp\left(-2\cdot\frac{x^2}{\sigma^2}\right)$$
+  <!-- /func:gauss -->
+  </li>
+  
+  <li><a name="sinc"/><!-- func:sinc -->
+  <b><tt><!-- template -->sinc(x)<!-- /template --></tt> - <i>sinc function </i>:</b><br>
+  $$bmath:\mbox{sinc}(x)=\begin{cases}1 & x\equiv0\\\frac{\sin(x)}{x}&\mathrm{elsewhere}\end{cases}$$
+  <!-- /func:sinc -->
+  </li>
+  
+  <li><a name="erf"/><!-- func:erf -->
+  <b><tt><!-- template -->erf(x)<!-- /template --></tt> - <i>error function </i>:</b><br>
+  $$bmath:\operatorname{erf}(x) = \frac{2}{\sqrt{\pi}} \int_0^x e^{-\tau^2}\,\mathrm{d}\tau$$
+  <!-- /func:erf -->
+  </li>
+  
+  <li><a name="erfc"/><!-- func:erfc -->
+  <b><tt><!-- template -->erfc(x)<!-- /template --></tt> - <i>erfc function </i>:</b><br>
+  $$bmath:\operatorname{erfc}(x) = 1 - \operatorname{erf}(x) = \frac{2}{\sqrt{\pi}} \int_x^\infty e^{-\tau^2}\,\mathrm{d}\tau.$$
+  <!-- /func:erfc -->
+  </li>
+  
+  <li><a name="lgamma"/><!-- func:lgamma -->
+  <b><tt><!-- template -->lgamma(x)<!-- /template --></tt> - <i>logarithmic gamma function </i>:</b><br>
+  $$bmath:\ln\left(\Gamma(x)\right) = \ln\left[\int_0^\infty t^{x-1} \mathrm{e}^{-t} \mathrm{d}t\right]$$
+  <!-- /func:lgamma -->
+  </li>
+  
+  <li><a name="tgamma"/><!-- func:tgamma -->
+  <b><tt><!-- template -->sinc(x)<!-- /template --></tt> - <i>gamma function </i>:</b><br>
+  $$bmath:\Gamma(x) = \int_0^\infty t^{x-1} \mathrm{e}^{-t} \mathrm{d}t$$
+  <!-- /func:tgamma -->
+  </li>
+  
+  <li><a name="j0"/><!-- func:j0 -->
+  <b><tt><!-- template -->j0(x)<!-- /template --></tt> - <i>Bessel functions of the first kind </i>:</b><br>
+  
+  <!-- /func:j0 -->
+  </li>
+  
+  <li><a name="j1"/><!-- func:j1 -->
+  <b><tt><!-- template -->j1(x)<!-- /template --></tt> - <i>Bessel functions of the first kind </i>:</b><br>
+  
+  <!-- /func:j1 -->
+  </li>
+  
+  <li><a name="jn"/><!-- func:jn -->
+  <b><tt><!-- template -->jn(n, x)<!-- /template --></tt> - <i>Bessel functions of the first kind </i>:</b><br>
+  
+  <!-- /func:jn -->
+  </li>
+  
+  <li><a name="y0"/><!-- func:y0 -->
+  <b><tt><!-- template -->y0(x)<!-- /template --></tt> - <i>Bessel functions of the second kind </i>:</b><br>
+  
+  <!-- /func:y0 -->
+  </li>
+  
+  <li><a name="y1"/><!-- func:y1 -->
+  <b><tt><!-- template -->y1(x)<!-- /template --></tt> - <i>Bessel functions of the second kind </i>:</b><br>
+  
+  <!-- /func:y1 -->
+  </li>
+  
+  <li><a name="yn"/><!-- func:yn -->
+  <b><tt><!-- template -->yn(n, x)<!-- /template --></tt> - <i>Bessel functions of the second kind </i>:</b><br>
+  
+  <!-- /func:yn -->
+  </li>
+
+
+  <li><a name="min"/><!-- func:min -->
+  <b><tt><!-- template -->min(x,y)<!-- /template --></tt> - <i>returns the smaller of the two arguments </i>:</b><br>
+  <!-- /func:min -->
+  </li>
+  
+  <li><a name="max"/><!-- func:max -->
+  <b><tt><!-- template -->max(x,y)<!-- /template --></tt> - <i>returns the larger of the two arguments </i>:</b><br>
+  <!-- /func:max -->
+  </li>
+  
+  <li><a name="fmod"/><!-- func:fmod -->
+  <b><tt><!-- template -->fmod(x,y)<!-- /template --></tt> - <i>returns the reminder after division x/y division </i>:</b><br>
+  <!-- /func:fmod -->
+  </li>
+  </ul>
+  
+  <li><a name="if"/><!-- func:if -->
+  <b><tt><!-- template -->if(c, t, f)<!-- /template --></tt> - <i>returns t, of c is true and f else </i>:</b><br>
+  <!-- /func:if -->  
+  </ul>
+  
+  </body>
+  </html>
+  

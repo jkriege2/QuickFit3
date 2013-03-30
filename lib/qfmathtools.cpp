@@ -1,4 +1,39 @@
 #include "qfmathtools.h"
+#include <float.h>
+
+double qfSinc( double x )
+{
+    static double const    taylor_0_bound = 3*DBL_MIN ;
+    static double const    taylor_2_bound = sqrt(taylor_0_bound);
+    static double const    taylor_n_bound = sqrt(taylor_2_bound);
+
+    if    (abs(x) >= taylor_n_bound)
+    {
+        return sin(x)/x;
+    }
+    else
+    {
+        // approximation by taylor series in x at 0 up to order 0
+        double    result = 1;
+
+        if    (abs(x) >= taylor_0_bound)
+        {
+            double    x2 = x*x;
+
+            // approximation by taylor series in x at 0 up to order 2
+            result -= x2/static_cast<double>(6);
+
+            if    (abs(x) >= taylor_2_bound)
+            {
+                // approximation by taylor series in x at 0 up to order 4
+                result += (x2*x2)/static_cast<double>(120);
+            }
+        }
+
+        return result;
+    }
+}
+
 
 
 template <class T>

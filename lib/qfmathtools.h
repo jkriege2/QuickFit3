@@ -45,6 +45,9 @@ inline float qfCube(float x) { return x*x*x; }
 inline double qfPow4(double x) { double x2=x*x; return x2*x2; }
 inline float qfPow4(float x) { float x2=x*x; return x2*x2; }
 
+
+QFLIB_EXPORT double qfSinc(double x);
+
 /*! \brief calculate the average and variance of a given array
     \ingroup qf3lib_mathtools
 

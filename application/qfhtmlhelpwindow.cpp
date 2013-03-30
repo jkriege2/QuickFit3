@@ -888,7 +888,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
 
 
             // interpret $$math:<latex>$$ items
-            QRegExp rxLaTeX("\\$\\$(math|bmath|mathb)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxLaTeX("\\$\\$(math|bmath|mathb)\\:(.*)\\$\\$", Qt::CaseInsensitive);
             rxLaTeX.setMinimal(true);
             count = 0;
             pos = 0;

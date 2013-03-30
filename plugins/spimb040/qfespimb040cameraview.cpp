@@ -6,6 +6,7 @@
 #include "datatable2.h"
 #include "qfespimb040opticssetup.h"
 #include <typeinfo>
+#include "qfmathtools.h"
 
 #include <QtGui>
 #include <QtCore>
@@ -26,7 +27,7 @@ double fSlit( double t, const double *p )
     const double avg=p[2];
     const double d=p[3];
     const double x=M_PI*(t-avg)/d;
-    const double s=sin(x)/x;
+    const double s=qfSinc(x);
     return offset+A*s*s;
 }
 
