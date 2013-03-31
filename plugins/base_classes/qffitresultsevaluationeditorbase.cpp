@@ -101,10 +101,10 @@ void QFFitResultsEvaluationEditorBase::writeSettings() {
 // READING & WRITING (CURRENT) FIT RESULTS TO INI
 /////////////////////////////////////////////////////////////////////
 
-void QFFitResultsEvaluationEditorBase::saveCurrentFitResults() {
+void QFFitResultsEvaluationEditorBase::saveCurrentFitResults(QFRawDataRecord* rec) {
     if (!current) return;
     QFFitResultsEvaluation* eval=qobject_cast<QFFitResultsEvaluation*>(current);
-    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitFunction* ffunc=eval->getFitFunction(rec);
     if (!ffunc || !eval) return;
 
 
@@ -123,14 +123,14 @@ void QFFitResultsEvaluationEditorBase::saveCurrentFitResults() {
         }
         if (ok) {
             QSettings settings(fileName, QSettings::IniFormat);
-            settings.setValue("fit_function/id", eval->getFitFunction()->id());
+            settings.setValue("fit_function/id", eval->getFitFunction(rec)->id());
 
             QStringList pids=ffunc->getParameterIDs();
-            double* fullParams=eval->allocFillParameters();
-            double* errors=eval->allocFillParameterErrors();
-            bool* paramsFix=eval->allocFillFix();
-            double* paramsMin=eval->allocFillParametersMin();
-            double* paramsMax=eval->allocFillParametersMax();
+            double* fullParams=eval->allocFillParameters(ffunc);
+            double* errors=eval->allocFillParameterErrors(ffunc);
+            bool* paramsFix=eval->allocFillFix(ffunc);
+            double* paramsMin=eval->allocFillParametersMin(ffunc);
+            double* paramsMax=eval->allocFillParametersMax(ffunc);
             //ffunc->calcParameter(fullParams, errors);
             for (int i=0; i<pids.size(); i++) {
                 QString id=pids[i];
@@ -141,12 +141,12 @@ void QFFitResultsEvaluationEditorBase::saveCurrentFitResults() {
                     if (!d.userEditable) visible=false;
 
                     if (visible) {
-                        settings.setValue("fit_params/"+id+"/value", eval->getFitValue(id));
-                        if (d.displayError==QFFitFunction::EditError) settings.setValue("fit_params/"+id+"/error", eval->getFitError(id));
-                        if (d.fit) settings.setValue("fit_params/"+id+"/fix", eval->getFitFix(id));
+                        settings.setValue("fit_params/"+id+"/value", eval->getFitValue(id, rec));
+                        if (d.displayError==QFFitFunction::EditError) settings.setValue("fit_params/"+id+"/error", eval->getFitError(id, rec));
+                        if (d.fit) settings.setValue("fit_params/"+id+"/fix", eval->getFitFix(id, rec));
                         if (d.userRangeEditable) {
-                           settings.setValue("fit_params/"+id+"/min", eval->getFitMin(id));
-                           settings.setValue("fit_params/"+id+"/max", eval->getFitMax(id));
+                           settings.setValue("fit_params/"+id+"/min", eval->getFitMin(id, rec));
+                           settings.setValue("fit_params/"+id+"/max", eval->getFitMax(id, rec));
                         }
                     }
                 }
@@ -160,10 +160,10 @@ void QFFitResultsEvaluationEditorBase::saveCurrentFitResults() {
     }
 }
 
-void QFFitResultsEvaluationEditorBase::loadCurrentFitResults() {
+void QFFitResultsEvaluationEditorBase::loadCurrentFitResults(QFRawDataRecord* rec) {
     if (!current) return;
     QFFitResultsEvaluation* eval=qobject_cast<QFFitResultsEvaluation*>(current);
-    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitFunction* ffunc=eval->getFitFunction(rec);
     if (!ffunc || !eval) return;
 
     QString filter= tr("Fit Parameter Set (*.fps)");
@@ -174,26 +174,26 @@ void QFFitResultsEvaluationEditorBase::loadCurrentFitResults() {
         eval->set_doEmitPropertiesChanged(false);
         m_currentFPSSaveDir=QFileInfo(fileName).absolutePath();
         QSettings settings(fileName, QSettings::IniFormat);
-        QString ffuncname=settings.value("fit_function/id", eval->getFitFunction()->id()).toString();
+        QString ffuncname=settings.value("fit_function/id", eval->getFitFunction(rec)->id()).toString();
         eval->setFitFunction(ffuncname);
         settings.beginGroup("fit_params");
         QStringList keys = settings.allKeys();
         for (int i=0; i<keys.size(); i++) {
             if (keys[i].endsWith("/error")) {
                 QString paramname=keys[i].left(keys[i].length()-6);
-                eval->setFitError(paramname, settings.value(keys[i]).toDouble());
+                eval->setFitError(paramname, settings.value(keys[i]).toDouble(), rec);
             } else if (keys[i].endsWith("/value")) {
                 QString paramname=keys[i].left(keys[i].length()-6);
-                eval->setFitValue(paramname, settings.value(keys[i]).toDouble());
+                eval->setFitValue(paramname, settings.value(keys[i]).toDouble(), rec);
             } else if (keys[i].endsWith("/fix")) {
                 QString paramname=keys[i].left(keys[i].length()-4);
-                eval->setFitFix(paramname, settings.value(keys[i]).toBool());
+                eval->setFitFix(paramname, settings.value(keys[i]).toBool(), rec);
             } else if (keys[i].endsWith("/min")) {
                 QString paramname=keys[i].left(keys[i].length()-4);
-                eval->setFitMin(paramname, settings.value(keys[i]).toDouble());
+                eval->setFitMin(paramname, settings.value(keys[i]).toDouble(), rec);
             } else if (keys[i].endsWith("/max")) {
                 QString paramname=keys[i].left(keys[i].length()-4);
-                eval->setFitMax(paramname, settings.value(keys[i]).toDouble());
+                eval->setFitMax(paramname, settings.value(keys[i]).toDouble(), rec);
             }
         }
         eval->set_doEmitPropertiesChanged(true);
@@ -202,6 +202,18 @@ void QFFitResultsEvaluationEditorBase::loadCurrentFitResults() {
         replotData();
         QApplication::restoreOverrideCursor();
     }
+}
+
+void QFFitResultsEvaluationEditorBase::saveCurrentFitResults()
+{
+    QFFitResultsEvaluation* eval=qobject_cast<QFFitResultsEvaluation*>(current);
+    if (eval) saveCurrentFitResults(eval->getHighlightedRecord());
+}
+
+void QFFitResultsEvaluationEditorBase::loadCurrentFitResults()
+{
+    QFFitResultsEvaluation* eval=qobject_cast<QFFitResultsEvaluation*>(current);
+    if (eval) loadCurrentFitResults(eval->getHighlightedRecord());
 }
 
 
@@ -330,17 +342,16 @@ void QFFitResultsEvaluationEditorBase::resetAll() {
 
 
 
-void QFFitResultsEvaluationEditorBase::copyToAll() {
+void QFFitResultsEvaluationEditorBase::copyToAll(QFRawDataRecord* rec) {
 
     if (!current) return;
     QFFitResultsEvaluation* eval=qobject_cast<QFFitResultsEvaluation*>(current);
     if (!eval) return;
-    copyToInitial(false);
+    copyToInitial(false, rec);
 
-    QFFitFunction* ffunc=eval->getFitFunction();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    double* params=eval->allocFillParameters();
+    double* params=eval->allocFillParameters(eval->getFitFunction(rec));
 
     QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
 
@@ -351,16 +362,17 @@ void QFFitResultsEvaluationEditorBase::copyToAll() {
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* record=recs[i];
         if (record) {
+            QFFitFunction* ffunc=eval->getFitFunction(record);
             record->disableEmitResultsChanged();
             for (int i=0; i<ffunc->paramCount(); i++) {
                 QString id=ffunc->getParameterID(i);
-                double value=eval->getFitValue(id);
-                double error=eval->getFitError(id);
-                bool fix=eval->getFitFix(id);
+                double value=eval->getFitValue(id, record);
+                double error=eval->getFitError(id, record);
+                bool fix=eval->getFitFix(id, record);
                 if (ffunc->isParameterVisible(i, params)) {
                     if (eval->hasFit(record)) {
-                        eval->setFitResultValue(record, eval->getEvaluationResultID(), id, value, error);
-                        eval->setFitResultFix(record, eval->getEvaluationResultID(), id, fix);
+                        eval->setFitResultValue(record, eval->getEvaluationResultID(record), id, value, error);
+                        eval->setFitResultFix(record, eval->getEvaluationResultID(record), id, fix);
                     }
                 }
             }
@@ -378,15 +390,15 @@ void QFFitResultsEvaluationEditorBase::copyToAll() {
 
 
 
-void QFFitResultsEvaluationEditorBase::copyToInitial(bool emitSignals) {
+void QFFitResultsEvaluationEditorBase::copyToInitial(bool emitSignals, QFRawDataRecord *rec) {
     if (!current) return;
     QFFitResultsEvaluation* eval=qobject_cast<QFFitResultsEvaluation*>(current);
     if (!eval) return;
 
-    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitFunction* ffunc=eval->getFitFunction(rec);
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    double* params=eval->allocFillParameters();
+    double* params=eval->allocFillParameters(ffunc);
 
     eval->set_doEmitResultsChanged(false);
     eval->set_doEmitPropertiesChanged(false);
@@ -419,7 +431,7 @@ void QFFitResultsEvaluationEditorBase::copyToInitial(bool emitSignals) {
 int QFFitResultsEvaluationEditorBase::getUserMin(QFRawDataRecord* rec, int defaultMin) {
     QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
     if (!data) return defaultMin;
-    const QString resultID=data->getEvaluationResultID();
+    const QString resultID=data->getEvaluationResultID(rec);
 
     // WORKROUND FOR OLD PROPERTY NAMES
     int defaultM=rec->getProperty(QString(resultID+"_datacut_min").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMin).toInt();
@@ -430,7 +442,7 @@ int QFFitResultsEvaluationEditorBase::getUserMin(QFRawDataRecord* rec, int defau
 int QFFitResultsEvaluationEditorBase::getUserMax(QFRawDataRecord* rec, int defaultMax) {
     QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
     if (!data) return defaultMax;
-    const QString resultID=data->getEvaluationResultID();
+    const QString resultID=data->getEvaluationResultID(rec);
 
     // WORKROUND FOR OLD PROPERTY NAMES
     int defaultM=rec->getProperty(QString(resultID+"_datacut_max").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMax).toInt();
@@ -442,7 +454,7 @@ int QFFitResultsEvaluationEditorBase::getUserMin(int defaultMin) {
     QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
     if (!data) return defaultMin;
     QFRawDataRecord* rdr=data->getHighlightedRecord();
-    const QString resultID=data->getEvaluationResultID();
+    const QString resultID=data->getEvaluationResultID(rdr);
 
     // WORKROUND FOR OLD PROPERTY NAMES
     int defaultM=rdr->getProperty(QString(resultID+"_datacut_min").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMin).toInt();
@@ -454,7 +466,7 @@ int QFFitResultsEvaluationEditorBase::getUserMax(int defaultMax) {
     QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
     if (!data) return defaultMax;
     QFRawDataRecord* rdr=data->getHighlightedRecord();
-    const QString resultID=data->getEvaluationResultID();
+    const QString resultID=data->getEvaluationResultID(rdr);
 
 
 
@@ -469,7 +481,7 @@ void QFFitResultsEvaluationEditorBase::setUserMin(int userMin) {
     QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
     if (!data) return;
     QFRawDataRecord* rdr=data->getHighlightedRecord();
-    const QString resultID=data->getEvaluationResultID();
+    const QString resultID=data->getEvaluationResultID(rdr);
     rdr->setQFProperty(resultID+"_datacut_min", userMin, false, false);
 }
 
@@ -478,7 +490,7 @@ void QFFitResultsEvaluationEditorBase::setUserMax(int userMax) {
     QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
     if (!data) return;
     QFRawDataRecord* rdr=data->getHighlightedRecord();
-    const QString resultID=data->getEvaluationResultID();
+    const QString resultID=data->getEvaluationResultID(rdr);
     rdr->setQFProperty(resultID+"_datacut_max", userMax, false, false);
 }
 
@@ -487,7 +499,7 @@ void QFFitResultsEvaluationEditorBase::setUserMinMax(int userMin, int userMax) {
     QFFitResultsEvaluation* data=qobject_cast<QFFitResultsEvaluation*>(current);
     if (!data) return;
     QFRawDataRecord* rdr=data->getHighlightedRecord();
-    const QString resultID=data->getEvaluationResultID();
+    const QString resultID=data->getEvaluationResultID(rdr);
     rdr->disableEmitPropertiesChanged();
     rdr->setQFProperty(resultID+"_datacut_min", userMin, false, false);
     rdr->setQFProperty(resultID+"_datacut_max", userMax, false, false);

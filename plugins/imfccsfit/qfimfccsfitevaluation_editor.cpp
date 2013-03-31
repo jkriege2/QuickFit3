@@ -30,6 +30,11 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     l<<3*ui->splitter->height()/4;
     l<<ui->splitter->height()/4;
     ui->splitter->setSizes(l);
+    ui->datacut->set_allowCopyToAll(false);
+    ui->datacut->set_copyToFilesEnabled(false);
+    ui->datacut->set_copyToRunsEnabled(false);
+    ui->datacut->set_runsName(tr("pixels"));
+
 
 
 
@@ -94,7 +99,15 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     // connect widgets 
     connect(ui->btnEvaluateAll, SIGNAL(clicked()), this, SLOT(evaluateAll()));
     connect(ui->btnEvaluateCurrent, SIGNAL(clicked()), this, SLOT(evaluateCurrent()));
-    
+    connect(ui->pltData, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(zoomChangedLocally(double,double,double,double,JKQtPlotter*)));
+    connect(ui->pltResiduals, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(zoomChangedLocally(double,double,double,double,JKQtPlotter*)));
+/*    connect(ui->datacut, SIGNAL(copyUserMinToAll(int)), this, SLOT(copyUserMinToAll(int)));
+    connect(ui->datacut, SIGNAL(copyUserMaxToAll(int)), this, SLOT(copyUserMaxToAll(int)));
+    connect(ui->datacut, SIGNAL(copyUserMinMaxToAll(int,int)), this, SLOT(copyUserMinMaxToAll(int,int)));
+    connect(ui->datacut, SIGNAL(copyUserMinToAllRuns(int)), this, SLOT(copyUserMinToAllRuns(int)));
+    connect(ui->datacut, SIGNAL(copyUserMaxToAllRuns(int)), this, SLOT(copyUserMaxToAllRuns(int)));
+    connect(ui->datacut, SIGNAL(copyUserMinMaxToAllRuns(int,int)), this, SLOT(copyUserMinMaxToAllRuns(int,int)));*/
+
     updatingData=false;
 }
 
@@ -102,6 +115,30 @@ QFImFCCSFitEvaluationEditor::~QFImFCCSFitEvaluationEditor()
 {
     delete ui;
     delete dlgEvaluationProgress;
+}
+
+int QFImFCCSFitEvaluationEditor::getUserMin(int index)
+{
+    QFImFCCSFitEvaluationItem* item=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!current) return 0;
+    return getUserMin(item->getFitFile(0), index);
+}
+
+int QFImFCCSFitEvaluationEditor::getUserMax(int index)
+{
+    QFImFCCSFitEvaluationItem* item=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!current) return 0;
+    return getUserMax(item->getFitFile(0), index);
+}
+
+int QFImFCCSFitEvaluationEditor::getUserMin(QFRawDataRecord *rec, int index)
+{
+    return getUserMin(rec, index, ui->datacut->get_userMin());
+}
+
+int QFImFCCSFitEvaluationEditor::getUserMax(QFRawDataRecord *rec, int index)
+{
+    return getUserMax(rec, index, ui->datacut->get_userMax());
 }
 
 void QFImFCCSFitEvaluationEditor::zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender) {
@@ -128,6 +165,8 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         disconnect(ui->btnAddFile, SIGNAL(clicked()), item_old, SLOT(addFitFile()));
         disconnect(ui->btnRemoveFile, SIGNAL(clicked()), item_old, SLOT(removeFitFile()));
         disconnect(item, SIGNAL(fileChanged(int,QFRawDataRecord*)), this, SLOT(fileChanged(int,QFRawDataRecord*)));
+        disconnect(ui->datacut, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersChanged(int, int, int, int)));
+        disconnect(item_old->getParameterInputTableModel(), SIGNAL(fitParamChanged()), this, SLOT(displayEvaluation()));
     }
 
 
@@ -146,16 +185,16 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         connect(item->getParameterInputTableModel(), SIGNAL(modelRebuilt()), this, SLOT(ensureCorrectParamaterModelDisplay()));
 
         /* connect widgets and fill with data from item here */
-        connect(item, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
         connect(ui->btnAddFile, SIGNAL(clicked()), item, SLOT(addFitFile()));
         connect(ui->btnRemoveFile, SIGNAL(clicked()), item, SLOT(removeFitFile()));
         connect(item, SIGNAL(fileChanged(int,QFRawDataRecord*)), this, SLOT(fileChanged(int,QFRawDataRecord*)));
+        connect(ui->datacut, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersChanged(int, int, int, int)));
+        connect(item->getParameterInputTableModel(), SIGNAL(fitParamChanged()), this, SLOT(displayEvaluation()));
         ui->pltOverview->setRDR(item->getFitFile(0));
         updatingData=false;
     }
 
     ensureCorrectParamaterModelDisplay();
-    displayData();
     displayEvaluation();
 }
 
@@ -163,8 +202,7 @@ void QFImFCCSFitEvaluationEditor::resultsChanged() {
     /* some other evaluation or the user changed the results stored in the current raw data record,
        so redisplay */
     ensureCorrectParamaterModelDisplay();
-    displayData();
-    displayEvaluation();    
+    displayEvaluation();
 }
 
 void QFImFCCSFitEvaluationEditor::readSettings() {
@@ -253,34 +291,21 @@ void QFImFCCSFitEvaluationEditor::setCurrentRun(int run)
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
-    qDebug()<<data->getCurrentIndex();
     data->setCurrentIndex(run);
-    qDebug()<<run<<data->getCurrentIndex();
-    displayData();
+
+    QFRawDataRecord* currentRecord=data->getFitFile(0);
+
+    if (currentRecord) {
+        ui->datacut->disableSliderSignals();
+        ui->datacut->set_min(getUserRangeMin(currentRecord, data->getCurrentIndex()));
+        ui->datacut->set_max(getUserRangeMax(currentRecord, data->getCurrentIndex()));
+        ui->datacut->set_userMin(getUserMin(currentRecord, data->getCurrentIndex(), getUserRangeMin(currentRecord, data->getCurrentIndex())));
+        ui->datacut->set_userMax(getUserMax(currentRecord, data->getCurrentIndex(), getUserRangeMax(currentRecord, data->getCurrentIndex())));
+        ui->datacut->enableSliderSignals();
+    }
+
     displayEvaluation();
     QApplication::restoreOverrideCursor();
-}
-
-void QFImFCCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
-    // this slot is called when the user selects a new record in the raw data record list on the RHS of this widget in the evaluation dialog
-    
-    QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
-    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
-    QFRawDataRecord* data=currentRecord; // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(currentRecord);
-    disconnect(formerRecord, SIGNAL(rawDataChanged()), this, SLOT(displayData()));
-
-    if (data) { // if we have a valid object, update
-        connect(currentRecord, SIGNAL(rawDataChanged()), this, SLOT(displayData())); // redisplay data, if data changed
-
-        updatingData=true;
-        // assign values to widgets here 
-        ui->pltOverview->setRDR(currentRecord);
-        updatingData=false;
-    }
-    
-    // ensure that data of new highlighted record is displayed
-    displayEvaluation();
-    displayData();
 }
 
 void QFImFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
@@ -341,7 +366,17 @@ void QFImFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
 
 void QFImFCCSFitEvaluationEditor::fileChanged(int num, QFRawDataRecord *file)
 {
+    QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     if (num==0) ui->pltOverview->setRDR(file);
+    if (!eval) return;
+
+    ui->datacut->disableSliderSignals();
+    ui->datacut->set_min(0);
+    ui->datacut->set_max(getUserRangeMax(file, eval->getCurrentIndex()));
+    ui->datacut->set_userMin(getUserMin(0));
+    ui->datacut->set_userMax(getUserMax(getUserRangeMax(file, eval->getCurrentIndex())));
+    ui->datacut->enableSliderSignals();
+    displayData();
 }
 
 void QFImFCCSFitEvaluationEditor::plotMouseMoved(double x, double y)
@@ -350,6 +385,7 @@ void QFImFCCSFitEvaluationEditor::plotMouseMoved(double x, double y)
 }
 
 void QFImFCCSFitEvaluationEditor::displayEvaluation() {
+    displayData();
 }
 
 void QFImFCCSFitEvaluationEditor::displayData() {
@@ -369,8 +405,10 @@ void QFImFCCSFitEvaluationEditor::displayData() {
     ui->pltData->get_plotter()->get_yAxis()->set_drawGrid(ui->chkGrid->isChecked());
     ui->pltResiduals->get_plotter()->get_xAxis()->set_drawGrid(ui->chkGrid->isChecked());
     ui->pltResiduals->get_plotter()->get_yAxis()->set_drawGrid(ui->chkGrid->isChecked());
+    ds->clear();
     QList<QColor> cols;
     cols<<QColor("darkgreen")<<QColor("red")<<QColor("blue")<<QColor("darkorange")<<QColor("purple")<<QColor("maroon");
+    qDebug()<<"\n\n\n\n ### displayData() eval="<<eval<<" ###";
     if (eval) {
         for (int file=0; file<eval->getNumberOfFitFiles(); file++) {
             QFFitFunction* ff=eval->getFitFunction(file);
@@ -381,19 +419,27 @@ void QFImFCCSFitEvaluationEditor::displayData() {
 
             double* data=fcs->getCorrelationRun(eval->getCurrentIndex());
             double* tau=fcs->getCorrelationT();
-            double* sigma=fcs->getCorrelationRunError(eval->getCurrentIndex());
+            bool wOK=false;
+            double* sigma=eval->allocWeights(&wOK, rec, eval->getCurrentIndex(), ui->datacut->get_userMin(), ui->datacut->get_userMax());//fcs->getCorrelationRunError(eval->getCurrentIndex());
+            if (!wOK && sigma) {
+                free(sigma);
+                sigma=NULL;
+            }
             long N=fcs->getCorrelationN();
             if (data && tau) {
-                int c_tau=ds->addCopiedColumn(tau, N, tr("file%1: tau [s]").arg(file+1));
-                int c_data=ds->addCopiedColumn(data, N, tr("file%1: g(tau)").arg(file+1));
-                int c_error=-1;
-                if (sigma) c_error=c_data=ds->addCopiedColumn(sigma, N, tr("file%1: errors").arg(file+1));
+                size_t c_tau=ds->addCopiedColumn(tau, N, tr("file%1: tau [s]").arg(file+1));
+                size_t c_data=ds->addCopiedColumn(data, N, tr("file%1: g(tau)").arg(file+1));
+                size_t c_error=0;
+                if (sigma) c_error=ds->addCopiedColumn(sigma, N, tr("file%1: errors").arg(file+1));
+                //qDebug()<<c_tau<<c_data<<c_error;
                 JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(ui->pltData->get_plotter());
                 QString plotname=QString("\\verb{")+rec->getName()+QString(": ")+fcs->getCorrelationRunName(eval->getCurrentIndex())+QString("}");
                 g->set_title(plotname);
                 g->set_xColumn(c_tau);
                 g->set_yColumn(c_data);
-                g->set_yErrorColumn(c_error);
+                g->set_xErrorColumn(-1);
+                if (sigma) g->set_yErrorColumn(c_error);
+                else g->set_yErrorColumn(-1);
                 g->set_color(cols.value(file, g->get_color()));
                 QColor ec=g->get_color().lighter();
                 g->set_errorColor(ec);
@@ -402,7 +448,11 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 g->set_symbol(ui->cmbDisplayData->getSymbol());
                 g->set_drawLine(ui->cmbDisplayData->getDrawLine());
                 g->set_yErrorStyle(ui->cmbErrorDisplay->getErrorStyle());
+                g->set_datarange_start(ui->datacut->get_userMin());
+                g->set_datarange_end(ui->datacut->get_userMax());
                 ui->pltData->get_plotter()->addGraph(g);
+
+                //qDebug()<<ff<<ff->name();
 
                 double* params=eval->allocFillParameters(rec, eval->getCurrentIndex(), ff);
                 double* err=eval->allocFillParameterErrors(rec, eval->getCurrentIndex(), ff);
@@ -410,6 +460,7 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 QVector<double> paramsV;
                 for (int i=0; i<ff->paramCount(); i++) {
                     paramsV<<params[i];
+                    //qDebug()<<ff->getParameterID(i)<<" = "<<params[i];
                 }
                 JKQTPxQFFitFunctionLineGraph* g_fit=new JKQTPxQFFitFunctionLineGraph();
                 g_fit->set_title(tr("fit: %1").arg(plotname));
@@ -418,21 +469,26 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 g_fit->set_color(g->get_color());
                 g_fit->set_style(Qt::DashLine);
                 g_fit->set_lineWidth(1);
+                g_fit->set_minSamples(30);
+                g_fit->set_maxRefinementDegree(4);
+                g_fit->set_plotRefinement(true);
                 ui->pltData->get_plotter()->addGraph(g_fit);
 
-                QFFitStatistics fstat=ff->calcFitStatistics(N, tau, data, sigma, 0, N-1, params, err, fix, 3, 100);
+                QFFitStatistics fstat=ff->calcFitStatistics(N, tau, data, sigma, ui->datacut->get_userMin(), ui->datacut->get_userMax(), params, err, fix, 3, 100);
 
-                int c_resid=ds->addCopiedColumn(fstat.residuals, N, tr("file%1: residuals").arg(file+1));
-                int c_residw=ds->addCopiedColumn(fstat.residuals_weighted, N, tr("file%1: weighted residuals").arg(file+1));
-                int c_residat=ds->addCopiedColumn(fstat.tau_runavg, fstat.runAvgN, tr("file%1: tau for avg. res.").arg(file+1));
-                int c_resida=ds->addCopiedColumn(fstat.residuals_runavg, N, tr("file%1: avg. residuals").arg(file+1));
-                int c_residaw=ds->addCopiedColumn(fstat.residuals_runavg_weighted, N, tr("file%1: weighted avg. residuals").arg(file+1));
+                size_t c_resid=ds->addCopiedColumn(fstat.residuals, N, tr("file%1: residuals").arg(file+1));
+                size_t c_residw=ds->addCopiedColumn(fstat.residuals_weighted, N, tr("file%1: weighted residuals").arg(file+1));
+                size_t c_residat=ds->addCopiedColumn(fstat.tau_runavg, fstat.runAvgN, tr("file%1: tau for avg. res.").arg(file+1));
+                size_t c_resida=ds->addCopiedColumn(fstat.residuals_runavg, N, tr("file%1: avg. residuals").arg(file+1));
+                size_t c_residaw=ds->addCopiedColumn(fstat.residuals_runavg_weighted, N, tr("file%1: weighted avg. residuals").arg(file+1));
                 JKQTPxyLineGraph* g_res=new JKQTPxyLineGraph();
                 g_res->set_xColumn(c_tau);
                 g_res->set_yColumn(c_resid);
                 g_res->set_color(g->get_color());
                 g_res->set_symbol(ui->cmbDisplayData->getSymbol());
                 g_res->set_drawLine(ui->cmbDisplayData->getDrawLine());
+                g_res->set_datarange_start(ui->datacut->get_userMin());
+                g_res->set_datarange_end(ui->datacut->get_userMax());
                 ui->pltResiduals->get_plotter()->addGraph(g_res);
                 JKQTPxyLineGraph* g_resa=new JKQTPxyLineGraph();
                 g_resa->set_xColumn(c_residat);
@@ -441,12 +497,16 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 g_resa->set_drawLine(true);
                 g_resa->set_symbol(JKQTPnoSymbol);
                 ui->pltResiduals->get_plotter()->addGraph(g_resa);
+                fstat.free();
+
+
 
 
                 free(params);
                 free(err);
                 free(fix);
             }
+            if (sigma) free(sigma);
 
             ui->pltData->zoomToFit();
             ui->pltResiduals->zoomToFit();
@@ -480,7 +540,7 @@ void QFImFCCSFitEvaluationEditor::doEvaluation(QFRawDataRecord* record) {
     
     // write back fit results to record!
     record->disableEmitResultsChanged();
-    record->resultsSetBoolean(eval->getEvaluationResultID(), "evaluation_completed", true);
+    record->resultsSetBoolean(eval->getEvaluationResultID(record), "evaluation_completed", true);
     record->enableEmitResultsChanged();
     emit resultsChanged();
 }
@@ -510,7 +570,6 @@ void QFImFCCSFitEvaluationEditor::evaluateCurrent() {
     doEvaluation(record);
 
     displayEvaluation();
-    displayData();
     dlgEvaluationProgress->setValue(100);
 
     QApplication::restoreOverrideCursor();
@@ -548,7 +607,6 @@ void QFImFCCSFitEvaluationEditor::evaluateAll() {
     }
     dlgEvaluationProgress->setValue(recs.size());
     displayEvaluation();
-    displayData();
     QApplication::restoreOverrideCursor();
 }
 
@@ -667,5 +725,66 @@ void QFImFCCSFitEvaluationEditor::on_cmbWeight_currentWeightChanged(QFFCSWeighti
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     data->setFitDataWeighting(weight);
     QApplication::restoreOverrideCursor();
+}
+
+int QFImFCCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord *rec, int index)
+{
+    return 0;
+}
+
+int QFImFCCSFitEvaluationEditor::getUserMin(QFRawDataRecord *rec, int index, int defaultMin)
+{
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return defaultMin;
+    const QString resultID=data->getEvaluationResultID(index, rec);
+
+    // WORKROUND FOR OLD PROPERTY NAMES
+    int defaultM=rec->getProperty(QString(resultID+"_datacut_min"), defaultMin).toInt();
+
+    return rec->getProperty(resultID+"_datacut_min", defaultM).toInt();
+}
+
+int QFImFCCSFitEvaluationEditor::getUserMax(QFRawDataRecord *rec, int index, int defaultMax)
+{
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return defaultMax;
+    const QString resultID=data->getEvaluationResultID(index, rec);
+
+    // WORKROUND FOR OLD PROPERTY NAMES
+    int defaultM=rec->getProperty(QString(resultID+"_datacut_max"), defaultMax).toInt();
+
+    return rec->getProperty(resultID+"_datacut_max", defaultM).toInt();
+    //return rec->getProperty(resultID+"_datacut_max", defaultMax).toInt();
+}
+
+void QFImFCCSFitEvaluationEditor::setUserMinMax(int userMin, int userMax)
+{
+    if (!current) return;
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    for (int i=0; i<data->getNumberOfFitFiles(); i++) {
+        QFRawDataRecord* rdr=data->getFitFile(i);
+        const QString resultID=data->getEvaluationResultID(rdr);
+        rdr->disableEmitPropertiesChanged();
+        rdr->setQFProperty(resultID+"_datacut_min", userMin, false, false);
+        rdr->setQFProperty(resultID+"_datacut_max", userMax, false, false);
+        rdr->enableEmitPropertiesChanged(true);
+    }
+}
+
+void QFImFCCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int min, int max)
+{
+    if (!current) return;
+    setUserMinMax(userMin, userMax);
+    displayData();
+}
+
+int QFImFCCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int index)
+{
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(rec);
+    if (data) {
+        return data->getCorrelationN()-1;
+    }
+    return 0;
 }
 

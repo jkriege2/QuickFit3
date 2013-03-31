@@ -34,7 +34,7 @@ void QFFitResultsByIndexEvaluationEditorBase::copyUserMinToAll(int userMin) {
             QFRawDataRecord* rdr=recs[i];
             rdr->disableEmitPropertiesChanged();
             for (int r=data->getIndexMin(rdr); r<=data->getIndexMax(rdr); r++) {
-                const QString resultID=data->getEvaluationResultID(r);
+                const QString resultID=data->getEvaluationResultID(r, rdr);
                 if (!((rdr==current->getHighlightedRecord())&&(r==data->getCurrentIndex()))) {
                     rdr->setQFProperty(resultID+"_datacut_min", userMin, false, false);
                 }
@@ -57,7 +57,7 @@ void QFFitResultsByIndexEvaluationEditorBase::copyUserMaxToAll(int userMax) {
             QFRawDataRecord* rdr=recs[i];
             rdr->disableEmitPropertiesChanged();
             for (int r=data->getIndexMin(rdr); r<=data->getIndexMax(rdr); r++) {
-                const QString resultID=data->getEvaluationResultID(r);
+                const QString resultID=data->getEvaluationResultID(r, rdr);
                 if (!((rdr==current->getHighlightedRecord())&&(r==data->getCurrentIndex()))) {
                     rdr->setQFProperty(resultID+"_datacut_max", userMax, false, false);
                 }
@@ -81,7 +81,7 @@ void QFFitResultsByIndexEvaluationEditorBase::copyUserMinMaxToAll(int userMin, i
             QFRawDataRecord* rdr=recs[i];
             rdr->disableEmitPropertiesChanged();
             for (int r=data->getIndexMin(rdr); r<=data->getIndexMax(rdr); r++) {
-                const QString resultID=data->getEvaluationResultID(r);
+                const QString resultID=data->getEvaluationResultID(r, rdr);
                 if (!((rdr==current->getHighlightedRecord())&&(r==data->getCurrentIndex()))) {
                     rdr->setQFProperty(resultID+"_datacut_min", userMin, false, false);
                     rdr->setQFProperty(resultID+"_datacut_max", userMax, false, false);
@@ -101,7 +101,7 @@ void QFFitResultsByIndexEvaluationEditorBase::copyUserMinToAllRuns(int userMin) 
     QFRawDataRecord* rdr=data->getHighlightedRecord();
     rdr->disableEmitPropertiesChanged();
     for (int r=data->getIndexMin(rdr); r<=data->getIndexMax(rdr); r++) {
-        const QString resultID=data->getEvaluationResultID(r);
+        const QString resultID=data->getEvaluationResultID(r, rdr);
         if (!((rdr==current->getHighlightedRecord())&&(r==data->getCurrentIndex()))) {
             rdr->setQFProperty(resultID+"_datacut_min", userMin, false, false);
         }
@@ -120,7 +120,7 @@ void QFFitResultsByIndexEvaluationEditorBase::copyUserMaxToAllRuns(int userMax) 
     QFRawDataRecord* rdr=data->getHighlightedRecord();
     rdr->disableEmitPropertiesChanged();
     for (int r=data->getIndexMin(rdr); r<=data->getIndexMax(rdr); r++) {
-        const QString resultID=data->getEvaluationResultID(r);
+        const QString resultID=data->getEvaluationResultID(r, rdr);
         if (!((rdr==current->getHighlightedRecord())&&(r==data->getCurrentIndex()))) {
             rdr->setQFProperty(resultID+"_datacut_max", userMax, false, false);
         }
@@ -138,7 +138,7 @@ void QFFitResultsByIndexEvaluationEditorBase::copyUserMinMaxToAllRuns(int userMi
     QFRawDataRecord* rdr=data->getHighlightedRecord();
     rdr->disableEmitPropertiesChanged();
     for (int r=data->getIndexMin(rdr); r<=data->getIndexMax(rdr); r++) {
-        const QString resultID=data->getEvaluationResultID(r);
+        const QString resultID=data->getEvaluationResultID(r, rdr);
         if (!((rdr==current->getHighlightedRecord())&&(r==data->getCurrentIndex()))) {
             rdr->setQFProperty(resultID+"_datacut_min", userMin, false, false);
             rdr->setQFProperty(resultID+"_datacut_max", userMax, false, false);
@@ -154,10 +154,10 @@ void QFFitResultsByIndexEvaluationEditorBase::copyUserMinMaxToAllRuns(int userMi
 int QFFitResultsByIndexEvaluationEditorBase::getUserMin(QFRawDataRecord* rec, int index, int defaultMin) {
     QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     if (!data) return defaultMin;
-    const QString resultID=data->getEvaluationResultID(index);
+    const QString resultID=data->getEvaluationResultID(index, rec);
 
     // WORKROUND FOR OLD PROPERTY NAMES
-    int defaultM=rec->getProperty(QString(resultID+"_datacut_min").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMin).toInt();
+    int defaultM=rec->getProperty(QString(resultID+"_datacut_min").replace(QString("_")+data->getFitFunction(rec)->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMin).toInt();
 
     return rec->getProperty(resultID+"_datacut_min", defaultM).toInt();
 }
@@ -165,10 +165,10 @@ int QFFitResultsByIndexEvaluationEditorBase::getUserMin(QFRawDataRecord* rec, in
 int QFFitResultsByIndexEvaluationEditorBase::getUserMax(QFRawDataRecord* rec, int index, int defaultMax) {
     QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     if (!data) return defaultMax;
-    const QString resultID=data->getEvaluationResultID(index);
+    const QString resultID=data->getEvaluationResultID(index, rec);
 
     // WORKROUND FOR OLD PROPERTY NAMES
-    int defaultM=rec->getProperty(QString(resultID+"_datacut_max").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMax).toInt();
+    int defaultM=rec->getProperty(QString(resultID+"_datacut_max").replace(QString("_")+data->getFitFunction(rec)->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMax).toInt();
 
     return rec->getProperty(resultID+"_datacut_max", defaultM).toInt();
     //return rec->getProperty(resultID+"_datacut_max", defaultMax).toInt();
@@ -256,9 +256,8 @@ void QFFitResultsByIndexEvaluationEditorBase::copyToAll() {
     if (!current) return;
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     if (!eval) return;
-    copyToInitial(false);
+    copyToInitial(false, eval->getHighlightedRecord());
 
-    QFFitFunction* ffunc=eval->getFitFunction();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     double* params=eval->allocFillParameters();
@@ -272,6 +271,7 @@ void QFFitResultsByIndexEvaluationEditorBase::copyToAll() {
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* record=recs[i];
         if (record) {
+            QFFitFunction* ffunc=eval->getFitFunction(record);
             record->disableEmitResultsChanged();
             for (int i=0; i<ffunc->paramCount(); i++) {
                 QString id=ffunc->getParameterID(i);
@@ -305,9 +305,8 @@ void QFFitResultsByIndexEvaluationEditorBase::copyToAllRuns() {
     if (!current) return;
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     if (!eval) return;
-    copyToInitial(false);
+    copyToInitial(false, eval->getHighlightedRecord());
 
-    QFFitFunction* ffunc=eval->getFitFunction();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     double* params=eval->allocFillParameters();
@@ -317,6 +316,7 @@ void QFFitResultsByIndexEvaluationEditorBase::copyToAllRuns() {
 
     QFRawDataRecord* record=eval->getHighlightedRecord();
     if (record) {
+        QFFitFunction* ffunc=eval->getFitFunction(record);
         record->disableEmitResultsChanged();
         for (int i=0; i<ffunc->paramCount(); i++) {
             QString id=ffunc->getParameterID(i);
@@ -348,9 +348,8 @@ void QFFitResultsByIndexEvaluationEditorBase::copyToAllCurrentRun() {
     if (!current) return;
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     if (!eval) return;
-    copyToInitial(false);
+    copyToInitial(false, eval->getHighlightedRecord());
 
-    QFFitFunction* ffunc=eval->getFitFunction();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     double* params=eval->allocFillParameters();
@@ -363,6 +362,7 @@ void QFFitResultsByIndexEvaluationEditorBase::copyToAllCurrentRun() {
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* record=recs[i];
         if (record) {
+            QFFitFunction* ffunc=eval->getFitFunction(record);
             record->disableEmitResultsChanged();
             for (int i=0; i<ffunc->paramCount(); i++) {
                 QString id=ffunc->getParameterID(i);

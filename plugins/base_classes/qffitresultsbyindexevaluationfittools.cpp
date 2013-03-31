@@ -20,7 +20,7 @@ QFFitStatistics QFFitResultsByIndexEvaluationFitTools::calcFitStatistics(bool st
         if (storeAsResults) {
 
             QString param="";
-            QString eid= t->getEvaluationResultID(run);
+            QString eid= t->getEvaluationResultID(run, record);
             t->setFitResultValue(record, eid, param="fitstat_chisquared", result.residSqrSum);
             t->setFitResultGroup(record, eid, param, QObject::tr("fit statistics"));
             t->setFitResultLabel(record, eid, param, QObject::tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));

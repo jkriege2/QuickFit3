@@ -30,8 +30,8 @@ bool QFFitResultsByIndexAsVectorEvaluation::isParamNameLocalStore(const QString 
 
 
 
-void QFFitResultsByIndexAsVectorEvaluation::resetDefaultFitValue(const QString& id) {
-    resetDefaultFitValue(getHighlightedRecord(), getEvaluationResultID(), id);
+void QFFitResultsByIndexAsVectorEvaluation::resetDefaultFitValue(const QString& id,  QFRawDataRecord *r) {
+    resetDefaultFitValue(r, getEvaluationResultID(r), id);
 }
 
 void QFFitResultsByIndexAsVectorEvaluation::resetDefaultFitValue(QFRawDataRecord* r, const QString& resultID, const QString& id) {
@@ -53,8 +53,8 @@ void QFFitResultsByIndexAsVectorEvaluation::resetDefaultFitValue(QFRawDataRecord
     }
 }
 
-void QFFitResultsByIndexAsVectorEvaluation::resetDefaultFitFix(const QString& id) {
-    resetDefaultFitFix(getHighlightedRecord(), getEvaluationResultID(), id);
+void QFFitResultsByIndexAsVectorEvaluation::resetDefaultFitFix(const QString& id,  QFRawDataRecord *r) {
+    resetDefaultFitFix(r, getEvaluationResultID(r), id);
 }
 
 void QFFitResultsByIndexAsVectorEvaluation::resetDefaultFitFix(QFRawDataRecord* r, const QString& resultID, const QString& id) {
@@ -84,7 +84,7 @@ void QFFitResultsByIndexAsVectorEvaluation::resetAllFitResultsCurrentFileAllIndi
     bool doEmit=r->isEmitResultsChangedEnabled();
     r->disableEmitResultsChanged();
     for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {
-        resetAllFitResults(r, getEvaluationResultID(idx));
+        resetAllFitResults(r, getEvaluationResultID(idx, r));
     }
     if (doEmit) r->enableEmitResultsChanged(true);
 }
@@ -102,7 +102,7 @@ void QFFitResultsByIndexAsVectorEvaluation::resetAllFitResultsAllFilesAllIndices
         r->disableEmitResultsChanged();
         for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {
             //qDebug()<<"resetAllFitResultsAllFilesAllIndices(): idx="<<idx<<" getEvaluationResultID(idx)="<<getEvaluationResultID(idx);
-            resetAllFitResults(r, getEvaluationResultID(idx));
+            resetAllFitResults(r, getEvaluationResultID(idx, r));
         }
 
         if (doEmit) r->enableEmitResultsChanged(true);
@@ -110,21 +110,20 @@ void QFFitResultsByIndexAsVectorEvaluation::resetAllFitResultsAllFilesAllIndices
 }
 
 void QFFitResultsByIndexAsVectorEvaluation::resetAllFitResultsCurrent() {
-    resetAllFitResults(getHighlightedRecord(), getEvaluationResultID());
+    resetAllFitResults(getHighlightedRecord(), getEvaluationResultID(getHighlightedRecord()));
 }
 
 /*! \brief reset all parameters to the initial/global/default value in all files and all indexs */
 void QFFitResultsByIndexAsVectorEvaluation::resetAllFitValue()  {
-    QFFitFunction* f=getFitFunction();
-    if (f==NULL) return ;
     QList<QPointer<QFRawDataRecord> > recs=getApplicableRecords();
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* r=recs[i];
         if (r) {
+            QFFitFunction* f=getFitFunction(r);
             bool doEmit=r->isEmitResultsChangedEnabled();
             r->disableEmitResultsChanged();
             for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {
-                QString resultID=getEvaluationResultID(idx);
+                QString resultID=getEvaluationResultID(idx, r);
                 for (int j=0; j<f->paramCount(); j++) {
                     QString id=f->getParameterID(j);
                     resetDefaultFitValue(r, resultID, id);
@@ -140,16 +139,15 @@ void QFFitResultsByIndexAsVectorEvaluation::resetAllFitValue()  {
 
 /*! \brief reset all parameters to the initial/global/default fix in all files and all indexs */
 void QFFitResultsByIndexAsVectorEvaluation::resetAllFitFix() {
-    QFFitFunction* f=getFitFunction();
-    if (f==NULL) return ;
     QList<QPointer<QFRawDataRecord> > recs=getApplicableRecords();
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* r=recs[i];
         if (r) {
+            QFFitFunction* f=getFitFunction(r);
             bool doEmit=r->isEmitResultsChangedEnabled();
             r->disableEmitResultsChanged();
             for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {
-                QString resultID=transformResultID(getEvaluationResultID(idx));
+                QString resultID=transformResultID(getEvaluationResultID(idx, r));
                 for (int j=0; j<f->paramCount(); j++) {
                     QString id=f->getParameterID(j);
                     resetDefaultFitFix(r, resultID, id);
@@ -190,21 +188,21 @@ void QFFitResultsByIndexAsVectorEvaluation::resetAllFitResultsAllFiles() {
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* r=recs[i];
         if (r) {
-            resetAllFitResults(r, getEvaluationResultID());
+            resetAllFitResults(r, getEvaluationResultID(r));
         }
     }
 }
 
 
 bool QFFitResultsByIndexAsVectorEvaluation::hasFit(QFRawDataRecord* r1, const QString& evalID) const {
-    QString resultID=getEvaluationResultID();
+    QString resultID=getEvaluationResultID(r1);
     int index=getIndexFromEvaluationResultID(evalID);
     if (index<0) {
         return QFFitResultsByIndexEvaluation::hasFit(r1, evalID);
     } else {
 
         QFRawDataRecord* r=r1;
-        if (getFitFunction()==NULL) return false;
+        if (getFitFunction(r)==NULL) return false;
         if (r==NULL) r=getHighlightedRecord();
         if (r==NULL) return false;
         QString tresultID=transformResultID(evalID);
@@ -226,8 +224,7 @@ bool QFFitResultsByIndexAsVectorEvaluation::hasFit(QFRawDataRecord* r1, const QS
 
 /*! \brief set the given parameter \a id to the given value (and error) in all files, hasFit for the file is \c true */
 void QFFitResultsByIndexAsVectorEvaluation::setAllFitValues(const QString& id, double value, double error, bool currentFileOnly) {
-    QFFitFunction* f=getFitFunction();
-    if (f==NULL) return ;
+
     QList<QPointer<QFRawDataRecord> > recs;
     recs.clear();
     if (currentFileOnly) {
@@ -235,16 +232,17 @@ void QFFitResultsByIndexAsVectorEvaluation::setAllFitValues(const QString& id, d
     } else {
         recs=getApplicableRecords();
     }
-    int pid=f->getParameterNum(id);
-    QString unit="";
-    if (pid>-1) unit=f->getDescription(pid).unit;
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* r=recs[i];
-        if (r) {
+        QFFitFunction* f=getFitFunction(r);
+        if (r&&f) {
+            int pid=f->getParameterNum(id);
+            QString unit="";
+            if (pid>-1) unit=f->getDescription(pid).unit;
             bool doEmit=r->isEmitResultsChangedEnabled();
             r->disableEmitResultsChanged();
             for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {
-                QString resultID=getEvaluationResultID(idx);
+                QString resultID=getEvaluationResultID(idx, r);
                 QString en=transformResultID(resultID);
                 if (hasFit(r, idx)) {
                     if (idx<0) {
@@ -263,8 +261,6 @@ void QFFitResultsByIndexAsVectorEvaluation::setAllFitValues(const QString& id, d
 
 /*! \brief set the given parameter \a id to the given fix value */
 void QFFitResultsByIndexAsVectorEvaluation::setAllFitFixes(const QString& id, bool fix, bool currentFileOnly) {
-    QFFitFunction* f=getFitFunction();
-    if (f==NULL) return ;
     QList<QPointer<QFRawDataRecord> > recs;
     recs.clear();
     if (currentFileOnly) {
@@ -274,11 +270,12 @@ void QFFitResultsByIndexAsVectorEvaluation::setAllFitFixes(const QString& id, bo
     }
     for (int i=0; i<recs.size(); i++) {
         QFRawDataRecord* r=recs[i];
-        if (r) {
+        QFFitFunction* f=getFitFunction(r);
+        if (r&&f) {
             bool doEmit=r->isEmitResultsChangedEnabled();
             r->disableEmitResultsChanged();
             for(int idx=getIndexMin(recs[i]); idx<=getIndexMax(recs[i]); idx++) {
-                QString resultID=getEvaluationResultID(idx);
+                QString resultID=getEvaluationResultID(idx, r);
                 QString en=transformResultID(resultID);
                 if (hasFit(r, idx)) {
                     if (idx<0) {
@@ -298,7 +295,7 @@ void QFFitResultsByIndexAsVectorEvaluation::setAllFitFixes(const QString& id, bo
 
 
 void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, double value)  {
-    QFFitFunction* f=getFitFunction();
+    QFFitFunction* f=getFitFunction(r);
     QString unit="";
     if (f) {
         int pid=f->getParameterNum(parameterID);
@@ -329,7 +326,7 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord* r
     if (index<0) {
         QFFitResultsByIndexEvaluation::setFitResultValue(r, resultID, parameterID, value, error);
     } else if (r) {
-        QFFitFunction* f=getFitFunction();
+        QFFitFunction* f=getFitFunction(r);
         QString unit="";
         if (f) {
             int pid=f->getParameterNum(parameterID);
@@ -351,7 +348,7 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord* r
     if (index<0) {
         QFFitResultsByIndexEvaluation::setFitResultValue(r, resultID, parameterID, value, error);
     } else if (r) {
-        QFFitFunction* f=getFitFunction();
+        QFFitFunction* f=getFitFunction(r);
 
         QString pid=getFitParamID(parameterID);
         bool doEmit=r->isEmitResultsChangedEnabled();
@@ -370,7 +367,7 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord *r
     if (index<0) {
         QFFitResultsByIndexEvaluation::setFitResultValue(r, resultID, parameterID, value, error);
     } else if (r) {
-        QFFitFunction* f=getFitFunction();
+        QFFitFunction* f=getFitFunction(r);
 
         QString pid=getFitParamID(parameterID);
         bool doEmit=r->isEmitResultsChangedEnabled();
@@ -391,7 +388,7 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValue(QFRawDataRecord *r
     if (index<0) {
         QFFitResultsByIndexEvaluation::setFitResultValue(r, resultID, parameterID, value, unit);
     } else if (r) {
-        QFFitFunction* f=getFitFunction();
+        QFFitFunction* f=getFitFunction(r);
 
         QString pid=getFitParamID(parameterID);
         bool doEmit=r->isEmitResultsChangedEnabled();
@@ -455,7 +452,7 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValueBool(QFRawDataRecor
 }
 
 void QFFitResultsByIndexAsVectorEvaluation::setFitResultValueInt(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, int64_t value)  {
-    QFFitFunction* f=getFitFunction();
+    QFFitFunction* f=getFitFunction(r);
     QString unit="";
     if (f) {
         int pid=f->getParameterNum(parameterID);
@@ -538,7 +535,7 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValues(QFRawDataRecord* 
         if (index<0) {
             QFFitResultsByIndexEvaluation::setFitResultValues(r, resultID, values, errors);
         } else {
-            QFFitFunction* f=getFitFunction();
+            QFFitFunction* f=getFitFunction(r);
             if (f) {
                 bool doEmit=r->isEmitResultsChangedEnabled();
                 bool thisDoEmit=doEmitResultsChanged;
@@ -564,7 +561,7 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValuesVisible(QFRawDataR
         if (index<0) {
             QFFitResultsByIndexEvaluation::setFitResultValuesVisible(r, resultID, values, errors);
         } else {
-            QFFitFunction* f=getFitFunction();
+            QFFitFunction* f=getFitFunction(r);
             if (f) {
                 bool doEmit=r->isEmitResultsChangedEnabled();
                 bool thisDoEmit=doEmitResultsChanged;
@@ -592,7 +589,7 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValuesVisibleWithGroupAn
         if (index<0) {
             QFFitResultsByIndexEvaluation::setFitResultValuesVisibleWithGroupAndLabel(r, resultID, values, errors, group, fix, fixGroup, sortPriority);
         } else {
-            QFFitFunction* f=getFitFunction();
+            QFFitFunction* f=getFitFunction(r);
             if (f) {
                 bool doEmit=r->isEmitResultsChangedEnabled();
                 bool thisDoEmit=doEmitResultsChanged;
@@ -637,7 +634,7 @@ double QFFitResultsByIndexAsVectorEvaluation::getFitValue(QFRawDataRecord* r, co
     if (index<0) {
         return QFFitResultsByIndexEvaluation::getFitValue(r, resultID, parameterID);
     } else if (r) {
-        QFFitFunction* f=getFitFunction();
+        QFFitFunction* f=getFitFunction(r);
         if (f==NULL) {
             return 0;
         }
@@ -687,7 +684,7 @@ double QFFitResultsByIndexAsVectorEvaluation::getFitError(QFRawDataRecord* r, co
     if (index<0) {
         return QFFitResultsByIndexEvaluation::getFitError(r, resultID, parameterID);
     } else if (r) {
-        QFFitFunction* f=getFitFunction();
+        QFFitFunction* f=getFitFunction(r);
         if (f==NULL) {
             return 0;
         }
@@ -738,7 +735,7 @@ bool QFFitResultsByIndexAsVectorEvaluation::getFitFix(QFRawDataRecord* r, const 
     if (index<0) {
         return QFFitResultsByIndexEvaluation::getFitFix(r, resultID, parameterID);
     } else if (r) {
-        QFFitFunction* f=getFitFunction();
+        QFFitFunction* f=getFitFunction(r);
         if (f==NULL) {
             return false;
         }

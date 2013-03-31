@@ -679,7 +679,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::readSettings() {
     }
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::updateParameterValues()
+void QFFitResultsByIndexEvaluationEditorWithWidgets::updateParameterValues(QFRawDataRecord* rec)
 {
     if (!current) return;
     if (!cmbModel) return;
@@ -690,12 +690,12 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::updateParameterValues()
     //qDebug()<<"QFFCSFitEvaluationEditor::updateParameterValues()";
     //QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(current->getHighlightedRecord());
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    QFFitFunction* ffunc=eval->getFitFunction();
+    QFFitFunction* ffunc=eval->getFitFunction(rec);
 
     if (!ffunc) return;
 
-    double* fullParams=eval->allocFillParameters();
-    double* errors=eval->allocFillParameterErrors();
+    double* fullParams=eval->allocFillParameters(ffunc);
+    double* errors=eval->allocFillParameterErrors(ffunc);
     ffunc->calcParameter(fullParams, errors);
 
 
@@ -927,7 +927,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
         labFitResult->setText("");
     }
 
-    updateParameterValues();
+    updateParameterValues(eval->getHighlightedRecord());
     //setUpdatesEnabled(updEn);
 }
 
@@ -1160,7 +1160,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::residualHistogramBinsChange
 }
 
 void QFFitResultsByIndexEvaluationEditorWithWidgets::parameterValueChanged() {
-    updateParameterValues();
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    if (eval) updateParameterValues(eval->getHighlightedRecord());
     replotData();
 }
 
@@ -1169,11 +1170,13 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::parameterValueEnterPressed(
 }
 
 void QFFitResultsByIndexEvaluationEditorWithWidgets::parameterFixChanged() {
-    updateParameterValues();
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    if (eval) updateParameterValues(eval->getHighlightedRecord());
 }
 
 void QFFitResultsByIndexEvaluationEditorWithWidgets::parameterRangeChanged() {
-    updateParameterValues();
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    if (eval) updateParameterValues(eval->getHighlightedRecord());
     replotData();
 }
 

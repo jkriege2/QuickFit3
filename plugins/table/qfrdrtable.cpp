@@ -81,6 +81,29 @@ QFRDRTable::PlotInfo::PlotInfo()
     keepDataAspectRatio=false;
     dataAspectRatio=1;
     axisAspectRatio=1;
+    x0axis=true;
+    y0axis=true;
+
+
+
+     backgroundColor=QColor("white");
+     gridColor=QColor("darkgrey");
+     gridStyle=Qt::DashLine;
+     gridWidth=1;
+     xlabelPos=JKQTPlabelCenter;
+     xlabelType=JKQTPCALTexponentCharacter;
+     xlabelMode1=JKQTPCADMcomplete;
+     xlabelMode2=JKQTPCADMticks;
+     xdigits=3;
+     xminTicks=7;
+     xminorTicks=1;
+     ylabelPos=JKQTPlabelCenter;
+     ylabelType=JKQTPCALTexponentCharacter;
+     ylabelMode1=JKQTPCADMcomplete;
+     ylabelMode2=JKQTPCADMticks;
+     ydigits=3;
+     yminTicks=5;
+     yminorTicks=1;
 }
 
 
@@ -705,6 +728,8 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 plot.ylabel=te.attribute("ylabel", "y");
                 plot.xlog=QStringToBool( te.attribute("xlog", "false"));
                 plot.ylog=QStringToBool( te.attribute("ylog", "false"));
+                plot.x0axis=QStringToBool( te.attribute("x0axis", "true"));
+                plot.y0axis=QStringToBool( te.attribute("y0axis", "true"));
                 plot.grid=QStringToBool( te.attribute("grid", "true"));
                 plot.showKey=QStringToBool( te.attribute("showkey"));
                 plot.xmin=CQStringToDouble(te.attribute("xmin", "0"));
@@ -725,6 +750,27 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 plot.axisAspectRatio=CQStringToDouble(te.attribute("dataaspect", "1"));
                 plot.keepAxisAspectRatio=QStringToBool( te.attribute("keep_axisaspect", "false"));
                 plot.dataAspectRatio=CQStringToDouble(te.attribute("axisaspect", "1"));
+
+                plot.backgroundColor=QStringToQColor(te.attribute("background_color", "white"));
+                plot.gridColor=QStringToQColor(te.attribute("grid_color", "darkgrey"));
+                plot.gridStyle=String2QPenStyle(te.attribute("grid_style", "dash"));
+                plot.gridWidth=te.attribute("grid_width", "1").toDouble();
+                plot.xdigits=te.attribute("xdigits", "3").toInt();
+                plot.ydigits=te.attribute("ydigits", "3").toInt();
+                plot.xminTicks=te.attribute("xmin_ticks", "7").toInt();
+                plot.xminorTicks=te.attribute("xminor_ticks", "1").toInt();
+                plot.yminTicks=te.attribute("ymin_ticks", "7").toInt();
+                plot.yminorTicks=te.attribute("yminor_ticks", "1").toInt();
+                plot.xlabelPos=String2JKQTPlabelPosition(te.attribute("xlabel_pos", "center"));
+                plot.ylabelPos=String2JKQTPlabelPosition(te.attribute("ylabel_pos", "center"));
+                plot.xlabelType=String2JKQTPCAlabelType(te.attribute("xlabel_type", "exponent"));
+                plot.ylabelType=String2JKQTPCAlabelType(te.attribute("ylabel_type", "exponent"));
+                plot.xlabelMode1=String2JKQTPCAdrawMode(te.attribute("xlabel_mode1", "all"));
+                plot.xlabelMode2=String2JKQTPCAdrawMode(te.attribute("xlabel_mode2", "ticks"));
+                plot.ylabelMode1=String2JKQTPCAdrawMode(te.attribute("ylabel_mode1", "all"));
+                plot.ylabelMode2=String2JKQTPCAdrawMode(te.attribute("ylabel_mode2", "ticks"));
+
+
 
                 QDomElement ge=te.firstChildElement("graph");
                 while (!ge.isNull()) {
@@ -826,6 +872,8 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
         w.writeAttribute("grid", boolToQString(plots[i].grid));
         w.writeAttribute("xlog", boolToQString(plots[i].xlog));
         w.writeAttribute("ylog", boolToQString(plots[i].ylog));
+        w.writeAttribute("x0axis", boolToQString(plots[i].x0axis));
+        w.writeAttribute("y0axis", boolToQString(plots[i].y0axis));
         w.writeAttribute("xmin", CDoubleToQString(plots[i].xmin));
         w.writeAttribute("xmax", CDoubleToQString(plots[i].xmax));
         w.writeAttribute("ymin", CDoubleToQString(plots[i].ymin));
@@ -838,11 +886,32 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
         w.writeAttribute("keytransparency", CDoubleToQString(plots[i].keyTransparency));
         w.writeAttribute("keyposition", JKQTPkeyPosition2String(plots[i].keyPosition));
         w.writeAttribute("keylayout", JKQTPkeyLayout2String(plots[i].keyLayout));
-
         w.writeAttribute("keep_dataaspect", boolToQString(plots[i].keepDataAspectRatio));
         w.writeAttribute("dataaspect", CDoubleToQString(plots[i].axisAspectRatio));
         w.writeAttribute("keep_axisaspect", boolToQString(plots[i].keepAxisAspectRatio));
         w.writeAttribute("axisaspect", CDoubleToQString(plots[i].dataAspectRatio));
+
+        w.writeAttribute("grid_width", CDoubleToQString(plots[i].gridWidth));
+        w.writeAttribute("background_color", QColor2String(plots[i].backgroundColor));
+        w.writeAttribute("grid_color", QColor2String(plots[i].gridColor));
+        w.writeAttribute("grid_style", QPenStyle2String(plots[i].gridStyle));
+
+        w.writeAttribute("xdigits", QString::number(plots[i].xdigits));
+        w.writeAttribute("ydigits", QString::number(plots[i].ydigits));
+        w.writeAttribute("xmin_ticks", QString::number(plots[i].xminTicks));
+        w.writeAttribute("xminor_ticks", QString::number(plots[i].xminorTicks));
+        w.writeAttribute("ymin_ticks", QString::number(plots[i].yminTicks));
+        w.writeAttribute("yminor_ticks", QString::number(plots[i].yminorTicks));
+        w.writeAttribute("xlabel_pos", JKQTPlabelPosition2String(plots[i].xlabelPos));
+        w.writeAttribute("ylabel_pos", JKQTPlabelPosition2String(plots[i].ylabelPos));
+        w.writeAttribute("xlabel_type", JKQTPCAlabelType2String(plots[i].xlabelType));
+        w.writeAttribute("ylabel_type", JKQTPCAlabelType2String(plots[i].ylabelType));
+
+        w.writeAttribute("xlabel_mode1", JKQTPCAdrawMode2String(plots[i].xlabelMode1));
+        w.writeAttribute("xlabel_mode2", JKQTPCAdrawMode2String(plots[i].xlabelMode2));
+        w.writeAttribute("ylabel_mode1", JKQTPCAdrawMode2String(plots[i].ylabelMode1));
+        w.writeAttribute("ylabel_mode2", JKQTPCAdrawMode2String(plots[i].ylabelMode2));
+
 
         for (int g=0; g<plots[i].graphs.size(); g++) {
             w.writeStartElement("graph");

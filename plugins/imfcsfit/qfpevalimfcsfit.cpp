@@ -248,7 +248,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
 
                 for (int ri=0; ri<rdrs.size(); ri++) {
                     QFRawDataRecord* r=rdrs[ri];
-                    QString erid=imFCS->getEvaluationResultID(0);
+                    QString erid=imFCS->getEvaluationResultID(0, r);
                     QString en=imFCS->transformResultID(erid);
                     //qDebug()<<r->getName()<<":  "<<en<<"    ["<<erid<<"]"<<r->resultsExistsFromEvaluation(en)<<r->resultsExists(en, "diff_coeff1")<<r->resultsCalcNames(en)<<r->resultsCalcNames(erid);
                     QVector<double> D=r->resultsGetAsDoubleList(en,  "fitparam_diff_coeff1");
@@ -414,7 +414,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool3()
                         if (bin*width>xmax) xmax=1.1*bin*width;
 
 
-                        QString erid=imFCS->getEvaluationResultID(0);
+                        QString erid=imFCS->getEvaluationResultID(0, r);
                         QString en=imFCS->transformResultID(erid);
                         QVector<double> wxy=r->resultsGetAsDoubleList(en,  "fitparam_focus_width");
                         //if (r->resultsExists(en,  "fitparam_diff_coeff1"))  Dcalib=r->resultsGetAsDouble(en,  "fitparam_diff_coeff1");

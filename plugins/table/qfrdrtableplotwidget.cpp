@@ -38,6 +38,10 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
 
     updating=true;
     ui->setupUi(this);
+
+    //ui->formLayout_3->removeWidget(ui->widSaveCoordSettings);
+    //ui->tabWidget->setCornerWidget(ui->widSaveCoordSettings);
+
     functionRef->registerEditor(ui->edtFunction);
     ui->edtXMin->setCheckBounds(false, true);
     ui->edtXMax->setCheckBounds(true, false);
@@ -110,6 +114,8 @@ void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
             ui->edtYLabel->setText(g.ylabel);
             ui->chkLogX->setChecked(g.xlog);
             ui->chkLogY->setChecked(g.ylog);
+            ui->chkX0Axis->setChecked(g.x0axis);
+            ui->chkY0Axis->setChecked(g.y0axis);
             ui->chkGrid->setChecked(g.grid);
             ui->chkShowKey->setChecked(g.showKey);
             ui->edtXMin->setValue(g.xmin);
@@ -125,6 +131,27 @@ void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
             ui->chkKeepDataAspect->setChecked(g.keepDataAspectRatio);
             ui->edtAxisAspect->setValue(g.axisAspectRatio);
             ui->edtDataAspect->setValue(g.dataAspectRatio);
+
+            ui->spinXAxisDigits->setValue(g.xdigits);
+            ui->spinYAxisDigits->setValue(g.ydigits);
+            ui->spinXAxisMinTicks->setValue(g.xminTicks);
+            ui->spinXAxisMinorTicks->setValue(g.xminorTicks);
+            ui->spinYAxisMinTicks->setValue(g.yminTicks);
+            ui->spinYAxisMinorTicks->setValue(g.yminorTicks);
+            ui->cmbXLabelPosition->setPosition(g.xlabelPos);
+            ui->cmbYLabelPosition->setPosition(g.ylabelPos);
+            ui->cmbXLabel->setLabelType(g.xlabelType);
+            ui->cmbYLabel->setLabelType(g.ylabelType);
+            ui->cmbXMode1->setDrawMode(g.xlabelMode1);
+            ui->cmbXMode2->setDrawMode(g.xlabelMode2);
+            ui->cmbYMode1->setDrawMode(g.ylabelMode1);
+            ui->cmbYMode2->setDrawMode(g.ylabelMode2);
+            ui->cmbGridColor->setCurrentColor(g.gridColor);
+            ui->cmbBackgroundColor->setCurrentColor(g.backgroundColor);
+            ui->cmbGridLinestyle->setCurrentLineStyle(g.gridStyle);
+            ui->spinGridWidth->setValue(g.gridWidth);
+
+
             ui->listGraphs->clear();
             QList<QFRDRTable::GraphInfo> graphs=g.graphs;
             for (int i=0; i<g.graphs.size(); i++) {
@@ -534,6 +561,8 @@ void QFRDRTablePlotWidget::plotDataChanged() {
         emit plotTitleChanged(this->plot, p.title);
         p.xlog=ui->chkLogX->isChecked();
         p.ylog=ui->chkLogY->isChecked();
+        p.x0axis=ui->chkX0Axis->isChecked();
+        p.y0axis=ui->chkY0Axis->isChecked();
         p.grid=ui->chkGrid->isChecked();
         p.showKey=ui->chkShowKey->isChecked();
         p.xmin=ui->edtXMin->value();
@@ -552,6 +581,25 @@ void QFRDRTablePlotWidget::plotDataChanged() {
         p.axisAspectRatio=ui->edtAxisAspect->value();
         p.keepAxisAspectRatio=ui->chkKeepAxisAspect->isChecked();
         p.keepDataAspectRatio=ui->chkKeepDataAspect->isChecked();
+
+        p.xdigits=ui->spinXAxisDigits->value();
+        p.ydigits=ui->spinYAxisDigits->value();
+        p.xminTicks=ui->spinXAxisMinTicks->value();
+        p.xminorTicks=ui->spinXAxisMinorTicks->value();
+        p.yminTicks=ui->spinYAxisMinTicks->value();
+        p.yminorTicks=ui->spinYAxisMinorTicks->value();
+        p.xlabelPos=ui->cmbXLabelPosition->getPosition();
+        p.ylabelPos=ui->cmbYLabelPosition->getPosition();
+        p.xlabelType=ui->cmbXLabel->getLabelType();
+        p.ylabelType=ui->cmbYLabel->getLabelType();
+        p.xlabelMode1=ui->cmbXMode1->getDrawMode();
+        p.xlabelMode2=ui->cmbXMode2->getDrawMode();
+        p.ylabelMode1=ui->cmbYMode1->getDrawMode();
+        p.ylabelMode2=ui->cmbYMode2->getDrawMode();
+        p.gridColor=ui->cmbGridColor->currentColor();
+        p.backgroundColor=ui->cmbBackgroundColor->currentColor();
+        p.gridStyle=ui->cmbGridLinestyle->currentLineStyle();
+        p.gridWidth=ui->spinGridWidth->value();
 
         current->setPlot(this->plot, p);
         //QFRDRTable::GraphInfo graph=current->getPlot(this->plot).graphs.value(currentRow, QFRDRTable::GraphInfo());
@@ -572,10 +620,35 @@ void QFRDRTablePlotWidget::updateGraph() {
 
         ui->plotter->getXAxis()->set_axisLabel(p.xlabel);
         ui->plotter->getXAxis()->set_logAxis(p.xlog);
+        ui->plotter->getXAxis()->set_showZeroAxis(p.x0axis);
+        ui->plotter->getYAxis()->set_showZeroAxis(p.y0axis);
         ui->plotter->getXAxis()->set_labelFont(p.fontName);
         ui->plotter->getXAxis()->set_labelFontSize(p.axisLabelFontSize);
         ui->plotter->getXAxis()->set_tickLabelFont(p.fontName);
         ui->plotter->getXAxis()->set_tickLabelFontSize(p.axisFontSize);
+        ui->plotter->getXAxis()->set_gridWidth(p.gridWidth);
+        ui->plotter->getYAxis()->set_gridWidth(p.gridWidth);
+        ui->plotter->getXAxis()->set_gridStyle(p.gridStyle);
+        ui->plotter->getYAxis()->set_gridStyle(p.gridStyle);
+        ui->plotter->getXAxis()->set_gridColor(p.gridColor);
+        ui->plotter->getYAxis()->set_gridColor(p.gridColor);
+        ui->plotter->getXAxis()->set_labelDigits(p.xdigits);
+        ui->plotter->getYAxis()->set_labelDigits(p.ydigits);
+        ui->plotter->getXAxis()->set_minTicks(p.xminTicks);
+        ui->plotter->getYAxis()->set_minTicks(p.yminTicks);
+        ui->plotter->getXAxis()->set_minorTicks(p.xminorTicks);
+        ui->plotter->getYAxis()->set_minorTicks(p.yminorTicks);
+        ui->plotter->getXAxis()->set_labelPosition(p.xlabelPos);
+        ui->plotter->getYAxis()->set_labelPosition(p.ylabelPos);
+        ui->plotter->getXAxis()->set_labelType(p.xlabelType);
+        ui->plotter->getYAxis()->set_labelType(p.ylabelType);
+        ui->plotter->getXAxis()->set_drawMode1(p.xlabelMode1);
+        ui->plotter->getXAxis()->set_drawMode2(p.xlabelMode2);
+        ui->plotter->getYAxis()->set_drawMode1(p.ylabelMode1);
+        ui->plotter->getYAxis()->set_drawMode2(p.ylabelMode2);
+
+
+
         ui->plotter->getYAxis()->set_axisLabel(p.ylabel);
         ui->plotter->getYAxis()->set_logAxis(p.ylog);
         ui->plotter->getYAxis()->set_labelFont(p.fontName);
@@ -591,6 +664,7 @@ void QFRDRTablePlotWidget::updateGraph() {
         ui->plotter->get_plotter()->set_maintainAxisAspectRatio(p.keepAxisAspectRatio);
         ui->plotter->get_plotter()->set_aspectRatio(p.dataAspectRatio);
         ui->plotter->get_plotter()->set_axisAspectRatio(p.axisAspectRatio);
+        ui->plotter->get_plotter()->set_plotBackgroundColor(p.backgroundColor);
         QFont keyf(p.fontName);
         keyf.setPointSizeF(p.keyFontSize);
         QFontMetricsF keyfm(keyf);
@@ -898,7 +972,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 JKQTPColumnMathImage* pg=new JKQTPColumnMathImage(ui->plotter->get_plotter());
                 pg->set_title(g.title);
 
-                if (g.xcolumn>=0 && g.xcolumn<ui->plotter->getDatastore()->getColumnCount())  pg->set_imageColumn(g.xcolumn);
+                if (g.xcolumn>=0 && g.xcolumn<(long)ui->plotter->getDatastore()->getColumnCount())  pg->set_imageColumn(g.xcolumn);
                 pg->set_autoImageRange(g.imageAutoRange);
                 pg->set_imageMin(g.imageMin);
                 pg->set_imageMax(g.imageMax);
@@ -932,7 +1006,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 JKQTPColumnOverlayImageEnhanced* pg=new JKQTPColumnOverlayImageEnhanced(ui->plotter->get_plotter());
                 pg->set_title(g.title);
 
-                if (g.xcolumn>=0 && g.xcolumn<ui->plotter->getDatastore()->getColumnCount())  pg->set_imageColumn(g.xcolumn);
+                if (g.xcolumn>=0 && g.xcolumn<(long)ui->plotter->getDatastore()->getColumnCount())  pg->set_imageColumn(g.xcolumn);
                 pg->set_x(g.imageX);
                 pg->set_y(g.imageY);
                 pg->set_width(g.imageWidth);
@@ -952,7 +1026,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_title(g.title);
                 pg->set_function(g.function);
                 //qDebug()<<"adding function plot "<<g.function;
-                if (g.ycolumn>=0 && g.ycolumn<ui->plotter->getDatastore()->getColumnCount()) {
+                if (g.ycolumn>=0 && g.ycolumn<(long)ui->plotter->getDatastore()->getColumnCount()) {
                     pg->set_parameterColumn(g.ycolumn);
                 }
                 pg->set_drawLine(true);
@@ -1337,6 +1411,8 @@ void QFRDRTablePlotWidget::connectWidgets()
     connect(ui->chkGrid, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     connect(ui->chkLogX, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     connect(ui->chkLogY, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->chkX0Axis, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->chkY0Axis, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     connect(ui->chkShowKey, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     connect(ui->edtXMin, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     connect(ui->edtXMax, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
@@ -1354,6 +1430,27 @@ void QFRDRTablePlotWidget::connectWidgets()
     connect(ui->edtDataAspect, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     connect(ui->chkKeepAxisAspect, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     connect(ui->chkKeepDataAspect, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+
+    connect(ui->spinXAxisDigits, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->spinYAxisDigits, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->spinXAxisMinTicks, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->spinXAxisMinorTicks, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->spinYAxisMinTicks, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->spinYAxisMinorTicks, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbXLabelPosition, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbYLabelPosition, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbXLabel, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbYLabel, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbXMode1, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbXMode2, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbYMode1, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbYMode2, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+
+    connect(ui->cmbGridColor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbBackgroundColor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbGridLinestyle, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->spinGridWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+
 
     connect(ui->edtFunction, SIGNAL(editingFinished()), this, SLOT(graphDataChanged()));
     connect(ui->edtGraphTitle, SIGNAL(editingFinished()), this, SLOT(graphDataChanged()));
@@ -1408,6 +1505,8 @@ void QFRDRTablePlotWidget::disconnectWidgets()
     disconnect(ui->chkGrid, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     disconnect(ui->chkLogX, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     disconnect(ui->chkLogY, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->chkX0Axis, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->chkY0Axis, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     disconnect(ui->chkShowKey, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     disconnect(ui->edtXMin, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->edtXMax, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
@@ -1425,6 +1524,24 @@ void QFRDRTablePlotWidget::disconnectWidgets()
     disconnect(ui->edtDataAspect, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->chkKeepAxisAspect, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     disconnect(ui->chkKeepDataAspect, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinXAxisDigits, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinYAxisDigits, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinXAxisMinTicks, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinXAxisMinorTicks, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinYAxisMinTicks, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinYAxisMinorTicks, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbXLabelPosition, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbYLabelPosition, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbXLabel, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbYLabel, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbXMode1, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbXMode2, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbYMode1, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbYMode2, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbGridColor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbBackgroundColor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbGridLinestyle, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinGridWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
 
 
     disconnect(ui->edtFunction, SIGNAL(editingFinished()), this, SLOT(graphDataChanged()));
@@ -1473,7 +1590,7 @@ void QFRDRTablePlotWidget::disconnectWidgets()
 int QFRDRTablePlotWidget::getColumnWithStride(int column, const QFRDRTable::GraphInfo& g)
 {
     //qDebug()<<"getColumnWithStride  column="<<column<<"    strided: "<<g.isStrided<<" stride="<<g.stride<<" strideStart="<<g.strideStart;
-    if (column>=0 && column<ui->plotter->getDatastore()->getColumnCount()) {
+    if (column>=0 && column<(long)ui->plotter->getDatastore()->getColumnCount()) {
         if (g.isStrided) {
             return ui->plotter->getDatastore()->copyColumn(column, g.strideStart-1, g.stride, tr("(%2,%3)-strided \"%1\"").arg(ui->plotter->getDatastore()->getColumnNames().at(column)).arg(g.strideStart).arg(g.stride));
         } else {
@@ -1512,6 +1629,8 @@ void QFRDRTablePlotWidget::on_btnSaveSystem_clicked() {
             set.setValue("grid",ui->chkGrid->isChecked());
             set.setValue("logx",ui->chkLogX->isChecked());
             set.setValue("logy",ui->chkLogY->isChecked());
+            set.setValue("x0axis",ui->chkX0Axis->isChecked());
+            set.setValue("y0axis",ui->chkY0Axis->isChecked());
             set.setValue("showkey",ui->chkShowKey->isChecked());
             set.setValue("fontname", ui->cmbFontname->currentText());
             set.setValue("axisfontsize", ui->spinAxisFontSize->value());
@@ -1525,6 +1644,28 @@ void QFRDRTablePlotWidget::on_btnSaveSystem_clicked() {
             set.setValue("dataaspect", ui->edtDataAspect->value());
             set.setValue("keepaxisaspect", ui->chkKeepAxisAspect->isChecked());
             set.setValue("keepdataaspect", ui->chkKeepDataAspect->isChecked());
+
+
+
+
+            set.setValue("xdigits", ui->spinXAxisDigits->value());
+            set.setValue("ydigits", ui->spinYAxisDigits->value());
+            set.setValue("xminTicks", ui->spinXAxisMinTicks->value());
+            set.setValue("xminorTicks", ui->spinXAxisMinorTicks->value());
+            set.setValue("yminTicks", ui->spinYAxisMinTicks->value());
+            set.setValue("yminorTicks", ui->spinYAxisMinorTicks->value());
+            set.setValue("xlabelPos", JKQTPlabelPosition2String(ui->cmbXLabelPosition->getPosition()));
+            set.setValue("ylabelPos", JKQTPlabelPosition2String(ui->cmbYLabelPosition->getPosition()));
+            set.setValue("xlabelType", JKQTPCAlabelType2String(ui->cmbXLabel->getLabelType()));
+            set.setValue("ylabelType", JKQTPCAlabelType2String(ui->cmbYLabel->getLabelType()));
+            set.setValue("xlabelMode1", JKQTPCAdrawMode2String(ui->cmbXMode1->getDrawMode()));
+            set.setValue("xlabelMode2", JKQTPCAdrawMode2String(ui->cmbXMode2->getDrawMode()));
+            set.setValue("ylabelMode1", JKQTPCAdrawMode2String(ui->cmbYMode1->getDrawMode()));
+            set.setValue("ylabelMode2", JKQTPCAdrawMode2String(ui->cmbYMode2->getDrawMode()));
+            set.setValue("backgroundColor", QColor2String(ui->cmbBackgroundColor->currentColor()));
+            set.setValue("gridColor", QColor2String(ui->cmbGridColor->currentColor()));
+            set.setValue("gridStyle", QPenStyle2String(ui->cmbGridLinestyle->currentLineStyle()));
+            set.setValue("gridWidth", ui->spinGridWidth->value());
         }
     }
     ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRTablePlotWidget/lasttemplatedir", dir);
@@ -1624,6 +1765,8 @@ void QFRDRTablePlotWidget::on_btnLoadSystem_clicked() {
         ui->chkGrid->setChecked(set.value("grid",ui->chkGrid->isChecked()).toBool());
         ui->chkLogX->setChecked(set.value("logx",ui->chkLogX->isChecked()).toBool());
         ui->chkLogY->setChecked(set.value("logy",ui->chkLogY->isChecked()).toBool());
+        ui->chkX0Axis->setChecked(set.value("x0axis",ui->chkX0Axis->isChecked()).toBool());
+        ui->chkY0Axis->setChecked(set.value("y0axis",ui->chkY0Axis->isChecked()).toBool());
         ui->chkShowKey->setChecked(set.value("showkey",ui->chkShowKey->isChecked()).toBool());
         ui->cmbFontname->setCurrentFont(QFont(set.value("fontname", ui->cmbFontname->currentFont().family()).toString()));
         ui->spinAxisFontSize->setValue(set.value("axisfontsize", ui->spinAxisFontSize->value()).toDouble());
@@ -1637,7 +1780,25 @@ void QFRDRTablePlotWidget::on_btnLoadSystem_clicked() {
         ui->edtDataAspect->setValue(set.value("dataaspect", ui->edtDataAspect->value()).toDouble());
         ui->chkKeepAxisAspect->setChecked(set.value("keepaxisaspect", ui->chkKeepAxisAspect->isChecked()).toBool());
         ui->chkKeepDataAspect->setChecked(set.value("keepdataaspect", ui->chkKeepDataAspect->isChecked()).toBool());
-
+        ui->spinXAxisDigits->setValue(set.value("xdigits", ui->spinXAxisDigits->value()).toInt());
+        ui->spinYAxisDigits->setValue(set.value("ydigits", ui->spinYAxisDigits->value()).toInt());
+        ui->spinXAxisMinTicks->setValue(set.value("xminTicks", ui->spinXAxisMinTicks->value()).toInt());
+        ui->spinXAxisMinorTicks->setValue(set.value("xminorTicks", ui->spinXAxisMinorTicks->value()).toInt());
+        ui->spinYAxisMinTicks->setValue(set.value("yminTicks", ui->spinYAxisMinTicks->value()).toInt());
+        ui->spinYAxisMinorTicks->setValue(set.value("yminorTicks", ui->spinYAxisMinorTicks->value()).toInt());
+        ui->cmbXLabelPosition->setPosition(String2JKQTPlabelPosition(set.value("xlabelPos", JKQTPlabelPosition2String(ui->cmbXLabelPosition->getPosition())).toString()));
+        ui->cmbYLabelPosition->setPosition(String2JKQTPlabelPosition(set.value("ylabelPos", JKQTPlabelPosition2String(ui->cmbYLabelPosition->getPosition())).toString()));
+        ui->cmbXLabel->setLabelType(String2JKQTPCAlabelType(set.value("xlabelType", JKQTPCAlabelType2String(ui->cmbXLabel->getLabelType())).toString()));
+        ui->cmbYLabel->setLabelType(String2JKQTPCAlabelType(set.value("ylabelType", JKQTPCAlabelType2String(ui->cmbYLabel->getLabelType())).toString()));
+        ui->cmbXMode1->setDrawMode(String2JKQTPCAdrawMode(set.value("xlabelMode1", JKQTPCAdrawMode2String(ui->cmbXMode1->getDrawMode())).toString()));
+        ui->cmbXMode2->setDrawMode(String2JKQTPCAdrawMode(set.value("xlabelMode2", JKQTPCAdrawMode2String(ui->cmbXMode2->getDrawMode())).toString()));
+        ui->cmbYMode1->setDrawMode(String2JKQTPCAdrawMode(set.value("ylabelMode1", JKQTPCAdrawMode2String(ui->cmbYMode1->getDrawMode())).toString()));
+        ui->cmbYMode2->setDrawMode(String2JKQTPCAdrawMode(set.value("ylabelMode2", JKQTPCAdrawMode2String(ui->cmbYMode2->getDrawMode())).toString()));
+        ui->cmbGridColor->setCurrentColor(QColor(set.value("gridColor", QColor2String(ui->cmbGridColor->currentColor())).toString()));
+        ui->cmbBackgroundColor->setCurrentColor(QColor(set.value("backgroundColor", QColor2String(ui->cmbBackgroundColor->currentColor())).toString()));
+        ui->cmbGridLinestyle->setCurrentLineStyle(String2QPenStyle(set.value("gridStyle", QPenStyle2String(ui->cmbGridLinestyle->currentLineStyle())).toString()));
+        ui->spinGridWidth->setValue(set.value("gridWidth", ui->spinGridWidth->value()).toDouble());
     }
     ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRTablePlotWidget/lasttemplatedir", dir);
 }
+

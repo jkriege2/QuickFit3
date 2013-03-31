@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>936</width>
-    <height>587</height>
+    <height>625</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -164,7 +164,7 @@
         <enum>Qt::Vertical</enum>
        </property>
        <widget class="QWidget" name="verticalLayoutWidget">
-        <layout class="QVBoxLayout" name="verticalLayout_4">
+        <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,1">
          <item>
           <widget class="QLabel" name="labPosition">
            <property name="text">
@@ -184,13 +184,29 @@
          </item>
         </layout>
        </widget>
-       <widget class="QFPlotter" name="pltResiduals" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>100</height>
-         </size>
-        </property>
+       <widget class="QWidget" name="verticalLayoutWidget_2">
+        <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,0">
+         <item>
+          <widget class="QFPlotter" name="pltResiduals" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>30</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="DataCutSliders" name="datacut" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>10</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
       <widget class="QFRDRImageToRunPreview" name="pltOverview" native="true">
@@ -318,15 +334,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QVisibleHandleSplitter</class>
-   <extends>QSplitter</extends>
-   <header>qvisiblehandlesplitter.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QFRDRImageToRunPreview</class>
    <extends>QWidget</extends>
    <header>qfrdrimagetorunpreview.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QVisibleHandleSplitter</class>
+   <extends>QSplitter</extends>
+   <header>qvisiblehandlesplitter.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -348,6 +364,12 @@
    <class>JKQTPerrorPlotstyleComboBox</class>
    <extends>QComboBox</extends>
    <header>jkqtptools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DataCutSliders</class>
+   <extends>QWidget</extends>
+   <header>datacutslider.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

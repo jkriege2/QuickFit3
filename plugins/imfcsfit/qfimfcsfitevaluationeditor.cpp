@@ -590,7 +590,7 @@ void QFImFCSFitEvaluationEditor::updateFitFunctions() {
                 // update display of fit results
                 /////////////////////////////////////////////////////////////////////////////////
                 QString txtFit="<font face=\"Arial\">";
-                QString fitResult=record->resultsGetAsString(eval->getEvaluationResultID(), "fitalg_messageHTML", eval->getCurrentIndex(), true);
+                QString fitResult=record->resultsGetAsString(eval->getEvaluationResultID(record), "fitalg_messageHTML", eval->getCurrentIndex(), true);
 
                 if (!fitResult.isEmpty()) {
                     txtFit+=txtFit+tr("<div style=\"border-style:solid\"><b>Fit Result Message:</b><center>%1</center></div><br>").arg(fitResult);
@@ -1042,8 +1042,8 @@ void QFImFCSFitEvaluationEditor::setFitParameterFromFile()
                 QString param=dlg->getParameter();
                 //qDebug()<<ok<<param<<avg<<d.size()-1<<data->getIndexMax(current->getHighlightedRecord())<<d.value(0,0);
                 if (ok && d.size()-1==data->getIndexMax(current->getHighlightedRecord())) {
-                    data->setFitResultValue(data->getHighlightedRecord(),data->getEvaluationResultID(0), param, d);
-                    data->setFitResultValue(data->getHighlightedRecord(),data->getEvaluationResultID(-1), param, avg);
+                    data->setFitResultValue(data->getHighlightedRecord(),data->getEvaluationResultID(0, data->getHighlightedRecord()), param, d);
+                    data->setFitResultValue(data->getHighlightedRecord(),data->getEvaluationResultID(-1, data->getHighlightedRecord()), param, avg);
                 }
             }
             delete dlg;

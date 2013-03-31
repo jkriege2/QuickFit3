@@ -367,7 +367,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 // update display of fit results
                 /////////////////////////////////////////////////////////////////////////////////
                 QString txtFit="<font face=\"Arial\">";
-                QString fitResult=record->resultsGetAsString(eval->getEvaluationResultID(), "fitalg_messageHTML");
+                QString fitResult=record->resultsGetAsString(eval->getEvaluationResultID(record), "fitalg_messageHTML");
 
                 if (!fitResult.isEmpty()) {
                     txtFit+=txtFit+tr("<div style=\"border-style:solid\"><b>Fit Result Message:</b><center>%1</center></div><br>").arg(fitResult);

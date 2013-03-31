@@ -542,7 +542,7 @@ QFFitStatistics QFImFCSFitEvaluation::calcFitStatistics(bool storeAsResults, QFF
     if (record) {
         if (storeAsResults) {
             QString param="";
-            QString eid= getEvaluationResultID(run);
+            QString eid= getEvaluationResultID(run, record);
             setFitResultValue(record, run, param="fitstat_chisquared", result.residSqrSum);
             setFitResultGroup(record, run, param, tr("fit statistics"));
             setFitResultLabel(record, run, param, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"));

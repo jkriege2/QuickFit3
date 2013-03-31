@@ -128,6 +128,10 @@ class QFFitResultsEvaluationEditorBase : public QFEvaluationEditor {
     public slots:
 
         /** \brief save current fit function and fit results to an INI file (see \Ref QFFitResultsEvaluationEditorBase_FitResultIniFiles for details on the format) */
+        virtual void saveCurrentFitResults(QFRawDataRecord* rec);
+        /** \brief set current fit function and fit results according to an INI file (see \Ref QFFitResultsEvaluationEditorBase_FitResultIniFiles for details on the format) */
+        virtual void loadCurrentFitResults(QFRawDataRecord* rec);
+        /** \brief save current fit function and fit results to an INI file (see \Ref QFFitResultsEvaluationEditorBase_FitResultIniFiles for details on the format) */
         virtual void saveCurrentFitResults();
         /** \brief set current fit function and fit results according to an INI file (see \Ref QFFitResultsEvaluationEditorBase_FitResultIniFiles for details on the format) */
         virtual void loadCurrentFitResults();
@@ -170,9 +174,9 @@ class QFFitResultsEvaluationEditorBase : public QFEvaluationEditor {
         /** \brief reset all files */
         virtual void resetAll();
         /** \brief copy to all files, all runs */
-        virtual void copyToAll();
+        virtual void copyToAll(QFRawDataRecord* rec);
         /** \brief copy to initial values */
-        virtual void copyToInitial(bool emitSignals=true);
+        virtual void copyToInitial(bool emitSignals=true, QFRawDataRecord* rec=NULL);
 
 
     protected:

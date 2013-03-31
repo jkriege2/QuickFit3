@@ -186,6 +186,8 @@ void QFRDRTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
         case QVariant::Time: id="t"; break;
         case QVariant::UInt: id="u"; break;
         case QVariant::ULongLong: id="u"; break;
+        default:
+            id="?";
     }
 
     QColor c("white");

@@ -1182,7 +1182,7 @@ bool QFRDRFCSData::reloadFromFiles() {
         if (!(getProperty("SEARCHED_MORE_FILES", false).toBool()) && cfiles.size()>0) {
             QRegExp rxFCS("(.*)\\_(fcs.+)corr\\.dat");
             rxFCS.setMinimal(true);
-            qDebug()<<"matching "<<cfiles[0]<<" against "<<rxFCS.pattern();
+            //qDebug()<<"matching "<<cfiles[0]<<" against "<<rxFCS.pattern();
             if (rxFCS.exactMatch(cfiles[0])) {
                 QString objectname=rxFCS.cap(2);
                 QString basename=rxFCS.cap(1)+"_"+objectname;

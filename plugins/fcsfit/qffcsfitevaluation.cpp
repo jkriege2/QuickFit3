@@ -254,7 +254,7 @@ int QFFCSFitEvaluation::getIndexMax(QFRawDataRecord* r) const {
 
 void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFFitAlgorithmReporter* dlgFitProgress, bool doLog) {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
-    QFFitFunction* ffunc=getFitFunction();
+    QFFitFunction* ffunc=getFitFunction(record);
     QFFitAlgorithm* falg=getFitAlgorithm();
     if ((!ffunc)||(!data)||(!falg)) return;
 

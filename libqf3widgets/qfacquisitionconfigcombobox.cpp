@@ -103,9 +103,9 @@ void QFAcquisitionConfigComboBox::deviceChanged(QFExtension* extension, QFExtens
     }
 
     model()->sort(0);
-    for (int i=0; i<count(); i++) {
+    /*for (int i=0; i<count(); i++) {
         qDebug()<<itemText(i)<<itemData(i);
-    }
+    }*/
     // FINALLY: make sure the combo boxes have their values set.
     int configidx=findText(ac);
     if (configidx<0) configidx=0;

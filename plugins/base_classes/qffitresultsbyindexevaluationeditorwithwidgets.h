@@ -65,7 +65,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /** \brief write the settings */
         virtual void writeSettings();
         /** \brief used to reread all parameter widget values from the datastore */
-        virtual void updateParameterValues();
+        virtual void updateParameterValues(QFRawDataRecord* rec);
 
         /** \brief return the datacutslider absolute maximum */
         virtual int getUserRangeMax(QFRawDataRecord* rec, int index)=0;

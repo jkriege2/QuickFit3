@@ -44,8 +44,12 @@ class QFImFCCSParameterInputTable : public QAbstractTableModel
         int getColsPerRDR() const;
     signals:
         void modelRebuilt();
+        void fitParamChanged();
+        void fitParamFixChanged();
+        void fitParamErrorChanged();
     public slots:
         void rebuildModel();
+        bool recalculateFitParameters(bool emitFitParamSignals=true, bool emit dataChangedSignals=true);
     public:
         bool checkRebuildModel(bool alwaysreset=false);
     protected:

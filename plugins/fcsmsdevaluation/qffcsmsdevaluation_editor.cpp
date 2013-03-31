@@ -1908,7 +1908,7 @@ void QFFCSMSDEvaluationEditor::fitMSD()
             break;
         }
     }
-    qDebug()<<"fitMSD: "<<btnID<<act;
+    //qDebug()<<"fitMSD: "<<btnID<<act;
     if (btnID<0) return;
 
     QFFCSMSDEvaluationFitMSDDialog* dlg=new QFFCSMSDEvaluationFitMSDDialog(data, btnID, this);

@@ -199,10 +199,11 @@ void CamAndorAcquisitionThread::run() {
                     GetTemperatureF(&temperature);
                     ttimer.start();
                 }
-                timedout= false; //(lastWritten.elapsed()>lastWrittenTimeout) && ((m_numKinetics-imageCount)<maxMissingFrames);
+                timedout= (lastWritten.elapsed()>lastWrittenTimeout) && ((m_numKinetics-imageCount)<maxMissingFrames); //false
             }
 
             if (timedout) {
+                CHECK_NO_RETURN_OK(ok, AbortAcquisition(), tr("error while aborting acquisition"));
                 QString msg=tr("\n%1: tinyTIFF acquisition timed out ... acquired %2 of %3 frames with %4s timeout").arg(m_log_prefix).arg(imageCount).arg(m_numKinetics).arg(double(lastWrittenTimeout)/1000.0);
                 qDebug()<<msg;
                 emit log_warning(msg);

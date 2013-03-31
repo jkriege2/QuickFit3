@@ -163,12 +163,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             /*bool showKeyBorder;
             double keyBorderWidth;
             QColor keyBorderColor;
-            QColor keyBackgroundColor;
-            QColor backgroundColor;
-            QColor gridColor;
-            Qt::PenStyle gridStyle;
-            double gridWidth;*/
-
+            QColor keyBackgroundColor;*/
             QColor axisColor;
             double axisWidth;
             QString fontName;
@@ -180,6 +175,29 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             JKQTPkeyPosition keyPosition;
             JKQTPkeyLayout keyLayout;
             QList<GraphInfo> graphs;
+
+
+
+            QColor backgroundColor;
+            QColor gridColor;
+            Qt::PenStyle gridStyle;
+            double gridWidth;
+            JKQTPlabelPosition xlabelPos;
+            JKQTPCAlabelType xlabelType;
+            JKQTPCAdrawMode xlabelMode1;
+            JKQTPCAdrawMode xlabelMode2;
+            int xdigits;
+            int xminTicks;
+            int xminorTicks;
+            JKQTPlabelPosition ylabelPos;
+            JKQTPCAlabelType ylabelType;
+            JKQTPCAdrawMode ylabelMode1;
+            JKQTPCAdrawMode ylabelMode2;
+            int ydigits;
+            int yminTicks;
+            int yminorTicks;
+            bool x0axis;
+            bool y0axis;
         };
 
 

@@ -2527,7 +2527,7 @@ QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThrea
     i.dualViewID=dualViewID;
     i.internalDualViewMode=job.dualViewMode;
     i.filetype=QFRDRImagingFCSCorrelationJobThread::ftNandB;
-    qDebug()<<"getFileInfoNandB:"<<filename<<filenameVar<<filenameBack<<filenameBackVar;
+    //qDebug()<<"getFileInfoNandB:"<<filename<<filenameVar<<filenameBack<<filenameBackVar;
     return i;
 }
 

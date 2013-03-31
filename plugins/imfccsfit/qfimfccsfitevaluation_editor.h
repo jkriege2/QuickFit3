@@ -26,7 +26,29 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         QFImFCCSFitEvaluationEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent=NULL);
         /** Default destructor */
         virtual ~QFImFCCSFitEvaluationEditor();
+
+
+        /** \brief get the lower datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int,int) with a viable choice for \a defaultMin */
+        virtual int getUserMin(int index);
+        /** \brief get the upper datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int,int) with a viable choice for \a defaultMax */
+        virtual int getUserMax(int index);
+        /** \brief get the lower datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int,int) with a viable choice for \a defaultMin */
+        virtual int getUserMin(QFRawDataRecord* rec, int index);
+        /** \brief get the upper datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int,int) with a viable choice for \a defaultMax */
+        virtual int getUserMax(QFRawDataRecord* rec, int index);
+        virtual int getUserRangeMax(QFRawDataRecord *rec, int index);
+        virtual int getUserRangeMin(QFRawDataRecord *rec, int index);
+        /** \brief get the lower datacut for the current record, the \a defaultMin should be read from editors current data cut widget */
+        virtual int getUserMin(QFRawDataRecord* rec, int index, int defaultMin);
+        /** \brief get the upper datacut for the current record, the \a defaultMax should be read from editors current data cut widget */
+        virtual int getUserMax(QFRawDataRecord* rec, int index, int defaultMax);
+        /** \brief set the upper and lower datacut for the current record */
+        virtual void setUserMinMax(int userMin, int userMax);
+
     protected slots:
+        /** \brief executed when the sliders values change */
+        void slidersChanged(int userMin, int userMax, int min, int max);
+
         void zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender);
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old);
@@ -76,8 +98,6 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void createReportDoc(QTextDocument* document);
 
     protected slots:
-        /** \brief activated when the highlighted record changed */
-        void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
 
         /** ßbrief ensures that the parameter table model is displayed properly */
         void ensureCorrectParamaterModelDisplay();

@@ -114,13 +114,13 @@ void QFPlotterPrivate::copyToTable()
 
                             if (yeg) {
                                 cols->colgraphAddErrorPlot(graph, xcol, -1,  ycol, columns.value(yeg->get_yErrorColumn(), -1), type, name);
-                                qDebug()<<"addyerrorg "<<yeg->get_yErrorColumn()<<columns.value(yeg->get_yErrorColumn(), -1);
+                                //qDebug()<<"addyerrorg "<<yeg->get_yErrorColumn()<<columns.value(yeg->get_yErrorColumn(), -1);
                             } else if (xeg) {
                                 cols->colgraphAddErrorPlot(graph, xcol, columns.value(xeg->get_xErrorColumn(), -1),  ycol, -1, type, name);
-                                qDebug()<<"addxerrorg "<<xeg->get_xErrorColumn()<<columns.value(xeg->get_xErrorColumn(), -1);
+                                //qDebug()<<"addxerrorg "<<xeg->get_xErrorColumn()<<columns.value(xeg->get_xErrorColumn(), -1);
                             } else if (xyeg) {
                                 cols->colgraphAddErrorPlot(graph, xcol, columns.value(xyeg->get_xErrorColumn(), -1),  ycol, columns.value(xyeg->get_yErrorColumn(), -1), type, name);
-                                qDebug()<<"addxyerrorg "<<xyeg->get_xErrorColumn()<<columns.value(xyeg->get_xErrorColumn(), -1)<<xyeg->get_yErrorColumn()<<columns.value(xyeg->get_yErrorColumn(), -1);
+                                //qDebug()<<"addxyerrorg "<<xyeg->get_xErrorColumn()<<columns.value(xyeg->get_xErrorColumn(), -1)<<xyeg->get_yErrorColumn()<<columns.value(xyeg->get_yErrorColumn(), -1);
                             } else {
                                 cols->colgraphAddPlot(graph, xcol, ycol, type, name);
                             }

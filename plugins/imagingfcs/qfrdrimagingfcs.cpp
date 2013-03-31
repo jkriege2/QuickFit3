@@ -575,7 +575,7 @@ void QFRDRImagingFCSPlugin::insertNandBFromVideoCorrelatorFile(const QString& ev
     initParams["INTERNAL_DUALVIEW_MODE_CHANNEL"]=dualViewID;
 
 
-    qDebug()<<"insertN&B: evalFilename="<<evalFilename;
+    //qDebug()<<"insertN&B: evalFilename="<<evalFilename;
     if (QFile::exists(evalFilename)) {
         int width=0;
         int height=0;
@@ -584,7 +584,7 @@ void QFRDRImagingFCSPlugin::insertNandBFromVideoCorrelatorFile(const QString& ev
         if (!readEvalSettings(evalFilename, false, initParams, paramsReadonly, width, height, more_files, more_files_types, more_files_descriptions, description, filename_settings, filename_acquisition, filename_overview, filename_overviewstd, filename_background, filename_backgroundstddev, role, -1)) {
             ok=false;
         }
-        qDebug()<<"insertN&B: evalFilename="<<evalFilename<<"   ok="<<ok;
+        //qDebug()<<"insertN&B: evalFilename="<<evalFilename<<"   ok="<<ok;
 
         if (ok) {
             QStringList files, files_types, files_descriptions;
@@ -756,7 +756,7 @@ bool QFRDRImagingFCSPlugin::readEvalSettings(const QString &evalFilename, bool i
     QFile file(evalFilename);
     bool overviewReal=false;
     QDir d=QFileInfo(evalFilename).absoluteDir();
-    qDebug()<<"readEvalSettings: "<<evalFilename;
+    //qDebug()<<"readEvalSettings: "<<evalFilename;
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream stream(&file);
         QString line;
@@ -1080,6 +1080,15 @@ bool QFRDRImagingFCSPlugin::readEvalSettings(const QString &evalFilename, bool i
 
         initParams["IS_OVERVIEW_SCALED"]=!overviewReal;
         paramsReadonly<<"IS_OVERVIEW_SCALED";
+    }
+
+    // if this is an FCCS record, we don't want the DCCS_DELTAX/Y properties, as this the whift by half an image represents NO shift between the foci!
+    if (role.toUpper().startsWith("FCCS")) {
+        initParams["FCCS_CORRELATIONCHIFTX"]=initParams.value("DCCF_DELTAX", 0);
+        initParams["FCCS_CORRELATIONCHIFTY"]=initParams.value("DCCF_DELTAY", 0);
+        paramsReadonly<<"FCCS_CORRELATIONCHIFTX"<<"FCCS_CORRELATIONCHIFTY";
+        initParams.remove("DCCF_DELTAX");
+        initParams.remove("DCCF_DELTAY");
     }
     return ok;
 }

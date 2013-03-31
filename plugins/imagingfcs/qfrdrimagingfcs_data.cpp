@@ -1178,10 +1178,12 @@ bool QFRDRImagingFCSData::leaveoutRun(int run) const {
 }
 
 double* QFRDRImagingFCSData::getCorrelationRun(int run) const {
+    if (run<=0) return getCorrelationMean();
     return &(correlations[run*N]);
 }
 
 double* QFRDRImagingFCSData::getCorrelationRunError(int run) const {
+    if (run<=0) return getCorrelationStdDev();
     return &(sigmas[run*N]);
 }
 
@@ -1200,6 +1202,7 @@ double* QFRDRImagingFCSData::getCorrelationStdDev() const {
 }
 
 bool QFRDRImagingFCSData::isCorrelationRunVisible(int run) const {
+    if (run<0) return false;
     return !leaveoutRun(run);
 }
 

@@ -105,16 +105,16 @@ public:
     virtual QString getFitFunctionID() const;
 
     /** \brief get the current fitting function */
-    virtual QFFitFunction* getFitFunction(QFRawDataRecord* rdr) const;
+    virtual QFFitFunction* getFitFunction(QFRawDataRecord *rdr) const;
 
     /** \brief get the current fitting function ID */
-    virtual QString getFitFunctionID(QFRawDataRecord* rdr) const;
+    virtual QString getFitFunctionID( QFRawDataRecord* rdr) const;
 
     /** \brief create a new instance of the current fit algorithm ... the user has to destroy the instance */
     virtual QFFitAlgorithm* createFitAlgorithm(QObject *parent=NULL) const;
 
     /** \brief create a new instance of the current fit function ... the user has to destroy the instance */
-    virtual QFFitFunction* createFitFunction(QObject *parent=NULL) const;
+    virtual QFFitFunction* createFitFunction(QFRawDataRecord *rdr , QObject *parent=NULL)const;
 
 
 
@@ -712,7 +712,7 @@ public:
 
 
     /*! \brief return a resultID for storage of fit results in a QFRawDataRecord results store. The ID is valid for the currently highlighted record and all current settings */
-    virtual QString getEvaluationResultID() const=0;
+    virtual QString getEvaluationResultID(QFRawDataRecord *r) const=0;
     /*! \brief reset the given parameter value (\a id) in the given raw data record \a r for the \a resultID to its default/initial value */
     virtual void resetDefaultFitValue(QFRawDataRecord *r, const QString &resultID, const QString &id);
     /*! \brief reset the given parameter fix (\a id) in the given raw data record \a r for the \a resultID to its default/initial value */

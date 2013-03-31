@@ -6,21 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>841</width>
-    <height>730</height>
+    <width>1171</width>
+    <height>913</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_5">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QVisibleHandleSplitter" name="splitter">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="childrenCollapsible">
-      <bool>false</bool>
      </property>
      <widget class="QWidget" name="verticalLayoutWidget">
       <layout class="QVBoxLayout" name="layPlot">
@@ -50,7 +47,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabPlots">
        <attribute name="title">
@@ -1561,7 +1558,51 @@
         <string>Coordinate &amp;System</string>
        </attribute>
        <layout class="QFormLayout" name="formLayout_3">
-        <item row="3" column="0">
+        <item row="0" column="1">
+         <widget class="QWidget" name="widSaveCoordSettings" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout_14">
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnLoadSystem">
+             <property name="text">
+              <string>load the system settings from a template</string>
+             </property>
+             <property name="icon">
+              <iconset resource="qfrdrtable.qrc">
+               <normaloff>:/table/fileopen.png</normaloff>:/table/fileopen.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnSaveSystem">
+             <property name="text">
+              <string>save the system settings as a template</string>
+             </property>
+             <property name="icon">
+              <iconset resource="qfrdrtable.qrc">
+               <normaloff>:/table/filesave.png</normaloff>:/table/filesave.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="0">
          <widget class="QLabel" name="label_9">
           <property name="text">
            <string>&amp;title:</string>
@@ -1571,8 +1612,48 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
+        <item row="1" column="1">
          <widget class="QLineEdit" name="edtTitle">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QCheckBox" name="chkKeepAxisAspect">
+          <property name="text">
+           <string>keep axis aspect ratio</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QFDoubleEdit" name="edtDataAspect">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QCheckBox" name="chkKeepDataAspect">
+          <property name="text">
+           <string>keep data aspect ratio</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QFDoubleEdit" name="edtAxisAspect">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -1592,47 +1673,48 @@
          </widget>
         </item>
         <item row="4" column="1">
-         <widget class="QLineEdit" name="edtXLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLineEdit" name="edtXLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_26">
+            <property name="text">
+             <string>position:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="JKQTPlabelPositionComboBox" name="cmbXLabelPosition"/>
+          </item>
+         </layout>
         </item>
         <item row="5" column="0">
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>Y axis label:</string>
-          </property>
-          <property name="buddy">
-           <cstring>edtYLabel</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QLineEdit" name="edtYLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0">
          <widget class="QLabel" name="label_10">
           <property name="text">
-           <string>x axis range:</string>
+           <string>X axis range:</string>
           </property>
           <property name="buddy">
            <cstring>edtXMin</cstring>
           </property>
          </widget>
         </item>
-        <item row="6" column="1">
+        <item row="5" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QCheckBox" name="chkLogX">
+            <property name="text">
+             <string>x log-scale</string>
+            </property>
+           </widget>
+          </item>
           <item>
            <widget class="QFDoubleEdit" name="edtXMin">
             <property name="sizePolicy">
@@ -1669,18 +1751,120 @@
           </item>
          </layout>
         </item>
+        <item row="6" column="0">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>X axis ticks:</string>
+          </property>
+          <property name="buddy">
+           <cstring>cmbXMode1</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <layout class="QGridLayout" name="gridLayout_5" columnstretch="1,1,0,0,0" columnminimumwidth="0,0,0,0,0">
+          <item row="0" column="0">
+           <widget class="JKQTPCAdrawModeComboBox" name="cmbXMode1"/>
+          </item>
+          <item row="0" column="2">
+           <widget class="JKQTPCAlabelTypeComboBox" name="cmbXLabel"/>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>digits:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <widget class="QSpinBox" name="spinXAxisDigits">
+            <property name="value">
+             <number>3</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>min. #ticks / #minor ticks:</string>
+            </property>
+            <property name="buddy">
+             <cstring>spinXAxisMinTicks</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3" colspan="2">
+           <widget class="QCheckBox" name="chkX0Axis">
+            <property name="text">
+             <string>0-axis</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="JKQTPCAdrawModeComboBox" name="cmbXMode2"/>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="spinXAxisMinTicks">
+            <property name="value">
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QSpinBox" name="spinXAxisMinorTicks">
+            <property name="value">
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
         <item row="7" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Y axis label:</string>
+          </property>
+          <property name="buddy">
+           <cstring>edtYLabel</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_17" stretch="1,0">
+          <item>
+           <widget class="QLineEdit" name="edtYLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="JKQTPlabelPositionComboBox" name="cmbYLabelPosition"/>
+          </item>
+         </layout>
+        </item>
+        <item row="8" column="0">
          <widget class="QLabel" name="label_11">
           <property name="text">
-           <string>y axis range:</string>
+           <string>Y axis range:</string>
           </property>
           <property name="buddy">
            <cstring>edtYMin</cstring>
           </property>
          </widget>
         </item>
-        <item row="7" column="1">
+        <item row="8" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QCheckBox" name="chkLogY">
+            <property name="text">
+             <string>y log-scale</string>
+            </property>
+           </widget>
+          </item>
           <item>
            <widget class="QFDoubleEdit" name="edtYMin">
             <property name="sizePolicy">
@@ -1709,6 +1893,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="label_29">
+            <property name="text">
+             <string>position:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="btnAutoscaleY">
             <property name="text">
              <string>autoscale</string>
@@ -1717,88 +1908,72 @@
           </item>
          </layout>
         </item>
-        <item row="8" column="0">
-         <widget class="QLabel" name="label_12">
+        <item row="9" column="0">
+         <widget class="QLabel" name="label_22">
           <property name="text">
-           <string>axis scaling:</string>
+           <string>X axis ticks:</string>
           </property>
           <property name="buddy">
-           <cstring>chkLogX</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <widget class="QCheckBox" name="chkLogX">
-            <property name="text">
-             <string>x: log-scale</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="chkLogY">
-            <property name="text">
-             <string>y: log-scale</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item row="9" column="0">
-         <widget class="QCheckBox" name="chkKeepAxisAspect">
-          <property name="text">
-           <string>keep axis aspect ratio</string>
+           <cstring>cmbYMode1</cstring>
           </property>
          </widget>
         </item>
         <item row="9" column="1">
-         <widget class="QFDoubleEdit" name="edtAxisAspect">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
+         <layout class="QGridLayout" name="gridLayout_6" columnstretch="1,1,0,0,0" columnminimumwidth="0,0,0,0,0">
+          <item row="0" column="0">
+           <widget class="JKQTPCAdrawModeComboBox" name="cmbYMode1"/>
+          </item>
+          <item row="0" column="2">
+           <widget class="JKQTPCAlabelTypeComboBox" name="cmbYLabel"/>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>digits:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <widget class="QSpinBox" name="spinYAxisDigits">
+            <property name="value">
+             <number>3</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>min. #ticks / #minor ticks:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3" colspan="2">
+           <widget class="QCheckBox" name="chkY0Axis">
+            <property name="text">
+             <string>0-axis</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="JKQTPCAdrawModeComboBox" name="cmbYMode2"/>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="spinYAxisMinTicks">
+            <property name="value">
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QSpinBox" name="spinYAxisMinorTicks">
+            <property name="value">
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item row="10" column="0">
-         <widget class="QCheckBox" name="chkKeepDataAspect">
-          <property name="text">
-           <string>keep data aspect ratio</string>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="1">
-         <widget class="QFDoubleEdit" name="edtDataAspect">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="0">
          <widget class="QLabel" name="label_16">
           <property name="text">
            <string>grid:</string>
@@ -1808,10 +1983,71 @@
           </property>
          </widget>
         </item>
-        <item row="11" column="1">
-         <widget class="QCheckBox" name="chkGrid">
+        <item row="10" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_18" stretch="0,1,1,0,0">
+          <item>
+           <widget class="QCheckBox" name="chkGrid">
+            <property name="text">
+             <string>show grid</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="ColorComboBox" name="cmbGridColor">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="LineStyleComboBox" name="cmbGridLinestyle">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_24">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="text">
+             <string>width:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="spinGridWidth">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="value">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="11" column="0">
+         <widget class="QLabel" name="label_25">
           <property name="text">
-           <string>show grid</string>
+           <string>background:</string>
+          </property>
+          <property name="buddy">
+           <cstring>cmbBackgroundColor</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="1">
+         <widget class="ColorComboBox" name="cmbBackgroundColor">
+          <property name="enabled">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -1827,9 +2063,6 @@
         </item>
         <item row="12" column="1">
          <layout class="QFormLayout" name="formLayout_2">
-          <property name="fieldGrowthPolicy">
-           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-          </property>
           <item row="0" column="0">
            <widget class="QLabel" name="label_37">
             <property name="text">
@@ -1985,9 +2218,9 @@
          </widget>
         </item>
         <item row="14" column="0">
-         <widget class="QLabel" name="label_18">
+         <widget class="QLabel" name="label_23">
           <property name="text">
-           <string>key font size:</string>
+           <string>font sizes:</string>
           </property>
           <property name="buddy">
            <cstring>spinKeyFontSize</cstring>
@@ -1995,133 +2228,108 @@
          </widget>
         </item>
         <item row="14" column="1">
-         <widget class="QDoubleSpinBox" name="spinKeyFontSize">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="decimals">
-           <number>1</number>
-          </property>
-          <property name="minimum">
-           <double>1.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>256.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="15" column="0">
-         <widget class="QLabel" name="label_19">
-          <property name="text">
-           <string>axis tick font size:</string>
-          </property>
-          <property name="buddy">
-           <cstring>spinAxisFontSize</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="15" column="1">
-         <widget class="QDoubleSpinBox" name="spinAxisFontSize">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="decimals">
-           <number>1</number>
-          </property>
-          <property name="minimum">
-           <double>1.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>256.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="16" column="0">
-         <widget class="QLabel" name="label_20">
-          <property name="text">
-           <string>axis label font size:</string>
-          </property>
-          <property name="buddy">
-           <cstring>spinAxisLabelFontSize</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="16" column="1">
-         <widget class="QDoubleSpinBox" name="spinAxisLabelFontSize">
-          <property name="decimals">
-           <number>1</number>
-          </property>
-          <property name="minimum">
-           <double>1.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>256.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="17" column="0">
-         <widget class="QLabel" name="label_21">
-          <property name="text">
-           <string>title font size:</string>
-          </property>
-          <property name="buddy">
-           <cstring>spinTitleFontSize</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="17" column="1">
-         <widget class="QDoubleSpinBox" name="spinTitleFontSize">
-          <property name="decimals">
-           <number>1</number>
-          </property>
-          <property name="minimum">
-           <double>1.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>256.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_14">
-          <item>
-           <spacer name="horizontalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QToolButton" name="btnLoadSystem">
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_18">
             <property name="text">
-             <string>load the system settings from a template</string>
+             <string>key:</string>
             </property>
-            <property name="icon">
-             <iconset resource="qfrdrtable.qrc">
-              <normaloff>:/table/fileopen.png</normaloff>:/table/fileopen.png</iconset>
+            <property name="buddy">
+             <cstring>spinKeyFontSize</cstring>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QToolButton" name="btnSaveSystem">
-            <property name="text">
-             <string>save the system settings as a template</string>
+          <item row="0" column="1">
+           <widget class="QDoubleSpinBox" name="spinKeyFontSize">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-            <property name="icon">
-             <iconset resource="qfrdrtable.qrc">
-              <normaloff>:/table/filesave.png</normaloff>:/table/filesave.png</iconset>
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>256.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_20">
+            <property name="text">
+             <string>axis label:</string>
+            </property>
+            <property name="buddy">
+             <cstring>spinAxisLabelFontSize</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="spinAxisLabelFontSize">
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>256.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_19">
+            <property name="text">
+             <string>axis tick:</string>
+            </property>
+            <property name="buddy">
+             <cstring>spinAxisFontSize</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QDoubleSpinBox" name="spinAxisFontSize">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>256.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="label_21">
+            <property name="text">
+             <string>title:</string>
+            </property>
+            <property name="buddy">
+             <cstring>spinTitleFontSize</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QDoubleSpinBox" name="spinTitleFontSize">
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>256.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -2154,14 +2362,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFDoubleEdit</class>
-   <extends>QLineEdit</extends>
-   <header>qfdoubleedit.h</header>
-   <slots>
-    <signal>valueChanged(double)</signal>
-   </slots>
-  </customwidget>
-  <customwidget>
    <class>QFPlotter</class>
    <extends>QWidget</extends>
    <header>qfplotter.h</header>
@@ -2174,6 +2374,19 @@
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>JKQTPerrorPlotstyleComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QFDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfdoubleedit.h</header>
+   <slots>
+    <signal>valueChanged(double)</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
    <class>LineStyleComboBox</class>
    <extends>QComboBox</extends>
    <header>linestylecombobox.h</header>
@@ -2182,11 +2395,6 @@
    <class>ColorComboBox</class>
    <extends>QComboBox</extends>
    <header>colorcombobox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>JKQTPerrorPlotstyleComboBox</class>
-   <extends>QComboBox</extends>
-   <header>jkqtptools.h</header>
   </customwidget>
   <customwidget>
    <class>JKQTPSymbolComboBox</class>
@@ -2208,34 +2416,120 @@
    <extends>QComboBox</extends>
    <header>jkqtpimageelements.h</header>
   </customwidget>
+  <customwidget>
+   <class>JKQTPCAdrawModeComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>JKQTPCAlabelTypeComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>JKQTPlabelPositionComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>btnAddGraph</tabstop>
   <tabstop>btnDeleteGraph</tabstop>
+  <tabstop>btnCloneGraph</tabstop>
+  <tabstop>btnMoveUp</tabstop>
+  <tabstop>btnMoveDown</tabstop>
+  <tabstop>btnResetColoring</tabstop>
   <tabstop>listGraphs</tabstop>
   <tabstop>cmbGraphType</tabstop>
   <tabstop>edtGraphTitle</tabstop>
+  <tabstop>edtFunction</tabstop>
+  <tabstop>btnFunctionHelp</tabstop>
   <tabstop>cmbLinesXData</tabstop>
   <tabstop>cmbLinesXError</tabstop>
   <tabstop>cmbLinesYData</tabstop>
   <tabstop>cmbLinesYError</tabstop>
+  <tabstop>chkSTrided</tabstop>
+  <tabstop>spinStrideStart</tabstop>
+  <tabstop>spinStride</tabstop>
+  <tabstop>cmbLineColor</tabstop>
+  <tabstop>sliderPlotTransparent</tabstop>
+  <tabstop>spinBox_3</tabstop>
+  <tabstop>chkDrawLine</tabstop>
+  <tabstop>spinLineWidth</tabstop>
+  <tabstop>cmbLineStyle</tabstop>
+  <tabstop>cmbFillColor</tabstop>
+  <tabstop>sliderFillTransparent</tabstop>
+  <tabstop>spinBox_2</tabstop>
   <tabstop>cmbSymbol</tabstop>
   <tabstop>spinSymbolSize</tabstop>
   <tabstop>cmbErrorStyle</tabstop>
   <tabstop>cmbErrorColor</tabstop>
+  <tabstop>sliderErrorTransparent</tabstop>
+  <tabstop>spinBox</tabstop>
+  <tabstop>spinImageWidth</tabstop>
+  <tabstop>edtColorbarLabel</tabstop>
+  <tabstop>cmbColormap</tabstop>
+  <tabstop>cmbImageTrueColor</tabstop>
+  <tabstop>sliderImageTrueColor</tabstop>
+  <tabstop>spinBox_5</tabstop>
+  <tabstop>cmbImageFalseColor</tabstop>
+  <tabstop>sliderImageFalseColor</tabstop>
+  <tabstop>spinBox_6</tabstop>
+  <tabstop>edtImageWidth</tabstop>
+  <tabstop>edtImageHeight</tabstop>
+  <tabstop>edtImageX</tabstop>
+  <tabstop>edtImageY</tabstop>
+  <tabstop>edtImageMin</tabstop>
+  <tabstop>chkImageAutorange</tabstop>
+  <tabstop>edtImageMax</tabstop>
+  <tabstop>spinColorbarWidth</tabstop>
+  <tabstop>chkImageColorbarRight</tabstop>
+  <tabstop>chkImageColorbarTop</tabstop>
+  <tabstop>spinColorbarHeight</tabstop>
+  <tabstop>btnLoadSystem</tabstop>
+  <tabstop>btnSaveSystem</tabstop>
   <tabstop>edtTitle</tabstop>
+  <tabstop>chkKeepAxisAspect</tabstop>
+  <tabstop>edtDataAspect</tabstop>
+  <tabstop>chkKeepDataAspect</tabstop>
+  <tabstop>edtAxisAspect</tabstop>
   <tabstop>edtXLabel</tabstop>
-  <tabstop>edtYLabel</tabstop>
+  <tabstop>cmbXLabelPosition</tabstop>
+  <tabstop>chkLogX</tabstop>
   <tabstop>edtXMin</tabstop>
   <tabstop>edtXMax</tabstop>
   <tabstop>btnAutoscaleX</tabstop>
+  <tabstop>cmbXMode1</tabstop>
+  <tabstop>cmbXMode2</tabstop>
+  <tabstop>cmbXLabel</tabstop>
+  <tabstop>spinXAxisDigits</tabstop>
+  <tabstop>spinXAxisMinTicks</tabstop>
+  <tabstop>spinXAxisMinorTicks</tabstop>
+  <tabstop>chkX0Axis</tabstop>
+  <tabstop>edtYLabel</tabstop>
+  <tabstop>cmbYLabelPosition</tabstop>
+  <tabstop>chkLogY</tabstop>
   <tabstop>edtYMin</tabstop>
   <tabstop>edtYMax</tabstop>
   <tabstop>btnAutoscaleY</tabstop>
-  <tabstop>chkLogX</tabstop>
-  <tabstop>chkLogY</tabstop>
+  <tabstop>cmbYMode1</tabstop>
+  <tabstop>cmbYMode2</tabstop>
+  <tabstop>cmbYLabel</tabstop>
+  <tabstop>spinYAxisDigits</tabstop>
+  <tabstop>spinYAxisMinTicks</tabstop>
+  <tabstop>spinYAxisMinorTicks</tabstop>
+  <tabstop>chkY0Axis</tabstop>
   <tabstop>chkGrid</tabstop>
+  <tabstop>cmbGridColor</tabstop>
+  <tabstop>cmbGridLinestyle</tabstop>
+  <tabstop>spinGridWidth</tabstop>
+  <tabstop>cmbBackgroundColor</tabstop>
+  <tabstop>chkShowKey</tabstop>
+  <tabstop>sliderKeyTransparency</tabstop>
+  <tabstop>spinBox_4</tabstop>
+  <tabstop>cmbKeyPosition</tabstop>
+  <tabstop>cmbKeyLayout</tabstop>
   <tabstop>cmbFontname</tabstop>
   <tabstop>spinKeyFontSize</tabstop>
   <tabstop>spinAxisFontSize</tabstop>
@@ -2244,151 +2538,88 @@
  </tabstops>
  <resources>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
   <connection>
-   <sender>sliderKeyTransparency</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox_4</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>852</x>
-     <y>368</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>880</x>
-     <y>369</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sliderFillTransparent</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox_2</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>710</x>
-     <y>440</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>809</x>
-     <y>441</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sliderErrorTransparent</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>781</x>
-     <y>486</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>809</x>
-     <y>487</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sliderImageTrueColor</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox_5</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>780</x>
-     <y>556</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>808</x>
-     <y>557</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sliderImageFalseColor</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox_6</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>780</x>
-     <y>581</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>808</x>
-     <y>582</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chkImageAutorange</sender>
+   <sender>chkGrid</sender>
    <signal>toggled(bool)</signal>
-   <receiver>edtImageMin</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>413</x>
-     <y>650</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>527</x>
-     <y>652</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chkImageAutorange</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>label_46</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>413</x>
-     <y>650</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>648</x>
-     <y>652</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chkImageAutorange</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>edtImageMax</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>413</x>
-     <y>650</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>799</x>
-     <y>652</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chkKeepDataAspect</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>edtDataAspect</receiver>
+   <receiver>label_24</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>357</x>
-     <y>292</y>
+     <x>528</x>
+     <y>374</y>
     </hint>
     <hint type="destinationlabel">
-     <x>827</x>
-     <y>295</y>
+     <x>1099</x>
+     <y>373</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkGrid</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbGridLinestyle</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>528</x>
+     <y>374</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1063</x>
+     <y>373</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkGrid</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbGridColor</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>528</x>
+     <y>374</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>796</x>
+     <y>373</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkSTrided</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>widStride</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>331</x>
+     <y>552</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>840</x>
+     <y>555</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliderPlotTransparent</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_3</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1111</x>
+     <y>577</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1139</x>
+     <y>578</y>
     </hint>
    </hints>
   </connection>
@@ -2400,43 +2631,155 @@
    <hints>
     <hint type="sourcelabel">
      <x>354</x>
-     <y>266</y>
+     <y>107</y>
     </hint>
     <hint type="destinationlabel">
-     <x>765</x>
-     <y>269</y>
+     <x>816</x>
+     <y>133</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>sliderPlotTransparent</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox_3</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>748</x>
-     <y>394</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>809</x>
-     <y>395</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chkSTrided</sender>
+   <sender>chkKeepDataAspect</sender>
    <signal>toggled(bool)</signal>
-   <receiver>widStride</receiver>
+   <receiver>edtDataAspect</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>295</x>
-     <y>359</y>
+     <x>357</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>620</x>
-     <y>351</y>
+     <x>816</x>
+     <y>110</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkImageAutorange</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtImageMax</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>446</x>
+     <y>833</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1133</x>
+     <y>835</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkImageAutorange</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_46</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>446</x>
+     <y>833</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>861</x>
+     <y>835</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkImageAutorange</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtImageMin</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>446</x>
+     <y>833</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>680</x>
+     <y>835</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliderImageFalseColor</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_6</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1110</x>
+     <y>764</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1138</x>
+     <y>765</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliderImageTrueColor</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_5</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1110</x>
+     <y>739</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1138</x>
+     <y>740</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliderErrorTransparent</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1111</x>
+     <y>669</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1139</x>
+     <y>670</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliderFillTransparent</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_2</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1111</x>
+     <y>623</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1139</x>
+     <y>624</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliderKeyTransparency</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_4</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1118</x>
+     <y>451</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1146</x>
+     <y>451</y>
     </hint>
    </hints>
   </connection>

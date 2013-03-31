@@ -31,7 +31,8 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         virtual ~QFFitResultsByIndexEvaluation();
 
 
-
+    signals:
+        void currentIndexChanged(int newIndex);
 
     public:
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
@@ -322,7 +323,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function */
-        virtual QString getEvaluationResultID() const ;
+        virtual QString getEvaluationResultID(QFRawDataRecord *r) const ;
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
@@ -330,7 +331,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
-        virtual QString getEvaluationResultID(int currentIndex) const;
+        virtual QString getEvaluationResultID(int currentIndex,  QFRawDataRecord *r) const;
 
 
         virtual bool hasSpecial(const QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error) const ;

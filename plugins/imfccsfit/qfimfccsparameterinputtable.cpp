@@ -192,12 +192,16 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
             if (newrdr) {
                 item->setFitFile(cols, newrdr);
                 emit dataChanged(index, index);
+                recalculateFitParameters(false);
+                emit fitParamChanged();
                 return true;
             }
         } else if (row==1) {
             item->setFitFunction(cols, value.toString());
             if (!checkRebuildModel(false)) {
                 emit dataChanged(index, index);
+                recalculateFitParameters(false);
+                emit fitParamChanged();
             }
             return true;
         } else if (row>1) {
@@ -207,17 +211,22 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
                     item->setFitValue(pid.id, value.toDouble(), rdr);
                     if (!checkRebuildModel(false)) {
                         emit dataChanged(index, index);
+                        recalculateFitParameters(false);
                     }
+                    emit fitParamChanged();
                     return true;
                 }
                 if (coli==1) {
                     item->setFitError(pid.id, value.toDouble(), rdr);
                     emit dataChanged(index, index);
+                    recalculateFitParameters(false);
+                    emit fitParamErrorChanged();
                     return true;
                 }
                 if (coli==3) {
                     item->setFitFix(pid.id, value.toBool(), rdr);
                     emit dataChanged(index, index);
+                    emit fitParamFixChanged();
                     return true;
                 }
             }
@@ -255,13 +264,69 @@ void QFImFCCSParameterInputTable::rebuildModel()
     checkRebuildModel(true);
 }
 
+bool QFImFCCSParameterInputTable::recalculateFitParameters(bool emitFitParamSignals, bool dataChangedSignals)
+{
+    bool changed=false;
+
+    for (int i=0; i<item->getNumberOfFitFiles(); i++) {
+        QFRawDataRecord* rdr=item->getFitFile(i);
+        QFFitFunction* ff=item->getFitFunction(i);
+        //qDebug()<<"   file="<<i<<"   rdr="<<rdr<<"   ff="<<ff;
+        if (rdr&&ff) {
+            // 1. store old parameters and error, store which parameters were visible
+            // 2. recalculate parameters
+            // 3. emit dataChanged() signals for all cells that have changed and set changed to true, if any changed
+
+            double* p_old=item->allocFillParameters(rdr, item->getCurrentIndex(), ff);
+            double* e_old=item->allocFillParameterErrors(rdr, item->getCurrentIndex(), ff);
+            double* p=duplicateArray(p_old, ff->paramCount());
+            double* e=duplicateArray(e_old, ff->paramCount());
+            QStringList fpids=ff->getParameterIDs();
+
+
+            ff->calcParameter(p, e);
+            //qDebug()<<"   file="<<i<<"   rdr="<<rdr->getName()<<"   ff="<<ff->name()<<"   fpids="<<fpids;
+            for (int fi=0; fi<fpids.size(); fi++) {
+                if (ff->isParameterVisible(fi, p)) {
+                    int row=-1;
+                    int col=1+i*colsPerRDR;
+                    QModelIndex idx;
+                    QModelIndex eidx;
+                    if (fitParamListContainsID(fpids[fi], fitparamids, &row)) {
+                        idx=index(row, col);
+                        eidx=index(row, col+1);
+                    }
+                    if (p_old[fi]!=p[fi]) {
+                        changed=true;
+                        emit dataChanged(idx, idx);
+                    }
+                    if (e_old[fi]!=e[fi]) {
+                        changed=true;
+                        emit dataChanged(eidx, eidx);
+                    }
+                }
+            }
+            free(p);
+            free(e);
+            free(p_old);
+            free(e_old);
+        }
+    }
+
+    if (changed && emitFitParamSignals) {
+        emit fitParamChanged();
+        emit fitParamErrorChanged();
+    }
+    return changed;
+}
+
 bool QFImFCCSParameterInputTable::checkRebuildModel(bool alwaysreset)
 {
     QList<FitParam> fitparamids_new;
     bool ok=false;
     static int rebuildCount=0;
     QElapsedTimer t;
-    qDebug()<<"QFImFCCSParameterInputTable::checkRebuildModel(): "<<rebuildCount+1;
+    //qDebug()<<"QFImFCCSParameterInputTable::checkRebuildModel(): "<<rebuildCount+1;
     rebuildCount++;
     t.start();
 
@@ -306,7 +371,7 @@ bool QFImFCCSParameterInputTable::checkRebuildModel(bool alwaysreset)
         ok=true;
     }
     if (ok || alwaysreset) reset();
-    qDebug()<<"QFImFCCSParameterInputTable::checkRebuildModel() "<<rebuildCount<<": done "<<t.elapsed()<<"ms    =>"<<ok;
+    //qDebug()<<"QFImFCCSParameterInputTable::checkRebuildModel() "<<rebuildCount<<": done "<<t.elapsed()<<"ms    =>"<<ok;
 
     return ok;
 }

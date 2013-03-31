@@ -8,7 +8,8 @@
 
 
 QFImFCCSFitEvaluationItem::QFImFCCSFitEvaluationItem(QFProject* parent):
-    QFFitResultsByIndexAsVectorEvaluation("fcs_,dls_,fccs_", parent, false, false)
+    QFFitResultsByIndexAsVectorEvaluation("fcs_,dls_,fccs_", parent, false, false),
+    QFFCSWeightingTools()
 {
     matchFunctor=new QFImFCCSMatchRDRFunctor();
     m_weighting=EqualWeighting;
@@ -36,6 +37,7 @@ QFImFCCSFitEvaluationItem::QFImFCCSFitEvaluationItem(QFProject* parent):
 
     paramTable=new QFImFCCSParameterInputTable(this);
     connect(this, SIGNAL(parameterStructureChanged()), paramTable, SLOT(rebuildModel()));
+    connect(this, SIGNAL(currentIndexChanged(int)), paramTable, SLOT(rebuildModel()));
     ensureFitFiles();
 }
 
@@ -146,6 +148,7 @@ void QFImFCCSFitEvaluationItem::setCurrentIndex(int index)
         if (index<=getIndexMax(r)) m_currentIndex=index;
         if (index>getIndexMax(r)) m_currentIndex=getIndexMax(r);
         r->setQFProperty(QString(getType()+QString::number(getID())+"_last_index"), m_currentIndex, false, false);
+        emit currentIndexChanged(m_currentIndex);
     }
 }
 
@@ -295,17 +298,17 @@ QString QFImFCCSFitEvaluationItem::getFitFunctionID() const
     return getFitFunctionID(0);
 }
 
-QFFitFunction *QFImFCCSFitEvaluationItem::getFitFunction(QFRawDataRecord *rdr) const
+QFFitFunction *QFImFCCSFitEvaluationItem::getFitFunction( QFRawDataRecord *rdr) const
 {
-    int idx=fitFilesList.indexOf(rdr);
-    if (rdr && idx>=0) {
-        return getFitFunction(idx);
-    }
-    return NULL;
+    //if (rdr) qDebug()<<"QFImFCCSFitEvaluationItem::getFitFunction("<<rdr->getName()<<")";
+    //else qDebug()<<"QFImFCCSFitEvaluationItem::getFitFunction("<<rdr<<")";
+    return getFitFunctionForID(getFitFunctionID(rdr));
 }
 
 QString QFImFCCSFitEvaluationItem::getFitFunctionID(QFRawDataRecord *rdr) const
 {
+    //if (rdr) qDebug()<<"QFImFCCSFitEvaluationItem::getFitFunctionID("<<rdr->getName()<<")";
+    //else qDebug()<<"QFImFCCSFitEvaluationItem::getFitFunctionID("<<rdr<<")";
     int idx=fitFilesList.indexOf(rdr);
     if (rdr && idx>=0) {
         return getFitFunctionID(idx);

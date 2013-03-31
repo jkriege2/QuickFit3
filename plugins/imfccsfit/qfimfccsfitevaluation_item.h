@@ -98,8 +98,8 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         virtual QString getFitFunctionID(int num) const;
         virtual QString getFitFunctionID() const;
 
-        virtual QFFitFunction* getFitFunction(QFRawDataRecord* rdr) const;
-        virtual QString getFitFunctionID(QFRawDataRecord* rdr) const;
+        virtual QFFitFunction* getFitFunction(QFRawDataRecord *rdr) const;
+        virtual QString getFitFunctionID( QFRawDataRecord* rdr) const;
 
         /** \brief if this returns a non-empty string (default: empty string), the result is added to the getParameterStoreID() to make the store specific to the given \a rdr */
         virtual QString rdrPointerToParameterStoreID(QFRawDataRecord* rdr) const;
