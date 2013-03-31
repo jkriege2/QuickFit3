@@ -159,7 +159,26 @@ class QFLIB_EXPORT QFPluginServices {
         virtual QString getPluginTutorial(const QString& pluginID)=0;
 
         /** \brief return the settings for the given plugin ID */
-        virtual QString getPluginSettings(const QString& pluginID)=0;
+        virtual QString getPluginHelpSettings(const QString& pluginID)=0;
+
+
+
+
+
+
+        /** \brief return the assets of the online help for the given plugin ID */
+        virtual QString getPluginAssetsDirectory(const QString& pluginID)=0;
+
+        /** \brief searches for the given inifile (or \c PLUGINID.ini if \a inifiles is empty) in a list of subdirectories:
+         *
+         *  This function searches in these directories, in this order:
+         *    - global configuration directory
+         *    - plugin assets directory
+         *    - config directory
+         *    - \c /plugins/PLUGINID/ subdirectory of config directory
+         */
+        virtual QString getPluginMaybeGlobalSettings(const QString& pluginID, const QString& inifile=QString(""))=0;
+
 
 
         /*! \brief return a pointer to a given menu, or NULL

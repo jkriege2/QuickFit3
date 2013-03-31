@@ -1721,6 +1721,12 @@ QFProject *MainWindow::getCurrentProject() const
     return project;
 }
 
+QString MainWindow::getPluginAssetsDirectory(const QString &pluginID)
+{
+    return settings->getAssetsDirectory()+QString("/plugins/")+pluginID+QString("/");
+
+}
+
 QWidget *MainWindow::getCreateView(const QString &name, const QString &title)
 {
     if (!histograms.contains(name)) {
@@ -1791,7 +1797,7 @@ QString MainWindow::getPluginTutorial(const QString& pluginID) {
     return "";
 }
 
-QString MainWindow::getPluginSettings(const QString& pluginID) {
+QString MainWindow::getPluginHelpSettings(const QString& pluginID) {
     if (evaluationFactory->contains(pluginID)) return evaluationFactory->getPluginSettings(pluginID);
     if (rawDataFactory->contains(pluginID)) return rawDataFactory->getPluginSettings(pluginID);
     if (extensionManager->contains(pluginID)) return extensionManager->getPluginSettings(pluginID);
@@ -2256,4 +2262,13 @@ QList<QPair<QString, QString> >* MainWindow::getHTMLReplacementList() {
 QList<QFPluginServices::HelpDirectoryInfo>* MainWindow::getPluginHelpList() {
     return &pluginHelpList;
 
+}
+
+QString MainWindow::getPluginMaybeGlobalSettings(const QString &pluginID, const QString &inifile)
+{
+    QString ini=services->getGlobalConfigFileDirectory()+inifile;
+    if (!QFile::exists(ini)) ini=services->getPluginConfigFileDirectory(pluginID)+inifile;
+    if (!QFile::exists(ini)) ini=services->getPluginAssetsDirectory(pluginID)+inifile;
+    if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+inifile;
+    return ini;
 }

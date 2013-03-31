@@ -131,7 +131,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual QString getPluginTutorial(const QString& pluginID);
 
         /** \brief QFPluginServices::getPluginSettings() */
-        virtual QString getPluginSettings(const QString& pluginID);
+        virtual QString getPluginHelpSettings(const QString& pluginID);
 
         /** \brief QFPluginServices::getPluginHelpDirectory() */
         virtual QString getPluginHelpDirectory(const QString& pluginID);
@@ -144,6 +144,20 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual QFRawDataPropertyEditor* openRawDataEditor(QFRawDataRecord* rdr);
         virtual QFProject* getCurrentProject() const;
 
+        /** \brief return the assets of the online help for the given plugin ID */
+        virtual QString getPluginAssetsDirectory(const QString& pluginID);
+
+        /** \brief searches for the given inifile (or \c PLUGINID.ini if \a inifiles is empty) in a list of subdirectories:
+         *
+         *  This function searches in these directories, in this order:
+         *    - global configuration directory
+         *    - plugin assets directory
+         *    - \c /plugins/PLUGINID/ subdirectory of config directory
+         *    - config directory
+         *
+         *  Returns the path to the first file that exists. If no file exists, the path to the last file is returned
+         */
+        virtual QString getPluginMaybeGlobalSettings(const QString& pluginID, const QString& inifile=QString(""));
 
 
         virtual QWidget* getCreateView(const QString& name, const QString& title);
