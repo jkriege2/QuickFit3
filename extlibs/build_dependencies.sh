@@ -1,4 +1,4 @@
-/bin/bash
+#! /bin/bash
 
 function print_result {
 	if [ $2 == -1 ]; then
@@ -21,6 +21,8 @@ function print_result {
 	fi
 }
 
+
+
 echo -e "========================================================================\n"\
 "= QuickFit 3 dependency build script                                   =\n"\
 "========================================================================\n\n"\
@@ -36,8 +38,51 @@ echo -e  "\n"
 read -p "how many parallel builds do you want to use in make (1/2/3/...)? " -n 1  MAKE_PARALLEL_BUILDS
 echo -e  "\n"
 
-CURRENTDIR=${PWD}
+#sh ../output/get_bit_depth.sh
 
+CURRENTDIR=${PWD}
+QT_INFO_LIBS=`qmake -query QT_INSTALL_LIBS`
+QT_INFO_BIN=`qmake -query QT_INSTALL_BINS`
+QT_INFO_PLUGINS=`qmake -query QT_INSTALL_PLUGINS`
+QT_INFO_INSTALLDIR=`qmake -query QT_INSTALL_PREFIX`
+QT_INFO_VERSION=`qmake -query QT_VERSION`
+echo -e "\n\nbuilding for\n    Qt version ${QT_INFO_VERSION}\n       in ${QT_INFO_INSTALLDIR}\n\n"
+
+ISMSYS=`uname -o`
+echo $ISMSYS
+if [ "$ISMSYS" != "${string/Msys/}" ] ; then
+	echo -e "building in MSys environment on Windows!\n\n"
+fi
+
+qtOK=-5
+if [ "$ISMSYS" != "${string/Msys/}" ] ; then
+	qtOK=-1
+	read -p "Do you want to copy 'Qt DLLs' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+	if [ $INSTALL_ANSWER == "y" ] ; then
+		echo -e  "------------------------------------------------------------------------\n"\
+		"-- COPYING: Qt DLLs                                                   --\n"\
+		"------------------------------------------------------------------------\n\n"
+		
+		cp /mingw/bin/mingwm10.dll ../output/
+		cp /mingw/bin/libstdc++-6.dll ../output/
+		
+		USEDQTMODULES=QtCore4 QtGui4 QtOpenGL4 QtScript4 QtScriptTools4 QtSvg4 QtXml4
+		USEDQTPLUGINS= imageformats/*.dll
+		mkdir ../output/qtplugins
+		for f in $USEDQTMODULES
+		do
+			cp "${QT_INFO_BIN}/${f}d.dll"  "../output/qtplugins"
+			cp "${QT_INFO_BIN}/${f}.dll"  "../output/qtplugins"
+		done
+		for f in $USEDQTPLUGINS
+		do
+			cp "${QT_INFO_PLUGINS}/${f}"  "../output/qtplugins"
+			cp "${QT_INFO_PLUGINS}/${f}"  "../output/qtplugins"
+		done
+		qtOK=0
+	fi
+fi
 
 # TODO:
 #   copy Qt libs to the output dir of QF3 on windows
@@ -382,8 +427,6 @@ fi
 
 
 libusbOK=-5
-ISMSYS=`uname -o`
-echo $ISMSYS
 if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 	libusbOK=-1
 	read -p "Do you want to build 'libusb-win32' (windows only!!!) (y/n)? " -n 1 INSTALL_ANSWER
@@ -566,14 +609,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 		
 		libOK=$?
 		if [ $libOK -eq 0 ] ; then		
-			# TODO:
-			#   copy Qt3d libs to the output dir of QF3 on windows
-			#     1. use qmake -query and determine the Qt install dir
-			#     2. copy all libs from there to ../output/ (include plugins, debug and normal libs!
-			libOK=$?
-			if [ $libOK -ne 0 ] ; then		
-				libOK=-4
-			fi
+			cp "${QT_INFO_BIN}/Qt3Dd.dll"  "../output/"
+			cp "${QT_INFO_BIN}/Qt3D.dll"  "../output/"
+			ibOK=0
 		else
 			libOK=-3
 		fi
@@ -600,6 +638,7 @@ echo -e  "\n--------------------------------------------------------------------
 "-- BUILD RESULTS                                                       --\n"\
 "------------------------------------------------------------------------\n\n"\
 
+print_result "Qt DLLs copy" $qtOK
 print_result "zlib" $zlibOK
 print_result "lmfit" $lmfitOK
 print_result "levmar" $levmarOK
