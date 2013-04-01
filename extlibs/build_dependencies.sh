@@ -534,52 +534,53 @@ fi
 
 
 libqt3dOK=-1
-# read -p "Do you want to build 'qt-3d (for Qt4)' (y/n)? " -n 1 INSTALL_ANSWER
-# echo -e  "\n"
-# if [ $INSTALL_ANSWER == "y" ] ; then
-	# echo -e  "\n------------------------------------------------------------------------\n"\
-	# "-- BUILDING: qt-3d (for Qt4)                                          --\n"\
-	# "------------------------------------------------------------------------\n\n"\
+#read -p "Do you want to build 'qt-3d (for Qt4)' (y/n)? " -n 1 INSTALL_ANSWER
+#echo -e  "\n"
+INSTALL_ANSWER = "n"
+if [ $INSTALL_ANSWER == "y" ] ; then
+	echo -e  "\n------------------------------------------------------------------------\n"\
+	"-- BUILDING: qt-3d (for Qt4)                                          --\n"\
+	"------------------------------------------------------------------------\n\n"\
 
-	# cd qt3d_qt4
-	# mkdir build
-	# mkdir bin
-	# mkdir bin/plugins
-	# mkdir lib
-	# mkdir include
-	# mkdir src
-	# tar xvf qt-qt3d-qt4.tar.gz -C ./build/
-	# cd build/qt-qt3d
-	# qmake qt3d.pro "CONFIG+=release debug"
-	# libOK=$?
-	# if [ $libOK -eq 0 ] ; then
-		# make -j${MAKE_PARALLEL_BUILDS}
-		# make -j${MAKE_PARALLEL_BUILDS} Release
+	cd qt3d_qt4
+	mkdir build
+	mkdir bin
+	mkdir bin/plugins
+	mkdir lib
+	mkdir include
+	mkdir src
+	tar xvf qt-qt3d-qt4.tar.gz -C ./build/
+	cd build/qt-qt3d
+	qmake qt3d.pro "CONFIG+=release debug"
+	libOK=$?
+	if [ $libOK -eq 0 ] ; then
+		make -j${MAKE_PARALLEL_BUILDS}
+		make -j${MAKE_PARALLEL_BUILDS} Release
 		
-		# libOK=$?
-		# if [ $libOK -eq 0 ] ; then		
-			# make -j${MAKE_PARALLEL_BUILDS} install
-			# libOK=$?
-			# if [ $libOK -ne 0 ] ; then		
-				# libOK=-4
-			# fi
-		# else
-			# libOK=-3
-		# fi
-	# else
-	    # libOK=-2
-	# fi
+		libOK=$?
+		if [ $libOK -eq 0 ] ; then		
+			make -j${MAKE_PARALLEL_BUILDS} install
+			libOK=$?
+			if [ $libOK -ne 0 ] ; then		
+				libOK=-4
+			fi
+		else
+			libOK=-3
+		fi
+	else
+	    libOK=-2
+	fi
 	
 
-	# cd ../../
-	# if [ $KEEP_BUILD_DIR == "n" ] ; then
-		# rm -rf build
-	# fi
-	# cd ${CURRENTDIR}
+	cd ../../
+	if [ $KEEP_BUILD_DIR == "n" ] ; then
+		rm -rf build
+	fi
+	cd ${CURRENTDIR}
 	
-	# libqt3dOK=$libOK
+	libqt3dOK=$libOK
 
-# fi
+fi
 
 
 
