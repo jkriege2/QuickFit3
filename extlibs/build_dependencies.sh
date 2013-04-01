@@ -1,4 +1,4 @@
-#! /bin/bash
+/bin/bash
 
 function print_result {
 	if [ $2 == -1 ]; then
@@ -37,6 +37,13 @@ read -p "how many parallel builds do you want to use in make (1/2/3/...)? " -n 1
 echo -e  "\n"
 
 CURRENTDIR=${PWD}
+
+
+# TODO:
+#   copy Qt libs to the output dir of QF3 on windows
+#     1. use qmake -query and determine the Qt install dir
+#     2. copy all libs from there to ../output/ (include plugins, debug and normal libs!
+
 
 zlibOK=-1
 read -p "Do you want to build 'zlib' (y/n)? " -n 1 INSTALL_ANSWER
@@ -554,12 +561,15 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	qmake qt3d.pro "CONFIG+=release debug"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
-		make -j${MAKE_PARALLEL_BUILDS}
-		make -j${MAKE_PARALLEL_BUILDS} Release
+		make 
+		make release
 		
 		libOK=$?
 		if [ $libOK -eq 0 ] ; then		
-			make -j${MAKE_PARALLEL_BUILDS} install
+			# TODO:
+			#   copy Qt3d libs to the output dir of QF3 on windows
+			#     1. use qmake -query and determine the Qt install dir
+			#     2. copy all libs from there to ../output/ (include plugins, debug and normal libs!
 			libOK=$?
 			if [ $libOK -ne 0 ] ; then		
 				libOK=-4
@@ -573,9 +583,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	
 
 	cd ../../
-	if [ $KEEP_BUILD_DIR == "n" ] ; then
-		rm -rf build
-	fi
+	#if [ $KEEP_BUILD_DIR == "n" ] ; then
+	#	rm -rf build
+	#fi
 	cd ${CURRENTDIR}
 	
 	libqt3dOK=$libOK
