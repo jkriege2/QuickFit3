@@ -900,7 +900,7 @@ QChar QFMathParser::peekStream(QTextStream *stream)
         stream->operator>>(c);
         stream->seek(p);
     }
-    qDebug()<<"peek "<<c;
+    //qDebug()<<"peek "<<c;
     return c;
 }
 
@@ -914,11 +914,11 @@ bool QFMathParser::getFromStream(QTextStream *stream, QChar &c)
     if (!stream) return false;
     c=QChar(0);
     if (stream->atEnd()) {
-        qDebug()<<"read "<<c<<": false";
+        //qDebug()<<"read "<<c<<": false";
         return false;
     }
     stream->operator>>(c);
-    qDebug()<<"read "<<c<<": true";
+    //qDebug()<<"read "<<c<<": true";
     return true;
 }
 
