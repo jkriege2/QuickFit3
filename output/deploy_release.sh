@@ -32,7 +32,7 @@ if [ "${BITDEPTH}" == "64" ]; then
 	ZIPFILESPECIAL=quickfit3_64bit_special_${SVNVER}.zip
 fi
 SPIMPLUGINS=" cam_testcamera stage_pi863 cam_andor spimb040 shutter_servo_arduino filterc_test cam_systemcam filterc_tmcl lights_b040laserbox lights_pccsled"
-SPECIALPLUGINS=""
+SPECIALPLUGINS=" imfccs_fit"
 REMOVEPLUGINS=" ${SPECIALPLUGINS} ${SPIMPLUGINS} cam_radhard2 cam_rh2v2  b040_ffmcontrol alv_autocorrelator5000 multicontrol_stage qfe_acquisitiontest scanner2000_nicounter"
 SPIMONLYQTMODULES=" QtScript4.dll QtScriptTools4.dll"
 SPECIALONLYQTMODULES=""

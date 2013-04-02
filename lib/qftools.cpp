@@ -654,3 +654,47 @@ void removeAllActions(QWidget* widget) {
         if (act[i]) widget->removeAction(act[i]);
     }
 }
+
+QString qchartostr(QChar data) {
+    QString ost;
+    switch(data.toLatin1()) {
+      case 0: ost+="[NUL]"; break;
+      case 1: ost+="[SOH]"; break;
+      case 2: ost+="[STX]"; break;
+      case 3: ost+="[ETX]"; break;
+      case 4: ost+="[EOT]"; break;
+      case 5: ost+="[ENQ]"; break;
+      case 6: ost+="[ACK]"; break;
+      case 7: ost+="[BEL]"; break;
+      case 8: ost+="[BS]"; break;
+      case 9: ost+="[TAB]"; break;
+      case 10: ost+="[LF]"; break;
+      case 11: ost+="[VT]"; break;
+      case 12: ost+="[FF]"; break;
+      case 13: ost+="[CR]"; break;
+      case 14: ost+="[SO]"; break;
+      case 15: ost+="[SI]"; break;
+      case 16: ost+="[DLE]"; break;
+      case 17: ost+="[DC1]"; break;
+      case 18: ost+="[DC2]"; break;
+      case 19: ost+="[DC3]"; break;
+      case 20: ost+="[DC4]"; break;
+      case 21: ost+="[NAK]"; break;
+      case 22: ost+="[SYN]"; break;
+      case 23: ost+="[ETB]"; break;
+      case 24: ost+="[CAN]"; break;
+      case 25: ost+="[EM]"; break;
+      case 26: ost+="[SUB]"; break;
+      case 27: ost+="[ESC]"; break;
+      case 28: ost+="[FS]"; break;
+      case 29: ost+="[GS]"; break;
+      case 30: ost+="[RS]"; break;
+      case 31: ost+="[US]"; break;
+      case 32: ost+="[SP]"; break;
+      case 127: ost+="[DEL]"; break;
+  //    case : ost+=""; break;
+      default:
+        ost+=data;
+    }
+    return ost;
+}

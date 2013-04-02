@@ -144,8 +144,10 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual QFRawDataPropertyEditor* openRawDataEditor(QFRawDataRecord* rdr);
         virtual QFProject* getCurrentProject() const;
 
-        /** \brief return the assets of the online help for the given plugin ID */
+        /** \brief return the assets directory  of the online help for the given plugin ID */
         virtual QString getPluginAssetsDirectory(const QString& pluginID);
+        /** \brief return the config file directory of the online help for the given plugin ID */
+        virtual QString getPluginConfigDirectory(const QString& pluginID);
 
         /** \brief searches for the given inifile (or \c PLUGINID.ini if \a inifiles is empty) in a list of subdirectories:
          *

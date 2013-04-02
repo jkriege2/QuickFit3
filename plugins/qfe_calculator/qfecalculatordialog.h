@@ -2,7 +2,7 @@
 #define QFECALCULATORDIALOG_H
 
 #include <QDialog>
-#include "jkmathparser.h"
+#include "qfmathparser.h"
 #include "qftools.h"
 #include "qffunctionreferencetool.h"
 
@@ -28,7 +28,7 @@ class QFECalculatorDialog : public QDialog {
         void on_edtExpression_textChanged(QString text);
     private:
         Ui::QFECalculatorDialog *ui;
-        jkMathParser* parser;
+        QFMathParser* parser;
         QFECalculator* calc;
         QFFunctionReferenceTool* functionRef;
 };

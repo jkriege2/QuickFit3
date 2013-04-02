@@ -1726,6 +1726,12 @@ QString MainWindow::getPluginAssetsDirectory(const QString &pluginID)
     return settings->getAssetsDirectory()+QString("/plugins/")+pluginID+QString("/");
 
 }
+QString MainWindow::getPluginConfigDirectory(const QString &pluginID)
+{
+    return settings->getConfigFileDirectory()+QString("/plugins/")+pluginID+QString("/");
+
+}
+
 
 QWidget *MainWindow::getCreateView(const QString &name, const QString &title)
 {
@@ -2266,9 +2272,9 @@ QList<QFPluginServices::HelpDirectoryInfo>* MainWindow::getPluginHelpList() {
 
 QString MainWindow::getPluginMaybeGlobalSettings(const QString &pluginID, const QString &inifile)
 {
-    QString ini=services->getGlobalConfigFileDirectory()+inifile;
-    if (!QFile::exists(ini)) ini=services->getPluginConfigFileDirectory(pluginID)+inifile;
-    if (!QFile::exists(ini)) ini=services->getPluginAssetsDirectory(pluginID)+inifile;
-    if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+inifile;
+    QString ini=getGlobalConfigFileDirectory()+inifile;
+    if (!QFile::exists(ini)) ini=getPluginConfigDirectory(pluginID)+inifile;
+    if (!QFile::exists(ini)) ini=getPluginAssetsDirectory(pluginID)+inifile;
+    if (!QFile::exists(ini)) ini=getConfigFileDirectory()+inifile;
     return ini;
 }

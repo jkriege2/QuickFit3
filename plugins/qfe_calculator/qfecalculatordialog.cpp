@@ -7,7 +7,7 @@ QFECalculatorDialog::QFECalculatorDialog(QFECalculator *calc, QWidget *parent) :
     ui(new Ui::QFECalculatorDialog)
 {
     this->calc=calc;
-    parser=new jkMathParser();
+    parser=new QFMathParser();
 
     functionRef=new QFFunctionReferenceTool(NULL);
     functionRef->setCompleterFile(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+calc->getID()+"/table_expression.txt");
@@ -47,15 +47,15 @@ void QFECalculatorDialog::showHelp()
 void QFECalculatorDialog::showCache()
 {
     ui->lstCache->clear();
-    std::vector<std::pair<std::string, jkMathParser::jkmpVariable> > vars= parser->getVariables();
+    QList<QPair<QString, QFMathParser::qfmpVariable> > vars= parser->getVariables();
     for (size_t i=0; i<vars.size(); i++) {
-        QString v=QString("%1 = ").arg(vars[i].first.c_str());
-            if (vars[i].second.type==jkMathParser::jkmpBool) {
+        QString v=QString("%1 = ").arg(vars[i].first);
+            if (vars[i].second.type==QFMathParser::qfmpBool) {
                 v=v+tr("%1 [boolean]").arg(boolToQString(*(vars[i].second.boolean)));
-            } else if (vars[i].second.type==jkMathParser::jkmpDouble) {
+            } else if (vars[i].second.type==QFMathParser::qfmpDouble) {
                 v=v+tr("%1 [float]").arg(*(vars[i].second.num));
-            } else if (vars[i].second.type==jkMathParser::jkmpString) {
-                v=v+tr("%1 [string]").arg(vars[i].second.str->c_str());
+            } else if (vars[i].second.type==QFMathParser::qfmpString) {
+                v=v+tr("%1 [string]").arg(*(vars[i].second.str));
             } else {
                 v=v+tr("??? [unknown]");
             }
@@ -66,26 +66,26 @@ void QFECalculatorDialog::showCache()
 
 void QFECalculatorDialog::on_btnEvaluate_clicked()
 {
-    std::string expression=ui->edtExpression->text().toStdString();
+    QString expression=ui->edtExpression->text();
     QTextCursor cur(ui->edtHistory->document());
     cur.movePosition(QTextCursor::Start);
-    cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&gt;&gt; <i>%1</i></tt><br>").arg(expression.c_str())));
-    try {
-        jkMathParser::jkmpResult r=parser->evaluate(expression);
+    cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&gt;&gt; <i>%1</i></tt><br>").arg(expression)));
+    parser->resetErrors();
+        QFMathParser::qfmpResult r=parser->evaluate(expression);
 
         QString result;
         if (r.isValid) {
-            if (r.type==jkMathParser::jkmpBool) {
+            if (r.type==QFMathParser::qfmpBool) {
                 result=tr("<font color=\"blue\">[boolean] %1</font>").arg(boolToQString(r.boolean));
-            } else if (r.type==jkMathParser::jkmpDouble) {
+            } else if (r.type==QFMathParser::qfmpDouble) {
                 result=tr("<font color=\"blue\">[float] %1</font>").arg(r.num);
-            } else if (r.type==jkMathParser::jkmpString) {
-                result=tr("<font color=\"blue\">[string] %1</font>").arg(r.str.c_str());
+            } else if (r.type==QFMathParser::qfmpString) {
+                result=tr("<font color=\"blue\">[string] %1</font>").arg(r.str);
             } else {
                 result=tr("<font color=\"red\">[unknown] ? ? ?</font>");
             }
-            jkMathParser::jkmpResult r1=parser->getVariableOrInvalid("ans");
-            jkMathParser::jkmpResult r2=parser->getVariableOrInvalid("ans1");
+            QFMathParser::qfmpResult r1=parser->getVariableOrInvalid("ans");
+            QFMathParser::qfmpResult r2=parser->getVariableOrInvalid("ans1");
             if (r1.isValid) {
                 parser->addVariable("ans1", r1);
             }
@@ -99,8 +99,8 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
         }
 
         cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;&nbsp; = %1</tt><br>").arg(result)));
-    } catch(std::exception& E) {
-        cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;&nbsp; <font color=\"red\">ERROR: %1</font></tt><br>").arg(E.what())));
+    if (parser->hasErrorOccured()) {
+        cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;&nbsp; <font color=\"red\">ERROR: %1</font></tt><br>").arg(parser->getLastErrors().join("<br>ERROR: "))));
     }
     calc->setHistory(ui->edtHistory->document()->toHtml("UTF-8"));
     ui->edtHistory->moveCursor(QTextCursor::Start);
@@ -109,16 +109,15 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
 }
 
 void QFECalculatorDialog::on_edtExpression_textChanged(QString text) {
-    try {
-        ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>"));
-        jkMathParser mp; // instanciate
-        jkMathParser::jkmpNode* n;
-        // parse some numeric expression
-        n=mp.parse(text.toStdString());
-        delete n;
-        ui->btnEvaluate->setEnabled(true);
-    } catch(std::exception& E) {
-        ui->labError->setText(tr("<font color=\"red\">ERROR:</font> %1").arg(E.what()));
+    ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>"));
+    QFMathParser mp; // instanciate
+    QFMathParser::qfmpNode* n;
+    // parse some numeric expression
+    n=mp.parse(text);
+    delete n;
+    ui->btnEvaluate->setEnabled(true);
+    if (mp.hasErrorOccured()) {
+        ui->labError->setText(tr("<font color=\"red\">ERROR: %1</font>").arg(mp.getLastErrors().join("<br>ERROR: ")));
         ui->btnEvaluate->setEnabled(false);
     }
 
@@ -133,7 +132,7 @@ void QFECalculatorDialog::on_btnClearHistory_clicked()
 void QFECalculatorDialog::on_btnClearCache_clicked()
 {
     delete parser;
-    parser=new jkMathParser();
+    parser=new QFMathParser();
     showCache();
 }
 

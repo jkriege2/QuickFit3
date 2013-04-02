@@ -166,8 +166,10 @@ class QFLIB_EXPORT QFPluginServices {
 
 
 
-        /** \brief return the assets of the online help for the given plugin ID */
+        /** \brief return the assets directory for the given plugin ID */
         virtual QString getPluginAssetsDirectory(const QString& pluginID)=0;
+        /** \brief return the config directory for the given plugin ID */
+        virtual QString getPluginConfigDirectory(const QString& pluginID)=0;
 
         /** \brief searches for the given inifile (or \c PLUGINID.ini if \a inifiles is empty) in a list of subdirectories:
          *

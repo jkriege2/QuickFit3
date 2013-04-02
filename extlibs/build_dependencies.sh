@@ -67,8 +67,8 @@ if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 		cp /mingw/bin/mingwm10.dll ../output/
 		cp /mingw/bin/libstdc++-6.dll ../output/
 		
-		USEDQTMODULES=QtCore4 QtGui4 QtOpenGL4 QtScript4 QtScriptTools4 QtSvg4 QtXml4
-		USEDQTPLUGINS= imageformats/*.dll
+		USEDQTMODULES="QtCore4 QtGui4 QtOpenGL4 QtScript4 QtScriptTools4 QtSvg4 QtXml4"
+		USEDQTPLUGINS= "imageformats/*.dll"
 		mkdir ../output/qtplugins
 		for f in $USEDQTMODULES
 		do
@@ -584,9 +584,8 @@ fi
 
 
 libqt3dOK=-1
-#read -p "Do you want to build 'qt-3d (for Qt4)' (y/n)? " -n 1 INSTALL_ANSWER
-#echo -e  "\n"
-INSTALL_ANSWER = "n"
+read -p "Do you want to build 'qt-3d (for Qt4)' (y/n)? " -n 1 INSTALL_ANSWER
+echo -e  "\n"
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "\n------------------------------------------------------------------------\n"\
 	"-- BUILDING: qt-3d (for Qt4)                                          --\n"\
@@ -594,23 +593,28 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd qt3d_qt4
 	mkdir build
-	mkdir bin
-	mkdir bin/plugins
-	mkdir lib
-	mkdir include
-	mkdir src
 	tar xvf qt-qt3d-qt4.tar.gz -C ./build/
 	cd build/qt-qt3d
 	qmake qt3d.pro "CONFIG+=release debug"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
+	    echo "patching the assip lib inside Qt3D!!!"
+		ASSIMPFILES="./3rdparty/assimp/include/aiTypes.h"
+		for i in $ASSIMPFILES; do
+			sed 's/ ::strlen/std::strlen/g' $i > $i.temp | mv $i.temp $i 
+			sed 's/ ::strcmp/std::strcmp/g' $i > $i.temp | mv $i.temp $i 
+			sed 's/<math.h>/<cmath>/g' $i > $i.temp | mv $i.temp $i 
+			sed 's/#define AI_TYPES_H_INC/#define AI_TYPES_H_INC \
+			#include <cstring>/g' $i > $i.temp | mv $i.temp $i 
+		done
+	
 		make 
 		make release
 		
 		libOK=$?
 		if [ $libOK -eq 0 ] ; then		
-			cp "${QT_INFO_BIN}/Qt3Dd.dll"  "../output/"
-			cp "${QT_INFO_BIN}/Qt3D.dll"  "../output/"
+			cp "${QT_INFO_BIN}/Qt3Dd.dll"  "../../../../output/"
+			cp "${QT_INFO_BIN}/Qt3D.dll"  "../../../../output/"
 			ibOK=0
 		else
 			libOK=-3
