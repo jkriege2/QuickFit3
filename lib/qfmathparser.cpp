@@ -479,6 +479,13 @@ inline QString strip(QString s) {
 
 
 
+QFMathParser::qfmpResult QFMathParser::getInvalidResult()
+{
+    qfmpResult res;
+    res.isValid=false;
+    return res;
+}
+
 void QFMathParser::qfmpError(QString st)
 {
     qDebug()<<"ERROR: "<<st;
@@ -868,7 +875,7 @@ QFMathParser::qfmpEvaluateFunc QFMathParser::getFunctionDef(QString name){
   } else {
     // error
     //std::cout <<name<<std::endl;
-    qfmpError(QString("function '%s' does not exist (getFunctionDef)").arg(name));
+    qfmpError(QString("function '%1' does not exist (getFunctionDef)").arg(name));
   }
   return NULL;
 }
@@ -950,7 +957,7 @@ QFMathParser::qfmpResult QFMathParser::evaluateFunction(QString name, QFMathPars
   } else {
     // error
     //qfmpError("function does not exist")
-    qfmpError(QString("function '%s' does not exist (evaluateFunction)").arg(name));
+    qfmpError(QString("function '%1' does not exist (evaluateFunction)").arg(name));
   }
   QFMathParser::qfmpResult res;
   res.isValid=false;
@@ -1254,7 +1261,7 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
                     }
 
                     if ( CurrentToken != RBRACKET ) {
-                        qfmpError(QString("')' expected, but '%s' found").arg(currenttokentostring()));
+                        qfmpError(QString("')' expected, but '%1' found").arg(currenttokentostring()));
                         return NULL;
                     }
                     QFMathParser::qfmpNode** p=NULL;
@@ -1323,7 +1330,7 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
 
 		default:
             qfmpError("primary expected");
-            return NULL;
+        return new qfmpInvalidNode(this, NULL);
 
 	}
 

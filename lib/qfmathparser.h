@@ -299,7 +299,9 @@ class QFLIB_EXPORT QFMathParser
 
           /** \brief convert the value this struct representens into a QString and adds the name of the datatype in \c [...] */
           inline QString toTypeString();
-        } ;
+        };
+
+        qfmpResult getInvalidResult();
 
 
         /** \brief This struct is for managing variables. Unlike qfmpResult this struct
@@ -551,6 +553,23 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+        };
+
+
+        /**
+         * \brief This class represents a an invalid node that always resturns an invalid value
+         */
+        class QFLIB_EXPORT qfmpInvalidNode: public qfmpNode {
+          public:
+            /** \brief constructor for a qfmpConstantNode
+             *  \param d the value of the constant
+             *  \param p a pointer to a jkMathParser object
+             *  \param par a pointer to the parent node
+             */
+            qfmpInvalidNode(QFMathParser* p, qfmpNode* par) { setParser(p); setParent(par); };
+
+            /** \brief evaluate this node */
+            virtual qfmpResult evaluate() { return parser->getInvalidResult(); };
         };
 
         /**
