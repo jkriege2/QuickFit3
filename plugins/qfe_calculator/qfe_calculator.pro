@@ -16,12 +16,10 @@ DESTDIR = $${QFOUTPUT}/plugins/
 # Input
 HEADERS += qfecalculator.h \
     qfecalculatordialog.h \
-    ../../../../../LIB/trunk/jkmathparser.h \
     ../base_classes/qffunctionreferencetool.h
 
 SOURCES += qfecalculator.cpp \
     qfecalculatordialog.cpp \
-    ../../../../../LIB/trunk/jkmathparser.cpp \
     ../base_classes/qffunctionreferencetool.cpp
 
 FORMS = \
