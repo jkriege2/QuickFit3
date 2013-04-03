@@ -7,7 +7,7 @@
 #include <iostream>
 #include <float.h>
 #include <QDebug>
-
+#include <stdint.h>
 
 
 /******************************************************************************************
