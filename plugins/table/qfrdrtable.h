@@ -10,7 +10,7 @@
 #include "qftools.h"
 #include "qfrdrtableinterface.h"
 #include "qfrdrcolumngraphsinterface.h"
-#include "jkmathparser.h"
+#include "qfmathparser.h"
 
 
 /*! \brief this class is used to manage a table of values (strings/numbers)
@@ -291,7 +291,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         /** \brief returns the filetype of the Export file dialog */
         QString getExportDialogFiletypes() { return tr("Comma Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files [german Excel] (*.csv, *.txt);;SYLK File (*.sylk, *.slk)"); };
 
-        QVariant evaluateExpression(jkMathParser &mp, jkMathParser::jkmpNode *n, QModelIndex cell, bool *ok, const QString &expression, QString *error);
+        QVariant evaluateExpression(QFMathParser &mp, QFMathParser::qfmpNode *n, QModelIndex cell, bool *ok, const QString &expression, QString *error);
     protected slots:
         void tdataChanged( const QModelIndex & tl, const QModelIndex & br ) {
             emit rawDataChanged();

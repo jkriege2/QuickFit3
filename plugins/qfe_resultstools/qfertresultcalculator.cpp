@@ -2,6 +2,7 @@
 #include "ui_qfertresultcalculator.h"
 #include "programoptions.h"
 #include "qfpluginservices.h"
+#include "qfmathparser.h"
 
 QFERTResultCalculator::QFERTResultCalculator(QWidget *parent) :
     QDialog(parent),
@@ -119,57 +120,56 @@ void QFERTResultCalculator::eval()
 
     if (resA.isNumberType() && resB.isNumberType()) {
         if (sizeA==0 && sizeB==0) {
-            jkMathParser p;
+            QFMathParser p;
             p.clearFunctions();
             p.clearVariables();
             p.addStandardFunctions();
             p.addStandardVariables();
             p.addVariableDouble("A", resA.getAsDouble());
             p.addVariableDouble("B", resB.getAsDouble());
-            try {
-                jkMathParser::jkmpNode* n=p.parse(getExpression().toStdString());
-                jkMathParser::jkmpResult r=n->evaluate();
-                if (r.type==jkMathParser::jkmpDouble) {
+            QFMathParser::qfmpNode* n=p.parse(getExpression());
+            QFMathParser::qfmpResult r=n->evaluate();
+            if (!p.hasErrorOccured()) {
+                if (r.type==QFMathParser::qfmpDouble) {
                     rdrA->resultsSetNumber(getEvalIDA(), getNewResultName(), r.num);
-                } else if (r.type==jkMathParser::jkmpBool) {
+                } else if (r.type==QFMathParser::qfmpBool) {
                     rdrA->resultsSetBoolean(getEvalIDA(), getNewResultName(), r.boolean);
                 } else {
-                    rdrA->resultsSetString(getEvalIDA(), getNewResultName(), QString(r.toString().c_str()));
+                    rdrA->resultsSetString(getEvalIDA(), getNewResultName(), QFMathParser::resultToString(r));
                 }
                 rdrA->resultsSetGroup(getEvalIDA(), getNewResultName(), "evaluation results");
-            } catch(std::exception& E) {
-                QMessageBox::critical(this, tr("results calculator"), tr("error while parsing/evaluating expression: %1").arg(E.what()));
-                //ui->labError->setText(tr("<font color=\"red\">ERROR:</font> %1").arg(E.what()));
+            } else {
+                QMessageBox::critical(this, tr("results calculator"), tr("error while parsing/evaluating expression: %1").arg(p.getLastError()));
+                //ui->labError->setText(tr("<font color=\"red\">ERROR:</font> %1").arg(p.getLastError()));
             }
 
         } else if (sizeA>0 && sizeB>0) {
-            jkMathParser p;
+            QFMathParser p;
             p.clearFunctions();
             p.clearVariables();
             p.addStandardFunctions();
             p.addStandardVariables();
-            try {
-                QVector<double> res, rA=resA.getAsDoubleVector(), rB=resB.getAsDoubleVector();
-                QVector<bool> resBo;
-                QVector<QString> sl;
-                bool isBool=false;
-                bool isSTring=false;
-                jkMathParser::jkmpNode* n=p.parse(getExpression().toStdString());
+            QVector<double> res, rA=resA.getAsDoubleVector(), rB=resB.getAsDoubleVector();
+            QVector<bool> resBo;
+            QVector<QString> sl;
+            bool isBool=false;
+            bool isSTring=false;
+            QFMathParser::qfmpNode* n=p.parse(getExpression());
+            if (!p.hasErrorOccured()) {
                 for (int i=0; i<qMin(sizeA, sizeB); i++) {
                     p.addVariableDouble("A", rA.value(i, 0));
                     p.addVariableDouble("B", rB.value(i, 0));
-                    jkMathParser::jkmpResult r=n->evaluate();
-                    if (r.type==jkMathParser::jkmpDouble) {
-                        res<<r.num;
-                        //rdrA->resultsSetNumber(getEvalIDA(), getNewResultName(), r.num);
-                    } else if (r.type==jkMathParser::jkmpBool) {
-                        //rdrA->resultsSetBoolean(getEvalIDA(), getNewResultName(), r.boolean);
-                        resBo<<r.boolean;
-                        isBool=true;
-                    } else {
-                        sl<<r.toString().c_str();
-                        isSTring=true;
-                        //rdrA->resultsSetString(getEvalIDA(), getNewResultName(), r.toString());
+                    QFMathParser::qfmpResult r=n->evaluate();
+                    if (!p.hasErrorOccured()) {
+                        if (r.type==QFMathParser::qfmpDouble) {
+                            res<<r.num;
+                        } else if (r.type==QFMathParser::qfmpBool) {
+                            resBo<<r.boolean;
+                            isBool=true;
+                        } else {
+                            sl<<r.toString();
+                            isSTring=true;
+                        }
                     }
                 }
                 if (isBool) {
@@ -180,8 +180,10 @@ void QFERTResultCalculator::eval()
                     rdrA->resultsSetNumberList(getEvalIDA(), getNewResultName(), res);
                 }
                 rdrA->resultsSetGroup(getEvalIDA(), getNewResultName(), "evaluation results");
-            } catch(std::exception& E) {
-                QMessageBox::critical(this, tr("results calculator"), tr("error while parsing/evaluating expression: %1").arg(E.what()));
+            }
+            if (n) delete n;
+            if (p.hasErrorOccured()) {
+                    QMessageBox::critical(this, tr("results calculator"), tr("error while parsing/evaluating expression:\n    %1").arg(p.getLastErrors().join("\n    ")));
                 //ui->labError->setText(tr("<font color=\"red\">ERROR:</font> %1").arg(E.what()));
             }
 

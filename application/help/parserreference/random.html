@@ -9,10 +9,31 @@
   
 
   <h2>random numbers</h2>
+  <p>The math parser uses internally a Mersenne Twister random number generator.</p>
   <ul>
   <li><a name="rand"/><!-- func:rand -->
   <b><tt><!-- template -->rand()<!-- /template --></tt> - <i>returns a random number between 0 and 1 (equally distributed) </i>:</b><br>
+  The function <tt>rand()</tt> accepts up to two arguments:<ul>
+    <li><tt>rand(N)</tt> returns a random number between 0 and N</li>
+    <li><tt>rand(N1, N2)</tt> returns a random number between N1 and N2</li>
+  </ul>
   <!-- /func:rand -->
+  </li>
+  <li><a name="randint"/><!-- func:randint -->
+  <b><tt><!-- template -->randint()<!-- /template --></tt> - <i>returns an integer valued random number between 0 and 2<sup>32</sup>-1 (equally distributed) </i>:</b><br>
+  The function <tt>randint()</tt> accepts up to two arguments:<ul>
+    <li><tt>randint(N)</tt> returns a random number between 0 and N</li>
+    <li><tt>randint(N1, N2)</tt> returns a random number between N1 and N2</li>
+  </ul>
+  <!-- /func:randint -->
+  </li>
+  <li><a name="randnorm"/><!-- func:randnorm -->
+  <b><tt><!-- template -->randnorm()<!-- /template --></tt> - <i>returns an normally distributed random number with mean 0 and variante 1 </i>:</b><br>
+  The function <tt>randnorm()</tt> accepts up to two arguments:<ul>
+    <li><tt>randnorm(VAR)</tt> returns a random number normally distributed with mean 0 and variance <tt>VAR</tt></li>
+    <li><tt>randnorm(MEAN, VAR)</tt> returns a random number normally distributed with mean <tt>MEAN</tt> and variance <tt>VAR</tt></li>
+  </ul>
+  <!-- /func:randnorm -->
   </li>
   <li><a name="srand"/><!-- func:srand -->
   <b><tt><!-- template -->srand(x)<!-- /template --></tt> - <i>seed the internal random number generator </i>:</b><br>

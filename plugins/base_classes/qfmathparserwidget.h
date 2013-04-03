@@ -7,7 +7,7 @@
 #include <QThread>
 #include <QStringListModel>
 #include "qffunctionreferencetool.h"
-#include "jkmathparser.h"
+#include "qfmathparser.h"
 
 
 
@@ -43,7 +43,7 @@ class QFMathParserWidget : public QWidget {
         QString getExpression() const;
         void setExpression(const QString& exp);
         void addExpressionDefaultWords(const QStringList& words);
-        jkMathParser* getMathParser() const { return mp; }
+        QFMathParser* getMathParser() const { return mp; }
 
    protected slots:
         void on_edtFormula_textChanged(QString text);
@@ -55,7 +55,7 @@ class QFMathParserWidget : public QWidget {
     protected:
         Ui::QFMathParserWidget *ui;
 
-        jkMathParser* mp;
+        QFMathParser* mp;
 
         QFFunctionReferenceTool* functionRef;
 

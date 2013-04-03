@@ -89,7 +89,8 @@ HEADERS += dlgnewproperty.h \
     qfresultsgroupcombobox.h \
     qfrawdataresultscombobox.h \
     qfelidedlabel.h \
-    qfmathparser.h
+    qfmathparser.h \
+    ../extlibs/MersenneTwister.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -166,6 +167,8 @@ CONFIG += dll lib_bundle exceptions rtti stl create_prl
 DEFINES += QFLIB_LIBRARY
 
 
+
+SRC_DISTRIBUTED.files = ../extlibs/MersenneTwister.h
 
 
 

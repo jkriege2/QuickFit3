@@ -17,7 +17,7 @@ DlgNewVersion::DlgNewVersion(QWidget *parent) :
                             "  howpublished={[web page] \verb+%4+},\n"
                             "  year={%2},\n"
                             "  note={[Accessed on %5]},\n"
-                            "}</pre></code>").arg(qfInfoVersion()).arg(qfInfoCompiler()).arg(qfInfoSVNVersion()).arg(qfInfoWeblink()).arg(QDate::currentDate().toString("yyyy-MM-dd")));
+                            "}</pre></code>").arg(qfInfoCompileDate()).arg(qfInfoCompiler()).arg(qfInfoSVNVersion()).arg(qfInfoWeblink()).arg(QDate::currentDate().toString("yyyy-MM-dd")));
     ui->labMailinglist->setText(tr("<a href=\"mailto:%1\">%1</a> (<a href=\"%2\">subscribe</a>)<br><a href=\"%3\">%3</a>").arg(qfInfoMaillist()).arg(qfInfoMaillistRequest()).arg(qfInfoWeblink()));
     ui->labLicense->setText(qfInfoLicense());
     QFile f(":/quickfit3/releasenotes.html");

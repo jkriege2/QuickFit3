@@ -71,34 +71,34 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
     cur.movePosition(QTextCursor::Start);
     cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&gt;&gt; <i>%1</i></tt><br>").arg(expression)));
     parser->resetErrors();
-        QFMathParser::qfmpResult r=parser->evaluate(expression);
+    QFMathParser::qfmpResult r=parser->evaluate(expression);
 
-        QString result;
-        if (r.isValid) {
-            if (r.type==QFMathParser::qfmpBool) {
-                result=tr("<font color=\"blue\">[boolean] %1</font>").arg(boolToQString(r.boolean));
-            } else if (r.type==QFMathParser::qfmpDouble) {
-                result=tr("<font color=\"blue\">[float] %1</font>").arg(r.num);
-            } else if (r.type==QFMathParser::qfmpString) {
-                result=tr("<font color=\"blue\">[string] %1</font>").arg(r.str);
-            } else {
-                result=tr("<font color=\"red\">[unknown] ? ? ?</font>");
-            }
-            QFMathParser::qfmpResult r1=parser->getVariableOrInvalid("ans");
-            QFMathParser::qfmpResult r2=parser->getVariableOrInvalid("ans1");
-            if (r1.isValid) {
-                parser->addVariable("ans1", r1);
-            }
-            if (r2.isValid) {
-                parser->addVariable("ans2", r2);
-            }
-            parser->addVariable("ans", r);
-            parser->addVariable("answer", r);
+    QString result;
+    if (r.isValid) {
+        if (r.type==QFMathParser::qfmpBool) {
+            result=tr("<font color=\"blue\">[boolean] %1</font>").arg(boolToQString(r.boolean));
+        } else if (r.type==QFMathParser::qfmpDouble) {
+            result=tr("<font color=\"blue\">[float] %1</font>").arg(r.num);
+        } else if (r.type==QFMathParser::qfmpString) {
+            result=tr("<font color=\"blue\">[string] %1</font>").arg(r.str);
         } else {
-            result=tr("<font color=\"red\">invalid result</font>");
+            result=tr("<font color=\"red\">[unknown] ? ? ?</font>");
         }
+        QFMathParser::qfmpResult r1=parser->getVariableOrInvalid("ans");
+        QFMathParser::qfmpResult r2=parser->getVariableOrInvalid("ans1");
+        if (r1.isValid) {
+            parser->addVariable("ans1", r1);
+        }
+        if (r2.isValid) {
+            parser->addVariable("ans2", r2);
+        }
+        parser->addVariable("ans", r);
+        parser->addVariable("answer", r);
+    } else {
+        result=tr("<font color=\"red\">invalid result</font>");
+    }
 
-        cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;&nbsp; = %1</tt><br>").arg(result)));
+    cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;&nbsp; = %1</tt><br>").arg(result)));
     if (parser->hasErrorOccured()) {
         cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;&nbsp; <font color=\"red\">ERROR: %1</font></tt><br>").arg(parser->getLastErrors().join("<br>ERROR: "))));
     }
@@ -111,10 +111,10 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
 void QFECalculatorDialog::on_edtExpression_textChanged(QString text) {
     ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>"));
     QFMathParser mp; // instanciate
-    QFMathParser::qfmpNode* n;
+    QFMathParser::qfmpNode* n=NULL;
     // parse some numeric expression
     n=mp.parse(text);
-    delete n;
+    if (n) delete n;
     ui->btnEvaluate->setEnabled(true);
     if (mp.hasErrorOccured()) {
         ui->labError->setText(tr("<font color=\"red\">ERROR: %1</font>").arg(mp.getLastErrors().join("<br>ERROR: ")));

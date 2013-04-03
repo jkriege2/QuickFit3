@@ -1,6 +1,8 @@
 #include "qfmathtools.h"
 #include <float.h>
 
+
+
 double qfSinc( double x )
 {
     static double const    taylor_0_bound = 3*DBL_MIN ;

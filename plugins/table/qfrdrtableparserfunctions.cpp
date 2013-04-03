@@ -3,7 +3,7 @@
 
 
 
-void addQFRDRTableFunctions(jkMathParser* parser, QStringList* names) {
+void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names) {
     parser->addFunction("data", fQFRDRTableEditor_data);
     parser->addFunction("dataleft", fQFRDRTableEditor_dataleft);
     parser->addFunction("colavg", fQFRDRTableEditor_colavg);
@@ -25,15 +25,15 @@ void addQFRDRTableFunctions(jkMathParser* parser, QStringList* names) {
 
 
 
-jkMathParser::jkmpResult fQFRDRTableEditor_data(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
-    jkMathParser::jkmpResult res;
+QFMathParser::qfmpResult fQFRDRTableEditor_data(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    QFMathParser::qfmpResult res;
     res.num=NAN;
-    jkMathParserData* d=(jkMathParserData*)p->get_data();
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            res.type=jkMathParser::jkmpDouble;
-            if (n!=2) p->jkmpError("data(row, column) needs 2 argument");
-            if ((params[0].type!=jkMathParser::jkmpDouble)||(params[1].type!=jkMathParser::jkmpDouble)) p->jkmpError("data(row, column) needs two integer arguments");
+            res.type=QFMathParser::qfmpDouble;
+            if (n!=2) p->qfmpError("data(row, column) needs 2 argument");
+            if ((params[0].type!=QFMathParser::qfmpDouble)||(params[1].type!=QFMathParser::qfmpDouble)) p->qfmpError("data(row, column) needs two integer arguments");
             int r=floor(params[0].num-1);
             int c=floor(params[1].num-1);
             if (r>=0 && c>=0 && r<d->model->rowCount() && c<d->model->columnCount()) {
@@ -43,18 +43,18 @@ jkMathParser::jkmpResult fQFRDRTableEditor_data(jkMathParser::jkmpResult* params
                     case QVariant::ULongLong :
                     case QVariant::Int :
                     case QVariant::UInt :
-                    case QVariant::Double: res.num=da.toDouble(); res.type=jkMathParser::jkmpDouble; break;
+                    case QVariant::Double: res.num=da.toDouble(); res.type=QFMathParser::qfmpDouble; break;
                     case QVariant::Date:
-                    case QVariant::DateTime: res.num=da.toDateTime().toMSecsSinceEpoch(); res.type=jkMathParser::jkmpDouble; break;
-                    case QVariant::Time: res.num=QDateTime(QDate::currentDate(), da.toTime()).toMSecsSinceEpoch(); res.type=jkMathParser::jkmpDouble; break;
-                    case QVariant::Bool: res.boolean=da.toBool(); res.type=jkMathParser::jkmpBool; break;
+                    case QVariant::DateTime: res.num=da.toDateTime().toMSecsSinceEpoch(); res.type=QFMathParser::qfmpDouble; break;
+                    case QVariant::Time: res.num=QDateTime(QDate::currentDate(), da.toTime()).toMSecsSinceEpoch(); res.type=QFMathParser::qfmpDouble; break;
+                    case QVariant::Bool: res.boolean=da.toBool(); res.type=QFMathParser::qfmpBool; break;
                     case QVariant::String:
-                        res.str=da.toString().toStdString(); res.type=jkMathParser::jkmpString; break;
+                        res.str=da.toString(); res.type=QFMathParser::qfmpString; break;
                     default:
                         if (da.canConvert(QVariant::Double)) {
-                            res.num=da.toDouble(); res.type=jkMathParser::jkmpDouble; break;
+                            res.num=da.toDouble(); res.type=QFMathParser::qfmpDouble; break;
                         } else {
-                            res.str=da.toString().toStdString(); res.type=jkMathParser::jkmpString; break;
+                            res.str=da.toString(); res.type=QFMathParser::qfmpString; break;
                         }
                         break;
                 }
@@ -64,15 +64,15 @@ jkMathParser::jkmpResult fQFRDRTableEditor_data(jkMathParser::jkmpResult* params
     return res;
 }
 
-jkMathParser::jkmpResult fQFRDRTableEditor_dataleft(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
-    jkMathParser::jkmpResult res;
+QFMathParser::qfmpResult fQFRDRTableEditor_dataleft(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    QFMathParser::qfmpResult res;
     res.num=NAN;
-    jkMathParserData* d=(jkMathParserData*)p->get_data();
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            res.type=jkMathParser::jkmpDouble;
-            if (n!=1) p->jkmpError("dataleft(delta_column) needs 1 argument");
-            if ((params[0].type!=jkMathParser::jkmpDouble)) p->jkmpError("dataleft(delta_column) needs one integer arguments");
+            res.type=QFMathParser::qfmpDouble;
+            if (n!=1) p->qfmpError("dataleft(delta_column) needs 1 argument");
+            if ((params[0].type!=QFMathParser::qfmpDouble)) p->qfmpError("dataleft(delta_column) needs one integer arguments");
             int delta=floor(params[0].num);
             QVariant da= d->model->cell(d->row,d->column-delta);
             switch(da.type()) {
@@ -80,18 +80,18 @@ jkMathParser::jkmpResult fQFRDRTableEditor_dataleft(jkMathParser::jkmpResult* pa
                 case QVariant::ULongLong :
                 case QVariant::Int :
                 case QVariant::UInt :
-                case QVariant::Double: res.num=da.toDouble(); res.type=jkMathParser::jkmpDouble; break;
+                case QVariant::Double: res.num=da.toDouble(); res.type=QFMathParser::qfmpDouble; break;
                 case QVariant::Date:
-                case QVariant::DateTime: res.num=da.toDateTime().toMSecsSinceEpoch(); res.type=jkMathParser::jkmpDouble; break;
-                case QVariant::Time: res.num=QDateTime(QDate::currentDate(), da.toTime()).toMSecsSinceEpoch(); res.type=jkMathParser::jkmpDouble; break;
-                case QVariant::Bool: res.boolean=da.toBool(); res.type=jkMathParser::jkmpBool; break;
+                case QVariant::DateTime: res.num=da.toDateTime().toMSecsSinceEpoch(); res.type=QFMathParser::qfmpDouble; break;
+                case QVariant::Time: res.num=QDateTime(QDate::currentDate(), da.toTime()).toMSecsSinceEpoch(); res.type=QFMathParser::qfmpDouble; break;
+                case QVariant::Bool: res.boolean=da.toBool(); res.type=QFMathParser::qfmpBool; break;
                 case QVariant::String:
-                    res.str=da.toString().toStdString(); res.type=jkMathParser::jkmpString; break;
+                    res.str=da.toString(); res.type=QFMathParser::qfmpString; break;
                 default:
                     if (da.canConvert(QVariant::Double)) {
-                        res.num=da.toDouble(); res.type=jkMathParser::jkmpDouble; break;
+                        res.num=da.toDouble(); res.type=QFMathParser::qfmpDouble; break;
                     } else {
-                        res.str=da.toString().toStdString(); res.type=jkMathParser::jkmpString; break;
+                        res.str=da.toString(); res.type=QFMathParser::qfmpString; break;
                     }
                     break;
             }
@@ -101,16 +101,16 @@ jkMathParser::jkmpResult fQFRDRTableEditor_dataleft(jkMathParser::jkmpResult* pa
 }
 
 
-jkMathParser::jkmpResult fQFRDRTableEditor_colavg(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
-    jkMathParser::jkmpResult res;
+QFMathParser::qfmpResult fQFRDRTableEditor_colavg(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    QFMathParser::qfmpResult res;
     res.num=NAN;
-    jkMathParserData* d=(jkMathParserData*)p->get_data();
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)) p->jkmpError("colavg(column) needs one integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)) p->qfmpError("colavg(column) needs one integer argument");
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -118,7 +118,7 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colavg(jkMathParser::jkmpResult* para
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)||(params[1].type!=jkMathParser::jkmpDouble)||(params[2].type!=jkMathParser::jkmpDouble)) p->jkmpError("colavg(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)||(params[1].type!=QFMathParser::qfmpDouble)||(params[2].type!=QFMathParser::qfmpDouble)) p->qfmpError("colavg(column, range_start, range_end) needs three integer argument");
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -126,12 +126,12 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colavg(jkMathParser::jkmpResult* para
                     }
                 }
             } else {
-                p->jkmpError("colavg(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                p->qfmpError("colavg(column [, range_start, range_end]) needs 1 or 3 arguments argument");
             }
 
 
             res.num=qfstatisticsAverage(data);
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
 
         }
     }
@@ -139,16 +139,16 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colavg(jkMathParser::jkmpResult* para
 }
 
 
-jkMathParser::jkmpResult fQFRDRTableEditor_colsum(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
-    jkMathParser::jkmpResult res;
+QFMathParser::qfmpResult fQFRDRTableEditor_colsum(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    QFMathParser::qfmpResult res;
     res.num=NAN;
-    jkMathParserData* d=(jkMathParserData*)p->get_data();
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)) p->jkmpError("colsum(column) needs one integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)) p->qfmpError("colsum(column) needs one integer argument");
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -156,7 +156,7 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colsum(jkMathParser::jkmpResult* para
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)||(params[1].type!=jkMathParser::jkmpDouble)||(params[2].type!=jkMathParser::jkmpDouble)) p->jkmpError("colsum(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)||(params[1].type!=QFMathParser::qfmpDouble)||(params[2].type!=QFMathParser::qfmpDouble)) p->qfmpError("colsum(column, range_start, range_end) needs three integer argument");
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -164,28 +164,28 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colsum(jkMathParser::jkmpResult* para
                     }
                 }
             } else {
-                p->jkmpError("colsum(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                p->qfmpError("colsum(column [, range_start, range_end]) needs 1 or 3 arguments argument");
             }
 
 
             res.num=qfstatisticsSum(data);
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
 
         }
     }
     return res;
 }
 
-jkMathParser::jkmpResult fQFRDRTableEditor_colsum2(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
-    jkMathParser::jkmpResult res;
+QFMathParser::qfmpResult fQFRDRTableEditor_colsum2(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    QFMathParser::qfmpResult res;
     res.num=NAN;
-    jkMathParserData* d=(jkMathParserData*)p->get_data();
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)) p->jkmpError("colsum2(column) needs one integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)) p->qfmpError("colsum2(column) needs one integer argument");
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -193,7 +193,7 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colsum2(jkMathParser::jkmpResult* par
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)||(params[1].type!=jkMathParser::jkmpDouble)||(params[2].type!=jkMathParser::jkmpDouble)) p->jkmpError("colsum2(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)||(params[1].type!=QFMathParser::qfmpDouble)||(params[2].type!=QFMathParser::qfmpDouble)) p->qfmpError("colsum2(column, range_start, range_end) needs three integer argument");
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -201,12 +201,12 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colsum2(jkMathParser::jkmpResult* par
                     }
                 }
             } else {
-                p->jkmpError("colsum2(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                p->qfmpError("colsum2(column [, range_start, range_end]) needs 1 or 3 arguments argument");
             }
 
 
             res.num=qfstatisticsSum2(data);
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
 
         }
     }
@@ -215,16 +215,16 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colsum2(jkMathParser::jkmpResult* par
 
 
 
-jkMathParser::jkmpResult fQFRDRTableEditor_colvar(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
-    jkMathParser::jkmpResult res;
+QFMathParser::qfmpResult fQFRDRTableEditor_colvar(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    QFMathParser::qfmpResult res;
     res.num=NAN;
-    jkMathParserData* d=(jkMathParserData*)p->get_data();
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)) p->jkmpError("colvar(column) needs one integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)) p->qfmpError("colvar(column) needs one integer argument");
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -232,7 +232,7 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colvar(jkMathParser::jkmpResult* para
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)||(params[1].type!=jkMathParser::jkmpDouble)||(params[2].type!=jkMathParser::jkmpDouble)) p->jkmpError("colvar(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)||(params[1].type!=QFMathParser::qfmpDouble)||(params[2].type!=QFMathParser::qfmpDouble)) p->qfmpError("colvar(column, range_start, range_end) needs three integer argument");
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -240,12 +240,12 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colvar(jkMathParser::jkmpResult* para
                     }
                 }
             } else {
-                p->jkmpError("colvar(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                p->qfmpError("colvar(column [, range_start, range_end]) needs 1 or 3 arguments argument");
             }
 
 
             res.num=qfstatisticsVariance(data);
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
 
         }
     }
@@ -253,16 +253,16 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colvar(jkMathParser::jkmpResult* para
 }
 
 
-jkMathParser::jkmpResult fQFRDRTableEditor_colstd(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
-    jkMathParser::jkmpResult res;
+QFMathParser::qfmpResult fQFRDRTableEditor_colstd(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    QFMathParser::qfmpResult res;
     res.num=NAN;
-    jkMathParserData* d=(jkMathParserData*)p->get_data();
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)) p->jkmpError("colstd(column) needs one integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)) p->qfmpError("colstd(column) needs one integer argument");
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -270,7 +270,7 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colstd(jkMathParser::jkmpResult* para
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)||(params[1].type!=jkMathParser::jkmpDouble)||(params[2].type!=jkMathParser::jkmpDouble)) p->jkmpError("colstd(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)||(params[1].type!=QFMathParser::qfmpDouble)||(params[2].type!=QFMathParser::qfmpDouble)) p->qfmpError("colstd(column, range_start, range_end) needs three integer argument");
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -278,12 +278,12 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colstd(jkMathParser::jkmpResult* para
                     }
                 }
             } else {
-                p->jkmpError("colstd(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                p->qfmpError("colstd(column [, range_start, range_end]) needs 1 or 3 arguments argument");
             }
 
 
             res.num=sqrt(qfstatisticsVariance(data));
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
 
         }
     }
@@ -291,16 +291,16 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colstd(jkMathParser::jkmpResult* para
 }
 
 
-jkMathParser::jkmpResult fQFRDRTableEditor_colmin(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
-    jkMathParser::jkmpResult res;
+QFMathParser::qfmpResult fQFRDRTableEditor_colmin(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    QFMathParser::qfmpResult res;
     res.num=NAN;
-    jkMathParserData* d=(jkMathParserData*)p->get_data();
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)) p->jkmpError("colmin(column) needs one integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)) p->qfmpError("colmin(column) needs one integer argument");
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -308,7 +308,7 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colmin(jkMathParser::jkmpResult* para
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)||(params[1].type!=jkMathParser::jkmpDouble)||(params[2].type!=jkMathParser::jkmpDouble)) p->jkmpError("colmin(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)||(params[1].type!=QFMathParser::qfmpDouble)||(params[2].type!=QFMathParser::qfmpDouble)) p->qfmpError("colmin(column, range_start, range_end) needs three integer argument");
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -316,12 +316,12 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colmin(jkMathParser::jkmpResult* para
                     }
                 }
             } else {
-                p->jkmpError("colmin(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                p->qfmpError("colmin(column [, range_start, range_end]) needs 1 or 3 arguments argument");
             }
 
             qSort(data);
             res.num=qfstatisticsSortedMin(data);
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
 
         }
     }
@@ -329,16 +329,16 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colmin(jkMathParser::jkmpResult* para
 }
 
 
-jkMathParser::jkmpResult fQFRDRTableEditor_colmax(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
-    jkMathParser::jkmpResult res;
+QFMathParser::qfmpResult fQFRDRTableEditor_colmax(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    QFMathParser::qfmpResult res;
     res.num=NAN;
-    jkMathParserData* d=(jkMathParserData*)p->get_data();
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)) p->jkmpError("colmax(column) needs one integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)) p->qfmpError("colmax(column) needs one integer argument");
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -346,7 +346,7 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colmax(jkMathParser::jkmpResult* para
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)||(params[1].type!=jkMathParser::jkmpDouble)||(params[2].type!=jkMathParser::jkmpDouble)) p->jkmpError("colmax(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)||(params[1].type!=QFMathParser::qfmpDouble)||(params[2].type!=QFMathParser::qfmpDouble)) p->qfmpError("colmax(column, range_start, range_end) needs three integer argument");
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -354,12 +354,12 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colmax(jkMathParser::jkmpResult* para
                     }
                 }
             } else {
-                p->jkmpError("colmax(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                p->qfmpError("colmax(column [, range_start, range_end]) needs 1 or 3 arguments argument");
             }
 
             qSort(data);
             res.num=qfstatisticsSortedMax(data);
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
 
         }
     }
@@ -367,16 +367,16 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colmax(jkMathParser::jkmpResult* para
 }
 
 
-jkMathParser::jkmpResult fQFRDRTableEditor_colmedian(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
-    jkMathParser::jkmpResult res;
+QFMathParser::qfmpResult fQFRDRTableEditor_colmedian(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    QFMathParser::qfmpResult res;
     res.num=NAN;
-    jkMathParserData* d=(jkMathParserData*)p->get_data();
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)) p->jkmpError("colmedian(column) needs one integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)) p->qfmpError("colmedian(column) needs one integer argument");
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -384,7 +384,7 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colmedian(jkMathParser::jkmpResult* p
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)||(params[1].type!=jkMathParser::jkmpDouble)||(params[2].type!=jkMathParser::jkmpDouble)) p->jkmpError("colmedian(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)||(params[1].type!=QFMathParser::qfmpDouble)||(params[2].type!=QFMathParser::qfmpDouble)) p->qfmpError("colmedian(column, range_start, range_end) needs three integer argument");
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -392,12 +392,12 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colmedian(jkMathParser::jkmpResult* p
                     }
                 }
             } else {
-                p->jkmpError("colmedian(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                p->qfmpError("colmedian(column [, range_start, range_end]) needs 1 or 3 arguments argument");
             }
 
             qSort(data);
             res.num=qfstatisticsSortedMedian(data);
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
 
         }
     }
@@ -406,17 +406,17 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colmedian(jkMathParser::jkmpResult* p
 
 
 
-jkMathParser::jkmpResult fQFRDRTableEditor_colquantile(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
-    jkMathParser::jkmpResult res;
+QFMathParser::qfmpResult fQFRDRTableEditor_colquantile(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    QFMathParser::qfmpResult res;
     res.num=NAN;
-    jkMathParserData* d=(jkMathParserData*)p->get_data();
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
             QList<double> data;
             double quantile=0;
             if (n==2) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)||(params[1].type!=jkMathParser::jkmpDouble)) p->jkmpError("colquantile(column, quantile) needs two number argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)||(params[1].type!=QFMathParser::qfmpDouble)) p->qfmpError("colquantile(column, quantile) needs two number argument");
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -425,7 +425,7 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colquantile(jkMathParser::jkmpResult*
                 }
                 quantile=params[1].num;
             } else if (n==4) {
-                if ((params[0].type!=jkMathParser::jkmpDouble)||(params[1].type!=jkMathParser::jkmpDouble)||(params[2].type!=jkMathParser::jkmpDouble)||(params[3].type!=jkMathParser::jkmpDouble)) p->jkmpError("colquantile(column, range_start, range_end, quantile) needs four number argument");
+                if ((params[0].type!=QFMathParser::qfmpDouble)||(params[1].type!=QFMathParser::qfmpDouble)||(params[2].type!=QFMathParser::qfmpDouble)||(params[3].type!=QFMathParser::qfmpDouble)) p->qfmpError("colquantile(column, range_start, range_end, quantile) needs four number argument");
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -434,12 +434,12 @@ jkMathParser::jkmpResult fQFRDRTableEditor_colquantile(jkMathParser::jkmpResult*
                 }
                 quantile=params[3].num;
             } else {
-                p->jkmpError("colquantile(column [, range_start, range_end], quantile) needs 2 or 4 arguments ");
+                p->qfmpError("colquantile(column [, range_start, range_end], quantile) needs 2 or 4 arguments ");
             }
 
             qSort(data);
             res.num=qfstatisticsSortedQuantile(data, quantile);
-            res.type=jkMathParser::jkmpDouble;
+            res.type=QFMathParser::qfmpDouble;
 
         }
     }

@@ -28,6 +28,7 @@
 #include <QList>
 #include <QString>
 #include <QPair>
+#include "../extlibs/MersenneTwister.h"
 
 
 
@@ -181,22 +182,22 @@
             }
             if (r.type==qfmpDouble) cout<<r.num<<endl;
             if (r.type==qfmpString) cout<<r.str<<endl;
-            delete n;
         }
         if (mp.hasErrorOccured()) {
             qDebug()<<"ERROR: "<<mp.getLastError();
         }
+        if (n) delete n;
 
         // parse some string expression
         n=mp.parse("var1='false'; var1+'true'");
         if (!mp.hasErrorOccured()) {
             r=n->evaluate();
             if (r.type==qfmpString) cout<<r.str<<endl;
-            delete n;
         }
         if (mp.hasErrorOccured()) {
             qDebug()<<"ERROR: "<<mp.getLastError();
         }
+        if (n) delete n;
      \endcode
 
 
@@ -237,7 +238,7 @@ class QFLIB_EXPORT QFMathParser
             COMP_GREATER,       /*!< \brief greater than operation '>' */
             COMP_SMALLER,       /*!< \brief smaller than operation '<' */
             COMP_GEQUAL,        /*!< \brief greater than or equal operation '>=' */
-            COMP_SEQUAL,        /*!< \brief smaller than or equal operation '<=' */
+            COMP_SEQUAL        /*!< \brief smaller than or equal operation '<=' */
         };
 
 
@@ -295,13 +296,16 @@ class QFLIB_EXPORT QFMathParser
           bool boolean;          /*!< \brief contains result if \c type==qfmpBool */
 
           /** \brief convert the value this struct representens into a QString */
-          inline QString toString();
+          QFLIB_EXPORT QString toString() const;
 
           /** \brief convert the value this struct representens into a QString and adds the name of the datatype in \c [...] */
-          inline QString toTypeString();
+          QFLIB_EXPORT QString toTypeString() const;
         };
 
-        qfmpResult getInvalidResult();
+        static QString resultToString(const qfmpResult &r);
+        static QString resultToTypeString(const qfmpResult &r);
+
+        static qfmpResult getInvalidResult();
 
 
         /** \brief This struct is for managing variables. Unlike qfmpResult this struct
@@ -351,7 +355,7 @@ class QFLIB_EXPORT QFMathParser
          * }
          * \endcode
          */
-        typedef qfmpResult (*qfmpEvaluateFunc)(qfmpResult*, unsigned char, QFMathParser*);
+        typedef qfmpResult (*qfmpEvaluateFunc)(qfmpResult*, unsigned int, QFMathParser*);
 
 
         /** \brief description of a user registered function */
@@ -418,7 +422,7 @@ class QFLIB_EXPORT QFMathParser
             qfmpBinaryArithmeticNode(char op, qfmpNode* l, qfmpNode* r, QFMathParser* p, qfmpNode* par);
 
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpBinaryArithmeticNode() { delete left; delete right;};
+            ~qfmpBinaryArithmeticNode();
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
@@ -442,7 +446,7 @@ class QFLIB_EXPORT QFMathParser
             qfmpBinaryBoolNode(char op, qfmpNode* l, qfmpNode* r, QFMathParser* p, qfmpNode* par);
 
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpBinaryBoolNode() { delete left; delete right;};
+            ~qfmpBinaryBoolNode();
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
@@ -466,7 +470,7 @@ class QFLIB_EXPORT QFMathParser
             qfmpCompareNode(char op, qfmpNode* l, qfmpNode* r, QFMathParser* p, qfmpNode* par);
 
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpCompareNode () { delete left; delete right;};
+            ~qfmpCompareNode ();
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
@@ -489,7 +493,7 @@ class QFLIB_EXPORT QFMathParser
             qfmpUnaryNode(char op, qfmpNode* c, QFMathParser* p, qfmpNode* par);
 
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpUnaryNode() {delete child;};
+            ~qfmpUnaryNode();
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
@@ -505,7 +509,7 @@ class QFLIB_EXPORT QFMathParser
             char operation;
           public:
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpVariableAssignNode() {delete child;};
+            ~qfmpVariableAssignNode() ;
 
             /** \brief constructor for a qfmpVariableAssignNode
              *  \param var name of the variable to assign to
@@ -584,8 +588,7 @@ class QFLIB_EXPORT QFMathParser
         class QFLIB_EXPORT qfmpFunctionNode: public qfmpNode {
           private:
             QString fun;
-            qfmpNode** child;
-            unsigned char n;
+            QVector<QFMathParser::qfmpNode*> child;
             qfmpEvaluateFunc function;
           public:
             /** \brief constructor for a qfmpFunctionNode
@@ -595,7 +598,7 @@ class QFLIB_EXPORT QFMathParser
              *  \param p a pointer to a jkMathParser object
              *  \param par a pointer to the parent node
              */
-            qfmpFunctionNode(QString name, qfmpNode** c, unsigned char num, QFMathParser* p, qfmpNode* par);
+            qfmpFunctionNode(QString name, QVector<QFMathParser::qfmpNode*> params, QFMathParser* p, qfmpNode* par);
 
             /** \brief standard destructor, also destroy the children (recursively) */
             ~qfmpFunctionNode();
@@ -623,6 +626,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief add a qfmpNode n to the list */
             void add(qfmpNode* n);
+            /** \brief remove the first node from the list and only delet it if \a deleteObject is \c true, returns a pointer to the first node, if \a deleteObject is \c false otherwise returns \c NULL */
+            qfmpNode* popFirst(bool deleteObject=false);
 
             /** \brief evaluate the node */
             virtual qfmpResult evaluate();
@@ -693,6 +698,8 @@ class QFLIB_EXPORT QFMathParser
         QTextStream * program;
         QString progStr;
 
+        MTRand rng;
+
         /** \brief vector containing all temporary variables */
         QList<qfmpTempVariable> tempvariables;
 
@@ -717,8 +724,10 @@ class QFLIB_EXPORT QFMathParser
         void setVariableDouble(QString name, double value);
 
 
-        /**\brief  adds a temporary variable */
+        /** \brief  adds a temporary variable */
         void addTempVariable(QString name, qfmpResult value);
+
+        void* data;
 
         QStringList lastError;
         int errors;
@@ -728,16 +737,18 @@ class QFLIB_EXPORT QFMathParser
         bool getFromStream(QTextStream* stream, QChar& ch);
 
 	public:
-		/**\brief class constructor */
+        /** \brief class constructor */
         QFMathParser();
 
-		/**\brief class destructor */
+        /** \brief class destructor */
         virtual ~QFMathParser();
 
         /** \brief returns whether an error has occured since the last call to resetError() */
         bool hasErrorOccured() const;
         /** \brief retuns the last error */
         QString getLastError() const;
+        /** \brief retuns the last error */
+        QString getFirstError() const;
         /** \brief return a list of the last errors */
         QStringList getLastErrors() const;
         /** \brief returns the number of errors since the last call to resetErrors() */
@@ -745,51 +756,56 @@ class QFLIB_EXPORT QFMathParser
         /** \brief resets the error state to no errors */
         void resetErrors();
 
+        void* get_data() const { return data; }
+        void set_data(void* _data) { data=_data; }
 
-		/**\brief  register a new function
+        MTRand* get_rng() { return &rng; }
+
+
+        /** \brief  register a new function
 		 * \param name name of the new function
 		 * \param function a pointer to the implementation
 		 */
         void addFunction(QString name, qfmpEvaluateFunc function);
 
-		/**\brief  register a new external variable of type double
+        /** \brief  register a new external variable of type double
 		 * \param name name of the new variable
 		 * \param v pointer to the variable memory
 		 */
         void addVariableDouble(QString name, double* v);
 
-		/**\brief  register a new external variable of type string
+        /** \brief  register a new external variable of type string
 		 * \param name name of the new variable
 		 * \param v pointer to the variable memory
 		 */
         void addVariableString(QString name, QString* v);
 
-		/**\brief  register a new external variable of type boolean
+        /** \brief  register a new external variable of type boolean
 		 * \param name name of the new variable
 		 * \param v pointer to the variable memory
 		 */
         void addVariableBoolean(QString name, bool* v);
 
 
-		/**\brief  register a new internal variable of type double
+        /** \brief  register a new internal variable of type double
 		 * \param name name of the new variable
 		 * \param v initial value of this variable
 		 */
         void addVariableDouble(QString name, double v);
 
-		/**\brief  register a new internal variable of type string
+        /** \brief  register a new internal variable of type string
 		 * \param name name of the new variable
 		 * \param v initial value of this variable
 		 */
         void addVariableString(QString name, QString v);
 
-        /**\brief  register a new internal variable of type boolean
+        /** \brief  register a new internal variable of type boolean
          * \param name name of the new variable
          * \param v initial value of this variable
          */
         void addVariableBoolean(QString name, bool v);
 
-        /**\brief  register a new internal variable of type boolean
+        /** \brief  register a new internal variable of type boolean
          * \param name name of the new variable
          * \param v initial value of this variable
          */
@@ -797,26 +813,26 @@ class QFLIB_EXPORT QFMathParser
 
 
 
-        /**\brief  returns the value of the given variable */
+        /** \brief  returns the value of the given variable */
         qfmpResult getVariable(QString name);
-        /**\brief  returns the value of the given variable */
+        /** \brief  returns the value of the given variable */
         qfmpResult getVariableOrInvalid(QString name);
 
-        /**\brief  returns the defining structure of the given variable */
+        /** \brief  returns the defining structure of the given variable */
         qfmpVariable getVariableDef(QString name);
 
 
-        /**\brief  evaluates a registered function
+        /** \brief  evaluates a registered function
          * \param name name of the (registered function) to be evaluated
          * \param params array of the input parameters
          * \param n number of input parameters (<=8)
          */
         qfmpResult evaluateFunction(QString name, qfmpResult* params, unsigned char n);
 
-        /**\brief  returns the defining structure of the given function */
+        /** \brief  returns the defining structure of the given function */
         qfmpEvaluateFunc getFunctionDef(QString name);
 
-        /**\brief  tests whether a temporary variable exists */
+        /** \brief  tests whether a temporary variable exists */
         inline bool tempvariableExists(QString name){
           if (tempvariables.size()<=0)  return false;
           for (int i=tempvariables.size()-1; i>=0; i--) {
@@ -825,36 +841,36 @@ class QFLIB_EXPORT QFMathParser
           return false;
         };
 
-        /**\brief  tests whether a variable exists */
+        /** \brief  tests whether a variable exists */
         inline bool variableExists(QString name){ return tempvariableExists(name)||(variables.find(name)!=variables.end()); };
 
-        /**\brief  tests whether a function exists */
+        /** \brief  tests whether a function exists */
         inline bool functionExists(QString name){ return !(functions.find(name)==functions.end()); };
 
-        /**\brief  deletes all defined variables. the memory of internal variables
+        /** \brief  deletes all defined variables. the memory of internal variables
          * will be released. the external memory will not be released.
          */
         void clearVariables();
 
-        /**\brief  delete the specified variabale and releases its internal memory.*/
+        /** \brief  delete the specified variabale and releases its internal memory.*/
         void deleteVariable(QString name);
 
-        /**\brief  clears the list of internal functions*/
+        /** \brief  clears the list of internal functions*/
         inline void clearFunctions() {functions.clear();};
 
-        /**\brief  registers standard variables*/
+        /** \brief  registers standard variables*/
         void addStandardVariables();
 
-        /**\brief  registers standard functions*/
+        /** \brief  registers standard functions*/
         void addStandardFunctions();
 
-        /**\brief  parses the given expression*/
+        /** \brief  parses the given expression*/
         qfmpNode* parse(QString prog);
 
         /** \brief evaluate the given expression */
         qfmpResult evaluate(QString prog);
 
-        /**\brief  prints a list of all registered variables */
+        /** \brief  prints a list of all registered variables */
         QString printVariables();
 
         QList<QPair<QString, qfmpVariable> > getVariables();

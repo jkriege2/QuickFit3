@@ -18,7 +18,7 @@
 #include "tableresizedialog.h"
 #include "qfrdrtabledelegate.h"
 #include "qftools.h"
-#include "jkmathparser.h"
+#include "qfmathparser.h"
 #include "qfrdrtableformuladialog.h"
 #include "qfrdrtablehistogramdialog.h"
 
@@ -113,7 +113,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
 
         QToolBar* tbMain;
 
-        QVariant evaluateExpression(jkMathParser& mp, jkMathParser::jkmpNode* node, QModelIndex cell, bool* ok, const QString& expression=QString("? ? ?"));
+        QVariant evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode* node, QModelIndex cell, bool* ok, const QString& expression=QString("? ? ?"));
     private:
 };
 

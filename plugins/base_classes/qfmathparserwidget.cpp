@@ -1,11 +1,11 @@
 #include "qfmathparserwidget.h"
 #include "ui_qfmathparserwidget.h"
 #include "programoptions.h"
-#include "jkmathparser.h"
+#include "qfmathparser.h"
 #include "qfpluginservices.h"
 
-jkMathParser::jkmpResult QFMathParserWidget_dummy(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
-    jkMathParser::jkmpResult res;
+QFMathParser::qfmpResult QFMathParserWidget_dummy(QFMathParser::qfmpResult* params, unsigned char n, QFMathParser* p) {
+    QFMathParser::qfmpResult res;
 
     return res;
 }
@@ -14,7 +14,7 @@ QFMathParserWidget::QFMathParserWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QFMathParserWidget)
 {
-    mp=new jkMathParser();
+    mp=new QFMathParser();
     functionRef=new QFFunctionReferenceTool(NULL);
     functionRef->setCompleterFile(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/table/table_expression.txt");
     functionRef->setDefaultWordsMathExpression();
@@ -70,14 +70,15 @@ void QFMathParserWidget::addExpressionDefaultWords(const QStringList &words)
 }
 
 void QFMathParserWidget::on_edtFormula_textChanged(QString text) {
-    try {
+    QFMathParser::qfmpNode* n;
+    mp->resetErrors();
+    // parse some numeric expression
+    n=mp->parse(getExpression());
+    delete n;
+    if (mp->hasErrorOccured()) {
+        ui->labError->setText(tr("<font color=\"red\">ERROR:</font> %1").arg(mp->getLastError()));
+    } else {
         ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>"));
-        jkMathParser::jkmpNode* n;
-        // parse some numeric expression
-        n=mp->parse(getExpression().toStdString());
-        delete n;
-    } catch(std::exception& E) {
-        ui->labError->setText(tr("<font color=\"red\">ERROR:</font> %1").arg(E.what()));
     }
 
 }

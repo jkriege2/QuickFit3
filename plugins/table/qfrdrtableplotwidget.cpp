@@ -4,7 +4,8 @@
 #include "qfrdrtable.h"
 #include "qftools.h"
 #include "qfdoubleedit.h"
-#include "jkqtpparsedfunctionelements.h"
+#include "qfmathparserxfunctionlinegraph.h"
+
 
 
 
@@ -1022,7 +1023,7 @@ void QFRDRTablePlotWidget::updateGraph() {
 
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtFunction) {
-                JKQTPxParsedFunctionLineGraph* pg=new JKQTPxParsedFunctionLineGraph(ui->plotter->get_plotter());
+                QFMathParserXFunctionLineGraph* pg=new QFMathParserXFunctionLineGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
                 pg->set_function(g.function);
                 //qDebug()<<"adding function plot "<<g.function;
@@ -1732,15 +1733,14 @@ void QFRDRTablePlotWidget::on_btnResetColoring_clicked()
 
 void QFRDRTablePlotWidget::on_edtFunction_textChanged(const QString &text)
 {
-    try {
-        ui->labFunctionOK->setText(tr("<font color=\"darkgreen\">function OK</font>"));
-        jkMathParser mp; // instanciate
-        jkMathParser::jkmpNode* n;
-        // parse some numeric expression
-        n=mp.parse(text.toStdString());
-        delete n;
-    } catch(std::exception& E) {
-        ui->labFunctionOK->setText(tr("<font color=\"red\">ERROR in function:</font> %1").arg(E.what()));
+    ui->labFunctionOK->setText(tr("<font color=\"darkgreen\">function OK</font>"));
+    QFMathParser mp; // instanciate
+    QFMathParser::qfmpNode* n;
+    // parse some numeric expression
+    n=mp.parse(text);
+    delete n;
+    if (mp.hasErrorOccured()) {
+        ui->labFunctionOK->setText(tr("<font color=\"red\">ERROR in function:<br>&nbsp;&nbsp;&nbsp;&nbsp;%1</font>").arg(mp.getLastErrors().join("<br>&nbsp;&nbsp;&nbsp;&nbsp;")));
     }
 }
 

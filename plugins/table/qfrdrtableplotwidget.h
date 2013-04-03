@@ -8,7 +8,7 @@
 #include "tools.h"
 #include "qfrdrtable.h"
 #include "QToolTip"
-#include "jkmathparser.h"
+#include "qfmathparser.h"
 #include "qffunctionreferencetool.h"
 
 namespace Ui {

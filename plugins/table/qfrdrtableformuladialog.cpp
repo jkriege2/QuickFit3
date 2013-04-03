@@ -1,12 +1,12 @@
 #include "qfrdrtableformuladialog.h"
 #include "ui_qfrdrtableformuladialog.h"
 #include "programoptions.h"
-#include "jkmathparser.h"
+#include "qfmathparser.h"
 #include "qfpluginservices.h"
 #include "qfrdrtableparserfunctions.h"
 
-jkMathParser::jkmpResult QFRDRTableFormulaDialog_dummy(jkMathParser::jkmpResult* params, unsigned char n, jkMathParser* p) {
-    jkMathParser::jkmpResult res;
+QFMathParser::qfmpResult QFRDRTableFormulaDialog_dummy(QFMathParser::qfmpResult* params, unsigned char n, QFMathParser* p) {
+    QFMathParser::qfmpResult res;
 
     return res;
 }
@@ -40,7 +40,7 @@ QFRDRTableFormulaDialog::QFRDRTableFormulaDialog(QWidget *parent) :
     defaultWords<<"dataleft";
 
 
-    jkMathParser mp; // instanciate
+    QFMathParser mp; // instanciate
     addQFRDRTableFunctions(&mp, &defaultWords);
 
     functionRef->addDefaultWords(defaultWords);
@@ -71,21 +71,22 @@ void QFRDRTableFormulaDialog::setExpression(const QString &exp)
 }
 
 void QFRDRTableFormulaDialog::on_edtFormula_textChanged(QString text) {
-    try {
+
+    QFMathParser mp; // instanciate
+    addQFRDRTableFunctions(&mp);
+    mp.addVariableDouble("row", 0.0);
+    mp.addVariableDouble("rows", 1.0);
+    mp.addVariableDouble("col", 0.0);
+    mp.addVariableDouble("column", 0.0);
+    mp.addVariableDouble("columns", 1.0);
+    QFMathParser::qfmpNode* n;
+    // parse some numeric expression
+    n=mp.parse(getExpression());
+    delete n;
+    if (mp.hasErrorOccured()) {
+        ui->labError->setText(tr("<font color=\"red\">ERROR:<br>&nbsp;&nbsp;&nbsp;&nbsp;%1</font>").arg(mp.getLastErrors().join("<br>&nbsp;&nbsp;&nbsp;&nbsp;")));
+    } else {
         ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>"));
-        jkMathParser mp; // instanciate
-        addQFRDRTableFunctions(&mp);
-        mp.addVariableDouble("row", 0.0);
-        mp.addVariableDouble("rows", 1.0);
-        mp.addVariableDouble("col", 0.0);
-        mp.addVariableDouble("column", 0.0);
-        mp.addVariableDouble("columns", 1.0);
-        jkMathParser::jkmpNode* n;
-        // parse some numeric expression
-        n=mp.parse(getExpression().toStdString());
-        delete n;
-    } catch(std::exception& E) {
-        ui->labError->setText(tr("<font color=\"red\">ERROR:</font> %1").arg(E.what()));
     }
 
 }
