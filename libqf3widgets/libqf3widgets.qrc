@@ -68,5 +68,6 @@
         <file alias="default_config.png">icons/default_config.png</file>
         <file alias="default_config_set.png">icons/default_config_set.png</file>
         <file alias="qfplotter_copytotable.png">icons/qfplotter_copytotable.png</file>
+        <file alias="stage_none.png">icons/stage_none.png</file>
     </qresource>
 </RCC>

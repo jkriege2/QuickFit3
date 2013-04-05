@@ -905,9 +905,16 @@ p, li { white-space: pre-wrap; }
       <widget class="QFCameraConfigEditorWidget" name="cmbCam1Settings" native="true">
        <property name="minimumSize">
         <size>
-         <width>0</width>
+         <width>50</width>
          <height>10</height>
         </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnTestAcq1">
+       <property name="text">
+        <string>&amp;Test</string>
        </property>
       </widget>
      </item>
@@ -932,9 +939,16 @@ p, li { white-space: pre-wrap; }
       <widget class="QFCameraConfigEditorWidget" name="cmbCam2Settings" native="true">
        <property name="minimumSize">
         <size>
-         <width>0</width>
+         <width>50</width>
          <height>10</height>
         </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnTestAcq2">
+       <property name="text">
+        <string>&amp;Test</string>
        </property>
       </widget>
      </item>
@@ -1099,6 +1113,13 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="btnTestAcqLP1">
+       <property name="text">
+        <string>&amp;Test</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_10">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -1126,6 +1147,13 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="btnTestAcqLP2">
+       <property name="text">
+        <string>&amp;Test</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_11">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -1149,6 +1177,13 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="sizeAdjustPolicy">
         <enum>QComboBox::AdjustToContents</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnTestAcqLP3">
+       <property name="text">
+        <string>&amp;Test</string>
        </property>
       </widget>
      </item>

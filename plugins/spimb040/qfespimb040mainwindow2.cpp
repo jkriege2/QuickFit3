@@ -5,7 +5,7 @@
 
 
 
-#define sqr(a) ((a)*(a))
+#define sqr(a) qfSqr(a)
 #define PROCESS_EVENTS_TIMEOUT_MS 20
 #define SPIMACQUISITION_ERROR(message, title) \
     log_error(QString("  - ")+(message)+QString("\n")); \
@@ -155,7 +155,7 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
         //------------------------------------------------------------------------------------------
         // create tab for image stack acquisition
         //------------------------------------------------------------------------------------------
-        widImageStack=new QFESPIMB040ImageStackConfigWidget2(this, m_pluginServices, optSetup, widAcquisitionDescription, widExperimentDescription, m_pluginServices->getConfigFileDirectory());
+        widImageStack=new QFESPIMB040ImageStackConfigWidget2(this, this, this, m_pluginServices, optSetup, widAcquisitionDescription, widExperimentDescription, m_pluginServices->getConfigFileDirectory());
         //tabAcquisition->addTab(widImageStack, tr("Image S&tack"));
         tabMain->addTab(widImageStack, tr("Acquisition: Image S&tack"));
         connect(widImageStack, SIGNAL(doStack()), this, SLOT(doImageStack()));
@@ -164,7 +164,7 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
         //------------------------------------------------------------------------------------------
         // create tab for cam parameter image series acquisition
         //------------------------------------------------------------------------------------------
-        widCamParamScan=new QFESPIMB040CamParamStackConfigWidget2(this, m_pluginServices, optSetup, widAcquisitionDescription, widExperimentDescription, m_pluginServices->getConfigFileDirectory());
+        widCamParamScan=new QFESPIMB040CamParamStackConfigWidget2(this, this, this, m_pluginServices, optSetup, widAcquisitionDescription, widExperimentDescription, m_pluginServices->getConfigFileDirectory());
         tabMain->addTab(widCamParamScan, tr("Acquisition: Camera Parameter Series"));
         connect(widCamParamScan, SIGNAL(doStack()), this, SLOT(doCamParamStack()));
         connect(optSetup, SIGNAL(lightpathesChanged(QFESPIMB040OpticsSetupItems)), widCamParamScan, SLOT(lightpathesChanged(QFESPIMB040OpticsSetupItems)));
@@ -204,7 +204,8 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
 
 
 void QFESPIMB040MainWindow2::doImageStack() {
-    if (!(widImageStack->use1() || widImageStack->use2())) {
+    widImageStack->performStack();
+    /*if (!(widImageStack->use1() || widImageStack->use2())) {
         QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No camera selected!"));
         return;
     }
@@ -965,7 +966,7 @@ void QFESPIMB040MainWindow2::doImageStack() {
     optSetup->unlockStages();
     optSetup->unlockLightpath();
     optSetup->ensureLightpath();
-    progress.close();
+    progress.close();*/
 }
 
 
@@ -975,6 +976,8 @@ void QFESPIMB040MainWindow2::doImageStack() {
 
 
 void QFESPIMB040MainWindow2::doCamParamStack() {
+    widCamParamScan->performStack();
+    /*
     if (!(widCamParamScan->use1() || widCamParamScan->use2())) {
         QMessageBox::critical(this, tr("B040SPIM: Parameter Stack Acquisition"), tr("Cannot start image acquisition: No camera selected!"));
         return;
@@ -1574,7 +1577,7 @@ void QFESPIMB040MainWindow2::doCamParamStack() {
     }
     optSetup->unlockLightpath();
     optSetup->ensureLightpath();
-
+    */
 }
 
 void QFESPIMB040MainWindow2::doDeviceParameterStack()
@@ -2402,18 +2405,18 @@ bool QFESPIMB040MainWindow2::connectStageForAcquisition(QFExtensionLinearStage* 
     stageInitialPos=0;
     if (!stage) {
 
-        SPIMACQUISITION_ERROR(tr("no stage %1 selected").arg(stageNum), acquisitionTitle);
+        SPIMACQUISITION_ERROR(tr("no stage %1 selected").arg(stage->getStageName(stageAxis)), acquisitionTitle);
         optSetup->unlockStages();
         optSetup->unlockLightpath();
         return false;
     }
     if (ok && (!stage->isConnected(stageAxis))) {
-        log_text(tr("  - connecting to stage %3: '%1', axis %2!\n").arg(widImageStack->stageExtension()->getName()).arg(stageAxis).arg(stageNum));
+        log_text(tr("  - connecting to stage %3: '%1', axis %2!\n").arg(stage->getStageName(stageAxis)).arg(stageAxis).arg(stageNum));
         stage->connectDevice(stageAxis);
     }
     if (ok && (!stage->isConnected(stageAxis)))  {
         ok=false;
-        SPIMACQUISITION_ERROR(tr("error connecting to stage %3: '%1', axis %2").arg(widImageStack->stageExtension()->getName()).arg(stageAxis).arg(stageNum), acquisitionTitle);
+        SPIMACQUISITION_ERROR(tr("error connecting to stage %3: '%1', axis %2").arg(stage->getStageName(stageAxis)).arg(stageAxis).arg(stageNum), acquisitionTitle);
     }
     if (ok) {
         stage->setJoystickActive(stageAxis, false);

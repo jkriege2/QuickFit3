@@ -224,6 +224,13 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="btnAcq1TestPreview4">
+          <property name="text">
+           <string>&amp;Test</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_14">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -250,6 +257,13 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="focusPolicy">
            <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAcq1TestPreview3">
+          <property name="text">
+           <string>&amp;Test</string>
           </property>
          </widget>
         </item>
@@ -333,6 +347,13 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="focusPolicy">
             <enum>Qt::TabFocus</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnAcq1Test">
+           <property name="text">
+            <string>&amp;Test</string>
            </property>
           </widget>
          </item>
@@ -431,6 +452,13 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="btnAcq1TestPreview2">
+          <property name="text">
+           <string>&amp;Test</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_8">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -477,6 +505,13 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="focusPolicy">
            <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAcq1TestPreview1">
+          <property name="text">
+           <string>&amp;Test</string>
           </property>
          </widget>
         </item>
@@ -712,6 +747,13 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="btnAcq2TestPreview2">
+          <property name="text">
+           <string>&amp;Test</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_12">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -748,6 +790,13 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="focusPolicy">
            <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAcq2Test">
+          <property name="text">
+           <string>&amp;Test</string>
           </property>
          </widget>
         </item>
@@ -811,6 +860,13 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="focusPolicy">
            <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAcq2TestPreview1">
+          <property name="text">
+           <string>&amp;Test</string>
           </property>
          </widget>
         </item>
@@ -928,6 +984,13 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="btnAcq2TestPreview3">
+          <property name="text">
+           <string>&amp;Test</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_13">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -954,6 +1017,13 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="focusPolicy">
            <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAcq2TestPreview4">
+          <property name="text">
+           <string>&amp;Test</string>
           </property>
          </widget>
         </item>

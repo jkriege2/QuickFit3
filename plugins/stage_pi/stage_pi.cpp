@@ -87,6 +87,7 @@ void QFExtensionLinearStagePI::initExtension() {
             d.joystickEnabled=false;
             d.state=QFExtensionLinearStage::Disconnected;
             d.name=axisname;
+            d.label=inifile.value(axisname+"/label", tr("PI Mercury 863, axis %1").arg(i)).toString();
             axes.append(d);
         }
     }
@@ -477,6 +478,13 @@ void QFExtensionLinearStagePI::move(unsigned int axis, double newPosition) {
         }
         axes[axis].state=QFExtensionLinearStage::Moving;
     }
+}
+
+QString QFExtensionLinearStagePI::getStageName(unsigned int axis) const
+{
+    QString n=tr("PI Mercury 863, axis %1").arg(axis);
+    if (axis>=0 && axis<axes.size()) n=axes[axis].label;
+    return n;
 }
 
 

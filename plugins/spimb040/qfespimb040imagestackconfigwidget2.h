@@ -10,6 +10,7 @@
 #include "qfespimb040opticssetup.h"
 #include "qfespimb040acquisitiondescription.h"
 #include "qfespimb040experimentdescription.h"
+#include "qfespimb040acquisitiontools.h"
 
 class QFESPIMB040MainWindow; // forward
 class QFPluginServices; // forward
@@ -27,7 +28,7 @@ class QFESPIMB040ImageStackConfigWidget2 : public QWidget, public QFESPIMB040Fil
         Q_OBJECT
 
     public:
-        explicit QFESPIMB040ImageStackConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
+        explicit QFESPIMB040ImageStackConfigWidget2(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
         ~QFESPIMB040ImageStackConfigWidget2();
 
         /** \brief return the filename for the currently selected camera configuration */
@@ -35,14 +36,14 @@ class QFESPIMB040ImageStackConfigWidget2 : public QWidget, public QFESPIMB040Fil
         /** \brief return the name (not the full filename with path) for the currently selected camera configuration */
         QString currentConfigName(int camera) const;
 
-    signals:
-        void doStack();
+
 
     public:
         void loadSettings(QSettings& settings, QString prefix);
         void storeSettings(QSettings& settings, QString prefix) const;
 
 
+    protected:
         bool saveMeasurements() const;
 
         int images() const;
@@ -91,8 +92,12 @@ class QFESPIMB040ImageStackConfigWidget2 : public QWidget, public QFESPIMB040Fil
         QString lightpath2Filename() const;
         QString lightpath3() const;
         QString lightpath3Filename() const;
-public slots:
+    signals:
+        void doStack();
+
+    public slots:
         void lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes);
+        void performStack();
     protected slots:
         void on_btnAcquire_clicked();
         void on_chkUse1_clicked(bool enabled);
@@ -130,6 +135,21 @@ public slots:
         void on_btnSaveTemplate_clicked();
         void on_btnLoadTemplate_clicked();
 
+        void on_btnTestAcq1_pressed();
+        void on_btnTestAcq1_released();
+        void on_btnTestAcq2_pressed();
+        void on_btnTestAcq2_released();
+
+        void on_btnTestAcqLP1_pressed();
+        void on_btnTestAcqLP1_released();
+
+        void on_btnTestAcqLP2_pressed();
+        void on_btnTestAcqLP2_released();
+
+        void on_btnTestAcqLP3_pressed();
+        void on_btnTestAcqLP3_released();
+
+
         void checkStage();
         void updateLabel();
 
@@ -140,6 +160,8 @@ public slots:
         QFESPIMB040OpticsSetup* opticsSetup;
         QFESPIMB040AcquisitionDescription* acqDescription;
         QFESPIMB040ExperimentDescription* expDescription;
+        QFPluginLogService* log;
+        QFESPIMB040AcquisitionTools* acqTools;
 
         QAction* actGetCurrent;
         QAction* actGetCurrentAround;

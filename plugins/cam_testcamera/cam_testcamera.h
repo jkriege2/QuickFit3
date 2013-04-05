@@ -55,7 +55,7 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         };
 
         /** \copydoc QFExtension::deinit() */
@@ -185,6 +185,8 @@ class QFECamTestCamera : public QObject, public QFExtensionBase, public QFExtens
         double particlePSF[2];
         /** \brief indicate whether there should be some hot pixels */
         int hotpixels[2];
+        /** \brief dualview channel brightnes for rhs half, compared to lhs */
+        double dualviewBrightness[2];
 
 
         void initParticles(int camera, int n);

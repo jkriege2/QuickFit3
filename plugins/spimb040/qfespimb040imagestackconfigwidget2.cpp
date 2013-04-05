@@ -13,13 +13,18 @@
 #include "qfespimb040opticssetup.h"
 #include "qfcompleterfromfile.h"
 #include "qfstyledbutton.h"
+#include <tiffio.h>
+#include "libtiff_tools.h"
 
 #define STAGE_INTERVAL_MS 1313
+#define PROCESS_EVENTS_TIMEOUT_MS 20
 
-QFESPIMB040ImageStackConfigWidget2::QFESPIMB040ImageStackConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* stageConfig, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory) :
+QFESPIMB040ImageStackConfigWidget2::QFESPIMB040ImageStackConfigWidget2(QFESPIMB040AcquisitionTools *acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* stageConfig, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory) :
     QWidget(parent),
     ui(new Ui::QFESPIMB040ImageStackConfigWidget2)
 {
+    this->acqTools=acqTools;
+    this->log=log;
     m_pluginServices=pluginServices;
     this->opticsSetup=stageConfig;
     this->acqDescription=acqDescription;
@@ -786,6 +791,63 @@ void QFESPIMB040ImageStackConfigWidget2::on_btnLoadTemplate_clicked()
     ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ImageStackConfigWidget2/lasttemplatedir", dir);
 }
 
+void QFESPIMB040ImageStackConfigWidget2::on_btnTestAcq1_pressed()
+{
+    opticsSetup->overrideCameraPreview(0, ui->cmbCam1Settings->currentConfigFilename(), "");
+}
+
+void QFESPIMB040ImageStackConfigWidget2::on_btnTestAcq1_released()
+{
+    opticsSetup->resetCameraPreview(0);
+}
+
+void QFESPIMB040ImageStackConfigWidget2::on_btnTestAcq2_pressed()
+{
+    opticsSetup->overrideCameraPreview(1, ui->cmbCam2Settings->currentConfigFilename(), "");
+}
+
+void QFESPIMB040ImageStackConfigWidget2::on_btnTestAcq2_released()
+{
+    opticsSetup->resetCameraPreview(1);
+}
+
+void QFESPIMB040ImageStackConfigWidget2::on_btnTestAcqLP1_pressed()
+{
+    opticsSetup->overrideCameraPreview(0, ui->cmbCam1Settings->currentConfigFilename(), lightpath1Filename());
+    opticsSetup->overrideCameraPreview(1, ui->cmbCam2Settings->currentConfigFilename(), lightpath1Filename());
+}
+
+void QFESPIMB040ImageStackConfigWidget2::on_btnTestAcqLP1_released()
+{
+    opticsSetup->resetCameraPreview(0);
+    opticsSetup->resetCameraPreview(1);
+}
+
+void QFESPIMB040ImageStackConfigWidget2::on_btnTestAcqLP2_pressed()
+{
+    opticsSetup->overrideCameraPreview(0, ui->cmbCam1Settings->currentConfigFilename(), lightpath2Filename());
+    opticsSetup->overrideCameraPreview(1, ui->cmbCam2Settings->currentConfigFilename(), lightpath2Filename());
+}
+
+void QFESPIMB040ImageStackConfigWidget2::on_btnTestAcqLP2_released()
+{
+    opticsSetup->resetCameraPreview(0);
+    opticsSetup->resetCameraPreview(1);
+}
+
+void QFESPIMB040ImageStackConfigWidget2::on_btnTestAcqLP3_pressed()
+{
+    opticsSetup->overrideCameraPreview(0, ui->cmbCam1Settings->currentConfigFilename(), lightpath3Filename());
+    opticsSetup->overrideCameraPreview(1, ui->cmbCam2Settings->currentConfigFilename(), lightpath3Filename());
+}
+
+void QFESPIMB040ImageStackConfigWidget2::on_btnTestAcqLP3_released()
+{
+    opticsSetup->resetCameraPreview(0);
+    opticsSetup->resetCameraPreview(1);
+}
+
+
 QString QFESPIMB040ImageStackConfigWidget2::currentConfigFilename(int camera) const {
     if (camera==0) return ui->cmbCam1Settings->currentConfigFilename();
     if (camera==1) return ui->cmbCam2Settings->currentConfigFilename();
@@ -822,7 +884,789 @@ void QFESPIMB040ImageStackConfigWidget2::lightpathesChanged(QFESPIMB040OpticsSet
 
 }
 
+
 bool QFESPIMB040ImageStackConfigWidget2::saveMeasurements() const {
     return ui->chkSaveMeasurements->isChecked();
+}
+
+
+
+
+
+
+
+
+
+
+
+#define IMAGESTACK_ERROR(message) \
+    log->log_error(QString("  - ")+(message)+QString("\n")); \
+    QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition Error"), (message));
+
+
+void QFESPIMB040ImageStackConfigWidget2::performStack()
+{
+    if (!(use1() || use2())) {
+        QMessageBox::critical(this, tr("B040SPIM: Image Stack Acquisition"), tr("Cannot start image acquisition: No camera selected!"));
+        return;
+    }
+
+    QDateTime startDateTime=QDateTime::currentDateTime();
+    QList<QFESPIMB040OpticsSetup::measuredValues> measured;
+
+    QProgressListDialog progress(tr("Image Stack Acquisition"), tr("&Cancel"), 0, 100, this);
+    progress.setWindowModality(Qt::WindowModal);
+    //progress.setMinimumDuration(0);
+    progress.setValue(0);
+    progress.addItem(tr("initializing stages"));
+    progress.addItem(tr("preparing cameras"));
+    progress.addItem(tr("performing acquisition"));
+    progress.addItem(tr("storing data to disk"));
+    progress.addItem(tr("clean up"));
+    progress.setHasProgressBar(true);
+    progress.show();
+
+
+    log->log_text(tr("starting image stack acquisition:\n"));
+    log->log_text(tr("  - locking stages\n"));
+    progress.start();
+    opticsSetup->lockStages();
+    opticsSetup->lockLightpath();
+
+    bool ok=true;
+    int axisCount=1; // number of axes to use for scan
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // CHECK/CONNECT SELECTED STAGE 1
+    //////////////////////////////////////////////////////////////////////////////////////
+    QFExtensionLinearStage* stage=this->stage();
+    int stageAxis=currentAxisID();
+    double stageInitialPos=0;
+    progress.setProgressText(tr("locking stage 1 ..."));
+    ok=acqTools->connectStageForAcquisition(stage, stageAxis, stageInitialPos, tr("B040SPIM: Image Stack Acquisition"),1);
+
+
+    if (ok) {
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // CHECK/CONNECT SELECTED STAGE 2 (if selected)
+        //////////////////////////////////////////////////////////////////////////////////////
+        QFExtensionLinearStage* stage2=this->stage2();
+        int stageAxis2=currentAxisID2();
+        double stageInitialPos2=0;
+        if (useStage2()) {
+            progress.setProgressText(tr("locking stage 2 ..."));
+            ok=acqTools->connectStageForAcquisition(stage2, stageAxis2, stageInitialPos2, tr("B040SPIM: Image Stack Acquisition"),2);
+            if (ok) axisCount++;
+
+        }
+
+        if (!ok) {
+            opticsSetup->unlockStages();
+            opticsSetup->unlockLightpath();
+            return;
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // CHECK/CONNECT SELECTED STAGE 3 (if selected)
+        //////////////////////////////////////////////////////////////////////////////////////
+        QFExtensionLinearStage* stage3=this->stage3();
+        int stageAxis3=currentAxisID3();
+        double stageInitialPos3=0;
+        if (useStage3()) {
+            progress.setProgressText(tr("locking stage 3 ..."));
+            ok=acqTools->connectStageForAcquisition(stage3, stageAxis3, stageInitialPos3, tr("B040SPIM: Image Stack Acquisition"),3);
+            if (ok) axisCount++;
+
+        }
+
+        if (!ok) {
+            opticsSetup->unlockStages();
+            opticsSetup->unlockLightpath();
+            return;
+        }
+
+
+        progress.nextItem();
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // LOCK/INIT CAMERA 1
+        //////////////////////////////////////////////////////////////////////////////////////
+        bool useCam1=false;
+        QFExtension* extension1=NULL;
+        QFExtensionCamera* ecamera1=NULL;
+        int camera1=0;
+        QString acquisitionSettingsFilename1="", previewSettingsFilename1="";
+        QString acquisitionPrefix1=prefix1();
+        QStringList TIFFFIlename1;;
+        QList<TIFF*> tiff1;
+        if (use1()) {
+            progress.setProgressText(tr("locking camera 1 ..."));
+            if (!(useCam1=opticsSetup->lockCamera(0, &extension1, &ecamera1, &camera1, &previewSettingsFilename1))) {
+                IMAGESTACK_ERROR(tr("error locking camera 1!\n"));
+            }
+        }
+        if (QFile::exists(currentConfigFilename(0))) acquisitionSettingsFilename1=currentConfigFilename(0);
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // LOCK/INIT CAMERA 2
+        //////////////////////////////////////////////////////////////////////////////////////
+        bool useCam2=false;
+        QFExtension* extension2=NULL;
+        QFExtensionCamera* ecamera2=NULL;
+        QString acquisitionSettingsFilename2="", previewSettingsFilename2="";
+        QString acquisitionPrefix2=prefix2();
+        QStringList TIFFFIlename2;
+        QList<TIFF*> tiff2;
+        int camera2=0;
+        if (use2()) {
+            progress.setProgressText(tr("locking camera 2 ..."));
+            if(!(useCam2=opticsSetup->lockCamera(1, &extension2, &ecamera2, &camera2, &previewSettingsFilename2))) {
+                IMAGESTACK_ERROR(tr("error locking camer 2!\n"));
+            }
+        }
+        if (QFile::exists(currentConfigFilename(1))) acquisitionSettingsFilename2=currentConfigFilename(1);
+
+        if (ok && !useCam1 && !useCam2) {
+            IMAGESTACK_ERROR(tr("Cannot start image acquisition: No camera selected, or both cameras not usable!"));
+            ok=false;
+        }
+
+        if (ok && useCam1) log->log_text(tr("  - storing files with prefix 1: '%1'\n").arg(acquisitionPrefix1));
+        if (ok && useCam2) log->log_text(tr("  - storing files with prefix 2: '%1'\n").arg(acquisitionPrefix2));
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // PREPARE CAMERA 1
+        //////////////////////////////////////////////////////////////////////////////////////
+        int width1=0, height1=0;
+        uint32_t* buffer1=NULL;
+        if (ok && useCam1) {
+            progress.setLabelText(tr("preparing camera 1 ..."));
+            ok=acqTools->prepareCamera(1, camera1, ecamera1, acquisitionSettingsFilename1, width1, height1, &buffer1);
+
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // PREPARE CAMERA 2
+        //////////////////////////////////////////////////////////////////////////////////////
+        int width2=0, height2=0;
+        uint32_t* buffer2=NULL;
+        if (ok && useCam2) {
+            progress.setLabelText(tr("preparing camera 2 ..."));
+            ok=acqTools->prepareCamera(2, camera2, ecamera2, acquisitionSettingsFilename2, width2, height2, &buffer2);
+
+
+        }
+
+
+        progress.setLabelText(tr("preparing lightpathes ..."));
+
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // COUNT LIGHTPATHS
+        //////////////////////////////////////////////////////////////////////////////////////
+        QStringList lightpathList;
+        QStringList lightpathNames;
+        if (lightpath1Activated()) {
+            if (QFile::exists(lightpath1Filename())) {
+                lightpathList.append(lightpath1Filename());
+                lightpathNames.append(lightpath1());
+                TIFFFIlename1.append(acquisitionPrefix1+".lightpath1.tif");
+                tiff1.append(NULL);
+                TIFFFIlename2.append(acquisitionPrefix2+".lightpath1.tif");
+                tiff2.append(NULL);
+            } else {
+                ok=false;
+                IMAGESTACK_ERROR(tr("acquisition lightpath 1 '%1' configuration not found!").arg(lightpath1()));
+            }
+        }
+        if (lightpath2Activated()) {
+            if (QFile::exists(lightpath2Filename())) {
+                lightpathList.append(lightpath2Filename());
+                lightpathNames.append(lightpath2());
+                TIFFFIlename1.append(acquisitionPrefix1+".lightpath2.tif");
+                tiff1.append(NULL);
+                TIFFFIlename2.append(acquisitionPrefix2+".lightpath2.tif");
+                tiff2.append(NULL);
+            } else {
+                ok=false;
+                IMAGESTACK_ERROR(tr("acquisition lightpath 2 '%1' configuration not found!").arg(lightpath2()));
+            }
+        }
+        if (lightpath3Activated()) {
+            if (QFile::exists(lightpath3Filename())) {
+                lightpathList.append(lightpath3Filename());
+                lightpathNames.append(lightpath3());
+                TIFFFIlename1.append(acquisitionPrefix1+".lightpath3.tif");
+                tiff1.append(NULL);
+                TIFFFIlename2.append(acquisitionPrefix2+".lightpath3.tif");
+                tiff2.append(NULL);
+            } else {
+                ok=false;
+                IMAGESTACK_ERROR(tr("acquisition lightpath 3 '%1' configuration not found!").arg(lightpath3()));
+            }
+        }
+        if (ok && lightpathList.isEmpty()) {
+            lightpathList.append("");
+            lightpathNames.append("default");
+            TIFFFIlename1.append(acquisitionPrefix1+".tif");
+            tiff1.append(NULL);
+            TIFFFIlename2.append(acquisitionPrefix2+".tif");
+            tiff2.append(NULL);
+        }
+
+        progress.setLabelText(tr("opening/creating output files ..."));
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // OPEN OUTPUT TIFF FILES
+        //////////////////////////////////////////////////////////////////////////////////////
+        progress.setLabelText(tr("opening output files ..."));
+        QApplication::processEvents();
+        if (ok && useCam1) {
+            for (int i=0; i<TIFFFIlename1.size(); i++) {
+                QDir().mkpath(QFileInfo(TIFFFIlename1[i].toAscii().data()).absolutePath());
+                tiff1[i]=TIFFOpen(TIFFFIlename1[i].toAscii().data(), "w");
+                if (!tiff1[i]) {
+                    ok=false;
+                    IMAGESTACK_ERROR(tr("error opening TIFF file (camera 1) '%1'!").arg(TIFFFIlename1[i]));
+                    break;
+                }
+            }
+        }
+        if (ok && useCam2) {
+            for (int i=0; i<TIFFFIlename2.size(); i++) {
+                QDir().mkpath(QFileInfo(TIFFFIlename2[i].toAscii().data()).absolutePath());
+                tiff2[i]=TIFFOpen(TIFFFIlename2[i].toAscii().data(), "w");
+                if (!tiff2[i]) {
+                    ok=false;
+                    IMAGESTACK_ERROR(tr("error opening TIFF file (camera 2) '%1'!").arg(TIFFFIlename2[i]));
+                }
+            }
+        }
+
+        progress.setLabelText(tr("switching main shutter on ..."));
+
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // switch on light
+        //////////////////////////////////////////////////////////////////////////////////////
+        bool formerMainShutterState=opticsSetup->getMainIlluminationShutter();
+        if (opticsSetup->isMainIlluminationShutterAvailable()){
+            log->log_text(tr("  - switch main shutter on!\n"));
+            opticsSetup->setMainIlluminationShutter(true, true);
+        }
+
+
+        if (progress.wasCanceled()) {
+            log->log_warning(tr("canceled by user!\n"));
+            ok=false;
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // CALCULATE A LIST WITH ALL POSITIONS TO MOVE TO
+        //////////////////////////////////////////////////////////////////////////////////////
+        progress.setLabelText(tr("preparing list of stage positions ..."));
+        double stageStart=stackStart();
+        double stageDelta=stackDelta();
+        int stageCount=stackCount();
+
+        double stageStart2=stackStart2();
+        double stageDelta2=stackDelta2();
+        int stageCount2=stackCount2();
+        bool stageReturn2=stage2Cycling();
+
+        double stageStart3=stackStart3();
+        double stageDelta3=stackDelta3();
+        int stageCount3=stackCount3();
+        bool stageReturn3=stage3Cycling();
+
+        QList<QTriple<double, double, double> > moveTo;
+
+        if (axisCount==1) {
+            double pos=stageStart;
+            for (int x=0; x<stageCount; x++) {
+                moveTo.append(qMakeTriple(pos, 0.0, 0.0));
+                pos=pos+stageDelta;
+            }
+        } else if (axisCount==2) {
+            double pos=stageStart;
+            double pos2=stageStart2;
+            for (int x=0; x<stageCount; x++) {
+                if (stageReturn2) pos2=stageStart2;
+                for (int y=0; y<stageCount2; y++) {
+                    moveTo.append(qMakeTriple(pos, pos2, 0.0));
+                    pos2=pos2+stageDelta2;
+                }
+                pos=pos+stageDelta;
+            }
+        } else if (axisCount==3) {
+            double pos=stageStart;
+            double pos2=stageStart2;
+            double pos3=stageStart3;
+            for (int x=0; x<stageCount; x++) {
+                if (stageReturn2) pos2=stageStart2;
+                for (int y=0; y<stageCount2; y++) {
+                    if (stageReturn3) pos3=stageStart3;
+                    for (int z=0; z<stageCount3; z++) {
+                        moveTo.append(qMakeTriple(pos, pos2, pos3));
+                        pos3=pos3+stageDelta3;
+                    }
+                    pos2=pos2+stageDelta2;
+                }
+                pos=pos+stageDelta;
+            }
+        }
+
+
+        int images=moveTo.size()*this->images()*lightpathList.size();
+
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // ACQUIRE IMAGE, MOVE, ACQUIRE IMAGE, MOVE, ...
+        //    images are stored in TIFF files using libtiff and they are (possibly) downscaled to 16-bit
+        //////////////////////////////////////////////////////////////////////////////////////
+        progress.nextItem();
+
+        QMap<QString, QVariant> acquisitionDescription, acquisitionDescription1, acquisitionDescription2;
+        QList<QVariant> positions, positions2, positions3;
+        QTime timAcquisition=QTime::currentTime();
+        QDateTime timStart;
+        QString estimation="";
+        QString fps="";
+        double duration=0;
+        if (ok) {
+            progress.setLabelText(tr("acquiring images ..."));
+            bool running=ok;
+            //double newPos=stageStart;
+            int posIdx=0;
+            int imageIdx=0;
+            measured.append(opticsSetup->getMeasuredValues());
+            while (running && (posIdx<=moveTo.size())) {
+                double newPos=stageInitialPos;
+                double newPos2=stageInitialPos2;
+                double newPos3=stageInitialPos3;
+                if (posIdx<moveTo.size()) {
+                    newPos=moveTo[posIdx].first;
+                    newPos2=moveTo[posIdx].second;
+                    newPos3=moveTo[posIdx].third;
+                }
+                if (axisCount==1) {
+                    log->log_text(tr("  - moving to position %1 micron ...").arg(newPos));
+                    stage->move(stageAxis, newPos);
+                    QTime t1;
+                    t1.start();
+                    while (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Moving) {
+                        if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
+                            progress.setLabelText(tr("moving stage to %1 microns (distance: %2) ...%3%4").arg(newPos).arg(fabs(stage->getPosition(stageAxis)-newPos)).arg(estimation).arg(fps));
+                            QApplication::processEvents();
+                            if (progress.wasCanceled()) break;
+                            t1.start();
+                        }
+                    }
+
+                    // wait additional time-span after moving stages!
+                    QTime t;
+                    int DeltaT=qMin(5000,qMax(1,delay()));
+                    t.start();
+                    t1.start();
+                    while (t.elapsed()<DeltaT) {
+                        if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS)  {
+                            progress.setLabelText(tr("moving stage to %1 microns (distance: %2) ... waiting%3%4").arg(newPos).arg(fabs(stage->getPosition(stageAxis)-newPos)).arg(estimation).arg(fps));
+                            QApplication::processEvents();
+                            if (progress.wasCanceled()) break;
+                            t1.start();
+                        }
+                    }
+                    if (ok) {
+                        if (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Ready) {
+                            log->log_text(tr(" OK\n"));
+                            positions.append(stage->getPosition(stageAxis));
+                        } else {
+                            IMAGESTACK_ERROR(tr("error moving to position %1 micron!\n").arg(newPos));
+                            ok=false;
+                        }
+                    }
+
+                } else if (axisCount==2) {
+                    log->log_text(tr("  - moving to position (%1, %2) micron ...").arg(newPos).arg(newPos2));
+                    stage->move(stageAxis, newPos);
+                    stage2->move(stageAxis2, newPos2);
+                    QTime t1;
+                    t1.start();
+                    while (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Moving || stage2->getAxisState(stageAxis2)==QFExtensionLinearStage::Moving) {
+                        if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
+                            double dist=sqrt(qfSqr(stage->getPosition(stageAxis)-newPos)+qfSqr(stage2->getPosition(stageAxis2)-newPos2));
+                            progress.setLabelText(tr("moving stage to (%1, %2) microns (distance: %3) ...%4%5").arg(newPos).arg(newPos2).arg(dist).arg(estimation).arg(fps));
+                            QApplication::processEvents();
+                            if (progress.wasCanceled()) break;
+                            t1.start();
+                        }
+                    }
+
+                    // wait additional time-span after moving stages!
+                    QTime t;
+                    int DeltaT=qMin(5000,qMax(1,delay()));
+                    t.start();
+                    t1.start();
+                    while (t.elapsed()<DeltaT) {
+                        if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
+                            double dist=sqrt(qfSqr(stage->getPosition(stageAxis)-newPos)+qfSqr(stage2->getPosition(stageAxis2)-newPos2));
+                            progress.setLabelText(tr("moving stage to (%1, %2) microns (distance: %3) ... waiting%4%5").arg(newPos).arg(newPos2).arg(dist).arg(estimation).arg(fps));
+                            QApplication::processEvents();
+                            if (progress.wasCanceled()) break;
+                            t1.start();
+                        }
+                    }
+                    if (ok) {
+                        if (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Ready && stage2->getAxisState(stageAxis2)==QFExtensionLinearStage::Ready) {
+                            log->log_text(tr(" OK\n"));
+                            positions.append(stage->getPosition(stageAxis));
+                            positions2.append(stage2->getPosition(stageAxis2));
+                        } else {
+                            IMAGESTACK_ERROR(tr("error moving to position (%1, %2) micron!\n").arg(newPos).arg(newPos2));
+                            ok=false;
+                        }
+                    }
+                } else if (axisCount==3) {
+                    log->log_text(tr("  - moving to position (%1, %2, %3) micron ...").arg(newPos).arg(newPos2).arg(newPos3));
+                    stage->move(stageAxis, newPos);
+                    stage2->move(stageAxis2, newPos2);
+                    stage3->move(stageAxis3, newPos3);
+                    QTime t1;
+                    t1.start();
+                    while (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Moving || stage2->getAxisState(stageAxis2)==QFExtensionLinearStage::Moving || stage3->getAxisState(stageAxis3)==QFExtensionLinearStage::Moving) {
+                        if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
+                            double dist=sqrt(qfSqr(stage->getPosition(stageAxis)-newPos) + qfSqr(stage2->getPosition(stageAxis2)-newPos2) + qfSqr(stage3->getPosition(stageAxis3)-newPos3));
+                            progress.setLabelText(tr("moving stage to (%1, %2, %3) microns (distance: %4) ...%5%6").arg(newPos).arg(newPos2).arg(newPos3).arg(dist).arg(estimation).arg(fps));
+                            QApplication::processEvents();
+                            if (progress.wasCanceled()) break;
+                            t1.start();
+                        }
+                    }
+
+                    // wait additional time-span after moving stages!
+                    QTime t;
+                    int DeltaT=qMin(5000,qMax(1,delay()));
+                    t.start();
+                    t1.start();
+                    while (t.elapsed()<DeltaT) {
+                        if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
+                            double dist=sqrt(qfSqr(stage->getPosition(stageAxis)-newPos) + qfSqr(stage2->getPosition(stageAxis2)-newPos2) + qfSqr(stage3->getPosition(stageAxis3)-newPos3));
+                            progress.setLabelText(tr("moving stage to (%1, %2, %3) microns (distance: %4) ... waiting%5%6").arg(newPos).arg(newPos2).arg(newPos3).arg(dist).arg(estimation).arg(fps));
+                            QApplication::processEvents();
+                            if (progress.wasCanceled()) break;
+                            t1.start();
+                        }
+                    }
+                    if (ok) {
+                        if (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Ready && stage2->getAxisState(stageAxis2)==QFExtensionLinearStage::Ready && stage3->getAxisState(stageAxis3)==QFExtensionLinearStage::Ready) {
+                            log->log_text(tr(" OK\n"));
+                            positions.append(stage->getPosition(stageAxis));
+                            positions2.append(stage2->getPosition(stageAxis2));
+                            positions3.append(stage3->getPosition(stageAxis3));
+                        } else {
+                            IMAGESTACK_ERROR(tr("error moving to position (%1, %2, %3) micron!\n").arg(newPos).arg(newPos2).arg(newPos3));
+                            ok=false;
+                        }
+                    }
+                }
+
+
+                QApplication::processEvents();
+                if (posIdx<moveTo.size()) {
+                    if (progress.wasCanceled()) {
+                        running=false;
+                        log->log_warning(tr("  - acquisition canceled by user!\n"));
+                    } else {
+                        if (saveMeasurements()) measured.append(opticsSetup->getMeasuredValues());
+                        for (int lp=0; lp<lightpathList.size(); lp++) {
+                            if (lightpathList.size()>1 || lp==0) {
+                                if (!lightpathList[lp].isEmpty() && QFile::exists(lightpathList[lp])) {
+                                    log->log_text(tr("  - setting lightpath '%1' (%2) ...").arg(lightpathNames[lp]).arg(lp));
+                                    opticsSetup->loadLightpathConfig(lightpathList[lp], true);
+                                    log->log_text(tr(" DONE\n"));
+                                }
+                                if (posIdx<=0) {
+                                    opticsSetup->saveLightpathConfig(acquisitionDescription, lightpathNames[lp], QString("lightpath%1/").arg(lp+1), QList<bool>(), true);
+                                }
+                            }
+                            for (int img=0; img<this->images(); img++) {
+                                log->log_text(tr("  - acquiring images (%1/%2) ...\n").arg(imageIdx+1).arg(images));
+                                if (posIdx>3) {
+                                    double duration=double(timAcquisition.elapsed())/1000.0;
+                                    double eta=duration/double(posIdx+1.0)*double(moveTo.size());
+                                    double etc=eta-duration;
+                                    uint mini=floor(etc/60.0);
+                                    uint secs=round(etc-double(mini)*60.0);
+                                    estimation=tr("\nest. remaining duration (min:secs): %1:%2 ").arg(mini, 2, 10, QChar('0')).arg(secs, 2, 10, QChar('0'));
+
+                                    fps=tr("\nacquisition rate: %1fps").arg(double(imageIdx+1)/duration, 0, 'f', 2);
+                                }
+                                progress.setLabelText(tr("acquiring images (%1/%2) ...%3%4").arg(imageIdx+1).arg(images).arg(estimation).arg(fps));
+                                QApplication::processEvents();
+                                if (progress.wasCanceled()) {
+                                    running=false;
+                                    log->log_warning(tr("  - acquisition canceled by user!\n"));
+                                    break;
+                                }
+                                if (posIdx==0) {
+                                    timAcquisition.start();
+                                    timStart=QDateTime::currentDateTime();
+                                }
+                                uint64_t timestampDummy=0;
+                                if (useCam1) {
+                                    if (ecamera1->acquireOnCamera(camera1, buffer1, NULL, &acquisitionDescription1)) {
+                                        TIFFTWriteUint16from32(tiff1[lp], buffer1, width1, height1, false);
+                                        TIFFWriteDirectory(tiff1[lp]);
+                                    } else {
+                                        ok=false;
+                                        IMAGESTACK_ERROR(tr("error acquiring image %1/%2 on camera 1!\n").arg(imageIdx+1).arg(images));
+                                    }
+                                }
+                                //QApplication::processEvents();
+                                if (useCam2) {
+                                    if (ecamera2->acquireOnCamera(camera2, buffer2, NULL, &acquisitionDescription2)) {
+                                        TIFFTWriteUint16from32(tiff2[lp], buffer2, width2, height2, false);
+                                        TIFFWriteDirectory(tiff2[lp]);
+                                    } else {
+                                        ok=false;
+                                        IMAGESTACK_ERROR(tr("error acquiring image %1/%2 on camera 2!\n").arg(imageIdx+1).arg(images));
+                                    }
+                                }
+                                imageIdx++;
+
+                            }
+                        }
+
+                        //QApplication::processEvents();
+                    }
+                }
+                if (!ok) running=false;
+
+                posIdx++;
+                newPos+=stageDelta;
+                progress.setValue((int)round((double)posIdx/(double)moveTo.size()*100.0));
+                QApplication::processEvents();
+                if (progress.wasCanceled()) {
+                    break;
+                }
+            }
+            duration=timAcquisition.elapsed()/1000.0;
+        }
+        progress.setValue(100);
+        if (saveMeasurements()) measured.append(opticsSetup->getMeasuredValues());
+
+        progress.nextItem();
+        progress.setProgressText(tr("switching main shutter off ..."));
+
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // switch on/off light
+        //////////////////////////////////////////////////////////////////////////////////////
+        if (opticsSetup->isMainIlluminationShutterAvailable()){
+            log->log_text(tr("  - switch main shutter %1!\n").arg((formerMainShutterState)?tr("on"):tr("off")));
+            opticsSetup->setMainIlluminationShutter(formerMainShutterState, true);
+        }
+
+
+        progress.setProgressText(tr("closing TIF files ..."));
+        //////////////////////////////////////////////////////////////////////////////////////
+        // close tiff files and free buffers
+        //////////////////////////////////////////////////////////////////////////////////////
+        progress.setLabelText(tr("closing output files ..."));
+        QApplication::processEvents();
+        for (int lp=0; lp<tiff1.size(); lp++) if (tiff1[lp]) TIFFClose(tiff1[lp]);
+        for (int lp=0; lp<tiff2.size(); lp++) if (tiff2[lp]) TIFFClose(tiff2[lp]);
+        tiff1.clear();
+        tiff2.clear();
+        if (buffer1) free(buffer1);
+        if (buffer2) free(buffer2);
+        buffer1=buffer2=NULL;
+
+        progress.setProgressText(tr("collecting acquisition data ..."));
+        //////////////////////////////////////////////////////////////////////////////////////
+        // collect acquisition data common to all cameras
+        //////////////////////////////////////////////////////////////////////////////////////
+        QString positionsCSV;
+        if (ok) {
+            acquisitionDescription["type"]="stack 1 axis";
+            acquisitionDescription["axis1/type"]="other";
+            if (opticsSetup->getXStage()==stage && opticsSetup->getXStageAxis()==stageAxis) acquisitionDescription["axis1/type"]="x";
+            if (opticsSetup->getYStage()==stage && opticsSetup->getYStageAxis()==stageAxis) acquisitionDescription["axis1/type"]="y";
+            if (opticsSetup->getZStage()==stage && opticsSetup->getZStageAxis()==stageAxis) acquisitionDescription["axis1/type"]="z";
+            acquisitionDescription["axis1/stage_name"]=stageExtension()->getName();
+            acquisitionDescription["axis1/stage_axis"]=stageAxis;
+            acquisitionDescription["axis1/stack_start"]=stageStart;
+            acquisitionDescription["axis1/stack_delta"]=stageDelta;
+            acquisitionDescription["axis1/stack_count"]=stageCount;
+            acquisitionDescription["sequence_overall_length"]=images;
+            acquisitionDescription["images_per_position"]=this->images();
+            acquisitionDescription["lightpath_count"]=lightpathList.count();
+            acquisitionDescription["lightpaths"]=lightpathNames;
+            acquisitionDescription["start_time"]=timStart;
+            acquisitionDescription["duration"]=duration;
+            acquisitionDescription["stack_positions"]=positions;
+            if (useStage2() && useStage3()) {
+                acquisitionDescription["type"]="stack 3 axis";
+                acquisitionDescription["axis2/stack_positions"]=positions2;
+                acquisitionDescription["axis3/stack_positions"]=positions3;
+            } else if (useStage2() && !useStage3()) {
+                acquisitionDescription["type"]="stack 2 axis";
+                acquisitionDescription["axis1/stack_positions"]=positions2;
+            }
+
+            if (useStage2()) {
+                acquisitionDescription["axis2/type"]="other";
+                if (opticsSetup->getXStage()==stage2 && opticsSetup->getXStageAxis()==stageAxis2) acquisitionDescription["axis2/type"]="x";
+                if (opticsSetup->getYStage()==stage2 && opticsSetup->getYStageAxis()==stageAxis2) acquisitionDescription["axis2/type"]="y";
+                if (opticsSetup->getZStage()==stage2 && opticsSetup->getZStageAxis()==stageAxis2) acquisitionDescription["axis2/type"]="z";
+                acquisitionDescription["axis2/stage_name"]=stageExtension2()->getName();
+                acquisitionDescription["axis2/stage_axis"]=stageAxis2;
+                acquisitionDescription["axis2/stack_start"]=stageStart2;
+                acquisitionDescription["axis2/stack_delta"]=stageDelta2;
+                acquisitionDescription["axis2/stack_count"]=stageCount2;
+            }
+
+            if (useStage3()) {
+                acquisitionDescription["axis3/type"]="other";
+                if (opticsSetup->getXStage()==stage3 && opticsSetup->getXStageAxis()==stageAxis3) acquisitionDescription["axis3/type"]="x";
+                if (opticsSetup->getYStage()==stage3 && opticsSetup->getYStageAxis()==stageAxis3) acquisitionDescription["axis3/type"]="y";
+                if (opticsSetup->getZStage()==stage3 && opticsSetup->getZStageAxis()==stageAxis3) acquisitionDescription["axis3/type"]="z";
+                acquisitionDescription["axis3/stage_name"]=stageExtension3()->getName();
+                acquisitionDescription["axis3/stage_axis"]=stageAxis3;
+                acquisitionDescription["axis3/stack_start"]=stageStart3;
+                acquisitionDescription["axis3/stack_delta"]=stageDelta3;
+                acquisitionDescription["axis3/stack_count"]=stageCount3;
+            }
+
+
+            QTextStream pf(&positionsCSV);
+            if (axisCount==3) {
+                pf<<"# number, position 1[micrometer], position 2 [micrometer], position 3 [micrometer], ideal position 1 [micrometer], ideal position 2 [micrometer], ideal position 3 [micrometer] \n";
+                for (int i=0; i<qMin(positions.size(), moveTo.size()); i++) {
+                    pf<<i<<", "<<CDoubleToQString(positions[i].toDouble())<<", "<<CDoubleToQString(positions2[i].toDouble())<<", "<<CDoubleToQString(positions3[i].toDouble())<<", "<<CDoubleToQString(moveTo[i].first)<<", "<<CDoubleToQString(moveTo[i].second)<<", "<<CDoubleToQString(moveTo[i].third)<<"\n";
+                }
+            } else if (axisCount==2) {
+                pf<<"# number, position 1[micrometer], position 2 [micrometer], ideal position 1 [micrometer], ideal position 2 [micrometer] \n";
+                for (int i=0; i<qMin(positions.size(), moveTo.size()); i++) {
+                    pf<<i<<", "<<CDoubleToQString(positions[i].toDouble())<<", "<<CDoubleToQString(positions2[i].toDouble())<<", "<<CDoubleToQString(moveTo[i].first)<<", "<<CDoubleToQString(moveTo[i].second)<<"\n";
+                }
+            } else if (axisCount==1) {
+                pf<<"# number, position 1[micrometer], ideal position 1 [micrometer] \n";
+                for (int i=0; i<qMin(positions.size(), moveTo.size()); i++) {
+                    pf<<i<<", "<<CDoubleToQString(positions[i].toDouble())<<", "<<CDoubleToQString(moveTo[i].first)<<"\n";
+                }
+            }
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // write image stack properties to files, also collects camera specific information
+        //////////////////////////////////////////////////////////////////////////////////////
+        if (ok && useCam1) {
+            QMap<QString, QVariant> acquisitionDescription11=acquisitionDescription;
+            acquisitionDescription11=acquisitionDescription11.unite(acquisitionDescription1);
+            QList<QFExtensionCamera::CameraAcquititonFileDescription> files;
+            for (int lp=0; lp<TIFFFIlename1.size(); lp++) {
+                QFExtensionCamera::CameraAcquititonFileDescription d;
+                d.name=TIFFFIlename1[lp];
+                d.description="image stack from camera 1, lightpath "+QString(lp+1)+" '"+lightpathNames[lp]+"'";
+                d.type="TIFF16";
+                files.append(d);
+            }
+
+
+            QString PositionsFilename=acquisitionPrefix1+".positions.dat";
+            QFile posFile(PositionsFilename);
+            if (posFile.open(QIODevice::WriteOnly)) {
+                posFile.write(positionsCSV.toAscii().data());
+                posFile.close();
+                QFExtensionCamera::CameraAcquititonFileDescription d;
+                d.name=PositionsFilename;
+                d.description="positions of image stack from camera 1";
+                d.type="CSV";
+                files.append(d);
+            } else {
+                log->log_error(tr("  - could not write positions file '%1' for camera 1: %2 ...").arg(PositionsFilename).arg(posFile.errorString()));
+            }
+
+            QString MeasurementsFilename=acqTools->saveMeasuredData(acquisitionPrefix1, measured);
+            if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
+                QFExtensionCamera::CameraAcquititonFileDescription d;
+                d.name=MeasurementsFilename;
+                d.description="measureable properties of setup";
+                d.type="CSV";
+                files.append(d);
+            }
+
+            log->log_text(tr("  - writing acquisition description 1 ..."));
+            acqTools->savePreviewDescription(0, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription11, files, startDateTime);
+            log->log_text(tr(" DONE!\n"));
+        }
+        if (ok && useCam2) {
+            QMap<QString, QVariant> acquisitionDescription22=acquisitionDescription;
+            acquisitionDescription22=acquisitionDescription22.unite(acquisitionDescription2);
+            QList<QFExtensionCamera::CameraAcquititonFileDescription> files;
+            for (int lp=0; lp<TIFFFIlename1.size(); lp++) {
+                QFExtensionCamera::CameraAcquititonFileDescription d;
+                d.name=TIFFFIlename2[lp];
+                d.description="image stack from camera 2, lightpath "+QString(lp+1)+" '"+lightpathNames[lp]+"'";
+                d.type="TIFF16";
+                files.append(d);
+            }
+
+
+            QString PositionsFilename=acquisitionPrefix2+".positions.dat";
+            QFile posFile(PositionsFilename);
+            if (posFile.open(QIODevice::WriteOnly)) {
+                posFile.write(positionsCSV.toAscii().data());
+                posFile.close();
+                QFExtensionCamera::CameraAcquititonFileDescription d;
+                d.name=PositionsFilename;
+                d.description="positions of image stack from camera 1";
+                d.type="CSV";
+                files.append(d);
+            } else {
+                log->log_error(tr("  - could not write positions file '%1' for camera 2: %2 ...").arg(PositionsFilename).arg(posFile.errorString()));
+            }
+
+            QString MeasurementsFilename=acqTools->saveMeasuredData(acquisitionPrefix2, measured);
+            if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
+                QFExtensionCamera::CameraAcquititonFileDescription d;
+                d.name=MeasurementsFilename;
+                d.description="measureable properties of setup";
+                d.type="CSV";
+                files.append(d);
+            }
+
+            log->log_text(tr("  - writing acquisition description 2 ..."));
+            acqTools->savePreviewDescription(1, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription22, files, startDateTime);
+            log->log_text(tr(" DONE!\n"));
+        }
+
+        progress.nextItem();
+        progress.setProgressText(tr("releasing cameras ..."));
+        //////////////////////////////////////////////////////////////////////////////////////
+        // release cameras
+        //////////////////////////////////////////////////////////////////////////////////////
+        if (useCam1) {
+            opticsSetup->releaseCamera(0);
+            log->log_text(tr("  - released camera 1!\n"));
+        }
+        if (useCam2) {
+            opticsSetup->releaseCamera(1);
+            log->log_text(tr("  - released camera 2!\n"));
+        }
+
+        if (ok && useCam1) log->log_text(tr("  - stored files with prefix 1: '%1'\n").arg(acquisitionPrefix1));
+        if (ok && useCam2) log->log_text(tr("  - stored files with prefix 2: '%1'\n").arg(acquisitionPrefix2));
+
+        if (ok) log->log_text(tr("image stack acquisition DONE!\n"));
+    }
+    progress.setProgressText(tr("releasing stages and lightpath ..."));
+    opticsSetup->unlockStages();
+    opticsSetup->unlockLightpath();
+    opticsSetup->ensureLightpath();
+    progress.close();
 }
 

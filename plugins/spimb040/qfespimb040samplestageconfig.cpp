@@ -979,15 +979,15 @@ void QFESPIMB040SampleStageConfig::connectStages() {
     actConnectY->blockSignals(true);
     actConnectZ->blockSignals(true);
 
-    if (!actConnectX->isChecked()) {
+    if (cmbStageX->currentExtensionLinearStage() && !actConnectX->isChecked()) {
         actConnectX->setChecked(true);
         disConnectX();
     }
-    if (!actConnectY->isChecked()) {
+    if (cmbStageY->currentExtensionLinearStage() && !actConnectY->isChecked()) {
         actConnectY->setChecked(true);
         disConnectY();
     }
-    if (!actConnectZ->isChecked()) {
+    if (cmbStageZ->currentExtensionLinearStage() && !actConnectZ->isChecked()) {
         actConnectZ->setChecked(true);
         disConnectZ();
     }
@@ -999,15 +999,15 @@ void QFESPIMB040SampleStageConfig::connectStages() {
 
 void QFESPIMB040SampleStageConfig::disconnectStages() {
     bool updt=updatesEnabled(); setUpdatesEnabled(false);
-    if (actConnectX->isChecked()) {
+    if (cmbStageX->currentExtensionLinearStage() && actConnectX->isChecked()) {
         actConnectX->setChecked(true);
         actConnectX->trigger();
     }
-    if (actConnectY->isChecked()) {
+    if (cmbStageY->currentExtensionLinearStage() && actConnectY->isChecked()) {
         actConnectY->setChecked(true);
         actConnectY->trigger();
     }
-    if (actConnectZ->isChecked()) {
+    if (cmbStageZ->currentExtensionLinearStage() && actConnectZ->isChecked()) {
         actConnectZ->setChecked(true);
         actConnectZ->trigger();
     }

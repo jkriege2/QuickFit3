@@ -100,6 +100,9 @@ class QFExtensionLinearStage {
          */
          virtual void move(unsigned int axis, double newPosition)=0;
 
+        /*! \brief returns the human readable name of the given stage axis */
+        virtual QString getStageName(unsigned int axis) const=0;
+
 };
 
 

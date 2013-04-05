@@ -55,6 +55,16 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         void loadSettings(QSettings& settings, QString prefix);
         void storeSettings(QSettings& settings, QString prefix) const;
 
+        QVariant getCameraSetting1(QFExtensionCamera::CameraSetting which)const;
+        void setCameraSetting1(QFExtensionCamera::CameraSetting which, QVariant value);
+        QVariant getCameraSetting2(QFExtensionCamera::CameraSetting which)const;
+        void setCameraSetting2(QFExtensionCamera::CameraSetting which, QVariant value);
+        void clearCameraSettings1();
+        void clearCameraSettings2();
+        QMap<QFExtensionCamera::CameraSetting, QVariant> getCameraSettings1() const;
+        QMap<QFExtensionCamera::CameraSetting, QVariant> getCameraSettings2() const;
+
+    protected:
 
         QString prefix1() ;
         QString prefix2() ;
@@ -69,14 +79,6 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         int frames1() const;
         int frames2() const;
 
-        QVariant getCameraSetting1(QFExtensionCamera::CameraSetting which)const;
-        void setCameraSetting1(QFExtensionCamera::CameraSetting which, QVariant value);
-        QVariant getCameraSetting2(QFExtensionCamera::CameraSetting which)const;
-        void setCameraSetting2(QFExtensionCamera::CameraSetting which, QVariant value);
-        void clearCameraSettings1();
-        void clearCameraSettings2();
-        QMap<QFExtensionCamera::CameraSetting, QVariant> getCameraSettings1() const;
-        QMap<QFExtensionCamera::CameraSetting, QVariant> getCameraSettings2() const;
 
         bool lightpathActivated() const;
         QString lightpathFilename() const;
@@ -109,6 +111,31 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         void updateReplaces();
         void on_btnReset1_clicked();
         void on_btnReset2_clicked();
+
+
+
+        void on_btnAcq1Test_pressed();
+        void on_btnAcq1Test_released();
+        void on_btnAcq1TestPreview1_pressed();
+        void on_btnAcq1TestPreview1_released();
+        void on_btnAcq1TestPreview2_pressed();
+        void on_btnAcq1TestPreview2_released();
+        void on_btnAcq1TestPreview3_pressed();
+        void on_btnAcq1TestPreview3_released();
+        void on_btnAcq1TestPreview4_pressed();
+        void on_btnAcq1TestPreview4_released();
+
+        void on_btnAcq2Test_pressed();
+        void on_btnAcq2Test_released();
+        void on_btnAcq2TestPreview1_pressed();
+        void on_btnAcq2TestPreview1_released();
+        void on_btnAcq2TestPreview2_pressed();
+        void on_btnAcq2TestPreview2_released();
+        void on_btnAcq2TestPreview3_pressed();
+        void on_btnAcq2TestPreview3_released();
+        void on_btnAcq2TestPreview4_pressed();
+        void on_btnAcq2TestPreview4_released();
+
     private:
         QFPluginServices* m_pluginServices;
         Ui::QFESPIMB040AcquisitionConfigWidget2 *ui;

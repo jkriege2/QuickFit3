@@ -37,6 +37,7 @@ void QFStageComboBox::findExtensions() {
         if (stage) stages.append(extobj);
     }
 
+    addItem(QIcon(":/libqf3widgets/stage_none.png"), tr("--- none ---"), QPoint(-1, -1));
     for (int i=0; i<stages.size(); i++) {
         QFExtension* extension=qobject_cast<QFExtension*>(stages[i]);
         QFExtensionLinearStage* stage = qobject_cast<QFExtensionLinearStage*>(stages[i]);
@@ -51,7 +52,7 @@ void QFStageComboBox::findExtensions() {
 }
 
 QObject* QFStageComboBox::currentExtensionObject() const {
-    if (currentIndex()<0) {
+    if (currentIndex()<1) {
         return NULL;
     }
 
@@ -63,7 +64,7 @@ QObject* QFStageComboBox::currentExtensionObject() const {
 }
 
 QFExtension* QFStageComboBox::currentExtension() const {
-    if (currentIndex()<0) {
+    if (currentIndex()<1) {
         return NULL;
     }
 
@@ -79,7 +80,7 @@ QFExtension* QFStageComboBox::currentExtension() const {
 }
 
 QFExtensionLinearStage* QFStageComboBox::currentExtensionLinearStage() const {
-    if (currentIndex()<0) {
+    if (currentIndex()<1) {
         return NULL;
     }
 
@@ -95,8 +96,8 @@ QFExtensionLinearStage* QFStageComboBox::currentExtensionLinearStage() const {
 }
 
 int QFStageComboBox::currentAxisID() const {
-    if (currentIndex()<0) {
-        return NULL;
+    if (currentIndex()<1) {
+        return -1;
     }
 
     QPoint p = itemData(currentIndex()).toPoint();
@@ -114,7 +115,7 @@ int QFStageComboBox::currentAxisID() const {
 
 
 int QFStageComboBox::currentExtensionID() const {
-    if (currentIndex()<0) {
+    if (currentIndex()<1) {
         return -1;
     }
 
@@ -149,6 +150,6 @@ void QFStageComboBox::loadSettings(QSettings& settings, QString prefix) {
            }
        }
    }
-   if (!ok) setCurrentIndex(-1);
+   if (!ok) setCurrentIndex(0);
 
 }

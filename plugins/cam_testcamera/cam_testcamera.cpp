@@ -28,6 +28,7 @@ QFECamTestCamera::QFECamTestCamera(QObject* parent):
     seriesCount[0]=seriesCount[1]=0;
     seriesRunning[0]=seriesRunning[1]=false;
     seriesFilenamePrefix[0]=seriesFilenamePrefix[1]="";
+    dualviewBrightness[0]=dualviewBrightness[1]=1;
 
 }
 
@@ -94,6 +95,7 @@ void QFECamTestCamera::useCameraSettings(unsigned int camera, const QSettings& s
     particlePSF[camera]=         settings.value(QString("testdevice/particle_psf"), 2).toDouble();
     particleBackground[camera]=  settings.value(QString("testdevice/particle_background"), 0.2).toDouble();
     hotpixels[camera]=           settings.value(QString("testdevice/hotpixels"), 0).toInt();
+    dualviewBrightness[camera]=  settings.value(QString("testdevice/dualviewBrightness"), 1).toDouble();
 
     initParticles(camera, particleN[camera]);
 
@@ -127,6 +129,8 @@ void QFECamTestCamera::showCameraSettingsDialog(unsigned int camera, QSettings& 
     cmbPattern->addItem(tr("blinking rings"));
     cmbPattern->addItem(tr("few moving rings"));
     cmbPattern->addItem(tr("particles"));
+    cmbPattern->addItem(tr("dual view particles"));
+    cmbPattern->addItem(tr("fixed grid"));
     cmbPattern->setCurrentIndex(settings.value(QString("testdevice/testpattern"), testpattern[camera]).toInt());
     fl->addRow(tr("pattern:"), cmbPattern);
 
@@ -180,6 +184,12 @@ void QFECamTestCamera::showCameraSettingsDialog(unsigned int camera, QSettings& 
     spinHotpixels->setMaximum(1000);
     spinHotpixels->setValue(settings.value(QString("testdevice/hotpixels"), particleBackground[camera]).toInt());
 
+    QDoubleSpinBox* spindDualviewB=new QDoubleSpinBox(r);
+    fl->addRow(tr("dualview brightness factor:"), spindDualviewB);
+    spindDualviewB->setMinimum(0.01);
+    spindDualviewB->setMaximum(100);
+    spindDualviewB->setValue(settings.value(QString("testdevice/dualviewBrightness"), dualviewBrightness[camera]).toDouble());
+
 
     lay->addWidget(r);
 
@@ -199,6 +209,7 @@ void QFECamTestCamera::showCameraSettingsDialog(unsigned int camera, QSettings& 
         settings.setValue(QString("testdevice/width"), spinWidth->value());
         settings.setValue(QString("testdevice/height"), spinHeight->value());
         settings.setValue(QString("testdevice/hotpixels"), spinHotpixels->value());
+        settings.setValue(QString("testdevice/dualviewBrightness"), spindDualviewB->value());
     }
     delete dlg;
 }
@@ -276,7 +287,7 @@ bool QFECamTestCamera::acquireOnCamera(unsigned int camera, uint32_t* data, uint
                 data[y*getCameraImageWidth(camera)+x]=noise[camera]*r*200.0+abs(200.0*sin(sqrt(xx*xx+yy*yy)*2.0*M_PI+(double)counter[camera]/10.0*M_PI));
             }
         }
-    } else {
+    } else if (testpattern[camera]==3) {
         stepParticles(camera);
         for (int y=0; y<getImageCameraHeight(camera); y++) {
             for (int x=0; x<getCameraImageWidth(camera); x++) {
@@ -289,7 +300,44 @@ bool QFECamTestCamera::acquireOnCamera(unsigned int camera, uint32_t* data, uint
                 data[y*getCameraImageWidth(camera)+x]=Poisson(v);
             }
         }
+    } else if (testpattern[camera]==4) {
+        stepParticles(camera);
+        for (int y=0; y<getImageCameraHeight(camera); y++) {
+            for (int x=0; x<getCameraImageWidth(camera); x++) {
+                double v=particleBackground[camera];
+                for (int i=0; i<particleN[camera]; i++) {
+                    double pX=particleX[camera][i]/2.0;
+                    if (x>=getCameraImageWidth(camera)/2) pX=pX+double(getCameraImageWidth(camera)/2);
+                    double pY=particleY[camera][i];
+                    double r=((double)x-pX)*((double)x-pX) + ((double)y-pY)*((double)y-pY);
+                    v=v+exp(-0.5*r/(particlePSF[camera]*particlePSF[camera]))*particleBrightnes[camera];
+                }
+
+                data[y*getCameraImageWidth(camera)+x]=Poisson(v);
+            }
+        }
+    } else {
+        for (int y=0; y<getImageCameraHeight(camera); y++) {
+            for (int x=0; x<getCameraImageWidth(camera); x++) {
+                bool back=true;
+                if ((x+5)%10<3) back=false;
+                if ((y+5)%10<3) back=false;
+
+                if (back) data[y*getCameraImageWidth(camera)+x]=particleBackground[camera];
+                else data[y*getCameraImageWidth(camera)+x]=particleBrightnes[camera];
+            }
+        }
     }
+
+    if (dualviewBrightness[camera]!=1) {
+        for (int y=0; y<getImageCameraHeight(camera); y++) {
+            for (int x=getCameraImageWidth(camera)/2; x<getCameraImageWidth(camera); x++) {
+                data[y*getCameraImageWidth(camera)+x]*=dualviewBrightness[camera];
+            }
+        }
+
+    }
+
     if (hotpixels[camera]>0) {
         // generate some hot pixels by use of a linear congruency random number generator
         // with given initial and seed values

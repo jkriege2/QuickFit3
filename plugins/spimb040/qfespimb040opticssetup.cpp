@@ -476,6 +476,27 @@ void QFESPIMB040OpticsSetup::releaseCamera(int setup_cam) {
     }
 }
 
+void QFESPIMB040OpticsSetup::overrideCameraPreview(int setup_cam, const QString &camera_settings, const QString &lightpath)
+{
+    if (!lightpath.isEmpty() && QFile::exists(lightpath)) {
+        ui->cmbLightpathConfig->setEnabled(false);
+        lockLightpath();
+        loadLightpathConfig(lightpath, true);
+        unlockLightpath();
+    }
+    if (setup_cam==0) ui->camConfig1->overridePreview(camera_settings);
+    if (setup_cam==1) ui->camConfig2->overridePreview(camera_settings);
+}
+
+void QFESPIMB040OpticsSetup::resetCameraPreview(int setup_cam)
+{
+
+    if (setup_cam==0) ui->camConfig1->resetPreview();
+    if (setup_cam==1) ui->camConfig2->resetPreview();
+    ensureLightpath();
+    ui->cmbLightpathConfig->setEnabled(true);
+}
+
 void QFESPIMB040OpticsSetup::on_btnConnectDevices_clicked() {
     QProgressListDialog* dlg=new QProgressListDialog(this, Qt::Dialog|Qt::WindowStaysOnBottomHint);
     dlg->setWindowModality(Qt::WindowModal);

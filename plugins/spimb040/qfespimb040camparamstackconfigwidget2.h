@@ -9,6 +9,7 @@
 #include "qfespimb040filenametool.h"
 #include "qtriple.h"
 #include "qfespimb040opticssetup.h"
+#include "qfespimb040acquisitiontools.h"
 class QFESPIMB040MainWindow; // forward
 class QFPluginServices; // forward
 class QFExtension;
@@ -26,7 +27,7 @@ class QFESPIMB040CamParamStackConfigWidget2 : public QWidget, public QFESPIMB040
         Q_OBJECT
 
     public:
-        explicit QFESPIMB040CamParamStackConfigWidget2(QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
+        explicit QFESPIMB040CamParamStackConfigWidget2(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
         ~QFESPIMB040CamParamStackConfigWidget2();
 
         /** \brief return the filename for the currently selected camera configuration */
@@ -41,11 +42,13 @@ class QFESPIMB040CamParamStackConfigWidget2 : public QWidget, public QFESPIMB040
 
     public slots:
         void lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes);
+        void performStack();
     public:
         void loadSettings(QSettings& settings, QString prefix);
         void storeSettings(QSettings& settings, QString prefix) const;
 
 
+    protected:
         QString prefix1();
         QString prefix2();
         bool use1() const;
@@ -87,6 +90,8 @@ class QFESPIMB040CamParamStackConfigWidget2 : public QWidget, public QFESPIMB040
         QFESPIMB040OpticsSetup* opticsSetup;
         QFESPIMB040AcquisitionDescription* acqDescription;
         QFESPIMB040ExperimentDescription* expDescription;
+        QFPluginLogService* log;
+        QFESPIMB040AcquisitionTools* acqTools;
 
 };
 

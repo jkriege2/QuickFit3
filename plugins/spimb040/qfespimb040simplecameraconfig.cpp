@@ -34,6 +34,7 @@ QFESPIMB040SimpleCameraConfig::QFESPIMB040SimpleCameraConfig(QWidget* parent):
     locked=false;
     restartPreview=false;
     m_magnification=1;
+    m_lastUserPreview="";
 
 
     // initialize raw image memory ...
@@ -643,6 +644,35 @@ void QFESPIMB040SimpleCameraConfig::disconnectCamera() {
 
 void QFESPIMB040SimpleCameraConfig::setReadOnly(bool readonly) {
     cmbAcquisitionDevice->setReadOnly(readonly);
+}
+
+void QFESPIMB040SimpleCameraConfig::overridePreview(const QString &previewfilename)
+{
+    if (!isCameraConnected()) {
+        return;
+    }
+    //qDebug()<<"overridePreview: start: m_lastUserPreview="<<m_lastUserPreview<<"   new="<<cmbPreviewConfiguration->currentConfigFilename();
+    if (QFile::exists(previewfilename)) {
+        if (!QFile::exists(m_lastUserPreview) || m_lastUserPreview.isEmpty()) {
+            m_lastUserPreview=cmbPreviewConfiguration->currentConfigFilename();
+        }
+        cmbPreviewConfiguration->setCurrentConfigFile(previewfilename);
+
+        //qDebug()<<"overridePreview: end: m_lastUserPreview="<<m_lastUserPreview<<"   new="<<cmbPreviewConfiguration->currentConfigFilename();
+    }
+}
+
+void QFESPIMB040SimpleCameraConfig::resetPreview()
+{
+    if (!isCameraConnected()) {
+        return;
+    }
+    //qDebug()<<"resetPreview: start: m_lastUserPreview="<<m_lastUserPreview;
+    if (QFile::exists(m_lastUserPreview)) {
+        cmbPreviewConfiguration->setCurrentConfigFile(m_lastUserPreview);
+        m_lastUserPreview="";
+    }
+    //qDebug()<<"resetPreview: end: m_lastUserPreview="<<m_lastUserPreview;
 }
 
 bool QFESPIMB040SimpleCameraConfig::isCameraConnected() const {

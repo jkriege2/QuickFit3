@@ -68,8 +68,9 @@ class QFESPIMB040OpticsSetup : public QWidget {
         void lockStages();
         /** \brief unlock access to stages: restart the thread used for stage access by this widget  */
         void unlockStages();
-
+        /** \brief locks access to lightpath controls (shutters, laser, ...) */
         void lockLightpath();
+        /** \brief unlocks access to lightpath controls (shutters, laser, ...) */
         void unlockLightpath();
         /*! \brief return a map containing a description of the optics setup, suitable for meta-data storage
 
@@ -105,6 +106,14 @@ class QFESPIMB040OpticsSetup : public QWidget {
 
         /*! \brief release a locked camera n, for more details see lockCamera() */
         void releaseCamera(int setup_cam);
+
+        /*! \brief allows to temporarily overwrite the camera preview settings and the current lightpath.
+
+            Use resetCameraPreview() to go back to the normal settings.
+         */
+        void overrideCameraPreview(int setup_cam, const QString& camera_settings, const QString& lightpath=QString(""));
+        /*! \brief reset the overridden camera settings set with overrideCameraPreview() to the user defaults */
+        void resetCameraPreview(int setup_cam);
 
         /*! \rief calculate the overall system magnification for the given camera in the setup (currently 0,1) */
         double getCameraMagnification(int setup_cam) const;
@@ -180,9 +189,13 @@ class QFESPIMB040OpticsSetup : public QWidget {
         /** \brief return a description of the laser configuration */
         QString getLaserConfig();
 
+        /** \brief returns \c true if the given lightpath is loaded */
         bool lightpathLoaded(const QString &filename);
+        /** \brief returns the currently selected lightpath name */
         QString getCurrentLightpath() const;
+        /** \brief returns the currently selected lightpath file */
         QString getCurrentLightpathFilename() const;
+        /** \brief make sure the currently selected lightpath is used */
         void ensureLightpath();
 
         struct measuredValues {

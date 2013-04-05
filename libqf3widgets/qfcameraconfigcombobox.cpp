@@ -67,6 +67,12 @@ void QFCameraConfigComboBox::connectTo(QFCameraComboBox* combo) {
     }
 }
 
+QString QFCameraConfigComboBox::currentConfigFilename() const
+{
+    if (currentIndex()<0) return "";
+    else return itemData(currentIndex()).toString();
+}
+
 void QFCameraConfigComboBox::cameraChanged(QFExtension* extension, QFExtensionCamera* cam, int camIdx) {
     m_cam=cam;
     m_camIdx=camIdx;
@@ -118,8 +124,15 @@ void QFCameraConfigComboBox::cameraChanged(QFExtension* extension, QFExtensionCa
 
 }
 
-void QFCameraConfigComboBox::setCurrentConfig(QString name) {
+void QFCameraConfigComboBox::setCurrentConfig(const QString& name) {
     int configidx=findText(name);
+    if (configidx<0) configidx=0;
+    setCurrentIndex(configidx);
+}
+
+void QFCameraConfigComboBox::setCurrentConfigFilename(const QString &filename)
+{
+    int configidx=findData(filename);
     if (configidx<0) configidx=0;
     setCurrentIndex(configidx);
 }
@@ -285,7 +298,7 @@ void QFCameraConfigComboBox::gotoCurrentDefault()
 
 }
 
-void QFCameraConfigComboBox::setDefaultConfig(QString defConfig)
+void QFCameraConfigComboBox::setDefaultConfig(const QString &defConfig)
 {
     defaultConfig=defConfig;
     rereadConfigFiles();

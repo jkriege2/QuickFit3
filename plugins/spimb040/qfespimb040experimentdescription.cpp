@@ -4,12 +4,31 @@
 #include "qfpluginservices.h"
 #include "programoptions.h"
 #include "qftools.h"
+#include "qfcompleterfromfile.h"
+#include "qfstyledbutton.h"
 
 QFESPIMB040ExperimentDescription::QFESPIMB040ExperimentDescription(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QFESPIMB040ExperimentDescription)
 {
     ui->setupUi(this);
+
+    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/");
+    QFCompleterFromFile* c1=new QFCompleterFromFile(this);
+    c1->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/expdescription_id.txt");
+    ui->edtID->setCompleter(c1);
+    ui->edtID->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->edtID, ui->edtID));
+
+    c1=new QFCompleterFromFile(this);
+    c1->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/expdescription_experimenter.txt");
+    ui->edtExperimenter->setCompleter(c1);
+    ui->edtExperimenter->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->edtExperimenter, ui->edtExperimenter));
+
+    c1=new QFCompleterFromFile(this);
+    c1->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/expdescription_title.txt");
+    ui->edtTitle->setCompleter(c1);
+    ui->edtTitle->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->edtTitle, ui->edtTitle));
+
     updateTime();
 }
 

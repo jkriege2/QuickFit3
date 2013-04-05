@@ -101,6 +101,8 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
         virtual void move(unsigned int axis, double newPosition);
 
 
+        /** \copydoc QFExtensionLinearStage::getStageName() */
+        virtual QString getStageName(unsigned int axis) const;
 
 
         /** \brief log project text message
@@ -150,6 +152,7 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
              double velocity;
 
              QString name;
+             QString label;
         };
 
         QChar currentID;

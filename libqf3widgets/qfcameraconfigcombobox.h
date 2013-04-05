@@ -61,15 +61,17 @@ class QFWIDLIB_EXPORT QFCameraConfigComboBox : public QEnhancedComboBox {
         void connectTo(QFCameraComboBox* combo);
 
         /** \brief return the filename for the currently selected camera configuration */
-        QString currentConfigFilename() const { if (currentIndex()<0) return ""; else return itemData(currentIndex()).toString(); };
+        QString currentConfigFilename() const;
 
         /** \brief select a given camera configuration */
-        void setCurrentConfig(QString name);
+        void setCurrentConfig(const QString &name);
+        /** \brief select a given camera configuration file */
+        void setCurrentConfigFilename(const QString& filename);
 
         void setStopResume(QFCameraConfigComboBoxStartResume* stopresume);
 
         QString getDefaultConfig() const { return defaultConfig; }
-        void setDefaultConfig(QString defConfig);
+        void setDefaultConfig(const QString& defConfig);
     public slots:
         /*! \brief may be used to connect this widget to a QFCameraComboBox
 
@@ -134,7 +136,9 @@ class QFWIDLIB_EXPORT QFCameraConfigEditorWidget : public QWidget {
         /** \brief return the name (not the full filename with path) for the currently selected camera configuration */
         QString currentConfigName() const { return combobox->currentText(); };
         /** \brief select a given camera configuration */
-        void setCurrentConfig(QString name) { combobox->setCurrentConfig(name); }
+        void setCurrentConfig(const QString& name) { combobox->setCurrentConfig(name); }
+        /** \brief select a given camera configuration file */
+        void setCurrentConfigFile(const QString& filename) { combobox->setCurrentConfigFilename(filename); }
         /** \brief this QAction triggers the configuration of the currently selected camera settings, provided for convenience, if you need this functionality at additional buttons in your GUI */
         QAction* configAction() const { return actConfig; }
 

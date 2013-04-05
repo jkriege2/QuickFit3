@@ -60,6 +60,7 @@ class QFESPIMB040DeviceParamStackConfigWidget : public QWidget, public QFESPIMB0
         void loadSettings(QSettings& settings, QString prefix);
         void storeSettings(QSettings& settings, QString prefix) const;
 
+    protected:
 
         QString prefix1();
         QString prefix2();

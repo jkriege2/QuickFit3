@@ -447,6 +447,112 @@ void QFESPIMB040AcquisitionConfigWidget2::on_btnReset2_clicked()
     ui->spinFrames2->setValue(ui->spinFrames2->minimum());
 }
 
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq1Test_pressed()
+{
+    opticsSetup->overrideCameraPreview(0, ui->cmbAcquisitionSettings1->currentConfigFilename(), lightpathFilenamePreview(0));
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq1Test_released()
+{
+    opticsSetup->resetCameraPreview(0);
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq1TestPreview1_pressed()
+{
+    opticsSetup->overrideCameraPreview(0, ui->cmbPreviewSettings1_1->currentConfigFilename(), lightpathFilenamePreview(0));
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq1TestPreview1_released()
+{
+    opticsSetup->resetCameraPreview(0);
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq1TestPreview2_pressed()
+{
+    opticsSetup->overrideCameraPreview(0, ui->cmbPreviewSettings1_2->currentConfigFilename(), lightpathFilenamePreview(1));
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq1TestPreview2_released()
+{
+    opticsSetup->resetCameraPreview(0);
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq1TestPreview3_pressed()
+{
+    opticsSetup->overrideCameraPreview(0, ui->cmbPreviewSettings1_3->currentConfigFilename(), lightpathFilenamePreview(2));
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq1TestPreview3_released()
+{
+    opticsSetup->resetCameraPreview(0);
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq1TestPreview4_pressed()
+{
+    opticsSetup->overrideCameraPreview(0, ui->cmbPreviewSettings1_4->currentConfigFilename(), lightpathFilenamePreview(3));
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq1TestPreview4_released()
+{
+    opticsSetup->resetCameraPreview(0);
+}
+
+
+
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2Test_pressed()
+{
+    opticsSetup->overrideCameraPreview(1, ui->cmbAcquisitionSettings2->currentConfigFilename(), lightpathFilenamePreview(1));
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2Test_released()
+{
+    opticsSetup->resetCameraPreview(1);
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2TestPreview1_pressed()
+{
+    opticsSetup->overrideCameraPreview(1, ui->cmbPreviewSettings2_1->currentConfigFilename(), lightpathFilenamePreview(1));
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2TestPreview1_released()
+{
+    opticsSetup->resetCameraPreview(1);
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2TestPreview2_pressed()
+{
+    opticsSetup->overrideCameraPreview(1, ui->cmbPreviewSettings2_2->currentConfigFilename(), lightpathFilenamePreview(1));
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2TestPreview2_released()
+{
+    opticsSetup->resetCameraPreview(1);
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2TestPreview3_pressed()
+{
+    opticsSetup->overrideCameraPreview(1, ui->cmbPreviewSettings2_3->currentConfigFilename(), lightpathFilenamePreview(2));
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2TestPreview3_released()
+{
+    opticsSetup->resetCameraPreview(1);
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2TestPreview4_pressed()
+{
+    opticsSetup->overrideCameraPreview(1, ui->cmbPreviewSettings2_4->currentConfigFilename(), lightpathFilenamePreview(3));
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2TestPreview4_released()
+{
+    opticsSetup->resetCameraPreview(1);
+}
+
+
+
+
 int QFESPIMB040AcquisitionConfigWidget2::repeats() const
 {
     return ui->spinRepeat->value();

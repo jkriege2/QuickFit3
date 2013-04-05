@@ -102,7 +102,10 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
     public slots:
         void setReadOnly(bool readonly);
 
-
+        /** \brief overrides the currently selected preview settinsg with the given file */
+        void overridePreview(const QString& previewfilename);
+        /** \brief resets the last overridePreview() call */
+        void resetPreview();
     signals:
         /** \brief emitted when the set of configuration files changes */
         void configFilesChanged();
@@ -113,6 +116,7 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
         int m_camViewID;
         QFExtensionManager* m_extManager;
 
+        QString m_lastUserPreview;
 
     protected slots:
 
