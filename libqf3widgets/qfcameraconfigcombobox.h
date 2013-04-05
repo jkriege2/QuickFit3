@@ -8,7 +8,6 @@
 #include "qfcameracombobox.h"
 #include "libwid_imexport.h"
 #include "qenhancedcombobox.h"
-
 /*! \brief Interface that allows to stop/resume an acquisition
     \ingroup qf3lib_widgets
  */

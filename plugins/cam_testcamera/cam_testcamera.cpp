@@ -2,6 +2,7 @@
 #include <QtGui>
 #include <QtPlugin>
 #include <iostream>
+#include "qfpluginservices.h"
 
 QFECamTestCamera::QFECamTestCamera(QObject* parent):
     QObject(parent)
@@ -49,6 +50,16 @@ void QFECamTestCamera::projectChanged(QFProject* oldProject, QFProject* project)
 }
 
 void QFECamTestCamera::initExtension() {
+    QString pd=QFPluginServices::getInstance()->getPluginConfigDirectory(getID());
+    QDir(QFPluginServices::getInstance()->getConfigFileDirectory()).mkpath(pd);
+    QDir d(pd);
+    QDir a(QFPluginServices::getInstance()->getPluginAssetsDirectory(getID()));
+    QStringList sl=a.entryList(QStringList("*.ccf"));
+    for (int i=0; i<sl.size(); i++) {
+        //qDebug()<<a.absoluteFilePath(sl[i])<<d.absoluteFilePath(sl[i]);
+        if (!QFile::exists(d.absoluteFilePath(sl[i]))) QFile::copy(a.absoluteFilePath(sl[i]), d.absoluteFilePath(sl[i]));
+    }
+
 }
 
 void QFECamTestCamera::loadSettings(ProgramOptions* settingspo) {

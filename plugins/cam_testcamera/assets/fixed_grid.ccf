@@ -1,0 +1,14 @@
+[testdevice]
+testpattern=4
+noise=0
+particle_n=5
+particle_brightnes=10
+particle_psf=2
+particle_background=0.2
+width=50
+height=50
+hotpixels=0
+dualviewBrightness=1
+
+[General]
+camconfigname=fixed grid

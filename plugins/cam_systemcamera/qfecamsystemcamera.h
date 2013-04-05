@@ -57,6 +57,7 @@ class QFECamSystemcamera : public QObject, public QFExtensionBase, public QFExte
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
 
+
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */
         virtual void projectChanged(QFProject* oldProject, QFProject* project);

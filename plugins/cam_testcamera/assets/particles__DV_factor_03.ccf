@@ -1,0 +1,14 @@
+[General]
+camconfigname="particles, DV factor 0.3"
+
+[testdevice]
+testpattern=4
+noise=0
+particle_n=5
+particle_brightnes=50
+particle_psf=2
+particle_background=10
+width=50
+height=50
+hotpixels=0
+dualviewBrightness=0.3

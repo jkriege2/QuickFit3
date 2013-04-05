@@ -196,6 +196,17 @@ void QFExtensionCameraAndor::projectChanged(QFProject* oldProject, QFProject* pr
 void QFExtensionCameraAndor::initExtension() {
     services->log_global_text(tr("%2initializing extension '%1' ...\n").arg(getName()).arg(LOG_PREFIX));
 
+
+    QString pd=QFPluginServices::getInstance()->getPluginConfigDirectory(getID());
+    QDir(QFPluginServices::getInstance()->getConfigFileDirectory()).mkpath(pd);
+    QDir d(pd);
+    QDir a(QFPluginServices::getInstance()->getPluginAssetsDirectory(getID()));
+    QStringList sl=a.entryList(QStringList("*.ccf"));
+    for (int i=0; i<sl.size(); i++) {
+        //qDebug()<<a.absoluteFilePath(sl[i])<<d.absoluteFilePath(sl[i]);
+        if (!QFile::exists(d.absoluteFilePath(sl[i]))) QFile::copy(a.absoluteFilePath(sl[i]), d.absoluteFilePath(sl[i]));
+    }
+
     // read and output version infos:
     char version[1024];
     GetVersionInfo(AT_SDKVersion, version, 1023);

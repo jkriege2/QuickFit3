@@ -87,6 +87,17 @@ void QFECamSystemcamera::projectChanged(QFProject* oldProject, QFProject* projec
 }
 
 void QFECamSystemcamera::initExtension() {
+
+    QString pd=QFPluginServices::getInstance()->getPluginConfigDirectory(getID());
+    QDir(QFPluginServices::getInstance()->getConfigFileDirectory()).mkpath(pd);
+    QDir d(pd);
+    QDir a(QFPluginServices::getInstance()->getPluginAssetsDirectory(getID()));
+    QStringList sl=a.entryList(QStringList("*.ccf"));
+    for (int i=0; i<sl.size(); i++) {
+        //qDebug()<<a.absoluteFilePath(sl[i])<<d.absoluteFilePath(sl[i]);
+        if (!QFile::exists(d.absoluteFilePath(sl[i]))) QFile::copy(a.absoluteFilePath(sl[i]), d.absoluteFilePath(sl[i]));
+    }
+
     /* do initializations here but do not yet connect to the camera! */
     VideoCapture cap;
     cameras=cap.getDeviceList();

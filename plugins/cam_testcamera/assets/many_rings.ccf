@@ -1,0 +1,13 @@
+[General]
+camconfigname=many rings
+
+[testdevice]
+testpattern=0
+noise=0
+particle_n=1
+particle_brightnes=10
+particle_psf=2
+particle_background=0.2
+width=100
+height=100
+hotpixels=0
