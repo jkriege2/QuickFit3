@@ -1,6 +1,9 @@
 #include "qfespimb040filenametool.h"
 #include <QDebug>
 #include "qftools.h"
+#include "qfespimb040opticssetup.h"
+#include "qfespimb040experimentdescription.h"
+#include "qfespimb040acquisitiondescription.h"
 
 QFESPIMB040FilenameTool::QFESPIMB040FilenameTool()
 {

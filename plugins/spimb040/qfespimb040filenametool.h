@@ -7,9 +7,10 @@
 #include <QWidget>
 #include <QDir>
 #include <QFileInfo>
-#include "qfespimb040opticssetup.h"
-#include "qfespimb040experimentdescription.h"
-#include "qfespimb040acquisitiondescription.h"
+
+class QFESPIMB040OpticsSetup; //forward
+class QFESPIMB040ExperimentDescription; //forward
+class QFESPIMB040AcquisitionDescription; //forward
 
 class QFESPIMB040FilenameTool {
     public:

@@ -5,13 +5,13 @@
 #include <QSettings>
 #include <QMap>
 #include <QVariant>
+#include "qfespimb040filenametool.h"
 
 namespace Ui {
     class QFESPIMB040AcquisitionDescription;
-}
+};
 
-class QFESPIMB040AcquisitionDescription : public QWidget
-{
+class QFESPIMB040AcquisitionDescription : public QWidget, public QFESPIMB040FilenameTool {
         Q_OBJECT
         
     public:
@@ -27,13 +27,18 @@ class QFESPIMB040AcquisitionDescription : public QWidget
         int getPlate() const;
         QString getComment() const;
         QString getPrefix() const;
+
+        void setOtherSettingWidgets(QFESPIMB040OpticsSetup *setup, QFESPIMB040ExperimentDescription *exp);
     protected slots:
         void on_btnClearAll_clicked();
         void on_btnNextCell_clicked();
         void updateTime();
         void spinChanged();
+        void updateReplaces();
     private:
         Ui::QFESPIMB040AcquisitionDescription *ui;
+        QFESPIMB040OpticsSetup *opticsSetup;
+        QFESPIMB040ExperimentDescription* expDescription;
 };
 
 #endif // QFESPIMB040ACQUISITIONDESCRIPTION_H

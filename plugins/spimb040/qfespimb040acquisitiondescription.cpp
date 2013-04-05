@@ -11,6 +11,8 @@ QFESPIMB040AcquisitionDescription::QFESPIMB040AcquisitionDescription(QWidget *pa
     ui(new Ui::QFESPIMB040AcquisitionDescription)
 {
     ui->setupUi(this);
+    this->expDescription=NULL;
+    this->opticsSetup=NULL;
 
     QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/");
     QFCompleterFromFile* c1=new QFCompleterFromFile(this);
@@ -23,12 +25,19 @@ QFESPIMB040AcquisitionDescription::QFESPIMB040AcquisitionDescription(QWidget *pa
     ui->edtComment->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->edtComment, ui->edtComment));
 
     updateTime();
+
 }
 
 QFESPIMB040AcquisitionDescription::~QFESPIMB040AcquisitionDescription()
 {
     delete ui;
 }
+
+void QFESPIMB040AcquisitionDescription::updateReplaces()
+{
+    setGlobalReplaces(opticsSetup, expDescription, this);
+}
+
 
 
 void QFESPIMB040AcquisitionDescription::loadSettings(QSettings& settings, QString prefix) {
@@ -83,6 +92,16 @@ QString QFESPIMB040AcquisitionDescription::getPrefix() const
 {
     return ui->edtPrefix->text();
 }
+
+void QFESPIMB040AcquisitionDescription::setOtherSettingWidgets(QFESPIMB040OpticsSetup *setup, QFESPIMB040ExperimentDescription *exp)
+{
+    this->opticsSetup=setup;
+    this->expDescription=exp;
+    updateReplaces();
+    bindLineEdit(ui->edtPrefix);
+
+}
+
 void QFESPIMB040AcquisitionDescription::on_btnClearAll_clicked() {
     ui->edtComment->setText("");
     ui->spinCell->setValue(1);
