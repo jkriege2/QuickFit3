@@ -325,7 +325,7 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief action to save marginal+histogram data */
         QAction* actSaveData;
 
-        bool measureFirst;
+        //bool measureFirst;
 
 
         /*! \brief image data
@@ -412,6 +412,8 @@ class QFESPIMB040CameraView : public QWidget {
         void imageMouseMoved(double x, double y);
         /** \brief called when the mouse is clicked on the image plot window. This is used together with actMaskEdit to control editing of image masks */
         void imageMouseClicked(double x, double y);
+
+        void imageMouseDragged(double x1, double y1, double x2, double y2, Qt::KeyboardModifiers modifiers);
         /** \brief en/disables autoscaling of coloring
          *
          * This method en/disables the input widgets for the upper/lower counts. It does not trigger a redraw, as
@@ -459,7 +461,6 @@ class QFESPIMB040CameraView : public QWidget {
         void graphParameterChanged();
         void updateGraph();
         void clearGraph();
-
 
     protected:
         /*! \brief save a given JKImage as a file (different formats)

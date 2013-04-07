@@ -58,6 +58,12 @@ void QFPRDRFCS::insertALV5000File(const QStringList& filename, const QMap<QStrin
         QMap<QString, QVariant> p=paramValues;
         p["CHANNEL"]=i;
         QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - CH%2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(i), filename, p, paramReadonly);
+        if (crossCorrelation) {
+            e->setRole(QString("ACF%1").arg(i));
+        }else  {
+            e->setRole(QString("FCCS").arg(i));
+        }
+
         if (e->error()) {
             QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV5000 file '%1' (channel %3/%4):\n%2").arg(filename.value(0, "")).arg(e->errorDescription()).arg(i+1).arg(cc));
             services->log_error(tr("Error while importing ALV5000 file '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));

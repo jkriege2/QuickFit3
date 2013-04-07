@@ -239,6 +239,22 @@ QString doubleToQString(double value, int prec, char f, QChar decimalSeparator) 
     return res;
 }
 
+QString doubleVecToQString(const QVector<double>& value, int prec, char f, QChar decimalSeparator, const QString itemSeparator) {
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    QString out="";
+    for (int i=0; i<value.size(); i++) {
+        if (i>0) out+=itemSeparator;
+        QString res=loc.toString(value[i], f, prec);
+        if (loc.decimalPoint()!=decimalSeparator) {
+            res=res.replace(loc.decimalPoint(), decimalSeparator);
+        }
+        out+=res;
+    }
+    return out;
+}
+
+
 QString CDoubleToQString(double value) {
     QLocale loc=QLocale::c();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);

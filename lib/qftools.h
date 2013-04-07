@@ -181,6 +181,11 @@ QFLIB_EXPORT QVariant getQVariantFromString(const QString& type, const QString& 
 
 */
 QFLIB_EXPORT QString doubleToQString(double value, int prec = 10, char f = 'g', QChar decimalSeparator='.' );
+/*! \brief convert a vector of numbers to a QString with a given decimalSeparator
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString doubleVecToQString(const QVector<double>& value, int prec = 10, char f = 'g', QChar decimalSeparator='.', const QString itemSeparator=", " );
 /*! \brief convert a number to a QString with a given decimalSeparator
     \ingroup qf3lib_tools
 

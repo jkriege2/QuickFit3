@@ -551,9 +551,13 @@ QString QFMathParser::tokentostring(QFMathParser::qfmpTokenType token) {
 	    case DIV: return "DIV (/)";
 	    case MODULO: return "MODULO (%)";
 	    case ASSIGN: return "ASSIGN (=)";
-	    case LBRACKET: return "LBRACKET '('";
-	    case RBRACKET: return "RBRACKET ')'";
-	    case POWER: return "POWER (^)";
+        case LPARENTHESE: return "LPARENTHESE '('";
+        case RPARENTHESE: return "RPARENTHESE ')'";
+        case LBRACKET: return "LBRACKET '['";
+        case RBRACKET: return "RBRACKET ']'";
+        case LBRACE: return "LBRACE '{'";
+        case RBRACE: return "RBRACE '}'";
+        case POWER: return "POWER (^)";
 	    case FACTORIAL_LOGIC_NOT: return "FACTORIAL_LOGIC_NOT (!)";
 	    case LOGIC_NOT: return "LOGIC_NOT (!/not)";
 	    case LOGIC_AND: return "LOGIC_AND (&&/and)";
@@ -574,39 +578,7 @@ QString QFMathParser::tokentostring(QFMathParser::qfmpTokenType token) {
 }
 
 QString QFMathParser::currenttokentostring() {
-    switch(CurrentToken) {
-        case END: return "END";
-        case PRINT: return "PRINT (;)";
-        case PARAMETER_DIV: return "PARAMETER_DIV (,)";
-	    case STRING_DELIM: return "STRING_DELIM (' or \")";
-        case NAME: return QString("NAME (%1)").arg(StringValue);
-        case NUMBER: return QString("NUMBER (%1)").arg(NumberValue);
-	    case PLUS: return "PLUS (+)";
-	    case MINUS: return "MINUS (-)";
-	    case MUL: return "MUL (*)";
-	    case DIV: return "DIV (/)";
-	    case MODULO: return "MODULO (%)";
-	    case ASSIGN: return "ASSIGN (=)";
-	    case LBRACKET: return "LBRACKET '('";
-	    case RBRACKET: return "RBRACKET ')'";
-	    case POWER: return "POWER (^)";
-	    case FACTORIAL_LOGIC_NOT: return "FACTORIAL_LOGIC_NOT (!)";
-	    case LOGIC_NOT: return "LOGIC_NOT (!/not)";
-	    case LOGIC_AND: return "LOGIC_AND (&/and)";
-	    case LOGIC_OR: return "LOGIC_OR (|/or)";
-	    case LOGIC_XOR: return "LOGIC_XOR (xor)";
-	    case LOGIC_NOR: return "LOGIC_NOR (nor)";
-	    case LOGIC_NAND: return "LOGIC_NAND (nand)";
-	    case LOGIC_TRUE: return "LOGIC_TRUE (true)";
-	    case LOGIC_FALSE: return "LOGIC_FALSE (false)";
-	    case COMP_EQUALT: return "COMP_EQUALT (==)";
-	    case COMP_UNEQUAL: return "COMP_UNEQUAL (!=)";
-	    case COMP_GREATER: return "COMP_GREATER (>)";
-	    case COMP_SMALLER: return "COMP_SMALLER (<)";
-	    case COMP_GEQUAL: return "COMP_GEQUAL (>=)";
-	    case COMP_SEQUAL: return "COMP_SEQUAL (<=)";
-    }
-    return "unknown";
+    return tokentostring(CurrentToken);
 }
 
 
@@ -701,6 +673,11 @@ void QFMathParser::addStandardFunctions(){
 	addFunction("sigmoid", fSigmoid);
 	addFunction("sign", fSign);
 	addFunction("tosystempathseparator", fToSystemPathSeparator);
+    /*addFunction("mean", fMean);
+    addFunction("std", fStd);
+    addFunction("var", fVar);
+    addFunction("median", fMedian);
+    addFunction("quantile", fQuantile);*/
 }
 
 // class destructor
@@ -722,6 +699,16 @@ void QFMathParser::addVariableDouble(QString name, double* v)
     qfmpVariable nv;
     nv.type=QFMathParser::qfmpDouble;
     nv.num=v;
+    if (variableExists(name)) nv.internal=variables[name].internal; else nv.internal=false;
+    variables[name]=nv;
+}
+
+void QFMathParser::addVariableDoubleVec(QString name, QVector<double> *v)
+{
+    name=strip(name);
+    qfmpVariable nv;
+    nv.type=QFMathParser::qfmpDoubleVector;
+    nv.numVec=v;
     if (variableExists(name)) nv.internal=variables[name].internal; else nv.internal=false;
     variables[name]=nv;
 }
@@ -926,16 +913,6 @@ QFMathParser::qfmpEvaluateFunc QFMathParser::getFunctionDef(QString name){
   return NULL;
 }
 
-void QFMathParser::addTempVariable(QString name, QFMathParser::qfmpResult value) {
-  qfmpTempVariable v;
-  v.name=name;
-  v.type=value.type;
-  v.internal=true;
-  if (v.type==QFMathParser::qfmpDouble) { v.num=new double; }
-  else if (v.type==QFMathParser::qfmpString) { v.str=new QString; }
-  else if (v.type==QFMathParser::qfmpBool) { v.boolean=new bool; }
-  tempvariables.push_back(v);
-}
 
 QChar QFMathParser::peekStream(QTextStream *stream)
 {
@@ -977,20 +954,23 @@ void QFMathParser::setVariableDouble(QString name, double value) {
 
 void QFMathParser::setVariable(QString name, QFMathParser::qfmpResult value)
 {
-	bool nexist=!variableExists(name);
+    bool nexist=!variableExists(name);
     qfmpVariable v=variables[name];
-	v.type=value.type;
+    v.type=value.type;
     if (value.type==QFMathParser::qfmpDouble) {
-    if (nexist) {v.num=new double; v.internal=true;}
-    *(v.num)=value.num;
-  } else if (value.type==QFMathParser::qfmpString) {
-    if (nexist) {v.str=new QString; v.internal=true;}
-    *(v.str)=value.str;
-  } else if (value.type==QFMathParser::qfmpBool) {
-    if (nexist) {v.boolean=new bool; v.internal=true;}
-    *(v.boolean)=value.boolean;
-  }
-  variables[name]=v;
+        if (nexist) {v.num=new double; v.internal=true;}
+        *(v.num)=value.num;
+    } else if (value.type==QFMathParser::qfmpString) {
+        if (nexist) {v.str=new QString; v.internal=true;}
+        *(v.str)=value.str;
+    } else if (value.type==QFMathParser::qfmpBool) {
+        if (nexist) {v.boolean=new bool; v.internal=true;}
+        *(v.boolean)=value.boolean;
+    } else if (value.type==QFMathParser::qfmpDoubleVector) {
+        if (nexist) {v.numVec=new QVector<double>(); v.internal=true;}
+        *(v.numVec)=value.numVec;
+    }
+    variables[name]=v;
 }
 
 
@@ -1042,11 +1022,19 @@ QFMathParser::qfmpTokenType QFMathParser::getToken(){
 			return CurrentToken=PLUS;
 		case '-':
 			return CurrentToken=MINUS;
-		case '(':
-			return CurrentToken=LBRACKET;
-		case ')':
-			return CurrentToken=RBRACKET;
-		case ',':
+        case '(':
+            return CurrentToken=LPARENTHESE;
+        case ')':
+            return CurrentToken=RPARENTHESE;
+        case '[':
+            return CurrentToken=LBRACKET;
+        case ']':
+            return CurrentToken=RBRACKET;
+        case '{':
+            return CurrentToken=LBRACE;
+        case '}':
+            return CurrentToken=RBRACE;
+        case ',':
 			return CurrentToken=PARAMETER_DIV;
 		case '"':
 			return CurrentToken=STRING_DELIM;
@@ -1290,23 +1278,23 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
                 getToken();
                 if (CurrentToken == ASSIGN) { // assign a variable name
                     res=new qfmpVariableAssignNode(varname, logicalExpression(true), this, NULL);
-                } else if (CurrentToken == LBRACKET) { // function found
+                } else if (CurrentToken == LPARENTHESE) { // function found
                     //QFMathParser::qfmpNode** params=(QFMathParser::qfmpNode**)malloc(255*sizeof(QFMathParser::qfmpNode*));
                     QVector<QFMathParser::qfmpNode*> params;
 
 
                     getToken();
-                    while ((CurrentToken != RBRACKET)&&(CurrentToken!=END)) {
+                    while ((CurrentToken != RPARENTHESE)&&(CurrentToken!=END)) {
                         QFMathParser::qfmpNode* parameter=logicalExpression(params.size()>0);
                         params.append(parameter);
-                        if ((CurrentToken!=RBRACKET)&&(CurrentToken!=PARAMETER_DIV)&&(CurrentToken!=END)) {
+                        if ((CurrentToken!=RPARENTHESE)&&(CurrentToken!=PARAMETER_DIV)&&(CurrentToken!=END)) {
                             qfmpError(QString("')' or ',' expected, but '%1' found").arg(currenttokentostring()));
                             return NULL;
                         }
 
                     }
 
-                    if ( CurrentToken != RBRACKET ) {
+                    if ( CurrentToken != RPARENTHESE ) {
                         qfmpError(QString("')' expected, but '%1' found").arg(currenttokentostring()));
                         return NULL;
                     }
@@ -1334,13 +1322,14 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
             res= (QFMathParser::qfmpNode*)new qfmpUnaryNode('-', primary(true), this, NULL);
 			break;
 
-		case LOGIC_NOT:
+        case FACTORIAL_LOGIC_NOT:
+        case LOGIC_NOT:
             res= (QFMathParser::qfmpNode*)new qfmpUnaryNode('!', primary(true), this, NULL);
 			break;
 
-		case LBRACKET: { // found primary ( expression )
+        case LPARENTHESE: { // found primary: ( expression )
             QFMathParser::qfmpNode* expr=logicalExpression(true);
-            if (CurrentToken != RBRACKET) {
+            if (CurrentToken != RPARENTHESE) {
                 qfmpError(QString("')' expected, but '%1' found").arg(currenttokentostring()));
                 return NULL;
             }
@@ -1348,7 +1337,6 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
 			res= expr;
 			break;
 		}
-		case FACTORIAL_LOGIC_NOT:
         case LOGIC_TRUE: {// found 'true'
             QFMathParser::qfmpResult val;
             val.type=QFMathParser::qfmpBool;
@@ -1875,12 +1863,14 @@ QFMathParser::qfmpResult::qfmpResult()
     str="";       /*!< \brief contains result if \c type==qfmpString */
     num=0;            /*!< \brief contains result if \c type==qfmpDouble */
     boolean=false;          /*!< \brief contains result if \c type==qfmpBool */
+    numVec.clear();
 }
 
 QString QFMathParser::qfmpResult::toString() const
 {
     switch(type) {
         case qfmpDouble: return doubleToQString(num);
+        case qfmpDoubleVector: return QString("[ ")+doubleVecToQString(numVec)+QString(" ]");
         case qfmpString: return str;
         case qfmpBool: return boolToQString(boolean);
     }
@@ -1892,6 +1882,7 @@ QString QFMathParser::qfmpResult::toTypeString() const
 {
     switch(type) {
         case qfmpDouble: return doubleToQString(num)+QObject::tr(" [number]");
+        case qfmpDoubleVector: return QString("[ ")+doubleVecToQString(numVec)+QObject::tr(" ] [number vector]");
         case qfmpString: return str+QObject::tr(" [string]");
         case qfmpBool: return boolToQString(boolean)+QObject::tr(" [bool]");
     }
@@ -1906,6 +1897,7 @@ QFMathParser::qfmpVariable::qfmpVariable()
     str=NULL;        /*!< \brief this points to the variable data if \c type==qfmpString */
     num=NULL;             /*!< \brief this points to the variable data if \c type==qfmpDouble */
     boolean=NULL;
+    numVec=NULL;
 }
 
 

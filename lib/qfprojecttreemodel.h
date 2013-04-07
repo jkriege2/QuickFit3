@@ -22,11 +22,19 @@ class QFLIB_EXPORT QFProjectTreeModel : public QAbstractItemModel {
         /** Default destructor */
         virtual ~QFProjectTreeModel();
         /** \brief initialize the model with a given project */
-        void init(QFProject* p);
+        void init(QFProject* p, bool displayRDR=true, bool displayEval=true);
 
         QSet<int> getSelectedRDR() const;
         QSet<int> getSelectedEvaluations() const;
     protected:
+
+        bool displayRDR;
+        bool displayEval;
+        int groupCol;
+        int roleCol;
+        bool displayGroupAsColor;
+        QColor groupBaseColor;
+
         /** \brief the project represented by this data model */
         QFProject* current;
         QFProjectTreeModelNode* rootItem;
@@ -56,6 +64,7 @@ class QFLIB_EXPORT QFProjectTreeModel : public QAbstractItemModel {
         virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
         virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
         virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+        virtual QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
 
         QFProjectTreeModelNode* getTreeNodeByIndex(const QModelIndex& index) const;
         /** \brief return the raw data record specified by the given QModelIndex */
@@ -80,6 +89,11 @@ class QFLIB_EXPORT QFProjectTreeModel : public QAbstractItemModel {
 
         /** \brief returns the type of the supplied index */
         QFProjectTreeModelNode::nodeType classifyIndex(const QModelIndex& index) const;
+
+    public slots:
+        void setDisplayRole(bool enabled);
+        void setDisplayGroup(bool enabled);
+        void setDisplayGroupAsColor(bool enabled);
     protected slots:
         /** \brief connected to the propertiesChanged() slot of the owning QFEvaluationItem. Used to
          *         tell the model that something has changed */

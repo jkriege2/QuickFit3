@@ -165,7 +165,7 @@
        <item>
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>3</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="stackedWidgetPage1">
           <layout class="QFormLayout" name="formLayout">
@@ -463,6 +463,7 @@ p, li { white-space: pre-wrap; }
  </tabstops>
  <resources>
   <include location="quickfit3.qrc"/>
+  <include location="../lib/lib.qrc"/>
   <include location="../lib/lib.qrc"/>
   <include location="../lib/lib.qrc"/>
  </resources>

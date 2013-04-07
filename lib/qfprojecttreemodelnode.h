@@ -48,7 +48,6 @@ class QFLIB_EXPORT QFProjectTreeModelNode : public QObject {
 
         QFProjectTreeModelNode *child(int row);
         int childCount() const;
-        int columnCount() const;
         int row() const;
         QFProjectTreeModelNode *parent();
         nodeType type() const;

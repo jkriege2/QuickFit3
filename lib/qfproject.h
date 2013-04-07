@@ -97,6 +97,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         bool m_subset;
         QSet<int> subsetRDR;
         QSet<int> subsetEval;
+        QStringList rdrgroups;
 
     public:
         /** Default constructor */
@@ -140,6 +141,25 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         void setCreator(const QString& c);
         /** \brief return the file name  */
         QString getFile()const;
+
+
+        /** \brief returns the name of the given group */
+        QString getRDRGroupName(int group) const;
+        /** \brief returns all members of the given group */
+        QList<QFRawDataRecord*> getRDRGroupMembers(int group) const;
+        /** \brief add a new group */
+        int addRDRGroup(const QString& name);
+        /** \brief set the group name */
+        void setRDRGroupName(int group, const QString& name);
+        /** \brief get the number of groups */
+        int getRDRGroupCount() const;
+        /** \brief get all group names */
+        QStringList getRDRGroupNames() const;
+        /** \brief add a new group, if it doesn't exist yet, returns the group ID if the group already exists */
+        int addOrFindRDRGroup(const QString& name);
+        /** \brief finds the ID of the given group or -1 if it doesn't exist */
+        int findRDRGroup(const QString& name);
+
 
         /** \brief return the number of raw data records in the project */
         int getRawDataCount()const;

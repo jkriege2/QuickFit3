@@ -216,9 +216,6 @@ int QFProjectTreeModelNode::childCount() const {
     return childItems.count();
 }
 
-int QFProjectTreeModelNode::columnCount() const {
-    return 1;
-}
 
 
 QFProjectTreeModelNode *QFProjectTreeModelNode::parent() {

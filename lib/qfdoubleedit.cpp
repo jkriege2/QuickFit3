@@ -111,15 +111,25 @@ void QFDoubleEdit::setRange(double min, double max)
 
 void QFDoubleEdit::stepUp()
 {
-    double i=m_increment;
+    stepUp(1);
+}
+
+void QFDoubleEdit::stepDown()
+{
+    stepDown(1);
+}
+
+void QFDoubleEdit::stepUp(int steps)
+{
+    double i=m_increment*double(steps);
     if (m_Integer) i=round(m_increment);
     setValue(value()+i);
     emit valueChanged(value());
 }
 
-void QFDoubleEdit::stepDown()
+void QFDoubleEdit::stepDown(int steps)
 {
-    double i=m_increment;
+    double i=m_increment*double(steps);
     if (m_Integer) i=round(m_increment);
     setValue(value()-i);
     emit valueChanged(value());
@@ -166,7 +176,7 @@ void QFDoubleEdit::focusOutEvent ( QFocusEvent * event ) {
 
 void QFDoubleEdit::keyPressEvent ( QKeyEvent * event )  {
     //std::cout<<"key="<<event->key()<<"   modifiers="<<event->modifiers()<<std::endl;
-    if  ((event->modifiers()==Qt::NoModifier)&&((event->key()==44) || (event->key()==46))) { // convert '.' and ',' to the current locle's decimal point!
+    if  ((event->modifiers()==Qt::NoModifier)&&((event->key()==44) || (event->key()==46) || (event->key()==Qt::Key_Comma) || (event->key()==Qt::Key_Period))) { // convert '.' and ',' to the current locle's decimal point!
         QKeyEvent key(QEvent::KeyPress, 0, Qt::NoModifier, QString(QLocale::system().decimalPoint()));
         QLineEdit::keyPressEvent(&key);
         event->accept();
@@ -206,6 +216,17 @@ void QFDoubleEdit::resizeEvent ( QResizeEvent * event ) {
     m_btnUp->resize(btnWidth, btnHeight+1);
     m_btnDown->move(width()-btnWidth, btnHeight-1);
     m_btnDown->resize(btnWidth, height()-btnHeight);
+}
+
+void QFDoubleEdit::wheelEvent(QWheelEvent *event)
+{
+    int numDegrees = event->delta() / 8;
+    int numSteps = numDegrees / 15;
+
+    if (event->orientation() == Qt::Horizontal) {
+        stepUp(numSteps);
+    }
+    event->accept();
 }
 
 void QFDoubleEdit::addContextmenuAction(QAction* menuAction) {

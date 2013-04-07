@@ -62,7 +62,7 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
     pixelHeight=1;
     measureX[0]=measureX[1]=0;
     measureY[0]=measureY[1]=0;
-    measureFirst=true;
+    //measureFirst=true;
     m_stopresume=stopresume;
     this->opticsSetup=opticsSetup;
 
@@ -211,8 +211,10 @@ void QFESPIMB040CameraView::createMainWidgets() {
     plteMarginalPos->set_crossWidth(15);
     plteMainDistance=new JKQTFPLinePlot(pltMain, 2, measureX, measureY, QColor("red"));
     pltMain->addPlot(plteMarginalPos);
+    pltMain->set_dragLine(true);
     connect(pltMain, SIGNAL(mouseMoved(double, double)), this, SLOT(imageMouseMoved(double, double)));
     connect(pltMain, SIGNAL(clicked(double, double)), this, SLOT(imageMouseClicked(double, double)));
+    connect(pltMain, SIGNAL(mouseDragged(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageMouseDragged(double,double,double,double,Qt::KeyboardModifiers)));
     layPlt->addWidget(pltMain, 0, 1);
     //vbl->setStretchFactor(pltMain, 10);
     ///////////////////////////////////////////////////////////////
@@ -746,7 +748,7 @@ void QFESPIMB040CameraView::imageMouseClicked(double x, double y) {
         }
         redrawFrameRecalc();
     } else if (actMeasure->isChecked()) {
-        if (measureFirst) {
+        /*if (measureFirst) {
             measureX[0]=(double)xx+0.5;
             measureY[0]=(double)yy+0.5;
         } else {
@@ -754,7 +756,7 @@ void QFESPIMB040CameraView::imageMouseClicked(double x, double y) {
             measureY[1]=(double)yy+0.5;
         }
         measureFirst = !measureFirst;
-        redrawFrameRecalc();
+        redrawFrameRecalc();*/
     } else {
         if ((xx>=0) && (xx<image.width()) && (yy>=0) && (yy<image.height())) {
             pltDataMarginalXPixel=xx;
@@ -764,6 +766,34 @@ void QFESPIMB040CameraView::imageMouseClicked(double x, double y) {
         //qDebug()<<pltDataMarginalXPixelF<<pltDataMarginalYPixelF;
     }
     imageMouseMoved(x,y);
+}
+
+void QFESPIMB040CameraView::imageMouseDragged(double x1, double y1, double x2, double y2, Qt::KeyboardModifiers modifiers)
+{
+    uint32_t xx=floor(x1);
+    uint32_t yy=floor(y1);
+    uint32_t xx2=floor(x2);
+    uint32_t yy2=floor(y2);
+
+    uint32_t xxold=xx;
+    uint32_t yyold=yy;
+    uint32_t xxold2=xx2;
+    uint32_t yyold2=yy2;
+
+    switch(cmbRotation->currentIndex()) {
+        case 1: yy=xxold; xx=image.width()-yyold-1; yy2=xxold2; xx2=image.width()-yyold2-1; break;
+        case 2: yy=image.height()-yyold-1; xx=image.width()-xxold-1; yy2=image.height()-yyold2-1; xx2=image.width()-xxold2-1; break;
+        case 3: yy=image.height()-xxold-1; xx=yyold;  yy2=image.height()-xxold2-1; xx2=yyold2; break;
+    };
+
+    //qDebug()<<"mouseDragged: "<<x1<<y1<<" -> "<<x2<<y2<<"   "<<actMeasure->isChecked()<<"   "<<modifiers;
+    if (actMeasure->isChecked()) {
+        measureX[0]=(double)xx+0.5;
+        measureY[0]=(double)yy+0.5;
+        measureX[1]=(double)xx2+0.5;
+        measureY[1]=(double)yy2+0.5;
+        imageMouseMoved(x2,y2);
+    }
 }
 
 
@@ -2113,4 +2143,3 @@ void QFESPIMB040CameraView::clearGraph() {
     graphTime.start();
     updateGraph();
 }
-  

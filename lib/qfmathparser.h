@@ -149,14 +149,16 @@
 <pre>  primary         ->  <b>true</b> | <b>false</b>
                       | string_constant
                       | NUMBER
+                      | <b>[</b> vector_list <b>]</b>
                       | NAME
-                      | NAME <b>=</b> logical_expression
+                      | NAME <b>=</b> logical_expression                      
                       | <b>+</b> primary | <b>-</b> primary | <b>!</b> primary | <b>not</b> primary
                       | <b>(</b> logical_expression <b>)</b>
                       | NAME<b>(</b> parameter_list <b>)</b>
                       | primary <b>^</b> primary</pre>
 <pre>  string_constant -> <b>&quot;</b> STRING <b>&quot;</b> | <b>&apos;</b> STRING <b>&apos;</b></pre>
 <pre>  parameter_list  ->  \f$ \lambda \f$ | logical_expression | logical_expression <b>,</b> parameter_list</pre>
+<pre>  vector_list  ->  logical_expression | logical_expression <b>,</b> vector_list</pre>
 
 
 
@@ -221,8 +223,12 @@ class QFLIB_EXPORT QFMathParser
             DIV,                /*!< \brief a division operator '/' */
             MODULO,             /*!< \brief a modulo operator '%' */
             ASSIGN,             /*!< \brief a variable assignment = */
-            LBRACKET,           /*!< \brief left brackets '(' */
-            RBRACKET,           /*!< \brief right brackets ')' */
+            LPARENTHESE,        /*!< \brief left parentheses '(' */
+            RPARENTHESE,        /*!< \brief right parentheses ')' */
+            LBRACKET,           /*!< \brief left bracket '[' */
+            RBRACKET,           /*!< \brief right bracket ']' */
+            LBRACE,             /*!< \brief left brace '{' */
+            RBRACE,             /*!< \brief right brace '}' */
             POWER,              /*!< \brief a power operator '^' */
             FACTORIAL_LOGIC_NOT, /*!< \brief a factorial operator or a logical NOT '!' */
             LOGIC_NOT,          /*!< \brief a logical NOT '!' / 'not' */
@@ -281,7 +287,9 @@ class QFLIB_EXPORT QFMathParser
          */
         enum qfmpResultType {qfmpDouble,  /*!< \brief a floating-point number with double precision. This is also used to deal with integers */
                              qfmpString,  /*!< \brief a string of characters */
-                             qfmpBool};   /*!< \brief a boolean value true|false */
+                             qfmpBool,   /*!< \brief a boolean value true|false */
+                             qfmpDoubleVector  /*!< \brief a vector of floating point numbers */
+                             };
 
 
 
@@ -294,6 +302,7 @@ class QFLIB_EXPORT QFMathParser
           QString str;       /*!< \brief contains result if \c type==qfmpString */
           double num;            /*!< \brief contains result if \c type==qfmpDouble */
           bool boolean;          /*!< \brief contains result if \c type==qfmpBool */
+          QVector<double> numVec; /*!< \brief contains result if \c type==qfmpDoubleVector */
 
           /** \brief convert the value this struct representens into a QString */
           QFLIB_EXPORT QString toString() const;
@@ -318,17 +327,7 @@ class QFLIB_EXPORT QFMathParser
           QString *str;        /*!< \brief this points to the variable data if \c type==qfmpString */
           double *num;             /*!< \brief this points to the variable data if \c type==qfmpDouble */
           bool *boolean;           /*!< \brief this points to the variable data if \c type==qfmpBool */
-        };
-
-        /** \brief This struct is for managing temporary variables. It is generally like qfmpVariable.
-          */
-        struct QFLIB_EXPORT qfmpTempVariable {
-          QString name;       /*!< \brief name of the variable */
-          qfmpResultType type;    /*!< \brief type of the variable */
-          bool internal;          /*!< \brief this is an internal variable */
-          QString *str;       /*!< \brief this points to the variable data if \c type==qfmpString */
-          double *num;            /*!< \brief this points to the variable data if \c type==qfmpDouble */
-          bool *boolean;          /*!< \brief this points to the variable data if \c type==qfmpBool */
+          QVector<double>* numVec; /*!< \brief this points to the variable data if \c type==qfmpDoubleVector */
         };
 
 
@@ -700,8 +699,6 @@ class QFLIB_EXPORT QFMathParser
 
         MTRand rng;
 
-        /** \brief vector containing all temporary variables */
-        QList<qfmpTempVariable> tempvariables;
 
         /** \brief map to manage all currently defined variables */
         QMap<QString, qfmpVariable> variables;
@@ -722,10 +719,6 @@ class QFLIB_EXPORT QFMathParser
         void setVariable(QString name, qfmpResult value);
         /** \brief set the defining struct of the given variable */
         void setVariableDouble(QString name, double value);
-
-
-        /** \brief  adds a temporary variable */
-        void addTempVariable(QString name, qfmpResult value);
 
         void* data;
 
@@ -769,10 +762,15 @@ class QFLIB_EXPORT QFMathParser
         void addFunction(QString name, qfmpEvaluateFunc function);
 
         /** \brief  register a new external variable of type double
-		 * \param name name of the new variable
-		 * \param v pointer to the variable memory
-		 */
+         * \param name name of the new variable
+         * \param v pointer to the variable memory
+         */
         void addVariableDouble(QString name, double* v);
+        /** \brief  register a new external variable of type double vector
+         * \param name name of the new variable
+         * \param v pointer to the variable memory
+         */
+        void addVariableDoubleVec(QString name, QVector<double>* v);
 
         /** \brief  register a new external variable of type string
 		 * \param name name of the new variable
@@ -832,17 +830,10 @@ class QFLIB_EXPORT QFMathParser
         /** \brief  returns the defining structure of the given function */
         qfmpEvaluateFunc getFunctionDef(QString name);
 
-        /** \brief  tests whether a temporary variable exists */
-        inline bool tempvariableExists(QString name){
-          if (tempvariables.size()<=0)  return false;
-          for (int i=tempvariables.size()-1; i>=0; i--) {
-            if (tempvariables[i].name==name) return true;
-          }
-          return false;
-        };
+
 
         /** \brief  tests whether a variable exists */
-        inline bool variableExists(QString name){ return tempvariableExists(name)||(variables.find(name)!=variables.end()); };
+        inline bool variableExists(QString name){ return (variables.find(name)!=variables.end()); };
 
         /** \brief  tests whether a function exists */
         inline bool functionExists(QString name){ return !(functions.find(name)==functions.end()); };

@@ -60,6 +60,7 @@ QFRawDataRecord::QFRawDataRecord(QFProject* parent):
 {
     lock=new QReadWriteLock(QReadWriteLock::Recursive);
     project=parent;
+    group=-1;
     errorOcc=false;
     errorDesc="";
     name="";
@@ -129,6 +130,7 @@ void QFRawDataRecord::init(const QString& name, QStringList inputFiles, QStringL
     files=inputFiles;
     files_types=inputFilesTypes;
     files_desciptions=inputFileDescriptions;
+    group=-1;
     intReadData();
     //std::cout<<"after intReadData() in init ...\n";
     project->registerRawDataRecord(this);
@@ -140,11 +142,27 @@ void QFRawDataRecord::init(QDomElement& e, bool loadAsDummy) {
     //std::cout<<"creating QFRawDataRecord\n";
     name="";;
     description="";
+    group=-1;
     //std::cout<<"  reading XML\n";
     readXML(e);
     //std::cout<<"  registering record\n";
     project->registerRawDataRecord(this);
     //std::cout<<"created QFRawDataRecord\n";
+}
+
+bool QFRawDataRecord::hasGroup() const
+{
+    return group>=0;
+}
+
+QString QFRawDataRecord::getGroupName() const
+{
+    return project->getRDRGroupName(group);
+}
+
+QList<QFRawDataRecord *> QFRawDataRecord::getGroupMembers() const
+{
+    return project->getRDRGroupMembers(group);
 }
 
 QString QFRawDataRecord::getFileForType(const QString &type) {
@@ -409,7 +427,27 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
     }
     if (em) emit basicPropertiesChanged();
 }
-/** \brief set the description  */
+
+void QFRawDataRecord::setGroup(int g)
+{
+    bool em=false;
+    {
+
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (group!=g) {
+            group=g;
+            em=true;
+        }
+    }
+    if (em) emit basicPropertiesChanged();
+}
+
 void QFRawDataRecord::setDescription(const QString& d) {
     bool em=false;
     {
@@ -444,6 +482,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
         role=e.attribute("role", "");
         ID=e.attribute("id", "-1").toInt(&ok);
         if (ID==-1) { setError(tr("invalid ID in <rawdatarecord name=\"%1\" ...>!").arg(name)); return; }
+        bool gOK=false;
+        group=e.attribute("group", "-1").toInt(&gOK);
+        if (!gOK) group=-1;
         if (!project->checkID(ID)) {
             setError(tr("ID %1 in <rawdatarecord name=\"%2\" ...> already in use in the project!").arg(ID).arg(name));
             return;
@@ -807,6 +848,7 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
     w.writeStartElement("rawdataelement");
     w.writeAttribute("type", getType());
     w.writeAttribute("id", QString::number(ID));
+    w.writeAttribute("group", QString::number(group));
     w.writeAttribute("name", name);
     if (!folder.isEmpty()) w.writeAttribute("folder", folder);
     if (!role.isEmpty()) w.writeAttribute("role", role);

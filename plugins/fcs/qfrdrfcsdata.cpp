@@ -1275,6 +1275,31 @@ bool QFRDRFCSData::reloadFromFiles() {
     return false;
 }
 
+QStringList QFRDRFCSData::getAvailableRoles() const
+{
+    QStringList sl;
+    sl<<"ACF0"<<"ACF1"<<"ACF2"<<"ACF3"<<"FCCS";
+    /*sl<<"correlation";
+    sl<<"acf";
+    sl<<"ccf";
+    sl<<"dccf";
+    sl<<"fcs_red";
+    sl<<"fcs_green";
+    sl<<"fcs0";
+    sl<<"fcs1";
+    sl<<"fccs";
+    sl<<"ccf(-1,0)";
+    sl<<"ccf(1,0)";
+    sl<<"ccf(0,-1)";
+    sl<<"ccf(0,1)";*/
+    return sl;
+}
+
+bool QFRDRFCSData::isRoleUserEditable() const
+{
+    return  false;
+}
+
 
 
 

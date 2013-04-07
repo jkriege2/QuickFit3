@@ -16,7 +16,7 @@
 #include "qfrawdatapropertyeditor.h"
 #include "qfselectionlistdialog.h"
 
-#define sqr(x) ((x)*(x))
+#define sqr(x) qfSqr(x)
 
 #define CLICK_UPDATE_TIMEOUT 500
 //#define DEBUG_TIMIMNG
@@ -27,7 +27,7 @@
 QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent):
     QFRawDataEditor(services, propEditor, parent)
 {
-    m_fitFunctions=services->getFitFunctionManager()->getModels("", this);
+    m_fitFunctions=QFPluginServices::getInstance()->getFitFunctionManager()->getModels("", this);
     plteOverviewSelectedData=NULL;
     plteOverviewExcludedData=NULL;
     plteOverviewSize=0;

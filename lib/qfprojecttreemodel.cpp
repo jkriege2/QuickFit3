@@ -9,6 +9,11 @@ QFProjectTreeModel::QFProjectTreeModel(QObject* parent):
     rdrFolderItem=NULL;
     evalFolderItem=NULL;
     projectItem=NULL;
+    displayEval=displayRDR=true;
+    groupCol=-1;
+    roleCol=-1;
+    groupBaseColor=QColor("aliceblue");
+    displayGroupAsColor=true;
 }
 
 QFProjectTreeModel::~QFProjectTreeModel()
@@ -20,10 +25,12 @@ QFProjectTreeModel::~QFProjectTreeModel()
     projectItem=NULL;
 }
 
-void QFProjectTreeModel::init(QFProject* p) {
+void QFProjectTreeModel::init(QFProject* p, bool displayRDR, bool displayEval) {
     if (current) disconnect(current, SIGNAL(structureChanged(bool)), this , SLOT(projectStructureChanged()));
     if (current) disconnect(current, SIGNAL(propertiesChanged()), this , SLOT(projectDataChanged()));
     current=p;
+    this->displayEval=displayEval;
+    this->displayRDR=displayRDR;
     rdrUnchecked.clear();
     evaluationUnchecked.clear();
     createModelTree();
@@ -61,24 +68,6 @@ QSet<int> QFProjectTreeModel::getSelectedEvaluations() const
 
 void QFProjectTreeModel::createModelTree() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-    QFProjectTreeModelNode* newRoot=new QFProjectTreeModelNode(QFProjectTreeModelNode::qfpntRoot, NULL);
-    projectItem=newRoot->addChild(QFProjectTreeModelNode::qfpntProject, tr("Project"));
-    projectItem->setProject(current);
-    rdrFolderItem=projectItem->addChildFolder(tr("Raw Data Records"));
-    for (int i=0; i<current->getRawDataCount(); i++) {
-        QFRawDataRecord* rec=current->getRawDataByNum(i);
-        if (rec->getFolder().isEmpty()) rdrFolderItem->addChild(rec);
-        else {
-            QFProjectTreeModelNode* fld=rdrFolderItem->addChildFolder(rec->getFolder());
-            if (fld) fld->addChild(rec);
-            else rdrFolderItem->addChild(rec);
-        }
-    }
-    evalFolderItem=projectItem->addChildFolder(tr("Evaluation Items"));
-    for (int i=0; i<current->getEvaluationCount(); i++) {
-        evalFolderItem->addChild(current->getEvaluationByNum(i));
-    }
     if (rootItem) {
         delete rootItem;
         rootItem=NULL;
@@ -86,16 +75,36 @@ void QFProjectTreeModel::createModelTree() {
         evalFolderItem=NULL;
         projectItem=NULL;
     }
+
+    QFProjectTreeModelNode* newRoot=new QFProjectTreeModelNode(QFProjectTreeModelNode::qfpntRoot, NULL);
+    projectItem=newRoot->addChild(QFProjectTreeModelNode::qfpntProject, tr("Project"));
+    projectItem->setProject(current);
+    if (displayRDR) {
+        rdrFolderItem=projectItem->addChildFolder(tr("Raw Data Records"));
+        for (int i=0; i<current->getRawDataCount(); i++) {
+            QFRawDataRecord* rec=current->getRawDataByNum(i);
+            if (rec->getFolder().isEmpty()) rdrFolderItem->addChild(rec);
+            else {
+                QFProjectTreeModelNode* fld=rdrFolderItem->addChildFolder(rec->getFolder());
+                if (fld) fld->addChild(rec);
+                else rdrFolderItem->addChild(rec);
+            }
+        }
+    }
+    if (displayEval) {
+        evalFolderItem=projectItem->addChildFolder(tr("Evaluation Items"));
+        for (int i=0; i<current->getEvaluationCount(); i++) {
+            evalFolderItem->addChild(current->getEvaluationByNum(i));
+        }
+    }
+
     rootItem=newRoot;
     QApplication::restoreOverrideCursor();
 }
 
 int QFProjectTreeModel::columnCount ( const QModelIndex & parent ) const {
     if (!current || !rootItem) return 0;
-    if (parent.isValid())
-        return static_cast<QFProjectTreeModelNode*>(parent.internalPointer())->columnCount();
-    else
-        return rootItem->columnCount();
+    return qMax(qMax(1, groupCol+1), roleCol+1);
 }
 
 int QFProjectTreeModel:: rowCount ( const QModelIndex & parent) const {
@@ -153,23 +162,27 @@ QVariant QFProjectTreeModel::data ( const QModelIndex & index, int role ) const 
     QFProjectTreeModelNode *item = static_cast<QFProjectTreeModelNode*>(index.internalPointer());
     QFProjectTreeModelNode::nodeType nt=classifyIndex(index);
 
+    int col=index.column();
+
     if (item) {
         if (role == Qt::DisplayRole || role == Qt::EditRole) {
-            return item->title();
+            if (col==0) return item->title();
+            if (col==groupCol && nt==QFProjectTreeModelNode::qfpntRawDataRecord && item->rawDataRecord()) return item->rawDataRecord()->getGroupName();
+            if (col==roleCol && nt==QFProjectTreeModelNode::qfpntRawDataRecord && item->rawDataRecord()) return item->rawDataRecord()->getRole();
         } else if (role == Qt::DecorationRole) {
-            return item->icon();
+            if (col==0) return item->icon();
         } else if (role == Qt::ToolTipRole || role == Qt::StatusTipRole) {
-            return item->toolHelp();
+            if (col==0) return item->toolHelp();
         } else if (role == Qt::CheckStateRole && current->isDummy()) {
-            if (nt==QFProjectTreeModelNode::qfpntEvaluationRecord) {
+            if (col==0 && nt==QFProjectTreeModelNode::qfpntEvaluationRecord) {
                 if (evaluationUnchecked.contains(item->evaluationItem()->getID())) return Qt::Unchecked;
                 else return Qt::Checked;
             }
-            if (nt==QFProjectTreeModelNode::qfpntRawDataRecord) {
+            if (col==0 && nt==QFProjectTreeModelNode::qfpntRawDataRecord) {
                 if (rdrUnchecked.contains(item->rawDataRecord()->getID())) return Qt::Unchecked;
                 else return Qt::Checked;
             }
-            if (nt==QFProjectTreeModelNode::qfpntDirectory) {
+            if (col==0 && nt==QFProjectTreeModelNode::qfpntDirectory) {
                 QFProjectTreeModelNode* dirNode=getTreeNodeByIndex(index);
                 QList<QFProjectTreeModelNode*> l=dirNode->getAllChildRawDataRecords();
                 QMap<QFRawDataRecord*, QString> m;
@@ -194,6 +207,17 @@ QVariant QFProjectTreeModel::data ( const QModelIndex & index, int role ) const 
                 if (allUnchecked) return  Qt::Unchecked;
                 return Qt::PartiallyChecked;
             }
+        } else if (displayGroupAsColor && role==Qt::BackgroundRole && nt==QFProjectTreeModelNode::qfpntRawDataRecord) {
+            QFRawDataRecord* rec=getRawDataByIndex(index);
+            if (rec) {
+                double grpCount=qMax(10,current->getRDRGroupCount());
+                double grp=rec->getGroup()+1;
+                if (grp>0) {
+                    int colFactor=100+grp/grpCount*80.0;
+                    //qDebug()<<grp<<grpCount<<"  -> "<<colFactor;
+                    return groupBaseColor.darker(colFactor);
+                }
+            }
         }
     }
     return QVariant();
@@ -203,9 +227,9 @@ bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &valu
 
     //qDebug()<<"QFProjectTreeModel::setData("<<index<<value<<role<<")";
     if (!current || !rootItem) return false;
-
+    int col=index.column();
     QFProjectTreeModelNode::nodeType nt=classifyIndex(index);
-    if (nt==QFProjectTreeModelNode::qfpntProject && role==Qt::EditRole) {
+    if (col==0 && nt==QFProjectTreeModelNode::qfpntProject && role==Qt::EditRole) {
         current->setName(value.toString());
         emit dataChanged(index, index);
         return true;
@@ -214,11 +238,13 @@ bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &valu
         if (role==Qt::EditRole) {
             QFRawDataRecord* rec=getRawDataByIndex(index);
             if (rec) {
-                rec->setName(value.toString());
-                emit dataChanged(index, index);
-                return true;
+                if (col==0) {
+                    rec->setName(value.toString());
+                    emit dataChanged(index, index);
+                    return true;
+                }
             }
-        } else if (role==Qt::CheckStateRole) {
+        } else if (col==0 && role==Qt::CheckStateRole) {
             QFRawDataRecord* rec=getRawDataByIndex(index);
             if (rec) {
                 if (value.toBool()) {
@@ -232,14 +258,14 @@ bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &valu
         }
     }
     if (nt==QFProjectTreeModelNode::qfpntEvaluationRecord) {
-        if (role==Qt::EditRole) {
+        if (col==0 && role==Qt::EditRole) {
             QFEvaluationItem* rec=getEvaluationByIndex(index);
             if (rec) {
                 rec->setName(value.toString());
                 emit dataChanged(index, index);
                 return true;
             }
-        } else if (role==Qt::CheckStateRole) {
+        } else if (col==0 && role==Qt::CheckStateRole) {
             QFEvaluationItem* rec=getEvaluationByIndex(index);
             if (rec) {
                 if (value.toBool()) {
@@ -254,7 +280,7 @@ bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &valu
         }
     }
     if (nt==QFProjectTreeModelNode::qfpntDirectory) {
-        if (role==Qt::EditRole) {
+        if (col==0 && role==Qt::EditRole) {
             QFProjectTreeModelNode* dirNode=getTreeNodeByIndex(index);
             dirNode->setTitle(value.toString());
             QList<QFProjectTreeModelNode*> l=dirNode->getAllChildRawDataRecords();
@@ -277,7 +303,7 @@ bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &valu
             emit dataChanged(index, index);
             current->setSignalsEnabled(sigEn, true);
             return true;
-        } else if (role==Qt::CheckStateRole) {
+        } else if (col==0 && role==Qt::CheckStateRole) {
             QFProjectTreeModelNode* dirNode=getTreeNodeByIndex(index);
             QList<QFProjectTreeModelNode*> l=dirNode->getAllChildRawDataRecords();
             for (int i=0; i<l.size(); i++) {
@@ -301,6 +327,17 @@ bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &valu
     }
 
     return false;
+}
+
+QVariant QFProjectTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation==Qt::Horizontal) {
+        if (role==Qt::DisplayRole) {
+            if (section==roleCol) return tr("role");
+            if (section==groupCol) return tr("group");
+        }
+    }
+    return QVariant();
 }
 
 QFProjectTreeModelNode *QFProjectTreeModel::getTreeNodeByIndex(const QModelIndex &index) const
@@ -476,6 +513,44 @@ QFProjectTreeModelNode::nodeType QFProjectTreeModel::classifyIndex(const QModelI
     if (item) return item->type();
 
     return QFProjectTreeModelNode::qfpntUnknown;
+}
+
+void QFProjectTreeModel::setDisplayRole(bool enabled)
+{
+    if (!enabled) {
+        roleCol=-1;
+    } else {
+        if (groupCol>=0) {
+            roleCol=2;
+        } else {
+            roleCol=1;
+        }
+    }
+
+    reset();
+}
+
+void QFProjectTreeModel::setDisplayGroup(bool enabled)
+{
+    if (!enabled) {
+        groupCol=-1;
+        if (roleCol>=0) roleCol=1;
+    } else {
+        if (roleCol>=0) {
+            groupCol=1;
+            roleCol=2;
+        } else {
+            groupCol=1;
+        }
+    }
+
+    reset();
+}
+
+void QFProjectTreeModel::setDisplayGroupAsColor(bool enabled)
+{
+    displayGroupAsColor=enabled;
+    reset();
 }
 
 

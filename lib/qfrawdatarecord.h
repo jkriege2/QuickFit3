@@ -86,6 +86,14 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         inline QString getName() const { return name; }
         /** \brief return the role */
         inline QString getRole() const { return role; }
+        /** \brief return the group */
+        inline int getGroup() const { return group; }
+        /** \brief returns \c true if this RDR has a group */
+        bool hasGroup() const;
+        /** \brief returns the name of the group of the current record, or an empty string if no group is given  */
+        QString getGroupName() const;
+        /** \brief returns all members (including this record) of the records group */
+        QList<QFRawDataRecord*> getGroupMembers() const;
         /** \brief return the description  */
         inline QString getDescription() const { return description; }
         /** \brief return the list of linked files */
@@ -190,6 +198,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void setFolder(const QString& n);
         /** \brief set the RDRs role */
         void setRole(const QString& n);
+        /** \brief set the RDRs role */
+        void setGroup(int g);
 
         /** \brief set the description  */
         void setDescription(const QString& d);
@@ -281,6 +291,9 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         QString errorDesc;
         /** \brief pointer to the parent project object */
         QFProject* project;
+
+        /** \brief group ID (or -1 of none) */
+        int group;
 
         /** \brief read object contents from QDomElement
          *

@@ -324,6 +324,13 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
         w.writeAttribute("quickfit_compiledate", qfInfoCompileDate());
         w.writeAttribute("name", name);
         w.writeAttribute("creator", creator);
+        w.writeStartElement("rdr_groups");
+        for (int i=0; i<rdrgroups.size(); i++) {
+            w.writeStartElement("rdr_group");
+            w.writeCDATA(rdrgroups[i]);
+            w.writeEndElement();
+        }
+        w.writeEndElement();
         w.writeStartElement("description");
         w.writeCDATA(description);
         w.writeEndElement();
@@ -476,6 +483,17 @@ void QFProject::internalReadXML(const QString& file) {
                 //std::cout<<"    reading XML: project properties\n";
                 QDomElement te=e.firstChildElement("properties");
                 readProperties(te);
+
+                QDomElement rdg=e.firstChildElement("rdr_groups");
+                rdrgroups.clear();
+                if (!rdg.isNull()) {
+                    rdg=rdg.firstChildElement("rdr_group");
+                    while (!rdg.isNull()) {
+                        rdrgroups<<rdg.text();
+                        rdg=rdg.nextSiblingElement("rdr_group");
+                    }
+                }
+
 
                 if (services) {
                     services->setProgressRange(0, e.firstChildElement("rawdata").elementsByTagName("rawdataelement").size()+e.firstChildElement("evaluations").elementsByTagName("evaluation").size());
@@ -1266,6 +1284,27 @@ QString QFProject::getFile()const  {
     return file;
 }
 
+QString QFProject::getRDRGroupName(int group) const
+{
+    return rdrgroups.value(group, "");
+}
+
+QList<QFRawDataRecord *> QFProject::getRDRGroupMembers(int group) const
+{
+    QList<QFRawDataRecord *> l;
+    //if (group>=0 && group<rdrgroups.size()) {
+    for (int i=0; i<getRawDataCount(); i++) {
+        QFRawDataRecord* rdr=getRawDataByNum(i);
+        if (rdr && rdr->getGroup()==group) l<<rdr;
+    }
+    /*} else {
+        for (int i=0; i<getRawDataCount(); i++) {
+            l<<getRawDataByNum(i);
+        }
+    }*/
+    return l;
+}
+
 int QFProject::getRawDataCount()const  {
     return rawData.size();
 }
@@ -1485,6 +1524,45 @@ bool QFProject::areSignalsEnabled() const
 bool QFProject::isDummy() const
 {
     return m_dummy;
+}
+
+int QFProject::addRDRGroup(const QString &name)
+{
+    rdrgroups<<name;
+    emitStructureChanged();
+    return rdrgroups.size()-1;
+}
+
+void QFProject::setRDRGroupName(int group, const QString &name)
+{
+    if (group>=0 && group<rdrgroups.size()) {
+        rdrgroups[group]=name;
+        emitStructureChanged();
+    }
+}
+
+int QFProject::getRDRGroupCount() const
+{
+    return rdrgroups.size();
+}
+
+QStringList QFProject::getRDRGroupNames() const
+{
+    return rdrgroups;
+}
+
+int QFProject::addOrFindRDRGroup(const QString &name)
+{
+    int i=findRDRGroup(name);
+    if (i<0) {
+        i=addRDRGroup(name);
+    }
+    return i;
+}
+
+int QFProject::findRDRGroup(const QString &name)
+{
+    return rdrgroups.indexOf(name);
 }
 
 

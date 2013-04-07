@@ -80,9 +80,9 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
             \param filename filename of the input file
             \param filename_overview filename of a file containing an overview image
         */
-        void insertVideoCorrelatorFile(const QString& filename, const QString& filename_overview=QString(""), const QString &filename_evalsettings=QString(""), bool binary=false, const QString &role=QString(""), int internalDualViewMode=0, int dualViewID=0, bool addCorrelations=true, bool adNandB=true);
+        void insertVideoCorrelatorFile(const QString& filename, const QString& filename_overview=QString(""), const QString &filename_evalsettings=QString(""), bool binary=false, const QString &role=QString(""), int internalDualViewMode=0, int dualViewID=0, bool addCorrelations=true, bool adNandB=true, const QString &group=QString(""));
         /*! \brief add a number and brightness record from a video_correlator file to the current project */
-        void insertNandBFromVideoCorrelatorFile(const QString& evalFilename, const QString& filename_overvieww, const QString& filename_overviewstdw, const QString& filenameBack, const QString &filenameBackStd=QString(""), int internalDualViewMode=0, int dualViewID=0, const QString &role=QString(""));
+        void insertNandBFromVideoCorrelatorFile(const QString& evalFilename, const QString& filename_overvieww, const QString& filename_overviewstdw, const QString& filenameBack, const QString &filenameBackStd=QString(""), int internalDualViewMode=0, int dualViewID=0, const QString &role=QString(""), const QString &group=QString(""));
         /*! \brief find the evaluation seetinsg file for the give data file ... also returns some additional data from filename heuristics */
         void filenameHeuristics(const QString& filename, QString *evalFilename, bool* isCross, bool* isDCCF, int *dccfid, bool *isJanBFile, QString *role);
 
@@ -102,8 +102,8 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
         QFRDRImagingFCSSimulator* dlgSimulate;
 
         /** \brief insert record, if it is not yet contained in the project! */
-        void insertProjectRecord(const QString& type, const QString& name, const QString& filename, const QString& role, const QString& description=QString(""), const QString& directory=QString(""), const QMap<QString,QVariant>& init_params=QFStringVariantMap(), const QStringList& init_params_readonly=QStringList());
-        void insertProjectRecordFiles(const QString &type, const QString &name, const QStringList &filename, const QString& role, const QStringList &filetypes, const QStringList &filedescriptions, const QString &description=QString(""), const QString &directory=QString(""), const QMap<QString,QVariant>& init_params=QFStringVariantMap(), const QStringList& init_params_readonly=QStringList());
+        QFRawDataRecord* insertProjectRecord(const QString& type, const QString& name, const QString& filename, const QString& role=QString(""), const QString& group=QString(""), const QString& description=QString(""), const QString &directory=QString(""), const QMap<QString, QVariant> &init_params=QFStringVariantMap(), const QStringList &init_params_readonly=QStringList());
+        QFRawDataRecord* insertProjectRecordFiles(const QString &type, const QString &name, const QStringList &filename, const QString& role, const QString& group, const QStringList &filetypes, const QStringList &filedescriptions, const QString &description=QString(""), const QString &directory=QString(""), const QMap<QString,QVariant>& init_params=QFStringVariantMap(), const QStringList& init_params_readonly=QStringList());
 
         bool parseSPIMSettings(const QString& filename_settings, QString& description, QMap<QString,QVariant>& initParams, QStringList& paramsReadonly, QStringList& files, QStringList& files_types, QStringList& files_descriptions);
 

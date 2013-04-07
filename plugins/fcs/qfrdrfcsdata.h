@@ -244,6 +244,11 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         /** \copydoc QFRawDataRecord::reloadFromFiles() */
         virtual bool reloadFromFiles();
 
+        /** \brief returns a list of the allowed RDR roles, default: an emplty list */
+        virtual QStringList getAvailableRoles() const;
+        /** \brief if this returns \c true, the user may change the RDRs role in the QFRawDataPropertyEditor, default: \c false */
+        virtual bool isRoleUserEditable() const;
+
     protected:
         /** \brief write the contents of the object to a XML file */
         virtual void intWriteData(QXmlStreamWriter& w);

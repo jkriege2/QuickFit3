@@ -854,15 +854,15 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                             }
                             if (job.addFCCSSeparately && job.dualViewMode!=0) {
                                 if (QFile::exists(localFilename1)) {
-                                    addFiles.append(getFileInfo(localFilename1, configFilename, "ACF0", 0));
-                                    addFiles.append(getFileInfo(localFilename1, configFilename, "ACF1", 1));
+                                    addFiles.append(getFileInfo(localFilename1, configFilename, "ACF0", 0, getGroupName()));
+                                    addFiles.append(getFileInfo(localFilename1, configFilename, "ACF1", 1, getGroupName()));
                                 } else {
-                                    addFiles.append(getFileInfo(localFilename, configFilename, "ACF0", 0));
-                                    addFiles.append(getFileInfo(localFilename, configFilename, "ACF1", 1));
+                                    addFiles.append(getFileInfo(localFilename, configFilename, "ACF0", 0, getGroupName()));
+                                    addFiles.append(getFileInfo(localFilename, configFilename, "ACF1", 1, getGroupName()));
                                 }
                             } else {
-                                if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, configFilename, "ACF"));
-                                else addFiles.append(getFileInfo(localFilename, configFilename, "ACF"));
+                                if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, configFilename, "ACF", getGroupName()));
+                                else addFiles.append(getFileInfo(localFilename, configFilename, "ACF", getGroupName()));
                             }
 
                         }
@@ -893,11 +893,11 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     }
                                     QString role=job.DCCFrole.value(id, "DCCF");
                                     if (role.toLower()=="fccs") {
-                                        if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, configFilename, role, 0));
-                                        else addFiles.append(getFileInfo(localFilename, configFilename, role, 0));
+                                        if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, configFilename, role, 0, getGroupName()));
+                                        else addFiles.append(getFileInfo(localFilename, configFilename, role, 0, getGroupName()));
                                     } else {
-                                        if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, configFilename, role));
-                                        else addFiles.append(getFileInfo(localFilename, configFilename, role));
+                                        if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, configFilename, role, getGroupName()));
+                                        else addFiles.append(getFileInfo(localFilename, configFilename, role, getGroupName()));
                                     }
                                 }
                             }
@@ -923,8 +923,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create binary crosscorrelation file '%1': %2!").arg(localFilename1).arg(error));
                             }
-                            if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, configFilename, QString("CCF")));
-                            else addFiles.append(getFileInfo((localFilename), configFilename, "CCF"));
+                            if (QFile::exists(localFilename1)) addFiles.append(getFileInfo(localFilename1, configFilename, QString("CCF"), getGroupName()));
+                            else addFiles.append(getFileInfo((localFilename), configFilename, "CCF", getGroupName()));
 
                         }
                         emit progressIncrement(10);
@@ -941,10 +941,10 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 && QFile::exists(backstdFilename)*/) {
 
                             if (job.addFCCSSeparately && job.dualViewMode!=0) {
-                                addFiles.append(getFileInfoNandB(averageFilenameF, stdFilename, backgroundFilename, backstdFilename, configFilename, "N&B1", 0));
-                                addFiles.append(getFileInfoNandB(averageFilenameF, stdFilename, backgroundFilename, backstdFilename, configFilename, "N&B2", 1));
+                                addFiles.append(getFileInfoNandB(averageFilenameF, stdFilename, backgroundFilename, backstdFilename, configFilename, "N&B1", 0, getGroupName()));
+                                addFiles.append(getFileInfoNandB(averageFilenameF, stdFilename, backgroundFilename, backstdFilename, configFilename, "N&B2", 1, getGroupName()));
                             } else {
-                                addFiles.append(getFileInfoNandB(averageFilenameF, stdFilename, backgroundFilename, backstdFilename, configFilename, "N&B", 0));
+                                addFiles.append(getFileInfoNandB(averageFilenameF, stdFilename, backgroundFilename, backstdFilename, configFilename, "N&B", 0, getGroupName()));
                             }
                         }
                     } else {
@@ -2481,41 +2481,44 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
 
 }
 
-QFRDRImagingFCSCorrelationJobThread::Fileinfo::Fileinfo(const QString &filename, const QString &role, int internalDualViewMode, int dualViewID, bool isNandB)
+QFRDRImagingFCSCorrelationJobThread::Fileinfo::Fileinfo(const QString &filename, const QString &role, int internalDualViewMode, int dualViewID, bool isNandB, const QString& group)
 {
     this->filename=filename;
     this->filenameVar="";
     this->filenameBack="";
     this->filenameBackVar="";
     this->role=role;
+    this->group=group;
     this->internalDualViewMode=internalDualViewMode;
     this->dualViewID=dualViewID;
     this->filetype=QFRDRImagingFCSCorrelationJobThread::ftCorrelation;
 }
 
-QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThread::getFileInfo(const QString &filename, const QString& filenameEvalSettings, const QString &role)
+QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThread::getFileInfo(const QString &filename, const QString& filenameEvalSettings, const QString &role, const QString &group)
 {
     QFRDRImagingFCSCorrelationJobThread::Fileinfo i;
     i.filename=filename;
     i.filenameEvalSettings=filenameEvalSettings;
     i.role=role;
+    i.group=group;
     i.dualViewID=0;
     i.internalDualViewMode=0;
     return i;
 }
 
-QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThread::getFileInfo(const QString &filename, const QString &filenameEvalSettings, const QString &role, int dualViewID)
+QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThread::getFileInfo(const QString &filename, const QString &filenameEvalSettings, const QString &role, int dualViewID, const QString& group)
 {
     QFRDRImagingFCSCorrelationJobThread::Fileinfo i;
     i.filename=filename;
     i.filenameEvalSettings=filenameEvalSettings;
     i.role=role;
+    i.group=group;
     i.dualViewID=dualViewID;
     i.internalDualViewMode=job.dualViewMode;
     return i;
 }
 
-QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThread::getFileInfoNandB(const QString &filename, const QString &filenameVar, const QString &filenameBack, const QString &filenameBackVar, const QString& filenameEvalSettings, const QString &role, int dualViewID)
+QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThread::getFileInfoNandB(const QString &filename, const QString &filenameVar, const QString &filenameBack, const QString &filenameBackVar, const QString& filenameEvalSettings, const QString &role, int dualViewID, const QString& group)
 {
     QFRDRImagingFCSCorrelationJobThread::Fileinfo i;
     i.filename=filename;
@@ -2524,11 +2527,17 @@ QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThrea
     i.filenameBackVar=filenameBackVar;
     i.filenameEvalSettings=filenameEvalSettings;
     i.role=role;
+    i.group=group;
     i.dualViewID=dualViewID;
     i.internalDualViewMode=job.dualViewMode;
     i.filetype=QFRDRImagingFCSCorrelationJobThread::ftNandB;
     //qDebug()<<"getFileInfoNandB:"<<filename<<filenameVar<<filenameBack<<filenameBackVar;
     return i;
+}
+
+QString QFRDRImagingFCSCorrelationJobThread::getGroupName() const
+{
+    return outputFilenameBase;
 }
 
 void QFRDRImagingFCSCorrelationJobThread::StatisticsDataset::clear()

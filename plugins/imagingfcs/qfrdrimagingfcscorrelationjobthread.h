@@ -200,21 +200,23 @@ class QFRDRImagingFCSCorrelationJobThread : public QThread {
         };
 
         struct Fileinfo{                
-            Fileinfo(const QString& filename=QString(""), const QString& role=QString(""), int internalDualViewMode=0, int dualViewID=0, bool isNandB=true);
+                Fileinfo(const QString& filename=QString(""), const QString& role=QString(""), int internalDualViewMode=0, int dualViewID=0, bool isNandB=true, const QString &group=QString(""));
             QString filename;
             QString filenameVar;
             QString filenameBack;
             QString filenameBackVar;
             QString filenameEvalSettings;
             QString role;
+            QString group;
             int internalDualViewMode;
             int dualViewID;
             FileTypes filetype;
         };
 
-        Fileinfo getFileInfo(const QString& filename, const QString& filenameEvalSettings, const QString& role="");
-        Fileinfo getFileInfo(const QString& filename, const QString& filenameEvalSettings, const QString& role, int dualViewID);
-        Fileinfo getFileInfoNandB(const QString& filename, const QString& filenameVar, const QString& filenameBack, const QString &filenameBackVar, const QString &filenameEvalSettings, const QString &role, int dualViewID);
+        Fileinfo getFileInfo(const QString& filename, const QString& filenameEvalSettings, const QString& role="", const QString& group="");
+        Fileinfo getFileInfo(const QString& filename, const QString& filenameEvalSettings, const QString& role, int dualViewID, const QString& group="");
+        Fileinfo getFileInfoNandB(const QString& filename, const QString& filenameVar, const QString& filenameBack, const QString &filenameBackVar, const QString &filenameEvalSettings, const QString &role, int dualViewID, const QString& group=QString(""));
+        QString getGroupName() const;
 
         explicit QFRDRImagingFCSCorrelationJobThread(QFPluginServices* services, QObject *parent = 0);
         ~QFRDRImagingFCSCorrelationJobThread();

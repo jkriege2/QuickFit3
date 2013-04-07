@@ -72,6 +72,8 @@ class QFLIB_EXPORT QFDoubleEdit : public QLineEdit {
         void setDecimals(int decimals) { m_decimals=decimals; setValue(value()); }
         void stepUp();
         void stepDown();
+        void stepUp(int steps);
+        void stepDown(int steps);
         void setIncrement(double inc) { m_increment=inc; }
         void setSingleStep(double inc) { setIncrement(inc); }
         void setShowUpDown(bool showUpDown);
@@ -120,6 +122,7 @@ class QFLIB_EXPORT QFDoubleEdit : public QLineEdit {
         virtual void focusOutEvent ( QFocusEvent * event ) ;
         virtual void keyPressEvent ( QKeyEvent * event ) ;
         virtual void resizeEvent ( QResizeEvent * event ) ;
+        virtual void wheelEvent ( QWheelEvent * event );
 };
 
 #endif // QFDOUBLEEDIT_H
