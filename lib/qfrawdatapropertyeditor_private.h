@@ -23,6 +23,7 @@
 #include "qfcompleterfromfile.h"
 #include "qfpropertyitemdelegate.h"
 #include "dlg_qffileeditdialog.h"
+#include "qfprojecttreemodel.h"
 
 class QFRawDataPropertyEditor; // forward
 
@@ -157,6 +158,11 @@ class QFRawDataPropertyEditor_private : public QObject
         QCheckBox* chkShowAvg;
         QComboBox* cmbGroup;
 
+        QPointer<QTreeView> treeNextRecord;
+        QPointer<QFProjectTreeModel> projectTree;
+        QPushButton* btnSelectFromTree;
+
+
         //QSortFilterProxyModel* paramFilterProxy;
 
         QList<QPointer<QFRawDataEditor> > editorList;
@@ -255,6 +261,9 @@ class QFRawDataPropertyEditor_private : public QObject
         void setCurrent(QFRawDataRecord* c);
 
         void reloadGroupList();
+
+        void selectRecordFromTreeClicked();
+        void selectRecordFromTreeSelected(const QModelIndex& index);
 };
 
 #endif // QFRAWDATAPROPERTYEDITOR_PRIVATE_H

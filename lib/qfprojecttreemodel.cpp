@@ -14,6 +14,7 @@ QFProjectTreeModel::QFProjectTreeModel(QObject* parent):
     roleCol=-1;
     groupBaseColor=QColor("aliceblue");
     displayGroupAsColor=true;
+    rdrTypeFiler="";
 }
 
 QFProjectTreeModel::~QFProjectTreeModel()
@@ -83,11 +84,15 @@ void QFProjectTreeModel::createModelTree() {
         rdrFolderItem=projectItem->addChildFolder(tr("Raw Data Records"));
         for (int i=0; i<current->getRawDataCount(); i++) {
             QFRawDataRecord* rec=current->getRawDataByNum(i);
-            if (rec->getFolder().isEmpty()) rdrFolderItem->addChild(rec);
-            else {
-                QFProjectTreeModelNode* fld=rdrFolderItem->addChildFolder(rec->getFolder());
-                if (fld) fld->addChild(rec);
-                else rdrFolderItem->addChild(rec);
+            if (rec) {
+                if (rdrTypeFiler.isEmpty() || (!rdrTypeFiler.isEmpty() && rec->getType().toLower()==rdrTypeFiler.toLower())) {
+                    if (rec->getFolder().isEmpty()) rdrFolderItem->addChild(rec);
+                    else {
+                        QFProjectTreeModelNode* fld=rdrFolderItem->addChildFolder(rec->getFolder());
+                        if (fld) fld->addChild(rec);
+                        else rdrFolderItem->addChild(rec);
+                    }
+                }
             }
         }
     }
@@ -550,6 +555,13 @@ void QFProjectTreeModel::setDisplayGroup(bool enabled)
 void QFProjectTreeModel::setDisplayGroupAsColor(bool enabled)
 {
     displayGroupAsColor=enabled;
+    reset();
+}
+
+void QFProjectTreeModel::setRDRTypeFilter(const QString &type)
+{
+    rdrTypeFiler=type;
+    createModelTree();
     reset();
 }
 

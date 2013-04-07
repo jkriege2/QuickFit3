@@ -34,6 +34,7 @@ class QFLIB_EXPORT QFProjectTreeModel : public QAbstractItemModel {
         int roleCol;
         bool displayGroupAsColor;
         QColor groupBaseColor;
+        QString rdrTypeFiler;
 
         /** \brief the project represented by this data model */
         QFProject* current;
@@ -94,6 +95,7 @@ class QFLIB_EXPORT QFProjectTreeModel : public QAbstractItemModel {
         void setDisplayRole(bool enabled);
         void setDisplayGroup(bool enabled);
         void setDisplayGroupAsColor(bool enabled);
+        void setRDRTypeFilter(const QString& type);
     protected slots:
         /** \brief connected to the propertiesChanged() slot of the owning QFEvaluationItem. Used to
          *         tell the model that something has changed */

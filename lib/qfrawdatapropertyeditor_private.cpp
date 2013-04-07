@@ -15,6 +15,9 @@ QFRawDataPropertyEditor_private::QFRawDataPropertyEditor_private(QFRawDataProper
     QObject(parent)
 {
     d=parent;
+    treeNextRecord=NULL;
+    projectTree=NULL;
+
 }
 
 void QFRawDataPropertyEditor_private::nameChanged(const QString& text) {
@@ -109,6 +112,11 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     btnPrevious->setDefaultAction(actPrevious);
     vl->addWidget(btnPrevious);
     connect(actPrevious, SIGNAL(triggered()), this, SLOT(previousPressed()));
+
+    btnSelectFromTree=new QPushButton(tr("select RDR"), d);
+    btnSelectFromTree->setToolTip(tr("click this to select the next record to display from a tree of all records in the current project which are of the semae type"));
+    connect(btnSelectFromTree, SIGNAL(clicked()), this, SLOT(selectRecordFromTreeClicked()));
+    vl->addWidget(btnSelectFromTree);
 
     actNext=new QAction(QIcon(":/lib/prop_next.png"), tr("&next"), d);
     actNext->setToolTip(tr("move to next record"));
@@ -1377,6 +1385,62 @@ void QFRawDataPropertyEditor_private::reloadGroupList()
     cmbGroup->setCurrentIndex(i);
     cmbGroup->blockSignals(false);
     cmbGroup->setUpdatesEnabled(true);
+}
+
+void QFRawDataPropertyEditor_private::selectRecordFromTreeClicked()
+{
+    if (!current) return;
+    treeNextRecord=new QTreeView(d);
+    treeNextRecord->setVisible(false);
+    treeNextRecord->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    treeNextRecord->setHeaderHidden(true);
+    projectTree=new QFProjectTreeModel(treeNextRecord);
+    projectTree->init(current->getProject(), true, false);
+    projectTree->setRDRTypeFilter(current->getType());
+    treeNextRecord->setModel(projectTree);
+    treeNextRecord->move(btnSelectFromTree->x(), btnSelectFromTree->y()+btnSelectFromTree->height());
+    QSize s=treeNextRecord->sizeHint();
+    s.setWidth(qMin(d->width()-btnSelectFromTree->x()-5, qMax(s.width(), d->width()/3)));
+    s.setHeight(qMin(d->height()-btnSelectFromTree->y()-btnSelectFromTree->height()-5, (30*QFontMetrics(treeNextRecord->font()).height())/2));
+    treeNextRecord->resize(s);
+    treeNextRecord->setCurrentIndex(projectTree->index(current));
+    treeNextRecord->expandAll();
+    treeNextRecord->setVisible(true);
+    treeNextRecord->setFocus();
+    connect(treeNextRecord, SIGNAL(clicked(QModelIndex)), this, SLOT(selectRecordFromTreeSelected(QModelIndex)));
+}
+
+void QFRawDataPropertyEditor_private::selectRecordFromTreeSelected(const QModelIndex &index)
+{
+    if (treeNextRecord) {
+        treeNextRecord->close();
+    }
+    if (projectTree && current) {
+        QFRawDataRecord* n=projectTree->getRawDataByIndex(index);
+        if (n) {
+            if (treeNextRecord) {
+                treeNextRecord->hide();
+                treeNextRecord->disconnect();
+                treeNextRecord->setModel(NULL);
+                if (projectTree) delete projectTree;
+                treeNextRecord->deleteLater();
+                treeNextRecord=NULL;
+                projectTree=NULL;
+            }
+            setCurrent(n);
+            return;
+        }
+    }
+    if (treeNextRecord) {
+        treeNextRecord->hide();
+        treeNextRecord->disconnect();
+        treeNextRecord->setModel(NULL);
+        if (projectTree) delete projectTree;
+        treeNextRecord->deleteLater();
+        treeNextRecord=NULL;
+        projectTree=NULL;
+    }
+
 }
 
 
