@@ -30,20 +30,20 @@
 /*! \brief squares the argument
     \ingroup qf3lib_mathtools
  */
-inline double qfSqr(double x) { return x*x; }
-inline float qfSqr(float x) { return x*x; }
+QFLIB_EXPORT inline double qfSqr(double x) { return x*x; }
+QFLIB_EXPORT inline float qfSqr(float x) { return x*x; }
 
 /*! \brief takes the argument to the third power
     \ingroup qf3lib_mathtools
  */
-inline double qfCube(double x) { return x*x*x; }
-inline float qfCube(float x) { return x*x*x; }
+QFLIB_EXPORT inline double qfCube(double x) { return x*x*x; }
+QFLIB_EXPORT inline float qfCube(float x) { return x*x*x; }
 
 /*! \brief takes the argument to the fourth power
     \ingroup qf3lib_mathtools
  */
-inline double qfPow4(double x) { double x2=x*x; return x2*x2; }
-inline float qfPow4(float x) { float x2=x*x; return x2*x2; }
+QFLIB_EXPORT inline double qfPow4(double x) { double x2=x*x; return x2*x2; }
+QFLIB_EXPORT inline float qfPow4(float x) { float x2=x*x; return x2*x2; }
 
 
 QFLIB_EXPORT double qfSinc(double x);
@@ -94,7 +94,7 @@ double qfstatisticsAverage(const T value) {
 }
 
 
-/*! \brief calculate the sum of data
+/*! \brief calculate the number of elements in \a value that contain a valid float
     \ingroup qf3lib_mathtools
 
     \f[ \overline{v}=\cdot\sum\limits_{i=0}^{N-1} v_i \f]
@@ -102,7 +102,7 @@ double qfstatisticsAverage(const T value) {
 template <class T>
 long long qfstatisticsCount(const T value) {
     long long N=value.size();
-    if (N<=1) return 0;
+    if (N<=0) return 0;
     long long NN=0;
     for (register long long i=0; i<N; i++) {
         if (QFFloatIsOK(value[i])) {
@@ -112,6 +112,54 @@ long long qfstatisticsCount(const T value) {
     return NN;
 }
 
+/*! \brief calculate the minimum of the data in \a value
+    \ingroup qf3lib_mathtools
+
+*/
+template <class T>
+T qfstatisticsMin(const QList<T> value) {
+    long long N=value.size();
+    if (N<=0) return 0;
+    if (N==1) return value[0];
+    T m=0;
+    bool first=true;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i])) {
+            if (first)  {
+                m=value[i];
+                first=false;
+            } else if (value[i]<m) {
+                m=value[i];
+            }
+        }
+    }
+    return m;
+}
+
+
+/*! \brief calculate the maximum of the data in \a value
+    \ingroup qf3lib_mathtools
+
+*/
+template <class T>
+T qfstatisticsMax(const QList<T> value) {
+    long long N=value.size();
+    if (N<=0) return 0;
+    if (N==1) return value[0];
+    T m=0;
+    bool first=true;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i])) {
+            if (first)  {
+                m=value[i];
+                first=false;
+            } else if (value[i]>m) {
+                m=value[i];
+            }
+        }
+    }
+    return m;
+}
 
 /*! \brief calculate the sum of data
     \ingroup qf3lib_mathtools

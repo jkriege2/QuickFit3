@@ -1,11 +1,10 @@
 #include "qffitfunctionsspimfcsdiffe2.h"
-
 #include <cmath>
-#define sqr(x) ((x)*(x))
-#define cube(x) ((x)*(x)*(x))
-#define pow4(x) ((x)*(x)*(x)*(x))
-#define pow5(x) ((x)*(x)*(x)*(x)*(x))
-#define NAVOGADRO (6.02214179e23)
+#include "qftools.h"
+#define sqr(x) qfSqr(x)
+#define cube(x) qfCube(x)
+#define pow4(x) qfPow4(x)
+#define NAVOGADRO QF_NAVOGADRO
 
 QFFitFunctionsSPIMFCSDiffE2::QFFitFunctionsSPIMFCSDiffE2() {
     //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
@@ -109,6 +108,27 @@ void QFFitFunctionsSPIMFCSDiffE2::evaluateDerivatives(double* derivatives, doubl
 }
 
 void QFFitFunctionsSPIMFCSDiffE2::sortParameter(double *parameterValues, double *error, bool *fix) const {
+
+    const int comp=parameterValues[FCSSDiff_n_components];
+    QList<QPair<int, double> > dataForSort;
+
+    if (comp>1) {
+        if (!fix || (!fix[FCSSDiff_diff_coeff1]))dataForSort.append(qMakePair(FCSSDiff_diff_coeff1, parameterValues[FCSSDiff_diff_coeff1]));
+        if (!fix || (!fix[FCSSDiff_diff_coeff2]))dataForSort.append(qMakePair(FCSSDiff_diff_coeff2, parameterValues[FCSSDiff_diff_coeff2]));
+        if (comp>2) {
+            if (!fix || (!fix[FCSSDiff_diff_coeff3]))dataForSort.append(qMakePair(FCSSDiff_diff_coeff3, parameterValues[FCSSDiff_diff_coeff3]));
+        }
+
+        if (dataForSort.size()>1) {
+            QList<int> init, final;
+            init=qfQPairListToFirstList(dataForSort);
+            qSort(dataForSort.begin(), dataForSort.end(), qfQPairCompareSecond<int, double>);//qfFitFuncCompareSecond);
+            final=qfQPairListToFirstList(dataForSort);
+            qfSortVectorByPermutation(init, final, parameterValues);
+            if (error) qfSortVectorByPermutation(init, final, error);
+        }
+
+    }
     /*const int comp=parameterValues[FCSSDiff_n_components];
     const double N=parameterValues[FCSSDiff_n_particle];
     const double D1=parameterValues[FCSSDiff_diff_coeff1];

@@ -1,7 +1,7 @@
 #ifndef QFFITFUNCTIONSSPIMFCSDIFF_H
 #define QFFITFUNCTIONSSPIMFCSDIFF_H
 #include "qfpluginfitfunction.h"
-
+#include "qftools.h"
 
 
 

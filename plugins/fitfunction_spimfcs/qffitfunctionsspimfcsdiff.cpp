@@ -108,7 +108,31 @@ double QFFitFunctionsSPIMFCSDiff::evaluate(double t, const double* data) const {
 void QFFitFunctionsSPIMFCSDiff::evaluateDerivatives(double* derivatives, double t, const double* data) const {
 }
 
+
+
+
+
 void QFFitFunctionsSPIMFCSDiff::sortParameter(double *parameterValues, double *error, bool *fix) const {
+    const int comp=parameterValues[FCSSDiff_n_components];
+    QList<QPair<int, double> > dataForSort;
+
+    if (comp>1) {
+        if (!fix || (!fix[FCSSDiff_diff_coeff1]))dataForSort.append(qMakePair(FCSSDiff_diff_coeff1, parameterValues[FCSSDiff_diff_coeff1]));
+        if (!fix || (!fix[FCSSDiff_diff_coeff2]))dataForSort.append(qMakePair(FCSSDiff_diff_coeff2, parameterValues[FCSSDiff_diff_coeff2]));
+        if (comp>2) {
+            if (!fix || (!fix[FCSSDiff_diff_coeff3]))dataForSort.append(qMakePair(FCSSDiff_diff_coeff3, parameterValues[FCSSDiff_diff_coeff3]));
+        }
+
+        if (dataForSort.size()>1) {
+            QList<int> init, final;
+            init=qfQPairListToFirstList(dataForSort);
+            qSort(dataForSort.begin(), dataForSort.end(), qfQPairCompareSecond<int, double>);//qfFitFuncCompareSecond);
+            final=qfQPairListToFirstList(dataForSort);
+            qfSortVectorByPermutation(init, final, parameterValues);
+            if (error) qfSortVectorByPermutation(init, final, error);
+        }
+
+    }
    /* const int comp=parameterValues[FCSSDiff_n_components];
     const double N=parameterValues[FCSSDiff_n_particle];
     const double D1=parameterValues[FCSSDiff_diff_coeff1];
