@@ -160,7 +160,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	export LDFLAGS="${LDFLAGS} -fPIC "
         export CFLAGS="${CFLAGS} -fPIC "
         export CPPFLAGS="${CPPFLAGS} -fPIC"
-	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit  CFLAGS="-m128bit-long-double -mtune=generic -msse -mfpmath=sse" CPPFLAGS="-m128bit-long-double -mtune=generic -msse -mfpmath=sse"
+	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit  CFLAGS="-fPIC -m128bit-long-double -mtune=generic -msse -mfpmath=sse" CPPFLAGS="-fPIC -m128bit-long-double -mtune=generic -msse -mfpmath=sse"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
