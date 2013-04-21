@@ -408,7 +408,7 @@ T* duplicateArray(const T* input, long long N) {
 
 
 
-/*! \brief can be used with qSort to sort <code>QList<QPair<T1, T2> ></code> for the first element of the pair
+/*! \brief can be used with qSort to sort <code>QList<QPair<T1, T2> ></code> for the first element of the pair in increasing order, i.e. compares with \c <
     \ingroup qf3lib_tools
 */
 template <class T1, class T2>
@@ -416,7 +416,7 @@ bool qfQPairCompareFirst(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
     return s1.first < s2.first;
 }
 
-/*! \brief can be used with qSort to sort <code>QList<QPair<T1, T2> ></code> for the second element of the pair
+/*! \brief can be used with qSort to sort <code>QList<QPair<T1, T2> ></code> for the second element of the pair in increasing order, i.e. compares with \c <
     \ingroup qf3lib_tools
 */
 template <class T1, class T2>
@@ -424,7 +424,7 @@ bool qfQPairCompareSecond(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
     return s1.second < s2.second;
 }
 
-/*! \brief can be used with qSort to sort <code>QList<QTriple<T1, T2, T3> ></code> for the first element of the triple
+/*! \brief can be used with qSort to sort <code>QList<QTriple<T1, T2, T3> ></code> for the first element of the triple in increasing order, i.e. compares with \c <
     \ingroup qf3lib_tools
 */
 template <class T1, class T2, class T3>
@@ -432,7 +432,7 @@ bool qfQTripleCompareFirst(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, 
     return s1.first < s2.first;
 }
 
-/*! \brief can be used with qSort to sort <code>QList<QTriple<T1, T2, T3> ></code> for the second element of the triple
+/*! \brief can be used with qSort to sort <code>QList<QTriple<T1, T2, T3> ></code> for the second element of the triple in increasing order, i.e. compares with \c <
     \ingroup qf3lib_tools
 */
 template <class T1, class T2, class T3>
@@ -440,7 +440,7 @@ bool qfQTripleCompareSecond(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2,
     return s1.second < s2.second;
 }
 
-/*! \brief can be used with qSort to sort <code>QList<QTriple<T1, T2, T3> ></code> for the third element of the triple
+/*! \brief can be used with qSort to sort <code>QList<QTriple<T1, T2, T3> ></code> for the third element of the triple in increasing order, i.e. compares with \c <
     \ingroup qf3lib_tools
 */
 template <class T1, class T2, class T3>
@@ -448,13 +448,83 @@ bool qfQTripleCompareThird(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, 
     return s1.third < s2.third;
 }
 
+
+
+
+
+
+
+
+/*! \brief can be used with qSort to sort <code>QList<QPair<T1, T2> ></code> for the first element of the pair in decreasing order, i.e. compares with \c >=
+    \ingroup qf3lib_tools
+*/
+template <class T1, class T2>
+bool qfQPairCompareFirstDec(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
+    return s1.first >= s2.first;
+}
+
+/*! \brief can be used with qSort to sort <code>QList<QPair<T1, T2> ></code> for the second element of the pair in decreasing order, i.e. compares with \c >=
+    \ingroup qf3lib_tools
+*/
+template <class T1, class T2>
+bool qfQPairCompareSecondDec(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
+    return s1.second >= s2.second;
+}
+
+/*! \brief can be used with qSort to sort <code>QList<QTriple<T1, T2, T3> ></code> for the first element of the triple in decreasing order, i.e. compares with \c >=
+    \ingroup qf3lib_tools
+*/
+template <class T1, class T2, class T3>
+bool qfQTripleCompareFirstDec(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, T3> &s2) {
+    return s1.first >= s2.first;
+}
+
+/*! \brief can be used with qSort to sort <code>QList<QTriple<T1, T2, T3> ></code> for the second element of the triple in decreasing order, i.e. compares with \c >=
+    \ingroup qf3lib_tools
+*/
+template <class T1, class T2, class T3>
+bool qfQTripleCompareSecondDec(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, T3> &s2) {
+    return s1.second >= s2.second;
+}
+
+/*! \brief can be used with qSort to sort <code>QList<QTriple<T1, T2, T3> ></code> for the third element of the triple in decreasing order, i.e. compares with \c >=
+    \ingroup qf3lib_tools
+*/
+template <class T1, class T2, class T3>
+bool qfQTripleCompareThirdDec(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, T3> &s2) {
+    return s1.third >= s2.third;
+}
+
+
+
+
+
+/*! \brief return a list of the values from an array \a data specified by a list of indexes \a selection
+    \ingroup qf3lib_tools
+
+    \note The parameter \a selection has to be QList<int> or QVector<int> (or a comparable list of ordinals/indexes).
+          The minimum requirement is that the type T1 has a method \c size() and implements \c operator[](), The return
+          value of the []-operator should be an index to data, i.e. a type like \c int, \c long, ... So a standard call
+          would be with argument of type \c QList<int> or \c QVector<int>.
+*/
+template <class T1, class T2>
+QList<T2> qfSelectFromVector(const T1& selection, T2* data) {
+    QList<T2> res;
+    for (int i=0; i<selection.size(); i++) {
+        res<<data[selection[i]];
+    }
+    return res;
+}
+
+
+
 /*! \brief sort the vector \a data according to the permutation given in \a initialOrder and \newOrder
     \ingroup qf3lib_tools
 
     After the call the element in \a data that was at position \c initialOder[0] will be at \c newOrder[0]
     and the element at \c initialOder[1] will be at \c newOrder[1] ...
 
-    \note This is not really speed optimized. The parameters \a initialorder and neworder have to be QList<int> or QVector<int>.
+    \note This is not really speed optimized. The parameters \a initialorder and neworder have to be QList<int> or QVector<int> (or a comparable list of ordinals/indexes).
           The minimum requirement is that the type T1 has a method \c size() and implements \c operator[](), The return
           value of the []-operator should be an index to data, i.e. a type like \c int, \c long, ... So a standard call
           would be with argument of type \c QList<int> or \c QVector<int>.

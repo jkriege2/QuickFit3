@@ -89,6 +89,10 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         void setFilesListFilteres(bool filtered);
         bool isFilesListFiltered() const;
 
+        /** \brief get the current record */
+        QFEvaluationItem* getCurrent() const;
+
+
         /** \brief write the settings */
         virtual void writeSettings();
         /** \brief return widget ID */
@@ -109,6 +113,9 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         QMenu* getHelpMenu() const;
 
         QPointer<QFEvaluationEditor> getEditor() const;
+        /** \brief send the given command string to all edtor tabs */
+        void sendEditorCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant());
+
     private slots:
         /** \brief called when the name editor changes its contents */
         void nameChanged(const QString& text);

@@ -168,7 +168,7 @@ void QFTableModel::resize(quint16 rows, quint16 columns) {
     int oldrows=this->rows;
 
     if (columns>oldcolumns) {
-        for (int i=oldcolumns; i<columns; i++) {
+        for (int i=oldcolumns; i<=columns; i++) {
             columnNames.append(QString::number(i));
         }
     } else if (columns<oldcolumns) {
@@ -705,6 +705,7 @@ void QFTableModel::setColumnTitleCreate(quint16 column, QString name) {
     //std::cout<<"setColumnTitle("<<column<<", '"<<name.toStdString()<<")\n";
     if (readonly) return;
     resize(rows, qMax(columns, quint16(column+1)));
+    //qDebug()<<"setColumnTitleCreate("<<column<<", "<<name<<"):     columnNames.size()="<<columnNames.size();
     if (column<columnNames.size()) columnNames[column]=name;
     if (doEmitSignals) emit headerDataChanged(Qt::Horizontal, column, column);
 }

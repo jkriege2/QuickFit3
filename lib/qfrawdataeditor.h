@@ -7,7 +7,7 @@
 #include "qfpluginservices.h"
 #include "qftools.h"
 #include "lib_imexport.h"
-
+#include <QVariant>
 
 // forward declaration
 class QFRawDataRecord;
@@ -30,6 +30,12 @@ class QFLIB_EXPORT QFRawDataEditor : public QWidget {
         void setSettings(ProgramOptions* s, int peID);
         /** \brief save the settings to the ProgramOptions object set by setSettings() */
         void saveSettings() { writeSettings(); };
+        /*! \brief execute the given command
+
+            This function does nothing in the default implementation. It can be implemented to allow editor to perform
+            certain functions that are called form the outside.
+         */
+        virtual void sendEditorCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant());
     protected slots:
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) =0;

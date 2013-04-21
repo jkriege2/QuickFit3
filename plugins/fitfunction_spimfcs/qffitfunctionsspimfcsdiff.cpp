@@ -125,141 +125,39 @@ void QFFitFunctionsSPIMFCSDiff::sortParameter(double *parameterValues, double *e
 
         if (dataForSort.size()>1) {
             QList<int> init, final;
-            init=qfQPairListToFirstList(dataForSort);
-            qSort(dataForSort.begin(), dataForSort.end(), qfQPairCompareSecond<int, double>);//qfFitFuncCompareSecond);
             final=qfQPairListToFirstList(dataForSort);
+            //QList<double> initvals=qfQPairListToSecondList(dataForSort);
+            qSort(dataForSort.begin(), dataForSort.end(), qfQPairCompareSecondDec<int, double>);
+            init=qfQPairListToFirstList(dataForSort);
+            /*qDebug()<<"sorting: "<<id();
+            qDebug()<<"   Ds:";
+            qDebug()<<"      init  = "<<init;
+            qDebug()<<"       vals = "<<qfSelectFromVector(init, parameterValues);
+            qDebug()<<"       vals = "<<qfSelectFromVector(init, error);
+            qDebug()<<"      final = "<<final;*/
+
             qfSortVectorByPermutation(init, final, parameterValues);
             if (error) qfSortVectorByPermutation(init, final, error);
+
+            // now we sort the diffusion fractions, using that ID_rhoI=ID_coeffI-1:
+            for (int i=0; i<qMin(init.size(), final.size()); i++) {
+                init[i]=init[i]-1.0;
+                final[i]=final[i]-1.0;
+            }
+            /*qDebug()<<"   rhos:";
+            qDebug()<<"      init  = "<<init;
+            if (error) qDebug()<<"       vals = "<<qfSelectFromVector(init, error);
+            if (fix) qDebug()<<"       vals = "<<qfSelectFromVector(init, fix);
+            qDebug()<<"      final = "<<final;*/
+
+            qfSortVectorByPermutation(init, final, parameterValues);
+            if (error) qfSortVectorByPermutation(init, final, error);
+            if (fix) qfSortVectorByPermutation(init, final, fix);
+            //qDebug()<<"   fix = "<<fix<<"   error = "<<error;
+
         }
 
     }
-   /* const int comp=parameterValues[FCSSDiff_n_components];
-    const double N=parameterValues[FCSSDiff_n_particle];
-    const double D1=parameterValues[FCSSDiff_diff_coeff1];
-    const double rho1=parameterValues[FCSSDiff_diff_rho1];
-    const double D2=parameterValues[FCSSDiff_diff_coeff2];
-    const double rho2=parameterValues[FCSSDiff_diff_rho2];
-    const double D3=parameterValues[FCSSDiff_diff_coeff3];
-    const double rho3=parameterValues[FCSSDiff_diff_rho3];
-
-    const double eD1=error[FCSSDiff_diff_coeff1];
-    const double erho1=error[FCSSDiff_diff_rho1];
-    const double eD2=error[FCSSDiff_diff_coeff2];
-    const double erho2=error[FCSSDiff_diff_rho2];
-    const double eD3=error[FCSSDiff_diff_coeff3];
-    const double erho3=error[FCSSDiff_diff_rho3];
-
-    if (comp==2) {
-        if (D1>D2) {
-            parameterValues[FCSSDiff_diff_coeff2]=D1;
-            parameterValues[FCSSDiff_diff_coeff1]=D2;
-            parameterValues[FCSSDiff_diff_rho2]=rho1;
-            parameterValues[FCSSDiff_diff_rho1]=rho2;
-
-            error[FCSSDiff_diff_coeff2]=eD1;
-            error[FCSSDiff_diff_coeff1]=eD2;
-            error[FCSSDiff_diff_rho2]=rho1;
-            error[FCSSDiff_diff_rho1]=rho2;
-        }
-    } else if (comp==3) {
-        if (D1 < D2) {                 // a < b here
-           if (D1 < D3) {              //   a < c     : a the smallest
-              if (D2 < D3) {           //      b < c  : a < b < c
-                  parameterValues[FCSSDiff_diff_coeff1]=D3;
-                  parameterValues[FCSSDiff_diff_coeff2]=D2;
-                  parameterValues[FCSSDiff_diff_coeff3]=D1;
-                  parameterValues[FCSSDiff_diff_rho1]=rho3;
-                  parameterValues[FCSSDiff_diff_rho2]=rho2;
-                  parameterValues[FCSSDiff_diff_rho3]=rho1;
-
-                  error[FCSSDiff_diff_coeff1]=eD3;
-                  error[FCSSDiff_diff_coeff2]=eD2;
-                  error[FCSSDiff_diff_coeff3]=eD1;
-                  error[FCSSDiff_diff_rho1]=rho3;
-                  error[FCSSDiff_diff_rho2]=rho2;
-                  error[FCSSDiff_diff_rho3]=rho1;
-              } else {                 //      c <= b : a < c <= b
-                  parameterValues[FCSSDiff_diff_coeff1]=D2;
-                  parameterValues[FCSSDiff_diff_coeff2]=D3;
-                  parameterValues[FCSSDiff_diff_coeff3]=D1;
-                  parameterValues[FCSSDiff_diff_rho1]=rho2;
-                  parameterValues[FCSSDiff_diff_rho2]=rho3;
-                  parameterValues[FCSSDiff_diff_rho3]=rho1;
-
-                  error[FCSSDiff_diff_coeff1]=eD2;
-                  error[FCSSDiff_diff_coeff2]=eD3;
-                  error[FCSSDiff_diff_coeff3]=eD1;
-                  error[FCSSDiff_diff_rho1]=rho2;
-                  error[FCSSDiff_diff_rho2]=rho3;
-                  error[FCSSDiff_diff_rho3]=rho1;
-              }
-           } else {                    //   a >= c    : c <= a < b
-              parameterValues[FCSSDiff_diff_coeff1]=D2;
-              parameterValues[FCSSDiff_diff_coeff2]=D1;
-              parameterValues[FCSSDiff_diff_coeff3]=D3;
-              parameterValues[FCSSDiff_diff_rho1]=rho2;
-              parameterValues[FCSSDiff_diff_rho2]=rho1;
-              parameterValues[FCSSDiff_diff_rho3]=rho3;
-
-              error[FCSSDiff_diff_coeff1]=eD2;
-              error[FCSSDiff_diff_coeff2]=eD1;
-              error[FCSSDiff_diff_coeff3]=eD3;
-              error[FCSSDiff_diff_rho1]=rho2;
-              error[FCSSDiff_diff_rho2]=rho1;
-              error[FCSSDiff_diff_rho3]=rho3;
-           }
-        } else {                       // b <= a here
-           if (D2 < D3) {              //   b < c     : b the smallest
-              if (D1 < D3) {           //     a < c   : b <= a < c
-                  parameterValues[FCSSDiff_diff_coeff1]=D3;
-                  parameterValues[FCSSDiff_diff_coeff2]=D1;
-                  parameterValues[FCSSDiff_diff_coeff3]=D2;
-                  parameterValues[FCSSDiff_diff_rho1]=rho3;
-                  parameterValues[FCSSDiff_diff_rho2]=rho1;
-                  parameterValues[FCSSDiff_diff_rho3]=rho2;
-
-                  error[FCSSDiff_diff_coeff1]=eD3;
-                  error[FCSSDiff_diff_coeff2]=eD1;
-                  error[FCSSDiff_diff_coeff3]=eD2;
-                  error[FCSSDiff_diff_rho1]=rho3;
-                  error[FCSSDiff_diff_rho2]=rho1;
-                  error[FCSSDiff_diff_rho3]=rho2;
-              } else {                 //     a >= c  : b < c <= a
-                  parameterValues[FCSSDiff_diff_coeff1]=D1;
-                  parameterValues[FCSSDiff_diff_coeff2]=D3;
-                  parameterValues[FCSSDiff_diff_coeff3]=D2;
-                  parameterValues[FCSSDiff_diff_rho1]=rho1;
-                  parameterValues[FCSSDiff_diff_rho2]=rho3;
-                  parameterValues[FCSSDiff_diff_rho3]=rho2;
-
-                  error[FCSSDiff_diff_coeff1]=eD1;
-                  error[FCSSDiff_diff_coeff2]=eD3;
-                  error[FCSSDiff_diff_coeff3]=eD2;
-                  error[FCSSDiff_diff_rho1]=rho1;
-                  error[FCSSDiff_diff_rho2]=rho3;
-                  error[FCSSDiff_diff_rho3]=rho2;
-              }
-           } else {                    //   c <= b    : c <= b <= a
-               parameterValues[FCSSDiff_diff_coeff1]=D1;
-               parameterValues[FCSSDiff_diff_coeff2]=D2;
-               parameterValues[FCSSDiff_diff_coeff3]=D3;
-               parameterValues[FCSSDiff_diff_rho1]=rho1;
-               parameterValues[FCSSDiff_diff_rho2]=rho2;
-               parameterValues[FCSSDiff_diff_rho3]=rho3;
-
-               error[FCSSDiff_diff_coeff1]=eD1;
-               error[FCSSDiff_diff_coeff2]=eD2;
-               error[FCSSDiff_diff_coeff3]=eD3;
-               error[FCSSDiff_diff_rho1]=rho1;
-               error[FCSSDiff_diff_rho2]=rho2;
-               error[FCSSDiff_diff_rho3]=rho3;
-           }
-        }
-
-
-    }*/
-
-
 }
 
 void QFFitFunctionsSPIMFCSDiff::calcParameter(double* data, double* error) const {

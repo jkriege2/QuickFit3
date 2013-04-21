@@ -37,6 +37,10 @@ void QFEvaluationEditor::setCurrent(QFEvaluationItem* c, int peID) {
     connect(c, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), this, SLOT(resultsChanged(QFRawDataRecord*,QString,QString)));
 }
 
+void QFEvaluationEditor::sendEditorCommand(const QString &command, const QVariant &param1, const QVariant &param2, const QVariant &param3, const QVariant &param4, const QVariant &param5)
+{
+}
+
 void QFEvaluationEditor::closeEvent( QCloseEvent * event ) {
     if (settings) writeSettings();
     event->accept();

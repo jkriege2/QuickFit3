@@ -1688,9 +1688,9 @@ void MainWindow::registerSettingsPane(QFPluginOptionsDialogInterface *plugin)
     pluginOptionDialogs.append(plugin);
 }
 
-QFEvaluationPropertyEditor *MainWindow::openEvaluationEditor(QFEvaluationItem *rec)
+QFEvaluationPropertyEditor *MainWindow::openEvaluationEditor(QFEvaluationItem *rec, bool alwaysCreateNew)
 {
-     Qt::WindowFlags f=Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint;
+/*     Qt::WindowFlags f=Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint;
     if (rec) {
         QFEvaluationPropertyEditor* edt=new QFEvaluationPropertyEditor(this, settings, rec, evaluationPropEditors.size(), NULL, f);
         edt->setAttribute(Qt::WA_DeleteOnClose);
@@ -1699,18 +1699,74 @@ QFEvaluationPropertyEditor *MainWindow::openEvaluationEditor(QFEvaluationItem *r
         edt->activateWindow();
         return edt;
     }
+    return NULL;*/
+
+    Qt::WindowFlags f=Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint;
+
+
+    if (rec) {
+        bool showNew=alwaysCreateNew;
+        QFEvaluationPropertyEditor* edt=NULL;
+        if (!alwaysCreateNew) {
+            for (int i=0; i<evaluationPropEditors.size(); i++) {
+                if (evaluationPropEditors[i]) {
+                    if (evaluationPropEditors[i]->getCurrent()==rec) {
+                        showNew=false;
+                        edt=evaluationPropEditors[i];
+                        break;
+                    }
+                }
+            }
+        }
+        if (showNew || !edt) {
+            edt=new QFEvaluationPropertyEditor(this, settings, rec, evaluationPropEditors.size(), NULL, f);
+            edt->setAttribute(Qt::WA_DeleteOnClose);
+            evaluationPropEditors.append(edt);
+            edt->show();
+            edt->activateWindow();
+            edt->raise();
+        } else {
+            edt->show();
+            edt->activateWindow();
+            edt->raise();
+        }
+        return edt;
+    }
     return NULL;
+
 }
 
-QFRawDataPropertyEditor *MainWindow::openRawDataEditor(QFRawDataRecord *rec)
+QFRawDataPropertyEditor *MainWindow::openRawDataEditor(QFRawDataRecord *rec, bool alwaysCreateNew)
 {
-     Qt::WindowFlags f=Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint;
+    Qt::WindowFlags f=Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint;
+
+
     if (rec) {
-        QFRawDataPropertyEditor* edt=new QFRawDataPropertyEditor(this, settings, rec, rawDataPropEditors.size(), NULL, f);
-        edt->setAttribute(Qt::WA_DeleteOnClose);
-        rawDataPropEditors.append(edt);
-        edt->show();
-        edt->activateWindow();
+        bool showNew=alwaysCreateNew;
+        QFRawDataPropertyEditor* edt=NULL;
+        if (!alwaysCreateNew) {
+            for (int i=0; i<rawDataPropEditors.size(); i++) {
+                if (rawDataPropEditors[i]) {
+                    if (rawDataPropEditors[i]->getCurrent()==rec) {
+                        showNew=false;
+                        edt=rawDataPropEditors[i];
+                        break;
+                    }
+                }
+            }
+        }
+        if (showNew || !edt) {
+            edt=new QFRawDataPropertyEditor(this, settings, rec, rawDataPropEditors.size(), NULL, f);
+            edt->setAttribute(Qt::WA_DeleteOnClose);
+            rawDataPropEditors.append(edt);
+            edt->show();
+            edt->activateWindow();
+            edt->raise();
+        } else {
+            edt->show();
+            edt->activateWindow();
+            edt->raise();
+        }
         return edt;
     }
     return NULL;

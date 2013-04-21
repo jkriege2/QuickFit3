@@ -232,7 +232,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
 
         virtual void colgraphAddPlot(int graph, int columnX, int columnY, ColumnGraphTypes type, const QString&  title);
-        virtual void colgraphAddErrorPlot(int graph, int columnX, int columnXError, int columnY, int columnYError, ColumnGraphTypes type, const QString&  title);
+        virtual void colgraphAddErrorPlot(int graph, int columnX, int columnXError, int columnY, int columnYError, ColumnGraphTypes type, const QString&  title, ErrorGraphTypes errorStyle=egtBars);
         virtual void colgraphAddGraph(const QString&  title, const QString& xLabel=QString("x"), const QString& yLabel=QString("y"), bool logX=false, bool logY=false);
         virtual int colgraphGetPlotCount(int graph) const;
         virtual int colgraphGetGraphCount() const;
@@ -248,9 +248,17 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual void colgraphsetXRange(int graph, double xmin, double xmax);
         virtual void colgraphsetYRange(int graph, double xmin, double xmax);
 
+        virtual void colgraphSetPlotTitle(int graph,  int plot,  const QString& title);
+        virtual void colgraphSetPlotType(int graph,  int plot,  ColumnGraphTypes type);
+        virtual void colgraphSetPlotErrorStyle(int graph,  int plot,  ErrorGraphTypes errorStyle);
+        virtual void colgraphSetPlotErrorColor(int graph,  int plot, QColor errorColor);
+        virtual void colgraphSetPlotFillColor(int graph,  int plot, QColor fillColor);
+        virtual void colgraphSetPlotErrorTransparency(int graph,  int plot, double errorT);
+        virtual void colgraphSetPlotFillTransparency(int graph,  int plot, double fillT);
+        virtual void colgraphSetPlotPlotTransparency(int graph,  int plot, double trans);
+        virtual void colgraphSetPlotSymbol(int graph,  int plot,  ColumnGraphSymbols symbol, double symbolSize=10.0);
 
-
-
+        void colgraphToolsSetGraphtype(QFRDRTable::GraphInfo& g, QFRDRColumnGraphsInterface::ColumnGraphTypes type);
 
 
         int getPlotCount() const;
@@ -299,6 +307,15 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         void trawDataChanged() {
             emit rawDataChanged();
         }
+
+        void emitRebuildPlotWidgets();
+
+        void didRebuildPlotWidgets();
+    protected:
+        bool emittedRebuildPlotWidgets;
+    signals:
+        void rebuildPlotWidgets();
+
 
     protected:
         virtual void intWriteData(QXmlStreamWriter& w);

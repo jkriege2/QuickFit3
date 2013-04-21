@@ -68,6 +68,7 @@ void QFRDRPlotEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* 
     updating=true;
     if (old) {
         QFRDRTable* m=qobject_cast<QFRDRTable*>(old);
+        disconnect(m, SIGNAL(rebuildPlotWidgets()), this, SLOT(rebuildPlotWidgets()));
         if (m && m->model()) {
 
             //disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), actPaste, SLOT(setEnabled(bool)));
@@ -77,6 +78,7 @@ void QFRDRPlotEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* 
     //std::cout<<"qobject_cast ... ";
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     this->current=m;
+    connect(m, SIGNAL(rebuildPlotWidgets()), this, SLOT(rebuildPlotWidgets()));
     //std::cout<<m<<" ... ";
     //if (m) std::cout<<m->model()<<" ... ";
     rebuildPlotWidgets();
@@ -241,6 +243,26 @@ void QFRDRPlotEditor::clearPlotWidgets()
 
 void QFRDRPlotEditor::updatePlotName(int plot, QString title) {
     if (plot>=0 && plot<tabPlots->count()) tabPlots->setTabText(plot, title);
+}
+
+void QFRDRPlotEditor::sendEditorCommand(const QString &command, const QVariant &param1, const QVariant &param2, const QVariant &param3, const QVariant &param4, const QVariant &param5)
+{
+    QString c=command.toLower().trimmed();
+    if (command=="showplot") {
+        bool ok=false;
+        int idx=param1.toInt(&ok);
+        if (param1.type()==QVariant::String) {
+            for (int i=0; i<tabPlots->count(); i++) {
+                if (tabPlots->tabText(i).trimmed()==param1.toString().trimmed()) {
+                    tabPlots->setCurrentIndex(i);
+                    break;
+                }
+            }
+        } else if (ok) {
+            tabPlots->setCurrentIndex(idx);
+        }
+
+    }
 }
 
 

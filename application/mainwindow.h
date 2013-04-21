@@ -138,10 +138,11 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
         /** \brief register a configuration pane for a plugin in the main options dialog */
         virtual void registerSettingsPane(QFPluginOptionsDialogInterface* plugin);
-        /** \brief open a new evaluation editor window for the given record */
-        virtual QFEvaluationPropertyEditor* openEvaluationEditor(QFEvaluationItem* eval);
-        /** \brief open a new raw data record editor window for the given record */
-        virtual QFRawDataPropertyEditor* openRawDataEditor(QFRawDataRecord* rdr);
+        /** \copydoc QFPluginServices::openEvaluationEditor() */
+        virtual QFEvaluationPropertyEditor* openEvaluationEditor(QFEvaluationItem* eval, bool alwaysCreateNew=true);
+        /** \copydoc QFPluginServices::openRawDataEditor() */
+        virtual QFRawDataPropertyEditor* openRawDataEditor(QFRawDataRecord* rdr, bool alwaysCreateNew=true);
+        /** \copydoc QFPluginServices::getCurrentProject() */
         virtual QFProject* getCurrentProject() const;
 
         /** \brief return the assets directory  of the online help for the given plugin ID */

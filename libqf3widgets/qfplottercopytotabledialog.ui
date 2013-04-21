@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>775</width>
-    <height>252</height>
+    <width>807</width>
+    <height>285</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,25 +15,28 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
         <string>file:</string>
        </property>
+       <property name="buddy">
+        <cstring>cmbRDR</cstring>
+       </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="1">
       <widget class="QFRDRTableComboBox" name="cmbRDR"/>
      </item>
-     <item>
+     <item row="1" column="0">
       <widget class="QCheckBox" name="chkNewTable">
        <property name="text">
         <string>create new:</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="1" column="1">
       <widget class="QLineEdit" name="edtNewTableName">
        <property name="enabled">
         <bool>false</bool>
@@ -83,6 +86,9 @@
            <property name="text">
             <string>graph to add to:</string>
            </property>
+           <property name="buddy">
+            <cstring>cmbGraph</cstring>
+           </property>
           </widget>
          </item>
          <item row="0" column="0">
@@ -112,6 +118,13 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chkShowTableEditor">
+     <property name="text">
+      <string>show table editor after insert</string>
+     </property>
     </widget>
    </item>
    <item>
@@ -167,12 +180,12 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>227</x>
-     <y>216</y>
+     <x>236</x>
+     <y>243</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
-     <y>233</y>
+     <y>223</y>
     </hint>
    </hints>
   </connection>
@@ -184,43 +197,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>295</x>
-     <y>222</y>
+     <y>243</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
-     <y>233</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chkNewTable</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>cmbRDR</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>189</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>80</x>
-     <y>19</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chkNewTable</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>edtNewTableName</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>189</x>
-     <y>18</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>293</x>
-     <y>17</y>
+     <y>223</y>
     </hint>
    </hints>
   </connection>
@@ -235,40 +216,8 @@
      <y>93</y>
     </hint>
     <hint type="destinationlabel">
-     <x>69</x>
-     <y>186</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chCreateNewGraph</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>edtNewGraphName</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>132</x>
-     <y>158</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>337</x>
-     <y>177</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chCreateNewGraph</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>cmbGraph</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>146</x>
-     <y>174</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>162</x>
-     <y>125</y>
+     <x>88</x>
+     <y>169</y>
     </hint>
    </hints>
   </connection>

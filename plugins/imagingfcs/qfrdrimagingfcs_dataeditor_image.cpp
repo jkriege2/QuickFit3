@@ -172,7 +172,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     chkOverviewVisible=new QCheckBox(tr("overview"), grpVisiblePlots);
     chkOverviewVisible->setChecked(true);
     chkGofVisible=new QCheckBox(tr("goodnes of fit"), grpVisiblePlots);
-    chkGofVisible->setChecked(true);
+    chkGofVisible->setChecked(false);
     chkMaskVisible=new QCheckBox(tr("mask"), grpVisiblePlots);
     chkMaskVisible->setChecked(false);
     glVisPlots->addWidget(chkOverviewVisible, 0,0);
@@ -3257,8 +3257,8 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     plotter->loadSettings(*(settings->getQSettings()), QString("imfcsimageeditor/corrplot"));
     chkLogTauAxis->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/log_tau_axis"), true).toBool());
     chkOverviewVisible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/overview_visible"), true).toBool());
-    chkGofVisible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/gof_visible"), true).toBool());
-    chkMaskVisible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/mask_visible"), true).toBool());
+    chkGofVisible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/gof_visible"), false).toBool());
+    chkMaskVisible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/mask_visible"), false).toBool());
     chkKeys->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/display_keys"), false).toBool());
     cmbSeletionCorrDisplayMode->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/corr_seldisplaymode"), 0).toInt());
     chkDisplayResiduals->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/display_resid"), true).toBool());

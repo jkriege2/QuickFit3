@@ -139,5 +139,6 @@ void QFRDRColumnGraphsComboBox::refill()
 
 void QFRDRColumnGraphsComboBox::myCurrentIndexChanged(int i)
 {
+    //qDebug()<<"myCurrentIndexChanged(index="<<i<<")";
 }
 

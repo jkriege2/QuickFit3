@@ -16,11 +16,16 @@ QFPEvalIMFCSFit::QFPEvalIMFCSFit(QObject* parent):
     //ctor
     QFPluginServices::getInstance()->registerSettingsPane(this);
     menuCalibration=NULL;
+    calibrationWizard=NULL;
 }
 
 QFPEvalIMFCSFit::~QFPEvalIMFCSFit()
 {
     //dtor
+    if (calibrationWizard) {
+        calibrationWizard->close();
+        delete calibrationWizard;
+    }
 }
 
 QFEvaluationItem* QFPEvalIMFCSFit::createRecord(QFProject* parent) {
@@ -48,22 +53,28 @@ void QFPEvalIMFCSFit::init()
         QAction* actHelp=new QAction(QIcon(":/lib/help.png"), tr("Calbration Tutorial"), this);
         connect(actHelp, SIGNAL(triggered()), this, SLOT(showCalibrationTutorial()));
         menu->addAction(actHelp);
-        menu->addSeparator();
+        QAction* actWizard=new QAction(QIcon(":/lib/wizard.png"), tr("Calbration Wizard"), this);
+        connect(actWizard, SIGNAL(triggered()), this, SLOT(insertFCSCalibrationWizard()));
+        menu->addAction(actWizard);
+        QMenu* menu1=menu->addMenu("steps ...");
 
         QAction* actFCSCalib=new QAction(QIcon(":/imfcsfit/imfcs_fitcalib.png"), tr("&0: add imFCS Calibration Fits"), this);
         actFCSCalib->setStatusTip(tr("Insert a set of imFCS least-squares fit evaluations for a SPIM calibration"));
         connect(actFCSCalib, SIGNAL(triggered()), this, SLOT(insertFCSFitForCalibration()));
-        menu->addAction(actFCSCalib);
+        menu1->addAction(actFCSCalib);
 
         QAction* actImFCSCalibFit=new QAction(tr("&1: Fit D's"), this);
-        menu->addAction(actImFCSCalibFit);
+        menu1->addAction(actImFCSCalibFit);
         connect(actImFCSCalibFit, SIGNAL(triggered()), this, SLOT(imFCSCalibrationTool1()));
         QAction* actImFCSCalib=new QAction(tr("&2: Collect D Data"), this);
-        menu->addAction(actImFCSCalib);
+        menu1->addAction(actImFCSCalib);
         connect(actImFCSCalib, SIGNAL(triggered()), this, SLOT(imFCSCalibrationTool2()));
-        QAction* actImFCSCalib2=new QAction(tr("&3: Collect wxy Data"), this);
-        menu->addAction(actImFCSCalib2);
-        connect(actImFCSCalib2, SIGNAL(triggered()), this, SLOT(imFCSCalibrationTool3()));
+        QAction* actImFCSCalib1=new QAction(tr("&3: Fit wxy"), this);
+        menu1->addAction(actImFCSCalib1);
+        connect(actImFCSCalib1, SIGNAL(triggered()), this, SLOT(imFCSCalibrationTool3()));
+        QAction* actImFCSCalib2=new QAction(tr("&4: Collect wxy Data"), this);
+        menu1->addAction(actImFCSCalib2);
+        connect(actImFCSCalib2, SIGNAL(triggered()), this, SLOT(imFCSCalibrationTool4()));
 
         QMenu* extm=services->getMenu("tools");
         if (extm) {
@@ -95,6 +106,22 @@ void QFPEvalIMFCSFit::insertFCSFit() {
     if (project) {
         project->addEvaluation(getID(), "imFCS Fit");
     }
+}
+
+void QFPEvalIMFCSFit::insertFCSCalibrationWizard()
+{
+    if (!calibrationWizard) {
+        calibrationWizard=new ImFCSCalibrationWizard(NULL);
+        connect(calibrationWizard, SIGNAL(showTutorial()), this, SLOT(showCalibrationTutorial()));
+        connect(calibrationWizard, SIGNAL(run1()), this, SLOT(insertFCSFitForCalibration()));
+        connect(calibrationWizard, SIGNAL(run2()), this, SLOT(imFCSCalibrationTool1()));
+        connect(calibrationWizard, SIGNAL(run3()), this, SLOT(imFCSCalibrationTool2()));
+        connect(calibrationWizard, SIGNAL(run4()), this, SLOT(imFCSCalibrationTool3()));
+        connect(calibrationWizard, SIGNAL(run5()), this, SLOT(imFCSCalibrationTool4()));
+    }
+    calibrationWizard->show();
+    calibrationWizard->activateWindow();
+    calibrationWizard->raise();
 }
 
 void QFPEvalIMFCSFit::insertFCSFitForCalibration() {
@@ -284,26 +311,35 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
         }
     }
 
-
+    int gr=-1;
     if (graph) {
-        int i=0;
+        /*int i=0;
         while (graph->colgraphGetGraphCount()<1 && i<1) {
             graph->colgraphAddGraph("title");
             i++;
+        }*/
+        graph->colgraphAddGraph("title");
+        gr=graph->colgraphGetGraphCount()-1;
+
+        graph->colgraphSetGraphTitle(gr, tr("pixel size vs. diffusion coefficient"));
+        graph->colgraphSetGraphXAxisProps(gr, tr("pixel size [nm]"));
+        graph->colgraphSetGraphYAxisProps(gr, tr("diffusion coefficient [µm²/s]"));
+        while (graph->colgraphGetPlotCount(gr)>0){
+            graph->colgraphRemovePlot(gr, 0);
         }
-        graph->colgraphSetGraphTitle(0, tr("pixel size vs. diffusion coefficient"));
-        graph->colgraphSetGraphXAxisProps(0, tr("pixel size [nm]"));
-        graph->colgraphSetGraphYAxisProps(0, tr("diffusion coefficient [µm²/s]"));
-        while (graph->colgraphGetPlotCount(0)>0){
-            graph->colgraphRemovePlot(0, 0);
+        for (int i=0; i<focus_widths.size(); i++) {
+            graph->colgraphAddPlot(gr, 0, 1+i*2, QFRDRColumnGraphsInterface::cgtLinesPoints, tr("w_{xy}=%1nm").arg(focus_widths[i]));
         }
-        for (i=0; i<focus_widths.size(); i++) {
-            graph->colgraphAddPlot(0, 0, 1+i*2, QFRDRColumnGraphsInterface::cgtLinesPoints, tr("w_{xy}=%1nm").arg(focus_widths[i]));
-        }
-        graph->colgraphsetXRange(0, xmin, xmax);
-        graph->colgraphsetYRange(0, ymin, ymax);
+        graph->colgraphsetXRange(gr, xmin, xmax);
+        graph->colgraphsetYRange(gr, ymin, ymax);
 
 
+    }
+
+    QFRawDataPropertyEditor* editor=QFPluginServices::getInstance()->openRawDataEditor(etab, false);
+    if (editor) {
+        if (gr>=0) editor->sendEditorCommand("showPlot", gr);
+        editor->showTab(2);
     }
 
     QApplication::restoreOverrideCursor();
@@ -344,11 +380,36 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
 
 void QFPEvalIMFCSFit::imFCSCalibrationTool3()
 {
+    if (!project || !services) {
+        QMessageBox::critical(parentWidget, tr("imFCS Calibration"), tr("No project loaded!"));
+        return;
+    }
+    log_text(tr("imFCS calibration tool 3: fitting wxy ... \n"));
+    for (int i=0; i<project->getEvaluationCount(); i++) {
+        QFEvaluationItem* e=project->getEvaluationByNum(i);
+        QFImFCSFitEvaluation* imFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
+        if (imFCS && e->getProperty("IMFCS_CALIBRATION_FITWXY", false).toBool()) {
+            log_text(tr("   - fitting %1 \n").arg(e->getName()));
+            QFEvaluationPropertyEditor* pedt=services->openEvaluationEditor(e);
+            QFEvaluationEditor* edt=pedt->getEditor();
+            QFImFCSFitEvaluationEditor* eedt=qobject_cast<QFImFCSFitEvaluationEditor*>(edt);
+            if (eedt && e->getName().toLower().contains("wxy")) {
+                eedt->fitEverythingThreaded();
+            }
+            if (pedt) pedt->close();
+            log_text(tr("        DONE!\n"));
+        }
+    }
+    log_text(tr("imFCS calibration tool 3: fitting D's ... DONE!\n"));
+}
+
+void QFPEvalIMFCSFit::imFCSCalibrationTool4()
+{
     if (!project)  {
         QMessageBox::critical(parentWidget, tr("imFCS Calibration"), tr("No project loaded!"));
         return;
     }
-    log_text(tr("imFCS calibration tool 3: collecting wxy data ... \n"));
+    log_text(tr("imFCS calibration tool 4: collecting wxy data ... \n"));
 
     // find table for resultsQFRDRRunSelectionsInterface
     QFRawDataRecord* etab=NULL;
@@ -377,6 +438,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool3()
         return;
     }
     QFRDRColumnGraphsInterface* graph=qobject_cast<QFRDRColumnGraphsInterface*>(etab);
+    int gr=-1;
 
     QList<QFRawDataRecord*> rdrs;
     double xmin=0;
@@ -396,7 +458,8 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool3()
             QString colName=tr("wxy [nm]");
             QString colNameE=tr("wxy_error [nm]");
             if (fitwxy) {
-                int cols=tab->tableGetColumnCount();
+                int cols=e->getProperty("IMFCS_CALIBRATION_COLS", tab->tableGetColumnCount()).toInt();
+                e->setQFProperty("IMFCS_CALIBRATION_COLS", cols);
                 //qDebug()<<"cols="<<cols;
                 int rcounter=0;
                 tab->tableSetColumnTitle(cols, tr("pixel size [nm]"));
@@ -451,8 +514,14 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool3()
                     tab->tableSetData(rcounter-1, cols+3, qfstatisticsAverage(wxyvec));
                     tab->tableSetData(rcounter-1, cols+4, sqrt(qfstatisticsVariance(wxyvec)));
                     if (graph) {
-                        graph->colgraphAddGraph(tr("pixel size vs. lat. focus size, D=%2µm²/s").arg(Dcalib));
-                        int ggraph=graph->colgraphGetGraphCount()-1;
+                        int ggraph=e->getProperty("IMFCS_CALIBRATION_GRAPHS", -1).toInt();
+                        if (ggraph<0) {
+                            graph->colgraphAddGraph(tr("pixel size vs. lat. focus size, D=%2µm²/s").arg(Dcalib));
+                            ggraph=graph->colgraphGetGraphCount()-1;
+                        } else {
+                            graph->colgraphSetGraphTitle(ggraph, tr("pixel size vs. lat. focus size, D=%2µm²/s").arg(Dcalib));
+                        }
+                        e->setQFProperty("IMFCS_CALIBRATION_GRAPHS", ggraph);
                         graph->colgraphSetGraphTitle(ggraph, tr("pixel size vs. lat. focus size"));
                         graph->colgraphSetGraphXAxisProps(ggraph, tr("pixel size [nm]"));
                         graph->colgraphSetGraphYAxisProps(ggraph, tr("lateral focus size w_{xy} [nm]"));
@@ -462,6 +531,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool3()
                         graph->colgraphSetPlotColor(ggraph, graph->colgraphGetPlotCount(ggraph)-1, QColor("blue"));
                         graph->colgraphsetXRange(ggraph, xmin, xmax);
                         graph->colgraphsetYRange(ggraph, ymin, ymax);
+                        gr=ggraph;
 
                     }
                 }
@@ -471,7 +541,14 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool3()
 
     }
 
-    log_text(tr("imFCS calibration tool 3: collecting wxy data ... DONE!\n"));
+    QFRawDataPropertyEditor* editor=QFPluginServices::getInstance()->openRawDataEditor(etab, false);
+    if (editor) {
+        if (gr>=0) editor->sendEditorCommand("showPlot", gr);
+        editor->showTab(2);
+    }
+
+
+    log_text(tr("imFCS calibration tool 4: collecting wxy data ... DONE!\n"));
 
 }
 

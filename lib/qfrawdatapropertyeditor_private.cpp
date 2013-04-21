@@ -1390,24 +1390,32 @@ void QFRawDataPropertyEditor_private::reloadGroupList()
 void QFRawDataPropertyEditor_private::selectRecordFromTreeClicked()
 {
     if (!current) return;
-    treeNextRecord=new QTreeView(d);
-    treeNextRecord->setVisible(false);
-    treeNextRecord->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    treeNextRecord->setHeaderHidden(true);
-    projectTree=new QFProjectTreeModel(treeNextRecord);
-    projectTree->init(current->getProject(), true, false);
-    projectTree->setRDRTypeFilter(current->getType());
-    treeNextRecord->setModel(projectTree);
-    treeNextRecord->move(btnSelectFromTree->x(), btnSelectFromTree->y()+btnSelectFromTree->height());
-    QSize s=treeNextRecord->sizeHint();
-    s.setWidth(qMin(d->width()-btnSelectFromTree->x()-5, qMax(s.width(), d->width()/3)));
-    s.setHeight(qMin(d->height()-btnSelectFromTree->y()-btnSelectFromTree->height()-5, (30*QFontMetrics(treeNextRecord->font()).height())/2));
-    treeNextRecord->resize(s);
-    treeNextRecord->setCurrentIndex(projectTree->index(current));
-    treeNextRecord->expandAll();
-    treeNextRecord->setVisible(true);
-    treeNextRecord->setFocus();
-    connect(treeNextRecord, SIGNAL(clicked(QModelIndex)), this, SLOT(selectRecordFromTreeSelected(QModelIndex)));
+    if (!treeNextRecord) {
+        treeNextRecord=new QTreeView(d);
+        treeNextRecord->setVisible(false);
+        treeNextRecord->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        treeNextRecord->setHeaderHidden(true);
+        projectTree=new QFProjectTreeModel(treeNextRecord);
+        projectTree->init(current->getProject(), true, false);
+        projectTree->setRDRTypeFilter(current->getType());
+        treeNextRecord->setModel(projectTree);
+        connect(treeNextRecord, SIGNAL(clicked(QModelIndex)), this, SLOT(selectRecordFromTreeSelected(QModelIndex)));
+    }
+    if (!treeNextRecord->isVisible()) {
+        treeNextRecord->move(btnSelectFromTree->x(), btnSelectFromTree->y()+btnSelectFromTree->height());
+        QSize s=treeNextRecord->sizeHint();
+        s.setWidth(qMin(d->width()-btnSelectFromTree->x()-5, qMax(s.width(), d->width()/3)));
+        s.setHeight(qMin(d->height()-btnSelectFromTree->y()-btnSelectFromTree->height()-5, (30*QFontMetrics(treeNextRecord->font()).height())/2));
+        treeNextRecord->resize(s);
+        treeNextRecord->setCurrentIndex(projectTree->index(current));
+        treeNextRecord->expandAll();
+        treeNextRecord->setVisible(true);
+        treeNextRecord->setFocus();
+    } else {
+        treeNextRecord->close();
+        treeNextRecord->hide();
+    }
+
 }
 
 void QFRawDataPropertyEditor_private::selectRecordFromTreeSelected(const QModelIndex &index)
@@ -1420,12 +1428,12 @@ void QFRawDataPropertyEditor_private::selectRecordFromTreeSelected(const QModelI
         if (n) {
             if (treeNextRecord) {
                 treeNextRecord->hide();
-                treeNextRecord->disconnect();
+                /*treeNextRecord->disconnect();
                 treeNextRecord->setModel(NULL);
                 if (projectTree) delete projectTree;
                 treeNextRecord->deleteLater();
                 treeNextRecord=NULL;
-                projectTree=NULL;
+                projectTree=NULL;*/
             }
             setCurrent(n);
             return;
@@ -1433,12 +1441,12 @@ void QFRawDataPropertyEditor_private::selectRecordFromTreeSelected(const QModelI
     }
     if (treeNextRecord) {
         treeNextRecord->hide();
-        treeNextRecord->disconnect();
+        /*treeNextRecord->disconnect();
         treeNextRecord->setModel(NULL);
         if (projectTree) delete projectTree;
         treeNextRecord->deleteLater();
         treeNextRecord=NULL;
-        projectTree=NULL;
+        projectTree=NULL;*/
     }
 
 }

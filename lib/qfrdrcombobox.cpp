@@ -92,6 +92,7 @@ void QFRDRComboBox::refill()
     setUpdatesEnabled(true);
     if (this->project) connect(this->project, SIGNAL(structureChanged()), this, SLOT(refill()));
     setCurrentRDR(rdr);
+    if (currentIndex()<0 && count()>0) setCurrentIndex(0);
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(myCurrentIndexChanged(int)));
     if (currentRDR()!=rdr) emit currentRDRChanged(currentRDR());
     if (count()<=0) emit refilledEmpty();

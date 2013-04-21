@@ -8,6 +8,7 @@
 #include "qfpluginservices.h"
 #include <QTextDocument>
 #include "qfrawdatarecord.h"
+#include <QVariant>
 
 // forward declaration
 class QFEvaluationItem;
@@ -32,6 +33,13 @@ class QFLIB_EXPORT QFEvaluationEditor : public QWidget {
             if (settings) readSettings();
         }
         void saveSettings() { writeSettings(); };
+        /*! \brief execute the given command
+
+            This function does nothing in the default implementation. It can be implemented to allow editor to perform
+            certain functions that are called form the outside.
+         */
+        virtual void sendEditorCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant());
+
     protected slots:
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old) =0;

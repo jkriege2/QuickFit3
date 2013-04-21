@@ -2,7 +2,7 @@
 #define QFFITFUNCTIONSSPIMFCSDIFF_H
 #include "qfpluginfitfunction.h"
 #include "qftools.h"
-
+#include <QDebug>
 
 
 /*! \brief QFFitFunction class for a SPIM-FCS fit model with pure diffusion and 1/sqrt(e) lateral width

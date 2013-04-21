@@ -33,7 +33,8 @@ HEADERS += qfpevalimfcsfit.h \
     ../base_classes/qffitresultsbyindexevaluationfittools.h \
     ../base_classes/qffcstools.h \
     ../base_classes/qfrdrimagetorunpreview.h \
-    qfimfcssetparamfromfiledialog.h
+    qfimfcssetparamfromfiledialog.h \
+    imfcscalibrationwizard.h
 
 
 SOURCES += qfpevalimfcsfit.cpp \
@@ -53,13 +54,15 @@ SOURCES += qfpevalimfcsfit.cpp \
     ../base_classes/qffitresultsbyindexevaluationfittools.cpp \
     ../base_classes/qffcstools.cpp \
     ../base_classes/qfrdrimagetorunpreview.cpp \
-    qfimfcssetparamfromfiledialog.cpp
+    qfimfcssetparamfromfiledialog.cpp \
+    imfcscalibrationwizard.cpp
 
 
 FORMS = \    
     imfcscalibrationdialog.ui \
     optionswidget.ui \
-    qfimfcssetparamfromfiledialog.ui
+    qfimfcssetparamfromfiledialog.ui \
+    imfcscalibrationwizard.ui
 
 RESOURCES += qfevalimfcsfit.qrc \
     ../base_classes/qffitresultsevaluationeditorbase.qrc

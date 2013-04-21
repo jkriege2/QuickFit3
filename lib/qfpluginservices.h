@@ -241,10 +241,18 @@ class QFLIB_EXPORT QFPluginServices {
         /** \brief register a configuration pane for a plugin in the main options dialog */
         virtual void registerSettingsPane(QFPluginOptionsDialogInterface* plugin)=0;
 
-        /** \brief open a new evaluation editor window for the given record */
-        virtual QFEvaluationPropertyEditor* openEvaluationEditor(QFEvaluationItem* eval)=0;
-        /** \brief open a new raw data record editor window for the given record */
-        virtual QFRawDataPropertyEditor* openRawDataEditor(QFRawDataRecord* rdr)=0;
+        /** \brief open a new evaluation editor window for the given evaluation
+         *
+         *   If \a alwaysCreateNew is \c false and an editor for the given evaluation is already opened, this opened editor is displayed and now new editor is created.
+         *   If \a alwaysCreateNew is \c true a new editor window is always created.
+         */
+        virtual QFEvaluationPropertyEditor* openEvaluationEditor(QFEvaluationItem* eval, bool alwaysCreateNew=true)=0;
+        /** \brief open a new raw data record editor window for the given record
+         *
+         *   If \a alwaysCreateNew is \c false and an editor for the given record is already opened, this opened editor is displayed and now new editor is created.
+         *   If \a alwaysCreateNew is \c true a new editor window is always created.
+         */
+        virtual QFRawDataPropertyEditor* openRawDataEditor(QFRawDataRecord* rdr, bool alwaysCreateNew=true)=0;
         /** \brief returns a pointer to the currently loaded QFProject */
         virtual QFProject* getCurrentProject() const=0;
     private:

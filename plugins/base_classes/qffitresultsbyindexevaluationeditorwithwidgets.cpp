@@ -338,7 +338,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     scrollParameters=new JKVerticalScrollArea(this);
     layModel->addWidget(scrollParameters, 100);
     layModel->setSpacing(2);
-    QWidget* widParameters=new QWidget(this);
+    widParameters=new QWidget(this);
     scrollParameters->setWidget(widParameters);
     scrollParameters->setWidgetResizable(true);
     layParameters=new QGridLayout(this);
@@ -698,6 +698,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::updateParameterValues(QFRaw
     double* errors=eval->allocFillParameterErrors(ffunc);
     ffunc->calcParameter(fullParams, errors);
 
+    widParameters->setUpdatesEnabled(false);
 
     for (int i=0; i<m_fitParameters.size(); i++) {
         if (m_fitParameters[i]) {
@@ -719,6 +720,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::updateParameterValues(QFRaw
     if (eval->hasFit()) labFitParameters->setText(tr("<b><u>Local</u> Fit Parameters:</b>"));
     else labFitParameters->setText(tr("<b><u>Global</u> Fit Parameters:</b>"));
     //qDebug()<<"QFFitResultsByIndexEvaluationEditor::updateParameterValues() ... done "<<t.elapsed()<<" ms";
+
+    widParameters->setUpdatesEnabled(true);
 
 }
 
@@ -812,6 +815,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
         /////////////////////////////////////////////////////////////////////////////////////////////
         //bool updEn=updatesEnabled();
         //setUpdatesEnabled(false);
+        widParameters->setUpdatesEnabled(false);
         for (int i=0; i<m_fitParameters.size(); i++) {
             if (m_fitParameters[i]) {
                 m_fitParameters[i]->disableDatastore();
@@ -825,6 +829,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
             }
         }
         m_fitParameters.clear();
+        widParameters->setUpdatesEnabled(true);
         //setUpdatesEnabled(updEn);
         return;
     }
@@ -837,6 +842,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
         /////////////////////////////////////////////////////////////////////////////////////////////
         // first delete all fit parameter widgets
         /////////////////////////////////////////////////////////////////////////////////////////////
+        widParameters->setUpdatesEnabled(false);
         for (int i=0; i<m_fitParameters.size(); i++) {
             if (m_fitParameters[i]) {
                 m_fitParameters[i]->disableDatastore();
@@ -915,6 +921,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
         }
         // add stretcher item in bottom row
         layParameters->addItem(new QSpacerItem(5,5, QSizePolicy::Minimum, QSizePolicy::Expanding), layParameters->rowCount(), 0);
+        widParameters->setUpdatesEnabled(true);
     }
 
     if (eval->getCurrentIndex()!=spinRun->value()) eval->setCurrentIndex(eval->getCurrentIndex());

@@ -191,6 +191,8 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         JKVerticalScrollArea* scrollParameters;
         /** \brief layout that is used to display fit parameters */
         QGridLayout* layParameters;
+        /** \brief widget containing all fit parameter edit/display fields */
+        QWidget* widParameters;
 
         /** \brief fit progress dialog */
         dlgQFFitAlgorithmProgressDialog* dlgFitProgress;

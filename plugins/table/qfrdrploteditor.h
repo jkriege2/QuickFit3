@@ -30,6 +30,8 @@ class QFRDRPlotEditor : public QFRawDataEditor {
         QFRDRPlotEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent=NULL);
         /** Default destructor */
         virtual ~QFRDRPlotEditor();
+    public slots:
+        void rebuildPlotWidgets(bool keepPosition=false);
     protected slots:
         /** \brief create widgets on object creation */
         void createWidgets();
@@ -48,9 +50,17 @@ class QFRDRPlotEditor : public QFRawDataEditor {
         void movePlotUp();
         void movePlotDown();
         void deletePlot(int i);
-        void rebuildPlotWidgets(bool keepPosition=false);
+
         void clearPlotWidgets();
         void updatePlotName(int plot, QString title);
+    public:
+        /*! \brief execute an editor command
+
+            These commands are defined:
+              - \c showPlot: param1 is the name or index of the given plot. This will display the given (by param1) plot tab.
+            .
+          */
+        virtual void sendEditorCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant());
     protected:
 
         QPointer<QFRDRTable> current;

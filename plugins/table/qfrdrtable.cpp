@@ -134,6 +134,8 @@ QFRDRTable::QFRDRTable(QFProject* parent/*, QString name, QString inputFile*/):
     autocolors.append(QColor("indianred"));
     autocolors.append(QColor("darkolivegreen"));
     autocolors.append(QColor("mediumpurple"));
+    emittedRebuildPlotWidgets=false;
+    connect(this, SIGNAL(rebuildPlotWidgets()), this, SLOT(didRebuildPlotWidgets()));
 }
 
 
@@ -188,7 +190,7 @@ void QFRDRTable::tableSetColumnData(quint16 column, QList<QVariant> data)
 
 void QFRDRTable::tableSetColumnTitle(quint16 column, const QString &data)
 {
-    //qDebug()<<"tableSetColumnTitle("<<column<<",    "<<data<<")";
+    //qDebug()<<"tableSetColumnTitle("<<column<<",    "<<data<<")   datamodel<<"<<datamodel;
     if (datamodel)  {
         datamodel->setColumnTitleCreate(column, data);
     }
@@ -312,6 +314,34 @@ bool QFRDRTable::tableIsReadonly() const
     return datamodel->isReadonly();
 }
 
+void QFRDRTable::colgraphToolsSetGraphtype(QFRDRTable::GraphInfo &g, QFRDRColumnGraphsInterface::ColumnGraphTypes type)
+{
+    switch (type) {
+        case QFRDRColumnGraphsInterface::cgtLines:
+            g.type=gtLines;
+            g.drawLine=true;
+            g.symbol=JKQTPnoSymbol;
+            break;
+        case QFRDRColumnGraphsInterface::cgtPoints:
+            g.type=gtLines;
+            g.drawLine=false;
+            break;
+        case QFRDRColumnGraphsInterface::cgtLinesPoints:
+            g.type=gtLines;
+            g.drawLine=true;
+            break;
+        case QFRDRColumnGraphsInterface::cgtBars:
+            g.type=gtBarsVertical;
+            break;
+        case QFRDRColumnGraphsInterface::cgtSteps:
+            g.type=gtStepsVertical;
+            break;
+        case QFRDRColumnGraphsInterface::cgtImpulses:
+            g.type=gtImpulsesVertical;
+            break;
+    }
+}
+
 void QFRDRTable::colgraphAddPlot(int graph, int columnX, int columnY, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title)
 {
     if (graph>=0 && graph<plots.size()) {
@@ -322,38 +352,17 @@ void QFRDRTable::colgraphAddPlot(int graph, int columnX, int columnY, QFRDRColum
         g.color=autocolors.value((plt.graphs.size()-1)%autocolors.size(), QColor("red"));
         g.errorColor=g.color.darker();
         g.fillColor=g.color.lighter();
-        switch (type) {
-            case QFRDRColumnGraphsInterface::cgtLines:
-                g.type=gtLines;
-                g.drawLine=true;
-                g.symbol=JKQTPnoSymbol;
-                break;
-            case QFRDRColumnGraphsInterface::cgtPoints:
-                g.type=gtLines;
-                g.drawLine=false;
-                break;
-            case QFRDRColumnGraphsInterface::cgtLinesPoints:
-                g.type=gtLines;
-                g.drawLine=true;
-                break;
-            case QFRDRColumnGraphsInterface::cgtBars:
-                g.type=gtBarsVertical;
-                break;
-            case QFRDRColumnGraphsInterface::cgtSteps:
-                g.type=gtStepsVertical;
-                break;
-            case QFRDRColumnGraphsInterface::cgtImpulses:
-                g.type=gtImpulsesVertical;
-                break;
-        }
+        colgraphToolsSetGraphtype(g, type);
         g.title=title;
         plt.graphs.append(g);
 
         setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+
     }
 }
 
-void QFRDRTable::colgraphAddErrorPlot(int graph, int columnX, int columnXError, int columnY, int columnYError, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title)
+void QFRDRTable::colgraphAddErrorPlot(int graph, int columnX, int columnXError, int columnY, int columnYError, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, ErrorGraphTypes errorStyle)
 {
     if (graph>=0 && graph<plots.size()) {
 
@@ -362,7 +371,9 @@ void QFRDRTable::colgraphAddErrorPlot(int graph, int columnX, int columnXError, 
         QFRDRTable::PlotInfo plt=getPlot(graph);
         plt.graphs.last().xerrorcolumn=columnXError;
         plt.graphs.last().yerrorcolumn=columnYError;
+        plt.graphs.last().errorStyle=(JKQTPerrorPlotstyle)errorStyle;
         setPlot(graph, plt);
+        emitRebuildPlotWidgets();
     }
 
 }
@@ -376,6 +387,7 @@ void QFRDRTable::colgraphAddGraph(const QString &title, const QString &xLabel, c
     info.xlog=logX;
     info.ylog=logY;
     addPlot(info);
+    emitRebuildPlotWidgets();
 }
 
 int QFRDRTable::colgraphGetPlotCount(int graph) const
@@ -394,6 +406,7 @@ int QFRDRTable::colgraphGetGraphCount() const
 void QFRDRTable::colgraphRemoveGraph(int graph)
 {
     deletePlot(graph);
+    emitRebuildPlotWidgets();
 }
 
 void QFRDRTable::colgraphRemovePlot(int graph, int plot)
@@ -402,6 +415,7 @@ void QFRDRTable::colgraphRemovePlot(int graph, int plot)
         QFRDRTable::PlotInfo plt=getPlot(graph);
         plt.graphs.removeAt(plot);
         setPlot(graph, plt);
+        emitRebuildPlotWidgets();
     }
 }
 
@@ -411,11 +425,14 @@ void QFRDRTable::colgraphSetPlotColor(int graph, int plot, QColor color)
         QFRDRTable::PlotInfo plt=getPlot(graph);
         if (plot>=0 && plot<plt.graphs.size()) {
             plt.graphs[plot].color=color;
+            plt.graphs[plot].colorTransparent=color.alphaF();
             plt.graphs[plot].errorColor=plt.graphs[plot].color.darker();
+            plt.graphs[plot].errorColorTransparent=plt.graphs[plot].errorColor.alphaF();
             plt.graphs[plot].fillColor=plt.graphs[plot].color.lighter();
+            plt.graphs[plot].fillColorTransparent=plt.graphs[plot].fillColor.alphaF();
         }
-        plt.graphs[plot];
         setPlot(graph, plt);
+        emitRebuildPlotWidgets();
     }
 }
 
@@ -428,8 +445,8 @@ void QFRDRTable::colgraphSetPlotColor(int graph, int plot, QColor color, QColor 
             plt.graphs[plot].errorColor=plt.graphs[plot].color.darker();
             plt.graphs[plot].fillColor=fillColor;
         }
-        plt.graphs[plot];
         setPlot(graph, plt);
+        emitRebuildPlotWidgets();
     }
 }
 
@@ -442,8 +459,8 @@ void QFRDRTable::colgraphSetPlotColor(int graph, int plot, QColor color, QColor 
             plt.graphs[plot].errorColor=errorColor;
             plt.graphs[plot].fillColor=fillColor;
         }
-        plt.graphs[plot];
         setPlot(graph, plt);
+        emitRebuildPlotWidgets();
     }
 }
 
@@ -453,6 +470,7 @@ void QFRDRTable::colgraphSetGraphTitle(int graph, const QString &title)
         QFRDRTable::PlotInfo plt=getPlot(graph);
         plt.title=title;
         setPlot(graph, plt);
+        emitRebuildPlotWidgets();
     }
 }
 
@@ -472,6 +490,7 @@ void QFRDRTable::colgraphSetGraphXAxisProps(int graph, const QString &xLabel, bo
         plt.xlabel=xLabel;
         plt.xlog=logX;
         setPlot(graph, plt);
+        emitRebuildPlotWidgets();
     }
 
 }
@@ -483,6 +502,7 @@ void QFRDRTable::colgraphSetGraphYAxisProps(int graph, const QString &yLabel, bo
         plt.ylabel=yLabel;
         plt.ylog=logY;
         setPlot(graph, plt);
+        emitRebuildPlotWidgets();
     }
 }
 
@@ -493,6 +513,7 @@ void QFRDRTable::colgraphsetXRange(int graph, double xmin, double xmax)
         plt.xmin=xmin;
         plt.xmax=xmax;
         setPlot(graph, plt);
+        emitRebuildPlotWidgets();
     }
 }
 
@@ -503,7 +524,123 @@ void QFRDRTable::colgraphsetYRange(int graph, double xmin, double xmax)
         plt.ymin=xmin;
         plt.ymax=xmax;
         setPlot(graph, plt);
-    }}
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetPlotTitle(int graph, int plot, const QString &title)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            plt.graphs[plot].title=title;
+        }
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetPlotType(int graph, int plot, QFRDRColumnGraphsInterface::ColumnGraphTypes type)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+           colgraphToolsSetGraphtype(plt.graphs[plot], type);
+        }
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetPlotErrorStyle(int graph, int plot, QFRDRColumnGraphsInterface::ErrorGraphTypes errorStyle)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            plt.graphs[plot].errorStyle=(JKQTPerrorPlotstyle)errorStyle;
+        }
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetPlotErrorColor(int graph, int plot, QColor errorColor)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            plt.graphs[plot].errorColor=errorColor;
+            plt.graphs[plot].errorColorTransparent=errorColor.alphaF();
+        }
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetPlotFillColor(int graph, int plot, QColor fillColor)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            plt.graphs[plot].fillColor=fillColor;
+            plt.graphs[plot].fillColorTransparent=fillColor.alphaF();
+        }
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetPlotErrorTransparency(int graph, int plot, double errorT)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            plt.graphs[plot].errorColorTransparent=errorT;
+        }
+        plt.graphs[plot];
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetPlotFillTransparency(int graph, int plot, double fillT)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            plt.graphs[plot].fillColorTransparent=fillT;
+        }
+        plt.graphs[plot];
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetPlotPlotTransparency(int graph, int plot, double trans)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            plt.graphs[plot].colorTransparent=trans;
+        }
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetPlotSymbol(int graph, int plot, QFRDRColumnGraphsInterface::ColumnGraphSymbols symbol, double symbolSize)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            plt.graphs[plot].symbol=(JKQTPgraphSymbols)symbol;
+            plt.graphs[plot].symbolSize=symbolSize;
+        }
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
 
 int QFRDRTable::getPlotCount() const
 {
@@ -607,6 +744,12 @@ QVariant QFRDRTable::evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode
 
     if (*ok) *ok=true;
     return result;
+}
+
+void QFRDRTable::emitRebuildPlotWidgets()
+{
+    if (!emittedRebuildPlotWidgets) emit rebuildPlotWidgets();
+    //emittedRebuildPlotWidgets=true;
 }
 
 
@@ -965,5 +1108,10 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
         w.writeEndElement();
     }
     w.writeEndElement();
+}
+
+void QFRDRTable::didRebuildPlotWidgets()
+{
+    //emittedRebuildPlotWidgets=false;
 }
 

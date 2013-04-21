@@ -76,9 +76,9 @@ class QFRDRImagingFCSDataEditorCountrate : public QFRawDataEditor {
         QComboBox* cmbVideo;
 
         /** \brief a combobox to select how the runs are displayed */
-        QComboBox* cmbRunStyle;
+        JKQTPLinePlotStyleComboBox* cmbRunStyle;
         /** \brief a combobox to select how the error of the runs are displayed */
-        QComboBox* cmbRunErrorStyle;
+        JKQTPerrorPlotstyleComboBox* cmbRunErrorStyle;
         /** \brief a button which excludes the selected runs from the evaluation */
         QPushButton* btnDontUse;
         /** \brief a button which includes the selected runs to the evaluation */

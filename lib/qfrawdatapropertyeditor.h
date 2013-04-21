@@ -43,6 +43,8 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         virtual ~QFRawDataPropertyEditor();
         /** \brief set the current record */
         void setCurrent(QFRawDataRecord* c);
+        /** \brief get the current record */
+        QFRawDataRecord* getCurrent() const;
         /** \brief set a Programoptions object to use for storing application settings */
         void setSettings(ProgramOptions* settings);
         /** \brief write the settings */
@@ -57,6 +59,19 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         void registerMenu(QMenu* menu, int editor=-1);
         /** \brief returns a pointer to the help menu of this editor */
         QMenu* getHelpMenu() const;
+        /** \brief activate the given tab in the editor
+         *
+         *  If N (>2) tabs are available in the window, then:
+         *    - 0: the basic properties editor
+         *    - 1...N-2: the editors of the current RDR
+         *    - N-1: the results tab
+         *  .
+         */
+        void showTab(int tab);
+        /** \brief return the number of available tabs */
+        int getTabs() const;
+        /** \brief send the given command string to all edtor tabs */
+        void sendEditorCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant());
     protected:
 
         /** \brief read the settings */

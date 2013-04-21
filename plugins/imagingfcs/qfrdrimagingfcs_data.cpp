@@ -1178,12 +1178,12 @@ bool QFRDRImagingFCSData::leaveoutRun(int run) const {
 }
 
 double* QFRDRImagingFCSData::getCorrelationRun(int run) const {
-    if (run<=0) return getCorrelationMean();
+    if (run<0) return getCorrelationMean();
     return &(correlations[run*N]);
 }
 
 double* QFRDRImagingFCSData::getCorrelationRunError(int run) const {
-    if (run<=0) return getCorrelationStdDev();
+    if (run<0) return getCorrelationStdDev();
     return &(sigmas[run*N]);
 }
 
@@ -1762,7 +1762,7 @@ void QFRDRImagingFCSData::leaveoutAddRun(int run) {
 
 
 int QFRDRImagingFCSData::getOverviewImageCount() const {
-    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && isFCCS()) {
         return 4+ovrImages.size();
     }
     return 2+ovrImages.size();
@@ -1771,7 +1771,7 @@ int QFRDRImagingFCSData::getOverviewImageCount() const {
 int QFRDRImagingFCSData::getOverviewImageWidth(int image) const {
     if (image==0) return getImageFromRunsWidth();
     if (image==1) return getImageFromRunsWidth();
-    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && isFCCS()) {
         if (image==2) return getImageFromRunsWidth();
         if (image==3) return getImageFromRunsWidth();
         if (image-3<=ovrImages.size()) return ovrImages[image-4].width;
@@ -1784,7 +1784,7 @@ int QFRDRImagingFCSData::getOverviewImageWidth(int image) const {
 int QFRDRImagingFCSData::getOverviewImageHeight(int image) const {
     if (image==0) return getImageFromRunsHeight();
     if (image==1) return getImageFromRunsHeight();
-    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && isFCCS()) {
         if (image==2) return getImageFromRunsHeight();
         if (image==3) return getImageFromRunsHeight();
         if (image-3<=ovrImages.size()) return ovrImages[image-4].height;
@@ -1796,7 +1796,7 @@ int QFRDRImagingFCSData::getOverviewImageHeight(int image) const {
 }
 
 QString QFRDRImagingFCSData::getOverviewImageName(int image) const {
-    if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical) {
+    if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && isFCCS()) {
         if (image==0) return tr("top overview image (time average)");
         if (image==1) return tr("top standard deviation overview image (time average)");
         if (image==2) return tr("bottom overview image (time average)");
@@ -1805,7 +1805,7 @@ QString QFRDRImagingFCSData::getOverviewImageName(int image) const {
         return QString("");
 
     }
-    if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal) {
+    if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && isFCCS()) {
         if (image==0) return tr("left overview image (time average)");
         if (image==1) return tr("left standard deviation overview image (time average)");
         if (image==2) return tr("right overview image (time average)");
@@ -1821,7 +1821,7 @@ QString QFRDRImagingFCSData::getOverviewImageName(int image) const {
 }
 
 QString QFRDRImagingFCSData::getOverviewImageID(int image) const {
-    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && isFCCS()) {
         if (image>3 && image-3<=ovrImages.size()) return ovrImages[image-4].id;
         return QString("");
     }
@@ -1832,7 +1832,7 @@ QString QFRDRImagingFCSData::getOverviewImageID(int image) const {
 double *QFRDRImagingFCSData::getOverviewImage(int image) const {
     if (image==0) return overviewF;
     if (image==1) return overviewFSTD;
-    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && isFCCS()) {
         if (image==2) return overviewF2;
         if (image==3) return overviewF2STD;
         if (image-3<=ovrImages.size()) return ovrImages[image-4].image;
@@ -1844,7 +1844,7 @@ double *QFRDRImagingFCSData::getOverviewImage(int image) const {
 
 QList<QFRDROverviewImageInterface::OverviewImageGeoElement> QFRDRImagingFCSData::getOverviewImageAnnotations(int image) const {
     QList<QFRDROverviewImageInterface::OverviewImageGeoElement> result;
-    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && isFCCS()) {
         if (image>3 && image-4<ovrImages.size()) return ovrImages[image-4].geoElements;
     } else {
         if (image>1 && image-2<ovrImages.size()) return ovrImages[image-2].geoElements;

@@ -73,16 +73,16 @@ void QFRDRImagingFCSDataEditorCountrate::createWidgets() {
     row++;
 
 
-    cmbRunStyle=new QComboBox(w);
-    cmbRunStyle->addItem(QIcon(":/imaging_fcs/fcsplot_lines.png"), tr("lines"));
+    cmbRunStyle=new JKQTPLinePlotStyleComboBox(w);
+    /*cmbRunStyle->addItem(QIcon(":/imaging_fcs/fcsplot_lines.png"), tr("lines"));
     cmbRunStyle->addItem(QIcon(":/imaging_fcs/fcsplot_points.png"), tr("points"));
-    cmbRunStyle->addItem(QIcon(":/imaging_fcs/fcsplot_pointslines.png"), tr("lines+points"));
+    cmbRunStyle->addItem(QIcon(":/imaging_fcs/fcsplot_pointslines.png"), tr("lines+points"));*/
 
-    cmbRunErrorStyle=new QComboBox(w);
-    cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_enone.png"), tr("none"));
+    cmbRunErrorStyle=new JKQTPerrorPlotstyleComboBox(w);
+    /*cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_enone.png"), tr("none"));
     cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_ebars.png"), tr("bars"));
     cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elines.png"), tr("lines"));
-    cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elinesbars.png"), tr("lines+bars"));
+    cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elinesbars.png"), tr("lines+bars"));*/
 
     gl->addWidget((labRunOptions=new QLabel(tr("pixel &options:"), w)), row, 0);
     labRunOptions->setBuddy(cmbRunStyle);
@@ -409,17 +409,19 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
 
 
 
-        JKQTPerrorPlotstyle runerrorstyle=JKQTPnoError;
-        switch (cmbRunErrorStyle->currentIndex()) {
+        JKQTPerrorPlotstyle runerrorstyle=cmbRunErrorStyle->getErrorStyle();
+        /*switch (cmbRunErrorStyle->currentIndex()) {
             case 1: runerrorstyle=JKQTPerrorBars; break;
             case 2: runerrorstyle=JKQTPerrorLines; break;
             case 3: runerrorstyle=JKQTPerrorBarsLines; break;
             case 4: runerrorstyle=JKQTPerrorPolygons; break;
             case 5: runerrorstyle=JKQTPerrorBarsPolygons; break;
-        }
-        bool runLine=(cmbRunStyle->currentIndex()!=1);
+        }*/
+        /*bool runLine=(cmbRunStyle->currentIndex()!=1);
         JKQTPgraphSymbols runSymbol=JKQTPcross;
-        if (cmbRunStyle->currentIndex()==0) runSymbol=JKQTPnoSymbol;
+        if (cmbRunStyle->currentIndex()==0) runSymbol=JKQTPnoSymbol;*/
+        bool runLine=cmbRunStyle->getDrawLine();
+        JKQTPgraphSymbols runSymbol=cmbRunStyle->getSymbol();
 
         size_t c_tau=ds->addLinearColumn(frames, 0, frames*m->getImageStackTUnitFactor(cmbVideo->currentIndex()), tr("time [%1]").arg(m->getImageStackTUnitName(cmbVideo->currentIndex())));
 

@@ -45,4 +45,8 @@ void QFRawDataEditor::setSettings(ProgramOptions* s, int peID) {
     if (settings) readSettings();
 }
 
+void QFRawDataEditor::sendEditorCommand(const QString &command, const QVariant &param1, const QVariant &param2, const QVariant &param3, const QVariant &param4, const QVariant &param5)
+{
+}
+
 

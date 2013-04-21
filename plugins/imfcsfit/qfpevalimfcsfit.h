@@ -4,7 +4,8 @@
 #include "qfpluginevaluation.h"
 #include "qfpluginoptionsdialog.h"
 #include "qfpluginservices.h"
-
+#include "qfrawdatapropertyeditor.h"
+#include "imfcscalibrationwizard.h"
 
 /*!
     \defgroup qf3evalp_imfcsfit FCS Least Squares Curve Fitting Plugin for imaging FCS
@@ -71,16 +72,21 @@ class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase, publi
     protected slots:
         /** \brief insert FCS data from file*/
         void insertFCSFit();
+
+        void insertFCSCalibrationWizard();
+
         void insertFCSFitForCalibration();
 
         void imFCSCalibrationTool1();
         void imFCSCalibrationTool2();
         void imFCSCalibrationTool3();
+        void imFCSCalibrationTool4();
         void showCalibrationTutorial();
 
 
     private:
         QMenu* menuCalibration;
+        ImFCSCalibrationWizard* calibrationWizard;
 };
 
 #endif // QFPEVALIMFCSFIT_H

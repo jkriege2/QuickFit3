@@ -89,6 +89,11 @@ void QFRawDataPropertyEditor::setCurrent(QFRawDataRecord* c) {
     p->setCurrent(c);
 }
 
+QFRawDataRecord *QFRawDataPropertyEditor::getCurrent() const
+{
+    return p->current;
+}
+
 
 void QFRawDataPropertyEditor::setSettings(ProgramOptions* settings) {
     //std::cout<<"QFRawDataPropertyEditor::setSettings("<<settings<<")\n";
@@ -138,6 +143,23 @@ void QFRawDataPropertyEditor::writeSettings() {
 QMenu *QFRawDataPropertyEditor::getHelpMenu() const
 {
     return p->menuHelp;
+}
+
+void QFRawDataPropertyEditor::showTab(int tab)
+{
+    p->tabMain->setCurrentIndex(tab);
+}
+
+int QFRawDataPropertyEditor::getTabs() const
+{
+    return p->tabMain->count();
+}
+
+void QFRawDataPropertyEditor::sendEditorCommand(const QString &command, const QVariant &param1, const QVariant &param2, const QVariant &param3, const QVariant &param4, const QVariant &param5)
+{
+    for (int i=0; i<p->editorList.size(); i++) {
+        if (p->editorList[i]) p->editorList[i]->sendEditorCommand(command, param1, param2, param3, param4, param5);
+    }
 }
 
 

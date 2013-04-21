@@ -310,22 +310,26 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
 
     if ((scheme!="http") && (scheme!="https") && (scheme!="ftp") && (scheme!="ftps") && (scheme!="mailto") && (scheme!="sftp") && (scheme!="svn") && (scheme!="ssh") /*&& QFile::exists(QFileInfo(s).absoluteFilePath())*/) {
 
-        QDir spd(searchPath);
-        QString filename=link.toString(QUrl::RemoveFragment);
-        QString fragment=link.fragment();
-        QString cl=spd.cleanPath(spd.absoluteFilePath(filename));
-        QString s=spd.absoluteFilePath(cl); //absoluteFilePath
-        searchPath=QFileInfo(s).absolutePath();
-        descriptionBrowser->setSearchPaths(QStringList(searchPath)<<"./");
-        descriptionBrowser->setHtml(loadHTML(QFileInfo(s).absoluteFilePath()));
-        for (int i=history.size()-1; i>=qMax(0,history_idx)+1; i--) {
-            history.pop();
-        }
-        history.push(HistoryEntry(s, descriptionBrowser->documentTitle()));
-        history_idx=history.size()-1;
-        updateButtons();
-        if (link.hasFragment()) {
-            descriptionBrowser->scrollToAnchor(QString("#")+fragment);
+        if ((scheme!="pop") || (scheme!="popup") || (scheme!="tool")||(scheme!="tip")){
+
+        } else {
+            QDir spd(searchPath);
+            QString filename=link.toString(QUrl::RemoveFragment);
+            QString fragment=link.fragment();
+            QString cl=spd.cleanPath(spd.absoluteFilePath(filename));
+            QString s=spd.absoluteFilePath(cl); //absoluteFilePath
+            searchPath=QFileInfo(s).absolutePath();
+            descriptionBrowser->setSearchPaths(QStringList(searchPath)<<"./");
+            descriptionBrowser->setHtml(loadHTML(QFileInfo(s).absoluteFilePath()));
+            for (int i=history.size()-1; i>=qMax(0,history_idx)+1; i--) {
+                history.pop();
+            }
+            history.push(HistoryEntry(s, descriptionBrowser->documentTitle()));
+            history_idx=history.size()-1;
+            updateButtons();
+            if (link.hasFragment()) {
+                descriptionBrowser->scrollToAnchor(QString("#")+fragment);
+            }
         }
     } else {
         QDesktopServices::openUrl(link);

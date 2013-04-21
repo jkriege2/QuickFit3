@@ -973,6 +973,11 @@ bool QFEvaluationPropertyEditor::isFilesListFiltered() const
     return filesListFiltered;
 }
 
+QFEvaluationItem *QFEvaluationPropertyEditor::getCurrent() const
+{
+    return current;
+}
+
 
 void QFEvaluationPropertyEditor::readSettings() {
     if (!settings) return;
@@ -1057,6 +1062,13 @@ QMenu *QFEvaluationPropertyEditor::getHelpMenu() const
 QPointer<QFEvaluationEditor> QFEvaluationPropertyEditor::getEditor() const
 {
     return editor;
+}
+
+void QFEvaluationPropertyEditor::sendEditorCommand(const QString &command, const QVariant &param1, const QVariant &param2, const QVariant &param3, const QVariant &param4, const QVariant &param5)
+{
+    if (getEditor()) {
+        getEditor()->sendEditorCommand(command, param1, param2, param3, param4, param5);
+    }
 }
 
 void QFEvaluationPropertyEditor::selectionChanged(const QModelIndex& index, const QModelIndex& oldindex) {

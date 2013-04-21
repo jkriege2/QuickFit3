@@ -5,6 +5,7 @@
 #include "qfpluginservices.h"
 #include <QDebug>
 #include "qfplottercopytotabledialog.h"
+#include "qfrawdatapropertyeditor.h"
 
 class MyQFSelectRDRDialogMatchFunctor: public QFMatchRDRFunctor {
     public:
@@ -38,9 +39,10 @@ void QFPlotterPrivate::copyToTable()
         QString tabname="";
         QFRDRTableInterface* tab=dlg->getTable();
         QFRDRColumnGraphsInterface* cols=dlg->getGraph();
+        QFRawDataRecord* rdr=dlg->getRDR();
         if (dlg->getNewTable(tabname)) {
             if (tabname.isEmpty()) tabname=tr("NEW_TABLE");
-            QFRawDataRecord* rdr=QFPluginServices::getInstance()->getCurrentProject()->addRawData("table", tabname, "");
+            rdr=QFPluginServices::getInstance()->getCurrentProject()->addRawData("table", tabname, "");
             tab=dynamic_cast<QFRDRTableInterface*>(rdr);
             cols=dynamic_cast<QFRDRColumnGraphsInterface*>(rdr);
         }
@@ -57,6 +59,7 @@ void QFPlotterPrivate::copyToTable()
                 }
                 tab->tableSetColumnData(idx, d);
                 tab->tableSetColumnTitle(idx, col.get_name());
+                //qDebug()<<"set col title idx="<<idx<<"   name="<<col.get_name();
                 columns<<idx;
                 idx++;
             }
@@ -64,9 +67,10 @@ void QFPlotterPrivate::copyToTable()
             QMessageBox::critical(plotter, tr("Add data to table"), tr("No table selected or could not create table!\nCould not add data!"));
             ok=false;
         }
+        int graph=-1;
         if (ok && dlg->getAddGraphs()) {
             if (cols) {
-                int graph=dlg->getGraphID();
+                graph=dlg->getGraphID();
                 QString graphtitle;
                 JKQtBasePlotter* p=plotter->get_plotter();
                 if (dlg->getNewGraph(graphtitle)) {
@@ -83,6 +87,7 @@ void QFPlotterPrivate::copyToTable()
                     JKQTPgraph* g=p->getGraph(j);
                     if (g && g->get_visible()) {
                         QString name=g->get_title();
+
                         JKQTPxyGraph* xyg=dynamic_cast<JKQTPxyGraph*>(g);
                         JKQTPxyLineGraph* xylg=dynamic_cast<JKQTPxyLineGraph*>(g);
                         JKQTPxGraphErrors* xeg=dynamic_cast<JKQTPxGraphErrors*>(g);
@@ -91,13 +96,18 @@ void QFPlotterPrivate::copyToTable()
                         JKQTPColumnMathImage* colig=dynamic_cast<JKQTPColumnMathImage*>(g);
                         JKQTPMathImage* ig=dynamic_cast<JKQTPMathImage*>(g);
                         QFRDRColumnGraphsInterface::ColumnGraphTypes type=QFRDRColumnGraphsInterface::cgtLinesPoints;
+                        QFRDRColumnGraphsInterface::ColumnGraphSymbols symbol=QFRDRColumnGraphsInterface::cgsFilledCircle;
+                        double symbolSize=15.0;
 
                         if (xyg) {
                             QColor color=QColor("red");
                             QColor fillColor=color.lighter();
+                            QColor errorColor=color.darker();
                             if (xylg) {
                                 color=xylg->get_color();
                                 fillColor=xylg->get_fillColor();
+                                symbol=(QFRDRColumnGraphsInterface::ColumnGraphSymbols)xylg->get_symbol();
+                                symbolSize=xylg->get_symbolSize();
                                 if (xylg->get_drawLine() && xylg->get_symbol()!=JKQTPnoSymbol) type=QFRDRColumnGraphsInterface::cgtLinesPoints;
                                 else if (xylg->get_drawLine() && xylg->get_symbol()==JKQTPnoSymbol) type=QFRDRColumnGraphsInterface::cgtLines;
                                 else if (!xylg->get_drawLine() && xylg->get_symbol()!=JKQTPnoSymbol) type=QFRDRColumnGraphsInterface::cgtPoints;
@@ -113,26 +123,31 @@ void QFPlotterPrivate::copyToTable()
 
 
                             if (yeg) {
-                                cols->colgraphAddErrorPlot(graph, xcol, -1,  ycol, columns.value(yeg->get_yErrorColumn(), -1), type, name);
+                                cols->colgraphAddErrorPlot(graph, xcol, -1,  ycol, columns.value(yeg->get_yErrorColumn(), -1), type, name, (QFRDRColumnGraphsInterface::ErrorGraphTypes)yeg->get_errorStyle());
+                                errorColor=yeg->get_errorColor();
                                 //qDebug()<<"addyerrorg "<<yeg->get_yErrorColumn()<<columns.value(yeg->get_yErrorColumn(), -1);
                             } else if (xeg) {
-                                cols->colgraphAddErrorPlot(graph, xcol, columns.value(xeg->get_xErrorColumn(), -1),  ycol, -1, type, name);
+                                cols->colgraphAddErrorPlot(graph, xcol, columns.value(xeg->get_xErrorColumn(), -1),  ycol, -1, type, name, (QFRDRColumnGraphsInterface::ErrorGraphTypes)xeg->get_errorStyle());
+                                errorColor=xeg->get_errorColor();
                                 //qDebug()<<"addxerrorg "<<xeg->get_xErrorColumn()<<columns.value(xeg->get_xErrorColumn(), -1);
                             } else if (xyeg) {
-                                cols->colgraphAddErrorPlot(graph, xcol, columns.value(xyeg->get_xErrorColumn(), -1),  ycol, columns.value(xyeg->get_yErrorColumn(), -1), type, name);
+                                cols->colgraphAddErrorPlot(graph, xcol, columns.value(xyeg->get_xErrorColumn(), -1),  ycol, columns.value(xyeg->get_yErrorColumn(), -1), type, name, (QFRDRColumnGraphsInterface::ErrorGraphTypes)xyeg->get_yErrorStyle());
+                                errorColor=xyeg->get_errorColor();
                                 //qDebug()<<"addxyerrorg "<<xyeg->get_xErrorColumn()<<columns.value(xyeg->get_xErrorColumn(), -1)<<xyeg->get_yErrorColumn()<<columns.value(xyeg->get_yErrorColumn(), -1);
                             } else {
                                 cols->colgraphAddPlot(graph, xcol, ycol, type, name);
                             }
+                            //qDebug()<<"color="<<color<<"   fillColor="<<fillColor;
                             if (color!=QColor("red")) {
-                                if (fillColor!=QColor("red").lighter()) {
-                                    cols->colgraphSetPlotColor(graph, cols->colgraphGetPlotCount(graph)-1, color, fillColor);
-                                } else {
-                                    cols->colgraphSetPlotColor(graph, cols->colgraphGetPlotCount(graph)-1, color);
-                                }
-                            } else if (fillColor!=QColor("red").lighter()) {
-                                cols->colgraphSetPlotColor(graph, cols->colgraphGetPlotCount(graph)-1, color, fillColor);
+                                cols->colgraphSetPlotColor(graph, cols->colgraphGetPlotCount(graph)-1, color);
                             }
+                            if (fillColor!=QColor("red").lighter()) {
+                                cols->colgraphSetPlotFillColor(graph, cols->colgraphGetPlotCount(graph)-1, fillColor);
+                            }
+                            if (errorColor!=QColor("red").darker()) {
+                                cols->colgraphSetPlotErrorColor(graph, cols->colgraphGetPlotCount(graph)-1, errorColor);
+                            }
+                            cols->colgraphSetPlotSymbol(graph, cols->colgraphGetPlotCount(graph)-1, symbol, symbolSize);
 
                         } else if (colig) {
                         }
@@ -141,6 +156,13 @@ void QFPlotterPrivate::copyToTable()
             } else {
                 QMessageBox::critical(plotter, tr("Add graphs to table"), tr("Could not add plots, as this is not supported by the selected table record!"));
                 ok=false;
+            }
+        }
+        if (ok && rdr && dlg->getShowEditor()) {
+            QFRawDataPropertyEditor* editor=QFPluginServices::getInstance()->openRawDataEditor(rdr, false);
+            if (editor) {
+                if (graph>=0) editor->sendEditorCommand("showPlot", graph);
+                editor->showTab(2);
             }
         }
     }
