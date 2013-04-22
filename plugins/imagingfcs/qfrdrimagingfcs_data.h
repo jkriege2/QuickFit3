@@ -240,9 +240,27 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
         double getTauMin() const;
 
-        /*! \brief selects a subpart of a full DV image.
+        /*! \brief selects a subpart of a full DV image for the correlation functions.
+
+            This function performs these tasks:
+              # creates a temporary copy of the correlation data.
+              # reallocates the internal data fields for the correlations with width/2 or height/2 according to DV setting
+              # copies only the data of the selected image half.
+            .
          */
         void splitCFsForDualView();
+        /*! \brief selects a subpart of a full DV image for the videos.
+            This function performs these tasks if in DV-mode:
+              # resort video, so left part is followed by right part if this is FCCS otherwise only the left or right part o the video is contained in the video array.
+              # the width/height is changed accordingly
+              # if in FCCS mode, a pointer to the second channel is stored (video2/videoUncorrected2), never free this pointer, as the complete memory block is
+                alloced in one call !
+              # no data is reallocated!
+            .
+         */
+        void splitVideosForDualView();
+        /** \brief splits a single video */
+        void splitVideo(double* video, double*& video2, int& width, int& height, uint32_t frames);
 
 
     protected:
@@ -328,11 +346,13 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         };
 
         double* video;
+        double* video2;
         int video_width;
         int video_height;
         uint32_t video_frames;
 
         double* videoUncorrected;
+        double* videoUncorrected2;
         int videoUncorrected_width;
         int videoUncorrected_height;
         uint32_t videoUncorrected_frames;

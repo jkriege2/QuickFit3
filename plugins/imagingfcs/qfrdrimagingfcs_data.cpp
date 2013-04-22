@@ -75,11 +75,13 @@ QFRDRImagingFCSData::QFRDRImagingFCSData(QFProject* parent):
     ucStat2.N=0;
 
     video=NULL;
+    video2=NULL;
     video_width=0;
     video_height=0;
     video_frames=0;
     hasStatistics=false;
     videoUncorrected=NULL;
+    videoUncorrected2=NULL;
     videoUncorrected_width=0;
     videoUncorrected_height=0;
     videoUncorrected_frames=0;
@@ -530,6 +532,8 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                 }
             }
         }
+
+        splitVideosForDualView();
 
         if (!hasStatistics && !hasStatistics2 && internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
             for (int i=0; i<files.size(); i++) {
@@ -1875,14 +1879,30 @@ int QFRDRImagingFCSData::getImageStackHeight(int stack) const {
 }
 
 int QFRDRImagingFCSData::getImageStackChannels(int stack) const {
-    if (stack==0) return 1;
-    if (stack==1) return 1;
+    if (isFCCS()) {
+        if (stack==0) return 2;
+        if (stack==1) return 2;
+    } else {
+        if (stack==0) return 1;
+        if (stack==1) return 1;
+    }
     return 0;
 }
 
 double *QFRDRImagingFCSData::getImageStack(int stack, uint32_t frame, uint32_t channel) const {
-    if (stack==0) return &(video[frame*video_width*video_height]);
-    if (stack==1) return &(videoUncorrected[frame*videoUncorrected_width*videoUncorrected_height]);
+    if (isFCCS()) {
+        if (stack==0) {
+            if (channel==0) return &(video[frame*video_width*video_height]);
+            if (channel==1) return &(video2[frame*video_width*video_height]);
+        }
+        if (stack==1) {
+            if (channel==0) return &(videoUncorrected[frame*videoUncorrected_width*videoUncorrected_height]);
+            if (channel==1) return &(videoUncorrected2[frame*videoUncorrected_width*videoUncorrected_height]);
+        }
+    } else {
+        if (stack==0) return &(video[frame*video_width*video_height]);
+        if (stack==1) return &(videoUncorrected[frame*videoUncorrected_width*videoUncorrected_height]);
+    }
     return NULL;
 }
 
@@ -2174,6 +2194,23 @@ void QFRDRImagingFCSData::splitCFsForDualView() {
     free(oldL);
     free(oldTau);
     recalcCorrelations();
+}
+
+void QFRDRImagingFCSData::splitVideosForDualView()
+{
+   splitVideo(video, video2, video_width, video_height, video_frames);
+   splitVideo(videoUncorrected, videoUncorrected2, videoUncorrected_width, videoUncorrected_height, videoUncorrected_frames);
+}
+
+void QFRDRImagingFCSData::splitVideo(double *video, double *&video2, int &width, int &height, uint32_t frames)
+{
+    int oldWidth=width;
+    int oldHeight=height;
+    if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal) {
+
+    } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical) {
+
+    }
 }
 
 
