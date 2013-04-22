@@ -139,6 +139,8 @@ class QFLIB_EXPORT QFPluginServices {
         /** \brief a list of the online help directories of all plugins with metadata.
          */
         virtual QList<HelpDirectoryInfo>* getPluginHelpList()=0;
+        /** \brief returns a list of tooltips for the online-help */
+        virtual QMap<QString, QString> getTooltips() const=0;
 
         /** \brief display the help window and open the given file. If no file is given, des QuickFit main help page is shown. */
         virtual void displayHelpWindow(const QString& helpfile=QString(""))=0;

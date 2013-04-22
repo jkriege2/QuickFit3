@@ -5,12 +5,13 @@
 #include "qfrdrtableinterface.h"
 #include "qfrdrcolumngraphsinterface.h"
 #include "qfrawdatarecord.h"
+#include "libwid_imexport.h"
 
 namespace Ui {
     class QFPlotterCopyToTableDialog;
 }
 
-class QFPlotterCopyToTableDialog : public QDialog
+class QFWIDLIB_EXPORT QFPlotterCopyToTableDialog : public QDialog
 {
         Q_OBJECT
         

@@ -14,7 +14,7 @@ QFEvaluationItemFactory::~QFEvaluationItemFactory()
 }
 
 
-void QFEvaluationItemFactory::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList) {
+void QFEvaluationItemFactory::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QString>& tooltips) {
     QDir pluginsDir = QDir(directory);
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
@@ -53,7 +53,12 @@ void QFEvaluationItemFactory::searchPlugins(QString directory, QList<QFPluginSer
                     info.pluginDLLbasename=QFileInfo(fileName).baseName();
                     info.pluginDLLSuffix=QFileInfo(fileName).suffix();
                     pluginHelpList->append(info);
-                }
+                    QSettings setTooltips(info.directory+"tooltips.ini", QSettings::IniFormat);
+
+                    QStringList keys=setTooltips.childKeys();
+                    for (int i=0; i<keys.size(); i++) {
+                        tooltips[keys[i]]=setTooltips.value(keys[i], tr("<i>no tooltip available</i>")).toString();
+                    }                }
             }
         }
     }

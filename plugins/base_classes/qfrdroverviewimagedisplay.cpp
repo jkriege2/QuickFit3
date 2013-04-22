@@ -116,6 +116,12 @@ void QFRDROverviewImageDisplay::createWidgets() {
     image->get_colorBarRightAxis()->set_labelDigits(2);
     image->get_colorBarRightAxis()->set_minTicks(3);
     pltImage->addGraph(image);
+    imageRGB=new JKQTPRGBMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0, 0, pltImage->get_plotter());
+    imageRGB->get_colorBarRightAxis()->set_labelType(JKQTPCALTdefault);
+    imageRGB->get_colorBarRightAxis()->set_labelDigits(2);
+    imageRGB->get_colorBarRightAxis()->set_minTicks(3);
+    imageRGB->set_visible(false);
+    pltImage->addGraph(imageRGB);
 
     QColor ovlSelCol=QColor("red");
     ovlSelCol.setAlphaF(0.3);
@@ -592,6 +598,7 @@ void QFRDROverviewImageDisplay::rawDataChanged()
 }
 
 void QFRDROverviewImageDisplay::showFrame(int frame) {
+    tabMain->setTabEnabled(1,false);
     pltImage->set_doDrawing(false);
     current->setQFProperty("imfcs_invrimgdisp_playpos", player->getPosition(), false, false);
     pltImage->getDatastore()->clear();
@@ -602,7 +609,17 @@ void QFRDROverviewImageDisplay::showFrame(int frame) {
         int idx=cmbImage->currentIndex()-m->getOverviewImageCount();
         int width=mv->getImageStackWidth(idx);
         int height=mv->getImageStackHeight(idx);
-        image->set_data(mv->getImageStack(idx, frame), width, height, JKQTPMathImageBase::DoubleArray);
+        image->set_data(mv->getImageStack(idx, frame, 0), width, height, JKQTPMathImageBase::DoubleArray);
+        image->set_visible(true);
+        imageRGB->set_visible(false);
+        if (mv->getImageStackChannels(idx)<=1) {
+            imageRGB->set_visible(false);
+            image->set_visible(true);
+        } else {
+            imageRGB->set_data(mv->getImageStack(idx, frame, 1), mv->getImageStack(idx, frame, 0), mv->getImageStack(idx, frame, 2), width, height, JKQTPMathImageBase::DoubleArray);
+            imageRGB->set_visible(true);
+            image->set_visible(false);
+        }
         emit displayedFrame((double)frame*mv->getImageStackTUnitFactor(idx));
 
         if (selected_width!=width || selected_height!=height) {
@@ -635,6 +652,7 @@ void QFRDROverviewImageDisplay::showFrame(int frame) {
 }
 
 void QFRDROverviewImageDisplay::displayImage() {
+    tabMain->setTabEnabled(1,true);
     if (!image) return;
     if (!current) return;
     player->pause();
@@ -662,6 +680,8 @@ void QFRDROverviewImageDisplay::displayImage() {
             image->set_data(m->getOverviewImage(cmbImage->currentIndex()), width, height, JKQTPMathImageBase::DoubleArray);
             image->set_width(width);
             image->set_height(height);
+            image->set_visible(true);
+            imageRGB->set_visible(false);
 
             if (selected_width!=width || selected_height!=height) {
                 selected.clear();
@@ -715,9 +735,18 @@ void QFRDROverviewImageDisplay::displayImage() {
         player->setSingleShot(true);
         player->setVisible(true);
         chkHistVideo->setVisible(true);
-        image->set_data(mv->getImageStack(idx, 0), width, height, JKQTPMathImageBase::DoubleArray);
+        image->set_data(mv->getImageStack(idx, 0, 0), width, height, JKQTPMathImageBase::DoubleArray);
         image->set_width(rwidth);
         image->set_height(rheight);
+        image->set_visible(true);
+        imageRGB->set_visible(false);
+        if (mv->getImageStackChannels(idx)>1) {
+            imageRGB->set_data(mv->getImageStack(idx, 0, 1), mv->getImageStack(idx, 0, 0), mv->getImageStack(idx, 0, 3), width, height, JKQTPMathImageBase::DoubleArray);
+            imageRGB->set_width(rwidth);
+            imageRGB->set_height(rheight);
+            image->set_visible(false);
+            imageRGB->set_visible(true);
+        }
 
         if (selected_width!=width || selected_height!=height) {
             selected.clear();
@@ -741,6 +770,8 @@ void QFRDROverviewImageDisplay::displayImage() {
         //player->play();
     } else  {
         image->set_data(NULL, 0, 0, JKQTPMathImageBase::UInt16Array);
+        image->set_visible(true);
+        imageRGB->set_visible(false);
         showHistograms(NULL, 0);
         histogram->setEnabled(false);
 
@@ -878,7 +909,11 @@ void QFRDROverviewImageDisplay::writeSettings(QSettings &settings, const QString
 
 void QFRDROverviewImageDisplay::mouseMoved(double x, double y) {
     if (image) {
-        labValue->setText(tr("Position: (%1, %2)        Value: %3").arg(x).arg(y).arg(image->getValueAt(x,y)));
+        if (image->get_visible()) {
+            labValue->setText(tr("Position: (%1, %2)        Value: %3").arg(x).arg(y).arg(image->getValueAt(x,y)));
+        } else if (imageRGB->get_visible()){
+            labValue->setText(tr("Position: (%1, %2)        Value: (%3, %4, %5)").arg(x).arg(y).arg(imageRGB->getValueAt(x,y,1)).arg(imageRGB->getValueAt(x,y,0)).arg(imageRGB->getValueAt(x,y,3)));
+        }
     } else {
         labValue->setText("");
     }

@@ -166,6 +166,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual QWidget* getCreateView(const QString& name, const QString& title);
         virtual void clearView(const QString& name);
         virtual void addHistogramToView(const QString& name, const Histogram& histogram);
+        virtual QMap<QString, QString> getTooltips() const;
     protected:
         void closeEvent(QCloseEvent *event);
         virtual void showEvent(QShowEvent* event);
@@ -287,6 +288,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
         QList<QPair<QString, QString> > htmlReplaceList;
         QList<QFPluginServices::HelpDirectoryInfo> pluginHelpList;
+        QMap<QString, QString> tooltips;
 
         QList<QFPluginOptionsDialogInterface*> pluginOptionDialogs;
         QMap<QString, QFHistogramView*> histograms;

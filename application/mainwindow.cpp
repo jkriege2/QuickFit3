@@ -170,6 +170,25 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
             "<tr><td align=\"center\" ><a href=\"#top_page\"><img src=\":/lib/help/help_top.png\"></a>&nbsp;&nbsp;&nbsp;</td><td align=\"left\" >$$local_plugin_icon$$&nbsp;&nbsp;&nbsp;</td><td align=\"right\" width=\"90%\">  <b>$$local_plugin_name$$</b> <i>$$local_plugin_copyright$$</i><br>$$local_plugin_weblink$$<br>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.end"), QString("</td></tr></table></td></tr></table>")));// </div>")));
 
+
+
+    QSettings setTooltips(settings->getMainHelpDirectory()+"tooltips.ini", QSettings::IniFormat);
+
+    QStringList keys=setTooltips.childKeys();
+    for (int i=0; i<keys.size(); i++) {
+        tooltips[keys[i]]=setTooltips.value(keys[i], tr("<i>no tooltip available</i>")).toString();
+    }
+
+    QMapIterator<QString, QString> it(tooltips);
+    while (it.hasNext()) {
+        it.next();
+        if (it.value().startsWith("%")) tooltips[it.key()]=tooltips[it.value().mid(1)];
+    }
+    //qDebug()<<tooltips;
+    helpWindow->setTooltips(tooltips);
+
+
+
     logFileMainWidget->log_text(tr("QuickFit started succesfully!\n"));
 
 
@@ -205,12 +224,12 @@ MainWindow::~MainWindow() {
 
 void MainWindow::searchAndRegisterPlugins() {
     // find plugins
-    rawDataFactory->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
-    evaluationFactory->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
-    fitFunctionManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
-    fitAlgorithmManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
-    importerManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
-    extensionManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList);
+    rawDataFactory->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips);
+    evaluationFactory->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips);
+    fitFunctionManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips);
+    fitAlgorithmManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips);
+    importerManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips);
+    extensionManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips);
 
 
     // distribute application hooks
@@ -2319,6 +2338,10 @@ void MainWindow::openWebpage()
 
 QList<QPair<QString, QString> >* MainWindow::getHTMLReplacementList() {
     return &htmlReplaceList;
+}
+
+QMap<QString, QString> MainWindow::getTooltips() const {
+    return tooltips;
 }
 
 QList<QFPluginServices::HelpDirectoryInfo>* MainWindow::getPluginHelpList() {

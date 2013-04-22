@@ -431,7 +431,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     chkAutorangeOverview=new QCheckBox("auto", wovr);
     chkAutorangeOverview->setChecked(true);
-    gli->addRow(tr("color &range:"), chkAutorangeOverview);
+    gli->addRow(tr("channel 1 &range:"), chkAutorangeOverview);
 
     edtOvrMin=new QFDoubleEdit(wovr);
     edtOvrMin->setCheckBounds(false, false);
@@ -443,6 +443,17 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     coll->addWidget(edtOvrMax,1);
     coll->setContentsMargins(0,0,0,0);
     gli->addRow(QString(""), coll);
+
+    edtOvr2Min=new QFDoubleEdit(wovr);
+    edtOvr2Min->setCheckBounds(false, false);
+    edtOvr2Max=new QFDoubleEdit(wovr);
+    edtOvr2Max->setCheckBounds(false, false);
+    coll=new QHBoxLayout();
+    coll->addWidget(edtOvr2Min,1);
+    coll->addWidget(new QLabel(" ... "));
+    coll->addWidget(edtOvr2Max,1);
+    coll->setContentsMargins(0,0,0,0);
+    gli->addRow(QString("channel 2 range:"), coll);
 
 
 
@@ -1070,7 +1081,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     actImagesDrawPoints->setChecked(true);
     setImageEditMode();
 
-
+    actCopyGroupACFsToTable=new QAction("copy all CFs from group to table", this);
+    connect(actCopyGroupACFsToTable, SIGNAL(triggered()), this, SLOT(copyGroupACFsToTable()));
 
 
 
@@ -1202,6 +1214,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuSelection->addAction(actCopySelection);
     menuSelection->addAction(actPasteSelection);
 
+    menuImagingFCSTools=propertyEditor->addOrFindMenu(tr("ImagingFCS Tools"));
+    menuImagingFCSTools->addAction(actCopyGroupACFsToTable);
 
 }
 
@@ -1247,6 +1261,8 @@ void QFRDRImagingFCSImageEditor::saveImageSettings() {
             if (!chkAutorangeOverview->isChecked()) {
                 current->setQFProperty(QString("imfcs_imed_ovrcolmin_%1").arg(egroup), edtOvrMin->value(), false, false);
                 current->setQFProperty(QString("imfcs_imed_ovrcolmax_%1").arg(egroup), edtOvrMax->value(), false, false);
+                current->setQFProperty(QString("imfcs_imed_ovr2colmin_%1").arg(egroup), edtOvr2Min->value(), false, false);
+                current->setQFProperty(QString("imfcs_imed_ovr2colmax_%1").arg(egroup), edtOvr2Max->value(), false, false);
             }
 
 
@@ -1304,9 +1320,9 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
             if (plteOverview->get_visible()) plteOverview->getDataMinMax(mi, ma);
             else {
                 plteOverview->getDataMinMax(mi, ma);
-                plteOverviewRGB->getDataMinMaxG(mi2,ma2);
-                if (mi2<mi) mi=mi2;
-                if (ma2>ma) ma=ma2;
+                plteOverviewRGB->getDataMinMaxG(mi2,ma2);                
+                //if (mi2<mi) mi=mi2;
+                //if (ma2>ma) ma=ma2;
             }
 
             d=current->getProperty(QString("imfcs_imed_ovrcolorbar_%1").arg(egroup),
@@ -1316,9 +1332,14 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
             chkAutorangeOverview->setChecked(current->getProperty(QString("imfcs_imed_ovrautorange_%1").arg(egroup), true).toBool());
             edtOvrMin->setEnabled(!chkAutorangeOverview->isChecked());
             edtOvrMax->setEnabled(!chkAutorangeOverview->isChecked());
+            edtOvr2Min->setEnabled(!chkAutorangeOverview->isChecked()&&plteOverviewRGB->get_visible());
+            edtOvr2Max->setEnabled(!chkAutorangeOverview->isChecked()&&plteOverviewRGB->get_visible());
+            cmbColorbarOverview->setEnabled(!plteOverviewRGB->get_visible());
             if (!chkAutorangeOverview->isChecked()) {
                 edtOvrMin->setValue(current->getProperty(QString("imfcs_imed_ovrcolmin_%1").arg(egroup), mi).toDouble());
                 edtOvrMax->setValue(current->getProperty(QString("imfcs_imed_ovrcolmax_%1").arg(egroup), ma).toDouble());
+                edtOvr2Min->setValue(current->getProperty(QString("imfcs_imed_ovr2colmin_%1").arg(egroup), mi2).toDouble());
+                edtOvr2Max->setValue(current->getProperty(QString("imfcs_imed_ovr2colmax_%1").arg(egroup), ma2).toDouble());
             }
 
             connectParameterWidgets(true);
@@ -1478,32 +1499,48 @@ void QFRDRImagingFCSImageEditor::ovrPaletteChanged() {
     }
     if (m && m->getImageFromRunsChannels()>1 && m->getImageFromRunsPreview(1)!=NULL && plteOverviewExcludedData!=NULL) {
         statisticsMaskedMinMax(m->getImageFromRunsPreview(1), plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), ovrmi2, ovrma2, false);
-        if (ovrmi2<ovrmi) ovrmi=ovrmi2;
-        if (ovrma2>ovrma) ovrma=ovrma2;
+        //if (ovrmi2<ovrmi) ovrmi=ovrmi2;
+        //if (ovrma2>ovrma) ovrma=ovrma2;
     }
     if (m && chkAutorangeOverview->isChecked() && m->getImageFromRunsPreview()!=NULL && plteOverviewExcludedData!=NULL) {
         plteOverview->set_imageMin(ovrmi);
         plteOverview->set_imageMax(ovrma);
         plteOverviewRGB->set_imageMinG(ovrmi);
         plteOverviewRGB->set_imageMaxG(ovrma);
-        plteOverviewRGB->set_imageMin(ovrmi);
-        plteOverviewRGB->set_imageMax(ovrma);
+        plteOverviewRGB->set_imageMin(ovrmi2);
+        plteOverviewRGB->set_imageMax(ovrma2);
     }
 
     edtOvrMin->setEnabled(!chkAutorangeOverview->isChecked());
     edtOvrMax->setEnabled(!chkAutorangeOverview->isChecked());
+    edtOvr2Min->setEnabled(!chkAutorangeOverview->isChecked()&&plteOverviewRGB->get_visible());
+    edtOvr2Max->setEnabled(!chkAutorangeOverview->isChecked()&&plteOverviewRGB->get_visible());
+    cmbColorbarOverview->setEnabled(!plteOverviewRGB->get_visible());
     if (chkAutorangeOverview->isChecked()) {
         double mi=ovrmi, ma=ovrma;
-        if (ovrmi==ovrma) plteOverview->getDataMinMax(mi, ma);
+        if (plteOverview->get_visible()) {
+            if (ovrmi==ovrma) plteOverview->getDataMinMax(mi, ma);
+        } else {
+            if (ovrmi==ovrma) plteOverviewRGB->getDataMinMaxG(mi, ma);
+        }
 
         //qDebug()<<"ovrPaletteChanged: "<<oldDoDraw<<"   range: "<<mi<<"..."<<ma;
         edtOvrMin->setValue(mi);
         edtOvrMax->setValue(ma);
+
+
+        mi=ovrmi2;
+        ma=ovrma2;
+        if (ovrmi2==ovrma2 && plteOverviewRGB->get_visible()) plteOverviewRGB->getDataMinMaxG(mi, ma);
+
+        //qDebug()<<"ovrPaletteChanged: "<<oldDoDraw<<"   range: "<<mi<<"..."<<ma;
+        edtOvr2Min->setValue(mi);
+        edtOvr2Max->setValue(ma);
     }
     plteOverview->set_imageMin(edtOvrMin->value());
     plteOverview->set_imageMax(edtOvrMax->value());
-    plteOverviewRGB->set_imageMinG(edtOvrMin->value());
-    plteOverviewRGB->set_imageMaxG(edtOvrMax->value());
+    plteOverviewRGB->set_imageMinG(edtOvr2Min->value());
+    plteOverviewRGB->set_imageMaxG(edtOvr2Max->value());
     plteOverviewRGB->set_imageMin(edtOvrMin->value());
     plteOverviewRGB->set_imageMax(edtOvrMax->value());
     saveImageSettings();
@@ -3540,6 +3577,8 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
             connect(chkAutorangeOverview, SIGNAL(toggled(bool)), this, SLOT(ovrPaletteChanged()));
             connect(edtOvrMin, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
             connect(edtOvrMax, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
+            connect(edtOvr2Min, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
+            connect(edtOvr2Max, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
 
 
 
@@ -3571,6 +3610,8 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
         disconnect(chkAutorangeOverview, SIGNAL(toggled(bool)), this, SLOT(ovrPaletteChanged()));
         disconnect(edtOvrMin, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
         disconnect(edtOvrMax, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
+        disconnect(edtOvr2Min, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
+        disconnect(edtOvr2Max, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
 
 
         histogram->connectParameterWidgets(connectTo);
@@ -4440,6 +4481,7 @@ void QFRDRImagingFCSImageEditor::copyMaskToAll() {
     }
 }
 
+
 void QFRDRImagingFCSImageEditor::copyToMatlab() {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 
@@ -5135,5 +5177,133 @@ void QFRDRImagingFCSImageEditor::invertMask() {
         m->recalcCorrelations();
     }
     rawDataChanged();
+}
+
+
+void QFRDRImagingFCSImageEditor::copyGroupACFsToTable() {
+    QList<QFRawDataRecord*> recs=current->getProject()->getRDRGroupMembers(current->getGroup());
+    QFRDRImagingFCSData* cm=qobject_cast<QFRDRImagingFCSData*>(current);
+    QList<int> sel=cm->maskToIndexList();
+    if (recs.size()>0) {
+        for (int i=recs.size()-1; i>=0; i--) {
+            bool use=false;
+            if (recs[i]->getType()==current->getType()) {
+                QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(recs[i]);
+                if (m) use=true;
+            }
+            if (!use) recs.removeAt(i);
+        }
+    }
+    if (recs.size()>0) {
+        QFPlotterCopyToTableDialog* dlg=new QFPlotterCopyToTableDialog(plotter);
+        //dlg->setDescription(tr("Select a table record into which to write the plot data."));
+        if (dlg->exec()) {
+            QString tabname="";
+            QFRDRTableInterface* tab=dlg->getTable();
+            QFRDRColumnGraphsInterface* cols=dlg->getGraph();
+            QFRawDataRecord* rdr=dlg->getRDR();
+            if (dlg->getNewTable(tabname)) {
+                if (tabname.isEmpty()) tabname=tr("NEW_TABLE");
+                rdr=QFPluginServices::getInstance()->getCurrentProject()->addRawData("table", tabname, "");
+                tab=dynamic_cast<QFRDRTableInterface*>(rdr);
+                cols=dynamic_cast<QFRDRColumnGraphsInterface*>(rdr);
+                if (rdr) {
+                    rdr->setFolder(current->getFolder());
+                    rdr->setGroup(current->getGroup());
+                }
+            }
+            int graph=-1;
+            if (cols && dlg->getAddGraphs()) {
+
+                graph=dlg->getGraphID();
+                QString graphtitle;
+                if (dlg->getNewGraph(graphtitle)) {
+                    if (graphtitle.isEmpty()) {
+                        graphtitle=tr("new graph");
+                    }
+                    graph=cols->colgraphGetGraphCount();
+                    cols->colgraphAddGraph(graphtitle, tr("lag time \\tau [s]"), tr("correlation function g(\\tau)"), true, false);
+                }
+            }
+
+            double ymin=0;
+            double ymax=0;
+            double xmin=0, xmax=0;
+            for (int i=0; i<recs.size(); i++) {
+                QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(recs[i]);
+                QString name=m->getRole();
+                if (name.isEmpty()) name=m->getName();
+
+                QList<QVariant> tau, cf, cstd;
+                double* t=m->getCorrelationT();
+                double* c=m->getCorrelation();
+
+                for (int n=0; n<m->getCorrelationN(); n++) {
+                    tau<<t[n];
+                    if (sel.size()<=0) {
+                        cf<<(m->getCorrelationMean())[n];
+                        cstd<<(m->getCorrelationStdDev())[n];
+                    } else {
+                        QVector<double> dat;
+                        for (int s=0; s<sel.size(); s++) {
+                            dat<<c[sel[s]];
+                        }
+                        double v=0;
+                        cf<<qfstatisticsAverageVariance(v, dat);
+                        cstd<<sqrt(v);
+                    }
+                    if (i==0 && n==0) {
+                        ymin=cf.last().toDouble()-cstd.last().toDouble();
+                        ymax=cf.last().toDouble()+cstd.last().toDouble();
+                    } else {
+                        if (ymin>cf.last().toDouble()-cstd.last().toDouble()) ymin=cf.last().toDouble()-cstd.last().toDouble();
+                        if (ymax<cf.last().toDouble()+cstd.last().toDouble()) ymax=cf.last().toDouble()+cstd.last().toDouble();
+                    }
+                }
+                if (i==0) {
+                    xmin=tau.first().toDouble();
+                    xmax=tau.last().toDouble();
+                } else {
+                    if (tau.first().toDouble()<xmin) xmin=tau.first().toDouble();
+                    if (tau.last().toDouble()<xmax) xmax=tau.last().toDouble();
+                }
+                int ctau=0;
+                if (tab) {
+                    int c=tab->tableGetColumnCount();
+                    ctau=c;
+                    tab->tableSetColumnTitle(c, name+tr(" - tau [s]"));
+                    tab->tableSetColumnData(c, tau);
+                    c++;
+                    tab->tableSetColumnTitle(c, name+tr(" - CF"));
+                    tab->tableSetColumnData(c, cf);
+                    c++;
+                    tab->tableSetColumnTitle(c, name+tr(" - Error"));
+                    tab->tableSetColumnData(c, cstd);
+                    c++;
+                }
+                if (cols && dlg->getAddGraphs()) {
+                    QColor color=QColor("green");
+                    if (i==1) color=QColor("red");
+                    if (i==2) color=QColor("blue");
+                    if (i==3) color=QColor("darkcyan");
+                    if (i==4) color=QColor("orange");
+                    if (i==5) color=QColor("magenta");
+
+                    int plot=cols->colgraphGetPlotCount(graph);
+                    cols->colgraphAddErrorPlot(graph, ctau, -1, ctau+1, ctau+2, QFRDRColumnGraphsInterface::cgtLines, name, QFRDRColumnGraphsInterface::egtPolygons);
+                    QColor colf=color.lighter();
+                    colf.setAlphaF(0.5);
+                    QColor cole=color.darker();
+                    cole.setAlphaF(0.5);
+                    cols->colgraphSetPlotColor(graph, plot, color, colf, cole);
+                }
+
+            }
+            if (cols && dlg->getAddGraphs()) {
+                cols->colgraphsetXRange(graph, xmin, xmax);
+                cols->colgraphsetYRange(graph, ymin, ymax);
+            }
+        }
+    }
 }
 

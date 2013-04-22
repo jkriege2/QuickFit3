@@ -159,6 +159,7 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
     dataT=NULL;
     ui->pltIntensity->get_plotter()->clearOverlayElement(true);
     avgIndicator=new JKQTPoverlayVerticalLine(0, ui->pltIntensity->get_plotter());
+    ui->pltIntensity->get_plotter()->addOverlayElement(avgIndicator);
     if (!current || !m) {
         ds->clear();
         ui->pltIntensity->set_doDrawing(false);
@@ -179,7 +180,7 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
         JKQTPdatastore* ds=ui->pltIntensity->get_plotter()->getDatastore();
         ds->clear();
         ui->pltIntensity->set_doDrawing(false);
-        double duration=m->getProperty("MEASUREMENT_DURATION_MS", 0).toDouble()/1000.0;
+        double duration=m->getMeasurementDuration();
         double exposure=m->getProperty("FRAMETIME_MS", 0).toDouble();
         int segments=m->getSegmentCount();
         int sumframes=m->getProperty("VIDEO_AVGFRAMES", 0).toInt();

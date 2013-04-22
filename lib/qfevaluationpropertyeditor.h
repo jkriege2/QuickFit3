@@ -107,6 +107,9 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         void setMenuBarVisible(bool visible);
         /** \brief add a new menu to te menubar that is visible for the specified editor only, if editor>=0 or always, if editor<0 */
         QMenu* addMenu(const QString &title, int editor=-1);
+        /** \brief add a new menu (if it does not yet exist) to te menubar that is visible for the specified editor only, if editor>=0 or always, if editor<0 */
+        QMenu* addOrFindMenu(const QString &title, int editor=-1);
+
         /** \brief tells the editor to switch the visibility of the specified menu according to the set editor (see addMenu() ), but does not add the menu to the main menu bar */
         void registerMenu(QMenu* menu, int editor=-1);
         /** \brief returns a pointer to the help menu of this editor */

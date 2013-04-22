@@ -79,6 +79,8 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         int getSegmentCount() const;
         /** \brief returns the length of a segment in seconds */
         double getSegmentDuration() const;
+        /** \brief returns the length of the whole measurement in seconds */
+        double getMeasurementDuration() const;
         /** \brief returns \c true, if the specified segment is used in the per-pixel-avg. */
         bool segmentUsed(int segment) const;
         /** \brief returns \c true if all segments are used (non excluded) */
@@ -256,6 +258,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
               # if in FCCS mode, a pointer to the second channel is stored (video2/videoUncorrected2), never free this pointer, as the complete memory block is
                 alloced in one call !
               # no data is reallocated!
+              # one temporary internal copy of the data is created
             .
          */
         void splitVideosForDualView();

@@ -32,7 +32,9 @@
 #include <QToolBar>
 #include "jkverticalscrollarea.h"
 #include "qfcorrelationmasktools.h"
-
+#include "qfrdrtableinterface.h"
+#include "qfrdrcolumngraphsinterface.h"
+#include "qfplottercopytotabledialog.h"
 /*! \brief editor for FCS fit parameter images, created from QFRDRImagingFCSData
     \ingroup qf3rdrdp_imaging_fcs
 
@@ -227,6 +229,8 @@ protected:
         void copyFitResultStatistics();
         void copyMaskToAll();
 
+        void copyGroupACFsToTable();
+
     protected:
         /** \brief map with all available fit functions */
         QMap<QString, QFFitFunction*> m_fitFunctions;
@@ -343,6 +347,8 @@ protected:
         QCheckBox* chkAutorangeOverview;
         QFDoubleEdit* edtOvrMin;
         QFDoubleEdit* edtOvrMax;
+        QFDoubleEdit* edtOvr2Min;
+        QFDoubleEdit* edtOvr2Max;
 
         /** \brief combobox for the color bar of gof image */
         QComboBox* cmbColorbarGof;
@@ -568,9 +574,12 @@ protected:
         /** \brief action to copy image data to Matlab */
         QAction* actCopyDataAsColumns;
 
+        QAction* actCopyGroupACFsToTable;
+
         QMenu* menuData;
         QMenu* menuMask;
         QMenu* menuSelection;
+        QMenu* menuImagingFCSTools;
 
         QFCorrelationMaskTools* correlationMaskTools;
 };

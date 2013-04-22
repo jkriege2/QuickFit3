@@ -27,6 +27,7 @@ class QFRDRImageMaskTools : public QFRDRImageMaskInterface {
         virtual long maskGetCount() const;
         virtual void maskSetIdx(uint16_t idx, bool value=true);
         virtual bool maskGetIdx(uint16_t idx) const;
+        virtual QList<int> maskToIndexList();
     protected:
         virtual void maskInit(uint16_t w, uint16_t h);
         virtual void maskDelete();

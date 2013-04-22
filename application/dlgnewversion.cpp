@@ -14,7 +14,7 @@ DlgNewVersion::DlgNewVersion(QWidget *parent) :
                             "@misc{quickfit3,<br>\n"
                             "&nbsp;&nbsp;author={Jan Wolfgang Krieger and Jörg Langowski},<br>\n"
                             "&nbsp;&nbsp;title={QuickFit %1 (compiled: %2, SVN: %3): A data evaluation application for biophysics},<br>\n"
-                            "&nbsp;&nbsp;howpublished={[web page] \verb+%4+},<br>\n"
+                            "&nbsp;&nbsp;howpublished={[web page] \\verb+%4+},<br>\n"
                             "&nbsp;&nbsp;year={%2},<br>\n"
                             "&nbsp;&nbsp;note={[Accessed on %5]},<br>\n"
                             "}</code>").arg(qfInfoVersionFull()).arg(qfInfoCompileDate()).arg(qfInfoSVNVersion()).arg(qfInfoWeblink()).arg(QDate::currentDate().toString("yyyy-MM-dd")));

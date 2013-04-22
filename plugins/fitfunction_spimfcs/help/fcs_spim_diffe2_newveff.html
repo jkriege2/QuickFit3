@@ -2,18 +2,19 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>SPIM-FCS fit model diffusion, 1/e²-radii</title>
+		<title>SPIM-FCS fit model diffusion, 1/e²-radii, new V<sub>eff</sub></title>
 	</head>
 	<body>
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-		<h2>SPIM-FCS fit model diffusion, 1/e²-radii</h2>
+		<h2>SPIM-FCS fit model diffusion, 1/e²-radii, new V<sub>eff</sub></h2>
 		<p>This function implements a 1-component pure-diffusion model for data acquired with a camera in SPIM illumination mode. The model was taken from:
 		<blockquote>
-		  Wohland T, Shi X, Sankaran J, Stelzer EH (2010): <b>Single plane illumination fluorescence correlation spectroscopy (SPIM-FCS) probes inhomogeneous three-dimensional environments</b>, <i>Optics Express</i> <b>18</b>(10): 10627-10641, doi: 10.1364/OE.18.010627.
+		  A. Pratap Singh, JW. Krieger, J. Buchholz, E. Charbon, J. Langowski, T. Wohland (2013): <b>The performance of 2D array detectors for light sheet based fluorescence correlation spectroscopy</b>, <i>Optics Express</i> <b>21</b>(7): 8652ff, doi: 10.1364/OE.21.008652.
 		</blockquote>
 		The fit function is defined as:
 		<!--<blockquote><img src="./pic/form_387.png"></blockquote>-->
-                                                      $$bmath:g(\tau)=G_\infty+\frac{(I-B)^2}{I^2}\cdot\frac{1}{N}\cdot\frac{1}{4a^2\cdot\sqrt{\pi}}\cdot\sum_{i=1}^3\rho_i\cdot\left[a\cdot\sqrt{\pi}\cdot\mbox{erf}\left(\frac{a}{2\cdot\sqrt{D_i\tau+w_{xy}^2}}\right)+\frac{4\cdot\sqrt{D_i\tau+w_{xy}^2}}{\sqrt{\pi}}\cdot\left[\exp\left(-\frac{a^2}{4\cdot(D_i\tau+w_{xy}^2)}\right)-1\right]\right]^2\cdot\left[1+\frac{D_i\tau}{w_z^2}\right]^{-1/2}$$
+        $$bmath:g(\tau)=G_\infty+\frac{1}{N/V_{\text{eff}}}\cdot\frac{1}{\sqrt{\pi}\cdot w_za^2}\cdot\sum_{i=1}^3\rho_i\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{4D_i\tau+w_{xy}^2}}\right)+\sqrt{4D_i\tau+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{4D_i\tau+w_{xy}^2}\right)-1\right]\right]^2\cdot\left[1+\frac{4D_i\tau}{w_z^2}\right]^{-1/2}$$
+		$$bmath:V_{\text{eff}}=\frac{\sqrt{\pi}\cdot a^2w_z}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
 		The parameters are:
 		<blockquote><table border=1>
 		  <tr><th>var.</th><th>Parameter</th></tr>
@@ -31,11 +32,6 @@
 		<blockquote> <i>&rho;<sub>1</sub> = 1 - &rho;<sub>2</sub></i> - &rho;<sub>3</sub><br></i>
 		             <i>&Delta;&rho;<sub>1</sub> = &radic;<span style="border-top: 1px solid black">(&Delta;&rho;<sub>2</sub><sup>2</sup> + &Delta;&rho;<sub>3</sub><sup>2</sup>)</span></i>
 		</blockquote>
-		</p>
-		<p>The focal volume is calculated as:
-		<blockquote><img src="./pic/form_388.png"><br><img src="./pic/form_389.png"></blockquote>
-		and the concentration therefore is:
-		<blockquote><img src="./pic/form_390.png"><br><img src="./pic/form_391.png"></blockquote>
 		</p>
 	</body>
 </html>

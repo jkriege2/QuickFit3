@@ -1,6 +1,6 @@
 #ifndef QFHTMLHelpWindow_H
 #define QFHTMLHelpWindow_H
-
+#include <QToolTip>
 #include <QDir>
 #include <QShortcut>
 #include <QListWidget>
@@ -59,6 +59,8 @@ class QFHTMLHelpWindow : public QWidget {
 
         /** \brief set a pointer to an external (global) replacement list */
         void setHtmlReplacementList(QList<QPair<QString, QString> >* list);
+        /** \brief set a pointer to an external (global) replacement list */
+        void setTooltips(const QMap<QString, QString>& list);
 
         /** \brief init with a list of plugin help directories */
         void setPluginDirList(QList<QFPluginServices::HelpDirectoryInfo>* pluginList);
@@ -86,6 +88,8 @@ class QFHTMLHelpWindow : public QWidget {
 
         void helpOnHelp();
     private:
+        QMap<QString, QString> tooltips;
+
         QList<QPair<QString, QString> >* replaces;
 
         QList<QFPluginServices::HelpDirectoryInfo>* pluginList;

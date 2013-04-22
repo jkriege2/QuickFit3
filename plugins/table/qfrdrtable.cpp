@@ -442,8 +442,11 @@ void QFRDRTable::colgraphSetPlotColor(int graph, int plot, QColor color, QColor 
         QFRDRTable::PlotInfo plt=getPlot(graph);
         if (plot>=0 && plot<plt.graphs.size()) {
             plt.graphs[plot].color=color;
+            plt.graphs[plot].colorTransparent=color.alphaF();
             plt.graphs[plot].errorColor=plt.graphs[plot].color.darker();
+            plt.graphs[plot].errorColorTransparent=plt.graphs[plot].errorColor.alphaF();
             plt.graphs[plot].fillColor=fillColor;
+            plt.graphs[plot].fillColorTransparent=plt.graphs[plot].fillColor.alphaF();
         }
         setPlot(graph, plt);
         emitRebuildPlotWidgets();
@@ -456,8 +459,11 @@ void QFRDRTable::colgraphSetPlotColor(int graph, int plot, QColor color, QColor 
         QFRDRTable::PlotInfo plt=getPlot(graph);
         if (plot>=0 && plot<plt.graphs.size()) {
             plt.graphs[plot].color=color;
+            plt.graphs[plot].colorTransparent=color.alphaF();
             plt.graphs[plot].errorColor=errorColor;
+            plt.graphs[plot].errorColorTransparent=plt.graphs[plot].errorColor.alphaF();
             plt.graphs[plot].fillColor=fillColor;
+            plt.graphs[plot].fillColorTransparent=plt.graphs[plot].fillColor.alphaF();
         }
         setPlot(graph, plt);
         emitRebuildPlotWidgets();

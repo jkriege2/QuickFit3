@@ -44,6 +44,8 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     p.setColor(QPalette::Inactive, QPalette::Highlight, p.color(QPalette::Active,  QPalette::Highlight));
     p.setColor(QPalette::Inactive, QPalette::HighlightedText, p.color(QPalette::Active,  QPalette::HighlightedText));
     descriptionBrowser->setPalette(p);
+    descriptionBrowser->setOpenLinks(false);
+    descriptionBrowser->setOpenExternalLinks(false);
     connect(descriptionBrowser, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(anchorClicked(const QUrl&)));
 
 
@@ -310,8 +312,10 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
 
     if ((scheme!="http") && (scheme!="https") && (scheme!="ftp") && (scheme!="ftps") && (scheme!="mailto") && (scheme!="sftp") && (scheme!="svn") && (scheme!="ssh") /*&& QFile::exists(QFileInfo(s).absoluteFilePath())*/) {
 
-        if ((scheme!="pop") || (scheme!="popup") || (scheme!="tool")||(scheme!="tip")){
-
+        if ((scheme=="pop") || (scheme=="popup") || (scheme=="tooltip") || (scheme=="tool")||(scheme=="tip")){
+            QString tooltip=link.toString(QUrl::RemoveScheme);
+            //qDebug()<<"show tooltip: "<<tooltip<<tooltips.value(tooltip);
+            QToolTip::showText(descriptionBrowser->mapFromGlobal(QCursor::pos()), tooltips.value(tooltip, tr("<i>no tooltip available</i>")), descriptionBrowser, QRect());
         } else {
             QDir spd(searchPath);
             QString filename=link.toString(QUrl::RemoveFragment);
@@ -987,6 +991,32 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
             pos += rxImages.matchedLength()+(news.size()-old.size());
         }
 
+        // insert tooltips: search all occurences of the tooltip keywords that are not inside a tag (i.e. surrounded by a closing tag on
+        // the left and an opening tag on the right) and where the tag is not something special (like headers or links).
+        QMapIterator<QString, QString> itTT(tooltips);
+        while (itTT.hasNext()) {
+            itTT.next();
+            QRegExp rxTT(QString("\\<\\s*(\\w\\w*)[^\\>]*\\>[^\\<\\>]*(%1)[^\\<\\>]*\\<").arg(itTT.key()));
+            rxTT.setMinimal(true);
+            pos = 0;
+            //qDebug()<<rxTT;
+            while ((pos = rxTT.indexIn(result, pos)) != -1) {
+                QString rep=QString("<a href=\"tooltip:%1\">%2</a>").arg(itTT.key()).arg(rxTT.cap(2));
+                //qDebug()<<pos<<": "<<rxTT.cap(1)<<" ("<<rxTT.pos(1)<<")";
+                //qDebug()<<pos<<": "<<rxTT.cap(2)<<" ("<<rxTT.pos(2)<<")  <==  "<<rep;
+                QString tag=rxTT.cap(1).toLower();
+                if (tag!="h1" && tag!="h2" && tag!="h3" && tag!="h4" && tag!="h5" && tag!="title" && tag!="a") {
+                    result=result.replace(rxTT.pos(2), rxTT.cap(2).size(), rep);
+                    pos += rep.size();
+                } else {
+                    pos += rxTT.matchedLength();
+                }
+            }
+
+        }
+        //qDebug()<<result;
+
+
     }
     //qDebug()<<result;
     return result;
@@ -997,6 +1027,11 @@ void QFHTMLHelpWindow::setHtmlReplacementList(QList<QPair<QString, QString> >* l
     replaces=list;
 }
 
+void QFHTMLHelpWindow::setTooltips(const QMap<QString, QString> &list)
+{
+    tooltips=list;
+}
+
 void QFHTMLHelpWindow::setPluginDirList(QList<QFPluginServices::HelpDirectoryInfo>* pluginList) {
     this->pluginList=pluginList;
 }
@@ -1005,6 +1040,7 @@ void QFHTMLHelpWindow::initFromPluginServices(QFPluginServices* services) {
     m_pluginServices=services;
     setHtmlReplacementList(services->getHTMLReplacementList());
     setPluginDirList(services->getPluginHelpList());
+    setTooltips(services->getTooltips());
 }
 
 void QFHTMLHelpWindow::setContentsMenuActions(const QList<QAction *> &items)

@@ -78,6 +78,14 @@ QMenu *QFRawDataPropertyEditor::addMenu(const QString& title, int editor)
     return m;
 }
 
+QMenu *QFRawDataPropertyEditor::addOrFindMenu(const QString &title, int editor)
+{
+    for (int i=0; i<p->menus.size(); i++)  {
+        if ((p->menus[i].first==editor || p->menus[i].first<0) && p->menus[i].second && p->menus[i].second->title()==title) return p->menus[i].second;
+    }
+    return addMenu(title, editor);
+}
+
 void QFRawDataPropertyEditor::registerMenu(QMenu *menu, int editor) {
     p->menus.append(qMakePair(editor, menu));
     p->currentTabChanged(p->tabMain->currentIndex());

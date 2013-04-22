@@ -1048,6 +1048,14 @@ QMenu *QFEvaluationPropertyEditor::addMenu(const QString &title, int editor)
     return m;
 }
 
+QMenu *QFEvaluationPropertyEditor::addOrFindMenu(const QString &title, int editor)
+{
+    for (int i=0; i<menus.size(); i++)  {
+        if ((menus[i].first==editor || menus[i].first<0) && menus[i].second && menus[i].second->title()==title) return menus[i].second;
+    }
+    return addMenu(title, editor);
+}
+
 void QFEvaluationPropertyEditor::registerMenu(QMenu *menu, int editor)
 {
     menus.append(qMakePair(editor, menu));

@@ -212,4 +212,14 @@ bool QFRDRImageMaskTools::maskGetIdx(uint16_t idx) const
     return false;
 }
 
+QList<int> QFRDRImageMaskTools::maskToIndexList()
+{
+    QList<int> lst;
+    for (uint32_t i=0; i<mask_w*mask_h; i++) {
+        if (mask[i]) lst<<i;
+    }
+
+    return lst;
+}
+
 

@@ -52,7 +52,7 @@ QFRDRImagingFCSDataEditorCountrate::~QFRDRImagingFCSDataEditorCountrate()
 
 void QFRDRImagingFCSDataEditorCountrate::createWidgets() {
     imFCSTools=new QFRDRImagingFCSEditTools(this);
-    menuImagingFCSTools=propertyEditor->addMenu(tr("ImagingFCS Tools"));
+    menuImagingFCSTools=propertyEditor->addOrFindMenu(tr("ImagingFCS Tools"));
     imFCSTools->registerToMenu(menuImagingFCSTools);
 
     int row=0;
@@ -368,7 +368,8 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
     int vidW=m->getImageStackWidth(cmbVideo->currentIndex());
     int vidH=m->getImageStackHeight(cmbVideo->currentIndex());
     int frames=m->getImageStackFrames(cmbVideo->currentIndex());
-    double duration=m->getProperty("MEASUREMENT_DURATION_MS", 0).toDouble()/1000.0;
+    int channels=m->getImageStackChannels(cmbVideo->currentIndex());
+    double duration=m->getMeasurementDuration();
     double exposure=m->getProperty("FRAMETIME_MS", 0).toDouble();
     int segments=m->getProperty("SEGMENTS", 0).toInt();
     int sumframes=m->getProperty("VIDEO_AVGFRAMES", 0).toInt();
@@ -423,6 +424,7 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
         bool runLine=cmbRunStyle->getDrawLine();
         JKQTPgraphSymbols runSymbol=cmbRunStyle->getSymbol();
 
+        //qDebug()<<frames<<m->getImageStackTUnitFactor(cmbVideo->currentIndex());
         size_t c_tau=ds->addLinearColumn(frames, 0, frames*m->getImageStackTUnitFactor(cmbVideo->currentIndex()), tr("time [%1]").arg(m->getImageStackTUnitName(cmbVideo->currentIndex())));
 
         plotter->get_xAxis()->set_axisLabel(tr("time $t$ [%1]").arg(m->getImageStackTUnitName(cmbVideo->currentIndex())));
@@ -438,79 +440,96 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
         double cc=0;
         for (int i=0; i<m->getCorrelationRuns(); i++) {
             if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
-                double* d=m->getImageStack(cmbVideo->currentIndex(),0,0);
-                size_t c_run=ds->addCopiedColumn(&(d[i]),frames, vidW*vidH, QString("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
-                size_t c_rune=-1;
-                JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
-                g->set_lineWidth(1);
-                g->set_xColumn(c_tau);
-                g->set_yColumn(c_run);
-                g->set_drawLine(runLine);
-                g->set_symbol(runSymbol);
-                g->set_title(tr("run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
-                QColor c;
-                c.setHsvF(cc/cnt,1.0,1.0);
-                g->set_color(c);
+                for (int c=0; c<channels; c++) {
+                    double* d=m->getImageStack(cmbVideo->currentIndex(),0, c);
+                    size_t c_run=ds->addCopiedColumn(&(d[i]),frames, vidW*vidH, QString("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
+                    size_t c_rune=-1;
+                    JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
+                    g->set_lineWidth(1);
+                    g->set_xColumn(c_tau);
+                    g->set_yColumn(c_run);
+                    g->set_drawLine(runLine);
+                    g->set_symbol(runSymbol);
+                    g->set_title(tr("run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
+                    QColor col;
+                    if (cnt>1) {
+                        col.setHsvF(cc/cnt,1.0,1.0);
+                        if (c%3==0) g->set_color(col);
+                        else g->set_color(col.darker(150));
+                        if (c%3==1) g->set_style(Qt::DashLine);
+                        if (c%3==2) g->set_style(Qt::DashDotLine);
+                    } else  {
+                        col=QColor("green");
+                        if (c==1) col=QColor("red");
+                        if (c==2) col=QColor("blue");
+                        if (c==3) col=QColor("magenta");
+                        g->set_color(col);
+                        g->set_style(Qt::SolidLine);
+                    }
 
-                g->set_yErrorColumn(c_rune);
-                g->set_yErrorStyle(runerrorstyle);
-                g->set_xErrorStyle(JKQTPnoError);
-                QColor errc=g->get_color().lighter();
-                g->set_errorColor(errc);
-                errc.setAlphaF(0.5);
-                g->set_errorFillColor(errc);
-                g->set_symbolSize(5);
-                g->set_errorWidth(1);
-
-                plotter->addGraph(g);
 
 
-                if (cmbVideo->currentText().contains("uncorrected")) {
-                    double background=m->getProperty("BASELINE", 0).toDouble();
-                    double bleachTime=0;
-                    double bleachAmplitude=0;
-                    for (int id=0; id<m->getOverviewImageCount(); id++) {
-                        QString ft=m->getOverviewImageID(id);
-                        QString name=m->getOverviewImageName(id);
-                        double* d=m->getOverviewImage(id);
-                        //qDebug()<<"ft="<<ft<<"   name="<<name<<"   d="<<d<<"        "<<m->getOverviewImageHeight(id)<<" x "<<m->getOverviewImageWidth(id);
-                        if (d && m->getOverviewImageHeight(id)==vidH && m->getOverviewImageWidth(id)==vidW) {
-                            if (ft=="background") background=d[i];
-                            if (ft=="display_image") {
-                                if (name.toLower().contains(tr("bleach amplitude"))) {
-                                    bleachAmplitude=d[i];
-                                } else if (name.toLower().contains(tr("bleach time file"))) {
-                                    bleachTime=d[i];
+                    g->set_yErrorColumn(c_rune);
+                    g->set_yErrorStyle(runerrorstyle);
+                    g->set_xErrorStyle(JKQTPnoError);
+                    QColor errc=g->get_color().lighter();
+                    g->set_errorColor(errc);
+                    errc.setAlphaF(0.5);
+                    g->set_errorFillColor(errc);
+                    g->set_symbolSize(5);
+                    g->set_errorWidth(1);
+
+                    plotter->addGraph(g);
+
+
+                    if (cmbVideo->currentText().toLower().contains("uncorrected") || cmbVideo->currentText().toLower().contains("uncorr")) {
+                        double background=m->getProperty("BASELINE", 0).toDouble();
+                        double bleachTime=0;
+                        double bleachAmplitude=0;
+                        for (int id=0; id<m->getOverviewImageCount(); id++) {
+                            QString ft=m->getOverviewImageID(id);
+                            QString name=m->getOverviewImageName(id);
+                            double* d=m->getOverviewImage(id);
+                            //qDebug()<<"ft="<<ft<<"   name="<<name<<"   d="<<d<<"        "<<m->getOverviewImageHeight(id)<<" x "<<m->getOverviewImageWidth(id);
+                            if (d && m->getOverviewImageHeight(id)==vidH && m->getOverviewImageWidth(id)==vidW) {
+                                if (ft=="background" || ft=="background frame") background=d[i];
+                                if (ft=="display_image") {
+                                    if (name.toLower().contains(tr("bleach amplitude"))) {
+                                        bleachAmplitude=d[i];
+                                    } else if (name.toLower().contains(tr("bleach time file"))) {
+                                        bleachTime=d[i];
+                                    }
                                 }
                             }
                         }
-                    }
-                    //qDebug()<<"background="<<background<<"   bleachAmplitude="<<bleachAmplitude<<"   bleachTime="<<bleachTime;
-                    if (background!=0 || bleachTime!=0 || bleachAmplitude!=0) {
-                        double* d=(double*)malloc(frames*sizeof(double));
-                        double timeFactor=1.0/double(frames)*m->getProperty("FRAME_COUNT", 0).toDouble();
-                        for (int tt=0; tt<frames; tt++) {
-                            double time=double(tt)*timeFactor;
-                            d[tt]=background+bleachAmplitude*exp(-time/bleachTime);
+                        //qDebug()<<"background="<<background<<"   bleachAmplitude="<<bleachAmplitude<<"   bleachTime="<<bleachTime;
+                        if (background!=0 || bleachTime!=0 || bleachAmplitude!=0) {
+                            double* d=(double*)malloc(frames*sizeof(double));
+                            double timeFactor=m->getMeasurementDuration()/double(frames);
+                            for (int tt=0; tt<frames; tt++) {
+                                double time=double(tt)*timeFactor;
+                                d[tt]=background+bleachAmplitude*exp(-time/bleachTime);
+                            }
+                            size_t c_bleach=ds->addColumn(d, frames, tr("bleach correction fit"));
+                            JKQTPxyLineGraph* gl=new JKQTPxyLineGraph(plotter->get_plotter());
+                            gl->set_xColumn(c_tau);
+                            gl->set_yColumn(c_bleach);
+                            gl->set_color(col.darker());
+                            gl->set_symbol(JKQTPnoSymbol);
+                            gl->set_drawLine(true);
+                            gl->set_lineWidth(2);
+                            gl->set_style(Qt::DashLine);
+                            gl->set_title(tr("run %1: fit (b=%2, A=%3, \\tau_B=%4 s)").arg(i).arg(background).arg(floattolatexstr(bleachAmplitude, 2, true, 1e-16, 1e-3, 1e5).c_str()).arg(floattolatexstr(bleachTime/m->getProperty("FRAME_COUNT", 1).toDouble()*m->getMeasurementDuration(), 2, true, 1e-16, 1e-3, 1e5).c_str()));
+                            plotter->addGraph(gl);
                         }
-                        size_t c_bleach=ds->addColumn(d, frames, tr("bleach correction fit"));
-                        JKQTPxyLineGraph* gl=new JKQTPxyLineGraph(plotter->get_plotter());
-                        gl->set_xColumn(c_tau);
-                        gl->set_yColumn(c_bleach);
-                        gl->set_color(c.darker());
-                        gl->set_symbol(JKQTPnoSymbol);
-                        gl->set_drawLine(true);
-                        gl->set_lineWidth(2);
-                        gl->set_style(Qt::DashLine);
-                        gl->set_title(tr("run %1: fit (b=%2, A=%3, \\tau_B=%4 s)").arg(i).arg(background).arg(floattolatexstr(bleachAmplitude, 2, true, 1e-16, 1e-3, 1e5).c_str()).arg(floattolatexstr(bleachTime/m->getProperty("FRAME_COUNT", 1).toDouble()*m->getProperty("MEASUREMENT_DURATION_MS", 0).toDouble()/1000.0, 2, true, 1e-16, 1e-3, 1e5).c_str()));
-                        plotter->addGraph(gl);
-
-                        JKQTPgeoInfiniteLine* gb=new JKQTPgeoInfiniteLine(plotter->get_plotter(), 0, background, 1,0,c.darker(),2,Qt::DotLine);
-                        gb->set_title(tr("run %1: background (b=%2)").arg(i).arg(background));
-                        plotter->addGraph(gb);
+                        if (background!=0) {
+                            JKQTPgeoInfiniteLine* gb=new JKQTPgeoInfiniteLine(plotter->get_plotter(), 0, background, 1,0,col.darker(),2,Qt::DotLine);
+                            gb->set_title(tr("run %1: background (b=%2)").arg(i).arg(background));
+                            plotter->addGraph(gb);
+                        }
                     }
-                }
 
+                }
                 cc++;
             }
         }

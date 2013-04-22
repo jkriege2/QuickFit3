@@ -22,8 +22,9 @@
 	<p>The plots have several <a href="$$mainhelpdir$$jkqtplotter.html">means to interact with the user</a>.</p>
 	<p>Further display options:
 	<ul>
-	  <li><b>general options/DualView mode:</b> If your microscope is equipped with DualView (or OptoSplit) optics, the displayed image will be split in the center into two parts (left/right, top/bottom) which correspond to two detection channels. This option allows to use this information. If the DualView mode is set properly, the e.g. when selecting pixels, they will be selected in both channels. Also the correlation curve display below will display two averaged curves if several pixels are detected to allow for a comparison of the two image channels.</li>
 	  <li><b>Correlation plot styles/Selection Display mode:</b> here you can select what the correlation display should contain if several pixels are selected: Either the curves of all selected pixels are shown (which is possibly slow if you selected many pixels, or an average over these correlation curves is displayed. In that case the parameters table also contains the statistics of all selected fit results. Note that in DualView mode (see above) one average/statistics for every image channel will be displayed!</li>
+
+	  <li><b><font color="red">deprecated:</font></b><br><small><b>general options/DualView mode:</b> If your microscope is equipped with DualView (or OptoSplit) optics, the displayed image will be split in the center into two parts (left/right, top/bottom) which correspond to two detection channels. This option allows to use this information. If the DualView mode is set properly, the e.g. when selecting pixels, they will be selected in both channels. Also the correlation curve display below will display two averaged curves if several pixels are detected to allow for a comparison of the two image channels.</small></li>
 	</ul>
 	</p>
 	
@@ -40,7 +41,7 @@
 	<h4>Saving Data and Reports</h4>
 	<p>You can save the parameter and goodnes-of-fit images as data files for further processing, or as a report:
 		<ul>
-		  <li><b><img src=":/imaging_fcs/preview_savedata.png"> Save data:</b> Saves the parameter image and goodnes of fit image as a separate file. The selected parameter transformations are omitted. You can select different file formats:
+		  <li><b><img src=":/imaging_fcs/preview_savedata.png"> Data | Save data:</b> Saves the parameter image and goodnes of fit image as a separate file. The selected parameter transformations are omitted. You can select different file formats:
 		    <ol>
 			  <li><i>Comma-Separated value:</i> saves the data as text file which contains a matrix of numbers, separated by commas (,) and with a dot (.) as decimal separator.</li>
 			  <li><i>Semicolon-Separated value [German Excel]:</i> saves the data as text file which contains a matrix of numbers, separated by semicolons (;) and with a comma (,) as decimal separator.</li>
@@ -51,9 +52,13 @@
 			</ol>
 			The two images are saved into separae files. They end with the suffix <tt>.param.ext</tt> for the parameter image or <tt>.gof.ext</tt> for the goodnes of fit image.
 		  </li>
-		  <li><b><img src=":/imaging_fcs/copydatatomatlab.png"> Copy Images to Matlab:</b> copies the currently displayed images to the clipboard as a Matlab script. When the script is executed it defines four variables, one for each type of data (parameter image, goodnes of fit image, mask image, overview image).<li>
-		  <li><b><img src=":/imaging_fcs/copydata.png"> Copy Images as Columns:</b> copies the currently displayed images to the clipboard in a format so they can be imported into spreadsheet programs. This function serializes the data, i.e. each image is copies as one column. Before the data is actually copied, you will be rpesented with a dialog that allows to select the columns that should be exported. It is also possible to add the pixel ID (integer number starting at <tt>(0,0) -> 0</tt> and numbering all pixels in row-major order) and pixel coordinates.<li>
-		  <li><b>Insert Correlation Curves as new RDR into Project:</b> This function takes the currently selected pixels and copies the according ACFs into a new <a href="$$mainhelpdir$$/../plugins/help/qfrdrfcs/fcs.html">fcs raw data record</a>. This new RDR is then inserted into the project. Then you can perform additional FCS evaluations on these. Note that all information about the position of the pixels gets lost! Each pixel's ACF is inserted as a run into the fcs record.<li>
+		  <li><b><img src=":/imaging_fcs/copydatatomatlab.png"> Data | Copy Images to Matlab:</b> copies the currently displayed images to the clipboard as a Matlab script. When the script is executed it defines four variables, one for each type of data (parameter image, goodnes of fit image, mask image, overview image).</li>
+		  <li><b><img src=":/imaging_fcs/copydata.png"> Data | Copy Images as Columns:</b> copies the currently displayed images to the clipboard in a format so they can be imported into spreadsheet programs. This function serializes the data, i.e. each image is copies as one column. Before the data is actually copied, you will be rpesented with a dialog that allows to select the columns that should be exported. It is also possible to add the pixel ID (integer number starting at <tt>(0,0) -> 0</tt> and numbering all pixels in row-major order) and pixel coordinates.</li>
+		  <li><b>Data | Insert Correlation Curves as new RDR into Project:</b> This function takes the currently selected pixels and copies the according ACFs into a new <a href="$$mainhelpdir$$/../plugins/help/qfrdrfcs/fcs.html">fcs raw data record</a>. This new RDR is then inserted into the project. Then you can perform additional FCS evaluations on these. Note that all information about the position of the pixels gets lost! Each pixel's ACF is inserted as a run into the fcs record.</li>
+		  <li><b>imFCS Tools | copy all CFs from group to table:</b> This function will average the correlation functions in the current selection and copy it into a new table raw data record. Then it does the same for all files in the same rdr group as the current file. Finally the table will contain all averaged ACFs for the given selection from all files in the group and a plot contaiing all those. You can use this function to create FCCS overview plots like this one: <center>
+	<a name="imfcs_ui_pic000"><img src="./pic/imfcs_ui_pic000.png" border="1"><br/>
+<i>FCCS plot</i>
+</center></li>
 		  <li><b><img src=":/imaging_fcs/report_save.png"> Save report:</b> Save the contenst of the current window as a PDF or PostScript file.</li>
 		  <li><b><img src=":/imaging_fcs/report_print.png"> Print report:</b> Print the contents of the curret window.</li>
 		</ul>

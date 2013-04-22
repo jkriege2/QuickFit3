@@ -71,6 +71,7 @@ class QFRDROverviewImageDisplay : public QWidget
         QFPLayerControls* player;
 
         JKQTPMathImage* image;
+        JKQTPRGBMathImage* imageRGB;
         QList<JKQTPgraph*> overlayGraphs;
         /** \brief plot for the selected runs in pltOverview, plot plteOverviewSelectedData */
         JKQTPOverlayImageEnhanced* plteSelected;
