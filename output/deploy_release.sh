@@ -23,10 +23,12 @@ rm a.out
 rm test~.cpp
 echo -e "\n   bit depth: ${BITDEPTH}\n\n"
 
+INSTALLER_BASENAME=quickfit3_${SVNVER}
 ZIPFILE=quickfit3_${SVNVER}.zip
 ZIPFILESPIM=quickfit3_spimplugins_${SVNVER}.zip
 ZIPFILESPECIAL=quickfit3_special_${SVNVER}.zip
 if [ "${BITDEPTH}" == "64" ]; then
+	INSTALLER_BASENAME=quickfit3_64bit_${SVNVER}
 	ZIPFILE=quickfit3_64bit_${SVNVER}.zip
 	ZIPFILESPIM=quickfit3_64bit_spimplugins_${SVNVER}.zip
 	ZIPFILESPECIAL=quickfit3_64bit_special_${SVNVER}.zip
@@ -75,6 +77,7 @@ rm ./globalconfig/*
 rmdir ./globalconfig
 rm ./qtplugins/q*d4.dll
 rm ./Qt*d4.dll
+rm ./Qt*d.dll
 rm
 
 for f in $SPIMONLYQTMODULES
@@ -151,7 +154,14 @@ done
 
 rm *.sh
 rm *.ini
+rm *.nsi
+rm *.~*
 rm ATMCD32D.DLL
+rm *.~*
+rm *setup.exe
+rm test*.*
+rm untitled*.*
+rm *.log
 
 zip -rv9 ../${ZIPFILE} *
 cd ..
@@ -161,6 +171,98 @@ cd ..
 cd deployspecial
 zip -rv9 ../${ZIPFILESPECIAL} *
 cd ..
+
+echo -e "\n\nWRITING WINDOWS INSTALLER SCRIPT:\n\n"
+
+echo -e "\n\nWRITING WINDOWS INSTALLER SCRIPT:\n\n"
+
+cd deploy
+INSTALLER_FILES=
+UNINSTALLER_FILES=
+for f in `find . -type f`
+do
+    fn=${f//\//\\\\}
+	fn=${fn//.\\/}
+    INSTALLER_FILES="${INSTALLER_FILES}\\
+File \\/oname=\"$fn\" \"$fn\""
+    UNINSTALLER_FILES="${UNINSTALLER_FILES}\\
+Delete \\/REBOOTOK \"\$INSTDIR\\$fn\""
+done
+INSTALLER_DIRS=
+for f in `find . -type d`
+do
+    fn=${f//\//\\\\}
+	fn=${fn//.\\/}
+    INSTALLER_DIRS="${INSTALLER_DIRS}\\
+CreateDirectory  \"\$INSTDIR\\$fn\""
+    
+done
+cd ..
+
+cd deployspim
+SPIMINSTALLER_FILES=
+SPIMUNINSTALLER_FILES=
+for f in `find . -type f`
+do
+    fn=${f//\//\\\\}
+	fn=${fn//.\\/}
+    SPIMINSTALLER_FILES="${SPIMINSTALLER_FILES}\\
+File \\/oname=\"$fn\" \"$fn\""
+    SPIMUNINSTALLER_FILES="${SPIMUNINSTALLER_FILES}\\
+Delete \\/REBOOTOK \"\$INSTDIR\\$fn\""
+done
+SPIMINSTALLER_DIRS=
+for f in `find . -type d`
+do
+    fn=${f//\//\\\\}
+	fn=${fn//.\\/}
+    SPIMINSTALLER_DIRS="${SPIMINSTALLER_DIRS}\\
+CreateDirectory  \"\$INSTDIR\\$fn\""
+    
+done
+cd ..
+
+echo $SPIMINSTALLER_FILES
+echo $SPIMUNINSTALLER_FILES
+echo $SPIMINSTALLER_DIRS
+
+sed "s/%%INSTALLER_FILES%%/$INSTALLER_FILES/" nsis_basicscript.nsi > nsis_basicscript.~si
+ls -l *.~*
+#less nsis_basicscript.~si
+sed "s/%%UNINSTALLER_FILES%%/$UNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+#less nsis_basicscript.~si
+sed "s/%%SPIMINSTALLER_FILES%%/$SPIMINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+#less nsis_basicscript.~si
+sed "s/%%SPIMUNINSTALLER_FILES%%/$SPIMUNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+#less nsis_basicscript.~si
+sed "s/%%INSTALLER_BASENAME%%/$INSTALLER_BASENAME/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+#less nsis_basicscript.~si
+sed "s/%%SVNVER%%/$SVNVER/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+#less nsis_basicscript.~si
+sed "s/%%BITDEPTH%%/$BITDEPTH/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+#less nsis_basicscript.~si
+sed "s/%%INSTALLER_DIRS%%/$INSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+#less nsis_basicscript.~si
+sed "s/%%SPIMINSTALLER_DIRS%%/$SPIMINSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+#less nsis_basicscript.~si
+
+cp nsis_basicscript.~si ${INSTALLER_BASENAME}.nsi
+#rm nsis_basicscript.~si
+rm *.~*
+
+
+makensis ${INSTALLER_BASENAME}.nsi
+
+
+echo -e "\n\nCLEANUP:\n\n"
 
 rm -rf deploy
 rm -rf deployspim

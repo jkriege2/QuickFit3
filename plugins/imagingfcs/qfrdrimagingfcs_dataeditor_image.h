@@ -267,17 +267,17 @@ protected:
         /** \brief checkbox to select whether to display selected/excluded pixels overlay on image plot */
         QCheckBox* chkDisplayImageOverlay;
         /** \brief a combobox to select how the average run are displayed */
-        QComboBox* cmbAverageStyle;
+        JKQTPLinePlotStyleComboBox* cmbAverageStyle;
         /** \brief a combobox to select how the error of the average run are displayed */
-        QComboBox* cmbAverageErrorStyle;
+        JKQTPerrorPlotstyleComboBox* cmbAverageErrorStyle;
 
         /** \brief a combobox to select how to display the selected pixel */
         QComboBox* cmbSelectionStyle;
 
         /** \brief a combobox to select how the runs are displayed */
-        QComboBox* cmbRunStyle;
+        JKQTPLinePlotStyleComboBox* cmbRunStyle;
         /** \brief a combobox to select how the error of the runs are displayed */
-        QComboBox* cmbRunErrorStyle;
+        JKQTPerrorPlotstyleComboBox* cmbRunErrorStyle;
         /** \brief checkbox to select log tau-axis */
         QCheckBox* chkLogTauAxis;
         /** \brief label for the run options */
@@ -343,7 +343,7 @@ protected:
 
 
         /** \brief combobox for the color bar of overview image */
-        QComboBox* cmbColorbarOverview;
+        JKQTPMathImageColorPalette* cmbColorbarOverview;
         QCheckBox* chkAutorangeOverview;
         QFDoubleEdit* edtOvrMin;
         QFDoubleEdit* edtOvrMax;
@@ -351,19 +351,15 @@ protected:
         QFDoubleEdit* edtOvr2Max;
 
         /** \brief combobox for the color bar of gof image */
-        QComboBox* cmbColorbarGof;
+        JKQTPMathImageColorPalette* cmbColorbarGof;
 
         /** \brief combobox for the color bar of plteImage */
-        QComboBox* cmbColorbar;
+        JKQTPMathImageColorPalette* cmbColorbar;
         /** \brief combobox for the display style of plteImage */
         QComboBox* cmbImageStyle;
         /** \brief cobobox to select what should happen to the out-of-range pixels */
         QComboBox* cmbOutOfRangeMode;
 
-        ///** \brief combobox for the color bar of plteOverview */
-        //QComboBox* cmbOverviewColorbar;
-        ///** \brief combobox for the color bar of plteGofImage */
-        //QComboBox* cmbGofColorbar;
 
         /** \brief checkbox to en-/disable automatic color bar scaling */
         QCheckBox* chkImageAutoScale;

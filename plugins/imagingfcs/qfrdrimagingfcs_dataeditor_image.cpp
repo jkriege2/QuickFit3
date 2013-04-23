@@ -70,6 +70,9 @@ QFRDRImagingFCSImageEditor::~QFRDRImagingFCSImageEditor()
 
 
 void QFRDRImagingFCSImageEditor::createWidgets() {
+    setUpdatesEnabled(false);
+
+
     QLabel* l;
     QGridLayout* lb=new QGridLayout(this);
     setLayout(lb);
@@ -359,11 +362,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     gli->addRow(tr("st&yle:"), cmbImageStyle);
 
 
-    cmbColorbar=new QComboBox(wimg);
-    QStringList sl=JKQTFPimagePlot_getPalettes();
-    for (int i=0; i<sl.size(); i++) {
-        cmbColorbar->addItem(JKQTFPimagePlot_getPaletteIcon(i), sl[i]);
-    }
+    cmbColorbar=new JKQTPMathImageColorPalette(wimg);
     gli->addRow(tr("color &palette:"), cmbColorbar);
 
     chkImageAutoScale=new QCheckBox("auto", wimg);
@@ -422,11 +421,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     gli=new QFormLayout(this);
     wovr->setLayout(gli);
 
-    cmbColorbarOverview=new QComboBox(wovr);
-    sl=JKQTFPimagePlot_getPalettes();
-    for (int i=0; i<sl.size(); i++) {
-        cmbColorbarOverview->addItem(JKQTFPimagePlot_getPaletteIcon(i), sl[i]);
-    }
+    cmbColorbarOverview=new JKQTPMathImageColorPalette(wovr);
     gli->addRow(tr("color &palette:"), cmbColorbarOverview);
 
     chkAutorangeOverview=new QCheckBox("auto", wovr);
@@ -483,18 +478,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     gl->addRow(tr("display average:"), cpsHBox);
 
-    cmbAverageStyle=new QComboBox(w);
-    cmbAverageStyle->addItem(QIcon(":/imaging_fcs/fcsplot_lines.png"), tr("lines"));
-    cmbAverageStyle->addItem(QIcon(":/imaging_fcs/fcsplot_points.png"), tr("points"));
-    cmbAverageStyle->addItem(QIcon(":/imaging_fcs/fcsplot_pointslines.png"), tr("lines+points"));
+    cmbAverageStyle=new JKQTPLinePlotStyleComboBox(w);
 
-    cmbAverageErrorStyle=new QComboBox(w);
-    cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_enone.png"), tr("none"));
-    cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_ebars.png"), tr("bars"));
-    cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elines.png"), tr("lines"));
-    cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elinesbars.png"), tr("lines+bars"));
-    cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_epoly.png"), tr("polygons"));
-    cmbAverageErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_epolybars.png"), tr("polygons+bars"));
+    cmbAverageErrorStyle=new JKQTPerrorPlotstyleComboBox(w);
     cpsHBox=new QHBoxLayout(this);
     cpsHBox->setContentsMargins(0,0,0,0);
     cpsHBox->addWidget(cmbAverageStyle);
@@ -505,18 +491,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(chkDisplayAverage, SIGNAL(toggled(bool)), cmbAverageErrorStyle, SLOT(setEnabled(bool)));
     connect(chkDisplayAverage, SIGNAL(toggled(bool)), l, SLOT(setEnabled(bool)));
 
-    cmbRunStyle=new QComboBox(w);
-    cmbRunStyle->addItem(QIcon(":/imaging_fcs/fcsplot_lines.png"), tr("lines"));
-    cmbRunStyle->addItem(QIcon(":/imaging_fcs/fcsplot_points.png"), tr("points"));
-    cmbRunStyle->addItem(QIcon(":/imaging_fcs/fcsplot_pointslines.png"), tr("lines+points"));
+    cmbRunStyle=new JKQTPLinePlotStyleComboBox(w);
 
-    cmbRunErrorStyle=new QComboBox(w);
-    cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_enone.png"), tr("none"));
-    cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_ebars.png"), tr("bars"));
-    cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elines.png"), tr("lines"));
-    cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_elinesbars.png"), tr("lines+bars"));
-    cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_epoly.png"), tr("polygons"));
-    cmbRunErrorStyle->addItem(QIcon(":/imaging_fcs/fcsplot_epolybars.png"), tr("polygons+bars"));
+    cmbRunErrorStyle=new JKQTPerrorPlotstyleComboBox(w);
     cpsHBox=new QHBoxLayout(this);
     cpsHBox->setContentsMargins(0,0,0,0);
     cpsHBox->addWidget(cmbRunStyle);
@@ -1217,6 +1194,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuImagingFCSTools=propertyEditor->addOrFindMenu(tr("ImagingFCS Tools"));
     menuImagingFCSTools->addAction(actCopyGroupACFsToTable);
 
+    setUpdatesEnabled(true);
 }
 
 void QFRDRImagingFCSImageEditor::saveImageSettings() {
@@ -1416,7 +1394,7 @@ void QFRDRImagingFCSImageEditor::paletteChanged() {
     bool oldDoDraw=pltImage->get_doDrawing();
     pltImage->set_doDrawing(false);
 
-    plteImage->set_palette(cmbColorbar->currentIndex());
+    plteImage->set_palette(cmbColorbar->colorPalette());
     plteImage->set_autoImageRange(false);//chkImageAutoScale->isChecked());
     //plteImage->set_autoImageRange(false);
     double mi=0, ma=0;
@@ -1491,7 +1469,7 @@ void QFRDRImagingFCSImageEditor::ovrPaletteChanged() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 
-    plteOverview->set_palette(cmbColorbarOverview->currentIndex());
+    plteOverview->set_palette(cmbColorbarOverview->colorPalette());
     plteOverview->set_autoImageRange(false);//chkAutorangeOverview->isChecked());
     double ovrmi=0, ovrma=0, ovrmi2=0, ovrma2=0;
     if (m && m->getImageFromRunsPreview(0)!=NULL && plteOverviewExcludedData!=NULL) {
@@ -1539,10 +1517,10 @@ void QFRDRImagingFCSImageEditor::ovrPaletteChanged() {
     }
     plteOverview->set_imageMin(edtOvrMin->value());
     plteOverview->set_imageMax(edtOvrMax->value());
-    plteOverviewRGB->set_imageMinG(edtOvr2Min->value());
-    plteOverviewRGB->set_imageMaxG(edtOvr2Max->value());
-    plteOverviewRGB->set_imageMin(edtOvrMin->value());
-    plteOverviewRGB->set_imageMax(edtOvrMax->value());
+    plteOverviewRGB->set_imageMinG(edtOvrMin->value());
+    plteOverviewRGB->set_imageMaxG(edtOvrMax->value());
+    plteOverviewRGB->set_imageMin(edtOvr2Min->value());
+    plteOverviewRGB->set_imageMax(edtOvr2Max->value());
     saveImageSettings();
     pltOverview->set_doDrawing(oldDoDraw);
     if (oldDoDraw) pltOverview->update_plot();
@@ -2414,7 +2392,7 @@ void QFRDRImagingFCSImageEditor::replotImage() {
         plteImage->set_data(plteImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::DoubleArray);
         plteImage->set_width(w);
         plteImage->set_height(h);
-        plteImage->set_palette(cmbColorbar->currentIndex());
+        plteImage->set_palette(cmbColorbar->colorPalette());
 
         plteGofImage->set_data(plteGofImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::DoubleArray);
         plteGofImage->set_width(w);
@@ -2715,7 +2693,7 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
                 plteOverview->set_autoImageRange(false);//chkAutorangeOverview->isChecked());
                 updateSelectionArrays();
                 plteOverview->set_data(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::DoubleArray);
-                plteOverview->set_palette(cmbColorbarOverview->currentIndex());
+                plteOverview->set_palette(cmbColorbarOverview->colorPalette());
                 ovrPaletteChanged();
             } else if (channels>1) {
                 plteOverviewRGB->set_visible(true);
@@ -2840,29 +2818,13 @@ void QFRDRImagingFCSImageEditor::replotData() {
     if (m->getCorrelationN()>0) {
 
 
-        JKQTPerrorPlotstyle runerrorstyle=JKQTPnoError;
-        switch (cmbRunErrorStyle->currentIndex()) {
-            case 1: runerrorstyle=JKQTPerrorBars; break;
-            case 2: runerrorstyle=JKQTPerrorLines; break;
-            case 3: runerrorstyle=JKQTPerrorBarsLines; break;
-            case 4: runerrorstyle=JKQTPerrorPolygons; break;
-            case 5: runerrorstyle=JKQTPerrorBarsPolygons; break;
-        }
-        bool runLine=(cmbRunStyle->currentIndex()!=1);
-        JKQTPgraphSymbols runSymbol=JKQTPcross;
-        if (cmbRunStyle->currentIndex()==0) runSymbol=JKQTPnoSymbol;
+        JKQTPerrorPlotstyle runerrorstyle=cmbRunErrorStyle->getErrorStyle();
+        bool runLine=cmbRunStyle->getDrawLine();
+        JKQTPgraphSymbols runSymbol=cmbRunStyle->getSymbol();
 
-        JKQTPerrorPlotstyle avgerrorstyle=JKQTPnoError;
-        switch (cmbAverageErrorStyle->currentIndex()) {
-            case 1: avgerrorstyle=JKQTPerrorBars; break;
-            case 2: avgerrorstyle=JKQTPerrorLines; break;
-            case 3: avgerrorstyle=JKQTPerrorBarsLines; break;
-            case 4: avgerrorstyle=JKQTPerrorPolygons; break;
-            case 5: avgerrorstyle=JKQTPerrorBarsPolygons; break;
-        }
-        bool avgLine=(cmbAverageStyle->currentIndex()!=1);
-        JKQTPgraphSymbols avgSymbol=JKQTPcross;
-        if (cmbAverageStyle->currentIndex()==0) avgSymbol=JKQTPnoSymbol;
+        JKQTPerrorPlotstyle avgerrorstyle=cmbAverageErrorStyle->getErrorStyle();
+        bool avgLine=cmbAverageStyle->getDrawLine();
+        JKQTPgraphSymbols avgSymbol=cmbAverageStyle->getSymbol();
 
 
 
@@ -5053,6 +5015,11 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
                 histogram->addHistogram(tr("selection"), datahistsel, datasizesel);
                 histogram->setHistogramXLabel(cmbParameter->currentText());
             }
+        } else {
+            while (histogram->histogramCount()>1) {
+                histogram->removeHistogram(histogram->histogramCount()-1);
+            }
+            histogram->updateHistogram(true, -1);
         }
     }
     if (dv) {
@@ -5085,6 +5052,11 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
                     histogram2->addHistogram(tr("selection"), datahistsel, datasizesel);
                     histogram2->setHistogramXLabel(cmbParameter->currentText());
                 }
+            } else {
+                while (histogram2->histogramCount()>1) {
+                    histogram2->removeHistogram(histogram2->histogramCount()-1);
+                }
+                histogram2->updateHistogram(true, -1);
             }
         }
         if (replot) histogram2->updateHistogram(true, 1);
@@ -5303,6 +5275,15 @@ void QFRDRImagingFCSImageEditor::copyGroupACFsToTable() {
                 cols->colgraphsetXRange(graph, xmin, xmax);
                 cols->colgraphsetYRange(graph, ymin, ymax);
             }
+
+            if (rdr && dlg->getShowEditor()) {
+                QFRawDataPropertyEditor* editor=QFPluginServices::getInstance()->openRawDataEditor(rdr, false);
+                if (editor) {
+                    if (graph>=0) editor->sendEditorCommand("showPlot", graph);
+                    editor->showTab(2);
+                }
+            }
+
         }
     }
 }
