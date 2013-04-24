@@ -544,8 +544,9 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                 }
             }
         }
-
-        splitVideosForDualView();
+        if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
+            splitVideosForDualView();
+        }
 
         if (!hasStatistics && !hasStatistics2 && internalDualViewMode()!=QFRDRImagingFCSData::dvNone) {
             for (int i=0; i<files.size(); i++) {

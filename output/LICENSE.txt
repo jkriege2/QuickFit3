@@ -1,0 +1,48 @@
+--------------------------------------------------------------------------------
+-- QuickFit 3.0                                                               --
+-- (c) 2010-2013 by Jan W. Krieger                                            --
+--     Biophysics of Macromolecules (B040)                                    --
+--     German Cancer Research center (DKFZ)                                   --
+--------------------------------------------------------------------------------
+--   http://www.dkfz.de/Macromol/quickfit/                                    --
+--------------------------------------------------------------------------------
+
+
+This software is postcard ware: If you find QuickFit usefull and like it, 
+please send us a postcard from your part of the world to
+
+    Deutsches Krebsforschungs Zentrum (DKFZ)
+    Abteilung B040
+    Im Neuenheimer Feld 580
+    D-69120 Heidelberg
+    GERMANY
+
+If you use this software for a publication, you will have to cite QuickFit this 
+in the publication. In the online-help we give examples of how to cite QuickFit.
+Also have a look at the online-help of the plugins you used to see whether you 
+should cite additional libraries used in these plugins. Here is an example 
+BiBTeX record that can be used to cite QuickFit (update to the version you 
+downloaded or copy an. updated version from the Copyright page of the onine 
+help!):
+
+    @misc{quickfit3,
+        author={Jan Wolfgang Krieger and Jörg Langowski},
+        title={QuickFit 3.0 (status: beta, compiled: ???, SVN: ???): A data 
+		       evaluation application for biophysics},
+        howpublished={[web page] \verb+http://www.dkfz.de/Macromol/quickfit/+},
+        year={2012},
+        note={[Accessed on ???]},
+    } 
+
+A citation may look like this:
+
+    JW. Krieger, J. Langowski (2012): QuickFit 3.0 (status: beta, compiled: ???, 
+	  SVN: ???): A data evaluation application for biophysics, 
+	  [web page] http://www.dkfz.de/Macromol/quickfit/ [Accessed on ???] 
+
+This software is provided as is without any warranties. Use it at your own risk.
+But: We do our best to make a well tested and good pakage (as it is massively 
+used in our department).
+
+Please have a look into QuickFit's ABOUT dialog and online-help for a list and
+copyrights of additional libraries and tools used in QuickFit.

@@ -34,7 +34,8 @@ HEADERS += qfpevalimfcsfit.h \
     ../base_classes/qffcstools.h \
     ../base_classes/qfrdrimagetorunpreview.h \
     qfimfcssetparamfromfiledialog.h \
-    imfcscalibrationwizard.h
+    imfcscalibrationwizard.h \
+    ../interfaces/qfrdrimfcscorrelatorremote.h
 
 
 SOURCES += qfpevalimfcsfit.cpp \

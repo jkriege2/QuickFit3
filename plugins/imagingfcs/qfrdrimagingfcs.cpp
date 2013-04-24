@@ -21,6 +21,30 @@ QFRDRImagingFCSPlugin::~QFRDRImagingFCSPlugin()
 void QFRDRImagingFCSPlugin::deinit() {
 }
 
+void QFRDRImagingFCSPlugin::imfcsCorrRemoteUserSelectFile()
+{
+    correlateAndInsert();
+    dlgCorrelate->userSelectFile();
+}
+
+void QFRDRImagingFCSPlugin::imfcsCorrRemoteSelectFile(const QString &filename)
+{
+    correlateAndInsert();
+    dlgCorrelate->openFile(filename);
+}
+
+void QFRDRImagingFCSPlugin::imfcsCorrRemoteAddJob()
+{
+    correlateAndInsert();
+    dlgCorrelate->clickAddJob();
+}
+
+void QFRDRImagingFCSPlugin::imfcsCorrRemoteAddJobSeries(const QString &parameter, double start, double end, double inc)
+{
+    correlateAndInsert();
+    dlgCorrelate->clickAddJobSeries(parameter, start, end, inc);
+}
+
 QFRawDataRecord* QFRDRImagingFCSPlugin::createRecord(QFProject* parent) {
     // factory method: create a QFRawDataRecord objectof the type of this plugin (QFRDRImagingFCSData)
     return new QFRDRImagingFCSData(parent);

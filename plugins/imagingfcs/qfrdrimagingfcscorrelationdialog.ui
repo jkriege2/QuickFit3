@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1046</width>
-    <height>834</height>
+    <width>1102</width>
+    <height>868</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,13 +26,19 @@
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0">
    <item>
     <widget class="QGroupBox" name="groupBox_3">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
       <string> New Correlation Job: </string>
      </property>
      <property name="flat">
       <bool>false</bool>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
+     <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,1,0">
       <item row="0" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
@@ -123,8 +129,14 @@
         </item>
        </layout>
       </item>
-      <item row="2" column="1">
-       <widget class="QScrollArea" name="scrollArea_2">
+      <item row="1" column="1">
+       <widget class="QScrollArea" name="scrollAreaParams">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
@@ -139,9 +151,15 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>940</width>
-           <height>528</height>
+           <width>996</width>
+           <height>533</height>
           </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <property name="margin">
@@ -149,6 +167,18 @@
           </property>
           <item>
            <widget class="QFrame" name="widDetails">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>528</height>
+             </size>
+            </property>
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
             </property>
@@ -1914,7 +1944,7 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="1" column="0">
        <widget class="QLabel" name="labDetails">
         <property name="text">
          <string>&lt;b&gt;Details:&lt;/b&gt;</string>
@@ -1924,7 +1954,7 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="2" column="1">
        <widget class="QWidget" name="widAddJob" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <property name="spacing">
@@ -2019,6 +2049,12 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
       <string> Progress: </string>
      </property>
@@ -2116,6 +2152,12 @@ p, li { white-space: pre-wrap; }
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>100</height>
+         </size>
+        </property>
         <property name="horizontalScrollBarPolicy">
          <enum>Qt::ScrollBarAsNeeded</enum>
         </property>
@@ -2130,8 +2172,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1006</width>
-           <height>69</height>
+           <width>1062</width>
+           <height>98</height>
           </rect>
          </property>
          <property name="sizePolicy">

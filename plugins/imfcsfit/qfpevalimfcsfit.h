@@ -76,6 +76,8 @@ class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase, publi
         void insertFCSCalibrationWizard();
 
         void insertFCSFitForCalibration();
+        void imFCSCalibrationSelectFile();
+        void imFCSCalibrationCorrelate();
 
         void imFCSCalibrationTool1();
         void imFCSCalibrationTool2();

@@ -86,6 +86,10 @@ macx{
   }
 }
 
+ICON_FILES.files = qf3icon.icns\
+                   qf3icon.ico\
+                   qf3icon_old.ico
+ICON_FILES.path = $${QFOUTPUT}
 
 
 ASSETSSTYLESHEET_FILES.files = ./assets/stylesheets/*.*
@@ -98,4 +102,4 @@ HELPREF_FILES.path = $${QFOUTPUT}/assets/help/parserreference/
 HELPREFPIC_FILES.files = ./help/parserreference/pic/*.*
 HELPREFPIC_FILES.path = $${QFOUTPUT}/assets/help/parserreference/pic/
 
-INSTALLS += ASSETSSTYLESHEET_FILES HELPREF_FILES HELPREFPIC_FILES
+INSTALLS += ASSETSSTYLESHEET_FILES HELPREF_FILES HELPREFPIC_FILES ICON_FILES

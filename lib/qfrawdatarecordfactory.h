@@ -68,6 +68,9 @@ class QFLIB_EXPORT QFRawDataRecordFactory : public QObject {
         /** \brief return \c true if a plugin with the given ID is registered */
         bool contains(QString ID);
 
+        /** \brief returns a pointer to the given plugin or NULL */
+        QFPluginRawDataRecord* getPlugin(const QString& ID);
+
 
         /** \brief returns the author for a specified QFRawDataRecord ID. */
         QString getAuthor(QString ID);

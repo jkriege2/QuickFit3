@@ -36,17 +36,21 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         void readSettings();
 
         QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> getFilesToAdd() const;
+
     signals:
         void runSimulation();
     public slots:
         void openFile(const QString& file);
+        void userSelectFile();
+        void clickAddJob();
+        void clickAddJobSeries(const QString& parameter, double start, double end, double inc);
 
     protected slots:
         void on_btnSelectImageFile_clicked();
         void on_btnSelectImageFileNoCount_clicked();
         void on_btnSelectBackgroundFile_clicked();
         void on_btnAddJob_clicked();
-        void on_btnAddSeriesJob_clicked();
+        void on_btnAddSeriesJob_clicked(const QString& parameter=QString(""), double start=-1, double end=-1, double inc=-1);
         void on_btnLoad_clicked();
         void on_btnLoadNoCount_clicked();
         void on_btnHelp_clicked();

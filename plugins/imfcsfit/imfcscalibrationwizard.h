@@ -22,6 +22,8 @@ class ImFCSCalibrationWizard : public QDialog
         void run4();
         void run5();
         void showTutorial();
+        void loadFile();
+        void correlate();
     protected slots:
         void on_btnHelp_clicked();
         void on_btnClose_clicked();
@@ -30,6 +32,8 @@ class ImFCSCalibrationWizard : public QDialog
         void on_btnStep3_clicked();
         void on_btnStep4_clicked();
         void on_btnStep5_clicked();
+        void on_btnLoadFile_clicked();
+        void on_btnCorrelate_clicked();
 
     private:
         Ui::ImFCSCalibrationWizard *ui;

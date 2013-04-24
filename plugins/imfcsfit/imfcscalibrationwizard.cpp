@@ -1,11 +1,17 @@
 #include "imfcscalibrationwizard.h"
 #include "ui_imfcscalibrationwizard.h"
+#include "qfpluginservices.h"
+#include "qfrawdatarecordfactory.h"
+#include "qfrdrimfcscorrelatorremote.h"
 
 ImFCSCalibrationWizard::ImFCSCalibrationWizard(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ImFCSCalibrationWizard)
 {
     ui->setupUi(this);
+    QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+    ui->btnLoadFile->setEnabled(p&&p->getRawDataRecordFactory()->contains("imaging_fcs")&&dynamic_cast<QFRDRIMFCSCorrelatorRemote*>(p->getRawDataRecordFactory()->getPlugin("imaging_fcs")));
+    ui->btnCorrelate->setEnabled(p&&p->getRawDataRecordFactory()->contains("imaging_fcs")&&dynamic_cast<QFRDRIMFCSCorrelatorRemote*>(p->getRawDataRecordFactory()->getPlugin("imaging_fcs")));
 }
 
 ImFCSCalibrationWizard::~ImFCSCalibrationWizard()
@@ -21,26 +27,40 @@ void ImFCSCalibrationWizard::on_btnClose_clicked()
 void ImFCSCalibrationWizard::on_btnStep1_clicked()
 {
     emit run1();
+    ui->widget2->setEnabled(true);
 }
 
 void ImFCSCalibrationWizard::on_btnStep2_clicked()
 {
     emit run2();
+    ui->widget3->setEnabled(true);
 }
 
 void ImFCSCalibrationWizard::on_btnStep3_clicked()
 {
     emit run3();
+    ui->widget4->setEnabled(true);
 }
 
 void ImFCSCalibrationWizard::on_btnStep4_clicked()
 {
     emit run4();
+    ui->widget5->setEnabled(true);
 }
 
 void ImFCSCalibrationWizard::on_btnStep5_clicked()
 {
     emit run5();
+}
+
+void ImFCSCalibrationWizard::on_btnLoadFile_clicked()
+{
+    emit loadFile();
+}
+
+void ImFCSCalibrationWizard::on_btnCorrelate_clicked()
+{
+    emit correlate();
 }
 
 void ImFCSCalibrationWizard::on_btnHelp_clicked()

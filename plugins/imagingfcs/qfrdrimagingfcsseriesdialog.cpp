@@ -38,6 +38,13 @@ QList<double> QFRDRImagingFCSSeriesDialog::getValues() const {
     return vals;
 }
 
+void QFRDRImagingFCSSeriesDialog::setParameter(const QString &parameter)
+{
+    QString p=parameter.toLower().trimmed();
+    if (p=="binning") setParameter(0);
+    else setParameter(0);
+}
+
 void QFRDRImagingFCSSeriesDialog::closeEvent(QCloseEvent *event) {
     if (ProgramOptions::getInstance()) {
         ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRImagingFCSSeriesDialog/parameter", ui->cmbPrameter->currentIndex());
@@ -46,4 +53,16 @@ void QFRDRImagingFCSSeriesDialog::closeEvent(QCloseEvent *event) {
         ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRImagingFCSSeriesDialog/delta", ui->edtDelta->value());
 
     }
+}
+
+void QFRDRImagingFCSSeriesDialog::setParameter(int idx)
+{
+    ui->cmbPrameter->setCurrentIndex(idx);
+}
+
+void QFRDRImagingFCSSeriesDialog::setRange(double start, double end, double inc)
+{
+    ui->edtStart->setValue(start);
+    ui->edtStop->setValue(end);
+    ui->edtDelta->setValue(inc);
 }

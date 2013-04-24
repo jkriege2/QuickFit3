@@ -211,3 +211,9 @@ bool  QFRawDataRecordFactory::contains(QString ID) {
     return items.contains(ID);
 }
 
+QFPluginRawDataRecord *QFRawDataRecordFactory::getPlugin(const QString &ID)
+{
+    if (items.contains(ID)) return items[ID];
+    return NULL;
+}
+

@@ -86,6 +86,13 @@ void QFEvaluationItemFactory::init()
     }
 }
 
+QFPluginEvaluationItem *QFEvaluationItemFactory::getPlugin(const QString& ID)
+{
+    if (items.contains(ID)) return items[ID];
+    return NULL;
+
+}
+
 int QFEvaluationItemFactory::getMajorVersion(QString id) {
     int ma, mi;
     if (items.contains(id)) {

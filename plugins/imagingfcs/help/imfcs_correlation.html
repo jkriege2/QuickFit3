@@ -10,12 +10,21 @@
   <body>
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 	<a name="#imagecorrelation"><h2>Image Correlation</h2>
-	<p>The imFCS plugin also provides a module that calculates auto- and crosscorrelation functions (ACFs, CCFs) from image series. The image series have to be available in one of these formats:
+	<p>The imFCS plugin also provides a module that calculates auto- and crosscorrelation functions (ACFs, CCFs) from image series. 
+             The image series have to be available in one of these formats:
 	   <ul>
 	     <li>multi-frame <b>TIFF</b> file (with 8- or 16-bit greyscale frames that all have the same size)</li>
 		 <li><b>RadHard raw</b> format</li>
 	   </ul>
-	   Additional formats may be available, if reader plugins are installed for them. The imFCS plugin will read in the image series <i>I(x,y,t)</i> (<i>t=0..T-1, x=0..width-1, y=0..height-1</i>) and then calculate the ACFs/CCFs:
+	   Additional formats may be available, if reader plugins are installed for them. 
+              <center>
+              	<a name="imfcs_correlation_pic000"><img src="./pic/imfcs_correlation_pic000.png" border="1"><br/>
+              <i>processing steps of the imFCS plugin</i>
+              </center>
+    
+             The imFCS plugin will read in the image series <i>I(x,y,t)</i> (<i>t=0..T-1, x=0..width-1, y=0..height-1</i>) 
+             and then perform <a href="imfcs_binning.html">binning,</a> <a href="imfcs_backgroundbleach.html">background and 
+             bleach correction</a> and finally calculate the ACFs/CCFs:
 	   <ul>
 	     <li><b>autocorrelation function <i>g<sub>x,y</sub>(&tau;)</i> (ACF)</b> for every pixel <i>(x,y)</i>
 		     <blockquote>
@@ -32,6 +41,10 @@
 			 Here the neighbors are the four directly neighboring pixels, i.e. <i>(x',y') = (x-1,y); (x+1,y); (x,y-1); (x,y+1)</i> If a neighboring pixel does not exist, the CCF equals 0 for all values of &tau;. The result is saved in a comma-separated values (CSV) file <tt>basename.<i>crosscorrelation.dat</i></tt>, as described <a href="imfcs_dataformats.html#formats_ccf">here</a>. The pixels are ordered row-major, i.e. the order is
 			   <i>(0,0), (1,0), ...,(width-1,0), (0,1), (1,1), ..., (width-1,1), ..., (width-1, height-1). </i>
 		 </li>
+                <li><b>two-color crosscorrelation function <i>g<sub>(x,y)-(width/2,y)</sub>(&tau;)</i> or <i>g<sub>(x,y)-(x,height/2)</sub>(&tau;)</i> (FCCS):</b> 
+                    In this mode, the image is assumed to be split into two halfes, representing two color channels. the split is either horicontal or
+                    vertical and the FCCS correlation fucntion is calculated as for the CCFs, but with a fixed distance of <i>width/2</i> for a horizontal
+                    split or <i>height/2</i> for a vertical split. Such splitting can easily be achieved with a DualView optics module in the microscope.</li>
 	   </ul>
 	   In both cases the averaging operation is defined as:
 		 <blockquote>

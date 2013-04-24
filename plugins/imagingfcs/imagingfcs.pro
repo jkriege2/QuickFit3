@@ -53,7 +53,8 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcsedittools.h \
     qfrdrimagingfcssimulator.h \
     qfrdrimagingfcssimulationthread.h \
-    ../../extlibs/MersenneTwister.h
+    ../../extlibs/MersenneTwister.h \
+    ../interfaces/qfrdrimfcscorrelatorremote.h
 
 
 

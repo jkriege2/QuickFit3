@@ -57,6 +57,8 @@ class QFLIB_EXPORT QFEvaluationItemFactory : public QObject {
         /** \brief initialize all plugins */
         void init();
 
+        QFPluginEvaluationItem* getPlugin(const QString &ID);
+
         /** \brief returns a list of the IDs of all available QFEvaluationItems. */
         QStringList getIDList();
 

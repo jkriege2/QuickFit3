@@ -22,6 +22,8 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     lastImagefileDir="";
     filenameDisplayed="";
     ui->setupUi(this);
+    ui->scrollAreaParams->setMaximumHeight(int(1.1*ui->widDetails->height()));
+    qDebug()<<ui->scrollAreaParams->maximumHeight()<<ui->widDetails->height()<<int(1.1*ui->widDetails->height());
     QRegExp rxv("\\s*([\\+\\-]?\\d+\\s*\\,\\s*[\\+\\-]?\\d+(\\s*;\\s*[\\+\\-]?\\d+\\s*\\,\\s*[\\+\\-]?\\d+)*)");
     ui->edtDCCF->setValidator(new QRegExpValidator(rxv, ui->edtDCCF));
     ui->edtFrameTime->setRange(1e-10,1e10);
@@ -423,7 +425,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnSelectBackgroundFile_clicked() {
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_btnHelp_clicked() {
-    pluginServices->displayHelpWindow(pluginServices->getPluginHelpDirectory("imaging_fcs")+"imfcs_correlator.html");
+    pluginServices->displayHelpWindow(pluginServices->getPluginHelpDirectory("imaging_fcs")+"imfcs_correlation.html");
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_btnLoad_clicked() {
@@ -779,10 +781,14 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     addJob(job);
 }
 
-void QFRDRImagingFCSCorrelationDialog::on_btnAddSeriesJob_clicked() {
+void QFRDRImagingFCSCorrelationDialog::on_btnAddSeriesJob_clicked(const QString &parameter, double start, double end, double inc) {
     IMFCSJob job=initJob();
 
     QFRDRImagingFCSSeriesDialog* dlg=new QFRDRImagingFCSSeriesDialog(this);
+    if (!parameter.isEmpty()) {
+        dlg->setParameter(parameter);
+        dlg->setRange(start, end, inc);
+    }
 
     if (dlg->exec()) {
         QList<double> vals=dlg->getValues();
@@ -1105,5 +1111,20 @@ void QFRDRImagingFCSCorrelationDialog::openFile(const QString &file)
 {
     ui->edtImageFile->setText(file);
     on_btnLoad_clicked();
+}
+
+void QFRDRImagingFCSCorrelationDialog::userSelectFile()
+{
+    on_btnSelectImageFile_clicked();
+}
+
+void QFRDRImagingFCSCorrelationDialog::clickAddJob()
+{
+    on_btnAddJob_clicked();
+}
+
+void QFRDRImagingFCSCorrelationDialog::clickAddJobSeries(const QString &parameter, double start, double end, double inc)
+{
+    on_btnAddSeriesJob_clicked(parameter, start, end, inc);
 }
 

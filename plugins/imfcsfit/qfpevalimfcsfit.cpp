@@ -9,6 +9,9 @@
 #include "qfrdrrunselection.h"
 #include "qfevaluationeditor.h"
 #include "qfimfcsfitevaluationeditor.h"
+#include "qfrdrimfcscorrelatorremote.h"
+#include "qfrawdatarecordfactory.h"
+
 
 QFPEvalIMFCSFit::QFPEvalIMFCSFit(QObject* parent):
     QObject(parent)
@@ -118,6 +121,8 @@ void QFPEvalIMFCSFit::insertFCSCalibrationWizard()
         connect(calibrationWizard, SIGNAL(run3()), this, SLOT(imFCSCalibrationTool2()));
         connect(calibrationWizard, SIGNAL(run4()), this, SLOT(imFCSCalibrationTool3()));
         connect(calibrationWizard, SIGNAL(run5()), this, SLOT(imFCSCalibrationTool4()));
+        connect(calibrationWizard, SIGNAL(loadFile()), this, SLOT(imFCSCalibrationSelectFile()));
+        connect(calibrationWizard, SIGNAL(correlate()), this, SLOT(imFCSCalibrationCorrelate()));
     }
     calibrationWizard->show();
     calibrationWizard->activateWindow();
@@ -158,6 +163,24 @@ void QFPEvalIMFCSFit::insertFCSFitForCalibration() {
             delete edummy;
         }
         delete dlg;
+    }
+}
+
+void QFPEvalIMFCSFit::imFCSCalibrationSelectFile()
+{
+    QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+    if(p&&p->getRawDataRecordFactory()->contains("imaging_fcs")) {
+        QFRDRIMFCSCorrelatorRemote* r=dynamic_cast<QFRDRIMFCSCorrelatorRemote*>(p->getRawDataRecordFactory()->getPlugin("imaging_fcs"));
+        r->imfcsCorrRemoteUserSelectFile();
+    }
+}
+
+void QFPEvalIMFCSFit::imFCSCalibrationCorrelate()
+{
+    QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+    if(p&&p->getRawDataRecordFactory()->contains("imaging_fcs")) {
+        QFRDRIMFCSCorrelatorRemote* r=dynamic_cast<QFRDRIMFCSCorrelatorRemote*>(p->getRawDataRecordFactory()->getPlugin("imaging_fcs"));
+        r->imfcsCorrRemoteAddJobSeries("binning", 1, 5, 1);
     }
 }
 
@@ -393,14 +416,14 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool3()
             QFEvaluationPropertyEditor* pedt=services->openEvaluationEditor(e);
             QFEvaluationEditor* edt=pedt->getEditor();
             QFImFCSFitEvaluationEditor* eedt=qobject_cast<QFImFCSFitEvaluationEditor*>(edt);
-            if (eedt && e->getName().toLower().contains("wxy")) {
+            if (eedt) {
                 eedt->fitEverythingThreaded();
             }
             if (pedt) pedt->close();
             log_text(tr("        DONE!\n"));
         }
     }
-    log_text(tr("imFCS calibration tool 3: fitting D's ... DONE!\n"));
+    log_text(tr("imFCS calibration tool 3: fitting wxy's ... DONE!\n"));
 }
 
 void QFPEvalIMFCSFit::imFCSCalibrationTool4()

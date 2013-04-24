@@ -4,7 +4,7 @@
 #include "qfpluginrawdata.h"
 #include "qfrdrimagingfcscorrelationdialog.h"
 #include "qfrdrimagingfcssimulator.h"
-
+#include "qfrdrimfcscorrelatorremote.h"
 #include <QPointer>
 /*!
     \defgroup qf3rdrdp_imaging_fcs Raw Data Record Plugin
@@ -15,9 +15,9 @@
     \ingroup qf3rdrdp_imaging_fcs
     */
 
-class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
+class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase, public QFRDRIMFCSCorrelatorRemote {
         Q_OBJECT
-        Q_INTERFACES(QFPluginRawDataRecord)
+        Q_INTERFACES(QFPluginRawDataRecord QFRDRIMFCSCorrelatorRemote)
     public:
         /** Default constructor */
         QFRDRImagingFCSPlugin(QObject* parent=NULL);
@@ -63,6 +63,13 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase {
 
         /** \brief icon for the plugin */
         virtual QString getIconFilename() const  { return QString(":/imaging_fcs/qfrdrimagingfcs.png"); };
+
+
+        virtual void imfcsCorrRemoteUserSelectFile();
+        virtual void imfcsCorrRemoteSelectFile(const QString& filename);
+        virtual void imfcsCorrRemoteAddJob();
+        virtual void imfcsCorrRemoteAddJobSeries(const QString& parameter, double start, double end, double inc=1);
+
     protected slots:
         /** \brief insertdata from file*/
         void insertRecord();

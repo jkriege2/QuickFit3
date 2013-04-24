@@ -19,6 +19,9 @@ class QFRDRImagingFCSSeriesDialog : public QDialog
         ~QFRDRImagingFCSSeriesDialog();
         int getParameter() const;
         QList<double> getValues() const;
+        void setParameter(const QString& parameter);
+        void setParameter(int idx);
+        void setRange(double start, double end, double inc);
         
     private:
         Ui::QFRDRImagingFCSSeriesDialog *ui;
