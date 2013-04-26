@@ -1,21 +1,25 @@
 #include "imfcscalibrationwizard.h"
 #include "ui_imfcscalibrationwizard.h"
+#include "qfrdrimfcscorrelatorremote.h"
+#include "programoptions.h"
+#include "qftools.h"
+#include "qfproject.h"
 #include "qfpluginservices.h"
 #include "qfrawdatarecordfactory.h"
-#include "qfrdrimfcscorrelatorremote.h"
 
 ImFCSCalibrationWizard::ImFCSCalibrationWizard(QWidget *parent) :
-    QDialog(parent),
+    QWidget(parent),
     ui(new Ui::ImFCSCalibrationWizard)
 {
     ui->setupUi(this);
     QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
     ui->btnLoadFile->setEnabled(p&&p->getRawDataRecordFactory()->contains("imaging_fcs")&&dynamic_cast<QFRDRIMFCSCorrelatorRemote*>(p->getRawDataRecordFactory()->getPlugin("imaging_fcs")));
     ui->btnCorrelate->setEnabled(p&&p->getRawDataRecordFactory()->contains("imaging_fcs")&&dynamic_cast<QFRDRIMFCSCorrelatorRemote*>(p->getRawDataRecordFactory()->getPlugin("imaging_fcs")));
-}
+    loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "ImFCSCalibrationWizard");}
 
 ImFCSCalibrationWizard::~ImFCSCalibrationWizard()
 {
+    saveWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "ImFCSCalibrationWizard");
     delete ui;
 }
 

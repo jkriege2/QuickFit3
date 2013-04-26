@@ -70,7 +70,7 @@ void QFImFCCSFitEvaluation::insertEvaluation() {
 
 void QFImFCCSFitEvaluation::calcRelativeCCF()
 {
-    if (!dlgRelCCF) dlgRelCCF=new QFImFCCSRelativeCCFDialog(parentWidget);
+    if (!dlgRelCCF) dlgRelCCF=new QFImFCCSRelativeCCFDialog(NULL);
     dlgRelCCF->show();
 }
 

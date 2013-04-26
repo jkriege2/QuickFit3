@@ -106,7 +106,7 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
 
         QFImFCCSParameterInputTable* getParameterInputTableModel() const;
 
-        int getNumberOfFitFiles() const;
+        int getFitFileCount() const;
         QFMatchRDRFunctor* getMatchFunctor() const;
         /** \brief set the current index to use */
         virtual int getCurrentIndex() const;

@@ -11,11 +11,14 @@
 #include "qfrdrimagetoruninterface.h"
 #include <stdint.h>
 #include "qfmathtools.h"
+#include "programoptions.h"
+#include "qftools.h"
 
 QFImFCCSRelativeCCFDialog::QFImFCCSRelativeCCFDialog(QWidget *parent) :
-    QDialog(parent),
+    QWidget(parent),
     ui(new Ui::QFImFCCSRelativeCCFDialog)
 {
+
     plt=NULL;
     ui->setupUi(this);
     matchFunctor=new QFImFCCSMatchRDRFunctor();
@@ -26,6 +29,7 @@ QFImFCCSRelativeCCFDialog::QFImFCCSRelativeCCFDialog(QWidget *parent) :
 
     ui->widOverviewACF->setRDR(NULL);
     ui->widOverviewCCF->setRDR(NULL);
+
 
     bool okACF=false;
     bool okCCF=false;
@@ -43,10 +47,12 @@ QFImFCCSRelativeCCFDialog::QFImFCCSRelativeCCFDialog(QWidget *parent) :
         if (okACF&&okCCF) break;
     }
 
+    loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "ImFCSCalibrationWizard");
 }
 
 QFImFCCSRelativeCCFDialog::~QFImFCCSRelativeCCFDialog()
 {
+    saveWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "ImFCSCalibrationWizard");
     delete ui;
     delete matchFunctor;
 }
@@ -147,6 +153,11 @@ bool QFImFCCSRelativeCCFDialog::calculateRelCCF(QFRawDataRecord *acf, QFRawDataR
     return true;
 }
 
+void QFImFCCSRelativeCCFDialog::on_cmbCCF_currentIndexChanged(int index)
+{
+    replotImages();
+}
+
 void QFImFCCSRelativeCCFDialog::on_cmbACF_currentIndexChanged(int /*index*/)
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -163,6 +174,7 @@ void QFImFCCSRelativeCCFDialog::on_cmbACF_currentIndexChanged(int /*index*/)
             QString ainput=acf->getFileForType("input");
             QFRawDataRecord* guess1=NULL;
             QFRawDataRecord* guess2=NULL;
+            QFRawDataRecord* guess3=NULL;
             //QFRawDataRecord* guess3=NULL;
             QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
             for (int i=0; i<lst.size(); i++) {
@@ -172,30 +184,31 @@ void QFImFCCSRelativeCCFDialog::on_cmbACF_currentIndexChanged(int /*index*/)
                     QString cinput=lst[i]->getFileForType("input");
                     if (isCCF(lst[i])) {
                         if (! (ainput.isEmpty() || cinput.isEmpty())) {
-                            if (QFileInfo(cinput)==QFileInfo(ainput)) {
-                                guess1=lst[i];
+                            if ((QFileInfo(cinput)==QFileInfo(ainput))) {
+                                guess2=lst[i];
                             }
                         }
                         if (! (adir.isEmpty() || cdir.isEmpty())) {
                             if (adir==cdir) {
-                                guess2=lst[i];
+                                guess3=lst[i];
                             }
+                        }
+                        if (acf->getGroup()==lst[i]->getGroup()) {
+                            guess1=lst[i];
                         }
                     }
                 }
             }
             if (guess1) ui->cmbCCF->setCurrentRDR(guess1);
             else if (guess2) ui->cmbCCF->setCurrentRDR(guess2);
+            else if (guess3) ui->cmbCCF->setCurrentRDR(guess3);
+            else qDebug()<<"no guess found";
         }
     }
     replotImages();
     QApplication::restoreOverrideCursor();
 }
 
-void QFImFCCSRelativeCCFDialog::on_cmbCCF_currentIndexChanged(int index)
-{
-    replotImages();
-}
 
 void QFImFCCSRelativeCCFDialog::replotImages()
 {
@@ -260,7 +273,11 @@ void QFImFCCSRelativeCCFDialog::addResult()
         QString evalName=QString("CalcRelCCF_ACF%1_CCF%2").arg(acf->getID()).arg(ccf->getID());
         QString group="results";
         QString egroup=evalName;
-        QString egrouplabel=tr("rel. CCF amlitude of ACF: '%1', CCF: '%2'").arg(acf->getName()).arg(ccf->getName());
+        QString acfName=acf->getRole();
+        if (acfName.isEmpty()) acfName=acf->getName();
+        QString ccfName=ccf->getRole();
+        if (ccfName.isEmpty()) ccfName=ccf->getName();
+        QString egrouplabel=tr("rel. CCF amlitude of CCF/ACF: '%2'/'%1'").arg(acfName).arg(ccfName);
         QString rn="relative_ccf_amplitude";
 
         ccf->resultsSetEvaluationGroup(evalName, egroup);
@@ -269,6 +286,12 @@ void QFImFCCSRelativeCCFDialog::addResult()
         ccf->resultsSetNumberErrorList(evalName, rn, rel, rel_error, w*h);
         ccf->resultsSetLabel(evalName, rn, tr("relative CCF amplitude"));
         ccf->resultsSetGroup(evalName, rn, group);
+        ccf->resultsSetInteger(evalName, "acf_file_id", acf->getID());
+        ccf->resultsSetString(evalName, "acf_file_role", acf->getRole());
+        ccf->resultsSetString(evalName, "acf_file_name", acf->getName());
+        ccf->resultsSetInteger(evalName, "ccf_file_id", ccf->getID());
+        ccf->resultsSetString(evalName, "ccf_file_role", ccf->getRole());
+        ccf->resultsSetString(evalName, "ccf_file_name", ccf->getName());
 
 
 
@@ -286,13 +309,6 @@ void QFImFCCSRelativeCCFDialog::on_btnNextACF_clicked()
 
 }
 
-void QFImFCCSRelativeCCFDialog::on_btnNextFile_clicked()
-{
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    nextFile();
-    QApplication::restoreOverrideCursor();
-}
-
 void QFImFCCSRelativeCCFDialog::on_btnNextFileSameRole_clicked()
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -300,15 +316,6 @@ void QFImFCCSRelativeCCFDialog::on_btnNextFileSameRole_clicked()
     QApplication::restoreOverrideCursor();
 }
 
-void QFImFCCSRelativeCCFDialog::on_btnStoreDataAllSameRole_clicked()
-{
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    addResult();
-    while(nextFileSameRole()) {
-        addResult();
-    }
-    QApplication::restoreOverrideCursor();
-}
 
 bool QFImFCCSRelativeCCFDialog::isACF(const QFRawDataRecord *rec)
 {
@@ -332,15 +339,18 @@ bool QFImFCCSRelativeCCFDialog::nextACF()
     if (current>=0 && current+1<lst.size()) {
         QFRawDataRecord* guess1=NULL;
         QFRawDataRecord* guess2=NULL;
+        QFRawDataRecord* guess3=NULL;
         QString adir=getACF()->getFolder();
         QString ainput=getACF()->getFileForType("input");
         for (int i=current+1; i<lst.size(); i++) {
             if (isACF(lst[i])) {
                 QString binput=lst[i]->getFileForType("input");
                 QString bdir=getACF()->getFolder();
-                if (!(binput.isEmpty() || ainput.isEmpty()) && QFileInfo(ainput)==QFileInfo(binput)) {
+                if (getACF()->getGroup()==lst[i]->getGroup()) {
                     guess1=lst[i];
                     break;
+                } else if (!(binput.isEmpty() || ainput.isEmpty()) && ((QFileInfo(binput)==QFileInfo(ainput)) )) {
+                    if (!guess2) guess2=lst[i];
                 } else if (adir.trimmed().toLower()==bdir.trimmed().toLower()) {
                     if (!guess2) guess2=lst[i];
                 }
@@ -348,40 +358,13 @@ bool QFImFCCSRelativeCCFDialog::nextACF()
         }
         if (guess1) { ui->cmbACF->setCurrentRDR(guess1); return true; }
         else if (guess2) { ui->cmbACF->setCurrentRDR(guess2); return true; }
+        else if (guess3) { ui->cmbACF->setCurrentRDR(guess3); return true; }
     }
     return false;
 
 
 }
 
-bool QFImFCCSRelativeCCFDialog::nextFile()
-{
-    QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
-    if (!(matchFunctor && project&&getACF()) ) return false;
-    QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
-    int current=lst.indexOf(getACF());
-    if (current>=0 && current+1<lst.size()) {
-        QFRawDataRecord* guess1=NULL;
-        QFRawDataRecord* guess2=NULL;
-        QString adir=getACF()->getFolder();
-        QString ainput=getACF()->getFileForType("input");
-        for (int i=current+1; i<lst.size(); i++) {
-            if (isACF(lst[i])) {
-                QString binput=lst[i]->getFileForType("input");
-                QString bdir=getACF()->getFolder();
-                if (!(binput.isEmpty() || ainput.isEmpty()) && QFileInfo(ainput)!=QFileInfo(binput)) {
-                    guess1=lst[i];
-                    break;
-                } else if (adir.trimmed().toLower()!=bdir.trimmed().toLower()) {
-                    if (!guess2) guess2=lst[i];
-                }
-            }
-        }
-        if (guess1) { ui->cmbACF->setCurrentRDR(guess1); return true; }
-        else if (guess2) { ui->cmbACF->setCurrentRDR(guess2); return true; }
-    }
-    return false;
-}
 
 bool QFImFCCSRelativeCCFDialog::nextFileSameRole()
 {
@@ -392,38 +375,100 @@ bool QFImFCCSRelativeCCFDialog::nextFileSameRole()
     if (current>=0 && current+1<lst.size()) {
         QFRawDataRecord* guess1=NULL;
         QFRawDataRecord* guess2=NULL;
+        QFRawDataRecord* guess3=NULL;
         QString adir=getACF()->getFolder();
         QString ainput=getACF()->getFileForType("input");
         for (int i=current+1; i<lst.size(); i++) {
-            if (lst[i] && lst[i]->getRole().toUpper()==getACF()->getRole().toUpper()) {
+            qDebug()<<"checking: "<<lst[i]->getName();
+            if (isACF(lst[i]) && lst[i]->getRole().toUpper()==getACF()->getRole().toUpper()) {
                 QString binput=lst[i]->getFileForType("input");
                 QString bdir=getACF()->getFolder();
-                if (!(binput.isEmpty() || ainput.isEmpty()) && QFileInfo(ainput)!=QFileInfo(binput)) {
+                if (getACF()->getGroup()==lst[i]->getGroup()) {
                     guess1=lst[i];
                     break;
-                } else if (adir.trimmed().toLower()!=bdir.trimmed().toLower()) {
+                } else if (!(binput.isEmpty() || ainput.isEmpty()) && ((QFileInfo(binput)==QFileInfo(ainput)) )) {
+                    if (!guess2) guess2=lst[i];
+                } else if (adir.trimmed().toLower()==bdir.trimmed().toLower()) {
                     if (!guess2) guess2=lst[i];
                 }
             }
         }
         if (guess1) { ui->cmbACF->setCurrentRDR(guess1); return true; }
         else if (guess2) { ui->cmbACF->setCurrentRDR(guess2); return true; }
+        else if (guess3) { ui->cmbACF->setCurrentRDR(guess3); return true; }
     }
     return false;
 }
 
 
+void QFImFCCSRelativeCCFDialog::on_btnHelp_clicked()
+{
+    QFPluginServices::getInstance()->displayPluginHelpWindow("imfccs_fit", "calc_ccf_amplitude.html");
+}
+
+
+
+
+
+
 void QFImFCCSRelativeCCFDialog::on_btnStoreDataAll_clicked()
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QModernProgressDialog progress(tr("calculating relative CCF amplitudes ..."), tr("&Cancel"), this);
+    progress.show();
+    QFRawDataRecord* rdr=ui->cmbACF->currentRDR();
+    QString role="";
+    QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
+    if (rdr&&project) {
+        role=rdr->getRole().toUpper();
+        QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
+        for (int i=0; i<lst.size(); i++) {
+            if (lst[i] && isACF(lst[i])) {
+                ui->cmbACF->setCurrentRDR(lst[i]);
+                break;
+            }
+        }
+
+    }
+    QApplication::processEvents();
+    on_cmbACF_currentIndexChanged(ui->cmbACF->currentIndex());
     addResult();
     while (nextACF()) {
+        on_cmbACF_currentIndexChanged(ui->cmbACF->currentIndex());
+        //QApplication::processEvents();
         addResult();
+        if (progress.wasCanceled()) break;
     }
     QApplication::restoreOverrideCursor();
 }
 
-void QFImFCCSRelativeCCFDialog::on_btnHelp_clicked()
+void QFImFCCSRelativeCCFDialog::on_btnStoreDataAllSameRole_clicked()
 {
-    QFPluginServices::getInstance()->displayPluginHelpWindow("imfccs_fit", "calc_ccf_amplitude.html");
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
+    QModernProgressDialog progress(tr("calculating relative CCF amplitudes ..."), tr("&Cancel"), this);
+    progress.show();
+    QFRawDataRecord* rdr=ui->cmbACF->currentRDR();
+    QString role="";
+    if (project&&rdr) {
+        role=rdr->getRole().toUpper();
+        QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
+        for (int i=0; i<lst.size(); i++) {
+            if (lst[i] && lst[i]->getRole().toUpper()==role && isACF(lst[i])) {
+                ui->cmbACF->setCurrentRDR(lst[i]);
+                break;
+            }
+        }
+
+    }
+    QApplication::processEvents();
+    on_cmbACF_currentIndexChanged(ui->cmbACF->currentIndex());
+    addResult();
+    while(nextFileSameRole()) {
+        on_cmbACF_currentIndexChanged(ui->cmbACF->currentIndex());
+        //QApplication::processEvents();
+        addResult();
+        if (progress.wasCanceled()) break;
+    }
+    QApplication::restoreOverrideCursor();
 }

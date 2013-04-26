@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>QFImFCCSRelativeCCFDialog</class>
- <widget class="QDialog" name="QFImFCCSRelativeCCFDialog">
+ <widget class="QWidget" name="QFImFCCSRelativeCCFDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>942</width>
-    <height>606</height>
+    <width>642</width>
+    <height>578</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -56,37 +56,14 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
-      <widget class="QSpinBox" name="spinAvg">
-       <property name="minimum">
-        <number>1</number>
-       </property>
-       <property name="maximum">
-        <number>100</number>
-       </property>
-       <property name="singleStep">
-        <number>3</number>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="3">
-      <widget class="QPushButton" name="btnNextFileSameRole">
-       <property name="text">
-        <string>next file, same &amp;role</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="3">
-      <widget class="QPushButton" name="btnNextFile">
-       <property name="text">
-        <string>next &amp;file</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="3">
       <widget class="QPushButton" name="btnNextACF">
        <property name="text">
-        <string>&amp;next ACF</string>
+        <string>&amp;next</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/prop_next.png</normaloff>:/lib/prop_next.png</iconset>
        </property>
       </widget>
      </item>
@@ -106,10 +83,61 @@
        </property>
       </spacer>
      </item>
+     <item row="3" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QSpinBox" name="spinAvg">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="singleStep">
+          <number>3</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="3">
+      <widget class="QPushButton" name="btnNextFileSameRole">
+       <property name="text">
+        <string>next file, same &amp;role</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/prop_next.png</normaloff>:/lib/prop_next.png</iconset>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout" rowstretch="0,1,0,1" columnstretch="1,1">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>ACF overview</string>
+       </property>
+       <property name="buddy">
+        <cstring>widOverviewACF</cstring>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="1">
       <widget class="QFRDRImageToRunPreview" name="widOverviewCCF" native="true">
        <property name="minimumSize">
@@ -120,81 +148,40 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>CCF overview</string>
-       </property>
-       <property name="buddy">
-        <cstring>widOverviewCCF</cstring>
+     <item row="1" column="0">
+      <widget class="QFRDRImageToRunPreview" name="widOverviewACF" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>100</height>
+        </size>
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
-      <layout class="QGridLayout" name="gridLayout_2" columnstretch="0">
-       <item row="1" column="0">
-        <widget class="QPushButton" name="btnStoreData">
-         <property name="text">
-          <string>&amp;store result</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../../lib/lib.qrc">
-           <normaloff>:/lib/file_add.png</normaloff>:/lib/file_add.png</iconset>
-         </property>
-         <property name="default">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QPushButton" name="btnStoreDataAll">
-         <property name="text">
-          <string>&amp;store all results</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../../lib/lib.qrc">
-           <normaloff>:/lib/file_add.png</normaloff>:/lib/file_add.png</iconset>
-         </property>
-         <property name="default">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
+     <item row="2" column="0" colspan="2">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>rel. CCF amplitude</string>
+       </property>
+       <property name="buddy">
+        <cstring>pltData</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" colspan="2">
+      <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,0,0">
+       <item row="0" column="2">
         <widget class="QPushButton" name="btnReplot">
          <property name="text">
           <string>&amp;replot</string>
          </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="4" column="0">
-        <widget class="QPushButton" name="btnStoreDataAllSameRole">
-         <property name="text">
-          <string>&amp;store all results, same role</string>
-         </property>
          <property name="icon">
           <iconset resource="../../lib/lib.qrc">
-           <normaloff>:/lib/file_add.png</normaloff>:/lib/file_add.png</iconset>
-         </property>
-         <property name="default">
-          <bool>true</bool>
+           <normaloff>:/lib/refresh16.png</normaloff>:/lib/refresh16.png</iconset>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="1" column="2">
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -207,45 +194,90 @@
          </property>
         </spacer>
        </item>
+       <item row="4" column="2">
+        <widget class="QPushButton" name="btnStoreDataAll">
+         <property name="text">
+          <string>&amp;store all results</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../lib/lib.qrc">
+           <normaloff>:/lib/save_all.png</normaloff>:/lib/save_all.png</iconset>
+         </property>
+         <property name="default">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2">
+        <widget class="QPushButton" name="btnStoreDataAllSameRole">
+         <property name="text">
+          <string>&amp;store all results, same role</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../lib/lib.qrc">
+           <normaloff>:/lib/save_all.png</normaloff>:/lib/save_all.png</iconset>
+         </property>
+         <property name="default">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="3" column="2">
+        <widget class="QPushButton" name="btnStoreData">
+         <property name="text">
+          <string>&amp;store this result</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../lib/lib.qrc">
+           <normaloff>:/lib/save16.png</normaloff>:/lib/save16.png</iconset>
+         </property>
+         <property name="default">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>store rel. CCF plot to CCF RDR as a result:</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" rowspan="6">
+        <widget class="QFPlotter" name="pltData" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>100</height>
+          </size>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_3">
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>ACF overview</string>
+        <string>CCF overview</string>
        </property>
        <property name="buddy">
-        <cstring>widOverviewACF</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QFPlotter" name="pltData" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>100</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>rel. CCF amplitude</string>
-       </property>
-       <property name="buddy">
-        <cstring>pltData</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QFRDRImageToRunPreview" name="widOverviewACF" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>100</height>
-        </size>
+        <cstring>widOverviewCCF</cstring>
        </property>
       </widget>
      </item>
@@ -314,10 +346,10 @@
  <tabstops>
   <tabstop>cmbACF</tabstop>
   <tabstop>cmbCCF</tabstop>
-  <tabstop>btnStoreData</tabstop>
   <tabstop>pushButton</tabstop>
  </tabstops>
  <resources>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
@@ -329,8 +361,8 @@
    <slot>replotImages()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>431</x>
-     <y>269</y>
+     <x>630</x>
+     <y>270</y>
     </hint>
     <hint type="destinationlabel">
      <x>488</x>
@@ -345,8 +377,8 @@
    <slot>addResult()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>499</x>
-     <y>238</y>
+     <x>630</x>
+     <y>474</y>
     </hint>
     <hint type="destinationlabel">
      <x>439</x>
@@ -361,12 +393,28 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>500</x>
-     <y>509</y>
+     <x>631</x>
+     <y>567</y>
     </hint>
     <hint type="destinationlabel">
      <x>464</x>
      <y>482</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinAvg</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QFImFCCSRelativeCCFDialog</receiver>
+   <slot>replotImages()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>127</x>
+     <y>82</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>215</x>
+     <y>88</y>
     </hint>
    </hints>
   </connection>

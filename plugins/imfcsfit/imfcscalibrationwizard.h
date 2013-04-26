@@ -1,13 +1,13 @@
 #ifndef IMFCSCALIBRATIONWIZARD_H
 #define IMFCSCALIBRATIONWIZARD_H
 
-#include <QDialog>
+#include <QWidget>
 
 namespace Ui {
     class ImFCSCalibrationWizard;
 }
 
-class ImFCSCalibrationWizard : public QDialog
+class ImFCSCalibrationWizard : public QWidget
 {
         Q_OBJECT
         

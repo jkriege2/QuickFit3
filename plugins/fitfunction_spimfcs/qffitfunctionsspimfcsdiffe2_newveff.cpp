@@ -1,6 +1,7 @@
 #include "qffitfunctionsspimfcsdiffe2_newveff.h"
 #include <cmath>
 #include "qftools.h"
+#include "imfcstools.h"
 #define sqr(x) qfSqr(x)
 #define cube(x) qfCube(x)
 #define pow4(x) qfPow4(x)
@@ -100,7 +101,7 @@ double QFFitFunctionsSPIMFCSDiffE2NewVeff::evaluate(double t, const double* data
         cfac=cfac+rho3*d3;
     }
 
-    const double Veff=sqpi*sqr(a)*sigmaz/sqr(erf(a/wxy)+wxy/sqpi/a*(exp(-sqr(a/wxy))-1.0));
+    const double Veff=SPIMFCS_newVeff(a, wxy, sigmaz);
     const double pre=1.0/sqr(a)/sqpi/sigmaz;
     return offset+pre/(N/Veff)*cfac*backfactor;
 }
@@ -239,13 +240,17 @@ void QFFitFunctionsSPIMFCSDiffE2NewVeff::calcParameter(double* data, double* err
     //const double pi32=pow(M_PI, 3.0/2.0);
     const double sqpi=sqrt(M_PI);
     // calculate Veff
-    data[FCSSDiff_focus_volume]=sqpi*sqr(a)*sigmaz/sqr(erf(a/wxy)+wxy/sqpi/a*(exp(-sqr(a/wxy))-1.0));
-    if (error) error[FCSSDiff_focus_volume]=0;
+    data[FCSSDiff_focus_volume]=SPIMFCS_newVeff(a, wxy, sigmaz);;
+    if (error) error[FCSSDiff_focus_volume]=SPIMFCS_newVeffError(a, wxy, sigmaz);;
 
     // calculate C = N / Veff
-    if (data[FCSSDiff_focus_volume]!=0) data[FCSSDiff_concentration]=N/data[FCSSDiff_focus_volume]/(NAVOGADRO * 1.0e-24); else data[FCSSDiff_concentration]=0;
-    if (error) {
-        error[FCSSDiff_concentration]=0;
+    if (data[FCSSDiff_focus_volume]!=0) {
+        data[FCSSDiff_concentration]=N/data[FCSSDiff_focus_volume]/(NAVOGADRO * 1.0e-24);
+    } else {
+        data[FCSSDiff_concentration]=0;
+    }
+    if (data[FCSSDiff_focus_volume]!=0 && error) {
+        error[FCSSDiff_concentration]=sqrt(qfSqr(eN/data[FCSSDiff_focus_volume]/(NAVOGADRO * 1.0e-24))+qfSqr(error[FCSSDiff_focus_volume]*N/qfSqr(data[FCSSDiff_focus_volume])/(NAVOGADRO * 1.0e-24)));//N/data[FCSSDiff_focus_volume]/(NAVOGADRO * 1.0e-24)
     }
 
 

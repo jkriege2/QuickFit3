@@ -71,6 +71,8 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void on_cmbWeight_currentWeightChanged(QFFCSWeightingTools::DataWeight weight);
 
         void setCurrentRun(int run);
+
+        void configureForSPIMFCCS();
     protected:
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFImFCCSFitEvaluationEditor *ui;
@@ -80,6 +82,8 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         
         /** \brief where did we save the last report */
         QString currentSaveDirectory;
+        QAction* actConfigureForSPIMFCCS;
+        QMenu* menuImFCCSFit;
         
         /*! \brief a flag that indicates whether we are currently updating the display data 
         

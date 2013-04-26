@@ -1,15 +1,16 @@
 #ifndef QFIMFCCSRELATIVECCFDIALOG_H
 #define QFIMFCCSRELATIVECCFDIALOG_H
 
-#include <QDialog>
+#include <QWidget>
 #include "qfimfccsfitevaluation_item.h"
 #include "qfplotter.h"
+#include "qmodernprogresswidget.h"
 
 namespace Ui {
     class QFImFCCSRelativeCCFDialog;
 }
 
-class QFImFCCSRelativeCCFDialog : public QDialog
+class QFImFCCSRelativeCCFDialog : public QWidget
 {
         Q_OBJECT
         
@@ -28,7 +29,6 @@ class QFImFCCSRelativeCCFDialog : public QDialog
         void replotImages();
         void addResult();
         void on_btnNextACF_clicked();
-        void on_btnNextFile_clicked();
         void on_btnNextFileSameRole_clicked();
         void on_btnStoreDataAllSameRole_clicked();
         void on_btnStoreDataAll_clicked();
@@ -39,7 +39,6 @@ class QFImFCCSRelativeCCFDialog : public QDialog
         JKQTPColumnMathImage* plt;
 
         bool nextACF();
-        bool nextFile();
         bool nextFileSameRole();
 
         bool isACF(const QFRawDataRecord* rec);

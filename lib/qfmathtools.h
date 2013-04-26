@@ -30,20 +30,20 @@
 /*! \brief squares the argument
     \ingroup qf3lib_mathtools
  */
-QFLIB_EXPORT inline double qfSqr(double x) { return x*x; }
-QFLIB_EXPORT inline float qfSqr(float x) { return x*x; }
+inline double qfSqr(double x) { return x*x; }
+inline float qfSqr(float x) { return x*x; }
 
 /*! \brief takes the argument to the third power
     \ingroup qf3lib_mathtools
  */
-QFLIB_EXPORT inline double qfCube(double x) { return x*x*x; }
-QFLIB_EXPORT inline float qfCube(float x) { return x*x*x; }
+inline double qfCube(double x) { return x*x*x; }
+inline float qfCube(float x) { return x*x*x; }
 
 /*! \brief takes the argument to the fourth power
     \ingroup qf3lib_mathtools
  */
-QFLIB_EXPORT inline double qfPow4(double x) { double x2=x*x; return x2*x2; }
-QFLIB_EXPORT inline float qfPow4(float x) { float x2=x*x; return x2*x2; }
+inline double qfPow4(double x) { double x2=x*x; return x2*x2; }
+inline float qfPow4(float x) { float x2=x*x; return x2*x2; }
 
 
 QFLIB_EXPORT double qfSinc(double x);

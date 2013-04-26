@@ -75,6 +75,7 @@
         <file alias="copy16_matlab.png">icons/copy16_matlab.png</file>
         <file alias="report_bug.png">icons/tools_report_bug.png</file>
         <file alias="wizard.png">icons/tools_wizard.png</file>
+        <file alias="save_all.png">icons/save_all.png</file>
     </qresource>
     <qresource prefix="/lib/qfstyledbutton">
         <file alias="network.png">icons/network.png</file>

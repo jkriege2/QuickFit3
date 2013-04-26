@@ -1,6 +1,7 @@
 #include "qffitfunctionsspimfcsdiffce2.h"
 #include <cmath>
 #include "qftools.h"
+#include "imfcstools.h"
 #define sqr(x) qfSqr(x)
 #define cube(x) qfCube(x)
 #define pow4(x) qfPow4(x)
@@ -228,11 +229,9 @@ void QFFitFunctionsSPIMFCSDiffCE2::calcParameter(double* data, double* error) co
 
 
 
-    //const double pi32=pow(M_PI, 3.0/2.0);
-    const double sqpi=sqrt(M_PI);
     // calculate Veff
-    data[FCSSDiff_focus_volume]=sqpi*sqr(a)*sigmaz/sqr(erf(a/wxy)+wxy/sqpi/a*(exp(-sqr(a/wxy))-1.0));
-    if (error) error[FCSSDiff_focus_volume]=0;
+    data[FCSSDiff_focus_volume]=SPIMFCS_newVeff(a, wxy, sigmaz);
+    if (error) error[FCSSDiff_focus_volume]=SPIMFCS_newVeffError(a, wxy, sigmaz);
 
 
 

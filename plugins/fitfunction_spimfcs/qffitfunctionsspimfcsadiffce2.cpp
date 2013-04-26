@@ -1,0 +1,238 @@
+#include "qffitfunctionsspimfcsadiffce2.h"
+#include "qfpreprocessormagic.h"
+#include "imfcstools.h"
+#include <QDebug>
+#include <cmath>
+#define sqr(x) ((x)*(x))
+#define cube(x) ((x)*(x)*(x))
+#define pow4(x) ((x)*(x)*(x)*(x))
+#define pow5(x) ((x)*(x)*(x)*(x)*(x))
+#define NAVOGADRO (6.02214179e23)
+
+
+QFFitFunctionsSPIMFCSADiffCE2::QFFitFunctionsSPIMFCSADiffCE2() {
+
+
+
+    //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
+    addParameter(IntCombo,     "n_components",            "number of diffusing components",                        "components",               "",            "",                      false,     true,         false,             QFFitFunction::NoError,      false, 1,            1,        3,        1,   1,      2);
+    #define SPIMFCSADIFF_n_components QFPPM_COUNT_START
+    addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define SPIMFCSADIFF_concentration QFPPM_INC(QFPPM_COUNT_START)
+    addParameter(FloatNumber,  "diff_rho1",               "fraction of first component",                           "&rho;<sub>1</sub>",        "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1);
+    #define SPIMFCSADIFF_diff_rho1 QFPPM_INC(SPIMFCSADIFF_concentration)
+    addParameter(FloatNumber,  "diff_acoeff1",            "anomalous diffusion coefficient of species 1",          "&Gamma;<sub>1</sub>",      "micron^2/s^{\alpha_1}", "&mu;m<sup>2</sup>/s<sup>&alpha;1</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    #define SPIMFCSADIFF_diff_acoeff1 QFPPM_INC(SPIMFCSADIFF_diff_rho1)
+    addParameter(FloatNumber,  "diff_alpha1",             "anomality parameter of species 1",                      "&alpha;<sub>1</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0.01,     100,      0.1, 0        );
+    #define SPIMFCSADIFF_diff_alpha1 QFPPM_INC(SPIMFCSADIFF_diff_acoeff1)
+    addParameter(FloatNumber,  "diff_rho2",               "fraction of second component",                          "&rho;<sub>2</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1  );
+    #define SPIMFCSADIFF_diff_rho2 QFPPM_INC(SPIMFCSADIFF_diff_alpha1)
+    addParameter(FloatNumber,  "diff_acoeff2",            "anomalous diffusion coefficient of species 2",          "&Gamma;<sub>2</sub>",      "micron^2/s^{\alpha_2}", "&mu;m<sup>2</sup>/s<sup>&alpha;2</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    #define SPIMFCSADIFF_diff_acoeff2 QFPPM_INC(SPIMFCSADIFF_diff_rho2)
+    addParameter(FloatNumber,  "diff_alpha2",             "anomality parameter of species 2",                      "&alpha;<sub>2</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0.01,     100,      0.1, 0        );
+    #define SPIMFCSADIFF_diff_alpha2 QFPPM_INC(SPIMFCSADIFF_diff_acoeff2)
+    addParameter(FloatNumber,  "diff_rho3",               "fraction of third component",                           "&rho;<sub>3</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1  );
+    #define SPIMFCSADIFF_diff_rho3 QFPPM_INC(SPIMFCSADIFF_diff_alpha2)
+    addParameter(FloatNumber,  "diff_acoeff3",            "anomalous diffusion coefficient of species 3",          "&Gamma;<sub>3</sub>",      "micron^2/s^{\alpha_3}", "&mu;m<sup>2</sup>/s<sup>&alpha;3</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    #define SPIMFCSADIFF_diff_acoeff3 QFPPM_INC(SPIMFCSADIFF_diff_rho3)
+    addParameter(FloatNumber,  "diff_alpha3",             "anomality parameter of species 3",                      "&alpha;<sub>3</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0.01,     100,      0.1, 0        );
+    #define SPIMFCSADIFF_diff_alpha3 QFPPM_INC(SPIMFCSADIFF_diff_acoeff3)
+
+    addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
+    #define SPIMFCSADIFF_offset QFPPM_INC(SPIMFCSADIFF_diff_alpha3)
+    addParameter(FloatNumber,  "focus_hieght",            "PSF: axial radius (1/e²)",                              "w<sub>z</sub>",            "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 620,         0.01,     1e5,      10  );
+    #define SPIMFCSADIFF_focus_height QFPPM_INC(SPIMFCSADIFF_offset)
+    addParameter(FloatNumber,  "focus_width",             "PSF: lateral radius (1/e²)",                            "w<sub>x,y</sub>",          "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 300,          0,        1e4,      10    );
+    #define SPIMFCSADIFF_focus_width QFPPM_INC(SPIMFCSADIFF_focus_height)
+    addParameter(FloatNumber,  "pixel_width",             "pixel width",                                           "a",                        "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 400,          0,        1e4,      10    );
+    #define SPIMFCSADIFF_pixel_width QFPPM_INC(SPIMFCSADIFF_focus_width)
+    addParameter(FloatNumber,  "focus_volume",            "focus: effective colume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define SPIMFCSADIFF_focus_volume QFPPM_INC(SPIMFCSADIFF_pixel_width)
+    addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
+    #define SPIMFCSADIFF_count_rate QFPPM_INC(SPIMFCSADIFF_focus_volume)
+    addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
+    #define SPIMFCSADIFF_background QFPPM_INC(SPIMFCSADIFF_count_rate)
+
+}
+
+double QFFitFunctionsSPIMFCSADiffCE2::evaluate(double t, const double* data) const {
+    const int comp=data[SPIMFCSADIFF_n_components];
+    const double C=data[SPIMFCSADIFF_concentration];
+    const double GAMMA1=data[SPIMFCSADIFF_diff_acoeff1];
+    const double GAMMA2=data[SPIMFCSADIFF_diff_acoeff2];
+    const double GAMMA3=data[SPIMFCSADIFF_diff_acoeff3];
+    const double a1=data[SPIMFCSADIFF_diff_alpha1];
+    const double a2=data[SPIMFCSADIFF_diff_alpha2];
+    const double a3=data[SPIMFCSADIFF_diff_alpha3];
+    const double rho2=data[SPIMFCSADIFF_diff_rho2];
+    const double rho3=data[SPIMFCSADIFF_diff_rho3];
+    const double sigmaz=data[SPIMFCSADIFF_focus_height]/1.0e3;
+    const double wxy=data[SPIMFCSADIFF_focus_width]/1.0e3;
+    const double a=data[SPIMFCSADIFF_pixel_width]/1.0e3;
+    const double offset=data[SPIMFCSADIFF_offset];
+    const double background=data[SPIMFCSADIFF_background];
+    const double cr=data[SPIMFCSADIFF_count_rate];
+    double backfactor=sqr(cr-background)/sqr(cr);
+    if (fabs(cr)<1e-15 || fabs(background)<1e-10) backfactor=1;
+
+    double rho1=1;
+    if (comp==2) {
+        rho1=1.0-rho2;
+    }
+    if (comp==3) {
+        rho1=1.0-rho2-rho3;
+    }
+
+    double cfac=0;
+    const double sqpi=sqrt(M_PI);
+
+    if (comp>0) {
+        const double ta1=pow(t, a1);
+        const double fac_z1=sqrt(1.0+4.0*GAMMA1*ta1/sqr(sigmaz));
+        const double dt_sigma2=4.0*GAMMA1*ta1+sqr(wxy);
+        const double fac_xy1=erf(a/sqrt(dt_sigma2))+sqrt(dt_sigma2)/(sqpi*a)*(exp(-sqr(a)/dt_sigma2)-1.0);
+        const double d1=1.0/fac_z1*sqr(fac_xy1);
+        cfac=rho1*d1;
+    }
+
+    if (comp>1) {
+        const double ta2=pow(t, a2);
+        const double fac_z2=sqrt(1.0+4.0*GAMMA2*ta2/sqr(sigmaz));
+        const double dt_sigma22=4.0*GAMMA2*ta2+sqr(wxy);
+        const double fac_xy2=erf(a/sqrt(dt_sigma22))+sqrt(dt_sigma22)/(sqpi*a)*(exp(-sqr(a)/dt_sigma22)-1.0);
+        const double d2=1.0/fac_z2*sqr(fac_xy2);
+        cfac=cfac+rho2*d2;
+    }
+
+    if (comp>2) {
+        const double ta3=pow(t, a3);
+        const double fac_z3=sqrt(1.0+4.0*GAMMA3*ta3/sqr(sigmaz));
+        const double dt_sigma23=4.0*GAMMA3*ta3+sqr(wxy);
+        const double fac_xy3=erf(a/sqrt(dt_sigma23))+sqrt(dt_sigma23)/(sqpi*a)*(exp(-sqr(a)/dt_sigma23)-1.0);
+        const double d3=1.0/fac_z3*sqr(fac_xy3);
+        cfac=cfac+rho3*d3;
+    }
+
+    const double pre=1.0/sqr(a)/sqpi/sigmaz;
+    return offset+pre/(C)*cfac*backfactor;
+
+}
+
+
+
+void QFFitFunctionsSPIMFCSADiffCE2::sortParameter(double *parameterValues, double *error, bool *fix) const {
+
+
+}
+
+void QFFitFunctionsSPIMFCSADiffCE2::calcParameter(double* data, double* error) const {
+    double C=data[SPIMFCSADIFF_concentration];
+    double eC=0;
+    //double D1=data[SPIMFCSADIFF_diff_acoeff1];
+    double eD1=0;
+    double sigmaz=data[SPIMFCSADIFF_focus_height]/1.0e3;
+    double esigmaz=0;
+    double wxy=data[SPIMFCSADIFF_focus_width]/1.0e3;
+    double ewxy=0;
+    double a=data[SPIMFCSADIFF_pixel_width]/1.0e3;
+    double ea=0;
+    //double offset=data[SPIMFCSADIFF_offset];
+    double eoffset=0;
+
+    int comp=data[SPIMFCSADIFF_n_components];
+    double rho2=data[SPIMFCSADIFF_diff_rho2];
+    double erho2=0;
+    double rho3=data[SPIMFCSADIFF_diff_rho3];
+    double erho3=0;
+    double cps=data[SPIMFCSADIFF_count_rate];
+    double ecps=0;
+    //double ecpm=0;
+    double background=data[SPIMFCSADIFF_background];
+    double ebackground=0;
+
+    if (error) {
+        eC=error[SPIMFCSADIFF_concentration];
+        eD1=error[SPIMFCSADIFF_diff_acoeff1];
+        esigmaz=error[SPIMFCSADIFF_focus_height]/1.0e3;
+        ewxy=error[SPIMFCSADIFF_focus_width]/1.0e3;
+        ea=error[SPIMFCSADIFF_pixel_width]/1.0e3;
+        eoffset=error[SPIMFCSADIFF_offset];
+        erho2=error[SPIMFCSADIFF_diff_rho2];
+        erho3=error[SPIMFCSADIFF_diff_rho3];
+        ecps=error[SPIMFCSADIFF_count_rate];
+        //ecpm=error[SPIMFCSADIFF_cpm];
+        ebackground=error[SPIMFCSADIFF_background];
+    }
+
+
+    // calculate rho1
+    double rho1=1;
+    double erho1=0;
+    if (comp==2) {
+        if (rho2>1.0) rho2=1.0;
+        if (rho2<0.0) rho2=0.0;
+        if (rho2>1.0) {
+            rho1=0;
+            rho2=0.5;
+        }
+        rho1=1.0-rho2;
+        erho1=erho2;
+    }
+    if (comp==3) {
+        if (rho2>1.0) rho2=1.0;
+        if (rho2<0.0) rho2=0.0;
+        if (rho3>1.0) rho3=1.0;
+        if (rho3<0.0) rho3=0.0;
+        if (rho2+rho3>1.0) {
+            rho1=0;
+            rho2=rho3=0.5;
+        }
+        rho1=1.0-rho2-rho3;
+        erho1=sqrt(erho2*erho2+erho3*erho3);
+    }
+
+    data[SPIMFCSADIFF_diff_rho1]=rho1;
+    data[SPIMFCSADIFF_diff_rho2]=rho2;
+    data[SPIMFCSADIFF_diff_rho3]=rho3;
+    if (error) {
+        error[SPIMFCSADIFF_diff_rho1]=erho1;
+        error[SPIMFCSADIFF_diff_rho2]=erho2;
+        error[SPIMFCSADIFF_diff_rho3]=erho3;
+    }
+
+
+    // calculate 1/N
+    //data[SPIMFCSADIFF_1n_particle]=1.0/N;
+    //if (error) error[SPIMFCSADIFF_1n_particle]=fabs(eN/N/N);
+
+    //const double sqpi=sqrt(M_PI);
+    // calculate Veff
+    data[SPIMFCSADIFF_focus_volume]=SPIMFCS_newVeff(a, wxy, sigmaz);
+    if (error) error[SPIMFCSADIFF_focus_volume]=SPIMFCS_newVeffError(a, wxy, sigmaz);
+
+
+
+    // calculate CPM = (CPS-background)/N
+    //data[SPIMFCSADIFF_cpm]=(cps-background)/N;
+    //error[SPIMFCSADIFF_cpm]=sqrt(sqr(ecps/N)+sqr(ebackground/N)+sqr(eN*(cps-background)/sqr(N)));
+
+}
+
+bool QFFitFunctionsSPIMFCSADiffCE2::isParameterVisible(int parameter, const double* data) const {
+    int comp=data[SPIMFCSADIFF_n_components];
+    switch(parameter) {
+        case SPIMFCSADIFF_diff_rho1:  return comp>1;
+        case SPIMFCSADIFF_diff_acoeff1: case SPIMFCSADIFF_diff_alpha1: return comp>0;
+        case SPIMFCSADIFF_diff_rho2: case SPIMFCSADIFF_diff_acoeff2: case SPIMFCSADIFF_diff_alpha2: return comp>1;
+        case SPIMFCSADIFF_diff_rho3: case SPIMFCSADIFF_diff_acoeff3: case SPIMFCSADIFF_diff_alpha3: return comp>2;
+    }
+    return true;
+}
+
+unsigned int QFFitFunctionsSPIMFCSADiffCE2::getAdditionalPlotCount(const double* params) {
+    return 0;
+}
+
+QString QFFitFunctionsSPIMFCSADiffCE2::transformParametersForAdditionalPlot(int plot, double* params) {
+    return "";
+}

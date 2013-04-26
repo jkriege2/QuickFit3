@@ -16,7 +16,7 @@ int QFImFCCSParameterInputTable::rowCount(const QModelIndex &parent) const
 
 int QFImFCCSParameterInputTable::columnCount(const QModelIndex &parent) const
 {
-    return 1+colsPerRDR*item->getNumberOfFitFiles();
+    return 1+colsPerRDR*item->getFitFileCount();
 }
 
 Qt::ItemFlags QFImFCCSParameterInputTable::flags(const QModelIndex &index) const
@@ -268,7 +268,7 @@ bool QFImFCCSParameterInputTable::recalculateFitParameters(bool emitFitParamSign
 {
     bool changed=false;
 
-    for (int i=0; i<item->getNumberOfFitFiles(); i++) {
+    for (int i=0; i<item->getFitFileCount(); i++) {
         QFRawDataRecord* rdr=item->getFitFile(i);
         QFFitFunction* ff=item->getFitFunction(i);
         //qDebug()<<"   file="<<i<<"   rdr="<<rdr<<"   ff="<<ff;
@@ -330,7 +330,7 @@ bool QFImFCCSParameterInputTable::checkRebuildModel(bool alwaysreset)
     rebuildCount++;
     t.start();
 
-    for (int i=0; i<item->getNumberOfFitFiles(); i++) {
+    for (int i=0; i<item->getFitFileCount(); i++) {
         QFRawDataRecord* rdr=item->getFitFile(i);
         QFFitFunction* ff=item->getFitFunction(i);
         //qDebug()<<"   file="<<i<<"   rdr="<<rdr<<"   ff="<<ff;

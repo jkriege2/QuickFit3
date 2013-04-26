@@ -4,7 +4,6 @@
 
 
 
-
 /*! \brief QFFitFunction class for a SPIM-FCS fit model with pure diffusion and lateral 1/e^2 width
     \ingroup qf3fitfunp_fitfunctions_spimfcs
 

@@ -363,6 +363,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
     if (editor) {
         if (gr>=0) editor->sendEditorCommand("showPlot", gr);
         editor->showTab(2);
+        editor->raise();
     }
 
     QApplication::restoreOverrideCursor();
@@ -568,6 +569,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool4()
     if (editor) {
         if (gr>=0) editor->sendEditorCommand("showPlot", gr);
         editor->showTab(2);
+        editor->raise();
     }
 
 

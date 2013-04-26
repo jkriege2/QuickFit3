@@ -89,6 +89,12 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     connect(ui->pltData->get_plotter()->get_actZoomAll(), SIGNAL(triggered()), ui->pltResiduals, SLOT(zoomToFit()));
 
 
+    menuImFCCSFit=propEditor->addOrFindMenu(tr("Tools"), 0);
+    actConfigureForSPIMFCCS=new QAction(tr("configure for SPIM-FCCS ..."), this);
+    connect(actConfigureForSPIMFCCS, SIGNAL(triggered()), this, SLOT(configureForSPIMFCCS()));
+
+    menuImFCCSFit->addAction(actConfigureForSPIMFCCS);
+    menuImFCCSFit->addSeparator();
 
     
     // create progress dialog for evaluation
@@ -291,6 +297,7 @@ void QFImFCCSFitEvaluationEditor::setCurrentRun(int run)
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
     data->setCurrentIndex(run);
 
     QFRawDataRecord* currentRecord=data->getFitFile(0);
@@ -306,6 +313,25 @@ void QFImFCCSFitEvaluationEditor::setCurrentRun(int run)
 
     displayEvaluation();
     QApplication::restoreOverrideCursor();
+}
+
+void QFImFCCSFitEvaluationEditor::configureForSPIMFCCS() {
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+
+    if (data->getFitFileCount()<3) {
+        while (data->getFitFileCount()<3) {
+            data->addFitFile();
+        }
+    } else if (data->getFitFileCount()>3) {
+        while (data->getFitFileCount()>3) {
+            data->removeFitFile();
+        }
+    }
+
+    data->setFitFunction(0, "fcs_spim_diffc");
+    data->setFitFunction(1, "fcs_spim_diffc");
+    data->setFitFunction(2, "fccs_spim_diff2color");
 }
 
 void QFImFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
@@ -410,7 +436,7 @@ void QFImFCCSFitEvaluationEditor::displayData() {
     cols<<QColor("darkgreen")<<QColor("red")<<QColor("blue")<<QColor("darkorange")<<QColor("purple")<<QColor("maroon");
     qDebug()<<"\n\n\n\n ### displayData() eval="<<eval<<" ###";
     if (eval) {
-        for (int file=0; file<eval->getNumberOfFitFiles(); file++) {
+        for (int file=0; file<eval->getFitFileCount(); file++) {
             QFFitFunction* ff=eval->getFitFunction(file);
             QFRawDataRecord* rec=eval->getFitFile(file);
 
@@ -762,7 +788,7 @@ void QFImFCCSFitEvaluationEditor::setUserMinMax(int userMin, int userMax)
     if (!current) return;
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     if (!data) return;
-    for (int i=0; i<data->getNumberOfFitFiles(); i++) {
+    for (int i=0; i<data->getFitFileCount(); i++) {
         QFRawDataRecord* rdr=data->getFitFile(i);
         const QString resultID=data->getEvaluationResultID(rdr);
         rdr->disableEmitPropertiesChanged();

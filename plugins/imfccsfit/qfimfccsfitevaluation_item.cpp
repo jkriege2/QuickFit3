@@ -330,7 +330,7 @@ QFImFCCSParameterInputTable *QFImFCCSFitEvaluationItem::getParameterInputTableMo
     return paramTable;
 }
 
-int QFImFCCSFitEvaluationItem::getNumberOfFitFiles() const
+int QFImFCCSFitEvaluationItem::getFitFileCount() const
 {
     return fitFilesList.size();
 }

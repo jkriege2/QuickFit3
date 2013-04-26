@@ -16,7 +16,10 @@ HEADERS += qfpfitfunctionsspimfcs.h \
     qffitfunctionsspimfccsdiff2color.h \
     qffitfunctionsspimfcsdiffc.h \
     qffitfunctionsspimfcsdiffe2_newveff.h \
-    qffitfunctionsspimfcsdiffce2.h
+    qffitfunctionsspimfcsdiffce2.h \
+    qffitfunctionsspimfcsadiffe2.h \
+    imfcstools.h \
+    qffitfunctionsspimfcsadiffce2.h
 
 SOURCES += qfpfitfunctionsspimfcs.cpp\
            qffitfunctionsspimfcsdiff.cpp \
@@ -26,7 +29,10 @@ SOURCES += qfpfitfunctionsspimfcs.cpp\
     qffitfunctionsspimfccsdiff2color.cpp \
     qffitfunctionsspimfcsdiffc.cpp \
     qffitfunctionsspimfcsdiffe2_newveff.cpp \
-    qffitfunctionsspimfcsdiffce2.cpp
+    qffitfunctionsspimfcsdiffce2.cpp \
+    qffitfunctionsspimfcsadiffe2.cpp \
+    imfcstools.cpp \
+    qffitfunctionsspimfcsadiffce2.cpp
 
 FORMS =
 
