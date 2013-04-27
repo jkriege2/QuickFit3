@@ -14,17 +14,17 @@
  * default-Funktionen für den Parser
  ******************************************************************************************/
 
-QFMathParser::qfmpResult fdoubleToQString(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fdoubleToQString(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpString;
-  if (n!=1) p->qfmpError("doubleToQString accepts 1 argument");
-  if (params[0].type!=QFMathParser::qfmpDouble) p->qfmpError("doubleToQString needs double argument");
+  if (n!=1) p->qfmpError("doubletostring accepts 1 argument");
+  if (params[0].type!=QFMathParser::qfmpDouble) p->qfmpError("doubletostring needs double argument");
   r.str=doubleToQString(params[0].num);
   return r;
 }
 
 
-QFMathParser::qfmpResult fIntToStr(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fIntToStr(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpString;
   if (n!=1) p->qfmpError("inttostr accepts 1 argument");
@@ -33,17 +33,17 @@ QFMathParser::qfmpResult fIntToStr(QFMathParser::qfmpResult* params, unsigned in
   return r;
 }
 
-QFMathParser::qfmpResult fboolToQString(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fboolToQString(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpString;
-  if (n!=1) p->qfmpError("boolToQString accepts 1 argument");
-  if (params[0].type!=QFMathParser::qfmpBool) p->qfmpError("doubleToQString needs bool argument");
+  if (n!=1) p->qfmpError("booltostring accepts 1 argument");
+  if (params[0].type!=QFMathParser::qfmpBool) p->qfmpError("booltostring needs bool argument");
   r.str=(r.boolean)?"true":"false";
   return r;
 }
 
 
-QFMathParser::qfmpResult fToSystemPathSeparator(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fToSystemPathSeparator(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpString;
   if (n!=1) p->qfmpError("tosystempathseparator accepts 1 argument");
@@ -59,7 +59,7 @@ QFMathParser::qfmpResult fToSystemPathSeparator(QFMathParser::qfmpResult* params
 }
 
 
-QFMathParser::qfmpResult fSinc(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fSinc(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("sinc accepts 1 argument");
@@ -71,7 +71,7 @@ QFMathParser::qfmpResult fSinc(QFMathParser::qfmpResult* params, unsigned int  n
   return r;
 }
 
-QFMathParser::qfmpResult fTanc(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fTanc(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("tanc accepts 1 argument");
@@ -80,7 +80,7 @@ QFMathParser::qfmpResult fTanc(QFMathParser::qfmpResult* params, unsigned int  n
   return r;
 }
 
-QFMathParser::qfmpResult fSin(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fSin(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("sin accepts 1 argument");
@@ -89,7 +89,7 @@ QFMathParser::qfmpResult fSin(QFMathParser::qfmpResult* params, unsigned int  n,
   return r;
 }
 
-QFMathParser::qfmpResult fCos(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fCos(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("cos accepts 1 argument");
@@ -98,7 +98,7 @@ QFMathParser::qfmpResult fCos(QFMathParser::qfmpResult* params, unsigned int  n,
   return r;
 }
 
-QFMathParser::qfmpResult fTan(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fTan(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("tan accepts 1 argument");
@@ -107,7 +107,7 @@ QFMathParser::qfmpResult fTan(QFMathParser::qfmpResult* params, unsigned int  n,
   return r;
 }
 
-QFMathParser::qfmpResult fExp(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fExp(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("exp accepts 1 argument");
@@ -116,7 +116,7 @@ QFMathParser::qfmpResult fExp(QFMathParser::qfmpResult* params, unsigned int  n,
   return r;
 }
 
-QFMathParser::qfmpResult fLog(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fLog(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("log accepts 1 argument");
@@ -125,7 +125,7 @@ QFMathParser::qfmpResult fLog(QFMathParser::qfmpResult* params, unsigned int  n,
   return r;
 }
 
-QFMathParser::qfmpResult fLog10(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fLog10(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("log10 accepts 1 argument");
@@ -134,7 +134,7 @@ QFMathParser::qfmpResult fLog10(QFMathParser::qfmpResult* params, unsigned int  
   return r;
 }
 
-QFMathParser::qfmpResult fLog2(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fLog2(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("log2 accepts 1 argument");
@@ -143,7 +143,7 @@ QFMathParser::qfmpResult fLog2(QFMathParser::qfmpResult* params, unsigned int  n
   return r;
 }
 
-QFMathParser::qfmpResult fSqrt(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fSqrt(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("sqrt accepts 1 argument");
@@ -151,7 +151,7 @@ QFMathParser::qfmpResult fSqrt(QFMathParser::qfmpResult* params, unsigned int  n
   r.num=sqrt(params[0].num);
   return r;
 }
-QFMathParser::qfmpResult fCbrt(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fCbrt(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("cbrt accepts 1 argument");
@@ -160,7 +160,7 @@ QFMathParser::qfmpResult fCbrt(QFMathParser::qfmpResult* params, unsigned int  n
   return r;
 }
 
-QFMathParser::qfmpResult fSqr(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fSqr(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("sqr accepts 1 argument");
@@ -169,7 +169,7 @@ QFMathParser::qfmpResult fSqr(QFMathParser::qfmpResult* params, unsigned int  n,
   return r;
 }
 
-QFMathParser::qfmpResult fAbs(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fAbs(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("abs accepts 1 argument");
@@ -178,13 +178,13 @@ QFMathParser::qfmpResult fAbs(QFMathParser::qfmpResult* params, unsigned int  n,
   return r;
 }
 
-QFMathParser::qfmpResult fIf(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fIf(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   if (n!=3) p->qfmpError("If accepts 3 argument");
   if (params[0].type!=QFMathParser::qfmpBool) p->qfmpError("If needs bool as first argument");
   if (params[0].boolean) return params[1]; else return params[2];
 }
 
-QFMathParser::qfmpResult fASin(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fASin(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("asin accepts 1 argument");
@@ -193,7 +193,7 @@ QFMathParser::qfmpResult fASin(QFMathParser::qfmpResult* params, unsigned int  n
   return r;
 }
 
-QFMathParser::qfmpResult fACos(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fACos(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("acos accepts 1 argument");
@@ -202,7 +202,7 @@ QFMathParser::qfmpResult fACos(QFMathParser::qfmpResult* params, unsigned int  n
   return r;
 }
 
-QFMathParser::qfmpResult fATan(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fATan(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("atan accepts 1 argument");
@@ -211,7 +211,7 @@ QFMathParser::qfmpResult fATan(QFMathParser::qfmpResult* params, unsigned int  n
   return r;
 }
 
-QFMathParser::qfmpResult fATan2(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fATan2(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=2) p->qfmpError("atan2 accepts 2 argument");
@@ -220,7 +220,7 @@ QFMathParser::qfmpResult fATan2(QFMathParser::qfmpResult* params, unsigned int  
   return r;
 }
 
-QFMathParser::qfmpResult fSinh(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fSinh(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("sinh accepts 1 argument");
@@ -229,7 +229,7 @@ QFMathParser::qfmpResult fSinh(QFMathParser::qfmpResult* params, unsigned int  n
   return r;
 }
 
-QFMathParser::qfmpResult fCosh(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fCosh(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("cosh accepts 1 argument");
@@ -238,7 +238,7 @@ QFMathParser::qfmpResult fCosh(QFMathParser::qfmpResult* params, unsigned int  n
   return r;
 }
 
-QFMathParser::qfmpResult fTanh(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fTanh(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("tanh accepts 1 argument");
@@ -247,7 +247,7 @@ QFMathParser::qfmpResult fTanh(QFMathParser::qfmpResult* params, unsigned int  n
   return r;
 }
 
-QFMathParser::qfmpResult fErf(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fErf(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("erf accepts 1 argument");
@@ -256,7 +256,7 @@ QFMathParser::qfmpResult fErf(QFMathParser::qfmpResult* params, unsigned int  n,
   return r;
 }
 
-QFMathParser::qfmpResult fErfc(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fErfc(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("erfc accepts 1 argument");
@@ -265,7 +265,7 @@ QFMathParser::qfmpResult fErfc(QFMathParser::qfmpResult* params, unsigned int  n
   return r;
 }
 
-QFMathParser::qfmpResult flGamma(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult flGamma(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("lgamma accepts 1 argument");
@@ -274,7 +274,7 @@ QFMathParser::qfmpResult flGamma(QFMathParser::qfmpResult* params, unsigned int 
   return r;
 }
 
-QFMathParser::qfmpResult ftGamma(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult ftGamma(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("tgamma accepts 1 argument");
@@ -283,7 +283,7 @@ QFMathParser::qfmpResult ftGamma(QFMathParser::qfmpResult* params, unsigned int 
   return r;
 }
 
-QFMathParser::qfmpResult fJ0(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fJ0(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("j0 accepts 1 argument");
@@ -292,7 +292,7 @@ QFMathParser::qfmpResult fJ0(QFMathParser::qfmpResult* params, unsigned int  n, 
   return r;
 }
 
-QFMathParser::qfmpResult fJ1(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fJ1(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("j1 accepts 1 argument");
@@ -301,7 +301,7 @@ QFMathParser::qfmpResult fJ1(QFMathParser::qfmpResult* params, unsigned int  n, 
   return r;
 }
 
-QFMathParser::qfmpResult fY0(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fY0(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("y0 accepts 1 argument");
@@ -310,7 +310,7 @@ QFMathParser::qfmpResult fY0(QFMathParser::qfmpResult* params, unsigned int  n, 
   return r;
 }
 
-QFMathParser::qfmpResult fY1(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fY1(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("y1 accepts 1 argument");
@@ -319,7 +319,7 @@ QFMathParser::qfmpResult fY1(QFMathParser::qfmpResult* params, unsigned int  n, 
   return r;
 }
 
-QFMathParser::qfmpResult fYn(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fYn(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=2) p->qfmpError("yn accepts 2 argument");
@@ -328,7 +328,7 @@ QFMathParser::qfmpResult fYn(QFMathParser::qfmpResult* params, unsigned int  n, 
   return r;
 }
 
-QFMathParser::qfmpResult fJn(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fJn(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=2) p->qfmpError("jn accepts 2 argument");
@@ -337,7 +337,7 @@ QFMathParser::qfmpResult fJn(QFMathParser::qfmpResult* params, unsigned int  n, 
   return r;
 }
 
-QFMathParser::qfmpResult fSRand(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fSRand(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   //if (n!=1) p->qfmpError("srand accepts 1 argument");
@@ -349,7 +349,7 @@ QFMathParser::qfmpResult fSRand(QFMathParser::qfmpResult* params, unsigned int  
   return r;
 }
 
-QFMathParser::qfmpResult fRand(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fRand(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n>2) p->qfmpError("rand accepts 0, 1 or 2 arguments");
@@ -360,7 +360,7 @@ QFMathParser::qfmpResult fRand(QFMathParser::qfmpResult* params, unsigned int  n
   return r;
 }
 
-QFMathParser::qfmpResult fRandNorm(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fRandNorm(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   double mean=0;
@@ -379,7 +379,7 @@ QFMathParser::qfmpResult fRandNorm(QFMathParser::qfmpResult* params, unsigned in
   return r;
 }
 
-QFMathParser::qfmpResult fRandInt(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fRandInt(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   if (n>2) p->qfmpError("randint accepts 0, 1 or 2 argument");
   r.type=QFMathParser::qfmpDouble;
@@ -389,7 +389,7 @@ QFMathParser::qfmpResult fRandInt(QFMathParser::qfmpResult* params, unsigned int
   return r;
 }
 
-QFMathParser::qfmpResult fCeil(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fCeil(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("ceil accepts 1 argument");
@@ -398,7 +398,7 @@ QFMathParser::qfmpResult fCeil(QFMathParser::qfmpResult* params, unsigned int  n
   return r;
 }
 
-QFMathParser::qfmpResult fFloor(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fFloor(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("floor accepts 1 argument");
@@ -407,7 +407,7 @@ QFMathParser::qfmpResult fFloor(QFMathParser::qfmpResult* params, unsigned int  
   return r;
 }
 
-QFMathParser::qfmpResult fTrunc(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fTrunc(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("trunc accepts 1 argument");
@@ -416,7 +416,7 @@ QFMathParser::qfmpResult fTrunc(QFMathParser::qfmpResult* params, unsigned int  
   return r;
 }
 
-QFMathParser::qfmpResult fRound(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fRound(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("round accepts 1 argument");
@@ -425,7 +425,7 @@ QFMathParser::qfmpResult fRound(QFMathParser::qfmpResult* params, unsigned int  
   return r;
 }
 
-QFMathParser::qfmpResult fFMod(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fFMod(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=2) p->qfmpError("fmod accepts 2 argument");
@@ -434,7 +434,7 @@ QFMathParser::qfmpResult fFMod(QFMathParser::qfmpResult* params, unsigned int  n
   return r;
 }
 
-QFMathParser::qfmpResult fMin(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fMin(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=2) p->qfmpError("min accepts 2 argument");
@@ -443,7 +443,7 @@ QFMathParser::qfmpResult fMin(QFMathParser::qfmpResult* params, unsigned int  n,
   return r;
 }
 
-QFMathParser::qfmpResult fMax(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fMax(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=2) p->qfmpError("max accepts 2 argument");
@@ -452,7 +452,7 @@ QFMathParser::qfmpResult fMax(QFMathParser::qfmpResult* params, unsigned int  n,
   return r;
 }
 
-QFMathParser::qfmpResult QFSPIMLightsheetEvaluationItem_fGauss(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult QFSPIMLightsheetEvaluationItem_fGauss(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=2) p->qfmpError("gauss accepts 2 argument");
@@ -461,7 +461,7 @@ QFMathParser::qfmpResult QFSPIMLightsheetEvaluationItem_fGauss(QFMathParser::qfm
   return r;
 }
 
-QFMathParser::qfmpResult fSlit(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fSlit(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=2) p->qfmpError("slit accepts 2 argument");
@@ -470,7 +470,7 @@ QFMathParser::qfmpResult fSlit(QFMathParser::qfmpResult* params, unsigned int  n
   return r;
 }
 
-QFMathParser::qfmpResult fTheta(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fTheta(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("theta accepts 1 argument");
@@ -479,7 +479,7 @@ QFMathParser::qfmpResult fTheta(QFMathParser::qfmpResult* params, unsigned int  
   return r;
 }
 
-QFMathParser::qfmpResult fSigmoid(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fSigmoid(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("sigmoid accepts 1 argument");
@@ -488,7 +488,7 @@ QFMathParser::qfmpResult fSigmoid(QFMathParser::qfmpResult* params, unsigned int
   return r;
 }
 
-QFMathParser::qfmpResult fSign(QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
+QFMathParser::qfmpResult fSign(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFMathParser::qfmpResult r;
   r.type=QFMathParser::qfmpDouble;
   if (n!=1) p->qfmpError("sign accepts 1 argument");
@@ -532,7 +532,7 @@ QFMathParser::qfmpResult QFMathParser::getInvalidResult()
 
 void QFMathParser::qfmpError(QString st)
 {
-    qDebug()<<"ERROR: "<<st;
+    //qDebug()<<"ERROR: "<<st;
     lastError.append(st);
     errors++;
 }
@@ -558,11 +558,14 @@ QString QFMathParser::tokentostring(QFMathParser::qfmpTokenType token) {
         case LBRACE: return "LBRACE '{'";
         case RBRACE: return "RBRACE '}'";
         case POWER: return "POWER (^)";
-	    case FACTORIAL_LOGIC_NOT: return "FACTORIAL_LOGIC_NOT (!)";
+        case TILDE: return "TILDE (~)";
+        case FACTORIAL_LOGIC_NOT: return "FACTORIAL_LOGIC_NOT (!)";
 	    case LOGIC_NOT: return "LOGIC_NOT (!/not)";
 	    case LOGIC_AND: return "LOGIC_AND (&&/and)";
 	    case LOGIC_OR: return "LOGIC_OR (||/or)";
-	    case LOGIC_XOR: return "LOGIC_XOR (xor)";
+        case BINARY_AND: return "BINARY_AND (&)";
+        case BINARY_OR: return "BINARY_OR (|)";
+        case LOGIC_XOR: return "LOGIC_XOR (xor)";
 	    case LOGIC_NOR: return "LOGIC_NOR (nor)";
 	    case LOGIC_NAND: return "LOGIC_NAND (nand)";
 	    case LOGIC_TRUE: return "LOGIC_TRUE (true)";
@@ -589,36 +592,42 @@ QString QFMathParser::currenttokentostring() {
 
 // class constructor
 QFMathParser::QFMathParser() {
+    //qDebug()<<"constructing QFMathParser";
+    environment.setParent(this);
+    //qDebug()<<"constructing QFMathParser: adding functions";
     addStandardFunctions();
+    //qDebug()<<"constructing QFMathParser: adding variables";
     addStandardVariables();
+    //qDebug()<<"constructing QFMathParser: resetting errors";
     resetErrors();
+    //qDebug()<<"done";
 }
 
 void QFMathParser::addStandardVariables(){
-	addVariableDouble("pi", M_PI);
-	addVariableDouble("e", M_E);
-	addVariableDouble("sqrt2", sqrt(2));
-	addVariableString("version", "0.2");
-	addVariableDouble("log2e", M_LOG2E);
-	addVariableDouble("log10e", M_LOG10E);
-	addVariableDouble("ln2", M_LN2);
-	addVariableDouble("ln10", M_LN10);
-  	addVariableDouble("h", 6.6260689633E-34);
-  	addVariableDouble("hbar", 1.05457162853E-34);
-  	addVariableDouble("epsilon0", 8.854187817E-12);
-  	addVariableDouble("mu0", 12.566370614E-7);
-  	addVariableDouble("c", 299792458);
-  	addVariableDouble("ce", 1.60217648740E-19);
-  	addVariableDouble("muB", 927.40091523E-26);
-  	addVariableDouble("muB_eV", 5.788381755579E-5);
-  	addVariableDouble("muN", 5.0507832413E-27);
-  	addVariableDouble("muN_eV", 3.152451232645E-8);
-  	addVariableDouble("me", 9.1093821545E-31);
-  	addVariableDouble("mp", 1.67262163783E-27);
-  	addVariableDouble("mn", 1.67492721184E-27);
-  	addVariableDouble("NA", 6.0221417930E23);
-  	addVariableDouble("kB", 1.380650424E-23);
-  	addVariableDouble("kB_eV", 8.61734315E-5);
+    addVariableDouble("pi", M_PI);
+    addVariableDouble("e", M_E);
+    addVariableDouble("sqrt2", sqrt(2));
+    addVariableString("version", "0.2");
+    addVariableDouble("log2e", M_LOG2E);
+    addVariableDouble("log10e", M_LOG10E);
+    addVariableDouble("ln2", M_LN2);
+    addVariableDouble("ln10", M_LN10);
+    addVariableDouble("h", 6.6260689633E-34);
+    addVariableDouble("hbar", 1.05457162853E-34);
+    addVariableDouble("epsilon0", 8.854187817E-12);
+    addVariableDouble("mu0", 12.566370614E-7);
+    addVariableDouble("c", 299792458);
+    addVariableDouble("ce", 1.60217648740E-19);
+    addVariableDouble("muB", 927.40091523E-26);
+    addVariableDouble("muB_eV", 5.788381755579E-5);
+    addVariableDouble("muN", 5.0507832413E-27);
+    addVariableDouble("muN_eV", 3.152451232645E-8);
+    addVariableDouble("me", 9.1093821545E-31);
+    addVariableDouble("mp", 1.67262163783E-27);
+    addVariableDouble("mn", 1.67492721184E-27);
+    addVariableDouble("NA", 6.0221417930E23);
+    addVariableDouble("kB", 1.380650424E-23);
+    addVariableDouble("kB_eV", 8.61734315E-5);
 }
 
 void QFMathParser::addStandardFunctions(){
@@ -664,8 +673,8 @@ void QFMathParser::addStandardFunctions(){
 	addFunction("min", fMin);
 	addFunction("max", fMax);
 	addFunction("inttostr", fIntToStr);
-    addFunction("doubleToQString", fdoubleToQString);
-    addFunction("boolToQString", fboolToQString);
+    addFunction("doubletostring", fdoubleToQString);
+    addFunction("booltostring", fboolToQString);
 	addFunction("gauss", QFSPIMLightsheetEvaluationItem_fGauss);
 	addFunction("slit", fSlit);
 	addFunction("theta", fTheta);
@@ -692,225 +701,97 @@ bool QFMathParser::hasErrorOccured() const
     return errors>0;
 }
 
-// fügt eine Variable hinzu. Der Speicher wird extern verwaltet
-void QFMathParser::addVariableDouble(QString name, double* v)
+
+void QFMathParser::addVariableDouble(const QString &name, double v)
 {
-    name=strip(name);
-    qfmpVariable nv;
-    nv.type=QFMathParser::qfmpDouble;
-    nv.num=v;
-    if (variableExists(name)) nv.internal=variables[name].internal; else nv.internal=false;
-    variables[name]=nv;
+    //qDebug()<<"addVariableDouble("<<name<<v<<")";
+    environment.addVariableDouble(name, v);
 }
 
-void QFMathParser::addVariableDoubleVec(QString name, QVector<double> *v)
+void QFMathParser::addVariableString(const QString& name, const QString &v)
 {
-    name=strip(name);
-    qfmpVariable nv;
-    nv.type=QFMathParser::qfmpDoubleVector;
-    nv.numVec=v;
-    if (variableExists(name)) nv.internal=variables[name].internal; else nv.internal=false;
-    variables[name]=nv;
+    environment.addVariableString(name, v);
 }
 
-void QFMathParser::addVariableString(QString name, QString* v)
+void QFMathParser::addVariableBoolean(const QString &name, bool v)
 {
-    name=strip(name);
-    qfmpVariable nv;
-    nv.type=QFMathParser::qfmpString;
-    nv.str=v;
-    if (variableExists(name)) nv.internal=variables[name].internal; else nv.internal=false;
-    variables[name]=nv;
+    environment.addVariableBoolean(name, v);
 }
 
-void QFMathParser::addVariableBoolean(QString name, bool* v)
+void QFMathParser::addVariable(const QString& name, const QFMathParser::qfmpResult& result)
 {
-    name=strip(name);
-    qfmpVariable nv;
-    nv.type=QFMathParser::qfmpBool;
-    nv.boolean=v;
-    if (variableExists(name)) nv.internal=variables[name].internal; else nv.internal=false;
-    variables[name]=nv;
+    environment.addVariable(name, result);
+
 }
 
-void QFMathParser::addVariableDouble(QString name, double v)
+void QFMathParser::setVariable(const QString& name, const QFMathParser::qfmpResult& result)
 {
-    name=strip(name);
-    qfmpVariable nv;
-    nv.type=QFMathParser::qfmpDouble;
-    nv.num=new double;//(double*)malloc(sizeof(double));
-    nv.internal=true;
-    *(nv.num)=v;
-//  std::cout<<*(nv.num)<<std::endl;
-    variables[name]=nv;
+    environment.setVariable(name, result);
+
 }
 
-void QFMathParser::addVariableString(QString name, QString v)
+void QFMathParser::deleteVariable(const QString &name)
 {
-    name=strip(name);
-    qfmpVariable nv;
-    nv.type=QFMathParser::qfmpString;
-    nv.str=new QString;
-    nv.internal=true;
-    *(nv.str)=v;
-    variables[strip(name)]=nv;
-}
-
-void QFMathParser::addVariableBoolean(QString name, bool v)
-{
-    name=strip(name);
-    qfmpVariable nv;
-    nv.type=QFMathParser::qfmpBool;
-    nv.boolean=new bool;
-    nv.internal=true;
-    *(nv.boolean)=v;
-    variables[name]=nv;
-}
-
-void QFMathParser::addVariable(QString name, QFMathParser::qfmpResult result)
-{
-    switch(result.type) {
-        case qfmpDouble:
-            addVariableDouble(name, result.num);
-            break;
-        case qfmpString:
-            addVariableString(name, result.str);
-            break;
-        case qfmpBool:
-            addVariableBoolean(name, result.boolean);
-            break;
-    }
-
+    environment.deleteVariable(name);
 }
 
 
 QString QFMathParser::printVariables() {
-    QString res="";
-    if (variables.size()>0) {
-        for(QMap<QString, qfmpVariable>::const_iterator i=variables.begin(); i!=variables.end(); ++i) {
-            qfmpVariable v=variables[i.key()];
-            res+="'"+i.key()+"'"+"\t\t";
-            if (v.internal) res+="intern"; else res+="extern";
-            res+="\t";
-            if (v.type==QFMathParser::qfmpBool) res+="bool\t";
-            if (v.type==QFMathParser::qfmpDouble) res+="double\t";
-            if (v.type==QFMathParser::qfmpString) res+="string\t";
+    return environment.printVariables();
 
-            res+="\n";
-
-        }
-    }
-    qDebug()<<res;
-    return res;
 }
 
 QList<QPair<QString, QFMathParser::qfmpVariable> > QFMathParser::getVariables()
 {
-    QList<QPair<QString, qfmpVariable> > result;
-    if (variables.size()>0) {
-        for(QMap<QString, qfmpVariable>::const_iterator i=variables.begin(); i!=variables.end(); ++i) {
-            qfmpVariable v=variables[i.key()];
-            result.push_back(qMakePair(i.key(), v));
-        }
-    }
-    return result;
+    return environment.getVariables();
+}
+
+QString QFMathParser::printFunctions()
+{
+    return environment.printFunctions();
+}
+
+QList<QPair<QString, QFMathParser::qfmpFunctionDescriptor> > QFMathParser::getFunctions()
+{
+    return environment.getFunctions();
 }
 
 
-void QFMathParser::deleteVariable(QString name) {
-    if (variableExists(name)) {
-        qfmpVariable v=variables[name];
-        if (v.internal) {
-            if (v.type==QFMathParser::qfmpDouble) { delete v.num; }
-            else if (v.type==QFMathParser::qfmpString) { delete v.str; }
-            else if (v.type==QFMathParser::qfmpBool) { delete v.boolean; }
-        }
-        variables.erase(variables.find(name));
-    }
+
+void QFMathParser::clearFunctions()
+{
+    environment.clearFunctions();
 }
 
 
 void QFMathParser::clearVariables(){
-    if (variables.size()>0) {
-        for(QMap<QString, qfmpVariable>::const_iterator i=variables.begin(); i!=variables.end(); ++i) {
-            qfmpVariable v=variables[i.key()];
-            if (v.internal) {
-                if (v.type==QFMathParser::qfmpDouble) { delete v.num; }
-                else if (v.type==QFMathParser::qfmpString) { delete v.str; }
-                else if (v.type==QFMathParser::qfmpBool) { delete v.boolean; }
-            }
-
-        }
-        variables.clear();
-    }
+    environment.clearVariables();
 }
 
 // gibt den aktuellen Wert einer Variablen zurück
 QFMathParser::qfmpResult QFMathParser::getVariable(QString name)
 {
-    if (variableExists(name)) {
-        qfmpVariable v=variables[name];
-        QFMathParser::qfmpResult r;
-        r.type=v.type;
-        if (v.type==QFMathParser::qfmpDouble) {
-            r.num=*(v.num);
-        } else if (v.type==QFMathParser::qfmpString) {
-            r.str=*(v.str);
-        } else if (v.type==QFMathParser::qfmpBool) {
-            r.boolean=*(v.boolean);
-        }
-        return r;
-    } else {
-        // error
-        //std::cout <<"error for:  '"<<name<<"'"<<std::endl;
-        qfmpError(QString("variable '%1' does not exist (getVariable)").arg(name));
-    }
-    QFMathParser::qfmpResult res;
-    res.isValid=false;
-    return res;
+    return environment.getVariable(name);
 }
 
 QFMathParser::qfmpResult QFMathParser::getVariableOrInvalid(QString name)
 {
-    if (variableExists(name)) {
-        qfmpVariable v=variables[name];
-        QFMathParser::qfmpResult r;
-        r.type=v.type;
-        if (v.type==QFMathParser::qfmpDouble) {
-            r.num=*(v.num);
-        } else if (v.type==QFMathParser::qfmpString) {
-            r.str=*(v.str);
-        } else if (v.type==QFMathParser::qfmpBool) {
-            r.boolean=*(v.boolean);
-        }
-        return r;
-    }
-    QFMathParser::qfmpResult res;
-    res.isValid=false;
-    return res;
+    if (environment.variableExists(name)) return environment.getVariable(name);
+    QFMathParser::qfmpResult r;
+    r.isValid=false;
+    return r;
 }
 
-QFMathParser::qfmpVariable QFMathParser::getVariableDef(QString name)
+
+
+void QFMathParser::enterBlock()
 {
-  if (variableExists(name)) {
-  	return variables[name];
-  } else {
-    // error
-    //std::cout <<"error for:  '"<<name<<"'"<<std::endl;
-    qfmpError(QString("variable '%1' does not exist (getVariableDef)").arg(name));
-  }
-  return qfmpVariable();
+    environment.enterBlock();
 }
 
-QFMathParser::qfmpEvaluateFunc QFMathParser::getFunctionDef(QString name){
-  if (functionExists(name)) {
-  	return functions[name].function;
-  } else {
-    // error
-    //std::cout <<name<<std::endl;
-    qfmpError(QString("function '%1' does not exist (getFunctionDef)").arg(name));
-  }
-  return NULL;
+void QFMathParser::leaveBlock()
+{
+    environment.leaveBlock();
 }
 
 
@@ -945,57 +826,27 @@ bool QFMathParser::getFromStream(QTextStream *stream, QChar &c)
     return true;
 }
 
-void QFMathParser::setVariableDouble(QString name, double value) {
-    QFMathParser::qfmpResult r;
-    r.type=QFMathParser::qfmpDouble;
-    r.num=value;
-    setVariable(name, r);
-}
 
-void QFMathParser::setVariable(QString name, QFMathParser::qfmpResult value)
+
+void QFMathParser::addVariable(const QString &name, const QFMathParser::qfmpVariable& value)
 {
-    bool nexist=!variableExists(name);
-    qfmpVariable v=variables[name];
-    v.type=value.type;
-    if (value.type==QFMathParser::qfmpDouble) {
-        if (nexist) {v.num=new double; v.internal=true;}
-        *(v.num)=value.num;
-    } else if (value.type==QFMathParser::qfmpString) {
-        if (nexist) {v.str=new QString; v.internal=true;}
-        *(v.str)=value.str;
-    } else if (value.type==QFMathParser::qfmpBool) {
-        if (nexist) {v.boolean=new bool; v.internal=true;}
-        *(v.boolean)=value.boolean;
-    } else if (value.type==QFMathParser::qfmpDoubleVector) {
-        if (nexist) {v.numVec=new QVector<double>(); v.internal=true;}
-        *(v.numVec)=value.numVec;
-    }
-    variables[name]=v;
+    environment.addVariable(name, value);
 }
 
 
 // wertet eine Funktion aus
-QFMathParser::qfmpResult QFMathParser::evaluateFunction(QString name, QFMathParser::qfmpResult* params, unsigned char n)
+QFMathParser::qfmpResult QFMathParser::evaluateFunction(const QString& name, const QVector<qfmpResult> &params)
 {
-  if (functionExists(name)) {
-    //std::cout <<"found"    ;
-  	return functions[name].function(params, n, this);
-  } else {
-    // error
-    //qfmpError("function does not exist")
-    qfmpError(QString("function '%1' does not exist (evaluateFunction)").arg(name));
-  }
-  QFMathParser::qfmpResult res;
-  res.isValid=false;
-  return res;
+  return environment.evaluateFunction(name, params);
 
 }
 
-void QFMathParser::addFunction(QString name, qfmpEvaluateFunc function) {
+void QFMathParser::addFunction(const QString& name, qfmpEvaluateFunc function) {
   qfmpFunctionDescriptor f;
   f.function=function;
   f.name=name;
-  functions[name]=f;
+  f.type=QFMathParser::functionC;
+  environment.setFunction(name, f);
 }
 
 
@@ -1040,7 +891,9 @@ QFMathParser::qfmpTokenType QFMathParser::getToken(){
 			return CurrentToken=STRING_DELIM;
 		case '^':
 			return CurrentToken=POWER;
-		case '!':{
+        case '~':
+            return CurrentToken=TILDE;
+        case '!':{
             QChar ch1=0;
             if (program) getFromStream(program, ch1);
 			if (ch1=='=') return CurrentToken=COMP_UNEQUAL;
@@ -1054,7 +907,8 @@ QFMathParser::qfmpTokenType QFMathParser::getToken(){
 			if (ch1=='&') return CurrentToken=LOGIC_AND;
 			// else
             putbackStream(program, ch1);
-            qfmpError("undefined operator '&'; Did you mean LOGICAL_AND ('&&' / 'and')?");
+            return CurrentToken=BINARY_AND;
+            //qfmpError("undefined operator '&'; Did you mean LOGICAL_AND ('&&' / 'and')?");
             break;
 		}
 		case '|':{
@@ -1063,7 +917,8 @@ QFMathParser::qfmpTokenType QFMathParser::getToken(){
 			if (ch1=='|') return CurrentToken=LOGIC_OR;
 			// else
             putbackStream(program, ch1);
-            qfmpError("undefined operator '|'; Did you mean LOGICAL_OR ('||' / 'or')?");
+            return CurrentToken=BINARY_OR;
+            //qfmpError("undefined operator '|'; Did you mean LOGICAL_OR ('||' / 'or')?");
             break;
 		}
 		case '=':{
@@ -1110,9 +965,11 @@ QFMathParser::qfmpTokenType QFMathParser::getToken(){
 
 				if (StringValue=="true") return CurrentToken=LOGIC_TRUE;
 				if (StringValue=="false") return CurrentToken=LOGIC_FALSE;
-				if (StringValue=="and") return CurrentToken=LOGIC_AND;
-				if (StringValue=="or") return CurrentToken=LOGIC_OR;
-				if (StringValue=="xor") return CurrentToken=LOGIC_XOR;
+                if (StringValue=="and") return CurrentToken=LOGIC_AND;
+                if (StringValue=="or") return CurrentToken=LOGIC_OR;
+                if (StringValue=="band") return CurrentToken=BINARY_AND;
+                if (StringValue=="bor") return CurrentToken=BINARY_OR;
+                if (StringValue=="xor") return CurrentToken=LOGIC_XOR;
 				if (StringValue=="not") return CurrentToken=LOGIC_NOT;
 				if (StringValue=="nor") return CurrentToken=LOGIC_NOR;
 				if (StringValue=="nand") return CurrentToken=LOGIC_NAND;
@@ -1166,7 +1023,7 @@ QFMathParser::qfmpNode* QFMathParser::logicalExpression(bool get){
 			case LOGIC_OR:
                 left= (QFMathParser::qfmpNode*)new qfmpBinaryBoolNode(qfmpLOPor, left, logicalTerm(true), this, NULL);
 				break;
-			case LOGIC_XOR:
+            case LOGIC_XOR:
                 left= (QFMathParser::qfmpNode*)new qfmpBinaryBoolNode(qfmpLOPxor, left, logicalTerm(true), this, NULL);
 				break;
 			case LOGIC_NOR:
@@ -1182,10 +1039,10 @@ QFMathParser::qfmpNode* QFMathParser::logicalTerm(bool get){
 
 	for(;;) // forever, do until you find anything else than an expressions
 		switch(CurrentToken) {
-			case LOGIC_AND:
+            case LOGIC_AND:
                 left= (QFMathParser::qfmpNode*)new qfmpBinaryBoolNode(qfmpLOPand, left, compExpression(true), this, NULL);
-				break;
-			case LOGIC_NAND:
+                break;
+            case LOGIC_NAND:
                 left= (QFMathParser::qfmpNode*)new qfmpBinaryBoolNode(qfmpLOPnand, left, compExpression(true), this, NULL);
 				break;
 			default:
@@ -1230,7 +1087,10 @@ QFMathParser::qfmpNode* QFMathParser::mathExpression(bool get){
 			case PLUS:
                 left= (QFMathParser::qfmpNode*)new qfmpBinaryArithmeticNode('+', left, mathTerm(true), this, NULL);
 				break;
-			case MINUS:
+            case BINARY_OR:
+                left= (QFMathParser::qfmpNode*)new qfmpBinaryArithmeticNode('|', left, mathTerm(true), this, NULL);
+                break;
+            case MINUS:
                 left= (QFMathParser::qfmpNode*)new qfmpBinaryArithmeticNode('-', left, mathTerm(true), this, NULL);
 				break;
 			default:
@@ -1252,7 +1112,10 @@ QFMathParser::qfmpNode* QFMathParser::mathTerm(bool get){
 			case MODULO:
                 left= (QFMathParser::qfmpNode*)new qfmpBinaryArithmeticNode('%', left, primary(true), this, NULL);
 				break;
-			default:
+            case BINARY_AND:
+                left= (QFMathParser::qfmpNode*)new qfmpBinaryArithmeticNode('&', left, mathTerm(true), this, NULL);
+                break;
+            default:
 				return left;
 		}
 }
@@ -1327,6 +1190,10 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
             res= (QFMathParser::qfmpNode*)new qfmpUnaryNode('!', primary(true), this, NULL);
 			break;
 
+        case TILDE:
+            res= (QFMathParser::qfmpNode*)new qfmpUnaryNode('~', primary(true), this, NULL);
+            break;
+
         case LPARENTHESE: { // found primary: ( expression )
             QFMathParser::qfmpNode* expr=logicalExpression(true);
             if (CurrentToken != RPARENTHESE) {
@@ -1366,9 +1233,10 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
 
     if (!res) res=new qfmpInvalidNode(this, NULL);
 
-	return res;
+    return res;
 
 }
+
 
 QString QFMathParser::readDelim(QChar delimiter){
     QString res="";
@@ -1425,12 +1293,18 @@ QFMathParser::qfmpResult QFMathParser::qfmpUnaryNode::evaluate(){
            return res;
          } else parser->qfmpError("'!' only defined for bool");
          break;
-    case '-':
-         if (c.type==QFMathParser::qfmpDouble) {
-           res.num=-c.num;
-           return res;
-         } else parser->qfmpError("'-' only defined for double");
-         break;
+      case '-':
+           if (c.type==QFMathParser::qfmpDouble) {
+             res.num=-c.num;
+             return res;
+           } else parser->qfmpError("'-' only defined for double");
+           break;
+      case '~':
+           if (c.isInteger()) {
+               res.num=double(~c.toInteger());
+               return res;
+           } else parser->qfmpError("'~' only defined for integer numbers");
+           break;
      default: parser->qfmpError("unknown unary operation");
   }
   res.isValid=false;
@@ -1536,7 +1410,28 @@ QFMathParser::qfmpResult QFMathParser::qfmpBinaryArithmeticNode::evaluate(){
             parser->qfmpError("bool or string may not be taken to powers");
          } else parser->qfmpError("different types while taking to power");
          break;
-     default: parser->qfmpError("unknown arithmetic operation");
+
+    case '&':
+        if (!(l.isInteger() && r.isInteger())) {
+            parser->qfmpError("lhs and rhs argument of binary AND have to be integer numbers");
+            break;
+        }
+        res.type=QFMathParser::qfmpDouble;
+        res.num=double(l.toInteger()&r.toInteger());
+        return res;
+        break;
+    case '|':
+        if (!(l.isInteger() && r.isInteger())) {
+            parser->qfmpError("lhs and rhs argument of binary OR have to be integer numbers");
+            break;
+        }
+        res.type=QFMathParser::qfmpDouble;
+        res.num=double(l.toInteger()|r.toInteger());
+        return res;
+        break;
+
+
+      default: parser->qfmpError("unknown arithmetic operation");
   }
   res.isValid=false;
   return res;
@@ -1696,32 +1591,33 @@ QFMathParser::qfmpResult QFMathParser::qfmpBinaryBoolNode::evaluate(){
   if ((l.type!=QFMathParser::qfmpBool)||(r.type!=QFMathParser::qfmpBool)) parser->qfmpError("logical operations only for bool");
   else {
       switch(operation) {
-        case qfmpLOPand:
-            res.type=QFMathParser::qfmpBool;
-            res.boolean=l.boolean&&r.boolean;
-            return res;
-            break;
-        case qfmpLOPor:
-            res.type=QFMathParser::qfmpBool;
-            res.boolean=l.boolean||r.boolean;
-            return res;
-            break;
-        case qfmpLOPnor:
-            res.type=QFMathParser::qfmpBool;
-            res.boolean=!(l.boolean||r.boolean);
-            return res;
-            break;
-        case qfmpLOPxor:
-            res.type=QFMathParser::qfmpBool;
-            res.boolean=(l.boolean&& (!r.boolean))||(r.boolean&& (!l.boolean));
-            return res;
-            break;
-        case qfmpLOPnand:
-            res.type=QFMathParser::qfmpBool;
-            res.boolean=!(l.boolean&&r.boolean);
-            return res;
-            break;
-         default: parser->qfmpError("unknown error");
+          case qfmpLOPand:
+              res.type=QFMathParser::qfmpBool;
+              res.boolean=l.boolean&&r.boolean;
+              return res;
+              break;
+          case qfmpLOPor:
+              res.type=QFMathParser::qfmpBool;
+              res.boolean=l.boolean||r.boolean;
+              return res;
+              break;
+          case qfmpLOPnor:
+              res.type=QFMathParser::qfmpBool;
+              res.boolean=!(l.boolean||r.boolean);
+              return res;
+              break;
+          case qfmpLOPxor:
+              res.type=QFMathParser::qfmpBool;
+              res.boolean=(l.boolean&& (!r.boolean))||(r.boolean&& (!l.boolean));
+              return res;
+              break;
+          case qfmpLOPnand:
+              res.type=QFMathParser::qfmpBool;
+              res.boolean=!(l.boolean&&r.boolean);
+              return res;
+              break;
+
+          default: parser->qfmpError("unknown error");
               break;
       }
   }
@@ -1826,7 +1722,6 @@ QFMathParser::qfmpFunctionNode::qfmpFunctionNode(QString name, QVector<qfmpNode 
       if (child[i]) child[i]->setParent(this);
     }
   }
-  function=p->getFunctionDef(name);
 }
 
 QFMathParser::qfmpResult QFMathParser::qfmpFunctionNode::evaluate() {
@@ -1837,17 +1732,12 @@ QFMathParser::qfmpResult QFMathParser::qfmpFunctionNode::evaluate() {
       else data.append(QFMathParser::getInvalidResult());
     }
   }
-//  jkMathParser::Result r= getParser()->evaluateFunction(fun, data,n);
-  return function(data.data(),data.size(), parser);
+  return parser->evaluateFunction(fun, data);
 }
 
 
 QFMathParser::qfmpFunctionNode::~qfmpFunctionNode() {
-  /*if (n>0) {
-    for (int i=0; i<n; i++) {
-      delete child[i];
-    }
-  }*/
+
     if (child.size()>0) {
       for (int i=0; i<child.size(); i++) {
         if (child[i]) delete child[i];
@@ -1880,6 +1770,7 @@ QString QFMathParser::qfmpResult::toString() const
 
 QString QFMathParser::qfmpResult::toTypeString() const
 {
+    if (!isValid) return QObject::tr("[INVALID]");
     switch(type) {
         case qfmpDouble: return doubleToQString(num)+QObject::tr(" [number]");
         case qfmpDoubleVector: return QString("[ ")+doubleVecToQString(numVec)+QObject::tr(" ] [number vector]");
@@ -1888,6 +1779,42 @@ QString QFMathParser::qfmpResult::toTypeString() const
     }
     return "";
 
+}
+
+int64_t QFMathParser::qfmpResult::toInteger() const
+{
+    if (type==qfmpDouble) return num;
+    if (type==qfmpBool) return (boolean)?1:0;
+    return 0;
+}
+
+bool QFMathParser::qfmpResult::isInteger() const
+{
+    return type==qfmpDouble;
+}
+
+void QFMathParser::qfmpResult::setDouble(double val)
+{
+    type=qfmpDouble;
+    num=val;
+}
+
+void QFMathParser::qfmpResult::setBoolean(bool val)
+{
+    type=qfmpBool;
+    boolean=val;
+}
+
+void QFMathParser::qfmpResult::setString(const QString &val)
+{
+    type=qfmpString;
+    str=val;
+}
+
+void QFMathParser::qfmpResult::setDoubleVec(const QVector<double> &val)
+{
+    type=qfmpDoubleVector;
+    numVec=val;
 }
 
 QFMathParser::qfmpVariable::qfmpVariable()
@@ -1899,6 +1826,68 @@ QFMathParser::qfmpVariable::qfmpVariable()
     boolean=NULL;
     numVec=NULL;
 }
+
+void QFMathParser::qfmpVariable::clearMemory()
+{
+    if (internal) {
+        if (type==qfmpDouble && num) delete (num);
+        if (type==qfmpBool && boolean) delete (boolean);
+        if (type==qfmpString && str) delete (str);
+        if (type==qfmpDoubleVector && numVec) delete (numVec);
+        num=NULL;
+        boolean=NULL;
+        str=NULL;
+        numVec=NULL;
+    }
+    internal=false;
+}
+
+QFMathParser::qfmpResult QFMathParser::qfmpVariable::toResult() const
+{
+    QFMathParser::qfmpResult r;
+    r.type=type;
+    r.isValid=true;
+    if (type==QFMathParser::qfmpDouble && num) {
+        r.num=*(num);
+    } else if (type==QFMathParser::qfmpString && str) {
+        r.str=*(str);
+    } else if (type==QFMathParser::qfmpBool && boolean) {
+        r.boolean=*(boolean);
+    } else if (type==QFMathParser::qfmpDoubleVector && numVec) {
+        r.numVec=*(numVec);
+    } else {
+        r.isValid=false;
+    }
+    return r;
+}
+
+bool QFMathParser::qfmpVariable::isInternal() const
+{
+    return internal;
+}
+
+void QFMathParser::qfmpVariable::set(const QFMathParser::qfmpResult &result)
+{
+    if (type==result.type) {
+        switch (result.type) {
+            case qfmpDouble: { if (!num) num=new double; internal=true; } *num=result.num; break;
+            case qfmpDoubleVector: { if (!numVec) numVec=new QVector<double>; internal=true; } *numVec=result.numVec; break;
+            case qfmpString: { if (!str) str=new QString; internal=true; } *str=result.str; break;
+            case qfmpBool: { if (!boolean) boolean=new bool; internal=true; } *boolean=result.boolean; break;
+        }
+    } else {
+        clearMemory();
+        internal=true;
+        type=result.type;
+        switch (result.type) {
+            case qfmpDouble: num=new double; *num=result.num; break;
+            case qfmpDoubleVector: numVec=new QVector<double>; *numVec=result.numVec; break;
+            case qfmpString: str=new QString; *str=result.str; break;
+            case qfmpBool: boolean=new bool; *boolean=result.boolean; break;
+        }
+    }
+}
+
 
 
 
@@ -1929,4 +1918,372 @@ QString QFMathParser::getFirstError() const
 {
     if (lastError.isEmpty()) return QString();
     return lastError.first();
+}
+
+QFMathParser::qfmpFunctionDescriptor::qfmpFunctionDescriptor()
+{
+    name="";
+    type=QFMathParser::functionC;
+    functionNode=NULL;
+    parameterNames.clear();
+}
+
+void QFMathParser::qfmpFunctionDescriptor::clearMemory()
+{
+    if (type==QFMathParser::functionNode && functionNode) {
+        delete functionNode;
+        functionNode=NULL;
+    }
+}
+
+QFMathParser::qfmpResult QFMathParser::qfmpFunctionDescriptor::evaluate(const QVector<qfmpResult> &parameters, QFMathParser* parent) const
+{
+    QFMathParser::qfmpResult r;
+    r.isValid=true;
+    if (type==QFMathParser::functionC) {
+        return function(parameters.data(), parameters.size(), parent);
+    }
+    if (type==QFMathParser::functionNode) {
+        if (parameterNames.size()!=parameters.size()) {
+            parent->qfmpError(QObject::tr("function '%1' takes %2 parameters, but %3 parameters were given").arg(name).arg(parameterNames.size()).arg(parameters.size()));
+        } else {
+            if (parent && parameterNames.size()>0) {
+                parent->enterBlock();
+                for (int i=0; i<parameterNames.size(); i++) {
+                    parent->addVariable(parameterNames[i], parameters[i]);
+                }
+                r=functionNode->evaluate();
+                parent->leaveBlock();
+                return r;
+            } else {
+                r=functionNode->evaluate();
+                return r;
+            }
+        }
+    }
+    r.isValid=false;
+    return r;
+}
+
+QString QFMathParser::qfmpFunctionDescriptor::toDefString() const
+{
+    QString res="";
+    if (type==QFMathParser::functionNode) res=QString("%1(%2): node\n").arg(name).arg(parameterNames.join(", "));
+    if (type==QFMathParser::functionC) res=QString("%1(?): C function").arg(name);
+    return res;
+}
+
+
+QFMathParser::executionEnvironment::executionEnvironment(QFMathParser *parent)
+{
+    //qDebug()<<"executionEnvironment constructed parent="<<parent;
+    currentLevel=0;
+    this->parent=parent;
+}
+
+QFMathParser::executionEnvironment::~executionEnvironment()
+{
+    clear();
+}
+
+void QFMathParser::executionEnvironment::setParent(QFMathParser *parent)
+{
+    this->parent=parent;
+}
+
+void QFMathParser::executionEnvironment::enterBlock()
+{
+    currentLevel++;
+}
+
+void QFMathParser::executionEnvironment::leaveBlock()
+{
+    if (currentLevel>0) {
+        currentLevel--;
+        QStringList keys=variables.keys();
+        for (int i=0; i<keys.size(); i++) {
+            while (variables[keys[i]].last().first>currentLevel) {
+                variables[keys[i]].last().second.clearMemory();
+                variables[keys[i]].removeLast();
+            }
+            if (variables[keys[i]].isEmpty()) variables.remove(keys[i]);
+        }
+
+        keys=functions.keys();
+        for (int i=0; i<keys.size(); i++) {
+            while (functions[keys[i]].last().first>currentLevel) {
+                functions[keys[i]].last().second.clearMemory();
+                functions[keys[i]].removeLast();
+            }
+            if (functions[keys[i]].isEmpty()) functions.remove(keys[i]);
+        }
+    } else {
+        parent->qfmpError(QObject::tr("cannot leave toplevel block!"));
+    }
+ }
+
+void QFMathParser::executionEnvironment::clear()
+{
+    clearVariables();
+    clearFunctions();
+    currentLevel=0;
+}
+
+
+
+void QFMathParser::executionEnvironment::addVariable(const QString &name, const QFMathParser::qfmpVariable &variable)
+{
+    //qDebug()<<"addVariable("<<name<<")";
+    if (variables.contains(name) && variables[name].size()>0) {
+        if (variables[name].last().first==currentLevel) {
+            variables[name].last().second.clearMemory();
+            int l=variables[name].last().first;
+            variables[name].removeLast();
+            variables[name].append(qMakePair(l, variable));
+        } else {
+            variables[name].append(qMakePair(currentLevel, variable));
+        }
+    } else {
+        QList<QPair<int, qfmpVariable> > l;
+        l.append(qMakePair(currentLevel, variable));
+        variables[name]=l;
+    }
+}
+
+void QFMathParser::executionEnvironment::setVariableDouble(const QString &name, double result)
+{
+    //qDebug()<<"executionEnvironment::setVariableDouble("<<name<<result<<")";
+    QFMathParser::qfmpResult r;
+    r.setDouble(result);
+    setVariable(name, r);
+}
+
+void QFMathParser::executionEnvironment::setVariableDoubleVec(const QString &name, const QVector<double> &result)
+{
+    QFMathParser::qfmpResult r;
+    r.setDoubleVec(result);
+    setVariable(name, r);
+}
+
+void QFMathParser::executionEnvironment::setVariableString(const QString &name, const QString &result)
+{
+    QFMathParser::qfmpResult r;
+    r.setString(result);
+    setVariable(name, r);
+}
+
+void QFMathParser::executionEnvironment::setVariableBoolean(const QString &name, bool result)
+{
+    QFMathParser::qfmpResult r;
+    r.setBoolean(result);
+    setVariable(name, r);
+
+}
+
+void QFMathParser::executionEnvironment::addVariableDouble(const QString &name, double result)
+{
+    //qDebug()<<"executionEnvironment::addVariableDouble("<<name<<result<<")";
+    QFMathParser::qfmpResult r;
+    r.setDouble(result);
+    //qDebug()<<"  adding "<<r.toTypeString();
+    addVariable(name, r);
+}
+
+void QFMathParser::executionEnvironment::addVariableDoubleVec(const QString &name, const QVector<double> &result)
+{
+    QFMathParser::qfmpResult r;
+    r.setDoubleVec(result);
+    addVariable(name, r);
+}
+
+void QFMathParser::executionEnvironment::addVariableString(const QString &name, const QString &result)
+{
+    QFMathParser::qfmpResult r;
+    r.setString(result);
+    addVariable(name, r);
+}
+
+void QFMathParser::executionEnvironment::addVariableBoolean(const QString &name, bool result)
+{
+    QFMathParser::qfmpResult r;
+    r.setBoolean(result);
+    addVariable(name, r);
+}
+
+void QFMathParser::executionEnvironment::deleteVariable(const QString &name)
+{
+    if (variables.contains(name)) {
+        for (int i=0; i<variables[name].size(); i++) {
+            qfmpVariable v=variables[name].at(i).second;
+            v.clearMemory();
+        }
+    }
+    variables.remove(name);
+}
+
+QString QFMathParser::executionEnvironment::printVariables() const
+{
+    QString res="";
+
+    if (variables.size()>0) {
+
+        QMapIterator<QString, QList<QPair<int, QFMathParser::qfmpVariable> > > itV(variables);
+        while (itV.hasNext()) {
+            itV.next();
+
+            qfmpVariable v=itV.value().last().second;
+            res+="'"+itV.key()+"'"+"\t\t";
+            if (v.isInternal()) res+="intern"; else res+="extern";
+            res+="\t"+v.toResult().toTypeString();
+            res+="\n";
+
+        }
+    }
+    return res;
+}
+
+QString QFMathParser::executionEnvironment::printFunctions() const
+{
+    QString res="";
+
+    if (functions.size()>0) {
+
+        QMapIterator<QString, QList<QPair<int, QFMathParser::qfmpFunctionDescriptor> > > itV(functions);
+        while (itV.hasNext()) {
+            itV.next();
+
+            res+=itV.value().last().second.toDefString();
+
+            /*qfmpFunctionDescriptor v=itV.value().last().second;
+            if (v.type==QFMathParser::functionNode) res+=QString("%1(%2): node\n").arg(itV.key()).arg(v.parameterNames.join(", "));
+            if (v.type==QFMathParser::functionC) res+=QString("%1(?): C function").arg(itV.key());*/
+        }
+    }
+    return res;
+}
+
+QList<QPair<QString, QFMathParser::qfmpVariable> > QFMathParser::executionEnvironment::getVariables() const
+{
+    QList<QPair<QString, QFMathParser::qfmpVariable> > res;
+
+    if (variables.size()>0) {
+        QMapIterator<QString, QList<QPair<int, QFMathParser::qfmpVariable> > > itV(variables);
+        while (itV.hasNext()) {
+            itV.next();
+            res.append(qMakePair(itV.key(), itV.value().last().second));
+        }
+    }
+    return res;
+}
+
+QList<QPair<QString, QFMathParser::qfmpFunctionDescriptor> > QFMathParser::executionEnvironment::getFunctions() const
+{
+    QList<QPair<QString, QFMathParser::qfmpFunctionDescriptor> > res;
+
+    if (functions.size()>0) {
+        QMapIterator<QString, QList<QPair<int, QFMathParser::qfmpFunctionDescriptor> > > itV(functions);
+        while (itV.hasNext()) {
+            itV.next();
+            res.append(qMakePair(itV.key(), itV.value().last().second));
+        }
+    }
+    return res;
+}
+
+void QFMathParser::executionEnvironment::setFunction(const QString &name, const QFMathParser::qfmpFunctionDescriptor &function)
+{
+    if (functions.contains(name) && functions[name].size()>0) {
+        if (functions[name].last().first==currentLevel) {
+            functions[name].last().second.clearMemory();
+            int l=functions[name].last().first;
+            functions[name].removeLast();
+            functions[name].append(qMakePair(l, function));
+        } else {
+            functions[name].append(qMakePair(currentLevel, function));
+        }
+    } else {
+        QList<QPair<int, qfmpFunctionDescriptor> > l;
+        l.append(qMakePair(currentLevel, function));
+        functions[name]=l;
+      }
+}
+
+QFMathParser::qfmpResult QFMathParser::executionEnvironment::getVariable(const QString &name) const
+{
+    QFMathParser::qfmpResult res;
+    res.isValid=false;
+    if (variables.contains(name) && variables[name].size()>0) {
+        res=variables[name].last().second.toResult();
+        res.isValid=true;
+        return res;
+    }
+    if (parent) parent->qfmpError(QObject::tr("the variable '%1' does not exist").arg(name));
+    return res;
+}
+
+QFMathParser::qfmpResult QFMathParser::executionEnvironment::evaluateFunction(const QString &name, const QVector<QFMathParser::qfmpResult> &parameters) const
+{
+    QFMathParser::qfmpResult res;
+    res.isValid=false;
+    if (functions.contains(name) && functions[name].size()>0) {
+        res=functions[name].last().second.evaluate(parameters, parent);
+        res.isValid=true;
+    }
+    if (parent) parent->qfmpError(QObject::tr("the function '%1' does not exist").arg(name));
+    return res;
+
+}
+
+void QFMathParser::executionEnvironment::addVariable(const QString &name, const QFMathParser::qfmpResult &result)
+{
+    //qDebug()<<"executionEnvironment::addVariable("<<name<<result.toTypeString()<<")";
+    bool add=true;
+    if (variables.contains(name)) {
+        //qDebug()<<"   contains "<<name;
+        if (variables[name].size()>0) {
+            //qDebug()<<"   contains: size="<<variables[name].size();
+            if (variables[name].last().first==currentLevel) {
+                //qDebug()<<"   contains: level="<<variables[name].last().first;
+                variables[name].last().second.set(result);
+                add=false;
+                return;
+            }
+        }
+    }
+    if (add) {
+        //qDebug()<<"   addidng 0";
+        QFMathParser::qfmpVariable v;
+        v.set(result);
+        //qDebug()<<"   addidng 1";
+
+        QList<QPair<int, qfmpVariable> > l;
+        l.append(qMakePair(currentLevel, v));
+        //qDebug()<<"   addidng 2";
+        variables[name]=l;
+        //qDebug()<<"   addidng 3";
+    }
+}
+
+void QFMathParser::executionEnvironment::setVariable(const QString &name, const QFMathParser::qfmpResult &result)
+{
+    if (variables.contains(name) && variables[name].size()>0) {
+        variables[name].last().second.set(result);
+    } else {
+        QFMathParser::qfmpVariable v;
+        v.set(result);
+        QList<QPair<int, qfmpVariable> > l;
+        l.append(qMakePair(currentLevel, v));
+        variables[name]=l;
+    }
+
+}
+
+void QFMathParser::executionEnvironment::clearVariables()
+{
+    variables.clear();
+}
+
+void QFMathParser::executionEnvironment::clearFunctions()
+{
+    functions.clear();
 }

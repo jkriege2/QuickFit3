@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>944</width>
-    <height>530</height>
+    <height>462</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -105,7 +105,7 @@
     </widget>
    </item>
    <item row="3" column="2" rowspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="6,0,0,0,4">
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="6,0,0,0,3,3">
      <item>
       <widget class="QLabel" name="labHelp">
        <property name="minimumSize">
@@ -175,6 +175,9 @@
      </item>
      <item>
       <widget class="QListWidget" name="lstCache"/>
+     </item>
+     <item>
+      <widget class="QListWidget" name="lstFunctions"/>
      </item>
     </layout>
    </item>
@@ -268,6 +271,7 @@
   <tabstop>btnClearHistory</tabstop>
  </tabstops>
  <resources>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>

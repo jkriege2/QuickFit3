@@ -46,21 +46,22 @@ void QFECalculatorDialog::showHelp()
 
 void QFECalculatorDialog::showCache()
 {
+    ui->lstCache->setUpdatesEnabled(false);
+    ui->lstFunctions->setUpdatesEnabled(false);
     ui->lstCache->clear();
+    ui->lstFunctions->clear();
     QList<QPair<QString, QFMathParser::qfmpVariable> > vars= parser->getVariables();
     for (size_t i=0; i<vars.size(); i++) {
         QString v=QString("%1 = ").arg(vars[i].first);
-            if (vars[i].second.type==QFMathParser::qfmpBool) {
-                v=v+tr("%1 [boolean]").arg(boolToQString(*(vars[i].second.boolean)));
-            } else if (vars[i].second.type==QFMathParser::qfmpDouble) {
-                v=v+tr("%1 [float]").arg(*(vars[i].second.num));
-            } else if (vars[i].second.type==QFMathParser::qfmpString) {
-                v=v+tr("%1 [string]").arg(*(vars[i].second.str));
-            } else {
-                v=v+tr("??? [unknown]");
-            }
+        v+=vars[i].second.toResult().toTypeString();
         ui->lstCache->addItem(v);
     }
+    QList<QPair<QString, QFMathParser::qfmpFunctionDescriptor> > funs= parser->getFunctions();
+    for (size_t i=0; i<funs.size(); i++) {
+        ui->lstFunctions->addItem(funs[i].second.toDefString());
+    }
+    ui->lstCache->setUpdatesEnabled(true);
+    ui->lstFunctions->setUpdatesEnabled(true);
 }
 
 

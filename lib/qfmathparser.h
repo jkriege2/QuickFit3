@@ -28,6 +28,7 @@
 #include <QList>
 #include <QString>
 #include <QPair>
+#include <QStack>
 #include "../extlibs/MersenneTwister.h"
 
 
@@ -141,10 +142,12 @@
                       | expression <b>&lt;</b> math_expression</pre>
 <pre>  math_expression ->  term
                       | math_expression <b>+</b> math_term
-                      | math_expression <b>-</b> math_term</pre>
+                      | math_expression <b>-</b> math_term
+                      | math_expression <b>|</b> math_term</pre>
 <pre>  math_term       ->  primary
                       | term <b>*</b> primary
                       | term <b>/</b> primary
+                      | term <b>&amp;</b> primary
                       | term ( <b>%</b> | <b>mod</b> ) primary</pre>
 <pre>  primary         ->  <b>true</b> | <b>false</b>
                       | string_constant
@@ -152,7 +155,7 @@
                       | <b>[</b> vector_list <b>]</b>
                       | NAME
                       | NAME <b>=</b> logical_expression                      
-                      | <b>+</b> primary | <b>-</b> primary | <b>!</b> primary | <b>not</b> primary
+                      | <b>+</b> primary | <b>-</b> primary | <b>!</b> primary | <b>not</b> primary | <b>~</b> primary
                       | <b>(</b> logical_expression <b>)</b>
                       | NAME<b>(</b> parameter_list <b>)</b>
                       | primary <b>^</b> primary</pre>
@@ -230,6 +233,7 @@ class QFLIB_EXPORT QFMathParser
             LBRACE,             /*!< \brief left brace '{' */
             RBRACE,             /*!< \brief right brace '}' */
             POWER,              /*!< \brief a power operator '^' */
+            TILDE,              /*!< \brief a tilde symbol '~' */
             FACTORIAL_LOGIC_NOT, /*!< \brief a factorial operator or a logical NOT '!' */
             LOGIC_NOT,          /*!< \brief a logical NOT '!' / 'not' */
             LOGIC_AND,          /*!< \brief a logical AND operator '&&' / 'and' */
@@ -239,6 +243,8 @@ class QFLIB_EXPORT QFMathParser
             LOGIC_NAND,         /*!< \brief a logical NAND operator 'nand' */
             LOGIC_TRUE,         /*!< \brief 'true' */
             LOGIC_FALSE,        /*!< \brief  'false' */
+            BINARY_AND,          /*!< \brief a binary AND operator '&' */
+            BINARY_OR,           /*!< \brief a binary OR operator '|' */
             COMP_EQUALT,        /*!< \brief equals operation '==' */
             COMP_UNEQUAL,       /*!< \brief unequal operation '!=' */
             COMP_GREATER,       /*!< \brief greater than operation '>' */
@@ -249,14 +255,15 @@ class QFLIB_EXPORT QFMathParser
 
 
 
-        /** \brief internal names for logic operations */
+        /** \brief internal names for logic/binary operations */
         enum {
-          qfmpLOPand='a',
-          qfmpLOPor='o',
-          qfmpLOPxor='x',
-          qfmpLOPnor='n',
-          qfmpLOPnand='A',
-          qfmpLOPnot='n'
+            qfmpLOPand='a',
+            qfmpLOPor='o',
+            qfmpLOPxor='x',
+            qfmpLOPnor='r',
+            qfmpLOPnand='d',
+            qfmpLOPnot='n',
+
         };
 
 
@@ -295,20 +302,34 @@ class QFLIB_EXPORT QFMathParser
 
         /** \brief result of any expression  */
         struct QFLIB_EXPORT qfmpResult {
-          qfmpResult();
+            public:
+                qfmpResult();
 
-          bool isValid;
-          qfmpResultType type;   /*!< \brief type of the result */
-          QString str;       /*!< \brief contains result if \c type==qfmpString */
-          double num;            /*!< \brief contains result if \c type==qfmpDouble */
-          bool boolean;          /*!< \brief contains result if \c type==qfmpBool */
-          QVector<double> numVec; /*!< \brief contains result if \c type==qfmpDoubleVector */
 
-          /** \brief convert the value this struct representens into a QString */
-          QFLIB_EXPORT QString toString() const;
+                /** \brief convert the value this struct representens into a QString */
+                QFLIB_EXPORT QString toString() const;
 
-          /** \brief convert the value this struct representens into a QString and adds the name of the datatype in \c [...] */
-          QFLIB_EXPORT QString toTypeString() const;
+                /** \brief convert the value this struct representens into a QString and adds the name of the datatype in \c [...] */
+                QFLIB_EXPORT QString toTypeString() const;
+
+                /** \brief convert the value this struct to an integer */
+                QFLIB_EXPORT int64_t toInteger() const;
+                /** \brief is this result convertible to integer? */
+                QFLIB_EXPORT bool isInteger() const;
+
+                QFLIB_EXPORT void setDouble(double val);
+                QFLIB_EXPORT void setBoolean(bool val);
+                QFLIB_EXPORT void setString(const QString& val);
+                QFLIB_EXPORT void setDoubleVec(const QVector<double>& val);
+
+
+                bool isValid;
+                qfmpResultType type;   /*!< \brief type of the result */
+                QString str;       /*!< \brief contains result if \c type==qfmpString */
+                double num;            /*!< \brief contains result if \c type==qfmpDouble */
+                bool boolean;          /*!< \brief contains result if \c type==qfmpBool */
+                QVector<double> numVec; /*!< \brief contains result if \c type==qfmpDoubleVector */
+
         };
 
         static QString resultToString(const qfmpResult &r);
@@ -321,47 +342,28 @@ class QFLIB_EXPORT QFMathParser
           * only contains pointers to the data
           */
         struct QFLIB_EXPORT qfmpVariable {
-          qfmpVariable();
-          qfmpResultType type;     /*!< \brief type of the variable */
-          bool internal;           /*!< \brief this is an internal variable */
-          QString *str;        /*!< \brief this points to the variable data if \c type==qfmpString */
-          double *num;             /*!< \brief this points to the variable data if \c type==qfmpDouble */
-          bool *boolean;           /*!< \brief this points to the variable data if \c type==qfmpBool */
-          QVector<double>* numVec; /*!< \brief this points to the variable data if \c type==qfmpDoubleVector */
+            public:
+                qfmpVariable();
+                //~qfmpVariable();
+                QFLIB_EXPORT void clearMemory();
+
+                QFLIB_EXPORT QFMathParser::qfmpResult toResult() const;
+                QFLIB_EXPORT bool isInternal() const;
+                QFLIB_EXPORT void set(const qfmpResult& result);
+                inline  qfmpResultType getType() const { return type; }
+
+
+            protected:
+                qfmpResultType type;     /*!< \brief type of the variable */
+                bool internal;           /*!< \brief this is an internal variable */
+                QString *str;        /*!< \brief this points to the variable data if \c type==qfmpString */
+                double *num;             /*!< \brief this points to the variable data if \c type==qfmpDouble */
+                bool *boolean;           /*!< \brief this points to the variable data if \c type==qfmpBool */
+                QVector<double>* numVec; /*!< \brief this points to the variable data if \c type==qfmpDoubleVector */
         };
 
 
 
-        /** \brief This is a function prototype for adding new mathematical functions
-         *         to the parser
-         *
-         * If you want to add more math functions (like sin, cos , abs ...) to the
-         * parser, you will have to implement it with this prototype and then register
-         * it with jkMathParser::addFunction(). The first parameter points to an array
-         * containing the input parameters while the second one specifies the number
-         * of supplied parameters. The result has to be of type qfmpResult.
-         *
-         * All error handling has to be done inside the function definition. Here is a
-         * simple example:
-         * \code
-         * qfmpResult Abs(qfmpResult* params, unsigned char n){
-         *   qfmpResult r;
-         *   r.type=qfmpDouble;
-         *   if (n!=1) qfmpError("abs accepts 1 argument");
-         *   if (params[0].type!=qfmpDouble) qfmpError("abs needs double argument");
-         *   r.num=fabs(params[0].num);
-         *   return r;
-         * }
-         * \endcode
-         */
-        typedef qfmpResult (*qfmpEvaluateFunc)(qfmpResult*, unsigned int, QFMathParser*);
-
-
-        /** \brief description of a user registered function */
-        struct QFLIB_EXPORT qfmpFunctionDescriptor {
-          qfmpEvaluateFunc function;    /*!< \brief a pointer to the function implementation */
-          QString name;             /*!< \brief name of the function */
-        };
 
 
         /*@}*/
@@ -404,7 +406,8 @@ class QFLIB_EXPORT QFMathParser
 
         /**
          * \brief This class represents a binary arithmetic operation:
-         *  add (+), subtract (-), multiply (*), divide (/), a to the power of b (a^b)
+         *  add (+), subtract (-), multiply (*), divide (/), a to the power of b (a^b),
+         *  binary and (&), binary or (|)
          */
         class QFLIB_EXPORT qfmpBinaryArithmeticNode: public qfmpNode {
           private:
@@ -575,6 +578,54 @@ class QFLIB_EXPORT QFMathParser
             virtual qfmpResult evaluate() { return parser->getInvalidResult(); };
         };
 
+
+
+
+        /** \brief This is a function prototype for adding new mathematical functions
+         *         to the parser
+         *
+         * If you want to add more math functions (like sin, cos , abs ...) to the
+         * parser, you will have to implement it with this prototype and then register
+         * it with jkMathParser::addFunction(). The first parameter points to an array
+         * containing the input parameters while the second one specifies the number
+         * of supplied parameters. The result has to be of type qfmpResult.
+         *
+         * All error handling has to be done inside the function definition. Here is a
+         * simple example:
+         * \code
+         * qfmpResult Abs(qfmpResult* params, unsigned char n){
+         *   qfmpResult r;
+         *   r.type=qfmpDouble;
+         *   if (n!=1) qfmpError("abs accepts 1 argument");
+         *   if (params[0].type!=qfmpDouble) qfmpError("abs needs double argument");
+         *   r.num=fabs(params[0].num);
+         *   return r;
+         * }
+         * \endcode
+         */
+        typedef qfmpResult (*qfmpEvaluateFunc)(const qfmpResult*, unsigned int, QFMathParser*);
+
+        /** \brief types of functions */
+        enum qfmpFunctiontype {
+            functionC,
+            functionNode
+        };
+
+        /** \brief description of a user registered function */
+        struct QFLIB_EXPORT qfmpFunctionDescriptor {
+            qfmpFunctionDescriptor();
+            //~qfmpFunctionDescriptor();
+            QFLIB_EXPORT void clearMemory();
+            qfmpEvaluateFunc function;    /*!< \brief a pointer to the function implementation */
+            QString name;             /*!< \brief name of the function */
+            qfmpFunctiontype type;  /*!< \brief type of the function */
+            qfmpNode* functionNode;   /*!< \brief points to the node definig the function */
+            QStringList parameterNames;  /*!< \brief a list of the function parameters, if the function is defined by a node */
+
+            QFLIB_EXPORT qfmpResult evaluate(const QVector<qfmpResult> &parameters, QFMathParser *parent) const;
+            QFLIB_EXPORT QString toDefString() const;
+        };
+
         /**
          * \brief This class represents an arbitrary function.
          *
@@ -588,7 +639,6 @@ class QFLIB_EXPORT QFMathParser
           private:
             QString fun;
             QVector<QFMathParser::qfmpNode*> child;
-            qfmpEvaluateFunc function;
           public:
             /** \brief constructor for a qfmpFunctionNode
              *  \param name name of the function
@@ -637,6 +687,63 @@ class QFLIB_EXPORT QFMathParser
 
         /*@}*/
 
+
+
+        class executionEnvironment {
+            protected:
+                /** \brief map to manage all currently defined variables */
+                QMap<QString, QList<QPair<int, qfmpVariable> > > variables;
+
+                /** \brief map to manage all currently rtegistered functions */
+                QMap<QString, QList<QPair<int, qfmpFunctionDescriptor> > > functions;
+
+                int currentLevel;
+
+                QFMathParser* parent;
+            public:
+                executionEnvironment(QFMathParser* parent=NULL);
+                ~executionEnvironment();
+
+                void setParent(QFMathParser* parent);
+
+                void enterBlock();
+                void leaveBlock();
+                int getBlocklevel() const;
+                void clearVariables();
+                void clearFunctions();
+                void clear();
+
+                void addVariable(const QString& name, const qfmpVariable& variable);
+                void setFunction(const QString& name, const qfmpFunctionDescriptor& function);
+
+                /** \brief  tests whether a variable exists */
+                bool variableExists(const QString& name){ return (variables.find(name)!=variables.end()); }
+
+                /** \brief  tests whether a function exists */
+                bool functionExists(const QString& name){ return !(functions.find(name)==functions.end()); }
+
+                qfmpResult getVariable(const QString& name) const;
+                qfmpResult evaluateFunction(const QString& name, const QVector<qfmpResult> &parameters) const;
+
+                void addVariable(const QString& name, const qfmpResult& result);
+                void setVariable(const QString& name, const qfmpResult& result);
+                void setVariableDouble(const QString& name, double result);
+                void setVariableDoubleVec(const QString& name, const QVector<double>& result);
+                void setVariableString(const QString& name, const QString& result);
+                void setVariableBoolean(const QString& name, bool result);
+                void addVariableDouble(const QString& name, double result);
+                void addVariableDoubleVec(const QString& name, const QVector<double>& result);
+                void addVariableString(const QString& name, const QString& result);
+                void addVariableBoolean(const QString& name, bool result);
+                void deleteVariable(const QString& name);
+
+                QString printVariables() const;
+                QString printFunctions() const;
+                QList<QPair<QString, qfmpVariable> > getVariables() const;
+                QList<QPair<QString, qfmpFunctionDescriptor> > getFunctions() const;
+
+
+        };
 
     public:
         /**
@@ -700,11 +807,7 @@ class QFLIB_EXPORT QFMathParser
         MTRand rng;
 
 
-        /** \brief map to manage all currently defined variables */
-        QMap<QString, qfmpVariable> variables;
-
-        /** \brief map to manage all currently rtegistered functions */
-        QMap<QString, qfmpFunctionDescriptor> functions;
+        executionEnvironment environment;
 
         /** \brief the current token while parsing a string */
         qfmpTokenType CurrentToken;
@@ -715,10 +818,6 @@ class QFLIB_EXPORT QFMathParser
         /** \brief the string value of the current token (when applicable) during the parsing step */
         double NumberValue;
 
-        /** \brief set the defining struct of the given variable */
-        void setVariable(QString name, qfmpResult value);
-        /** \brief set the defining struct of the given variable */
-        void setVariableDouble(QString name, double value);
 
         void* data;
 
@@ -759,55 +858,43 @@ class QFLIB_EXPORT QFMathParser
 		 * \param name name of the new function
 		 * \param function a pointer to the implementation
 		 */
-        void addFunction(QString name, qfmpEvaluateFunc function);
+        void addFunction(const QString &name, qfmpEvaluateFunc function);
 
-        /** \brief  register a new external variable of type double
-         * \param name name of the new variable
-         * \param v pointer to the variable memory
-         */
-        void addVariableDouble(QString name, double* v);
-        /** \brief  register a new external variable of type double vector
-         * \param name name of the new variable
-         * \param v pointer to the variable memory
-         */
-        void addVariableDoubleVec(QString name, QVector<double>* v);
-
-        /** \brief  register a new external variable of type string
-		 * \param name name of the new variable
-		 * \param v pointer to the variable memory
-		 */
-        void addVariableString(QString name, QString* v);
-
-        /** \brief  register a new external variable of type boolean
-		 * \param name name of the new variable
-		 * \param v pointer to the variable memory
-		 */
-        void addVariableBoolean(QString name, bool* v);
+        /** \brief set the defining struct of the given variable */
+        void addVariable(const QString& name, const qfmpVariable &value);
 
 
         /** \brief  register a new internal variable of type double
 		 * \param name name of the new variable
 		 * \param v initial value of this variable
 		 */
-        void addVariableDouble(QString name, double v);
+        void addVariableDouble(const QString& name, double v);
 
         /** \brief  register a new internal variable of type string
 		 * \param name name of the new variable
 		 * \param v initial value of this variable
 		 */
-        void addVariableString(QString name, QString v);
+        void addVariableString(const QString &name, const QString& v);
 
         /** \brief  register a new internal variable of type boolean
          * \param name name of the new variable
          * \param v initial value of this variable
          */
-        void addVariableBoolean(QString name, bool v);
+        void addVariableBoolean(const QString& name, bool v);
 
         /** \brief  register a new internal variable of type boolean
          * \param name name of the new variable
          * \param v initial value of this variable
          */
-        void addVariable(QString name, qfmpResult result);
+        void addVariable(const QString &name, const qfmpResult &result);
+        /** \brief  register a new internal variable if the given variable does not exist, otherwise set the axisting variable to the given value
+         * \param name name of the new variable
+         * \param v initial value of this variable
+         */
+        void setVariable(const QString &name, const qfmpResult &result);
+
+        void deleteVariable(const QString& name);
+
 
 
 
@@ -816,38 +903,32 @@ class QFLIB_EXPORT QFMathParser
         /** \brief  returns the value of the given variable */
         qfmpResult getVariableOrInvalid(QString name);
 
-        /** \brief  returns the defining structure of the given variable */
-        qfmpVariable getVariableDef(QString name);
 
 
         /** \brief  evaluates a registered function
          * \param name name of the (registered function) to be evaluated
          * \param params array of the input parameters
-         * \param n number of input parameters (<=8)
          */
-        qfmpResult evaluateFunction(QString name, qfmpResult* params, unsigned char n);
-
-        /** \brief  returns the defining structure of the given function */
-        qfmpEvaluateFunc getFunctionDef(QString name);
+        qfmpResult evaluateFunction(const QString &name, const QVector<qfmpResult>& params);
 
 
 
         /** \brief  tests whether a variable exists */
-        inline bool variableExists(QString name){ return (variables.find(name)!=variables.end()); };
+        inline bool variableExists(const QString& name){ return environment.variableExists(name); }
 
         /** \brief  tests whether a function exists */
-        inline bool functionExists(QString name){ return !(functions.find(name)==functions.end()); };
+        inline bool functionExists(const QString& name){ return environment.functionExists(name); }
+
+        void enterBlock();
+        void leaveBlock();
 
         /** \brief  deletes all defined variables. the memory of internal variables
          * will be released. the external memory will not be released.
          */
         void clearVariables();
 
-        /** \brief  delete the specified variabale and releases its internal memory.*/
-        void deleteVariable(QString name);
-
         /** \brief  clears the list of internal functions*/
-        inline void clearFunctions() {functions.clear();};
+        void clearFunctions();
 
         /** \brief  registers standard variables*/
         void addStandardVariables();
@@ -865,6 +946,11 @@ class QFLIB_EXPORT QFMathParser
         QString printVariables();
 
         QList<QPair<QString, qfmpVariable> > getVariables();
+
+        /** \brief  prints a list of all registered variables */
+        QString printFunctions();
+
+        QList<QPair<QString, qfmpFunctionDescriptor> > getFunctions();
 
 };
 
