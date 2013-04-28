@@ -38,7 +38,7 @@ Qt::ItemFlags QFImFCCSParameterInputTable::flags(const QModelIndex &index) const
             if (fp.isValid() && ff->hasParameter(fp.id) &&ff->getDescription(fp.id).fit) {
                 f=f|Qt::ItemIsUserCheckable;
             }
-        }else if (i==1) {
+        } else if ((i==1) || (i==4)) {
             FitParam fp=fitparamids.value(row-2, FitParam());
             if (fp.isValid() && ff->hasParameter(fp.id) &&ff->getDescription(fp.id).displayError==QFFitFunction::EditError) {
                 f=f|Qt::ItemIsEditable;
@@ -136,6 +136,26 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
                             if (item->getFitFix(fp.id, rdr)) return Qt::Checked;
                             return Qt::Unchecked;
                         }
+                    } if (coli==4) {
+                        if (role==Qt::DisplayRole && desc.fit) {
+                            int g=item->getLinkParameter(cols, fp.id);
+                            if (g>=0) return tr("global #%1").arg(g);
+                        } else if ((role==globalParamRole || role==Qt::EditRole) && desc.fit) {
+                            return item->getLinkParameter(cols, fp.id);
+                        } else if (role==widgetTypeRole && desc.fit) {
+                            return wtGlobalParamCombo;
+                        } else if (role==Qt::BackgroundRole) {
+                            int g=item->getLinkParameter(cols, fp.id);
+                            if (g>=0) {
+                                QColor col;
+                                col.setHsvF(double(g%10)*0.8, 0.5, 0.8);
+                                QBrush b(col);
+                                if (g>=10) b.setStyle(Qt::BDiagPattern);
+                                if (g>=20) b.setStyle(Qt::DiagCrossPattern);
+                                if (g>=30) b.setStyle(Qt::CrossPattern);
+                                return b;
+                            }
+                        }
                     }
                 } else {
                     if (role==Qt::BackgroundRole) return QBrush(QApplication::palette().color(QPalette::Window).darker());
@@ -227,6 +247,12 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
                     item->setFitFix(pid.id, value.toBool(), rdr);
                     emit dataChanged(index, index);
                     emit fitParamFixChanged();
+                    return true;
+                }
+                if (coli==4) {
+                    item->setLinkParameter(cols, pid.id, value.toInt());
+                    emit dataChanged(index, index);
+                    emit fitParamGlobalChanged();
                     return true;
                 }
             }

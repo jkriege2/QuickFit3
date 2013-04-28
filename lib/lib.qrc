@@ -13,6 +13,8 @@
         <file alias="lib/projecttree_emptyeval.png">../images/16x16/empty.png</file>
         <file alias="lib/projecttree_project.png">../images/16x16/qf3fileicon.png</file>
         <file alias="lib/file_add.png">icons/list_add.png</file>
+        <file alias="lib/add.png">icons/add.png</file>
+        <file alias="lib/clear.png">icons/clear.png</file>
         <file alias="lib/file_delete.png">icons/list_remove.png</file>
         <file alias="lib/file_edit.png">icons/edit.png</file>
         <file alias="lib/file_copy.png">icons/edit_copy.png</file>

@@ -107,6 +107,20 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
             connect(cmb, SIGNAL(currentIndexChanged(int)), this, SLOT(onEditorFinished()));
             return cmb;
         }
+        if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtGlobalParamCombo) {
+            QComboBox* cmb=new QComboBox(parent);
+            int cnt=imfccs->getLinkParameterCount();
+            cmb->addItem(QIcon(":/lib/clear.png"), tr("-- not linked --").arg(cnt), -1);
+            for (int i=0; i<cnt; i++) {
+                cmb->addItem(tr("global param #%1").arg(cnt), i);
+            }
+            cmb->addItem(QIcon(":/lib/add.png"), tr("new global param #%1").arg(cnt), cnt);
+
+            //qDebug()<<"   created ffcombo "<<t.elapsed()<<"ms";
+            //cmb->view()->setMinimumWidth(450);
+            connect(cmb, SIGNAL(currentIndexChanged(int)), this, SLOT(onEditorFinished()));
+            return cmb;
+        }
         /*if (imfccs && fpID.isValid() && widgetType.toInt()==QFImFCCSParameterInputTable::wtFixCheck) {
             QCheckBox* chk=new QCheckBox(parent);
             chk->setText("");
@@ -184,6 +198,16 @@ void QFImFCCSParameterInputDelegate::setEditorData(QWidget *editor, const QModel
                 return;
             }
         }
+        if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtGlobalParamCombo) {
+            QComboBox* cmb=qobject_cast<QComboBox*>(editor);
+            if (cmb) {
+                bool ok=false;
+                int idx=index.data(QFImFCCSParameterInputTable::globalParamRole).toInt(&ok);
+                if (!ok || idx<-1) idx=-1;
+                cmb->setCurrentIndex(idx);
+                return;
+            }
+        }
         if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtFixCheck) {
             QCheckBox* edt=qobject_cast<QCheckBox*>(editor);
             if (edt) {
@@ -254,6 +278,13 @@ void QFImFCCSParameterInputDelegate::setModelData(QWidget *editor, QAbstractItem
             if (cmb) {
                 model->setData(index, cmb->itemData(cmb->currentIndex()).toString());
                 //imfccs->setFitFunction(fileID.toInt(), project->getRawDataByID(cmb->itemData(cmb->currentIndex()).toString()));
+                return;
+            }
+        }
+        if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtGlobalParamCombo) {
+            QComboBox* cmb=qobject_cast<QComboBox*>(editor);
+            if (cmb) {
+                model->setData(index, qMin(-1, cmb->currentIndex()-1));
                 return;
             }
         }

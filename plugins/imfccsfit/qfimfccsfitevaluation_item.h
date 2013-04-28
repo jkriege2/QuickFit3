@@ -110,6 +110,14 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         QFMatchRDRFunctor* getMatchFunctor() const;
         /** \brief set the current index to use */
         virtual int getCurrentIndex() const;
+
+        /** \brief returns the number of currently used link parameters
+         *
+         *  \note This function is reltively costy, as it iterates over all elements in globalParams, to find the maximum value!
+         */
+        int getLinkParameterCount() const;
+        /** \brief returns the global_param of the given file and fit parameter, or -1 if none */
+        int getLinkParameter(int file, QString parameter);
     public slots:
         void setFitFile(int num, QFRawDataRecord *record);
         virtual void setFitFunction(int num, QString fitFunction);
@@ -118,6 +126,12 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         virtual void removeFitFile();
         /** \brief set the current index to use */
         virtual void setCurrentIndex(int index);
+        /** \brief set the global parameter of the given file and fit parameter \a parameter therein */
+        virtual void setLinkParameter(int file, QString parameter, int global_param);
+        /** \brief set the global parameter of the given file and fit parameter \a parameter therein */
+        virtual void unsetLinkParameter(int file, QString parameter);
+        /** \brief clear all linked parameters in the given file or all linked parameters, if \c file<0 */
+        virtual void clearLinkParameters(int file=-1);
 
     signals:
         void fileChanged(int num, QFRawDataRecord* record);
@@ -134,6 +148,18 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         QMap<int, QString> m_multiFitFunctions;
         /** \brief files for a fit */
         QList<QPointer<QFRawDataRecord> > fitFilesList;
+
+
+        /*! \brief list of linked parameters
+
+            The first key is the file number, the second is the parameter in this file. The value finally
+            describes the number/ID of the global parameter the given parameter is linked to:
+
+            \c <file, fit_param; global_param>
+         */
+        QMap<int, QMap<QString, int> > globalParams;
+        mutable bool globalParamsChanged;
+        mutable int lastGlobalParamsCount;
 
 
         /** \brief makes sure that at least one fit file is in the list */

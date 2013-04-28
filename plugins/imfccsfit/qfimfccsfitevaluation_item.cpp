@@ -15,6 +15,8 @@ QFImFCCSFitEvaluationItem::QFImFCCSFitEvaluationItem(QFProject* parent):
     m_weighting=EqualWeighting;
     m_currentIndex=-1;
     m_multiFitFunctions.clear();
+    globalParamsChanged=true;
+    lastGlobalParamsCount=0;
     //mutexThreadedFit=new QMutex(QMutex::Recursive);
 
     if (m_fitFunctions.contains("fcs_spim_diffc")) {
@@ -152,6 +154,36 @@ void QFImFCCSFitEvaluationItem::setCurrentIndex(int index)
     }
 }
 
+void QFImFCCSFitEvaluationItem::setLinkParameter(int file, QString parameter, int global_param)
+{
+    if (global_param>=0) {
+        int old=globalParams[file].value(parameter, -1);
+        globalParams[file].insert(parameter, global_param);
+        if (old!=global_param) setDataChanged();
+    } else {
+        bool change=globalParams[file].contains(parameter);
+        globalParams[file].remove(parameter);
+        if (change) setDataChanged();
+    }
+    globalParamsChanged=true;
+}
+
+void QFImFCCSFitEvaluationItem::unsetLinkParameter(int file, QString parameter)
+{
+    setLinkParameter(file, parameter, -1);
+}
+
+void QFImFCCSFitEvaluationItem::clearLinkParameters(int file)
+{
+    if (file<0) {
+        globalParams.clear();
+    } else {
+        globalParams.remove(file);
+    }
+    globalParamsChanged=true;
+    setDataChanged();
+}
+
 void QFImFCCSFitEvaluationItem::ensureFitFiles()
 {
     if (fitFilesList.size()<=0)  {
@@ -190,6 +222,7 @@ void QFImFCCSFitEvaluationItem::intWriteData(QXmlStreamWriter &w)
         w.writeEndElement();
     }
     w.writeEndElement();
+
     w.writeStartElement("fitfiles");
     for (int ii=0; ii<fitFilesList.size(); ii++) {
         w.writeStartElement("fitfile");
@@ -200,6 +233,23 @@ void QFImFCCSFitEvaluationItem::intWriteData(QXmlStreamWriter &w)
         w.writeEndElement();
     }
     w.writeEndElement();
+
+    w.writeStartElement("globalparams");
+    QMapIterator<int, QMap<QString, int> > it(globalParams);
+    while (it.hasNext()) {
+        it.next();
+        QMapIterator<QString, int> it2(it.value());
+        while (it2.hasNext()) {
+            it2.next();
+            w.writeStartElement("globalparam");
+            w.writeAttribute("file", QString::number(it.key()));
+            w.writeAttribute("parameter", it2.key());
+            w.writeAttribute("global", QString::number(it2.value()));
+            w.writeEndElement();
+        }
+    }
+    w.writeEndElement();
+
 }
 
 void QFImFCCSFitEvaluationItem::intReadData(QDomElement *e)
@@ -218,6 +268,7 @@ void QFImFCCSFitEvaluationItem::intReadData(QDomElement *e)
 
         e1=e1.nextSiblingElement("multifunction");
     }
+
     fitFilesList.clear();
     e1=e->firstChildElement("fitfiles").firstChildElement("fitfile");
     while (!e1.isNull()) {
@@ -232,8 +283,24 @@ void QFImFCCSFitEvaluationItem::intReadData(QDomElement *e)
         e1=e1.nextSiblingElement("fitfile");
     }
     ensureFitFiles();
-    paramTable->rebuildModel();
 
+    globalParams.clear();
+    e1=e->firstChildElement("globalparams").firstChildElement("globalparam");
+    while (!e1.isNull()) {
+        bool ok=false, ok1=false;
+        int file=e1.attribute("file", "-1").toInt(&ok);
+        int global=e1.attribute("global", "-1").toInt(&ok1);
+        QString param=e1.attribute("parameter", "");
+        if (file>=0 && global>=0 && ok && ok1 && (!param.isEmpty())) {
+            globalParams[file].insert(param, global);
+        }
+
+        e1=e1.nextSiblingElement("globalparam");
+    }
+    globalParamsChanged=true;
+    lastGlobalParamsCount=0;
+
+    paramTable->rebuildModel();
 }
 
 
@@ -354,6 +421,32 @@ int QFImFCCSFitEvaluationItem::getCurrentIndex() const
         /*m_currentIndex=*/index=getIndexMax(r);
     }
     return index;
+}
+
+int QFImFCCSFitEvaluationItem::getLinkParameterCount() const
+{
+    if (!globalParamsChanged) return qMax(0,lastGlobalParamsCount);
+    int count=0;
+    QMapIterator<int, QMap<QString, int> > it(globalParams);
+    while (it.hasNext()) {
+        it.next();
+        QMapIterator<QString, int> it2(it.value());
+        while (it2.hasNext()) {
+            it2.next();
+            if (it2.value()>count) count=it2.value();
+        }
+    }
+    globalParamsChanged=false;
+    lastGlobalParamsCount=count+1;
+    return count+1;
+}
+
+int QFImFCCSFitEvaluationItem::getLinkParameter(int file, QString parameter)
+{
+    if (globalParams.contains(file)) {
+        return globalParams[file].value(parameter, -1);
+    }
+    return -1;
 }
 
 

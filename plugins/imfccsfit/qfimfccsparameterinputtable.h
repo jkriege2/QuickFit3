@@ -17,7 +17,8 @@ class QFImFCCSParameterInputTable : public QAbstractTableModel
             wtValueDoubleEdit=4,
             wtValueComboBox=5,
             wtValueIntEdit=6,
-            wtErrorEdit=7
+            wtErrorEdit=7,
+            wtGlobalParamCombo=8
         };
 
         enum QFImFCCSParameterInputTableRoles {
@@ -26,7 +27,8 @@ class QFImFCCSParameterInputTable : public QAbstractTableModel
             widgetTypeRole=  Qt::UserRole+2,
             fitParameterIDRole= Qt::UserRole+3,
             evaluationIDRole= Qt::UserRole+4,
-            fitFileIDRole=Qt::UserRole+4
+            fitFileIDRole=Qt::UserRole+4,
+            globalParamRole=Qt::UserRole+5
         };
 
         explicit QFImFCCSParameterInputTable(QFImFCCSFitEvaluationItem *parent = 0);
@@ -46,6 +48,7 @@ class QFImFCCSParameterInputTable : public QAbstractTableModel
         void modelRebuilt();
         void fitParamChanged();
         void fitParamFixChanged();
+        void fitParamGlobalChanged();
         void fitParamErrorChanged();
     public slots:
         void rebuildModel();
