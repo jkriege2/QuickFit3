@@ -147,9 +147,7 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
                         } else if (role==Qt::BackgroundRole) {
                             int g=item->getLinkParameter(cols, fp.id);
                             if (g>=0) {
-                                QColor col;
-                                col.setHsvF(double(g%10)*0.8, 0.5, 0.8);
-                                QBrush b(col);
+                                QBrush b(getCycleColor(g, 10, 0.5, 0.8));
                                 if (g>=10) b.setStyle(Qt::BDiagPattern);
                                 if (g>=20) b.setStyle(Qt::DiagCrossPattern);
                                 if (g>=30) b.setStyle(Qt::CrossPattern);
@@ -200,12 +198,14 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
     int row=index.row();
 
     //QFAutoOutputTimer(QString("setData(%1, %2, %3, r=%4)").arg(index.row()).arg(index.column()).arg(value.toString()).arg(role));
+    //qDebug()<<QString("setData(%1, %2, %3, r=%4)").arg(index.row()).arg(index.column()).arg(value.toString()).arg(role);
 
     if (role==Qt::EditRole && col>0) {
         int cols=(col-1)/colsPerRDR;
         int coli=(col-1)%colsPerRDR;
         QFRawDataRecord* rdr=item->getFitFile(cols);
         QFFitFunction* ff=item->getFitFunction(cols);
+        //qDebug()<<"cols="<<cols<<"   coli="<<coli;
 
         if (row==0 && coli==0) {
             QFRawDataRecord* newrdr=item->getProject()->getRawDataByID(value.toInt());
@@ -229,6 +229,16 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
             if (pid.isValid()) {
                 if (coli==0) {
                     item->setFitValue(pid.id, value.toDouble(), rdr);
+                    // also set all other linked parameters to this new value!
+                    QList<QPair<int, QString> > linked=item->getLinkedParameterList(cols, pid.id);
+                    for (int li=0; li<linked.size(); li++) {
+                        item->setFitValue(linked[li].second, value.toDouble(), item->getFitFile(linked[li].first));
+                        if (fitParamListContainsID(linked[li].second, fitparamids, &row)) {
+                            QModelIndex idx=this->index(2+row, 1+linked[li].first*getColsPerRDR());
+                            emit dataChanged(idx, idx);
+                        }
+                    }
+
                     if (!checkRebuildModel(false)) {
                         emit dataChanged(index, index);
                         recalculateFitParameters(false);

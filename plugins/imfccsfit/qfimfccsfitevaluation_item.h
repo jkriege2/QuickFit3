@@ -117,7 +117,9 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
          */
         int getLinkParameterCount() const;
         /** \brief returns the global_param of the given file and fit parameter, or -1 if none */
-        int getLinkParameter(int file, QString parameter);
+        int getLinkParameter(int file, QString parameter) const;
+        /** \brief get a list if items a given parameter is linked to */
+        QList<QPair<int, QString> > getLinkedParameterList(int file, QString parameter) const;
     public slots:
         void setFitFile(int num, QFRawDataRecord *record);
         virtual void setFitFunction(int num, QString fitFunction);

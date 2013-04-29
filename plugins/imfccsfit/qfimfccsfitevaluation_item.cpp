@@ -441,12 +441,30 @@ int QFImFCCSFitEvaluationItem::getLinkParameterCount() const
     return count+1;
 }
 
-int QFImFCCSFitEvaluationItem::getLinkParameter(int file, QString parameter)
+int QFImFCCSFitEvaluationItem::getLinkParameter(int file, QString parameter) const
 {
     if (globalParams.contains(file)) {
         return globalParams[file].value(parameter, -1);
     }
     return -1;
+}
+
+QList<QPair<int, QString> > QFImFCCSFitEvaluationItem::getLinkedParameterList(int file, QString parameter) const
+{
+    QList<QPair<int, QString> > l;
+    int link=getLinkParameter(file, parameter);
+    if (link<0) return l;
+
+    QMapIterator<int, QMap<QString, int> > it(globalParams);
+    while (it.hasNext()) {
+        it.next();
+        QMapIterator<QString, int> it2(it.value());
+        while (it2.hasNext()) {
+            it2.next();
+            if (it2.value()==link && (it.key()!=file || it2.key()!=parameter)) l<<qMakePair(it.key(), it2.key());
+        }
+    }
+    return l;
 }
 
 

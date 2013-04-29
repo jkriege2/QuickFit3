@@ -714,3 +714,11 @@ QString qchartostr(QChar data) {
     }
     return ost;
 }
+
+
+QColor getCycleColor(int value, unsigned int max, double S, double V) {
+    while (value<0) value=value+max;
+    QColor col;
+    col.setHsvF(double(value%max)/double(max-1)*0.8, S, V);
+    return col;
+}

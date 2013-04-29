@@ -64,7 +64,7 @@ QSize QFImFCCSParameterInputDelegate::sizeHint(const QStyleOptionViewItem &optio
 
 QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    QFAutoOutputTimer ta(QString("QFImFCCSParameterInputDelegate::createEditor(%1, %2)").arg(index.row()).arg(index.column()));
+    //QFAutoOutputTimer ta(QString("QFImFCCSParameterInputDelegate::createEditor(%1, %2)").arg(index.row()).arg(index.column()));
     QElapsedTimer t;
     t.start();
     QVariant widgetType=index.data(QFImFCCSParameterInputTable::widgetTypeRole);
@@ -111,11 +111,14 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
             QComboBox* cmb=new QComboBox(parent);
             int cnt=imfccs->getLinkParameterCount();
             cmb->addItem(QIcon(":/lib/clear.png"), tr("-- not linked --").arg(cnt), -1);
+            //cmb->setItemData(0, Q, Qt::ForegroundRole);
             for (int i=0; i<cnt; i++) {
-                cmb->addItem(tr("global param #%1").arg(cnt), i);
+                cmb->addItem(tr("global param #%1").arg(i), i);
+                cmb->setItemData(1+i, QBrush(getCycleColor(i, 10, 0.5, 0.8)), Qt::BackgroundRole);
             }
             cmb->addItem(QIcon(":/lib/add.png"), tr("new global param #%1").arg(cnt), cnt);
-
+            cmb->setItemData(cnt, QBrush(getCycleColor(cnt, 10, 0.5, 0.8)), Qt::BackgroundRole);
+            cmb->view()->setMinimumWidth(250);
             //qDebug()<<"   created ffcombo "<<t.elapsed()<<"ms";
             //cmb->view()->setMinimumWidth(450);
             connect(cmb, SIGNAL(currentIndexChanged(int)), this, SLOT(onEditorFinished()));
@@ -167,7 +170,7 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
 
 void QFImFCCSParameterInputDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    QFAutoOutputTimer ta(QString("QFImFCCSParameterInputDelegate::setEditorData(%1, %2)").arg(index.row()).arg(index.column()));
+    //QFAutoOutputTimer ta(QString("QFImFCCSParameterInputDelegate::setEditorData(%1, %2)").arg(index.row()).arg(index.column()));
     QVariant widgetType=index.data(QFImFCCSParameterInputTable::widgetTypeRole);
     QVariant rdrID=index.data(QFImFCCSParameterInputTable::rdrIDRole);
     QVariant ffID=index.data(QFImFCCSParameterInputTable::fitFunctionIDRole);
@@ -284,7 +287,10 @@ void QFImFCCSParameterInputDelegate::setModelData(QWidget *editor, QAbstractItem
         if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtGlobalParamCombo) {
             QComboBox* cmb=qobject_cast<QComboBox*>(editor);
             if (cmb) {
-                model->setData(index, qMin(-1, cmb->currentIndex()-1));
+                //qDebug()<<"globalParam="<<cmb->currentIndex()-1;
+                int g=cmb->currentIndex()-1;
+                if (g<-1) g=-1;
+                model->setData(index, g);
                 return;
             }
         }
