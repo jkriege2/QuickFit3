@@ -30,7 +30,7 @@
 #include <QPair>
 #include <QStack>
 #include "../extlibs/MersenneTwister.h"
-
+#include <stdint.h>
 
 
 #ifndef QFMATHPARSER_H
@@ -313,9 +313,13 @@ class QFLIB_EXPORT QFMathParser
                 QFLIB_EXPORT QString toTypeString() const;
 
                 /** \brief convert the value this struct to an integer */
-                QFLIB_EXPORT int64_t toInteger() const;
+                QFLIB_EXPORT int32_t toInteger() const;
+                /** \brief convert the value this struct to an integer */
+                QFLIB_EXPORT uint32_t toUInt() const;
                 /** \brief is this result convertible to integer? */
                 QFLIB_EXPORT bool isInteger() const;
+                /** \brief is this result convertible to unsigned integer? */
+                QFLIB_EXPORT bool isUInt() const;
 
                 QFLIB_EXPORT void setDouble(double val);
                 QFLIB_EXPORT void setBoolean(bool val);

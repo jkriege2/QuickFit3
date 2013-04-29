@@ -17,7 +17,13 @@
    <item row="2" column="1">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QPushButton" name="btnEvaluateCurrent">
+      <widget class="QToolButton" name="btnEvaluateCurrent">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>Evaluate &amp;Current</string>
        </property>
@@ -25,16 +31,28 @@
         <iconset>
          <normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</iconset>
        </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnEvaluateAll">
+      <widget class="QToolButton" name="btnEvaluateCurrentAllRuns">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
-        <string>Evaluate &amp;All</string>
+        <string>Evaluate &amp;Current</string>
        </property>
        <property name="icon">
         <iconset>
          <normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
        </property>
       </widget>
      </item>
@@ -46,7 +64,13 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnSaveReport">
+      <widget class="QToolButton" name="btnSaveReport">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>Save &amp;Report</string>
        </property>
@@ -54,16 +78,28 @@
         <iconset>
          <normaloff>:/imfccs_fit/qfeval_savereport.png</normaloff>:/imfccs_fit/qfeval_savereport.png</iconset>
        </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnPrintReport">
+      <widget class="QToolButton" name="btnPrintReport">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>&amp;Print Report</string>
        </property>
        <property name="icon">
         <iconset>
          <normaloff>:/imfccs_fit/qfeval_printreport.png</normaloff>:/imfccs_fit/qfeval_printreport.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
        </property>
       </widget>
      </item>

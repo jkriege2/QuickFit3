@@ -128,6 +128,7 @@ int QFImFCCSFitEvaluationItem::addFitFile()
     }
     setDataChanged();
     paramTable->rebuildModel();
+    if (fitFilesList.size()>0) emit fileChanged(fitFilesList.size()-1, fitFilesList.last());
     return fitFilesList.size()-1;
 }
 
@@ -135,6 +136,7 @@ void QFImFCCSFitEvaluationItem::removeFitFile()
 {
     if (fitFilesList.size()>1) {
         fitFilesList.removeLast();
+        if (fitFilesList.size()>0) emit fileChanged(0, fitFilesList.first());
         paramTable->rebuildModel();
         setDataChanged();
     }

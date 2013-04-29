@@ -1,6 +1,7 @@
 #include <QtCore/QCoreApplication>
 #include "../../qfmathparser.h"
 #include <QDebug>
+#include <stdint.h>
 
 #define TEST(expr) {\
     parser.resetErrors(); \
@@ -15,6 +16,14 @@ int main(int argc, char *argv[])
 {
     
     QFMathParser parser;
+
+    /*for (uint32_t i=0; i<0xFFFFFFFF; i++) {
+        double di=i;
+        uint32_t ii=di;
+        if (ii!=i) qDebug()<<"   "<<i<<"!="<<ii<<" (double="<<di<<")";
+        if (i%10000000==0) qDebug()<<i;
+    }*/
+
 
     TEST("1+2+pi");
     TEST("1+2*pi");

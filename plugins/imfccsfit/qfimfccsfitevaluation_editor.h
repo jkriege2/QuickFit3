@@ -8,6 +8,7 @@
 #include "qffitfunctionplottools.h"
 #include "jkqtplotter.h"
 #include "qffcsweightingtools.h"
+#include "dlgqffitalgorithmprogressdialog.h"
 
 namespace Ui {
     class QFImFCCSFitEvaluationEditor;
@@ -77,14 +78,23 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFImFCCSFitEvaluationEditor *ui;
         
-        /** \brief progress dialog used by the fits */
-        QProgressDialog* dlgEvaluationProgress;
         
         /** \brief where did we save the last report */
         QString currentSaveDirectory;
         QAction* actConfigureForSPIMFCCS;
+        QAction* actFitCurrent;
+        QAction* actFitRunsCurrentMT;
+        QAction* actFitRunsCurrent;
+        QAction* actPrintReport;
+        QAction* actSaveReport;
         QMenu* menuImFCCSFit;
-        
+        QMenu* menuEvaluation;
+
+        /** \brief fit progress dialog */
+        dlgQFFitAlgorithmProgressDialog* dlgFitProgress;
+        /** \brief reporter for dlgFitProgress */
+        dlgQFFitAlgorithmProgressDialogReporter* dlgFitProgressReporter;
+
         /*! \brief a flag that indicates whether we are currently updating the display data 
         
             This may be used to distinguish between events emitted by the user, changing something (in a widget, ...) or
@@ -112,10 +122,13 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
 
     
-        /** \brief evaluate all files */
-        void evaluateAll();
         /** \brief evaluate current file */
-        void evaluateCurrent();
+        void fitCurrent();
+        /** \brief all runs/pixels current file */
+        void fitRunsCurrentThreaded();
+        /** \brief all runs/pixels current file, multi-threaded version */
+        void fitRunsCurrent();
+
         /** \brief display the data from the current raw data record */
         void displayData();
         /** \brief display the current evaluation results */

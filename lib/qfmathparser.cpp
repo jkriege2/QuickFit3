@@ -1781,7 +1781,14 @@ QString QFMathParser::qfmpResult::toTypeString() const
 
 }
 
-int64_t QFMathParser::qfmpResult::toInteger() const
+int32_t QFMathParser::qfmpResult::toInteger() const
+{
+    if (type==qfmpDouble) return num;
+    if (type==qfmpBool) return (boolean)?1:0;
+    return 0;
+}
+
+uint32_t QFMathParser::qfmpResult::toUInt() const
 {
     if (type==qfmpDouble) return num;
     if (type==qfmpBool) return (boolean)?1:0;
@@ -1790,7 +1797,12 @@ int64_t QFMathParser::qfmpResult::toInteger() const
 
 bool QFMathParser::qfmpResult::isInteger() const
 {
-    return type==qfmpDouble;
+    return (type==qfmpDouble)&&(fabs(num)<4294967296.0);
+}
+
+bool QFMathParser::qfmpResult::isUInt() const
+{
+    return type==qfmpDouble&&(fabs(num)<2147483648.0);
 }
 
 void QFMathParser::qfmpResult::setDouble(double val)

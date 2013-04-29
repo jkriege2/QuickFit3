@@ -9,7 +9,7 @@
 #include <QtGui>
 #include <QtCore>
 #include "tools.h"
-
+#include "dlgqfprogressdialog.h"
 
 QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent):
     QFEvaluationEditor(services, propEditor, parent),
@@ -19,6 +19,11 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     
     currentSaveDirectory="";
     
+
+    // setup fit progress dialog
+    dlgFitProgress = new dlgQFFitAlgorithmProgressDialog(this);
+    dlgFitProgressReporter=new dlgQFFitAlgorithmProgressDialogReporter(dlgFitProgress);
+
     // setup widgets
     ui->setupUi(this);
     ui->pltOverview->setRunSelectWidgetActive(true);
@@ -89,22 +94,45 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     connect(ui->pltData->get_plotter()->get_actZoomAll(), SIGNAL(triggered()), ui->pltResiduals, SLOT(zoomToFit()));
 
 
-    menuImFCCSFit=propEditor->addOrFindMenu(tr("Tools"), 0);
+    menuEvaluation=propEditor->addOrFindMenu(tr("&Evaluation"), 0);
+    menuImFCCSFit=propEditor->addOrFindMenu(tr("&Tools"), 0);
+
+    actFitCurrent=new QAction(QIcon(":/imfccsfit/fit_fitcurrent.png"), tr("Fit &Current"), this);
+    connect(actFitCurrent, SIGNAL(triggered()), this, SLOT(fitCurrent()));
+    ui->btnEvaluateCurrent->setDefaultAction(actFitCurrent);
+    menuEvaluation->addAction(actFitCurrent);
+
+    actFitRunsCurrentMT=new QAction(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels (MT)"), this);
+    connect(actFitRunsCurrentMT, SIGNAL(triggered()), this, SLOT(fitRunsCurrentThreaded()));
+    ui->btnEvaluateCurrentAllRuns->setDefaultAction(actFitRunsCurrentMT);
+    menuEvaluation->addAction(actFitRunsCurrentMT);
+
+    actFitRunsCurrent=new QAction(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels"), this);
+    connect(actFitRunsCurrent, SIGNAL(triggered()), this, SLOT(fitRunsCurrent()));
+    ui->btnEvaluateCurrentAllRuns->addAction(actFitRunsCurrent);
+    menuEvaluation->addAction(actFitRunsCurrent);
+
+    actSaveReport=new QAction(QIcon(":/imfccsfit/fit_savereport.png"), tr("&Save Report"), this);
+    connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
+    ui->btnSaveReport->setDefaultAction(actSaveReport);
+    menuEvaluation->addSeparator();
+    menuEvaluation->addAction(actSaveReport);
+
+    actPrintReport=new QAction(QIcon(":/imfccsfit/fit_printreport.png"), tr("&Print Report"), this);
+    connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
+    ui->btnPrintReport->setDefaultAction(actPrintReport);
+    menuEvaluation->addAction(actPrintReport);
+
+
     actConfigureForSPIMFCCS=new QAction(tr("configure for SPIM-FCCS ..."), this);
     connect(actConfigureForSPIMFCCS, SIGNAL(triggered()), this, SLOT(configureForSPIMFCCS()));
-
     menuImFCCSFit->addAction(actConfigureForSPIMFCCS);
+
     menuImFCCSFit->addSeparator();
 
     
-    // create progress dialog for evaluation
-    dlgEvaluationProgress=new QProgressDialog(NULL);
-    dlgEvaluationProgress->hide();
-    dlgEvaluationProgress->setWindowModality(Qt::WindowModal);
     
     // connect widgets 
-    connect(ui->btnEvaluateAll, SIGNAL(clicked()), this, SLOT(evaluateAll()));
-    connect(ui->btnEvaluateCurrent, SIGNAL(clicked()), this, SLOT(evaluateCurrent()));
     connect(ui->pltData, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(zoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     connect(ui->pltResiduals, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(zoomChangedLocally(double,double,double,double,JKQtPlotter*)));
 /*    connect(ui->datacut, SIGNAL(copyUserMinToAll(int)), this, SLOT(copyUserMinToAll(int)));
@@ -120,7 +148,6 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
 QFImFCCSFitEvaluationEditor::~QFImFCCSFitEvaluationEditor()
 {
     delete ui;
-    delete dlgEvaluationProgress;
 }
 
 int QFImFCCSFitEvaluationEditor::getUserMin(int index)
@@ -434,7 +461,7 @@ void QFImFCCSFitEvaluationEditor::displayData() {
     ds->clear();
     QList<QColor> cols;
     cols<<QColor("darkgreen")<<QColor("red")<<QColor("blue")<<QColor("darkorange")<<QColor("purple")<<QColor("maroon");
-    qDebug()<<"\n\n\n\n ### displayData() eval="<<eval<<" ###";
+    //qDebug()<<"\n\n\n\n ### displayData() eval="<<eval<<" ###";
     if (eval) {
         for (int file=0; file<eval->getFitFileCount(); file++) {
             QFFitFunction* ff=eval->getFitFunction(file);
@@ -547,94 +574,212 @@ void QFImFCCSFitEvaluationEditor::displayData() {
 }
 
 
-void QFImFCCSFitEvaluationEditor::doEvaluation(QFRawDataRecord* record) {
-    QApplication::processEvents();
-    QApplication::processEvents();
-
-    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record); //if (!data) return;
-    QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
-
-    if (!eval) return;
-    
-    if (dlgEvaluationProgress->wasCanceled()) return; // canceled by user ?
-    
-    /*
-        DO YOUR EVALUATION HERE
-    */
-
-    services->log_text(tr("evaluation complete\n"));
-    
-    // write back fit results to record!
-    record->disableEmitResultsChanged();
-    record->resultsSetBoolean(eval->getEvaluationResultID(record), "evaluation_completed", true);
-    record->enableEmitResultsChanged();
-    emit resultsChanged();
-}
 
 
 
-
-void QFImFCCSFitEvaluationEditor::evaluateCurrent() {
-    /* EXECUTE AN EVALUATION FOR THE CURRENT RECORD ONLY */
+void QFImFCCSFitEvaluationEditor::fitCurrent() {
     if (!current) return;
-    QFRawDataRecord* record=current->getHighlightedRecord(); 
-    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
     QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
-    if ((!eval)||(!record)/*||(!data)*/) return;
+    if (!eval) return;
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if (!falg) return;
 
-    
-    
-    dlgEvaluationProgress->setLabelText(tr("evaluate '%1' ...").arg(record->getName()));
-    
-    dlgEvaluationProgress->setRange(0,100);
-    dlgEvaluationProgress->setValue(50);
-    dlgEvaluationProgress->open();
-
+    falg->setReporter(dlgFitProgressReporter);
+    QString runname=tr("average");
+    if (eval->getCurrentIndex()>=0) runname=QString::number(eval->getCurrentIndex());
+    dlgFitProgress->reportSuperStatus(tr("fit run %1<br>using algorithm '%2' \n").arg(runname).arg(falg->name()));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(100);
+    dlgFitProgress->setProgress(0);
+    dlgFitProgress->setSuperProgress(0);
+    dlgFitProgress->setAllowCancel(true);
+    dlgFitProgress->display();
+    QApplication::processEvents();
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-    // here we call doEvaluation to execute our evaluation for the current record only
-    doEvaluation(record);
 
+    //feval->doFit(record, eval->getCurrentIndex(), getUserMin(record, eval->getCurrentIndex(), datacut->get_userMin()), getUserMax(record, eval->getCurrentIndex(), datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
+    //record->enableEmitResultsChanged(true);
+
+    dlgFitProgress->reportSuperStatus(tr("fit done ... updating user interface\n"));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(100);
     displayEvaluation();
-    dlgEvaluationProgress->setValue(100);
-
     QApplication::restoreOverrideCursor();
+    dlgFitProgress->done();
+    falg->setReporter(NULL);
+    QApplication::processEvents();
+    current->emitResultsChanged();
 }
 
-
-void QFImFCCSFitEvaluationEditor::evaluateAll() {
-    /* EXECUTE AN EVALUATION FOR ALL RECORDS */
+void QFImFCCSFitEvaluationEditor::fitRunsCurrentThreaded()
+{
     if (!current) return;
-
     QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     if (!eval) return;
-
-    // get a list of all raw data records this evaluation is applicable to
-    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
-    dlgEvaluationProgress->setRange(0,recs.size());
-    dlgEvaluationProgress->setValue(0);
-    dlgEvaluationProgress->open();
-
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-    // iterate through all records and all runs therein and do the fits
-    for (int i=0; i<recs.size(); i++) {
-        QFRawDataRecord* record=recs[i]; 
-        // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
-        QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
-        if ((record)/*&&(data)*/) {
-            dlgEvaluationProgress->setLabelText(tr("evaluate '%1' ...").arg(record->getName()));
-            // here we call doEvaluation to execute our evaluation for the current record only
-            doEvaluation(record);
-        }
-        dlgEvaluationProgress->setValue(i);
-        // check whether the user canceled this evaluation
-        if (dlgEvaluationProgress->wasCanceled()) break;
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if (!falg->isThreadSafe()) {
+        fitRunsCurrent();
+        return;
     }
-    dlgEvaluationProgress->setValue(recs.size());
+    if (!falg) return;
+
+    dlgQFProgressDialog* dlgTFitProgress=new dlgQFProgressDialog(this);
+    dlgTFitProgress->reportTask(tr("fit all runs in the current file<br>using algorithm '%1' \n").arg(falg->name()));
+    dlgTFitProgress->setProgressMax(100);
+    dlgTFitProgress->setProgress(0);
+    dlgTFitProgress->setAllowCancel(true);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgTFitProgress->display();
+
+
+    int items=0;
+    int thread=0;
+    dlgTFitProgress->reportStatus("creating thread objects ...");
+    QApplication::processEvents();
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+    //QList<QFFitResultsByIndexEvaluationFitThread*> threads;
+    int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
+    if (ProgramOptions::getConfigValue(eval->getType()+"/overrule_threads", false).toBool()) {
+        threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
+    }
+    /*for (int i=0; i<threadcount; i++) {
+        threads.append(new QFFitResultsByIndexEvaluationFitThread(true, this));
+    }
+
+
+    // enqueue the jobs in the several threads and finally make sure they know when to stop
+    dlgTFitProgress->reportStatus("distributing jobs ...");
+    QApplication::processEvents();
+    //for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=eval->getHighlightedRecord();
+        QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
+
+        if (record ) {
+            record->disableEmitResultsChanged();
+            int runmax=eval->getIndexMax(record);
+            int runmin=eval->getIndexMin(record);
+            items=items+runmax-runmin+1;
+            for (int run=runmin; run<=runmax; run++) {
+                bool doall=!current->getProperty("LEAVEOUTMASKED", false).toBool();
+                //qDebug()<<doall;
+                if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
+                    threads[thread]->addJob(eval, record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()));
+                    thread++;
+                    if (thread>=threadcount) thread=0;
+                }
+            }
+        }
+    //}
+    dlgTFitProgress->setProgressMax(items+5);
+
+
+    // start all threads and wait for them to finish
+    for (int i=0; i<threadcount; i++) {
+        threads[i]->start();
+    }
+    bool finished=false;
+    bool canceled=false;
+    QTime time;
+    time.start();
+    while (!finished) {
+
+
+        // check whether all threads have finished and collect progress info
+        finished=true;
+        int jobsDone=0;
+        for (int i=0; i<threadcount; i++) {
+            finished=finished&&threads[i]->isFinished();
+            jobsDone=jobsDone+threads[i]->getJobsDone();
+        }
+        dlgTFitProgress->setProgress(jobsDone);
+        if (!canceled) {
+            double runtime=double(time.elapsed())/1.0e3;
+            double timeperfit=runtime/double(jobsDone);
+            double estimatedRuntime=double(items)*timeperfit;
+            double remaining=estimatedRuntime-runtime;
+            dlgTFitProgress->reportStatus(tr("processing fits in %3 threads ... %1/%2 done\nruntime: %4:%5       remaining: %6:%7 [min:secs]       %8 fits/sec").arg(jobsDone).arg(items).arg(threadcount).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
+        }
+        QApplication::processEvents();
+
+        // check for user canceled
+        if (!canceled && dlgTFitProgress->isCanceled()) {
+            dlgTFitProgress->reportStatus("sending all threads the CANCEL signal");
+            for (int i=0; i<threadcount; i++) {
+                threads[i]->cancel(false);
+            }
+            canceled=true;
+        }
+    }
+
+
+    // free memory
+    for (int i=0; i<threadcount; i++) {
+        delete threads[i];
+    }*/
+
+    dlgTFitProgress->reportStatus(tr("fit done ... updating user interface\n"));
+    dlgTFitProgress->setProgress(items+2);
+    QApplication::processEvents();
+
+    /*for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+        if (record ) {
+            record->enableEmitResultsChanged(true);
+        }
+    }*/
+    current->emitResultsChanged();
+
+    dlgTFitProgress->setProgress(items+3);
+    QApplication::processEvents();
+    displayEvaluation();
+    dlgTFitProgress->setProgress(items+5);
+    QApplication::processEvents();
+    QApplication::restoreOverrideCursor();
+    dlgTFitProgress->done();
+    delete dlgTFitProgress;
+}
+
+void QFImFCCSFitEvaluationEditor::fitRunsCurrent()
+{
+    if (!current) return;
+    QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!eval) return;
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if (!falg) return;
+
+    falg->setReporter(dlgFitProgressReporter);
+    QString runname=tr("average");
+    if (eval->getCurrentIndex()>=0) runname=QString::number(eval->getCurrentIndex());
+    dlgFitProgress->reportSuperStatus(tr("fit run %1<br>using algorithm '%2' \n").arg(runname).arg(falg->name()));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(100);
+    dlgFitProgress->setProgress(0);
+    dlgFitProgress->setSuperProgress(0);
+    dlgFitProgress->setAllowCancel(true);
+    dlgFitProgress->display();
+    QApplication::processEvents();
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+
+    //feval->doFit(record, eval->getCurrentIndex(), getUserMin(record, eval->getCurrentIndex(), datacut->get_userMin()), getUserMax(record, eval->getCurrentIndex(), datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
+    //record->enableEmitResultsChanged(true);
+
+    dlgFitProgress->reportSuperStatus(tr("fit done ... updating user interface\n"));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(100);
     displayEvaluation();
     QApplication::restoreOverrideCursor();
+    dlgFitProgress->done();
+    falg->setReporter(NULL);
+    QApplication::processEvents();
+    current->emitResultsChanged();
 }
+
 
 
 
@@ -671,18 +816,18 @@ void QFImFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
 
     
     // insert heading
-    cursor.insertText(tr("Evaluation Report:\n\n"), fHeading1);
+    cursor.insertText(tr("imFCCS Fit Report:\n\n"), fHeading1);
     cursor.movePosition(QTextCursor::End);
 
     // insert table with some data
-    QTextTableFormat tableFormat;
+    /*QTextTableFormat tableFormat;
     tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
     tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
     QTextTable* table = cursor.insertTable(2, 2, tableFormat);
     table->cellAt(0, 0).firstCursorPosition().insertText(tr("raw data:"), fTextBold);
     table->cellAt(0, 1).firstCursorPosition().insertText(record->getName(), fText);
     table->cellAt(1, 0).firstCursorPosition().insertText(tr("ID:"), fTextBold);
-    table->cellAt(1, 1).firstCursorPosition().insertText(QString::number(record->getID()));
+    table->cellAt(1, 1).firstCursorPosition().insertText(QString::number(record->getID()));*/
     cursor.movePosition(QTextCursor::End);
 
 }
