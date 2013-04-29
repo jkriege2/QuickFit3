@@ -492,3 +492,6 @@ void QFFitAlgorithm::FitQFOptimizeFunctionFunctor::evaluateJacobian(double* eval
     mapArrayFromFunctorToModel(m_modelParams, params);
     m_model->evaluateJacobian(evalout, m_modelParams);
 }
+
+
+

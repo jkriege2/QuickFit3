@@ -583,6 +583,8 @@ void QFImFCCSFitEvaluationEditor::fitCurrent() {
     if (!eval) return;
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
     if (!falg) return;
+    QList<QFRawDataRecord*> records=eval->getFitFiles();
+    if (records.size()<=0) return;
 
     falg->setReporter(dlgFitProgressReporter);
     QString runname=tr("average");
@@ -598,9 +600,10 @@ void QFImFCCSFitEvaluationEditor::fitCurrent() {
     QApplication::processEvents();
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-
-    //feval->doFit(record, eval->getCurrentIndex(), getUserMin(record, eval->getCurrentIndex(), datacut->get_userMin()), getUserMax(record, eval->getCurrentIndex(), datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
-    //record->enableEmitResultsChanged(true);
+    eval->doFit(records, eval->getCurrentIndex(), getUserMin(records[0], eval->getCurrentIndex(), ui->datacut->get_userMin()), getUserMax(records[0], eval->getCurrentIndex(), ui->datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
+    for (int i=0; i<records.size(); i++) {
+        records[i]->enableEmitResultsChanged(true);
+    }
 
     dlgFitProgress->reportSuperStatus(tr("fit done ... updating user interface\n"));
     dlgFitProgress->reportStatus("");
@@ -749,14 +752,19 @@ void QFImFCCSFitEvaluationEditor::fitRunsCurrent()
     if (!eval) return;
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
     if (!falg) return;
+    QList<QFRawDataRecord*> records=eval->getFitFiles();
+    if (records.size()<=0) return;
+    QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(records[0]);
 
     falg->setReporter(dlgFitProgressReporter);
+    int runmax=eval->getIndexMax(records[0]);
+    int runmin=eval->getIndexMin(records[0]);
     QString runname=tr("average");
     if (eval->getCurrentIndex()>=0) runname=QString::number(eval->getCurrentIndex());
     dlgFitProgress->reportSuperStatus(tr("fit run %1<br>using algorithm '%2' \n").arg(runname).arg(falg->name()));
     dlgFitProgress->reportStatus("");
     dlgFitProgress->setProgressMax(100);
-    dlgFitProgress->setSuperProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(runmax-runmin);
     dlgFitProgress->setProgress(0);
     dlgFitProgress->setSuperProgress(0);
     dlgFitProgress->setAllowCancel(true);
@@ -765,8 +773,32 @@ void QFImFCCSFitEvaluationEditor::fitRunsCurrent()
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
 
-    //feval->doFit(record, eval->getCurrentIndex(), getUserMin(record, eval->getCurrentIndex(), datacut->get_userMin()), getUserMax(record, eval->getCurrentIndex(), datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
-    //record->enableEmitResultsChanged(true);
+    QTime time;
+    time.start();
+    for (int run=runmin; run<=runmax; run++) {
+        bool doall=true;//!current->getProperty("leaveoutMasked", false).toBool();
+        if (doall || (!doall && rsel && !rsel->leaveoutRun(run))) {
+            falg->setReporter(dlgFitProgressReporter);
+            QString runname=tr("average");
+            if (run>=0) runname=QString::number(run);
+            double runtime=double(time.elapsed())/1.0e3;
+            double timeperfit=runtime/double(run-runmin);
+            double estimatedRuntime=double(runmax-runmin)*timeperfit;
+            double remaining=estimatedRuntime-runtime;
+            dlgFitProgress->reportSuperStatus(tr("fit run %1<br>using algorithm '%2' \nruntime: %3:%4       remaining: %5:%6 [min:secs]       %9 fits/sec").arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
+
+            //doFit(record, run);
+            eval->doFit(records, run, getUserMin(records[0], run, ui->datacut->get_userMin()), getUserMax(records[0], run, ui->datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
+
+            dlgFitProgress->incSuperProgress();
+            QApplication::processEvents();
+            falg->setReporter(NULL);
+            if (dlgFitProgress->isCanceled()) break;
+        }
+    }
+    for (int i=0; i<records.size(); i++) {
+        records[i]->enableEmitResultsChanged(true);
+    }
 
     dlgFitProgress->reportSuperStatus(tr("fit done ... updating user interface\n"));
     dlgFitProgress->reportStatus("");

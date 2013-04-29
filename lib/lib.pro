@@ -91,7 +91,8 @@ HEADERS += dlgnewproperty.h \
     qfelidedlabel.h \
     qfmathparser.h \
     ../extlibs/MersenneTwister.h \
-    qfrawdatapropertyeditor_private.h
+    qfrawdatapropertyeditor_private.h \
+    qfglobalfittool.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -151,7 +152,8 @@ SOURCES += dlgnewproperty.cpp \
     qfelidedlabel.cpp \
     qfversion.cpp \
     qfmathparser.cpp \
-    qfrawdatapropertyeditor_private.cpp
+    qfrawdatapropertyeditor_private.cpp \
+    qfglobalfittool.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

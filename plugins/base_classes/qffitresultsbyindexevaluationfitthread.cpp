@@ -36,14 +36,29 @@ void QFFitResultsByIndexEvaluationFitThread::run() {
         }
 
         // if we found a valid job: perform it
-        QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(job.evaluation);
-        if (jobIsValid&&feval) {
-            feval->doFitForMultithread(job.record, job.run, job.userMin, job.userMax, this);
+        if (job.record) {
+            // if the record property is used, we have a single-record fit and run the according function
+            QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(job.evaluation);
+            if (jobIsValid&&feval) {
+                feval->doFitForMultithread(job.record, job.run, job.userMin, job.userMax, this);
 
-            {
-                QWriteLocker locker(lock);
-                jobsDone++;
+                {
+                    QWriteLocker locker(lock);
+                    jobsDone++;
+                }
             }
+        } else {
+            // otherwise thefit depends on several files (stored in records) and we call the according function.
+            QFFitResultsByIndexMultiRDREvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexMultiRDREvaluationFitTools*>(job.evaluation);
+            if (jobIsValid&&feval) {
+                feval->doFitForMultithread(job.records, job.run, job.userMin, job.userMax, this);
+
+                {
+                    QWriteLocker locker(lock);
+                    jobsDone++;
+                }
+            }
+
         }
     }
 }
@@ -52,6 +67,20 @@ void QFFitResultsByIndexEvaluationFitThread::addJob(QFFitResultsByIndexEvaluatio
     QFFitResultsByIndexEvaluationFitThread::Job j;
     j.evaluation=evaluation;
     j.record=record;
+    j.run=run;
+    j.userMax=userMax;
+    j.userMin=userMin;
+    QWriteLocker locker(lock);
+    jobs.enqueue(j);
+    jobCount++;
+}
+
+void QFFitResultsByIndexEvaluationFitThread::addJob(QFFitResultsByIndexEvaluation *evaluation, QList<QFRawDataRecord *> records, int run, int userMin, int userMax)
+{
+    QFFitResultsByIndexEvaluationFitThread::Job j;
+    j.evaluation=evaluation;
+    j.records=records;
+    j.record=NULL;
     j.run=run;
     j.userMax=userMax;
     j.userMin=userMin;

@@ -325,16 +325,27 @@ echo $SPIMUNINSTALLER_FILES
 echo $SPIMINSTALLER_DIRS
 
 sed "s/%%INSTALLER_FILES%%/$INSTALLER_FILES/" nsis_basicscript.nsi > nsis_basicscript.~si
+#ls-l *.~*
 sed "s/%%UNINSTALLER_FILES%%/$UNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+#ls-l *.~*
 sed "s/%%SPIMINSTALLER_FILES%%/$SPIMINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+#ls-l *.~*
 sed "s/%%SPIMUNINSTALLER_FILES%%/$SPIMUNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+#ls-l *.~*
 sed "s/%%INSTALLER_BASENAME%%/$INSTALLER_BASENAME/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+#ls-l *.~*
 sed "s/%%SVNVER%%/$SVNVER/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+#ls -l *.~*
 sed "s/%%COMPILEDATE%%/$COMPILEDATE/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+#ls -l *.~*
 sed "s/%%BITDEPTH%%/$BITDEPTH/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+#ls -l *.~*
 sed "s/%%INSTALLER_DIRS%%/$INSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+#ls -l *.~*
 sed "s/%%SPIMINSTALLER_DIRS%%/$SPIMINSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+#ls -l *.~*
 sed "s/%%INSTALLER_INSTDIR%%/$INSTALLER_INSTDIR/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+#ls -l *.~*
 
 cp nsis_basicscript.~si ${INSTALLER_BASENAME}.nsi
 #rm nsis_basicscript.~si

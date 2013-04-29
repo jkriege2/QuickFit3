@@ -30,7 +30,7 @@ class QFImFCCSMatchRDRFunctor: public QFMatchRDRFunctor {
     
     
 */
-class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, public QFFitResultsByIndexEvaluationFitTools, public QFFCSWeightingTools {
+class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, public QFFitResultsByIndexMultiRDREvaluationFitTools, public QFFCSWeightingTools {
         Q_OBJECT
     signals:
         void parameterStructureChanged();
@@ -65,27 +65,6 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         /** \brief return the largest available index */
         virtual int getIndexMax(QFRawDataRecord* r) const;
 
-        /*! \brief perform a fit for the given \a record and \a run
-
-            The parameters \a defaultMinDatarange and \a defaultMaxDatarange set the range of data points taken for the fit.
-            If both are -1, the full range is used
-
-            The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
-
-            \note this method is intended to perform the fits one after the other or single fits. It will internally starts the fit algorithm
-                  in its own thread. If you want to control the multithreading by yourself, use doFitForMultithread() instead !!!
-          */
-        virtual void doFit(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFFitAlgorithmReporter* dlgFitProgress=NULL, bool doLog=false);
-
-        /*! \brief perform a fit for the given \a record and \a run
-
-            The parameters \a defaultMinDatarange and \a defaultMaxDatarange set the range of data points taken for the fit.
-            If both are -1, the full range is used
-
-            The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
-          */
-        virtual void doFitForMultithread(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const;
-
         /** \brief calculates fit statistics for the given fit function and dataset. */
         QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
 
@@ -97,6 +76,7 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         virtual QFFitFunction* getFitFunctionForID(QString id) const;
         virtual QString getFitFunctionID(int num) const;
         virtual QString getFitFunctionID() const;
+        virtual QList<QFRawDataRecord*> getFitFiles() const;
 
         virtual QFFitFunction* getFitFunction(QFRawDataRecord *rdr) const;
         virtual QString getFitFunctionID( QFRawDataRecord* rdr) const;
@@ -196,6 +176,29 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         virtual bool overrideFitFunctionPreset(QFRawDataRecord* r, QString paramName, double &value) const ;
         virtual bool overrideFitFunctionPresetError(QFRawDataRecord* r, QString paramName, double &value) const ;
         virtual bool overrideFitFunctionPresetFix(QFRawDataRecord* r, QString paramName, bool &value) const ;
+
+    public:
+        /*! \brief perform a fit for the given \a records and \a run
+
+            The parameters \a defaultMinDatarange and \a defaultMaxDatarange set the range of data points taken for the fit.
+            If both are -1, the full range is used
+
+            The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
+
+            \note this method is intended to perform the fits one after the other or single fits. It will internally starts the fit algorithm
+                  in its own thread. If you want to control the multithreading by yourself, use doFitForMultithread() instead !!!
+          */
+        virtual void doFit(const QList<QFRawDataRecord*>& records, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFFitAlgorithmReporter* dlgFitProgress=NULL, bool doLog=false);
+
+        /*! \brief perform a fit for the given \a record and \a run
+
+            The parameters \a defaultMinDatarange and \a defaultMaxDatarange set the range of data points taken for the fit.
+            If both are -1, the full range is used
+
+            The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
+          */
+        virtual void doFitForMultithread(const QList<QFRawDataRecord*>& records, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const;
+
     protected:
 
         /* explicitly make some functions visible again, as the C++ compiler hides function definitions

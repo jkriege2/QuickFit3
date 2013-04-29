@@ -32,6 +32,7 @@ class QFFitResultsByIndexEvaluationFitThread : public QThread, public QFPluginLo
         virtual void run();
 
         void addJob(QFFitResultsByIndexEvaluation* evaluation, QFRawDataRecord* record, int run, int userMin, int userMax);
+        void addJob(QFFitResultsByIndexEvaluation* evaluation, QList<QFRawDataRecord*> records, int run, int userMin, int userMax);
 
         void cancel(bool waitForFinished=true);
 
@@ -58,6 +59,7 @@ class QFFitResultsByIndexEvaluationFitThread : public QThread, public QFPluginLo
             Job();
             QFFitResultsByIndexEvaluation* evaluation;
             QFRawDataRecord* record;
+            QList<QFRawDataRecord*> records;
             int run;
             int userMin;
             int userMax;

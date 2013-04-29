@@ -1,17 +1,8 @@
 #include "qffitresultsbyindexevaluationfittools.h"
 #include "qffitresultsbyindexevaluation.h"
 
-QFFitResultsByIndexEvaluationFitTools::QFFitResultsByIndexEvaluationFitTools()
-{
-    mutexThreadedFit=new QMutex(QMutex::Recursive);
-}
 
-QFFitResultsByIndexEvaluationFitTools::~QFFitResultsByIndexEvaluationFitTools()
-{
-    delete mutexThreadedFit;
-}
-
-QFFitStatistics QFFitResultsByIndexEvaluationFitTools::calcFitStatistics(bool storeAsResults, QFFitFunction *ffunc, long N, double *tauvals, double *corrdata, double *weights, int datacut_min, int datacut_max, double *fullParams, double *errors, bool *paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord *record, int run)
+QFFitStatistics QFFitResultsByIndexEvaluationFitToolsBase::calcFitStatistics(bool storeAsResults, QFFitFunction *ffunc, long N, double *tauvals, double *corrdata, double *weights, int datacut_min, int datacut_max, double *fullParams, double *errors, bool *paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord *record, int run)
 {
     QFFitStatistics result= ffunc->calcFitStatistics(N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins);
 
@@ -70,3 +61,14 @@ QFFitStatistics QFFitResultsByIndexEvaluationFitTools::calcFitStatistics(bool st
 
     return result;
 }
+
+QFFitResultsByIndexEvaluationFitToolsBase::QFFitResultsByIndexEvaluationFitToolsBase()
+{
+    mutexThreadedFit=new QMutex(QMutex::Recursive);
+}
+
+QFFitResultsByIndexEvaluationFitToolsBase::~QFFitResultsByIndexEvaluationFitToolsBase()
+{
+    delete mutexThreadedFit;
+}
+

@@ -6,10 +6,19 @@
 #include "qffcstools.h"
 #include "qfprojectrawdatamodel.h"
 
+QFImFCCSMatchRDRFunctor::QFImFCCSMatchRDRFunctor()
+{
+}
+
+bool QFImFCCSMatchRDRFunctor::matches(const QFRawDataRecord *record) const
+{
+    return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
+}
 
 QFImFCCSFitEvaluationItem::QFImFCCSFitEvaluationItem(QFProject* parent):
     QFFitResultsByIndexAsVectorEvaluation("fcs_,dls_,fccs_", parent, false, false),
-    QFFCSWeightingTools()
+    QFFCSWeightingTools(),
+    QFFitResultsByIndexMultiRDREvaluationFitTools()
 {
     matchFunctor=new QFImFCCSMatchRDRFunctor();
     m_weighting=EqualWeighting;
@@ -66,17 +75,9 @@ int QFImFCCSFitEvaluationItem::getIndexMax(QFRawDataRecord *r) const
     else return fcs->getCorrelationRuns()-1;
 }
 
-void QFImFCCSFitEvaluationItem::doFit(QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFFitAlgorithmReporter *dlgFitProgress, bool doLog)
-{
-}
-
-void QFImFCCSFitEvaluationItem::doFitForMultithread(QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
-{
-}
-
 QFFitStatistics QFImFCCSFitEvaluationItem::calcFitStatistics(bool storeAsResults, QFFitFunction *ffunc, long N, double *tauvals, double *corrdata, double *weights, int datacut_min, int datacut_max, double *fullParams, double *errors, bool *paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord *record, int run)
 {
-    return QFFitResultsByIndexEvaluationFitTools::calcFitStatistics(storeAsResults, ffunc,  N, tauvals, corrdata, weights,  datacut_min,  datacut_max, fullParams, errors, paramsFix,  runAvgWidth,  residualHistogramBins, record,  run);
+    return QFFitResultsByIndexEvaluationFitToolsBase::calcFitStatistics(storeAsResults, ffunc,  N, tauvals, corrdata, weights,  datacut_min,  datacut_max, fullParams, errors, paramsFix,  runAvgWidth,  residualHistogramBins, record,  run);
 }
 
 QFEvaluationRawDataModelProxy *QFImFCCSFitEvaluationItem::getRawDataProxyModel() const
@@ -362,9 +363,18 @@ bool QFImFCCSFitEvaluationItem::overrideFitFunctionPresetFix(QFRawDataRecord* r,
     return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetFix(r, paramName, value);
 }
 
+
+
 QString QFImFCCSFitEvaluationItem::getFitFunctionID() const
 {
     return getFitFunctionID(0);
+}
+
+QList<QFRawDataRecord *> QFImFCCSFitEvaluationItem::getFitFiles() const
+{
+    QList<QFRawDataRecord *> l;
+    for (int i=0; i<fitFilesList.size(); i++) l<<fitFilesList[i];
+    return l;
 }
 
 QFFitFunction *QFImFCCSFitEvaluationItem::getFitFunction( QFRawDataRecord *rdr) const
@@ -470,11 +480,11 @@ QList<QPair<int, QString> > QFImFCCSFitEvaluationItem::getLinkedParameterList(in
 }
 
 
-QFImFCCSMatchRDRFunctor::QFImFCCSMatchRDRFunctor()
+
+void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange, QFFitAlgorithmReporter *dlgFitProgress, bool doLog)
 {
 }
 
-bool QFImFCCSMatchRDRFunctor::matches(const QFRawDataRecord *record) const
+void QFImFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
 {
-    return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
 }
