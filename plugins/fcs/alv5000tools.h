@@ -49,7 +49,7 @@
  *  \ingroup quickfit2ALV
  */
 enum ALV_TOKENTYPE {
-	ALV_EOF,
+    ALV_EOF,
     ALV_LINEBREAK,
     ALV_COLON,
     ALV_NAME,
