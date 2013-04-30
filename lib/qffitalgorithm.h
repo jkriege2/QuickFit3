@@ -175,6 +175,12 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 */
                 void mapArrayFromFunctorToModel(double* modelData, const double* functorData);
 
+                /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$
+                */
+                inline int mapFromFunctorToModel(int functorIndex){
+                    return modelFromFunctor[functorIndex];
+                }
+
                 /** \brief evaluate the function \f$ \vec{g}(\vec{q}) \f$ */
                 virtual void evaluate(double* evalout, const double* params);
 
@@ -182,10 +188,18 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 virtual void evaluateJacobian(double* evalout, const double* params);
 
                 /** \brief returns \c true if the model implements its jacobian analytically and therefore evaluateJacobian() may be used */
-                virtual bool get_implementsJacobian() const { return m_model->get_implementsDerivatives(); };
+                virtual bool get_implementsJacobian() const { return m_model->get_implementsDerivatives(); }
 
                 /** \brief return the number of parameters \f$ Q \f$ in \f$ \vec{q}=m(\vec{p}) \f$ */
-                virtual int get_paramcount() const { return m_paramCount; };
+                virtual int get_paramcount() const { return m_paramCount; }
+
+                /** \brief return the used QFFitFunction */
+                QFFitFunction* getModel() const { return m_model; }
+
+                /** \brief return a pointer to the stored initial fit parameters */
+                double* getModelParams() const { return m_modelParams; }
+                /** \brief return the number of to the stored initial fit parameters */
+                int getModelParamsCount() const { return m_model->paramCount(); }
             protected:
 
 
@@ -397,17 +411,17 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
 
         /** \brief report a status message */
-        void reportStatus(const QString& message) { if (m_reporter) m_reporter->reportStatus(message); };
+        void reportStatus(const QString& message) { if (m_reporter) m_reporter->reportStatus(message); }
         /** \brief set the progress maximum to \a max */
-        void setProgressMax(int max=100) { if (m_reporter) m_reporter->setProgressMax(max); };
+        void setProgressMax(int max=100) { if (m_reporter) m_reporter->setProgressMax(max); }
         /** \brief set the current progress to the given value */
-        void setProgress(int value) { if (m_reporter) m_reporter->setProgress(value); };
+        void setProgress(int value) { if (m_reporter) m_reporter->setProgress(value); }
         /** \brief set the current progress to the given value */
-        void setProgressFull() { if (m_reporter) m_reporter->setProgressFull(); };
+        void setProgressFull() { if (m_reporter) m_reporter->setProgressFull(); }
         /** \brief increment the current progress */
-        void incProgress(int increment=1) { if (m_reporter) m_reporter->incProgress(increment); };
+        void incProgress(int increment=1) { if (m_reporter) m_reporter->incProgress(increment); }
         /** \brief return \c true, if the user has canceled the fit procedure */
-        bool isCanceled() { if (m_reporter) return m_reporter->isCanceled(); else return false; };
+        bool isCanceled() { if (m_reporter) return m_reporter->isCanceled(); else return false; }
 
     protected:
         /*! \brief this routine implements the fitting itself
@@ -433,7 +447,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
         /** \brief return a name for the algorithm */
         virtual QString name() const=0;
         /** \brief return a short name for the algorithm (max. around 10-20 characters) */
-        virtual QString shortName() const { return name(); };
+        virtual QString shortName() const { return name(); }
         /** \brief return a short unique algorithm ID string */
         virtual QString id() const=0;
 

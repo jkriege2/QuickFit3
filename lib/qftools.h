@@ -412,6 +412,31 @@ T* duplicateArray(const T* input, long long N) {
     return out;
 }
 
+/*! \brief copies the contents inf \a input (\a N elements) into \a out and returns \a out
+    \ingroup qf3lib_tools
+
+*/
+template <class T>
+T* copyArray(T* out, const T* input, long long N) {
+    memcpy(out, input, N*sizeof(T));
+    return out;
+}
+
+/*! \brief copies the contents inf \a input (\a N elements) into \a out and returns \a out or fills out with \a defaultValue if \a input is \c NULL
+    \ingroup qf3lib_tools
+
+*/
+template <class T>
+T* copyArrayOrDefault(T* out, const T* input, long long N, T defaultValue) {
+    if (input) {
+        memcpy(out, input, N*sizeof(T));
+    } else {
+        for (long long i=0; i<N; i++) {
+            out[i]=defaultValue;
+        }
+    }
+    return out;
+}
 
 
 /*! \brief can be used with qSort to sort <code>QList<QPair<T1, T2> ></code> for the first element of the pair in increasing order, i.e. compares with \c <

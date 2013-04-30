@@ -91,7 +91,7 @@ void QFTCSPCReaderPicoquantPT3::reset() {
 
 bool QFTCSPCReaderPicoquantPT3::nextRecord() {
     PT3Record TTTRrecord;
-
+    bool ok=false;
     do {
         // READ ONE RECORD and check for errors
         int result = fread( &TTTRrecord, 1, sizeof(TTTRrecord) ,tttrfile);
@@ -105,20 +105,25 @@ bool QFTCSPCReaderPicoquantPT3::nextRecord() {
         double truensync = ((double)ofltime+(double)TTTRrecord.bits.numsync);
         double truetime = (truensync*syncperiod + (double)TTTRrecord.bits.dtime*(double)boardHeader.Resolution)/1000000000.0;
 
+        current.macrotime=truetime;
         if(TTTRrecord.bits.channel!=0xF) {
-            current.macrotime=truetime;
             current.input_channel=TTTRrecord.bits.channel;
-            current.microtime_channel=0;
+            current.microtime_channel=TTTRrecord.bits.dtime;
+            current.isPhoton=true;
+            ok=true;
         } else { /* this means we have a 'special record' */
             if(TTTRrecord.special.markers==0) { // not a marker means overflow
                 ofltime += PT3T3WRAPAROUND; /* unwrap the time tag overflow */
                 overflows++;
+                ok=false;
             } else {
                 // we have a marker
                 truetime = truensync*syncperiod/1000000000.0;
+                current.marker_type=TTTRrecord.special.markers;
+                ok=true;
             }
         }
-    } while (TTTRrecord.bits.channel==0xF);
+    } while (!ok);
 
 
     return (int64_t(currentTTTRRecordNum)<TTTRHeader.Records && !feof(tttrfile));

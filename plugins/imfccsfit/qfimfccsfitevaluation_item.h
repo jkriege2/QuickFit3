@@ -15,6 +15,8 @@
 #include "qfevaluationpropertyeditor.h"
 #include "qfimfccsparameterinputtable.h"
 #include "qfmatchrdrfunctor.h"
+#include "qffitfunction.h"
+#include "qfglobalfittool.h"
 
 class QFImFCCSMatchRDRFunctor: public QFMatchRDRFunctor {
     public:
@@ -66,13 +68,14 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         virtual int getIndexMax(QFRawDataRecord* r) const;
 
         /** \brief calculates fit statistics for the given fit function and dataset. */
-        QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
+        QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errorsVector, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
 
 
         QFEvaluationRawDataModelProxy* getRawDataProxyModel() const;
 
         virtual QFRawDataRecord* getFitFile(int num) const;
         virtual QFFitFunction* getFitFunction(int num) const;
+        QStringList getFitFunctionIDs() const;
         virtual QFFitFunction* getFitFunctionForID(QString id) const;
         virtual QString getFitFunctionID(int num) const;
         virtual QString getFitFunctionID() const;
@@ -90,6 +93,7 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         QFMatchRDRFunctor* getMatchFunctor() const;
         /** \brief set the current index to use */
         virtual int getCurrentIndex() const;
+
 
         /** \brief returns the number of currently used link parameters
          *
@@ -119,6 +123,32 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         void fileChanged(int num, QFRawDataRecord* record);
     protected:
 
+        struct doFitData {
+            double* params;
+            double* initialparams;
+            double* errors;
+            double* errorsI;
+            double* paramsMin;
+            double* paramsMax;
+            bool* paramsFix;
+
+            QFFitFunction* ffunc;
+            int cut_low;
+            int cut_up;
+            int cut_N;
+
+            double* weights;
+            double* taudata;
+            double* corrdata;
+            long N;
+            bool weightsOK;
+
+            bool emitSignals;
+        };
+        QList<double*> paramsVector;
+        QList<double*> initialParamsVector;
+        QList<double*> errorsVector;
+
         QFImFCCSMatchRDRFunctor* matchFunctor;
         /** \brief proxy model to filter rdrModel */
         QFEvaluationRawDataModelProxy* rdrProxy;
@@ -143,6 +173,9 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         mutable bool globalParamsChanged;
         mutable int lastGlobalParamsCount;
 
+        /** \brief thread used for fitting */
+        QFGlobalThreadedFit* doFitThread;
+
 
         /** \brief makes sure that at least one fit file is in the list */
         void ensureFitFiles();
@@ -156,7 +189,6 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         virtual void intWriteData(QXmlStreamWriter& w);
         /** \brief read back the data stored by intWriteXML() */
         virtual void intReadData(QDomElement* e);
-
 
 
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the

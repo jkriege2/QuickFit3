@@ -4,6 +4,7 @@ QFFitResultsByIndexEvaluation::QFFitResultsByIndexEvaluation(const QString& fitF
     QFFitResultsEvaluation(fitFunctionPrefix, parent, showRDRList, useSelection)
 {
     m_currentIndex=0;
+    getEvaluationResultIDUsesFitFunction=true;
 }
 
 
@@ -11,9 +12,14 @@ QFFitResultsByIndexEvaluation::~QFFitResultsByIndexEvaluation() {
 }
 
 QString QFFitResultsByIndexEvaluation::getEvaluationResultID(QString fitFunction, int currentIndex) const {
-    //qDebug()<<"QFFitResultsByIndexEvaluation::getEvaluationResultID("<<fitFunction<<", "<<currentIndex<<")";
-    if (currentIndex<0) return QString("%1_%2_%3_runavg").arg(getType()).arg(getID()).arg(fitFunction);
-    return QString("%1_%2_%3_run%4").arg(getType()).arg(getID()).arg(fitFunction).arg(currentIndex);
+    if (getEvaluationResultIDUsesFitFunction) {
+        //qDebug()<<"QFFitResultsByIndexEvaluation::getEvaluationResultID("<<fitFunction<<", "<<currentIndex<<")";
+        if (currentIndex<0) return QString("%1_%2_%3_runavg").arg(getType()).arg(getID()).arg(fitFunction);
+        return QString("%1_%2_%3_run%4").arg(getType()).arg(getID()).arg(fitFunction).arg(currentIndex);
+    } else {
+        if (currentIndex<0) return QString("%1_%2_runavg").arg(getType()).arg(getID());
+        return QString("%1_%2_run%3").arg(getType()).arg(getID()).arg(currentIndex);
+    }
 }
 
 int QFFitResultsByIndexEvaluation::getIndexFromEvaluationResultID(const QString &resultID) const {

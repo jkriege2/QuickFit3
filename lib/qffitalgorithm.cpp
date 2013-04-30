@@ -219,6 +219,7 @@ void QFFitAlgorithm::FitQFFitFunctionFunctor::mapArrayFromFunctorToModel(double*
 }
 
 
+
 void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluate(double* evalout, const double* params) {
     mapArrayFromFunctorToModel(m_modelParams, params);
     /*std::cout<<"N="<<m_N<<" Q="<<m_paramCount<<" M="<<get_evalout()<<"  P = ( ";

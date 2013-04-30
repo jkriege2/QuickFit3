@@ -347,6 +347,9 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         /** \brief current index to use */
         int m_currentIndex;
 
+        /** \brief indicates whether getEvaluationResultID() uses the fitfunction ID in it's return value (default: \c true ) */
+        bool getEvaluationResultIDUsesFitFunction;
+
 
 
     public:

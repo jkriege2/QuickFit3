@@ -126,6 +126,7 @@ void QFTCSPCReaderPicoquant::reset() {
 
 bool QFTCSPCReaderPicoquant::nextRecord() {
     TTTRrecordType TTTRrecord;
+    bool ok=false;
 
     do {
         // READ ONE RECORD and check for errors
@@ -139,20 +140,30 @@ bool QFTCSPCReaderPicoquant::nextRecord() {
         // calculate the true time of the photon
         double truetime = double(ofltime + TTTRrecord.TimeTag) * TTTRHeader.Globclock/1000000000.0 ; /* convert to seconds */
 
-        current.isPhoton=true;
+        current.isPhoton=false;
         current.marker_type=0;
+        current.macrotime=truetime;
+        current.input_channel=0;
+        current.microtime_channel=0;
         if(TTTRrecord.Valid) {
-            current.macrotime=truetime;
+            current.isPhoton=true;
             current.input_channel=TTTRrecord.Route;
             current.microtime_channel=TTTRrecord.Channel;
+            ok=true;
         } else { /* this means we have a 'special record' */
             if(TTTRrecord.Channel & 0x800) { /* NEW v.5.0: Instead of te overflow bit we now evaluate this */
                 /*	         AFTER! evaluating the valid record. */
                 ofltime += 65536; /* unwrap the time tag overflow */
                 overflows++;
+                ok=false;
+            }
+            if(TTTRrecord.Channel & 0x007)	{
+                current.isPhoton=false;
+                current.marker_type=TTTRrecord.Channel & 0x007;
+                ok=true;
             }
         }
-    } while (!(TTTRrecord.Valid));
+    } while (!ok);
 
     return (int64_t(currentTTTRRecordNum)<TTTRHeader.NoOfRecords && !feof(tttrfile));
 }

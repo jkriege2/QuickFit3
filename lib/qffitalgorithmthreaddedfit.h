@@ -27,9 +27,9 @@ class QFLIB_EXPORT QFFitAlgorithmThreadedFit: public QThread {
         void init(QFFitAlgorithm* algorithm, double* paramsOut, double* paramErrorsOut, double* dataX, double* dataY, double* dataWeight, uint64_t N, QFFitFunction* model, double* initialParams, bool* fixParams=NULL, double* paramsMin=NULL, double* paramsMax=NULL);
 
         /** \brief return the result of the last fit call */
-        QFFitAlgorithm::FitResult getResult() { return result; };
+        QFFitAlgorithm::FitResult getResult() const { return result; }
         /** \brief return the runtime of the fit in milliseconds */
-        double getDeltaTime() { return deltaTime; };
+        double getDeltaTime() const { return deltaTime; }
 
     protected:
         QFFitAlgorithm* algorithm;
