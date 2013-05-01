@@ -673,7 +673,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
 
         if (OK) {
             QFFitAlgorithm::FitResult result=doFitThread->getResults();
-            cnt++;
+            cnt=0;
             for (int r=0; r<records.size(); r++) {
                 QFRawDataRecord* record=records[r];
                 QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);

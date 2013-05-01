@@ -111,6 +111,7 @@ class QFLIB_EXPORT QFFitMultiQFFitFunctionFunctor: public QFFitAlgorithm::Functo
         inline bool* getParamsFix(int idx) const { return subFunctors[idx].paramsFix; }
         inline QFFitAlgorithm::FitQFFitFunctionFunctor* getSubFunctor(int idx) const { return subFunctors[idx].f; }
         inline int getLinkedPrameterCount() const { return m_linkedParamsCount; }
+        inline int mapSubFunctorToGlobal(int functor, int parameter) const { return subFunctors[functor].mapToLocal[parameter]; }
     protected:
         struct subFunctorData {
             /** \brief functor to evaluate this data term */

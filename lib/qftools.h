@@ -18,6 +18,7 @@
 #include <QIcon>
 #include <QListWidget>
 #include "qtriple.h"
+#include <QTextStream>
 
 typedef QMap<QString, QVariant> QFStringVariantMap;
 /*! \brief returns a new QToolButton for the specified QAction
@@ -438,6 +439,51 @@ T* copyArrayOrDefault(T* out, const T* input, long long N, T defaultValue) {
     return out;
 }
 
+
+/*! \brief builds a string out of a given array
+    \ingroup qf3lib_tools
+
+*/
+template <class T>
+QString arrayToString(const T* input, long long N) {
+    QString res;
+    {
+        QTextStream txt(&res, QIODevice::WriteOnly);
+        bool first=true;
+        for (int i=0; i<N; i++) {
+            if (!first) {
+                txt<<QString(", ");
+            }
+            txt<<input[i];
+            first=false;
+        }
+    }
+    return QString("[ %1 ]").arg(res);
+}
+
+/*! \brief builds a string out of a given container (with size() and operator[]). If \a withIDs is \c true, the index will be output in front of each value.
+    \ingroup qf3lib_tools
+
+*/
+template <class T>
+QString listToString(const T& input, bool withIDs=false) {
+    QString res;
+    {
+        QTextStream txt(&res, QIODevice::WriteOnly);
+        bool first=true;
+        for (int i=0; i<input.size(); i++) {
+            if (!first) {
+                txt<<QString(", ");
+            }
+            if (withIDs) {
+                txt<<i<<":";
+            }
+            txt<<input[i];
+            first=false;
+        }
+    }
+    return QString("[ %1 ]").arg(res);
+}
 
 /*! \brief can be used with qSort to sort <code>QList<QPair<T1, T2> ></code> for the first element of the pair in increasing order, i.e. compares with \c <
     \ingroup qf3lib_tools
