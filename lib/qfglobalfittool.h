@@ -9,6 +9,10 @@
 /*! \brief this is a special functor which is used for data fitting of a multi-dataterm fit problem with objective functions declared by QFFitFunction
     \ingroup qf3lib_fitting
 
+            \image html QFFitMultiQFFitFunctionFunctor.png
+            \image latex QFFitMultiQFFitFunctionFunctor.png
+
+
     The QFFitFunction declares a set of \f$ k=1..K\f$ 1D function \f$ f_k(x; \vec{p}_k), \vec{p}_k\in\mathbb{R}^{N_k} \f$ .
     This functor is provided with a set of data \f$ (x_{k,m}, y_{k,m}, \sigma_{k,m}), m=1..M_k \f$
     where \f$ \sigma_{k,m} \f$ are weights for the data.

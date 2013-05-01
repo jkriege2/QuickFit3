@@ -144,6 +144,10 @@ class QFLIB_EXPORT QFFitAlgorithm {
             \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ which is defined below, so this Functor finally calculates:
                 \f[ g_m(\vec{q})=\frac{y_m-f(x_m; m(\vec{q}))}{\sigma_m} \f]
             The data, the weights and the fix-vector is given to this functor in the constructor. Afterwards you may call evaluate() to calculate \f$ \vec{g}(\vec{q}) \f$ .
+
+            The functor is easier explained by this image:
+            \image html FitQFFunctionFunctor.png
+            \image latex FitQFFunctionFunctor.png
         */
         class QFLIB_EXPORT FitQFFitFunctionFunctor: public Functor {
             public:
