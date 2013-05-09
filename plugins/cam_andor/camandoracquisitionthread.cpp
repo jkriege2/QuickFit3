@@ -175,8 +175,8 @@ void CamAndorAcquisitionThread::run() {
             QTime lastWritten;
             lastWritten.start();
             bool timedout=false;
-            int lastWrittenTimeout=10000;
-            int maxMissingFrames=20;
+            int lastWrittenTimeout=20000;
+            int maxMissingFrames=50;
             while ((!canceled) && ok && (status==DRV_ACQUIRING) && !timedout) {
                 selectCamera(m_camera);
                 CHECK_NO_RETURN_OK(ok, GetStatus(&status), tr("error while reading status"));
@@ -203,10 +203,12 @@ void CamAndorAcquisitionThread::run() {
             }
 
             if (timedout) {
+
                 CHECK_NO_RETURN_OK(ok, AbortAcquisition(), tr("error while aborting acquisition"));
                 QString msg=tr("\n%1: tinyTIFF acquisition timed out ... acquired %2 of %3 frames with %4s timeout").arg(m_log_prefix).arg(imageCount).arg(m_numKinetics).arg(double(lastWrittenTimeout)/1000.0);
                 qDebug()<<msg;
-                emit log_warning(msg);
+                //emit log_warning(msg);
+                emit log_error(msg);
             }
 
             if (m_fileformat==0) {
