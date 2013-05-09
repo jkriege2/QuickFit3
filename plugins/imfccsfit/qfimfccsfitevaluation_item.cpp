@@ -705,10 +705,10 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
                     //qDebug()<<"\n\n";
 
                     // round errors and values
-                    /*for (int i=0; i<dfd.ffunc->paramCount(); i++) {
+                    for (int i=0; i<dfd.ffunc->paramCount(); i++) {
                         errors[i]=roundError(errors[i], 2);
                         params[i]=roundWithError(params[i], errors[i], 2);
-                    }*/
+                    }
 
                     //qDebug()<<"record "<<r<<"  ("<<record->getName()<<"):";
                     for (int i=0; i<dfd.ffunc->paramCount(); i++) {
