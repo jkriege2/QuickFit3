@@ -86,7 +86,7 @@ class QFLIB_EXPORT QFFitMultiQFFitFunctionFunctor: public QFFitAlgorithm::Functo
         virtual int get_paramcount() const;
 
         /** \brief add data term */
-        void addTerm(QFFitFunction* model, const double* currentParams, const bool* fixParams, const double* dataX, const double* dataY, const double* dataWeight, uint64_t M, double* paramsMin=NULL, double* paramsMax=NULL);
+        void addTerm(QFFitFunction* model, const double* currentParams, const bool* fixParams, const double* dataX, const double* dataY, const double* dataWeight, uint64_t M, const double *paramsMin=NULL, const double *paramsMax=NULL);
         /** \brief init linking information */
         void setAllLinks(const QList<QList<QPair<int, int> > >& linkedParams);
         /** \brief add global parameter */
@@ -164,7 +164,7 @@ class QFLIB_EXPORT QFGlobalFitTool {
         ~QFGlobalFitTool();
 
         /** \brief add data term */
-        void addTerm(QFFitFunction* model, const double* currentParams, const bool* fixParams, const double* dataX, const double* dataY, const double* dataWeight, uint64_t M, double* paramsMin=NULL, double* paramsMax=NULL);
+        void addTerm(QFFitFunction* model, const double* currentParams, const bool* fixParams, const double* dataX, const double* dataY, const double* dataWeight, uint64_t M, const double *paramsMin=NULL, const double *paramsMax=NULL);
         /** \brief init linking information */
         void setAllLinks(const QList<QList<QPair<int, int> > >& linkedParams);
         /** \brief add global parameter */

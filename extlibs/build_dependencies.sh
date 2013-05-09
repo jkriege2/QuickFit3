@@ -40,6 +40,7 @@ echo -e  "\n"
 
 #sh ../output/get_bit_depth.sh
 
+MORECFLAGS="-m128bit-long-double -mtune=generic -msse -msse2 -mmmx -m3dnow -mfpmath=sse"
 CURRENTDIR=${PWD}
 QT_INFO_LIBS=`qmake -query QT_INSTALL_LIBS`
 QT_INFO_BIN=`qmake -query QT_INSTALL_BINS`
@@ -160,7 +161,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	export LDFLAGS="${LDFLAGS} -fPIC "
         export CFLAGS="${CFLAGS} -fPIC "
         export CPPFLAGS="${CPPFLAGS} -fPIC"
-	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit  CFLAGS="-fPIC -m128bit-long-double -mtune=generic -msse -mfpmath=sse" CPPFLAGS="-fPIC -m128bit-long-double -mtune=generic -msse -mfpmath=sse"
+	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit  CFLAGS="-fPIC ${MORECFLAGS}" CPPFLAGS="-fPIC ${MORECFLAGS}"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
@@ -394,7 +395,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir build
 	tar xvf gsl-1.15.tar.gz -C ./build/
 	cd build/gsl-1.15
-	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/gsl CFLAGS="-m128bit-long-double -mtune=generic -msse -mfpmath=sse" CPPFLAGS="-m128bit-long-double -mtune=generic -msse -mfpmath=sse"
+	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/gsl   CFLAGS="-fPIC ${MORECFLAGS}" CPPFLAGS="-fPIC ${MORECFLAGS}"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}

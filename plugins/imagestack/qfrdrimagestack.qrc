@@ -12,5 +12,7 @@
         <file alias="player_rew.png">images/player_rew.png</file>
         <file alias="player_start.png">images/player_start.png</file>
         <file alias="player_stop.png">images/player_stop.png</file>
+        <file alias="multifile_stack.png">images/multifile_stack.png</file>
+        <file alias="singlefile_stack.png">images/singlefile_stack.png</file>
     </qresource>
 </RCC>

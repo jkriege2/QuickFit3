@@ -305,7 +305,7 @@ public:
      *  \param fixGroup the group the fix results should be added to
      *  \param sortPriority should the results be assigned sort priority?
      */
-    virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, double* values, double* errors, const QString& group, bool* fix=NULL, const QString& fixGroup=QString(""), bool sortPriority=true) ;
+    virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, const double* values, const double* errors, const QString& group, const bool* fix=NULL, const QString& fixGroup=QString(""), bool sortPriority=true) ;
 
 
 

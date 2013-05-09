@@ -603,14 +603,16 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
             ffunc->calcParameter(dfd.initialparams, dfd.errors);
 
             int fitparamcount=0;
+            //qDebug()<<"record "<<r<<"  ("<<record->getName()<<"):";
             for (int i=0; i<ffunc->paramCount(); i++) {
                 if (ffunc->isParameterVisible(i, dfd.params) && (!dfd.paramsFix[i]) && ffunc->getDescription(i).fit) {
                     if (!iparams.isEmpty()) iparams=iparams+";  ";
                     fitparamcount++;
                     iparams=iparams+QString("%1 = %2").arg(ffunc->getDescription(i).id).arg(dfd.params[i]);
                 }
-                //printf("  fit: %s = %lf +/m %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
+                //qDebug("  before_fit: %s = %lf +/m %lf", ffunc->getDescription(i).id.toStdString().c_str(), dfd.params[i], dfd.errors[i]);
             }
+            //qDebug()<<"\n\n";
             if (doLog) QFPluginLogTools::log_text(tr("      - initial params         (%1)\n").arg(iparams));
 
 
@@ -690,29 +692,40 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
                     dfd.ffunc->calcParameter(params, errors);
                     dfd.ffunc->sortParameter(params, errors, dfd.paramsFix);
                     dfd.ffunc->calcParameter(params, errors);
+
+                    //qDebug()<<"record "<<r<<"  ("<<record->getName()<<"):  errors="<<errors<<"  params="<<params;
                     for (int i=0; i<dfd.ffunc->paramCount(); i++) {
                         if (dfd.ffunc->isParameterVisible(i, params) && (!dfd.paramsFix[i]) && dfd.ffunc->getDescription(i).fit) {
                             if (!oparams.isEmpty()) oparams=oparams+";  ";
 
                             oparams=oparams+QString("%1 = %2+/-%3").arg(dfd.ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
                         }
-                        //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
+                        //qDebug("  after_fit: %s = %lf +/- %lf", dfd.ffunc->getDescription(i).id.toStdString().c_str(), dfd.params[i], dfd.errors[i]);
                     }
+                    //qDebug()<<"\n\n";
 
                     // round errors and values
-                    for (int i=0; i<dfd.ffunc->paramCount(); i++) {
+                    /*for (int i=0; i<dfd.ffunc->paramCount(); i++) {
                         errors[i]=roundError(errors[i], 2);
                         params[i]=roundWithError(params[i], errors[i], 2);
-                    }
-                    setFitResultValuesVisibleWithGroupAndLabel(record, run, params, errors, tr("fit results"), dfd.paramsFix, tr("fit results"), true);
+                    }*/
 
+                    //qDebug()<<"record "<<r<<"  ("<<record->getName()<<"):";
                     for (int i=0; i<dfd.ffunc->paramCount(); i++) {
                         if (dfd.ffunc->isParameterVisible(i, params) && (!dfd.paramsFix[i]) && dfd.ffunc->getDescription(i).fit) {
                             if (!orparams.isEmpty()) orparams=orparams+";  ";
                             orparams=orparams+QString("%1 = %2+/-%3").arg(dfd.ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
                         }
-                        //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
+                        //qDebug("  rounded_after_fit: %s = %lf +/- %lf", dfd.ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
                     }
+                    //qDebug()<<"\n\n";
+                    setFitResultValuesVisibleWithGroupAndLabel(record, run, params, errors, tr("fit results"), dfd.paramsFix, tr("fit results"), true);
+
+                    //qDebug()<<"record "<<r<<"  ("<<record->getName()<<"):";
+                    for (int i=0; i<dfd.ffunc->paramCount(); i++) {
+                        //qDebug("  rounded_after_fit_after_save: %s = %lf +/- %lf", dfd.ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
+                    }
+                    //qDebug()<<"\n\n";
 
                     if (doLog) QFPluginLogTools::log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(doFitThread->getDeltaTime()).arg(result.fitOK?tr("success"):tr("no convergence")));
                     if (doLog) QFPluginLogTools::log_text(tr("   - result-message: %1\n").arg(result.messageSimple));

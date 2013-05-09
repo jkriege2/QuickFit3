@@ -583,7 +583,7 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValuesVisible(QFRawDataR
     }
 }
 
-void QFFitResultsByIndexAsVectorEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, double* values, double* errors, const QString& group, bool* fix, const QString& fixGroup, bool sortPriority)  {
+void QFFitResultsByIndexAsVectorEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, const QString& resultID, const double *values, const double *errors, const QString& group, const bool *fix, const QString& fixGroup, bool sortPriority)  {
     if (r!=NULL) {
         int index=getIndexFromEvaluationResultID(resultID);
         if (index<0) {

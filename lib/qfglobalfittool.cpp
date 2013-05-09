@@ -2,8 +2,8 @@
 #include "qftools.h"
 
 
-//#define DEBUG_GLOBALFIT
 #undef DEBUG_GLOBALFIT
+//#define DEBUG_GLOBALFIT
 
 
 
@@ -19,7 +19,7 @@ QFFitMultiQFFitFunctionFunctor::~QFFitMultiQFFitFunctionFunctor()
     clear();
 }
 
-void QFFitMultiQFFitFunctionFunctor::addTerm(QFFitFunction *model, const double *currentParams, const bool *fixParams, const double *dataX, const double *dataY, const double *dataWeight, uint64_t M, double *paramsMin, double *paramsMax)
+void QFFitMultiQFFitFunctionFunctor::addTerm(QFFitFunction *model, const double *currentParams, const bool *fixParams, const double *dataX, const double *dataY, const double *dataWeight, uint64_t M, const double *paramsMin, const double *paramsMax)
 {
     subFunctorData sfd;
     sfd.f=new QFFitAlgorithm::FitQFFitFunctionFunctor(model, currentParams, fixParams, dataX, dataY, dataWeight, M);
@@ -199,12 +199,13 @@ void QFFitMultiQFFitFunctionFunctor::recalculateInternals()
 void QFFitMultiQFFitFunctionFunctor::clear()
 {
     for (int i=0; i<subFunctors.size(); i++) {
-        delete subFunctors[i].f;
-        free(subFunctors[i].mapToLocal);
-        free(subFunctors[i].paramsMin);
-        free(subFunctors[i].paramsMax);
-        free(subFunctors[i].paramsFix);
-        free(subFunctors[i].modelParams);
+        if (subFunctors[i].f) delete subFunctors[i].f;
+        //subFunctors[i].f=NULL;
+        if (subFunctors[i].mapToLocal) free(subFunctors[i].mapToLocal);
+        if (subFunctors[i].paramsMin) free(subFunctors[i].paramsMin);
+        if (subFunctors[i].paramsMax) free(subFunctors[i].paramsMax);
+        if (subFunctors[i].paramsFix) free(subFunctors[i].paramsFix);
+        if (subFunctors[i].modelParams) free(subFunctors[i].modelParams);
     }
     subFunctors.clear();
     m_paramCount=0;
@@ -237,7 +238,7 @@ QFGlobalFitTool::~QFGlobalFitTool()
     delete functor;
 }
 
-void QFGlobalFitTool::addTerm(QFFitFunction *model, const double *currentParams, const bool *fixParams, const double *dataX, const double *dataY, const double *dataWeight, uint64_t M, double *paramsMin, double *paramsMax)
+void QFGlobalFitTool::addTerm(QFFitFunction *model, const double *currentParams, const bool *fixParams, const double *dataX, const double *dataY, const double *dataWeight, uint64_t M, const double *paramsMin, const double *paramsMax)
 {
     functor->addTerm(model, currentParams, fixParams, dataX, dataY, dataWeight, M, paramsMin, paramsMax);
 }

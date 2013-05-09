@@ -127,7 +127,7 @@ void QFFitResultsByIndexEvaluation::setFitResultValuesVisible(QFRawDataRecord* r
     setFitResultValuesVisible(r, getEvaluationResultID(index, r),  values, errors);
 }
 
-void QFFitResultsByIndexEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int index, double* values, double* errors, const QString& group, bool* fix, const QString& fixGroup, bool sortPriority)  {
+void QFFitResultsByIndexEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord* r, int index, const double *values, const double *errors, const QString& group, const bool *fix, const QString& fixGroup, bool sortPriority)  {
     setFitResultValuesVisibleWithGroupAndLabel(r, getEvaluationResultID(index, r),  values, errors, group, fix, fixGroup, sortPriority);
 }
 

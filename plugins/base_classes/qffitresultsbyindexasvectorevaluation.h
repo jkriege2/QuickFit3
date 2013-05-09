@@ -58,7 +58,7 @@ class QFFitResultsByIndexAsVectorEvaluation : public QFFitResultsByIndexEvaluati
         virtual void setFitResultValueInt(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, int64_t value) ;
         virtual void setFitResultValueBool(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, bool value) ;
         virtual void setFitResultValues(QFRawDataRecord *r, const QString &resultID, double *values, double *errors) ;
-        virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord *r, const QString &resultID, double *values, double *errors, const QString &group, bool *fix, const QString &fixGroup, bool sortPriority) ;
+        virtual void setFitResultValuesVisibleWithGroupAndLabel(QFRawDataRecord *r, const QString &resultID, const double *values, const double *errors, const QString &group,const  bool *fix, const QString &fixGroup, bool sortPriority) ;
         virtual void setFitResultValuesVisible(QFRawDataRecord *r, const QString &resultID, double *values, double *errors) ;
         virtual void setFitResultFix(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, bool fix) ;
         virtual void setFitResultGroup(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, const QString &group) ;

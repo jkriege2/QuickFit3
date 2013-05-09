@@ -22,11 +22,11 @@ QFRawDataRecord* QFRDRImageStackPlugin::createRecord(QFProject* parent) {
 void QFRDRImageStackPlugin::registerToMenu(QMenu* menuMain) {
     // create menu entries to insert data with this type
     QMenu* menu=menuMain->addMenu(QIcon(getIconFilename()), tr("image &stacks"));
-    QAction* action=new QAction(tr("single-file image stack(s)"), parentWidget);
+    QAction* action=new QAction(QIcon(":/image_stack/singlefile_stack.png"), tr("single-file image stack(s)"), parentWidget);
     action->setStatusTip(tr("Insert an image file as image stack"));
     connect(action, SIGNAL(triggered()), this, SLOT(insertSingleFileImageStack()));
     menu->addAction(action);
-    action=new QAction(tr("multi-file image stack"), parentWidget);
+    action=new QAction(QIcon(":/image_stack/multifile_stack.png"), tr("multi-file image stack"), parentWidget);
     action->setStatusTip(tr("Insert several image files as channels into a single image stack"));
     connect(action, SIGNAL(triggered()), this, SLOT(insertMultiFileImageStack()));
     menu->addAction(action);
