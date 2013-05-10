@@ -2,7 +2,7 @@
 #include "programoptions.h"
 #include "qftools.h"
 #include <QClipboard>
-
+#include <QButtonGroup>
 #define sqr(x) ((x)*(x))
 
 #define CLICK_UPDATE_TIMEOUT 500
@@ -42,6 +42,9 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
     actRedoMask->setToolTip(tr("redo peviously undone change to mask"));
     connect(actRedoMask, SIGNAL(triggered()), this, SLOT(redoMask()));
 
+    actMaskBorder=new QAction(QIcon(":/qfrdrmaskeditor/maskborder.png"), tr("mask &border"), parentWidget);
+    actMaskBorder->setToolTip(tr("mask a border around the image"));
+    connect(actMaskBorder, SIGNAL(triggered()), this, SLOT(maskBorder()));
 
 
 
@@ -147,6 +150,7 @@ void QFRDRImageMaskEditTools::setRDR(QFRawDataRecord *rdr)
     actPasteMask->setEnabled(imagemask);
     actClearMask->setEnabled(imagemask);
     actInvertMask->setEnabled(imagemask);
+    actMaskBorder->setEnabled(imagemask);
 
     if (rdr)  {
         undos=rdr->getProperty(settingsPrefix+"QFRDRImageMaskEditTools_undostack",QStringList()).toStringList();
@@ -309,6 +313,93 @@ void QFRDRImageMaskEditTools::redoMask()
     updateUndoActions();
 }
 
+void QFRDRImageMaskEditTools::maskBorder()
+{
+    if (!imagemask) return;
+    QDialog* dlg=new QDialog(parentWidget);
+    QGridLayout* grid=new QGridLayout(dlg);
+    dlg->setLayout(grid);
+
+    QSpinBox* spinTop=new QSpinBox(dlg);
+    spinTop->setRange(0, imagemask->maskGetHeight());
+    QSpinBox* spinBot=new QSpinBox(dlg);
+    spinBot->setRange(0, imagemask->maskGetHeight());
+    QSpinBox* spinLeft=new QSpinBox(dlg);
+    spinLeft->setRange(0, imagemask->maskGetHeight());
+    QSpinBox* spinRight=new QSpinBox(dlg);
+    spinRight->setRange(0, imagemask->maskGetHeight());
+    QCheckBox* chkSyncX=new QCheckBox(tr("synchronize left/right"), dlg);
+    connect(chkSyncX, SIGNAL(toggled(bool)), spinRight, SLOT(setDisabled(bool)));
+    QCheckBox* chkSyncY=new QCheckBox(tr("synchronize top/bottom"), dlg);
+    connect(chkSyncY, SIGNAL(toggled(bool)), spinBot, SLOT(setDisabled(bool)));
+    QCheckBox* chkSyncXY=new QCheckBox(tr("synchronize all"), dlg);
+    connect(chkSyncXY, SIGNAL(toggled(bool)), spinBot, SLOT(setDisabled(bool)));
+    connect(chkSyncXY, SIGNAL(toggled(bool)), spinLeft, SLOT(setDisabled(bool)));
+    connect(chkSyncXY, SIGNAL(toggled(bool)), spinRight, SLOT(setDisabled(bool)));
+    QCheckBox* chkOverwrite=new QCheckBox(tr("overwrite old mask"), dlg);
+    QDialogButtonBox* btn=new QDialogButtonBox(dlg);
+    btn->addButton(QDialogButtonBox::Ok);
+    btn->addButton(QDialogButtonBox::Cancel);
+    connect(btn, SIGNAL(accepted()), dlg, SLOT(accept()));
+    connect(btn, SIGNAL(rejected()), dlg, SLOT(reject()));
+    grid->addWidget(new QLabel(tr("cut top:")), 0, 2);
+    grid->addWidget(spinTop, 1, 2);
+    grid->addWidget(new QLabel(tr("cut left:")), 2, 0);
+    grid->addWidget(spinLeft, 3, 0);
+    grid->addWidget(new QLabel(tr("cut right:")), 2, 4);
+    grid->addWidget(spinRight, 3, 4);
+    grid->addWidget(new QLabel(tr("cut bottom:")), 4, 2);
+    grid->addWidget(spinBot, 5, 2);
+    grid->addWidget(chkSyncX, 6,0,1,4);
+    grid->addWidget(chkSyncY, 7,0,1,4);
+    grid->addWidget(chkSyncXY, 8,0,1,4);
+    grid->addWidget(chkOverwrite, 9,0,1,4);
+    grid->addWidget(btn, 10,0,1,4);
+    spinBot->setValue(ProgramOptions::getConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_bot", 0).toInt());
+    spinTop->setValue(ProgramOptions::getConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_top", 0).toInt());
+    spinLeft->setValue(ProgramOptions::getConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_left", 0).toInt());
+    spinRight->setValue(ProgramOptions::getConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_right", 0).toInt());
+    chkSyncX->setChecked(ProgramOptions::getConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_syncX", false).toBool());
+    chkSyncY->setChecked(ProgramOptions::getConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_syncY", false).toBool());
+    chkSyncXY->setChecked(ProgramOptions::getConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_syncXY", false).toBool());
+    chkOverwrite->setChecked(ProgramOptions::getConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_overwrite", true).toBool());
+
+    if (dlg->exec()) {
+        if (chkSyncX->isChecked()) spinRight->setValue(spinLeft->value());
+        if (chkSyncY->isChecked()) spinBot->setValue(spinTop->value());
+        if (chkSyncXY->isChecked()) {
+            spinBot->setValue(spinTop->value());
+            spinRight->setValue(spinTop->value());
+            spinLeft->setValue(spinTop->value());
+        }
+        ProgramOptions::setConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_bot", spinBot->value());
+        ProgramOptions::setConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_top", spinTop->value());
+        ProgramOptions::setConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_left", spinLeft->value());
+        ProgramOptions::setConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_right", spinRight->value());
+        ProgramOptions::setConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_syncX", chkSyncX->isChecked());
+        ProgramOptions::setConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_syncY", chkSyncY->isChecked());
+        ProgramOptions::setConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_syncXY", chkSyncXY->isChecked());
+        ProgramOptions::setConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_overwrite", chkOverwrite->isChecked());
+
+        if (chkOverwrite->isChecked()) imagemask->maskClear();
+        for (uint16_t x=0; x<imagemask->maskGetWidth(); x++) {
+            for (uint16_t y=0; y<imagemask->maskGetHeight(); y++) {
+                if (!(   x>=spinLeft->value() && x<imagemask->maskGetWidth()-spinRight->value()
+                    && y>=spinBot->value() && y<imagemask->maskGetHeight()-spinTop->value())) {
+                    imagemask->maskSet(x,y);
+                }
+            }
+
+        }
+
+        signalMaskChanged(false, false);
+        updateUndoActions();
+
+    }
+    delete dlg;
+
+}
+
 void QFRDRImageMaskEditTools::registerMaskToolsToMenu(QMenu *menu) const
 {
     menu->addAction(actUndoMask);
@@ -321,6 +412,7 @@ void QFRDRImageMaskEditTools::registerMaskToolsToMenu(QMenu *menu) const
     menu->addSeparator();
     menu->addAction(actClearMask);
     menu->addAction(actInvertMask);
+    menu->addAction(actMaskBorder);
 
 }
 
@@ -375,10 +467,10 @@ void QFRDRImageMaskEditTools::imageClicked(double x, double y, Qt::KeyboardModif
         if (modifiers==Qt::ControlModifier && !actImagesScribble->isChecked()) {
             imagemask->maskToggle(xx,yy);
         } else if (modifiers==Qt::ShiftModifier) {
-            imagemask->maskSet(xx,yy);
+            imagemask->maskUnset(xx,yy);
         } else {
             if (!actImagesScribble->isChecked()) imagemask->maskClear();
-            imagemask->maskUnset(xx,yy);
+            imagemask->maskSet(xx,yy);
         }
         signalMaskChanged(true);
     }
@@ -395,9 +487,9 @@ void QFRDRImageMaskEditTools::imageScribbled(double x, double y, Qt::KeyboardMod
 
         if (first && modifiers==Qt::NoModifier) imagemask->maskClear();
         if (modifiers==Qt::ShiftModifier) {
-            imagemask->maskSet(xx,yy);
-        } else {
             imagemask->maskUnset(xx,yy);
+        } else {
+            imagemask->maskSet(xx,yy);
         }
         signalMaskChanged(true);
     }
@@ -420,14 +512,14 @@ void QFRDRImageMaskEditTools::imageRectangleFinished(double x, double y, double 
     if (modifiers==Qt::ControlModifier) {
         for (int yy=yy1; yy<=yy2; yy++) {
             for (int xx=xx1; xx<=xx2; xx++) {
-                imagemask->maskUnset(xx,yy);
+                imagemask->maskSet(xx,yy);
                 //qDebug()<<"  u"<<xx<<yy;
             }
         }
     } else if (modifiers==Qt::ShiftModifier) {
         for (int yy=yy1; yy<=yy2; yy++) {
             for (int xx=xx1; xx<=xx2; xx++) {
-                imagemask->maskSet(xx,yy);
+                imagemask->maskUnset(xx,yy);
                 //qDebug()<<"  s"<<xx<<yy;
             }
         }
@@ -436,7 +528,7 @@ void QFRDRImageMaskEditTools::imageRectangleFinished(double x, double y, double 
         //qDebug()<<"  c";
         for (int yy=yy1; yy<=yy2; yy++) {
             for (int xx=xx1; xx<=xx2; xx++) {
-                imagemask->maskUnset(xx,yy);
+                imagemask->maskSet(xx,yy);
                 //qDebug()<<"  u"<<xx<<yy;
             }
         }
@@ -455,14 +547,14 @@ void QFRDRImageMaskEditTools::imageLineFinished(double x1, double y1, double x2,
             QPointF p=line.pointAt(i);
             int xx=qBound(0,(int)floor(p.x()), imagemask->maskGetWidth()-1);
             int yy=qBound(0,(int)floor(p.y()), imagemask->maskGetHeight()-1);
-            imagemask->maskUnset(xx,yy);
+            imagemask->maskSet(xx,yy);
         }
     } else if (modifiers==Qt::ShiftModifier) {
         for (double i=0; i<1.0; i=i+0.5/double(qMax(imagemask->maskGetWidth(), imagemask->maskGetHeight()))) {
             QPointF p=line.pointAt(i);
             int xx=qBound(0,(int)floor(p.x()), imagemask->maskGetWidth()-1);
             int yy=qBound(0,(int)floor(p.y()), imagemask->maskGetHeight()-1);
-            imagemask->maskSet(xx,yy);
+            imagemask->maskUnset(xx,yy);
         }
     } else {
         imagemask->maskClear();
@@ -470,7 +562,7 @@ void QFRDRImageMaskEditTools::imageLineFinished(double x1, double y1, double x2,
             QPointF p=line.pointAt(i);
             int xx=qBound(0,(int)floor(p.x()), imagemask->maskGetWidth()-1);
             int yy=qBound(0,(int)floor(p.y()), imagemask->maskGetHeight()-1);
-            imagemask->maskUnset(xx,yy);
+            imagemask->maskSet(xx,yy);
         }
     }
 
@@ -494,20 +586,20 @@ void QFRDRImageMaskEditTools::imageCircleFinished(double x, double y, double rad
     if (modifiers==Qt::ControlModifier) {
         for (int yy=yy1; yy<=yy2; yy++) {
             for (int xx=xx1; xx<=xx2; xx++) {
-                if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) imagemask->maskUnset(xx,yy);
+                if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) imagemask->maskSet(xx,yy);
             }
         }
     } else if (modifiers==Qt::ShiftModifier) {
         for (int yy=yy1; yy<=yy2; yy++) {
             for (int xx=xx1; xx<=xx2; xx++) {
-                if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) imagemask->maskSet(xx,yy);
+                if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) imagemask->maskUnset(xx,yy);
             }
         }
     } else {
         imagemask->maskClear();
         for (int yy=yy1; yy<=yy2; yy++) {
             for (int xx=xx1; xx<=xx2; xx++) {
-                if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) imagemask->maskUnset(xx,yy);
+                if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) imagemask->maskSet(xx,yy);
             }
         }
     }
@@ -531,20 +623,20 @@ void QFRDRImageMaskEditTools::imageEllipseFinished(double x, double y, double ra
         if (modifiers==Qt::ControlModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) imagemask->maskUnset(xx,yy);
+                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) imagemask->maskSet(xx,yy);
                 }
             }
         } else if (modifiers==Qt::ShiftModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) imagemask->maskSet(xx,yy);
+                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) imagemask->maskUnset(xx,yy);
                 }
             }
         } else {
             imagemask->maskClear();
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) imagemask->maskUnset(xx,yy);
+                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) imagemask->maskSet(xx,yy);
                 }
             }
         }

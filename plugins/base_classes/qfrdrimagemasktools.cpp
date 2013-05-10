@@ -143,13 +143,13 @@ void QFRDRImageMaskTools::maskSetAll()
     }
 }
 
-void QFRDRImageMaskTools::maskSet(uint16_t x, uint16_t y)
+void QFRDRImageMaskTools::maskUnset(uint16_t x, uint16_t y)
 {
     if (!mask) return;
     mask[y*mask_w+x]=false;
 }
 
-void QFRDRImageMaskTools::maskUnset(uint16_t x, uint16_t y, bool value)
+void QFRDRImageMaskTools::maskSet(uint16_t x, uint16_t y, bool value)
 {
     if (!mask) return;
     mask[y*mask_w+x]=value;

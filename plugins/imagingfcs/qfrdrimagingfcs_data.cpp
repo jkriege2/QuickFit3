@@ -2178,7 +2178,7 @@ void QFRDRImagingFCSData::splitCFsForDualView() {
                 memcpy(&(correlations[idxOut]), &(oldC[idxIn]), N*sizeof(double));
                 memcpy(&(sigmas[idxOut]), &(oldS[idxIn]), N*sizeof(double));
                 //qDebug()<<"("<<x<<","<<y<<"):   idxIn="<<idxIn<<"  =>  idxOut="<<idxOut<<"   N="<<N<<"   out="<<correlations[idxOut]<<"  <- "<<oldC[idxIn];
-                maskUnset(x, y, oldL[y*oldWidth+x+shift]);
+                maskSet(x, y, oldL[y*oldWidth+x+shift]);
             }
         }
     } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical) {
@@ -2192,7 +2192,7 @@ void QFRDRImagingFCSData::splitCFsForDualView() {
                 const int idxOut=y*width*N+x*N;
                 memcpy(&(correlations[idxOut]), &(oldC[idxIn]), N*sizeof(double));
                 memcpy(&(sigmas[idxOut]), &(oldS[idxIn]), N*sizeof(double));
-                maskUnset(x, y, oldL[y*oldWidth+x+shift]);
+                maskSet(x, y, oldL[y*oldWidth+x+shift]);
             }
         }
     }

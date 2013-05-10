@@ -16,8 +16,8 @@ class QFRDRImageMaskTools : public QFRDRImageMaskInterface {
         virtual void maskLoadFromIndexString(const QString& data, QChar separator=QChar(','));
         virtual void maskClear();
         virtual void maskSetAll();
-        virtual void maskSet(uint16_t x, uint16_t y);
-        virtual void maskUnset(uint16_t x, uint16_t y, bool value=true);
+        virtual void maskUnset(uint16_t x, uint16_t y);
+        virtual void maskSet(uint16_t x, uint16_t y, bool value=true);
         virtual void maskToggle(uint16_t x, uint16_t y);
         virtual void maskInvert();
         virtual bool maskGet(uint16_t x, uint16_t y) const ;

@@ -32,6 +32,7 @@ class QFRDRImageMaskEditTools: public QObject {
         QAction* get_actInvertMask() const { return actInvertMask; }
         QAction* get_actUndoMask() const { return actUndoMask; }
         QAction* get_actRedoMask() const { return actRedoMask; }
+        QAction* get_actMaskBorder() const { return actMaskBorder; }
 
         void registerPlotter(JKQtPlotter* plot);
         void unregisterPlotter(JKQtPlotter* plot);
@@ -47,6 +48,7 @@ class QFRDRImageMaskEditTools: public QObject {
         void invertMask();
         void undoMask();
         void redoMask();
+        void maskBorder();
     signals:
         void rawDataChanged();
 
@@ -73,6 +75,7 @@ class QFRDRImageMaskEditTools: public QObject {
         QAction* actSaveMask;
         QAction* actClearMask;
         QAction* actInvertMask;
+        QAction* actMaskBorder;
 
         QAction* actUndoMask;
         QAction* actRedoMask;

@@ -22,8 +22,8 @@ class QFRDRImageMaskInterface {
         virtual QString maskToString() const=0;
         virtual void maskClear()=0;
         virtual void maskSetAll()=0;
-        virtual void maskSet(uint16_t x, uint16_t y)=0;
-        virtual void maskUnset(uint16_t x, uint16_t y, bool value=true)=0;
+        virtual void maskUnset(uint16_t x, uint16_t y)=0;
+        virtual void maskSet(uint16_t x, uint16_t y, bool value=true)=0;
         virtual void maskToggle(uint16_t x, uint16_t y)=0;
         virtual void maskInvert()=0;
         virtual bool maskGet(uint16_t x, uint16_t y) const =0;

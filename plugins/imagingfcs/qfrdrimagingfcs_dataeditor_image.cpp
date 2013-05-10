@@ -1785,10 +1785,10 @@ void QFRDRImagingFCSImageEditor::imageClicked(double x, double y, Qt::KeyboardMo
             if (modifiers==Qt::ControlModifier && !actImagesScribble->isChecked()) {
                 m->maskToggle(xx,yy);
             } else if (modifiers==Qt::ShiftModifier) {
-                m->maskSet(xx,yy);
+                m->maskUnset(xx,yy);
             } else {
                 if (!actImagesScribble->isChecked()) m->maskClear();
-                m->maskUnset(xx,yy);
+                m->maskSet(xx,yy);
             }
         }
         replotSelection(true);
@@ -1818,9 +1818,9 @@ void QFRDRImagingFCSImageEditor::imageScribbled(double x, double y, Qt::Keyboard
         } else {
             if (first && modifiers==Qt::NoModifier) m->maskClear();
             if (modifiers==Qt::ShiftModifier) {
-                m->maskSet(xx,yy);
-            } else {
                 m->maskUnset(xx,yy);
+            } else {
+                m->maskSet(xx,yy);
             }
         }
         replotSelection(true);
@@ -1906,20 +1906,20 @@ void QFRDRImagingFCSImageEditor::imageRectangleFinished(double x, double y, doub
         if (modifiers==Qt::ControlModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    m->maskUnset(xx,yy);
+                    m->maskSet(xx,yy);
                 }
             }
         } else if (modifiers==Qt::ShiftModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    m->maskSet(xx,yy);
+                    m->maskUnset(xx,yy);
                 }
             }
         } else {
             m->maskClear();
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    m->maskUnset(xx,yy);
+                    m->maskSet(xx,yy);
                 }
             }
         }
@@ -1984,20 +1984,20 @@ void QFRDRImagingFCSImageEditor::imageEllipseFinished(double x, double y, double
         if (modifiers==Qt::ControlModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) m->maskUnset(xx,yy);
+                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) m->maskSet(xx,yy);
                 }
             }
         } else if (modifiers==Qt::ShiftModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) m->maskSet(xx,yy);
+                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) m->maskUnset(xx,yy);
                 }
             }
         } else {
             m->maskClear();
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) m->maskUnset(xx,yy);
+                    if (sqr(double(xx)-x+0.5)/sqr(radiusX)+sqr(double(yy)-y+0.5)/sqr(radiusY)<1.0) m->maskSet(xx,yy);
                 }
             }
         }
@@ -2062,20 +2062,20 @@ void QFRDRImagingFCSImageEditor::imageCircleFinished(double x, double y, double 
         if (modifiers==Qt::ControlModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) m->maskUnset(xx,yy);
+                    if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) m->maskSet(xx,yy);
                 }
             }
         } else if (modifiers==Qt::ShiftModifier) {
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) m->maskSet(xx,yy);
+                    if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) m->maskUnset(xx,yy);
                 }
             }
         } else {
             m->maskClear();
             for (int yy=yy1; yy<=yy2; yy++) {
                 for (int xx=xx1; xx<=xx2; xx++) {
-                    if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) m->maskUnset(xx,yy);
+                    if (sqr(double(xx)-x+0.5)+sqr(double(yy)-y+0.5)<sqr(radius)) m->maskSet(xx,yy);
                 }
             }
         }
@@ -2130,14 +2130,14 @@ void QFRDRImagingFCSImageEditor::imageLineFinished(double x1, double y1, double 
                 QPointF p=line.pointAt(i);
                 int xx=qBound(0,(int)floor(p.x()), m->getImageFromRunsWidth()-1);
                 int yy=qBound(0,(int)floor(p.y()), m->getImageFromRunsHeight()-1);
-                m->maskUnset(xx,yy);
+                m->maskSet(xx,yy);
             }
         } else if (modifiers==Qt::ShiftModifier) {
             for (double i=0; i<1.0; i=i+0.5/double(qMax(m->getImageFromRunsWidth(), m->getImageFromRunsHeight()))) {
                 QPointF p=line.pointAt(i);
                 int xx=qBound(0,(int)floor(p.x()), m->getImageFromRunsWidth()-1);
                 int yy=qBound(0,(int)floor(p.y()), m->getImageFromRunsHeight()-1);
-                m->maskSet(xx,yy);
+                m->maskUnset(xx,yy);
             }
         } else {
             m->maskClear();
@@ -2145,7 +2145,7 @@ void QFRDRImagingFCSImageEditor::imageLineFinished(double x1, double y1, double 
                 QPointF p=line.pointAt(i);
                 int xx=qBound(0,(int)floor(p.x()), m->getImageFromRunsWidth()-1);
                 int yy=qBound(0,(int)floor(p.y()), m->getImageFromRunsHeight()-1);
-                m->maskUnset(xx,yy);
+                m->maskSet(xx,yy);
             }
         }
     }
