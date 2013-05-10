@@ -615,6 +615,7 @@ void QFImFCCSFitEvaluationEditor::fitCurrent() {
     falg->setReporter(NULL);
     QApplication::processEvents();
     current->emitResultsChanged();
+    eval->getParameterInputTableModel()->rebuildModel();
 }
 
 void QFImFCCSFitEvaluationEditor::fitRunsCurrentThreaded()
@@ -743,6 +744,7 @@ void QFImFCCSFitEvaluationEditor::fitRunsCurrentThreaded()
     QApplication::restoreOverrideCursor();
     dlgTFitProgress->done();
     delete dlgTFitProgress;
+    eval->getParameterInputTableModel()->rebuildModel();
 }
 
 void QFImFCCSFitEvaluationEditor::fitRunsCurrent()
@@ -810,6 +812,7 @@ void QFImFCCSFitEvaluationEditor::fitRunsCurrent()
     falg->setReporter(NULL);
     QApplication::processEvents();
     current->emitResultsChanged();
+    eval->getParameterInputTableModel()->rebuildModel();
 }
 
 

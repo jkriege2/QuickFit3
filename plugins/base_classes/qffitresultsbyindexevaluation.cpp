@@ -180,7 +180,8 @@ void QFFitResultsByIndexEvaluation::fillFix(QFRawDataRecord* r, int index, bool*
 }
 
 double* QFFitResultsByIndexEvaluation::allocFillParameters(QFRawDataRecord* r, int index, QFFitFunction* function) const {
-    //qDebug()<<"QFFitResultsByIndexEvaluation::allocFillParameters("<<r->getName()<<", "<<index<<", "<<function->id()<<")";
+    //if (function) qDebug()<<"QFFitResultsByIndexEvaluation::allocFillParameters("<<r->getName()<<", "<<index<<", "<<function->id()<<")";
+    //else qDebug()<<"QFFitResultsByIndexEvaluation::allocFillParameters("<<r->getName()<<", "<<index<<", NULL)";
     return allocFillParameters(r, getEvaluationResultID(index, r), function);
 }
 

@@ -145,9 +145,7 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
 
             bool emitSignals;
         };
-        QList<double*> paramsVector;
-        QList<double*> initialParamsVector;
-        QList<double*> errorsVector;
+
 
         QFImFCCSMatchRDRFunctor* matchFunctor;
         /** \brief proxy model to filter rdrModel */

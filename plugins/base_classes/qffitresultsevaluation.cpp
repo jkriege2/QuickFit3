@@ -934,12 +934,14 @@ void QFFitResultsEvaluation::fillFix(QFRawDataRecord* r, const QString& resultID
 
 
 double* QFFitResultsEvaluation::allocFillParameters(QFRawDataRecord* r, const QString& resultID, QFFitFunction *function) const {
-    //qDebug()<<"QFFitResultsEvaluation::allocFillParameters("<<r->getName()<<", "<<resultID<<", "<<function->id()<<")";
+    //if (function) qDebug()<<"  QFFitResultsEvaluation::allocFillParameters("<<r->getName()<<", "<<resultID<<", "<<function->id()<<")";
+    //else qDebug()<<"  QFFitResultsEvaluation::allocFillParameters("<<r->getName()<<", "<<resultID<<", "<<NULL<<")";
     QFFitFunction* f=function;
     if (!f) f=getFitFunction(r);
     if (f!=NULL) {
         double* res=(double*)calloc(f->paramCount(), sizeof(double));
-        fillParameters(r, resultID, res);
+        //qDebug()<<"    result size: "<<f->paramCount();
+        fillParameters(r, resultID, res, f);
         return res;
     }
     return NULL;
@@ -950,7 +952,7 @@ double* QFFitResultsEvaluation::allocFillParameterErrors(QFRawDataRecord* r, con
     if (!f) f=getFitFunction(r);
     if (f!=NULL) {
         double* res=(double*)calloc(f->paramCount(), sizeof(double));
-        fillParameterErrors(r, resultID, res);
+        fillParameterErrors(r, resultID, res, f);
         return res;
     }
     return NULL;
@@ -964,7 +966,7 @@ bool* QFFitResultsEvaluation::allocFillFix(QFRawDataRecord* r, const QString& re
     if (!f) f=getFitFunction(r);
     if (f!=NULL) {
         bool* res=(bool*)calloc(f->paramCount(), sizeof(bool));
-        fillFix(r, resultID, res);
+        fillFix(r, resultID, res, f);
         return res;
     }
     return NULL;
@@ -977,7 +979,7 @@ double* QFFitResultsEvaluation::allocFillParametersMin(QFFitFunction *function) 
 
     if (f!=NULL) {
         double* res=(double*)calloc(f->paramCount(), sizeof(double));
-        fillParametersMin(res);
+        fillParametersMin(res, f);
         return res;
     }
     return NULL;
@@ -989,7 +991,7 @@ double* QFFitResultsEvaluation::allocFillParametersMax(QFFitFunction *function) 
 
     if (f!=NULL) {
         double* res=(double*)calloc(f->paramCount(), sizeof(double));
-        fillParametersMax(res);
+        fillParametersMax(res, f);
         return res;
     }
     return NULL;

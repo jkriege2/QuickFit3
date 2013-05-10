@@ -207,7 +207,7 @@ class QFLIB_EXPORT QFGlobalThreadedFit: public QThread {
         virtual ~QFGlobalThreadedFit();
 
         /** \brief initialize the fit parameters */
-        void init(QFGlobalFitTool* model, QList<double*> paramsOut, QList<double*> paramErrorsOut, QList<double*> initialParams, QList<double *> paramErrorsIn);
+        void init(QFGlobalFitTool* globalTool, QList<double*> paramsOut, QList<double*> paramErrorsOut, QList<double*> initialParams, QList<double *> paramErrorsIn);
 
         /** \brief return the result of the last fit call */
         inline QFFitAlgorithm::FitResult getResults() const { return results; }
@@ -217,7 +217,7 @@ class QFLIB_EXPORT QFGlobalThreadedFit: public QThread {
     protected:
         QList<double*> paramsOut;
         QList<double*> paramErrorsOut;
-        QFGlobalFitTool* model;
+        QFGlobalFitTool* globalTool;
         QList<double*> initialParams;
         QList<double *> paramErrorsIn;
         QFFitAlgorithm::FitResult results;

@@ -3,7 +3,7 @@
 
 
 #undef DEBUG_GLOBALFIT
-#define DEBUG_GLOBALFIT
+//#define DEBUG_GLOBALFIT
 
 
 
@@ -394,9 +394,9 @@ QFGlobalThreadedFit::~QFGlobalThreadedFit()
 {
 }
 
-void QFGlobalThreadedFit::init(QFGlobalFitTool *model, QList<double *> paramsOut, QList<double *> paramErrorsOut, QList<double *> initialParams, QList<double *> paramErrorsIn)
+void QFGlobalThreadedFit::init(QFGlobalFitTool *globalTool, QList<double *> paramsOut, QList<double *> paramErrorsOut, QList<double *> initialParams, QList<double *> paramErrorsIn)
 {
-    this->model=model;
+    this->globalTool=globalTool;
     this->paramsOut=paramsOut;
     this->paramErrorsOut=paramErrorsOut;
     this->initialParams=initialParams;
@@ -407,6 +407,6 @@ void QFGlobalThreadedFit::init(QFGlobalFitTool *model, QList<double *> paramsOut
 void QFGlobalThreadedFit::run()
 {
     QTime tstart=QTime::currentTime();
-    results=model->fit(paramsOut, paramErrorsOut, initialParams, paramErrorsIn);
+    results=globalTool->fit(paramsOut, paramErrorsOut, initialParams, paramErrorsIn);
     deltaTime=(double)tstart.msecsTo(QTime::currentTime());
 }

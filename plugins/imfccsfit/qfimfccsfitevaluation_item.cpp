@@ -504,7 +504,9 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
     QString iparams="";
     QString oparams="";
     QString orparams="";
-
+    QList<double*> paramsVector;
+    QList<double*> initialParamsVector;
+    QList<double*> errorsVector, errorsVectorI;
 
     QFFitAlgorithm* falg=getFitAlgorithm();
     if ((!falg)||records.size()<=0) return;
@@ -583,27 +585,28 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
             if (!dfd.weightsOK && doLog) QFPluginLogTools::log_warning(tr("      - weights have invalid values => setting all weights to 1\n"));
             // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
             // we are working with a complete set of parameters
-            dfd.params=allocFillParameters(record, run);
-            dfd.initialparams=allocFillParameters(record, run);
-            dfd.errors=allocFillParameterErrors(record, run);
-            dfd.errorsI=allocFillParameterErrors(record, run);
-            dfd.paramsMin=allocFillParametersMin();
-            dfd.paramsMax=allocFillParametersMax();
-            dfd.paramsFix=allocFillFix(record, run);
+            dfd.params=allocFillParameters(record, run, ffunc);
+            dfd.initialparams=allocFillParameters(record, run, ffunc);
+            dfd.errors=allocFillParameterErrors(record, run, ffunc);
+            dfd.errorsI=allocFillParameterErrors(record, run, ffunc);
+            dfd.paramsMin=allocFillParametersMin(ffunc);
+            dfd.paramsMax=allocFillParametersMax(ffunc);
+            dfd.paramsFix=allocFillFix(record, run, ffunc);
             dfd.ffunc=ffunc;
             dfd.cut_low=cut_low;
             dfd.cut_up=cut_up;
             dfd.cut_N=cut_N;
 
-            qDebug()<<"adding "<<r<<": ("<<record->getName()<<")   ffunc="<<ffunc->name();
-            qDebug()<<"  params="<<arrayToString(dfd.params, ffunc->paramCount());
-            qDebug()<<"  initialparams="<<arrayToString(dfd.initialparams, ffunc->paramCount());
-            qDebug()<<"  errors="<<arrayToString(dfd.errors, ffunc->paramCount());
-            qDebug()<<"  errorsI="<<arrayToString(dfd.errorsI, ffunc->paramCount());
+            //qDebug()<<"adding "<<r<<": ("<<record->getName()<<")   ffunc="<<ffunc->name();
+            //qDebug()<<"  params="<<arrayToString(dfd.params, ffunc->paramCount());
+            //qDebug()<<"  initialparams="<<arrayToString(dfd.initialparams, ffunc->paramCount());
+            //qDebug()<<"  errors="<<arrayToString(dfd.errors, ffunc->paramCount());
+            //qDebug()<<"  errorsI="<<arrayToString(dfd.errorsI, ffunc->paramCount());
 
             paramsVector.append(dfd.params);
             initialParamsVector.append(dfd.initialparams);
             errorsVector.append(dfd.errors);
+            errorsVectorI.append(dfd.errorsI);
 
             ffunc->calcParameter(dfd.params, dfd.errors);
             ffunc->calcParameter(dfd.initialparams, dfd.errors);
@@ -655,7 +658,11 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
                 dlgFitProgress->setProgressMax(100);
                 dlgFitProgress->setProgress(0);
             }
-            doFitThread->init(&tool, paramsVector, errorsVector, initialParamsVector, errorsVector);
+            //qDebug()<<"### before thread->init(): paramsVector.size="<<paramsVector.size();
+            //qDebug()<<"  params[0]="<<arrayToString(paramsVector[0], fitData[0].ffunc->paramCount());
+            doFitThread->init(&tool, paramsVector, errorsVector, initialParamsVector, errorsVectorI);
+            //qDebug()<<"### after thread->init(): paramsVector.size="<<paramsVector.size();
+            //qDebug()<<"  params[0]="<<arrayToString(paramsVector[0], fitData[0].ffunc->paramCount());
             //doFitThread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
             doFitThread->start(QThread::HighPriority);
             QTime t;
@@ -686,7 +693,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
                 QFRawDataRecord* record=records[r];
                 QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
                 if (data) {
-                    doFitData dfd=fitData[cnt];
+                    const doFitData& dfd=fitData[cnt];
                     double* errors=errorsVector[cnt];
                     double* params=paramsVector[cnt];
                     for (int i=0; i<dfd.ffunc->paramCount(); i++) {
