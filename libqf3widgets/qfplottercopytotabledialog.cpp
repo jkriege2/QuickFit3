@@ -84,6 +84,11 @@ bool QFPlotterCopyToTableDialog::getShowEditor() const
     return ui->chkShowTableEditor->isChecked();
 }
 
+void QFPlotterCopyToTableDialog::setDescription(const QString &text)
+{
+    ui->labDescription->setText(text);
+}
+
 void QFPlotterCopyToTableDialog::on_cmbRDR_refilled(bool full)
 {
     //qDebug()<<"on_cmbRDR_refilled(full="<<full<<")";
@@ -103,6 +108,12 @@ void QFPlotterCopyToTableDialog::on_chkNewTable_toggled(bool checked)
     //qDebug()<<"on_chkNewTable_toggled(checked="<<checked<<")";
     ui->cmbRDR->setEnabled(!checked);
     ui->edtNewTableName->setEnabled(checked);
+    if (checked) {
+        ui->chCreateNewGraph->setChecked(true);
+        ui->chCreateNewGraph->setEnabled(false);
+    } else {
+        ui->chCreateNewGraph->setEnabled(true);
+    }
 }
 
 void QFPlotterCopyToTableDialog::on_cmbGraph_refilled(bool full)

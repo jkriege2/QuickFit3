@@ -20,7 +20,7 @@ BLAS_INCLUDE =
 
 OUTPUTDIR_NAME = output
 
-QMAKE_CXXFLAGS += -Wno-unused-variable -Werror=return-type -m128bit-long-double -mtune=generic -msse -msse2 -mmmx -m3dnow -mfpmath=sse
+QMAKE_CXXFLAGS += -Wno-unused-variable -Werror=return-type -m128bit-long-double -mtune=generic -msse -msse2 -mmmx -m3dnow -mfpmath=sse -ftree-vectorize -ftree-vectorizer-verbose=5
 exists(quickfit.inc):include(quickfit.inc)
 
 !win32 {

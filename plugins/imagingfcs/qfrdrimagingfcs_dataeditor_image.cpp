@@ -5155,7 +5155,12 @@ void QFRDRImagingFCSImageEditor::invertMask() {
 void QFRDRImagingFCSImageEditor::copyGroupACFsToTable() {
     QList<QFRawDataRecord*> recs=current->getProject()->getRDRGroupMembers(current->getGroup());
     QFRDRImagingFCSData* cm=qobject_cast<QFRDRImagingFCSData*>(current);
-    QList<int> sel=cm->maskToIndexList();
+    QList<int> sel;
+    if (plteOverviewSize>0 && plteOverviewSelectedData) {
+        for (int i=0; i<plteOverviewSize; i++) {
+            if (plteOverviewSelectedData[i] && !plteOverviewExcludedData[i]) sel<<i;
+        }
+    }
     if (recs.size()>0) {
         for (int i=recs.size()-1; i>=0; i--) {
             bool use=false;
@@ -5168,6 +5173,7 @@ void QFRDRImagingFCSImageEditor::copyGroupACFsToTable() {
     }
     if (recs.size()>0) {
         QFPlotterCopyToTableDialog* dlg=new QFPlotterCopyToTableDialog(plotter);
+        dlg->setDescription(tr("adding average over %1 graphs to table <br><small>&nbsp;&nbsp;&nbsp;<i>selected: %2</i></small>").arg(sel.size()).arg(listToString(sel)));
         //dlg->setDescription(tr("Select a table record into which to write the plot data."));
         if (dlg->exec()) {
             QString tabname="";
@@ -5218,7 +5224,8 @@ void QFRDRImagingFCSImageEditor::copyGroupACFsToTable() {
                     } else {
                         QVector<double> dat;
                         for (int s=0; s<sel.size(); s++) {
-                            dat<<c[sel[s]];
+                            const double* cc=m->getCorrelationRun(sel[s]);
+                            dat<<cc[n];
                         }
                         double v=0;
                         cf<<qfstatisticsAverageVariance(v, dat);

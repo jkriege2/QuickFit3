@@ -7,13 +7,23 @@
     <x>0</x>
     <y>0</y>
     <width>807</width>
-    <height>285</height>
+    <height>326</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Add plot data to table ...</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QLabel" name="labDescription">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
    <item>
     <layout class="QGridLayout" name="gridLayout_2">
      <item row="0" column="0">

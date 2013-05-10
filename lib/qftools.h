@@ -485,6 +485,21 @@ QString listToString(const T& input, bool withIDs=false) {
     return QString("[ %1 ]").arg(res);
 }
 
+/*! \brief returns a list of all items in the list that have a given value
+    \ingroup qf3lib_tools
+
+*/
+template <class T>
+QList<int> valueIndizesFromArray(const T* input, int N, T value) {
+    QList<int> l;
+    if (N>0 && input) {
+        for (int i=0; i<N; i++) {
+            if (input[i]==value) l<<i;
+        }
+    }
+    return l;
+}
+
 /*! \brief can be used with qSort to sort <code>QList<QPair<T1, T2> ></code> for the first element of the pair in increasing order, i.e. compares with \c <
     \ingroup qf3lib_tools
 */
