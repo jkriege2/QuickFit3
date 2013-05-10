@@ -595,6 +595,12 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
             dfd.cut_up=cut_up;
             dfd.cut_N=cut_N;
 
+            qDebug()<<"adding "<<r<<": ("<<record->getName()<<")   ffunc="<<ffunc->name();
+            qDebug()<<"  params="<<arrayToString(dfd.params, ffunc->paramCount());
+            qDebug()<<"  initialparams="<<arrayToString(dfd.initialparams, ffunc->paramCount());
+            qDebug()<<"  errors="<<arrayToString(dfd.errors, ffunc->paramCount());
+            qDebug()<<"  errorsI="<<arrayToString(dfd.errorsI, ffunc->paramCount());
+
             paramsVector.append(dfd.params);
             initialParamsVector.append(dfd.initialparams);
             errorsVector.append(dfd.errors);

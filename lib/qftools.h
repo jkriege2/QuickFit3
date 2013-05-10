@@ -430,7 +430,7 @@ T* copyArray(T* out, const T* input, long long N) {
 template <class T>
 T* copyArrayOrDefault(T* out, const T* input, long long N, T defaultValue) {
     if (input) {
-        memcpy(out, input, N*sizeof(T));
+        if (out!=input) memcpy(out, input, N*sizeof(T));
     } else {
         for (long long i=0; i<N; i++) {
             out[i]=defaultValue;

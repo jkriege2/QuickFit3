@@ -82,6 +82,12 @@ QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
     setRunSelectWidgetActive(false);
 }
 
+QFRDRImageToRunPreview::~QFRDRImageToRunPreview()
+{
+    if (plteOverviewSelectedData) free(plteOverviewSelectedData);
+    if (plteOverviewExcludedData) free(plteOverviewExcludedData);
+}
+
 void QFRDRImageToRunPreview::setRDR(QFRawDataRecord *record)
 {
     this->record=record;

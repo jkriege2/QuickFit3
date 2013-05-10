@@ -209,4 +209,7 @@ plg_qfe_helpeditor.depends = lib libqf3widgets
     plg_scanner2000_nicounter.depends = lib libqf3widgets
 }
 
+OTHER_FILES += \
+    quickfit3.supp
+
 

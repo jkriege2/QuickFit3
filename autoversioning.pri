@@ -7,7 +7,7 @@ COMPILERVERSION=$$system($$QMAKE_CXX --version)
 
 
 # try to read the SVN version
-SVNVERSION = $$system(SVNVERSION)
+SVNVERSION = $$system(svnversion)
 contains(SVNVERSION,exported):SVNVERSION=
 contains(SVNVERSION,exported):SVNVERSION=
 isEmpty(SVNVERSION){

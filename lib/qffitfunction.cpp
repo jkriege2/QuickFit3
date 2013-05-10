@@ -12,12 +12,12 @@ QFFitStatistics QFFitFunction::calcFitStatistics(long N, double* tauvals, double
         }
     }
 
-    double* model=(double*)malloc(N*sizeof(double));
+    QVector<double> model(N, 0);
     for (int i=0; i<N; i++) {
         model[i]=evaluate(tauvals[i], fullParams);
     }
 
-    return calculateFitStatistics(N, tauvals, model, corrdata, weights, datacut_min, datacut_max, fitparamN, runAvgWidth, residualHistogramBins);
+    return calculateFitStatistics(N, tauvals, model.data(), corrdata, weights, datacut_min, datacut_max, fitparamN, runAvgWidth, residualHistogramBins);
 }
 
 

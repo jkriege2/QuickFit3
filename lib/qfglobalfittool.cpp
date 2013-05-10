@@ -3,7 +3,7 @@
 
 
 #undef DEBUG_GLOBALFIT
-//#define DEBUG_GLOBALFIT
+#define DEBUG_GLOBALFIT
 
 
 
@@ -30,7 +30,7 @@ void QFFitMultiQFFitFunctionFunctor::addTerm(QFFitFunction *model, const double 
     if (paramsMin) sfd.paramsMin=duplicateArray(paramsMin, model->paramCount());
     if (paramsMax) sfd.paramsMax=duplicateArray(paramsMax, model->paramCount());
     sfd.paramsFix=NULL;
-    if (fixParams) duplicateArray(fixParams, model->paramCount());
+    if (fixParams) sfd.paramsFix=duplicateArray(fixParams, model->paramCount());
     subFunctors.append(sfd);
     recalculateInternals();
 }
@@ -160,7 +160,7 @@ void QFFitMultiQFFitFunctionFunctor::recalculateInternals()
                 dbg0+=QString("F%1               |").arg(i,2,10,QLatin1Char(' '));
                 dbg +=QString(" G%1              |").arg(idx,2,10,QLatin1Char(' '));
                 //dbg1+=QString("%1              |").arg(cnt,4,10,QLatin1Char(' '));
-                dbg1+=QString("                  |").arg(cnt,4,10,QLatin1Char(' '));
+                dbg1+=QString("                  |");
                 dbg2+=QString("%1 |").arg(f->getModel()->getParameterID(f->mapFromFunctorToModel(p)).leftJustified(17,' ', true));
                 cnt++;
 #endif
@@ -288,7 +288,8 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fit(QList<double *> paramsOut, QList<
     for (int i=0; i<functor->getSubFunctorCount(); i++) {
         QFFitAlgorithm::FitQFFitFunctionFunctor* f=functor->getSubFunctor(i);
 #ifdef DEBUG_GLOBALFIT
-        qDebug()<<"F"<<i<<": "<<f->getModel()->name()<<": "<<listToString( f->getModel()->getParameterIDs(), true);
+        qDebug()<<"\n\n\n\n\n\n\n\n\n\n\n\n\n";
+        qDebug()<<"F"<<i<<": "<<f->getModel()->name()<<":\n   "<<listToString( f->getModel()->getParameterIDs(), true)<<"\n   "<<arrayToString(initialParams[i], f->getModel()->paramCount());
 #endif
         int pcount=f->get_paramcount();
         double* pi=initialParams[i];
@@ -301,7 +302,7 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fit(QList<double *> paramsOut, QList<
             int modelIdx=f->mapFromFunctorToModel(p);
             int idx=functor->mapSubFunctorToGlobal(i, p);
 #ifdef DEBUG_GLOBALFIT
-            qDebug()<<"<-F"<<i<<":   idx="<<idx<<"/"<<ppcount<<"     modelIdx="<<modelIdx<<"/"<<f->getModelParamsCount();
+            qDebug()<<"<-F"<<i<<":   idx="<<idx<<"/"<<ppcount<<"     modelIdx="<<modelIdx<<"/"<<f->getModelParamsCount()<<"  pi="<<pi<<"   err="<<err;
             if (idx>=0 && idx<ppcount) {
 #endif
                 params[idx]=pi[modelIdx];
@@ -352,8 +353,11 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fit(QList<double *> paramsOut, QList<
         //double* pi=initialParams[i];
         double* err=paramErrorsOut[i];
         double* po=paramsOut[i];
-        copyArray(po, f->getModelParams(), f->getModelParamsCount());
-        copyArrayOrDefault(err, paramErrorsIn[i], f->getModelParamsCount(), 0.0);
+#ifdef DEBUG_GLOBALFIT
+        qDebug()<<"->F"<<i<<":   err="<<err<<"  po="<<po;
+#endif
+        //copyArray(po, f->getModelParams(), f->getModelParamsCount());
+        //copyArrayOrDefault(err, paramErrorsIn[i], f->getModelParamsCount(), 0.0);
         for (int p=0; p<pcount; p++) {
             int modelIdx=f->mapFromFunctorToModel(p);
             int idx=functor->mapSubFunctorToGlobal(i, p);
@@ -364,6 +368,8 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fit(QList<double *> paramsOut, QList<
                 po[modelIdx]=params[idx];
                 err[modelIdx]=errors[idx];
 #ifdef DEBUG_GLOBALFIT
+            } else {
+                qDebug()<<"ERROR: invalid idx="<<idx<<"   max="<<ppcount;
             }
 #endif
         }

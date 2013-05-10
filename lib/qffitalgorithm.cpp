@@ -395,9 +395,9 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::optimize(double* paramsOut, double* pa
     free(tparamsOut);
     free(tinitialParams);
 
-    if (ppparamsMin==NULL) free(ppparamsMin);
-    if (ppparamsMax==NULL) free(ppparamsMax);
-    if (ppparamsFix==NULL) free(ppparamsFix);
+    if (ppparamsMin) free(ppparamsMin);
+    if (ppparamsMax) free(ppparamsMax);
+    if (ppparamsFix) free(ppparamsFix);
     return result;
 }
 

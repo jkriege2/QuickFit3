@@ -66,6 +66,9 @@ QFFitResultsEvaluation::~QFFitResultsEvaluation() {
         delete j.value();
     }
     m_fitAlgorithms.clear();
+
+    if (fitParamSettings) delete fitParamSettings;
+    if (fitParamGlobalSettings) delete fitParamGlobalSettings;
 }
 
 
