@@ -1,6 +1,10 @@
 #include "qfmathtools.h"
 #include <float.h>
 
+double qfTanc( double x ) {
+    if (x==0) return 1;
+    return tan(x)/x;
+}
 
 
 double qfSinc( double x )
@@ -35,6 +39,7 @@ double qfSinc( double x )
         return result;
     }
 }
+
 
 
 

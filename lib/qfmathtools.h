@@ -45,8 +45,66 @@ inline float qfCube(float x) { return x*x*x; }
 inline double qfPow4(double x) { double x2=x*x; return x2*x2; }
 inline float qfPow4(float x) { float x2=x*x; return x2*x2; }
 
-
+/** \brief sinc function \f$ \mbox{sinc}(x)=\frac{\sin(x)}{x} \f$ */
 QFLIB_EXPORT double qfSinc(double x);
+/** \brief sinc function \f$ \mbox{tanc}(x)=\frac{\tan(x)}{x} \f$ */
+QFLIB_EXPORT double qfTanc(double x);
+
+/** \brief 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma)=\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$  */
+inline double qfGaussSqrtE(double x, double sigma=1) {
+    return exp(-0.5*x*x/(sigma*sigma));
+}
+/** \brief normalized 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma)=\frac{1}{w\cdot\sqrt{2\pi}}\cdot\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$  */
+inline double qfGaussNormSqrtE(double x, double sigma=1){
+    return exp(-0.5*x*x/(sigma*sigma))/(sigma*sqrt(2.0*M_PI));
+}
+/** \brief 1/e²-width gaussian function \f$ \mbox{g}(x, w)=\exp\left(-2\cdot\frac{x^2}{w^2}\right) \f$ with \f$ g(w,w)=1/e^2 \f$  */
+inline double qfGaussE2(double x, double w=1) { return qfGaussSqrtE(x, w/2.0); }
+/** \brief normalized 1/e²-width gaussian function \f$ \mbox{g}(x, w)=\frac{\sqrt{2}}{w\cdot\sqrt{\pi}}\cdot\exp\left(-2\cdot\frac{x^2}{w^2}\right) \f$  */
+inline double qfGaussNormE2(double x, double w=1) { return qfGaussNormSqrtE(x, w/2.0); }
+/** \brief Theta step function \f$ \Theta(x)=\begin{cases}0&x<0\\1&\text{else}\end{cases} \f$  */
+inline double qfTheta(double x) { return (x>=0)?1.0:0.0; }
+/** \brief Theta step function \f$ \mbox{sigmoid}(x)=\frac{1}{1+\exp(-x)} \f$  */
+inline double qfSigmoid(double x) { return 1.0/(1+exp(-1.0*x)); }
+/** \brief sign function \f$ \mbox{signa}(x)=\begin{cases}-1&x<0\\0&x=0\\1&x>0\end{cases} \f$  */
+inline double qfSign(double x) {
+    if (x<0) return -1;
+    if (x>0) return 1;
+    return 0;
+}
+
+/** \brief range/slit function \f$ \mbox{slit}(x)=\begin{cases}1&-a/2\leq x\leq a/2\\0&\text{else}\end{cases} \f$  */
+inline double qfSlit(double x, double a) {
+    if (x>=-a/2.0 && x<=a/2.0) return 1;
+    return 0;
+}
+
+/** \brief convert degrees (0..360) ro radians (0..2pi)  */
+inline double qfDegToRad(double x) {
+    return x/180.0*M_PI;
+}
+
+/** \brief convert degrees (0..360) ro radians (0..2pi)  */
+inline double qfRadToDeg(double x) {
+    return x/M_PI*180.0;
+}
+
+/*! \brief calculate the dot product of two vectors
+    \ingroup qf3lib_mathtools
+
+*/
+template <typename T>
+typename T::value_type qfDotProduct(const T& v1, const T& v2) {
+    if (v1.size()!=v2.size()) return 0;
+    typename T::value_type r=0;
+    for (int i=0; i<v1.size(); i++) {
+        r=r+v1[i]*v2[i];
+    }
+    return r;
+}
+
+
+
 
 /*! \brief calculate the average and variance of a given array
     \ingroup qf3lib_mathtools
@@ -56,7 +114,7 @@ QFLIB_EXPORT double qfSinc(double x);
 
 */
 template <class T>
-double qfstatisticsAverageVariance(double& var, const T value) {
+double qfstatisticsAverageVariance(double& var, const T& value) {
     long long N=value.size();
     if (N<=1) return 0;
     register double sum=0;
@@ -79,7 +137,7 @@ double qfstatisticsAverageVariance(double& var, const T value) {
     \f[ \overline{v}=\frac{1}{N}\cdot\sum\limits_{i=0}^{N-1} v_i \f]
 */
 template <class T>
-double qfstatisticsAverage(const T value) {
+double qfstatisticsAverage(const T& value) {
     long long N=value.size();
     if (N<=1) return 0;
     register double sum=0;
@@ -100,7 +158,7 @@ double qfstatisticsAverage(const T value) {
     \f[ \overline{v}=\cdot\sum\limits_{i=0}^{N-1} v_i \f]
 */
 template <class T>
-long long qfstatisticsCount(const T value) {
+long long qfstatisticsCount(const T& value) {
     long long N=value.size();
     if (N<=0) return 0;
     long long NN=0;
@@ -116,8 +174,8 @@ long long qfstatisticsCount(const T value) {
     \ingroup qf3lib_mathtools
 
 */
-template <class T>
-T qfstatisticsMin(const QList<T> value) {
+template <typename T>
+typename T::value_type qfstatisticsMin(const T& value) {
     long long N=value.size();
     if (N<=0) return 0;
     if (N==1) return value[0];
@@ -136,17 +194,40 @@ T qfstatisticsMin(const QList<T> value) {
     return m;
 }
 
+/*! \brief calculate the minimum of the data in \a value
+    \ingroup qf3lib_mathtools
+
+*/
+template <class T>
+T qfstatisticsMin(const QVector<T>& value) {
+    long long N=value.size();
+    if (N<=0) return 0;
+    if (N==1) return value[0];
+    T m=0;
+    bool first=true;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i])) {
+            if (first)  {
+                m=value[i];
+                first=false;
+            } else if (value[i]<m) {
+                m=value[i];
+            }
+        }
+    }
+    return m;
+}
 
 /*! \brief calculate the maximum of the data in \a value
     \ingroup qf3lib_mathtools
 
 */
-template <class T>
-T qfstatisticsMax(const QList<T> value) {
+template <typename T>
+typename T::value_type qfstatisticsMax(const T& value) {
     long long N=value.size();
     if (N<=0) return 0;
     if (N==1) return value[0];
-    T m=0;
+    typename T::value_type m=0;
     bool first=true;
     for (register long long i=0; i<N; i++) {
         if (QFFloatIsOK(value[i])) {
@@ -161,13 +242,14 @@ T qfstatisticsMax(const QList<T> value) {
     return m;
 }
 
+
 /*! \brief calculate the sum of data
     \ingroup qf3lib_mathtools
 
-    \f[ \overline{v}=\cdot\sum\limits_{i=0}^{N-1} v_i \f]
+    \f[ \overline{v}=\sum\limits_{i=0}^{N-1} v_i \f]
 */
 template <class T>
-double qfstatisticsSum(const T value) {
+double qfstatisticsSum(const T& value) {
     long long N=value.size();
     if (N<=1) return 0;
     register double sum=0;
@@ -178,13 +260,31 @@ double qfstatisticsSum(const T value) {
     }
     return sum;
 }
+
+/*! \brief calculate the product of data
+    \ingroup qf3lib_mathtools
+
+    \f[ \overline{v}=\prod\limits_{i=0}^{N-1} v_i \f]
+*/
+template <class T>
+double qfstatisticsProd(const T& value) {
+    long long N=value.size();
+    if (N<=1) return 0;
+    register double prod=1;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i])) {
+            prod=prod*(double)(value[i]);
+        }
+    }
+    return prod;
+}
 /*! \brief calculate the sum of data squares
     \ingroup qf3lib_mathtools
 
     \f[ \overline{v}=\cdot\sum\limits_{i=0}^{N-1} v_i^2 \f]
 */
 template <class T>
-double qfstatisticsSum2(const T value) {
+double qfstatisticsSum2(const T& value) {
     long long N=value.size();
     if (N<=1) return 0;
     register double sum=0;
@@ -204,7 +304,7 @@ double qfstatisticsSum2(const T value) {
 
 */
 template <class T>
-double qfstatisticsVariance(const T value) {
+double qfstatisticsVariance(const T& value) {
     long long N=value.size();
     if (N<=1) return 0;
     register double sum=0;
@@ -220,6 +320,10 @@ double qfstatisticsVariance(const T value) {
     return ( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
 }
 
+template <class T>
+double qfstatisticsStd(const T& value) {
+    return sqrt(qfstatisticsVariance(value));
+}
 
 
 
@@ -232,7 +336,7 @@ double qfstatisticsVariance(const T value) {
     \ingroup tools_math_stat
 */
 template <typename T>
-typename T::value_type qfstatisticsSortedMin(T input) {
+typename T::value_type qfstatisticsSortedMin(const T& input) {
     if (input.size()<=0) return 0;
     return input[0];
 }
@@ -242,7 +346,7 @@ typename T::value_type qfstatisticsSortedMin(T input) {
     \ingroup tools_math_stat
 */
 template <typename T>
-typename T::value_type qfstatisticsSortedMax(T input) {
+typename T::value_type qfstatisticsSortedMax(const T& input) {
     if (input.size()<=0) return 0;
     return input[input.size()-1];
 }
@@ -254,7 +358,7 @@ typename T::value_type qfstatisticsSortedMax(T input) {
     if \a N is odd, then the center element is returned, otherwise the function returns the average of the two centering elements
 */
 template <typename T>
-typename T::value_type qfstatisticsSortedMedian(T input) {
+typename T::value_type qfstatisticsSortedMedian(const T& input) {
     long long N=input.size();
     if (N<=0) return 0;
     if (N==1) return input[0];
@@ -272,7 +376,7 @@ typename T::value_type qfstatisticsSortedMedian(T input) {
     if \a N is odd, then the center element is returned, otherwise the function returns the average of the two centering elements
 */
 template <typename T>
-typename T::value_type qfstatisticsMedian(T input_in) {
+typename T::value_type qfstatisticsMedian(const T& input_in) {
     T input=input_in;
     qSort(input);
     return qfstatisticsSortedMedian(input);
@@ -284,7 +388,7 @@ typename T::value_type qfstatisticsMedian(T input_in) {
 
 */
 template <typename T>
-typename T::value_type qfstatisticsSortedQuantile(T input, double quantile) {
+typename T::value_type qfstatisticsSortedQuantile(const T& input, double quantile) {
     long long N=input.size();
     if (N<=0) return 0;
     if (N==1) return input[0];
@@ -302,7 +406,7 @@ typename T::value_type qfstatisticsSortedQuantile(T input, double quantile) {
 
 */
 template <typename T>
-typename T::value_type qfstatisticsQuantile(T input_in, double quantile) {
+typename T::value_type qfstatisticsQuantile(const T& input_in, double quantile) {
     T input=input_in;
     qSort(input);
     return qfstatisticsSortedQuantile(input, quantile);
