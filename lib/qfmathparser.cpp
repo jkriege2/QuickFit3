@@ -849,6 +849,11 @@ void QFMathParser::addFunction(const QString& name, qfmpEvaluateFunc function) {
   environment.setFunction(name, f);
 }
 
+void QFMathParser::addFunction(const QString &name, QStringList parameterNames, QFMathParser::qfmpNode *function)
+{
+    environment.addFunction(name, parameterNames, function);
+}
+
 
 QFMathParser::qfmpTokenType QFMathParser::getToken(){
     QChar ch=0;
@@ -946,9 +951,10 @@ QFMathParser::qfmpTokenType QFMathParser::getToken(){
 			return CurrentToken=COMP_SMALLER;
 		}
 		case '0': case '1': case '2': case '3': case '4':
-		case '5': case '6': case '7': case '8': case '9':{
+        case '5': case '6': case '7': case '8': case '9': case '.':{
             putbackStream(program, ch);
-			(*program) >> NumberValue;
+            //(*program) >> NumberValue;
+            NumberValue=readNumber();
 			return CurrentToken=NUMBER;
 		}
 		default:
@@ -1161,8 +1167,29 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
                         qfmpError(QString("')' expected, but '%1' found").arg(currenttokentostring()));
                         return NULL;
                     }
-                    res=new qfmpFunctionNode(varname, params, this, NULL);
                     getToken();
+                    if (CurrentToken==ASSIGN) { // function assignment
+                        bool allParamsAreNames=true;
+                        QStringList pnames;
+                        for (int i=0; i<params.size(); i++) {
+                            qfmpVariableNode* n=NULL;
+                            if (n=dynamic_cast<qfmpVariableNode*>(params[i])) {
+                                pnames<<n->getName();
+                            } else {
+                                allParamsAreNames=false;
+                            }
+
+                        }
+                        //qDebug()<<"FASSIGN: "<<varname<<allParamsAreNames<<pnames;
+                        if (allParamsAreNames) {
+                            res=new qfmpFunctionAssignNode(varname, pnames, primary(true), this, NULL);
+                        } else {
+                            qfmpError(QString("malformed function assignmentfound, expected this form: FNAME(P1, P2, ...)=expression").arg(currenttokentostring()));
+                            return NULL;
+                        }
+                    } else {
+                        res=new qfmpFunctionNode(varname, params, this, NULL);
+                    }
 
                 } else {
                   res=(QFMathParser::qfmpNode*)new qfmpVariableNode(varname, this, NULL);
@@ -1237,6 +1264,292 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
 
 }
 
+double QFMathParser::readNumber()
+{
+
+  double current_double=0;
+
+  bool isMantissa=true;
+  double dfactor=1;
+  int mantissaPos=0;
+  bool isNumber=true;
+  bool foundDot=false;
+
+
+  std::string num="";
+  int i=0;
+  QChar c;
+
+  if (getFromStream(program, c)) {
+   // check sign
+    if (c=='-') { dfactor=-1; isNumber=getFromStream(program, c); i++; }
+    else if (c=='+') { isNumber=getFromStream(program, c); i++; }
+
+    if (isNumber && c=='0') {
+        isNumber=getFromStream(program, c); i++;
+        if (c=='x' || c=='X') return dfactor*readHex();
+        if (c=='o' || c=='O') return dfactor*readOct();
+        if (c=='b' || c=='B') return dfactor*readBin();
+    }
+    putbackStream(program, c);
+    return dfactor*readDec();
+
+  }
+}
+
+double QFMathParser::readDec()
+{
+
+  double current_double=0;
+
+  bool isMantissa=true;
+  double dfactor=1;
+  int mantissaPos=0;
+  bool isNumber=true;
+  bool foundDot=false;
+
+
+  QString num="";
+  int i=0;
+  QChar c;
+
+  if (getFromStream(program, c)) {
+   // check sign
+    if (c=='-') { dfactor=-1; isNumber=getFromStream(program, c); i++; }
+    else if (c=='+') { isNumber=getFromStream(program, c); i++; }
+
+    while (isNumber) {
+      if (!isMantissa) {
+        switch(c.toLatin1()) {
+          case '0':
+          case '1':
+          case '2':
+          case '3':
+          case '4':
+          case '5':
+          case '6':
+          case '7':
+          case '8':
+          case '9':
+            num+=c;
+            break;
+          case '-':
+            if (i==mantissaPos) {
+              num+=c;
+            } else {
+              isNumber=false;
+              putbackStream(program, c);
+            }
+            break;
+          case '+':
+            if (i!=mantissaPos) {
+              isNumber=false;
+              putbackStream(program, c);
+            }
+            break;
+          default:
+            putbackStream(program, c);
+            isNumber=false;
+        }
+      }
+      if (isMantissa) {
+        switch(c.toLatin1()) {
+          case '0':
+          case '1':
+          case '2':
+          case '3':
+          case '4':
+          case '5':
+          case '6':
+          case '7':
+          case '8':
+          case '9':
+            num+=c;
+            break;
+          case '.':
+            if (foundDot) {
+              putbackStream(program, c);
+              isNumber=false;
+            } else {
+              num+=c;
+              foundDot=true;
+            }
+            break;
+          case '-':
+            if (i==mantissaPos) {
+              dfactor=-1;
+            } else {
+              isNumber=false;
+              putbackStream(program, c);
+            }
+            break;
+          case '+':
+            if (i==mantissaPos) {
+              dfactor=1;
+            } else {
+              putbackStream(program, c);
+              isNumber=false;
+            }
+            break;
+          case 'e':
+          case 'E':
+            isMantissa=false;
+            num+='e';
+            mantissaPos=i+1;
+            break;
+
+          default:
+            putbackStream(program, c);
+            isNumber=false;
+        }
+      }
+      i++;
+      if (isNumber) isNumber=getFromStream(program, c);
+    }
+  }
+
+    if (num.length()<=0) num="0";
+    current_double = num.toDouble();
+    current_double=(current_double)*dfactor;
+    return current_double;
+}
+
+double QFMathParser::readHex() {
+    double current_double=0;
+    double dfactor=1;
+    bool isNumber=true;
+
+    QString num="";
+    int i=0;
+    QChar c;
+
+    if (getFromStream(program, c)) {
+        // check sign
+        if (c=='-') { dfactor=-1; isNumber=getFromStream(program, c); i++; }
+        else if (c=='+') { isNumber=getFromStream(program, c); i++; }
+
+        while (isNumber) {
+            switch(c.toLatin1()) {
+              case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                case 'A':
+                case 'a':
+                case 'B':
+                case 'b':
+                case 'C':
+                case 'c':
+                case 'D':
+                case 'd':
+                case 'E':
+                case 'e':
+                case 'F':
+                case 'f':
+                num+=c;
+                break;
+              default:
+                putbackStream(program, c);
+                isNumber=false;
+            }
+            i++;
+            if (isNumber) isNumber=getFromStream(program, c);
+        }
+    }
+
+      if (num.length()<=0) num="0";
+      current_double=num.toInt(NULL, 16);
+      current_double=(current_double)*dfactor;
+      return current_double;
+}
+
+double QFMathParser::readOct() {
+    double current_double=0;
+    double dfactor=1;
+    bool isNumber=true;
+
+    QString num="";
+    int i=0;
+    QChar c;
+
+    if (getFromStream(program, c)) {
+        // check sign
+        if (c=='-') { dfactor=-1; isNumber=getFromStream(program, c); i++; }
+        else if (c=='+') { isNumber=getFromStream(program, c); i++; }
+
+        while (isNumber) {
+            switch(c.toLatin1()) {
+              case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                num+=c;
+                break;
+              default:
+                putbackStream(program, c);
+                isNumber=false;
+            }
+            i++;
+            if (isNumber) isNumber=getFromStream(program, c);
+        }
+    }
+
+      if (num.length()<=0) num="0";
+      double fac=1;
+      current_double=num.toInt(NULL, 8);
+      current_double=(current_double)*dfactor;
+      return current_double;}
+
+double QFMathParser::readBin() {
+
+  double current_double=0;
+  double dfactor=1;
+  bool isNumber=true;
+
+  QString num="";
+  int i=0;
+  QChar c;
+
+  if (getFromStream(program, c)) {
+      // check sign
+      if (c=='-') { dfactor=-1; isNumber=getFromStream(program, c); i++; }
+      else if (c=='+') { isNumber=getFromStream(program, c); i++; }
+
+      while (isNumber) {
+          switch(c.toLatin1()) {
+            case '0':
+            case '1':
+              num+=c;
+              break;
+            default:
+              putbackStream(program, c);
+              isNumber=false;
+          }
+          i++;
+          if (isNumber) isNumber=getFromStream(program, c);
+      }
+  }
+
+    if (num.length()<=0) num="0";
+    double fac=1;
+    current_double=0;
+    for (int i=num.size()-1; i>=0; i--) {
+        if (num[i]=='1') current_double=current_double+fac;
+        fac=fac*2.0;
+    }
+    current_double=(current_double)*dfactor;
+    return current_double;
+}
 
 QString QFMathParser::readDelim(QChar delimiter){
     QString res="";
@@ -1309,6 +1622,12 @@ QFMathParser::qfmpResult QFMathParser::qfmpUnaryNode::evaluate(){
   }
   res.isValid=false;
   return res;
+}
+
+QFMathParser::qfmpNode *QFMathParser::qfmpUnaryNode::copy(QFMathParser::qfmpNode *par)
+{
+    QFMathParser::qfmpNode *n= new QFMathParser::qfmpUnaryNode(operation, child->copy(), getParser(), par);
+    return n;
 }
 
 
@@ -1437,6 +1756,12 @@ QFMathParser::qfmpResult QFMathParser::qfmpBinaryArithmeticNode::evaluate(){
   return res;
 }
 
+QFMathParser::qfmpNode *QFMathParser::qfmpBinaryArithmeticNode::copy(QFMathParser::qfmpNode *par)
+{
+    QFMathParser::qfmpNode *n= new QFMathParser::qfmpBinaryArithmeticNode(operation, left->copy(), right->copy(), getParser(), par);
+    return n;
+}
+
 
 
 
@@ -1559,6 +1884,12 @@ QFMathParser::qfmpResult QFMathParser::qfmpCompareNode::evaluate(){
   return res;
 }
 
+QFMathParser::qfmpNode *QFMathParser::qfmpCompareNode::copy(QFMathParser::qfmpNode *par)
+{
+    QFMathParser::qfmpNode *n= new QFMathParser::qfmpCompareNode(operation, left->copy(), right->copy(), getParser(), par);
+    return n;
+}
+
 
 
 
@@ -1625,6 +1956,12 @@ QFMathParser::qfmpResult QFMathParser::qfmpBinaryBoolNode::evaluate(){
   return res;
 }
 
+QFMathParser::qfmpNode *QFMathParser::qfmpBinaryBoolNode::copy(QFMathParser::qfmpNode *par)
+{
+    QFMathParser::qfmpNode *n= new QFMathParser::qfmpBinaryBoolNode(operation, left->copy(), right->copy(), getParser(), par);
+    return n;
+}
+
 
 
 
@@ -1635,8 +1972,12 @@ QFMathParser::qfmpVariableNode::qfmpVariableNode(QString name, QFMathParser* p, 
 };
 
 QFMathParser::qfmpResult QFMathParser::qfmpVariableNode::evaluate() {
-  return getParser()->getVariable(var);
-};
+    return getParser()->getVariable(var);
+}
+
+QFMathParser::qfmpNode *QFMathParser::qfmpVariableNode::copy(QFMathParser::qfmpNode *par)
+{
+return new QFMathParser::qfmpVariableNode(var, getParser(), par);};
 
 
 
@@ -1676,6 +2017,20 @@ QFMathParser::qfmpResult QFMathParser::qfmpNodeList::evaluate(){
   return res;
 }
 
+QFMathParser::qfmpNode *QFMathParser::qfmpNodeList::copy(QFMathParser::qfmpNode *par)
+{
+
+    QFMathParser::qfmpNodeList* n= new QFMathParser::qfmpNodeList(getParser());
+    if (list.size()>0) {
+        for (int i=0; i<list.size(); i++) {
+            n->add(list[i]->copy(n));
+        }
+    }
+
+    n->setParent(par);
+    return n;
+}
+
 QFMathParser::qfmpNodeList::~qfmpNodeList() {
 /*  if (getCount()>0) {
      for (int i=0; i<getCount(); i++) {
@@ -1712,6 +2067,12 @@ QFMathParser::qfmpResult QFMathParser::qfmpVariableAssignNode::evaluate(){
   return res;
 }
 
+QFMathParser::qfmpNode *QFMathParser::qfmpVariableAssignNode::copy(QFMathParser::qfmpNode *par)
+{
+    if (child) return new QFMathParser::qfmpVariableAssignNode(variable, child->copy(NULL), getParser(), par);
+    else return new QFMathParser::qfmpVariableAssignNode(variable, NULL, getParser(), par);
+}
+
 QFMathParser::qfmpFunctionNode::qfmpFunctionNode(QString name, QVector<qfmpNode *> params, QFMathParser *p, qfmpNode *par) {
   child=params;
   fun=name;
@@ -1733,6 +2094,18 @@ QFMathParser::qfmpResult QFMathParser::qfmpFunctionNode::evaluate() {
     }
   }
   return parser->evaluateFunction(fun, data);
+}
+
+QFMathParser::qfmpNode *QFMathParser::qfmpFunctionNode::copy(QFMathParser::qfmpNode *par)
+{
+    QVector<qfmpNode *> params;
+    if (child.size()>0) {
+        for (int i=0; i<child.size(); i++) {
+            params<<child[i]->copy(NULL);
+        }
+    }
+
+    return new QFMathParser::qfmpFunctionNode(fun, params, getParser(), par);
 }
 
 
@@ -2014,7 +2387,7 @@ void QFMathParser::executionEnvironment::leaveBlock()
         currentLevel--;
         QStringList keys=variables.keys();
         for (int i=0; i<keys.size(); i++) {
-            while (variables[keys[i]].last().first>currentLevel) {
+            while (!(variables[keys[i]].isEmpty())&&variables[keys[i]].last().first>currentLevel) {
                 variables[keys[i]].last().second.clearMemory();
                 variables[keys[i]].removeLast();
             }
@@ -2023,7 +2396,7 @@ void QFMathParser::executionEnvironment::leaveBlock()
 
         keys=functions.keys();
         for (int i=0; i<keys.size(); i++) {
-            while (functions[keys[i]].last().first>currentLevel) {
+            while ((!functions[keys[i]].isEmpty()) && functions[keys[i]].last().first>currentLevel) {
                 functions[keys[i]].last().second.clearMemory();
                 functions[keys[i]].removeLast();
             }
@@ -2163,6 +2536,7 @@ QString QFMathParser::executionEnvironment::printFunctions() const
         QMapIterator<QString, QList<QPair<int, QFMathParser::qfmpFunctionDescriptor> > > itV(functions);
         while (itV.hasNext()) {
             itV.next();
+            if (res.size()>0) res+="\n";
 
             res+=itV.value().last().second.toDefString();
 
@@ -2217,7 +2591,17 @@ void QFMathParser::executionEnvironment::setFunction(const QString &name, const 
         QList<QPair<int, qfmpFunctionDescriptor> > l;
         l.append(qMakePair(currentLevel, function));
         functions[name]=l;
-      }
+    }
+}
+
+void QFMathParser::executionEnvironment::addFunction(const QString &name, QStringList parameterNames, QFMathParser::qfmpNode *function)
+{
+    QFMathParser::qfmpFunctionDescriptor fd;
+    fd.type=functionNode;
+    fd.parameterNames=parameterNames;
+    fd.functionNode=function;
+    fd.name=name;
+    setFunction(name, fd);
 }
 
 QFMathParser::qfmpResult QFMathParser::executionEnvironment::getVariable(const QString &name) const
@@ -2237,13 +2621,15 @@ QFMathParser::qfmpResult QFMathParser::executionEnvironment::evaluateFunction(co
 {
     QFMathParser::qfmpResult res;
     res.isValid=false;
+    //qDebug()<<"searching function "<<name<<": "<<functions.contains(name);
+    //if (functions.contains(name)) qDebug()<<"   defs: "<<functions[name].size();
     if (functions.contains(name) && functions[name].size()>0) {
         res=functions[name].last().second.evaluate(parameters, parent);
         res.isValid=true;
+        return res;
     }
     if (parent) parent->qfmpError(QObject::tr("the function '%1' does not exist").arg(name));
     return res;
-
 }
 
 void QFMathParser::executionEnvironment::addVariable(const QString &name, const QFMathParser::qfmpResult &result)
@@ -2299,3 +2685,46 @@ void QFMathParser::executionEnvironment::clearFunctions()
 {
     functions.clear();
 }
+
+QFMathParser::qfmpFunctionAssignNode::~qfmpFunctionAssignNode()
+{
+    if (child) delete child;
+}
+
+QFMathParser::qfmpFunctionAssignNode::qfmpFunctionAssignNode(QString function, QStringList parameterNames, QFMathParser::qfmpNode *c, QFMathParser *p, QFMathParser::qfmpNode *par)
+{
+    child=c;
+    if (child) child->setParent(this);
+    setParser(p);
+    setParent(par);
+    this->function=function;
+    this->parameterNames=parameterNames;
+}
+
+QFMathParser::qfmpResult QFMathParser::qfmpFunctionAssignNode::evaluate()
+{
+    QFMathParser::qfmpResult res;
+    res.isValid=false;
+    /*if (child) res=child->evaluate();
+  //  std::cout<<"assign: "<<variable<<"    "<<res.num<<std::endl;
+    getParser()->setVariable(variable, res);*/
+    getParser()->addFunction(function, parameterNames, child->copy(NULL));
+    return res;
+}
+
+QFMathParser::qfmpNode *QFMathParser::qfmpFunctionAssignNode::copy(QFMathParser::qfmpNode *par)
+{
+    if (child) return new QFMathParser::qfmpFunctionAssignNode(function, parameterNames, child->copy(NULL), getParser(), par);
+    else return new QFMathParser::qfmpFunctionAssignNode(function, parameterNames, NULL, getParser(), par);
+}
+
+QFMathParser::qfmpNode *QFMathParser::qfmpConstantNode::copy(QFMathParser::qfmpNode *par)
+{
+    return new QFMathParser::qfmpConstantNode(data, getParser(), par);
+}
+
+QFMathParser::qfmpNode *QFMathParser::qfmpInvalidNode::copy(QFMathParser::qfmpNode *par)
+{
+    return new QFMathParser::qfmpInvalidNode(getParser(), par);
+}
+

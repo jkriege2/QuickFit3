@@ -154,7 +154,8 @@
                       | NUMBER
                       | <b>[</b> vector_list <b>]</b>
                       | NAME
-                      | NAME <b>=</b> logical_expression                      
+                      | NAME <b>=</b> logical_expression
+                      | NAME(parameter_list) <b>=</b> logical_expression
                       | <b>+</b> primary | <b>-</b> primary | <b>!</b> primary | <b>not</b> primary | <b>~</b> primary
                       | <b>(</b> logical_expression <b>)</b>
                       | NAME<b>(</b> parameter_list <b>)</b>
@@ -389,22 +390,25 @@ class QFLIB_EXPORT QFMathParser
             qfmpNode* parent;      /*!< \brief points to the parent node */
           public:
             /** \brief virtual class destructor */
-            virtual ~qfmpNode() {};
+            virtual ~qfmpNode() {}
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate()=0;
 
             /** \brief return a pointer to the jkMathParser  */
-            inline QFMathParser* getParser(){ return parser; };
+            inline QFMathParser* getParser(){ return parser; }
 
             /** \brief set the jkMathParser  */
-            inline void setParser(QFMathParser* mp){ parser=mp; };
+            inline void setParser(QFMathParser* mp){ parser=mp; }
 
             /** \brief returns a pointer to the parent node */
-            inline qfmpNode* getParent(){ return parent; };
+            inline qfmpNode* getParent(){ return parent; }
 
             /** \brief sets the parent node  */
-            inline void setParent(qfmpNode* par) { parent=par; };
+            inline void setParent(qfmpNode* par) { parent=par; }
+
+            /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
+            virtual qfmpNode* copy(qfmpNode* par=NULL) =0;
         };
 
 
@@ -432,6 +436,9 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+
+            /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
+            virtual qfmpNode* copy(qfmpNode* par=NULL) ;
         };
 
         /**
@@ -456,6 +463,10 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+
+            /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
+            virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+
         };
 
         /**
@@ -480,6 +491,10 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+
+            /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
+            virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+
         };
 
         /**
@@ -503,6 +518,10 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+
+            /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
+            virtual qfmpNode* copy(qfmpNode* par=NULL);
+
         };
 
         /**
@@ -527,6 +546,39 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+
+            /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
+            virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+
+        };
+
+        /**
+         * \brief This class represents a variable assignment (a = expression)
+         */
+        class QFLIB_EXPORT qfmpFunctionAssignNode: public qfmpNode {
+          private:
+            qfmpNode* child;
+            QString function;
+            QStringList parameterNames;
+          public:
+            /** \brief standard destructor, also destroy the children (recursively)  */
+            ~qfmpFunctionAssignNode() ;
+
+            /** \brief constructor for a qfmpVariableAssignNode
+             *  \param function name of the function to assign to
+             *  \param parameterNames list of parameters of the new function
+             *  \param c child node/right-hand-side expression
+             *  \param p a pointer to a jkMathParser object
+             *  \param par a pointer to the parent node
+             */
+            qfmpFunctionAssignNode(QString function, QStringList parameterNames, qfmpNode* c, QFMathParser* p, qfmpNode* par);
+
+            /** \brief evaluate this node */
+            virtual qfmpResult evaluate();
+
+            /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
+            virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+
         };
 
         /**
@@ -545,6 +597,10 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate() { return data; };
+
+            /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
+            virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+
         };
 
         /**
@@ -563,6 +619,12 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+
+            inline QString getName() const { return var; }
+
+            /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
+            virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+
         };
 
 
@@ -580,6 +642,10 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate() { return parser->getInvalidResult(); };
+
+            /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
+            virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+
         };
 
 
@@ -658,6 +724,10 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+
+            /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
+            virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+
         };
 
         /**
@@ -687,6 +757,10 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief get the number of nodes in the list */
             int getCount() {return list.size();};
+
+            /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
+            virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+
         };
 
         /*@}*/
@@ -719,6 +793,7 @@ class QFLIB_EXPORT QFMathParser
 
                 void addVariable(const QString& name, const qfmpVariable& variable);
                 void setFunction(const QString& name, const qfmpFunctionDescriptor& function);
+                void addFunction(const QString& name, QStringList parameterNames, qfmpNode* function);
 
                 /** \brief  tests whether a variable exists */
                 bool variableExists(const QString& name){ return (variables.find(name)!=variables.end()); }
@@ -810,6 +885,13 @@ class QFLIB_EXPORT QFMathParser
 
         MTRand rng;
 
+        double readNumber();
+        double readBin();
+        double readHex();
+        double readOct();
+        double readDec();
+
+
 
         executionEnvironment environment;
 
@@ -863,6 +945,8 @@ class QFLIB_EXPORT QFMathParser
 		 * \param function a pointer to the implementation
 		 */
         void addFunction(const QString &name, qfmpEvaluateFunc function);
+
+        void addFunction(const QString& name, QStringList parameterNames, qfmpNode* function);
 
         /** \brief set the defining struct of the given variable */
         void addVariable(const QString& name, const qfmpVariable &value);
