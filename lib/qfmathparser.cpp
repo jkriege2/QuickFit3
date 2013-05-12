@@ -517,6 +517,7 @@ QString QFMathParser::resultTypeToString(QFMathParser::qfmpResultType type)
         case qfmpDoubleVector: return QObject::tr("number vector");
         case qfmpBool: return QObject::tr("bool");
         case qfmpString: return QObject::tr("string");
+        case qfmpVoid: return QObject::tr("void");
     }
     return QObject::tr("invalid");
 }
@@ -2400,6 +2401,7 @@ QString QFMathParser::qfmpResult::toString() const
         case qfmpDoubleVector: return QString("[ ")+doubleVecToQString(numVec)+QString(" ]");
         case qfmpString: return str;
         case qfmpBool: return boolToQString(boolean);
+        case qfmpVoid: break;
     }
     return "";
 
@@ -2413,6 +2415,7 @@ QString QFMathParser::qfmpResult::toTypeString() const
         case qfmpDoubleVector: return QString("[ ")+doubleVecToQString(numVec)+QObject::tr(" ] [number vector]");
         case qfmpString: return str+QObject::tr(" [string]");
         case qfmpBool: return boolToQString(boolean)+QObject::tr(" [bool]");
+        case qfmpVoid: return boolToQString(boolean)+QObject::tr(" [void]");
     }
     return resultTypeToString(type);
 
@@ -2482,6 +2485,26 @@ bool QFMathParser::qfmpResult::convertsToVector() const
 bool QFMathParser::qfmpResult::convertsToIntVector() const
 {
     return convertsToVector();
+}
+
+bool QFMathParser::qfmpResult::isUsableResult() const
+{
+    return isValid && (type!=qfmpVoid);
+}
+
+QFMathParser::qfmpResult QFMathParser::qfmpResult::invalidResult()
+{
+    QFMathParser::qfmpResult r;
+    r.isValid=false;
+    return r;
+}
+
+QFMathParser::qfmpResult QFMathParser::qfmpResult::voidResult()
+{
+    QFMathParser::qfmpResult r;
+    r.isValid=true;
+    r.type=qfmpVoid;
+    return r;
 }
 
 
@@ -2555,6 +2578,7 @@ void QFMathParser::qfmpVariable::set(const QFMathParser::qfmpResult &result)
             case qfmpDoubleVector: { if (!numVec) numVec=new QVector<double>; internal=true; } *numVec=result.numVec; break;
             case qfmpString: { if (!str) str=new QString; internal=true; } *str=result.str; break;
             case qfmpBool: { if (!boolean) boolean=new bool; internal=true; } *boolean=result.boolean; break;
+            case qfmpVoid: break;
         }
     } else {
         clearMemory();
@@ -2565,6 +2589,7 @@ void QFMathParser::qfmpVariable::set(const QFMathParser::qfmpResult &result)
             case qfmpDoubleVector: numVec=new QVector<double>; *numVec=result.numVec; break;
             case qfmpString: str=new QString; *str=result.str; break;
             case qfmpBool: boolean=new bool; *boolean=result.boolean; break;
+            case qfmpVoid: break;
         }
     }
 }
@@ -3013,13 +3038,8 @@ QFMathParser::qfmpFunctionAssignNode::qfmpFunctionAssignNode(QString function, Q
 
 QFMathParser::qfmpResult QFMathParser::qfmpFunctionAssignNode::evaluate()
 {
-    QFMathParser::qfmpResult res;
-    res.isValid=false;
-    /*if (child) res=child->evaluate();
-  //  std::cout<<"assign: "<<variable<<"    "<<res.num<<std::endl;
-    getParser()->setVariable(variable, res);*/
     getParser()->addFunction(function, parameterNames, child->copy(NULL));
-    return res;
+    return QFMathParser::qfmpResult::invalidResult();
 }
 
 QFMathParser::qfmpNode *QFMathParser::qfmpFunctionAssignNode::copy(QFMathParser::qfmpNode *par)

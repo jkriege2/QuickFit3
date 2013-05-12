@@ -723,7 +723,7 @@ QVariant QFRDRTable::evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode
         r=n->evaluate();
 
 
-        if (r.isValid) {
+        if (r.isUsableResult()) {
             if (r.type==QFMathParser::qfmpBool) {
                 result=QVariant(r.boolean);
             } else if (r.type==QFMathParser::qfmpDouble) {

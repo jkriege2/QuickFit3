@@ -51,13 +51,13 @@ void QFECalculatorDialog::showCache()
     ui->lstCache->clear();
     ui->lstFunctions->clear();
     QList<QPair<QString, QFMathParser::qfmpVariable> > vars= parser->getVariables();
-    for (size_t i=0; i<vars.size(); i++) {
+    for (int i=0; i<vars.size(); i++) {
         QString v=QString("%1 = ").arg(vars[i].first);
         v+=vars[i].second.toResult().toTypeString();
         ui->lstCache->addItem(v);
     }
     QList<QPair<QString, QFMathParser::qfmpFunctionDescriptor> > funs= parser->getFunctions();
-    for (size_t i=0; i<funs.size(); i++) {
+    for (int i=0; i<funs.size(); i++) {
         ui->lstFunctions->addItem(funs[i].second.toDefString());
     }
     ui->lstCache->setUpdatesEnabled(true);
@@ -80,17 +80,21 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
             result=tr("<font color=\"blue\">[boolean] %1</font>").arg(boolToQString(r.boolean));
         } else if (r.type==QFMathParser::qfmpDouble) {
             result=tr("<font color=\"blue\">[float] %1</font>").arg(r.num);
+        } else if (r.type==QFMathParser::qfmpDoubleVector) {
+            result=tr("<font color=\"blue\">[float] %1</font>").arg(listToString(r.numVec));
         } else if (r.type==QFMathParser::qfmpString) {
             result=tr("<font color=\"blue\">[string] %1</font>").arg(r.str);
+        } else if (r.type==QFMathParser::qfmpVoid) {
+            result=tr("<font color=\"blue\">[void]</font>");
         } else {
             result=tr("<font color=\"red\">[unknown] ? ? ?</font>");
         }
         QFMathParser::qfmpResult r1=parser->getVariableOrInvalid("ans");
         QFMathParser::qfmpResult r2=parser->getVariableOrInvalid("ans1");
-        if (r1.isValid) {
+        if (r1.isUsableResult()) {
             parser->addVariable("ans1", r1);
         }
-        if (r2.isValid) {
+        if (r2.isUsableResult()) {
             parser->addVariable("ans2", r2);
         }
         parser->addVariable("ans", r);

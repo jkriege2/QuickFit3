@@ -623,7 +623,8 @@ class QFLIB_EXPORT QFMathParser
         enum qfmpResultType {qfmpDouble,  /*!< \brief a floating-point number with double precision. This is also used to deal with integers */
                              qfmpString,  /*!< \brief a string of characters */
                              qfmpBool,   /*!< \brief a boolean value true|false */
-                             qfmpDoubleVector  /*!< \brief a vector of floating point numbers */
+                             qfmpDoubleVector,  /*!< \brief a vector of floating point numbers */
+                             qfmpVoid,  /*!< \brief a vector of floating point numbers */
                              };
 
         static QString resultTypeToString(qfmpResultType type);
@@ -657,11 +658,20 @@ class QFLIB_EXPORT QFMathParser
                 QFLIB_EXPORT void setBoolean(bool val);
                 QFLIB_EXPORT void setString(const QString& val);
                 QFLIB_EXPORT void setDoubleVec(const QVector<double>& val);
+                /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
                 QFLIB_EXPORT QVector<double> asVector() const;
+                /** \brief returns \c true, if the result may be converted to a vector of number */
                 QFLIB_EXPORT bool  convertsToVector() const;
+                /** \brief converst the result to a vector of integers (numbers and number vectors are converted!) */
                 QFLIB_EXPORT QVector<int> asIntVector() const;
+                /** \brief returns \c true, if the result may be converted to a vector of integers */
                 QFLIB_EXPORT bool  convertsToIntVector() const;
-
+                /** \brief returns \c true if the result is valid and not void */
+                QFLIB_EXPORT bool isUsableResult() const;
+                /** \brief returns an invalid result */
+                QFLIB_EXPORT static qfmpResult invalidResult();
+                /** \brief returns an void result */
+                QFLIB_EXPORT static qfmpResult voidResult();
 
                 bool isValid;
                 qfmpResultType type;   /*!< \brief type of the result */

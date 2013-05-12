@@ -319,6 +319,8 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         /*! \brief reset all fit results to the initial/global/default value in the current file but all indexes */
         virtual void resetAllFitResultsCurrentFileAllIndices();
         /*! \brief reset all fit results to the initial/global/default value in the current file but all indexes */
+        virtual void resetAllFitResultsAllIndices(QFRawDataRecord* rec);
+        /*! \brief reset all fit results to the initial/global/default value in the current file but all indexes */
         virtual void resetAllFitResultsAllFilesAllIndices();
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the

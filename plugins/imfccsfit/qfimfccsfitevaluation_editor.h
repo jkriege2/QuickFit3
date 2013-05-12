@@ -74,6 +74,8 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void setCurrentRun(int run);
 
         void configureForSPIMFCCS();
+
+        void filesSetActivated(const QModelIndex& idx);
     protected:
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFImFCCSFitEvaluationEditor *ui;
@@ -83,10 +85,15 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         QString currentSaveDirectory;
         QAction* actConfigureForSPIMFCCS;
         QAction* actFitCurrent;
-        QAction* actFitRunsCurrentMT;
-        QAction* actFitRunsCurrent;
+        QAction* actFitAllPixelsMT;
+        QAction* actFitAllPixels;
         QAction* actPrintReport;
         QAction* actSaveReport;
+
+        QAction* actResetCurrent;
+        QAction* actResetAllPixels;
+        QAction* actCopyToInitial;
+
         QMenu* menuImFCCSFit;
         QMenu* menuEvaluation;
 
@@ -125,18 +132,18 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief evaluate current file */
         void fitCurrent();
         /** \brief all runs/pixels current file */
-        void fitRunsCurrentThreaded();
+        void fitAllPixelsThreaded();
         /** \brief all runs/pixels current file, multi-threaded version */
-        void fitRunsCurrent();
+        void fitAllPixels();
 
         /** \brief display the data from the current raw data record */
         void displayData();
         /** \brief display the current evaluation results */
         void displayEvaluation();
-        /** \brief save a report of the evaluation results */
-        void saveReport();
-        /** \brief print a report of the evaluation results */
-        void printReport();
+
+        void resetCurrent();
+        void resetAllPixels();
+        void copyToInitial();
 
 
 };

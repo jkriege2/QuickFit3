@@ -18,9 +18,10 @@ bool QFImFCCSMatchRDRFunctor::matches(const QFRawDataRecord *record) const
 
 QFImFCCSFitEvaluationItem::QFImFCCSFitEvaluationItem(QFProject* parent):
     QFFitResultsByIndexAsVectorEvaluation("fcs_,dls_,fccs_", parent, false, false),
-    QFFCSWeightingTools(),
-    QFFitResultsByIndexMultiRDREvaluationFitTools()
+    QFFitResultsByIndexMultiRDREvaluationFitTools(),
+    QFFCSWeightingTools()
 {
+    qRegisterMetaType<QList<QFRawDataRecord*> >("QList<QFRawDataRecord*>");
     getEvaluationResultIDUsesFitFunction=true;
     matchFunctor=new QFImFCCSMatchRDRFunctor();
     m_weighting=EqualWeighting;
@@ -52,6 +53,9 @@ QFImFCCSFitEvaluationItem::QFImFCCSFitEvaluationItem(QFProject* parent):
     paramTable=new QFImFCCSParameterInputTable(this);
     connect(this, SIGNAL(parameterStructureChanged()), paramTable, SLOT(rebuildModel()));
     connect(this, SIGNAL(currentIndexChanged(int)), paramTable, SLOT(rebuildModel()));
+
+    fittedFileSetsModel=new QFImFCCSFileSetsModel(this);
+    connect(this, SIGNAL(filesetsChanged()), fittedFileSetsModel, SLOT(rebuildModel()));
     ensureFitFiles();
 }
 
@@ -222,6 +226,28 @@ void QFImFCCSFitEvaluationItem::setFitFile(int num, QFRawDataRecord *record)
 
 }
 
+void QFImFCCSFitEvaluationItem::setFitFiles(const QList<QFRawDataRecord *> &records)
+{
+    while (records.size()>fitFilesList.size()) fitFilesList.append(NULL);
+    for (int i=0; i<records.size(); i++) {
+        fitFilesList[i]=records[i];
+    }
+    emit parameterStructureChanged();
+    setDataChanged();
+    for (int i=0; i<records.size(); i++) {
+        emit fileChanged(i, records[i]);
+    }
+}
+
+void QFImFCCSFitEvaluationItem::setFitFileSet(int idx)
+{
+    if (idx>=0 && idx<fittedFileSets.size())  {
+        setFitFiles(fittedFileSets[idx]);
+    } else if (idx-fittedFileSets.size()>=0 && idx-fittedFileSets.size()<guessedFileSets.size()) {
+        setFitFiles(guessedFileSets[idx-fittedFileSets.size()]);
+    }
+}
+
 
 void QFImFCCSFitEvaluationItem::intWriteData(QXmlStreamWriter &w)
 {
@@ -245,6 +271,19 @@ void QFImFCCSFitEvaluationItem::intWriteData(QXmlStreamWriter &w)
         if (fitFilesList[ii]) {
             w.writeAttribute("id", QString::number(fitFilesList[ii]->getID()));
         }
+        w.writeEndElement();
+    }
+    w.writeEndElement();
+
+    w.writeStartElement("fittedfilesets");
+    for (int ii=0; ii<fittedFileSets.size(); ii++) {
+        w.writeStartElement("set");
+        QString l;
+        for (int jj=0; jj<fittedFileSets[ii].size(); jj++) {
+            if (jj>0)l+=",";
+            l+=QString::number(fittedFileSets[ii].at(jj)->getID());
+        }
+        w.writeAttribute("records", l);
         w.writeEndElement();
     }
     w.writeEndElement();
@@ -298,6 +337,38 @@ void QFImFCCSFitEvaluationItem::intReadData(QDomElement *e)
         e1=e1.nextSiblingElement("fitfile");
     }
     ensureFitFiles();
+
+    fittedFileSets.clear();
+    e1=e->firstChildElement("fittedfilesets").firstChildElement("set");
+    while (!e1.isNull()) {
+        QString recs=e1.attribute("records", "");
+        if (!recs.isEmpty()) {
+            QList<QFRawDataRecord*> fileSet;
+            QStringList sl=recs.split(',');
+            bool ok=true;
+            for (int i=0; i<sl.size(); i++) {
+                bool okI=false;
+                int id=sl[i].toInt(&okI);
+                if (okI && id>0) {
+                    QFRawDataRecord* rdr=project->getRawDataByID(id);
+                    if (isApplicable(rdr)) {
+                        fileSet.append(rdr);
+                    } else {
+                        ok=false;
+                        break;
+                    }
+                } else {
+                    ok=false;
+                    break;
+                }
+
+            }
+            if (ok) fittedFileSets.append(fileSet);
+        }
+
+        e1=e1.nextSiblingElement("set");
+    }
+    emit filesetsChanged();
 
     globalParams.clear();
     e1=e->firstChildElement("globalparams").firstChildElement("globalparam");
@@ -489,6 +560,51 @@ QList<QPair<int, QString> > QFImFCCSFitEvaluationItem::getLinkedParameterList(in
         }
     }
     return l;
+}
+
+const QList<QList<QFRawDataRecord *> > &QFImFCCSFitEvaluationItem::getFittedFiles() const
+{
+    return fittedFileSets;
+}
+
+const QList<QList<QFRawDataRecord *> > &QFImFCCSFitEvaluationItem::getGuessedFiles() const
+{
+    return guessedFileSets;
+}
+
+void QFImFCCSFitEvaluationItem::addFittedFileSet(const QList<QFRawDataRecord* > &fileset)
+{
+    if (!fittedFileSets.contains(fileset)) {
+        fittedFileSets.append(fileset);
+        guessFileSets(fileset, false);
+        emit filesetsChanged();
+    }
+}
+
+void QFImFCCSFitEvaluationItem::removeFittedFileSet(const QList<QFRawDataRecord* > &fileset)
+{
+    int oldS=fittedFileSets.size();
+    fittedFileSets.removeAll(fileset);
+    if (fittedFileSets.size()!=oldS) emit filesetsChanged();
+}
+
+QFImFCCSFileSetsModel *QFImFCCSFitEvaluationItem::getFileSetsModel() const
+{
+    return fittedFileSetsModel;
+}
+
+void QFImFCCSFitEvaluationItem::clearFittedFileSets()
+{
+    int oldS=fittedFileSets.size();
+    fittedFileSets.clear();
+    if (fittedFileSets.size()!=oldS) emit filesetsChanged();
+}
+
+void QFImFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &fileset, bool emitChangedSignal)
+{
+    int oldS=guessedFileSets.size();
+    guessedFileSets.clear();
+    if (emitChangedSignal && guessedFileSets.size()!=oldS) emit filesetsChanged();
 }
 
 
@@ -689,6 +805,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
         if (OK) {
             QFFitAlgorithm::FitResult result=doFitThread->getResults();
             cnt=0;
+            addFittedFileSet(records);
             for (int r=0; r<records.size(); r++) {
                 QFRawDataRecord* record=records[r];
                 QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);

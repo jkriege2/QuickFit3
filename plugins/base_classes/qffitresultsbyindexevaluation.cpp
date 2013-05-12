@@ -226,7 +226,13 @@ QString QFFitResultsByIndexEvaluation::getIndexName(QFRawDataRecord *rec, int in
 
 /*! \brief reset the all fit results to the initial/global/default value in the current file, but all indexs */
 void QFFitResultsByIndexEvaluation::resetAllFitResultsCurrentFileAllIndices() {
-    QFRawDataRecord* r=getHighlightedRecord();
+    resetAllFitResultsAllIndices(getHighlightedRecord());
+}
+
+void QFFitResultsByIndexEvaluation::resetAllFitResultsAllIndices(QFRawDataRecord *rec)
+{
+    QFRawDataRecord* r=rec;
+    if (!r) r=getHighlightedRecord();
     if (!r) return;
     r->disableEmitResultsChanged();
     for(int idx=getIndexMin(r); idx<=getIndexMax(r); idx++) {

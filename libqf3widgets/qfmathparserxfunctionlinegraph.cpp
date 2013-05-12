@@ -11,7 +11,7 @@ double QFMathParserXFunctionLineGraph_evaluate(double x, void* data) {
         d->parser->addVariableDouble("x", x);
         QFMathParser::qfmpResult r=d->node->evaluate();
 
-        if (r.isValid) {
+        if (r.isUsableResult()) {
             if (r.type==QFMathParser::qfmpBool) {
                 return r.boolean?1.0:0.0;
             } else if (r.type==QFMathParser::qfmpDouble) {

@@ -37,7 +37,7 @@ class QFFitResultsByIndexAsVectorEvaluation : public QFFitResultsByIndexEvaluati
         virtual void resetAllFitResultsAllFilesAllIndices();
         virtual void resetDefaultFitValue(const QString &id, QFRawDataRecord *r);
         virtual void resetDefaultFitFix(const QString &id, QFRawDataRecord *r);
-        virtual void resetAllFitResultsCurrent();
+        virtual void resetAllFitResultsCurrent(QFRawDataRecord *r=NULL);
         virtual void resetAllFitResults(QFRawDataRecord* r, const QString &resultID);
         virtual void resetDefaultFitValue(QFRawDataRecord *r, const QString &resultID, const QString &id);
         virtual void resetAllFitValue();

@@ -109,8 +109,10 @@ void QFFitResultsByIndexAsVectorEvaluation::resetAllFitResultsAllFilesAllIndices
     }
 }
 
-void QFFitResultsByIndexAsVectorEvaluation::resetAllFitResultsCurrent() {
-    resetAllFitResults(getHighlightedRecord(), getEvaluationResultID(getHighlightedRecord()));
+void QFFitResultsByIndexAsVectorEvaluation::resetAllFitResultsCurrent(QFRawDataRecord *r) {
+    QFRawDataRecord *rec=r;
+    if (!r) rec=getHighlightedRecord();
+    resetAllFitResults(rec, getEvaluationResultID(rec));
 }
 
 /*! \brief reset all parameters to the initial/global/default value in all files and all indexs */

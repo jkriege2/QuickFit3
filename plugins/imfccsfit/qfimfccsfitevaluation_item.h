@@ -17,6 +17,7 @@
 #include "qfmatchrdrfunctor.h"
 #include "qffitfunction.h"
 #include "qfglobalfittool.h"
+#include "qfimfccsfilesetsmodel.h"
 
 class QFImFCCSMatchRDRFunctor: public QFMatchRDRFunctor {
     public:
@@ -104,7 +105,20 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         int getLinkParameter(int file, QString parameter) const;
         /** \brief get a list if items a given parameter is linked to */
         QList<QPair<int, QString> > getLinkedParameterList(int file, QString parameter) const;
+
+        /** \brief returns a list of file sets (lists of QFRawDataRecord s) that have already been fitted */
+        const QList<QList<QFRawDataRecord* > >& getFittedFiles() const;
+        /** \brief returns a guessed list of other file sets  */
+        const QList<QList<QFRawDataRecord* > >& getGuessedFiles() const;
+        void removeFittedFileSet(const QList<QFRawDataRecord* >& fileset);
+        QFImFCCSFileSetsModel* getFileSetsModel() const;
+        void clearFittedFileSets();
+
     public slots:
+        void guessFileSets(const QList<QFRawDataRecord* >& fileset, bool emitChangedSignal=true);
+        void addFittedFileSet(const QList<QFRawDataRecord* >& fileset);
+        void setFitFiles(const QList<QFRawDataRecord*>& records);
+        void setFitFileSet(int idx);
         void setFitFile(int num, QFRawDataRecord *record);
         virtual void setFitFunction(int num, QString fitFunction);
         virtual void setFitFunction(QString fitFunction);
@@ -121,6 +135,7 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
 
     signals:
         void fileChanged(int num, QFRawDataRecord* record);
+        void filesetsChanged();
     protected:
 
         struct doFitData {
@@ -152,6 +167,11 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         QFEvaluationRawDataModelProxy* rdrProxy;
 
         QFImFCCSParameterInputTable* paramTable;
+
+        QFImFCCSFileSetsModel* fileSetsModel;
+        /** \brief a list of all file sets (list of QFRawDataRecord s) that have already been fited */
+        QList<QList<QFRawDataRecord* > > fittedFileSets, guessedFileSets;
+        QFImFCCSFileSetsModel* fittedFileSetsModel;
 
 
         /** \brief this list stores the several fit functions selected in the editor */

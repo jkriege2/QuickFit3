@@ -49,6 +49,8 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
 
 
 
+
+
     // set correlation/residual plots:
     ui->pltData->get_plotter()->set_gridPrinting(true);
     ui->pltData->get_plotter()->addGridPrintingPlotter(0,1,ui->pltResiduals->get_plotter());
@@ -102,15 +104,37 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     ui->btnEvaluateCurrent->setDefaultAction(actFitCurrent);
     menuEvaluation->addAction(actFitCurrent);
 
-    actFitRunsCurrentMT=new QAction(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels (MT)"), this);
-    connect(actFitRunsCurrentMT, SIGNAL(triggered()), this, SLOT(fitRunsCurrentThreaded()));
-    ui->btnEvaluateCurrentAllRuns->setDefaultAction(actFitRunsCurrentMT);
-    menuEvaluation->addAction(actFitRunsCurrentMT);
+    actFitAllPixelsMT=new QAction(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels (MT)"), this);
+    connect(actFitAllPixelsMT, SIGNAL(triggered()), this, SLOT(fitAllPixelsThreaded()));
+    actFitAllPixelsMT->setEnabled(false);
+    ui->btnEvaluateCurrentAllRuns->addAction(actFitAllPixelsMT);
+    menuEvaluation->addAction(actFitAllPixelsMT);
 
-    actFitRunsCurrent=new QAction(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels"), this);
-    connect(actFitRunsCurrent, SIGNAL(triggered()), this, SLOT(fitRunsCurrent()));
-    ui->btnEvaluateCurrentAllRuns->addAction(actFitRunsCurrent);
-    menuEvaluation->addAction(actFitRunsCurrent);
+    actFitAllPixels=new QAction(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels"), this);
+    connect(actFitAllPixels, SIGNAL(triggered()), this, SLOT(fitAllPixels()));
+    ui->btnEvaluateCurrentAllRuns->addAction(actFitAllPixels);
+    ui->btnEvaluateCurrentAllRuns->setDefaultAction(actFitAllPixels);
+    menuEvaluation->addAction(actFitAllPixels);
+
+    actResetCurrent=new QAction(tr("&Reset Current"), this);
+    actResetCurrent->setToolTip(tr("reset the currently displayed file (and pixel) to the initial parameters\nThis deletes all fit results stored for the current file."));
+    connect(actResetCurrent, SIGNAL(triggered()), this, SLOT(resetCurrent()));
+    ui->btnClearCurrent->setDefaultAction(actResetCurrent);
+    menuEvaluation->addSeparator();
+    menuEvaluation->addAction(actResetCurrent);
+
+    actResetAllPixels=new QAction(tr("Reset All &Pixels"), this);
+    actResetAllPixels->setToolTip(tr("reset all pixels to the initial parameters in the current file.\nThis deletes all fit results stored for all runs in the current file."));
+    connect(actResetAllPixels, SIGNAL(triggered()), this, SLOT(resetAllPixels()));
+    ui->btnClearAllPixels->setDefaultAction(actResetAllPixels);
+    menuEvaluation->addAction(actResetAllPixels);
+
+    actCopyToInitial=new QAction(tr("Copy to &Initial"), this);
+    actCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters,\n so they are used by files/runs that were not fit yet."));
+    connect(actCopyToInitial, SIGNAL(triggered()), this, SLOT(copyToInitial()));
+    ui->btnCopyToInitial->setDefaultAction(actCopyToInitial);
+    menuEvaluation->addAction(actCopyToInitial);
+
 
     actSaveReport=new QAction(QIcon(":/imfccsfit/fit_savereport.png"), tr("&Save Report"), this);
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
@@ -191,6 +215,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
     }
     ui->tableView->setModel(NULL);
     ui->pltOverview->setRDR(0);
+    ui->lstFileSets->setModel(NULL);
 
     if (old!=NULL && item_old!=NULL) {
         /* disconnect item_old and clear all widgets here */
@@ -213,6 +238,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         ui->cmbErrorDisplay->setCurrentIndex(item->getProperty("imFCCSFit/errordisplay", 0).toInt());
         ui->chkGrid->setChecked(item->getProperty("imFCCSFit/grid", true).toBool());
         ui->chkKey->setChecked(item->getProperty("imFCCSFit/key", true).toBool());
+        ui->lstFileSets->setModel(item->getFileSetsModel());
 
         ui->tableView->setModel(item->getParameterInputTableModel());
         connect(item->getParameterInputTableModel(), SIGNAL(modelRebuilt()), this, SLOT(ensureCorrectParamaterModelDisplay()));
@@ -223,6 +249,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         connect(item, SIGNAL(fileChanged(int,QFRawDataRecord*)), this, SLOT(fileChanged(int,QFRawDataRecord*)));
         connect(ui->datacut, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersChanged(int, int, int, int)));
         connect(item->getParameterInputTableModel(), SIGNAL(fitParamChanged()), this, SLOT(displayEvaluation()));
+        connect(ui->lstFileSets, SIGNAL(clicked(QModelIndex)), this, SLOT(filesSetActivated(QModelIndex)));
         ui->pltOverview->setRDR(item->getFitFile(0));
         updatingData=false;
     }
@@ -361,6 +388,13 @@ void QFImFCCSFitEvaluationEditor::configureForSPIMFCCS() {
     data->setFitFunction(2, "fccs_spim_diff2color");
 }
 
+void QFImFCCSFitEvaluationEditor::filesSetActivated(const QModelIndex &idx)
+{
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    data->setFitFileSet(idx.row());
+}
+
 void QFImFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
 {
     QElapsedTimer t;
@@ -438,7 +472,12 @@ void QFImFCCSFitEvaluationEditor::plotMouseMoved(double x, double y)
 }
 
 void QFImFCCSFitEvaluationEditor::displayEvaluation() {
+    if (!current) return;
+    QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+
     displayData();
+    eval->getParameterInputTableModel()->rebuildModel();
+
 }
 
 void QFImFCCSFitEvaluationEditor::displayData() {
@@ -618,14 +657,14 @@ void QFImFCCSFitEvaluationEditor::fitCurrent() {
     eval->getParameterInputTableModel()->rebuildModel();
 }
 
-void QFImFCCSFitEvaluationEditor::fitRunsCurrentThreaded()
+void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
 {
     if (!current) return;
     QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     if (!eval) return;
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
     if (!falg->isThreadSafe()) {
-        fitRunsCurrent();
+        fitAllPixels();
         return;
     }
     if (!falg) return;
@@ -747,7 +786,7 @@ void QFImFCCSFitEvaluationEditor::fitRunsCurrentThreaded()
     eval->getParameterInputTableModel()->rebuildModel();
 }
 
-void QFImFCCSFitEvaluationEditor::fitRunsCurrent()
+void QFImFCCSFitEvaluationEditor::fitAllPixels()
 {
     if (!current) return;
     QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
@@ -818,106 +857,72 @@ void QFImFCCSFitEvaluationEditor::fitRunsCurrent()
 
 
 
-void QFImFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
+
+void QFImFCCSFitEvaluationEditor::resetCurrent()
+{
     if (!current) return;
-    QFRawDataRecord* record=current->getHighlightedRecord(); 
-    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
     QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
-    if ((!eval)||(!record)/*||(!data)*/) return;
-
-    
-    // we use this QTextCursor to write the document
-    QTextCursor cursor(document);
-    
-    // here we define some generic formats
-    QTextCharFormat fText=cursor.charFormat();
-    fText.setFontPointSize(8);
-    QTextCharFormat fTextSmall=fText;
-    fTextSmall.setFontPointSize(0.85*fText.fontPointSize());
-    QTextCharFormat fTextBold=fText;
-    fTextBold.setFontWeight(QFont::Bold);
-    QTextCharFormat fTextBoldSmall=fTextBold;
-    fTextBoldSmall.setFontPointSize(0.85*fText.fontPointSize());
-    QTextCharFormat fHeading1=fText;
-    QTextBlockFormat bfLeft;
-    bfLeft.setAlignment(Qt::AlignLeft);
-    QTextBlockFormat bfRight;
-    bfRight.setAlignment(Qt::AlignRight);
-    QTextBlockFormat bfCenter;
-    bfCenter.setAlignment(Qt::AlignHCenter);
-
-    fHeading1.setFontPointSize(2*fText.fontPointSize());
-    fHeading1.setFontWeight(QFont::Bold);
-
-    
-    // insert heading
-    cursor.insertText(tr("imFCCS Fit Report:\n\n"), fHeading1);
-    cursor.movePosition(QTextCursor::End);
-
-    // insert table with some data
-    /*QTextTableFormat tableFormat;
-    tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
-    tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
-    QTextTable* table = cursor.insertTable(2, 2, tableFormat);
-    table->cellAt(0, 0).firstCursorPosition().insertText(tr("raw data:"), fTextBold);
-    table->cellAt(0, 1).firstCursorPosition().insertText(record->getName(), fText);
-    table->cellAt(1, 0).firstCursorPosition().insertText(tr("ID:"), fTextBold);
-    table->cellAt(1, 1).firstCursorPosition().insertText(QString::number(record->getID()));*/
-    cursor.movePosition(QTextCursor::End);
-
-}
-
-void QFImFCCSFitEvaluationEditor::saveReport() {
-    /* it is often a good idea to have a possibility to save or print a report about the fit results.
-       This is implemented in a generic way here.    */
-
-    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
-                                currentSaveDirectory,
-                                tr("PDF File (*.pdf);;PostScript File (*.ps)"));
-
-    if (!fn.isEmpty()) {
-        currentSaveDirectory=QFileInfo(fn).absolutePath();
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-        QFileInfo fi(fn);
-        QPrinter* printer=new QPrinter();
-        printer->setPaperSize(QPrinter::A4);
-        printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-        printer->setOrientation(QPrinter::Portrait);
-        printer->setOutputFormat(QPrinter::PdfFormat);
-        if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
-        printer->setOutputFileName(fn);
-        QTextDocument* doc=new QTextDocument();
-        doc->setTextWidth(printer->pageRect().size().width());
-        createReportDoc(doc);
-        doc->print(printer);
-        delete doc;
-        delete printer;
-        QApplication::restoreOverrideCursor();
-    }
-}
-
-void QFImFCCSFitEvaluationEditor::printReport() {
-    /* it is often a good idea to have a possibility to save or print a report about the fit results.
-       This is implemented in a generic way here.    */
-    QPrinter* p=new QPrinter();
-
-    p->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-    p->setOrientation(QPrinter::Portrait);
-    QPrintDialog *dialog = new QPrintDialog(p, this);
-    dialog->setWindowTitle(tr("Print Report"));
-    if (dialog->exec() != QDialog::Accepted) {
-        delete p;
-        return;
-    }
-
+    if (!eval) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QTextDocument* doc=new QTextDocument();
-    doc->setTextWidth(p->pageRect().size().width());
-    createReportDoc(doc);
-    doc->print(p);
-    delete p;
-    delete doc;
+    for (int f=0; f<eval->getFitFileCount(); f++) {
+        QFRawDataRecord* rec=eval->getFitFile(f);
+        eval->resetAllFitResultsCurrent(rec);
+    }
+    displayEvaluation();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFImFCCSFitEvaluationEditor::resetAllPixels()
+{
+    if (!current) return;
+    QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!eval) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+    for (int f=0; f<eval->getFitFileCount(); f++) {
+        QFRawDataRecord* rec=eval->getFitFile(f);
+        eval->resetAllFitResultsAllIndices(rec);
+    }
+    displayEvaluation();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFImFCCSFitEvaluationEditor::copyToInitial()
+{
+    if (!current) return;
+    QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!eval) return;
+
+    eval->set_doEmitResultsChanged(false);
+    eval->set_doEmitPropertiesChanged(false);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+    for (int f=0; f<eval->getFitFileCount(); f++) {
+        QFRawDataRecord* rec=eval->getFitFile(f);
+        QFFitFunction* ffunc=eval->getFitFunction(f);
+
+        double* params=eval->allocFillParameters(ffunc);
+
+
+        for (int i=0; i<ffunc->paramCount(); i++) {
+            QString id=ffunc->getParameterID(i);
+            double value=eval->getFitValue(id, rec);
+            double error=eval->getFitError(id, rec);
+            bool fix=eval->getFitFix(id, rec);
+            if (ffunc->isParameterVisible(i, params)) {
+                eval->setInitFitFix(id, fix, rec);
+                eval->setInitFitValue(id, value, error, rec);
+                //qDebug()<<"set("<<rec->getID()<<") "<<id<<" = "<<value<<" +/- "<<error;
+            };
+        }
+        free(params);
+    }
+
+
+    eval->set_doEmitResultsChanged(true);
+    eval->set_doEmitPropertiesChanged(true);
+    eval->emitResultsChanged();
+
     QApplication::restoreOverrideCursor();
 }
 
@@ -994,3 +999,52 @@ int QFImFCCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int index
     return 0;
 }
 
+
+void QFImFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
+    QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if ((!eval)||(!record)/*||(!data)*/) return;
+
+
+    // we use this QTextCursor to write the document
+    QTextCursor cursor(document);
+
+    // here we define some generic formats
+    QTextCharFormat fText=cursor.charFormat();
+    fText.setFontPointSize(8);
+    QTextCharFormat fTextSmall=fText;
+    fTextSmall.setFontPointSize(0.85*fText.fontPointSize());
+    QTextCharFormat fTextBold=fText;
+    fTextBold.setFontWeight(QFont::Bold);
+    QTextCharFormat fTextBoldSmall=fTextBold;
+    fTextBoldSmall.setFontPointSize(0.85*fText.fontPointSize());
+    QTextCharFormat fHeading1=fText;
+    QTextBlockFormat bfLeft;
+    bfLeft.setAlignment(Qt::AlignLeft);
+    QTextBlockFormat bfRight;
+    bfRight.setAlignment(Qt::AlignRight);
+    QTextBlockFormat bfCenter;
+    bfCenter.setAlignment(Qt::AlignHCenter);
+
+    fHeading1.setFontPointSize(2*fText.fontPointSize());
+    fHeading1.setFontWeight(QFont::Bold);
+
+
+    // insert heading
+    cursor.insertText(tr("imFCCS Fit Report:\n\n"), fHeading1);
+    cursor.movePosition(QTextCursor::End);
+
+    // insert table with some data
+    /*QTextTableFormat tableFormat;
+    tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
+    tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
+    QTextTable* table = cursor.insertTable(2, 2, tableFormat);
+    table->cellAt(0, 0).firstCursorPosition().insertText(tr("raw data:"), fTextBold);
+    table->cellAt(0, 1).firstCursorPosition().insertText(record->getName(), fText);
+    table->cellAt(1, 0).firstCursorPosition().insertText(tr("ID:"), fTextBold);
+    table->cellAt(1, 1).firstCursorPosition().insertText(QString::number(record->getID()));*/
+    cursor.movePosition(QTextCursor::End);
+
+}
