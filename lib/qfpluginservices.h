@@ -20,6 +20,10 @@ class QFEvaluationPropertyEditor;
 class QFRawDataRecord;
 class QFRawDataPropertyEditor;
 class QFProject;
+class QFMathParser;
+class qfmpResult;
+
+typedef qfmpResult (*qfmpCFunction)(const qfmpResult*, unsigned int, QFMathParser*);
 
 
 /*! \brief wrapper class that allows plugins to access basic logging services
@@ -257,6 +261,18 @@ class QFLIB_EXPORT QFPluginServices {
         virtual QFRawDataPropertyEditor* openRawDataEditor(QFRawDataRecord* rdr, bool alwaysCreateNew=true)=0;
         /** \brief returns a pointer to the currently loaded QFProject */
         virtual QFProject* getCurrentProject() const=0;
+
+        /** \brief  add a function to the list of global functions available in <u>all</u> QFMathParser objects, that are defined by a call its addStandardFunctions() (or the constructor) */
+        virtual void addGlobalFunction(const QString& name, qfmpCFunction function)=0;
+        /** \brief  add a variablen to the list of global variables available in <u>all</u> QFMathParser objects, that are defined by a call to addStandardVariables() (or the constructor) */
+        virtual void addGlobalVariable(const QString& name, double value)=0;
+        /** \brief  add a variablen to the list of global variables available in <u>all</u> QFMathParser objects, that are defined by a call to addStandardVariables() (or the constructor) */
+        virtual void addGlobalVariable(const QString& name, const QVector<double>& value)=0;
+        /** \brief  add a variablen to the list of global variables available in <u>all</u> QFMathParser objects, that are defined by a call to addStandardVariables() (or the constructor) */
+        virtual void addGlobalVariable(const QString& name, const QString& value)=0;
+        /** \brief  add a variablen to the list of global variables available in <u>all</u> QFMathParser objects, that are defined by a call to addStandardVariables() (or the constructor) */
+        virtual void addGlobalVariable(const QString& name, bool value)=0;
+
     private:
         static QFPluginServices* inst;
 };

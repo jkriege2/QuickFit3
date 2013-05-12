@@ -5,8 +5,8 @@
 #include "qfpluginservices.h"
 #include "qfrdrtableparserfunctions.h"
 
-QFMathParser::qfmpResult QFRDRTableFormulaDialog_dummy(const QFMathParser::qfmpResult* params, unsigned char n, QFMathParser* p) {
-    QFMathParser::qfmpResult res;
+qfmpResult QFRDRTableFormulaDialog_dummy(const qfmpResult* params, unsigned char n, QFMathParser* p) {
+    qfmpResult res;
 
     return res;
 }

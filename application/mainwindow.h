@@ -27,6 +27,7 @@
 #include "qfhistogramservice.h"
 #include "qfhistogramview.h"
 #include "qfelidedlabel.h"
+#include "qfmathparser.h"
 
 
 
@@ -144,6 +145,18 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual QFRawDataPropertyEditor* openRawDataEditor(QFRawDataRecord* rdr, bool alwaysCreateNew=true);
         /** \copydoc QFPluginServices::getCurrentProject() */
         virtual QFProject* getCurrentProject() const;
+
+        /** \copydoc QFPluginServices::addGlobalFunction() */
+        virtual void addGlobalFunction(const QString& name, qfmpCFunction function);
+        /** \copydoc QFPluginServices::addGlobalVariable() */
+        virtual void addGlobalVariable(const QString& name, double value);
+        /** \copydoc QFPluginServices::addGlobalVariable() */
+        virtual void addGlobalVariable(const QString& name, const QVector<double>& value);
+        /** \copydoc QFPluginServices::addGlobalVariable() */
+        virtual void addGlobalVariable(const QString& name, const QString& value);
+        /** \copydoc QFPluginServices::addGlobalVariable() */
+        virtual void addGlobalVariable(const QString& name, bool value);
+
 
         /** \brief return the assets directory  of the online help for the given plugin ID */
         virtual QString getPluginAssetsDirectory(const QString& pluginID);

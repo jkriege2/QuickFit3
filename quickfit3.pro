@@ -106,6 +106,11 @@ SUBDIRS += plg_calc_diffcoeff
 plg_calc_diffcoeff.subdir=./plugins/calc_diffcoeff
 plg_calc_diffcoeff.depends = lib libqf3widgets
 
+SUBDIRS += plg_qfe_defaultmathparserextensions
+plg_qfe_defaultmathparserextensions.subdir=./plugins/qfe_defaultmathparserextensions
+plg_qfe_defaultmathparserextensions.depends = lib libqf3widgets
+
+
 SUBDIRS += plg_qfe_calculator
 plg_qfe_calculator.subdir=./plugins/qfe_calculator
 plg_qfe_calculator.depends = lib libqf3widgets

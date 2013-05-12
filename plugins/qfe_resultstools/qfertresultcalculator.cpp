@@ -128,11 +128,11 @@ void QFERTResultCalculator::eval()
             p.addVariableDouble("A", resA.getAsDouble());
             p.addVariableDouble("B", resB.getAsDouble());
             QFMathParser::qfmpNode* n=p.parse(getExpression());
-            QFMathParser::qfmpResult r=n->evaluate();
+            qfmpResult r=n->evaluate();
             if (!p.hasErrorOccured()) {
-                if (r.type==QFMathParser::qfmpDouble) {
+                if (r.type==qfmpDouble) {
                     rdrA->resultsSetNumber(getEvalIDA(), getNewResultName(), r.num);
-                } else if (r.type==QFMathParser::qfmpBool) {
+                } else if (r.type==qfmpBool) {
                     rdrA->resultsSetBoolean(getEvalIDA(), getNewResultName(), r.boolean);
                 } else {
                     rdrA->resultsSetString(getEvalIDA(), getNewResultName(), QFMathParser::resultToString(r));
@@ -159,11 +159,11 @@ void QFERTResultCalculator::eval()
                 for (int i=0; i<qMin(sizeA, sizeB); i++) {
                     p.addVariableDouble("A", rA.value(i, 0));
                     p.addVariableDouble("B", rB.value(i, 0));
-                    QFMathParser::qfmpResult r=n->evaluate();
+                    qfmpResult r=n->evaluate();
                     if (!p.hasErrorOccured()) {
-                        if (r.type==QFMathParser::qfmpDouble) {
+                        if (r.type==qfmpDouble) {
                             res<<r.num;
-                        } else if (r.type==QFMathParser::qfmpBool) {
+                        } else if (r.type==qfmpBool) {
                             resBo<<r.boolean;
                             isBool=true;
                         } else {

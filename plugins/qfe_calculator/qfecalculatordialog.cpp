@@ -72,25 +72,25 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
     cur.movePosition(QTextCursor::Start);
     cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&gt;&gt; <i>%1</i></tt><br>").arg(expression)));
     parser->resetErrors();
-    QFMathParser::qfmpResult r=parser->evaluate(expression);
+    qfmpResult r=parser->evaluate(expression);
 
     QString result;
     if (r.isValid) {
-        if (r.type==QFMathParser::qfmpBool) {
+        if (r.type==qfmpBool) {
             result=tr("<font color=\"blue\">[boolean] %1</font>").arg(boolToQString(r.boolean));
-        } else if (r.type==QFMathParser::qfmpDouble) {
+        } else if (r.type==qfmpDouble) {
             result=tr("<font color=\"blue\">[float] %1</font>").arg(r.num);
-        } else if (r.type==QFMathParser::qfmpDoubleVector) {
+        } else if (r.type==qfmpDoubleVector) {
             result=tr("<font color=\"blue\">[float] %1</font>").arg(listToString(r.numVec));
-        } else if (r.type==QFMathParser::qfmpString) {
+        } else if (r.type==qfmpString) {
             result=tr("<font color=\"blue\">[string] %1</font>").arg(r.str);
-        } else if (r.type==QFMathParser::qfmpVoid) {
+        } else if (r.type==qfmpVoid) {
             result=tr("<font color=\"blue\">[void]</font>");
         } else {
             result=tr("<font color=\"red\">[unknown] ? ? ?</font>");
         }
-        QFMathParser::qfmpResult r1=parser->getVariableOrInvalid("ans");
-        QFMathParser::qfmpResult r2=parser->getVariableOrInvalid("ans1");
+        qfmpResult r1=parser->getVariableOrInvalid("ans");
+        qfmpResult r2=parser->getVariableOrInvalid("ans1");
         if (r1.isUsableResult()) {
             parser->addVariable("ans1", r1);
         }

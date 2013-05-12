@@ -14,7 +14,7 @@
 
  */
 
-/** \file jkmathparser.h
+/** \file QFMathParser.h
  *  \ingroup qf3lib_mathtools_parser
  */
 #include "lib_imexport.h"
@@ -58,18 +58,18 @@
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    QFMathParser::qfmpResult r;\
-    r.type=QFMathParser::qfmpDouble;\
+qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    qfmpResult r;\
+    r.type=qfmpDouble;\
     if (n!=1) {\
         p->qfmpError(QObject::tr("%1(...) needs exacptly 1 argument").arg(#NAME_IN_PARSER));\
         r.isValid=false;\
         return r;\
     }\
-    if (params[0].type==QFMathParser::qfmpDouble) {\
+    if (params[0].type==qfmpDouble) {\
         r.num=CFUNC(params[0].num);\
-    } else if(params[0].type==QFMathParser::qfmpDoubleVector) {\
-        r.type=QFMathParser::qfmpDoubleVector;\
+    } else if(params[0].type==qfmpDoubleVector) {\
+        r.type=qfmpDoubleVector;\
         r.numVec.resize(params[0].numVec.size());\
         for (int i=0; i<params[0].numVec.size(); i++) {\
             r.numVec[i]=CFUNC(params[0].numVec[i]);\
@@ -99,16 +99,16 @@ QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned 
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    QFMathParser::qfmpResult r;\
-    r.type=QFMathParser::qfmpDouble;\
+qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    qfmpResult r;\
+    r.type=qfmpDouble;\
     if (n!=1) {\
         p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg(#NAME_IN_PARSER));\
         r.isValid=false;\
         return r;\
     }\
-    if(params[0].type==QFMathParser::qfmpDoubleVector) {\
-        r.type=QFMathParser::qfmpDoubleVector;\
+    if(params[0].type==qfmpDoubleVector) {\
+        r.type=qfmpDoubleVector;\
         r.numVec=CFUNC(params[0].numVec);\
     } else {\
         p->qfmpError(QObject::tr("%1(x) argument has to be vector of numbers").arg(#NAME_IN_PARSER));\
@@ -130,16 +130,16 @@ QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned 
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    QFMathParser::qfmpResult r;\
-    r.type=QFMathParser::qfmpDouble;\
+qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    qfmpResult r;\
+    r.type=qfmpDouble;\
     if (n!=1) {\
         p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg(#NAME_IN_PARSER));\
         r.isValid=false;\
         return r;\
     }\
-    if(params[0].type==QFMathParser::qfmpDoubleVector) {\
-        r.type=QFMathParser::qfmpDouble;\
+    if(params[0].type==qfmpDoubleVector) {\
+        r.type=qfmpDouble;\
         r.num=CFUNC(params[0].numVec);\
     } else {\
         p->qfmpError(QObject::tr("%1(x) argument has to be a vector of numbers").arg(#NAME_IN_PARSER));\
@@ -161,16 +161,16 @@ QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned 
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_2PARAM1VEC_VECTONUM_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    QFMathParser::qfmpResult r;\
-    r.type=QFMathParser::qfmpDouble;\
+qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    qfmpResult r;\
+    r.type=qfmpDouble;\
     if (n!=2) {\
         p->qfmpError(QObject::tr("%1(x, p) needs exacptly 2 argument").arg(#NAME_IN_PARSER));\
         r.isValid=false;\
         return r;\
     }\
-    if(params[0].type==QFMathParser::qfmpDoubleVector && params[1].type==QFMathParser::qfmpDouble) {\
-        r.type=QFMathParser::qfmpDouble;\
+    if(params[0].type==qfmpDoubleVector && params[1].type==qfmpDouble) {\
+        r.type=qfmpDouble;\
         r.num=CFUNC(params[0].numVec, params[1].num);\
     } else {\
         p->qfmpError(QObject::tr("%1(x, p) argument x has to be a vector of numbers and p a number").arg(#NAME_IN_PARSER));\
@@ -194,15 +194,15 @@ QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned 
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    QFMathParser::qfmpResult r;\
-    r.type=QFMathParser::qfmpString;\
+qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    qfmpResult r;\
+    r.type=qfmpString;\
     if (n!=1) {\
         p->qfmpError(QObject::tr("%1(...) needs exacptly 1 argument").arg(#NAME_IN_PARSER));\
         r.isValid=false;\
         return r;\
     }\
-    if (params[0].type==QFMathParser::qfmpString) {\
+    if (params[0].type==qfmpString) {\
         r.str=CFUNC(params[0].str);\
     } else {\
         p->qfmpError(QObject::tr("%1(...) argument has to be a string").arg(#NAME_IN_PARSER));\
@@ -229,26 +229,26 @@ QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned 
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_2PARAM2VEC_NUMERIC_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    QFMathParser::qfmpResult r;\
-    r.type=QFMathParser::qfmpDouble;\
+qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    qfmpResult r;\
+    r.type=qfmpDouble;\
     if (n!=2) {\
         p->qfmpError(QObject::tr("%1(...) needs exactly 2 argument").arg(#NAME_IN_PARSER));\
         r.isValid=false;\
         return r;\
     }\
     double pa=0; \
-    if (params[0].type==QFMathParser::qfmpDouble) {\
+    if (params[0].type==qfmpDouble) {\
         pa=params[0].num;\
     } else {\
         p->qfmpError(QObject::tr("%1(...) first argument has to be a number").arg(#NAME_IN_PARSER));\
         r.isValid=false;\
         return r;\
     }\
-    if (params[1].type==QFMathParser::qfmpDouble) {\
+    if (params[1].type==qfmpDouble) {\
         r.num=CFUNC(pa, params[1].num);\
-    } else if(params[1].type==QFMathParser::qfmpDoubleVector) {\
-        r.type=QFMathParser::qfmpDoubleVector;\
+    } else if(params[1].type==qfmpDoubleVector) {\
+        r.type=qfmpDoubleVector;\
         r.numVec.resize(params[1].numVec.size());\
         for (int i=0; i<params[1].numVec.size(); i++) {\
             r.numVec[i]=CFUNC(pa, params[1].numVec[i]);\
@@ -274,26 +274,26 @@ QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned 
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_2PARAM1VEC_NUMERIC_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    QFMathParser::qfmpResult r;\
-    r.type=QFMathParser::qfmpDouble;\
+qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    qfmpResult r;\
+    r.type=qfmpDouble;\
     if (n!=2) {\
         p->qfmpError(QObject::tr("%1(...) needs exactly 2 argument").arg(#NAME_IN_PARSER));\
         r.isValid=false;\
         return r;\
     }\
     double pa=0; \
-    if (params[1].type==QFMathParser::qfmpDouble) {\
+    if (params[1].type==qfmpDouble) {\
         pa=params[1].num;\
     } else {\
         p->qfmpError(QObject::tr("%1(...) second argument has to be a number").arg(#NAME_IN_PARSER));\
         r.isValid=false;\
         return r;\
     }\
-    if (params[0].type==QFMathParser::qfmpDouble) {\
+    if (params[0].type==qfmpDouble) {\
         r.num=CFUNC(params[0].num, pa);\
-    } else if(params[0].type==QFMathParser::qfmpDoubleVector) {\
-        r.type=QFMathParser::qfmpDoubleVector;\
+    } else if(params[0].type==qfmpDoubleVector) {\
+        r.type=qfmpDoubleVector;\
         r.numVec.resize(params[0].numVec.size());\
         for (int i=0; i<params[0].numVec.size(); i++) {\
             r.numVec[i]=CFUNC(params[0].numVec[i], pa);\
@@ -320,23 +320,23 @@ QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned 
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_2PARAM12VEC_NUMERIC_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    QFMathParser::qfmpResult r;\
-    r.type=QFMathParser::qfmpDouble;\
+qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    qfmpResult r;\
+    r.type=qfmpDouble;\
     if (n!=2) {\
         p->qfmpError(QObject::tr("%1(...) needs exactly 2 argument").arg(#NAME_IN_PARSER));\
         r.isValid=false;\
         return r;\
     }\
-    if (params[0].type==QFMathParser::qfmpDouble && params[1].type==QFMathParser::qfmpDouble) {\
+    if (params[0].type==qfmpDouble && params[1].type==qfmpDouble) {\
     r.num=CFUNC(params[0].num, params[1].num);\
-    } else if(params[0].type==QFMathParser::qfmpDoubleVector && params[1].type==QFMathParser::qfmpDoubleVector) {\
+    } else if(params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector) {\
         if (params[0].numVec.size()!=params[1].numVec.size()) {\
             p->qfmpError(QObject::tr("%1(x,y) both arguments have to have same length").arg(#NAME_IN_PARSER));\
             r.isValid=false;\
             return r;\
         }\
-        r.type=QFMathParser::qfmpDoubleVector;\
+        r.type=qfmpDoubleVector;\
         r.numVec.resize(params[0].numVec.size());\
         for (int i=0; i<params[0].numVec.size(); i++) {\
             r.numVec[i]=CFUNC(params[0].numVec[i], params[1].numVec[i]);\
@@ -358,6 +358,83 @@ QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned 
 #define QFMATHPARSER_DEFINE_2PARAM12VEC_NUMERIC_FUNC_SIMPLE(FName, CFUNC) QFMATHPARSER_DEFINE_2PARAM12VEC_NUMERIC_FUNC(FName, CFUNC, CFUNC)
 
 
+
+
+/**
+ * \defgroup qfmpultil utilities for QFMathParser function parser class
+ * \ingroup qf3lib_mathtools_parser
+ */
+/*@{*/
+
+/** possible result types
+ *    - \c qfmpDouble: a floating-point number with double precision. This is
+ *                     also used to deal with integers
+ *    - \c qfmpString: a string of characters
+ *    - \c qfmpBool:   a boolean value true|false
+ *  .
+ */
+enum qfmpResultType {qfmpDouble,  /*!< \brief a floating-point number with double precision. This is also used to deal with integers */
+                     qfmpString,  /*!< \brief a string of characters */
+                     qfmpBool,   /*!< \brief a boolean value true|false */
+                     qfmpDoubleVector,  /*!< \brief a vector of floating point numbers */
+                     qfmpVoid,  /*!< \brief a vector of floating point numbers */
+                     };
+
+/** \brief result of any expression  */
+struct QFLIB_EXPORT qfmpResult {
+    public:
+        qfmpResult();
+        qfmpResult(double value);
+        qfmpResult(QString value);
+        qfmpResult(bool value);
+        qfmpResult(const QVector<double> &value);
+
+
+        /** \brief convert the value this struct representens into a QString */
+        QFLIB_EXPORT QString toString() const;
+
+        /** \brief convert the value this struct representens into a QString and adds the name of the datatype in \c [...] */
+        QFLIB_EXPORT QString toTypeString() const;
+
+        /** \brief convert the value this struct to an integer */
+        QFLIB_EXPORT int32_t toInteger() const;
+        /** \brief convert the value this struct to an integer */
+        QFLIB_EXPORT uint32_t toUInt() const;
+        /** \brief is this result convertible to integer? */
+        QFLIB_EXPORT bool isInteger() const;
+        /** \brief is this result convertible to unsigned integer? */
+        QFLIB_EXPORT bool isUInt() const;
+
+        QFLIB_EXPORT void setDouble(double val);
+        QFLIB_EXPORT void setBoolean(bool val);
+        QFLIB_EXPORT void setString(const QString& val);
+        QFLIB_EXPORT void setDoubleVec(const QVector<double>& val);
+        /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
+        QFLIB_EXPORT QVector<double> asVector() const;
+        /** \brief returns \c true, if the result may be converted to a vector of number */
+        QFLIB_EXPORT bool  convertsToVector() const;
+        /** \brief converst the result to a vector of integers (numbers and number vectors are converted!) */
+        QFLIB_EXPORT QVector<int> asIntVector() const;
+        /** \brief returns \c true, if the result may be converted to a vector of integers */
+        QFLIB_EXPORT bool  convertsToIntVector() const;
+        /** \brief returns \c true if the result is valid and not void */
+        QFLIB_EXPORT bool isUsableResult() const;
+        /** \brief returns an invalid result */
+        QFLIB_EXPORT static qfmpResult invalidResult();
+        /** \brief returns an void result */
+        QFLIB_EXPORT static qfmpResult voidResult();
+
+        bool isValid;
+        qfmpResultType type;   /*!< \brief type of the result */
+        QString str;       /*!< \brief contains result if \c type==qfmpString */
+        double num;            /*!< \brief contains result if \c type==qfmpDouble */
+        bool boolean;          /*!< \brief contains result if \c type==qfmpBool */
+        QVector<double> numVec; /*!< \brief contains result if \c type==qfmpDoubleVector */
+
+};
+/*@}*/
+
+
 /*! \brief A simple function parser to parse (build memory tree representation) and
            evaluate simple mathematical expressions
     \ingroup qf3lib_mathtools_parser
@@ -377,7 +454,7 @@ QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned 
  memory is provided by the calling program. The parser supports a variable
  assign operation \code a=<expression>\endcode  which allows to define new
  variables during evaluation. There are some mathematical standard constants
- registered by calling jkMathParser::addStandardVariables():
+ registered by calling QFMathParser::addStandardVariables():
    - \c pi = \f$ \pi \f$
    - \c e = \f$ \exp(1) \f$
    - \c sqrt2 = \f$ \sqrt{2} \f$
@@ -403,8 +480,8 @@ QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned 
    - \c kB = \f$ k_B=1.380650424\cdot 10^{-23}\;\mathrm{\frac{J}{K}}  \f$ (Boltzman constant)
    - \c kB_eV = \f$ k_B=8.61734315\cdot 10^{-5}\;\mathrm{\frac{eV}{K}}  \f$ (Boltzman constant)
 .
- You can add user-defined contants by calling jkMathParser::addVariableDouble()
- jkMathParser::addVariableBoolean() or jkMathParser::addVariableString()
+ You can add user-defined contants by calling QFMathParser::addVariableDouble()
+ QFMathParser::addVariableBoolean() or QFMathParser::addVariableString()
 
 
  \section qfmp_functions functions:
@@ -425,11 +502,11 @@ QFMathParser::qfmpResult FName(const QFMathParser::qfmpResult* params, unsigned 
    - ...
  .
 
- these functions are registere by calling jkMathParser::addStandardFunctions().
- you can add new functions by calling jkMathParser::addFunction();
+ these functions are registere by calling QFMathParser::addStandardFunctions().
+ you can add new functions by calling QFMathParser::addFunction();
 
  \section qfmp_resultsofparsing result of parsing and evaluation:
- The result of calling jkMathParser::parse()
+ The result of calling QFMathParser::parse()
  will be a tree-like structure in memory. The parse() function will return
  a pointer to the root node of this structure. All nodes inherit from
  qfmpNode class. To evaluate such a structure simply call qfmpNode::evaluate()
@@ -539,7 +616,7 @@ class QFLIB_EXPORT QFMathParser
 {
     protected:
 
-        /** \brief the possible tokens that can be recognized by the tokenizer in jkMathParser::getToken() */
+        /** \brief the possible tokens that can be recognized by the tokenizer in QFMathParser::getToken() */
         enum qfmpTokenType {
             END,                /*!< \brief end token */
             PRINT,              /*!< \brief a semicolon ';' */
@@ -607,80 +684,15 @@ class QFLIB_EXPORT QFMathParser
         /*@}*/
 
     public:
+
         /**
-         * \defgroup qfmpultil utilities for jkMathParser function parser class
+         * \defgroup qfmpultil utilities for QFMathParser function parser class
          * \ingroup qf3lib_mathtools_parser
          */
         /*@{*/
 
-        /** possible result types
-         *    - \c qfmpDouble: a floating-point number with double precision. This is
-         *                     also used to deal with integers
-         *    - \c qfmpString: a string of characters
-         *    - \c qfmpBool:   a boolean value true|false
-         *  .
-         */
-        enum qfmpResultType {qfmpDouble,  /*!< \brief a floating-point number with double precision. This is also used to deal with integers */
-                             qfmpString,  /*!< \brief a string of characters */
-                             qfmpBool,   /*!< \brief a boolean value true|false */
-                             qfmpDoubleVector,  /*!< \brief a vector of floating point numbers */
-                             qfmpVoid,  /*!< \brief a vector of floating point numbers */
-                             };
-
         static QString resultTypeToString(qfmpResultType type);
 
-        /** \brief result of any expression  */
-        struct QFLIB_EXPORT qfmpResult {
-            public:
-                qfmpResult();
-                qfmpResult(double value);
-                qfmpResult(QString value);
-                qfmpResult(bool value);
-                qfmpResult(const QVector<double> &value);
-
-
-                /** \brief convert the value this struct representens into a QString */
-                QFLIB_EXPORT QString toString() const;
-
-                /** \brief convert the value this struct representens into a QString and adds the name of the datatype in \c [...] */
-                QFLIB_EXPORT QString toTypeString() const;
-
-                /** \brief convert the value this struct to an integer */
-                QFLIB_EXPORT int32_t toInteger() const;
-                /** \brief convert the value this struct to an integer */
-                QFLIB_EXPORT uint32_t toUInt() const;
-                /** \brief is this result convertible to integer? */
-                QFLIB_EXPORT bool isInteger() const;
-                /** \brief is this result convertible to unsigned integer? */
-                QFLIB_EXPORT bool isUInt() const;
-
-                QFLIB_EXPORT void setDouble(double val);
-                QFLIB_EXPORT void setBoolean(bool val);
-                QFLIB_EXPORT void setString(const QString& val);
-                QFLIB_EXPORT void setDoubleVec(const QVector<double>& val);
-                /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
-                QFLIB_EXPORT QVector<double> asVector() const;
-                /** \brief returns \c true, if the result may be converted to a vector of number */
-                QFLIB_EXPORT bool  convertsToVector() const;
-                /** \brief converst the result to a vector of integers (numbers and number vectors are converted!) */
-                QFLIB_EXPORT QVector<int> asIntVector() const;
-                /** \brief returns \c true, if the result may be converted to a vector of integers */
-                QFLIB_EXPORT bool  convertsToIntVector() const;
-                /** \brief returns \c true if the result is valid and not void */
-                QFLIB_EXPORT bool isUsableResult() const;
-                /** \brief returns an invalid result */
-                QFLIB_EXPORT static qfmpResult invalidResult();
-                /** \brief returns an void result */
-                QFLIB_EXPORT static qfmpResult voidResult();
-
-                bool isValid;
-                qfmpResultType type;   /*!< \brief type of the result */
-                QString str;       /*!< \brief contains result if \c type==qfmpString */
-                double num;            /*!< \brief contains result if \c type==qfmpDouble */
-                bool boolean;          /*!< \brief contains result if \c type==qfmpBool */
-                QVector<double> numVec; /*!< \brief contains result if \c type==qfmpDoubleVector */
-
-        };
 
         static QString resultToString(const qfmpResult &r);
         static QString resultToTypeString(const qfmpResult &r);
@@ -697,7 +709,7 @@ class QFLIB_EXPORT QFMathParser
                 //~qfmpVariable();
                 QFLIB_EXPORT void clearMemory();
 
-                QFLIB_EXPORT QFMathParser::qfmpResult toResult() const;
+                QFLIB_EXPORT qfmpResult toResult() const;
                 QFLIB_EXPORT bool isInternal() const;
                 QFLIB_EXPORT void set(const qfmpResult& result);
                 inline  qfmpResultType getType() const { return type; }
@@ -741,10 +753,10 @@ class QFLIB_EXPORT QFMathParser
             /** \brief evaluate this node */
             virtual qfmpResult evaluate()=0;
 
-            /** \brief return a pointer to the jkMathParser  */
+            /** \brief return a pointer to the QFMathParser  */
             inline QFMathParser* getParser(){ return parser; }
 
-            /** \brief set the jkMathParser  */
+            /** \brief set the QFMathParser  */
             inline void setParser(QFMathParser* mp){ parser=mp; }
 
             /** \brief returns a pointer to the parent node */
@@ -772,7 +784,7 @@ class QFLIB_EXPORT QFMathParser
              *  \param op the operation to be performed: add (+), subtract (-), multiply (*), divide (/), a to the power of b (a^b)
              *  \param l left child node/operand
              *  \param r right child node/operand
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
             explicit qfmpBinaryArithmeticNode(char op, qfmpNode* l, qfmpNode* r, QFMathParser* p, qfmpNode* par);
@@ -799,7 +811,7 @@ class QFLIB_EXPORT QFMathParser
              *  \param op the operation to be performed: (a)nd, (o)r, (x)or, (n)or, nand (A)
              *  \param l left child node/operand
              *  \param r right child node/operand
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
             explicit qfmpBinaryBoolNode(char op, qfmpNode* l, qfmpNode* r, QFMathParser* p, qfmpNode* par);
@@ -827,7 +839,7 @@ class QFLIB_EXPORT QFMathParser
              *  \param op the operation to be performed: != (!), == (=), >= (b), <= (a), (>), (<)
              *  \param l left child node/operand
              *  \param r right child node/operand
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
             explicit qfmpCompareNode(char op, qfmpNode* l, qfmpNode* r, QFMathParser* p, qfmpNode* par);
@@ -854,7 +866,7 @@ class QFLIB_EXPORT QFMathParser
             /** \brief constructor for a qfmpUnaryNode
              *  \param op the operation to be performed: (!), (-)
              *  \param c child node/operand
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
             explicit qfmpUnaryNode(char op, qfmpNode* c, QFMathParser* p, qfmpNode* par);
@@ -884,7 +896,7 @@ class QFLIB_EXPORT QFMathParser
             /** \brief constructor for a qfmpVariableAssignNode
              *  \param var name of the variable to assign to
              *  \param index index child node
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
             explicit qfmpVectorAccessNode(QString var, qfmpNode* index, QFMathParser* p, qfmpNode* par);
@@ -911,7 +923,7 @@ class QFLIB_EXPORT QFMathParser
             /** \brief constructor for a qfmpVariableAssignNode
              *  \param var name of the variable to assign to
              *  \param c child node/right-hand-side expression
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
             explicit qfmpVariableAssignNode(QString var, qfmpNode* c, QFMathParser* p, qfmpNode* par);
@@ -938,7 +950,7 @@ class QFLIB_EXPORT QFMathParser
              *  \param var name of the variable to assign to
              *  \param index index node
              *  \param expression child node/right-hand-side expression
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
             explicit qfmpVectorElementAssignNode(QString var, qfmpNode* index, qfmpNode* expression, QFMathParser* p, qfmpNode* par);
@@ -968,7 +980,7 @@ class QFLIB_EXPORT QFMathParser
              *  \param function name of the function to assign to
              *  \param parameterNames list of parameters of the new function
              *  \param c child node/right-hand-side expression
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
             explicit qfmpFunctionAssignNode(QString function, QStringList parameterNames, qfmpNode* c, QFMathParser* p, qfmpNode* par);
@@ -990,7 +1002,7 @@ class QFLIB_EXPORT QFMathParser
           public:
             /** \brief constructor for a qfmpConstantNode
              *  \param d the value of the constant
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
             explicit qfmpConstantNode(qfmpResult d, QFMathParser* p, qfmpNode* par):qfmpNode(p, par) { data=d; };
@@ -1012,7 +1024,7 @@ class QFLIB_EXPORT QFMathParser
           public:
             /** \brief constructor for a qfmpVariableNode
              *  \param name name of the variable
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
             explicit qfmpVariableNode(QString name, QFMathParser* p, qfmpNode* par);
@@ -1035,7 +1047,7 @@ class QFLIB_EXPORT QFMathParser
           public:
             /** \brief constructor for a qfmpConstantNode
              *  \param d the value of the constant
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
             explicit qfmpInvalidNode(QFMathParser* p, qfmpNode* par):qfmpNode(p, par) { };
@@ -1056,7 +1068,7 @@ class QFLIB_EXPORT QFMathParser
          *
          * If you want to add more math functions (like sin, cos , abs ...) to the
          * parser, you will have to implement it with this prototype and then register
-         * it with jkMathParser::addFunction(). The first parameter points to an array
+         * it with QFMathParser::addFunction(). The first parameter points to an array
          * containing the input parameters while the second one specifies the number
          * of supplied parameters. The result has to be of type qfmpResult.
          *
@@ -1100,7 +1112,7 @@ class QFLIB_EXPORT QFMathParser
          * \brief This class represents an arbitrary function.
          *
          * When initialized this class will get the function description that is
-         * linked to the supplied function name from jkMathParser object. This
+         * linked to the supplied function name from QFMathParser object. This
          * information is saved locally and won't be changed when evaluating!
          *
          * Functions may have 8 parameters at the most.
@@ -1114,7 +1126,7 @@ class QFLIB_EXPORT QFMathParser
              *  \param name name of the function
              *  \param c a pointer to an array of qfmpNode objects that represent the parameter expressions
              *  \param num number of children in c
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
             explicit qfmpFunctionNode(QString name, QVector<QFMathParser::qfmpNode*> params, QFMathParser* p, qfmpNode* par);
@@ -1140,7 +1152,7 @@ class QFLIB_EXPORT QFMathParser
             QList<qfmpNode*> list;
           public:
             /** \brief constructor for a qfmpNodeList
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              */
             explicit qfmpNodeList(QFMathParser* p, qfmpNode* par=NULL):qfmpNode(p, par) { };
 
@@ -1171,7 +1183,7 @@ class QFLIB_EXPORT QFMathParser
         class QFLIB_EXPORT qfmpVectorList: public qfmpNodeList {
           public:
             /** \brief constructor for a qfmpNodeList
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              */
             explicit qfmpVectorList(QFMathParser* p, qfmpNode* par=NULL): qfmpNodeList(p, par) { setParser(p); setParent(par); };
 
@@ -1199,7 +1211,7 @@ class QFLIB_EXPORT QFMathParser
              *  \param start start child node/operand
              *  \param end end child node/operand
              *  \param step step child node/operand
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
             explicit qfmpVectorConstructionNode(qfmpNode* start, qfmpNode* end, qfmpNode* step, QFMathParser* p, qfmpNode* par);
@@ -1227,7 +1239,7 @@ class QFLIB_EXPORT QFMathParser
              *  \param start start child node/operand
              *  \param end end child node/operand
              *  \param step step child node/operand
-             *  \param p a pointer to a jkMathParser object
+             *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
             explicit qfmpCasesNode(QFMathParser* p, qfmpNode* par);
@@ -1555,6 +1567,28 @@ class QFLIB_EXPORT QFMathParser
         QString printFunctions();
 
         QList<QPair<QString, qfmpFunctionDescriptor> > getFunctions();
+
+
+        /**
+         * \defgroup qfmpglobal Tools to globaly extend QFMathParser
+         * \ingroup qf3lib_mathtools_parser
+         */
+        /*@{*/
+    protected:
+        static QList<QPair<QString, qfmpEvaluateFunc> > externalGlobalFunctions;
+        static QList<QPair<QString, qfmpResult> > externalGlobalVariables;
+    public:
+        /** \brief  add a function to the list of global functions that are defined by a call to addStandardFunctions() (or the constructor) */
+        static void addGlobalFunction(const QString& name, qfmpEvaluateFunc function);
+        /** \brief  add a variablen to the list of global variables that are defined by a call to addStandardVariables() (or the constructor) */
+        static void addGlobalVariable(const QString& name, double value);
+        /** \brief  add a variablen to the list of global variables that are defined by a call to addStandardVariables() (or the constructor) */
+        static void addGlobalVariable(const QString& name, const QVector<double>& value);
+        /** \brief  add a variablen to the list of global variables that are defined by a call to addStandardVariables() (or the constructor) */
+        static void addGlobalVariable(const QString& name, const QString& value);
+        /** \brief  add a variablen to the list of global variables that are defined by a call to addStandardVariables() (or the constructor) */
+        static void addGlobalVariable(const QString& name, bool value);
+        /*@}*/
 
 };
 

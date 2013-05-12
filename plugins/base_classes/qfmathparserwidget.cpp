@@ -4,8 +4,8 @@
 #include "qfmathparser.h"
 #include "qfpluginservices.h"
 
-QFMathParser::qfmpResult QFMathParserWidget_dummy(const QFMathParser::qfmpResult* params, unsigned char n, QFMathParser* p) {
-    QFMathParser::qfmpResult res;
+qfmpResult QFMathParserWidget_dummy(const qfmpResult* params, unsigned char n, QFMathParser* p) {
+    qfmpResult res;
 
     return res;
 }

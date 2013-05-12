@@ -1796,6 +1796,31 @@ QFProject *MainWindow::getCurrentProject() const
     return project;
 }
 
+void MainWindow::addGlobalFunction(const QString &name, qfmpCFunction function)
+{
+    QFMathParser::addGlobalFunction(name, function);
+}
+
+void MainWindow::addGlobalVariable(const QString &name, double value)
+{
+    QFMathParser::addGlobalVariable(name, value);
+}
+
+void MainWindow::addGlobalVariable(const QString &name, const QVector<double> &value)
+{
+    QFMathParser::addGlobalVariable(name, value);
+}
+
+void MainWindow::addGlobalVariable(const QString &name, const QString &value)
+{
+    QFMathParser::addGlobalVariable(name, value);
+}
+
+void MainWindow::addGlobalVariable(const QString &name, bool value)
+{
+    QFMathParser::addGlobalVariable(name, value);
+}
+
 QString MainWindow::getPluginAssetsDirectory(const QString &pluginID)
 {
     return settings->getAssetsDirectory()+QString("/plugins/")+pluginID+QString("/");

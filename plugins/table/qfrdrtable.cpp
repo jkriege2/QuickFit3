@@ -719,19 +719,19 @@ QVariant QFRDRTable::evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode
         d.model=m->model();
         mp.set_data(&d);
 
-        QFMathParser::qfmpResult r;
+        qfmpResult r;
         r=n->evaluate();
 
 
         if (r.isUsableResult()) {
-            if (r.type==QFMathParser::qfmpBool) {
+            if (r.type==qfmpBool) {
                 result=QVariant(r.boolean);
-            } else if (r.type==QFMathParser::qfmpDouble) {
+            } else if (r.type==qfmpDouble) {
                 if (QFFloatIsOK(r.num))
                     result=QVariant(r.num);
                 else
                     result=QVariant();
-            } else if (r.type==QFMathParser::qfmpString) {
+            } else if (r.type==qfmpString) {
                 result=QVariant(r.str);
             } else {
                 result=QVariant();
