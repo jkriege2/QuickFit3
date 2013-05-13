@@ -617,7 +617,7 @@ void QFImFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &fi
 {
     int oldS=guessedFileSets.size();
     guessedFileSets.clear();
-    qDebug()<<"guessFileSets "<<fileset.size();
+    //qDebug()<<"guessFileSets "<<fileset.size();
 
     if (fileset.size()>0) {
         QString groupName=fileset[0]->getGroupName();
@@ -637,10 +637,10 @@ void QFImFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &fi
         }
 
         QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
-        qDebug()<<"sameGroup "<<sameGroup<<" ("<<groupName<<")   sameFolder="<<sameFolder<<" ("<<folderName<<")   allRolesOK="<<allRolesOK<<"   someRolesOK="<<someRolesOK<<"   roles"<<roles;
+        //qDebug()<<"sameGroup "<<sameGroup<<" ("<<groupName<<")   sameFolder="<<sameFolder<<" ("<<folderName<<")   allRolesOK="<<allRolesOK<<"   someRolesOK="<<someRolesOK<<"   roles"<<roles;
         if (project && someRolesOK) {
             if (sameGroup && !groupName.isEmpty()) {
-                qDebug()<<"guess from group";
+                //qDebug()<<"guess from group";
                 for (int i=0; i<project->getRDRGroupCount(); i++) {
                     QList<QFRawDataRecord*> rlist=project->getRDRGroupMembers(i);
                     QList<QFRawDataRecord*> newset;
@@ -658,7 +658,7 @@ void QFImFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &fi
                     if (ok && !guessedFileSets.contains(newset) && !fittedFileSets.contains(newset)) guessedFileSets.append(newset);
                 }
             } else if (sameFolder) {
-                qDebug()<<"guess from folder";
+                //qDebug()<<"guess from folder";
                 for (int i=0; i<project->getRawDataCount(); i++) {
                     QList<QFRawDataRecord*> rlist=project->getRDRsInFolder(project->getRawDataByNum(i)->getFolder());
                     QList<QFRawDataRecord*> newset;
@@ -680,7 +680,7 @@ void QFImFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &fi
             }
         }
     }
-    qDebug()<<"guessed:"<<guessedFileSets.size();
+    //qDebug()<<"guessed:"<<guessedFileSets.size();
 
     if (emitChangedSignal && guessedFileSets.size()!=oldS) emit filesetsChanged();
 }
