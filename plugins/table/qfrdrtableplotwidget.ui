@@ -47,7 +47,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabPlots">
        <attribute name="title">
@@ -2434,6 +2434,14 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QFDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfdoubleedit.h</header>
+   <slots>
+    <signal>valueChanged(double)</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
    <class>QFPlotter</class>
    <extends>QWidget</extends>
    <header>qfplotter.h</header>
@@ -2449,14 +2457,6 @@
    <class>JKQTPerrorPlotstyleComboBox</class>
    <extends>QComboBox</extends>
    <header>jkqtptools.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QFDoubleEdit</class>
-   <extends>QLineEdit</extends>
-   <header>qfdoubleedit.h</header>
-   <slots>
-    <signal>valueChanged(double)</signal>
-   </slots>
   </customwidget>
   <customwidget>
    <class>LineStyleComboBox</class>

@@ -13,3 +13,4 @@
 <li><b><a href="$$mainhelpdir$$/parserreference/unit.html">unit conversion functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/constants.html">common math/physics constants</a></b></li>
 <!--<li><b><a href="./parserreference/.html"></a></b></li>-->
+$$qfmathparser_ref$$

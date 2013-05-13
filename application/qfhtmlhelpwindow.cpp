@@ -17,13 +17,7 @@
 #include "programoptions.h"
 #include "qmodernprogresswidget.h"
 
-QString removeHTMLComments(const QString& data) {
-     QRegExp rxComments("<!--(.*)-->", Qt::CaseInsensitive);
-     rxComments.setMinimal(true);
-     QString data1=data;
-     data1.remove(rxComments);
-     return data1;
-}
+
 
 QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     QWidget(parent, flags)
@@ -314,8 +308,14 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
 
         if ((scheme=="pop") || (scheme=="popup") || (scheme=="tooltip") || (scheme=="tool")||(scheme=="tip")){
             QString tooltip=link.toString(QUrl::RemoveScheme);
+            QString tooltipfn="";
+            QString tooltipstr=tr("<i>no tooltip available</i>");
+            if (tooltips.contains(tooltip)) {
+                tooltipstr=tooltips[tooltip].tooltip;
+                tooltipfn=tooltips[tooltip].tooltipfile;
+            }
             //qDebug()<<"show tooltip: "<<tooltip<<tooltips.value(tooltip);
-            QToolTip::showText(descriptionBrowser->mapFromGlobal(QCursor::pos()), tooltips.value(tooltip, tr("<i>no tooltip available</i>")), descriptionBrowser, QRect());
+            QToolTip::showText(descriptionBrowser->mapFromGlobal(QCursor::pos()), transformQF3HelpHTML(tooltipstr, tooltipfn), descriptionBrowser, QRect());
         } else {
             QDir spd(searchPath);
             QString filename=link.toString(QUrl::RemoveFragment);
@@ -860,8 +860,8 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
 
 
 
-            // interpret $$insert:<filename>$$ and $$insertglobal:<filename>$$ items
-            QRegExp rxInsert("\\$\\$(insert|insertglobal)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            // interpret $$insert:<filename>$$ and $$insertglobal:<filename>$$, $$see:text$$ items
+            QRegExp rxInsert("\\$\\$(insert|insertglobal|see)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxInsert.setMinimal(true);
             count = 0;
             pos = 0;
@@ -885,6 +885,13 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                     if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
                         rep=f.readAll();
                     }
+                    result=result.replace(rxInsert.cap(0), rep);
+                } else if (m_pluginServices&&(command=="see")) {
+                    QString rep=tr("<blockquote>"
+                                     "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: cornsilk ;  border-color: darkgreen\" >"
+                                   "<tr><td align=\"left\"><b>See:</b> %1</td></tr>"
+                                   "</table></blockquote>").arg(file);
+
                     result=result.replace(rxInsert.cap(0), rep);
                 }
 
@@ -948,18 +955,25 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
 
 
 
-            // interpret $$plugin_info:<name>:<id>$$ items
-            QRegExp rxPluginInfo("\\$\\$plugin_info\\:([^\\$]*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            // interpret $$plugin_info:<name>:<id>$$, $$fig:file:caption$$,  $$figure:file:caption$$ items
+            QRegExp rxPluginInfo("\\$\\$(plugin_info|fig|figure)\\:([^\\$]*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxPluginInfo.setMinimal(true);
             count = 0;
             pos = 0;
             while ((pos = rxPluginInfo.indexIn(result, pos)) != -1) {
-                QString name=rxPluginInfo.cap(1).toLower().trimmed();
-                QString id=rxPluginInfo.cap(2).trimmed().toLower();
+                QString command=rxPluginInfo.cap(1).toLower().trimmed();
+                QString param1=rxPluginInfo.cap(2).toLower().trimmed();
+                QString param2=rxPluginInfo.cap(3).trimmed().toLower();
 
-                if (m_pluginServices) {
-                    if (name=="help") result=result.replace(rxPluginInfo.cap(0), m_pluginServices->getPluginHelp(id));
-                    if (name=="tutorial") result=result.replace(rxPluginInfo.cap(0), m_pluginServices->getPluginTutorial(id));
+                if (m_pluginServices && command=="plugin_info") {
+                    if (param1=="help") result=result.replace(rxPluginInfo.cap(0), m_pluginServices->getPluginHelp(param2));
+                    if (param1=="tutorial") result=result.replace(rxPluginInfo.cap(0), m_pluginServices->getPluginTutorial(param2));
+                } else if (command=="fig" || command=="figure") {
+                    QString rep=tr("<center>"
+                                     "<img src=\"%1\"><br><i>%2</i><br>"
+                                   "</center>").arg(param1).arg(param2);
+                    result=result.replace(rxInsert.cap(0), rep);
+
                 }
 
                 ++count;
@@ -993,7 +1007,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
 
         // insert tooltips: search all occurences of the tooltip keywords that are not inside a tag (i.e. surrounded by a closing tag on
         // the left and an opening tag on the right) and where the tag is not something special (like headers or links).
-        QMapIterator<QString, QString> itTT(tooltips);
+        QMapIterator<QString, QFToolTipsData> itTT(tooltips);
         while (itTT.hasNext()) {
             itTT.next();
             QRegExp rxTT(QString("\\<\\s*(\\w\\w*)[^\\>]*\\>[^\\<\\>]*(%1)[^\\<\\>]*\\<").arg(itTT.key()));
@@ -1027,7 +1041,7 @@ void QFHTMLHelpWindow::setHtmlReplacementList(QList<QPair<QString, QString> >* l
     replaces=list;
 }
 
-void QFHTMLHelpWindow::setTooltips(const QMap<QString, QString> &list)
+void QFHTMLHelpWindow::setTooltips(const QMap<QString, QFToolTipsData> &list)
 {
     tooltips=list;
 }

@@ -83,6 +83,7 @@ class QFFunctionReferenceTool : public QObject
         void setLabTemplate(QLabel* labTemplate);
         void setProgress(QModernProgressWidget *progress);
 
+        /** \brief registers a QLineEdit as formula editor (basically the function showCurrentFunctionHelp() can be used to show help for the word currently under the cursor */
         void registerEditor(QLineEdit* edtFormula);
 
         bool hasFunction(const QString name);
@@ -90,10 +91,13 @@ class QFFunctionReferenceTool : public QObject
     signals:
         
     public slots:
+        /** \brief opens an online-help window and displays the help entry for the given function */
         void showFunctionHelp(QString name);
-        void startSearch(const QStringList& directories, const QStringList& filters);
-        void startSearch(const QStringList& directories);
-        void startSearch(const QString& directory);
+        /** \brief searches for a function definition in the following directories. uses the given filename filters to select files in the directories. The directories are then extended by the directories stored in the global config variable \a globalConfigVar (see QFPluginServices::getGlobalConfigValue() )  */
+        void startSearch(const QStringList& directories, const QStringList& filters, const QString& globalConfigVar=QString("QFMathParser_ref"));
+        void startSearch(const QStringList& directories, const QString& globalConfigVar=QString("QFMathParser_ref"));
+        void startSearch(const QString& directory, const QString& globalConfigVar=QString("QFMathParser_ref"));
+        /** \brief opens an online-help window and displays the help entry for the function currentyl under the cursor */
         void showCurrentFunctionHelp();
     protected slots:
         void onCursorPositionChanged(int old, int newPos);
@@ -108,6 +112,7 @@ class QFFunctionReferenceTool : public QObject
             QString fhelp;
             QString ftemplate;
             QString fhelplink;
+            QString fhelpfile;
         };
 
         QMap<QString, functionDescription > functionhelp;

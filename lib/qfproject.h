@@ -182,6 +182,10 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         QFRawDataRecord* getRawDataByID(int ID);
         /** \brief return the i-th raw data record, or \c NULL */
         QFRawDataRecord* getRawDataByNum(int i) const;
+        /** \brief returns all RDR records in the given folder */
+        QList<QFRawDataRecord*> getRDRsInFolder(const QString& folder, bool alsoSubfolders=false);
+
+
         /** \brief return the next sibling rawdata record, or NULL if none */
         QFRawDataRecord* getNextRawData(QFRawDataRecord* current);
         /** \brief return the previous sibling rawdata record, or NULL if none */

@@ -46,11 +46,19 @@ class QFLIB_EXPORT QFEnhancedLineEdit : public QLineEdit {
         void addInsertContextMenuEntry(const QIcon & icon, const QString& name, const QString& insert);
         void clearContextMenu();
 
+        bool useHistory() const;
+        void setUseHistory(bool use);
+        QStringList getHistory() const;
+        void clearHistory();
+        void addToHistory(const QString& item);
+        void setHistory(const QStringList& history);
+
 
     protected:
         virtual void focusOutEvent ( QFocusEvent * event ) ;
         virtual void resizeEvent ( QResizeEvent * event );
         virtual void contextMenuEvent ( QContextMenuEvent * event );
+        virtual void keyPressEvent(QKeyEvent *event);
         /** \brief return the width of the buttons until the i-th button */
         int getButtonsWidth(int i);
         void moveButtons();
@@ -61,6 +69,10 @@ class QFLIB_EXPORT QFEnhancedLineEdit : public QLineEdit {
         int m_buttonDistance;
         QList<QAbstractButton*> buttons;
         QList<QAction*> contextmenuActions;
+
+        int m_historyposition;
+        QStringList history;
+        bool m_useHistory;
 };
 
 

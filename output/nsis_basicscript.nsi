@@ -110,14 +110,9 @@ Function finishpageaction
 	CreateShortCut "$desktop\${PRODUCT_NAME}.lnk" "$instdir\quickfit3.exe"
 FunctionEnd
 
-function .onInit
-	setShellVarContext all
-	!insertmacro VerifyUserIsAdmin
-	!insertmacro MULTIUSER_INIT
-functionEnd
 
 # This installs the main application
-Section "${PRODUCT_NAME} ${PRODUCT_VERSION}"
+Section "${PRODUCT_NAME} ${PRODUCT_VERSION}" sec_main
 	Push $OUTDIR ; Store previous output directory
 	SetOutPath "$INSTDIR" ; Set output directory
 
@@ -152,7 +147,7 @@ Section "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 	IntFmt $0 "0x%08X" $0
 	WriteRegDWORD HKLM  "${UNINSTALL_KEY}" "EstimatedSize" "$0"
 
-!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+	!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
 	# write start menu entries
 	createDirectory "$SMPROGRAMS\$StartMenuFolder"
 	createShortCut "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}.lnk" "$INSTDIR\quickfit3.exe" "" "$INSTDIR\qf3icon.ico"
@@ -176,7 +171,7 @@ SectionEnd
 
 
 # This installs the SPIM plugins
-Section "SPIM Plugins"
+Section "SPIM Plugins" sec_spim
 	Push $OUTDIR ; Store previous output directory
 	SetOutPath "$INSTDIR" ; Set output directory
 	
@@ -194,6 +189,16 @@ SectionEnd
 
 
 
+function .onInit
+	setShellVarContext all
+	!insertmacro VerifyUserIsAdmin
+	!insertmacro MULTIUSER_INIT
+	IntOp $0 ${SF_SELECTED} | ${SF_RO}
+	IntOp $0 $0 | ${SF_BOLD}
+    SectionSetFlags ${sec_main} $0
+    SectionSetFlags ${sec_spim} 0
+
+functionEnd
 
 
 
@@ -212,7 +217,7 @@ functionEnd
 
 
 # This uninstalls the main application
-Section "un.${PRODUCT_NAME} ${PRODUCT_VERSION}"
+Section "un.${PRODUCT_NAME} ${PRODUCT_VERSION}" sec_un_main
 
 	!insertmacro MUI_STARTMENU_GETFOLDER Application $StartMenuFolder
 	

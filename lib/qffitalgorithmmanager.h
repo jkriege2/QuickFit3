@@ -60,7 +60,7 @@ class QFLIB_EXPORT QFFitAlgorithmManager : public QObject {
         virtual QString getWeblink(int i) const;
 
         /** \brief search for raw data record plugins in the given directory */
-        void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QString> &tooltips);
+        void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData> &tooltips);
 
         /** \brief return the plugin index for a given fit function id */
         int getPluginForID(QString id) const;

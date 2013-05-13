@@ -84,6 +84,11 @@
          - \c $$references$$ will introduce a list of references into the document.
 		 .
 	  
+	  - Additional Commands:
+         - \c $$see:text$$ will add a yellow box with the test "See" and the given <i>text</i> to the help document
+		 - \c $$fig:file:caption$$ $$figure:file:caption$$ will add the given image \c file as a figure with the given caption
+		 .
+	  
     .  
     In the default header some of the metadata from the HTML page are used to display buttons to go to the next, previous and contents page:
     \code

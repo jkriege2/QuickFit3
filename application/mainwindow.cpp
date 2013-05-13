@@ -9,6 +9,7 @@
 #include "dlgnewversion.h"
 #include "dlgrdrsetproperty.h"
 #include "dlgselectprojectsubset.h"
+#include "jkmathparser.h"
 
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
@@ -176,13 +177,14 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
 
     QStringList keys=setTooltips.childKeys();
     for (int i=0; i<keys.size(); i++) {
-        tooltips[keys[i]]=setTooltips.value(keys[i], tr("<i>no tooltip available</i>")).toString();
+        tooltips[keys[i]].tooltip=setTooltips.value(keys[i], tr("<i>no tooltip available</i>")).toString();
+        tooltips[keys[i]].tooltipfile=settings->getMainHelpDirectory()+"tooltips.ini";
     }
 
-    QMapIterator<QString, QString> it(tooltips);
+    QMapIterator<QString, QFToolTipsData> it(tooltips);
     while (it.hasNext()) {
         it.next();
-        if (it.value().startsWith("%")) tooltips[it.key()]=tooltips[it.value().mid(1)];
+        if (it.value().tooltip.startsWith("%")) tooltips[it.key()]=tooltips[it.value().tooltip.mid(1)];
     }
     //qDebug()<<tooltips;
     helpWindow->setTooltips(tooltips);
@@ -1821,6 +1823,16 @@ void MainWindow::addGlobalVariable(const QString &name, bool value)
     QFMathParser::addGlobalVariable(name, value);
 }
 
+QVariant MainWindow::getGlobalConfigValue(const QString &key)
+{
+    return globalParameterStore.value(key, QVariant());
+}
+
+void MainWindow::setGlobalConfigValue(const QString &key, const QVariant &value)
+{
+    globalParameterStore[key]=value;
+}
+
 QString MainWindow::getPluginAssetsDirectory(const QString &pluginID)
 {
     return settings->getAssetsDirectory()+QString("/plugins/")+pluginID+QString("/");
@@ -2365,7 +2377,38 @@ QList<QPair<QString, QString> >* MainWindow::getHTMLReplacementList() {
     return &htmlReplaceList;
 }
 
-QMap<QString, QString> MainWindow::getTooltips() const {
+QString MainWindow::getHTMLReplacement(const QString &name)
+{
+    for (int i=0; i<htmlReplaceList.size(); i++) {
+        if (htmlReplaceList[i].first==name) return htmlReplaceList[i].second;
+    }
+    return QString();
+}
+
+void MainWindow::setOrAddHTMLReplacement(const QString &name, const QString &value)
+{
+    for (int i=0; i<htmlReplaceList.size(); i++) {
+        if (htmlReplaceList[i].first==name) {
+            htmlReplaceList[i].second=value;
+            return;
+        }
+    }
+    htmlReplaceList.append(qMakePair(name, value));
+}
+
+void MainWindow::appendOrAddHTMLReplacement(const QString &name, const QString &appendValue, const QString &separator)
+{
+    for (int i=0; i<htmlReplaceList.size(); i++) {
+        if (htmlReplaceList[i].first==name) {
+            if (htmlReplaceList[i].second.isEmpty()) htmlReplaceList[i].second=appendValue;
+            else  htmlReplaceList[i].second=htmlReplaceList[i].second+separator+appendValue;
+            return;
+        }
+    }
+    htmlReplaceList.append(qMakePair(name, appendValue));
+}
+
+QMap<QString, QFToolTipsData> MainWindow::getTooltips() const {
     return tooltips;
 }
 
@@ -2381,4 +2424,424 @@ QString MainWindow::getPluginMaybeGlobalSettings(const QString &pluginID, const 
     if (!QFile::exists(ini)) ini=getPluginAssetsDirectory(pluginID)+inifile;
     if (!QFile::exists(ini)) ini=getConfigFileDirectory()+inifile;
     return ini;
+}
+
+QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced, const QF3HelpReplacesList& more_replaces, bool insertTooltips) {
+    JKQTmathText mathParser(this);
+    mathParser.set_fontSize(13);
+    mathParser.useXITS();
+
+    QString result=removeHTMLComments(input_html);
+    QString fileDir=QFileInfo(filename).absolutePath();
+    QString basepath=QFileInfo(filename).absolutePath();
+    QDir basedir=QFileInfo(filename).absoluteDir();
+
+    if (!fileDir.endsWith("/")) fileDir.append("/");
+    QList<QPair<QString, QString> > fromHTML_replaces;
+    QList<QPair<QString, QString> >* replaces=QFPluginServices::getInstance()->getHTMLReplacementList();
+    QList<QFPluginServices::HelpDirectoryInfo>* pluginList=QFPluginServices::getInstance()->getPluginHelpList();
+
+    // find special information in file
+    QRegExp rxTitle("<title>(.*)</title>", Qt::CaseInsensitive);
+    if (rxTitle.indexIn(result) != -1) fromHTML_replaces.append(qMakePair(QString("title"), rxTitle.cap(1)));
+
+    QRegExp rxMeta("(<meta\\s*content\\s*=\\s*\"([^\"']*)\"\\s*name\\s*=\\s*\"([^\"']*)\"[^>]*>|<meta\\s*name\\s*=\\s*\"([^\"']*)\"\\s*content\\s*=\\s*\"([^\"']*)\"[^>]*>)", Qt::CaseInsensitive);
+    rxMeta.setMinimal(false);
+    int count = 0;
+    int pos = 0;
+    while ((pos = rxMeta.indexIn(result, pos)) != -1) {
+
+        QString name=rxMeta.cap(2);
+        QString content=rxMeta.cap(1);
+        if (name.isEmpty() && content.isEmpty()) {
+            name=rxMeta.cap(3);
+            content=rxMeta.cap(4);
+        }
+        if ((!name.isEmpty())&&(!content.isEmpty())) {
+            fromHTML_replaces.append(qMakePair(QString("meta_")+name,content));
+        }
+
+        ++count;
+        pos += rxMeta.matchedLength();
+    }
+
+    QRegExp rxLink("<link\\s*rel\\s*=\\s*\"([^\"']*)\"[^\\>]*href\\s*=\\s*\"([^\"']*)\"[^>]*>", Qt::CaseInsensitive);
+    rxLink.setMinimal(false);
+    count = 0;
+    pos = 0;
+    while ((pos = rxLink.indexIn(result, pos)) != -1) {
+
+        QString rel=rxLink.cap(1).toLower();
+        QString href=rxLink.cap(2);
+        if (!href.isEmpty()) {
+            if (rel=="contents") fromHTML_replaces.append(qMakePair(QString("rel_contents"), QObject::tr("<a href=\"%1\"><img src=\":/lib/help/help_contents.png\" border=\"0\"><!--Contents--></a> ").arg(href)));
+            if (rel=="index") fromHTML_replaces.append(qMakePair(QString("rel_index"), QObject::tr("<a href=\"%1\">Index</a> ").arg(href)));
+            if (rel=="copyright") fromHTML_replaces.append(qMakePair(QString("rel_copyright"), QObject::tr("<a href=\"%1\">Copyright</a> ").arg(href)));
+            if (rel=="top") fromHTML_replaces.append(qMakePair(QString("rel_top"), QObject::tr("<a href=\"%1\">Top</a> ").arg(href)));
+            if (rel=="prev") fromHTML_replaces.append(qMakePair(QString("rel_prev"), QObject::tr("<a href=\"%1\"><img src=\":/lib/help/help_prev.png\" border=\"0\"></a><!--&nbsp;<a href=\"%1\">Previous</a>--> ").arg(href)));
+            if (rel=="next") fromHTML_replaces.append(qMakePair(QString("rel_next"), QObject::tr("<a href=\"%1\"><img src=\":/lib/help/help_next.png\" border=\"0\"></a><!--&nbsp;<a href=\"%1\">Next</a>--> ").arg(href)));
+            if (rel=="up") fromHTML_replaces.append(qMakePair(QString("rel_up"), QObject::tr("<a href=\"%1\"><img src=\":/lib/help/help_up.png\" border=\"0\"></a><!--&nbsp;<a href=\"%1\">Up</a>--> ").arg(href)));
+            //if (rel=="prev") fromHTML_replaces.append(qMakePair(QString("rel_prev"), QObject::tr("<a href=\"%1\"><img src=\":/lib/help/help_prev.png\" border=\"0\"></a>&nbsp;<a href=\"%1\">Previous</a> ").arg(href)));
+        }
+
+        ++count;
+        pos += rxLink.matchedLength();
+    }
+
+    // collectspecial replaces based on current directory
+    bool foundPlugin=false;
+    if (pluginList) {
+        for (int i=0; i<pluginList->size(); i++) {
+            if (QDir(pluginList->at(i).directory)==basepath) { // we found the info for this directory
+                QString pid=pluginList->at(i).plugin->getID();
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_icon"), QString("<img src=\"%1\">").arg(pluginList->at(i).plugin->getIconFilename())));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_iconfilename"), pluginList->at(i).plugin->getIconFilename()));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_name"), pluginList->at(i).plugin->getName()));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_author"), pluginList->at(i).plugin->getAuthor()));
+                if (basedir.exists("copyright.html")) {
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_copyright"), QString("<a href=\"copyright.html\">%1</a>").arg(pluginList->at(i).plugin->getCopyright())));
+                } else {
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_copyright"), pluginList->at(i).plugin->getCopyright()));
+                }
+
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink_url"), pluginList->at(i).plugin->getWeblink()));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink"), QObject::tr("<a href=\"%1\">Plugin Webpage</a>").arg(pluginList->at(i).plugin->getWeblink())));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_id"), pid));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_dllbasename"), pluginList->at(i).pluginDLLbasename));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_dllsuffix"), pluginList->at(i).pluginDLLSuffix));
+                if (QFPluginServices::getInstance()) {
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_assets"), QFPluginServices::getInstance()->getAssetsDirectory()+"/plugins/"+pluginList->at(i).pluginDLLbasename+"/"));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_config"), QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+pluginList->at(i).pluginDLLbasename+"/"));
+                }
+                if (!pluginList->at(i).tutorial.isEmpty()) {
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_tutorial_file"), pluginList->at(i).tutorial));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_tutorial_link"), QObject::tr("$$qf_commondoc_header.separator$$  <a href=\"%1\"><b>Plugin Tutorial</b></a>").arg(pluginList->at(i).tutorial)));
+                }
+                if (!pluginList->at(i).mainhelp.isEmpty()) {
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_mainhelp_file"), pluginList->at(i).mainhelp));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_mainhelp_link"), QObject::tr("$$qf_commondoc_header.separator$$  <a href=\"%1\"><b>Plugin Help</b></a>").arg(pluginList->at(i).mainhelp)));
+                }
+                int major=0, minor=0;
+                pluginList->at(i).plugin->getVersion(major, minor);
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_version"), QString("%1.%2").arg(major).arg(minor)));
+                if (!pluginList->at(i).plugintypehelp.isEmpty()) {
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_typehelp_file"), pluginList->at(i).plugintypehelp));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_typehelp_link"), QObject::tr("$$qf_commondoc_header.separator$$  <a href=\"%1\">%2</a>").arg(pluginList->at(i).plugintypehelp).arg(pluginList->at(i).plugintypename)));
+                }
+                foundPlugin=true;
+                break;
+            }
+        }
+
+    }
+
+    if (!foundPlugin) {
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_icon"), QString("<img src=\":/icon.png\">")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_iconfilename"), QString(":/icon.png")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_name"), QObject::tr("QuickFit $$version$$: Online-Help")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_author"), QString("$$author$$")));
+        if (basedir.exists("copyright.html")) {
+            fromHTML_replaces.append(qMakePair(QString("local_plugin_copyright"), QString("<a href=\"copyright.html\">$$copyright$$</a>")));
+        } else {
+            fromHTML_replaces.append(qMakePair(QString("local_plugin_copyright"), QString("$$copyright$$")));
+        }
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink_url"), QString("$$weblink$$")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink"), QObject::tr("<a href=\"$$weblink$$\">QuickFit Webpage</a>")));
+    }
+
+    // handle replaces, also handles special commands, like $$list:...$$
+    if (!result.isEmpty()) {
+        bool replaced=true;
+        int cnt=0;
+        while (replaced && (cnt<15)) {
+            replaced=false;
+            if (replaces) for (int i=0; i<replaces->size(); i++) {
+                if (result.contains(QString("$$")+(*replaces)[i].first+QString("$$"))) replaced=true;
+                result=result.replace(QString("$$")+(*replaces)[i].first+QString("$$"), (*replaces)[i].second);
+            }
+            for (int i=0; i<fromHTML_replaces.size(); i++) {
+                if (result.contains(QString("$$")+fromHTML_replaces[i].first+QString("$$"))) replaced=true;
+                result=result.replace(QString("$$")+fromHTML_replaces[i].first+QString("$$"), fromHTML_replaces[i].second);
+            }
+            for (int i=0; i<more_replaces.size(); i++) {
+                if (result.contains(QString("$$")+more_replaces[i].first+QString("$$"))) replaced=true;
+                result=result.replace(QString("$$")+more_replaces[i].first+QString("$$"), more_replaces[i].second);
+            }
+
+
+            // interpret $$list:<list_name>:<filter>$$ items
+            QRegExp rxList("\\$\\$list\\:([a-z]+)\\:([^\\$\\s]*)\\$\\$", Qt::CaseInsensitive);
+            rxList.setMinimal(true);
+            int count = 0;
+            int pos = 0;
+            while ((pos = rxList.indexIn(result, pos)) != -1) {
+                QString list=rxList.cap(1).toLower().trimmed();
+                QString filter=rxList.cap(2).trimmed();
+                //qDebug()<<pos<<list<<filter;
+                if (QFPluginServices::getInstance()) {
+                    if (list=="fitalg") {
+                        QString text="";
+                        QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
+                        QString item_template_nolink=QString("<li><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</li>");
+                        // gather information about plugins
+                        for (int i=0; i<QFPluginServices::getInstance()->getFitAlgorithmManager()->pluginCount(); i++) {
+                            int id=i;
+                            QString aID="";
+                            QStringList fa=QFPluginServices::getInstance()->getFitAlgorithmManager()->getIDList(id);
+                            QString dir=QFPluginServices::getInstance()->getFitAlgorithmManager()->getPluginHelp(id);
+                            QString name=QFPluginServices::getInstance()->getFitAlgorithmManager()->getName(id);
+                            QString icon=QFPluginServices::getInstance()->getFitAlgorithmManager()->getIconFilename(id);
+                            for (int j=0; j<fa.size(); j++) {
+                                aID=fa[j];
+                                QFFitAlgorithm* a=QFPluginServices::getInstance()->getFitAlgorithmManager()->createAlgorithm(aID);
+                                if (a) {
+                                    name=a->name();
+                                    dir=dir=QFPluginServices::getInstance()->getFitAlgorithmManager()->getPluginHelp(id, aID);
+                                    delete a;
+                                    if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
+                                    else text+=item_template_nolink.arg(icon).arg(name);
+                                }
+                            }
+                        }
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                        }
+                    } else if (list=="fitfunc") {
+                        QString text="";
+                        QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
+                        QString item_template_nolink=QString("<li><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</li>");
+                        // gather information about plugins
+                            QMap<QString, QFFitFunction*> models= QFPluginServices::getInstance()->getFitFunctionManager()->getModels(filter);
+                            QMapIterator<QString, QFFitFunction*> j(models);
+                            while (j.hasNext()) {
+                                j.next();
+                                int id=QFPluginServices::getInstance()->getFitFunctionManager()->getPluginForID(j.key());
+                                QString dir=QFPluginServices::getInstance()->getFitFunctionManager()->getPluginHelp(id);
+                                QString name=QFPluginServices::getInstance()->getFitFunctionManager()->getName(id);
+                                QString icon=QFPluginServices::getInstance()->getFitFunctionManager()->getIconFilename(id);
+                                QFFitFunction* a=j.value();
+                                if (a) {
+                                    name=a->name();
+                                    dir=dir=QFPluginServices::getInstance()->getFitFunctionManager()->getPluginHelp(id, j.key());
+                                    delete a;
+                                    if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
+                                    else text+=item_template_nolink.arg(icon).arg(name);
+                                }
+                            }
+
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                        }
+                    } else if (list=="extension") {
+                        QString text="";
+                        QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
+                        QString item_template_nolink=QString("<li><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</li>");
+                        // gather information about plugins
+                        QStringList ids=QFPluginServices::getInstance()->getExtensionManager()->getIDList();
+                        for (int i=0; i<ids.size(); i++) {
+                            QString id=ids[i];
+                            QString dir=QFPluginServices::getInstance()->getExtensionManager()->getPluginHelp(id);
+                            QString name=QFPluginServices::getInstance()->getExtensionManager()->getName(id);
+                            QString icon=QFPluginServices::getInstance()->getExtensionManager()->getIconFilename(id);
+                            if (filter.isEmpty() || ((!filter.isEmpty()) && (QFPluginServices::getInstance()->getExtensionManager()->getQObjectInstance(id)->inherits(filter.toAscii().data())))) {
+                                if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
+                                else text+=item_template_nolink.arg(icon).arg(name);
+                            }
+                        }
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                        }
+                    }
+                }
+
+                ++count;
+                pos += rxList.matchedLength();
+            }
+
+
+
+
+            // interpret $$insert:<filename>$$ and $$insertglobal:<filename>$$ items
+            QRegExp rxInsert("\\$\\$(insert|insertglobal|see)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            rxInsert.setMinimal(true);
+            count = 0;
+            pos = 0;
+            while ((pos = rxInsert.indexIn(result, pos)) != -1) {
+                QString command=rxInsert.cap(1).toLower().trimmed();
+                QString file=rxInsert.cap(2).trimmed();
+                //qDebug()<<pos<<list<<filter;
+
+                if (command=="insert") {
+                    //qDebug()<<QFileInfo(filename).absoluteDir().absoluteFilePath(file);
+                    QFile f(QFileInfo(filename).absoluteDir().absoluteFilePath(file));
+                    QString rep="";
+                    if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                        rep=f.readAll();
+                    }
+                    result=result.replace(rxInsert.cap(0), rep);
+                } else if (QFPluginServices::getInstance()&&(command=="insertglobal")) {
+                    //qDebug()<<QDir(QFPluginServices::getInstance()->getAssetsDirectory()+"/help/").absoluteFilePath(file);
+                    QFile f(QDir(QFPluginServices::getInstance()->getAssetsDirectory()+"/help/").absoluteFilePath(file));
+                    QString rep="";
+                    if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                        rep=f.readAll();
+                    }
+                    result=result.replace(rxInsert.cap(0), rep);
+                } else if (QFPluginServices::getInstance()&&(command=="see")) {
+                    QString rep=tr("<blockquote>"
+                                     "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: cornsilk ;  border-color: darkgreen\" >"
+                                   "<tr><td align=\"left\"><b>See:</b> %1</td></tr>"
+                                   "</table></blockquote>").arg(file);
+
+                    result=result.replace(rxInsert.cap(0), rep);
+                }
+
+                ++count;
+                pos += rxInsert.matchedLength();
+            }
+
+
+
+
+            // interpret $$math:<latex>$$ items
+            QRegExp rxLaTeX("\\$\\$(math|bmath|mathb)\\:(.*)\\$\\$", Qt::CaseInsensitive);
+            rxLaTeX.setMinimal(true);
+            count = 0;
+            pos = 0;
+            while ((pos = rxLaTeX.indexIn(result, pos)) != -1) {
+                QString command=rxLaTeX.cap(1).toLower().trimmed();
+                QString latex="$"+rxLaTeX.cap(2).trimmed()+"$";
+
+                if (command=="math" || command=="bmath" || command=="mathb") {
+                    QImage pix(300,100,QImage::Format_ARGB32_Premultiplied);
+                    QPainter p(&pix);
+                    p.setRenderHint(QPainter::Antialiasing);
+                    p.setRenderHint(QPainter::HighQualityAntialiasing);
+                    p.setRenderHint(QPainter::TextAntialiasing);
+                    mathParser.parse(latex);
+                    bool ok=false;
+                    QString ht=mathParser.toHtml(&ok);
+                    if (ok) {
+                        if (command=="bmath" || command=="mathb") {
+                            result=result.replace(rxLaTeX.cap(0), QString("<blockquote><font size=\"+2\" face=\"%2\"><i>%1</i></font></blockquote>").arg(ht).arg(mathParser.get_fontRoman()));
+                        } else {
+                            result=result.replace(rxLaTeX.cap(0), QString("<font face=\"%2\"><i>%1</i></font>").arg(ht).arg(mathParser.get_fontRoman()));
+                        }
+                    } else {
+                        QSizeF size=mathParser.getSize(p);
+                        p.end();
+                        pix=QImage(size.width()*1.2, size.height()*1.1, QImage::Format_ARGB32_Premultiplied);
+                        pix.fill(Qt::transparent);
+                        p.begin(&pix);
+                        p.setRenderHint(QPainter::Antialiasing);
+                        p.setRenderHint(QPainter::HighQualityAntialiasing);
+                        p.setRenderHint(QPainter::TextAntialiasing);
+                        mathParser.draw(p,Qt::AlignTop | Qt::AlignLeft, QRectF(QPointF(0,0), size));
+                        p.end();
+                        QString texfilename=QDir::tempPath()+"/qf3help_"+QFileInfo(filename).baseName()+"_tex"+QString::number(count)+".png";
+                        //qDebug()<<"latex-render: "<<latex<<"\n    size = "<<size<<"  output = "<<texfilename;
+                        pix.save(texfilename);
+
+                        if (command=="bmath" || command=="mathb") {
+                            result=result.replace(rxLaTeX.cap(0), QString("<blockquote><img style=\"vertical-align: middle;\" alt=\"%1\" src=\"%2\"></blockquote>").arg(latex).arg(texfilename));
+                        } else {
+                            result=result.replace(rxLaTeX.cap(0), QString("<img style=\"vertical-align: middle;\" alt=\"%1\" src=\"%2\">").arg(latex).arg(texfilename));
+                        }                    }
+
+                }
+
+                ++count;
+                pos += rxLaTeX.matchedLength();
+            }
+
+
+
+            // interpret $$plugin_info:<name>:<id>$$, $$fig:file:caption$$,  $$figure:file:caption$$ items
+            QRegExp rxPluginInfo("\\$\\$(plugin_info|fig|figure)\\:([^\\$]*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            rxPluginInfo.setMinimal(true);
+            count = 0;
+            pos = 0;
+            while ((pos = rxPluginInfo.indexIn(result, pos)) != -1) {
+                QString command=rxPluginInfo.cap(1).toLower().trimmed();
+                QString param1=rxPluginInfo.cap(2).toLower().trimmed();
+                QString param2=rxPluginInfo.cap(3).trimmed().toLower();
+
+                if (QFPluginServices::getInstance() && command=="plugin_info") {
+                    if (param1=="help") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginHelp(param2));
+                    if (param1=="tutorial") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginTutorial(param2));
+                } else if (command=="fig" || command=="figure") {
+                    QString rep=tr("<center>"
+                                     "<img src=\"%1\"><br><i>%2</i><br>"
+                                   "</center>").arg(param1).arg(param2);
+                    result=result.replace(rxInsert.cap(0), rep);
+
+                }
+
+                ++count;
+                pos += rxPluginInfo.matchedLength();
+            }
+
+
+
+            cnt++;
+        }
+
+
+
+        // remove all unreplaces $$name$$ sequences
+        if (removeNonReplaced) {
+            QRegExp rxSpecials("\\$\\$.+\\$\\$");
+            rxSpecials.setMinimal(true);
+            result=result.remove(rxSpecials);
+        }
+
+        // make all image pathes absolute, WORKAROUND FOR PROBLEM IN Qt4.8.0
+        QRegExp rxImages("<img\\s.*src\\s*=\\s*\\\"([^\\\"]*)\\\".*>");
+        rxImages.setMinimal(true);
+        rxImages.setCaseSensitivity(Qt::CaseInsensitive);
+        pos = 0;
+        while ((pos = rxImages.indexIn(result, pos)) != -1) {
+            QString file=rxImages.cap(1).trimmed();
+            QString old=QString("\"%1\"").arg(file);
+            QString news=QString("\"%1%2\"").arg(fileDir).arg(file);
+            if (QFileInfo(file).isRelative()) {
+                result.replace(old, news);
+            }
+            pos += rxImages.matchedLength()+(news.size()-old.size());
+        }
+
+
+        if (insertTooltips) {
+            // insert tooltips: search all occurences of the tooltip keywords that are not inside a tag (i.e. surrounded by a closing tag on
+            // the left and an opening tag on the right) and where the tag is not something special (like headers or links).
+            QMapIterator<QString, QFToolTipsData> itTT(tooltips);
+            while (itTT.hasNext()) {
+                itTT.next();
+                QRegExp rxTT(QString("\\<\\s*(\\w\\w*)[^\\>]*\\>[^\\<\\>]*(%1)[^\\<\\>]*\\<").arg(itTT.key()));
+                rxTT.setMinimal(true);
+                pos = 0;
+                //qDebug()<<rxTT;
+                while ((pos = rxTT.indexIn(result, pos)) != -1) {
+                    QString rep=QString("<a href=\"tooltip:%1\">%2</a>").arg(itTT.key()).arg(rxTT.cap(2));
+                    //qDebug()<<pos<<": "<<rxTT.cap(1)<<" ("<<rxTT.pos(1)<<")";
+                    //qDebug()<<pos<<": "<<rxTT.cap(2)<<" ("<<rxTT.pos(2)<<")  <==  "<<rep;
+                    QString tag=rxTT.cap(1).toLower();
+                    if (tag!="h1" && tag!="h2" && tag!="h3" && tag!="h4" && tag!="h5" && tag!="title" && tag!="a") {
+                        result=result.replace(rxTT.pos(2), rxTT.cap(2).size(), rep);
+                        pos += rep.size();
+                    } else {
+                        pos += rxTT.matchedLength();
+                    }
+                }
+
+            }
+        }
+        //qDebug()<<result;
+
+
+    }
+
+    return result;
+
+
 }

@@ -6,6 +6,7 @@ QFFunctionReferenceToolDocSearchThread::QFFunctionReferenceToolDocSearchThread(Q
     QThread(parent)
 {
     this->files=files;
+
     stopped=false;
     rxDefinition=QRegExp("<!--\\s*func:([\\w]*)\\s*-->(.*)<!--\\s*/func:\\1\\s*-->");
     rxTemplate=QRegExp("<!--\\s*template\\s*-->(.*)<!--\\s*/template\\s*-->");
@@ -140,6 +141,10 @@ void QFFunctionReferenceTool::addFunction(QString name, QString templ, QString h
     fd.fhelp=help;
     fd.ftemplate=templ;
     fd.fhelplink=helplink;
+    QUrl url(helplink);
+    fd.fhelpfile=url.toString(QUrl::RemoveFragment);
+    //qDebug()<<"function help "<<helplink;
+    //qDebug()<<"           -> "<<fd.fhelpfile;
     functionhelp[name.toLower()]=fd;
     QStringList sl=compExpression->stringlistModel()->stringList();
     if (!sl.contains(name)) sl.append(name);
@@ -373,16 +378,24 @@ QString QFFunctionReferenceTool::getFunctionTemplate(QString name)
 
 QString QFFunctionReferenceTool::getFunctionHelp(QString name)
 {
+    QString html="";
     if (functionhelp.contains(name)) {
-        return functionhelp[name.toLower()].fhelp;
-    } else {
-        return "";
+        return transformQF3HelpHTML(functionhelp[name.toLower()].fhelp, functionhelp[name.toLower()].fhelpfile);
     }
+
+    return QString();
 
 }
 
-void QFFunctionReferenceTool::startSearch(const QStringList &directories, const QStringList &filters)
+void QFFunctionReferenceTool::startSearch(const QStringList &directories_in, const QStringList &filters, const QString &globalConfigVar)
 {
+    QStringList directories=directories_in;
+
+    QStringList refDirs=QFPluginServices::getInstance()->getGlobalConfigValue(globalConfigVar).toStringList();
+    for (int i=0; i<refDirs.size(); i++) {
+        if (!directories.contains(refDirs[i])) directories.append(refDirs[i]);
+    }
+
     QStringList files;
     for (int dd=0; dd<directories.size(); dd++) {
         QDir d(directories[dd]);
@@ -412,16 +425,16 @@ void QFFunctionReferenceTool::startSearch(const QStringList &directories, const 
     delayedStartSearchThreads();
 }
 
-void QFFunctionReferenceTool::startSearch(const QStringList &directories)
+void QFFunctionReferenceTool::startSearch(const QStringList &directories, const QString& globalConfigVar)
 {
     QStringList filter;
     filter<<"*.html"<<"*.htm"<<"*.txt";
-    startSearch(directories, filter);
+    startSearch(directories, filter, globalConfigVar);
 }
 
-void QFFunctionReferenceTool::startSearch(const QString &directory)
+void QFFunctionReferenceTool::startSearch(const QString &directory, const QString& globalConfigVar)
 {
-    startSearch(QStringList(directory));
+    startSearch(QStringList(directory), globalConfigVar);
 }
 
 void QFFunctionReferenceTool::showCurrentFunctionHelp()

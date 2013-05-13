@@ -9,6 +9,13 @@
 #include <QElapsedTimer>
 #include <QSysInfo>
 #include <QProcess>
+#include "qfpluginservices.h"
+#include "qfplugin.h"
+#include "qffitalgorithm.h"
+#include "qffitfunction.h"
+#include <QPainter>
+#include "qffitalgorithmmanager.h"
+#include "qffitfunctionmanager.h"
 
 QAction* getSeparatorAction(QObject* parent) {
     QAction* a=new QAction(parent);
@@ -722,3 +729,26 @@ QColor getCycleColor(int value, unsigned int max, double S, double V) {
     col.setHsvF(double(value%max)/double(max-1)*0.8, S, V);
     return col;
 }
+
+QString removeHTMLComments(const QString& data) {
+     QRegExp rxComments("<!--(.*)-->", Qt::CaseInsensitive);
+     rxComments.setMinimal(true);
+     QString data1=data;
+     data1.remove(rxComments);
+     return data1;
+}
+
+QString transformQF3HelpHTMLFile(const QString& filename, const QString& defaultText, bool removeNonReplaced, const QFHelpReplacesList& more_replaces, bool insertTooltips) {
+    QFile f(filename);
+    if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        QTextStream in(&f);
+        return transformQF3HelpHTML(in.readAll(), filename, removeNonReplaced, more_replaces, insertTooltips);
+    } else {
+        return transformQF3HelpHTML(defaultText, filename, removeNonReplaced, more_replaces, insertTooltips);
+    }
+}
+
+QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced, const QList<QPair<QString, QString> >& more_replaces, bool insertTooltips) {
+    return QFPluginServices::getInstance()->transformQF3HelpHTML(input_html, filename, removeNonReplaced, more_replaces, insertTooltips);
+}
+

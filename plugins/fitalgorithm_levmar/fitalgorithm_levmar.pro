@@ -21,8 +21,7 @@ FORMS +=
 
 RESOURCES +=
 
-SRC_DISTRIBUTED.files = $$HEADERS \
-                        $$SOURCES
+
 
 TRANSLATIONS= ./translations/de.fitalgorithm_levmar.ts
 
@@ -31,6 +30,11 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/ \
                .
+SRC_DISTRIBUTED.files = $$HEADERS \
+                        $$SOURCES \
+                        $$FORMS \
+                        $$RESOURCES \
+                        $$TRANSLATIONS
 
 QT += core
 CONFIG += exceptions rtti stl

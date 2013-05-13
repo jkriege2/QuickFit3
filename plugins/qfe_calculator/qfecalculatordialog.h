@@ -31,6 +31,7 @@ class QFECalculatorDialog : public QDialog {
         QFMathParser* parser;
         QFECalculator* calc;
         QFFunctionReferenceTool* functionRef;
+        QStringList history;
 };
 
 #endif // QFECALCULATORDIALOG_H

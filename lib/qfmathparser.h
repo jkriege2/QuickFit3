@@ -36,7 +36,7 @@
 #ifndef QFMATHPARSER_H
 #define QFMATHPARSER_H
 
-
+class QFMathParser; // forward
 
 /**
  * \defgroup qfmpmain main function parser class
@@ -373,11 +373,11 @@ qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
  *    - \c qfmpBool:   a boolean value true|false
  *  .
  */
-enum qfmpResultType {qfmpDouble,  /*!< \brief a floating-point number with double precision. This is also used to deal with integers */
-                     qfmpString,  /*!< \brief a string of characters */
-                     qfmpBool,   /*!< \brief a boolean value true|false */
-                     qfmpDoubleVector,  /*!< \brief a vector of floating point numbers */
-                     qfmpVoid,  /*!< \brief a vector of floating point numbers */
+enum qfmpResultType {qfmpDouble=0x01,  /*!< \brief a floating-point number with double precision. This is also used to deal with integers */
+                     qfmpString=0x02,  /*!< \brief a string of characters */
+                     qfmpBool=0x04,   /*!< \brief a boolean value true|false */
+                     qfmpDoubleVector=0x08,  /*!< \brief a vector of floating point numbers */
+                     qfmpVoid=0x016  /*!< \brief a vector of floating point numbers */
                      };
 
 /** \brief result of any expression  */
@@ -404,6 +404,8 @@ struct QFLIB_EXPORT qfmpResult {
         QFLIB_EXPORT bool isInteger() const;
         /** \brief is this result convertible to unsigned integer? */
         QFLIB_EXPORT bool isUInt() const;
+        /** \brief returns the size of the result (number of characters for string, numbers of entries in vectors, 0 for void and 1 else) */
+        QFLIB_EXPORT int length() const;
 
         QFLIB_EXPORT void setDouble(double val);
         QFLIB_EXPORT void setBoolean(bool val);
@@ -419,10 +421,35 @@ struct QFLIB_EXPORT qfmpResult {
         QFLIB_EXPORT bool  convertsToIntVector() const;
         /** \brief returns \c true if the result is valid and not void */
         QFLIB_EXPORT bool isUsableResult() const;
+        /** \brief converst the result to a number (numbers are converted!) */
+        QFLIB_EXPORT double asNumber() const;
+        /** \brief converst the result to a string (strings are converted!) */
+        QFLIB_EXPORT QString asString() const;
+        /** \brief converst the result to a boolean (numbers and booleans are converted!) */
+        QFLIB_EXPORT bool asBool() const;
+        /** \brief returns the type */
+        QFLIB_EXPORT qfmpResultType getType() const;
+        /** \brief returns a string, describing the type of this result */
+        QFLIB_EXPORT QString typeName() const;
+
         /** \brief returns an invalid result */
         QFLIB_EXPORT static qfmpResult invalidResult();
         /** \brief returns an void result */
         QFLIB_EXPORT static qfmpResult voidResult();
+
+        QFLIB_EXPORT static qfmpResult add(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static qfmpResult sub(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static qfmpResult mul(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static qfmpResult div(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static qfmpResult mod(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static qfmpResult power(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static qfmpResult bitwiseand(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static qfmpResult bitwiseor(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static qfmpResult logicand(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static qfmpResult logicor(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static qfmpResult logicnot(const qfmpResult& l, QFMathParser *p);
+        QFLIB_EXPORT static qfmpResult neg(const qfmpResult& l, QFMathParser* p);
+        QFLIB_EXPORT static qfmpResult bitwisenot(const qfmpResult& l, QFMathParser* p);
 
         bool isValid;
         qfmpResultType type;   /*!< \brief type of the result */

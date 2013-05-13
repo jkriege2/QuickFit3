@@ -28,7 +28,7 @@
     </widget>
    </item>
    <item row="0" column="2">
-    <widget class="QLineEdit" name="edtExpression">
+    <widget class="QFEnhancedLineEdit" name="edtExpression">
      <property name="placeholderText">
       <string>enter expression to evaluate</string>
      </property>
@@ -107,22 +107,47 @@
    <item row="3" column="2" rowspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="6,0,0,0,3,3">
      <item>
-      <widget class="QLabel" name="labHelp">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>0</height>
-        </size>
+      <widget class="QScrollArea" name="scrollArea">
+       <property name="widgetResizable">
+        <bool>true</bool>
        </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::RichText</enum>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>330</width>
+          <height>171</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="labHelp">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </item>
      <item>
@@ -265,6 +290,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFEnhancedLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfenhancedlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>edtExpression</tabstop>
   <tabstop>edtHistory</tabstop>

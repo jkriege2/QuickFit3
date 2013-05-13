@@ -1355,6 +1355,17 @@ QFRawDataRecord* QFProject::getRawDataByNum(int i) const {
     else return NULL;
 }
 
+QList<QFRawDataRecord *> QFProject::getRDRsInFolder(const QString &folder, bool alsoSubfolders)
+{
+    QList<QFRawDataRecord *> lst;
+    for (int i=0; i<getRawDataCount(); i++) {
+        QFRawDataRecord * r=getRawDataByNum(i);
+        if (r->getFolder()==folder) lst<<r;
+        else if (alsoSubfolders&&r->getFolder().startsWith(folder)) lst<<r;
+    }
+    return lst;
+}
+
 
 QFEvaluationItem* QFProject::getEvaluationByID(int ID) const {
     if (evaluationIDExists(ID)) return evaluations[ID];

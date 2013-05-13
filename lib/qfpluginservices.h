@@ -24,6 +24,7 @@ class QFMathParser;
 class qfmpResult;
 
 typedef qfmpResult (*qfmpCFunction)(const qfmpResult*, unsigned int, QFMathParser*);
+typedef QList<QPair<QString, QString> > QF3HelpReplacesList;
 
 
 /*! \brief wrapper class that allows plugins to access basic logging services
@@ -56,6 +57,11 @@ class QFLIB_EXPORT QFPluginLogService {
 
 Q_DECLARE_INTERFACE(QFPluginLogService,
                      "www.dkfz.de.b040.quickfit3.QFPluginLogService/1.0")
+
+struct QFToolTipsData{
+    QString tooltip;
+    QString tooltipfile;
+};
 
 /*! \brief wrapper class that allows plugins to access basic services of the QuickFit application
     \ingroup qf3plugintools
@@ -140,11 +146,28 @@ class QFLIB_EXPORT QFPluginServices {
          *  occurence of \c $$key and replace any such occurence by the given value.
          */
         virtual QList<QPair<QString, QString> >* getHTMLReplacementList()=0;
+        /** \brief returns the first element with name \a name from the HTML help replacement list
+          *
+          * \note edits the HTML help replacement list, accessed by getHTMLReplacementList() (i.e. this is a convenience function!)
+          */
+        virtual QString getHTMLReplacement(const QString& name)=0;
+        /** \brief either replaces the value of the first element with name \a name in the HTML help replacement list with \a value, or append the new value.
+          *
+          * \note edits the HTML help replacement list, accessed by getHTMLReplacementList() (i.e. this is a convenience function!)
+          */
+        virtual void setOrAddHTMLReplacement(const QString& name, const QString& value)=0;
+        /** \brief either appends the value \a appendValue to the first element with name \a name in the HTML help replacement list, or append the new value \a appendValue.
+          *        The \a separator is used to separate \a appendValue and the old value, if the latter one exists.
+          *
+          * \note edits the HTML help replacement list, accessed by getHTMLReplacementList() (i.e. this is a convenience function!)
+          */
+        virtual void appendOrAddHTMLReplacement(const QString& name, const QString& appendValue, const QString& separator=QString("\n"))=0;
+
         /** \brief a list of the online help directories of all plugins with metadata.
          */
         virtual QList<HelpDirectoryInfo>* getPluginHelpList()=0;
         /** \brief returns a list of tooltips for the online-help */
-        virtual QMap<QString, QString> getTooltips() const=0;
+        virtual QMap<QString, QFToolTipsData> getTooltips() const=0;
 
         /** \brief display the help window and open the given file. If no file is given, des QuickFit main help page is shown. */
         virtual void displayHelpWindow(const QString& helpfile=QString(""))=0;
@@ -166,9 +189,34 @@ class QFLIB_EXPORT QFPluginServices {
 
         /** \brief return the settings for the given plugin ID */
         virtual QString getPluginHelpSettings(const QString& pluginID)=0;
+        /*! \brief transforms some special tags in the given input html
+            \ingroup qf3lib_tools
+
+            This functions performs SOME of the transformations described in \pageref qf3helpsystem .
+
+            It does not (amongst others):
+              - add standard headers/footers
+              - literature references
+              - table of contents
+            .
+
+            It does (amongst others):
+              -
+            .
+         */
+        virtual QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced=true, const QF3HelpReplacesList& more_replaces=QF3HelpReplacesList(), bool insertTooltips=false)=0;
 
 
-
+        /** \brief returns a global configuration value. This can be used to implement an application wide communication/exchange
+          *
+          * \see setGlobalConfigValue()
+          */
+        virtual QVariant getGlobalConfigValue(const QString& key)=0;
+        /** \brief sets a global configuration value. This can be used to implement an application wide communication/exchange
+          *
+          * \see getGlobalConfigValue()
+          */
+        virtual void setGlobalConfigValue(const QString& key, const QVariant& value)=0;
 
 
 

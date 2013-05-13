@@ -33,7 +33,9 @@ INCLUDEPATH += ../../lib/ \
 
 SRC_DISTRIBUTED.files = $$HEADERS \
                         $$SOURCES \
-                        $$FORMS
+                        $$FORMS \
+                        $$RESOURCES \
+                        $$TRANSLATIONS
 
 
 QT += gui xml svg

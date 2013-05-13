@@ -91,6 +91,14 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
         /** \copydoc QFPluginServices::getHTMLReplacementList() */
         virtual QList<QPair<QString, QString> >* getHTMLReplacementList();
+        /** \copydoc QFPluginServices::getHTMLReplacement() */
+        virtual QString getHTMLReplacement(const QString& name);
+        /** \copydoc QFPluginServices::setOrAddHTMLReplacement() */
+        virtual void setOrAddHTMLReplacement(const QString& name, const QString& value);
+        /** \copydoc QFPluginServices::appendOrAddHTMLReplacement() */
+        virtual void appendOrAddHTMLReplacement(const QString& name, const QString& appendValue, const QString& separator=QString("\n"));
+
+
         /** \copydocQFPluginServices::getPluginHelpList() */
         virtual QList<QFPluginServices::HelpDirectoryInfo>* getPluginHelpList();
         /** \copydoc QFPluginServices::getAssetsDirectory() */
@@ -156,7 +164,12 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual void addGlobalVariable(const QString& name, const QString& value);
         /** \copydoc QFPluginServices::addGlobalVariable() */
         virtual void addGlobalVariable(const QString& name, bool value);
-
+        /** \copydoc QFPluginServices::getGlobalConfigValue() */
+        virtual QVariant getGlobalConfigValue(const QString& key);
+        /** \copydoc QFPluginServices::setGlobalConfigValue() */
+        virtual void setGlobalConfigValue(const QString& key, const QVariant& value);
+        /** \copydoc QFPluginServices::transformQF3HelpHTML() */
+        virtual QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced=true, const QF3HelpReplacesList& more_replaces=QF3HelpReplacesList(), bool insertTooltips=false);
 
         /** \brief return the assets directory  of the online help for the given plugin ID */
         virtual QString getPluginAssetsDirectory(const QString& pluginID);
@@ -179,7 +192,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual QWidget* getCreateView(const QString& name, const QString& title);
         virtual void clearView(const QString& name);
         virtual void addHistogramToView(const QString& name, const Histogram& histogram);
-        virtual QMap<QString, QString> getTooltips() const;
+        virtual QMap<QString, QFToolTipsData> getTooltips() const;
     protected:
         void closeEvent(QCloseEvent *event);
         virtual void showEvent(QShowEvent* event);
@@ -301,10 +314,11 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
         QList<QPair<QString, QString> > htmlReplaceList;
         QList<QFPluginServices::HelpDirectoryInfo> pluginHelpList;
-        QMap<QString, QString> tooltips;
+        QMap<QString, QFToolTipsData> tooltips;
 
         QList<QFPluginOptionsDialogInterface*> pluginOptionDialogs;
         QMap<QString, QFHistogramView*> histograms;
+        QMap<QString, QVariant> globalParameterStore;
         QString lastHistogram;
 
         QTimer newProjectTimer;

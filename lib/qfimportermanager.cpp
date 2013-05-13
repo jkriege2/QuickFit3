@@ -7,7 +7,7 @@ QFImporterManager::QFImporterManager(ProgramOptions* options, QObject *parent) :
 }
 
 
-void QFImporterManager::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QString>& tooltips) {
+void QFImporterManager::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData>& tooltips) {
     QDir pluginsDir = QDir(directory);
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
@@ -46,9 +46,9 @@ void QFImporterManager::searchPlugins(QString directory, QList<QFPluginServices:
 
                     QStringList keys=setTooltips.childKeys();
                     for (int i=0; i<keys.size(); i++) {
-                        tooltips[keys[i]]=setTooltips.value(keys[i], tr("<i>no tooltip available</i>")).toString();
+                        tooltips[keys[i]].tooltip=setTooltips.value(keys[i], tr("<i>no tooltip available</i>")).toString();
+                        tooltips[keys[i]].tooltipfile=info.directory+"tooltips.ini";
                     }
-
                 }
             }
         }

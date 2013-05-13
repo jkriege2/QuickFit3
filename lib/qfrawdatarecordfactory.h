@@ -45,7 +45,7 @@ class QFLIB_EXPORT QFRawDataRecordFactory : public QObject {
         virtual ~QFRawDataRecordFactory();
 
         /** \brief search for raw data record plugins in the given directory */
-        void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QString> &tooltips);
+        void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData> &tooltips);
 
         /** \brief distribute objects to plugins that allow interaction with the main application */
         void distribute(QFProject* project, ProgramOptions* settings, QFPluginServices* services, QWidget* parent);

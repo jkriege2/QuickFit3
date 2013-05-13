@@ -1,0 +1,84 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Fits: Function Parameter Optimization</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+  <h2>Linear Fits (Regression, ...)</h2>
+  <ul>
+	  <li><a name="regression"/><!-- func:regression -->
+	  <b><tt><!-- template -->regression(X, Y)<!-- /template --></tt>, <tt>regression(X, Y, "parameter", parameterValue)</tt> - <i>calculates the linear regression coefficients from the data vectors <tt>X</tt> and <tt>Y</tt> </i>:</b><br>
+	  The argument <tt>X</tt> and <tt>Y</tt> have to be vectors with at least two entries (one needs two datapoints to estimate two parameters of a line!). The function returns the two coefficients of $$math:f(x)=a+b\cdot x$$ as a vector with the entires <tt>[a, b]</tt>. <br>
+	  A special call <tt>regression(X, Y, "parameter", parameterValue)</tt> allows to fix one of the two parameters a or b:
+	  <blockquote>
+	      <tt>regression(X, Y, "a", 2)</tt> performs a regression with a fixed to 2<br>
+		  <tt>regression(X, Y, "b", 0)</tt> performs a regression with b fixed to 0
+	  </blockquote>
+	  In both cases the return vector is still <tt>[a, b]</tt>
+	  <!-- /func:regression -->
+	  </li>
+
+	  <li><a name="weighted_regression"/><!-- func:weighted_regression -->
+	  <b><tt><!-- template -->weighted_regression(X, Y, W)<!-- /template --></tt>, <tt>weighted_regression(X, Y, W, "parameter", parameterValue)</tt> - <i>calculates the linear regression coefficients from the data vectors <tt>X</tt> and <tt>Y</tt>. The weights are given in <tt>W</tt> </i>:</b><br>
+	  The argument <tt>X</tt>, <tt>Y</tt> and <tt>W</tt> have to be vectors with at least two entries (one needs two datapoints to estimate two parameters of a line!). The function returns the two coefficients of $$math:f(x)=a+b\cdot x$$ as a vector with the entires <tt>[a, b]</tt>. <br>
+	  A special call <tt>weighted_regression(X, Y, W, "parameter", parameterValue)</tt> allows to fix one of the two parameters a or b:
+	  <blockquote>
+	      <tt>weighted_regression(X, Y, W, "a", 2)</tt> performs a regression with a fixed to 2<br>
+		  <tt>weighted_regression(X, Y, W, "b", 0)</tt> performs a regression with b fixed to 0
+	  </blockquote>
+	  In both cases the return vector is still <tt>[a, b]</tt>
+	  <!-- /func:weighted_regression -->
+	  </li>
+
+	  <li><a name="irls"/><!-- func:irls -->
+	  <b><tt><!-- template -->irls(X, Y)<!-- /template --></tt>, <tt>irls(X, Y, "parameter", parameterValue)</tt> - <i>calculates the iteratively reweighted regression coefficients from the data vectors <tt>X</tt> and <tt>Y</tt> </i>:</b><br>
+	  The argument <tt>X</tt> and <tt>Y</tt> have to be vectors with at least two entries (one needs two datapoints to estimate two parameters of a line!). The function returns the two coefficients of $$math:f(x)=a+b\cdot x$$ as a vector with the entires <tt>[a, b]</tt>. <br>
+	  A special call <tt>irls(X, Y, "parameter", parameterValue)</tt> allows to fix one of the two parameters a or b:
+	  <blockquote>
+	      <tt>irls(X, Y, "a", 2)</tt> performs a regression with a fixed to 2<br>
+		  <tt>irls(X, Y, "b", 0)</tt> performs a regression with b fixed to 0
+	  </blockquote>
+	  In both cases the return vector is still <tt>[a, b]</tt>. <br>
+	  It is also possible to change the parameters p (default: 1.1) and  number of iterations (default: 100) of the IRLS algorithm:
+	  <blockquote>
+	      <tt>irls(X, Y, p)</tt><br>
+	      <tt>irls(X, Y, p, iterations)</tt><br>
+	      <tt>irls(X, Y, p, "a", 2)</tt><br>
+	      <tt>irls(X, Y, p, iterations, "a", 2)</tt><br>
+	  </blockquote>
+	  <br>
+	  <u>Algorithm Description:</u><br>
+
+    This is a simple form of the IRLS algorithm to estimate the parameters a and b in a linear model $$math: f(x)=a+b\cdot x $$.
+    This algorithm solves the optimization problem for a $$math: L_p$$-norm:
+      $$bmath: (a^\ast,b^\ast)=\argmin\limits_{a,b}\sum\limits_i|a+b\cdot x_i-y_i|^p $$
+    by iteratively optimization weights \f$ \vec{w} \f$ and solving a weighted least squares problem in each iteration:
+      $$bmath: (a_n,b_n)=\argmin\limits_{a,b}\sum\limits_i|a+b\cdot x_i-y_i|^{(p-2)}\cdot|a+b\cdot x_i-y_i|^2 $
+
+
+    The algoruithms works as follows:<ol>
+      <li> calculate initial $$math: a_0$$ and $$math: b_0$$ with unweighted regression from x and y</li>
+      <li> perform a number of iterations (parameter iterations ). In each iteration n:<ol>
+          <li>calculate the error vector $$math:\vec{e}$$: $$bmath: e_i = a+b\cdot x_i -y_i $$</li>
+          <li>estimate new weights $$math:\vec{w}$$: $$bmath: w_i=|e_i|^{(p-2)/2} $$</li>
+          <li>calculate new estimates $$math: a_n$$ and $$math: b_n$$ with weighted regression from $$math: \vec{x}$$ and $$math: \vec{y}$$ and $$math: \vec{w}$$</li>
+        </ol></li>
+      <li>return the last estimates $$math:a_n$$ and $$math:b_n$$</li>
+    </ol>
+
+    $$figure:../pic/irls.png:$$
+	$$see:C. Sidney Burrus: "Iterative Reweighted Least Squares", <a href="http://cnx.org/content/m45285/latest/">http://cnx.org/content/m45285/latest/</a>$$
+	  <!-- /func:regression -->
+	  </li>
+  
+  </ul>
+    <h2>Nonlinear Fits (Least Squares, ...)</h2>
+	<ul>
+	</ul>
+
+  </body>
+  </html>
+  

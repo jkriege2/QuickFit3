@@ -49,4 +49,7 @@ CONFIG += exceptions rtti stl
 
 SRC_DISTRIBUTED.files = $$HEADERS \
                         $$SOURCES \
-                        $$FORMS
+                        $$FORMS \
+                        $$RESOURCES \
+                        $$TRANSLATIONS
+

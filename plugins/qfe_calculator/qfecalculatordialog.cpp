@@ -14,6 +14,7 @@ QFECalculatorDialog::QFECalculatorDialog(QFECalculator *calc, QWidget *parent) :
     functionRef->setDefaultWordsMathExpression();
 
     ui->setupUi(this);
+    ui->edtExpression->setUseHistory(true);
 
     functionRef->registerEditor(ui->edtExpression);
     functionRef->setCurrentHelpButton(ui->btnFunctionHelp);
@@ -99,6 +100,9 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
         }
         parser->addVariable("ans", r);
         parser->addVariable("answer", r);
+        ui->edtExpression->setText("");
+        ui->edtExpression->setFocus();
+        history.append(expression);
     } else {
         result=tr("<font color=\"red\">invalid result</font>");
     }
@@ -130,6 +134,7 @@ void QFECalculatorDialog::on_edtExpression_textChanged(QString text) {
 
 void QFECalculatorDialog::on_btnClearHistory_clicked()
 {
+    history.clear();
     ui->edtHistory->clear();
     calc->setHistory(ui->edtHistory->document()->toHtml("UTF-8"));
 }

@@ -7,6 +7,7 @@ QFEnhancedLineEdit::QFEnhancedLineEdit(QWidget* parent):
     QLineEdit(parent)
 {
     m_buttonDistance=1;
+    m_historyposition=-1;
     setContextMenuPolicy(Qt::DefaultContextMenu);
     //setMinimumHeight(minimumHeight()+2);
 
@@ -22,6 +23,7 @@ void QFEnhancedLineEdit::focusOutEvent(QFocusEvent* event) {
         completer()->model()->insertRow(completer()->model()->rowCount());
         completer()->model()->setData(completer()->model()->index(completer()->model()->rowCount()-1,0), this->text());
     }
+    history.append(text());
     QLineEdit::focusOutEvent(event);
 }
 
@@ -181,3 +183,61 @@ void QFEnhancedLineEdit::clearContextMenu() {
     }
 }
 
+bool QFEnhancedLineEdit::useHistory() const
+{
+    return m_useHistory;
+}
+
+void QFEnhancedLineEdit::setUseHistory(bool use)
+{
+    m_useHistory=use;
+    m_historyposition=-1;
+}
+
+QStringList QFEnhancedLineEdit::getHistory() const
+{
+    return history;
+}
+
+void QFEnhancedLineEdit::clearHistory()
+{
+    history.clear();
+    m_historyposition=-1;
+}
+
+void QFEnhancedLineEdit::addToHistory(const QString &item)
+{
+    history.append(item);
+}
+
+void QFEnhancedLineEdit::setHistory(const QStringList &history)
+{
+    this->history=history;
+}
+
+
+void QFEnhancedLineEdit::keyPressEvent(QKeyEvent *event) {
+    qDebug()<<event->key();
+    if (m_useHistory) {
+        if(event->key() == Qt::Key_Up){
+            if (m_historyposition<history.size()+1) m_historyposition++;
+            if (m_historyposition>=0 && m_historyposition<history.size()) {
+                setText(history[history.size()-1-m_historyposition]);
+                selectAll();
+            }
+            return ;
+        } else if(event->key() == Qt::Key_Down){
+            if (m_historyposition>-1) m_historyposition--;
+            if (m_historyposition>=0 && m_historyposition<history.size()) {
+                setText(history[history.size()-1-m_historyposition]);
+                selectAll();
+            }
+            return ;
+        }
+    }
+    if (event->key()==Qt::Key_Enter || event->key()==Qt::Key_Return) {
+        history.append(text());
+    }
+    // default handler for event
+    QLineEdit::keyPressEvent(event);
+}

@@ -217,9 +217,17 @@ void QFImFCCSFitEvaluationItem::ensureFitFiles()
 
 void QFImFCCSFitEvaluationItem::setFitFile(int num, QFRawDataRecord *record)
 {
+    QList<QFRawDataRecord*> fileset;
     if (num<0) return;
     else if (num>fitFilesList.size()) fitFilesList.append(record);
     else fitFilesList[num]=record;
+
+    for (int i=0; i<fitFilesList.size(); i++) {
+        fileset<<fitFilesList[i];
+    }
+    if (guessedFileSets.size()<=0) guessFileSets(fileset, false);
+    emit parameterStructureChanged();
+
     emit parameterStructureChanged();
     setDataChanged();
     emit fileChanged(num, record);
@@ -228,10 +236,15 @@ void QFImFCCSFitEvaluationItem::setFitFile(int num, QFRawDataRecord *record)
 
 void QFImFCCSFitEvaluationItem::setFitFiles(const QList<QFRawDataRecord *> &records)
 {
+    QList<QFRawDataRecord*> fileset;
     while (records.size()>fitFilesList.size()) fitFilesList.append(NULL);
     for (int i=0; i<records.size(); i++) {
         fitFilesList[i]=records[i];
     }
+    for (int i=0; i<fitFilesList.size(); i++) {
+        fileset<<fitFilesList[i];
+    }
+    if (guessedFileSets.size()<=0) guessFileSets(fileset, false);
     emit parameterStructureChanged();
     setDataChanged();
     for (int i=0; i<records.size(); i++) {
@@ -604,6 +617,71 @@ void QFImFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &fi
 {
     int oldS=guessedFileSets.size();
     guessedFileSets.clear();
+    qDebug()<<"guessFileSets "<<fileset.size();
+
+    if (fileset.size()>0) {
+        QString groupName=fileset[0]->getGroupName();
+        bool sameGroup=true;
+        QString folderName=fileset[0]->getFolder();
+        bool sameFolder=true;
+        QStringList roles;
+        bool allRolesOK=true;
+        bool someRolesOK=false;
+        for (int i=0; i<fileset.size(); i++) {
+            if (fileset[i]->getGroupName()!=groupName) sameGroup=false;
+            if (fileset[i]->getFolder()!=folderName) sameFolder=false;
+            QString role=fileset[i]->getRole();
+            roles<<role;
+            if (role.isEmpty()) allRolesOK=false;
+            else someRolesOK=true;
+        }
+
+        QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
+        qDebug()<<"sameGroup "<<sameGroup<<" ("<<groupName<<")   sameFolder="<<sameFolder<<" ("<<folderName<<")   allRolesOK="<<allRolesOK<<"   someRolesOK="<<someRolesOK<<"   roles"<<roles;
+        if (project && someRolesOK) {
+            if (sameGroup && !groupName.isEmpty()) {
+                qDebug()<<"guess from group";
+                for (int i=0; i<project->getRDRGroupCount(); i++) {
+                    QList<QFRawDataRecord*> rlist=project->getRDRGroupMembers(i);
+                    QList<QFRawDataRecord*> newset;
+                    bool ok=false;
+                    for (int j=0; j<roles.size(); j++) newset<<NULL;
+                    for (int j=0; j<rlist.size(); j++) {
+                        if (rlist[j]) {
+                            int idx=roles.indexOf(rlist[j]->getRole());
+                            if (idx>=0 && idx<newset.size()) {
+                                newset[idx]=rlist[j];
+                                ok=true;
+                            }
+                        }
+                    }
+                    if (ok && !guessedFileSets.contains(newset) && !fittedFileSets.contains(newset)) guessedFileSets.append(newset);
+                }
+            } else if (sameFolder) {
+                qDebug()<<"guess from folder";
+                for (int i=0; i<project->getRawDataCount(); i++) {
+                    QList<QFRawDataRecord*> rlist=project->getRDRsInFolder(project->getRawDataByNum(i)->getFolder());
+                    QList<QFRawDataRecord*> newset;
+                    bool ok=false;
+                    for (int j=0; j<roles.size(); j++) newset<<NULL;
+                    for (int j=0; j<rlist.size(); j++) {
+                        if (rlist[j]) {
+                            int idx=roles.indexOf(rlist[j]->getRole());
+                            if (idx>=0 && idx<newset.size()) {
+                                newset[idx]=rlist[j];
+                                ok=true;
+                            }
+                        }
+                    }
+                    if (ok && !guessedFileSets.contains(newset) && !fittedFileSets.contains(newset)) guessedFileSets.append(newset);
+                }
+            } else {
+
+            }
+        }
+    }
+    qDebug()<<"guessed:"<<guessedFileSets.size();
+
     if (emitChangedSignal && guessedFileSets.size()!=oldS) emit filesetsChanged();
 }
 

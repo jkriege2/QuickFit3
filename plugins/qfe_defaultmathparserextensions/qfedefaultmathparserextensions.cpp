@@ -1,8 +1,10 @@
 #include "qfedefaultmathparserextensions.h"
+#include "qfedefaultmathparserextensionfunctions.h"
 #include <QtGui>
 #include <QtPlugin>
 #include <iostream>
 #include "qfpluginservices.h"
+#include "qfmathparser.h"
 
 #define LOG_PREFIX QString("qfe_defaultmathparserextensions >>> ").toUpper()
 
@@ -30,22 +32,12 @@ void QFEDefaultMathParserExtensions::projectChanged(QFProject* oldProject, QFPro
 void QFEDefaultMathParserExtensions::initExtension() {
     /* do initializations here but do not yet connect to the camera! */
     
-	/*
-	// some example code that may be used to register a menu and a tool button:
-	services->log_global_text(tr("initializing extension '%1' ...\n").arg(getName()));
-    
-	QAction* actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Start Extension"), this);
-    connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
-    QToolBar* exttb=services->getToolbar("extensions");
-    if (exttb) {
-        exttb->addAction(actStartPlugin);
-    }
-    QMenu* extm=services->getMenu("extensions");
-    if (extm) {
-        extm->addAction(actStartPlugin);
-    }
-    services->log_global_text(tr("initializing extension '%1' ... DONE\n").arg(getName()));
-	*/
+    // make the additional documentation known to the main help
+    QFPluginServices::getInstance()->appendOrAddHTMLReplacement("qfmathparser_ref", QString("$$insert:%1/parserref.inc$$").arg(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())));
+    QFPluginServices::getInstance()->setGlobalConfigValue("QFMathParser_ref", QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
+    QFMathParser::addGlobalFunction("regression", fRegression);
+    QFMathParser::addGlobalFunction("weighted_regression", fWeightedRegression);
+    QFMathParser::addGlobalFunction("irls", fIRLS);
 }
 
 

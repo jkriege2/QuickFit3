@@ -25,7 +25,7 @@ bool QFFitAlgorithmManager::contains(const QString &ID)
     return false;
 }
 
-void QFFitAlgorithmManager::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QString>& tooltips) {
+void QFFitAlgorithmManager::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData>& tooltips) {
     QDir pluginsDir = QDir(directory);
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
@@ -69,9 +69,9 @@ void QFFitAlgorithmManager::searchPlugins(QString directory, QList<QFPluginServi
 
                     QStringList keys=setTooltips.childKeys();
                     for (int i=0; i<keys.size(); i++) {
-                        tooltips[keys[i]]=setTooltips.value(keys[i], tr("<i>no tooltip available</i>")).toString();
+                        tooltips[keys[i]].tooltip=setTooltips.value(keys[i], tr("<i>no tooltip available</i>")).toString();
+                        tooltips[keys[i]].tooltipfile=info.directory+"tooltips.ini";
                     }
-
                 }
             }
         }

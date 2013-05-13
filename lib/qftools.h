@@ -680,4 +680,13 @@ QList<T3> qfQTripleListToThirdList(const QList<QTriple<T1, T2, T3> > &input) {
     return res;
 }
 
+QFLIB_EXPORT QString removeHTMLComments(const QString& data);
+
+typedef QList<QPair<QString, QString> > QFHelpReplacesList;
+/** \copydoc QFPluginServices::setGlobalConfigValue() */
+QFLIB_EXPORT QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced=true, const QFHelpReplacesList& more_replaces=QFHelpReplacesList(), bool insertTooltips=false);
+/*! \brief transforms some special tags in the given input file. If the file does not exist, defaultText is used */
+QFLIB_EXPORT QString transformQF3HelpHTMLFile(const QString& filename, const QString& defaultText=QString(""), bool removeNonReplaced=true, const QFHelpReplacesList& more_replaces=QFHelpReplacesList(), bool insertTooltips=false);
+
+
 #endif // QFTOOLS_H
