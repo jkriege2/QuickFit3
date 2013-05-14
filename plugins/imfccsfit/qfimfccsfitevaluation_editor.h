@@ -76,6 +76,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void configureForSPIMFCCS();
 
         void filesSetActivated(const QModelIndex& idx);
+        void on_chkSaveStrings_toggled(bool checked);
     protected:
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFImFCCSFitEvaluationEditor *ui;

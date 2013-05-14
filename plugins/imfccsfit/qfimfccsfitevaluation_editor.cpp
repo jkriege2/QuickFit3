@@ -238,6 +238,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         ui->cmbErrorDisplay->setCurrentIndex(item->getProperty("imFCCSFit/errordisplay", 0).toInt());
         ui->chkGrid->setChecked(item->getProperty("imFCCSFit/grid", true).toBool());
         ui->chkKey->setChecked(item->getProperty("imFCCSFit/key", true).toBool());
+        ui->chkSaveStrings->setChecked(item->getProperty("dontSaveFitResultMessage", true).toBool());
         ui->lstFileSets->setModel(item->getFileSetsModel());
 
         ui->tableView->setModel(item->getParameterInputTableModel());
@@ -997,6 +998,11 @@ int QFImFCCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int index
         return data->getCorrelationN()-1;
     }
     return 0;
+}
+void QFImFCCSFitEvaluationEditor::on_chkSaveStrings_toggled(bool checked)
+{
+    if (!current) return;
+    current->setQFProperty("dontSaveFitResultMessage", checked, false, false);
 }
 
 

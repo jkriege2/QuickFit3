@@ -6,6 +6,9 @@
 #include "qffitfunctionsspimfcsdiffe2_newveff.h"
 #include "qffitfunctionsspimfcsadiffe2.h"
 #include "qffitfunctionsspimfcsadiffce2.h"
+#include "qffitfunctionsspimfccsfwdiff2colorccf.h"
+#include "qffitfunctionsspimfccsfwdiff2coloracfg.h"
+#include "qffitfunctionsspimfccsfwdiff2coloracfr.h"
 
 QStringList QFPFitFunctionsSPIMFCS::getIDs() const {
     QStringList res;
@@ -22,6 +25,10 @@ QStringList QFPFitFunctionsSPIMFCS::getIDs() const {
 
     res<<"fccs_spim_diffflow";
     res<<"fccs_spim_diff2color";
+
+    res<<"fccs_spim_fw_diff2colorccf";
+    res<<"fccs_spim_fw_diff2coloracfg";
+    res<<"fccs_spim_fw_diff2coloracfr";
     return res;
 }
 
@@ -46,6 +53,12 @@ QFFitFunction* QFPFitFunctionsSPIMFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionsSPIMFCCSDiffFlow();
     } else if (id=="fccs_spim_diff2color") {
         return new QFFitFunctionsSPIMFCCSDiff2Color();
+    } else if (id=="fccs_spim_fw_diff2coloracfg") {
+        return new QFFitFunctionsSPIMFCCSFWDiff2ColorACFG();
+    } else if (id=="fccs_spim_fw_diff2coloracfr") {
+        return new QFFitFunctionsSPIMFCCSFWDiff2ColorACFR();
+    } else if (id=="fccs_spim_fw_diff2colorccf") {
+        return new QFFitFunctionsSPIMFCCSFWDiff2ColorACFR();
     }
     return NULL;
 }

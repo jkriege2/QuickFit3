@@ -203,6 +203,7 @@ void QFImFCCSFitEvaluationItem::clearLinkParameters(int file)
     setDataChanged();
 }
 
+
 void QFImFCCSFitEvaluationItem::ensureFitFiles()
 {
     if (fitFilesList.size()<=0)  {
@@ -960,6 +961,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
 
                     if (run<0) record->resultsSetString(evalID, "fitalg_name", falg->id());
                     else if (!getProperty("dontSaveFitResultMessage", false).toBool()) record->resultsSetInStringList(evalID, "fitalg_name", run, falg->id());
+                    else  record->resultsSetString(evalID, "fitalg_name", falg->id());
                     record->resultsSetGroup(evalID, param, group);
                     record->resultsSetLabel(evalID, param, tr("fit: algorithm"));
 

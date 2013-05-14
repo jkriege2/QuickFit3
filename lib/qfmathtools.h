@@ -12,15 +12,20 @@
 #include <QFileDialog>
 #include <cstdlib>
 
-/*! \brief Avogadro's number \f$ N_A=6.022\cdot10^{23} \f$
+/*! \brief Avogadro's number \f$ N_A=6.02214179\cdot10^{23} \f$
     \ingroup qf3lib_mathtools
  */
 #define QF_NAVOGADRO (6.02214179e23)
 
-/*! \brief square root of pi \f$ \sqrt{\pi}=1.772453851 \f$
+/*! \brief square root of pi \f$ \sqrt{\pi}=1.77245385091 \f$
     \ingroup qf3lib_mathtools
  */
-#define QF_SQRTPI (1.772453851)
+#define QF_SQRTPI (1.77245385091)
+
+/*! \brief square root of pi \f$ \sqrt{2\pi}=2.50662827463 \f$
+    \ingroup qf3lib_mathtools
+ */
+#define QF_SQRT2PI (2.50662827463)
 
 /*! \brief check whether the dlotaing point number is OK (i.e. non-inf, non-NAN)
     \ingroup qf3lib_mathtools
