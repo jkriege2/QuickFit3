@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <stdint.h>
 #include <limits>
+#include <algorithm>
 
 /******************************************************************************************
  * default-Funktionen für den Parser
