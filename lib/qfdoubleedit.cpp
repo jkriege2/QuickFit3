@@ -5,20 +5,23 @@
 #include <cmath>
 #include <QMenu>
 #include <QFile>
-
+#include <QDebug>
+#include <float.h>
 QFDoubleEdit::QFDoubleEdit(QWidget* parent):
     QLineEdit(parent)
 {
     QFDoubleEdit_BASIC_REGEXP=QString("(\\+|\\-)?\\d+("+QString(QLocale::system().decimalPoint())+"\\d+)?((e|E)(\\+|\\-)?\\d+)?");
     setMinimumHeight(22);
 
+    m_logscale=false;
+    m_logbase=10;
     m_Integer=false;
     m_checkMaximum=true;
     m_maximum=100;
     m_checkMinimum=true;
     m_minimum=-100;
     m_decimals=6;
-    m_increment=true;
+    m_increment=1;
     m_current=1;
     m_updownKeyEnabled=true;
 
@@ -80,6 +83,12 @@ double QFDoubleEdit::value() const {
     if (!ok) return 0;
     if (m_checkMaximum && (val>m_maximum)) { val=m_maximum; }
     if (m_checkMaximum && (val<m_minimum)) { val=m_minimum; }
+    if (m_logscale) {
+        if (val<=0) {
+            if (m_Integer) val=1;
+            else val=DBL_MIN;
+        }
+    }
     return val;
 }
 
@@ -89,6 +98,12 @@ void QFDoubleEdit::setValue(double valueIn) {
     if (m_checkMaximum && (value>m_maximum)) { value=m_maximum; }
     if (m_checkMaximum && (value<m_minimum)) { value=m_minimum; }
     if (m_Integer) value=round(valueIn);
+    if (m_logscale) {
+        if (value<=0) {
+            if (m_Integer) value=1;
+            else value=DBL_MIN;
+        }
+    }
 
     QString txt;
     txt=txt.sprintf(QString("%."+QString::number(m_decimals)+"g").toAscii().data(), value);
@@ -121,17 +136,42 @@ void QFDoubleEdit::stepDown()
 
 void QFDoubleEdit::stepUp(int steps)
 {
-    double i=m_increment*double(steps);
-    if (m_Integer) i=round(m_increment);
-    setValue(value()+i);
+    double newVal=value();
+    if (m_logscale) {
+
+        for (int j=0; j<steps; j++) {
+            double decade=qMin(ceil(log(newVal)/log(m_logbase)), floor(log(newVal)/log(m_logbase)));
+            double inc=pow(m_logbase, decade)/m_increment;
+            //qDebug()<<newVal<<decade<<inc;
+            newVal+=inc;
+        }
+    } else {
+        double i=m_increment*double(steps);
+        if (m_Integer) i=round(m_increment);
+        newVal+=i;
+    }
+    setValue(newVal);
     emit valueChanged(value());
 }
 
 void QFDoubleEdit::stepDown(int steps)
 {
-    double i=m_increment*double(steps);
-    if (m_Integer) i=round(m_increment);
-    setValue(value()-i);
+    double newVal=value();
+    if (m_logscale) {
+
+        for (int j=0; j<steps; j++) {
+            double decade=qMin(ceil(log(newVal)/log(m_logbase)), floor(log(newVal)/log(m_logbase)));
+            double inc=pow(m_logbase, decade)/m_increment;
+            if (newVal-inc<=0.0 || newVal-inc<=m_minimum) inc=inc/m_logbase;
+            //qDebug()<<newVal<<decade<<inc;
+            newVal-=inc;
+        }
+    } else {
+        double i=m_increment*double(steps);
+        if (m_Integer) i=round(m_increment);
+        newVal-=i;
+    }
+    setValue(newVal);
     emit valueChanged(value());
 }
 
@@ -209,6 +249,15 @@ void QFDoubleEdit::setUpDownKeyEnabled(bool enabled)
     m_updownKeyEnabled=enabled;
 }
 
+void QFDoubleEdit::setLogScale(bool enabled, double increments)
+{
+    m_logscale=enabled;
+    if (m_logscale) {
+        m_increment=increments;
+        setValue(value());
+    }
+}
+
 void QFDoubleEdit::resizeEvent ( QResizeEvent * event ) {
     int btnWidth=ceil((double)event->size().height()*3.0/4.0);
     int btnHeight=ceil((double)qMax(22,event->size().height())/2.0);
@@ -222,9 +271,11 @@ void QFDoubleEdit::wheelEvent(QWheelEvent *event)
 {
     int numDegrees = event->delta() / 8;
     int numSteps = numDegrees / 15;
+    //qDebug()<<event->delta()<<event->orientation();
 
-    if (event->orientation() == Qt::Horizontal) {
-        stepUp(numSteps);
+    if (event->orientation() == Qt::Vertical) {
+        if (numSteps<0) stepDown(-numSteps);
+            else stepUp(numSteps);
     }
     event->accept();
 }
@@ -255,4 +306,9 @@ void QFDoubleEdit::contextMenuEvent(QContextMenuEvent* event) {
 
 void QFDoubleEdit::addKeyEvent(int key, Qt::KeyboardModifiers modifiers) {
     m_keyEvents.append(qMakePair(key, modifiers));
+}
+
+bool QFDoubleEdit::logScale() const
+{
+    return m_logscale;
 }

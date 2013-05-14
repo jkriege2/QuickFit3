@@ -147,11 +147,12 @@ QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInte
         }
     }
 
-    if (widget==FloatEdit) {
+    if (widget==FloatEdit || widget==LogFloatEdit) {
         neditValue=new QFDoubleEdit(parent);
         neditValue->setRange(datastore->getFitMin(parameterID), datastore->getFitMax(parameterID));
         layout->addWidget(neditValue, row, COL_VALUE);
         neditValue->setSingleStep(m_increment);
+        neditValue->setLogScale(widget==LogFloatEdit, qMin(10.0,m_increment));
         neditValue->setReadOnly(!editable);
         if (editable) {
             neditValue->setBackgroundColor(m_parent->palette().color(QPalette::Base));
@@ -253,10 +254,10 @@ QFFitParameterWidgetWrapper::QFFitParameterWidgetWrapper(QFFitParameterBasicInte
     }
 
     if (editable) {
-        if (widget==FloatEdit) {
+        if (widget==FloatEdit || widget==LogFloatEdit) {
             neditMin=new QFDoubleEdit(parent);
             neditMin->setCheckBounds(false, false);
-            neditMin->setSingleStep(m_increment);
+            neditMin->setSingleStep(m_increment);            
             neditMin->setShowUpDown(false);
             connect(neditMin, SIGNAL(valueChanged(double)), this, SLOT(doubleMinChanged(double)));
 
@@ -369,7 +370,7 @@ void QFFitParameterWidgetWrapper::reloadValues() {
 
     double value=m_datastore->getFitValue(m_parameterID);
 
-    if (m_widgetType==FloatEdit) {
+    if (m_widgetType==FloatEdit || m_widgetType==LogFloatEdit) {
         if (neditValue) neditValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
         if (neditValue && (neditValue->value()!=value)) neditValue->setValue(value);
     } else if (m_widgetType==IntSpinBox) {
@@ -406,7 +407,7 @@ void QFFitParameterWidgetWrapper::setValue(double value, double error, bool writ
         m_datastore->setFitValue(m_parameterID, value);
     }
 
-    if (m_widgetType==FloatEdit) {
+    if (m_widgetType==FloatEdit || m_widgetType==LogFloatEdit) {
         if (neditValue) neditValue->setRange(m_datastore->getFitMin(m_parameterID), m_datastore->getFitMax(m_parameterID));
         if (neditValue && (neditValue->value()!=value)) neditValue->setValue(value);
     } else if (m_widgetType==IntSpinBox) {

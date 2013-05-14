@@ -29,6 +29,8 @@ class QFFCSMSDEvaluationFitMSDDialog : public QDialog
         QFFCSMSDEvaluationItem* evaluation;
         int theoryID;
         QVector<double> dist, distTau;
+        int getRangeMin();
+        int getRangeMax();
 };
 
 #endif // QFFCSMSDEVALUATIONFITMSDDIALOG_H

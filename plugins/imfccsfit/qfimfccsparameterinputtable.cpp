@@ -119,6 +119,7 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
                         if (role==Qt::DisplayRole || role==Qt::EditRole) return roundWithError(item->getFitValue(fp.id, rdr), item->getFitError(fp.id, rdr));
                         if (role==widgetTypeRole && desc.userEditable) {
                             if (desc.type==QFFitFunction::FloatNumber) return wtValueDoubleEdit;
+                            if (desc.type==QFFitFunction::LogFloatNumber) return wtValueLogDoubleEdit;
                             if (desc.type==QFFitFunction::IntNumber) return wtValueIntEdit;
                             if (desc.type==QFFitFunction::IntCombo) return wtValueComboBox;
                         }

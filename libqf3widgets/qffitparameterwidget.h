@@ -40,7 +40,7 @@ class QFWIDLIB_EXPORT QFFitParameterWidgetWrapper : public QObject {
         Q_OBJECT
     public:
         /** \brief used to specify the widget to display */
-        enum WidgetType { FloatEdit=0, IntSpinBox=1, IntDropDown=2, Header=255 };
+        enum WidgetType { FloatEdit=0, IntSpinBox=1, IntDropDown=2, LogFloatEdit=3, Header=255 };
         /*! \brief constructor
 
             \param datastore this is used to read/write the values

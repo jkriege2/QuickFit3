@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>686</width>
+    <width>704</width>
     <height>583</height>
    </rect>
   </property>
@@ -28,7 +28,7 @@
     </widget>
    </item>
    <item>
-    <widget class="DataCutSliders" name="datacut" native="true">
+    <widget class="DoubleDataCutSliders" name="datacut" native="true">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -268,26 +268,27 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QFDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfdoubleedit.h</header>
+  </customwidget>
+  <customwidget>
    <class>QFPlotter</class>
    <extends>QWidget</extends>
    <header>qfplotter.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QFDoubleEdit</class>
-   <extends>QLineEdit</extends>
-   <header>qfdoubleedit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>DataCutSliders</class>
+   <class>DoubleDataCutSliders</class>
    <extends>QWidget</extends>
-   <header>datacutslider.h</header>
+   <header>doubledatacutsliders.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="fcsmsdevaluation.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>

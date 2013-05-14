@@ -18,7 +18,8 @@ class QFImFCCSParameterInputTable : public QAbstractTableModel
             wtValueComboBox=5,
             wtValueIntEdit=6,
             wtErrorEdit=7,
-            wtGlobalParamCombo=8
+            wtGlobalParamCombo=8,
+            wtValueLogDoubleEdit=9
         };
 
         enum QFImFCCSParameterInputTableRoles {

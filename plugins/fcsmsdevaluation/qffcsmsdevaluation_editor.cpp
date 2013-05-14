@@ -297,8 +297,8 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     splitMorePLot->addWidget(wPltDist);
 
     //splitMorePLot->setCollapsible(splitMorePLot->indexOf(pltDistribution), false);
-    splitterDist->setCollapsible(splitterDist->indexOf(pltDistribution), false);
-    splitterDist->setCollapsible(splitterDist->indexOf(pltDistResults), false);
+    splitterDist->setCollapsible(0, false);
+    splitterDist->setCollapsible(1, false);
 
     QAction* actFirst=menuParameters->actions().value(0, NULL);
     actAverageFirstFrames=new QAction(tr("&average first few frames for N"), this);
@@ -1782,7 +1782,6 @@ void QFFCSMSDEvaluationEditor::updateDistribution() {
     // plot theory curves
     /////////////////////////////////////////////////////////////////////////////////
     for (int i=0; i<MSDTHEORYCOUNT; i++)     {
-        QVector<double> theo;
         if (chkSlope[i]->isChecked()) {
             const double D=numPre[i]->value()*numD[i]->value();
             const double a=numAlpha[i]->value();

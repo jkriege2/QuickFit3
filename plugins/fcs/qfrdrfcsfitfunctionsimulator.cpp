@@ -298,6 +298,7 @@ void QFRDRFCSFitFunctionSimulator::displayModel(bool newWidget){
             QFFitParameterWidgetWrapper::WidgetType wtype=QFFitParameterWidgetWrapper::FloatEdit;
             if (d.type==QFFitFunction::IntNumber) wtype=QFFitParameterWidgetWrapper::IntSpinBox;
             if (d.type==QFFitFunction::IntCombo) wtype=QFFitParameterWidgetWrapper::IntDropDown;
+            if (d.type==QFFitFunction::LogFloatNumber) wtype=QFFitParameterWidgetWrapper::LogFloatEdit;
             bool editable=d.userEditable;
             bool displayFix=d.userEditable;
             QFFitFunction::ErrorDisplayMode displayError=d.displayError;

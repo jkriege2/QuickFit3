@@ -12,19 +12,33 @@ QFFCSMSDEvaluationFitMSDDialog::QFFCSMSDEvaluationFitMSDDialog(QFFCSMSDEvaluatio
     this->theoryID=theoryID;
     dist=evaluation->getMSD(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel());
     distTau=evaluation->getMSDTaus(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel());
-    ui->datacut->set_min(0);
-    ui->datacut->set_max(qMin(dist.size(), distTau.size()));
-    QString param=QString("msd_theory%1_fit_rangemin").arg(theoryID);
+    if (distTau.size()>0) {
+        ui->datacut->set_min(distTau.first());
+        ui->datacut->set_max(distTau.last());
+    }
+    ui->datacut->setLogScale(true, 20);
+    QString param=QString("msd_theory%1_fit_trangemin").arg(theoryID);
     if (evaluation->fitValueExists(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param)) {
         ui->datacut->set_userMin(evaluation->getFitValue(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param));
     } else {
-        ui->datacut->set_userMin(0);
+        param=QString("msd_theory%1_fit_rangemin").arg(theoryID);
+        if (evaluation->fitValueExists(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param)) {
+            ui->datacut->set_userMin(evaluation->getFitValue(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param));
+        } else {
+            ui->datacut->set_userMin(ui->datacut->get_min());
+        }
     }
-    param=QString("msd_theory%1_fit_rangemax").arg(theoryID);
+
+    param=QString("msd_theory%1_fit_trangemax").arg(theoryID);
     if (evaluation->fitValueExists(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param)) {
         ui->datacut->set_userMax(evaluation->getFitValue(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param));
     } else {
-        ui->datacut->set_userMax(dist.size()-1);
+        param=QString("msd_theory%1_fit_rangemax").arg(theoryID);
+        if (evaluation->fitValueExists(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param)) {
+            ui->datacut->set_userMax(evaluation->getFitValue(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param));
+        } else {
+            ui->datacut->set_userMax(ui->datacut->get_max());
+        }
     }
     ui->edtAlpha->setValue(evaluation->getTheoryAlpha(theoryID));
     ui->edtD->setValue(evaluation->getTheoryD(theoryID));
@@ -45,16 +59,13 @@ QFFCSMSDEvaluationFitMSDDialog::~QFFCSMSDEvaluationFitMSDDialog()
 
 void QFFCSMSDEvaluationFitMSDDialog::saveResults()
 {
-
-
-
     bool rc=evaluation->get_doEmitResultsChanged();
     bool pc=evaluation->get_doEmitPropertiesChanged();
     evaluation->set_doEmitResultsChanged(false);
     evaluation->set_doEmitPropertiesChanged(false);
-    QString param=QString("msd_theory%1_fit_rangemin").arg(theoryID);
+    QString param=QString("msd_theory%1_fit_trangemin").arg(theoryID);
     evaluation->setFitValue(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param, ui->datacut->get_userMin());
-    param=QString("msd_theory%1_fit_rangemax").arg(theoryID);
+    param=QString("msd_theory%1_fit_trangemax").arg(theoryID);
     evaluation->setFitValue(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param, ui->datacut->get_userMax());
     evaluation->setTheory(theoryID, true, ui->edtPre->value(), ui->edtD->value(), ui->edtAlpha->value());
     evaluation->setFitFix(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), evaluation->getTheoryAlphaName(theoryID), ui->chkFixAlpha->isChecked());
@@ -70,7 +81,13 @@ void QFFCSMSDEvaluationFitMSDDialog::on_btnFit_clicked()
     connectSignals(false);
     double alpha=ui->edtAlpha->value();
     double D=ui->edtD->value();
-    evaluation->calcMSDFit(alpha, ui->chkFixAlpha->isChecked(), D, ui->chkFixD->isChecked(), evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), ui->edtPre->value(), ui->datacut->get_userMin(), ui->datacut->get_userMax(), ui->cmbFitType->currentIndex());
+
+    int rmin=getRangeMin();
+    int rmax=getRangeMax();
+
+
+
+    evaluation->calcMSDFit(alpha, ui->chkFixAlpha->isChecked(), D, ui->chkFixD->isChecked(), evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), ui->edtPre->value(), rmin, rmax, ui->cmbFitType->currentIndex());
     ui->edtAlpha->setValue(alpha);
     ui->edtD->setValue(D);
     connectSignals(true);
@@ -122,7 +139,7 @@ void QFFCSMSDEvaluationFitMSDDialog::replotGraph()
     g_dist->set_color(QColor("blue"));
     ui->pltDistribution->addGraph(g_dist);
 
-    JKQTPoverlayVerticalRange* ovlRange=new JKQTPoverlayVerticalRange(distTau.value(ui->datacut->get_userMin(), distTau.first()), distTau.value(ui->datacut->get_userMax(), distTau.last()), ui->pltDistribution->get_plotter());
+    JKQTPoverlayVerticalRange* ovlRange=new JKQTPoverlayVerticalRange(ui->datacut->get_userMin(), ui->datacut->get_userMax(), ui->pltDistribution->get_plotter());
     ovlRange->set_inverted(true);
     QColor fillRange=QColor("grey");
     fillRange.setAlphaF(0.5);
@@ -159,11 +176,36 @@ void QFFCSMSDEvaluationFitMSDDialog::connectSignals(bool connectS)
         connect(ui->edtPre, SIGNAL(valueChanged(double)), this, SLOT(replotGraph()));
         connect(ui->edtD, SIGNAL(valueChanged(double)), this, SLOT(replotGraph()));
         connect(ui->edtAlpha, SIGNAL(valueChanged(double)), this, SLOT(replotGraph()));
-        connect(ui->datacut, SIGNAL(slidersChanged(int,int,int,int)), this, SLOT(replotGraph()));
+        connect(ui->datacut, SIGNAL(slidersChanged(double,double,double,double)), this, SLOT(replotGraph()));
     } else {
         disconnect(ui->edtPre, SIGNAL(valueChanged(double)), this, SLOT(replotGraph()));
         disconnect(ui->edtD, SIGNAL(valueChanged(double)), this, SLOT(replotGraph()));
         disconnect(ui->edtAlpha, SIGNAL(valueChanged(double)), this, SLOT(replotGraph()));
-        disconnect(ui->datacut, SIGNAL(slidersChanged(int,int,int,int)), this, SLOT(replotGraph()));
+        disconnect(ui->datacut, SIGNAL(slidersChanged(double,double,double,double)), this, SLOT(replotGraph()));
     }
+}
+
+int QFFCSMSDEvaluationFitMSDDialog::getRangeMin()
+{
+    int rm=0;
+    for (int i=0; i<distTau.size(); i++) {
+        if (distTau[i]>=ui->datacut->get_userMin()) {
+            rm=i;
+            break;
+        }
+    }
+    return qBound(rm, 0, distTau.size()-1);
+}
+
+int QFFCSMSDEvaluationFitMSDDialog::getRangeMax()
+{
+    int rm=distTau.size()-1;
+    for (int i=distTau.size()-1; i>=0; i--) {
+        if (distTau[i]<=ui->datacut->get_userMax()) {
+            rm=i;
+            break;
+        }
+    }
+
+    return qBound(0, rm, distTau.size()-1);
 }

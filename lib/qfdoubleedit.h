@@ -28,6 +28,9 @@
     This widget may also be used to catch key events. You will have to register each event using addKeyEvent().
     If a key event matches, the keyEvent() signal will be emitted.
 
+    Using setLogScale() the sidget can be switched to a logarithmic step scheme. In that case, the increments are the
+    number of increments per decade.
+
  */
 class QFLIB_EXPORT QFDoubleEdit : public QLineEdit {
         Q_OBJECT
@@ -59,6 +62,7 @@ class QFLIB_EXPORT QFDoubleEdit : public QLineEdit {
         double increment() const { return m_increment; }
         bool showUpDown() const { return m_showUpDown; }
         bool isIntegerWidget() const { return m_Integer; }
+        bool logScale() const;
     public slots:
         void setCheckMaximum(bool check) { m_checkMaximum=check; }
         void setCheckMinimum(bool check) { m_checkMinimum=check; }
@@ -78,6 +82,7 @@ class QFLIB_EXPORT QFDoubleEdit : public QLineEdit {
         void setSingleStep(double inc) { setIncrement(inc); }
         void setShowUpDown(bool showUpDown);
         void setUpDownKeyEnabled(bool enabled);
+        void setLogScale(bool enabled, double increments=10);
     signals:
         /** \brief emited whenever a entered value changed */
         void valueChanged(double value);
@@ -109,6 +114,8 @@ class QFLIB_EXPORT QFDoubleEdit : public QLineEdit {
         bool m_checkMaximum;
         bool m_checkMinimum;
         int m_decimals;
+        bool m_logscale;
+        double m_logbase;
         QString QFDoubleEdit_BASIC_REGEXP;
         bool m_Integer;
         bool m_showUpDown;

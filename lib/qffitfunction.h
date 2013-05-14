@@ -59,6 +59,7 @@ class QFLIB_EXPORT QFFitFunction {
         /** \brief different types of input widgets for parameters */
         enum ParameterType {
             FloatNumber=0, /**< a floating point number edit widget is used for the parameter*/
+            LogFloatNumber=3, /**< a floating point number edit widget is used for the parameter, which uses a logarithmic stepping scheme*/
             IntNumber=1,   /**< an integer number edit widget is used for the parameter*/
             IntCombo=2,    /**< a combobox widget is used for the parameter*/
             Invalid=100    /**< invalid widget */

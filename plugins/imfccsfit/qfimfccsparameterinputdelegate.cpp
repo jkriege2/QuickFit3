@@ -130,8 +130,11 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
             //qDebug()<<"   created fixcheck";
             return chk;
         }*/
-        if (imfccs && fpID.isValid() && widgetType.toInt()==QFImFCCSParameterInputTable::wtValueDoubleEdit) {
+        if (imfccs && fpID.isValid() && (widgetType.toInt()==QFImFCCSParameterInputTable::wtValueDoubleEdit || widgetType.toInt()==QFImFCCSParameterInputTable::wtValueLogDoubleEdit)) {
             QFDoubleEdit* edt=new QFDoubleEdit(parent);
+            if (widgetType.toInt()==QFImFCCSParameterInputTable::wtValueLogDoubleEdit) {
+                edt->setLogScale(true, 10);
+            }
             edt->setRange(imfccs->getFitMin(fpID.toString(), rdr), imfccs->getFitMax(fpID.toString(), rdr));
             //qDebug()<<"   created valuedoubleedit "<<t.elapsed()<<"ms";
             return edt;
