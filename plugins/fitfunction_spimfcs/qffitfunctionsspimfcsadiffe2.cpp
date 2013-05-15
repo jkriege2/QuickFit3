@@ -215,7 +215,7 @@ void QFFitFunctionsSPIMFCSADiffE2::calcParameter(double* data, double* error) co
     const double sqpi=sqrt(M_PI);
     // calculate Veff
     data[SPIMFCSADIFF_focus_volume]=SPIMFCS_newVeff(a, wxy, sigmaz);
-    if (error) error[SPIMFCSADIFF_focus_volume]=SPIMFCS_newVeffError(a, wxy, sigmaz);
+    if (error) error[SPIMFCSADIFF_focus_volume]=SPIMFCS_newVeffError(a, ea, wxy, ewxy, sigmaz, esigmaz);
 
     if (data[SPIMFCSADIFF_focus_volume]!=0) {
         data[SPIMFCSADIFF_concentration]=N/data[SPIMFCSADIFF_focus_volume]/(NAVOGADRO * 1.0e-24);

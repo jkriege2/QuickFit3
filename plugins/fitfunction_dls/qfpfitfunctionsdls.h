@@ -38,12 +38,12 @@ class QFPFitFunctionsDLS : public QObject, public QFPluginFitFunction {
 
         /** \brief author the plugin */
         virtual QString getAuthor() const {
-            return QString("Jan W. Krieger");
+            return QString("Jan W. Krieger, Benedikt Häusele");
         };
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("(c) 2012 by Jan W. Krieger");
+            return tr("(c) 2012 by Jan W. Krieger, Benedikt Häusele");
         };
 
         /** \brief weblink for the plugin */

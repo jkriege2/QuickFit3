@@ -208,7 +208,7 @@ void QFFitFunctionsSPIMFCSADiffCE2::calcParameter(double* data, double* error) c
     //const double sqpi=sqrt(M_PI);
     // calculate Veff
     data[SPIMFCSADIFF_focus_volume]=SPIMFCS_newVeff(a, wxy, sigmaz);
-    if (error) error[SPIMFCSADIFF_focus_volume]=SPIMFCS_newVeffError(a, wxy, sigmaz);
+    if (error) error[SPIMFCSADIFF_focus_volume]=SPIMFCS_newVeffError(a, ea, wxy, ewxy, sigmaz, esigmaz);
 
 
 

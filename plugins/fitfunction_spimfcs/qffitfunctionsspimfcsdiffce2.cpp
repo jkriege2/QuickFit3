@@ -231,7 +231,7 @@ void QFFitFunctionsSPIMFCSDiffCE2::calcParameter(double* data, double* error) co
 
     // calculate Veff
     data[FCSSDiff_focus_volume]=SPIMFCS_newVeff(a, wxy, sigmaz);
-    if (error) error[FCSSDiff_focus_volume]=SPIMFCS_newVeffError(a, wxy, sigmaz);
+    if (error) error[FCSSDiff_focus_volume]=SPIMFCS_newVeffError(a, ea, wxy, ewxy, sigmaz, esigmaz);
 
 
 
