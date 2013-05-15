@@ -286,6 +286,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         void contactAuhtors();
         void contactMailinglist();
         void openWebpage();
+
+        void fixFilesPathesInProject();
     private:
         void createWidgets();
         void createActions();
@@ -364,6 +366,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QAction* actRDRUndoReplace;
         QAction* actPerformanceTest;
         QAction* actRDRSetProperty;
+        QAction* actFixFilesPathes;
         QProgressBar* prgMainProgress;
 
         /** \brief length of the list of recently opened files */

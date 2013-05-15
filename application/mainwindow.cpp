@@ -9,6 +9,7 @@
 #include "dlgnewversion.h"
 #include "dlgrdrsetproperty.h"
 #include "dlgselectprojectsubset.h"
+#include "dlgfixfilepaths.h"
 #include "jkmathparser.h"
 
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
@@ -1010,6 +1011,8 @@ void MainWindow::createActions() {
     connect(actRDRUndoReplace, SIGNAL(triggered()), this, SLOT(rdrUndoReplace()));
     actRDRSetProperty=new QAction(tr("set property in multiple RDRs"), this);
     connect(actRDRSetProperty, SIGNAL(triggered()), this, SLOT(rdrSetProperty()));
+    actFixFilesPathes=new QAction(tr("fix files paths in project"), this);
+    connect(actFixFilesPathes, SIGNAL(triggered()), this, SLOT(fixFilesPathesInProject()));
 
     actPerformanceTest=new QAction(tr("test QFProject performance"), this);
     connect(actPerformanceTest, SIGNAL(triggered()), this, SLOT(projectPerformanceTest()));
@@ -1067,6 +1070,8 @@ void MainWindow::createMenus() {
     projectToolsMenu->addAction(actRDRUndoReplace);
     projectToolsMenu->addSeparator();
     projectToolsMenu->addAction(actRDRSetProperty);
+    projectToolsMenu->addSeparator();
+    projectToolsMenu->addAction(actFixFilesPathes);
     debugToolsMenu=toolsMenu->addMenu(tr("debug tools"));
     debugToolsMenu->addAction(actPerformanceTest);
     toolsMenu->addSeparator();
@@ -2844,4 +2849,81 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
     return result;
 
 
+}
+
+void MainWindow::fixFilesPathesInProject()
+{
+    int replaced=0;
+    QMap<QString, QString> pathReplaces;
+    if (!project) return;
+    QProgressDialog progress("fixing filepaths in raw data records...", "&Cancel", 0, project->getRawDataCount(), this);
+    progress.setWindowModality(Qt::WindowModal);
+    DlgFixFilepaths* dlg=NULL;
+    QString lastDir=QFileInfo(project->getFile()).absolutePath();
+    bool canceled=false;
+    for (int i=0; i<project->getRawDataCount(); i++) {
+        QFRawDataRecord* rdr=project->getRawDataByNum(i);
+        if (rdr) {
+            progress.setValue(i);
+
+            QStringList files=rdr->getFiles();
+            for (int j=0; j<files.size(); j++) {
+                QString file=files[j];
+                if (!QFile::exists(file)) {
+                    QFileInfo fi(file);
+                    QString oldPath=fi.absolutePath();
+                    if (pathReplaces.contains(oldPath) && QFile::exists(pathReplaces.value(oldPath, "./")+"/"+fi.fileName())) {
+                        files[j]=pathReplaces.value(oldPath, "./")+"/"+fi.fileName();
+                        log_text(tr("%1 (%4): replaced file '%2'\n"
+                                    "%1 (%4):            => '%3'\n").arg(j).arg(file).arg(files[j]).arg(replaced));
+                        //qDebug()<<replaced<<"replace "<<file<<" \n"
+                        //          "     => "<<files[j];
+                        replaced++;
+                        rdr->setFileName(j, files[j]);
+                    } else {
+                        if (!dlg) dlg=new DlgFixFilepaths(file, lastDir, &progress);
+                        else dlg->init(file, lastDir);
+
+                        int res=dlg->exec();
+                        if (res==QDialog::Rejected) {
+                            canceled=true;
+                            break;
+                        } else if (res==QDialog::Accepted) {
+                            QString newFile=dlg->getNewFilename();
+                            QString newPath=QFileInfo(newFile).absolutePath();
+                            lastDir=dlg->getLastDir();
+                            pathReplaces[oldPath]=newPath;
+                            files[j]=pathReplaces.value(oldPath, "./")+"/"+fi.fileName();
+                            log_text(tr("%1 (%4): replaced file '%2'\n"
+                                        "%1 (%4):            => '%3'\n").arg(j).arg(file).arg(files[j]).arg(replaced));
+                            //qDebug()<<replaced<<"replace "<<file<<" \n"
+                            //          "     => "<<files[j];
+
+                            replaced++;
+                            rdr->setFileName(j, files[j]);
+                        }
+                    }
+                }
+            }
+
+
+            QApplication::processEvents(QEventLoop::AllEvents, 5);
+            if (progress.wasCanceled() || canceled)  break;
+        }
+    }
+    if (dlg) delete dlg;
+    progress.setValue(project->getRawDataCount());
+    QApplication::processEvents();
+    QApplication::processEvents();
+    QApplication::processEvents();
+    progress.close();
+
+    if (replaced>0) {
+        if (QMessageBox::information(this, tr("Fix Filenames"), tr("Fixed %1 filenames.\n  You will have to save and reload the project before the changes take full effect. Do that now?").arg(replaced), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
+            QApplication::processEvents();
+            QApplication::processEvents();
+            QApplication::processEvents();
+            reloadProject();
+        }
+    }
 }

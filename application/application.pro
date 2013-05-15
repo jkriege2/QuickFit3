@@ -40,7 +40,8 @@ HEADERS += mainwindow.h \
     dlgcontactauthors.h \
     dlgnewversion.h \
     dlgrdrsetproperty.h \
-    dlgselectprojectsubset.h
+    dlgselectprojectsubset.h \
+    dlgfixfilepaths.h
 
 SOURCES += main.cpp \
            mainwindow.cpp \
@@ -50,7 +51,8 @@ SOURCES += main.cpp \
     dlgcontactauthors.cpp \
     dlgnewversion.cpp \
     dlgrdrsetproperty.cpp \
-    dlgselectprojectsubset.cpp
+    dlgselectprojectsubset.cpp \
+    dlgfixfilepaths.cpp
 
 FORMS =    optionsdialog.ui \
            about.ui \
@@ -59,7 +61,8 @@ FORMS =    optionsdialog.ui \
     dlgcontactauthors.ui \
     dlgnewversion.ui \
     dlgrdrsetproperty.ui \
-    dlgselectprojectsubset.ui
+    dlgselectprojectsubset.ui \
+    dlgfixfilepaths.ui
 
 RESOURCES += quickfit3.qrc
 
@@ -103,3 +106,6 @@ HELPREFPIC_FILES.files = ./help/parserreference/pic/*.*
 HELPREFPIC_FILES.path = $${QFOUTPUT}/assets/help/parserreference/pic/
 
 INSTALLS += ASSETSSTYLESHEET_FILES HELPREF_FILES HELPREFPIC_FILES ICON_FILES
+
+
+
