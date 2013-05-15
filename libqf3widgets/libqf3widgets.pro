@@ -186,7 +186,6 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     doubledatacutsliders.cpp
 
 
-
 FORMS += qfdlg_csvparameters.ui \
     qf3objectiveeditor.ui \
     qf3filtereditor.ui \

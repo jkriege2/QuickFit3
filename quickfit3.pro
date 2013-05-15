@@ -24,7 +24,7 @@ SUBDIRS += plg_fcs
 plg_fcs.subdir = ./plugins/fcs
 plg_fcs.depends = lib libqf3widgets
 
-SUBDIRS += plg_imagingfcs
+#SUBDIRS += plg_imagingfcs
 plg_imagingfcs.subdir = ./plugins/imagingfcs
 plg_imagingfcs.depends = lib libqf3widgets
 
@@ -86,7 +86,7 @@ SUBDIRS += plg_fitalgorithm_fit_lmfit
 plg_fitalgorithm_fit_lmfit.subdir=./plugins/fitalgorithm_fit_lmfit
 plg_fitalgorithm_fit_lmfit.depends = lib libqf3widgets
 
-SUBDIRS += plg_basicimageimporters
+#SUBDIRS += plg_basicimageimporters
 plg_basicimageimporters.subdir=./plugins/basicimageimporters
 plg_basicimageimporters.depends = lib
 
@@ -106,11 +106,6 @@ SUBDIRS += plg_calc_diffcoeff
 plg_calc_diffcoeff.subdir=./plugins/calc_diffcoeff
 plg_calc_diffcoeff.depends = lib libqf3widgets
 
-SUBDIRS += plg_qfe_defaultmathparserextensions
-plg_qfe_defaultmathparserextensions.subdir=./plugins/qfe_defaultmathparserextensions
-plg_qfe_defaultmathparserextensions.depends = lib libqf3widgets
-
-
 SUBDIRS += plg_qfe_calculator
 plg_qfe_calculator.subdir=./plugins/qfe_calculator
 plg_qfe_calculator.depends = lib libqf3widgets
@@ -123,7 +118,7 @@ SUBDIRS += plg_qfe_resultstools
 plg_qfe_resultstools.subdir=./plugins/qfe_resultstools
 plg_qfe_resultstools.depends = lib libqf3widgets
 
-SUBDIRS += plg_numberandbrightness
+#SUBDIRS += plg_numberandbrightness
 plg_numberandbrightness.subdir=./plugins/numberandbrightness
 plg_numberandbrightness.depends = lib libqf3widgets
 
@@ -140,78 +135,80 @@ plg_qfe_helpeditor.subdir=./plugins/qfe_helpeditor
 plg_qfe_helpeditor.depends = lib libqf3widgets
 
 
-
 !macx {
 
-    SUBDIRS += plg_spimb040
+    #SUBDIRS += plg_spimb040
     plg_spimb040.subdir=./plugins/spimb040
     plg_spimb040.depends = lib libqf3widgets
 
-    SUBDIRS += plg_cam_testcamera
+    #SUBDIRS += plg_cam_testcamera
     plg_cam_testcamera.subdir=./plugins/cam_testcamera
     plg_cam_testcamera.depends = lib libqf3widgets
 
     !contains(QF3CONFIG, bits64) {
-        SUBDIRS += plg_cam_systemcamera
+   #     SUBDIRS += plg_cam_systemcamera
         plg_cam_systemcamera.subdir=./plugins/cam_systemcamera
         plg_cam_systemcamera.depends = lib libqf3widgets
     }
 
     !contains(QF3CONFIG, nospecialdrivers) {
-        SUBDIRS += plg_cam_radhard2
+    #    SUBDIRS += plg_cam_radhard2
         plg_cam_radhard2.subdir=./plugins/cam_radhard2
         plg_cam_radhard2.depends = lib libqf3widgets
 
-        SUBDIRS += plg_cam_andor
+     #   SUBDIRS += plg_cam_andor
         plg_cam_andor.subdir=./plugins/cam_andor
         plg_cam_andor.depends = lib libqf3widgets
 
         unix {
-            SUBDIRS += plg_cam_rh2v2
+      #      SUBDIRS += plg_cam_rh2v2
             plg_cam_rh2v2.subdir=./plugins/cam_rh2v2
             plg_cam_rh2v2.depends = lib libqf3widgets
         }
     }
 
-    SUBDIRS += plg_stage_pi
+  #  SUBDIRS += plg_stage_pi
     plg_stage_pi.subdir=./plugins/stage_pi
     plg_stage_pi.depends = lib libqf3widgets
 
-    SUBDIRS += plg_shutter_servo_arduino
+   # SUBDIRS += plg_shutter_servo_arduino
     plg_shutter_servo_arduino.subdir=./plugins/shutter_servo_arduino
     plg_shutter_servo_arduino.depends = lib libqf3widgets
 
-    SUBDIRS += plg_filterc_test
+  #  SUBDIRS += plg_filterc_test
     plg_filterc_test.subdir=./plugins/filterc_test
     plg_filterc_test.depends = lib libqf3widgets
 
-    SUBDIRS += plg_filterc_tmcl
+   # SUBDIRS += plg_filterc_tmcl
     plg_filterc_tmcl.subdir=./plugins/filterc_tmcl
     plg_filterc_tmcl.depends = lib libqf3widgets
 
-    SUBDIRS += plg_lights_pccsled
+   # SUBDIRS += plg_lights_pccsled
     plg_lights_pccsled.subdir=./plugins/lights_pccsled
     plg_lights_pccsled.depends = lib libqf3widgets
 
-    SUBDIRS += plg_lights_b040laserbox
+   # SUBDIRS += plg_lights_b040laserbox
     plg_lights_b040laserbox.subdir=./plugins/lights_b040laserbox
     plg_lights_b040laserbox.depends = lib libqf3widgets
 
-#    SUBDIRS += plg_b040_ffmcontrol
+   # SUBDIRS += plg_b040_ffmcontrol
     plg_b040_ffmcontrol.subdir=./plugins/b040_ffmcontrol
     plg_b040_ffmcontrol.depends = lib libqf3widgets
 
-#    SUBDIRS += plg_multicontrol_stage
+    #SUBDIRS += plg_multicontrol_stage
     plg_multicontrol_stage.subdir=./plugins/multicontrol_stage
     plg_multicontrol_stage.depends = lib libqf3widgets
 
-#    SUBDIRS += plg_alv_autocorrelator5000
+   # SUBDIRS += plg_alv_autocorrelator5000
     plg_alv_autocorrelator5000.subdir=./plugins/alv_autocorrelator5000
     plg_alv_autocorrelator5000.depends = lib libqf3widgets
 
-#    SUBDIRS += plg_scanner2000_nicounter
+    #SUBDIRS += plg_scanner2000_nicounter
     plg_scanner2000_nicounter.subdir=./plugins/scanner2000_nicounter
     plg_scanner2000_nicounter.depends = lib libqf3widgets
+
 }
 
-
+#SUBDIRS += plg_contcorrelation
+plg_contcorrelation.subdir = ./plugins/contcorrelation
+plg_contcorrelation.depends = lib libqf3widgets
