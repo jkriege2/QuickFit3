@@ -1,0 +1,22 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>SPIM-FCCS: Diffusion, 2-color, ACF green (1/e² radii)</title>
+  </head>
+<body>
+  $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+  <h2>SPIM-FCCS: Diffusion, 2-color, ACF green (1/e² radii)</h2>
+  $$see:<a href="fccs_spim_fw_diff2coloracfg.html">ACF, green model</a>, <a href="fccs_spim_fw_diff2coloracfr.html">ACF, red model</a>, <a href="fccs_spim_fw_diff2colorccf.html">CCF, model</a>$$
+  <p>This function implements a 1-component diffusion model $$math:G_{gg}(\tau)$$ for 2-color crosscorrelation data acquired with a camera in SPIM illumination mode. The theory and functional form are described below.
+     In addition these quantities are calculated by the model:
+     $$bmath:V_\text{eff}(w_0, z_0)=\frac{\left(\int \mbox{MDF}\left(\vec{x}\right)\;\mathrm{d}V\right)^2}{\int \mbox{MDF}^2(\vec{x})\;\mathrm{d}V}=\frac{\sqrt{\pi}\cdot a^{2} z_0}{{\left(\mathrm{erf}\left(\frac{a}{ w_0}\right)+\frac{ w_0}{\sqrt{\pi}\cdot a}\left(\mathrm{e^{-\left(a/ w_0\right)^2}}-1\right)\right)}^2}$$
+  </p>
+
+
+$$insert:fccs_spim_fw_diff2colorG.inc$$
+
+$$references$$
+
+</body>
+</html>

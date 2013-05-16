@@ -1185,6 +1185,20 @@ bool QFRDRImagingFCSData::isFCCS() const
     return fccs;
 }
 
+bool QFRDRImagingFCSData::isACF() const
+{
+    bool acf=getRole().toLower().startsWith("acf");
+    if (acf && isFCCS()) {
+        acf=false;
+    }
+    return acf;
+}
+
+bool QFRDRImagingFCSData::overviewImagesSwapped() const
+{
+    return getProperty("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL", false).toBool();
+}
+
 int QFRDRImagingFCSData::leaveoutGetRunCount() const
 {
     return getCorrelationRuns();
@@ -1277,7 +1291,7 @@ void QFRDRImagingFCSData::allocateOverviews(int x, int y) {
 
         overviewF=(double*)calloc(x*y,sizeof(double));
         overviewFSTD=(double*)calloc(x*y,sizeof(double));
-        if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && !getRole().toLower().startsWith("acf")) {
+        if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone /*&& !getRole().toLower().startsWith("acf")*/) {
             overviewF2=(double*)calloc(x*y,sizeof(double));
             overviewF2STD=(double*)calloc(x*y,sizeof(double));
         }
@@ -1608,22 +1622,25 @@ int QFRDRImagingFCSData::getExpectedFileHeight() const
     return getProperty("FULL_DV_HEIGHT", getProperty("HEIGHT", 0).toInt()).toInt();
 }
 
-void QFRDRImagingFCSData::splitImage(double* overviewF, double* overviewF2, const double* inputImage, uint32_t nx, uint32_t ny) const
+void QFRDRImagingFCSData::splitImage(double* overviewF, double* overviewF2, const double* inputImage, uint32_t nx, uint32_t ny)
 {
-    //qDebug()<<getID()<<"splitImage(overviewF="<<overviewF<<",  overviewF2="<<overviewF2<<",  nx="<<nx<<",  ny="<<ny<<")   width*height = "<<width<<"*"<<height<<"   intDV2,channel="<<internalDualViewMode()<<","<<internalDualViewModeChannel();
+    qDebug()<<getID()<<"splitImage(overviewF="<<overviewF<<",  overviewF2="<<overviewF2<<",  nx="<<nx<<",  ny="<<ny<<")   width = "<<width<<"   height = "<<height<<"   intDV2="<<internalDualViewMode()<<",channel="<<internalDualViewModeChannel();
     if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && nx>=2*width && ny==height) {
         int shift1=0;
         int shift2=width;
         double* out1=overviewF;
         double* out2=overviewF2;
-        if (!isFCCS()) {
-            out2=NULL;
+        if (overviewF2 && !isFCCS()) {
+            //out2=NULL;
             if (internalDualViewModeChannel()==0) {
                 shift1=0;
-                shift2=0;
+                shift2=width;
             } else {
                 shift1=width;
                 shift2=0;
+            }
+            if (!propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL")) {
+                setQFProperty("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL", internalDualViewModeChannel()!=0, false);
             }
         }
         if (out1) {
@@ -1634,8 +1651,9 @@ void QFRDRImagingFCSData::splitImage(double* overviewF, double* overviewF2, cons
                     out1[idxOut]=inputImage[idxIn];
                 }
             }
+            qDebug()<<"writing out1["<<out2<<"] ="<<out1[0]<<out1[1]<<out1[2];
         }
-        if (out2) {
+        if (out2) {            
             for (int y=0; y<height; y++) {
                 for (int x=0; x<width; x++) {
                     const int idxIn=y*nx+x+shift2;
@@ -1643,20 +1661,24 @@ void QFRDRImagingFCSData::splitImage(double* overviewF, double* overviewF2, cons
                     out2[idxOut]=inputImage[idxIn];
                 }
             }
+            qDebug()<<"writing out2["<<out2<<"] ="<<out2[0]<<out2[1]<<out2[2];
         }
     } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && nx==width && ny>=2*height) {
         int shift1=0;
         int shift2=height;
         double* out1=overviewF;
         double* out2=overviewF2;
-        if (!isFCCS()) {
-            out2=NULL;
+        if (overviewF2 && !isFCCS()) {
+            //out2=NULL;
             if (internalDualViewModeChannel()==0) {
                 shift1=0;
-                shift2=0;
+                shift2=height;
             } else {
                 shift1=height;
                 shift2=0;
+            }
+            if (!propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL")) {
+                setQFProperty("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL", internalDualViewModeChannel()!=0, false);
             }
         }
         if (out1) {
@@ -1730,7 +1752,17 @@ int QFRDRImagingFCSData::getImageFromRunsChannels() const
     if (internalDualViewMode()==QFRDRImagingFCSData::dvNone) {
         return 1;
     } else {
-        if (isFCCS()) return 2;
+        if ((overviewF2 && propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL")) || isFCCS()) return 2;
+        return 1;
+    }
+}
+
+int QFRDRImagingFCSData::getImageFromRunsChannelsAdvised() const
+{
+    if (internalDualViewMode()==QFRDRImagingFCSData::dvNone) {
+        return 1;
+    } else {
+        if ((overviewF2 && propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") && !isACF()) || isFCCS()) return 2;
         return 1;
     }
 }
@@ -1779,7 +1811,7 @@ void QFRDRImagingFCSData::leaveoutAddRun(int run) {
 
 
 int QFRDRImagingFCSData::getOverviewImageCount() const {
-    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && isFCCS()) {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") || isFCCS())) {
         return 4+ovrImages.size();
     }
     return 2+ovrImages.size();
@@ -1788,7 +1820,7 @@ int QFRDRImagingFCSData::getOverviewImageCount() const {
 int QFRDRImagingFCSData::getOverviewImageWidth(int image) const {
     if (image==0) return getImageFromRunsWidth();
     if (image==1) return getImageFromRunsWidth();
-    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && isFCCS()) {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") || isFCCS())) {
         if (image==2) return getImageFromRunsWidth();
         if (image==3) return getImageFromRunsWidth();
         if (image-3<=ovrImages.size()) return ovrImages[image-4].width;
@@ -1801,7 +1833,7 @@ int QFRDRImagingFCSData::getOverviewImageWidth(int image) const {
 int QFRDRImagingFCSData::getOverviewImageHeight(int image) const {
     if (image==0) return getImageFromRunsHeight();
     if (image==1) return getImageFromRunsHeight();
-    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && isFCCS()) {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") || isFCCS())) {
         if (image==2) return getImageFromRunsHeight();
         if (image==3) return getImageFromRunsHeight();
         if (image-3<=ovrImages.size()) return ovrImages[image-4].height;
@@ -1813,20 +1845,32 @@ int QFRDRImagingFCSData::getOverviewImageHeight(int image) const {
 }
 
 QString QFRDRImagingFCSData::getOverviewImageName(int image) const {
-    if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && isFCCS()) {
-        if (image==0) return tr("top overview image (time average)");
-        if (image==1) return tr("top standard deviation overview image (time average)");
-        if (image==2) return tr("bottom overview image (time average)");
-        if (image==3) return tr("bottom standard deviation overview image (time average)");
+    if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") || isFCCS())) {
+        if ((image==0 && !overviewImagesSwapped())
+          ||(image==2 && overviewImagesSwapped())) return tr("top overview image (time average)");
+        if ((image==1 && !overviewImagesSwapped())
+          ||(image==3 && overviewImagesSwapped())) return tr("top standard deviation overview image (time average)");
+        if ((image==2 && !overviewImagesSwapped())
+          ||(image==0 && overviewImagesSwapped())) return tr("bottom overview image (time average)");
+        if ((image==3 && !overviewImagesSwapped())
+          ||(image==1 && overviewImagesSwapped())) return tr("bottom standard deviation overview image (time average)");
         if (image-3<=ovrImages.size()) return ovrImages[image-4].name;
         return QString("");
 
     }
-    if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && isFCCS()) {
-        if (image==0) return tr("left overview image (time average)");
+    if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") || isFCCS())) {
+        if ((image==0 && !overviewImagesSwapped())
+          ||(image==2 && overviewImagesSwapped())) return tr("left overview image (time average)");
+        if ((image==1 && !overviewImagesSwapped())
+          ||(image==3 && overviewImagesSwapped())) return tr("left standard deviation overview image (time average)");
+        if ((image==2 && !overviewImagesSwapped())
+          ||(image==0 && overviewImagesSwapped())) return tr("right overview image (time average)");
+        if ((image==3 && !overviewImagesSwapped())
+          ||(image==1 && overviewImagesSwapped())) return tr("right standard deviation overview image (time average)");
+        /*if (image==0) return tr("left overview image (time average)");
         if (image==1) return tr("left standard deviation overview image (time average)");
         if (image==2) return tr("right overview image (time average)");
-        if (image==3) return tr("right standard deviation overview image (time average)");
+        if (image==3) return tr("right standard deviation overview image (time average)");*/
         if (image-3<=ovrImages.size()) return ovrImages[image-4].name;
         return QString("");
 
@@ -1838,7 +1882,7 @@ QString QFRDRImagingFCSData::getOverviewImageName(int image) const {
 }
 
 QString QFRDRImagingFCSData::getOverviewImageID(int image) const {
-    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && isFCCS()) {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") || isFCCS())) {
         if (image>3 && image-3<=ovrImages.size()) return ovrImages[image-4].id;
         return QString("");
     }
@@ -1849,7 +1893,7 @@ QString QFRDRImagingFCSData::getOverviewImageID(int image) const {
 double *QFRDRImagingFCSData::getOverviewImage(int image) const {
     if (image==0) return overviewF;
     if (image==1) return overviewFSTD;
-    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && isFCCS()) {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") || isFCCS())) {
         if (image==2) return overviewF2;
         if (image==3) return overviewF2STD;
         if (image-3<=ovrImages.size()) return ovrImages[image-4].image;
@@ -1861,7 +1905,7 @@ double *QFRDRImagingFCSData::getOverviewImage(int image) const {
 
 QList<QFRDROverviewImageInterface::OverviewImageGeoElement> QFRDRImagingFCSData::getOverviewImageAnnotations(int image) const {
     QList<QFRDROverviewImageInterface::OverviewImageGeoElement> result;
-    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && isFCCS()) {
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") || isFCCS())) {
         if (image>3 && image-4<ovrImages.size()) return ovrImages[image-4].geoElements;
     } else {
         if (image>1 && image-2<ovrImages.size()) return ovrImages[image-2].geoElements;
@@ -1995,14 +2039,19 @@ QString QFRDRImagingFCSData::getImageStackTimepointName(int stack, int t) const 
 }
 
 double QFRDRImagingFCSData::getSimpleCountrateAverage(int run, int channel) const {
-    if (channel==0) {
+    int ch=channel;
+    if (overviewF2 && overviewImagesSwapped()) {
+        if (ch==1) ch=0;
+        if (ch==0) ch=1;
+    }
+    if (ch==0) {
         if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF) {
             if (run>=0) return overviewF[run]/getTauMin()/1000.0;
         }
         if (run==-2) return  backStat.avgCnt/getTauMin()/1000.0;
         if (hasStatistics) return stat.avgCnt/getTauMin()/1000.0;
     }
-    if (channel==1) {
+    if (ch==1) {
         if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF2) {
             if (run>=0) return overviewF2[run]/getTauMin()/1000.0;
         }
@@ -2013,13 +2062,18 @@ double QFRDRImagingFCSData::getSimpleCountrateAverage(int run, int channel) cons
 }
 
 double QFRDRImagingFCSData::getSimpleCountrateVariance(int run, int channel) const {
-    if (channel==0) {
+    int ch=channel;
+    if (overviewF2 && overviewImagesSwapped()) {
+        if (ch==1) ch=0;
+        if (ch==0) ch=1;
+    }
+    if (ch==0) {
         if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewFSTD) {
             if (run>=0 && run<width*height) return overviewFSTD[run]/getTauMin()/1000.0;
         }
         if (run==-2) return sqrt(backStat.sigmaCnt)/getTauMin()/1000.0;
         if (hasStatistics) return sqrt(stat.sigmaCnt)/getTauMin()/1000.0;
-    } else if (channel==1) {
+    } else if (ch==1) {
         if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF2STD) {
             if (run>=0 && run<width*height) return overviewF2STD[run]/getTauMin()/1000.0;
         }

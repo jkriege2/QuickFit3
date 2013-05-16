@@ -18,6 +18,15 @@ class QFRDRImageToRunInterface {
         virtual int getImageFromRunsHeight() const=0;
         /** \brief return the number of color channels */
         virtual int getImageFromRunsChannels() const=0;
+        /** \brief return the number of color channels that are advised to be displayed
+         *
+         *  This always returns a number \c >=0 and \c <=getImageFromRunsChannels() it is the number of preview images
+         *  you should absolutely display, even if more are available. e.g.
+         *    - For an imFCCS-record for the CCF getImageFromRunsChannels()=getImageFromRunsChannelsAdvised()=2 so the red and green channels are displayed
+         *    - In the same case for the two ACFs getImageFromRunsChannels()=2 and getImageFromRunsChannelsAdvised()=1, as you may only want to see the single channel the ACF was calculated for
+         *  .
+         */
+        virtual int getImageFromRunsChannelsAdvised() const=0;
 
         /*! \brief return a pointer to a uint16_t image of size getDataImageWidth() * getDataImageHeight()
 

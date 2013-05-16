@@ -120,6 +120,8 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         DualViewMode dualViewMode() const;
         void setDualViewMode(DualViewMode mode);
         bool isFCCS() const;
+        bool isACF() const;
+        bool overviewImagesSwapped() const;
 
 
 
@@ -381,7 +383,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         int getExpectedFileWidth() const;
         int getExpectedFileHeight() const;
 
-        void splitImage(double *overviewF, double *overviewF2, const double *inputImage, uint32_t nx, uint32_t ny) const;
+        void splitImage(double *overviewF, double *overviewF2, const double *inputImage, uint32_t nx, uint32_t ny);
 
     protected:
         /** \brief allocate memory to store a \a x by \a y set of correlation curves (+ additional data, like average and sigmas) with \a N datapoints each */
@@ -396,6 +398,8 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual int getImageFromRunsHeight() const;
         /** \copydoc QFRDRImageToRunInterface::getImageFromRunsChannels() */
         virtual int getImageFromRunsChannels() const;
+        /** \copydoc QFRDRImageToRunInterface::getImageFromRunsChannelsAdvised() */
+        virtual int getImageFromRunsChannelsAdvised() const;
         /** \copydoc QFRDRImageToRunInterface::xyToRun() */
         virtual int xyToRun(int x, int y) const;
         /** \copydoc QFRDRImageToRunInterface::runToX() */
@@ -406,6 +410,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual int xyToIndex(int x, int y) const;
         /** \copydoc QFRDRImageToRunInterface::getImageFromRunsPreview() */
         virtual double* getImageFromRunsPreview(int channel=0) const;
+
 
         /** \brief returns true, if a given run/pixel is inside the second DualView channel */
         bool indexIsDualView2(int32_t sel);

@@ -281,13 +281,15 @@ void QFRDRImagingFCSDataEditorCountrate::replotOverview() {
     } else {
         double* ov=m->getImageFromRunsPreview(0);
         double* ov2=m->getImageFromRunsPreview(1);
-        int channels=m->getImageFromRunsChannels();
+        int channels=m->getImageFromRunsChannelsAdvised();
         double w=m->getImageFromRunsWidth();
         double h=m->getImageFromRunsHeight();
         double dx=1;
         if (w>1) dx=pow(10.0,floor(log(w)/log(10.0)));
         double dy=1;
         if (h>1) dy=pow(10.0,floor(log(h)/log(10.0)));
+
+        if (channels==2 && current && current->getProperty("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL", false).toBool()) qSwap(ov, ov2);
 
         //qDebug()<<"replotOverview:  "<<w<<" x "<<h;
 

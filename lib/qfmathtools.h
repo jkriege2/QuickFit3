@@ -55,44 +55,153 @@ QFLIB_EXPORT double qfSinc(double x);
 /** \brief sinc function \f$ \mbox{tanc}(x)=\frac{\tan(x)}{x} \f$ */
 QFLIB_EXPORT double qfTanc(double x);
 
-/** \brief 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma)=\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$  */
+/** \brief 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma)=\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$
+    \ingroup qf3lib_mathtools
+ */
 inline double qfGaussSqrtE(double x, double sigma=1) {
     return exp(-0.5*x*x/(sigma*sigma));
 }
-/** \brief normalized 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma)=\frac{1}{w\cdot\sqrt{2\pi}}\cdot\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$  */
+/** \brief normalized 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma)=\frac{1}{w\cdot\sqrt{2\pi}}\cdot\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$
+    \ingroup qf3lib_mathtools
+ */
 inline double qfGaussNormSqrtE(double x, double sigma=1){
     return exp(-0.5*x*x/(sigma*sigma))/(sigma*sqrt(2.0*M_PI));
 }
-/** \brief 1/e²-width gaussian function \f$ \mbox{g}(x, w)=\exp\left(-2\cdot\frac{x^2}{w^2}\right) \f$ with \f$ g(w,w)=1/e^2 \f$  */
+/** \brief 1/e²-width gaussian function \f$ \mbox{g}(x, w)=\exp\left(-2\cdot\frac{x^2}{w^2}\right) \f$ with \f$ g(w,w)=1/e^2 \f$
+    \ingroup qf3lib_mathtools
+ */
 inline double qfGaussE2(double x, double w=1) { return qfGaussSqrtE(x, w/2.0); }
-/** \brief normalized 1/e²-width gaussian function \f$ \mbox{g}(x, w)=\frac{\sqrt{2}}{w\cdot\sqrt{\pi}}\cdot\exp\left(-2\cdot\frac{x^2}{w^2}\right) \f$  */
+/** \brief normalized 1/e²-width gaussian function \f$ \mbox{g}(x, w)=\frac{\sqrt{2}}{w\cdot\sqrt{\pi}}\cdot\exp\left(-2\cdot\frac{x^2}{w^2}\right) \f$
+    \ingroup qf3lib_mathtools
+ */
 inline double qfGaussNormE2(double x, double w=1) { return qfGaussNormSqrtE(x, w/2.0); }
-/** \brief Theta step function \f$ \Theta(x)=\begin{cases}0&x<0\\1&\text{else}\end{cases} \f$  */
+/** \brief Theta step function \f$ \Theta(x)=\begin{cases}0&x<0\\1&\text{else}\end{cases} \f$
+    \ingroup qf3lib_mathtools
+ */
 inline double qfTheta(double x) { return (x>=0)?1.0:0.0; }
-/** \brief Theta step function \f$ \mbox{sigmoid}(x)=\frac{1}{1+\exp(-x)} \f$  */
+/** \brief Theta step function \f$ \mbox{sigmoid}(x)=\frac{1}{1+\exp(-x)} \f$
+    \ingroup qf3lib_mathtools
+ */
 inline double qfSigmoid(double x) { return 1.0/(1+exp(-1.0*x)); }
-/** \brief sign function \f$ \mbox{signa}(x)=\begin{cases}-1&x<0\\0&x=0\\1&x>0\end{cases} \f$  */
+/** \brief sign function \f$ \mbox{signa}(x)=\begin{cases}-1&x<0\\0&x=0\\1&x>0\end{cases} \f$
+    \ingroup qf3lib_mathtools
+ */
 inline double qfSign(double x) {
     if (x<0) return -1;
     if (x>0) return 1;
     return 0;
 }
 
-/** \brief range/slit function \f$ \mbox{slit}(x)=\begin{cases}1&-a/2\leq x\leq a/2\\0&\text{else}\end{cases} \f$  */
+/** \brief range/slit function \f$ \mbox{slit}(x)=\begin{cases}1&-a/2\leq x\leq a/2\\0&\text{else}\end{cases} \f$
+    \ingroup qf3lib_mathtools
+ */
 inline double qfSlit(double x, double a) {
     if (x>=-a/2.0 && x<=a/2.0) return 1;
     return 0;
 }
 
-/** \brief convert degrees (0..360) ro radians (0..2pi)  */
+/** \brief convert degrees (0..360) ro radians (0..2pi)
+    \ingroup qf3lib_mathtools
+ */
 inline double qfDegToRad(double x) {
     return x/180.0*M_PI;
 }
 
-/** \brief convert degrees (0..360) ro radians (0..2pi)  */
+/** \brief convert degrees (0..360) ro radians (0..2pi)
+    \ingroup qf3lib_mathtools
+ */
 inline double qfRadToDeg(double x) {
     return x/M_PI*180.0;
 }
+
+
+/** \brief calculate the error propagation for <code>factorA*a+factorB*b</code> or <code>factorA*a-factorB*b</code> with errors \a ea and \a eb
+    \ingroup qf3lib_mathtools
+
+    \f[ f=\alpha a\pm\beta b \f]
+    \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\right)^2+\left(\Delta b\cdot\beta\right)^2} \f]
+ */
+inline double qfErrorSumMinus(double a, double ea, double b, double eb, double factorA=1.0, double factorB=1.0) {
+    return sqrt(qfSqr(factorA*ea)+qfSqr(factorB*eb));
+}
+
+/** \brief calculate the error propagation for <code>a*b</code> with errors \a ea and \a eb
+    \ingroup qf3lib_mathtools
+
+    \f[ f=a\cdot b \f]
+    \f[ \Delta f=\sqrt{\left(\Delta a\cdot b\right)^2+\left(\Delta b\cdot a\right)^2} \f]
+ */
+inline double qfErrorMul(double a, double ea, double b, double eb) {
+    return sqrt(qfSqr(ea*b)+qfSqr(eb*a));
+}
+
+/** \brief calculate the error propagation for <code>a/b</code> with errors \a ea and \a eb
+    \ingroup qf3lib_mathtools
+    \f[ f=\frac{a}{b} \f]
+    \f[ \Delta f=\sqrt{\left(\Delta a\cdot b\right)^2+\left(\Delta b\cdot\frac{1}{b^2}\right)^2} \f]
+ */
+inline double qfErrorDiv(double a, double ea, double b, double eb) {
+    return sqrt(qfSqr(ea*b)+qfSqr(eb*a/b/b));
+}
+
+/** \brief calculate the error propagation for <code>a^(factorB*b)</code> with errors \a ea and \a eb
+    \ingroup qf3lib_mathtools
+    \f[ f=a^{\beta b} \f]
+    \f[ \Delta f=\sqrt{\left(\Delta a\cdot a^{\beta b-1}\right)^2+\left(\Delta b\cdot a^{\beta b}\beta\cdot\log(a)\right)^2} \f]
+ */
+inline double qfErrorPow(double a, double ea, double b, double eb, double factorB=1.0) {
+    return sqrt(qfSqr(ea*pow(a, factorB*b-1.0))+qfSqr(eb*pow(a, factorB*b)*factorB*log(a)));
+}
+
+/** \brief calculate the error propagation for <code>sqrt(factorA*a+offsetA)</code> with errors \a ea
+    \ingroup qf3lib_mathtools
+    \f[ f=\sqrt{\alpha a+o} \f]
+    \f[ \Delta f=\left|\left(\frac{\Delta a\cdot\alpha}{2\sqrt{\alpha a+o}}\right)\right| \f]
+ */
+inline double qfErrorSqrt(double a, double ea, double factorA=1.0, double offsetA=0.0) {
+    return fabs(ea/sqrt(factorA*a+offsetA)*factorA/2.0);
+}
+
+/** \brief calculate the error propagation for <code>sqrt(factorA*a+factorB*b+offset)</code> with errors \a ea
+    \ingroup qf3lib_mathtools
+    \f[ f=\sqrt{\alpha a+\beta b+o} \f]
+    \f[ \Delta f=\sqrt{\left(\frac{\Delta a\cdot\alpha}{2\sqrt{\alpha a+\beta b+o}}\right)^2+\left(\frac{\Delta b\cdot\beta}{2\sqrt{\alpha a+\beta b+o}}\right)^2} \f]
+ */
+inline double qfErrorSqrt(double a, double ea, double b, double eb, double factorA=1.0, double factorB=1.0, double offset=0.0) {
+    const double f=2.0*sqrt(factorA*a+factorB*b+offset);
+    return sqrt(qfSqr(ea/f*factorA)+qfSqr(eb/f*factorB));
+}
+
+/** \brief calculate the error propagation for <code>sin(factorA*a+factorB*b+offset)</code> with errors \a ea
+    \ingroup qf3lib_mathtools
+    \f[ f=\sin(\alpha a+\beta b+o) \f]
+    \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\cdot\cos(\alpha a+\beta b+o)\right)^2+\left(\Delta b\cdot\beta\cdot\cos(\alpha a+\beta b+o)\right)^2} \f]
+ */
+inline double qfErrorSin(double a, double ea, double b, double eb, double factorA=1.0, double factorB=1.0, double offset=0.0) {
+    const double f=cos(factorA*a+factorB*b+offset);
+    return sqrt(qfSqr(ea*f*factorA)+qfSqr(eb*f*factorB));
+}
+
+/** \brief calculate the error propagation for <code>cos(factorA*a+factorB*b+offset)</code> with errors \a ea
+    \ingroup qf3lib_mathtools
+    \f[ f=\cos(\alpha a+\beta b+o) \f]
+    \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\cdot\sin(\alpha a+\beta b+o)\right)^2+\left(\Delta b\cdot\beta\cdot\sin(\alpha a+\beta b+o)\right)^2} \f]
+ */
+inline double qfErrorCos(double a, double ea, double b, double eb, double factorA=1.0, double factorB=1.0, double offset=0.0) {
+    const double f=sin(factorA*a+factorB*b+offset);
+    return sqrt(qfSqr(ea*f*factorA)+qfSqr(eb*f*factorB));
+}
+
+/** \brief calculate the error propagation for <code>tan(factorA*a+factorB*b+offset)</code> with errors \a ea
+    \ingroup qf3lib_mathtools
+    \f[ f=\tan(\alpha a+\beta b+o) \f]
+    \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\cdot\left[\cos(\alpha a+\beta b+o)\right]^{-2}\right)^2+\left(\Delta b\cdot\beta\cdot\left[\sin(\alpha a+\beta b+o)\right]^{-2}\right)^2} \f]
+ */
+inline double qfErrorTan(double a, double ea, double b, double eb, double factorA=1.0, double factorB=1.0, double offset=0.0) {
+    const double f=1.0/qfSqr(cos(factorA*a+factorB*b+offset));
+    return sqrt(qfSqr(ea*f*factorA)+qfSqr(eb*f*factorB));
+}
+
 
 /*! \brief calculate the dot product of two vectors
     \ingroup qf3lib_mathtools

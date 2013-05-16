@@ -1475,7 +1475,7 @@ void QFRDRImagingFCSImageEditor::ovrPaletteChanged() {
     if (m && m->getImageFromRunsPreview(0)!=NULL && plteOverviewExcludedData!=NULL) {
         statisticsMaskedMinMax(m->getImageFromRunsPreview(0), plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), ovrmi, ovrma, false);
     }
-    if (m && m->getImageFromRunsChannels()>1 && m->getImageFromRunsPreview(1)!=NULL && plteOverviewExcludedData!=NULL) {
+    if (m && m->getImageFromRunsChannelsAdvised()>1 && m->getImageFromRunsPreview(1)!=NULL && plteOverviewExcludedData!=NULL) {
         statisticsMaskedMinMax(m->getImageFromRunsPreview(1), plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), ovrmi2, ovrma2, false);
         //if (ovrmi2<ovrmi) ovrmi=ovrmi2;
         //if (ovrma2>ovrma) ovrma=ovrma2;
@@ -2663,7 +2663,7 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
         //uint16_t* ov=m->getDataImagePreview();
         double w=m->getImageFromRunsWidth();
         double h=m->getImageFromRunsHeight();
-        int channels=m->getImageFromRunsChannels();
+        int channels=m->getImageFromRunsChannelsAdvised();
         if ((w==0) || (h==0)) {
             w=h=1;
         }
@@ -4607,7 +4607,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             if (QFile::exists(fileNameOverview)) {
                 saveOverview=(QMessageBox::question(this, tr("imFCS: Save Overview Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameOverview), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
             }
-            if (m->getImageFromRunsChannels()>1 && QFile::exists(fileNameOverview2)) {
+            if (m->getImageFromRunsChannelsAdvised()>1 && QFile::exists(fileNameOverview2)) {
                 saveOverview=(QMessageBox::question(this, tr("imFCS: Save Overview Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameOverview2), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
             }
         } else {
@@ -4624,7 +4624,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
         readParameterImage(image.data(), gof_image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone, currentGofParameter(), QFRDRImagingFCSImageEditor::itNone);
         //mask_image.assign(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
         overview_image.assign(m->getImageFromRunsPreview(0), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
-        if (m->getImageFromRunsChannels()>1) overview_image2.assign(m->getImageFromRunsPreview(1), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        if (m->getImageFromRunsChannelsAdvised()>1) overview_image2.assign(m->getImageFromRunsPreview(1), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         for (int32_t i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
             mask_image(i)=(plteOverviewExcludedData[i])?1:0;
         }
@@ -4634,7 +4634,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), ", ", '.');
             if (saveOverview) {
                 overview_image.save_csv(fileNameOverview.toStdString(), ", ", '.');
-                if (m->getImageFromRunsChannels()>1) overview_image2.save_csv(fileNameOverview2.toStdString(), ", ", '.');
+                if (m->getImageFromRunsChannelsAdvised()>1) overview_image2.save_csv(fileNameOverview2.toStdString(), ", ", '.');
             }
         } else if (selFilter==filters[1]) {
             if (saveParam) image.save_csv(fileNameParam.toStdString(), "; ", ',');
@@ -4642,7 +4642,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), "; ", ',');
             if (saveOverview) {
                 overview_image.save_csv(fileNameOverview.toStdString(), "; ", ',');
-                if (m->getImageFromRunsChannels()>1) overview_image2.save_csv(fileNameOverview2.toStdString(), "; ", ',');
+                if (m->getImageFromRunsChannelsAdvised()>1) overview_image2.save_csv(fileNameOverview2.toStdString(), "; ", ',');
             }
         } else if (selFilter==filters[7]) {
             if (saveParam) image.save_csv(fileNameParam.toStdString(), "\t", '.');
@@ -4650,7 +4650,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), "\t", '.');
             if (saveOverview) {
                 overview_image.save_csv(fileNameOverview.toStdString(), "\t", '.');
-                if (m->getImageFromRunsChannels()>1) overview_image2.save_csv(fileNameOverview2.toStdString(), "\t", '.');
+                if (m->getImageFromRunsChannelsAdvised()>1) overview_image2.save_csv(fileNameOverview2.toStdString(), "\t", '.');
             }
         } else if (selFilter==filters[8]) {
             if (saveParam) image.save_csv(fileNameParam.toStdString(), "; ", '.');
@@ -4658,7 +4658,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), "; ", '.');
             if (saveOverview) {
                 overview_image.save_csv(fileNameOverview.toStdString(), "; ", '.');
-                if (m->getImageFromRunsChannels()>1) overview_image2.save_csv(fileNameOverview2.toStdString(), "; ", '.');
+                if (m->getImageFromRunsChannelsAdvised()>1) overview_image2.save_csv(fileNameOverview2.toStdString(), "; ", '.');
             }
         } else if (selFilter==filters[2]) {
             if (saveParam)  image.save_sylk(fileNameParam.toStdString());
@@ -4666,7 +4666,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             if (saveMask) mask_image.save_sylk(fileNameMask.toStdString());
             if (saveOverview) {
                 overview_image.save_sylk(fileNameOverview.toStdString());
-                if (m->getImageFromRunsChannels()>1) overview_image2.save_sylk(fileNameOverview2.toStdString());
+                if (m->getImageFromRunsChannelsAdvised()>1) overview_image2.save_sylk(fileNameOverview2.toStdString());
             }
         } else if (selFilter==filters[3]) {
             if (saveParam) image.save_tifffloat(fileNameParam.toStdString());
@@ -4674,7 +4674,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             if (saveMask) mask_image.save_tifffloat(fileNameMask.toStdString());
             if (saveOverview) {
                 overview_image.save_tifffloat(fileNameOverview.toStdString());
-                if (m->getImageFromRunsChannels()>1) overview_image2.save_tifffloat(fileNameOverview2.toStdString());
+                if (m->getImageFromRunsChannelsAdvised()>1) overview_image2.save_tifffloat(fileNameOverview2.toStdString());
             }
         } else if (selFilter==filters[4]) {
             if (saveParam) image.save_tiffuint16(fileNameParam.toStdString());
@@ -4682,7 +4682,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             if (saveMask) mask_image.save_tiffuint16(fileNameMask.toStdString());
             if (saveOverview) {
                 overview_image.save_tiffuint16(fileNameOverview.toStdString());
-                if (m->getImageFromRunsChannels()>1) overview_image2.save_tiffuint16(fileNameOverview2.toStdString());
+                if (m->getImageFromRunsChannelsAdvised()>1) overview_image2.save_tiffuint16(fileNameOverview2.toStdString());
             }
         } else if (selFilter==filters[6]) {
             if (saveMatlab) {
@@ -4691,7 +4691,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
                 data.append(gof_image.to_matlab("goodnesOfFit").c_str());
                 data.append(mask_image.to_matlab("mask").c_str());
                 data.append(overview_image.to_matlab("overview").c_str());
-                if (m->getImageFromRunsChannels()>1) data.append(overview_image2.to_matlab("overview2").c_str());
+                if (m->getImageFromRunsChannelsAdvised()>1) data.append(overview_image2.to_matlab("overview2").c_str());
                 QFile file(fileNameMatlab);
                 if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                     QTextStream out(&file);

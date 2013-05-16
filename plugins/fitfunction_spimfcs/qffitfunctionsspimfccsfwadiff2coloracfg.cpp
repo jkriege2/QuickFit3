@@ -1,46 +1,52 @@
-#include "qffitfunctionsspimfccsfwdiff2coloracfg.h"
+#include "qffitfunctionsspimfccsfwadiff2coloracfg.h"
 #include "qfmathtools.h"
 #include <cmath>
 #include "imfcstools.h"
-QFFitFunctionsSPIMFCCSFWDiff2ColorACFG::QFFitFunctionsSPIMFCCSFWDiff2ColorACFG() {
+QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::QFFitFunctionsSPIMFCCSFWADiff2ColorACFG() {
     //           type,         id,                        name,                                                   label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,               initialFIx,  initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(FloatNumber,  "concentration_a",         "concentration of species a in focus",         "C<sub>a</sub>",           "nM",         "nM",                              true,      true,          true,              QFFitFunction::DisplayError, false, 10,          0,        1e50,     1    );
     #define FCCSDiff_concentrationa 0
     addParameter(FloatNumber,  "concentration_ab",         "concentration of species ab in focus",       "C<sub>ab</sub>",           "nM",         "nM",                             true,      true,          true,              QFFitFunction::DisplayError, false, 5,          0,        1e50,     1    );
     #define FCCSDiff_concentrationab 1
-    addParameter(FloatNumber,  "diff_coeff_a",            "diffusion coefficient of species a",                  "D<sub>a</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
-    #define FCCSDiff_diff_coeffa 2
-    addParameter(FloatNumber,  "diff_coeff_ab",            "diffusion coefficient of species ab",                  "D<sub>ab</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
-    #define FCCSDiff_diff_coeffab 3
+    addParameter(FloatNumber,  "diff_acoeff_a",            "diffusion coefficient of species a",                  "&Gamma;<sub>a</sub>",            "micron^2/s^alpha", "&mu;m<sup>2</sup>/s<sup>&alpha;</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    #define FCCSDiff_diff_acoeffa 2
+    addParameter(FloatNumber,  "diff_alpha_a",            "anomality parameter of species a",                  "&alpha;<sub>a</sub>",            "", "",                             true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0.01,     100,      0.1, 0       );
+    #define FCCSDiff_diff_alphaa 3
+    addParameter(FloatNumber,  "diff_acoeff_ab",            "diffusion coefficient of species ab",                  "&Gamma;<sub>ab</sub>",            "micron^2/s^alpha", "&mu;m<sup>2</sup>/s<sup>&alpha;</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    #define FCCSDiff_diff_acoeffab 4
+    addParameter(FloatNumber,  "diff_alpha_ab",            "anomality parameter of species ab",                  "&alpha;<sub>ab</sub>",            "", "",                             true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0.01,     100,      0.1, 0       );
+    #define FCCSDiff_diff_alphaab 5
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                   "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
-    #define FCCSDiff_offset 4
+    #define FCCSDiff_offset 6
     addParameter(FloatNumber,  "focus_distance_x",         "foci: lateral distance in x-direction",               "d<sub>x</sub>",            "nm",         "nm",                     true,      true,         true,             QFFitFunction::EditError,    true, 0,           -1e6,     1e6,      10  );
-    #define FCCSDiff_focus_distancex 5
+    #define FCCSDiff_focus_distancex 7
     addParameter(FloatNumber,  "focus_distance_y",         "foci: lateral distance in y-direction",               "d<sub>y</sub>",            "nm",         "nm",                     true,      true,         true,             QFFitFunction::EditError,    true, 0,              -1e6,     1e6,      10  );
-    #define FCCSDiff_focus_distancey 6
+    #define FCCSDiff_focus_distancey 8
     addParameter(FloatNumber,  "focus_distance_z",         "foci: longitudinal distance in z-direction",          "d<sub>z</sub>",            "nm",         "nm",                     true,      true,         true,             QFFitFunction::EditError,    true, 0,              -1e6,     1e6,      10  );
-    #define FCCSDiff_focus_distancez 7
+    #define FCCSDiff_focus_distancez 9
     addParameter(FloatNumber,  "focus_height1",            "green PSF: axial radius (1/e² radius)",               "z<sub>g</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 1240,         0.01,     1e5,      10  );
-    #define FCCSDiff_focus_height1 8
+    #define FCCSDiff_focus_height1 10
     addParameter(FloatNumber,  "focus_width1",             "green PSF: lateral radius (1/e² radius)",             "w<sub>g</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 600,          0,        1e4,      10    );
-    #define FCCSDiff_focus_width1 9
+    #define FCCSDiff_focus_width1 11
     addParameter(FloatNumber,  "pixel_width",             "pixel width",                                           "a",                        "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 400,          0,        1e4,      10    );
-    #define FCCSDiff_pixel_width 10
+    #define FCCSDiff_pixel_width 12
     addParameter(FloatNumber,  "focus_volume1",            "green focus: effective colume",                               "V<sub>eff,g</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSSDiff_focus_volume 11
+    #define FCSSDiff_focus_volume 13
     addParameter(FloatNumber,  "count_rate1",              "count rate green, during measurement",                      "&lang;F<sub>g</sub>&rang;",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_count_rate1 12
+    #define FCCSDiff_count_rate1 14
     addParameter(FloatNumber,  "background1",              "background count rate green, during measurement",           "B<sub>g</sub>",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_background1 13
+    #define FCCSDiff_background1 15
 
 }
 
 
-double QFFitFunctionsSPIMFCCSFWDiff2ColorACFG::evaluate(double t, const double* data) const {
+double QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::evaluate(double t, const double* data) const {
     const double cab=data[FCCSDiff_concentrationab]*6.022e-1; // FCCSDiff_concentrationab given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
     const double ca=data[FCCSDiff_concentrationa]*6.022e-1; // FCCSDiff_concentrationa given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
-    const double Da=data[FCCSDiff_diff_coeffa];
-    const double Dab=data[FCCSDiff_diff_coeffab];
+    const double Da=data[FCCSDiff_diff_acoeffa];
+    const double Dab=data[FCCSDiff_diff_acoeffab];
+    const double alphaa=data[FCCSDiff_diff_alphaa];
+    const double alphaab=data[FCCSDiff_diff_alphaab];
 
     const double dx=data[FCCSDiff_focus_distancex]/1000.0;
     const double dy=data[FCCSDiff_focus_distancey]/1000.0;
@@ -64,11 +70,11 @@ double QFFitFunctionsSPIMFCCSFWDiff2ColorACFG::evaluate(double t, const double* 
     const double etaG=(cr1-background1)/(ca+cab);
     const double Fg=etaG*(ca+cab);
 
-    // double Grr_b=etaR*etaR*cb*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Db, t, wxyR, wxyR, wzR, wzR);
-    // double Grr_ab=etaR*etaR*cab*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, t, wxyR, wxyR, wzR, wzR);
-     double Ggg_a=etaG*etaG*ca*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Da, t, wxyG, wxyG, wzG, wzG);
-     double Ggg_ab=etaG*etaG*cab*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, t, wxyG, wxyG, wzG, wzG);
-    // double Ggr_ab=etaG*etaR*cab*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, t, wxyG, wxyR, wzG, wzR);
+    // double Grr_b=etaR*etaR*cb*QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Db, alphab, t, wxyR, wxyR, wzR, wzR);
+    // double Grr_ab=etaR*etaR*cab*QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, alphaab, t, wxyR, wxyR, wzR, wzR);
+     double Ggg_a=etaG*etaG*ca*QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Da, alphaa, t, wxyG, wxyG, wzG, wzG);
+     double Ggg_ab=etaG*etaG*cab*QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, alphaab, t, wxyG, wxyG, wzG, wzG);
+    // double Ggr_ab=etaG*etaR*cab*QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, alphaab, t, wxyG, wxyR, wzG, wzR);
     if (fabs(ca)<1e-15) Ggg_a=0;
     //if (fabs(cb)<1e-15) Grr_b=0;
     if (fabs(cab)<1e-15) /*Grr_ab=*/Ggg_ab=/*Ggr_ab=*/0;
@@ -78,7 +84,7 @@ double QFFitFunctionsSPIMFCCSFWDiff2ColorACFG::evaluate(double t, const double* 
     return offset+backfactor*cfac/(Fg*Fg);
 }
 
-void QFFitFunctionsSPIMFCCSFWDiff2ColorACFG::calcParameter(double* data, double* error) const {
+void QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::calcParameter(double* data, double* error) const {
 //    const double cab=data[FCCSDiff_concentrationab]*6.022e-1; // FCCSDiff_concentrationab given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
 //    double ecab=0;
 //    const double ca=data[FCCSDiff_concentrationa]*6.022e-1; // FCCSDiff_concentrationa given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
@@ -153,14 +159,14 @@ void QFFitFunctionsSPIMFCCSFWDiff2ColorACFG::calcParameter(double* data, double*
     if (error) error[FCSSDiff_focus_volume]=SPIMFCS_newVeffError(a, ea, wxyG, ewxyG, wzG, ewzG);
 }
 
-bool QFFitFunctionsSPIMFCCSFWDiff2ColorACFG::isParameterVisible(int parameter, const double* data) const {
+bool QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::isParameterVisible(int parameter, const double* data) const {
     return true;
 }
 
-unsigned int QFFitFunctionsSPIMFCCSFWDiff2ColorACFG::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::getAdditionalPlotCount(const double* params) {
     return 0;
 }
 
-QString QFFitFunctionsSPIMFCCSFWDiff2ColorACFG::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::transformParametersForAdditionalPlot(int plot, double* params) {
     return "";
 }

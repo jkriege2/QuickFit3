@@ -37,6 +37,8 @@ void QFImFCCSParameterInputDelegate::paint(QPainter *painter, const QStyleOption
 
 QSize QFImFCCSParameterInputDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    QVariant widgetType=index.data(QFImFCCSParameterInputTable::widgetTypeRole);
+    if (widgetType.toInt()==QFImFCCSParameterInputTable::wtFitFunctionCombobox || widgetType.toInt()==QFImFCCSParameterInputTable::wtRDRCombobox) return QSize();
     //QFAutoOutputTimer t(QString("QFImFCCSParameterInputDelegate::sizeHint(%1, %2)").arg(index.row()).arg(index.column()));
     return QFHTMLDelegate::sizeHint(option, index);
     /*

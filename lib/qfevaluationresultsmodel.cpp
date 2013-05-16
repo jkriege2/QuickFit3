@@ -284,6 +284,12 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                             double var=0;
                             double mean=qfstatisticsAverageVariance(var, r.ivec);
                             return QVariant(QString("mean: %1<br>S.D.: %2<br>count: %3<br><i>&nbsp;&nbsp;&nbsp;%4</i>").arg(mean).arg(sqrt(var)).arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type)));
+                        } else if ((r.type==QFRawDataRecord::qfrdreBooleanVector) || (r.type==QFRawDataRecord::qfrdreBooleanMatrix) ) {
+                            int cnt=0;
+                            qCount(r.bvec, true, cnt);
+                            return QVariant(QString("[%2]<br>item: %1<br>true items: %3").arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type)).arg(cnt));
+                        } else if (  (r.type==QFRawDataRecord::qfrdreStringVector) || (r.type==QFRawDataRecord::qfrdreStringMatrix) ) {
+                            return QVariant(QString("[%2]<br>count: %1").arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type)));
                         } else if ((r.type==QFRawDataRecord::qfrdreString)) {
                             return QVariant(tr("contents: %2<br><i>&nbsp;&nbsp;&nbsp;%1</i>").arg(QFRawDataRecord::evaluationResultType2String(r.type)).arg(data(index, Qt::DisplayRole).toString()));
                         }

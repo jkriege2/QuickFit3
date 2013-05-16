@@ -415,6 +415,8 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
     JKQTmathText mathParser(this);
     mathParser.set_fontSize(13);
     mathParser.useXITS();
+
+
     /*
     if (fonts.contains("Times New Roman")) {
         //qDebug()<<"using Times New Roman";
@@ -455,6 +457,20 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
     } else {
         result=tr("<html><header><title>Error: Help page does not exist</title></header><body>$$qf_commondoc_header.start$$ $$qf_commondoc_header.simplest$$ $$qf_commondoc_header.end$$<center>The Quickfit online-help page you are trying to access does not exist!<br><br>File was: <i>%1</i></center></body></html>").arg(filename);
     }
+
+    QString basepath=QFileInfo(filename).absolutePath();
+    QDir basedir=QFileInfo(filename).absoluteDir();
+    if (basedir.exists("tutorial.html")) {
+        if (QFileInfo(filename).fileName()=="tutorial.html") {
+            fromHTML_replaces.append(qMakePair(QString("rel_tutorial"), tr("<b><img src=\":/lib/help/help_tutorial.png\" border=\"0\">&nbsp;Tutorial</b> ")));
+        } else {
+            fromHTML_replaces.append(qMakePair(QString("rel_tutorial"), tr("<a href=\"%1\"><img src=\":/lib/help/help_tutorial.png\" border=\"0\"></a>&nbsp;<a href=\"%1\">Tutorial</a> ").arg(basedir.absoluteFilePath("tutorial.html"))));
+        }
+    } else {
+        fromHTML_replaces.append(qMakePair(QString("rel_tutorial"), QString(" ")));
+    }
+
+
     // find special information in file
     QRegExp rxTitle("<title>(.*)</title>", Qt::CaseInsensitive);
     if (rxTitle.indexIn(result) != -1) fromHTML_replaces.append(qMakePair(QString("title"), rxTitle.cap(1)));
@@ -501,178 +517,6 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
         ++count;
         pos += rxLink.matchedLength();
     }
-
-    // extract table of contents from header tags
-    QRegExp rxHeader("<\\s*h([123456789]).*>(.*)<\\/\\s*h\\1\\s*>", Qt::CaseInsensitive);
-    rxHeader.setMinimal(true);
-    count = 0;
-    pos = 0;
-    int minHeaderLevel=0;
-    QList<QFHTMLHelpWindow::ContentsEntry> contents;
-    bool first=true;
-    while ((pos = rxHeader.indexIn(result, pos)) != -1) {
-
-        int level=rxHeader.cap(1).toInt();
-        QString text=rxHeader.cap(2);
-
-        QFHTMLHelpWindow::ContentsEntry h;
-        if (contents.size()>0) h=contents.value(contents.size()-1);
-
-        h.header=text;
-        if (first) {
-            for (int i=1; i<=level; i++) {
-                h.num.append(1);
-            }
-        } else {
-            if (level==h.num.size()) {
-                h.num[h.num.size()-1]=h.num[h.num.size()-1]+1;
-            } else if (level>h.num.size()) {
-                for (int i=h.num.size(); i<level; i++) {
-                    h.num.append(1);
-                }
-            } else if (level<h.num.size()) {
-                for (int i=h.num.size(); i>=level; i--) {
-                    h.num.removeAt(i);
-                }
-                h.num[h.num.size()-1]=h.num[h.num.size()-1]+1;
-            }
-        }
-
-        QString id="";
-        QString tid="";
-        for (int i=0; i<h.num.size(); i++) {
-            if (!id.isEmpty()) id+="_";
-            if (!tid.isEmpty()) tid+=".";
-            id+=QString::number(h.num[i]);
-            tid+=QString::number(h.num[i]);
-        }
-        if (first) {
-            minHeaderLevel=h.num.size();
-        } else if (h.num.size()<minHeaderLevel) {
-            minHeaderLevel=h.num.size();
-        }
-        //qDebug()<<h.num.size()<<"(min: "<<minHeaderLevel<<")"<<tid<<h.header;
-        first=false;
-        h.id=id;
-        h.prefix=tid;
-
-        contents.append(h);
-        ++count;
-        pos += rxHeader.matchedLength();
-
-    }
-    // improve header tags
-    QRegExp rxHeader1("(<\\s*h[123456789].*)>", Qt::CaseInsensitive);
-    rxHeader1.setMinimal(true);
-    count = 0;
-    pos = 0;
-    while ((pos = rxHeader.indexIn(result, pos)) != -1) {
-
-        QString prefix="";
-        for (int j=minHeaderLevel-1; j<contents[count].num.size(); j++) {
-            if (!prefix.isEmpty()) prefix+=".";
-            prefix+=QString::number(contents[count].num[j]);
-        }
-        contents[count].prefix=prefix;
-        QString header=contents[count].header;
-        QString newmatch=rxHeader.cap(0);
-        newmatch=newmatch.replace(header, QString("<i>")+contents[count].prefix+QString(".</i>&nbsp;&nbsp;&nbsp;")+header);
-        QString insert=QString("<a name=\"%1\">%2").arg(contents[count].id).arg(newmatch);
-
-        //qDebug()<<rxHeader.cap(0)<<header<<newmatch;
-
-        if (count>0 && minHeaderLevel==contents[count].num.size()) {
-            insert=QString("$$qf_commondoc_backtop$$<br><br><br>")+insert;
-        }
-
-        if (rxHeader1.indexIn(insert, 0)!=-1) {
-            insert=insert.replace(rxHeader1.cap(1), rxHeader1.cap(1)+QString(" style=\"background-color: azure;\" "));
-        }
-
-        result=result.replace(rxHeader.cap(0), insert);
-
-        ++count;
-        pos += insert.size();
-
-    }
-    // compute table of contents
-    QString contentsHTML;
-    if (contents.size()>0) {
-        contentsHTML="<div style=\"background-color: azure;  border-color: midnightblue; border-style: solid; padding-top:5px; padding-left:5px; padding-right:5px; padding-bottom:5px; margin: 5px;\"><a name=\"table_of_contents\"><b>Table of Contents:</b><br>";
-        for (int i=0; i<contents.size(); i++) {
-            QString spaces="";
-            QString prefix="";
-            for (int j=minHeaderLevel-1; j<contents[i].num.size(); j++) {
-                spaces+="&nbsp;&nbsp;&nbsp;";
-                if (!prefix.isEmpty()) prefix+=".";
-                prefix+=QString::number(contents[i].num[j]);
-            }
-            contentsHTML+=QString("%4<a href=\"#%1\">%2 %3</a><br>").arg(contents[i].id).arg(contents[i].prefix).arg(contents[i].header).arg(spaces);
-        }
-        contentsHTML+="</div>";
-        //qDebug()<<contentsHTML;
-        fromHTML_replaces.append(qMakePair(QString("contents"), contentsHTML));
-    }
-
-    QString basepath=QFileInfo(filename).absolutePath();
-    QDir basedir=QFileInfo(filename).absoluteDir();
-    if (basedir.exists("tutorial.html")) {
-        if (QFileInfo(filename).fileName()=="tutorial.html") {
-            fromHTML_replaces.append(qMakePair(QString("rel_tutorial"), tr("<b><img src=\":/lib/help/help_tutorial.png\" border=\"0\">&nbsp;Tutorial</b> ")));
-        } else {
-            fromHTML_replaces.append(qMakePair(QString("rel_tutorial"), tr("<a href=\"%1\"><img src=\":/lib/help/help_tutorial.png\" border=\"0\"></a>&nbsp;<a href=\"%1\">Tutorial</a> ").arg(basedir.absoluteFilePath("tutorial.html"))));
-        }
-    } else {
-        fromHTML_replaces.append(qMakePair(QString("rel_tutorial"), QString(" ")));
-    }
-
-
-    // extract references tags $$ref:<ID>:Text$$
-    QStringList refList;
-    QMap<QString, int> refIDMap;
-    QRegExp rxRef("\\$\\$(invisibleref|ref)\\:(\\w*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
-    rxRef.setMinimal(true);
-    count = 0;
-    pos = 0;
-    while ((pos = rxRef.indexIn(result, pos)) != -1) {
-
-        QString inst=rxRef.cap(1).toLower();
-        QString ID=rxRef.cap(2).toLower();
-        QString ref=rxRef.cap(3);
-        int refNum=-1;
-
-        if (!ID.isEmpty()) {
-            if (refIDMap.contains(ID)) {
-                refNum=refIDMap[ID];
-                ref=refList.value(refNum, ref);
-            } else {
-                refList.append(ref);
-                refNum=refIDMap[ID]=refList.size()-1;
-            }
-        } else {
-            refList.append(ref);
-            refNum=refList.size()-1;
-        }
-
-        QString rep=QString("<a href=\"#ref%1\">[%2]</a>").arg(refNum+1).arg(refNum+1);
-        if (inst=="invisibleref") {
-            rep="";
-        }
-
-        result=result.replace(rxRef.cap(0), rep);
-
-        ++count;
-        pos += rep.size();
-
-    }
-    QString referencesHTML="";
-    for (int i=0; i<refList.size(); i++) {
-        referencesHTML=referencesHTML+QString("<li><a name=\"ref%1\">%2</li>").arg(i+1).arg(refList[i]);
-    }
-    if (refList.size()>0) {
-        referencesHTML=QString("<ol>%1</ol>").arg(referencesHTML);
-    }
-    fromHTML_replaces.append(qMakePair(QString("references"), referencesHTML));
 
 
 
@@ -747,7 +591,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
         if (!result.contains("$$qf_commondoc_header")) {
             result=result.replace(QString("<body>"), QString("<body>$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$"));
         }
-        if (!result.contains("$$contents") && contents.size()>1) {
+        if (!result.contains("$$contents")) {
             result=result.replace(QString("$$qf_commondoc_header.end$$"), QString("$$qf_commondoc_header.end$$\n<br><hr><br>$$contents$$<br><hr><br>"));
         }
         bool replaced=true;
@@ -984,6 +828,169 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
         }
 
 
+
+        // extract table of contents from header tags
+        QRegExp rxHeader("<\\s*h([123456789]).*>(.*)<\\/\\s*h\\1\\s*>", Qt::CaseInsensitive);
+        rxHeader.setMinimal(true);
+        count = 0;
+        pos = 0;
+        int minHeaderLevel=0;
+        QList<QFHTMLHelpWindow::ContentsEntry> contents;
+        bool first=true;
+        while ((pos = rxHeader.indexIn(result, pos)) != -1) {
+
+            int level=rxHeader.cap(1).toInt();
+            QString text=rxHeader.cap(2);
+
+            QFHTMLHelpWindow::ContentsEntry h;
+            if (contents.size()>0) h=contents.value(contents.size()-1);
+
+            h.header=text;
+            if (first) {
+                for (int i=1; i<=level; i++) {
+                    h.num.append(1);
+                }
+            } else {
+                if (level==h.num.size()) {
+                    h.num[h.num.size()-1]=h.num[h.num.size()-1]+1;
+                } else if (level>h.num.size()) {
+                    for (int i=h.num.size(); i<level; i++) {
+                        h.num.append(1);
+                    }
+                } else if (level<h.num.size()) {
+                    for (int i=h.num.size(); i>=level; i--) {
+                        h.num.removeAt(i);
+                    }
+                    h.num[h.num.size()-1]=h.num[h.num.size()-1]+1;
+                }
+            }
+
+            QString id="";
+            QString tid="";
+            for (int i=0; i<h.num.size(); i++) {
+                if (!id.isEmpty()) id+="_";
+                if (!tid.isEmpty()) tid+=".";
+                id+=QString::number(h.num[i]);
+                tid+=QString::number(h.num[i]);
+            }
+            if (first) {
+                minHeaderLevel=h.num.size();
+            } else if (h.num.size()<minHeaderLevel) {
+                minHeaderLevel=h.num.size();
+            }
+            //qDebug()<<h.num.size()<<"(min: "<<minHeaderLevel<<")"<<tid<<h.header;
+            first=false;
+            h.id=id;
+            h.prefix=tid;
+
+            contents.append(h);
+            ++count;
+            pos += rxHeader.matchedLength();
+
+        }
+        // improve header tags
+        QRegExp rxHeader1("(<\\s*h[123456789].*)>", Qt::CaseInsensitive);
+        rxHeader1.setMinimal(true);
+        count = 0;
+        pos = 0;
+        while ((pos = rxHeader.indexIn(result, pos)) != -1) {
+
+            QString prefix="";
+            for (int j=minHeaderLevel-1; j<contents[count].num.size(); j++) {
+                if (!prefix.isEmpty()) prefix+=".";
+                prefix+=QString::number(contents[count].num[j]);
+            }
+            contents[count].prefix=prefix;
+            QString header=contents[count].header;
+            QString newmatch=rxHeader.cap(0);
+            newmatch=newmatch.replace(header, QString("<i>")+contents[count].prefix+QString(".</i>&nbsp;&nbsp;&nbsp;")+header);
+            QString insert=QString("<a name=\"%1\">%2").arg(contents[count].id).arg(newmatch);
+
+            //qDebug()<<rxHeader.cap(0)<<header<<newmatch;
+
+            if (count>0 && minHeaderLevel==contents[count].num.size()) {
+                insert=QString("$$qf_commondoc_backtop$$<br><br><br>")+insert;
+            }
+
+            if (rxHeader1.indexIn(insert, 0)!=-1) {
+                insert=insert.replace(rxHeader1.cap(1), rxHeader1.cap(1)+QString(" style=\"background-color: azure;\" "));
+            }
+
+            result=result.replace(rxHeader.cap(0), insert);
+
+            ++count;
+            pos += insert.size();
+
+        }
+        // compute table of contents
+        QString contentsHTML;
+        if (contents.size()>0) {
+            contentsHTML="<div style=\"background-color: azure;  border-color: midnightblue; border-style: solid; padding-top:5px; padding-left:5px; padding-right:5px; padding-bottom:5px; margin: 5px;\"><a name=\"table_of_contents\"><b>Table of Contents:</b><br>";
+            for (int i=0; i<contents.size(); i++) {
+                QString spaces="";
+                QString prefix="";
+                for (int j=minHeaderLevel-1; j<contents[i].num.size(); j++) {
+                    spaces+="&nbsp;&nbsp;&nbsp;";
+                    if (!prefix.isEmpty()) prefix+=".";
+                    prefix+=QString::number(contents[i].num[j]);
+                }
+                contentsHTML+=QString("%4<a href=\"#%1\">%2 %3</a><br>").arg(contents[i].id).arg(contents[i].prefix).arg(contents[i].header).arg(spaces);
+            }
+            contentsHTML+="</div>";
+            //qDebug()<<contentsHTML;
+            //fromHTML_replaces.append(qMakePair(QString("contents"), contentsHTML));
+        }
+
+
+        // extract references tags $$ref:<ID>:Text$$
+        QStringList refList;
+        QMap<QString, int> refIDMap;
+        QRegExp rxRef("\\$\\$(invisibleref|ref)\\:(\\w*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+        rxRef.setMinimal(true);
+        count = 0;
+        pos = 0;
+        while ((pos = rxRef.indexIn(result, pos)) != -1) {
+
+            QString inst=rxRef.cap(1).toLower();
+            QString ID=rxRef.cap(2).toLower();
+            QString ref=rxRef.cap(3);
+            int refNum=-1;
+
+            if (!ID.isEmpty()) {
+                if (refIDMap.contains(ID)) {
+                    refNum=refIDMap[ID];
+                    ref=refList.value(refNum, ref);
+                } else {
+                    refList.append(ref);
+                    refNum=refIDMap[ID]=refList.size()-1;
+                }
+            } else {
+                refList.append(ref);
+                refNum=refList.size()-1;
+            }
+
+            QString rep=QString("<a href=\"#ref%1\">[%2]</a>").arg(refNum+1).arg(refNum+1);
+            if (inst=="invisibleref") {
+                rep="";
+            }
+
+            result=result.replace(rxRef.cap(0), rep);
+
+            ++count;
+            pos += rep.size();
+
+        }
+        QString referencesHTML="";
+        for (int i=0; i<refList.size(); i++) {
+            referencesHTML=referencesHTML+QString("<li><a name=\"ref%1\">%2</li>").arg(i+1).arg(refList[i]);
+        }
+        if (refList.size()>0) {
+            referencesHTML=QString("<ol>%1</ol>").arg(referencesHTML);
+        }
+        //fromHTML_replaces.append(qMakePair(QString("references"), referencesHTML));
+
+        result=result.replace("$$contents$$", contentsHTML);
+        result=result.replace("$$references$$", referencesHTML);
 
         // remove all unreplaces $$name$$ sequences
         QRegExp rxSpecials("\\$\\$.+\\$\\$");

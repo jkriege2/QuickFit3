@@ -86,12 +86,14 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
             else return QVariant();
         }
         if (row==0) {
+            //qDebug()<<"data(r="<<row<<", c="<<col<<")";
             if (rdr && coli==0) {
                 if (role==Qt::DisplayRole || role==Qt::EditRole) return rdr->getName();
                 if (role==Qt::DecorationRole) return rdr->getSmallIcon();
                 if (role==widgetTypeRole) return wtRDRCombobox;
             }
         } else if (row==1) {
+            //qDebug()<<"data(r="<<row<<", c="<<col<<")";
             if (ff && coli==0) {
                 if (role==Qt::DisplayRole || role==Qt::EditRole) return ff->name();
                 if (role==Qt::DecorationRole) return QIcon(":/lib/fitfunc_icon.png");
@@ -206,19 +208,23 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
         int coli=(col-1)%colsPerRDR;
         QFRawDataRecord* rdr=item->getFitFile(cols);
         QFFitFunction* ff=item->getFitFunction(cols);
+        /*if (row<=1) {
+            rdr=item->getFitFile(col);
+            ff=item->getFitFunction(col);
+        }*/
         //qDebug()<<"cols="<<cols<<"   coli="<<coli;
 
         if (row==0 && coli==0) {
             QFRawDataRecord* newrdr=item->getProject()->getRawDataByID(value.toInt());
             if (newrdr) {
-                item->setFitFile(cols, newrdr);
+                item->setFitFile(col/*s*/, newrdr);
                 emit dataChanged(index, index);
                 recalculateFitParameters(false);
                 emit fitParamChanged();
                 return true;
             }
         } else if (row==1) {
-            item->setFitFunction(cols, value.toString());
+            item->setFitFunction(col/*s*/, value.toString());
             if (!checkRebuildModel(false)) {
                 emit dataChanged(index, index);
                 recalculateFitParameters(false);

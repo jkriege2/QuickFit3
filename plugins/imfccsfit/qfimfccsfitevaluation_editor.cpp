@@ -147,10 +147,14 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     ui->btnPrintReport->setDefaultAction(actPrintReport);
     menuEvaluation->addAction(actPrintReport);
 
+    QMenu* m=menuImFCCSFit->addMenu(tr("configure evaluation for ..."));
 
-    actConfigureForSPIMFCCS=new QAction(tr("configure for SPIM-FCCS ..."), this);
+    actConfigureForSPIMFCCS=new QAction(tr("SPIM-FCCS: normal diffusion"), this);
     connect(actConfigureForSPIMFCCS, SIGNAL(triggered()), this, SLOT(configureForSPIMFCCS()));
-    menuImFCCSFit->addAction(actConfigureForSPIMFCCS);
+    m->addAction(actConfigureForSPIMFCCS);
+    actConfigureForASPIMFCCS=new QAction(tr("SPIM-FCCS: anomalous diffusion"), this);
+    connect(actConfigureForASPIMFCCS, SIGNAL(triggered()), this, SLOT(configureForASPIMFCCS()));
+    m->addAction(actConfigureForASPIMFCCS);
 
     menuImFCCSFit->addSeparator();
 
@@ -225,6 +229,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         disconnect(item, SIGNAL(fileChanged(int,QFRawDataRecord*)), this, SLOT(fileChanged(int,QFRawDataRecord*)));
         disconnect(ui->datacut, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersChanged(int, int, int, int)));
         disconnect(item_old->getParameterInputTableModel(), SIGNAL(fitParamChanged()), this, SLOT(displayEvaluation()));
+        disconnect(item_old->getParameterInputTableModel(), SIGNAL(modelRebuilt()), this, SLOT(setParameterTableSpans()));
     }
 
 
@@ -243,6 +248,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
 
         ui->tableView->setModel(item->getParameterInputTableModel());
         connect(item->getParameterInputTableModel(), SIGNAL(modelRebuilt()), this, SLOT(ensureCorrectParamaterModelDisplay()));
+        setParameterTableSpans();
 
         /* connect widgets and fill with data from item here */
         connect(ui->btnAddFile, SIGNAL(clicked()), item, SLOT(addFitFile()));
@@ -251,6 +257,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         connect(ui->datacut, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersChanged(int, int, int, int)));
         connect(item->getParameterInputTableModel(), SIGNAL(fitParamChanged()), this, SLOT(displayEvaluation()));
         connect(ui->lstFileSets, SIGNAL(clicked(QModelIndex)), this, SLOT(filesSetActivated(QModelIndex)));
+        connect(item->getParameterInputTableModel(), SIGNAL(modelRebuilt()), this, SLOT(setParameterTableSpans()));
         ui->pltOverview->setRDR(item->getFitFile(0));
         updatingData=false;
     }
@@ -384,9 +391,59 @@ void QFImFCCSFitEvaluationEditor::configureForSPIMFCCS() {
         }
     }
 
-    data->setFitFunction(0, "fcs_spim_diffc");
-    data->setFitFunction(1, "fcs_spim_diffc");
-    data->setFitFunction(2, "fccs_spim_diff2color");
+    data->setFitFunction(0, "fccs_spim_fw_diff2coloracfg");
+    data->setFitFunction(1, "fccs_spim_fw_diff2coloracfr");
+    data->setFitFunction(2, "fccs_spim_fw_diff2colorccf");
+    data->clearLinkParameters();
+
+    QStringList globals;
+    globals<<"concentration_a"<<"concentration_b"<<"concentration_ab"
+          <<"diff_coeff_a"  <<"diff_coeff_b"  <<"diff_coeff_ab"
+         <<"crosstalk"<<"focus_distance_x"  <<"focus_distance_y"  <<"focus_distance_z"
+        <<"focus_width1"  <<"focus_width2"  <<"focus_height1"  <<"focus_height2"
+       <<"pixel_width"<<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
+
+    for (int g=0; g<globals.size(); g++) {
+        data->setLinkParameter(0, globals[g], g);
+        data->setLinkParameter(1, globals[g], g);
+        data->setLinkParameter(2, globals[g], g);
+    }
+
+}
+
+void QFImFCCSFitEvaluationEditor::configureForASPIMFCCS() {
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+
+    if (data->getFitFileCount()<3) {
+        while (data->getFitFileCount()<3) {
+            data->addFitFile();
+        }
+    } else if (data->getFitFileCount()>3) {
+        while (data->getFitFileCount()>3) {
+            data->removeFitFile();
+        }
+    }
+
+    data->setFitFunction(0, "fccs_spim_fw_adiff2coloracfg");
+    data->setFitFunction(1, "fccs_spim_fw_adiff2coloracfr");
+    data->setFitFunction(2, "fccs_spim_fw_adiff2colorccf");
+    data->clearLinkParameters();
+
+    QStringList globals;
+    globals<<"concentration_a"<<"concentration_b"<<"concentration_ab"
+          <<"diff_acoeff_a"  <<"diff_acoeff_b"  <<"diff_acoeff_ab"
+         <<"diff_alpha_a"  <<"diff_alpha_b"  <<"diff_alpha_ab"
+         <<"crosstalk"<<"focus_distance_x"  <<"focus_distance_y"  <<"focus_distance_z"
+        <<"focus_width1"  <<"focus_width2"  <<"focus_height1"  <<"focus_height2"
+       <<"pixel_width"<<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
+
+    for (int g=0; g<globals.size(); g++) {
+        data->setLinkParameter(0, globals[g], g);
+        data->setLinkParameter(1, globals[g], g);
+        data->setLinkParameter(2, globals[g], g);
+    }
+
 }
 
 void QFImFCCSFitEvaluationEditor::filesSetActivated(const QModelIndex &idx)
@@ -431,8 +488,8 @@ void QFImFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
            if (i>0 && eval) {
                int ii=(i-1)%(eval->getParameterInputTableModel()->getColsPerRDR());
                //qDebug()<<"  resizing h"<<i<<" to contents "<<t.elapsed()<<"ms";
-               if (ii==0) h->resizeSection(i, 250);
-               else if (ii==1) h->resizeSection(i, 75);
+               if (ii==0) h->resizeSection(i, 100);
+               else if (ii==1) h->resizeSection(i, 50);
                else if (ii==2) h->resizeSection(i, 50);
                else if (ii==3) h->resizeSection(i, 24);
                else if (ii==4) h->resizeSection(i, 75);
@@ -925,6 +982,14 @@ void QFImFCCSFitEvaluationEditor::copyToInitial()
     eval->emitResultsChanged();
 
     QApplication::restoreOverrideCursor();
+}
+
+void QFImFCCSFitEvaluationEditor::setParameterTableSpans()
+{
+    for (int i=1; i<ui->tableView->model()->columnCount(); i++) {
+        ui->tableView->setSpan(0,i,1,5);
+        ui->tableView->setSpan(1,i,1,5);
+    }
 }
 
 void QFImFCCSFitEvaluationEditor::on_cmbWeight_currentWeightChanged(QFFCSWeightingTools::DataWeight weight)

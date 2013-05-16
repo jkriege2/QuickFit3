@@ -74,6 +74,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void setCurrentRun(int run);
 
         void configureForSPIMFCCS();
+        void configureForASPIMFCCS();
 
         void filesSetActivated(const QModelIndex& idx);
         void on_chkSaveStrings_toggled(bool checked);
@@ -85,6 +86,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief where did we save the last report */
         QString currentSaveDirectory;
         QAction* actConfigureForSPIMFCCS;
+        QAction* actConfigureForASPIMFCCS;
         QAction* actFitCurrent;
         QAction* actFitAllPixelsMT;
         QAction* actFitAllPixels;
@@ -145,6 +147,8 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void resetCurrent();
         void resetAllPixels();
         void copyToInitial();
+
+        void setParameterTableSpans();
 
 
 };

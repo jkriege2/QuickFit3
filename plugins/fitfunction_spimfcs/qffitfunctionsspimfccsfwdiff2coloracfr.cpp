@@ -2,6 +2,7 @@
 #include "qfmathtools.h"
 #include <cmath>
 #include "imfcstools.h"
+#include <QDebug>
 QFFitFunctionsSPIMFCCSFWDiff2ColorACFR::QFFitFunctionsSPIMFCCSFWDiff2ColorACFR() {
     //           type,         id,                        name,                                                   label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,               initialFIx,  initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(FloatNumber,  "concentration_a",         "concentration of species a in focus",         "C<sub>a</sub>",           "nM",         "nM",                              true,      true,          true,              QFFitFunction::DisplayError, false, 10,          0,        1e50,     1    );
@@ -26,13 +27,13 @@ QFFitFunctionsSPIMFCCSFWDiff2ColorACFR::QFFitFunctionsSPIMFCCSFWDiff2ColorACFR()
     #define FCCSDiff_focus_distancey 9
     addParameter(FloatNumber,  "focus_distance_z",         "foci: longitudinal distance in z-direction",          "d<sub>z</sub>",            "nm",         "nm",                     true,      true,         true,             QFFitFunction::EditError,    true, 0,              -1e6,     1e6,      10  );
     #define FCCSDiff_focus_distancez 10
-    addParameter(FloatNumber,  "focus_height1",            "green PSF: axial radius (1/e² radius)",               "z<sub>g</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 620,         0.01,     1e5,      10  );
+    addParameter(FloatNumber,  "focus_height1",            "green PSF: axial radius (1/e² radius)",               "z<sub>g</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 1240,         0.01,     1e5,      10  );
     #define FCCSDiff_focus_height1 11
-    addParameter(FloatNumber,  "focus_width1",             "green PSF: lateral radius (1/e² radius)",             "w<sub>g</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 300,          0,        1e4,      10    );
+    addParameter(FloatNumber,  "focus_width1",             "green PSF: lateral radius (1/e² radius)",             "w<sub>g</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 600,          0,        1e4,      10    );
     #define FCCSDiff_focus_width1 12
-    addParameter(FloatNumber,  "focus_height2",            "red PSF: axial radius (1/e² radius)",               "z<sub>r</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 650,         0.01,     1e5,      10  );
+    addParameter(FloatNumber,  "focus_height2",            "red PSF: axial radius (1/e² radius)",               "z<sub>r</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 1300,         0.01,     1e5,      10  );
     #define FCCSDiff_focus_height2 13
-    addParameter(FloatNumber,  "focus_width2",             "red PSF: lateral radius (1/e² radius)",             "w<sub>r</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 330,          0,        1e4,      10    );
+    addParameter(FloatNumber,  "focus_width2",             "red PSF: lateral radius (1/e² radius)",             "w<sub>r</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 660,          0,        1e4,      10    );
     #define FCCSDiff_focus_width2 14
     addParameter(FloatNumber,  "pixel_width",             "pixel width",                                           "a",                        "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 400,          0,        1e4,      10    );
     #define FCCSDiff_pixel_width 15
@@ -89,14 +90,20 @@ double QFFitFunctionsSPIMFCCSFWDiff2ColorACFR::evaluate(double t, const double* 
     const double Fg=etaG*(ca+cab);
     const double Fr=etaR*(cb+cab)+kappa*Fg;
 
-    const double Grr_b=etaR*etaR*ca*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Db, t, wxyR, wxyR, wzR, wzR);
-    const double Grr_ab=etaR*etaR*cab*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, t, wxyR, wxyR, wzR, wzR);
-    const double Ggg_a=etaG*etaG*ca*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Da, t, wxyG, wxyG, wzG, wzG);
-    const double Ggg_ab=etaG*etaG*cab*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, t, wxyG, wxyG, wzG, wzG);
-    const double Ggr_ab=etaG*etaR*cab*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, t, wxyG, wxyR, wzG, wzR);
+    double Grr_b=etaR*etaR*cb*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Db, t, wxyR, wxyR, wzR, wzR);
+    double Grr_ab=etaR*etaR*cab*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, t, wxyR, wxyR, wzR, wzR);
+    double Ggg_a=etaG*etaG*ca*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Da, t, wxyG, wxyG, wzG, wzG);
+    double Ggg_ab=etaG*etaG*cab*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, t, wxyG, wxyG, wzG, wzG);
+    double Ggr_ab=etaG*etaR*cab*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, t, wxyG, wxyR, wzG, wzR);
+    if (fabs(ca)<1e-15) Ggg_a=0;
+    if (fabs(cb)<1e-15) Grr_b=0;
+    if (fabs(cab)<1e-15) Grr_ab=Ggg_ab=Ggr_ab=0;
 
     const double cfac=Grr_b+Grr_ab+qfSqr(kappa)*(Ggg_a+Ggg_ab)+2.0*kappa*Ggr_ab;
 
+    //qDebug()<<"red("<<t<<"): offset="<<offset<<"  backfactor="<<backfactor<<"  cfac="<<cfac;
+    //qDebug()<<"          Fr="<<Fr<<"  Fg="<<Fg<<"  etaR="<<etaR<<"  etaG="<<etaG;
+    //qDebug()<<"          cr1="<<cr1<<"  cr2="<<cr2<<"  background1="<<background1<<"  background2="<<background2;
     return offset+backfactor*cfac/(Fr*Fr);
 }
 
