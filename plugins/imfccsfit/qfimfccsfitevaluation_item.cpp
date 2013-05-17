@@ -776,6 +776,8 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
             }
             if (doLog) QFPluginLogTools::log_text(tr("      - fit data range: %1...%2 (%3 datapoints)\n").arg(cut_low).arg(cut_up).arg(cut_N));
             dfd.weightsOK=false;
+            dfd.taudata=&(dfd.taudata[cut_low]);
+            dfd.corrdata=&(dfd.corrdata[cut_low]);
             dfd.weights=allocWeights(&(dfd.weightsOK), record, run, cut_low, cut_up);
             if (!dfd.weightsOK && doLog) QFPluginLogTools::log_warning(tr("      - weights have invalid values => setting all weights to 1\n"));
             // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
@@ -813,6 +815,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
                     if (!iparams.isEmpty()) iparams=iparams+";  ";
                     fitparamcount++;
                     iparams=iparams+QString("%1 = %2").arg(ffunc->getDescription(i).id).arg(dfd.params[i]);
+                    //iparams=iparams+QString("%1 = %2 (%3..%4)").arg(ffunc->getDescription(i).id).arg(dfd.params[i]).arg(dfd.paramsMin[i]).arg(dfd.paramsMax[i]);
                 }
                 //qDebug("  before_fit: %s = %lf +/m %lf", ffunc->getDescription(i).id.toStdString().c_str(), dfd.params[i], dfd.errors[i]);
             }
@@ -821,7 +824,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
 
 
             fitData.append(dfd);
-            tool.addTerm(ffunc, dfd.params, dfd.paramsFix, dfd.taudata, dfd.corrdata, dfd.weights, dfd.N);
+            tool.addTerm(ffunc, dfd.params, dfd.paramsFix, dfd.taudata, dfd.corrdata, dfd.weights, dfd.cut_N);//, dfd.paramsMin, dfd.paramsMax);
         }
     }
 

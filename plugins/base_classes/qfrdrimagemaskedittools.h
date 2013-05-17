@@ -49,6 +49,7 @@ class QFRDRImageMaskEditTools: public QObject {
         void undoMask();
         void redoMask();
         void maskBorder();
+        void copyMaskToGroup();
     signals:
         void rawDataChanged();
 
@@ -76,6 +77,7 @@ class QFRDRImageMaskEditTools: public QObject {
         QAction* actClearMask;
         QAction* actInvertMask;
         QAction* actMaskBorder;
+        QAction* actCopyMaskToGroup;
 
         QAction* actUndoMask;
         QAction* actRedoMask;

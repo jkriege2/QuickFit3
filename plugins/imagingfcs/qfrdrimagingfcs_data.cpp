@@ -1624,7 +1624,7 @@ int QFRDRImagingFCSData::getExpectedFileHeight() const
 
 void QFRDRImagingFCSData::splitImage(double* overviewF, double* overviewF2, const double* inputImage, uint32_t nx, uint32_t ny)
 {
-    qDebug()<<getID()<<"splitImage(overviewF="<<overviewF<<",  overviewF2="<<overviewF2<<",  nx="<<nx<<",  ny="<<ny<<")   width = "<<width<<"   height = "<<height<<"   intDV2="<<internalDualViewMode()<<",channel="<<internalDualViewModeChannel();
+    //qDebug()<<getID()<<"splitImage(overviewF="<<overviewF<<",  overviewF2="<<overviewF2<<",  nx="<<nx<<",  ny="<<ny<<")   width = "<<width<<"   height = "<<height<<"   intDV2="<<internalDualViewMode()<<",channel="<<internalDualViewModeChannel();
     if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && nx>=2*width && ny==height) {
         int shift1=0;
         int shift2=width;
@@ -1651,7 +1651,7 @@ void QFRDRImagingFCSData::splitImage(double* overviewF, double* overviewF2, cons
                     out1[idxOut]=inputImage[idxIn];
                 }
             }
-            qDebug()<<"writing out1["<<out2<<"] ="<<out1[0]<<out1[1]<<out1[2];
+            //qDebug()<<"writing out1["<<out2<<"] ="<<out1[0]<<out1[1]<<out1[2];
         }
         if (out2) {            
             for (int y=0; y<height; y++) {
@@ -1661,7 +1661,7 @@ void QFRDRImagingFCSData::splitImage(double* overviewF, double* overviewF2, cons
                     out2[idxOut]=inputImage[idxIn];
                 }
             }
-            qDebug()<<"writing out2["<<out2<<"] ="<<out2[0]<<out2[1]<<out2[2];
+            //qDebug()<<"writing out2["<<out2<<"] ="<<out2[0]<<out2[1]<<out2[2];
         }
     } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && nx==width && ny>=2*height) {
         int shift1=0;

@@ -246,7 +246,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         ui->cmbErrorDisplay->setCurrentIndex(item->getProperty("imFCCSFit/errordisplay", 0).toInt());
         ui->chkGrid->setChecked(item->getProperty("imFCCSFit/grid", true).toBool());
         ui->chkKey->setChecked(item->getProperty("imFCCSFit/key", true).toBool());
-        ui->chkSaveStrings->setChecked(item->getProperty("dontSaveFitResultMessage", true).toBool());
+        ui->chkSaveStrings->setChecked(!item->getProperty("dontSaveFitResultMessage", true).toBool());
         ui->lstFileSets->setModel(item->getFileSetsModel());
 
         ui->tableView->setModel(item->getParameterInputTableModel());
@@ -463,7 +463,7 @@ void QFImFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
     //qDebug()<<"ensureCorrectParamaterModelDisplay";
     QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     setUpdatesEnabled(false);
-    ui->tableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    ui->tableView->setEditTriggers(QAbstractItemView::DoubleClicked| QAbstractItemView::SelectedClicked| QAbstractItemView::EditKeyPressed| QAbstractItemView::EditKeyPressed|QAbstractItemView::CurrentChanged);
     ui->tableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     QHeaderView* h=ui->tableView->verticalHeader();
     if (h) {
@@ -491,7 +491,7 @@ void QFImFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
            if (i>0 && eval) {
                int ii=(i-1)%(eval->getParameterInputTableModel()->getColsPerRDR());
                //qDebug()<<"  resizing h"<<i<<" to contents "<<t.elapsed()<<"ms";
-               if (ii==0) h->resizeSection(i, 100);
+               if (ii==0) h->resizeSection(i, 125);
                else if (ii==1) h->resizeSection(i, 50);
                else if (ii==2) h->resizeSection(i, 50);
                else if (ii==3) h->resizeSection(i, 24);
@@ -993,7 +993,7 @@ void QFImFCCSFitEvaluationEditor::copyToInitial()
 
 void QFImFCCSFitEvaluationEditor::setParameterTableSpans()
 {
-    for (int i=1; i<ui->tableView->model()->columnCount(); i++) {
+    for (int i=1; i<ui->tableView->model()->columnCount(); i=i+5) {
         ui->tableView->setSpan(0,i,1,5);
         ui->tableView->setSpan(1,i,1,5);
     }
@@ -1020,7 +1020,7 @@ int QFImFCCSFitEvaluationEditor::getUserMin(QFRawDataRecord *rec, int index, int
 {
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     if (!data) return defaultMin;
-    const QString resultID=data->getEvaluationResultID(index, rec);
+    const QString resultID=data->getEvaluationResultID(-1/*index*/, rec);
 
     // WORKROUND FOR OLD PROPERTY NAMES
     int defaultM=rec->getProperty(QString(resultID+"_datacut_min"), defaultMin).toInt();
@@ -1032,7 +1032,7 @@ int QFImFCCSFitEvaluationEditor::getUserMax(QFRawDataRecord *rec, int index, int
 {
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     if (!data) return defaultMax;
-    const QString resultID=data->getEvaluationResultID(index, rec);
+    const QString resultID=data->getEvaluationResultID(-1/*index*/, rec);
 
     // WORKROUND FOR OLD PROPERTY NAMES
     int defaultM=rec->getProperty(QString(resultID+"_datacut_max"), defaultMax).toInt();
@@ -1048,7 +1048,7 @@ void QFImFCCSFitEvaluationEditor::setUserMinMax(int userMin, int userMax)
     if (!data) return;
     for (int i=0; i<data->getFitFileCount(); i++) {
         QFRawDataRecord* rdr=data->getFitFile(i);
-        const QString resultID=data->getEvaluationResultID(rdr);
+        const QString resultID=data->getEvaluationResultID(-1, rdr);
         rdr->disableEmitPropertiesChanged();
         rdr->setQFProperty(resultID+"_datacut_min", userMin, false, false);
         rdr->setQFProperty(resultID+"_datacut_max", userMax, false, false);
@@ -1074,7 +1074,7 @@ int QFImFCCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int index
 void QFImFCCSFitEvaluationEditor::on_chkSaveStrings_toggled(bool checked)
 {
     if (!current) return;
-    current->setQFProperty("dontSaveFitResultMessage", checked, false, false);
+    current->setQFProperty("dontSaveFitResultMessage", !checked, false, false);
 }
 
 

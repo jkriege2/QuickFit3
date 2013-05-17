@@ -118,7 +118,13 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
                 bool visible=fp.visibleIn.contains(rdr);
                 if (visible) {
                     if (coli==0) {
-                        if (role==Qt::DisplayRole || role==Qt::EditRole) return roundWithError(item->getFitValue(fp.id, rdr), item->getFitError(fp.id, rdr));
+                        if (role==Qt::DisplayRole) {
+                            const double err=item->getFitError(fp.id, rdr);
+                            const double val=item->getFitValue(fp.id, rdr);
+                            if (fabs(err)>1e-25) return roundWithError(val, err);
+                            return roundError(val, 4);
+                        }
+                        if (role==Qt::EditRole) return roundWithError(item->getFitValue(fp.id, rdr), item->getFitError(fp.id, rdr));
                         if (role==widgetTypeRole && desc.userEditable) {
                             if (desc.type==QFFitFunction::FloatNumber) return wtValueDoubleEdit;
                             if (desc.type==QFFitFunction::LogFloatNumber) return wtValueLogDoubleEdit;
@@ -217,14 +223,14 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
         if (row==0 && coli==0) {
             QFRawDataRecord* newrdr=item->getProject()->getRawDataByID(value.toInt());
             if (newrdr) {
-                item->setFitFile(col/*s*/, newrdr);
+                item->setFitFile(cols, newrdr);
                 emit dataChanged(index, index);
                 recalculateFitParameters(false);
                 emit fitParamChanged();
                 return true;
             }
         } else if (row==1) {
-            item->setFitFunction(col/*s*/, value.toString());
+            item->setFitFunction(cols, value.toString());
             if (!checkRebuildModel(false)) {
                 emit dataChanged(index, index);
                 recalculateFitParameters(false);

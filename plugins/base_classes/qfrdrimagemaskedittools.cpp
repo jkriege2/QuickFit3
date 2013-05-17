@@ -46,6 +46,10 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
     actMaskBorder->setToolTip(tr("mask a border around the image"));
     connect(actMaskBorder, SIGNAL(triggered()), this, SLOT(maskBorder()));
 
+    actCopyMaskToGroup=new QAction(tr("copy mask to all files in same &group"), parentWidget);
+    actCopyMaskToGroup->setToolTip(tr(""));
+    connect(actCopyMaskToGroup, SIGNAL(triggered()), this, SLOT(copyMaskToGroup()));
+
 
 
 
@@ -151,6 +155,7 @@ void QFRDRImageMaskEditTools::setRDR(QFRawDataRecord *rdr)
     actClearMask->setEnabled(imagemask);
     actInvertMask->setEnabled(imagemask);
     actMaskBorder->setEnabled(imagemask);
+    actCopyMaskToGroup->setEnabled(rdr && rdr->getGroup()>=0);
 
     if (rdr)  {
         undos=rdr->getProperty(settingsPrefix+"QFRDRImageMaskEditTools_undostack",QStringList()).toStringList();
@@ -265,6 +270,27 @@ void QFRDRImageMaskEditTools::copyMask()
     mime->setData("quickfit3/pixelselection", mask.toUtf8());
     clipboard->setMimeData(mime);
 }
+
+void QFRDRImageMaskEditTools::copyMaskToGroup()
+{
+    if (!imagemask || !rdr) return;
+    int g=rdr->getGroup();
+    QString mask=imagemask->maskToString();
+
+    for (int r=0; r<rdr->getProject()->getRawDataCount(); r++) {
+        QFRawDataRecord* rd=rdr->getProject()->getRawDataByNum(r);
+        if (rd && rd->getGroup()==g) {
+            QFRDRImageMaskInterface* rm=qobject_cast<QFRDRImageMaskInterface*>(rd);
+            if (rm) {
+                rm->maskClear();
+                rm->maskLoadFromString(mask);
+            }
+        }
+
+    }
+
+}
+
 
 void QFRDRImageMaskEditTools::clearMask()
 {
@@ -400,6 +426,7 @@ void QFRDRImageMaskEditTools::maskBorder()
 
 }
 
+
 void QFRDRImageMaskEditTools::registerMaskToolsToMenu(QMenu *menu) const
 {
     menu->addAction(actUndoMask);
@@ -409,6 +436,7 @@ void QFRDRImageMaskEditTools::registerMaskToolsToMenu(QMenu *menu) const
     menu->addAction(actSaveMask);
     menu->addAction(actCopyMask);
     menu->addAction(actPasteMask);
+    menu->addAction(actCopyMaskToGroup);
     menu->addSeparator();
     menu->addAction(actClearMask);
     menu->addAction(actInvertMask);

@@ -1,5 +1,6 @@
 #include "qfmathtools.h"
 #include <float.h>
+#include <QDebug>
 
 double qfTanc( double x ) {
     if (x==0) return 1;
@@ -76,6 +77,7 @@ double roundError(double error, int addSignifcant) {
     if (fabs(error)<DBL_MIN*10.0) return error;
     int sbits_error=ceil(log(fabs(error))/log(10.0));
     double f=pow(10.0, sbits_error-1-addSignifcant);
+    //qDebug()<<"roundError("<<error<<addSignifcant<<")  sbits_error="<<sbits_error<<"  f="<<f;
     return round(error/f)*f;
 }
 
