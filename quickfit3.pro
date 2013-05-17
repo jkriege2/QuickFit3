@@ -134,7 +134,9 @@ SUBDIRS += plg_qfe_helpeditor
 plg_qfe_helpeditor.subdir=./plugins/qfe_helpeditor
 plg_qfe_helpeditor.depends = lib libqf3widgets
 
-
+SUBDIRS += plg_qfe_defaultmathparserextensions
+plg_qfe_defaultmathparserextensions.subdir=./plugins/qfe_defaultmathparserextensions
+plg_qfe_defaultmathparserextensions.depends = lib libqf3widgets
 
 !macx {
 

@@ -40,6 +40,9 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     ui->datacut->set_copyToRunsEnabled(false);
     ui->datacut->set_runsName(tr("pixels"));
 
+    ui->cmbDisplayData->addUsedSymbol(JKQTPfilledCircle);
+    ui->cmbDisplayData->addUsedSymbol(JKQTPdot);
+
 
 
 
@@ -597,6 +600,8 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 g->set_errorFillColor(ec);
                 g->set_symbol(ui->cmbDisplayData->getSymbol());
                 g->set_drawLine(ui->cmbDisplayData->getDrawLine());
+                g->set_symbolSize(5);
+                g->set_lineWidth(1);
                 g->set_yErrorStyle(ui->cmbErrorDisplay->getErrorStyle());
                 g->set_datarange_start(ui->datacut->get_userMin());
                 g->set_datarange_end(ui->datacut->get_userMax());
@@ -618,7 +623,7 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 g_fit->set_paramsVector(paramsV);
                 g_fit->set_color(g->get_color());
                 g_fit->set_style(Qt::DashLine);
-                g_fit->set_lineWidth(1);
+                g_fit->set_lineWidth(2);
                 g_fit->set_minSamples(30);
                 g_fit->set_maxRefinementDegree(4);
                 g_fit->set_plotRefinement(true);
@@ -636,6 +641,8 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 g_res->set_yColumn(c_resid);
                 g_res->set_color(g->get_color());
                 g_res->set_symbol(ui->cmbDisplayData->getSymbol());
+                g_res->set_symbolSize(5);
+                g_res->set_lineWidth(1);
                 g_res->set_drawLine(ui->cmbDisplayData->getDrawLine());
                 g_res->set_datarange_start(ui->datacut->get_userMin());
                 g_res->set_datarange_end(ui->datacut->get_userMax());
