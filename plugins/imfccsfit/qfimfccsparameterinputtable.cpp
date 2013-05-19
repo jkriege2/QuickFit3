@@ -261,13 +261,35 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
                 }
                 if (coli==1) {
                     item->setFitError(pid.id, value.toDouble(), rdr);
-                    emit dataChanged(index, index);
-                    recalculateFitParameters(false);
+                    // also set all other linked parameters to this new value!
+                    QList<QPair<int, QString> > linked=item->getLinkedParameterList(cols, pid.id);
+                    for (int li=0; li<linked.size(); li++) {
+                        item->setFitError(linked[li].second, value.toDouble(), item->getFitFile(linked[li].first));
+                        if (fitParamListContainsID(linked[li].second, fitparamids, &row)) {
+                            QModelIndex idx=this->index(2+row, 1+linked[li].first*getColsPerRDR());
+                            emit dataChanged(idx, idx);
+                        }
+                    }
+
+                    if (!checkRebuildModel(false)) {
+                        emit dataChanged(index, index);
+                        recalculateFitParameters(false);
+                    }
                     emit fitParamErrorChanged();
                     return true;
                 }
                 if (coli==3) {
                     item->setFitFix(pid.id, value.toBool(), rdr);
+                    // also set all other linked parameters to this new value!
+                    QList<QPair<int, QString> > linked=item->getLinkedParameterList(cols, pid.id);
+                    for (int li=0; li<linked.size(); li++) {
+                        item->setFitFix(linked[li].second, value.toBool(), item->getFitFile(linked[li].first));
+                        if (fitParamListContainsID(linked[li].second, fitparamids, &row)) {
+                            QModelIndex idx=this->index(2+row, 1+linked[li].first*getColsPerRDR());
+                            emit dataChanged(idx, idx);
+                        }
+                    }
+
                     emit dataChanged(index, index);
                     emit fitParamFixChanged();
                     return true;
