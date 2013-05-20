@@ -1,6 +1,9 @@
 #include "qfevaluationitemfactory.h"
 #include "qfevaluationitem.h"
 #include "qflib_version.h"
+#include "qfextensionmanager.h"
+#include "qfrawdatarecordfactory.h"
+#include "qfevaluationitemfactory.h"
 
 QFEvaluationItemFactory::QFEvaluationItemFactory(ProgramOptions* options, QObject* parent):
     QObject(parent)
@@ -59,7 +62,11 @@ void QFEvaluationItemFactory::searchPlugins(QString directory, QList<QFPluginSer
                     for (int i=0; i<keys.size(); i++) {
                         tooltips[keys[i]].tooltip=setTooltips.value(keys[i], tr("<i>no tooltip available</i>")).toString();
                         tooltips[keys[i]].tooltipfile=info.directory+"tooltips.ini";
-                    }                }
+                    }
+                }
+                QFPluginServices::getInstance()->getExtensionManager()->addExtensionPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalExtensionPlugins());
+                addEvalPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalEvaluationPlugins());
+                QFPluginServices::getInstance()->getRawDataRecordFactory()->addRDRPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalRDRPlugins());
             }
         }
     }
@@ -110,6 +117,24 @@ int QFEvaluationItemFactory::getMinorVersion(QString id) {
         return mi;
     }
     return 0;
+}
+
+void QFEvaluationItemFactory::addEvalPlugin(const QString &filename, QFPluginEvaluationItem *record)
+{
+    if (record) {
+        QString id=record->getID();
+        items[id]=record;
+        filenames[id]=filename;
+        emit showMessage(tr("loaded evaluation plugin '%2' (%1) ...").arg(filename).arg(record->getName()));
+        emit showLongMessage(tr("loaded evaluation plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(filenames[record->getID()]).arg(record->getName()).arg(record->getAuthor()).arg(record->getCopyright()));
+    }
+}
+
+void QFEvaluationItemFactory::addEvalPlugins(const QString &filename, QList<QFPluginEvaluationItem *> records)
+{
+    for (int i=0; i<records.size(); i++) {
+        addEvalPlugin(filename, records[i]);
+    }
 }
 
 

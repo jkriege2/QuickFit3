@@ -93,6 +93,11 @@ class QFLIB_EXPORT QFExtensionManager : public QObject {
             return NULL;
         }
 
+        /** \brief add a plugin from an external source */
+        void addExtensionPlugin(const QString& filename, QFExtension* record );
+        /** \brief add a plugin from an external source */
+        void addExtensionPlugins(const QString& filename, QList<QFExtension*> records );
+
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

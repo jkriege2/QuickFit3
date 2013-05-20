@@ -103,6 +103,13 @@ class QFLIB_EXPORT QFEvaluationItemFactory : public QObject {
         /** \brief get plugins minor version number */
         int getMinorVersion(QString id);
 
+
+        /** \brief add a plugin from an external source */
+        void addEvalPlugin(const QString& filename, QFPluginEvaluationItem* record );
+        /** \brief add a plugin from an external source */
+        void addEvalPlugins(const QString& filename, QList<QFPluginEvaluationItem*> records );
+
+
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

@@ -10,11 +10,13 @@
 #include "qfplugin.h"
 #include "lib_imexport.h"
 
+
+
 /** \brief virtual interface class for all QuickFit 3 raw data record plugins
     \ingroup qf3rawdataplugins
 
 */
-class QFPluginRawDataRecord: public QFPlugin {
+class QFPluginRawDataRecord: public QFPlugin, public QFPluginAdditionalPluginsInterface {
     public:
         /** \brief class destructor */
         virtual ~QFPluginRawDataRecord() {};
@@ -77,6 +79,15 @@ class QFLIB_EXPORT QFPluginRawDataRecordBase: public QFPluginRawDataRecord {
         /** \brief init plugin, this function is guaranteed to be called once, before  */
         virtual void init() {};
 
+        /** \copydoc QFPluginAdditionalPluginsInterface::getAdditionalRDRPlugins() */
+        virtual QList<QFPluginRawDataRecord*> getAdditionalRDRPlugins() const { return QList<QFPluginRawDataRecord*>(); };
+
+        /** \copydoc QFPluginAdditionalPluginsInterface::getAdditionalEvaluationPlugins() */
+        virtual QList<QFPluginEvaluationItem*> getAdditionalEvaluationPlugins() const  { return QList<QFPluginEvaluationItem*>(); };
+
+        /** \copydoc QFPluginAdditionalPluginsInterface::getAdditionalExtensionPlugins() */
+        virtual QList<QFExtension*> getAdditionalExtensionPlugins() const { return QList<QFExtension*>(); };
+
     protected:
         QFPluginServices* services;
         QFProject* project;
@@ -85,6 +96,6 @@ class QFLIB_EXPORT QFPluginRawDataRecordBase: public QFPluginRawDataRecord {
 };
 
 Q_DECLARE_INTERFACE(QFPluginRawDataRecord,
-                     "www.dkfz.de.b040.quickfit3.QFPluginRawDataRecord/1.0")
+                     "www.dkfz.de.b040.quickfit3.QFPluginRawDataRecord/1.1")
 
 #endif // QFPLUGINRAWDATARECORDBASE_H

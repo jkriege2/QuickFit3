@@ -1670,11 +1670,11 @@ void MainWindow::autoWriteSettings() {
     QTimer::singleShot(30000, this, SLOT(autoWriteSettings()));
 }
 
-QFFitFunctionManager* MainWindow::getFitFunctionManager() {
+QFFitFunctionManager* MainWindow::getFitFunctionManager() const {
     return fitFunctionManager;
 }
 
-QFFitAlgorithmManager* MainWindow::getFitAlgorithmManager() {
+QFFitAlgorithmManager* MainWindow::getFitAlgorithmManager() const {
     return fitAlgorithmManager;
 }
 
@@ -2000,12 +2000,17 @@ void MainWindow::insertToolBar(QString toolbarname, QToolBar* newToolbar) {
     addToolBar(newToolbar);
 }
 
-QFExtensionManager* MainWindow::getExtensionManager() {
+QFExtensionManager* MainWindow::getExtensionManager() const {
     return extensionManager;
 }
 
-QFImporterManager *MainWindow::getImporterManager() {
+QFImporterManager *MainWindow::getImporterManager() const {
     return importerManager;
+}
+
+QFEvaluationItemFactory *MainWindow::getEvaluationItemFactory() const
+{
+    return evaluationFactory;
 }
 
 QString MainWindow::getConfigFileDirectory() {
@@ -2699,7 +2704,27 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                    "</table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
-                }
+                } else if (QFPluginServices::getInstance()&&(command=="note")) {
+                    QString rep=tr("<blockquote>"
+                                     "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" >"
+                                   "<tr><td align=\"left\"><b>Note:</b> %1</td></tr>"
+                                   "</table></blockquote>").arg(file);
+
+                    result=result.replace(rxInsert.cap(0), rep);
+                } else if (QFPluginServices::getInstance()&&(command=="info")) {
+                    QString rep=tr("<blockquote>"
+                                     "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" >"
+                                   "<tr><td align=\"left\"><b>Information:</b> %1</td></tr>"
+                                   "</table></blockquote>").arg(file);
+
+                    result=result.replace(rxInsert.cap(0), rep);
+                 } else if (QFPluginServices::getInstance()&&(command=="warning")) {
+                    QString rep=tr("<blockquote>"
+                                     "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: navajowhite ;  border-color: orangered\" >"
+                                   "<tr><td align=\"left\"><b>Note:</b> %1</td></tr>"
+                                   "</table></blockquote>").arg(file);
+
+                    result=result.replace(rxInsert.cap(0), rep);                }
 
                 ++count;
                 pos += rxInsert.matchedLength();
@@ -2926,4 +2951,9 @@ void MainWindow::fixFilesPathesInProject()
             reloadProject();
         }
     }
+}
+
+QFRawDataRecordFactory *MainWindow::getRawDataRecordFactory() const
+{
+    return rawDataFactory;
 }

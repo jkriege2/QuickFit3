@@ -4,7 +4,8 @@
 #include <QDir>
 #include "qfextension.h"
 #include "qfpluginservices.h"
-
+#include "qfevaluationitemfactory.h"
+#include "qfrawdatarecordfactory.h"
 
 QFExtensionManager::QFExtensionManager(ProgramOptions* options, QObject* parent):
     QObject(parent)
@@ -68,6 +69,10 @@ void QFExtensionManager::searchPlugins(QString directory, QList<QFPluginServices
                         tooltips[keys[i]].tooltipfile=info.directory+"tooltips.ini";
                     }
                 }
+                addExtensionPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalExtensionPlugins());
+                QFPluginServices::getInstance()->getEvaluationItemFactory()->addEvalPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalEvaluationPlugins());
+                QFPluginServices::getInstance()->getRawDataRecordFactory()->addRDRPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalRDRPlugins());
+
             }
         }
     }
@@ -225,6 +230,24 @@ QString QFExtensionManager::getPluginCopyrightFile(QString ID) {
         return m_options->getAssetsDirectory()+QString("/plugins/help/%1/copyright.html").arg(basename);
     }
     return "";
+}
+
+void QFExtensionManager::addExtensionPlugin(const QString &filename, QFExtension *record)
+{
+    if (record) {
+        QString id=record->getID();
+        items[id]=record;
+        filenames[id]=filename;
+        emit showMessage(tr("loaded extension plugin '%2' (%1) ...").arg(filename).arg(record->getName()));
+        emit showLongMessage(tr("loaded extension plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(filenames[record->getID()]).arg(record->getName()).arg(record->getAuthor()).arg(record->getCopyright()));
+    }
+}
+
+void QFExtensionManager::addExtensionPlugins(const QString &filename, QList<QFExtension *> records)
+{
+    for (int i=0; i<records.size(); i++) {
+        addExtensionPlugin(filename, records[i]);
+    }
 }
 
 bool QFExtensionManager::contains(QString ID) {

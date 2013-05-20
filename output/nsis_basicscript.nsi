@@ -1,8 +1,8 @@
 # A few handy definitions to avoid repetition
 !define COMPANY_NAME "German Cancer Research Center (DKFZ)"
-!define PRODUCT_NAME "QuickFit"
-!define PRODUCT_VERSION "3.0 (SVN %%SVNVER%% COMPILEDATE: %%COMPILEDATE%%, %%BITDEPTH%%-bit)"
 !define BIT_DEPTH "%%BITDEPTH%%"
+!define PRODUCT_NAME "QuickFit 3.0 (${BIT_DEPTH}-bits}"
+!define PRODUCT_VERSION " (SVN %%SVNVER%% COMPILEDATE: %%COMPILEDATE%%, %%BITDEPTH%%-bit)"
 !define HELPURL "http://www.dkfz.de/Macromol/quickfit/"
 !define UPDATEURL "http://www.dkfz.de/Macromol/quickfit/#download"
 !define URLInfoAbout "http://www.dkfz.de/Macromol/quickfit/"
@@ -190,13 +190,38 @@ SectionEnd
 
 
 function .onInit
-	setShellVarContext all
-	!insertmacro VerifyUserIsAdmin
-	!insertmacro MULTIUSER_INIT
-	IntOp $0 ${SF_SELECTED} | ${SF_RO}
-	IntOp $0 $0 | ${SF_BOLD}
-    SectionSetFlags ${sec_main} $0
-    SectionSetFlags ${sec_spim} 0
+	  ReadRegStr $R0 HKLM \
+	  "${UNINSTALL_KEY}" \
+	  "UninstallString"
+	  StrCmp $R0 "" done
+	 
+	  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+	  "${PRODUCT_NAME} is already installed. $\n$\nClick `OK` to remove the \
+	  previous version or `Cancel` to cancel this upgrade." \
+	  IDOK uninst
+	  Abort
+	 
+	;Run the uninstaller
+	uninst:
+	  ClearErrors
+	  ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
+	 
+	  IfErrors no_remove_uninstaller done
+		;You can either use Delete /REBOOTOK in the uninstaller or add some code
+		;here to remove the uninstaller. Use a registry key to check
+		;whether the user has chosen to uninstall. If you are using an uninstaller
+		;components page, make sure all sections are uninstalled.
+	  no_remove_uninstaller:
+	 
+	done:
+
+  	  setShellVarContext all
+	  !insertmacro VerifyUserIsAdmin
+	  !insertmacro MULTIUSER_INIT
+	  IntOp $0 ${SF_SELECTED} | ${SF_RO}
+	  IntOp $0 $0 | ${SF_BOLD}
+      SectionSetFlags ${sec_main} $0
+      SectionSetFlags ${sec_spim} 0
 
 functionEnd
 

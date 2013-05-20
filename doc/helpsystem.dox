@@ -86,6 +86,9 @@
 	  
 	  - Additional Commands:
          - \c $$see:text$$ will add a yellow box with the test "See" and the given <i>text</i> to the help document
+         - \c $$note:text$$ will add a blue box with the test "Note" and the given <i>text</i> to the help document
+         - \c $$info:text$$ will add a blue box with the test "Information" and the given <i>text</i> to the help document
+         - \c $$warning:text$$ will add a orange/red box with the test "Warning" and the given <i>text</i> to the help document
 		 - \c $$fig:file:caption$$ $$figure:file:caption$$ will add the given image \c file as a figure with the given caption
 		 .
 	  

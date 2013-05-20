@@ -105,6 +105,13 @@ class QFLIB_EXPORT QFRawDataRecordFactory : public QObject {
 
         /** \brief register menu items for specified ID. */
         void registerMenu(QString ID, QMenu* menu);
+
+
+        /** \brief add a plugin from an external source */
+        void addRDRPlugin(const QString& filename, QFPluginRawDataRecord* record );
+        /** \brief add a plugin from an external source */
+        void addRDRPlugins(const QString& filename, QList<QFPluginRawDataRecord*> records );
+
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

@@ -77,9 +77,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         /** \copydoc QFPluginServices::incProgress()  */
         virtual void incProgress();
         /** \copydoc QFPluginServices::getFitFunctionManager() */
-        virtual QFFitFunctionManager* getFitFunctionManager();
+        virtual QFFitFunctionManager* getFitFunctionManager() const;
         /** \copydoc QFPluginServices::getFitAlgorithmManager() */
-        virtual QFFitAlgorithmManager* getFitAlgorithmManager();
+        virtual QFFitAlgorithmManager* getFitAlgorithmManager()  const;
         /** \copydoc QFPluginServices::getSettings() */
         virtual QSettings* getSettings();
         /** \copydoc QFPluginServices::getOptions() */
@@ -121,10 +121,15 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual void insertToolBar(QString toolbarname, QToolBar* newToolbar);
 
         /** \copydoc QFPluginServices::getExtensionManager() */
-        virtual QFExtensionManager* getExtensionManager();
+        virtual QFExtensionManager* getExtensionManager() const;
 
         /** \copydoc QFPluginServices::getImporterManager() */
-        virtual QFImporterManager* getImporterManager();
+        virtual QFImporterManager* getImporterManager() const;
+
+        /** \copydoc QFPluginServices::getEvaluationItemFactory() */
+        virtual QFEvaluationItemFactory* getEvaluationItemFactory() const;
+        /** \copydoc QFPluginServices::getRawDataRecordFactory() */
+        virtual QFRawDataRecordFactory* getRawDataRecordFactory() const;
 
         /** \brief QFPluginServices::displayHelpWindow() */
         virtual void displayHelpWindow(const QString& helpfile=QString(""));
@@ -426,10 +431,6 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         /** \brief help display widget */
         QFHTMLHelpWindow* helpWindow;
 
-        /** \brief return a pointer to the raw data record factry object */
-        inline QFRawDataRecordFactory* getRawDataRecordFactory() { return rawDataFactory; };
-        /** \brief return a pointer to the evaluation item factry object */
-        inline QFEvaluationItemFactory* getEvaluationItemFactory() { return evaluationFactory; };
         /** \brief used to store the splash screen pixmap, as given to the constructor. This pixmap may be used for info dialogs. */
         QPixmap splashPix;
 };

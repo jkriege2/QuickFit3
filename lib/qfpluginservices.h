@@ -22,6 +22,8 @@ class QFRawDataPropertyEditor;
 class QFProject;
 class QFMathParser;
 class qfmpResult;
+class QFEvaluationItemFactory;
+class QFRawDataRecordFactory;
 
 typedef qfmpResult (*qfmpCFunction)(const qfmpResult*, unsigned int, QFMathParser*);
 typedef QList<QPair<QString, QString> > QF3HelpReplacesList;
@@ -119,13 +121,18 @@ class QFLIB_EXPORT QFPluginServices {
         /** increment progress bar by 1  */
         virtual void incProgress()=0;
         /** \brief return a pointer to a fit function manager object */
-        virtual QFFitFunctionManager* getFitFunctionManager()=0;
+        virtual QFFitFunctionManager* getFitFunctionManager() const=0;
         /** \brief return a pointer to a fit function manager object */
-        virtual QFFitAlgorithmManager* getFitAlgorithmManager()=0;
+        virtual QFFitAlgorithmManager* getFitAlgorithmManager() const=0;
         /** \brief returns a QFExtensionManager object that allows access to all currently loaded QFExtensions */
-        virtual QFExtensionManager* getExtensionManager()=0;
+        virtual QFExtensionManager* getExtensionManager() const=0;
         /** \brief returns a QFImporterManager object that allows access to all currently loaded QFImporter s */
-        virtual QFImporterManager* getImporterManager()=0;
+        virtual QFImporterManager* getImporterManager() const=0;
+        /** \brief returns the QFEvaluationItemFactory of the current QF3 instance */
+        virtual QFEvaluationItemFactory* getEvaluationItemFactory() const=0;
+        /** \brief returns the QFRawDataRecordFactory of the current QF3 instance */
+        virtual QFRawDataRecordFactory* getRawDataRecordFactory() const=0;
+
         /** \brief return a pointer to a valid QSettings object for the main settings INI file */
         virtual QSettings* getSettings()=0;
         /** \brief return a pointer to the applications ProgramOptions object */

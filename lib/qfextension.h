@@ -17,7 +17,7 @@
           as it already implements some functionality (storage of commonly used pointers, ...)
 */
 
-class QFExtension: public QFPlugin {
+class QFExtension: public QFPlugin, public QFPluginAdditionalPluginsInterface {
     public:
         /** \brief class destructor */
         virtual ~QFExtension() {};
@@ -85,6 +85,15 @@ class QFLIB_EXPORT QFExtensionBase: public QFExtension {
             storeSettings(settings);
         }
 
+        /** \copydoc QFPluginAdditionalPluginsInterface::getAdditionalRDRPlugins() */
+        virtual QList<QFPluginRawDataRecord*> getAdditionalRDRPlugins() const { return QList<QFPluginRawDataRecord*>(); }
+
+        /** \copydoc QFPluginAdditionalPluginsInterface::getAdditionalEvaluationPlugins() */
+        virtual QList<QFPluginEvaluationItem*> getAdditionalEvaluationPlugins() const  { return QList<QFPluginEvaluationItem*>(); }
+
+        /** \copydoc QFPluginAdditionalPluginsInterface::getAdditionalExtensionPlugins() */
+        virtual QList<QFExtension*> getAdditionalExtensionPlugins() const { return QList<QFExtension*>(); }
+
 
     protected:
         QFPluginServices* services;
@@ -110,7 +119,7 @@ class QFLIB_EXPORT QFExtensionBase: public QFExtension {
 };
 
 Q_DECLARE_INTERFACE(QFExtension,
-                     "www.dkfz.de.b040.quickfit3.QFExtension/1.0")
+                     "www.dkfz.de.b040.quickfit3.QFExtension/1.1")
 
 
 #endif // QFEXTENSION_H

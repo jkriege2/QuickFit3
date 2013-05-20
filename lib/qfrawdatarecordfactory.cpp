@@ -1,6 +1,7 @@
 #include "qfrawdatarecordfactory.h"
 #include "qfrawdatarecord.h"
-
+#include "qfextensionmanager.h"
+#include "qfevaluationitemfactory.h"
 QFRawDataRecordFactory::QFRawDataRecordFactory(ProgramOptions* options, QObject* parent):
     QObject(parent)
 {
@@ -60,6 +61,9 @@ void QFRawDataRecordFactory::searchPlugins(QString directory, QList<QFPluginServ
                         tooltips[keys[i]].tooltipfile=info.directory+"tooltips.ini";
                     }
                 }
+                QFPluginServices::getInstance()->getExtensionManager()->addExtensionPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalExtensionPlugins());
+                QFPluginServices::getInstance()->getEvaluationItemFactory()->addEvalPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalEvaluationPlugins());
+                addRDRPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalRDRPlugins());
             }
         }
     }
@@ -159,6 +163,25 @@ void QFRawDataRecordFactory::registerMenu(QString ID, QMenu* menu)  {
     if (items.contains(ID)) {
         return items[ID]->registerToMenu(menu);
     }
+}
+
+void QFRawDataRecordFactory::addRDRPlugin(const QString &filename, QFPluginRawDataRecord *record)
+{
+    if (record) {
+        QString id=record->getID();
+        items[id]=record;
+        filenames[id]=filename;
+        emit showMessage(tr("loaded raw data plugin '%2' (%1) ...").arg(filename).arg(record->getName()));
+        emit showLongMessage(tr("loaded raw data plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(filenames[record->getID()]).arg(record->getName()).arg(record->getAuthor()).arg(record->getCopyright()));
+    }
+}
+
+void QFRawDataRecordFactory::addRDRPlugins(const QString &filename, QList<QFPluginRawDataRecord *> records)
+{
+    for (int i=0; i<records.size(); i++) {
+        addRDRPlugin(filename, records[i]);
+    }
+
 };
 
 

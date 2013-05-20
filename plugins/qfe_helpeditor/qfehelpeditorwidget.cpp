@@ -228,10 +228,26 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$insertglobal:FILENAME$$");
 
 
-    menu=new QMenu(tr("insert LaTeX"), this);
+    menu=new QMenu(tr("insert Equations (LaTeX)"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
     addInsertAction(menu, "$$math:LATEX$$");
     addInsertAction(menu, "$$bmath:LATEX$$");
+
+
+    menu=new QMenu(tr("insert Literature References"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "$$ref:<ID>:Text$$");
+    addInsertAction(menu, "$$invisibleref:<ID>:Text$$");
+    addInsertAction(menu, "$$references$$");
+
+
+    menu=new QMenu(tr("insert Additional Markup"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "$$fig:FILENAME:CAPTION$$");
+    addInsertAction(menu, "$$see:Text$$");
+    addInsertAction(menu, "$$note:Text$$");
+    addInsertAction(menu, "$$info:Text$$");
+    addInsertAction(menu, "$$warning:Text$$");
     //addInsertAction(menu, "$$$$");
 
 }

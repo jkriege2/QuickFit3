@@ -14,7 +14,7 @@
     \ingroup qf3evaluationplugins
 
 */
-class QFPluginEvaluationItem: public QFPlugin {
+class QFPluginEvaluationItem: public QFPlugin, public QFPluginAdditionalPluginsInterface {
     public:
         /** \brief class destructor */
         virtual ~QFPluginEvaluationItem() {};
@@ -70,6 +70,15 @@ class QFLIB_EXPORT QFPluginEvaluationItemBase: public QFPluginEvaluationItem {
         /** \brief init plugin, this function is guaranteed to be called once, before  */
         virtual void init() {};
 
+        /** \copydoc QFPluginAdditionalPluginsInterface::getAdditionalRDRPlugins() */
+        virtual QList<QFPluginRawDataRecord*> getAdditionalRDRPlugins() const { return QList<QFPluginRawDataRecord*>(); };
+
+        /** \copydoc QFPluginAdditionalPluginsInterface::getAdditionalEvaluationPlugins() */
+        virtual QList<QFPluginEvaluationItem*> getAdditionalEvaluationPlugins() const  { return QList<QFPluginEvaluationItem*>(); };
+
+        /** \copydoc QFPluginAdditionalPluginsInterface::getAdditionalExtensionPlugins() */
+        virtual QList<QFExtension*> getAdditionalExtensionPlugins() const { return QList<QFExtension*>(); };
+
     protected:
         QFPluginServices* services;
         QFProject* project;
@@ -89,7 +98,7 @@ class QFLIB_EXPORT QFPluginEvaluationItemBase: public QFPluginEvaluationItem {
 
 
 Q_DECLARE_INTERFACE(QFPluginEvaluationItem,
-                     "www.dkfz.de.b040.quickfit3.QFPluginEvaluationItem/1.0")
+                     "www.dkfz.de.b040.quickfit3.QFPluginEvaluationItem/1.1")
 
 
 #endif // QFPLUGINEVALUATIONITEMBASE_H

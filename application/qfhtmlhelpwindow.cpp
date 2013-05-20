@@ -737,6 +737,27 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                                    "</table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
+                } else if (m_pluginServices&&(command=="note")) {
+                    QString rep=tr("<blockquote>"
+                                     "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" >"
+                                   "<tr><td align=\"left\"><b>Note:</b> %1</td></tr>"
+                                   "</table></blockquote>").arg(file);
+
+                    result=result.replace(rxInsert.cap(0), rep);
+                } else if (m_pluginServices&&(command=="info")) {
+                    QString rep=tr("<blockquote>"
+                                     "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" >"
+                                   "<tr><td align=\"left\"><b>Information:</b> %1</td></tr>"
+                                   "</table></blockquote>").arg(file);
+
+                    result=result.replace(rxInsert.cap(0), rep);
+                 } else if (m_pluginServices&&(command=="warning")) {
+                    QString rep=tr("<blockquote>"
+                                     "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: navajowhite ;  border-color: orangered\" >"
+                                   "<tr><td align=\"left\"><b>Note:</b> %1</td></tr>"
+                                   "</table></blockquote>").arg(file);
+
+                    result=result.replace(rxInsert.cap(0), rep);
                 }
 
                 ++count;
