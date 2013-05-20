@@ -27,9 +27,17 @@ QVariant QFTablePluginModel::data(const QModelIndex &index, int role) const
 
 QVariant QFTablePluginModel::headerData(int section, Qt::Orientation orientation, int role) const {
     QVariant h=QFTableModel::headerData(section, orientation, role);
-     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
-         return QString("%1: %2").arg(section+1).arg(h.toString());
-     }
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+        return QString("%1: %2").arg(section+1).arg(h.toString());
+    }
+    if (orientation == Qt::Horizontal && role == Qt::ToolTipRole) {
+        if (this->hasColumnHeaderData(section, QFRDRTable::ColumnExpressionRole)) {
+            QString exp=this->getColumnHeaderData(section, QFRDRTable::ColumnExpressionRole).toString();
+            if (!exp.isEmpty()) {
+                return h.toString()+tr("<font color=\"darkblue\"><br>column expression: <i>%1</i></font>").arg(exp);
+            }
+        }
+    }
 
      return h;
 }

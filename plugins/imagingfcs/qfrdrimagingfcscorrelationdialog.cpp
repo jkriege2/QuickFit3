@@ -601,7 +601,8 @@ void QFRDRImagingFCSCorrelationDialog::updateProgress() {
 
 
 
-IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
+IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob(int biningForFCCS) {
+
     //updateFromFile(false); // make sure that inputconfigfile cintains the settings file for the input (if it exists)
     IMFCSJob job;
     job.progress=NULL;
@@ -639,6 +640,7 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
     job.backstatistics_frames=qMax(2, ui->spinBackStatistics->value());
     job.segments=ui->spinSegments->value();
     job.binning=ui->spinBinning->value();
+    if (biningForFCCS<0) biningForFCCS=job.binning;
     job.interleaved_binning=ui->chkInterleavedBinning->isChecked();
     job.binAverage=ui->chkAverageBinning->isChecked();
     job.use_cropping=ui->chkCrop->isChecked();
@@ -653,14 +655,14 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob() {
 
     if (ui->chk2cFCCS->isChecked()) {
         if (ui->cmbDualView->currentIndex()==1) {
-            job.DCCFDeltaX << image_width/2;
+            job.DCCFDeltaX << image_width/2/biningForFCCS;
             job.DCCFDeltaY << 0;
             job.DCCFrole<<QString("FCCS");
             job.distanceCCF=true;
             //qDebug()<<"added DV_H FCCS";
         } else if (ui->cmbDualView->currentIndex()==2) {
             job.DCCFDeltaX << 0;
-            job.DCCFDeltaY << image_height/2;
+            job.DCCFDeltaY << image_height/2/biningForFCCS;
             job.DCCFrole<<QString("FCCS");
             job.distanceCCF=true;
             //qDebug()<<"added DV_V FCCS";
@@ -782,7 +784,6 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_btnAddSeriesJob_clicked(const QString &parameter, double start, double end, double inc) {
-    IMFCSJob job=initJob();
 
     QFRDRImagingFCSSeriesDialog* dlg=new QFRDRImagingFCSSeriesDialog(this);
     if (!parameter.isEmpty()) {
@@ -795,6 +796,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddSeriesJob_clicked(const QString 
 
         setEditControlsEnabled(false);
         for (int i=0; i<vals.size(); i++) {
+            IMFCSJob job=initJob(vals[i]);
             if (dlg->getParameter()==0) { //binning
                 job.binning=vals[i];
             }

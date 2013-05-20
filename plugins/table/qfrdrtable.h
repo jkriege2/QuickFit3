@@ -25,7 +25,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
     public:
         enum {
             TableExpressionRole = Qt::UserRole+1,
-            TableCommentRole = Qt::UserRole+2
+            TableCommentRole = Qt::UserRole+2,
+            ColumnExpressionRole = Qt::UserRole+10
         };
 
 

@@ -830,6 +830,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
             while (!te.isNull()) {
                 columns++;
                 QString n=te.attribute("title");
+                QString hexp=te.attribute("column_expression");
                 QDomElement re=te.firstChildElement("row");
                 quint16 r=0;
                 //std::cout<<"resize("<<rows<<", "<<columns<<")\n";
@@ -857,6 +858,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 }
 
                 datamodel->setColumnTitle(columns-1, n);
+                if (!hexp.isEmpty()) datamodel->setColumnHeaderData(columns-1, ColumnExpressionRole, hexp);
                 te = te.nextSiblingElement("column");
             }
         } else {
@@ -995,6 +997,9 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
         for (quint16 c=0; c<datamodel->columnCount(); c++) {
             w.writeStartElement("column");
             w.writeAttribute("title", datamodel->columnTitle(c));
+            if (datamodel->hasColumnHeaderData(c, ColumnExpressionRole)) {
+                w.writeAttribute("column_expression", datamodel->getColumnHeaderData(c, ColumnExpressionRole).toString());
+            }
             for (quint16 r=0; r<datamodel->rowCount(); r++) {
                 if (datamodel->cell(r, c).isValid()) {
                     w.writeStartElement("row");

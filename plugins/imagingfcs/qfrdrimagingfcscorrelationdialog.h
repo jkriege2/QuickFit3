@@ -87,7 +87,7 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         int runningThreads() const;
         int waitingThreads() const;
         void ensureTiffReader();
-        IMFCSJob initJob();
+        IMFCSJob initJob(int biningForFCCS=-1);
         void addJob(IMFCSJob jobin, bool ignoreDualView=false);
     private:
         QFPluginServices* pluginServices;

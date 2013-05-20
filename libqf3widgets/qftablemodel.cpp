@@ -66,7 +66,11 @@ Qt::ItemFlags QFTableModel::flags(const QModelIndex &index) const {
 
 QVariant QFTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
      if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
-         if (section<columnNames.size()) return columnNames[section];
+         if (role==Qt::DisplayRole) {
+            if (section<columnNames.size()) return columnNames[section];
+         } else if (headerDataMap.contains(section)) {
+             return headerDataMap[section].value(role, QVariant());
+         }
      } else if (orientation == Qt::Vertical && role == Qt::DisplayRole) {
          if (verticalHeaderShowRowNumbers) return QString::number(section+1);
      }
@@ -634,6 +638,23 @@ quint16 QFTableModel::getAddRow(quint16 column, QVariant data) {
     return rows-1;
 }
 
+void QFTableModel::setColumnHeaderData(quint16 column, int role, const QVariant &data)
+{
+    headerDataMap[column].insert(role, data);
+}
+
+QVariant QFTableModel::getColumnHeaderData(quint16 column, int role) const
+{
+    if (headerDataMap.contains(column)) return headerDataMap[column].value(role, QVariant());
+    return QVariant();
+}
+
+bool QFTableModel::hasColumnHeaderData(quint16 column, int role) const
+{
+    if (headerDataMap.contains(column)) return headerDataMap[column].contains(role);
+    return false;
+}
+
 void QFTableModel::setDefaultEditValue(QVariant defaultEditValue)
 {
     this->defaultEditValue=defaultEditValue;
@@ -1050,7 +1071,8 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
     return true;
 }
 
-void QFTableModel::copy(QModelIndexList selection, bool createXMLFragment) {
+QString QFTableModel::saveXML(QModelIndexList selection, bool createXMLFragment)
+{
     QString xml;
     {
         QXmlStreamWriter w(&xml);
@@ -1079,6 +1101,15 @@ void QFTableModel::copy(QModelIndexList selection, bool createXMLFragment) {
                 w.writeStartElement("col");
                 w.writeAttribute("col", QString::number(c-smallestColumn));
                 w.writeAttribute("name", columnTitle(c));
+                if (headerDataMap.contains(c)) {
+                    QHashIterator<int, QVariant> it(headerDataMap[c]);
+                    while (it.hasNext()) {
+                        it.next();
+                        w.writeAttribute(QString("more_type%1").arg(it.key()), getQVariantType(it.value()));
+                        w.writeAttribute(QString("more_data%1").arg(it.key()), getQVariantData(it.value()));
+
+                    }
+                }
                 w.writeEndElement();
             }
         }
@@ -1114,6 +1145,23 @@ void QFTableModel::copy(QModelIndexList selection, bool createXMLFragment) {
         w.writeEndElement();
         if (!createXMLFragment)  w.writeEndDocument();
     }
+    return xml;
+}
+
+bool QFTableModel::saveXML(const QString &filename, QModelIndexList selection)
+{
+    QFile f(filename);
+    if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
+        QTextStream out(&f);
+        out<<saveXML(selection, false);
+        f.close();
+        return true;
+    }
+    return false;
+}
+
+void QFTableModel::copy(QModelIndexList selection, bool createXMLFragment) {
+    QString xml=saveXML(selection, createXMLFragment);
     QMimeData* mime=new QMimeData();
     mime->setData("quickfit3/qfrdrtable", xml.toUtf8());
     QString csv;
@@ -1222,6 +1270,26 @@ bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bo
                         int c=scol+e.attribute("col").toInt();
                         QString t=e.attribute("name");
                         setColumnTitleCreate(c, t);
+
+                        QDomNamedNodeMap nm=e.attributes();
+                        QRegExp rxAtrD("more\\_data(\\d+)");
+                        for (int na=0; na<nm.size(); na++) {
+                            //qDebug()<<na;
+                            QDomAttr atr=nm.item(na).toAttr();
+
+                            if (!atr.isNull()) {
+                                //qDebug()<<atr.name()<<" = "<<atr.value();
+                                if (rxAtrD.indexIn(atr.name())>=0) {
+                                    //qDebug()<< "   num = "<<rxAtrD.cap(1);
+                                    QString typ=e.attribute(QString("more_type%1").arg(rxAtrD.cap(1)));
+                                    //qDebug()<< "   type = "<<typ;
+                                    QVariant md=getQVariantFromString(typ, atr.value());
+                                    setColumnHeaderData(c, rxAtrD.cap(1).toInt(), md);
+                                }
+                            }
+                        }
+
+
                         e=e.nextSiblingElement("col");
                     }
                 }

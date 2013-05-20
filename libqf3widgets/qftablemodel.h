@@ -83,6 +83,9 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         QHash<quint32, QVariant> dataCheckedMap;
         /** \brief this map is used to store additional data for roles >=Qt::UserRole */
         QHash<quint32, QHash<int, QVariant> > moreDataMap;
+
+        QHash<quint32, QHash<int, QVariant> > headerDataMap;
+
         /** \brief string list that contains the column names */
         QStringList columnNames;
         /** \brief indicates whether the model is readonly (via the QAbstractTableModel interface!!!) or not */
@@ -169,6 +172,10 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         QString columnTitle(quint16 column) const;
         /** \brief search for a row that contains the given value in the given column. Adds a row if it was not found and returns row number */
         quint16 getAddRow(quint16 column, QVariant data);
+        /** \brief set data stored in the column header column title */
+        void setColumnHeaderData(quint16 column, int role, const QVariant &data);
+        QVariant getColumnHeaderData(quint16 column, int role) const;
+        bool hasColumnHeaderData(quint16 column, int role) const;
 
         /** \brief set the default QVariant value displayed in an editor, if the value does not yet exist */
         void setDefaultEditValue(QVariant defaultEditValue);
