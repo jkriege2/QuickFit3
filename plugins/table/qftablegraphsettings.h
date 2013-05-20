@@ -30,12 +30,21 @@ class QFTableGraphSettings : public QWidget
         /** \brief write the settings */
         virtual void writeSettings(QSettings& settings, const QString& prefix=QString(""));
 
+        void writeGraphData(QFRDRTable::GraphInfo &graph);
+        void loadGraphData(const QFRDRTable::GraphInfo &graph);
+        void updatePlotWidgetVisibility(const QFRDRTable::GraphInfo &graph);
+        QIcon getGraphIcon(int i) const;
+    signals:
+        void graphDataChanged();
+    public slots:
+        void initFocus();
+
     protected slots:
         void on_btnFunctionHelp_clicked();
+        void on_edtFunction_textChanged(const QString &text);
 
+        void writeGraphData();
         void reloadColumns(QComboBox* combo);
-        void graphDataChanged(QFRDRTable::GraphInfo &graph);
-        void updatePlotWidgetVisibility(QFRDRTable::GraphInfo &graph);
 
         void connectWidgets();
         void disconnectWidgets();

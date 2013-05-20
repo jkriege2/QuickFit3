@@ -44,11 +44,13 @@ QFRDRTable::GraphInfo::GraphInfo() {
     imageMax=0;
     imageAutoRange=true;
     imageLegend="";
+    imageLegendMod="";
     imageColorbarRight=true;
     imageColorbarTop=false;
     colorbarWidth=20;
     colorbarRelativeHeight=0.75;
     function="";
+    modifierMode=JKQTPMathImage::ModifyValue;
 
 }
 
@@ -104,6 +106,7 @@ QFRDRTable::PlotInfo::PlotInfo()
      ydigits=3;
      yminTicks=5;
      yminorTicks=1;
+
 }
 
 
@@ -699,18 +702,24 @@ void QFRDRTable::swapPlots(int i, int j)
 
 
 
-QVariant QFRDRTable::evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode *n, QModelIndex cell, bool* ok, const QString& expression, QString* error)
+QVariant QFRDRTable::evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode *n, QModelIndex cell, bool* ok, const QString& expression, QString* error, bool columnMode)
 {
     QVariant result;
     QFRDRTable* m=this;
     int row = cell.row();
     int column = cell.column();
     if (m) {
-        mp.addVariableDouble("row", cell.row()+1);
-        mp.addVariableDouble("col", cell.column()+1);
-        mp.addVariableDouble("column", cell.column()+1);
-        mp.addVariableDouble("rows", m->model()->rowCount());
-        mp.addVariableDouble("columns", m->model()->columnCount());
+        if (columnMode) {
+            mp.addVariableDouble("col", cell.column()+1);
+            mp.addVariableDouble("rows", m->model()->rowCount());
+            mp.addVariableDouble("columns", m->model()->columnCount());
+        } else {
+            mp.addVariableDouble("row", cell.row()+1);
+            mp.addVariableDouble("col", cell.column()+1);
+            mp.addVariableDouble("column", cell.column()+1);
+            mp.addVariableDouble("rows", m->model()->rowCount());
+            mp.addVariableDouble("columns", m->model()->columnCount());
+        }
         mp.resetErrors();
 
         QFMathParserData d;
@@ -726,6 +735,18 @@ QVariant QFRDRTable::evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode
         if (r.isUsableResult()) {
             if (r.type==qfmpBool) {
                 result=QVariant(r.boolean);
+            } else if (r.type==qfmpDoubleVector) {
+                if (columnMode) {
+                    QVariantList vl;
+                    for (int i=0; i<r.numVec.size(); i++) {
+                        vl<<r.numVec[i];
+                    }
+                    return vl;
+                } else {
+                    double res=r.asNumberAlsoVector();
+                    if (QFFloatIsOK(res)) result=QVariant(res);
+                    else result=QVariant();
+                }
             } else if (r.type==qfmpDouble) {
                 if (QFFloatIsOK(r.num))
                     result=QVariant(r.num);
@@ -969,7 +990,9 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.colorbarWidth=ge.attribute("image_colorbarwidth", "20").toDouble();
                     graph.colorbarRelativeHeight=ge.attribute("image_colorbarrelativeheight", "0.75").toDouble();
                     graph.imageLegend=ge.attribute("image_legend", "");
+                    graph.imageLegendMod=ge.attribute("image_legend_mod", "");
                     graph.function=ge.attribute("function", "");
+                    graph.modifierMode=JKQTPMathImage::StringToModifierMode(ge.attribute("modifier_mode", "none"));
 
 
                     plot.graphs.append(graph);
@@ -1108,11 +1131,13 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("image_colorbarwidth", QString::number(plots[i].graphs[g].colorbarWidth));
             w.writeAttribute("image_colorbarrelativeheight", QString::number(plots[i].graphs[g].colorbarRelativeHeight));
             w.writeAttribute("image_legend", plots[i].graphs[g].imageLegend);
+            w.writeAttribute("image_legend_mod", plots[i].graphs[g].imageLegendMod);
             w.writeAttribute("function", plots[i].graphs[g].function);
 
             w.writeAttribute("stride", QString::number(plots[i].graphs[g].stride));
             w.writeAttribute("stride_start", QString::number(plots[i].graphs[g].strideStart));
             w.writeAttribute("is_strided", boolToQString(plots[i].graphs[g].isStrided));
+            w.writeAttribute("modifier_mode", JKQTPMathImage::ModifierModeToString(plots[i].graphs[g].modifierMode));
 
             w.writeEndElement();
         }

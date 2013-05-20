@@ -2343,6 +2343,13 @@ double qfmpResult::asNumber() const
     return NAN;
 }
 
+double qfmpResult::asNumberAlsoVector() const
+{
+    if (type==qfmpDouble) return num;
+    if (type==qfmpDoubleVector && numVec.size()>0) return numVec[0];
+    return NAN;
+}
+
 QString qfmpResult::asString() const
 {
     if (type==qfmpString) return str;

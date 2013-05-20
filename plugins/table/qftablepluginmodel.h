@@ -8,7 +8,7 @@ class QFTablePluginModel : public QFTableModel
     public:
         explicit QFTablePluginModel(QObject *parent=NULL);
         virtual QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
-
+        virtual Qt::ItemFlags flags(const QModelIndex &index) const;
         virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 };
 

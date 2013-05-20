@@ -41,6 +41,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             gtBarsHorizontal,
             gtBarsVertical,
             gtImage,
+            gtRGBImage,
             gtMaskImage,
             gtFunction
         };
@@ -57,6 +58,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
                 case gtBarsHorizontal: return QString("barsh");
                 case gtBarsVertical: return QString("barsv");
                 case gtImage: return QString("image");
+                case gtRGBImage: return QString("rgbimage");
                 case gtMaskImage: return QString("maskimage");
                 case gtFunction: return QString("function");
             }
@@ -75,6 +77,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
                 case gtBarsHorizontal: return QIcon(":/table/icons/plot_hbars.png");
                 case gtBarsVertical: return QIcon(":/table/icons/plot_vbars.png");
                 case gtImage: return QIcon(":/table/icons/plot_image.png");
+                case gtRGBImage: return QIcon(":/table/icons/plot_rgbimage.png");
                 case gtMaskImage: return QIcon(":/table/icons/plot_maskimage.png");
                 case gtFunction: return QIcon(":/table/icons/plot_function.png");
             }
@@ -93,6 +96,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             if (s=="barsh") return gtBarsHorizontal;
             if (s=="barsv") return gtBarsVertical;
             if (s=="image") return gtImage;
+            if (s=="rgbimage") return gtRGBImage;
             if (s=="maskimage") return gtMaskImage;
             if (s=="function") return gtFunction;
             return gtLines;
@@ -137,10 +141,12 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             double imageMax;
             bool imageAutoRange;
             QString imageLegend;
+            QString imageLegendMod;
             bool imageColorbarRight;
             bool imageColorbarTop;
             int colorbarWidth;
             double colorbarRelativeHeight;
+            JKQTPMathImage::ModifierMode modifierMode;
 
             QString function;
 
@@ -199,6 +205,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             int yminorTicks;
             bool x0axis;
             bool y0axis;
+
         };
 
 
@@ -300,7 +307,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         /** \brief returns the filetype of the Export file dialog */
         QString getExportDialogFiletypes() { return tr("Comma Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files [german Excel] (*.csv, *.txt);;SYLK File (*.sylk, *.slk)"); };
 
-        QVariant evaluateExpression(QFMathParser &mp, QFMathParser::qfmpNode *n, QModelIndex cell, bool *ok, const QString &expression, QString *error);
+        QVariant evaluateExpression(QFMathParser &mp, QFMathParser::qfmpNode *n, QModelIndex cell, bool *ok, const QString &expression, QString *error, bool columnMode=false);
     protected slots:
         void tdataChanged( const QModelIndex & tl, const QModelIndex & br ) {
             emit rawDataChanged();

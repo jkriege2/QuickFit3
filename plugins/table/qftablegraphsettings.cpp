@@ -77,10 +77,16 @@ void QFTableGraphSettings::writeSettings(QSettings &settings, const QString &pre
 {
 }
 
-void QFTableGraphSettings::on_btnFunctionHelp_clicked()
+QIcon QFTableGraphSettings::getGraphIcon(int i) const
 {
-    if (current)
-        QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("table")+"/mathparser.html");
+    return ui->cmbGraphType->itemIcon(i);
+}
+
+
+
+void QFTableGraphSettings::writeGraphData()
+{
+    emit graphDataChanged();
 }
 
 void QFTableGraphSettings::reloadColumns(QComboBox *combo)
@@ -113,9 +119,9 @@ void QFTableGraphSettings::reloadColumns(QComboBox *combo)
     combo->setCurrentIndex(idx);
 }
 
-void QFTableGraphSettings::graphDataChanged(QFRDRTable::GraphInfo& graph)
+void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
 {
-    //qDebug()<<"graphDataChanged    updating="<<updating;
+    //qDebug()<<"QFTableGraphSettings::graphDataChanged    updating="<<updating;
     if (updating) return;
     if (current) {
         updating=true;
@@ -133,8 +139,9 @@ void QFTableGraphSettings::graphDataChanged(QFRDRTable::GraphInfo& graph)
             case 7: graph.type=QFRDRTable::gtBarsVertical; break;
             case 8: graph.type=QFRDRTable::gtBarsHorizontal; break;
             case 9: graph.type=QFRDRTable::gtImage; break;
-            case 10: graph.type=QFRDRTable::gtMaskImage; break;
-            case 11: graph.type=QFRDRTable::gtFunction; break;
+            case 10: graph.type=QFRDRTable::gtRGBImage; break;
+            case 11: graph.type=QFRDRTable::gtMaskImage; break;
+            case 12: graph.type=QFRDRTable::gtFunction; break;
             case 0:
             default: graph.type=QFRDRTable::gtLines; break;
         }
@@ -188,17 +195,111 @@ void QFTableGraphSettings::graphDataChanged(QFRDRTable::GraphInfo& graph)
         graph.imageColorbarRight=ui->chkImageColorbarRight->isChecked();
         graph.imageColorbarTop=ui->chkImageColorbarTop->isChecked();
         graph.imageLegend=ui->edtColorbarLabel->text();
+        graph.imageLegendMod=ui->edtColorbarLabelMod->text();
         graph.colorbarWidth=ui->spinColorbarWidth->value();
         graph.colorbarRelativeHeight=ui->spinColorbarHeight->value()/100.0;
         graph.function=ui->edtFunction->text();
         graph.isStrided=ui->chkSTrided->isChecked();
         graph.stride=ui->spinStride->value();
         graph.strideStart=ui->spinStrideStart->value();
+        graph.modifierMode=(JKQTPMathImage::ModifierMode)ui->cmbModifierMode->currentIndex();
 
+        updating=false;
     }
 }
 
-void QFTableGraphSettings::updatePlotWidgetVisibility(QFRDRTable::GraphInfo& graph)
+void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
+{
+    updating=true;
+    ui->edtGraphTitle->setText(graph.title);
+    ui->cmbLinesXData->setCurrentIndex(graph.xcolumn+1);
+    ui->cmbLinesXError->setCurrentIndex(graph.xerrorcolumn+1);
+    ui->cmbLinesYData->setCurrentIndex(graph.ycolumn+1);
+    ui->cmbLinesYError->setCurrentIndex(graph.yerrorcolumn+1);
+    switch(graph.type) {
+        case QFRDRTable::gtImpulsesVertical:
+            ui->cmbGraphType->setCurrentIndex(1);
+            break;
+        case QFRDRTable::gtImpulsesHorizontal:
+            ui->cmbGraphType->setCurrentIndex(2);
+            break;
+        case QFRDRTable::gtFilledCurveX:
+            ui->cmbGraphType->setCurrentIndex(3);
+            break;
+        case QFRDRTable::gtFilledCurveY:
+            ui->cmbGraphType->setCurrentIndex(4);
+            break;
+        case QFRDRTable::gtStepsVertical:
+            ui->cmbGraphType->setCurrentIndex(5);
+            break;
+        case QFRDRTable::gtStepsHorizontal:
+            ui->cmbGraphType->setCurrentIndex(6);
+            break;
+        case QFRDRTable::gtBarsVertical:
+            ui->cmbGraphType->setCurrentIndex(7);
+            break;
+        case QFRDRTable::gtBarsHorizontal:
+            ui->cmbGraphType->setCurrentIndex(8);
+            break;
+        case QFRDRTable::gtImage:
+            ui->cmbGraphType->setCurrentIndex(9);
+            break;
+        case QFRDRTable::gtRGBImage:
+            ui->cmbGraphType->setCurrentIndex(10);
+            break;
+        case QFRDRTable::gtMaskImage:
+            ui->cmbGraphType->setCurrentIndex(11);
+            break;
+        case QFRDRTable::gtFunction:
+            ui->cmbGraphType->setCurrentIndex(12);
+            break;
+        case QFRDRTable::gtLines:
+        default:
+            ui->cmbGraphType->setCurrentIndex(0);
+            break;
+    }
+    ui->cmbErrorColor->setCurrentColor(graph.errorColor);
+    ui->cmbLineColor->setCurrentColor(graph.color);
+    ui->cmbFillColor->setCurrentColor(graph.fillColor);
+    ui->cmbErrorStyle->setSymbol(graph.errorStyle);
+    ui->cmbSymbol->setSymbol(graph.symbol);
+    ui->cmbLineStyle->setCurrentLineStyle(graph.style);
+    ui->spinLineWidth->setValue(graph.linewidth);
+    ui->spinSymbolSize->setValue(graph.symbolSize);
+    ui->chkDrawLine->setChecked(graph.drawLine);
+    ui->sliderPlotTransparent->setValue(graph.colorTransparent*255.0);
+    ui->sliderErrorTransparent->setValue(graph.errorColorTransparent*255.0);
+    ui->sliderFillTransparent->setValue(graph.fillColorTransparent*255.0);
+    ui->cmbImageFalseColor->setCurrentColor(graph.imageFalseColor);
+    ui->sliderImageFalseColor->setValue(graph.imageFalseTransparent*255.0);
+    ui->cmbImageTrueColor->setCurrentColor(graph.imageTrueColor);
+    ui->sliderImageTrueColor->setValue(graph.imageTrueTransparent*255.0);
+    ui->edtImageHeight->setValue(graph.imageHeight);
+    ui->edtImageWidth->setValue(graph.imageWidth);
+    ui->edtImageMax->setValue(graph.imageMax);
+    ui->edtImageMin->setValue(graph.imageMin);
+    ui->edtImageX->setValue(graph.imageX);
+    ui->edtImageY->setValue(graph.imageY);
+    ui->spinImageWidth->setValue(graph.imagePixelWidth);
+    ui->cmbColormap->setColorPalette(graph.imagePalette);
+    ui->chkImageAutorange->setChecked(graph.imageAutoRange);
+
+
+    ui->chkImageColorbarRight->setChecked(graph.imageColorbarRight);
+    ui->chkImageColorbarTop->setChecked(graph.imageColorbarTop);
+    ui->edtColorbarLabel->setText(graph.imageLegend);
+    ui->edtColorbarLabelMod->setText(graph.imageLegendMod);
+    ui->spinColorbarWidth->setValue(graph.colorbarWidth);
+    ui->spinColorbarHeight->setValue(graph.colorbarRelativeHeight*100.0);
+    ui->edtFunction->setText(graph.function);
+    ui->chkSTrided->setChecked(graph.isStrided);
+    ui->spinStride->setValue(graph.stride);
+    ui->spinStrideStart->setValue(graph.strideStart);
+    ui->cmbModifierMode->setCurrentIndex(graph.modifierMode);
+    updating=false;
+}
+
+void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInfo& graph)
 {
     if (current) {
         if (this->plot<0 || this->plot>=current->getPlotCount()) return;
@@ -223,9 +324,9 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(QFRDRTable::GraphInfo& gra
         ui->widImage->setVisible(true);
         ui->widLineStyle->setVisible(true);
         ui->widSymbol->setVisible(true);
+        ui->labErrorStyle->setVisible(true);
         ui->labDataX->setVisible(true);
         ui->labDataY->setVisible(true);
-        ui->labErrorStyle->setVisible(true);
         ui->labErrorX->setVisible(true);
         ui->labErrorY->setVisible(true);
         ui->labFillColor->setVisible(true);
@@ -244,6 +345,11 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(QFRDRTable::GraphInfo& gra
         ui->labFuction->setVisible(false);
         ui->chkSTrided->setVisible(true);
         ui->widStride->setVisible(true);
+
+        ui->labDataX->setText(tr("X Data Column:"));
+        ui->labDataY->setText(tr("Y Data Column:"));
+        ui->labErrorX->setText(tr("X Error Column:"));
+        ui->labErrorY->setText(tr("Y Error Column:"));
 
         switch(ui->cmbGraphType->currentIndex()) {
 
@@ -404,8 +510,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(QFRDRTable::GraphInfo& gra
                 //graph.type=QFRDRTable::gtImage;
                 ui->cmbLinesXError->setVisible(false);
                 ui->labErrorX->setVisible(false);
-                ui->cmbLinesYData->setVisible(false);
-                ui->labDataY->setVisible(false);
+                ui->cmbLinesYData->setVisible(true);
+                ui->labDataY->setVisible(true);
                 ui->cmbLinesYError->setVisible(false);
                 ui->labErrorY->setVisible(false);
                 ui->labSymbol->setVisible(false);
@@ -418,9 +524,35 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(QFRDRTable::GraphInfo& gra
                 ui->labFillColor->setVisible(false);
                 ui->widLineStyle->setVisible(false);
                 ui->labLinestyle->setVisible(false);
+                ui->labDataX->setText(tr("Image Column:"));
+                ui->labDataY->setText(tr("Modifier Column:"));
                 break;
             case 10:
+                //graph.type=QFRDRTable::gtRGBImage;
+                ui->cmbLinesXError->setVisible(true);
+                ui->labErrorX->setVisible(true);
+                ui->cmbLinesYData->setVisible(true);
+                ui->labDataY->setVisible(true);
+                ui->cmbLinesYError->setVisible(true);
+                ui->labErrorY->setVisible(true);
+                ui->labSymbol->setVisible(false);
+                ui->widSymbol->setVisible(false);
+                ui->widErrorStyle->setVisible(false);
+                ui->labErrorStyle->setVisible(false);
+                ui->widColor->setVisible(false);
+                ui->labColor->setVisible(false);
+                ui->widFillColor->setVisible(false);
+                ui->labFillColor->setVisible(false);
+                ui->widLineStyle->setVisible(false);
+                ui->labLinestyle->setVisible(false);
+                ui->labDataX->setText(tr("R Column:"));
+                ui->labDataY->setText(tr("G Column:"));
+                ui->labErrorX->setText(tr("B Column:"));
+                ui->labErrorY->setText(tr("Modifier Column:"));
+                break;
+            case 11:
                 //graph.type=QFRDRTable::gtMaskImage;
+                ui->labDataX->setText(tr("Mask Column:"));
                 ui->cmbLinesXError->setVisible(false);
                 ui->labErrorX->setVisible(false);
                 ui->cmbLinesYData->setVisible(false);
@@ -437,8 +569,10 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(QFRDRTable::GraphInfo& gra
                 ui->labFillColor->setVisible(false);
                 ui->widLineStyle->setVisible(false);
                 ui->labLinestyle->setVisible(false);
+                ui->cmbModifierMode->setVisible(false);
+                ui->labModifierMode->setVisible(false);
                 break;
-            case 11:
+            case 12:
                 //graph.type=QFRDRTable::gtFunction;
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
@@ -479,46 +613,47 @@ void QFTableGraphSettings::connectWidgets()
     //qDebug()<<"connectWidgets";
 
 
-    connect(ui->edtFunction, SIGNAL(editingFinished()), this, SLOT(graphDataChanged()));
-    connect(ui->edtGraphTitle, SIGNAL(editingFinished()), this, SLOT(graphDataChanged()));
-    connect(ui->cmbGraphType, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->cmbLinesXData, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->cmbLinesXError, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->cmbLinesYData, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->cmbLinesYError, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->cmbFillColor, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->cmbErrorColor, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->cmbErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->cmbLineColor, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->cmbLineStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->cmbSymbol, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->chkDrawLine, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
-    connect(ui->spinLineWidth, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    connect(ui->spinSymbolSize, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    connect(ui->sliderErrorTransparent, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->sliderFillTransparent, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->sliderPlotTransparent, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->cmbImageFalseColor, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->cmbImageTrueColor, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->cmbColormap, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->spinImageWidth, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    connect(ui->edtImageMax, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    connect(ui->edtImageMin, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    connect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    connect(ui->edtImageX, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    connect(ui->edtImageY, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    connect(ui->sliderImageFalseColor, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->sliderImageTrueColor, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->edtColorbarLabel, SIGNAL(editingFinished()), this, SLOT(graphDataChanged()));
-    connect(ui->spinColorbarWidth, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    connect(ui->spinColorbarHeight, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    connect(ui->chkImageColorbarRight, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
-    connect(ui->chkImageColorbarTop, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
-    connect(ui->chkImageAutorange, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
-    connect(ui->chkSTrided, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
-    connect(ui->spinStride, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    connect(ui->spinStrideStart, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
+    connect(ui->edtFunction, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtGraphTitle, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->cmbGraphType, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbLinesXData, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbLinesXError, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbLinesYData, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbLinesYError, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbFillColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbErrorColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbLineColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbLineStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbSymbol, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->chkDrawLine, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    connect(ui->spinLineWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->spinSymbolSize, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->sliderErrorTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->sliderFillTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->sliderPlotTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbImageFalseColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbImageTrueColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbColormap, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbModifierMode, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->spinImageWidth, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->edtImageMax, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->edtImageMin, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->edtImageX, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->edtImageY, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->sliderImageFalseColor, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->sliderImageTrueColor, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->edtColorbarLabel, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->spinColorbarWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->spinColorbarHeight, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->chkImageColorbarRight, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    connect(ui->chkImageColorbarTop, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    connect(ui->chkImageAutorange, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    connect(ui->chkSTrided, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    connect(ui->spinStride, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->spinStrideStart, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
 }
 
 void QFTableGraphSettings::disconnectWidgets()
@@ -526,45 +661,70 @@ void QFTableGraphSettings::disconnectWidgets()
     //qDebug()<<"disconnectWidgets";
 
 
-    disconnect(ui->edtFunction, SIGNAL(editingFinished()), this, SLOT(graphDataChanged()));
-    disconnect(ui->edtGraphTitle, SIGNAL(editingFinished()), this, SLOT(graphDataChanged()));
-    disconnect(ui->cmbGraphType, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->cmbLinesXData, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->cmbLinesXError, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->cmbLinesYData, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->cmbLinesYError, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->cmbErrorColor, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->cmbFillColor, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->cmbErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->cmbLineColor, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->cmbLineStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->cmbSymbol, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->chkDrawLine, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
-    disconnect(ui->spinLineWidth, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    disconnect(ui->spinSymbolSize, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    disconnect(ui->sliderErrorTransparent, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->sliderFillTransparent, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->sliderPlotTransparent, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->cmbImageFalseColor, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->cmbImageTrueColor, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->cmbColormap, SIGNAL(currentIndexChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->spinImageWidth, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    disconnect(ui->edtImageMax, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    disconnect(ui->edtImageMin, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    disconnect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    disconnect(ui->edtImageX, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    disconnect(ui->edtImageY, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    disconnect(ui->sliderImageFalseColor, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->sliderImageTrueColor, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->edtColorbarLabel, SIGNAL(editingFinished()), this, SLOT(graphDataChanged()));
-    disconnect(ui->spinColorbarWidth, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    disconnect(ui->spinColorbarHeight, SIGNAL(valueChanged(double)), this, SLOT(graphDataChanged()));
-    disconnect(ui->chkImageColorbarRight, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
-    disconnect(ui->chkImageColorbarTop, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
-    disconnect(ui->chkImageAutorange, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
-    disconnect(ui->chkSTrided, SIGNAL(toggled(bool)), this, SLOT(graphDataChanged()));
-    disconnect(ui->spinStride, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
-    disconnect(ui->spinStrideStart, SIGNAL(valueChanged(int)), this, SLOT(graphDataChanged()));
+    disconnect(ui->edtFunction, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtGraphTitle, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbGraphType, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbLinesXData, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbLinesXError, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbLinesYData, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbLinesYError, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbErrorColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbFillColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbLineColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbLineStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbSymbol, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbModifierMode, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->chkDrawLine, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinLineWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinSymbolSize, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->sliderErrorTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->sliderFillTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->sliderPlotTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbImageFalseColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbImageTrueColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbColormap, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinImageWidth, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->edtImageMax, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->edtImageMin, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->edtImageX, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->edtImageY, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->sliderImageFalseColor, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->sliderImageTrueColor, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->edtColorbarLabel, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->spinColorbarWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinColorbarHeight, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->chkImageColorbarRight, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    disconnect(ui->chkImageColorbarTop, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    disconnect(ui->chkImageAutorange, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    disconnect(ui->chkSTrided, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinStride, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinStrideStart, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
 
+}
+
+void QFTableGraphSettings::initFocus()
+{
+    ui->edtGraphTitle->setFocus();
+}
+
+void QFTableGraphSettings::on_edtFunction_textChanged(const QString &text)
+{
+    ui->labFunctionOK->setText(tr("<font color=\"darkgreen\">function OK</font>"));
+    QFMathParser mp; // instanciate
+    QFMathParser::qfmpNode* n;
+    // parse some numeric expression
+    n=mp.parse(text);
+    delete n;
+    if (mp.hasErrorOccured()) {
+        ui->labFunctionOK->setText(tr("<font color=\"red\">ERROR in function:<br>&nbsp;&nbsp;&nbsp;&nbsp;%1</font>").arg(mp.getLastErrors().join("<br>&nbsp;&nbsp;&nbsp;&nbsp;")));
+    }
+}
+
+void QFTableGraphSettings::on_btnFunctionHelp_clicked()
+{
+     if (current)
+         QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("table")+"/mathparser.html");
 }

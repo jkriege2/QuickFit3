@@ -121,6 +121,9 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         inline void setVerticalHeaderShowRowNumbers(bool enabled) { verticalHeaderShowRowNumbers=enabled; reset(); }
         inline bool getVerticalHeaderShowRowNumbers() const { return verticalHeaderShowRowNumbers; }
 
+        QVariantList getColumnData(int column, int role = Qt::EditRole) const;
+        QVector<double> getColumnDataAsNumbers(int column, int role = Qt::EditRole) const;
+
         /** \brief swap the contents of two cells */
         void swapCells(quint16 row1, quint16 column1, quint16 row2, quint16 column2);
 

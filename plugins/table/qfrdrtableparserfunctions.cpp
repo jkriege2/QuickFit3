@@ -3,7 +3,7 @@
 
 
 
-void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names) {
+void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names, bool columnMode) {
     parser->addFunction("data", fQFRDRTableEditor_data);
     parser->addFunction("dataleft", fQFRDRTableEditor_dataleft);
     parser->addFunction("colavg", fQFRDRTableEditor_colavg);
@@ -15,12 +15,41 @@ void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names) {
     parser->addFunction("colmax", fQFRDRTableEditor_colmax);
     parser->addFunction("colmedian", fQFRDRTableEditor_colmedian);
     parser->addFunction("colquantile", fQFRDRTableEditor_colquantile);
+    if (columnMode) {
+        parser->addFunction("column", fQFRDRTableEditor_column);
+        parser->addFunction("columndata", fQFRDRTableEditor_column);
+
+    }
 
     if (names) {
         *names<<"data"<<"dataleft"<<"colavg"<<"colsum"<<"solsum2"<<"colvar"<<"colstad"<<"colmin"<<"colmax"<<"colmedian"<<"colquantile";
+        if (columnMode) {
+            *names<<"column"<<"columndata";
+        }
     }
 }
 
+
+
+
+
+qfmpResult fQFRDRTableEditor_column(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    qfmpResult res=qfmpResult::invalidResult();
+    res.num=NAN;
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            if (n!=1) p->qfmpError("column(column) needs 1 argument");
+            if ((params[0].type!=qfmpDouble)) p->qfmpError("column(column) needs one integer arguments");
+            int c=floor(params[0].num-1);
+            if (c>=0 && c<d->model->columnCount()) {
+
+                res.setDoubleVec(d->model->getColumnDataAsNumbers(c, Qt::EditRole));
+            }
+        }
+    }
+    return res;
+}
 
 
 

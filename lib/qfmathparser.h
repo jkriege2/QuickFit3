@@ -423,6 +423,8 @@ struct QFLIB_EXPORT qfmpResult {
         QFLIB_EXPORT bool isUsableResult() const;
         /** \brief converst the result to a number (numbers are converted!) */
         QFLIB_EXPORT double asNumber() const;
+        /** \brief converst the result to a number (numbers are converted and from a number vector the first element is returned!) */
+        QFLIB_EXPORT double asNumberAlsoVector() const;
         /** \brief converst the result to a string (strings are converted!) */
         QFLIB_EXPORT QString asString() const;
         /** \brief converst the result to a boolean (numbers and booleans are converted!) */

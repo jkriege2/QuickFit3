@@ -45,10 +45,7 @@ class QFRDRTablePlotWidget : public QWidget
         void on_btnMoveUp_clicked();
         void on_btnMoveDown_clicked();
         void on_btnResetColoring_clicked();
-        void on_edtFunction_textChanged(const QString& text);
-        void on_btnFunctionHelp_clicked();
 
-        void reloadColumns(QComboBox* combo);
         void graphDataChanged();
         void plotDataChanged();
         void updateGraph();
@@ -70,7 +67,6 @@ class QFRDRTablePlotWidget : public QWidget
         int plot;
         bool updating;
         QList<QColor> autocolors;
-        QFFunctionReferenceTool* functionRef;
 };
 
 #endif // QFRDRTABLEPLOTWIDGET_H

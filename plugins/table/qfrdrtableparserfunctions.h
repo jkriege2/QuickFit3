@@ -14,9 +14,10 @@ struct QFMathParserData {
     int column;
 };
 
-void addQFRDRTableFunctions(QFMathParser* parser, QStringList *names=NULL);
+void addQFRDRTableFunctions(QFMathParser* parser, QStringList *names=NULL, bool columnMode=false);
 
 qfmpResult fQFRDRTableEditor_data(const qfmpResult* params, unsigned int n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_column(const qfmpResult* params, unsigned int n, QFMathParser* p);
 
 qfmpResult fQFRDRTableEditor_dataleft(const qfmpResult* params, unsigned int  n, QFMathParser* p);
 

@@ -7,6 +7,7 @@ QFTablePluginModel::QFTablePluginModel(QObject* parent):
     setVerticalHeaderShowRowNumbers(true);
 }
 
+
 QVariant QFTablePluginModel::data(const QModelIndex &index, int role) const
 {
     if (role==Qt::ToolTipRole) {
@@ -22,6 +23,17 @@ QVariant QFTablePluginModel::data(const QModelIndex &index, int role) const
         return tt;
     }
     return QFTableModel::data(index, role);
+}
+
+Qt::ItemFlags QFTablePluginModel::flags(const QModelIndex &index) const
+{
+    if (index.model()) {
+        QVariant colexp=index.model()->headerData(index.column(), Qt::Horizontal, QFRDRTable::ColumnExpressionRole);
+        if (colexp.isValid() && colexp.canConvert(QVariant::String)) {
+            return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+        }
+    }
+    return QFTableModel::flags(index);
 }
 
 

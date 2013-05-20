@@ -157,6 +157,13 @@ void QFRDRTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
 
 void QFRDRTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    if (index.model()) {
+        QVariant colexp=index.model()->headerData(index.column(), Qt::Horizontal, QFRDRTable::ColumnExpressionRole);
+        if (colexp.isValid() && colexp.canConvert(QVariant::String)) {
+            QColor c("lightgrey");
+            painter->fillRect(option.rect, QBrush(c));
+        }
+    }
     if (!index.data(QFRDRTable::TableExpressionRole).toString().isEmpty()) {
         QColor c("gainsboro");
         painter->fillRect(option.rect, QBrush(c));

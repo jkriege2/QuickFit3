@@ -30,7 +30,8 @@ HEADERS += dlgcsvparameters.h \
     qfrdrtableenhancedtableview.h \
     ../interfaces/qfrdrtableinterface.h \
     ../interfaces/qfrdrcolumngraphsinterface.h \
-    qftablegraphsettings.h
+    qftablegraphsettings.h \
+    qfrdrtablecolumneditor.h
 
 SOURCES += dlgcsvparameters.cpp \
            qfrdrtable.cpp \
@@ -49,7 +50,8 @@ SOURCES += dlgcsvparameters.cpp \
     qfrdrtableparserfunctions.cpp \
     ../base_classes/qffunctionreferencetool.cpp \
     qfrdrtableenhancedtableview.cpp \
-    qftablegraphsettings.cpp
+    qftablegraphsettings.cpp \
+    qfrdrtablecolumneditor.cpp
 
 FORMS = dlg_csvparameters.ui \
     tableresizedialog.ui \
@@ -58,9 +60,11 @@ FORMS = dlg_csvparameters.ui \
     qfrdrtableformuladialog.ui \
     qfrdrtablesortdialog.ui \
     qfrdrtablehistogramdialog.ui \
-    qftablegraphsettings.ui
+    qftablegraphsettings.ui \
+    qfrdrtablecolumneditor.ui
 
-RESOURCES += qfrdrtable.qrc
+RESOURCES += qfrdrtable.qrc \
+    ../../lib/lib.qrc
 
 TRANSLATIONS= ./translations/de.qfrdrtable.ts
 

@@ -65,7 +65,7 @@ Qt::ItemFlags QFTableModel::flags(const QModelIndex &index) const {
 }
 
 QVariant QFTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
-     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+     if (orientation == Qt::Horizontal) {
          if (role==Qt::DisplayRole) {
             if (section<columnNames.size()) return columnNames[section];
          } else if (headerDataMap.contains(section)) {
@@ -114,6 +114,35 @@ bool QFTableModel::setData(const QModelIndex &index, const QVariant &value, int 
     }
     doEmitSignals=oldEmit;
     return false;
+}
+
+QVariantList QFTableModel::getColumnData(int column, int role) const
+{
+    QVariantList vl;
+    if (column>=0 && column<columns) {
+        for (int r=0; r<rows; r++) {
+            vl<<data(index(r, column), role);
+        }
+    }
+    return vl;
+}
+
+QVector<double> QFTableModel::getColumnDataAsNumbers(int column, int role) const
+{
+    QVector<double> vl;
+    if (column>=0 && column<columns) {
+        for (int r=rows-1; r>=0; r--) {
+            QVariant d=data(index(r, column), role);
+            bool ok=false;
+            double dd=d.toDouble(&ok);
+            if (d.isValid() && d.canConvert(QVariant::Double) && ok) {
+                vl.push_front(dd);
+            } else if (vl.size()>0) {
+                vl.push_front(NAN);
+            }
+        }
+    }
+    return vl;
 }
 
 void QFTableModel::swapCells(quint16 row1, quint16 column1, quint16 row2, quint16 column2) {

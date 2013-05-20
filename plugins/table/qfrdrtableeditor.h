@@ -54,7 +54,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slSetDatatype();
         void slSaveTable();
         void slLoadTable();
-        void slSetColumnTitle(int col=-1);
+        void slEditColumnProperties(int col=-1);
         void slResize();
         void slCopy();
         void slPaste();
@@ -113,7 +113,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
 
         QToolBar* tbMain;
 
-        QVariant evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode* node, QModelIndex cell, bool* ok, const QString& expression=QString("? ? ?"));
+        QVariant evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode* node, QModelIndex cell, bool* ok, const QString& expression=QString("? ? ?"), bool columnMode=false);
     private:
 };
 
