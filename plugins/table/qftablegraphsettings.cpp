@@ -546,8 +546,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
                 ui->widLineStyle->setVisible(false);
                 ui->labLinestyle->setVisible(false);
                 ui->labDataX->setText(tr("R Column:"));
-                ui->labDataY->setText(tr("G Column:"));
-                ui->labErrorX->setText(tr("B Column:"));
+                ui->labErrorX->setText(tr("G Column:"));
+                ui->labDataY->setText(tr("B Column:"));
                 ui->labErrorY->setText(tr("Modifier Column:"));
                 break;
             case 11:
