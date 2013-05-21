@@ -847,6 +847,9 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_colorBarTopVisible(g.imageColorbarTop);
                 pg->set_colorBarRelativeHeight(g.colorbarRelativeHeight);
                 pg->set_colorBarWidth(g.colorbarWidth);
+                pg->set_imageName(g.imageLegend);
+                pg->set_imageNameG(g.imageLegendG);
+                pg->set_imageNameB(g.imageLegendB);
                 /*pg->set_imageName(g.imageLegend);
                 pg->set_imageNameFontName(p.fontName);
                 pg->set_imageNameFontSize(p.axisLabelFontSize);*/
@@ -860,6 +863,29 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->get_colorBarTopAxis()->set_axisLabel(g.imageLegend);
                 pg->get_colorBarTopAxis()->set_labelFont(p.fontName);
                 pg->get_colorBarTopAxis()->set_labelFontSize(p.axisFontSize);
+
+                pg->get_colorBarRightAxisG()->set_tickLabelFont(p.fontName);
+                pg->get_colorBarRightAxisG()->set_tickLabelFontSize(p.axisFontSize);
+                pg->get_colorBarRightAxisG()->set_axisLabel(g.imageLegendG);
+                pg->get_colorBarRightAxisG()->set_labelFont(p.fontName);
+                pg->get_colorBarRightAxisG()->set_labelFontSize(p.axisFontSize);
+                pg->get_colorBarTopAxisG()->set_tickLabelFont(p.fontName);
+                pg->get_colorBarTopAxisG()->set_tickLabelFontSize(p.axisFontSize);
+                pg->get_colorBarTopAxisG()->set_axisLabel(g.imageLegendG);
+                pg->get_colorBarTopAxisG()->set_labelFont(p.fontName);
+                pg->get_colorBarTopAxisG()->set_labelFontSize(p.axisFontSize);
+
+                pg->get_colorBarRightAxisB()->set_tickLabelFont(p.fontName);
+                pg->get_colorBarRightAxisB()->set_tickLabelFontSize(p.axisFontSize);
+                pg->get_colorBarRightAxisB()->set_axisLabel(g.imageLegendB);
+                pg->get_colorBarRightAxisB()->set_labelFont(p.fontName);
+                pg->get_colorBarRightAxisB()->set_labelFontSize(p.axisFontSize);
+                pg->get_colorBarTopAxisB()->set_tickLabelFont(p.fontName);
+                pg->get_colorBarTopAxisB()->set_tickLabelFontSize(p.axisFontSize);
+                pg->get_colorBarTopAxisB()->set_axisLabel(g.imageLegendB);
+                pg->get_colorBarTopAxisB()->set_labelFont(p.fontName);
+                pg->get_colorBarTopAxisB()->set_labelFontSize(p.axisFontSize);
+
                 pg->set_modifierMode(g.modifierMode);
                 ui->plotter->addGraph(pg);
 

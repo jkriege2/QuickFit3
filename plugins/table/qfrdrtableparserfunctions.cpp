@@ -15,17 +15,17 @@ void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names, bool colum
     parser->addFunction("colmax", fQFRDRTableEditor_colmax);
     parser->addFunction("colmedian", fQFRDRTableEditor_colmedian);
     parser->addFunction("colquantile", fQFRDRTableEditor_colquantile);
-    if (columnMode) {
+    //if (columnMode) {
         parser->addFunction("column", fQFRDRTableEditor_column);
         parser->addFunction("columndata", fQFRDRTableEditor_column);
 
-    }
+    //}
 
     if (names) {
         *names<<"data"<<"dataleft"<<"colavg"<<"colsum"<<"solsum2"<<"colvar"<<"colstad"<<"colmin"<<"colmax"<<"colmedian"<<"colquantile";
-        if (columnMode) {
+        //if (columnMode) {
             *names<<"column"<<"columndata";
-        }
+        //}
     }
 }
 

@@ -18,6 +18,7 @@ void QFCorrelationMaskTools::setRDR(QFRawDataRecord *rdr)
     QFRDRImageMaskEditTools::setRDR(rdr);
     fcs=qobject_cast<QFRDRFCSDataInterface*>(rdr);
     actFindErroneousPixels->setEnabled(runselection && fcs);
+    actMaskAllZero->setEnabled(runselection && fcs);
 }
 
 
@@ -32,6 +33,8 @@ void QFCorrelationMaskTools::findErroneousPixels()
             setLeaveout(dlg->getInitSelection(), true);
             setLeaveout(mask, dlg->doClearOldMask());
 
+        } else {
+            setLeaveout(dlg->getInitSelection(), true);
         }
         disconnect(dlg, SIGNAL(setSelection(QList<int>,bool)), this, SLOT(setLeaveout(QList<int>,bool)));
         delete dlg;
@@ -64,4 +67,5 @@ void QFCorrelationMaskTools::maskAllZeroCorrelations()
 void QFCorrelationMaskTools::registerCorrelationToolsToMenu(QMenu *menu) const
 {
     menu->addAction(actFindErroneousPixels);
+    menu->addAction(actMaskAllZero);
 }

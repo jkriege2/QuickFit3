@@ -195,6 +195,8 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.imageColorbarRight=ui->chkImageColorbarRight->isChecked();
         graph.imageColorbarTop=ui->chkImageColorbarTop->isChecked();
         graph.imageLegend=ui->edtColorbarLabel->text();
+        graph.imageLegendG=ui->edtColorbarLabelG->text();
+        graph.imageLegendB=ui->edtColorbarLabelB->text();
         graph.imageLegendMod=ui->edtColorbarLabelMod->text();
         graph.colorbarWidth=ui->spinColorbarWidth->value();
         graph.colorbarRelativeHeight=ui->spinColorbarHeight->value()/100.0;
@@ -288,6 +290,8 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->chkImageColorbarRight->setChecked(graph.imageColorbarRight);
     ui->chkImageColorbarTop->setChecked(graph.imageColorbarTop);
     ui->edtColorbarLabel->setText(graph.imageLegend);
+    ui->edtColorbarLabelG->setText(graph.imageLegendG);
+    ui->edtColorbarLabelB->setText(graph.imageLegendB);
     ui->edtColorbarLabelMod->setText(graph.imageLegendMod);
     ui->spinColorbarWidth->setValue(graph.colorbarWidth);
     ui->spinColorbarHeight->setValue(graph.colorbarRelativeHeight*100.0);
@@ -350,6 +354,28 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
         ui->labDataY->setText(tr("Y Data Column:"));
         ui->labErrorX->setText(tr("X Error Column:"));
         ui->labErrorY->setText(tr("Y Error Column:"));
+
+        ui->labTransparencyFalse->setVisible(false);
+        ui->widFalseTransparency->setVisible(false);
+        ui->labTransparencyTrue->setVisible(false);
+        ui->widTrueTransparency->setVisible(false);
+        ui->labTrueColor->setVisible(false);
+        ui->cmbImageTrueColor->setVisible(false);
+        ui->labFalseColor->setVisible(false);
+        ui->cmbImageFalseColor->setVisible(false);
+        ui->labColormap->setVisible(false);
+        ui->cmbColormap->setVisible(false);
+        ui->labColorbarLabel->setVisible(false);
+        ui->edtColorbarLabel->setVisible(false);
+        ui->labModifierMode->setVisible(false);
+        ui->cmbModifierMode->setVisible(false);
+        ui->labColorbarLabelMod->setVisible(false);
+        ui->edtColorbarLabelMod->setVisible(false);
+        ui->labColorbarLabelG->setVisible(false);
+        ui->edtColorbarLabelG->setVisible(false);
+        ui->labColorbarLabelB->setVisible(false);
+        ui->edtColorbarLabelB->setVisible(false);
+        ui->labColorbarLabel->setText(tr("bar label:"));
 
         switch(ui->cmbGraphType->currentIndex()) {
 
@@ -526,6 +552,24 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
                 ui->labLinestyle->setVisible(false);
                 ui->labDataX->setText(tr("Image Column:"));
                 ui->labDataY->setText(tr("Modifier Column:"));
+
+                ui->labTransparencyFalse->setVisible(false);
+                ui->widFalseTransparency->setVisible(false);
+                ui->labTransparencyTrue->setVisible(false);
+                ui->widTrueTransparency->setVisible(false);
+                ui->labTrueColor->setVisible(false);
+                ui->cmbImageTrueColor->setVisible(false);
+                ui->labFalseColor->setVisible(false);
+                ui->cmbImageFalseColor->setVisible(false);
+                ui->labColormap->setVisible(true);
+                ui->cmbColormap->setVisible(true);
+                ui->labColorbarLabel->setVisible(true);
+                ui->edtColorbarLabel->setVisible(true);
+                ui->labModifierMode->setVisible(true);
+                ui->cmbModifierMode->setVisible(true);
+                ui->labColorbarLabelMod->setVisible(true);
+                ui->edtColorbarLabelMod->setVisible(true);
+
                 break;
             case 10:
                 //graph.type=QFRDRTable::gtRGBImage;
@@ -549,6 +593,29 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
                 ui->labErrorX->setText(tr("G Column:"));
                 ui->labDataY->setText(tr("B Column:"));
                 ui->labErrorY->setText(tr("Modifier Column:"));
+
+                ui->labTransparencyFalse->setVisible(false);
+                ui->widFalseTransparency->setVisible(false);
+                ui->labTransparencyTrue->setVisible(false);
+                ui->widTrueTransparency->setVisible(false);
+                ui->labTrueColor->setVisible(false);
+                ui->cmbImageTrueColor->setVisible(false);
+                ui->labFalseColor->setVisible(false);
+                ui->cmbImageFalseColor->setVisible(false);
+                ui->labColormap->setVisible(false);
+                ui->cmbColormap->setVisible(false);
+                ui->labColorbarLabel->setVisible(true);
+                ui->edtColorbarLabel->setVisible(true);
+                ui->labModifierMode->setVisible(true);
+                ui->cmbModifierMode->setVisible(true);
+                ui->labColorbarLabelMod->setVisible(false);
+                ui->edtColorbarLabelMod->setVisible(false);
+                ui->labColorbarLabelG->setVisible(true);
+                ui->edtColorbarLabelG->setVisible(true);
+                ui->labColorbarLabelB->setVisible(true);
+                ui->edtColorbarLabelB->setVisible(true);
+                ui->labColorbarLabel->setText(tr("R bar label:"));
+
                 break;
             case 11:
                 //graph.type=QFRDRTable::gtMaskImage;
@@ -571,6 +638,24 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
                 ui->labLinestyle->setVisible(false);
                 ui->cmbModifierMode->setVisible(false);
                 ui->labModifierMode->setVisible(false);
+
+                ui->labTransparencyFalse->setVisible(true);
+                ui->widFalseTransparency->setVisible(true);
+                ui->labTransparencyTrue->setVisible(true);
+                ui->widTrueTransparency->setVisible(true);
+                ui->labTrueColor->setVisible(true);
+                ui->cmbImageTrueColor->setVisible(true);
+                ui->labFalseColor->setVisible(true);
+                ui->cmbImageFalseColor->setVisible(true);
+                ui->labColormap->setVisible(false);
+                ui->cmbColormap->setVisible(false);
+                ui->labColorbarLabel->setVisible(false);
+                ui->edtColorbarLabel->setVisible(false);
+                ui->labModifierMode->setVisible(false);
+                ui->cmbModifierMode->setVisible(false);
+                ui->labColorbarLabelMod->setVisible(false);
+                ui->edtColorbarLabelMod->setVisible(false);
+
                 break;
             case 12:
                 //graph.type=QFRDRTable::gtFunction;
@@ -646,6 +731,8 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->sliderImageFalseColor, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->sliderImageTrueColor, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->edtColorbarLabel, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtColorbarLabelB, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtColorbarLabelG, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->spinColorbarWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
     connect(ui->spinColorbarHeight, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
     connect(ui->chkImageColorbarRight, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
@@ -694,6 +781,8 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->sliderImageFalseColor, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->sliderImageTrueColor, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->edtColorbarLabel, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtColorbarLabelB, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtColorbarLabelG, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     disconnect(ui->spinColorbarWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
     disconnect(ui->spinColorbarHeight, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
     disconnect(ui->chkImageColorbarRight, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));

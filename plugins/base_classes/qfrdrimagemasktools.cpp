@@ -222,4 +222,8 @@ QList<int> QFRDRImageMaskTools::maskToIndexList()
     return lst;
 }
 
+void QFRDRImageMaskTools::maskMaskChangedEvent()
+{
+}
+
 

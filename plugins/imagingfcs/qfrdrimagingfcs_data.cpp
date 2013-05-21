@@ -2313,4 +2313,11 @@ void QFRDRImagingFCSData::splitVideo(double *video, double *&video2, int &width,
     free(temp);
 }
 
+void QFRDRImagingFCSData::maskMaskChangedEvent()
+{
+    recalcCorrelations();
+}
+
+
+
 

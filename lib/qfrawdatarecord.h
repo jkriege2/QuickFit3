@@ -22,6 +22,7 @@
 
 class QDomElement; // forward
 class QFRawDataRecordPrivate; // forward
+struct qfmpResult; // forward
 
 /*! \brief this class manages one raw data record in the project
     \ingroup qf3lib_project
@@ -385,6 +386,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             bool isNumberType() const;
             double getAsDouble() const;
             QVector<double> getAsDoubleVector() const;
+            qfmpResult getAsMathParserResult() const;
+            void setFromMathParserResult(const qfmpResult& result);
         };
 
         /*! \brief initial size for results hash
@@ -554,8 +557,14 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void resultsSetBoolean(const QString& evaluationName, const QString& resultName, bool value);
         /** \brief set result from evaluationResult */
         void resultsSet(const QString& evaluationName, const QString& resultName, const evaluationResult& result);
-        /** \brief return a specified result as variant */
+        /** \brief return a specified result  */
         evaluationResult resultsGet(const QString& evalName, const QString& resultName) const;
+
+        /** \brief return a specified result as a QFMathParser result (qfmpResult) */
+        qfmpResult resultsGetForMathParser(const QString& evalName, const QString& resultName) const;
+        /** \brief set a specified result from a QFMathParser result (qfmpResult) */
+        void resultsSetFromMathParser(const QString& evalName, const QString& resultName, const qfmpResult& result) ;
+
         /** \brief return the type of a specified result, or qfrdreInvalid if an error occured (eval does not exist ...) */
         evaluationResultType resultsGetType(const QString& evalName, const QString& resultName) const;
         /** \brief remove the value stored in the given position

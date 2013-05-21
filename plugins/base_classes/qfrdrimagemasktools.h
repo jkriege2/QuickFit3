@@ -28,12 +28,14 @@ class QFRDRImageMaskTools : public QFRDRImageMaskInterface {
         virtual void maskSetIdx(uint16_t idx, bool value=true);
         virtual bool maskGetIdx(uint16_t idx) const;
         virtual QList<int> maskToIndexList();
+        virtual void maskMaskChangedEvent();
     protected:
         virtual void maskInit(uint16_t w, uint16_t h);
         virtual void maskDelete();
 
         virtual QString maskToListString(const QString& coordinate_separator=QString(", "), const QString& pixel_separator=QString("; ")) const;
         virtual void maskLoadFromListString(const QString& maskstring, QChar coordinate_separator=QChar(','), QChar pixel_separator=QChar(';'));
+
 
     private:
         bool* mask;

@@ -89,6 +89,9 @@
          - \c $$note:text$$ will add a blue box with the test "Note" and the given <i>text</i> to the help document
          - \c $$info:text$$ will add a blue box with the test "Information" and the given <i>text</i> to the help document
          - \c $$warning:text$$ will add a orange/red box with the test "Warning" and the given <i>text</i> to the help document
+         - \c $$example:text$$ will add a blue/gray box with the text formatted as example
+         - \c $$cexample:text$$ \c $$codeexample:text$$ will add a blue/gray box with the text formatted as a code example (typewrite/Courier font)
+         - \c $$tt:text$$ \c $$code:text$$  will format the text in the typewrite/Courier font
 		 - \c $$fig:file:caption$$ $$figure:file:caption$$ will add the given image \c file as a figure with the given caption
 		 .
 	  

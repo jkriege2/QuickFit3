@@ -81,7 +81,7 @@ void QFRDRImagingFCSSimulationThread::run()
     config.setValue("acquisition/type", tr("simulation"));
     config.setValue("acquisition/frame_time", frametime*1.0e-6);
     config.setValue("acquisition/frame_rate", 1/(frametime*1.0e-6));
-    config.setValue("acquisition/baseline_offset", background);
+    config.setValue("acquisition/baseline_offset", 0);
     if (dualView) config.setValue("acquisition/dualview_mode", "h");
     else config.setValue("acquisition/dualview_mode", "none");
     config.setValue("files/count", 2);
@@ -106,8 +106,8 @@ void QFRDRImagingFCSSimulationThread::run()
     config.setValue("simulation/brightnessR", brightnessR);
     config.setValue("simulation/pixel_size", pixel_size);
     config.setValue("simulation/psf_size", psf_size);
-    config.setValue("acquisition/background", background);
-    config.setValue("acquisition/backgroundNoise", backgroundNoise);
+    config.setValue("simulation/background", background);
+    config.setValue("simulation/backgroundNoise", backgroundNoise);
 
     int framesize=width*height;
     int realwidth=width;

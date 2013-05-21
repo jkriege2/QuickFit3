@@ -3,7 +3,7 @@
 #include <QtXml>
 #include "qtriple.h"
 #include "binarydatatools.h"
-
+#include "qfmathparser.h"
 //#define DEBUG_THREAN
 
 class QFRawDataRecordPrivate {
@@ -2566,6 +2566,29 @@ QFRawDataRecord::evaluationResult QFRawDataRecord::resultsGet(const QString& eva
     return r;
 }
 
+qfmpResult QFRawDataRecord::resultsGetForMathParser(const QString &evalName, const QString &resultName) const
+{
+    return resultsGet(evalName, resultName).getAsMathParserResult();
+}
+
+void QFRawDataRecord::resultsSetFromMathParser(const QString &evaluationName, const QString &resultName, const qfmpResult &result)
+{
+    {
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        evaluationResult r;
+        r.setFromMathParserResult(result);
+        if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+        dstore->results[evaluationName]->results.insert(resultName, r);
+    }
+    emitResultsChanged(evaluationName, resultName, false);
+}
+
 QFRawDataRecord::evaluationResultType QFRawDataRecord::resultsGetType(const QString& evalName, const QString& resultName) const {
     if (resultsExists(evalName, resultName)) {
         
@@ -4255,6 +4278,70 @@ QVector<double> QFRawDataRecord::evaluationResult::getAsDoubleVector() const
             return res;
     }
     return res;
+}
+
+qfmpResult QFRawDataRecord::evaluationResult::getAsMathParserResult() const
+{
+    switch (type) {
+        case QFRawDataRecord::qfrdreNumber:
+        case QFRawDataRecord::qfrdreNumberError:
+            return qfmpResult(dvalue);
+        case QFRawDataRecord::qfrdreInteger:
+            return qfmpResult((double)ivalue);
+        case QFRawDataRecord::qfrdreNumberVector:
+        case QFRawDataRecord::qfrdreNumberMatrix:
+        case QFRawDataRecord::qfrdreNumberErrorVector:
+        case QFRawDataRecord::qfrdreNumberErrorMatrix:
+            return qfmpResult(dvec);
+        case QFRawDataRecord::qfrdreIntegerVector:
+        case QFRawDataRecord::qfrdreIntegerMatrix:
+            {
+                QVector<double> dv;
+                for(int i=0; i<ivec.size(); i++) dv<<ivec[i];
+                return qfmpResult(dv);
+            }
+        case QFRawDataRecord::qfrdreString:
+            return qfmpResult(svalue);
+        case QFRawDataRecord::qfrdreStringVector:
+        case QFRawDataRecord::qfrdreStringMatrix:
+            if (!svec.isEmpty()) return qfmpResult(svec.first());
+            break;
+        case QFRawDataRecord::qfrdreBoolean:
+            return qfmpResult(bvalue);
+        case QFRawDataRecord::qfrdreBooleanVector:
+        case QFRawDataRecord::qfrdreBooleanMatrix:
+            if (!bvec.isEmpty()) return qfmpResult(bvec.first());
+            break;
+        case QFRawDataRecord::qfrdreInvalid:
+        default:
+            return qfmpResult::invalidResult();
+    }
+    return qfmpResult::invalidResult();
+}
+
+void QFRawDataRecord::evaluationResult::setFromMathParserResult(const qfmpResult &result)
+{
+    if (result.isValid) {
+        switch(result.type) {
+            case qfmpDouble:
+                type=QFRawDataRecord::qfrdreNumber;
+                dvalue=result.num;
+            case qfmpString:
+                type=QFRawDataRecord::qfrdreString;
+                svalue=result.str;
+            case qfmpBool:
+                type=QFRawDataRecord::qfrdreBoolean;
+                bvalue=result.boolean;
+            case qfmpDoubleVector:
+                type=QFRawDataRecord::qfrdreNumberVector;
+                dvec=result.numVec;
+            case qfmpVoid:
+                type=QFRawDataRecord::qfrdreInvalid;
+                break;
+        }
+    } else {
+        type=QFRawDataRecord::qfrdreInvalid;
+    }
 }
 
 

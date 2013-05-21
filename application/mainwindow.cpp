@@ -2672,7 +2672,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$insert:<filename>$$ and $$insertglobal:<filename>$$ items
-            QRegExp rxInsert("\\$\\$(insert|insertglobal|see)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxInsert("\\$\\$(insert|insertglobal|see|note|info|warning|example|codeexample|cexample|tt|code)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxInsert.setMinimal(true);
             count = 0;
             pos = 0;
@@ -2724,8 +2724,26 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                    "<tr><td align=\"left\"><b>Note:</b> %1</td></tr>"
                                    "</table></blockquote>").arg(file);
 
-                    result=result.replace(rxInsert.cap(0), rep);                }
+                    result=result.replace(rxInsert.cap(0), rep);
+                } else if (QFPluginServices::getInstance()&&(command=="example")) {
+                   QString rep=tr("<blockquote>"
+                                    "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightgrey ;  border-color: midnightblue\" >"
+                                  "<tr><td align=\"left\">%1</td></tr>"
+                                  "</table></blockquote>").arg(file);
 
+                   result=result.replace(rxInsert.cap(0), rep);
+                } else if (QFPluginServices::getInstance()&&(command=="cexample"||command=="codeexample")) {
+                   QString rep=tr("<blockquote>"
+                                    "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightgrey ;  border-color: midnightblue\" >"
+                                  "<tr><td align=\"left\"><tt>%1</tt></td></tr>"
+                                  "</table></blockquote>").arg(file);
+
+                   result=result.replace(rxInsert.cap(0), rep);
+                } else if (QFPluginServices::getInstance()&&(command=="tt"||command=="code")) {
+                   QString rep=tr("<tt>%1</tt>").arg(file);
+
+                   result=result.replace(rxInsert.cap(0), rep);
+                }
                 ++count;
                 pos += rxInsert.matchedLength();
             }

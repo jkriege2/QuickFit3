@@ -1,6 +1,192 @@
 <li><a name="$$SVN$$"><b>$$COMPILEDATE$$ (SVN: $$SVN$$)</b>
+
 <!--
-		<li><a name="1956"><b>2012-12-10 (SVN: 1956)</b>-->
+		<ul>
+		  <li><b>new plugins:</b><ul>
+		    <li><b></b>: </li>
+		    <li><b></b>: </li>
+
+		  </ul></li>
+		  <li><b>QuickFit3:</b><ul>
+		    <li></li>
+		    <li></li>
+		  </ul></li>
+		  
+		  <li><b>:</b><ul>
+		    <li></li>
+		    <li></li>
+		  </ul></li>
+
+		</ul>
+
+-->
+
+<!--
+		<li><a name="2250"><b>2013-05-21 (SVN: 2250)</b>-->
+
+		<ul>
+		  <li><b>new plugins:</b><ul>
+		    <li><b>imfccsfit</b>: imaging FCCS fit evaluation plugin with global fitting, contains tool to calculate the relative CCF amplitude </li>
+		    <li><b>qfe_resultstools</b>: plugin with tools to work with rdr results (currently only a calculator Tool in the Tools menu)</li>
+		    <li><b>qfe_defaultmathparserextensions</b>: plugin to extend the main math parser woth more functions (e.g. regression, model fit, ...)</li>
+
+		  </ul></li>
+		  <li><b>QuickFit3:</b><ul>
+		    <li>improved rendering in JKMathText: (- added italic correction in sub/superscript - corrected whitespace handling in math mode (now ignores them just like LaTeX, use "\ " to get an explicit whitepsace))</li>
+		    <li>increased lib version</li>
+		    <li>evaluation and rdr plugins have an init() method now</li>
+		    <li>online-help now supports special tags for references</li>
+		    <li>added installer (using NSIS)</li>
+		    <li>improved plotters: now they may copy the current plot into a table record</li>
+		    <li>bugfix: App crashed sometimes when closing before closing all evaluation windows separately</li>
+		    <li>It is possible to edit folder, RDR and evaluation names in the project tree</li>
+		    <li>the project tree now has a context menu to delete and add records.</li>
+		    <li>added function to load only a selected subset of a project</li>
+		    <li>improved expression parser implementation and documentation</li>
+		    <li>QFDoubleEdit now supports step up/down via mouse wheel</li>
+		    <li>rdrs may now have a group to which they are assigned</li>
+		    <li>project tree displays group using background color</li>
+		    <li>added button to RDR editors that allows to select the next record from a tree of the project.</li>
+		    <li>online help: added tooltips, which may be defined in special INI files</li>
+		    <li>plotter: error polygons are plotted as one large polygon now</li>
+		    <li>JKQTFASTPLOTTER: has a context menu to copy the current image to the clipboard now</li>		  
+		    <li>improved expression parser: supports  binary/hex/oct number constants, number vectors and function assignments (e.g. f(x)=x^2) + several new functions and improved documentation</li>
+		    <li>removed some smaller memory leaks (found by valgrind)</li>
+		    <li>QFDoubleEdit supports log-scaled stepping now, mouse-wheel interaction fixed</li>
+		    <li>added tool to fix wrong file paths in RDRs to the main application</li>
+		    <li>result tables show more information in tooltips for boolean and string arrays</li>
+		  </ul></li>
+		  
+		  <li><b>qfe_calculator</b><ul>
+		    <li>bugfix, online-help for expression parser displayed correctly now</li>
+		    <li>uses imrpoved expression parser now</li>
+		  </ul></li>
+		  
+		  <li><b>table:</b><ul>
+		    <li>bugfix, online-help for expression parser displayed correctly now</li>
+		    <li>asks now whether to delete a graph</li>
+		    <li>changed default font for graphs </li>
+		    <li>bugfix: deleting a graph lead to an endless loop</li>
+		    <li>now supports common interfaces to edit data in table and graphs</li>
+		    <li>bugfix: table-size not initialized on startup</li>
+		    <li>more options to layout the coordinate system (background, axis styles, ...)</li>
+		    <li>added RGB image plot</li>
+		    <li>added alpha/saturation/value "modification" channel to image plots</li>
+		  </ul></li>
+		  
+		  <li><b>imFCS:</b><ul>
+		    <li>bugfixes, crash when no overview image is returned</li>
+		    <li>bugfix: didn't read 4e6 frames due to integer overflow</li>
+		    <li>now reads also 80s Radhard correlation runs</li>
+		    <li>added display of background image size to correlation dialog</li>
+		    <li>bugfix: updating avg. correlations works now properly with the "Mask" menu</li>
+		    <li>increased binary correlation file format ID version to 3.1 ... older data is scrambled in the segment data and if additional correlations are saved in each pixel (e.g. 4-neighbor-CCF)</li>
+		    <li>added tool to exclude segments from the ACF in each pixel</li>
+		    <li>bugfix when reading 4-neighbor-CCF from binary files</li>
+		    <li>added simulator for 2D diffusion (including DualView to simulate imFCCS)</li>
+		    <li>added buttons to correlator window that allow to load a file without counting the frames in it (e.g. for a larger set of measurements, where the number of frames is always the same) ... this makes selecting a file much faster!</li>
+		    <li>prepared for two-channel overview image</li>
+		    <li>continued preparations to load only one half of a full imageDV2-correlations into an imFCS RDR</li>
+		    <li>FCCS correlation works properly now</li>
+		    <li>added overview widget</li>
+		    <li>added too (menu entry in editor) to set a fit parameter from another file.</li>
+		    <li>bugfix: first pixel (run 0) always equalled averag/std </li>
+		    <li>count rate display now works, also with FCCS files and dual-channel videos</li>
+		    <li>dual-channel videos are supported</li>
+		    <li>added second set of range edit fields for second color channel of overview</li>
+		    <li>added function to automatically create ACF1+ACF2+FCCS-plot</li>
+		    <li>istogram update when selection changes works now properly</li>
+		    <li>color range selection for 2 color channels now works correctly</li>
+		    <li>added mask tool that allows to create a masked border around the </li>
+		    <li>made sure that the ACF from an FCCS dataset has two overview images and allows to read the countrate from both channels, although it's only ACF_g or ACF_r</li>
+		    <li>added "copy mask to files in group" menu entry</li>
+			<li>imFCS simulation does no longer report its background offset back, as a background file is created that corrects for the background!</li>
+			<li>"mask|mask outlier CFs": now giving lower and upper percentage (e.g. 5% & 5% leaves only 5%..95%)</li>
+			<li>"mask|copy mask to group" now updates the average run properly!</li>
+		  </ul></li>
+		  
+		  <li><b>imFCSFit:</b><ul>
+		    <li>added wizard for calibration + documentation</li>
+		    <li>added method to automatically execute the D-fits in calibration</li>
+		  </ul></li>
+		  
+		  <li><b>cam_rh2v2:</b><ul>
+		    <li>now support NOT writing raw data (it's sent to /dev/null)</li>
+		  </ul></li>
+		  
+		  <li><b>B040SPIM:</b><ul>
+		    <li>acquisition script may now set camera properties</li>
+		    <li>camera view now save camera configuration with images and has option to save to multiple image formats with one click</li>
+		    <li>additional info on camera is saved for image stacks</li>
+		    <li>prefix-linedits in acquisition settings tabs now have button to select from autocompleter</li>
+		    <li>all acquisition settings tabs have save/load template buttons now</li>
+		    <li>added common prefix to qcquisition description</li>
+		    <li>added configuration tab</li>
+		    <li>added "Test" buttons to the image stack and acquisition config tabs that allow to quickly test the choosen camera/lightpath settinsg while the button is pressed</li>
+		    <li>line measurements in the camera view window now works with dragging the mouse, not 2 clicks</li>
+		    <li>DualView filter select comboboxes are locked by the lock button now</li>		  
+		  </ul></li>
+		  
+		  <li><b>image_stack:</b><ul>
+		    <li>full support for mask editing</li>
+		    <li>added mask tool that allows to create a masked border around the </li>
+		  </ul></li>
+		  
+		  <li><b>lightsheet_analysis:</b><ul>
+		    <li>fixed display error for column cuts</li>
+		    <li>now displays cut through image row/column for all channels</li>
+		  </ul></li>
+		  
+		  <li><b>msd:</b><ul>
+		    <li>added new testdata of Puc18 plasmid</li>
+		    <li>D(tau) and alpha(tau) curves are now fitted with different methods (LM fit, regression and iteratively reweighted least squares regression)</li>
+		    <li>added tool to fit power law to msd (displayed as "theory curve")</li>
+		    <li>fit range and result is displayed in MSD-plot when mouse moves over D(tau)/alpha(tau) plot</li>
+		    <li>in line-fits dialog, the fit-range is set in real time-units now</li>
+		  </ul></li>
+		  
+		  <li><b>cam_andor:</b><ul>
+		    <li>bugfix: switched output format of some values from float to double, as QSettings seems to have problems writing floats in QVariants!</li>
+		    <li>added checkbox to allow advanced EMGain</li>
+		  </ul></li>
+		  
+		  <li><b>fcs:</b><ul>
+		    <li>plugin can load correlation output from the diffusion4 FCS simulation tool</li>
+		    <li>Added and integrated parser for ALV-6000 files by cloning and modding the existing ALV-5000 parser sparsely</li>
+		  </ul></li>
+		  
+		  <li><b>helpeditor:</b><ul>
+		    <li>added more formatting buttons</li>
+		    <li>added more buttons (math, code, ...)</li>
+		  </ul></li>
+		  
+		  <li><b>calc_diffcoeff:</b><ul>
+		    <li>moved calculation of D of sphere from its own tab to the "spheroid" tab (where also cylinders and ellipsoids are calculated)</li>
+		  </ul></li>
+
+		  <li><b>fitfunction_spimfcs:</b><ul>
+		    <li>added fit function for anomalous diffusion (+demo project +documentation)</li>
+		    <li>started fit function for 2-color SPIM-FCCS</li>
+		    <li>updated documentation to show background correction factor</li>
+		    <li>anomalous diffusion model and diffusion model with c and D as parameters now work properly</li>
+		    <li>implemented simple 2-color-FCCS model</li>
+		    <li>corrected sorting behaviour (rhos and fixes are sorted now too)</li>
+		    <li>added functions with new Veff and c,D as parameters with 1/e²-widths</li>
+		    <li>added anomalous diffusion with e² radii and with c as fit parameter and e² radii</li>
+		    <li>added fit functions for 2-color FCCS anomalous diffusion</li>
+		  </ul></li>
+
+		  <li><b>cam_testcamera:</b><ul>
+		    <li>added DualView modes and a fixed grid testpattern</li>
+		  </ul></li>
+		</ul>
+		
+		
+		
+		
+		
+		
+		<li><a name="1956"><b>2012-12-10 (SVN: 1956)</b>
 		<ul>
 		  <li><b>new plugins:</b><ul>
 		    <li><b>qfe_calculator</b>: a small math expression parser as Tool (see Tools-menu)</li>

@@ -44,6 +44,8 @@ QFRDRTable::GraphInfo::GraphInfo() {
     imageMax=0;
     imageAutoRange=true;
     imageLegend="";
+    imageLegendG="";
+    imageLegendB="";
     imageLegendMod="";
     imageColorbarRight=true;
     imageColorbarTop=false;
@@ -248,7 +250,7 @@ void QFRDRTable::tableReevaluateExpressions()
             addQFRDRTableFunctions(&mp);
             mp.addVariableDouble("row", 1);
             mp.addVariableDouble("col", 1);
-            mp.addVariableDouble("column", 1);
+            //mp.addVariableDouble("column", 1);
             mp.addVariableDouble("columns", 1.0);
             mp.addVariableDouble("rows", 1.0);
 
@@ -716,7 +718,7 @@ QVariant QFRDRTable::evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode
         } else {
             mp.addVariableDouble("row", cell.row()+1);
             mp.addVariableDouble("col", cell.column()+1);
-            mp.addVariableDouble("column", cell.column()+1);
+            //mp.addVariableDouble("column", cell.column()+1);
             mp.addVariableDouble("rows", m->model()->rowCount());
             mp.addVariableDouble("columns", m->model()->columnCount());
         }
@@ -990,6 +992,8 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.colorbarWidth=ge.attribute("image_colorbarwidth", "20").toDouble();
                     graph.colorbarRelativeHeight=ge.attribute("image_colorbarrelativeheight", "0.75").toDouble();
                     graph.imageLegend=ge.attribute("image_legend", "");
+                    graph.imageLegendG=ge.attribute("image_legend_g", "");
+                    graph.imageLegendB=ge.attribute("image_legend_b", "");
                     graph.imageLegendMod=ge.attribute("image_legend_mod", "");
                     graph.function=ge.attribute("function", "");
                     graph.modifierMode=JKQTPMathImage::StringToModifierMode(ge.attribute("modifier_mode", "none"));
@@ -1131,6 +1135,8 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("image_colorbarwidth", QString::number(plots[i].graphs[g].colorbarWidth));
             w.writeAttribute("image_colorbarrelativeheight", QString::number(plots[i].graphs[g].colorbarRelativeHeight));
             w.writeAttribute("image_legend", plots[i].graphs[g].imageLegend);
+            w.writeAttribute("image_legend_g", plots[i].graphs[g].imageLegendG);
+            w.writeAttribute("image_legend_b", plots[i].graphs[g].imageLegendB);
             w.writeAttribute("image_legend_mod", plots[i].graphs[g].imageLegendMod);
             w.writeAttribute("function", plots[i].graphs[g].function);
 

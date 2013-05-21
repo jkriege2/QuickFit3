@@ -115,7 +115,26 @@ void QFERTResultCalculator::eval()
     QFRawDataRecord::evaluationResult resA=rdrA->resultsGet(getEvalIDA(), getResultIDA());
     QFRawDataRecord::evaluationResult resB=rdrB->resultsGet(getEvalIDB(), getResultIDB());
 
-    int sizeA=resA.getVectorMatrixItems();
+
+    QFMathParser p;
+    p.clearFunctions();
+    p.clearVariables();
+    p.addStandardFunctions();
+    p.addStandardVariables();
+    p.addVariable("A", resA.getAsMathParserResult());
+    p.addVariable("B", resB.getAsMathParserResult());
+    QFMathParser::qfmpNode* n=p.parse(getExpression());
+    qfmpResult r=n->evaluate();
+    if (!p.hasErrorOccured()) {
+        rdrA->resultsSetFromMathParser(getEvalIDA(), getNewResultName(), r);
+        rdrA->resultsSetGroup(getEvalIDA(), getNewResultName(), "evaluation results");
+    } else {
+        QMessageBox::critical(this, tr("results calculator"), tr("error while parsing/evaluating expression: %1").arg(p.getLastError()));
+        //ui->labError->setText(tr("<font color=\"red\">ERROR:</font> %1").arg(p.getLastError()));
+    }
+
+
+/*    int sizeA=resA.getVectorMatrixItems();
     int sizeB=resB.getVectorMatrixItems();
 
     if (resA.isNumberType() && resB.isNumberType()) {
@@ -188,7 +207,7 @@ void QFERTResultCalculator::eval()
             }
 
         }
-    }
+    }*/
     QApplication::restoreOverrideCursor();
 }
 
@@ -235,8 +254,8 @@ void QFERTResultCalculator::on_cmbResultA_currentResultChanged(QString result, Q
 {
     QFRawDataRecord* rdrA=getRecA();
     if(rdrA) {
-        QFRawDataRecord::evaluationResult resA=rdrA->resultsGet(evalID, result);
-        ui->labPropertiesA->setText(QString("type: %1  items: %2").arg(QFRawDataRecord::evaluationResultType2String(resA.type)).arg(resA.getVectorMatrixItems()));
+        qfmpResult resA=rdrA->resultsGet(evalID, result).getAsMathParserResult();
+        ui->labPropertiesA->setText(QString("type: %1  items: %2").arg(resA.typeName()).arg(resA.length()));//.arg(QFRawDataRecord::evaluationResultType2String(resA.type)).arg(resA.getVectorMatrixItems()));
     } else {
         ui->labPropertiesA->setText("");
     }
@@ -246,8 +265,8 @@ void QFERTResultCalculator::on_cmbResultB_currentResultChanged(QString result, Q
 {
     QFRawDataRecord* rdrA=getRecB();
     if (rdrA) {
-        QFRawDataRecord::evaluationResult resA=rdrA->resultsGet(evalID, result);
-        ui->labPropertiesB->setText(QString("type: %1  items: %2").arg(QFRawDataRecord::evaluationResultType2String(resA.type)).arg(resA.getVectorMatrixItems()));
+        qfmpResult resA=rdrA->resultsGet(evalID, result).getAsMathParserResult();
+        ui->labPropertiesA->setText(QString("type: %1  items: %2").arg(resA.typeName()).arg(resA.length()));//.arg(QFRawDataRecord::evaluationResultType2String(resA.type)).arg(resA.getVectorMatrixItems()));
     } else {
         ui->labPropertiesB->setText("");
     }

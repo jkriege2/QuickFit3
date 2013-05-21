@@ -174,7 +174,16 @@ void QFRDRImageMaskEditTools::setRDR(QFRawDataRecord *rdr)
 
 void QFRDRImageMaskEditTools::setLeaveout(QList<int> leaveout, bool clearOld)
 {
-    if (runselection) {
+    if (imagemask) {
+        if (clearOld) imagemask->maskClear();
+        for (int i=0; i<leaveout.size(); i++) {
+            int idx=leaveout[i];
+            int x=idx%imagemask->maskGetWidth();
+            int y=idx/imagemask->maskGetWidth();
+            imagemask->maskSet(x, y);
+        }
+        signalMaskChanged(false, true);
+    } else if (runselection) {
         QSet<int> set=leaveout.toSet();
         for (int i=0; i<runselection->leaveoutGetRunCount(); i++) {
             if (set.contains(i)) runselection->leaveoutAddRun(i);
@@ -284,10 +293,12 @@ void QFRDRImageMaskEditTools::copyMaskToGroup()
             if (rm) {
                 rm->maskClear();
                 rm->maskLoadFromString(mask);
+                rm->maskMaskChangedEvent();
             }
         }
 
     }
+    signalMaskChanged(false, false);
 
 }
 

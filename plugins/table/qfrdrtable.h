@@ -141,6 +141,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             double imageMax;
             bool imageAutoRange;
             QString imageLegend;
+            QString imageLegendG;
+            QString imageLegendB;
             QString imageLegendMod;
             bool imageColorbarRight;
             bool imageColorbarTop;

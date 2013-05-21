@@ -705,7 +705,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
 
 
             // interpret $$insert:<filename>$$ and $$insertglobal:<filename>$$, $$see:text$$ items
-            QRegExp rxInsert("\\$\\$(insert|insertglobal|see)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxInsert("\\$\\$(insert|insertglobal|see|note|info|warning|example|codeexample|cexample|tt|code)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxInsert.setMinimal(true);
             count = 0;
             pos = 0;
@@ -751,13 +751,31 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                                    "</table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
-                 } else if (m_pluginServices&&(command=="warning")) {
-                    QString rep=tr("<blockquote>"
-                                     "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: navajowhite ;  border-color: orangered\" >"
-                                   "<tr><td align=\"left\"><b>Note:</b> %1</td></tr>"
-                                   "</table></blockquote>").arg(file);
+                } else if (m_pluginServices&&(command=="warning")) {
+                   QString rep=tr("<blockquote>"
+                                    "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: navajowhite ;  border-color: orangered\" >"
+                                  "<tr><td align=\"left\"><b>Note:</b> %1</td></tr>"
+                                  "</table></blockquote>").arg(file);
 
-                    result=result.replace(rxInsert.cap(0), rep);
+                   result=result.replace(rxInsert.cap(0), rep);
+                } else if (m_pluginServices&&(command=="example")) {
+                   QString rep=tr("<blockquote>"
+                                    "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightgrey ;  border-color: midnightblue\" >"
+                                  "<tr><td align=\"left\">%1</td></tr>"
+                                  "</table></blockquote>").arg(file);
+
+                   result=result.replace(rxInsert.cap(0), rep);
+                } else if (m_pluginServices&&(command=="cexample"||command=="codeexample")) {
+                   QString rep=tr("<blockquote>"
+                                    "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightgrey ;  border-color: midnightblue\" >"
+                                  "<tr><td align=\"left\"><tt>%1</tt></td></tr>"
+                                  "</table></blockquote>").arg(file);
+
+                   result=result.replace(rxInsert.cap(0), rep);
+                } else if (m_pluginServices&&(command=="tt"||command=="code")) {
+                   QString rep=tr("<tt>%1</tt>").arg(file);
+
+                   result=result.replace(rxInsert.cap(0), rep);
                 }
 
                 ++count;

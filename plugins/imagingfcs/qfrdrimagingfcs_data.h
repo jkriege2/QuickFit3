@@ -267,7 +267,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief splits a single video */
         void splitVideo(double* video, double*& video2, int& width, int& height, uint32_t frames);
 
-
+        virtual void maskMaskChangedEvent();
     protected:
         /** \brief width of the image */
         int width;

@@ -13,7 +13,7 @@ QFFindErroneousCorrelationDlg::QFFindErroneousCorrelationDlg(QWidget *parent) :
 QFFindErroneousCorrelationDlg::~QFFindErroneousCorrelationDlg()
 {
     ProgramOptions::setConfigValue("QFFindErroneousCorrelationDlg/chkClearMask", ui->chkClearMask->isChecked());
-    ProgramOptions::setConfigValue("QFFindErroneousCorrelationDlg/spinHighQuantile", ui->spinHighQuantile->value());
+    ProgramOptions::setConfigValue("QFFindErroneousCorrelationDlg/spinHighQuantile", 100.0-ui->spinHighQuantile->value());
     ProgramOptions::setConfigValue("QFFindErroneousCorrelationDlg/spinLowQuantile", ui->spinLowQuantile->value());
     ProgramOptions::setConfigValue("QFFindErroneousCorrelationDlg/spinLagMax", ui->spinLagMax->value());
     ProgramOptions::setConfigValue("QFFindErroneousCorrelationDlg/spinLagMin", ui->spinLagMin->value());
@@ -38,7 +38,7 @@ void QFFindErroneousCorrelationDlg::init(QFRDRRunSelectionsInterface *runselecti
     ui->spinLagMax->setValue(10);
 
     ui->chkClearMask->setChecked(ProgramOptions::getConfigValue("QFFindErroneousCorrelationDlg/chkClearMask", false).toBool());
-    ui->spinHighQuantile->setValue(ProgramOptions::getConfigValue("QFFindErroneousCorrelationDlg/spinHighQuantile", 95).toDouble());
+    ui->spinHighQuantile->setValue(100-ProgramOptions::getConfigValue("QFFindErroneousCorrelationDlg/spinHighQuantile", 95).toDouble());
     ui->spinLowQuantile->setValue(ProgramOptions::getConfigValue("QFFindErroneousCorrelationDlg/spinLowQuantile", 5).toDouble());
     ui->spinLagMax->setValue(ProgramOptions::getConfigValue("QFFindErroneousCorrelationDlg/spinLagMax", 10).toInt());
     ui->spinLagMin->setValue(ProgramOptions::getConfigValue("QFFindErroneousCorrelationDlg/spinLagMin", 5).toInt());
@@ -107,11 +107,11 @@ void QFFindErroneousCorrelationDlg::performCalc()
             data<<value/double(l1-l1+1);
         }
         double ql=qfstatisticsQuantile(data, ui->spinLowQuantile->value()/100.0);
-        double qh=qfstatisticsQuantile(data, ui->spinHighQuantile->value()/100.0);
+        double qh=qfstatisticsQuantile(data, (100.0-ui->spinHighQuantile->value())/100.0);
         mask.clear();
         for (int i=0; i<data.size(); i++) {
-            if (ui->spinLowQuantile->value()>0 && data[i]<=ql)  mask<<i;
-            if (ui->spinHighQuantile->value()<100 && data[i]>qh) mask<<i;
+            if (ui->spinLowQuantile->value()>0.0 && data[i]<=ql)  mask<<i;
+            if (ui->spinHighQuantile->value()-100.0<100.0 && data[i]>qh) mask<<i;
         }
 
         if (ui->chkClearMask->isChecked()) emit setSelection(mask, true);
