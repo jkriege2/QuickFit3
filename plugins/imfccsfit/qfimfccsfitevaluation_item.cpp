@@ -703,6 +703,8 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
     QList<double*> initialParamsVector;
     QList<double*> errorsVector, errorsVectorI;
 
+    bool saveLongStrings=!getProperty("dontSaveFitResultMessage", true).toBool();
+
     QFFitAlgorithm* falg=getFitAlgorithm();
     if ((!falg)||records.size()<=0) return;
     QFRDRFCSDataInterface* data0=qobject_cast<QFRDRFCSDataInterface*>(records.first());
@@ -963,7 +965,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
                     record->resultsSetLabel(evalID, param, tr("fit: model"));
 
                     if (run<0) record->resultsSetString(evalID, "fitalg_name", falg->id());
-                    else if (!getProperty("dontSaveFitResultMessage", false).toBool()) record->resultsSetInStringList(evalID, "fitalg_name", run, falg->id());
+                    else if (saveLongStrings) record->resultsSetInStringList(evalID, "fitalg_name", run, falg->id());
                     else  record->resultsSetString(evalID, "fitalg_name", falg->id());
                     record->resultsSetGroup(evalID, param, group);
                     record->resultsSetLabel(evalID, param, tr("fit: algorithm"));
@@ -979,12 +981,12 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
                     record->resultsSetLabel(evalID, param, tr("fit: success"));
 
                     if (run<0) record->resultsSetString(evalID, "fitalg_message", result.messageSimple);
-                    else if (!getProperty("dontSaveFitResultMessage", false).toBool()) record->resultsSetInStringList(evalID, "fitalg_message", run, result.messageSimple);
+                    else if (saveLongStrings) record->resultsSetInStringList(evalID, "fitalg_message", run, result.messageSimple);
                     record->resultsSetGroup(evalID, param, group);
                     record->resultsSetLabel(evalID, param, tr("fit: message"));
 
                     if (run<0) record->resultsSetString(evalID, "fitalg_messageHTML", result.message);
-                    else if (!getProperty("dontSaveFitResultMessage", false).toBool()) record->resultsSetInStringList(evalID, "fitalg_messageHTML", run, result.message);
+                    else if (saveLongStrings) record->resultsSetInStringList(evalID, "fitalg_messageHTML", run, result.message);
                     record->resultsSetGroup(evalID, param, group);
                     record->resultsSetLabel(evalID, param, tr("fit: message (markup)"));
 
@@ -1028,7 +1030,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
                                 break;
                             case QFRawDataRecord::qfrdreString:
                                 if (run<0) record->resultsSetString(evalID, param=("fitalg_"+it.key()), it.value().svalue);
-                                else if (!getProperty("dontSaveFitResultMessage", false).toBool()) record->resultsSetInStringList(evalID, param=("fitalg_"+it.key()), run, it.value().svalue, it.value().unit);
+                                else if (saveLongStrings) record->resultsSetInStringList(evalID, param=("fitalg_"+it.key()), run, it.value().svalue, it.value().unit);
                                 break;
 
                             case QFRawDataRecord::qfrdreBooleanVector:

@@ -128,6 +128,7 @@ void QFERTResultCalculator::eval()
     if (!p.hasErrorOccured()) {
         rdrA->resultsSetFromMathParser(getEvalIDA(), getNewResultName(), r);
         rdrA->resultsSetGroup(getEvalIDA(), getNewResultName(), "evaluation results");
+        //qDebug()<<getNewResultName()<<r.toTypeString();
     } else {
         QMessageBox::critical(this, tr("results calculator"), tr("error while parsing/evaluating expression: %1").arg(p.getLastError()));
         //ui->labError->setText(tr("<font color=\"red\">ERROR:</font> %1").arg(p.getLastError()));
@@ -266,7 +267,7 @@ void QFERTResultCalculator::on_cmbResultB_currentResultChanged(QString result, Q
     QFRawDataRecord* rdrA=getRecB();
     if (rdrA) {
         qfmpResult resA=rdrA->resultsGet(evalID, result).getAsMathParserResult();
-        ui->labPropertiesA->setText(QString("type: %1  items: %2").arg(resA.typeName()).arg(resA.length()));//.arg(QFRawDataRecord::evaluationResultType2String(resA.type)).arg(resA.getVectorMatrixItems()));
+        ui->labPropertiesB->setText(QString("type: %1  items: %2").arg(resA.typeName()).arg(resA.length()));//.arg(QFRawDataRecord::evaluationResultType2String(resA.type)).arg(resA.getVectorMatrixItems()));
     } else {
         ui->labPropertiesB->setText("");
     }

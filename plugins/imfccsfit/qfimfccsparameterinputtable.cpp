@@ -266,7 +266,7 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
                     for (int li=0; li<linked.size(); li++) {
                         item->setFitError(linked[li].second, value.toDouble(), item->getFitFile(linked[li].first));
                         if (fitParamListContainsID(linked[li].second, fitparamids, &row)) {
-                            QModelIndex idx=this->index(2+row, 1+linked[li].first*getColsPerRDR());
+                            QModelIndex idx=this->index(2+row, 1+linked[li].first*getColsPerRDR()+1);
                             emit dataChanged(idx, idx);
                         }
                     }
@@ -285,7 +285,7 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
                     for (int li=0; li<linked.size(); li++) {
                         item->setFitFix(linked[li].second, value.toBool(), item->getFitFile(linked[li].first));
                         if (fitParamListContainsID(linked[li].second, fitparamids, &row)) {
-                            QModelIndex idx=this->index(2+row, 1+linked[li].first*getColsPerRDR());
+                            QModelIndex idx=this->index(2+row, 1+linked[li].first*getColsPerRDR()+3);
                             emit dataChanged(idx, idx);
                         }
                     }

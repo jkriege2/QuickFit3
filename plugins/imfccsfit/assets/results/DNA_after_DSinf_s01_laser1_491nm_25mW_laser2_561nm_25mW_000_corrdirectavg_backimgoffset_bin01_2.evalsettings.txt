@@ -1,0 +1,54 @@
+date/time                   : 2013/05/21 10:33:39
+input file                  : ../DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000.tif
+input description file      : ../DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000.configuration.ini
+overview image file         : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.overview.tif
+overview image file real    : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.overview_float.tif
+overview std image          : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.overviewstd.tif
+background image file       : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.background.tif
+background stddev           : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.backgroundstd.tif
+uncorr. overview image file : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.overview_uncorrected.tif
+uncorr. overview std image  : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.overviewstd_uncorrected.tif
+video file                  : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.video.tif
+uncorrected video file      : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.videouncorr.tif
+statistics file             : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.statistics.dat
+background statistics file  : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.backstatistics.dat
+uncorrected statistics file : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.uncorrstatistics.dat
+statistics file DV1         : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.statistics_dv1.dat
+background statistics file DV1 : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.backstatistics_dv1.dat
+uncorrected statistics file DV1 : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.uncorrstatistics_dv1.dat
+statistics file DV2         : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.statistics_dv2.dat
+background statistics file DV2 : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.backstatistics_dv2.dat
+uncorrected statistics file DV2 : DNA_after_DSinf_s01_laser1_491nm_25mW_laser2_561nm_25mW_000_corrdirectavg_backimgoffset_bin01_2.uncorrstatistics_dv2.dat
+width                       : 128
+height                      : 6
+dualview mode               : 1
+binning                     : 1
+interleaved binning         : false
+averaging binning           : false
+frame count in file         : 699993
+frame count                 : 70000
+first frame                 : 0
+last frame                  : 69999
+correlation segments        : 2
+correlator S                : 11
+correlator m                : 2
+correlator P                : 16
+correlator type             : 2
+correlator type name        : direct with averaging
+smallest tau [s]            : 0.00033
+baseline                    : 0
+video sum up                : 699
+video frames                : 100
+video avgMin                : -1.63409
+video avgMax                : 45.4048
+video uncorrected avgMin    : 93.0428
+video uncorrected avgMax    : 140.917
+statistics over             : 700
+DCCF 0 role                   : FCCS
+DCCF 0 Delta x                : 64
+DCCF 0 Delta y                : 0
+DCCF 0 frame width            : 128
+DCCF 0 frame height           : 6
+bleach correction           : remove frame average
+bleach average frames       : 279
+duration [s]                : 88.798

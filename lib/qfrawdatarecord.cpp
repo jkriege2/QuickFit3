@@ -4326,15 +4326,19 @@ void QFRawDataRecord::evaluationResult::setFromMathParserResult(const qfmpResult
             case qfmpDouble:
                 type=QFRawDataRecord::qfrdreNumber;
                 dvalue=result.num;
+                break;
             case qfmpString:
                 type=QFRawDataRecord::qfrdreString;
                 svalue=result.str;
+                break;
             case qfmpBool:
                 type=QFRawDataRecord::qfrdreBoolean;
                 bvalue=result.boolean;
+                break;
             case qfmpDoubleVector:
                 type=QFRawDataRecord::qfrdreNumberVector;
                 dvec=result.numVec;
+                break;
             case qfmpVoid:
                 type=QFRawDataRecord::qfrdreInvalid;
                 break;
