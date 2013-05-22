@@ -611,7 +611,6 @@ QList<T2> qfSelectFromVector(const T1& selection, T2* data) {
 
 
 /*! \brief sort the vector \a data according to the permutation given in \a initialOrder and \newOrder
-    \ingroup qf3lib_tools
 
     After the call the element in \a data that was at position \c initialOder[0] will be at \c newOrder[0]
     and the element at \c initialOder[1] will be at \c newOrder[1] ...
@@ -680,13 +679,88 @@ QList<T3> qfQTripleListToThirdList(const QList<QTriple<T1, T2, T3> > &input) {
     return res;
 }
 
+enum QFImageHalf {
+    qfihNone=-1,
+    qfihLeft=0,
+    qfihRight=1,
+    qfihTop=2,
+    qfihBottom=3,
+
+    qfihAny=qfihNone
+};
+
+/*! \brief copy one half of an image
+    \ingroup qf3lib_tools
+
+    input has to be of size inWidth*inHeight, ahereas output is expected to be of size inWidth*inHeight/2!
+*/
+template <typename T1, typename T2>
+void qfCopyImageHalf(T1* output, const T2* input, int inWidth, int inHeight, QFImageHalf imageHalf) {
+    int width=inWidth;
+    int height=inHeight;
+    int shiftx=0;
+    int shifty=0;
+    bool ok=false;
+    if (imageHalf==qfihLeft) {
+        width=inWidth/2;
+        height=inHeight;
+        shiftx=0;
+        shifty=0;
+        ok=true;
+    } else if (imageHalf==qfihRight) {
+        width=inWidth/2;
+        height=inHeight;
+        shiftx=width;
+        shifty=0;
+        ok=true;
+    } else if (imageHalf==qfihTop) {
+        width=inWidth;
+        height=inHeight/2;
+        shiftx=0;
+        shifty=0;
+        ok=true;
+    } else if (imageHalf==qfihBottom) {
+        width=inWidth;
+        height=inHeight/2;
+        shiftx=0;
+        shifty=height;
+        ok=true;
+    }
+    for (int y=0; y<height; y++) {
+        for (int x=0; x<width; x++) {
+            const int idxIn=(y+shifty)*inWidth+x+shiftx;
+            const int idxOut=y*width+x;
+            output[idxOut]=input[idxIn];
+        }
+    }
+}
+
+/*! \brief remove all HTML comments from a string
+    \ingroup qf3lib_tools
+*/
 QFLIB_EXPORT QString removeHTMLComments(const QString& data);
 
 typedef QList<QPair<QString, QString> > QFHelpReplacesList;
-/** \copydoc QFPluginServices::setGlobalConfigValue() */
+/*! \copydoc QFPluginServices::transformQF3HelpHTML()
+    \ingroup qf3lib_tools
+ */
 QFLIB_EXPORT QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced=true, const QFHelpReplacesList& more_replaces=QFHelpReplacesList(), bool insertTooltips=false);
-/*! \brief transforms some special tags in the given input file. If the file does not exist, defaultText is used */
+/*! \brief transforms some special tags in the given input file. If the file does not exist, defaultText is used
+    \ingroup qf3lib_tools
+
+ */
 QFLIB_EXPORT QString transformQF3HelpHTMLFile(const QString& filename, const QString& defaultText=QString(""), bool removeNonReplaced=true, const QFHelpReplacesList& more_replaces=QFHelpReplacesList(), bool insertTooltips=false);
+/*! \brief converts a light wavelength (in nanometers) into a color representing this wavelength
+    \ingroup qf3lib_tools
+
+    This is based on code from:
+       - http://www.efg2.com/Lab/ScienceAndEngineering/Spectra.htm
+       - http://www.midnightkite.com/color.html
+    .
+ */
+QFLIB_EXPORT QColor wavelengthToColor(double wavelength);
+
+
 
 
 #endif // QFTOOLS_H

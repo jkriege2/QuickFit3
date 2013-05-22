@@ -59,6 +59,10 @@ class QFRDRImageStackPlugin : public QObject, public QFPluginRawDataRecordBase {
         /** \brief insertdata from file*/
         void insertSingleFileImageStack();
         void insertMultiFileImageStack();
+
+        void insertSingleFileHDualViewImageStack();
+        void insertSingleFileVDualViewImageStack();
+        void insertSingleFileDualViewImageStack(char dvMode='h');
 };
 
 #endif // QFRDRIMAGESTACK_H

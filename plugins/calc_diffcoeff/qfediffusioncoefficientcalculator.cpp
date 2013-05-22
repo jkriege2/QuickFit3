@@ -3,10 +3,12 @@
 #include <QtPlugin>
 #include <iostream>
 #include "dlgcalcdiffcoeff.h"
+#include "optionswidget.h"
+#include "qfmathtools.h"
 
 #define LOG_PREFIX QString("calc_diffcoeff >>> ").toUpper()
 
-#define K_BOLTZ 1.3806488e-23
+#define K_BOLTZ QF_K_BOLTZ
 
 QFEDiffusionCoefficientCalculator::QFEDiffusionCoefficientCalculator(QObject* parent):
     QObject(parent)
@@ -362,6 +364,21 @@ void QFEDiffusionCoefficientCalculator::setReportVal(const QString &name, QVaria
 void QFEDiffusionCoefficientCalculator::clearReportVals()
 {
     reportVals.clear();
+}
+
+QString QFEDiffusionCoefficientCalculator::pluginOptionsName() const
+{
+    return getName();
+}
+
+QIcon QFEDiffusionCoefficientCalculator::pluginOptionsIcon() const
+{
+    return QIcon(getIconFilename());
+}
+
+QFPluginOptionsWidget *QFEDiffusionCoefficientCalculator::createOptionsWidget(QWidget *parent)
+{
+    return new OptionsWidget(this, parent);
 }
 
 

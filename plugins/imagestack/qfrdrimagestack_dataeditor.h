@@ -56,6 +56,11 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         QComboBox* cmbChannelR;
         QComboBox* cmbChannelG;
         QComboBox* cmbChannelB;
+        QComboBox* cmbChannelA;
+        JKQTPImageModifierModeComboBox* cmbModifierMode;
+        JKQTPMathImageColorPaletteComboBox* cmbColorbar;
+        QLabel* labModifierMode;
+        QLabel* labColorbar;
         QComboBox* cmbChannelMode;
         ColorComboBox* cmbMaskColor;
         QSpinBox* spinBins;
@@ -63,6 +68,7 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         QLabel* labFrame;
         QVisibleHandleSplitter* splitter;
         QMenu* menuMask;
+        QLabel* labSelectiondata;
 
         QString lastMaskDir;
 
@@ -85,6 +91,11 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         JKQTPRGBMathImage* imageRGB;
         /** \brief plot for the excluded runs in pltOverview, plot plteOverviewSelectedData */
         JKQTPOverlayImageEnhanced* plteOverviewExcluded;
+        JKQTPOverlayImageEnhanced* plteOverviewSelected;
+
+        bool* selection;
+        int selectionWidth;
+        int selectionHeight;
 
         QFRDRImageMaskEditTools* maskTools;
 
@@ -96,6 +107,9 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         virtual void writeSettings();
 
         void addDataHistogram(double* data, bool *mask, int size, const QString& title, const QString& colX, const QString& colY, QColor col=QColor("darkblue"), double shift=0, double width=0.9);
+
+        void connectWidgets();
+        void disconnectWidgets();
 };
 
 #endif // QFRDRIMAGESTACKEDITOR_H

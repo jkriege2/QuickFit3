@@ -638,7 +638,11 @@ bool QFRDRImagingFCSData::loadOverview(double* overviewF, double* overviewF2, co
                 splitImage(overviewF, overviewF2, tmp, nx, ny);
             }
             free(tmp);
+        } else {
+            log_warning(tr("WARNING: could not load overview image file '%1'\n").arg(filename));
         }
+    } else {
+        log_warning(tr("WARNING: could not find overview image file '%1'\n").arg(filename));
     }
 
     if (!ok && overviewF) {
@@ -688,8 +692,13 @@ bool QFRDRImagingFCSData::loadImage(const QString& filename, double** data, int*
             *data=(double*)malloc(nx*ny*sizeof(double));
             ok=TIFFReadFrame<double>(tif, *data);
             TIFFClose(tif);
+        } else {
+            log_warning(tr("WARNING: could not load overview image file '%1'\n").arg(filename));
         }
+    } else {
+        log_warning(tr("WARNING: could not find overview image file '%1'\n").arg(filename));
     }
+
     double crscaling=getProperty("OVERVIEW_SCALING", 1.0).toDouble();
     if (crscaling!=1.0 && (*data)) {
         for (int i=0; i<(*width)*(*height); i++) {
@@ -736,7 +745,11 @@ bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int*
             } while (TIFFReadDirectory(tif) && i<=(*frames));
             TIFFClose(tif);
             //qDebug()<<getID()<<"loading video "<<filename<<"   siez="<<*width<<"x"<<*height<<"   frames="<<*frames;
+        } else {
+            log_warning(tr("WARNING: could not load overview image file '%1'\n").arg(filename));
         }
+    } else {
+        log_warning(tr("WARNING: could not find overview image file '%1'\n").arg(filename));
     }
     return ok;
 }

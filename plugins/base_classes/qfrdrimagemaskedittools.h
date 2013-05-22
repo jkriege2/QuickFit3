@@ -14,6 +14,7 @@
 #include <QStack>
 #include "jkqtplotter.h"
 #include <QToolBar>
+#include <QWidgetAction>
 
 class QFRDRImageMaskEditTools: public QObject {
         Q_OBJECT
@@ -38,6 +39,8 @@ class QFRDRImageMaskEditTools: public QObject {
         void unregisterPlotter(JKQtPlotter* plot);
         virtual void registerPlotterMaskToolsToToolbar(QToolBar *menu) const;
         void setUseDelay(bool use);
+
+        void setAllowEditSelection(bool enabled, bool* selectionArray=NULL, int width=0, int height=0);
 
     public slots:
         void loadMask();
@@ -67,6 +70,8 @@ class QFRDRImageMaskEditTools: public QObject {
         void updateAfterClick();
         void setImageEditMode();
 
+        void cmbModeChanged(int index);
+
     protected:
         QWidget* parentWidget;
         QPointer<QFRawDataRecord> rdr;
@@ -90,6 +95,8 @@ class QFRDRImageMaskEditTools: public QObject {
         QAction* actImagesDrawLine;
         QAction* actImagesScribble;
         QActionGroup* agImageSelectionActions;
+        QComboBox* cmbMode;
+        QWidgetAction* actMode;
 
 
         QList<QPointer<JKQtPlotter> > plotters;
@@ -102,6 +109,11 @@ class QFRDRImageMaskEditTools: public QObject {
         QString settingsPrefix;
         QTimer* timUpdateAfterClick;
         bool useDelay;
+
+        bool* selection;
+        int selectionWidth;
+        int selectionHeight;
+        bool selectionEditing;
 
 };
 

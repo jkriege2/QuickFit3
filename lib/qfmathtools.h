@@ -17,6 +17,11 @@
  */
 #define QF_NAVOGADRO (6.02214179e23)
 
+/*! \brief Boltzman's constant number \f$ k_B=1.380648813\cdot10^{-23}J/K \f$
+    \ingroup qf3lib_mathtools
+ */
+#define QF_K_BOLTZ 1.380648813e-23
+
 /*! \brief square root of pi \f$ \sqrt{\pi}=1.77245385091 \f$
     \ingroup qf3lib_mathtools
  */

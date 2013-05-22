@@ -14,5 +14,7 @@
         <file alias="player_stop.png">images/player_stop.png</file>
         <file alias="multifile_stack.png">images/multifile_stack.png</file>
         <file alias="singlefile_stack.png">images/singlefile_stack.png</file>
+        <file alias="singlefile_dvh_stack.png">images/singlefile_dvh_stack.png</file>
+        <file alias="singlefile_dvv_stack.png">images/singlefile_dvv_stack.png</file>
     </qresource>
 </RCC>

@@ -8,6 +8,7 @@
 #include "dlgcalcdiffcoeff.h"
 #include "qfextensiontool.h"
 #include "qfextensionreportingtool.h"
+#include "qfpluginoptionsdialog.h"
 #include <QList>
 #include <QStringList>
 /*!
@@ -18,9 +19,9 @@
 /*! \brief QFExtension implementation
     \ingroup qf3ext_qfe_calc_diffcoeff
  */
-class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase, public QFExtensionTool, public QFExtensionReportingTool {
+class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase, public QFExtensionTool, public QFExtensionReportingTool, public QFPluginOptionsDialogInterface {
         Q_OBJECT
-        Q_INTERFACES(QFExtension QFExtensionTool QFExtensionReportingTool)
+        Q_INTERFACES(QFExtension QFExtensionTool QFExtensionReportingTool QFPluginOptionsDialogInterface)
     public:
         /** Default constructor */
         QFEDiffusionCoefficientCalculator(QObject* parent=NULL);
@@ -48,7 +49,7 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=1;
+            minor=2;
         };
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
@@ -98,6 +99,10 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
 
         void setReportVal(const QString& name, QVariant val);
         void clearReportVals();
+
+        QString pluginOptionsName() const;
+        QIcon pluginOptionsIcon() const;
+        QFPluginOptionsWidget *createOptionsWidget(QWidget *parent);
 
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */

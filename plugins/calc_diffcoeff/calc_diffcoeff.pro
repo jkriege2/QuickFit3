@@ -17,15 +17,18 @@ HEADERS += qfediffusioncoefficientcalculator.h \
     dlgcalcdiffcoeff.h \
     ../interfaces/qfextensiontool.h \
     ../interfaces/qfextensionreportingtool.h \
-    dlgcomponentinfo.h
+    dlgcomponentinfo.h \
+    optionswidget.h
 
 SOURCES += qfediffusioncoefficientcalculator.cpp \
     dlgcalcdiffcoeff.cpp \
-    dlgcomponentinfo.cpp
+    dlgcomponentinfo.cpp \
+    optionswidget.cpp
 
 FORMS = \
     dlgcalcdiffcoeff.ui \
-    dlgcomponentinfo.ui
+    dlgcomponentinfo.ui \
+    optionswidget.ui
 
 RESOURCES += qfediffusioncoefficientcalculator.qrc
 

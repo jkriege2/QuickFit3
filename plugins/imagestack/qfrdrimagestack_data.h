@@ -30,6 +30,8 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
         Q_OBJECT
         Q_INTERFACES(QFRDRImageStackInterface QFRDRImageMaskInterface)
     public:
+
+
         /** Default constructor */
         QFRDRImageStackData(QFProject* parent);
         /** Default destructor */
@@ -162,13 +164,19 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
          */
         virtual void intReadData(QDomElement* e=NULL);
 
+
+
         double memsize;
 
         enum loadMode {
             lmGetSize,
             lmReadData
         };
-
+        enum DualViewMode {
+            dvNone=0,
+            dvHorizontal=1,
+            dvVertical=2
+        };
         struct ImageStack {
             ImageStack();
             double* data;
@@ -177,6 +185,7 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
             int height;
             int channels;
             int file;
+            DualViewMode dvMode;
         };
 
         /*! \brief load imagestack from file
@@ -184,12 +193,14 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
             The data is stored in the given ImageStack \a stack. If \a mode is lmGetSize, only the image stack sizes are stored in
             stack, if \a mode is lmReadData the image stack is read from the file.
          */
-        bool loadImageFile(ImageStack &stack, QString filename, loadMode mode, int channel=0);
+        bool loadImageFile(ImageStack &stack, QString filename, loadMode mode, int channel=0, QFImageHalf whichHalfToLoad=qfihAny);
         QList<ImageStack> stacks;
         /** \brief allocate memory for all entries in stacks */
         bool allocateMemory();
         /** \brief clear all memory allocated in stacks, does NOT clear stacks!!! */
         void clearMemory();
+
+        void loadImageStacks(const QString& stacktype, const QString& maskS=QString(""));
 
 };
 

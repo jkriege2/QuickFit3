@@ -752,3 +752,59 @@ QString transformQF3HelpHTML(const QString& input_html, const QString& filename,
     return QFPluginServices::getInstance()->transformQF3HelpHTML(input_html, filename, removeNonReplaced, more_replaces, insertTooltips);
 }
 
+int wavelengthToColorAdjust(double color, double factor, double gamma=0.8, int IntensityMax=255) {
+    if (color==0) return 0;
+    else return qBound(0,(int)round(IntensityMax * pow(color * factor, gamma)), IntensityMax);
+}
+
+QColor wavelengthToColor(double wavelength) {
+    int IntensityMax=255;
+    double gamma=0.8;
+    double factor=1;
+
+    double r=0, g=0, b=0;
+
+    if (wavelength<380) {
+        r=1;
+        g=0;
+        b=1;
+    } else if (wavelength>=380 && wavelength<=439) {
+        r=-(wavelength-440.0)/(440.0-380.0);
+        g=0;
+        b=1;
+    } else if (wavelength>439 && wavelength<=489) {
+        r=0;
+        g=(wavelength-439.0)/(490.0-439.0);
+        b=1;
+    } else if (wavelength>489 && wavelength<=509) {
+        r=0;
+        g=1;
+        b=-(wavelength-510.0)/(510.0-490.0);
+    } else if (wavelength>509 && wavelength<=579) {
+        r= (wavelength - 510.0) / (580.0 - 510.0);
+        g= 1.0;
+        b= 0.0;
+    } else if (wavelength>579 && wavelength<=644) {
+        r= 1.0;
+        g= -(wavelength - 645.0) / (645.0 - 580.0);
+        b= 0.0;
+    } else if (wavelength>644 ) {
+        r= 1.0;
+        g= 0.0;
+        b= 0.0;
+    }
+
+    if (wavelength<380) {
+        factor=0.3;
+    } else if (wavelength>=380 && wavelength<=419) {
+        factor = 0.3 + 0.7*(wavelength - 380.0) / (420.0 - 380.0);
+    } else if (wavelength>700 && wavelength<=780.0) {
+        factor = 0.3 + 0.7*(780.0 - wavelength) / (780.0 - 700.0);
+    } else if (wavelength>780.0) {
+        factor=0.3;
+    }
+
+    return QColor(wavelengthToColorAdjust(r, factor, gamma, IntensityMax),
+                  wavelengthToColorAdjust(g, factor, gamma, IntensityMax),
+                  wavelengthToColorAdjust(b, factor, gamma, IntensityMax));
+}

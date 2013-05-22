@@ -43,23 +43,43 @@ void QFRDRImageStackData::intReadData(QDomElement* e) {
     //qDebug()<<maskS;
     clearMemory();
     stacks.clear();
+    loadImageStacks(stacktype, maskS);
+}
+
+void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QString &maskS)
+{
     if (stacktype=="ONEFILEPERSTACK") {
         if (files.size()>0) {
-            getProject()->getServices()->log_text(tr("  - loading images in image stack '%1'\n").arg(getName()));
+            log_text(tr("  - loading images in image stack '%1'\n").arg(getName()));
             // we need two runs: in the first one, we only read the image stack sizes, then we can allocate the memory for the
             // image series and finally read in the data
             for (int f=0; f<files.size(); f++) {
-                if (files_types.value(f, "image").toLower()=="image") {
+                QString ft=files_types.value(f, "image").toLower();
+                if (ft=="image" || ft=="image_hdualview" || ft=="image_vdualview") {
                     QFRDRImageStackData::ImageStack s;
                     s.file=f;
                     stacks.append(s);
                     loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmGetSize);
-                    getProject()->getServices()->log_text(tr("    * image stack %1 (file: '%2') size:   width=%3,   height=%4,   frames=%5\n").arg(stacks.size()).arg(files[f]).arg(stacks.last().width).arg(stacks.last().height).arg(stacks.last().frames));
+                    QString dvMode="none";
+                    stacks.last().dvMode=dvNone;
+                    if (ft=="image_hdualview") {
+                        dvMode="h";
+                        stacks.last().width=stacks.last().width/2;
+                        stacks.last().dvMode=dvHorizontal;
+                        stacks.last().channels=2;
+                    } else if (ft=="image_vdualview") {
+                        stacks.last().height=stacks.last().height/2;
+                        dvMode="v";
+                        stacks.last().dvMode=dvVertical;
+                        stacks.last().channels=2;
+                    }
+                    getProject()->getServices()->log_text(tr("    * image stack %1 (file: '%2', %7) size:   width=%3,   height=%4,   frames=%5,   DualViewMode=%6\n").arg(stacks.size()).arg(files[f]).arg(stacks.last().width).arg(stacks.last().height).arg(stacks.last().frames).arg(dvMode).arg(ft));
                     setQFProperty(QString("WIDTH%1").arg(stacks.size()-1), stacks.last().width, false, true);
                     setQFProperty(QString("HEIGHT%1").arg(stacks.size()-1), stacks.last().height, false, true);
                     setQFProperty(QString("FRAMES%1").arg(stacks.size()-1), stacks.last().frames, false, true);
                     setQFProperty(QString("CHANNELS%1").arg(stacks.size()-1), stacks.last().channels, false, true);
                     setQFProperty(QString("FILENUM%1").arg(stacks.size()-1), stacks.last().file, false, true);
+                    setQFProperty(QString("DUALVIEWMODE%1").arg(stacks.size()-1), stacks.last().dvMode, false, true);
 
                     QString p;
                     p=QString("XUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "pixels"), true, true);
@@ -90,12 +110,14 @@ void QFRDRImageStackData::intReadData(QDomElement* e) {
                 getProject()->getServices()->log_text(tr("  - allocated %1 of memory\n").arg(bytestostr(memsize).c_str()));
                 int stack=0;
                 for (int f=0; f<files.size(); f++) {
-                    if (files_types.value(f, "image").toLower()=="image" && (stack<stacks.size())) {
+                    QString ft=files_types.value(f, "image").toLower();
+                    if ((ft=="image" || ft=="image_hdualview" || ft=="image_vdualview" ) && (stack<stacks.size())) {
                         getProject()->getServices()->log_text(tr("    * loading image stack %1/%2 (file: '%3') ...\n").arg(stack+1).arg(stacks.size()).arg(files[f]));
-                        if (loadImageFile(stacks[stack], files[f], QFRDRImageStackData::lmReadData)) {
+                        if (loadImageFile(stacks[stack], files[f], QFRDRImageStackData::lmReadData, 0, qfihAny)) {
                             stack++;
                         } else {
                             setError(tr("error loading image stack %1 (file: '%2')\n").arg(stacks.size()).arg(files[f]));
+                            log_error(tr("error loading image stack %1 (file: '%2')\n").arg(stacks.size()).arg(files[f]));
                             return;
                         }
                     }
@@ -103,8 +125,14 @@ void QFRDRImageStackData::intReadData(QDomElement* e) {
                 if (maskS.size()>0) getProject()->getServices()->log_text(tr("    * loading image mask (%1) ...\n").arg(maskS));
                 maskClear();
                 maskLoadFromListString(maskS,',', ';');
-            } else setError(tr("Error allocating %1 of memory!").arg(bytestostr(memsize).c_str()));
-        } else setError(tr("there are no files in the %1 record!").arg(getName()));
+            } else {
+                setError(tr("Error allocating %1 of memory!").arg(bytestostr(memsize).c_str()));
+                log_error(tr("Error allocating %1 of memory!").arg(bytestostr(memsize).c_str()));
+            }
+        } else {
+            setError(tr("there are no files in the %1 record!").arg(getName()));
+            log_error(tr("there are no files in the %1 record!").arg(getName()));
+        }
     } else if (stacktype=="ONEFILEPERCHANNEL") {
         if (files.size()>0) {
             getProject()->getServices()->log_text(tr("  - loading images in image stack '%1'\n").arg(getName()));
@@ -114,20 +142,37 @@ void QFRDRImageStackData::intReadData(QDomElement* e) {
             { QFRDRImageStackData::ImageStack s;
             stacks.append(s); }
             for (int f=0; f<files.size(); f++) {
-                if (files_types.value(f, "image").toLower()=="image") {
+                QString ft=files_types.value(f, "image").toLower();
+                if (ft=="image" || ft=="image_ldualview" || ft=="image_rdualview" || ft=="image_tdualview" || ft=="image_bdualview") {
                     stacks.last().file=f;
 
                     int c=stacks.last().channels;
                     int w=stacks.last().width;
                     int h=stacks.last().height;
                     int fr=stacks.last().frames;
-
                     loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmGetSize);
-                    getProject()->getServices()->log_text(tr("    * image stack %1 (file: '%2') size:   width=%3,   height=%4,   frames=%5\n").arg(stacks.size()).arg(files[f]).arg(stacks.last().width).arg(stacks.last().height).arg(stacks.last().frames));
+
+                    QString dvMode="none";
+                    stacks.last().dvMode=dvNone;
+                    if (ft=="image_ldualview" || ft=="image_rdualview") {
+                        dvMode="h";
+                        stacks.last().width=stacks.last().width/2;
+                        stacks.last().dvMode=dvHorizontal;
+                        stacks.last().channels=2;
+                    } else if (ft=="image_tdualview" || ft=="image_bdualview") {
+                        stacks.last().height=stacks.last().height/2;
+                        dvMode="v";
+                        stacks.last().dvMode=dvVertical;
+                        stacks.last().channels=2;
+                    }
+
+
+                    getProject()->getServices()->log_text(tr("    * image stack %1 (file: '%2', %7) size:   width=%3,   height=%4,   frames=%5,   DualViewMode=%6\n").arg(stacks.size()).arg(files[f]).arg(stacks.last().width).arg(stacks.last().height).arg(stacks.last().frames).arg(dvMode).arg(ft));
                     setQFProperty(QString("WIDTH%1").arg(stacks.size()-1), stacks.last().width, false, true);
                     setQFProperty(QString("HEIGHT%1").arg(stacks.size()-1), stacks.last().height, false, true);
                     setQFProperty(QString("FRAMES%1").arg(stacks.size()-1), stacks.last().frames, false, true);
                     setQFProperty(QString("FILENUM%1").arg(stacks.size()-1), stacks.last().file, false, true);
+                    setQFProperty(QString("DUALVIEWMODE%1").arg(stacks.size()-1), stacks.last().dvMode, false, true);
 
                     stacks.last().channels=c+1;
 
@@ -139,6 +184,7 @@ void QFRDRImageStackData::intReadData(QDomElement* e) {
                          ||(h!=stacks.last().height)
                          ||(fr!=stacks.last().frames)) ) {
                         setError(tr("size of file '%1'' does not fit the size of the other files in this stack").arg(files[f]));
+                        log_error(tr("size of file '%1'' does not fit the size of the other files in this stack").arg(files[f]));
                     }
 
                 }
@@ -167,12 +213,50 @@ void QFRDRImageStackData::intReadData(QDomElement* e) {
                 int channel=0;
                 getProject()->getServices()->log_text(tr("  - allocated %1 of memory\n").arg(bytestostr(memsize).c_str()));
                 for (int f=0; f<files.size(); f++) {
-                    if (files_types.value(f, "image").toLower()=="image") {
+                    QString ft=files_types.value(f, "image").toLower();
+                    if (ft=="image") {
                         getProject()->getServices()->log_text(tr("    * loading image stack %1 (file: '%2') ...\n").arg(stacks.size()).arg(files[f]));
                         if (loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmReadData, channel)) {
                             channel++;
                         } else {
                             setError(tr("error loading image stack %1 (file: '%2')\n").arg(stacks.size()).arg(files[f]));
+                            log_error(tr("error loading image stack %1 (file: '%2')\n").arg(stacks.size()).arg(files[f]));
+                            return;
+                        }
+                    } else if (ft=="image_ldualview") {
+                        getProject()->getServices()->log_text(tr("    * loading image stack %1 (file: '%2', left half) ...\n").arg(stacks.size()).arg(files[f]));
+                        if (loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmReadData, channel, qfihLeft)) {
+                            channel++;
+                        } else {
+                            setError(tr("error loading image stack %1 (file: '%2', left half)\n").arg(stacks.size()).arg(files[f]));
+                            log_error(tr("error loading image stack %1 (file: '%2', left half)\n").arg(stacks.size()).arg(files[f]));
+                            return;
+                        }
+                    } else if (ft=="image_rdualview") {
+                        getProject()->getServices()->log_text(tr("    * loading image stack %1 (file: '%2', right half) ...\n").arg(stacks.size()).arg(files[f]));
+                        if (loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmReadData, channel, qfihRight)) {
+                            channel++;
+                        } else {
+                            setError(tr("error loading image stack %1 (file: '%2', right half)\n").arg(stacks.size()).arg(files[f]));
+                            log_error(tr("error loading image stack %1 (file: '%2', right half)\n").arg(stacks.size()).arg(files[f]));
+                            return;
+                        }
+                    } else if (ft=="image_tdualview") {
+                        getProject()->getServices()->log_text(tr("    * loading image stack %1 (file: '%2', top half) ...\n").arg(stacks.size()).arg(files[f]));
+                        if (loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmReadData, channel, qfihTop)) {
+                            channel++;
+                        } else {
+                            setError(tr("error loading image stack %1 (file: '%2', top half)\n").arg(stacks.size()).arg(files[f]));
+                            log_error(tr("error loading image stack %1 (file: '%2', top half)\n").arg(stacks.size()).arg(files[f]));
+                            return;
+                        }
+                    } else if (ft=="image_bdualview") {
+                        getProject()->getServices()->log_text(tr("    * loading image stack %1 (file: '%2', bottom half) ...\n").arg(stacks.size()).arg(files[f]));
+                        if (loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmReadData, channel, qfihBottom)) {
+                            channel++;
+                        } else {
+                            setError(tr("error loading image stack %1 (file: '%2', bottom half)\n").arg(stacks.size()).arg(files[f]));
+                            log_error(tr("error loading image stack %1 (file: '%2', bottom half)\n").arg(stacks.size()).arg(files[f]));
                             return;
                         }
                     }
@@ -180,22 +264,30 @@ void QFRDRImageStackData::intReadData(QDomElement* e) {
                 if (maskS.size()>0) getProject()->getServices()->log_text(tr("    * loading image mask (%1) ...\n").arg(maskS));
                 maskClear();
                 maskLoadFromListString(maskS,',', ';');
-            } else setError(tr("Error allocating %1 of memory!").arg(bytestostr(memsize).c_str()));
-        } else setError(tr("there are no files in the %1 record!").arg(getName()));
+            } else {
+                setError(tr("Error allocating %1 of memory!").arg(bytestostr(memsize).c_str()));
+                log_error(tr("Error allocating %1 of memory!").arg(bytestostr(memsize).c_str()));
+            }
+        } else {
+            setError(tr("there are no files in the %1 record!").arg(getName()));
+            log_error(tr("there are no files in the %1 record!").arg(getName()));
+        }
     } else {
         setError(tr("Error while reading image stack: unknown stack type %1").arg(stacktype));
+        log_error(tr("Error while reading image stack: unknown stack type %1").arg(stacktype));
         return;
     }
 
 }
 
-bool QFRDRImageStackData::loadImageFile(QFRDRImageStackData::ImageStack& stack, QString filename, loadMode mode, int channel) {
+bool QFRDRImageStackData::loadImageFile(QFRDRImageStackData::ImageStack& stack, QString filename, loadMode mode, int channel, QFImageHalf whichHalfToLoad) {
 	bool ok=true;
     QString filetype=getProperty("FILETYPE", "").toString();
     QStringList reader_id=QFRDRImageStackData::getImageReaderIDList(getProject()->getServices());
     int reader_idx=reader_id.indexOf(filetype);
     if (!reader_id.contains(filetype)) {
         setError(tr("Error while reading image: unknown file type %2 (file was: '%1')").arg(filename).arg(filetype));
+        log_error(tr("Error while reading image: unknown file type %2 (file was: '%1')").arg(filename).arg(filetype));
         return false;
     }
 
@@ -210,8 +302,28 @@ bool QFRDRImageStackData::loadImageFile(QFRDRImageStackData::ImageStack& stack, 
             } else {
                 uint32_t i=0;
                 do {
-                    double* d=&(stack.data[channel*stack.width*stack.height*stack.frames + i*stack.width*stack.height]);
-                    reader->readFrameDouble(d);
+                    if (stack.dvMode==dvNone) {
+                        double* d=&(stack.data[channel*stack.width*stack.height*stack.frames + i*stack.width*stack.height]);
+                        reader->readFrameDouble(d);
+                    } else {
+                        double* tmp=(double*)malloc(reader->frameWidth()*reader->frameHeight()*sizeof(double));
+                        reader->readFrameDouble(tmp);
+                        if (whichHalfToLoad==qfihAny) {
+                            double* d1=&(stack.data[channel*stack.width*stack.height*stack.frames + i*stack.width*stack.height]);
+                            double* d2=&(stack.data[(channel+1)*stack.width*stack.height*stack.frames + i*stack.width*stack.height]);
+                            if (stack.dvMode==dvHorizontal) {
+                                qfCopyImageHalf(d1, tmp, reader->frameWidth(), reader->frameHeight(), qfihLeft);
+                                qfCopyImageHalf(d2, tmp, reader->frameWidth(), reader->frameHeight(), qfihRight);
+                            } else if (stack.dvMode==dvHorizontal) {
+                                qfCopyImageHalf(d1, tmp, reader->frameWidth(), reader->frameHeight(), qfihTop);
+                                qfCopyImageHalf(d2, tmp, reader->frameWidth(), reader->frameHeight(), qfihBottom);
+                            }
+                        } else if (whichHalfToLoad!=qfihNone) {
+                            double* d1=&(stack.data[channel*stack.width*stack.height*stack.frames + i*stack.width*stack.height]);
+                            qfCopyImageHalf(d1, tmp, reader->frameWidth(), reader->frameHeight(), whichHalfToLoad);
+                        }
+                        free(tmp);
+                    }
                     i++;
                 } while (i<stack.frames && reader->nextFrame());
             }
@@ -220,13 +332,18 @@ bool QFRDRImageStackData::loadImageFile(QFRDRImageStackData::ImageStack& stack, 
         } else {
             ok=false;
             setError(tr("Could not open image file '%1' with reader %2").arg(filename).arg(filetype));
+            log_error(tr("Could not open image file '%1' with reader %2").arg(filename).arg(filetype));
         }
     } else {
         ok=false;
         setError(tr("Could not allocate reader %2 for image file '%1'").arg(filename).arg(filetype));
+        log_error(tr("Could not allocate reader %2 for image file '%1'").arg(filename).arg(filetype));
     }
 
-    if (!ok) setError(tr("Error while reading file '%1'").arg(filename));
+    if (!ok) {
+        setError(tr("Error while reading file '%1'").arg(filename));
+        log_error(tr("Error while reading file '%1'").arg(filename));
+    }
     return ok;
 }
 
@@ -255,6 +372,7 @@ void QFRDRImageStackData::clearMemory() {
     memsize=0;
     maskDelete();
 }
+
 
 QVariant QFRDRImageStackData::getEnumeratedProperty(const QString &prop, int stack, QVariant defaultValue) const {
     QVariant res=getProperty(prop, defaultValue);
@@ -419,3 +537,4 @@ QFRDRImageStackData::ImageStack::ImageStack() {
     channels=0;
     file=-1;
 }
+

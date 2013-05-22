@@ -1011,7 +1011,8 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
         for (int i=0; i< files.size(); i++) {
             QString file=files[i];
             QFileInfo fi(project->getFile());
-            file=fi.absoluteDir().relativeFilePath(files[i]);
+            //file=fi.absoluteDir().relativeFilePath(files[i]);
+            file=QDir(fi.canonicalPath()).relativeFilePath(QFileInfo(files[i]).canonicalFilePath());
             w.writeStartElement("file");
             if (i<files_types.size()) {
                 if (!files_types[i].isEmpty()) {

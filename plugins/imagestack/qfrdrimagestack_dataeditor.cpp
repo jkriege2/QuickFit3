@@ -7,13 +7,16 @@ QFRDRImageStackDataEditor::QFRDRImageStackDataEditor(QFPluginServices* services,
 {
     dataMode=QFRDRImageStackDataEditor::dmFullHistogram;
     maskTools=new QFRDRImageMaskEditTools(this, QString("imagestackeditor/"));
+    selection=NULL;
+    selectionWidth=0;
+    selectionHeight=0;
     createWidgets();
     connect(maskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
 }
 
 QFRDRImageStackDataEditor::~QFRDRImageStackDataEditor()
 {
-    //dtor
+    if (selection) free(selection);
 }
 
 void QFRDRImageStackDataEditor::createWidgets() {
@@ -39,7 +42,7 @@ void QFRDRImageStackDataEditor::createWidgets() {
     layTop->addWidget(new QLabel(tr("<b>channel mode:</b>")));
     cmbChannelMode=new QComboBox(this);
     cmbChannelMode->addItem(tr("single-channel"));
-    cmbChannelMode->addItem(tr("3-channel RGB"));
+    cmbChannelMode->addItem(tr("4-channel RGBA"));
     cmbChannelMode->setCurrentIndex(0);
     layTop->addWidget(cmbChannelMode);
     layTop->addWidget(new QLabel(tr("<b>channels:</b>")));
@@ -49,6 +52,20 @@ void QFRDRImageStackDataEditor::createWidgets() {
     layTop->addWidget(cmbChannelG);
     cmbChannelB=new QComboBox(this);
     layTop->addWidget(cmbChannelB);
+    cmbChannelA=new QComboBox(this);
+    layTop->addWidget(cmbChannelA);
+    /*
+        QComboBox* cmbChannelA;
+        JKQTPImageModifierModeComboBox* cmbModifierMode;
+        JKQTPMathImageColorPaletteComboBox* cmbColorbar;
+
+      */
+    layTop->addWidget(labModifierMode= new QLabel(tr("<b>A mode:</b>")));
+    cmbModifierMode=new JKQTPImageModifierModeComboBox(this);
+    layTop->addWidget(cmbModifierMode);
+    layTop->addWidget(labColorbar= new QLabel(tr("<b>palette:</b>")));
+    cmbColorbar=new JKQTPMathImageColorPaletteComboBox(this);
+    layTop->addWidget(cmbColorbar);
     layTop->addStretch();
 
     layTop->addWidget(new QLabel(tr("<b>mask color:</b>")));
@@ -117,13 +134,18 @@ void QFRDRImageStackDataEditor::createWidgets() {
     sizes<<round(splitter->width()/2.0)<<round(splitter->width()/2.0);
     splitter->setSizes(sizes);
 
+    QGridLayout* layLabels=new QGridLayout(this);
 
+    labSelectiondata=new QLabel(this);
+    layLabels->addWidget(labSelectiondata, 0, 1, 3,1);
+    layLabels->setColumnStretch(0,1);
+    layLabels->setColumnStretch(1,3);
 
     labDescription=new QLabel(this);
-    mainLay->addWidget(labDescription);
+    layLabels->addWidget(labDescription, 0,0);
     labFrame=new QLabel(this);
-    mainLay->addWidget(labFrame);
-
+    layLabels->addWidget(labFrame,1,0);
+    mainLay->addLayout(layLabels);
     player=new QFPLayerControls(this);
     player->setVisible(false);
     mainLay->addWidget(labTAxis=new QLabel(tr("<b>time/z axis:</b>")));
@@ -146,8 +168,12 @@ void QFRDRImageStackDataEditor::createWidgets() {
 
     QColor ovlExCol=QColor("black");
     //ovlExCol.setAlphaF(0.5);
+    QColor ovlSelCol=QColor("red");
+    ovlSelCol.setAlphaF(0.5);
     plteOverviewExcluded=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlExCol, pltImage->get_plotter());
     plteOverviewExcluded->set_rectanglesAsImageOverlay(true);
+    plteOverviewSelected=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlSelCol, pltImage->get_plotter());
+    plteOverviewSelected->set_rectanglesAsImageOverlay(true);
 
 
 
@@ -161,20 +187,11 @@ void QFRDRImageStackDataEditor::createWidgets() {
     toolbar->addAction(pltImage->get_plotter()->get_actZoomIn());
     toolbar->addAction(pltImage->get_plotter()->get_actZoomOut());
     toolbar->addSeparator();
-    //toolbar->addAction(actEditMask);
     maskTools->registerPlotterMaskToolsToToolbar(toolbar);
 
 
     menuMask=propertyEditor->addMenu("&Mask", 0);
-    /*menuMask->addAction(actClearMask);
-    menuMask->addAction(actInvertMask);
-    menuMask->addAction(actEditMask);
-    menuMask->addSeparator();
-    menuMask->addAction(actSaveMask);
-    menuMask->addAction(actLoadMask);
-    menuMask->addSeparator();
-    menuMask->addAction(actCopyMask);
-    menuMask->addAction(actPasteMask);*/
+
     maskTools->registerMaskToolsToMenu(menuMask);
 
 };
@@ -213,7 +230,7 @@ void QFRDRImageStackDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
     connect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
     connect(cmbChannelMode, SIGNAL(currentIndexChanged(int)), this, SLOT(channelModeChanged()));
     //connect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)));
-    channelModeChanged();
+    //channelModeChanged();
     stackChanged();
 };
 
@@ -228,12 +245,19 @@ void QFRDRImageStackDataEditor::rawDataChanged() {
 void QFRDRImageStackDataEditor::readSettings() {
 	// read widget settings
     if (!settings) return;
+    //qDebug()<<"readSettings()";
     QString prefix="image_stack/";
+    bool upd=updatesEnabled();
+    setUpdatesEnabled(false);
     player->setFPS(settings->getQSettings()->value(prefix+"player_fps", player->getFPS()).toDouble());
     player->setReplay(settings->getQSettings()->value(prefix+"player_replay", player->getReplay()).toBool());
     cmbChannelMode->setCurrentIndex(settings->getQSettings()->value(prefix+"imagemode", 0).toInt());
-    spinBins->setValue(settings->getQSettings()->value(prefix+"bins", 200).toInt());
+    cmbColorbar->setCurrentIndex(settings->getQSettings()->value(prefix+"colorbar", JKQTPMathImage::GRAY).toInt());
+    cmbModifierMode->setCurrentIndex(settings->getQSettings()->value(prefix+"modifiermode", JKQTPMathImageBase::ModifyAlpha).toInt());
+    spinBins->setValue(settings->getQSettings()->value(prefix+"bins", 100).toInt());
     loadSplitter(*(settings->getQSettings()), splitter, prefix);
+    setUpdatesEnabled(upd);
+    //qDebug()<<"readSettings(): done";
 }
 
 
@@ -244,6 +268,8 @@ void QFRDRImageStackDataEditor::writeSettings() {
     settings->getQSettings()->setValue(prefix+"player_fps", player->getFPS());
     settings->getQSettings()->setValue(prefix+"player_replay", player->getReplay());
     settings->getQSettings()->setValue(prefix+"imagemode", cmbChannelMode->currentIndex());
+    settings->getQSettings()->setValue(prefix+"colorbar", cmbColorbar->currentIndex());
+    settings->getQSettings()->setValue(prefix+"modifiermode", cmbModifierMode->currentIndex());
     settings->getQSettings()->setValue(prefix+"bins", spinBins->value());
     saveSplitter(*(settings->getQSettings()), splitter, prefix);
 }
@@ -266,15 +292,38 @@ void QFRDRImageStackDataEditor::addDataHistogram(double *data, bool* mask, int s
     plteHistogram->set_shift(shift);
     plteHistogram->set_width(width);
     plteHistogram->set_fillColor(col);
-    plteHistogram->set_color(col.darker());
+    plteHistogram->set_color(col);
     pltData->addGraph(plteHistogram);
 
     free(histX);
     free(histY);
 }
 
+void QFRDRImageStackDataEditor::connectWidgets()
+{
+    connect(cmbChannelR, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    connect(cmbChannelG, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    connect(cmbChannelB, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    connect(cmbChannelA, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    connect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    connect(cmbModifierMode, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    connect(cmbMaskColor, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+}
+
+void QFRDRImageStackDataEditor::disconnectWidgets()
+{
+    disconnect(cmbChannelR, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    disconnect(cmbChannelG, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    disconnect(cmbChannelB, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    disconnect(cmbChannelA, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    disconnect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    disconnect(cmbModifierMode, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    disconnect(cmbMaskColor, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+}
+
 
 void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
+    //qDebug()<<"showFrame("<<frame<<startPlayer<<")";
     bool dd=pltImage->get_doDrawing();
     pltImage->set_doDrawing(false);
     bool ddd=pltData->get_doDrawing();
@@ -285,6 +334,8 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
     pltData->clearGraphs(true);
     JKQTPdatastore* dsData=pltData->getDatastore();
     dsData->clear();
+    QString selectiontextA="";
+    QString selectiontextD="";
 
     QFRDRImageStackData* mv=qobject_cast<QFRDRImageStackData*>(current);
     if (mv && cmbImageStack->currentIndex()<mv->getImageStackCount()) {
@@ -294,6 +345,35 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
         int channel=cmbChannelR->currentIndex();
         int channelG=cmbChannelG->currentIndex();
         int channelB=cmbChannelB->currentIndex();
+        int channelA=cmbChannelA->currentIndex();
+        double* ar=NULL;
+        double amin=0;
+        double amax=0;
+        if (channelA>=0 && channelA<mv->getImageStackChannels(idx)) ar=mv->getImageStack(idx, frame, channelA);
+        if (ar && mv->maskGet()) statisticsMaskedMinMax(ar, mv->maskGet(), width*height, amin, amax, false);
+
+        if (!selection || selectionWidth!=width || selectionHeight!=height) {
+            selection=(bool*)realloc(selection, width*height*sizeof(bool));
+            selectionWidth=width;
+            selectionHeight=height;
+            if (selection) for (int i=0; i<width*height; i++) selection[i]=false;
+        }
+
+        plteOverviewSelected->set_data(selection, width, height);
+        plteOverviewSelected->set_width(width);
+        plteOverviewSelected->set_height(height);
+        maskTools->setAllowEditSelection(selection, selection, selectionWidth, selectionHeight);
+        if (selection&&ar) {
+            double var, vara;
+            double avg=statisticsAverageVarianceMasked(var, selection, ar, width*height, true);
+            double avga=statisticsAverageVariance(vara, ar, width*height);
+            selectiontextA=tr("<b>A <small>[sel/all]</small>:</b> (%3&plusmn;%4) / (%1&plusmn;%2)").arg(avga).arg(sqrt(vara)).arg(avg).arg(sqrt(var));
+        } else if (ar) {
+            double vara;
+            double avga=statisticsAverageVariance(vara, ar, width*height);
+            selectiontextA=tr("<b>A <small>[all]</small>:</b> (%1&plusmn;%2)").arg(avga).arg(sqrt(vara));
+        }
+
         if (cmbChannelMode->currentIndex()==0) {
             double* ir=NULL;
 
@@ -303,7 +383,20 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
             //qDebug()<<"frame="<<frame<<"   "<<ir;
 
             image->set_data(ir, width, height, JKQTPMathImageBase::DoubleArray);
+            image->set_dataModifier(ar, JKQTPMathImageBase::DoubleArray);
+            image->set_modifierMode(cmbModifierMode->getModifierMode());
+            image->set_palette(cmbColorbar->colorPalette());
 
+            if (selection&&ir) {
+                double var, vara;
+                double avg=statisticsAverageVarianceMasked(var, selection, ir, width*height, true);
+                double avga=statisticsAverageVariance(vara, ir, width*height);
+                selectiontextD=tr("<b>D <small>[sel/all]</small>:</b> (%3&plusmn;%4) / (%1&plusmn;%2)").arg(avga).arg(sqrt(vara)).arg(avg).arg(sqrt(var));
+            } else if (ir) {
+                double vara;
+                double avga=statisticsAverageVariance(vara, ir, width*height);
+                selectiontextD=tr("<b>D <small>[all]</small>:</b> (%1&plusmn;%2)").arg(avga).arg(sqrt(vara));
+            }
             if (mv->maskGet()) {
                 double cmin=0;
                 double cmax=0;
@@ -311,8 +404,11 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
                 image->set_imageMin(cmin);
                 image->set_imageMax(cmax);
                 image->set_autoImageRange(false);
+                image->set_modifierMin(amin);
+                image->set_modifierMax(amax);
+                image->set_autoModifierRange(false);
             } else {
-                image->set_autoImageRange(true);
+                image->set_autoModifierRange(true);
             }
 
             pltImage->addGraph(image);
@@ -334,6 +430,41 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
             imageRGB->set_data(ir, ig, ib, width, height, JKQTPMathImageBase::DoubleArray);
             imageRGB->set_width(width);
             imageRGB->set_height(height);
+            imageRGB->set_dataModifier(ar, JKQTPMathImageBase::DoubleArray);
+            imageRGB->set_modifierMode(cmbModifierMode->getModifierMode());
+
+            if (selection&&ir) {
+                double var, vara;
+                double avg=statisticsAverageVarianceMasked(var, selection, ir, width*height, true);
+                double avga=statisticsAverageVariance(vara, ir, width*height);
+                selectiontextD=tr("<b>R <small>[sel/all]</small>:</b> (%3&plusmn;%4) / (%1&plusmn;%2)").arg(avga).arg(sqrt(vara)).arg(avg).arg(sqrt(var));
+            } else if (ir) {
+                double vara;
+                double avga=statisticsAverageVariance(vara, ir, width*height);
+                selectiontextD=tr("<b>R <small>[all]</small>:</b> (%1&plusmn;%2)").arg(avga).arg(sqrt(vara));
+            }
+            if (!selectiontextD.isEmpty()) selectiontextD+="<br>";
+            if (selection&&ig) {
+                double var, vara;
+                double avg=statisticsAverageVarianceMasked(var, selection, ig, width*height, true);
+                double avga=statisticsAverageVariance(vara, ig, width*height);
+                selectiontextD+=tr("<b>G <small>[sel/all]</small>:</b> (%3&plusmn;%4) / (%1&plusmn;%2)").arg(avga).arg(sqrt(vara)).arg(avg).arg(sqrt(var));
+            } else if (ig) {
+                double vara;
+                double avga=statisticsAverageVariance(vara, ig, width*height);
+                selectiontextD+=tr("<b>G <small>[all]</small>:</b> (%1&plusmn;%2)").arg(avga).arg(sqrt(vara));
+            }
+            if (!selectiontextD.isEmpty()) selectiontextD+="<br>";
+            if (selection&&ib) {
+                double var, vara;
+                double avg=statisticsAverageVarianceMasked(var, selection, ib, width*height, true);
+                double avga=statisticsAverageVariance(vara, ib, width*height);
+                selectiontextD+=tr("<b>B <small>[sel/all]</small>:</b> (%3&plusmn;%4) / (%1&plusmn;%2)").arg(avga).arg(sqrt(vara)).arg(avg).arg(sqrt(var));
+            } else if (ib) {
+                double vara;
+                double avga=statisticsAverageVariance(vara, ib, width*height);
+                selectiontextD+=tr("<b>B <small>[all]</small>:</b> (%1&plusmn;%2)").arg(avga).arg(sqrt(vara));
+            }
 
             if (mv->maskGet()) {
                 double cmin=0;
@@ -359,8 +490,13 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
                 }
 
                 imageRGB->set_autoImageRange(false);
+                image->set_modifierMin(amin);
+                image->set_modifierMax(amax);
+                image->set_autoModifierRange(false);
+
             } else {
                 imageRGB->set_autoImageRange(true);
+                image->set_autoModifierRange(true);
             }
 
 
@@ -372,15 +508,28 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
             }
         }
 
+        if (dataMode==QFRDRImageStackDataEditor::dmFullHistogram) {
+            if (ar) addDataHistogram(ar, mv->maskGet(), width*height, tr("alpha histogram"), tr("histogram_alpha_x"), tr("histogram_alpha_y"), QColor("darkgrey"), 0, 0.3);
+        }
         plteOverviewExcluded->set_data(mv->maskGet(), mv->maskGetWidth(), mv->maskGetHeight());
         plteOverviewExcluded->set_width(width);
         plteOverviewExcluded->set_height(height);
         plteOverviewExcluded->set_trueColor(cmbMaskColor->currentColor());
         pltImage->addGraph(plteOverviewExcluded);
+        pltImage->addGraph(plteOverviewSelected);
+
+
 
         emit displayedFrame((double)frame*mv->getImageStackTUnitFactor(idx));
         labFrame->setText(tr("<b>frame:</b> %1/%2 (%3 %4), masked: %5").arg(frame+1).arg(mv->getImageStackFrames(idx)).arg(frame*mv->getImageStackTUnitFactor(idx)).arg(mv->getImageStackTUnitName(idx)).arg(mv->maskGetCount()));
     }
+    QString text="";
+    if (!selectiontextA.isEmpty()) text=selectiontextA;
+    if (!selectiontextD.isEmpty()) {
+        if (!text.isEmpty()) text+="<br>";
+        text+=selectiontextD;
+    }
+    labSelectiondata->setText(text);
 
 
 
@@ -395,10 +544,12 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
         pltData->set_doDrawing(ddd);
         pltData->update_plot();
     }
+    //qDebug()<<"showFrame("<<frame<<startPlayer<<"): done";
 }
 
 void QFRDRImageStackDataEditor::displayImage() {
     if (!image) return;
+    //qDebug()<<"displayImage()";
     player->pause();
     current->setQFProperty("imstack_invrimgdisp_image", cmbImageStack->currentIndex(), false, false);
     QFRDRImageStackData* mv=qobject_cast<QFRDRImageStackData*>(current);
@@ -436,29 +587,32 @@ void QFRDRImageStackDataEditor::displayImage() {
     pltImage->set_doDrawing(true);
     //pltImage->zoomToFit();
     pltImage->update_plot();
+    //qDebug()<<"displayImage(): done";
 }
 
 void QFRDRImageStackDataEditor::stackChanged() {
     QFRDRImageStackData* mv=qobject_cast<QFRDRImageStackData*>(current);
     int idx=cmbImageStack->currentIndex();
-    disconnect(cmbChannelR, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
-    disconnect(cmbChannelG, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
-    disconnect(cmbChannelB, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    disconnectWidgets();
     if (cmbChannelR->currentIndex()>=0) current->setQFProperty("imstack_invrimgdisp_channelr", cmbChannelR->currentIndex(), false, false);
     if (cmbChannelG->currentIndex()>=0) current->setQFProperty("imstack_invrimgdisp_channelg", cmbChannelG->currentIndex(), false, false);
     if (cmbChannelB->currentIndex()>=0) current->setQFProperty("imstack_invrimgdisp_channelb", cmbChannelB->currentIndex(), false, false);
+    if (cmbChannelA->currentIndex()>=0) current->setQFProperty("imstack_invrimgdisp_channela", cmbChannelA->currentIndex(), false, false);
     cmbChannelR->clear();
     cmbChannelG->clear();
     cmbChannelB->clear();
+    cmbChannelA->clear();
     if (mv) {
         for (int c=0; c<mv->getImageStackChannels(idx); c++) {
             cmbChannelR->addItem(mv->getImageStackChannelName(idx, c));
             cmbChannelG->addItem(mv->getImageStackChannelName(idx, c));
             cmbChannelB->addItem(mv->getImageStackChannelName(idx, c));
+            cmbChannelA->addItem(mv->getImageStackChannelName(idx, c));
         }
         cmbChannelR->addItem(tr("--- none ---"));
         cmbChannelG->addItem(tr("--- none ---"));
         cmbChannelB->addItem(tr("--- none ---"));
+        cmbChannelA->addItem(tr("--- none ---"));
 
         int frames=mv->getImageStackFrames(idx);
         player->setRange(0, frames-1);
@@ -467,10 +621,9 @@ void QFRDRImageStackDataEditor::stackChanged() {
     cmbChannelR->setCurrentIndex(current->getProperty("imstack_invrimgdisp_channelr", 0).toInt());
     cmbChannelG->setCurrentIndex(current->getProperty("imstack_invrimgdisp_channelg", 1).toInt());
     cmbChannelB->setCurrentIndex(current->getProperty("imstack_invrimgdisp_channelb", 2).toInt());
+    cmbChannelA->setCurrentIndex(current->getProperty("imstack_invrimgdisp_channela", 3).toInt());
 
-    connect(cmbChannelR, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
-    connect(cmbChannelG, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
-    connect(cmbChannelB, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    connectWidgets();
     displayImage();
     pltImage->zoomToFit();
     pltImage->update_plot();
@@ -479,14 +632,19 @@ void QFRDRImageStackDataEditor::stackChanged() {
 void QFRDRImageStackDataEditor::channelModeChanged() {
     QFRDRImageStackData* mv=qobject_cast<QFRDRImageStackData*>(current);
     int idx=cmbImageStack->currentIndex();
-    disconnect(cmbChannelR, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    disconnectWidgets();
     if (cmbChannelMode->currentIndex()>=0) current->setQFProperty("imstack_invrimgdisp_channelmode", cmbChannelMode->currentIndex(), false, false);
 
     cmbChannelR->setVisible(true);
+    cmbChannelA->setVisible(true);
     cmbChannelG->setVisible(cmbChannelMode->currentIndex()==1);
     cmbChannelB->setVisible(cmbChannelMode->currentIndex()==1);
+    cmbColorbar->setVisible(cmbChannelMode->currentIndex()==0);
+    labColorbar->setVisible(cmbChannelMode->currentIndex()==0);
+    cmbModifierMode->setVisible(true);
+    labModifierMode->setVisible(true);
 
-    connect(cmbChannelR, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    connectWidgets();
     displayImage();
 }
 

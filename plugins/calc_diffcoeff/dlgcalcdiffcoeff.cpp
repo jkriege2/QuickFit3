@@ -171,7 +171,10 @@ void DlgCalcDiffCoeff::updateD() {
 void DlgCalcDiffCoeff::updateGivenD() {
     QString filename=QFPluginServices::getInstance()->getAssetsDirectory()+"/plugins/"+plugin->getID()+"/samples.ini";
     QSettings set(filename, QSettings::IniFormat);
-    QString filenameC=QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/mysamples.ini";
+    QString filenameC=ProgramOptions::getConfigValue("calc_diffcoeff/user_database", QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/calc_diffcoeff/mysamples.ini").toString();
+    /*QFileInfo fi(filenameC);
+    QDir d;
+    d.mkpath(fi.absolutePath());*/
     QSettings setC(filenameC, QSettings::IniFormat);
 
     updating=true;
@@ -225,8 +228,9 @@ void DlgCalcDiffCoeff::updatePlot()
 }
 
 void DlgCalcDiffCoeff::on_btnDeleteGivenD_clicked() {
-    QString filenameC=QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/mysamples.ini";
-    QDir().mkpath(QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/");
+    //QString filenameC=QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/mysamples.ini";
+    QString filenameC=ProgramOptions::getConfigValue("calc_diffcoeff/user_database", QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/calc_diffcoeff/mysamples.ini").toString();
+    QDir().mkpath(QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/calc_diffcoeff/");
 
     QSettings set(filenameC, QSettings::IniFormat);
 
@@ -258,8 +262,9 @@ void DlgCalcDiffCoeff::on_btnDeleteGivenD_clicked() {
 }
 
 void DlgCalcDiffCoeff::on_btnSaveGivenD_clicked() {
-    QString filenameC=QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/mysamples.ini";
-    QDir().mkpath(QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/");
+    //QString filenameC=QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/mysamples.ini";
+    QString filenameC=ProgramOptions::getConfigValue("calc_diffcoeff/user_database", QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/calc_diffcoeff/mysamples.ini").toString();
+    QDir().mkpath(QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/calc_diffcoeff/");
 
     QSettings set(filenameC, QSettings::IniFormat);
 
@@ -468,7 +473,8 @@ void DlgCalcDiffCoeff::writeSettings() {
 
 void DlgCalcDiffCoeff::readSamples() {
     QString filename=QFPluginServices::getInstance()->getAssetsDirectory()+"/plugins/"+plugin->getID()+"/samples.ini";
-    QString filenameC=QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/mysamples.ini";
+    //QString filenameC=QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/mysamples.ini";
+    QString filenameC=ProgramOptions::getConfigValue("calc_diffcoeff/user_database", QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/calc_diffcoeff/mysamples.ini").toString();
     //qDebug()<<"reading samples.ini: "<<filename;
     QSettings set(filename, QSettings::IniFormat);
     QSettings setC(filenameC, QSettings::IniFormat);
@@ -634,7 +640,8 @@ void DlgCalcDiffCoeff::showHelp()
 }
 
 void DlgCalcDiffCoeff::on_btnSendEmailGivenD_clicked() {
-    QString filenameC=QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/mysamples.ini";
+    //QString filenameC=QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+plugin->getID()+"/mysamples.ini";
+    QString filenameC=ProgramOptions::getConfigValue("calc_diffcoeff/user_database", QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/calc_diffcoeff/mysamples.ini").toString();
     QFile f(filenameC);
     QString filecontents;
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
