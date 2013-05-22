@@ -36,6 +36,8 @@ class QFTableGraphSettings : public QWidget
         QIcon getGraphIcon(int i) const;
     signals:
         void graphDataChanged();
+        void performFit(int xCol, int yCol, int sigmaCol, int plot, QString function);
+        void performRegression(int xCol, int yCol, int sigmaCol, int  plot);
     public slots:
         void initFocus();
 
@@ -48,6 +50,9 @@ class QFTableGraphSettings : public QWidget
 
         void connectWidgets();
         void disconnectWidgets();
+
+        void doFit();
+        void doRegression();
     protected:
 
     private:
@@ -56,6 +61,9 @@ class QFTableGraphSettings : public QWidget
         int plot;
         bool updating;
         QFFunctionReferenceTool* functionRef;
+
+        QAction* actFit;
+        QAction* actRegression;
 };
 
 #endif // QFTABLEGRAPHSETTINGS_H

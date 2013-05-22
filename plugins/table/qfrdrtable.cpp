@@ -797,8 +797,24 @@ QString QFRDRTable::getEditorName(int i)
 
 QFRawDataEditor *QFRDRTable::createEditor(QFPluginServices *services, QFRawDataPropertyEditor *propEditor, int i, QWidget *parent)
 {
-    if (i==0) return new QFRDRTableEditor(services, propEditor, parent);
-    if (i==1) return new QFRDRPlotEditor(services, propEditor, parent);
+
+    if (i==0) {
+        QFRDRTableEditor* tab= new QFRDRTableEditor(services, propEditor, parent);
+        return tab;
+    }
+    if (i==1) {
+        QFRDRPlotEditor* edt= new QFRDRPlotEditor(services, propEditor, parent);
+        if (propEditor) {
+            for (int j=0; j<propEditor->getEditorList().size(); j++) {
+                QFRDRTableEditor* tabEdt=qobject_cast<QFRDRTableEditor*>(propEditor->getEditorList().value(j, NULL));
+                if (tabEdt) {
+                    connect(edt, SIGNAL(performFit(int,int,int,int,QString,bool,bool)), tabEdt, SLOT(requestFit(int,int,int,int,QString,bool,bool)));
+                    connect(edt, SIGNAL(performRegression(int,int,int,int,bool,bool)), tabEdt, SLOT(requestRegression(int,int,int,int,bool,bool)));
+                }
+            }
+        }
+        return edt;
+    }
     return NULL;
 };
 

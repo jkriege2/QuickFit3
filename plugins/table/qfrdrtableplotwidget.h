@@ -32,7 +32,12 @@ class QFRDRTablePlotWidget : public QWidget
         virtual void writeSettings(QSettings& settings, const QString& prefix=QString(""));
     signals:
         void plotTitleChanged(int plot, QString title);
+    signals:
+        void performFit(int xCol, int yCol, int sigmaCol, int plot, QString function,bool xlog,bool ylog);
+        void performRegression(int xCol, int yCol, int sigmaCol, int plot,bool xlog,bool ylog);
     protected slots:
+        void doFit(int xCol, int yCol, int sigmaCol, int plot, QString function);
+        void doRegression(int xCol, int yCol, int sigmaCol, int plot);
         void listGraphs_currentRowChanged(int currentRow);
         void on_btnDeleteGraph_clicked();
         void on_btnCloneGraph_clicked();

@@ -170,4 +170,9 @@ void QFRawDataPropertyEditor::sendEditorCommand(const QString &command, const QV
     }
 }
 
+QList<QPointer<QFRawDataEditor> > QFRawDataPropertyEditor::getEditorList() const
+{
+    return p->editorList;
+}
+
 

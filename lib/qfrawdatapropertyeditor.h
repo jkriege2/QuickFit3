@@ -74,6 +74,8 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         int getTabs() const;
         /** \brief send the given command string to all edtor tabs */
         void sendEditorCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant());
+        /** \brief returns a list of all QFRawDataEditor already in this view widget */
+        QList<QPointer<QFRawDataEditor> > getEditorList() const;
     protected:
 
         /** \brief read the settings */

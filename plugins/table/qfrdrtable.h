@@ -11,7 +11,9 @@
 #include "qfrdrtableinterface.h"
 #include "qfrdrcolumngraphsinterface.h"
 #include "qfmathparser.h"
-
+#include <QPointer>
+#include <QMultiMap>
+class QFRDRTableEditor; // forward
 
 /*! \brief this class is used to manage a table of values (strings/numbers)
     \ingroup qf3rdrdp_table

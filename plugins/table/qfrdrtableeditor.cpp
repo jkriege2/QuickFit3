@@ -6,6 +6,7 @@
 #include <QtAlgorithms>
 #include "qfrdrtableparserfunctions.h"
 #include "qfrdrtablecolumneditor.h"
+#include "qfrdrtablecurvefitdialog.h"
 
 QFRDRTableEditor::QFRDRTableEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent):
     QFRawDataEditor(services, propEditor, parent)
@@ -19,6 +20,26 @@ QFRDRTableEditor::QFRDRTableEditor(QFPluginServices* services,  QFRawDataPropert
 QFRDRTableEditor::~QFRDRTableEditor()
 {
     writeSettings();
+}
+
+void QFRDRTableEditor::requestFit(int xCol, int yCol, int sigmaCol, int plot, QString function, bool xlog, bool ylog)
+{
+    QFRDRTableCurveFitDialog* dlg=new QFRDRTableCurveFitDialog(this);
+    dlg->setWindowTitle(tr("Least-Squares Curve Fitting"));
+    if (dlg->exec()) {
+
+    }
+    delete dlg;
+}
+
+void QFRDRTableEditor::requestRegression(int xCol, int yCol, int sigmaCol, int plot, bool xlog, bool ylog)
+{
+    QFRDRTableCurveFitDialog* dlg=new QFRDRTableCurveFitDialog(this);
+    dlg->setWindowTitle(tr("Regression Analysis"));
+    if (dlg->exec()) {
+
+    }
+    delete dlg;
 }
 
 void QFRDRTableEditor::createWidgets() {

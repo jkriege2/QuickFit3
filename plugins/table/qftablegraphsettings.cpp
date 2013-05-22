@@ -14,10 +14,19 @@ QFTableGraphSettings::QFTableGraphSettings(QWidget *parent) :
     functionRef->setCompleterFile(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/table/table_expression.txt");
     functionRef->setDefaultWordsMathExpression();
 
+    actFit=new QAction(tr("least squares fit"), this);
+    connect(actFit, SIGNAL(triggered()), this, SLOT(doFit()));
+    actRegression=new QAction(tr("regression analysis"), this);
+    connect(actRegression, SIGNAL(triggered()), this, SLOT(doRegression()));
+
 
     updating=true;
 
     ui->setupUi(this);
+    ui->btnFit->addAction(actRegression);
+    ui->btnFit->addAction(actFit);
+    ui->btnFit->setDefaultAction(actFit);
+    ui->btnFit->setVisible(false);
     functionRef->registerEditor(ui->edtFunction);
     ui->edtImageHeight->setCheckBounds(true, false);
     ui->edtImageHeight->setRange(0, 1e10);
@@ -376,6 +385,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
         ui->labColorbarLabelB->setVisible(false);
         ui->edtColorbarLabelB->setVisible(false);
         ui->labColorbarLabel->setText(tr("bar label:"));
+        ui->btnFit->setVisible(true);
 
         switch(ui->cmbGraphType->currentIndex()) {
 
@@ -402,6 +412,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
                 ui->cmbLineStyle->setVisible(false);
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
+                ui->btnFit->setVisible(false);
 
                 /*ui->cmbErrorColor->setVisible(true);
                 ui->cmbErrorStyle->setVisible(true);
@@ -441,6 +452,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
                 ui->labErrorX->setVisible(false);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
+                ui->btnFit->setVisible(false);
 
                 /*ui->cmbErrorColor->setVisible(true);
                 ui->cmbErrorStyle->setVisible(true);
@@ -487,6 +499,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
                 ui->widSymbol->setVisible(false);
                 ui->widErrorStyle->setVisible(false);
                 ui->labErrorStyle->setVisible(false);
+                ui->btnFit->setVisible(false);
 /*                    ui->cmbErrorColor->setVisible(false);
                 ui->cmbErrorStyle->setVisible(false);
                 ui->cmbLinesXError->setVisible(false);
@@ -531,9 +544,11 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
                 ui->widErrorStyle->setVisible(false);
                 ui->labErrorStyle->setVisible(false);
                 ui->chkDrawLine->setVisible(false);
+                ui->btnFit->setVisible(false);
                 break;
             case 9:
                 //graph.type=QFRDRTable::gtImage;
+                ui->btnFit->setVisible(false);
                 ui->cmbLinesXError->setVisible(false);
                 ui->labErrorX->setVisible(false);
                 ui->cmbLinesYData->setVisible(true);
@@ -573,6 +588,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
                 break;
             case 10:
                 //graph.type=QFRDRTable::gtRGBImage;
+                ui->btnFit->setVisible(false);
                 ui->cmbLinesXError->setVisible(true);
                 ui->labErrorX->setVisible(true);
                 ui->cmbLinesYData->setVisible(true);
@@ -619,6 +635,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
                 break;
             case 11:
                 //graph.type=QFRDRTable::gtMaskImage;
+                ui->btnFit->setVisible(false);
                 ui->labDataX->setText(tr("Mask Column:"));
                 ui->cmbLinesXError->setVisible(false);
                 ui->labErrorX->setVisible(false);
@@ -659,6 +676,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
                 break;
             case 12:
                 //graph.type=QFRDRTable::gtFunction;
+                ui->btnFit->setVisible(false);
+                ui->labDataY->setText(tr("function parameter column"));
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
                 ui->cmbLinesXError->setVisible(false);
@@ -689,6 +708,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
                 ui->widImage->setVisible(false);
                 break;
         }
+
 
     }
 }
@@ -792,6 +812,16 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->spinStride, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->spinStrideStart, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
 
+}
+
+void QFTableGraphSettings::doFit()
+{
+    emit performFit(ui->cmbLinesXData->currentIndex(), ui->cmbLinesYData->currentIndex(), ui->cmbLinesYError->currentIndex(), plot, QString(""));
+}
+
+void QFTableGraphSettings::doRegression()
+{
+    emit performRegression(ui->cmbLinesXData->currentIndex(), ui->cmbLinesYData->currentIndex(), ui->cmbLinesYError->currentIndex(), plot);
 }
 
 void QFTableGraphSettings::initFocus()

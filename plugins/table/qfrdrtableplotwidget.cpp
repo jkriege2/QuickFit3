@@ -37,6 +37,9 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     updating=true;
     ui->setupUi(this);
 
+    connect(ui->widGraphSettings, SIGNAL(performFit(int,int,int,int,QString)), this, SLOT(doFit(int,int,int,int,QString)));
+    connect(ui->widGraphSettings, SIGNAL(performRegression(int,int,int,int)), this, SLOT(doRegression(int,int,int,int)));
+
     //ui->formLayout_3->removeWidget(ui->widSaveCoordSettings);
     //ui->tabWidget->setCornerWidget(ui->widSaveCoordSettings);
 
@@ -1328,5 +1331,15 @@ void QFRDRTablePlotWidget::on_btnLoadSystem_clicked() {
         ui->spinGridWidth->setValue(set.value("gridWidth", ui->spinGridWidth->value()).toDouble());
     }
     ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRTablePlotWidget/lasttemplatedir", dir);
+}
+
+void QFRDRTablePlotWidget::doFit(int xCol, int yCol, int sigmaCol, int plot, QString function)
+{
+    emit performFit(xCol, yCol, sigmaCol, plot, function, ui->chkLogX->isChecked(), ui->chkLogY->isChecked());
+}
+
+void QFRDRTablePlotWidget::doRegression(int xCol, int yCol, int sigmaCol, int plot)
+{
+    emit performRegression(xCol, yCol, sigmaCol, plot, ui->chkLogX->isChecked(), ui->chkLogY->isChecked());
 }
 

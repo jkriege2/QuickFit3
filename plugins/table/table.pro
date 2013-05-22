@@ -31,7 +31,8 @@ HEADERS += dlgcsvparameters.h \
     ../interfaces/qfrdrtableinterface.h \
     ../interfaces/qfrdrcolumngraphsinterface.h \
     qftablegraphsettings.h \
-    qfrdrtablecolumneditor.h
+    qfrdrtablecolumneditor.h \
+    qfrdrtablecurvefitdialog.h
 
 SOURCES += dlgcsvparameters.cpp \
            qfrdrtable.cpp \
@@ -51,7 +52,8 @@ SOURCES += dlgcsvparameters.cpp \
     ../base_classes/qffunctionreferencetool.cpp \
     qfrdrtableenhancedtableview.cpp \
     qftablegraphsettings.cpp \
-    qfrdrtablecolumneditor.cpp
+    qfrdrtablecolumneditor.cpp \
+    qfrdrtablecurvefitdialog.cpp
 
 FORMS = dlg_csvparameters.ui \
     tableresizedialog.ui \
@@ -61,7 +63,8 @@ FORMS = dlg_csvparameters.ui \
     qfrdrtablesortdialog.ui \
     qfrdrtablehistogramdialog.ui \
     qftablegraphsettings.ui \
-    qfrdrtablecolumneditor.ui
+    qfrdrtablecolumneditor.ui \
+    qfrdrtablecurvefitdialog.ui
 
 RESOURCES += qfrdrtable.qrc \
     ../../lib/lib.qrc

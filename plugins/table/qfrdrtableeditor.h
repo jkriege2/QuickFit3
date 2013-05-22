@@ -32,6 +32,10 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QFRDRTableEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent=NULL);
         /** Default destructor */
         virtual ~QFRDRTableEditor();
+    public slots:
+        void requestFit(int xCol, int yCol, int sigmaCol, int plot, QString function, bool xlog=false, bool ylog=false);
+        void requestRegression(int xCol, int yCol, int sigmaCol, int plot, bool xlog=false, bool ylog=false);
+
     protected slots:
         /** \brief create widgets on object creation */
         void createWidgets();
