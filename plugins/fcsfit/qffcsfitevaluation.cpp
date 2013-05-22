@@ -323,8 +323,8 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
         double* initialparams=allocFillParameters(record, run);
         double* errors=allocFillParameterErrors(record, run);
         double* errorsI=allocFillParameterErrors(record, run);
-        double* paramsMin=allocFillParametersMin();
-        double* paramsMax=allocFillParametersMax();
+        double* paramsMin=allocFillParametersMin(record);
+        double* paramsMax=allocFillParametersMax(record);
         bool* paramsFix=allocFillFix(record, run);
 
 
@@ -693,8 +693,8 @@ void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, i
         double* initialparams=allocFillParameters(record, run, ffunc);
         double* errors=allocFillParameterErrors(record, run, ffunc);
         double* errorsI=allocFillParameterErrors(record, run, ffunc);
-        double* paramsMin=allocFillParametersMin(ffunc);
-        double* paramsMax=allocFillParametersMax(ffunc);
+        double* paramsMin=allocFillParametersMin(record, ffunc);
+        double* paramsMax=allocFillParametersMax(record, ffunc);
         bool* paramsFix=allocFillFix(record, run, ffunc);
         locker.unlock();
 

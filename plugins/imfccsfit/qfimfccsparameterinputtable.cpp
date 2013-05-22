@@ -6,7 +6,7 @@ QFImFCCSParameterInputTable::QFImFCCSParameterInputTable(QFImFCCSFitEvaluationIt
     QAbstractTableModel(parent)
 {
     this->item=parent;
-    colsPerRDR=5;
+    editRanges=true;
 }
 
 int QFImFCCSParameterInputTable::rowCount(const QModelIndex &parent) const
@@ -16,7 +16,7 @@ int QFImFCCSParameterInputTable::rowCount(const QModelIndex &parent) const
 
 int QFImFCCSParameterInputTable::columnCount(const QModelIndex &parent) const
 {
-    return 1+colsPerRDR*item->getFitFileCount();
+    return 1+getColsPerRDR()*item->getFitFileCount();
 }
 
 Qt::ItemFlags QFImFCCSParameterInputTable::flags(const QModelIndex &index) const
@@ -26,19 +26,19 @@ Qt::ItemFlags QFImFCCSParameterInputTable::flags(const QModelIndex &index) const
     int col=index.column();
     int row=index.row();
     if (col>0) {
-        int cols=(col-1)/colsPerRDR;
-        int coli=(col-1)%colsPerRDR;
-        if (row>1 || coli==0) f=f|Qt::ItemIsEditable;
-        int s=(col-1)/colsPerRDR;
-        int i=(col-1)%colsPerRDR;
+        int cols=(col-1)/getColsPerRDR();
+        int coli=(col-1)%getColsPerRDR();
+        if (row>1 || coli==0  || (editRanges && coli==2) || (editRanges && coli==3)) f=f|Qt::ItemIsEditable;
+        //int s=(col-1)/getColsPerRDR();
+        //int coli=(col-1)%getColsPerRDR();
         QFRawDataRecord* rdr=item->getFitFile(cols);
         QFFitFunction* ff=item->getFitFunction(cols);
-        if (i==3) {
+        if (coli==getColsPerRDR()-2) {
             FitParam fp=fitparamids.value(row-2, FitParam());
             if (fp.isValid() && ff->hasParameter(fp.id) &&ff->getDescription(fp.id).fit) {
                 f=f|Qt::ItemIsUserCheckable;
             }
-        } else if ((i==1) || (i==4)) {
+        } else if ((coli==1) || (coli==getColsPerRDR()-1)) {
             FitParam fp=fitparamids.value(row-2, FitParam());
             if (fp.isValid() && ff->hasParameter(fp.id) &&ff->getDescription(fp.id).displayError==QFFitFunction::EditError) {
                 f=f|Qt::ItemIsEditable;
@@ -72,8 +72,8 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
             return f;
         }
     } else if (col>0) {
-        int cols=(col-1)/colsPerRDR;
-        int coli=(col-1)%colsPerRDR;
+        int cols=(col-1)/getColsPerRDR();
+        int coli=(col-1)%getColsPerRDR();
         if (role==fitFileIDRole) return cols;
         QFRawDataRecord* rdr=item->getFitFile(cols);
         QFFitFunction* ff=item->getFitFunction(cols);
@@ -138,14 +138,30 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
                             if (desc.displayError==QFFitFunction::EditError) return wtErrorEdit;
                         }
                         if (role==Qt::BackgroundRole && desc.displayError!=QFFitFunction::EditError) return QBrush(QApplication::palette().color(QPalette::Window));
-                    } if (coli==2) {
+                    } if (editRanges && coli==2) {
+                        if (role==Qt::DisplayRole || role==Qt::EditRole) {
+                            return item->getFitMin(fp.id, rdr);
+                        }
+                        if (role==widgetTypeRole && desc.userEditable) {
+                            if (desc.type==QFFitFunction::FloatNumber) return wtRangeEditMin;
+                        }
+                        if (role==Qt::BackgroundRole && !desc.userEditable) return QBrush(QApplication::palette().color(QPalette::Window));
+                    } if (editRanges && coli==3) {
+                        if (role==Qt::DisplayRole || role==Qt::EditRole) {
+                            return item->getFitMax(fp.id, rdr);
+                        }
+                        if (role==widgetTypeRole && desc.userEditable) {
+                            if (desc.type==QFFitFunction::FloatNumber) return wtRangeEditMax;
+                        }
+                        if (role==Qt::BackgroundRole && !desc.userEditable) return QBrush(QApplication::palette().color(QPalette::Window));
+                    } if (coli==getColsPerRDR()-3) {
                         if (role==Qt::DisplayRole || role==Qt::EditRole) return desc.unitLabel;
-                    } if (coli==3) {
+                    } if (coli==getColsPerRDR()-2) {
                         if (role==Qt::CheckStateRole && desc.fit) {
                             if (item->getFitFix(fp.id, rdr)) return Qt::Checked;
                             return Qt::Unchecked;
                         }
-                    } if (coli==4) {
+                    } if (coli==getColsPerRDR()-1) {
                         if (role==Qt::DisplayRole && desc.fit) {
                             int g=item->getLinkParameter(cols, fp.id);
                             if (g>=0) return tr("global #%1").arg(g);
@@ -183,12 +199,17 @@ QVariant QFImFCCSParameterInputTable::headerData(int section, Qt::Orientation or
         if (orientation==Qt::Horizontal) {
             if (section==0) return QString("parameter");
             else if (section>0) {
-                int s=(section-1)/colsPerRDR;
-                int i=(section-1)%colsPerRDR;
+                int s=(section-1)/getColsPerRDR();
+                int i=(section-1)%getColsPerRDR();
                 if (i==0) return tr("value");
                 if (i==1) return tr("error");
-                if (i==3) return tr("fix");
-                if (i==4) return tr("global");
+                if (editRanges) {
+                    if (i==2) return tr("min");
+                    if (i==3) return tr("max");
+                }
+                if (i==getColsPerRDR()-3) return tr("unit");
+                if (i==getColsPerRDR()-2) return tr("fix");
+                if (i==getColsPerRDR()-1) return tr("global");
             }
         } else if (orientation==Qt::Vertical) {
             /*if (section==0) return QString("file");
@@ -210,8 +231,8 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
     //qDebug()<<QString("setData(%1, %2, %3, r=%4)").arg(index.row()).arg(index.column()).arg(value.toString()).arg(role);
 
     if (role==Qt::EditRole && col>0) {
-        int cols=(col-1)/colsPerRDR;
-        int coli=(col-1)%colsPerRDR;
+        int cols=(col-1)/getColsPerRDR();
+        int coli=(col-1)%getColsPerRDR();
         QFRawDataRecord* rdr=item->getFitFile(cols);
         QFFitFunction* ff=item->getFitFunction(cols);
         /*if (row<=1) {
@@ -278,7 +299,41 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
                     emit fitParamErrorChanged();
                     return true;
                 }
-                if (coli==3) {
+                if (editRanges && coli==2) {
+                    item->setFitMin(pid.id, value.toDouble(), rdr);
+                    // also set all other linked parameters to this new value!
+                    QList<QPair<int, QString> > linked=item->getLinkedParameterList(cols, pid.id);
+                    for (int li=0; li<linked.size(); li++) {
+                        item->setFitMin(linked[li].second, value.toDouble(), item->getFitFile(linked[li].first));
+                        if (fitParamListContainsID(linked[li].second, fitparamids, &row)) {
+                            QModelIndex idx=this->index(2+row, 1+linked[li].first*getColsPerRDR()+2);
+                            emit dataChanged(idx, idx);
+                        }
+                    }
+
+                    emit dataChanged(index, index);
+                    recalculateFitParameters(false);
+                    emit fitParamErrorChanged();
+                    return true;
+                }
+                if (editRanges && coli==3) {
+                    item->setFitMax(pid.id, value.toDouble(), rdr);
+                    // also set all other linked parameters to this new value!
+                    QList<QPair<int, QString> > linked=item->getLinkedParameterList(cols, pid.id);
+                    for (int li=0; li<linked.size(); li++) {
+                        item->setFitMax(linked[li].second, value.toDouble(), item->getFitFile(linked[li].first));
+                        if (fitParamListContainsID(linked[li].second, fitparamids, &row)) {
+                            QModelIndex idx=this->index(2+row, 1+linked[li].first*getColsPerRDR()+2);
+                            emit dataChanged(idx, idx);
+                        }
+                    }
+
+                    emit dataChanged(index, index);
+                    recalculateFitParameters(false);
+                    emit fitParamErrorChanged();
+                    return true;
+                }
+                if (coli==getColsPerRDR()-2) {
                     item->setFitFix(pid.id, value.toBool(), rdr);
                     // also set all other linked parameters to this new value!
                     QList<QPair<int, QString> > linked=item->getLinkedParameterList(cols, pid.id);
@@ -294,7 +349,7 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
                     emit fitParamFixChanged();
                     return true;
                 }
-                if (coli==4) {
+                if (coli==getColsPerRDR()-1) {
                     item->setLinkParameter(cols, pid.id, value.toInt());
                     emit dataChanged(index, index);
                     emit fitParamGlobalChanged();
@@ -305,8 +360,8 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
     }
 
     if (role==Qt::CheckStateRole && col>0) {
-        int cols=(col-1)/colsPerRDR;
-        int coli=(col-1)%colsPerRDR;
+        int cols=(col-1)/getColsPerRDR();
+        int coli=(col-1)%getColsPerRDR();
         QFRawDataRecord* rdr=item->getFitFile(cols);
 
         if (row>1) {
@@ -327,7 +382,8 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
 
 int QFImFCCSParameterInputTable::getColsPerRDR() const
 {
-    return colsPerRDR;
+    if (editRanges) return 7;
+    return 5;
 }
 
 void QFImFCCSParameterInputTable::rebuildModel()
@@ -360,7 +416,7 @@ bool QFImFCCSParameterInputTable::recalculateFitParameters(bool emitFitParamSign
             for (int fi=0; fi<fpids.size(); fi++) {
                 if (ff->isParameterVisible(fi, p)) {
                     int row=-1;
-                    int col=1+i*colsPerRDR;
+                    int col=1+i*getColsPerRDR();
                     QModelIndex idx;
                     QModelIndex eidx;
                     if (fitParamListContainsID(fpids[fi], fitparamids, &row)) {
@@ -389,6 +445,12 @@ bool QFImFCCSParameterInputTable::recalculateFitParameters(bool emitFitParamSign
         emit fitParamErrorChanged();
     }
     return changed;
+}
+
+void QFImFCCSParameterInputTable::setEditRanges(bool enabled)
+{
+    editRanges=enabled;
+    rebuildModel();
 }
 
 bool QFImFCCSParameterInputTable::checkRebuildModel(bool alwaysreset)
@@ -446,6 +508,8 @@ bool QFImFCCSParameterInputTable::checkRebuildModel(bool alwaysreset)
 
     return ok;
 }
+
+
 
 bool QFImFCCSParameterInputTable::fitParamListContainsID(const QString &id, const QList<QFImFCCSParameterInputTable::FitParam> &fitparamids, int* found)
 {

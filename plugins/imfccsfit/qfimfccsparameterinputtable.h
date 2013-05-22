@@ -19,7 +19,9 @@ class QFImFCCSParameterInputTable : public QAbstractTableModel
             wtValueIntEdit=6,
             wtErrorEdit=7,
             wtGlobalParamCombo=8,
-            wtValueLogDoubleEdit=9
+            wtValueLogDoubleEdit=9,
+            wtRangeEditMin=10,
+            wtRangeEditMax=11
         };
 
         enum QFImFCCSParameterInputTableRoles {
@@ -54,12 +56,14 @@ class QFImFCCSParameterInputTable : public QAbstractTableModel
     public slots:
         void rebuildModel();
         bool recalculateFitParameters(bool emitFitParamSignals=true, bool emit dataChangedSignals=true);
+        void setEditRanges(bool enabled);
     public:
         bool checkRebuildModel(bool alwaysreset=false);
     protected:
         QFImFCCSFitEvaluationItem* item;
 
-        int colsPerRDR;
+        bool editRanges;
+
         struct FitParam {
             FitParam();
             bool isFit;

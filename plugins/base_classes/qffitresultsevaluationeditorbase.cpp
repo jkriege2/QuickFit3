@@ -129,8 +129,8 @@ void QFFitResultsEvaluationEditorBase::saveCurrentFitResults(QFRawDataRecord* re
             double* fullParams=eval->allocFillParameters(ffunc);
             double* errors=eval->allocFillParameterErrors(ffunc);
             bool* paramsFix=eval->allocFillFix(ffunc);
-            double* paramsMin=eval->allocFillParametersMin(ffunc);
-            double* paramsMax=eval->allocFillParametersMax(ffunc);
+            double* paramsMin=eval->allocFillParametersMin(NULL, ffunc);
+            double* paramsMax=eval->allocFillParametersMax(NULL, ffunc);
             //ffunc->calcParameter(fullParams, errors);
             for (int i=0; i<pids.size(); i++) {
                 QString id=pids[i];

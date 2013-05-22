@@ -383,6 +383,16 @@
            </property>
           </spacer>
          </item>
+         <item>
+          <widget class="QPushButton" name="btnEditRanges">
+           <property name="text">
+            <string>edit P ranges</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
       </layout>
@@ -496,6 +506,7 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>

@@ -586,11 +586,11 @@ public:
     /** \brief fill the given array of doubles with the current parameter lower bounds, as appropriate to use together with QFFitFunction
      *  \param param parameter minimums vector to fill
     */
-    virtual void fillParametersMin(double* param, QFFitFunction* function=NULL) const;
+    virtual void fillParametersMin(double* param, QFRawDataRecord* r, QFFitFunction* function=NULL) const;
     /** \brief fill the given array of doubles with the current parameter upper bounds, as appropriate to use together with QFFitFunction
      *  \param param parameter maximums vector to fill
     */
-    virtual void fillParametersMax(double* param, QFFitFunction* function=NULL) const;
+    virtual void fillParametersMax(double* param, QFRawDataRecord *r , QFFitFunction *function=NULL)const;
     /** \brief fill the given array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
      *  \param param parameter fix vector to fill
     */
@@ -610,12 +610,12 @@ public:
         \return parameter minimums vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
     */
-    virtual double* allocFillParametersMin(QFFitFunction* function=NULL) const;
+    virtual double* allocFillParametersMin(QFRawDataRecord* r, QFFitFunction* function=NULL) const;
     /*! \brief fill a newly allocated array of doubles with the current parameter upper bounds, as appropriate to use together with QFFitFunction
         \return parameter maximums vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
     */
-    virtual double* allocFillParametersMax(QFFitFunction* function=NULL) const ;
+    virtual double* allocFillParametersMax(QFRawDataRecord *r , QFFitFunction *function=NULL)const ;
     /*! \brief fill a newly allocated array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
         \return parameter fix vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!

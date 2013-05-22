@@ -146,6 +146,7 @@ int QFImFCCSFitEvaluationItem::addFitFile()
     setDataChanged();
     paramTable->rebuildModel();
     if (fitFilesList.size()>0) emit fileChanged(fitFilesList.size()-1, fitFilesList.last());
+
     return fitFilesList.size()-1;
 }
 
@@ -788,8 +789,8 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
             dfd.initialparams=allocFillParameters(record, run, ffunc);
             dfd.errors=allocFillParameterErrors(record, run, ffunc);
             dfd.errorsI=allocFillParameterErrors(record, run, ffunc);
-            dfd.paramsMin=allocFillParametersMin(ffunc);
-            dfd.paramsMax=allocFillParametersMax(ffunc);
+            dfd.paramsMin=allocFillParametersMin(record, ffunc);
+            dfd.paramsMax=allocFillParametersMax(record, ffunc);
             dfd.paramsFix=allocFillFix(record, run, ffunc);
             dfd.ffunc=ffunc;
             dfd.cut_low=cut_low;
@@ -799,6 +800,8 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
             //qDebug()<<"adding "<<r<<": ("<<record->getName()<<")   ffunc="<<ffunc->name();
             //qDebug()<<"  params="<<arrayToString(dfd.params, ffunc->paramCount());
             //qDebug()<<"  initialparams="<<arrayToString(dfd.initialparams, ffunc->paramCount());
+            //qDebug()<<"  paramsMin="<<arrayToString(dfd.paramsMin, ffunc->paramCount());
+            //qDebug()<<"  paramsMax="<<arrayToString(dfd.paramsMax, ffunc->paramCount());
             //qDebug()<<"  errors="<<arrayToString(dfd.errors, ffunc->paramCount());
             //qDebug()<<"  errorsI="<<arrayToString(dfd.errorsI, ffunc->paramCount());
 
@@ -826,7 +829,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
 
 
             fitData.append(dfd);
-            tool.addTerm(ffunc, dfd.params, dfd.paramsFix, dfd.taudata, dfd.corrdata, dfd.weights, dfd.cut_N);//, dfd.paramsMin, dfd.paramsMax);
+            tool.addTerm(ffunc, dfd.params, dfd.paramsFix, dfd.taudata, dfd.corrdata, dfd.weights, dfd.cut_N, dfd.paramsMin, dfd.paramsMax);
         }
     }
 

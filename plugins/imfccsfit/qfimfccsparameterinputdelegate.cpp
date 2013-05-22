@@ -132,12 +132,16 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
             //qDebug()<<"   created fixcheck";
             return chk;
         }*/
-        if (imfccs && fpID.isValid() && (widgetType.toInt()==QFImFCCSParameterInputTable::wtValueDoubleEdit || widgetType.toInt()==QFImFCCSParameterInputTable::wtValueLogDoubleEdit)) {
+        if (imfccs && fpID.isValid() && (widgetType.toInt()==QFImFCCSParameterInputTable::wtValueDoubleEdit || widgetType.toInt()==QFImFCCSParameterInputTable::wtValueLogDoubleEdit || widgetType.toInt()==QFImFCCSParameterInputTable::wtRangeEditMin || widgetType.toInt()==QFImFCCSParameterInputTable::wtRangeEditMax)) {
             QFDoubleEdit* edt=new QFDoubleEdit(parent);
             if (widgetType.toInt()==QFImFCCSParameterInputTable::wtValueLogDoubleEdit) {
                 edt->setLogScale(true, 10);
             }
-            edt->setRange(imfccs->getFitMin(fpID.toString(), rdr), imfccs->getFitMax(fpID.toString(), rdr));
+            if (widgetType.toInt()==QFImFCCSParameterInputTable::wtRangeEditMin || widgetType.toInt()==QFImFCCSParameterInputTable::wtRangeEditMax) {
+                edt->setCheckBounds(false, false);
+            } else {
+                edt->setRange(imfccs->getFitMin(fpID.toString(), rdr), imfccs->getFitMax(fpID.toString(), rdr));
+            }
             //qDebug()<<"   created valuedoubleedit "<<t.elapsed()<<"ms";
             return edt;
         }
@@ -230,6 +234,20 @@ void QFImFCCSParameterInputDelegate::setEditorData(QWidget *editor, const QModel
                 return;
             }
         }
+        if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtRangeEditMin) {
+            QFDoubleEdit* edt=qobject_cast<QFDoubleEdit*>(editor);
+            if (edt) {
+                edt->setValue(imfccs->getFitMin(fpID.toString(), rdr));
+                return;
+            }
+        }
+        if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtRangeEditMax) {
+            QFDoubleEdit* edt=qobject_cast<QFDoubleEdit*>(editor);
+            if (edt) {
+                edt->setValue(imfccs->getFitMax(fpID.toString(), rdr));
+                return;
+            }
+        }
         if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtValueIntEdit) {
             QSpinBox* edt=qobject_cast<QSpinBox*>(editor);
             if (edt) {
@@ -306,13 +324,14 @@ void QFImFCCSParameterInputDelegate::setModelData(QWidget *editor, QAbstractItem
                 return;
             }
         }
-        if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtValueDoubleEdit) {
+        if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtValueDoubleEdit || widgetType.toInt()==QFImFCCSParameterInputTable::wtRangeEditMin || widgetType.toInt()==QFImFCCSParameterInputTable::wtRangeEditMax) {
             QFDoubleEdit* edt=qobject_cast<QFDoubleEdit*>(editor);
             if (edt) {
                 model->setData(index, edt->value());
                 return;
             }
         }
+
         if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtValueIntEdit) {
             QSpinBox* edt=qobject_cast<QSpinBox*>(editor);
             if (edt) {

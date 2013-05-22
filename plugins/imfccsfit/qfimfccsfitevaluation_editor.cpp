@@ -227,8 +227,8 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
     if (old!=NULL && item_old!=NULL) {
         /* disconnect item_old and clear all widgets here */
         disconnect(item_old, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
-        disconnect(ui->btnAddFile, SIGNAL(clicked()), item_old, SLOT(addFitFile()));
-        disconnect(ui->btnRemoveFile, SIGNAL(clicked()), item_old, SLOT(removeFitFile()));
+        //disconnect(ui->btnAddFile, SIGNAL(clicked()), item_old, SLOT(addFitFile()));
+        //disconnect(ui->btnRemoveFile, SIGNAL(clicked()), item_old, SLOT(removeFitFile()));
         disconnect(item, SIGNAL(fileChanged(int,QFRawDataRecord*)), this, SLOT(fileChanged(int,QFRawDataRecord*)));
         disconnect(ui->datacut, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersChanged(int, int, int, int)));
         disconnect(item_old->getParameterInputTableModel(), SIGNAL(fitParamChanged()), this, SLOT(displayEvaluation()));
@@ -254,8 +254,8 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         setParameterTableSpans();
 
         /* connect widgets and fill with data from item here */
-        connect(ui->btnAddFile, SIGNAL(clicked()), item, SLOT(addFitFile()));
-        connect(ui->btnRemoveFile, SIGNAL(clicked()), item, SLOT(removeFitFile()));
+        //connect(ui->btnAddFile, SIGNAL(clicked()), item, SLOT(addFitFile()));
+        //connect(ui->btnRemoveFile, SIGNAL(clicked()), item, SLOT(removeFitFile()));
         connect(item, SIGNAL(fileChanged(int,QFRawDataRecord*)), this, SLOT(fileChanged(int,QFRawDataRecord*)));
         connect(ui->datacut, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersChanged(int, int, int, int)));
         connect(item->getParameterInputTableModel(), SIGNAL(fitParamChanged()), this, SLOT(displayEvaluation()));
@@ -494,8 +494,9 @@ void QFImFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
                if (ii==0) h->resizeSection(i, 125);
                else if (ii==1) h->resizeSection(i, 50);
                else if (ii==2) h->resizeSection(i, 50);
-               else if (ii==3) h->resizeSection(i, 24);
-               else if (ii==4) h->resizeSection(i, 75);
+               else if (ii==eval->getParameterInputTableModel()->getColsPerRDR()-2) h->resizeSection(i, 24);
+               else if (ii==eval->getParameterInputTableModel()->getColsPerRDR()-1) h->resizeSection(i, 75);
+               else h->resizeSection(i, 75);
                //qDebug()<<"  resizing h"<<i<<" to contents done "<<t.elapsed()<<"ms";
                //h->setResizeMode(i, QHeaderView::Interactive);
                /*
@@ -507,6 +508,7 @@ void QFImFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
            }
        }
    }
+   setParameterVisibility();
    setUpdatesEnabled(true);
    //qDebug()<<"ensureCorrectParamaterModelDisplay done "<<t.elapsed()<<"ms";
 
@@ -594,6 +596,7 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 if (sigma) g->set_yErrorColumn(c_error);
                 else g->set_yErrorColumn(-1);
                 g->set_color(cols.value(file, g->get_color()));
+                g->set_fillColor(g->get_color().lighter());
                 QColor ec=g->get_color().lighter();
                 g->set_errorColor(ec);
                 ec.setAlphaF(0.5);
@@ -602,6 +605,7 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 g->set_drawLine(ui->cmbDisplayData->getDrawLine());
                 g->set_symbolSize(5);
                 g->set_lineWidth(1);
+                g->set_xErrorStyle(JKQTPnoError);
                 g->set_yErrorStyle(ui->cmbErrorDisplay->getErrorStyle());
                 g->set_datarange_start(ui->datacut->get_userMin());
                 g->set_datarange_end(ui->datacut->get_userMax());
@@ -640,6 +644,7 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 g_res->set_xColumn(c_tau);
                 g_res->set_yColumn(c_resid);
                 g_res->set_color(g->get_color());
+                g_res->set_fillColor(g->get_fillColor());
                 g_res->set_symbol(ui->cmbDisplayData->getSymbol());
                 g_res->set_symbolSize(5);
                 g_res->set_lineWidth(1);
@@ -993,21 +998,23 @@ void QFImFCCSFitEvaluationEditor::copyToInitial()
 
 void QFImFCCSFitEvaluationEditor::setParameterTableSpans()
 {
-    for (int i=1; i<ui->tableView->model()->columnCount(); i=i+5) {
-        ui->tableView->setSpan(0,i,1,5);
-        ui->tableView->setSpan(1,i,1,5);
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    for (int i=1; i<ui->tableView->model()->columnCount(); i=i+data->getParameterInputTableModel()->getColsPerRDR()) {
+        ui->tableView->setSpan(0,i,1,data->getParameterInputTableModel()->getColsPerRDR());
+        ui->tableView->setSpan(1,i,1,data->getParameterInputTableModel()->getColsPerRDR());
     }
+    setParameterVisibility();
 }
 
 void QFImFCCSFitEvaluationEditor::on_cmbWeight_currentWeightChanged(QFFCSWeightingTools::DataWeight weight)
 {
     if (!current) return;
-    if (!current->getHighlightedRecord()) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QString pid=ui->cmbFitAlgorithm->currentFitAlgorithmID();
-    current->getHighlightedRecord()->setQFProperty("algorithm", pid, false, false);
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
     data->setFitDataWeighting(weight);
+    displayData();
     QApplication::restoreOverrideCursor();
 }
 
@@ -1077,13 +1084,52 @@ void QFImFCCSFitEvaluationEditor::on_chkSaveStrings_toggled(bool checked)
     current->setQFProperty("dontSaveFitResultMessage", !checked, false, false);
 }
 
+void QFImFCCSFitEvaluationEditor::on_btnEditRanges_toggled(bool enabled)
+{
+    setParameterVisibility();
+    ensureCorrectParamaterModelDisplay();
+}
+
+void QFImFCCSFitEvaluationEditor::setParameterVisibility()
+{
+    bool enabled=ui->btnEditRanges->isChecked();
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    //data->getParameterInputTableModel()->setEditRanges(enabled);
+    for (int i=1; i<ui->tableView->model()->columnCount(); i=i+data->getParameterInputTableModel()->getColsPerRDR()) {
+        ui->tableView->setColumnHidden(i+2, !enabled);
+        ui->tableView->setColumnHidden(i+3, !enabled);
+    }
+}
+
+void QFImFCCSFitEvaluationEditor::on_btnAddFile_clicked()
+{
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    data->addFitFile();
+    setParameterTableSpans();
+    ensureCorrectParamaterModelDisplay();
+    //connect(ui->btnRemoveFile, SIGNAL(clicked()), item, SLOT(removeFitFile()));
+
+}
+
+void QFImFCCSFitEvaluationEditor::on_btnRemoveFile_clicked()
+{
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    data->removeFitFile();
+    setParameterTableSpans();
+    ensureCorrectParamaterModelDisplay();
+    //connect(ui->btnRemoveFile, SIGNAL(clicked()), item, SLOT(removeFitFile()));
+}
+
 
 void QFImFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     if (!current) return;
-    QFRawDataRecord* record=current->getHighlightedRecord();
+    //QFRawDataRecord* record=current->getHighlightedRecord();
     // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
     QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
-    if ((!eval)||(!record)/*||(!data)*/) return;
+    if ((!eval)/*||(!record)||(!data)*/) return;
 
 
     // we use this QTextCursor to write the document

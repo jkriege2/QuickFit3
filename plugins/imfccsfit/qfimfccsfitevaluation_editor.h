@@ -78,6 +78,10 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
         void filesSetActivated(const QModelIndex& idx);
         void on_chkSaveStrings_toggled(bool checked);
+        void on_btnEditRanges_toggled(bool enabled);
+        void setParameterVisibility();
+        void on_btnAddFile_clicked();
+        void on_btnRemoveFile_clicked();
     protected:
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFImFCCSFitEvaluationEditor *ui;

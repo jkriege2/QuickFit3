@@ -973,49 +973,51 @@ bool* QFFitResultsEvaluation::allocFillFix(QFRawDataRecord* r, const QString& re
 }
 
 
-double* QFFitResultsEvaluation::allocFillParametersMin(QFFitFunction *function) const {
+double* QFFitResultsEvaluation::allocFillParametersMin(QFRawDataRecord* r, QFFitFunction *function) const {
     QFFitFunction* f=function;
     if (!f) f=getFitFunction(getHighlightedRecord());
 
     if (f!=NULL) {
         double* res=(double*)calloc(f->paramCount(), sizeof(double));
-        fillParametersMin(res, f);
+        fillParametersMin(res, r, f);
         return res;
     }
     return NULL;
 }
 
-double* QFFitResultsEvaluation::allocFillParametersMax(QFFitFunction *function) const {
+double* QFFitResultsEvaluation::allocFillParametersMax(QFRawDataRecord* r, QFFitFunction *function) const {
     QFFitFunction* f=function;
     if (!f) f=getFitFunction(getHighlightedRecord());
 
     if (f!=NULL) {
         double* res=(double*)calloc(f->paramCount(), sizeof(double));
-        fillParametersMax(res, f);
+        fillParametersMax(res, r, f);
         return res;
     }
     return NULL;
 }
 
-void QFFitResultsEvaluation::fillParametersMin(double* param, QFFitFunction* function) const {
+void QFFitResultsEvaluation::fillParametersMin(double* param, QFRawDataRecord* r, QFFitFunction* function) const {
     QFFitFunction* f=function;
-    if (!f) f=getFitFunction(getHighlightedRecord());
+    if (!r) r=getHighlightedRecord();
+    if (!f) f=getFitFunction(r);
     if (f!=NULL) {
         for (int i=0; i<f->paramCount(); i++) {
             QString id=f->getParameterID(i);
-            param[i]=getFitMin(id);
+            param[i]=getFitMin(id, r);
         }
     }
 }
 
-void QFFitResultsEvaluation::fillParametersMax(double* param, QFFitFunction* function) const {
+void QFFitResultsEvaluation::fillParametersMax(double* param, QFRawDataRecord* r, QFFitFunction* function) const {
     QFFitFunction* f=function;
-    if (!f) f=getFitFunction(getHighlightedRecord());
+    if (!r) r=getHighlightedRecord();
+    if (!f) f=getFitFunction(r);
 
     if (f!=NULL) {
         for (int i=0; i<f->paramCount(); i++) {
             QString id=f->getParameterID(i);
-            param[i]=getFitMax(id);
+            param[i]=getFitMax(id, r);
         }
     }
 }
