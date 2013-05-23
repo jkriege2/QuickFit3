@@ -16,6 +16,7 @@ QFEDiffusionCoefficientCalculator::QFEDiffusionCoefficientCalculator(QObject* pa
 	logService=NULL;
     dlg=NULL;
     actStartPlugin=NULL;
+     QFPluginServices::getInstance()->registerSettingsPane(this);
 }
 
 QFEDiffusionCoefficientCalculator::~QFEDiffusionCoefficientCalculator() {

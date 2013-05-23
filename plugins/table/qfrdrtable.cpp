@@ -53,6 +53,7 @@ QFRDRTable::GraphInfo::GraphInfo() {
     colorbarRelativeHeight=0.75;
     function="";
     modifierMode=JKQTPMathImage::ModifyValue;
+    functionType=gtfString;
 
 }
 
@@ -869,11 +870,29 @@ void QFRDRTable::intReadData(QDomElement* e) {
             while (!te.isNull()) {
                 columns++;
                 QString n=te.attribute("title");
-                QString hexp=te.attribute("column_expression");
+                QString hexp=te.attribute("expression", te.attribute("column_expression"));
+                QString hc=te.attribute("comment", te.attribute("column_comment"));
                 QDomElement re=te.firstChildElement("row");
                 quint16 r=0;
                 //std::cout<<"resize("<<rows<<", "<<columns<<")\n";
                 datamodel->resize(rows, columns);
+                datamodel->setColumnTitle(columns-1, n);
+                if (!hexp.isEmpty()) datamodel->setColumnHeaderData(columns-1, ColumnExpressionRole, hexp);
+                if (!hc.isEmpty()) datamodel->setColumnHeaderData(columns-1, ColumnCommentRole, hc);
+                QDomNamedNodeMap sl=te.attributes();
+                for (int i=0; i<sl.size(); i++) {
+                    QString a=sl.item(i).nodeName();
+                    //qDebug()<<"found attribute "<<a;
+                    QRegExp rx("colpar(\\w+)(\\d+)");
+                    if (  rx.indexIn(a)>=0) {
+                        bool ok=false;
+                        int role=rx.cap(1).toInt(&ok);
+                        if (ok&&role>=0 && !te.attribute(a).isEmpty()) {
+                            QVariant v= getQVariantFromString( te.attribute(QString("colpart%1").arg(role), "string"), te.attribute(a));
+                            datamodel->setColumnHeaderData(columns-1, ColumnExpressionRole, v);
+                        }
+                    }
+                }
                 //std::cout<<"resize("<<rows<<", "<<columns<<") DONE\n";
                 while (!re.isNull()) {
                     QString t=re.attribute("type").toLower();
@@ -896,8 +915,6 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     r++;
                 }
 
-                datamodel->setColumnTitle(columns-1, n);
-                if (!hexp.isEmpty()) datamodel->setColumnHeaderData(columns-1, ColumnExpressionRole, hexp);
                 te = te.nextSiblingElement("column");
             }
         } else {
@@ -1012,6 +1029,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.imageLegendB=ge.attribute("image_legend_b", "");
                     graph.imageLegendMod=ge.attribute("image_legend_mod", "");
                     graph.function=ge.attribute("function", "");
+                    graph.functionType=String2GTFunctionType(ge.attribute("functiontype", "string"));
                     graph.modifierMode=JKQTPMathImage::StringToModifierMode(ge.attribute("modifier_mode", "none"));
 
 
@@ -1041,7 +1059,18 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeStartElement("column");
             w.writeAttribute("title", datamodel->columnTitle(c));
             if (datamodel->hasColumnHeaderData(c, ColumnExpressionRole)) {
-                w.writeAttribute("column_expression", datamodel->getColumnHeaderData(c, ColumnExpressionRole).toString());
+                w.writeAttribute("expression", datamodel->getColumnHeaderData(c, ColumnExpressionRole).toString());
+            }
+            if (datamodel->hasColumnHeaderData(c, ColumnCommentRole)) {
+                w.writeAttribute("comment", datamodel->getColumnHeaderData(c, ColumnCommentRole).toString());
+            }
+            QList<quint32> coldroles=datamodel->getColumnHeaderDataRoles();
+            for (int i=0; i<coldroles.size(); i++) {
+                if (coldroles[i]!=ColumnExpressionRole && coldroles[i]!=ColumnCommentRole) {
+                    w.writeAttribute(QString("colpar%1").arg(coldroles[i]), getQVariantData(datamodel->getColumnHeaderData(c, coldroles[i])));
+                    w.writeAttribute(QString("colpart%1").arg(coldroles[i]), getQVariantType(datamodel->getColumnHeaderData(c, coldroles[i])));
+
+                }
             }
             for (quint16 r=0; r<datamodel->rowCount(); r++) {
                 if (datamodel->cell(r, c).isValid()) {
@@ -1155,6 +1184,7 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("image_legend_b", plots[i].graphs[g].imageLegendB);
             w.writeAttribute("image_legend_mod", plots[i].graphs[g].imageLegendMod);
             w.writeAttribute("function", plots[i].graphs[g].function);
+            w.writeAttribute("functiontype", GTFunctionType2String(plots[i].graphs[g].functionType));
 
             w.writeAttribute("stride", QString::number(plots[i].graphs[g].stride));
             w.writeAttribute("stride_start", QString::number(plots[i].graphs[g].strideStart));

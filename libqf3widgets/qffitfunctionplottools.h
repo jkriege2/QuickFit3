@@ -21,7 +21,6 @@ class QFWIDLIB_EXPORT JKQTPxQFFitFunctionLineGraph: public JKQTPxFunctionLineGra
 
         GetMacro(QFFitFunction*, fitFunction);
         GetSetMacro(bool, ownsFunction);
-        GetSetMacro(QVector<double>, paramsVector);
         GetSetMacro(double, scaleX);
         GetSetMacro(double, offsetX);
 
@@ -29,14 +28,14 @@ class QFWIDLIB_EXPORT JKQTPxQFFitFunctionLineGraph: public JKQTPxFunctionLineGra
     protected:
         QFFitFunction* fitFunction;
         bool ownsFunction;
-        QVector<double> paramsVector;
 
         double scaleX;
         double offsetX;
 
         JKQTPxQFFitFunctionLineGraphFunctionParams* intParam;
 
-        virtual void createPlotData();
+        virtual void collectParameters();
+        //virtual void createPlotData( bool collectParams=true);
 
 
 };

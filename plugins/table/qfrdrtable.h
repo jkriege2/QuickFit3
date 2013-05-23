@@ -28,7 +28,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         enum {
             TableExpressionRole = Qt::UserRole+1,
             TableCommentRole = Qt::UserRole+2,
-            ColumnExpressionRole = Qt::UserRole+10
+            ColumnExpressionRole = Qt::UserRole+10,
+            ColumnCommentRole = Qt::UserRole+11
         };
 
 
@@ -47,6 +48,34 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             gtMaskImage,
             gtFunction
         };
+
+        enum GTFunctionType {
+            gtfQFFunction,
+            gtfPolynomial,
+            gtfExponential,
+            gtfPowerLaw,
+            gtfString
+        };
+
+        static QString GTFunctionType2String(GTFunctionType type) {
+            switch(type) {
+                case gtfQFFunction: return QString("qffunction");
+                case gtfPolynomial: return QString("poly");
+                case gtfExponential: return QString("exp");
+                case gtfPowerLaw: return QString("pow");
+                default:
+                case gtfString:
+                    return QString("string");
+            }
+
+        }
+        static GTFunctionType String2GTFunctionType(QString type) {
+            if(type=="qffunction") return gtfQFFunction;
+            if(type=="poly") return gtfPolynomial;
+            if(type=="exp") return gtfExponential;
+            if(type=="pow") return gtfPowerLaw;
+            return gtfString;
+        }
 
         static QString GraphType2String(GraphType type) {
             switch(type) {
@@ -153,6 +182,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             JKQTPMathImage::ModifierMode modifierMode;
 
             QString function;
+            GTFunctionType functionType;
 
         };
 

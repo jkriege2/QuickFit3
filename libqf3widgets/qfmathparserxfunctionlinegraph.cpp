@@ -52,8 +52,9 @@ QFMathParserXFunctionLineGraph::~QFMathParserXFunctionLineGraph()
     delete efdata.parser;
 }
 
-void QFMathParserXFunctionLineGraph::createPlotData()
+void QFMathParserXFunctionLineGraph::createPlotData(bool collectParams)
 {
+    collectParameters();
     QElapsedTimer timer;
     timer.start();
     for (int i=0; i<fdata.varcount; i++) {
@@ -74,8 +75,8 @@ void QFMathParserXFunctionLineGraph::createPlotData()
 
         }
     }
-    for (int i=0; i<parameters.size(); i++) {
-        fdata.parser->addVariableDouble(QString("p%1").arg(fdata.varcount+1), parameters[i]);
+    for (int i=0; i<iparams.size(); i++) {
+        fdata.parser->addVariableDouble(QString("p%1").arg(fdata.varcount+1), iparams[i]);
         fdata.varcount=fdata.varcount+1;
     }
     fdata.parser->addVariable(QString("x"),  QFMathParser::qfmpVariable(&dummyX));
@@ -105,8 +106,8 @@ void QFMathParserXFunctionLineGraph::createPlotData()
 
         }
     }
-    for (int i=0; i<errorParameters.size(); i++) {
-        efdata.parser->addVariableDouble(QString("p%1").arg(efdata.varcount+1), errorParameters[i]);
+    for (int i=0; i<ierrorparams.size(); i++) {
+        efdata.parser->addVariableDouble(QString("p%1").arg(efdata.varcount+1), ierrorparams[i]);
         efdata.varcount=efdata.varcount+1;
     }
     efdata.parser->addVariable(QString("x"), QFMathParser::qfmpVariable(&dummyEX));
@@ -122,7 +123,7 @@ void QFMathParserXFunctionLineGraph::createPlotData()
     set_errorPlotFunction(QFMathParserXFunctionLineGraph_evaluate);
 
     t=timer.elapsed();
-    JKQTPxFunctionLineGraph::createPlotData();
+    JKQTPxFunctionLineGraph::createPlotData(false);
     //qDebug()<<"createPlotData():   JKQTPxFunctionLineGraph::createPlotData():   "<<timer.elapsed()-t<<"ms";
 
     /*int count=0;
@@ -133,4 +134,5 @@ void QFMathParserXFunctionLineGraph::createPlotData()
     }
     qDebug()<<"refined to "<<count<<" daatapoints";*/
 }
+
 

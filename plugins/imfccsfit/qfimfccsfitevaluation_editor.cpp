@@ -624,7 +624,7 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 JKQTPxQFFitFunctionLineGraph* g_fit=new JKQTPxQFFitFunctionLineGraph();
                 g_fit->set_title(tr("fit: %1").arg(plotname));
                 g_fit->set_fitFunction(ff, false);
-                g_fit->set_paramsVector(paramsV);
+                g_fit->set_params(paramsV);
                 g_fit->set_color(g->get_color());
                 g_fit->set_style(Qt::DashLine);
                 g_fit->set_lineWidth(2);

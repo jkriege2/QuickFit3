@@ -54,9 +54,9 @@
 
     This is a simple form of the IRLS algorithm to estimate the parameters a and b in a linear model $$math: f(x)=a+b\cdot x $$.
     This algorithm solves the optimization problem for a $$math: L_p$$-norm:
-      $$bmath: (a^\ast,b^\ast)=\argmin\limits_{a,b}\sum\limits_i|a+b\cdot x_i-y_i|^p $$
+      $$bmath:(a^\ast,b^\ast)=\argmin\limits_{a,b}\sum\limits_i|a+b\cdot x_i-y_i|^p$$
     by iteratively optimization weights \f$ \vec{w} \f$ and solving a weighted least squares problem in each iteration:
-      $$bmath: (a_n,b_n)=\argmin\limits_{a,b}\sum\limits_i|a+b\cdot x_i-y_i|^{(p-2)}\cdot|a+b\cdot x_i-y_i|^2 $
+      $$bmath:(a_n,b_n)=\argmin\limits_{a,b}\sum\limits_i|a+b\cdot x_i-y_i|^{(p-2)}\cdot|a+b\cdot x_i-y_i|^2$$
 
 
     The algoruithms works as follows:<ol>
@@ -69,7 +69,7 @@
       <li>return the last estimates $$math:a_n$$ and $$math:b_n$$</li>
     </ol>
 
-    $$figure:../pic/irls.png:$$
+    <center><img src="../pic/irls.png"></center>
 	$$see:C. Sidney Burrus: "Iterative Reweighted Least Squares", <a href="http://cnx.org/content/m45285/latest/">http://cnx.org/content/m45285/latest/</a>$$
 	  <!-- /func:regression -->
 	  </li>

@@ -684,6 +684,11 @@ bool QFTableModel::hasColumnHeaderData(quint16 column, int role) const
     return false;
 }
 
+QList<quint32> QFTableModel::getColumnHeaderDataRoles() const
+{
+    return headerDataMap.keys();
+}
+
 void QFTableModel::setDefaultEditValue(QVariant defaultEditValue)
 {
     this->defaultEditValue=defaultEditValue;

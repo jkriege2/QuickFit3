@@ -179,6 +179,7 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         void setColumnHeaderData(quint16 column, int role, const QVariant &data);
         QVariant getColumnHeaderData(quint16 column, int role) const;
         bool hasColumnHeaderData(quint16 column, int role) const;
+        QList<quint32> getColumnHeaderDataRoles() const;
 
         /** \brief set the default QVariant value displayed in an editor, if the value does not yet exist */
         void setDefaultEditValue(QVariant defaultEditValue);

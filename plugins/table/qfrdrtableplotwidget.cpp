@@ -912,29 +912,45 @@ void QFRDRTablePlotWidget::updateGraph() {
 
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtFunction) {
-                QFMathParserXFunctionLineGraph* pg=new QFMathParserXFunctionLineGraph(ui->plotter->get_plotter());
-                pg->set_title(g.title);
-                pg->set_function(g.function);
-                //qDebug()<<"adding function plot "<<g.function;
-                if (g.ycolumn>=0 && g.ycolumn<(long)ui->plotter->getDatastore()->getColumnCount()) {
-                    pg->set_parameterColumn(g.ycolumn);
+                JKQTPxFunctionLineGraph* pg=NULL;
+
+                if (g.functionType==QFRDRTable::gtfString) {
+                    QFMathParserXFunctionLineGraph* pgf=new QFMathParserXFunctionLineGraph(ui->plotter->get_plotter());
+                    pgf->set_function(g.function);
+                    if (g.ycolumn>=0 && g.ycolumn<(long)ui->plotter->getDatastore()->getColumnCount()) {
+                        pgf->set_parameterColumn(g.ycolumn);
+                    }
+                    pg=pgf;
+
+                } else if (g.functionType==QFRDRTable::gtfPolynomial) {
+                    JKQTPxFunctionLineGraph* pgf=new JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
+                    pgf->setSpecialFunction(JKQTPxFunctionLineGraph::Polynomial);
+                    if (g.ycolumn>=0 && g.ycolumn<(long)ui->plotter->getDatastore()->getColumnCount()) {
+                        pgf->set_parameterColumn(g.ycolumn);
+                    }
+                    pg=pgf;
                 }
-                pg->set_drawLine(true);
-                pg->set_lineWidth(g.linewidth);
-                QColor c=g.color;
-                c.setAlphaF(g.colorTransparent);
-                pg->set_color(c);
-                QColor ec=g.errorColor;
-                ec.setAlphaF(g.errorColorTransparent);
-                pg->set_errorColor(ec);
-                QColor efc=g.errorColor;
-                efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
-                pg->set_errorFillColor(efc);
-                QColor fc=g.fillColor;
-                fc.setAlphaF(g.fillColorTransparent);
-                pg->set_fillColor(fc);
-                pg->set_style(g.style);
-                ui->plotter->addGraph(pg);
+
+                if (pg) {
+                    pg->set_title(g.title);
+                    //qDebug()<<"adding function plot "<<g.function;
+                    pg->set_drawLine(true);
+                    pg->set_lineWidth(g.linewidth);
+                    QColor c=g.color;
+                    c.setAlphaF(g.colorTransparent);
+                    pg->set_color(c);
+                    QColor ec=g.errorColor;
+                    ec.setAlphaF(g.errorColorTransparent);
+                    pg->set_errorColor(ec);
+                    QColor efc=g.errorColor;
+                    efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
+                    pg->set_errorFillColor(efc);
+                    QColor fc=g.fillColor;
+                    fc.setAlphaF(g.fillColorTransparent);
+                    pg->set_fillColor(fc);
+                    pg->set_style(g.style);
+                    ui->plotter->addGraph(pg);
+                }
             } else { // gtLines etc.
                 JKQTPxyLineErrorGraph* pg=new JKQTPxyLineErrorGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);

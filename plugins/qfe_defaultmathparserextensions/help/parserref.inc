@@ -1,2 +1,2 @@
-<li><b><a href="./parserreference/fit.html">fits: function parameter optimization</a></b></li>
-<!--<li><b><a href="./parserreference/.html"></a></b></li>-->
+<li><b><a href="$$plugin_info:helpdir:qfe_defaultmathparserextensions$$/parserreference/fit.html">fits: function parameter optimization</a></b></li>
+<!--<li><b><a href="$$plugin_info:helpdir:qfe_defaultmathparserextensions$$/parserreference/.html"></a></b></li>-->

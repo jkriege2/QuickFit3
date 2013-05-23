@@ -35,7 +35,18 @@ void JKQTPxQFFitFunctionLineGraph::set_fitFunction(QFFitFunction *fitFunction, b
     this->ownsFunction=ownsFunction;
 }
 
-void JKQTPxQFFitFunctionLineGraph::createPlotData()
+void JKQTPxQFFitFunctionLineGraph::collectParameters()
+{
+    JKQTPxFunctionLineGraph::collectParameters();
+    intParam->function=fitFunction;
+    intParam->param=iparams;
+    intParam->scaleX=scaleX;
+    intParam->offsetX=offsetX;
+    set_plotFunction(JKQTPxQFFitFunctionLineGraph_func);
+    set_params((void*)intParam);
+}
+
+/*void JKQTPxQFFitFunctionLineGraph::createPlotData(bool collectParams)
 {
     intParam->function=fitFunction;
     intParam->param=paramsVector;
@@ -44,5 +55,5 @@ void JKQTPxQFFitFunctionLineGraph::createPlotData()
     set_plotFunction(JKQTPxQFFitFunctionLineGraph_func);
     set_params((void*)intParam);
 
-    JKQTPxFunctionLineGraph::createPlotData();
-}
+    JKQTPxFunctionLineGraph::createPlotData(false);
+}*/

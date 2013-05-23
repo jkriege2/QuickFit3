@@ -487,7 +487,7 @@ void QFSPIMLightsheetEvaluationEditor::showImageCut(QFSPIMLightsheetEvaluationIt
                 parTxt+=QString("</tr>");
             }
             JKQTPxQFFitFunctionLineGraph* lg=new JKQTPxQFFitFunctionLineGraph(ui->pltFit->get_plotter());
-            lg->set_paramsVector(params);
+            lg->set_params(params);
             lg->set_fitFunction(model, true);
             lg->set_drawLine(true);
             lg->set_lineWidth(2);

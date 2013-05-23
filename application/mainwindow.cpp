@@ -2817,6 +2817,9 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 if (QFPluginServices::getInstance() && command=="plugin_info") {
                     if (param1=="help") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginHelp(param2));
                     if (param1=="tutorial") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginTutorial(param2));
+                    if (param1=="helpdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginHelpDirectory(param2));
+                    if (param1=="assetsdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginAssetsDirectory(param2));
+                    if (param1=="configdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginConfigDirectory(param2));
                 } else if (command=="fig" || command=="figure") {
                     QString rep=tr("<center>"
                                      "<img src=\"%1\"><br><i>%2</i><br>"

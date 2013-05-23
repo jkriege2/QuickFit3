@@ -36,26 +36,18 @@ class QFWIDLIB_EXPORT QFMathParserXFunctionLineGraph : public JKQTPxFunctionLine
         /** \brief class destructor */
         virtual ~QFMathParserXFunctionLineGraph();
 
-        GetSetMacro(QList<double>, parameters);
         GetSetMacro(QString, function);
-        GetSetMacro(int, parameterColumn);
 
-        GetSetMacro(QList<double>, errorParameters);
         GetSetMacro(QString, errorFunction);
-        GetSetMacro(int, errorParameterColumn);
     protected:
 
 
         /** \brief which plot style to use from the parent plotter (via JKQtPlotterBase::getPlotStyle() and JKQtPlotterBase::getNextStyle() ) */
         QString function;
-        QList<double> parameters;
         QFMathParserXFunctionLineGraphFunctionData fdata;
-        int parameterColumn;
 
         QString errorFunction;
-        QList<double> errorParameters;
         QFMathParserXFunctionLineGraphFunctionData efdata;
-        int errorParameterColumn;
 
         GetSetMacroI(jkqtpPlotFunctionType, plotFunction, clearData());
         GetSetMacroI(void*, params, clearData());
@@ -63,7 +55,7 @@ class QFWIDLIB_EXPORT QFMathParserXFunctionLineGraph : public JKQTPxFunctionLine
         GetSetMacro(void*, errorParams);
 
         /** \brief fill the data array with data from the function plotFunction */
-        virtual void createPlotData();
+        virtual void createPlotData(bool collectParams=true);
 
         double dummyX, dummyEX;
 

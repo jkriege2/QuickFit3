@@ -207,6 +207,9 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     menu->addSeparator();
     addInsertAction(menu, "$$plugin_info:help:PLUGINID$$");
     addInsertAction(menu, "$$plugin_info:tutorial:PLUGINID$$");
+    addInsertAction(menu, "$$plugin_info:helpdir:PLUGINID$$");
+    addInsertAction(menu, "$$plugin_info:assetsdir:PLUGINID$$");
+    addInsertAction(menu, "$$plugin_info:configdir:PLUGINID$$");
 
 
     menu=new QMenu(tr("plugin lists"), this);
