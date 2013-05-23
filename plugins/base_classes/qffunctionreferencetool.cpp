@@ -1,6 +1,6 @@
 #include "qffunctionreferencetool.h"
 #include "qfpluginservices.h"
-
+#include "qfhtmlhelptools.h"
 
 QFFunctionReferenceToolDocSearchThread::QFFunctionReferenceToolDocSearchThread(QStringList files, QObject *parent):
     QThread(parent)

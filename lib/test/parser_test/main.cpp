@@ -5,7 +5,7 @@
 #include <QElapsedTimer>
 #define TEST(expr) {\
     parser.resetErrors(); \
-    QFMathParser::qfmpResult r=parser.evaluate(expr); \
+    qfmpResult r=parser.evaluate(expr); \
     qDebug()<<expr<<"  =  "<<r.toTypeString()<<"\n"; \
     if (parser.hasErrorOccured()) { \
         qDebug()<<"   ERROR "<<parser.getLastErrors().join("\n    ")<<"\n" ;\
@@ -33,17 +33,49 @@
     QFMathParser::qfmpNode* n=parser.parse(#expr); \
     el=double(timer.nsecsElapsed())/1e6; \
     qDebug()<<"parsing: "<<el<<" ms"; \
+    parser.resetErrors(); \
+    QFMathParser::ByteCodeProgram bprog;\
+    timer.start(); \
+    n->createByteCode(bprog); \
+    el=double(timer.nsecsElapsed())/1e6; \
+    qDebug()<<"generating bytecode: "<<el<<" ms\n\n-----------------------------------------------------------\n"<<QFMathParser::printBytecode(bprog)<<"\n-----------------------------------------------------------\n"; \
      \
     timer.start(); \
+    qfmpResult rtst; \
     for (int i=0; i<cnt; i++) { \
-        QFMathParser::qfmpResult r=n->evaluate(); \
-        val=r.num; \
+        rtst=n->evaluate(); \
     } \
     el=double(timer.nsecsElapsed())/1e6; \
-    qDebug()<<"interpreted: "<<el<<" ms     (result="<<val<<")"; \
+    qDebug()<<"interpreted (evaluate with return value): "<<el<<" ms     (result="<<rtst.toTypeString()<<")"; \
     qDebug()<<"interpreted/native : "<<el/nat; \
     if (parser.hasErrorOccured()) { \
         qDebug()<<"   ERROR "<<parser.getLastErrors().join("\n    ")<<"\n" ; \
+    } \
+    \
+    timer.start(); \
+    qfmpResult rr; \
+    for (int i=0; i<cnt; i++) { \
+        n->evaluate(rr); \
+    } \
+    el=double(timer.nsecsElapsed())/1e6; \
+    qDebug()<<"interpreted (evaluate call-by-value): "<<el<<" ms     (result="<<rr.toTypeString()<<")"; \
+    qDebug()<<"interpreted/native : "<<el/nat; \
+    if (parser.hasErrorOccured()) { \
+        qDebug()<<"   ERROR "<<parser.getLastErrors().join("\n    ")<<"\n" ; \
+    } \
+    \
+    if (doBytecode) { \
+        timer.start(); \
+        qfmpResult rrb; \
+        for (int i=0; i<cnt; i++) { \
+            parser.evaluateBytecode(rrb, bprog); \
+        } \
+        el=double(timer.nsecsElapsed())/1e6; \
+        qDebug()<<"interpreted (bytecode): "<<el<<" ms     (result="<<rrb.toTypeString()<<")"; \
+        qDebug()<<"interpreted/native : "<<el/nat; \
+        if (parser.hasErrorOccured()) { \
+            qDebug()<<"   ERROR "<<parser.getLastErrors().join("\n    ")<<"\n" ; \
+        } \
     } \
     qDebug()<<"\n"; \
 }
@@ -56,11 +88,22 @@ void speed_test() {
     qDebug()<<"\n\n=========================================================";
     qDebug()<<"== SPEED TEST\n=========================================================";
 
+    bool doBytecode=true;
     {
-        SPEEDTEST(pi*37.467);
+        /*SPEEDTEST(pi*37.467);
+        SPEEDTEST(pi+37.467);
+        SPEEDTEST(pi-37.467);
+        SPEEDTEST(-pi);
         SPEEDTEST(pi*37.467+45.3e-4/1e-8-1);
         SPEEDTEST(sqrt(sin(2.5*58)));
-        SPEEDTEST(sqrt(45.6*sin(pi*37.467)+45.3e-4/1e-8)-1);
+        SPEEDTEST(sqrt(45.6*sin(pi*37.467)+45.3e-4/1e-8)-1);*/
+        SPEEDTEST(1+1);
+        SPEEDTEST(1.54-1.35);
+        SPEEDTEST(1.54-5%2);
+        SPEEDTEST(1.54-5.0/2.0);
+        SPEEDTEST(1+2+3+4+5+6+7+8+9+10+11+12+13+14+15+16+17+18+19+20);
+        SPEEDTEST(1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20);
+        SPEEDTEST(sqrt(1+2)+sin(3+4)+sqrt(5+6)+sin(7+8)+cos(9+10)+sqrt(11+12)+cos(13+14)+sqrt(15+16)+sin(17+18)+cos(19+20));
     }
 }
 #pragma GCC pop_options
@@ -77,7 +120,7 @@ int main(int argc, char *argv[])
         if (i%10000000==0) qDebug()<<i;
     }*/
 
-    speed_test();
+
 
     TEST("1+2+pi");
     TEST("1+2*pi");
@@ -206,6 +249,10 @@ int main(int argc, char *argv[])
     TEST("concat(1:2:4, [18,19,20], 3, [1, pi])");
     TEST("[1:2:4, [18,19,20], 3, 1, pi, 3:-1:1]");
     TEST("for(i,1,5,if(i<=3,-i,i^3))");
+    TEST("xx=~(1:20)");
+    TEST("sum(i,0,length(xx)-1,int2bin(xx[i])+\"   \")");
+    TEST("sum(i,~xx,int2hex(i)+\"   \")");
+    TEST("sum(i,~xx,int2oct(i)+\"   \")");
     TEST("x=1:5;y=5:-1:1");
     TEST("x+y");
     TEST("x*y");
@@ -216,12 +263,32 @@ int main(int argc, char *argv[])
     TEST("-x");
     TEST("x^y");
     TEST("x^2");
-    TEST("xx=~(1:20)");
-    TEST("sum(i,0,length(xx)-1,int2bin(xx[i])+\"   \")");
-    TEST("sum(i,~xx,int2hex(i)+\"   \")");
-    TEST("sum(i,~xx,int2oct(i)+\"   \")");
+
+    TEST("x=1:5;y=5:-1:1");
+    TEST("x=1:5; y=5:-1:1");
+    TEST("1:5;5:-1:1");
+    TEST("1:1:5;5:-1:1");
+    TEST("[1,2,5];[5,4,3]");
+    TEST("x=[1,2,5]; y=[5,4,3]");
+    TEST("x=[1,2,5]; [5,4,3]");
+    TEST("1; 5");
+    TEST("x=1; 5");
+    TEST("1; y=5");
+    TEST("x=1; y=5");
+    TEST("5:-1:1;1:5");
+    TEST("5:-1:1;1:1:5");
+    TEST("1:1:5;5:-1:1");
+    TEST("[1,2,5];[5,4,3]");
+    TEST("[1,2,5];[5,4,3];[4,3,pi]");
+    TEST("[1,2,5];1:5;[4,3,pi]");
+    TEST("[1,2,5];[5,4,3];1:5");
+    TEST("x=[1,2,5]; y=[5,4,3]");
+    TEST("x=[1,2,5]; [5,4,3]");
+    TEST("x=[1,2,5]");
+    TEST("[1,2,5]");
 
 
 
+    speed_test();
     return 0;
 }

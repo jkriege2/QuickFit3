@@ -7,9 +7,10 @@
 double QFMathParserXFunctionLineGraph_evaluate(double x, void* data) {
     QFMathParserXFunctionLineGraphFunctionData* d=(QFMathParserXFunctionLineGraphFunctionData*)data;
     if (d && d->parser && d->node) {
-        d->parser->resetErrors();
-        d->parser->addVariableDouble("x", x);
-        qfmpResult r=d->node->evaluate();
+        //d->parser->resetErrors();
+        *(d->x)=x;
+        qfmpResult r;
+        d->node->evaluate(r);
 
         if (r.isUsableResult()) {
             if (r.type==qfmpBool) {
@@ -59,6 +60,7 @@ void QFMathParserXFunctionLineGraph::createPlotData()
         fdata.parser->deleteVariable(QString("p%1").arg(i+1));
     }
     fdata.varcount=0;
+    fdata.x=&dummyX;
     if (parent && parameterColumn>=0) {
 
         JKQTPdatastore* datastore=parent->getDatastore();
@@ -76,7 +78,7 @@ void QFMathParserXFunctionLineGraph::createPlotData()
         fdata.parser->addVariableDouble(QString("p%1").arg(fdata.varcount+1), parameters[i]);
         fdata.varcount=fdata.varcount+1;
     }
-    fdata.parser->addVariableDouble(QString("x"), 0.0);
+    fdata.parser->addVariable(QString("x"),  QFMathParser::qfmpVariable(&dummyX));
     if (fdata.node) delete fdata.node;
     qint64 t=timer.elapsed();
     //qDebug()<<"createPlotData():   adding variables: "<<t<<"ms";
@@ -89,6 +91,7 @@ void QFMathParserXFunctionLineGraph::createPlotData()
         efdata.parser->deleteVariable(QString("p%1").arg(i+1));
     }
     efdata.varcount=0;
+    efdata.x=&dummyEX;
     if (parent && errorParameterColumn>=0) {
 
         JKQTPdatastore* datastore=parent->getDatastore();
@@ -106,7 +109,7 @@ void QFMathParserXFunctionLineGraph::createPlotData()
         efdata.parser->addVariableDouble(QString("p%1").arg(efdata.varcount+1), errorParameters[i]);
         efdata.varcount=efdata.varcount+1;
     }
-    efdata.parser->addVariableDouble(QString("x"), 0.0);
+    efdata.parser->addVariable(QString("x"), QFMathParser::qfmpVariable(&dummyEX));
     if (efdata.node) delete efdata.node;
     t=timer.elapsed();
     //qDebug()<<"createPlotData():   adding variables: "<<t-t0<<"ms";

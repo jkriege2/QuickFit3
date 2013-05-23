@@ -324,7 +324,7 @@ void QFImFCCSParameterInputDelegate::setModelData(QWidget *editor, QAbstractItem
                 return;
             }
         }
-        if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtValueDoubleEdit || widgetType.toInt()==QFImFCCSParameterInputTable::wtRangeEditMin || widgetType.toInt()==QFImFCCSParameterInputTable::wtRangeEditMax) {
+        if (imfccs && (widgetType.toInt()==QFImFCCSParameterInputTable::wtValueDoubleEdit || widgetType.toInt()==QFImFCCSParameterInputTable::wtRangeEditMin || widgetType.toInt()==QFImFCCSParameterInputTable::wtRangeEditMax)) {
             QFDoubleEdit* edt=qobject_cast<QFDoubleEdit*>(editor);
             if (edt) {
                 model->setData(index, edt->value());

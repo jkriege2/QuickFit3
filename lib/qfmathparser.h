@@ -58,27 +58,23 @@ class QFMathParser; // forward
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    qfmpResult r;\
-    r.type=qfmpDouble;\
+void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
     if (n!=1) {\
         p->qfmpError(QObject::tr("%1(...) needs exacptly 1 argument").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
-        return r;\
+        r.setInvalid();\
+        return ;\
     }\
     if (params[0].type==qfmpDouble) {\
-        r.num=CFUNC(params[0].num);\
+        r.setDouble(CFUNC(params[0].num));\
     } else if(params[0].type==qfmpDoubleVector) {\
-        r.type=qfmpDoubleVector;\
-        r.numVec.resize(params[0].numVec.size());\
+        r.setDoubleVec(params[0].numVec.size());\
         for (int i=0; i<params[0].numVec.size(); i++) {\
             r.numVec[i]=CFUNC(params[0].numVec[i]);\
         }\
     } else {\
         p->qfmpError(QObject::tr("%1(...) argument has to be a number or vector of numbers").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
+        r.setInvalid();\
     }\
-    return r;\
 }
 
 /** \brief same as QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(FName, NAME_IN_PARSER, CFUNC), but NAME_IN_PARSER==CFUNC */
@@ -99,22 +95,19 @@ qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    qfmpResult r;\
-    r.type=qfmpDouble;\
+void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
     if (n!=1) {\
         p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
-        return r;\
+        r.setInvalid();\
+        return; \
     }\
     if(params[0].type==qfmpDoubleVector) {\
-        r.type=qfmpDoubleVector;\
-        r.numVec=CFUNC(params[0].numVec);\
+        r.setDoubleVec(CFUNC(params[0].numVec));\
     } else {\
         p->qfmpError(QObject::tr("%1(x) argument has to be vector of numbers").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
+        r.setInvalid();\
     }\
-    return r;\
+    return; \
 }
 
 /*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
@@ -130,22 +123,19 @@ qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    qfmpResult r;\
-    r.type=qfmpDouble;\
+void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
     if (n!=1) {\
         p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
-        return r;\
+        r.setInvalid();\
+        return; \
     }\
     if(params[0].type==qfmpDoubleVector) {\
-        r.type=qfmpDouble;\
-        r.num=CFUNC(params[0].numVec);\
+        r.setDouble(CFUNC(params[0].numVec));\
     } else {\
         p->qfmpError(QObject::tr("%1(x) argument has to be a vector of numbers").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
+        r.setInvalid();\
     }\
-    return r;\
+    return; \
 }
 
 /*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
@@ -161,22 +151,19 @@ qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_2PARAM1VEC_VECTONUM_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    qfmpResult r;\
-    r.type=qfmpDouble;\
+void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
     if (n!=2) {\
         p->qfmpError(QObject::tr("%1(x, p) needs exacptly 2 argument").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
-        return r;\
+        r.setInvalid();\
+        return; \
     }\
     if(params[0].type==qfmpDoubleVector && params[1].type==qfmpDouble) {\
-        r.type=qfmpDouble;\
-        r.num=CFUNC(params[0].numVec, params[1].num);\
+        r.setDouble(CFUNC(params[0].numVec, params[1].num));\
     } else {\
         p->qfmpError(QObject::tr("%1(x, p) argument x has to be a vector of numbers and p a number").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
+        r.setInvalid();\
     }\
-    return r;\
+    return; \
 }
 
 
@@ -194,21 +181,21 @@ qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    qfmpResult r;\
+void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
     r.type=qfmpString;\
+    r.isValid=true;\
     if (n!=1) {\
         p->qfmpError(QObject::tr("%1(...) needs exacptly 1 argument").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
-        return r;\
+        r.setInvalid();\
+        return; \
     }\
     if (params[0].type==qfmpString) {\
         r.str=CFUNC(params[0].str);\
     } else {\
         p->qfmpError(QObject::tr("%1(...) argument has to be a string").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
+        r.setInvalid();\
     }\
-    return r;\
+    return; \
 }
 
 /** \brief same as QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(FName, NAME_IN_PARSER, CFUNC), but NAME_IN_PARSER==CFUNC */
@@ -229,21 +216,21 @@ qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_2PARAM2VEC_NUMERIC_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    qfmpResult r;\
+void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
     r.type=qfmpDouble;\
+    r.isValid=true;\
     if (n!=2) {\
         p->qfmpError(QObject::tr("%1(...) needs exactly 2 argument").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
-        return r;\
+        r.setInvalid();\
+        return; \
     }\
     double pa=0; \
     if (params[0].type==qfmpDouble) {\
         pa=params[0].num;\
     } else {\
         p->qfmpError(QObject::tr("%1(...) first argument has to be a number").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
-        return r;\
+        r.setInvalid();\
+        return; \
     }\
     if (params[1].type==qfmpDouble) {\
         r.num=CFUNC(pa, params[1].num);\
@@ -255,9 +242,9 @@ qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
         }\
     } else {\
         p->qfmpError(QObject::tr("%1(...) second argument has to be a number or vector of numbers").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
+        r.setInvalid();\
     }\
-    return r;\
+    return; \
 }
 
 /*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
@@ -274,21 +261,21 @@ qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_2PARAM1VEC_NUMERIC_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    qfmpResult r;\
+void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    r.isValid=true;\
     r.type=qfmpDouble;\
     if (n!=2) {\
         p->qfmpError(QObject::tr("%1(...) needs exactly 2 argument").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
-        return r;\
+        r.setInvalid();\
+        return; \
     }\
     double pa=0; \
     if (params[1].type==qfmpDouble) {\
         pa=params[1].num;\
     } else {\
         p->qfmpError(QObject::tr("%1(...) second argument has to be a number").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
-        return r;\
+        r.setInvalid();\
+        return; \
     }\
     if (params[0].type==qfmpDouble) {\
         r.num=CFUNC(params[0].num, pa);\
@@ -300,9 +287,9 @@ qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
         }\
     } else {\
         p->qfmpError(QObject::tr("%1(...) first argument has to be a number or vector of numbers").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
+        r.setInvalid();\
     }\
-    return r;\
+    return; \
 }
 
 
@@ -320,21 +307,21 @@ qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
     \param CFUNC name of the C function to call
 */
 #define QFMATHPARSER_DEFINE_2PARAM12VEC_NUMERIC_FUNC(FName, NAME_IN_PARSER, CFUNC) \
-qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    qfmpResult r;\
+void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    r.isValid=true;\
     r.type=qfmpDouble;\
     if (n!=2) {\
         p->qfmpError(QObject::tr("%1(...) needs exactly 2 argument").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
-        return r;\
+        r.setInvalid();\
+        return; \
     }\
     if (params[0].type==qfmpDouble && params[1].type==qfmpDouble) {\
     r.num=CFUNC(params[0].num, params[1].num);\
     } else if(params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector) {\
         if (params[0].numVec.size()!=params[1].numVec.size()) {\
             p->qfmpError(QObject::tr("%1(x,y) both arguments have to have same length").arg(#NAME_IN_PARSER));\
-            r.isValid=false;\
-            return r;\
+            r.setInvalid();\
+            return; \
         }\
         r.type=qfmpDoubleVector;\
         r.numVec.resize(params[0].numVec.size());\
@@ -343,9 +330,9 @@ qfmpResult FName(const qfmpResult* params, unsigned int  n, QFMathParser* p){\
         }\
     } else {\
         p->qfmpError(QObject::tr("%1(...) first argument has to be a number or vector of numbers").arg(#NAME_IN_PARSER));\
-        r.isValid=false;\
+        r.setInvalid();\
     }\
-    return r;\
+    return; \
 }
 
 /** \brief same as QFMATHPARSER_DEFINE_2PARAM1VEC_NUMERIC_FUNC(FName, NAME_IN_PARSER, CFUNC), but NAME_IN_PARSER==CFUNC */
@@ -389,48 +376,55 @@ struct QFLIB_EXPORT qfmpResult {
         qfmpResult(bool value);
         qfmpResult(const QVector<double> &value);
 
+        qfmpResult(const qfmpResult &value);
+        //qfmpResult(qfmpResult &value);
+        //explicit qfmpResult(qfmpResult value);
+        qfmpResult& operator=(const qfmpResult &value);
 
+         QFLIB_EXPORT void setInvalid();
+         QFLIB_EXPORT void setVoid();
         /** \brief convert the value this struct representens into a QString */
-        QFLIB_EXPORT QString toString() const;
+         QFLIB_EXPORT QString toString() const;
 
         /** \brief convert the value this struct representens into a QString and adds the name of the datatype in \c [...] */
-        QFLIB_EXPORT QString toTypeString() const;
+         QFLIB_EXPORT QString toTypeString() const;
 
         /** \brief convert the value this struct to an integer */
-        QFLIB_EXPORT int32_t toInteger() const;
+         QFLIB_EXPORT int32_t toInteger() const;
         /** \brief convert the value this struct to an integer */
-        QFLIB_EXPORT uint32_t toUInt() const;
+         QFLIB_EXPORT uint32_t toUInt() const;
         /** \brief is this result convertible to integer? */
-        QFLIB_EXPORT bool isInteger() const;
+         QFLIB_EXPORT bool isInteger() const;
         /** \brief is this result convertible to unsigned integer? */
-        QFLIB_EXPORT bool isUInt() const;
+         QFLIB_EXPORT bool isUInt() const;
         /** \brief returns the size of the result (number of characters for string, numbers of entries in vectors, 0 for void and 1 else) */
-        QFLIB_EXPORT int length() const;
+         QFLIB_EXPORT int length() const;
 
-        QFLIB_EXPORT void setDouble(double val);
-        QFLIB_EXPORT void setBoolean(bool val);
-        QFLIB_EXPORT void setString(const QString& val);
-        QFLIB_EXPORT void setDoubleVec(const QVector<double>& val);
+         QFLIB_EXPORT void setDouble(double val);
+         QFLIB_EXPORT void setBoolean(bool val);
+         QFLIB_EXPORT void setString(const QString& val);
+         QFLIB_EXPORT void setDoubleVec(const QVector<double>& val);
+         QFLIB_EXPORT void setDoubleVec(int size=0, double defaultVal=0);
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
-        QFLIB_EXPORT QVector<double> asVector() const;
+         QFLIB_EXPORT QVector<double> asVector() const;
         /** \brief returns \c true, if the result may be converted to a vector of number */
-        QFLIB_EXPORT bool  convertsToVector() const;
+         QFLIB_EXPORT bool  convertsToVector() const;
         /** \brief converst the result to a vector of integers (numbers and number vectors are converted!) */
-        QFLIB_EXPORT QVector<int> asIntVector() const;
+         QFLIB_EXPORT QVector<int> asIntVector() const;
         /** \brief returns \c true, if the result may be converted to a vector of integers */
-        QFLIB_EXPORT bool  convertsToIntVector() const;
+         QFLIB_EXPORT bool  convertsToIntVector() const;
         /** \brief returns \c true if the result is valid and not void */
-        QFLIB_EXPORT bool isUsableResult() const;
+         QFLIB_EXPORT bool isUsableResult() const;
         /** \brief converst the result to a number (numbers are converted!) */
-        QFLIB_EXPORT double asNumber() const;
+         QFLIB_EXPORT double asNumber() const;
         /** \brief converst the result to a number (numbers are converted and from a number vector the first element is returned!) */
-        QFLIB_EXPORT double asNumberAlsoVector() const;
+         QFLIB_EXPORT double asNumberAlsoVector() const;
         /** \brief converst the result to a string (strings are converted!) */
-        QFLIB_EXPORT QString asString() const;
+         QFLIB_EXPORT QString asString() const;
         /** \brief converst the result to a boolean (numbers and booleans are converted!) */
-        QFLIB_EXPORT bool asBool() const;
+         QFLIB_EXPORT bool asBool() const;
         /** \brief returns the type */
-        QFLIB_EXPORT qfmpResultType getType() const;
+         QFLIB_EXPORT qfmpResultType getType() const;
         /** \brief returns a string, describing the type of this result */
         QFLIB_EXPORT QString typeName() const;
 
@@ -452,6 +446,47 @@ struct QFLIB_EXPORT qfmpResult {
         QFLIB_EXPORT static qfmpResult logicnot(const qfmpResult& l, QFMathParser *p);
         QFLIB_EXPORT static qfmpResult neg(const qfmpResult& l, QFMathParser* p);
         QFLIB_EXPORT static qfmpResult bitwisenot(const qfmpResult& l, QFMathParser* p);
+
+        QFLIB_EXPORT static void add(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void sub(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void mul(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void div(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void mod(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void power(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void bitwiseand(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void bitwiseor(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void logicand(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void logicor(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void logicnot(qfmpResult& result, const qfmpResult& l, QFMathParser *p);
+        QFLIB_EXPORT static void logicnand(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void logicnor(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void logicxor(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void neg(qfmpResult& result, const qfmpResult& l, QFMathParser* p);
+        QFLIB_EXPORT static void bitwisenot(qfmpResult& result, const qfmpResult& l, QFMathParser* p);
+
+        QFLIB_EXPORT static void la_add(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        /*QFLIB_EXPORT static void la_sub(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void la_mul(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void la_div(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void la_mod(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void la_power(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void la_bitwiseand(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void la_bitwiseor(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void la_logicand(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void la_logicor(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void la_logicnot(qfmpResult& l, QFMathParser *p);
+        QFLIB_EXPORT static void la_logicnand(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void la_logicnor(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void la_logicxor(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void la_neg(qfmpResult& l, QFMathParser* p);
+        QFLIB_EXPORT static void la_bitwisenot(qfmpResult& l, QFMathParser* p);*/
+
+        QFLIB_EXPORT static void compareequal(qfmpResult& res, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void comparenotequal(qfmpResult& res, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void comparegreater(qfmpResult& res, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void comparegreaterequal(qfmpResult& res, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void comparesmaller(qfmpResult& res, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
+        QFLIB_EXPORT static void comparesmallerequal(qfmpResult& res, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
 
         bool isValid;
         qfmpResultType type;   /*!< \brief type of the result */
@@ -649,7 +684,7 @@ class QFLIB_EXPORT QFMathParser
         enum qfmpTokenType {
             END,                /*!< \brief end token */
             PRINT,              /*!< \brief a semicolon ';' */
-            COMMA,      /*!< \brief a comma ',' between two function parameters */
+            COMMA,              /*!< \brief a comma ',' between two function parameters */
             STRING_DELIM,       /*!< \brief a string delimiter ' or " */
             NAME,               /*!< \brief a name (consisting of characters) of a variable or function */
             NUMBER,             /*!< \brief a number in scientific notation */
@@ -696,7 +731,7 @@ class QFLIB_EXPORT QFMathParser
             qfmpLOPxor='x',
             qfmpLOPnor='r',
             qfmpLOPnand='d',
-            qfmpLOPnot='n',
+            qfmpLOPnot='n'
 
         };
 
@@ -710,9 +745,62 @@ class QFLIB_EXPORT QFMathParser
             qfmpCOMPlesserequal='a',
             qfmpCOMPgreaterequal='b'
         };
-        /*@}*/
+
+
+
+
+
+        /**
+         * \defgroup qfmpbytecode utilities for QFMathParser function parser class, that allow to build a bytecode program from a parse tree
+         * \ingroup qf3lib_mathtools_parser
+         *
+         * \warning The bytecode utilities are NOT YET COMPLETE ... and not guaranteed to be faster than the evaluate(r) call!
+         */
+        /*@{*/
 
     public:
+        /** \brief possible bytecodes */
+        enum ByteCodes {
+            bcNOP,
+            bcPush,
+            bcPop,
+            bcPushString,
+            bcPopString,
+            bcPushInt,
+            bcPopInt,
+            bcVarAccess,
+            bcAdd,
+            bcMul,
+            bcDiv,
+            bcSub,
+            bcMod,
+            bcPow,
+            bcBitAnd,
+            bcBitOr,
+            bcCallFunction
+        };
+
+        struct ByteCodeInstruction {
+            public:
+                ByteCodeInstruction(ByteCodes opcode);
+                ByteCodeInstruction(ByteCodes opcode, const qfmpResult& respar);
+                ByteCodeInstruction(ByteCodes opcode, const QString& strpar);
+                ByteCodeInstruction(ByteCodes opcode, const QString& strpar, int intpar);
+                ByteCodeInstruction(ByteCodes opcode, int intpar);
+                ByteCodes opcode;
+                qfmpResult respar;
+                QString strpar;
+                int intpar;
+        };
+
+        typedef QList<ByteCodeInstruction> ByteCodeProgram;
+
+        void evaluateBytecode(qfmpResult& result, const ByteCodeProgram& program);
+        static QString printBytecode(const ByteCodeProgram& program);
+
+        /*@}*/
+    public:
+
 
         /**
          * \defgroup qfmpultil utilities for QFMathParser function parser class
@@ -735,10 +823,14 @@ class QFLIB_EXPORT QFMathParser
         struct QFLIB_EXPORT qfmpVariable {
             public:
                 qfmpVariable();
+                qfmpVariable(double* ref);
+                qfmpVariable(QString* ref);
+                qfmpVariable(bool* ref);
+                qfmpVariable(QVector<double>* ref);
                 //~qfmpVariable();
                 QFLIB_EXPORT void clearMemory();
-
                 QFLIB_EXPORT qfmpResult toResult() const;
+                QFLIB_EXPORT void toResult(qfmpResult& r) const;
                 QFLIB_EXPORT bool isInternal() const;
                 QFLIB_EXPORT void set(const qfmpResult& result);
                 inline  qfmpResultType getType() const { return type; }
@@ -782,6 +874,9 @@ class QFLIB_EXPORT QFMathParser
             /** \brief evaluate this node */
             virtual qfmpResult evaluate()=0;
 
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result)=0;
+
             /** \brief return a pointer to the QFMathParser  */
             inline QFMathParser* getParser(){ return parser; }
 
@@ -796,6 +891,9 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) =0;
+
+            /** \brief create bytecode that evaluates the current node */
+            virtual void createByteCode(ByteCodeProgram& program) {}
         };
 
 
@@ -823,9 +921,13 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+            /** \brief create bytecode that evaluates the current node */
+            virtual void createByteCode(ByteCodeProgram& program);
         };
 
         /**
@@ -850,6 +952,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
@@ -878,6 +982,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
@@ -905,6 +1011,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL);
@@ -932,6 +1040,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
@@ -959,6 +1069,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
@@ -986,6 +1098,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
@@ -1016,6 +1130,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
@@ -1034,13 +1150,17 @@ class QFLIB_EXPORT QFMathParser
              *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
-            explicit qfmpConstantNode(qfmpResult d, QFMathParser* p, qfmpNode* par):qfmpNode(p, par) { data=d; };
+            explicit qfmpConstantNode(qfmpResult d, QFMathParser* p, qfmpNode* par):qfmpNode(p, par) { data=d; }
 
             /** \brief evaluate this node */
-            virtual qfmpResult evaluate() { return data; };
+            virtual qfmpResult evaluate() ;
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+            /** \brief create bytecode that evaluates the current node */
+            virtual void createByteCode(ByteCodeProgram& program);
 
         };
 
@@ -1060,11 +1180,15 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             inline QString getName() const { return var; }
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+            /** \brief create bytecode that evaluates the current node */
+            virtual void createByteCode(ByteCodeProgram& program);
 
         };
 
@@ -1082,7 +1206,9 @@ class QFLIB_EXPORT QFMathParser
             explicit qfmpInvalidNode(QFMathParser* p, qfmpNode* par):qfmpNode(p, par) { };
 
             /** \brief evaluate this node */
-            virtual qfmpResult evaluate() { return parser->getInvalidResult(); };
+            virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
@@ -1116,9 +1242,14 @@ class QFLIB_EXPORT QFMathParser
          */
         typedef qfmpResult (*qfmpEvaluateFunc)(const qfmpResult*, unsigned int, QFMathParser*);
 
+        /** \brief This is a function prototype like qfmpEvaluateFunc but returns its result with call by reference
+         */
+        typedef void (*qfmpEvaluateFuncRefReturn)(qfmpResult&, const qfmpResult*, unsigned int, QFMathParser*);
+
         /** \brief types of functions */
         enum qfmpFunctiontype {
             functionC,
+            functionCRefReturn,
             functionNode
         };
 
@@ -1128,12 +1259,13 @@ class QFLIB_EXPORT QFMathParser
             //~qfmpFunctionDescriptor();
             QFLIB_EXPORT void clearMemory();
             qfmpEvaluateFunc function;    /*!< \brief a pointer to the function implementation */
+            qfmpEvaluateFuncRefReturn functionRR;    /*!< \brief a pointer to the function implementation */
             QString name;             /*!< \brief name of the function */
             qfmpFunctiontype type;  /*!< \brief type of the function */
             qfmpNode* functionNode;   /*!< \brief points to the node definig the function */
             QStringList parameterNames;  /*!< \brief a list of the function parameters, if the function is defined by a node */
 
-            QFLIB_EXPORT qfmpResult evaluate(const QVector<qfmpResult> &parameters, QFMathParser *parent) const;
+            QFLIB_EXPORT void evaluate(qfmpResult& res, const QVector<qfmpResult> &parameters, QFMathParser *parent) const;
             QFLIB_EXPORT QString toDefString() const;
         };
 
@@ -1165,9 +1297,16 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
+
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+
+
+            /** \brief create bytecode that evaluates the current node */
+            virtual void createByteCode(ByteCodeProgram& program) ;
 
         };
 
@@ -1183,18 +1322,22 @@ class QFLIB_EXPORT QFMathParser
             /** \brief constructor for a qfmpNodeList
              *  \param p a pointer to a QFMathParser object
              */
-            explicit qfmpNodeList(QFMathParser* p, qfmpNode* par=NULL):qfmpNode(p, par) { };
+            explicit qfmpNodeList(QFMathParser* p, qfmpNode* par=NULL);
 
             /** \brief standard destructor, also destroy the children (recursively) */
-            ~qfmpNodeList();
+            virtual ~qfmpNodeList();
 
             /** \brief add a qfmpNode n to the list */
             void add(qfmpNode* n);
             /** \brief remove the first node from the list and only delet it if \a deleteObject is \c true, returns a pointer to the first node, if \a deleteObject is \c false otherwise returns \c NULL */
             qfmpNode* popFirst(bool deleteObject=false);
+            /** \brief remove the first node from the list and only delet it if \a deleteObject is \c true, returns a pointer to the first node, if \a deleteObject is \c false otherwise returns \c NULL */
+            qfmpNode* popLast(bool deleteObject=false);
 
             /** \brief evaluate the node */
             virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             /** \brief get the number of nodes in the list */
             int getCount() {return list.size();};
@@ -1222,6 +1365,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate the node */
             virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
@@ -1250,6 +1395,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
@@ -1281,6 +1428,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
@@ -1311,6 +1460,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief evaluate this node */
             virtual qfmpResult evaluate();
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
@@ -1321,7 +1472,7 @@ class QFLIB_EXPORT QFMathParser
 
 
 
-        class executionEnvironment {
+        class QFLIB_EXPORT executionEnvironment {
             protected:
                 /** \brief map to manage all currently defined variables */
                 QMap<QString, QList<QPair<int, qfmpVariable> > > variables;
@@ -1336,39 +1487,131 @@ class QFLIB_EXPORT QFMathParser
                 executionEnvironment(QFMathParser* parent=NULL);
                 ~executionEnvironment();
 
-                void setParent(QFMathParser* parent);
+                QFLIB_EXPORT void setParent(QFMathParser* parent);
 
-                void enterBlock();
-                void leaveBlock();
-                int getBlocklevel() const;
-                void clearVariables();
-                void clearFunctions();
-                void clear();
+                inline void enterBlock() {
+                    currentLevel++;
+                }
+                inline void leaveBlock(){
+                    if (currentLevel>0) {
+                        currentLevel--;
+                        QStringList keys=variables.keys();
+                        for (int i=0; i<keys.size(); i++) {
+                            while (!(variables[keys[i]].isEmpty())&&variables[keys[i]].last().first>currentLevel) {
+                                variables[keys[i]].last().second.clearMemory();
+                                variables[keys[i]].removeLast();
+                            }
+                            //if (keys[i]=="x") //qDebug()<<"**LEAVE_BLOCK "<<currentLevel+1<<": var:"<<keys[i]<<"   levels="<<variables[keys[i]].size();
+                            if (variables[keys[i]].isEmpty()) variables.remove(keys[i]);
+                        }
 
-                void addVariable(const QString& name, const qfmpVariable& variable);
-                void setFunction(const QString& name, const qfmpFunctionDescriptor& function);
-                void addFunction(const QString& name, QStringList parameterNames, qfmpNode* function);
+                        keys=functions.keys();
+                        for (int i=0; i<keys.size(); i++) {
+                            while ((!functions[keys[i]].isEmpty()) && functions[keys[i]].last().first>currentLevel) {
+                                functions[keys[i]].last().second.clearMemory();
+                                functions[keys[i]].removeLast();
+                            }
+                            if (functions[keys[i]].isEmpty()) functions.remove(keys[i]);
+                        }
+                    } else {
+                        parent->qfmpError(QObject::tr("cannot leave toplevel block!"));
+                    }
+                 }
+
+                QFLIB_EXPORT int getBlocklevel() const;
+                QFLIB_EXPORT void clearVariables();
+                QFLIB_EXPORT void clearFunctions();
+                QFLIB_EXPORT void clear();
+
+                QFLIB_EXPORT void addVariable(const QString& name, const qfmpVariable& variable);
+                QFLIB_EXPORT void setFunction(const QString& name, const qfmpFunctionDescriptor& function);
+                QFLIB_EXPORT void addFunction(const QString& name, const QStringList& parameterNames, qfmpNode* function);
 
                 /** \brief  tests whether a variable exists */
-                bool variableExists(const QString& name){ return (variables.find(name)!=variables.end()); }
+                inline bool variableExists(const QString& name){ return (variables.find(name)!=variables.end()); }
 
                 /** \brief  tests whether a function exists */
-                bool functionExists(const QString& name){ return !(functions.find(name)==functions.end()); }
+                inline bool functionExists(const QString& name){ return !(functions.find(name)==functions.end()); }
 
-                qfmpResult getVariable(const QString& name) const;
-                qfmpResult evaluateFunction(const QString& name, const QVector<qfmpResult> &parameters) const;
+                inline qfmpResult getVariable(const QString& name) const {
+                    qfmpResult res;
+                    res.isValid=false;
+                    if (variables.contains(name) && variables[name].size()>0) {
+                        res=variables[name].last().second.toResult();
+                        res.isValid=true;
+                        return res;
+                    }
+                    if (parent) parent->qfmpError(QObject::tr("the variable '%1' does not exist").arg(name));
+                    return res;
+                }
+                inline qfmpResult evaluateFunction(const QString& name, const QVector<qfmpResult> &parameters) const{
+                    qfmpResult res;
+                    if (functions.contains(name) && functions[name].size()>0) {
+                        functions[name].last().second.evaluate(res, parameters, parent);
+                    } else {
+                        if (parent) parent->qfmpError(QObject::tr("the function '%1' does not exist").arg(name));
+                        res.setInvalid();
+                    }
+                    return res;
+                }
 
-                void addVariable(const QString& name, const qfmpResult& result);
-                void setVariable(const QString& name, const qfmpResult& result);
-                void setVariableDouble(const QString& name, double result);
-                void setVariableDoubleVec(const QString& name, const QVector<double>& result);
-                void setVariableString(const QString& name, const QString& result);
-                void setVariableBoolean(const QString& name, bool result);
-                void addVariableDouble(const QString& name, double result);
-                void addVariableDoubleVec(const QString& name, const QVector<double>& result);
-                void addVariableString(const QString& name, const QString& result);
-                void addVariableBoolean(const QString& name, bool result);
-                void deleteVariable(const QString& name);
+                inline void getVariable(qfmpResult& res, const QString& name) const{
+                    if (variables.contains(name) && variables[name].size()>0) {
+                        variables[name].last().second.toResult(res);
+                    } else {
+                        if (parent) parent->qfmpError(QObject::tr("the variable '%1' does not exist").arg(name));
+                        res.setInvalid();
+                    }
+                }
+
+                inline void evaluateFunction(qfmpResult& res, const QString& name, const QVector<qfmpResult> &parameters) const{
+                    if (functions.contains(name) && functions[name].size()>0) {
+                        functions[name].last().second.evaluate(res, parameters, parent);
+                    } else {
+                        if (parent) parent->qfmpError(QObject::tr("the function '%1' does not exist").arg(name));
+                        res.setInvalid();
+                    }
+                }
+
+                inline void addVariable(const QString& name, const qfmpResult& result){
+                    bool add=true;
+                    if (variables.contains(name)) {
+                        if (variables[name].size()>0) {
+                            if (variables[name].last().first==currentLevel) {
+                                variables[name].last().second.set(result);
+                                add=false;
+                                return;
+                            }
+                        }
+                    }
+                    if (add) {
+                        QFMathParser::qfmpVariable v;
+                        v.set(result);
+                        variables[name].append(qMakePair(currentLevel, v));
+                    }
+                }
+
+                inline void setVariable(const QString& name, const qfmpResult& result){
+                    if (variables.contains(name) && variables[name].size()>0) {
+                        variables[name].last().second.set(result);
+                    } else {
+                        QFMathParser::qfmpVariable v;
+                        v.set(result);
+                        QList<QPair<int, qfmpVariable> > l;
+                        l.append(qMakePair(currentLevel, v));
+                        variables[name]=l;
+                    }
+                }
+
+                QFLIB_EXPORT void setVariableDouble(const QString& name, double result);
+                QFLIB_EXPORT void setVariableDoubleVec(const QString& name, const QVector<double>& result);
+                QFLIB_EXPORT void setVariableString(const QString& name, const QString& result);
+                QFLIB_EXPORT void setVariableBoolean(const QString& name, bool result);
+                QFLIB_EXPORT void addVariableDouble(const QString& name, double result);
+                QFLIB_EXPORT void addVariableDoubleVec(const QString& name, const QVector<double>& result);
+                QFLIB_EXPORT void addVariableString(const QString& name, const QString& result);
+                QFLIB_EXPORT void addVariableBoolean(const QString& name, bool result);
+                QFLIB_EXPORT void deleteVariable(const QString& name);
 
                 QString printVariables() const;
                 QString printFunctions() const;
@@ -1502,51 +1745,79 @@ class QFLIB_EXPORT QFMathParser
 		 * \param function a pointer to the implementation
 		 */
         void addFunction(const QString &name, qfmpEvaluateFunc function);
+        /** \brief  register a new function
+         * \param name name of the new function
+         * \param function a pointer to the implementation
+         */
+        void addFunction(const QString &name, qfmpEvaluateFuncRefReturn function);
 
-        void addFunction(const QString& name, QStringList parameterNames, qfmpNode* function);
+        inline void addFunction(const QString& name, const QStringList& parameterNames, qfmpNode* function){
+            environment.addFunction(name, parameterNames, function);
+        }
 
         /** \brief set the defining struct of the given variable */
-        void addVariable(const QString& name, const qfmpVariable &value);
+        inline void addVariable(const QString& name, const qfmpVariable &value) {
+            environment.addVariable(name, value);
+        }
 
 
         /** \brief  register a new internal variable of type double
 		 * \param name name of the new variable
 		 * \param v initial value of this variable
 		 */
-        void addVariableDouble(const QString& name, double v);
+        inline void addVariableDouble(const QString& name, double v) {
+            environment.addVariableDouble(name, v);
+        }
 
         /** \brief  register a new internal variable of type string
 		 * \param name name of the new variable
 		 * \param v initial value of this variable
 		 */
-        void addVariableString(const QString &name, const QString& v);
+        inline void addVariableString(const QString &name, const QString& v) {
+            environment.addVariableString(name, v);
+        }
 
         /** \brief  register a new internal variable of type boolean
          * \param name name of the new variable
          * \param v initial value of this variable
          */
-        void addVariableBoolean(const QString& name, bool v);
+        inline void addVariableBoolean(const QString& name, bool v) {
+            environment.addVariableBoolean(name, v);
+        }
 
         /** \brief  register a new internal variable of type boolean
          * \param name name of the new variable
          * \param v initial value of this variable
          */
-        void addVariable(const QString &name, const qfmpResult &result);
+        inline void addVariable(const QString &name, const qfmpResult &result) {
+            environment.addVariable(name, result);
+        }
+
         /** \brief  register a new internal variable if the given variable does not exist, otherwise set the axisting variable to the given value
          * \param name name of the new variable
          * \param v initial value of this variable
          */
-        void setVariable(const QString &name, const qfmpResult &result);
+        inline void setVariable(const QString &name, const qfmpResult &result) {
+            environment.setVariable(name, result);
+        }
 
-        void deleteVariable(const QString& name);
-
-
-
+        inline void deleteVariable(const QString& name) {
+            environment.deleteVariable(name);
+        }
 
         /** \brief  returns the value of the given variable */
-        qfmpResult getVariable(QString name);
+        inline void getVariable(qfmpResult& r, QString name) {
+            environment.getVariable(r, name);
+        }
+
         /** \brief  returns the value of the given variable */
-        qfmpResult getVariableOrInvalid(QString name);
+        inline void getVariableOrInvalid(qfmpResult& r, QString name) {
+            if (environment.variableExists(name)) {
+                environment.getVariable(r, name);
+            } else {
+                r.setInvalid();
+            }
+        }
 
 
 
@@ -1554,7 +1825,33 @@ class QFLIB_EXPORT QFMathParser
          * \param name name of the (registered function) to be evaluated
          * \param params array of the input parameters
          */
-        qfmpResult evaluateFunction(const QString &name, const QVector<qfmpResult>& params);
+        inline void evaluateFunction(qfmpResult& r, const QString &name, const QVector<qfmpResult>& params) {
+            environment.evaluateFunction(r, name, params);
+        }
+
+
+
+        /** \brief  returns the value of the given variable */
+        inline qfmpResult getVariable(QString name) {
+            return environment.getVariable(name);
+        }
+
+        /** \brief  returns the value of the given variable */
+        inline qfmpResult getVariableOrInvalid(QString name) {
+            if (environment.variableExists(name)) return environment.getVariable(name);
+            return qfmpResult::invalidResult();
+
+        }
+
+
+
+        /** \brief  evaluates a registered function
+         * \param name name of the (registered function) to be evaluated
+         * \param params array of the input parameters
+         */
+        inline qfmpResult evaluateFunction(const QString &name, const QVector<qfmpResult>& params) {
+            return environment.evaluateFunction(name, params);
+        }
 
 
 
@@ -1564,16 +1861,24 @@ class QFLIB_EXPORT QFMathParser
         /** \brief  tests whether a function exists */
         inline bool functionExists(const QString& name){ return environment.functionExists(name); }
 
-        void enterBlock();
-        void leaveBlock();
+        inline void enterBlock() {
+            environment.enterBlock();
+        }
+        inline void leaveBlock() {
+            environment.leaveBlock();
+        }
 
         /** \brief  deletes all defined variables. the memory of internal variables
          * will be released. the external memory will not be released.
          */
-        void clearVariables();
+        inline void clearVariables(){
+            environment.clearVariables();
+        };
 
         /** \brief  clears the list of internal functions*/
-        void clearFunctions();
+        inline void clearFunctions(){
+            environment.clearFunctions();
+        };
 
         /** \brief  registers standard variables*/
         void addStandardVariables();
@@ -1588,14 +1893,23 @@ class QFLIB_EXPORT QFMathParser
         qfmpResult evaluate(QString prog);
 
         /** \brief  prints a list of all registered variables */
-        QString printVariables();
+        inline QString printVariables(){
+            return environment.printVariables();
 
-        QList<QPair<QString, qfmpVariable> > getVariables();
+        }
+
+       inline  QList<QPair<QString, qfmpVariable> > getVariables(){
+            return environment.getVariables();
+        }
 
         /** \brief  prints a list of all registered variables */
-        QString printFunctions();
+        inline QString printFunctions(){
+            return environment.printFunctions();
+        }
 
-        QList<QPair<QString, qfmpFunctionDescriptor> > getFunctions();
+        inline QList<QPair<QString, qfmpFunctionDescriptor> > getFunctions(){
+            return environment.getFunctions();
+        }
 
 
         /**
@@ -1605,10 +1919,13 @@ class QFLIB_EXPORT QFMathParser
         /*@{*/
     protected:
         static QList<QPair<QString, qfmpEvaluateFunc> > externalGlobalFunctions;
+        static QList<QPair<QString, qfmpEvaluateFuncRefReturn> > externalGlobalFunctionsRR;
         static QList<QPair<QString, qfmpResult> > externalGlobalVariables;
     public:
         /** \brief  add a function to the list of global functions that are defined by a call to addStandardFunctions() (or the constructor) */
         static void addGlobalFunction(const QString& name, qfmpEvaluateFunc function);
+        /** \brief  add a function to the list of global functions that are defined by a call to addStandardFunctions() (or the constructor) */
+        static void addGlobalFunction(const QString& name, qfmpEvaluateFuncRefReturn function);
         /** \brief  add a variablen to the list of global variables that are defined by a call to addStandardVariables() (or the constructor) */
         static void addGlobalVariable(const QString& name, double value);
         /** \brief  add a variablen to the list of global variables that are defined by a call to addStandardVariables() (or the constructor) */

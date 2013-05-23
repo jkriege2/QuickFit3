@@ -16,7 +16,7 @@
 #include "jkqtmathtext.h"
 #include "programoptions.h"
 #include "qmodernprogresswidget.h"
-
+#include "qfhtmlhelptools.h"
 
 
 QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):

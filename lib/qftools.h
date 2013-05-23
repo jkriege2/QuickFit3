@@ -735,21 +735,6 @@ void qfCopyImageHalf(T1* output, const T2* input, int inWidth, int inHeight, QFI
     }
 }
 
-/*! \brief remove all HTML comments from a string
-    \ingroup qf3lib_tools
-*/
-QFLIB_EXPORT QString removeHTMLComments(const QString& data);
-
-typedef QList<QPair<QString, QString> > QFHelpReplacesList;
-/*! \copydoc QFPluginServices::transformQF3HelpHTML()
-    \ingroup qf3lib_tools
- */
-QFLIB_EXPORT QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced=true, const QFHelpReplacesList& more_replaces=QFHelpReplacesList(), bool insertTooltips=false);
-/*! \brief transforms some special tags in the given input file. If the file does not exist, defaultText is used
-    \ingroup qf3lib_tools
-
- */
-QFLIB_EXPORT QString transformQF3HelpHTMLFile(const QString& filename, const QString& defaultText=QString(""), bool removeNonReplaced=true, const QFHelpReplacesList& more_replaces=QFHelpReplacesList(), bool insertTooltips=false);
 /*! \brief converts a light wavelength (in nanometers) into a color representing this wavelength
     \ingroup qf3lib_tools
 

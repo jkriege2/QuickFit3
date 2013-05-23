@@ -11,7 +11,7 @@
 #include "dlgselectprojectsubset.h"
 #include "dlgfixfilepaths.h"
 #include "jkmathparser.h"
-
+#include "qfhtmlhelptools.h"
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
 

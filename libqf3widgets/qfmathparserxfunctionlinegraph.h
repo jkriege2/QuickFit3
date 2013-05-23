@@ -17,6 +17,7 @@ struct QFMathParserXFunctionLineGraphFunctionData {
     QFMathParser* parser;
     QFMathParser::qfmpNode* node;
     int varcount;
+    double* x;
 };
 
 /*! \brief This implements line plots where the data is taken from a user supplied function \f$ y=f(x) \f$ The function is defined as a string and parsed by QFMathParser
@@ -63,6 +64,8 @@ class QFWIDLIB_EXPORT QFMathParserXFunctionLineGraph : public JKQTPxFunctionLine
 
         /** \brief fill the data array with data from the function plotFunction */
         virtual void createPlotData();
+
+        double dummyX, dummyEX;
 
 };
 
