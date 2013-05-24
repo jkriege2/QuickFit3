@@ -1,11 +1,13 @@
+#include "ui_qfrdrtableplotwidget.h"
 #include "qfrdrtableplotwidget.h"
 #include "programoptions.h"
-#include "ui_qfrdrtableplotwidget.h"
 #include "qfrdrtable.h"
 #include "qftools.h"
 #include "qfdoubleedit.h"
 #include "qfmathparserxfunctionlinegraph.h"
-
+#include "qffitfunctionplottools.h"
+#include "qffitfunctionmanager.h"
+#include "qffitfunction.h"
 
 
 
@@ -914,24 +916,42 @@ void QFRDRTablePlotWidget::updateGraph() {
             } else if (g.type==QFRDRTable::gtFunction) {
                 JKQTPxFunctionLineGraph* pg=NULL;
 
+                int vecItems=0;
                 if (g.functionType==QFRDRTable::gtfString) {
                     QFMathParserXFunctionLineGraph* pgf=new QFMathParserXFunctionLineGraph(ui->plotter->get_plotter());
                     pgf->set_function(g.function);
-                    if (g.ycolumn>=0 && g.ycolumn<(long)ui->plotter->getDatastore()->getColumnCount()) {
-                        pgf->set_parameterColumn(g.ycolumn);
-                    }
                     pg=pgf;
 
                 } else if (g.functionType==QFRDRTable::gtfPolynomial) {
                     JKQTPxFunctionLineGraph* pgf=new JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
                     pgf->setSpecialFunction(JKQTPxFunctionLineGraph::Polynomial);
-                    if (g.ycolumn>=0 && g.ycolumn<(long)ui->plotter->getDatastore()->getColumnCount()) {
-                        pgf->set_parameterColumn(g.ycolumn);
-                    }
                     pg=pgf;
+                    vecItems=11;
+                } else if (g.functionType==QFRDRTable::gtfExponential) {
+                    JKQTPxFunctionLineGraph* pgf=new JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
+                    pgf->setSpecialFunction(JKQTPxFunctionLineGraph::Exponential);
+                    pg=pgf;
+                    vecItems=3;
+                } else if (g.functionType==QFRDRTable::gtfPowerLaw) {
+                    JKQTPxFunctionLineGraph* pgf=new JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
+                    pgf->setSpecialFunction(JKQTPxFunctionLineGraph::PowerLaw);
+                    pg=pgf;
+                    vecItems=3;
+                } else if (g.functionType==QFRDRTable::gtfQFFunction) {
+                    JKQTPxQFFitFunctionLineGraph* pgf=new JKQTPxQFFitFunctionLineGraph(ui->plotter->get_plotter());
+                    QFFitFunction* ff=NULL;
+                    pgf->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(g.function, NULL), true);
+                    pg=pgf;
+                    if (ff) vecItems=ff->paramCount();
                 }
 
+
                 if (pg) {
+                    if (g.ycolumn>=0 && g.ycolumn<(long)ui->plotter->getDatastore()->getColumnCount()) {
+                        pg->set_parameterColumn(g.ycolumn);
+                    } else {
+                        pg->set_params(g.functionParameters);
+                    }
                     pg->set_title(g.title);
                     //qDebug()<<"adding function plot "<<g.function;
                     pg->set_drawLine(true);
@@ -1031,9 +1051,9 @@ void QFRDRTablePlotWidget::updatePlotWidgetVisibility() {
         int r=ui->listGraphs->currentRow();
         QFRDRTable::PlotInfo p=current->getPlot(this->plot);
         if (r>=0 && r<p.graphs.size()) {
-            QFRDRTable::GraphInfo graph=p.graphs.at(r);
+            //QFRDRTable::GraphInfo graph=p.graphs.at(r);
 
-            ui->widGraphSettings->updatePlotWidgetVisibility(graph);
+            ui->widGraphSettings->updatePlotWidgetVisibility();
 
 
             ui->widGraphSettings->setVisible(true);

@@ -10,6 +10,8 @@
 #include "QToolTip"
 #include "qfmathparser.h"
 #include "qffunctionreferencetool.h"
+#include "qffitfunctionvalueinputtable.h"
+
 namespace Ui {
     class QFTableGraphSettings;
 }
@@ -32,7 +34,7 @@ class QFTableGraphSettings : public QWidget
 
         void writeGraphData(QFRDRTable::GraphInfo &graph);
         void loadGraphData(const QFRDRTable::GraphInfo &graph);
-        void updatePlotWidgetVisibility(const QFRDRTable::GraphInfo &graph);
+        void updatePlotWidgetVisibility();
         QIcon getGraphIcon(int i) const;
     signals:
         void graphDataChanged();
@@ -44,6 +46,7 @@ class QFTableGraphSettings : public QWidget
     protected slots:
         void on_btnFunctionHelp_clicked();
         void on_edtFunction_textChanged(const QString &text);
+        void cmbFunctionTypeCurrentIndexChanged(int index);
 
         void writeGraphData();
         void reloadColumns(QComboBox* combo);
@@ -61,6 +64,9 @@ class QFTableGraphSettings : public QWidget
         int plot;
         bool updating;
         QFFunctionReferenceTool* functionRef;
+
+        QFFitFunctionValueInputTable* fitfuncValuesTable;
+        QVector<double> fitfuncValues, fitfuncValuesDummy;
 
         QAction* actFit;
         QAction* actRegression;

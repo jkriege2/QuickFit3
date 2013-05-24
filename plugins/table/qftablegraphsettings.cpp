@@ -5,6 +5,8 @@
 #include "qftools.h"
 #include "qfdoubleedit.h"
 #include "qfmathparserxfunctionlinegraph.h"
+#include "qffitfunctionvalueinputdelegate.h"
+
 
 QFTableGraphSettings::QFTableGraphSettings(QWidget *parent) :
     QWidget(parent),
@@ -14,15 +16,23 @@ QFTableGraphSettings::QFTableGraphSettings(QWidget *parent) :
     functionRef->setCompleterFile(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/table/table_expression.txt");
     functionRef->setDefaultWordsMathExpression();
 
-    actFit=new QAction(tr("least squares fit"), this);
+    actFit=new QAction(QIcon(":/table/fit.png"), tr("least squares fit"), this);
     connect(actFit, SIGNAL(triggered()), this, SLOT(doFit()));
-    actRegression=new QAction(tr("regression analysis"), this);
+    actRegression=new QAction(QIcon(":/table/regression.png"), tr("regression analysis"), this);
     connect(actRegression, SIGNAL(triggered()), this, SLOT(doRegression()));
 
 
     updating=true;
 
     ui->setupUi(this);
+
+    ui->tabFunctionParameters->setItemDelegate(new QFFitFunctionValueInputDelegate(ui->tabFunctionParameters));
+    fitfuncValuesTable=new QFFitFunctionValueInputTable(this);
+    fitfuncValuesTable->setEditErrors(false);
+    fitfuncValuesTable->setEditFix(false);
+    fitfuncValuesTable->setEditRanges(false);
+    ui->tabFunctionParameters->setModel(fitfuncValuesTable);
+
     ui->btnFit->addAction(actRegression);
     ui->btnFit->addAction(actFit);
     ui->btnFit->setDefaultAction(actFit);
@@ -36,10 +46,12 @@ QFTableGraphSettings::QFTableGraphSettings(QWidget *parent) :
     ui->edtImageWidth->setRange(0, 1e10);
     ui->edtImageX->setCheckBounds(true, false);
     ui->edtImageY->setCheckBounds(true, false);
+    ui->cmbGraphType->setCurrentIndex(0);
     current=NULL;
     this->plot=-1;
     updating=false;
     if (ProgramOptions::getInstance() && ProgramOptions::getInstance()->getQSettings()) readSettings(*(ProgramOptions::getInstance()->getQSettings()), "table/QFRDRTablePlotWidget/");
+    updatePlotWidgetVisibility();
 }
 
 QFTableGraphSettings::~QFTableGraphSettings()
@@ -154,7 +166,7 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
             case 0:
             default: graph.type=QFRDRTable::gtLines; break;
         }
-        updatePlotWidgetVisibility(graph);
+        updatePlotWidgetVisibility();
 
 
 
@@ -214,6 +226,13 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.stride=ui->spinStride->value();
         graph.strideStart=ui->spinStrideStart->value();
         graph.modifierMode=(JKQTPMathImage::ModifierMode)ui->cmbModifierMode->currentIndex();
+
+        graph.functionType=(QFRDRTable::GTFunctionType)ui->cmbFunctionType->currentIndex();
+        if (graph.functionType==QFRDRTable::gtfQFFunction) {
+            graph.function=ui->cmbQFFitFunction->currentFitFunctionID();
+        }
+        graph.functionParameters=fitfuncValues;
+
 
         updating=false;
     }
@@ -309,10 +328,19 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->spinStride->setValue(graph.stride);
     ui->spinStrideStart->setValue(graph.strideStart);
     ui->cmbModifierMode->setCurrentIndex(graph.modifierMode);
+
+    ui->cmbFunctionType->setCurrentIndex((int)graph.functionType);
+    if (graph.functionType==QFRDRTable::gtfQFFunction) {
+        ui->cmbQFFitFunction->setCurrentFitFunction(graph.function);
+    }
+    fitfuncValues=graph.functionParameters;
+    ui->tabFunctionParameters->resizeColumnsToContents();
+    ui->tabFunctionParameters->resizeRowsToContents();
+
     updating=false;
 }
 
-void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInfo& graph)
+void QFTableGraphSettings::updatePlotWidgetVisibility()
 {
     if (current) {
         if (this->plot<0 || this->plot>=current->getPlotCount()) return;
@@ -386,6 +414,13 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
         ui->edtColorbarLabelB->setVisible(false);
         ui->labColorbarLabel->setText(tr("bar label:"));
         ui->btnFit->setVisible(true);
+
+        ui->labQFFitFuction->setVisible(false);
+        ui->labFuctionType->setVisible(false);
+        ui->labFuctionParameters->setVisible(false);
+        ui->cmbFunctionType->setVisible(false);
+        ui->cmbQFFitFunction->setVisible(false);
+        ui->tabFunctionParameters->setVisible(false);
 
         switch(ui->cmbGraphType->currentIndex()) {
 
@@ -688,12 +723,32 @@ void QFTableGraphSettings::updatePlotWidgetVisibility(const QFRDRTable::GraphInf
                 ui->labErrorY->setVisible(false);
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
-                ui->widFunction->setVisible(true);
-                ui->labFuction->setVisible(true);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
                 ui->chkSTrided->setVisible(false);
                 ui->widStride->setVisible(false);
+
+                ui->labFuctionType->setVisible(true);
+                ui->cmbFunctionType->setVisible(true);
+
+                if (ui->cmbFunctionType->currentIndex()==0) {
+                    ui->widFunction->setVisible(true);
+                    ui->labFuction->setVisible(true);
+                } else if (ui->cmbFunctionType->currentIndex()==ui->cmbFunctionType->count()-1) {
+                    ui->labQFFitFuction->setVisible(true);
+                    ui->cmbQFFitFunction->setVisible(true);
+                    if (ui->cmbLinesYData->currentIndex()==0) {
+                        ui->labFuctionParameters->setVisible(true);
+                        ui->tabFunctionParameters->setVisible(true);
+                    }
+                } else {
+                    if (ui->cmbLinesYData->currentIndex()==0) {
+                        ui->labFuctionParameters->setVisible(true);
+                        ui->tabFunctionParameters->setVisible(true);
+                    }
+                }
+
+
 
                 /*ui->widLineStyle->setVisible(false);
                 ui->cmbLinesXError->setVisible(false);
@@ -761,6 +816,10 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->chkSTrided, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->spinStride, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->spinStrideStart, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
+    connect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(fitfuncValuesTable, SIGNAL(fitParamChanged()), this, SLOT(writeGraphData()));
+    connect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), fitfuncValuesTable, SLOT(rebuildModel()));
 }
 
 void QFTableGraphSettings::disconnectWidgets()
@@ -812,6 +871,10 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->spinStride, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->spinStrideStart, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
 
+    disconnect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
+    disconnect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(fitfuncValuesTable, SIGNAL(fitParamChanged()), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), fitfuncValuesTable, SLOT(rebuildModel()));
 }
 
 void QFTableGraphSettings::doFit()
@@ -840,6 +903,46 @@ void QFTableGraphSettings::on_edtFunction_textChanged(const QString &text)
     if (mp.hasErrorOccured()) {
         ui->labFunctionOK->setText(tr("<font color=\"red\">ERROR in function:<br>&nbsp;&nbsp;&nbsp;&nbsp;%1</font>").arg(mp.getLastErrors().join("<br>&nbsp;&nbsp;&nbsp;&nbsp;")));
     }
+}
+
+void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)
+{
+    if (ui->cmbFunctionType->currentIndex()==0) {
+        fitfuncValuesTable->setWriteTo(&fitfuncValuesDummy, QStringList());
+    } else if (ui->cmbFunctionType->currentIndex()==1) {
+        int vsize=11;
+        if (fitfuncValues.size()>vsize) fitfuncValues.remove(fitfuncValues.size()-(fitfuncValues.size()-vsize), fitfuncValues.size()-vsize);
+        while (fitfuncValues.size()<vsize) fitfuncValues.append(0);
+        QStringList pn;
+        pn<<tr("offset");
+        for (int i=1; i<fitfuncValues.size(); i++) {
+            pn.append(tr("p%1").arg(i+1));
+        }
+        fitfuncValuesTable->setWriteTo(&fitfuncValues, pn);
+    } else if (ui->cmbFunctionType->currentIndex()==2) {
+        int vsize=3;
+        if (fitfuncValues.size()>vsize) fitfuncValues.remove(fitfuncValues.size()-(fitfuncValues.size()-vsize), fitfuncValues.size()-vsize);
+        while (fitfuncValues.size()<vsize) fitfuncValues.append(0);
+        QStringList pn;
+        pn<<tr("offset")<<tr("amplitude")<<tr("exponent_div");
+        fitfuncValuesTable->setWriteTo(&fitfuncValues, pn);
+    } else if (ui->cmbFunctionType->currentIndex()==3) {
+        int vsize=3;
+        if (fitfuncValues.size()>vsize) {
+            qDebug()<<"deleting:  oldsize="<<fitfuncValues.size()<<"  newsize="<<vsize<<" startdel="<<fitfuncValues.size()-(vsize-fitfuncValues.size())<<" count="<<vsize-fitfuncValues.size();
+            fitfuncValues.remove(fitfuncValues.size()-(fitfuncValues.size()-vsize), fitfuncValues.size()-vsize);
+        }
+        while (fitfuncValues.size()<vsize) fitfuncValues.append(0);
+        QStringList pn;
+        pn<<tr("offset")<<tr("amplitude")<<tr("exponent");
+        fitfuncValuesTable->setWriteTo(&fitfuncValues, pn);
+    } else if (ui->cmbFunctionType->currentIndex()==4) {
+        QFFitFunction* ff(ui->cmbQFFitFunction->createCurrentInstance(fitfuncValuesTable));
+        fitfuncValues.clear();
+        fitfuncValuesTable->setWriteTo(&fitfuncValues, ff, true);
+    }
+    updatePlotWidgetVisibility();
+    writeGraphData();
 }
 
 void QFTableGraphSettings::on_btnFunctionHelp_clicked()

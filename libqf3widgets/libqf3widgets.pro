@@ -49,7 +49,6 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            ../../../../LIB/trunk/qt/qmoretextobject.h \
            qehtreeview.h \
            datacutslider.h \
-           qffitparameterbasicinterface.h \
            qffitparameterwidget.h \
            qfdlgcsvparameters.h \
     qfstagecombobox.h \

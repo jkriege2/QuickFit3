@@ -3,7 +3,7 @@
 
 #include <QString>
 #include <QtPlugin>
-#include "libwid_imexport.h"
+#include "lib_imexport.h"
 
 class QFRawDataRecord; // forward
 
@@ -12,7 +12,7 @@ class QFRawDataRecord; // forward
 
     This interface is provided for convenience, so special widgets that display fitting parameters may be re-used later on.
  */
-class QFWIDLIB_EXPORT QFFitParameterBasicInterface {
+class QFLIB_EXPORT QFFitParameterBasicInterface {
     public:
         virtual ~QFFitParameterBasicInterface() {};
 
@@ -111,6 +111,5 @@ class QFWIDLIB_EXPORT QFFitParameterBasicInterface {
 
 Q_DECLARE_INTERFACE(QFFitParameterBasicInterface,
                      "www.dkfz.de.b040.quickfit3.QFFitParameterBasicInterface/1.1")
-
 
 #endif // QFFITPARAMETERBASICINTERFACE_H

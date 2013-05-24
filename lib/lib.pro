@@ -94,7 +94,10 @@ HEADERS += dlgnewproperty.h \
     qfrawdatapropertyeditor_private.h \
     qfglobalfittool.h \
     qfmanyfilessettings.h \
-    qfhtmlhelptools.h
+    qfhtmlhelptools.h \
+    qffitfunctionvalueinputtable.h \
+    qffitfunctionvalueinputdelegate.h \
+    qffitparameterbasicinterface.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -157,7 +160,10 @@ SOURCES += dlgnewproperty.cpp \
     qfrawdatapropertyeditor_private.cpp \
     qfglobalfittool.cpp \
     qfmanyfilessettings.cpp \
-    qfhtmlhelptools.cpp
+    qfhtmlhelptools.cpp \
+    qffitfunctionvalueinputtable.cpp \
+    qffitfunctionvalueinputdelegate.cpp \
+    qffitparameterbasicinterface.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

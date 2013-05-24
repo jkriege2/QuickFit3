@@ -50,11 +50,11 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         };
 
         enum GTFunctionType {
-            gtfQFFunction,
-            gtfPolynomial,
-            gtfExponential,
-            gtfPowerLaw,
-            gtfString
+            gtfString=0,
+            gtfPolynomial=1,
+            gtfExponential=2,
+            gtfPowerLaw=3,
+            gtfQFFunction=4
         };
 
         static QString GTFunctionType2String(GTFunctionType type) {
@@ -183,6 +183,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
             QString function;
             GTFunctionType functionType;
+            QVector<double> functionParameters;
 
         };
 

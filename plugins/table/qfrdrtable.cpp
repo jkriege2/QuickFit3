@@ -5,6 +5,9 @@
 #include "qfrdrploteditor.h"
 #include "qftools.h"
 #include "qfrdrtableparserfunctions.h"
+#include "binarydatatools.h"
+
+
 #define DEFAULT_EDITVAL double(0.0)
 
 QFRDRTable::GraphInfo::GraphInfo() {
@@ -1031,6 +1034,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.function=ge.attribute("function", "");
                     graph.functionType=String2GTFunctionType(ge.attribute("functiontype", "string"));
                     graph.modifierMode=JKQTPMathImage::StringToModifierMode(ge.attribute("modifier_mode", "none"));
+                    graph.functionParameters=stringToDoubleArray_base64(ge.attribute("fparams", ""));
 
 
                     plot.graphs.append(graph);
@@ -1185,7 +1189,7 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("image_legend_mod", plots[i].graphs[g].imageLegendMod);
             w.writeAttribute("function", plots[i].graphs[g].function);
             w.writeAttribute("functiontype", GTFunctionType2String(plots[i].graphs[g].functionType));
-
+            w.writeAttribute("fparams", doubleArrayToString_base64(plots[i].graphs[g].functionParameters));
             w.writeAttribute("stride", QString::number(plots[i].graphs[g].stride));
             w.writeAttribute("stride_start", QString::number(plots[i].graphs[g].strideStart));
             w.writeAttribute("is_strided", boolToQString(plots[i].graphs[g].isStrided));

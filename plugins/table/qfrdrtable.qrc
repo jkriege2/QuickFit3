@@ -50,5 +50,7 @@
         <file>icons/plot_function.png</file>
         <file alias="formulaclear.png">icons/formulaclear.png</file>
         <file>icons/plot_rgbimage.png</file>
+        <file alias="fit.png">icons/fit.png</file>
+        <file alias="regression.png">icons/regression.png</file>
     </qresource>
 </RCC>
