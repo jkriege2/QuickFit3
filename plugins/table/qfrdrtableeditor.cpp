@@ -7,6 +7,7 @@
 #include "qfrdrtableparserfunctions.h"
 #include "qfrdrtablecolumneditor.h"
 #include "qfrdrtablecurvefitdialog.h"
+#include "qfrdrtableregressiondialog.h"
 
 QFRDRTableEditor::QFRDRTableEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent):
     QFRawDataEditor(services, propEditor, parent)
@@ -34,12 +35,15 @@ void QFRDRTableEditor::requestFit(int xCol, int yCol, int sigmaCol, int plot, QS
 
 void QFRDRTableEditor::requestRegression(int xCol, int yCol, int sigmaCol, int plot, bool xlog, bool ylog)
 {
-    QFRDRTableCurveFitDialog* dlg=new QFRDRTableCurveFitDialog(this);
-    dlg->setWindowTitle(tr("Regression Analysis"));
-    if (dlg->exec()) {
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        //qDebug()<<"regression cX="<<xCol<<"  cY="<<yCol<<"  cW="<<sigmaCol<<"  plot="<<plot<<"  xlog="<<xlog<<"  ylog="<<ylog;
+        QFRDRTableRegressionDialog* dlg=new QFRDRTableRegressionDialog(m, xCol, yCol, sigmaCol, this, xlog, ylog, -1, plot);
+        if (dlg->exec()) {
 
+        }
+        delete dlg;
     }
-    delete dlg;
 }
 
 void QFRDRTableEditor::createWidgets() {

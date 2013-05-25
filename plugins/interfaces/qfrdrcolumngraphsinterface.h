@@ -18,7 +18,12 @@ class QFRDRColumnGraphsInterface {
             cgtPoints,
             cgtBars,
             cgtSteps,
-            cgtImpulses
+            cgtImpulses,
+            cgtExpression,
+            cgtPolynomial,
+            cgtExponential,
+            cgtPowerLaw,
+            cgtQFFitFunction
         };
 
         enum ErrorGraphTypes {
@@ -99,6 +104,22 @@ class QFRDRColumnGraphsInterface {
         virtual void colgraphsetXRange(int graph, double xmin, double xmax)=0;
         /** \brief set y-axis range */
         virtual void colgraphsetYRange(int graph, double xmin, double xmax)=0;
+        /** \brief add a function plot which takes it's parameters from a column, or doesn't have parameters
+         *
+         *  \note This function only works with type==cgtExpression, cgtPolynomial, cgtExponential, cgtPowerLaw, cgtQFFitFunction. Depending on
+         *        the value of type, the parameter expression either contains a math expression, like \c "p1+p2*sin(p3*x)" or the name of an available QFFitFunction
+         *        For the special cases cgtPolynomial, cgtExponential, cgtPowerLaw, the expression is ignored!
+         *        If any non-function type is used, the the type is automatically set to be cgtExpression.
+         */
+        virtual void colgraphAddFunctionPlot(int graph, const QString& expression, ColumnGraphTypes type, const QString&  title, int columnParam=-1)=0;
+        /** \brief add a function plot which takes it's parameters from a vector of numbers
+         *
+         *  \note This function only works with typ==cgtExpression, cgtPolynomial, cgtExponential, cgtPowerLaw, cgtQFFitFunction. Depending on
+         *        the value of type, the parameter expression either contains a math expression, like \c "p1+p2*sin(p3*x)" or the name of an available QFFitFunction
+         *        For the special cases cgtPolynomial, cgtExponential, cgtPowerLaw, the expression is ignored!
+         *        If any non-function type is used, the the type is automatically set to be cgtExpression.
+         */
+        virtual void colgraphAddFunctionPlot(int graph, const QString& expression, ColumnGraphTypes type, const QString&  title, const QVector<double>& params)=0;
 
 };
 

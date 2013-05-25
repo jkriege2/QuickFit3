@@ -202,7 +202,7 @@ void QFImFCCSRelativeCCFDialog::on_cmbACF_currentIndexChanged(int /*index*/)
             if (guess1) ui->cmbCCF->setCurrentRDR(guess1);
             else if (guess2) ui->cmbCCF->setCurrentRDR(guess2);
             else if (guess3) ui->cmbCCF->setCurrentRDR(guess3);
-            else qDebug()<<"no guess found";
+            //else qDebug()<<"no guess found";
         }
     }
     replotImages();
@@ -379,7 +379,7 @@ bool QFImFCCSRelativeCCFDialog::nextFileSameRole()
         QString adir=getACF()->getFolder();
         QString ainput=getACF()->getFileForType("input");
         for (int i=current+1; i<lst.size(); i++) {
-            qDebug()<<"checking: "<<lst[i]->getName();
+            //qDebug()<<"checking: "<<lst[i]->getName();
             if (isACF(lst[i]) && lst[i]->getRole().toUpper()==getACF()->getRole().toUpper()) {
                 QString binput=lst[i]->getFileForType("input");
                 QString bdir=getACF()->getFolder();

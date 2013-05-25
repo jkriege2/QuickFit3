@@ -6,6 +6,7 @@
 #include <QStringList>
 #include<QMap>
 #include<QVector>
+#include "float.h"
 
 
 class QFFitParameterBasicInterface;
@@ -14,7 +15,8 @@ class QFFitFunction;
 
 
 struct QFLIB_EXPORT QFFitFunctionValueInputTableFitParamData {
-    QFFitFunctionValueInputTableFitParamData();
+        QFFitFunctionValueInputTableFitParamData();
+        QFFitFunctionValueInputTableFitParamData(double value, double error=0, bool fix=false, double min=-DBL_MAX, double max=DBL_MAX);
 
     double value;
     double error;
@@ -85,10 +87,12 @@ class QFLIB_EXPORT QFFitFunctionValueInputTable : public QAbstractTableModel
         void rebuildModel();
         bool recalculateFitParameters(bool emitFitParamSignals=true, bool emit dataChangedSignals=true);
         void setEditRanges(bool enabled);
+        void setDoRebuildModel(bool doReb);
     public:
         bool checkRebuildModel(bool alwaysreset=false);
     protected:
         int colbasicWidth;
+        bool doRebuild;
         QFFitParameterBasicInterface* item;
         QVector<double>* datavector;
         QVector<double>* errorvector;

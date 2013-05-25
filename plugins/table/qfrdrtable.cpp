@@ -190,12 +190,37 @@ void QFRDRTable::tableSetData(quint16 row, quint16 column, const QVariant &data)
     }
 }
 
-void QFRDRTable::tableSetColumnData(quint16 column, QList<QVariant> data)
+void QFRDRTable::tableSetColumnData(quint16 column, const QList<QVariant> &data)
 {
     if (datamodel)  {
         datamodel->setColumnCreate(column, data);
     }
 }
+
+QList<QVariant> QFRDRTable::tableGetColumnData(quint16 column)
+{
+    if (datamodel)  {
+        return datamodel->getColumnData(column);
+    }
+    return QList<QVariant>();
+}
+
+void QFRDRTable::tableSetColumnDataAsDouble(quint16 column, const QVector<double> &data)
+{
+    if (datamodel)  {
+        datamodel->setColumnCreate(column, data);
+    }
+}
+
+QVector<double> QFRDRTable::tableGetColumnDataAsDouble(quint16 column)
+{
+    if (datamodel)  {
+        return datamodel->getColumnDataAsNumbers(column);
+    }
+    return QVector<double>();
+}
+
+
 
 void QFRDRTable::tableSetColumnTitle(quint16 column, const QString &data)
 {
@@ -348,6 +373,13 @@ void QFRDRTable::colgraphToolsSetGraphtype(QFRDRTable::GraphInfo &g, QFRDRColumn
         case QFRDRColumnGraphsInterface::cgtImpulses:
             g.type=gtImpulsesVertical;
             break;
+        case QFRDRColumnGraphsInterface::cgtExpression:
+        case QFRDRColumnGraphsInterface::cgtPolynomial:
+        case QFRDRColumnGraphsInterface::cgtPowerLaw:
+        case QFRDRColumnGraphsInterface::cgtExponential:
+        case QFRDRColumnGraphsInterface::cgtQFFitFunction:
+            g.type=gtFunction;
+            break;
     }
 }
 
@@ -363,6 +395,70 @@ void QFRDRTable::colgraphAddPlot(int graph, int columnX, int columnY, QFRDRColum
         g.fillColor=g.color.lighter();
         colgraphToolsSetGraphtype(g, type);
         g.title=title;
+        plt.graphs.append(g);
+
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+
+    }
+}
+
+void QFRDRTable::colgraphAddFunctionPlot(int graph, const QString &expression, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, int columnParam)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        QFRDRTable::GraphInfo g;
+        g.ycolumn=columnParam;
+        g.color=autocolors.value((plt.graphs.size()-1)%autocolors.size(), QColor("red"));
+        g.errorColor=g.color.darker();
+        g.fillColor=g.color.lighter();
+        colgraphToolsSetGraphtype(g, type);
+        g.title=title;
+        g.function=expression;
+        switch (type) {
+            case cgtPowerLaw: g.functionType=gtfPowerLaw; break;
+            case cgtPolynomial: g.functionType=gtfPolynomial; break;
+            case cgtExponential: g.functionType=gtfExponential; break;
+            case cgtQFFitFunction: g.functionType=gtfQFFunction; break;
+            default:
+            case cgtExpression: g.functionType=gtfString; break;
+        }
+        g.functionParameters.clear();
+        g.drawLine=true;
+        g.symbol=JKQTPnoSymbol;
+
+        plt.graphs.append(g);
+
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+
+    }
+}
+
+void QFRDRTable::colgraphAddFunctionPlot(int graph, const QString &expression, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, const QVector<double> &params)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        QFRDRTable::GraphInfo g;
+        g.ycolumn=-1;
+        g.color=autocolors.value((plt.graphs.size()-1)%autocolors.size(), QColor("red"));
+        g.errorColor=g.color.darker();
+        g.fillColor=g.color.lighter();
+        colgraphToolsSetGraphtype(g, type);
+        g.title=title;
+        g.function=expression;
+        switch (type) {
+            case cgtPowerLaw: g.functionType=gtfPowerLaw; break;
+            case cgtPolynomial: g.functionType=gtfPolynomial; break;
+            case cgtExponential: g.functionType=gtfExponential; break;
+            case cgtQFFitFunction: g.functionType=gtfQFFunction; break;
+            default:
+            case cgtExpression: g.functionType=gtfString; break;
+        }
+        g.functionParameters=params;
+        g.drawLine=true;
+        g.symbol=JKQTPnoSymbol;
+
         plt.graphs.append(g);
 
         setPlot(graph, plt);

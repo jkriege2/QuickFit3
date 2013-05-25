@@ -1033,8 +1033,17 @@ void QFRDRTablePlotWidget::updateData() {
                 double d=current->model()->cell(r, c).toDouble(&ok);
                 if (ok) data[r]=d;
             }
+            int items=current->model()->rowCount();
+            int i=current->model()->rowCount()-1;
+            while (i>=0 && !QFFloatIsOK(data[i])) {
+                items--;
+                i--;
+            }
 
-            ds->addCopiedColumn(data, current->model()->rowCount(), current->model()->columnTitle(c));
+            double dummy=NAN;
+
+            if (items>0) ds->addCopiedColumn(data, items, current->model()->columnTitle(c));
+            else  ds->addCopiedColumn(&dummy, 1, current->model()->columnTitle(c));
             free(data);
         }
     }

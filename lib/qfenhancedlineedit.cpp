@@ -217,7 +217,7 @@ void QFEnhancedLineEdit::setHistory(const QStringList &history)
 
 
 void QFEnhancedLineEdit::keyPressEvent(QKeyEvent *event) {
-    qDebug()<<event->key();
+    //qDebug()<<event->key();
     if (m_useHistory) {
         if(event->key() == Qt::Key_Up){
             if (m_historyposition<history.size()+1) m_historyposition++;

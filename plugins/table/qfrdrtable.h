@@ -258,7 +258,6 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
         virtual QVariant tableGetData(quint16 row, quint16 column) const;
         virtual void tableSetData(quint16 row, quint16 column, const QVariant& data);
-        virtual void tableSetColumnData(quint16 column, QList<QVariant> data);
         virtual void tableSetColumnTitle( quint16 column, const QString& data);
         virtual QString tableGetColumnTitle(quint16 column) const;
         virtual bool tableSupportsExpressions() const;
@@ -268,6 +267,10 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual int tableGetColumnCount() const;
         virtual int tableGetRowCount() const;
         virtual bool tableIsReadonly() const;
+        virtual void tableSetColumnData(quint16 column, const QList<QVariant>& data);
+        virtual QList<QVariant> tableGetColumnData(quint16 column);
+        virtual void tableSetColumnDataAsDouble(quint16 column, const QVector<double>& data);
+        virtual QVector<double> tableGetColumnDataAsDouble(quint16 column);
 
 
 
@@ -275,6 +278,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
 
         virtual void colgraphAddPlot(int graph, int columnX, int columnY, ColumnGraphTypes type, const QString&  title);
+        virtual void colgraphAddFunctionPlot(int graph, const QString& expression, ColumnGraphTypes type, const QString&  title, int columnParam=-1);
+        virtual void colgraphAddFunctionPlot(int graph, const QString& expression, ColumnGraphTypes type, const QString&  title, const QVector<double>& params);
         virtual void colgraphAddErrorPlot(int graph, int columnX, int columnXError, int columnY, int columnYError, ColumnGraphTypes type, const QString&  title, ErrorGraphTypes errorStyle=egtBars);
         virtual void colgraphAddGraph(const QString&  title, const QString& xLabel=QString("x"), const QString& yLabel=QString("y"), bool logX=false, bool logY=false);
         virtual int colgraphGetPlotCount(int graph) const;

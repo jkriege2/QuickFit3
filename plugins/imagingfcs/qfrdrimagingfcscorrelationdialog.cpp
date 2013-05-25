@@ -23,7 +23,7 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     filenameDisplayed="";
     ui->setupUi(this);
     ui->scrollAreaParams->setMaximumHeight(int(1.1*ui->widDetails->height()));
-    qDebug()<<ui->scrollAreaParams->maximumHeight()<<ui->widDetails->height()<<int(1.1*ui->widDetails->height());
+    //qDebug()<<ui->scrollAreaParams->maximumHeight()<<ui->widDetails->height()<<int(1.1*ui->widDetails->height());
     QRegExp rxv("\\s*([\\+\\-]?\\d+\\s*\\,\\s*[\\+\\-]?\\d+(\\s*;\\s*[\\+\\-]?\\d+\\s*\\,\\s*[\\+\\-]?\\d+)*)");
     ui->edtDCCF->setValidator(new QRegExpValidator(rxv, ui->edtDCCF));
     ui->edtFrameTime->setRange(1e-10,1e10);

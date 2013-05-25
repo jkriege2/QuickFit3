@@ -11,6 +11,7 @@
 QFFitFunctionValueInputTable::QFFitFunctionValueInputTable(QObject *parent) :
     QAbstractTableModel(parent)
 {
+    doRebuild=true;
     this->editRanges=false;
     this->editerrors=false;
     this->editfix=false;
@@ -455,8 +456,15 @@ void QFFitFunctionValueInputTable::setEditRanges(bool enabled)
     rebuildModel();
 }
 
+void QFFitFunctionValueInputTable::setDoRebuildModel(bool doReb)
+{
+    doRebuild=doReb;
+    if (doReb) rebuildModel();
+}
+
 bool QFFitFunctionValueInputTable::checkRebuildModel(bool alwaysreset)
 {
+    if (!doRebuild) return false;
     QList<FitParam> fitparamids_new;
     bool ok=false;
     static int rebuildCount=0;
@@ -807,4 +815,13 @@ QFFitFunctionValueInputTableFitParamData::QFFitFunctionValueInputTableFitParamDa
     min=-DBL_MAX;
     max=DBL_MAX;
 
+}
+
+QFFitFunctionValueInputTableFitParamData::QFFitFunctionValueInputTableFitParamData(double value, double error, bool fix, double min, double max)
+{
+    this->value=value;
+    this->error=error;
+    this->fix=fix;
+    this->min=min;
+    this->max=max;
 }

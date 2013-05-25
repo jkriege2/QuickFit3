@@ -879,12 +879,12 @@ void QFTableGraphSettings::disconnectWidgets()
 
 void QFTableGraphSettings::doFit()
 {
-    emit performFit(ui->cmbLinesXData->currentIndex(), ui->cmbLinesYData->currentIndex(), ui->cmbLinesYError->currentIndex(), plot, QString(""));
+    emit performFit(ui->cmbLinesXData->currentIndex()-1, ui->cmbLinesYData->currentIndex()-1, ui->cmbLinesYError->currentIndex()-1, plot, QString(""));
 }
 
 void QFTableGraphSettings::doRegression()
 {
-    emit performRegression(ui->cmbLinesXData->currentIndex(), ui->cmbLinesYData->currentIndex(), ui->cmbLinesYError->currentIndex(), plot);
+    emit performRegression(ui->cmbLinesXData->currentIndex()-1, ui->cmbLinesYData->currentIndex()-1, ui->cmbLinesYError->currentIndex()-1, plot);
 }
 
 void QFTableGraphSettings::initFocus()
@@ -929,7 +929,7 @@ void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)
     } else if (ui->cmbFunctionType->currentIndex()==3) {
         int vsize=3;
         if (fitfuncValues.size()>vsize) {
-            qDebug()<<"deleting:  oldsize="<<fitfuncValues.size()<<"  newsize="<<vsize<<" startdel="<<fitfuncValues.size()-(vsize-fitfuncValues.size())<<" count="<<vsize-fitfuncValues.size();
+            //qDebug()<<"deleting:  oldsize="<<fitfuncValues.size()<<"  newsize="<<vsize<<" startdel="<<fitfuncValues.size()-(vsize-fitfuncValues.size())<<" count="<<vsize-fitfuncValues.size();
             fitfuncValues.remove(fitfuncValues.size()-(fitfuncValues.size()-vsize), fitfuncValues.size()-vsize);
         }
         while (fitfuncValues.size()<vsize) fitfuncValues.append(0);

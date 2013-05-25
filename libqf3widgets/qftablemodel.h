@@ -138,9 +138,13 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         /** \brief set the given cell to the supplied value */
         void setCell(quint16 row, quint16 column, QVariant value);
         /** \brief sets a whole column */
-        void setColumn(quint16 column, QList<QVariant> &value);
+        void setColumn(quint16 column, const QList<QVariant> &value);
         /** \brief sets a whole column */
-        void setColumnCreate(quint16 column, QList<QVariant> &value);
+        void setColumn(quint16 column, const QVector<double> &value);
+        /** \brief sets a whole column */
+        void setColumnCreate(quint16 column, const QList<QVariant> &value);
+        /** \brief sets a whole column */
+        void setColumnCreate(quint16 column, const QVector<double> &value);
         /** \brief copy the contents of cell (row_old, column_old) to cell (row, column) */
         void copyCell(quint16 row, quint16 column, quint16 row_old, quint16 column_old);
         /** \brief set the given cell to the supplied value, if the cell is outside the table size, the table is resized accordingly */
