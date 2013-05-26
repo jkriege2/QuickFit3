@@ -67,7 +67,7 @@ QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int co
     }
     datapoints=dataX.size();
     weights.clear();
-    for (int i=0; i<dataW.size(); i++) weights<<dataW[i];
+    for (int i=0; i<dataW.size(); i++) weights<<1.0/qfSqr(dataW[i]);
     //qDebug()<<"datapoints_after_clean="<<datapoints;
 
     if (dataX.size()>0) {

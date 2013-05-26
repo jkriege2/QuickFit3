@@ -750,11 +750,22 @@ class QFLIB_EXPORT QFMathParser
 
 
 
-        /**
-         * \defgroup qfmpbytecode utilities for QFMathParser function parser class, that allow to build a bytecode program from a parse tree
-         * \ingroup qf3lib_mathtools_parser
-         *
-         * \warning The bytecode utilities are NOT YET COMPLETE ... and not guaranteed to be faster than the evaluate(r) call!
+        /*! \defgroup qfmpbytecode utilities for QFMathParser function parser class, that allow to build a bytecode program from a parse tree
+            \ingroup qf3lib_mathtools_parser
+
+            Sometimes the evaluation of the expression can be done faster, if the tree structure is translated into a bytecode run on a simple
+            stack machine. To do so, the program has to be translated into that bytecode and has to meet certain conditions:
+               # Only numbers (and booleans, as \c false==(number!=0)) may be used, no strings or number vectors
+               # For evaluated functions, the C-function call of the form double name([double[, double[, ...]]]) should be known.
+               # variables may NOT hange their adress, i.e. if an external variable is defined as a pointer during compile,
+                 the pointr may not change until the evaluation, as the pointer is hard-coded into the program
+               # no recursion (???)
+               # functions may only be defined in the global scope
+            .
+            So not all expressions may be translated into ByteCode. the method qfmpNode::createByteCode() thus returns true on success
+            and false else.
+
+            \warning The bytecode utilities are NOT YET COMPLETE ... and not guaranteed to be faster than the evaluate(r) call!
          */
         /*@{*/
 
@@ -764,38 +775,83 @@ class QFLIB_EXPORT QFMathParser
             bcNOP,
             bcPush,
             bcPop,
-            bcPushString,
-            bcPopString,
-            bcPushInt,
-            bcPopInt,
-            bcVarAccess,
+            bcVarRead,
+            bcVarWrite,
+            bcHeapRead,
+            bcHeapWrite,
+            bcAddHeapOffset,
+
             bcAdd,
             bcMul,
             bcDiv,
             bcSub,
             bcMod,
             bcPow,
+            bcNeg,
+
+
             bcBitAnd,
             bcBitOr,
-            bcCallFunction
+            bcBitNot,
+
+            bcLogicAnd,
+            bcLogicOr,
+            bcLogicNot,
+            bcLogicXor,
+
+            bcCmpEqual,
+            bcCmpLesser,
+            bcCmpLesserEqual,
+
+            bcCallCFunction,
+            bcCallCMPFunction,
+
+            bcJumpRel,
+            bcJumpCondRel,
+
+            bcBJumpRel,
+            bcBJumpCondRel
+
+        };
+
+        enum {
+            ByteCodeInitialHeapSize=128
         };
 
         struct ByteCodeInstruction {
             public:
-                ByteCodeInstruction(ByteCodes opcode);
-                ByteCodeInstruction(ByteCodes opcode, const qfmpResult& respar);
-                ByteCodeInstruction(ByteCodes opcode, const QString& strpar);
-                ByteCodeInstruction(ByteCodes opcode, const QString& strpar, int intpar);
+                ByteCodeInstruction(ByteCodes opcode=bcNOP);
+                ByteCodeInstruction(ByteCodes opcode, double numpar);
                 ByteCodeInstruction(ByteCodes opcode, int intpar);
+                ByteCodeInstruction(ByteCodes opcode, void* pntpar);
+                ByteCodeInstruction(ByteCodes opcode, void* pntpar, int intpar);
                 ByteCodes opcode;
-                qfmpResult respar;
-                QString strpar;
+                double numpar;
                 int intpar;
+                void* pntpar;
         };
 
-        typedef QList<ByteCodeInstruction> ByteCodeProgram;
+        class qfmpNode; // forward
 
-        void evaluateBytecode(qfmpResult& result, const ByteCodeProgram& program);
+        struct QFLIB_EXPORT ByteCodeEnvironment {
+                ByteCodeEnvironment(QFMathParser* parser);
+
+                void init(QFMathParser* parser);
+
+                QFMathParser* parser;
+                int heapItemPointer;
+                QMap<QString, QList<int> > heapVariables;
+                int pushVar(const QString& name);
+                void popVar(const QString& name);
+                QMap<QString, QPair<QStringList, qfmpNode*> > functionDefs;
+        };
+
+        friend struct ByteCodeEnvironment;
+
+        typedef QVector<ByteCodeInstruction> ByteCodeProgram;
+
+        double evaluateBytecode(const ByteCodeProgram &program);
+        static QString printBytecode(const ByteCodeInstruction& instruction);
         static QString printBytecode(const ByteCodeProgram& program);
 
         /*@}*/
@@ -821,6 +877,7 @@ class QFLIB_EXPORT QFMathParser
           * only contains pointers to the data
           */
         struct QFLIB_EXPORT qfmpVariable {
+                friend struct ByteCodeEnvironment;
             public:
                 qfmpVariable();
                 qfmpVariable(double* ref);
@@ -834,6 +891,10 @@ class QFLIB_EXPORT QFMathParser
                 QFLIB_EXPORT bool isInternal() const;
                 QFLIB_EXPORT void set(const qfmpResult& result);
                 inline  qfmpResultType getType() const { return type; }
+                inline QString* getStr() const { return str; }
+                inline double* getNum() const { return num; }
+                inline bool* getBoolean() const { return boolean; }
+                inline QVector<double>* getNumVec() const { return numVec; }
 
 
             protected:
@@ -893,7 +954,7 @@ class QFLIB_EXPORT QFMathParser
             virtual qfmpNode* copy(qfmpNode* par=NULL) =0;
 
             /** \brief create bytecode that evaluates the current node */
-            virtual void createByteCode(ByteCodeProgram& program) {}
+            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment) { return false; }
         };
 
 
@@ -927,7 +988,7 @@ class QFLIB_EXPORT QFMathParser
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
             /** \brief create bytecode that evaluates the current node */
-            virtual void createByteCode(ByteCodeProgram& program);
+            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment);
         };
 
         /**
@@ -957,6 +1018,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+            /** \brief create bytecode that evaluates the current node */
+            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment);
 
         };
 
@@ -987,6 +1050,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+            /** \brief create bytecode that evaluates the current node */
+            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment);
 
         };
 
@@ -1016,6 +1081,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL);
+            /** \brief create bytecode that evaluates the current node */
+            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment);
 
         };
 
@@ -1160,7 +1227,7 @@ class QFLIB_EXPORT QFMathParser
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
             /** \brief create bytecode that evaluates the current node */
-            virtual void createByteCode(ByteCodeProgram& program);
+            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment);
 
         };
 
@@ -1188,7 +1255,7 @@ class QFLIB_EXPORT QFMathParser
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
             /** \brief create bytecode that evaluates the current node */
-            virtual void createByteCode(ByteCodeProgram& program);
+            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment *environment);
 
         };
 
@@ -1241,6 +1308,14 @@ class QFLIB_EXPORT QFMathParser
          * \endcode
          */
         typedef qfmpResult (*qfmpEvaluateFunc)(const qfmpResult*, unsigned int, QFMathParser*);
+        typedef double (*qfmpEvaluateFuncSimple0Param)();
+        typedef double (*qfmpEvaluateFuncSimple1Param)(double);
+        typedef double (*qfmpEvaluateFuncSimple2Param)(double,double);
+        typedef double (*qfmpEvaluateFuncSimple3Param)(double,double,double);
+        typedef double (*qfmpEvaluateFuncSimple0ParamMP)(QFMathParser*);
+        typedef double (*qfmpEvaluateFuncSimple1ParamMP)(double, QFMathParser*);
+        typedef double (*qfmpEvaluateFuncSimple2ParamMP)(double,double, QFMathParser*);
+        typedef double (*qfmpEvaluateFuncSimple3ParamMP)(double,double,double, QFMathParser*);
 
         /** \brief This is a function prototype like qfmpEvaluateFunc but returns its result with call by reference
          */
@@ -1264,6 +1339,8 @@ class QFLIB_EXPORT QFMathParser
             qfmpFunctiontype type;  /*!< \brief type of the function */
             qfmpNode* functionNode;   /*!< \brief points to the node definig the function */
             QStringList parameterNames;  /*!< \brief a list of the function parameters, if the function is defined by a node */
+
+            QMap<int, void*> simpleFuncPointer; /*!<  \brief points to the simple implementation of the function, e.g. of type qfmpEvaluateFuncSimple0Param or qfmpEvaluateFuncSimple0ParamMP, the integer-key indexes the function as its number of parameters for a simple call to simpleFuncPointer ... values >100 indicate the use of a MP-variant, i.e. 102 means a call to qfmpEvaluateFuncSimple2ParamMP whereas 1 means a call to  qfmpEvaluateFuncSimple1Param */
 
             QFLIB_EXPORT void evaluate(qfmpResult& res, const QVector<qfmpResult> &parameters, QFMathParser *parent) const;
             QFLIB_EXPORT QString toDefString() const;
@@ -1306,7 +1383,7 @@ class QFLIB_EXPORT QFMathParser
 
 
             /** \brief create bytecode that evaluates the current node */
-            virtual void createByteCode(ByteCodeProgram& program) ;
+            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment) ;
 
         };
 
@@ -1344,6 +1421,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+            /** \brief create bytecode that evaluates the current node */
+            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment) ;
 
         };
 
@@ -1433,6 +1512,9 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+            /** \brief create bytecode that evaluates the current node */
+            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment) ;
+
 
         };
 
@@ -1462,6 +1544,8 @@ class QFLIB_EXPORT QFMathParser
             virtual qfmpResult evaluate();
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
+            /** \brief create bytecode that evaluates the current node */
+            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment) ;
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
@@ -1544,6 +1628,22 @@ class QFLIB_EXPORT QFMathParser
                     if (parent) parent->qfmpError(QObject::tr("the variable '%1' does not exist").arg(name));
                     return res;
                 }
+                inline bool getVariableDef(const QString& name, qfmpVariable& vardef) const {
+                    if (variables.contains(name) && variables[name].size()>0) {
+                        vardef=variables[name].last().second;
+                        return true;
+                    }
+                    if (parent) parent->qfmpError(QObject::tr("the variable '%1' does not exist").arg(name));
+                    return false;
+                }
+                inline int getVariableLevel(const QString& name) const {
+                    if (variables.contains(name) && variables[name].size()>0) {
+                        return variables[name].last().first;
+                    }
+                    if (parent) parent->qfmpError(QObject::tr("the variable '%1' does not exist").arg(name));
+                    return -1;
+                }
+
                 inline qfmpResult evaluateFunction(const QString& name, const QVector<qfmpResult> &parameters) const{
                     qfmpResult res;
                     if (functions.contains(name) && functions[name].size()>0) {
@@ -1553,6 +1653,23 @@ class QFLIB_EXPORT QFMathParser
                         res.setInvalid();
                     }
                     return res;
+                }
+
+                inline bool getFunctionDef(const QString& name, qfmpFunctionDescriptor& vardef) const {
+                    if (functions.contains(name) && functions[name].size()>0) {
+                        vardef=functions[name].last().second;
+                        return true;
+                    }
+                    if (parent) parent->qfmpError(QObject::tr("the function '%1' does not exist").arg(name));
+                    return false;
+                }
+
+                inline int getFunctionLevel(const QString& name) const {
+                    if (functions.contains(name) && functions[name].size()>0) {
+                        return functions[name].last().first;
+                    }
+                    if (parent) parent->qfmpError(QObject::tr("the function '%1' does not exist").arg(name));
+                    return -1;
                 }
 
                 inline void getVariable(qfmpResult& res, const QString& name) const{
@@ -1745,15 +1862,22 @@ class QFLIB_EXPORT QFMathParser
 		 * \param function a pointer to the implementation
 		 */
         void addFunction(const QString &name, qfmpEvaluateFunc function);
+        void addFunction(const QString &name, qfmpEvaluateFunc function, qfmpEvaluateFuncSimple0Param f0, qfmpEvaluateFuncSimple1Param f1=NULL, qfmpEvaluateFuncSimple2Param f2=NULL, qfmpEvaluateFuncSimple3Param f3=NULL);
+        void addFunction(const QString &name, qfmpEvaluateFunc function, qfmpEvaluateFuncSimple0ParamMP f0, qfmpEvaluateFuncSimple1ParamMP f1=NULL, qfmpEvaluateFuncSimple2ParamMP f2=NULL, qfmpEvaluateFuncSimple3ParamMP f3=NULL);
+
+
         /** \brief  register a new function
          * \param name name of the new function
          * \param function a pointer to the implementation
          */
         void addFunction(const QString &name, qfmpEvaluateFuncRefReturn function);
+        void addFunction(const QString &name, qfmpEvaluateFuncRefReturn function, qfmpEvaluateFuncSimple0Param f0, qfmpEvaluateFuncSimple1Param f1=NULL, qfmpEvaluateFuncSimple2Param f2=NULL, qfmpEvaluateFuncSimple3Param f3=NULL);
+        void addFunction(const QString &name, qfmpEvaluateFuncRefReturn function, qfmpEvaluateFuncSimple0ParamMP f0, qfmpEvaluateFuncSimple1ParamMP f1=NULL, qfmpEvaluateFuncSimple2ParamMP f2=NULL, qfmpEvaluateFuncSimple3ParamMP f3=NULL);
 
         inline void addFunction(const QString& name, const QStringList& parameterNames, qfmpNode* function){
             environment.addFunction(name, parameterNames, function);
         }
+
 
         /** \brief set the defining struct of the given variable */
         inline void addVariable(const QString& name, const qfmpVariable &value) {

@@ -5,28 +5,72 @@
 #include <QElapsedTimer>
 #define TEST(expr) {\
     parser.resetErrors(); \
-    qfmpResult r=parser.evaluate(expr); \
-    qDebug()<<expr<<"  =  "<<r.toTypeString()<<"\n"; \
+    QFMathParser::qfmpNode* n=parser.parse(expr); \
+    qfmpResult r=n->evaluate(); \
+    qDebug()<<expr<<"       =  "<<r.toTypeString()<<"\n"; \
     if (parser.hasErrorOccured()) { \
         qDebug()<<"   ERROR "<<parser.getLastErrors().join("\n    ")<<"\n" ;\
     }\
+    if (doByteCode) { \
+        QFMathParser::ByteCodeProgram bprog;\
+        QFMathParser::ByteCodeEnvironment bcenv(&parser);\
+        bcenv.init(&parser); \
+        if (n->createByteCode(bprog, &bcenv)) { \
+            double rr=NAN;\
+            qDebug()<<expr<<"  =[BC]=  "<<(rr=parser.evaluateBytecode(bprog))<<"\n"; \
+            if (r.getType()==qfmpDouble && rr!=r.asNumber()) { \
+                qDebug()<<"   BCNOTEQUAL:   eval="<<r.toTypeString()<<"   bc="<<rr<<"   rel_error="<<(rr-r.asNumber())/r.asNumber();\
+            } else if (r.getType()==qfmpBool && (rr!=0.0)!=r.asBool()) { \
+                qDebug()<<"   BCNOTEQUAL:   eval="<<r.toTypeString()<<"   bc="<<(rr!=0.0);\
+            }\
+            if (showBytecode) qDebug()<<"\n-----------------------------------------------------------\n"<<QFMathParser::printBytecode(bprog)<<"\n-----------------------------------------------------------\n"; \
+        }\
+        if (parser.hasErrorOccured()) { \
+            qDebug()<<"   BCERROR "<<parser.getLastErrors().join("\n    ")<<"\n" ;\
+        }\
+    }\
   }
 
+double dbgif(bool test, double trueV, double falseV) {
+    if (test) return trueV; else return falseV;
+}
+double dbgcases(bool test1, double trueV1, double elseV) {
+    if (test1) return trueV1; else return elseV;
+}
+double dbgcases(bool test1, double trueV1, bool test2, double trueV2, double elseV) {
+    if (test1) return trueV1;
+    else if (test2) return trueV2;
+    else return elseV;
+}
+
+double dbgcases(bool test1, double trueV1, bool test2, double trueV2, bool test3, double trueV3, double elseV) {
+    if (test1) return trueV1;
+    else if (test2) return trueV2;
+    else if (test3) return trueV3;
+    else return elseV;
+}
 
 #define SPEEDTEST(expr)     { \
-    int cnt=1000; \
+    double a=1.23456; \
+    double b=12.3456; \
+    double c=-123.456; \
+    parser.addVariableDouble("a", a); \
+    parser.addVariableDouble("b", b); \
+    parser.addVariableDouble("c", c); \
+    int cnt=10000; \
     double pi=M_PI; \
     QElapsedTimer timer; \
     double el=0; \
     timer.start(); \
-    double val=1; \
+    volatile double val=1; \
     for (int i=0; i<cnt; i++) { \
         val=expr; \
     } \
+    double native_val=val; \
     el=double(timer.nsecsElapsed())/1e6; \
     qDebug()<<"evaluations: "<<cnt; \
     qDebug()<<"expression: "<<#expr; \
-    qDebug()<<"native: "<<el<<" ms     (result="<<val<<")"; \
+    qDebug()<<"native:                                   "<<el<<" ms\t= "<<double(cnt)*1000.0/el<<" eval/sec\t     (result="<<val<<")"; \
     double nat=el; \
     parser.resetErrors(); \
     timer.start(); \
@@ -35,10 +79,19 @@
     qDebug()<<"parsing: "<<el<<" ms"; \
     parser.resetErrors(); \
     QFMathParser::ByteCodeProgram bprog;\
+    QFMathParser::ByteCodeEnvironment bcenv(&parser);\
     timer.start(); \
-    n->createByteCode(bprog); \
-    el=double(timer.nsecsElapsed())/1e6; \
-    qDebug()<<"generating bytecode: "<<el<<" ms\n\n-----------------------------------------------------------\n"<<QFMathParser::printBytecode(bprog)<<"\n-----------------------------------------------------------\n"; \
+    bcenv.init(&parser); \
+    bool bytecodeOK=false; \
+    if (n->createByteCode(bprog, &bcenv)) { \
+        el=double(timer.nsecsElapsed())/1e6; \
+        qDebug()<<"generating bytecode: "<<el<<" ms (incl. environment init)"; \
+        if (showBytecode) qDebug()<<"\n-----------------------------------------------------------\n"<<QFMathParser::printBytecode(bprog)<<"\n-----------------------------------------------------------\n"; \
+        bytecodeOK=true; \
+    } else {\
+        qDebug()<<"generating bytecode: impossible\n"; \
+        qDebug()<<"   ERROR "<<parser.getLastErrors().join("\n    ")<<"\n" ; \
+    } \
      \
     timer.start(); \
     qfmpResult rtst; \
@@ -46,11 +99,14 @@
         rtst=n->evaluate(); \
     } \
     el=double(timer.nsecsElapsed())/1e6; \
-    qDebug()<<"interpreted (evaluate with return value): "<<el<<" ms     (result="<<rtst.toTypeString()<<")"; \
+    qDebug()<<"interpreted (evaluate with return value): "<<el<<" ms\t= "<<double(cnt)*1000.0/el<<" eval/sec\t     (result="<<rtst.toTypeString()<<")"; \
     qDebug()<<"interpreted/native : "<<el/nat; \
     if (parser.hasErrorOccured()) { \
         qDebug()<<"   ERROR "<<parser.getLastErrors().join("\n    ")<<"\n" ; \
     } \
+    if (native_val!=rtst.asNumber()) { \
+        qDebug()<<"   ERROR native and expression value differ rel_error="<<(native_val-rtst.asNumber())/fabs(native_val)<<":    native="<<native_val<<"    evaluated="<<rtst.asNumber(); \
+    }\
     \
     timer.start(); \
     qfmpResult rr; \
@@ -58,24 +114,30 @@
         n->evaluate(rr); \
     } \
     el=double(timer.nsecsElapsed())/1e6; \
-    qDebug()<<"interpreted (evaluate call-by-value): "<<el<<" ms     (result="<<rr.toTypeString()<<")"; \
+    qDebug()<<"interpreted (evaluate call-by-value):     "<<el<<" ms\t= "<<double(cnt)*1000.0/el<<" eval/sec\t     (result="<<rr.toTypeString()<<")"; \
     qDebug()<<"interpreted/native : "<<el/nat; \
     if (parser.hasErrorOccured()) { \
         qDebug()<<"   ERROR "<<parser.getLastErrors().join("\n    ")<<"\n" ; \
     } \
+    if (native_val!=rr.asNumber()) { \
+        qDebug()<<"   ERROR native and expression value differ rel_error="<<(native_val-rr.asNumber())/fabs(native_val)<<":    native="<<native_val<<"    evaluated="<<rr.asNumber(); \
+    }\
     \
-    if (doBytecode) { \
+    if (doBytecode && bytecodeOK) { \
         timer.start(); \
-        qfmpResult rrb; \
+        double rrb; \
         for (int i=0; i<cnt; i++) { \
-            parser.evaluateBytecode(rrb, bprog); \
+            rrb=parser.evaluateBytecode(bprog); \
         } \
         el=double(timer.nsecsElapsed())/1e6; \
-        qDebug()<<"interpreted (bytecode): "<<el<<" ms     (result="<<rrb.toTypeString()<<")"; \
+        qDebug()<<"interpreted (bytecode):                   "<<el<<" ms\t= "<<double(cnt)*1000.0/el<<" eval/sec\t     (result="<<rrb<<")"; \
         qDebug()<<"interpreted/native : "<<el/nat; \
         if (parser.hasErrorOccured()) { \
-            qDebug()<<"   ERROR "<<parser.getLastErrors().join("\n    ")<<"\n" ; \
+            qDebug()<<"   PARSER_ERROR "<<parser.getLastErrors().join("\n    ")<<"\n" ; \
         } \
+        if (native_val!=rrb) { \
+            qDebug()<<"   ERROR native and expression value differ rel_error="<<(native_val-rrb)/fabs(native_val)<<":    native="<<native_val<<"    evaluated="<<rrb; \
+        }\
     } \
     qDebug()<<"\n"; \
 }
@@ -83,20 +145,20 @@
 
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
-void speed_test() {
+void speed_test(bool doBytecode, bool showBytecode) {
     QFMathParser parser;
     qDebug()<<"\n\n=========================================================";
     qDebug()<<"== SPEED TEST\n=========================================================";
-
-    bool doBytecode=true;
+    ;
     {
-        /*SPEEDTEST(pi*37.467);
-        SPEEDTEST(pi+37.467);
-        SPEEDTEST(pi-37.467);
+        SPEEDTEST(pi*b);
+        SPEEDTEST(pi/b);
+        SPEEDTEST(pi+b);
+        SPEEDTEST(pi-b);
         SPEEDTEST(-pi);
-        SPEEDTEST(pi*37.467+45.3e-4/1e-8-1);
-        SPEEDTEST(sqrt(sin(2.5*58)));
-        SPEEDTEST(sqrt(45.6*sin(pi*37.467)+45.3e-4/1e-8)-1);*/
+        SPEEDTEST(pi*a+45.3e-4/1e-8-1);
+        SPEEDTEST(sqrt(sin(a*b)));
+        SPEEDTEST(sqrt(45.6*sin(pi*37.467)+45.3e-4/1e-8)-1);
         SPEEDTEST(1+1);
         SPEEDTEST(1.54-1.35);
         SPEEDTEST(1.54-5%2);
@@ -104,6 +166,9 @@ void speed_test() {
         SPEEDTEST(1+2+3+4+5+6+7+8+9+10+11+12+13+14+15+16+17+18+19+20);
         SPEEDTEST(1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20);
         SPEEDTEST(sqrt(1+2)+sin(3+4)+sqrt(5+6)+sin(7+8)+cos(9+10)+sqrt(11+12)+cos(13+14)+sqrt(15+16)+sin(17+18)+cos(19+20));
+        SPEEDTEST(sqrt(a+b)+sin(b+c)+sqrt(a-c)+sin(b+a)+cos(a+c)+sqrt(b+b)+cos(a+a)+sqrt(-c)+sin(a*c)+cos(b+5.0));
+        SPEEDTEST(dbgcases(a<b, 1, a>b, 2, a>=b, 3, -1));
+        SPEEDTEST(a-b-c-a-b-c-c-b-a-c-b-a-c-a-c-b-a-18.0-c-a);
     }
 }
 #pragma GCC pop_options
@@ -112,6 +177,8 @@ int main(int argc, char *argv[])
 {
     
     QFMathParser parser;
+    bool doByteCode=true;
+    bool showBytecode=true;
 
     /*for (uint32_t i=0; i<0xFFFFFFFF; i++) {
         double di=i;
@@ -289,6 +356,17 @@ int main(int argc, char *argv[])
 
 
 
-    speed_test();
+    speed_test(doByteCode, showBytecode);
+
+    TEST("prod(i,1,5,i)");
+    TEST("prod(i,1,2,5,i)");
+    TEST("sum(i,1,5,i)");
+    TEST("sum(i,1,2,5,i)");
+    TEST("sum(i,0,1,5,sum(j,0,3,j^2))");
+    TEST("sum(i,0,1,5,sum(i,0,3,j^2))");
+    TEST("sum(i,0,1,5,sum(j,0,i,j^2))");
+    TEST("sum(i,0,1,5,sum(j,0,3,j^2))");
+    TEST("sum(i,0,1,5,sum(i,0,3,i^2))");
+
     return 0;
 }
