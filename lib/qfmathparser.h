@@ -580,6 +580,35 @@ struct QFLIB_EXPORT qfmpResult {
  external variable x as the argument and then evaluate the function for
  each x.
 
+ Evaluation can either be done with the results being returned as return-values (~5-10% slower)
+ or with call-by-reference return-values.
+ The third possibility is to translate the memory tree into an internal bytecode:
+ \code
+QFMathParser parser
+parser.resetErrors();
+QFMathParser::qfmpNode* n=parser.parse("sin(2*pi*(x^2+y^2))");
+qfmpResult r=n->evaluate();
+qDebug()<<expr<<"       =  "<<r.toTypeString()<<"\n";
+QFMathParser::ByteCodeProgram bprog;
+QFMathParser::ByteCodeEnvironment bcenv(&parser);
+bcenv.init(&parser);
+if (n->createByteCode(bprog, &bcenv)) {
+    double rr=NAN;
+    qDebug()<<expr<<"  =[BC]=  "<<(rr=parser.evaluateBytecode(bprog))<<"\n";
+    qDebug()<<"\n-----------------------------------------------------------\n"<<QFMathParser::printBytecode(bprog)<<"\n-----------------------------------------------------------\n";
+}
+ \endcode
+ This allows to evaluate the expression ~10-20 times fast, but not all features are supported, see \link qfmpbytecode bytecode (only number- and boolean values, limited support for
+ variables, limitied support for user-defined functions (no recursion), ...).
+
+ Here are some test-results (AMD QuadCore, 32-bit, 10000 evaluations each, gcc 4.4 no optimization, debug-build):
+   - \c sqrt(a+b)+sin(b+c)+sqrt(a-c)+sin(b+a)+cos(a+c)+sqrt(b+b)+cos(a+a)+sqrt(-c)+sin(a*c)+cos(b+5.0) native: 8.7ms, return-value-evaluation: 945ms, call-by-reference: 891ms, bytecode: 40ms
+   - \c cos(sqrt(a+b)+c*a) native: 1.8ms, return-value-evaluation: 186ms, call-by-reference: 177ms, bytecode: 13ms
+ .
+ Note that the speed-loss compared to the native execution depends on the compiler, optimization and especially the expression itself. Using a -O2 release build, the results
+ of the parser  are improved ~2-fold.
+
+
  \section qfmp_ebnf EBNF definition of the parsed expressions
 
 <pre> logical_expression ->  logical_term
@@ -756,10 +785,11 @@ class QFLIB_EXPORT QFMathParser
             Sometimes the evaluation of the expression can be done faster, if the tree structure is translated into a bytecode run on a simple
             stack machine. To do so, the program has to be translated into that bytecode and has to meet certain conditions:
                # Only numbers (and booleans, as \c false==(number!=0)) may be used, no strings or number vectors
-               # For evaluated functions, the C-function call of the form double name([double[, double[, ...]]]) should be known.
+               # For evaluated functions, the C-function call of the form double name([double[, double[, ...]]]) should be known. If not, the parser will try to call
+                 the qfmpResultFunction, but this will be very expensive, compared to calling the C-function!
                # variables may NOT hange their adress, i.e. if an external variable is defined as a pointer during compile,
                  the pointr may not change until the evaluation, as the pointer is hard-coded into the program
-               # no recursion (???)
+               # no recursion
                # functions may only be defined in the global scope
             .
             So not all expressions may be translated into ByteCode. the method qfmpNode::createByteCode() thus returns true on success
@@ -779,7 +809,6 @@ class QFLIB_EXPORT QFMathParser
             bcVarWrite,
             bcHeapRead,
             bcHeapWrite,
-            bcAddHeapOffset,
 
             bcAdd,
             bcMul,
@@ -805,6 +834,7 @@ class QFLIB_EXPORT QFMathParser
 
             bcCallCFunction,
             bcCallCMPFunction,
+            bcCallResultFunction,
 
             bcJumpRel,
             bcJumpCondRel,
@@ -825,10 +855,12 @@ class QFLIB_EXPORT QFMathParser
                 ByteCodeInstruction(ByteCodes opcode, int intpar);
                 ByteCodeInstruction(ByteCodes opcode, void* pntpar);
                 ByteCodeInstruction(ByteCodes opcode, void* pntpar, int intpar);
+                ByteCodeInstruction(ByteCodes opcode, QString strpar, int intpar);
                 ByteCodes opcode;
                 double numpar;
                 int intpar;
                 void* pntpar;
+                QString strpar;
         };
 
         class qfmpNode; // forward
@@ -844,6 +876,7 @@ class QFLIB_EXPORT QFMathParser
                 int pushVar(const QString& name);
                 void popVar(const QString& name);
                 QMap<QString, QPair<QStringList, qfmpNode*> > functionDefs;
+                QSet<QString> inFunctionCalls;
         };
 
         friend struct ByteCodeEnvironment;
@@ -1141,6 +1174,9 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+            /** \brief create bytecode that evaluates the current node */
+            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment);
+
 
         };
 
@@ -1202,6 +1238,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+            /** \brief create bytecode that evaluates the current node */
+            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment);
 
         };
 
@@ -1449,6 +1487,8 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+            /** \brief create bytecode that evaluates the current node */
+            virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment) ;
 
         };
 

@@ -165,6 +165,13 @@ namespace QFMathParser_Private {
 
     QFMATHPARSER_DEFINE_2PARAM2VEC_NUMERIC_FUNC_SIMPLE(fYn, yn)
     QFMATHPARSER_DEFINE_2PARAM2VEC_NUMERIC_FUNC_SIMPLE(fJn, jn)
+    double fJn(double a, double b) {
+        return jn(a,b);
+    }
+    double fYn(double a, double b) {
+        return yn(a,b);
+    }
+
     QFMATHPARSER_DEFINE_2PARAM1VEC_NUMERIC_FUNC(fSlit, slit, qfSlit)
     QFMATHPARSER_DEFINE_2PARAM12VEC_NUMERIC_FUNC_SIMPLE(fFMod, fmod)
     QFMATHPARSER_DEFINE_2PARAM12VEC_NUMERIC_FUNC_SIMPLE(fATan2, atan2)
@@ -198,6 +205,10 @@ namespace QFMathParser_Private {
       else p->get_rng()->seed();
       return r;
     }
+    double fSRand(double rangeMax, QFMathParser* p) {
+        p->get_rng()->seed(uint32_t(rangeMax));
+        return 0;
+    }
 
     qfmpResult fRand(const qfmpResult* params, unsigned int  n, QFMathParser* p){
       qfmpResult r;
@@ -208,6 +219,16 @@ namespace QFMathParser_Private {
       else if (n==2) r.num=p->get_rng()->rand()*(params[1].num-params[0].num)+params[0].num;
       else r.num=p->get_rng()->rand(params[0].num);
       return r;
+    }
+
+    double fRand(double rangeMin, double rangeMax, QFMathParser* p) {
+        return p->get_rng()->rand()*(rangeMax-rangeMin)+rangeMin;
+    }
+    double fRand(double rangeMax, QFMathParser* p) {
+        return p->get_rng()->rand(rangeMax);
+    }
+    double fRand(QFMathParser* p) {
+        return p->get_rng()->rand();
     }
 
     qfmpResult fRandNorm(const qfmpResult* params, unsigned int  n, QFMathParser* p){
@@ -228,6 +249,16 @@ namespace QFMathParser_Private {
       return r;
     }
 
+    double fRandNorm(double mean, double var, QFMathParser* p) {
+        return p->get_rng()->randNorm(mean,var);
+    }
+    double fRandNorm(double var, QFMathParser* p) {
+        return p->get_rng()->randNorm(0,var);
+    }
+    double fRandNorm(QFMathParser* p) {
+        return p->get_rng()->randNorm(0,1);
+    }
+
     qfmpResult fRandInt(const qfmpResult* params, unsigned int  n, QFMathParser* p){
       qfmpResult r;
       if (n>2) p->qfmpError(QObject::tr("randint accepts 0, 1 or 2 argument"));
@@ -236,6 +267,16 @@ namespace QFMathParser_Private {
       else if (n==2) r.num=p->get_rng()->randInt()*((uint32_t)params[1].num-(uint32_t)params[0].num)+(uint32_t)params[0].num;
       else r.num=p->get_rng()->randInt((uint32_t)params[0].num);
       return r;
+    }
+
+    double fRandInt(double rangeMin, double rangeMax, QFMathParser* p) {
+        return p->get_rng()->randInt()*((uint32_t)rangeMax-(uint32_t)rangeMin)+(uint32_t)rangeMin;
+    }
+    double fRandInt(double rangeMax, QFMathParser* p) {
+        return p->get_rng()->randInt((uint32_t)rangeMax);
+    }
+    double fRandInt(QFMathParser* p) {
+        return p->get_rng()->randInt();
     }
 
 
@@ -260,6 +301,10 @@ namespace QFMathParser_Private {
       return r;
     }
 
+    double fMin(double a,double b) {
+        return (a<b)?a:b;
+    }
+
     qfmpResult fMax(const qfmpResult* params, unsigned int  n, QFMathParser* p){
         qfmpResult r;
         r.type=qfmpDouble;
@@ -273,6 +318,10 @@ namespace QFMathParser_Private {
             return r;
         }
         return r;
+    }
+
+    double fMax(double a,double b) {
+        return (a>b)?a:b;
     }
 
     qfmpResult fLength(const qfmpResult* params, unsigned int  n, QFMathParser* p){
@@ -437,35 +486,35 @@ void QFMathParser::addStandardFunctions(){
     addFunction("tgamma", QFMathParser_Private::ftGamma, NULL, tgamma);
     addFunction("j0", QFMathParser_Private::fJ0, NULL, j0);
     addFunction("j1", QFMathParser_Private::fJ1, NULL, j1);
-    addFunction("jn", QFMathParser_Private::fJn);
+    addFunction("jn", QFMathParser_Private::fJn, NULL, NULL, QFMathParser_Private::fJn);
     addFunction("y0", QFMathParser_Private::fY0, NULL, y0);
     addFunction("y1", QFMathParser_Private::fY1, NULL, y1);
-    addFunction("yn", QFMathParser_Private::fYn);
-    addFunction("rand", QFMathParser_Private::fRand);
-    addFunction("randint", QFMathParser_Private::fRandInt);
-    addFunction("randnorm", QFMathParser_Private::fRandNorm);
-    addFunction("srand", QFMathParser_Private::fSRand);
-    addFunction("ceil", QFMathParser_Private::fCeil);
-    addFunction("floor", QFMathParser_Private::fFloor);
-    addFunction("trunc", QFMathParser_Private::fTrunc);
+    addFunction("yn", QFMathParser_Private::fYn, NULL, NULL, QFMathParser_Private::fYn);
+    addFunction("rand", QFMathParser_Private::fRand, QFMathParser_Private::fRand, QFMathParser_Private::fRand, QFMathParser_Private::fRand);
+    addFunction("randint", QFMathParser_Private::fRandInt, QFMathParser_Private::fRandInt, QFMathParser_Private::fRandInt, QFMathParser_Private::fRandInt);
+    addFunction("randnorm", QFMathParser_Private::fRandNorm, QFMathParser_Private::fRandNorm, QFMathParser_Private::fRandNorm, QFMathParser_Private::fRandNorm);
+    addFunction("srand", QFMathParser_Private::fSRand, NULL, QFMathParser_Private::fSRand);
+    addFunction("ceil", QFMathParser_Private::fCeil, NULL, ceil);
+    addFunction("floor", QFMathParser_Private::fFloor, NULL, floor);
+    addFunction("trunc", QFMathParser_Private::fTrunc, NULL, trunc);
     addFunction("round", QFMathParser_Private::fRound, NULL, round);
     addFunction("fmod", QFMathParser_Private::fFMod, NULL, NULL, fmod);
-    addFunction("min", QFMathParser_Private::fMin);
-    addFunction("max", QFMathParser_Private::fMax);
+    addFunction("min", QFMathParser_Private::fMin,NULL,NULL,QFMathParser_Private::fMin);
+    addFunction("max", QFMathParser_Private::fMax,NULL,NULL,QFMathParser_Private::fMax);
     addFunction("int2bin", QFMathParser_Private::fIntToBinStr);
     addFunction("int2oct", QFMathParser_Private::fIntToOctStr);
     addFunction("int2hex", QFMathParser_Private::fIntToHexStr);
     addFunction("int2str", QFMathParser_Private::fIntToStr);
     addFunction("num2str", QFMathParser_Private::fdoubleToQString);
     addFunction("bool2str", QFMathParser_Private::fboolToQString);
-    addFunction("gaussnn", QFMathParser_Private::fGauss);
-    addFunction("gauss", QFMathParser_Private::fGaussDist);
-    addFunction("slit", QFMathParser_Private::fSlit);
-    addFunction("theta", QFMathParser_Private::fTheta);
+    addFunction("gaussnn", QFMathParser_Private::fGauss, NULL, qfGaussSqrtE, qfGaussSqrtE);
+    addFunction("gauss", QFMathParser_Private::fGaussDist, NULL, qfGaussNormSqrtE, qfGaussNormSqrtE);
+    addFunction("slit", QFMathParser_Private::fSlit, NULL, NULL,qfSlit);
+    addFunction("theta", QFMathParser_Private::fTheta, NULL, qfTheta);
     addFunction("tanc", QFMathParser_Private::fTanc, NULL, qfTanc);
-    addFunction("sigmoid", QFMathParser_Private::fSigmoid);
-    addFunction("sign", QFMathParser_Private::fSign);
-    addFunction("roundsig", QFMathParser_Private::fRoundSig);
+    addFunction("sigmoid", QFMathParser_Private::fSigmoid, NULL, qfSigmoid);
+    addFunction("sign", QFMathParser_Private::fSign, NULL, qfSign);
+    addFunction("roundsig", QFMathParser_Private::fRoundSig, NULL, roundError, roundError);
     addFunction("tosystempathseparator", QFMathParser_Private::fToSystemPathSeparator);
     addFunction("trimm", QFMathParser_Private::fTrimm);
     addFunction("tolower", QFMathParser_Private::fToLower);
@@ -486,8 +535,8 @@ void QFMathParser::addStandardFunctions(){
     addFunction("shuffle", QFMathParser_Private::fShuffle);
     addFunction("reverse", QFMathParser_Private::fReverse);
     addFunction("concat", QFMathParser_Private::fConcat);
-    addFunction("deg2rad", QFMathParser_Private::fDegToRad);
-    addFunction("rad2deg", QFMathParser_Private::fRadToDeg);
+    addFunction("deg2rad", QFMathParser_Private::fDegToRad, NULL, qfDegToRad);
+    addFunction("rad2deg", QFMathParser_Private::fRadToDeg, NULL, qfRadToDeg);
     addFunction("dot", QFMathParser_Private::fDot);
 
     for (int i=0; i<externalGlobalFunctions.size(); i++) {
@@ -3595,9 +3644,8 @@ bool QFMathParser::qfmpVariableNode::createByteCode(QFMathParser::ByteCodeProgra
             getParser()->qfmpError(QObject::tr("only top-level variables allowed in byte-coded expressionen (variable '%1', level %2)").arg(var).arg(level));
             return false;
         }
-        double* varP=NULL;
         if (def.getType()==qfmpDouble) {
-            varP=def.getNum();
+            double* varP=def.getNum();
             if (varP) {
                 program.append(QFMathParser::ByteCodeInstruction(QFMathParser::bcVarRead, varP));
                 return true;
@@ -3606,7 +3654,7 @@ bool QFMathParser::qfmpVariableNode::createByteCode(QFMathParser::ByteCodeProgra
                 return false;
             }
         } else {
-            getParser()->qfmpError(QObject::tr("only number-values variables allowed in byte-coded expressions (variable '%1')").arg(var));
+            getParser()->qfmpError(QObject::tr("only number-valued variables allowed in byte-coded expressions (variable '%1')").arg(var));
             return false;
         }
     } else {
@@ -3763,6 +3811,55 @@ QFMathParser::qfmpNode *QFMathParser::qfmpVariableAssignNode::copy(QFMathParser:
     else return new QFMathParser::qfmpVariableAssignNode(variable, NULL, getParser(), par);
 }
 
+bool QFMathParser::qfmpVariableAssignNode::createByteCode(QFMathParser::ByteCodeProgram &program, QFMathParser::ByteCodeEnvironment *environment)
+{
+    QFMathParser::qfmpVariable def;
+
+    bool ok=child->createByteCode(program, environment);
+
+    if (ok) {
+        if (environment->heapVariables.contains(variable) && environment->heapVariables[variable].size()>0) {
+            if (environment->heapVariables[variable].last()>=0) {
+                program.append(QFMathParser::ByteCodeInstruction(QFMathParser::bcHeapWrite, environment->heapVariables[variable].last()));
+                program.append(QFMathParser::ByteCodeInstruction(QFMathParser::bcHeapRead, environment->heapVariables[variable].last()));
+                return true;
+            } else {
+                getParser()->qfmpError(QObject::tr("heap-adress-error, tried to access heap item %1").arg(environment->heapVariables[variable].last()));
+                return false;
+            }
+        } else if (getParser()->environment.getVariableDef(variable, def)) {
+            int level=getParser()->environment.getVariableLevel(variable);
+            if (level>0) {
+                getParser()->qfmpError(QObject::tr("only top-level variables allowed in byte-coded expressionen (variable '%1', level %2)").arg(variable).arg(level));
+                return false;
+            }
+            double* varP=NULL;
+            if (def.getType()==qfmpDouble) {
+                varP=def.getNum();
+                if (varP) {
+                    program.append(QFMathParser::ByteCodeInstruction(QFMathParser::bcVarWrite, varP));
+                    program.append(QFMathParser::ByteCodeInstruction(QFMathParser::bcVarRead, varP));
+                    return true;
+                } else {
+                    getParser()->qfmpError(QObject::tr("variable '%1' points to NULL").arg(variable));
+                    return false;
+                }
+            } else {
+                getParser()->qfmpError(QObject::tr("only number-values variables allowed in byte-coded expressions (variable '%1')").arg(variable));
+                return false;
+            }
+        } else {
+            /*getParser()->qfmpError(QObject::tr("variable '%1' not found").arg(var));
+            return false;*/
+            int varIdx=environment->pushVar(variable);
+            program.append(QFMathParser::ByteCodeInstruction(QFMathParser::bcHeapWrite, varIdx));
+            program.append(QFMathParser::ByteCodeInstruction(QFMathParser::bcHeapRead, varIdx));
+            return true;
+        }
+    }
+    return ok;
+}
+
 QFMathParser::qfmpFunctionNode::qfmpFunctionNode(QString name, QVector<qfmpNode *> params, QFMathParser *p, qfmpNode *par):
     qfmpNode(p, par)
  {
@@ -3823,15 +3920,37 @@ bool QFMathParser::qfmpFunctionNode::createByteCode(QFMathParser::ByteCodeProgra
     }
     if (ok) {
         QFMathParser::qfmpFunctionDescriptor def;
-        if (getParser()->environment.getFunctionDef(fun, def)) {
+        if (environment->functionDefs.contains(fun) && environment->functionDefs[fun].second) {
+            if (environment->inFunctionCalls.contains(fun)) {
+                getParser()->qfmpError(QObject::tr("no recursive function calls allowed in byte-code (function '%1')").arg(fun));
+                return false;
+            } else if (environment->functionDefs[fun].first.size()==params) {
+                for (int i=0; i<params; i++) {
+                    int varID=environment->pushVar(environment->functionDefs[fun].first[i]);
+                    program.append(QFMathParser::ByteCodeInstruction(QFMathParser::bcHeapWrite, varID));
+                }
+
+                environment->inFunctionCalls.insert(fun);
+                ok=ok&&environment->functionDefs[fun].second->createByteCode(program, environment);
+                environment->inFunctionCalls.remove(fun);
+                for (int i=0; i<params; i++) {
+                    environment->popVar(environment->functionDefs[fun].first[i]);
+                }
+                return ok;
+            } else {
+                getParser()->qfmpError(QObject::tr("function '%1' defined with wrong number of parameters (required: %2, in definition: %3)").arg(fun).arg(params).arg(environment->functionDefs[fun].first.size()));
+                return false;
+            }
+        } else if (getParser()->environment.getFunctionDef(fun, def)) {
             int level=getParser()->environment.getFunctionLevel(fun);
             if (level>0) {
                 getParser()->qfmpError(QObject::tr("only top-level functions allowed in byte-coded expressionen (function '%1', level %2)").arg(fun).arg(level));
                 return false;
             }
             if ((!def.simpleFuncPointer.contains(params) && !def.simpleFuncPointer.contains(100+params)) || (!def.simpleFuncPointer[params] && !def.simpleFuncPointer[100+params])) {
-                getParser()->qfmpError(QObject::tr("no implementation of function '%1(...)' with %2 parameters found").arg(fun).arg(params));
-                return false;
+                program.append(QFMathParser::ByteCodeInstruction(QFMathParser::bcCallResultFunction, fun, params));
+                //getParser()->qfmpError(QObject::tr("no implementation of function '%1(...)' with %2 parameters found").arg(fun).arg(params));
+                return true;
             }
             if (def.simpleFuncPointer.contains(params)) {
                 void* fp=def.simpleFuncPointer[params];
@@ -3842,9 +3961,6 @@ bool QFMathParser::qfmpFunctionNode::createByteCode(QFMathParser::ByteCodeProgra
                 program.append(QFMathParser::ByteCodeInstruction(QFMathParser::bcCallCMPFunction, fp, params));
                 return true;
             }
-        } else {
-            getParser()->qfmpError(QObject::tr("function '%1' not found").arg(fun));
-            return false;
         }
     }
     return false;
@@ -4622,6 +4738,15 @@ QFMathParser::qfmpNode *QFMathParser::qfmpFunctionAssignNode::copy(QFMathParser:
     else return new QFMathParser::qfmpFunctionAssignNode(function, parameterNames, NULL, getParser(), par);
 }
 
+bool QFMathParser::qfmpFunctionAssignNode::createByteCode(QFMathParser::ByteCodeProgram &program, QFMathParser::ByteCodeEnvironment *environment)
+{
+    if (child) {
+        environment->functionDefs[function]=qMakePair(parameterNames, child);
+        return true;
+    }
+    return false;
+}
+
 qfmpResult QFMathParser::qfmpConstantNode::evaluate()
 {
     return data;
@@ -4641,7 +4766,7 @@ bool QFMathParser::qfmpConstantNode::createByteCode(QFMathParser::ByteCodeProgra
 {
     if (data.type==qfmpDouble) {
         program.append(QFMathParser::ByteCodeInstruction(bcPush, data.num));
-    } else if (data.type==qfmpDouble) {
+    } else if (data.type==qfmpBool) {
         program.append(QFMathParser::ByteCodeInstruction(bcPush, (data.boolean)?1.0:0.0));
     } else {
         getParser()->qfmpError(QObject::tr("only numbers and booleans allowed in bytecoded expressions!"));
@@ -4720,6 +4845,12 @@ QFMathParser::qfmpNode *QFMathParser::qfmpVectorList::copy(QFMathParser::qfmpNod
     n->setParent(par);
     return n;
 
+}
+
+bool QFMathParser::qfmpVectorList::createByteCode(QFMathParser::ByteCodeProgram &program, QFMathParser::ByteCodeEnvironment *environment)
+{
+    if (getParser()) getParser()->qfmpError(QObject::tr("no vector constructs in byte-code allowed"));
+    return false;
 }
 
 QFMathParser::qfmpNode *QFMathParser::qfmpVectorConstructionNode::copy(QFMathParser::qfmpNode *par)
@@ -5739,7 +5870,7 @@ double QFMathParser::evaluateBytecode(const QFMathParser::ByteCodeProgram &progr
     QLinkedList<int> intStack;*/
     QStack<double> resultStack;
     QVector<double> heap;
-    int heapoffset=0;
+    //int heappointer=0;
     heap.resize(ByteCodeInitialHeapSize);
     resultStack.reserve(128);
     bool ok=true;
@@ -5780,7 +5911,7 @@ double QFMathParser::evaluateBytecode(const QFMathParser::ByteCodeProgram &progr
 
 
             case bcHeapRead:
-                resultStack.push(heap.value(itp->intpar+heapoffset, NAN));
+                resultStack.push(heap.value(itp->intpar, NAN));
 #ifdef QFMATHPARSER_BYTECODESTACK_DEBUGMESSAGES
                 qDebug()<<"HEAPREAD  #"<<itp->intpar+heapoffset<<" == "<<heap.value(itp->intpar+heapoffset, NAN);
 #endif
@@ -5793,15 +5924,12 @@ double QFMathParser::evaluateBytecode(const QFMathParser::ByteCodeProgram &progr
                 } else
 #endif
                 {
-                    if (itp->intpar+heapoffset>heap.size()) heap.resize(itp->intpar+heapoffset+1);
-                    heap[itp->intpar+heapoffset]=resultStack.pop();
+                    if (itp->intpar>heap.size()) heap.resize(itp->intpar+1);
+                    heap[itp->intpar]=resultStack.pop();
 #ifdef QFMATHPARSER_BYTECODESTACK_DEBUGMESSAGES
                     qDebug()<<"HEAPWRITE  #"<<itp->intpar+heapoffset<<" <= "<<heap[itp->intpar+heapoffset];
 #endif
                 }
-                break;
-            case bcAddHeapOffset:
-                heapoffset+=itp->intpar;
                 break;
 
 
@@ -5840,6 +5968,28 @@ double QFMathParser::evaluateBytecode(const QFMathParser::ByteCodeProgram &progr
                         default: break;
                     }
                 } break;
+        case bcCallResultFunction:
+#ifdef QFMATHPARSER_BYTECODESTACK_ERRORCHECKING
+            if (resultStack.size()<itp->intpar) {
+                qfmpError(QObject::tr("QFMathParser Bytecode Interpreter: error in CALLRESULTFUNC opcode: stack is too small"));
+                ok=false;
+            } else
+#endif
+            {
+                const QStack<double>::iterator it=resultStack.end();
+                QVector<qfmpResult> parameters;
+                for (int i=0; i<itp->intpar; i++) {
+                    parameters<<qfmpResult(resultStack.pop());
+                }
+                qfmpResult r;
+                evaluateFunction(r, itp->strpar, parameters);
+                if (r.type==qfmpDouble) resultStack.push(r.asNumber());
+                else if (r.type==qfmpBool) resultStack.push((r.asBool())?1.0:0.0);
+                else {
+                    qfmpError(QObject::tr("QFMathParser Bytecode Interpreter: result of function call ('%1'') was not a number!").arg(itp->strpar));
+                    ok=false;
+                }
+            } break;
 
             case bcAdd:
 #ifdef QFMATHPARSER_BYTECODESTACK_ERRORCHECKING
@@ -6190,6 +6340,9 @@ QString QFMathParser::printBytecode(const QFMathParser::ByteCodeInstruction &ins
         case bcCallCMPFunction:
             res+=QString("CALLCMPFUNCTION 0x%1, %2").arg((uint64_t)inst.pntpar,0,16).arg(inst.intpar);
             break;
+        case bcCallResultFunction:
+            res+=QString("CALLRESULTFUNCTION %1, %2").arg(inst.strpar).arg(inst.intpar);
+            break;
         case bcJumpRel:
             res+=QString("JMPREL %1").arg(inst.intpar);
             break;
@@ -6250,7 +6403,6 @@ QString QFMathParser::printBytecode(const QFMathParser::ByteCodeInstruction &ins
         case bcCmpLesserEqual: res+=QString("CMPLESSEREQUAL"); break;
         case bcHeapRead: res+=QString("HEAPREAD %1").arg(inst.intpar); break;
         case bcHeapWrite: res+=QString("HEAPWRITE %1").arg(inst.intpar); break;
-        case bcAddHeapOffset: res+=QString("ADDTPHEAPOFFSET %1").arg(inst.intpar); break;
         default:
             res+=QString("*** UNKNOWN *** %1").arg(inst.opcode);
             break;
@@ -6297,6 +6449,13 @@ QFMathParser::ByteCodeInstruction::ByteCodeInstruction(QFMathParser::ByteCodes o
 {
     this->opcode=opcode;
     this->pntpar=pntpar;
+    this->intpar=intpar;
+}
+
+QFMathParser::ByteCodeInstruction::ByteCodeInstruction(QFMathParser::ByteCodes opcode, QString strpar, int intpar)
+{
+    this->opcode=opcode;
+    this->strpar=strpar;
     this->intpar=intpar;
 }
 

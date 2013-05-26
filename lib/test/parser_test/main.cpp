@@ -166,9 +166,10 @@ void speed_test(bool doBytecode, bool showBytecode) {
         SPEEDTEST(1+2+3+4+5+6+7+8+9+10+11+12+13+14+15+16+17+18+19+20);
         SPEEDTEST(1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20);
         SPEEDTEST(sqrt(1+2)+sin(3+4)+sqrt(5+6)+sin(7+8)+cos(9+10)+sqrt(11+12)+cos(13+14)+sqrt(15+16)+sin(17+18)+cos(19+20));
-        SPEEDTEST(sqrt(a+b)+sin(b+c)+sqrt(a-c)+sin(b+a)+cos(a+c)+sqrt(b+b)+cos(a+a)+sqrt(-c)+sin(a*c)+cos(b+5.0));
         SPEEDTEST(dbgcases(a<b, 1, a>b, 2, a>=b, 3, -1));
         SPEEDTEST(a-b-c-a-b-c-c-b-a-c-b-a-c-a-c-b-a-18.0-c-a);
+        SPEEDTEST(sqrt(a+b)+sin(b+c)+sqrt(a-c)+sin(b+a)+cos(a+c)+sqrt(b+b)+cos(a+a)+sqrt(-c)+sin(a*c)+cos(b+5.0));
+        SPEEDTEST(cos(sqrt(a+b)+c*a));
     }
 }
 #pragma GCC pop_options
@@ -178,7 +179,7 @@ int main(int argc, char *argv[])
     
     QFMathParser parser;
     bool doByteCode=true;
-    bool showBytecode=true;
+    bool showBytecode=false;
 
     /*for (uint32_t i=0; i<0xFFFFFFFF; i++) {
         double di=i;
@@ -356,7 +357,6 @@ int main(int argc, char *argv[])
 
 
 
-    speed_test(doByteCode, showBytecode);
 
     TEST("prod(i,1,5,i)");
     TEST("prod(i,1,2,5,i)");
@@ -367,6 +367,13 @@ int main(int argc, char *argv[])
     TEST("sum(i,0,1,5,sum(j,0,i,j^2))");
     TEST("sum(i,0,1,5,sum(j,0,3,j^2))");
     TEST("sum(i,0,1,5,sum(i,0,3,i^2))");
+
+    TEST("f(x)=x^2;f(23+a)");
+    TEST("fib(x)=if(x<=1, 1, fib(x-1)+fib(x-2)); fib(5)");
+    TEST("xx=a; j0(xx)-j0(a)");
+    TEST("j1(a)");
+    TEST("jn(1,2)");
+    speed_test(doByteCode, showBytecode);
 
     return 0;
 }

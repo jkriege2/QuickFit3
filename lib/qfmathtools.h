@@ -63,23 +63,43 @@ QFLIB_EXPORT double qfTanc(double x);
 /** \brief 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma)=\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$
     \ingroup qf3lib_mathtools
  */
-inline double qfGaussSqrtE(double x, double sigma=1) {
+inline double qfGaussSqrtE(double x, double sigma) {
     return exp(-0.5*x*x/(sigma*sigma));
+}
+/** \brief 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma=1)=\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$
+    \ingroup qf3lib_mathtools
+ */
+inline double qfGaussSqrtE(double x) {
+    return qfGaussSqrtE(x, 1);
 }
 /** \brief normalized 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma)=\frac{1}{w\cdot\sqrt{2\pi}}\cdot\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$
     \ingroup qf3lib_mathtools
  */
-inline double qfGaussNormSqrtE(double x, double sigma=1){
+inline double qfGaussNormSqrtE(double x, double sigma){
     return exp(-0.5*x*x/(sigma*sigma))/(sigma*sqrt(2.0*M_PI));
+}
+/** \brief normalized 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma=1)=\frac{1}{w\cdot\sqrt{2\pi}}\cdot\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$
+    \ingroup qf3lib_mathtools
+ */
+inline double qfGaussNormSqrtE(double x){
+    return qfGaussNormSqrtE(x,1);
 }
 /** \brief 1/e²-width gaussian function \f$ \mbox{g}(x, w)=\exp\left(-2\cdot\frac{x^2}{w^2}\right) \f$ with \f$ g(w,w)=1/e^2 \f$
     \ingroup qf3lib_mathtools
  */
-inline double qfGaussE2(double x, double w=1) { return qfGaussSqrtE(x, w/2.0); }
+inline double qfGaussE2(double x, double w) { return qfGaussSqrtE(x, w/2.0); }
+/** \brief 1/e²-width gaussian function \f$ \mbox{g}(x, w)=\exp\left(-2\cdot\frac{x^2}{w^2}\right) \f$ with \f$ g(w,w)=1/e^2 \f$
+    \ingroup qf3lib_mathtools
+ */
+inline double qfGaussE2(double x) { return qfGaussSqrtE(x, 1.0/2.0); }
 /** \brief normalized 1/e²-width gaussian function \f$ \mbox{g}(x, w)=\frac{\sqrt{2}}{w\cdot\sqrt{\pi}}\cdot\exp\left(-2\cdot\frac{x^2}{w^2}\right) \f$
     \ingroup qf3lib_mathtools
  */
-inline double qfGaussNormE2(double x, double w=1) { return qfGaussNormSqrtE(x, w/2.0); }
+inline double qfGaussNormE2(double x, double w) { return qfGaussNormSqrtE(x, w/2.0); }
+/** \brief normalized 1/e²-width gaussian function \f$ \mbox{g}(x, w)=\frac{\sqrt{2}}{w\cdot\sqrt{\pi}}\cdot\exp\left(-2\cdot\frac{x^2}{w^2}\right) \f$
+    \ingroup qf3lib_mathtools
+ */
+inline double qfGaussNormE2(double x) { return qfGaussNormSqrtE(x, 1.0/2.0); }
 /** \brief Theta step function \f$ \Theta(x)=\begin{cases}0&x<0\\1&\text{else}\end{cases} \f$
     \ingroup qf3lib_mathtools
  */
@@ -555,7 +575,13 @@ QFLIB_EXPORT double roundWithError(double value, double error, int addSignifcant
     \ingroup qf3lib_mathtools
 
 */
-QFLIB_EXPORT double roundError(double error, int addSignifcant=1) ;
+QFLIB_EXPORT double roundError(double error, int addSignifcant) ;
+inline double roundError(double error) {
+    return roundError(error, 1);
+}
+inline double roundError(double error, double addSignifcant) {
+    return roundError(error, int(addSignifcant));
+}
 
 /** \brief used as result type for the function calcFitStatistics()
  *  \ingroup qf3lib_mathtools
