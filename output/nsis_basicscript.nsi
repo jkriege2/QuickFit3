@@ -1,7 +1,7 @@
 # A few handy definitions to avoid repetition
 !define COMPANY_NAME "German Cancer Research Center (DKFZ)"
 !define BIT_DEPTH "%%BITDEPTH%%"
-!define PRODUCT_NAME "QuickFit 3.0 (${BIT_DEPTH}-bits}"
+!define PRODUCT_NAME "QuickFit 3.0 (${BIT_DEPTH}-bits)"
 !define PRODUCT_VERSION " (SVN %%SVNVER%% COMPILEDATE: %%COMPILEDATE%%, %%BITDEPTH%%-bit)"
 !define HELPURL "http://www.dkfz.de/Macromol/quickfit/"
 !define UPDATEURL "http://www.dkfz.de/Macromol/quickfit/#download"
@@ -46,6 +46,7 @@ Var StartMenuFolder
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKLM" 
 !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\QuickFit 3" 
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder" 
+!define MUI_STARTMENUPAGE_DEFAULT_FOLDER "${PRODUCT_NAME}"
 !insertmacro MUI_PAGE_STARTMENU Application $StartMenuFolder
 !insertmacro MUI_PAGE_INSTFILES
 !define MUI_FINISHPAGE_RUN "quickfit3.exe"
