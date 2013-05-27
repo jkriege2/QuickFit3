@@ -269,10 +269,12 @@ if [ "${create_deploy}" != "0" ]; then
 	cp releasenotes.~ht releasenotes.html
 	rm *.~*
 	cp releasenotes.html ../releasenotes.html
+	cd ..
 
 fi
 
 if [ "${createZIP}" != "0" ]; then
+    cd deploy
 	echo -e "\n\nCREATING ZIP ARCHIVES FOR DEPLOYMENT:\n\n"
 	zip -rv9 ../${ZIPFILE} *
 	cd ..
@@ -281,8 +283,8 @@ if [ "${createZIP}" != "0" ]; then
 	cd ..
 	cd deployspecial
 	zip -rv9 ../${ZIPFILESPECIAL} *
+	cd ..
 fi
-cd ..
 
 
 echo -e "\n\nWRITING WINDOWS INSTALLER SCRIPT:\n\n"
