@@ -18,6 +18,10 @@ function help {
 	echo -e "                     script finishes                  (default: on)"
 	echo -e "    --deployspecials deploy the specials together with the standard" 
 	echo -e "                     installation                    (default: off)"
+	echo -e "    --nodeldeploy    do not clean up at the end of the process" 
+	echo -e "                     (delete deploy directory)        (default: on)"
+	echo -e "    --nocreatedeploy create deploy directory at start of script" 
+	echo -e "                                                      (default: on)"
 }
 
 showhelp="0"
@@ -25,6 +29,8 @@ domake="0"
 createZIP="1"
 runNSIS="1"
 deployspecials="0"
+delete_deploy="1"
+create_deploy="1"
 
 until [ -z "$1" ]  # Until all parameters used up . . .
 do
@@ -55,11 +61,18 @@ do
     if [ "$1" == "--nonsis" ]; then
 	    runNSIS="0"
 	fi
+    if [ "$1" == "--nodeldeploy" ]; then
+	    delete_deploy="0"
+	fi
+    if [ "$1" == "--nocreatedeploy" ]; then
+	    create_deploy="0"
+	fi
     if [ "$1" == "--deployspecials" ]; then
 	    deployspecials="1"
 	fi
 	shift;
 done
+
 
 if [ "$showhelp" != "0" ]; then
 	help
@@ -114,150 +127,150 @@ SPIMONLYQTMODULES=" QtScript4.dll QtScriptTools4.dll"
 SPECIALONLYQTMODULES=""
 
 
+if [ "${create_deploy}" != "0" ]; then
+
+	rm -rf deploy
+	rm -rf deployspim
+	rm -rf deployspecial
+	cp ${ZIPFILE} "${ZIPFILE}.backup"
+	rm ${ZIPFILE}
+	cp ${ZIPFILESPIM} "${ZIPFILESPIM}.backup"
+	rm ${ZIPFILESPIM}
+	cp ${ZIPFILESPECIAL} "${ZIPFILESPECIAL}.backup"
+	rm ${ZIPFILESPECIAL}
+
+	mkdir -p deploy
 
 
-rm -rf deploy
-rm -rf deployspim
-rm -rf deployspecial
-cp ${ZIPFILE} "${ZIPFILE}.backup"
-rm ${ZIPFILE}
-cp ${ZIPFILESPIM} "${ZIPFILESPIM}.backup"
-rm ${ZIPFILESPIM}
-cp ${ZIPFILESPECIAL} "${ZIPFILESPECIAL}.backup"
-rm ${ZIPFILESPECIAL}
-
-mkdir -p deploy
 
 
 
-
-
-if [ "${domake}" != "0" ]; then
-	cd ..
-	#rm compiledate.h
-	#rm svnversion.h
-	#rm ./application/Makefile
-	#rm ./application/Makefile.Release
-	#rm ./application/Makefile.Debug
-	qmake "CONFIG+=release" "CONFIG-=debug" quickfit3.pro
-	make
-	make install
-	cd output
-fi
-
-
-for f in *
-do
-    if [ $f != "deploy" ]; then
-	  cp -rv $f ./deploy
+	if [ "${domake}" != "0" ]; then
+		cd ..
+		#rm compiledate.h
+		#rm svnversion.h
+		#rm ./application/Makefile
+		#rm ./application/Makefile.Release
+		#rm ./application/Makefile.Debug
+		qmake "CONFIG+=release" "CONFIG-=debug" quickfit3.pro
+		make
+		make install
+		cd output
 	fi
-done
-
-if ! cd deploy; then echo "could not create ./deploy/"; exit 1; fi
-rm ./globalconfig/*
-rm -rf ./globalconfig
-mkdir globalconfig
-rm ./qtplugins/q*d4.dll
-rm ./Qt*d4.dll
-rm ./Qt*d.dll
-rm
-
-for f in $SPIMONLYQTMODULES
-do
-    rm -rf  "./${f}"
-done
-
-for f in $SPECIALONLYQTMODULES
-do
-    rm -rf  "./${f}"
-done
-
-find -name "quickfit3_*.zip" -exec rm -rf {} \;
-find -name "*.sh" -exec rm -rf {} \;
-find -name ".svn" -type d -exec rm -rf {} \;
-find -name "*.log" -exec rm -rf {} \;
-find -name "*.prl" -exec rm -rf {} \;
-find -name "*.autosave" -exec rm -rf {} \;
-find -name "*.a" -exec rm -rf {} \;
-find -name "*.backup" -exec rm -rf {} \;
-find -name "*.ts" -exec rm -rf {} \;
-find -name "*.cpt" -exec rm -rf {} \;
-
-mkdir ../deployspim
-mkdir ../deployspim/plugins
-mkdir ../deployspim/globalconfig_templates
-mkdir ../deployspim/source
-mkdir ../deployspim/assets
-mkdir ../deployspim/assets/plugins
-mkdir ../deployspim/assets/plugins/help
-
-mkdir ../deployspecial
-mkdir ../deployspecial/plugins
-mkdir ../deployspecial/globalconfig_templates
-mkdir ../deployspecial/source
-mkdir ../deployspecial/assets
-mkdir ../deployspecial/assets/plugins
-mkdir ../deployspecial/assets/plugins/help
-
-cp -rf ./globalconfig_templates/* ../deployspim/globalconfig_templates
-cp -rf ./globalconfig_templates/* ../deployspecial/globalconfig_templates
-for f in $SPIMONLYQTMODULES
-do
-    cp -rf "../${f}" ../deployspim
-done
-for f in $SPECIALONLYQTMODULES
-do
-    cp -rf "../${f}" ../deployspecial
-done
-for f in $SPIMPLUGINS
-do
-	mkdir "../deployspim/assets/plugins/${f}"
-	mkdir "../deployspim/assets/plugins/help/${f}"
-    cp -rf  "./assets/plugins/${f}" "../deployspim/assets/plugins/"
-    cp -rf  "./assets/plugins/help/${f}" "../deployspim/assets/help/plugins/"
-	find -name "${f}.*" -exec cp -rf "{}" "../deployspim/{}" \;
-done
-
-for f in $SPECIALPLUGINS
-do
-	mkdir "../deployspecial/assets/plugins/${f}"
-	mkdir "../deployspecial/assets/plugins/help/${f}"
-    cp -rf  "./assets/plugins/${f}" "../deployspecial/assets/plugins/"
-    cp -rf  "./assets/plugins/help/${f}" "../deployspecial/assets/help/plugins/"
-	find -name "${f}.*" -exec cp -rf "{}" "../deployspecial/{}" \;
-done
-
-for f in $REMOVEPLUGINS
-do
-    rm -rf  "./assets/plugins/${f}"
-    rm -rf  "./assets/plugins/help/${f}"
-	find -name "${f}.*" -exec rm -rf {} \;
-done
-
-rm *.sh
-rm *.ini
-rm *.nsi
-rm *.~*
-rm ATMCD32D.DLL
-rm *setup.exe
-rm test*.*
-rm untitled*.*
-rm *.log
-rm *.nsh
-rm releasenotes_template.html
-
-echo -e "\n\nCREATING RELEASE NOTES:\n\n"
-sed "/%%RELEASE_NOTES%%/ {
-  r ../../application/releasenote.html
-  d  
-}" ../releasenotes_template.html > releasenotes.~ht
-sed "s/\\\$\\\$SVN\\\$\\\$/$SVNVER/g" releasenotes.~ht > releasenotes.~~h | cp -f releasenotes.~~h releasenotes.~ht
-sed "s/\\\$\\\$COMPILEDATE\\\$\\\$/$COMPILEDATE/g" releasenotes.~ht > releasenotes.~~h | cp -f releasenotes.~~h releasenotes.~ht
-cp releasenotes.~ht releasenotes.html
-rm *.~*
-cp releasenotes.html ../releasenotes.html
 
 
+	for f in *
+	do
+		if [ $f != "deploy" ]; then
+		  cp -rv $f ./deploy
+		fi
+	done
+
+	if ! cd deploy; then echo "could not create ./deploy/"; exit 1; fi
+	rm ./globalconfig/*
+	rm -rf ./globalconfig
+	mkdir globalconfig
+	rm ./qtplugins/q*d4.dll
+	rm ./Qt*d4.dll
+	rm ./Qt*d.dll
+	rm
+
+	for f in $SPIMONLYQTMODULES
+	do
+		rm -rf  "./${f}"
+	done
+
+	for f in $SPECIALONLYQTMODULES
+	do
+		rm -rf  "./${f}"
+	done
+
+	find -name "quickfit3_*.zip" -exec rm -rf {} \;
+	find -name "*.sh" -exec rm -rf {} \;
+	find -name ".svn" -type d -exec rm -rf {} \;
+	find -name "*.log" -exec rm -rf {} \;
+	find -name "*.prl" -exec rm -rf {} \;
+	find -name "*.autosave" -exec rm -rf {} \;
+	find -name "*.a" -exec rm -rf {} \;
+	find -name "*.backup" -exec rm -rf {} \;
+	find -name "*.ts" -exec rm -rf {} \;
+	find -name "*.cpt" -exec rm -rf {} \;
+
+	mkdir ../deployspim
+	mkdir ../deployspim/plugins
+	mkdir ../deployspim/globalconfig_templates
+	mkdir ../deployspim/source
+	mkdir ../deployspim/assets
+	mkdir ../deployspim/assets/plugins
+	mkdir ../deployspim/assets/plugins/help
+
+	mkdir ../deployspecial
+	mkdir ../deployspecial/plugins
+	mkdir ../deployspecial/globalconfig_templates
+	mkdir ../deployspecial/source
+	mkdir ../deployspecial/assets
+	mkdir ../deployspecial/assets/plugins
+	mkdir ../deployspecial/assets/plugins/help
+
+	cp -rf ./globalconfig_templates/* ../deployspim/globalconfig_templates
+	cp -rf ./globalconfig_templates/* ../deployspecial/globalconfig_templates
+	for f in $SPIMONLYQTMODULES
+	do
+		cp -rf "../${f}" ../deployspim
+	done
+	for f in $SPECIALONLYQTMODULES
+	do
+		cp -rf "../${f}" ../deployspecial
+	done
+	for f in $SPIMPLUGINS
+	do
+		mkdir "../deployspim/assets/plugins/${f}"
+		mkdir "../deployspim/assets/plugins/help/${f}"
+		cp -rf  "./assets/plugins/${f}" "../deployspim/assets/plugins/"
+		cp -rf  "./assets/plugins/help/${f}" "../deployspim/assets/help/plugins/"
+		find -name "${f}.*" -exec cp -rf "{}" "../deployspim/{}" \;
+	done
+
+	for f in $SPECIALPLUGINS
+	do
+		mkdir "../deployspecial/assets/plugins/${f}"
+		mkdir "../deployspecial/assets/plugins/help/${f}"
+		cp -rf  "./assets/plugins/${f}" "../deployspecial/assets/plugins/"
+		cp -rf  "./assets/plugins/help/${f}" "../deployspecial/assets/help/plugins/"
+		find -name "${f}.*" -exec cp -rf "{}" "../deployspecial/{}" \;
+	done
+
+	for f in $REMOVEPLUGINS
+	do
+		rm -rf  "./assets/plugins/${f}"
+		rm -rf  "./assets/plugins/help/${f}"
+		find -name "${f}.*" -exec rm -rf {} \;
+	done
+
+	rm *.sh
+	rm *.ini
+	rm *.nsi
+	rm *.~*
+	rm ATMCD32D.DLL
+	rm *setup.exe
+	rm test*.*
+	rm untitled*.*
+	rm *.log
+	rm *.nsh
+	rm releasenotes_template.html
+
+	echo -e "\n\nCREATING RELEASE NOTES:\n\n"
+	sed "/%%RELEASE_NOTES%%/ {
+	  r ../../application/releasenote.html
+	  d  
+	}" ../releasenotes_template.html > releasenotes.~ht
+	sed "s/\\\$\\\$SVN\\\$\\\$/$SVNVER/g" releasenotes.~ht > releasenotes.~~h | cp -f releasenotes.~~h releasenotes.~ht
+	sed "s/\\\$\\\$COMPILEDATE\\\$\\\$/$COMPILEDATE/g" releasenotes.~ht > releasenotes.~~h | cp -f releasenotes.~~h releasenotes.~ht
+	cp releasenotes.~ht releasenotes.html
+	rm *.~*
+	cp releasenotes.html ../releasenotes.html
+
+fi
 
 if [ "${createZIP}" != "0" ]; then
 	echo -e "\n\nCREATING ZIP ARCHIVES FOR DEPLOYMENT:\n\n"
@@ -325,27 +338,27 @@ echo $SPIMUNINSTALLER_FILES
 echo $SPIMINSTALLER_DIRS
 
 sed "s/%%INSTALLER_FILES%%/$INSTALLER_FILES/" nsis_basicscript.nsi > nsis_basicscript.~si
-#ls-l *.~*
+ls-l *.~*
 sed "s/%%UNINSTALLER_FILES%%/$UNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
-#ls-l *.~*
+ls-l *.~*
 sed "s/%%SPIMINSTALLER_FILES%%/$SPIMINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
-#ls-l *.~*
+ls-l *.~*
 sed "s/%%SPIMUNINSTALLER_FILES%%/$SPIMUNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
-#ls-l *.~*
+ls-l *.~*
 sed "s/%%INSTALLER_BASENAME%%/$INSTALLER_BASENAME/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
-#ls-l *.~*
+ls-l *.~*
 sed "s/%%SVNVER%%/$SVNVER/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
-#ls -l *.~*
+ls -l *.~*
 sed "s/%%COMPILEDATE%%/$COMPILEDATE/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
-#ls -l *.~*
+ls -l *.~*
 sed "s/%%BITDEPTH%%/$BITDEPTH/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
-#ls -l *.~*
+ls -l *.~*
 sed "s/%%INSTALLER_DIRS%%/$INSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
-#ls -l *.~*
+ls -l *.~*
 sed "s/%%SPIMINSTALLER_DIRS%%/$SPIMINSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
-#ls -l *.~*
+ls -l *.~*
 sed "s/%%INSTALLER_INSTDIR%%/$INSTALLER_INSTDIR/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
-#ls -l *.~*
+ls -l *.~*
 
 cp nsis_basicscript.~si ${INSTALLER_BASENAME}.nsi
 #rm nsis_basicscript.~si
@@ -356,12 +369,13 @@ if [ "${runNSIS}" != "0" ]; then
 	makensis ${INSTALLER_BASENAME}.nsi
 fi
 
+if [ "${delete_deploy}" != "0" ]; then
+	echo -e "\n\nCLEANUP:\n\n"
 
-echo -e "\n\nCLEANUP:\n\n"
-
-rm -rf deploy
-rm -rf deployspim
-rm -rf deployspecial
-rm "${ZIPFILE}.backup"
-rm "${ZIPFILESPIM}.backup"
-rm "${ZIPFILESPECIAL}.backup"
+	rm -rf deploy
+	rm -rf deployspim
+	rm -rf deployspecial
+	rm "${ZIPFILE}.backup"
+	rm "${ZIPFILESPIM}.backup"
+	rm "${ZIPFILESPECIAL}.backup"
+fi
