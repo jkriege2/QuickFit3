@@ -134,7 +134,7 @@ Qt::ItemFlags QFFitFunctionValueInputTable::flags(const QModelIndex &index) cons
         int cols=(col-1)/getColsPerRDR();
         int coli=(col-1)%getColsPerRDR();
         if (coli==0) {
-            f=f|Qt::ItemIsEditable;
+            if (getParameterEditable(row)) f=f|Qt::ItemIsEditable;
         } else if (fitfunction && editfix && coli==fixIdx) {
             FitParam fp=fitparamids.value(row, FitParam());
             if (fp.isValid() && fitfunction->hasParameter(fp.id) && fitfunction->getDescription(fp.id).fit) {
@@ -223,7 +223,9 @@ QVariant QFFitFunctionValueInputTable::data(const QModelIndex &index, int role) 
                         return QBrush(QApplication::palette().color(QPalette::Window));
                     }
                 } else if (role==widgetTypeRole) {
-                    return wtValueDoubleEdit;
+                    if (getParameterEditable(row)) return wtValueDoubleEdit;
+                } else if (role==Qt::BackgroundRole && !getParameterEditable(row)){
+                    return QBrush(QApplication::palette().color(QPalette::Window));
                 }
             }
         } else if (coli==errorIdx && editerrors) {
@@ -559,6 +561,18 @@ bool QFFitFunctionValueInputTable::fitParamListContainsID(const QString &id, con
     return false;
 }
 
+bool QFFitFunctionValueInputTable::getParameterEditable(int row) const
+{
+    FitParam fp=fitparamids.value(row, FitParam());
+    bool rangeval=true;
+    if (fitfunction&&fitfunction->hasParameter(fp.id)) {
+        rangeval=fitfunction->getDescription(fp.id).userEditable;
+    }
+    if (datamap && fp.isValid() && datamap->contains(fp.id)) {
+        rangeval=(*datamap)[fp.id].editable;
+    }
+    return rangeval;
+}
 double QFFitFunctionValueInputTable::getParameterMin(int row) const
 {
     FitParam fp=fitparamids.value(row, FitParam());
@@ -814,14 +828,16 @@ QFFitFunctionValueInputTableFitParamData::QFFitFunctionValueInputTableFitParamDa
     fix=false;
     min=-DBL_MAX;
     max=DBL_MAX;
+    editable=true;
 
 }
 
-QFFitFunctionValueInputTableFitParamData::QFFitFunctionValueInputTableFitParamData(double value, double error, bool fix, double min, double max)
+QFFitFunctionValueInputTableFitParamData::QFFitFunctionValueInputTableFitParamData(double value, double error, bool fix, double min, double max, bool editable)
 {
     this->value=value;
     this->error=error;
     this->fix=fix;
     this->min=min;
     this->max=max;
+    this->editable=editable;
 }

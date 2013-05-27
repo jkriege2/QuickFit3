@@ -16,13 +16,14 @@ class QFFitFunction;
 
 struct QFLIB_EXPORT QFFitFunctionValueInputTableFitParamData {
         QFFitFunctionValueInputTableFitParamData();
-        QFFitFunctionValueInputTableFitParamData(double value, double error=0, bool fix=false, double min=-DBL_MAX, double max=DBL_MAX);
+        QFFitFunctionValueInputTableFitParamData(double value, double error=0, bool fix=false, double min=-DBL_MAX, double max=DBL_MAX, bool editable=true);
 
     double value;
     double error;
     bool fix;
     double min;
     double max;
+    bool editable;
 };
 
 class QFLIB_EXPORT QFFitFunctionValueInputTable : public QAbstractTableModel
@@ -134,6 +135,7 @@ class QFLIB_EXPORT QFFitFunctionValueInputTable : public QAbstractTableModel
         double getParameterValue(int row) const;
         double getParameterError(int row) const;
         bool getParameterFix(int row) const;
+        bool getParameterEditable(int row) const;
         double getParameterValue(const QString& id) const;
         double getParameterError(const QString& id) const;
 

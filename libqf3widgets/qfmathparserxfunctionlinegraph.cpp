@@ -6,7 +6,10 @@
 
 double QFMathParserXFunctionLineGraph_evaluate(double x, void* data) {
     QFMathParserXFunctionLineGraphFunctionData* d=(QFMathParserXFunctionLineGraphFunctionData*)data;
-    if (d && d->parser && d->node) {
+    if (d && d->useByteCode && d->parser && d->byteCode.size()>0) {
+        *(d->x)=x;
+        return d->parser->evaluateBytecode(d->byteCode);
+    } else if (d && d->parser && d->node) {
         //d->parser->resetErrors();
         *(d->x)=x;
         qfmpResult r;
@@ -19,6 +22,16 @@ double QFMathParserXFunctionLineGraph_evaluate(double x, void* data) {
                 return r.num;
             }
         }
+    }
+    return NAN;
+
+}
+
+double QFMathParserXFunctionLineGraph_evaluateBytecode(double x, void* data) {
+    QFMathParserXFunctionLineGraphFunctionData* d=(QFMathParserXFunctionLineGraphFunctionData*)data;
+    if (d && d->parser && d->byteCode.size()>0) {
+        *(d->x)=x;
+        return d->parser->evaluateBytecode(d->byteCode);
     }
     return NAN;
 
@@ -84,6 +97,10 @@ void QFMathParserXFunctionLineGraph::createPlotData(bool collectParams)
     qint64 t=timer.elapsed();
     //qDebug()<<"createPlotData():   adding variables: "<<t<<"ms";
     fdata.node=fdata.parser->parse(function);
+    QFMathParser::ByteCodeEnvironment environment(fdata.parser);
+    environment.init(fdata.parser);
+    fdata.byteCode.clear();
+    fdata.useByteCode=fdata.useByteCode=fdata.node->createByteCode(fdata.byteCode, &environment);
     //qDebug()<<"createPlotData():   parsing: "<<timer.elapsed()-t<<"ms";
 
 
@@ -116,6 +133,10 @@ void QFMathParserXFunctionLineGraph::createPlotData(bool collectParams)
     //qDebug()<<"createPlotData():   adding variables: "<<t-t0<<"ms";
     efdata.node=efdata.parser->parse(errorFunction);
     //qDebug()<<"createPlotData():   parsing: "<<timer.elapsed()-t<<"ms";
+    QFMathParser::ByteCodeEnvironment eenvironment(efdata.parser);
+    environment.init(efdata.parser);
+    efdata.byteCode.clear();
+    efdata.useByteCode=efdata.node->createByteCode(efdata.byteCode, &eenvironment);
 
     set_params(&fdata);
     set_plotFunction(QFMathParserXFunctionLineGraph_evaluate);

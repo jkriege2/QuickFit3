@@ -16,6 +16,8 @@ class JKQtBasePlotter;
 struct QFMathParserXFunctionLineGraphFunctionData {
     QFMathParser* parser;
     QFMathParser::qfmpNode* node;
+    QFMathParser::ByteCodeProgram byteCode;
+    bool useByteCode;
     int varcount;
     double* x;
 };

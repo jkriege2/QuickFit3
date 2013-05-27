@@ -159,20 +159,33 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
     int rmin=getRangeMin();
     int rmax=getRangeMax();
 
-    double* dx=dataX.data();
-    double* dy=dataY.data();
-    double* dw=dataW.data();
-    double* dww=weights.data();
+    QVector<double> datX=dataX;
+    QVector<double> datY=dataY;
+    QVector<double> datW=dataW;
+    QVector<double> datWW=weights;
+
+    if (method>=0 && method<=2) {
+        for (int i=rmin; i<=rmax; i++) {
+            datX<<dataX[i];
+            datY<<dataY[i];
+            datW<<dataW[i];
+            datWW<<weights[i];
+        }
+    } else {
+
+    }
+    double* dx=datX.data();
+    double* dy=datY.data();
+    double* dw=datW.data();
+    double* dww=datWW.data();
     int items=rmax-rmin+1;
+
+    QVector<double> funeval, residuals, residuals_weighted;
 
     bool ok=false;
     QString error="";
 
     if (items>1) {
-        dx=&(dx[rmin]);
-        dy=&(dy[rmin]);
-        dw=&(dw[rmin]);
-        dww=&(dww[rmin]);
         error=tr("unknown regression method!");
         lastResults.clear();
         lastResultD.clear();
@@ -183,6 +196,11 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
             lastResults<<a<<b;
             lastResultD<<a<<b;
             resultComment=tr("regression result");
+            for (int i=0; i<dataX.size(); i++) {
+                funeval<<a+b*dataX[i];
+                residuals<<dataY[i]-funeval[i];
+                residuals_weighted<<residuals[i];
+            }
             ok=true;
         } else if (method==1 && dataW.size()==datapoints) {
             statisticsLinearWeightedRegression(dx, dy, dww, items, a, b, afix, bfix);
@@ -190,17 +208,51 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
             lastResults<<a<<b;
             lastResultD<<a<<b;
             resultComment=tr("weighted regression result");
+            for (int i=0; i<dataX.size(); i++) {
+                funeval<<a+b*dataX[i];
+                residuals<<dataY[i]-funeval[i];
+                residuals_weighted<<residuals[i]*weights[i];
+            }
             ok=true;
         } else if (method==2) {
             int iterations=getParamValue("iterations", 100);
             double param=getParamValue("irls_param", 1.1);
-            statisticsIterativelyReweightedLeastSquaresRegression(&(dx[rmin]), &(dy[rmin]), items, a, b, param, iterations, afix, bfix);
+            statisticsIterativelyReweightedLeastSquaresRegression(dx, dy, items, a, b, param, iterations, afix, bfix);
             fitresult=tr("robust regression: f(x)= %1 + %2 \\cdot x").arg(floattolatexstr(a).c_str()).arg(floattolatexstr(b).c_str());
             lastResults<<a<<b;
             lastResultD<<a<<b;
             resultComment=tr("robust regression result");
+            for (int i=0; i<dataX.size(); i++) {
+                funeval<<a+b*dataX[i];
+                residuals<<dataY[i]-funeval[i];
+                residuals_weighted<<residuals[i];
+            }
             ok=true;
         } else {
+        }
+
+        // estimate goodness-of-fit
+        if (residuals.size()>0) {
+            double chi2=0;
+            double chi2w=0;
+            double TSS=0;
+            double obsMean=0;
+            for (int i=0; i<=items; i++) {
+                obsMean+=dataY[i];
+            }
+            obsMean=obsMean/double(items);
+            for (int i=0; i<=items; i++) {
+                chi2+=qfSqr(residuals[i]);
+                chi2w+=qfSqr(residuals_weighted[i]);
+                TSS+=qfSqr(dataY[i]-obsMean);
+            }
+            double R2=1.0-chi2/TSS;
+            paramMap["R2"].value=R2;
+            paramMap["R2"].error=0;
+            paramMap["R2"].fix=false;
+            paramMap["R2"].editable=false;
+            resultComment+=tr(", R^2=%1").arg(R2);
+
         }
     }
 
