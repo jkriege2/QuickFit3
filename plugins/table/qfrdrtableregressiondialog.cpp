@@ -82,6 +82,8 @@ QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int co
     paramMap["b"].fix=false;
     paramMap["iterations"].value=100;
     paramMap["irls_param"].value=1.1;
+    paramMap["R2"].value=0;
+    paramMap["R2"].editable=false;
 
     ui->tabParams->setItemDelegate(new QFFitFunctionValueInputDelegate(ui->tabParams));
     parameterTable=new QFFitFunctionValueInputTable(this);
@@ -282,10 +284,10 @@ void QFRDRTableRegressionDialog::replotGraph()
     ui->pltDistribution->getXAxis()->set_labelFontSize(11);
     ui->pltDistribution->getXAxis()->set_tickLabelFontSize(10);
     ui->pltDistribution->getXAxis()->set_logAxis(ui->chkLogX->isChecked());
+    ui->pltDistribution->getXAxis()->set_drawMode1(JKQTPCADMcomplete);
     ui->pltDistribution->getYAxis()->set_labelFontSize(11);
     ui->pltDistribution->getYAxis()->set_tickLabelFontSize(10);
-    ui->pltDistribution->getYAxis()->set_logAxis(ui->chkLogX->isChecked());
-    ui->pltDistribution->getXAxis()->set_drawMode1(JKQTPCADMcomplete);
+    ui->pltDistribution->getYAxis()->set_logAxis(ui->chkLogY->isChecked());
     ui->pltDistribution->get_plotter()->setBorder(1,1,1,1);
     ui->pltDistribution->get_plotter()->set_useAntiAliasingForSystem(true);
     ui->pltDistribution->get_plotter()->set_useAntiAliasingForGraphs(true);
@@ -352,10 +354,10 @@ void QFRDRTableRegressionDialog::replotGraph()
 
 
 
-    ui->pltDistribution->zoomToFit();
     ui->pltDistribution->set_doDrawing(true);
     ui->pltDistribution->set_emitSignals(true);
-    ui->pltDistribution->update_plot();
+    ui->pltDistribution->zoomToFit();
+    //ui->pltDistribution->update_plot();
     QApplication::restoreOverrideCursor();
 }
 
@@ -376,15 +378,17 @@ void QFRDRTableRegressionDialog::methodChanged(int method)
     parameterLabels<<"slope b = ";
     if (method==2) {
         parameterNames<<"irls_param";
-        parameterLabels<<"IRLS parameter:";
+        parameterLabels<<"IRLS parameter: ";
         parameterNames<<"iterations";
-        parameterLabels<<"IRLS iterations:";
+        parameterLabels<<"IRLS iterations: ";
     }
     if (method>=0 && method<=2) {
         ui->labEquation->setText("f(x) = a + b\\cdot x");
     } else {
         ui->labEquation->setText("--- --- ---");
     }
+    parameterNames<<"R2";
+    parameterLabels<<"R² = ";
     parameterTable->setWriteTo(&paramMap, parameterNames, parameterLabels);
     parameterTable->setDoRebuildModel(true);
     on_btnFit_clicked();

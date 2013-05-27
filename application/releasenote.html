@@ -22,7 +22,8 @@
 -->
 
 <!--
-		<li><a name="2250"><b>2013-05-21 (SVN: 2250)</b>-->
+		<li><a name="2271"><b>2013-05-27 (SVN: 2271)</b>-->
+
 
 		<ul>
 		  <li><b>new plugins:</b><ul>
@@ -42,7 +43,7 @@
 		    <li>It is possible to edit folder, RDR and evaluation names in the project tree</li>
 		    <li>the project tree now has a context menu to delete and add records.</li>
 		    <li>added function to load only a selected subset of a project</li>
-		    <li>improved expression parser implementation and documentation</li>
+		    <li>improved expression parser implementation, speed and documentation</li>
 		    <li>QFDoubleEdit now supports step up/down via mouse wheel</li>
 		    <li>rdrs may now have a group to which they are assigned</li>
 		    <li>project tree displays group using background color</li>
@@ -55,11 +56,24 @@
 		    <li>QFDoubleEdit supports log-scaled stepping now, mouse-wheel interaction fixed</li>
 		    <li>added tool to fix wrong file paths in RDRs to the main application</li>
 		    <li>result tables show more information in tooltips for boolean and string arrays</li>
+			<li>improved saving of relative filepathes (should clean away symbolic links now)</li>
 		  </ul></li>
 		  
 		  <li><b>qfe_calculator</b><ul>
 		    <li>bugfix, online-help for expression parser displayed correctly now</li>
 		    <li>uses imrpoved expression parser now</li>
+			<li>added options dialog entry to set custom database path</li>
+		  </ul></li>
+		  
+		  <li><b>imFCCSFit</b><ul>
+		    <li></li>
+		    <li></li>
+		    <li></li>
+		    <li></li>
+		    <li>minds parameter ranges now when fitting</li>
+		    <li>added button to activate additional columns to edit the parameter ranges</li>
+		    <li>added tutorial on imFCCS (fitting, relative amplitude ...) + data for tutorial (as QFP-project) in plugin's assets</li>
+		    <li>implemented basic functionality</li>
 		  </ul></li>
 		  
 		  <li><b>table:</b><ul>
@@ -72,6 +86,9 @@
 		    <li>more options to layout the coordinate system (background, axis styles, ...)</li>
 		    <li>added RGB image plot</li>
 		    <li>added alpha/saturation/value "modification" channel to image plots</li>
+			<li>added extra labels for G and B channel in RGBimages</li>
+		    <li>added tool to calculate (linear) regression of a plot</li>
+			<li>added several new possibilities to function plot (QFFitFunction, polynomial, exponential, power-law</li>
 		  </ul></li>
 		  
 		  <li><b>imFCS:</b><ul>
@@ -130,6 +147,8 @@
 		  <li><b>image_stack:</b><ul>
 		    <li>full support for mask editing</li>
 		    <li>added mask tool that allows to create a masked border around the </li>
+			<li>added possibility to load DualView image stacks</li>
+			<li>added possibility to do a selection and get avg/std from this selection</li>
 		  </ul></li>
 		  
 		  <li><b>lightsheet_analysis:</b><ul>
@@ -174,6 +193,7 @@
 		    <li>added functions with new Veff and c,D as parameters with 1/e²-widths</li>
 		    <li>added anomalous diffusion with e² radii and with c as fit parameter and e² radii</li>
 		    <li>added fit functions for 2-color FCCS anomalous diffusion</li>
+			<li>corrected description of equilibrium constants ... now dissociation constants and unit is correct!</li>
 		  </ul></li>
 
 		  <li><b>cam_testcamera:</b><ul>

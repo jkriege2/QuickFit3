@@ -848,7 +848,7 @@ class QFLIB_EXPORT QFMathParser
             ByteCodeInitialHeapSize=128
         };
 
-        struct ByteCodeInstruction {
+        struct QFLIB_EXPORT ByteCodeInstruction {
             public:
                 ByteCodeInstruction(ByteCodes opcode=bcNOP);
                 ByteCodeInstruction(ByteCodes opcode, double numpar);
