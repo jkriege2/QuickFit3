@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
     
     QFMathParser parser;
     bool doByteCode=true;
-    bool showBytecode=false;
+    bool showBytecode=true;
 
     /*for (uint32_t i=0; i<0xFFFFFFFF; i++) {
         double di=i;
