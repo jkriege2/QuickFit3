@@ -2,6 +2,7 @@
 #define IMFCSCALIBRATIONWIZARD_H
 
 #include <QWidget>
+#include "qfplotter.h"
 
 namespace Ui {
     class ImFCSCalibrationWizard;
@@ -14,6 +15,8 @@ class ImFCSCalibrationWizard : public QWidget
     public:
         explicit ImFCSCalibrationWizard(QWidget *parent = 0);
         ~ImFCSCalibrationWizard();
+        QFPlotter* getPltD() const;
+        QFPlotter* getPltWXY() const;
 
     signals:
         void run1();

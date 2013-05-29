@@ -38,10 +38,14 @@ void QFPlotter::initQFPlotter()
 void QFPlotter::modifyContextMenu(QMenu *menu)
 {
     menu->insertAction(plotter->get_actCopyMatlab(), p->actCopyToTable);
+    menu->addSeparator();
+    menu->addAction(p->actHelp);
 }
 
 void QFPlotter::populateToolbar(QToolBar *toolbar) const
 {
     JKQtPlotter::populateToolbar(toolbar);
     toolbar->insertAction(plotter->get_actCopyMatlab(), p->actCopyToTable);
+    toolbar->addSeparator();
+    toolbar->addAction(p->actHelp);
 }

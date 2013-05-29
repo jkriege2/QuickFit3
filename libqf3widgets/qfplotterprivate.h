@@ -16,9 +16,11 @@ class QFPlotterPrivate : public QObject
         
     public slots:
         void copyToTable();
+        void showHelp();
 
     protected:
         QAction* actCopyToTable;
+        QAction* actHelp;
         QFPlotter* plotter;
         
 };

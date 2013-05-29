@@ -23,6 +23,16 @@ ImFCSCalibrationWizard::~ImFCSCalibrationWizard()
     delete ui;
 }
 
+QFPlotter *ImFCSCalibrationWizard::getPltD() const
+{
+    return ui->pltD;
+}
+
+QFPlotter *ImFCSCalibrationWizard::getPltWXY() const
+{
+    return ui->pltWXY;
+}
+
 void ImFCSCalibrationWizard::on_btnClose_clicked()
 {
     close();

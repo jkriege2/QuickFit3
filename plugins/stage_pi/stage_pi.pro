@@ -17,11 +17,13 @@ include(../../libquickfitwidgets.pri)
 HEADERS += stage_pi.h \
            ../interfaces/qfextensionlinearstage.h \
            ../../../../../LIB/trunk/jkserialconnection.h \
-    pimercury863calibrationdialog.h
+    pimercury863calibrationdialog.h \
+    ../base_classes/qf3comportmanager.h
 
 SOURCES += stage_pi.cpp \
            ../../../../../LIB/trunk/jkserialconnection.cpp \
-    pimercury863calibrationdialog.cpp
+    pimercury863calibrationdialog.cpp \
+    ../base_classes/qf3comportmanager.cpp
 
 FORMS =
 

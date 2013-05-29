@@ -6,19 +6,32 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>293</width>
-    <height>470</height>
+    <width>607</width>
+    <height>514</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>320</width>
+    <height>500</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>imFCS Calibration Wizard</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing">
-    <number>0</number>
-   </property>
-   <item>
+  <property name="windowIcon">
+   <iconset resource="qfevalimfcsfit.qrc">
+    <normaloff>:/imfcsfit/focalvolume.png</normaloff>:/imfcsfit/focalvolume.png</iconset>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_7" columnstretch="0,1,0">
+   <item row="0" column="0">
     <widget class="QWidget" name="widget0" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>250</width>
+       <height>0</height>
+      </size>
+     </property>
      <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,0" columnstretch="0,1">
       <item row="0" column="0" rowspan="2">
        <widget class="QLabel" name="label_11">
@@ -72,7 +85,7 @@ p, li { white-space: pre-wrap; }
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="1" column="0">
     <widget class="QWidget" name="widget1" native="true">
      <layout class="QGridLayout" name="gridLayout" rowstretch="0,0" columnstretch="0,1">
       <item row="0" column="0" rowspan="2">
@@ -105,7 +118,7 @@ p, li { white-space: pre-wrap; }
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="2" column="0">
     <widget class="QWidget" name="widget2" native="true">
      <property name="enabled">
       <bool>false</bool>
@@ -145,7 +158,7 @@ p, li { white-space: pre-wrap; }
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="3" column="0">
     <widget class="QWidget" name="widget3" native="true">
      <property name="enabled">
       <bool>false</bool>
@@ -185,7 +198,7 @@ p, li { white-space: pre-wrap; }
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="4" column="0">
     <widget class="QWidget" name="widget4" native="true">
      <property name="enabled">
       <bool>false</bool>
@@ -225,7 +238,7 @@ p, li { white-space: pre-wrap; }
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="5" column="0">
     <widget class="QWidget" name="widget5" native="true">
      <property name="enabled">
       <bool>false</bool>
@@ -265,20 +278,7 @@ p, li { white-space: pre-wrap; }
      </layout>
     </widget>
    </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
+   <item row="7" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="btnHelp">
@@ -317,11 +317,54 @@ p, li { white-space: pre-wrap; }
      </item>
     </layout>
    </item>
+   <item row="0" column="1" rowspan="3">
+    <widget class="QFPlotter" name="pltD" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>100</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" rowspan="3">
+    <widget class="QFPlotter" name="pltWXY" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>100</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFPlotter</class>
+   <extends>QWidget</extends>
+   <header>qfplotter.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../imagingfcs/qfrdrimagingfcs.qrc"/>
+  <include location="qfevalimfcsfit.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>

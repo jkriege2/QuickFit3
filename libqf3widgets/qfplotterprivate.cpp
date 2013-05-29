@@ -26,6 +26,8 @@ QFPlotterPrivate::QFPlotterPrivate(QFPlotter *plotter, QObject *parent) :
     this->plotter=plotter;
     actCopyToTable=new QAction(QIcon(":/libqf3widgets/qfplotter_copytotable.png"), tr("copy plot data to table RDR"), this);
     connect(actCopyToTable, SIGNAL(triggered()), this, SLOT(copyToTable()));
+    actHelp=new QAction(QIcon(":/lib/help.png"), tr("Help on plotter widgets"), this);
+    connect(actHelp, SIGNAL(triggered()), this, SLOT(showHelp()));
 }
 
 
@@ -167,4 +169,10 @@ void QFPlotterPrivate::copyToTable()
         }
     }
     delete dlg;
+}
+
+void QFPlotterPrivate::showHelp()
+{
+    QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getMainHelpDirectory()+QString("/jkqtplotter.html"));
+
 }

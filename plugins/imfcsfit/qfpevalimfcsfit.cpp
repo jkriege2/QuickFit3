@@ -56,12 +56,12 @@ void QFPEvalIMFCSFit::init()
         QAction* actHelp=new QAction(QIcon(":/lib/help.png"), tr("Calbration Tutorial"), this);
         connect(actHelp, SIGNAL(triggered()), this, SLOT(showCalibrationTutorial()));
         menu->addAction(actHelp);
-        QAction* actWizard=new QAction(QIcon(":/lib/wizard.png"), tr("Calbration Wizard"), this);
+        QAction* actWizard=new QAction(QIcon(":/imfcsfit/imfcs_fitcalib.png"), tr("Calbration Wizard"), this);
         connect(actWizard, SIGNAL(triggered()), this, SLOT(insertFCSCalibrationWizard()));
         menu->addAction(actWizard);
         QMenu* menu1=menu->addMenu("steps ...");
 
-        QAction* actFCSCalib=new QAction(QIcon(":/imfcsfit/imfcs_fitcalib.png"), tr("&0: add imFCS Calibration Fits"), this);
+        QAction* actFCSCalib=new QAction(QIcon(":/imfcsfit/imfcs_calib_addfiles.png"), tr("&0: add imFCS Calibration Fits"), this);
         actFCSCalib->setStatusTip(tr("Insert a set of imFCS least-squares fit evaluations for a SPIM calibration"));
         connect(actFCSCalib, SIGNAL(triggered()), this, SLOT(insertFCSFitForCalibration()));
         menu1->addAction(actFCSCalib);
@@ -260,6 +260,8 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
     double xmax=0;
     double ymin=0;
     double ymax=0;
+    QVector<double> pixwidths;
+    QList<QVector<double> > wxys, wxyerrs;
     for (int i=0; i<project->getEvaluationCount(); i++) {
         QFEvaluationItem* e=project->getEvaluationByNum(i);
         QFImFCSFitEvaluation* imFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
@@ -284,7 +286,8 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
 
 
                             //tab->tableSetData(rcounter, 0, imFCS->getFitValue(r, imFCS->getEvaluationResultID(-1), "pixel_size"));
-                            tab->tableSetData(rcounter, 0, bin*width);
+                            //tab->tableSetData(rcounter, 0, bin*width);
+                            pixwidths<<bin*width;
                             if (bin*width>xmax) xmax=1.1*bin*width;
 
                             rcounter++;
@@ -293,8 +296,13 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
                             pixel_sizes<<bin*width;
                         }
                     }
+                    tab->tableSetColumnDataAsDouble(0, pixwidths);
+
                 }
                 first=false;
+
+                wxys.append(QVector<double>());
+                wxyerrs.append(QVector<double>());
 
                 for (int ri=0; ri<rdrs.size(); ri++) {
                     QFRawDataRecord* r=rdrs[ri];
@@ -320,18 +328,36 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
 
                     double Dvar=0;
                     double Dmean=qfstatisticsAverageVariance(Dvar, D);
-                    tab->tableSetData(ri, 1+counter*2, Dmean);
-                    tab->tableSetData(ri, 1+counter*2+1, sqrt(Dvar));
+                    //tab->tableSetData(ri, 1+counter*2, Dmean);
+                    wxys[counter]<<Dmean;
+                    wxyerrs[counter]<<sqrt(Dvar);
+                    //tab->tableSetData(ri, 1+counter*2+1, sqrt(Dvar));
                     Ds[ri]=Ds[ri]+Dmean;
                     Ds2[ri]=Ds2[ri]+Dmean*Dmean;
                 }
 
+                tab->tableSetColumnDataAsDouble(1+counter*2, wxys[counter]);
+                tab->tableSetColumnDataAsDouble(1+counter*2+1, wxyerrs[counter]);
                 tab->tableSetColumnTitle(1+counter*2, colName);
                 tab->tableSetColumnTitle(1+counter*2+1, colNameE);
 
                 counter++;
             }
         }
+    }
+
+    if (calibrationWizard)  {
+        calibrationWizard->getPltD()->set_doDrawing(false);
+        JKQTPdatastore* ds=calibrationWizard->getPltD()->getDatastore();
+        ds->clear();
+        calibrationWizard->getPltD()->clearGraphs();
+        if (pixwidths.size()>0 && counter>0) {
+            size_t c_ps=ds->addCopiedColumn(pixwidths.data(), pixwidths.size(), tr("pixel widths"));
+
+        }
+
+        calibrationWizard->getPltD()->set_doDrawing(false);
+        calibrationWizard->getPltD()->zoomToFit();
     }
 
     int gr=-1;

@@ -28,6 +28,8 @@
         <file alias="fit_fitall.png">icons/fit_fitall.png</file>
         <file alias="param_load.png">icons/fileopen.png</file>
         <file alias="param_save.png">icons/filesave.png</file>
-        <file alias="imfcs_fitcalib.png">icons/imfcs_fitcalib.png</file>
+        <file alias="focalvolume.png">icons/focalvolume.png</file>
+        <file alias="imfcs_fitcalib.png">icons/focalvolume.png</file>
+        <file alias="imfcs_calib_addfiles.png">icons/imfcs_fitcalib.png</file>
     </qresource>
 </RCC>
