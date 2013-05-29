@@ -16,7 +16,6 @@ class ImFCSCalibrationWizard : public QWidget
         explicit ImFCSCalibrationWizard(QWidget *parent = 0);
         ~ImFCSCalibrationWizard();
         QFPlotter* getPltD() const;
-        QFPlotter* getPltWXY() const;
 
     signals:
         void run1();
@@ -28,6 +27,8 @@ class ImFCSCalibrationWizard : public QWidget
         void loadFile();
         void correlate();
     protected slots:
+        void on_btnReset_clicked();
+        void on_btnUnlock_clicked();
         void on_btnHelp_clicked();
         void on_btnClose_clicked();
         void on_btnStep1_clicked();

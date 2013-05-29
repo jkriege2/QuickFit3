@@ -251,7 +251,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
     int counter=0;
     bool first=true;
     QList<QFRawDataRecord*> rdrs;
-    QList<double> focus_widths, Ds, Ds2, pixel_sizes;
+    QVector<double> focus_widths, Ds, Ds2, pixel_sizes;
     QString model="";
     double wz=0;
     double ewz=0;
@@ -261,7 +261,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
     double ymin=0;
     double ymax=0;
     QVector<double> pixwidths;
-    QList<QVector<double> > wxys, wxyerrs;
+    QList<QVector<double> > Dvals, Derrs;
     for (int i=0; i<project->getEvaluationCount(); i++) {
         QFEvaluationItem* e=project->getEvaluationByNum(i);
         QFImFCSFitEvaluation* imFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
@@ -301,8 +301,8 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
                 }
                 first=false;
 
-                wxys.append(QVector<double>());
-                wxyerrs.append(QVector<double>());
+                Dvals.append(QVector<double>());
+                Derrs.append(QVector<double>());
 
                 for (int ri=0; ri<rdrs.size(); ri++) {
                     QFRawDataRecord* r=rdrs[ri];
@@ -329,15 +329,16 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
                     double Dvar=0;
                     double Dmean=qfstatisticsAverageVariance(Dvar, D);
                     //tab->tableSetData(ri, 1+counter*2, Dmean);
-                    wxys[counter]<<Dmean;
-                    wxyerrs[counter]<<sqrt(Dvar);
+                    qDebug()<<"Dvals["<<counter<<"/"<<Dvals.size()<<"]="<<Dmean;
+                    Dvals[counter]<<Dmean;
+                    Derrs[counter]<<sqrt(Dvar);
                     //tab->tableSetData(ri, 1+counter*2+1, sqrt(Dvar));
                     Ds[ri]=Ds[ri]+Dmean;
                     Ds2[ri]=Ds2[ri]+Dmean*Dmean;
                 }
 
-                tab->tableSetColumnDataAsDouble(1+counter*2, wxys[counter]);
-                tab->tableSetColumnDataAsDouble(1+counter*2+1, wxyerrs[counter]);
+                tab->tableSetColumnDataAsDouble(1+counter*2, Dvals[counter]);
+                tab->tableSetColumnDataAsDouble(1+counter*2+1, Derrs[counter]);
                 tab->tableSetColumnTitle(1+counter*2, colName);
                 tab->tableSetColumnTitle(1+counter*2+1, colNameE);
 
@@ -346,18 +347,42 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
         }
     }
 
+    QStringList DsNames;
+    for (int ri=0; ri<Ds.size(); ri++) {
+        if (counter>1) Ds2[ri]=sqrt((Ds2[ri]-Ds[ri]*Ds[ri]/double(counter))/double(counter-1));
+        else Ds2[ri]=0;
+        Ds[ri]=Ds[ri]/double(counter);
+        DsNames<<tr("a=%1nm:  D= (%2 +/- %3) µm²/s").arg(pixel_sizes[ri]).arg(Ds[ri]).arg(Ds2[ri]);
+    }
     if (calibrationWizard)  {
         calibrationWizard->getPltD()->set_doDrawing(false);
         JKQTPdatastore* ds=calibrationWizard->getPltD()->getDatastore();
         ds->clear();
         calibrationWizard->getPltD()->clearGraphs();
+        calibrationWizard->getPltD()->get_plotter()->set_plotLabel(tr("pixel size vs. diffusion coefficient"));
+        calibrationWizard->getPltD()->get_plotter()->getXAxis()->set_axisLabel(tr("pixel size [nm]"));
+        calibrationWizard->getPltD()->get_plotter()->getYAxis()->set_axisLabel(tr("diffusion coefficient [µm²/s]"));
         if (pixwidths.size()>0 && counter>0) {
             size_t c_ps=ds->addCopiedColumn(pixwidths.data(), pixwidths.size(), tr("pixel widths"));
-
+            size_t c_Davg=ds->addCopiedColumn(Ds.data(), Ds.size(), tr("avg(D) [µm²/s]"));
+            size_t c_Dsd=ds->addCopiedColumn(Ds2.data(), Ds2.size(), tr("std(D) [µm²/s]"));
+            for (int i=0; i<counter; i++) {
+                size_t c_D=ds->addCopiedColumn(Dvals[i].data(), Dvals[i].size(), tr("D(w_{xy}=%1nm)").arg(focus_widths[i]));
+                size_t c_ED=ds->addCopiedColumn(Derrs[i].data(), Derrs[i].size(), tr("error: D(w_{xy}=%1nm)").arg(focus_widths[i]));
+                JKQTPxyLineErrorGraph* plt=new JKQTPxyLineErrorGraph(calibrationWizard->getPltD()->get_plotter());
+                plt->set_title( tr("w_{xy}=%1nm").arg(focus_widths[i]));
+                plt->set_xColumn(c_ps);
+                plt->set_yColumn(c_D);
+                plt->set_yErrorColumn(c_ED);
+                plt->set_xErrorStyle(JKQTPnoError);
+                plt->set_yErrorStyle(JKQTPnoError);
+                calibrationWizard->getPltD()->get_plotter()->addGraph(plt);
+            }
         }
 
-        calibrationWizard->getPltD()->set_doDrawing(false);
+        calibrationWizard->getPltD()->set_doDrawing(true);
         calibrationWizard->getPltD()->zoomToFit();
+        calibrationWizard->raise();
     }
 
     int gr=-1;
@@ -391,20 +416,14 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
         editor->showTab(2);
         editor->raise();
     }
+    if (calibrationWizard) calibrationWizard->raise();
 
     QApplication::restoreOverrideCursor();
 
 
-    QStringList DsNames;
-    for (int ri=0; ri<Ds.size(); ri++) {
-        if (counter>1) Ds2[ri]=sqrt((Ds2[ri]-Ds[ri]*Ds[ri]/double(counter))/double(counter-1));
-        else Ds2[ri]=0;
-        Ds[ri]=Ds[ri]/double(counter);
-        DsNames<<tr("a=%1nm:  D= (%2 +/- %3) µm²/s").arg(pixel_sizes[ri]).arg(Ds[ri]).arg(Ds2[ri]);
-    }
 
     bool dlgOK=false;
-    int DItem=DsNames.indexOf(QInputDialog::getItem(parentWidget, tr("imFCS Calibration"), tr("Please choose the binning at which to measure the \"true\" diffusion coefficient for the calibration:"), DsNames, 4, false, &dlgOK));
+    int DItem=DsNames.indexOf(QInputDialog::getItem(calibrationWizard, tr("imFCS Calibration"), tr("Please choose the binning at which to measure the \"true\" diffusion coefficient for the calibration:"), DsNames, 4, false, &dlgOK));
 
     if (dlgOK) {
 

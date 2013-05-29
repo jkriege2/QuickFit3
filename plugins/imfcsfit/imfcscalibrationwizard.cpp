@@ -28,10 +28,6 @@ QFPlotter *ImFCSCalibrationWizard::getPltD() const
     return ui->pltD;
 }
 
-QFPlotter *ImFCSCalibrationWizard::getPltWXY() const
-{
-    return ui->pltWXY;
-}
 
 void ImFCSCalibrationWizard::on_btnClose_clicked()
 {
@@ -80,4 +76,21 @@ void ImFCSCalibrationWizard::on_btnCorrelate_clicked()
 void ImFCSCalibrationWizard::on_btnHelp_clicked()
 {
     emit showTutorial();
+}
+
+
+void ImFCSCalibrationWizard::on_btnReset_clicked()
+{
+    ui->widget2->setEnabled(false);
+    ui->widget3->setEnabled(false);
+    ui->widget4->setEnabled(false);
+    ui->widget5->setEnabled(false);
+}
+
+void ImFCSCalibrationWizard::on_btnUnlock_clicked()
+{
+    ui->widget2->setEnabled(true);
+    ui->widget3->setEnabled(true);
+    ui->widget4->setEnabled(true);
+    ui->widget5->setEnabled(true);
 }
