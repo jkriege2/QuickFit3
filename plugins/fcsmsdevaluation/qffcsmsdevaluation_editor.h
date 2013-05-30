@@ -120,6 +120,7 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         void averageFirstFewLags();
         void getNFromFits();
         void copyAverageData();
+        void fitAllMSD();
 
     protected:       
         /*! \brief create an evaluation report for the current record */
@@ -165,6 +166,7 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         QAction* actAverageFirstLags;
         QAction* actGetNFromFits;
         QAction* actCopyAverageData;
+        QAction* actFitAllMSD;
         JKQTPoverlayVerticalRange* ovlDistRange;
         JKQTPoverlayLine* ovlModel;
 

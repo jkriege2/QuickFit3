@@ -7,6 +7,7 @@
 #include "csvtools.h"
 #include "qffcsmsdevaluationaveragechannelsdialog.h"
 #include "qffcsmsdevaluationgetnfromfits.h"
+#include "qffcsmsdevaluationfitallmsddialog.h"
 
 /////////////
 #include <QGridLayout>
@@ -305,10 +306,14 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     QAction* actFirst=menuParameters->actions().value(0, NULL);
     actAverageFirstLags=new QAction(tr("&average first few lags for N"), this);
     connect(actAverageFirstLags, SIGNAL(triggered()), this, SLOT(averageFirstFewLags()));
-    menuParameters->insertAction(actFirst, actAverageFirstLags);
     actGetNFromFits=new QAction(tr("get N from FCS fits"), this);
     connect(actGetNFromFits, SIGNAL(triggered()), this, SLOT(getNFromFits()));
+    actFitAllMSD=new QAction(tr("fit theory to several MSDs"), this);
+    connect(actFitAllMSD, SIGNAL(triggered()), this, SLOT(fitAllMSD());
+
+    menuParameters->insertAction(actFirst, actFitAllMSD);
     menuParameters->insertAction(actFirst, actGetNFromFits);
+    menuParameters->insertAction(actFirst, actAverageFirstLags);
     menuParameters->insertSeparator(actFirst);
 
     actCopyAverageData=new QAction(QIcon(":/copy.png"), tr("&copy runs-average of MSD"), this);
@@ -447,10 +452,10 @@ void QFFCSMSDEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
         dataEventsEnabled=false;
 
         for (int i=0; i<MSDTHEORYCOUNT; i++)     {
-            chkSlope[i]->setChecked(item->getTheoryEnabled(i));
-            numPre[i]->setValue(item->getTheoryPre(i));
-            numD[i]->setValue(item->getTheoryD(i));
-            numAlpha[i]->setValue(item->getTheoryAlpha(i));
+            chkSlope[i]->setChecked(item->getTheoryEnabled(i, item->getHighlightedRecord(), item->getCurrentIndex()));
+            numPre[i]->setValue(item->getTheoryPre(i, item->getHighlightedRecord(), item->getCurrentIndex()));
+            numD[i]->setValue(item->getTheoryD(i, item->getHighlightedRecord(), item->getCurrentIndex()));
+            numAlpha[i]->setValue(item->getTheoryAlpha(i, item->getHighlightedRecord(), item->getCurrentIndex()));
         }
 
         /*edtAlpha->setValue(item->getAlpha());
@@ -460,15 +465,15 @@ void QFFCSMSDEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
         edtNumIter->setValue(item->getNumIter());
         connect(edtNumIter, SIGNAL(valueChanged(int)), this, SLOT(NumIterChanged(int)));*/
 
-        cmbFitType->setCurrentIndex(item->getFitType());
+        cmbFitType->setCurrentIndex(item->getFitType(item->getHighlightedRecord(), item->getCurrentIndex()));
         connect(cmbFitType, SIGNAL(currentIndexChanged(int)), this, SLOT(fitTypeChanged(int)));
 
-        spinFitWidth->setValue(item->getFitWidth());
+        spinFitWidth->setValue(item->getFitWidth(item->getHighlightedRecord(), item->getCurrentIndex()));
         connect(spinFitWidth, SIGNAL(valueChanged(int)), this, SLOT(fitWidthChanged(int)));
         cmbWeights->setCurrentIndex(item->getFitDataWeighting() );//current->getProperty("weights", 0).toInt());
         connect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
         connect(sliderDist, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersDistChanged(int, int, int, int)));
-        chkFitRange->setChecked(item->getFitRangeLimited());
+        chkFitRange->setChecked(item->getFitRangeLimited(item->getHighlightedRecord(), item->getCurrentIndex()));
         connect(chkFitRange, SIGNAL(toggled(bool)),this,SLOT(fitRangeChanged(bool)));
 
 
@@ -575,15 +580,15 @@ void QFFCSMSDEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
         dataEventsEnabled=false;
         //edtAlpha->setValue(eval->getAlpha());
         cmbWeights->setCurrentWeight(eval->getFitDataWeighting());
-        cmbFitType->setCurrentIndex(eval->getFitType());
-        spinFitWidth->setValue(eval->getFitWidth());
+        cmbFitType->setCurrentIndex(eval->getFitType(currentRecord, eval->getCurrentIndex()));
+        spinFitWidth->setValue(eval->getFitWidth(currentRecord, eval->getCurrentIndex()));
         //edtNumIter->setRange(1,10000); //qMax(0,data->getCorrelationN())
         //edtNumIter->setValue(eval->getNumIter());
-        for (int i=0; i<4; i++)     {
-            chkSlope[i]->setChecked(eval->getTheoryEnabled(i));
-            numPre[i]->setValue(eval->getTheoryPre(i));
-            numD[i]->setValue(eval->getTheoryD(i));
-            numAlpha[i]->setValue(eval->getTheoryAlpha(i));
+        for (int i=0; i<MSDTHEORYCOUNT; i++)     {
+            chkSlope[i]->setChecked(eval->getTheoryEnabled(i, currentRecord, eval->getCurrentIndex()));
+            numPre[i]->setValue(eval->getTheoryPre(i, currentRecord, eval->getCurrentIndex()));
+            numD[i]->setValue(eval->getTheoryD(i, currentRecord, eval->getCurrentIndex()));
+            numAlpha[i]->setValue(eval->getTheoryAlpha(i, currentRecord, eval->getCurrentIndex()));
         }
 
         updateSliders();
@@ -1131,10 +1136,16 @@ void QFFCSMSDEvaluationEditor::displayParameters() {
 
     bool oldde=dataEventsEnabled;
     dataEventsEnabled=false;
-    spinFitWidth->setValue(eval->getFitWidth());
-    cmbFitType->setCurrentIndex(eval->getFitType());
-    chkFitRange->setChecked(eval->getFitRangeLimited());
+    spinFitWidth->setValue(eval->getFitWidth(eval->getHighlightedRecord(), eval->getCurrentIndex()));
+    cmbFitType->setCurrentIndex(eval->getFitType(eval->getHighlightedRecord(), eval->getCurrentIndex()));
+    chkFitRange->setChecked(eval->getFitRangeLimited(eval->getHighlightedRecord(), eval->getCurrentIndex()));
     //edtNumIter->setValue(eval->getNumIter());
+    for (int i=0; i<MSDTHEORYCOUNT; i++)     {
+        chkSlope[i]->setChecked(eval->getTheoryEnabled(i, eval->getHighlightedRecord(), eval->getCurrentIndex()));
+        numPre[i]->setValue(eval->getTheoryPre(i, eval->getHighlightedRecord(), eval->getCurrentIndex()));
+        numD[i]->setValue(eval->getTheoryD(i, eval->getHighlightedRecord(), eval->getCurrentIndex()));
+        numAlpha[i]->setValue(eval->getTheoryAlpha(i, eval->getHighlightedRecord(), eval->getCurrentIndex()));
+    }
     dataEventsEnabled=oldde;
 
 
@@ -1271,7 +1282,7 @@ void QFFCSMSDEvaluationEditor::averageFirstFewLags() {
                     }
                 }
             }
-            if (i%10==0) QApplication::processEvents();
+            QApplication::processEvents();
             if (progress.wasCanceled()) break;
         }
 
@@ -1338,41 +1349,59 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
         }
 
 
-        QFEvaluationItem* evalRead=dlg->getEval();
-        if (evalRead) {
-            QModernProgressDialog progress(tr("reading N from fit results ..."), tr("Cancel"), this);
-            progress.show();
-            progress.setMode(true, true);
-            progress.setRange(0, applyTo.size());
+        QString evalGroup=dlg->getEvalGroup();
+        QString readParam=dlg->getParameter();
+        //qDebug()<<evalGroup<<readParam;
+        QModernProgressDialog progress(tr("reading N (parameter '%1') from fit results ...").arg(readParam), tr("Cancel"), this);
+        progress.show();
+        progress.setMode(true, true);
+        progress.setRange(0, applyTo.size());
 
-            for (int i=0; i<applyTo.size(); i++) {
-                progress.setValue(i);
-                data=applyTo[i].data;
-                record=applyTo[i].record;
-                int run=applyTo[i].run;
+        for (int i=0; i<applyTo.size(); i++) {
+            progress.setValue(i);
+            data=applyTo[i].data;
+            record=applyTo[i].record;
+            int run=applyTo[i].run;
 
-                double N=-1;
-
-
-                //TODO: implement this!
+            double N=-1;
 
 
-                if (N>=0) {
-                    for (int j=0; j<eval->getParameterCount(eval->getCurrentModel()); j++) {
-                        QString pid=eval->getParameterID(eval->getCurrentModel(), j);
-                        //qDebug()<<pid<<1.0/avg;
-                        if (pid=="n_particle") {
-                            if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, N);
-                            eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, N);
+            if (record) {
+                QStringList sl=record->resultsCalcNames("", "", evalGroup);
+                QStringList eval=record->resultsCalcEvaluationsInGroup(evalGroup);
+                QString runid="_runavg";
+                if (run>=0) runid=QString("_run%1").arg(run);
+                for (int ei=0; ei<eval.size(); ei++) {
+                    if (eval[ei].endsWith(runid)) {
+                        if (record->resultsExists(eval[ei], readParam)) {
+                            bool ok=false;
+                            double NN=record->resultsGetAsDouble(eval[ei], readParam, &ok);
+                            if (ok) {
+                                N=NN;
+                                break;
+                            }
                         }
                     }
                 }
-                if (i%10==0) QApplication::processEvents();
-                if (progress.wasCanceled()) break;
+                //qDebug()<<record->getName()<<" run="<<run<<":  N="<<N;
             }
-        }
 
+
+            if (N>=0) {
+                for (int j=0; j<eval->getParameterCount(eval->getCurrentModel()); j++) {
+                    QString pid=eval->getParameterID(eval->getCurrentModel(), j);
+                    //qDebug()<<pid<<1.0/avg;
+                    if (pid=="n_particle") {
+                        if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, N);
+                        eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, N);
+                    }
+                }
+            }
+            QApplication::processEvents();
+            if (progress.wasCanceled()) break;
+        }
     }
+
     delete dlg;
     widFitParams->updateWidgetValues();
     fitParamChanged();
@@ -1572,6 +1601,30 @@ void QFFCSMSDEvaluationEditor::copyAverageData() {
     delete dlg;
 }
 
+void QFFCSMSDEvaluationEditor::fitAllMSD()
+{
+
+    QFFCSMSDEvaluationItem* data=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    if (!dataEventsEnabled) return;
+    if (!data) return;
+
+
+    QFFCSMSDEvaluationFitAllMSDDialog* dlg=new QFFCSMSDEvaluationFitAllMSDDialog(data, 0, this);
+
+    dlg->exec();
+
+    for (int i=0; i<MSDTHEORYCOUNT; i++)     {
+        chkSlope[i]->setChecked(data->getTheoryEnabled(i, data->getHighlightedRecord(), data->getCurrentIndex()));
+        numPre[i]->setValue(data->getTheoryPre(i, data->getHighlightedRecord(), data->getCurrentIndex()));
+        numD[i]->setValue(data->getTheoryD(i, data->getHighlightedRecord(), data->getCurrentIndex()));
+        numAlpha[i]->setValue(data->getTheoryAlpha(i, data->getHighlightedRecord(), data->getCurrentIndex()));
+    }
+
+    delete dlg;
+
+    updateDistribution();
+}
+
 
 
 
@@ -1608,6 +1661,7 @@ void QFFCSMSDEvaluationEditor::fitCurrent() {
     displayParameters();
     displayData();
     dlgEvaluationProgress->setValue(100);
+    dlgEvaluationProgress->close();
 
     QApplication::restoreOverrideCursor();
 }
@@ -1656,6 +1710,7 @@ void QFFCSMSDEvaluationEditor::fitRunsCurrent() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged(record);
     dlgEvaluationProgress->setValue(recs.size());
+    dlgEvaluationProgress->close();
     updateSliders();
     displayParameters();
     displayData();
@@ -1708,6 +1763,7 @@ void QFFCSMSDEvaluationEditor::fitAll() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged();
     dlgEvaluationProgress->setValue(recs.size());
+    dlgEvaluationProgress->close();
     updateSliders();
     displayParameters();
     displayData();
@@ -1762,6 +1818,7 @@ void QFFCSMSDEvaluationEditor::fitRunsAll() {
     dataEventsEnabled=oldde;
     eval->emitResultsChanged();
     dlgEvaluationProgress->setValue(recs.size());
+    dlgEvaluationProgress->close();
     updateSliders();
     displayParameters();
     displayData();
@@ -1988,7 +2045,7 @@ void QFFCSMSDEvaluationEditor::fitWidthChanged(int width) {
     bool pc=data->get_doEmitPropertiesChanged();
     data->set_doEmitResultsChanged(false);
     data->set_doEmitPropertiesChanged(false);
-    if (data) data->setFitWidth(width);
+    if (data) data->setFitWidth(width, data->getHighlightedRecord(), data->getCurrentIndex());
     data->set_doEmitResultsChanged(rc);
     data->set_doEmitPropertiesChanged(pc);
     updateDistributionResults();
@@ -2005,7 +2062,7 @@ void QFFCSMSDEvaluationEditor::fitTypeChanged(int type)
     bool pc=data->get_doEmitPropertiesChanged();
     data->set_doEmitResultsChanged(false);
     data->set_doEmitPropertiesChanged(false);
-    if (data) data->setFitType(type);
+    if (data) data->setFitType(type, data->getHighlightedRecord(), data->getCurrentIndex());
     data->set_doEmitResultsChanged(rc);
     data->set_doEmitPropertiesChanged(pc);
     updateDistributionResults();
@@ -2023,7 +2080,7 @@ void QFFCSMSDEvaluationEditor::fitRangeChanged(bool range) {
     bool pc=data->get_doEmitPropertiesChanged();
     data->set_doEmitResultsChanged(false);
     data->set_doEmitPropertiesChanged(false);
-    if (data) data->setFitRangeLimited(range);
+    if (data) data->setFitRangeLimited(range, data->getHighlightedRecord(), data->getCurrentIndex());
     data->set_doEmitResultsChanged(rc);
     data->set_doEmitPropertiesChanged(pc);
     updateDistributionResults();
@@ -2053,7 +2110,7 @@ void QFFCSMSDEvaluationEditor::theoryChanged() {
     data->set_doEmitResultsChanged(false);
     data->set_doEmitPropertiesChanged(false);
     for (int i=0; i<MSDTHEORYCOUNT; i++)     {
-        data->setTheory(i, chkSlope[i]->isChecked(), numPre[i]->value(), numD[i]->value(), numAlpha[i]->value());
+        data->setTheory(i, chkSlope[i]->isChecked(), numPre[i]->value(), numD[i]->value(), numAlpha[i]->value(), data->getHighlightedRecord(), data->getCurrentIndex());
     }
     data->set_doEmitResultsChanged(rc);
     data->set_doEmitPropertiesChanged(pc);
@@ -2083,11 +2140,11 @@ void QFFCSMSDEvaluationEditor::fitMSD()
 
     dlg->exec();
 
-    for (int i=0; i<4; i++)     {
-        chkSlope[i]->setChecked(data->getTheoryEnabled(i));
-        numPre[i]->setValue(data->getTheoryPre(i));
-        numD[i]->setValue(data->getTheoryD(i));
-        numAlpha[i]->setValue(data->getTheoryAlpha(i));
+    for (int i=0; i<MSDTHEORYCOUNT; i++)     {
+        chkSlope[i]->setChecked(data->getTheoryEnabled(i, data->getHighlightedRecord(), data->getCurrentIndex()));
+        numPre[i]->setValue(data->getTheoryPre(i, data->getHighlightedRecord(), data->getCurrentIndex()));
+        numD[i]->setValue(data->getTheoryD(i, data->getHighlightedRecord(), data->getCurrentIndex()));
+        numAlpha[i]->setValue(data->getTheoryAlpha(i, data->getHighlightedRecord(), data->getCurrentIndex()));
     }
 
     delete dlg;

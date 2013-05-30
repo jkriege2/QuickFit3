@@ -108,20 +108,20 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
         virtual QString getEvaluationResultID(int currentIndex, int model) const;
         using QFUsesResultsByIndexAndModelEvaluation::getEvaluationResultID;
 
-        double getTheoryAlpha(int i) const;
-        double getTheoryD(int i) const;
-        double getTheoryPre(int i) const;
-        QString getTheoryAlphaName(int i) const;
-        QString getTheoryDName(int i) const;
-        QString getTheoryPreName(int i) const;
-        bool getTheoryEnabled(int i) const;
-        void setTheory(int i, bool enabled, double pre, double D, double alpha);
-        int getFitWidth() const;
-        void setFitWidth(int width);
-        bool getFitRangeLimited() const;
-        void setFitRangeLimited(bool rangeLimit);
-        int getFitType() const;
-        void setFitType(int type);
+        double getTheoryAlpha(int i, QFRawDataRecord* record, int run) const;
+        double getTheoryD(int i, QFRawDataRecord* record, int run) const;
+        double getTheoryPre(int i, QFRawDataRecord* record, int run) const;
+        QString getTheoryAlphaName(int i, QFRawDataRecord* record, int run) const;
+        QString getTheoryDName(int i, QFRawDataRecord* record, int run) const;
+        QString getTheoryPreName(int i, QFRawDataRecord* record, int run) const;
+        bool getTheoryEnabled(int i, QFRawDataRecord* record, int run) const;
+        void setTheory(int i, bool enabled, double pre, double D, double alpha, QFRawDataRecord* record, int run);
+        int getFitWidth(QFRawDataRecord* record, int run) const;
+        void setFitWidth(int width, QFRawDataRecord* record, int run);
+        bool getFitRangeLimited(QFRawDataRecord* record, int run) const;
+        void setFitRangeLimited(bool rangeLimit, QFRawDataRecord* record, int run);
+        int getFitType(QFRawDataRecord* record, int run) const;
+        void setFitType(int type, QFRawDataRecord* record, int run);
     protected:
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */

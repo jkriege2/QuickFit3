@@ -4,6 +4,7 @@
 #include <QComboBox>
 #include "qfrawdatarecord.h"
 #include "lib_imexport.h"
+#include <QRegExp>
 
 
 /*! \brief combobox that displays a list of all revaluation groups of a specified QFRawDataRecord
@@ -16,6 +17,8 @@ class QFLIB_EXPORT QFResultsGroupComboBox : public QComboBox {
         explicit QFResultsGroupComboBox(QWidget *parent = 0);
 
         QString currentEvaluationGroup() const;
+        void setGroupFilter(bool enabled, const QRegExp& filter=QRegExp());
+        void setContainedParam(const QString& param);
     public slots:
         void setCurrentEvaluationGroup(const QString& group);
         void setRDR(QFRawDataRecord *rdr);
@@ -28,6 +31,9 @@ class QFLIB_EXPORT QFResultsGroupComboBox : public QComboBox {
         QPointer<QFRawDataRecord> rdr;
         QStringList egroups;
         QStringList egnames;
+        QRegExp rxFilter;
+        bool doFilter;
+        QString containsParamInGroup;
 };
 
 #endif // QFRESULTSGROUPCOMBOBOX_H

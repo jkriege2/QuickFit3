@@ -55,7 +55,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QComboBox" name="cmbEval"/>
+      <widget class="QFResultsGroupComboBox" name="cmbEval"/>
      </item>
     </layout>
    </item>
@@ -71,6 +71,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFResultsGroupComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qfresultsgroupcombobox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

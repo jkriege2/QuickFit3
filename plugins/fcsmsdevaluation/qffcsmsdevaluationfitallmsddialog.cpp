@@ -1,11 +1,11 @@
-#include "qffcsmsdevaluationfitmsddialog.h"
-#include "ui_qffcsmsdevaluationfitmsddialog.h"
+#include "qffcsmsdevaluationfitallmsddialog.h"
+#include "ui_qffcsmsdevaluationfitallmsddialog.h"
 #include "qffcsmsdevaluation_item.h"
 #include "qfpluginservices.h"
 
-QFFCSMSDEvaluationFitMSDDialog::QFFCSMSDEvaluationFitMSDDialog(QFFCSMSDEvaluationItem* evaluation, int theoryID, QWidget *parent) :
+QFFCSMSDEvaluationFitAllMSDDialog::QFFCSMSDEvaluationFitAllMSDDialog(QFFCSMSDEvaluationItem* evaluation, int theoryID, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::QFFCSMSDEvaluationFitMSDDialog)
+    ui(new Ui::QFFCSMSDEvaluationFitAllMSDDialog)
 {
     ui->setupUi(this);
     this->evaluation=evaluation;
@@ -53,12 +53,12 @@ QFFCSMSDEvaluationFitMSDDialog::QFFCSMSDEvaluationFitMSDDialog(QFFCSMSDEvaluatio
     on_btnFit_clicked();
 }
 
-QFFCSMSDEvaluationFitMSDDialog::~QFFCSMSDEvaluationFitMSDDialog()
+QFFCSMSDEvaluationFitAllMSDDialog::~QFFCSMSDEvaluationFitAllMSDDialog()
 {
     delete ui;
 }
 
-void QFFCSMSDEvaluationFitMSDDialog::saveResults()
+void QFFCSMSDEvaluationFitAllMSDDialog::saveResults()
 {
     bool rc=evaluation->get_doEmitResultsChanged();
     bool pc=evaluation->get_doEmitPropertiesChanged();
@@ -76,7 +76,7 @@ void QFFCSMSDEvaluationFitMSDDialog::saveResults()
     accept();
 }
 
-void QFFCSMSDEvaluationFitMSDDialog::on_btnFit_clicked()
+void QFFCSMSDEvaluationFitAllMSDDialog::on_btnFit_clicked()
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     connectSignals(false);
@@ -96,7 +96,7 @@ void QFFCSMSDEvaluationFitMSDDialog::on_btnFit_clicked()
     replotGraph();
 }
 
-void QFFCSMSDEvaluationFitMSDDialog::replotGraph()
+void QFFCSMSDEvaluationFitAllMSDDialog::replotGraph()
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     ui->pltDistribution->set_doDrawing(false);
@@ -166,12 +166,12 @@ void QFFCSMSDEvaluationFitMSDDialog::replotGraph()
     QApplication::restoreOverrideCursor();
 }
 
-void QFFCSMSDEvaluationFitMSDDialog::showHelp()
+void QFFCSMSDEvaluationFitAllMSDDialog::showHelp()
 {
     QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("fcs_msd")+"fit_msd.html");
 }
 
-void QFFCSMSDEvaluationFitMSDDialog::connectSignals(bool connectS)
+void QFFCSMSDEvaluationFitAllMSDDialog::connectSignals(bool connectS)
 {
     if (connectS) {
         connect(ui->edtPre, SIGNAL(valueChanged(double)), this, SLOT(replotGraph()));
@@ -186,7 +186,7 @@ void QFFCSMSDEvaluationFitMSDDialog::connectSignals(bool connectS)
     }
 }
 
-int QFFCSMSDEvaluationFitMSDDialog::getRangeMin()
+int QFFCSMSDEvaluationFitAllMSDDialog::getRangeMin()
 {
     int rm=0;
     for (int i=0; i<distTau.size(); i++) {
@@ -198,7 +198,7 @@ int QFFCSMSDEvaluationFitMSDDialog::getRangeMin()
     return qBound(rm, 0, distTau.size()-1);
 }
 
-int QFFCSMSDEvaluationFitMSDDialog::getRangeMax()
+int QFFCSMSDEvaluationFitAllMSDDialog::getRangeMax()
 {
     int rm=distTau.size()-1;
     for (int i=distTau.size()-1; i>=0; i--) {

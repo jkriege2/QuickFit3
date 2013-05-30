@@ -4,6 +4,8 @@ QFResultsGroupComboBox::QFResultsGroupComboBox(QWidget *parent) :
     QComboBox(parent)
 {
     rdr=NULL;
+    containsParamInGroup="";
+    doFilter=false;
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(myCurrentIndexChanged(int)));
 }
 
@@ -18,7 +20,12 @@ void QFResultsGroupComboBox::setRDR(QFRawDataRecord *rdr)
     if (rdr) {
         QStringList oldEG=egroups;
         QStringList oldEGN=egnames;
-        egroups=rdr->resultsCalcEvalGroups();
+        egroups=rdr->resultsCalcEvalGroups(containsParamInGroup);
+        if (doFilter) {
+            for (int i=egroups.size()-1; i>=0; i--) {
+                if (rxFilter.indexIn(egroups[i])<0) egroups.removeAt(i);
+            }
+        }
         egnames.clear();
         for (int i=0; i<egroups.size(); i++) {
             egnames<<QString("%1").arg(rdr->resultsGetLabelForEvaluationGroup(egroups[i]));
@@ -49,6 +56,20 @@ void QFResultsGroupComboBox::setRDR(QFRawDataRecord *rdr)
 QString QFResultsGroupComboBox::currentEvaluationGroup() const
 {
     return itemData(currentIndex()).toString();
+}
+
+void QFResultsGroupComboBox::setGroupFilter(bool enabled, const QRegExp &filter)
+{
+    doFilter=enabled;
+    this->rxFilter=filter;
+    refill();
+
+}
+
+void QFResultsGroupComboBox::setContainedParam(const QString &param)
+{
+    containsParamInGroup=param;
+    refill();
 }
 
 void QFResultsGroupComboBox::setCurrentEvaluationGroup(const QString &group)

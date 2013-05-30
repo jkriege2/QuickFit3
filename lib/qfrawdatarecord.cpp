@@ -3682,8 +3682,10 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
                 j.next();
                 QString rn=j.key();
                 if ((group.isEmpty() || (group==j.value().group)) && (!l.contains(rn))) {
-                    if (j.value().sortPriority) lp.append(rn);
-                    else l.append(rn);
+                    if (!lp.contains(rn)) {
+                        if (j.value().sortPriority ) lp.append(rn);
+                        else l.append(rn);
+                    }
                 }
             }
         }

@@ -17,7 +17,8 @@ class QFFCSMSDEvaluationGetNFromFits : public QDialog
         ~QFFCSMSDEvaluationGetNFromFits();
 
         int getApplyTo() const;
-        QFEvaluationItem* getEval() const;
+        QString getEvalGroup() const;
+        QString getParameter() const;
     private:
         Ui::QFFCSMSDEvaluationGetNFromFits *ui;
 };

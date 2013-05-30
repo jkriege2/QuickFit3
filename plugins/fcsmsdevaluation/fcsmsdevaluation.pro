@@ -27,7 +27,8 @@ HEADERS += qffcsmsdevaluation.h \
     ../base_classes/qffitresultsbyindexevaluationfittools.h \
     ../base_classes/qffcsweightingtools.h \
     qffcsmsdevaluationaveragechannelsdialog.h \
-    qffcsmsdevaluationgetnfromfits.h
+    qffcsmsdevaluationgetnfromfits.h \
+    qffcsmsdevaluationfitallmsddialog.h
 
 SOURCES += qffcsmsdevaluation.cpp \
            qffcsmsdevaluation_item.cpp \
@@ -42,14 +43,17 @@ SOURCES += qffcsmsdevaluation.cpp \
     ../base_classes/qffitresultsbyindexevaluationfittools.cpp \
     ../base_classes/qffcsweightingtools.cpp \
     qffcsmsdevaluationaveragechannelsdialog.cpp \
-    qffcsmsdevaluationgetnfromfits.cpp
+    qffcsmsdevaluationgetnfromfits.cpp \
+    qffcsmsdevaluationfitallmsddialog.cpp
 
 FORMS = \   
     qffcsmsdevaluationfitmsddialog.ui \
     qffcsmsdevaluationaveragechannelsdialog.ui \
-    qffcsmsdevaluationgetnfromfits.ui
+    qffcsmsdevaluationgetnfromfits.ui \
+    qffcsmsdevaluationfitallmsddialog.ui
 
-RESOURCES += fcsmsdevaluation.qrc
+RESOURCES += fcsmsdevaluation.qrc \
+    ../../lib/lib.qrc
 
 TRANSLATIONS= ./translations/de.fcsmsdevaluation.ts
 

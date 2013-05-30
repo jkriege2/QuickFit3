@@ -93,68 +93,70 @@ QStringList QFFCSMSDEvaluationItem::getFitTypes()
     return sl;
 }
 
-void QFFCSMSDEvaluationItem::setTheory(int i, bool enabled, double pre, double D, double alpha) {
-    setFitValue(QString("msd_theory%1_en").arg(i), (enabled)?1:0);
-    setFitValue(QString("msd_theory%1_pre").arg(i), pre);
-    setFitValue(QString("msd_theory%1_d").arg(i), D);
-    setFitValue(QString("msd_theory%1_alpha").arg(i), alpha);
+void QFFCSMSDEvaluationItem::setTheory(int i, bool enabled, double pre, double D, double alpha, QFRawDataRecord* record, int run) {
+    //qDebug()<<getTheoryAlphaName(i, record, run)<<" = "<<alpha;
+    setFitResultValue(record, run, getCurrentModel(), QString("msd_theory%1_en").arg(i), (enabled)?1:0);
+    setFitResultValue(record, run, getCurrentModel(), getTheoryPreName(i, record, run), pre);
+    setFitResultValue(record, run, getCurrentModel(), getTheoryDName(i, record, run), D);
+    setFitResultValue(record, run, getCurrentModel(), getTheoryAlphaName(i, record, run), alpha);
 }
 
-int QFFCSMSDEvaluationItem::getFitWidth() const {
-    return getFitValue(QString("msd_fitwidth"));
+int QFFCSMSDEvaluationItem::getFitWidth(QFRawDataRecord* record, int run) const {
+    return getFitValue(record, run, getCurrentModel(), QString("msd_fitwidth"));
 }
 
-bool QFFCSMSDEvaluationItem::getFitRangeLimited() const {
-    return getFitValue(QString("msd_fitlimitedrange"));
+bool QFFCSMSDEvaluationItem::getFitRangeLimited(QFRawDataRecord* record, int run) const {
+    return getFitValue(record, run, getCurrentModel(), QString("msd_fitlimitedrange"));
 }
 
-void QFFCSMSDEvaluationItem::setFitRangeLimited(bool rangeLimit) {
-    setFitValue(QString("msd_fitlimitedrange"), rangeLimit);
+void QFFCSMSDEvaluationItem::setFitRangeLimited(bool rangeLimit, QFRawDataRecord* record, int run) {
+    setFitValue(record, run, getCurrentModel(), QString("msd_fitlimitedrange"), rangeLimit);
 }
 
-int QFFCSMSDEvaluationItem::getFitType() const
+int QFFCSMSDEvaluationItem::getFitType(QFRawDataRecord* record, int run) const
 {
-    return getFitValue(QString("msd_fittype"));
+    return getFitValue(record, run, getCurrentModel(), QString("msd_fittype"));
 }
 
-void QFFCSMSDEvaluationItem::setFitType(int type)
+void QFFCSMSDEvaluationItem::setFitType(int type, QFRawDataRecord* record, int run)
 {
-    setFitValue(QString("msd_fittype"), type);
+    setFitValue(record, run, getCurrentModel(), QString("msd_fittype"), type);
 }
 
-void QFFCSMSDEvaluationItem::setFitWidth(int width) {
-    setFitValue(QString("msd_fitwidth"), width);
+void QFFCSMSDEvaluationItem::setFitWidth(int width, QFRawDataRecord* record, int run) {
+    setFitValue(record, run, getCurrentModel(), QString("msd_fitwidth"), width);
 }
 
-bool QFFCSMSDEvaluationItem::getTheoryEnabled(int i) const {
-    return getFitValue(QString("msd_theory%1_en").arg(i))!=0;
+bool QFFCSMSDEvaluationItem::getTheoryEnabled(int i, QFRawDataRecord* record, int run) const {
+    return getFitValue(record, run, getCurrentModel(), QString("msd_theory%1_en").arg(i))!=0;
 }
 
-double QFFCSMSDEvaluationItem::getTheoryPre(int i) const {
-    return getFitValue(getTheoryPreName(i));
+double QFFCSMSDEvaluationItem::getTheoryPre(int i, QFRawDataRecord* record, int run) const {
+    return getFitValue(record, run, getCurrentModel(), getTheoryPreName(i, record, run));
 }
 
-QString QFFCSMSDEvaluationItem::getTheoryAlphaName(int i) const
+QString QFFCSMSDEvaluationItem::getTheoryAlphaName(int i, QFRawDataRecord* record, int run) const
 {
     return QString("msd_theory%1_alpha").arg(i);
 }
 
-QString QFFCSMSDEvaluationItem::getTheoryDName(int i) const
+QString QFFCSMSDEvaluationItem::getTheoryDName(int i, QFRawDataRecord* record, int run) const
 {
     return QString("msd_theory%1_d").arg(i);
 }
 
-QString QFFCSMSDEvaluationItem::getTheoryPreName(int i) const
+QString QFFCSMSDEvaluationItem::getTheoryPreName(int i, QFRawDataRecord* record, int run) const
 {
     return QString("msd_theory%1_pre").arg(i);
 }
 
-double QFFCSMSDEvaluationItem::getTheoryD(int i) const {
-    return getFitValue(getTheoryDName(i));
+double QFFCSMSDEvaluationItem::getTheoryD(int i, QFRawDataRecord* record, int run) const {
+    return getFitValue(record, run, getCurrentModel(), getTheoryDName(i, record, run));
 }
 
-double QFFCSMSDEvaluationItem::getTheoryAlpha(int i) const {
-    return getFitValue(getTheoryAlphaName(i));
+double QFFCSMSDEvaluationItem::getTheoryAlpha(int i, QFRawDataRecord* record, int run) const {
+    //qDebug()<<"read: "<<getTheoryAlphaName(i, record, run)<<" == "<<getFitValue(record, run, getCurrentModel(), getTheoryAlphaName(i, record, run));
+    return getFitValue(record, run, getCurrentModel(), getTheoryAlphaName(i, record, run));
 }
 
 
@@ -575,7 +577,7 @@ bool QFFCSMSDEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QStri
 
     for (int i=0; i<MSDTHEORYCOUNT; i++) {
         if (parameterID==QString("msd_theory%1_en").arg(i)) {
-            defaultValue.value=0;            
+            defaultValue.value=(i==0)?1:0;
             return true;
         }
         if (parameterID==QString("msd_theory%1_pre").arg(i)) {
@@ -598,11 +600,11 @@ bool QFFCSMSDEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QStri
         }
     }
     if (parameterID==QString("msd_fitwidth")) {
-        defaultValue.value=10;
+        defaultValue.value=25;
         return true;
     }
     if (parameterID==QString("msd_fittype")) {
-        defaultValue.value=0;
+        defaultValue.value=2;
         return true;
     }
     if (parameterID==QString("msd_fitlimitedrange")) {
