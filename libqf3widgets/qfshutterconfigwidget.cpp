@@ -259,6 +259,11 @@ bool QFShutterConfigWidget::getShutterState() {
     return false;
 }
 
+QAction *QFShutterConfigWidget::getStateAction() const
+{
+    return actState;
+}
+
 
 void QFShutterConfigWidget::displayShutterStates(/*bool automatic*/) {
     if (useThread) return;

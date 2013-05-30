@@ -74,6 +74,8 @@ class QFWIDLIB_EXPORT QFShutterConfigWidget : public QWidget {
 
         bool getShutterState();
 
+        QAction* getStateAction() const;
+
 
     public slots:
         void setReadOnly(bool readonly);

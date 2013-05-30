@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1275</width>
-    <height>73</height>
+    <height>99</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -44,7 +44,17 @@
       <property name="spacing">
        <number>2</number>
       </property>
-      <item row="2" column="7">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>current sample:</string>
+        </property>
+        <property name="buddy">
+         <cstring>edtCurrentSampleName</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="9">
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>comment:</string>
@@ -54,7 +64,24 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="2">
+      <item row="2" column="5">
+       <widget class="QSpinBox" name="spinWell">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="13">
+       <widget class="QPushButton" name="btnClearAll">
+        <property name="text">
+         <string>reset</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>well:</string>
@@ -64,34 +91,57 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="11">
-       <widget class="QPushButton" name="btnClearAll">
-        <property name="text">
-         <string>reset</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="6">
+      <item row="2" column="8">
        <widget class="QPushButton" name="btnNextCell">
         <property name="text">
          <string>next cell</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="8">
-       <widget class="QEnhancedLineEdit" name="edtComment">
-        <property name="placeholderText">
-         <string>comment ...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
+      <item row="2" column="2">
        <widget class="QLabel" name="label">
         <property name="text">
          <string>plate/experiment:</string>
         </property>
         <property name="buddy">
          <cstring>spinPlate</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="6">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>sample/cell:</string>
+        </property>
+        <property name="buddy">
+         <cstring>spinCell</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="7">
+       <widget class="QSpinBox" name="spinCell">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QSpinBox" name="spinPlate">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QEnhancedLineEdit" name="edtCurrentSampleName">
+        <property name="placeholderText">
+         <string>current sample ...</string>
         </property>
        </widget>
       </item>
@@ -105,57 +155,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="4">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>sample/cell:</string>
-        </property>
-        <property name="buddy">
-         <cstring>spinCell</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="9">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>date/time:</string>
-        </property>
-        <property name="buddy">
-         <cstring>edtDateTime</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QSpinBox" name="spinPlate">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>9999</number>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="3">
-       <widget class="QSpinBox" name="spinWell">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>9999</number>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="5">
-       <widget class="QSpinBox" name="spinCell">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>9999</number>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="10">
+      <item row="0" column="13">
        <widget class="QDateTimeEdit" name="edtDateTime">
         <property name="font">
          <font>
@@ -167,25 +167,25 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1" colspan="11">
-       <widget class="QEnhancedLineEdit" name="edtPrefix">
-        <property name="placeholderText">
-         <string>prefix ...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_7">
+      <item row="0" column="11">
+       <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>current sample:</string>
+         <string>date/time:</string>
         </property>
         <property name="buddy">
-         <cstring>edtCurrentSampleName</cstring>
+         <cstring>edtDateTime</cstring>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="11">
-       <widget class="QEnhancedLineEdit" name="edtCurrentSampleName">
+      <item row="2" column="10" colspan="2">
+       <widget class="QEnhancedLineEdit" name="edtComment">
+        <property name="placeholderText">
+         <string>comment ...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="10">
+       <widget class="QEnhancedLineEdit" name="edtPrefix">
         <property name="placeholderText">
          <string>prefix ...</string>
         </property>

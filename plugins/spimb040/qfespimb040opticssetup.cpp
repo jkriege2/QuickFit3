@@ -42,6 +42,7 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
 
 
     ui->shutterMainIllumination->init(m_log, m_pluginServices);
+    ui->tbMainShutter->setDefaultAction(ui->shutterMainIllumination->getStateAction());
     ui->shutterLaser1->init(m_log, m_pluginServices);
     ui->shutterLaser2->init(m_log, m_pluginServices);
     ui->shutterTransmission->init(m_log, m_pluginServices);
