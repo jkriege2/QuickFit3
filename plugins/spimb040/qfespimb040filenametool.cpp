@@ -94,6 +94,7 @@ void QFESPIMB040FilenameTool::setGlobalReplaces(QFESPIMB040OpticsSetup *setup, Q
         setReplaceValue("plate000", QString("%1").arg(acq->getPlate(), 3, 10, QChar('0')));
         setReplaceValue("plate0000", QString("%1").arg(acq->getPlate(), 4, 10, QChar('0')));
         setReplaceValue("comment", cleanStringForFilename(acq->getComment()));
+        setReplaceValue("samplename", cleanStringForFilename(acq->getSample()));
     }
     setReplaceValue("today", QDate::currentDate().toString("yyyy_MM_dd"));
     setReplaceValue("date", QDate::currentDate().toString("yyyy_MM_dd"));

@@ -35,6 +35,7 @@ QFESPIMB040MainWindow2::~QFESPIMB040MainWindow2()
 }
 
 void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
+    setUpdatesEnabled(false);
     jkloadWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
     jkloadSplitter((*settings->getQSettings()), splitter, "plugin_spim_b040/");
     if (optSetup) optSetup->loadSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
@@ -46,6 +47,16 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     if (widCamParamScan) widCamParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
     if (widDeviceParamScan) widDeviceParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/deviceparamscan/");
     if (widConfig) widConfig->loadSettings((*settings->getQSettings()), "plugin_spim_b040/config/");
+    setUpdatesEnabled(true);
+    if (optSetup) optSetup->setUpdatesEnabled(true);
+    if (widExperimentDescription) widExperimentDescription->setUpdatesEnabled(true);
+    if (widAcquisitionDescription) widAcquisitionDescription->setUpdatesEnabled(true);
+    if (widScriptedAcquisition) widScriptedAcquisition->setUpdatesEnabled(true);
+    if (widImageStack) widImageStack->setUpdatesEnabled(true);
+    if (widAcquisition) widAcquisition->setUpdatesEnabled(true);
+    if (widCamParamScan) widCamParamScan->setUpdatesEnabled(true);
+    if (widDeviceParamScan) widDeviceParamScan->setUpdatesEnabled(true);
+    if (widConfig) widConfig->setUpdatesEnabled(true);
 }
 
 void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
@@ -70,6 +81,12 @@ QFESPIMB040AcquisitionConfigWidget2 *QFESPIMB040MainWindow2::getWidAcquisition()
 
 void QFESPIMB040MainWindow2::closeEvent ( QCloseEvent * event ) {
     optSetup->close();
+    QFPluginServices::getInstance()->log_global_text("\n\n=========================================================\n");
+    QFPluginServices::getInstance()->log_global_text("== CLOSING SPIM CONTROL PLUGIN!                        ==\n");
+    QFPluginServices::getInstance()->log_global_text("=========================================================\n\n\n");
+    QFPluginServices::getInstance()->setProjectMode(true);
+    QWidget::closeEvent(event);
+    deleteLater();
 }
 
 void QFESPIMB040MainWindow2::showEvent( QShowEvent * event )  {
@@ -125,6 +142,7 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     optSetup=new QFESPIMB040OpticsSetup(this, this, this, m_pluginServices);
     tabMain->addTab(optSetup, tr("Instrument Setup"));
+    topl->insertWidget(0, optSetup->takeLightpathWidget());
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create tab for experiment description input

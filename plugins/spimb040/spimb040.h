@@ -57,7 +57,7 @@ class QFESPIMB040 : public QObject, public QFExtensionBase {
         QAction* actStartPlugin;
         QAction* actStartPluginOld;
 
-        QFESPIMB040MainWindow2* main;
+        QPointer<QFESPIMB040MainWindow2> main;
 
         /** \copydoc QFExtensionBase::projectChanged() */
         virtual void projectChanged(QFProject* oldProject, QFProject* project);

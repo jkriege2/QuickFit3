@@ -19,10 +19,14 @@ QFESPIMB040AcquisitionDescription::QFESPIMB040AcquisitionDescription(QWidget *pa
     c1->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/acqdescription_prefix.txt");
     QFCompleterFromFile* c2=new QFCompleterFromFile(this);
     c2->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/acqdescription_comment.txt");
+    QFCompleterFromFile* c3=new QFCompleterFromFile(this);
+    c3->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/completers/acqdescription_currentsample.txt");
     ui->edtPrefix->setCompleter(c1);
     ui->edtComment->setCompleter(c2);
+    ui->edtCurrentSampleName->setCompleter(c3);
     ui->edtPrefix->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->edtPrefix, ui->edtPrefix));
     ui->edtComment->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->edtComment, ui->edtComment));
+    ui->edtCurrentSampleName->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->edtCurrentSampleName, ui->edtCurrentSampleName));
 
     updateTime();
 
@@ -43,6 +47,7 @@ void QFESPIMB040AcquisitionDescription::updateReplaces()
 void QFESPIMB040AcquisitionDescription::loadSettings(QSettings& settings, QString prefix) {
     ui->edtPrefix->setText(settings.value(prefix+"prefix", QDir::homePath()+"spim_").toString());
     ui->edtComment->setText(settings.value(prefix+"comment", "").toString());
+    ui->edtCurrentSampleName->setText(settings.value(prefix+"sample", "").toString());
     ui->spinCell->setValue(settings.value(prefix+"cell", 1).toInt());
     ui->spinPlate->setValue(settings.value(prefix+"plate", 1).toInt());
     ui->spinWell->setValue(settings.value(prefix+"well", 1).toInt());
@@ -51,6 +56,7 @@ void QFESPIMB040AcquisitionDescription::loadSettings(QSettings& settings, QStrin
 void QFESPIMB040AcquisitionDescription::storeSettings(QSettings& settings, QString prefix) const {
     settings.setValue(prefix+"prefix", ui->edtPrefix->text());
     settings.setValue(prefix+"comment", ui->edtComment->text());
+    settings.setValue(prefix+"sample", ui->edtCurrentSampleName->text());
     settings.setValue(prefix+"cell", ui->spinCell->value());
     settings.setValue(prefix+"plate", ui->spinPlate->value());
     settings.setValue(prefix+"well", ui->spinWell->value());
@@ -61,6 +67,7 @@ QMap<QString, QVariant> QFESPIMB040AcquisitionDescription::getDescription() cons
     QMap<QString, QVariant> description;
     description["prefix"]=ui->edtPrefix->text();
     description["comment"]=ui->edtComment->text();
+    description["samplename"]=ui->edtCurrentSampleName->text();
     description["cell"]=ui->spinCell->value();
     description["plate"]=ui->spinPlate->value();
     description["well"]=ui->spinWell->value();
@@ -86,6 +93,11 @@ int QFESPIMB040AcquisitionDescription::getPlate() const
 QString QFESPIMB040AcquisitionDescription::getComment() const
 {
     return ui->edtComment->text();
+}
+
+QString QFESPIMB040AcquisitionDescription::getSample() const
+{
+    return ui->edtCurrentSampleName->text();
 }
 
 QString QFESPIMB040AcquisitionDescription::getPrefix() const

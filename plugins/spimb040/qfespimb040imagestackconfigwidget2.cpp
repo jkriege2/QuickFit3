@@ -351,7 +351,7 @@ void QFESPIMB040ImageStackConfigWidget2::on_spinSteps_valueChanged(int value) {
 
 void QFESPIMB040ImageStackConfigWidget2::updateLabel() {
     bool updt=updatesEnabled();
-    setUpdatesEnabled(false);
+    if (updt) setUpdatesEnabled(false);
     double start=stackStart();
     double delta=stackDelta();
     int steps=stackCount()-1;
@@ -378,7 +378,7 @@ void QFESPIMB040ImageStackConfigWidget2::updateLabel() {
     } else {
         ui->labStage3->setText(tr("---"));
     }
-    setUpdatesEnabled(updt);
+    if (updt) setUpdatesEnabled(updt);
 }
 
 void QFESPIMB040ImageStackConfigWidget2::on_btnConfig_clicked() {

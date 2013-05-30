@@ -117,7 +117,8 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         virtual void displayParameters();
         void distzoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender);
 
-        void averageFirstFewFrames();
+        void averageFirstFewLags();
+        void getNFromFits();
         void copyAverageData();
 
     protected:       
@@ -161,7 +162,8 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         QCheckBox* chkShowKey;
         QCheckBox* chkFitRange;
 
-        QAction* actAverageFirstFrames;
+        QAction* actAverageFirstLags;
+        QAction* actGetNFromFits;
         QAction* actCopyAverageData;
         JKQTPoverlayVerticalRange* ovlDistRange;
         JKQTPoverlayLine* ovlModel;

@@ -60,7 +60,7 @@ QF3ObjectiveComboboxNotifier* QF3ObjectiveCombobox::m_notifier=NULL;
 QF3ObjectiveCombobox::QF3ObjectiveCombobox(QWidget* parent):
     QWidget(parent)
 {
-    if (m_notifier==NULL) m_notifier=new QF3ObjectiveComboboxNotifier(this);
+    if (m_notifier==NULL) m_notifier=new QF3ObjectiveComboboxNotifier(QApplication::instance());
     globalobjectives="";
     localobjectives="";
 

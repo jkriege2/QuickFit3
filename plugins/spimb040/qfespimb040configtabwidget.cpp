@@ -2,7 +2,7 @@
 #include "ui_qfespimb040configtabwidget.h"
 #include "programoptions.h"
 
-QFESPIMB040ConfigTabWidget* QFESPIMB040ConfigTabWidget::instance=NULL;
+QPointer<QFESPIMB040ConfigTabWidget> QFESPIMB040ConfigTabWidget::instance=NULL;
 
 QFESPIMB040ConfigTabWidget::QFESPIMB040ConfigTabWidget(QWidget *parent) :
     QWidget(parent),

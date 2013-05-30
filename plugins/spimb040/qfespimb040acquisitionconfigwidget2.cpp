@@ -324,7 +324,7 @@ void QFESPIMB040AcquisitionConfigWidget2::on_chkUse2_toggled(bool enabled) {
 
 void QFESPIMB040AcquisitionConfigWidget2::updateBackgroundWidgets() {
     bool updt=updatesEnabled();
-    setUpdatesEnabled(false);
+    if (updt) setUpdatesEnabled(false);
     ui->cmbPreviewSettings1_1->setEnabled(ui->chkOverview->isChecked());
     ui->cmbPreviewSettings2_1->setEnabled(ui->chkOverview->isChecked());
     ui->cmbPreviewSettings1_2->setEnabled(ui->chkLightpathPreview2->isChecked());
@@ -337,7 +337,7 @@ void QFESPIMB040AcquisitionConfigWidget2::updateBackgroundWidgets() {
     ui->spinBackgroundFrames2->setEnabled(ui->chkBackground->isChecked());
     ui->labPreviewFrames1->setEnabled(ui->chkBackground->isChecked());
     ui->labPreviewFrames2->setEnabled(ui->chkBackground->isChecked());
-    setUpdatesEnabled(updt);
+    if (updt) setUpdatesEnabled(updt);
 }
 
 void QFESPIMB040AcquisitionConfigWidget2::on_chkBackground_toggled(bool enabled) {

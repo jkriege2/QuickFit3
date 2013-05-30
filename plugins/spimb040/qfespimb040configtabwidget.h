@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QSettings>
+#include <QPointer>
 
 namespace Ui {
     class QFESPIMB040ConfigTabWidget;
@@ -35,7 +36,7 @@ class QFESPIMB040ConfigTabWidget : public QWidget{
         void reloadStylesheets(bool forSure=false);
     private:
         Ui::QFESPIMB040ConfigTabWidget *ui;
-        static QFESPIMB040ConfigTabWidget* instance;
+        static QPointer<QFESPIMB040ConfigTabWidget> instance;
 };
 
 #endif // QFESPIMB040CONFIGTABWIDGET_H

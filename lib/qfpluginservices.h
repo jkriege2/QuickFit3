@@ -327,6 +327,8 @@ class QFLIB_EXPORT QFPluginServices {
         virtual void addGlobalVariable(const QString& name, const QString& value)=0;
         /** \brief  add a variablen to the list of global variables available in <u>all</u> QFMathParser objects, that are defined by a call to addStandardVariables() (or the constructor) */
         virtual void addGlobalVariable(const QString& name, bool value)=0;
+        /** \brief disables all project editing capabilities for the QuickFit main window ... may be used if QF3 is used to control instruments to prevent the user from using projects! */
+        virtual void setProjectMode(bool projectModeEnabled=true, const QString& nonProjectTitle=QString("non-project mode"))=0;
 
     private:
         static QFPluginServices* inst;

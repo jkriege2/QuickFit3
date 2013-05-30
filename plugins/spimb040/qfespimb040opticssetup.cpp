@@ -146,7 +146,7 @@ QShortcut *QFESPIMB040OpticsSetup::addShortCut(const QString &id, const QString 
 
 void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
     bool updt=updatesEnabled();
-    setUpdatesEnabled(false);
+    if (updt) setUpdatesEnabled(false);
     ui->camConfig1->loadSettings(settings, prefix+"cam_config1/");
     ui->camConfig2->loadSettings(settings, prefix+"cam_config2/");
     ui->stageSetup->loadSettings(settings, prefix+"stages/");
@@ -186,7 +186,7 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
         shortcuts[i].shortcut->setKey(seq);
         shortcuts[i].shortcut->setEnabled(!seq.isEmpty());
     }
-    setUpdatesEnabled(updt);
+    if (updt) setUpdatesEnabled(updt);
 }
 
 void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) {
@@ -226,6 +226,15 @@ void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) 
     for (int i=0; i<shortcuts.size(); i++) {
         settings.setValue(prefix+"shortcut_"+shortcuts[i].id, shortcuts[i].shortcut->key().toString());
     }
+}
+
+QWidget *QFESPIMB040OpticsSetup::takeLightpathWidget() const
+{
+    QLayoutItem* it= ui->layHTop->takeAt(ui->layHTop->indexOf(ui->frmLightpath));
+    if (it) {
+        return it->widget();
+    }
+    return NULL;
 }
 
 void QFESPIMB040OpticsSetup::loadPluginGlobalSettings(QSettings &settings, QString prefix) {

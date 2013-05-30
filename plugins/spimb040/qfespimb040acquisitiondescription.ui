@@ -44,7 +44,7 @@
       <property name="spacing">
        <number>2</number>
       </property>
-      <item row="1" column="7">
+      <item row="2" column="7">
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>comment:</string>
@@ -54,7 +54,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
+      <item row="2" column="2">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>well:</string>
@@ -64,28 +64,28 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="11">
+      <item row="2" column="11">
        <widget class="QPushButton" name="btnClearAll">
         <property name="text">
          <string>reset</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="6">
+      <item row="2" column="6">
        <widget class="QPushButton" name="btnNextCell">
         <property name="text">
          <string>next cell</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="8">
+      <item row="2" column="8">
        <widget class="QEnhancedLineEdit" name="edtComment">
         <property name="placeholderText">
          <string>comment ...</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
          <string>plate/experiment:</string>
@@ -101,11 +101,11 @@
          <string>common prefix:</string>
         </property>
         <property name="buddy">
-         <cstring>spinPlate</cstring>
+         <cstring>edtPrefix</cstring>
         </property>
        </widget>
       </item>
-      <item row="1" column="4">
+      <item row="2" column="4">
        <widget class="QLabel" name="label_3">
         <property name="text">
          <string>sample/cell:</string>
@@ -115,7 +115,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="9">
+      <item row="2" column="9">
        <widget class="QLabel" name="label_5">
         <property name="text">
          <string>date/time:</string>
@@ -125,7 +125,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="2" column="1">
        <widget class="QSpinBox" name="spinPlate">
         <property name="minimum">
          <number>1</number>
@@ -135,7 +135,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
+      <item row="2" column="3">
        <widget class="QSpinBox" name="spinWell">
         <property name="minimum">
          <number>1</number>
@@ -145,7 +145,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="5">
+      <item row="2" column="5">
        <widget class="QSpinBox" name="spinCell">
         <property name="minimum">
          <number>1</number>
@@ -155,7 +155,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="10">
+      <item row="2" column="10">
        <widget class="QDateTimeEdit" name="edtDateTime">
         <property name="font">
          <font>
@@ -169,6 +169,23 @@
       </item>
       <item row="0" column="1" colspan="11">
        <widget class="QEnhancedLineEdit" name="edtPrefix">
+        <property name="placeholderText">
+         <string>prefix ...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>current sample:</string>
+        </property>
+        <property name="buddy">
+         <cstring>edtCurrentSampleName</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="11">
+       <widget class="QEnhancedLineEdit" name="edtCurrentSampleName">
         <property name="placeholderText">
          <string>prefix ...</string>
         </property>
@@ -195,8 +212,8 @@
    <slot>spinChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>147</x>
-     <y>38</y>
+     <x>141</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
      <x>212</x>
@@ -211,8 +228,8 @@
    <slot>spinChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>217</x>
-     <y>39</y>
+     <x>212</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
      <x>309</x>
@@ -227,8 +244,8 @@
    <slot>spinChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>355</x>
-     <y>46</y>
+     <x>317</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
      <x>424</x>

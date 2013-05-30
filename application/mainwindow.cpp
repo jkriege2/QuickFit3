@@ -55,6 +55,8 @@ void myMessageOutput(QtMsgType type, const char *msg)
 MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     QMainWindow(NULL)
 {
+    projectModeEnabled=true;
+    nonprojectTitle=tr("non-project mode");
     projectFileFilter=tr("QuickFit Project (*.qfp);;QuickFit Project Autosave (*.qfp.autosave *.qfp.autosave.backup);;QuickFit Project backup (*.qfp.backup)");
     projectSaveFileFilter=tr("QuickFit Project (*.qfp)");
     settings=s;
@@ -1418,7 +1420,8 @@ void MainWindow::setCurrentProject(const QString &fileName) {
     else
         shownName = strippedName(curFile);
 
-    setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("QuickFit %1").arg(qfInfoVersionFull())));
+    if (projectModeEnabled) setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("QuickFit %1").arg(qfInfoVersionFull())));
+    else  setWindowTitle(tr("%2 - %1").arg(nonprojectTitle).arg(tr("QuickFit %1").arg(qfInfoVersionFull())));
 
     // update recent files list in ini file
     recentMenu->addRecentFile(fileName);
@@ -1848,6 +1851,45 @@ QString MainWindow::getPluginConfigDirectory(const QString &pluginID)
     return settings->getConfigFileDirectory()+QString("/plugins/")+pluginID+QString("/");
 
 }
+
+void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProjectTitle)
+{
+    this->projectModeEnabled=projectModeEnabled;
+    this->nonprojectTitle=nonProjectTitle;
+    setUpdatesEnabled(false);
+    spMain->setEnabled(projectModeEnabled);
+    tvMain->setEnabled(projectModeEnabled);
+    tabLogs->setTabEnabled(tabLogs->indexOf(logFileProjectWidget), projectModeEnabled);
+    if (!projectModeEnabled) tabLogs->setCurrentWidget(logFileMainWidget);
+    if (projectModeEnabled) logFileMainWidget->log_header(tr("activating project mode"));
+    else logFileMainWidget->log_header(tr("disabling project mode"));
+
+    projectToolsMenu->setEnabled(projectModeEnabled);
+    projectSpecialMenu->setEnabled(projectModeEnabled);
+    dataMenu->setEnabled(projectModeEnabled);
+    evaluationMenu->setEnabled(projectModeEnabled);
+    insertItemMenu->setEnabled(projectModeEnabled);
+    fileToolBar->setEnabled(projectModeEnabled);
+    dataToolBar->setEnabled(projectModeEnabled);
+    newProjectAct->setEnabled(projectModeEnabled);
+    openProjectAct->setEnabled(projectModeEnabled);
+    openProjectSubsetAct->setEnabled(projectModeEnabled);
+    saveProjectAct->setEnabled(projectModeEnabled);
+    saveProjectAsAct->setEnabled(projectModeEnabled);
+    actReloadProject->setEnabled(projectModeEnabled);
+    actRDRReplace->setEnabled(projectModeEnabled);
+    actRDRUndoReplace->setEnabled(projectModeEnabled);
+    actPerformanceTest->setEnabled(projectModeEnabled);
+    actRDRSetProperty->setEnabled(projectModeEnabled);
+    actFixFilesPathes->setEnabled(projectModeEnabled);
+    delItemAct->setEnabled(projectModeEnabled);
+    recentMenu->setMenuEnabled(projectModeEnabled);
+
+    setUpdatesEnabled(true);
+    setCurrentProject(project->getFile());
+}
+
+
 
 
 QWidget *MainWindow::getCreateView(const QString &name, const QString &title)

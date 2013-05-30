@@ -181,6 +181,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         /** \brief return the config file directory of the online help for the given plugin ID */
         virtual QString getPluginConfigDirectory(const QString& pluginID);
 
+        virtual void setProjectMode(bool projectModeEnabled=true, const QString& nonProjectTitle=QString("non-project mode"));
+
         /** \brief searches for the given inifile (or \c PLUGINID.ini if \a inifiles is empty) in a list of subdirectories:
          *
          *  This function searches in these directories, in this order:
@@ -315,6 +317,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         bool saveProject(const QString &fileName);
         void setCurrentProject(const QString &fileName);
         QString strippedName(const QString &fullFileName);
+
+        bool projectModeEnabled;
+        QString nonprojectTitle;
 
         QString curFile;
         QPointer<QFProject> project;

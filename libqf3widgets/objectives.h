@@ -14,7 +14,7 @@
 #include <QMessageBox>
 #include "libwid_imexport.h"
 #include "qenhancedcombobox.h"
-
+#include <QPointer>
 /*! \brief description of an objective
     \ingroup qf3lib_widgets
 

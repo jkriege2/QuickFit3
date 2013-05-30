@@ -53,6 +53,9 @@ class QFESPIMB040OpticsSetup : public QWidget {
         /** \brief save settings */
         void storeSettings(QSettings& settings, QString prefix);
 
+        /** \brief removes the lightpath widget from it's place in the dialog and returns a pointer to it. */
+        QWidget* takeLightpathWidget() const;
+
 
 
         void loadPluginGlobalSettings(QSettings& settings, QString prefix);

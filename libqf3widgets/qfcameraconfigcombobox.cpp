@@ -33,7 +33,7 @@ QFCameraConfigComboBox::QFCameraConfigComboBox(QWidget* parent, QString configDi
     m_stopresume=NULL;
     defaultConfig="";
 //    std::cout<<"m_notifier="<<m_notifier<<std::endl;
-    if (m_notifier==NULL) m_notifier=new QFCameraConfigComboBoxNotifier(NULL);
+    if (m_notifier==NULL) m_notifier=new QFCameraConfigComboBoxNotifier(QApplication::instance());
     connect(m_notifier, SIGNAL(doUpdate()), this, SLOT(rereadConfigFiles()));
     init(configDirectory);
 }

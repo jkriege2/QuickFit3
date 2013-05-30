@@ -26,6 +26,7 @@ class QFESPIMB040AcquisitionDescription : public QWidget, public QFESPIMB040File
         int getWell() const;
         int getPlate() const;
         QString getComment() const;
+        QString getSample() const;
         QString getPrefix() const;
 
         void setOtherSettingWidgets(QFESPIMB040OpticsSetup *setup, QFESPIMB040ExperimentDescription *exp);

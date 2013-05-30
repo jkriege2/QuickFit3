@@ -62,9 +62,16 @@ void QFESPIMB040::startPlugin() {
     //QMessageBox::information(parentWidget, getName(), getDescription());
     if (!main) {
         main=new QFESPIMB040MainWindow2(services, NULL);
+        QFPluginServices::getInstance()->log_global_text("\n\n=========================================================\n");
+        QFPluginServices::getInstance()->log_global_text("== STARTING SPIM CONTROL PLUGIN!                       ==\n");
+        QFPluginServices::getInstance()->log_global_text("=========================================================\n\n\n");
+
+        QFPluginServices::getInstance()->setProjectMode(false, tr("!!!SPIM CONTROL MODE!!!"));
     }
-    if (settings) main->loadSettings(settings);
-    main->show();
+    if (main) {
+        if (settings) main->loadSettings(settings);
+        main->show();
+    }
     QApplication::restoreOverrideCursor();
 }
 

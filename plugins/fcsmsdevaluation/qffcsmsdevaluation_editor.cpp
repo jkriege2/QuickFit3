@@ -5,6 +5,8 @@
 #include "qffcsmsdevaluationfitmsddialog.h"
 #include "qfselectionlistdialog.h"
 #include "csvtools.h"
+#include "qffcsmsdevaluationaveragechannelsdialog.h"
+#include "qffcsmsdevaluationgetnfromfits.h"
 
 /////////////
 #include <QGridLayout>
@@ -301,9 +303,12 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     splitterDist->setCollapsible(1, false);
 
     QAction* actFirst=menuParameters->actions().value(0, NULL);
-    actAverageFirstFrames=new QAction(tr("&average first few frames for N"), this);
-    connect(actAverageFirstFrames, SIGNAL(triggered()), this, SLOT(averageFirstFewFrames()));
-    menuParameters->insertAction(actFirst, actAverageFirstFrames);
+    actAverageFirstLags=new QAction(tr("&average first few lags for N"), this);
+    connect(actAverageFirstLags, SIGNAL(triggered()), this, SLOT(averageFirstFewLags()));
+    menuParameters->insertAction(actFirst, actAverageFirstLags);
+    actGetNFromFits=new QAction(tr("get N from FCS fits"), this);
+    connect(actGetNFromFits, SIGNAL(triggered()), this, SLOT(getNFromFits()));
+    menuParameters->insertAction(actFirst, actGetNFromFits);
     menuParameters->insertSeparator(actFirst);
 
     actCopyAverageData=new QAction(QIcon(":/copy.png"), tr("&copy runs-average of MSD"), this);
@@ -1161,7 +1166,14 @@ void QFFCSMSDEvaluationEditor::distzoomChangedLocally(double newxmin, double new
     }
 }
 
-void QFFCSMSDEvaluationEditor::averageFirstFewFrames() {
+struct averageFirstFewFramesData {
+        QFRawDataRecord* record;
+        QFRDRFCSDataInterface* data;
+        int run;
+};
+
+void QFFCSMSDEvaluationEditor::averageFirstFewLags() {
+
     /* EXECUTE AN EVALUATION FOR THE CURRENT RECORD ONLY */
     if (!current) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
@@ -1173,41 +1185,198 @@ void QFFCSMSDEvaluationEditor::averageFirstFewFrames() {
     int data_start=datacut->get_userMin();
     int data_end=datacut->get_userMax();
 
-    bool ok=false;
-    int points=QInputDialog::getInt(this, windowTitle(), tr("number of points to average"), ProgramOptions::getConfigValue("QFFCSMSDEvaluationEditor/avgruns_last", 5).toInt(), 1, data_end-data_start, 1, &ok);
-    if (ok) {
+    QFFCSMSDEvaluationAverageChannelsDialog* dlg=new QFFCSMSDEvaluationAverageChannelsDialog(this);
+    dlg->init(ProgramOptions::getConfigValue("QFFCSMSDEvaluationEditor/avgruns_last", 5).toInt(), 1, data_end-data_start);
+    //bool ok=false;
+    //int points=QInputDialog::getInt(this, windowTitle(), tr("number of points to average"), ProgramOptions::getConfigValue("QFFCSMSDEvaluationEditor/avgruns_last", 5).toInt(), 1, data_end-data_start, 1, &ok);
+    if (dlg->exec()) {
+        int points=dlg->getPoints();
         ProgramOptions::setConfigValue("QFFCSMSDEvaluationEditor/avgruns_last", points);
         double *d=NULL;
-        if (eval->getCurrentIndex()<0) {
-            d=data->getCorrelationMean();
-        } else {
-            if (eval->getCurrentIndex()<(int)data->getCorrelationRuns()) {
-                d=data->getCorrelationRun(eval->getCurrentIndex());
-            } else {
-                d=data->getCorrelationMean();
+
+        QList<averageFirstFewFramesData > applyTo;
+        if (dlg->getApplyTo()==0) { // current
+            averageFirstFewFramesData dr;
+            dr.record=record;
+            dr.data=data;
+            dr.run=eval->getCurrentIndex();
+            applyTo.append(dr);
+        } else if (dlg->getApplyTo()==1) { // all runs
+            for (int i=eval->getIndexMin(record); i<=eval->getIndexMax(record); i++) {
+                averageFirstFewFramesData dr;
+                dr.record=record;
+                dr.data=data;
+                dr.run=i;
+                applyTo.append(dr);
             }
-        }
-        if (d) {
-            double avg=0;
-            double cnt=0;
-            for (int i=data_start; i<data_start+points; i++) {
-                avg=avg+d[i];
-                cnt++;
+        } else if (dlg->getApplyTo()==2) { // all files, this runs
+            QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+            for (int i=0; i<recs.size(); i++) {
+                averageFirstFewFramesData dr;
+                dr.record=recs[i];
+                dr.data=qobject_cast<QFRDRFCSDataInterface*>(dr.record);
+                dr.run=eval->getCurrentIndex();
+                if (dr.record&&dr.data && eval->getIndexMin(dr.record)<=dr.run && dr.run<=eval->getIndexMax(dr.record)) applyTo.append(dr);
             }
-            avg=avg/cnt;
-            for (int i=0; i<eval->getParameterCount(eval->getCurrentModel()); i++) {
-                QString pid=eval->getParameterID(eval->getCurrentModel(), i);
-                //qDebug()<<pid<<1.0/avg;
-                if (pid=="n_particle") {
-                    eval->setFitValue(record, eval->getCurrentIndex(), eval->getCurrentModel(), pid, 1.0/avg);
+        } else if (dlg->getApplyTo()==3) { // everything
+            QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+            for (int i=0; i<recs.size(); i++) {
+                for (int r=eval->getIndexMin(recs[i]); r<=eval->getIndexMax(recs[i]); r++) {
+                    averageFirstFewFramesData dr;
+                    dr.record=recs[i];
+                    dr.data=qobject_cast<QFRDRFCSDataInterface*>(dr.record);
+                    dr.run=r;
+                    if (dr.record&&dr.data && eval->getIndexMin(dr.record)<=dr.run && dr.run<=eval->getIndexMax(dr.record)) applyTo.append(dr);
                 }
             }
         }
 
+        QModernProgressDialog progress(tr("estimating N ..."), tr("Cancel"), this);
+        progress.show();
+        progress.setMode(true, true);
+        progress.setRange(0, applyTo.size());
+
+        for (int i=0; i<applyTo.size(); i++) {
+            progress.setValue(i);
+            data=applyTo[i].data;
+            record=applyTo[i].record;
+            int run=applyTo[i].run;
+
+            data_start=getUserMin(record, run);
+            data_end=getUserMax(record, run);
+
+            if (run<0) {
+                d=data->getCorrelationMean();
+            } else {
+                if (eval->getCurrentIndex()<(int)data->getCorrelationRuns()) {
+                    d=data->getCorrelationRun(run);
+                } else {
+                    d=data->getCorrelationMean();
+                }
+            }
+            if (d) {
+                double avg=0;
+                double cnt=0;
+                for (int j=data_start; j<qMin(data_end, data_start+points); j++) {
+                    avg=avg+d[j];
+                    cnt++;
+                }
+                avg=avg/cnt;
+                for (int j=0; j<eval->getParameterCount(eval->getCurrentModel()); j++) {
+                    QString pid=eval->getParameterID(eval->getCurrentModel(), j);
+                    //qDebug()<<pid<<1.0/avg;
+                    if (pid=="n_particle") {
+                        if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, 1.0/avg);
+                        eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, 1.0/avg);
+                    }
+                }
+            }
+            if (i%10==0) QApplication::processEvents();
+            if (progress.wasCanceled()) break;
+        }
+
     }
+    delete dlg;
     widFitParams->updateWidgetValues();
     fitParamChanged();
 
+}
+
+void QFFCSMSDEvaluationEditor::getNFromFits()
+{
+    /* EXECUTE AN EVALUATION FOR THE CURRENT RECORD ONLY */
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
+    QFFCSMSDEvaluationItem* eval=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    if ((!eval)||(!record)||(!data)) return;
+
+    int data_start=datacut->get_userMin();
+    int data_end=datacut->get_userMax();
+
+    QFFCSMSDEvaluationGetNFromFits* dlg=new QFFCSMSDEvaluationGetNFromFits(record, this);
+    //bool ok=false;
+    //int points=QInputDialog::getInt(this, windowTitle(), tr("number of points to average"), ProgramOptions::getConfigValue("QFFCSMSDEvaluationEditor/avgruns_last", 5).toInt(), 1, data_end-data_start, 1, &ok);
+    if (dlg->exec()) {
+
+        QList<averageFirstFewFramesData > applyTo;
+        if (dlg->getApplyTo()==0) { // current
+            averageFirstFewFramesData dr;
+            dr.record=record;
+            dr.data=data;
+            dr.run=eval->getCurrentIndex();
+            applyTo.append(dr);
+        } else if (dlg->getApplyTo()==1) { // all runs
+            for (int i=eval->getIndexMin(record); i<=eval->getIndexMax(record); i++) {
+                averageFirstFewFramesData dr;
+                dr.record=record;
+                dr.data=data;
+                dr.run=i;
+                applyTo.append(dr);
+            }
+        } else if (dlg->getApplyTo()==2) { // all files, this runs
+            QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+            for (int i=0; i<recs.size(); i++) {
+                averageFirstFewFramesData dr;
+                dr.record=recs[i];
+                dr.data=qobject_cast<QFRDRFCSDataInterface*>(dr.record);
+                dr.run=eval->getCurrentIndex();
+                if (dr.record&&dr.data && eval->getIndexMin(dr.record)<=dr.run && dr.run<=eval->getIndexMax(dr.record)) applyTo.append(dr);
+            }
+        } else if (dlg->getApplyTo()==3) { // everything
+            QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+            for (int i=0; i<recs.size(); i++) {
+                for (int r=eval->getIndexMin(recs[i]); r<=eval->getIndexMax(recs[i]); r++) {
+                    averageFirstFewFramesData dr;
+                    dr.record=recs[i];
+                    dr.data=qobject_cast<QFRDRFCSDataInterface*>(dr.record);
+                    dr.run=r;
+                    if (dr.record&&dr.data && eval->getIndexMin(dr.record)<=dr.run && dr.run<=eval->getIndexMax(dr.record)) applyTo.append(dr);
+                }
+            }
+        }
+
+
+        QFEvaluationItem* evalRead=dlg->getEval();
+        if (evalRead) {
+            QModernProgressDialog progress(tr("reading N from fit results ..."), tr("Cancel"), this);
+            progress.show();
+            progress.setMode(true, true);
+            progress.setRange(0, applyTo.size());
+
+            for (int i=0; i<applyTo.size(); i++) {
+                progress.setValue(i);
+                data=applyTo[i].data;
+                record=applyTo[i].record;
+                int run=applyTo[i].run;
+
+                double N=-1;
+
+
+                //TODO: implement this!
+
+
+                if (N>=0) {
+                    for (int j=0; j<eval->getParameterCount(eval->getCurrentModel()); j++) {
+                        QString pid=eval->getParameterID(eval->getCurrentModel(), j);
+                        //qDebug()<<pid<<1.0/avg;
+                        if (pid=="n_particle") {
+                            if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, N);
+                            eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, N);
+                        }
+                    }
+                }
+                if (i%10==0) QApplication::processEvents();
+                if (progress.wasCanceled()) break;
+            }
+        }
+
+    }
+    delete dlg;
+    widFitParams->updateWidgetValues();
+    fitParamChanged();
+    //QFFCSMSDEvaluationGetNFromFits;
 }
 
 void QFFCSMSDEvaluationEditor::copyAverageData() {

@@ -32,7 +32,7 @@ QFAcquisitionConfigComboBox::QFAcquisitionConfigComboBox(QWidget* parent, QStrin
     m_extension=NULL;
     m_stopresume=NULL;
 //    std::cout<<"m_notifier="<<m_notifier<<std::endl;
-    if (m_notifier==NULL) m_notifier=new QFAcquisitionConfigComboBoxNotifier(NULL);
+    if (m_notifier==NULL) m_notifier=new QFAcquisitionConfigComboBoxNotifier(QApplication::instance());
     connect(m_notifier, SIGNAL(doUpdate()), this, SLOT(rereadConfigFiles()));
     init(configDirectory);
 }
