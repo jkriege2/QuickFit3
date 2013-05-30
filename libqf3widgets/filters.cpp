@@ -61,7 +61,7 @@ QF3FilterComboboxNotifier* QF3FilterCombobox::m_notifier=NULL;
 QF3FilterCombobox::QF3FilterCombobox(QWidget* parent):
     QWidget(parent)
 {
-    if (m_notifier==NULL) m_notifier=new QF3FilterComboboxNotifier(QApplication::instance());
+    if (m_notifier==NULL) m_notifier=new QF3FilterComboboxNotifier(NULL);
     globalfilters="";
     localfilters="";
 

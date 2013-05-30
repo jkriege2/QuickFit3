@@ -1427,43 +1427,9 @@ void MainWindow::setCurrentProject(const QString &fileName) {
     recentMenu->addRecentFile(fileName);
     QSettings* s=settings->getQSettings();
     recentMenu->storeSettings(*s, "mainwindow/recentfilelist");
-    /*QStringList files = s->value("mainwindow/recentfilelist").toStringList();
-    files.removeAll(fileName);
-    files.prepend(fileName);
-    while (files.size() > MaxRecentFiles)
-        files.removeLast();
-    files.removeDuplicates();
-    if (files.size()>0) for (int j = files.size()-1; j >=0 ; j--) {
-        if (files[j].trimmed().isEmpty()) {
-            files.removeAt(j);
-        } else {
-            recentFileActs[j]->setVisible(false);
-        }
-    }
-    s->setValue("mainwindow/recentfilelist", files);
-    updateRecentFileActions();*/
+
 }
 
-/*void MainWindow::updateRecentFileActions(){
-    QSettings* s=settings->getQSettings();
-    QStringList files = s->value("mainwindow/recentfilelist").toStringList();
-    files.removeDuplicates();
-    if (files.size()>0) for (int j = files.size()-1; j >=0 ; j--) {
-        if (files[j].trimmed().isEmpty()) {
-            files.removeAt(j);
-        } else {
-            recentFileActs[j]->setVisible(false);
-        }
-    }
-    int numRecentFiles = qMin(files.size(), (int)MaxRecentFiles);
-    for (int i = 0; i < numRecentFiles; ++i) {
-        QString text = tr("&%1 %2").arg(i + 1).arg(strippedName(files[i]));
-        recentFileActs[i]->setText(text);
-        recentFileActs[i]->setData(files[i]);
-        recentFileActs[i]->setVisible(true);
-    }
-    if (recentMenu) recentMenu->setEnabled(numRecentFiles > 0);
-}*/
 
 QString MainWindow::strippedName(const QString &fullFileName) {
     return QFileInfo(fullFileName).fileName();
@@ -1886,7 +1852,8 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
     recentMenu->setMenuEnabled(projectModeEnabled);
 
     setUpdatesEnabled(true);
-    setCurrentProject(project->getFile());
+    if (project) setCurrentProject(project->getFile());
+    else setCurrentProject("");
 }
 
 

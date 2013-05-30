@@ -86,7 +86,7 @@ void QFESPIMB040MainWindow2::closeEvent ( QCloseEvent * event ) {
     QFPluginServices::getInstance()->log_global_text("=========================================================\n\n\n");
     QFPluginServices::getInstance()->setProjectMode(true);
     QWidget::closeEvent(event);
-    deleteLater();
+    //deleteLater();
 }
 
 void QFESPIMB040MainWindow2::showEvent( QShowEvent * event )  {
