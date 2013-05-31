@@ -1259,7 +1259,7 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
                     while (stage->getAxisState(stageAxis)==QFExtensionLinearStage::Moving) {
                         if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
                             progress.setLabelText(tr("moving stage to %1 microns (distance: %2) ...%3%4").arg(newPos).arg(fabs(stage->getPosition(stageAxis)-newPos)).arg(estimation).arg(fps));
-                            QApplication::processEvents();
+                            QApplication::processEvents(QEventLoop::AllEvents, 2);
                             if (progress.wasCanceled()) break;
                             t1.start();
                         }
@@ -1273,7 +1273,7 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
                     while (t.elapsed()<DeltaT) {
                         if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS)  {
                             progress.setLabelText(tr("moving stage to %1 microns (distance: %2) ... waiting%3%4").arg(newPos).arg(fabs(stage->getPosition(stageAxis)-newPos)).arg(estimation).arg(fps));
-                            QApplication::processEvents();
+                            QApplication::processEvents(QEventLoop::AllEvents, 2);
                             if (progress.wasCanceled()) break;
                             t1.start();
                         }
@@ -1298,7 +1298,7 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
                         if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
                             double dist=sqrt(qfSqr(stage->getPosition(stageAxis)-newPos)+qfSqr(stage2->getPosition(stageAxis2)-newPos2));
                             progress.setLabelText(tr("moving stage to (%1, %2) microns (distance: %3) ...%4%5").arg(newPos).arg(newPos2).arg(dist).arg(estimation).arg(fps));
-                            QApplication::processEvents();
+                            QApplication::processEvents(QEventLoop::AllEvents, 2);
                             if (progress.wasCanceled()) break;
                             t1.start();
                         }
@@ -1313,7 +1313,7 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
                         if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
                             double dist=sqrt(qfSqr(stage->getPosition(stageAxis)-newPos)+qfSqr(stage2->getPosition(stageAxis2)-newPos2));
                             progress.setLabelText(tr("moving stage to (%1, %2) microns (distance: %3) ... waiting%4%5").arg(newPos).arg(newPos2).arg(dist).arg(estimation).arg(fps));
-                            QApplication::processEvents();
+                            QApplication::processEvents(QEventLoop::AllEvents, 2);
                             if (progress.wasCanceled()) break;
                             t1.start();
                         }
@@ -1339,7 +1339,7 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
                         if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
                             double dist=sqrt(qfSqr(stage->getPosition(stageAxis)-newPos) + qfSqr(stage2->getPosition(stageAxis2)-newPos2) + qfSqr(stage3->getPosition(stageAxis3)-newPos3));
                             progress.setLabelText(tr("moving stage to (%1, %2, %3) microns (distance: %4) ...%5%6").arg(newPos).arg(newPos2).arg(newPos3).arg(dist).arg(estimation).arg(fps));
-                            QApplication::processEvents();
+                            QApplication::processEvents(QEventLoop::AllEvents, 2);
                             if (progress.wasCanceled()) break;
                             t1.start();
                         }
@@ -1354,7 +1354,7 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
                         if (t1.elapsed()>PROCESS_EVENTS_TIMEOUT_MS) {
                             double dist=sqrt(qfSqr(stage->getPosition(stageAxis)-newPos) + qfSqr(stage2->getPosition(stageAxis2)-newPos2) + qfSqr(stage3->getPosition(stageAxis3)-newPos3));
                             progress.setLabelText(tr("moving stage to (%1, %2, %3) microns (distance: %4) ... waiting%5%6").arg(newPos).arg(newPos2).arg(newPos3).arg(dist).arg(estimation).arg(fps));
-                            QApplication::processEvents();
+                            QApplication::processEvents(QEventLoop::AllEvents, 2);
                             if (progress.wasCanceled()) break;
                             t1.start();
                         }
@@ -1373,7 +1373,7 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
                 }
 
 
-                QApplication::processEvents();
+                QApplication::processEvents(QEventLoop::AllEvents, 2);
                 if (posIdx<moveTo.size()) {
                     if (progress.wasCanceled()) {
                         running=false;
@@ -1404,7 +1404,7 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
                                     fps=tr("\nacquisition rate: %1fps").arg(double(imageIdx+1)/duration, 0, 'f', 2);
                                 }
                                 progress.setLabelText(tr("acquiring images (%1/%2) ...%3%4").arg(imageIdx+1).arg(images).arg(estimation).arg(fps));
-                                QApplication::processEvents();
+                                QApplication::processEvents(QEventLoop::AllEvents, 2);
                                 if (progress.wasCanceled()) {
                                     running=false;
                                     log->log_warning(tr("  - acquisition canceled by user!\n"));
@@ -1447,7 +1447,7 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
                 posIdx++;
                 newPos+=stageDelta;
                 progress.setValue((int)round((double)posIdx/(double)moveTo.size()*100.0));
-                QApplication::processEvents();
+                QApplication::processEvents(QEventLoop::AllEvents, 10);
                 if (progress.wasCanceled()) {
                     break;
                 }
