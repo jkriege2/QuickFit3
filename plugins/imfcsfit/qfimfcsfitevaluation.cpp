@@ -600,6 +600,7 @@ QFImFCSMatchRDRFunctor *QFImFCSFitEvaluation::getMatchFunctor() const
 
 bool QFImFCSFitEvaluation::overrideFitFunctionPreset(QFRawDataRecord* r, QString paramid, double &value) const {
     if (qfFCSOverrideFitFunctionPreset(this, r, paramid, value)) {
+        qDebug()<<"found override for "<<paramid<<" : "<<value;
         return true;
     }
     return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPreset(r, paramid, value);

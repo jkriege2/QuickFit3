@@ -132,6 +132,11 @@ bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid
         error=0;
         return true;
     }
+    QString param=paramid;
+    if (param.contains("hieght")) {
+        return qfFCSHasSpecial(r, index, param.replace("hieght", "height", Qt::CaseInsensitive), value, error);
+    }
+
     return false;
 }
 
@@ -177,6 +182,10 @@ bool qfFCSOverrideFitFunctionPreset(const QFEvaluationItem* eval, const QFRawDat
             return true;
         }
     }
+    QString p=param;
+    if (p.contains("HIEGHT")) {
+        return qfFCSOverrideFitFunctionPreset(eval, r, p.replace("HIEGHT", "HEIGHT", Qt::CaseInsensitive), value, checkPositive);
+    }
     return false;
 }
 
@@ -213,6 +222,11 @@ bool qfFCSOverrideFitFunctionPresetError(const QFEvaluationItem* eval, const QFR
             return true;
         }
     }
+    QString p=param;
+    if (p.contains("HIEGHT")) {
+        return qfFCSOverrideFitFunctionPresetError(eval, r, p.replace("HIEGHT", "HEIGHT", Qt::CaseInsensitive), value, checkPositive);
+    }
+
     return false;
 
 }
@@ -242,6 +256,11 @@ bool qfFCSOverrideFitFunctionPresetFix(const QFEvaluationItem* eval, const QFRaw
         value=eval->getProperty(preset, false).toBool();
         return true;
     }
+    QString p=param;
+    if (p.contains("HIEGHT")) {
+        return qfFCSOverrideFitFunctionPresetFix(eval, r, p.replace("HIEGHT", "HEIGHT", Qt::CaseInsensitive), value);
+    }
+
     return false;
 }
 
