@@ -34,10 +34,10 @@ class QFFCSMSDEvaluationFitAllMSDDialog : public QDialog
         QVector<double> dist, distTau;
         int getRangeMin();
         int getRangeMax();
-        QList<QGroupBox> groupBoxs;
-        QList<QCheckBox> fixAlphas, fixDs;
-        QList<QFDoubleEdit> Ds, Ps, Alphas;
-        QList<DoubleDataCutSliders> Ranges;
+        QList<QGroupBox*> groupBoxs;
+        QList<QCheckBox*> fixAlphas, fixDs;
+        QList<QFDoubleEdit*> Ds, Ps, Alphas;
+        QList<DoubleDataCutSliders*> Ranges;
 };
 
 #endif // QFFCSMSDEvaluationFitAllMSDDialog_H

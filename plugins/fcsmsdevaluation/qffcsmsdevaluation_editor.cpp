@@ -309,7 +309,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     actGetNFromFits=new QAction(tr("get N from FCS fits"), this);
     connect(actGetNFromFits, SIGNAL(triggered()), this, SLOT(getNFromFits()));
     actFitAllMSD=new QAction(tr("fit theory to several MSDs"), this);
-    connect(actFitAllMSD, SIGNAL(triggered()), this, SLOT(fitAllMSD());
+    connect(actFitAllMSD, SIGNAL(triggered()), this, SLOT(fitAllMSD()));
 
     menuParameters->insertAction(actFirst, actFitAllMSD);
     menuParameters->insertAction(actFirst, actGetNFromFits);
@@ -1609,7 +1609,7 @@ void QFFCSMSDEvaluationEditor::fitAllMSD()
     if (!data) return;
 
 
-    QFFCSMSDEvaluationFitAllMSDDialog* dlg=new QFFCSMSDEvaluationFitAllMSDDialog(data, 0, this);
+    QFFCSMSDEvaluationFitAllMSDDialog* dlg=new QFFCSMSDEvaluationFitAllMSDDialog(data, this);
 
     dlg->exec();
 
