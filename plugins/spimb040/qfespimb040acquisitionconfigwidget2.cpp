@@ -703,6 +703,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         //////////////////////////////////////////////////////////////////////////////////////
         // SET LIGHTPATH
         //////////////////////////////////////////////////////////////////////////////////////
+        opticsSetup->lockLighpathCombobox();
         QString oldLightpath=opticsSetup->getCurrentLightpathFilename();
         QString lightpathName=lightpath();
         if (lightpathActivated()) {
@@ -716,6 +717,12 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                 opticsSetup->loadLightpathConfig(lightpathFilename(), true);
                 log->log_text(tr("  - setting acquisition lightpath settings '%1' ... DONE\n").arg(lightpath()));
             }
+        }
+
+        QApplication::processEvents();
+        if (progress.wasCanceled())  {
+            userCanceled=true;
+            ok=false;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////
@@ -737,6 +744,11 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         QString acquisitionPrefix1=prefix1();
         QString acquisitionPrefix2=prefix2();
         progress.nextItem();
+        QApplication::processEvents();
+        if (progress.wasCanceled())  {
+            userCanceled=true;
+            ok=false;
+        }
 
 
 
@@ -785,6 +797,10 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             progress.nextItem();
             progress.setLabelText(tr("acquiring background frames from cameras ..."));
             QApplication::processEvents();
+            if (progress.wasCanceled())  {
+                userCanceled=true;
+                ok=false;
+            }
 
             //////////////////////////////////////////////////////////////////////////////////////
             // switch off light
@@ -824,6 +840,11 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         // acquire overview images
         //////////////////////////////////////////////////////////////////////////////////////
         progress.nextItem();
+        QApplication::processEvents();
+        if (progress.wasCanceled())  {
+            userCanceled=true;
+            ok=false;
+        }
         QList<int> prevs;
         for (int ovrImg=1; ovrImg<previewCount(); ovrImg++) {
             prevs<<ovrImg;
@@ -887,6 +908,11 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         // acquire image series
         //////////////////////////////////////////////////////////////////////////////////////
         progress.nextItem();
+        QApplication::processEvents();
+        if (progress.wasCanceled())  {
+            userCanceled=true;
+            ok=false;
+        }
         QMap<QFExtensionCamera::CameraSetting, QVariant> camset1, camset2;
         camset1=getCameraSettings1();
         camset2=getCameraSettings2();
@@ -905,6 +931,11 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         // acquire overview images
         //////////////////////////////////////////////////////////////////////////////////////
         progress.nextItem();
+        QApplication::processEvents();
+        if (progress.wasCanceled())  {
+            userCanceled=true;
+            ok=false;
+        }
         prevs.clear();
         for (int ovrImg=0; ovrImg<previewCount(); ovrImg++) {
             prevs<<ovrImg;
@@ -950,6 +981,11 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
 
 
         progress.nextItem();
+        QApplication::processEvents();
+        if (progress.wasCanceled())  {
+            userCanceled=true;
+            ok=false;
+        }
         //////////////////////////////////////////////////////////////////////////////////////
         // RESET LIGHTPATH
         //////////////////////////////////////////////////////////////////////////////////////
@@ -957,6 +993,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             opticsSetup->loadLightpathConfig(oldLightpath, false);
             log->log_text(tr("  - resetting acquisition lightpath ...\n"));
         }
+        opticsSetup->unlockLighpathCombobox();
 
         //////////////////////////////////////////////////////////////////////////////////////
         // write acquisition data

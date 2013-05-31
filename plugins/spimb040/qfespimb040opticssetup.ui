@@ -1236,6 +1236,19 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
+         <widget class="QToolButton" name="btnUnlock">
+          <property name="font">
+           <font>
+            <pointsize>7</pointsize>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>&amp;unlock</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -2025,8 +2038,8 @@ p, li { white-space: pre-wrap; }
    <slot>saveCurrentLightpatConfig()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>672</x>
-     <y>35</y>
+     <x>284</x>
+     <y>36</y>
     </hint>
     <hint type="destinationlabel">
      <x>422</x>
@@ -2041,8 +2054,8 @@ p, li { white-space: pre-wrap; }
    <slot>deleteCurrentLightpatConfig()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>696</x>
-     <y>35</y>
+     <x>308</x>
+     <y>36</y>
     </hint>
     <hint type="destinationlabel">
      <x>557</x>
@@ -2057,8 +2070,8 @@ p, li { white-space: pre-wrap; }
    <slot>configShortcuts()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1079</x>
-     <y>38</y>
+     <x>1110</x>
+     <y>39</y>
     </hint>
     <hint type="destinationlabel">
      <x>534</x>
@@ -2322,6 +2335,22 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>btnUnlock</sender>
+   <signal>clicked()</signal>
+   <receiver>QFESPIMB040OpticsSetup</receiver>
+   <slot>unlockLighpathCombobox()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>329</x>
+     <y>27</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>409</x>
+     <y>48</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>updateMagnifications()</slot>
@@ -2329,5 +2358,6 @@ p, li { white-space: pre-wrap; }
   <slot>saveCurrentLightpatConfig()</slot>
   <slot>deleteCurrentLightpatConfig()</slot>
   <slot>configShortcuts()</slot>
+  <slot>unlockLighpathCombobox()</slot>
  </slots>
 </ui>

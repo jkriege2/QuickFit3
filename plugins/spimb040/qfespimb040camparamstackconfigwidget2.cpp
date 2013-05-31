@@ -481,6 +481,7 @@ void QFESPIMB040CamParamStackConfigWidget2::performStack()
         //////////////////////////////////////////////////////////////////////////////////////
         // SET LIGHTPATH
         //////////////////////////////////////////////////////////////////////////////////////
+        opticsSetup->lockLighpathCombobox();
         QString oldLightpath=opticsSetup->getCurrentLightpathFilename();
         QString oldLightpathName=opticsSetup->getCurrentLightpath();
         QString lightpathName="unknown";
@@ -826,6 +827,7 @@ void QFESPIMB040CamParamStackConfigWidget2::performStack()
             opticsSetup->loadLightpathConfig(oldLightpath, false);
             log->log_text(tr("  - resetting to old lightpath settings (%1) ...\n").arg(oldLightpath));//Name));
         }
+        opticsSetup->unlockLighpathCombobox();
 
         //////////////////////////////////////////////////////////////////////////////////////
         // close tiff files and free buffers

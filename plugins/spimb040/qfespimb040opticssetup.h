@@ -232,6 +232,8 @@ class QFESPIMB040OpticsSetup : public QWidget {
         void deleteCurrentLightpatConfig();
         void emitLighpathesChanged();
         void userChangedLightpath(QString filename);
+        void unlockLighpathCombobox();
+        void lockLighpathCombobox();
     signals:
         void lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes);
 

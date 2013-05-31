@@ -496,6 +496,7 @@ void QFESPIMB040OpticsSetup::overrideCameraPreview(int setup_cam, const QString 
     }
     if (setup_cam==0) ui->camConfig1->overridePreview(camera_settings);
     if (setup_cam==1) ui->camConfig2->overridePreview(camera_settings);
+    loadLightpathConfig(lightpath, true);
 }
 
 void QFESPIMB040OpticsSetup::resetCameraPreview(int setup_cam)
@@ -659,6 +660,7 @@ void QFESPIMB040OpticsSetup::on_chkDetectionFilterWheel_toggled(bool checked) {
 void QFESPIMB040OpticsSetup::configsChanged(QFESPIMB040OpticsSetupItems configs) {
     emit lightpathesChanged(configs);
 }
+
 
 void QFESPIMB040OpticsSetup::configShortcuts() {
     QFESPIMB040ShortcutConfigDialog* dlg=new QFESPIMB040ShortcutConfigDialog(this);
@@ -943,6 +945,16 @@ void QFESPIMB040OpticsSetup::userChangedLightpath(QString filename) {
     ui->cmbLightpathConfig->setEnabled(true);
 }
 
+void QFESPIMB040OpticsSetup::unlockLighpathCombobox()
+{
+    ui->cmbLightpathConfig->setEnabled(true);
+}
+
+void QFESPIMB040OpticsSetup::lockLighpathCombobox()
+{
+    ui->cmbLightpathConfig->setEnabled(false);
+}
+
 void QFESPIMB040OpticsSetup::ensureLightpath() {
    //qDebug()<<"ensureLightpath()";
     lockLightpath();
@@ -1206,6 +1218,7 @@ void QFESPIMB040OpticsSetup::loadLightpathConfig(const QString &filename, bool w
 
 
 void QFESPIMB040OpticsSetup::lockLightpath() {
+    lockLighpathCombobox();
    //qDebug()<<"locking lighpath 1";
     ui->shutterLaser1->lockShutters();
    //qDebug()<<"locking lighpath 2";
@@ -1232,6 +1245,7 @@ void QFESPIMB040OpticsSetup::unlockLightpath() {
     ui->lsLaser2->unlockLightSource();
     ui->lsTransmission->unlockLightSource();
     ui->filtcDetection->unlockFilterChangers();
+    unlockLighpathCombobox();
    //qDebug()<<"unlocking lightpath done";
 }
 
