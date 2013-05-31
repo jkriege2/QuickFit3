@@ -10,13 +10,13 @@
     <x>0</x>
     <y>0</y>
     <width>773</width>
-    <height>583</height>
+    <height>741</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Fit MSD power law</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0,0,0">
    <item>
     <widget class="QFPlotter" name="pltDistribution" native="true">
      <property name="minimumSize">
@@ -28,9 +28,60 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <layout class="QFormLayout" name="formLayout">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>apply fit to:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>algorithm:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="cmbFitType"/>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="cmbApplyTo">
+       <item>
+        <property name="text">
+         <string>current</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>all runs</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>all files, this run</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>everything</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpTheory1">
      <property name="title">
-      <string> Power-law fit </string>
+      <string> fit theory curve 1</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
@@ -45,7 +96,7 @@
       <property name="bottomMargin">
        <number>9</number>
       </property>
-      <item row="4" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -56,17 +107,17 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
+      <item row="3" column="1">
        <widget class="QFDoubleEdit" name="edtPre"/>
       </item>
-      <item row="4" column="2">
+      <item row="3" column="2">
        <widget class="QLabel" name="label_3">
         <property name="text">
          <string> * </string>
         </property>
        </widget>
       </item>
-      <item row="4" column="4">
+      <item row="3" column="4">
        <widget class="QLabel" name="label_5">
         <property name="text">
          <string> * &amp;tau; ^</string>
@@ -76,24 +127,24 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="5" column="3">
+      <item row="4" column="3">
        <widget class="QCheckBox" name="chkFixD">
         <property name="text">
          <string>fix</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="5">
+      <item row="4" column="5">
        <widget class="QCheckBox" name="chkFixAlpha">
         <property name="text">
          <string>fix</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="3">
+      <item row="3" column="3">
        <widget class="QFDoubleEdit" name="edtD"/>
       </item>
-      <item row="3" column="3">
+      <item row="2" column="3">
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>&lt;b&gt;D&lt;/b&gt; (fit parameter) =</string>
@@ -103,7 +154,7 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="2" column="1">
        <widget class="QLabel" name="label">
         <property name="text">
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -117,10 +168,10 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="4" column="5">
+      <item row="3" column="5">
        <widget class="QFDoubleEdit" name="edtAlpha"/>
       </item>
-      <item row="3" column="5">
+      <item row="2" column="5">
        <widget class="QLabel" name="label_6">
         <property name="text">
          <string>&lt;b&gt;alpha&lt;/b&gt;  (fit parameter) =</string>
@@ -130,17 +181,7 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string>algorithm:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1" colspan="6">
-       <widget class="QComboBox" name="cmbFitType"/>
-      </item>
-      <item row="4" column="6">
+      <item row="3" column="6">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -153,44 +194,432 @@ p, li { white-space: pre-wrap; }
         </property>
        </spacer>
       </item>
-      <item row="0" column="0" colspan="8">
-       <widget class="QLabel" name="label_8">
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="text">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-style:italic;&quot;&gt;A click on &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; font-style:italic;&quot;&gt;Fit&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-style:italic;&quot;&gt; will fit the power law &lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;table border=&quot;1&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;&quot; align=&quot;center&quot; cellspacing=&quot;0&quot; cellpadding=&quot;3&quot;&gt;
-&lt;tr&gt;
-&lt;td&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-style:italic;&quot;&gt;〈r&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-style:italic; vertical-align:super;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-style:italic;&quot;&gt;(τ)〉 = P · D · τ&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-style:italic; vertical-align:super;&quot;&gt;α&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; font-style:italic;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-style:italic;&quot;&gt;to the selected range in the MSD data. The variable P is the prefactor and usually P=6, as this resembles the Einstein relation &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-style:italic;&quot;&gt;〈r&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-style:italic; vertical-align:super;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-style:italic;&quot;&gt;(τ)〉 = 6·D·τ&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-style:italic;&quot;&gt; for normal 3D diffusion.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" colspan="8">
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
+      <item row="4" column="1">
        <widget class="QLabel" name="label_9">
         <property name="text">
          <string>&lt;i&gt;&lt;center&gt;(no fit parameter)&lt;/center&gt;&lt;/i&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="7">
+      <item row="3" column="7">
        <widget class="DoubleDataCutSliders" name="datacut" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>10</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpTheory1_2">
+     <property name="title">
+      <string> fit theory curve 2</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>2</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; 〈r&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;(τ)〉 = &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QFDoubleEdit" name="edtPre_2"/>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLabel" name="label_12">
+        <property name="text">
+         <string> * </string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4">
+       <widget class="QLabel" name="label_13">
+        <property name="text">
+         <string> * &amp;tau; ^</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="3">
+       <widget class="QCheckBox" name="chkFixD_2">
+        <property name="text">
+         <string>fix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="5">
+       <widget class="QCheckBox" name="chkFixAlpha_2">
+        <property name="text">
+         <string>fix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QFDoubleEdit" name="edtD_2"/>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLabel" name="label_14">
+        <property name="text">
+         <string>&lt;b&gt;D&lt;/b&gt; (fit parameter) =</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="label_15">
+        <property name="text">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;prefactor &lt;span style=&quot; font-weight:600;&quot;&gt;P =&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="5">
+       <widget class="QFDoubleEdit" name="edtAlpha_2"/>
+      </item>
+      <item row="2" column="5">
+       <widget class="QLabel" name="label_16">
+        <property name="text">
+         <string>&lt;b&gt;alpha&lt;/b&gt;  (fit parameter) =</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="6">
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="label_17">
+        <property name="text">
+         <string>&lt;i&gt;&lt;center&gt;(no fit parameter)&lt;/center&gt;&lt;/i&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="7">
+       <widget class="DoubleDataCutSliders" name="datacut_2" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>10</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpTheory1_4">
+     <property name="title">
+      <string> fit theory curve 3</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>2</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_25">
+        <property name="text">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; 〈r&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;(τ)〉 = &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QFDoubleEdit" name="edtPre_4"/>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLabel" name="label_26">
+        <property name="text">
+         <string> * </string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4">
+       <widget class="QLabel" name="label_27">
+        <property name="text">
+         <string> * &amp;tau; ^</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="3">
+       <widget class="QCheckBox" name="chkFixD_4">
+        <property name="text">
+         <string>fix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="5">
+       <widget class="QCheckBox" name="chkFixAlpha_4">
+        <property name="text">
+         <string>fix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QFDoubleEdit" name="edtD_4"/>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLabel" name="label_28">
+        <property name="text">
+         <string>&lt;b&gt;D&lt;/b&gt; (fit parameter) =</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="label_29">
+        <property name="text">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;prefactor &lt;span style=&quot; font-weight:600;&quot;&gt;P =&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="5">
+       <widget class="QFDoubleEdit" name="edtAlpha_4"/>
+      </item>
+      <item row="2" column="5">
+       <widget class="QLabel" name="label_30">
+        <property name="text">
+         <string>&lt;b&gt;alpha&lt;/b&gt;  (fit parameter) =</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="6">
+       <spacer name="horizontalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="label_31">
+        <property name="text">
+         <string>&lt;i&gt;&lt;center&gt;(no fit parameter)&lt;/center&gt;&lt;/i&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="7">
+       <widget class="DoubleDataCutSliders" name="datacut_4" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>10</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpTheory1_3">
+     <property name="title">
+      <string> fit theory curve 4</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>2</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_18">
+        <property name="text">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; 〈r&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;(τ)〉 = &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QFDoubleEdit" name="edtPre_3"/>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLabel" name="label_19">
+        <property name="text">
+         <string> * </string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4">
+       <widget class="QLabel" name="label_20">
+        <property name="text">
+         <string> * &amp;tau; ^</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="3">
+       <widget class="QCheckBox" name="chkFixD_3">
+        <property name="text">
+         <string>fix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="5">
+       <widget class="QCheckBox" name="chkFixAlpha_3">
+        <property name="text">
+         <string>fix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QFDoubleEdit" name="edtD_3"/>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLabel" name="label_21">
+        <property name="text">
+         <string>&lt;b&gt;D&lt;/b&gt; (fit parameter) =</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="label_22">
+        <property name="text">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;prefactor &lt;span style=&quot; font-weight:600;&quot;&gt;P =&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="5">
+       <widget class="QFDoubleEdit" name="edtAlpha_3"/>
+      </item>
+      <item row="2" column="5">
+       <widget class="QLabel" name="label_23">
+        <property name="text">
+         <string>&lt;b&gt;alpha&lt;/b&gt;  (fit parameter) =</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="6">
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="label_24">
+        <property name="text">
+         <string>&lt;i&gt;&lt;center&gt;(no fit parameter)&lt;/center&gt;&lt;/i&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="7">
+       <widget class="DoubleDataCutSliders" name="datacut_3" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -229,6 +658,13 @@ p, li { white-space: pre-wrap; }
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="pushButton_3">
+       <property name="text">
+        <string>&amp;Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButton_2">
        <property name="font">
         <font>
@@ -245,13 +681,6 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="default">
         <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="text">
-        <string>&amp;Cancel</string>
        </property>
       </widget>
      </item>

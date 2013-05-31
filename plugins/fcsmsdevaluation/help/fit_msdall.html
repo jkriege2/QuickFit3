@@ -1,0 +1,21 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>FCS Mean Squared Displacement (MSD) Online-Help: Fit All MSD Dialog</title>
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+    <p>This dialog can be used to fit a power law $$bmath:\langle r^2(\tau)\rangle=6\cdot D\cdot\tau^\alpha$$ to a selected range of MSD curves (e.g. the current only, or all runs of the current file, ...). Simply specify the range in which to fit, the initial values and the type of fit to perform and click on "Fit". All files and/or runs, selected in "apply to" will be fitted to the actvated models. The fit results will be stored in the "theory curves" of the runs/files.
+    </p>
+    <p>Several fit methods are available (although all fit the same model function):
+    
+  <ol>
+      <li><b>Levenberg-Marquardt-Fit (LM-Fit):</b> This method uses the standard LM least squares fit routine to fit the power law model</li>
+      <li><b>regression:</b> This uses a simple regression to fit a line to the double-logarithmically plotted data</li>
+      <li><b>robust regression (IRLS):</b> This uses a robust (iteratively reweighted least squares) regression to fit a line to the double-logarithmically plotted data. See <a href="http://cnx.org/content/m45285/latest/">http://cnx.org/content/m45285/latest/</a> for further information on IRLS.</li>
+  </ol>
+  </p>
+
+  </body>
+</html>

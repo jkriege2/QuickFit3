@@ -3,48 +3,60 @@
 #include "qffcsmsdevaluation_item.h"
 #include "qfpluginservices.h"
 
-QFFCSMSDEvaluationFitAllMSDDialog::QFFCSMSDEvaluationFitAllMSDDialog(QFFCSMSDEvaluationItem* evaluation, int theoryID, QWidget *parent) :
+QFFCSMSDEvaluationFitAllMSDDialog::QFFCSMSDEvaluationFitAllMSDDialog(QFFCSMSDEvaluationItem* evaluation, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QFFCSMSDEvaluationFitAllMSDDialog)
 {
     ui->setupUi(this);
     this->evaluation=evaluation;
-    this->theoryID=theoryID;
+    this->theoryID=0;
     dist=evaluation->getMSD(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel());
     distTau=evaluation->getMSDTaus(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel());
-    if (distTau.size()>0) {
-        ui->datacut->set_min(distTau.first());
-        ui->datacut->set_max(distTau.last());
-    }
-    ui->datacut->setLogScale(true, 20);
-    QString param=QString("msd_theory%1_fit_trangemin").arg(theoryID);
-    if (evaluation->fitValueExists(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param)) {
-        ui->datacut->set_userMin(evaluation->getFitValue(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param));
-    } else {
-        param=QString("msd_theory%1_fit_rangemin").arg(theoryID);
+
+    groupBoxs<<ui->grpTheory1<<ui->grpTheory1_2<<ui->grpTheory1_3<<ui->grpTheory1_4;
+    fixAlphas<<ui->chkFixAlpha<<ui->chkFixAlpha_2<<ui->chkFixAlpha_3<<ui->chkFixAlpha_4;
+    fixDs<<ui->chkFixD<<ui->chkFixD_2<<ui->chkFixD_3<<ui->chkFixD_4;
+    Ds<<ui->edtD<<ui->edtD_2<<ui->edtD_3<<ui->edtD_4;
+    Alphas<<ui->edtAlpha<<ui->edtAlpha_2<<ui->edtAlpha_3<<ui->edtAlpha_4;
+    Ps<<ui->edtPre<<ui->edtPre_2<<ui->edtPre_3<<ui->edtPre_4;
+    Ranges<<ui->datacut<<ui->datacut_2<<ui->datacut_3<<ui->datacut_4;
+
+    for (int i=0; i<groupBoxs.size(); i++) {
+        Ranges[i]->set_min(distTau.first()/10000.0);;
+        Ranges[i]->set_max(distTau.last()*10000.0);
+        Ranges[i]->setLogScale(true, 20);
+
+        QString param=QString("msd_theory%1_fit_trangemin").arg(i);
         if (evaluation->fitValueExists(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param)) {
-            ui->datacut->set_userMin(evaluation->getFitValue(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param));
+            Ranges[i]->set_userMin(evaluation->getFitValue(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param));
         } else {
-            ui->datacut->set_userMin(ui->datacut->get_min());
+            param=QString("msd_theory%1_fit_rangemin").arg(i);
+            if (evaluation->fitValueExists(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param)) {
+                Ranges[i]->set_userMin(evaluation->getFitValue(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param));
+            } else {
+                Ranges[i]->set_userMin(Ranges[i]->get_min());
+            }
         }
+
+        param=QString("msd_theory%1_fit_trangemax").arg(i);
+        if (evaluation->fitValueExists(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param)) {
+            Ranges[i]->set_userMax(evaluation->getFitValue(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param));
+        } else {
+            param=QString("msd_theory%1_fit_rangemax").arg(i);
+            if (evaluation->fitValueExists(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param)) {
+                Ranges[i]->set_userMax(evaluation->getFitValue(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param));
+            } else {
+                Ranges[i]->set_userMax(Ranges[i]->get_max());
+            }
+        }
+        Alphas[i]->setValue(evaluation->getTheoryAlpha(i, evaluation->getHighlightedRecord(), evaluation->getCurrentIndex()));
+        Ds[i]->setValue(evaluation->getTheoryD(i, evaluation->getHighlightedRecord(), evaluation->getCurrentIndex()));
+        Ps[i]->setValue(evaluation->getTheoryPre(i, evaluation->getHighlightedRecord(), evaluation->getCurrentIndex()));
+        fixAlphas[i]->setChecked(evaluation->getFitFix(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), evaluation->getTheoryAlphaName(i, evaluation->getHighlightedRecord(), evaluation->getCurrentIndex())));
+        fixDs[i]->setChecked(evaluation->getFitFix(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), evaluation->getTheoryDName(i, evaluation->getHighlightedRecord(), evaluation->getCurrentIndex())));
+
     }
 
-    param=QString("msd_theory%1_fit_trangemax").arg(theoryID);
-    if (evaluation->fitValueExists(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param)) {
-        ui->datacut->set_userMax(evaluation->getFitValue(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param));
-    } else {
-        param=QString("msd_theory%1_fit_rangemax").arg(theoryID);
-        if (evaluation->fitValueExists(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param)) {
-            ui->datacut->set_userMax(evaluation->getFitValue(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), param));
-        } else {
-            ui->datacut->set_userMax(ui->datacut->get_max());
-        }
-    }
-    ui->edtAlpha->setValue(evaluation->getTheoryAlpha(theoryID, evaluation->getHighlightedRecord(), evaluation->getCurrentIndex()));
-    ui->edtD->setValue(evaluation->getTheoryD(theoryID, evaluation->getHighlightedRecord(), evaluation->getCurrentIndex()));
-    ui->edtPre->setValue(evaluation->getTheoryPre(theoryID, evaluation->getHighlightedRecord(), evaluation->getCurrentIndex()));
-    ui->chkFixAlpha->setChecked(evaluation->getFitFix(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), evaluation->getTheoryAlphaName(theoryID, evaluation->getHighlightedRecord(), evaluation->getCurrentIndex())));
-    ui->chkFixD->setChecked(evaluation->getFitFix(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex(), evaluation->getCurrentModel(), evaluation->getTheoryDName(theoryID, evaluation->getHighlightedRecord(), evaluation->getCurrentIndex())));
     ui->cmbFitType->addItems(QFFCSMSDEvaluationItem::getFitTypes());
     ui->cmbFitType->setCurrentIndex(evaluation->getFitType(evaluation->getHighlightedRecord(), evaluation->getCurrentIndex()));
 
@@ -168,7 +180,7 @@ void QFFCSMSDEvaluationFitAllMSDDialog::replotGraph()
 
 void QFFCSMSDEvaluationFitAllMSDDialog::showHelp()
 {
-    QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("fcs_msd")+"fit_msd.html");
+    QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("fcs_msd")+"fit_msdall.html");
 }
 
 void QFFCSMSDEvaluationFitAllMSDDialog::connectSignals(bool connectS)
