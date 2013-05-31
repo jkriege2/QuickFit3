@@ -64,7 +64,7 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
 
     chkDontSaveFitResultMessage=new QCheckBox(tr("don't save fit messages"), this);
     chkDontSaveFitResultMessage->setToolTip(tr("this improves the speed of saving the project significantly!"));
-    chkDontSaveFitResultMessage->setChecked(false);
+    chkDontSaveFitResultMessage->setChecked(true);
     connect(chkDontSaveFitResultMessage, SIGNAL(toggled(bool)), this, SLOT(dontSaveFitResultMessageChanged(bool)));
 
 
@@ -132,7 +132,7 @@ void QFImFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerReco
     if (eval) {
         dataEventsEnabled=false;
         cmbWeights->setCurrentWeight(eval->getFitDataWeighting());
-        chkDontSaveFitResultMessage->setChecked(current->getProperty("dontSaveFitResultMessage", false).toBool());
+        chkDontSaveFitResultMessage->setChecked(current->getProperty("dontSaveFitResultMessage", true).toBool());
         chkLeaveoutMasked->setChecked(current->getProperty("LEAVEOUTMASKED", true).toBool());
         pltOverview->setRDR(currentRecord);
         connect(pltOverview, SIGNAL(currentRunChanged(int)), this, SLOT(overviewRunChanged(int)));
