@@ -55,10 +55,10 @@ INCLUDEPATH += ../../lib/ \
 QT += gui xml svg
 CONFIG += exceptions rtti stl
 
-ASSETSTESTDATA_FILES.files = ./assets/fcs_testdata/*.*
-ASSETSTESTDATA_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/fcs_testdata/
-ASSETSTESTFCCSDATA_FILES.files = ./assets/fccs_data/*.*
-ASSETSTESTFCCSDATA_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/fccs_data/
+ASSETSTESTDATA_FILES.files = ./examples/fcs_testdata/*.*
+ASSETSTESTDATA_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/fcs_testdata/
+ASSETSTESTFCCSDATA_FILES.files = ./examples/fccs_data/*.*
+ASSETSTESTFCCSDATA_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/fccs_data/
 
 INSTALLS += ASSETSTESTDATA_FILES ASSETSTESTFCCSDATA_FILES
 

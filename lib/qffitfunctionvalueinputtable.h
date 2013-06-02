@@ -61,8 +61,6 @@ class QFLIB_EXPORT QFFitFunctionValueInputTable : public QAbstractTableModel
         void setWriteTo(QVector<double>* datavector, const QStringList& rownames, const QStringList& rowlabels=QStringList());
         void setWriteTo(QMap<QString, QFFitFunctionValueInputTableFitParamData>* datamap, QFFitFunction* fitfunction, bool ownsFitFunction=true);
         void setWriteTo(QMap<QString, QFFitFunctionValueInputTableFitParamData>* datamap, const QStringList& rownames, const QStringList& rowlabels=QStringList());
-        void setEditErrors(bool editerrors);
-        void setEditFix(bool editfix);
 
         void setWriteToFitParamBasic(QFFitParameterBasicInterface* intf);
         void setAuxiliaryWriteTo(QVector<double>* errorvector, QVector<double>* minvector, QVector<double>* maxvector, QVector<bool>* fixvector);
@@ -88,6 +86,8 @@ class QFLIB_EXPORT QFFitFunctionValueInputTable : public QAbstractTableModel
         void rebuildModel();
         bool recalculateFitParameters(bool emitFitParamSignals=true, bool emit dataChangedSignals=true);
         void setEditRanges(bool enabled);
+        void setEditErrors(bool editerrors);
+        void setEditFix(bool editfix);
         void setDoRebuildModel(bool doReb);
     public:
         bool checkRebuildModel(bool alwaysreset=false);

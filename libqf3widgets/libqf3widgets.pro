@@ -24,7 +24,7 @@ QT += gui xml svg opengl
 
 DESTDIR = $$QFOUTPUT
 
-
+#DEFINES += JKQTBP_AUTOTIMER
 # Input
 HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            ../../../../LIB/trunk/qt/jkqtpdatastorage.h \
@@ -110,7 +110,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfrdrtablecombobox.h \
     qfplottercopytotabledialog.h \
     qfmathparserxfunctionlinegraph.h \
-    doubledatacutsliders.h
+    doubledatacutsliders.h \
+    ../../../../LIB/trunk/qt/jkautooutputtimer.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -182,7 +183,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfrdrtablecombobox.cpp \
     qfplottercopytotabledialog.cpp \
     qfmathparserxfunctionlinegraph.cpp \
-    doubledatacutsliders.cpp
+    doubledatacutsliders.cpp \
+    ../../../../LIB/trunk/qt/jkautooutputtimer.cpp
 
 
 FORMS += qfdlg_csvparameters.ui \

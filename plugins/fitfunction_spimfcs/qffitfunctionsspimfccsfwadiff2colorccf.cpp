@@ -56,6 +56,10 @@ QFFitFunctionsSPIMFCCSFWADiff2ColorCCF::QFFitFunctionsSPIMFCCSFWADiff2ColorCCF()
     #define FCCSDiff_count_rate2 24
     addParameter(FloatNumber,  "background2",              "background count rate red, during measurement",           "B<sub>r</sub>",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
     #define FCCSDiff_background2 25
+    addParameter(FloatNumber,  "brightness_a",             "molar brightness of fluorophore on A",           "&eta;<sub>a</sub>",            "counts/nM",           "counts/nM^{-1}",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
+    #define FCCSDiff_brightness_a 26
+    addParameter(FloatNumber,  "brightness_b",             "molar brightness of fluorophore on B",           "&eta;<sub>b</sub>",            "counts/nM",           "counts/nM^{-1}",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
+    #define FCCSDiff_brightness_b 27
 
 }
 
@@ -151,17 +155,17 @@ void QFFitFunctionsSPIMFCCSFWADiff2ColorCCF::calcParameter(double* data, double*
 //    const double offset=data[FCCSDiff_offset];
 //    double eoffset=0;
 
-//    const double kappa=data[FCCSDiff_crosstalk];
-//    double ekappa=0;
+    const double kappa=data[FCCSDiff_crosstalk];
+    double ekappa=0;
 
-//    const double background1=data[FCCSDiff_background1];
-//    double ebackground1=0;
-//    const double cr1=data[FCCSDiff_count_rate1];
-//    double ecr1=0;
-//    const double background2=data[FCCSDiff_background2];
-//    double ebackground2=0;
-//    const double cr2=data[FCCSDiff_count_rate2];
-//    double ecr2=0;
+    const double background1=data[FCCSDiff_background1];
+    double ebackground1=0;
+    const double cr1=data[FCCSDiff_count_rate1];
+    double ecr1=0;
+    const double background2=data[FCCSDiff_background2];
+    double ebackground2=0;
+    const double cr2=data[FCCSDiff_count_rate2];
+    double ecr2=0;
     if (error) {
         ecab=error[FCCSDiff_concentrationab]*6.022e-1; // FCCSDiff_concentrationab given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
         eca=error[FCCSDiff_concentrationa]*6.022e-1; // FCCSDiff_concentrationa given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
@@ -178,12 +182,18 @@ void QFFitFunctionsSPIMFCCSFWADiff2ColorCCF::calcParameter(double* data, double*
 //        ewxyR=error[FCCSDiff_focus_width2]/1.0e3;
 //        ea=error[FCCSDiff_pixel_width]/1.0e3;
 //        eoffset=error[FCCSDiff_offset];
-//        ekappa=error[FCCSDiff_crosstalk];
-//        ebackground1=error[FCCSDiff_background1];
-//        ecr1=error[FCCSDiff_count_rate1];
-//        ebackground2=error[FCCSDiff_background2];
-//        ecr2=error[FCCSDiff_count_rate2];
+        ekappa=error[FCCSDiff_crosstalk];
+        ebackground1=error[FCCSDiff_background1];
+        ecr1=error[FCCSDiff_count_rate1];
+        ebackground2=error[FCCSDiff_background2];
+        ecr2=error[FCCSDiff_count_rate2];
     }
+
+    data[FCCSDiff_brightness_a]=(cr1-background1)/(ca+cab);
+    if (error) error[FCCSDiff_brightness_a]=0;
+    data[FCCSDiff_brightness_b]=(cr2-background2-kappa*(cr1-background1))/(cb+cab);
+    if (error) error[FCCSDiff_brightness_b]=0;
+
 
     data[FCCSDiff_relconcentration]=cab/(ca+cb+cab);
     if (error) error[FCCSDiff_relconcentration]=sqrt(qfSqr(eca*cab/qfSqr(ca+cb+cab))+qfSqr(ecb*cab/qfSqr(ca+cb+cab))+qfSqr(ecab*(ca+cb)/qfSqr(ca+cb+cab)));

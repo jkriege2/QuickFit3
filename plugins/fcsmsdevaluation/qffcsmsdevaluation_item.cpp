@@ -785,7 +785,7 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
                 control.maxcall=getParameter("max_iterations").toInt();*/
 
                 msd_diff3d_params d = {wxy, gamma, N_particle, meas_acf};
-                double r=60.0*tau;
+                double r=3.0*sqr(wxy)/2.0*(1.0/N_particle/corrdata[rangeMinDatarange+i]-1.0);
                 if (msd.size()==Ndist && msd_tau.size()==Ndist && msd_tau[i]==distTaus[i]) {
                     r=msd[i];
                 }

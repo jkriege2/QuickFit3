@@ -38,8 +38,8 @@ QT += gui xml core
 CONFIG += exceptions rtti stl
 
 
-ASSETS_TESTDATA.files = ./assets/test_data/*.*
-ASSETS_TESTDATA.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/test_data/
+ASSETS_TESTDATA.files = ./examples/test_data/*.*
+ASSETS_TESTDATA.path = $${QFOUTPUT}/examples/$${TARGET}/test_data/
 INSTALLS += ASSETS_TESTDATA
 
 

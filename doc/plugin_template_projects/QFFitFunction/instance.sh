@@ -73,6 +73,7 @@ for i in ${BASENAME}_f1.*; do
 done
 
 mkdir -p $FNAME/translations
+mkdir -p $FNAME/examples
 mkdir -p $FNAME/help
 mkdir -p $FNAME/help/pic
 cp ftarget.html $FNAME/help/${TARGETNAME}.html

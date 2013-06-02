@@ -107,6 +107,8 @@ class QFWIDLIB_EXPORT DataCutSliders : public QWidget
     public slots:
         /** \brief sets all the data and constraints of the widget at once */
         void setValues(int userMin, int userMax, int min, int max);
+
+        void setCentralLabel(const QString& label);
     private:
         /** \brief update the widgets with the values in the private data members */
         void update();
@@ -147,6 +149,7 @@ class QFWIDLIB_EXPORT DataCutSliders : public QWidget
         bool copyToRunsEnabled;
         /** \brief enable copy to all files */
         bool copyToFilesEnabled;
+        QLabel* labCentral;
 };
 
 

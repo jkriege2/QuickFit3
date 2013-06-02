@@ -38,6 +38,12 @@ SRC_DISTRIBUTED.path = $${QFOUTPUT}/source/plugins/$${TARGET}/
 HELP_FILES.files = ./help/*.*
 HELP_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/
 
+HELPPARSERREF_FILES.files = ./help/parserreference/*.*
+HELPPARSERREF_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/parserreference/
+
+HELPPARSERREFPIC_FILES.files = ./help/parserreference/pic/*.*
+HELPPARSERREFPIC_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/parserreference/pic/
+
 HELPPIC_FILES.files = ./help/pic/*.*
 HELPPIC_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/pic/
 
@@ -59,7 +65,10 @@ GLOBALCONFIGMACX_FILES.path = $${QFOUTPUT}/globalconfig_templates/
 ASSETS_TRANSLATIONS.files = ./translations/*.qm
 ASSETS_TRANSLATIONS.path = $${QFOUTPUT}/assets/translations/
 
-INSTALLS += HELP_FILES HELPPIC_FILES ASSETS_FILES GLOBALCONFIG_FILES ASSETS_TRANSLATIONS SRC_DISTRIBUTED
+EXAMPLES_FILES.files = ./examples/*.*
+EXAMPLES_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/
+
+INSTALLS += HELP_FILES HELPPIC_FILES ASSETS_FILES GLOBALCONFIG_FILES ASSETS_TRANSLATIONS SRC_DISTRIBUTED EXAMPLES_FILES HELPPARSERREF_FILES HELPPARSERREFPIC_FILES
 
 win32 {
     INSTALLS += GLOBALCONFIGWIN32_FILES

@@ -21,8 +21,7 @@ class QFFCSMSDEvaluationFitAllMSDDialog : public QDialog
         ~QFFCSMSDEvaluationFitAllMSDDialog();
 
     protected slots:
-        void saveResults();
-        void on_btnFit_clicked();
+        void performFit();
         void replotGraph();
         void showHelp();
     protected:
@@ -30,10 +29,9 @@ class QFFCSMSDEvaluationFitAllMSDDialog : public QDialog
     private:
         Ui::QFFCSMSDEvaluationFitAllMSDDialog *ui;
         QFFCSMSDEvaluationItem* evaluation;
-        int theoryID;//TODO: deprecated!!!
         QVector<double> dist, distTau;
-        int getRangeMin();
-        int getRangeMax();
+        int getRangeMin(const QVector<double> &distTau, DoubleDataCutSliders *sliders);
+        int getRangeMax(const QVector<double> &distTau, DoubleDataCutSliders *sliders);
         QList<QGroupBox*> groupBoxs;
         QList<QCheckBox*> fixAlphas, fixDs;
         QList<QFDoubleEdit*> Ds, Ps, Alphas;

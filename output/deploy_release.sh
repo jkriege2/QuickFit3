@@ -201,6 +201,7 @@ if [ "${create_deploy}" != "0" ]; then
 	mkdir ../deployspim/globalconfig_templates
 	mkdir ../deployspim/source
 	mkdir ../deployspim/assets
+	mkdir ../deployspim/examples
 	mkdir ../deployspim/assets/plugins
 	mkdir ../deployspim/assets/plugins/help
 
@@ -209,6 +210,7 @@ if [ "${create_deploy}" != "0" ]; then
 	mkdir ../deployspecial/globalconfig_templates
 	mkdir ../deployspecial/source
 	mkdir ../deployspecial/assets
+	mkdir ../deployspecial/examples
 	mkdir ../deployspecial/assets/plugins
 	mkdir ../deployspecial/assets/plugins/help
 
@@ -227,6 +229,7 @@ if [ "${create_deploy}" != "0" ]; then
 		mkdir "../deployspim/assets/plugins/${f}"
 		mkdir "../deployspim/assets/plugins/help/${f}"
 		cp -rf  "./assets/plugins/${f}" "../deployspim/assets/plugins/"
+		cp -rf  "./examples/${f}" "../deployspecial/examples/"
 		cp -rf  "./assets/plugins/help/${f}" "../deployspim/assets/help/plugins/"
 		find -name "${f}.*" -exec cp -rf "{}" "../deployspim/{}" \;
 	done
@@ -234,8 +237,10 @@ if [ "${create_deploy}" != "0" ]; then
 	for f in $SPECIALPLUGINS
 	do
 		mkdir "../deployspecial/assets/plugins/${f}"
+		mkdir "../deployspecial/examples/${f}"
 		mkdir "../deployspecial/assets/plugins/help/${f}"
 		cp -rf  "./assets/plugins/${f}" "../deployspecial/assets/plugins/"
+		cp -rf  "./examples/${f}" "../deployspecial/examples/"
 		cp -rf  "./assets/plugins/help/${f}" "../deployspecial/assets/help/plugins/"
 		find -name "${f}.*" -exec cp -rf "{}" "../deployspecial/{}" \;
 	done
@@ -247,6 +252,8 @@ if [ "${create_deploy}" != "0" ]; then
 		find -name "${f}.*" -exec rm -rf {} \;
 	done
 
+	
+	
 	rm *.sh
 	rm *.ini
 	rm *.nsi

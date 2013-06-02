@@ -108,6 +108,8 @@ class QFWIDLIB_EXPORT DoubleDataCutSliders : public QWidget
     public slots:
         /** \brief sets all the data and constraints of the widget at once */
         void setValues(double userMin, double userMax, double min, double max);
+
+        void setCentralText(const QString& label);
     private:
         /** \brief update the widgets with the values in the private data members */
         void update();
@@ -148,6 +150,8 @@ class QFWIDLIB_EXPORT DoubleDataCutSliders : public QWidget
         bool copyToRunsEnabled;
         /** \brief enable copy to all files */
         bool copyToFilesEnabled;
+
+        QLabel* labCentral;
 };
 
 #endif // DOUBLEDATACUTSLIDERS_H

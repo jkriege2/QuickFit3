@@ -39,6 +39,7 @@ DataCutSliders::DataCutSliders(QWidget* parent):
 
     QLabel* lab1=new QLabel(tr("<b>lower & upper cut-off</b>"), this);
     lab1->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+    labCentral=lab1;
     layout->addWidget(editLow,  0, 0, Qt::AlignLeft|Qt::AlignTop);
     layout->addWidget(lab1, 0, 1, Qt::AlignRight|Qt::AlignBottom);
     layout->addWidget(editHigh, 0, 2, Qt::AlignRight|Qt::AlignTop);
@@ -123,6 +124,11 @@ void DataCutSliders::setValues(int userMin, int userMax, int min, int max) {
     this->min=min;
     this->max=max;
     update();
+}
+
+void DataCutSliders::setCentralLabel(const QString &label)
+{
+    labCentral->setText(label);
 }
 
 void DataCutSliders::update() {

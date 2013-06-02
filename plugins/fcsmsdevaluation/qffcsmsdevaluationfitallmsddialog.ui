@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>773</width>
-    <height>741</height>
+    <width>814</width>
+    <height>677</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -73,6 +73,20 @@
        </item>
       </widget>
      </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>model:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="JKQTMathTextLabel" name="labEquation">
+       <property name="text">
+        <string>\langle r^2(\tau)\rangle = P\cdot D\cdot\tau^\alpha</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -82,6 +96,9 @@
      </property>
      <property name="checkable">
       <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
@@ -96,92 +113,30 @@
       <property name="bottomMargin">
        <number>9</number>
       </property>
-      <item row="3" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; 〈r&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;(τ)〉 = &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QFDoubleEdit" name="edtPre"/>
-      </item>
-      <item row="3" column="2">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string> * </string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="4">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string> * &amp;tau; ^</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::RichText</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="3">
-       <widget class="QCheckBox" name="chkFixD">
-        <property name="text">
-         <string>fix</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="5">
-       <widget class="QCheckBox" name="chkFixAlpha">
-        <property name="text">
-         <string>fix</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="3">
-       <widget class="QFDoubleEdit" name="edtD"/>
-      </item>
-      <item row="2" column="3">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>&lt;b&gt;D&lt;/b&gt; (fit parameter) =</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <string>&lt;font color=&quot;red&quot;&gt;&amp;diams;&amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;b&gt;P=&lt;/b&gt;</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLabel" name="label">
+       <widget class="QFDoubleEdit" name="edtPre"/>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;prefactor &lt;span style=&quot; font-weight:600;&quot;&gt;P =&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <string>&lt;b&gt;D=&lt;/b&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="5">
+      <item row="2" column="3">
+       <widget class="QFDoubleEdit" name="edtD"/>
+      </item>
+      <item row="2" column="6">
        <widget class="QFDoubleEdit" name="edtAlpha"/>
       </item>
-      <item row="2" column="5">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>&lt;b&gt;alpha&lt;/b&gt;  (fit parameter) =</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="6">
+      <item row="2" column="8">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -194,20 +149,47 @@ p, li { white-space: pre-wrap; }
         </property>
        </spacer>
       </item>
-      <item row="4" column="1">
-       <widget class="QLabel" name="label_9">
-        <property name="text">
-         <string>&lt;i&gt;&lt;center&gt;(no fit parameter)&lt;/center&gt;&lt;/i&gt;</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="7">
+      <item row="2" column="10">
        <widget class="DoubleDataCutSliders" name="datacut" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
           <height>10</height>
          </size>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="QCheckBox" name="chkFixD">
+        <property name="text">
+         <string>fix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="7">
+       <widget class="QCheckBox" name="chkFixAlpha">
+        <property name="text">
+         <string>fix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="9">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>&lt;b&gt;fit range: &lt;/b&gt;</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="5">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>&lt;b&gt;&amp;alpha;=&lt;/b&gt;</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
         </property>
        </widget>
       </item>
@@ -222,6 +204,9 @@ p, li { white-space: pre-wrap; }
      <property name="checkable">
       <bool>true</bool>
      </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <property name="leftMargin">
        <number>9</number>
@@ -235,92 +220,40 @@ p, li { white-space: pre-wrap; }
       <property name="bottomMargin">
        <number>9</number>
       </property>
-      <item row="3" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label_11">
         <property name="text">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; 〈r&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;(τ)〉 = &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;font color=&quot;green&quot;&gt;&amp;diams;&amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;b&gt;P=&lt;/b&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="2" column="1">
        <widget class="QFDoubleEdit" name="edtPre_2"/>
       </item>
-      <item row="3" column="2">
+      <item row="2" column="2">
        <widget class="QLabel" name="label_12">
         <property name="text">
-         <string> * </string>
+         <string>&lt;b&gt;D=&lt;/b&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="4">
+      <item row="2" column="5">
        <widget class="QLabel" name="label_13">
         <property name="text">
-         <string> * &amp;tau; ^</string>
+         <string>&lt;b&gt;&amp;alpha;=&lt;/b&gt;</string>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
         </property>
        </widget>
       </item>
-      <item row="4" column="3">
-       <widget class="QCheckBox" name="chkFixD_2">
-        <property name="text">
-         <string>fix</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="5">
-       <widget class="QCheckBox" name="chkFixAlpha_2">
-        <property name="text">
-         <string>fix</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="3">
+      <item row="2" column="3">
        <widget class="QFDoubleEdit" name="edtD_2"/>
       </item>
-      <item row="2" column="3">
-       <widget class="QLabel" name="label_14">
-        <property name="text">
-         <string>&lt;b&gt;D&lt;/b&gt; (fit parameter) =</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="label_15">
-        <property name="text">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;prefactor &lt;span style=&quot; font-weight:600;&quot;&gt;P =&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="5">
+      <item row="2" column="6">
        <widget class="QFDoubleEdit" name="edtAlpha_2"/>
       </item>
-      <item row="2" column="5">
-       <widget class="QLabel" name="label_16">
-        <property name="text">
-         <string>&lt;b&gt;alpha&lt;/b&gt;  (fit parameter) =</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="6">
+      <item row="2" column="8">
        <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -333,20 +266,37 @@ p, li { white-space: pre-wrap; }
         </property>
        </spacer>
       </item>
-      <item row="4" column="1">
-       <widget class="QLabel" name="label_17">
-        <property name="text">
-         <string>&lt;i&gt;&lt;center&gt;(no fit parameter)&lt;/center&gt;&lt;/i&gt;</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="7">
+      <item row="2" column="10">
        <widget class="DoubleDataCutSliders" name="datacut_2" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
           <height>10</height>
          </size>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="QCheckBox" name="chkFixD_2">
+        <property name="text">
+         <string>fix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="7">
+       <widget class="QCheckBox" name="chkFixAlpha_2">
+        <property name="text">
+         <string>fix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="9">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>&lt;b&gt;fit range: &lt;/b&gt;</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
         </property>
        </widget>
       </item>
@@ -361,6 +311,9 @@ p, li { white-space: pre-wrap; }
      <property name="checkable">
       <bool>true</bool>
      </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
      <layout class="QGridLayout" name="gridLayout_4">
       <property name="leftMargin">
        <number>9</number>
@@ -374,92 +327,40 @@ p, li { white-space: pre-wrap; }
       <property name="bottomMargin">
        <number>9</number>
       </property>
-      <item row="3" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label_25">
         <property name="text">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; 〈r&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;(τ)〉 = &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;font color=&quot;blue&quot;&gt;&amp;diams;&amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;b&gt;P=&lt;/b&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="2" column="1">
        <widget class="QFDoubleEdit" name="edtPre_4"/>
       </item>
-      <item row="3" column="2">
+      <item row="2" column="2">
        <widget class="QLabel" name="label_26">
         <property name="text">
-         <string> * </string>
+         <string>&lt;b&gt;D=&lt;/b&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="4">
+      <item row="2" column="5">
        <widget class="QLabel" name="label_27">
         <property name="text">
-         <string> * &amp;tau; ^</string>
+         <string>&lt;b&gt;&amp;alpha;=&lt;/b&gt;</string>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
         </property>
        </widget>
       </item>
-      <item row="4" column="3">
-       <widget class="QCheckBox" name="chkFixD_4">
-        <property name="text">
-         <string>fix</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="5">
-       <widget class="QCheckBox" name="chkFixAlpha_4">
-        <property name="text">
-         <string>fix</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="3">
+      <item row="2" column="3">
        <widget class="QFDoubleEdit" name="edtD_4"/>
       </item>
-      <item row="2" column="3">
-       <widget class="QLabel" name="label_28">
-        <property name="text">
-         <string>&lt;b&gt;D&lt;/b&gt; (fit parameter) =</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="label_29">
-        <property name="text">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;prefactor &lt;span style=&quot; font-weight:600;&quot;&gt;P =&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="5">
+      <item row="2" column="6">
        <widget class="QFDoubleEdit" name="edtAlpha_4"/>
       </item>
-      <item row="2" column="5">
-       <widget class="QLabel" name="label_30">
-        <property name="text">
-         <string>&lt;b&gt;alpha&lt;/b&gt;  (fit parameter) =</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="6">
+      <item row="2" column="8">
        <spacer name="horizontalSpacer_5">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -472,20 +373,37 @@ p, li { white-space: pre-wrap; }
         </property>
        </spacer>
       </item>
-      <item row="4" column="1">
-       <widget class="QLabel" name="label_31">
-        <property name="text">
-         <string>&lt;i&gt;&lt;center&gt;(no fit parameter)&lt;/center&gt;&lt;/i&gt;</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="7">
+      <item row="2" column="10">
        <widget class="DoubleDataCutSliders" name="datacut_4" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
           <height>10</height>
          </size>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="QCheckBox" name="chkFixD_4">
+        <property name="text">
+         <string>fix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="7">
+       <widget class="QCheckBox" name="chkFixAlpha_4">
+        <property name="text">
+         <string>fix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="9">
+       <widget class="QLabel" name="label_14">
+        <property name="text">
+         <string>&lt;b&gt;fit range: &lt;/b&gt;</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
         </property>
        </widget>
       </item>
@@ -500,6 +418,9 @@ p, li { white-space: pre-wrap; }
      <property name="checkable">
       <bool>true</bool>
      </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <property name="leftMargin">
        <number>9</number>
@@ -513,92 +434,40 @@ p, li { white-space: pre-wrap; }
       <property name="bottomMargin">
        <number>9</number>
       </property>
-      <item row="3" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label_18">
         <property name="text">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; 〈r&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;(τ)〉 = &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;font color=&quot;magenta&quot;&gt;&amp;diams;&amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;b&gt;P=&lt;/b&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="2" column="1">
        <widget class="QFDoubleEdit" name="edtPre_3"/>
       </item>
-      <item row="3" column="2">
+      <item row="2" column="2">
        <widget class="QLabel" name="label_19">
         <property name="text">
-         <string> * </string>
+         <string>&lt;b&gt;D=&lt;/b&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="4">
+      <item row="2" column="5">
        <widget class="QLabel" name="label_20">
         <property name="text">
-         <string> * &amp;tau; ^</string>
+         <string>&lt;b&gt;&amp;alpha;=&lt;/b&gt;</string>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
         </property>
        </widget>
       </item>
-      <item row="4" column="3">
-       <widget class="QCheckBox" name="chkFixD_3">
-        <property name="text">
-         <string>fix</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="5">
-       <widget class="QCheckBox" name="chkFixAlpha_3">
-        <property name="text">
-         <string>fix</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="3">
+      <item row="2" column="3">
        <widget class="QFDoubleEdit" name="edtD_3"/>
       </item>
-      <item row="2" column="3">
-       <widget class="QLabel" name="label_21">
-        <property name="text">
-         <string>&lt;b&gt;D&lt;/b&gt; (fit parameter) =</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="label_22">
-        <property name="text">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;prefactor &lt;span style=&quot; font-weight:600;&quot;&gt;P =&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="5">
+      <item row="2" column="6">
        <widget class="QFDoubleEdit" name="edtAlpha_3"/>
       </item>
-      <item row="2" column="5">
-       <widget class="QLabel" name="label_23">
-        <property name="text">
-         <string>&lt;b&gt;alpha&lt;/b&gt;  (fit parameter) =</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="6">
+      <item row="2" column="8">
        <spacer name="horizontalSpacer_4">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -611,20 +480,37 @@ p, li { white-space: pre-wrap; }
         </property>
        </spacer>
       </item>
-      <item row="4" column="1">
-       <widget class="QLabel" name="label_24">
-        <property name="text">
-         <string>&lt;i&gt;&lt;center&gt;(no fit parameter)&lt;/center&gt;&lt;/i&gt;</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="7">
+      <item row="2" column="10">
        <widget class="DoubleDataCutSliders" name="datacut_3" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
           <height>10</height>
          </size>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="QCheckBox" name="chkFixD_3">
+        <property name="text">
+         <string>fix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="7">
+       <widget class="QCheckBox" name="chkFixAlpha_3">
+        <property name="text">
+         <string>fix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="9">
+       <widget class="QLabel" name="label_15">
+        <property name="text">
+         <string>&lt;b&gt;fit range: &lt;/b&gt;</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
         </property>
        </widget>
       </item>
@@ -706,6 +592,11 @@ p, li { white-space: pre-wrap; }
    <header>doubledatacutsliders.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>JKQTMathTextLabel</class>
+   <extends>QLabel</extends>
+   <header>jkqtmathtext.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
@@ -723,8 +614,8 @@ p, li { white-space: pre-wrap; }
    <slot>showHelp()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>57</x>
-     <y>572</y>
+     <x>67</x>
+     <y>666</y>
     </hint>
     <hint type="destinationlabel">
      <x>69</x>
@@ -739,8 +630,8 @@ p, li { white-space: pre-wrap; }
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>601</x>
-     <y>571</y>
+     <x>722</x>
+     <y>665</y>
     </hint>
     <hint type="destinationlabel">
      <x>591</x>
@@ -752,11 +643,11 @@ p, li { white-space: pre-wrap; }
    <sender>pushButton_2</sender>
    <signal>clicked()</signal>
    <receiver>QFFCSMSDEvaluationFitAllMSDDialog</receiver>
-   <slot>saveResults()</slot>
+   <slot>performFit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>548</x>
-     <y>565</y>
+     <x>803</x>
+     <y>666</y>
     </hint>
     <hint type="destinationlabel">
      <x>510</x>
@@ -766,7 +657,7 @@ p, li { white-space: pre-wrap; }
   </connection>
  </connections>
  <slots>
-  <slot>saveResults()</slot>
+  <slot>performFit()</slot>
   <slot>showHelp()</slot>
  </slots>
 </ui>

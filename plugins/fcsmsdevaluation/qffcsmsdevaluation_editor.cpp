@@ -264,6 +264,12 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     cmbDistResultsMode=new QComboBox(this);
     cmbDistResultsMode->addItem(tr("local alpha"));
     cmbDistResultsMode->addItem(tr("local D"));
+    cmbDistResultsMode->addItem(tr("MSD/(6*tau)"));
+    cmbDistResultsMode->addItem(tr("MSD/(4*tau)"));
+    cmbDistResultsMode->addItem(tr("MSD/(P0*D0*tau)"));
+    cmbDistResultsMode->addItem(tr("MSD/(P1*D1*tau)"));
+    cmbDistResultsMode->addItem(tr("MSD/(P2*D2*tau)"));
+    cmbDistResultsMode->addItem(tr("MSD/(P3*D3*tau)"));
     connect(cmbDistResultsMode, SIGNAL(currentIndexChanged(int)), this, SLOT(updateDistributionResults()));
     tbPlotDistResults->addSeparator();
     tbPlotDistResults->addWidget(new QLabel(tr("   parameter: ")));
@@ -308,13 +314,14 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     connect(actAverageFirstLags, SIGNAL(triggered()), this, SLOT(averageFirstFewLags()));
     actGetNFromFits=new QAction(tr("get N from FCS fits"), this);
     connect(actGetNFromFits, SIGNAL(triggered()), this, SLOT(getNFromFits()));
-    actFitAllMSD=new QAction(tr("fit theory to several MSDs"), this);
-    connect(actFitAllMSD, SIGNAL(triggered()), this, SLOT(fitAllMSD()));
-
-    menuParameters->insertAction(actFirst, actFitAllMSD);
     menuParameters->insertAction(actFirst, actGetNFromFits);
     menuParameters->insertAction(actFirst, actAverageFirstLags);
     menuParameters->insertSeparator(actFirst);
+
+    actFitAllMSD=new QAction(tr("fit theory to several MSDs"), this);
+    connect(actFitAllMSD, SIGNAL(triggered()), this, SLOT(fitAllMSD()));
+    menuFit->addSeparator();
+    menuFit->addAction(actFitAllMSD);
 
     actCopyAverageData=new QAction(QIcon(":/copy.png"), tr("&copy runs-average of MSD"), this);
     connect(actCopyAverageData, SIGNAL(triggered()), this, SLOT(copyAverageData()));
@@ -516,7 +523,7 @@ void QFFCSMSDEvaluationEditor::plotDistMouseMoved(double x, double y)
     int colEI=pltDistResults->getDatastore()->getColumnNum("msdfit_tau_end");
     int colDI=pltDistResults->getDatastore()->getColumnNum("msdfit_D");
     int colAI=pltDistResults->getDatastore()->getColumnNum("msdfit_alpha");
-    if (colI>=0 && colEI>=0 && colSI>=0) {
+    if (colI>=0 && colEI>=0 && colSI>=0 && cmbDistResultsMode->currentIndex()<2) {
         JKQTPcolumn col=pltDistResults->getDatastore()->getColumn(colI);
         JKQTPcolumn colS=pltDistResults->getDatastore()->getColumn(colSI);
         JKQTPcolumn colE=pltDistResults->getDatastore()->getColumn(colEI);
@@ -1863,8 +1870,11 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
     if (!eval) return;
     QVector<double> distTau=eval->getMSDTaus(eval->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel());
     QVector<double> dist=eval->getMSD(eval->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel());
+    if (distTau.size()>0) qDebug()<<distTau.first()<<distTau.last();
     int data_start=sliderDist->get_userMin();
     int data_end=sliderDist->get_userMax();
+    int msd_start=sliderDist->get_userMin();
+    int msd_end=sliderDist->get_userMax();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
@@ -1878,6 +1888,14 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
     dsdist->deleteAllColumns("msdfit_tau");
     dsdist->deleteAllColumns("msdfit_D");
     dsdist->deleteAllColumns("msdfit_alpha");
+    dsdist->deleteAllColumns("msdtransform_div6tau");
+    dsdist->deleteAllColumns("msdtransform_div4tau");
+    dsdist->deleteAllColumns("msdtransform_divPD0tau");
+    dsdist->deleteAllColumns("msdtransform_divPD1tau");
+    dsdist->deleteAllColumns("msdtransform_divPD2tau");
+    dsdist->deleteAllColumns("msdtransform_divPD3tau");
+    int c_tau=dsdist->getColumnNames().indexOf("msd_tau");
+    if (c_tau<0) c_tau=dsdist->addCopiedColumn(distTau.data(), distTau.size(), "msd_tau");
 
     int wid=spinFitWidth->value();
     int first=0;
@@ -1892,6 +1910,46 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
     if (distTau.size()>1 && dist.size()>1 && wid>=3 && eval->hasResults()) {
 
         eval->calcMSDFits(fitTau, fitA, fitD, eval->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel(), spinFitWidth->value(), qMax(1, spinFitWidth->value()/7), sliderDist->get_userMin(), cmbFitType->currentIndex(), &fitTauStart, &fitTauEnd);
+
+        QVector<double> mored=dist;
+        for (int i=0; i<dist.size(); i++) {
+            mored[i]=dist[i]/(6.0*distTau[i]);
+        }
+        int c_msdtransform6tau=dsdist->addCopiedColumn(mored.data(), mored.size(), "msdtransform_div6tau");
+        mored=dist;
+        for (int i=0; i<dist.size(); i++) {
+            mored[i]=dist[i]/(4.0*distTau[i]);
+        }
+        int c_msdtransform4tau=dsdist->addCopiedColumn(mored.data(), mored.size(), "msdtransform_div4tau");
+        mored=dist;
+        double P=eval->getTheoryPre(0, eval->getHighlightedRecord(), eval->getCurrentIndex());
+        double D=eval->getTheoryD(0, eval->getHighlightedRecord(), eval->getCurrentIndex());
+        for (int i=0; i<dist.size(); i++) {
+            mored[i]=dist[i]/(P*D*distTau[i]);
+        }
+        int c_msdtransformPD0tau=dsdist->addCopiedColumn(mored.data(), mored.size(), "msdtransform_divPD0tau");
+        mored=dist;
+        P=eval->getTheoryPre(1, eval->getHighlightedRecord(), eval->getCurrentIndex());
+        D=eval->getTheoryD(1, eval->getHighlightedRecord(), eval->getCurrentIndex());
+        for (int i=0; i<dist.size(); i++) {
+            mored[i]=dist[i]/(P*D*distTau[i]);
+        }
+        int c_msdtransformPD1tau=dsdist->addCopiedColumn(mored.data(), mored.size(), "msdtransform_divPD1tau");
+        mored=dist;
+        P=eval->getTheoryPre(2, eval->getHighlightedRecord(), eval->getCurrentIndex());
+        D=eval->getTheoryD(2, eval->getHighlightedRecord(), eval->getCurrentIndex());
+        for (int i=0; i<dist.size(); i++) {
+            mored[i]=dist[i]/(P*D*distTau[i]);
+        }
+        int c_msdtransformPD2tau=dsdist->addCopiedColumn(mored.data(), mored.size(), "msdtransform_divPD2tau");
+        mored=dist;
+        P=eval->getTheoryPre(3, eval->getHighlightedRecord(), eval->getCurrentIndex());
+        D=eval->getTheoryD(3, eval->getHighlightedRecord(), eval->getCurrentIndex());
+        for (int i=0; i<dist.size(); i++) {
+            mored[i]=dist[i]/(P*D*distTau[i]);
+        }
+        int c_msdtransformPD3tau=dsdist->addCopiedColumn(mored.data(), mored.size(), "msdtransform_divPD3tau");
+
 
         int c_msdtau=dsdist->addCopiedColumn(fitTau.data(), fitTau.size(), "msdfit_tau");
         int c_msdD=dsdist->addCopiedColumn(fitD.data(), fitD.size(), "msdfit_D");
@@ -1917,6 +1975,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
 
         //qDebug()<<"found: data_start="<<data_start<<"   data_end="<<data_end;
 
+        pltDistResults->getYAxis()->set_logAxis(false);
         if (cmbDistResultsMode->currentIndex()==0) {
             JKQTPxyLineGraph* g_msdfit=new JKQTPxyLineGraph(pltDistribution->get_plotter());
             g_msdfit->set_drawLine(true);
@@ -1930,7 +1989,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
             g_msdfit->set_color(QColor("red"));
             pltDistResults->addGraph(g_msdfit);
             pltDistResults->getYAxis()->set_axisLabel("local \\alpha");
-        } else {
+        } else if (cmbDistResultsMode->currentIndex()==1)  {
             JKQTPxyLineGraph* g_msdfit=new JKQTPxyLineGraph(pltDistribution->get_plotter());
             g_msdfit->set_drawLine(true);
             g_msdfit->set_title("local $D$");
@@ -1943,6 +2002,58 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
             g_msdfit->set_color(QColor("red"));
             pltDistResults->addGraph(g_msdfit);
             pltDistResults->getYAxis()->set_axisLabel("local $D$ [\\mu m^2/s]");
+        } else if (cmbDistResultsMode->currentIndex()>=2 && cmbDistResultsMode->currentIndex()<=7 )  {
+            JKQTPxyLineGraph* g_msdtransform=new JKQTPxyLineGraph(pltDistribution->get_plotter());
+            if (cmbDistResultsMode->currentIndex()==2) {
+                g_msdtransform->set_title("\\langle r^2(\\tau)\\rangle/(6\\tau)");
+                g_msdtransform->set_xColumn(c_tau);
+                g_msdtransform->set_yColumn(c_msdtransform6tau);
+                g_msdtransform->set_color(QColor("red"));
+                pltDistResults->getYAxis()->set_axisLabel("\\langle r^2(\\tau)\\rangle/(6\\tau) [\\mu m^2]");
+                pltDistResults->getYAxis()->set_logAxis(true);
+            } else if (cmbDistResultsMode->currentIndex()==3) {
+                g_msdtransform->set_title("\\langle r^2(\\tau)\\rangle/(4\\tau)");
+                g_msdtransform->set_xColumn(c_tau);
+                g_msdtransform->set_yColumn(c_msdtransform4tau);
+                g_msdtransform->set_color(QColor("red"));
+                pltDistResults->getYAxis()->set_axisLabel("\\langle r^2(\\tau)\\rangle/(4\\tau) [\\mu m^2]");
+                pltDistResults->getYAxis()->set_logAxis(true);
+            } else if (cmbDistResultsMode->currentIndex()==4) {
+                g_msdtransform->set_title("\\langle r^2(\\tau)\\rangle/(P_0D_0\\tau)");
+                g_msdtransform->set_xColumn(c_tau);
+                g_msdtransform->set_yColumn(c_msdtransformPD0tau);
+                g_msdtransform->set_color(QColor("red"));
+                pltDistResults->getYAxis()->set_axisLabel("\\langle r^2(\\tau)\\rangle/(P_0D_0\\tau) [s^{\\alpha-1}]");
+                pltDistResults->getYAxis()->set_logAxis(true);
+            } else if (cmbDistResultsMode->currentIndex()==5) {
+                g_msdtransform->set_title("\\langle r^2(\\tau)\\rangle/(P_1D_1\\tau)");
+                g_msdtransform->set_xColumn(c_tau);
+                g_msdtransform->set_yColumn(c_msdtransformPD1tau);
+                g_msdtransform->set_color(QColor("red"));
+                pltDistResults->getYAxis()->set_axisLabel("\\langle r^2(\\tau)\\rangle/(P_1D_1\\tau) [s^{\\alpha-1}]");
+                pltDistResults->getYAxis()->set_logAxis(true);
+            } else if (cmbDistResultsMode->currentIndex()==6) {
+                g_msdtransform->set_title("\\langle r^2(\\tau)\\rangle/(P_2D_2\\tau)");
+                g_msdtransform->set_xColumn(c_tau);
+                g_msdtransform->set_yColumn(c_msdtransformPD2tau);
+                g_msdtransform->set_color(QColor("red"));
+                pltDistResults->getYAxis()->set_axisLabel("\\langle r^2(\\tau)\\rangle/(P_2D_2\\tau) [s^{\\alpha-1}]");
+                pltDistResults->getYAxis()->set_logAxis(true);
+            } else if (cmbDistResultsMode->currentIndex()==7) {
+                g_msdtransform->set_title("\\langle r^2(\\tau)\\rangle/(P_3D_3\\tau)");
+                g_msdtransform->set_xColumn(c_tau);
+                g_msdtransform->set_yColumn(c_msdtransformPD3tau);
+                g_msdtransform->set_color(QColor("red"));
+                pltDistResults->getYAxis()->set_axisLabel("\\langle r^2(\\tau)\\rangle/(P_3D_3\\tau) [s^{\\alpha-1}]");
+                pltDistResults->getYAxis()->set_logAxis(true);
+            }
+
+            g_msdtransform->set_drawLine(true);
+            g_msdtransform->set_datarange_start(msd_start);
+            g_msdtransform->set_datarange_end(msd_end);
+            g_msdtransform->set_symbol(JKQTPnoSymbol);
+            g_msdtransform->set_symbolSize(7);
+            pltDistResults->addGraph(g_msdtransform);
         }
 
     }

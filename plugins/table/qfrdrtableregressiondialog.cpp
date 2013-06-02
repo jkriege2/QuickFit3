@@ -372,6 +372,8 @@ void QFRDRTableRegressionDialog::methodChanged(int method)
     parameterTable->setEditErrors(false);
     parameterTable->setEditFix(true);
     parameterTable->setEditRanges(false);
+    parameterNames.clear();
+    parameterLabels.clear();
     parameterNames<<"a";
     parameterLabels<<"offset a = ";
     parameterNames<<"b";

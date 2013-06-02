@@ -65,4 +65,8 @@ QT += gui xml svg core opengl
 CONFIG += exceptions rtti stl
 
 
+ASSETS_RESULTS.files = ./examples/results/*.*
+ASSETS_RESULTS.path = $${QFOUTPUT}/examples/$${TARGET}/results/
+
+INSTALLS += ASSETS_RESULTS
 

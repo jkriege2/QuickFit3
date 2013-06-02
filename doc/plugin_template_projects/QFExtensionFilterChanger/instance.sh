@@ -48,6 +48,7 @@ for i in ${BASENAME}.*; do
 done
 
 mkdir -p $DIRNAME/translations
+mkdir -p $FNAME/examples
 mkdir -p $DIRNAME/assets
 mkdir -p $DIRNAME/help
 mkdir -p $DIRNAME/help/pic

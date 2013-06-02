@@ -47,8 +47,8 @@ QT += gui xml core opengl
 CONFIG += exceptions rtti stl
 
 
-ASSETS_TESTDATA_FILES.files = ./assets/test_data/*.*
-ASSETS_TESTDATA_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/test_data
+ASSETS_TESTDATA_FILES.files = ./examples/test_data/*.*
+ASSETS_TESTDATA_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/test_data
 
 INSTALLS += ASSETS_TESTDATA_FILES
 

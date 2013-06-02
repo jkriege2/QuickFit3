@@ -25,12 +25,16 @@ QFRDRTableEditor::~QFRDRTableEditor()
 
 void QFRDRTableEditor::requestFit(int xCol, int yCol, int sigmaCol, int plot, QString function, bool xlog, bool ylog)
 {
-    QFRDRTableCurveFitDialog* dlg=new QFRDRTableCurveFitDialog(this);
-    dlg->setWindowTitle(tr("Least-Squares Curve Fitting"));
-    if (dlg->exec()) {
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        //qDebug()<<"regression cX="<<xCol<<"  cY="<<yCol<<"  cW="<<sigmaCol<<"  plot="<<plot<<"  xlog="<<xlog<<"  ylog="<<ylog;
+        QFRDRTableCurveFitDialog* dlg=new QFRDRTableCurveFitDialog(m, xCol, yCol, sigmaCol, this, xlog, ylog, -1, plot);
+        if (dlg->exec()) {
 
+        }
+        delete dlg;
     }
-    delete dlg;
+
 }
 
 void QFRDRTableEditor::requestRegression(int xCol, int yCol, int sigmaCol, int plot, bool xlog, bool ylog)

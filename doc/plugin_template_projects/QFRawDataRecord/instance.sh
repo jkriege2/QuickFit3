@@ -46,6 +46,7 @@ done
 
 mkdir -p $FNAME/translations
 mkdir -p $FNAME/assets
+mkdir -p $FNAME/examples
 mkdir -p $FNAME/help
 mkdir -p $FNAME/help/pic
 cp -v help.html $FNAME/help/${TARGETNAME}.html

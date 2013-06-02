@@ -331,6 +331,7 @@ bool QFFitFunctionValueInputTable::setData(const QModelIndex &index, const QVari
 {
     int col=index.column();
     int row=index.row();
+    qDebug()<<"setData("<<index<<value<<role<<")";
     if (col>0) {
         int cols=(col-1)/getColsPerRDR();
         int coli=(col-1)%getColsPerRDR();
@@ -366,7 +367,12 @@ bool QFFitFunctionValueInputTable::setData(const QModelIndex &index, const QVari
                 }
             }
         } else if (coli==fixIdx && editfix) {
-            if (role==Qt::CheckStateRole||role==Qt::DisplayRole||role==Qt::EditRole) {
+            if (role==Qt::CheckStateRole) {
+                qDebug()<<role<<value;
+                setParameterFix(row, value.toInt()!=0);
+                return true;
+            } else if (role==Qt::DisplayRole||role==Qt::EditRole) {
+                qDebug()<<role<<value;
                 if (value.canConvert(QVariant::Bool)) {
                     setParameterFix(row, value.toBool());
                     return true;
@@ -482,23 +488,31 @@ bool QFFitFunctionValueInputTable::checkRebuildModel(bool alwaysreset)
     errorIdx=-1;
     rangeIdx=-1;
     fixIdx=-1;
+    int colcnt=1;
     if (editerrors) {
         colNames.append(tr("error"));
         colWidth.append(colbasicWidth*2/3);
-        errorIdx=1;
+        if (errorIdx!=colcnt) ok=true;
+        errorIdx=colcnt;
+        colcnt++;
     }
     if (editfix) {
         colNames.append(tr("fix"));
         colWidth.append(24);
-        fixIdx=2;
+        if (fixIdx!=colcnt) ok=true;
+        fixIdx=colcnt;
+        colcnt++;
     }
     if (editRanges) {
         colNames.append(tr("min"));
         colNames.append(tr("max"));
         colWidth.append(colbasicWidth/2);
         colWidth.append(colbasicWidth/2);
-        errorIdx=3;
+        if (rangeIdx!=colcnt) ok=true;
+        rangeIdx=colcnt;
+        colcnt+=2;
     }
+    //qDebug()<<"fixIdx="<<fixIdx<<"   errorIdx="<<errorIdx<<"   rangeIdx="<<rangeIdx;
 
 
     if (fitfunction) {
@@ -573,6 +587,7 @@ bool QFFitFunctionValueInputTable::getParameterEditable(int row) const
     }
     return rangeval;
 }
+
 double QFFitFunctionValueInputTable::getParameterMin(int row) const
 {
     FitParam fp=fitparamids.value(row, FitParam());

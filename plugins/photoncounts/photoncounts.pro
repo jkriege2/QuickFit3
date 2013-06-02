@@ -38,8 +38,8 @@ CONFIG += exceptions rtti stl
 
 
 
-ASSETSTESTDATA_FILES.files = ./assets/testdata/*.*
-ASSETSTESTDATA_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/testdata/
+ASSETSTESTDATA_FILES.files = ./examples/testdata/*.*
+ASSETSTESTDATA_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/testdata/
 
 INSTALLS += ASSETSTESTDATA_FILES
 

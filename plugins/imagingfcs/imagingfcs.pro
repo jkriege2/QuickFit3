@@ -111,7 +111,7 @@ QT += gui xml svg opengl
 CONFIG += exceptions rtti stl
 
 
-ASSETS_TESTDATA.files = ./assets/imfcs_testdata/*.*
-ASSETS_TESTDATA.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/imfcs_testdata/
+ASSETS_TESTDATA.files = ./examples/imfcs_testdata/*.*
+ASSETS_TESTDATA.path = $${QFOUTPUT}/examples/$${TARGET}/imfcs_testdata/
 
 INSTALLS += ASSETS_TESTDATA
