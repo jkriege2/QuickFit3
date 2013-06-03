@@ -22,8 +22,12 @@
 -->
 
 <!--
-		<li><a name="2271"><b>2013-05-27 (SVN: 2271)</b>-->
+		<li><a name="2297"><b>2013-06-03 (SVN: 2297)</b>-->
 
+		
+
+		
+		
 
 		<ul>
 		  <li><b>new plugins:</b><ul>
@@ -57,6 +61,8 @@
 		    <li>added tool to fix wrong file paths in RDRs to the main application</li>
 		    <li>result tables show more information in tooltips for boolean and string arrays</li>
 			<li>improved saving of relative filepathes (should clean away symbolic links now)</li>
+		    <li>plotters have help context menu entry now</li>
+			<li>added tools to QMake projects to install example files into examples subdirectory of installation, moved examples to new directories!</li>
 		  </ul></li>
 		  
 		  <li><b>qfe_calculator</b><ul>
@@ -67,9 +73,7 @@
 		  
 		  <li><b>imFCCSFit</b><ul>
 		    <li></li>
-		    <li></li>
-		    <li></li>
-		    <li></li>
+		    <li>added D(bin*a) graphs to imFCS calibration wizard</li>
 		    <li>minds parameter ranges now when fitting</li>
 		    <li>added button to activate additional columns to edit the parameter ranges</li>
 		    <li>added tutorial on imFCCS (fitting, relative amplitude ...) + data for tutorial (as QFP-project) in plugin's assets</li>
@@ -89,6 +93,7 @@
 			<li>added extra labels for G and B channel in RGBimages</li>
 		    <li>added tool to calculate (linear) regression of a plot</li>
 			<li>added several new possibilities to function plot (QFFitFunction, polynomial, exponential, power-law</li>
+			<li>started to implement curve fit tool for QFFitFunction</li>
 		  </ul></li>
 		  
 		  <li><b>imFCS:</b><ul>
@@ -120,6 +125,7 @@
 			<li>imFCS simulation does no longer report its background offset back, as a background file is created that corrects for the background!</li>
 			<li>"mask|mask outlier CFs": now giving lower and upper percentage (e.g. 5% & 5% leaves only 5%..95%)</li>
 			<li>"mask|copy mask to group" now updates the average run properly!</li>
+			<li>corrected bug in imFCS calibration: preset wz was not used in fits!   the default value 620 was used instead (always!!!)</li>
 		  </ul></li>
 		  
 		  <li><b>imFCSFit:</b><ul>
@@ -141,7 +147,13 @@
 		    <li>added configuration tab</li>
 		    <li>added "Test" buttons to the image stack and acquisition config tabs that allow to quickly test the choosen camera/lightpath settinsg while the button is pressed</li>
 		    <li>line measurements in the camera view window now works with dragging the mouse, not 2 clicks</li>
-		    <li>DualView filter select comboboxes are locked by the lock button now</li>		  
+		    <li>DualView filter select comboboxes are locked by the lock button now</li>
+		    <li>switches mainwindow to non-project mode, so project editing is disabled!</li>
+		    <li>added "sample name" input widget to acquisition description</li>
+		    <li>lightpath selection now moved from optics setup tab to top-level widget</li>
+			<li>added button to unlock lightpath combobox</li>
+			<li>removed some commented out code sections</li>
+			<li>tried to improve speed of image stack acquisition</li>
 		  </ul></li>
 		  
 		  <li><b>image_stack:</b><ul>
@@ -162,6 +174,14 @@
 		    <li>added tool to fit power law to msd (displayed as "theory curve")</li>
 		    <li>fit range and result is displayed in MSD-plot when mouse moves over D(tau)/alpha(tau) plot</li>
 		    <li>in line-fits dialog, the fit-range is set in real time-units now</li>
+		    <li>added possibility to get 1/N for all records with one click (extended "average first few lags for N" dialog)</li>
+		    <li>started to implement tool to read N from fcs_fit!</li>
+			<li>added tool to read N from FCS fit results</li>
+			<li>some minor bugfixes (theory results were not properly updated in edit widgets, when the run was changed)</li>
+			<li>improved initial estimated for 3D-MSD-fit (now takes the result of the 2D-transformation as initial value)</li>
+			<li>implemented fitting all theory data to MSDs</li>
+			<li>added transforms of MSD-curve in lower plot</li>
+
 		  </ul></li>
 		  
 		  <li><b>cam_andor:</b><ul>
@@ -194,6 +214,7 @@
 		    <li>added anomalous diffusion with e² radii and with c as fit parameter and e² radii</li>
 		    <li>added fit functions for 2-color FCCS anomalous diffusion</li>
 			<li>corrected description of equilibrium constants ... now dissociation constants and unit is correct!</li>
+			<li>added display fields for the molar brightnesses of fluorophores a and b</li>
 		  </ul></li>
 
 		  <li><b>cam_testcamera:</b><ul>

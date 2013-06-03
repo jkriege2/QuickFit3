@@ -1885,6 +1885,9 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
     pltDistResults->clearGraphs();
     pltDistResults->get_plotter()->set_showKey(chkShowKeyDistResults->isChecked());
 
+    qDebug()<<dsdist->getColumnCount();
+    dsdist->deleteAllColumns("msdfit_tau_start");
+    dsdist->deleteAllColumns("msdfit_tau_end");
     dsdist->deleteAllColumns("msdfit_tau");
     dsdist->deleteAllColumns("msdfit_D");
     dsdist->deleteAllColumns("msdfit_alpha");
@@ -1894,6 +1897,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
     dsdist->deleteAllColumns("msdtransform_divPD1tau");
     dsdist->deleteAllColumns("msdtransform_divPD2tau");
     dsdist->deleteAllColumns("msdtransform_divPD3tau");
+    qDebug()<<dsdist->getColumnCount();
     int c_tau=dsdist->getColumnNames().indexOf("msd_tau");
     if (c_tau<0) c_tau=dsdist->addCopiedColumn(distTau.data(), distTau.size(), "msd_tau");
 
@@ -1956,6 +1960,9 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
         int c_msdA=dsdist->addCopiedColumn(fitA.data(), fitA.size(), "msdfit_alpha");
         dsdist->addCopiedColumn(fitTauStart.data(), fitTauStart.size(), "msdfit_tau_start");
         dsdist->addCopiedColumn(fitTauEnd.data(), fitTauEnd.size(), "msdfit_tau_end");
+
+        qDebug()<<dsdist->getColumnCount();
+        qDebug()<<c_msdtransformPD0tau<<c_msdtransformPD1tau<<c_msdtransformPD2tau<<c_msdtransformPD3tau<<c_msdtau<<c_msdD<<c_msdA;
         //qDebug()<<fitTau.size()<<fitTau;
         //qDebug()<<fitD.size()<<fitD;
         //qDebug()<<fitA.size()<<fitA;
