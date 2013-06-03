@@ -24,7 +24,6 @@ void QFFitFunctionValueInputDelegate::paint(QPainter *painter, const QStyleOptio
 QSize QFFitFunctionValueInputDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     return QFHTMLDelegate::sizeHint(option, index);
-
 }
 
 
@@ -74,10 +73,11 @@ QWidget *QFFitFunctionValueInputDelegate::createEditor(QWidget *parent, const QS
             connect(edt, SIGNAL(currentIndexChanged(int)), this, SLOT(onEditorFinished()));
             QFFitFunction::ParameterDescription desc=ff->getDescription(fpID.toString());
             int cnt=0;
+            //qDebug()<<fpMin<<"..."<<fpMax<<ff;
             if (fpMin.isValid()&&fpMax.isValid()){
                 bool okmi=false, okma=false;
                 int mi=fpMin.toInt(&okmi);
-                int ma=fpMax.toInt(&okmi);
+                int ma=fpMax.toInt(&okma);
                 if (okmi&&okma&&ma>=mi) {
                     for (int i=mi; i<=ma; i++) {
                         edt->addItem(desc.comboItems.value(cnt, QString::number(i)), i);

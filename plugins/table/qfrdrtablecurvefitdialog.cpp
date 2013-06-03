@@ -117,12 +117,14 @@ void QFRDRTableCurveFitDialog::saveResults()
             } else {
                 table->colgraphAddFunctionPlot(g, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, lastResultD);
             }
+            table->colgraphSetPlotTitle(g, table->colgraphGetPlotCount(g)-1, resultComment);
         } else if (saveGraph>=2){
             if (savedTo>=0) {
                 table->colgraphAddFunctionPlot(saveGraph-2, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, savedTo);
             } else {
                 table->colgraphAddFunctionPlot(saveGraph-2, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, lastResultD);
             }
+            table->colgraphSetPlotTitle(saveGraph-2, table->colgraphGetPlotCount(saveGraph-2)-1, resultComment);
         }
         delete model;
     }
@@ -352,7 +354,22 @@ void QFRDRTableCurveFitDialog::methodChanged(int method)
 
     parameterTable->setWriteTo(&paramMap, model, true);
     parameterTable->setDoRebuildModel(true);
-    on_btnFit_clicked();
+    ui->tabParams->setUpdatesEnabled(false);
+    for (int i=0; i<ui->tabParams->model()->rowCount(); i++) {
+        ui->tabParams->setRowHeight(i, QFontMetricsF(ui->tabParams->font()).height()*1.6);
+    }
+    ui->tabParams->verticalHeader()->setVisible(false);
+    //ui->tabParams->horizontalHeader()
+    for (int i=0; i<ui->tabParams->model()->columnCount(); i++) {
+        if (i==0) ui->tabParams->setColumnWidth(i, 100);
+        else if ((i-1)%parameterTable->getColsPerRDR()==0) ui->tabParams->setColumnWidth(i, 75);
+        else if ((i-1)%parameterTable->getColsPerRDR()==1) ui->tabParams->setColumnWidth(i, 50);
+        else if ((i-1)%parameterTable->getColsPerRDR()==2) ui->tabParams->setColumnWidth(i, 20);
+        else if ((i-1)%parameterTable->getColsPerRDR()==3) ui->tabParams->setColumnWidth(i, 75);
+        else if ((i-1)%parameterTable->getColsPerRDR()==4) ui->tabParams->setColumnWidth(i, 75);
+    }
+    ui->tabParams->setUpdatesEnabled(true);
+    //on_btnFit_clicked();
 }
 
 void QFRDRTableCurveFitDialog::connectSignals(bool connectS)

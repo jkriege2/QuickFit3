@@ -291,17 +291,17 @@ QVariant QFFitFunctionValueInputTable::data(const QModelIndex &index, int role) 
                 }
             }
         } else if (coli==fixIdx && editfix) {
-            if (role==Qt::CheckStateRole||role==Qt::DisplayRole||role==Qt::EditRole) {
-                return getParameterFix(row);
+            if (role==Qt::CheckStateRole) {
+                return getParameterFix(row)?2:0;
             }
         }
     }
     if (role==widgetTypeRole) return wtNone;
-    if (role==Qt::SizeHintRole) {
+    /*if (role==Qt::SizeHintRole) {
         QFontMetrics fm(QApplication::font());
         if (col-1>=0 && col-1<colWidth.size()) return QSize(colWidth[col-1], fm.height()+2);
         else return QSize(colbasicWidth, fm.height()+2);
-    }
+    }*/
     return QVariant();
 
 
@@ -319,11 +319,11 @@ QVariant QFFitFunctionValueInputTable::headerData(int section, Qt::Orientation o
 
         }
     }
-    if (role==Qt::SizeHintRole) {
-        QFontMetrics fm(QApplication::font());
-        if (section-1>=0 && section-1<colWidth.size()) return QSize(colWidth[section-1], fm.height()*2/3);
+    /*if (role==Qt::SizeHintRole) {
+        QFontMetricsF fm(QApplication::font());
+        if (section-1>=0 && section-1<colWidth.size()) return QSize(colWidth[section-1], fm.height()*1.3);
         else return QSize(colbasicWidth, fm.height()+2);
-    }
+    }*/
     return QVariant();
 }
 
@@ -331,7 +331,7 @@ bool QFFitFunctionValueInputTable::setData(const QModelIndex &index, const QVari
 {
     int col=index.column();
     int row=index.row();
-    qDebug()<<"setData("<<index<<value<<role<<")";
+    //qDebug()<<"setData("<<index<<value<<role<<")";
     if (col>0) {
         int cols=(col-1)/getColsPerRDR();
         int coli=(col-1)%getColsPerRDR();
@@ -368,11 +368,11 @@ bool QFFitFunctionValueInputTable::setData(const QModelIndex &index, const QVari
             }
         } else if (coli==fixIdx && editfix) {
             if (role==Qt::CheckStateRole) {
-                qDebug()<<role<<value;
+                //qDebug()<<role<<value;
                 setParameterFix(row, value.toInt()!=0);
                 return true;
             } else if (role==Qt::DisplayRole||role==Qt::EditRole) {
-                qDebug()<<role<<value;
+                //qDebug()<<role<<value;
                 if (value.canConvert(QVariant::Bool)) {
                     setParameterFix(row, value.toBool());
                     return true;
