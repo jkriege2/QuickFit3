@@ -625,15 +625,18 @@ void QFRDRTableEditor::slEditColumnProperties(int col) {
                 quint16 c=sm->currentIndex().column();
                 if (col>=0) c=col;
                 QString t=m->model()->columnTitle(c);
+                QVariant comment=m->model()->getColumnHeaderData(c, QFRDRTable::ColumnCommentRole);
                 QVariant exp=m->model()->getColumnHeaderData(c, QFRDRTable::ColumnExpressionRole);
 
                 QFRDRTableColumnEditor* edt=new QFRDRTableColumnEditor(this);
                 edt->setColumnTitle(t);
+                edt->setComment(comment.toString());
                 edt->setExpression(exp.isValid() && exp.canConvert(QVariant::String), exp.toString());
 
                 if (edt->exec()) {
                      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
                      m->model()->setColumnTitle(c, edt->getColumnTitle());
+                     m->model()->setColumnHeaderData(c, QFRDRTable::ColumnCommentRole, edt->getComment());
                      if (edt->getExpressionEnabled()) {
                          m->model()->setColumnHeaderData(c, QFRDRTable::ColumnExpressionRole, edt->getExpression());
                          slRecalcAll();

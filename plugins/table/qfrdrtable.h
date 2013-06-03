@@ -43,6 +43,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             gtStepsVertical,
             gtBarsHorizontal,
             gtBarsVertical,
+            gtBoxplotX,
+            gtBoxplotY,
             gtImage,
             gtRGBImage,
             gtMaskImage,
@@ -88,6 +90,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
                 case gtStepsVertical: return QString("stepsv");
                 case gtBarsHorizontal: return QString("barsh");
                 case gtBarsVertical: return QString("barsv");
+                case gtBoxplotX: return QString("boxx");
+                case gtBoxplotY: return QString("boxy");
                 case gtImage: return QString("image");
                 case gtRGBImage: return QString("rgbimage");
                 case gtMaskImage: return QString("maskimage");
@@ -107,6 +111,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
                 case gtStepsVertical: return QIcon(":/table/icons/plot_vsteps.png");
                 case gtBarsHorizontal: return QIcon(":/table/icons/plot_hbars.png");
                 case gtBarsVertical: return QIcon(":/table/icons/plot_vbars.png");
+                case gtBoxplotX: return QIcon(":/table/icons/plot_boxplotsx.png");
+                case gtBoxplotY: return QIcon(":/table/icons/plot_boxplotsy.png");
                 case gtImage: return QIcon(":/table/icons/plot_image.png");
                 case gtRGBImage: return QIcon(":/table/icons/plot_rgbimage.png");
                 case gtMaskImage: return QIcon(":/table/icons/plot_maskimage.png");
@@ -126,6 +132,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             if (s=="stepsv") return gtStepsVertical;
             if (s=="barsh") return gtBarsHorizontal;
             if (s=="barsv") return gtBarsVertical;
+            if (s=="boxx") return gtBoxplotX;
+            if (s=="boxy") return gtBoxplotY;
             if (s=="image") return gtImage;
             if (s=="rgbimage") return gtRGBImage;
             if (s=="maskimage") return gtMaskImage;
@@ -135,12 +143,18 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
         struct GraphInfo {
             GraphInfo();
+            //void setBoxplotColumns(int position, int minC, int q25C, int medianC, int meanC, int q75C, int maxC);
             GraphType type;
             QString title;
             int xcolumn;
             int ycolumn;
             int xerrorcolumn;
             int yerrorcolumn;
+            int meancolumn;
+            int q75column;
+            int maxcolumn;
+            double width;
+            double shift;
             Qt::PenStyle style;
             QColor color;
             double colorTransparent;
@@ -262,6 +276,9 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual QString tableGetColumnTitle(quint16 column) const;
         virtual bool tableSupportsExpressions() const;
         virtual void tableSetExpression(quint16 row, quint16 column, const QString& expression=QString(""));
+        virtual void tableSetColumnExpression(quint16 column, const QString& expression=QString(""));
+        virtual void tableSetColumnComment(quint16 column, const QString& comment=QString(""));
+        virtual void tableSetComment(quint16 row, quint16 column, const QString& comment=QString(""));
         virtual QString tableGetExpression(quint16 row, quint16 column) const;
         virtual void tableReevaluateExpressions();
         virtual int tableGetColumnCount() const;

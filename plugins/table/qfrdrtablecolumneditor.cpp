@@ -61,6 +61,16 @@ QFRDRTableColumnEditor::~QFRDRTableColumnEditor()
     delete ui;
 }
 
+void QFRDRTableColumnEditor::setComment(const QString &comment)
+{
+    ui->edtComment->setText(comment);
+}
+
+QString QFRDRTableColumnEditor::getComment() const
+{
+    return ui->edtComment->text();
+}
+
 QString QFRDRTableColumnEditor::getExpression() const
 {
     return ui->edtFormula->text();

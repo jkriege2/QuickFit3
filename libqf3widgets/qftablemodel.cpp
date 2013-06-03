@@ -1407,3 +1407,82 @@ bool QFTableModel::readXML(const QString &filename) {
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return false;
     return readXML(file.readAll(), 0, 0, true);
 }
+
+
+QFTableModelColumnHeaderModel::QFTableModelColumnHeaderModel(QFTableModel *table, QObject *parent):
+    QAbstractListModel(parent)
+{
+    hasNone=false;
+    setModel(table);
+}
+
+QFTableModelColumnHeaderModel::~QFTableModelColumnHeaderModel()
+{
+}
+
+
+void QFTableModelColumnHeaderModel::setModel(QFTableModel *model)
+{
+    if (this->model) {
+        disconnect(this->model, SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(rebuildModel()));
+        disconnect(this->model, SIGNAL(layoutChanged()), this, SLOT(rebuildModel()));
+    }
+    this->model=model;
+    if (model) {
+        connect(model, SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(rebuildModel()));
+        connect(model, SIGNAL(layoutChanged()), this, SLOT(rebuildModel()));
+    }
+    rebuildModel();
+}
+
+void QFTableModelColumnHeaderModel::setHasNone(bool hasNone)
+{
+    this->hasNone=hasNone;
+    rebuildModel();
+}
+
+QVariant QFTableModelColumnHeaderModel::data(const QModelIndex &index, int role) const
+{
+    int row=index.row();
+    if (role==Qt::DisplayRole || role==Qt::EditRole) {
+        if (hasNone) {
+            if (row==0) return tr("--- none ---");
+            return tr("#%1: %2").arg(row).arg(model->getColumnTitles().value(row-1, ""));
+        } else {
+            return tr("#%1: %2").arg(row+1).arg(model->getColumnTitles().value(row, ""));
+        }
+    } else if (role==Qt::UserRole) {
+        if (hasNone) {
+            if (row==0) return QVariant();
+            return model->getColumnTitles().value(row-1, "");
+        } else {
+            return model->getColumnTitles().value(row, "");
+        }
+    }
+    return QVariant();
+}
+
+Qt::ItemFlags QFTableModelColumnHeaderModel::flags(const QModelIndex &index) const
+{
+    return Qt::ItemIsSelectable|Qt::ItemIsEnabled;
+}
+
+QVariant QFTableModelColumnHeaderModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation==Qt::Horizontal && section==0) return tr("column title");
+    return QVariant();
+}
+
+int QFTableModelColumnHeaderModel::rowCount(const QModelIndex &parent) const
+{
+    if (model) {
+        if (hasNone) return model->columnCount()+1;
+        return model->columnCount();
+    }
+    return 0;
+}
+
+void QFTableModelColumnHeaderModel::rebuildModel()
+{
+    reset();
+}

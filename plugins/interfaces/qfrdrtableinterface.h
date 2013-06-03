@@ -42,6 +42,12 @@ class QFRDRTableInterface {
         virtual void tableSetColumnDataAsDouble(quint16 column, const QVector<double>& data)=0;
         /** \brief returns a whole column in a table converted to  numbers  */
         virtual QVector<double> tableGetColumnDataAsDouble(quint16 column)=0;
+        /** \brief set the expression used to calculate the contents of the given column  */
+        virtual void tableSetColumnExpression(quint16 column, const QString& expression=QString(""))=0;
+        /** \brief set the comment of the given column  */
+        virtual void tableSetColumnComment(quint16 column, const QString& comment=QString(""))=0;
+        /** \brief set the comment for the given cell (row, column)  */
+        virtual void tableSetComment(quint16 row, quint16 column, const QString& comment=QString(""))=0;
 
 };
 

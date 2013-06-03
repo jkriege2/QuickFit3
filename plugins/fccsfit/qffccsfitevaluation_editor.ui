@@ -1,0 +1,624 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFFCCSFitEvaluationEditor</class>
+ <widget class="QWidget" name="QFFCCSFitEvaluationEditor">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1066</width>
+    <height>625</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>FCCS Editor</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout" columnstretch="1,0">
+   <item row="1" column="1" rowspan="2">
+    <layout class="QGridLayout" name="gridLayout_3">
+     <item row="0" column="0" colspan="2">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>file sets:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2">
+      <widget class="QListView" name="lstFileSets">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>350</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="textElideMode">
+        <enum>Qt::ElideMiddle</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QToolButton" name="btnEvaluateCurrent">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Evaluate &amp;Current</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qffccsfitevaluation.qrc">
+         <normaloff>:/fccs_fit/fit_fitcurrent.png</normaloff>:/fccs_fit/fit_fitcurrent.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0" colspan="2">
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="QToolButton" name="btnSaveReport">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Save &amp;Report</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qffccsfitevaluation.qrc">
+         <normaloff>:/fccs_fit/fit_savereport.png</normaloff>:/fccs_fit/fit_savereport.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QToolButton" name="btnEvaluateCurrentAllRuns">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Evaluate &amp;All Runs</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qffccsfitevaluation.qrc">
+         <normaloff>:/fccs_fit/fit_fitallruns.png</normaloff>:/fccs_fit/fit_fitallruns.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QToolButton" name="btnPrintReport">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>&amp;Print Report</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qffccsfitevaluation.qrc">
+         <normaloff>:/fccs_fit/fit_printreport.png</normaloff>:/fccs_fit/fit_printreport.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QToolButton" name="btnClearCurrent">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>clear current</string>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" colspan="2">
+      <widget class="Line" name="line_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QToolButton" name="btnCopyToInitial">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>copy to initial</string>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QToolButton" name="btnClearAllPixels">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>clear All Runs</string>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" colspan="2">
+      <widget class="QCheckBox" name="chkSaveStrings">
+       <property name="text">
+        <string>save long result strings</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="1">
+      <widget class="QFFitAlgorithmComboBox" name="cmbFitAlgorithm"/>
+     </item>
+     <item row="0" column="4">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>&lt;b&gt;Fit algorithm: &lt;/b&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QPushButton" name="btnAlgorithmConfig">
+       <property name="text">
+        <string>&amp;Config</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QPushButton" name="btnAlgorithmHelp">
+       <property name="text">
+        <string>&amp;Description</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="5">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>&lt;b&gt;weighting:&lt;/b&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="6">
+      <widget class="QFFCSWeightingCombobox" name="cmbWeight"/>
+     </item>
+     <item row="0" column="7">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0">
+    <widget class="QVisibleHandleSplitter" name="splitter_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <widget class="QVisibleHandleSplitter" name="splitter_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QVisibleHandleSplitter" name="splitter">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <widget class="QWidget" name="verticalLayoutWidget">
+        <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,1">
+         <item>
+          <widget class="QLabel" name="labPosition">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFPlotter" name="pltData" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>100</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="verticalLayoutWidget_2">
+        <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,0">
+         <item>
+          <widget class="QFPlotter" name="pltResiduals" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>30</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="DataCutSliders" name="datacut" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>10</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QFRDRImageToRunPreview" name="pltOverview" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>100</height>
+        </size>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QTableView" name="tableView"/>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QPushButton" name="btnAddFile">
+           <property name="text">
+            <string>add file</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../lib/lib.qrc">
+             <normaloff>:/lib/file_add.png</normaloff>:/lib/file_add.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnRemoveFile">
+           <property name="text">
+            <string>remove file</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../lib/lib.qrc">
+             <normaloff>:/lib/file_delete.png</normaloff>:/lib/file_delete.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnEditRanges">
+           <property name="text">
+            <string>edit P ranges</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>&lt;b&gt;display options:&lt;/b&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>data:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="JKQTPLinePlotStyleComboBox" name="cmbDisplayData"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>errors:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="JKQTPerrorPlotstyleComboBox" name="cmbErrorDisplay"/>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkGrid">
+       <property name="text">
+        <string>grid</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkKey">
+       <property name="text">
+        <string>key</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFPlotter</class>
+   <extends>QWidget</extends>
+   <header>qfplotter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFRDRImageToRunPreview</class>
+   <extends>QWidget</extends>
+   <header>qfrdrimagetorunpreview.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QVisibleHandleSplitter</class>
+   <extends>QSplitter</extends>
+   <header>qvisiblehandlesplitter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFFitAlgorithmComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qffitalgorithmcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QFFCSWeightingCombobox</class>
+   <extends>QComboBox</extends>
+   <header>qffcsweightingtools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>JKQTPLinePlotStyleComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>JKQTPerrorPlotstyleComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DataCutSliders</class>
+   <extends>QWidget</extends>
+   <header>datacutslider.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../lib/lib.qrc"/>
+  <include location="qffccsfitevaluation.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>cmbFitAlgorithm</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFFCCSFitEvaluationEditor</receiver>
+   <slot>fitAlgorithmChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>128</x>
+     <y>27</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>113</x>
+     <y>39</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAlgorithmConfig</sender>
+   <signal>clicked()</signal>
+   <receiver>QFFCCSFitEvaluationEditor</receiver>
+   <slot>configFitAlgorithm()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>184</x>
+     <y>26</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>172</x>
+     <y>37</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAlgorithmHelp</sender>
+   <signal>clicked()</signal>
+   <receiver>QFFCCSFitEvaluationEditor</receiver>
+   <slot>showFitAlgorithmHelp()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>262</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>242</x>
+     <y>36</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbDisplayData</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>QFFCCSFitEvaluationEditor</receiver>
+   <slot>displayOptionsChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>146</x>
+     <y>57</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>178</x>
+     <y>65</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbErrorDisplay</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>QFFCCSFitEvaluationEditor</receiver>
+   <slot>displayOptionsChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>310</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>329</x>
+     <y>66</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkGrid</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFFCCSFitEvaluationEditor</receiver>
+   <slot>displayOptionsChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>356</x>
+     <y>58</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>65</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkKey</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFFCCSFitEvaluationEditor</receiver>
+   <slot>displayOptionsChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>383</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>618</x>
+     <y>64</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>fitAlgorithmChanged(int)</slot>
+  <slot>configFitAlgorithm()</slot>
+  <slot>showFitAlgorithmHelp()</slot>
+  <slot>displayOptionsChanged()</slot>
+ </slots>
+</ui>

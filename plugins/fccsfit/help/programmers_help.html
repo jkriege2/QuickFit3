@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>imFCCS Fit: Hints for fit model programmers</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	
+	 This plugin uses a subset of the available QuickFit Fit models. When implementing a model for the imaging FCCS Fit plugin, please keep these hints in mind:
+	 <ul>
+	   <li>Some parameter names have special meaning and QuickFit will possibly fill in a special value:
+	     <ul>
+		   <li><tt>count_rate</tt> is the countrate measured together with the FCS curve (if available) in Hz or counts per second</li>
+		   <li><tt>count_rate1</tt> is the countrate measured together with the FCCS curve in channel 1 (if available) in Hz or counts per second</li>
+		   <li><tt>count_rate2</tt> is the countrate measured together with the FCCS curve in channel 2 (if available) in Hz or counts per second</li>
+		   <li><tt>pixel_width, pixel_height</tt> are the width and height of image pixels (usually also taking care of binning) in nanometers.</li>
+		   <li><tt>dls_angle</tt> the scattering angle for e.g. dynamic light scattering in degrees.</li>
+		   <li><tt>wavelength</tt> the wavelength for e.g. dynamic light scattering in nanometers.</li>
+		   <li><tt>refractive_index</tt> the refractive indes for e.g. dynamic light scattering.</li>
+		   <li><tt>refractive_index</tt> the sample viscosity for e.g. dynamic light scattering centi Poise (cp).</li>
+		   <li><tt>temperature</tt> the temperature for e.g. dynamic light scattering in Kelvin (K).</li>
+		   <li><tt>focus_distance</tt> the distance of two foci in 2fFCS/DCCF in nanometers.</li>
+		   <li><tt>focus_distancex</tt> the distance of two foci in x-direction in a 2fFCS/DCCFmeasurement in nanometers.</li>
+		   <li><tt>focus_distancey</tt> the distance of two foci in y-direction in a 2fFCS/DCCFmeasurement in nanometers.</li>
+		 </ul>
+	   </li>
+	   <li>It is possible to overwrite the QFFitFunction given initial parameter values with the QFEvaluationItem's QFProperties interface, by setting a property of the following names to the desired initial value/err/fix:
+	   <ul>
+	     <li><tt>PRESET_<i>PARAMID</i></tt>: overwrites the initial values of the parameter <tt><i>PARAMID</i></tt> (in all upper-case letters).</li>
+	     <li><tt>PRESET_<i>PARAMID</i>_ERROR</tt>: overwrites the initial error of the parameter <tt><i>PARAMID</i></tt> (in all upper-case letters).</li>
+	     <li><tt>PRESET_<i>PARAMID</i>_FIX</tt>: overwrites the initial fix state of the parameter <tt><i>PARAMID</i></tt> (in all upper-case letters).</li>
+	   </ul>
+	 </ul>
+
+	 <p></p>
+	 <p></p>
+  </body>
+</html>
+

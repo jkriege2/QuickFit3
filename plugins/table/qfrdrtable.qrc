@@ -52,5 +52,7 @@
         <file>icons/plot_rgbimage.png</file>
         <file alias="fit.png">icons/fit.png</file>
         <file alias="regression.png">icons/regression.png</file>
+        <file>icons/plot_boxplotsx.png</file>
+        <file>icons/plot_boxplotsy.png</file>
     </qresource>
 </RCC>

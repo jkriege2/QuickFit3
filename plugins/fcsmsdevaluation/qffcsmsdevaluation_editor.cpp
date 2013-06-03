@@ -1870,7 +1870,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
     if (!eval) return;
     QVector<double> distTau=eval->getMSDTaus(eval->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel());
     QVector<double> dist=eval->getMSD(eval->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel());
-    if (distTau.size()>0) qDebug()<<distTau.first()<<distTau.last();
+    //if (distTau.size()>0) qDebug()<<distTau.first()<<distTau.last();
     int data_start=sliderDist->get_userMin();
     int data_end=sliderDist->get_userMax();
     int msd_start=sliderDist->get_userMin();
@@ -1885,7 +1885,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
     pltDistResults->clearGraphs();
     pltDistResults->get_plotter()->set_showKey(chkShowKeyDistResults->isChecked());
 
-    qDebug()<<dsdist->getColumnCount();
+    //qDebug()<<dsdist->getColumnCount();
     dsdist->deleteAllColumns("msdfit_tau_start");
     dsdist->deleteAllColumns("msdfit_tau_end");
     dsdist->deleteAllColumns("msdfit_tau");
@@ -1897,7 +1897,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
     dsdist->deleteAllColumns("msdtransform_divPD1tau");
     dsdist->deleteAllColumns("msdtransform_divPD2tau");
     dsdist->deleteAllColumns("msdtransform_divPD3tau");
-    qDebug()<<dsdist->getColumnCount();
+    //qDebug()<<dsdist->getColumnCount();
     int c_tau=dsdist->getColumnNames().indexOf("msd_tau");
     if (c_tau<0) c_tau=dsdist->addCopiedColumn(distTau.data(), distTau.size(), "msd_tau");
 
@@ -1961,8 +1961,8 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
         dsdist->addCopiedColumn(fitTauStart.data(), fitTauStart.size(), "msdfit_tau_start");
         dsdist->addCopiedColumn(fitTauEnd.data(), fitTauEnd.size(), "msdfit_tau_end");
 
-        qDebug()<<dsdist->getColumnCount();
-        qDebug()<<c_msdtransformPD0tau<<c_msdtransformPD1tau<<c_msdtransformPD2tau<<c_msdtransformPD3tau<<c_msdtau<<c_msdD<<c_msdA;
+        //qDebug()<<dsdist->getColumnCount();
+        //qDebug()<<c_msdtransformPD0tau<<c_msdtransformPD1tau<<c_msdtransformPD2tau<<c_msdtransformPD3tau<<c_msdtau<<c_msdD<<c_msdA;
         //qDebug()<<fitTau.size()<<fitTau;
         //qDebug()<<fitD.size()<<fitD;
         //qDebug()<<fitA.size()<<fitA;

@@ -578,6 +578,8 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_title(g.title);
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                pg->set_width(g.width);
+                pg->set_shift(g.shift);
                 /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
                 if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
@@ -614,6 +616,8 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_title(g.title);
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                pg->set_width(g.width);
+                pg->set_shift(g.shift);
                 /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
                 if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
@@ -971,6 +975,54 @@ void QFRDRTablePlotWidget::updateGraph() {
                     pg->set_style(g.style);
                     ui->plotter->addGraph(pg);
                 }
+            } else if (g.type==QFRDRTable::gtBoxplotX) {
+                JKQTPboxplotHorizontalGraph* pg=new JKQTPboxplotHorizontalGraph(ui->plotter->get_plotter());
+                pg->set_title(g.title);
+                pg->set_posColumn(getColumnWithStride(g.xcolumn, g));
+                pg->set_minColumn(getColumnWithStride(g.xerrorcolumn, g));
+                pg->set_percentile25Column(getColumnWithStride(g.ycolumn, g));
+                pg->set_medianColumn(getColumnWithStride(g.yerrorcolumn, g));
+                pg->set_meanColumn(getColumnWithStride(g.meancolumn, g));
+                pg->set_percentile75Column(getColumnWithStride(g.q75column, g));
+                pg->set_maxColumn(getColumnWithStride(g.maxcolumn, g));
+
+                pg->set_boxWidth(g.width);
+                pg->set_meanSymbol(g.symbol);
+                pg->set_meanSymbolSize(g.symbolSize);
+                pg->set_lineWidth(g.linewidth);
+                QColor c=g.color;
+                c.setAlphaF(g.colorTransparent);
+                pg->set_color(c);
+
+                QColor fc=g.fillColor;
+                fc.setAlphaF(g.fillColorTransparent);
+                //pg->set_fillColor(fc);
+                //pg->set_style(g.style);
+                ui->plotter->addGraph(pg);
+            } else if (g.type==QFRDRTable::gtBoxplotX) {
+                JKQTPboxplotVerticalGraph* pg=new JKQTPboxplotVerticalGraph(ui->plotter->get_plotter());
+                pg->set_title(g.title);
+                pg->set_posColumn(getColumnWithStride(g.xcolumn, g));
+                pg->set_minColumn(getColumnWithStride(g.xerrorcolumn, g));
+                pg->set_percentile25Column(getColumnWithStride(g.ycolumn, g));
+                pg->set_medianColumn(getColumnWithStride(g.yerrorcolumn, g));
+                pg->set_meanColumn(getColumnWithStride(g.meancolumn, g));
+                pg->set_percentile75Column(getColumnWithStride(g.q75column, g));
+                pg->set_maxColumn(getColumnWithStride(g.maxcolumn, g));
+
+                pg->set_boxWidth(g.width);
+                pg->set_meanSymbol(g.symbol);
+                pg->set_meanSymbolSize(g.symbolSize);
+                pg->set_lineWidth(g.linewidth);
+                QColor c=g.color;
+                c.setAlphaF(g.colorTransparent);
+                pg->set_color(c);
+
+                QColor fc=g.fillColor;
+                fc.setAlphaF(g.fillColorTransparent);
+                //pg->set_fillColor(fc);
+                //pg->set_style(g.style);
+                ui->plotter->addGraph(pg);
             } else { // gtLines etc.
                 JKQTPxyLineErrorGraph* pg=new JKQTPxyLineErrorGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);

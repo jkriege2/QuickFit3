@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="fccs_fit/qffccsfitevaluation.png">images/fccs_fit_22.png</file>
+        <file alias="fccs_fit/qffccsfitevaluation_small.png">images/fccs_fit.png</file>
+        <file alias="fccsfit.png">images/fccs_fit.png</file>
+        <file alias="fccsfit_logo.png">images/fccs_fit_22.png</file>
+    </qresource>
+    <qresource prefix="/fccs_fit">
+        <file alias="fit_savereport.png">images/fcs_savereport_22.png</file>
+        <file alias="fit_printreport.png">images/fcs_printreport_22.png</file>
+        <file alias="plot_saveplot.png">images/fcsplot_saveplot.png</file>
+        <file alias="plot_savedata.png">images/fcsplot_savedata.png</file>
+        <file alias="plot_print.png">images/fcsplot_print.png</file>
+        <file alias="plot_zoomall.png">images/fcsplot_zoomall.png</file>
+        <file alias="fit_fit.png">images/wizard.png</file>
+        <file alias="fit_fitcurrent.png">images/fit_fitcurrent.png</file>
+        <file alias="fit_fitallruns.png">images/fit_fitallruns.png</file>
+        <file alias="fit_fitcurrentrunallfiles.png">images/fit_fitcurrentrunallfiles.png</file>
+        <file alias="fit_fitall.png">images/fit_fitall.png</file>
+        <file alias="param_load.png">images/fileopen.png</file>
+        <file alias="param_save.png">images/filesave.png</file>
+    </qresource>
+</RCC>

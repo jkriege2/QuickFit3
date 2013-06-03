@@ -20,6 +20,11 @@ QFRDRTable::GraphInfo::GraphInfo() {
     ycolumn=-1;
     xerrorcolumn=-1;
     yerrorcolumn=-1;
+    meancolumn=-1;
+    q75column=-1;
+    maxcolumn=-1;
+    width=0.9;
+    shift=0;
     style=Qt::SolidLine;
     color=QColor("red");
     errorColor=color.darker();
@@ -249,6 +254,27 @@ void QFRDRTable::tableSetExpression(quint16 row, quint16 column, const QString &
         datamodel->setData(datamodel->index(row, column), expression, QFRDRTable::TableExpressionRole);
     }
 
+}
+
+void QFRDRTable::tableSetColumnExpression(quint16 column, const QString &expression)
+{
+    if (datamodel)  {
+        datamodel->setColumnHeaderData(column, QFRDRTable::ColumnExpressionRole, expression);
+    }
+}
+
+void QFRDRTable::tableSetColumnComment(quint16 column, const QString &comment)
+{
+    if (datamodel)  {
+        datamodel->setColumnHeaderData(column, QFRDRTable::ColumnCommentRole, comment);
+    }
+}
+
+void QFRDRTable::tableSetComment(quint16 row, quint16 column, const QString &comment)
+{
+    if (datamodel)  {
+        datamodel->setData(datamodel->index(row, column), comment, QFRDRTable::TableCommentRole);
+    }
 }
 
 QString QFRDRTable::tableGetExpression(quint16 row, quint16 column) const
@@ -1088,6 +1114,11 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.ycolumn=ge.attribute("ycolumn", "-1").toInt();
                     graph.xerrorcolumn=ge.attribute("xerrorcolumn", "-1").toInt();
                     graph.yerrorcolumn=ge.attribute("yerrorcolumn", "-1").toInt();
+
+                    graph.meancolumn=ge.attribute("meancolumn", "-1").toInt();
+                    graph.q75column=ge.attribute("q75column", "-1").toInt();
+                    graph.maxcolumn=ge.attribute("maxcolumn", "-1").toInt();
+
                     graph.linewidth=ge.attribute("linewidth", "1").toDouble();
                     graph.symbolSize=ge.attribute("symbolSize", "1").toDouble();
                     graph.color=QStringToQColor(ge.attribute("color", "blue"));
@@ -1104,6 +1135,8 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.stride=ge.attribute("stride", "1").toInt();
                     graph.strideStart=ge.attribute("stride_start", "1").toInt();
                     graph.isStrided=QStringToBool(ge.attribute("is_strided", "false"));
+                    graph.width=ge.attribute("width", "0.9").toDouble();
+                    graph.shift=ge.attribute("shift", "0").toDouble();
 
                     graph.imageTrueColor=QStringToQColor(ge.attribute("image_truecolor", "blue"));
                     graph.imageTrueTransparent=ge.attribute("image_truecolor_trans", "0.5").toDouble();
@@ -1248,6 +1281,13 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("ycolumn", QString::number(plots[i].graphs[g].ycolumn));
             w.writeAttribute("xerrorcolumn", QString::number(plots[i].graphs[g].xerrorcolumn));
             w.writeAttribute("yerrorcolumn", QString::number(plots[i].graphs[g].yerrorcolumn));
+
+            w.writeAttribute("meancolumn", QString::number(plots[i].graphs[g].meancolumn));
+            w.writeAttribute("q75column", QString::number(plots[i].graphs[g].q75column));
+            w.writeAttribute("maxcolumn", QString::number(plots[i].graphs[g].maxcolumn));
+            w.writeAttribute("width", CDoubleToQString(plots[i].graphs[g].width));
+            w.writeAttribute("shift", CDoubleToQString(plots[i].graphs[g].shift));
+
             w.writeAttribute("linewidth", QString::number(plots[i].graphs[g].linewidth));
             w.writeAttribute("symbolSize", QString::number(plots[i].graphs[g].symbolSize));
             w.writeAttribute("style", QPenStyle2String(plots[i].graphs[g].style));

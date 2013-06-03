@@ -293,4 +293,26 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
     private:
 };
 
+class QFWIDLIB_EXPORT QFTableModelColumnHeaderModel : public QAbstractListModel {
+        Q_OBJECT
+    public:
+        /** Default constructor */
+        QFTableModelColumnHeaderModel(QFTableModel * table, QObject* parent=NULL);
+        /** Default destructor */
+        virtual ~QFTableModelColumnHeaderModel();
+
+        void setModel(QFTableModel * model);
+        void setHasNone(bool hasNone);
+
+        virtual QVariant data(const QModelIndex &index, int role) const;
+        virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+        virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+        virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    public slots:
+        void rebuildModel();
+    protected:
+        QFTableModel * model;
+        bool hasNone;
+};
+
 #endif // QFTABLEMODEL_H

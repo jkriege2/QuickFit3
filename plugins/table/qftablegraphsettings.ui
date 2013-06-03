@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>654</width>
-    <height>740</height>
+    <height>850</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -129,6 +129,24 @@
       <property name="icon">
        <iconset resource="qfrdrtable.qrc">
         <normaloff>:/table/icons/plot_hbars.png</normaloff>:/table/icons/plot_hbars.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>boxplot X</string>
+      </property>
+      <property name="icon">
+       <iconset resource="qfrdrtable.qrc">
+        <normaloff>:/table/icons/plot_boxplotsx.png</normaloff>:/table/icons/plot_boxplotsx.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>boxplot Y</string>
+      </property>
+      <property name="icon">
+       <iconset resource="qfrdrtable.qrc">
+        <normaloff>:/table/icons/plot_boxplotsy.png</normaloff>:/table/icons/plot_boxplotsy.png</iconset>
       </property>
      </item>
      <item>
@@ -379,7 +397,7 @@
      </property>
     </widget>
    </item>
-   <item row="10" column="0">
+   <item row="13" column="0">
     <widget class="QCheckBox" name="chkSTrided">
      <property name="font">
       <font>
@@ -392,7 +410,7 @@
      </property>
     </widget>
    </item>
-   <item row="10" column="1">
+   <item row="13" column="1">
     <widget class="QWidget" name="widStride" native="true">
      <property name="enabled">
       <bool>false</bool>
@@ -451,7 +469,7 @@
      </layout>
     </widget>
    </item>
-   <item row="11" column="0">
+   <item row="14" column="0">
     <widget class="QLabel" name="labColor">
      <property name="font">
       <font>
@@ -467,7 +485,7 @@
      </property>
     </widget>
    </item>
-   <item row="11" column="1">
+   <item row="14" column="1">
     <widget class="QWidget" name="widColor" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_17" stretch="1,0,0,0">
       <property name="margin">
@@ -560,7 +578,7 @@
      </layout>
     </widget>
    </item>
-   <item row="12" column="0">
+   <item row="15" column="0">
     <widget class="QLabel" name="labLinestyle">
      <property name="font">
       <font>
@@ -576,7 +594,7 @@
      </property>
     </widget>
    </item>
-   <item row="12" column="1">
+   <item row="15" column="1">
     <widget class="QWidget" name="widLineStyle" native="true">
      <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0,0,0,0,0">
       <property name="margin">
@@ -653,7 +671,7 @@
      </layout>
     </widget>
    </item>
-   <item row="13" column="0">
+   <item row="16" column="0">
     <widget class="QLabel" name="labFillColor">
      <property name="font">
       <font>
@@ -669,7 +687,7 @@
      </property>
     </widget>
    </item>
-   <item row="13" column="1">
+   <item row="16" column="1">
     <widget class="QWidget" name="widFillColor" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="1,0,0">
       <property name="margin">
@@ -752,7 +770,7 @@
      </layout>
     </widget>
    </item>
-   <item row="14" column="0">
+   <item row="17" column="0">
     <widget class="QLabel" name="labSymbol">
      <property name="font">
       <font>
@@ -768,7 +786,7 @@
      </property>
     </widget>
    </item>
-   <item row="14" column="1">
+   <item row="17" column="1">
     <widget class="QWidget" name="widSymbol" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_22" stretch="1,0,0">
       <property name="margin">
@@ -819,7 +837,7 @@
      </layout>
     </widget>
    </item>
-   <item row="15" column="0">
+   <item row="19" column="0">
     <widget class="QLabel" name="labErrorStyle">
      <property name="font">
       <font>
@@ -835,7 +853,7 @@
      </property>
     </widget>
    </item>
-   <item row="15" column="1">
+   <item row="19" column="1">
     <widget class="QWidget" name="widErrorStyle" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="1,0,1,0,0,0">
       <property name="margin">
@@ -948,7 +966,7 @@
      </layout>
     </widget>
    </item>
-   <item row="16" column="0">
+   <item row="20" column="0">
     <widget class="QLabel" name="labImage">
      <property name="font">
       <font>
@@ -964,7 +982,7 @@
      </property>
     </widget>
    </item>
-   <item row="16" column="1">
+   <item row="20" column="1">
     <widget class="QWidget" name="widImage" native="true">
      <layout class="QGridLayout" name="gridLayout_5" rowminimumheight="0,0,0,0,0,0,0,0,0,0,0">
       <property name="margin">
@@ -1545,7 +1563,7 @@
      </layout>
     </widget>
    </item>
-   <item row="18" column="1">
+   <item row="22" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -1642,7 +1660,7 @@
    <item row="4" column="1">
     <widget class="QFFitFunctionComboBox" name="cmbQFFitFunction"/>
    </item>
-   <item row="9" column="0">
+   <item row="12" column="0">
     <widget class="QLabel" name="labFuctionParameters">
      <property name="font">
       <font>
@@ -1658,8 +1676,193 @@
      </property>
     </widget>
    </item>
-   <item row="9" column="1">
+   <item row="12" column="1">
     <widget class="QTableView" name="tabFunctionParameters"/>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="labMean">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Mean column:</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmbLinesYError</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="labQ75">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>75% quantile column:</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmbLinesYError</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="labMax">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>max. column:</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmbLinesYError</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QComboBox" name="cmbLinesMean">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="1">
+    <widget class="QComboBox" name="cmbLinesMax">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1">
+    <widget class="QComboBox" name="cmbLinesQ75">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="18" column="0">
+    <widget class="QLabel" name="labWidth">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>width:</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmbColormap</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="18" column="1">
+    <widget class="QWidget" name="widWidth" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QDoubleSpinBox" name="edtWidth">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="suffix">
+         <string> %</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="labShift">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>shift:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="edtShift">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="suffix">
+         <string> %</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>
@@ -1704,6 +1907,7 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>

@@ -59,6 +59,7 @@ class QFTableGraphSettings : public QWidget
     protected:
 
     private:
+        QFTableModelColumnHeaderModel* headerModel;
         Ui::QFTableGraphSettings *ui;
         QFRDRTable* current;
         int plot;
