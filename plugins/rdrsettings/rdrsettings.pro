@@ -32,7 +32,7 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
-ASSETS_TESTDATA.files = ./assets/examples/*.*
+ASSETS_TESTDATA.files = ./assets/examples/testdata/*.*
 ASSETS_TESTDATA.path = $${QFOUTPUT}/examples/$${TARGET}/testdata/
 INSTALLS += ASSETS_TESTDATA
 
