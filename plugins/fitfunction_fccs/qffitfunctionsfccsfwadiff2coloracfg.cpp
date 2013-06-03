@@ -1,8 +1,8 @@
-#include "qffitfunctionsspimfccsfwadiff2coloracfg.h"
+#include "qffitfunctionsfccsfwadiff2coloracfg.h"
 #include "qfmathtools.h"
 #include <cmath>
-#include "imfcstools.h"
-QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::QFFitFunctionsSPIMFCCSFWADiff2ColorACFG() {
+#include "fcstools.h"
+QFFitFunctionsFCCSFWADiff2ColorACFG::QFFitFunctionsFCCSFWADiff2ColorACFG() {
     //           type,         id,                        name,                                                   label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,               initialFIx,  initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(FloatNumber,  "concentration_a",         "concentration of species a in focus",         "C<sub>a</sub>",           "nM",         "nM",                              true,      true,          true,              QFFitFunction::DisplayError, false, 10,          0,        1e50,     1    );
     #define FCCSDiff_concentrationa 0
@@ -42,7 +42,7 @@ QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::QFFitFunctionsSPIMFCCSFWADiff2ColorACFG
 }
 
 
-double QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::evaluate(double t, const double* data) const {
+double QFFitFunctionsFCCSFWADiff2ColorACFG::evaluate(double t, const double* data) const {
     const double cab=data[FCCSDiff_concentrationab]*6.022e-1; // FCCSDiff_concentrationab given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
     const double ca=data[FCCSDiff_concentrationa]*6.022e-1; // FCCSDiff_concentrationa given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
     const double Da=data[FCCSDiff_diff_acoeffa];
@@ -72,11 +72,11 @@ double QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::evaluate(double t, const double*
     const double etaG=(cr1-background1)/(ca+cab);
     const double Fg=etaG*(ca+cab);
 
-    // double Grr_b=etaR*etaR*cb*QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Db, alphab, t, wxyR, wxyR, wzR, wzR);
-    // double Grr_ab=etaR*etaR*cab*QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, alphaab, t, wxyR, wxyR, wzR, wzR);
-     double Ggg_a=etaG*etaG*ca*QFFitFunctionsFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Da, alphaa, t, wxyG, wxyG, wzG, wzG);
-     double Ggg_ab=etaG*etaG*cab*QFFitFunctionsFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, alphaab, t, wxyG, wxyG, wzG, wzG);
-    // double Ggr_ab=etaG*etaR*cab*QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, alphaab, t, wxyG, wxyR, wzG, wzR);
+    // double Grr_b=etaR*etaR*cb*QFFitFunctionsFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Db, alphab, t, wxyR, wxyR, wzR, wzR);
+    // double Grr_ab=etaR*etaR*cab*QFFitFunctionsFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, alphaab, t, wxyR, wxyR, wzR, wzR);
+     double Ggg_a=etaG*etaG*ca*QFFitFunctionsFCCSFWADiff2ColorCCF_corrfactor( dx, dy, dz, Da, alphaa, t, wxyG, wxyG, wzG, wzG);
+     double Ggg_ab=etaG*etaG*cab*QFFitFunctionsFCCSFWADiff2ColorCCF_corrfactor( dx, dy, dz, Dab, alphaab, t, wxyG, wxyG, wzG, wzG);
+    // double Ggr_ab=etaG*etaR*cab*QFFitFunctionsFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, alphaab, t, wxyG, wxyR, wzG, wzR);
     if (fabs(ca)<1e-15) Ggg_a=0;
     //if (fabs(cb)<1e-15) Grr_b=0;
     if (fabs(cab)<1e-15) /*Grr_ab=*/Ggg_ab=/*Ggr_ab=*/0;
@@ -86,7 +86,7 @@ double QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::evaluate(double t, const double*
     return offset+backfactor*cfac/(Fg*Fg);
 }
 
-void QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::calcParameter(double* data, double* error) const {
+void QFFitFunctionsFCCSFWADiff2ColorACFG::calcParameter(double* data, double* error) const {
     const double cab=data[FCCSDiff_concentrationab]*6.022e-1; // FCCSDiff_concentrationab given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
     double ecab=0;
     const double ca=data[FCCSDiff_concentrationa]*6.022e-1; // FCCSDiff_concentrationa given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
@@ -159,18 +159,18 @@ void QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::calcParameter(double* data, double
     data[FCCSDiff_brightness_a]=(cr1-background1)/(ca+cab);
     if (error) error[FCCSDiff_brightness_a]=0;
 
-    data[FCSSDiff_focus_volume]=SPIMFCS_newVeff(a, wxyG, wzG);
-    if (error) error[FCSSDiff_focus_volume]=SPIMFCS_newVeffError(a, ea, wxyG, ewxyG, wzG, ewzG);
+    data[FCSSDiff_focus_volume]=FCS_newVeff( wxyG, wzG);
+    if (error) error[FCSSDiff_focus_volume]=FCS_newVeffError( wxyG, ewxyG, wzG, ewzG);
 }
 
-bool QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::isParameterVisible(int parameter, const double* data) const {
+bool QFFitFunctionsFCCSFWADiff2ColorACFG::isParameterVisible(int parameter, const double* data) const {
     return true;
 }
 
-unsigned int QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionsFCCSFWADiff2ColorACFG::getAdditionalPlotCount(const double* params) {
     return 0;
 }
 
-QString QFFitFunctionsSPIMFCCSFWADiff2ColorACFG::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionsFCCSFWADiff2ColorACFG::transformParametersForAdditionalPlot(int plot, double* params) {
     return "";
 }

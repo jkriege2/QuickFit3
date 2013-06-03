@@ -25,10 +25,10 @@ HEADERS += qffccsfitevaluation.h \
     ../base_classes/qffcsweightingtools.h \
     ../base_classes/qffcstools.h \
     optionswidget.h \
-    ../base_classes/qfrdrimagetorunpreview.h \
     qffccsparameterinputtable.h \
     qffccsparameterinputdelegate.h \
-    qffccsfilesetsmodel.h
+    qffccsfilesetsmodel.h \
+    ../base_classes/qfrdrrunselector.h
 
 SOURCES += qffccsfitevaluation.cpp \
            qffccsfitevaluation_item.cpp \
@@ -40,10 +40,10 @@ SOURCES += qffccsfitevaluation.cpp \
     ../base_classes/qffcsweightingtools.cpp \
     ../base_classes/qffcstools.cpp \
     optionswidget.cpp \
-    ../base_classes/qfrdrimagetorunpreview.cpp \
     qffccsparameterinputtable.cpp \
     qffccsparameterinputdelegate.cpp \
-    qffccsfilesetsmodel.cpp
+    qffccsfilesetsmodel.cpp \
+    ../base_classes/qfrdrrunselector.cpp
 
 FORMS = qffccsfitevaluation_editor.ui \   
     optionswidget.ui

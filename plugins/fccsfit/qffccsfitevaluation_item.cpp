@@ -13,7 +13,7 @@ QFFCCSMatchRDRFunctor::QFFCCSMatchRDRFunctor()
 
 bool QFFCCSMatchRDRFunctor::matches(const QFRawDataRecord *record) const
 {
-    return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
+    return record->inherits("QFRDRFCSDataInterface");
 }
 
 QFFCCSFitEvaluationItem::QFFCCSFitEvaluationItem(QFProject* parent):

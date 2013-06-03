@@ -26,7 +26,6 @@ QFFCCSFitEvaluationEditor::QFFCCSFitEvaluationEditor(QFPluginServices* services,
 
     // setup widgets
     ui->setupUi(this);
-    ui->pltOverview->setRunSelectWidgetActive(true);
     connect(ui->pltOverview, SIGNAL(currentRunChanged(int)), this, SLOT(setCurrentRun(int)));
     ui->splitter->setChildrenCollapsible(false);
     ui->splitter->setStretchFactor(0,3);
@@ -38,7 +37,7 @@ QFFCCSFitEvaluationEditor::QFFCCSFitEvaluationEditor(QFPluginServices* services,
     ui->datacut->set_allowCopyToAll(false);
     ui->datacut->set_copyToFilesEnabled(false);
     ui->datacut->set_copyToRunsEnabled(false);
-    ui->datacut->set_runsName(tr("pixels"));
+    ui->datacut->set_runsName(tr("runs"));
 
     ui->cmbDisplayData->addUsedSymbol(JKQTPfilledCircle);
     ui->cmbDisplayData->addUsedSymbol(JKQTPdot);
@@ -107,30 +106,30 @@ QFFCCSFitEvaluationEditor::QFFCCSFitEvaluationEditor(QFPluginServices* services,
     ui->btnEvaluateCurrent->setDefaultAction(actFitCurrent);
     menuEvaluation->addAction(actFitCurrent);
 
-    actFitAllPixelsMT=new QAction(QIcon(":/fccsfit/fit_fitallruns.png"), tr("Fit &All Pixels (MT)"), this);
-    connect(actFitAllPixelsMT, SIGNAL(triggered()), this, SLOT(fitAllPixelsThreaded()));
-    actFitAllPixelsMT->setEnabled(false);
-    ui->btnEvaluateCurrentAllRuns->addAction(actFitAllPixelsMT);
-    menuEvaluation->addAction(actFitAllPixelsMT);
+    actFitAllRunsMT=new QAction(QIcon(":/fccsfit/fit_fitallruns.png"), tr("Fit &All Runs (MT)"), this);
+    connect(actFitAllRunsMT, SIGNAL(triggered()), this, SLOT(fitAllRunsThreaded()));
+    actFitAllRunsMT->setEnabled(false);
+    ui->btnEvaluateCurrentAllRuns->addAction(actFitAllRunsMT);
+    menuEvaluation->addAction(actFitAllRunsMT);
 
-    actFitAllPixels=new QAction(QIcon(":/fccsfit/fit_fitallruns.png"), tr("Fit &All Pixels"), this);
-    connect(actFitAllPixels, SIGNAL(triggered()), this, SLOT(fitAllPixels()));
-    ui->btnEvaluateCurrentAllRuns->addAction(actFitAllPixels);
-    ui->btnEvaluateCurrentAllRuns->setDefaultAction(actFitAllPixels);
-    menuEvaluation->addAction(actFitAllPixels);
+    actFitAllRuns=new QAction(QIcon(":/fccsfit/fit_fitallruns.png"), tr("Fit &All Runs"), this);
+    connect(actFitAllRuns, SIGNAL(triggered()), this, SLOT(fitAllRuns()));
+    ui->btnEvaluateCurrentAllRuns->addAction(actFitAllRuns);
+    ui->btnEvaluateCurrentAllRuns->setDefaultAction(actFitAllRuns);
+    menuEvaluation->addAction(actFitAllRuns);
 
     actResetCurrent=new QAction(tr("&Reset Current"), this);
-    actResetCurrent->setToolTip(tr("reset the currently displayed file (and pixel) to the initial parameters\nThis deletes all fit results stored for the current file."));
+    actResetCurrent->setToolTip(tr("reset the currently displayed file (and runs) to the initial parameters\nThis deletes all fit results stored for the current file."));
     connect(actResetCurrent, SIGNAL(triggered()), this, SLOT(resetCurrent()));
     ui->btnClearCurrent->setDefaultAction(actResetCurrent);
     menuEvaluation->addSeparator();
     menuEvaluation->addAction(actResetCurrent);
 
-    actResetAllPixels=new QAction(tr("Reset All &Pixels"), this);
-    actResetAllPixels->setToolTip(tr("reset all pixels to the initial parameters in the current file.\nThis deletes all fit results stored for all runs in the current file."));
-    connect(actResetAllPixels, SIGNAL(triggered()), this, SLOT(resetAllPixels()));
-    ui->btnClearAllPixels->setDefaultAction(actResetAllPixels);
-    menuEvaluation->addAction(actResetAllPixels);
+    actResetAllRuns=new QAction(tr("Reset All &Runs"), this);
+    actResetAllRuns->setToolTip(tr("reset all runs to the initial parameters in the current file.\nThis deletes all fit results stored for all runs in the current file."));
+    connect(actResetAllRuns, SIGNAL(triggered()), this, SLOT(resetAllPixels()));
+    ui->btnClearAllPixels->setDefaultAction(actResetAllRuns);
+    menuEvaluation->addAction(actResetAllRuns);
 
     actCopyToInitial=new QAction(tr("Copy to &Initial"), this);
     actCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters,\n so they are used by files/runs that were not fit yet."));
@@ -152,10 +151,10 @@ QFFCCSFitEvaluationEditor::QFFCCSFitEvaluationEditor(QFPluginServices* services,
 
     QMenu* m=menuFCCSFit->addMenu(tr("configure evaluation for ..."));
 
-    actConfigureForNormalFCCS=new QAction(tr("SPIM-FCCS: normal diffusion"), this);
+    actConfigureForNormalFCCS=new QAction(tr("FCCS: normal diffusion"), this);
     connect(actConfigureForNormalFCCS, SIGNAL(triggered()), this, SLOT(configureForSPFCCS()));
     m->addAction(actConfigureForNormalFCCS);
-    actConfigureForAnomalousFCCS=new QAction(tr("SPIM-FCCS: anomalous diffusion"), this);
+    actConfigureForAnomalousFCCS=new QAction(tr("FCCS: anomalous diffusion"), this);
     connect(actConfigureForAnomalousFCCS, SIGNAL(triggered()), this, SLOT(configureForASPFCCS()));
     m->addAction(actConfigureForAnomalousFCCS);
 
@@ -394,9 +393,9 @@ void QFFCCSFitEvaluationEditor::configureForSPFCCS() {
         }
     }
 
-    data->setFitFunction(0, "fccs_spim_fw_diff2coloracfg");
-    data->setFitFunction(1, "fccs_spim_fw_diff2coloracfr");
-    data->setFitFunction(2, "fccs_spim_fw_diff2colorccf");
+    data->setFitFunction(0, "fccs_fw_diff2coloracfg");
+    data->setFitFunction(1, "fccs_fw_diff2coloracfr");
+    data->setFitFunction(2, "fccs_fw_diff2colorccf");
     data->clearLinkParameters();
 
     QStringList globals;
@@ -404,7 +403,7 @@ void QFFCCSFitEvaluationEditor::configureForSPFCCS() {
           <<"diff_coeff_a"  <<"diff_coeff_b"  <<"diff_coeff_ab"
          <<"crosstalk"<<"focus_distance_x"  <<"focus_distance_y"  <<"focus_distance_z"
         <<"focus_width1"  <<"focus_width2"  <<"focus_height1"  <<"focus_height2"
-       <<"pixel_width"<<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
+       <<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
 
     for (int g=0; g<globals.size(); g++) {
         data->setLinkParameter(0, globals[g], g);
@@ -428,9 +427,9 @@ void QFFCCSFitEvaluationEditor::configureForASPFCCS() {
         }
     }
 
-    data->setFitFunction(0, "fccs_spim_fw_adiff2coloracfg");
-    data->setFitFunction(1, "fccs_spim_fw_adiff2coloracfr");
-    data->setFitFunction(2, "fccs_spim_fw_adiff2colorccf");
+    data->setFitFunction(0, "fccs_fw_adiff2coloracfg");
+    data->setFitFunction(1, "fccs_fw_adiff2coloracfr");
+    data->setFitFunction(2, "fccs_fw_adiff2colorccf");
     data->clearLinkParameters();
 
     QStringList globals;
@@ -439,7 +438,7 @@ void QFFCCSFitEvaluationEditor::configureForASPFCCS() {
          <<"diff_alpha_a"  <<"diff_alpha_b"  <<"diff_alpha_ab"
          <<"crosstalk"<<"focus_distance_x"  <<"focus_distance_y"  <<"focus_distance_z"
         <<"focus_width1"  <<"focus_width2"  <<"focus_height1"  <<"focus_height2"
-       <<"pixel_width"<<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
+       <<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
 
     for (int g=0; g<globals.size(); g++) {
         data->setLinkParameter(0, globals[g], g);
@@ -570,7 +569,6 @@ void QFFCCSFitEvaluationEditor::displayData() {
             QFRawDataRecord* rec=eval->getFitFile(file);
 
             QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(rec);
-            QFRDRImageToRunInterface* runintf=dynamic_cast<QFRDRImageToRunInterface*>(rec);
 
             double* data=fcs->getCorrelationRun(eval->getCurrentIndex());
             double* tau=fcs->getCorrelationT();
@@ -727,14 +725,14 @@ void QFFCCSFitEvaluationEditor::fitCurrent() {
     eval->getParameterInputTableModel()->rebuildModel();
 }
 
-void QFFCCSFitEvaluationEditor::fitAllPixelsThreaded()
+void QFFCCSFitEvaluationEditor::fitAllRunsThreaded()
 {
     if (!current) return;
     QFFCCSFitEvaluationItem* eval=qobject_cast<QFFCCSFitEvaluationItem*>(current);
     if (!eval) return;
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
     if (!falg->isThreadSafe()) {
-        fitAllPixels();
+        fitAllRuns();
         return;
     }
     if (!falg) return;
@@ -856,7 +854,7 @@ void QFFCCSFitEvaluationEditor::fitAllPixelsThreaded()
     eval->getParameterInputTableModel()->rebuildModel();
 }
 
-void QFFCCSFitEvaluationEditor::fitAllPixels()
+void QFFCCSFitEvaluationEditor::fitAllRuns()
 {
     if (!current) return;
     QFFCCSFitEvaluationItem* eval=qobject_cast<QFFCCSFitEvaluationItem*>(current);

@@ -9,10 +9,24 @@ DESTDIR = $$QFOUTPUT/plugins
 
 # Input
 HEADERS += qfpfitfunctionsfccs.h \
-           qffitfunctionfccsnormaldiff3d.h
+           qffitfunctionfccsnormaldiff3d.h \
+    qffitfunctionsfccsfwdiff2colorccf.h \
+    qffitfunctionsfccsfwdiff2coloracfr.h \
+    qffitfunctionsfccsfwdiff2coloracfg.h \
+    qffitfunctionsfccsfwadiff2colorccf.h \
+    qffitfunctionsfccsfwadiff2coloracfr.h \
+    qffitfunctionsfccsfwadiff2coloracfg.h \
+    fcstools.h
 
 SOURCES += qfpfitfunctionsfccs.cpp\
-           qffitfunctionfccsnormaldiff3d.cpp
+           qffitfunctionfccsnormaldiff3d.cpp \
+    qffitfunctionsfccsfwdiff2colorccf.cpp \
+    qffitfunctionsfccsfwdiff2coloracfr.cpp \
+    qffitfunctionsfccsfwdiff2coloracfg.cpp \
+    qffitfunctionsfccsfwadiff2colorccf.cpp \
+    qffitfunctionsfccsfwadiff2coloracfr.cpp \
+    qffitfunctionsfccsfwadiff2coloracfg.cpp \
+    fcstools.cpp
 
 FORMS =
 

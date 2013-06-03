@@ -92,13 +92,13 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
         QAction* actConfigureForNormalFCCS;
         QAction* actConfigureForAnomalousFCCS;
         QAction* actFitCurrent;
-        QAction* actFitAllPixelsMT;
-        QAction* actFitAllPixels;
+        QAction* actFitAllRunsMT;
+        QAction* actFitAllRuns;
         QAction* actPrintReport;
         QAction* actSaveReport;
 
         QAction* actResetCurrent;
-        QAction* actResetAllPixels;
+        QAction* actResetAllRuns;
         QAction* actCopyToInitial;
 
         QMenu* menuFCCSFit;
@@ -139,9 +139,9 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief evaluate current file */
         void fitCurrent();
         /** \brief all runs/pixels current file */
-        void fitAllPixelsThreaded();
+        void fitAllRunsThreaded();
         /** \brief all runs/pixels current file, multi-threaded version */
-        void fitAllPixels();
+        void fitAllRuns();
 
         /** \brief display the data from the current raw data record */
         void displayData();

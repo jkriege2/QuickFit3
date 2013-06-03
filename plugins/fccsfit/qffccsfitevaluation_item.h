@@ -45,18 +45,18 @@ class QFFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, pu
         virtual ~QFFCCSFitEvaluationItem();
 
         /** \brief return type (short type string) */
-        virtual QString getType() const { return QString("fccs_fit"); };
+        virtual QString getType() const { return QString("fccs_fit"); }
         /** \brief return type (longer type string, user readable) */
-        virtual QString getTypeName() const { return tr("imaging FCCS Fit"); };
+        virtual QString getTypeName() const { return tr("Global FCCS Fit"); }
         /** \brief return a small icon (16x16) */
-        virtual QIcon getSmallIcon() const { return QIcon(":/fccs_fit.png"); };
+        virtual QIcon getSmallIcon() const { return QIcon(":/fccs_fit.png"); }
         /** \brief return type description */
-        virtual QString getTypeDescription() const { return tr("Least squares fitting for imaging fluorescence crosscorrelation spectroscopy (imaging FCCS) data"); };
+        virtual QString getTypeDescription() const { return tr("Global least squares fitting for fluorescence crosscorrelation spectroscopy (FCCS) data"); }
         /** \brief return a large icon (32x32) */
-        virtual QIcon getLargeIcon() const { return QIcon(":/fccs_fit_logo.png"); };
+        virtual QIcon getLargeIcon() const { return QIcon(":/fccs_fit_logo.png"); }
         /** \brief returns the number of additional editor panes for this record */
         /** \brief returns the name for the i-th editor pane */
-        virtual QString getEditorName() { return QString("Fit"); };
+        virtual QString getEditorName() { return QString("Fit"); }
         /** \brief create an object for the i-th editor pane */
         virtual QFEvaluationEditor* createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent=NULL);
 
