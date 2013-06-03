@@ -75,6 +75,9 @@ void QFTableGraphSettings::setRecord(QFRDRTable *record, int plot)
     ui->cmbLinesXError->setModel(headerModel);
     ui->cmbLinesYData->setModel(headerModel);
     ui->cmbLinesYError->setModel(headerModel);
+    ui->cmbLinesMax->setModel(headerModel);
+    ui->cmbLinesMean->setModel(headerModel);
+    ui->cmbLinesQ75->setModel(headerModel);
 
     /*reloadColumns(ui->cmbLinesXData);
     reloadColumns(ui->cmbLinesXError);
@@ -639,8 +642,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labMean->setVisible(true);
                 ui->labQ75->setVisible(true);
                 ui->labDataX->setText(tr("position Column:"));
-                ui->labDataY->setText(tr("Minimum Column:"));
-                ui->labErrorX->setText(tr("25% Quantile Column:"));
+                ui->labErrorX->setText(tr("Minimum Column:"));
+                ui->labDataY->setText(tr("25% Quantile Column:"));
                 ui->labErrorY->setText(tr("Median Column:"));
                 ui->labMax->setText(tr("Maximum Column:"));
                 ui->labMean->setText(tr("Mean Column:"));

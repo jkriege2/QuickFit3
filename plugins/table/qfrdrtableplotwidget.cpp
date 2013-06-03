@@ -976,7 +976,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                     ui->plotter->addGraph(pg);
                 }
             } else if (g.type==QFRDRTable::gtBoxplotX) {
-                JKQTPboxplotHorizontalGraph* pg=new JKQTPboxplotHorizontalGraph(ui->plotter->get_plotter());
+                JKQTPboxplotVerticalGraph* pg=new JKQTPboxplotVerticalGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
                 pg->set_posColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_minColumn(getColumnWithStride(g.xerrorcolumn, g));
@@ -999,8 +999,8 @@ void QFRDRTablePlotWidget::updateGraph() {
                 //pg->set_fillColor(fc);
                 //pg->set_style(g.style);
                 ui->plotter->addGraph(pg);
-            } else if (g.type==QFRDRTable::gtBoxplotX) {
-                JKQTPboxplotVerticalGraph* pg=new JKQTPboxplotVerticalGraph(ui->plotter->get_plotter());
+            } else if (g.type==QFRDRTable::gtBoxplotY) {
+                JKQTPboxplotHorizontalGraph* pg=new JKQTPboxplotHorizontalGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
                 pg->set_posColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_minColumn(getColumnWithStride(g.xerrorcolumn, g));

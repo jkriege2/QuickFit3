@@ -1412,6 +1412,7 @@ bool QFTableModel::readXML(const QString &filename) {
 QFTableModelColumnHeaderModel::QFTableModelColumnHeaderModel(QFTableModel *table, QObject *parent):
     QAbstractListModel(parent)
 {
+    model=NULL;
     hasNone=false;
     setModel(table);
 }
