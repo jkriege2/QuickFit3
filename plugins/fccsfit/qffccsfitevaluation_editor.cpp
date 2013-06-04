@@ -101,18 +101,18 @@ QFFCCSFitEvaluationEditor::QFFCCSFitEvaluationEditor(QFPluginServices* services,
     menuEvaluation=propEditor->addOrFindMenu(tr("&Evaluation"), 0);
     menuFCCSFit=propEditor->addOrFindMenu(tr("&Tools"), 0);
 
-    actFitCurrent=new QAction(QIcon(":/fccsfit/fit_fitcurrent.png"), tr("Fit &Current"), this);
+    actFitCurrent=new QAction(QIcon(":/fccs_fit/fit_fitcurrent.png"), tr("Fit &Current"), this);
     connect(actFitCurrent, SIGNAL(triggered()), this, SLOT(fitCurrent()));
     ui->btnEvaluateCurrent->setDefaultAction(actFitCurrent);
     menuEvaluation->addAction(actFitCurrent);
 
-    actFitAllRunsMT=new QAction(QIcon(":/fccsfit/fit_fitallruns.png"), tr("Fit &All Runs (MT)"), this);
+    actFitAllRunsMT=new QAction(QIcon(":/fccs_fit/fit_fitallruns.png"), tr("Fit &All Runs (MT)"), this);
     connect(actFitAllRunsMT, SIGNAL(triggered()), this, SLOT(fitAllRunsThreaded()));
     actFitAllRunsMT->setEnabled(false);
     ui->btnEvaluateCurrentAllRuns->addAction(actFitAllRunsMT);
     menuEvaluation->addAction(actFitAllRunsMT);
 
-    actFitAllRuns=new QAction(QIcon(":/fccsfit/fit_fitallruns.png"), tr("Fit &All Runs"), this);
+    actFitAllRuns=new QAction(QIcon(":/fccs_fit/fit_fitallruns.png"), tr("Fit &All Runs"), this);
     connect(actFitAllRuns, SIGNAL(triggered()), this, SLOT(fitAllRuns()));
     ui->btnEvaluateCurrentAllRuns->addAction(actFitAllRuns);
     ui->btnEvaluateCurrentAllRuns->setDefaultAction(actFitAllRuns);
@@ -138,13 +138,13 @@ QFFCCSFitEvaluationEditor::QFFCCSFitEvaluationEditor(QFPluginServices* services,
     menuEvaluation->addAction(actCopyToInitial);
 
 
-    actSaveReport=new QAction(QIcon(":/fccsfit/fit_savereport.png"), tr("&Save Report"), this);
+    actSaveReport=new QAction(QIcon(":/fccs_fit/fit_savereport.png"), tr("&Save Report"), this);
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
     ui->btnSaveReport->setDefaultAction(actSaveReport);
     menuEvaluation->addSeparator();
     menuEvaluation->addAction(actSaveReport);
 
-    actPrintReport=new QAction(QIcon(":/fccsfit/fit_printreport.png"), tr("&Print Report"), this);
+    actPrintReport=new QAction(QIcon(":/fccs_fit/fit_printreport.png"), tr("&Print Report"), this);
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
     ui->btnPrintReport->setDefaultAction(actPrintReport);
     menuEvaluation->addAction(actPrintReport);
@@ -402,7 +402,7 @@ void QFFCCSFitEvaluationEditor::configureForSPFCCS() {
     globals<<"concentration_a"<<"concentration_b"<<"concentration_ab"
           <<"diff_coeff_a"  <<"diff_coeff_b"  <<"diff_coeff_ab"
          <<"crosstalk"<<"focus_distance_x"  <<"focus_distance_y"  <<"focus_distance_z"
-        <<"focus_width1"  <<"focus_width2"  <<"focus_height1"  <<"focus_height2"
+        <<"focus_width1"  <<"focus_width2"  <<"focus_struct_fac1"  <<"focus_struct_fac2"
        <<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
 
     for (int g=0; g<globals.size(); g++) {
@@ -437,7 +437,7 @@ void QFFCCSFitEvaluationEditor::configureForASPFCCS() {
           <<"diff_acoeff_a"  <<"diff_acoeff_b"  <<"diff_acoeff_ab"
          <<"diff_alpha_a"  <<"diff_alpha_b"  <<"diff_alpha_ab"
          <<"crosstalk"<<"focus_distance_x"  <<"focus_distance_y"  <<"focus_distance_z"
-        <<"focus_width1"  <<"focus_width2"  <<"focus_height1"  <<"focus_height2"
+        <<"focus_width1"  <<"focus_width2"  <<"focus_struct_fac1"  <<"focus_struct_fac2"
        <<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
 
     for (int g=0; g<globals.size(); g++) {
@@ -579,6 +579,7 @@ void QFFCCSFitEvaluationEditor::displayData() {
                 sigma=NULL;
             }
             long N=fcs->getCorrelationN();
+            qDebug()<<"file="<<file<<" I="<<eval->getCurrentIndex()<<":   tau="<<tau[0]<<" d="<<data[0]<<N;
             if (data && tau) {
                 size_t c_tau=ds->addCopiedColumn(tau, N, tr("file%1: tau [s]").arg(file+1));
                 size_t c_data=ds->addCopiedColumn(data, N, tr("file%1: g(tau)").arg(file+1));

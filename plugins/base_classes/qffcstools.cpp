@@ -3,6 +3,7 @@
 #include "qfrdrcountratesinterface.h"
 
 bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid, double &value, double &error)  {
+    //qDebug()<<"qfFCSHasSpecial: "<<paramid;
     if (paramid=="count_rate") {
         QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
         value=0;
@@ -13,24 +14,31 @@ bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid
         }
         QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);
         if (scrintf && value==0) {
-            value=scrintf->getSimpleCountrateAverage(index)*1000.0;
-            error=scrintf->getSimpleCountrateVariance(index)*1000.0;
+            value=scrintf->getSimpleCountrateAverage(index, true)*1000.0;
+            error=scrintf->getSimpleCountrateStdDev(index, true)*1000.0;
         }
         if (crintf||scrintf) return true;
     } else if (paramid=="count_rate1") {
         QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
         value=0;
         error=0;
+        //qDebug()<<paramid<<crintf;
         if (crintf && crintf->getRateChannels()>0) {
-            error=crintf->getRateStdDev(index, 0)*1000.0;
-            value=crintf->getRateMean(index, 0)*1000.0;
-            //qDebug()<<"getRateMean(run="<<run<<", ch=0) = "<<value<<" +/- "<<error;
+            int c=0;
+            if (crintf->getRateChannelsSwapped()) {
+                if (c==0) c=1;
+                else if (c==1) c=0;
+            }
+            error=crintf->getRateStdDev(index, c)*1000.0;
+            value=crintf->getRateMean(index, c)*1000.0;
+            //qDebug()<<"getRateMean(run="<<index<<", ch=0) = "<<value<<" +/- "<<error;
             return true;
         }
         QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);
+        //qDebug()<<paramid<<scrintf;
         if (scrintf && value==0) {
-            value=scrintf->getSimpleCountrateAverage(index)*1000.0;
-            error=scrintf->getSimpleCountrateVariance(index)*1000.0;
+            value=scrintf->getSimpleCountrateAverage(index,0, false)*1000.0;
+            error=scrintf->getSimpleCountrateStdDev(index,0, false)*1000.0;
             return true;
         }
     } else if (paramid=="count_rate2") {
@@ -38,15 +46,20 @@ bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid
         value=0;
         error=0;
         if (crintf && crintf->getRateChannels()>1) {
-            error=crintf->getRateStdDev(index, 1)*1000.0;
-            value=crintf->getRateMean(index, 1)*1000.0;
-            //qDebug()<<"getRateMean(run="<<run<<", ch=1) = "<<value<<" +/- "<<error;
+            int c=1;
+            if (crintf->getRateChannelsSwapped()) {
+                if (c==0) c=1;
+                else if (c==1) c=0;
+            }
+            error=crintf->getRateStdDev(index, c)*1000.0;
+            value=crintf->getRateMean(index, c)*1000.0;
+            //qDebug()<<"getRateMean(run="<<index<<", ch=1) = "<<value<<" +/- "<<error;
             return true;
         }
         QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);
         if (scrintf && value==0 && scrintf->getSimpleCountrateChannels()>1) {
-            value=scrintf->getSimpleCountrateAverage(index,1)*1000.0;
-            error=scrintf->getSimpleCountrateVariance(index,1)*1000.0;
+            value=scrintf->getSimpleCountrateAverage(index,1, false)*1000.0;
+            error=scrintf->getSimpleCountrateStdDev(index,1, false)*1000.0;
             return true;
         }
     } else if (paramid=="pixel_width") {

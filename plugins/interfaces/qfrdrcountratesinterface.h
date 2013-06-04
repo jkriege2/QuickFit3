@@ -76,6 +76,8 @@ class QFRDRCountRatesInterface
         /** \brief calculate minimum and maximum count rates */
         virtual void getRateMinMax(int run, double& min, double& max, int channel=0) const=0;
 
+        virtual bool getRateChannelsSwapped() const=0;
+
 };
 
 Q_DECLARE_INTERFACE( QFRDRCountRatesInterface,

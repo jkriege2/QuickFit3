@@ -476,9 +476,9 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual QString getImageStackTimepointName(int stack, int t) const;
 
         /** \copydoc QFRDRCountRatesInterface::getSimpleCountrateAverage() */
-        virtual double getSimpleCountrateAverage(int run=-1, int channel=0) const ;
+        virtual double getSimpleCountrateAverage(int run=-1, int channel=0, bool swapChannels=false) const ;
         /** \copydoc QFRDRCountRatesInterface::getSimpleCountrateVariance() */
-        virtual double getSimpleCountrateVariance(int run=-1, int channel=0) const ;
+        virtual double getSimpleCountrateStdDev(int run=-1, int channel=0, bool swapChannels=false) const ;
         /** \copydoc QFRDRCountRatesInterface::getSimpleCountrateChannels() */
         virtual int getSimpleCountrateChannels() const ;
 

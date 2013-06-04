@@ -24,7 +24,8 @@ HEADERS += dlgcsvparameters.h \
     qfrdrfcsfitfunctionsimulator.h \
     ../interfaces/qfrdrrunselection.h \
     ../../../../../LIB/trunk/jkmathparser.h \
-    ../../../../../LIB/trunk/jkiniparser2.h
+    ../../../../../LIB/trunk/jkiniparser2.h \
+    ../interfaces/qfrdrsimplecountrateinterface.h
 
 
 SOURCES += dlgcsvparameters.cpp \

@@ -22,7 +22,7 @@
 -->
 
 <!--
-		<li><a name="2297"><b>2013-06-03 (SVN: 2297)</b>-->
+		<li><a name="2303"><b>2013-06-04 (SVN: 2303)</b>-->
 
 		
 
@@ -34,6 +34,7 @@
 		    <li><b>imfccsfit</b>: imaging FCCS fit evaluation plugin with global fitting, contains tool to calculate the relative CCF amplitude </li>
 		    <li><b>qfe_resultstools</b>: plugin with tools to work with rdr results (currently only a calculator Tool in the Tools menu)</li>
 		    <li><b>qfe_defaultmathparserextensions</b>: plugin to extend the main math parser woth more functions (e.g. regression, model fit, ...)</li>
+		    <li><b>fccs_fit</b>: plugin to perform a global FCCS fit for non-imaging FCS data (e.g. confocal FCS data/DLS data)</li>
 
 		  </ul></li>
 		  <li><b>QuickFit3:</b><ul>
@@ -72,7 +73,7 @@
 		  </ul></li>
 		  
 		  <li><b>imFCCSFit</b><ul>
-		    <li></li>
+		    <li>bugfix: now countrates are no longer swapped in the red-channel model</li>
 		    <li>added D(bin*a) graphs to imFCS calibration wizard</li>
 		    <li>minds parameter ranges now when fitting</li>
 		    <li>added button to activate additional columns to edit the parameter ranges</li>
@@ -94,6 +95,8 @@
 		    <li>added tool to calculate (linear) regression of a plot</li>
 			<li>added several new possibilities to function plot (QFFitFunction, polynomial, exponential, power-law</li>
 			<li>started to implement curve fit tool for QFFitFunction</li>
+			<li>added boxplots</li>
+			<li>allows width and shift for bar charts</li>
 		  </ul></li>
 		  
 		  <li><b>imFCS:</b><ul>
@@ -168,6 +171,10 @@
 		    <li>now displays cut through image row/column for all channels</li>
 		  </ul></li>
 		  
+		  <li><b>fitfunctions_fccs:</b><ul>
+		    <li>added fit function following the Ries/Schwille FCCS framework for normal and anomalous diffusion in confocal FCCS</li>
+		  </ul></li>
+		  
 		  <li><b>msd:</b><ul>
 		    <li>added new testdata of Puc18 plasmid</li>
 		    <li>D(tau) and alpha(tau) curves are now fitted with different methods (LM fit, regression and iteratively reweighted least squares regression)</li>
@@ -191,7 +198,8 @@
 		  
 		  <li><b>fcs:</b><ul>
 		    <li>plugin can load correlation output from the diffusion4 FCS simulation tool</li>
-		    <li>Added and integrated parser for ALV-6000 files by cloning and modding the existing ALV-5000 parser sparsely</li>
+		    <li>Added and integrated parser for ALV-6000 files by cloning and modding the existing ALV-5000 parser sparsely (thanks to Benedikt Häusele)</li>
+		    <liIf an FCS record displays an autocorrelation measurement, but both color channels were acquired, the countrates for both channels are loaded and displayed. Still the countrate of the loaded ACF channel is returned as countrate channel 1 and the other one as 2, son in the red ACF record, the countrates are swapped</li>
 		  </ul></li>
 		  
 		  <li><b>helpeditor:</b><ul>

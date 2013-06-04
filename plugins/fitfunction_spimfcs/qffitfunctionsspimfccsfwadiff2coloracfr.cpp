@@ -55,9 +55,9 @@ QFFitFunctionsSPIMFCCSFWADiff2ColorACFR::QFFitFunctionsSPIMFCCSFWADiff2ColorACFR
     #define FCCSDiff_count_rate2 23
     addParameter(FloatNumber,  "background2",              "background count rate red, during measurement",           "B<sub>r</sub>",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
     #define FCCSDiff_background2 24
-    addParameter(FloatNumber,  "brightness_a",             "molar brightness of fluorophore on A",           "&eta;<sub>a</sub>",            "counts/nM",           "counts/nM^{-1}",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
+    addParameter(FloatNumber,  "brightness_a",             "molar brightness of fluorophore on A",           "&eta;<sub>a</sub>",            "counts/nM",           "counts/nM",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
     #define FCCSDiff_brightness_a 25
-    addParameter(FloatNumber,  "brightness_b",             "molar brightness of fluorophore on B",           "&eta;<sub>b</sub>",            "counts/nM",           "counts/nM^{-1}",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
+    addParameter(FloatNumber,  "brightness_b",             "molar brightness of fluorophore on B",           "&eta;<sub>b</sub>",            "counts/nM",           "counts/nM",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
     #define FCCSDiff_brightness_b 26
 
 }
@@ -103,11 +103,11 @@ double QFFitFunctionsSPIMFCCSFWADiff2ColorACFR::evaluate(double t, const double*
     const double Fg=etaG*(ca+cab);
     const double Fr=etaR*(cb+cab)+kappa*Fg;
 
-    double Grr_b=etaR*etaR*cb*QFFitFunctionsFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Db, alphab, t, wxyR, wxyR, wzR, wzR);
-    double Grr_ab=etaR*etaR*cab*QFFitFunctionsFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, alphaab, t, wxyR, wxyR, wzR, wzR);
-    double Ggg_a=etaG*etaG*ca*QFFitFunctionsFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Da, alphaa, t, wxyG, wxyG, wzG, wzG);
-    double Ggg_ab=etaG*etaG*cab*QFFitFunctionsFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, alphaab, t, wxyG, wxyG, wzG, wzG);
-    double Ggr_ab=etaG*etaR*cab*QFFitFunctionsFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, alphaab, t, wxyG, wxyR, wzG, wzR);
+    double Grr_b=etaR*etaR*cb*QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Db, alphab, t, wxyR, wxyR, wzR, wzR);
+    double Grr_ab=etaR*etaR*cab*QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, alphaab, t, wxyR, wxyR, wzR, wzR);
+    double Ggg_a=etaG*etaG*ca*QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Da, alphaa, t, wxyG, wxyG, wzG, wzG);
+    double Ggg_ab=etaG*etaG*cab*QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, alphaab, t, wxyG, wxyG, wzG, wzG);
+    double Ggr_ab=etaG*etaR*cab*QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, alphaab, t, wxyG, wxyR, wzG, wzR);
     if (fabs(ca)<1e-15) Ggg_a=0;
     if (fabs(cb)<1e-15) Grr_b=0;
     if (fabs(cab)<1e-15) Grr_ab=Ggg_ab=Ggr_ab=0;

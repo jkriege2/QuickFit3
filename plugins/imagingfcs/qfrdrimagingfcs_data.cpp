@@ -2051,11 +2051,11 @@ QString QFRDRImagingFCSData::getImageStackTimepointName(int stack, int t) const 
     return QString("%1%2").arg(getImageStackTUnitFactor(stack)*t).arg(getImageStackTUnitName(stack));
 }
 
-double QFRDRImagingFCSData::getSimpleCountrateAverage(int run, int channel) const {
+double QFRDRImagingFCSData::getSimpleCountrateAverage(int run, int channel, bool swapChannels) const {
     int ch=channel;
-    if (overviewF2 && overviewImagesSwapped()) {
+    if (overviewF2 && overviewImagesSwapped()&&swapChannels) {
         if (ch==1) ch=0;
-        if (ch==0) ch=1;
+        else if (ch==0) ch=1;
     }
     if (ch==0) {
         if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF) {
@@ -2074,11 +2074,11 @@ double QFRDRImagingFCSData::getSimpleCountrateAverage(int run, int channel) cons
     return 0;
 }
 
-double QFRDRImagingFCSData::getSimpleCountrateVariance(int run, int channel) const {
+double QFRDRImagingFCSData::getSimpleCountrateStdDev(int run, int channel, bool swapChannels) const {
     int ch=channel;
-    if (overviewF2 && overviewImagesSwapped()) {
+    if (overviewF2 && overviewImagesSwapped()&&swapChannels) {
         if (ch==1) ch=0;
-        if (ch==0) ch=1;
+        else if (ch==0) ch=1;
     }
     if (ch==0) {
         if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewFSTD) {

@@ -11,9 +11,9 @@ class QFRDRSimpleCountRatesInterface {
     public:
         virtual ~QFRDRSimpleCountRatesInterface() {};
         /** \brief returns the average count rate for the given run (or a common value for index<0) */
-        virtual double getSimpleCountrateAverage(int run=-1, int channel=0) const=0;
+        virtual double getSimpleCountrateAverage(int run=-1, int channel=0, bool swapChannels=false) const=0;
         /** \brief returns the variance of the count rate for the given run (or a common value for index<0) */
-        virtual double getSimpleCountrateVariance(int run=-1, int channel=0) const=0;
+        virtual double getSimpleCountrateStdDev(int run=-1, int channel=0, bool swapChannels=false) const=0;
         /** \brief returns the number of countrate channels */
         virtual int getSimpleCountrateChannels() const=0;
 };

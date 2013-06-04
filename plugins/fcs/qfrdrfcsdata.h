@@ -25,6 +25,7 @@
 #include "csvtools.h"
 #include "qfrdrfcsfitfunctionsimulator.h"
 #include "qfrdrrunselection.h"
+#include "qfrdrsimplecountrateinterface.h"
 
 
 /*! \brief manages a FCS dataset (set of correlation curves with multiple runs)
@@ -45,9 +46,9 @@
   account for the correlation average. This may be usefull, if only some few of the runs in a file are damaged
   (e.g. by agregates moving through the focus ...).
 */
-class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRCountRatesInterface, public QFRDRRunSelectionsInterface {
+class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRCountRatesInterface, public QFRDRRunSelectionsInterface, public QFRDRSimpleCountRatesInterface {
         Q_OBJECT
-        Q_INTERFACES(QFRDRFCSDataInterface QFRDRCountRatesInterface QFRDRRunSelectionsInterface)
+        Q_INTERFACES(QFRDRFCSDataInterface QFRDRCountRatesInterface QFRDRRunSelectionsInterface QFRDRSimpleCountRatesInterface)
     public:
         /** Default constructor */
         QFRDRFCSData(QFProject* parent);
@@ -118,7 +119,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         /** \brief values of the correlation function for a specified run.
          *         This is a 1D array of size correlationN
          */
-        inline virtual double* getCorrelationRun(int run) const { return &(correlation[run*correlationN]); };
+        virtual double* getCorrelationRun(int run) const ;
         /** \brief values of the averaged correlation function (averaged over all runs).
          *         This is a 1D array of size correlationN */
         inline virtual double* getCorrelationMean() const { return correlationMean; };
@@ -128,7 +129,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         /** \brief errors, associated with the correlation function for a specified run.
          *         This is a 1D array of size correlationN
          */
-        virtual double* getCorrelationRunError(int run) const { return &(correlationErrors[run*correlationN]); };
+        virtual double* getCorrelationRunError(int run) const;
 
         /** \copydoc QFRDRFCSDataInterface::getCorrelationRunName() */
         virtual QString getCorrelationRunName(int run) const;
@@ -149,13 +150,13 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
          *
          * access this as \code rate[run*rateN + n] \endcode
          */
-        inline virtual double* getRate(int channel=0) const { return &(rate[channel*rateN*rateRuns]); };
+        virtual double* getRate(int channel=0) const ;
         /** \brief values of the count rate nfor a given run.
          *         This is a 1D array of length  rateN
          *
          * access this as \code rate[run*rateN + n] \endcode
          */
-        inline virtual double* getRateRun(int run, int channel=0) const  { return &(rate[channel*rateN*rateRuns+run*rateN]); };
+        virtual double* getRateRun(int run, int channel=0) const  ;
 
 
         /** \brief number of binned count rate runs in this object */
@@ -178,6 +179,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
          */
         inline virtual double* getBinnedRateRun (int run, int channel=0) const { return &(binnedRate[channel*binnedRateN*rateRuns + run*binnedRateN]); };
 
+        bool getRateChannelsSwapped() const;
 
         /** \brief calculate the mean value of the count rate */
         virtual double calcRateMean(int run=0, int channel=0) const;
@@ -187,6 +189,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         virtual double getRateMean(int run=0, int channel=0) const ;
         /** \brief return the standard deviation of the count rate, as last calculated by a call to calcRateStdDev()  */
         virtual double getRateStdDev(int run=0, int channel=0) const ;
+
 
         /** \brief calculate minimum and maximum count rates */
         virtual void calcRateMinMax(int run, double& min, double& max, int channel=0) const;
@@ -249,6 +252,13 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         virtual QStringList getAvailableRoles() const;
         /** \brief if this returns \c true, the user may change the RDRs role in the QFRawDataPropertyEditor, default: \c false */
         virtual bool isRoleUserEditable() const;
+
+        /** \copydoc QFRDRSimpleCountRatesInterface::getSimpleCountrateAverage() */
+        virtual double getSimpleCountrateAverage(int run=-1, int channel=0, bool swapChannels=false) const;
+        /** \copydoc QFRDRSimpleCountRatesInterface::getSimpleCountrateVariance() */
+        virtual double getSimpleCountrateStdDev(int run=-1, int channel=0, bool swapChannels=false) const;
+        /** \copydoc QFRDRSimpleCountRatesInterface::getSimpleCountrateChannels() */
+        virtual int getSimpleCountrateChannels() const;
 
     protected:
         /** \brief write the contents of the object to a XML file */

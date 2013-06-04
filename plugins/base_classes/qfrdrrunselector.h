@@ -41,7 +41,7 @@ class QFRDRRunSelector : public QWidget
         int runmax;
         int runmin;
 
-        QGridLayout* gl;
+        QHBoxLayout* gl;
         QLabel* labInfo;
 
         QSpinBox* spinRun;

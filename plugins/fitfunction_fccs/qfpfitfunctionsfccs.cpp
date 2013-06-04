@@ -9,12 +9,12 @@
 QStringList QFPFitFunctionsFCCS::getIDs() const {
     QStringList res;
     res<<"fccs_diff3d";
-    /*res<<"fccs_fw_diff2colorccf";
+    res<<"fccs_fw_diff2colorccf";
     res<<"fccs_fw_diff2coloracfg";
     res<<"fccs_fw_diff2coloracfr";
     res<<"fccs_fw_adiff2colorccf";
     res<<"fccs_fw_adiff2coloracfg";
-    res<<"fccs_fw_adiff2coloracfr";*/
+    res<<"fccs_fw_adiff2coloracfr";
     return res;
 }
 

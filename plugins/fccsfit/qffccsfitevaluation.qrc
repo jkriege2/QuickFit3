@@ -2,8 +2,8 @@
     <qresource prefix="/">
         <file alias="fccs_fit/qffccsfitevaluation.png">images/fccs_fit_22.png</file>
         <file alias="fccs_fit/qffccsfitevaluation_small.png">images/fccs_fit.png</file>
-        <file alias="fccsfit.png">images/fccs_fit.png</file>
-        <file alias="fccsfit_logo.png">images/fccs_fit_22.png</file>
+        <file alias="fccs_fit.png">images/fccs_fit.png</file>
+        <file alias="fccs_fit_logo.png">images/fccs_fit_22.png</file>
     </qresource>
     <qresource prefix="/fccs_fit">
         <file alias="fit_savereport.png">images/fcs_savereport_22.png</file>

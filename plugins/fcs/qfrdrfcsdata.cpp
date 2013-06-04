@@ -348,6 +348,20 @@ void QFRDRFCSData::exportData(const QString& format, const QString& filename)con
     }*/
 }
 
+double *QFRDRFCSData::getCorrelationRun(int run) const
+{
+    if (run==-1) return getCorrelationMean();
+    if (run>=0 && run<correlationRuns) return &(correlation[run*correlationN]);
+    return NULL;
+}
+
+double *QFRDRFCSData::getCorrelationRunError(int run) const
+{
+    if (run==-1) return getCorrelationStdDev();
+    if (run>=0 && run<correlationRuns) return &(correlationErrors[run*correlationN]);
+    return NULL;
+}
+
 
 void QFRDRFCSData::intWriteData(QXmlStreamWriter& w) {
     if (leaveout.size()>0) {
@@ -870,7 +884,7 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
         }
 
         resizeCorrelations(ccorrN, runs);
-        if (getProperty("CROSS_CORRELATION", false).toBool()) resizeRates(rrateN, runs, 2);
+        if (getProperty("CROSS_CORRELATION", false).toBool()||getProperty("DUAL_CHANNEL", false).toBool()) resizeRates(rrateN, runs, 2);
         else resizeRates(rrateN, runs, 1);
         int run0=0;
         for (int ii=0; ii<data.size(); ii++) {
@@ -977,6 +991,10 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
                                 rate[c*rateN*rateRuns+run0*rateN+i]=d[1+c];
                             }
                         }
+                        if (getRateChannelsSwapped() && rateChannels==2) {
+                            qSwap(rate[0*rateN*rateRuns+run0*rateN+i], rate[1*rateN*rateRuns+run0*rateN+i]);
+                        }
+
                     } else if (runs>1) {
                         // multiple runs -> average is in file -> ignore average column
                         if (d.size()<=1+channel) {
@@ -993,6 +1011,10 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
                                 rate[c*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]=d[1+c];
                             }
                         }
+                        if (getRateChannelsSwapped() && rateChannels==2) {
+                            qSwap(rate[0*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i], rate[1*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]);
+                        }
+
                     }
                 }
 
@@ -1276,7 +1298,7 @@ bool QFRDRFCSData::loadFromALV6000Files(QStringList filenames) {
         }
 
         resizeCorrelations(ccorrN, runs);
-        if (getProperty("CROSS_CORRELATION", false).toBool()) resizeRates(rrateN, runs, 2);
+        if (getProperty("CROSS_CORRELATION", false).toBool()||getProperty("DUAL_CHANNEL", false).toBool()) resizeRates(rrateN, runs, 2);
         else resizeRates(rrateN, runs, 1);
         int run0=0;
         for (int ii=0; ii<data.size(); ii++) {
@@ -1383,6 +1405,9 @@ bool QFRDRFCSData::loadFromALV6000Files(QStringList filenames) {
                                 rate[c*rateN*rateRuns+run0*rateN+i]=d[1+c];
                             }
                         }
+                        if (getRateChannelsSwapped() && rateChannels==2) {
+                            qSwap(rate[0*rateN*rateRuns+run0*rateN+i], rate[1*rateN*rateRuns+run0*rateN+i]);
+                        }
                     } else if (runs>1) {
                         // multiple runs -> average is in file -> ignore average column
                         if (d.size()<=1+channel) {
@@ -1398,6 +1423,9 @@ bool QFRDRFCSData::loadFromALV6000Files(QStringList filenames) {
                             for (int c=0; c<rateChannels; c++) {
                                 rate[c*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]=d[1+c];
                             }
+                        }
+                        if (getRateChannelsSwapped() && rateChannels==2) {
+                            qSwap(rate[0*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i], rate[1*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]);
                         }
                     }
                 }
@@ -1463,6 +1491,26 @@ QString QFRDRFCSData::getCorrelationRunName(int run) const {
     //if (run<0) return tr("average");
     if (run<correlationRuns) return tr("run %1").arg(run);
     return QString("");
+}
+
+double *QFRDRFCSData::getRate(int channel) const
+{
+    return &(rate[channel*rateN*rateRuns]);
+}
+
+double *QFRDRFCSData::getRateRun(int run, int channel) const
+{
+    if (run>=0 && run<rateRuns) return &(rate[channel*rateN*rateRuns+run*rateN]);
+    return NULL;
+}
+
+bool QFRDRFCSData::getRateChannelsSwapped() const
+{
+    int channel=0;
+    if (propertyExists("CHANNEL")) channel=getProperty("CHANNEL", 0).toInt();
+    //qDebug()<<"channelsSwapped(): "<<channel<<rateRuns;
+    if (rateRuns>1 && channel!=0) return true;
+    return false;
 }
 
 void QFRDRFCSData::saveInternal(QXmlStreamWriter& w) const {
@@ -1714,6 +1762,33 @@ bool QFRDRFCSData::isRoleUserEditable() const
 {
     return  false;
 }
+
+double QFRDRFCSData::getSimpleCountrateAverage(int run, int channel, bool swapChannels) const
+{
+    int ch=channel;
+    if (getRateChannelsSwapped()&&swapChannels) {
+        if (ch==1) ch=0;
+        else if (ch==0) ch=1;
+    }
+    return getRateMean(run, ch);
+}
+
+
+double QFRDRFCSData::getSimpleCountrateStdDev(int run, int channel, bool swapChannels) const
+{
+    int ch=channel;
+    if (getRateChannelsSwapped()&&swapChannels) {
+        if (ch==1) ch=0;
+        else if (ch==0) ch=1;
+    }
+    return getRateStdDev(run, ch);
+}
+
+int QFRDRFCSData::getSimpleCountrateChannels() const
+{
+    return rateChannels;
+}
+
 
 
 
