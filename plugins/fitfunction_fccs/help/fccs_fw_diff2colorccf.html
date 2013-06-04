@@ -2,13 +2,13 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <title>SPIM-FCCS: Diffusion, 2-color, CCF (1/e² radii)</title>
+  <title>FCCS: Diffusion, 2-color, CCF (1/e² radii)</title>
   </head>
 <body>
   $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-  <h2>SPIM-FCCS: Diffusion, 2-color, CCF (1/e² radii)</h2>
-  $$see:<a href="fccs_spim_fw_adiff2coloracfg.html">ACF, green model</a>, <a href="fccs_spim_fw_adiff2coloracfr.html">ACF, red model</a>, <a href="fccs_spim_fw_adiff2colorccf.html">CCF, model</a>$$
-  <p>This function implements a 1-component diffusion model $$math:G_{gr}(\tau)$$ for 2-color crosscorrelation data acquired with a camera in SPIM illumination mode. The theory and functional form are described below.
+  <h2>FCCS: Diffusion, 2-color, CCF (1/e² radii)</h2>
+  $$see:<a href="fccs_fw_adiff2coloracfg.html">ACF, green model</a>, <a href="fccs_fw_adiff2coloracfr.html">ACF, red model</a>, <a href="fccs_fw_adiff2colorccf.html">CCF, model</a>$$
+  <p>This function implements a 1-component diffusion model $$math:G_{gr}(\tau)$$ for for 2-color crosscorrelation data for a confocal microscope. The theory and functional form are described below.
      In addition these quantities are calculated by the model:
      $$bmath:\frac{c_{AB}}{c_{all}}=\frac{c_{AB}}{c_A+c_B+c_{AB}},\ \ \ \ \ \Delta\left(\frac{c_{AB}}{c_{all}}\right)=\sqrt{\left(\Delta c_A\cdot\frac{c_{AB}}{(c_A+c_B+c_{AB})^2}\right)^2+\left(\Delta c_B\cdot\frac{c_{AB}}{(c_A+c_B+c_{AB})^2}\right)^2+\left(\Delta c_{AB}\cdot\frac{c_A+c_B}{(c_A+c_B+c_{AB})^2}\right)^2}$$
      $$bmath:\frac{c_{AB}}{\min(c_A, c_B)}$$
@@ -16,7 +16,7 @@
   </p>
 
 
-$$insert:fccs_spim_fw_diff2colorG.inc$$
+$$insert:fccs_fw_diff2colorG.inc$$
 
 $$references$$
 

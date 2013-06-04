@@ -67,12 +67,14 @@ void QFFCCSFileSetsModel::rebuildModel()
                 QString roles="";
                 QString n="";
                 for (int i=0; i<set.size(); i++) {
-                    if (set[i]->getGroupName()!=groupName) sameGroup=false;
-                    if (set[i]->getFolder()!=folderName) sameFolder=false;
-                    if (roles.size()>0) roles+="+";
-                    roles+=set[i]->getRole();
-                    if (n.size()>0) n+="+";
-                    n+=set[i]->getName();
+                    if (set[i]) {
+                        if (set[i]->getGroupName()!=groupName) sameGroup=false;
+                        if (set[i]->getFolder()!=folderName) sameFolder=false;
+                        if (roles.size()>0) roles+="+";
+                        roles+=set[i]->getRole();
+                        if (n.size()>0) n+="+";
+                        n+=set[i]->getName();
+                    }
                 }
 
                 if (sameGroup && !groupName.isEmpty()) name=groupName;

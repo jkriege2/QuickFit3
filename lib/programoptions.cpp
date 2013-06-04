@@ -48,6 +48,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     globalConfigDir=appDir+"/globalconfig/";
     configDir=QDir::homePath()+"/."+fi.completeBaseName()+"/";
     assetsDir=appDir+"/assets/";
+    examplesDir=appDir+"/examples/";
     pluginsDir=appDir+"/plugins/";
 
     #ifdef __WINDOWS__
@@ -192,6 +193,9 @@ QString ProgramOptions::getAssetsDirectory() const {
     return assetsDir;
 }
 
+QString ProgramOptions::getExamplesDirectory() const {
+    return examplesDir;
+}
 QString ProgramOptions::getMainHelpDirectory() const
 {
     return assetsDir+"/help/";

@@ -58,7 +58,7 @@ void QFPRDRFCS::insertALV5000File(const QStringList& filename, const QMap<QStrin
         QMap<QString, QVariant> p=paramValues;
         p["CHANNEL"]=i;
         QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - CH%2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(i), filename, p, paramReadonly);
-        if (crossCorrelation) {
+        if (!crossCorrelation) {
             e->setRole(QString("ACF%1").arg(i));
         }else  {
             e->setRole(QString("FCCS").arg(i));

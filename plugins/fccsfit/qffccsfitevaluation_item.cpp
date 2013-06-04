@@ -657,7 +657,7 @@ void QFFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &file
                             }
                         }
                     }
-                    if (ok && !guessedFileSets.contains(newset) && !fittedFileSets.contains(newset)) guessedFileSets.append(newset);
+                    if (ok && !guessedFileSets.contains(newset) && !fittedFileSets.contains(newset) && !newset.contains(NULL))  guessedFileSets.append(newset);
                 }
             } else if (sameFolder) {
                 //qDebug()<<"guess from folder";
@@ -675,7 +675,7 @@ void QFFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &file
                             }
                         }
                     }
-                    if (ok && !guessedFileSets.contains(newset) && !fittedFileSets.contains(newset)) guessedFileSets.append(newset);
+                    if (ok && !guessedFileSets.contains(newset) && !fittedFileSets.contains(newset) && !newset.contains(NULL)) guessedFileSets.append(newset);
                 }
             } else {
 

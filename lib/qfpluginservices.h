@@ -143,6 +143,8 @@ class QFLIB_EXPORT QFPluginServices {
         virtual QString getGlobalConfigFileDirectory()=0;
         /** \brief return a base path where to find assets files */
         virtual QString getAssetsDirectory()=0;
+        /** \brief return a base path where to find examples files */
+        virtual QString getExamplesDirectory()=0;
         /** \brief return a base path where to find QuickFits main help files */
         virtual QString getMainHelpDirectory()=0;
         /** \brief return a base path where to find plugins */
@@ -229,6 +231,8 @@ class QFLIB_EXPORT QFPluginServices {
 
         /** \brief return the assets directory for the given plugin ID */
         virtual QString getPluginAssetsDirectory(const QString& pluginID)=0;
+        /** \brief return the examples directory for the given plugin ID */
+        virtual QString getPluginExamplesDirectory(const QString& pluginID)=0;
         /** \brief return the config directory for the given plugin ID */
         virtual QString getPluginConfigDirectory(const QString& pluginID)=0;
 

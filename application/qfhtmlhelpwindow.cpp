@@ -544,8 +544,10 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_dllbasename"), pluginList->at(i).pluginDLLbasename));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_dllsuffix"), pluginList->at(i).pluginDLLSuffix));
                 if (m_pluginServices) {
-                    fromHTML_replaces.append(qMakePair(QString("local_plugin_assets"), m_pluginServices->getAssetsDirectory()+"/plugins/"+pluginList->at(i).pluginDLLbasename+"/"));
-                    fromHTML_replaces.append(qMakePair(QString("local_plugin_config"), m_pluginServices->getConfigFileDirectory()+"/plugins/"+pluginList->at(i).pluginDLLbasename+"/"));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_assets"), QFPluginServices::getInstance()->getPluginAssetsDirectory(pluginList->at(i).pluginDLLbasename)));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_help"), QFPluginServices::getInstance()->getPluginHelpDirectory(pluginList->at(i).pluginDLLbasename)));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_examples"), QFPluginServices::getInstance()->getPluginExamplesDirectory(pluginList->at(i).pluginDLLbasename)));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_config"), QFPluginServices::getInstance()->getPluginConfigDirectory(pluginList->at(i).pluginDLLbasename)));
                 }
                 if (!pluginList->at(i).tutorial.isEmpty()) {
                     fromHTML_replaces.append(qMakePair(QString("local_plugin_tutorial_file"), pluginList->at(i).tutorial));
@@ -854,6 +856,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
                     if (param1=="helpdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginHelpDirectory(param2));
                     if (param1=="assetsdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginAssetsDirectory(param2));
                     if (param1=="configdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginConfigDirectory(param2));
+                    if (param1=="examplesdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginExamplesDirectory(param2));
                 } else if (command=="fig" || command=="figure") {
                     QString rep=tr("<center>"
                                      "<img src=\"%1\"><br><i>%2</i><br>"

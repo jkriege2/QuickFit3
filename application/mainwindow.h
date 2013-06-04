@@ -103,6 +103,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual QList<QFPluginServices::HelpDirectoryInfo>* getPluginHelpList();
         /** \copydoc QFPluginServices::getAssetsDirectory() */
         virtual QString getAssetsDirectory();
+        /** \copydoc QFPluginServices::getExamplesDirectory() */
+        virtual QString getExamplesDirectory();
         /** \copydoc QFPluginServices::getMainHelpDirectory() */
         virtual QString getMainHelpDirectory();
         /** \copydoc QFPluginServices::getPluginsDirectory() */
@@ -178,6 +180,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
         /** \brief return the assets directory  of the online help for the given plugin ID */
         virtual QString getPluginAssetsDirectory(const QString& pluginID);
+        /** \brief return the examples directory  of the online help for the given plugin ID */
+        virtual QString getPluginExamplesDirectory(const QString& pluginID);
         /** \brief return the config file directory of the online help for the given plugin ID */
         virtual QString getPluginConfigDirectory(const QString& pluginID);
 

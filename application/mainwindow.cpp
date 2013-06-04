@@ -121,7 +121,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("version.status"), QString(qfInfoVersionStatus())));
     htmlReplaceList.append(qMakePair(QString("version.date"), QString(qfInfoCompileDate()).trimmed()));
     htmlReplaceList.append(qMakePair(QString("version"), QString(qfInfoVersionFull())));
-    htmlReplaceList.append(qMakePair(QString("qfInfoVersionFull()"), QApplication::applicationVersion()));
+    htmlReplaceList.append(qMakePair(QString("version_full"), QApplication::applicationVersion()));
     htmlReplaceList.append(qMakePair(QString("thanksto"), QString(qfInfoThanksTo())));
     htmlReplaceList.append(qMakePair(QString("copyright"), QString(qfInfoCopyright())));
     htmlReplaceList.append(qMakePair(QString("author"), QString(qfInfoAuthor())));
@@ -137,6 +137,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("plugincopyright_list"), createPluginDocCopyrights()));
     htmlReplaceList.append(qMakePair(QString("mainhelpdir"), settings->getMainHelpDirectory()));
     htmlReplaceList.append(qMakePair(QString("assetsdir"), settings->getAssetsDirectory()));
+    htmlReplaceList.append(qMakePair(QString("examplesdir"), settings->getExamplesDirectory()));
     htmlReplaceList.append(qMakePair(QString("configdir"), settings->getConfigFileDirectory()));
     htmlReplaceList.append(qMakePair(QString("tutorials_contents"), QString("<ul>")+createPluginDocTutorials("<li>%1 tutorial:<ul>", "</ul></li>")+QString("/<ul>")));
     htmlReplaceList.append(qMakePair(QString("settings_contents"), QString("<ul>")+createPluginDocSettings("<li>%1 settings:<ul>", "</ul></li>")+QString("/<ul>")));
@@ -1812,6 +1813,12 @@ QString MainWindow::getPluginAssetsDirectory(const QString &pluginID)
     return settings->getAssetsDirectory()+QString("/plugins/")+pluginID+QString("/");
 
 }
+
+QString MainWindow::getPluginExamplesDirectory(const QString &pluginID)
+{
+    return settings->getExamplesDirectory()+QString("/")+pluginID+QString("/");
+}
+
 QString MainWindow::getPluginConfigDirectory(const QString &pluginID)
 {
     return settings->getConfigFileDirectory()+QString("/plugins/")+pluginID+QString("/");
@@ -2031,6 +2038,11 @@ QString MainWindow::getGlobalConfigFileDirectory() {
 }
 QString MainWindow::getAssetsDirectory() {
     return settings->getAssetsDirectory();
+}
+
+QString MainWindow::getExamplesDirectory()
+{
+    return settings->getExamplesDirectory();
 }
 
 QString MainWindow::getMainHelpDirectory() {
@@ -2529,8 +2541,10 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_dllbasename"), pluginList->at(i).pluginDLLbasename));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_dllsuffix"), pluginList->at(i).pluginDLLSuffix));
                 if (QFPluginServices::getInstance()) {
-                    fromHTML_replaces.append(qMakePair(QString("local_plugin_assets"), QFPluginServices::getInstance()->getAssetsDirectory()+"/plugins/"+pluginList->at(i).pluginDLLbasename+"/"));
-                    fromHTML_replaces.append(qMakePair(QString("local_plugin_config"), QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/"+pluginList->at(i).pluginDLLbasename+"/"));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_assets"), QFPluginServices::getInstance()->getPluginAssetsDirectory(pluginList->at(i).pluginDLLbasename)));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_help"), QFPluginServices::getInstance()->getPluginHelpDirectory(pluginList->at(i).pluginDLLbasename)));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_examples"), QFPluginServices::getInstance()->getPluginExamplesDirectory(pluginList->at(i).pluginDLLbasename)));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_config"), QFPluginServices::getInstance()->getPluginConfigDirectory(pluginList->at(i).pluginDLLbasename)));
                 }
                 if (!pluginList->at(i).tutorial.isEmpty()) {
                     fromHTML_replaces.append(qMakePair(QString("local_plugin_tutorial_file"), pluginList->at(i).tutorial));
@@ -2829,6 +2843,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                     if (param1=="helpdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginHelpDirectory(param2));
                     if (param1=="assetsdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginAssetsDirectory(param2));
                     if (param1=="configdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginConfigDirectory(param2));
+                    if (param1=="examplesdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginExamplesDirectory(param2));
                 } else if (command=="fig" || command=="figure") {
                     QString rep=tr("<center>"
                                      "<img src=\"%1\"><br><i>%2</i><br>"

@@ -154,19 +154,37 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
 
     setScriptFilename(tr("new_help.html"));
     QMenu* menu;
-    menu=new QMenu(tr("version/copyright info"), this);
+    menu=new QMenu(tr("directories"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
     addInsertAction(menu, "$$mainhelpdir$$");
+    addInsertAction(menu, "$$assetsdir$$");
+    addInsertAction(menu, "$$examplesdir$$");
+    addInsertAction(menu, "$$configdir$$");
+
+    menu=new QMenu(tr("version/copyright info"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
     addInsertAction(menu, "$$version.svnrevision$$");
     addInsertAction(menu, "$$version.status$$");
     addInsertAction(menu, "$$version.date$$");
     addInsertAction(menu, "$$version$$");
-    addInsertAction(menu, "$$qfInfoVersionFull()$$");
+    addInsertAction(menu, "$$version_full$$");
     menu->addSeparator();
     addInsertAction(menu, "$$thanksto$$");
     addInsertAction(menu, "$$copyright$$");
     addInsertAction(menu, "$$author$$");
     addInsertAction(menu, "$$weblink$$");
+    addInsertAction(menu, "$$license$$");
+    addInsertAction(menu, "$$maillist$$");
+    addInsertAction(menu, "$$maillistrequest$$");
+
+    menu=new QMenu(tr("general help links"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "$$qf_ui_rdr_helpfile$$");
+    addInsertAction(menu, "$$qf_ui_rdr_helpfiletitle$$");
+    addInsertAction(menu, "$$qf_ui_eval_helpfile$$");
+    addInsertAction(menu, "$$qf_ui_eval_helpfiletitle$$");
+    addInsertAction(menu, "$$qf_ui_jkqtplotter_helpfile$$");
+    addInsertAction(menu, "$$qf_ui_jkqtplotter_helpfiletitle$$");
 
 
     menu=new QMenu(tr("page header/footer"), this);
@@ -204,11 +222,16 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$local_plugin_version$$");
     addInsertAction(menu, "$$local_plugin_typehelp_link$$");
     addInsertAction(menu, "$$local_plugin_typehelp_file$$");
+    addInsertAction(menu, "$$local_plugin_assets$$");
+    addInsertAction(menu, "$$local_plugin_examples$$");
+    addInsertAction(menu, "$$local_plugin_help$$");
+    addInsertAction(menu, "$$local_plugin_config$$");
     menu->addSeparator();
     addInsertAction(menu, "$$plugin_info:help:PLUGINID$$");
     addInsertAction(menu, "$$plugin_info:tutorial:PLUGINID$$");
     addInsertAction(menu, "$$plugin_info:helpdir:PLUGINID$$");
     addInsertAction(menu, "$$plugin_info:assetsdir:PLUGINID$$");
+    addInsertAction(menu, "$$plugin_info:examplesdir:PLUGINID$$");
     addInsertAction(menu, "$$plugin_info:configdir:PLUGINID$$");
 
 
@@ -223,6 +246,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     ui->edtScript->getEditor()->addAction(menu->menuAction());
     addInsertAction(menu, "$$tutorials_contents$$");
     addInsertAction(menu, "$$help_contents$$");
+    addInsertAction(menu, "$$settings_contents$$");
 
 
     menu=new QMenu(tr("insert files"), this);
@@ -313,7 +337,7 @@ void QFEHelpEditorWidget::on_btnSave_clicked()
 {
     QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastScriptDir", ProgramOptions::getInstance()->getMainHelpDirectory()).toString();
     QDir d(dir);
-    QString filename=qfGetSaveFileName(this, tr("save acquisition script ..."), d.absoluteFilePath(currentScript), tr("help (*.html)"));
+    QString filename=qfGetSaveFileName(this, tr("save acquisition script ..."), d.absoluteFilePath(currentScript), tr("QuickFit 3 help (*.html *.htm *.inc);;All Files (*.*)"));
     if (!filename.isEmpty()) {
         bool ok=true;
         /*if (QFile::exists(filename)) {
@@ -468,7 +492,7 @@ void QFEHelpEditorWidget::openScript(QString dir, bool saveDir) {
         if (dir=="last") {
             dir=ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastScriptDir", ProgramOptions::getInstance()->getMainHelpDirectory()).toString();
         }
-        QString filename=qfGetOpenFileName(this, tr("Open help file ..."), dir, tr("help (*.html)"))    ;
+        QString filename=qfGetOpenFileName(this, tr("Open help file ..."), dir, tr("QuickFit 3 help (*.html *.htm *.inc);;All Files (*.*)"))    ;
         if (QFile::exists(filename)) {
             QFile f(filename);
             if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
@@ -545,6 +569,7 @@ void QFEHelpEditorWidget::on_btnLink_clicked()
 
     links<<"$$mainhelpdir$$/";
     links<<"$$assetsdir$$/";
+    links<<"$$examplesdir$$/";
     links<<"$$configdir$$/";
     //links<<"$$$$/";
     links<<"mailto:$$email$$";

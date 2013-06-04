@@ -15,3 +15,13 @@ with the channel brightnesses:
 
 
 
+<h3>Triplet and Blinking</h3>
+<p>Triplet and blinking can be taken into account by transforming the correlation functions in the following way:
+$$bmath:G_{gg}^X(\tau)\rightarrow T^X(\tau)\cdot G_{gg}^X(\tau)$$
+$$bmath:G_{rr}^X(\tau)\rightarrow T^X(\tau)\cdot G_{gg}^X(\tau)$$
+$$bmath:G_{gr}^X(\tau)\rightarrow  G_{gg}^X(\tau)$$
+where the triplet and blinking term for species X is:
+$$bmath:T^X(\tau)=\frac{1-\Theta_T+\Theta_T\cdot e^{-\tau/\tau_T}}{1-\Theta_T}$$
+</p>
+
+

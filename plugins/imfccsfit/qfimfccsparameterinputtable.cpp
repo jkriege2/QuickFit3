@@ -367,7 +367,7 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
         if (row>1) {
             FitParam pid=fitparamids.value(row-2, FitParam());
             if (pid.isValid()) {
-                if (coli==3) {
+                if (coli==getColsPerRDR()-2) {
                     item->setFitFix(pid.id, value.toBool(), rdr);
                     emit dataChanged(index, index);
                     return true;

@@ -36,4 +36,17 @@ inline double QFFitFunctionsFCCSFWADiff2ColorCCF_corrfactor(double dx, double dy
            QFFitFunctionsFCCSFWADiff2ColorCCF_corrfactor(dz, Gamma, alpha, t, zg, zr);
 }
 
+inline double QFFitFunctionFCCSFWTriplet(int components, double t, double thetaT, double tauT, double thetaR=0.0, double tauR=0.0) {
+    if (  (components==1 && fabs(thetaT)>1e-15 && fabs(tauT)>1e-15)
+          ||(components==2 && (fabs(thetaT)>1e-15 && fabs(tauT)>1e-15) && (fabs(thetaR)<1e-15 || fabs(tauR)<1e-15))) {
+        return (1.0-thetaT+thetaT*exp(-t/tauT))/(1.0-thetaT);
+    } else if (components==2 && (fabs(thetaT)>1e-15 && fabs(tauT)>1e-15)& (fabs(thetaR)>1e-15 && fabs(tauR)>1e-15)) {
+        return (1.0-thetaT-thetaR+thetaT*exp(-t/tauT)+thetaR*exp(-t/tauR))/(1.0-thetaT-thetaR);
+    } else if (components==2 && (fabs(thetaT)<1e-15 || fabs(tauT)<1e-15)& (fabs(thetaR)>1e-15 && fabs(tauR)>1e-15)) {
+        return (1.0-thetaR+thetaR*exp(-t/tauR))/(1.0-thetaR);
+    } else {
+        return 1.0;
+    }
+}
+
 #endif // FCCSTOOLS_H

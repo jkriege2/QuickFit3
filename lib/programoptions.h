@@ -71,9 +71,11 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         QString getGlobalConfigFileDirectory() const;
         /** \brief points to a directory containing the QuickFit plugins, see \ref qf3whereiswhat */
         QString getPluginDirectory() const;
-        /** \brief points to a directory containing the QuickFit plugins, see \ref qf3whereiswhat */
+        /** \brief points to a directory containing the QuickFit assets files, see \ref qf3whereiswhat */
         QString getAssetsDirectory() const;
-        /** \brief points to a directory containing the QuickFit plugins, see \ref qf3whereiswhat */
+        /** \brief points to a directory containing the QuickFit examples, see \ref qf3whereiswhat */
+        QString getExamplesDirectory() const;
+        /** \brief points to a directory containing the QuickFit main help, see \ref qf3whereiswhat */
         QString getMainHelpDirectory() const;
         /** \brief returns the directory of the QuickFit main application */
         QString getApplicationDirectory() const;
@@ -152,6 +154,7 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         /** \brief assetsDir is a directory that contains QuickFit assets, like Help-Files, additional needed files, lik
          *         data files ... that are NOT changed by QuickFit, see \ref qf3whereiswhat */
         QString assetsDir;
+        QString examplesDir;
         /** \brief points to a directory containing the QuickFit plugins, see \ref qf3whereiswhat */
         QString pluginsDir;
 

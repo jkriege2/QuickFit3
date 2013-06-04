@@ -982,16 +982,17 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
                             error=true;
                             break;
                         }
-                        if (data[ii].isDual && channel==1) {
+                        /*if (data[ii].isDual && channel==1) {
                             for (int c=0; c<rateChannels; c++) {
                                 rate[c*rateN*rateRuns+run0*rateN+i]=d[1+rateChannels-1-c];
                             }
-                        } else {
+                        } else {*/
                             for (int c=0; c<rateChannels; c++) {
                                 rate[c*rateN*rateRuns+run0*rateN+i]=d[1+c];
                             }
-                        }
-                        if (getRateChannelsSwapped() && rateChannels==2) {
+                        //}
+                        if (getRateChannelsSwapped()) {
+                            //qDebug()<<"swapping in "<<getName();
                             qSwap(rate[0*rateN*rateRuns+run0*rateN+i], rate[1*rateN*rateRuns+run0*rateN+i]);
                         }
 
@@ -1002,16 +1003,17 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
                             error=true;
                             break;
                         }
-                        if (data[ii].isDual) {
+                        /*if (data[ii].isDual&&channel==1) {
                             for (int c=0; c<rateChannels; c++) {
                                 rate[c*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]=d[1+rateChannels-1-c];
                             }
-                        } else {
+                        } else {*/
                             for (int c=0; c<rateChannels; c++) {
                                 rate[c*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]=d[1+c];
                             }
-                        }
-                        if (getRateChannelsSwapped() && rateChannels==2) {
+                        //}
+                        if (getRateChannelsSwapped()) {
+                            //qDebug()<<"swapping in "<<getName();
                             qSwap(rate[0*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i], rate[1*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]);
                         }
 
@@ -1396,16 +1398,17 @@ bool QFRDRFCSData::loadFromALV6000Files(QStringList filenames) {
                             error=true;
                             break;
                         }
-                        if (data[ii].isDual && channel==1) {
+                        /*if (data[ii].isDual && channel==1) {
                             for (int c=0; c<rateChannels; c++) {
                                 rate[c*rateN*rateRuns+run0*rateN+i]=d[1+rateChannels-1-c];
                             }
-                        } else {
+                        } else {*/
                             for (int c=0; c<rateChannels; c++) {
                                 rate[c*rateN*rateRuns+run0*rateN+i]=d[1+c];
                             }
-                        }
-                        if (getRateChannelsSwapped() && rateChannels==2) {
+                        //}
+                        if (getRateChannelsSwapped()) {
+                            qDebug()<<"swapping in "<<getName();
                             qSwap(rate[0*rateN*rateRuns+run0*rateN+i], rate[1*rateN*rateRuns+run0*rateN+i]);
                         }
                     } else if (runs>1) {
@@ -1415,16 +1418,17 @@ bool QFRDRFCSData::loadFromALV6000Files(QStringList filenames) {
                             error=true;
                             break;
                         }
-                        if (data[ii].isDual) {
+                        /*if (data[ii].isDual) {
                             for (int c=0; c<rateChannels; c++) {
                                 rate[c*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]=d[1+rateChannels-1-c];
                             }
-                        } else {
+                        } else {*/
                             for (int c=0; c<rateChannels; c++) {
                                 rate[c*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]=d[1+c];
                             }
-                        }
-                        if (getRateChannelsSwapped() && rateChannels==2) {
+                        //}
+                        if (getRateChannelsSwapped()) {
+                            qDebug()<<"swapping in "<<getName();
                             qSwap(rate[0*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i], rate[1*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]);
                         }
                     }
@@ -1508,8 +1512,8 @@ bool QFRDRFCSData::getRateChannelsSwapped() const
 {
     int channel=0;
     if (propertyExists("CHANNEL")) channel=getProperty("CHANNEL", 0).toInt();
-    //qDebug()<<"channelsSwapped(): "<<channel<<rateRuns;
-    if (rateRuns>1 && channel!=0) return true;
+    //qDebug()<<"channelsSwapped(): "<<getName()<<channel<<rateChannels;
+    if (rateChannels==2 && channel==1) return true;
     return false;
 }
 

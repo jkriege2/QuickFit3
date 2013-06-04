@@ -401,9 +401,12 @@ void QFFCCSFitEvaluationEditor::configureForSPFCCS() {
     QStringList globals;
     globals<<"concentration_a"<<"concentration_b"<<"concentration_ab"
           <<"diff_coeff_a"  <<"diff_coeff_b"  <<"diff_coeff_ab"
-         <<"crosstalk"<<"focus_distance_x"  <<"focus_distance_y"  <<"focus_distance_z"
-        <<"focus_width1"  <<"focus_width2"  <<"focus_struct_fac1"  <<"focus_struct_fac2"
-       <<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
+          <<"n_nonfluorescent"<<"nonfl_tau_a"<<"nonfl_theta_a"<<"nonfl_tau_b"<<"nonfl_theta_b"<<"nonfl_tau_ab"<<"nonfl_theta_ab"
+          <<"crosstalk"<<"focus_distance_x"  <<"focus_distance_y"  <<"focus_distance_z"
+          <<"focus_width1"  <<"focus_width2"  <<"focus_struct_fac1"  <<"focus_struct_fac2"
+          <<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
+
+
 
     for (int g=0; g<globals.size(); g++) {
         data->setLinkParameter(0, globals[g], g);
@@ -434,11 +437,12 @@ void QFFCCSFitEvaluationEditor::configureForASPFCCS() {
 
     QStringList globals;
     globals<<"concentration_a"<<"concentration_b"<<"concentration_ab"
-          <<"diff_acoeff_a"  <<"diff_acoeff_b"  <<"diff_acoeff_ab"
-         <<"diff_alpha_a"  <<"diff_alpha_b"  <<"diff_alpha_ab"
-         <<"crosstalk"<<"focus_distance_x"  <<"focus_distance_y"  <<"focus_distance_z"
-        <<"focus_width1"  <<"focus_width2"  <<"focus_struct_fac1"  <<"focus_struct_fac2"
-       <<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
+           <<"diff_acoeff_a"  <<"diff_acoeff_b"  <<"diff_acoeff_ab"
+           <<"diff_alpha_a"  <<"diff_alpha_b"  <<"diff_alpha_ab"
+           <<"n_nonfluorescent"<<"nonfl_tau_a"<<"nonfl_theta_a"<<"nonfl_tau_b"<<"nonfl_theta_b"<<"nonfl_tau_ab"<<"nonfl_theta_ab"
+           <<"crosstalk"<<"focus_distance_x"  <<"focus_distance_y"  <<"focus_distance_z"
+           <<"focus_width1"  <<"focus_width2"  <<"focus_struct_fac1"  <<"focus_struct_fac2"
+           <<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
 
     for (int g=0; g<globals.size(); g++) {
         data->setLinkParameter(0, globals[g], g);
@@ -579,7 +583,7 @@ void QFFCCSFitEvaluationEditor::displayData() {
                 sigma=NULL;
             }
             long N=fcs->getCorrelationN();
-            qDebug()<<"file="<<file<<" I="<<eval->getCurrentIndex()<<":   tau="<<tau[0]<<" d="<<data[0]<<N;
+            //qDebug()<<"file="<<file<<" I="<<eval->getCurrentIndex()<<":   tau="<<tau[0]<<" d="<<data[0]<<N;
             if (data && tau) {
                 size_t c_tau=ds->addCopiedColumn(tau, N, tr("file%1: tau [s]").arg(file+1));
                 size_t c_data=ds->addCopiedColumn(data, N, tr("file%1: g(tau)").arg(file+1));
