@@ -42,7 +42,7 @@ QFFitFunctionsFCCSFWDiff2ColorACFG::QFFitFunctionsFCCSFWDiff2ColorACFG() {
     #define FCCSDiff_count_rate1 16
     addParameter(FloatNumber,  "background1",              "background count rate green, during measurement",           "B<sub>g</sub>",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
     #define FCCSDiff_background1 17
-    addParameter(FloatNumber,  "brightness_a",             "molar brightness of fluorophore on A",           "&eta;<sub>a</sub>",            "counts/molecule",           "counts/molecule",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5             );
+    addParameter(FloatNumber,  "brightness_a",             "molar brightness of fluorophore on A",           "&eta;<sub>a</sub>",            "cpm",           "cpm",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5             );
     #define FCCSDiff_brightness_a 18
 
 }
