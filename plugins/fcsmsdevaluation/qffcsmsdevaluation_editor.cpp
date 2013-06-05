@@ -320,8 +320,11 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
 
     actFitAllMSD=new QAction(tr("fit theory to several MSDs"), this);
     connect(actFitAllMSD, SIGNAL(triggered()), this, SLOT(fitAllMSD()));
+    actUpdateCalculated=new QAction(tr("update plots derived from fit"), this);
+    connect(actUpdateCalculated, SIGNAL(triggered()), this, SLOT(theoryChanged()));
     menuFit->addSeparator();
     menuFit->addAction(actFitAllMSD);
+    menuFit->addAction(actUpdateCalculated);
 
     actCopyAverageData=new QAction(QIcon(":/copy.png"), tr("&copy runs-average of MSD"), this);
     connect(actCopyAverageData, SIGNAL(triggered()), this, SLOT(copyAverageData()));
@@ -1880,7 +1883,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
 
     JKQTPdatastore* dsdist=pltDistResults->get_plotter()->getDatastore();
 
-    bool updt=true;//pltDistResults->get_doDrawing();
+    bool updt=pltDistResults->get_doDrawing();
     pltDistResults->set_doDrawing(false);
     pltDistResults->clearGraphs();
     pltDistResults->get_plotter()->set_showKey(chkShowKeyDistResults->isChecked());
@@ -1891,6 +1894,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
     dsdist->deleteAllColumns("msdfit_tau");
     dsdist->deleteAllColumns("msdfit_D");
     dsdist->deleteAllColumns("msdfit_alpha");
+    dsdist->deleteAllColumns("msdtransform_tau");
     dsdist->deleteAllColumns("msdtransform_div6tau");
     dsdist->deleteAllColumns("msdtransform_div4tau");
     dsdist->deleteAllColumns("msdtransform_divPD0tau");
@@ -1898,8 +1902,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
     dsdist->deleteAllColumns("msdtransform_divPD2tau");
     dsdist->deleteAllColumns("msdtransform_divPD3tau");
     //qDebug()<<dsdist->getColumnCount();
-    int c_tau=dsdist->getColumnNames().indexOf("msd_tau");
-    if (c_tau<0) c_tau=dsdist->addCopiedColumn(distTau.data(), distTau.size(), "msd_tau");
+    int c_tau=dsdist->addCopiedColumn(distTau.data(), distTau.size(), "msdtransform_tau");
 
     int wid=spinFitWidth->value();
     int first=0;
@@ -1961,8 +1964,8 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
         dsdist->addCopiedColumn(fitTauStart.data(), fitTauStart.size(), "msdfit_tau_start");
         dsdist->addCopiedColumn(fitTauEnd.data(), fitTauEnd.size(), "msdfit_tau_end");
 
-        //qDebug()<<dsdist->getColumnCount();
-        //qDebug()<<c_msdtransformPD0tau<<c_msdtransformPD1tau<<c_msdtransformPD2tau<<c_msdtransformPD3tau<<c_msdtau<<c_msdD<<c_msdA;
+        qDebug()<<dsdist->getColumnCount();
+        qDebug()<<c_msdtransformPD0tau<<c_msdtransformPD1tau<<c_msdtransformPD2tau<<c_msdtransformPD3tau<<c_msdtau<<c_msdD<<c_msdA;
         //qDebug()<<fitTau.size()<<fitTau;
         //qDebug()<<fitD.size()<<fitD;
         //qDebug()<<fitA.size()<<fitA;
@@ -2234,6 +2237,7 @@ void QFFCSMSDEvaluationEditor::theoryChanged() {
     data->set_doEmitPropertiesChanged(pc);
 
     updateDistribution();
+    updateDistributionResults();
 }
 
 void QFFCSMSDEvaluationEditor::fitMSD()

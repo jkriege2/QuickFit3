@@ -167,6 +167,7 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         QAction* actGetNFromFits;
         QAction* actCopyAverageData;
         QAction* actFitAllMSD;
+        QAction* actUpdateCalculated;
         JKQTPoverlayVerticalRange* ovlDistRange;
         JKQTPoverlayLine* ovlModel;
 
