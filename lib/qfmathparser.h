@@ -31,7 +31,7 @@
 #include <QStack>
 #include "../extlibs/MersenneTwister.h"
 #include <stdint.h>
-
+#include <QDebug>
 
 #ifndef QFMATHPARSER_H
 #define QFMATHPARSER_H
@@ -364,7 +364,9 @@ enum qfmpResultType {qfmpDouble=0x01,  /*!< \brief a floating-point number with 
                      qfmpString=0x02,  /*!< \brief a string of characters */
                      qfmpBool=0x04,   /*!< \brief a boolean value true|false */
                      qfmpDoubleVector=0x08,  /*!< \brief a vector of floating point numbers */
-                     qfmpVoid=0x016  /*!< \brief a vector of floating point numbers */
+                     qfmpStringVector=0x10, /*!< \brief a vector of strings */
+                     qfmpBoolVector=0x20, /*!< \brief a vector of booleans */
+                     qfmpVoid=0x40  /*!< \brief a vector of floating point numbers */
                      };
 
 /** \brief result of any expression  */
@@ -372,9 +374,12 @@ struct QFLIB_EXPORT qfmpResult {
     public:
         qfmpResult();
         qfmpResult(double value);
+        qfmpResult(int value);
         qfmpResult(QString value);
         qfmpResult(bool value);
         qfmpResult(const QVector<double> &value);
+        qfmpResult(const QVector<bool> &value);
+        qfmpResult(const QStringList &value);
 
         qfmpResult(const qfmpResult &value);
         //qfmpResult(qfmpResult &value);
@@ -405,8 +410,16 @@ struct QFLIB_EXPORT qfmpResult {
          QFLIB_EXPORT void setString(const QString& val);
          QFLIB_EXPORT void setDoubleVec(const QVector<double>& val);
          QFLIB_EXPORT void setDoubleVec(int size=0, double defaultVal=0);
+         QFLIB_EXPORT void setBoolVec(const QVector<bool>& val);
+         QFLIB_EXPORT void setBoolVec(int size=0, bool defaultVal=false);
+         QFLIB_EXPORT void setStringVec(const QStringList& val);
+         QFLIB_EXPORT void setStringVec(int size=0, const QString& defaultVal=QString(""));
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
          QFLIB_EXPORT QVector<double> asVector() const;
+        /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
+         QFLIB_EXPORT QStringList asStrVector() const;
+        /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
+         QFLIB_EXPORT QVector<bool> asBoolVector() const;
         /** \brief returns \c true, if the result may be converted to a vector of number */
          QFLIB_EXPORT bool  convertsToVector() const;
         /** \brief converst the result to a vector of integers (numbers and number vectors are converted!) */
@@ -417,8 +430,12 @@ struct QFLIB_EXPORT qfmpResult {
          QFLIB_EXPORT bool isUsableResult() const;
         /** \brief converst the result to a number (numbers are converted!) */
          QFLIB_EXPORT double asNumber() const;
-        /** \brief converst the result to a number (numbers are converted and from a number vector the first element is returned!) */
-         QFLIB_EXPORT double asNumberAlsoVector() const;
+         /** \brief converst the result to a number (numbers are converted and from a number vector the first element is returned!) */
+          QFLIB_EXPORT double asNumberAlsoVector() const;
+          /** \brief converst the result to a number (numbers are converted and from a number vector the first element is returned!) */
+           QFLIB_EXPORT QString asStringAlsoVector() const;
+           /** \brief converst the result to a number (numbers are converted and from a number vector the first element is returned!) */
+            QFLIB_EXPORT bool asBooleanAlsoVector() const;
         /** \brief converst the result to a string (strings are converted!) */
          QFLIB_EXPORT QString asString() const;
         /** \brief converst the result to a boolean (numbers and booleans are converted!) */
@@ -481,6 +498,9 @@ struct QFLIB_EXPORT qfmpResult {
         QFLIB_EXPORT static void la_neg(qfmpResult& l, QFMathParser* p);
         QFLIB_EXPORT static void la_bitwisenot(qfmpResult& l, QFMathParser* p);*/
 
+        QFLIB_EXPORT bool operator==(const qfmpResult& other) const;
+        QFLIB_EXPORT bool operator!=(const qfmpResult& other) const;
+
         QFLIB_EXPORT static void compareequal(qfmpResult& res, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
         QFLIB_EXPORT static void comparenotequal(qfmpResult& res, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
         QFLIB_EXPORT static void comparegreater(qfmpResult& res, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
@@ -494,6 +514,8 @@ struct QFLIB_EXPORT qfmpResult {
         double num;            /*!< \brief contains result if \c type==qfmpDouble */
         bool boolean;          /*!< \brief contains result if \c type==qfmpBool */
         QVector<double> numVec; /*!< \brief contains result if \c type==qfmpDoubleVector */
+        QStringList strVec;
+        QVector<bool> boolVec;
 
 };
 /*@}*/
@@ -917,6 +939,8 @@ class QFLIB_EXPORT QFMathParser
                 qfmpVariable(QString* ref);
                 qfmpVariable(bool* ref);
                 qfmpVariable(QVector<double>* ref);
+                qfmpVariable(QVector<bool>* ref);
+                qfmpVariable(QStringList* ref);
                 //~qfmpVariable();
                 QFLIB_EXPORT void clearMemory();
                 QFLIB_EXPORT qfmpResult toResult() const;
@@ -928,6 +952,8 @@ class QFLIB_EXPORT QFMathParser
                 inline double* getNum() const { return num; }
                 inline bool* getBoolean() const { return boolean; }
                 inline QVector<double>* getNumVec() const { return numVec; }
+                inline QVector<bool>* getBoolVec() const { return boolVec; }
+                inline QStringList* getStrVec() const { return strVec; }
 
 
             protected:
@@ -937,6 +963,8 @@ class QFLIB_EXPORT QFMathParser
                 double *num;             /*!< \brief this points to the variable data if \c type==qfmpDouble */
                 bool *boolean;           /*!< \brief this points to the variable data if \c type==qfmpBool */
                 QVector<double>* numVec; /*!< \brief this points to the variable data if \c type==qfmpDoubleVector */
+                QVector<bool>* boolVec; /*!< \brief this points to the variable data if \c type==qfmpBoolVector */
+                QStringList* strVec; /*!< \brief this points to the variable data if \c type==qfmpStringVector */
         };
 
 
@@ -966,7 +994,7 @@ class QFLIB_EXPORT QFMathParser
             virtual ~qfmpNode() {}
 
             /** \brief evaluate this node */
-            virtual qfmpResult evaluate()=0;
+            virtual qfmpResult evaluate();
 
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result)=0;
@@ -1138,8 +1166,6 @@ class QFLIB_EXPORT QFMathParser
              */
             explicit qfmpVectorAccessNode(QString var, qfmpNode* index, QFMathParser* p, qfmpNode* par);
 
-            /** \brief evaluate this node */
-            virtual qfmpResult evaluate();
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
 
@@ -1167,8 +1193,6 @@ class QFLIB_EXPORT QFMathParser
              */
             explicit qfmpVariableAssignNode(QString var, qfmpNode* c, QFMathParser* p, qfmpNode* par);
 
-            /** \brief evaluate this node */
-            virtual qfmpResult evaluate();
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
 
@@ -1199,8 +1223,6 @@ class QFLIB_EXPORT QFMathParser
              */
             explicit qfmpVectorElementAssignNode(QString var, qfmpNode* index, qfmpNode* expression, QFMathParser* p, qfmpNode* par);
 
-            /** \brief evaluate this node */
-            virtual qfmpResult evaluate();
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
 
@@ -1663,6 +1685,7 @@ class QFLIB_EXPORT QFMathParser
                     if (variables.contains(name) && variables[name].size()>0) {
                         res=variables[name].last().second.toResult();
                         res.isValid=true;
+                        //qDebug()<<"getVariable("<<name<<"): "<<res.toTypeString();
                         return res;
                     }
                     if (parent) parent->qfmpError(QObject::tr("the variable '%1' does not exist").arg(name));
@@ -1719,6 +1742,7 @@ class QFLIB_EXPORT QFMathParser
                         if (parent) parent->qfmpError(QObject::tr("the variable '%1' does not exist").arg(name));
                         res.setInvalid();
                     }
+                    //qDebug()<<"getVariable(res, "<<name<<", "<<res.toTypeString()<<")";
                 }
 
                 inline void evaluateFunction(qfmpResult& res, const QString& name, const QVector<qfmpResult> &parameters) const{
@@ -1749,6 +1773,7 @@ class QFLIB_EXPORT QFMathParser
                 }
 
                 inline void setVariable(const QString& name, const qfmpResult& result){
+                    //qDebug()<<"setVariable("<<name<<", "<<result.toTypeString()<<")";
                     if (variables.contains(name) && variables[name].size()>0) {
                         variables[name].last().second.set(result);
                     } else {
@@ -1762,10 +1787,14 @@ class QFLIB_EXPORT QFMathParser
 
                 QFLIB_EXPORT void setVariableDouble(const QString& name, double result);
                 QFLIB_EXPORT void setVariableDoubleVec(const QString& name, const QVector<double>& result);
+                QFLIB_EXPORT void setVariableStringVec(const QString& name, const QStringList& result);
+                QFLIB_EXPORT void setVariableBoolVec(const QString& name, const QVector<bool>& result);
                 QFLIB_EXPORT void setVariableString(const QString& name, const QString& result);
                 QFLIB_EXPORT void setVariableBoolean(const QString& name, bool result);
                 QFLIB_EXPORT void addVariableDouble(const QString& name, double result);
                 QFLIB_EXPORT void addVariableDoubleVec(const QString& name, const QVector<double>& result);
+                QFLIB_EXPORT void addVariableStringVec(const QString& name, const QStringList& result);
+                QFLIB_EXPORT void addVariableBoolVec(const QString& name, const QVector<bool>& result);
                 QFLIB_EXPORT void addVariableString(const QString& name, const QString& result);
                 QFLIB_EXPORT void addVariableBoolean(const QString& name, bool result);
                 QFLIB_EXPORT void deleteVariable(const QString& name);
@@ -1948,6 +1977,20 @@ class QFLIB_EXPORT QFMathParser
         inline void addVariableBoolean(const QString& name, bool v) {
             environment.addVariableBoolean(name, v);
         }
+        /** \brief  register a new internal variable of type boolean vector
+         * \param name name of the new variable
+         * \param v initial value of this variable
+         */
+        inline void addVariableBoolVector(const QString& name, const QVector<bool>& v) {
+            environment.addVariableBoolVec(name, v);
+        }
+        /** \brief  register a new internal variable of type boolean vector
+         * \param name name of the new variable
+         * \param v initial value of this variable
+         */
+        inline void addVariableStringVector(const QString& name, const QStringList& v) {
+            environment.addVariableStringVec(name, v);
+        }
 
         /** \brief  register a new internal variable of type boolean
          * \param name name of the new variable
@@ -2094,6 +2137,10 @@ class QFLIB_EXPORT QFMathParser
         static void addGlobalVariable(const QString& name, double value);
         /** \brief  add a variablen to the list of global variables that are defined by a call to addStandardVariables() (or the constructor) */
         static void addGlobalVariable(const QString& name, const QVector<double>& value);
+        /** \brief  add a variablen to the list of global variables that are defined by a call to addStandardVariables() (or the constructor) */
+        static void addGlobalVariable(const QString& name, const QVector<bool>& value);
+        /** \brief  add a variablen to the list of global variables that are defined by a call to addStandardVariables() (or the constructor) */
+        static void addGlobalVariable(const QString& name, const QStringList& value);
         /** \brief  add a variablen to the list of global variables that are defined by a call to addStandardVariables() (or the constructor) */
         static void addGlobalVariable(const QString& name, const QString& value);
         /** \brief  add a variablen to the list of global variables that are defined by a call to addStandardVariables() (or the constructor) */

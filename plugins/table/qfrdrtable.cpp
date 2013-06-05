@@ -875,7 +875,27 @@ QVariant QFRDRTable::evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode
                     if (QFFloatIsOK(res)) result=QVariant(res);
                     else result=QVariant();
                 }
-            } else if (r.type==qfmpDouble) {
+            } else if (r.type==qfmpStringVector) {
+                if (columnMode) {
+                    QVariantList vl;
+                    for (int i=0; i<r.strVec.size(); i++) {
+                        vl<<r.strVec[i];
+                    }
+                    return vl;
+                } else {
+                    result=QVariant(r.asStringAlsoVector());
+                }
+            } else if (r.type==qfmpBoolVector) {
+                if (columnMode) {
+                    QVariantList vl;
+                    for (int i=0; i<r.boolVec.size(); i++) {
+                        vl<<r.boolVec[i];
+                    }
+                    return vl;
+                } else {
+                    result=QVariant(r.asBooleanAlsoVector());
+                }
+             } else if (r.type==qfmpDouble) {
                 if (QFFloatIsOK(r.num))
                     result=QVariant(r.num);
                 else

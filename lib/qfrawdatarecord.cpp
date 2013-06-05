@@ -4307,13 +4307,13 @@ qfmpResult QFRawDataRecord::evaluationResult::getAsMathParserResult() const
             return qfmpResult(svalue);
         case QFRawDataRecord::qfrdreStringVector:
         case QFRawDataRecord::qfrdreStringMatrix:
-            if (!svec.isEmpty()) return qfmpResult(svec.first());
+            if (!svec.isEmpty()) return qfmpResult(svec);
             break;
         case QFRawDataRecord::qfrdreBoolean:
             return qfmpResult(bvalue);
         case QFRawDataRecord::qfrdreBooleanVector:
         case QFRawDataRecord::qfrdreBooleanMatrix:
-            if (!bvec.isEmpty()) return qfmpResult(bvec.first());
+            if (!bvec.isEmpty()) return qfmpResult(bvec);
             break;
         case QFRawDataRecord::qfrdreInvalid:
         default:
@@ -4341,6 +4341,14 @@ void QFRawDataRecord::evaluationResult::setFromMathParserResult(const qfmpResult
             case qfmpDoubleVector:
                 type=QFRawDataRecord::qfrdreNumberVector;
                 dvec=result.numVec;
+                break;
+            case qfmpBoolVector:
+                type=QFRawDataRecord::qfrdreBooleanVector;
+                bvec=result.boolVec;
+                break;
+            case qfmpStringVector:
+                type=QFRawDataRecord::qfrdreStringVector;
+                svec=result.strVec;
                 break;
             case qfmpVoid:
                 type=QFRawDataRecord::qfrdreInvalid;

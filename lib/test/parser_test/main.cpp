@@ -30,6 +30,38 @@
         }\
     }\
   }
+#define TESTCMP(expr,expectedresult) {\
+    parser.resetErrors(); \
+    QFMathParser::qfmpNode* n=parser.parse(expr); \
+    qfmpResult r=n->evaluate(); \
+    qDebug()<<expr<<"       =  "<<r.toTypeString()<<"\n"; \
+    if (parser.hasErrorOccured()) { \
+        qDebug()<<"   ERROR "<<parser.getLastErrors().join("\n    ")<<"\n" ;\
+    } else {\
+        if (r.operator!=(qfmpResult(expectedresult))) { \
+            qDebug()<<"   ERROR: RESULT NOT EQUAL TO EXPECTED RESULT (exprected: "<<qfmpResult(expectedresult).toTypeString()<<")!!!\n" ;\
+        }\
+    } \
+    if (doByteCode) { \
+        QFMathParser::ByteCodeProgram bprog;\
+        QFMathParser::ByteCodeEnvironment bcenv(&parser);\
+        bcenv.init(&parser); \
+        if (n->createByteCode(bprog, &bcenv)) { \
+            double rr=NAN;\
+            qDebug()<<expr<<"  =[BC]=  "<<(rr=parser.evaluateBytecode(bprog))<<"\n"; \
+            if (r.getType()==qfmpDouble && rr!=r.asNumber()) { \
+                qDebug()<<"   BCNOTEQUAL:   eval="<<r.toTypeString()<<"   bc="<<rr<<"   rel_error="<<(rr-r.asNumber())/r.asNumber();\
+            } else if (r.getType()==qfmpBool && (rr!=0.0)!=r.asBool()) { \
+                qDebug()<<"   BCNOTEQUAL:   eval="<<r.toTypeString()<<"   bc="<<(rr!=0.0);\
+            }\
+            if (showBytecode) qDebug()<<"\n-----------------------------------------------------------\n"<<QFMathParser::printBytecode(bprog)<<"\n-----------------------------------------------------------\n"; \
+        }\
+        if (parser.hasErrorOccured()) { \
+            qDebug()<<"   BCERROR "<<parser.getLastErrors().join("\n    ")<<"\n" ;\
+        }\
+    }\
+  }
+#define TESTCMP1(expectedresult) TESTCMP(#expectedresult, expectedresult)
 
 double dbgif(bool test, double trueV, double falseV) {
     if (test) return trueV; else return falseV;
@@ -178,8 +210,8 @@ int main(int argc, char *argv[])
 {
     
     QFMathParser parser;
-    bool doByteCode=true;
-    bool showBytecode=true;
+    bool doByteCode=false;
+    bool showBytecode=false;
 
     /*for (uint32_t i=0; i<0xFFFFFFFF; i++) {
         double di=i;
@@ -189,26 +221,26 @@ int main(int argc, char *argv[])
     }*/
 
 
-
-    TEST("1+2+pi");
-    TEST("1+2*pi");
-    TEST("1*2+pi");
-    TEST("1*(2+pi)");
-    TEST("sin(2.5*pi)");
-    TEST("sqrt(sin(2.5*pi))");
-    TEST("-2.5e-45");
-    TEST("2.5e-45");
-    TEST("000.001");
-    TEST("2.8e45");
-    TEST("0b11010");
+    double pi=M_PI;
+    TESTCMP("1+2+pi", 1.0+2.0+M_PI);
+    TESTCMP("1+2*pi", 1.0+2.0*M_PI);
+    TESTCMP("1*2+pi", 1.0*2.0+M_PI);
+    TESTCMP1(1*(2+pi));
+    TESTCMP1(sin(2.5*pi));
+    TESTCMP1(sqrt(sin(2.5*pi)));
+    TESTCMP1(-2.5e-45);
+    TESTCMP1(2.5e-45);
+    TESTCMP1(000.001);
+    TESTCMP1(2.8e45);
+    TESTCMP1(0b11010);
     TEST("0b112010");
-    TEST("0xFF");
-    TEST("0xFF&0x0F");
-    TEST("0xFF&0x0F&0x02");
-    TEST("0x01&0x0F&0x02");
-    TEST("0x01|0x0F&0x02");
-    TEST("(0x01|0x0F)&0x02");
-    TEST("0x01|(0x0F&0x02)");
+    TESTCMP1(0xFF);
+    TESTCMP1(0xFF&0x0F);
+    TESTCMP1(0xFF&0x0F&0x02);
+    TESTCMP1(0x01&0x0F&0x02);
+    TESTCMP1(0x01|0x0F&0x02);
+    TESTCMP1((0x01|0x0F)&0x02);
+    TESTCMP1(0x01|(0x0F&0x02));
 
     qDebug()<<"\n\n"<<parser.printVariables()<<"\n\n";
     TEST("a=5*5+0.1");
@@ -296,17 +328,7 @@ int main(int argc, char *argv[])
     TEST("quantile(x,0.25)");
     TEST("quantile(x,0.75)");
 
-    TEST("x[5]=-1");
-    TEST("x");
-    TEST("x[1:3]=nan");
-    TEST("x");
-    TEST("x[[7,9]]=inf");
-    TEST("x");
-    TEST("[-7,-9]");
-    TEST("x[[7,9]]=[-7,-9]");
-    TEST("x");
-    TEST("x[[1,3,5,7,9]]");
-    TEST("x[0:2:9]");
+
     TEST("removeall(x, -1)");
     TEST("remove(x, 1:3)");
     TEST("x=1:20");
@@ -373,7 +395,57 @@ int main(int argc, char *argv[])
     TEST("xx=a; j0(xx)-j0(a)");
     TEST("j1(a)");
     TEST("jn(1,2)");
-    speed_test(doByteCode, showBytecode);
+
+    TEST("x=1:10");
+    TEST("x[5]=-1");
+    TEST("x");
+    TEST("x[1:3]=nan");
+    TEST("x");
+    TEST("x[[7,9]]=inf");
+    TEST("x");
+    TEST("[-7,-9]");
+    TEST("x[[7,9]]=[-7,-9]");
+    TEST("x");
+    TEST("x[[1,3,5,7,9]]");
+    TEST("x[0:2:9]");
+    TEST("x=[\"a\", \"b\", \"c\", \"d\", \"e\", \"f\", \"g\", \"h\", \"i\", \"j\", \"k\", \"l\", \"m\", \"n\"]");
+    TEST("x[5]=-1");
+    TEST("x");
+    TEST("x[5]=\"x\"");
+    TEST("x");
+    TEST("x[1:3]=\"inf\"");
+    TEST("x");
+    TEST("x[[7,9]]=\"inf\"");
+    TEST("x");
+    TEST("x[[7,9]]=[\"7\",\"9\"]");
+    TEST("x");
+    TEST("x[[1,3,5,7,9]]");
+    TEST("x[0:2:9]");
+    TEST("x=\"abcdefghijklmnop\"");
+    TEST("x[5]=-1");
+    TEST("x");
+    TEST("x[5]=\"x\"");
+    TEST("x");
+    TEST("x[1:3]=\"z\"");
+    TEST("x");
+    TEST("x[[7,9]]=\"z\"");
+    TEST("x");
+    TEST("x[[7,9]]=[\"7\",\"9\"]");
+    TEST("x");
+    TEST("x[[1,3,5,7,9]]");
+    TEST("x[0:2:9]");
+    TEST("x=[true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false]");
+    TEST("x[5]=-1");
+    TEST("x");
+    TEST("x[1:3]=false");
+    TEST("x");
+    TEST("x[[7,9]]=false");
+    TEST("x");
+    TEST("x[[7,9]]=[false,true]");
+    TEST("x");
+    TEST("x[[1,3,5,7,9]]");
+    TEST("x[0:2:9]");
+    //speed_test(doByteCode, showBytecode);
 
     return 0;
 }

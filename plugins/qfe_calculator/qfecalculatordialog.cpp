@@ -82,7 +82,11 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
         } else if (r.type==qfmpDouble) {
             result=tr("<font color=\"blue\">[float] %1</font>").arg(r.num);
         } else if (r.type==qfmpDoubleVector) {
-            result=tr("<font color=\"blue\">[float] %1</font>").arg(listToString(r.numVec));
+            result=tr("<font color=\"blue\">[float vector] %1</font>").arg(listToString(r.numVec));
+        } else if (r.type==qfmpStringVector) {
+            result=tr("<font color=\"blue\">[string vector] %1</font>").arg(listToString(r.strVec));
+        } else if (r.type==qfmpBoolVector) {
+            result=tr("<font color=\"blue\">[boolean vector] %1</font>").arg(listToString(r.boolVec));
         } else if (r.type==qfmpString) {
             result=tr("<font color=\"blue\">[string] %1</font>").arg(r.str);
         } else if (r.type==qfmpVoid) {

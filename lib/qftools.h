@@ -19,6 +19,7 @@
 #include <QListWidget>
 #include "qtriple.h"
 #include <QTextStream>
+#include <QBitArray>
 
 typedef QMap<QString, QVariant> QFStringVariantMap;
 /*! \brief returns a new QToolButton for the specified QAction
@@ -187,6 +188,26 @@ QFLIB_EXPORT QString doubleToQString(double value, int prec = 10, char f = 'g', 
 
 */
 QFLIB_EXPORT QString doubleVecToQString(const QVector<double>& value, int prec = 10, char f = 'g', QChar decimalSeparator='.', const QString itemSeparator=", " );
+/*! \brief convert a vector of booleans to a QString
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString bitarrayToQString(const QBitArray& value, const QString itemSeparator=", ", const QString& trueName=QString("true"), const QString& falseName=QString("false") );
+/*! \brief convert a vector of booleans to a QString
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QVector<double> bitarrayToNumVec(const QBitArray& value, double trueValue=1, double falseValue=0);
+/*! \brief convert a vector of booleans to a QString
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString boolvectorToQString(const QVector<bool>& value, const QString itemSeparator=", ", const QString& trueName=QString("true"), const QString& falseName=QString("false") );
+/*! \brief convert a vector of booleans to a QString
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QVector<double> boolvectorToNumVec(const QVector<bool>& value, double trueValue=1, double falseValue=0);
 /*! \brief convert a number to a QString with a given decimalSeparator
     \ingroup qf3lib_tools
 

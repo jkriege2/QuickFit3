@@ -255,6 +255,43 @@ QString doubleVecToQString(const QVector<double>& value, int prec, char f, QChar
     return out;
 }
 
+QString bitarrayToQString(const QBitArray& value, const QString itemSeparator, const QString& trueName, const QString& falseName ) {
+    QString out="";
+    for (int i=0; i<value.size(); i++) {
+        if (i>0) out+=itemSeparator;
+        if (value[i]) out+=trueName;
+        else out+=falseName;
+    }
+    return out;
+
+}
+
+QVector<double> bitarrayToNumVec(const QBitArray& value, double trueValue, double falseValue) {
+    QVector<double> v;
+    for (int i=0; i<value.size(); i++) {
+        v<<(value[i]?trueValue:falseValue);
+    }
+    return v;
+}
+
+QString boolvectorToQString(const QVector<bool>& value, const QString itemSeparator, const QString& trueName, const QString& falseName ) {
+    QString out="";
+    for (int i=0; i<value.size(); i++) {
+        if (i>0) out+=itemSeparator;
+        if (value[i]) out+=trueName;
+        else out+=falseName;
+    }
+    return out;
+
+}
+
+QVector<double> boolvectorToNumVec(const QVector<bool>& value, double trueValue, double falseValue) {
+    QVector<double> v;
+    for (int i=0; i<value.size(); i++) {
+        v<<(value[i]?trueValue:falseValue);
+    }
+    return v;
+}
 
 QString CDoubleToQString(double value) {
     QLocale loc=QLocale::c();
