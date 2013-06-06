@@ -531,13 +531,22 @@ void QFHistogramView::writeReport(QTextCursor& cursor, QTextDocument* document) 
         QPainter* painter=new QPainter(&pic);
         pltParamHistogram->get_plotter()->draw(*painter, QRect(0,0,pltParamHistogram->width(),pltParamHistogram->height()));
         delete painter;
-        double scale=0.5*document->textWidth()/pic.boundingRect().width();
+        double scale=0.5*document->textWidth()/double(pic.boundingRect().width());
         if (scale<=0) scale=1;
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
 
         tabCursor=table->cellAt(0, 1).firstCursorPosition();
         tabCursor.insertText(tr("\n"), fTextBoldSmall);
-        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><nobr><span style=\"font-size: 7pt;\">%1</span></nobr></center>").arg(tvHistogramParameters->toHtml(1,true))));
+        //tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><nobr><span style=\"font-size: 7pt;\">%1</span></nobr></center>").arg(tvHistogramParameters->toHtml(1,true))));
+        QPicture picT;
+        painter=new QPainter(&picT);
+        tvHistogramParameters->paint(*painter);
+        delete painter;
+        scale=0.4*document->textWidth()/double(picT.boundingRect().width());
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("fit results table:\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale);
+
     }
     cursor.movePosition(QTextCursor::End);
 }

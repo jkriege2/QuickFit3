@@ -344,7 +344,7 @@
      <widget class="QWidget" name="horizontalLayoutWidget">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QTableView" name="tableView"/>
+        <widget class="QEnhancedTableView" name="tableView"/>
        </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -504,8 +504,14 @@
    <header>datacutslider.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>QEnhancedTableView</class>
+   <extends>QTableView</extends>
+   <header>qenhancedtableview.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>

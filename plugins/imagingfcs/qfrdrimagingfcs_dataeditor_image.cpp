@@ -4843,21 +4843,21 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     cursor.movePosition(QTextCursor::End);
     QApplication::processEvents();
 
-    table = cursor.insertTable(2,1, tableFormat1);
+    table = cursor.insertTable(1,2, tableFormat1);
     {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
         QPicture pic;
         QPainter* painter=new QPainter(&pic);
         plotter->get_plotter()->draw(*painter, QRect(0,0,plotter->width(),plotter->height()+plotterResid->height()));
         delete painter;
-        double scale=0.7*document->textWidth()/pic.boundingRect().width();
+        double scale=0.65*document->textWidth()/double(pic.boundingRect().width());
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("correlation curves:\n"), fTextBoldSmall);
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
 
-        tabCursor=table->cellAt(1,0).firstCursorPosition();
+        tabCursor=table->cellAt(0,1).firstCursorPosition();
         tabCursor.insertText(tr("\n"), fTextBoldSmall);
-        int tfsize=8;
+        /*int tfsize=8;
         QString htmltable=tvParams->toHtml(0, true);
         int colcnt=htmltable.count("<th ",Qt::CaseInsensitive);
         if (colcnt>=24) tfsize=7;
@@ -4868,7 +4868,15 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         if (colcnt>=48) tfsize=2;
         if (colcnt>=54) tfsize=1;
         //qDebug()<<colcnt<<tfsize;
-        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><nobr><span style=\"font-size: %2pt;\">%1</span></nobr></center>").arg(htmltable).arg(tfsize)));
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><nobr><span style=\"font-size: %2pt;\">%1</span></nobr></center>").arg(htmltable).arg(tfsize)));*/
+        QPicture picT;
+        painter=new QPainter(&picT);
+        tvParams->paint(*painter);
+        delete painter;
+        scale=0.3*document->textWidth()/double(picT.boundingRect().width());
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("fit results table:\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale);
     }
     QApplication::processEvents();
     cursor.movePosition(QTextCursor::End);

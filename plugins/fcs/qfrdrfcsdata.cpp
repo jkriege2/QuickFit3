@@ -392,12 +392,17 @@ void QFRDRFCSData::intReadData(QDomElement* e) {
             if (ok) leaveout.append(lo);
         }
     }
+    if (!propertyExists("SAME_COUNTRATE_FOR_ALL")) {
+        setQFProperty("SAME_COUNTRATE_FOR_ALL", false, true, true);
+    }
     QString filetype=getProperty("FILETYPE", "unknown").toString().toUpper();
     if (filetype.toUpper()=="INTERNAL") {
         loadInternal(e);
     } else {
         reloadFromFiles();
     }
+
+
 
     //std::cout<<"intReadData ended\n";
 }
@@ -973,6 +978,11 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
                             break;
                         }
                         rate[(data[ii].runs+run0-1)*rateN+i]=d[1+channel];
+                        if (getProperty("SAME_COUNTRATE_FOR_ALL", false).toBool()) {
+                            for (int crr=0; crr<data[ii].runs; crr++) {
+                                rate[(crr+run0)*rateN+i]=d[1+channel];
+                            }
+                        }
                     }
                 } else {
                     if (runs==1) {
@@ -1012,11 +1022,19 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
                                 rate[c*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]=d[1+c];
                             }
                         //}
+                        if (getProperty("SAME_COUNTRATE_FOR_ALL", false).toBool()) {
+                            for (int c=0; c<rateChannels; c++) {
+                                for (int crr=0; crr<data[ii].runs; crr++) {
+                                    rate[c*rateN*rateRuns+(run0+crr)*rateN+i]=d[1+c];
+                                }
+                            }
+                        }
                         if (getRateChannelsSwapped()) {
                             //qDebug()<<"swapping in "<<getName();
-                            qSwap(rate[0*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i], rate[1*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]);
+                            for (int crr=0; crr<data[ii].runs; crr++) {
+                                qSwap(rate[0*rateN*rateRuns+(run0+crr)*rateN+i], rate[1*rateN*rateRuns+(run0+crr)*rateN+i]);
+                            }
                         }
-
                     }
                 }
 

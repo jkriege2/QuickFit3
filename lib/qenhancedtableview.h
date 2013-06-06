@@ -31,10 +31,15 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         void addActionsToToolbar(QToolBar* tb) const;
         void addActionsToMenu(QMenu* m) const;
 
+        void print(QPrinter* printer, bool onePageWide=false, bool onePageHigh=false);
+
+        void paint(QPainter& painter, QRect pageRec=QRect());
+        QSizeF getTotalSize() const;
+
     signals:
         void keyPressed(int key, Qt::KeyboardModifiers modifiers, QString text);
     public slots:
-        void printTable();
+        void print();
         void copySelectionToExcel(int copyrole=Qt::EditRole, bool storeHead=true);
         void copySelectionToExcelNoHead(int copyrole=Qt::EditRole);
         void copySelectionToMatlabNoHead(int copyrole=Qt::EditRole);
@@ -42,6 +47,9 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         void copySelectionAsMedianQuantilesToExcel(int medianrole=Qt::EditRole, int q25role=-1, int q75role=-1, bool storeHead=true, Qt::Orientation orientation=Qt::Horizontal);
     protected:
         virtual void keyPressEvent(QKeyEvent* event);
+        void paint(QPainter &painter, double scale, int page, double hhh, double vhw, const QList<int>& pageCols, const QList<int>& pageRows, QPrinter* p=NULL);
+
+        QPrinter* getPrinter(QPrinter* printerIn=NULL, bool *localPrinter=NULL);
     protected slots:
         void changeHTMLFontSize(QTextDocument* txt, double fontSize);
     private:

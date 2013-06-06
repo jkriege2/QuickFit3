@@ -9,6 +9,7 @@
 #include <QtGui>
 #include <QtCore>
 #include "tools.h"
+#include "qmoretextobject.h"
 #include "dlgqfprogressdialog.h"
 
 QFFCCSFitEvaluationEditor::QFFCCSFitEvaluationEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent):
@@ -1134,6 +1135,9 @@ void QFFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     QFFCCSFitEvaluationItem* eval=qobject_cast<QFFCCSFitEvaluationItem*>(current);
     if ((!eval)/*||(!record)||(!data)*/) return;
 
+    int PicTextFormat=QTextFormat::UserObject + 1;
+    QObject *picInterface = new QPictureTextObject;
+    document->documentLayout()->registerHandler(PicTextFormat, picInterface);
 
     // we use this QTextCursor to write the document
     QTextCursor cursor(document);
@@ -1160,8 +1164,43 @@ void QFFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
 
 
     // insert heading
-    cursor.insertText(tr("FCCS Fit Report:\n\n"), fHeading1);
+    cursor.insertText(tr("imFCCS Fit Report:\n\n"), fHeading1);
     cursor.movePosition(QTextCursor::End);
+
+    cursor.insertText(tr("run: %1/%2..%3\n").arg(eval->getCurrentIndex()).arg(eval->getIndexMin(eval->getFitFile(0))).arg(eval->getIndexMax(eval->getFitFile(0))), fTextBoldSmall);
+
+    QTextTableFormat tableFormat;
+    tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
+    tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
+    QTextTable* table = cursor.insertTable(2,1, tableFormat);
+    {
+        QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
+        QPicture pic;
+        QPainter* painter=new QPainter(&pic);
+        ui->pltData->get_plotter()->draw(*painter, QRect(0,0,ui->pltData->width(),ui->pltData->height()+ui->pltResiduals->height()));
+        delete painter;
+        double scale=0.9*document->textWidth()/double(pic.boundingRect().width());
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("correlation curves:\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+
+        tabCursor=table->cellAt(1,0).firstCursorPosition();
+        tabCursor.insertText(tr("\n"), fTextBoldSmall);
+        QPicture picT;
+        painter=new QPainter(&picT);
+        ui->tableView->paint(*painter);
+        delete painter;
+        scale=0.95*document->textWidth()/double(picT.boundingRect().width());
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("fit results table:\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale);
+    }
+    QApplication::processEvents();
+    cursor.movePosition(QTextCursor::End);
+    QApplication::processEvents();
+
+
+
 
     // insert table with some data
     /*QTextTableFormat tableFormat;
@@ -1173,5 +1212,4 @@ void QFFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     table->cellAt(1, 0).firstCursorPosition().insertText(tr("ID:"), fTextBold);
     table->cellAt(1, 1).firstCursorPosition().insertText(QString::number(record->getID()));*/
     cursor.movePosition(QTextCursor::End);
-
 }

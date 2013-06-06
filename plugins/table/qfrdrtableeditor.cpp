@@ -191,6 +191,8 @@ void QFRDRTableEditor::createWidgets() {
     tbMain->addAction(actLoadTable);
     tbMain->addAction(actSaveTable);
     tbMain->addSeparator();
+    tbMain->addAction(tvMain->getActPrint());
+    tbMain->addSeparator();
     tbMain->addAction(actCopy);
     tbMain->addAction(actCut);
     tbMain->addAction(actPaste);
@@ -247,6 +249,8 @@ void QFRDRTableEditor::createWidgets() {
     QMenu* menuFile=propertyEditor->addMenu("&File", 0);
     menuFile->addAction(actLoadTable);
     menuFile->addAction(actSaveTable);
+    menuFile->addSeparator();
+    menuFile->addAction(tvMain->getActPrint());
 
     QMenu* menuEdit=propertyEditor->addMenu("&Edit", 0);
     menuEdit->addAction(actCopy);

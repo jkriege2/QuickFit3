@@ -29,6 +29,8 @@ class QFRDRImageToRunPreview : public QWidget
 
         int getCurrentRun() const;
         void setRunSelectWidgetActive(bool active);
+
+        void draw(QPainter *painter, QSize* size);
     signals:
         void currentRunChanged(int run);
         void currentPixelChanged(int x, int y);

@@ -130,6 +130,17 @@ void QFRDRImageToRunPreview::setRunSelectWidgetActive(bool active)
 
 }
 
+void QFRDRImageToRunPreview::draw(QPainter *painter, QSize *size)
+{
+    painter->save();
+    painter->drawText(0, double(spinRun->height())*0.7, tr("current run: %1 %2").arg(labRun->text()).arg(labInfo->text()));
+    painter->save();
+    painter->translate(0,spinRun->height());
+    pltOverview->draw(painter, size);
+    painter->restore();
+    painter->restore();
+}
+
 void QFRDRImageToRunPreview::replotOverview()
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
