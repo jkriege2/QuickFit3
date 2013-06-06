@@ -6,6 +6,8 @@
 #include <QDebug>
 #include "qfplottercopytotabledialog.h"
 #include "qfrawdatapropertyeditor.h"
+#include "qffitfunctionplottools.h"
+#include "qfmathparserxfunctionlinegraph.h"
 
 class MyQFSelectRDRDialogMatchFunctor: public QFMatchRDRFunctor {
     public:
@@ -49,20 +51,21 @@ void QFPlotterPrivate::copyToTable()
             cols=dynamic_cast<QFRDRColumnGraphsInterface*>(rdr);
         }
         bool ok=true;
-        QList<int> columns;
+        QMap<int, int> columns;
         if (tab) {
             JKQTPdatastore* ds=plotter->getDatastore();
             int idx=tab->tableGetColumnCount();
-            for (int i=0; i<ds->getColumnCount(); i++) {
+            QList<size_t> cids=ds->getColumnIDs();
+            for (int i=0; i<cids.size(); i++) {
                 QList<QVariant> d;
-                JKQTPcolumn col=ds->getColumn(i);
+                JKQTPcolumn col=ds->getColumn(cids[i]);
                 for (int j=0; j<col.getRows(); j++) {
                     d<<col.getValue(j);
                 }
                 tab->tableSetColumnData(idx, d);
                 tab->tableSetColumnTitle(idx, col.get_name());
                 //qDebug()<<"set col title idx="<<idx<<"   name="<<col.get_name();
-                columns<<idx;
+                columns[cids[i]]=idx;
                 idx++;
             }
         } else {
@@ -95,6 +98,8 @@ void QFPlotterPrivate::copyToTable()
                         JKQTPxGraphErrors* xeg=dynamic_cast<JKQTPxGraphErrors*>(g);
                         JKQTPyGraphErrors* yeg=dynamic_cast<JKQTPyGraphErrors*>(g);
                         JKQTPxyGraphErrors* xyeg=dynamic_cast<JKQTPxyGraphErrors*>(g);
+                        QFMathParserXFunctionLineGraph* qfmpg=dynamic_cast<QFMathParserXFunctionLineGraph*>(g);
+                        JKQTPxQFFitFunctionLineGraph* qfffg=dynamic_cast<JKQTPxQFFitFunctionLineGraph*>(g);
                         JKQTPColumnMathImage* colig=dynamic_cast<JKQTPColumnMathImage*>(g);
                         JKQTPMathImage* ig=dynamic_cast<JKQTPMathImage*>(g);
                         QFRDRColumnGraphsInterface::ColumnGraphTypes type=QFRDRColumnGraphsInterface::cgtLinesPoints;
@@ -152,6 +157,53 @@ void QFPlotterPrivate::copyToTable()
                             cols->colgraphSetPlotSymbol(graph, cols->colgraphGetPlotCount(graph)-1, symbol, symbolSize);
 
                         } else if (colig) {
+                        } else if(qfffg && qfffg->get_fitFunction()) {
+                            QColor color=QColor("red");
+                            QColor fillColor=color.lighter();
+                            QColor errorColor=color.darker();
+                            type=QFRDRColumnGraphsInterface::cgtQFFitFunction;
+                            color=qfffg->get_color();
+                            fillColor=qfffg->get_fillColor();
+
+
+                            int pcol=columns.value(qfffg->get_parameterColumn(), -1);
+
+                            if (pcol>=0) cols->colgraphAddFunctionPlot(graph, qfffg->get_fitFunction()->id(), type, qfffg->get_title(), pcol );
+                            else cols->colgraphAddFunctionPlot(graph, qfffg->get_fitFunction()->id(), type, qfffg->get_title(), qfffg->get_internalParams() );
+
+                            if (color!=QColor("red")) {
+                                cols->colgraphSetPlotColor(graph, cols->colgraphGetPlotCount(graph)-1, color);
+                            }
+                            if (fillColor!=QColor("red").lighter()) {
+                                cols->colgraphSetPlotFillColor(graph, cols->colgraphGetPlotCount(graph)-1, fillColor);
+                            }
+                            if (errorColor!=QColor("red").darker()) {
+                                cols->colgraphSetPlotErrorColor(graph, cols->colgraphGetPlotCount(graph)-1, errorColor);
+                            }
+                        } else if(qfmpg) {
+                            QColor color=QColor("red");
+                            QColor fillColor=color.lighter();
+                            QColor errorColor=color.darker();
+                            type=QFRDRColumnGraphsInterface::cgtExpression;
+                            color=qfmpg->get_color();
+                            fillColor=qfmpg->get_fillColor();
+
+
+                            int pcol=columns.value(qfmpg->get_parameterColumn(), -1);
+
+                            if (pcol>=0) cols->colgraphAddFunctionPlot(graph, qfmpg->get_function(), type, qfmpg->get_title(), pcol );
+                            else cols->colgraphAddFunctionPlot(graph, qfmpg->get_function(), type, qfmpg->get_title(), qfmpg->get_internalParams() );
+
+                            if (color!=QColor("red")) {
+                                cols->colgraphSetPlotColor(graph, cols->colgraphGetPlotCount(graph)-1, color);
+                            }
+                            if (fillColor!=QColor("red").lighter()) {
+                                cols->colgraphSetPlotFillColor(graph, cols->colgraphGetPlotCount(graph)-1, fillColor);
+                            }
+                            if (errorColor!=QColor("red").darker()) {
+                                cols->colgraphSetPlotErrorColor(graph, cols->colgraphGetPlotCount(graph)-1, errorColor);
+                            }
+
                         }
                     }
                 }

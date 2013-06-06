@@ -16,46 +16,49 @@ QFFitFunctionsSPIMFCCSFWDiff2ColorCCF::QFFitFunctionsSPIMFCCSFWDiff2ColorCCF() {
     #define FCCSDiff_fraction_ab 4
     addParameter(FloatNumber,  "fraction_ab_min",     "relative concentration of species ab in focus cAB/min(cA,cB)",      "C<sub>ab</sub>/min(C<sub>a</sub>, C<sub>b</sub>)", "",  "",            false,      false,          false,              QFFitFunction::DisplayError, false, 0.2,           0,     1,      0.1, 0, 1     );
     #define FCCSDiff_fraction_ab_min 5
+    addParameter(FloatNumber,  "fraction_abmax",     "relative concentration of species ab in focus cAB/max(cA,cB)",      "C<sub>ab</sub>/max(C<sub>a</sub>, C<sub>b</sub>)", "",  "",            false,      false,          false,              QFFitFunction::DisplayError, false, 0.2,           0,     1,      0.1, 0, 1     );
+    #define FCCSDiff_fraction_abmax 6
+
     addParameter(FloatNumber,  "disscciation_constant",     "disscciation constant KD of reaction ab <-> a+b",      "K<sub>d</sub>",            "nM",           "nM",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
-    #define FCCSDiff_KD 6
+    #define FCCSDiff_KD 7
     addParameter(FloatNumber,  "diff_coeff_a",            "diffusion coefficient of species a",                  "D<sub>a</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
-    #define FCCSDiff_diff_coeffa 7
+    #define FCCSDiff_diff_coeffa 8
     addParameter(FloatNumber,  "diff_coeff_b",            "diffusion coefficient of species b",                  "D<sub>b</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
-    #define FCCSDiff_diff_coeffb 8
+    #define FCCSDiff_diff_coeffb 9
     addParameter(FloatNumber,  "diff_coeff_ab",            "diffusion coefficient of species ab",                  "D<sub>ab</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
-    #define FCCSDiff_diff_coeffab 9
+    #define FCCSDiff_diff_coeffab 10
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                   "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
-    #define FCCSDiff_offset 10
+    #define FCCSDiff_offset 11
     addParameter(FloatNumber,  "crosstalk",               "crosstalk coefficient",                                "&kappa;",                  "",         "",                         true,      true,         true,             QFFitFunction::EditError,    true, 0,           0,     1,      0.1, 0, 1  );
-    #define FCCSDiff_crosstalk 11
+    #define FCCSDiff_crosstalk 12
     addParameter(FloatNumber,  "focus_distance_x",         "foci: lateral distance in x-direction",               "d<sub>x</sub>",            "nm",         "nm",                     true,      true,         true,             QFFitFunction::EditError,    true, 0,           -1e6,     1e6,      10  );
-    #define FCCSDiff_focus_distancex 12
+    #define FCCSDiff_focus_distancex 13
     addParameter(FloatNumber,  "focus_distance_y",         "foci: lateral distance in y-direction",               "d<sub>y</sub>",            "nm",         "nm",                     true,      true,         true,             QFFitFunction::EditError,    true, 0,              -1e6,     1e6,      10  );
-    #define FCCSDiff_focus_distancey 13
+    #define FCCSDiff_focus_distancey 14
     addParameter(FloatNumber,  "focus_distance_z",         "foci: longitudinal distance in z-direction",          "d<sub>z</sub>",            "nm",         "nm",                     true,      true,         true,             QFFitFunction::EditError,    true, 0,              -1e6,     1e6,      10  );
-    #define FCCSDiff_focus_distancez 14
+    #define FCCSDiff_focus_distancez 15
     addParameter(FloatNumber,  "focus_height1",            "green PSF: axial radius (1/e� radius)",               "z<sub>g</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 1240,         0.01,     1e5,      10  );
-    #define FCCSDiff_focus_height1 15
+    #define FCCSDiff_focus_height1 16
     addParameter(FloatNumber,  "focus_width1",             "green PSF: lateral radius (1/e� radius)",             "w<sub>g</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 600,          0,        1e4,      10    );
-    #define FCCSDiff_focus_width1 16
+    #define FCCSDiff_focus_width1 17
     addParameter(FloatNumber,  "focus_height2",            "red PSF: axial radius (1/e� radius)",               "z<sub>r</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 1300,         0.01,     1e5,      10  );
-    #define FCCSDiff_focus_height2 17
+    #define FCCSDiff_focus_height2 18
     addParameter(FloatNumber,  "focus_width2",             "red PSF: lateral radius (1/e� radius)",             "w<sub>r</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 660,          0,        1e4,      10    );
-    #define FCCSDiff_focus_width2 18
+    #define FCCSDiff_focus_width2 19
     addParameter(FloatNumber,  "pixel_width",             "pixel width",                                           "a",                        "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 400,          0,        1e4,      10    );
-    #define FCCSDiff_pixel_width 19
+    #define FCCSDiff_pixel_width 20
     addParameter(FloatNumber,  "count_rate1",              "count rate green, during measurement",                      "&lang;F<sub>g</sub>&rang;",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_count_rate1 20
+    #define FCCSDiff_count_rate1 21
     addParameter(FloatNumber,  "background1",              "background count rate green, during measurement",           "B<sub>g</sub>",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_background1 21
+    #define FCCSDiff_background1 22
     addParameter(FloatNumber,  "count_rate2",              "count rate red, during measurement",                      "&lang;F<sub>r</sub>&rang;",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_count_rate2 22
+    #define FCCSDiff_count_rate2 23
     addParameter(FloatNumber,  "background2",              "background count rate red, during measurement",           "B<sub>r</sub>",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_background2 23
+    #define FCCSDiff_background2 24
     addParameter(FloatNumber,  "brightness_a",             "molar brightness of fluorophore on A",           "&eta;<sub>a</sub>",            "counts/nM",           "counts/nM",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
-    #define FCCSDiff_brightness_a 24
+    #define FCCSDiff_brightness_a 25
     addParameter(FloatNumber,  "brightness_b",             "molar brightness of fluorophore on B",           "&eta;<sub>b</sub>",            "counts/nM",           "counts/nM",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
-    #define FCCSDiff_brightness_b 25
+    #define FCCSDiff_brightness_b 26
 
 }
 
@@ -194,6 +197,13 @@ void QFFitFunctionsSPIMFCCSFWDiff2ColorCCF::calcParameter(double* data, double* 
     } else {
         data[FCCSDiff_fraction_ab_min]=cab/cb;
         if (error) error[FCCSDiff_fraction_ab_min]=qfErrorDiv(cab, ecab, cb, ecb);
+    }
+    if (ca>cb) {
+        data[FCCSDiff_fraction_abmax]=cab/ca;
+        if (error) error[FCCSDiff_fraction_abmax]=qfErrorDiv(cab, ecab, ca, eca);
+    } else {
+        data[FCCSDiff_fraction_abmax]=cab/cb;
+        if (error) error[FCCSDiff_fraction_abmax]=qfErrorDiv(cab, ecab, cb, ecb);
     }
 
     data[FCCSDiff_fraction_ab]=cab/(ca+cb);
