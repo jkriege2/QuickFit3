@@ -451,6 +451,8 @@ void QFRDRTablePlotWidget::updateGraph() {
         ui->plotter->getYAxis()->set_gridStyle(p.gridStyle);
         ui->plotter->getXAxis()->set_gridColor(p.gridColor);
         ui->plotter->getYAxis()->set_gridColor(p.gridColor);
+        ui->plotter->getXAxis()->set_autoLabelDigits(false);
+        ui->plotter->getYAxis()->set_autoLabelDigits(false);
         ui->plotter->getXAxis()->set_labelDigits(p.xdigits);
         ui->plotter->getYAxis()->set_labelDigits(p.ydigits);
         ui->plotter->getXAxis()->set_minTicks(p.xminTicks);
