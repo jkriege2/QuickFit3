@@ -23,6 +23,7 @@ QFPlotterCopyToTableDialog::QFPlotterCopyToTableDialog(QWidget *parent) :
     //if (ui->cmbGraph->count()>0) ui->chCreateNewGraph->setChecked(QFPluginServices::getInstance()->getCurrentProject()->getProperty("QFPlotterCopyToTableDialog/newgraph", true).toBool());
     ui->radAlsoAddGraphs->setChecked(QFPluginServices::getInstance()->getCurrentProject()->getProperty("QFPlotterCopyToTableDialog/alsoaddgraph", true).toBool());
     ui->chkShowTableEditor->setChecked(QFPluginServices::getInstance()->getCurrentProject()->getProperty("QFPlotterCopyToTableDialog/showEditor", false).toBool());
+    ui->chkOnlyForPlots->setChecked(QFPluginServices::getInstance()->getCurrentProject()->getProperty("QFPlotterCopyToTableDialog/chkOnlyForPlots", false).toBool());
 }
 
 QFPlotterCopyToTableDialog::~QFPlotterCopyToTableDialog()
@@ -33,6 +34,7 @@ QFPlotterCopyToTableDialog::~QFPlotterCopyToTableDialog()
     QFPluginServices::getInstance()->getCurrentProject()->setQFProperty("QFPlotterCopyToTableDialog/newgraph", ui->chCreateNewGraph->isChecked());
     QFPluginServices::getInstance()->getCurrentProject()->setQFProperty("QFPlotterCopyToTableDialog/newtable", ui->chkNewTable->isChecked());
     QFPluginServices::getInstance()->getCurrentProject()->setQFProperty("QFPlotterCopyToTableDialog/showEditor", ui->chkShowTableEditor->isChecked());
+    QFPluginServices::getInstance()->getCurrentProject()->setQFProperty("QFPlotterCopyToTableDialog/chkOnlyForPlots", ui->chkOnlyForPlots->isChecked());
     delete ui;
 }
 
@@ -87,6 +89,16 @@ bool QFPlotterCopyToTableDialog::getShowEditor() const
 void QFPlotterCopyToTableDialog::setDescription(const QString &text)
 {
     ui->labDescription->setText(text);
+}
+
+bool QFPlotterCopyToTableDialog::copyOnlyPlotData() const
+{
+    return ui->chkOnlyForPlots->isChecked();
+}
+
+QString QFPlotterCopyToTableDialog::getPrefix()
+{
+    return ui->edtPrefix->text();
 }
 
 void QFPlotterCopyToTableDialog::on_cmbRDR_refilled(bool full)

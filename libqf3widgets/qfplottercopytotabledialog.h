@@ -28,6 +28,8 @@ class QFWIDLIB_EXPORT QFPlotterCopyToTableDialog : public QDialog
         bool getAddGraphs() const;
         bool getShowEditor() const;
         void setDescription(const QString& text);
+        bool copyOnlyPlotData() const;
+        QString getPrefix();
 
     protected slots:
         void on_cmbRDR_refilled(bool full);

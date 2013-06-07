@@ -54,19 +54,37 @@ void QFPlotterPrivate::copyToTable()
         QMap<int, int> columns;
         if (tab) {
             JKQTPdatastore* ds=plotter->getDatastore();
+            JKQtBasePlotter* p=plotter->get_plotter();
             int idx=tab->tableGetColumnCount();
             QList<size_t> cids=ds->getColumnIDs();
             for (int i=0; i<cids.size(); i++) {
-                QList<QVariant> d;
-                JKQTPcolumn col=ds->getColumn(cids[i]);
-                for (int j=0; j<col.getRows(); j++) {
-                    d<<col.getValue(j);
+                bool copyCol=false;
+                if (!dlg->copyOnlyPlotData()) copyCol=true;
+                else {
+                    for (int j=0; j<p->getGraphCount(); j++) {
+                        JKQTPgraph* g=p->getGraph(j);
+                        if (g->usesColumn(cids[i])) {
+                            copyCol=true;
+                            break;
+                        }
+                    }
                 }
-                tab->tableSetColumnData(idx, d);
-                tab->tableSetColumnTitle(idx, col.get_name());
-                //qDebug()<<"set col title idx="<<idx<<"   name="<<col.get_name();
-                columns[cids[i]]=idx;
-                idx++;
+
+                if(copyCol) {
+                    QList<QVariant> d;
+                    JKQTPcolumn col=ds->getColumn(cids[i]);
+                    for (int j=0; j<col.getRows(); j++) {
+                        d<<col.getValue(j);
+                    }
+                    tab->tableSetColumnData(idx, d);
+                    QString tit=dlg->getPrefix();
+                    if (tit.size()>0) tit=tit+QString(" ");
+                    tit=tit+col.get_name();
+                    tab->tableSetColumnTitle(idx, tit);
+                    //qDebug()<<"set col title idx="<<idx<<"   name="<<col.get_name();
+                    columns[cids[i]]=idx;
+                    idx++;
+                }
             }
         } else {
             QMessageBox::critical(plotter, tr("Add data to table"), tr("No table selected or could not create table!\nCould not add data!"));

@@ -732,11 +732,11 @@ void QEnhancedTableView::print(QPrinter *printer, bool onePageWide, bool onePage
 
      //p->setPageMargins(10,10,10,10,QPrinter::Millimeter);
 
-     if (width()>height()) {
+     /*if (width()>height()) {
          p->setOrientation(QPrinter::Landscape);
      } else {
          p->setOrientation(QPrinter::Portrait);
-     }
+     }*/
 
      clearSelection();
 
@@ -982,9 +982,9 @@ QPrinter *QEnhancedTableView::getPrinter(QPrinter *printerIn, bool *localPrinter
         delete dialog;
         return printerIn;
     }
-    delete dialog;
     p=dialog->printer();
     if (p) ProgramOptions::setConfigValue("QEnhancedTableView/lastPrinter", p->printerName());
+    delete dialog;
     return p;
 }
 

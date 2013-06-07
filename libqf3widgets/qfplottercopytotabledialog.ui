@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>807</width>
-    <height>326</height>
+    <height>380</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,6 +50,30 @@
       <widget class="QLineEdit" name="edtNewTableName">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QCheckBox" name="chkOnlyForPlots">
+       <property name="toolTip">
+        <string>if activated this tool will only copy the data really used for the selected plot. If unchecked additional column might be copied!</string>
+       </property>
+       <property name="text">
+        <string>copy only data that is required for plots</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="edtPrefix">
+       <property name="toolTip">
+        <string>this text is prepended to every column name in the table (e.g. use this to identify where which column came from!)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>column name prefix:</string>
        </property>
       </widget>
      </item>
