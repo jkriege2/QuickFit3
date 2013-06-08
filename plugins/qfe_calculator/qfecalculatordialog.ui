@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>QF3 Calculator Plugin</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="qfecalculator.qrc">
+    <normaloff>:/qfe_calculator/qfecalculator.png</normaloff>:/qfe_calculator/qfecalculator.png</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
@@ -303,6 +307,9 @@
   <tabstop>btnClearHistory</tabstop>
  </tabstops>
  <resources>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="qfecalculator.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>

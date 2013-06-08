@@ -23,7 +23,10 @@ class QFRDRColumnGraphsInterface {
             cgtPolynomial,
             cgtExponential,
             cgtPowerLaw,
-            cgtQFFitFunction
+            cgtQFFitFunction,
+            cgtImage,
+            cgtRGBImage,
+            cgtMaskImage
         };
 
         enum ErrorGraphTypes {
@@ -34,6 +37,42 @@ class QFRDRColumnGraphsInterface {
             egtLinesBars=2,
             egtPolygonsBars=1
 
+        };
+        enum ImageModifierMode {
+            cgtiModifyNone=0,
+            cgtiModifyValue=1,
+            cgtiModifySaturation=2,
+            cgtiModifyAlpha=3
+        };
+
+        enum ImageColorPalette {
+            cgtiRED=0,
+            cgtiINVERTEDRED=1,
+            cgtiGREEN=2,
+            cgtiINVERTEDGREEN=3,
+            cgtiBLUE=4,
+            cgtiINVERTEDBLUE=5,
+            cgtiGRAY=6,
+            cgtiINVERTEDGRAY=7,
+            cgtiMATLAB=8,
+            cgtiRYGB=9,
+            cgtiHSV=10,
+            cgtiINVERTED_HSV=11,
+            cgtiRAINBOW=12,
+            cgtiHOT=13,
+            cgtiOCEAN=14,
+            cgtiTRAFFICLIGHT=15,
+            cgtiBLUEMAGENTAYELLOW=16,
+            cgtiBLUEYELLOW=17,
+            cgtiCYAN=18
+        };
+
+        enum ImagePlotRangeChannel {
+            cgtiDataChannel=0,
+            cgtiRedChannel=cgtiDataChannel,
+            cgtiGreenChannel=1,
+            cgtiBlueChannel=2,
+            cgtiModifierChannel=3
         };
 
         enum ColumnGraphSymbols {
@@ -120,6 +159,21 @@ class QFRDRColumnGraphsInterface {
          *        If any non-function type is used, the the type is automatically set to be cgtExpression.
          */
         virtual void colgraphAddFunctionPlot(int graph, const QString& expression, ColumnGraphTypes type, const QString&  title, const QVector<double>& params)=0;
+        /** \brief add an image plot which
+         */
+        virtual void colgraphAddImagePlot(int graph, int imageColumn, ImageColorPalette palette, double x, double y, double width, double height, int Nx, const QString& title)=0;
+        /** \brief add a mask image plot which
+         */
+        virtual void colgraphAddImageMaskPlot(int graph, int imageColumn, double x, double y, double width, double height, int Nx, const QString& title, QColor trueColor=QColor("black"), QColor falseColor=QColor("transparent"))=0;
+        /** \brief add an RGB image plot which
+         */
+        virtual void colgraphAddRGBImagePlot(int graph, int imageRColumn, int imageGColumn, int imageBColumn, double x, double y, double width, double height, int Nx, const QString& title)=0;
+        /** \brief set the modifier channel of the given image plot
+         */
+        virtual void colgraphSetImagePlotModifier(int graph, int plot, int imageModifierColumn, ImageModifierMode mode)=0;
+        /** \brief set the modifier channel of the given image plot
+         */
+        virtual void colgraphSetImagePlotRange(int graph, int plot, ImagePlotRangeChannel channel, bool autoRange, double min=0, double max=0)=0;
 
 };
 

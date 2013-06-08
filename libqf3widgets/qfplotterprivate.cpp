@@ -119,7 +119,8 @@ void QFPlotterPrivate::copyToTable()
                         QFMathParserXFunctionLineGraph* qfmpg=dynamic_cast<QFMathParserXFunctionLineGraph*>(g);
                         JKQTPxQFFitFunctionLineGraph* qfffg=dynamic_cast<JKQTPxQFFitFunctionLineGraph*>(g);
                         JKQTPColumnMathImage* colig=dynamic_cast<JKQTPColumnMathImage*>(g);
-                        JKQTPMathImage* ig=dynamic_cast<JKQTPMathImage*>(g);
+                        JKQTPColumnRGBMathImage* colrgbg=dynamic_cast<JKQTPColumnRGBMathImage*>(g);
+                        JKQTPColumnOverlayImageEnhanced* colmask=dynamic_cast<JKQTPColumnOverlayImageEnhanced*>(g);
                         QFRDRColumnGraphsInterface::ColumnGraphTypes type=QFRDRColumnGraphsInterface::cgtLinesPoints;
                         QFRDRColumnGraphsInterface::ColumnGraphSymbols symbol=QFRDRColumnGraphsInterface::cgsFilledCircle;
                         double symbolSize=15.0;
@@ -175,6 +176,19 @@ void QFPlotterPrivate::copyToTable()
                             cols->colgraphSetPlotSymbol(graph, cols->colgraphGetPlotCount(graph)-1, symbol, symbolSize);
 
                         } else if (colig) {
+                            cols->colgraphAddImagePlot(graph, columns.value(colig->get_imageColumn(),-1), QFRDRColumnGraphsInterface::ImageColorPalette((int)colig->get_palette()), colig->get_x(), colig->get_y(), colig->get_width(), colig->get_height(), colig->get_Nx(), colig->get_title());
+                            cols->colgraphSetImagePlotModifier(graph, cols->colgraphGetPlotCount(graph), colig->get_modifierColumn(),  QFRDRColumnGraphsInterface::ImageModifierMode((int)colig->get_modifierMode()));
+                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph), QFRDRColumnGraphsInterface::cgtiDataChannel, colig->get_autoImageRange(), colig->get_imageMin(), colig->get_imageMax());
+                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph), QFRDRColumnGraphsInterface::cgtiModifierChannel, colig->get_autoModifierRange(), colig->get_modifierMin(), colig->get_modifierMax());
+                        } else if (colmask) {
+                            cols->colgraphAddImageMaskPlot(graph, columns.value(colmask->get_imageColumn(),-1), colmask->get_x(), colmask->get_y(), colmask->get_width(), colmask->get_height(), colmask->get_Nx(), colmask->get_title(), colmask->get_trueColor(), colmask->get_falseColor());
+                        } else if (colrgbg) {
+                            cols->colgraphAddRGBImagePlot(graph, columns.value(colrgbg->get_imageRColumn(),-1), columns.value(colrgbg->get_imageGColumn(),-1), columns.value(colrgbg->get_imageBColumn(),-1), colrgbg->get_x(), colrgbg->get_y(), colrgbg->get_width(), colrgbg->get_height(), colrgbg->get_Nx(), colrgbg->get_title());
+                            cols->colgraphSetImagePlotModifier(graph, cols->colgraphGetPlotCount(graph), colrgbg->get_modifierColumn(),  QFRDRColumnGraphsInterface::ImageModifierMode((int)colrgbg->get_modifierMode()));
+                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph), QFRDRColumnGraphsInterface::cgtiRedChannel, colrgbg->get_autoImageRange(), colrgbg->get_imageMin(), colrgbg->get_imageMax());
+                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph), QFRDRColumnGraphsInterface::cgtiGreenChannel, colrgbg->get_autoImageRange(), colrgbg->get_imageMinG(), colrgbg->get_imageMaxG());
+                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph), QFRDRColumnGraphsInterface::cgtiBlueChannel, colrgbg->get_autoImageRange(), colrgbg->get_imageMinB(), colrgbg->get_imageMaxB());
+                            //cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph), QFRDRColumnGraphsInterface::cgtiModifierChannel, colrgbg->get_g, colrgbg->get_modifierMin(), colrgbg->get_modifierMax());
                         } else if(qfffg && qfffg->get_fitFunction()) {
                             QColor color=QColor("red");
                             QColor fillColor=color.lighter();

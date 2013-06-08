@@ -509,6 +509,109 @@ void QFRDRTable::colgraphAddErrorPlot(int graph, int columnX, int columnXError, 
 
 }
 
+void QFRDRTable::colgraphAddImagePlot(int graph, int imageColumn, QFRDRColumnGraphsInterface::ImageColorPalette palette, double x, double y, double width, double height, int Nx, const QString &title)
+{
+    if (graph>=0 && graph<plots.size()) {
+
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        QFRDRTable::GraphInfo g;
+        g.type=QFRDRTable::gtImage;
+        g.xcolumn=imageColumn;
+        g.imageX=x;
+        g.imageY=y;
+        g.imageWidth=width;
+        g.imageHeight=height;
+        g.imagePixelWidth=Nx;
+        g.title=title;
+        g.imagePalette=JKQTPMathImage::ColorPalette((int)palette);
+        plt.graphs.append(g);
+
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+     }
+}
+
+void QFRDRTable::colgraphAddImageMaskPlot(int graph, int imageColumn, double x, double y, double width, double height, int Nx, const QString &title, QColor trueColor, QColor falseColor)
+{
+    if (graph>=0 && graph<plots.size()) {
+
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        QFRDRTable::GraphInfo g;
+        g.type=QFRDRTable::gtMaskImage;
+        g.xcolumn=imageColumn;
+        g.imageX=x;
+        g.imageY=y;
+        g.imageWidth=width;
+        g.imageHeight=height;
+        g.imagePixelWidth=Nx;
+        g.title=title;
+        g.imageTrueColor=trueColor;
+        g.imageTrueTransparent=trueColor.alphaF();
+        g.imageFalseColor=falseColor;
+        g.imageFalseTransparent=falseColor.alphaF();
+        plt.graphs.append(g);
+
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+     }
+}
+
+void QFRDRTable::colgraphAddRGBImagePlot(int graph, int imageRColumn, int imageGColumn, int imageBColumn, double x, double y, double width, double height, int Nx, const QString &title)
+{
+    if (graph>=0 && graph<plots.size()) {
+
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        QFRDRTable::GraphInfo g;
+        g.type=QFRDRTable::gtRGBImage;
+        g.xcolumn=imageRColumn;
+        g.xerrorcolumn=imageGColumn;
+        g.ycolumn=imageBColumn;
+        g.imageX=x;
+        g.imageY=y;
+        g.imageWidth=width;
+        g.imageHeight=height;
+        g.imagePixelWidth=Nx;
+        g.title=title;
+        plt.graphs.append(g);
+
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+     }
+}
+
+void QFRDRTable::colgraphSetImagePlotModifier(int graph, int plot, int imageModifierColumn, QFRDRColumnGraphsInterface::ImageModifierMode mode)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            if (plt.graphs[plot].type==QFRDRTable::gtRGBImage) {
+                plt.graphs[plot].yerrorcolumn=imageModifierColumn;
+            } else {
+                plt.graphs[plot].ycolumn=imageModifierColumn;
+            }
+            plt.graphs[plot].modifierMode=JKQTPMathImage::ModifierMode((int)mode);
+        }
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetImagePlotRange(int graph, int plot, QFRDRColumnGraphsInterface::ImagePlotRangeChannel channel, bool autoRange, double min, double max)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            if (channel!=cgtiModifierChannel) {
+                plt.graphs[plot].imageAutoRange=autoRange;
+                plt.graphs[plot].imageMin=autoRange;
+                plt.graphs[plot].imageMax=autoRange;
+            }
+        }
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
 void QFRDRTable::colgraphAddGraph(const QString &title, const QString &xLabel, const QString &yLabel, bool logX, bool logY)
 {
     PlotInfo info;

@@ -430,6 +430,10 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
         ui->labMean->setText(tr("Mean Column:"));
         ui->labQ75->setText(tr("75% Quantile Column:"));
 
+        ui->cmbLinesMax->setVisible(false);
+        ui->cmbLinesMean->setVisible(false);
+        ui->cmbLinesQ75->setVisible(false);
+
         ui->labTransparencyFalse->setVisible(false);
         ui->widFalseTransparency->setVisible(false);
         ui->labTransparencyTrue->setVisible(false);
