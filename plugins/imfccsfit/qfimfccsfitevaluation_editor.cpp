@@ -1026,17 +1026,24 @@ void QFImFCCSFitEvaluationEditor::fitAllFilesetsAllPixels()
 
     QTime time;
     time.start();
+    falg->setReporter(dlgFitProgressReporter);
     for (int i=0; i<fileSets.size(); i++) {
         QList<QFRawDataRecord* > records=fileSets[i];
+        bool ok=true;
+        for (int j=0; j<records.size(); j++) {
+            ok=ok&&records[j];
+        }
 
-        if (records.size()>0 && records[0] ) {
+        if (records.size()>0 && ok ) {
             int runmax=eval->getIndexMax(records[0]);
             int runmin=eval->getIndexMin(records[0]);
+            for (int j=0; j<records.size(); j++) {
+                records[j]->disableEmitResultsChanged();
+            }
             QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(records[0]);
             for (int run=runmin; run<=runmax; run++) {
                 bool doall=true;//!current->getProperty("leaveoutMasked", false).toBool();
                 if (doall || (!doall && rsel && !rsel->leaveoutRun(run))) {
-                    falg->setReporter(dlgFitProgressReporter);
                     QString runname=tr("average");
                     if (run>=0) runname=QString::number(run);
                     double runtime=double(time.elapsed())/1.0e3;
@@ -1050,15 +1057,15 @@ void QFImFCCSFitEvaluationEditor::fitAllFilesetsAllPixels()
 
                     dlgFitProgress->incSuperProgress();
                     QApplication::processEvents();
-                    falg->setReporter(NULL);
                     if (dlgFitProgress->isCanceled()) break;
                 }
             }
-            for (int i=0; i<records.size(); i++) {
-                records[i]->enableEmitResultsChanged(true);
+            for (int j=0; j<records.size(); j++) {
+                records[j]->enableEmitResultsChanged(true);
             }
         }
     }
+    falg->setReporter(NULL);
 
     dlgFitProgress->reportSuperStatus(tr("fit done ... updating user interface\n"));
     dlgFitProgress->reportStatus("");
