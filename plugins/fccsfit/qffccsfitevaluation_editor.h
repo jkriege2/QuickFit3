@@ -98,6 +98,8 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
         QAction* actFitAllRuns;
         QAction* actPrintReport;
         QAction* actSaveReport;
+        QAction* actGuess;
+
 
         QAction* actResetCurrent;
         QAction* actResetAllRuns;
@@ -155,6 +157,8 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void copyToInitial();
 
         void setParameterTableSpans();
+
+        void guessFromCurrentFileSet();
 
 
 };

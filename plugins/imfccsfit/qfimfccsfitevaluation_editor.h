@@ -76,6 +76,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void configureForSPIMFCCS();
         //void configureFor2CSPIMFCCS();
         void configureForASPIMFCCS();
+        void guessFromCurrentFileSet();
 
         void filesSetActivated(const QModelIndex& idx);
         void on_chkSaveStrings_toggled(bool checked);
@@ -99,6 +100,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         QAction* actPrintReport;
         QAction* actSaveReport;
         QAction* actFitAllFilesetsAllPixels;
+        QAction* actGuess;
 
         QAction* actResetCurrent;
         QAction* actResetAllPixels;

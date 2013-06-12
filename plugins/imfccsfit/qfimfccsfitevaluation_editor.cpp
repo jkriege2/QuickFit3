@@ -168,6 +168,11 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
 
     menuImFCCSFit->addSeparator();
 
+    actGuess=new QAction(tr("Guess file sets ..."), this);
+    connect(actGuess, SIGNAL(triggered()), this, SLOT(guessFromCurrentFileSet()));
+    menuImFCCSFit->addAction(actGuess);
+
+
     
     
     // connect widgets 
@@ -490,6 +495,13 @@ void QFImFCCSFitEvaluationEditor::configureForASPIMFCCS() {
         data->setLinkParameter(2, globals[g], g);
     }
 
+}
+
+void QFImFCCSFitEvaluationEditor::guessFromCurrentFileSet()
+{
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    data->guessFileSets(data->getFitFiles(), true);
 }
 
 void QFImFCCSFitEvaluationEditor::filesSetActivated(const QModelIndex &idx)

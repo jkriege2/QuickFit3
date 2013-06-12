@@ -164,6 +164,9 @@ QFFCCSFitEvaluationEditor::QFFCCSFitEvaluationEditor(QFPluginServices* services,
     m->addAction(actConfigureForAnomalousFCCS);
 
     menuFCCSFit->addSeparator();
+    actGuess=new QAction(tr("Guess file sets ..."), this);
+    connect(actGuess, SIGNAL(triggered()), this, SLOT(guessFromCurrentFileSet()));
+    menuFCCSFit->addAction(actGuess);
 
     
     
@@ -1050,6 +1053,13 @@ void QFFCCSFitEvaluationEditor::setParameterTableSpans()
         ui->tableView->setSpan(1,i,1,data->getParameterInputTableModel()->getColsPerRDR());
     }
     setParameterVisibility();
+}
+
+void QFFCCSFitEvaluationEditor::guessFromCurrentFileSet()
+{
+    QFFCCSFitEvaluationItem* data=qobject_cast<QFFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    data->guessFileSets(data->getFitFiles(), true);
 }
 
 void QFFCCSFitEvaluationEditor::on_cmbWeight_currentWeightChanged(QFFCSWeightingTools::DataWeight weight)
