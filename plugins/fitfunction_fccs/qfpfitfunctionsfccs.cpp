@@ -5,6 +5,9 @@
 #include "qffitfunctionsfccsfwdiff2coloracfg.h"
 #include "qffitfunctionsfccsfwdiff2coloracfr.h"
 #include "qffitfunctionsfccsfwdiff2colorccf.h"
+#include "qffitfunctionsfccsfwdiff2colortcacfg.h"
+#include "qffitfunctionsfccsfwdiff2colortcacfr.h"
+#include "qffitfunctionsfccsfwdiff2colortcccf.h"
 
 QStringList QFPFitFunctionsFCCS::getIDs() const {
     QStringList res;
@@ -12,6 +15,9 @@ QStringList QFPFitFunctionsFCCS::getIDs() const {
     res<<"fccs_fw_diff2colorccf";
     res<<"fccs_fw_diff2coloracfg";
     res<<"fccs_fw_diff2coloracfr";
+    res<<"fccs_fw_diff2colortcccf";
+    res<<"fccs_fw_diff2colortcacfg";
+    res<<"fccs_fw_diff2colortcacfr";
     res<<"fccs_fw_adiff2colorccf";
     res<<"fccs_fw_adiff2coloracfg";
     res<<"fccs_fw_adiff2coloracfr";
@@ -27,6 +33,12 @@ QFFitFunction* QFPFitFunctionsFCCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionsFCCSFWDiff2ColorACFR();
     } else if (id=="fccs_fw_diff2colorccf") {
         return new QFFitFunctionsFCCSFWDiff2ColorCCF();
+    } else if (id=="fccs_fw_diff2colortcacfg") {
+        return new QFFitFunctionsFCCSFWDiff2ColorTCACFG();
+    } else if (id=="fccs_fw_diff2colortcacfr") {
+        return new QFFitFunctionsFCCSFWDiff2ColorTCACFR();
+    } else if (id=="fccs_fw_diff2colortcccf") {
+        return new QFFitFunctionsFCCSFWDiff2ColorTCCCF();
     } else if (id=="fccs_fw_adiff2coloracfg") {
         return new QFFitFunctionsFCCSFWADiff2ColorACFG();
     } else if (id=="fccs_fw_adiff2coloracfr") {

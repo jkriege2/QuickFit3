@@ -837,6 +837,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
     int cnt=0;
     tool.setGlobalParamCount(getLinkParameterCount());
     //QList<QList<QPair<int, int> > > links(getLinkParameterCount());
+    tool.setDoRecalculateInternals(false);
     for (int r=0; r<records.size(); r++) {
         QFRawDataRecord* record=records[r];
         QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
@@ -851,6 +852,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
             cnt++;
         }
     }
+    tool.setDoRecalculateInternals(true);
 
     bool OK=true;
     try {
@@ -872,7 +874,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
             t.start();
             while (!doFitThread->isFinished()) {
                 if (t.elapsed()>10) {
-                    QApplication::processEvents(QEventLoop::AllEvents, 50);
+                    QApplication::processEvents(QEventLoop::AllEvents, 10);
                     if (dlgFitProgress && dlgFitProgress->isCanceled()) {
                       doFitThread->terminate();
                       break;

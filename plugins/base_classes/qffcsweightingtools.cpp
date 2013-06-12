@@ -58,7 +58,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *rec
     QFFCSWeightingTools::DataWeight weighting=getFitDataWeighting();
     double* weights=(double*)malloc(N*sizeof(double));
     bool weightsOK=false;
-    if (weighting==QFFCSWeightingTools::StdDevWeighting) {
+    if (data && weighting==QFFCSWeightingTools::StdDevWeighting) {
         double* std=data->getCorrelationStdDev();
         weightsOK=true;
         for (int i=0; i<N; i++) {
@@ -78,7 +78,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *rec
             }
         }
     }
-    if (weighting==QFFCSWeightingTools::RunErrorWeighting) {
+    if (data && weighting==QFFCSWeightingTools::RunErrorWeighting) {
         double* std=NULL;
         if (run>=0) std=data->getCorrelationRunError(run);
         else std=data->getCorrelationStdDev();

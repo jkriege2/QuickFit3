@@ -11,6 +11,7 @@
 QFFitMultiQFFitFunctionFunctor::QFFitMultiQFFitFunctionFunctor():
     QFFitAlgorithm::Functor(0)
 {
+    doRecalculateInternals=true;
     m_paramCount=0;
 }
 
@@ -114,6 +115,7 @@ void QFFitMultiQFFitFunctionFunctor::setGlobalParamCount(int count)
 
 void QFFitMultiQFFitFunctionFunctor::recalculateInternals()
 {
+    if (!doRecalculateInternals) return;
 #ifdef DEBUG_GLOBALFIT
     QString dbg0="||";
     QString dbg ="||";
@@ -227,6 +229,12 @@ int QFFitMultiQFFitFunctionFunctor::getLinkID(int subID, int paramID)
     return -1;
 }
 
+void QFFitMultiQFFitFunctionFunctor::setDoRecalculateInternals(bool enabled)
+{
+    doRecalculateInternals=enabled;
+    if (enabled) recalculateInternals();
+}
+
 QFGlobalFitTool::QFGlobalFitTool(QFFitAlgorithm *algorithm)
 {
     m_algorithm=algorithm;
@@ -271,6 +279,11 @@ void QFGlobalFitTool::setGlobalParamCount(int count)
 void QFGlobalFitTool::clear()
 {
     functor->clear();
+}
+
+void QFGlobalFitTool::setDoRecalculateInternals(bool enabled)
+{
+    functor->setDoRecalculateInternals(enabled);
 }
 
 QFFitAlgorithm::FitResult QFGlobalFitTool::fit(QList<double *> paramsOut, QList<double *> paramErrorsOut, QList<double *> initialParams, QList<double *> paramErrorsIn)

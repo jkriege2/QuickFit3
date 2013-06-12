@@ -75,6 +75,7 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
         void configureForSPFCCS();
         void configureForASPFCCS();
+        void configureFor2CSPIMFCCS();
 
         void filesSetActivated(const QModelIndex& idx);
         void on_chkSaveStrings_toggled(bool checked);
@@ -90,6 +91,7 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief where did we save the last report */
         QString currentSaveDirectory;
         QAction* actConfigureForNormalFCCS;
+        QAction* actConfigureFor2CFCCS;
         QAction* actConfigureForAnomalousFCCS;
         QAction* actFitCurrent;
         QAction* actFitAllRunsMT;

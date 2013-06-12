@@ -475,11 +475,11 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \copydoc QFRDRImageStackInterface::getImageStackTimepointName() */
         virtual QString getImageStackTimepointName(int stack, int t) const;
 
-        /** \copydoc QFRDRCountRatesInterface::getSimpleCountrateAverage() */
+        /** \copydoc QFRDRSimpleCountRatesInterface::getSimpleCountrateAverage() */
         virtual double getSimpleCountrateAverage(int run=-1, int channel=0, bool swapChannels=false) const ;
-        /** \copydoc QFRDRCountRatesInterface::getSimpleCountrateVariance() */
+        /** \copydoc QFRDRSimpleCountRatesInterface::getSimpleCountrateVariance() */
         virtual double getSimpleCountrateStdDev(int run=-1, int channel=0, bool swapChannels=false) const ;
-        /** \copydoc QFRDRCountRatesInterface::getSimpleCountrateChannels() */
+        /** \copydoc QFRDRSimpleCountRatesInterface::getSimpleCountrateChannels() */
         virtual int getSimpleCountrateChannels() const ;
 
 };

@@ -116,6 +116,8 @@ class QFLIB_EXPORT QFFitMultiQFFitFunctionFunctor: public QFFitAlgorithm::Functo
         inline QFFitAlgorithm::FitQFFitFunctionFunctor* getSubFunctor(int idx) const { return subFunctors[idx].f; }
         inline int getLinkedPrameterCount() const { return m_linkedParamsCount; }
         inline int mapSubFunctorToGlobal(int functor, int parameter) const { return subFunctors[functor].mapToLocal[parameter]; }
+
+        void setDoRecalculateInternals(bool enabled);
     protected:
         struct subFunctorData {
             /** \brief functor to evaluate this data term */
@@ -146,6 +148,8 @@ class QFLIB_EXPORT QFFitMultiQFFitFunctionFunctor: public QFFitAlgorithm::Functo
 
         int m_paramCount;
         int m_linkedParamsCount;
+
+        bool doRecalculateInternals;
 
         void recalculateInternals();
 
@@ -178,6 +182,7 @@ class QFLIB_EXPORT QFGlobalFitTool {
         /** \brief clear object */
         void clear();
 
+        void setDoRecalculateInternals(bool enabled);
 
 
         QFFitAlgorithm::FitResult fit(QList<double *> paramsOut, QList<double *> paramErrorsOut, QList<double *> initialParams, QList<double *> paramErrorsIn);

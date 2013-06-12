@@ -525,21 +525,39 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                             loadStatistics(ucStat, files[i]);
                         }
                     } else {
-                        if (ft=="statistics_dv1") {
-                            loadStatistics(stat, files[i]);
-                            hasStatistics=true;
-                        } else if (ft=="background_statistics_dv1") {
-                            loadStatistics(backStat, files[i]);
-                        } else if (ft=="uncorrected_statistics_dv1") {
-                            loadStatistics(ucStat, files[i]);
-                        } else if (ft=="statistics_dv2") {
-                            loadStatistics(stat2, files[i]);
-                            hasStatistics2=true;
-                        } else if (ft=="background_statistics_dv2") {
-                            loadStatistics(backStat2, files[i]);
-                        } else if (ft=="uncorrected_statistics_dv2") {
-                            loadStatistics(ucStat2, files[i]);
-                        }
+                        //if (internalDualViewModeChannel()==0) {
+                            if (ft=="statistics_dv1") {
+                                loadStatistics(stat, files[i]);
+                                hasStatistics=true;
+                            } else if (ft=="background_statistics_dv1") {
+                                loadStatistics(backStat, files[i]);
+                            } else if (ft=="uncorrected_statistics_dv1") {
+                                loadStatistics(ucStat, files[i]);
+                            } else if (ft=="statistics_dv2") {
+                                loadStatistics(stat2, files[i]);
+                                hasStatistics2=true;
+                            } else if (ft=="background_statistics_dv2") {
+                                loadStatistics(backStat2, files[i]);
+                            } else if (ft=="uncorrected_statistics_dv2") {
+                                loadStatistics(ucStat2, files[i]);
+                            }
+                        /*} else if (internalDualViewModeChannel()==1) {
+                            if (ft=="statistics_dv1") {
+                                loadStatistics(stat2, files[i]);
+                                hasStatistics2=true;
+                            } else if (ft=="background_statistics_dv1") {
+                                loadStatistics(backStat2, files[i]);
+                            } else if (ft=="uncorrected_statistics_dv1") {
+                                loadStatistics(ucStat2, files[i]);
+                            } else if (ft=="statistics_dv2") {
+                                loadStatistics(stat, files[i]);
+                                hasStatistics=true;
+                            } else if (ft=="background_statistics_dv2") {
+                                loadStatistics(backStat, files[i]);
+                            } else if (ft=="uncorrected_statistics_dv2") {
+                                loadStatistics(ucStat, files[i]);
+                            }
+                        }*/
                     }
                 }
             }
@@ -2053,34 +2071,57 @@ QString QFRDRImagingFCSData::getImageStackTimepointName(int stack, int t) const 
 
 double QFRDRImagingFCSData::getSimpleCountrateAverage(int run, int channel, bool swapChannels) const {
     int ch=channel;
-    if (overviewF2 && overviewImagesSwapped()&&swapChannels) {
+    if (overviewImagesSwapped()&&!swapChannels) {
         if (ch==1) ch=0;
         else if (ch==0) ch=1;
     }
-    if (ch==0) {
+    //qDebug()<<"getSimpleCountrateAverage("<<getRole()<<" r="<<run<<" c="<<channel<<" c_read="<<ch<<" swap="<<swapChannels<<" ovrSwapped="<<overviewImagesSwapped()<<")   overviewF="<<overviewF<<" overviewF2="<<overviewF2<<" scaled="<<getProperty("IS_OVERVIEW_SCALED", true).toBool();
+    if (run>=0&&ch==0) {
         if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF) {
-            if (run>=0) return overviewF[run]/getTauMin()/1000.0;
+            if (run>=0) {
+                //qDebug()<<"       F => "<<overviewF[run]/getTauMin()/1000.0<<"   (tauMin="<<getTauMin()<<")";
+                return overviewF[run]/getTauMin()/1000.0;
+            }
         }
-        if (run==-2) return  backStat.avgCnt/getTauMin()/1000.0;
-        if (hasStatistics) return stat.avgCnt/getTauMin()/1000.0;
     }
-    if (ch==1) {
-        if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF2) {
-            if (run>=0) return overviewF2[run]/getTauMin()/1000.0;
+    if (run<0&&channel==0) {
+        if (swapChannels && overviewImagesSwapped()) {
+            if (run==-2) return  backStat2.avgCnt/getTauMin()/1000.0;
+            if (hasStatistics2) return stat2.avgCnt/getTauMin()/1000.0;
+        } else {
+            if (run==-2) return  backStat.avgCnt/getTauMin()/1000.0;
+            if (hasStatistics) return stat.avgCnt/getTauMin()/1000.0;
         }
-        if (run==-2) return  backStat2.avgCnt/getTauMin()/1000.0;
-        if (hasStatistics2) return stat2.avgCnt/getTauMin()/1000.0;
+    }
+    if (run>=0&&ch==1) {
+        if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF2) {
+            if (run>=0) {
+                //qDebug()<<"       F2 => "<<overviewF2[run]/getTauMin()/1000.0<<"   (tauMin="<<getTauMin()<<")";
+                return overviewF2[run]/getTauMin()/1000.0;
+            }
+        }
+        //if (run==-2) return  backStat2.avgCnt/getTauMin()/1000.0;
+        //if (hasStatistics2) return stat2.avgCnt/getTauMin()/1000.0;
+    }
+    if (run<0&&channel==1) {
+        if (swapChannels && overviewImagesSwapped()) {
+            if (run==-2) return  backStat.avgCnt/getTauMin()/1000.0;
+            if (hasStatistics) return stat.avgCnt/getTauMin()/1000.0;
+        } else {
+            if (run==-2) return  backStat2.avgCnt/getTauMin()/1000.0;
+            if (hasStatistics2) return stat2.avgCnt/getTauMin()/1000.0;
+        }
     }
     return 0;
 }
 
 double QFRDRImagingFCSData::getSimpleCountrateStdDev(int run, int channel, bool swapChannels) const {
     int ch=channel;
-    if (overviewF2 && overviewImagesSwapped()&&swapChannels) {
+    if (overviewImagesSwapped()&&!swapChannels) {
         if (ch==1) ch=0;
         else if (ch==0) ch=1;
     }
-    if (ch==0) {
+/*    if (ch==0) {
         if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewFSTD) {
             if (run>=0 && run<width*height) return overviewFSTD[run]/getTauMin()/1000.0;
         }
@@ -2092,7 +2133,39 @@ double QFRDRImagingFCSData::getSimpleCountrateStdDev(int run, int channel, bool 
         }
         if (run==-2) return sqrt(backStat2.sigmaCnt)/getTauMin()/1000.0;
         if (hasStatistics2) return sqrt(stat2.sigmaCnt)/getTauMin()/1000.0;
+    }*/
+
+    if (run>=0&&ch==0) {
+        if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewFSTD) {
+            if (run>=0) return overviewFSTD[run]/getTauMin()/1000.0;
+        }
     }
+    if (run<0&&channel==0) {
+        if (swapChannels && overviewImagesSwapped()) {
+            if (run==-2) return  backStat2.sigmaCnt/getTauMin()/1000.0;
+            if (hasStatistics2) return stat2.sigmaCnt/getTauMin()/1000.0;
+        } else {
+            if (run==-2) return  backStat.sigmaCnt/getTauMin()/1000.0;
+            if (hasStatistics) return stat.sigmaCnt/getTauMin()/1000.0;
+        }
+    }
+    if (run>=0&&ch==1) {
+        if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF2STD) {
+            if (run>=0) return overviewF2STD[run]/getTauMin()/1000.0;
+        }
+        //if (run==-2) return  backStat2.avgCnt/getTauMin()/1000.0;
+        //if (hasStatistics2) return stat2.avgCnt/getTauMin()/1000.0;
+    }
+    if (run<0&&channel==1) {
+        if (swapChannels && overviewImagesSwapped()) {
+            if (run==-2) return  backStat.sigmaCnt/getTauMin()/1000.0;
+            if (hasStatistics) return stat.sigmaCnt/getTauMin()/1000.0;
+        } else {
+            if (run==-2) return  backStat2.sigmaCnt/getTauMin()/1000.0;
+            if (hasStatistics2) return stat2.sigmaCnt/getTauMin()/1000.0;
+        }
+    }
+
     return 0;
 }
 

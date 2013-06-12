@@ -120,6 +120,12 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     ui->btnEvaluateCurrentAllRuns->setDefaultAction(actFitAllPixels);
     menuEvaluation->addAction(actFitAllPixels);
 
+    actFitAllFilesetsAllPixels=new QAction(QIcon(":/imfccsfit/fit_fitall.png"), tr("Fit All Filesets && Pixels"), this);
+    connect(actFitAllFilesetsAllPixels, SIGNAL(triggered()), this, SLOT(fitAllFilesetsAllPixels()));
+    ui->btnFitAllFilesetsAllPixels->addAction(actFitAllFilesetsAllPixels);
+    ui->btnFitAllFilesetsAllPixels->setDefaultAction(actFitAllFilesetsAllPixels);
+    menuEvaluation->addAction(actFitAllFilesetsAllPixels);
+
     actResetCurrent=new QAction(tr("&Reset Current"), this);
     actResetCurrent->setToolTip(tr("reset the currently displayed file (and pixel) to the initial parameters\nThis deletes all fit results stored for the current file."));
     connect(actResetCurrent, SIGNAL(triggered()), this, SLOT(resetCurrent()));
@@ -414,6 +420,42 @@ void QFImFCCSFitEvaluationEditor::configureForSPIMFCCS() {
     }
 
 }
+
+/*void QFImFCCSFitEvaluationEditor::configureFor2CSPIMFCCS()
+{
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+
+    if (data->getFitFileCount()<3) {
+        while (data->getFitFileCount()<3) {
+            data->addFitFile();
+        }
+    } else if (data->getFitFileCount()>3) {
+        while (data->getFitFileCount()>3) {
+            data->removeFitFile();
+        }
+    }
+
+    data->setFitFunction(0, "fccs_spim_fw_diff2colortcacfg");
+    data->setFitFunction(1, "fccs_spim_fw_diff2colortcacfr");
+    data->setFitFunction(2, "fccs_spim_fw_diff2colortcccf");
+    data->clearLinkParameters();
+
+    QStringList globals;
+    globals<<"concentration_a"<<"concentration_b"<<"concentration_ab"
+          <<"diff_coeff_a"  <<"diff_coeff_b"  <<"diff_coeff_ab"
+         <<"diff_coeff2_a"  <<"diff_coeff2_b"  <<"diff_coeff2_ab"
+        <<"diff_rho2_a"  <<"diff_rho2_b"  <<"diff_rho2_ab"
+         <<"crosstalk"<<"focus_distance_x"  <<"focus_distance_y"  <<"focus_distance_z"
+        <<"focus_width1"  <<"focus_width2"  <<"focus_height1"  <<"focus_height2"
+       <<"pixel_width"<<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
+
+    for (int g=0; g<globals.size(); g++) {
+        data->setLinkParameter(0, globals[g], g);
+        data->setLinkParameter(1, globals[g], g);
+        data->setLinkParameter(2, globals[g], g);
+    }
+}*/
 
 void QFImFCCSFitEvaluationEditor::configureForASPIMFCCS() {
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
@@ -916,6 +958,100 @@ void QFImFCCSFitEvaluationEditor::fitAllPixels()
     dlgFitProgress->reportStatus("");
     dlgFitProgress->setProgressMax(100);
     dlgFitProgress->setSuperProgressMax(100);
+    displayEvaluation();
+    QApplication::restoreOverrideCursor();
+    dlgFitProgress->done();
+    falg->setReporter(NULL);
+    QApplication::processEvents();
+    current->emitResultsChanged();
+    eval->getParameterInputTableModel()->rebuildModel();
+}
+
+void QFImFCCSFitEvaluationEditor::fitAllFilesetsAllPixels()
+{
+    if (!current) return;
+    QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!eval) return;
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if (!falg) return;
+    //QList<QFRawDataRecord*> records=eval->getFitFiles();
+    //if (records.size()<=0) return;
+
+
+    falg->setReporter(dlgFitProgressReporter);
+
+
+    QList<QList<QFRawDataRecord* > > fileSets=eval->getFittedFiles();
+    fileSets.append(eval->getGuessedFiles());
+
+    // count the records and runs to work on (for proper superProgress
+    int items=0;
+    for (int i=0; i<fileSets.size(); i++) {
+        QList<QFRawDataRecord* > records=fileSets[i];
+
+        if (records.size()>0 && records[0] ) {
+            int runmax=eval->getIndexMax(records[0]);
+            int runmin=eval->getIndexMin(records[0]);
+            items=items+runmax-runmin+1;
+        }
+    }
+    dlgFitProgress->setSuperProgressMax(items);
+
+
+
+    QString runname=tr("average");
+    if (eval->getCurrentIndex()>=0) runname=QString::number(eval->getCurrentIndex());
+    dlgFitProgress->reportSuperStatus(tr("fit run %1<br>using algorithm '%2' \n").arg(runname).arg(falg->name()));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setProgress(0);
+    dlgFitProgress->setSuperProgress(0);
+    dlgFitProgress->setAllowCancel(true);
+    dlgFitProgress->display();
+    QApplication::processEvents();
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+
+    QTime time;
+    time.start();
+    for (int i=0; i<fileSets.size(); i++) {
+        QList<QFRawDataRecord* > records=fileSets[i];
+
+        if (records.size()>0 && records[0] ) {
+            int runmax=eval->getIndexMax(records[0]);
+            int runmin=eval->getIndexMin(records[0]);
+            QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(records[0]);
+            for (int run=runmin; run<=runmax; run++) {
+                bool doall=true;//!current->getProperty("leaveoutMasked", false).toBool();
+                if (doall || (!doall && rsel && !rsel->leaveoutRun(run))) {
+                    falg->setReporter(dlgFitProgressReporter);
+                    QString runname=tr("average");
+                    if (run>=0) runname=QString::number(run);
+                    double runtime=double(time.elapsed())/1.0e3;
+                    double timeperfit=runtime/double(run-runmin);
+                    double estimatedRuntime=double(runmax-runmin)*timeperfit;
+                    double remaining=estimatedRuntime-runtime;
+                    dlgFitProgress->reportSuperStatus(tr("fit run %1<br>using algorithm '%2' \nruntime: %3:%4       remaining: %5:%6 [min:secs]       %9 fits/sec").arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
+
+                    //doFit(record, run);
+                    eval->doFit(records, run, getUserMin(records[0], run, ui->datacut->get_userMin()), getUserMax(records[0], run, ui->datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
+
+                    dlgFitProgress->incSuperProgress();
+                    QApplication::processEvents();
+                    falg->setReporter(NULL);
+                    if (dlgFitProgress->isCanceled()) break;
+                }
+            }
+            for (int i=0; i<records.size(); i++) {
+                records[i]->enableEmitResultsChanged(true);
+            }
+        }
+    }
+
+    dlgFitProgress->reportSuperStatus(tr("fit done ... updating user interface\n"));
+    dlgFitProgress->reportStatus("");
+    dlgFitProgress->setProgressMax(100);
+    dlgFitProgress->setSuperProgressMax(items);
     displayEvaluation();
     QApplication::restoreOverrideCursor();
     dlgFitProgress->done();

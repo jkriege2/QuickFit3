@@ -74,6 +74,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void setCurrentRun(int run);
 
         void configureForSPIMFCCS();
+        //void configureFor2CSPIMFCCS();
         void configureForASPIMFCCS();
 
         void filesSetActivated(const QModelIndex& idx);
@@ -90,12 +91,14 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief where did we save the last report */
         QString currentSaveDirectory;
         QAction* actConfigureForSPIMFCCS;
+        QAction* actConfigureFor2CSPIMFCCS;
         QAction* actConfigureForASPIMFCCS;
         QAction* actFitCurrent;
         QAction* actFitAllPixelsMT;
         QAction* actFitAllPixels;
         QAction* actPrintReport;
         QAction* actSaveReport;
+        QAction* actFitAllFilesetsAllPixels;
 
         QAction* actResetCurrent;
         QAction* actResetAllPixels;
@@ -142,6 +145,9 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void fitAllPixelsThreaded();
         /** \brief all runs/pixels current file, multi-threaded version */
         void fitAllPixels();
+
+        /** \brief all runs/pixels current file, multi-threaded version */
+        void fitAllFilesetsAllPixels();
 
         /** \brief display the data from the current raw data record */
         void displayData();

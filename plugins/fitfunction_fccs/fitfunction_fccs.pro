@@ -16,7 +16,10 @@ HEADERS += qfpfitfunctionsfccs.h \
     qffitfunctionsfccsfwadiff2colorccf.h \
     qffitfunctionsfccsfwadiff2coloracfr.h \
     qffitfunctionsfccsfwadiff2coloracfg.h \
-    fcstools.h
+    fcstools.h \
+    qffitfunctionsfccsfwdiff2colortcccf.h \
+    qffitfunctionsfccsfwdiff2colortcacfr.h \
+    qffitfunctionsfccsfwdiff2colortcacfg.h
 
 SOURCES += qfpfitfunctionsfccs.cpp\
            qffitfunctionfccsnormaldiff3d.cpp \
@@ -26,7 +29,10 @@ SOURCES += qfpfitfunctionsfccs.cpp\
     qffitfunctionsfccsfwadiff2colorccf.cpp \
     qffitfunctionsfccsfwadiff2coloracfr.cpp \
     qffitfunctionsfccsfwadiff2coloracfg.cpp \
-    fcstools.cpp
+    fcstools.cpp \
+    qffitfunctionsfccsfwdiff2colortcccf.cpp \
+    qffitfunctionsfccsfwdiff2colortcacfr.cpp \
+    qffitfunctionsfccsfwdiff2colortcacfg.cpp
 
 FORMS =
 
