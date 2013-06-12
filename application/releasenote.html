@@ -22,12 +22,9 @@
 -->
 
 <!--
-		<li><a name="2303"><b>2013-06-04 (SVN: 2303)</b>-->
+		<li><a name="2344"><b>2013-06-12 (SVN: 2344)</b>-->
 
-		
-
-		
-		
+		   
 
 		<ul>
 		  <li><b>new plugins:</b><ul>
@@ -38,6 +35,10 @@
 
 		  </ul></li>
 		  <li><b>QuickFit3:</b><ul>
+		    <li>"copy plot data to table RDR" has an additional checkbox now that allows to copy only the data really used for the plot!</li>
+		    <li>"copy plot data to table RDR" can take a prefix for the column names now</li>
+		    <li>added print option to tables</li>
+		    <li>expression parser has basic support for string and bool arrays</li>
 		    <li>improved rendering in JKMathText: (- added italic correction in sub/superscript - corrected whitespace handling in math mode (now ignores them just like LaTeX, use "\ " to get an explicit whitepsace))</li>
 		    <li>increased lib version</li>
 		    <li>evaluation and rdr plugins have an init() method now</li>
@@ -73,6 +74,8 @@
 		  </ul></li>
 		  
 		  <li><b>imFCCSFit</b><ul>
+		    <li>improved speed of fits?</li>
+		    <li>improved reports</li>
 		    <li>bugfix: now countrates are no longer swapped in the red-channel model</li>
 		    <li>added D(bin*a) graphs to imFCS calibration wizard</li>
 		    <li>minds parameter ranges now when fitting</li>
@@ -97,6 +100,8 @@
 			<li>started to implement curve fit tool for QFFitFunction</li>
 			<li>added boxplots</li>
 			<li>allows width and shift for bar charts</li>
+		    <li>added printing support in tables</li>
+		    <li>added possibility to add image plots wil colgraphs... interface, added this to QFPlotter</li>
 		  </ul></li>
 		  
 		  <li><b>imFCS:</b><ul>
@@ -172,10 +177,13 @@
 		  </ul></li>
 		  
 		  <li><b>fitfunctions_fccs:</b><ul>
+		    <li>added cAB/max(cA,cB) property to FCCS models (SPIM and confocal)</li>
 		    <li>added fit function following the Ries/Schwille FCCS framework for normal and anomalous diffusion in confocal FCCS</li>
+		    <li>added 2-component normal diffusion model</li>
 		  </ul></li>
 		  
 		  <li><b>msd:</b><ul>
+		    <li>bugfix: theory and curves calculated from theory are updated reliably now</li>
 		    <li>added new testdata of Puc18 plasmid</li>
 		    <li>D(tau) and alpha(tau) curves are now fitted with different methods (LM fit, regression and iteratively reweighted least squares regression)</li>
 		    <li>added tool to fit power law to msd (displayed as "theory curve")</li>
@@ -197,6 +205,7 @@
 		  </ul></li>
 		  
 		  <li><b>fcs:</b><ul>
+		    <li>added property to allow to use one countrate (e.g. when only one is available in an ALV file) for all runs</li>
 		    <li>plugin can load correlation output from the diffusion4 FCS simulation tool</li>
 		    <li>Added and integrated parser for ALV-6000 files by cloning and modding the existing ALV-5000 parser sparsely (thanks to Benedikt Häusele)</li>
 		    <liIf an FCS record displays an autocorrelation measurement, but both color channels were acquired, the countrates for both channels are loaded and displayed. Still the countrate of the loaded ACF channel is returned as countrate channel 1 and the other one as 2, son in the red ACF record, the countrates are swapped</li>
