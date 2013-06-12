@@ -7,7 +7,7 @@
 !define UPDATEURL "http://www.dkfz.de/Macromol/quickfit/#download"
 !define URLInfoAbout "http://www.dkfz.de/Macromol/quickfit/"
 !define UNINSTALL_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY_NAME} ${PRODUCT_NAME}"
-
+!define REG_KEY "Software\${PRODUCT_NAME}"
 # Set the installer name and compilation properties
 OutFile "%%INSTALLER_BASENAME%%_setup.exe"
 RequestExecutionLevel admin
@@ -19,8 +19,16 @@ ShowInstDetails show
 ShowUninstDetails show
 SetCompressor /FINAL  LZMA 
 
+# Set Version Information
+VIProductVersion ${PRODUCT_VERSION}
+VIAddVersionKey "ProductName" "Installer for ${PRODUCT_NAME}"
+VIAddVersionKey "CompanyName" ${COMPANY_NAME}
+VIAddVersionKey "LegalCopyright" ${BrandingText}
+VIAddVersionKey "FileDescription" "Installer Application"
+  
+
 # Set the default installation location
-InstallDir "%%INSTALLER_INSTDIR%%\${PRODUCT_NAME}3"
+InstallDir "%%INSTALLER_INSTDIR%%\${PRODUCT_NAME}"
 
 # Include Multiuser setup
 !define MULTIUSER_EXECUTIONLEVEL Highest
@@ -37,14 +45,14 @@ InstallDir "%%INSTALLER_INSTDIR%%\${PRODUCT_NAME}3"
 Var StartMenuFolder
 !define MUI_WELCOMEFINISHPAGE_BITMAP "..\images\splash_installer.bmp"
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP  "..\images\splash_installer.bmp"
-!define MUI_WELCOMEPAGE_TITLE "Install ${PRODUCT_NAME}, %%BITDEPTH%%-bit (%%SVNVER%%, %%COMPILEDATE%%)!"
+!define MUI_WELCOMEPAGE_TITLE "Install ${PRODUCT_NAME}, ${BIT_DEPTH}-bit (%%SVNVER%%, %%COMPILEDATE%%)!"
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_README "README.txt"
 !insertmacro MUI_PAGE_LICENSE "LICENSE.txt"
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKLM" 
-!define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\QuickFit 3" 
+!define MUI_STARTMENUPAGE_REGISTRY_KEY ${REG_KEY}
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder" 
 !define MUI_STARTMENUPAGE_DEFAULT_FOLDER "${PRODUCT_NAME}"
 !insertmacro MUI_PAGE_STARTMENU Application $StartMenuFolder
@@ -55,12 +63,14 @@ Var StartMenuFolder
 !define MUI_FINISHPAGE_SHOWREADME_CHECKED
 !define MUI_FINISHPAGE_SHOWREADME_TEXT "Create Desktop Shortcut"
 !define MUI_FINISHPAGE_SHOWREADME_FUNCTION finishpageaction
+!define MUI_FINISHPAGE_LINK QuickFit Webpage
+!define MUI_FINISHPAGE_LINK_LOCATION ${URLInfoAbout}
 !insertmacro MUI_PAGE_FINISH
 
 !include "FileFunc.nsh"
  
 # Remember the installation directory for future updates and the uninstaller
-InstallDirRegKey HKLM "Software${COMPANY_NAME}${PRODUCT_NAME}" "InstallDir"
+InstallDirRegKey HKLM ${REG_KEY} "InstallDir"
 
 
 
@@ -215,6 +225,9 @@ function .onInit
 	  no_remove_uninstaller:
 	 
 	done:
+
+	  StrCpy $0 ${DefaultStartMenuFolder}
+      StrCpy "$StartMenuFolder" $0
 
   	  setShellVarContext all
 	  !insertmacro VerifyUserIsAdmin

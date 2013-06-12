@@ -361,11 +361,14 @@ void QFImFCCSFitEvaluationItem::intReadData(QDomElement *e)
             QList<QFRawDataRecord*> fileSet;
             QStringList sl=recs.split(',');
             bool ok=true;
+            //qDebug()<<"read set "<<recs<<"  ok="<<ok;
             for (int i=0; i<sl.size(); i++) {
                 bool okI=false;
                 int id=sl[i].toInt(&okI);
-                if (okI && id>0) {
-                    QFRawDataRecord* rdr=project->getRawDataByID(id);
+                //qDebug()<<"       id="<<id<<" ok="<<okI;
+                if (okI && id>=0) {
+                    QFRawDataRecord* rdr=project->getRawDataByID(id);                    
+                    //qDebug()<<"       rdr="<<rdr<<" isApplicable="<<isApplicable(rdr);
                     if (isApplicable(rdr)) {
                         fileSet.append(rdr);
                     } else {
@@ -378,6 +381,7 @@ void QFImFCCSFitEvaluationItem::intReadData(QDomElement *e)
                 }
 
             }
+            //qDebug()<<"       ok="<<ok;
             if (ok) fittedFileSets.append(fileSet);
         }
 

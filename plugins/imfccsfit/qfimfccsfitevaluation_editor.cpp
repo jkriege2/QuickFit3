@@ -1035,6 +1035,7 @@ void QFImFCCSFitEvaluationEditor::fitAllFilesetsAllPixels()
         }
 
         if (records.size()>0 && ok ) {
+            eval->setFitFiles(records);
             int runmax=eval->getIndexMax(records[0]);
             int runmin=eval->getIndexMin(records[0]);
             for (int j=0; j<records.size(); j++) {

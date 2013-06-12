@@ -364,7 +364,7 @@ void QFFCCSFitEvaluationItem::intReadData(QDomElement *e)
             for (int i=0; i<sl.size(); i++) {
                 bool okI=false;
                 int id=sl[i].toInt(&okI);
-                if (okI && id>0) {
+                if (okI && id>=0) {
                     QFRawDataRecord* rdr=project->getRawDataByID(id);
                     if (isApplicable(rdr)) {
                         fileSet.append(rdr);
