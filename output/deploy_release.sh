@@ -162,7 +162,11 @@ if [ "${create_deploy}" != "0" ]; then
 	for f in *
 	do
 		if [ $f != "deploy" ]; then
-		  cp -rv $f ./deploy
+		  if [[ "$f" != *setup.exe ]]; then
+			if [[ "$f" != quickfit3_*.* ]]; then
+				cp -rv $f ./deploy
+			fi	
+		  fi
 		fi
 	done
 

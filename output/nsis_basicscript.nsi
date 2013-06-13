@@ -20,11 +20,11 @@ ShowUninstDetails show
 SetCompressor /FINAL  LZMA 
 
 # Set Version Information
-VIProductVersion ${PRODUCT_VERSION}
-VIAddVersionKey "ProductName" "Installer for ${PRODUCT_NAME}"
-VIAddVersionKey "CompanyName" ${COMPANY_NAME}
-VIAddVersionKey "LegalCopyright" ${BrandingText}
-VIAddVersionKey "FileDescription" "Installer Application"
+#VIProductVersion ${PRODUCT_VERSION}
+#VIAddVersionKey "ProductName" "Installer for ${PRODUCT_NAME}"
+#VIAddVersionKey "CompanyName" ${COMPANY_NAME}
+#VIAddVersionKey "LegalCopyright" ${BrandingText}
+#VIAddVersionKey "FileDescription" "Installer Application"
   
 
 # Set the default installation location
@@ -63,7 +63,7 @@ Var StartMenuFolder
 !define MUI_FINISHPAGE_SHOWREADME_CHECKED
 !define MUI_FINISHPAGE_SHOWREADME_TEXT "Create Desktop Shortcut"
 !define MUI_FINISHPAGE_SHOWREADME_FUNCTION finishpageaction
-!define MUI_FINISHPAGE_LINK QuickFit Webpage
+!define MUI_FINISHPAGE_LINK "QuickFit Webpage"
 !define MUI_FINISHPAGE_LINK_LOCATION ${URLInfoAbout}
 !insertmacro MUI_PAGE_FINISH
 
