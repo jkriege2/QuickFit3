@@ -69,6 +69,8 @@ class QFRDRTableColumnEditor : public QDialog
         QString getFunctionTemplate(QString name);
         QString getFunctionHelp(QString name);
 
+        virtual void showEvent(QShowEvent* event);
+
 };
 
 

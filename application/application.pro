@@ -41,7 +41,8 @@ HEADERS += mainwindow.h \
     dlgnewversion.h \
     dlgrdrsetproperty.h \
     dlgselectprojectsubset.h \
-    dlgfixfilepaths.h
+    dlgfixfilepaths.h \
+    renamegroupsdialog.h
 
 SOURCES += main.cpp \
            mainwindow.cpp \
@@ -52,7 +53,8 @@ SOURCES += main.cpp \
     dlgnewversion.cpp \
     dlgrdrsetproperty.cpp \
     dlgselectprojectsubset.cpp \
-    dlgfixfilepaths.cpp
+    dlgfixfilepaths.cpp \
+    renamegroupsdialog.cpp
 
 FORMS =    optionsdialog.ui \
            about.ui \
@@ -62,7 +64,8 @@ FORMS =    optionsdialog.ui \
     dlgnewversion.ui \
     dlgrdrsetproperty.ui \
     dlgselectprojectsubset.ui \
-    dlgfixfilepaths.ui
+    dlgfixfilepaths.ui \
+    renamegroupsdialog.ui
 
 RESOURCES += quickfit3.qrc
 

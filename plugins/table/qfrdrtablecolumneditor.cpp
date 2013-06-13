@@ -225,4 +225,11 @@ QString QFRDRTableColumnEditor::getFunctionHelp(QString name)
     return functionRef->getFunctionHelp(name);
 }
 
+void QFRDRTableColumnEditor::showEvent(QShowEvent *event)
+{
+    ui->edtTitle->setFocus();
+    ui->edtTitle->selectAll();
+    QDialog::showEvent(event);
+}
+
 

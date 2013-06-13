@@ -299,6 +299,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         void openWebpage();
 
         void fixFilesPathesInProject();
+
+        void renameGroups();
     private:
         void createWidgets();
         void createActions();
@@ -381,6 +383,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QAction* actPerformanceTest;
         QAction* actRDRSetProperty;
         QAction* actFixFilesPathes;
+        QAction* actRenameGroups;
         QProgressBar* prgMainProgress;
 
         /** \brief length of the list of recently opened files */

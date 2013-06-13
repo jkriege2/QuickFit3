@@ -4223,6 +4223,10 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
     cmbMode->setCurrentIndex(settings->value(prefix+"cmbMode", 0).toInt());
     dlg->addWidget(tr("result table orientation"), cmbMode);
 
+    QCheckBox* chkHeaders=new QCheckBox("", dlg);
+    chkHeaders->setChecked(settings->value(prefix+"chkHeaders", true).toBool());
+    dlg->addWidget(tr("copy with headers:"), chkHeaders);
+
     QList<copyFitResultStatistics_data> data;
     QStringList labels, names;
 
@@ -4337,6 +4341,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
         settings->setValue(prefix+"copymin", listMode->item(5)->checkState());
         settings->setValue(prefix+"copymax", listMode->item(6)->checkState());
         settings->setValue(prefix+"cmbMode", cmbMode->currentIndex());
+        settings->setValue(prefix+"chkHeaders", chkHeaders->isChecked());
 
         QList<QList<double> > result;
         QList<int> items=dlg->getSelectedIndexes();
@@ -4365,10 +4370,11 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
 
 
             if (cmbMode->currentIndex()==0) {
-                csvCopy(csvDataRotate(result), colNames, rowNames);
+                if (chkHeaders->isChecked()) csvCopy(csvDataRotate(result), colNames, rowNames);
+                else csvCopy(csvDataRotate(result));
             } else {
-                csvCopy(result, rowNames, colNames);
-
+                if (chkHeaders->isChecked()) csvCopy(result, rowNames, colNames);
+                else csvCopy(result);
             }
         } else if (cmbMode->currentIndex()<=3) {
             QList<double> r;
@@ -4391,10 +4397,11 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
 
 
             if (cmbMode->currentIndex()==2) {
-                csvCopy(csvDataRotate(result), colNames, rowNames);
+                if (chkHeaders->isChecked()) csvCopy(csvDataRotate(result), colNames, rowNames);
+                else csvCopy(csvDataRotate(result));
             } else {
-                csvCopy(result, rowNames, colNames);
-
+                if (chkHeaders->isChecked()) csvCopy(result, rowNames, colNames);
+                else csvCopy(result);
             }
         }
     }

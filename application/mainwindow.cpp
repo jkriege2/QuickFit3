@@ -12,6 +12,7 @@
 #include "dlgfixfilepaths.h"
 #include "jkmathparser.h"
 #include "qfhtmlhelptools.h"
+#include "renamegroupsdialog.h"
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
 
@@ -1016,6 +1017,8 @@ void MainWindow::createActions() {
     connect(actRDRSetProperty, SIGNAL(triggered()), this, SLOT(rdrSetProperty()));
     actFixFilesPathes=new QAction(tr("fix files paths in project"), this);
     connect(actFixFilesPathes, SIGNAL(triggered()), this, SLOT(fixFilesPathesInProject()));
+    actRenameGroups=new QAction(tr("rename RDR groups"), this);
+    connect(actRenameGroups, SIGNAL(triggered()), this, SLOT(renameGroups()));
 
     actPerformanceTest=new QAction(tr("test QFProject performance"), this);
     connect(actPerformanceTest, SIGNAL(triggered()), this, SLOT(projectPerformanceTest()));
@@ -1073,6 +1076,8 @@ void MainWindow::createMenus() {
     projectToolsMenu->addAction(actRDRUndoReplace);
     projectToolsMenu->addSeparator();
     projectToolsMenu->addAction(actRDRSetProperty);
+    projectToolsMenu->addSeparator();
+    projectToolsMenu->addAction(actRenameGroups);
     projectToolsMenu->addSeparator();
     projectToolsMenu->addAction(actFixFilesPathes);
     debugToolsMenu=toolsMenu->addMenu(tr("debug tools"));
@@ -1850,6 +1855,7 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
     saveProjectAct->setEnabled(projectModeEnabled);
     saveProjectAsAct->setEnabled(projectModeEnabled);
     actReloadProject->setEnabled(projectModeEnabled);
+    actRenameGroups->setEnabled(projectModeEnabled);
     actRDRReplace->setEnabled(projectModeEnabled);
     actRDRUndoReplace->setEnabled(projectModeEnabled);
     actPerformanceTest->setEnabled(projectModeEnabled);
@@ -2996,6 +3002,20 @@ void MainWindow::fixFilesPathesInProject()
             reloadProject();
         }
     }
+}
+
+void MainWindow::renameGroups()
+{
+    if (!project) return;
+    RenameGroupsDialog* dlg=new RenameGroupsDialog(this);
+    dlg->setStrings(project->getRDRGroupNames());
+    if (dlg->exec()) {
+        QStringList sl=dlg->getStrings();
+        for (int i=0; i<sl.size(); i++) {
+            project->setRDRGroupName(i, sl[i]);
+        }
+    }
+    delete dlg;
 }
 
 QFRawDataRecordFactory *MainWindow::getRawDataRecordFactory() const
