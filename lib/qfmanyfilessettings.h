@@ -6,6 +6,7 @@
 #include <QList>
 #include <QVariant>
 #include <QPointer>
+#include <QSet>
 
 /*! \brief this class accesses a hirarchy of settings files
     \ingroup qf3lib_tools
@@ -34,15 +35,18 @@ class QFLIB_EXPORT QFManyFilesSettings: public QObject {
         QFManyFilesSettings(QObject* parent=NULL);
         virtual ~QFManyFilesSettings();
 
-        void addSettings(QSettings* settings, bool takeOwnership=true);
+        void addSettings(QSettings* settings, bool takeOwnership=true, bool readony=false);
         void clear(bool deleteSettings=true);
         QSettings* getSettings(int level);
 
-        QVariant value(const QString& key, const QVariant& defaultValue=QVariant()) const;
-        bool setValue(const QString& key, const QVariant& value);
+        QVariant value(const QString& key, const QVariant& defaultValue=QVariant(), int* level=NULL) const;
+        bool setValue(const QString& key, const QVariant& value, int* level=NULL);
+
+        QStringList childGroups() const;
 
     protected:
         QList<QPointer<QSettings> > settings;
+        QSet<QSettings*> readonly;
 };
 
 #endif // QFMANYFILESSETTINGS_H

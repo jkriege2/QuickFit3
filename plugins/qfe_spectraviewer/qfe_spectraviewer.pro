@@ -14,11 +14,13 @@ DESTDIR = $${QFOUTPUT}/plugins/
 # Input
 HEADERS += qfespectraviewer.h \
     qfespectraviewerdialog.h \
-    optionswidget.h
+    optionswidget.h \
+    spectrummanager.h
 
 SOURCES += qfespectraviewer.cpp \
     qfespectraviewerdialog.cpp \
-    optionswidget.cpp
+    optionswidget.cpp \
+    spectrummanager.cpp
 
 FORMS = \
     qfespectraviewerdialog.ui \

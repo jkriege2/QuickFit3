@@ -1,4 +1,5 @@
 #include "qfmanyfilessettings.h"
+#include <QStringList>
 
 QFManyFilesSettings::QFManyFilesSettings(QObject *parent):
     QObject(parent)
@@ -10,10 +11,11 @@ QFManyFilesSettings::~QFManyFilesSettings()
     clear();
 }
 
-void QFManyFilesSettings::addSettings(QSettings *settings, bool takeOwnership)
+void QFManyFilesSettings::addSettings(QSettings *settings, bool takeOwnership, bool readony)
 {
     this->settings.append(settings);
     if (takeOwnership) settings->setParent(this);
+    if (readony) this->readonly.insert(settings);
 }
 
 void QFManyFilesSettings::clear(bool deleteSettings)
@@ -24,6 +26,7 @@ void QFManyFilesSettings::clear(bool deleteSettings)
         }
     }
     settings.clear();
+    readonly.clear();
 }
 
 QSettings *QFManyFilesSettings::getSettings(int level)
@@ -31,17 +34,20 @@ QSettings *QFManyFilesSettings::getSettings(int level)
     return settings.value(level, NULL);
 }
 
-QVariant QFManyFilesSettings::value(const QString &key, const QVariant &defaultValue) const
+QVariant QFManyFilesSettings::value(const QString &key, const QVariant &defaultValue, int* level) const
 {
     for (int i=settings.size()-1; i>=0; i--) {
         if (settings[i]) {
-            if (settings[i]->contains(key)) return settings[i]->value(key, defaultValue);
+            if (settings[i]->contains(key)) {
+                if (level) *level=i;
+                return settings[i]->value(key, defaultValue);
+            }
         }
     }
     return defaultValue;
 }
 
-bool QFManyFilesSettings::setValue(const QString &key, const QVariant &value)
+bool QFManyFilesSettings::setValue(const QString &key, const QVariant &value, int *level)
 {
     int foundOnLevel=settings.size()-1;
     for (int i=settings.size()-1; i>=0; i--) {
@@ -52,6 +58,7 @@ bool QFManyFilesSettings::setValue(const QString &key, const QVariant &value)
             }
         }
     }
+    if (level) *level=foundOnLevel;
     for (int i=foundOnLevel; i>=0; i--) {
         if (settings[i]) {
             if (settings[i]->isWritable()) {
@@ -61,4 +68,18 @@ bool QFManyFilesSettings::setValue(const QString &key, const QVariant &value)
         }
     }
     return false;
+}
+
+QStringList QFManyFilesSettings::childGroups() const
+{
+    QStringList sl;
+    for (int i=foundOnLevel; i>=0; i--) {
+        if (settings[i]) {
+            if (settings[i]->isWritable()) {
+                sl<<settings[i]->childGroups();
+            }
+        }
+    }
+    sl.removeDuplicates();
+    return sl;
 }
