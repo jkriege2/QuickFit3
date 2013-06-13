@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="qfe_spectraviewer/qfespectraviewer.png">icons/qfespectraviewer.png</file>
+</qresource>
+</RCC>

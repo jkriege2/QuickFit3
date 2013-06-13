@@ -122,6 +122,10 @@ SUBDIRS += plg_qfe_resultstools
 plg_qfe_resultstools.subdir=./plugins/qfe_resultstools
 plg_qfe_resultstools.depends = lib libqf3widgets
 
+SUBDIRS += plg_qfe_spectraviewer
+plg_qfe_spectraviewer.subdir=./plugins/qfe_spectraviewer
+plg_qfe_spectraviewer.depends = lib libqf3widgets
+
 SUBDIRS += plg_numberandbrightness
 plg_numberandbrightness.subdir=./plugins/numberandbrightness
 plg_numberandbrightness.depends = lib libqf3widgets
