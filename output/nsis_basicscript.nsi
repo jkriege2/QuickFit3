@@ -7,7 +7,7 @@
 !define UPDATEURL "http://www.dkfz.de/Macromol/quickfit/#download"
 !define URLInfoAbout "http://www.dkfz.de/Macromol/quickfit/"
 !define UNINSTALL_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY_NAME} ${PRODUCT_NAME}"
-!define REG_KEY "Software\${PRODUCT_NAME}"
+!define REG_KEY "Software\QuickFit3_%%BITDEPTH%%"
 # Set the installer name and compilation properties
 OutFile "%%INSTALLER_BASENAME%%_setup.exe"
 RequestExecutionLevel admin
@@ -70,7 +70,7 @@ Var StartMenuFolder
 !include "FileFunc.nsh"
  
 # Remember the installation directory for future updates and the uninstaller
-InstallDirRegKey HKLM ${REG_KEY} "InstallDir"
+InstallDirRegKey HKLM "${REG_KEY}" "InstallDir"
 
 
 
@@ -226,8 +226,6 @@ function .onInit
 	 
 	done:
 
-	  StrCpy $0 ${DefaultStartMenuFolder}
-      StrCpy "$StartMenuFolder" $0
 
   	  setShellVarContext all
 	  !insertmacro VerifyUserIsAdmin
