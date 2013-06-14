@@ -500,7 +500,7 @@ void MainWindow::about() {
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
         QString text=f.readAll();
         text=text.replace("$$SVN$$", qfInfoSVNVersion());
-        text=text.replace("$$qfInfoCompileDate()$$", qfInfoCompileDate());
+        text=text.replace("$$COMPILEDATE$$", qfInfoCompileDate());
         ui_releasenotes->setText(text);
     } else {
         ui_releasenotes->setPlainText(tr("none available :-((("));

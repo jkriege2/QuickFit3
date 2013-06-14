@@ -29,7 +29,7 @@ DlgNewVersion::DlgNewVersion(QWidget *parent) :
     } else {
         ui->edtReleaseNotes->setPlainText(tr("none available :-((("));
     }
-    ui->labVersion->setText(tr("version %1 (SVN: %2 qfInfoCompileDate(): %3)").arg(qfInfoVersion()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()));
+    ui->labVersion->setText(tr("version %1 (SVN: %2 compiledate: %3)").arg(qfInfoVersion()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()));
 }
 
 DlgNewVersion::~DlgNewVersion()
