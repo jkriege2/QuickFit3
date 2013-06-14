@@ -18,6 +18,9 @@ void addQFRDRTableFunctions(QFMathParser* parser, QStringList *names=NULL, bool 
 
 qfmpResult fQFRDRTableEditor_data(const qfmpResult* params, unsigned int n, QFMathParser* p);
 qfmpResult fQFRDRTableEditor_column(const qfmpResult* params, unsigned int n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_columnUnique(const qfmpResult* params, unsigned int n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_indexedColAvg(const qfmpResult* params, unsigned int n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_indexedColStd(const qfmpResult* params, unsigned int n, QFMathParser* p);
 
 qfmpResult fQFRDRTableEditor_dataleft(const qfmpResult* params, unsigned int  n, QFMathParser* p);
 

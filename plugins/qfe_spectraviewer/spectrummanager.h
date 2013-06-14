@@ -21,7 +21,8 @@
 #include <QMap>
 #include "tools.h"
 #include "jkiniparser2.h"
-
+#include <QStringList>
+#include <QSettings>
 
 /** \brief this class is used to manage fluorophor properties and spectra
  *  \ingroup diff4_tools
@@ -38,31 +39,61 @@ class SpectrumManager {
     public:
         /** \brief this struct contains all data neede to describe a spectrum */
         struct Spectrum {
-            Spectrum();
-            /** \brief the file the absorption spectrum was loaded from */
-            QString filename;
-            /** \brief number of spectrum inside file */
-            int spectrumIDInFile;
-            /** \brief if \c true the CSV file contains one wavelength column, otherwise the layoutout is wavelength, spectrum, wavelength, spectrum, ... */
-            bool separateWavelengthsInFile;
-            /** \brief the wavelengths from the file [nanometers] */
-            double* wavelength;
-            /** \brief the absorption efficiencies from the file [0..1] */
-            double* spectrum;
-            /** \brief the fluorescence from the file [0..1] */
-            int N;
-            /** \brief GSL lookup accelerator for absorbance */
-            gsl_interp_accel *accel;
-            /** \brief this stores the spline calculated from the data in the file for absorbance */
-            gsl_spline *spline;
-            /** \brief reference/source for absorption spectrum */
-            QString reference;
+            private:
+                /** \brief specifies the type of interpolation for the spectra */
+                const gsl_interp_type *spectral_interpolation_type;
+                /** \brief the file the absorption spectrum was loaded from */
+                QString filename;
+                /** \brief number of spectrum inside file */
+                int spectrumIDInFile;
+                /** \brief if \c true the CSV file contains one wavelength column, otherwise the layoutout is wavelength, spectrum, wavelength, spectrum, ... */
+                bool separateWavelengthsInFile;
+                /** \brief the wavelengths from the file [nanometers] */
+                double* wavelength;
+                /** \brief the absorption efficiencies from the file [0..1] */
+                double* spectrum;
+                /** \brief the fluorescence from the file [0..1] */
+                int N;
+                /** \brief GSL lookup accelerator for absorbance */
+                gsl_interp_accel *accel;
+                /** \brief this stores the spline calculated from the data in the file for absorbance */
+                gsl_spline *spline;
+                bool loaded;
+                void internalInit(const QVector<double>& wavelength, const QVector<double>& spectrum);
 
-            void init(const QVector<double>& wavelength, const QVector<double>& spectrum);
-            void init(const QString& filename, int ID=0, bool separateWavelengths=false);
-            void clear();
-            double getSpectrumAt(double wavelength) const;
-            double getSpectrumIntegral(double lambda_start, double lambda_end) const;
+            public:
+                Spectrum();
+                /** \brief reference/source for absorption spectrum */
+                QString reference;
+
+                void ensureSpectrum();
+
+                void init(const QVector<double>& wavelength, const QVector<double>& spectrum);
+                void init(const QString& filename, int ID=0, bool separateWavelengths=false);
+                void clear();
+                double getSpectrumAt(double wavelength);
+                double getSpectrumIntegral(double lambda_start, double lambda_end) ;
+                double getWavelengthMin() ;
+                double getWavelengthMax() ;
+                double getSpectrumMin() ;
+                double getSpectrumMax() ;
+                double getSpectrumMaxWavelength() ;
+                double getSpectrumFullIntegral() ;
+                inline double* getWavelength()  {
+                    //ensureSpectrum();
+                    return wavelength;
+                }
+                inline double* getSpectrum()  {
+                    //ensureSpectrum();
+                    return spectrum;
+                }
+                inline int getN() {
+                    //ensureSpectrum();
+                    return N;
+                }
+                QString getFilename() const { return filename; }
+                int getID() const { return spectrumIDInFile; }
+                bool getSeparateWavelengthsInFile() const { return separateWavelengthsInFile; }
         };
 
         /** \brief specifies the properties of one fluorophor */
@@ -75,10 +106,10 @@ class SpectrumManager {
             double fluorescence_efficiency;
             /** \brief fluorescence lifetime [sec] */
             double fluorescence_lifetime;
-            /** \brief absorption cross section [meters^2] */
-            double absorption_crosssection;
+            /** \brief molar exctinction coefficient [1/(M cm)] */
+            double extiction_coefficient;
             /** \brief wavelength at which the absorption cross section is given [nanometers] */
-            double absorption_crosssection_wavelength;
+            double extiction_coefficient_wavelength;
             /** \brief absorption specturm */
             int spectrum_abs;
             /** \brief fluorophor */
@@ -87,7 +118,6 @@ class SpectrumManager {
             QString reference;
             /** \brief conditions of measurements for the above given properties */
             QString condition;
-            QString inifile;
         };
 
         /** \brief specifies the properties of a lightsource */
@@ -101,9 +131,6 @@ class SpectrumManager {
             int spectrum;
             /** \brief reference/source of data */
             QString reference;
-            /** \brief conditions of measurements for the above given properties */
-            QString condition;
-            QString inifile;
         };
 
         /** \brief specifies the properties of a filter */
@@ -117,20 +144,16 @@ class SpectrumManager {
             int spectrum;
             /** \brief reference/source of data */
             QString reference;
-            /** \brief conditions of measurements for the above given properties */
-            QString condition;
-            QString inifile;
+
         };
 
     protected:
-        /** \brief specifies the type of interpolation for the spectra */
-        const gsl_interp_type *spectral_interpolation_type;
 
 
         /** \brief load all \c *.spec file from the current directory */
         void init_spectra();
 
-        QList<Spectrum> spectra;
+        QList<Spectrum*> spectra;
 
         /** \brief fluorophor database */
         QMap<QString, FluorophorData> fluorophores;
@@ -138,27 +161,6 @@ class SpectrumManager {
         QMap<QString, LightSourceData> lightsources;
         /** \brief fluorophor database */
         QMap<QString, FilterData> filters;
-
-        /** \brief parse the \c fluorophors.ini file and fill fluorophor_database
-         *
-         * The \c fluorophors.ini file contains a list of the fluorescence parameters of the different fluorophors.
-         * Each entry is characterized by a name. Note that if you also have a spectrum for the dye the name of the
-         * spectrum file has to be \c name.spec where \c name is the same name as in \c fluorophors.ini.
-         *
-         * Each entry has this form:
-         * \verbatim
-[Rho6G]
-q_fluor=0.94
-tau_fluor=3.9e-9
-sigma_abs=3.6e-20 \endverbatim
-         * Here \ Rho6G is the name and the spectrum is saved as \c rho6g.spec (case is ignored!). The property q_fluor
-         * give the fluorescence efficiency (i.e. \f$ \frac{\mbox{fluorescence photons}}{\mbox{absorbed photons}} \f$) in
-         * the range [0..1], \c tau_fluor gives the fluorescence lifetime in seconds and \c sigma_abs (\f$ \sigma_{abs} \f$)
-         * the absorption cross  section in \f$ \mbox{meters}^2 \f$. Instead of \c sigma_abs you can also provide
-         * c molar_extinction which is the molar extinction coefficient \f$ \epsilon_{mol} \f$ in 1/(cm*Molar)=liters/(mol*cm).
-         * These two properties are connected by \f[ \sigma_{abs}=\frac{\epsilon_{abs}}{N_A}=\frac{\epsilon_{abs}[l/(\mbox{cm}\cdot\mbox{mol})]\cdot 10^{-1}}{6.022\cdot10^{23}}[\mbox{meters}^2] \f]
-         */
-        void init_fluorophor_database();
 
     private:
 
@@ -187,14 +189,15 @@ sigma_abs=3.6e-20 \endverbatim
         void clear();
 
         void loadFluorophoreDatabase(const QString& ininame, const QStringList& directories=QStringList() );
+        void loadFilterDatabase(const QString& ininame, const QStringList& directories=QStringList() );
+        void loadLightSourceDatabase(const QString& ininame, const QStringList& directories=QStringList() );
 
 
         /** \brief add a spectrum file to the internal database */
-        int addSpectrum(const QString &filename, int ID=0, bool separateWavelengths=false);
+        int addSpectrum(const QString &filename, int ID=0, bool separateWavelengths=false, const QString &reference=QString(""));
         /** \brief return the i-th spectrum */
-        Spectrum& getSpectrum(int i) const;
+        Spectrum *getSpectrum(int i);
         /** \brief return the i-th spectrum */
-        const Spectrum& getSpectrum(int i) const;
 
 
         /** \brief returns \c true if fluorophor exists in database */
@@ -203,13 +206,11 @@ sigma_abs=3.6e-20 \endverbatim
         bool filterExists(const QString& f);
         /** \brief returns \c true if fluorophor exists in database */
         bool lightsourceExists(const QString& f);
+        bool spectrumExists(int f);
 
-        FluorophorData& getFluorophoreData(const QString& name);
-        LightSourceData& getLightSourceData(const QString& name);
-        FilterData& getFilterData(const QString& name);
-        const FluorophorData& getFluorophoreData(const QString& name);
-        const LightSourceData& getLightSourceData(const QString& name);
-        const FilterData& getFilterData(const QString& name);
+         FluorophorData getFluorophoreData(const QString& name)  ;
+         LightSourceData getLightSourceData(const QString& name)  ;
+         FilterData getFilterData(const QString& name)  ;
 
 };
 #endif // SPECTRUMMANAGER_H

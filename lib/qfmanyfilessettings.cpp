@@ -61,7 +61,7 @@ bool QFManyFilesSettings::setValue(const QString &key, const QVariant &value, in
     if (level) *level=foundOnLevel;
     for (int i=foundOnLevel; i>=0; i--) {
         if (settings[i]) {
-            if (settings[i]->isWritable()) {
+            if (settings[i]->isWritable() && !readonly.contains(settings[i])) {
                 settings[i]->setValue(key, value);
                 return true;
             }
@@ -73,11 +73,9 @@ bool QFManyFilesSettings::setValue(const QString &key, const QVariant &value, in
 QStringList QFManyFilesSettings::childGroups() const
 {
     QStringList sl;
-    for (int i=foundOnLevel; i>=0; i--) {
+    for (int i=settings.size()-1; i>=0; i--) {
         if (settings[i]) {
-            if (settings[i]->isWritable()) {
-                sl<<settings[i]->childGroups();
-            }
+            sl<<settings[i]->childGroups();
         }
     }
     sl.removeDuplicates();

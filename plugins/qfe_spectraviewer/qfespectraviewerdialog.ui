@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>939</width>
-    <height>678</height>
+    <width>925</width>
+    <height>707</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,98 +17,116 @@
    <iconset resource="qfespectraviewer.qrc">
     <normaloff>:/qfe_spectraviewer/qfespectraviewer.png</normaloff>:/qfe_spectraviewer/qfespectraviewer.png</iconset>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
    <item>
-    <widget class="QVisibleHandleSplitter" name="splitter">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+    <widget class="QFPlotter" name="plotter" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>100</height>
+      </size>
      </property>
-     <widget class="QFPlotter" name="plotter" native="true">
-      <property name="minimumSize">
-       <size>
-        <width>100</width>
-        <height>100</height>
-       </size>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget_2" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1">
+      <property name="margin">
+       <number>0</number>
       </property>
-     </widget>
-     <widget class="QWidget" name="widget_2" native="true">
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <property name="margin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QWidget" name="widget" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QPushButton" name="btnAddFluorophore">
+      <item>
+       <widget class="QWidget" name="widget" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QPushButton" name="btnAddFluorophore">
+           <property name="text">
+            <string>add &amp;fluorophore</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnDelete">
+           <property name="text">
+            <string>&amp;Delete</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QListWidget" name="lstSpectra"/>
+      </item>
+      <item>
+       <widget class="QStackedWidget" name="stackSpectraEditor">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="widEmpty"/>
+        <widget class="QWidget" name="widFluorophore">
+         <layout class="QFormLayout" name="formLayout">
+          <property name="fieldGrowthPolicy">
+           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label">
             <property name="text">
-             <string>add &amp;fluorophore</string>
+             <string>fluorophore:</string>
             </property>
            </widget>
           </item>
-          <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="cmbFluorophore"/>
           </item>
-          <item>
-           <widget class="QPushButton" name="btnDelete">
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="chkFluorophoreShowExcitation">
             <property name="text">
-             <string>&amp;Delete</string>
+             <string>show excitation spectrum</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QCheckBox" name="chkFluorophoreShowEmission">
+            <property name="text">
+             <string>show emission spectrum</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QTableView" name="tabFluorophoreInfo"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>info:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>options:</string>
             </property>
            </widget>
           </item>
          </layout>
         </widget>
-       </item>
-       <item>
-        <widget class="QListWidget" name="lstSpectra"/>
-       </item>
-       <item>
-        <widget class="QStackedWidget" name="stackSpectraEditor">
-         <property name="currentIndex">
-          <number>0</number>
-         </property>
-         <widget class="QWidget" name="widEmpty"/>
-         <widget class="QWidget" name="widFluorophore">
-          <layout class="QFormLayout" name="formLayout">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>fluorophore</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="cmbFluorophore"/>
-           </item>
-          </layout>
-         </widget>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>
@@ -118,12 +136,6 @@
    <class>QFPlotter</class>
    <extends>QWidget</extends>
    <header>qfplotter.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QVisibleHandleSplitter</class>
-   <extends>QSplitter</extends>
-   <header>qvisiblehandlesplitter.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

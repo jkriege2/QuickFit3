@@ -22,7 +22,7 @@ OptionsWidget::~OptionsWidget()
 
 void OptionsWidget::readSettings(ProgramOptions *options)
 {
-    ui->edtUserDatabase->setText(options->getConfigValue("qfe_spectraviewer/user_database", QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/qfe_spectraviewer/").toString());
+    ui->edtUserDatabase->setText(options->getConfigValue("qfe_spectraviewer/user_database", QFPluginServices::getInstance()->getPluginConfigDirectory("qfe_spectraviewer")).toString());
 }
 
 void OptionsWidget::writeSettings(ProgramOptions *options)

@@ -767,6 +767,6 @@ void qfCopyImageHalf(T1* output, const T2* input, int inWidth, int inHeight, QFI
 QFLIB_EXPORT QColor wavelengthToColor(double wavelength);
 
 
-
+QFLIB_EXPORT QIcon qfGetColorIcon(QColor color, QSize size=QSize(16,16));
 
 #endif // QFTOOLS_H

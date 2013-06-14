@@ -818,3 +818,9 @@ QColor wavelengthToColor(double wavelength) {
                   wavelengthToColorAdjust(g, factor, gamma, IntensityMax),
                   wavelengthToColorAdjust(b, factor, gamma, IntensityMax));
 }
+
+QIcon qfGetColorIcon(QColor color, QSize size) {
+    QPixmap pm(size);
+    pm.fill(color);
+    return QIcon(pm);
+}

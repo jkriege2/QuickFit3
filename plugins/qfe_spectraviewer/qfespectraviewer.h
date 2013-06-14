@@ -10,7 +10,7 @@
     \defgroup qf3ext_qfe_spectraviewer QFExtension implementation
     \ingroup qf3extensionplugins
 */
-
+class SpectrumManager;
 class QFESpectraViewerDialog;
 
 /*! \brief QFExtension implementation
@@ -56,6 +56,9 @@ class QFESpectraViewer : public QObject, public QFExtensionBase, public QFPlugin
         QIcon pluginOptionsIcon() const;
         QFPluginOptionsWidget *createOptionsWidget(QWidget *parent);
 
+
+        SpectrumManager* getSpectrumManager() const;
+
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */
         virtual void projectChanged(QFProject* oldProject, QFProject* project);
@@ -84,6 +87,7 @@ class QFESpectraViewer : public QObject, public QFExtensionBase, public QFPlugin
 	protected:
         QFPluginLogService* logService;
         QFESpectraViewerDialog* dlg;
+        SpectrumManager* manager;
 		
 	protected slots:
 	    /** \brief target, used in example code in initExtension() */

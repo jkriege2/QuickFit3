@@ -4,7 +4,10 @@
 #include <QDialog>
 #include <QList>
 #include <QSettings>
+#include <QListWidget>
+#include "qftablemodel.h"
 class QFESpectraViewer;
+class SpectrumManager;
 
 namespace Ui {
     class QFESpectraViewerDialog;
@@ -16,7 +19,9 @@ enum QFESpectraViewerPlotItemType {
 
 struct QFESpectraViewerPlotItem {
     QFESpectraViewerPlotItemType type;
-    int spectrum;
+    QString name;
+    bool showExcitation;
+    bool showEmission;
 };
 
 class QFESpectraViewerDialog : public QDialog
@@ -33,9 +38,20 @@ class QFESpectraViewerDialog : public QDialog
 
         void loadSpectraConfig(QSettings& settings, const QString& prefix=QString(""));
         void saveSpectraConfig(QSettings& settings, const QString& prefix=QString(""));
+    protected slots:
+        void on_btnAddFluorophore_clicked();
+        void on_btnDelete_clicked();
+        void spectrumSelected();
+        void saveFromWidgets();
+        void loadToWidgets();
     protected:
         Ui::QFESpectraViewerDialog *ui;
         QFESpectraViewer* plugin;
+        SpectrumManager* manager;
+
+        QFTableModel modFluorophoreData;
+
+        int currentIndex;
 
         QList<QFESpectraViewerPlotItem> plotItems;
 };
