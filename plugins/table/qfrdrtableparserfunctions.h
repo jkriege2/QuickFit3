@@ -21,6 +21,10 @@ qfmpResult fQFRDRTableEditor_column(const qfmpResult* params, unsigned int n, QF
 qfmpResult fQFRDRTableEditor_columnUnique(const qfmpResult* params, unsigned int n, QFMathParser* p);
 qfmpResult fQFRDRTableEditor_indexedColAvg(const qfmpResult* params, unsigned int n, QFMathParser* p);
 qfmpResult fQFRDRTableEditor_indexedColStd(const qfmpResult* params, unsigned int n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_indexedColMin(const qfmpResult* params, unsigned int n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_indexedColMax(const qfmpResult* params, unsigned int n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_indexedColMedian(const qfmpResult* params, unsigned int n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_indexedColQuantile(const qfmpResult* params, unsigned int n, QFMathParser* p);
 
 qfmpResult fQFRDRTableEditor_dataleft(const qfmpResult* params, unsigned int  n, QFMathParser* p);
 

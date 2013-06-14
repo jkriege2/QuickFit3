@@ -202,11 +202,13 @@ void QFTableModel::resize(quint16 rows, quint16 columns) {
 
     if (columns>oldcolumns) {
         for (int i=oldcolumns; i<=columns; i++) {
-            columnNames.append(QString::number(i));            
+            columnNames.append(QString::number(i));
+            emit columnAdded(i);
         }
     } else if (columns<oldcolumns) {
         for (int i=oldcolumns-1; i>=columns; i--) {
             if (!columnNames.isEmpty()) columnNames.removeLast();
+            emit columnRemoved(i);
         }
     }
 
@@ -313,6 +315,7 @@ void QFTableModel::insertColumn(quint16 c) {
         //reset();
         beginInsertColumns(QModelIndex(),c,c);
         endInsertColumns();
+        emit columnAdded(c);
     }
     //std::cout<<"  insertColumn("<<c<<") ... DONE\n";
 }
@@ -429,6 +432,7 @@ void QFTableModel::deleteColumn(quint16 c) {
     if (doEmitSignals) {
         beginRemoveColumns(QModelIndex(), c, c);
         endRemoveColumns();
+        emit columnRemoved(c);
 //        reset();
     }
 }
@@ -782,7 +786,10 @@ void QFTableModel::setColumnTitle(quint16 column, QString name) {
     if (readonly || (column>=columns)) return;
     for (int c=columnNames.size(); c<columns; c++) columnNames.append(QString::number(c));
     if (column<columnNames.size()) columnNames[column]=name;
-    if (doEmitSignals) emit headerDataChanged(Qt::Horizontal, column, column);
+    if (doEmitSignals) {
+        emit headerDataChanged(Qt::Horizontal, column, column);
+    }
+    emit columnTitleChanged(column);
 }
 
 void QFTableModel::setColumnTitleCreate(quint16 column, QString name) {
@@ -792,6 +799,7 @@ void QFTableModel::setColumnTitleCreate(quint16 column, QString name) {
     //qDebug()<<"setColumnTitleCreate("<<column<<", "<<name<<"):     columnNames.size()="<<columnNames.size();
     if (column<columnNames.size()) columnNames[column]=name;
     if (doEmitSignals) emit headerDataChanged(Qt::Horizontal, column, column);
+    emit columnTitleChanged(column);
 }
 
 QString QFTableModel::columnTitle(quint16 column) const {
@@ -1486,4 +1494,19 @@ int QFTableModelColumnHeaderModel::rowCount(const QModelIndex &parent) const
 void QFTableModelColumnHeaderModel::rebuildModel()
 {
     reset();
+}
+
+void QFTableModelColumnHeaderModel::nameChanged(int i)
+{
+    emit dataChanged(index(i), index(i));
+}
+
+void QFTableModelColumnHeaderModel::nameDeleted(int i)
+{
+    //emit rowsRemoved(QModelIndex(), i, i);
+}
+
+void QFTableModelColumnHeaderModel::nameAdded(int i)
+{
+    //emit rowsInserted(QModelIndex(), i, i);
 }

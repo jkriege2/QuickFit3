@@ -13,6 +13,7 @@ QFTableGraphSettings::QFTableGraphSettings(QWidget *parent) :
     ui(new Ui::QFTableGraphSettings)
 {
     headerModel=new QFTableModelColumnHeaderModel(NULL, this);
+    //headerModel=new QStringListModel(this);
     functionRef=new QFFunctionReferenceTool(NULL);
     functionRef->setCompleterFile(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/table/table_expression.txt");
     functionRef->setDefaultWordsMathExpression();
@@ -64,29 +65,46 @@ QFTableGraphSettings::~QFTableGraphSettings()
 
 void QFTableGraphSettings::setRecord(QFRDRTable *record, int plot)
 {
+    if (current) {
+        disconnect(current->model(), SIGNAL(layoutChanged()), this, SLOT(updateComboboxes()));
+        disconnect(current->model(), SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(updateComboboxes()));
+    }
     current=record;
     this->plot=plot;
     updating=true;
     disconnectWidgets();
 
+
     headerModel->setHasNone(true);
     headerModel->setModel(current->model());
-    ui->cmbLinesXData->setModel(headerModel);
+
+    /*ui->cmbLinesXData->setModel(headerModel);
     ui->cmbLinesXError->setModel(headerModel);
     ui->cmbLinesYData->setModel(headerModel);
     ui->cmbLinesYError->setModel(headerModel);
     ui->cmbLinesMax->setModel(headerModel);
     ui->cmbLinesMean->setModel(headerModel);
-    ui->cmbLinesQ75->setModel(headerModel);
-
-    /*reloadColumns(ui->cmbLinesXData);
-    reloadColumns(ui->cmbLinesXError);
-    reloadColumns(ui->cmbLinesYData);
-    reloadColumns(ui->cmbLinesYError);*/
+    ui->cmbLinesQ75->setModel(headerModel);*/
+    if (current) {
+        connect(current->model(), SIGNAL(layoutChanged()), this, SLOT(updateComboboxes()));
+        connect(current->model(), SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(updateComboboxes()));
+    }
+    updateComboboxes();
     updating=false;
     connectWidgets();
 
     //updateGraph();
+}
+
+void QFTableGraphSettings::updateComboboxes()
+{
+    reloadColumns(ui->cmbLinesXData);
+    reloadColumns(ui->cmbLinesXError);
+    reloadColumns(ui->cmbLinesYData);
+    reloadColumns(ui->cmbLinesYError);
+    reloadColumns(ui->cmbLinesMax);
+    reloadColumns(ui->cmbLinesMean);
+    reloadColumns(ui->cmbLinesQ75);
 }
 
 void QFTableGraphSettings::rawDataChanged()
@@ -652,6 +670,9 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labMax->setText(tr("Maximum Column:"));
                 ui->labMean->setText(tr("Mean Column:"));
                 ui->labQ75->setText(tr("75% Quantile Column:"));
+                ui->cmbLinesMax->setVisible(true);
+                ui->cmbLinesMean->setVisible(true);
+                ui->cmbLinesQ75->setVisible(true);
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
                 ui->labSymbol->setVisible(true);
@@ -985,6 +1006,7 @@ void QFTableGraphSettings::doRegression()
 {
     emit performRegression(ui->cmbLinesXData->currentIndex()-1, ui->cmbLinesYData->currentIndex()-1, ui->cmbLinesYError->currentIndex()-1, plot);
 }
+
 
 void QFTableGraphSettings::initFocus()
 {

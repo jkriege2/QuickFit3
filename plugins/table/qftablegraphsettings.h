@@ -56,10 +56,13 @@ class QFTableGraphSettings : public QWidget
 
         void doFit();
         void doRegression();
+
+        void updateComboboxes();
     protected:
 
     private:
         QFTableModelColumnHeaderModel* headerModel;
+        //QStringListModel* headerModel;
         Ui::QFTableGraphSettings *ui;
         QFRDRTable* current;
         int plot;

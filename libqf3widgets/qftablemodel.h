@@ -290,6 +290,9 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         void notReadonlyChanged(bool notReadonly);
 
 
+        void columnRemoved(int i);
+        void columnAdded(int i);
+        void columnTitleChanged(int i);
     private:
 };
 
@@ -310,6 +313,9 @@ class QFWIDLIB_EXPORT QFTableModelColumnHeaderModel : public QAbstractListModel 
         virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     public slots:
         void rebuildModel();
+        void nameChanged(int i);
+        void nameDeleted(int i);
+        void nameAdded(int i);
     protected:
         QFTableModel * model;
         bool hasNone;

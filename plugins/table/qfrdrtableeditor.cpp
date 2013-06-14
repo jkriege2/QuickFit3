@@ -949,7 +949,7 @@ void QFRDRTableEditor::slRecalcAll()
                 for (int i=0; i<m->model()->columnCount(); i++) {
                     QString lexp=m->model()->getColumnHeaderData(i, QFRDRTable::ColumnExpressionRole).toString();
                     if (!lexp.isEmpty()) {
-                        QVariantList ov=m->model()->getColumnData(i);
+                        QVariantList ov=m->model()->getColumnData(i, Qt::DisplayRole);
 
                         //qDebug()<<"     reeval0 col"<<i<<": "<<lexp<<"\n              "<<ov.size();
                         if (!cnodes.contains(lexp)) {
@@ -969,8 +969,33 @@ void QFRDRTableEditor::slRecalcAll()
                                 //qDebug()<<"     reeval4 col("<<i<<ov.size()<<")";
                                 mpColumns.resetErrors();
                                 QVariantList nv=evaluateExpression(mpColumns, cnodes[lexp], m->model()->index(0,i), &ok, lexp, true).toList();
-                                //qDebug()<<"     reeval5 col("<<i<<ov.size()<<")\n        <= "<<ok<<nv.size();
-                                if (ok && (ov.size()!=nv.size() || ov!=nv)) {
+                                //qDebug()<<"     reeval5 col("<<i<<n.size()<<")\n        <= "<<ok<<nv.size();
+                                bool equalWithVariant=true;
+                                qDebug()<<"nv = "<<nv;
+                                qDebug()<<"ov = "<<ov;
+                                for (int in=0; in<qMax(nv.size(),ov.size()); in++) {
+                                    if (in<nv.size() && in<ov.size()) {
+                                        qDebug()<<nv[in]<<ov[in]<<nv[in].isValid()<<ov[in].isValid();
+                                        if (nv[in]!=ov[in]) {
+                                            equalWithVariant=false;
+                                            //qDebug()<<"  unequal idx "<<i<<nv[i]<<ov[i];
+                                            break;
+                                        } else if (nv[in].isValid() && !ov[in].isValid()) {
+                                            equalWithVariant=false;
+                                            //qDebug()<<"  unequal idx "<<i<<nv[i]<<ov[i];
+                                            break;
+                                        }
+
+                                    } else {
+                                        if (in>=nv.size() && ov[in].isValid()) {
+                                            //qDebug()<<"  unequal idx "<<i<<" no_nv "<<ov[i];
+                                            equalWithVariant=false;
+                                            break;
+                                        }
+                                    }
+                                }
+                                qDebug()<<ok<<ov.size()<<nv.size()<<equalWithVariant;
+                                if (ok && !equalWithVariant) {
                                     changes++;
                                     for (int r=0; r<qMax(nv.size(), m->model()->rowCount()); r++) {
                                         m->model()->setCellCreate(r, i, nv.value(r, QVariant()));

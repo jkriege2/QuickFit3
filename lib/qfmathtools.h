@@ -318,31 +318,7 @@ typename T::value_type qfstatisticsMin(const T& value) {
     long long N=value.size();
     if (N<=0) return 0;
     if (N==1) return value[0];
-    T m=0;
-    bool first=true;
-    for (register long long i=0; i<N; i++) {
-        if (QFFloatIsOK(value[i])) {
-            if (first)  {
-                m=value[i];
-                first=false;
-            } else if (value[i]<m) {
-                m=value[i];
-            }
-        }
-    }
-    return m;
-}
-
-/*! \brief calculate the minimum of the data in \a value
-    \ingroup qf3lib_mathtools
-
-*/
-template <class T>
-T qfstatisticsMin(const QVector<T>& value) {
-    long long N=value.size();
-    if (N<=0) return 0;
-    if (N==1) return value[0];
-    T m=0;
+    typename T::value_type m=0;
     bool first=true;
     for (register long long i=0; i<N; i++) {
         if (QFFloatIsOK(value[i])) {
