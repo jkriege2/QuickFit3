@@ -22,9 +22,8 @@
 -->
 
 <!--
-		<li><a name="2344"><b>2013-06-12 (SVN: 2344)</b>-->
+		<li><a name="2358"><b>2013-06-12 (SVN: 2358)</b>-->
 
-		   
 
 		<ul>
 		  <li><b>new plugins:</b><ul>
@@ -65,6 +64,7 @@
 			<li>improved saving of relative filepathes (should clean away symbolic links now)</li>
 		    <li>plotters have help context menu entry now</li>
 			<li>added tools to QMake projects to install example files into examples subdirectory of installation, moved examples to new directories!</li>
+			<li>added tool ("Tools|Project Tools" menu) to rename RDR groups</li>
 		  </ul></li>
 		  
 		  <li><b>qfe_calculator</b><ul>
@@ -102,6 +102,8 @@
 			<li>allows width and shift for bar charts</li>
 		    <li>added printing support in tables</li>
 		    <li>added possibility to add image plots wil colgraphs... interface, added this to QFPlotter</li>
+			<li>implemented indexed statistics</li>
+			<li>bugfixed visibility of Median/Q75/max comboboxes in table editor for boxplots</li>
 		  </ul></li>
 		  
 		  <li><b>imFCS:</b><ul>
@@ -134,6 +136,7 @@
 			<li>"mask|mask outlier CFs": now giving lower and upper percentage (e.g. 5% & 5% leaves only 5%..95%)</li>
 			<li>"mask|copy mask to group" now updates the average run properly!</li>
 			<li>corrected bug in imFCS calibration: preset wz was not used in fits!   the default value 620 was used instead (always!!!)</li>
+			<li>added checkbox to "copy result statistics" tool to switch off copying of the headers</li>
 		  </ul></li>
 		  
 		  <li><b>imFCSFit:</b><ul>
@@ -180,6 +183,7 @@
 		    <li>added cAB/max(cA,cB) property to FCCS models (SPIM and confocal)</li>
 		    <li>added fit function following the Ries/Schwille FCCS framework for normal and anomalous diffusion in confocal FCCS</li>
 		    <li>added 2-component normal diffusion model</li>
+			<li>bugfix: concentrations were wrong by a factor of (pi/2)^3 ... this is corrected now. D and rel. concentrations were not influenced</li>
 		  </ul></li>
 		  
 		  <li><b>msd:</b><ul>
