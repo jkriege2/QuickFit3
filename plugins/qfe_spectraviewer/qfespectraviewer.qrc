@@ -1,5 +1,19 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file alias="qfe_spectraviewer/qfespectraviewer.png">icons/qfespectraviewer.png</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file alias="qfe_spectraviewer/qfespectraviewer.png">icons/qfespectraviewer.png</file>
+    </qresource>
+    <qresource prefix="/qfe_spectraviewer">
+        <file alias="filter.png">icons/filter.png</file>
+        <file>icons/filter_bandpass.png</file>
+        <file>icons/filter_invalid.png</file>
+        <file>icons/filter_longpass.png</file>
+        <file>icons/filter_notch.png</file>
+        <file>icons/filter_shortpass.png</file>
+        <file>icons/filter_spectrum.png</file>
+        <file alias="fluorophore.png">icons/fluorophore.png</file>
+        <file>icons/laser.png</file>
+        <file alias="lightsource.png">icons/lightsource.png</file>
+        <file>icons/lightsource_spectrum.png</file>
+        <file>icons/qfespectraviewer.png</file>
+    </qresource>
 </RCC>

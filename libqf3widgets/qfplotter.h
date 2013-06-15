@@ -18,14 +18,14 @@ class QFWIDLIB_EXPORT QFPlotter : public JKQtPlotter
         explicit QFPlotter(QWidget *parent = 0);
 
         QToolBar* createToolbar(QWidget* parent=NULL, const QString& name=QString(""));
-        
+        virtual void populateToolbar(QToolBar* toolbar) const;
+
     signals:
         
     public slots:
     protected:
         void initQFPlotter();
         virtual void modifyContextMenu(QMenu* menu);
-        virtual void populateToolbar(QToolBar* toolbar) const;
 
         
 };

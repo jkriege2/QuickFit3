@@ -76,15 +76,18 @@ void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStr
             gn+="/";
             FluorophorData d=fluorophores.value(groups[i], FluorophorData());
 
-            d.name=set.value(gn+"name", gn).toString();
+            d.name=set.value(gn+"name", groups[i]).toString();
             d.description=set.value(gn+"description", "").toString();
             d.manufacturer=set.value(gn+"manufacturer", "").toString();
             d.reference=set.value(gn+"reference", "").toString();
             d.condition=set.value(gn+"condition", "").toString();
+            d.orderNo=set.value(gn+"oder_no", "").toString();
             d.fluorescence_efficiency=set.value(gn+"q_fluor", NAN).toDouble();
             d.fluorescence_lifetime=set.value(gn+"tau_fluor", NAN).toDouble();
             d.extiction_coefficient=set.value(gn+"molar_extinction",0).toDouble();
             d.extiction_coefficient_wavelength=set.value(gn+"sigma_abs_wavelength", NAN).toDouble();
+            d.excitation_maxwavelength=set.value(gn+"excitation_max", NAN).toDouble();
+            d.emission_maxwavelength=set.value(gn+"emission_max", NAN).toDouble();
             QString fn;
             int fnID=0;
             bool fnSepWL;
@@ -96,6 +99,10 @@ void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStr
             if (QFile::exists(fn)) {
                 d.spectrum_abs=addSpectrum(fn, fnID, fnSepWL, set.value(gn+"spectrum_abs_reference", d.reference).toString());
             }
+            if (!QFFloatIsOK(d.excitation_maxwavelength) && spectrumExists(d.spectrum_abs)) {
+                spectra[d.spectrum_abs]->ensureSpectrum();
+                d.excitation_maxwavelength=spectra[d.spectrum_abs]->getSpectrumMaxWavelength();
+            }
 
             level=-1;
             fn=set.value(gn+"spectrum_fl", "", &level).toString();
@@ -104,6 +111,10 @@ void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStr
             fnSepWL=set.value(gn+"spectrum_fl_separatewavelengths", false).toBool();
             if (QFile::exists(fn)) {
                 d.spectrum_fl=addSpectrum(fn, fnID, fnSepWL, set.value(gn+"spectrum_fl_reference", d.reference).toString());
+            }
+            if (!QFFloatIsOK(d.emission_maxwavelength) && spectrumExists(d.spectrum_fl)) {
+                spectra[d.spectrum_fl]->ensureSpectrum();
+                d.emission_maxwavelength=spectra[d.spectrum_fl]->getSpectrumMaxWavelength();
             }
             fluorophores[groups[i]]=d;
 
@@ -130,7 +141,7 @@ void SpectrumManager::loadFilterDatabase(const QString &ininame, const QStringLi
             gn+="/";
             FilterData d=filters.value(groups[i], FilterData());
 
-            d.name=set.value(gn+"name", gn).toString();
+            d.name=set.value(gn+"name", groups[i]).toString();
             d.description=set.value(gn+"description", "").toString();
             d.manufacturer=set.value(gn+"manufacturer", "").toString();
             d.reference=set.value(gn+"reference", "").toString();
@@ -171,7 +182,7 @@ void SpectrumManager::loadLightSourceDatabase(const QString &ininame, const QStr
             gn+="/";
             LightSourceData d=lightsources.value(groups[i], LightSourceData());
 
-            d.name=set.value(gn+"name", gn).toString();
+            d.name=set.value(gn+"name", groups[i]).toString();
             d.description=set.value(gn+"description", "").toString();
             d.manufacturer=set.value(gn+"manufacturer", "").toString();
             d.reference=set.value(gn+"reference", "").toString();
@@ -263,11 +274,24 @@ void SpectrumManager::Spectrum::ensureSpectrum()
                 }
 
             }
+            int i=0;
+            while (i<sp.size() && sp[i]==0) i++;
+            if (i>0) {
+                sp.remove(0,i);
+                wl.remove(0,i);
+            }
+            i=sp.size()-1;
+            while (i>=0 && sp[i]==0)  i--;
+            if (i<sp.size()-1) {
+                sp.remove(i, sp.size()-1-i);
+                wl.remove(i, sp.size()-1-i);
+            }
+
             internalInit(wl, sp);
             loaded=true;
-            qDebug()<<"loaded spectrum"<<wavelength<<spectrum<<N<<accel<<spline;
+            //qDebug()<<"loaded spectrum"<<wavelength<<spectrum<<N<<accel<<spline;
         } catch(datatable2_exception e) {   // error handling with exceptions
-            qDebug()<<"table error: "<<e.get_message().c_str()<<endl;
+            //qDebug()<<"table error: "<<e.get_message().c_str()<<endl;
         }
     }
 
@@ -356,21 +380,22 @@ void SpectrumManager::Spectrum::internalInit(const QVector<double> &lambda, cons
 {
     if (lambda.size()>0&&eff.size()>0) {
         N=qMin(lambda.size(), eff.size());
-        this->wavelength=(double*)realloc(this->wavelength, N);
-        this->spectrum=(double*)realloc(this->spectrum, N);
+        this->wavelength=(double*)realloc(this->wavelength, N*sizeof(double));
+        this->spectrum=(double*)realloc(this->spectrum, N*sizeof(double));
         if (accel) gsl_interp_accel_free(accel);
         if (spline) gsl_spline_free(spline);
         copyArray(this->wavelength, lambda.data(), N);
         copyArray(this->spectrum, eff.data(), N);
 
-        qDebug()<<arrayToString(this->wavelength, N);
-        qDebug()<<arrayToString(this->spectrum, N);
+        //qDebug()<<arrayToString(this->wavelength, N);
+        //qDebug()<<arrayToString(this->spectrum, N);
 
         double m=statisticsMax(this->spectrum, N);
         for (int i=0; i<N; i++) this->spectrum[i]=this->spectrum[i]/m;
 
 
-        qDebug()<<"allcoing GSL N="<<N;
+
+        //qDebug()<<"allcoing GSL N="<<N;
         accel= gsl_interp_accel_alloc();
         spline=gsl_spline_alloc(spectral_interpolation_type,N);
         gsl_spline_init(spline, this->wavelength, this->spectrum, N);

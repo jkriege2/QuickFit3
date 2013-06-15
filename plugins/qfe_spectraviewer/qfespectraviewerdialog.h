@@ -14,14 +14,23 @@ namespace Ui {
 }
 
 enum QFESpectraViewerPlotItemType {
-    qfesFluorohpore=0
+    qfesFluorohpore=0,
+    qfesLightSourceSpectrum=1,
+    qfesLightSourceSingleLine=2,
+    qfesFilterSpectrum=3,
+    qfesFilterBandpass=4
 };
 
 struct QFESpectraViewerPlotItem {
+    QFESpectraViewerPlotItem(QFESpectraViewerPlotItemType type=qfesFluorohpore);
     QFESpectraViewerPlotItemType type;
     QString name;
     bool showExcitation;
     bool showEmission;
+    bool filterIsExcitation;
+    double centralWavelength;
+    double spectralWidth;
+    QString displayName;
 };
 
 class QFESpectraViewerDialog : public QDialog
@@ -40,16 +49,19 @@ class QFESpectraViewerDialog : public QDialog
         void saveSpectraConfig(QSettings& settings, const QString& prefix=QString(""));
     protected slots:
         void on_btnAddFluorophore_clicked();
+        void on_btnAddFilter_clicked();
+        void on_btnAddLightsource_clicked();
         void on_btnDelete_clicked();
         void spectrumSelected();
         void saveFromWidgets();
         void loadToWidgets();
+        void updateItemPropertiesModel();
     protected:
         Ui::QFESpectraViewerDialog *ui;
         QFESpectraViewer* plugin;
         SpectrumManager* manager;
 
-        QFTableModel modFluorophoreData;
+        QFTableModel modItemProperties;
 
         int currentIndex;
 

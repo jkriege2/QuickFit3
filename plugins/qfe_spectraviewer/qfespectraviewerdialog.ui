@@ -17,7 +17,7 @@
    <iconset resource="qfespectraviewer.qrc">
     <normaloff>:/qfe_spectraviewer/qfespectraviewer.png</normaloff>:/qfe_spectraviewer/qfespectraviewer.png</iconset>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+  <layout class="QVBoxLayout" name="mainLayout" stretch="1,0">
    <item>
     <widget class="QFPlotter" name="plotter" native="true">
      <property name="minimumSize">
@@ -30,7 +30,7 @@
    </item>
    <item>
     <widget class="QWidget" name="widget_2" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,2">
       <property name="margin">
        <number>0</number>
       </property>
@@ -41,6 +41,32 @@
           <widget class="QPushButton" name="btnAddFluorophore">
            <property name="text">
             <string>add &amp;fluorophore</string>
+           </property>
+           <property name="icon">
+            <iconset resource="qfespectraviewer.qrc">
+             <normaloff>:/qfe_spectraviewer/fluorophore.png</normaloff>:/qfe_spectraviewer/fluorophore.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnAddFilter">
+           <property name="text">
+            <string>add &amp;filter</string>
+           </property>
+           <property name="icon">
+            <iconset resource="qfespectraviewer.qrc">
+             <normaloff>:/qfe_spectraviewer/filter.png</normaloff>:/qfe_spectraviewer/filter.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnAddLightsource">
+           <property name="text">
+            <string>add &amp;lightsource</string>
+           </property>
+           <property name="icon">
+            <iconset resource="qfespectraviewer.qrc">
+             <normaloff>:/qfe_spectraviewer/lightsource.png</normaloff>:/qfe_spectraviewer/lightsource.png</iconset>
            </property>
           </widget>
          </item>
@@ -62,6 +88,10 @@
            <property name="text">
             <string>&amp;Delete</string>
            </property>
+           <property name="icon">
+            <iconset resource="../../lib/lib.qrc">
+             <normaloff>:/lib/prop_delete.png</normaloff>:/lib/prop_delete.png</iconset>
+           </property>
           </widget>
          </item>
         </layout>
@@ -71,60 +101,284 @@
        <widget class="QListWidget" name="lstSpectra"/>
       </item>
       <item>
-       <widget class="QStackedWidget" name="stackSpectraEditor">
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="widEmpty"/>
-        <widget class="QWidget" name="widFluorophore">
-         <layout class="QFormLayout" name="formLayout">
-          <property name="fieldGrowthPolicy">
-           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QStackedWidget" name="stackSpectraEditor">
+          <property name="currentIndex">
+           <number>0</number>
           </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>fluorophore:</string>
+          <widget class="QWidget" name="widFilter">
+           <layout class="QFormLayout" name="formLayout_2">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>&lt;b&gt;filter:&lt;/b&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>type:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="cmbFilterUsage">
+              <item>
+               <property name="text">
+                <string>excitation</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>emission</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="2" column="0" colspan="2">
+             <widget class="QStackedWidget" name="stackFilter">
+              <property name="currentIndex">
+               <number>1</number>
+              </property>
+              <widget class="QWidget" name="widFilterBandpass">
+               <layout class="QFormLayout" name="formLayout_7">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_11">
+                  <property name="text">
+                   <string>central wavelength:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QDoubleSpinBox" name="spinFilterCentral">
+                  <property name="suffix">
+                   <string> nm</string>
+                  </property>
+                  <property name="maximum">
+                   <double>10000.000000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>525.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_10">
+                  <property name="text">
+                   <string>linewidth:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QDoubleSpinBox" name="spinFilterLinewidth">
+                  <property name="suffix">
+                   <string> nm</string>
+                  </property>
+                  <property name="maximum">
+                   <double>10000.000000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>50.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="widFilterSpectrum">
+               <layout class="QFormLayout" name="formLayout_6">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_9">
+                  <property name="text">
+                   <string>filter:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QComboBox" name="cmbFilter"/>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="cmbFilterType">
+              <item>
+               <property name="text">
+                <string>band pass</string>
+               </property>
+               <property name="icon">
+                <iconset resource="qfespectraviewer.qrc">
+                 <normaloff>:/qfe_spectraviewer/icons/filter_bandpass.png</normaloff>:/qfe_spectraviewer/icons/filter_bandpass.png</iconset>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>with spectrum</string>
+               </property>
+               <property name="icon">
+                <iconset resource="qfespectraviewer.qrc">
+                 <normaloff>:/qfe_spectraviewer/icons/filter_spectrum.png</normaloff>:/qfe_spectraviewer/icons/filter_spectrum.png</iconset>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="widLightSource">
+           <layout class="QFormLayout" name="formLayout_3">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>&lt;b&gt;lightsource type:&lt;/b&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="cmbLightSourceType">
+              <item>
+               <property name="text">
+                <string>laser (single wavelength)</string>
+               </property>
+               <property name="icon">
+                <iconset resource="qfespectraviewer.qrc">
+                 <normaloff>:/qfe_spectraviewer/icons/laser.png</normaloff>:/qfe_spectraviewer/icons/laser.png</iconset>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>with spectrum</string>
+               </property>
+               <property name="icon">
+                <iconset resource="qfespectraviewer.qrc">
+                 <normaloff>:/qfe_spectraviewer/icons/lightsource_spectrum.png</normaloff>:/qfe_spectraviewer/icons/lightsource_spectrum.png</iconset>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2">
+             <widget class="QStackedWidget" name="stackLightsource">
+              <property name="currentIndex">
+               <number>1</number>
+              </property>
+              <widget class="QWidget" name="widLSLaser">
+               <layout class="QFormLayout" name="formLayout_4">
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_6">
+                  <property name="text">
+                   <string>central wavelength:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QDoubleSpinBox" name="spinLaserCentral">
+                  <property name="suffix">
+                   <string> nm</string>
+                  </property>
+                  <property name="maximum">
+                   <double>10000.000000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>488.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_7">
+                  <property name="text">
+                   <string>linewidth:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QDoubleSpinBox" name="spinLaserLinewidth">
+                  <property name="suffix">
+                   <string> nm</string>
+                  </property>
+                  <property name="maximum">
+                   <double>100.000000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>1.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="widLSSpectrum">
+               <layout class="QFormLayout" name="formLayout_5">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_8">
+                  <property name="text">
+                   <string>lightsource:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QComboBox" name="cmbLightsource"/>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="widEmpty"/>
+          <widget class="QWidget" name="widFluorophore">
+           <layout class="QFormLayout" name="formLayout">
+            <property name="fieldGrowthPolicy">
+             <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
             </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="cmbFluorophore"/>
-          </item>
-          <item row="1" column="1">
-           <widget class="QCheckBox" name="chkFluorophoreShowExcitation">
-            <property name="text">
-             <string>show excitation spectrum</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QCheckBox" name="chkFluorophoreShowEmission">
-            <property name="text">
-             <string>show emission spectrum</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QTableView" name="tabFluorophoreInfo"/>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>info:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>options:</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </widget>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>&lt;b&gt;fluorophore:&lt;/b&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="cmbFluorophore"/>
+            </item>
+            <item row="1" column="1">
+             <widget class="QCheckBox" name="chkFluorophoreShowExcitation">
+              <property name="text">
+               <string>show excitation spectrum</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QCheckBox" name="chkFluorophoreShowEmission">
+              <property name="text">
+               <string>show emission spectrum</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>options:</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTableView" name="tabFluorophoreInfo">
+          <attribute name="horizontalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -140,7 +394,96 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfespectraviewer.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cmbLightSourceType</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>stackLightsource</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>905</x>
+     <y>393</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>574</x>
+     <y>448</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbFilterType</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>stackFilter</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>509</x>
+     <y>372</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>479</x>
+     <y>426</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbLightsource</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFESpectraViewerDialog</receiver>
+   <slot>updateItemPropertiesModel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>506</x>
+     <y>419</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>434</x>
+     <y>360</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbFluorophore</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFESpectraViewerDialog</receiver>
+   <slot>updateItemPropertiesModel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>499</x>
+     <y>387</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>388</x>
+     <y>701</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbFilter</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFESpectraViewerDialog</receiver>
+   <slot>updateItemPropertiesModel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>458</x>
+     <y>443</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>434</x>
+     <y>705</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>updateItemPropertiesModel()</slot>
+ </slots>
 </ui>

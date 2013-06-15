@@ -139,6 +139,19 @@ inline double qfRadToDeg(double x) {
     return x/M_PI*180.0;
 }
 
+/** \brief normalized cauchy distribution
+    \ingroup qf3lib_mathtools
+ */
+inline double qfCauchy(double x, double fwhm, double center=0.0) {
+    return 1.0/(qfSqr((x-center)/fwhm)+1.0)/M_PI/fwhm;
+}
+
+/** \brief cauchy distribution with given amplitude
+    \ingroup qf3lib_mathtools
+ */
+inline double qfCauchy(double x, double A, double fwhm, double center) {
+    return A/(qfSqr((x-center)/fwhm)+1.0);
+}
 
 /** \brief calculate the error propagation for <code>factorA*a+factorB*b</code> or <code>factorA*a-factorB*b</code> with errors \a ea and \a eb
     \ingroup qf3lib_mathtools

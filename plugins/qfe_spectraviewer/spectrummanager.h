@@ -112,12 +112,17 @@ class SpectrumManager {
             double extiction_coefficient_wavelength;
             /** \brief absorption specturm */
             int spectrum_abs;
-            /** \brief fluorophor */
+            /** \brief fluorescence spectrum */
             int spectrum_fl;
+            /** \brief excitation maximum wavelength [nm] */
+            double excitation_maxwavelength;
+            /** \brief emission maximum wavelength [nm] */
+            double emission_maxwavelength;
             /** \brief reference/source of data */
             QString reference;
             /** \brief conditions of measurements for the above given properties */
             QString condition;
+            QString orderNo;
         };
 
         /** \brief specifies the properties of a lightsource */
@@ -131,6 +136,8 @@ class SpectrumManager {
             int spectrum;
             /** \brief reference/source of data */
             QString reference;
+            /** \brief typical emission wavelength [nm] */
+            double typical_wavelength;
         };
 
         /** \brief specifies the properties of a filter */
@@ -144,6 +151,8 @@ class SpectrumManager {
             int spectrum;
             /** \brief reference/source of data */
             QString reference;
+            /** \brief typical emission wavelength [nm] */
+            double typical_wavelength;
 
         };
 
