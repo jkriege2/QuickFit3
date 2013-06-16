@@ -824,3 +824,18 @@ QIcon qfGetColorIcon(QColor color, QSize size) {
     pm.fill(color);
     return QIcon(pm);
 }
+
+QString getNewFilename(const QString& filename, const QDir& dir) {
+    if (!QFile::exists(dir.absoluteFilePath(filename))) return filename;
+    QFileInfo info(dir.absoluteFilePath(filename));
+    QDir d=info.absoluteDir();
+    QString base=info.baseName();
+    QString suffix=info.completeSuffix();
+    QString newFilename=d.absoluteFilePath(base+"."+suffix);
+    int i=1;
+    while (QFile::exists(newFilename)) {
+        newFilename=d.absoluteFilePath(base+QString("%1.").arg(i, 4,10,QLatin1Char('0'))+suffix);
+        i++;
+    }
+    return newFilename;
+}

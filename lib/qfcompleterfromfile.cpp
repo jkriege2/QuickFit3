@@ -1,7 +1,7 @@
 #include "qfcompleterfromfile.h"
 #include <QDebug>
 #include <iostream>
-
+#include <QDir>
 
 QFCompleterFromFile::QFCompleterFromFile(QObject * parent):
     QCompleter(parent)
@@ -43,6 +43,7 @@ void QFCompleterFromFile::setFilename(QString val) {
 void QFCompleterFromFile::modelDataChanged ( const QModelIndex & topLeft, const QModelIndex & bottomRight ) {
     //std::cout<<"model changed\n";
     if (m_filename.size()>0) {
+        QDir().mkpath(QFileInfo(m_filename).absolutePath());
         QFile f(m_filename);
         //qDebug()<<"opening for writing: "<<m_filename;
         if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {

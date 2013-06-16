@@ -43,11 +43,11 @@ class QFESpectraViewerDialog : public QDialog
 
         void writeSettings();
         void readSettings();
-        void updatePlots();
 
         void loadSpectraConfig(QSettings& settings, const QString& prefix=QString(""));
         void saveSpectraConfig(QSettings& settings, const QString& prefix=QString(""));
     protected slots:
+        void updatePlots();
         void on_btnAddFluorophore_clicked();
         void on_btnAddFilter_clicked();
         void on_btnAddLightsource_clicked();
@@ -56,6 +56,17 @@ class QFESpectraViewerDialog : public QDialog
         void saveFromWidgets();
         void loadToWidgets();
         void updateItemPropertiesModel();
+        void createLightSourceSpectrum();
+        void on_btnEditLightsource_clicked();
+        void createFilterSpectrum();
+        void on_btnEditFilter_clicked();
+        void createFluorophoreSpectrum();
+        void on_btnEditFluorophore_clicked();
+        void reloadComboboxes();
+        void calcSpilloverTable();
+        void on_btnMailFluorophore_clicked();
+        void on_btnMailLightsource_clicked();
+        void on_btnMailFilter_clicked();
     protected:
         Ui::QFESpectraViewerDialog *ui;
         QFESpectraViewer* plugin;

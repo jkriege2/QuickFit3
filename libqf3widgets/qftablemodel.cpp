@@ -569,6 +569,21 @@ void QFTableModel::setColumn(quint16 column, const QVector<double> &value)
     if (doEmitSignals) emit dataChanged(index(0, column), index(row-1, column));
 }
 
+void QFTableModel::setColumn(quint16 column, const double *value, int N)
+{
+    //std::cout<<"setCell("<<row<<", "<<column<<", '"<<value.toString().toStdString()<<"' ["<<value.typeName()<<"])\n";
+    if (readonly || (column>=columns)) return;
+    quint16 row=0;
+    for (int i=0; i<N; i++) {
+        if (row<rows) {
+            quint32 a=xyAdressToUInt32(row, column);
+            dataMap[a]=value[i];
+        }
+        row++;
+    }
+    if (doEmitSignals) emit dataChanged(index(0, column), index(row-1, column));
+}
+
 
 void QFTableModel::copyCell(quint16 row, quint16 column, quint16 row_old, quint16 column_old)
 {
@@ -629,6 +644,16 @@ void QFTableModel::setColumnCreate(quint16 column, const QVector<double> &value)
     }
 
     setColumn(column, value);
+}
+
+void QFTableModel::setColumnCreate(quint16 column, const double *value, int N)
+{
+    if (readonly) return;
+    if ((N>rows) || (column>=columns)) {
+        resize(qMax(rows, quint16(N)), qMax(columns, quint16(column+1)));
+    }
+
+    setColumn(column, value, N);
 }
 
 void QFTableModel::setCellEditRole(quint16 row, quint16 column, QVariant value) {
@@ -887,7 +912,7 @@ bool QFTableModel::saveCSV(QTextStream &out, QString column_separator, char deci
     out<<header_start<<" ";
     int cc=0;
     for (quint16 c=0; c<columns; c++) {
-        if (usedCols.contains(c)) {
+        if (usedCols.contains(c) || saveCompleteTable) {
             if (cc>0) out<<column_separator;
             if (c<columnNames.size()) out<<QString("\"%1\"").arg(columnNames[c]).arg(c+1);
             cc++;
@@ -898,10 +923,10 @@ bool QFTableModel::saveCSV(QTextStream &out, QString column_separator, char deci
 
     // write data
     for (quint16 r=0; r<rows; r++) {
-        if (usedRows.contains(r)) {
+        if (usedRows.contains(r)||saveCompleteTable) {
             bool first=true;
             for (quint16 c=0; c<columns; c++) {
-                if (usedCols.contains(c)) {
+                if (usedCols.contains(c) || saveCompleteTable) {
                     quint32 a=xyAdressToUInt32(r, c);
                     if (dataMap.contains(a)) {
                         QVariant& v=dataMap[a];
@@ -1045,7 +1070,7 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
                         dataread=true;
                     } else if (c==comment_start) {
                         i=line.size();
-                    } else if (c==column_separator) {
+                    } else if (c==column_separator || (column_separator==' ' && c.isSpace())) {
                         column++;
                     } else if ((c=='-') || (c=='+') || (c==decimal_separator) || (c>='0' && c<='9')) {
                         QString s="";
@@ -1289,12 +1314,17 @@ void QFTableModel::paste(int row_start, int column_start) {
         char dec=loc.decimalPoint().toLatin1();
         if (sl.size()>0) {
             QString d=sl[0];
+            int icntDot=d.count('.');
+            int icntCom=d.count(',');
             d=d.remove(dec);
             int cnt=d.count('\n');
             int cntSem=d.count(';');
             int cntCom=d.count(',');
             if (cntSem>cnt && ';'!=dec) sep=';';
             if (cntCom>cnt && ','!=dec) sep=',';
+            if (dec==',' && sep==',') dec='.';
+            if (sep!=',' && dec==',' && icntCom==0 && icntDot>0) dec='.';
+            if (sep!=',' && dec=='.' && icntCom>0 && icntDot==0) dec=',';
         }
         //qDebug()<<"sep='"<<sep<<"'    dec='"<<dec<<"'";
         readCSV(in, sep, dec, "#!", '#', row, column, false);

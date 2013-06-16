@@ -17,7 +17,24 @@
    <iconset resource="qfespectraviewer.qrc">
     <normaloff>:/qfe_spectraviewer/qfespectraviewer.png</normaloff>:/qfe_spectraviewer/qfespectraviewer.png</iconset>
   </property>
-  <layout class="QVBoxLayout" name="mainLayout" stretch="1,0">
+  <layout class="QVBoxLayout" name="mainLayout" stretch="0,1,0">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
    <item>
     <widget class="QFPlotter" name="plotter" native="true">
      <property name="minimumSize">
@@ -198,6 +215,30 @@
                 <item row="0" column="1">
                  <widget class="QComboBox" name="cmbFilter"/>
                 </item>
+                <item row="1" column="1">
+                 <layout class="QHBoxLayout" name="horizontalLayout_4">
+                  <item>
+                   <spacer name="horizontalSpacer_3">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="btnEditFilter">
+                    <property name="text">
+                     <string>&amp;edit</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
                </layout>
               </widget>
              </widget>
@@ -318,6 +359,30 @@
                 <item row="0" column="1">
                  <widget class="QComboBox" name="cmbLightsource"/>
                 </item>
+                <item row="1" column="1">
+                 <layout class="QHBoxLayout" name="horizontalLayout_2">
+                  <item>
+                   <spacer name="horizontalSpacer">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="btnEditLightsource">
+                    <property name="text">
+                     <string>&amp;edit</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
                </layout>
               </widget>
              </widget>
@@ -340,33 +405,57 @@
             <item row="0" column="1">
              <widget class="QComboBox" name="cmbFluorophore"/>
             </item>
-            <item row="1" column="1">
+            <item row="2" column="1">
              <widget class="QCheckBox" name="chkFluorophoreShowExcitation">
               <property name="text">
                <string>show excitation spectrum</string>
               </property>
              </widget>
             </item>
-            <item row="2" column="1">
+            <item row="3" column="1">
              <widget class="QCheckBox" name="chkFluorophoreShowEmission">
               <property name="text">
                <string>show emission spectrum</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
+            <item row="2" column="0">
              <widget class="QLabel" name="label_3">
               <property name="text">
                <string>options:</string>
               </property>
              </widget>
             </item>
+            <item row="1" column="1">
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnEditFluorophore">
+                <property name="text">
+                 <string>&amp;edit</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
            </layout>
           </widget>
          </widget>
         </item>
         <item>
-         <widget class="QTableView" name="tabFluorophoreInfo">
+         <widget class="QEnhancedTableView" name="tabFluorophoreInfo">
           <attribute name="horizontalHeaderVisible">
            <bool>false</bool>
           </attribute>
@@ -392,12 +481,18 @@
    <header>qfplotter.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>QEnhancedTableView</class>
+   <extends>QTableView</extends>
+   <header>qenhancedtableview.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="qfespectraviewer.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
@@ -409,12 +504,12 @@
    <slot>setCurrentIndex(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>905</x>
-     <y>393</y>
+     <x>501</x>
+     <y>387</y>
     </hint>
     <hint type="destinationlabel">
-     <x>574</x>
-     <y>448</y>
+     <x>501</x>
+     <y>387</y>
     </hint>
    </hints>
   </connection>
@@ -441,8 +536,8 @@
    <slot>updateItemPropertiesModel()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>506</x>
-     <y>419</y>
+     <x>492</x>
+     <y>369</y>
     </hint>
     <hint type="destinationlabel">
      <x>434</x>
@@ -485,5 +580,6 @@
  </connections>
  <slots>
   <slot>updateItemPropertiesModel()</slot>
+  <slot>updatePlots()</slot>
  </slots>
 </ui>

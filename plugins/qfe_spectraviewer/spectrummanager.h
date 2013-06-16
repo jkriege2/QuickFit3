@@ -73,6 +73,8 @@ class SpectrumManager {
                 void clear();
                 double getSpectrumAt(double wavelength);
                 double getSpectrumIntegral(double lambda_start, double lambda_end) ;
+                double getMulSpectrumIntegral(Spectrum* multWith, double lambda_start, double lambda_end) ;
+                double getMulSpectrumIntegral(Spectrum* multWith) ;
                 double getWavelengthMin() ;
                 double getWavelengthMax() ;
                 double getSpectrumMin() ;
@@ -97,8 +99,8 @@ class SpectrumManager {
         };
 
         /** \brief specifies the properties of one fluorophor */
-        struct FluorophorData {
-            FluorophorData();
+        struct FluorophoreData {
+            FluorophoreData();
             QString name;
             QString description;
             QString manufacturer;
@@ -106,6 +108,7 @@ class SpectrumManager {
             double fluorescence_efficiency;
             /** \brief fluorescence lifetime [sec] */
             double fluorescence_lifetime;
+            double fluorescence_efficiency_wavelength;
             /** \brief molar exctinction coefficient [1/(M cm)] */
             double extiction_coefficient;
             /** \brief wavelength at which the absorption cross section is given [nanometers] */
@@ -165,7 +168,7 @@ class SpectrumManager {
         QList<Spectrum*> spectra;
 
         /** \brief fluorophor database */
-        QMap<QString, FluorophorData> fluorophores;
+        QMap<QString, FluorophoreData> fluorophores;
         /** \brief fluorophor database */
         QMap<QString, LightSourceData> lightsources;
         /** \brief fluorophor database */
@@ -217,7 +220,7 @@ class SpectrumManager {
         bool lightsourceExists(const QString& f);
         bool spectrumExists(int f);
 
-         FluorophorData getFluorophoreData(const QString& name)  ;
+         FluorophoreData getFluorophoreData(const QString& name)  ;
          LightSourceData getLightSourceData(const QString& name)  ;
          FilterData getFilterData(const QString& name)  ;
 

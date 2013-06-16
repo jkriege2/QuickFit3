@@ -378,6 +378,12 @@ QFLIB_EXPORT QString getOSName();
 */
 QFLIB_EXPORT QString cleanStringForFilename(const QString& text, int maxLen=127, bool removeDot=true, bool removeSlash=true);
 
+/*! \brief adds an increasing number to the given filename, so the returned filename is not yet existent
+    \ingroup qf3lib_tools
+*/
+QFLIB_EXPORT QString getNewFilename(const QString& filename, const QDir& dir=QDir());
+
+
 /*! \brief convert the given string to a string suitable for use in filenames
     \ingroup qf3lib_tools
 */

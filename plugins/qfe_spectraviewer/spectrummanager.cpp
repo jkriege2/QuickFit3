@@ -4,6 +4,7 @@
 #include "qfmanyfilessettings.h"
 #include "statistics_tools.h"
 #include <QDebug>
+#include "statistics_tools.h"
 
 SpectrumManager::SpectrumManager(){
 }
@@ -74,7 +75,7 @@ void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStr
         QString gn=groups[i].toLower();
         if (!gn.isEmpty() && gn.size()>0) {
             gn+="/";
-            FluorophorData d=fluorophores.value(groups[i], FluorophorData());
+            FluorophoreData d=fluorophores.value(groups[i], FluorophoreData());
 
             d.name=set.value(gn+"name", groups[i]).toString();
             d.description=set.value(gn+"description", "").toString();
@@ -85,7 +86,6 @@ void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStr
             d.fluorescence_efficiency=set.value(gn+"q_fluor", NAN).toDouble();
             d.fluorescence_lifetime=set.value(gn+"tau_fluor", NAN).toDouble();
             d.extiction_coefficient=set.value(gn+"molar_extinction",0).toDouble();
-            d.extiction_coefficient_wavelength=set.value(gn+"sigma_abs_wavelength", NAN).toDouble();
             d.excitation_maxwavelength=set.value(gn+"excitation_max", NAN).toDouble();
             d.emission_maxwavelength=set.value(gn+"emission_max", NAN).toDouble();
             QString fn;
@@ -99,7 +99,7 @@ void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStr
             if (QFile::exists(fn)) {
                 d.spectrum_abs=addSpectrum(fn, fnID, fnSepWL, set.value(gn+"spectrum_abs_reference", d.reference).toString());
             }
-            if (!QFFloatIsOK(d.excitation_maxwavelength) && spectrumExists(d.spectrum_abs)) {
+            if ((!QFFloatIsOK(d.excitation_maxwavelength)||d.excitation_maxwavelength<0) && spectrumExists(d.spectrum_abs)) {
                 spectra[d.spectrum_abs]->ensureSpectrum();
                 d.excitation_maxwavelength=spectra[d.spectrum_abs]->getSpectrumMaxWavelength();
             }
@@ -112,10 +112,12 @@ void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStr
             if (QFile::exists(fn)) {
                 d.spectrum_fl=addSpectrum(fn, fnID, fnSepWL, set.value(gn+"spectrum_fl_reference", d.reference).toString());
             }
-            if (!QFFloatIsOK(d.emission_maxwavelength) && spectrumExists(d.spectrum_fl)) {
+            if ((!QFFloatIsOK(d.emission_maxwavelength)||d.emission_maxwavelength<0) && spectrumExists(d.spectrum_fl)) {
                 spectra[d.spectrum_fl]->ensureSpectrum();
                 d.emission_maxwavelength=spectra[d.spectrum_fl]->getSpectrumMaxWavelength();
             }
+            d.fluorescence_efficiency_wavelength=set.value(gn+"q_fluor_wavelength", d.emission_maxwavelength).toDouble();
+            d.extiction_coefficient_wavelength=set.value(gn+"molar_extinction_wavelength", d.excitation_maxwavelength).toDouble();
             fluorophores[groups[i]]=d;
 
         }
@@ -146,6 +148,7 @@ void SpectrumManager::loadFilterDatabase(const QString &ininame, const QStringLi
             d.manufacturer=set.value(gn+"manufacturer", "").toString();
             d.reference=set.value(gn+"reference", "").toString();
             d.orderNo=set.value(gn+"oder_no", "").toString();
+            d.typical_wavelength=set.value(gn+"typical_wavelength", NAN).toDouble();
             QString fn;
             int fnID=0;
             bool fnSepWL;
@@ -156,6 +159,10 @@ void SpectrumManager::loadFilterDatabase(const QString &ininame, const QStringLi
             fnSepWL=set.value(gn+"spectrum_separatewavelengths", false).toBool();
             if (QFile::exists(fn)) {
                 d.spectrum=addSpectrum(fn, fnID, fnSepWL, set.value(gn+"spectrum_reference", d.reference).toString());
+            }
+            if ((!QFFloatIsOK(d.typical_wavelength) || d.typical_wavelength<=0) && spectrumExists(d.spectrum)) {
+                spectra[d.spectrum]->ensureSpectrum();
+                d.typical_wavelength=spectra[d.spectrum]->getSpectrumMaxWavelength();
             }
 
             filters[groups[i]]=d;
@@ -187,6 +194,7 @@ void SpectrumManager::loadLightSourceDatabase(const QString &ininame, const QStr
             d.manufacturer=set.value(gn+"manufacturer", "").toString();
             d.reference=set.value(gn+"reference", "").toString();
             d.orderNo=set.value(gn+"oder_no", "").toString();
+            d.typical_wavelength=set.value(gn+"typical_wavelength", NAN).toDouble();
             QString fn;
             int fnID=0;
             bool fnSepWL;
@@ -197,6 +205,10 @@ void SpectrumManager::loadLightSourceDatabase(const QString &ininame, const QStr
             fnSepWL=set.value(gn+"spectrum_separatewavelengths", false).toBool();
             if (QFile::exists(fn)) {
                 d.spectrum=addSpectrum(fn, fnID, fnSepWL, set.value(gn+"spectrum_reference", d.reference).toString());
+            }
+            if ((!QFFloatIsOK(d.typical_wavelength) || d.typical_wavelength<=0) && spectrumExists(d.spectrum)) {
+                spectra[d.spectrum]->ensureSpectrum();
+                d.typical_wavelength=spectra[d.spectrum]->getSpectrumMaxWavelength();
             }
 
             lightsources[groups[i]]=d;
@@ -231,7 +243,7 @@ int SpectrumManager::addSpectrum(const QString& filename, int ID, bool separateW
 
 SpectrumManager::Spectrum::Spectrum()
 {
-    spectral_interpolation_type=gsl_interp_cspline;
+    spectral_interpolation_type=gsl_interp_linear;
     accel=NULL;
     spline=NULL;
     spectrumIDInFile=0;
@@ -320,6 +332,8 @@ double SpectrumManager::Spectrum::getSpectrumAt(double lambda)
 {
     //ensureSpectrum();
     if (!spline || !accel || !wavelength || !spectrum || N<=0) return 0;
+    if (lambda<wavelength[0]) return 0;
+    if (lambda>wavelength[N-1]) return 0;
     return gsl_spline_eval(spline,lambda, accel);
 }
 
@@ -327,7 +341,98 @@ double SpectrumManager::Spectrum::getSpectrumIntegral(double lambda_start, doubl
 {
     //ensureSpectrum();
     if (!spline || !accel || !wavelength || !spectrum || N<=0) return 0;
-    return gsl_spline_eval_integ(spline, lambda_start, lambda_end, accel);
+    double st=lambda_start;
+    double en=lambda_end;
+    if (st<wavelength[0]) st=wavelength[0];
+    if (en>wavelength[N-1]) en=wavelength[N-1];
+    double res=0;
+    if (gsl_spline_eval_integ_e(spline, st, en, accel, &res)) {
+        qDebug()<<"int "<<filename<<"    "<<st<<" ... "<<en<<"   = "<<0;
+        return 0;
+    }
+    qDebug()<<"int "<<filename<<"    "<<st<<" ... "<<en<<"   = "<<res;
+    return res;
+}
+
+double SpectrumManager::Spectrum::getMulSpectrumIntegral(SpectrumManager::Spectrum *multWith, double lambda_start, double lambda_end)
+{
+    try {
+        QVector<double> wl;
+        QVector<double> sp;
+
+        int inBetweenThis=0;
+        int thisStart=-1;
+        for (int i=0; i<N; i++) {
+            if (wavelength[i]>lambda_start && wavelength[i]<=lambda_end) {
+                if (thisStart<0) thisStart=i;
+                inBetweenThis++;
+            }
+        }
+        if (thisStart>0) {
+            thisStart--;
+            inBetweenThis++;
+        }
+        if (inBetweenThis<N) {
+            inBetweenThis++;
+        }
+
+        int inBetweenOther=0;
+        int otherStart=-1;
+        for (int i=0; i<multWith->N; i++) {
+            if (multWith->wavelength[i]>lambda_start && multWith->wavelength[i]<=lambda_end) {
+                if (otherStart<0) otherStart=i;
+                inBetweenOther++;
+            }
+        }
+        if (otherStart>0) {
+            otherStart--;
+            inBetweenOther++;
+        }
+        if (inBetweenOther<multWith->N) {
+            inBetweenOther++;
+        }
+
+
+        if (inBetweenThis>inBetweenOther) {
+            for (int i=thisStart; i<thisStart+inBetweenThis; i++) {
+                wl<<wavelength[i];
+                sp<<spectrum[i]*multWith->getSpectrumAt(wavelength[i]);
+            }
+        } else {
+            for (int i=otherStart; i<otherStart+inBetweenOther; i++) {
+                wl<<multWith->wavelength[i];
+                sp<<multWith->spectrum[i]*getSpectrumAt(multWith->wavelength[i]);
+            }
+        }
+
+        gsl_interp_accel *accel= gsl_interp_accel_alloc();
+        gsl_spline *spline=gsl_spline_alloc(spectral_interpolation_type,wl.size());
+        gsl_spline_init(spline, wl.data(), sp.data(), wl.size());
+        double res;
+        if (gsl_spline_eval_integ_e(spline, lambda_start, lambda_end, accel, &res)) {
+            res=0;
+        }
+        qDebug()<<"int "<<filename<<"*"<<multWith->filename<<"    "<<lambda_start<<" ... "<<lambda_end<<"   = "<<res;
+        qDebug()<<"    "<<arrayToString(wl.data(), wl.size());
+        qDebug()<<"    "<<arrayToString(sp.data(), sp.size());
+
+        gsl_interp_accel_free(accel);
+        gsl_spline_free(spline);
+        return res;
+    } catch (std::exception& E) {
+        qDebug()<<"ERROR: "<<E.what();
+        return 0;
+    }
+
+}
+
+double SpectrumManager::Spectrum::getMulSpectrumIntegral(SpectrumManager::Spectrum *multWith)
+{
+    double lstart=getWavelengthMin();
+    double lend=getWavelengthMax();
+    if (multWith->getWavelengthMin()>lstart) lstart=multWith->getWavelengthMin();
+    if (multWith->getWavelengthMax()<lend) lend=multWith->getWavelengthMax();
+    return getMulSpectrumIntegral(multWith, lstart, lend);
 }
 
 double SpectrumManager::Spectrum::getWavelengthMin()
@@ -384,8 +489,24 @@ void SpectrumManager::Spectrum::internalInit(const QVector<double> &lambda, cons
         this->spectrum=(double*)realloc(this->spectrum, N*sizeof(double));
         if (accel) gsl_interp_accel_free(accel);
         if (spline) gsl_spline_free(spline);
-        copyArray(this->wavelength, lambda.data(), N);
-        copyArray(this->spectrum, eff.data(), N);
+        /*copyArray(this->wavelength, lambda.data(), N);
+        copyArray(this->spectrum, eff.data(), N);*/
+
+        QVector<double> l=lambda;
+        QVector<double> ef=eff;
+        statisticsSort2(l.data(), ef.data(), N);
+
+        int N2=N;
+        N=0;
+        for (int i=0; i<N2; i++) {
+            if (i==0 || (i>0&&l[i]>l[i-1])) {
+                this->wavelength[N]=l[i];
+                this->spectrum[N]=ef[i];
+                N++;
+            }
+        }
+
+
 
         //qDebug()<<arrayToString(this->wavelength, N);
         //qDebug()<<arrayToString(this->spectrum, N);
@@ -433,7 +554,7 @@ bool SpectrumManager::spectrumExists(int f)
     return (f>=0 && f<spectra.size());
 }
 
-SpectrumManager::FluorophorData SpectrumManager::getFluorophoreData(const QString &name)
+SpectrumManager::FluorophoreData SpectrumManager::getFluorophoreData(const QString &name)
 {
     return fluorophores[name];
 }
@@ -469,7 +590,7 @@ SpectrumManager::LightSourceData::LightSourceData()
     spectrum=-1;
 }
 
-SpectrumManager::FluorophorData::FluorophorData()
+SpectrumManager::FluorophoreData::FluorophoreData()
 {
     fluorescence_efficiency=0;
     fluorescence_lifetime=0;

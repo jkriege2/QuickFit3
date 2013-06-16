@@ -58,6 +58,7 @@ class QFESpectraViewer : public QObject, public QFExtensionBase, public QFPlugin
 
 
         SpectrumManager* getSpectrumManager() const;
+        void reloadDatabases();
 
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */

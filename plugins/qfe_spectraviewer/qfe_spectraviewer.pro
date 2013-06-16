@@ -15,18 +15,33 @@ DESTDIR = $${QFOUTPUT}/plugins/
 HEADERS += qfespectraviewer.h \
     qfespectraviewerdialog.h \
     optionswidget.h \
-    spectrummanager.h
+    spectrummanager.h \
+    qfespectraviewerlightsourceeditor.h \
+    ../../../../../LIB/trunk/statistics_tools.h \
+    qfespectraviewerfluorophoreditor.h \
+    qfespectraviewerfiltereditor.h \
+    qfespectraviewerspilloverdialog.h
 
 SOURCES += qfespectraviewer.cpp \
     qfespectraviewerdialog.cpp \
     optionswidget.cpp \
-    spectrummanager.cpp
+    spectrummanager.cpp \
+    qfespectraviewerlightsourceeditor.cpp \
+    ../../../../../LIB/trunk/statistics_tools.cpp \
+    qfespectraviewerfluorophoreditor.cpp \
+    qfespectraviewerfiltereditor.cpp \
+    qfespectraviewerspilloverdialog.cpp
 
 FORMS = \
     qfespectraviewerdialog.ui \
-    optionswidget.ui
+    optionswidget.ui \
+    qfespectraviewerlightsourceeditor.ui \
+    qfespectraviewerfluorophoreditor.ui \
+    qfespectraviewerfiltereditor.ui \
+    qfespectraviewerspilloverdialog.ui
 
-RESOURCES += qfespectraviewer.qrc
+RESOURCES += qfespectraviewer.qrc \
+    ../../lib/lib.qrc
 
 TRANSLATIONS= ./translations/de.qfe_spectraviewer.ts
 

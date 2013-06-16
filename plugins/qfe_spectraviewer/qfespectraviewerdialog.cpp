@@ -5,10 +5,19 @@
 #include "spectrummanager.h"
 #include "jkautooutputtimer.h"
 #include <QToolBar>
+#include "qfespectraviewerlightsourceeditor.h"
+#include "qfespectraviewerfiltereditor.h"
+#include "qfespectraviewerfluorophoreditor.h"
+#include <QSettings>
+#include "qfespectraviewerspilloverdialog.h"
 
 double plotFunctionSpectralLine(double x, void* data) {
     double* d=(double*)data;
     return qfCauchy(x, d[0], d[1], d[2]);
+}
+double plotFunctionSmoothSpectrum(double x, void* data) {
+    SpectrumManager::Spectrum* d=(SpectrumManager::Spectrum*)data;
+    return d->getSpectrumAt(x);
 }
 
 QFESpectraViewerDialog::QFESpectraViewerDialog(QFESpectraViewer *plugin, QWidget *parent) :
@@ -26,11 +35,52 @@ QFESpectraViewerDialog::QFESpectraViewerDialog(QFESpectraViewer *plugin, QWidget
     connect(actClose, SIGNAL(triggered()), this, SLOT(close()));
     mainToolbar->addAction(actClose);
     mainToolbar->addSeparator();
-    ui->plotter->populateToolbar(mainToolbar);
+
+    QToolButton* btn=new QToolButton(this);
+    btn->setIcon(QIcon(":/lib/prop_add.png"));
+    btn->setText(tr("create new ..."));
+    btn->setPopupMode(QToolButton::InstantPopup);
+    QAction* actNewLightsource=new QAction(QIcon(":/qfe_spectraviewer/lightsource.png"), tr("... &lightsource"), this);
+    connect(actNewLightsource, SIGNAL(triggered()), this, SLOT(createLightSourceSpectrum()));
+    btn->addAction(actNewLightsource);
+    QAction* actNewFilter=new QAction(QIcon(":/qfe_spectraviewer/filter.png"), tr("... &filter"), this);
+    connect(actNewFilter, SIGNAL(triggered()), this, SLOT(createFilterSpectrum()));
+    btn->addAction(actNewFilter);
+    QAction* actFluorophore=new QAction(QIcon(":/qfe_spectraviewer/fluorophore.png"), tr("... f&luorophore"), this);
+    connect(actFluorophore, SIGNAL(triggered()), this, SLOT(createFluorophoreSpectrum()));
+    btn->addAction(actFluorophore);
+    mainToolbar->addWidget(btn);
+
+    mainToolbar->addSeparator();
+
+    QAction* actSpillover=new QAction(tr("&Spillover Table"), this);
+    connect(actSpillover, SIGNAL(triggered()), this, SLOT(calcSpilloverTable()));
+    mainToolbar->addAction(actSpillover);
+
+    /*mainToolbar->addSeparator();
+    ui->plotter->populateToolbar(mainToolbar);*/
+    ui->plotter->set_toolbarAlwaysOn(true);
 
     //qDebug()<<"loading fluorophores";
+    reloadComboboxes();
+    //qDebug()<<"setting model";
+    ui->tabFluorophoreInfo->setModel(&modItemProperties);
+
+
+    //qDebug()<<"read settings";
+    readSettings();
+    //qDebug()<<"constructor done";
+}
+
+void QFESpectraViewerDialog::reloadComboboxes()
+{
+    ui->lstSpectra->setCurrentRow(-1);
+    currentIndex=-1;
+    spectrumSelected();
+
     QStringList sl=manager->getFluorophores();
     ui->cmbFluorophore->clear();
+    ui->cmbFluorophore->setUpdatesEnabled(false);
     for (int i=0; i<sl.size(); i++) {
         if (manager->fluorophoreExists(sl[i])) {
             //qDebug()<<sl[i]<<manager->getFluorophoreData(sl[i]).name;
@@ -39,14 +89,45 @@ QFESpectraViewerDialog::QFESpectraViewerDialog(QFESpectraViewer *plugin, QWidget
             //ui->cmbFluorophore->addItem(sl[i], sl[i]);
         }
     }
+    ui->cmbFluorophore->setUpdatesEnabled(true);
 
-    //qDebug()<<"setting model";
-    ui->tabFluorophoreInfo->setModel(&modItemProperties);
+    sl=manager->getLightSources();
+    ui->cmbLightsource->clear();
+    ui->cmbLightsource->setUpdatesEnabled(false);
+    for (int i=0; i<sl.size(); i++) {
+        if (manager->lightsourceExists(sl[i])) {
+            //qDebug()<<sl[i]<<manager->getFluorophoreData(sl[i]).name;
+            ui->cmbLightsource->addItem(manager->getLightSourceData(sl[i]).name, sl[i]);
+            //qDebug()<<sl[i]<<manager->getFluorophoreData(sl[i]).name;
+            //ui->cmbFluorophore->addItem(sl[i], sl[i]);
+        }
+    }
+    ui->cmbLightsource->setUpdatesEnabled(true);
+
+    sl=manager->getFilters();
+    ui->cmbFilter->clear();
+    ui->cmbFilter->setUpdatesEnabled(false);
+    for (int i=0; i<sl.size(); i++) {
+        if (manager->filterExists(sl[i])) {
+            //qDebug()<<sl[i]<<manager->getFluorophoreData(sl[i]).name;
+            ui->cmbFilter->addItem(manager->getFilterData(sl[i]).name, sl[i]);
+            //qDebug()<<sl[i]<<manager->getFluorophoreData(sl[i]).name;
+            //ui->cmbFluorophore->addItem(sl[i], sl[i]);
+        }
+    }
+    ui->cmbFilter->setUpdatesEnabled(true);
 
 
-    //qDebug()<<"read settings";
-    readSettings();
-    //qDebug()<<"constructor done";
+    ui->lstSpectra->setCurrentRow(0);
+    spectrumSelected();
+}
+
+void QFESpectraViewerDialog::calcSpilloverTable()
+{
+    QFESpectraViewerSpilloverDialog* dlg=new QFESpectraViewerSpilloverDialog(this);
+    dlg->init(plotItems, manager);
+    dlg->exec();
+    delete dlg;
 }
 
 QFESpectraViewerDialog::~QFESpectraViewerDialog()
@@ -156,6 +237,7 @@ void QFESpectraViewerDialog::on_btnAddLightsource_clicked()
     spectrumSelected();
 }
 
+
 void QFESpectraViewerDialog::on_btnDelete_clicked()
 {
     //JKAutoOutputTimer tim("on_btnDelete_clicked");
@@ -168,6 +250,7 @@ void QFESpectraViewerDialog::on_btnDelete_clicked()
     if (plotItems.size()<=0) currentIndex=0;
     else ui->lstSpectra->setCurrentRow(0);
     spectrumSelected();
+
 }
 
 void QFESpectraViewerDialog::spectrumSelected()
@@ -182,6 +265,7 @@ void QFESpectraViewerDialog::spectrumSelected()
     if (idx<0) currentIndex=-1;
 
     loadToWidgets();
+    updatePlots();
 }
 
 void QFESpectraViewerDialog::saveFromWidgets()
@@ -202,7 +286,7 @@ void QFESpectraViewerDialog::saveFromWidgets()
         plotItems[currentIndex].displayName="";
         if (ui->cmbFilterType->currentIndex()==0) {
             plotItems[currentIndex].type=qfesFilterBandpass;
-            plotItems[currentIndex].displayName=tr("BP %1/%2").arg(ui->spinFilterCentral->value()).arg(ui->spinLaserLinewidth->value());
+            plotItems[currentIndex].displayName=tr("BP %1/%2").arg(ui->spinFilterCentral->value()).arg(ui->spinFilterLinewidth->value());
             plotItems[currentIndex].centralWavelength=ui->spinFilterCentral->value();
             plotItems[currentIndex].spectralWidth=ui->spinFilterLinewidth->value();
         } else {
@@ -235,15 +319,25 @@ void QFESpectraViewerDialog::saveFromWidgets()
 
     }
     updatePlots();
+    updateItemPropertiesModel();
 
 }
 
 void QFESpectraViewerDialog::loadToWidgets()
 {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //JKAutoOutputTimer tim("loadToWidgets");
     disconnect(ui->chkFluorophoreShowEmission, SIGNAL(toggled(bool)), this, SLOT(saveFromWidgets()));
     disconnect(ui->chkFluorophoreShowExcitation, SIGNAL(toggled(bool)), this, SLOT(saveFromWidgets()));
     disconnect(ui->cmbFluorophore, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
+    disconnect(ui->spinLaserCentral, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
+    disconnect(ui->spinLaserLinewidth, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
+    disconnect(ui->cmbLightSourceType, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
+    disconnect(ui->cmbLightsource, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
+    disconnect(ui->spinFilterCentral, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
+    disconnect(ui->spinFilterLinewidth, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
+    disconnect(ui->cmbFilterType, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
+    disconnect(ui->cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
     if (currentIndex<0 || currentIndex>=plotItems.size()) {
         ui->stackSpectraEditor->setCurrentWidget(ui->widEmpty);
     } else {
@@ -306,10 +400,12 @@ void QFESpectraViewerDialog::loadToWidgets()
         }
     }
     updateItemPropertiesModel();
+    QApplication::restoreOverrideCursor();
 }
 
 void QFESpectraViewerDialog::updateItemPropertiesModel()
 {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //qDebug()<<"updateItemPropertiesModel: "<<currentIndex;
     //JKAutoOutputTimer tim("loadToWidgets");
     modItemProperties.disableSignals();
@@ -320,7 +416,7 @@ void QFESpectraViewerDialog::updateItemPropertiesModel()
         if (plotItems[currentIndex].type==qfesFluorohpore)  {
             //qDebug()<<"updateItemPropertiesModel: is fluorophore";
             if (manager->fluorophoreExists(plotItems[currentIndex].name)) {
-                SpectrumManager::FluorophorData fl=manager->getFluorophoreData(plotItems[currentIndex].name);
+                SpectrumManager::FluorophoreData fl=manager->getFluorophoreData(plotItems[currentIndex].name);
                 //qDebug()<<"updateItemPropertiesModel: fl.name="<<fl.name;
                 int row=0;
                 modItemProperties.setCellCreate(row,0, tr("name"));
@@ -348,7 +444,7 @@ void QFESpectraViewerDialog::updateItemPropertiesModel()
                 modItemProperties.setCellCreate(row,1, fl.condition);
                 row++;
                 modItemProperties.setCellCreate(row,0, tr("fl. efficiency [%]"));
-                modItemProperties.setCellCreate(row,1, fl.fluorescence_efficiency*100.0);
+                modItemProperties.setCellCreate(row,1, tr("%1 @ %2nm").arg(fl.fluorescence_efficiency*100.0).arg(fl.fluorescence_efficiency_wavelength));
                 row++;
                 modItemProperties.setCellCreate(row,0, tr("fl. lifetime [ns]"));
                 modItemProperties.setCellCreate(row,1, fl.fluorescence_lifetime*1e9);
@@ -414,6 +510,122 @@ void QFESpectraViewerDialog::updateItemPropertiesModel()
     modItemProperties.enableSignals(true);
     ui->tabFluorophoreInfo->setModel(&modItemProperties);
     ui->tabFluorophoreInfo->resizeColumnsToContents();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFESpectraViewerDialog::createLightSourceSpectrum()
+{
+    QFESpectraViewerLightsourceEditor* dlg=new QFESpectraViewerLightsourceEditor(this);
+    if (dlg->exec()) {
+        QDir d(ProgramOptions::getConfigValue("qfe_spectraviewer/user_database", QFPluginServices::getInstance()->getPluginConfigDirectory("qfe_spectraviewer")).toString());
+        QSettings set(d.absoluteFilePath("ligtsources.ini"), QSettings::IniFormat);
+        dlg->addDataAndSpectrum(set, manager);
+        ui->lstSpectra->setCurrentRow(-1);
+        currentIndex=-1;
+        spectrumSelected();
+
+        plugin->reloadDatabases();
+        reloadComboboxes();
+    }
+    delete dlg;
+}
+
+
+void QFESpectraViewerDialog::on_btnEditLightsource_clicked()
+{
+    if (currentIndex<0 || currentIndex>=plotItems.size()) return;
+    QFESpectraViewerLightsourceEditor* dlg=new QFESpectraViewerLightsourceEditor(this);
+    if (manager->lightsourceExists(plotItems[currentIndex].name)) dlg->setFromData(plotItems[currentIndex].name, manager->getLightSourceData(plotItems[currentIndex].name), manager);
+    if (dlg->exec()) {
+        QDir d(ProgramOptions::getConfigValue("qfe_spectraviewer/user_database", QFPluginServices::getInstance()->getPluginConfigDirectory("qfe_spectraviewer")).toString());
+        QSettings set(d.absoluteFilePath("ligtsources.ini"), QSettings::IniFormat);
+        dlg->addDataAndSpectrum(set, manager);
+        ui->lstSpectra->setCurrentRow(-1);
+        currentIndex=-1;
+        spectrumSelected();
+
+        plugin->reloadDatabases();
+        reloadComboboxes();
+        updatePlots();
+    }
+    delete dlg;
+}
+
+void QFESpectraViewerDialog::createFilterSpectrum()
+{
+    QFESpectraViewerFilterEditor* dlg=new QFESpectraViewerFilterEditor(this);
+    if (dlg->exec()) {
+        QDir d(ProgramOptions::getConfigValue("qfe_spectraviewer/user_database", QFPluginServices::getInstance()->getPluginConfigDirectory("qfe_spectraviewer")).toString());
+        QSettings set(d.absoluteFilePath("filters.ini"), QSettings::IniFormat);
+        dlg->addDataAndSpectrum(set, manager);
+        ui->lstSpectra->setCurrentRow(-1);
+        currentIndex=-1;
+        spectrumSelected();
+
+        plugin->reloadDatabases();
+        reloadComboboxes();
+    }
+    delete dlg;
+}
+
+
+void QFESpectraViewerDialog::on_btnEditFilter_clicked()
+{
+    if (currentIndex<0 || currentIndex>=plotItems.size()) return;
+    QFESpectraViewerFilterEditor* dlg=new QFESpectraViewerFilterEditor(this);
+    if (manager->filterExists(plotItems[currentIndex].name)) dlg->setFromData(plotItems[currentIndex].name, manager->getFilterData(plotItems[currentIndex].name), manager);
+    if (dlg->exec()) {
+        QDir d(ProgramOptions::getConfigValue("qfe_spectraviewer/user_database", QFPluginServices::getInstance()->getPluginConfigDirectory("qfe_spectraviewer")).toString());
+        QSettings set(d.absoluteFilePath("filters.ini"), QSettings::IniFormat);
+        dlg->addDataAndSpectrum(set, manager);
+        ui->lstSpectra->setCurrentRow(-1);
+        currentIndex=-1;
+        spectrumSelected();
+
+        plugin->reloadDatabases();
+        reloadComboboxes();
+        updatePlots();
+    }
+    delete dlg;
+}
+
+
+void QFESpectraViewerDialog::createFluorophoreSpectrum()
+{
+    QFESpectraViewerFluorophoreEditor* dlg=new QFESpectraViewerFluorophoreEditor(this);
+    if (dlg->exec()) {
+        QDir d(ProgramOptions::getConfigValue("qfe_spectraviewer/user_database", QFPluginServices::getInstance()->getPluginConfigDirectory("qfe_spectraviewer")).toString());
+        QSettings set(d.absoluteFilePath("fluorophors.ini"), QSettings::IniFormat);
+        dlg->addDataAndSpectrum(set, manager);
+        ui->lstSpectra->setCurrentRow(-1);
+        currentIndex=-1;
+        spectrumSelected();
+
+        plugin->reloadDatabases();
+        reloadComboboxes();
+    }
+    delete dlg;
+}
+
+
+void QFESpectraViewerDialog::on_btnEditFluorophore_clicked()
+{
+    if (currentIndex<0 || currentIndex>=plotItems.size()) return;
+    QFESpectraViewerFluorophoreEditor* dlg=new QFESpectraViewerFluorophoreEditor(this);
+    if (manager->fluorophoreExists(plotItems[currentIndex].name)) dlg->setFromData(plotItems[currentIndex].name, manager->getFluorophoreData(plotItems[currentIndex].name), manager);
+    if (dlg->exec()) {
+        QDir d(ProgramOptions::getConfigValue("qfe_spectraviewer/user_database", QFPluginServices::getInstance()->getPluginConfigDirectory("qfe_spectraviewer")).toString());
+        QSettings set(d.absoluteFilePath("fluorophors.ini"), QSettings::IniFormat);
+        dlg->addDataAndSpectrum(set, manager);
+        ui->lstSpectra->setCurrentRow(-1);
+        currentIndex=-1;
+        spectrumSelected();
+
+        plugin->reloadDatabases();
+        reloadComboboxes();
+        updatePlots();
+    }
+    delete dlg;
 }
 
 void QFESpectraViewerDialog::writeSettings() {
@@ -425,6 +637,7 @@ void QFESpectraViewerDialog::writeSettings() {
             saveWidgetGeometry(*set, this, plugin->getID()+"/widget/");
             //saveSplitter(*set, ui->splitter, plugin->getID()+"/splitter/");
             saveSpectraConfig(*set,plugin->getID()+QString("/lastSpectra/") );
+            //set->setValue(plugin->getID()+"/chkSmoothSpectra", ui->chkSmoothSpectra->isChecked());
 
         }
     }
@@ -439,6 +652,7 @@ void QFESpectraViewerDialog::readSettings() {
             loadWidgetGeometry(*set, this, plugin->getID()+"/widget/");
             //loadSplitter(*set, ui->splitter, plugin->getID()+"/splitter/");
             loadSpectraConfig(*set,plugin->getID()+QString("/lastSpectra/") );
+            //ui->chkSmoothSpectra->setChecked(set->value(plugin->getID()+"/chkSmoothSpectra", true).toBool());
 
 
         }
@@ -447,6 +661,7 @@ void QFESpectraViewerDialog::readSettings() {
 
 void QFESpectraViewerDialog::updatePlots()
 {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //JKAutoOutputTimer tim("updatePlots");
     ui->plotter->set_doDrawing(false);
 
@@ -460,41 +675,86 @@ void QFESpectraViewerDialog::updatePlots()
     for (int i=0; i<plotItems.size(); i++) {
         QFESpectraViewerPlotItem item=plotItems[i];
         if (item.type==qfesFluorohpore && manager->fluorophoreExists(item.name)) {
-            SpectrumManager::FluorophorData fl=manager->getFluorophoreData(item.name);
-            if (manager->spectrumExists(fl.spectrum_abs))  {
-                JKQTPxyLineGraph* g=new JKQTPxyLineGraph(ui->plotter->get_plotter());
-                SpectrumManager::Spectrum* spec=manager->getSpectrum(fl.spectrum_abs);
-                //spec->ensureSpectrum();
-                size_t cWL=ds->addCopiedColumn(spec->getWavelength(), spec->getN(), tr("%1_abs_wavelength").arg(item.name));
-                size_t cSP=ds->addCopiedColumn(spec->getSpectrum(), spec->getN(), tr("%1_abs_spectrum").arg(item.name));
-                g->set_symbol(JKQTPnoSymbol);
-                g->set_drawLine(true);
-                g->set_lineWidth(2);
-                g->set_style(Qt::DashLine);
-                g->set_xColumn(cWL);
-                g->set_yColumn(cSP);
-                g->set_color(wavelengthToColor(spec->getSpectrumMaxWavelength()));
-                g->set_title(tr("abs: %1").arg(fl.name));
-                ui->plotter->addGraph(g);
-            }
-            if (manager->spectrumExists(fl.spectrum_fl))  {
-                JKQTPfilledCurveXGraph* g=new JKQTPfilledCurveXGraph(ui->plotter->get_plotter());
-                SpectrumManager::Spectrum* spec=manager->getSpectrum(fl.spectrum_fl);
-                size_t cWL=ds->addCopiedColumn(spec->getWavelength(), spec->getN(), tr("%1_fl_wavelength").arg(item.name));
-                size_t cSP=ds->addCopiedColumn(spec->getSpectrum(), spec->getN(), tr("%1_fl_spectrum").arg(item.name));
-                //g->set_symbol(JKQTPnoSymbol);
-                g->set_drawLine(true);
-                g->set_lineWidth(2);
-                g->set_style(Qt::DotLine);
-                QColor col=wavelengthToColor(spec->getSpectrumMaxWavelength());
-                g->set_color(col);
-                col.setAlphaF(0.5);
-                g->set_fillColor(col);
-                g->set_xColumn(cWL);
-                g->set_yColumn(cSP);
-                g->set_title(tr("fl: %1").arg(fl.name));
-                ui->plotter->addGraph(g);
-            }
+            SpectrumManager::FluorophoreData fl=manager->getFluorophoreData(item.name);
+            //if (!ui->chkSmoothSpectra->isChecked()) {
+                if (manager->spectrumExists(fl.spectrum_abs) && item.showExcitation)  {
+                    JKQTPxyLineGraph* g=new JKQTPxyLineGraph(ui->plotter->get_plotter());
+                    SpectrumManager::Spectrum* spec=manager->getSpectrum(fl.spectrum_abs);
+                    //spec->ensureSpectrum();
+                    size_t cWL=ds->addCopiedColumn(spec->getWavelength(), spec->getN(), tr("%1_abs_wavelength").arg(item.name));
+                    size_t cSP=ds->addCopiedColumn(spec->getSpectrum(), spec->getN(), tr("%1_abs_spectrum").arg(item.name));
+                    g->set_symbol(JKQTPnoSymbol);
+                    g->set_drawLine(true);
+                    g->set_lineWidth(2);
+                    g->set_style(Qt::DashLine);
+                    g->set_xColumn(cWL);
+                    g->set_yColumn(cSP);
+                    g->set_color(wavelengthToColor(spec->getSpectrumMaxWavelength()));
+                    if (manager->spectrumExists(fl.spectrum_fl))  {
+                        SpectrumManager::Spectrum* spec1=manager->getSpectrum(fl.spectrum_fl);
+                        g->set_color(wavelengthToColor(spec1->getSpectrumMaxWavelength()));
+                    }
+                    g->set_title(tr("abs: %1").arg(fl.name));
+                    ui->plotter->addGraph(g);
+                }
+                if (manager->spectrumExists(fl.spectrum_fl) && item.showEmission)  {
+                    JKQTPfilledCurveXGraph* g=new JKQTPfilledCurveXGraph(ui->plotter->get_plotter());
+                    SpectrumManager::Spectrum* spec=manager->getSpectrum(fl.spectrum_fl);
+                    size_t cWL=ds->addCopiedColumn(spec->getWavelength(), spec->getN(), tr("%1_fl_wavelength").arg(item.name));
+                    size_t cSP=ds->addCopiedColumn(spec->getSpectrum(), spec->getN(), tr("%1_fl_spectrum").arg(item.name));
+                    //g->set_symbol(JKQTPnoSymbol);
+                    g->set_drawLine(true);
+                    g->set_lineWidth(2);
+                    g->set_style(Qt::DotLine);
+                    QColor col=wavelengthToColor(spec->getSpectrumMaxWavelength());
+                    g->set_color(col);
+                    col.setAlphaF(0.5);
+                    g->set_fillColor(col);
+                    g->set_xColumn(cWL);
+                    g->set_yColumn(cSP);
+                    g->set_title(tr("fl: %1").arg(fl.name));
+                    ui->plotter->addGraph(g);
+                }
+            /*} else {
+                if (manager->spectrumExists(fl.spectrum_abs) && item.showExcitation)  {
+                    JKQTPxFunctionLineGraph* g=new  JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
+                    SpectrumManager::Spectrum* spec=manager->getSpectrum(fl.spectrum_abs);
+                    g->set_plotFunction(plotFunctionSmoothSpectrum);
+                    g->set_params((void*)spec);
+                    //spec->ensureSpectrum();
+                    size_t cWL=ds->addCopiedColumn(spec->getWavelength(), spec->getN(), tr("%1_abs_wavelength").arg(item.name));
+                    size_t cSP=ds->addCopiedColumn(spec->getSpectrum(), spec->getN(), tr("%1_abs_spectrum").arg(item.name));
+                    g->set_drawLine(true);
+                    g->set_lineWidth(2);
+                    g->set_style(Qt::DashLine);
+                    g->set_color(wavelengthToColor(spec->getSpectrumMaxWavelength()));
+                    if (manager->spectrumExists(fl.spectrum_fl))  {
+                        SpectrumManager::Spectrum* spec1=manager->getSpectrum(fl.spectrum_fl);
+                        g->set_color(wavelengthToColor(spec1->getSpectrumMaxWavelength()));
+                    }
+                    g->set_title(tr("abs: %1").arg(fl.name));
+                    ui->plotter->addGraph(g);
+                }
+                if (manager->spectrumExists(fl.spectrum_fl) && item.showEmission)  {
+                    JKQTPxFunctionLineGraph* g=new  JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
+                    SpectrumManager::Spectrum* spec=manager->getSpectrum(fl.spectrum_fl);
+                    g->set_plotFunction(plotFunctionSmoothSpectrum);
+                    g->set_params((void*)spec);
+                    size_t cWL=ds->addCopiedColumn(spec->getWavelength(), spec->getN(), tr("%1_fl_wavelength").arg(item.name));
+                    size_t cSP=ds->addCopiedColumn(spec->getSpectrum(), spec->getN(), tr("%1_fl_spectrum").arg(item.name));
+                    //g->set_symbol(JKQTPnoSymbol);
+                    g->set_drawLine(true);
+                    g->set_lineWidth(2);
+                    g->set_style(Qt::DotLine);
+                    QColor col=wavelengthToColor(spec->getSpectrumMaxWavelength());
+                    g->set_color(col);
+                    col.setAlphaF(0.5);
+                    g->set_fillColor(col);
+                    g->set_title(tr("fl: %1").arg(fl.name));
+                    ui->plotter->addGraph(g);
+                }
+            }*/
+
         } else if (item.type==qfesLightSourceSingleLine) {
             /*JKQTPxFunctionLineGraph* g=new  JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
             QVector<double> p;
@@ -547,30 +807,53 @@ void QFESpectraViewerDialog::updatePlots()
             ui->plotter->addGraph(g);
         } else if (item.type==qfesLightSourceSpectrum && manager->lightsourceExists(item.name)) {
             SpectrumManager::LightSourceData ls=manager->getLightSourceData(item.name);
-            if (manager->spectrumExists(ls.spectrum))  {
-                JKQTPfilledCurveXGraph* g=new JKQTPfilledCurveXGraph(ui->plotter->get_plotter());
-                SpectrumManager::Spectrum* spec=manager->getSpectrum(ls.spectrum);
-                //spec->ensureSpectrum();
-                size_t cWL=ds->addCopiedColumn(spec->getWavelength(), spec->getN(), tr("%1_wavelength").arg(item.name));
-                size_t cSP=ds->addCopiedColumn(spec->getSpectrum(), spec->getN(), tr("%1_spectrum").arg(item.name));
-                g->set_drawLine(true);
-                g->set_lineWidth(2);
-                g->set_style(Qt::DashLine);
-                g->set_xColumn(cWL);
-                g->set_yColumn(cSP);
-                QColor col=QColor("darkgrey");
-                g->set_color(col);
-                col.setAlphaF(0.25);
-                g->set_fillColor(col);
-                g->set_title(tr("LIGHT: %1").arg(ls.name));
-                ui->plotter->addGraph(g);
-            }
+            //if (!ui->chkSmoothSpectra->isChecked()) {
+                if (manager->spectrumExists(ls.spectrum))  {
+                    JKQTPfilledCurveXGraph* g=new JKQTPfilledCurveXGraph(ui->plotter->get_plotter());
+                    SpectrumManager::Spectrum* spec=manager->getSpectrum(ls.spectrum);
+                    //spec->ensureSpectrum();
+                    size_t cWL=ds->addCopiedColumn(spec->getWavelength(), spec->getN(), tr("%1_wavelength").arg(item.name));
+                    size_t cSP=ds->addCopiedColumn(spec->getSpectrum(), spec->getN(), tr("%1_spectrum").arg(item.name));
+                    g->set_drawLine(true);
+                    g->set_lineWidth(2);
+                    g->set_style(Qt::DashLine);
+                    g->set_xColumn(cWL);
+                    g->set_yColumn(cSP);
+                    QColor col=QColor("darkgrey");
+                    g->set_color(col);
+                    col.setAlphaF(0.25);
+                    g->set_fillColor(col);
+                    g->set_title(tr("LIGHT: %1").arg(ls.name));
+                    ui->plotter->addGraph(g);
+                }
+            /*} else {
+                if (manager->spectrumExists(ls.spectrum))  {
+                    JKQTPxFunctionLineGraph* g=new  JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
+                    SpectrumManager::Spectrum* spec=manager->getSpectrum(ls.spectrum);
+                    //spec->ensureSpectrum();
+                    size_t cWL=ds->addCopiedColumn(spec->getWavelength(), spec->getN(), tr("%1_wavelength").arg(item.name));
+                    size_t cSP=ds->addCopiedColumn(spec->getSpectrum(), spec->getN(), tr("%1_spectrum").arg(item.name));
+                    g->set_drawLine(true);
+                    g->set_lineWidth(2);
+                    g->set_style(Qt::DashLine);
+                    g->set_plotFunction(plotFunctionSmoothSpectrum);
+                    g->set_params((void*)spec);
+                    QColor col=QColor("darkgrey");
+                    g->set_color(col);
+                    col.setAlphaF(0.25);
+                    g->set_fillColor(col);
+                    g->set_title(tr("LIGHT: %1").arg(ls.name));
+                    ui->plotter->addGraph(g);
+                }
+            }*/
+
         }
     }
 
     ui->plotter->set_doDrawing(true);
     ui->plotter->zoomToFit(true, true, false, true);
     ui->plotter->update_plot();
+    QApplication::restoreOverrideCursor();
 }
 
 QFESpectraViewerPlotItem::QFESpectraViewerPlotItem(QFESpectraViewerPlotItemType type)
@@ -586,3 +869,40 @@ QFESpectraViewerPlotItem::QFESpectraViewerPlotItem(QFESpectraViewerPlotItemType 
 }
 
 
+void QFESpectraViewerDialog::on_btnMailFluorophore_clicked() {
+    /*int component=ui->comboBox->currentIndex();
+    QString datafilename=QFileInfo(plugin->getComponentDatafile(component)).fileName();
+    QFile f(plugin->getComponentDatafile(component));
+    QString filecontents;
+    if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        filecontents=f.readAll();
+        f.close();
+    }
+
+    QString inisection=QString("[component%1]\n"
+                               "name=%2\n"
+                               "molar_mass=%3\n"
+                               "reference=\"%4\"\n"
+                               "datafile=%5\n"
+                               "comment=\"%6\"\n"
+                               "comment_html=\"%7\"\n"
+                               "model=%8\n"
+                               "model_expression=\"%9\"\n").arg(component).arg(plugin->getComponentName(component)).arg(plugin->getComponentMolarMass(component)).arg(plugin->getComponentReference(component)).arg(datafilename).arg(plugin->getComponentComment(component, false)).arg(plugin->getComponentComment(component, true)).arg(plugin->getComponentModelID(component)).arg(plugin->getViscosityModelFunction(component, false));
+    QVector<double> params=plugin->getComponentModelParamaters(component);
+    for (int i=0; i<params.size(); i++) {
+        inisection+=QString("p%1=%2\n").arg(i+1).arg(params[i]);
+    }
+    QString mailcontents=tr("Dear authors,\nfind attatched my component data for inclusion in the next QuickFit release,\n\nBest,\n\n\nDATA:\n---------------------------------------------------------------------\n%1\n---------------------------------------------------------------------\n%3:\n%2\n---------------------------------------------------------------------\n").arg(inisection).arg(filecontents).arg(datafilename);
+
+    QUrl url=QUrl(QByteArray("mailto:")+qfInfoEmail().toLocal8Bit()+"?subject="+QUrl::toPercentEncoding("QuickFit3/calc_diffcoeff: new component data")+
+                  "&body="+QUrl::toPercentEncoding(mailcontents));
+    QDesktopServices::openUrl(url);*/
+}
+
+void QFESpectraViewerDialog::on_btnMailLightsource_clicked()
+{
+}
+
+void QFESpectraViewerDialog::on_btnMailFilter_clicked()
+{
+}
