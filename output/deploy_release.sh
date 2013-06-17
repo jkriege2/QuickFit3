@@ -107,11 +107,11 @@ rm a.out
 rm test~.cpp
 echo -e "\n   bit depth: ${BITDEPTH}\n\n"
 
-INSTALLER_BASENAME=quickfit3${SPECIALS}_${SVNVER}
+INSTALLER_BASENAME=quickfit3_32bit${SPECIALS}_${SVNVER}
 INSTALLER_INSTDIR="\$PROGRAMFILES32"
-ZIPFILE=quickfit3${SPECIALS}_${SVNVER}.zip
-ZIPFILESPIM=quickfit3${SPECIALS}_spimplugins_${SVNVER}.zip
-ZIPFILESPECIAL=quickfit3${SPECIALS}_special_${SVNVER}.zip
+ZIPFILE=quickfit3_32bit${SPECIALS}_${SVNVER}.zip
+ZIPFILESPIM=quickfit3_32bit${SPECIALS}_spimplugins_${SVNVER}.zip
+ZIPFILESPECIAL=quickfit3_32bit${SPECIALS}_special_${SVNVER}.zip
 if [ "${BITDEPTH}" == "64" ]; then
 	INSTALLER_INSTDIR="\$PROGRAMFILES64"
 	INSTALLER_BASENAME=quickfit3_64bit${SPECIALS}_${SVNVER}
