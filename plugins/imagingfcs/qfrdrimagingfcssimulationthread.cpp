@@ -158,11 +158,11 @@ void QFRDRImagingFCSSimulationThread::run()
         emit statusMessage(tr("running simulation ..."));
         if (!canceled) {
             for (currentFrame=0; currentFrame<frames; currentFrame++) {
+                for (int i=0; i<framesize; i++) {
+                    frame[i]=0;
+                }
 
                 //memset(frame, 0, framesize*sizeof(uint16_t));
-                for (int i=0; i<framesize; i++) {
-                    frame[i]=round(rng.randNorm(background, backgroundNoise*backgroundNoise));
-                }
                 propagateWalkers(wg, DG);
                 for (int i=0; i<wg.size(); i++) {
                     //if (i==0) qDebug()<<wg[i].x<<", "<<wg[i].y;
@@ -199,6 +199,9 @@ void QFRDRImagingFCSSimulationThread::run()
                     }
                 }
 
+                for (int i=0; i<framesize; i++) {
+                    frame[i]=frame[i]+round(rng.randNorm(background, backgroundNoise*backgroundNoise));
+                }
 
 
                 TinyTIFFWriter_writeImage(tif, frame);
