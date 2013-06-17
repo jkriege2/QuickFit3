@@ -31,6 +31,7 @@
 		    <li><b>qfe_resultstools</b>: plugin with tools to work with rdr results (currently only a calculator Tool in the Tools menu)</li>
 		    <li><b>qfe_defaultmathparserextensions</b>: plugin to extend the main math parser woth more functions (e.g. regression, model fit, ...)</li>
 		    <li><b>fccs_fit</b>: plugin to perform a global FCCS fit for non-imaging FCS data (e.g. confocal FCS data/DLS data)</li>
+		    <li><b>qfe_spectraviewer</b>: new plugin to display and compare fluorophore, lightsource and filter spectra</li>
 
 		  </ul></li>
 		  <li><b>QuickFit3:</b><ul>
@@ -180,6 +181,7 @@
 		  </ul></li>
 		  
 		  <li><b>fitfunctions_fccs:</b><ul>
+			<li>corrected a bug that lead to concentrations that were wrong by a factor of pi/2 </li>
 		    <li>added cAB/max(cA,cB) property to FCCS models (SPIM and confocal)</li>
 		    <li>added fit function following the Ries/Schwille FCCS framework for normal and anomalous diffusion in confocal FCCS</li>
 		    <li>added 2-component normal diffusion model</li>
