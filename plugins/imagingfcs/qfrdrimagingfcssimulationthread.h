@@ -16,12 +16,15 @@ class QFRDRImagingFCSSimulationThread : public QThread
         GetSetMacro(double, DG);
         GetSetMacro(double, DR);
         GetSetMacro(double, DRG);
-        GetSetMacro(double, psf_size);
+        GetSetMacro(double, psf_size_g);
+        GetSetMacro(double, psf_size_r);
+        GetSetMacro(double, crosstalk);
         GetSetMacro(double, VX);
         GetSetMacro(double, VY);
         GetSetMacro(double, pixel_size);
         GetSetMacro(double, frametime);
         GetSetMacro(long, frames);
+        GetSetMacro(long, warmup);
         GetSetMacro(bool, dualView);
         GetSetMacro(QString, filename);
         GetSetMacro(int, width);
@@ -53,12 +56,17 @@ class QFRDRImagingFCSSimulationThread : public QThread
         double DG;
         double DR;
         double DRG;
-        double psf_size;
+
+        double psf_size_g;
+        double psf_size_r;
+        double crosstalk;
         double VX;
         double VY;
         double pixel_size;
         double frametime;
         long frames;
+        long warmup;
+
         bool dualView;
         QString filename;
 

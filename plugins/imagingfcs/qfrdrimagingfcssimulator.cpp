@@ -52,7 +52,10 @@ void QFRDRImagingFCSSimulator::writeSettings() const {
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/walkersrg", ui->spinWalkersRG->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/frames", ui->spinFrames->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/frametime", ui->spinFrametime->value());
-    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/psfSize", ui->spinPSFSize->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/warmup", ui->spinWarmup->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/crosstalk", ui->spinCrosstalk->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/psfSizeGreen", ui->spinPSFSizeGreen->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/psfSizeRed", ui->spinPSFSizeRed->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/VX", ui->spinVX->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/VY", ui->spinVY->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/DualView", ui->chkDualView->isChecked());
@@ -75,9 +78,12 @@ void QFRDRImagingFCSSimulator::readSettings()
     ui->spinWalkersR->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/walkersR", 20).toInt());
     ui->spinWalkersG->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/walkersG", 20).toInt());
     ui->spinWalkersRG->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/walkersRG", 20).toInt());
-    ui->spinFrames->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/frames", 10000).toInt());
+    ui->spinFrames->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/frames", 20000).toInt());
     ui->spinFrametime->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/frametime", 20).toDouble());
-    ui->spinPSFSize->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/psfSize", 0.6).toDouble());
+    ui->spinWarmup->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/warmup", 10000).toDouble());
+    ui->spinPSFSizeGreen->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/psfSizeGreen", 0.6).toDouble());
+    ui->spinPSFSizeRed->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/psfSizeRed", 0.7).toDouble());
+    ui->spinCrosstalk->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/crosstalk", 5).toDouble());
     ui->spinVX->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/VX", 0).toDouble());
     ui->spinVY->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/VY", 0).toDouble());
     ui->chkDualView->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/DualView", false).toBool());
@@ -99,11 +105,14 @@ void QFRDRImagingFCSSimulator::on_btnRun_clicked()
         sim->set_dualView(ui->chkDualView->isChecked());
         sim->set_filename(ui->edtFilename->text());
         sim->set_frames(ui->spinFrames->value());
+        sim->set_warmup(ui->spinWarmup->value());
         sim->set_frametime(ui->spinFrametime->value());
         sim->set_height(ui->spinHeight->value());
         sim->set_width(ui->spinWidth->value());
         sim->set_pixel_size(ui->spinPixelSize->value());
-        sim->set_psf_size(ui->spinPSFSize->value());
+        sim->set_psf_size_g(ui->spinPSFSizeGreen->value());
+        sim->set_psf_size_r(ui->spinPSFSizeRed->value());
+        sim->set_crosstalk(ui->spinCrosstalk->value()/100.0);
         sim->set_walkersG(ui->spinWalkersG->value());
         sim->set_walkersR(ui->spinWalkersR->value());
         sim->set_walkersRG(ui->spinWalkersRG->value());
@@ -149,7 +158,7 @@ void QFRDRImagingFCSSimulator::setState(QFRDRImagingFCSSimulator::DialogState ne
         if (new_dstate==dsRunning) {
             ui->grpParams->setEnabled(false);
             ui->groupBox->setEnabled(true);
-            ui->progressBar->setRange(0, ui->spinFrames->value());
+            ui->progressBar->setRange(0, ui->spinFrames->value()+ui->spinWarmup->value());
             ui->progressBar->setValue(0);
             ui->labProgress->setText(tr("preparing simulation ..."));
         } else {

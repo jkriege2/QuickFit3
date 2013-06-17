@@ -20,9 +20,10 @@ QFRDRImagingFCSSimulationThread::QFRDRImagingFCSSimulationThread(QObject *parent
     brightnessR=100;
     DG=DR=DRG=5;
     VX=VY=0;
-    psf_size=300;
+    psf_size_g=500;
+    psf_size_r=550;
     pixel_size=400;
-    frames=10000;
+    frames=20000;
     frametime=500;
     dualView=false;
     width=10;
@@ -32,6 +33,9 @@ QFRDRImagingFCSSimulationThread::QFRDRImagingFCSSimulationThread(QObject *parent
     walkersRG=0;
     background=100;
     backgroundNoise=2;
+    crosstalk=5.0/100.0;
+    warmup=10000;
+
 }
 
 int QFRDRImagingFCSSimulationThread::getCurrentFrame() const
@@ -105,7 +109,10 @@ void QFRDRImagingFCSSimulationThread::run()
     config.setValue("simulation/brightnessG", brightnessG);
     config.setValue("simulation/brightnessR", brightnessR);
     config.setValue("simulation/pixel_size", pixel_size);
-    config.setValue("simulation/psf_size", psf_size);
+    config.setValue("simulation/psf_size_green", psf_size_g);
+    config.setValue("simulation/psf_size_red", psf_size_r);
+    config.setValue("simulation/crosstalk", crosstalk);
+    config.setValue("simulation/warmup", (qlonglong)warmup);
     config.setValue("simulation/background", background);
     config.setValue("simulation/backgroundNoise", backgroundNoise);
 
@@ -135,47 +142,72 @@ void QFRDRImagingFCSSimulationThread::run()
     }
 
     if (tif) {
-        emit statusMessage(tr("running simulation ..."));
-        for (currentFrame=0; currentFrame<frames; currentFrame++) {
-
-            //memset(frame, 0, framesize*sizeof(uint16_t));
-            for (int i=0; i<framesize; i++) {
-                frame[i]=round(rng.randNorm(background, backgroundNoise*backgroundNoise));
-            }
+        emit statusMessage(tr("warming up simulation ..."));
+        for (int wi=0; wi<warmup; wi++) {
             propagateWalkers(wg, DG);
-            for (int i=0; i<wg.size(); i++) {
-                //if (i==0) qDebug()<<wg[i].x<<", "<<wg[i].y;
-                for (int y=0; y<height; y++) {
-                    for (int x=0; x<width; x++) {
-                        frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG*exp(-2.0*(sqr(wg[i].x-double(x)*pixel_size)+sqr(wg[i].y-double(y)*pixel_size))/sqr(psf_size));
-                    }
-                }
-            }
             if (dualView) {
                 propagateWalkers(wr, DR);
                 propagateWalkers(wrg, DRG);
-                for (int i=0; i<wr.size(); i++) {
-                    for (int y=0; y<height; y++) {
-                        for (int x=0; x<width; x++) {
-                            frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wr[i].x-double(x)*pixel_size)+sqr(wr[i].y-double(y)*pixel_size))/sqr(psf_size));
-                        }
-                    }
-                }
-                for (int i=0; i<wrg.size(); i++) {
-                    for (int y=0; y<height; y++) {
-                        for (int x=0; x<width; x++) {
-                            frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wrg[i].x-double(x)*pixel_size)+sqr(wrg[i].y-double(y)*pixel_size))/sqr(psf_size));
-                            frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG*exp(-2.0*(sqr(wrg[i].x-double(x)*pixel_size)+sqr(wrg[i].y-double(y)*pixel_size))/sqr(psf_size));
-                        }
-                    }
-                }
             }
-
-
-
-            TinyTIFFWriter_writeImage(tif, frame);
-            if (timer.elapsed()>200) emit progress(currentFrame);
+            if (timer.elapsed()>200) {
+                emit progress(currentFrame+warmup);
+                timer.start();
+            }
             if (canceled) break;
+        }
+        emit statusMessage(tr("running simulation ..."));
+        if (!canceled) {
+            for (currentFrame=0; currentFrame<frames; currentFrame++) {
+
+                //memset(frame, 0, framesize*sizeof(uint16_t));
+                for (int i=0; i<framesize; i++) {
+                    frame[i]=round(rng.randNorm(background, backgroundNoise*backgroundNoise));
+                }
+                propagateWalkers(wg, DG);
+                for (int i=0; i<wg.size(); i++) {
+                    //if (i==0) qDebug()<<wg[i].x<<", "<<wg[i].y;
+                    for (int y=0; y<height; y++) {
+                        for (int x=0; x<width; x++) {
+                            frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG*exp(-2.0*(sqr(wg[i].x-double(x)*pixel_size)+sqr(wg[i].y-double(y)*pixel_size))/sqr(psf_size_g));
+                        }
+                    }
+                }
+                if (dualView) {
+                    propagateWalkers(wr, DR);
+                    propagateWalkers(wrg, DRG);
+                    for (int i=0; i<wr.size(); i++) {
+                        for (int y=0; y<height; y++) {
+                            for (int x=0; x<width; x++) {
+                                frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wr[i].x-double(x)*pixel_size)+sqr(wr[i].y-double(y)*pixel_size))/sqr(psf_size_r));
+                            }
+                        }
+                    }
+                    for (int i=0; i<wrg.size(); i++) {
+                        for (int y=0; y<height; y++) {
+                            for (int x=0; x<width; x++) {
+                                frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wrg[i].x-double(x)*pixel_size)+sqr(wrg[i].y-double(y)*pixel_size))/sqr(psf_size_r));
+                                frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG*exp(-2.0*(sqr(wrg[i].x-double(x)*pixel_size)+sqr(wrg[i].y-double(y)*pixel_size))/sqr(psf_size_g));
+                            }
+                        }
+                    }
+                    if (crosstalk>0) {
+                        for (int y=0; y<height; y++) {
+                            for (int x=0; x<width; x++) {
+                                frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+crosstalk*frame[y*realwidth+x];
+                            }
+                        }
+                    }
+                }
+
+
+
+                TinyTIFFWriter_writeImage(tif, frame);
+                if (timer.elapsed()>200) {
+                    emit progress(currentFrame+warmup);
+                    timer.start();
+                }
+                if (canceled) break;
+            }
         }
         emit statusMessage(tr("simulation finished ..."));
         TinyTIFFWriter_close(tif);
