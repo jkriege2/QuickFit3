@@ -1,22 +1,83 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Spectra Viewer Help</title>
-	</head>
-	<body>
-		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-		
-		<p>This plugin displays spectra of<ul>
-		<li>fluorophores</li>
-		<li>filters</li>
-		<li>excitation sources</li>
-		<li>...</li>
-		</ul>
-		And can perform some simple calculations on these spectra:
-		<!--<ul>
-		  <li></li>
-		</ul>-->
-		</p>
-	</body>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Spectra Viewer Help</title>
+</head>
+<body>
+  $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+  
+
+  <h2>Introduction</h2>
+  <p>This plugin displays spectra of
+  <ul>
+    <li>fluorophores</li>
+    <li>filters</li>
+    <li>excitation sources</li>  
+  </ul>
+  And can perform some simple calculations on these spectra:
+  <ul>
+    <li>The "spillover table" calculates how much of each fluorophore's fluorescence spectrum is detected in each of the filters.</li>
+  </ul>
+  </p>
+  
+  
+
+<h2>User Interface</h2>
+<p><center>
+	<a name="qfe_spectraviewer_pic000"><img src="./pic/qfe_spectraviewer_pic000.png" border="1"><br/>
+<i>QuickFit Spectra Viewer User Interface</i>
+</center>
+</p>
+<p>The user interface mainly consists of a graph displaying all spectra, a list of the selected speactra below the graph (bottom left) and 
+widgets to configure the diferent spectra (bottom right). On the lowwer bottom right there is also a table with different properties of the currently
+selected spectrum (if available), e.g. fluorescence quantum yields, extinction coefficients etc.
+</p>
+<p>To set up a plot, follow these steps:
+<ol>
+  <li>Use the button "add fluorophore", "add filter" and "add lightsource" to add all elements you require. They will appear as list entries on the rhs of the buttons (initially with a blank name). use the "Delete" button to remove the currently selected item from the list.</li>  
+  <li>Now select any of the items in the list by clicking on it. The according configurationwidgets will appear on the rhs.
+    <ul>
+      <li><i>fluorophore:</i> select a fluorophore from the dropdown list and it's spectrum will be displayed. You can also separately activate/deactivate the absorption and emission spectra.</li>
+      <li><i>filter:</i> First select whether you want to set up a <ul>
+        <li>... bandpass filter (then you give the central wavelength $$math:\lambda_c$$ and the spectral width $$math:\Delta\lambda$$. The filter will have a transmission of 100% in the range $$math:\left[\lambda_c-\frac{\Delta\lambda}{2} ... \lambda_c+\frac{\Delta\lambda}{2}\right]$$ and 0% outside.</li>
+        <li>... filter with spectrum, then you can select one of the available spectra.</li>
+      </ul>
+      In both cases it is possible to tell QuickFit whether the filter is used for excitation or detection, using the "type" combobox.</li>  
+      <li><i>lightsource:</i> First select whether you want to set up a <ul>
+        <li>... laser (single wavelength) source wth a given central wavelength $$math:\lambda_c$$ and the spectral linewidth $$math:\Delta\lambda$$. The lightsource will emit in the range $$math:\left[\lambda_c-\frac{\Delta\lambda}{2} ... \lambda_c+\frac{\Delta\lambda}{2}\right]$$ and will be displayed as a colored bar/range in the plot.</li>
+        <li>... lightsource with spectrum (e.g. Hg lamp or LEDs), then you can select one of the available spectra.</li>
+      </ul></li>
+    </ul>
+  </li>
+  <li>The spectra will be colored according to their maximum intensity wavelength (for fluorophores the maximum emission intensity, so EGFP will be green and mRFP1 red!). Lightsource spectra are shown in gray. All emission spectra are plotted as filled curves.</li>
+</ol></p>
+
+<p>
+The <b>Spillover table</b> can be accessed with the according button on the top left. A new window will appear:
+
+<center>
+	<a name="qfe_spectraviewer_pic001"><img src="./pic/qfe_spectraviewer_pic001.png" border="1"><br/>
+<i>Spillover table dialog</i>
+</center>
+In each table cell it contains the normalized overlap integral of the fluorophore's emission spectrum $$math:\phi(\lambda)$$ and the filter's transmission $$math:\epsilon(\lambda)$$:
+$$bmath:S=100%\cdot\frac{\int\phi(\lambda)\cdot\epsilon(\lambda)\;\mathrm{d}\lambda}{\int\phi(\lambda)\;\mathrm{d}\lambda}$$
+It is assumed that both spectra are normalized, so $$math:\max(\epsilon(\lambda))=1$$.
+</p>
+
+<p>If the data of any item is not correct, you can edit it using the "edit" button next to the according spectrum dropdown list. You can also create a new fluorophore/filter/lightsource dataset by using the "+" button on the top-left and selecting the according entry in the popup menu.
+<ol>
+  <li>A new dialog will pop up that allows to edit some generic data (references, names, ...) and (on a second and third tab) the spectra themselves. </li>
+  <li>The ID is used as an internal ID only, so it is never cisible to the user. If the ID is already in use the old dataset is overwritten. You can also use this to copy a spectrum, by simply editing it and renaming the ID. This will create a copy.</li>
+  <li>There are two databases. One is delivered with QuickFit and cannot be edited. If you still edit an entry, a new entry in your user-database is created that superseeds the initil one, but the initial one won't be deleted. The location of the user database is initially in <tt>$$plugin_info:configdir:qfe_spectraviewer$$</tt>, but this can be changed in QuickFits options dialog. The readonly default database can be found in <tt>$$plugin_info:assetsdir:qfe_spectraviewer$$</tt>.
+  In these directories, the <tt>.ini</tt> files contain all the metadata and the <tt>.spec</tt> files contain the spectra as comma-separated values.<br>
+  The simplest way to add a spectrum is to copy it from e.g. Excel or the table plugin: open the spectrum there and copy the two columns you want to use. Then you can paste them in the spectra editor tabs. You can also use digitizer software like <a href="http://digitizer.sourceforge.net/">Engauge</a> to read spectra from printed/PDF publications.</li>
+  <li>If you want to contribute to QuickFit, please send us your spectra via e-mail, then we can include them in the QuickFit installer.</li>
+</ol>
+  
+</p>
+
+
+
+</body>
 </html>

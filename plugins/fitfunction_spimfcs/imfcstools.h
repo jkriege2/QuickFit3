@@ -22,7 +22,7 @@ inline double QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_pixelcorrfactor(double a, do
 
 inline double QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(double dz, double D, double t, double wg, double wr) {
     const double dt_sigma=sqrt(8.0*D*t+wg*wg+wr*wr);
-    return exp(-2.0*dz*dz/dt_sigma)/dt_sigma/sqrt(2.0/M_PI);
+    return exp(-2.0*dz*dz/dt_sigma)/dt_sigma*sqrt(2.0/M_PI);
 }
 
 inline double QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(double a, double dx, double dy, double dz, double D, double t, double wg, double wr, double zg, double zr) {
@@ -41,7 +41,7 @@ inline double QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_pixelcorrfactor(double a, d
 
 inline double QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(double dz, double Gamma, double alpha, double t, double wg, double wr) {
     const double dt_sigma=sqrt(8.0*Gamma*pow(t, alpha)+wg*wg+wr*wr);
-    return exp(-2.0*dz*dz/dt_sigma)/dt_sigma/sqrt(2.0/M_PI);
+    return exp(-2.0*dz*dz/dt_sigma)/dt_sigma*sqrt(2.0/M_PI);
 }
 
 inline double QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(double a, double dx, double dy, double dz, double Gamma, double alpha, double t, double wg, double wr, double zg, double zr) {

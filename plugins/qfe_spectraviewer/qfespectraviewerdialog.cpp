@@ -200,7 +200,7 @@ void QFESpectraViewerDialog::on_btnAddFluorophore_clicked()
     it.showEmission=true;
     it.showExcitation=true;
     plotItems.append(it);
-    QListWidgetItem* item=new QListWidgetItem(it.name, ui->lstSpectra);
+    QListWidgetItem* item=new QListWidgetItem(QIcon(":/qfe_spectraviewer/fluorophore.png"), tr("--- new fluorophore ---"), ui->lstSpectra);
     //item->setData(Qt::UserRole, plotItems.size()-1);
     //ui->lstSpectra->addItem(item);
     ui->lstSpectra->setCurrentItem(item);
@@ -215,7 +215,7 @@ void QFESpectraViewerDialog::on_btnAddFilter_clicked()
     it.spectralWidth=35;
     it.centralWavelength=525;
     plotItems.append(it);
-    QListWidgetItem* item=new QListWidgetItem(it.name, ui->lstSpectra);
+    QListWidgetItem* item=new QListWidgetItem(QIcon(":/qfe_spectraviewer/lightsource.png"), tr("--- new filter ---"), ui->lstSpectra);
     //item->setData(Qt::UserRole, plotItems.size()-1);
     //ui->lstSpectra->addItem(item);
     ui->lstSpectra->setCurrentItem(item);
@@ -230,7 +230,7 @@ void QFESpectraViewerDialog::on_btnAddLightsource_clicked()
     it.spectralWidth=1;
     it.centralWavelength=488;
     plotItems.append(it);
-    QListWidgetItem* item=new QListWidgetItem(it.name, ui->lstSpectra);
+    QListWidgetItem* item=new QListWidgetItem(QIcon(":/qfe_spectraviewer/lightsource.png"), tr("--- new lightsource ---"), ui->lstSpectra);
     //item->setData(Qt::UserRole, plotItems.size()-1);
     //ui->lstSpectra->addItem(item);
     ui->lstSpectra->setCurrentItem(item);
@@ -248,7 +248,9 @@ void QFESpectraViewerDialog::on_btnDelete_clicked()
     delete item;
     plotItems.removeAt(delIdx);
     if (plotItems.size()<=0) currentIndex=0;
-    else ui->lstSpectra->setCurrentRow(0);
+    if (delIdx>0 && delIdx<plotItems.size()) currentIndex=delIdx;
+
+    ui->lstSpectra->setCurrentRow(currentIndex);
     spectrumSelected();
 
 }
