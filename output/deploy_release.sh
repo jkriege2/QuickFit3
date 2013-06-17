@@ -31,6 +31,7 @@ runNSIS="1"
 deployspecials="0"
 delete_deploy="1"
 create_deploy="1"
+SPECIALS=""
 
 until [ -z "$1" ]  # Until all parameters used up . . .
 do
@@ -69,6 +70,7 @@ do
 	fi
     if [ "$1" == "--deployspecials" ]; then
 	    deployspecials="1"
+		SPECIALS="_withspecials"
 	fi
 	shift;
 done
@@ -105,17 +107,17 @@ rm a.out
 rm test~.cpp
 echo -e "\n   bit depth: ${BITDEPTH}\n\n"
 
-INSTALLER_BASENAME=quickfit3_${SVNVER}
+INSTALLER_BASENAME=quickfit3${SPECIALS}_${SVNVER}
 INSTALLER_INSTDIR="\$PROGRAMFILES32"
-ZIPFILE=quickfit3_${SVNVER}.zip
-ZIPFILESPIM=quickfit3_spimplugins_${SVNVER}.zip
-ZIPFILESPECIAL=quickfit3_special_${SVNVER}.zip
+ZIPFILE=quickfit3${SPECIALS}_${SVNVER}.zip
+ZIPFILESPIM=quickfit3${SPECIALS}_spimplugins_${SVNVER}.zip
+ZIPFILESPECIAL=quickfit3${SPECIALS}_special_${SVNVER}.zip
 if [ "${BITDEPTH}" == "64" ]; then
 	INSTALLER_INSTDIR="\$PROGRAMFILES64"
-	INSTALLER_BASENAME=quickfit3_64bit_${SVNVER}
-	ZIPFILE=quickfit3_64bit_${SVNVER}.zip
-	ZIPFILESPIM=quickfit3_64bit_spimplugins_${SVNVER}.zip
-	ZIPFILESPECIAL=quickfit3_64bit_special_${SVNVER}.zip
+	INSTALLER_BASENAME=quickfit3_64bit${SPECIALS}_${SVNVER}
+	ZIPFILE=quickfit3_64bit${SPECIALS}_${SVNVER}.zip
+	ZIPFILESPIM=quickfit3_64bit${SPECIALS}_spimplugins_${SVNVER}.zip
+	ZIPFILESPECIAL=quickfit3_64bit${SPECIALS}_special_${SVNVER}.zip
 fi
 SPIMPLUGINS=" cam_testcamera stage_pi863 cam_andor spimb040 shutter_servo_arduino filterc_test cam_systemcam filterc_tmcl lights_b040laserbox lights_pccsled"
 SPECIALPLUGINS=" imfccs_fit"
