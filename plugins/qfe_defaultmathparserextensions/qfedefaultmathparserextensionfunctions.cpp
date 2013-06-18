@@ -152,3 +152,161 @@ qfmpResult fIRLS(const qfmpResult* params, unsigned int  n, QFMathParser* p){
     r.numVec<<b;
     return r;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+qfmpResult fErrorAdd(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+    qfmpResult r;
+    r.type=qfmpDoubleVector;
+    if (n!=2) {
+        p->qfmpError("erroradd(X,Y) needs 2 arguments");
+        return p->getInvalidResult();
+    }
+    if (!(params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector)) {
+        p->qfmpError("erroradd(X,Y) arguments X and Y have to be of type number vector");
+        return p->getInvalidResult();
+    }
+    if (params[0].length()!=2 || params[1].length()!=2) {
+        p->qfmpError("erroradd(X,Y) arguments X and Y have to have length 2");
+        return p->getInvalidResult();
+    }
+
+    double X=params[0].numVec[0];
+    double Xe=params[0].numVec[1];
+    double Y=params[1].numVec[0];
+    double Ye=params[1].numVec[1];
+
+    r.numVec.clear();
+    r.numVec<<X+Y;
+    r.numVec<<sqrt(Xe*Xe+Ye*Ye);
+    return r;
+}
+
+qfmpResult fErrorSub(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+    qfmpResult r;
+    r.type=qfmpDoubleVector;
+    if (n!=2) {
+        p->qfmpError("errorsub(X,Y) needs 2 arguments");
+        return p->getInvalidResult();
+    }
+    if (!(params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector)) {
+        p->qfmpError("errorsub(X,Y) arguments X and Y have to be of type number vector");
+        return p->getInvalidResult();
+    }
+    if (params[0].length()!=2 || params[1].length()!=2) {
+        p->qfmpError("errorsub(X,Y) arguments X and Y have to have length 2");
+        return p->getInvalidResult();
+    }
+
+    double X=params[0].numVec[0];
+    double Xe=params[0].numVec[1];
+    double Y=params[1].numVec[0];
+    double Ye=params[1].numVec[1];
+
+    r.numVec.clear();
+    r.numVec<<X-Y;
+    r.numVec<<sqrt(Xe*Xe+Ye*Ye);
+    return r;
+}
+
+
+
+
+qfmpResult fErrorMul(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+    qfmpResult r;
+    r.type=qfmpDoubleVector;
+    if (n!=2) {
+        p->qfmpError("errormul(X,Y) needs 2 arguments");
+        return p->getInvalidResult();
+    }
+    if (!(params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector)) {
+        p->qfmpError("errormul(X,Y) arguments X and Y have to be of type number vector");
+        return p->getInvalidResult();
+    }
+    if (params[0].length()!=2 || params[1].length()!=2) {
+        p->qfmpError("errormul(X,Y) arguments X and Y have to have length 2");
+        return p->getInvalidResult();
+    }
+
+    double X=params[0].numVec[0];
+    double Xe=params[0].numVec[1];
+    double Y=params[1].numVec[0];
+    double Ye=params[1].numVec[1];
+
+    r.numVec.clear();
+    r.numVec<<X*Y;
+    r.numVec<<sqrt(qfSqr(Y*Xe)+qfSqr(X*Ye));
+    return r;
+}
+
+qfmpResult fErrorDiv(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+    qfmpResult r;
+    r.type=qfmpDoubleVector;
+    if (n!=2) {
+        p->qfmpError("errordiv(X,Y) needs 2 arguments");
+        return p->getInvalidResult();
+    }
+    if (!(params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector)) {
+        p->qfmpError("errordiv(X,Y) arguments X and Y have to be of type number vector");
+        return p->getInvalidResult();
+    }
+    if (params[0].length()!=2 || params[1].length()!=2) {
+        p->qfmpError("errordiv(X,Y) arguments X and Y have to have length 2");
+        return p->getInvalidResult();
+    }
+
+    double X=params[0].numVec[0];
+    double Xe=params[0].numVec[1];
+    double Y=params[1].numVec[0];
+    double Ye=params[1].numVec[1];
+
+    r.numVec.clear();
+    r.numVec<<X/Y;
+    r.numVec<<sqrt(qfSqr(Xe/Y)+qfSqr(X*Ye/Y/Y));
+    return r;
+}
+qfmpResult fErrorPow(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+    qfmpResult r;
+    r.type=qfmpDoubleVector;
+    if (n!=2) {
+        p->qfmpError("errorpow(X,Y) needs 2 arguments");
+        return p->getInvalidResult();
+    }
+    if (!(params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector)) {
+        p->qfmpError("errorpow(X,Y) arguments X and Y have to be of type number vector");
+        return p->getInvalidResult();
+    }
+    if (params[0].length()!=2 || params[1].length()!=2) {
+        p->qfmpError("errorpow(X,Y) arguments X and Y have to have length 2");
+        return p->getInvalidResult();
+    }
+
+    double X=params[0].numVec[0];
+    double Xe=params[0].numVec[1];
+    double Y=params[1].numVec[0];
+    double Ye=params[1].numVec[1];
+
+    r.numVec.clear();
+    r.numVec<<pow(X,Y);
+    r.numVec<<sqrt(qfSqr(Xe*Y*pow(X,Y-1.0))+qfSqr(Ye*pow(X,Y)*log(Y)));
+    return r;
+}

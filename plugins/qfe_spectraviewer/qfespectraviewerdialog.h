@@ -18,7 +18,10 @@ enum QFESpectraViewerPlotItemType {
     qfesLightSourceSpectrum=1,
     qfesLightSourceSingleLine=2,
     qfesFilterSpectrum=3,
-    qfesFilterBandpass=4
+    qfesFilterBandpass=4,
+    qfesFilterLongpass=5,
+    qfesFilterShortpass=6,
+    qfesFilterNotch=7
 };
 
 struct QFESpectraViewerPlotItem {
@@ -67,6 +70,7 @@ class QFESpectraViewerDialog : public QDialog
         void on_btnMailFluorophore_clicked();
         void on_btnMailLightsource_clicked();
         void on_btnMailFilter_clicked();
+        void on_cmbFilterType_currentIndexChanged(int i);
     protected:
         Ui::QFESpectraViewerDialog *ui;
         QFESpectraViewer* plugin;

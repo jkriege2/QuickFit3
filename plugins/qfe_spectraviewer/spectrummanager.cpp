@@ -259,7 +259,9 @@ void SpectrumManager::Spectrum::ensureSpectrum()
     if (!loaded && QFile::exists(filename)) {
         try {
             datatable2 table;
+            //qDebug()<<"loading spectrum from "<<QFileInfo(filename).absoluteFilePath();
             table.load_csv(QFileInfo(filename).absoluteFilePath().toStdString(), ',', '#');
+            //qDebug()<<table.get_column_count()<<"x"<<table.get_line_count();
             QVector<double> wl, sp;
             if (spectrumIDInFile==0 && table.get_column_count()>=2) {
                 for (int i=0; i<table.get_line_count(); i++) {
@@ -339,6 +341,7 @@ double SpectrumManager::Spectrum::getSpectrumAt(double lambda)
 
 double SpectrumManager::Spectrum::getSpectrumIntegral(double lambda_start, double lambda_end)
 {
+    if (lambda_start>=lambda_end) return 0;
     //ensureSpectrum();
     if (!spline || !accel || !wavelength || !spectrum || N<=0) return 0;
     double st=lambda_start;
@@ -347,10 +350,10 @@ double SpectrumManager::Spectrum::getSpectrumIntegral(double lambda_start, doubl
     if (en>wavelength[N-1]) en=wavelength[N-1];
     double res=0;
     if (gsl_spline_eval_integ_e(spline, st, en, accel, &res)) {
-        qDebug()<<"int "<<filename<<"    "<<st<<" ... "<<en<<"   = "<<0;
+        //qDebug()<<"int "<<filename<<"    "<<st<<" ... "<<en<<"   = "<<0;
         return 0;
     }
-    qDebug()<<"int "<<filename<<"    "<<st<<" ... "<<en<<"   = "<<res;
+    //qDebug()<<"int "<<filename<<"    "<<st<<" ... "<<en<<"   = "<<res;
     return res;
 }
 
@@ -412,15 +415,15 @@ double SpectrumManager::Spectrum::getMulSpectrumIntegral(SpectrumManager::Spectr
         if (gsl_spline_eval_integ_e(spline, lambda_start, lambda_end, accel, &res)) {
             res=0;
         }
-        qDebug()<<"int "<<filename<<"*"<<multWith->filename<<"    "<<lambda_start<<" ... "<<lambda_end<<"   = "<<res;
-        qDebug()<<"    "<<arrayToString(wl.data(), wl.size());
-        qDebug()<<"    "<<arrayToString(sp.data(), sp.size());
+        //qDebug()<<"int "<<filename<<"*"<<multWith->filename<<"    "<<lambda_start<<" ... "<<lambda_end<<"   = "<<res;
+        //qDebug()<<"    "<<arrayToString(wl.data(), wl.size());
+        //qDebug()<<"    "<<arrayToString(sp.data(), sp.size());
 
         gsl_interp_accel_free(accel);
         gsl_spline_free(spline);
         return res;
     } catch (std::exception& E) {
-        qDebug()<<"ERROR: "<<E.what();
+        //qDebug()<<"ERROR: "<<E.what();
         return 0;
     }
 
@@ -531,7 +534,7 @@ void SpectrumManager::Spectrum::internalInit(const QVector<double> &lambda, cons
         this->spectrum=NULL;
         N=0;
     }
-    this->filename="";
+    //this->filename="";
     loaded=true;
 }
 

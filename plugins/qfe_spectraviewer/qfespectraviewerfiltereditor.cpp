@@ -150,6 +150,7 @@ SpectrumManager::FilterData QFESpectraViewerFilterEditor::getData() const
     data.spectrum=oldspectrum;
     data.description=ui->edtDescription->text();
     if (spectrumchanged) data.spectrum=-1;
+    //qDebug()<<spectrumchanged<<oldspectrum<<data.spectrum;
     return data;
 }
 
@@ -186,7 +187,12 @@ QString QFESpectraViewerFilterEditor::addDataAndSpectrum(QSettings& database, Sp
     SpectrumManager::FilterData data=getData();
     if (m) {
         if (data.spectrum<0) data.spectrum=addSpectrum(m, &specFilename);
+        else {
+            //qDebug()<<database.fileName()<<m->getSpectrum(data.spectrum)->getFilename()<<QDir(database.fileName()).relativeFilePath(m->getSpectrum(data.spectrum)->getFilename());
+            specFilename=QFileInfo(database.fileName()).absoluteDir().relativeFilePath(m->getSpectrum(data.spectrum)->getFilename());
+        }
     }
+    //qDebug()<<spectrumchanged<<oldspectrum<<specFilename;
     database.setValue(QString("%1/name").arg(ID), data.name);
     database.setValue(QString("%1/manufacturer").arg(ID), data.manufacturer);
     database.setValue(QString("%1/oder_no").arg(ID), data.orderNo);

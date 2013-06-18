@@ -122,7 +122,7 @@
         <item>
          <widget class="QStackedWidget" name="stackSpectraEditor">
           <property name="currentIndex">
-           <number>3</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="widFilter">
            <layout class="QFormLayout" name="formLayout_2">
@@ -203,6 +203,30 @@
                 </item>
                </layout>
               </widget>
+              <widget class="QWidget" name="widFilterShortpass">
+               <layout class="QFormLayout" name="formLayout_8">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_12">
+                  <property name="text">
+                   <string>cut on/off wavelength:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QDoubleSpinBox" name="spinFilterCutWavelength">
+                  <property name="suffix">
+                   <string> nm</string>
+                  </property>
+                  <property name="maximum">
+                   <double>10000.000000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>525.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
               <widget class="QWidget" name="widFilterSpectrum">
                <layout class="QFormLayout" name="formLayout_6">
                 <item row="0" column="0">
@@ -259,6 +283,33 @@
                <property name="icon">
                 <iconset resource="qfespectraviewer.qrc">
                  <normaloff>:/qfe_spectraviewer/icons/filter_bandpass.png</normaloff>:/qfe_spectraviewer/icons/filter_bandpass.png</iconset>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>longpass</string>
+               </property>
+               <property name="icon">
+                <iconset resource="qfespectraviewer.qrc">
+                 <normaloff>:/qfe_spectraviewer/icons/filter_longpass.png</normaloff>:/qfe_spectraviewer/icons/filter_longpass.png</iconset>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>shortpass</string>
+               </property>
+               <property name="icon">
+                <iconset resource="qfespectraviewer.qrc">
+                 <normaloff>:/qfe_spectraviewer/icons/filter_shortpass.png</normaloff>:/qfe_spectraviewer/icons/filter_shortpass.png</iconset>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>notch</string>
+               </property>
+               <property name="icon">
+                <iconset resource="qfespectraviewer.qrc">
+                 <normaloff>:/qfe_spectraviewer/icons/filter_notch.png</normaloff>:/qfe_spectraviewer/icons/filter_notch.png</iconset>
                </property>
               </item>
               <item>
@@ -511,8 +562,8 @@
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfespectraviewer.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
@@ -531,22 +582,6 @@
     <hint type="destinationlabel">
      <x>501</x>
      <y>387</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cmbFilterType</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>stackFilter</receiver>
-   <slot>setCurrentIndex(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>509</x>
-     <y>372</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>479</x>
-     <y>426</y>
     </hint>
    </hints>
   </connection>

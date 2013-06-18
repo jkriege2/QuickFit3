@@ -20,6 +20,8 @@ class QFESpectraViewerFluorophoreEditor : public QDialog
         void setFromData(const QString& ID, const SpectrumManager::FluorophoreData& data, SpectrumManager *manager=NULL);
         QString addDataAndSpectrum(QSettings &database, SpectrumManager *manager=NULL);
         void addSpectrum(SpectrumManager *manager=NULL, QString *filenameOut=NULL, QString *filenameOut_fl=NULL, int* spec_abs=NULL, int* spec_fl=NULL);
+        void addSpectrumFl(SpectrumManager *manager=NULL, QString *filenameOut_fl=NULL, int* spec_fl=NULL);
+        void addSpectrumAbs(SpectrumManager *manager=NULL, QString *filenameOut=NULL, int* spec_abs=NULL);
         SpectrumManager::FluorophoreData getData() const;
         QString getID() const;
         bool hasSpectrumChanged() const;

@@ -38,6 +38,14 @@ void QFEDefaultMathParserExtensions::initExtension() {
     QFMathParser::addGlobalFunction("regression", fRegression);
     QFMathParser::addGlobalFunction("weighted_regression", fWeightedRegression);
     QFMathParser::addGlobalFunction("irls", fIRLS);
+
+
+
+    QFMathParser::addGlobalFunction("eadd", fErrorAdd);
+    QFMathParser::addGlobalFunction("esub", fErrorSub);
+    QFMathParser::addGlobalFunction("emul", fErrorMul);
+    QFMathParser::addGlobalFunction("ediv", fErrorDiv);
+    QFMathParser::addGlobalFunction("epow", fErrorPow);
 }
 
 

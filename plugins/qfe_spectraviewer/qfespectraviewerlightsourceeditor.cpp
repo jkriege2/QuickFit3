@@ -184,6 +184,7 @@ QString QFESpectraViewerLightsourceEditor::addDataAndSpectrum(QSettings& databas
     SpectrumManager::LightSourceData data=getData();
     if (m) {
         if (data.spectrum<0) data.spectrum=addSpectrum(m, &specFilename);
+        else specFilename=QFileInfo(database.fileName()).absoluteDir().relativeFilePath(m->getSpectrum(data.spectrum)->getFilename());
     }
     database.setValue(QString("%1/name").arg(ID), data.name);
     database.setValue(QString("%1/manufacturer").arg(ID), data.manufacturer);

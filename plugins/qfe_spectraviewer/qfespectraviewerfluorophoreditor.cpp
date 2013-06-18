@@ -283,6 +283,12 @@ SpectrumManager::FluorophoreData QFESpectraViewerFluorophoreEditor::getData() co
 
 void QFESpectraViewerFluorophoreEditor::addSpectrum(SpectrumManager *manager, QString* filenameOut, QString* filenameOut_fl, int* spec_abs, int* spec_fl)
 {
+    addSpectrumAbs(manager, filenameOut, spec_abs);
+    addSpectrumFl(manager, filenameOut_fl, spec_fl);
+}
+
+void QFESpectraViewerFluorophoreEditor::addSpectrumAbs(SpectrumManager *manager, QString* filenameOut, int* spec_abs)
+{
     SpectrumManager *m=manager;
     if (!m) m=this->manager;
     if (m) {
@@ -302,6 +308,13 @@ void QFESpectraViewerFluorophoreEditor::addSpectrum(SpectrumManager *manager, QS
         int idx=m->addSpectrum(filename, 0, false, ui->edtSpectrumReference->text());
         if (spec_abs) *spec_abs=idx;
     }
+
+}
+
+void QFESpectraViewerFluorophoreEditor::addSpectrumFl(SpectrumManager *manager,  QString* filenameOut_fl,  int* spec_fl)
+{
+    SpectrumManager *m=manager;
+    if (!m) m=this->manager;
     if (m) {
         QDir d(ProgramOptions::getConfigValue("qfe_spectraviewer/user_database", QFPluginServices::getInstance()->getPluginConfigDirectory("qfe_spectraviewer")).toString());
         QString filename=cleanStringForFilename(ui->edtID->text().toLower())+"_fl";
@@ -330,7 +343,11 @@ QString QFESpectraViewerFluorophoreEditor::addDataAndSpectrum(QSettings& databas
     if (ID.isEmpty()) ID=cleanStringForFilename(ui->edtName->text().toLower().trimmed());
     SpectrumManager::FluorophoreData data=getData();
     if (m) {
-        if (data.spectrum_abs<0||data.spectrum_fl<0) addSpectrum(m, &specFilename, &spec2Filename, &(data.spectrum_abs), &(data.spectrum_fl));
+        if (data.spectrum_abs<0) addSpectrumAbs(m, &specFilename, &(data.spectrum_abs));
+        else specFilename=QFileInfo(database.fileName()).absoluteDir().relativeFilePath(m->getSpectrum(data.spectrum_abs)->getFilename());
+
+        if (data.spectrum_fl<0) addSpectrumFl(m, &spec2Filename, &(data.spectrum_fl));
+        else spec2Filename=QFileInfo(database.fileName()).absoluteDir().relativeFilePath(m->getSpectrum(data.spectrum_fl)->getFilename());
     }
     database.setValue(QString("%1/name").arg(ID), data.name);
     database.setValue(QString("%1/manufacturer").arg(ID), data.manufacturer);

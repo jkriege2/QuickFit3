@@ -292,6 +292,19 @@ void QFESpectraViewerDialog::saveFromWidgets()
             plotItems[currentIndex].displayName=tr("BP %1/%2").arg(ui->spinFilterCentral->value()).arg(ui->spinFilterLinewidth->value());
             plotItems[currentIndex].centralWavelength=ui->spinFilterCentral->value();
             plotItems[currentIndex].spectralWidth=ui->spinFilterLinewidth->value();
+        } else if (ui->cmbFilterType->currentIndex()==1) {
+            plotItems[currentIndex].type=qfesFilterLongpass;
+            plotItems[currentIndex].displayName=tr("LP %1").arg(ui->spinFilterCutWavelength->value());
+            plotItems[currentIndex].centralWavelength=ui->spinFilterCutWavelength->value();
+        } else if (ui->cmbFilterType->currentIndex()==2) {
+            plotItems[currentIndex].type=qfesFilterShortpass;
+            plotItems[currentIndex].displayName=tr("SP %1").arg(ui->spinFilterCutWavelength->value());
+            plotItems[currentIndex].centralWavelength=ui->spinFilterCutWavelength->value();
+        } else if (ui->cmbFilterType->currentIndex()==3) {
+            plotItems[currentIndex].type=qfesFilterNotch;
+            plotItems[currentIndex].displayName=tr("NOTCH %1/%2").arg(ui->spinFilterCentral->value()).arg(ui->spinFilterLinewidth->value());
+            plotItems[currentIndex].centralWavelength=ui->spinFilterCentral->value();
+            plotItems[currentIndex].spectralWidth=ui->spinFilterLinewidth->value();
         } else {
             plotItems[currentIndex].type=qfesFilterSpectrum;
             plotItems[currentIndex].name=ui->cmbFilter->itemData(ui->cmbFilter->currentIndex()).toString();
@@ -339,6 +352,7 @@ void QFESpectraViewerDialog::loadToWidgets()
     disconnect(ui->cmbLightsource, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
     disconnect(ui->spinFilterCentral, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
     disconnect(ui->spinFilterLinewidth, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
+    disconnect(ui->spinFilterCutWavelength, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
     disconnect(ui->cmbFilterType, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
     disconnect(ui->cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
     if (currentIndex<0 || currentIndex>=plotItems.size()) {
@@ -375,10 +389,11 @@ void QFESpectraViewerDialog::loadToWidgets()
              connect(ui->cmbLightSourceType, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
              connect(ui->cmbLightsource, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
 
-        } else  if (plotItems[currentIndex].type==qfesFilterBandpass)  {
+        } else  if (plotItems[currentIndex].type==qfesFilterBandpass || plotItems[currentIndex].type==qfesFilterNotch)  {
              ui->stackSpectraEditor->setCurrentWidget(ui->widFilter);
              ui->stackFilter->setCurrentWidget(ui->widFilterBandpass);
-             ui->cmbFilterType->setCurrentIndex(0);
+             if (plotItems[currentIndex].type==qfesFilterNotch) ui->cmbFilterType->setCurrentIndex(3);
+             else ui->cmbFilterType->setCurrentIndex(0);
              ui->cmbFilter->setCurrentIndex(ui->cmbFilter->findData(plotItems[currentIndex].name));
              ui->spinFilterCentral->setValue(plotItems[currentIndex].centralWavelength);
              ui->spinFilterLinewidth->setValue(plotItems[currentIndex].spectralWidth);
@@ -386,12 +401,24 @@ void QFESpectraViewerDialog::loadToWidgets()
              connect(ui->spinFilterLinewidth, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
              connect(ui->cmbFilterType, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
              connect(ui->cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
+        } else  if (plotItems[currentIndex].type==qfesFilterLongpass || plotItems[currentIndex].type==qfesFilterShortpass)  {
+             ui->stackSpectraEditor->setCurrentWidget(ui->widFilter);
+             ui->stackFilter->setCurrentWidget(ui->widFilterShortpass);
+             if (plotItems[currentIndex].type==qfesFilterLongpass) ui->cmbFilterType->setCurrentIndex(1);
+             else ui->cmbFilterType->setCurrentIndex(2);
+             ui->cmbFilter->setCurrentIndex(ui->cmbFilter->findData(plotItems[currentIndex].name));
+             ui->spinFilterCutWavelength->setValue(plotItems[currentIndex].centralWavelength);
+             ui->spinFilterLinewidth->setValue(plotItems[currentIndex].spectralWidth);
+             connect(ui->spinFilterCutWavelength, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
+             connect(ui->cmbFilterType, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
+             connect(ui->cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
         } else  if (plotItems[currentIndex].type==qfesFilterSpectrum)  {
              ui->stackSpectraEditor->setCurrentWidget(ui->widFilter);
              ui->stackFilter->setCurrentWidget(ui->widFilterSpectrum);
-             ui->cmbFilterType->setCurrentIndex(1);
+             ui->cmbFilterType->setCurrentIndex(ui->cmbFilterType->count()-1);
              ui->cmbFilter->setCurrentIndex(ui->cmbFilter->findData(plotItems[currentIndex].name));
              ui->spinFilterCentral->setValue(plotItems[currentIndex].centralWavelength);
+             ui->spinFilterCutWavelength->setValue(plotItems[currentIndex].centralWavelength);
              ui->spinFilterLinewidth->setValue(plotItems[currentIndex].spectralWidth);
              connect(ui->spinFilterCentral, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
              connect(ui->spinFilterLinewidth, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
@@ -790,7 +817,7 @@ void QFESpectraViewerDialog::updatePlots()
             g->set_title(tr("LASER (%1{\\pm}%2)nm").arg(item.centralWavelength).arg(item.spectralWidth));
             ui->plotter->addGraph(g);
 
-        } else if (item.type==qfesFilterBandpass) {
+        } else if (item.type==qfesFilterBandpass || item.type==qfesFilterNotch) {
             JKQTPverticalRange* g=new  JKQTPverticalRange(ui->plotter->get_plotter());
             g->set_lineWidth(2);
             g->set_rangeMin(item.centralWavelength-item.spectralWidth/2.0);
@@ -807,7 +834,69 @@ void QFESpectraViewerDialog::updatePlots()
             col.setAlphaF(0.25);
             g->set_fillColor(col);
             g->set_title(tr("FILTER: BP %1/%2").arg(item.centralWavelength).arg(item.spectralWidth));
+            if (item.type==qfesFilterNotch) {
+                g->set_invertedRange(true);
+                g->set_title(tr("FILTER: NOTCH %1/%2").arg(item.centralWavelength).arg(item.spectralWidth));
+            }
             ui->plotter->addGraph(g);
+        } else if (item.type==qfesFilterLongpass) {
+            JKQTPverticalRange* g=new  JKQTPverticalRange(ui->plotter->get_plotter());
+            g->set_lineWidth(2);
+            g->set_rangeCenter(item.centralWavelength);
+            g->set_plotCenterLine(false);
+            g->set_sizeMin(0);
+            g->set_sizeMax(1);
+            g->set_unlimitedSizeMax(false);
+            g->set_unlimitedSizeMin(false);
+            QColor col=wavelengthToColor(item.centralWavelength);
+            g->set_style(Qt::SolidLine);
+            g->set_color(col);
+            col.setAlphaF(0.25);
+            g->set_fillColor(col);
+            g->set_title(tr("FILTER: LP %1").arg(item.centralWavelength));
+            g->set_rangeMin(NAN);
+            g->set_rangeMax(item.centralWavelength);
+            g->set_invertedRange(true);
+            ui->plotter->addGraph(g);
+        } else if (item.type==qfesFilterShortpass) {
+            JKQTPverticalRange* g=new  JKQTPverticalRange(ui->plotter->get_plotter());
+            g->set_lineWidth(2);
+            g->set_rangeCenter(item.centralWavelength);
+            g->set_plotCenterLine(false);
+            g->set_sizeMin(0);
+            g->set_sizeMax(1);
+            g->set_unlimitedSizeMax(false);
+            g->set_unlimitedSizeMin(false);
+            QColor col=wavelengthToColor(item.centralWavelength);
+            g->set_style(Qt::SolidLine);
+            g->set_color(col);
+            col.setAlphaF(0.25);
+            g->set_fillColor(col);
+            g->set_title(tr("FILTER: LP %1").arg(item.centralWavelength));
+            g->set_rangeMin(item.centralWavelength);
+            g->set_rangeMax(NAN);
+            g->set_invertedRange(true);
+            ui->plotter->addGraph(g);
+        } else if (item.type==qfesFilterSpectrum && manager->filterExists(item.name)) {
+            SpectrumManager::FilterData ls=manager->getFilterData(item.name);
+            if (manager->spectrumExists(ls.spectrum))  {
+                JKQTPfilledCurveXGraph* g=new JKQTPfilledCurveXGraph(ui->plotter->get_plotter());
+                SpectrumManager::Spectrum* spec=manager->getSpectrum(ls.spectrum);
+                //spec->ensureSpectrum();
+                size_t cWL=ds->addCopiedColumn(spec->getWavelength(), spec->getN(), tr("%1_wavelength").arg(item.name));
+                size_t cSP=ds->addCopiedColumn(spec->getSpectrum(), spec->getN(), tr("%1_spectrum").arg(item.name));
+                g->set_drawLine(true);
+                g->set_lineWidth(2);
+                g->set_style(Qt::DashLine);
+                g->set_xColumn(cWL);
+                g->set_yColumn(cSP);
+                QColor col=wavelengthToColor(ls.typical_wavelength);
+                g->set_color(col);
+                col.setAlphaF(0.25);
+                g->set_fillColor(col);
+                g->set_title(tr("FILTER: %1").arg(ls.name));
+                ui->plotter->addGraph(g);
+            }
         } else if (item.type==qfesLightSourceSpectrum && manager->lightsourceExists(item.name)) {
             SpectrumManager::LightSourceData ls=manager->getLightSourceData(item.name);
             //if (!ui->chkSmoothSpectra->isChecked()) {
@@ -1020,4 +1109,11 @@ void QFESpectraViewerDialog::on_btnMailFilter_clicked()
 
 
     }
+}
+
+void QFESpectraViewerDialog::on_cmbFilterType_currentIndexChanged(int i)
+{
+    if (i==ui->cmbFilterType->count()-1) ui->stackFilter->setCurrentIndex(2);
+    else if (i==0||i==3) ui->stackFilter->setCurrentIndex(0);
+    else ui->stackFilter->setCurrentIndex(1);
 }

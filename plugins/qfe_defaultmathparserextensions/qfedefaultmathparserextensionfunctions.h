@@ -8,4 +8,11 @@ qfmpResult fWeightedRegression(const qfmpResult* params, unsigned int  n, QFMath
 qfmpResult fIRLS(const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
 
+
+qfmpResult fErrorAdd(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+qfmpResult fErrorSub(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+qfmpResult fErrorMul(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+qfmpResult fErrorDiv(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+qfmpResult fErrorPow(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+
 #endif // QFEDEFAULTMATHPARSEREXTENSIONFUNCTIONS_H
