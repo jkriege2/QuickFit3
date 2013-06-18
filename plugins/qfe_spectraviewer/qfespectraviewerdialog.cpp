@@ -10,6 +10,7 @@
 #include "qfespectraviewerfluorophoreditor.h"
 #include <QSettings>
 #include "qfespectraviewerspilloverdialog.h"
+#include "qfversion.h"
 
 double plotFunctionSpectralLine(double x, void* data) {
     double* d=(double*)data;
@@ -872,39 +873,151 @@ QFESpectraViewerPlotItem::QFESpectraViewerPlotItem(QFESpectraViewerPlotItemType 
 
 
 void QFESpectraViewerDialog::on_btnMailFluorophore_clicked() {
-    /*int component=ui->comboBox->currentIndex();
-    QString datafilename=QFileInfo(plugin->getComponentDatafile(component)).fileName();
-    QFile f(plugin->getComponentDatafile(component));
-    QString filecontents;
-    if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
-        filecontents=f.readAll();
-        f.close();
-    }
+    if (currentIndex<0 || currentIndex>=plotItems.size()) return;
+    if (manager->fluorophoreExists(plotItems[currentIndex].name)) {
+        QString spectrafiles="";
+        SpectrumManager::FluorophoreData d=manager->getFluorophoreData(plotItems[currentIndex].name);
+        QVector<double> absWL, flWL, absS, flS;
+        if (manager->spectrumExists(d.spectrum_abs)) {
+            absWL=  arrayToVector(manager->getSpectrum(d.spectrum_abs)->getWavelength(), manager->getSpectrum(d.spectrum_abs)->getN());
+            absS=  arrayToVector(manager->getSpectrum(d.spectrum_abs)->getSpectrum(), manager->getSpectrum(d.spectrum_abs)->getN());
+        }
+        if (manager->spectrumExists(d.spectrum_fl)) {
+            flWL=  arrayToVector(manager->getSpectrum(d.spectrum_fl)->getWavelength(), manager->getSpectrum(d.spectrum_fl)->getN());
+            flS=  arrayToVector(manager->getSpectrum(d.spectrum_fl)->getSpectrum(), manager->getSpectrum(d.spectrum_fl)->getN());
+        }
+        QString absFN=cleanStringForFilename(plotItems[currentIndex].name.toLower())+"_abs.spec";
+        spectrafiles+=QString("# %1\n").arg(absFN);
+        for (int i=0; i<absWL.size(); i++) {
+            spectrafiles+=(doubleToQString(absWL[i])+", "+doubleToQString(absS[i])+"\n");
+        }
+        QString flFN=cleanStringForFilename(plotItems[currentIndex].name.toLower())+"_fl.spec";
+        spectrafiles+="\n\n---------------------------------------------------------------------\n";
+        spectrafiles+=QString("# %1\n").arg(flFN);
+        for (int i=0; i<flWL.size(); i++) {
+            spectrafiles+=(doubleToQString(flWL[i])+", "+doubleToQString(flS[i])+"\n");
+        }
+        spectrafiles+="\n\n\n";
 
-    QString inisection=QString("[component%1]\n"
-                               "name=%2\n"
-                               "molar_mass=%3\n"
-                               "reference=\"%4\"\n"
-                               "datafile=%5\n"
-                               "comment=\"%6\"\n"
-                               "comment_html=\"%7\"\n"
-                               "model=%8\n"
-                               "model_expression=\"%9\"\n").arg(component).arg(plugin->getComponentName(component)).arg(plugin->getComponentMolarMass(component)).arg(plugin->getComponentReference(component)).arg(datafilename).arg(plugin->getComponentComment(component, false)).arg(plugin->getComponentComment(component, true)).arg(plugin->getComponentModelID(component)).arg(plugin->getViscosityModelFunction(component, false));
-    QVector<double> params=plugin->getComponentModelParamaters(component);
-    for (int i=0; i<params.size(); i++) {
-        inisection+=QString("p%1=%2\n").arg(i+1).arg(params[i]);
-    }
-    QString mailcontents=tr("Dear authors,\nfind attatched my component data for inclusion in the next QuickFit release,\n\nBest,\n\n\nDATA:\n---------------------------------------------------------------------\n%1\n---------------------------------------------------------------------\n%3:\n%2\n---------------------------------------------------------------------\n").arg(inisection).arg(filecontents).arg(datafilename);
+        QString data=QString("[%1]\n").arg(plotItems[currentIndex].name);
+        data+=QString("name = \"%1\"\n").arg(d.name);
+        data+=QString("manufacturer = \"%1\"\n").arg(d.manufacturer);
+        data+=QString("oder_no = \"%1\"\n").arg(d.orderNo);
+        data+=QString("reference = \"%1\"\n").arg(d.reference);
+        data+=QString("q_fluor = %1\n").arg(d.fluorescence_efficiency);
+        data+=QString("q_fluor_wavelength = %1\n").arg(d.fluorescence_efficiency_wavelength);
+        data+=QString("molar_extinction = %1\n").arg(d.extiction_coefficient);
+        data+=QString("molar_extinction_wavelength = %1\n").arg(d.extiction_coefficient_wavelength);
+        data+=QString("tau_fluor = %1\n").arg(d.fluorescence_lifetime);
+        data+=QString("excitation_max = %1\n").arg(d.excitation_maxwavelength);
+        data+=QString("emission_max = %1\n").arg(d.emission_maxwavelength);
+        data+=QString("description = \"%1\"\n").arg(d.description);
+        data+=QString("condition = \"%1\"\n").arg(d.condition);
+        data+=QString("spectrum_abs = \"%1\"\n").arg(absFN);
+        data+=QString("spectrum_abs_id = %1\n").arg(0);
+        data+=QString("spectrum_abs_separatewavelengths = %1\n").arg(false);
+        if (manager->spectrumExists(d.spectrum_abs)) {
+            data+=QString("spectrum_abs_reference = \"%1\"\n").arg(manager->getSpectrum(d.spectrum_abs)->reference);
+        }
+        data+=QString("spectrum_fl = \"%1\"\n").arg(flFN);
+        data+=QString("spectrum_fl_id = %1\n").arg(0);
+        data+=QString("spectrum_fl_separatewavelengths = %1\n").arg(false);
+        if (manager->spectrumExists(d.spectrum_fl)) {
+            data+=QString("spectrum_fl_reference = \"%1\"\n").arg(manager->getSpectrum(d.spectrum_fl)->reference);
+        }
 
-    QUrl url=QUrl(QByteArray("mailto:")+qfInfoEmail().toLocal8Bit()+"?subject="+QUrl::toPercentEncoding("QuickFit3/calc_diffcoeff: new component data")+
-                  "&body="+QUrl::toPercentEncoding(mailcontents));
-    QDesktopServices::openUrl(url);*/
+        QString mailcontents=tr("Dear authors,\nfind attatched my fluorophores spectrum data for inclusion in the next QuickFit release,\n\nBest,\n\n\nDATA:\n---------------------------------------------------------------------\n%1\n---------------------------------------------------------------------\n%2\n---------------------------------------------------------------------\n").arg(data).arg(spectrafiles);
+
+        QUrl url=QUrl(QByteArray("mailto:")+qfInfoEmail().toLocal8Bit()+"?subject="+QUrl::toPercentEncoding("QuickFit3/qfe_spectraviewer: new fluorophore data")+
+                      "&body="+QUrl::toPercentEncoding(mailcontents));
+        QDesktopServices::openUrl(url);
+
+
+    }
 }
 
 void QFESpectraViewerDialog::on_btnMailLightsource_clicked()
 {
+    if (currentIndex<0 || currentIndex>=plotItems.size()) return;
+    if (manager->lightsourceExists(plotItems[currentIndex].name)) {
+        QString spectrafiles="";
+        SpectrumManager::LightSourceData d=manager->getLightSourceData(plotItems[currentIndex].name);
+        QVector<double> absWL, absS;
+        if (manager->spectrumExists(d.spectrum)) {
+            absWL=  arrayToVector(manager->getSpectrum(d.spectrum)->getWavelength(), manager->getSpectrum(d.spectrum)->getN());
+            absS=  arrayToVector(manager->getSpectrum(d.spectrum)->getSpectrum(), manager->getSpectrum(d.spectrum)->getN());
+        }
+
+        QString absFN=cleanStringForFilename(plotItems[currentIndex].name.toLower())+".spec";
+        spectrafiles+=QString("# %1\n").arg(absFN);
+        for (int i=0; i<absWL.size(); i++) {
+            spectrafiles+=(doubleToQString(absWL[i])+", "+doubleToQString(absS[i])+"\n");
+        }
+        spectrafiles+="\n\n\n";
+
+        QString data=QString("[%1]\n").arg(plotItems[currentIndex].name);
+        data+=QString("name = %1\n").arg(d.name);
+        data+=QString("manufacturer = %1\n").arg(d.manufacturer);
+        data+=QString("oder_no = %1\n").arg(d.orderNo);
+        data+=QString("reference = %1\n").arg(d.reference);
+        data+=QString("typical_wavelength = %1\n").arg(d.typical_wavelength);
+        data+=QString("description = %1\n").arg(d.description);
+        data+=QString("spectrum = \"%1\"\n").arg(absFN);
+        data+=QString("spectrum_id = %1\n").arg(0);
+        data+=QString("spectrum_separatewavelengths = %1\n").arg(false);
+        if (manager->spectrumExists(d.spectrum)) {
+            data+=QString("spectrum_reference = \"%1\"\n").arg(manager->getSpectrum(d.spectrum)->reference);
+        }
+
+        QString mailcontents=tr("Dear authors,\nfind attatched my lightsource spectrum data for inclusion in the next QuickFit release,\n\nBest,\n\n\nDATA:\n---------------------------------------------------------------------\n%1\n---------------------------------------------------------------------\n%2\n---------------------------------------------------------------------\n").arg(data).arg(spectrafiles);
+
+        QUrl url=QUrl(QByteArray("mailto:")+qfInfoEmail().toLocal8Bit()+"?subject="+QUrl::toPercentEncoding("QuickFit3/qfe_spectraviewer: new lightsource data")+
+                      "&body="+QUrl::toPercentEncoding(mailcontents));
+        QDesktopServices::openUrl(url);
+
+
+    }
 }
 
 void QFESpectraViewerDialog::on_btnMailFilter_clicked()
 {
+    if (currentIndex<0 || currentIndex>=plotItems.size()) return;
+    if (manager->filterExists(plotItems[currentIndex].name)) {
+        QString spectrafiles="";
+        SpectrumManager::FilterData d=manager->getFilterData(plotItems[currentIndex].name);
+        QVector<double> absWL, absS;
+        if (manager->spectrumExists(d.spectrum)) {
+            absWL=  arrayToVector(manager->getSpectrum(d.spectrum)->getWavelength(), manager->getSpectrum(d.spectrum)->getN());
+            absS=  arrayToVector(manager->getSpectrum(d.spectrum)->getSpectrum(), manager->getSpectrum(d.spectrum)->getN());
+        }
+
+        QString absFN=cleanStringForFilename(plotItems[currentIndex].name.toLower())+".spec";
+        spectrafiles+=QString("# %1\n").arg(absFN);
+        for (int i=0; i<absWL.size(); i++) {
+            spectrafiles+=(doubleToQString(absWL[i])+", "+doubleToQString(absS[i])+"\n");
+        }
+        spectrafiles+="\n\n\n";
+
+        QString data=QString("[%1]\n").arg(plotItems[currentIndex].name);
+        data+=QString("name = \"%1\"\n").arg(d.name);
+        data+=QString("manufacturer = \"%1\"\n").arg(d.manufacturer);
+        data+=QString("oder_no = \"%1\"\n").arg(d.orderNo);
+        data+=QString("reference = \"%1\"\n").arg(d.reference);
+        data+=QString("typical_wavelength = %1\n").arg(d.typical_wavelength);
+        data+=QString("description = \"%1\"\n").arg(d.description);
+        data+=QString("spectrum = \"%1\"\n").arg(absFN);
+        data+=QString("spectrum_id = %1\n").arg(0);
+        data+=QString("spectrum_separatewavelengths = %1\n").arg(false);
+        if (manager->spectrumExists(d.spectrum)) {
+            data+=QString("spectrum_reference = \"%1\"\n").arg(manager->getSpectrum(d.spectrum)->reference);
+        }
+
+        QString mailcontents=tr("Dear authors,\nfind attatched my filter spectrum data for inclusion in the next QuickFit release,\n\nBest,\n\n\nDATA:\n---------------------------------------------------------------------\n%1\n---------------------------------------------------------------------\n%2\n---------------------------------------------------------------------\n").arg(data).arg(spectrafiles);
+
+        QUrl url=QUrl(QByteArray("mailto:")+qfInfoEmail().toLocal8Bit()+"?subject="+QUrl::toPercentEncoding("QuickFit3/qfe_spectraviewer: new filter data")+
+                      "&body="+QUrl::toPercentEncoding(mailcontents));
+        QDesktopServices::openUrl(url);
+
+
+    }
 }

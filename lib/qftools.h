@@ -440,6 +440,18 @@ T* duplicateArray(const T* input, long long N) {
     return out;
 }
 
+/*! \brief returns a vector containing all elements of the given array
+    \ingroup qf3lib_tools
+
+*/
+template <class T>
+QVector<T> arrayToVector(const T* input, long long N) {
+    T dummy;
+    QVector<T> out(N, dummy);
+    memcpy(out.data(), input, N*sizeof(T));
+    return out;
+}
+
 /*! \brief copies the contents inf \a input (\a N elements) into \a out and returns \a out
     \ingroup qf3lib_tools
 

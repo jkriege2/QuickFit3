@@ -122,7 +122,7 @@
         <item>
          <widget class="QStackedWidget" name="stackSpectraEditor">
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="widFilter">
            <layout class="QFormLayout" name="formLayout_2">
@@ -234,6 +234,13 @@
                    <widget class="QPushButton" name="btnEditFilter">
                     <property name="text">
                      <string>&amp;edit</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="btnMailFilter">
+                    <property name="text">
+                     <string>&amp;donate</string>
                     </property>
                    </widget>
                   </item>
@@ -381,6 +388,13 @@
                     </property>
                    </widget>
                   </item>
+                  <item>
+                   <widget class="QPushButton" name="btnMailLightsource">
+                    <property name="text">
+                     <string>&amp;donate</string>
+                    </property>
+                   </widget>
+                  </item>
                  </layout>
                 </item>
                </layout>
@@ -448,6 +462,13 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QPushButton" name="btnMailFluorophore">
+                <property name="text">
+                 <string>donate</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
            </layout>
@@ -476,15 +497,15 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QEnhancedTableView</class>
+   <extends>QTableView</extends>
+   <header>qenhancedtableview.h</header>
+  </customwidget>
+  <customwidget>
    <class>QFPlotter</class>
    <extends>QWidget</extends>
    <header>qfplotter.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QEnhancedTableView</class>
-   <extends>QTableView</extends>
-   <header>qenhancedtableview.h</header>
   </customwidget>
  </customwidgets>
  <resources>
