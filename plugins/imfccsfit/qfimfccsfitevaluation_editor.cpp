@@ -1050,7 +1050,7 @@ void QFImFCCSFitEvaluationEditor::fitAllFilesetsAllPixels()
                     if (run>=0) runname=QString::number(run);
                     double runtime=double(time.elapsed())/1.0e3;
                     double timeperfit=runtime/double(currentItem);
-                    double estimatedRuntime=double(runmax-runmin)*timeperfit;
+                    double estimatedRuntime=double(items)*timeperfit;
                     double remaining=estimatedRuntime-runtime;
                     dlgFitProgress->reportSuperStatus(tr("fit run %1<br>using algorithm '%2' \nruntime: %3:%4       remaining: %5:%6 [min:secs]       %9 fits/sec").arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
 
@@ -1066,7 +1066,9 @@ void QFImFCCSFitEvaluationEditor::fitAllFilesetsAllPixels()
             for (int j=0; j<records.size(); j++) {
                 records[j]->enableEmitResultsChanged(true);
             }
+            if (dlgFitProgress->isCanceled()) break;
         }
+        if (dlgFitProgress->isCanceled()) break;
     }
     falg->setReporter(NULL);
 
