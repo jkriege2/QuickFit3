@@ -19,17 +19,21 @@ QFImFCCSRelativeCCFDialog::QFImFCCSRelativeCCFDialog(QWidget *parent) :
     ui(new Ui::QFImFCCSRelativeCCFDialog)
 {
 
+
     plt=NULL;
-    ui->setupUi(this);
     matchFunctor=new QFImFCCSMatchRDRFunctor();
     QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
     QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
+    ui->setupUi(this);
     ui->cmbACF->init(project, matchFunctor);
     ui->cmbCCF->init(project, matchFunctor);
 
     ui->widOverviewACF->setRDR(NULL);
     ui->widOverviewCCF->setRDR(NULL);
 
+
+    connect(ui->cmbACF, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbACF_currentIndexChanged(int)));
+    connect(ui->cmbCCF, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCCF_currentIndexChanged(int)));
 
     bool okACF=false;
     bool okCCF=false;
@@ -48,6 +52,8 @@ QFImFCCSRelativeCCFDialog::QFImFCCSRelativeCCFDialog(QWidget *parent) :
     }
 
     loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "ImFCSCalibrationWizard");
+
+
 }
 
 QFImFCCSRelativeCCFDialog::~QFImFCCSRelativeCCFDialog()
@@ -153,12 +159,12 @@ bool QFImFCCSRelativeCCFDialog::calculateRelCCF(QFRawDataRecord *acf, QFRawDataR
     return true;
 }
 
-void QFImFCCSRelativeCCFDialog::on_cmbCCF_currentIndexChanged(int index)
+void QFImFCCSRelativeCCFDialog::cmbCCF_currentIndexChanged(int index)
 {
     replotImages();
 }
 
-void QFImFCCSRelativeCCFDialog::on_cmbACF_currentIndexChanged(int /*index*/)
+void QFImFCCSRelativeCCFDialog::cmbACF_currentIndexChanged(int /*index*/)
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRawDataRecord* acf=ui->cmbACF->currentRDR();
@@ -431,10 +437,10 @@ void QFImFCCSRelativeCCFDialog::on_btnStoreDataAll_clicked()
 
     }
     QApplication::processEvents();
-    on_cmbACF_currentIndexChanged(ui->cmbACF->currentIndex());
+    cmbACF_currentIndexChanged(ui->cmbACF->currentIndex());
     addResult();
     while (nextACF()) {
-        on_cmbACF_currentIndexChanged(ui->cmbACF->currentIndex());
+        cmbACF_currentIndexChanged(ui->cmbACF->currentIndex());
         //QApplication::processEvents();
         addResult();
         if (progress.wasCanceled()) break;
@@ -462,10 +468,10 @@ void QFImFCCSRelativeCCFDialog::on_btnStoreDataAllSameRole_clicked()
 
     }
     QApplication::processEvents();
-    on_cmbACF_currentIndexChanged(ui->cmbACF->currentIndex());
+    cmbACF_currentIndexChanged(ui->cmbACF->currentIndex());
     addResult();
     while(nextFileSameRole()) {
-        on_cmbACF_currentIndexChanged(ui->cmbACF->currentIndex());
+        cmbACF_currentIndexChanged(ui->cmbACF->currentIndex());
         //QApplication::processEvents();
         addResult();
         if (progress.wasCanceled()) break;

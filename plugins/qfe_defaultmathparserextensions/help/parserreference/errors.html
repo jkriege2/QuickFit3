@@ -1,0 +1,81 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Simple functions for propagation of uncertainty</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+  
+  <ul>
+	  <li><a name="eadd"/><!-- func:eadd -->
+	  <b><tt><!-- template -->eadd(X, Y)<!-- /template --></tt> - <i>calculates the sum of values <tt>X</tt> and <tt>Y</tt> and the error of the sum, if the errors of X and Y are known. Both parameters are given as 2-component vector <tt>[value, error]</tt> and a vector of the same type is returned. This function implements 
+	    $$bmath:(X\pm \Delta_X)+(Y\pm\Delta_Y)=(X+Y)\pm\sqrt{(\Delta_X)^2+(\Delta_Y)^2}$$</i></b><br>
+	  	  
+	  <blockquote>
+	      <tt>eadd([3.2,0.5], [5.3,0.2])</tt> adds the values $$math:(3.2\pm0.5)$$ and $$math:(5.3\pm0.2)$$<br>
+	  </blockquote>
+	  
+	  
+	  $$note:These functions do error propagation in a very simple manner. The result of a single function is always correct (provided the measurement errors are independent). If several function are combined, the result should be correct, as long as each value-error pair appears only once in the expression and the errors are independent! $$
+	  <!-- /func:eadd -->
+	  </li>
+
+	  <li><a name="esub"/><!-- func:esub -->
+	  <b><tt><!-- template -->esub(X, Y)<!-- /template --></tt> - <i>subtracts <tt>Y</tt> from <tt>X</tt> and the error of that operation, if the errors of X and Y are known. Both parameters are given as 2-component vector <tt>[value, error]</tt> and a vector of the same type is returned. This function implements 
+	    $$bmath:(X\pm \Delta_X)-(Y\pm\Delta_Y)=(X-Y)\pm\sqrt{(\Delta_X)^2+(\Delta_Y)^2}$$</i></b><br>
+	  	  
+	  <blockquote>
+	      <tt>esub([3.2,0.5], [5.3,0.2])</tt> subtracts the values $$math:(3.2\pm0.5)$$ and $$math:(5.3\pm0.2)$$<br>
+	  </blockquote>
+	  
+	  
+	  $$note:These functions do error propagation in a very simple manner. The result of a single function is always correct (provided the measurement errors are independent). If several function are combined, the result should be correct, as long as each value-error pair appears only once in the expression and the errors are independent! $$
+	  <!-- /func:esub -->
+	  </li>
+
+	  <li><a name="emul"/><!-- func:emul -->
+	  <b><tt><!-- template -->emul(X, Y)<!-- /template --></tt> - <i>calculates the sum of values <tt>X</tt> and <tt>Y</tt> and the error of the sum, if the errors of X and Y are known. Both parameters are given as 2-component vector <tt>[value, error]</tt> and a vector of the same type is returned. This function implements 
+	    $$bmath:(X\pm \Delta_X)\cdot (Y\pm\Delta_Y)=(X\cdot Y)\pm\sqrt{\left(Y\cdot\Delta_X\right)^2+\left(X\cdot\Delta_Y\right)^2}$$</i></b><br>
+	  	  
+	  <blockquote>
+	      <tt>emul([3.2,0.5], [5.3,0.2])</tt> multiplies the values $$math:(3.2\pm0.5)$$ and $$math:(5.3\pm0.2)$$<br>
+	  </blockquote>
+	  
+	  
+	  $$note:These functions do error propagation in a very simple manner. The result of a single function is always correct (provided the measurement errors are independent). If several function are combined, the result should be correct, as long as each value-error pair appears only once in the expression and the errors are independent! $$
+	  <!-- /func:emul -->
+	  </li>
+
+	  <li><a name="ediv"/><!-- func:ediv -->
+	  <b><tt><!-- template -->esub(X, Y)<!-- /template --></tt> - <i>divides <tt>X</tt> by <tt>Y</tt> and calculates the error of that operation, if the errors of X and Y are known. Both parameters are given as 2-component vector <tt>[value, error]</tt> and a vector of the same type is returned. This function implements 
+	    $$bmath:(X\pm \Delta_X)/(Y\pm\Delta_Y)=(X/Y)\pm\sqrt{\left(\frac{\Delta_X}{Y}\right)^2+\left(\frac{X\cdot\Delta_Y}{Y^2}\right)^2}$$</i></b><br>
+	  	  
+	  <blockquote>
+	      <tt>ediv([3.2,0.5], [5.3,0.2])</tt> divides the values $$math:(3.2\pm0.5)$$ and $$math:(5.3\pm0.2)$$<br>
+	  </blockquote>
+	  
+	  
+	  $$note:These functions do error propagation in a very simple manner. The result of a single function is always correct (provided the measurement errors are independent). If several function are combined, the result should be correct, as long as each value-error pair appears only once in the expression and the errors are independent! $$
+	  <!-- /func:ediv -->
+	  </li>
+	  
+	  
+	  <li><a name="epow"/><!-- func:epow -->
+	  <b><tt><!-- template -->epow(X, Y)<!-- /template --></tt> - <i>takes <tt>X</tt> to the power <tt>Y</tt> and calculates the error of that operation, if the errors of X and Y are known. Both parameters are given as 2-component vector <tt>[value, error]</tt> and a vector of the same type is returned. This function implements 
+	    $$bmath:(X\pm \Delta_X)^{(Y\pm\Delta_Y)}=(X^Y)\pm\sqrt{\left(\Delta_X\cdot Y\cdot X^{Y-1}\right)^2+\left(\Delta_Y\cdot X^Y\cdot\ln\left(Y\right)\right)^2}$$</i></b><br>
+	  	  
+	  <blockquote>
+	      <tt>epow([3.2,0.5], [5.3,0.2])</tt> divides the values $$math:(3.2\pm0.5)$$ and $$math:(5.3\pm0.2)$$<br>
+	  </blockquote>
+	  
+	  
+	  $$note:These functions do error propagation in a very simple manner. The result of a single function is always correct (provided the measurement errors are independent). If several function are combined, the result should be correct, as long as each value-error pair appears only once in the expression and the errors are independent! $$
+	  <!-- /func:epow -->
+	  </li>
+  </ul>
+  
+  </body>
+  </html>
+  

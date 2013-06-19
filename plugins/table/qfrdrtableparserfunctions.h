@@ -20,6 +20,9 @@ qfmpResult fQFRDRTableEditor_data(const qfmpResult* params, unsigned int n, QFMa
 qfmpResult fQFRDRTableEditor_column(const qfmpResult* params, unsigned int n, QFMathParser* p);
 qfmpResult fQFRDRTableEditor_columnUnique(const qfmpResult* params, unsigned int n, QFMathParser* p);
 qfmpResult fQFRDRTableEditor_indexedColAvg(const qfmpResult* params, unsigned int n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_indexedColSum(const qfmpResult* params, unsigned int n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_indexedColSum2(const qfmpResult* params, unsigned int n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_indexedColVar(const qfmpResult* params, unsigned int n, QFMathParser* p);
 qfmpResult fQFRDRTableEditor_indexedColStd(const qfmpResult* params, unsigned int n, QFMathParser* p);
 qfmpResult fQFRDRTableEditor_indexedColMin(const qfmpResult* params, unsigned int n, QFMathParser* p);
 qfmpResult fQFRDRTableEditor_indexedColMax(const qfmpResult* params, unsigned int n, QFMathParser* p);
@@ -37,6 +40,16 @@ qfmpResult fQFRDRTableEditor_colmedian(const qfmpResult* params, unsigned int  n
 qfmpResult fQFRDRTableEditor_colquantile(const qfmpResult* params, unsigned int  n, QFMathParser* p);
 qfmpResult fQFRDRTableEditor_colmin(const qfmpResult* params, unsigned int  n, QFMathParser* p);
 qfmpResult fQFRDRTableEditor_colmax(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+
+/*qfmpResult fQFRDRTableEditor_colsavg(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_colssum(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_colssum2(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_colsvar(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_colsstd(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_colsmedian(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_colsquantile(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_colsmin(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_colsmax(const qfmpResult* params, unsigned int  n, QFMathParser* p);*/
 
 
 #endif // QFRDRTABLEPARSERFUNCTIONS_H

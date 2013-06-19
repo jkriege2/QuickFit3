@@ -71,8 +71,10 @@ QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int co
     //qDebug()<<"datapoints_after_clean="<<datapoints;
 
     if (dataX.size()>0) {
-        ui->datacut->set_min(qfstatisticsMin(dataX));
-        ui->datacut->set_max(qfstatisticsMax(dataX));
+        double mi=qfstatisticsMin(dataX);
+        double ma=qfstatisticsMax(dataX);
+        ui->datacut->set_min(mi-(ma-mi)/2.0);
+        ui->datacut->set_max(ma+(ma-mi)/2.0);
     }
     ui->datacut->setLogScale(logX, 20);
 
@@ -93,6 +95,9 @@ QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int co
     ui->cmbFitType->addItem(tr("linear regression"), 0);
     if (dataW.size()==datapoints) ui->cmbFitType->addItem(tr("linear regression, weighted"), 1);
     ui->cmbFitType->addItem(tr("linear regression, robust"), 2);
+    ui->cmbFitType->addItem(tr("power-law regression"), 3);
+    //if (dataW.size()==datapoints) ui->cmbFitType->addItem(tr("power-law regression, weighted"), 4);
+    ui->cmbFitType->addItem(tr("power-law regression, robust"), 4);
 
     ui->cmbFitType->setCurrentIndex(0);
     methodChanged(ui->cmbFitType->currentIndex());
@@ -133,6 +138,12 @@ void QFRDRTableRegressionDialog::saveResults()
                 } else {
                     table->colgraphAddFunctionPlot(g, "", QFRDRColumnGraphsInterface::cgtPolynomial, fitresult, lastResultD);
                 }
+            } else if (method>=3 && method<=4) {
+                if (savedTo>=0) {
+                    table->colgraphAddFunctionPlot(g, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, savedTo);
+                } else {
+                    table->colgraphAddFunctionPlot(g, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, lastResultD);
+                }
             }
         } else if (saveGraph>=2){
             if (method>=0 && method<=2) {
@@ -140,6 +151,12 @@ void QFRDRTableRegressionDialog::saveResults()
                     table->colgraphAddFunctionPlot(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPolynomial, fitresult, savedTo);
                 } else {
                     table->colgraphAddFunctionPlot(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPolynomial, fitresult, lastResultD);
+                }
+            } else if (method>=3 && method<=4) {
+                if (savedTo>=0) {
+                    table->colgraphAddFunctionPlot(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, savedTo);
+                } else {
+                    table->colgraphAddFunctionPlot(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, lastResultD);
                 }
             }
         }
@@ -161,23 +178,28 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
     int rmin=getRangeMin();
     int rmax=getRangeMax();
 
-    QVector<double> datX=dataX;
-    QVector<double> datY=dataY;
-    QVector<double> datW=dataW;
-    QVector<double> datWW=weights;
+    QVector<double> datX;
+    QVector<double> datY;
+    QVector<double> datXLog;
+    QVector<double> datYLog;
+    QVector<double> datW;
+    QVector<double> datWW;
 
-    if (method>=0 && method<=2) {
+    //if (method>=0 && method<=2) {
         for (int i=rmin; i<=rmax; i++) {
             datX<<dataX[i];
             datY<<dataY[i];
             datW<<dataW[i];
             datWW<<weights[i];
+            datXLog<<log(dataX[i]);
+            datYLog<<log(dataY[i]);
         }
-    } else {
-
-    }
+        //if (datX.size()>1) qDebug()<<datX.first()<<datX.last()<<datX.size()<<rmin<<rmax;
+    //}
     double* dx=datX.data();
     double* dy=datY.data();
+    double* dxl=datXLog.data();
+    double* dyl=datYLog.data();
     double* dw=datW.data();
     double* dww=datWW.data();
     int items=rmax-rmin+1;
@@ -230,6 +252,41 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
                 residuals_weighted<<residuals[i];
             }
             ok=true;
+        } else  if (method==3) {
+            double ia=log(a);
+            double ib=b;
+            statisticsLinearRegression(dxl, dyl, items, ia, ib, afix, bfix);
+            a=exp(ia);
+            b=ib;
+            fitresult=tr("regression: f(x)= %1 \\cdot x^{%2}").arg(floattolatexstr(a).c_str()).arg(floattolatexstr(b).c_str());
+            lastResults<<a<<b;
+            lastResultD<<a<<b;
+            resultComment=tr("regression result");
+            for (int i=0; i<dataX.size(); i++) {
+                funeval<<a*pow(dataX[i],b);
+                residuals<<dataY[i]-funeval[i];
+                residuals_weighted<<residuals[i];
+            }
+            ok=true;
+        } else if (method==4) {
+            int iterations=getParamValue("iterations", 100);
+            double param=getParamValue("irls_param", 1.1);
+            double ia=log(a);
+            double ib=b;
+            statisticsIterativelyReweightedLeastSquaresRegression(dxl, dyl, items, ia, ib, param, iterations, afix, bfix);
+            a=exp(ia);
+            b=ib;
+            fitresult=tr("regression: f(x)= %1 \\cdot x^{%2}").arg(floattolatexstr(a).c_str()).arg(floattolatexstr(b).c_str());
+            lastResults<<a<<b;
+            lastResultD<<a<<b;
+            resultComment=tr("robust regression result");
+            for (int i=0; i<dataX.size(); i++) {
+                funeval<<a*pow(dataX[i],b);
+                residuals<<dataY[i]-funeval[i];
+                residuals_weighted<<residuals[i];
+            }
+            ok=true;
+
         } else {
         }
 
@@ -268,10 +325,10 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
 
         parameterTable->rebuildModel();
         QApplication::restoreOverrideCursor();
-        replotGraph();
-    } else {
+     } else {
         QMessageBox::critical(this, tr("Regression Error"), tr("an error occured during the regression analysis.\nerror message:\n    %1").arg(error));
     }
+    replotGraph();
     connectSignals(true);
 }
 
@@ -318,7 +375,8 @@ void QFRDRTableRegressionDialog::replotGraph()
     g_dist->set_yColumn(c_Y);
     g_dist->set_yErrorColumn(c_W);
     g_dist->set_xErrorStyle(JKQTPnoError);
-    g_dist->set_yErrorStyle(JKQTPerrorBars);
+    if (ui->chkPlotErrors->isChecked()) g_dist->set_yErrorStyle(JKQTPerrorBars);
+    else g_dist->set_yErrorStyle(JKQTPnoError);
     g_dist->set_color(QColor("blue"));
     g_dist->set_errorColor(g_dist->get_color().lighter());
     g_dist->set_drawLine(false);
@@ -338,12 +396,13 @@ void QFRDRTableRegressionDialog::replotGraph()
     g_fit->set_title(fitresult);
     g_fit->set_color(QColor("red"));
     bool ok=false;
-    if (method>=0 && method<=2) {
+    if (method>=0 && method<=4) {
         QVector<double> vecP;
         vecP<<getParamValue("a", 0);
         vecP<<getParamValue("b", 1);
         g_fit->set_params(vecP);
         g_fit->setSpecialFunction(JKQTPxFunctionLineGraph::Polynomial);
+        if (method>=3 && method<=4) g_fit->setSpecialFunction(JKQTPxFunctionLineGraph::PowerLaw);
         ok=true;
     }
     if (ok) {
@@ -357,7 +416,7 @@ void QFRDRTableRegressionDialog::replotGraph()
     ui->pltDistribution->set_doDrawing(true);
     ui->pltDistribution->set_emitSignals(true);
     ui->pltDistribution->zoomToFit();
-    //ui->pltDistribution->update_plot();
+    ui->pltDistribution->update_plot();
     QApplication::restoreOverrideCursor();
 }
 
@@ -386,6 +445,8 @@ void QFRDRTableRegressionDialog::methodChanged(int method)
     }
     if (method>=0 && method<=2) {
         ui->labEquation->setText("f(x) = a + b\\cdot x");
+    } else if (method>=3 && method<=4) {
+        ui->labEquation->setText("f(x) = a \\cdot x^b");
     } else {
         ui->labEquation->setText("--- --- ---");
     }
@@ -404,12 +465,14 @@ void QFRDRTableRegressionDialog::connectSignals(bool connectS)
         connect(ui->cmbFitType, SIGNAL(currentIndexChanged(int)), this, SLOT(methodChanged(int)));
         connect(ui->chkLogX, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         connect(ui->chkLogY, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
+        connect(ui->chkPlotErrors, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         connect(ui->datacut, SIGNAL(slidersChanged(double,double,double,double)), this, SLOT(replotGraph()));
     } else {
         disconnect(parameterTable, SIGNAL(fitParamChanged()), this, SLOT(replotGraph()));
         disconnect(ui->cmbFitType, SIGNAL(currentIndexChanged(int)), this, SLOT(methodChanged(int)));
         disconnect(ui->chkLogX, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         disconnect(ui->chkLogY, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
+        disconnect(ui->chkPlotErrors, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         disconnect(ui->datacut, SIGNAL(slidersChanged(double,double,double,double)), this, SLOT(replotGraph()));
     }
 }
@@ -417,20 +480,20 @@ void QFRDRTableRegressionDialog::connectSignals(bool connectS)
 int QFRDRTableRegressionDialog::getRangeMin()
 {
     int rm=0;
-    for (int i=0; i<datapoints; i++) {
+    for (int i=0; i<dataX.size(); i++) {
         if (dataX[i]>=ui->datacut->get_userMin()) {
             rm=i;
             break;
         }
     }
-    return qBound(rm, 0, dataX.size()-1);
+    return qBound(0, rm, dataX.size()-1);
 }
 
 int QFRDRTableRegressionDialog::getRangeMax()
 {
-    int rm=datapoints-1;
-    for (int i=datapoints-1; i>=0; i--) {
-        if (dataX[i]>ui->datacut->get_userMax()) {
+    int rm=getRangeMin();
+    for (int i=rm; i<dataX.size(); i++) {
+        if (dataX[i]<=ui->datacut->get_userMax()) {
             rm=i;            
         } else {
             break;

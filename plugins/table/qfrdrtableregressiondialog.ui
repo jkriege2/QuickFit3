@@ -32,7 +32,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,0,0">
      <item>
       <widget class="DoubleDataCutSliders" name="datacut" native="true">
        <property name="minimumSize">
@@ -54,6 +54,13 @@
       <widget class="QCheckBox" name="chkLogY">
        <property name="text">
         <string>log y</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkPlotErrors">
+       <property name="text">
+        <string>plot errors</string>
        </property>
       </widget>
      </item>
@@ -150,7 +157,7 @@
            <string>&amp;Fit</string>
           </property>
           <property name="icon">
-           <iconset resource="qfrdrtable.qrc">
+           <iconset resource="../fcsmsdevaluation/fcsmsdevaluation.qrc">
             <normaloff>:/fcsmsdevaluation/fit_fitcurrent.png</normaloff>:/fcsmsdevaluation/fit_fitcurrent.png</iconset>
           </property>
          </widget>
@@ -273,7 +280,9 @@
  </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
-  <include location="qfrdrtable.qrc"/>
+  <include location="../fcsmsdevaluation/fcsmsdevaluation.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
   <include location="../../lib/lib.qrc"/>
@@ -287,8 +296,8 @@
    <slot>showHelp()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>57</x>
-     <y>572</y>
+     <x>67</x>
+     <y>694</y>
     </hint>
     <hint type="destinationlabel">
      <x>69</x>
@@ -303,8 +312,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>601</x>
-     <y>571</y>
+     <x>720</x>
+     <y>693</y>
     </hint>
     <hint type="destinationlabel">
      <x>591</x>
@@ -319,8 +328,8 @@
    <slot>saveResults()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>548</x>
-     <y>565</y>
+     <x>639</x>
+     <y>693</y>
     </hint>
     <hint type="destinationlabel">
      <x>510</x>

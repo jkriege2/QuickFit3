@@ -32,7 +32,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,0,0">
      <item>
       <widget class="DoubleDataCutSliders" name="datacut" native="true">
        <property name="minimumSize">
@@ -54,6 +54,13 @@
       <widget class="QCheckBox" name="chkLogY">
        <property name="text">
         <string>log y</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkPlotErrors">
+       <property name="text">
+        <string>plot errors</string>
        </property>
       </widget>
      </item>
@@ -278,6 +285,7 @@
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../fcsmsdevaluation/fcsmsdevaluation.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>

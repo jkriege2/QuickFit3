@@ -284,7 +284,8 @@ void QFRDRTableCurveFitDialog::replotGraph()
     g_dist->set_yColumn(c_Y);
     g_dist->set_yErrorColumn(c_W);
     g_dist->set_xErrorStyle(JKQTPnoError);
-    g_dist->set_yErrorStyle(JKQTPerrorBars);
+    if (ui->chkPlotErrors->isChecked()) g_dist->set_yErrorStyle(JKQTPerrorBars);
+    else g_dist->set_yErrorStyle(JKQTPnoError);
     g_dist->set_color(QColor("blue"));
     g_dist->set_errorColor(g_dist->get_color().lighter());
     g_dist->set_drawLine(false);
@@ -379,12 +380,14 @@ void QFRDRTableCurveFitDialog::connectSignals(bool connectS)
         connect(ui->cmbFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(methodChanged(int)));
         connect(ui->chkLogX, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         connect(ui->chkLogY, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
+        connect(ui->chkPlotErrors, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         connect(ui->datacut, SIGNAL(slidersChanged(double,double,double,double)), this, SLOT(replotGraph()));
     } else {
         disconnect(parameterTable, SIGNAL(fitParamChanged()), this, SLOT(replotGraph()));
         disconnect(ui->cmbFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(methodChanged(int)));
         disconnect(ui->chkLogX, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         disconnect(ui->chkLogY, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
+        disconnect(ui->chkPlotErrors, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         disconnect(ui->datacut, SIGNAL(slidersChanged(double,double,double,double)), this, SLOT(replotGraph()));
     }
 }
@@ -403,7 +406,7 @@ int QFRDRTableCurveFitDialog::getRangeMin()
 
 int QFRDRTableCurveFitDialog::getRangeMax()
 {
-    int rm=datapoints-1;
+/*    int rm=datapoints-1;
     for (int i=datapoints-1; i>=0; i--) {
         if (dataX[i]>ui->datacut->get_userMax()) {
             rm=i;
@@ -412,8 +415,21 @@ int QFRDRTableCurveFitDialog::getRangeMax()
         }
     }
 
+    return qBound(0, rm, dataX.size()-1);*/
+    int rm=getRangeMin();
+    for (int i=rm; i<dataX.size(); i++) {
+        if (dataX[i]<=ui->datacut->get_userMax()) {
+            rm=i;
+        } else {
+            break;
+        }
+    }
+
     return qBound(0, rm, dataX.size()-1);
+
 }
+
+
 
 double QFRDRTableCurveFitDialog::getParamValue(const QString &param, double defaultVal) const
 {

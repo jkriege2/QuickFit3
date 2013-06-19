@@ -19,12 +19,25 @@ void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names, bool colum
         parser->addFunction("column", fQFRDRTableEditor_column);
         parser->addFunction("uniquecolumn", fQFRDRTableEditor_columnUnique);
         parser->addFunction("indexedcolavg", fQFRDRTableEditor_indexedColAvg);
+        parser->addFunction("indexedcolsum", fQFRDRTableEditor_indexedColSum);
+        parser->addFunction("indexedcolsum2", fQFRDRTableEditor_indexedColSum2);
+        parser->addFunction("indexedcolvar", fQFRDRTableEditor_indexedColVar);
         parser->addFunction("indexedcolstd", fQFRDRTableEditor_indexedColStd);
         parser->addFunction("indexedcolmin", fQFRDRTableEditor_indexedColMin);
         parser->addFunction("indexedcolmax", fQFRDRTableEditor_indexedColMax);
         parser->addFunction("indexedcolmedian", fQFRDRTableEditor_indexedColMedian);
         parser->addFunction("indexedcolquantile", fQFRDRTableEditor_indexedColQuantile);
         parser->addFunction("columndata", fQFRDRTableEditor_column);
+
+        /*parser->addFunction("colsavg", fQFRDRTableEditor_colsavg);
+        parser->addFunction("colssum", fQFRDRTableEditor_colssum);
+        parser->addFunction("colssum2", fQFRDRTableEditor_colssum2);
+        parser->addFunction("colsvar", fQFRDRTableEditor_colsvar);
+        parser->addFunction("colsstd", fQFRDRTableEditor_colsstd);
+        parser->addFunction("colsmin", fQFRDRTableEditor_colsmin);
+        parser->addFunction("colsmax", fQFRDRTableEditor_colsmax);
+        parser->addFunction("colsmedian", fQFRDRTableEditor_colsmedian);
+        parser->addFunction("colsquantile", fQFRDRTableEditor_colsquantile);*/
 
     //}
 
@@ -579,7 +592,7 @@ qfmpResult fQFRDRTableEditor_indexedColAvg(const qfmpResult* params, unsigned in
                         datasets[idxdv[i]].append(data[i]);
                     }
                     for (int i=0; i<dvu.size(); i++) {
-                        qDebug()<<"number col:"<<qfstatisticsAverage(datasets[dvu[i]])<<datasets[dvu[i]];
+                        //qDebug()<<"number col:"<<qfstatisticsAverage(datasets[dvu[i]])<<datasets[dvu[i]];
                         resvec<<qfstatisticsAverage(datasets[dvu[i]]);
                     }
                 } else {
@@ -591,6 +604,122 @@ qfmpResult fQFRDRTableEditor_indexedColAvg(const qfmpResult* params, unsigned in
                     }
                     for (int i=0; i<slu.size(); i++) {
                         resvec<<qfstatisticsAverage(datasets[slu[i]]);
+                    }
+                }
+                res.setDoubleVec(resvec);
+            }
+        }
+    }
+    return res;
+}
+
+
+
+qfmpResult fQFRDRTableEditor_indexedColSum(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    qfmpResult res=qfmpResult::invalidResult();
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            if (n!=2) p->qfmpError("indexedcolsum(column, index) needs 2 argument");
+            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) p->qfmpError("indexedcolsum(column, index) needs two integer arguments");
+            int c=floor(params[0].num-1);
+            int idx=floor(params[1].num-1);
+            if (c>=0 && c<d->model->columnCount() && idx>=0 && idx<d->model->columnCount()) {
+                QVector<double> data=d->model->getColumnDataAsNumbers(c, Qt::EditRole);
+                QVector<double> resvec;
+                QVariantList idxvl=d->model->getColumnData(idx, Qt::EditRole);
+                QVector<double> idxdv;
+                QStringList idxsl;
+                bool isNumber=true;
+                for (int i=0; i<idxvl.size(); i++) {
+                    bool ok=false;
+                    if (idxvl[i].canConvert(QVariant::Double)) {
+                        double d=idxvl[i].toDouble(&ok);
+                        idxdv<<d;
+                        if (!ok) isNumber=false;
+                    } else {
+                        isNumber=false;
+                    }
+                    idxsl<<idxvl[i].toString();
+                }
+                if (isNumber) {
+                    QMap<double, QList<double> > datasets;
+                    QVector<double> dvu;
+                    for (int i=0; i<idxdv.size(); i++) {
+                        if (!dvu.contains(idxdv[i])) dvu<<idxdv[i];
+                        datasets[idxdv[i]].append(data[i]);
+                    }
+                    for (int i=0; i<dvu.size(); i++) {
+                        //qDebug()<<"number col:"<<qfstatisticsSum(datasets[dvu[i]])<<datasets[dvu[i]];
+                        resvec<<qfstatisticsSum(datasets[dvu[i]]);
+                    }
+                } else {
+                    QMap<QString, QList<double> > datasets;
+                    QStringList slu;
+                    for (int i=0; i<idxsl.size(); i++) {
+                        if (!slu.contains(idxsl[i])) slu<<idxsl[i];
+                        datasets[idxsl[i]].append(data[i]);
+                    }
+                    for (int i=0; i<slu.size(); i++) {
+                        resvec<<qfstatisticsSum(datasets[slu[i]]);
+                    }
+                }
+                res.setDoubleVec(resvec);
+            }
+        }
+    }
+    return res;
+}
+
+
+
+qfmpResult fQFRDRTableEditor_indexedColSum2(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    qfmpResult res=qfmpResult::invalidResult();
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            if (n!=2) p->qfmpError("indexedcolsum2(column, index) needs 2 argument");
+            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) p->qfmpError("indexedcolsum2(column, index) needs two integer arguments");
+            int c=floor(params[0].num-1);
+            int idx=floor(params[1].num-1);
+            if (c>=0 && c<d->model->columnCount() && idx>=0 && idx<d->model->columnCount()) {
+                QVector<double> data=d->model->getColumnDataAsNumbers(c, Qt::EditRole);
+                QVector<double> resvec;
+                QVariantList idxvl=d->model->getColumnData(idx, Qt::EditRole);
+                QVector<double> idxdv;
+                QStringList idxsl;
+                bool isNumber=true;
+                for (int i=0; i<idxvl.size(); i++) {
+                    bool ok=false;
+                    if (idxvl[i].canConvert(QVariant::Double)) {
+                        double d=idxvl[i].toDouble(&ok);
+                        idxdv<<d;
+                        if (!ok) isNumber=false;
+                    } else {
+                        isNumber=false;
+                    }
+                    idxsl<<idxvl[i].toString();
+                }
+                if (isNumber) {
+                    QMap<double, QList<double> > datasets;
+                    QVector<double> dvu;
+                    for (int i=0; i<idxdv.size(); i++) {
+                        if (!dvu.contains(idxdv[i])) dvu<<idxdv[i];
+                        datasets[idxdv[i]].append(data[i]);
+                    }
+                    for (int i=0; i<dvu.size(); i++) {
+                        //qDebug()<<"number col:"<<qfstatisticsSum(datasets[dvu[i]])<<datasets[dvu[i]];
+                        resvec<<qfstatisticsSum2(datasets[dvu[i]]);
+                    }
+                } else {
+                    QMap<QString, QList<double> > datasets;
+                    QStringList slu;
+                    for (int i=0; i<idxsl.size(); i++) {
+                        if (!slu.contains(idxsl[i])) slu<<idxsl[i];
+                        datasets[idxsl[i]].append(data[i]);
+                    }
+                    for (int i=0; i<slu.size(); i++) {
+                        resvec<<qfstatisticsSum2(datasets[slu[i]]);
                     }
                 }
                 res.setDoubleVec(resvec);
@@ -650,6 +779,65 @@ qfmpResult fQFRDRTableEditor_indexedColStd(const qfmpResult* params, unsigned in
                     }
                     for (int i=0; i<slu.size(); i++) {
                         resvec<<qfstatisticsStd(datasets[slu[i]]);
+                    }
+                }
+                res.setDoubleVec(resvec);
+            }
+        }
+    }
+    return res;
+}
+
+
+
+
+
+qfmpResult fQFRDRTableEditor_indexedColVar(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    qfmpResult res=qfmpResult::invalidResult();
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            if (n!=2) p->qfmpError("indexedcolvar(column, index) needs 2 argument");
+            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) p->qfmpError("indexedcolvar(column, index) needs two integer arguments");
+            int c=floor(params[0].num-1);
+            int idx=floor(params[1].num-1);
+            if (c>=0 && c<d->model->columnCount() && idx>=0 && idx<d->model->columnCount()) {
+                QVector<double> data=d->model->getColumnDataAsNumbers(c, Qt::EditRole);
+                QVector<double> resvec;
+                QVariantList idxvl=d->model->getColumnData(idx, Qt::EditRole);
+                QVector<double> idxdv;
+                QStringList idxsl;
+                bool isNumber=true;
+                for (int i=0; i<idxvl.size(); i++) {
+                    bool ok=false;
+                    if (idxvl[i].canConvert(QVariant::Double)) {
+                        double d=idxvl[i].toDouble(&ok);
+                        idxdv<<d;
+                        if (!ok) isNumber=false;
+                    } else {
+                        isNumber=false;
+                    }
+                    idxsl<<idxvl[i].toString();
+                }
+                if (isNumber) {
+                    QMap<double, QList<double> > datasets;
+                    QVector<double> dvu;
+                    for (int i=0; i<idxdv.size(); i++) {
+                        if (!dvu.contains(idxdv[i])) dvu<<idxdv[i];
+                        datasets[idxdv[i]].append(data[i]);
+                    }
+                    for (int i=0; i<dvu.size(); i++) {
+                        resvec<<qfstatisticsVariance(datasets[dvu[i]]);
+                    }
+                } else {
+                    QMap<QString, QList<double> > datasets;
+                    QStringList slu;
+                    for (int i=0; i<idxsl.size(); i++) {
+                        if (!slu.contains(idxsl[i])) slu<<idxsl[i];
+                        datasets[idxsl[i]].append(data[i]);
+                    }
+                    for (int i=0; i<slu.size(); i++) {
+                        resvec<<qfstatisticsVariance(datasets[slu[i]]);
                     }
                 }
                 res.setDoubleVec(resvec);

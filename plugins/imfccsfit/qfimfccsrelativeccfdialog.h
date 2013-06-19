@@ -24,8 +24,8 @@ class QFImFCCSRelativeCCFDialog : public QWidget
         static bool calculateRelCCF(QFRawDataRecord* acf, QFRawDataRecord* ccf, double** rel, double** rel_error, int &w, int &h, int avgCount, bool showErrorMessage=false);
 
     protected slots:
-        void on_cmbACF_currentIndexChanged(int index);
-        void on_cmbCCF_currentIndexChanged(int index);
+        void cmbACF_currentIndexChanged(int index);
+        void cmbCCF_currentIndexChanged(int index);
         void replotImages();
         void addResult();
         void on_btnNextACF_clicked();
