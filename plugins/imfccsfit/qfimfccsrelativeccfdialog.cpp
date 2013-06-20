@@ -19,21 +19,28 @@ QFImFCCSRelativeCCFDialog::QFImFCCSRelativeCCFDialog(QWidget *parent) :
     ui(new Ui::QFImFCCSRelativeCCFDialog)
 {
 
-
+    qDebug()<<1;
     plt=NULL;
     matchFunctor=new QFImFCCSMatchRDRFunctor();
     QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
     QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
+    qDebug()<<2;
     ui->setupUi(this);
+    qDebug()<<3;
     ui->cmbACF->init(project, matchFunctor);
+    qDebug()<<4;
     ui->cmbCCF->init(project, matchFunctor);
+    qDebug()<<5;
 
     ui->widOverviewACF->setRDR(NULL);
+    qDebug()<<6;
     ui->widOverviewCCF->setRDR(NULL);
+    qDebug()<<7;
 
 
     connect(ui->cmbACF, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbACF_currentIndexChanged(int)));
     connect(ui->cmbCCF, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCCF_currentIndexChanged(int)));
+    qDebug()<<8;
 
     bool okACF=false;
     bool okCCF=false;
@@ -50,9 +57,11 @@ QFImFCCSRelativeCCFDialog::QFImFCCSRelativeCCFDialog(QWidget *parent) :
         }
         if (okACF&&okCCF) break;
     }
+    qDebug()<<9;
 
     loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "ImFCSCalibrationWizard");
 
+    qDebug()<<10;
 
 }
 

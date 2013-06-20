@@ -70,8 +70,11 @@ void QFImFCCSFitEvaluation::insertEvaluation() {
 
 void QFImFCCSFitEvaluation::calcRelativeCCF()
 {
+    qDebug()<<"calcRelativeCCF";
     if (!dlgRelCCF) dlgRelCCF=new QFImFCCSRelativeCCFDialog(NULL);
+    qDebug()<<"calcRelativeCCF1";
     dlgRelCCF->show();
+    qDebug()<<"calcRelativeCCF2";
 }
 
 
