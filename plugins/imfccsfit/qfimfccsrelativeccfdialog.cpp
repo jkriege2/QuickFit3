@@ -13,55 +13,62 @@
 #include "qfmathtools.h"
 #include "programoptions.h"
 #include "qftools.h"
+#include "jkautooutputtimer.h"
 
 QFImFCCSRelativeCCFDialog::QFImFCCSRelativeCCFDialog(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QFImFCCSRelativeCCFDialog)
 {
 
-    qDebug()<<1;
+    //qDebug()<<1;
     plt=NULL;
     matchFunctor=new QFImFCCSMatchRDRFunctor();
     QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
     QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
-    qDebug()<<2;
+    //qDebug()<<2;
     ui->setupUi(this);
-    qDebug()<<3;
+    //qDebug()<<3;
     ui->cmbACF->init(project, matchFunctor);
-    qDebug()<<4;
+    //qDebug()<<4;
     ui->cmbCCF->init(project, matchFunctor);
-    qDebug()<<5;
+    //qDebug()<<5;
 
     ui->widOverviewACF->setRDR(NULL);
-    qDebug()<<6;
+    //qDebug()<<6;
     ui->widOverviewCCF->setRDR(NULL);
-    qDebug()<<7;
+    //qDebug()<<7;
 
 
-    connect(ui->cmbACF, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbACF_currentIndexChanged(int)));
-    connect(ui->cmbCCF, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCCF_currentIndexChanged(int)));
-    qDebug()<<8;
+    //qDebug()<<8;
 
     bool okACF=false;
     bool okCCF=false;
     for (int i=0; i<lst.size(); i++) {
         if (lst[i]) {
+            //qDebug()<<lst[i]->getName();
             if (!okACF && isACF(lst[i])) {
+                //qDebug()<<"set ACF: ";
                 ui->cmbACF->setCurrentRDR(lst[i]);
                 okACF=true;
+                //qDebug()<<"set ACF: done";
             }
             if (!okCCF && isCCF(lst[i])) {
+                //qDebug()<<"set CCF: ";
                 ui->cmbCCF->setCurrentRDR(lst[i]);
                 okCCF=true;
+                //qDebug()<<"set CCF: done";
             }
         }
         if (okACF&&okCCF) break;
     }
-    qDebug()<<9;
+    //qDebug()<<9;
 
     loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "ImFCSCalibrationWizard");
+    connect(ui->cmbACF, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbACF_currentIndexChanged(int)));
+    connect(ui->cmbCCF, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCCF_currentIndexChanged(int)));
+    cmbACF_currentIndexChanged(ui->cmbACF->currentIndex());
 
-    qDebug()<<10;
+    //qDebug()<<10;
 
 }
 
@@ -84,6 +91,8 @@ QFRawDataRecord *QFImFCCSRelativeCCFDialog::getCCF() const
 
 bool QFImFCCSRelativeCCFDialog::calculateRelCCF(QFRawDataRecord *acf, QFRawDataRecord *ccf, double **rel_out, double **rel_error_out, int&w, int& h, int avgCount, bool showErrorMessage)
 {
+    //JKAutoOutputTimer tim(QString("calculateRelCCF"));
+    if (!acf || !ccf) return false;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRFCSDataInterface* acfFCS=dynamic_cast<QFRDRFCSDataInterface*>(acf);
     QFRDRImageToRunInterface* acfRUNIMAGE=dynamic_cast<QFRDRImageToRunInterface*>(acf);
@@ -93,27 +102,34 @@ bool QFImFCCSRelativeCCFDialog::calculateRelCCF(QFRawDataRecord *acf, QFRawDataR
         if (   acfRUNIMAGE->getImageFromRunsWidth()>0 && acfRUNIMAGE->getImageFromRunsWidth()==ccfRUNIMAGE->getImageFromRunsWidth()
             && acfRUNIMAGE->getImageFromRunsHeight()>0 && acfRUNIMAGE->getImageFromRunsHeight()==ccfRUNIMAGE->getImageFromRunsHeight() )
         {
+            //tim.write("1");
             w=acfRUNIMAGE->getImageFromRunsWidth();
             h=acfRUNIMAGE->getImageFromRunsHeight();
 
             double* acfD=acfFCS->getCorrelation();
-            double* acfS=acfFCS->getCorrelationStdDev();
+            double* acfS=acfFCS->getCorrelationRunErrors();
             int acfN=acfFCS->getCorrelationN();
             double* ccfD=ccfFCS->getCorrelation();
-            double* ccfS=ccfFCS->getCorrelationStdDev();
+            double* ccfS=ccfFCS->getCorrelationRunErrors();
             int ccfN=ccfFCS->getCorrelationN();
+            //tim.write(QString("1: acfN=%1, ccfN=%2 w=%3 h=%4").arg(acfN).arg(ccfN).arg(w).arg(h));
 
-            if (acfD && acfS && ccfD && ccfS) {
+            if (acfD && acfS && ccfD && ccfS && acfN>0 && ccfN>0) {
+                //tim.write("2");
                 double* rel=(double*)malloc(w*h*sizeof(double));
                 double* rel_error=(double*)malloc(w*h*sizeof(double));
                 uint64_t idxA=0;
                 uint64_t idxC=0;
                 for (int i=0; i<w*h; i++) {
-
+                    //tim.write(QString("3: %1 [%2...%3] avgCount=%4").arg(i).arg(w).arg(h).arg(avgCount));
                     double D=ccfD[idxC];
+                    //tim.write(QString("3:   ---"));
                     double A=acfD[idxA];
+                    //tim.write(QString("3:   ---"));
                     double eD=ccfS[idxC];
+                    //tim.write(QString("3:   ---"));
                     double eA=acfS[idxA];
+                    //tim.write(QString("3:   ---"));
 
                     if (avgCount>1) {
                         int avgA=qMin(avgCount, acfN);
@@ -131,19 +147,25 @@ bool QFImFCCSRelativeCCFDialog::calculateRelCCF(QFRawDataRecord *acf, QFRawDataR
                         D=D/double(avgC);
                         eD=eD/double(avgC);
                     }
+                    //tim.write(QString("3:   ---"));
 
                     rel[i]=D/A;
+                    //tim.write(QString("3:   ---"));
                     rel_error[i]=0;
+                    //tim.write(QString("3:   ---"));
                     if (acfS && ccfS) rel_error[i]=sqrt(qfSqr(eA*D/qfSqr(A)) + qfSqr(eD/A));
+                    //tim.write(QString("3:   ---"));
                     if (!QFFloatIsOK(rel_error[i])) rel_error[i]=0;
+                    //tim.write(QString("3:   ---"));
                     idxA=idxA+acfN;
+                    //tim.write(QString("3:   ---"));
                     idxC=idxC+ccfN;
-                    //qDebug()<<i<<A<<D<<rel[i]<<rel_error[i];
+                    //qDebug()<<i<<"/"<<w*h<<": "<<A<<D<<rel[i]<<rel_error[i];
                 }
                 if (rel_out) *rel_out=rel;
-                else free(rel);
+                else if (rel) free(rel);
                 if (rel_error_out) *rel_error_out=rel_error;
-                else free(rel_error);
+                else if (rel_error) free(rel_error);
 
                 QApplication::restoreOverrideCursor();
                 return true;
@@ -170,11 +192,13 @@ bool QFImFCCSRelativeCCFDialog::calculateRelCCF(QFRawDataRecord *acf, QFRawDataR
 
 void QFImFCCSRelativeCCFDialog::cmbCCF_currentIndexChanged(int index)
 {
+    //JKAutoOutputTimer tim(QString("cmbCCF_currentIndexChanged"));
     replotImages();
 }
 
 void QFImFCCSRelativeCCFDialog::cmbACF_currentIndexChanged(int /*index*/)
 {
+    //JKAutoOutputTimer tim(QString("cmbACF_currentIndexChanged"));
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRawDataRecord* acf=ui->cmbACF->currentRDR();
     QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
@@ -217,7 +241,7 @@ void QFImFCCSRelativeCCFDialog::cmbACF_currentIndexChanged(int /*index*/)
             if (guess1) ui->cmbCCF->setCurrentRDR(guess1);
             else if (guess2) ui->cmbCCF->setCurrentRDR(guess2);
             else if (guess3) ui->cmbCCF->setCurrentRDR(guess3);
-            //else qDebug()<<"no guess found";
+            //else //qDebug()<<"no guess found";
         }
     }
     replotImages();
@@ -227,6 +251,7 @@ void QFImFCCSRelativeCCFDialog::cmbACF_currentIndexChanged(int /*index*/)
 
 void QFImFCCSRelativeCCFDialog::replotImages()
 {
+    //JKAutoOutputTimer tim(QString("replotImages"));
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     ui->widOverviewACF->setRDR(ui->cmbACF->currentRDR());
     ui->widOverviewCCF->setRDR(ui->cmbCCF->currentRDR());
