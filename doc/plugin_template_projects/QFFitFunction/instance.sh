@@ -4,7 +4,7 @@ function replace_in_all {
 	echo "replace: " $1 
 	for i in ./$FNAME/*.cpp ./$FNAME/*.h ./$FNAME/*.pro ./$FNAME/*.qrc ./$FNAME/help/*.html; do 
 	  echo "  -> " $i
-	  sed $1 $i > $i.temp | mv $i.temp $i
+	  sed $1 < $i > $i.temp | mv $i.temp $i
 	done
 }
 
@@ -99,3 +99,5 @@ replace_in_all 's/HEADER_H/'$CLASSNAME_UC'_H/g'
 
 replace_in_all 's/doxygen_GROUPNAME/qf3fitfunp_'$TARGETNAME'/g'
 replace_in_all 's/f1.html/'$FITFUNCNAME'.html/g'
+
+rm $FNAME/*.temp
