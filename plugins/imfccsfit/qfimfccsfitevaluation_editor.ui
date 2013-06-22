@@ -16,154 +16,6 @@
   <layout class="QGridLayout" name="gridLayout" columnstretch="1,0">
    <item row="1" column="1" rowspan="2">
     <layout class="QGridLayout" name="gridLayout_3">
-     <item row="0" column="0" colspan="2">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>file sets:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0">
-      <widget class="QToolButton" name="btnClearCurrent">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>clear current</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</iconset>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextBesideIcon</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0" colspan="2">
-      <widget class="Line" name="line_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="0">
-      <widget class="QToolButton" name="btnCopyToInitial">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>copy to initial</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</iconset>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextBesideIcon</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="QToolButton" name="btnClearAllPixels">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>clear All Pixels</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</iconset>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextBesideIcon</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0" colspan="2">
-      <widget class="QCheckBox" name="chkSaveStrings">
-       <property name="text">
-        <string>save long result strings</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QToolButton" name="btnEvaluateCurrentAllRuns">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Evaluate &amp;Current</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</iconset>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextBesideIcon</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="9" column="1">
-      <widget class="QToolButton" name="btnPrintReport">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>&amp;Print Report</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/imfccs_fit/qfeval_printreport.png</normaloff>:/imfccs_fit/qfeval_printreport.png</iconset>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextBesideIcon</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="9" column="0">
-      <widget class="QToolButton" name="btnSaveReport">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Save &amp;Report</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/imfccs_fit/qfeval_savereport.png</normaloff>:/imfccs_fit/qfeval_savereport.png</iconset>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextBesideIcon</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="0" colspan="2">
-      <widget class="Line" name="line_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="0">
       <widget class="QToolButton" name="btnEvaluateCurrent">
        <property name="sizePolicy">
@@ -174,6 +26,26 @@
        </property>
        <property name="text">
         <string>Evaluate &amp;Current</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QToolButton" name="btnClearAllPixels">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>clear All Pixels</string>
        </property>
        <property name="icon">
         <iconset>
@@ -203,6 +75,134 @@
        </property>
       </widget>
      </item>
+     <item row="5" column="0" colspan="2">
+      <widget class="QCheckBox" name="chkSaveStrings">
+       <property name="text">
+        <string>save long result strings</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0" colspan="2">
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="0">
+      <widget class="QToolButton" name="btnSaveReport">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Save &amp;Report</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>:/imfccs_fit/qfeval_savereport.png</normaloff>:/imfccs_fit/qfeval_savereport.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QToolButton" name="btnEvaluateCurrentAllRuns">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Evaluate &amp;Current</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="1">
+      <widget class="QToolButton" name="btnPrintReport">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>&amp;Print Report</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>:/imfccs_fit/qfeval_printreport.png</normaloff>:/imfccs_fit/qfeval_printreport.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="QToolButton" name="btnCopyToInitial">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>copy to initial</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" colspan="2">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>file sets:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QToolButton" name="btnClearCurrent">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>clear current</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0" colspan="2">
+      <widget class="Line" name="line_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
      <item row="3" column="1">
       <widget class="QToolButton" name="btnFitAllFilesetsAllPixels">
        <property name="sizePolicy">
@@ -220,6 +220,13 @@
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" colspan="2">
+      <widget class="QCheckBox" name="chkDontFitMasked">
+       <property name="text">
+        <string>don't fit masked pixels</string>
        </property>
       </widget>
      </item>
@@ -531,6 +538,7 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>

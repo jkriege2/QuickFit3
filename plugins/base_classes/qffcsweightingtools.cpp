@@ -54,27 +54,30 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *rec
     int N=data->getCorrelationN();
 
     //qDebug()<<"allocWeights w="<<getFitDataWeighting();
+    if (N<=0) return NULL;
 
     QFFCSWeightingTools::DataWeight weighting=getFitDataWeighting();
     double* weights=(double*)malloc(N*sizeof(double));
     bool weightsOK=false;
     if (data && weighting==QFFCSWeightingTools::StdDevWeighting) {
         double* std=data->getCorrelationStdDev();
-        weightsOK=true;
-        for (int i=0; i<N; i++) {
-            weights[i]=std[i];
-            if ((data_start>=0) && (data_end>=0)) {
-                if ((i>=data_start)&&(i<=data_end)) {
+        if (std) {
+            weightsOK=true;
+            for (int i=0; i<N; i++) {
+                weights[i]=std[i];
+                if ((data_start>=0) && (data_end>=0)) {
+                    if ((i>=data_start)&&(i<=data_end)) {
+                        if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
+                            weightsOK=false;
+                            break;
+                        }
+                    };
+                } else {
                     if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
                         weightsOK=false;
                         break;
-                    }
-                };
-            } else {
-                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                    weightsOK=false;
-                    break;
-                };
+                    };
+                }
             }
         }
     }
@@ -82,21 +85,23 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *rec
         double* std=NULL;
         if (run>=0) std=data->getCorrelationRunError(run);
         else std=data->getCorrelationStdDev();
-        weightsOK=true;
-        for (int i=0; i<N; i++) {
-            weights[i]=std[i];
-            if ((data_start>=0) && (data_end>=0)) {
-                if ((i>=data_start)&&(i<=data_end)) {
+        if (std) {
+            weightsOK=true;
+            for (int i=0; i<N; i++) {
+                weights[i]=std[i];
+                if ((data_start>=0) && (data_end>=0)) {
+                    if ((i>=data_start)&&(i<=data_end)) {
+                        if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
+                            weightsOK=false;
+                            break;
+                        }
+                    };
+                } else {
                     if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
                         weightsOK=false;
                         break;
-                    }
-                };
-            } else {
-                if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) {
-                    weightsOK=false;
-                    break;
-                };
+                    };
+                }
             }
         }
     }

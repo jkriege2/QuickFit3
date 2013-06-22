@@ -24,6 +24,9 @@ QFRawDataPropertyEditor::QFRawDataPropertyEditor(QFPluginServices* services, Pro
     p->timerResizeProps=new QTimer(this);
     p->timerResizeProps->setSingleShot(true);
     p->timerResizeProps->setInterval(500);
+    p->services=services;
+    p->settings=set;
+    p->id=id;
     connect(p->timerResizeProps, SIGNAL(timeout()), p, SLOT(resizePropertiesTable()));
 
     setSettings(set);

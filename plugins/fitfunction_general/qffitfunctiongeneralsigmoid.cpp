@@ -1,10 +1,6 @@
 #include "qffitfunctiongeneralsigmoid.h"
-
+#include "qfmathtools.h"
 #include <cmath>
-#define sqr(x) ((x)*(x))
-#define cube(x) ((x)*(x)*(x))
-#define pow4(x) ((x)*(x)*(x)*(x))
-#define pow5(x) ((x)*(x)*(x)*(x)*(x))
 
 
 QFFitFunctionGeneralSigmoid::QFFitFunctionGeneralSigmoid() {
@@ -18,7 +14,7 @@ QFFitFunctionGeneralSigmoid::QFFitFunctionGeneralSigmoid() {
 
 double QFFitFunctionGeneralSigmoid::evaluate(double t, const double* data) const {
     const double p1=data[PARAM1];
-    return p1*sqr(t);
+    return p1*qfSqr(t);
 
 	// this dummy function is   f(x)=p1*x^2
 }

@@ -259,6 +259,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         ui->chkGrid->setChecked(item->getProperty("imFCCSFit/grid", true).toBool());
         ui->chkKey->setChecked(item->getProperty("imFCCSFit/key", true).toBool());
         ui->chkSaveStrings->setChecked(!item->getProperty("dontSaveFitResultMessage", true).toBool());
+        ui->chkDontFitMasked->setChecked(item->getProperty("dontFitMaskedPixels", true).toBool());
         ui->lstFileSets->setModel(item->getFileSetsModel());
 
         ui->tableView->setModel(item->getParameterInputTableModel());
@@ -1243,6 +1244,12 @@ void QFImFCCSFitEvaluationEditor::on_chkSaveStrings_toggled(bool checked)
 {
     if (!current) return;
     current->setQFProperty("dontSaveFitResultMessage", !checked, false, false);
+}
+
+void QFImFCCSFitEvaluationEditor::on_chkDontFitMasked_toggled(bool checked)
+{
+    if (!current) return;
+    current->setQFProperty("dontFitMaskedPixels", checked, false, false);
 }
 
 void QFImFCCSFitEvaluationEditor::on_btnEditRanges_toggled(bool enabled)

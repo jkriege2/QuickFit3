@@ -2932,7 +2932,9 @@ void MainWindow::fixFilesPathesInProject()
     int replaced=0;
     QMap<QString, QString> pathReplaces;
     if (!project) return;
-    QProgressDialog progress("fixing filepaths in raw data records...", "&Cancel", 0, project->getRawDataCount(), this);
+    log_text(tr("fixing filepaths in raw data records ...\n"));
+
+    QProgressDialog progress(tr("fixing filepaths in raw data records..."), "&Cancel", 0, project->getRawDataCount(), this);
     progress.setWindowModality(Qt::WindowModal);
     DlgFixFilepaths* dlg=NULL;
     QString lastDir=QFileInfo(project->getFile()).absolutePath();
@@ -2942,6 +2944,7 @@ void MainWindow::fixFilesPathesInProject()
         if (rdr) {
             progress.setValue(i);
 
+            int oldreplaced=replaced;
             QStringList files=rdr->getFiles();
             for (int j=0; j<files.size(); j++) {
                 QString file=files[j];
@@ -2982,6 +2985,11 @@ void MainWindow::fixFilesPathesInProject()
                 }
             }
 
+            if (replaced==oldreplaced) {
+                log_text(tr("%1: all files OK (no replaces necessary)!\n").arg(rdr->getName()));
+
+            }
+
 
             QApplication::processEvents(QEventLoop::AllEvents, 5);
             if (progress.wasCanceled() || canceled)  break;
@@ -2994,8 +3002,11 @@ void MainWindow::fixFilesPathesInProject()
     QApplication::processEvents();
     progress.close();
 
+    log_text(tr("fixing filepaths in raw data records ... DONE! (replaced %1 filenames)\n").arg(replaced));
+
     if (replaced>0) {
         if (QMessageBox::information(this, tr("Fix Filenames"), tr("Fixed %1 filenames.\n  You will have to save and reload the project before the changes take full effect. Do that now?").arg(replaced), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
+            log_text(tr("fixing filepaths in raw data records ... RELOADING PROJECT after %1 replaces!").arg(replaced));
             QApplication::processEvents();
             QApplication::processEvents();
             QApplication::processEvents();

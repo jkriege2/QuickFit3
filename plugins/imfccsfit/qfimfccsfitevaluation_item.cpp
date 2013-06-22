@@ -6,6 +6,8 @@
 #include "qffcstools.h"
 #include "qfprojectrawdatamodel.h"
 #include "qfglobalfittool.h"
+#include "qfrdrrunselection.h"
+
 
 QFImFCCSMatchRDRFunctor::QFImFCCSMatchRDRFunctor()
 {
@@ -709,6 +711,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
     QList<double*> errorsVector, errorsVectorI;
 
     bool saveLongStrings=!getProperty("dontSaveFitResultMessage", true).toBool();
+    bool dontFitMasked=getProperty("dontFitMaskedPixels", true).toBool();
 
     QFFitAlgorithm* falg=getFitAlgorithm();
     if ((!falg)||records.size()<=0) return;
@@ -716,6 +719,9 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
     if (!data0) return;
     QFGlobalFitTool tool(falg);
     tool.clear();
+
+    QFRDRRunSelectionsInterface* runsel=qobject_cast<QFRDRRunSelectionsInterface*>(records.first());
+    if (runsel && dontFitMasked && run>=0 && runsel->leaveoutRun(run)) return;
 
     if (dlgFitProgress) {
         dlgFitProgress->reportStatus(tr("setting up ..."));

@@ -80,6 +80,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
         void filesSetActivated(const QModelIndex& idx);
         void on_chkSaveStrings_toggled(bool checked);
+        void on_chkDontFitMasked_toggled(bool checked);
         void on_btnEditRanges_toggled(bool enabled);
         void setParameterVisibility();
         void on_btnAddFile_clicked();

@@ -44,9 +44,9 @@ win32 {
 isEmpty(DATESTR) {
     DATESTR = ---
 }
-message("RELEASE MODE: SVNVERSION is: $$SVNVERSION")
-message("RELEASE MODE: build date is: $$DATESTR")
-message("RELEASE MODE: compiler: $$COMPILERVERSION")
+message("COMPILE MODE: SVNVERSION is: $$SVNVERSION")
+message("COMPILE MODE: build date is: $$DATESTR")
+message("COMPILE MODE: compiler: $$COMPILERVERSION")
 
 
 

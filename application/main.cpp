@@ -32,6 +32,10 @@ int main(int argc, char * argv[])
     bool nosplash=false;
     for (int i=0; i<argc; i++) {
         if (QString(argv[i])=="--nosplash") nosplash=true;
+        if (QString(argv[i])=="--getbits") {
+            std::cout<<sizeof(void*)*8<<std::endl;
+            return 0;
+        }
     }
     Q_INIT_RESOURCE(quickfit3);
     QApplication app(argc, argv);

@@ -104,10 +104,14 @@ inline double qfGaussNormE2(double x) { return qfGaussNormSqrtE(x, 1.0/2.0); }
     \ingroup qf3lib_mathtools
  */
 inline double qfTheta(double x) { return (x>=0)?1.0:0.0; }
-/** \brief Theta step function \f$ \mbox{sigmoid}(x)=\frac{1}{1+\exp(-x)} \f$
+/** \brief sigmoidal function \f$ \mbox{sigmoid}(x)=\frac{1}{1+\exp(-x)} \f$
     \ingroup qf3lib_mathtools
  */
 inline double qfSigmoid(double x) { return 1.0/(1+exp(-1.0*x)); }
+/** \brief sigmoidal function \f$ \mbox{sigmoid}(x)=\frac{1}{1+\exp(-x)} \f$
+    \ingroup qf3lib_mathtools
+ */
+inline double qfSigmoid(double x, double width, double x0=0) { return 1.0/(1+exp(-1.0*(x-x0)/width)); }
 /** \brief sign function \f$ \mbox{signa}(x)=\begin{cases}-1&x<0\\0&x=0\\1&x>0\end{cases} \f$
     \ingroup qf3lib_mathtools
  */
