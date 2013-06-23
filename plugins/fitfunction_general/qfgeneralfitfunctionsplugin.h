@@ -2,7 +2,6 @@
 #define QFGENERALFITFUNCTIONSPLUGIN_H
 
 #include "qfpluginfitfunction.h"
-#include "qffitfunctiongeneralsigmoid.h"
 
 /*!
     \defgroup qf3fitfunp_fitfunction_general Fit Function Plugin

@@ -1,4 +1,7 @@
 #include "qfpfitfunctionsspimfcs.h"
+#include "qffitfunctionsspimfcsdiff.h"
+#include "qffitfunctionsspimfcsdiffe2.h"
+#include "qffitfunctionsspimfcsadiff.h"
 #include "qffitfunctionsspimfccsdiffflow.h"
 #include "qffitfunctionsspimfccsdiff2color.h"
 #include "qffitfunctionsspimfcsdiffc.h"
@@ -9,6 +12,9 @@
 #include "qffitfunctionsspimfccsfwdiff2colorccf.h"
 #include "qffitfunctionsspimfccsfwdiff2coloracfg.h"
 #include "qffitfunctionsspimfccsfwdiff2coloracfr.h"
+#include "qffitfunctionsspimfccsfw2cdiff2colorccf.h"
+#include "qffitfunctionsspimfccsfw2cdiff2coloracfg.h"
+#include "qffitfunctionsspimfccsfw2cdiff2coloracfr.h"
 #include "qffitfunctionsspimfccsfwadiff2colorccf.h"
 #include "qffitfunctionsspimfccsfwadiff2coloracfg.h"
 #include "qffitfunctionsspimfccsfwadiff2coloracfr.h"
@@ -32,6 +38,9 @@ QStringList QFPFitFunctionsSPIMFCS::getIDs() const {
     res<<"fccs_spim_fw_diff2colorccf";
     res<<"fccs_spim_fw_diff2coloracfg";
     res<<"fccs_spim_fw_diff2coloracfr";
+    res<<"fccs_spim_fw_2cdiff2colorccf";
+    res<<"fccs_spim_fw_2cdiff2coloracfg";
+    res<<"fccs_spim_fw_2cdiff2coloracfr";
     res<<"fccs_spim_fw_adiff2colorccf";
     res<<"fccs_spim_fw_adiff2coloracfg";
     res<<"fccs_spim_fw_adiff2coloracfr";
@@ -65,6 +74,12 @@ QFFitFunction* QFPFitFunctionsSPIMFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionsSPIMFCCSFWDiff2ColorACFR();
     } else if (id=="fccs_spim_fw_diff2colorccf") {
         return new QFFitFunctionsSPIMFCCSFWDiff2ColorCCF();
+    } else if (id=="fccs_spim_fw_2cdiff2coloracfg") {
+        return new QFFitFunctionsSPIMFCCSFW2CDiff2ColorACFG();
+    } else if (id=="fccs_spim_fw_2cdiff2coloracfr") {
+        return new QFFitFunctionsSPIMFCCSFW2CDiff2ColorACFR();
+    } else if (id=="fccs_spim_fw_2cdiff2colorccf") {
+        return new QFFitFunctionsSPIMFCCSFW2CDiff2ColorCCF();
     } else if (id=="fccs_spim_fw_adiff2coloracfg") {
         return new QFFitFunctionsSPIMFCCSFWADiff2ColorACFG();
     } else if (id=="fccs_spim_fw_adiff2coloracfr") {

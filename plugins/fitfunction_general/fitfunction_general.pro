@@ -9,10 +9,16 @@ DESTDIR = $$QFOUTPUT/plugins
 
 # Input
 HEADERS += qfgeneralfitfunctionsplugin.h \
-           qffitfunctiongeneralsigmoid.h
+           qffitfunctiongeneralsigmoid.h \
+    ../../../../../LIB/trunk/statistics_tools.h \
+    qffitfunctiongeneralgaussianvar.h \
+    qffitfunctiongenerallorentzian.h
 
 SOURCES += qfgeneralfitfunctionsplugin.cpp\
-           qffitfunctiongeneralsigmoid.cpp
+           qffitfunctiongeneralsigmoid.cpp \
+    ../../../../../LIB/trunk/statistics_tools.cpp \
+    qffitfunctiongeneralgaussianvar.cpp \
+    qffitfunctiongenerallorentzian.cpp
 
 FORMS =
 

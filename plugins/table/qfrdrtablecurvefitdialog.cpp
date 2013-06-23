@@ -103,10 +103,16 @@ void QFRDRTableCurveFitDialog::saveResults()
         if (saveCol==1) {
             savedTo=table->tableGetColumnCount();
             table->tableSetColumnData(savedTo, lastResults);
+            for (int i=0; i<lastResults.size(); i++) {
+                table->tableSetComment(i, savedTo, parameterNames.value(i, "")+"/"+parameterLabels.value(i, ""));
+            }
 
         } else if (saveCol>=2){
             savedTo=saveCol-2;
             table->tableSetColumnData(savedTo, lastResults);
+            for (int i=0; i<lastResults.size(); i++) {
+                table->tableSetComment(i, savedTo, parameterNames.value(i, "")+"/"+parameterLabels.value(i, ""));
+            }
         }
         if (saveGraph==1) {
             table->colgraphAddGraph(tr("curve fit results"), ui->pltDistribution->getXAxis()->get_axisLabel(), ui->pltDistribution->getYAxis()->get_axisLabel(), ui->pltDistribution->getXAxis()->get_logAxis(), ui->pltDistribution->getYAxis()->get_logAxis());

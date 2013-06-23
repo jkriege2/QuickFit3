@@ -74,7 +74,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void setCurrentRun(int run);
 
         void configureForSPIMFCCS();
-        //void configureFor2CSPIMFCCS();
+        void configureFor2CSPIMFCCS();
         void configureForASPIMFCCS();
         void guessFromCurrentFileSet();
 
@@ -93,6 +93,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief where did we save the last report */
         QString currentSaveDirectory;
         QAction* actConfigureForSPIMFCCS;
+        QAction* actConfigureForSPIMFCCS2CompD;
         QAction* actConfigureFor2CSPIMFCCS;
         QAction* actConfigureForASPIMFCCS;
         QAction* actFitCurrent;

@@ -2,7 +2,6 @@ x#ifndef HEADER_H
 #define HEADER_H
 
 #include "qfpluginfitfunction.h"
-#include "fitfunction_inst_f1.h"
 
 /*!
     \defgroup doxygen_GROUPNAME Fit Function Plugin

@@ -2,9 +2,6 @@
 #define QFPFITFUNCTIONSSPIMFCS_H
 
 #include "qfpluginfitfunction.h"
-#include "qffitfunctionsspimfcsdiff.h"
-#include "qffitfunctionsspimfcsdiffe2.h"
-#include "qffitfunctionsspimfcsadiff.h"
 #include <QStringList>
 
 /*!
@@ -69,7 +66,7 @@ class QFPFitFunctionsSPIMFCS : public QObject, public QFPluginFitFunction {
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=4;
+            minor=5;
         };
 
         /** \brief return list of plugin IDs */

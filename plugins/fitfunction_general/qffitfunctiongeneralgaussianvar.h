@@ -1,24 +1,24 @@
-#ifndef QFFITFUNCTIONGENERALSIGMOID_H
-#define QFFITFUNCTIONGENERALSIGMOID_H
+#ifndef QFFitFunctionGeneralGaussianVar_H
+#define QFFitFunctionGeneralGaussianVar_H
 #include "qfpluginfitfunction.h"
 
 
 
 
 /*! \brief QFFitFunction class for fit function
-    \ingroup qf3fitfunp_fitfunction_general
+    \ingroup qf3fitfunp_fitfunctions_general
 
 */
-class QFFitFunctionGeneralSigmoid: public QFFitFunction {
+class QFFitFunctionGeneralGaussianVar: public QFFitFunction {
     public:
-        QFFitFunctionGeneralSigmoid();
-        virtual ~QFFitFunctionGeneralSigmoid() {}
+        QFFitFunctionGeneralGaussianVar();
+        virtual ~QFFitFunctionGeneralGaussianVar() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QObject::tr("sigmoidal function"); }
+        virtual QString name() const { return QObject::tr("Gaussian function (1/sqrt(e) width)"); };
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return name(); }
+        virtual QString shortName() const { return name(); };
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("gen_sigmoid"); }
+        virtual QString id() const { return QString("gen_gaussian_sqrte"); };
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
@@ -39,10 +39,6 @@ class QFFitFunctionGeneralSigmoid: public QFFitFunction {
 
         /*! \copydoc QFFitFunction::evaluateDerivatives()   */
         virtual void evaluateDerivatives(double* derivatives, double t, const double* parameters) const ;
-
-        /*! \brief if implemented (and returns \c true) this function tries to estimate the initial parameters of a fit function from provided data. */
-        virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N);
-
 };
 
-#endif // QFFITFUNCTIONGENERALSIGMOID_H
+#endif // QFFitFunctionGeneralGaussianVar_H

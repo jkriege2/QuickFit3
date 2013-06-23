@@ -204,6 +204,25 @@ class QFLIB_EXPORT QFFitFunction {
         */
         virtual QString transformParametersForAdditionalPlot(int plot, double* params) { return QString(""); }
 
+        /*! \brief if implemented (and returns \c true) this function tries to estimate the initial parameters of a fit function from provided data. */
+        virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N);
+
+        /*! \brief numerically estimates the fitting function derivatives  \f$ J_n=\frac{\partial f}{\partial p_n}(x, \vec{p}) \f$ at the position
+                   \f$ x \f$ with the given parameter vector \f$ \vec{p} \f$
+            \param[out] derivatives as a vector \f$ \left[\frac{\partial f}{\partial p_1}, \frac{\partial f}{\partial p_2}, ..., \frac{\partial f}{\partial p_N}\right] \f$ .
+                        Only the derivaties for fit parameters are calculated.
+            \param x position \f$ x \f$ where to evaluate the fit function derivatives
+            \param parameters parameter vector \f$ \vec{p}\in\mathbb{R}^N \f$
+            \param stepsize stepsize used to evaluate the derivatives
+            \note this function uses the 5-point rule to estimate the derivative
+
+            \see <a href="http://hep1.phys.ntu.edu.tw/~kfjack/lecture/02/lecture-02.pdf">http://hep1.phys.ntu.edu.tw/~kfjack/lecture/02/lecture-02.pdf</a>
+                 <a href="http://oregonstate.edu/instruct/ch490/lessons/lesson11.htm">http://oregonstate.edu/instruct/ch490/lessons/lesson11.htm</a>
+                 <a href="http://en.wikipedia.org/wiki/Five-point_stencil">http://en.wikipedia.org/wiki/Five-point_stencil</a>
+         */
+        void evaluateNumericalDerivatives(double* derivatives, double x, const double* parameters, double stepsize=1e-8) const;
+
+
         /** \brief returns the description of the i-th parameter */
         ParameterDescription getDescription(int i) const  {
             return m_parameters[i];

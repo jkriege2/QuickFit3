@@ -162,6 +162,9 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     actConfigureForSPIMFCCS=new QAction(tr("SPIM-FCCS: normal diffusion"), this);
     connect(actConfigureForSPIMFCCS, SIGNAL(triggered()), this, SLOT(configureForSPIMFCCS()));
     m->addAction(actConfigureForSPIMFCCS);
+    actConfigureForSPIMFCCS2CompD=new QAction(tr("SPIM-FCCS: 2-component normal diffusion"), this);
+    connect(actConfigureForSPIMFCCS2CompD, SIGNAL(triggered()), this, SLOT(configureFor2CSPIMFCCS()));
+    m->addAction(actConfigureForSPIMFCCS2CompD);
     actConfigureForASPIMFCCS=new QAction(tr("SPIM-FCCS: anomalous diffusion"), this);
     connect(actConfigureForASPIMFCCS, SIGNAL(triggered()), this, SLOT(configureForASPIMFCCS()));
     m->addAction(actConfigureForASPIMFCCS);
@@ -427,7 +430,7 @@ void QFImFCCSFitEvaluationEditor::configureForSPIMFCCS() {
 
 }
 
-/*void QFImFCCSFitEvaluationEditor::configureFor2CSPIMFCCS()
+void QFImFCCSFitEvaluationEditor::configureFor2CSPIMFCCS()
 {
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     if (!data) return;
@@ -442,9 +445,9 @@ void QFImFCCSFitEvaluationEditor::configureForSPIMFCCS() {
         }
     }
 
-    data->setFitFunction(0, "fccs_spim_fw_diff2colortcacfg");
-    data->setFitFunction(1, "fccs_spim_fw_diff2colortcacfr");
-    data->setFitFunction(2, "fccs_spim_fw_diff2colortcccf");
+    data->setFitFunction(0, "fccs_spim_fw_2cdiff2coloracfg");
+    data->setFitFunction(1, "fccs_spim_fw_2cdiff2coloracfr");
+    data->setFitFunction(2, "fccs_spim_fw_2cdiff2colorccf");
     data->clearLinkParameters();
 
     QStringList globals;
@@ -461,7 +464,7 @@ void QFImFCCSFitEvaluationEditor::configureForSPIMFCCS() {
         data->setLinkParameter(1, globals[g], g);
         data->setLinkParameter(2, globals[g], g);
     }
-}*/
+}
 
 void QFImFCCSFitEvaluationEditor::configureForASPIMFCCS() {
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
