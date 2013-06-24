@@ -6,13 +6,13 @@
 
 QFFitFunctionGeneralSigmoid::QFFitFunctionGeneralSigmoid() {
     //           type,         id,                        name,                                                    label (HTML),                      unit,          unitlabel (HTML),        fit,       userEditable, userRangeEditable, displayError, initialFix,                initialValue, minValue, maxValue, inc, absMin, absMax
-    addParameter(FloatNumber,  "base",                    "base",                                                  "Y<sub>0</sub>",                   "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       true, 0.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    addParameter(FloatNumber,  "offset",                    "offset",                                                  "Y<sub>0</sub>",                   "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 0.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
     #define PARAM_BASE 0
-    addParameter(FloatNumber,  "max",                    "max",                                                  "Y<sub>max</sub>",                   "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       true, 1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    addParameter(FloatNumber,  "max",                    "max",                                                  "Y<sub>max</sub>",                   "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
     #define PARAM_MAX 1
-    addParameter(FloatNumber,  "position",                    "position",                                         "X<sub>1/2</sub>",                  "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       true, 0.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    addParameter(FloatNumber,  "position",                    "position",                                         "X<sub>1/2</sub>",                  "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 0.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
     #define PARAM_POSITION 2
-    addParameter(FloatNumber,  "rate",                    "rate",                                                               "w",                  "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       true, 1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    addParameter(FloatNumber,  "rate",                    "rate",                                                               "w",                  "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
     #define PARAM_RATE 3
 
 }

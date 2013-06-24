@@ -2299,6 +2299,7 @@ void QFRDRImagingFCSData::clearSelections()
 
 
 void QFRDRImagingFCSData::splitCFsForDualView() {
+    if (!correlations || !tau) return;
     double* oldC=duplicateArray(correlations, width*height*N);
     double* oldS=duplicateArray(sigmas, width*height*N);
     bool* oldL=duplicateArray(maskGet(), width*height);

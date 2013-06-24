@@ -14,7 +14,7 @@ class QFFitFunctionGeneralSigmoid: public QFFitFunction {
         QFFitFunctionGeneralSigmoid();
         virtual ~QFFitFunctionGeneralSigmoid() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QObject::tr("sigmoidal function"); }
+        virtual QString name() const { return QObject::tr("Sigmoidals: Sigmoidal function"); }
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */

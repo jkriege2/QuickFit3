@@ -1,5 +1,5 @@
-#ifndef QFFitFunctionGeneralGaussianVar_H
-#define QFFitFunctionGeneralGaussianVar_H
+#ifndef QFFitFunctionGeneral2GaussianVar_H
+#define QFFitFunctionGeneral2GaussianVar_H
 #include "qfpluginfitfunction.h"
 
 
@@ -9,16 +9,16 @@
     \ingroup qf3fitfunp_fitfunctions_general
 
 */
-class QFFitFunctionGeneralGaussianVar: public QFFitFunction {
+class QFFitFunctionGeneral2GaussianVar: public QFFitFunction {
     public:
-        QFFitFunctionGeneralGaussianVar();
-        virtual ~QFFitFunctionGeneralGaussianVar() {}
+        QFFitFunctionGeneral2GaussianVar();
+        virtual ~QFFitFunctionGeneral2GaussianVar() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QObject::tr("Peaks: Gaussian function (1/sqrt(e) width)"); };
+        virtual QString name() const { return QObject::tr("Peaks: Double Gaussian function (1/sqrt(e) width)"); };
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return name(); };
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("gen_gaussian_sqrte"); };
+        virtual QString id() const { return QString("gen_2gaussian_sqrte"); };
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
@@ -41,4 +41,4 @@ class QFFitFunctionGeneralGaussianVar: public QFFitFunction {
         virtual void evaluateDerivatives(double* derivatives, double t, const double* parameters) const ;
 };
 
-#endif // QFFitFunctionGeneralGaussianVar_H
+#endif // QFFitFunctionGeneral2GaussianVar_H

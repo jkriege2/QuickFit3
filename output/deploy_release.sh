@@ -93,18 +93,19 @@ echo -e "\n\ndetermining compile date:"
 COMPILEDATE=`date +%Y-%m-%d`
 echo -e "\n   compile date: ${COMPILEDATE}"
 echo -e "\n\ndetermining bit depth:"
-echo '
-#include <stdio.h>
-int main() {
-	int i=sizeof(void*)*8;
-	printf("%d\n", i);
-	return 0;
-}
-' > test~.cpp
-g++ -o a.out test~.cpp
-BITDEPTH=`./a.out`
-rm a.out 
-rm test~.cpp
+#echo '
+##include <stdio.h>
+#int main() {
+#	int i=sizeof(void*)*8;
+#	printf("%d\n", i);
+#	return 0;
+#}
+#' > test~.cpp
+#g++ -o a.out test~.cpp
+#BITDEPTH=`./a.out`
+#rm a.out 
+#rm test~.cpp
+BITDEPTH=`./quickfit3.exe --getbits`
 echo -e "\n   bit depth: ${BITDEPTH}\n\n"
 
 INSTALLER_BASENAME=quickfit3_32bit${SPECIALS}_${SVNVER}
@@ -277,8 +278,10 @@ if [ "${create_deploy}" != "0" ]; then
 	  r ../../application/releasenote.html
 	  d  
 	}" ../releasenotes_template.html > releasenotes.~ht
-	sed "s/\\\$\\\$SVN\\\$\\\$/$SVNVER/g" releasenotes.~ht > releasenotes.~~h | cp -f releasenotes.~~h releasenotes.~ht
-	sed "s/\\\$\\\$COMPILEDATE\\\$\\\$/$COMPILEDATE/g" releasenotes.~ht > releasenotes.~~h | cp -f releasenotes.~~h releasenotes.~ht
+	sed "s/\\\$\\\$SVN\\\$\\\$/$SVNVER/g" releasenotes.~ht > releasenotes.~~h
+	cp -f releasenotes.~~h releasenotes.~ht
+	sed "s/\\\$\\\$COMPILEDATE\\\$\\\$/$COMPILEDATE/g" releasenotes.~ht > releasenotes.~~h
+	cp -f releasenotes.~~h releasenotes.~ht
 	cp releasenotes.~ht releasenotes.html
 	rm *.~*
 	cp releasenotes.html ../releasenotes.html
@@ -354,25 +357,35 @@ echo $SPIMINSTALLER_DIRS
 
 sed "s/%%INSTALLER_FILES%%/$INSTALLER_FILES/" nsis_basicscript.nsi > nsis_basicscript.~si
 ls-l *.~*
-sed "s/%%UNINSTALLER_FILES%%/$UNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+sed "s/%%UNINSTALLER_FILES%%/$UNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls-l *.~*
-sed "s/%%SPIMINSTALLER_FILES%%/$SPIMINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+sed "s/%%SPIMINSTALLER_FILES%%/$SPIMINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls-l *.~*
-sed "s/%%SPIMUNINSTALLER_FILES%%/$SPIMUNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+sed "s/%%SPIMUNINSTALLER_FILES%%/$SPIMUNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls-l *.~*
-sed "s/%%INSTALLER_BASENAME%%/$INSTALLER_BASENAME/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+sed "s/%%INSTALLER_BASENAME%%/$INSTALLER_BASENAME/" nsis_basicscript.~si > nsis_basicscript.~~s 
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls-l *.~*
-sed "s/%%SVNVER%%/$SVNVER/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+sed "s/%%SVNVER%%/$SVNVER/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
-sed "s/%%COMPILEDATE%%/$COMPILEDATE/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+sed "s/%%COMPILEDATE%%/$COMPILEDATE/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
-sed "s/%%BITDEPTH%%/$BITDEPTH/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+sed "s/%%BITDEPTH%%/$BITDEPTH/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
-sed "s/%%INSTALLER_DIRS%%/$INSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+sed "s/%%INSTALLER_DIRS%%/$INSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
-sed "s/%%SPIMINSTALLER_DIRS%%/$SPIMINSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+sed "s/%%SPIMINSTALLER_DIRS%%/$SPIMINSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
-sed "s/%%INSTALLER_INSTDIR%%/$INSTALLER_INSTDIR/" nsis_basicscript.~si > nsis_basicscript.~~s | cp -f nsis_basicscript.~~s nsis_basicscript.~si
+sed "s/%%INSTALLER_INSTDIR%%/$INSTALLER_INSTDIR/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
 
 cp nsis_basicscript.~si ${INSTALLER_BASENAME}.nsi

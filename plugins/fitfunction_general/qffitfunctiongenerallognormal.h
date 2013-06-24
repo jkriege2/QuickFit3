@@ -1,24 +1,24 @@
-#ifndef QFFitFunctionGeneralGaussianVar_H
-#define QFFitFunctionGeneralGaussianVar_H
+#ifndef QFFitFunctionGeneralLogNormal_H
+#define QFFitFunctionGeneralLogNormal_H
 #include "qfpluginfitfunction.h"
 
 
 
 
 /*! \brief QFFitFunction class for fit function
-    \ingroup qf3fitfunp_fitfunctions_general
+    \ingroup qf3fitfunp_fitfunction_general
 
 */
-class QFFitFunctionGeneralGaussianVar: public QFFitFunction {
+class QFFitFunctionGeneralLogNormal: public QFFitFunction {
     public:
-        QFFitFunctionGeneralGaussianVar();
-        virtual ~QFFitFunctionGeneralGaussianVar() {}
+        QFFitFunctionGeneralLogNormal();
+        virtual ~QFFitFunctionGeneralLogNormal() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QObject::tr("Peaks: Gaussian function (1/sqrt(e) width)"); };
+        virtual QString name() const { return QObject::tr("Peaks: Log-Normal distribution"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return name(); };
+        virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("gen_gaussian_sqrte"); };
+        virtual QString id() const { return QString("gen_lognormal"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
@@ -39,6 +39,10 @@ class QFFitFunctionGeneralGaussianVar: public QFFitFunction {
 
         /*! \copydoc QFFitFunction::evaluateDerivatives()   */
         virtual void evaluateDerivatives(double* derivatives, double t, const double* parameters) const ;
+
+        /*! \brief if implemented (and returns \c true) this function tries to estimate the initial parameters of a fit function from provided data. */
+        virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N);
+
 };
 
-#endif // QFFitFunctionGeneralGaussianVar_H
+#endif // QFFitFunctionGeneralLogNormal_H

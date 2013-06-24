@@ -58,6 +58,7 @@ class QFTableGraphSettings : public QWidget
         void doRegression();
 
         void updateComboboxes();
+        void fitFunctionChanged();
     protected:
 
     private:

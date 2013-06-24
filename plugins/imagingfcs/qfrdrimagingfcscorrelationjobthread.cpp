@@ -31,8 +31,8 @@ QFRDRImagingFCSCorrelationJobThread::QFRDRImagingFCSCorrelationJobThread(QFPlugi
 }
 
 QFRDRImagingFCSCorrelationJobThread::~QFRDRImagingFCSCorrelationJobThread() {
-    if (backgroundImage) free(backgroundImage);
-    if (backgroundImageStd) free(backgroundImageStd);
+    if (backgroundImage) qfFree(backgroundImage);
+    if (backgroundImageStd) qfFree(backgroundImageStd);
 }
 
 double QFRDRImagingFCSCorrelationJobThread::durationMS() const {
@@ -215,10 +215,10 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                 if (frames>0) {
                     frame_width=reader->frameWidth();
                     frame_height=reader->frameHeight();
-                    average_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
-                    sqrsum_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
-                    average_uncorrected_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
-                    sqrsum_uncorrected_frame=(float*)calloc(frame_width*frame_height, sizeof(float));
+                    average_frame=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
+                    sqrsum_frame=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
+                    average_uncorrected_frame=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
+                    sqrsum_uncorrected_frame=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
 
                     baseline=job.backgroundOffset;
 
@@ -271,14 +271,14 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
 
                     video_count=floor(frames/job.video_frames);
                     real_video_count=video_count;
-                    video=(float*)calloc(frame_width*frame_height*video_count, sizeof(float));
-                    video_uncorrected=(float*)calloc(frame_width*frame_height*video_count, sizeof(float));
-                    bleachOffset=(float*)calloc(frame_width*frame_height, sizeof(float));
-                    bleachAmplitude=(float*)calloc(frame_width*frame_height, sizeof(float));
-                    bleachTime=(float*)calloc(frame_width*frame_height, sizeof(float));
-                    bleachFitOK=(uint8_t*)calloc(frame_width*frame_height, sizeof(uint8_t));
-                    //firstFrames=(float*)calloc(frame_width*frame_height, sizeof(float));
-                    //lastFrames=(float*)calloc(frame_width*frame_height, sizeof(float));
+                    video=(float*)qfCalloc(frame_width*frame_height*video_count, sizeof(float));
+                    video_uncorrected=(float*)qfCalloc(frame_width*frame_height*video_count, sizeof(float));
+                    bleachOffset=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
+                    bleachAmplitude=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
+                    bleachTime=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
+                    bleachFitOK=(uint8_t*)qfCalloc(frame_width*frame_height, sizeof(uint8_t));
+                    //firstFrames=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
+                    //lastFrames=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
 
                     ////////////////////////////////////////////////////////////////////////////////////////////
                     // CREATE FILENAMES FOR RESULTS AND MAKE SURE THE DIRECTORY FOR THE FILES EXISTS (mkpath() )
@@ -568,7 +568,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     avgMin=(video[i]<avgMin)?video[i]:avgMin;
                                     avgMax=(video[i]>avgMax)?video[i]:avgMax;
                                 }
-                                uint16_t* img=(uint16_t*)malloc(frame_width*frame_height*sizeof(uint16_t));
+                                uint16_t* img=(uint16_t*)qfMalloc(frame_width*frame_height*sizeof(uint16_t));
                                 for (register uint32_t c=0; c<real_video_count; c++) {
                                     for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                                         img[i]=(uint16_t)round((float)(video[c*frame_width*frame_height+i]-avgMin)*(float)0xFFFF/fabs(avgMax-avgMin));
@@ -582,7 +582,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     }
                                 }
                                 if (real_video_count/10<=0) progressIncrement(100);
-                                free(img);
+                                qfFree(img);
                                 TinyTIFFWriter_close(tif);
                                 videoAvgMin = avgMin;
                                 videoAvgMax = avgMax;
@@ -608,7 +608,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     avgMin=(video_uncorrected[i]<avgMin)?video_uncorrected[i]:avgMin;
                                     avgMax=(video_uncorrected[i]>avgMax)?video_uncorrected[i]:avgMax;
                                 }
-                                uint16_t* img=(uint16_t*)malloc(frame_width*frame_height*sizeof(uint16_t));
+                                uint16_t* img=(uint16_t*)qfMalloc(frame_width*frame_height*sizeof(uint16_t));
                                 for (register uint32_t c=0; c<real_video_count; c++) {
                                     for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                                         img[i]=(uint16_t)round((float)(video_uncorrected[c*frame_width*frame_height+i]-avgMin)*(float)0xFFFF/fabs(avgMax-avgMin));
@@ -622,7 +622,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     }
                                 }
                                 if (real_video_count/10<=0) progressIncrement(100);
-                                free(img);
+                                qfFree(img);
                                 TinyTIFFWriter_close(tif);
                                 videoUncorrectedAvgMin = avgMin;
                                 videoUncorrectedAvgMax = avgMax;
@@ -953,38 +953,38 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         emit messageChanged(tr("could not create output subdirectory '%1' in '%2'!").arg(localFileDirectory).arg(d.absolutePath()));
                     }
 
-                    if (video) free(video);
-                    if (video_uncorrected) free(video_uncorrected);
-                    if (fit_frames) free(fit_frames);
-                    if (fit_t) free(fit_t);
-                    if (bleachOffset) free(bleachOffset);
-                    if (bleachAmplitude) free(bleachAmplitude);
-                    if (bleachTime) free(bleachTime);
-                    if (bleachFitOK) free(bleachFitOK);
-                    if (average_frame) free(average_frame);
-                    if (sqrsum_frame) free(sqrsum_frame);
-                    if (acf_tau) free(acf_tau);
-                    if (acf) free(acf);
-                    if (acf_segments) free(acf_segments);
-                    if (acf_std) free(acf_std);
-                    if (ccf_tau) free(ccf_tau);
-                    if (ccf1) free(ccf1);
-                    if (ccf2) free(ccf2);
-                    if (ccf3) free(ccf3);
-                    if (ccf4) free(ccf4);
-                    if (ccf1_std) free(ccf1_std);
-                    if (ccf2_std) free(ccf2_std);
-                    if (ccf3_std) free(ccf3_std);
-                    if (ccf4_std) free(ccf4_std);
-                    if (ccf1_segments) free(ccf1_segments);
-                    if (ccf2_segments) free(ccf2_segments);
-                    if (ccf3_segments) free(ccf3_segments);
-                    if (ccf4_segments) free(ccf4_segments);
+                    if (video) qfFree(video);
+                    if (video_uncorrected) qfFree(video_uncorrected);
+                    if (fit_frames) qfFree(fit_frames);
+                    if (fit_t) qfFree(fit_t);
+                    if (bleachOffset) qfFree(bleachOffset);
+                    if (bleachAmplitude) qfFree(bleachAmplitude);
+                    if (bleachTime) qfFree(bleachTime);
+                    if (bleachFitOK) qfFree(bleachFitOK);
+                    if (average_frame) qfFree(average_frame);
+                    if (sqrsum_frame) qfFree(sqrsum_frame);
+                    if (acf_tau) qfFree(acf_tau);
+                    if (acf) qfFree(acf);
+                    if (acf_segments) qfFree(acf_segments);
+                    if (acf_std) qfFree(acf_std);
+                    if (ccf_tau) qfFree(ccf_tau);
+                    if (ccf1) qfFree(ccf1);
+                    if (ccf2) qfFree(ccf2);
+                    if (ccf3) qfFree(ccf3);
+                    if (ccf4) qfFree(ccf4);
+                    if (ccf1_std) qfFree(ccf1_std);
+                    if (ccf2_std) qfFree(ccf2_std);
+                    if (ccf3_std) qfFree(ccf3_std);
+                    if (ccf4_std) qfFree(ccf4_std);
+                    if (ccf1_segments) qfFree(ccf1_segments);
+                    if (ccf2_segments) qfFree(ccf2_segments);
+                    if (ccf3_segments) qfFree(ccf3_segments);
+                    if (ccf4_segments) qfFree(ccf4_segments);
                     for (int id=0; id<dccf.size(); id++) {
-                        if (dccf[id].dccf_tau) free(dccf[id].dccf_tau);
-                        if (dccf[id].dccf) free(dccf[id].dccf);
-                        if (dccf[id].dccf_std) free(dccf[id].dccf_std);
-                        if (dccf[id].dccf_segments) free(dccf[id].dccf_segments);
+                        if (dccf[id].dccf_tau) qfFree(dccf[id].dccf_tau);
+                        if (dccf[id].dccf) qfFree(dccf[id].dccf);
+                        if (dccf[id].dccf_std) qfFree(dccf[id].dccf_std);
+                        if (dccf[id].dccf_segments) qfFree(dccf[id].dccf_segments);
                     }
                     dccf.clear();
                     if (m_status==1) {
@@ -1134,11 +1134,11 @@ bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationBIN(const QString &file
 
 void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frames, double **ccf_tau_io, double **ccf_io, double **ccf_std_io, uint32_t &ccf_N, const QString& message, uint32_t increment_progress, double **ccf_segments_io) {
     ccf_N=job.S*job.P;
-    double* ccf=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+    double* ccf=(double*)qfCalloc(ccf_N*frame_width*frame_height,sizeof(double));
     double* ccf_std=NULL;
-    double* ccf_tau=(double*)calloc(ccf_N,sizeof(double));
-    long* ccf_t=(long*)calloc(ccf_N,sizeof(long));
-    if (ccf_segments_io && job.segments>1) *ccf_segments_io=(double*)calloc(ccf_N*frame_width*frame_height*job.segments,sizeof(double));
+    double* ccf_tau=(double*)qfCalloc(ccf_N,sizeof(double));
+    long* ccf_t=(long*)qfCalloc(ccf_N,sizeof(long));
+    if (ccf_segments_io && job.segments>1) *ccf_segments_io=(double*)qfCalloc(ccf_N*frame_width*frame_height*job.segments,sizeof(double));
 
     statisticsAutocorrelateCreateMultiTau(ccf_t, job.S, job.m, job.P);
 
@@ -1146,7 +1146,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, 
         ccf[nn]=1.0;
     }
     if (job.segments>1) {
-        ccf_std=(double*)calloc(ccf_N*frame_width*frame_height,sizeof(double));
+        ccf_std=(double*)qfCalloc(ccf_N*frame_width*frame_height,sizeof(double));
     }
 
     for (int32_t y=0; y<(int32_t)frame_height; y++) {
@@ -1171,9 +1171,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, 
                 }
             } else {
                 uint32_t segment_frames=frames/job.segments;
-                double* cftemp=(double*)calloc(ccf_N,sizeof(double));
-                double* sum=(double*)calloc(ccf_N,sizeof(double));
-                double* sum2=(double*)calloc(ccf_N,sizeof(double));
+                double* cftemp=(double*)qfCalloc(ccf_N,sizeof(double));
+                double* sum=(double*)qfCalloc(ccf_N,sizeof(double));
+                double* sum2=(double*)qfCalloc(ccf_N,sizeof(double));
                 for (register uint32_t ct=0; ct<ccf_N; ct++) {
                     sum[ct]=0;
                     sum2[ct]=0;
@@ -1206,14 +1206,14 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, 
                         }
                     }
                 }
-                free(cftemp);
+                qfFree(cftemp);
                 double segs=job.segments;
                 for (register uint32_t ct=0; ct<ccf_N; ct++) {
                     ccf[p*ccf_N+ct]=sum[0*ccf_N+ct]/segs;
                     ccf_std[p*ccf_N+ct]=sqrt((sum2[0*ccf_N+ct]-sum[0*ccf_N+ct]*sum[0*ccf_N+ct]/segs)/(segs-1.0));
                 }
-                free(sum);
-                free(sum2);
+                qfFree(sum);
+                qfFree(sum2);
             }
 
             if (m_status==1 && !was_canceled) {
@@ -1231,7 +1231,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, 
     for (uint32_t i=0; i<ccf_N; i++) {
         ccf_tau[i]=(double)ccf_t[i]*job.frameTime;
     }
-    free(ccf_t);
+    qfFree(ccf_t);
 
 
     *ccf_tau_io=ccf_tau;
@@ -1253,7 +1253,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
     frames_min=0;
     frames_max=0;
     while ((image_series==NULL) && (!was_canceled)) {
-        image_series=(float*)calloc((frames+2)*frame_width*frame_height,sizeof(float));
+        image_series=(float*)qfCalloc((frames+2)*frame_width*frame_height,sizeof(float));
         if (!image_series) {
             emit messageChanged(tr("waiting for available memory"));
         }
@@ -1269,8 +1269,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // NOW WE READ ALL FRAMES IN THE TIFF FILE INTO THE flot* ARRAY ALLOCATED BEFORE
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    firstFrames=(float*)calloc(frame_width*frame_height,sizeof(float));
-    lastFrames=(float*)calloc(frame_width*frame_height,sizeof(float));
+    firstFrames=(float*)qfCalloc(frame_width*frame_height,sizeof(float));
+    lastFrames=(float*)qfCalloc(frame_width*frame_height,sizeof(float));
 
     if (!was_canceled) {
         emit messageChanged(tr("reading frames ..."));
@@ -1288,7 +1288,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         register uint32_t frame=0;
         //float sframe_min=0;
         //float sframe_max=0;
-        float* frame_data=(float*)calloc(frame_width*frame_height,sizeof(float));
+        float* frame_data=(float*)qfCalloc(frame_width*frame_height,sizeof(float));
         for (register uint16 i=0; i<frame_width*frame_height; i++) {
             frame_data[i]=0;
             firstFrames[i]=0;
@@ -1349,7 +1349,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
             if (frames/500<=0) emit progressIncrement(500);
 
         }
-        free(frame_data);
+        qfFree(frame_data);
     }
 
     if (m_status==1 && !was_canceled) {
@@ -1358,8 +1358,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         calcBackgroundCorrection();
         NFitFrames=qMin((int64_t)300, (int64_t)frames);
-        fit_t=(double*)calloc(NFitFrames,sizeof(double));
-        fit_frames=(float*)calloc(NFitFrames*frame_width*frame_height,sizeof(float));
+        fit_t=(double*)qfCalloc(NFitFrames,sizeof(double));
+        fit_frames=(float*)qfCalloc(NFitFrames*frame_width*frame_height,sizeof(float));
         if (m_status==1 && !was_canceled ) {
             emit messageChanged(tr("applying baseline correction..."));
             for (register uint32_t i=0; i<frame_width*frame_height*frames; i++) {
@@ -1531,9 +1531,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
 
 
 
-    if (firstFrames) free(firstFrames);
-    if (lastFrames) free(lastFrames);
-    if (image_series) free(image_series);
+    if (firstFrames) qfFree(firstFrames);
+    if (lastFrames) qfFree(lastFrames);
+    if (image_series) qfFree(image_series);
     image_series=NULL;
 }
 
@@ -1593,8 +1593,8 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_correlations(QList<Multi
                         }
                         delete ccfjb[i];
                         ccfjb[i]=new correlatorjb<double, double>(job.S, job.P, 0.0);
-                        free(corr1[0]);
-                        free(corr1[1]);
+                        qfFree(corr1[0]);
+                        qfFree(corr1[1]);
                     }
                 }
                 i++;
@@ -1617,7 +1617,7 @@ void QFRDRImagingFCSCorrelationJobThread::average_ccfs(double** acf, double** ac
         if (was_canceled) break;
     }
     if (segments<=1) {
-        free(*acf_std);
+        qfFree(*acf_std);
         *acf_std=NULL;
     }
 }
@@ -1636,15 +1636,15 @@ void QFRDRImagingFCSCorrelationJobThread::prepare_ccfs(QList<MultiTauCorrelator<
     }
 
     if (acf_N>0) {
-        (*acf)=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
+        (*acf)=(double*)qfCalloc(acf_N*frame_width*frame_height,sizeof(double));
         for (uint64_t nn=0; nn<acf_N*frame_width*frame_height; nn++) {
             (*acf)[nn]=1.0;
         }
-        (*acf_std)=(double*)calloc(acf_N*frame_width*frame_height,sizeof(double));
+        (*acf_std)=(double*)qfCalloc(acf_N*frame_width*frame_height,sizeof(double));
         for (uint64_t nn=0; nn<acf_N*frame_width*frame_height; nn++) {
             (*acf_std)[nn]=1.0;
         }
-        (*acf_t)=(double*)calloc(acf_N,sizeof(double));
+        (*acf_t)=(double*)qfCalloc(acf_N,sizeof(double));
         if (job.correlator==CORRELATOR_MTAUALLMON) {
             double* tau=acfjk[0]->getCorTau();
             for (uint64_t tt=0; tt<acf_N; tt++) {
@@ -1655,8 +1655,8 @@ void QFRDRImagingFCSCorrelationJobThread::prepare_ccfs(QList<MultiTauCorrelator<
             for (uint64_t tt=0; tt<acf_N; tt++) {
                 (*acf_t)[tt]=job.frameTime*corr1[0][tt];
             }
-            free(corr1[0]);
-            free(corr1[1]);
+            qfFree(corr1[0]);
+            qfFree(corr1[1]);
         }
     }
 }
@@ -1741,7 +1741,7 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_dv2_statistics(QFRDRImag
         return;
     }
     //qDebug()<<"contribute_to_dv2_statistics "<<dv_width<<"x"<<dv_height<<"   shift=("<<shiftX1<<","<<shiftY1<<")";
-    float* frame_data1=(float*)malloc(dv_width*dv_height*sizeof(float));
+    float* frame_data1=(float*)qfMalloc(dv_width*dv_height*sizeof(float));
     // copy frame 1
     for (uint16 y=0; y<dv_height; y++) {
         for (uint16 x=0; x<dv_width; x++) {
@@ -1760,7 +1760,7 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_dv2_statistics(QFRDRImag
     // calc frame 2 statistics
     contribute_to_statistics(state2, frame_data1, dv_width, dv_height, frame, frames, NULL, NULL, NULL, dummyUI16, dummyF, dummyF, statistics2, isBackground);
 
-    free(frame_data1);
+    qfFree(frame_data1);
 }
 
 
@@ -1834,7 +1834,7 @@ bool QFRDRImagingFCSCorrelationJobThread::SaveSDTIFF(const QString &filename, fl
 {
     TIFF* tif = TIFFOpen(filename.toAscii().data(),"w");
     if (tif) {
-        float* sd=(float*)calloc(frame_width*frame_height, sizeof(float));
+        float* sd=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
 
         if (frames>1) {
             for (int i=0; i<frame_width*frame_height; i++) {
@@ -1849,7 +1849,7 @@ bool QFRDRImagingFCSCorrelationJobThread::SaveSDTIFF(const QString &filename, fl
 
         TIFFTWriteFloat(tif, sd, frame_width, frame_height);
         TIFFClose(tif);
-        free(sd);
+        qfFree(sd);
         return true;
     } else {
         if (error) *error=tr("could not create %2 '%1'!").arg(filename).arg(title);
@@ -1881,12 +1881,12 @@ bool QFRDRImagingFCSCorrelationJobThread::SaveTIFFUInt16_scaled(const QString &f
             avgMin=(average_frame[i]<avgMin)?average_frame[i]:avgMin;
             avgMax=(average_frame[i]>avgMax)?average_frame[i]:avgMax;
         }
-        uint16_t* img=(uint16_t*)malloc(frame_width*frame_height*sizeof(uint16_t));
+        uint16_t* img=(uint16_t*)qfMalloc(frame_width*frame_height*sizeof(uint16_t));
         for (uint32_t i=0; i<frame_width*frame_height; i++) {
             img[i]=(uint16_t)round((double)(average_frame[i]-avgMin)*(double)0xFFFF/fabs(avgMax-avgMin));
         }
         TIFFTWriteUint16(tif, img, frame_width, frame_height);
-        free(img);
+        qfFree(img);
         TIFFClose(tif);
         return true;
     } else {
@@ -1925,11 +1925,11 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
             dccf[di].dccfframe_height=frame_height;//-abs(job.DCCFDeltaY);
         }
     }
-    firstFrames=(float*)calloc(frame_width*frame_height,sizeof(float));
-    lastFrames=(float*)calloc(frame_width*frame_height,sizeof(float));
+    firstFrames=(float*)qfCalloc(frame_width*frame_height,sizeof(float));
+    lastFrames=(float*)qfCalloc(frame_width*frame_height,sizeof(float));
     NFitFrames=qMin((int64_t)300, (int64_t)frames);
-    fit_t=(double*)calloc(NFitFrames,sizeof(double));
-    fit_frames=(float*)calloc(NFitFrames*frame_width*frame_height,sizeof(float));
+    fit_t=(double*)qfCalloc(NFitFrames,sizeof(double));
+    fit_frames=(float*)qfCalloc(NFitFrames*frame_width*frame_height,sizeof(float));
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1950,7 +1950,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
         float fframes_min=0;
         float fframes_max=0;
 
-        float* frame_data=(float*)calloc(frame_width*frame_height,sizeof(float));
+        float* frame_data=(float*)qfCalloc(frame_width*frame_height,sizeof(float));
         for (int64_t i=0; i<frame_width*frame_height; i++)  {
             frame_data[i]=0;
         }
@@ -2002,7 +2002,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
             if (was_canceled) break;
         } while (reader->nextFrame() && (m_status==1) && (frame<frames) && (!was_canceled));
 
-        free(frame_data);
+        qfFree(frame_data);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2031,7 +2031,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
             }
             frame=0;
 
-            float* frame_data=(float*)malloc(frame_width*frame_height*sizeof(float));
+            float* frame_data=(float*)qfMalloc(frame_width*frame_height*sizeof(float));
             for (int i=0; i<NFitFrames; i++) {
                 int iidx=trunc((double)i/(double)(NFitFrames-1)*(double)frames);
                 if (iidx<0) iidx=0;
@@ -2066,7 +2066,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     emit messageChanged(tr("calculating bleach correction ... frame %1/%2 ...").arg(i+1).arg(NFitFrames));
                 }
             }
-            free(frame_data);
+            qfFree(frame_data);
 
             if (m_status!=1) {
                 emit statusChanged(m_status);
@@ -2086,7 +2086,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
     if (!was_canceled && m_status==1) {
         emit messageChanged(tr("preparing correlations ..."));
 
-        float* frame_data=(float*)malloc(frame_width*frame_height*sizeof(float));
+        float* frame_data=(float*)qfMalloc(frame_width*frame_height*sizeof(float));
 
         acf_N=0;
         if (job.acf) {
@@ -2214,7 +2214,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                 }
             }
         }
-        free(frame_data);
+        qfFree(frame_data);
     }
 
     qDeleteAll(acfjk);
@@ -2257,7 +2257,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                 control.maxcall=500;
                 lm_status_struct status;
 
-                double* fit_I=(double*)malloc(NFitFrames*sizeof(double));
+                double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
                     fit_I[jj]=log(fit_frames[jj*frame_width*frame_height+i]);
                 }
@@ -2292,7 +2292,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                      || (bleachAmplitude[i]==0) ) {
                     bleachFitOK[i]=0;
                 }
-                free(fit_I);
+                qfFree(fit_I);
                 if (i%(frame_width*frame_height/20)==0) {
                     emit messageChanged(tr("calculating bleach correction parameters (%1/%2) ...").arg(i+1).arg(frame_width*frame_height));
                 }
@@ -2308,7 +2308,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
     } else if (job.bleach==BLEACH_EXPREG) {
         if (fit_frames && fit_t && NFitFrames>2) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
-                double* fit_I=(double*)malloc(NFitFrames*sizeof(double));
+                double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
                     fit_I[jj]=log(fit_frames[jj*frame_width*frame_height+i]);
                 }
@@ -2333,7 +2333,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                      || (bleachAmplitude[i]==0) ) {
                     bleachFitOK[i]=0;
                 }
-                free(fit_I);
+                qfFree(fit_I);
                 if (i%(frame_width*frame_height/20)==0) {
                     emit messageChanged(tr("calculating bleach correction parameters (%1/%2) ...").arg(i+1).arg(frame_width*frame_height));
                 }
@@ -2357,10 +2357,10 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 }
 
 void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
-    if (backgroundImage) free(backgroundImage);
-    if (backgroundImageStd) free(backgroundImageStd);
-    backgroundImage=(float*)malloc(frame_width*frame_height*sizeof(float));
-    backgroundImageStd=(float*)malloc(frame_width*frame_height*sizeof(float));
+    if (backgroundImage) qfFree(backgroundImage);
+    if (backgroundImageStd) qfFree(backgroundImageStd);
+    backgroundImage=(float*)qfMalloc(frame_width*frame_height*sizeof(float));
+    backgroundImageStd=(float*)qfMalloc(frame_width*frame_height*sizeof(float));
     if (job.backgroundCorrection==0) {
         baseline=0;
     } else if (job.backgroundCorrection==1) {
@@ -2429,7 +2429,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
 
                     if ((bframe_width==frame_width)&&(bframe_height==frame_height))  {
 
-                        float* frame_data=(float*)malloc(frame_width*frame_height*sizeof(float));
+                        float* frame_data=(float*)qfMalloc(frame_width*frame_height*sizeof(float));
                         uint64_t frames=0;
                         do {
                             if (!reader->readFrameFloat(frame_data)) {
@@ -2460,7 +2460,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
                             backgroundImage[i]=ssum/(float)frames;
                         }
 
-                        free(frame_data);
+                        qfFree(frame_data);
                     } else {
                         m_status=-1; emit statusChanged(m_status);
                         emit messageChanged(tr("background and data files have different framesize (data: %1x%2,  background:%3x%4)").arg(frame_width).arg(frame_height).arg(bframe_width).arg(bframe_height));
@@ -2557,7 +2557,7 @@ QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state::contribute_
     sframe_max=0;
     cnt=0;
     statFirst=true;
-    video_frame=(float*)calloc(size, sizeof(float));
+    video_frame=(float*)qfCalloc(size, sizeof(float));
     for (int64_t i=0; i<size; i++)  {
         video_frame[i]=0;
     }
@@ -2565,6 +2565,6 @@ QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state::contribute_
 
 QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state::~contribute_to_statistics_state()
 {
-    free(video_frame);
+    qfFree(video_frame);
 }
 

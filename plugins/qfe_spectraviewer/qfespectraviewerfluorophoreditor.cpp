@@ -342,6 +342,7 @@ QString QFESpectraViewerFluorophoreEditor::addDataAndSpectrum(QSettings& databas
     QString ID=ui->edtID->text();
     if (ID.isEmpty()) ID=cleanStringForFilename(ui->edtName->text().toLower().trimmed());
     SpectrumManager::FluorophoreData data=getData();
+    //qDebug()<<data.spectrum_abs<<data.spectrum_fl;
     if (m) {
         if (data.spectrum_abs<0) addSpectrumAbs(m, &specFilename, &(data.spectrum_abs));
         else specFilename=QFileInfo(database.fileName()).absoluteDir().relativeFilePath(m->getSpectrum(data.spectrum_abs)->getFilename());
@@ -349,6 +350,7 @@ QString QFESpectraViewerFluorophoreEditor::addDataAndSpectrum(QSettings& databas
         if (data.spectrum_fl<0) addSpectrumFl(m, &spec2Filename, &(data.spectrum_fl));
         else spec2Filename=QFileInfo(database.fileName()).absoluteDir().relativeFilePath(m->getSpectrum(data.spectrum_fl)->getFilename());
     }
+    //qDebug()<<data.spectrum_abs<<data.spectrum_fl<<specFilename<<spec2Filename;
     database.setValue(QString("%1/name").arg(ID), data.name);
     database.setValue(QString("%1/manufacturer").arg(ID), data.manufacturer);
     database.setValue(QString("%1/oder_no").arg(ID), data.orderNo);

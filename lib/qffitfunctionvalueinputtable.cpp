@@ -520,6 +520,7 @@ bool QFFitFunctionValueInputTable::checkRebuildModel(bool alwaysreset)
         QStringList fpids=fitfunction->getParameterIDs();
         for (int i=0; i<fpids.size(); i++) {
             p[i]=getParameterValue(fpids[i]);
+            //qDebug()<<fpids[i]<<"="<<p[i];
         }
 
         for (int fi=0; fi<fpids.size(); fi++) {
@@ -656,7 +657,17 @@ double QFFitFunctionValueInputTable::getParameterValue(const QString &id) const
         if (fitfunction&&fitfunction->hasParameter(id)) {
             rangeval=fitfunction->getDescription(id).initialValue;
         }
-        if (datamap && datamap->contains(id)) {
+        if (datavector) {
+            int row=-1;
+            for (int i=0; i<fitparamids.size(); i++) {
+                if (fitparamids[i].id==id) {
+                    row=i;
+                    break;
+                }
+            }
+            if (row>=0) rangeval=datavector->value(row, rangeval);
+            //qDebug()<<row<<" "<<rangeval<<fitparamids.size();
+        } else if (datamap && datamap->contains(id)) {
             rangeval=(*datamap)[id].value;
         }
     }
@@ -669,7 +680,16 @@ double QFFitFunctionValueInputTable::getParameterError(const QString &id) const
     if (item) {
         rangeval=item->getFitError(id);
     } else {
-        if (datamap && datamap->contains(id)) {
+        if (errorvector) {
+            int row=-1;
+            for (int i=0; i<fitparamids.size(); i++) {
+                if (fitparamids[i].id==id) {
+                    row=i;
+                    break;
+                }
+            }
+            if (row>=0) rangeval=errorvector->value(row, rangeval);
+        } else if (datamap && datamap->contains(id)) {
             rangeval=(*datamap)[id].error;
         }
     }

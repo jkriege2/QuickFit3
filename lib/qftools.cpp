@@ -11,6 +11,55 @@
 #include <QProcess>
 #include <QPainter>
 
+#ifndef __LINUX__
+# if defined(linux)
+#  define __LINUX__
+# endif
+#endif
+
+#ifdef __LINUX__
+#include "malloc.h"
+#include "stdlib.h"
+#endif
+
+void* qfMalloc(size_t size) {
+#ifdef __LINUX__
+    return valloc(size);
+#else
+    return malloc(size);
+#endif
+}
+
+void* qfCalloc(size_t num, size_t size) {
+#ifdef __LINUX__
+    void* res=qfMalloc(num*size);
+    memset(res, 0, num*size);
+#else
+    return calloc(num, size);
+#endif
+}
+
+void* qfRealloc (void* ptr, size_t size) {
+#ifdef __LINUX__
+    return realloc(ptr, size);
+#else
+    return realloc(ptr, size);
+#endif
+}
+
+void qfFree(void* data) {
+#ifdef __LINUX__
+    free(data);
+#else
+    free(data);
+#endif
+}
+
+
+
+
+
+
 QAction* getSeparatorAction(QObject* parent) {
     QAction* a=new QAction(parent);
     a->setSeparator(true);

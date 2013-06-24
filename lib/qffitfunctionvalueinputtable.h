@@ -84,7 +84,7 @@ class QFLIB_EXPORT QFFitFunctionValueInputTable : public QAbstractTableModel
         void fitParamErrorChanged();
     public slots:
         void rebuildModel();
-        bool recalculateFitParameters(bool emitFitParamSignals=true, bool emit dataChangedSignals=true);
+        bool recalculateFitParameters(bool emitFitParamSignals=true, bool emitdataChangedSignals=true);
         void setEditRanges(bool enabled);
         void setEditErrors(bool editerrors);
         void setEditFix(bool editfix);

@@ -2936,6 +2936,7 @@ void MainWindow::fixFilesPathesInProject()
 
     QProgressDialog progress(tr("fixing filepaths in raw data records..."), "&Cancel", 0, project->getRawDataCount(), this);
     progress.setWindowModality(Qt::WindowModal);
+    progress.setMinimumDuration(0);
     DlgFixFilepaths* dlg=NULL;
     QString lastDir=QFileInfo(project->getFile()).absolutePath();
     bool canceled=false;
@@ -2962,6 +2963,8 @@ void MainWindow::fixFilesPathesInProject()
                     } else {
                         if (!dlg) dlg=new DlgFixFilepaths(file, lastDir, &progress);
                         else dlg->init(file, lastDir);
+                        dlg->setParent(&progress);
+                        dlg->setWindowModality(Qt::WindowModal);
 
                         int res=dlg->exec();
                         if (res==QDialog::Rejected) {

@@ -1,24 +1,24 @@
-#ifndef QFFitFunctionGeneralGaussianVar_H
-#define QFFitFunctionGeneralGaussianVar_H
+#ifndef QFFitFunctionGeneralPowerLaw_H
+#define QFFitFunctionGeneralPowerLaw_H
 #include "qfpluginfitfunction.h"
 
 
 
 
 /*! \brief QFFitFunction class for fit function
-    \ingroup qf3fitfunp_fitfunctions_general
+    \ingroup qf3fitfunp_fitfunction_general
 
 */
-class QFFitFunctionGeneralGaussianVar: public QFFitFunction {
+class QFFitFunctionGeneralPowerLaw: public QFFitFunction {
     public:
-        QFFitFunctionGeneralGaussianVar();
-        virtual ~QFFitFunctionGeneralGaussianVar() {}
+        QFFitFunctionGeneralPowerLaw();
+        virtual ~QFFitFunctionGeneralPowerLaw() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QObject::tr("Peaks: Gaussian function (1/sqrt(e) width)"); };
+        virtual QString name() const { return QObject::tr("General: Power law"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return name(); };
+        virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("gen_gaussian_sqrte"); };
+        virtual QString id() const { return QString("gen_powerlaw"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
@@ -39,6 +39,10 @@ class QFFitFunctionGeneralGaussianVar: public QFFitFunction {
 
         /*! \copydoc QFFitFunction::evaluateDerivatives()   */
         virtual void evaluateDerivatives(double* derivatives, double t, const double* parameters) const ;
+
+        /*! \brief if implemented (and returns \c true) this function tries to estimate the initial parameters of a fit function from provided data. */
+        virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N);
+
 };
 
-#endif // QFFitFunctionGeneralGaussianVar_H
+#endif // QFFitFunctionGeneralPowerLaw_H

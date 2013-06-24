@@ -107,6 +107,11 @@ void QFTableGraphSettings::updateComboboxes()
     reloadColumns(ui->cmbLinesQ75);
 }
 
+void QFTableGraphSettings::fitFunctionChanged()
+{
+    cmbFunctionTypeCurrentIndexChanged(ui->cmbFunctionType->currentIndex());
+}
+
 void QFTableGraphSettings::rawDataChanged()
 {
     if (updating) return;
@@ -931,9 +936,8 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->spinStride, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->spinStrideStart, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
-    connect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
     connect(fitfuncValuesTable, SIGNAL(fitParamChanged()), this, SLOT(writeGraphData()));
-    connect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), fitfuncValuesTable, SLOT(rebuildModel()));
 }
 
 void QFTableGraphSettings::disconnectWidgets()
@@ -992,9 +996,8 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->spinStrideStart, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
 
     disconnect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
-    disconnect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
     disconnect(fitfuncValuesTable, SIGNAL(fitParamChanged()), this, SLOT(writeGraphData()));
-    disconnect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), fitfuncValuesTable, SLOT(rebuildModel()));
 }
 
 void QFTableGraphSettings::doFit()
@@ -1060,6 +1063,11 @@ void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)
     } else if (ui->cmbFunctionType->currentIndex()==4) {
         QFFitFunction* ff(ui->cmbQFFitFunction->createCurrentInstance(fitfuncValuesTable));
         fitfuncValues.clear();
+        if (ff) {
+            for (int i=0; i<ff->paramCount(); i++) {
+                fitfuncValues<<ff->getDescription(i).initialValue;
+            }
+        }
         fitfuncValuesTable->setWriteTo(&fitfuncValues, ff, true);
     }
     updatePlotWidgetVisibility();

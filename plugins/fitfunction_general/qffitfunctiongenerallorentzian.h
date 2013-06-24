@@ -14,7 +14,7 @@ class QFFitFunctionGeneralLorentzian: public QFFitFunction {
         QFFitFunctionGeneralLorentzian();
         virtual ~QFFitFunctionGeneralLorentzian() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QObject::tr("Lorentzian function"); };
+        virtual QString name() const { return QObject::tr("Peaks: Lorentzian function"); };
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return name(); };
         /*! \copydoc QFFitFunction::id()   */

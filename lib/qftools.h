@@ -21,6 +21,26 @@
 #include <QTextStream>
 #include <QBitArray>
 
+/*! \brief QuickFit's internal malloc replacement (on some systems, this does a boundary-aligned malloc)
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT void* qfMalloc(size_t size);
+/*! \brief QuickFit's internal malloc replacement (on some systems, this does a boundary-aligned malloc)
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT void* qfCalloc(size_t num, size_t size);
+
+/*! \brief QuickFit's internal realloc replacement (on some systems, this does a boundary-aligned malloc)
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT void* qfRealloc (void* ptr, size_t size);
+/*! \brief QuickFit's internal free replacement
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT void qfFree(void* data);
+
+
+
 typedef QMap<QString, QVariant> QFStringVariantMap;
 /*! \brief returns a new QToolButton for the specified QAction
     \ingroup qf3lib_tools
@@ -435,8 +455,9 @@ QVector<T> removeQListDouplicates(const QVector<T>& list) {
 */
 template <class T>
 T* duplicateArray(const T* input, long long N) {
+    if (!input||N<=0) return NULL;
     T* out=(T*)malloc(N*sizeof(T));
-    memcpy(out, input, N*sizeof(T));
+    if (input && N>=0) memcpy(out, input, N*sizeof(T));
     return out;
 }
 

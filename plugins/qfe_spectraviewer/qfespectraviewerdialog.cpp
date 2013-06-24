@@ -22,7 +22,7 @@ double plotFunctionSmoothSpectrum(double x, void* data) {
 }
 
 QFESpectraViewerDialog::QFESpectraViewerDialog(QFESpectraViewer *plugin, QWidget *parent) :
-    QDialog(parent),
+    QDialog(parent,  Qt::Window|Qt::WindowSystemMenuHint|Qt::WindowMaximizeButtonHint|Qt::WindowMinimizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowTitleHint | Qt::WindowSystemMenuHint),
     ui(new Ui::QFESpectraViewerDialog)
 {
     currentIndex=-1;
@@ -37,20 +37,27 @@ QFESpectraViewerDialog::QFESpectraViewerDialog(QFESpectraViewer *plugin, QWidget
     mainToolbar->addAction(actClose);
     mainToolbar->addSeparator();
 
-    QToolButton* btn=new QToolButton(this);
-    btn->setIcon(QIcon(":/lib/prop_add.png"));
-    btn->setText(tr("create new ..."));
-    btn->setPopupMode(QToolButton::InstantPopup);
+    //QToolButton* btn=new QToolButton(this);
+    //btn->setIcon(QIcon(":/lib/prop_add.png"));
+    //btn->setText(tr("create new ..."));
+
+    ui->btnNewFluorophore->setIcon(QIcon(":/lib/prop_add.png"));
+    ui->btnNewFluorophore->setText(tr("create new ..."));
+
+    //btn->setPopupMode(QToolButton::InstantPopup);
     QAction* actNewLightsource=new QAction(QIcon(":/qfe_spectraviewer/lightsource.png"), tr("... &lightsource"), this);
     connect(actNewLightsource, SIGNAL(triggered()), this, SLOT(createLightSourceSpectrum()));
-    btn->addAction(actNewLightsource);
+    //btn->addAction(actNewLightsource);
+    ui->btnNewFluorophore->addAction(actNewLightsource);
     QAction* actNewFilter=new QAction(QIcon(":/qfe_spectraviewer/filter.png"), tr("... &filter"), this);
     connect(actNewFilter, SIGNAL(triggered()), this, SLOT(createFilterSpectrum()));
-    btn->addAction(actNewFilter);
+    //btn->addAction(actNewFilter);
+    ui->btnNewFluorophore->addAction(actNewFilter);
     QAction* actFluorophore=new QAction(QIcon(":/qfe_spectraviewer/fluorophore.png"), tr("... f&luorophore"), this);
     connect(actFluorophore, SIGNAL(triggered()), this, SLOT(createFluorophoreSpectrum()));
-    btn->addAction(actFluorophore);
-    mainToolbar->addWidget(btn);
+    //btn->addAction(actFluorophore);
+    ui->btnNewFluorophore->addAction(actFluorophore);
+    //mainToolbar->addWidget(btn);
 
     mainToolbar->addSeparator();
 
