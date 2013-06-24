@@ -263,6 +263,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         ui->chkKey->setChecked(item->getProperty("imFCCSFit/key", true).toBool());
         ui->chkSaveStrings->setChecked(!item->getProperty("dontSaveFitResultMessage", true).toBool());
         ui->chkDontFitMasked->setChecked(item->getProperty("dontFitMaskedPixels", true).toBool());
+        ui->spinFitRepeats->setValue(item->getProperty("repeatFit", 1).toInt());
         ui->lstFileSets->setModel(item->getFileSetsModel());
 
         ui->tableView->setModel(item->getParameterInputTableModel());
@@ -1243,10 +1244,17 @@ int QFImFCCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int index
     }
     return 0;
 }
+
 void QFImFCCSFitEvaluationEditor::on_chkSaveStrings_toggled(bool checked)
 {
     if (!current) return;
     current->setQFProperty("dontSaveFitResultMessage", !checked, false, false);
+}
+
+void QFImFCCSFitEvaluationEditor::on_spinFitRepeats_valueChanged(int value)
+{
+    if (!current) return;
+    current->setQFProperty("repeatFit", value, false, false);
 }
 
 void QFImFCCSFitEvaluationEditor::on_chkDontFitMasked_toggled(bool checked)

@@ -83,6 +83,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void on_chkDontFitMasked_toggled(bool checked);
         void on_btnEditRanges_toggled(bool enabled);
         void setParameterVisibility();
+        void on_spinFitRepeats_valueChanged(int value);
         void on_btnAddFile_clicked();
         void on_btnRemoveFile_clicked();
     protected:

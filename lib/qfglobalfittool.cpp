@@ -238,6 +238,7 @@ void QFFitMultiQFFitFunctionFunctor::setDoRecalculateInternals(bool enabled)
 QFGlobalFitTool::QFGlobalFitTool(QFFitAlgorithm *algorithm)
 {
     m_algorithm=algorithm;
+    m_repeatFit=1;
     functor=new QFFitMultiQFFitFunctionFunctor();
 }
 
@@ -279,6 +280,11 @@ void QFGlobalFitTool::setGlobalParamCount(int count)
 void QFGlobalFitTool::clear()
 {
     functor->clear();
+}
+
+void QFGlobalFitTool::setRepeats(int fitRepeat)
+{
+    m_repeatFit=fitRepeat;
 }
 
 void QFGlobalFitTool::setDoRecalculateInternals(bool enabled)
@@ -345,9 +351,13 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fit(QList<double *> paramsOut, QList<
 #endif
 
     if (minmax) {
-        res=m_algorithm->optimize(params, errors, functor, params, fix, pmin, pmax);
+        for (int i=0; i<m_repeatFit; i++) {
+            res=m_algorithm->optimize(params, errors, functor, params, fix, pmin, pmax);
+        }
     } else {
-        res=m_algorithm->optimize(params, errors, functor, params, fix, NULL, NULL);
+        for (int i=0; i<m_repeatFit; i++) {
+            res=m_algorithm->optimize(params, errors, functor, params, fix, NULL, NULL);
+        }
     }
 #ifdef DEBUG_GLOBALFIT
     qDebug()<<"AFTER OPTIMIZE: ("<<res.messageSimple<<")";

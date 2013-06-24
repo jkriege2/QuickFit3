@@ -719,6 +719,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
     if (!data0) return;
     QFGlobalFitTool tool(falg);
     tool.clear();
+    tool.setRepeats(qMax(1,getProperty("repeatFit", 1).toInt()));
 
     QFRDRRunSelectionsInterface* runsel=qobject_cast<QFRDRRunSelectionsInterface*>(records.first());
     if (runsel && dontFitMasked && run>=0 && runsel->leaveoutRun(run)) return;

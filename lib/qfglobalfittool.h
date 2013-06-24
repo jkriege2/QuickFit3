@@ -182,6 +182,8 @@ class QFLIB_EXPORT QFGlobalFitTool {
         /** \brief clear object */
         void clear();
 
+        void setRepeats(int fitRepeat);
+
         void setDoRecalculateInternals(bool enabled);
 
 
@@ -190,6 +192,7 @@ class QFLIB_EXPORT QFGlobalFitTool {
 
         QFFitAlgorithm* m_algorithm;
         QFFitMultiQFFitFunctionFunctor* functor;
+        int m_repeatFit;
 };
 
 
