@@ -1531,6 +1531,11 @@ p, li { white-space: pre-wrap; }
                      <string>Multi-Tau 2 (one monitor for all lags)</string>
                     </property>
                    </item>
+                   <item>
+                    <property name="text">
+                     <string>!!! Experimental Corelator from Shared Library [don't use]</string>
+                    </property>
+                   </item>
                   </widget>
                  </item>
                  <item>
@@ -2311,6 +2316,9 @@ p, li { white-space: pre-wrap; }
   <tabstop>pushButton</tabstop>
  </tabstops>
  <resources>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="qfrdrimagingfcs.qrc"/>
   <include location="../../lib/lib.qrc"/>

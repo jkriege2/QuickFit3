@@ -148,6 +148,7 @@ QString QFRDRImagingFCSCorrelationJobThread::replacePostfixSpecials(const QStrin
     if (job.correlator==CORRELATOR_DIRECTAVG_INT) corr="directavgint";
     if (job.correlator==CORRELATOR_MTAUALLMON) corr="mtauallmon";
     if (job.correlator==CORRELATOR_MTAUONEMON) corr="mtauonemon";
+    if (job.correlator==CORRELATOR_CORRELATORFROMSHAREDLIB) corr="correlatorfromshared";
     QString bleach="none";
     if (job.bleach==BLEACH_REMOVEAVG) bleach="delavg";
     if (job.bleach==BLEACH_EXP) bleach="exp";
@@ -771,6 +772,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     case CORRELATOR_DIRECTAVG_INT: text<<"direct with averaging, integer\n"; break;
                                     case CORRELATOR_MTAUALLMON:  text<<"multi-tau with monitors for all channels\n"; break;
                                     case CORRELATOR_MTAUONEMON:  text<<"multi-tau with a single monitor\n"; break;
+                                    case CORRELATOR_CORRELATORFROMSHAREDLIB:  text<<"multi-tau from shared library\n"; break;
 
                                     default: text<<"correlator type name        : unknown\n"; break;
                                 }
