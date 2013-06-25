@@ -20,13 +20,14 @@ BLAS_INCLUDE =
 
 OUTPUTDIR_NAME = output
 
-QMAKE_CXXFLAGS += -Wno-unused-variable -Werror=return-type -m128bit-long-double -mtune=generic -msse -msse2 -mmmx -m3dnow -mfpmath=both# -ftree-vectorize -ftree-vectorizer-verbose=5
+CXXTUNE= -mtune=generic
 exists(quickfit.inc):include(quickfit.inc)
 
 !win32 {
-    !macx:QMAKE_CXXFLAGS += -march=native
+    !macx:CXXTUNE= -march=native
     DEFINES += \'GLOBALCONFIGDIR=\"$$GLOBALCONFIGDIR\"\'
 }
+QMAKE_CXXFLAGS += -Wno-unused-variable -Werror=return-type -m128bit-long-double $${CXXTUNE} -msse -msse2 -mmmx -m3dnow -mfpmath=both# -ftree-vectorize -ftree-vectorizer-verbose=5
 
 contains( HAS_LAPACK, true ) {
     DEFINES += QF_HAS_LAPACK

@@ -48,6 +48,10 @@ SUBDIRS += plg_tcspcimporter
 plg_tcspcimporter.subdir = ./plugins/tcspcimporter
 plg_tcspcimporter.depends = lib libqf3widgets
 
+#SUBDIRS += plg_importers_simpletcspcimporter
+#plg_importers_simpletcspcimporter.subdir = ./plugins/importers_simpletcspcimporter
+#plg_importers_simpletcspcimporter.depends = lib libqf3widgets
+
 SUBDIRS += plg_fcsmaxent
 plg_fcsmaxent.subdir = ./plugins/qffcsmaxentevaluation
 plg_fcsmaxent.depends = lib libqf3widgets
@@ -166,15 +170,18 @@ plg_qfe_defaultmathparserextensions.depends = lib libqf3widgets
         plg_cam_radhard2.subdir=./plugins/cam_radhard2
         plg_cam_radhard2.depends = lib libqf3widgets
 
-        SUBDIRS += plg_cam_andor
-        plg_cam_andor.subdir=./plugins/cam_andor
-        plg_cam_andor.depends = lib libqf3widgets
-
         unix {
             SUBDIRS += plg_cam_rh2v2
             plg_cam_rh2v2.subdir=./plugins/cam_rh2v2
             plg_cam_rh2v2.depends = lib libqf3widgets
         }
+
+        !contains(QF3CONFIG, noandor) {
+            SUBDIRS += plg_cam_andor
+            plg_cam_andor.subdir=./plugins/cam_andor
+            plg_cam_andor.depends = lib libqf3widgets
+        }
+
     }
 
     SUBDIRS += plg_stage_pi

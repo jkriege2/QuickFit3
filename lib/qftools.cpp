@@ -34,6 +34,7 @@ void* qfCalloc(size_t num, size_t size) {
 #ifdef __LINUX__
     void* res=qfMalloc(num*size);
     memset(res, 0, num*size);
+    return res;
 #else
     return calloc(num, size);
 #endif
