@@ -6,6 +6,7 @@ UI_DIR = ./.uis/
 RCC_DIR = ./.rccs/
 OBJECTS_DIR = ./.objs/
 
+include("autoversioning.pri")
 
 
 include(quickfit_config.pri)
