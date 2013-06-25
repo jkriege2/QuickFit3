@@ -1,4 +1,5 @@
 
+include("autoversioning.pri")
 
 CONFIG(release, debug|release):message("building QuickFit in RELEASE mode")
 CONFIG(debug, debug|release):message("building QuickFit in DEBUG mode")
