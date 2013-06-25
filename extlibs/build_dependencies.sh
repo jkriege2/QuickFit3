@@ -35,12 +35,27 @@ echo -e "=======================================================================
 
 read -p "Do you want to build keep the build directories (y/n)? " -n 1 KEEP_BUILD_DIR
 echo -e  "\n"
-read -p "how many parallel builds do you want to use in make (1/2/3/...)? " -n 1  MAKE_PARALLEL_BUILDS
+read -p "How many parallel builds do you want to use in make (1/2/3/...)? " -n 1  MAKE_PARALLEL_BUILDS
+echo -e  "\n"
+read -p "Do you want to use more agressive optimizations for the built libraries (y/n)? " -n 1  MAKE_AGRESSIVEOPTIMIZATIONS
+echo -e  "\n"
+read -p "Do you want to optimize libraries for your local machine? (y/n)? " -n 1  MAKE_COMPILEFORLOCAL
 echo -e  "\n"
 
 #sh ../output/get_bit_depth.sh
+MORECFLAGS="-m128bit-long-double -mtune=generic -msse -msse2 -mmmx -m3dnow -mfpmath=sse "
+if [ $MAKE_COMPILEFORLOCAL == "y" ] ; then
+	if [ $MAKE_AGRESSIVEOPTIMIZATIONS == "y" ] ; then
+		MORECFLAGS="-m128bit-long-double -mtune=native -msse -msse2 -mmmx -m3dnow -mfpmath=sse -ftree-vectorize -ftree-vectorizer-verbose=5"
+	else
+		MORECFLAGS="-m128bit-long-double -mtune=native -msse -msse2 -mmmx -m3dnow -mfpmath=sse "
+	fi
+else
+	if [ $MAKE_AGRESSIVEOPTIMIZATIONS == "y" ] ; then
+		MORECFLAGS="-m128bit-long-double -mtune=generic -msse -msse2 -mmmx -m3dnow -mfpmath=sse -ftree-vectorize -ftree-vectorizer-verbose=5"
+	fi
+fi
 
-MORECFLAGS="-m128bit-long-double -mtune=generic -msse -msse2 -mmmx -m3dnow -mfpmath=sse"
 CURRENTDIR=${PWD}
 QT_INFO_LIBS=`qmake -query QT_INSTALL_LIBS`
 QT_INFO_BIN=`qmake -query QT_INSTALL_BINS`
@@ -85,10 +100,6 @@ if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 	fi
 fi
 
-# TODO:
-#   copy Qt libs to the output dir of QF3 on windows
-#     1. use qmake -query and determine the Qt install dir
-#     2. copy all libs from there to ../output/ (include plugins, debug and normal libs!
 
 
 zlibOK=-1
@@ -110,11 +121,11 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 		INCLUDE_PATH='../../include'
 		LIBRARY_PATH='../../lib'
 		
-		echo -e 'BINARY_PATH='$BINARY_PATH'\nINCLUDE_PATH='$INCLUDE_PATH'\nLIBRARY_PATH='$LIBRARY_PATH|cat - ./win32/Makefile.gcc > ./Makefile.gcc
+		echo -e 'BINARY_PATH='$BINARY_PATH'\nINCLUDE_PATH='$INCLUDE_PATH'\nLIBRARY_PATH='$LIBRARY_PATH'\nLOC='$MORECFLAGS|cat - ./win32/Makefile.gcc > ./Makefile.gcc
 		
 		MAKEFILE="Makefile.gcc"
 	else
-		./configure --static --prefix=${CURRENTDIR}/zlib
+		./configure --static --prefix=${CURRENTDIR}/zlib  CFLAGS="${MORECFLAGS}" CPPFLAGS="${MORECFLAGS}"
 		MAKEFILE="Makefile"
 	fi
 	libOK=$?
@@ -255,6 +266,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 		rm ./levmar2.h
 		
 	fi 
+	echo "OPTIMIZATIONFLAGS=${MORECFLAGS}"|cat - Makefile > Makefile.tmp && mv Makefile.tmp Makefile 
 
 	if [ $SKIP == "0" ] ; then
 
