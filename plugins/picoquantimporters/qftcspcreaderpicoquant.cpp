@@ -21,7 +21,7 @@ QString QFTCSPCReaderPicoquant::formatName() const {
     return QObject::tr("PicoQuant TTTR File");
 }
 
-bool QFTCSPCReaderPicoquant::open(QString filename) {
+bool QFTCSPCReaderPicoquant::open(const QString &filename, const QString &parameters) {
     close();
     tttrfile=fopen(filename.toAscii().data(), "rb");
     if (tttrfile) {
@@ -102,6 +102,11 @@ bool QFTCSPCReaderPicoquant::open(QString filename) {
         return true;
     }
     setLastError(QObject::tr("could not open TTTR file '%1'").arg(filename));
+    return false;
+}
+
+bool QFTCSPCReaderPicoquant::isOpenParametersUsed(QString *optionsDescription) const
+{
     return false;
 }
 

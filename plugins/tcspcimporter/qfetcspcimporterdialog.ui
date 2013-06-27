@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>911</width>
-    <height>624</height>
+    <height>652</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -573,6 +573,16 @@ p, li { white-space: pre-wrap; }
               </property>
              </item>
             </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="labParameter">
+             <property name="text">
+              <string>parameter:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="edtTCSPCFileParameter"/>
            </item>
            <item>
             <spacer name="horizontalSpacer">
@@ -1176,7 +1186,11 @@ p, li { white-space: pre-wrap; }
  </tabstops>
  <resources>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfetcspcimporter.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>

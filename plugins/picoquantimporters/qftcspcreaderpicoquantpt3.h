@@ -29,7 +29,10 @@ class QFTCSPCReaderPicoquantPT3: public QFTCSPCReader {
 
 
         /** \copydoc QFTCSPCReader:open:() */
-        virtual bool open(QString filename);
+        virtual bool open(const QString& filename, const QString& parameters=QString());
+        /** \brief QFTCSPCReader::isOpenParametersUsed() */
+        virtual bool isOpenParametersUsed( QString* optionsDescription=NULL) const;
+
         /** \copydoc QFTCSPCReader::close() */
         virtual void close();
         /** \copydoc QFTCSPCReader::reset() */

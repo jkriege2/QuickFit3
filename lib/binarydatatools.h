@@ -102,6 +102,11 @@ QFLIB_EXPORT void binfileWriteUint32(QFile& file, uint32_t data);
  */
 QFLIB_EXPORT uint64_t binfileReadUint64(QFile& file);
 
+/** \brief read a uint64_t from a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT uint64_t binfileReadUint64(FILE* file);
+
 /** \brief write a uint64_t to a binary file
  *  \ingroup qf3lib_mathtools
  */

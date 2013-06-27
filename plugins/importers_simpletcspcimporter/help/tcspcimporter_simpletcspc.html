@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Importer Plugin for "Simple TCSPC file [Hungarian 64-bit]" files</title>
+	</head>
+	<body>
+		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+		
+		This plugins imports photons from simple TCSPC files, defined as follows:
+		<ol>
+		  <li>The binary files contain a header which is not parsed at the moment. The header ends with a sequence of 32 bytes with a values of <tt>0xFF</tt> each.</li>
+		  <li>Each photon records contains the duration since the last photon and is 64 bits long:
+		    <ol>
+			    <li>bits 0..56 contain the time since the last photon in ticks (tick duration given as parameter and the user is asked for it on loading the file)</li>
+				<li>bit 57 indicates photon in channel 2</li>
+				<li>bit 58 indicates photon in channel 3</li>
+				<li>bit 59 indicates photon in channel 1</li>
+				<li>bit 60 indicates a special channel record for "RED OFF" (no photon)</li>
+				<li>bit 61 indicates a special channel record for "RED ON" (no photon)</li>
+				<li>bit 62 indicates a special channel record for "GREEN OFF" (no photon)</li>
+				<li>bit 63 indicates a special channel record for "GREEN ON" (no photon)</li>
+			</ol>
+		  </li>
+		</ol>
+		$$note:THe 64-bit records are stored in the file in LITTLE ENDIAN form ... on a BIG ENDIAN system this will be corrected!$$
+	</body>
+</html>

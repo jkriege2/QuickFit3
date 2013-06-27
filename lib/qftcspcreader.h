@@ -50,7 +50,9 @@ class QFLIB_EXPORT QFTCSPCReader: public QFImporter {
          *  \param filename name of the image sequence file
          *  \return \c true on success
          */
-        virtual bool open(QString filename)=0;
+        virtual bool open(const QString& filename, const QString& parameters=QString())=0;
+        /** \brief returns \c true if the parameters parameter of open() is used, returns a description string in optionsDescription, if applicable and provided */
+        virtual bool isOpenParametersUsed( QString* optionsDescription=NULL) const =0;
         /** \brief close the currently opened image file */
         virtual void close()=0;
         /** \brief move the reading pointer back to the first frame */

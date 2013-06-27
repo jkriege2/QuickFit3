@@ -1,21 +1,20 @@
-#ifndef QFTCSPCREADERPICOQUANT_H
-#define QFTCSPCREADERPICOQUANT_H
+#ifndef QFSimpleTCSPCImporter_H
+#define QFSimpleTCSPCImporter_H
 #include "qfpluginimporters.h"
 #include "qfimporter.h"
 #include "qftcspcreader.h"
 #include <stdio.h>
 #include <QMap>
-#include "picoquant_t3r_tools.h"
 
 
-/*! \brief QFImporter class for PicoQuant TTTR Files (as TCSPC files)
+/*! \brief QFImporter class for simple TCSPC
     \ingroup qf3importerplugins_importers_picoquant
 
 */
-class QFTCSPCReaderPicoquant: public QFTCSPCReader {
+class QFSimpleTCSPCImporter: public QFTCSPCReader {
     public:
-        QFTCSPCReaderPicoquant();
-        virtual ~QFTCSPCReaderPicoquant();
+        QFSimpleTCSPCImporter();
+        virtual ~QFSimpleTCSPCImporter();
         /*! \copydoc QFFitFunction::filter()   */
         virtual QString filter() const ;
         /*! \copydoc QFFitFunction::formatName()   */
@@ -27,7 +26,7 @@ class QFTCSPCReaderPicoquant: public QFTCSPCReader {
         /** \copydoc QFTCSPCReader:open:() */
         virtual bool open(const QString& filename, const QString& parameters=QString());
         /** \brief QFTCSPCReader::isOpenParametersUsed() */
-        virtual bool isOpenParametersUsed( QString* optionsDescription=NULL) const;
+        virtual bool isOpenParametersUsed(QString *optionsDescription=NULL) const;
 
         /** \copydoc QFTCSPCReader::close() */
         virtual void close();
@@ -49,19 +48,18 @@ class QFTCSPCReaderPicoquant: public QFTCSPCReader {
 
     protected:
         FILE* tttrfile;
-        TTTRTxtHdr txtHeader;
-        TTTRBinHdr binHeader;
-        TTTRBoardHdr boardHeader;
-        TTTRHdr TTTRHeader;
 
         fpos_t fileResetPos;
 
         uint64_t currentTTTRRecordNum;
-        uint64_t ofltime;
-        uint64_t overflows;
+        uint64_t recordsInTTTRFile;
+        uint64_t lastTTTRMacroTime;
+        uint64_t initialTTTRMacroTime;
+        double temporalResolutionSeconds;
+        double averageInterphotonTime;
 
         QFTCSPCRecord current;
         QMap<uint16_t, double> cr;
 };
 
-#endif // QFTCSPCREADERPICOQUANT_H
+#endif // QFSimpleTCSPCImporter_H

@@ -201,6 +201,11 @@ uint64_t binfileReadUint64(QFile& file) {
     return qFromLittleEndian(d);
 }
 
+uint64_t binfileReadUint64(FILE* file) {
+    uint64_t d;
+    fread((char*)&d, sizeof(d),1,file);
+    return qFromLittleEndian(d);
+}
 
 void binfileWriteUint32(QFile& file, uint32_t data) {
     uint32_t w=qToLittleEndian(data);

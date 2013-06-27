@@ -166,7 +166,7 @@ void QFETCSPCImporterJobThread::run() {
         }
         if (reader) {
             emit messageChanged(tr("opening %1 file ...").arg(reader->formatName()));
-            OK=reader->open(job.filename);
+            OK=reader->open(job.filename, job.importerParameter);
             if (!OK) {
                 m_status=-1; emit statusChanged(m_status);
                 if (reader) messageChanged(tr("error opening file '%1': %2").arg(job.filename).arg(reader->lastError()));
@@ -409,6 +409,12 @@ void QFETCSPCImporterJobThread::run() {
                             text<<"date/time                   : "<<QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss") << "\n";
                             text<<"input file                  : "<<d.relativeFilePath(job.filename) << "\n";
                             text<<"input filetype              : "<<d.relativeFilePath(reader->formatName()) << "\n";
+                            QString paramDescription="";
+                            if (reader->isOpenParametersUsed(&paramDescription)) {
+                                text<<"input file parameter        : "<<d.relativeFilePath(job.importerParameter) << "\n";
+                                text<<"input file parameter description : "<<paramDescription << "\n";
+
+                            }
                             //if (!acfFilename.isEmpty())             text<<"autocorrelation file        : " << d.relativeFilePath(acfFilename) << "\n";
                             //if (!acfFilenameBin.isEmpty())          text<<"bin. autocorrelation file   : " << d.relativeFilePath(acfFilenameBin) << "\n";
                             text<<"range start                 : "<<outLocale.toString(starttime) << "\n";

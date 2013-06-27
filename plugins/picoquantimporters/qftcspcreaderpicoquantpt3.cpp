@@ -21,7 +21,7 @@ QString QFTCSPCReaderPicoquantPT3::formatName() const {
     return QObject::tr("PicoQuant PicoHarp 300 PT3 File");
 }
 
-bool QFTCSPCReaderPicoquantPT3::open(QString filename) {
+bool QFTCSPCReaderPicoquantPT3::open(const QString &filename, const QString &parameters) {
     close();
     tttrfile=fopen(filename.toAscii().data(), "rb");
     if (tttrfile) {
@@ -67,6 +67,11 @@ bool QFTCSPCReaderPicoquantPT3::open(QString filename) {
     }
     setLastError(QObject::tr("could not open TTTR file '%1'").arg(filename));
     duration=0;
+    return false;
+}
+
+bool QFTCSPCReaderPicoquantPT3::isOpenParametersUsed(QString *optionsDescription) const
+{
     return false;
 }
 

@@ -362,6 +362,7 @@ void QFETCSPCImporterDialog::on_btnAddJob_clicked() {
     connect(job.thread, SIGNAL(progressIncrement(int)), job.progress, SLOT(incProgress(int)));
     connect(job.progress, SIGNAL(cancelClicked()), job.thread, SLOT(cancel()));
     job.filename=ui->edtTCSPCFile->text();
+    job.importerParameter=ui->edtTCSPCFileParameter->text();
     job.fcs_correlator=ui->cmbCorrelator->currentIndex();
     job.fileFormat=ui->cmbFileformat->currentIndex();
     //qDebug()<<"job.fileFormat="<<job.fileFormat<<"  "<<ui->cmbFileformat->count();
@@ -465,10 +466,22 @@ void QFETCSPCImporterDialog::updateDuration() {
 
 
 
-void QFETCSPCImporterDialog::updateFromFile(bool readFrameCount) {
-    QFTCSPCReader* reader=QFETCSPCImporterJobThread::getImporter(ui->cmbFileformat->currentIndex(), pluginServices);
+void QFETCSPCImporterDialog::updateFromFile(bool readFrameCount) {    
+    QFTCSPCReader* reader=QFETCSPCImporterJobThread::getImporter(ui->cmbFileformat->currentIndex(), pluginServices);    
     if (reader) {
-        if (reader->open(ui->edtTCSPCFile->text())) {
+        QString paramName="";
+        ui->edtTCSPCFileParameter->setEnabled(false);
+        ui->labParameter->setEnabled(false);
+        if (reader->isOpenParametersUsed(&paramName)) {
+            if (paramName.isEmpty()) ui->labParameter->setText(QString("   parameter:"));
+            else ui->labParameter->setText(QString("   %1:").arg(paramName));
+            ui->edtTCSPCFileParameter->setEnabled(true);
+            ui->labParameter->setEnabled(true);
+            if (ui->edtTCSPCFileParameter->text().isEmpty()) {
+                ui->edtTCSPCFileParameter->setText(QInputDialog::getText(this, tr("TCSPC import parameter"), tr("Please specify the TCSPC import parameter\n%1:").arg(paramName)));
+            }
+        }
+        if (reader->open(ui->edtTCSPCFile->text(), ui->edtTCSPCFileParameter->text())) {
             duration=reader->measurementDuration();
             channels=reader->inputChannels();
             reader->close();

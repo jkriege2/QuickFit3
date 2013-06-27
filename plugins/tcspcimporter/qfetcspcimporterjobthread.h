@@ -45,6 +45,8 @@ struct TCSPCImporterJob {
     QPointer<QFETCSPCImporterJobThread> thread;
     /** \brief name of the input file */
     QString filename;
+    /** \brief parameter for TCSPC importer */
+    QString importerParameter;
     /** \brief fileformat of the input file */
     int fileFormat;
     /** \brief correlator to use */
