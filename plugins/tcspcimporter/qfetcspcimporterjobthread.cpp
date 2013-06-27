@@ -288,10 +288,10 @@ void QFETCSPCImporterJobThread::run() {
                                  QTextStream text(&f);
                                  text.setLocale(outLocale);
                                  for (int i=0; i<fcs_tau.size(); i++) {
-                                     text<<outLocale.toString(fcs_tau[i]);
+                                     text<<doubleToQString(fcs_tau[i]);
                                      for (int r=0; r<job.fcs_segments; r++) {
                                          uint64_t id=xyzAdressToUInt64(ccf.first, ccf.second, r);
-                                         text<<", "<<outLocale.toString(fcs_ccfs[id].value(i, 0));
+                                         text<<", "<<doubleToQString(fcs_ccfs[id].value(i, 0));
                                      }
                                      text<<"\n";
                                  }
@@ -310,10 +310,10 @@ void QFETCSPCImporterJobThread::run() {
                                          else items=qMax(items, fcs_crs[id].size());
                                      }
                                      for (int i=0; i<items; i++) {
-                                         text<<outLocale.toString(double(i)*job.fcs_crbinning);
+                                         text<<doubleToQString(double(i)*job.fcs_crbinning);
                                          for (int r=0; r<job.fcs_segments; r++) {
                                              uint32_t id=xyAdressToUInt32(r, ccf.first);
-                                             text<<", "<<outLocale.toString(fcs_crs[id].value(i, 0));
+                                             text<<", "<<doubleToQString(fcs_crs[id].value(i, 0));
                                          }
                                          text<<"\n";
                                      }
@@ -335,10 +335,10 @@ void QFETCSPCImporterJobThread::run() {
                                              else items=qMax(items, fcs_crs[id].size());
                                          }
                                          for (int i=0; i<items; i++) {
-                                             text<<outLocale.toString(double(i)*job.fcs_crbinning);
+                                             text<<doubleToQString(double(i)*job.fcs_crbinning);
                                              for (int r=0; r<job.fcs_segments; r++) {
                                                  uint32_t id=xyAdressToUInt32(r, ccf.first);
-                                                 text<<", "<<outLocale.toString(fcs_crs[id].value(i, 0));
+                                                 text<<", "<<doubleToQString(fcs_crs[id].value(i, 0));
                                              }
                                              text<<"\n";
                                          }
@@ -358,10 +358,10 @@ void QFETCSPCImporterJobThread::run() {
                                              else items=qMax(items, fcs_crs[id].size());
                                          }
                                          for (int i=0; i<items; i++) {
-                                             text<<outLocale.toString(double(i)*job.fcs_crbinning);
+                                             text<<doubleToQString(double(i)*job.fcs_crbinning);
                                              for (int r=0; r<job.fcs_segments; r++) {
                                                  uint32_t id=xyAdressToUInt32(r, ccf.second);
-                                                 text<<", "<<outLocale.toString(fcs_crs[id].value(i, 0));
+                                                 text<<", "<<doubleToQString(fcs_crs[id].value(i, 0));
                                              }
                                              text<<"\n";
                                          }
@@ -417,14 +417,14 @@ void QFETCSPCImporterJobThread::run() {
                             }
                             //if (!acfFilename.isEmpty())             text<<"autocorrelation file        : " << d.relativeFilePath(acfFilename) << "\n";
                             //if (!acfFilenameBin.isEmpty())          text<<"bin. autocorrelation file   : " << d.relativeFilePath(acfFilenameBin) << "\n";
-                            text<<"range start                 : "<<outLocale.toString(starttime) << "\n";
-                            text<<"range duration              : "<<outLocale.toString(range_duration) << "\n";
+                            text<<"range start                 : "<<doubleToQString(starttime) << "\n";
+                            text<<"range duration              : "<<doubleToQString(range_duration) << "\n";
                             if (job.doFCS) {
-                                text<<"FCS: segments               : "<<outLocale.toString(job.fcs_segments) << "\n";
-                                text<<"FCS: correlator S           : "<<outLocale.toString(job.fcs_S) << "\n";
-                                text<<"FCS: correlator m           : "<<outLocale.toString(job.fcs_m) << "\n";
-                                text<<"FCS: correlator P           : "<<outLocale.toString(job.fcs_P) << "\n";
-                                text<<"FCS: correlator type        : "<<outLocale.toString(job.fcs_correlator) << "\n";
+                                text<<"FCS: segments               : "<<doubleToQString(job.fcs_segments) << "\n";
+                                text<<"FCS: correlator S           : "<<doubleToQString(job.fcs_S) << "\n";
+                                text<<"FCS: correlator m           : "<<doubleToQString(job.fcs_m) << "\n";
+                                text<<"FCS: correlator P           : "<<doubleToQString(job.fcs_P) << "\n";
+                                text<<"FCS: correlator type        : "<<doubleToQString(job.fcs_correlator) << "\n";
                                 text<<"FCS: correlator type name   : ";
                                 switch(job.fcs_correlator) {
                                     case CORRELATOR_MTAUALLMON:  text<<"multi-tau with monitors for all channels\n"; break;
@@ -432,8 +432,8 @@ void QFETCSPCImporterJobThread::run() {
 
                                     default: text<<"FCS: correlator type name        : unknown\n"; break;
                                 }
-                                text<<"FCS: smallest tau [s]            : "<<outLocale.toString(job.fcs_taumin) << "\n";
-                                text<<"FCS: count rate binning [s]      : "<<outLocale.toString(job.fcs_crbinning) << "\n";
+                                text<<"FCS: smallest tau [s]            : "<<doubleToQString(job.fcs_taumin) << "\n";
+                                text<<"FCS: count rate binning [s]      : "<<doubleToQString(job.fcs_crbinning) << "\n";
                                 for (int i=0; i<ccfFilenames.size(); i++) {
                                     if (!ccfFilenames[i].filename.isEmpty()) {
                                         if (ccfFilenames[i].channel1==ccfFilenames[i].channel2) text<<QString("FCS: acf %1 file               : ").arg(ccfFilenames[i].channel1,4)<<ccfFilenames[i].filename << "\n";
@@ -449,7 +449,7 @@ void QFETCSPCImporterJobThread::run() {
                                 }
                             }
                             if (job.doCountrate) {
-                                text<<"PhotonsCounts: binning [s]       : "<<outLocale.toString(job.countrate_binning) << "\n";
+                                text<<"PhotonsCounts: binning [s]       : "<<doubleToQString(job.countrate_binning) << "\n";
                             }
                             text<<"duration [s]                : "<<ptime.elapsed()/1000.0 << "\n";
 
