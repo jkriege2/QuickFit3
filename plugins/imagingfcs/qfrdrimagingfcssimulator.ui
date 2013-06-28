@@ -175,6 +175,9 @@
         </item>
         <item row="1" column="1">
          <widget class="QSpinBox" name="spinWalkersG">
+          <property name="maximum">
+           <number>10000</number>
+          </property>
           <property name="value">
            <number>10</number>
           </property>
@@ -185,12 +188,18 @@
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="maximum">
+           <number>10000</number>
+          </property>
          </widget>
         </item>
         <item row="1" column="3">
          <widget class="QSpinBox" name="spinWalkersRG">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="maximum">
+           <number>10000</number>
           </property>
          </widget>
         </item>

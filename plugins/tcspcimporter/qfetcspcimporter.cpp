@@ -61,7 +61,7 @@ void QFETCSPCImporter::startPlugin() {
     }
 }
 
-void QFETCSPCImporter::insertFCSCSVFile(const QString& filenameFCS, const QString &filenameCR, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly) {
+void QFETCSPCImporter::insertFCSCSVFile(const QString& filenameFCS, const QString &filenameCR, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group, const QString& role) {
     QStringList sl, types;
     sl<<filenameFCS;
     types<<"ACF";
@@ -71,6 +71,8 @@ void QFETCSPCImporter::insertFCSCSVFile(const QString& filenameFCS, const QStrin
     }
 
     QFRawDataRecord* e=project->addRawData("fcs", QFileInfo(filenameFCS).fileName(), sl, paramValues, paramReadonly, types);
+    e->setRole(role);
+    if (!group.isEmpty()) e->setGroup(project->addOrFindRDRGroup(group));
     if (e->error()) {
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filenameFCS).arg(e->errorDescription()));
         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filenameFCS).arg(e->errorDescription()));
@@ -78,7 +80,7 @@ void QFETCSPCImporter::insertFCSCSVFile(const QString& filenameFCS, const QStrin
     }
 }
 
-void QFETCSPCImporter::insertFCCSCSVFile(const QString& filenameFCS, const QString &filenameCR1, const QString &filenameCR2, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly) {
+void QFETCSPCImporter::insertFCCSCSVFile(const QString& filenameFCS, const QString &filenameCR1, const QString &filenameCR2, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group, const QString& role) {
     QStringList sl, types;
 
     sl<<filenameFCS;
@@ -94,6 +96,8 @@ void QFETCSPCImporter::insertFCCSCSVFile(const QString& filenameFCS, const QStri
 
 
     QFRawDataRecord* e=project->addRawData("fcs", QFileInfo(filenameFCS).fileName(), sl, paramValues, paramReadonly, types);
+    e->setRole(role);
+    if (!group.isEmpty()) e->setGroup(project->addOrFindRDRGroup(group));
     if (e->error()) {
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filenameFCS).arg(e->errorDescription()));
         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filenameFCS).arg(e->errorDescription()));
@@ -101,8 +105,10 @@ void QFETCSPCImporter::insertFCCSCSVFile(const QString& filenameFCS, const QStri
     }
 }
 
-void QFETCSPCImporter::insertCountRate(const QString& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
+void QFETCSPCImporter::insertCountRate(const QString& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly, const QString& group, const QString& role) {
     QFRawDataRecord* e=project->addRawData("photoncounts", QFileInfo(filename).fileName(), QStringList(filename), paramValues, paramReadonly);
+    e->setRole(role);
+    if (!group.isEmpty()) e->setGroup(project->addOrFindRDRGroup(group));
     if (e->error()) {
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
