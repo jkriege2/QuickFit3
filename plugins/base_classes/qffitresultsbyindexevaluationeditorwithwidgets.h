@@ -178,6 +178,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QAction* actFitAllFilesThreaded;
         QAction* actFitAllThreaded;
         QAction* actFitAllRunsThreaded;
+        QAction* actChi2Landscape;
 
         QMenu* menuFit;
         QMenu* menuParameters;
@@ -312,6 +313,9 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         void parameterFixChanged();
         /** \brief executed when a parameter range is changed by the user */
         void parameterRangeChanged();
+
+        void plotChi2Landscape();
+
 
     public slots:
         /*! \brief fit model to current data

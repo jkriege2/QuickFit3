@@ -30,7 +30,8 @@ HEADERS +=  qfpevalfcsfit.h \
     ../interfaces/qfrdrrunselection.h \
     ../base_classes/qffcsweightingtools.h \
     ../base_classes/qffitresultsbyindexevaluationfittools.h \
-    ../base_classes/qffcstools.h
+    ../base_classes/qffcstools.h \
+    ../base_classes/qffcsfitchi2landscapedialog.h
 
 
 SOURCES +=  qfpevalfcsfit.cpp \
@@ -47,11 +48,13 @@ SOURCES +=  qfpevalfcsfit.cpp \
     optionswidget.cpp \
     ../base_classes/qffcsweightingtools.cpp \
     ../base_classes/qffitresultsbyindexevaluationfittools.cpp \
-    ../base_classes/qffcstools.cpp
+    ../base_classes/qffcstools.cpp \
+    ../base_classes/qffcsfitchi2landscapedialog.cpp
 
 
 FORMS =    estimatefocalvolumedlg.ui \
-    optionswidget.ui
+    optionswidget.ui \
+    ../base_classes/qffcsfitchi2landscapedialog.ui
 
 RESOURCES += qfevalfcsfit.qrc \
     ../base_classes/qffitresultsevaluationeditorbase.qrc

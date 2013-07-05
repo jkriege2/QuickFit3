@@ -60,6 +60,18 @@ bool QFFitResultsByIndexEvaluation::hasSpecial(const QFRawDataRecord *r, int ind
     return false;
 }
 
+void QFFitResultsByIndexEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFile, int paramXID, const QVector<double> &paramXValues, int paramYFile, int paramYID, const QVector<double> &paramYvalues, const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange)
+{
+}
+
+void QFFitResultsByIndexEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFile, int paramXID, const QVector<double> &paramXValues, int paramYFile, int paramYID, const QVector<double> &paramYvalues, QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange)
+{
+    QList<QFRawDataRecord*> records;
+    records<<record;
+    calcChi2Landscape(chi2Landscape, paramXFile, paramXID, paramXValues, paramYFile, paramYID, paramYvalues, records, run, defaultMinDatarange, defaultMaxDatarange);
+}
+
+
 
 
 

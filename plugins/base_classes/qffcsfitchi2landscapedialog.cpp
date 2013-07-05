@@ -1,39 +1,43 @@
-#include "qfimfccsfitchi2landscapedialog.h"
-#include "ui_qfimfccsfitchi2landscapedialog.h"
+#include "qffcsfitchi2landscapedialog.h"
+#include "ui_qffcsfitchi2landscapedialog.h"
 
-QFImFCCSFitChi2LandscapeDialog::QFImFCCSFitChi2LandscapeDialog(QFImFCCSFitEvaluationItem *item, QWidget *parent) :
+
+
+
+QFFCSFitChi2LandscapeDialog::QFFCSFitChi2LandscapeDialog(QFRawDataRecord *item, int index, QFFitFunction *fitfunction, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::QFImFCCSFitChi2LandscapeDialog)
+    ui(new Ui::QFFCSFitChi2LandscapeDialog)
 {
-    this->item=item;
+    this->item=qobject_cast<QFFitResultsByIndexEvaluation *>(item);
+    this->index=index;
+    this->fitfunction=fitfunction;
     ui->setupUi(this);
 
     ui->cmbParameterX->clear();
     ui->cmbParameterY->clear();
 
-    for (int r=0; r<item->getFitFileCount(); r++) {
-        QFRawDataRecord* rec=item->getFitFile(r);
-        QFFitFunction* ff=item->getFitFunction(rec);
-        QStringList pids=ff->getParameterIDs();
-        for (int p=0; p<pids.size(); p++) {
-            QFFitFunction::ParameterDescription d=ff->getDescription(pids[p]);
-            QString name=tr("file %1: %2").arg(r+1).arg(d.name);
-            QPoint pnt(r, p);
-            ui->cmbParameterX->addItem(name, pnt);
-            ui->cmbParameterY->addItem(name, pnt);
-        }
+    QFRawDataRecord* rec=item;
+    QFFitFunction* ff=fitfunction;
+    QStringList pids=ff->getParameterIDs();
+    for (int p=0; p<pids.size(); p++) {
+        QFFitFunction::ParameterDescription d=ff->getDescription(pids[p]);
+        QString name=d.name;
+        ui->cmbParameterX->addItem(name, p);
+        ui->cmbParameterY->addItem(name, p);
     }
+
     updateInputs();
     ui->cmbParameterX->setCurrentIndex(0);
     ui->cmbParameterY->setCurrentIndex(1);
+
 }
 
-QFImFCCSFitChi2LandscapeDialog::~QFImFCCSFitChi2LandscapeDialog()
+QFFCSFitChi2LandscapeDialog::~QFFCSFitChi2LandscapeDialog()
 {
     delete ui;
 }
 
-void QFImFCCSFitChi2LandscapeDialog::updateInputs()
+void QFFCSFitChi2LandscapeDialog::updateInputs()
 {
     ui->spinXMax->setMaximum(DBL_MAX);
     ui->spinYMax->setMaximum(DBL_MAX);
@@ -43,7 +47,7 @@ void QFImFCCSFitChi2LandscapeDialog::updateInputs()
     else ui->spinYMin->setMinimum(1e-15);
 }
 
-void QFImFCCSFitChi2LandscapeDialog::on_btnPlot_clicked()
+void QFFCSFitChi2LandscapeDialog::on_btnPlot_clicked()
 {
     ui->plotter->set_doDrawing(false);
     ui->plotter->getDatastore()->clear();
@@ -81,9 +85,9 @@ void QFImFCCSFitChi2LandscapeDialog::on_btnPlot_clicked()
         }
     }
 
-    QPoint pX=ui->cmbParameterX->itemData(ui->cmbParameterX->currentIndex()).toPoint();
-    QPoint pY=ui->cmbParameterY->itemData(ui->cmbParameterY->currentIndex()).toPoint();
-    item->calcChi2Landscape(d, pX.x(), pX.y(), xData, pY.x(), pY.y(), yData, item->getFitFiles(), item->getCurrentIndex());
+    int pX=ui->cmbParameterX->itemData(ui->cmbParameterX->currentIndex()).toInt();
+    int pY=ui->cmbParameterY->itemData(ui->cmbParameterY->currentIndex()).toInt();
+    item->calcChi2Landscape(d, 0, pX, xData, 0, pY, yData, item->getHighlightedRecord(), index);
     if (ui->chkLogscale->isChecked()) {
         for (int i=0; i<ui->spinXPixels->value()*ui->spinYPixels->value(); i++) {
             d[i]=log10(d[i]);
@@ -116,3 +120,5 @@ void QFImFCCSFitChi2LandscapeDialog::on_btnPlot_clicked()
 
     free(d);
 }
+
+

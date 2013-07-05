@@ -970,3 +970,117 @@ void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, i
     if (falg) delete falg;
 
 }
+
+void QFFCSFitEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFile, int paramXID, const QVector<double> &paramXValues, int paramYFile, int paramYID, const QVector<double> &paramYValues, const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange)
+{
+    QFRawDataRecord* record=records.value(0,NULL);
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+
+    QFFitFunction* ffunc=getFitFunction(record);
+    QFFitAlgorithm* falg=getFitAlgorithm();
+    if ((!ffunc)||(!data)||(!falg)) return;
+
+    int rangeMinDatarange=0;
+    int rangeMaxDatarange=data->getCorrelationN();
+    if (defaultMinDatarange>=0) rangeMinDatarange=defaultMinDatarange;
+    if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
+
+    restoreQFFitAlgorithmParameters(falg);
+
+    //QFFCSFitEvaluation::DataWeight weighting=getFitDataWeighting();
+
+    if (data->getCorrelationN()>0) {
+        QString runname=tr("average");
+        if (run>=0) runname=QString::number(run);
+
+
+        long N=data->getCorrelationN();
+        double* weights=NULL;
+        double* taudata=data->getCorrelationT();
+        double* corrdata=NULL;
+        if (run<0) {
+            corrdata=data->getCorrelationMean();
+        } else {
+            if (run<(int)data->getCorrelationRuns()) {
+                corrdata=data->getCorrelationRun(run);
+            } else {
+                corrdata=data->getCorrelationMean();
+            }
+        }
+        // we also have to care for the data cutting
+        int cut_low=rangeMinDatarange;
+        int cut_up=rangeMaxDatarange;
+        if (cut_low<0) cut_low=0;
+        if (cut_up>=N) cut_up=N-1;
+        int cut_N=cut_up-cut_low+1;
+        if (cut_N<0) {
+            cut_low=0;
+            cut_up=ffunc->paramCount()-1;
+            if (cut_up>=N) cut_up=N-1;
+            cut_N=cut_up+1;
+        }
+
+        bool weightsOK=false;
+        weights=allocWeights(&weightsOK, record, run, cut_low, cut_up);
+
+        // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
+        // we are working with a complete set of parameters
+        double* params=allocFillParameters(record, run);
+        double* errors=allocFillParameterErrors(record, run);
+        bool* paramsFix=allocFillFix(record, run);
+
+
+
+        ffunc->calcParameter(params, errors);
+
+        QString iparams="";
+        QString oparams="";
+        QString orparams="";
+        int fitparamcount=0;
+        for (int i=0; i<ffunc->paramCount(); i++) {
+            if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
+                if (!iparams.isEmpty()) iparams=iparams+";  ";
+                fitparamcount++;
+                iparams=iparams+QString("%1 = %2").arg(ffunc->getDescription(i).id).arg(params[i]);
+            }
+            //printf("  fit: %s = %lf +/m %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
+        }
+
+
+
+        QFFitAlgorithm::FitQFFitFunctionFunctor fm(ffunc, params, paramsFix, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N);
+
+
+        int idxX=paramXID;
+        int idxY=paramYID;
+        int idx=0;
+        double* d=(double*)calloc(fm.get_evalout(), sizeof(double));
+
+        for (int y=0; y<paramYValues.size(); y++) {
+            for (int x=0; x<paramXValues.size(); x++) {
+                params[idxX]=paramXValues[x];
+                params[idxY]=paramYValues[y];
+
+                fm.evaluate(d, params);
+
+                double chi2=0;
+                for (int i=0; i<fm.get_evalout(); i++)  {
+                    chi2=chi2+qfSqr(d[i]);
+                }
+                chi2Landscape[idx]=chi2;
+
+                idx++;
+            }
+        }
+
+        free(d);
+
+
+        free(weights);
+        free(params);
+        free(errors);
+         free(paramsFix);
+
+
+    }
+}

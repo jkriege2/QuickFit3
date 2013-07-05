@@ -81,6 +81,14 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation, public QFFCSWei
 
         /** \brief calculates fit statistics for the given fit function and dataset. */
         //QFFitStatistics calcFitStatistics(bool saveAsresults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
+        /*! \brief fill a 2D array with a chi^2 landscape for the given fit, this is called like doFit() + some output arguments!
+
+            This method evaluates the chi2 landscape for a range of values of two parameters identified by the file/model of the parameter and it's ID therein. The output image
+            has to have size paramXValues.size()*paramYvalues.size().
+
+            Global parameters are resolved internally!
+         */
+        virtual void calcChi2Landscape(double* chi2Landscape, int paramXFile, int paramXID, const QVector<double>& paramXValues, int paramYFile, int paramYID, const QVector<double>& paramYvalues, const QList<QFRawDataRecord*>& records, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1);
 
     protected:
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the

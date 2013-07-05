@@ -11,6 +11,7 @@
 #include "tools.h"
 #include "dlgqfprogressdialog.h"
 #include "qmoretextobject.h"
+#include "qffcsfitchi2landscapedialog.h"
 
 QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent):
     QFEvaluationEditor(services, propEditor, parent),

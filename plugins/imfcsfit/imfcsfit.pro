@@ -35,7 +35,8 @@ HEADERS += qfpevalimfcsfit.h \
     ../base_classes/qfrdrimagetorunpreview.h \
     qfimfcssetparamfromfiledialog.h \
     imfcscalibrationwizard.h \
-    ../interfaces/qfrdrimfcscorrelatorremote.h
+    ../interfaces/qfrdrimfcscorrelatorremote.h \
+    ../base_classes/qffcsfitchi2landscapedialog.h
 
 
 SOURCES += qfpevalimfcsfit.cpp \
@@ -56,14 +57,16 @@ SOURCES += qfpevalimfcsfit.cpp \
     ../base_classes/qffcstools.cpp \
     ../base_classes/qfrdrimagetorunpreview.cpp \
     qfimfcssetparamfromfiledialog.cpp \
-    imfcscalibrationwizard.cpp
+    imfcscalibrationwizard.cpp \
+    ../base_classes/qffcsfitchi2landscapedialog.cpp
 
 
 FORMS = \    
     imfcscalibrationdialog.ui \
     optionswidget.ui \
     qfimfcssetparamfromfiledialog.ui \
-    imfcscalibrationwizard.ui
+    imfcscalibrationwizard.ui \
+    ../base_classes/qffcsfitchi2landscapedialog.ui
 
 RESOURCES += qfevalimfcsfit.qrc \
     ../base_classes/qffitresultsevaluationeditorbase.qrc

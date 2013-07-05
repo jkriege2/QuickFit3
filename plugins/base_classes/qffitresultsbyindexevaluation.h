@@ -339,6 +339,18 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         virtual bool hasSpecial(const QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error) const ;
 
 
+
+        /*! \brief fill a 2D array with a chi^2 landscape for the given fit, this is called like doFit() + some output arguments!
+
+            This method evaluates the chi2 landscape for a range of values of two parameters identified by the file/model of the parameter and it's ID therein. The output image
+            has to have size paramXValues.size()*paramYvalues.size().
+
+            Global parameters are resolved internally!
+         */
+        virtual void calcChi2Landscape(double* chi2Landscape, int paramXFile, int paramXID, const QVector<double>& paramXValues, int paramYFile, int paramYID, const QVector<double>& paramYvalues, const QList<QFRawDataRecord*>& records, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1);
+        virtual void calcChi2Landscape(double* chi2Landscape, int paramXFile, int paramXID, const QVector<double>& paramXValues, int paramYFile, int paramYID, const QVector<double>& paramYvalues, QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1);
+
+
     public slots:
         /** \brief set the current index to use */
         virtual void setCurrentIndex(int index);

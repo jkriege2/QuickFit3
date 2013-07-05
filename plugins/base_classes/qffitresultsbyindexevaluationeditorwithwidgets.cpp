@@ -16,6 +16,7 @@
 #include "qffitalgorithmmanager.h"
 #include "dlgqfprogressdialog.h"
 #include "qffitresultsbyindexevaluationfittools.h"
+#include "qffcsfitchi2landscapedialog.h"
 
 QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent, bool hasMultiThreaded, bool multiThreadPriority) :
     QFFitResultsByIndexEvaluationEditorBase(iniPrefix, propEditor, services, parent)
@@ -387,6 +388,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     actCopyToAllCurrentRun->setToolTip(tr("copy the currently displayed fit parameters to the set of\n initial parameters and also to all files, but only to the current run therein."));
     layButtons->addWidget(btnCopyToAllCurrentRun, 5, 0);
 
+    actChi2Landscape=new QAction(tr("&Plot &Chi2 Landscape"), this);
+    connect(actChi2Landscape, SIGNAL(triggered()), this, SLOT(plotChi2Landscape()));
 
     btnLoadParameters=createButtonAndActionShowText(actLoadParameters, QIcon(":/fcsfit/param_load.png"), tr("&Load Parameters"), this);
     actLoadParameters->setToolTip(tr("load a FCS fit parameter set from a file.\nThe parameter set files can be created using \"Save Parameters\""));
@@ -513,6 +516,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     menuFit->addAction(actConfigAlgorithm);
     menuFit->addAction(actAlgorithmHelp);
     menuFit->addAction(actModelHelp);
+    menuFit->addSeparator();
+    menuFit->addAction(actChi2Landscape);
 
     menuResults=propertyEditor->addMenu("&Results", 0);
     menuResults->addAction(pltData->get_plotter()->get_actSaveData());
@@ -1875,4 +1880,14 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllFilesThreaded()
     QApplication::restoreOverrideCursor();
     dlgTFitProgress->done();
     delete dlgTFitProgress;
+}
+
+void QFFitResultsByIndexEvaluationEditorWithWidgets::plotChi2Landscape()
+{
+    QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    if (!data) return;
+    QFFCSFitChi2LandscapeDialog* dlgChi2=new QFFCSFitChi2LandscapeDialog(data->getHighlightedRecord(), data->getCurrentIndex(), data->getFitFunction(), this);
+    dlgChi2->exec();
+
+    delete dlgChi2;
 }
