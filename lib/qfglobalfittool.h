@@ -188,6 +188,8 @@ class QFLIB_EXPORT QFGlobalFitTool {
 
 
         QFFitAlgorithm::FitResult fit(QList<double *> paramsOut, QList<double *> paramErrorsOut, QList<double *> initialParams, QList<double *> paramErrorsIn);
+
+        QFFitMultiQFFitFunctionFunctor* getFunctor() const;
     protected:
 
         QFFitAlgorithm* m_algorithm;

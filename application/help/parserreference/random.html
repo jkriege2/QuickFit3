@@ -35,9 +35,54 @@
   </ul>
   <!-- /func:randnorm -->
   </li>
+  <li><a name="randbool"/><!-- func:randbool -->
+  <b><tt><!-- template -->randbool()<!-- /template --></tt> - <i>returns random boolean vector with a propability of <tt>true</tt> of 0.5 (by default). The propability can also be given as a fucntion parameter. </i>:</b><br>
+  The function <tt>randbool()</tt> accepts up to two arguments:<ul>
+    <li><tt>randbool(0.2)</tt> returns a boolean that is <tt>true</tt> with a propability of 0.2</li>
+    <li><tt>randbool()</tt> returns a boolean that is <tt>true</tt> with a propability of 0.5</li>
+  </ul>
+  <!-- /func:randbool -->
+  </li>
   <li><a name="srand"/><!-- func:srand -->
   <b><tt><!-- template -->srand(x)<!-- /template --></tt> - <i>seed the internal random number generator </i>:</b><br>
   <!-- /func:srand -->
+  </li>
+  
+
+  <h2>random vectors</h2>
+  <p>The math parser uses internally a Mersenne Twister random number generator.</p>
+  <ul>
+  <li><a name="randvec"/><!-- func:randvec -->
+  <b><tt><!-- template -->randvec(items)<!-- /template --></tt> - <i>returns a vector (number of elements given in <tt>items</tt>) of random number between 0 and 1 (equally distributed) </i>:</b><br>
+  The function <tt>randvec()</tt> accepts up to three arguments:<ul>
+    <li><tt>randvec(items, N)</tt> returns a random number vector with <tt>items</tt> elements between 0 and N</li>
+    <li><tt>randvec(items, N1, N2)</tt> returns a random number vector with <tt>items</tt> elements between N1 and N2</li>
+  </ul>
+  <!-- /func:rand -->
+  </li>
+  <li><a name="randintvec"/><!-- func:randintvec -->
+  <b><tt><!-- template -->randintvec(items)<!-- /template --></tt> - <i>returns a vector (number of elements given in <tt>items</tt>) of  integer valued random number between 0 and 2<sup>32</sup>-1 (equally distributed) </i>:</b><br>
+  The function <tt>randintvec(items)</tt> accepts up to three arguments:<ul>
+    <li><tt>randintvec(items, N)</tt> returns a random number vector with <tt>items</tt> elements between 0 and N</li>
+    <li><tt>randintvec(items, N1, N2)</tt> returns a random number vector with <tt>items</tt> elements between N1 and N2</li>
+  </ul>
+  <!-- /func:randintvec -->
+  </li>
+  <li><a name="randnormvec"/><!-- func:randnormvec -->
+  <b><tt><!-- template -->randnormvec(items)<!-- /template --></tt> - <i>returns a vector (number of elements given in <tt>items</tt>) of normally distributed random number with mean 0 and variante 1 </i>:</b><br>
+  The function <tt>randnormvec()</tt> accepts up to three arguments:<ul>
+    <li><tt>randnormvec(items, VAR)</tt> returns a random number vector with <tt>items</tt> elements normally distributed with mean 0 and variance <tt>VAR</tt></li>
+    <li><tt>randnormvec(items, MEAN, VAR)</tt> returns a random number vector with <tt>items</tt> elements normally distributed with mean <tt>MEAN</tt> and variance <tt>VAR</tt></li>
+  </ul>
+  <!-- /func:randnormvec -->
+  </li>
+  <li><a name="randboolvec"/><!-- func:randboolvec -->
+  <b><tt><!-- template -->randboolvec(items)<!-- /template --></tt> - <i>returns a boolean vector (number of elements given in <tt>items</tt>) with elememts that are randomly choosen. the propability for <tt>true</tt> is 0.5 by default, but can also be given as a second parameter</i>:</b><br>
+  The function <tt>randboolvec()</tt> accepts up to two arguments:<ul>
+    <li><tt>randboolvec(10, 0.2)</tt> returns a boolean vector with 10 elements and a propability of <tt>true</tt> of 0.2</li>
+    <li><tt>randboolvec(10)</tt> returns a boolean vector with 10 elements and a propability of <tt>true</tt> of 0.5</li>
+  </ul>
+  <!-- /func:randboolvec -->
   </li>
   
 

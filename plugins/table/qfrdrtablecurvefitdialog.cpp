@@ -1,5 +1,7 @@
 #include "qfrdrtablecurvefitdialog.h"
 #include "ui_qfrdrtablecurvefitdialog.h"
+#include "dlgqfprogressdialog.h"
+#include "qffitalgorithmthreaddedfit.h"
 
 QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph) :
     QDialog(parent),
@@ -169,7 +171,7 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
     QString error="";
 
     if (model && algorithm && items>1) {
-        QVector<double> fitParamsIn, fitParamsOut, fitParamsErrOut, fitParamsMin, fitParamsMax;
+        QVector<double> fitParamsIn, fitParamsOut, fitParamsErrOut, fitParamsErrIn, fitParamsMin, fitParamsMax;
         QVector<bool> fitFix;
         QStringList ids=model->getParameterIDs();
         for (int i=0; i<ids.size(); i++) {
@@ -182,16 +184,94 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
             //qDebug()<<"in:  "<<ids[i]<<" = "<<fitParamsIn.last()<<fitFix.last();
         }
         fitParamsOut=fitParamsIn;
+        fitParamsErrIn=fitParamsErrOut;
 
-        QFFitAlgorithm::FitResult res=algorithm->fit(fitParamsOut.data(), fitParamsErrOut.data(), dx, dy, dw, items, model, fitParamsIn.data(), fitFix.data(), fitParamsMin.data(), fitParamsMax.data());
-        for (int i=0; i<ids.size(); i++) {
-            //qDebug()<<"out: "<<ids[i]<<" = "<<fitParamsOut[i]<<fitParamsErrOut[i];
+        ok=false;
+
+
+
+
+        dlgQFProgressDialog* progress=new dlgQFProgressDialog(this);
+        dlgQFProgressDialogReporter* progressReporter=new dlgQFProgressDialogReporter(progress);
+        progress->setWindowTitle(tr("Curve fit progress"));
+        progress->reportTask(tr("fitting curve ..."));
+        progress->reportStatus(tr("setting up curve fit ..."));
+        progress->setProgressMax(100);
+        progress->setProgress(0);
+        algorithm->setReporter(progressReporter);
+
+        QFFitAlgorithm::FitResult res;
+        try {
+
+
+            model->calcParameter(fitParamsIn.data(), fitParamsErrOut.data());
+            model->calcParameter(fitParamsIn.data(), fitParamsErrOut.data());
+
+
+            if (!progress->isCanceled()) {
+
+                progress->reportStatus(tr("fitting ..."));
+                progress->setProgressMax(100);
+                progress->setProgress(0);
+                QFFitAlgorithmThreadedFit* doFitThread=new QFFitAlgorithmThreadedFit(this);
+                doFitThread->init(algorithm, fitParamsOut.data(), fitParamsErrOut.data(), dx, dy, dw, items, model, fitParamsIn.data(), fitFix.data(), fitParamsMin.data(), fitParamsMax.data());
+                doFitThread->start(QThread::HighPriority);
+                QTime t;
+                t.start();
+                while (!doFitThread->isFinished()) {
+                    if (t.elapsed()>10) {
+                        QApplication::processEvents(QEventLoop::AllEvents, 20);
+                        if (progress->isCanceled()) {
+                          doFitThread->terminate();
+                          break;
+                        }
+                        t.start();
+                    }
+                }
+                progress->setProgressFull();
+                progress->reportStatus(tr("calculating parameters and errors ..."));
+                ok=!progress->isCanceled();
+                if (progress->isCanceled()) {
+                    error=tr("fit canceled by user");
+                }
+                res=doFitThread->getResult();
+                delete doFitThread;
+            }
+
+
+
+            for (int i=0; i<model->paramCount(); i++) {
+                if (!(model->isParameterVisible(i, fitParamsOut.data()) && (!fitFix[i]) && model->getDescription(i).fit)) {
+                    fitParamsErrOut[i]=fitParamsErrIn[i];
+                }
+            }
+
+            model->calcParameter(fitParamsOut.data(), fitParamsErrOut.data());
+            model->sortParameter(fitParamsOut.data(), fitParamsErrOut.data(), fitFix.data());
+            model->calcParameter(fitParamsOut.data(), fitParamsErrOut.data());
+
+
+
+        } catch(std::exception& E) {
+            QFPluginLogTools::log_error(tr("error during curve fitting, error message: %1\n").arg(E.what()));
+            error=E.what();
+            ok=false;
         }
+
+
+
+
+
+        /*QFFitAlgorithm::FitResult res=algorithm->fit(fitParamsOut.data(), fitParamsErrOut.data(), dx, dy, dw, items, model, fitParamsIn.data(), fitFix.data(), fitParamsMin.data(), fitParamsMax.data());
+        for (int i=0; i<ids.size(); i++) {
+            qDebug()<<"out: "<<ids[i]<<" = "<<fitParamsOut[i]<<fitParamsErrOut[i];
+        }
+        OK=true;*/
 
         lastResults.clear();
         lastResultD.clear();
         resultComment="";
-        if (res.fitOK) {
+        if (ok && res.fitOK) {
             for (int i=0; i<ids.size(); i++) {
                 paramMap[ids[i]].value=fitParamsOut[i];
                 paramMap[ids[i]].error=fitParamsErrOut[i];
@@ -238,7 +318,7 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
     parameterTable->rebuildModel();
     replotGraph();
     if (!ok) {
-        QMessageBox::critical(this, tr("Regression Error"), tr("an error occured during the regression analysis.\nerror message:\n    %1").arg(error));
+        QMessageBox::critical(this, tr("Fit Error"), tr("an error occured during the regression analysis.\nerror message:\n    %1").arg(error));
     }
     connectSignals(true);
     delete model;

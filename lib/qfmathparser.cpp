@@ -282,6 +282,128 @@ namespace QFMathParser_Private {
 
 
 
+    void fRandVec(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+      bool ok=true;
+      if (n>3 || n<=0) { ok=false; p->qfmpError(QObject::tr("randvec accepts 1, 2 or 3 arguments")); }
+      if (n>0 && (params[0].type!=qfmpDouble)) { ok=false;  p->qfmpError(QObject::tr("randvec needs a double as first argument (if any)")); }
+      if (n>1 && (params[1].type!=qfmpDouble)) { ok=false;  p->qfmpError(QObject::tr("randvec needs a double as second argument (if any)")); }
+      if (n>2 && (params[2].type!=qfmpDouble)) { ok=false;  p->qfmpError(QObject::tr("randvec needs a double as third argument (if any)")); }
+      int items=params[0].toInteger();
+      if (items<=0) { ok=false; p->qfmpError(QObject::tr("randvec's first argument has to be a positive integer number")); }
+      if (ok) {
+          r.setDoubleVec(items, 0);
+
+          if (n==1) {
+              for (int i=0; i<items; i++)
+                r.numVec[i]=p->get_rng()->rand();
+          } else if (n==2) {
+              for (int i=0; i<items; i++)
+                r.numVec[i]=p->get_rng()->rand()*(params[2].num-params[1].num)+params[1].num;
+          } else {
+              for (int i=0; i<items; i++)
+                r.numVec[i]=p->get_rng()->rand(params[1].num);
+          }
+      } else {
+        r.setInvalid();
+      }
+
+
+    }
+
+
+    void fRandIntVec(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+      bool ok=true;
+      if (n>3 || n<=0) { ok=false; p->qfmpError(QObject::tr("randintvec accepts 1, 2 or 3 arguments")); }
+      if (n>0 && (params[0].type!=qfmpDouble)) { ok=false; p->qfmpError(QObject::tr("randintvec needs a double as first argument (if any)")); }
+      if (n>1 && (params[1].type!=qfmpDouble)) { ok=false; p->qfmpError(QObject::tr("randintvec needs a double as second argument (if any)")); }
+      if (n>2 && (params[2].type!=qfmpDouble)) { ok=false; p->qfmpError(QObject::tr("randintvec needs a double as third argument (if any)")); }
+      int items=params[0].toInteger();
+      if (items<=0) { ok=false; p->qfmpError(QObject::tr("randintvec's first argument has to be a positive integer number")); }
+      if (ok) {
+          r.setDoubleVec(items, 0);
+
+          if (n==1) {
+              for (int i=0; i<items; i++)
+                r.numVec[i]=p->get_rng()->randInt();
+          } else if (n==2) {
+              for (int i=0; i<items; i++)
+                r.numVec[i]=p->get_rng()->randInt()*((uint32_t)params[2].num-(uint32_t)params[1].num)+(uint32_t)params[1].num;
+          } else {
+              for (int i=0; i<items; i++)
+                r.numVec[i]=p->get_rng()->randInt((uint32_t)params[1].num);
+          }
+      } else {
+          r.setInvalid();
+      }
+
+
+    }
+    void fRandNormVec(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        bool ok=true;
+      if (n>3 || n<=0) { ok=false; p->qfmpError(QObject::tr("randnormvec accepts 1, 2 or 3 arguments")); }
+      if (n>0 && (params[0].type!=qfmpDouble)) { ok=false; p->qfmpError(QObject::tr("randnormvec needs a double as first argument (if any)")); }
+      if (n>1 && (params[1].type!=qfmpDouble)) { ok=false; p->qfmpError(QObject::tr("randnormvec needs a double as second argument (if any)")); }
+      if (n>2 && (params[2].type!=qfmpDouble)) { ok=false; p->qfmpError(QObject::tr("randnormvec needs a double as third argument (if any)")); }
+      int items=params[0].toInteger();
+      if (items<=0) { ok=false; p->qfmpError(QObject::tr("randnormvec's first argument has to be a positive integer number")); }
+      if (ok) {
+
+          r.setDoubleVec(items, 0);
+          double mean=0;
+          double var=1;
+          if (n==2) {
+              var=params[1].num;
+          } else if (n>2) {
+              mean=params[1].num;
+              var=params[2].num;
+          }
+
+          for (int i=0; i<items; i++)
+            r.numVec[i]=p->get_rng()->randNorm(mean, var);
+      } else {
+          r.setInvalid();
+      }
+
+    }
+
+
+
+    void fRandBoolVec(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        bool ok=true;
+      if (n>2 || n<=0) { ok=false; p->qfmpError(QObject::tr("randboolvec accepts 1 or 2 arguments")); }
+      if (n>0 && (params[0].type!=qfmpDouble)) { ok=false; p->qfmpError(QObject::tr("randboolvec needs a double as first argument (if any)")); }
+      if (n>1 && (params[1].type!=qfmpDouble)) { ok=false; p->qfmpError(QObject::tr("randboolvec needs a double as second argument (if any)")); }
+      int items=params[0].toInteger();
+      double pr=0.5;
+      if (n>1) pr=params[1].num;
+      if (items<=0) { ok=false; p->qfmpError(QObject::tr("randboolvec's first argument has to be a positive integer number")); }
+      if (pr<0 || pr>1) { ok=false; p->qfmpError(QObject::tr("randboolvec's second argument has to be a number between 0 and 1")); }
+      if (ok) {
+          r.setBoolVec(items, false);
+
+          for (int i=0; i<items; i++)
+            r.boolVec[i]=(p->get_rng()->rand()<=pr);
+      } else {
+          r.setInvalid();
+      }
+
+    }
+
+    void fRandBool(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        bool ok=true;
+      if (n>1) { ok=false; p->qfmpError(QObject::tr("randbool accepts 0 or 1 arguments")); }
+      if (n>0 && (params[0].type!=qfmpDouble)) { ok=false; p->qfmpError(QObject::tr("randboolvec needs a double as first argument (if any)")); }
+      double pr=0.5;
+      if (n>1) pr=params[0].num;
+      if (pr<0 || pr>1) { ok=false; p->qfmpError(QObject::tr("randbool's second argument has to be a number between 0 and 1")); }
+      if (ok) {
+          r.setBoolean(p->get_rng()->rand()<=pr);
+      } else {
+          r.setInvalid();
+      }
+    }
+
+
 
 
 
@@ -493,6 +615,11 @@ void QFMathParser::addStandardFunctions(){
     addFunction("rand", QFMathParser_Private::fRand, QFMathParser_Private::fRand, QFMathParser_Private::fRand, QFMathParser_Private::fRand);
     addFunction("randint", QFMathParser_Private::fRandInt, QFMathParser_Private::fRandInt, QFMathParser_Private::fRandInt, QFMathParser_Private::fRandInt);
     addFunction("randnorm", QFMathParser_Private::fRandNorm, QFMathParser_Private::fRandNorm, QFMathParser_Private::fRandNorm, QFMathParser_Private::fRandNorm);
+    addFunction("randbool", QFMathParser_Private::fRandBool);
+    addFunction("randvec", QFMathParser_Private::fRandVec);
+    addFunction("randintvec", QFMathParser_Private::fRandIntVec);
+    addFunction("randnormvec", QFMathParser_Private::fRandNormVec);
+    addFunction("randboolvec", QFMathParser_Private::fRandBoolVec);
     addFunction("srand", QFMathParser_Private::fSRand, NULL, QFMathParser_Private::fSRand);
     addFunction("ceil", QFMathParser_Private::fCeil, NULL, ceil);
     addFunction("floor", QFMathParser_Private::fFloor, NULL, floor);

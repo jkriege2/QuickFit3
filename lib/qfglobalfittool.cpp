@@ -408,6 +408,11 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fit(QList<double *> paramsOut, QList<
     return res;
 }
 
+QFFitMultiQFFitFunctionFunctor *QFGlobalFitTool::getFunctor() const
+{
+    return functor;
+}
+
 
 QFGlobalThreadedFit::QFGlobalThreadedFit(QObject *parent): QThread(parent)
 {
