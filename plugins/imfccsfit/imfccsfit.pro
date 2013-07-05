@@ -29,7 +29,8 @@ HEADERS += qfimfccsfitevaluation.h \
     qfimfccsparameterinputtable.h \
     qfimfccsparameterinputdelegate.h \
     qfimfccsrelativeccfdialog.h \
-    qfimfccsfilesetsmodel.h
+    qfimfccsfilesetsmodel.h \
+    qfimfccsfitchi2landscapedialog.h
 
 SOURCES += qfimfccsfitevaluation.cpp \
            qfimfccsfitevaluation_item.cpp \
@@ -45,11 +46,13 @@ SOURCES += qfimfccsfitevaluation.cpp \
     qfimfccsparameterinputtable.cpp \
     qfimfccsparameterinputdelegate.cpp \
     qfimfccsrelativeccfdialog.cpp \
-    qfimfccsfilesetsmodel.cpp
+    qfimfccsfilesetsmodel.cpp \
+    qfimfccsfitchi2landscapedialog.cpp
 
 FORMS = qfimfccsfitevaluation_editor.ui \   
     optionswidget.ui \
-    qfimfccsrelativeccfdialog.ui
+    qfimfccsrelativeccfdialog.ui \
+    qfimfccsfitchi2landscapedialog.ui
 
 RESOURCES += qfimfccsfitevaluation.qrc \
     ../base_classes/qfrdrmaskeditor.qrc

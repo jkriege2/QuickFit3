@@ -9,6 +9,8 @@
 #include "jkqtplotter.h"
 #include "qffcsweightingtools.h"
 #include "dlgqffitalgorithmprogressdialog.h"
+#include "qfimfccsfitchi2landscapedialog.h"
+
 
 namespace Ui {
     class QFImFCCSFitEvaluationEditor;
@@ -86,9 +88,11 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void on_spinFitRepeats_valueChanged(int value);
         void on_btnAddFile_clicked();
         void on_btnRemoveFile_clicked();
+        void plotChi2Landscape();
     protected:
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFImFCCSFitEvaluationEditor *ui;
+
         
         
         /** \brief where did we save the last report */
@@ -104,6 +108,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         QAction* actSaveReport;
         QAction* actFitAllFilesetsAllPixels;
         QAction* actGuess;
+        QAction* actChi2Landscape;
 
         QAction* actResetCurrent;
         QAction* actResetAllPixels;

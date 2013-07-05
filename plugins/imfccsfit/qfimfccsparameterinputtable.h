@@ -47,6 +47,7 @@ class QFImFCCSParameterInputTable : public QAbstractTableModel
         virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
         int getColsPerRDR() const;
+
     signals:
         void modelRebuilt();
         void fitParamChanged();
@@ -55,7 +56,7 @@ class QFImFCCSParameterInputTable : public QAbstractTableModel
         void fitParamErrorChanged();
     public slots:
         void rebuildModel();
-        bool recalculateFitParameters(bool emitFitParamSignals=true, bool emit dataChangedSignals=true);
+        bool recalculateFitParameters(bool emitFitParamSignals=true, bool emitdataChangedSignals=true);
         void setEditRanges(bool enabled);
     public:
         bool checkRebuildModel(bool alwaysreset=false);
@@ -72,6 +73,8 @@ class QFImFCCSParameterInputTable : public QAbstractTableModel
             QString tooltip;
             QSet<QFRawDataRecord*> visibleIn;
             bool isValid() const;
+
+
 
             bool operator==(const FitParam& other)const;
         };

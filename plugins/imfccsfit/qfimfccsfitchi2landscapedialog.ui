@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFImFCCSFitChi2LandscapeDialog</class>
+ <widget class="QDialog" name="QFImFCCSFitChi2LandscapeDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>673</width>
+    <height>495</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,1" columnstretch="1,0,0">
+   <item row="2" column="0" colspan="3">
+    <widget class="QFPlotter" name="plotter" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>100</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="btnClose">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>&amp;Close</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>parameter X:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="cmbParameterX"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QComboBox" name="cmbModeX">
+       <item>
+        <property name="text">
+         <string>lin</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>log</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QDoubleSpinBox" name="spinXMin"/>
+     </item>
+     <item row="0" column="4">
+      <widget class="QDoubleSpinBox" name="spinXMax">
+       <property name="value">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="5">
+      <widget class="QSpinBox" name="spinXPixels">
+       <property name="minimum">
+        <number>10</number>
+       </property>
+       <property name="maximum">
+        <number>1000</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>parameter Y:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="cmbParameterY"/>
+     </item>
+     <item row="1" column="2">
+      <widget class="QComboBox" name="cmbModeY">
+       <item>
+        <property name="text">
+         <string>lin</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>log</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QDoubleSpinBox" name="spinYMin"/>
+     </item>
+     <item row="1" column="4">
+      <widget class="QDoubleSpinBox" name="spinYMax">
+       <property name="value">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="5">
+      <widget class="QSpinBox" name="spinYPixels">
+       <property name="minimum">
+        <number>10</number>
+       </property>
+       <property name="maximum">
+        <number>1000</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="1">
+    <widget class="QPushButton" name="btnPlot">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>&amp;Plot</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="2">
+    <widget class="QCheckBox" name="chkLogscale">
+     <property name="text">
+      <string>log-scale chi2 image plot</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFPlotter</class>
+   <extends>QWidget</extends>
+   <header>qfplotter.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnClose</sender>
+   <signal>clicked()</signal>
+   <receiver>QFImFCCSFitChi2LandscapeDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>641</x>
+     <y>34</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>667</x>
+     <y>67</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbModeX</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFImFCCSFitChi2LandscapeDialog</receiver>
+   <slot>updateInputs()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>189</x>
+     <y>23</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>306</x>
+     <y>60</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbModeY</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFImFCCSFitChi2LandscapeDialog</receiver>
+   <slot>updateInputs()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>217</x>
+     <y>44</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>293</x>
+     <y>56</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkLogscale</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFImFCCSFitChi2LandscapeDialog</receiver>
+   <slot>on_btnPlot_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>600</x>
+     <y>71</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>671</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>updateInputs()</slot>
+  <slot>on_btnPlot_clicked()</slot>
+ </slots>
+</ui>

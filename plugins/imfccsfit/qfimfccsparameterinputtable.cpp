@@ -386,6 +386,7 @@ int QFImFCCSParameterInputTable::getColsPerRDR() const
     return 5;
 }
 
+
 void QFImFCCSParameterInputTable::rebuildModel()
 {
     checkRebuildModel(true);

@@ -157,6 +157,10 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     ui->btnPrintReport->setDefaultAction(actPrintReport);
     menuEvaluation->addAction(actPrintReport);
 
+    actChi2Landscape=new QAction(tr("&Plot &Chi2 Landscape"), this);
+    connect(actChi2Landscape, SIGNAL(triggered()), this, SLOT(plotChi2Landscape()));
+    menuImFCCSFit->addAction(actChi2Landscape);
+
     QMenu* m=menuImFCCSFit->addMenu(tr("configure evaluation for ..."));
 
     actConfigureForSPIMFCCS=new QAction(tr("SPIM-FCCS: normal diffusion"), this);
@@ -1300,6 +1304,16 @@ void QFImFCCSFitEvaluationEditor::on_btnRemoveFile_clicked()
     setParameterTableSpans();
     ensureCorrectParamaterModelDisplay();
     //connect(ui->btnRemoveFile, SIGNAL(clicked()), item, SLOT(removeFitFile()));
+}
+
+void QFImFCCSFitEvaluationEditor::plotChi2Landscape()
+{
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    QFImFCCSFitChi2LandscapeDialog* dlgChi2=new QFImFCCSFitChi2LandscapeDialog(data, this);
+    dlgChi2->exec();
+
+    delete dlgChi2;
 }
 
 

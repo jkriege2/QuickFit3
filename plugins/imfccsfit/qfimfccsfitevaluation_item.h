@@ -163,6 +163,8 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
             bool emitSignals;
         };
 
+        void freeAndClearDoFitDataList(QList<doFitData>& fitData);
+
 
         QFImFCCSMatchRDRFunctor* matchFunctor;
         /** \brief proxy model to filter rdrModel */

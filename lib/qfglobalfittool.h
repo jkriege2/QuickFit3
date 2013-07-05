@@ -188,6 +188,7 @@ class QFLIB_EXPORT QFGlobalFitTool {
 
 
         QFFitAlgorithm::FitResult fit(QList<double *> paramsOut, QList<double *> paramErrorsOut, QList<double *> initialParams, QList<double *> paramErrorsIn);
+        void evalueCHi2Landscape(double* chi2Landscape, int paramXFile, int paramXID, const QVector<double>& paramXValues, int paramYFile, int paramYID, const QVector<double>& paramYvalues, QList<double *> initialParams);
 
         QFFitMultiQFFitFunctionFunctor* getFunctor() const;
     protected:

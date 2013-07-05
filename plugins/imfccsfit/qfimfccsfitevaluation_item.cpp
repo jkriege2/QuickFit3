@@ -833,7 +833,7 @@ void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<
     if (fitDataOut) *fitDataOut=fitData;
 }
 
-void QFImFCCSFitEvaluationItem::calcChi2Landscape(double *chi2Landscape, int paramXFile, int paramXID, const QVector<double> &paramXValues, int paramYFile, int paramYID, const QVector<double> &paramYvalues, const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange)
+void QFImFCCSFitEvaluationItem::calcChi2Landscape(double *chi2Landscape, int paramXFile, int paramXID, const QVector<double> &paramXValues, int paramYFile, int paramYID, const QVector<double> &paramYValues, const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange)
 {
     QString iparams="";
     QList<double*> paramsVector;
@@ -848,7 +848,7 @@ void QFImFCCSFitEvaluationItem::calcChi2Landscape(double *chi2Landscape, int par
     if (!data0) return;
     QFGlobalFitTool tool(falg);
     tool.clear();
-    tool.setRepeats(qMax(1,getProperty("repeatFit", 1).toInt()));
+    tool.setRepeats(1);
     tool.setDoRecalculateInternals(false);
 
     QFRDRRunSelectionsInterface* runsel=qobject_cast<QFRDRRunSelectionsInterface*>(records.first());
@@ -871,31 +871,32 @@ void QFImFCCSFitEvaluationItem::calcChi2Landscape(double *chi2Landscape, int par
     setupGlobalFitTool(tool, &fitData, iparams, paramsVector, initialParamsVector, errorsVector, errorsVectorI, records, run, rangeMinDatarange, rangeMaxDatarange, false);
 
 
-    /** TODO: fill in calc method here !!! */
+    tool.evalueCHi2Landscape(chi2Landscape, paramXFile, paramXID, paramXValues, paramYFile, paramYID, paramYValues, initialParamsVector);
 
 
+
+    freeAndClearDoFitDataList(fitData);
+}
+
+void QFImFCCSFitEvaluationItem::freeAndClearDoFitDataList(QList<doFitData>& fitData) {
     int cnt=0;
-    for (int r=0; r<records.size(); r++) {
-        QFRawDataRecord* record=records[r];
-        QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
-        if (data) {
-            if (fitData[cnt].emitSignals) record->enableEmitResultsChanged(true);
-            free(fitData[cnt].weights);
-            free(fitData[cnt].params);
-            free(fitData[cnt].initialparams);
-            free(fitData[cnt].errors);
-            free(fitData[cnt].errorsI);
-            free(fitData[cnt].paramsFix);
-            free(fitData[cnt].paramsMax);
-            free(fitData[cnt].paramsMin);
+    for (int r=0; r<fitData.size(); r++) {
+        QFRawDataRecord* record=getFitFile(r);
 
-            cnt++;
-        }
+        if (fitData[cnt].emitSignals && record) record->enableEmitResultsChanged(true);
+        free(fitData[cnt].weights);
+        free(fitData[cnt].params);
+        free(fitData[cnt].initialparams);
+        free(fitData[cnt].errors);
+        free(fitData[cnt].errorsI);
+        free(fitData[cnt].paramsFix);
+        free(fitData[cnt].paramsMax);
+        free(fitData[cnt].paramsMin);
+
+        cnt++;
     }
     fitData.clear();
 }
-
-
 
 
 
@@ -1301,24 +1302,8 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
     if (doLog) QFPluginLogTools::log_text(tr("   - clean up ... \n"));
     if (epc) set_doEmitPropertiesChanged(true);
     if (erc) set_doEmitResultsChanged(true);
-    int cnt=0;
-    for (int r=0; r<records.size(); r++) {
-        QFRawDataRecord* record=records[r];
-        QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
-        if (data) {
-            if (fitData[cnt].emitSignals) record->enableEmitResultsChanged(true);
-            free(fitData[cnt].weights);
-            free(fitData[cnt].params);
-            free(fitData[cnt].initialparams);
-            free(fitData[cnt].errors);
-            free(fitData[cnt].errorsI);
-            free(fitData[cnt].paramsFix);
-            free(fitData[cnt].paramsMax);
-            free(fitData[cnt].paramsMin);
 
-            cnt++;
-        }
-    }
+    freeAndClearDoFitDataList(fitData);
     fitData.clear();
     falg->setReporter(NULL);
 

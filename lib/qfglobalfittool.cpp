@@ -1,6 +1,6 @@
 #include "qfglobalfittool.h"
 #include "qftools.h"
-
+#include "qfmathtools.h"
 
 #undef DEBUG_GLOBALFIT
 //#define DEBUG_GLOBALFIT
@@ -406,6 +406,49 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fit(QList<double *> paramsOut, QList<
     qDebug()<<"return";
 #endif
     return res;
+}
+
+void QFGlobalFitTool::evalueCHi2Landscape(double *chi2Landscape, int paramXFile, int paramXID, const QVector<double> &paramXValues, int paramYFile, int paramYID, const QVector<double> &paramYValues, QList<double *> initialParams)
+{
+    int ppcount=functor->get_paramcount();
+    double* params=(double*)calloc(ppcount,sizeof(double));
+
+    // fill parameter vector
+    for (int i=0; i<functor->getSubFunctorCount(); i++) {
+        QFFitAlgorithm::FitQFFitFunctionFunctor* f=functor->getSubFunctor(i);
+        int pcount=f->get_paramcount();
+        double* pi=initialParams[i];
+        //double* po=paramsOut[i];
+        for (int p=0; p<pcount; p++) {
+            int modelIdx=f->mapFromFunctorToModel(p);
+            int idx=functor->mapSubFunctorToGlobal(i, p);
+            params[idx]=pi[modelIdx];
+        }
+    }
+
+    int idxX=functor->mapSubFunctorToGlobal(paramXFile, paramXID);
+    int idxY=functor->mapSubFunctorToGlobal(paramYFile, paramYID);
+    int idx=0;
+    double* d=(double*)calloc(functor->get_evalout(), sizeof(double));
+
+    for (int y=0; y<paramYValues.size(); y++) {
+        for (int x=0; x<paramXValues.size(); x++) {
+            params[idxX]=paramXValues[x];
+            params[idxY]=paramYValues[y];
+
+            functor->evaluate(d, params);
+
+            double chi2=0;
+            for (int i=0; i<functor->get_evalout(); i++)  {
+                chi2=chi2+qfSqr(d[i]);
+            }
+            chi2Landscape[idx]=chi2;
+
+            idx++;
+        }
+    }
+
+    free(d);
 }
 
 QFFitMultiQFFitFunctionFunctor *QFGlobalFitTool::getFunctor() const

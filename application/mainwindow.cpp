@@ -1038,6 +1038,7 @@ void MainWindow::createMenus() {
         recentMenu->addAction(recentFileActs[i]);
     updateRecentFileActions();*/
     recentMenu=new QRecentFilesMenu(fileMenu);
+    recentMenu->setMaxRecentFilesCount(20);
     recentMenu->setDefaultIcon(QIcon(":/qf3fileicon.png"));
     recentMenu->setUseSystemFileIcons(false);
     recentMenu->setIcon(QIcon(":/project_open_recent.png"));
