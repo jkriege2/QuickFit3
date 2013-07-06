@@ -33,6 +33,11 @@ int SpectrumManager::getFilterCount() const
     return filters.size();
 }
 
+int SpectrumManager::getDetectorCount() const
+{
+    return detectors.size();
+}
+
 QStringList SpectrumManager::getFluorophores() const
 {
     return fluorophores.keys();
@@ -46,6 +51,11 @@ QStringList SpectrumManager::getLightSources() const
 QStringList SpectrumManager::getFilters() const
 {
     return filters.keys();
+}
+
+QStringList SpectrumManager::getDetectors() const
+{
+    return detectors.keys();
 }
 
 void SpectrumManager::clear()
@@ -212,6 +222,54 @@ void SpectrumManager::loadLightSourceDatabase(const QString &ininame, const QStr
             }
 
             lightsources[groups[i]]=d;
+
+        }
+    }
+}
+
+void SpectrumManager::loadDetectorDatabase(const QString &ininame, const QStringList &directories)
+{
+    QFManyFilesSettings set;
+    if (directories.size()>0) {
+        for (int i=0; i<directories.size(); i++) {
+            set.addSettings(new QSettings(QDir(directories[i]).absoluteFilePath(ininame), QSettings::IniFormat), true);
+        }
+    } else {
+        set.addSettings(new QSettings(ininame, QSettings::IniFormat), true);
+    }
+
+    QStringList groups=set.childGroups();
+    for (int i=0; i<groups.size(); i++) {
+        QString gn=groups[i].toLower();
+        if (!gn.isEmpty() && gn.size()>0) {
+            gn+="/";
+            DetectorData d=detectors.value(groups[i], DetectorData());
+
+            d.name=set.value(gn+"name", groups[i]).toString();
+            d.description=set.value(gn+"description", "").toString();
+            d.manufacturer=set.value(gn+"manufacturer", "").toString();
+            d.reference=set.value(gn+"reference", "").toString();
+            d.orderNo=set.value(gn+"oder_no", "").toString();
+            d.peak_wavelength=set.value(gn+"peak_wavelength", NAN).toDouble();
+            d.peak_sensitivity=set.value(gn+"peak_sensitivity", NAN).toDouble();
+            d.peak_sensitivity_unit=set.value(gn+"peak_sensitivity_unit", "").toString();
+            QString fn;
+            int fnID=0;
+            bool fnSepWL;
+            int level=-1;
+            fn=set.value(gn+"spectrum", "", &level).toString();
+            if (fn.size()>0 && level>=0) fn=QFileInfo(set.getSettings(level)->fileName()).absoluteDir().absoluteFilePath(fn);
+            fnID=set.value(gn+"spectrum_id", 0).toInt();
+            fnSepWL=set.value(gn+"spectrum_separatewavelengths", false).toBool();
+            if (QFile::exists(fn)) {
+                d.spectrum=addSpectrum(fn, fnID, fnSepWL, set.value(gn+"spectrum_reference", d.reference).toString());
+            }
+            if ((!QFFloatIsOK(d.peak_wavelength) || d.peak_wavelength<=0) && spectrumExists(d.spectrum)) {
+                spectra[d.spectrum]->ensureSpectrum();
+                d.peak_wavelength=spectra[d.spectrum]->getSpectrumMaxWavelength();
+            }
+
+            detectors[groups[i]]=d;
 
         }
     }
@@ -552,6 +610,11 @@ bool SpectrumManager::lightsourceExists(const QString &f)
     return lightsources.contains(f);
 }
 
+bool SpectrumManager::detectorExists(const QString &f)
+{
+    return detectors.contains(f);
+}
+
 bool SpectrumManager::spectrumExists(int f)
 {
     return (f>=0 && f<spectra.size());
@@ -570,6 +633,11 @@ SpectrumManager::LightSourceData SpectrumManager::getLightSourceData(const QStri
 SpectrumManager::FilterData SpectrumManager::getFilterData(const QString &name)
 {
     return filters[name];
+}
+
+SpectrumManager::DetectorData SpectrumManager::getDetectorData(const QString &name)
+{
+    return detectors[name];
 }
 
 
@@ -601,5 +669,10 @@ SpectrumManager::FluorophoreData::FluorophoreData()
     extiction_coefficient_wavelength=0;
     spectrum_abs=-1;
     spectrum_fl=-1;
+}
+
+SpectrumManager::DetectorData::DetectorData()
+{
+    spectrum=-1;
 }
 

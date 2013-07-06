@@ -91,6 +91,17 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="btnAddDetector">
+           <property name="text">
+            <string>add &amp;detector</string>
+           </property>
+           <property name="icon">
+            <iconset resource="qfespectraviewer.qrc">
+             <normaloff>:/qfe_spectraviewer/detector.png</normaloff>:/qfe_spectraviewer/detector.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="verticalSpacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -163,7 +174,7 @@
         <item>
          <widget class="QStackedWidget" name="stackSpectraEditor">
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="widFilter">
            <layout class="QFormLayout" name="formLayout_2">
@@ -496,6 +507,51 @@
            </layout>
           </widget>
           <widget class="QWidget" name="widEmpty"/>
+          <widget class="QWidget" name="widDetector">
+           <layout class="QFormLayout" name="formLayout_9">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_13">
+              <property name="text">
+               <string>detector:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="cmbDetector"/>
+            </item>
+            <item row="1" column="1">
+             <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnEditDetector">
+                <property name="text">
+                 <string>&amp;edit</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnMailDetector">
+                <property name="text">
+                 <string>&amp;donate</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
           <widget class="QWidget" name="widFluorophore">
            <layout class="QFormLayout" name="formLayout">
             <property name="fieldGrowthPolicy">

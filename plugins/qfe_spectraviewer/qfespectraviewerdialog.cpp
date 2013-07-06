@@ -8,6 +8,7 @@
 #include "qfespectraviewerlightsourceeditor.h"
 #include "qfespectraviewerfiltereditor.h"
 #include "qfespectraviewerfluorophoreditor.h"
+#include "qfespectraviewerdetectoreditor.h"
 #include <QSettings>
 #include "qfespectraviewerspilloverdialog.h"
 #include "qfversion.h"
@@ -57,6 +58,11 @@ QFESpectraViewerDialog::QFESpectraViewerDialog(QFESpectraViewer *plugin, QWidget
     connect(actFluorophore, SIGNAL(triggered()), this, SLOT(createFluorophoreSpectrum()));
     //btn->addAction(actFluorophore);
     ui->btnNewFluorophore->addAction(actFluorophore);
+    //mainToolbar->addWidget(btn);
+    QAction* actDetector=new QAction(QIcon(":/qfe_spectraviewer/detector.png"), tr("... &detector"), this);
+    connect(actDetector, SIGNAL(triggered()), this, SLOT(createDetectorSpectrum()));
+    //btn->addAction(actDetector);
+    ui->btnNewFluorophore->addAction(actDetector);
     //mainToolbar->addWidget(btn);
 
     mainToolbar->addSeparator();
@@ -126,6 +132,16 @@ void QFESpectraViewerDialog::reloadComboboxes()
     ui->cmbFilter->setUpdatesEnabled(true);
 
 
+    sl=manager->getDetectors();
+    ui->cmbDetector->clear();
+    ui->cmbDetector->setUpdatesEnabled(false);
+    for (int i=0; i<sl.size(); i++) {
+        if (manager->detectorExists(sl[i])) {
+            ui->cmbDetector->addItem(manager->getDetectorData(sl[i]).name, sl[i]);
+        }
+    }
+    ui->cmbDetector->setUpdatesEnabled(true);
+
     ui->lstSpectra->setCurrentRow(0);
     spectrumSelected();
 }
@@ -172,6 +188,7 @@ void QFESpectraViewerDialog::loadSpectraConfig(QSettings &settings, const QStrin
             case qfesLightSourceSingleLine: item->setIcon(QIcon(":/qfe_spectraviewer/lightsource.png")); break;
             case qfesFilterSpectrum:
             case qfesFilterBandpass: item->setIcon(QIcon(":/qfe_spectraviewer/filter.png")); break;
+            case qfesDetector: item->setIcon(QIcon(":/qfe_spectraviewer/detector.png")); break;
 
             default: break;
         }
@@ -245,6 +262,19 @@ void QFESpectraViewerDialog::on_btnAddLightsource_clicked()
     spectrumSelected();
 }
 
+void QFESpectraViewerDialog::on_btnAddDetector_clicked()
+{
+    //JKAutoOutputTimer tim("on_btnAddFluorophore_clicked");
+    QFESpectraViewerPlotItem it;
+    it.type=qfesDetector;
+    plotItems.append(it);
+    QListWidgetItem* item=new QListWidgetItem(QIcon(":/qfe_spectraviewer/detector.png"), tr("--- new detector ---"), ui->lstSpectra);
+    //item->setData(Qt::UserRole, plotItems.size()-1);
+    //ui->lstSpectra->addItem(item);
+    ui->lstSpectra->setCurrentItem(item);
+    spectrumSelected();
+}
+
 
 void QFESpectraViewerDialog::on_btnDelete_clicked()
 {
@@ -291,6 +321,14 @@ void QFESpectraViewerDialog::saveFromWidgets()
         if (ui->lstSpectra->item(currentIndex)) {
             ui->lstSpectra->item(currentIndex)->setText(plotItems[currentIndex].displayName);
             ui->lstSpectra->item(currentIndex)->setIcon(QIcon(":/qfe_spectraviewer/fluorophore.png"));
+        }
+    } else if (ui->stackSpectraEditor->currentWidget()==ui->widDetector)  {
+        plotItems[currentIndex].type=qfesDetector;
+        plotItems[currentIndex].name=ui->cmbDetector->itemData(ui->cmbDetector->currentIndex()).toString();
+        plotItems[currentIndex].displayName=ui->cmbDetector->currentText();
+        if (ui->lstSpectra->item(currentIndex)) {
+            ui->lstSpectra->item(currentIndex)->setText(plotItems[currentIndex].displayName);
+            ui->lstSpectra->item(currentIndex)->setIcon(QIcon(":/qfe_spectraviewer/detector.png"));
         }
     } else if (ui->stackSpectraEditor->currentWidget()==ui->widFilter)  {
         plotItems[currentIndex].displayName="";
@@ -362,6 +400,7 @@ void QFESpectraViewerDialog::loadToWidgets()
     disconnect(ui->spinFilterCutWavelength, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
     disconnect(ui->cmbFilterType, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
     disconnect(ui->cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
+    disconnect(ui->cmbDetector, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
     if (currentIndex<0 || currentIndex>=plotItems.size()) {
         ui->stackSpectraEditor->setCurrentWidget(ui->widEmpty);
     } else {
@@ -395,7 +434,10 @@ void QFESpectraViewerDialog::loadToWidgets()
              connect(ui->spinLaserLinewidth, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
              connect(ui->cmbLightSourceType, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
              connect(ui->cmbLightsource, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
-
+        } else  if (plotItems[currentIndex].type==qfesDetector)  {
+             ui->stackSpectraEditor->setCurrentWidget(ui->widDetector);
+             ui->cmbDetector->setCurrentIndex(ui->cmbDetector->findData(plotItems[currentIndex].name));
+             connect(ui->cmbDetector, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
         } else  if (plotItems[currentIndex].type==qfesFilterBandpass || plotItems[currentIndex].type==qfesFilterNotch)  {
              ui->stackSpectraEditor->setCurrentWidget(ui->widFilter);
              ui->stackFilter->setCurrentWidget(ui->widFilterBandpass);
@@ -516,6 +558,32 @@ void QFESpectraViewerDialog::updateItemPropertiesModel()
                  modItemProperties.setCellCreate(row,1, ls.typical_wavelength);
                  row++;
              }
+        } else  if (plotItems[currentIndex].type==qfesDetector)  {
+             if (manager->lightsourceExists(plotItems[currentIndex].name)) {
+                 SpectrumManager::DetectorData ls=manager->getDetectorData(plotItems[currentIndex].name);
+                 int row=0;
+                 modItemProperties.setCellCreate(row,0, tr("name"));
+                 modItemProperties.setCellCreate(row,1, ls.name);
+                 row++;
+                 modItemProperties.setCellCreate(row,0, tr("order No."));
+                 modItemProperties.setCellCreate(row,1, ls.orderNo);
+                 row++;
+                 modItemProperties.setCellCreate(row,0, tr("description"));
+                 modItemProperties.setCellCreate(row,1, ls.description);
+                 row++;
+                 modItemProperties.setCellCreate(row,0, tr("manufacturer"));
+                 modItemProperties.setCellCreate(row,1, ls.manufacturer);
+                 row++;
+                 modItemProperties.setCellCreate(row,0, tr("reference"));
+                 modItemProperties.setCellCreate(row,1, ls.reference);
+                 row++;
+                 modItemProperties.setCellCreate(row,0, tr("peak wavelength [nm]"));
+                 modItemProperties.setCellCreate(row,1, ls.peak_wavelength);
+                 row++;
+                 modItemProperties.setCellCreate(row,0, tr("peak sensitivity [%1/W]").arg(ls.peak_sensitivity_unit));
+                 modItemProperties.setCellCreate(row,1, ls.peak_sensitivity);
+                 row++;
+             }
         } else  if (plotItems[currentIndex].type==qfesFilterSpectrum)  {
              if (manager->filterExists(plotItems[currentIndex].name)) {
                  SpectrumManager::FilterData ls=manager->getFilterData(plotItems[currentIndex].name);
@@ -556,6 +624,23 @@ void QFESpectraViewerDialog::createLightSourceSpectrum()
     if (dlg->exec()) {
         QDir d(ProgramOptions::getConfigValue("qfe_spectraviewer/user_database", QFPluginServices::getInstance()->getPluginConfigDirectory("qfe_spectraviewer")).toString());
         QSettings set(d.absoluteFilePath("ligtsources.ini"), QSettings::IniFormat);
+        dlg->addDataAndSpectrum(set, manager);
+        ui->lstSpectra->setCurrentRow(-1);
+        currentIndex=-1;
+        spectrumSelected();
+
+        plugin->reloadDatabases();
+        reloadComboboxes();
+    }
+    delete dlg;
+}
+
+void QFESpectraViewerDialog::createDetectorSpectrum()
+{
+    QFESpectraViewerDetectorEditor* dlg=new QFESpectraViewerDetectorEditor(this);
+    if (dlg->exec()) {
+        QDir d(ProgramOptions::getConfigValue("qfe_spectraviewer/user_database", QFPluginServices::getInstance()->getPluginConfigDirectory("qfe_spectraviewer")).toString());
+        QSettings set(d.absoluteFilePath("detectors.ini"), QSettings::IniFormat);
         dlg->addDataAndSpectrum(set, manager);
         ui->lstSpectra->setCurrentRow(-1);
         currentIndex=-1;
@@ -614,6 +699,27 @@ void QFESpectraViewerDialog::on_btnEditFilter_clicked()
     if (dlg->exec()) {
         QDir d(ProgramOptions::getConfigValue("qfe_spectraviewer/user_database", QFPluginServices::getInstance()->getPluginConfigDirectory("qfe_spectraviewer")).toString());
         QSettings set(d.absoluteFilePath("filters.ini"), QSettings::IniFormat);
+        dlg->addDataAndSpectrum(set, manager);
+        ui->lstSpectra->setCurrentRow(-1);
+        currentIndex=-1;
+        spectrumSelected();
+
+        plugin->reloadDatabases();
+        reloadComboboxes();
+        updatePlots();
+    }
+    delete dlg;
+}
+
+
+void QFESpectraViewerDialog::on_btnEditDetector_clicked()
+{
+    if (currentIndex<0 || currentIndex>=plotItems.size()) return;
+    QFESpectraViewerDetectorEditor* dlg=new QFESpectraViewerDetectorEditor(this);
+    if (manager->detectorExists(plotItems[currentIndex].name)) dlg->setFromData(plotItems[currentIndex].name, manager->getDetectorData(plotItems[currentIndex].name), manager);
+    if (dlg->exec()) {
+        QDir d(ProgramOptions::getConfigValue("qfe_spectraviewer/user_database", QFPluginServices::getInstance()->getPluginConfigDirectory("qfe_spectraviewer")).toString());
+        QSettings set(d.absoluteFilePath("detectors.ini"), QSettings::IniFormat);
         dlg->addDataAndSpectrum(set, manager);
         ui->lstSpectra->setCurrentRow(-1);
         currentIndex=-1;
@@ -945,6 +1051,27 @@ void QFESpectraViewerDialog::updatePlots()
                     ui->plotter->addGraph(g);
                 }
             }*/
+        } else if (item.type==qfesDetector && manager->detectorExists(item.name)) {
+            SpectrumManager::DetectorData ls=manager->getDetectorData(item.name);
+            //if (!ui->chkSmoothSpectra->isChecked()) {
+                if (manager->spectrumExists(ls.spectrum))  {
+                    JKQTPfilledCurveXGraph* g=new JKQTPfilledCurveXGraph(ui->plotter->get_plotter());
+                    SpectrumManager::Spectrum* spec=manager->getSpectrum(ls.spectrum);
+                    //spec->ensureSpectrum();
+                    size_t cWL=ds->addCopiedColumn(spec->getWavelength(), spec->getN(), tr("%1_wavelength").arg(item.name));
+                    size_t cSP=ds->addCopiedColumn(spec->getSpectrum(), spec->getN(), tr("%1_spectrum").arg(item.name));
+                    g->set_drawLine(true);
+                    g->set_lineWidth(1);
+                    g->set_style(Qt::DotLine);
+                    g->set_xColumn(cWL);
+                    g->set_yColumn(cSP);
+                    QColor col=QColor("darkgrey");
+                    g->set_color(col);
+                    col.setAlphaF(0.25);
+                    g->set_fillColor(col);
+                    g->set_title(tr("DETECTOR: %1").arg(ls.name));
+                    ui->plotter->addGraph(g);
+                }
 
         }
     }
@@ -1068,6 +1195,51 @@ void QFESpectraViewerDialog::on_btnMailLightsource_clicked()
         QString mailcontents=tr("Dear authors,\nfind attatched my lightsource spectrum data for inclusion in the next QuickFit release,\n\nBest,\n\n\nDATA:\n---------------------------------------------------------------------\n%1\n---------------------------------------------------------------------\n%2\n---------------------------------------------------------------------\n").arg(data).arg(spectrafiles);
 
         QUrl url=QUrl(QByteArray("mailto:")+qfInfoEmail().toLocal8Bit()+"?subject="+QUrl::toPercentEncoding("QuickFit3/qfe_spectraviewer: new lightsource data")+
+                      "&body="+QUrl::toPercentEncoding(mailcontents));
+        QDesktopServices::openUrl(url);
+
+
+    }
+}
+
+void QFESpectraViewerDialog::on_btnMailDetector_clicked()
+{
+    if (currentIndex<0 || currentIndex>=plotItems.size()) return;
+    if (manager->detectorExists(plotItems[currentIndex].name)) {
+        QString spectrafiles="";
+        SpectrumManager::DetectorData d=manager->getDetectorData(plotItems[currentIndex].name);
+        QVector<double> absWL, absS;
+        if (manager->spectrumExists(d.spectrum)) {
+            absWL=  arrayToVector(manager->getSpectrum(d.spectrum)->getWavelength(), manager->getSpectrum(d.spectrum)->getN());
+            absS=  arrayToVector(manager->getSpectrum(d.spectrum)->getSpectrum(), manager->getSpectrum(d.spectrum)->getN());
+        }
+
+        QString absFN=cleanStringForFilename(plotItems[currentIndex].name.toLower())+".spec";
+        spectrafiles+=QString("# %1\n").arg(absFN);
+        for (int i=0; i<absWL.size(); i++) {
+            spectrafiles+=(doubleToQString(absWL[i])+", "+doubleToQString(absS[i])+"\n");
+        }
+        spectrafiles+="\n\n\n";
+
+        QString data=QString("[%1]\n").arg(plotItems[currentIndex].name);
+        data+=QString("name = %1\n").arg(d.name);
+        data+=QString("manufacturer = %1\n").arg(d.manufacturer);
+        data+=QString("oder_no = %1\n").arg(d.orderNo);
+        data+=QString("reference = %1\n").arg(d.reference);
+        data+=QString("peak_wavelength = %1\n").arg(d.peak_wavelength);
+        data+=QString("peak_sensitivity = %1\n").arg(d.peak_sensitivity);
+        data+=QString("peak_sensitivity_unit = %1\n").arg(d.peak_sensitivity_unit);
+        data+=QString("description = %1\n").arg(d.description);
+        data+=QString("spectrum = \"%1\"\n").arg(absFN);
+        data+=QString("spectrum_id = %1\n").arg(0);
+        data+=QString("spectrum_separatewavelengths = %1\n").arg(false);
+        if (manager->spectrumExists(d.spectrum)) {
+            data+=QString("spectrum_reference = \"%1\"\n").arg(manager->getSpectrum(d.spectrum)->reference);
+        }
+
+        QString mailcontents=tr("Dear authors,\nfind attatched my detector spectrum data for inclusion in the next QuickFit release,\n\nBest,\n\n\nDATA:\n---------------------------------------------------------------------\n%1\n---------------------------------------------------------------------\n%2\n---------------------------------------------------------------------\n").arg(data).arg(spectrafiles);
+
+        QUrl url=QUrl(QByteArray("mailto:")+qfInfoEmail().toLocal8Bit()+"?subject="+QUrl::toPercentEncoding("QuickFit3/qfe_spectraviewer: new detector data")+
                       "&body="+QUrl::toPercentEncoding(mailcontents));
         QDesktopServices::openUrl(url);
 

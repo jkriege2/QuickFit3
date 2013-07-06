@@ -21,7 +21,8 @@ enum QFESpectraViewerPlotItemType {
     qfesFilterBandpass=4,
     qfesFilterLongpass=5,
     qfesFilterShortpass=6,
-    qfesFilterNotch=7
+    qfesFilterNotch=7,
+    qfesDetector=8
 };
 
 struct QFESpectraViewerPlotItem {
@@ -54,15 +55,18 @@ class QFESpectraViewerDialog : public QDialog
         void on_btnAddFluorophore_clicked();
         void on_btnAddFilter_clicked();
         void on_btnAddLightsource_clicked();
+        void on_btnAddDetector_clicked();
         void on_btnDelete_clicked();
         void spectrumSelected();
         void saveFromWidgets();
         void loadToWidgets();
         void updateItemPropertiesModel();
         void createLightSourceSpectrum();
+        void createDetectorSpectrum();
         void on_btnEditLightsource_clicked();
         void createFilterSpectrum();
         void on_btnEditFilter_clicked();
+        void on_btnEditDetector_clicked();
         void createFluorophoreSpectrum();
         void on_btnEditFluorophore_clicked();
         void reloadComboboxes();
@@ -70,6 +74,7 @@ class QFESpectraViewerDialog : public QDialog
         void on_btnMailFluorophore_clicked();
         void on_btnMailLightsource_clicked();
         void on_btnMailFilter_clicked();
+        void on_btnMailDetector_clicked();
         void on_cmbFilterType_currentIndexChanged(int i);
     protected:
         Ui::QFESpectraViewerDialog *ui;

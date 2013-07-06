@@ -14,7 +14,7 @@ class QFFCSFitChi2LandscapeDialog : public QDialog
         Q_OBJECT
         
     public:
-        explicit QFFCSFitChi2LandscapeDialog(QFRawDataRecord* item, int index, QFFitFunction* fitfunction, QWidget *parent = 0);
+        explicit QFFCSFitChi2LandscapeDialog(QFFitResultsByIndexEvaluation* item, QFRawDataRecord *rec, int index, QFFitFunction* fitfunction, QWidget *parent = 0);
         ~QFFCSFitChi2LandscapeDialog();
     protected slots:
         void updateInputs();
@@ -23,6 +23,7 @@ class QFFCSFitChi2LandscapeDialog : public QDialog
     private:
         Ui::QFFCSFitChi2LandscapeDialog *ui;
         QFFitResultsByIndexEvaluation* item;
+        QFRawDataRecord* rec;
         int index;
         QFFitFunction* fitfunction;
 };

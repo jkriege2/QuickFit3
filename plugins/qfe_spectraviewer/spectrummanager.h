@@ -159,6 +159,26 @@ class SpectrumManager {
 
         };
 
+        /** \brief specifies the properties of a detector */
+        struct DetectorData {
+            DetectorData();
+            QString name;
+            QString description;
+            QString manufacturer;
+            QString orderNo;
+            /** \brief absorption specturm */
+            int spectrum;
+            /** \brief reference/source of data */
+            QString reference;
+            /** \brief peak detection wavelength [nm] */
+            double peak_wavelength;
+            /** \brief peak detection sensitivity (at peak_wavelength) [unit/µW] */
+            double peak_sensitivity;
+            /** \brief peak detection sensitivity unit */
+            QString peak_sensitivity_unit;
+
+        };
+
     protected:
 
 
@@ -169,10 +189,12 @@ class SpectrumManager {
 
         /** \brief fluorophor database */
         QMap<QString, FluorophoreData> fluorophores;
-        /** \brief fluorophor database */
+        /** \brief lightsource database */
         QMap<QString, LightSourceData> lightsources;
-        /** \brief fluorophor database */
+        /** \brief filter database */
         QMap<QString, FilterData> filters;
+        /** \brief detector database */
+        QMap<QString, DetectorData> detectors;
 
     private:
 
@@ -191,18 +213,23 @@ class SpectrumManager {
         int getLightSourceCount() const;
         /** \brief get number of filters */
         int getFilterCount() const;
-        /** \brief get number of fluorophores */
-        QStringList getFluorophores() const;
-        /** \brief get number of light sources */
-        QStringList getLightSources() const;
         /** \brief get number of filters */
+        int getDetectorCount() const;
+        /** \brief get fluorophore IDs */
+        QStringList getFluorophores() const;
+        /** \brief get lightsource IDs */
+        QStringList getLightSources() const;
+        /** \brief get filter IDs*/
         QStringList getFilters() const;
+        /** \brief get detector IDs */
+        QStringList getDetectors() const;
 
         void clear();
 
         void loadFluorophoreDatabase(const QString& ininame, const QStringList& directories=QStringList() );
         void loadFilterDatabase(const QString& ininame, const QStringList& directories=QStringList() );
         void loadLightSourceDatabase(const QString& ininame, const QStringList& directories=QStringList() );
+        void loadDetectorDatabase(const QString& ininame, const QStringList& directories=QStringList() );
 
 
         /** \brief add a spectrum file to the internal database */
@@ -214,15 +241,18 @@ class SpectrumManager {
 
         /** \brief returns \c true if fluorophor exists in database */
         bool fluorophoreExists(const QString& f);
-        /** \brief returns \c true if fluorophor exists in database */
+        /** \brief returns \c true if filter exists in database */
         bool filterExists(const QString& f);
-        /** \brief returns \c true if fluorophor exists in database */
+        /** \brief returns \c true if lightsource exists in database */
         bool lightsourceExists(const QString& f);
+        /** \brief returns \c true if detector exists in database */
+        bool detectorExists(const QString& f);
         bool spectrumExists(int f);
 
          FluorophoreData getFluorophoreData(const QString& name)  ;
          LightSourceData getLightSourceData(const QString& name)  ;
          FilterData getFilterData(const QString& name)  ;
+         DetectorData getDetectorData(const QString& name)  ;
 
 };
 #endif // SPECTRUMMANAGER_H

@@ -4,11 +4,11 @@
 
 
 
-QFFCSFitChi2LandscapeDialog::QFFCSFitChi2LandscapeDialog(QFRawDataRecord *item, int index, QFFitFunction *fitfunction, QWidget *parent) :
+QFFCSFitChi2LandscapeDialog::QFFCSFitChi2LandscapeDialog(QFFitResultsByIndexEvaluation* item, QFRawDataRecord *rec, int index, QFFitFunction *fitfunction, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QFFCSFitChi2LandscapeDialog)
 {
-    this->item=qobject_cast<QFFitResultsByIndexEvaluation *>(item);
+    this->item=item;
     this->index=index;
     this->fitfunction=fitfunction;
     ui->setupUi(this);
@@ -16,7 +16,7 @@ QFFCSFitChi2LandscapeDialog::QFFCSFitChi2LandscapeDialog(QFRawDataRecord *item, 
     ui->cmbParameterX->clear();
     ui->cmbParameterY->clear();
 
-    QFRawDataRecord* rec=item;
+    this->rec=rec;
     QFFitFunction* ff=fitfunction;
     QStringList pids=ff->getParameterIDs();
     for (int p=0; p<pids.size(); p++) {
@@ -87,6 +87,7 @@ void QFFCSFitChi2LandscapeDialog::on_btnPlot_clicked()
 
     int pX=ui->cmbParameterX->itemData(ui->cmbParameterX->currentIndex()).toInt();
     int pY=ui->cmbParameterY->itemData(ui->cmbParameterY->currentIndex()).toInt();
+    qDebug()<<pX<<pY;
     item->calcChi2Landscape(d, 0, pX, xData, 0, pY, yData, item->getHighlightedRecord(), index);
     if (ui->chkLogscale->isChecked()) {
         for (int i=0; i<ui->spinXPixels->value()*ui->spinYPixels->value(); i++) {

@@ -1168,6 +1168,9 @@ void QFImFCSFitEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFi
         double* params=allocFillParameters(record, run);
         double* errors=allocFillParameterErrors(record, run);
         bool* paramsFix=allocFillFix(record, run);
+        for (int i=0; i<ffunc->paramCount(); i++) {
+            paramsFix[i]=false;
+        }
 
 
 
@@ -1189,6 +1192,8 @@ void QFImFCSFitEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFi
 
 
         QFFitAlgorithm::FitQFFitFunctionFunctor fm(ffunc, params, paramsFix, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N);
+        double* pm=(double*)malloc(fm.get_paramcount()*sizeof(double));
+
 
 
         int idxX=paramXID;
@@ -1200,8 +1205,8 @@ void QFImFCSFitEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFi
             for (int x=0; x<paramXValues.size(); x++) {
                 params[idxX]=paramXValues[x];
                 params[idxY]=paramYValues[y];
-
-                fm.evaluate(d, params);
+                fm.mapArrayFromModelToFunctor(pm, params);
+                fm.evaluate(d, pm);
 
                 double chi2=0;
                 for (int i=0; i<fm.get_evalout(); i++)  {
@@ -1214,6 +1219,7 @@ void QFImFCSFitEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFi
         }
 
         free(d);
+        free(pm);
 
 
         free(weights);

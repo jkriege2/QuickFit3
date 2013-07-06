@@ -1886,7 +1886,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::plotChi2Landscape()
 {
     QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     if (!data) return;
-    QFFCSFitChi2LandscapeDialog* dlgChi2=new QFFCSFitChi2LandscapeDialog(data->getHighlightedRecord(), data->getCurrentIndex(), data->getFitFunction(), this);
+    QFFCSFitChi2LandscapeDialog* dlgChi2=new QFFCSFitChi2LandscapeDialog(data, data->getHighlightedRecord(), data->getCurrentIndex(), data->getFitFunction(), this);
     dlgChi2->exec();
 
     delete dlgChi2;

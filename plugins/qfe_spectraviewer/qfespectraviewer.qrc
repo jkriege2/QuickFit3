@@ -15,5 +15,6 @@
         <file alias="lightsource.png">icons/lightsource.png</file>
         <file>icons/lightsource_spectrum.png</file>
         <file>icons/qfespectraviewer.png</file>
+        <file alias="detector.png">icons/detector.png</file>
     </qresource>
 </RCC>
