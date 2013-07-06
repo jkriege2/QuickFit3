@@ -123,6 +123,11 @@ void QFPlotterPrivate::copyToTable()
                         JKQTPColumnOverlayImageEnhanced* colmask=dynamic_cast<JKQTPColumnOverlayImageEnhanced*>(g);
                         QFRDRColumnGraphsInterface::ColumnGraphTypes type=QFRDRColumnGraphsInterface::cgtLinesPoints;
                         QFRDRColumnGraphsInterface::ColumnGraphSymbols symbol=QFRDRColumnGraphsInterface::cgsFilledCircle;
+
+                        JKQTPMathImage* ig=dynamic_cast<JKQTPMathImage*>(g);
+                        JKQTPRGBMathImage* rgbg=dynamic_cast<JKQTPRGBMathImage*>(g);
+                        JKQTPOverlayImage* mask=dynamic_cast<JKQTPOverlayImage*>(g);
+
                         double symbolSize=15.0;
 
                         if (xyg) {
@@ -177,18 +182,77 @@ void QFPlotterPrivate::copyToTable()
 
                         } else if (colig) {
                             cols->colgraphAddImagePlot(graph, columns.value(colig->get_imageColumn(),-1), QFRDRColumnGraphsInterface::ImageColorPalette((int)colig->get_palette()), colig->get_x(), colig->get_y(), colig->get_width(), colig->get_height(), colig->get_Nx(), colig->get_title());
-                            cols->colgraphSetImagePlotModifier(graph, cols->colgraphGetPlotCount(graph), colig->get_modifierColumn(),  QFRDRColumnGraphsInterface::ImageModifierMode((int)colig->get_modifierMode()));
-                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph), QFRDRColumnGraphsInterface::cgtiDataChannel, colig->get_autoImageRange(), colig->get_imageMin(), colig->get_imageMax());
-                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph), QFRDRColumnGraphsInterface::cgtiModifierChannel, colig->get_autoModifierRange(), colig->get_modifierMin(), colig->get_modifierMax());
+                            cols->colgraphSetImagePlotModifier(graph, cols->colgraphGetPlotCount(graph)-1, colig->get_modifierColumn(),  QFRDRColumnGraphsInterface::ImageModifierMode((int)colig->get_modifierMode()));
+                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiDataChannel, colig->get_autoImageRange(), colig->get_imageMin(), colig->get_imageMax());
+                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiModifierChannel, colig->get_autoModifierRange(), colig->get_modifierMin(), colig->get_modifierMax());
                         } else if (colmask) {
                             cols->colgraphAddImageMaskPlot(graph, columns.value(colmask->get_imageColumn(),-1), colmask->get_x(), colmask->get_y(), colmask->get_width(), colmask->get_height(), colmask->get_Nx(), colmask->get_title(), colmask->get_trueColor(), colmask->get_falseColor());
                         } else if (colrgbg) {
                             cols->colgraphAddRGBImagePlot(graph, columns.value(colrgbg->get_imageRColumn(),-1), columns.value(colrgbg->get_imageGColumn(),-1), columns.value(colrgbg->get_imageBColumn(),-1), colrgbg->get_x(), colrgbg->get_y(), colrgbg->get_width(), colrgbg->get_height(), colrgbg->get_Nx(), colrgbg->get_title());
-                            cols->colgraphSetImagePlotModifier(graph, cols->colgraphGetPlotCount(graph), colrgbg->get_modifierColumn(),  QFRDRColumnGraphsInterface::ImageModifierMode((int)colrgbg->get_modifierMode()));
-                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph), QFRDRColumnGraphsInterface::cgtiRedChannel, colrgbg->get_autoImageRange(), colrgbg->get_imageMin(), colrgbg->get_imageMax());
-                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph), QFRDRColumnGraphsInterface::cgtiGreenChannel, colrgbg->get_autoImageRange(), colrgbg->get_imageMinG(), colrgbg->get_imageMaxG());
-                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph), QFRDRColumnGraphsInterface::cgtiBlueChannel, colrgbg->get_autoImageRange(), colrgbg->get_imageMinB(), colrgbg->get_imageMaxB());
+                            cols->colgraphSetImagePlotModifier(graph, cols->colgraphGetPlotCount(graph)-1, colrgbg->get_modifierColumn(),  QFRDRColumnGraphsInterface::ImageModifierMode((int)colrgbg->get_modifierMode()));
+                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiRedChannel, colrgbg->get_autoImageRange(), colrgbg->get_imageMin(), colrgbg->get_imageMax());
+                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiGreenChannel, colrgbg->get_autoImageRange(), colrgbg->get_imageMinG(), colrgbg->get_imageMaxG());
+                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiBlueChannel, colrgbg->get_autoImageRange(), colrgbg->get_imageMinB(), colrgbg->get_imageMaxB());
                             //cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph), QFRDRColumnGraphsInterface::cgtiModifierChannel, colrgbg->get_g, colrgbg->get_modifierMin(), colrgbg->get_modifierMax());
+                        } else if (ig && tab) {
+                            int cimg=-1;
+                            int cmod=-1;
+                            if (ig->get_data()) {
+                                cimg=tab->tableGetColumnCount();
+                                tab->tableSetColumnDataAsDouble(cimg, ig->getDataAsDoubleVector());
+                                tab->tableSetColumnTitle(cimg, tr("image data \"%3\", Nx*Ny=%1*%2").arg(ig->get_Nx()).arg(ig->get_Ny()).arg(ig->get_title()));
+                            }
+                            if (ig->get_dataModifier()) {
+                                cmod=tab->tableGetColumnCount();
+                                tab->tableSetColumnDataAsDouble(cmod, ig->getDataAsDoubleVector());
+                                tab->tableSetColumnTitle(cimg, tr("image modifier data \"%3\" Nx*Ny=%1*%2").arg(ig->get_Nx()).arg(ig->get_Ny()).arg(ig->get_title()));
+                            }
+
+                            cols->colgraphAddImagePlot(graph, cimg, QFRDRColumnGraphsInterface::ImageColorPalette((int)ig->get_palette()), ig->get_x(), ig->get_y(), ig->get_width(), ig->get_height(), ig->get_Nx(), ig->get_title());
+                            cols->colgraphSetImagePlotModifier(graph, cols->colgraphGetPlotCount(graph)-1, cmod,  QFRDRColumnGraphsInterface::ImageModifierMode((int)ig->get_modifierMode()));
+                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiDataChannel, ig->get_autoImageRange(), ig->get_imageMin(), ig->get_imageMax());
+                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiModifierChannel, ig->get_autoModifierRange(), ig->get_modifierMin(), ig->get_modifierMax());
+                        } else if (mask && tab) {
+                            int cimg=-1;
+                            if (mask->get_data()) {
+                                cimg=tab->tableGetColumnCount();
+                                tab->tableSetColumnDataAsDouble(cimg, mask->getDataAsDoubleVector());
+                                tab->tableSetColumnTitle(cimg, tr("image mask data \"%3\", Nx*Ny=%1*%2").arg(mask->get_Nx()).arg(mask->get_Ny()).arg(mask->get_title()));
+                            }
+
+                            cols->colgraphAddImageMaskPlot(graph, cimg, mask->get_x(), mask->get_y(), mask->get_width(), mask->get_height(), mask->get_Nx(), mask->get_title(), mask->get_trueColor(), mask->get_falseColor());
+                        } else if (rgbg && tab) {
+                            int cimg=-1;
+                            int cimgG=-1;
+                            int cimgB=-1;
+                            int cmod=-1;
+                            if (rgbg->get_data()) {
+                                cimg=tab->tableGetColumnCount();
+                                tab->tableSetColumnDataAsDouble(cimg, rgbg->getDataAsDoubleVector());
+                                tab->tableSetColumnTitle(cimg, tr("R image data \"%3\", Nx*Ny=%1*%2").arg(rgbg->get_Nx()).arg(rgbg->get_Ny()).arg(rgbg->get_title()));
+                            }
+                            if (rgbg->get_dataG()) {
+                                cimgG=tab->tableGetColumnCount();
+                                tab->tableSetColumnDataAsDouble(cimg, rgbg->getDataGAsDoubleVector());
+                                tab->tableSetColumnTitle(cimg, tr("G image data \"%3\", Nx*Ny=%1*%2").arg(rgbg->get_Nx()).arg(rgbg->get_Ny()).arg(rgbg->get_title()));
+                            }
+                            if (rgbg->get_dataB()) {
+                                cimgB=tab->tableGetColumnCount();
+                                tab->tableSetColumnDataAsDouble(cimg, rgbg->getDataBAsDoubleVector());
+                                tab->tableSetColumnTitle(cimg, tr("B image data \"%3\", Nx*Ny=%1*%2").arg(rgbg->get_Nx()).arg(rgbg->get_Ny()).arg(rgbg->get_title()));
+                            }
+                            if (rgbg->get_dataModifier()) {
+                                cmod=tab->tableGetColumnCount();
+                                tab->tableSetColumnDataAsDouble(cmod, rgbg->getDataAsDoubleVector());
+                                tab->tableSetColumnTitle(cimg, tr("image modifier data \"%3\" Nx*Ny=%1*%2").arg(rgbg->get_Nx()).arg(rgbg->get_Ny()).arg(rgbg->get_title()));
+                            }
+
+                            cols->colgraphAddRGBImagePlot(graph, cimg, cimgG, cimgB, rgbg->get_x(), rgbg->get_y(), rgbg->get_width(), rgbg->get_height(), rgbg->get_Nx(), rgbg->get_title());
+                            cols->colgraphSetImagePlotModifier(graph, cols->colgraphGetPlotCount(graph)-1, cmod,  QFRDRColumnGraphsInterface::ImageModifierMode((int)rgbg->get_modifierMode()));
+                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiRedChannel, rgbg->get_autoImageRange(), rgbg->get_imageMin(), rgbg->get_imageMax());
+                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiGreenChannel, rgbg->get_autoImageRange(), rgbg->get_imageMinG(), rgbg->get_imageMaxG());
+                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiBlueChannel, rgbg->get_autoImageRange(), rgbg->get_imageMinB(), rgbg->get_imageMaxB());
+                            //cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph), QFRDRColumnGraphsInterface::cgtiModifierChannel, rgbg->get_g, rgbg->get_modifierMin(), rgbg->get_modifierMax());
                         } else if(qfffg && qfffg->get_fitFunction()) {
                             QColor color=QColor("red");
                             QColor fillColor=color.lighter();
