@@ -109,10 +109,33 @@ void QFFitResultsByIndexAsVectorEvaluation::resetAllFitResultsAllFilesAllIndices
     }
 }
 
-void QFFitResultsByIndexAsVectorEvaluation::resetAllFitResultsCurrent(QFRawDataRecord *r) {
-    QFRawDataRecord *rec=r;
-    if (!r) rec=getHighlightedRecord();
-    resetAllFitResults(rec, getEvaluationResultID(rec));
+void QFFitResultsByIndexAsVectorEvaluation::resetAllFitResultsCurrent(QFRawDataRecord *rec) {
+    QFRawDataRecord *r=rec;
+    if (!r) r=getHighlightedRecord();
+
+    if (r) {
+        int index=getCurrentIndex();
+        QString resultID=getEvaluationResultID(index, r);
+        bool doEmit=r->isEmitResultsChangedEnabled();
+        r->disableEmitResultsChanged();
+        QString tresultID=transformResultID(resultID);
+        if (index<0) {
+            QFFitResultsByIndexEvaluation::resetAllFitResults(r, resultID);
+        } else {
+            QList<QString> resids=r->resultsCalcNames(tresultID);
+            for (int i=0; i<resids.size(); i++) {
+                //qDebug()<<"resetAllFitResults():  resids["<<i<<"]="<<resids[i]<<"  tresultID="<<tresultID<<"  index="<<index;
+                if (isParamNameLocalStore(resids[i])) {
+                    r->resultsSetInBooleanList(tresultID, resids[i], index, false);
+                } else {
+                    r->resultsResetInList(tresultID, resids[i], index);
+                }
+                //r->resultsRemove(tresultID, resids[i], false);
+            }
+
+        }
+        if (doEmit) r->enableEmitResultsChanged(true);
+    }
 }
 
 /*! \brief reset all parameters to the initial/global/default value in all files and all indexs */
