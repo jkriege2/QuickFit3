@@ -85,30 +85,48 @@ bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid
         double bin=r->getProperty("BINNING", 1.0).toDouble();
         double width=r->getProperty("PIXEL_WIDTH", -1).toDouble();
         double height=r->getProperty("PIXEL_HEIGHT", -1).toDouble();
-        if (width<=0 || height<=0 || !(r->propertyExists("DCCF_DELTAX") && r->propertyExists("DCCF_DELTAY"))) return false;
-        value=sqrt(qfSqr(bin*width*deltax)+qfSqr(bin*height*deltay));
-        error=0;
-        return true;
+        if (r->getRole().toLower()=="acf") {
+            value=0;
+            error=0;
+            return true;
+        } else {
+            if (width<=0 || height<=0 || !(r->propertyExists("DCCF_DELTAX") && r->propertyExists("DCCF_DELTAY"))) return false;
+            value=sqrt(qfSqr(bin*width*deltax)+qfSqr(bin*height*deltay));
+            error=0;
+            return true;
+        }
     } else if (paramid=="focus_distancex"||paramid=="focus_distance_x") {
         if (!r) return false;
         double deltax=r->getProperty("DCCF_DELTAX", 0.0).toDouble();
         double bin=r->getProperty("BINNING", 1.0).toDouble();
         double width=r->getProperty("PIXEL_WIDTH", -1).toDouble();
-        if (width<=0 || !(r->propertyExists("DCCF_DELTAX"))) return false;
-        value=bin*width*deltax;
-        //qDebug()<<deltax<<bin<<width;
-        error=0;
-        return true;
+        if (r->getRole().toLower()=="acf") {
+            value=0;
+            error=0;
+            return true;
+        } else {
+            if (width<=0 || !(r->propertyExists("DCCF_DELTAX"))) return false;
+            value=bin*width*deltax;
+            //qDebug()<<deltax<<bin<<width;
+            error=0;
+            return true;
+        }
     } else if (paramid=="focus_distancey"||paramid=="focus_distance_y") {
         if (!r) return false;
         double deltay=r->getProperty("DCCF_DELTAY", 0.0).toDouble();
         double bin=r->getProperty("BINNING", 1.0).toDouble();
         double height=r->getProperty("PIXEL_HEIGHT", -1).toDouble();
-        if (height<=0 || !(r->propertyExists("DCCF_DELTAY"))) return false;
-        //qDebug()<<deltay<<bin<<height;
-        value=bin*height*deltay;
-        error=0;
-        return true;
+        if (r->getRole().toLower()=="acf") {
+            value=0;
+            error=0;
+            return true;
+        } else {
+            if (height<=0 || !(r->propertyExists("DCCF_DELTAY"))) return false;
+            //qDebug()<<deltay<<bin<<height;
+            value=bin*height*deltay;
+            error=0;
+            return true;
+        }
     } else if (paramid=="dls_angle") {
         if (!r) return false;
         if (!(r->propertyExists("ANGLE [°]") || r->propertyExists("ANGLE"))) return false;

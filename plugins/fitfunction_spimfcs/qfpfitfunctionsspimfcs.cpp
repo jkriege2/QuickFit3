@@ -3,6 +3,7 @@
 #include "qffitfunctionsspimfcsdiffe2.h"
 #include "qffitfunctionsspimfcsadiff.h"
 #include "qffitfunctionsspimfccsdiffflow.h"
+#include "qffitfunctionsspimfccsdiff.h"
 #include "qffitfunctionsspimfccsdiff2color.h"
 #include "qffitfunctionsspimfcsdiffc.h"
 #include "qffitfunctionsspimfcsdiffce2.h"
@@ -32,6 +33,7 @@ QStringList QFPFitFunctionsSPIMFCS::getIDs() const {
     res<<"fcs_spim_adiffe2";
     res<<"fcs_spim_adiffce2";
 
+    res<<"fccs_spim_diff";
     res<<"fccs_spim_diffflow";
     res<<"fccs_spim_diff2color";
 
@@ -64,6 +66,8 @@ QFFitFunction* QFPFitFunctionsSPIMFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionsSPIMFCSADiffE2();
     } else if (id=="fcs_spim_adiffce2") {
         return new QFFitFunctionsSPIMFCSADiffCE2();
+    } else if (id=="fccs_spim_diff") {
+        return new QFFitFunctionsSPIMFCCSDiff();
     } else if (id=="fccs_spim_diffflow") {
         return new QFFitFunctionsSPIMFCCSDiffFlow();
     } else if (id=="fccs_spim_diff2color") {

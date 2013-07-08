@@ -11,8 +11,10 @@ ImFCSCalibrationDialog::ImFCSCalibrationDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     if (ProgramOptions::getInstance()) {
-        ui->edtValues->setPlainText(ProgramOptions::getInstance()->getQSettings()->value("ImFCSCalibrationDialog/values", ui->edtValues->toPlainText()).toString());
-        ui->spinFocusHeight->setValue(ProgramOptions::getInstance()->getQSettings()->value("ImFCSCalibrationDialog/focusheight", ui->spinFocusHeight->value()).toDouble());
+        ui->edtValues->setPlainText(ProgramOptions::getConfigValue("ImFCSCalibrationDialog/values", ui->edtValues->toPlainText()).toString());
+        ui->spinFocusHeight->setValue(ProgramOptions::getConfigValue("ImFCSCalibrationDialog/focusheight", ui->spinFocusHeight->value()).toDouble());
+        ui->spinFocusHeightError->setValue(ProgramOptions::getConfigValue("ImFCSCalibrationDialog/focusheight_error", ui->spinFocusHeightError->value()).toDouble());
+        ui->chkFixOffset->setChecked(ProgramOptions::getConfigValue("ImFCSCalibrationDialog/fixoffset", ui->chkFixOffset->isChecked()).toBool());
     }
 }
 
@@ -23,9 +25,10 @@ ImFCSCalibrationDialog::~ImFCSCalibrationDialog()
 
 void ImFCSCalibrationDialog::closeEvent(QCloseEvent *event) {
     if (ProgramOptions::getInstance()) {
-        ProgramOptions::getInstance()->getQSettings()->setValue("ImFCSCalibrationDialog/values", ui->edtValues->toPlainText());
-        ProgramOptions::getInstance()->getQSettings()->setValue("ImFCSCalibrationDialog/focusheight", ui->spinFocusHeight->value());
-
+        ProgramOptions::setConfigValue("ImFCSCalibrationDialog/values", ui->edtValues->toPlainText());
+        ProgramOptions::setConfigValue("ImFCSCalibrationDialog/focusheight", ui->spinFocusHeight->value());
+        ProgramOptions::setConfigValue("ImFCSCalibrationDialog/focusheight_error", ui->spinFocusHeightError->value());
+        ProgramOptions::setConfigValue("ImFCSCalibrationDialog/fixoffset", ui->chkFixOffset->isChecked());
     }
 }
 
@@ -53,6 +56,11 @@ double ImFCSCalibrationDialog::getFocusHeight() const
 double ImFCSCalibrationDialog::getFocusHeightError() const
 {
     return ui->spinFocusHeightError->value();
+}
+
+bool ImFCSCalibrationDialog::getFixOffset() const
+{
+    return ui->chkFixOffset->isChecked();
 }
 
 void ImFCSCalibrationDialog::setFitModels(const QStringList& models, const QString& defaultModel)

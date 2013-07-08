@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>687</width>
-    <height>603</height>
+    <width>764</width>
+    <height>573</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -460,8 +460,10 @@ p, li { white-space: pre-wrap; }
  </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../imagingfcs/qfrdrimagingfcs.qrc"/>
   <include location="qfevalimfcsfit.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>

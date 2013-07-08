@@ -19,6 +19,7 @@ public:
     QList<double> getValues() const;
     double getFocusHeight() const;
     double getFocusHeightError() const;
+    bool getFixOffset() const;
 
     void setFitModels(const QStringList& models, const QString& defaultModel);
     QString getFitModel() const;
