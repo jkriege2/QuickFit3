@@ -13,6 +13,9 @@
 #include "qffitfunctionsspimfccsfwdiff2colorccf.h"
 #include "qffitfunctionsspimfccsfwdiff2coloracfg.h"
 #include "qffitfunctionsspimfccsfwdiff2coloracfr.h"
+#include "qffitfunctionsspimfccsfwfactordiff2colorccf.h"
+#include "qffitfunctionsspimfccsfwfactordiff2coloracfg.h"
+#include "qffitfunctionsspimfccsfwfactordiff2coloracfr.h"
 #include "qffitfunctionsspimfccsfw2cdiff2colorccf.h"
 #include "qffitfunctionsspimfccsfw2cdiff2coloracfg.h"
 #include "qffitfunctionsspimfccsfw2cdiff2coloracfr.h"
@@ -40,6 +43,9 @@ QStringList QFPFitFunctionsSPIMFCS::getIDs() const {
     res<<"fccs_spim_fw_diff2colorccf";
     res<<"fccs_spim_fw_diff2coloracfg";
     res<<"fccs_spim_fw_diff2coloracfr";
+    res<<"fccs_spim_fw_factordiff2colorccf";
+    res<<"fccs_spim_fw_factordiff2coloracfg";
+    res<<"fccs_spim_fw_factordiff2coloracfr";
     res<<"fccs_spim_fw_2cdiff2colorccf";
     res<<"fccs_spim_fw_2cdiff2coloracfg";
     res<<"fccs_spim_fw_2cdiff2coloracfr";
@@ -78,6 +84,12 @@ QFFitFunction* QFPFitFunctionsSPIMFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionsSPIMFCCSFWDiff2ColorACFR();
     } else if (id=="fccs_spim_fw_diff2colorccf") {
         return new QFFitFunctionsSPIMFCCSFWDiff2ColorCCF();
+    } else if (id=="fccs_spim_fw_factordiff2coloracfg") {
+        return new QFFitFunctionsSPIMFCCSFWFactorDiff2ColorACFG();
+    } else if (id=="fccs_spim_fw_factordiff2coloracfr") {
+        return new QFFitFunctionsSPIMFCCSFWFactorDiff2ColorACFR();
+    } else if (id=="fccs_spim_fw_factordiff2colorccf") {
+        return new QFFitFunctionsSPIMFCCSFWFactorDiff2ColorCCF();
     } else if (id=="fccs_spim_fw_2cdiff2coloracfg") {
         return new QFFitFunctionsSPIMFCCSFW2CDiff2ColorACFG();
     } else if (id=="fccs_spim_fw_2cdiff2coloracfr") {

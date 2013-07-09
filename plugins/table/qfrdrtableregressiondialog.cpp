@@ -193,6 +193,7 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
             datWW<<weights[i];
             datXLog<<log(dataX[i]);
             datYLog<<log(dataY[i]);
+            qDebug()<<i<<": "<<datX.last()<<datY.last()<<datW.last();
         }
         //if (datX.size()>1) qDebug()<<datX.first()<<datX.last()<<datX.size()<<rmin<<rmax;
     //}
@@ -203,6 +204,7 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
     double* dw=datW.data();
     double* dww=datWW.data();
     int items=rmax-rmin+1;
+    qDebug()<<"items="<<items;
 
     QVector<double> funeval, residuals, residuals_weighted;
 

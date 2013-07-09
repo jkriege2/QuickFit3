@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>SPIM-FCCS: Diffusion, factor D, 2-color, ACF green (1/e² radii)</title>
+  </head>
+<body>
+  $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+  <h2>SPIM-FCCS: Diffusion, factor D, 2-color, ACF green (1/e² radii)</h2>
+  $$see:<a href="fccs_spim_fw_factordiff2coloracfg.html">ACF, green model</a>, <a href="fccs_spim_fw_factordiff2coloracfr.html">ACF, red model</a>, <a href="fccs_spim_fw_factordiff2colorccf.html">CCF, model</a>$$
+  <p>This function implements a 1-component diffusion model $$math:G_{gg}(\tau)$$ for 2-color crosscorrelation data acquired with a camera in SPIM illumination mode. The theory and functional form are described below. In contrast to other fit functions, here only one diffusion coefficient is used as fit parameter ($$math:D_a$$) and the other two coefficients are calculated from this:
+  $$bmath:D_{b}=F_b\cdot D_a,\ \ \ \ \ D_{ab}=F_{ab}\cdot D_a.$$
+  This allows to fix e.g. the mass ratios between the single-labeled (non-bound) and double-labeled (bound) species.
+  <br>
+     In addition these quantities are calculated by the model:
+     $$bmath:V_\text{eff}(w_0, z_0)=\frac{\left(\int \mbox{MDF}\left(\vec{x}\right)\;\mathrm{d}V\right)^2}{\int \mbox{MDF}^2(\vec{x})\;\mathrm{d}V}=\frac{\sqrt{\pi}\cdot a^{2} z_0}{{\left(\mathrm{erf}\left(\frac{a}{ w_0}\right)+\frac{ w_0}{\sqrt{\pi}\cdot a}\left(\mathrm{e^{-\left(a/ w_0\right)^2}}-1\right)\right)}^2}$$
+  </p>
+
+
+$$insert:fccs_spim_fw_factordiff2colorG.inc$$
+
+$$references$$
+
+</body>
+</html>

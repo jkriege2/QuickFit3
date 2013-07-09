@@ -121,7 +121,7 @@ QVariantList QFTableModel::getColumnData(int column, int role) const
     QVariantList vl;
     if (column>=0 && column<columns) {
         for (int r=0; r<rows; r++) {
-            vl<<data(index(r, column), role);
+            vl<<cell(r, column);
         }
     }
     return vl;
@@ -132,10 +132,11 @@ QVector<double> QFTableModel::getColumnDataAsNumbers(int column, int role) const
     QVector<double> vl;
     if (column>=0 && column<columns) {
         for (int r=rows-1; r>=0; r--) {
-            QVariant d=data(index(r, column), role);
+            QVariant d=cell(r, column);
+            //qDebug()<<column<<","<<r<<": "<<d;
             bool ok=false;
             double dd=d.toDouble(&ok);
-            if (d.isValid() && d.canConvert(QVariant::Double) && ok) {
+            if (d.isValid() && (d.type()==QVariant::Double || d.type()==QVariant::Int || d.type()==QVariant::UInt || d.type()==QVariant::Bool || d.type()==QVariant::LongLong || d.type()==QVariant::ULongLong) && ok) {
                 vl.push_front(dd);
             } else if (vl.size()>0) {
                 vl.push_front(NAN);

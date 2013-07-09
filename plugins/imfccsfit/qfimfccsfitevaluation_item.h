@@ -114,6 +114,9 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         QFImFCCSFileSetsModel* getFileSetsModel() const;
         void clearFittedFileSets();
 
+        //void loadParametersFromFile(const QString& filename);
+        //void save ParametersToFile(const QString& filename);
+
     public slots:
         void guessFileSets(const QList<QFRawDataRecord* >& fileset, bool emitChangedSignal=true);
         void addFittedFileSet(const QList<QFRawDataRecord* >& fileset);
