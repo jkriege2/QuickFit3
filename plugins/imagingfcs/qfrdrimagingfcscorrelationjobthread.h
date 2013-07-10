@@ -32,6 +32,8 @@ class QFRDRImagingFCSCorrelationJobThread; // forward
 #define BLEACH_REMOVEAVG 1
 #define BLEACH_EXP 2
 #define BLEACH_EXPREG 3
+#define BLEACH_EXP_POLY2 4
+#define BLEACH_EXP_POLY3 5
 
 /*! \brief job description for correlation
     \ingroup qf3rdrdp_imaging_fcs
@@ -524,6 +526,9 @@ data                                                   size [bytes]             
         float* bleachOffset;
         float* bleachAmplitude;
         float* bleachTime;
+        float* bleachPoly2;
+        float* bleachPoly3;
+        float* bleachPolyShift;
         uint8_t* bleachFitOK;
         float* firstFrames;
         float* lastFrames;

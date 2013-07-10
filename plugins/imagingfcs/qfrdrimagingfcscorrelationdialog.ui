@@ -1139,6 +1139,16 @@ p, li { white-space: pre-wrap; }
                    <string>1-exponential regression</string>
                   </property>
                  </item>
+                 <item>
+                  <property name="text">
+                   <string>1-exponential(poly2) LM-fit</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>1-exponential(poly3) LM-fit</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
                <item>

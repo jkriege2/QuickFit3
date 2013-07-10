@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Imaging FCS Plugin: Background Correction</title>
+	  <link rel="prev" href="imfcs_binning.html"> 
+	  <link rel="next" href="imfcs_bleach.html"> 
+	  <link rel="contents" href="imaging_fcs.html">     
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+	
+	<a name="#background"><h2>Background Correction</h2>
+    <p>This plugin offers several options for the background correction. This is needed, as CCD-camera already ass a certain offset in order to prevent negativ readings. These possibilities are implemented:
+	<ul>
+	  <li><b>remove fixed offset:</b> subtracts only the given offset value from each pixel grey value</li>
+	  <li><b>remove fixed offset and minimum:</b> subtracts the given offset and the minimum grey value over the whole image series from each pixel grey value</li>
+	</ul>
+	Subtracting this background, improves the visibility of the correlation, But care must be taken to <u>not</u> remove part of the signal itself, as this may change the measured ACF/CCF amplitude and therefore the estimate of particle number.
+	</p>
+    <p></p>
+    <p></p>
+    <p></p>
+	
+	
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

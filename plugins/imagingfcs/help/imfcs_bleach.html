@@ -2,29 +2,13 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-  <title>Imaging FCS Plugin: Image Correlators</title>
-	  <link rel="prev" href="imfcs_binning.html"> 
+  <title>Imaging FCS Plugin: Bleach Correction</title>
+	  <link rel="prev" href="imfcs_background.html"> 
 	  <link rel="next" href="imfcs_correlator.html"> 
 	  <link rel="contents" href="imaging_fcs.html">     
   </head>
   <body>
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
-	<a name="#imagecorrelation"><h2>Image Correlation</h2>
-
-	
-	<a name="#background"><h2>Background Correction</h2>
-    <p>This plugin offers several options for the background correction. This is needed, as CCD-camera already ass a certain offset in order to prevent negativ readings. These possibilities are implemented:
-	<ul>
-	  <li><b>remove fixed offset:</b> subtracts only the given offset value from each pixel grey value</li>
-	  <li><b>remove fixed offset and minimum:</b> subtracts the given offset and the minimum grey value over the whole image series from each pixel grey value</li>
-	</ul>
-	Subtracting this background, improves the visibility of the correlation, But care must be taken to <u>not</u> remove part of the signal itself, as this may change the measured ACF/CCF amplitude and therefore the estimate of particle number.
-	</p>
-	$$qf_commondoc_backtop$$
-    <p></p>
-    <p></p>
-    <p></p>
-	
 	
 	<a name="#bleach"><h2>Bleaching Correction</h2>
     <p>This plugin offers also a possibility to correct for bleaching of the sample before the correlation. This might help to get rid of artefacts caused by this. Currently these methods are supported:
@@ -36,20 +20,18 @@
 	  </blockquote>
 	  See reference <a href="#references">[6]</a> for details on this method.
 	  </li>
-	  <li><b>remove mono-exponential:</b> This method assumes that the intensity of every pixel decays with a mono-exponential function:
-	  <blockquote>
-	    $$math:f(t)=A\cdot\exp(-t/\tau_{bleach}) $$
-	  </blockquote>
+	  <li><b>remove fitted function (exponential, exponential(poly2), exponential(poly3)):</b> This method assumes that the intensity of every pixel decays with one of these functions:
+	  <ol>
+	    <li><b><i>mono-exponential:</i></b> $$math:f(t)=A\cdot\exp\left(-\frac{t}{\tau_{bleach}}\right) $$
+	    <li><b><i>mono-exponential(poly2):</i></b> $$math:f(t)=A\cdot\exp\left(-\frac{o+t+f_2\cdot t^2}{\tau_{bleach}}\right) $$
+	    <li><b><i>mono-exponential(poly3):</i></b> $$math:f(t)=A\cdot\exp\left(-\frac{o+t+f_2\cdot t^2+f_3\cdot t^3}{\tau_{bleach}}\right) $$
+	  </ol>	
 	  For each pixel, a fit to a subset of max. 500 frames from complete image series is performed to determine the parameters in the equation above. This fit is automated and unsupervised!!! The results will be stored as TIFF images when the correlation is done. Each pixel may then be corrected according to (See references <a href="#references">[5,6]</a> for details on this method):
 	  <blockquote>
 	    $$math:I(x,y,t) = \frac{I(x,y,t)}{\sqrt{f(t)/f(0)}} + f(0) \cdot \left[1-\sqrt{f(t)/f(0)}\right]$$
 	  </blockquote>
       This correction may be used to remove artifacts due to depletion of the reservoir of fluorophores. See references <a href="#references">[5,6]</a> for details on this method.<br>If the fit to $$math:f(t)$$ does not succeed, the correction is simply not performed, i.e. $$math:f(t)=1$$.<br>
-	  The fit is either performed with the Levenberg-Marquardt Least-Squares routine (<b>LM-Fit</b>) or by calculating a simple <b>linear regression</b> of $$math:f(t)=a+b\cdot t$$ to the data subset $$math:(t_i, y_i=\log(I_i))_{i=1..N=500}$$:
-	      $$mathb:a = \overline{y} - b\cdot\overline{t}$$
-          $$mathb:b = \frac{\sum t_iy_i-N\cdot\overline{t}\cdot\overline{y}}{\sum x_i^2-N\cdot\overline{t}^2}$$
-	  Here $$math:\overline{x}=\frac{1}{N}\cdot\sum_{i=1}^Nx_i$$ is the simple average. From these parameters the model parameters may be derived:
-	      $$bmath:A = \exp(a),        \tau_{bleach}=-1/b$$
+	  The fit is either performed with the Levenberg-Marquardt Least-Squares routine (<b>LM-Fit</b>) or by calculating a robust <b>linear IRLS regression</b> (for mono-exponential) of $$math:f(t)=a+b\cdot t$$ to the data subset $$math:(t_i, y_i=\log(I_i))_{i=1..N=500}$$. For the fits with a polynomial in the exponential's argument, a series of fits is perfomred: First the exponential time and amplitude are estimated, using an IRLS regression. Then the polynomial of degree 2 is fitted with $$math:f_3=0$$ and finally (if selected) the fit with the full parameter set of the debree 3 polynomial is perfomre.d The results of the last step are always used as initial parameters for the next. Each value $$math:I_i$$ is calculated from the single-pixels time-series, by averaging over the given number of frames (see correlator dialog for the input field). The averages are taken at positions equally distributed over the whole timeseries.
 	  </li>
 
 	</ul>
