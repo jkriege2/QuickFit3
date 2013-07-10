@@ -52,6 +52,8 @@ QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int co
         dataW=table->tableGetColumnDataAsDouble(colW);
         //qDebug()<<"dataW.size="<<dataW.size();
         if (dataW.size()>0 && dataW.size()<datapoints) datapoints=dataW.size();
+    } else {
+        dataW=QVector<double>(datapoints, 1);
     }
     if (dataX.size()>datapoints) dataX.remove(dataX.size()-(dataX.size()-datapoints), (dataX.size()-datapoints));
     if (dataY.size()>datapoints) dataY.remove(dataY.size()-(dataY.size()-datapoints), (dataY.size()-datapoints));
@@ -178,6 +180,9 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
     int rmin=getRangeMin();
     int rmax=getRangeMax();
 
+
+
+
     QVector<double> datX;
     QVector<double> datY;
     QVector<double> datXLog;
@@ -185,25 +190,31 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
     QVector<double> datW;
     QVector<double> datWW;
 
-    //if (method>=0 && method<=2) {
-        for (int i=rmin; i<=rmax; i++) {
+
+    /*for (int i=rmin; i<=rmax; i++) {
+        datX<<dataX[i];
+        datY<<dataY[i];
+        datW<<dataW[i];
+    }*/
+    for (int i=0; i<datapoints; i++) {
+        if (dataX[i]>=ui->datacut->get_userMin() && dataX[i]<=ui->datacut->get_userMax()) {
             datX<<dataX[i];
             datY<<dataY[i];
             datW<<dataW[i];
             datWW<<weights[i];
             datXLog<<log(dataX[i]);
             datYLog<<log(dataY[i]);
-            qDebug()<<i<<": "<<datX.last()<<datY.last()<<datW.last();
         }
-        //if (datX.size()>1) qDebug()<<datX.first()<<datX.last()<<datX.size()<<rmin<<rmax;
-    //}
+    }
+
+
     double* dx=datX.data();
     double* dy=datY.data();
     double* dxl=datXLog.data();
     double* dyl=datYLog.data();
     double* dw=datW.data();
     double* dww=datWW.data();
-    int items=rmax-rmin+1;
+    int items=datX.size();
     qDebug()<<"items="<<items;
 
     QVector<double> funeval, residuals, residuals_weighted;

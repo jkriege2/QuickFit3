@@ -50,6 +50,8 @@ QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int colX, 
         dataW=table->tableGetColumnDataAsDouble(colW);
         //qDebug()<<"dataW.size="<<dataW.size();
         if (dataW.size()>0 && dataW.size()<datapoints) datapoints=dataW.size();
+    } else {
+        dataW=QVector<double>(datapoints, 1);
     }
     if (dataX.size()>datapoints) dataX.remove(dataX.size()-(dataX.size()-datapoints), (dataX.size()-datapoints));
     if (dataY.size()>datapoints) dataY.remove(dataY.size()-(dataY.size()-datapoints), (dataY.size()-datapoints));
@@ -152,19 +154,26 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
     int rmin=getRangeMin();
     int rmax=getRangeMax();
 
-    QVector<double> datX=dataX;
-    QVector<double> datY=dataY;
-    QVector<double> datW=dataW;
+    QVector<double> datX;
+    QVector<double> datY;
+    QVector<double> datW;
 
-    for (int i=rmin; i<=rmax; i++) {
+    /*for (int i=rmin; i<=rmax; i++) {
         datX<<dataX[i];
         datY<<dataY[i];
         datW<<dataW[i];
+    }*/
+    for (int i=0; i<datapoints; i++) {
+        if (dataX[i]>=ui->datacut->get_userMin() && dataX[i]<=ui->datacut->get_userMax()) {
+            datX<<dataX[i];
+            datY<<dataY[i];
+            datW<<dataW[i];
+        }
     }
     double* dx=datX.data();
     double* dy=datY.data();
     double* dw=datW.data();
-    int items=rmax-rmin+1;
+    int items=datX.size();
 
 
     bool ok=false;
