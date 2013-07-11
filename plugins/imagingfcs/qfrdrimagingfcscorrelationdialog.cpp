@@ -1074,9 +1074,11 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool count
                     ui->spinLastFrame->setMaximum(frame_count-1);
                     ui->spinFirstFrame->setMaximum(frame_count-1);
                     if (ui->chkLastFrame->isChecked()) ui->spinLastFrame->setValue(frame_count-1);
+                    if (ui->chkFirstFrame->isChecked()) ui->spinFirstFrame->setValue(0);
                     ui->spinVideoFrames->setMaximum(frame_count-1);
-                    ui->spinVideoFrames->setValue(qMax(2,frame_count/1000));
+                    ui->spinVideoFrames->setValue(qMax(2.0,round(double(frame_count)/1000.0)));
                     ui->spinStatistics->setMaximum(frame_count-1);
+                    ui->spinStatistics->setValue(ui->spinVideoFrames->value());
                     ui->spinBleachAvgFrames->setValue(qMax(1,frame_count/2500));
                 } else {
                     ui->spinLastFrame->setMaximum(10000000);
