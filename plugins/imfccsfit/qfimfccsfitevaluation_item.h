@@ -166,7 +166,7 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
             bool emitSignals;
         };
 
-        void freeAndClearDoFitDataList(QList<doFitData>& fitData);
+        void freeAndClearDoFitDataList(QList<doFitData>& fitData) const;
 
 
         QFImFCCSMatchRDRFunctor* matchFunctor;
@@ -247,8 +247,17 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
           */
         virtual void doFit(const QList<QFRawDataRecord*>& records, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFFitAlgorithmReporter* dlgFitProgress=NULL, bool doLog=false);
 
+        /*! \brief perform a fit for the given \a record and \a run
+
+            The parameters \a defaultMinDatarange and \a defaultMaxDatarange set the range of data points taken for the fit.
+            If both are -1, the full range is used
+
+            The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
+          */
+        virtual void doFitForMultithread(const QList<QFRawDataRecord*>& records, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const;
+
         /** \brief initialize a QFGlobalFitTool and several arrays with values needed to perform a global fit for a given run and list of files */
-        void setupGlobalFitTool(QFGlobalFitTool& tool, QList<doFitData>* fitDataOut, QString& iparams, QList<double *> &paramsVector, QList<double *> &initialParamsVector, QList<double*>& errorsVector, QList<double*>& errorsVectorI, const QList<QFRawDataRecord *> &records, int run, int rangeMinDatarange, int rangeMaxDatarange, bool doLog);
+        void setupGlobalFitTool(QFGlobalFitTool& tool, QList<doFitData>* fitDataOut, QString& iparams, QList<double *> &paramsVector, QList<double *> &initialParamsVector, QList<double*>& errorsVector, QList<double*>& errorsVectorI, const QList<QFRawDataRecord *> &records, int run, int rangeMinDatarange, int rangeMaxDatarange, bool doLog) const;
 
         /*! \brief fill a 2D array with a chi^2 landscape for the given fit, this is called like doFit() + some output arguments!
 
@@ -259,14 +268,6 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
          */
         virtual void calcChi2Landscape(double* chi2Landscape, int paramXFile, int paramXID, const QVector<double>& paramXValues, int paramYFile, int paramYID, const QVector<double>& paramYvalues, const QList<QFRawDataRecord*>& records, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1);
 
-        /*! \brief perform a fit for the given \a record and \a run
-
-            The parameters \a defaultMinDatarange and \a defaultMaxDatarange set the range of data points taken for the fit.
-            If both are -1, the full range is used
-
-            The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
-          */
-        virtual void doFitForMultithread(const QList<QFRawDataRecord*>& records, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const;
 
     protected:
 
