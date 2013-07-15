@@ -30,7 +30,7 @@ void QFFitResultsByIndexEvaluationFitThread::run() {
         {   QReadLocker locker(lock);
             if (!jobs.isEmpty()) {
                 job=jobs.dequeue();
-                jobIsValid= (job.record && job.evaluation);
+                jobIsValid= ((job.record||(!job.record&&job.records.size()>0)) && job.evaluation);
             }
             jempty=jobs.isEmpty();
         }
@@ -50,6 +50,7 @@ void QFFitResultsByIndexEvaluationFitThread::run() {
         } else {
             // otherwise thefit depends on several files (stored in records) and we call the according function.
             QFFitResultsByIndexMultiRDREvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexMultiRDREvaluationFitTools*>(job.evaluation);
+            //qDebug()<<jobIsValid<<feval;
             if (jobIsValid&&feval) {
                 feval->doFitForMultithread(job.records, job.run, job.userMin, job.userMax, this);
 

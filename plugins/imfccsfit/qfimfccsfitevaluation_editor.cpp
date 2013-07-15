@@ -13,6 +13,7 @@
 #include "qmoretextobject.h"
 #include "qffcsfitchi2landscapedialog.h"
 #include "qffitfunctionmanager.h"
+#include "qffitresultsbyindexevaluationfitthread.h"
 
 QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent):
     QFEvaluationEditor(services, propEditor, parent),
@@ -121,6 +122,8 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     ui->btnEvaluateCurrentAllRuns->addAction(actFitAllPixels);
     ui->btnEvaluateCurrentAllRuns->setDefaultAction(actFitAllPixels);
     menuEvaluation->addAction(actFitAllPixels);
+
+    //ui->btnEvaluateCurrentAllRuns->setDefaultAction(actFitAllPixels);
 
     actFitAllFilesetsAllPixels=new QAction(QIcon(":/imfccsfit/fit_fitall.png"), tr("Fit All Filesets && Pixels"), this);
     connect(actFitAllFilesetsAllPixels, SIGNAL(triggered()), this, SLOT(fitAllFilesetsAllPixels()));
@@ -891,6 +894,9 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
     QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     if (!eval) return;
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if (!falg) return;
+    QList<QFRawDataRecord*> records=eval->getFitFiles();
+    if (records.size()<=0) return;
     if (!falg->isThreadSafe()) {
         fitAllPixels();
         return;
@@ -910,13 +916,13 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
     int thread=0;
     dlgTFitProgress->reportStatus("creating thread objects ...");
     QApplication::processEvents();
-    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
-    //QList<QFFitResultsByIndexEvaluationFitThread*> threads;
+    //QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+    QList<QFFitResultsByIndexEvaluationFitThread*> threads;
     int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
     if (ProgramOptions::getConfigValue(eval->getType()+"/overrule_threads", false).toBool()) {
         threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
     }
-    /*for (int i=0; i<threadcount; i++) {
+    for (int i=0; i<threadcount; i++) {
         threads.append(new QFFitResultsByIndexEvaluationFitThread(true, this));
     }
 
@@ -925,7 +931,7 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
     dlgTFitProgress->reportStatus("distributing jobs ...");
     QApplication::processEvents();
     //for (int i=0; i<recs.size(); i++) {
-        QFRawDataRecord* record=eval->getHighlightedRecord();
+    QFRawDataRecord* record=records[0];
         QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
 
         if (record ) {
@@ -937,7 +943,8 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
                 bool doall=!current->getProperty("LEAVEOUTMASKED", false).toBool();
                 //qDebug()<<doall;
                 if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
-                    threads[thread]->addJob(eval, record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()));
+                    //qDebug()<<"t"<<thread<<"   r"<<run;
+                    threads[thread]->addJob(eval, records, run, getUserMin(records[0], run, ui->datacut->get_userMin()), getUserMax(records[0], run, ui->datacut->get_userMax()));
                     thread++;
                     if (thread>=threadcount) thread=0;
                 }
@@ -989,18 +996,18 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
     // free memory
     for (int i=0; i<threadcount; i++) {
         delete threads[i];
-    }*/
+    }
 
     dlgTFitProgress->reportStatus(tr("fit done ... updating user interface\n"));
     dlgTFitProgress->setProgress(items+2);
     QApplication::processEvents();
 
-    /*for (int i=0; i<recs.size(); i++) {
-        QFRawDataRecord* record=recs[i];
+    for (int i=0; i<records.size(); i++) {
+        QFRawDataRecord* record=records[i];
         if (record ) {
             record->enableEmitResultsChanged(true);
         }
-    }*/
+    }
     current->emitResultsChanged();
 
     dlgTFitProgress->setProgress(items+3);

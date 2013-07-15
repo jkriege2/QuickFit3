@@ -71,4 +71,3 @@ QFFitResultsByIndexEvaluationFitToolsBase::~QFFitResultsByIndexEvaluationFitTool
 {
     delete mutexThreadedFit;
 }
-

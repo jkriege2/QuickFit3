@@ -24,6 +24,7 @@ class QFFitResultsByIndexEvaluationFitTools: public QFFitResultsByIndexEvaluatio
 {
     public:
 
+
         /*! \brief perform a fit for the given \a record and \a run
 
             The parameters \a defaultMinDatarange and \a defaultMaxDatarange set the range of data points taken for the fit.
@@ -39,7 +40,7 @@ class QFFitResultsByIndexEvaluationFitTools: public QFFitResultsByIndexEvaluatio
 
             The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
           */
-        virtual void doFitForMultithread(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const {};
+        virtual void doFitForMultithread(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const =0;
 
 
 
@@ -51,6 +52,8 @@ class QFFitResultsByIndexEvaluationFitTools: public QFFitResultsByIndexEvaluatio
 class QFFitResultsByIndexMultiRDREvaluationFitTools: public QFFitResultsByIndexEvaluationFitToolsBase
 {
     public:
+
+
 
         /*! \brief perform a fit for the given \a records and \a run
 
@@ -67,7 +70,7 @@ class QFFitResultsByIndexMultiRDREvaluationFitTools: public QFFitResultsByIndexE
 
             The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
           */
-        virtual void doFitForMultithread(const QList<QFRawDataRecord*>& records, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const {}
+        virtual void doFitForMultithread(const QList<QFRawDataRecord*>& records, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const=0;
 
 };
 #endif // QFFITRESULTSBYINDEXEVALUATIONFITTOOLS_H
