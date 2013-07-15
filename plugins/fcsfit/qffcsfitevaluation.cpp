@@ -429,7 +429,6 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
                         params[i]=roundWithError(params[i], errors[i], 2);
                     }
                     setFitResultValuesVisibleWithGroupAndLabel(record, run, params, errors, tr("fit results"), paramsFix, tr("fit results"), true);
-
                     for (int i=0; i<ffunc->paramCount(); i++) {
                         if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
                             if (!orparams.isEmpty()) orparams=orparams+";  ";
@@ -451,6 +450,11 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
                     QString egroup=QString("%1%2__%3__%4").arg(getType()).arg(getID()).arg(falg->id()).arg(ffunc->id());
                     //QString egrouplabel=QString("%1%2: %3, %4").arg(getType()).arg(getID()).arg(falg->shortName()).arg(ffunc->shortName());
                     QString egrouplabel=QString("#%4 \"%1\": %2, %3").arg(getName()).arg(falg->shortName()).arg(ffunc->shortName()).arg(getID());
+                    record->resultsSetNumber(evalID, "fitparam_g0", ffunc->evaluate(0, params));
+                    record->resultsSetGroup(evalID, "fitparam_g0", tr("fit results"));
+                    record->resultsSetLabel(evalID, "fitparam_g0", tr("g(0)"));
+                    record->resultsSetSortPriority(evalID, "fitparam_g0", true);
+
 
 
                     record->resultsSetEvaluationGroup(evalID, egroup);
@@ -806,6 +810,9 @@ void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, i
                         record->resultsSetSortPriority(evalID,  ffid, true);
                     }
                 }
+                record->resultsSetNumber(evalID, "fitparam_g0", ffunc->evaluate(0, params));
+                record->resultsSetGroupLabelsAndSortPriority(evalID, "fitparam_g0", tr("fit results"), tr("g(0)"), tr("g(0)"), true);
+
 
                 record->resultsSetEvaluationGroup(evalID, egroup);
                 record->resultsSetEvaluationGroupLabel(egroup, egrouplabel);

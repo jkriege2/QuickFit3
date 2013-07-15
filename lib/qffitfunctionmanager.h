@@ -35,6 +35,8 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         /** \brief return number of available plugins */
         int pluginCount() { return fitPlugins.size(); }
 
+        QObject* getPluginObject(int i) const;
+
         /** \brief name for the plugin */
         virtual QString getName(int i) const;
 
@@ -109,6 +111,7 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
 
     private:
         QList<QFPluginFitFunction*> fitPlugins;
+        QList<QObject*> fitPluginObjects;
         QStringList filenames;
         ProgramOptions* m_options;
 

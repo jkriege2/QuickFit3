@@ -9,10 +9,13 @@
 #include "jkqtplotter.h"
 #include "qffcsweightingtools.h"
 #include "dlgqffitalgorithmprogressdialog.h"
+#include "qffitfunctionconfigforglobalfitinterface.h"
 
 namespace Ui {
     class QFFCCSFitEvaluationEditor;
 }
+
+class QFFCCSFitEvaluationItem; // forward
 
 /*! \brief editor for QFFCCSFitEvaluationItem
     \ingroup qf3rdrdp_FCCSfit
@@ -76,6 +79,7 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void configureForSPFCCS();
         void configureForASPFCCS();
         void configureFor2CSPIMFCCS();
+        void onConfigureGlobalItemClicked();
 
         void filesSetActivated(const QModelIndex& idx);
         void on_chkSaveStrings_toggled(bool checked);
@@ -87,7 +91,12 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFFCCSFitEvaluationEditor *ui;
         
-        
+        QList<QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig> globalConfig;
+        QList<QAction*> actsGlobalConfig;
+        QList<QMenu*> menusGlobalConfig;
+
+        void buildGlobalConfigs(QFFCCSFitEvaluationItem* current);
+
         /** \brief where did we save the last report */
         QString currentSaveDirectory;
         QAction* actConfigureForNormalFCCS;

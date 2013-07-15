@@ -1053,6 +1053,8 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
                     //qDebug()<<"\n\n";
                     setFitResultValuesVisibleWithGroupAndLabel(record, run, params, errors, tr("fit results"), dfd.paramsFix, tr("fit results"), true);
 
+
+
                     //qDebug()<<"record "<<r<<"  ("<<record->getName()<<"):";
                     for (int i=0; i<dfd.ffunc->paramCount(); i++) {
                         //qDebug("  rounded_after_fit_after_save: %s = %lf +/- %lf", dfd.ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
@@ -1070,6 +1072,10 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
                     QString param;
                     QString group="fit properties";
 
+                    if (run<0) record->resultsSetNumber(evalID, "fitparam_g0", dfd.ffunc->evaluate(0, dfd.params));
+                    else record->resultsSetInNumberList(evalID, "fitparam_g0", run, dfd.ffunc->evaluate(0, dfd.params));
+                    record->resultsSetGroup(evalID, "fitparam_g0", tr("fit results"));
+                    record->resultsSetLabel(evalID, "fitparam_g0", tr("g(0)"));
 
                     record->resultsSetEvaluationGroup(evalID, egroup);
                     record->resultsSetEvaluationGroupLabel(egroup, egrouplabel);
@@ -1342,6 +1348,10 @@ void QFImFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord 
                             record->resultsSetGroupLabelsAndSortPriority(evalID,ffid, tr("fit results"), dfd.ffunc->getDescription(pid).name+tr(", fix"), dfd.ffunc->getDescription(pid).label+tr(", fix"), true);
                         }
                     }
+
+                    if (run<0) record->resultsSetNumber(evalID, "fitparam_g0", dfd.ffunc->evaluate(0, dfd.params));
+                    else record->resultsSetInNumberListAndBool(evalID, "fitparam_g0", run, dfd.ffunc->evaluate(0, dfd.params), "", getParamNameLocalStore("fitparam_g0"), true);
+                    record->resultsSetGroupLabelsAndSortPriority(evalID, "fitparam_g0", tr("fit results"), tr("g(0)"), tr("g(0)"), true);
 
 
                     record->resultsSetEvaluationGroup(evalID, egroup);

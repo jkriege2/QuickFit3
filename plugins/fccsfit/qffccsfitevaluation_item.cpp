@@ -938,6 +938,7 @@ void QFFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int
                     //qDebug()<<"\n\n";
                     setFitResultValuesVisibleWithGroupAndLabel(record, run, params, errors, tr("fit results"), dfd.paramsFix, tr("fit results"), true);
 
+
                     //qDebug()<<"record "<<r<<"  ("<<record->getName()<<"):";
                     for (int i=0; i<dfd.ffunc->paramCount(); i++) {
                         //qDebug("  rounded_after_fit_after_save: %s = %lf +/- %lf", dfd.ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
@@ -955,6 +956,10 @@ void QFFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int
                     QString param;
                     QString group="fit properties";
 
+                    record->resultsSetNumber(evalID, "fitparam_g0", dfd.ffunc->evaluate(0, dfd.params));
+                    record->resultsSetGroup(evalID, "fitparam_g0", tr("fit results"));
+                    record->resultsSetLabel(evalID, "fitparam_g0", tr("g(0)"));
+                    record->resultsSetSortPriority(evalID, "fitparam_g0", true);
 
                     record->resultsSetEvaluationGroup(evalID, egroup);
                     record->resultsSetEvaluationGroupLabel(egroup, egrouplabel);

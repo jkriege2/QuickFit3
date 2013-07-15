@@ -30,7 +30,8 @@ HEADERS += qfimfccsfitevaluation.h \
     qfimfccsparameterinputdelegate.h \
     qfimfccsrelativeccfdialog.h \
     qfimfccsfilesetsmodel.h \
-    qfimfccsfitchi2landscapedialog.h
+    qfimfccsfitchi2landscapedialog.h \
+    ../interfaces/qffitfunctionconfigforglobalfitinterface.h
 
 SOURCES += qfimfccsfitevaluation.cpp \
            qfimfccsfitevaluation_item.cpp \

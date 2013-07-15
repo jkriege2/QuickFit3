@@ -11,6 +11,7 @@
 #include "tools.h"
 #include "qmoretextobject.h"
 #include "dlgqfprogressdialog.h"
+#include "qffitfunctionmanager.h"
 
 QFFCCSFitEvaluationEditor::QFFCCSFitEvaluationEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent):
     QFEvaluationEditor(services, propEditor, parent),
@@ -150,7 +151,7 @@ QFFCCSFitEvaluationEditor::QFFCCSFitEvaluationEditor(QFPluginServices* services,
     ui->btnPrintReport->setDefaultAction(actPrintReport);
     menuEvaluation->addAction(actPrintReport);
 
-    QMenu* m=menuFCCSFit->addMenu(tr("configure evaluation for ..."));
+    /*QMenu* m=menuFCCSFit->addMenu(tr("configure evaluation for ..."));
 
     actConfigureForNormalFCCS=new QAction(tr("FCCS: normal diffusion"), this);
     connect(actConfigureForNormalFCCS, SIGNAL(triggered()), this, SLOT(configureForSPFCCS()));
@@ -161,7 +162,7 @@ QFFCCSFitEvaluationEditor::QFFCCSFitEvaluationEditor(QFPluginServices* services,
 
     actConfigureForAnomalousFCCS=new QAction(tr("FCCS: anomalous diffusion"), this);
     connect(actConfigureForAnomalousFCCS, SIGNAL(triggered()), this, SLOT(configureForASPFCCS()));
-    m->addAction(actConfigureForAnomalousFCCS);
+    m->addAction(actConfigureForAnomalousFCCS);*/
 
     menuFCCSFit->addSeparator();
     actGuess=new QAction(tr("Guess file sets ..."), this);
@@ -246,7 +247,7 @@ void QFFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEval
 
     if (item) {
         updatingData=true;
-
+        buildGlobalConfigs(item);
         ui->cmbFitAlgorithm->setCurrentAlgorithm(item->getFitAlgorithm()->id());
         ui->cmbWeight->setCurrentWeight(item->getFitDataWeighting());
         ui->cmbDisplayData->setCurrentIndex(item->getProperty("FCCSFit/datadisplay", 1).toInt());
@@ -421,6 +422,46 @@ void QFFCCSFitEvaluationEditor::configureFor2CSPIMFCCS()
         data->setLinkParameter(0, globals[g], g);
         data->setLinkParameter(1, globals[g], g);
         data->setLinkParameter(2, globals[g], g);
+    }
+}
+
+void QFFCCSFitEvaluationEditor::onConfigureGlobalItemClicked()
+{
+    QAction* act=qobject_cast<QAction*>(sender());
+    int idx=actsGlobalConfig.indexOf(act);
+    qDebug()<<"sender()="<<sender()<<" type="<<sender()->metaObject()->className()<<"   act="<<act<<"   idx="<<idx;
+    if (act&&idx>=0&&idx<globalConfig.size()) {
+        QFFCCSFitEvaluationItem* data=qobject_cast<QFFCCSFitEvaluationItem*>(current);
+        if (!data) return;
+
+        if (data->getFitFileCount()<globalConfig[idx].models.size()) {
+            while (data->getFitFileCount()<globalConfig[idx].models.size()) {
+                data->addFitFile();
+            }
+        } else if (data->getFitFileCount()>globalConfig[idx].models.size()) {
+            while (data->getFitFileCount()>globalConfig[idx].models.size()) {
+                data->removeFitFile();
+            }
+        }
+
+        for (int i=0; i<globalConfig[idx].models.size(); i++) {
+            data->setFitFunction(i, globalConfig[idx].models[i]);
+        }
+        data->clearLinkParameters();
+
+        for (int i=0; i<globalConfig[idx].globalParams.size(); i++) {
+            QList<QStringList> g=globalConfig[idx].globalParams[i];
+            for (int j=0; j<g.size(); j++) {
+                QStringList sl=g[j];
+                if (sl.size()>0) {
+                    for (int s=0; s<sl.size(); s++) {
+                        if (!sl[s].isEmpty()) {
+                            data->setLinkParameter(j, sl[s], i);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -1176,6 +1217,50 @@ void QFFCCSFitEvaluationEditor::on_btnRemoveFile_clicked()
     setParameterTableSpans();
     ensureCorrectParamaterModelDisplay();
     //connect(ui->btnRemoveFile, SIGNAL(clicked()), item, SLOT(removeFitFile()));
+}
+
+void QFFCCSFitEvaluationEditor::buildGlobalConfigs(QFFCCSFitEvaluationItem *current)
+{
+    for (int i=0; i<actsGlobalConfig.size(); i++) {
+        actsGlobalConfig[i]->disconnect();
+        delete actsGlobalConfig[i];
+    }
+    for (int i=0; i<menusGlobalConfig.size(); i++) {
+        menuFCCSFit->removeAction(menusGlobalConfig[i]->menuAction());
+        delete menusGlobalConfig[i];
+    }
+    globalConfig.clear();
+    actsGlobalConfig.clear();
+    menusGlobalConfig.clear();
+
+    QStringList models=current->getAvailableFitFunctions();
+    QList<QFFitFunctionConfigForGlobalFitInterface*> modelPlugins;
+    for (int i=0; i<models.size(); i++) {
+        QFFitFunctionConfigForGlobalFitInterface* intf=qobject_cast<QFFitFunctionConfigForGlobalFitInterface*>(QFFitFunctionManager::getInstance()->getPluginObject(QFFitFunctionManager::getInstance()->getPluginForID(models[i])));
+        if (intf && !modelPlugins.contains(intf)) modelPlugins<<intf;
+    }
+    for (int i=0; i<modelPlugins.size(); i++) {
+        for (int j=0; j<modelPlugins[i]->getGlobalFitConfigCount(); j++) {
+            QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig c=modelPlugins[i]->getGlobalFitConfig(j);
+            QMenu* menu=NULL;
+            for (int k=0; k<menusGlobalConfig.size(); k++) {
+                if (menusGlobalConfig[k]->title()==c.groupLabel) {
+                    menu=menusGlobalConfig[k];
+                    break;
+                }
+            }
+            if (!menu) {
+                menu=menuFCCSFit->addMenu(c.groupLabel);
+                menusGlobalConfig<<menu;
+            }
+            if (menu) {
+                QAction * act=menu->addAction(c.menuEntryLabel);
+                connect(act, SIGNAL(triggered()), this, SLOT(onConfigureGlobalItemClicked()));
+                actsGlobalConfig<<act;
+                globalConfig<<c;
+            }
+        }
+    }
 }
 
 

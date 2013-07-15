@@ -35,6 +35,7 @@ void QFFitFunctionManager::searchPlugins(QString directory, QList<QFPluginServic
                     QFPluginLogTools::log_global_text(tr("    plugin built agains QFLib v%1.%2, this QFLib %3.%4\n").arg(pmajor).arg(pminor).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR));
                 }
                 fitPlugins.append(iRecord);
+                fitPluginObjects.append(plugin);
                 filenames.append(pluginsDir.absoluteFilePath(fileName));
                 emit showMessage(tr("loaded fit function plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
                 emit showLongMessage(tr("loaded fit function plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(pluginsDir.absoluteFilePath(fileName)).arg(iRecord->getName()).arg(iRecord->getAuthor()).arg(iRecord->getCopyright()));
@@ -142,6 +143,11 @@ bool QFFitFunctionManager::contains(const QString &ID)
     for (int i=0; i<fitPlugins.size(); i++)
         if (fitPlugins[i]->getID()==ID) return true;
     return false;
+}
+
+QObject *QFFitFunctionManager::getPluginObject(int i) const
+{
+    return fitPluginObjects.value(i, NULL);
 }
 
 int QFFitFunctionManager::getPluginForID(QString id) const {

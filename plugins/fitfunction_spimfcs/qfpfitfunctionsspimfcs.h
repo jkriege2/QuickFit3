@@ -3,7 +3,7 @@
 
 #include "qfpluginfitfunction.h"
 #include <QStringList>
-
+#include "qffitfunctionconfigforglobalfitinterface.h"
 /*!
     \defgroup qf3fitfunp_fitfunctions_spimfcs SPIM-FCS Fit Functions
     \ingroup qf3fitfunplugins
@@ -14,9 +14,9 @@
 /*! \brief plugin SPIM-FCS Fit Functions
     \ingroup qf3fitfunp_fitfunctions_spimfcs
 */
-class QFPFitFunctionsSPIMFCS : public QObject, public QFPluginFitFunction {
+class QFPFitFunctionsSPIMFCS : public QObject, public QFPluginFitFunction, public QFFitFunctionConfigForGlobalFitInterface {
         Q_OBJECT
-        Q_INTERFACES(QFPluginFitFunction)
+        Q_INTERFACES(QFPluginFitFunction QFFitFunctionConfigForGlobalFitInterface)
         Q_INTERFACES(QFPlugin)
     public:
         QF_PLUGIN
@@ -74,6 +74,10 @@ class QFPFitFunctionsSPIMFCS : public QObject, public QFPluginFitFunction {
 
         /** \brief return a QFFitFunction instance for the given ID, created with the given parent object */
         virtual QFFitFunction* get(QString id, QObject* parent) const ;
+
+        int getGlobalFitConfigCount() const;
+        GlobalFitConfig getGlobalFitConfig(int i) const;
+
     private:
 };
 

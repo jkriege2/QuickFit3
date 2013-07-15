@@ -22,6 +22,7 @@
 #include "qffitfunctionsspimfccsfwadiff2colorccf.h"
 #include "qffitfunctionsspimfccsfwadiff2coloracfg.h"
 #include "qffitfunctionsspimfccsfwadiff2coloracfr.h"
+#include "qftools.h"
 
 QStringList QFPFitFunctionsSPIMFCS::getIDs() const {
     QStringList res;
@@ -104,6 +105,179 @@ QFFitFunction* QFPFitFunctionsSPIMFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionsSPIMFCCSFWADiff2ColorCCF();
     }
     return NULL;
+}
+
+int QFPFitFunctionsSPIMFCS::getGlobalFitConfigCount() const
+{
+    return 6;
+}
+
+QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS::getGlobalFitConfig(int i) const
+{
+    QString spimfccslabel=tr("configure for SPIM-FCCS ...");
+    QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig res;
+    if (i==0) { // fccs_spim_fw_diff2coloracfg, fccs_spim_fw_diff2coloracfr, fccs_spim_fw_diff2colorccf
+        res.groupLabel=spimfccslabel;
+        res.menuEntryLabel=tr("... 2-color, 1-component normal diffusion");
+        res.models<<"fccs_spim_fw_diff2coloracfg"<<"fccs_spim_fw_diff2coloracfr"<<"fccs_spim_fw_diff2colorccf";
+        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff_a"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff_b"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff_ab"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("crosstalk"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_x"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_y"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_z"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width2"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height2"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("pixel_width"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("count_rate1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("count_rate2"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+
+
+    } else if (i==1) { // fccs_spim_fw_diff2coloracfg, fccs_spim_fw_diff2coloracfr, fccs_spim_fw_diff2colorccf
+        res.groupLabel=spimfccslabel;
+        res.menuEntryLabel=tr("... 2-color, 1-component normal diffusion, Da=Db=Dab");
+        res.models<<"fccs_spim_fw_diff2coloracfg"<<"fccs_spim_fw_diff2coloracfr"<<"fccs_spim_fw_diff2colorccf";
+        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
+        res.globalParams << constructQListWithMultipleItems(constructQStringListFromItems("diff_coeff_a", "diff_coeff_b", "diff_coeff_ab"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("crosstalk"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_x"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_y"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_z"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width2"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height2"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("pixel_width"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("count_rate1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("count_rate2"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+
+    } else if (i==2) { // fccs_spim_fw_diff2coloracfg, fccs_spim_fw_diff2coloracfr, fccs_spim_fw_diff2colorccf
+        res.groupLabel=spimfccslabel;
+        res.menuEntryLabel=tr("... 2-color, 1-component normal diffusion, Da=Db, Dab");
+        res.models<<"fccs_spim_fw_diff2coloracfg"<<"fccs_spim_fw_diff2coloracfr"<<"fccs_spim_fw_diff2colorccf";
+        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
+        res.globalParams << constructQListWithMultipleItems(constructQStringListFromItems("diff_coeff_a", "diff_coeff_b"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff_ab"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("crosstalk"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_x"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_y"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_z"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width2"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height2"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("pixel_width"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("count_rate1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("count_rate2"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+
+
+
+    } else if (i==3) { // fccs_spim_fw_factordiff2coloracfg, fccs_spim_fw_factordiff2coloracfr, fccs_spim_fw_factordiff2colorccf
+       res.groupLabel=spimfccslabel;
+       res.menuEntryLabel=tr("... 2-color, 1-component normal diffusion, Da, Db=Fb*Da, Dab=Fab*Da");
+       res.models<<"fccs_spim_fw_factordiff2coloracfg"<<"fccs_spim_fw_factordiff2coloracfr"<<"fccs_spim_fw_factordiff2colorccf";
+       res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff_a"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("diff_coefffactor_b"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("diff_coefffactor_ab"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("crosstalk"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_x"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_y"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_z"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_width1"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_width2"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_height1"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_height2"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("pixel_width"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("count_rate1"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("count_rate2"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+
+
+
+
+
+
+
+     } else    if (i==4) { // fccs_spim_fw_2cdiff2coloracfg, fccs_spim_fw_2cdiff2coloracfr, fccs_spim_fw_2cdiff2colorccf
+        res.groupLabel=spimfccslabel;
+        res.menuEntryLabel=tr("... 2-color, 2-component normal diffusion");
+        res.models<<"fccs_spim_fw_2cdiff2coloracfg"<<"fccs_spim_fw_2cdiff2coloracfr"<<"fccs_spim_fw_2cdiff2colorccf";
+        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff_a"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff_b"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff_ab"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff2_a"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff2_b"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff2_ab"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_rho2_a"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_rho2_b"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_rho2_ab"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("crosstalk"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_x"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_y"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_z"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width2"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height2"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("pixel_width"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("count_rate1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("count_rate2"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+
+    } else if (i==5) { // fccs_spim_fw_adiff2coloracfg, fccs_spim_fw_adiff2coloracfr, fccs_spim_fw_adiff2colorccf
+        res.groupLabel=spimfccslabel;
+        res.menuEntryLabel=tr("... 2-color, 1-component anomalous diffusion");
+        res.models<<"fccs_spim_fw_adiff2coloracfg"<<"fccs_spim_fw_adiff2coloracfr"<<"fccs_spim_fw_adiff2colorccf";
+        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_acoeff_a"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_acoeff_b"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_acoeff_ab"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_alpha_a"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_alpha_b"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_alpha_ab"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("crosstalk"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_x"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_y"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_z"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width2"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height2"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("pixel_width"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("count_rate1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("count_rate2"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+
+
+    }
+    return res;
 }
 
 Q_EXPORT_PLUGIN2(fitfunctions_spimfcs, QFPFitFunctionsSPIMFCS)

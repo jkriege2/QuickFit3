@@ -32,7 +32,8 @@ HEADERS += qfpfitfunctionsspimfcs.h \
     qffitfunctionsspimfccsfw2cdiff2colorccf.h \
     qffitfunctionsspimfccsfw2cdiff2coloracfr.h \
     qffitfunctionsspimfccsfw2cdiff2coloracfg.h \
-    qffitfunctionsspimfccsdiff.h
+    qffitfunctionsspimfccsdiff.h \
+    ../interfaces/qffitfunctionconfigforglobalfitinterface.h
 
 
 SOURCES += qfpfitfunctionsspimfcs.cpp\

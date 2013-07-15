@@ -3,6 +3,7 @@
 
 #include "qfpluginfitfunction.h"
 #include "qffitfunctionfccsnormaldiff3d.h"
+#include "qffitfunctionconfigforglobalfitinterface.h"
 
 /*!
     \defgroup qf3fitfunp_fitfunctions_fccs Fit Function Plugin
@@ -14,9 +15,9 @@
 /*! \brief plugin class for Fit Functions
     \ingroup qf3fitfunp_fitfunctions_fccs
 */
-class QFPFitFunctionsFCCS : public QObject, public QFPluginFitFunction {
+class QFPFitFunctionsFCCS : public QObject, public QFPluginFitFunction, public QFFitFunctionConfigForGlobalFitInterface {
         Q_OBJECT
-        Q_INTERFACES(QFPluginFitFunction)
+        Q_INTERFACES(QFPluginFitFunction QFFitFunctionConfigForGlobalFitInterface)
         Q_INTERFACES(QFPlugin)
     public:
 
@@ -72,6 +73,9 @@ class QFPFitFunctionsFCCS : public QObject, public QFPluginFitFunction {
 
         /** \brief return a QFFitFunction instance for the given ID, created with the given parent object */
         virtual QFFitFunction* get(QString id, QObject* parent) const ;
+
+        int getGlobalFitConfigCount() const;
+        GlobalFitConfig getGlobalFitConfig(int i) const;
 
         QF_PLUGIN
     private:

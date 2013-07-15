@@ -10,7 +10,7 @@
 #include "qffcsweightingtools.h"
 #include "dlgqffitalgorithmprogressdialog.h"
 #include "qfimfccsfitchi2landscapedialog.h"
-
+#include "qffitfunctionconfigforglobalfitinterface.h"
 
 namespace Ui {
     class QFImFCCSFitEvaluationEditor;
@@ -78,6 +78,9 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void configureForSPIMFCCS();
         void configureFor2CSPIMFCCS();
         void configureForASPIMFCCS();
+
+
+        void onConfigureGlobalItemClicked();
         void guessFromCurrentFileSet();
 
         void filesSetActivated(const QModelIndex& idx);
@@ -93,7 +96,13 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFImFCCSFitEvaluationEditor *ui;
 
-        
+
+        QList<QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig> globalConfig;
+        QList<QAction*> actsGlobalConfig;
+        QList<QMenu*> menusGlobalConfig;
+
+        void buildGlobalConfigs(QFImFCCSFitEvaluationItem* current);
+
         
         /** \brief where did we save the last report */
         QString currentSaveDirectory;

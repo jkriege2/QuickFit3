@@ -12,6 +12,7 @@
 #include "dlgqfprogressdialog.h"
 #include "qmoretextobject.h"
 #include "qffcsfitchi2landscapedialog.h"
+#include "qffitfunctionmanager.h"
 
 QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent):
     QFEvaluationEditor(services, propEditor, parent),
@@ -162,7 +163,7 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     connect(actChi2Landscape, SIGNAL(triggered()), this, SLOT(plotChi2Landscape()));
     menuImFCCSFit->addAction(actChi2Landscape);
 
-    QMenu* m=menuImFCCSFit->addMenu(tr("configure evaluation for ..."));
+    /*QMenu* m=menuImFCCSFit->addMenu(tr("configure evaluation for ..."));
 
     actConfigureForSPIMFCCS=new QAction(tr("SPIM-FCCS: normal diffusion"), this);
     connect(actConfigureForSPIMFCCS, SIGNAL(triggered()), this, SLOT(configureForSPIMFCCS()));
@@ -172,7 +173,10 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     m->addAction(actConfigureForSPIMFCCS2CompD);
     actConfigureForASPIMFCCS=new QAction(tr("SPIM-FCCS: anomalous diffusion"), this);
     connect(actConfigureForASPIMFCCS, SIGNAL(triggered()), this, SLOT(configureForASPIMFCCS()));
-    m->addAction(actConfigureForASPIMFCCS);
+    m->addAction(actConfigureForASPIMFCCS);*/
+
+
+
 
     menuImFCCSFit->addSeparator();
 
@@ -200,6 +204,8 @@ QFImFCCSFitEvaluationEditor::~QFImFCCSFitEvaluationEditor()
 {
     delete ui;
 }
+
+
 
 int QFImFCCSFitEvaluationEditor::getUserMin(int index)
 {
@@ -260,6 +266,8 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
     if (item) {
         updatingData=true;
 
+        buildGlobalConfigs(item);
+
         ui->cmbFitAlgorithm->setCurrentAlgorithm(item->getFitAlgorithm()->id());
         ui->cmbWeight->setCurrentWeight(item->getFitDataWeighting());
         ui->cmbDisplayData->setCurrentIndex(item->getProperty("imFCCSFit/datadisplay", 1).toInt());
@@ -289,6 +297,51 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
 
     ensureCorrectParamaterModelDisplay();
     displayEvaluation();
+}
+
+
+void QFImFCCSFitEvaluationEditor::buildGlobalConfigs(QFImFCCSFitEvaluationItem* current)
+{
+    for (int i=0; i<actsGlobalConfig.size(); i++) {
+        actsGlobalConfig[i]->disconnect();
+        delete actsGlobalConfig[i];
+    }
+    for (int i=0; i<menusGlobalConfig.size(); i++) {
+        menuImFCCSFit->removeAction(menusGlobalConfig[i]->menuAction());
+        delete menusGlobalConfig[i];
+    }
+    globalConfig.clear();
+    actsGlobalConfig.clear();
+    menusGlobalConfig.clear();
+
+    QStringList models=current->getAvailableFitFunctions();
+    QList<QFFitFunctionConfigForGlobalFitInterface*> modelPlugins;
+    for (int i=0; i<models.size(); i++) {
+        QFFitFunctionConfigForGlobalFitInterface* intf=qobject_cast<QFFitFunctionConfigForGlobalFitInterface*>(QFFitFunctionManager::getInstance()->getPluginObject(QFFitFunctionManager::getInstance()->getPluginForID(models[i])));
+        if (intf && !modelPlugins.contains(intf)) modelPlugins<<intf;
+    }
+    for (int i=0; i<modelPlugins.size(); i++) {
+        for (int j=0; j<modelPlugins[i]->getGlobalFitConfigCount(); j++) {
+            QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig c=modelPlugins[i]->getGlobalFitConfig(j);
+            QMenu* menu=NULL;
+            for (int k=0; k<menusGlobalConfig.size(); k++) {
+                if (menusGlobalConfig[k]->title()==c.groupLabel) {
+                    menu=menusGlobalConfig[k];
+                    break;
+                }
+            }
+            if (!menu) {
+                menu=menuImFCCSFit->addMenu(c.groupLabel);
+                menusGlobalConfig<<menu;
+            }
+            if (menu) {
+                QAction * act=menu->addAction(c.menuEntryLabel);
+                connect(act, SIGNAL(triggered()), this, SLOT(onConfigureGlobalItemClicked()));
+                actsGlobalConfig<<act;
+                globalConfig<<c;
+            }
+        }
+    }
 }
 
 void QFImFCCSFitEvaluationEditor::resultsChanged() {
@@ -505,6 +558,46 @@ void QFImFCCSFitEvaluationEditor::configureForASPIMFCCS() {
         data->setLinkParameter(2, globals[g], g);
     }
 
+}
+
+void QFImFCCSFitEvaluationEditor::onConfigureGlobalItemClicked()
+{
+    QAction* act=qobject_cast<QAction*>(sender());
+    int idx=actsGlobalConfig.indexOf(act);
+    qDebug()<<"sender()="<<sender()<<" type="<<sender()->metaObject()->className()<<"   act="<<act<<"   idx="<<idx;
+    if (act&&idx>=0&&idx<globalConfig.size()) {
+        QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+        if (!data) return;
+
+        if (data->getFitFileCount()<globalConfig[idx].models.size()) {
+            while (data->getFitFileCount()<globalConfig[idx].models.size()) {
+                data->addFitFile();
+            }
+        } else if (data->getFitFileCount()>globalConfig[idx].models.size()) {
+            while (data->getFitFileCount()>globalConfig[idx].models.size()) {
+                data->removeFitFile();
+            }
+        }
+
+        for (int i=0; i<globalConfig[idx].models.size(); i++) {
+            data->setFitFunction(i, globalConfig[idx].models[i]);
+        }
+        data->clearLinkParameters();
+
+        for (int i=0; i<globalConfig[idx].globalParams.size(); i++) {
+            QList<QStringList> g=globalConfig[idx].globalParams[i];
+            for (int j=0; j<g.size(); j++) {
+                QStringList sl=g[j];
+                if (sl.size()>0) {
+                    for (int s=0; s<sl.size(); s++) {
+                        if (!sl[s].isEmpty()) {
+                            data->setLinkParameter(j, sl[s], i);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 void QFImFCCSFitEvaluationEditor::guessFromCurrentFileSet()
@@ -1316,6 +1409,7 @@ void QFImFCCSFitEvaluationEditor::plotChi2Landscape()
 
     delete dlgChi2;
 }
+
 
 
 void QFImFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {

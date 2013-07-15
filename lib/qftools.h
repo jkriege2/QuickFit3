@@ -435,6 +435,132 @@ QList<T> removeQListDouplicates(const QList<T>& list) {
     return out;
 }
 
+
+/*! \brief constructs a list with the given default item contained N times
+    \ingroup qf3lib_tools
+*/
+template <class T>
+QList<T> constructQListWithMultipleItems(const T& item, int N=1) {
+    QList<T> out;
+    for (int i=0; i<N; i++) {
+        out<<item;
+    }
+    return out;
+}
+
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+template <class T>
+QList<T> constructQListFromItems(const T& item1) {
+    QList<T> out;
+    out<<item1;
+    return out;
+}
+
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+template <class T>
+QList<T> constructQListFromItems(const T& item1, const T& item2) {
+    QList<T> out;
+    out<<item1<<item2;
+    return out;
+}
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+template <class T>
+QList<T> constructQListFromItems(const T& item1, const T& item2, const T& item3) {
+    QList<T> out;
+    out<<item1<<item2<<item3;
+    return out;
+}
+
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+template <class T>
+QList<T> constructQListFromItems(const T& item1, const T& item2, const T& item3, const T& item4) {
+    QList<T> out;
+    out<<item1<<item2<<item3<<item4;
+    return out;
+}
+
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+template <class T>
+QList<T> constructQListFromItems(const T& item1, const T& item2, const T& item3, const T& item4, const T& item5) {
+    QList<T> out;
+    out<<item1<<item2<<item3<<item4<<item5;
+    return out;
+}
+
+
+
+
+
+
+
+
+
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+inline QStringList constructQStringListFromItems(const QString& item1) {
+    QStringList out;
+    out<<item1;
+    return out;
+}
+
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+
+inline QStringList constructQStringListFromItems(const QString& item1, const QString& item2) {
+    QStringList out;
+    out<<item1<<item2;
+    return out;
+}
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+
+inline QStringList constructQStringListFromItems(const QString& item1, const QString& item2, const QString& item3) {
+    QStringList out;
+    out<<item1<<item2<<item3;
+    return out;
+}
+
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+
+inline QStringList constructQStringListFromItems(const QString& item1, const QString& item2, const QString& item3, const QString& item4) {
+    QStringList out;
+    out<<item1<<item2<<item3<<item4;
+    return out;
+}
+
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+
+inline QStringList constructQStringListFromItems(const QString& item1, const QString& item2, const QString& item3, const QString& item4, const QString& item5) {
+    QStringList out;
+    out<<item1<<item2<<item3<<item4<<item5;
+    return out;
+}
+
+
+
+
+
+
+
+
+
 /*! \brief remove all duplicates from a list
     \ingroup qf3lib_tools
 

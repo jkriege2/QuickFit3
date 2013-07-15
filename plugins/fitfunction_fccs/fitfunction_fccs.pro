@@ -19,7 +19,8 @@ HEADERS += qfpfitfunctionsfccs.h \
     fcstools.h \
     qffitfunctionsfccsfwdiff2colortcccf.h \
     qffitfunctionsfccsfwdiff2colortcacfr.h \
-    qffitfunctionsfccsfwdiff2colortcacfg.h
+    qffitfunctionsfccsfwdiff2colortcacfg.h \
+    ../interfaces/qffitfunctionconfigforglobalfitinterface.h
 
 SOURCES += qfpfitfunctionsfccs.cpp\
            qffitfunctionfccsnormaldiff3d.cpp \
