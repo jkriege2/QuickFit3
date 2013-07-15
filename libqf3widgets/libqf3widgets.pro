@@ -143,6 +143,7 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfcameraconfigcombobox.cpp \
     qfcameracombobox.cpp \
     objectives.cpp \
+    ../../../../LIB/trunk/qt/jkqtpimagetools.cpp \
     ../../../../LIB/trunk/qt/jkqtpimageelements.cpp \
     filters.cpp \
     ../../../../LIB/trunk/qt/qenhancedcombobox.cpp \
