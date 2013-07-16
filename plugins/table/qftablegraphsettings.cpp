@@ -228,6 +228,7 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         }
         //qDebug()<<graph.fillColor.name()<<oldDefaultFillColor.name();
 
+        qDebug()<<graph.fillColor.name()<<oldDefaultFillColor.name();
         if (graph.fillColor!=oldDefaultFillColor) graph.fillColor=ui->cmbFillColor->currentColor();
         else {
             graph.fillColor=graph.color.lighter();
