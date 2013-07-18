@@ -304,32 +304,32 @@ void QFESPIMB040DeviceParamStackConfigWidget::updateReplaces()
 
 void QFESPIMB040DeviceParamStackConfigWidget::setDeviceParameter(int parameter, double value) {
     if (parameter==0) {
-        opticsSetup->getLaser1()->setLightSourcePower(opticsSetup->getLaser1ID(), 0, value);
-        while (!opticsSetup->getLaser1()->isLastLightSourceActionFinished(opticsSetup->getLaser1ID())) {
+        opticsSetup->getLaser(0)->setLightSourcePower(opticsSetup->getLaserID(0), 0, value);
+        while (!opticsSetup->getLaser(0)->isLastLightSourceActionFinished(opticsSetup->getLaserID(0))) {
             QApplication::processEvents();
         }
-        opticsSetup->getLaser1()->setLightSourceLineEnabled(opticsSetup->getLaser1ID(), 0, true);
-        while (!opticsSetup->getLaser1()->isLastLightSourceActionFinished(opticsSetup->getLaser1ID())) {
+        opticsSetup->getLaser(0)->setLightSourceLineEnabled(opticsSetup->getLaserID(0), 0, true);
+        while (!opticsSetup->getLaser(0)->isLastLightSourceActionFinished(opticsSetup->getLaserID(0))) {
             QApplication::processEvents();
         }
     }
     if (parameter==1) {
-        opticsSetup->getLaser2()->setLightSourcePower(opticsSetup->getLaser2ID(), 0, value);
-        while (!opticsSetup->getLaser2()->isLastLightSourceActionFinished(opticsSetup->getLaser2ID())) {
+        opticsSetup->getLaser(1)->setLightSourcePower(opticsSetup->getLaserID(1), 0, value);
+        while (!opticsSetup->getLaser(1)->isLastLightSourceActionFinished(opticsSetup->getLaserID(1))) {
             QApplication::processEvents();
         }
-        opticsSetup->getLaser2()->setLightSourceLineEnabled(opticsSetup->getLaser2ID(), 0, true);
-        while (!opticsSetup->getLaser2()->isLastLightSourceActionFinished(opticsSetup->getLaser2ID())) {
+        opticsSetup->getLaser(1)->setLightSourceLineEnabled(opticsSetup->getLaserID(1), 0, true);
+        while (!opticsSetup->getLaser(1)->isLastLightSourceActionFinished(opticsSetup->getLaserID(1))) {
             QApplication::processEvents();
         }
     }
     if (parameter==2) {
-        opticsSetup->getTransmissionLightSource()->setLightSourcePower(opticsSetup->getTransmissionLightSourceID(), 0, value);
-        while (!opticsSetup->getTransmissionLightSource()->isLastLightSourceActionFinished(opticsSetup->getTransmissionLightSourceID())) {
+        opticsSetup->getBrightfieldLightSource(QFESPIMB040OpticsSetupBase::BrightfieldTransmission)->setLightSourcePower(opticsSetup->getBrightfieldLightSourceID(QFESPIMB040OpticsSetupBase::BrightfieldTransmission), 0, value);
+        while (!opticsSetup->getBrightfieldLightSource(QFESPIMB040OpticsSetupBase::BrightfieldTransmission)->isLastLightSourceActionFinished(opticsSetup->getBrightfieldLightSourceID(QFESPIMB040OpticsSetupBase::BrightfieldTransmission))) {
             QApplication::processEvents();
         }
-        opticsSetup->getTransmissionLightSource()->setLightSourceLineEnabled(opticsSetup->getTransmissionLightSourceID(), 0, true);
-        while (!opticsSetup->getTransmissionLightSource()->isLastLightSourceActionFinished(opticsSetup->getTransmissionLightSourceID())) {
+        opticsSetup->getBrightfieldLightSource(QFESPIMB040OpticsSetupBase::BrightfieldTransmission)->setLightSourceLineEnabled(opticsSetup->getBrightfieldLightSourceID(QFESPIMB040OpticsSetupBase::BrightfieldTransmission), 0, true);
+        while (!opticsSetup->getBrightfieldLightSource(QFESPIMB040OpticsSetupBase::BrightfieldTransmission)->isLastLightSourceActionFinished(opticsSetup->getBrightfieldLightSourceID(QFESPIMB040OpticsSetupBase::BrightfieldTransmission))) {
             QApplication::processEvents();
         }
     }
@@ -337,13 +337,13 @@ void QFESPIMB040DeviceParamStackConfigWidget::setDeviceParameter(int parameter, 
 
 double QFESPIMB040DeviceParamStackConfigWidget::getDeviceParameter(int parameter) {
     if (parameter==0) {
-        return opticsSetup->getLaser1()->getLightSourceCurrentMeasuredPower(opticsSetup->getLaser1ID(), 0);
+        return opticsSetup->getLaser(0)->getLightSourceCurrentMeasuredPower(opticsSetup->getLaserID(0), 0);
     }
     if (parameter==1) {
-        return opticsSetup->getLaser2()->getLightSourceCurrentMeasuredPower(opticsSetup->getLaser2ID(), 0);
+        return opticsSetup->getLaser(1)->getLightSourceCurrentMeasuredPower(opticsSetup->getLaserID(1), 0);
     }
     if (parameter==2) {
-        return opticsSetup->getTransmissionLightSource()->getLightSourceCurrentMeasuredPower(opticsSetup->getTransmissionLightSourceID(), 0);
+        return opticsSetup->getBrightfieldLightSource(QFESPIMB040OpticsSetupBase::BrightfieldTransmission)->getLightSourceCurrentMeasuredPower(opticsSetup->getBrightfieldLightSourceID(QFESPIMB040OpticsSetupBase::BrightfieldTransmission), 0);
     }
     return 0;
 }

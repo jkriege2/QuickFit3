@@ -17,20 +17,20 @@
 #include "qfextension.h"
 #include "tools.h"
 #include "objectives.h"
-#include "qfextensionlinearstage.h"
-#include "qfextensioncamera.h"
-#include "qfcameraconfigcombobox.h"
-#include "qfcameracombobox.h"
+
 #include "qtriple.h"
 #include "qcheckablestringlistmodel.h"
 #include "qftablemodel.h"
 #include "qprogresslistwidget.h"
-#include "qfextensionmeasurementdevice.h"
 #include "../interfaces/qfextensionglobalsettingsreadwrite.h"
+#include "qfextensionmeasurementdevice.h"
 #include "qfextensionlightsource.h"
 #include "qfextensionfilterchanger.h"
 #include "qfespimb040opticssetupbase.h"
-
+#include "qfextensionlinearstage.h"
+#include "qfextensioncamera.h"
+#include "qfcameraconfigcombobox.h"
+#include "qfcameracombobox.h"
 class QFESPIMB040MainWindow; // forward
 namespace Ui {
     class QFESPIMB040OpticsSetup; // forward
@@ -83,6 +83,8 @@ class QFESPIMB040OpticsSetup : public QFESPIMB040OpticsSetupBase {
          */
         QMap<QString, QVariant> getSetup(int setup_cam=-1) const;
 
+        /*! returns the number of available cameras */
+        virtual int getCameraCount() const;
 
         /*! \brief returns a pointer to the QFExtensionCamera and ensures exclusive access to one camera  therein.
 
@@ -117,37 +119,26 @@ class QFESPIMB040OpticsSetup : public QFESPIMB040OpticsSetupBase {
         /*! \rief calculate the overall system magnification for the given camera in the setup (currently 0,1) */
         double getCameraMagnification(int setup_cam) const;
 
-        /** \brief return a pointer to the x-axis stage class */
-        QFExtensionLinearStage* getXStage();
 
-        /** \brief return a pointer to the y-axis stage class */
-        QFExtensionLinearStage* getYStage();
 
-        /** \brief return a pointer to the z-axis stage class */
-        QFExtensionLinearStage* getZStage();
 
-        /** \brief return a pointer to the x-axis QFExtension class */
-        QFExtension* getXStageExtension();
+        /** \brief return a pointer to the axis stage class */
+        virtual QFExtensionLinearStage* getStage(int stage);
+        /** \brief return a pointer to the axis QFExtension class */
+        virtual QFExtension* getStageExtension(int stage);
+        virtual bool isStageConnected(int stage) const;
+        /** \brief get the axis number of x-axis stage inside its class */
+        virtual int getStageAxis(int stage);
 
-        /** \brief return a pointer to the y-axis QFExtension class */
-        QFExtension* getYStageExtension();
 
-        /** \brief return a pointer to the z-axis QFExtension class */
-        QFExtension* getZStageExtension();
-
-        bool isXStageConnected() const;
-        bool isYStageConnected() const;
-        bool isZStageConnected() const;
 
         QFExtensionFilterChanger* getFilterChangerDetection() const;
         int getFilterChangerDetectionID() const;
 
-        QFExtensionLightSource* getLaser1();
-        QFExtensionLightSource* getLaser2();
-        QFExtensionLightSource* getTransmissionLightSource();
-        int getLaser1ID();
-        int getLaser2ID();
-        int getTransmissionLightSourceID();
+        QFExtensionLightSource* getLaser(int laser);
+        QFExtensionLightSource* getBrightfieldLightSource(int source);
+        int getLaserID(int laser);
+        int getBrightfieldLightSourceID(int source);
 
         QString getAxisNameForStage(QFExtensionLinearStage* stage, int axis);
 
@@ -158,14 +149,6 @@ class QFESPIMB040OpticsSetup : public QFESPIMB040OpticsSetupBase {
         QFCameraConfigComboBoxStartResume* getStopRelease(int camera) const;
 
 
-        /** \brief get the axis number of x-axis stage inside its class */
-        int getXStageAxis();
-
-        /** \brief get the axis number of y-axis stage inside its class */
-        int getYStageAxis();
-
-        /** \brief get the axis number of z-axis stage inside its class */
-        int getZStageAxis();
 
 
         /** \brief set main illumination shutter state */

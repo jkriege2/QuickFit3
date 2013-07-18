@@ -81,9 +81,9 @@ QFESPIMB040ScriptedAcquisitionInstrumentControl::QFESPIMB040ScriptedAcquisitionI
 void QFESPIMB040ScriptedAcquisitionInstrumentControl::setLaserIntensity(int laser, int line, double intensity)
 {
     if (laser==1)  {
-        opticsSetup->getLaser1()->setLightSourcePower(opticsSetup->getLaser1ID(), line, intensity);
+        opticsSetup->getLaser(0)->setLightSourcePower(opticsSetup->getLaserID(0), line, intensity);
     } else if (laser==2)  {
-        opticsSetup->getLaser2()->setLightSourcePower(opticsSetup->getLaser2ID(), line, intensity);
+        opticsSetup->getLaser(1)->setLightSourcePower(opticsSetup->getLaserID(1), line, intensity);
     } else {
         throwEngineException(QObject::tr("setLaserIntensity(laser=%1, %2, %3): unknown laser!").arg(laser).arg(line).arg(intensity));
     }
@@ -91,7 +91,7 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::setLaserIntensity(int lase
 
 void QFESPIMB040ScriptedAcquisitionInstrumentControl::setTransmissionIntensity(int line, double intensity)
 {
-    opticsSetup->getTransmissionLightSource()->setLightSourcePower(opticsSetup->getTransmissionLightSourceID(), line, intensity);
+    opticsSetup->getBrightfieldLightSource(QFESPIMB040OpticsSetupBase::BrightfieldTransmission)->setLightSourcePower(opticsSetup->getBrightfieldLightSourceID(QFESPIMB040OpticsSetupBase::BrightfieldTransmission), line, intensity);
 }
 
 void QFESPIMB040ScriptedAcquisitionInstrumentControl::setShutter(const QString& shutter, bool state)
@@ -114,14 +114,14 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::moveStageRel(const QString
     QFExtensionLinearStage*  stageE=NULL;
     int axis=0;
     if (stage=="x") {
-        stageE=opticsSetup->getXStage();
-        axis=opticsSetup->getXStageAxis();
+        stageE=opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageX);
+        axis=opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageX);
     } else if (stage=="y") {
-        stageE=opticsSetup->getYStage();
-        axis=opticsSetup->getYStageAxis();
+        stageE=opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageY);
+        axis=opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageY);
     } else if (stage=="z") {
-        stageE=opticsSetup->getZStage();
-        axis=opticsSetup->getZStageAxis();
+        stageE=opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageZ);
+        axis=opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageZ);
     } else {
         throwEngineException(QObject::tr("moveStageRel('%1', %2): unknown stage!").arg(stage).arg(newPos));
         return;
@@ -144,14 +144,14 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::moveStageAbs(const QString
     QFExtensionLinearStage*  stageE=NULL;
     int axis=0;
     if (stage=="x") {
-        stageE=opticsSetup->getXStage();
-        axis=opticsSetup->getXStageAxis();
+        stageE=opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageX);
+        axis=opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageX);
     } else if (stage=="y") {
-        stageE=opticsSetup->getYStage();
-        axis=opticsSetup->getYStageAxis();
+        stageE=opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageY);
+        axis=opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageY);
     } else if (stage=="z") {
-        stageE=opticsSetup->getZStage();
-        axis=opticsSetup->getZStageAxis();
+        stageE=opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageZ);
+        axis=opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageZ);
     } else {
         throwEngineException(QObject::tr("moveStageAbs('%1', %2): unknown stage!").arg(stage).arg(newPos));
         return;

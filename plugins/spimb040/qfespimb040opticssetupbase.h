@@ -7,6 +7,13 @@
 #include <QList>
 #include "qfextension.h"
 #include "qfextensioncamera.h"
+#include "qfextensionmeasurementdevice.h"
+#include "qfextensionlightsource.h"
+#include "qfextensionfilterchanger.h"
+#include "qfextensionlinearstage.h"
+#include "qfextensioncamera.h"
+#include "qfcameraconfigcombobox.h"
+#include "qfcameracombobox.h"
 
 typedef QList<QTriple<QIcon, QString, QString> > QFESPIMB040OpticsSetupItems;
 
@@ -22,6 +29,18 @@ class QFESPIMB040OpticsSetupBase: public QWidget {
             ShutterLaser1,
             ShutterLaser2,
             ShutterTransmission
+        };
+
+        enum specialStages {
+            StageX=0,
+            StageY=1,
+            StageZ=2,
+            StageR=3
+        };
+
+        enum specialBrightfieldSources {
+            BrightfieldTransmission=0,
+            BrightfieldEpi=1
         };
 
         struct measuredValues {
@@ -100,6 +119,93 @@ class QFESPIMB040OpticsSetupBase: public QWidget {
 
         /*! \rief calculate the overall system magnification for the given camera in the setup (currently 0,1) */
         virtual double getCameraMagnification(int setup_cam) const=0;
+
+        /*! returns the number of available cameras */
+        virtual int getCameraCount() const=0;
+
+
+
+
+
+
+
+        /** \brief return a pointer to the axis stage class */
+        virtual QFExtensionLinearStage* getStage(int stage)=0;
+        /** \brief return a pointer to the axis QFExtension class */
+        virtual QFExtension* getStageExtension(int stage)=0;
+        virtual bool isStageConnected(int stage) const=0;
+        /** \brief get the axis number of x-axis stage inside its class */
+        virtual int getStageAxis(int stage)=0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        virtual QFExtensionFilterChanger* getFilterChangerDetection() const=0;
+        virtual int getFilterChangerDetectionID() const=0;
+
+        virtual QFExtensionLightSource* getLaser(int laser)=0;
+        virtual QFExtensionLightSource* getBrightfieldLightSource(int source)=0;
+        virtual int getLaserID(int laser)=0;
+        virtual int getBrightfieldLightSourceID(int source)=0;
+
+        virtual QString getAxisNameForStage(QFExtensionLinearStage* stage, int axis)=0;
+
+        virtual bool isStageConnected(QFExtensionLinearStage* stage, int id, bool& found)=0;
+
+        virtual QFCameraComboBox* cameraComboBox(int camera) const=0;
+
+        virtual QFCameraConfigComboBoxStartResume* getStopRelease(int camera) const=0;
+
+
+
+        /** \brief set main illumination shutter state */
+        virtual void setShutter(Shutters shutter, bool opened, bool blocking=false)=0;
+
+
+        /** \brief set main illumination shutter state */
+        virtual bool setMainIlluminationShutter(bool opened, bool blocking=false)=0;
+        /** \brief return \c true, if the main acquisition shutter is available and functional */
+        virtual bool isMainIlluminationShutterAvailable()=0;
+        /** \brief get main illumination shutter state */
+        virtual bool getMainIlluminationShutter()=0;
+
+        /** \brief return a description of the laser configuration */
+        virtual QString getLaserConfig()=0;
+
+        /** \brief returns \c true if the given lightpath is loaded */
+        virtual bool lightpathLoaded(const QString &filename)=0;
+        /** \brief returns the currently selected lightpath name */
+        virtual QString getCurrentLightpath() const=0;
+        /** \brief returns the currently selected lightpath file */
+        virtual QString getCurrentLightpathFilename() const=0;
+        /** \brief make sure the currently selected lightpath is used */
+        virtual void ensureLightpath()=0;
+
+
+        /** \brief collect all available measureable values (laser powers etz.) */
+        virtual measuredValues getMeasuredValues()=0;
+
+        /** \brief returns the DualView mode for a given camera (\c "none", \c "horicontal" or \c "vertical" ) */
+        virtual QString dualViewMode(int camera) const=0;
+        /** \brief returns the DualView mode for a given camera (\c "none", \c "horicontal" or \c "vertical" ) */
+        virtual QString dualViewMode(QFExtensionCamera* ecam, int camera) const=0;
+
+        /** \brief returns the logical number (0,1) of the specified camera
+          *
+          * This function compares the given data with the two specified cameras and returns the respective ID, if a match is found. If no match is found, the function returns -1.
+          */
+        virtual int camNumFromExtension(QFExtensionCamera* ecam, int camera) const=0;
     signals:
         void lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes);
 

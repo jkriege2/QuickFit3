@@ -44,9 +44,20 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     ui->datacut->set_copyToRunsEnabled(false);
     ui->datacut->set_runsName(tr("pixels"));
 
-    ui->cmbDisplayData->addUsedSymbol(JKQTPfilledCircle);
-    ui->cmbDisplayData->addUsedSymbol(JKQTPdot);
-
+    ui->cmbDisplayData->setDefaultSymbol(JKQTPcross, 5);
+    ui->cmbDisplayData->addUsedSymbol(JKQTPcross, 5, true);
+    ui->cmbDisplayData->addUsedSymbol(JKQTPcross, 5, false);
+    ui->cmbDisplayData->addUsedSymbol(JKQTPcross, 10, true);
+    ui->cmbDisplayData->addUsedSymbol(JKQTPcross, 10, false);
+    ui->cmbDisplayData->addUsedSymbol(JKQTPcross, 15, true);
+    ui->cmbDisplayData->addUsedSymbol(JKQTPcross, 15, false);
+    ui->cmbDisplayData->addUsedSymbol(JKQTPfilledCircle, 5, true);
+    ui->cmbDisplayData->addUsedSymbol(JKQTPfilledCircle, 5, false);
+    ui->cmbDisplayData->addUsedSymbol(JKQTPfilledCircle, 10, true);
+    ui->cmbDisplayData->addUsedSymbol(JKQTPfilledCircle, 10, false);
+    ui->cmbDisplayData->addUsedSymbol(JKQTPfilledCircle, 15, true);
+    ui->cmbDisplayData->addUsedSymbol(JKQTPfilledCircle, 15, false);
+    ui->cmbDisplayData->addUsedSymbol(JKQTPdot, 10, false);
 
 
 
@@ -764,7 +775,7 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 g->set_errorFillColor(ec);
                 g->set_symbol(ui->cmbDisplayData->getSymbol());
                 g->set_drawLine(ui->cmbDisplayData->getDrawLine());
-                g->set_symbolSize(5);
+                g->set_symbolSize(ui->cmbDisplayData->getSymbolSize());
                 g->set_lineWidth(1);
                 g->set_xErrorStyle(JKQTPnoError);
                 g->set_yErrorStyle(ui->cmbErrorDisplay->getErrorStyle());
@@ -807,7 +818,7 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 g_res->set_color(g->get_color());
                 g_res->set_fillColor(g->get_fillColor());
                 g_res->set_symbol(ui->cmbDisplayData->getSymbol());
-                g_res->set_symbolSize(5);
+                g_res->set_symbolSize(ui->cmbDisplayData->getSymbolSize());
                 g_res->set_lineWidth(1);
                 g_res->set_drawLine(ui->cmbDisplayData->getDrawLine());
                 g_res->set_datarange_start(ui->datacut->get_userMin());

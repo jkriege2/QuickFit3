@@ -455,6 +455,11 @@ QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam) const {
     return setup;
 }
 
+int QFESPIMB040OpticsSetup::getCameraCount() const
+{
+    return 2;
+}
+
 
 void QFESPIMB040OpticsSetup::setLogging(QFPluginLogService* log) {
     m_log=log;
@@ -688,53 +693,7 @@ void QFESPIMB040OpticsSetup::updateMagnifications() {
 }
 
 
-QFExtensionLinearStage* QFESPIMB040OpticsSetup::getXStage() {
-    return ui->stageSetup->getXStage();
-}
 
-QFExtensionLinearStage* QFESPIMB040OpticsSetup::getYStage() {
-    return ui->stageSetup->getYStage();
-}
-
-QFExtensionLinearStage* QFESPIMB040OpticsSetup::getZStage() {
-    return ui->stageSetup->getZStage();
-}
-
-QFExtension* QFESPIMB040OpticsSetup::getXStageExtension() {
-    return ui->stageSetup->getXStageExtension();
-}
-
-QFExtension* QFESPIMB040OpticsSetup::getYStageExtension() {
-    return ui->stageSetup->getYStageExtension();
-}
-
-QFExtension* QFESPIMB040OpticsSetup::getZStageExtension() {
-    return ui->stageSetup->getZStageExtension();
-}
-
-int QFESPIMB040OpticsSetup::getXStageAxis() {
-    return ui->stageSetup->getXStageAxis();
-}
-
-int QFESPIMB040OpticsSetup::getYStageAxis() {
-    return ui->stageSetup->getYStageAxis();
-}
-
-int QFESPIMB040OpticsSetup::getZStageAxis() {
-    return ui->stageSetup->getZStageAxis();
-}
-
-bool QFESPIMB040OpticsSetup::isXStageConnected() const {
-    return ui->stageSetup->isXStageConnected();
-}
-
-bool QFESPIMB040OpticsSetup::isYStageConnected() const {
-    return ui->stageSetup->isYStageConnected();
-}
-
-bool QFESPIMB040OpticsSetup::isZStageConnected() const {
-    return ui->stageSetup->isZStageConnected();
-}
 
 QFExtensionFilterChanger *QFESPIMB040OpticsSetup::getFilterChangerDetection() const
 {
@@ -746,46 +705,80 @@ int QFESPIMB040OpticsSetup::getFilterChangerDetectionID() const
     return ui->filtcDetection->getFilterChangerID();
 }
 
-QFExtensionLightSource *QFESPIMB040OpticsSetup::getLaser1()
+QFExtensionLightSource *QFESPIMB040OpticsSetup::getLaser(int laser)
 {
-    return ui->lsLaser1->getLightSource();
+    if (laser==0) return ui->lsLaser1->getLightSource();
+    if (laser==1) return ui->lsLaser2->getLightSource();
+    return NULL;
 }
 
-QFExtensionLightSource *QFESPIMB040OpticsSetup::getLaser2()
+
+QFExtensionLightSource *QFESPIMB040OpticsSetup::getBrightfieldLightSource(int source)
 {
-    return ui->lsLaser2->getLightSource();
+    if (source==0) return ui->lsTransmission->getLightSource();
+    return NULL;
 }
 
-QFExtensionLightSource *QFESPIMB040OpticsSetup::getTransmissionLightSource()
+int QFESPIMB040OpticsSetup::getLaserID(int laser)
 {
-    return ui->lsTransmission->getLightSource();
+    if (laser==0) return ui->lsLaser1->getLightSourceID();
+    if (laser==1) return ui->lsLaser2->getLightSourceID();
+    return NULL;
 }
 
-int QFESPIMB040OpticsSetup::getLaser1ID()
-{
-    return ui->lsLaser1->getLightSourceID();
-}
 
-int QFESPIMB040OpticsSetup::getLaser2ID()
+int QFESPIMB040OpticsSetup::getBrightfieldLightSourceID(int source)
 {
-    return ui->lsLaser2->getLightSourceID();
-}
-
-int QFESPIMB040OpticsSetup::getTransmissionLightSourceID()
-{
-    return ui->lsTransmission->getLightSourceID();
+    if (source==0) return ui->lsTransmission->getLightSourceID();
+    return NULL;
 }
 
 bool QFESPIMB040OpticsSetup::isStageConnected(QFExtensionLinearStage* stage, int id, bool& found) {
     found=false;
     if (!stage || id<0) return false;
     found=true;
-    if (stage==getXStage() && id==getXStageAxis()) return isXStageConnected();
-    if (stage==getYStage() && id==getYStageAxis()) return isYStageConnected();
-    if (stage==getZStage() && id==getZStageAxis()) return isZStageConnected();
+    if (stage==getStage(QFESPIMB040OpticsSetupBase::StageX) && id==getStageAxis(QFESPIMB040OpticsSetupBase::StageX)) return isStageConnected(QFESPIMB040OpticsSetupBase::StageX);
+    if (stage==getStage(QFESPIMB040OpticsSetupBase::StageY) && id==getStageAxis(QFESPIMB040OpticsSetupBase::StageY)) return isStageConnected(QFESPIMB040OpticsSetupBase::StageY);
+    if (stage==getStage(QFESPIMB040OpticsSetupBase::StageZ) && id==getStageAxis(QFESPIMB040OpticsSetupBase::StageZ)) return isStageConnected(QFESPIMB040OpticsSetupBase::StageZ);
     found=false;
     return false;
 }
+
+int QFESPIMB040OpticsSetup::getStageAxis(int stage)
+{
+    if (stage==QFESPIMB040OpticsSetupBase::StageX) return ui->stageSetup->getXStageAxis();
+    if (stage==QFESPIMB040OpticsSetupBase::StageY) return ui->stageSetup->getYStageAxis();
+    if (stage==QFESPIMB040OpticsSetupBase::StageZ) return ui->stageSetup->getZStageAxis();
+    return -1;
+
+}
+
+
+bool QFESPIMB040OpticsSetup::isStageConnected(int stage) const
+{
+    if (stage==QFESPIMB040OpticsSetupBase::StageX) return ui->stageSetup->isXStageConnected();
+    if (stage==QFESPIMB040OpticsSetupBase::StageY) return ui->stageSetup->isYStageConnected();
+    if (stage==QFESPIMB040OpticsSetupBase::StageZ) return ui->stageSetup->isZStageConnected();
+    return false;
+}
+
+
+QFExtension *QFESPIMB040OpticsSetup::getStageExtension(int stage)
+{
+    if (stage==QFESPIMB040OpticsSetupBase::StageX) return ui->stageSetup->getXStageExtension();
+    if (stage==QFESPIMB040OpticsSetupBase::StageY) return ui->stageSetup->getYStageExtension();
+    if (stage==QFESPIMB040OpticsSetupBase::StageZ) return ui->stageSetup->getZStageExtension();
+    return NULL;
+}
+
+QFExtensionLinearStage *QFESPIMB040OpticsSetup::getStage(int stage)
+{
+    if (stage==QFESPIMB040OpticsSetupBase::StageX) return ui->stageSetup->getXStage();
+    if (stage==QFESPIMB040OpticsSetupBase::StageY) return ui->stageSetup->getYStage();
+    if (stage==QFESPIMB040OpticsSetupBase::StageZ) return ui->stageSetup->getZStage();
+    return NULL;
+}
+
 
 QFCameraComboBox* QFESPIMB040OpticsSetup::cameraComboBox(int camera) const {
     if (camera==0) return ui->camConfig1->cameraComboBox();
@@ -1370,3 +1363,4 @@ void QFESPIMB040OpticsSetup::on_btnSaveSetup_clicked()  {
     ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ExperimentDescription/lastopticssetupdir", dir);
 
 }
+

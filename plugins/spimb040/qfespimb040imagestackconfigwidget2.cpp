@@ -1492,9 +1492,9 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
         if (ok) {
             acquisitionDescription["type"]="stack 1 axis";
             acquisitionDescription["axis1/type"]="other";
-            if (opticsSetup->getXStage()==stage && opticsSetup->getXStageAxis()==stageAxis) acquisitionDescription["axis1/type"]="x";
-            if (opticsSetup->getYStage()==stage && opticsSetup->getYStageAxis()==stageAxis) acquisitionDescription["axis1/type"]="y";
-            if (opticsSetup->getZStage()==stage && opticsSetup->getZStageAxis()==stageAxis) acquisitionDescription["axis1/type"]="z";
+            if (opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageX)==stage && opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageX)==stageAxis) acquisitionDescription["axis1/type"]="x";
+            if (opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageY)==stage && opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageY)==stageAxis) acquisitionDescription["axis1/type"]="y";
+            if (opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageZ)==stage && opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageZ)==stageAxis) acquisitionDescription["axis1/type"]="z";
             acquisitionDescription["axis1/stage_name"]=stageExtension()->getName();
             acquisitionDescription["axis1/stage_axis"]=stageAxis;
             acquisitionDescription["axis1/stack_start"]=stageStart;
@@ -1518,9 +1518,9 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
 
             if (useStage2()) {
                 acquisitionDescription["axis2/type"]="other";
-                if (opticsSetup->getXStage()==stage2 && opticsSetup->getXStageAxis()==stageAxis2) acquisitionDescription["axis2/type"]="x";
-                if (opticsSetup->getYStage()==stage2 && opticsSetup->getYStageAxis()==stageAxis2) acquisitionDescription["axis2/type"]="y";
-                if (opticsSetup->getZStage()==stage2 && opticsSetup->getZStageAxis()==stageAxis2) acquisitionDescription["axis2/type"]="z";
+                if (opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageX)==stage2 && opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageX)==stageAxis2) acquisitionDescription["axis2/type"]="x";
+                if (opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageY)==stage2 && opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageY)==stageAxis2) acquisitionDescription["axis2/type"]="y";
+                if (opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageZ)==stage2 && opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageZ)==stageAxis2) acquisitionDescription["axis2/type"]="z";
                 acquisitionDescription["axis2/stage_name"]=stageExtension2()->getName();
                 acquisitionDescription["axis2/stage_axis"]=stageAxis2;
                 acquisitionDescription["axis2/stack_start"]=stageStart2;
@@ -1530,9 +1530,9 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
 
             if (useStage3()) {
                 acquisitionDescription["axis3/type"]="other";
-                if (opticsSetup->getXStage()==stage3 && opticsSetup->getXStageAxis()==stageAxis3) acquisitionDescription["axis3/type"]="x";
-                if (opticsSetup->getYStage()==stage3 && opticsSetup->getYStageAxis()==stageAxis3) acquisitionDescription["axis3/type"]="y";
-                if (opticsSetup->getZStage()==stage3 && opticsSetup->getZStageAxis()==stageAxis3) acquisitionDescription["axis3/type"]="z";
+                if (opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageX)==stage3 && opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageX)==stageAxis3) acquisitionDescription["axis3/type"]="x";
+                if (opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageY)==stage3 && opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageY)==stageAxis3) acquisitionDescription["axis3/type"]="y";
+                if (opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageZ)==stage3 && opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageZ)==stageAxis3) acquisitionDescription["axis3/type"]="z";
                 acquisitionDescription["axis3/stage_name"]=stageExtension3()->getName();
                 acquisitionDescription["axis3/stage_axis"]=stageAxis3;
                 acquisitionDescription["axis3/stack_start"]=stageStart3;
