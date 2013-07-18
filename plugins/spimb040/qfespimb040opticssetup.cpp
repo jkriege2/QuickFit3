@@ -8,7 +8,7 @@
 #include "qfespimb040lightpathsavedialog.h"
 
 QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidget* parent,  QFPluginLogService* log, QFPluginServices* pluginServices) :
-    QWidget(parent),
+    QFESPIMB040OpticsSetupBase(parent),
     ui(new Ui::QFESPIMB040OpticsSetup)
 {
     lightpathConfigModel=new QFTableModel(this);

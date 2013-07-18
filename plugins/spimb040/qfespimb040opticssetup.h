@@ -29,17 +29,17 @@
 #include "../interfaces/qfextensionglobalsettingsreadwrite.h"
 #include "qfextensionlightsource.h"
 #include "qfextensionfilterchanger.h"
+#include "qfespimb040opticssetupbase.h"
 
 class QFESPIMB040MainWindow; // forward
 namespace Ui {
     class QFESPIMB040OpticsSetup; // forward
 }
 
-typedef QList<QTriple<QIcon, QString, QString> > QFESPIMB040OpticsSetupItems;
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg): instrument setup widget
     \ingroup qf3ext_spimb040
  */
-class QFESPIMB040OpticsSetup : public QWidget {
+class QFESPIMB040OpticsSetup : public QFESPIMB040OpticsSetupBase {
         Q_OBJECT
 
     public:
@@ -54,14 +54,10 @@ class QFESPIMB040OpticsSetup : public QWidget {
         void storeSettings(QSettings& settings, QString prefix);
 
         /** \brief removes the lightpath widget from it's place in the dialog and returns a pointer to it. */
-        QWidget* takeLightpathWidget() const;
+        virtual QWidget* takeLightpathWidget() const;
 
 
 
-        void loadPluginGlobalSettings(QSettings& settings, QString prefix);
-        void storePluginGlobalSettings(QSettings& settings, QString prefix) const;
-        void loadPluginGlobalSettings(QSettings& settings, QObject *extensionObject, QString prefix);
-        void storePluginGlobalSettings(QSettings& settings, QObject* extensionObject, QString prefix) const;
 
         /*! \brief lock access to stages: stop the thread used for stage access by this widget
 
@@ -171,12 +167,6 @@ class QFESPIMB040OpticsSetup : public QWidget {
         /** \brief get the axis number of z-axis stage inside its class */
         int getZStageAxis();
 
-        enum Shutters  {
-            ShutterMain,
-            ShutterLaser1,
-            ShutterLaser2,
-            ShutterTransmission
-        };
 
         /** \brief set main illumination shutter state */
         void setShutter(Shutters shutter, bool opened, bool blocking=false);
@@ -201,15 +191,6 @@ class QFESPIMB040OpticsSetup : public QWidget {
         /** \brief make sure the currently selected lightpath is used */
         void ensureLightpath();
 
-        struct measuredValues {
-            QDateTime time;
-            QMap<QString, QVariant> data;
-
-            measuredValues() {
-                time=QDateTime::currentDateTime();
-                data.clear();
-            }
-        };
 
         /** \brief collect all available measureable values (laser powers etz.) */
         measuredValues getMeasuredValues();
@@ -234,8 +215,6 @@ class QFESPIMB040OpticsSetup : public QWidget {
         void userChangedLightpath(QString filename);
         void unlockLighpathCombobox();
         void lockLighpathCombobox();
-    signals:
-        void lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes);
 
     protected slots:
         void updateMagnifications();
@@ -255,8 +234,16 @@ class QFESPIMB040OpticsSetup : public QWidget {
     protected:
         void closeEvent(QCloseEvent * event);
         void showEvent( QShowEvent * event );
+
+        void loadPluginGlobalSettings(QSettings& settings, QString prefix);
+        void storePluginGlobalSettings(QSettings& settings, QString prefix) const;
+        void loadPluginGlobalSettings(QSettings& settings, QObject *extensionObject, QString prefix);
+        void storePluginGlobalSettings(QSettings& settings, QObject* extensionObject, QString prefix) const;
+
     private:
         Ui::QFESPIMB040OpticsSetup *ui;
+
+    protected:
         QFPluginServices* m_pluginServices;
 
         QFPluginLogService* m_log;

@@ -50,7 +50,8 @@ HEADERS += spimb040.h \
     qfespimb040scriptedacquisitiontools.h \
     replacedialog.h \
     finddialog.h \
-    qfespimb040configtabwidget.h
+    qfespimb040configtabwidget.h \
+    qfespimb040opticssetupbase.h
 
 SOURCES += spimb040.cpp \
            qfespimb040cameraview.cpp \
@@ -80,7 +81,8 @@ SOURCES += spimb040.cpp \
     qfespimb040scriptedacquisitiontools.cpp \
     replacedialog.cpp \
     finddialog.cpp \
-    qfespimb040configtabwidget.cpp
+    qfespimb040configtabwidget.cpp \
+    qfespimb040opticssetupbase.cpp
 FORMS = \
     qfespimb040opticssetup.ui \
     qfespimb00histogrammaskdialog.ui \
