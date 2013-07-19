@@ -695,14 +695,27 @@ void QFESPIMB040OpticsSetup::updateMagnifications() {
 
 
 
-QFExtensionFilterChanger *QFESPIMB040OpticsSetup::getFilterChangerDetection() const
+QFExtensionFilterChanger *QFESPIMB040OpticsSetup::getFilterChanger(int changer) const
 {
-    return ui->filtcDetection->getFilterChanger();
+    if (changer==FilterChangerDetection) return ui->filtcDetection->getFilterChanger();
+    return NULL;
 }
 
-int QFESPIMB040OpticsSetup::getFilterChangerDetectionID() const
+int QFESPIMB040OpticsSetup::getFilterChangerID(int changer) const
 {
-    return ui->filtcDetection->getFilterChangerID();
+    if (changer==0) return ui->filtcDetection->getFilterChangerID();
+    return -1;
+}
+
+QString QFESPIMB040OpticsSetup::getFilterChangerName(int changer) const
+{
+    if (changer==0) return tr("detection");
+    return QString();
+}
+
+int QFESPIMB040OpticsSetup::getFilterChangerCount() const
+{
+    return 1;
 }
 
 QFExtensionLightSource *QFESPIMB040OpticsSetup::getLaser(int laser)
@@ -733,6 +746,11 @@ int QFESPIMB040OpticsSetup::getBrightfieldLightSourceID(int source)
     return NULL;
 }
 
+int QFESPIMB040OpticsSetup::getLaserCount() const
+{
+    return 2;
+}
+
 bool QFESPIMB040OpticsSetup::isStageConnected(QFExtensionLinearStage* stage, int id, bool& found) {
     found=false;
     if (!stage || id<0) return false;
@@ -751,6 +769,20 @@ int QFESPIMB040OpticsSetup::getStageAxis(int stage)
     if (stage==QFESPIMB040OpticsSetupBase::StageZ) return ui->stageSetup->getZStageAxis();
     return -1;
 
+}
+
+QString QFESPIMB040OpticsSetup::getStageName(int stage) const
+{
+    if (stage==QFESPIMB040OpticsSetupBase::StageX) return "x";
+    if (stage==QFESPIMB040OpticsSetupBase::StageY) return "y";
+    if (stage==QFESPIMB040OpticsSetupBase::StageZ) return "z";
+    return "";
+
+}
+
+int QFESPIMB040OpticsSetup::getStageCount() const
+{
+    return 3;
 }
 
 
@@ -817,7 +849,7 @@ bool QFESPIMB040OpticsSetup::setMainIlluminationShutter(bool opened, bool blocki
 }
 
 
-void QFESPIMB040OpticsSetup::setShutter(QFESPIMB040OpticsSetup::Shutters shutter, bool opened, bool blocking)
+void QFESPIMB040OpticsSetup::setShutter(int shutter, bool opened, bool blocking)
 {
     if (shutter==QFESPIMB040OpticsSetup::ShutterMain) {
         setMainIlluminationShutter(opened, blocking);
@@ -867,6 +899,11 @@ void QFESPIMB040OpticsSetup::setShutter(QFESPIMB040OpticsSetup::Shutters shutter
             }
         }
     }
+}
+
+int QFESPIMB040OpticsSetup::getShutterCount() const
+{
+    return 4;
 }
 
 
@@ -1364,3 +1401,19 @@ void QFESPIMB040OpticsSetup::on_btnSaveSetup_clicked()  {
 
 }
 
+
+int QFESPIMB040OpticsSetup::getBrightfieldLightSourceCount() const
+{
+    return 1;
+}
+
+QString QFESPIMB040OpticsSetup::getLaserName(int laser) const
+{
+    return tr("Laser %1").arg(laser);
+}
+
+QString QFESPIMB040OpticsSetup::getBrightfieldLightSourceName(int lightsource) const
+{
+    if (lightsource==QFESPIMB040OpticsSetupBase::BrightfieldTransmission) return tr("transmission illumination");
+    return QString();
+}

@@ -80,18 +80,20 @@ QFESPIMB040ScriptedAcquisitionInstrumentControl::QFESPIMB040ScriptedAcquisitionI
 
 void QFESPIMB040ScriptedAcquisitionInstrumentControl::setLaserIntensity(int laser, int line, double intensity)
 {
-    if (laser==1)  {
-        opticsSetup->getLaser(0)->setLightSourcePower(opticsSetup->getLaserID(0), line, intensity);
-    } else if (laser==2)  {
-        opticsSetup->getLaser(1)->setLightSourcePower(opticsSetup->getLaserID(1), line, intensity);
+    if (laser>=0 && laser<opticsSetup->getLaserCount()) {
+        opticsSetup->getLaser(laser)->setLightSourcePower(opticsSetup->getLaserID(laser), line, intensity);
     } else {
         throwEngineException(QObject::tr("setLaserIntensity(laser=%1, %2, %3): unknown laser!").arg(laser).arg(line).arg(intensity));
     }
 }
 
-void QFESPIMB040ScriptedAcquisitionInstrumentControl::setTransmissionIntensity(int line, double intensity)
+void QFESPIMB040ScriptedAcquisitionInstrumentControl::setBrightfieldIntensity(int lightsource, int line, double intensity)
 {
-    opticsSetup->getBrightfieldLightSource(QFESPIMB040OpticsSetupBase::BrightfieldTransmission)->setLightSourcePower(opticsSetup->getBrightfieldLightSourceID(QFESPIMB040OpticsSetupBase::BrightfieldTransmission), line, intensity);
+    if (lightsource>0 && lightsource<opticsSetup->getBrightfieldLightSourceCount()) {
+        opticsSetup->getBrightfieldLightSource(lightsource)->setLightSourcePower(opticsSetup->getBrightfieldLightSourceID(lightsource), line, intensity);
+    } else {
+        throwEngineException(QObject::tr("setBrightfieldIntensity(lightSource=%1, %2, %3): unknown light source!").arg(lightsource).arg(line).arg(intensity));
+    }
 }
 
 void QFESPIMB040ScriptedAcquisitionInstrumentControl::setShutter(const QString& shutter, bool state)
@@ -105,7 +107,13 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::setShutter(const QString& 
     } else if (shutter=="transmission") {
         opticsSetup->setShutter(QFESPIMB040OpticsSetup::ShutterTransmission, state, true);
     } else {
-        throwEngineException(QObject::tr("setShutter('%1'): unknown shutter!").arg(shutter));
+        bool ok=false;
+        int ID=shutter.toInt(&ok);
+        if (ok && ID>=0 && ID<opticsSetup->getShutterCount()) {
+            opticsSetup->setShutter(ID, state, true);
+        } else {
+            throwEngineException(QObject::tr("setShutter('%1'): unknown shutter!").arg(shutter));
+        }
     }
 }
 
@@ -123,8 +131,15 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::moveStageRel(const QString
         stageE=opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageZ);
         axis=opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageZ);
     } else {
-        throwEngineException(QObject::tr("moveStageRel('%1', %2): unknown stage!").arg(stage).arg(newPos));
-        return;
+        bool ok=false;
+        int ID=stage.toInt(&ok);
+        if (ok && ID>=0 && ID<opticsSetup->getStageCount()) {
+            stageE=opticsSetup->getStage(ID);
+            axis=opticsSetup->getStageAxis(ID);
+        } else {
+            throwEngineException(QObject::tr("moveStageRel('%1', %2): unknown stage!").arg(stage).arg(newPos));
+            return;
+        }
     }
 
     stageE->move(axis, stageE->getPosition(axis)+newPos);
@@ -153,8 +168,15 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::moveStageAbs(const QString
         stageE=opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageZ);
         axis=opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageZ);
     } else {
-        throwEngineException(QObject::tr("moveStageAbs('%1', %2): unknown stage!").arg(stage).arg(newPos));
-        return;
+        bool ok=false;
+        int ID=stage.toInt(&ok);
+        if (ok && ID>=0 && ID<opticsSetup->getStageCount()) {
+            stageE=opticsSetup->getStage(ID);
+            axis=opticsSetup->getStageAxis(ID);
+        } else {
+            throwEngineException(QObject::tr("moveStageAbs('%1', %2): unknown stage!").arg(stage).arg(newPos));
+            return;
+        }
     }
 
     stageE->move(axis, newPos);
@@ -173,11 +195,18 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::setFilterWheel(const QStri
     QFExtensionFilterChanger* changer=NULL;
     int ID=0;
     if (wheel=="detection") {
-        changer=opticsSetup->getFilterChangerDetection();
-        ID=opticsSetup->getFilterChangerDetectionID();
+        changer=opticsSetup->getFilterChanger(QFESPIMB040OpticsSetupBase::FilterChangerDetection);
+        ID=opticsSetup->getFilterChangerID(QFESPIMB040OpticsSetupBase::FilterChangerDetection);
     } else {
-        throwEngineException(QObject::tr("setFilterWheel('%1', %2): unknown filter wheel!").arg(wheel).arg(filter));
-        return;
+        bool ok=false;
+        int ID=wheel.toInt(&ok);
+        if (ok && ID>=0 && ID<opticsSetup->getFilterChangerCount()) {
+            changer=opticsSetup->getFilterChanger(ID);
+            ID=opticsSetup->getFilterChangerID(ID);
+        } else {
+            throwEngineException(QObject::tr("setFilterWheel('%1', %2): unknown filter wheel!").arg(wheel).arg(filter));
+            return;
+        }
     }
     changer->setFilterChangerFilter(ID, filter);
     QElapsedTimer t;

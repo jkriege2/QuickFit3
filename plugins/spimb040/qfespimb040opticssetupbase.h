@@ -25,10 +25,10 @@ class QFESPIMB040OpticsSetupBase: public QWidget {
 
 
         enum Shutters  {
-            ShutterMain,
-            ShutterLaser1,
-            ShutterLaser2,
-            ShutterTransmission
+            ShutterMain=0,
+            ShutterLaser1=1,
+            ShutterLaser2=2,
+            ShutterTransmission=3
         };
 
         enum specialStages {
@@ -41,6 +41,10 @@ class QFESPIMB040OpticsSetupBase: public QWidget {
         enum specialBrightfieldSources {
             BrightfieldTransmission=0,
             BrightfieldEpi=1
+        };
+
+        enum specialFilterChangers {
+            FilterChangerDetection=0
         };
 
         struct measuredValues {
@@ -136,6 +140,7 @@ class QFESPIMB040OpticsSetupBase: public QWidget {
         virtual bool isStageConnected(int stage) const=0;
         /** \brief get the axis number of x-axis stage inside its class */
         virtual int getStageAxis(int stage)=0;
+        virtual QString getStageName(int stage) const=0;
 
 
 
@@ -151,17 +156,29 @@ class QFESPIMB040OpticsSetupBase: public QWidget {
 
 
 
-        virtual QFExtensionFilterChanger* getFilterChangerDetection() const=0;
-        virtual int getFilterChangerDetectionID() const=0;
+        virtual QFExtensionFilterChanger* getFilterChanger(int changer) const=0;
+        virtual int getFilterChangerID(int changer) const=0;
+        /*! returns the number of available filter changers */
+        virtual int getFilterChangerCount() const=0;
+        virtual QString getFilterChangerName(int changer) const=0;
 
         virtual QFExtensionLightSource* getLaser(int laser)=0;
         virtual QFExtensionLightSource* getBrightfieldLightSource(int source)=0;
         virtual int getLaserID(int laser)=0;
         virtual int getBrightfieldLightSourceID(int source)=0;
+        /*! returns the number of available lasers */
+        virtual int getLaserCount() const=0;
+        /*! returns the number of available brightfield light sources */
+        virtual int getBrightfieldLightSourceCount() const=0;
+        virtual QString getLaserName(int laser) const=0;
+        virtual QString getBrightfieldLightSourceName(int lightsource) const=0;
+
 
         virtual QString getAxisNameForStage(QFExtensionLinearStage* stage, int axis)=0;
 
         virtual bool isStageConnected(QFExtensionLinearStage* stage, int id, bool& found)=0;
+        /*! returns the number of available stages */
+        virtual int getStageCount() const=0;
 
         virtual QFCameraComboBox* cameraComboBox(int camera) const=0;
 
@@ -170,8 +187,9 @@ class QFESPIMB040OpticsSetupBase: public QWidget {
 
 
         /** \brief set main illumination shutter state */
-        virtual void setShutter(Shutters shutter, bool opened, bool blocking=false)=0;
-
+        virtual void setShutter(int shutter, bool opened, bool blocking=false)=0;
+        /*! returns the number of available shutters */
+        virtual int getShutterCount() const=0;
 
         /** \brief set main illumination shutter state */
         virtual bool setMainIlluminationShutter(bool opened, bool blocking=false)=0;

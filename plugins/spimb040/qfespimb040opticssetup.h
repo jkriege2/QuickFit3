@@ -129,18 +129,29 @@ class QFESPIMB040OpticsSetup : public QFESPIMB040OpticsSetupBase {
         virtual bool isStageConnected(int stage) const;
         /** \brief get the axis number of x-axis stage inside its class */
         virtual int getStageAxis(int stage);
+        virtual QString getStageName(int stage) const;
+        QString getAxisNameForStage(QFExtensionLinearStage* stage, int axis);
+        /*! returns the number of available stages */
+        virtual int getStageCount() const;
 
 
+        virtual QFExtensionFilterChanger* getFilterChanger(int changer) const;
+        virtual int getFilterChangerID(int changer) const;
+        virtual QString getFilterChangerName(int changer) const;
+        /*! returns the number of available filter changers */
+        virtual int getFilterChangerCount() const;
 
-        QFExtensionFilterChanger* getFilterChangerDetection() const;
-        int getFilterChangerDetectionID() const;
 
         QFExtensionLightSource* getLaser(int laser);
         QFExtensionLightSource* getBrightfieldLightSource(int source);
         int getLaserID(int laser);
         int getBrightfieldLightSourceID(int source);
-
-        QString getAxisNameForStage(QFExtensionLinearStage* stage, int axis);
+        /*! returns the number of available lasers */
+        virtual int getLaserCount() const;
+        /*! returns the number of available brightfield light sources */
+        virtual int getBrightfieldLightSourceCount() const;
+        virtual QString getLaserName(int laser) const;
+        virtual QString getBrightfieldLightSourceName(int lightsource) const;
 
         bool isStageConnected(QFExtensionLinearStage* stage, int id, bool& found);
 
@@ -152,8 +163,9 @@ class QFESPIMB040OpticsSetup : public QFESPIMB040OpticsSetupBase {
 
 
         /** \brief set main illumination shutter state */
-        void setShutter(Shutters shutter, bool opened, bool blocking=false);
-
+        void setShutter(int shutter, bool opened, bool blocking=false);
+        /*! returns the number of available shutters */
+        virtual int getShutterCount() const;
 
         /** \brief set main illumination shutter state */
         bool setMainIlluminationShutter(bool opened, bool blocking=false);

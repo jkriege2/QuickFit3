@@ -69,7 +69,7 @@ class QFESPIMB040ScriptedAcquisitionInstrumentControl : public QObject, public Q
 
     public slots:
         void setLaserIntensity(int laser, int line, double intensity);
-        void setTransmissionIntensity(int line, double intensity);
+        void setBrightfieldIntensity(int lightsource, int line, double intensity);
         void setShutter(const QString& shutter, bool state);
         void moveStageRel(const QString& stage, double delta);
         void moveStageAbs(const QString& stage, double new_position);
