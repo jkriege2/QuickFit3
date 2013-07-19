@@ -23,6 +23,11 @@ QFFitMultiQFFitFunctionFunctor::~QFFitMultiQFFitFunctionFunctor()
 void QFFitMultiQFFitFunctionFunctor::addTerm(QFFitFunction *model, const double *currentParams, const bool *fixParams, const double *dataX, const double *dataY, const double *dataWeight, uint64_t M, const double *paramsMin, const double *paramsMax)
 {
     subFunctorData sfd;
+
+    //qDebug()<<"QFFitMultiQFFitFunctionFunctor::addTerm():";
+    //qDebug()<<"   dataX="<<arrayToString(dataX, M);
+    //qDebug()<<"   dataY="<<arrayToString(dataY, M);
+
     sfd.f=new QFFitAlgorithm::FitQFFitFunctionFunctor(model, currentParams, fixParams, dataX, dataY, dataWeight, M);
     sfd.mapToLocal=(int*)calloc(sfd.f->get_paramcount(), sizeof(int));
     sfd.modelParams=duplicateArray(currentParams, model->paramCount());
@@ -53,6 +58,7 @@ void QFFitMultiQFFitFunctionFunctor::evaluate(double *evalout, const double *par
 
         outCnt+=subFunctors[i].f->get_evalout();
     }
+    //if (m_evalout!=outCnt) qDebug()<<"QFFitMultiQFFitFunctionFunctor::evaluate:   m_evalout="<<m_evalout<<"   outCnt="<<outCnt;
 }
 
 void QFFitMultiQFFitFunctionFunctor::evaluateJacobian(double *evalout, const double *params) {
@@ -439,8 +445,14 @@ void QFGlobalFitTool::evalueCHi2Landscape(double *chi2Landscape, int paramXFile,
             functor->evaluate(d, params);
 
             double chi2=0;
+            //qDebug()<<"---------------------------------------------------------------------------";
+            //qDebug()<<"-- x,y = "<<x<<y;
+            //qDebug()<<"-- x,y = "<<paramXValues[x]<<paramYValues[y];
+            //qDebug()<<"-- evalout_count = "<<functor->get_evalout();
+            //qDebug()<<"---------------------------------------------------------------------------";
             for (int i=0; i<functor->get_evalout(); i++)  {
                 chi2=chi2+qfSqr(d[i]);
+                //qDebug()<<d[i]<<qfSqr(d[i])<<chi2;
             }
             chi2Landscape[idx]=chi2;
 

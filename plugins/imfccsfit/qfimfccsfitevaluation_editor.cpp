@@ -756,8 +756,8 @@ void QFImFCCSFitEvaluationEditor::displayData() {
             if (data && tau) {
                 size_t c_tau=ds->addCopiedColumn(tau, N, tr("file%1: tau [s]").arg(file+1));
                 size_t c_data=ds->addCopiedColumn(data, N, tr("file%1: g(tau)").arg(file+1));
-                size_t c_error=0;
-                if (sigma) c_error=ds->addCopiedColumn(sigma, N, tr("file%1: errors").arg(file+1));
+                int c_error=-1;
+                if (sigma && eval->getFitDataWeighting()!=QFFCSWeightingTools::EqualWeighting) c_error=ds->addCopiedColumn(sigma, N, tr("file%1: errors").arg(file+1));
                 //qDebug()<<c_tau<<c_data<<c_error;
                 JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(ui->pltData->get_plotter());
                 QString plotname=QString("\\verb{")+rec->getName()+QString(": ")+fcs->getCorrelationRunName(eval->getCurrentIndex())+QString("}");
@@ -765,8 +765,7 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 g->set_xColumn(c_tau);
                 g->set_yColumn(c_data);
                 g->set_xErrorColumn(-1);
-                if (sigma) g->set_yErrorColumn(c_error);
-                else g->set_yErrorColumn(-1);
+                g->set_yErrorColumn(c_error);
                 g->set_color(cols.value(file, g->get_color()));
                 g->set_fillColor(g->get_color().lighter());
                 QColor ec=g->get_color().lighter();

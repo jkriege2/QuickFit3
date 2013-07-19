@@ -106,7 +106,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *rec
         }
     }
     if (!weightsOK && weights) {
-        for (int i=0; i<N; i++) weights[i]=1.0/N;
+        for (int i=0; i<N; i++) weights[i]=1.0;
         if (weighting==QFFCSWeightingTools::EqualWeighting) weightsOK=true;
     }
     //qDebug()<<"allocWeights weightsOK="<<weightsOK<<weights;
