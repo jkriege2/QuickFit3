@@ -64,6 +64,8 @@ void QFRDRImagingFCSSimulator::writeSettings() const {
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/brightnessR", ui->spinBrigthnessR->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/background", ui->spinBackground->value());
     ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/backgroundNoise", ui->spinBackgroundNoise->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/deltax", ui->spinDeltaX->value());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSSimulator/deltay", ui->spinDeltaY->value());
 }
 
 void QFRDRImagingFCSSimulator::readSettings()
@@ -91,6 +93,8 @@ void QFRDRImagingFCSSimulator::readSettings()
     ui->spinBrigthnessR->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/brightnessR", 20).toDouble());
     ui->spinBackground->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/background", 100).toDouble());
     ui->spinBackgroundNoise->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/backgroundNoise", 2).toDouble());
+    ui->spinDeltaX->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/deltax", 0).toDouble());
+    ui->spinDeltaY->setValue(ProgramOptions::getConfigValue("QFRDRImagingFCSSimulator/deltay", 0).toDouble());
 }
 
 void QFRDRImagingFCSSimulator::on_btnRun_clicked()
@@ -119,6 +123,8 @@ void QFRDRImagingFCSSimulator::on_btnRun_clicked()
         sim->set_DRG(ui->spinDRG->value());
         sim->set_VX(ui->spinVX->value());
         sim->set_VY(ui->spinVY->value());
+        sim->set_deltax(ui->spinDeltaX->value());
+        sim->set_deltay(ui->spinDeltaY->value());
         sim->set_brightnessG(ui->spinBrightnessG->value());
         sim->set_brightnessR(ui->spinBrigthnessR->value());
         sim->set_background(ui->spinBackground->value());

@@ -35,6 +35,7 @@ QFRDRImagingFCSSimulationThread::QFRDRImagingFCSSimulationThread(QObject *parent
     backgroundNoise=2;
     crosstalk=5.0/100.0;
     warmup=10000;
+    deltax=deltay=0;
 
 }
 
@@ -100,6 +101,8 @@ void QFRDRImagingFCSSimulationThread::run()
     config.setValue("simulation/DG", DG);
     config.setValue("simulation/DR", DR);
     config.setValue("simulation/DRG", DRG);
+    config.setValue("simulation/DeltaX", deltax);
+    config.setValue("simulation/DeltaY", deltay);
     config.setValue("simulation/VX", VX);
     config.setValue("simulation/VY", VY);
     config.setValue("simulation/walkersG", walkersG);
@@ -178,15 +181,15 @@ void QFRDRImagingFCSSimulationThread::run()
                     for (int i=0; i<wr.size(); i++) {
                         for (int y=0; y<height; y++) {
                             for (int x=0; x<width; x++) {
-                                frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wr[i].x-double(x)*pixel_size)+sqr(wr[i].y-double(y)*pixel_size))/sqr(psf_size_r));
+                                frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wr[i].x-double(x)*pixel_size-deltax)+sqr(wr[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_r));
                             }
                         }
                     }
                     for (int i=0; i<wrg.size(); i++) {
                         for (int y=0; y<height; y++) {
                             for (int x=0; x<width; x++) {
-                                frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wrg[i].x-double(x)*pixel_size)+sqr(wrg[i].y-double(y)*pixel_size))/sqr(psf_size_r));
-                                frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG*exp(-2.0*(sqr(wrg[i].x-double(x)*pixel_size)+sqr(wrg[i].y-double(y)*pixel_size))/sqr(psf_size_g));
+                                frame[y*realwidth+x+width]=frame[y*realwidth+x+width]+brightnessR*exp(-2.0*(sqr(wrg[i].x-double(x)*pixel_size-deltax)+sqr(wrg[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_r));
+                                frame[y*realwidth+x]=frame[y*realwidth+x]+brightnessG*exp(-2.0*(sqr(wrg[i].x-double(x)*pixel_size-deltax)+sqr(wrg[i].y-double(y)*pixel_size-deltay))/sqr(psf_size_g));
                             }
                         }
                     }
