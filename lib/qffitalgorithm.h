@@ -213,7 +213,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 */
                 IRLSFunctorAdaptor(FitFunctionFunctor* functor, double irls_parameter=1.1) ;
 
-                virtual ~IRLSFunctorAdaptor() {};
+                virtual ~IRLSFunctorAdaptor() ;
 
 
                 /*! \brief function that evaluates the arbitrary function

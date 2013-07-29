@@ -515,7 +515,7 @@ const double * QFFitAlgorithm::FitFunctionFunctor::getDataY() const
 
 const double * QFFitAlgorithm::FitFunctionFunctor::getDataWeight() const
 {
-    return m_dataWeight
+    return m_dataWeight;
 }
 
 uint64_t QFFitAlgorithm::FitFunctionFunctor::getDataPoints() const
