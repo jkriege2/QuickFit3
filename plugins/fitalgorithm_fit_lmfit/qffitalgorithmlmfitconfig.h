@@ -15,10 +15,11 @@ class QFFitAlgorithmLMFitConfigDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit QFFitAlgorithmLMFitConfigDialog(QWidget *parent = 0);
+    explicit QFFitAlgorithmLMFitConfigDialog(QWidget *parent = 0, bool IRLS=false);
     ~QFFitAlgorithmLMFitConfigDialog();
 
     void init(double ftol, double xtol, double gtol, double epsilon, double stepbound, int max_iterations);
+    void init(double ftol, double xtol, double gtol, double epsilon, double stepbound, int max_iterations, double irls_parameter, int irls_iterations);
 
     double ftol() const;
     double xtol() const;
@@ -26,7 +27,8 @@ public:
     double epsilon() const;
     double stepbound() const;
     int max_iterations() const;
-
+    int irls_iterations() const;
+    double irls_parameter() const;
 private:
     Ui::QFFitAlgorithmLMFitConfigDialog *ui;
 };

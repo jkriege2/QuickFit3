@@ -148,13 +148,9 @@ QString  QFFitAlgorithm::FitResult::getAsString(QString resultName) {
 
 
 QFFitAlgorithm::FitQFFitFunctionFunctor::FitQFFitFunctionFunctor(QFFitFunction* model, const double* currentParams, const bool* fixParams, const double* dataX, const double* dataY, const double* dataWeight, uint64_t M):
-    QFFitAlgorithm::Functor(M)
+    QFFitAlgorithm::FitFunctionFunctor(dataX, dataY, dataWeight,M)
 {
     m_model=model;
-    m_dataX=dataX;
-    m_dataY=dataY;
-    m_dataWeight=dataWeight;
-    m_M=M;
     m_N=model->paramCount();
     functorFromModel=NULL;
     modelFromFunctor=NULL;
@@ -494,5 +490,108 @@ void QFFitAlgorithm::FitQFOptimizeFunctionFunctor::evaluateJacobian(double* eval
     m_model->evaluateJacobian(evalout, m_modelParams);
 }
 
+QFFitAlgorithm::FitFunctionFunctor::FitFunctionFunctor(const double *dataX, const double *dataY, const double *dataWeight, uint64_t M):
+    QFFitAlgorithm::Functor(M)
+{
+    m_dataX=dataX;
+    m_dataY=dataY;
+    m_dataWeight=dataWeight;
+    m_M=M;
+}
+
+QFFitAlgorithm::FitFunctionFunctor::~FitFunctionFunctor()
+{
+}
+
+const double * QFFitAlgorithm::FitFunctionFunctor::getDataX() const
+{
+    return m_dataX;
+}
+
+const double * QFFitAlgorithm::FitFunctionFunctor::getDataY() const
+{
+    return m_dataY;
+}
+
+const double * QFFitAlgorithm::FitFunctionFunctor::getDataWeight() const
+{
+    return m_dataWeight
+}
+
+uint64_t QFFitAlgorithm::FitFunctionFunctor::getDataPoints() const
+{
+    return m_M;
+}
+
+void QFFitAlgorithm::FitFunctionFunctor::setDataX(const double *data)
+{
+    m_dataX=data;
+}
+
+void QFFitAlgorithm::FitFunctionFunctor::setDataY(const double *data)
+{
+    m_dataY=data;
+}
+
+void QFFitAlgorithm::FitFunctionFunctor::setDataWeight(const double *data)
+{
+    m_dataWeight=data;
+}
+
+QFFitAlgorithm::IRLSFunctorAdaptor::IRLSFunctorAdaptor(QFFitAlgorithm::FitFunctionFunctor *functor, double irls_parameter):
+    Functor(functor->get_evalout())
+{
+    this->irls_parameter=irls_parameter;
+    this->irls_functor=functor;
+    const uint64_t N=functor->getDataPoints();
+    irls_weights=(double*)malloc(N*sizeof(double));
+    for (uint64_t i=0; i<N; i++) {
+        irls_weights[i]=1.0/double(N);
+    }
+    oldWeights=irls_functor->getDataWeight();
+    irls_functor->setDataWeight(irls_weights);
+
+}
+
+QFFitAlgorithm::IRLSFunctorAdaptor::~IRLSFunctorAdaptor() {
+    irls_functor->setDataWeight(oldWeights);
+    free(irls_weights);
+}
+
+void QFFitAlgorithm::IRLSFunctorAdaptor::evaluate(double *evalout, const double *params)
+{
+    irls_functor->evaluate(evalout, params);
+}
+
+void QFFitAlgorithm::IRLSFunctorAdaptor::evaluateJacobian(double *evalout, const double *params)
+{
+    irls_functor->evaluateJacobian(evalout, params);
+}
+
+int QFFitAlgorithm::IRLSFunctorAdaptor::get_paramcount() const {
+    return irls_functor->get_paramcount();
+}
+
+bool QFFitAlgorithm::IRLSFunctorAdaptor::get_implementsJacobian() const {
+    return irls_functor->get_implementsJacobian();
+}
+
+void QFFitAlgorithm::IRLSFunctorAdaptor::irlsReweight(const double *params)
+{
+    double* err=(double*)malloc(irls_functor->get_evalout()*sizeof(double));
+
+    if (irls_functor->get_evalout()>=irls_functor->getDataPoints()) {
+        // calculate error vector (f(xi,p)-yi)/sigmai
+        irls_functor->evaluate(err, params);
+        for (int i=0; i<irls_functor->get_evalout(); i++) {
+            // calculate unweighted error f(xi,p)-yi
+            err[i]=err[i]*irls_weights[i];
+            // calculate new weight
+            irls_weights[i]=pow(fabs(err[i]), (irls_parameter-2.0)/2.0);
+        }
+    }
+
+    free(err);
+}
 
 

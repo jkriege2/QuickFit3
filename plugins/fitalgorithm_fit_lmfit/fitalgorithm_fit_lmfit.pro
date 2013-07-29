@@ -13,11 +13,13 @@ include(../../libquickfitwidgets.pri)
 # Input
 HEADERS += qfpfitalgorithmlmfit.h \
 		   qffitalgorithmlmfit.h \ 
-    qffitalgorithmlmfitconfig.h
+    qffitalgorithmlmfitconfig.h \
+    qffitalgorithmlmfitirls.h
 
 SOURCES += qfpfitalgorithmlmfit.cpp \
 		   qffitalgorithmlmfit.cpp \
-    qffitalgorithmlmfitconfig.cpp
+    qffitalgorithmlmfitconfig.cpp \
+    qffitalgorithmlmfitirls.cpp
 
 FORMS += \
     qffitalgorithmlmfitconfig.ui
@@ -40,3 +42,5 @@ SRC_DISTRIBUTED.files = $$HEADERS \
 
 QT += gui xml svg
 CONFIG += exceptions rtti stl
+
+

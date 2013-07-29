@@ -132,6 +132,131 @@ class QFLIB_EXPORT QFFitAlgorithm {
         };
 
 
+        /*! \brief base class for QFFitAlgorthm::Functor classes that let the user fit a dataset \f$(x_i,y_i,\sigma_i)\f$ to a 1D-function
+
+                \f[ g_m(\vec{p})=\frac{y_m-f(x_m; m(\vec{p}))}{\sigma_m} \f]
+
+            This class does not assume anything about the function \f$f(\cdot)\f$. it's implementatoin
+            is left to child classes of this virtual class (see e.g. QFFitAlgorithm::FitQFFitFunctionFunctor ).
+        */
+        class QFLIB_EXPORT FitFunctionFunctor: public Functor {
+            public:
+                /*! \brief constructor, initializes the functor
+                    \param dataX the x-values data vector \f$ x_m \f$
+                    \param dataY the y-values data vector \f$ y_m \f$
+                    \param dataWeights the weight vector \f$ \sigma_m \f$
+                    \param M number of datapoints
+                */
+                FitFunctionFunctor(const double* dataX, const double* dataY, const double* dataWeight, uint64_t M) ;
+
+                virtual ~FitFunctionFunctor();
+
+                const double* getDataX() const;
+                const double* getDataY() const;
+                const double* getDataWeight() const;
+                uint64_t getDataPoints() const;
+
+                void setDataX(const double* data);
+                void setDataY(const double* data);
+                void setDataWeight(const double* data);
+
+            protected:
+
+                /** \brief the x-values data vector \f$ x_m \f$ */
+                const double* m_dataX;
+                /** \brief the y-values data vector \f$ y_m \f$ */
+                const double* m_dataY;
+                /** \brief the weight vector \f$ \sigma_m \f$ */
+                const double* m_dataWeight;
+                /** \brief number of datapoints      */
+                uint64_t m_M;
+        };
+
+
+
+
+        /*! \brief adaptor class that uses a FitFunctionFunctor to implement iteratively reweighted least squares
+
+            \note The constructor will overwrite the data weights of the functor, given as a parameter. The destructor will
+                  reset them to the original values, so make sure that the given functor exists throughout the lifetime of
+                  any coupled IRLSFunctorAdaptor object!
+
+            This adaptor creates an internal vector of weightes, that it will use to overwrite any weights given to the
+            functor implementing the actual fit problem. Initially all datapoints have the same weight, but they will get
+            reweighted according to the IRLS algorithm on every call of the method irlsReweight(). The algorithm works
+            like this:
+
+
+            This is a simple form of the IRLS algorithm to estimate the parameters \f$\vec{p}\f$ in an arbitrary 1D fit model \f$ f(x;\vec{p}) \f$.
+            This algorithm solves the optimization problem for a \f$ L_p\f$-norm:
+              \f[ \vec{p}^\ast=\argmin\limits_{\vec{p}}\sum\limits_i|f(x_i;\vec{p})-y_i|^p \f]
+            by iteratively optimization weights \f$ \vec{w} \f$ and solving a weighted least squares problem in each iteration:
+              \f[ \vec{p}=\argmin\limits_{\vec{p}}\sum\limits_i|f(x_i;\vec{p})-y_i|^{(p-2)}\cdot|f(x_i;\vec{p})-y_i|^2 \f]
+
+
+            The algoruithms works as follows:
+              - calculate initial \f$ \vec{p}_0\f$ with an unweighted fit
+              - perform a number of iterations (parameter \a iterations ). In each iteration \f$ n\f$:
+                  - calculate the error vector \f$\vec{e}\f$: \f[ e_i = f(x_i;\vec{p}) -y_i \f]
+                  - estimate new weights \f$\vec{w}\f$: \[ w_i=|e_i|^{(p-2)/2} \]
+                  - calculate new estimates \f$ \vec{p}_n \f$ with a weighted least-squares fit, from \f$ \vec{x}\f$ and \f$ \vec{y}\f$ and \f$ \vec{w}\f$
+                .
+              - return the last estimates \f$ \vec{p}_n\f$
+            .
+
+            \see C. Sidney Burrus: "Iterative Reweighted Least Squares", <a href="http://cnx.org/content/m45285/latest/">http://cnx.org/content/m45285/latest/</a>
+
+        */
+        class QFLIB_EXPORT IRLSFunctorAdaptor: public Functor {
+            public:
+                /*! \brief constructor, initializes the functor
+                */
+                IRLSFunctorAdaptor(FitFunctionFunctor* functor, double irls_parameter=1.1) ;
+
+                virtual ~IRLSFunctorAdaptor() {};
+
+
+                /*! \brief function that evaluates the arbitrary function
+
+                    \param[out] evalout with size get_evalout()
+                    \param params parameter vector with size get_paramcount()
+                 */
+                virtual void evaluate(double* evalout, const double* params);
+
+                /*! \brief function that evaluates the arbitrary function
+
+                    \param[out] evalout with size get_evalout()*get_paramcount() in the order
+                                \f$ \left[ \frac{\partial f_1}{\partial p_1}, \frac{\partial f_1}{\partial p_2}, ..., \frac{\partial f_1}{\partial p_N}, \frac{\partial f_2}{\partial p_1}, \frac{\partial f_2}{\partial p_2}, ..., \frac{\partial f_2}{\partial p_N}, ..., \frac{\partial f_M}{\partial p_N} \right] \f$
+                    \param params parameter vector with size get_paramcount()
+
+                    \note This is only implemented if get_implementsJacobian() returns true
+                 */
+                virtual void evaluateJacobian(double* evalout, const double* params);
+
+                /** \brief return the number of parameters \f$ N \f$ */
+                virtual int get_paramcount() const;
+
+                /** \brief return \c true if the jacobian is implemented */
+                virtual bool get_implementsJacobian() const;
+
+
+
+                void irlsReweight(const double* params);
+
+            protected:
+
+                /** \brief IRLS parameter */
+                double irls_parameter;
+
+                /** \brief functor used to evaluate the fit problem */
+                FitFunctionFunctor* irls_functor;
+
+                double* irls_weights;
+
+                const double* oldWeights;
+        };
+
+
         /*! \brief this is a special functor which is used for data fitting to objective functions declared by QFFitFunction
 
             The QFFitFunction declares a 1D function \f$ f(x; \vec{p}), \vec{p}\in\mathbb{R}^N \f$ . This functor is provided with a set of data \f$ (x_m, y_m, \sigma_m), m=1..M \f$
@@ -149,7 +274,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
             \image html FitQFFunctionFunctor.png
             \image latex FitQFFunctionFunctor.png
         */
-        class QFLIB_EXPORT FitQFFitFunctionFunctor: public Functor {
+        class QFLIB_EXPORT FitQFFitFunctionFunctor: public FitFunctionFunctor {
             public:
                 /*! \brief constructor, initializes the functor
                     \param model QFFitFunction object used to evaluate \f$ f(x; \vec{p}) \f$
@@ -209,14 +334,6 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
                 /** \brief  QFFitFunction object used to evaluate \f$ f(x; \vec{p}) \f$ */
                 QFFitFunction* m_model;
-                /** \brief the x-values data vector \f$ x_m \f$ */
-                const double* m_dataX;
-                /** \brief the y-values data vector \f$ y_m \f$ */
-                const double* m_dataY;
-                /** \brief the weight vector \f$ \sigma_m \f$ */
-                const double* m_dataWeight;
-                /** \brief number of datapoints      */
-                uint64_t m_M;
                 /** \brief number of parameters in m_model */
                 int m_N;
                 /** \brief number of real (non-fixed) parameters, \c m_paramCount<=m_N */
