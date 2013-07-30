@@ -178,12 +178,35 @@ ALV_TOKEN ALV_getToken(FILE* alv_file, bool readingHeader) {
             ch=fgetc(alv_file);
             if (ferror(alv_file)) throw alv_exception(format("error during file access operation:\n  %s", strerror(errno)));
         }
+        // find special cases -1.#IND, -1.#INF
+        if (ch=='#') {
+            while((!feof(alv_file)) && ((ch=='#')||(ch=='I')||(ch=='i')||(ch=='N')||(ch=='n')||(ch=='F')||(ch=='f')||(ch=='D')||(ch=='d'))) {
+                t.value+=ch;
+                ch=fgetc(alv_file);
+                if (ferror(alv_file)) throw alv_exception(format("error during file access operation:\n  %s", strerror(errno)));
+            }
+        }
+        if (ch=='i'||ch=='I'||ch=='n'||ch=='N') {
+            while((!feof(alv_file)) &&            ((ch=='I')||(ch=='i')||(ch=='N')||(ch=='n')||(ch=='F')||(ch=='f')||(ch=='D')||(ch=='d'))) {
+                t.value+=ch;
+                ch=fgetc(alv_file);
+                if (ferror(alv_file)) throw alv_exception(format("error during file access operation:\n  %s", strerror(errno)));
+            }
+        }
         ungetc(ch, alv_file);
+
+
         if (ferror(alv_file)) throw alv_exception(format("error during file access operation:\n  %s", strerror(errno)));
         t.value=t.value.trimmed();
-        QLocale c(QLocale::C);
-        c.setNumberOptions(QLocale::OmitGroupSeparator);
-        t.doubleValue=c.toDouble(t.value);
+        if (t.value.toLower().endsWith("inf")) {
+            t.doubleValue=1.0/0.0;
+        } else if (t.value.toLower().endsWith("nan")||t.value.toLower().endsWith("ind")) {
+            t.doubleValue=NAN;
+        } else {
+            QLocale c(QLocale::C);
+            c.setNumberOptions(QLocale::OmitGroupSeparator);
+            t.doubleValue=c.toDouble(t.value);
+        }
         return t;
     }
     if (isalpha(ch)) {
