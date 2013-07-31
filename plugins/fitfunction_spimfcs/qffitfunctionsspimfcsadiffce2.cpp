@@ -14,10 +14,10 @@ QFFitFunctionsSPIMFCSADiffCE2::QFFitFunctionsSPIMFCSADiffCE2() {
 
 
 
-    //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
+    //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialFix, initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(IntCombo,     "n_components",            "number of diffusing components",                        "components",               "",            "",                      false,     true,         false,             QFFitFunction::NoError,      false, 1,            1,        3,        1,   1,      2);
     #define SPIMFCSADIFF_n_components QFPPM_COUNT_START
-    addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
     #define SPIMFCSADIFF_concentration QFPPM_INC(QFPPM_COUNT_START)
     addParameter(FloatNumber,  "diff_rho1",               "fraction of first component",                           "&rho;<sub>1</sub>",        "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1);
     #define SPIMFCSADIFF_diff_rho1 QFPPM_INC(SPIMFCSADIFF_concentration)

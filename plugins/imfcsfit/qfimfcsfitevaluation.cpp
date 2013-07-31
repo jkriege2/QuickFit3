@@ -352,9 +352,11 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                     ffunc->sortParameter(params, errors, paramsFix);
                     ffunc->calcParameter(params, errors);
 
+                    bool has_g0=false;
                     for (int i=0; i<ffunc->paramCount(); i++) {
                         if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
                             if (!oparams.isEmpty()) oparams=oparams+";  ";
+                            has_g0=has_g0||(ffunc->getDescription(i).id=="g0");
 
                             oparams=oparams+QString("%1 = %2+/-%3").arg(ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
                         }
@@ -391,8 +393,10 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                     QString egrouplabel=QString("#%4 \"%1\": %2, %3").arg(getName()).arg(falg->shortName()).arg(ffunc->shortName()).arg(getID());
 
 
-                    if (run<0) record->resultsSetNumber(evalID, "fitparam_g0", ffunc->evaluate(0, params));
-                    else record->resultsSetInNumberList(evalID, "fitparam_g0", run, ffunc->evaluate(0, params));
+                    if (!has_g0) {
+                        if (run<0) record->resultsSetNumber(evalID, "fitparam_g0", ffunc->evaluate(0, params));
+                        else record->resultsSetInNumberList(evalID, "fitparam_g0", run, ffunc->evaluate(0, params));
+                    }
                     record->resultsSetGroup(evalID, "fitparam_g0", tr("fit results"));
                     record->resultsSetLabel(evalID, "fitparam_g0", tr("g(0)"));
                     record->resultsSetSortPriority(evalID, "fitparam_g0", true);
@@ -870,9 +874,12 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
 
 
 
+
+                bool has_g0=false;
                 for (int i=0; i<ffunc->paramCount(); i++) {
                     if (ffunc->isParameterVisible(i, params)) {
                         QString pid=ffunc->getParameterID(i);
+                        has_g0=has_g0||(pid=="g0");
                         QString unit=ffunc->getDescription(pid).unit;
                         QString fpid=getFitParamID(pid);
                         QString ffid= getFitParamFixID(pid);
@@ -889,8 +896,10 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
                         record->resultsSetGroupLabelsAndSortPriority(evalID,ffid, tr("fit results"), ffunc->getDescription(pid).name+tr(", fix"), ffunc->getDescription(pid).label+tr(", fix"), true);
                     }
                 }
-                if (run<0) record->resultsSetNumber(evalID, "fitparam_g0", ffunc->evaluate(0, params));
-                else record->resultsSetInNumberListAndBool(evalID, "fitparam_g0", run, ffunc->evaluate(0, params), "", getParamNameLocalStore("fitparam_g0"), true);
+                if (!has_g0) {
+                    if (run<0) record->resultsSetNumber(evalID, "fitparam_g0", ffunc->evaluate(0, params));
+                    else record->resultsSetInNumberListAndBool(evalID, "fitparam_g0", run, ffunc->evaluate(0, params), "", getParamNameLocalStore("fitparam_g0"), true);
+                }
                 record->resultsSetGroupLabelsAndSortPriority(evalID, "fitparam_g0", tr("fit results"), tr("g(0)"), tr("g(0)"), true);
 
 
