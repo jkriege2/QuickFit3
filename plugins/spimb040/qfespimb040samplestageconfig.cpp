@@ -133,13 +133,15 @@ void QFESPIMB040SampleStageConfig::init(QFPluginLogService* log, QFPluginService
     updateStates();
 }
 
-void QFESPIMB040SampleStageConfig::loadSettings(QSettings& settings, QString prefix) {
+void QFESPIMB040SampleStageConfig::loadSettings(QSettings& settings, QString prefix, bool dontLoadDevices) {
     /*cmbStageX->setCurrentIndex(settings.value(prefix+"stage_x", 0).toInt());
     cmbStageY->setCurrentIndex(settings.value(prefix+"stage_y", 1).toInt());
     cmbStageZ->setCurrentIndex(settings.value(prefix+"stage_z", 2).toInt());*/
-    cmbStageX->loadSettings(settings, prefix+"stage_x/");
-    cmbStageY->loadSettings(settings, prefix+"stage_y/");
-    cmbStageZ->loadSettings(settings, prefix+"stage_z/");
+    if (!dontLoadDevices) {
+        cmbStageX->loadSettings(settings, prefix+"stage_x/");
+        cmbStageY->loadSettings(settings, prefix+"stage_y/");
+        cmbStageZ->loadSettings(settings, prefix+"stage_z/");
+    }
 
     spinJoystickMaxSpeed->setValue(settings.value(prefix+"joystick_max_speed", 500).toDouble());
     stageStateUpdateInterval=settings.value(prefix+"update_interval", stageStateUpdateInterval).toDouble();
@@ -150,7 +152,39 @@ void QFESPIMB040SampleStageConfig::loadSettings(QSettings& settings, QString pre
     //timerDisplayUpdate.setInterval(stageStateUpdateInterval);
 }
 
+void QFESPIMB040SampleStageConfig::loadSettings(QFManyFilesSettings &settings, QString prefix, bool dontLoadDevices)
+{
+    if (!dontLoadDevices) {
+        cmbStageX->loadSettings(settings, prefix+"stage_x/");
+        cmbStageY->loadSettings(settings, prefix+"stage_y/");
+        cmbStageZ->loadSettings(settings, prefix+"stage_z/");
+    }
+
+    spinJoystickMaxSpeed->setValue(settings.value(prefix+"joystick_max_speed", 500).toDouble());
+    stageStateUpdateInterval=settings.value(prefix+"update_interval", stageStateUpdateInterval).toDouble();
+    chkJoystick->setChecked(settings.value(prefix+"joystick_enabled", true).toBool());
+    m_stepX=settings.value(prefix+"step_x", m_stepX).toDouble();
+    m_stepY=settings.value(prefix+"step_y", m_stepY).toDouble();
+    m_stepZ=settings.value(prefix+"step_z", m_stepZ).toDouble();
+}
+
 void QFESPIMB040SampleStageConfig::storeSettings(QSettings& settings, QString prefix) {
+    /*settings.setValue(prefix+"stage_x", cmbStageX->currentIndex());
+    settings.setValue(prefix+"stage_y", cmbStageY->currentIndex());
+    settings.setValue(prefix+"stage_z", cmbStageZ->currentIndex());*/
+    cmbStageX->storeSettings(settings, prefix+"stage_x/");
+    cmbStageY->storeSettings(settings, prefix+"stage_y/");
+    cmbStageZ->storeSettings(settings, prefix+"stage_z/");
+    settings.setValue(prefix+"joystick_max_speed", spinJoystickMaxSpeed->value());
+    settings.setValue(prefix+"joystick_enabled", chkJoystick->isChecked());
+    settings.setValue(prefix+"update_interval", stageStateUpdateInterval);
+    settings.setValue(prefix+"step_x", m_stepX);
+    settings.setValue(prefix+"step_y", m_stepY);
+    settings.setValue(prefix+"step_z", m_stepZ);
+}
+
+void QFESPIMB040SampleStageConfig::storeSettings(QFManyFilesSettings &settings, QString prefix)
+{
     /*settings.setValue(prefix+"stage_x", cmbStageX->currentIndex());
     settings.setValue(prefix+"stage_y", cmbStageY->currentIndex());
     settings.setValue(prefix+"stage_z", cmbStageZ->currentIndex());*/

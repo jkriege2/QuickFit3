@@ -64,7 +64,20 @@ void QFLightSourceConfigWidget::loadSettings(QSettings &settings, QString prefix
 
 }
 
+void QFLightSourceConfigWidget::loadSettings(QFManyFilesSettings &settings, QString prefix)
+{
+    cmbLightSource->loadSettings(settings, prefix+"LightSource/");
+
+    stateUpdateInterval=settings.value(prefix+"update_interval", stateUpdateInterval).toDouble();
+}
+
 void QFLightSourceConfigWidget::saveSettings(QSettings &settings, QString prefix) {
+    cmbLightSource->storeSettings(settings, prefix+"LightSource/");
+    settings.setValue(prefix+"update_interval", stateUpdateInterval);
+}
+
+void QFLightSourceConfigWidget::saveSettings(QFManyFilesSettings &settings, QString prefix)
+{
     cmbLightSource->storeSettings(settings, prefix+"LightSource/");
     settings.setValue(prefix+"update_interval", stateUpdateInterval);
 }

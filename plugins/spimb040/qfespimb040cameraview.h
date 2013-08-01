@@ -29,8 +29,9 @@
 #include "qfcameraconfigcombobox.h"
 #include "qfespimb00histogrammaskdialog.h"
 #include "qfasttablelabel.h"
-#include "qrecentfilesmenu.h"
+#include "qfrecentfilesmenu.h"
 #include "qftools.h"
+#include "qfmanyfilessettings.h"
 
 class QFESPIMB040OpticsSetup; // forward
 
@@ -66,8 +67,10 @@ class QFESPIMB040CameraView : public QWidget {
         void init(int cameraID, QFCameraConfigComboBoxStartResume* stopresume, QFESPIMB040OpticsSetup* opticsSetup);
         /** \brief load settings */
         void loadSettings(QSettings&, QString prefix);
+        void loadSettings(QFManyFilesSettings& settings, QString prefix);
         /** \brief save settings */
         void storeSettings(QSettings&, QString prefix);
+        void storeSettings(QFManyFilesSettings& settings, QString prefix);
 
         /** \brief set size of pixels */
         void setPixelSize(double pixelWidth, double pixelHeight);
@@ -302,7 +305,7 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief action to activate/disactivate mask editing mode */
         QAction* actMaskEdit;
         /** \brief recent mask files menu */
-        QRecentFilesMenu* recentMaskFiles;
+        QFRecentFilesMenu* recentMaskFiles;
         /** \brief create a mask based on the current histogram */
         QAction* actMaskHisto;
         /** \brief action to clear mask */

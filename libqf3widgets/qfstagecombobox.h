@@ -7,7 +7,7 @@
 #include "qfextension.h"
 #include "libwid_imexport.h"
 #include "qenhancedcombobox.h"
-
+#include "qfmanyfilessettings.h"
 /*! \brief QComboBox which is filled with all available stages
     \ingroup qf3lib_widgets
 
@@ -23,8 +23,10 @@ class QFWIDLIB_EXPORT QFStageComboBox : public QEnhancedComboBox {
         virtual ~QFStageComboBox();
         /** \brief save the currently selected stage to a QSettings object */
         void storeSettings(QSettings& settings, QString prefix=QString("")) const;
+        void storeSettings(QFManyFilesSettings& settings, QString prefix=QString("")) const;
         /** \brief load the currently selected stage from a QSettings object */
         void loadSettings(QSettings& settings, QString prefix=QString(""));
+        void loadSettings(QFManyFilesSettings& settings, QString prefix=QString(""));
 
         /** \brief initialize the available stages from the given QFExtensionManager */
         void init(QFExtensionManager* extManager);

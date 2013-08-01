@@ -149,6 +149,17 @@ void QFFilterChangerComboBox::storeSettings(QSettings& settings, QString prefix)
     }
 }
 
+void QFFilterChangerComboBox::storeSettings(QFManyFilesSettings &settings, QString prefix) const
+{
+    if (currentExtension()) {
+        settings.setValue(prefix+"filterchanger_plugin_id", currentExtension()->getID());
+        settings.setValue(prefix+"filterchanger_id", currentFilterChangerID());
+    } else {
+        settings.setValue(prefix+"filterchanger_plugin_id", "");
+        settings.setValue(prefix+"filterchanger_id", -1);
+    }
+}
+
 void QFFilterChangerComboBox::loadSettings(QSettings& settings, QString prefix) {
    QString id=settings.value(prefix+"filterchanger_plugin_id", "").toString();
    int FilterChangerIdx=settings.value(prefix+"filterchanger_id", -1).toInt();
@@ -171,4 +182,28 @@ void QFFilterChangerComboBox::loadSettings(QSettings& settings, QString prefix) 
    }
    if (!ok) setCurrentIndex(0);
 
+}
+
+void QFFilterChangerComboBox::loadSettings(QFManyFilesSettings &settings, QString prefix)
+{
+    QString id=settings.value(prefix+"filterchanger_plugin_id", "").toString();
+    int FilterChangerIdx=settings.value(prefix+"filterchanger_id", -1).toInt();
+    setCurrentIndex(0);
+    bool ok=false;
+    QFExtension* extension=NULL;
+    QFExtensionFilterChanger* FilterChanger=NULL;
+    for (int i=0; i<count(); i++) {
+        QPoint p = itemData(i).toPoint();
+        int FilterChangerIdxC=p.y();
+        if ((p.x()>=0)&&(p.x()<FilterChangers.size())) {
+            extension=qobject_cast<QFExtension*>(FilterChangers[p.x()]);
+            FilterChanger=qobject_cast<QFExtensionFilterChanger*>(FilterChangers[p.x()]);
+            if (extension && extension->getID()==id && FilterChangerIdx==FilterChangerIdxC) {
+                ok=true;
+                setCurrentIndex(i);
+                break;
+            }
+        }
+    }
+    if (!ok) setCurrentIndex(0);
 }

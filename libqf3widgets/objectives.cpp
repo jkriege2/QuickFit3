@@ -257,7 +257,38 @@ void QF3ObjectiveCombobox::loadSettings(QSettings& settings, QString property) {
     }
 }
 
+void QF3ObjectiveCombobox::loadSettings(QFManyFilesSettings &settings, QString property)
+{
+    QString obj=settings.value(property+"/id", settings.value(property, "").toString()).toString();
+
+     if (obj.isEmpty()) cmbObjective->setCurrentIndex(0);
+     else {
+         int idx=cmbObjective->findText(obj);
+         if (idx<0) {
+             ObjectiveDescription d;
+             d.name=settings.value(property+"/name", "").toString();
+             d.manufacturer=settings.value(property+"/manufacturer", "").toString();
+             d.NA=settings.value(property+"/na", 1).toDouble();
+             d.magnification=settings.value(property+"/magnification", 1).toDouble();
+             objectives.append(d);
+             storeObjectives();
+             loadObjectives();
+         }
+         idx=cmbObjective->findText(obj);
+         cmbObjective->setCurrentIndex(idx);
+     }
+}
+
 void QF3ObjectiveCombobox::saveSettings(QSettings& settings, QString property) {
+    settings.setValue(property+"/id", cmbObjective->currentText());
+    settings.setValue(property+"/manufacturer", objective().manufacturer);
+    settings.setValue(property+"/name", objective().name);
+    settings.setValue(property+"/magnification", objective().magnification);
+    settings.setValue(property+"/na", objective().NA);
+}
+
+void QF3ObjectiveCombobox::saveSettings(QFManyFilesSettings &settings, QString property)
+{
     settings.setValue(property+"/id", cmbObjective->currentText());
     settings.setValue(property+"/manufacturer", objective().manufacturer);
     settings.setValue(property+"/name", objective().name);

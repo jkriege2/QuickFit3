@@ -72,7 +72,21 @@ void QFShutterConfigWidget::loadSettings(QSettings& settings, QString prefix) {
     updateStates();
 }
 
+void QFShutterConfigWidget::loadSettings(QFManyFilesSettings &settings, QString prefix)
+{
+    cmbShutter->loadSettings(settings, prefix+"shutter/");
+
+    shutterStateUpdateInterval=settings.value(prefix+"update_interval", shutterStateUpdateInterval).toDouble();
+    updateStates();
+}
+
 void QFShutterConfigWidget::saveSettings(QSettings& settings, QString prefix) {
+    cmbShutter->storeSettings(settings, prefix+"shutter/");
+    settings.setValue(prefix+"update_interval", shutterStateUpdateInterval);
+}
+
+void QFShutterConfigWidget::saveSettings(QFManyFilesSettings &settings, QString prefix)
+{
     cmbShutter->storeSettings(settings, prefix+"shutter/");
     settings.setValue(prefix+"update_interval", shutterStateUpdateInterval);
 }

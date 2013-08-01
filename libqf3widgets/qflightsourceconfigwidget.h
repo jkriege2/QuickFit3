@@ -39,7 +39,7 @@
 #include "libwid_imexport.h"
 #include "qflightsourceconfigwidgetthread.h"
 #include "qftools.h"
-
+#include "qfmanyfilessettings.h"
 
 
 /*! \brief QWidget with a set of controls that allow to control a LightSource
@@ -61,8 +61,10 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidget : public QFrame {
 
         /** \brief load settings */
         void loadSettings(QSettings& settings, QString prefix);
+        void loadSettings(QFManyFilesSettings& settings, QString prefix);
         /** \brief save settings */
         void saveSettings(QSettings& settings, QString prefix);
+        void saveSettings(QFManyFilesSettings& settings, QString prefix);
 
         /** \brief connect to all selected LightSources */
         void connectLightSource();

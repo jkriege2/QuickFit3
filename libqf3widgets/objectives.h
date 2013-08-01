@@ -15,6 +15,7 @@
 #include "libwid_imexport.h"
 #include "qenhancedcombobox.h"
 #include <QPointer>
+#include "qfmanyfilessettings.h"
 /*! \brief description of an objective
     \ingroup qf3lib_widgets
 
@@ -91,7 +92,9 @@ public:
 
     void setObjectivesINI(QString globalobjectives, QString localobjectives=QString(""));
     void loadSettings(QSettings& settings, QString property);
+    void loadSettings(QFManyFilesSettings& settings, QString property);
     void saveSettings(QSettings& settings, QString property);
+    void saveSettings(QFManyFilesSettings& settings, QString property);
 public slots:
     void loadObjectives();
     void storeObjectives();

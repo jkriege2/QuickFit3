@@ -154,6 +154,17 @@ void QFLightSourceComboBox::storeSettings(QSettings& settings, QString prefix) c
     }
 }
 
+void QFLightSourceComboBox::storeSettings(QFManyFilesSettings &settings, QString prefix) const
+{
+    if (currentExtension()) {
+        settings.setValue(prefix+"lightsource_plugin_id", currentExtension()->getID());
+        settings.setValue(prefix+"lightsource_id", currentLightSourceID());
+    } else {
+        settings.setValue(prefix+"lightsource_plugin_id", "");
+        settings.setValue(prefix+"lightsource_id", -1);
+    }
+}
+
 void QFLightSourceComboBox::loadSettings(QSettings& settings, QString prefix) {
    QString id=settings.value(prefix+"lightsource_plugin_id", "").toString();
    int LightSourceIdx=settings.value(prefix+"lightsource_id", -1).toInt();
@@ -177,3 +188,28 @@ void QFLightSourceComboBox::loadSettings(QSettings& settings, QString prefix) {
    if (!ok) setCurrentIndex(0);
 
 }
+
+void QFLightSourceComboBox::loadSettings(QFManyFilesSettings &settings, QString prefix)
+{
+    QString id=settings.value(prefix+"lightsource_plugin_id", "").toString();
+    int LightSourceIdx=settings.value(prefix+"lightsource_id", -1).toInt();
+    setCurrentIndex(0);
+    bool ok=false;
+    QFExtension* extension=NULL;
+    QFExtensionLightSource* LightSource=NULL;
+    for (int i=0; i<count(); i++) {
+        QPoint p = itemData(i).toPoint();
+        int LightSourceIdxC=p.y();
+        if ((p.x()>=0)&&(p.x()<LightSources.size())) {
+            extension=qobject_cast<QFExtension*>(LightSources[p.x()]);
+            LightSource=qobject_cast<QFExtensionLightSource*>(LightSources[p.x()]);
+            if (extension && extension->getID()==id && LightSourceIdx==LightSourceIdxC) {
+                ok=true;
+                setCurrentIndex(i);
+                break;
+            }
+        }
+    }
+    if (!ok) setCurrentIndex(0);
+}
+

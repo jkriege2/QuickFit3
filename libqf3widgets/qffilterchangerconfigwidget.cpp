@@ -106,7 +106,34 @@ void QFFilterChangerConfigWidget::loadSettings(QSettings& settings, QString pref
     updateFilters();
 }
 
+void QFFilterChangerConfigWidget::loadSettings(QFManyFilesSettings &settings, QString prefix)
+{
+    cmbFilterChanger->loadSettings(settings, prefix+"FilterChanger/");
+
+    FilterChangerStateUpdateInterval=settings.value(prefix+"update_interval", FilterChangerStateUpdateInterval).toDouble();
+
+    int fcnt=settings.value(prefix+"filter_count", 0).toInt();
+    for (int i=0; i<fcnt; i++) {
+        if (i<filters.size()) {
+            filters[i]=settings.value(prefix+"filter"+QString::number(i), "").toString();
+        } else {
+            filters.append(settings.value(prefix+"filter"+QString::number(i), "").toString());
+        }
+    }
+    updateFilters();
+}
+
 void QFFilterChangerConfigWidget::saveSettings(QSettings& settings, QString prefix) {
+    cmbFilterChanger->storeSettings(settings, prefix+"FilterChanger/");
+    settings.setValue(prefix+"update_interval", FilterChangerStateUpdateInterval);
+    settings.setValue(prefix+"filter_count", filters.size());
+    for (int i=0; i<filters.size(); i++) {
+        settings.setValue(prefix+"filter"+QString::number(i), filters[i]);
+    }
+}
+
+void QFFilterChangerConfigWidget::saveSettings(QFManyFilesSettings &settings, QString prefix)
+{
     cmbFilterChanger->storeSettings(settings, prefix+"FilterChanger/");
     settings.setValue(prefix+"update_interval", FilterChangerStateUpdateInterval);
     settings.setValue(prefix+"filter_count", filters.size());

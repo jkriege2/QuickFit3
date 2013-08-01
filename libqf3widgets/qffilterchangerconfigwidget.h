@@ -36,7 +36,7 @@
 #include "filters.h"
 #include "libwid_imexport.h"
 #include "qffilterchangerconfigwidgetthread.h"
-
+#include "qfmanyfilessettings.h"
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QWidget with a set of controls that allow to control a FilterChanger
     \ingroup qf3ext_spimb040
@@ -56,8 +56,10 @@ class QFWIDLIB_EXPORT QFFilterChangerConfigWidget : public QFrame {
 
         /** \brief load settings */
         void loadSettings(QSettings& settings, QString prefix);
+        void loadSettings(QFManyFilesSettings& settings, QString prefix);
         /** \brief save settings */
         void saveSettings(QSettings& settings, QString prefix);
+        void saveSettings(QFManyFilesSettings& settings, QString prefix);
 
         /** \brief connect to all selected FilterChangers */
         void connectFilterChanger();

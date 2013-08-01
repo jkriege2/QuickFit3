@@ -34,6 +34,7 @@ class QFESPIMB040MainWindow; // forward
 #include "qfextension.h"
 #include "tools.h"
 #include "qfstagecombobox.h"
+#include "qfmanyfilessettings.h"
 
 class QFESPIMB040SampleStageConfigThread; // forward
 
@@ -55,9 +56,11 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         void setLog(QFPluginLogService* log);
 
         /** \brief load settings */
-        void loadSettings(QSettings& settings, QString prefix);
+        void loadSettings(QSettings& settings, QString prefix, bool dontLoadDevices=false);
+        void loadSettings(QFManyFilesSettings& settings, QString prefix, bool dontLoadDevices=false);
         /** \brief save settings */
         void storeSettings(QSettings& settings, QString prefix);
+        void storeSettings(QFManyFilesSettings& settings, QString prefix);
 
         /** \brief connect to all selected stages */
         void connectStages();

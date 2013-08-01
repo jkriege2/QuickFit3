@@ -14,6 +14,8 @@
 #include <QMessageBox>
 #include "libwid_imexport.h"
 #include "qenhancedcombobox.h"
+#include "qfmanyfilessettings.h"
+#include <QFormLayout>
 
 /*! \brief description of a filter
     \ingroup qf3lib_widgets
@@ -81,17 +83,19 @@ public:
     ~QF3FilterCombobox();
 
     /** \brief return the current objective */
-    FilterDescription filter();
+    FilterDescription filter() const;
 
     /** brief return the i-th objective description */
-    FilterDescription getFilterDescription(int i);
+    FilterDescription getFilterDescription(int i) const;
 
-    bool filterExists(QString name);
+    bool filterExists(QString name) const;
 
     void setFilterINI(QString globalfilters, QString localfilters=QString(""));
 
     void loadSettings(QSettings& settings, QString property);
     void saveSettings(QSettings& settings, QString property);
+    void loadSettings(QFManyFilesSettings& settings, QString property);
+    void saveSettings(QFManyFilesSettings& settings, QString property);
 
     static QList<FilterDescription> getFilterList(QString globalfilters, QString localfilters=QString(""));
     static FilterDescription getFilter(QString filter, QString globalfilters, QString localfilters=QString(""));
@@ -122,5 +126,41 @@ protected:
     QHBoxLayout* hbl;
 
 };
+
+
+
+class QFWIDLIB_EXPORT QF3DualViewWidget : public QWidget {
+        Q_OBJECT
+    public:
+        QF3DualViewWidget(QWidget *parent = 0);
+        ~QF3DualViewWidget();
+
+        enum Orientation {
+            Horizontal =0,
+            Vertical=1
+        };
+
+        void loadSettings(QSettings& settings, QString property);
+        void saveSettings(QSettings& settings, QString property);
+        void loadSettings(QFManyFilesSettings& settings, QString property);
+        void saveSettings(QFManyFilesSettings& settings, QString property);
+        void setFilterINI(QString globalfilters, QString localfilters=QString(""));
+
+        QF3FilterCombobox* getSplitterCombobox() const;
+        QF3FilterCombobox* getShortCombobox() const;
+        QF3FilterCombobox* getLongCombobox() const;
+
+        FilterDescription filterSplitter() const;
+        FilterDescription filterShort() const;
+        FilterDescription filterLong() const;
+        Orientation orientation() const;
+    protected:
+        QComboBox* cmbDirection;
+        QF3FilterCombobox* fltSplitter;
+        QF3FilterCombobox* fltShort;
+        QF3FilterCombobox* fltLong;
+        QFormLayout* lay;
+};
+
 
 #endif // FILTERS_H

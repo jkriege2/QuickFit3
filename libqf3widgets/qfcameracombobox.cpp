@@ -156,6 +156,17 @@ void QFCameraComboBox::storeSettings(QSettings& settings, QString prefix) const 
     }
 }
 
+void QFCameraComboBox::storeSettings(QFManyFilesSettings &settings, QString prefix) const
+{
+    if (currentExtension()) {
+        settings.setValue(prefix+"camera_plugin_id", currentExtension()->getID());
+        settings.setValue(prefix+"camera_id", currentCameraID());
+    } else {
+        settings.setValue(prefix+"camera_plugin_id", "");
+        settings.setValue(prefix+"camera_id", -1);
+    }
+}
+
 void QFCameraComboBox::loadSettings(QSettings& settings, QString prefix) {
    QString id=settings.value(prefix+"camera_plugin_id", "").toString();
    int camIdx=settings.value(prefix+"camera_id", -1).toInt();
@@ -177,4 +188,27 @@ void QFCameraComboBox::loadSettings(QSettings& settings, QString prefix) {
    }
    if (!ok) setCurrentIndex(-1);
 
+}
+
+void QFCameraComboBox::loadSettings(QFManyFilesSettings &settings, QString prefix)
+{
+    QString id=settings.value(prefix+"camera_plugin_id", "").toString();
+    int camIdx=settings.value(prefix+"camera_id", -1).toInt();
+    bool ok=false;
+    QFExtension* extension=NULL;
+    QFExtensionCamera* cam=NULL;
+    for (int i=0; i<count(); i++) {
+        QPoint p = itemData(i).toPoint();
+        int camIdxC=p.y();
+        if ((p.x()>=0)&&(p.x()<cameras.size())) {
+            extension=qobject_cast<QFExtension*>(cameras[p.x()]);
+            cam=qobject_cast<QFExtensionCamera*>(cameras[p.x()]);
+            if (extension && extension->getID()==id && camIdx==camIdxC) {
+                ok=true;
+                setCurrentIndex(i);
+                break;
+            }
+        }
+    }
+    if (!ok) setCurrentIndex(-1);
 }

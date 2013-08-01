@@ -259,7 +259,7 @@ void QF3FilterCombobox::addFilter() {
     loadFilters();
 }
 
-FilterDescription QF3FilterCombobox::getFilterDescription(int i) {
+FilterDescription QF3FilterCombobox::getFilterDescription(int i) const {
     if (i>0 && i<=filters.size())
         return filters[i-1];
     FilterDescription o;
@@ -267,13 +267,13 @@ FilterDescription QF3FilterCombobox::getFilterDescription(int i) {
     return o;
 }
 
-FilterDescription QF3FilterCombobox::filter() {
+FilterDescription QF3FilterCombobox::filter() const {
     FilterDescription d;
     int i=cmbFilters->currentIndex()-1;
     if (i>=0 && i<filters.size()) return filters[i];
     return d;
 }
-bool QF3FilterCombobox::filterExists(QString name) {
+bool QF3FilterCombobox::filterExists(QString name) const {
     for (int i=0; i<filters.size(); i++) {
         if (name==filters[i].name) return true;
     }
@@ -289,8 +289,8 @@ void QF3FilterCombobox::loadSettings(QSettings& settings, QString property) {
         int idx=cmbFilters->findText(id);
         if (idx<0) {
             FilterDescription d;
-            d.manufacturer=settings.value(property+"/manufacturer", "").toString();
-            d.name=settings.value(property+"/name", "").toString();
+            d.manufacturer=settings.value(property+"/manufacturer", "???").toString();
+            d.name=settings.value(property+"/name", id).toString();
             d.type=settings.value(property+"/type", "").toString();
             filters.append(d);
             storeFilters();
@@ -306,6 +306,36 @@ void QF3FilterCombobox::saveSettings(QSettings& settings, QString property) {
     settings.setValue(property+"/manufacturer", filter().manufacturer);
     settings.setValue(property+"/name", filter().name);
     settings.setValue(property+"/type", filter().type);
+}
+
+void QF3FilterCombobox::loadSettings(QFManyFilesSettings &settings, QString property)
+{
+    QString id=settings.value(property+"/id", settings.value(property, "").toString()).toString();
+
+    if (id.isEmpty()) cmbFilters->setCurrentIndex(0);
+    else {
+        int idx=cmbFilters->findText(id);
+        if (idx<0) {
+            FilterDescription d;
+            d.manufacturer=settings.value(property+"/manufacturer", "???").toString();
+            d.name=settings.value(property+"/name", id).toString();
+            d.type=settings.value(property+"/type", "").toString();
+            filters.append(d);
+            storeFilters();
+            loadFilters();
+        }
+        idx=cmbFilters->findText(id);
+        cmbFilters->setCurrentIndex(idx);
+    }
+}
+
+void QF3FilterCombobox::saveSettings(QFManyFilesSettings &settings, QString property)
+{
+    settings.setValue(property+"/id", cmbFilters->currentText());
+    settings.setValue(property+"/manufacturer", filter().manufacturer);
+    settings.setValue(property+"/name", filter().name);
+    settings.setValue(property+"/type", filter().type);
+
 }
 
 
@@ -325,3 +355,101 @@ void QF3FilterCombobox::setCurrentFilter(const QString &name) {
         }
     }
 }
+
+QF3FilterCombobox *QF3DualViewWidget::getSplitterCombobox() const
+{
+    return fltSplitter;
+}
+
+QF3FilterCombobox *QF3DualViewWidget::getShortCombobox() const
+{
+    return fltShort;
+}
+
+QF3FilterCombobox *QF3DualViewWidget::getLongCombobox() const
+{
+    return fltLong;
+}
+
+FilterDescription QF3DualViewWidget::filterSplitter() const
+{
+    return fltSplitter->filter();
+}
+
+FilterDescription QF3DualViewWidget::filterShort() const
+{
+    return fltShort->filter();
+}
+
+FilterDescription QF3DualViewWidget::filterLong() const
+{
+    return fltLong->filter();
+}
+
+QF3DualViewWidget::Orientation QF3DualViewWidget::orientation() const
+{
+    return QF3DualViewWidget::Orientation(cmbDirection->currentIndex());
+}
+
+void QF3DualViewWidget::setFilterINI(QString globalfilters, QString localfilters)
+{
+    fltSplitter->setFilterINI(globalfilters, localfilters);
+    fltShort->setFilterINI(globalfilters, localfilters);
+    fltLong->setFilterINI(globalfilters, localfilters);
+}
+
+void QF3DualViewWidget::loadSettings(QSettings &settings, QString property)
+{
+    cmbDirection->setCurrentIndex(settings.value(property+"/orientation", 0).toInt());
+    fltSplitter->loadSettings(settings, property+"/splitter/");
+    fltShort->loadSettings(settings, property+"/short/");
+    fltLong->loadSettings(settings, property+"/long/");
+}
+
+void QF3DualViewWidget::saveSettings(QSettings &settings, QString property)
+{
+    settings.setValue(property+"/orientation", cmbDirection->currentIndex());
+    fltSplitter->saveSettings(settings, property+"/splitter/");
+    fltShort->saveSettings(settings, property+"/short/");
+    fltLong->saveSettings(settings, property+"/long/");
+}
+
+void QF3DualViewWidget::loadSettings(QFManyFilesSettings &settings, QString property)
+{
+    cmbDirection->setCurrentIndex(settings.value(property+"/orientation", 0).toInt());
+    fltSplitter->loadSettings(settings, property+"/splitter/");
+    fltShort->loadSettings(settings, property+"/short/");
+    fltLong->loadSettings(settings, property+"/long/");
+}
+
+void QF3DualViewWidget::saveSettings(QFManyFilesSettings &settings, QString property)
+{
+    settings.setValue(property+"/orientation", cmbDirection->currentIndex());
+    fltSplitter->saveSettings(settings, property+"/splitter/");
+    fltShort->saveSettings(settings, property+"/short/");
+    fltLong->saveSettings(settings, property+"/long/");
+}
+
+QF3DualViewWidget::QF3DualViewWidget(QWidget *parent):
+    QWidget(parent)
+{
+    lay=new QFormLayout(this);
+    setLayout(lay);
+    QLabel* l=NULL;
+    cmbDirection=new QComboBox(this);
+    cmbDirection->addItem(QIcon(":/libqf3widgets/dvhor.png"), tr("horizontal"));
+    cmbDirection->addItem(QIcon(":/libqf3widgets/dvver.png"), tr("vertical"));
+    lay->addRow(tr("<small>&orientation:</small>"), cmbDirection);
+    fltSplitter=new QF3FilterCombobox(this);
+    lay->addRow(tr("<small>splitter:</small>"), fltSplitter);
+    fltShort=new QF3FilterCombobox(this);
+    lay->addRow(tr("<small>short &lambda;:</small>"), fltShort);
+    fltLong=new QF3FilterCombobox(this);
+    lay->addRow(tr("<small>long &lambda;:</small>"), fltLong);
+
+}
+
+QF3DualViewWidget::~QF3DualViewWidget()
+{
+}
+

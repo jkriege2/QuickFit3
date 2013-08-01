@@ -543,7 +543,7 @@ void QFESPIMB040CameraView::createActions() {
 
     actMaskLoad = new QAction(QIcon(":/spimb040/maskload.png"), tr("&Load mask (broken pixels)"), this);
     connect(actMaskLoad, SIGNAL(triggered()), this, SLOT(loadMask()));
-    recentMaskFiles=new QRecentFilesMenu(this);
+    recentMaskFiles=new QFRecentFilesMenu(this);
     recentMaskFiles->setUseSystemFileIcons(false);
     recentMaskFiles->setDefaultIcon(QIcon(":/spimb040/maskfileicon.png"));
     recentMaskFiles->setAlwaysEnabled(true);
@@ -649,6 +649,62 @@ void QFESPIMB040CameraView::loadSettings(QSettings& settings, QString prefix) {
     jkloadSplitter(settings, gsplitter, prefix+"split_graph/");
 }
 
+void QFESPIMB040CameraView::loadSettings(QFManyFilesSettings &settings, QString prefix)
+{
+     jkloadWidgetGeometry(settings, this, prefix+"geometry/");
+     //jkloadSplitter(settings, splitHor,  prefix+"split_hor/");
+     jkloadSplitter(settings, splitVert, prefix+"split_vert/");
+     recentMaskFiles->readSettings(settings, prefix+"recent_mask_files/");
+
+     spinCountsLower->setValue(settings.value(prefix+"histogram.min", 0).toInt());
+     spinCountsUpper->setValue(settings.value(prefix+"histogram.max", 255).toInt());
+     chkCountsRangeAutoLow->setChecked(settings.value(prefix+"histogram.autolow", true).toBool());
+     chkCountsRangeAutoHigh->setChecked(settings.value(prefix+"histogram.autohigh", true).toBool());
+     setCountsAutoscale();
+     bool b=settings.value(prefix+"histogram.log", false).toBool();
+     chkHistogramLog->setChecked(b);
+     histogram_n=settings.value(prefix+"histogram.items", histogram_n).toUInt();
+     spinHistogramBins->setValue(histogram_n);
+     // reallocate histogram and initialize
+     if (histogram_x) free(histogram_x);
+     if (histogram_y) free(histogram_y);
+     histogram_x=(double*)malloc(histogram_n*sizeof(double));
+     histogram_y=(double*)malloc(histogram_n*sizeof(double));
+     for (unsigned int i=0; i<histogram_n; i++) {
+         histogram_x[i]=i;
+         histogram_y[i]=0;
+     }
+     b=settings.value(prefix+"histogram.items_auto", true).toBool();
+     chkHistogramBinsAuto->setChecked(b);
+     setHistogramBinsAutoscale(b);
+
+     cmbColorscale->setCurrentIndex(settings.value(prefix+"imagesettings.palette", 6).toInt());
+     cmbMaskColor->setCurrentIndex(settings.value(prefix+"imagesettings.mask_color", 0).toInt());
+     cmbRotation->setCurrentIndex(settings.value(prefix+"imagesettings.rotation", 0).toInt());
+     cmbMarginalPlots->setCurrentIndex(settings.value(prefix+"imagesettings.marginal", 1).toInt());
+     cmbMarginalFitFunction->setCurrentIndex(settings.value(prefix+"imagesettings.marginal_fitfunction", 0).toInt());
+     pltDataMarginalXPixel=settings.value(prefix+"imagesettings.marginal_xpixel", pltDataMarginalXPixel).toInt();
+     pltDataMarginalYPixel=settings.value(prefix+"imagesettings.marginal_ypixel", pltDataMarginalYPixel).toInt();
+
+     lastImagepath=settings.value(prefix+"last_imagepath", lastImagepath).toString();
+     lastMaskpath=settings.value(prefix+"last_maskpath", lastMaskpath).toString();
+     lastImagefilter=settings.value(prefix+"last_imagefilter", lastImagefilter).toString();
+     lastMaskHistogramMode=settings.value(prefix+"last_mask_histogram_mode", lastMaskHistogramMode).toInt();
+     lastMaskHistogramPixels=settings.value(prefix+"last_mask_histogram_pixels", lastMaskHistogramMode).toInt();
+     chkImageStatisticsHistogram->setChecked(settings.value(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked()).toBool());
+
+     chkGrid->setChecked(settings.value(prefix+"grid", false).toBool());
+     spinGridWidth->setValue(settings.value(prefix+"grid_width", 32).toInt());
+     cmbGridColor->setCurrentIndex(settings.value(prefix+"grid_color", 15).toInt());
+     cmbImageMode->setCurrentIndex(settings.value(prefix+"image_mode", 0).toInt());
+
+
+     chkGraph->setChecked(settings.value(prefix+"graph", false).toBool());
+     cmbGraphParameter->setCurrentIndex(settings.value(prefix+"graph_parameter", 0).toInt());
+     spinGraphWindow->setValue(settings.value(prefix+"graph_window", 60).toDouble());
+     jkloadSplitter(settings, gsplitter, prefix+"split_graph/");
+}
+
 void QFESPIMB040CameraView::storeSettings(QSettings& settings, QString prefix) {
     jksaveWidgetGeometry(settings, this, prefix+"geometry/");
     //jksaveSplitter(settings, splitHor,  prefix+"split_hor/");
@@ -688,6 +744,47 @@ void QFESPIMB040CameraView::storeSettings(QSettings& settings, QString prefix) {
     settings.setValue(prefix+"graph_window", spinGraphWindow->value());
     jksaveSplitter(settings, gsplitter, prefix+"split_graph/");
 
+}
+
+void QFESPIMB040CameraView::storeSettings(QFManyFilesSettings &settings, QString prefix)
+{
+    jksaveWidgetGeometry(settings, this, prefix+"geometry/");
+    //jksaveSplitter(settings, splitHor,  prefix+"split_hor/");
+    jksaveSplitter(settings, splitVert, prefix+"split_vert/");
+    recentMaskFiles->storeSettings(settings, prefix+"recent_mask_files/");
+
+    settings.setValue(prefix+"last_imagepath", lastImagepath);
+    settings.setValue(prefix+"last_maskpath", lastMaskpath);
+    settings.setValue(prefix+"last_imagefilter", lastImagefilter);
+
+    settings.setValue(prefix+"histogram.min", spinCountsLower->value());
+    settings.setValue(prefix+"histogram.max", spinCountsUpper->value());
+    settings.setValue(prefix+"histogram.autolow", chkCountsRangeAutoLow->isChecked());
+    settings.setValue(prefix+"histogram.autohigh", chkCountsRangeAutoHigh->isChecked());
+    settings.setValue(prefix+"histogram.log", chkHistogramLog->isChecked());
+    settings.setValue(prefix+"histogram.items", histogram_n);
+
+    settings.setValue(prefix+"imagesettings.palette", cmbColorscale->currentIndex());
+    settings.setValue(prefix+"imagesettings.mask_color", cmbMaskColor->currentIndex());
+    settings.setValue(prefix+"imagesettings.rotation", cmbRotation->currentIndex());
+    settings.setValue(prefix+"imagesettings.marginal", cmbMarginalPlots->currentIndex());
+    settings.setValue(prefix+"imagesettings.marginal_fitfunction", cmbMarginalFitFunction->currentIndex());
+    settings.setValue(prefix+"imagesettings.marginal_xpixel", pltDataMarginalXPixel);
+    settings.setValue(prefix+"imagesettings.marginal_ypixel", pltDataMarginalYPixel);
+
+    settings.setValue(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked());
+    settings.setValue(prefix+"last_mask_histogram_mode", lastMaskHistogramMode);
+    settings.setValue(prefix+"last_mask_histogram_pixels", lastMaskHistogramMode);
+
+    settings.setValue(prefix+"grid", chkGrid->isChecked());
+    settings.setValue(prefix+"grid_width", spinGridWidth->value());
+    settings.setValue(prefix+"grid_color", cmbGridColor->currentIndex());
+    settings.setValue(prefix+"image_mode", cmbImageMode->currentIndex());
+
+    settings.setValue(prefix+"graph", chkGraph->isChecked());
+    settings.setValue(prefix+"graph_parameter", cmbGraphParameter->currentIndex());
+    settings.setValue(prefix+"graph_window", spinGraphWindow->value());
+    jksaveSplitter(settings, gsplitter, prefix+"split_graph/");
 }
 
 void QFESPIMB040CameraView::imageMouseMoved(double x, double y) {

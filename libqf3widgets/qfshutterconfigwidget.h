@@ -35,7 +35,7 @@
 #include "qfshuttercombobox.h"
 #include "libwid_imexport.h"
 #include "qfshutterconfigwidgetthread.h"
-
+#include "qfmanyfilessettings.h"
 
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QWidget with a set of controls that allow to control a shutter
     \ingroup qf3lib_widgets
@@ -55,8 +55,10 @@ class QFWIDLIB_EXPORT QFShutterConfigWidget : public QWidget {
 
         /** \brief load settings */
         void loadSettings(QSettings& settings, QString prefix);
+        void loadSettings(QFManyFilesSettings& settings, QString prefix);
         /** \brief save settings */
         void saveSettings(QSettings& settings, QString prefix);
+        void saveSettings(QFManyFilesSettings& settings, QString prefix);
 
         /** \brief connect to all selected Shutters */
         void connectShutter();

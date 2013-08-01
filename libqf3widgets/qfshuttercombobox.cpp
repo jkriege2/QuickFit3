@@ -151,6 +151,17 @@ void QFShutterComboBox::storeSettings(QSettings& settings, QString prefix) const
     }
 }
 
+void QFShutterComboBox::storeSettings(QFManyFilesSettings &settings, QString prefix) const
+{
+    if (currentExtension()) {
+        settings.setValue(prefix+"shutter_plugin_id", currentExtension()->getID());
+        settings.setValue(prefix+"shutter_id", currentShutterID());
+    } else {
+        settings.setValue(prefix+"shutter_plugin_id", "");
+        settings.setValue(prefix+"shutter_id", -1);
+    }
+}
+
 void QFShutterComboBox::loadSettings(QSettings& settings, QString prefix) {
    QString id=settings.value(prefix+"shutter_plugin_id", "").toString();
    int shutterIdx=settings.value(prefix+"shutter_id", -1).toInt();
@@ -173,4 +184,28 @@ void QFShutterComboBox::loadSettings(QSettings& settings, QString prefix) {
    }
    if (!ok) setCurrentIndex(0);
 
+}
+
+void QFShutterComboBox::loadSettings(QFManyFilesSettings &settings, QString prefix)
+{
+    QString id=settings.value(prefix+"shutter_plugin_id", "").toString();
+    int shutterIdx=settings.value(prefix+"shutter_id", -1).toInt();
+    setCurrentIndex(0);
+    bool ok=false;
+    QFExtension* extension=NULL;
+    QFExtensionShutter* shutter=NULL;
+    for (int i=0; i<count(); i++) {
+        QPoint p = itemData(i).toPoint();
+        int shutterIdxC=p.y();
+        if ((p.x()>=0)&&(p.x()<shutters.size())) {
+            extension=qobject_cast<QFExtension*>(shutters[p.x()]);
+            shutter=qobject_cast<QFExtensionShutter*>(shutters[p.x()]);
+            if (extension && extension->getID()==id && shutterIdx==shutterIdxC) {
+                ok=true;
+                setCurrentIndex(i);
+                break;
+            }
+        }
+    }
+    if (!ok) setCurrentIndex(0);
 }

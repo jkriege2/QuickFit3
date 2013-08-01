@@ -7,7 +7,7 @@
 #include "qfextension.h"
 #include "libwid_imexport.h"
 #include "qenhancedcombobox.h"
-
+#include "qfmanyfilessettings.h"
 /*! \brief QComboBox which is filled with all available cameras
     \ingroup qf3lib_widgets
 
@@ -24,8 +24,10 @@ class QFWIDLIB_EXPORT QFFilterChangerComboBox : public QEnhancedComboBox {
         void init(QFExtensionManager* extManager);
         /** \brief save the currently selected camera to a QSettings object */
         void storeSettings(QSettings& settings, QString prefix=QString("")) const;
+        void storeSettings(QFManyFilesSettings& settings, QString prefix=QString("")) const;
         /** \brief load the currently selected camera from a QSettings object */
         void loadSettings(QSettings& settings, QString prefix=QString(""));
+        void loadSettings(QFManyFilesSettings& settings, QString prefix=QString(""));
         /** \brief return the currently selected camera extension as QFExtension */
         QFExtension* currentExtension() const;
         QObject* currentExtensionObject() const;

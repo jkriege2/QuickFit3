@@ -7,7 +7,7 @@
 #include <QVariant>
 #include <QPointer>
 #include <QSet>
-
+#include <QSplitter>
 /*! \brief this class accesses a hirarchy of settings files
     \ingroup qf3lib_tools
 
@@ -43,10 +43,19 @@ class QFLIB_EXPORT QFManyFilesSettings: public QObject {
         bool setValue(const QString& key, const QVariant& value, int* level=NULL);
 
         QStringList childGroups() const;
+        void beginGroup(const QString& prefix);
+        void endGroup();
+
 
     protected:
         QList<QPointer<QSettings> > settings;
         QSet<QSettings*> readonly;
 };
+
+QFLIB_EXPORT void jksaveWidgetGeometry(QFManyFilesSettings& settings, QWidget* widget, QString prefix);
+QFLIB_EXPORT void jkloadWidgetGeometry(QFManyFilesSettings& settings, QWidget* widget, QPoint defaultPosition, QSize defaultSize, QString prefix);
+QFLIB_EXPORT void jkloadWidgetGeometry(QFManyFilesSettings& settings, QWidget* widget, QString prefix);
+QFLIB_EXPORT void jksaveSplitter(QFManyFilesSettings& settings, QSplitter* splitter, QString prefix);
+QFLIB_EXPORT void jkloadSplitter(QFManyFilesSettings& settings, QSplitter* splitter, QString prefix);
 
 #endif // QFMANYFILESSETTINGS_H
