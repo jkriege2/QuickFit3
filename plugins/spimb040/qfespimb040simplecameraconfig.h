@@ -35,7 +35,7 @@
 #include "qfextensionmeasurementdevice.h"
 #include "qfmanyfilessettings.h"
 
-class QFESPIMB040OpticsSetup; // forward
+class QFESPIMB040OpticsSetupBase; // forward
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QGropBox with a set of controls that allow to control a camera
     \ingroup qf3ext_spimb040
 
@@ -57,7 +57,7 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
 
         void setLog(QFPluginLogService* logger);
 
-        void init(int camViewID, QFPluginServices* pluginServices, QString configDirectory, QFESPIMB040OpticsSetup* opticsSetup);
+        void init(int camViewID, QFPluginServices* pluginServices, QString configDirectory, QFESPIMB040OpticsSetupBase* opticsSetup);
 
         /** \brief load settings */
         void loadSettings(QSettings& settings, QString prefix, bool dontLoadDevices=false);

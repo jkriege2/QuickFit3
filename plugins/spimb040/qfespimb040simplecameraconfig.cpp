@@ -66,7 +66,7 @@ void QFESPIMB040SimpleCameraConfig::setMagnification(double mag) {
     m_magnification=mag;
 }
 
-void QFESPIMB040SimpleCameraConfig::init(int camViewID, QFPluginServices* pluginServices, QString configDirectory, QFESPIMB040OpticsSetup* opticsSetup) {
+void QFESPIMB040SimpleCameraConfig::init(int camViewID, QFPluginServices* pluginServices, QString configDirectory, QFESPIMB040OpticsSetupBase* opticsSetup) {
     m_camViewID=camViewID;
     m_pluginServices=pluginServices;
     m_extManager=NULL;

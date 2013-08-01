@@ -8,7 +8,7 @@
 #include <QDir>
 #include <QFileInfo>
 
-class QFESPIMB040OpticsSetup; //forward
+class QFESPIMB040OpticsSetupBase; //forward
 class QFESPIMB040ExperimentDescription; //forward
 class QFESPIMB040AcquisitionDescription; //forward
 
@@ -20,7 +20,7 @@ class QFESPIMB040FilenameTool {
         void setReplaceValues(const QMap<QString, QString>& replaceValues);
         void setReplaceValue(const QString& key, const QString& value);
         void bindLineEdit(QEnhancedLineEdit* edit);
-        void setGlobalReplaces(QFESPIMB040OpticsSetup* setup, QFESPIMB040ExperimentDescription* exp, QFESPIMB040AcquisitionDescription* acq);
+        void setGlobalReplaces(QFESPIMB040OpticsSetupBase* setup, QFESPIMB040ExperimentDescription* exp, QFESPIMB040AcquisitionDescription* acq);
 
     protected:
         QMap<QString, QString> replaceValues;

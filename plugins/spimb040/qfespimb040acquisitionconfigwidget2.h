@@ -28,7 +28,7 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         Q_OBJECT
 
     public:
-        explicit QFESPIMB040AcquisitionConfigWidget2(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
+        explicit QFESPIMB040AcquisitionConfigWidget2(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetupBase* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
         ~QFESPIMB040AcquisitionConfigWidget2();
 
         /** \brief return the filename for the currently selected camera configuration */
@@ -139,7 +139,7 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
     private:
         QFPluginServices* m_pluginServices;
         Ui::QFESPIMB040AcquisitionConfigWidget2 *ui;
-        QFESPIMB040OpticsSetup* opticsSetup;
+        QFESPIMB040OpticsSetupBase* opticsSetup;
         QFESPIMB040AcquisitionDescription* acqDescription;
         QFESPIMB040ExperimentDescription* expDescription;
         QMap<QFExtensionCamera::CameraSetting, QVariant> camset1, camset2;

@@ -27,7 +27,7 @@ class QFESPIMB040CamParamStackConfigWidget2 : public QWidget, public QFESPIMB040
         Q_OBJECT
 
     public:
-        explicit QFESPIMB040CamParamStackConfigWidget2(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
+        explicit QFESPIMB040CamParamStackConfigWidget2(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetupBase* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
         ~QFESPIMB040CamParamStackConfigWidget2();
 
         /** \brief return the filename for the currently selected camera configuration */
@@ -87,7 +87,7 @@ class QFESPIMB040CamParamStackConfigWidget2 : public QWidget, public QFESPIMB040
     private:
         Ui::QFESPIMB040CamParamStackConfigWidget2 *ui;
         QFPluginServices* m_pluginServices;
-        QFESPIMB040OpticsSetup* opticsSetup;
+        QFESPIMB040OpticsSetupBase* opticsSetup;
         QFESPIMB040AcquisitionDescription* acqDescription;
         QFESPIMB040ExperimentDescription* expDescription;
         QFPluginLogService* log;

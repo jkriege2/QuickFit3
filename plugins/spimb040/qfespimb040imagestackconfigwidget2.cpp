@@ -19,7 +19,7 @@
 #define STAGE_INTERVAL_MS 1313
 #define PROCESS_EVENTS_TIMEOUT_MS 20
 
-QFESPIMB040ImageStackConfigWidget2::QFESPIMB040ImageStackConfigWidget2(QFESPIMB040AcquisitionTools *acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* stageConfig, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory) :
+QFESPIMB040ImageStackConfigWidget2::QFESPIMB040ImageStackConfigWidget2(QFESPIMB040AcquisitionTools *acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetupBase* stageConfig, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory) :
     QWidget(parent),
     ui(new Ui::QFESPIMB040ImageStackConfigWidget2)
 {
@@ -912,7 +912,7 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
     }
 
     QDateTime startDateTime=QDateTime::currentDateTime();
-    QList<QFESPIMB040OpticsSetup::measuredValues> measured;
+    QList<QFESPIMB040OpticsSetupBase::measuredValues> measured;
 
     QProgressListDialog progress(tr("Image Stack Acquisition"), tr("&Cancel"), 0, 100, this);
     progress.setWindowModality(Qt::WindowModal);

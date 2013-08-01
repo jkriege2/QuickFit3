@@ -14,7 +14,7 @@
 #include <tiffio.h>
 #include "libtiff_tools.h"
 
-QFESPIMB040CamParamStackConfigWidget2::QFESPIMB040CamParamStackConfigWidget2(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory) :
+QFESPIMB040CamParamStackConfigWidget2::QFESPIMB040CamParamStackConfigWidget2(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetupBase* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory) :
     QWidget(parent),
     ui(new Ui::QFESPIMB040CamParamStackConfigWidget2)
 {
@@ -375,7 +375,7 @@ void QFESPIMB040CamParamStackConfigWidget2::performStack()
     }
 
     QDateTime startDateTime=QDateTime::currentDateTime();
-    QList<QFESPIMB040OpticsSetup::measuredValues> measured;
+    QList<QFESPIMB040OpticsSetupBase::measuredValues> measured;
 
 
     bool ok=true;

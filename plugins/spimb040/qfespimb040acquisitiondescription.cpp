@@ -105,7 +105,7 @@ QString QFESPIMB040AcquisitionDescription::getPrefix() const
     return ui->edtPrefix->text();
 }
 
-void QFESPIMB040AcquisitionDescription::setOtherSettingWidgets(QFESPIMB040OpticsSetup *setup, QFESPIMB040ExperimentDescription *exp)
+void QFESPIMB040AcquisitionDescription::setOtherSettingWidgets(QFESPIMB040OpticsSetupBase *setup, QFESPIMB040ExperimentDescription *exp)
 {
     this->opticsSetup=setup;
     this->expDescription=exp;

@@ -30,7 +30,7 @@ class QFESPIMB040DeviceParamStackConfigWidget : public QWidget, public QFESPIMB0
         Q_OBJECT
 
     public:
-        explicit QFESPIMB040DeviceParamStackConfigWidget(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
+        explicit QFESPIMB040DeviceParamStackConfigWidget(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetupBase* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
         ~QFESPIMB040DeviceParamStackConfigWidget();
 
         /** \brief return the filename for the currently selected camera configuration */
@@ -103,7 +103,7 @@ protected slots:
     private:
         Ui::QFESPIMB040DeviceParamStackConfigWidget *ui;
         QFPluginServices* m_pluginServices;
-        QFESPIMB040OpticsSetup* opticsSetup;
+        QFESPIMB040OpticsSetupBase* opticsSetup;
         QFESPIMB040AcquisitionDescription* acqDescription;
         QFESPIMB040ExperimentDescription* expDescription;
 

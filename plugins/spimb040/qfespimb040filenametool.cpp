@@ -68,7 +68,7 @@ void QFESPIMB040FilenameTool::fillLineEdits() {
     }
 }
 
-void QFESPIMB040FilenameTool::setGlobalReplaces(QFESPIMB040OpticsSetup *setup, QFESPIMB040ExperimentDescription* exp, QFESPIMB040AcquisitionDescription* acq) {
+void QFESPIMB040FilenameTool::setGlobalReplaces(QFESPIMB040OpticsSetupBase *setup, QFESPIMB040ExperimentDescription* exp, QFESPIMB040AcquisitionDescription* acq) {
     if (setup) setReplaceValue("laser", setup->getLaserConfig());
     if (exp) {
         setReplaceValue("exp_title",  cleanStringForFilename(exp->getTitle()));

@@ -19,7 +19,7 @@
     QMessageBox::critical(this, tr("B040SPIM: Device Parameter Stack Acquisition Error"), (message));
 
 
-QFESPIMB040DeviceParamStackConfigWidget::QFESPIMB040DeviceParamStackConfigWidget(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* stageConfig, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory) :
+QFESPIMB040DeviceParamStackConfigWidget::QFESPIMB040DeviceParamStackConfigWidget(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetupBase* stageConfig, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory) :
     QWidget(parent),
     ui(new Ui::QFESPIMB040DeviceParamStackConfigWidget)
 {
@@ -370,7 +370,7 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
     }
 
     QDateTime startDateTime=QDateTime::currentDateTime();
-    QList<QFESPIMB040OpticsSetup::measuredValues> measured;
+    QList<QFESPIMB040OpticsSetupBase::measuredValues> measured;
     QList<QFExtensionCamera::CameraAcquititonFileDescription> files1, files2;
     QMap<QString, QVariant> finalAcquisitionDescription1;
     QMap<QString, QVariant> finalAcquisitionDescription2;

@@ -12,7 +12,7 @@
 #include "qfstyledbutton.h"
 
 
-QFESPIMB040AcquisitionConfigWidget2::QFESPIMB040AcquisitionConfigWidget2(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory) :
+QFESPIMB040AcquisitionConfigWidget2::QFESPIMB040AcquisitionConfigWidget2(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetupBase* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory) :
     QWidget(parent),
     ui(new Ui::QFESPIMB040AcquisitionConfigWidget2)
 {
@@ -650,7 +650,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
     if (!(use1() || use2())) return;
 
     QDateTime startDateTime=QDateTime::currentDateTime();
-    QList<QFESPIMB040OpticsSetup::measuredValues> measured;
+    QList<QFESPIMB040OpticsSetupBase::measuredValues> measured;
 
     bool ok=true;
     log->log_text(tr("starting image series acquisition:\n"));

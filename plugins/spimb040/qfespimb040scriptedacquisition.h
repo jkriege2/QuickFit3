@@ -65,7 +65,7 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
         Q_OBJECT
 
     public:
-        explicit QFESPIMB040ScriptedAcquisition(QFESPIMB040MainWindow2* mainWindow, QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
+        explicit QFESPIMB040ScriptedAcquisition(QFESPIMB040MainWindow2* mainWindow, QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetupBase* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory);
         ~QFESPIMB040ScriptedAcquisition();
 
         QString getScript() const;
@@ -143,7 +143,7 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
     private:
         Ui::QFESPIMB040ScriptedAcquisition *ui;
         QFPluginServices* m_pluginServices;
-        QFESPIMB040OpticsSetup* opticsSetup;
+        QFESPIMB040OpticsSetupBase* opticsSetup;
         QFESPIMB040AcquisitionDescription* acqDescription;
         QFESPIMB040ExperimentDescription* expDescription;
         QFPluginLogService* log;

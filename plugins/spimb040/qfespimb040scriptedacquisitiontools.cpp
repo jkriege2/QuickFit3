@@ -13,7 +13,7 @@
 
 
 
-QFESPIMB040ScriptedAcquisitionTools::QFESPIMB040ScriptedAcquisitionTools(QFESPIMB040ScriptedAcquisition* widAcquisition, QFESPIMB040MainWindow2 *mainWindow, QFESPIMB040AcquisitionTools *acqTools, QFPluginLogService *log, QObject *parent, QFPluginServices *pluginServices, QFESPIMB040OpticsSetup *opticsSetup, QFESPIMB040AcquisitionDescription *acqDescription, QFESPIMB040ExperimentDescription *expDescription):
+QFESPIMB040ScriptedAcquisitionTools::QFESPIMB040ScriptedAcquisitionTools(QFESPIMB040ScriptedAcquisition* widAcquisition, QFESPIMB040MainWindow2 *mainWindow, QFESPIMB040AcquisitionTools *acqTools, QFPluginLogService *log, QObject *parent, QFPluginServices *pluginServices, QFESPIMB040OpticsSetupBase *opticsSetup, QFESPIMB040AcquisitionDescription *acqDescription, QFESPIMB040ExperimentDescription *expDescription):
     QObject(parent)
 {
     this->widAcquisition=widAcquisition;
@@ -65,7 +65,7 @@ void QFESPIMB040ScriptedAcquisitionTools::sleepMS(int duration)
 
 
 
-QFESPIMB040ScriptedAcquisitionInstrumentControl::QFESPIMB040ScriptedAcquisitionInstrumentControl(QFESPIMB040ScriptedAcquisition* widAcquisition, QFESPIMB040MainWindow2 *mainWindow, QFESPIMB040AcquisitionTools *acqTools, QFPluginLogService *log, QObject *parent, QFPluginServices *pluginServices, QFESPIMB040OpticsSetup *opticsSetup, QFESPIMB040AcquisitionDescription *acqDescription, QFESPIMB040ExperimentDescription *expDescription):
+QFESPIMB040ScriptedAcquisitionInstrumentControl::QFESPIMB040ScriptedAcquisitionInstrumentControl(QFESPIMB040ScriptedAcquisition* widAcquisition, QFESPIMB040MainWindow2 *mainWindow, QFESPIMB040AcquisitionTools *acqTools, QFPluginLogService *log, QObject *parent, QFPluginServices *pluginServices, QFESPIMB040OpticsSetupBase *opticsSetup, QFESPIMB040AcquisitionDescription *acqDescription, QFESPIMB040ExperimentDescription *expDescription):
     QObject(parent)
 {
     this->widAcquisition=widAcquisition;
@@ -101,11 +101,11 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::setShutter(const QString& 
     if (shutter=="main") {
         opticsSetup->setMainIlluminationShutter(state, true);
     } else if (shutter=="laser1") {
-        opticsSetup->setShutter(QFESPIMB040OpticsSetup::ShutterLaser1, state, true);
+        opticsSetup->setShutter(QFESPIMB040OpticsSetupBase::ShutterLaser1, state, true);
     } else if (shutter=="laser2") {
-        opticsSetup->setShutter(QFESPIMB040OpticsSetup::ShutterLaser2, state, true);
+        opticsSetup->setShutter(QFESPIMB040OpticsSetupBase::ShutterLaser2, state, true);
     } else if (shutter=="transmission") {
-        opticsSetup->setShutter(QFESPIMB040OpticsSetup::ShutterTransmission, state, true);
+        opticsSetup->setShutter(QFESPIMB040OpticsSetupBase::ShutterTransmission, state, true);
     } else {
         bool ok=false;
         int ID=shutter.toInt(&ok);
@@ -234,7 +234,7 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::setFilterWheel(const QStri
 
 
 
-QFESPIMB040ScriptedAcquisitionAcquisitionControl::QFESPIMB040ScriptedAcquisitionAcquisitionControl(QFESPIMB040ScriptedAcquisition* widAcquisition, QFESPIMB040MainWindow2 *mainWindow, QFESPIMB040AcquisitionTools *acqTools, QFPluginLogService *log, QObject *parent, QFPluginServices *pluginServices, QFESPIMB040OpticsSetup *opticsSetup, QFESPIMB040AcquisitionDescription *acqDescription, QFESPIMB040ExperimentDescription *expDescription):
+QFESPIMB040ScriptedAcquisitionAcquisitionControl::QFESPIMB040ScriptedAcquisitionAcquisitionControl(QFESPIMB040ScriptedAcquisition* widAcquisition, QFESPIMB040MainWindow2 *mainWindow, QFESPIMB040AcquisitionTools *acqTools, QFPluginLogService *log, QObject *parent, QFPluginServices *pluginServices, QFESPIMB040OpticsSetupBase *opticsSetup, QFESPIMB040AcquisitionDescription *acqDescription, QFESPIMB040ExperimentDescription *expDescription):
     QObject(parent)
 {
     this->widAcquisition=widAcquisition;

@@ -29,7 +29,7 @@ class QFESPIMB040AcquisitionDescription : public QWidget, public QFESPIMB040File
         QString getSample() const;
         QString getPrefix() const;
 
-        void setOtherSettingWidgets(QFESPIMB040OpticsSetup *setup, QFESPIMB040ExperimentDescription *exp);
+        void setOtherSettingWidgets(QFESPIMB040OpticsSetupBase *setup, QFESPIMB040ExperimentDescription *exp);
     protected slots:
         void on_btnClearAll_clicked();
         void on_btnNextCell_clicked();
@@ -38,7 +38,7 @@ class QFESPIMB040AcquisitionDescription : public QWidget, public QFESPIMB040File
         void updateReplaces();
     private:
         Ui::QFESPIMB040AcquisitionDescription *ui;
-        QFESPIMB040OpticsSetup *opticsSetup;
+        QFESPIMB040OpticsSetupBase *opticsSetup;
         QFESPIMB040ExperimentDescription* expDescription;
 };
 

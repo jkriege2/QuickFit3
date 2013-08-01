@@ -47,7 +47,7 @@ double fSigmoid( double t, const double *p )
 #define MARGINAL_FIT_SIZE_FACTOR 3
 #define MARGINAL_FIT_MINVALUES 100
 
-QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCameraConfigComboBoxStartResume* stopresume, QFESPIMB040OpticsSetup* opticsSetup):
+QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCameraConfigComboBoxStartResume* stopresume, QFESPIMB040OpticsSetupBase* opticsSetup):
     QWidget(parent)
 {
     setWindowTitle(tr("Preview Camera %1").arg(cameraID+1));
@@ -126,7 +126,7 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
 
 }
 
-void QFESPIMB040CameraView::init(int cameraID, QFCameraConfigComboBoxStartResume* stopresume, QFESPIMB040OpticsSetup *opticsSetup) {
+void QFESPIMB040CameraView::init(int cameraID, QFCameraConfigComboBoxStartResume* stopresume, QFESPIMB040OpticsSetupBase *opticsSetup) {
     setWindowTitle(tr("Preview Camera %1").arg(cameraID+1));
     m_stopresume=stopresume;
     this->opticsSetup=opticsSetup;

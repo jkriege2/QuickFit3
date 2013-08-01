@@ -33,7 +33,7 @@
 #include "qftools.h"
 #include "qfmanyfilessettings.h"
 
-class QFESPIMB040OpticsSetup; // forward
+class QFESPIMB040OpticsSetupBase; // forward
 
 
 /** \brief defines the type of the internal image representation of QFESPIMB040CameraView::image, may be uint32_t OR double OR float (nothing else!!!)  */
@@ -61,10 +61,10 @@ class QFESPIMB040CameraView : public QWidget {
             \param stopresume (if supplied) allows to stop/resume a preview in order to save an image
             \param parent the parent widget
          */
-        QFESPIMB040CameraView(QWidget* parent=NULL, int cameraID=0, QFCameraConfigComboBoxStartResume* stopresume=NULL, QFESPIMB040OpticsSetup* opticsSetup=NULL);
+        QFESPIMB040CameraView(QWidget* parent=NULL, int cameraID=0, QFCameraConfigComboBoxStartResume* stopresume=NULL, QFESPIMB040OpticsSetupBase* opticsSetup=NULL);
         virtual ~QFESPIMB040CameraView();
 
-        void init(int cameraID, QFCameraConfigComboBoxStartResume* stopresume, QFESPIMB040OpticsSetup* opticsSetup);
+        void init(int cameraID, QFCameraConfigComboBoxStartResume* stopresume, QFESPIMB040OpticsSetupBase* opticsSetup);
         /** \brief load settings */
         void loadSettings(QSettings&, QString prefix);
         void loadSettings(QFManyFilesSettings& settings, QString prefix);
@@ -136,7 +136,7 @@ class QFESPIMB040CameraView : public QWidget {
         QTabWidget* tabSettings;
         QTabWidget* tabResults;
 
-        QFESPIMB040OpticsSetup* opticsSetup;
+        QFESPIMB040OpticsSetupBase* opticsSetup;
 
         QFCameraConfigComboBoxStartResume* m_stopresume;
         int cameraID;

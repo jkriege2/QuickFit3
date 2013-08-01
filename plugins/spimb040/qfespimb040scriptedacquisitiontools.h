@@ -39,7 +39,7 @@ class QFESPIMB040ScriptedAcquisitionToolsBase {
 class QFESPIMB040ScriptedAcquisitionTools : public QObject, public QFESPIMB040ScriptedAcquisitionToolsBase {
         Q_OBJECT
     public:
-        explicit QFESPIMB040ScriptedAcquisitionTools(QFESPIMB040ScriptedAcquisition* widAcquisition, QFESPIMB040MainWindow2* mainWindow, QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QObject* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription);
+        explicit QFESPIMB040ScriptedAcquisitionTools(QFESPIMB040ScriptedAcquisition* widAcquisition, QFESPIMB040MainWindow2* mainWindow, QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QObject* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetupBase* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription);
 
 
     public slots:
@@ -51,7 +51,7 @@ class QFESPIMB040ScriptedAcquisitionTools : public QObject, public QFESPIMB040Sc
 
     private:
         QFPluginServices* m_pluginServices;
-        QFESPIMB040OpticsSetup* opticsSetup;
+        QFESPIMB040OpticsSetupBase* opticsSetup;
         QFESPIMB040AcquisitionDescription* acqDescription;
         QFESPIMB040ExperimentDescription* expDescription;
         QFPluginLogService* log;
@@ -65,7 +65,7 @@ class QFESPIMB040ScriptedAcquisitionTools : public QObject, public QFESPIMB040Sc
 class QFESPIMB040ScriptedAcquisitionInstrumentControl : public QObject, public QFESPIMB040ScriptedAcquisitionToolsBase {
         Q_OBJECT
     public:
-        explicit QFESPIMB040ScriptedAcquisitionInstrumentControl(QFESPIMB040ScriptedAcquisition* widAcquisition, QFESPIMB040MainWindow2* mainWindow, QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QObject* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription);
+        explicit QFESPIMB040ScriptedAcquisitionInstrumentControl(QFESPIMB040ScriptedAcquisition* widAcquisition, QFESPIMB040MainWindow2* mainWindow, QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QObject* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetupBase* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription);
 
     public slots:
         void setLaserIntensity(int laser, int line, double intensity);
@@ -77,7 +77,7 @@ class QFESPIMB040ScriptedAcquisitionInstrumentControl : public QObject, public Q
 
     private:
         QFPluginServices* m_pluginServices;
-        QFESPIMB040OpticsSetup* opticsSetup;
+        QFESPIMB040OpticsSetupBase* opticsSetup;
         QFESPIMB040AcquisitionDescription* acqDescription;
         QFESPIMB040ExperimentDescription* expDescription;
         QFPluginLogService* log;
@@ -92,7 +92,7 @@ class QFESPIMB040ScriptedAcquisitionInstrumentControl : public QObject, public Q
 class QFESPIMB040ScriptedAcquisitionAcquisitionControl : public QObject, public QFESPIMB040ScriptedAcquisitionToolsBase {
         Q_OBJECT
     public:
-        explicit QFESPIMB040ScriptedAcquisitionAcquisitionControl(QFESPIMB040ScriptedAcquisition* widAcquisition, QFESPIMB040MainWindow2* mainWindow, QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QObject* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetup* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription);
+        explicit QFESPIMB040ScriptedAcquisitionAcquisitionControl(QFESPIMB040ScriptedAcquisition* widAcquisition, QFESPIMB040MainWindow2* mainWindow, QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QObject* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetupBase* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription);
 
     public slots:
         void doAcquisition();
@@ -107,7 +107,7 @@ class QFESPIMB040ScriptedAcquisitionAcquisitionControl : public QObject, public 
 
     private:
         QFPluginServices* m_pluginServices;
-        QFESPIMB040OpticsSetup* opticsSetup;
+        QFESPIMB040OpticsSetupBase* opticsSetup;
         QFESPIMB040AcquisitionDescription* acqDescription;
         QFESPIMB040ExperimentDescription* expDescription;
         QFPluginLogService* log;
