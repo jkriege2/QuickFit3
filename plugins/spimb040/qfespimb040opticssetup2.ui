@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFESPIMB040OpticsSetup2</class>
+ <widget class="QWidget" name="QFESPIMB040OpticsSetup2">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1153</width>
+    <height>777</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="layHTop">
+     <item>
+      <widget class="QFrame" name="frmLightpath">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Panel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>1</number>
+        </property>
+        <property name="margin">
+         <number>1</number>
+        </property>
+        <item>
+         <widget class="Line" name="line_7">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>&amp;light path config:  </string>
+          </property>
+          <property name="buddy">
+           <cstring>cmbLightpathConfig</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFESPIMB040ConfigComboBox" name="cmbLightpathConfig">
+          <property name="sizeAdjustPolicy">
+           <enum>QComboBox::AdjustToContents</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnLightpathSave">
+          <property name="text">
+           <string>save the current lightpath (shutters, filterwheels, ...) to a config file</string>
+          </property>
+          <property name="icon">
+           <iconset resource="spimb040.qrc">
+            <normaloff>:/spimb040/lightpath_save.png</normaloff>:/spimb040/lightpath_save.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnLightpathDelete">
+          <property name="text">
+           <string>delete the currently selected lightpath (shutters, filterwheels, ...) config file</string>
+          </property>
+          <property name="icon">
+           <iconset resource="spimb040.qrc">
+            <normaloff>:/spimb040/lightpath_delete.png</normaloff>:/spimb040/lightpath_delete.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnUnlock">
+          <property name="font">
+           <font>
+            <pointsize>7</pointsize>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>&amp;unlock</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>25</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_29">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>&lt;b&gt;&amp;main shutter:&lt;/b&gt;</string>
+          </property>
+          <property name="buddy">
+           <cstring>cmbLightpathConfig</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="tbMainShutter">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>25</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="frame_2">
+       <property name="frameShape">
+        <enum>QFrame::Panel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <property name="spacing">
+         <number>1</number>
+        </property>
+        <property name="margin">
+         <number>1</number>
+        </property>
+        <item>
+         <widget class="QToolButton" name="btnConnectDevices">
+          <property name="minimumSize">
+           <size>
+            <width>29</width>
+            <height>29</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>connect all devices, except cameras</string>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="spimb040.qrc">
+            <normaloff>:/spimb040/connect_devices.png</normaloff>:/spimb040/connect_devices.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnConnectCameras">
+          <property name="minimumSize">
+           <size>
+            <width>29</width>
+            <height>29</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>connect all cameras</string>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="spimb040.qrc">
+            <normaloff>:/spimb040/connect_cameras.png</normaloff>:/spimb040/connect_cameras.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_5">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnDisconnectDevices">
+          <property name="minimumSize">
+           <size>
+            <width>29</width>
+            <height>29</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>disconnect all devices, except cameras</string>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="spimb040.qrc">
+            <normaloff>:/spimb040/disconnect_devices.png</normaloff>:/spimb040/disconnect_devices.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnDisconnectCameras">
+          <property name="minimumSize">
+           <size>
+            <width>29</width>
+            <height>29</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>disconnect all cameras</string>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="spimb040.qrc">
+            <normaloff>:/spimb040/disconnect_cameras.png</normaloff>:/spimb040/disconnect_cameras.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnLoadSetup">
+          <property name="minimumSize">
+           <size>
+            <width>29</width>
+            <height>29</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>load all settings in this form from an external INI file</string>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="spimb040.qrc">
+            <normaloff>:/spimb040/template_open.png</normaloff>:/spimb040/template_open.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnSaveSetup">
+          <property name="minimumSize">
+           <size>
+            <width>29</width>
+            <height>29</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>save all settings in this form from an external INI file</string>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="spimb040.qrc">
+            <normaloff>:/spimb040/template_save.png</normaloff>:/spimb040/template_save.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_8">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnShortcutConfig">
+          <property name="toolTip">
+           <string>configure the keyboard shortcuts for the SPIM control</string>
+          </property>
+          <property name="text">
+           <string>configure keyboard shortcuts</string>
+          </property>
+          <property name="icon">
+           <iconset resource="spimb040.qrc">
+            <normaloff>:/spimb040/shortcut_settings.png</normaloff>:/spimb040/shortcut_settings.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnLockFiltersEtc">
+          <property name="minimumSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>lock/unlock filters &amp; objectives</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="spimb040.qrc">
+            <normaloff>:/spimb040/lock_opened.png</normaloff>
+            <normalon>:/spimb040/lock_closed.png</normalon>:/spimb040/lock_opened.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QWidget" name="gridWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <layout class="QGridLayout" name="gridLayout"/>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFESPIMB040ConfigComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qfespimb040configcombobox.h</header>
+   <slots>
+    <signal>currentConfigChanged(QString)</signal>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>cmbLightpathConfig</tabstop>
+  <tabstop>btnLightpathSave</tabstop>
+  <tabstop>btnLightpathDelete</tabstop>
+ </tabstops>
+ <resources>
+  <include location="spimb040.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>btnLightpathSave</sender>
+   <signal>clicked()</signal>
+   <receiver>QFESPIMB040OpticsSetup2</receiver>
+   <slot>saveCurrentLightpatConfig()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>284</x>
+     <y>36</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>422</x>
+     <y>5</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLightpathDelete</sender>
+   <signal>clicked()</signal>
+   <receiver>QFESPIMB040OpticsSetup2</receiver>
+   <slot>deleteCurrentLightpatConfig()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>308</x>
+     <y>36</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>557</x>
+     <y>3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnShortcutConfig</sender>
+   <signal>clicked()</signal>
+   <receiver>QFESPIMB040OpticsSetup2</receiver>
+   <slot>configShortcuts()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1110</x>
+     <y>39</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>534</x>
+     <y>45</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnUnlock</sender>
+   <signal>clicked()</signal>
+   <receiver>QFESPIMB040OpticsSetup2</receiver>
+   <slot>unlockLighpathCombobox()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>329</x>
+     <y>27</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>409</x>
+     <y>48</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>updateMagnifications()</slot>
+  <slot>loadLightpathConfig(QString)</slot>
+  <slot>saveCurrentLightpatConfig()</slot>
+  <slot>deleteCurrentLightpatConfig()</slot>
+  <slot>configShortcuts()</slot>
+  <slot>unlockLighpathCombobox()</slot>
+ </slots>
+</ui>

@@ -39,6 +39,7 @@
 #include "qfespimb040acquisitionconfigwidget2.h"
 #include "qfespimb040camparamstackconfigwidget2.h"
 #include "qfespimb040opticssetup.h"
+#include "qfespimb040opticssetup2.h"
 #include "qtriple.h"
 #include "qftools.h"
 #include "qfespimb040experimentdescription.h"
@@ -79,6 +80,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
         QVisibleHandleSplitter* splitter;
 
         QFESPIMB040OpticsSetup* optSetup;
+        QFESPIMB040OpticsSetup2* optSetup2;
         QFESPIMB040ExperimentDescription* widExperimentDescription;
         QFPluginServices* m_pluginServices;
 

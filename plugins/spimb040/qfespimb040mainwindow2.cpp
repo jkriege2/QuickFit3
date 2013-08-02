@@ -23,6 +23,7 @@ QFESPIMB040MainWindow2::QFESPIMB040MainWindow2(QFPluginServices* pluginServices,
     widAcquisition=NULL;
     widConfig=NULL;
     optSetup=NULL;
+    optSetup2=NULL;
     m_pluginServices=pluginServices;
     // create widgets and actions
     createWidgets(pluginServices->getExtensionManager());
@@ -49,6 +50,7 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     if (widConfig) widConfig->loadSettings((*settings->getQSettings()), "plugin_spim_b040/config/");
     setUpdatesEnabled(true);
     if (optSetup) optSetup->setUpdatesEnabled(true);
+    if (optSetup2) optSetup2->setUpdatesEnabled(true);
     if (widExperimentDescription) widExperimentDescription->setUpdatesEnabled(true);
     if (widAcquisitionDescription) widAcquisitionDescription->setUpdatesEnabled(true);
     if (widScriptedAcquisition) widScriptedAcquisition->setUpdatesEnabled(true);
@@ -212,6 +214,12 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
         tabMain->addTab(widConfig, tr("&Configuration"));
         connect(widConfig, SIGNAL(styleChanged(QString,QString)), this, SLOT(styleChanged(QString,QString)));
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        // optics setup tab
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        optSetup2=new QFESPIMB040OpticsSetup2(this, this, this, m_pluginServices);
+        optSetup2->loadOptSetup(ProgramOptions::getConfigValue("spimb040/optsetup_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup").toString());
+        tabMain->addTab(optSetup2, tr("TESTING: Instrument Setup 2"));
 
         optSetup->emitLighpathesChanged();
 }
