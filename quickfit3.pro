@@ -32,9 +32,11 @@ SUBDIRS += plg_imfcsfit
 plg_imfcsfit.subdir = ./plugins/imfcsfit
 plg_imfcsfit.depends = lib libqf3widgets
 
-SUBDIRS += plg_imfccsfit
-plg_imfccsfit.subdir = ./plugins/imfccsfit
-plg_imfccsfit.depends = lib libqf3widgets
+!contains(QF3CONFIG, nospecials) {
+	SUBDIRS += plg_imfccsfit
+	plg_imfccsfit.subdir = ./plugins/imfccsfit
+	plg_imfccsfit.depends = lib libqf3widgets
+}
 
 SUBDIRS += plg_fccsfit
 plg_fccsfit.subdir = ./plugins/fccsfit
