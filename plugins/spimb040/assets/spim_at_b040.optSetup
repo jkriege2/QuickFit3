@@ -7,40 +7,80 @@
 type=group
 x=0
 y=0
-rowspan=1
-colspan=1
 title=Illumination
 
 [group_transmission]
 type=group
 ingroup=group_illumination
-x=0
-y=0
-rowspan=1
-colspan=1
-title=transmission illumination
+title="transmission illumination"
 colstretch=0,1
+
+[transmission_source]
+type=lightsource
+title="source:"
+ingroup=group_transmission
+
+[transmission_filter]
+type=filter
+title="filter:"
+ingroup=group_transmission
+
+[transmission_shutter]
+type=shutter
+title="shutter:"
+ingroup=group_transmission
+
+
 
 
 [group_laser1]
 type=group
 ingroup=group_illumination
-x=0
-y=1
-rowspan=1
-colspan=1
-title=laser source 1
+title="laser source 1"
 colstretch=0,1
+
+[laser1_source]
+type=lightsource
+title="source:"
+ingroup=group_laser1
+
+[laser1_filter]
+type=filter
+title="filter:"
+ingroup=group_laser1
+
+[laser1_shutter]
+type=shutter
+title="shutter:"
+ingroup=group_laser1
+
+
 
 [group_laser2]
 type=group
 ingroup=group_illumination
-x=0
-y=2
-rowspan=1
-colspan=1
-title=laser source 2
+title="laser source 2"
 colstretch=0,1
+
+[laser2_source]
+type=lightsource
+title="source:"
+ingroup=group_laser2
+
+[laser2_filter]
+type=filter
+title="filter:"
+ingroup=group_laser2
+
+[laser2_shutter]
+type=shutter
+title="shutter:"
+ingroup=group_laser2
+
+
+
+
+
 
 [group_lightsheet]
 type=group
@@ -52,7 +92,20 @@ colspan=1
 title=lightsheet formation
 colstretch=0,1
 
+[main_shutter]
+type=shutter
+special_role=main_shutter
+title="main shutter:"
+ingroup=group_lightsheet
 
+[lightsheet_objective]
+type=objective
+title="lightsheet<br>objective:"
+ingroup=group_lightsheet
+
+[stretch_illumination]
+type=vertical_stretch
+ingroup=group_illumination
 
 
 
@@ -78,22 +131,16 @@ y=0
 [image_overview]
 type=label
 ingroup=group_center
-x=0
-y=0
 image=spim_at_b040_optics_setup.png
 text=
 
 [stretch_image_stage]
-type=horizontal_stretch
+type=vertical_stretch
 ingroup=group_center
-x=0
-y=1
 
 [stages_xyz]
 type=stages_xyz
 ingroup=group_center
-x=0
-y=2
 
 
 
@@ -113,3 +160,69 @@ type=group
 x=2
 y=0
 title=Detection
+
+[detection_objective]
+type=objective
+title="detection<br>objective:"
+ingroup=group_detection
+special_role=detection_objective
+
+[detection_filter1]
+type=filter
+title="filter1:"
+ingroup=group_detection
+
+[detection_filter2]
+type=filter
+title="filter":"
+ingroup=group_detection
+
+[detection_filterwheel]
+type=filterchanger
+title="filter wheel:"
+checkable=true
+ingroup=group_detection
+
+[camera1]
+type=camera
+title="Camera 1:"
+checkable=true
+ingroup=group_detection
+
+[camera1_filter]
+type=filter
+ingroup=group_detection
+used_by=camera1
+
+[camera1_dualview]
+type=dualview
+ingroup=group_detection
+used_by=camera1
+
+[camera1_tubelens]
+type=objective
+ingroup=group_detection
+used_by=camera1
+
+
+
+[camera2]
+type=camera
+title="Camera 2:"
+checkable=true
+ingroup=group_detection
+
+[camera2_filter]
+type=filter
+ingroup=group_detection
+used_by=camera2
+
+[camera2_dualview]
+type=dualview
+ingroup=group_detection
+used_by=camera2
+
+[camera2_tubelens]
+type=objective
+ingroup=group_detection
+used_by=camera2

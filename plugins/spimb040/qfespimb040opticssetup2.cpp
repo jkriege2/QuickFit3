@@ -132,6 +132,9 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                sgroups<<settings.getGroupName(i).c_str();
            }
 
+           QString global_objectives=m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini";
+           QString global_filters=m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini";
+
 
            qDebug()<<sgroups;
            for (int i=0; i<sgroups.size(); i++) {
@@ -139,96 +142,159 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                settings.enterGroup(sgroups[i].toStdString());
                bool ok=true;
                QString id=sgroups[i];
-               QString type=QString(settings.getAsString("type", "unknown").c_str()).trimmed().toLower(); //settings.value("type", "unknown").toString().trimmed().toLower();
-               QString title=QString(settings.getAsString("title", "").c_str());//settings.value("title", "").toString();
-               QString ingroup=QString(settings.getAsString("ingroup", "").c_str());//settings.value("ingroup", "").toString();
-               QGridLayout* ingroupLayout=ui->gridLayout;
-               if (ui_groups.contains(ingroup)) {
-                   QGridLayout* ggl=qobject_cast<QGridLayout*>(ui_groups[ingroup]->layout());
-                   if (ggl) {
-                       ingroupLayout=ggl;
-                   } else {
-                       m_log->log_error(tr("\n\nERROR reading optSetup-file '%1':\n    item '%2': did not find INGROUP (%3). Ignoring element!\n\n").arg(filename).arg(id).arg(ingroup));
-                       ok=false;
-                   }
-               }
-               if (ui_widgets.contains(ingroup)) {
-                   QGridLayout* ggl=qobject_cast<QGridLayout*>(ui_widgets[ingroup]->layout());
-                   if (ggl) {
-                       ingroupLayout=ggl;
-                   } else {
-                       m_log->log_error(tr("\n\nERROR reading optSetup-file '%1':\n    item '%2': did not find INGROUP (%3). Ignoring element!\n\n").arg(filename).arg(id).arg(ingroup));
-                       ok=false;
-                   }
-               }
 
-               int x=settings.getAsInt("x", 0);//settings.value("x", ingroupLayout->columnCount()).toInt();
-               int y=settings.getAsInt("y", 0);//settings.value("y", ingroupLayout->rowCount()).toInt();
-               int width=settings.getAsInt("width", 16);//settings.value("x", ingroupLayout->columnCount()).toInt();
-               int height=settings.getAsInt("height", 16);//settings.value("y", ingroupLayout->rowCount()).toInt();
-               int rowSpan=settings.getAsInt("rowspan", 1);//settings.value("rowspan", 1).toInt();
-               int colSpan=settings.getAsInt("colspan", 1);//settings.value("colspan", 1).toInt();
-               if (ok) {
-                   if (type=="group") {
-                       QGroupBox* w=new QGroupBox(this);
-                       QGridLayout* wgl=new QGridLayout(w);
-                       w->setLayout(wgl);
-                       w->setTitle(title);
-                       w->setCheckable(settings.getAsBool("checkable", false));
-                       w->setChecked(settings.getAsBool("checked", false));
-                       w->setFlat(settings.getAsBool("flat", false));
-                       ui_groups[id]=w;
-                       ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
-                   } else if (type=="frame") {
-                       QFrame* w=new QFrame(this);
-                       QGridLayout* wgl=new QGridLayout(w);
-                       w->setLayout(wgl);
-                       QString setProp=QString(settings.getAsString("shadow", "raised").c_str()).trimmed().toLower();
-                       if (setProp=="plain") w->setFrameShadow(QFrame::Plain);
-                       if (setProp=="sunken") w->setFrameShadow(QFrame::Sunken);
-                       if (setProp=="raised") w->setFrameShadow(QFrame::Raised);
-                       setProp=QString(settings.getAsString("shape", "panel").c_str()).trimmed().toLower();
-                       if (setProp=="none") w->setFrameStyle(QFrame::NoFrame);
-                       if (setProp=="box") w->setFrameStyle(QFrame::Box);
-                       if (setProp=="panel") w->setFrameStyle(QFrame::Panel);
-                       if (setProp=="styledpanel") w->setFrameStyle(QFrame::StyledPanel);
-                       if (setProp=="hline") w->setFrameStyle(QFrame::HLine);
-                       if (setProp=="vline") w->setFrameStyle(QFrame::VLine);
-                       if (setProp=="winpanel") w->setFrameStyle(QFrame::WinPanel);
-                       w->setLineWidth(settings.getAsInt("linewidth", 1));
-                       w->setLineWidth(settings.getAsInt("midlinewidth", 1));
-                       ui_widgets[id]=w;
-                       ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
-                   } else if (type=="label") {
-                       QLabel* w=new QLabel(this);
-                       w->setText(title);
-                       QString image=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("image", "").c_str()));//settings.value("title", "").toString();
-                       qDebug()<<image;
-                       if (QFile::exists(image)) {
-                           w->setPixmap(QPixmap(image));
+               if (id=="global") {
+                   global_objectives=settings.getAsString("global_objectives", global_objectives.toStdString()).c_str();
+                   global_filters=settings.getAsString("global_filters", global_filters.toStdString()).c_str();
+               } else {
+
+                   QString type=QString(settings.getAsString("type", "unknown").c_str()).trimmed().toLower(); //settings.value("type", "unknown").toString().trimmed().toLower();
+                   QString title=QString(settings.getAsString("title", "").c_str());//settings.value("title", "").toString();
+                   QString ingroup=QString(settings.getAsString("ingroup", "").c_str());//settings.value("ingroup", "").toString();
+                   QGridLayout* ingroupLayout=ui->gridLayout;
+                   if (ui_groups.contains(ingroup)) {
+                       QGridLayout* ggl=qobject_cast<QGridLayout*>(ui_groups[ingroup]->layout());
+                       if (ggl) {
+                           ingroupLayout=ggl;
+                       } else {
+                           m_log->log_error(tr("\nERROR reading optSetup-file '%1':\n    item '%2': did not find INGROUP (%3). Ignoring element!\n").arg(filename).arg(id).arg(ingroup));
+                           ok=false;
                        }
-                       ui_labels[id]=w;
-                       ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
-                   } else if (type=="horizontal_stretch") {
-                       QSpacerItem* w=new QSpacerItem(width,height,QSizePolicy::MinimumExpanding,QSizePolicy::Minimum);
-                       ingroupLayout->addItem(w, y,x, rowSpan, colSpan);
-                   } else if (type=="vertical_stretch") {
-                       QSpacerItem* w=new QSpacerItem(width,height,QSizePolicy::Minimum,QSizePolicy::MinimumExpanding);
-                       ingroupLayout->addItem(w, y,x, rowSpan, colSpan);
+                   }
+                   if (ui_widgets.contains(ingroup)) {
+                       QGridLayout* ggl=qobject_cast<QGridLayout*>(ui_widgets[ingroup]->layout());
+                       if (ggl) {
+                           ingroupLayout=ggl;
+                       } else {
+                           m_log->log_error(tr("\nERROR reading optSetup-file '%1':\n    item '%2': did not find INGROUP (%3). Ignoring element!\n").arg(filename).arg(id).arg(ingroup));
+                           ok=false;
+                       }
+                   }
+
+                   int x=settings.getAsInt("x", 0);//settings.value("x", ingroupLayout->columnCount()).toInt();
+                   int y=settings.getAsInt("y", 0);//settings.value("y", ingroupLayout->rowCount()).toInt();
+                   if (ingroupLayout) y=settings.getAsInt("y",  ingroupLayout->rowCount());
+                   int width=settings.getAsInt("width", 16);//settings.value("x", ingroupLayout->columnCount()).toInt();
+                   int height=settings.getAsInt("height", 16);//settings.value("y", ingroupLayout->rowCount()).toInt();
+                   int rowSpan=settings.getAsInt("rowspan", 1);//settings.value("rowspan", 1).toInt();
+                   int colSpan=settings.getAsInt("colspan", 1);//settings.value("colspan", 1).toInt();
+                   if (ok) {
+                       qDebug()<<"create "<<type<<"-element '"<<id<<"' in "<<ingroupLayout->parent()->objectName();
+                       if (type=="group") {
+                           QGroupBox* w=new QGroupBox(this);
+                           QGridLayout* wgl=new QGridLayout(w);
+                           w->setObjectName(id);
+                           w->setLayout(wgl);
+                           w->setTitle(title);
+                           w->setCheckable(settings.getAsBool("checkable", false));
+                           w->setChecked(settings.getAsBool("checked", false));
+                           w->setFlat(settings.getAsBool("flat", false));
+                           ui_groups[id]=w;
+                           ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
+                       } else if (type=="frame") {
+                           QFrame* w=new QFrame(this);
+                           QGridLayout* wgl=new QGridLayout(w);
+                           w->setObjectName(id);
+                           w->setLayout(wgl);
+                           QString setProp=QString(settings.getAsString("shadow", "raised").c_str()).trimmed().toLower();
+                           if (setProp=="plain") w->setFrameShadow(QFrame::Plain);
+                           if (setProp=="sunken") w->setFrameShadow(QFrame::Sunken);
+                           if (setProp=="raised") w->setFrameShadow(QFrame::Raised);
+                           setProp=QString(settings.getAsString("shape", "panel").c_str()).trimmed().toLower();
+                           if (setProp=="none") w->setFrameStyle(QFrame::NoFrame);
+                           if (setProp=="box") w->setFrameStyle(QFrame::Box);
+                           if (setProp=="panel") w->setFrameStyle(QFrame::Panel);
+                           if (setProp=="styledpanel") w->setFrameStyle(QFrame::StyledPanel);
+                           if (setProp=="hline") w->setFrameStyle(QFrame::HLine);
+                           if (setProp=="vline") w->setFrameStyle(QFrame::VLine);
+                           if (setProp=="winpanel") w->setFrameStyle(QFrame::WinPanel);
+                           w->setLineWidth(settings.getAsInt("linewidth", 1));
+                           w->setLineWidth(settings.getAsInt("midlinewidth", 1));
+                           ui_widgets[id]=w;
+                           ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
+                       } else if (type=="label") {
+                           QLabel* w=new QLabel(this);
+                           w->setObjectName(id);
+                           w->setTextFormat(Qt::AutoText);
+                           w->setText(title);
+                           QString image=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("image", "").c_str()));//settings.value("title", "").toString();
+                           qDebug()<<image;
+                           if (QFile::exists(image)) {
+                               w->setPixmap(QPixmap(image));
+                           }
+                           ui_labels[id]=w;
+                           ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
+                       } else if (type=="filter") {
+                           QF3FilterCombobox* w=new QF3FilterCombobox(this);
+                           w->setObjectName(id);
+                           QString gf=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("global_filters", global_filters.toStdString()).c_str()));
+                           QString lf=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("local_filters", QString(m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini").toStdString()).c_str()));
+                           w->setFilterINI(gf, lf);
+                           QLabel* l=new QLabel(title, this);
+                           l->setTextFormat(Qt::AutoText);
+                           l->setBuddy(w);
+                           ingroupLayout->addWidget(l, y,x, rowSpan, 1);
+                           ingroupLayout->addWidget(w, y,x+1, rowSpan, qMax(1,colSpan-1));
+                           ui_filters[id]=w;
+                       } else if (type=="dualview") {
+                           QF3DualViewWidget* w=new QF3DualViewWidget(this);
+                           w->setObjectName(id);
+                           QString gf=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("global_filters", global_filters.toStdString()).c_str()));
+                           QString lf=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("local_filters", QString(m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini").toStdString()).c_str()));
+                           w->setFilterINI(gf, lf);
+                           QLabel* l=NULL;
+                           QCheckBox* cb=NULL;
+                           if (settings.getAsBool("checkable", true)) {
+                               cb=new QCheckBox(title, this);
+                               cb->setChecked(settings.getAsBool("checked", true));
+                               ingroupLayout->addWidget(cb, y,x, rowSpan, 1);
+                           } else {
+                               l=new QLabel(title, this);
+                               l->setTextFormat(Qt::AutoText);
+                               l->setBuddy(w);
+                               ingroupLayout->addWidget(l, y,x, rowSpan, 1);
+                           }
+                           ingroupLayout->addWidget(w, y,x+1, rowSpan, qMax(1,colSpan-1));
+                           ui_dualviews[id]=qMakePair(cb,w);
+                       } else if (type=="objective") {
+                           QF3ObjectiveCombobox* w=new QF3ObjectiveCombobox(this);
+                           w->setObjectName(id);
+                           QString gf=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("global_objectives", global_objectives.toStdString()).c_str()));
+                           QString lf=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("local_objectives", QString(m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini").toStdString()).c_str()));
+                           w->setObjectivesINI(gf, lf);
+                           QLabel* l=new QLabel(title, this);
+                           l->setBuddy(w);
+                           l->setTextFormat(Qt::AutoText);
+                           ingroupLayout->addWidget(l, y,x, rowSpan, 1);
+                           ingroupLayout->addWidget(w, y,x+1, rowSpan, qMax(1,colSpan-1));
+                           ui_objectives[id]=w;
+                       } else if (type=="horizontal_stretch") {
+                           QSpacerItem* w=new QSpacerItem(width,height,QSizePolicy::Expanding,QSizePolicy::Minimum);
+                           //w->setObjectName(id);
+                           ingroupLayout->addItem(w, y,x, rowSpan, colSpan);
+                       } else if (type=="vertical_stretch") {
+                           QSpacerItem* w=new QSpacerItem(width,height,QSizePolicy::Minimum,QSizePolicy::Expanding);
+                           //w->setObjectName(id);
+                           ingroupLayout->addItem(w, y,x, rowSpan, colSpan);
+                       } else {
+                           m_log->log_error(tr("\nERROR reading optSetup-file '%1':\n    item '%2' has unknown type '%3'. Ignoring element!\n").arg(filename).arg(id).arg(type));
+                           ok=false;
+                       }
                    }
                }
                settings.leaveGroup();
-           }
+
+            }
 
 
         } catch (std::exception& e) { // error handling
-            m_log->log_error(tr("\n\nERROR reading optSetup-file '%1':\n    %2\n\n").arg(filename).arg(e.what()));
+            m_log->log_error(tr("\nERROR reading optSetup-file '%1':\n    %2\n").arg(filename).arg(e.what()));
         }
 
 
         m_log->log_text(tr("loading optSetup-file '%1' ... DONE\n").arg(filename));
     } else {
-        m_log->log_error(tr("\n\nThe optSetup-file '%1' does not exist!\n\n").arg(filename));
+        m_log->log_error(tr("\nERROR: The optSetup-file '%1' does not exist!\n").arg(filename));
     }
 }
 

@@ -32,6 +32,8 @@
 #include "qfcameraconfigcombobox.h"
 #include "qfcameracombobox.h"
 #include "qfmanyfilessettings.h"
+#include "filters.h"
+#include "objectives.h"
 
 class QFESPIMB040MainWindow; // forward
 namespace Ui {
@@ -278,6 +280,9 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         QMap<QString, QGroupBox*> ui_groups;
         QMap<QString, QWidget*> ui_widgets;
         QMap<QString, QLabel*> ui_labels;
+        QMap<QString, QF3FilterCombobox*> ui_filters;
+        QMap<QString, QF3ObjectiveCombobox*> ui_objectives;
+        QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> > ui_dualviews;
 };
 
 #endif // QFESPIMB040OPTICSSETUP2_H
