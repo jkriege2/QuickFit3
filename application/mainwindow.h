@@ -301,6 +301,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         void fixFilesPathesInProject();
 
         void renameGroups();
+        void setRDRPropertyByRegExp();
     private:
         void createWidgets();
         void createActions();
@@ -384,6 +385,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QAction* actRDRSetProperty;
         QAction* actFixFilesPathes;
         QAction* actRenameGroups;
+        QAction* actSetRDRPropertyByRegExp;
         QProgressBar* prgMainProgress;
 
         /** \brief length of the list of recently opened files */

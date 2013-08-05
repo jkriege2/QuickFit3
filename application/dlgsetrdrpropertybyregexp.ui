@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DlgSetRDRPropertyByRegExp</class>
+ <widget class="QDialog" name="DlgSetRDRPropertyByRegExp">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>956</width>
+    <height>498</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Set RDR Property by RegExp ...</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout" columnstretch="2,1,0">
+   <item row="1" column="0">
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>input:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="cmbInputData">
+       <item>
+        <property name="text">
+         <string>name</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>mode:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="cmbMode">
+       <item>
+        <property name="text">
+         <string>use output string, when matches</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>use output string, when mismatches</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>use match</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>use capture 1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>use capture 2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>use capture 3</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>regular expression:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="edtRegExp"/>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>output string:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLineEdit" name="edtOutputValue"/>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>property to set:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QComboBox" name="cmbOutput">
+       <item>
+        <property name="text">
+         <string>RDR group</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>role</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>folder</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>name</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>test result:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLabel" name="labTest">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QCheckBox" name="chkCaseSensitive">
+       <property name="text">
+        <string>case sensitive</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QCheckBox" name="chkMinimal">
+       <property name="text">
+        <string>minimal</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>&lt;b&gt;set:&lt;/b&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;in these records:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="btnSelectAll">
+       <property name="text">
+        <string>select all</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSelectNone">
+       <property name="text">
+        <string>deselect all</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0" colspan="3">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QListWidget" name="lstRDR"/>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>DlgSetRDRPropertyByRegExp</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>574</x>
+     <y>488</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>DlgSetRDRPropertyByRegExp</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>642</x>
+     <y>488</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbInputData</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>DlgSetRDRPropertyByRegExp</receiver>
+   <slot>updateTest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>557</x>
+     <y>48</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>400</x>
+     <y>6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbMode</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>DlgSetRDRPropertyByRegExp</receiver>
+   <slot>updateTest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>573</x>
+     <y>74</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>397</x>
+     <y>44</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtRegExp</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>DlgSetRDRPropertyByRegExp</receiver>
+   <slot>updateTest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>573</x>
+     <y>100</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>338</x>
+     <y>57</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtOutputValue</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>DlgSetRDRPropertyByRegExp</receiver>
+   <slot>updateTest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>573</x>
+     <y>126</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>358</x>
+     <y>82</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbOutput</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>DlgSetRDRPropertyByRegExp</receiver>
+   <slot>updateTest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>573</x>
+     <y>171</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>353</x>
+     <y>169</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lstRDR</sender>
+   <signal>currentRowChanged(int)</signal>
+   <receiver>DlgSetRDRPropertyByRegExp</receiver>
+   <slot>updateTest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>735</x>
+     <y>240</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>496</x>
+     <y>232</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>updateTest()</slot>
+ </slots>
+</ui>

@@ -10,6 +10,7 @@
 #include "dlgrdrsetproperty.h"
 #include "dlgselectprojectsubset.h"
 #include "dlgfixfilepaths.h"
+#include "dlgsetrdrpropertybyregexp.h"
 #include "jkmathparser.h"
 #include "qfhtmlhelptools.h"
 #include "renamegroupsdialog.h"
@@ -1019,6 +1020,8 @@ void MainWindow::createActions() {
     connect(actFixFilesPathes, SIGNAL(triggered()), this, SLOT(fixFilesPathesInProject()));
     actRenameGroups=new QAction(tr("rename RDR groups"), this);
     connect(actRenameGroups, SIGNAL(triggered()), this, SLOT(renameGroups()));
+    actSetRDRPropertyByRegExp=new QAction(tr("set RDR property by RegExp"), this);
+    connect(actSetRDRPropertyByRegExp, SIGNAL(triggered()), this, SLOT(setRDRPropertyByRegExp()));
 
     actPerformanceTest=new QAction(tr("test QFProject performance"), this);
     connect(actPerformanceTest, SIGNAL(triggered()), this, SLOT(projectPerformanceTest()));
@@ -1079,6 +1082,8 @@ void MainWindow::createMenus() {
     projectToolsMenu->addAction(actRDRSetProperty);
     projectToolsMenu->addSeparator();
     projectToolsMenu->addAction(actRenameGroups);
+    projectToolsMenu->addSeparator();
+    projectToolsMenu->addAction(actSetRDRPropertyByRegExp);
     projectToolsMenu->addSeparator();
     projectToolsMenu->addAction(actFixFilesPathes);
     debugToolsMenu=toolsMenu->addMenu(tr("debug tools"));
@@ -1857,6 +1862,7 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
     saveProjectAsAct->setEnabled(projectModeEnabled);
     actReloadProject->setEnabled(projectModeEnabled);
     actRenameGroups->setEnabled(projectModeEnabled);
+    actSetRDRPropertyByRegExp->setEnabled(projectModeEnabled);
     actRDRReplace->setEnabled(projectModeEnabled);
     actRDRUndoReplace->setEnabled(projectModeEnabled);
     actPerformanceTest->setEnabled(projectModeEnabled);
@@ -3029,6 +3035,30 @@ void MainWindow::renameGroups()
         for (int i=0; i<sl.size(); i++) {
             project->setRDRGroupName(i, sl[i]);
         }
+    }
+    delete dlg;
+}
+
+void MainWindow::setRDRPropertyByRegExp()
+{
+    if (!project) return;
+    DlgSetRDRPropertyByRegExp* dlg=new DlgSetRDRPropertyByRegExp(this);
+    dlg->setProject(project);
+    if (dlg->exec()) {
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        QList<QPointer<QFRawDataRecord> > rdrs=dlg->getSelectedRDRs();
+        setProgressRange(0, rdrs.size());
+        for (int i=0; i<rdrs.size(); i++) {
+            if (rdrs[i]) dlg->applyResult(rdrs[i]);
+            if (i%10==0) {
+                setProgress(i);
+                QApplication::processEvents();
+            }
+        }
+        setProgressRange(0, 100);
+        setProgress(0);
+        QApplication::restoreOverrideCursor();
+
     }
     delete dlg;
 }
