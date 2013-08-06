@@ -115,7 +115,7 @@ class QFFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, pu
         void clearFittedFileSets();
 
     public slots:
-        void guessFileSets(const QList<QFRawDataRecord* >& fileset, bool emitChangedSignal=true);
+        void guessFileSets(const QList<QFRawDataRecord* >& fileset, bool emitChangedSignal=true, bool alwaysEmit=false);
         void addFittedFileSet(const QList<QFRawDataRecord* >& fileset);
         void setFitFiles(const QList<QFRawDataRecord*>& records);
         void setFitFileSet(int idx);

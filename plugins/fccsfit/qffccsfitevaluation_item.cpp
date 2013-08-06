@@ -488,10 +488,11 @@ QString QFFCCSFitEvaluationItem::getFitFunctionID(QFRawDataRecord *rdr) const
     //if (rdr) qDebug()<<"QFFCCSFitEvaluationItem::getFitFunctionID("<<rdr->getName()<<")";
     //else qDebug()<<"QFFCCSFitEvaluationItem::getFitFunctionID("<<rdr<<")";
     int idx=fitFilesList.indexOf(rdr);
+    //qDebug()<<"QFFCCSFitEvaluationItem::getFitFunctionID: idx="<<idx;
     if (rdr && idx>=0) {
         return getFitFunctionID(idx);
     }
-    return NULL;
+    return QString();
 }
 
 QString QFFCCSFitEvaluationItem::rdrPointerToParameterStoreID(QFRawDataRecord *rdr) const
@@ -616,7 +617,7 @@ void QFFCCSFitEvaluationItem::clearFittedFileSets()
     if (fittedFileSets.size()!=oldS) emit filesetsChanged();
 }
 
-void QFFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &fileset, bool emitChangedSignal)
+void QFFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &fileset, bool emitChangedSignal, bool alwaysEmit)
 {
     int oldS=guessedFileSets.size();
     guessedFileSets.clear();
@@ -685,7 +686,7 @@ void QFFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &file
     }
     //qDebug()<<"guessed:"<<guessedFileSets.size();
 
-    if (emitChangedSignal && guessedFileSets.size()!=oldS) emit filesetsChanged();
+    if (emitChangedSignal && (alwaysEmit|| (guessedFileSets.size()!=oldS))) emit filesetsChanged();
 }
 
 
@@ -750,6 +751,7 @@ void QFFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int
             record->disableEmitResultsChanged();
 
             QFFitFunction* ffunc=getFitFunction(record);
+            if (!ffunc) ffunc=getFitFunction(r);
             egroup+=QString("__"+ffunc->id());
             egrouplabel+=QString(", "+ffunc->shortName());
             if (doLog) QFPluginLogTools::log_text(tr("   - adding RDR '%1', model '%2'' ... \n").arg(record->getName()).arg(ffunc->name()));

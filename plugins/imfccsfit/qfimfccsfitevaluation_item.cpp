@@ -727,6 +727,7 @@ void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<
             record->disableEmitResultsChanged();
 
             QFFitFunction* ffunc=getFitFunction(record);
+            if (!ffunc) ffunc=getFitFunction(r);
             if (doLog) QFPluginLogTools::log_text(tr("   - adding RDR '%1', model '%2'' ... \n").arg(record->getName()).arg(ffunc->name()));
             dfd.N=data->getCorrelationN();
             dfd.weights=NULL;
