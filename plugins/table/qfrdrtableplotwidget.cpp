@@ -8,7 +8,7 @@
 #include "qffitfunctionplottools.h"
 #include "qffitfunctionmanager.h"
 #include "qffitfunction.h"
-
+#include "dlgcolorbarcoloring.h"
 
 
 QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
@@ -1255,6 +1255,13 @@ void QFRDRTablePlotWidget::autoColorGraph(QFRDRTable::GraphInfo &g, int autocolo
     g.errorColor=g.color.darker();
 }
 
+void QFRDRTablePlotWidget::autoColorGraph(QFRDRTable::GraphInfo &g, QColor color)
+{
+    g.color=color;
+    g.fillColor=g.color.lighter();
+    g.errorColor=g.color.darker();
+}
+
 void QFRDRTablePlotWidget::on_btnSaveSystem_clicked() {
 
     QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/table/graph_templates/");
@@ -1371,6 +1378,39 @@ void QFRDRTablePlotWidget::on_btnResetColoring_clicked()
         autoColorGraph(p.graphs[i], i);
     }
     current->setPlot(this->plot, p);
+    updating=false;
+    listGraphs_currentRowChanged(oldidx);
+    connectWidgets();
+    ui->listGraphs->setCurrentRow(oldidx);
+    ui->widGraphSettings->initFocus();
+}
+
+void QFRDRTablePlotWidget::on_btnColorByPalette_clicked()
+{
+
+    DlgColorbarColoring* dlg=new DlgColorbarColoring(this);
+
+    QStringList sl;
+
+    int oldidx=ui->listGraphs->currentRow();
+    disconnectWidgets();
+    updating=true;
+    QFRDRTable::PlotInfo p=current->getPlot(this->plot);
+    for (int i=0; i<p.graphs.size(); i++) {
+        sl.append(p.graphs[i].title);
+    }
+    dlg->init(sl);
+    if (dlg->exec()) {
+        QList<bool> chk=dlg->getSelected();
+        QList<QColor> col=dlg->getColors();
+        for (int i=0; i<qMin(col.size(), p.graphs.size()); i++) {
+            if (chk.value(i, true)) {
+                autoColorGraph(p.graphs[i], col[i]);
+            }
+        }
+        current->setPlot(this->plot, p);
+    }
+    delete dlg;
     updating=false;
     listGraphs_currentRowChanged(oldidx);
     connectWidgets();

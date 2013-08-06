@@ -50,6 +50,7 @@ class QFRDRTablePlotWidget : public QWidget
         void on_btnMoveUp_clicked();
         void on_btnMoveDown_clicked();
         void on_btnResetColoring_clicked();
+        void on_btnColorByPalette_clicked();
 
         void graphDataChanged();
         void plotDataChanged();
@@ -62,6 +63,7 @@ class QFRDRTablePlotWidget : public QWidget
     protected:
         int getColumnWithStride(int column, const QFRDRTable::GraphInfo &g);
         void autoColorGraph(QFRDRTable::GraphInfo& g, int autocolor=0);
+        void autoColorGraph(QFRDRTable::GraphInfo& g, QColor color);
 
     private:
         Ui::QFRDRTablePlotWidget *ui;
