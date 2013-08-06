@@ -690,6 +690,7 @@ struct ALVFILEDATA  {
 bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
 
     try {
+        double timefactor=getProperty("ALV_TIMEFACTOR", 1.0).toDouble();
         ALVFILEDATA init;
         init.runs=0;
         init.alv_file=NULL;
@@ -905,9 +906,9 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
                         break;
                     }
                     if (ii==0) {
-                        correlationT[i]=d[0]/1000.0;
+                        correlationT[i]=d[0]*timefactor/1000.0;
                     } else {
-                        if (correlationT[i]!=d[0]/1000.0) {
+                        if (correlationT[i]!=d[0]*timefactor/1000.0) {
                             setError(tr("lag time in file '%2' and file '%1' are unequal (expected %3, but read %4).").arg(data[0].filename).arg(data[ii].filename).arg(correlationT[i]).arg(d[0]/1000.0));
                             error=true;
                             //qDebug()<<"ERROR 2 !";
@@ -1124,6 +1125,7 @@ struct ALV6FILEDATA  {
 
 bool QFRDRFCSData::loadFromALV6000Files(QStringList filenames) {
     try {
+        double timefactor=getProperty("ALV_TIMEFACTOR", 1.0).toDouble();
         ALV6FILEDATA init;
         init.runs=0;
         init.alv_file=NULL;
@@ -1339,9 +1341,9 @@ bool QFRDRFCSData::loadFromALV6000Files(QStringList filenames) {
                         break;
                     }
                     if (ii==0) {
-                        correlationT[i]=d[0]/1000.0;
+                        correlationT[i]=d[0]*timefactor/1000.0;
                     } else {
-                        if (correlationT[i]!=d[0]/1000.0) {
+                        if (correlationT[i]!=d[0]*timefactor/1000.0) {
                             setError(tr("lag time in file '%2' and file '%1' are unequal (expected %3, but read %4).").arg(data[0].filename).arg(data[ii].filename).arg(correlationT[i]).arg(d[0]/1000.0));
                             error=true;
                             //qDebug()<<"ERROR 2 !";

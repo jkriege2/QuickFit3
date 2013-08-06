@@ -170,7 +170,8 @@ void DlgSetRDRPropertyByRegExp::updateTest()
     if (rdr) {
         QString txt=getResult(rdr, NULL, &error);
         ui->labTest->setText(txt);//QString("<tt>%1</tt>").arg(getResult(rdr)));
-        ui->labError->setText(QString("<font color=\"red\"><b>ERROR: %1</b></font>").arg(error));
+        if (error.isEmpty()) ui->labError->setText(QString("<font color=\"darkgreen\"><b>OK</b></font>"));
+            else ui->labError->setText(QString("<font color=\"red\"><b>ERROR: %1</b></font>").arg(error));
 
     }
 }
