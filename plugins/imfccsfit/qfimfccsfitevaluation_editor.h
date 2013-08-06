@@ -121,6 +121,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
         QAction* actResetCurrent;
         QAction* actResetAllPixels;
+        QAction* actResetAllPixelsInAllFilesets;
         QAction* actCopyToInitial;
 
         QMenu* menuImFCCSFit;
@@ -174,6 +175,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void displayEvaluation();
 
         void resetCurrent();
+        void resetAllPixelsInAllFilesets();
         void resetAllPixels();
         void copyToInitial();
 

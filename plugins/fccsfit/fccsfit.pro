@@ -28,7 +28,8 @@ HEADERS += qffccsfitevaluation.h \
     qffccsparameterinputtable.h \
     qffccsparameterinputdelegate.h \
     qffccsfilesetsmodel.h \
-    ../base_classes/qfrdrrunselector.h
+    ../base_classes/qfrdrrunselector.h \
+    dlgfccsfitallconfiguration.h
 
 SOURCES += qffccsfitevaluation.cpp \
            qffccsfitevaluation_item.cpp \
@@ -43,10 +44,12 @@ SOURCES += qffccsfitevaluation.cpp \
     qffccsparameterinputtable.cpp \
     qffccsparameterinputdelegate.cpp \
     qffccsfilesetsmodel.cpp \
-    ../base_classes/qfrdrrunselector.cpp
+    ../base_classes/qfrdrrunselector.cpp \
+    dlgfccsfitallconfiguration.cpp
 
 FORMS = qffccsfitevaluation_editor.ui \   
-    optionswidget.ui
+    optionswidget.ui \
+    dlgfccsfitallconfiguration.ui
 
 RESOURCES += qffccsfitevaluation.qrc \
     ../base_classes/qfrdrmaskeditor.qrc

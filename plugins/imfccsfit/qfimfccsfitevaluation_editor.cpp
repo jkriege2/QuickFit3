@@ -155,6 +155,11 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     ui->btnClearAllPixels->setDefaultAction(actResetAllPixels);
     menuEvaluation->addAction(actResetAllPixels);
 
+    actResetAllPixelsInAllFilesets=new QAction(tr("Reset All &Pixels in all filesets"), this);
+    actResetAllPixelsInAllFilesets->setToolTip(tr("reset all pixels to the initial parameters in all files fitted so far."));
+    connect(actResetAllPixelsInAllFilesets, SIGNAL(triggered()), this, SLOT(resetAllPixelsInAllFilesets()));
+    menuEvaluation->addAction(actResetAllPixelsInAllFilesets);
+
     actCopyToInitial=new QAction(tr("Copy to &Initial"), this);
     actCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters,\n so they are used by files/runs that were not fit yet."));
     connect(actCopyToInitial, SIGNAL(triggered()), this, SLOT(copyToInitial()));
@@ -1218,6 +1223,23 @@ void QFImFCCSFitEvaluationEditor::resetCurrent()
     for (int f=0; f<eval->getFitFileCount(); f++) {
         QFRawDataRecord* rec=eval->getFitFile(f);
         eval->resetAllFitResultsCurrent(rec);
+    }
+    displayEvaluation();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFImFCCSFitEvaluationEditor::resetAllPixelsInAllFilesets()
+{
+    if (!current) return;
+    QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!eval) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QList<QList<QFRawDataRecord* > > filesets=eval->getFittedFiles();
+    for (int i=0; i<filesets.size(); i++) {
+        for (int f=0; f<filesets[i].size(); f++) {
+            QFRawDataRecord* rec=filesets[i].value(f);
+            eval->resetAllFitResultsCurrent(rec);
+        }
     }
     displayEvaluation();
     QApplication::restoreOverrideCursor();

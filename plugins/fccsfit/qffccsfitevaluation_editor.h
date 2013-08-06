@@ -105,6 +105,7 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
         QAction* actFitCurrent;
         QAction* actFitAllRunsMT;
         QAction* actFitAllRuns;
+        QAction* actFitAllFilesetsAllPixels;
         QAction* actPrintReport;
         QAction* actSaveReport;
         QAction* actGuess;
@@ -112,6 +113,7 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
         QAction* actResetCurrent;
         QAction* actResetAllRuns;
+        QAction* actResetAllPixelsInAllFilesets;
         QAction* actCopyToInitial;
 
         QMenu* menuFCCSFit;
@@ -151,10 +153,13 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
     
         /** \brief evaluate current file */
         void fitCurrent();
-        /** \brief all runs/pixels current file */
-        void fitAllRunsThreaded();
         /** \brief all runs/pixels current file, multi-threaded version */
+        void fitAllRunsThreaded();
+        /** \brief all runs/pixels current file */
         void fitAllRuns();
+
+        /** \brief all runs/pixels in all filesets */
+        void fitAllFilesetsAllPixels();
 
         /** \brief display the data from the current raw data record */
         void displayData();
@@ -163,6 +168,7 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
         void resetCurrent();
         void resetAllPixels();
+        void resetAllPixelsInAllFilesets();
         void copyToInitial();
 
         void setParameterTableSpans();

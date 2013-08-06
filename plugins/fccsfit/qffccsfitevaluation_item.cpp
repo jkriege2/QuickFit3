@@ -78,6 +78,7 @@ int QFFCCSFitEvaluationItem::getIndexMax(QFRawDataRecord *r) const
 {
     if (!r) return -1;
     QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(r);
+    if (!fcs) return -1;
     if (fcs->getCorrelationRuns()<=0) return -1;
     else return fcs->getCorrelationRuns()-1;
 }
