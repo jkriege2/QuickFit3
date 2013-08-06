@@ -43,6 +43,7 @@ void DlgSetRDRPropertyByRegExp::setProject(QFProject *project)
         item->setIcon(r->getSmallIcon());
         ui->lstRDR->addItem(item);
     }
+    ui->lstRDR->setCurrentRow(0);
 
 }
 
@@ -66,11 +67,15 @@ QString DlgSetRDRPropertyByRegExp::getInputString(QFRawDataRecord *rdr) const
     return QString();
 }
 
-QString DlgSetRDRPropertyByRegExp::getResult(QFRawDataRecord *rdr, bool* apply) const
+QString DlgSetRDRPropertyByRegExp::getResult(QFRawDataRecord *rdr, bool* apply, QString *error) const
 {
     QRegExp rx(ui->edtRegExp->text());
     rx.setCaseSensitivity((ui->chkCaseSensitive->isChecked())?Qt::CaseSensitive:Qt::CaseInsensitive);
     rx.setMinimal(ui->chkMinimal->isChecked());
+    if (error) {
+        if (!rx.isValid()) *error=rx.errorString();
+        else *error="";
+    }
     QString input=getInputString(rdr);
     QString output=ui->edtOutputValue->text();
     if (ui->cmbMode->currentIndex()==0) {
@@ -108,6 +113,13 @@ QString DlgSetRDRPropertyByRegExp::getResult(QFRawDataRecord *rdr, bool* apply) 
             if (apply) *apply=true;
             return rx.cap(3);
         }
+    } else if (ui->cmbMode->currentIndex()==6) {
+        QString o=output;
+        for (int i=0; i<rx.captureCount(); i++) {
+            o=o.replace(QString("%")+QString::number(i), rx.cap(i));
+        }
+        if (apply) *apply=true;
+        return o;
     }
     if (apply) *apply=false;
     return QString();
@@ -154,7 +166,11 @@ void DlgSetRDRPropertyByRegExp::updateTest()
 {
     int idx=ui->lstRDR->currentRow();
     QFRawDataRecord* rdr=rdrs.value(idx, NULL);
+    QString error;
     if (rdr) {
-        ui->labTest->setText(getResult(rdr));//QString("<tt>%1</tt>").arg(getResult(rdr)));
+        QString txt=getResult(rdr, NULL, &error);
+        ui->labTest->setText(txt);//QString("<tt>%1</tt>").arg(getResult(rdr)));
+        ui->labError->setText(QString("<font color=\"red\"><b>ERROR: %1</b></font>").arg(error));
+
     }
 }

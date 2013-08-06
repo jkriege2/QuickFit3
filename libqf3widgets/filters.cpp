@@ -433,19 +433,27 @@ void QF3DualViewWidget::saveSettings(QFManyFilesSettings &settings, QString prop
 QF3DualViewWidget::QF3DualViewWidget(QWidget *parent):
     QWidget(parent)
 {
-    lay=new QFormLayout(this);
+    lay=new QGridLayout(this);
     setLayout(lay);
     QLabel* l=NULL;
     cmbDirection=new QComboBox(this);
     cmbDirection->addItem(QIcon(":/libqf3widgets/dvhor.png"), tr("horizontal"));
     cmbDirection->addItem(QIcon(":/libqf3widgets/dvver.png"), tr("vertical"));
-    lay->addRow(tr("<small>&orientation:</small>"), cmbDirection);
+    lay->addWidget(new QLabel(tr("<small>&orientation:</small>")),0,0);
+    lay->addWidget(cmbDirection,0,1);
     fltSplitter=new QF3FilterCombobox(this);
-    lay->addRow(tr("<small>splitter:</small>"), fltSplitter);
+    lay->addWidget(new QLabel(tr("<small>splitter:</small>")),0,2);
+    lay->addWidget(fltSplitter,0,3);
     fltShort=new QF3FilterCombobox(this);
-    lay->addRow(tr("<small>short &lambda;:</small>"), fltShort);
+    lay->addWidget(new QLabel(tr("<small>short &lambda;:</small>")),1,0);
+    lay->addWidget(fltShort,1,1);
     fltLong=new QF3FilterCombobox(this);
-    lay->addRow(tr("<small>long &lambda;:</small>"), fltLong);
+    lay->addWidget(new QLabel(tr("<small>long &lambda;:</small>")),1,2);
+    lay->addWidget(fltLong,1,3);
+    lay->setContentsMargins(0,0,0,0);
+    lay->setVerticalSpacing(1);
+    lay->setColumnStretch(1,1);
+    lay->setColumnStretch(3,1);
 
 }
 

@@ -51,7 +51,7 @@ class QFWIDLIB_EXPORT QFFilterChangerConfigWidget : public QFrame {
         /** Default destructor */
         virtual ~QFFilterChangerConfigWidget();
 
-        void init(const QString& filterconfig, QFPluginLogService* log, QFPluginServices* pluginServices);
+        void init(const QString &globalfilterconfig, const QString& filterconfig, QFPluginLogService* log, QFPluginServices* pluginServices);
         void setLog(QFPluginLogService* log);
 
         /** \brief load settings */
@@ -105,6 +105,7 @@ class QFWIDLIB_EXPORT QFFilterChangerConfigWidget : public QFrame {
         QFPluginLogService* m_log;
         QFPluginServices* m_pluginServices;
         QString m_filterconfig;
+        QString m_globalfilterconfig;
 
         QFFilterChangerConfigWidgetThread* m_thread;
         bool useThread;

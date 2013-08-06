@@ -25,7 +25,7 @@ class DlgSetRDRPropertyByRegExp : public QDialog
         QList<QPointer<QFRawDataRecord> > getSelectedRDRs() const;
 
         QString getInputString(QFRawDataRecord* rdr) const;
-        QString getResult(QFRawDataRecord* rdr, bool *apply=NULL) const;
+        QString getResult(QFRawDataRecord* rdr, bool *apply=NULL, QString *error=NULL) const;
         void applyResult(QFRawDataRecord* rdr);
     protected slots:
         void on_btnSelectNone_clicked();

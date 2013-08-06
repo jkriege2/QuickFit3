@@ -112,7 +112,9 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfmathparserxfunctionlinegraph.h \
     doubledatacutsliders.h \
     ../../../../LIB/trunk/qt/jkautooutputtimer.h \
-    qfrecentfilesmenu.h
+    qfrecentfilesmenu.h \
+    qfstageconfigwidgetthread.h \
+    qfstageconfigwidget.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -187,7 +189,9 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfmathparserxfunctionlinegraph.cpp \
     doubledatacutsliders.cpp \
     ../../../../LIB/trunk/qt/jkautooutputtimer.cpp \
-    qfrecentfilesmenu.cpp
+    qfrecentfilesmenu.cpp \
+    qfstageconfigwidgetthread.cpp \
+    qfstageconfigwidget.cpp
 
 
 FORMS += qfdlg_csvparameters.ui \

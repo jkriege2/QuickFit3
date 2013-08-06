@@ -13,7 +13,7 @@ title=Illumination
 type=group
 ingroup=group_illumination
 title="transmission illumination"
-colstretch=0,1
+colstretch="0,1"
 
 [transmission_source]
 type=lightsource
@@ -37,7 +37,7 @@ ingroup=group_transmission
 type=group
 ingroup=group_illumination
 title="laser source 1"
-colstretch=0,1
+colstretch="0,1"
 
 [laser1_source]
 type=lightsource
@@ -60,7 +60,7 @@ ingroup=group_laser1
 type=group
 ingroup=group_illumination
 title="laser source 2"
-colstretch=0,1
+colstretch="0,1"
 
 [laser2_source]
 type=lightsource
@@ -85,12 +85,8 @@ ingroup=group_laser2
 [group_lightsheet]
 type=group
 ingroup=group_illumination
-x=0
-y=3
-rowspan=1
-colspan=1
 title=lightsheet formation
-colstretch=0,1
+colstretch="0,1"
 
 [main_shutter]
 type=shutter
@@ -102,6 +98,7 @@ ingroup=group_lightsheet
 type=objective
 title="lightsheet<br>objective:"
 ingroup=group_lightsheet
+special_role=projection_objective
 
 [stretch_illumination]
 type=vertical_stretch
@@ -126,6 +123,7 @@ type=group #frame
 shape=none
 x=1
 y=0
+colstretch="0,1"
 
 
 [image_overview]
@@ -133,6 +131,8 @@ type=label
 ingroup=group_center
 image=spim_at_b040_optics_setup.png
 text=
+x=0
+colspan=2
 
 [stretch_image_stage]
 type=vertical_stretch
@@ -141,7 +141,14 @@ ingroup=group_center
 [stages_xyz]
 type=stages_xyz
 ingroup=group_center
+title="XYZ sample translation stages:"
+x=0
+colspan=2
 
+[stages_r]
+type=stage
+ingroup=group_center
+title="rotation:"
 
 
 
@@ -161,6 +168,8 @@ x=2
 y=0
 title=Detection
 
+
+
 [detection_objective]
 type=objective
 title="detection<br>objective:"
@@ -169,12 +178,12 @@ special_role=detection_objective
 
 [detection_filter1]
 type=filter
-title="filter1:"
+title="filter 1:"
 ingroup=group_detection
 
 [detection_filter2]
 type=filter
-title="filter":"
+title="filter 2:"
 ingroup=group_detection
 
 [detection_filterwheel]
@@ -183,46 +192,71 @@ title="filter wheel:"
 checkable=true
 ingroup=group_detection
 
+
+
+
+[stretch_detection]
+type=vertical_stretch
+ingroup=group_detection
+
 [camera1]
 type=camera
 title="Camera 1:"
 checkable=true
 ingroup=group_detection
+x=0
+colspan=2
 
 [camera1_filter]
 type=filter
 ingroup=group_detection
 used_by=camera1
+title="detection filter:"
 
 [camera1_dualview]
 type=dualview
 ingroup=group_detection
 used_by=camera1
+title="DualView:"
 
 [camera1_tubelens]
 type=objective
+subtype=tubelens
 ingroup=group_detection
 used_by=camera1
+title="tube lens:"
 
-
+[camera12_hline]
+type=hline
+ingroup=group_detection
+colspan=2
+x=0
 
 [camera2]
 type=camera
 title="Camera 2:"
 checkable=true
 ingroup=group_detection
+x=0
+colspan=2
 
 [camera2_filter]
 type=filter
 ingroup=group_detection
 used_by=camera2
+title="detection filter:"
 
 [camera2_dualview]
 type=dualview
 ingroup=group_detection
 used_by=camera2
+title="DualView:"
 
 [camera2_tubelens]
 type=objective
+subtype=tubelens
 ingroup=group_detection
 used_by=camera2
+title="tube lens:"
+
+

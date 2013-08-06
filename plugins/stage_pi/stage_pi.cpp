@@ -487,6 +487,13 @@ QString QFExtensionLinearStagePI::getStageName(unsigned int axis) const
     return n;
 }
 
+QFExtensionLinearStage::StageInfo QFExtensionLinearStagePI::getStageInfo(unsigned int axis) const
+{
+    QFExtensionLinearStage::StageInfo info;
+    info.maxSpeed=maxVelocity;
+    return info;
+}
+
 
 void QFExtensionLinearStagePI::log_text(QString message) {
 	if (logService) logService->log_text(message);

@@ -49,7 +49,7 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     ui->lsTransmission->init(m_log, m_pluginServices);
     ui->lsLaser1->init(m_log, m_pluginServices);
     ui->lsLaser2->init(m_log, m_pluginServices);
-    ui->filtcDetection->init("spimb040_filters.ini", m_log, m_pluginServices);
+    ui->filtcDetection->init(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini", m_log, m_pluginServices);
     ui->cmbLightpathConfig->init(m_pluginServices->getConfigFileDirectory()+"/plugins/ext_spimb040/", "lpc");
     ui->cmbLightpathConfig->setIcon(QIcon(":/spimb040/lightpath.png"));
     ui->btnLockFiltersEtc->setChecked(true);

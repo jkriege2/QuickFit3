@@ -104,6 +104,9 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
         /** \copydoc QFExtensionLinearStage::getStageName() */
         virtual QString getStageName(unsigned int axis) const;
 
+        /** \copydoc QFExtensionLinearStage::getStageInfo() */
+        virtual StageInfo getStageInfo(unsigned int axis) const;
+
 
         /** \brief log project text message
          *  \param message the message to log

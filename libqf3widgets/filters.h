@@ -159,7 +159,7 @@ class QFWIDLIB_EXPORT QF3DualViewWidget : public QWidget {
         QF3FilterCombobox* fltSplitter;
         QF3FilterCombobox* fltShort;
         QF3FilterCombobox* fltLong;
-        QFormLayout* lay;
+        QGridLayout* lay;
 };
 
 

@@ -71,6 +71,11 @@
          <string>use capture 3</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>replace %0,%1,... in output string by captures</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item row="2" column="0">
@@ -93,14 +98,14 @@
      <item row="5" column="1">
       <widget class="QLineEdit" name="edtOutputValue"/>
      </item>
-     <item row="7" column="0">
+     <item row="8" column="0">
       <widget class="QLabel" name="label_5">
        <property name="text">
         <string>property to set:</string>
        </property>
       </widget>
      </item>
-     <item row="7" column="1">
+     <item row="8" column="1">
       <widget class="QComboBox" name="cmbOutput">
        <item>
         <property name="text">
@@ -149,6 +154,13 @@
       <widget class="QCheckBox" name="chkMinimal">
        <property name="text">
         <string>minimal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QLabel" name="labError">
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>

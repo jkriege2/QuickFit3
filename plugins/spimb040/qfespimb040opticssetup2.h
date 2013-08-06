@@ -34,6 +34,12 @@
 #include "qfmanyfilessettings.h"
 #include "filters.h"
 #include "objectives.h"
+#include "qfespimb040simplecameraconfig.h"
+#include "qfespimb040samplestageconfig.h"
+#include "qflightsourceconfigwidget.h"
+#include "qfshutterconfigwidget.h"
+#include "qfstageconfigwidget.h"
+#include "qffilterchangerconfigwidget.h"
 
 class QFESPIMB040MainWindow; // forward
 namespace Ui {
@@ -237,6 +243,8 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
 
         void configShortcuts();
 
+        void changeDVenabledState();
+
 
     protected:
         void closeEvent(QCloseEvent * event);
@@ -283,6 +291,45 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         QMap<QString, QF3FilterCombobox*> ui_filters;
         QMap<QString, QF3ObjectiveCombobox*> ui_objectives;
         QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> > ui_dualviews;
+
+        QF3ObjectiveCombobox* objProjection;
+        QF3ObjectiveCombobox* objDetection;
+
+        struct CameraWidgets {
+            CameraWidgets() {
+                config=NULL;
+                filters.clear();
+                tubelens="";
+                shutter="";
+                dualview="";
+            }
+
+            QFESPIMB040SimpleCameraConfig* config;
+            QList<QString> filters;
+            QString tubelens;
+            QString shutter;
+            QString dualview;
+        };
+        QMap<QString, CameraWidgets> ui_cameras;
+
+        QMap<QString, QFESPIMB040SampleStageConfig*> ui_stageconfigs;
+        QMap<QString, QFStageConfigWidget*> ui_stages;
+        QMap<QString, QFFilterChangerConfigWidget*> ui_filterchangers;
+        QMap<QString, QFShutterConfigWidget*> ui_shutter;
+
+        QFShutterConfigWidget* shutterMain;
+
+        struct LightsourceWidgets {
+            LightsourceWidgets() {
+                config=NULL;
+                filters.clear();
+                shutter="";
+            }
+            QFLightSourceConfigWidget* config;
+            QList<QString> filters;
+            QString shutter;
+        };
+        QMap<QString, LightsourceWidgets> ui_lightsource;
 };
 
 #endif // QFESPIMB040OPTICSSETUP2_H

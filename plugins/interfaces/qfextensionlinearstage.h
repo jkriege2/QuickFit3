@@ -40,6 +40,27 @@ class QFExtensionLinearStage {
             Error=3
         };
 
+        /** \brief stage informations */
+        struct StageInfo {
+                StageInfo() {
+                    positionUnit=QString("µm");
+                    speedUnit=QString("µm/s");
+                    minPos=-1e37;
+                    maxPos=1e37;
+                    minSpeed=0;
+                    maxSpeed=1e37;
+                    resolution=1e-3;
+                }
+
+            QString positionUnit;
+            QString speedUnit;
+            double minPos;
+            double maxPos;
+            double minSpeed;
+            double maxSpeed;
+            double resolution;
+        };
+
 
         /** Default destructor */
         virtual ~QFExtensionLinearStage() {};
@@ -103,6 +124,8 @@ class QFExtensionLinearStage {
         /*! \brief returns the human readable name of the given stage axis */
         virtual QString getStageName(unsigned int axis) const=0;
 
+        /*! \brief returns some information of the given stage axis */
+        virtual StageInfo getStageInfo(unsigned int axis) const=0;
 };
 
 

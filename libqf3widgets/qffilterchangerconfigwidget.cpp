@@ -8,8 +8,10 @@ QFFilterChangerConfigWidget::QFFilterChangerConfigWidget(QWidget* parent):
 {
 
     useThread=true;
-    setFrameStyle(QFrame::Panel|QFrame::Raised);
-    setLineWidth(1);
+    //setFrameStyle(QFrame::Panel|QFrame::Raised);
+    //setLineWidth(1);
+    setFrameStyle(QFrame::NoFrame);
+    setLineWidth(0);
     FilterChangerStateUpdateInterval=251;
 
     m_thread=new QFFilterChangerConfigWidgetThread(this);
@@ -74,8 +76,9 @@ void QFFilterChangerConfigWidget::setLog(QFPluginLogService* log) {
     m_log=log;
 }
 
-void QFFilterChangerConfigWidget::init(const QString &filterconfig, QFPluginLogService *log, QFPluginServices *pluginServices) {
+void QFFilterChangerConfigWidget::init(const QString &globalfilterconfig, const QString &filterconfig, QFPluginLogService *log, QFPluginServices *pluginServices) {
     m_filterconfig=filterconfig;
+    m_globalfilterconfig=globalfilterconfig;
     m_log=log;
     m_pluginServices=pluginServices;
 
@@ -165,11 +168,11 @@ void QFFilterChangerConfigWidget::createWidgets() {
     widgetLayout->addWidget(btnSelectFilters,0,2);
     cmbFilterChanger=new QFFilterChangerComboBox(this);
     cmbFilterChanger->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    widgetLayout->addWidget(cmbFilterChanger,1,0);
+    widgetLayout->addWidget(cmbFilterChanger,0,3);//1,0);
     btnConnect=new QToolButton(this);
-    widgetLayout->addWidget(btnConnect,1,1);
+    widgetLayout->addWidget(btnConnect,0,4);//1,1);
     btnConfigure=new QToolButton(this);
-    widgetLayout->addWidget(btnConfigure,1,2);
+    widgetLayout->addWidget(btnConfigure,0,5);//1,2);
 
     QWidget* w=new QWidget(this);
     w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -251,7 +254,7 @@ void QFFilterChangerConfigWidget::updateFilters() {
                         f=filters[i];
                     }
                 }
-                cmbFilter->addItem(QF3FilterCombobox::getFilterIcon(f, m_pluginServices->getGlobalConfigFileDirectory()+QString("/")+m_filterconfig, m_pluginServices->getConfigFileDirectory()+QString("/")+m_filterconfig),
+                cmbFilter->addItem(QF3FilterCombobox::getFilterIcon(f, m_globalfilterconfig, m_filterconfig),
                                    tr("#%1: %2").arg(i+1).arg(f), f);
             }
         }
@@ -281,7 +284,7 @@ void QFFilterChangerConfigWidget::selectFilters() {
     for (unsigned int i=0; i<FilterChanger->getFilterChangerFilterCount(FilterChangerID); i++) {
         QF3FilterCombobox* cmb=new QF3FilterCombobox(this);
         combos.append(cmb);
-        cmb->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+QString("/")+m_filterconfig, m_pluginServices->getConfigFileDirectory()+QString("/")+m_filterconfig);
+        cmb->setFilterINI(m_globalfilterconfig, m_filterconfig);
         formlayout->addRow(tr("filter #%1:").arg(i+1), cmb);
         if (int64_t(i)<filters.size()) cmb->setCurrentFilter(filters[i]);
     }
@@ -398,7 +401,7 @@ QString QFFilterChangerConfigWidget::getCurrentFilter() const {
 FilterDescription QFFilterChangerConfigWidget::getCurrentFilterDescription() const {
     QString f="---";
     if (cmbFilter->currentIndex()>=0) f=cmbFilter->itemData(cmbFilter->currentIndex()).toString();
-    return QF3FilterCombobox::getFilter(f, m_pluginServices->getGlobalConfigFileDirectory()+QString("/")+m_filterconfig, m_pluginServices->getConfigFileDirectory()+QString("/")+m_filterconfig);
+    return QF3FilterCombobox::getFilter(f, m_globalfilterconfig, m_filterconfig);
 }
 
 

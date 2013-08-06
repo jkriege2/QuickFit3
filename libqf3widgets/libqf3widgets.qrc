@@ -71,5 +71,17 @@
         <file alias="stage_none.png">icons/stage_none.png</file>
         <file alias="dvhor.png">icons/dvhor.png</file>
         <file alias="dvver.png">icons/dvver.png</file>
+
+
+        <file alias="stagesettings.png">icons/configure_alt.png</file>
+        <file alias="stagemove.png">icons/2rightarrow.png</file>
+        <file alias="stage_error.png">icons/stage_error.png</file>
+        <file alias="stage_ready.png">icons/stage_ready.png</file>
+        <file alias="stage_moving.png">icons/stage_moving.png</file>
+        <file alias="stage_moving2.png">icons/stage_moving2.png</file>
+        <file alias="stage_disconnected.png">icons/stage_disconnected.png</file>
+        <file alias="stage_joystick.png">icons/joystick.png</file>
+        <file alias="stage_nojoystick.png">icons/nojoystick.png</file>
+
     </qresource>
 </RCC>
