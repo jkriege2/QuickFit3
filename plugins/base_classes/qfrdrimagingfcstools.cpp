@@ -95,9 +95,17 @@ void appendCategorizedFilesFromB040SPIMConfig(QSettings& settings, QStringList& 
                 files<<inifiles[i];
                 files_types<<"overview_after";
                 files_descriptions<<inifiledescriptions[i];
+            } else if (inifiledescriptions[i].toLower().contains("overview") && inifiledescriptions[i].toLower().contains("background")) {
+                files<<inifiles[i];
+                files_types<<"overview_background";
+                files_descriptions<<inifiledescriptions[i];
             } else if (inifiledescriptions[i].toLower().contains("z stack")) {
                 files<<inifiles[i];
                 files_types<<"zstack";
+                files_descriptions<<inifiledescriptions[i];
+            } else {
+                files<<inifiles[i];
+                files_types<<"image";
                 files_descriptions<<inifiledescriptions[i];
             }
         } else if (inifiletypes[i].toLower().contains("csv")) {

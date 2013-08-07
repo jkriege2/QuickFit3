@@ -843,7 +843,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                             acquisitionPrefix=acquisitionPrefix1+QString("_overview_background.tif");
                             prefix=QString("overview_background");
                         }
-                        ok=acqTools->acquireImageWithLightpath(lightpathFilenamePreview(ovrImg), lightpathPreview(ovrImg), extension1, ecamera1, camera1, currentPreviewConfigFilename(0,ovrImg), acquisitionPrefix, prefix, tr("overview background with lightpath %1 for camera 1").arg(ovrImg+1), moreFiles1, acquisitionDescription1);
+                        ok=acqTools->acquireImageWithLightpath("", "none", extension1, ecamera1, camera1, currentPreviewConfigFilename(0,ovrImg), acquisitionPrefix, prefix, tr("overview background with lightpath %1 for camera 1").arg(ovrImg+1), moreFiles1, acquisitionDescription1);
                         if (!ok) {
                             ACQUISITION_ERROR(tr("  - error acquiring overview background image from camera 1, lightpath %1!\n").arg(ovrImg+1));
                         } else {
@@ -860,7 +860,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                             acquisitionPrefix=acquisitionPrefix1+QString("_overview_background.tif");
                             prefix=QString("overview_background");
                         }
-                        ok=acqTools->acquireImageWithLightpath(lightpathFilenamePreview(ovrImg), lightpathPreview(ovrImg), extension2, ecamera2, camera2, currentPreviewConfigFilename(1,ovrImg), acquisitionPrefix, prefix, tr("overview background with lightpath %1 for camera 2").arg(ovrImg+1), moreFiles2, acquisitionDescription2);
+                        ok=acqTools->acquireImageWithLightpath("", "none", extension2, ecamera2, camera2, currentPreviewConfigFilename(1,ovrImg), acquisitionPrefix, prefix, tr("overview background with lightpath %1 for camera 2").arg(ovrImg+1), moreFiles2, acquisitionDescription2);
                         if (!ok) {
                             ACQUISITION_ERROR(tr("  - error acquiring overview background image from camera 2, lightpath %1!\n").arg(ovrImg+1));
                         } else {
