@@ -406,7 +406,7 @@ bool QFESPIMB040SimpleCameraConfig::connectDevice(QFExtension* extension, QFExte
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         viewData.extension=extension;
         viewData.camera=cam;
-        viewData.measurementDevice=qobject_cast<QFExtensionMeasurementDevice*>(object);
+        viewData.measurementDevice=qobject_cast<QFExtensionMeasurementAndControlDevice*>(object);
         viewData.usedCamera=camera;
         cam->setCameraLogging(m_log);
         bool s=cam->connectCameraDevice(camera);
@@ -711,7 +711,7 @@ bool QFESPIMB040SimpleCameraConfig::isCameraConnected() const {
 }
 
 void QFESPIMB040SimpleCameraConfig::storeMeasurements(QMap<QString, QVariant> &data, const QString &prefix) {
-    QFExtensionMeasurementDevice* md=viewData.measurementDevice;
+    QFExtensionMeasurementAndControlDevice* md=viewData.measurementDevice;
     int camIdx=viewData.usedCamera;
     //qDebug()<<"camera   extension="<<viewData.extension<<"   md="<<viewData.measurementDevice<<"   camIdx="<<camIdx<<"    md="<<md;
     if (md) {

@@ -1408,6 +1408,21 @@ QString QFExtensionCameraAndor::getMeasurementDeviceValueShortName(unsigned int 
     return QString();
 }
 
+bool QFExtensionCameraAndor::isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value)
+{
+    return false;
+}
+
+void QFExtensionCameraAndor::setMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value, const QVariant &data)
+{
+
+}
+
+QVariant::Type QFExtensionCameraAndor::getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value)
+{
+    return QVariant::Invalid;
+}
+
 Q_EXPORT_PLUGIN2(cam_andor, QFExtensionCameraAndor)
 
 

@@ -159,7 +159,7 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
             /** \brief typecast of extension to QFExtensionCamera */
             QFExtensionCamera* camera;
             /** \brief typecast of extension to QFExtensionMeasurementDevice */
-            QFExtensionMeasurementDevice* measurementDevice;
+            QFExtensionMeasurementAndControlDevice* measurementDevice;
             /** \brief which cmera of the QFExtensionCamera is used? */
             int usedCamera;
             /** \brief acquisition parameters */

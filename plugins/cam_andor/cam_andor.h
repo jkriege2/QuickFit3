@@ -34,9 +34,9 @@
     This class implements two interfaces: QFExtensionCamera to operate the camera and QFExtensionShutter to operate the shutter inside the camera.
 
  */
-class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QFExtensionCamera, public QFExtensionShutter, public QFExtensionMeasurementDevice {
+class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QFExtensionCamera, public QFExtensionShutter, public QFExtensionMeasurementAndControlDevice {
         Q_OBJECT
-        Q_INTERFACES(QFExtension QFExtensionCamera QFExtensionShutter QFExtensionMeasurementDevice)
+        Q_INTERFACES(QFExtension QFExtensionCamera QFExtensionShutter QFExtensionMeasurementAndControlDevice)
     public:
         /** Default constructor */
         QFExtensionCameraAndor(QObject* parent=NULL);
@@ -135,6 +135,12 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         virtual QString getMeasurementDeviceValueName(unsigned int measurementDevice, unsigned int value);
         /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceValueShortName() */
         virtual QString getMeasurementDeviceValueShortName(unsigned int measurementDevice, unsigned int value);
+        /** \copydoc QFExtensionMeasurementDevice::isMeasurementDeviceValueEditable() */
+        virtual bool isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value);
+        /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceValue() */
+        virtual void setMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value, const QVariant& data);
+        /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceEditableValueType() */
+        virtual QVariant::Type getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value);
 
 
 

@@ -1,7 +1,9 @@
 #ifndef QFEXTENSIONMEASUREMENTDEVICE_H
 #define QFEXTENSIONMEASUREMENTDEVICE_H
 
-
+#include <QVariant>
+#include <QWidget>
+#include <QString>
 
 /*! \brief QuickFit QFExtension to read arbitrary measured values from a device
     \ingroup qf3extensionplugins
@@ -10,12 +12,12 @@
 
 
  */
-class QFExtensionMeasurementDevice {
+class QFExtensionMeasurementAndControlDevice {
     public:
 
 
         /** Default destructor */
-        virtual ~QFExtensionMeasurementDevice() {}
+        virtual ~QFExtensionMeasurementAndControlDevice() {}
 
 
         /** \brief return the number of measurement devices */
@@ -44,7 +46,7 @@ class QFExtensionMeasurementDevice {
         /** \brief return the number of measured values in a measurement devices */
         virtual unsigned int getMeasurementDeviceValueCount(unsigned int measuremenDevice)=0;
 
-        /** \brief return a measured value from a specified measuremen devices */
+        /** \brief return a measured value from a specified measurement devices */
         virtual QVariant getMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value)=0;
 
         /** \brief return a name for the specified measuremen devices (human-readable)  */
@@ -53,12 +55,20 @@ class QFExtensionMeasurementDevice {
         /** \brief return a short name for the specified measuremen devices (for config-files etc. ... i.e. no space etc.)  */
         virtual QString getMeasurementDeviceValueShortName(unsigned int measuremenDevice, unsigned int value)=0;
 
+        /** \brief returns \c true, if the value can be changed, using setMeasurementDeviceValue()  */
+        virtual bool isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value)=0;
+
+        /** \brief set a value in a specified measurement devices. This method should block, until the value is set/transmitted */
+        virtual void setMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value, const QVariant& data)=0;
+
+        /** \brief returns the datatype of a measurement device editable value */
+        virtual QVariant::Type getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value)=0;
 
 };
 
 
-Q_DECLARE_INTERFACE( QFExtensionMeasurementDevice,
-                     "www.dkfz.de.b040.quickfit3.extensions.QFExtensionMeasurementDevice/1.0")
+Q_DECLARE_INTERFACE( QFExtensionMeasurementAndControlDevice,
+                     "www.dkfz.de.b040.quickfit3.extensions.QFExtensionMeasurementAndControlDevice/1.0")
 
 
 
