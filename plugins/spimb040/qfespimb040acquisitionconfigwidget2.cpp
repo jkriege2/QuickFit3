@@ -789,6 +789,10 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         if (ok && useCam1) log->log_text(tr("  - prefix 1: '%1'\n").arg(acquisitionPrefix1));
         if (ok && useCam2) log->log_text(tr("  - prefix 2: '%1'\n").arg(acquisitionPrefix2));
 
+        QList<int> prevs;
+        for (int ovrImg=1; ovrImg<previewCount(); ovrImg++) {
+            prevs<<ovrImg;
+        }
 
         //////////////////////////////////////////////////////////////////////////////////////
         // acquire background images
@@ -811,7 +815,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                 ACQUISITION_ERROR(tr("  - could not switch main shutter off!\n"));
             }
             //////////////////////////////////////////////////////////////////////////////////////
-            // pacquire background series
+            // acquire background series
             //////////////////////////////////////////////////////////////////////////////////////
             QMap<QFExtensionCamera::CameraSetting, QVariant> camset1, camset2;
             camset1=getCameraSettings1();
@@ -824,6 +828,48 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             } else {
                 log->log_text(tr("  - acquired background image series!\n"));
             }
+
+
+
+            for (int ovrImgI=0; ovrImgI<prevs.size(); ovrImgI++) {
+                int ovrImg=prevs[ovrImgI];
+                if (ok && lightpathActivatedPreview(ovrImg)) {
+                    if (ok && useCam1 && doOverviewA1) {
+                        progress.setLabelText(tr("acquiring overview background image from camera 1, lightpath %1 ...").arg(ovrImg+1));
+                        QApplication::processEvents();
+                        QString acquisitionPrefix=acquisitionPrefix1+QString("_overview_backgroundlp%1.tif").arg(ovrImg+1);
+                        QString prefix=QString("overview_background_lightpath%1").arg(ovrImg+1);
+                        if (ovrImg==0) {
+                            acquisitionPrefix=acquisitionPrefix1+QString("_overview_background.tif");
+                            prefix=QString("overview_background");
+                        }
+                        ok=acqTools->acquireImageWithLightpath(lightpathFilenamePreview(ovrImg), lightpathPreview(ovrImg), extension1, ecamera1, camera1, currentPreviewConfigFilename(0,ovrImg), acquisitionPrefix, prefix, tr("overview background with lightpath %1 for camera 1").arg(ovrImg+1), moreFiles1, acquisitionDescription1);
+                        if (!ok) {
+                            ACQUISITION_ERROR(tr("  - error acquiring overview background image from camera 1, lightpath %1!\n").arg(ovrImg+1));
+                        } else {
+                            log->log_text(tr("  - acquired overview image background from camer 1, lightpath %1!\n").arg(ovrImg+1));
+                        }
+
+                    }
+                    if (ok && useCam2 && doOverviewA2) {
+                        progress.setLabelText(tr("acquiring overview background image from camera 2, lightpath %1 ...").arg(ovrImg+1));
+                        QApplication::processEvents();
+                        QString acquisitionPrefix=acquisitionPrefix1+QString("_overview_backgroundlp%1.tif").arg(ovrImg+1);
+                        QString prefix=QString("overview_background_lightpath%1").arg(ovrImg+1);
+                        if (ovrImg==0) {
+                            acquisitionPrefix=acquisitionPrefix1+QString("_overview_background.tif");
+                            prefix=QString("overview_background");
+                        }
+                        ok=acqTools->acquireImageWithLightpath(lightpathFilenamePreview(ovrImg), lightpathPreview(ovrImg), extension2, ecamera2, camera2, currentPreviewConfigFilename(1,ovrImg), acquisitionPrefix, prefix, tr("overview background with lightpath %1 for camera 2").arg(ovrImg+1), moreFiles2, acquisitionDescription2);
+                        if (!ok) {
+                            ACQUISITION_ERROR(tr("  - error acquiring overview background image from camera 2, lightpath %1!\n").arg(ovrImg+1));
+                        } else {
+                            log->log_text(tr("  - acquired overview background image from camer 2, lightpath %1!\n").arg(ovrImg+1));
+                        }
+                    }
+                }
+            }
+
         }
 
         //////////////////////////////////////////////////////////////////////////////////////
@@ -845,10 +891,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             userCanceled=true;
             ok=false;
         }
-        QList<int> prevs;
-        for (int ovrImg=1; ovrImg<previewCount(); ovrImg++) {
-            prevs<<ovrImg;
-        }
+
         prevs<<0;
         for (int ovrImgI=0; ovrImgI<prevs.size(); ovrImgI++) {
             int ovrImg=prevs[ovrImgI];
