@@ -39,6 +39,8 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     updating=true;
     ui->setupUi(this);
 
+    //ui->scrollArea->setWidget();
+
     connect(ui->widGraphSettings, SIGNAL(performFit(int,int,int,int,QString)), this, SLOT(doFit(int,int,int,int,QString)));
     connect(ui->widGraphSettings, SIGNAL(performRegression(int,int,int,int)), this, SLOT(doRegression(int,int,int,int)));
 
@@ -105,6 +107,11 @@ void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
             ui->tabSystem->setEnabled(true);
             QFRDRTable::PlotInfo g=record->getPlot(plot);
             ui->edtTitle->setText(g.title);
+
+            ui->chkPlotAutosize->setChecked(g.graphAutosize);
+            ui->spinWidth->setValue(g.graphWidth);
+            ui->spinHeight->setValue(g.graphHeight);
+
             ui->edtXLabel->setText(g.xlabel);
             ui->edtYLabel->setText(g.ylabel);
             ui->chkLogX->setChecked(g.xlog);
@@ -377,7 +384,9 @@ void QFRDRTablePlotWidget::plotDataChanged() {
         p.title=ui->edtTitle->text();
         p.xlabel=ui->edtXLabel->text();
         p.ylabel=ui->edtYLabel->text();
-        emit plotTitleChanged(this->plot, p.title);
+        p.graphAutosize=ui->chkPlotAutosize->isChecked();
+        p.graphWidth=ui->spinWidth->value();
+        p.graphHeight=ui->spinHeight->value();
         p.xlog=ui->chkLogX->isChecked();
         p.ylog=ui->chkLogY->isChecked();
         p.x0axis=ui->chkX0Axis->isChecked();
@@ -419,6 +428,7 @@ void QFRDRTablePlotWidget::plotDataChanged() {
         p.backgroundColor=ui->cmbBackgroundColor->currentColor();
         p.gridStyle=ui->cmbGridLinestyle->currentLineStyle();
         p.gridWidth=ui->spinGridWidth->value();
+        emit plotTitleChanged(this->plot, p.title);
 
         current->setPlot(this->plot, p);
         //QFRDRTable::GraphInfo graph=current->getPlot(this->plot).graphs.value(currentRow, QFRDRTable::GraphInfo());
@@ -435,6 +445,14 @@ void QFRDRTablePlotWidget::updateGraph() {
         QFRDRTable::PlotInfo p=current->getPlot(this->plot);
 
         ui->plotter->set_doDrawing(false);
+        ui->plotter->set_emitSignals(false);
+
+        if (p.graphAutosize) {
+            ui->scrollArea->setWidgetResizable(true);
+        } else {
+            ui->scrollArea->setWidgetResizable(false);
+            ui->plotter->resize(p.graphWidth, p.graphHeight);
+        }
 
 
         ui->plotter->getXAxis()->set_axisLabel(p.xlabel);
@@ -1066,6 +1084,7 @@ void QFRDRTablePlotWidget::updateGraph() {
         }
 
         ui->plotter->set_doDrawing(true);
+        ui->plotter->set_emitSignals(true);
         ui->plotter->update_plot();
     }
     QApplication::restoreOverrideCursor();
@@ -1180,6 +1199,9 @@ void QFRDRTablePlotWidget::connectWidgets()
     connect(ui->spinGridWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     connect(ui->widGraphSettings, SIGNAL(graphDataChanged()), this, SLOT(graphDataChanged()));
 
+    connect(ui->chkPlotAutosize, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->spinHeight, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->spinWidth, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
 }
 
 void QFRDRTablePlotWidget::disconnectWidgets()
@@ -1231,6 +1253,9 @@ void QFRDRTablePlotWidget::disconnectWidgets()
     disconnect(ui->cmbGridLinestyle, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinGridWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
 
+    disconnect(ui->chkPlotAutosize, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinHeight, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinWidth, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
 
     disconnect(ui->widGraphSettings, SIGNAL(graphDataChanged()), this, SLOT(graphDataChanged()));
 }
@@ -1281,6 +1306,9 @@ void QFRDRTablePlotWidget::on_btnSaveSystem_clicked() {
             set.setValue("title", ui->edtTitle->text());
             set.setValue("xlabel",ui->edtXLabel->text());
             set.setValue("ylabel",ui->edtYLabel->text());
+            set.setValue("autosize",ui->chkPlotAutosize->isChecked());
+            set.setValue("plotwidth",ui->spinWidth->value());
+            set.setValue("plotheight",ui->spinHeight->value());
             set.setValue("grid",ui->chkGrid->isChecked());
             set.setValue("logx",ui->chkLogX->isChecked());
             set.setValue("logy",ui->chkLogY->isChecked());
@@ -1428,6 +1456,10 @@ void QFRDRTablePlotWidget::on_btnLoadSystem_clicked() {
     if (!filename.isEmpty()) {
         QSettings set(filename, QSettings::IniFormat);
 
+
+        ui->chkPlotAutosize->setChecked(set.value("autosize",ui->chkPlotAutosize->isChecked()).toBool());
+        ui->spinWidth->setValue(set.value("plotwidth", ui->spinWidth->value()).toInt());
+        ui->spinHeight->setValue(set.value("plotheight", ui->spinHeight->value()).toInt());
 
         ui->edtTitle->setText(set.value("title", ui->edtTitle->text()).toString());
         ui->edtXLabel->setText(set.value("xlabel",ui->edtXLabel->text()).toString());

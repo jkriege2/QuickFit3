@@ -255,6 +255,10 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             bool x0axis;
             bool y0axis;
 
+            bool graphAutosize;
+            int graphWidth;
+            int graphHeight;
+
         };
 
 

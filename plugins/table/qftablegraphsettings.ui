@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>654</width>
+    <width>582</width>
     <height>850</height>
    </rect>
   </property>
@@ -867,12 +867,6 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
-        </property>
        </widget>
       </item>
       <item>
@@ -889,12 +883,6 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
         </property>
        </widget>
       </item>
@@ -1006,12 +994,6 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
-        </property>
        </widget>
       </item>
       <item row="6" column="1">
@@ -1088,12 +1070,6 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
         </property>
        </widget>
       </item>
@@ -1876,11 +1852,6 @@
    </slots>
   </customwidget>
   <customwidget>
-   <class>JKQTPerrorPlotstyleComboBox</class>
-   <extends>QComboBox</extends>
-   <header>jkqtptools.h</header>
-  </customwidget>
-  <customwidget>
    <class>LineStyleComboBox</class>
    <extends>QComboBox</extends>
    <header>linestylecombobox.h</header>
@@ -1889,6 +1860,11 @@
    <class>ColorComboBox</class>
    <extends>QComboBox</extends>
    <header>colorcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>JKQTPerrorPlotstyleComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
   </customwidget>
   <customwidget>
    <class>JKQTPSymbolComboBox</class>
@@ -1907,6 +1883,7 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>

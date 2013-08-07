@@ -22,15 +22,15 @@ DlgColorbarColoring::DlgColorbarColoring(QWidget *parent) :
 
 DlgColorbarColoring::~DlgColorbarColoring()
 {
-    ProgramOptions::getConfigValue("table/DlgColorbarColoring/rad_bar", ui->radBar->isChecked());
-    ProgramOptions::getConfigValue("table/DlgColorbarColoring/rad_bar2", ui->radBar2->isChecked());
-    ProgramOptions::getConfigValue("table/DlgColorbarColoring/rad_bar3", ui->radBar3->isChecked());
-    ProgramOptions::getConfigValue("table/DlgColorbarColoring/colorbar", ui->cmbColorbar->currentIndex());
-    ProgramOptions::getConfigValue("table/DlgColorbarColoring/color21", ui->cmbCol21->currentIndex());
-    ProgramOptions::getConfigValue("table/DlgColorbarColoring/color22", ui->cmbCol22->currentIndex());
-    ProgramOptions::getConfigValue("table/DlgColorbarColoring/color31", ui->cmbCol31->currentIndex());
-    ProgramOptions::getConfigValue("table/DlgColorbarColoring/color32", ui->cmbCol32->currentIndex());
-    ProgramOptions::getConfigValue("table/DlgColorbarColoring/color33", ui->cmbCol33->currentIndex());
+    ProgramOptions::setConfigValue("table/DlgColorbarColoring/rad_bar", ui->radBar->isChecked());
+    ProgramOptions::setConfigValue("table/DlgColorbarColoring/rad_bar2", ui->radBar2->isChecked());
+    ProgramOptions::setConfigValue("table/DlgColorbarColoring/rad_bar3", ui->radBar3->isChecked());
+    ProgramOptions::setConfigValue("table/DlgColorbarColoring/colorbar", ui->cmbColorbar->currentIndex());
+    ProgramOptions::setConfigValue("table/DlgColorbarColoring/color21", ui->cmbCol21->currentIndex());
+    ProgramOptions::setConfigValue("table/DlgColorbarColoring/color22", ui->cmbCol22->currentIndex());
+    ProgramOptions::setConfigValue("table/DlgColorbarColoring/color31", ui->cmbCol31->currentIndex());
+    ProgramOptions::setConfigValue("table/DlgColorbarColoring/color32", ui->cmbCol32->currentIndex());
+    ProgramOptions::setConfigValue("table/DlgColorbarColoring/color33", ui->cmbCol33->currentIndex());
     delete ui;
 }
 

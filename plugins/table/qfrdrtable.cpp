@@ -67,6 +67,9 @@ QFRDRTable::GraphInfo::GraphInfo() {
 
 QFRDRTable::PlotInfo::PlotInfo()
 {
+    graphAutosize=true;
+    graphWidth=1000;
+    graphHeight=500;
     title="";
     xlabel="x";
     ylabel="y";
@@ -1179,6 +1182,9 @@ void QFRDRTable::intReadData(QDomElement* e) {
             while (!te.isNull()) {
                 PlotInfo plot;
                 plot.title=te.attribute("title", tr("graph title"));
+                plot.graphAutosize=QStringToBool(te.attribute("autosize", "true"));
+                plot.graphWidth=te.attribute("gwidth", "1000").toInt();
+                plot.graphHeight=te.attribute("gheight", "1000").toInt();
                 plot.xlabel=te.attribute("xlabel", "x");
                 plot.ylabel=te.attribute("ylabel", "y");
                 plot.xlog=QStringToBool( te.attribute("xlog", "false"));
@@ -1348,6 +1354,10 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
     for (int i=0; i<plots.size(); i++) {
         w.writeStartElement("plot");
         w.writeAttribute("title", plots[i].title);
+        w.writeAttribute("autosize", boolToQString(plots[i].graphAutosize));
+        w.writeAttribute("gwidth", QString::number(plots[i].graphWidth));
+        w.writeAttribute("gheight", QString::number(plots[i].graphHeight));
+
         w.writeAttribute("xlabel", plots[i].xlabel);
         w.writeAttribute("ylabel", plots[i].ylabel);
         w.writeAttribute("showkey", boolToQString(plots[i].showKey));
