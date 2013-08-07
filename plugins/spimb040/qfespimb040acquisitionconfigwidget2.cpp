@@ -789,10 +789,12 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         if (ok && useCam1) log->log_text(tr("  - prefix 1: '%1'\n").arg(acquisitionPrefix1));
         if (ok && useCam2) log->log_text(tr("  - prefix 2: '%1'\n").arg(acquisitionPrefix2));
 
+        // set order of overview images (basically: lightpath 0 as last image ... so we do not have to reset the lightpath
         QList<int> prevs;
         for (int ovrImg=1; ovrImg<previewCount(); ovrImg++) {
             prevs<<ovrImg;
         }
+        prevs<<0;
 
         //////////////////////////////////////////////////////////////////////////////////////
         // acquire background images
@@ -892,7 +894,6 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             ok=false;
         }
 
-        prevs<<0;
         for (int ovrImgI=0; ovrImgI<prevs.size(); ovrImgI++) {
             int ovrImg=prevs[ovrImgI];
             if (ok && lightpathActivatedPreview(ovrImg)) {

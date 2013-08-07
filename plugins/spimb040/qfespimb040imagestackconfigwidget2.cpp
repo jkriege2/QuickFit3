@@ -914,6 +914,7 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
     QDateTime startDateTime=QDateTime::currentDateTime();
     QList<QFESPIMB040OpticsSetupBase::measuredValues> measured;
 
+
     QProgressListDialog progress(tr("Image Stack Acquisition"), tr("&Cancel"), 0, 100, this);
     progress.setWindowModality(Qt::WindowModal);
     //progress.setMinimumDuration(0);
@@ -1000,6 +1001,8 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
         QString acquisitionPrefix1=prefix1();
         QStringList TIFFFIlename1;;
         QList<TIFF*> tiff1;
+        TIFF* tiff1_background=NULL;
+        QString TIFFFIlenameBackground1;
         if (use1()) {
             progress.setProgressText(tr("locking camera 1 ..."));
             if (!(useCam1=opticsSetup->lockCamera(0, &extension1, &ecamera1, &camera1, &previewSettingsFilename1))) {
@@ -1018,6 +1021,9 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
         QString acquisitionPrefix2=prefix2();
         QStringList TIFFFIlename2;
         QList<TIFF*> tiff2;
+        TIFF* tiff2_background=NULL;
+        QString TIFFFIlenameBackground2;
+
         int camera2=0;
         if (use2()) {
             progress.setProgressText(tr("locking camera 2 ..."));
@@ -1067,6 +1073,8 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
         //////////////////////////////////////////////////////////////////////////////////////
         QStringList lightpathList;
         QStringList lightpathNames;
+        TIFFFIlenameBackground1=acquisitionPrefix1+".background.tif";
+        TIFFFIlenameBackground2=acquisitionPrefix2+".background.tif";
         if (lightpath1Activated()) {
             if (QFile::exists(lightpath1Filename())) {
                 lightpathList.append(lightpath1Filename());
@@ -1123,6 +1131,13 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
         progress.setLabelText(tr("opening output files ..."));
         QApplication::processEvents();
         if (ok && useCam1) {
+            QDir().mkpath(QFileInfo(TIFFFIlenameBackground1.toAscii().data()).absolutePath());
+            tiff1_background=TIFFOpen(TIFFFIlenameBackground1.toAscii().data(), "w");;
+            if (!tiff1_background) {
+                ok=false;
+                IMAGESTACK_ERROR(tr("error opening TIFF file (camera 1) '%1'!").arg(TIFFFIlenameBackground1));
+            }
+
             for (int i=0; i<TIFFFIlename1.size(); i++) {
                 QDir().mkpath(QFileInfo(TIFFFIlename1[i].toAscii().data()).absolutePath());
                 tiff1[i]=TIFFOpen(TIFFFIlename1[i].toAscii().data(), "w");
@@ -1134,6 +1149,12 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
             }
         }
         if (ok && useCam2) {
+            QDir().mkpath(QFileInfo(TIFFFIlenameBackground2.toAscii().data()).absolutePath());
+            tiff2_background=TIFFOpen(TIFFFIlenameBackground2.toAscii().data(), "w");;
+            if (!tiff2_background) {
+                ok=false;
+                IMAGESTACK_ERROR(tr("error opening TIFF file (camera 2) '%1'!").arg(TIFFFIlenameBackground2));
+            }
             for (int i=0; i<TIFFFIlename2.size(); i++) {
                 QDir().mkpath(QFileInfo(TIFFFIlename2[i].toAscii().data()).absolutePath());
                 tiff2[i]=TIFFOpen(TIFFFIlename2[i].toAscii().data(), "w");
@@ -1148,9 +1169,41 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
 
 
         //////////////////////////////////////////////////////////////////////////////////////
-        // switch on light
+        // switch off light
         //////////////////////////////////////////////////////////////////////////////////////
         bool formerMainShutterState=opticsSetup->getMainIlluminationShutter();
+        if (opticsSetup->isMainIlluminationShutterAvailable()){
+            log->log_text(tr("  - switch main shutter off for background frames!\n"));
+            opticsSetup->setMainIlluminationShutter(false, true);
+        }
+        //////////////////////////////////////////////////////////////////////////////////////
+        // acquire backrgound images
+        //////////////////////////////////////////////////////////////////////////////////////
+            log->log_text(tr("  - acquiring background images ...\n"));
+
+            if (useCam1) {
+                if (ecamera1->acquireOnCamera(camera1, buffer1, NULL)) {
+                    TIFFTWriteUint16from32(tiff1_background, buffer1, width1, height1, false);
+                    log->log_text(tr("  - acquired overview image background from camera 1!\n"));
+                } else {
+                    ok=false;
+                    IMAGESTACK_ERROR(tr("error acquiring background image on camera 1!\n"));
+                }
+            }
+            //QApplication::processEvents();
+            if (useCam2) {
+                if (ecamera2->acquireOnCamera(camera2, buffer2, NULL)) {
+                    TIFFTWriteUint16from32(tiff2_background, buffer2, width2, height2, false);
+                    log->log_text(tr("  - acquired overview image background from camera 2!\n"));
+                } else {
+                    ok=false;
+                    IMAGESTACK_ERROR(tr("error acquiring background image on camera 2!\n"));
+                }
+            }
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // switch on light
+        //////////////////////////////////////////////////////////////////////////////////////
         if (opticsSetup->isMainIlluminationShutterAvailable()){
             log->log_text(tr("  - switch main shutter on!\n"));
             opticsSetup->setMainIlluminationShutter(true, true);
@@ -1392,11 +1445,11 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
                                 }
                             }
                             for (int img=0; img<this->images(); img++) {
-                                log->log_text(tr("  - acquiring images (%1/%2) ...\n").arg(imageIdx+1).arg(images));
-                                if (posIdx>3) {
-                                    double duration=double(timAcquisition.elapsed())/1000.0;
-                                    double eta=duration/double(posIdx+1.0)*double(moveTo.size());
-                                    double etc=eta-duration;
+                                            log->log_text(tr("  - acquiring images (%1/%2) ...\n").arg(imageIdx+1).arg(images));
+                                            if (posIdx>3) {
+                                                double duration=double(timAcquisition.elapsed())/1000.0;
+                                                double eta=duration/double(posIdx+1.0)*double(moveTo.size());
+                                                double etc=eta-duration;
                                     uint mini=floor(etc/60.0);
                                     uint secs=round(etc-double(mini)*60.0);
                                     estimation=tr("\nest. remaining duration (min:secs): %1:%2 ").arg(mini, 2, 10, QChar('0')).arg(secs, 2, 10, QChar('0'));
@@ -1476,6 +1529,9 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
         //////////////////////////////////////////////////////////////////////////////////////
         progress.setLabelText(tr("closing output files ..."));
         QApplication::processEvents();
+        if (tiff1_background) TIFFClose(tiff1_background);
+        if (tiff2_background) TIFFClose(tiff2_background);
+
         for (int lp=0; lp<tiff1.size(); lp++) if (tiff1[lp]) TIFFClose(tiff1[lp]);
         for (int lp=0; lp<tiff2.size(); lp++) if (tiff2[lp]) TIFFClose(tiff2[lp]);
         tiff1.clear();
@@ -1599,6 +1655,20 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
                 files.append(d);
             }
 
+            if (useCam1){
+                QFExtensionCamera::CameraAcquititonFileDescription d;
+                d.name=TIFFFIlenameBackground1;
+                d.description="background frame from camera 1";
+                d.type="TIFF16";
+                files.append(d);
+            }
+            if (useCam2){
+                QFExtensionCamera::CameraAcquititonFileDescription d;
+                d.name=TIFFFIlenameBackground2;
+                d.description="background frame from camera 2";
+                d.type="TIFF16";
+                files.append(d);
+            }
             log->log_text(tr("  - writing acquisition description 1 ..."));
             acqTools->savePreviewDescription(0, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription11, files, startDateTime);
             log->log_text(tr(" DONE!\n"));
