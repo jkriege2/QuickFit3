@@ -186,7 +186,9 @@ class QFESPIMB040OpticsSetupBase: public QWidget {
 
 
 
-        /** \brief set main illumination shutter state */
+        /** \brief set a special shutter state */
+        virtual void setSpecialShutter(int shutter, bool opened, bool blocking=false)=0;
+        /** \brief set a shutter state */
         virtual void setShutter(int shutter, bool opened, bool blocking=false)=0;
         /*! returns the number of available shutters */
         virtual int getShutterCount() const=0;

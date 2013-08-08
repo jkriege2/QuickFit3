@@ -18,37 +18,13 @@ QFESPIMB040OpticsSetup2::QFESPIMB040OpticsSetup2(QWidget* pluginMainWidget, QWid
     m_pluginServices=pluginServices;
     m_pluginMainWidget=pluginMainWidget;
     m_log=log;
+    shutterTransmission=NULL;
+    shutterLaser2=NULL;
+    shutterLaser1=NULL;
+    objProjection=NULL;
+    objDetection=NULL;
+
     ui->setupUi(this);
-    /*ui->camConfig1->init(0, m_pluginServices, m_pluginServices->getGlobalConfigFileDirectory(), this);
-    ui->camConfig1->setLog(m_log);
-    ui->camConfig2->init(1, m_pluginServices, m_pluginServices->getGlobalConfigFileDirectory(), this);
-    ui->camConfig2->setLog(m_log);
-    ui->stageSetup->init(m_log, m_pluginServices);
-    ui->filtTransmission->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
-    ui->filtDetection->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
-    ui->filtSplitter->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
-    ui->filtDetection11->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
-    ui->filtDetection21->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
-    ui->objDetection->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
-    ui->objProjection->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
-    ui->objTube1->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
-    ui->objTube2->setObjectivesINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini");
-    ui->filtDualView1Long->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
-    ui->filtDualView1Short->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
-    ui->filtDualView1Splitter->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
-    ui->filtDualView2Long->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
-    ui->filtDualView2Short->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
-    ui->filtDualView2Splitter->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
-
-
-    ui->shutterMainIllumination->init(m_log, m_pluginServices);
-    ui->shutterLaser1->init(m_log, m_pluginServices);
-    ui->shutterLaser2->init(m_log, m_pluginServices);
-    ui->shutterTransmission->init(m_log, m_pluginServices);
-    ui->lsTransmission->init(m_log, m_pluginServices);
-    ui->lsLaser1->init(m_log, m_pluginServices);
-    ui->lsLaser2->init(m_log, m_pluginServices);
-    ui->filtcDetection->init("spimb040_filters.ini", m_log, m_pluginServices);*/
 
 
 
@@ -59,55 +35,17 @@ QFESPIMB040OpticsSetup2::QFESPIMB040OpticsSetup2(QWidget* pluginMainWidget, QWid
     connect(ui->cmbLightpathConfig, SIGNAL(configsChanged(QFESPIMB040OpticsSetupItems)), this, SLOT(configsChanged(QFESPIMB040OpticsSetupItems)));
     connect(ui->cmbLightpathConfig, SIGNAL(currentConfigChanged(QString)), this, SLOT(userChangedLightpath(QString)));
 
+    actMainShutter=new QAction(QIcon(":/spimb040/shutter_opened.png"), tr("main shutter"), this);
+    actMainShutter->setCheckable(true);
+    actMainShutter->setChecked(true);
+    connect(actMainShutter, SIGNAL(triggered(bool)), this, SLOT(mainShutterToggled(bool)));
+    ui->tbMainShutter->setDefaultAction(actMainShutter);
+    connect(addShortCut("mainshutter_toggle", "main shutter: toggle"), SIGNAL(activated()), actMainShutter, SLOT(toggle()));
+    connect(addShortCut("mainshutter_on", "main shutter: on"), SIGNAL(activated()), this, SLOT(mainShutterOn()));
+    connect(addShortCut("mainshutter_off", "main shutter: off"), SIGNAL(activated()), this, SLOT(mainShutterOff()));
+
     // create shortcuts
-    /*connect(addShortCut("stage_x2", "translation stage: joystick speed x2"), SIGNAL(activated()), ui->stageSetup, SLOT(speedX2()));
-    connect(addShortCut("stage_x10", "translation stage: joystick speed x10"), SIGNAL(activated()), ui->stageSetup, SLOT(speedX10()));
-    connect(addShortCut("stage_d2", "translation stage: joystick speed /2"), SIGNAL(activated()), ui->stageSetup, SLOT(speedD2()));
-    connect(addShortCut("stage_d10", "translation stage: joystick speed /10"), SIGNAL(activated()), ui->stageSetup, SLOT(speedD10()));
-    connect(addShortCut("stage_stepx", "translation stage: step x"), SIGNAL(activated()), ui->stageSetup, SLOT(stepX()));
-    connect(addShortCut("stage_stepmx", "translation stage: step -x"), SIGNAL(activated()), ui->stageSetup, SLOT(stepMinusX()));
-    connect(addShortCut("stage_stepy", "translation stage: step y"), SIGNAL(activated()), ui->stageSetup, SLOT(stepY()));
-    connect(addShortCut("stage_stepmy", "translation stage: step -y"), SIGNAL(activated()), ui->stageSetup, SLOT(stepMinusY()));
-    connect(addShortCut("stage_stepz", "translation stage: step z"), SIGNAL(activated()), ui->stageSetup, SLOT(stepZ()));
-    connect(addShortCut("stage_stepmz", "translation stage: step -z"), SIGNAL(activated()), ui->stageSetup, SLOT(stepMinusZ()));
-    connect(addShortCut("stage_joysticktoggle", "translation stage: toggle joystick"), SIGNAL(activated()), ui->stageSetup, SLOT(toggleJoystick()));
-    connect(addShortCut("stage_joystick_on", "translation stage: joystick on"), SIGNAL(activated()), ui->stageSetup, SLOT(joystickOn()));
-    connect(addShortCut("stage_joystick_off", "translation stage: joystick off"), SIGNAL(activated()), ui->stageSetup, SLOT(joystickOff()));
 
-    connect(addShortCut("mainshutter_toggle", "main shutter: toggle"), SIGNAL(activated()), ui->shutterMainIllumination, SLOT(toggleShutter()));
-    connect(addShortCut("mainshutter_on", "main shutter: on"), SIGNAL(activated()), ui->shutterMainIllumination, SLOT(shutterOn()));
-    connect(addShortCut("mainshutter_off", "main shutter: off"), SIGNAL(activated()), ui->shutterMainIllumination, SLOT(shutterOff()));
-
-    connect(addShortCut("shutter_laser1_toggle", "laser 1 shutter: toggle"), SIGNAL(activated()), ui->shutterLaser1, SLOT(toggleShutter()));
-    connect(addShortCut("shutter_laser1_on", "laser 1 shutter: on"), SIGNAL(activated()), ui->shutterLaser1, SLOT(shutterOn()));
-    connect(addShortCut("shutter_laser1_off", "laser 1 shutter: off"), SIGNAL(activated()), ui->shutterLaser1, SLOT(shutterOff()));
-
-    connect(addShortCut("shutter_laser2_toggle", "laser 2 shutter: toggle"), SIGNAL(activated()), ui->shutterLaser2, SLOT(toggleShutter()));
-    connect(addShortCut("shutter_laser2_on", "laser 2 shutter: on"), SIGNAL(activated()), ui->shutterLaser2, SLOT(shutterOn()));
-    connect(addShortCut("shutter_laser2_off", "laser 2 shutter: off"), SIGNAL(activated()), ui->shutterLaser2, SLOT(shutterOff()));
-
-    connect(addShortCut("shutter_transmission_toggle", "transmission illumination shutter: toggle"), SIGNAL(activated()), ui->shutterTransmission, SLOT(toggleShutter()));
-    connect(addShortCut("shutter_transmission_on", "transmission illumination shutter: on"), SIGNAL(activated()), ui->shutterTransmission, SLOT(shutterOn()));
-    connect(addShortCut("shutter_transmission_off", "transmission illumination shutter: off"), SIGNAL(activated()), ui->shutterTransmission, SLOT(shutterOff()));
-
-    connect(addShortCut("filterchanger_detection_filter1", "detection filter changer: set filter #1"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter0()));
-    connect(addShortCut("filterchanger_detection_filter2", "detection filter changer: set filter #2"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter1()));
-    connect(addShortCut("filterchanger_detection_filter3", "detection filter changer: set filter #3"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter2()));
-    connect(addShortCut("filterchanger_detection_filter4", "detection filter changer: set filter #4"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter3()));
-    connect(addShortCut("filterchanger_detection_filter5", "detection filter changer: set filter #5"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter4()));
-    connect(addShortCut("filterchanger_detection_filter6", "detection filter changer: set filter #6"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter5()));
-    connect(addShortCut("filterchanger_detection_filter7", "detection filter changer: set filter #7"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter6()));
-    connect(addShortCut("filterchanger_detection_filter8", "detection filter changer: set filter #8"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter7()));
-    connect(addShortCut("filterchanger_detection_filter9", "detection filter changer: set filter #9"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter8()));
-    connect(addShortCut("filterchanger_detection_filter10", "detection filter changer: set filter #10"), SIGNAL(activated()), ui->filtcDetection, SLOT(setFilter9()));
-
-    connect(addShortCut("cam1_acquire_single", "camera 1: acquire single frame"), SIGNAL(activated()), ui->camConfig1, SLOT(previewSingle()));
-    connect(addShortCut("cam1_acquire_continuous_toggle", "camera 1: toggle preview acquisition"), SIGNAL(activated()), ui->camConfig1, SLOT(startStopPreview()));
-    connect(addShortCut("cam1_acquire_continuous_stop", "camera 1: stop preview"), SIGNAL(activated()), ui->camConfig1, SLOT(stopPreview()));
-
-    connect(addShortCut("cam2_acquire_single", "camera 2: acquire single frame"), SIGNAL(activated()), ui->camConfig2, SLOT(previewSingle()));
-    connect(addShortCut("cam2_acquire_continuous_toggle", "camera 2: toggle preview acquisition"), SIGNAL(activated()), ui->camConfig2, SLOT(startStopPreview()));
-    connect(addShortCut("cam2_acquire_continuous_stop", "camera 2: stop preview"), SIGNAL(activated()), ui->camConfig2, SLOT(stopPreview()));*/
 
 }
 
@@ -163,6 +101,7 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                    QString type=QString(settings.getAsString("type", "unknown").c_str()).trimmed().toLower(); //settings.value("type", "unknown").toString().trimmed().toLower();
                    QString title=QString(settings.getAsString("title", "").c_str());//settings.value("title", "").toString();
                    QString ingroup=QString(settings.getAsString("ingroup", "").c_str());//settings.value("ingroup", "").toString();
+                   QString inwidget=QString(settings.getAsString("inwidget", "").c_str());//settings.value("ingroup", "").toString();
                    QString special_role=QString(settings.getAsString("special_role", "").c_str()).trimmed().toLower();
                    QString used_by=QString(settings.getAsString("used_by", "").c_str()).trimmed().toLower();
                    QString subtype=QString(settings.getAsString("subtype", "").c_str()).trimmed().toLower();
@@ -256,6 +195,31 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
 
                            ui_widgets[id]=w;
                            ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
+                       } else if (type=="tabwidget") {
+                           QTabWidget* w=new QTabWidget(this);
+                           QGridLayout* wgl=new QGridLayout(w);
+                           widNew=w;
+                           ui_tabs[id]=w;
+                           ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
+                       } else if (type=="tabpage") {
+
+                           if (inwidget.isEmpty() || !ui_tabs.contains(inwidget)) {
+                               m_log->log_error(tr("\nERROR reading optSetup-file '%1':\n    %3-item '%2' parent '%4' does not exist. Ignoring element!\n").arg(filename).arg(id).arg(type).arg(inwidget));
+                               ok=false;
+
+                           } else {
+
+                               QWidget* w=new QWidget(this);
+                               QGridLayout* wgl=new QGridLayout(w);
+                               wgl->setContentsMargins(margin,margin,margin,margin);
+                               wgl->setSpacing(spacing);
+                               widNew=w;
+                               w->setLayout(wgl);
+
+                               ui_widgets[id]=w;
+                               ui_tabs[inwidget]->addTab(w, title);
+                           }
+
 
                        } else if (type=="label") {
                            QLabel* w=new QLabel(this);
@@ -297,6 +261,12 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            w->setLog(m_log);
                            ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
                            connect(w, SIGNAL(clicked(bool)), this, SLOT(changeDVenabledState()));
+
+                           connect(addShortCut(QString("cam%1_acquire_single").arg(ui_cameras.size()), QString("camera %1: acquire single frame").arg(ui_cameras.size())), SIGNAL(activated()), w, SLOT(previewSingle()));
+                           connect(addShortCut(QString("cam%1_acquire_continuous_toggle").arg(ui_cameras.size()), QString("camera %1: toggle preview acquisition").arg(ui_cameras.size())), SIGNAL(activated()), w, SLOT(startStopPreview()));
+                           connect(addShortCut(QString("cam%1_acquire_continuous_stop").arg(ui_cameras.size()), QString("camera %1: stop preview").arg(ui_cameras.size())), SIGNAL(activated()), w, SLOT(stopPreview()));
+
+
                            ui_cameras[id].config=w;
                        } else if (type=="stage") {
                            QFStageConfigWidget* w=new QFStageConfigWidget(this);
@@ -308,7 +278,19 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            l->setBuddy(w);
                            ingroupLayout->addWidget(l, y,x, rowSpan, 1, Qt::AlignTop|Qt::AlignLeft);
                            ingroupLayout->addWidget(w, y,x+1, rowSpan, qMax(1,colSpan-1));
-                           ui_stages[id]=w;
+
+                           connect(addShortCut(QString("stage%1_x2").arg(ui_stages.size()), QString("stage %1: joystick speed x2").arg(ui_stages.size())), SIGNAL(activated()), w, SLOT(speedX2()));
+                           connect(addShortCut(QString("stage%1_x10").arg(ui_stages.size()), QString("stage %1: joystick speed x10").arg(ui_stages.size())), SIGNAL(activated()), w, SLOT(speedX10()));
+                           connect(addShortCut(QString("stage%1_d2").arg(ui_stages.size()), QString("stage %1: joystick speed /2").arg(ui_stages.size())), SIGNAL(activated()), w, SLOT(speedD2()));
+                           connect(addShortCut(QString("stage%1_d10").arg(ui_stages.size()), QString("stage %1: joystick speed /10").arg(ui_stages.size())), SIGNAL(activated()), w, SLOT(speedD10()));
+                           connect(addShortCut(QString("stage%1_step").arg(ui_stages.size()), QString("stage %1: step x").arg(ui_stages.size())), SIGNAL(activated()), w, SLOT(stepX()));
+                           connect(addShortCut(QString("stage%1_stepm").arg(ui_stages.size()), QString("stage %1: step -x").arg(ui_stages.size())), SIGNAL(activated()), w, SLOT(stepMinusX()));
+                           connect(addShortCut(QString("stage%1_joysticktoggle").arg(ui_stages.size()), QString("stage %1: toggle joystick").arg(ui_stages.size())), SIGNAL(activated()), w, SLOT(toggleJoystick()));
+                           connect(addShortCut(QString("stage%1_joystick_on").arg(ui_stages.size()), QString("stage %1: joystick on").arg(ui_stages.size())), SIGNAL(activated()), w, SLOT(joystickOn()));
+                           connect(addShortCut(QString("stage%1_joystick_off").arg(ui_stages.size()), QString("stage %1: joystick off").arg(ui_stages.size())), SIGNAL(activated()), w, SLOT(joystickOff()));
+
+
+                                   ui_stages[id]=w;
                        } else if (type=="filterchanger") {
                            QFFilterChangerConfigWidget* w=new QFFilterChangerConfigWidget(this);
                            widNew=w;
@@ -331,6 +313,17 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                                if (ui_lightsource.contains(used_by)) ui_lightsource[used_by].filters.append(id);
                            }
 
+                           connect(addShortCut(QString("filterchanger_%1_filter1").arg(ui_filterchangers.size()), QString("filter changer %1: set filter #1").arg(ui_filterchangers.size())), SIGNAL(activated()), w, SLOT(setFilter0()));
+                           connect(addShortCut(QString("filterchanger_%1_filter2").arg(ui_filterchangers.size()), QString("filter changer %1: set filter #2").arg(ui_filterchangers.size())), SIGNAL(activated()), w, SLOT(setFilter1()));
+                           connect(addShortCut(QString("filterchanger_%1_filter3").arg(ui_filterchangers.size()), QString("filter changer %1: set filter #3").arg(ui_filterchangers.size())), SIGNAL(activated()), w, SLOT(setFilter2()));
+                           connect(addShortCut(QString("filterchanger_%1_filter4").arg(ui_filterchangers.size()), QString("filter changer %1: set filter #4").arg(ui_filterchangers.size())), SIGNAL(activated()), w, SLOT(setFilter3()));
+                           connect(addShortCut(QString("filterchanger_%1_filter5").arg(ui_filterchangers.size()), QString("filter changer %1: set filter #5").arg(ui_filterchangers.size())), SIGNAL(activated()), w, SLOT(setFilter4()));
+                           connect(addShortCut(QString("filterchanger_%1_filter6").arg(ui_filterchangers.size()), QString("filter changer %1: set filter #6").arg(ui_filterchangers.size())), SIGNAL(activated()), w, SLOT(setFilter5()));
+                           connect(addShortCut(QString("filterchanger_%1_filter7").arg(ui_filterchangers.size()), QString("filter changer %1: set filter #7").arg(ui_filterchangers.size())), SIGNAL(activated()), w, SLOT(setFilter6()));
+                           connect(addShortCut(QString("filterchanger_%1_filter8").arg(ui_filterchangers.size()), QString("filter changer %1: set filter #8").arg(ui_filterchangers.size())), SIGNAL(activated()), w, SLOT(setFilter7()));
+                           connect(addShortCut(QString("filterchanger_%1_filter9").arg(ui_filterchangers.size()), QString("filter changer %1: set filter #9").arg(ui_filterchangers.size())), SIGNAL(activated()), w, SLOT(setFilter8()));
+                           connect(addShortCut(QString("filterchanger_%1_filter10").arg(ui_filterchangers.size()), QString("filter changer %1: set filter #10").arg(ui_filterchangers.size())), SIGNAL(activated()), w, SLOT(setFilter9()));
+
                            ui_filterchangers[id]=w;
                        } else if (type=="stages_xyz") {
                            QFESPIMB040SampleStageConfig* w=new QFESPIMB040SampleStageConfig(this);
@@ -339,6 +332,22 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            w->setLog(m_log);
                            if (!title.isEmpty()) w->setTitle(title);
                            ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
+
+                           connect(addShortCut(QString("xyzstage%1_x2").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick speed x2").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(speedX2()));
+                           connect(addShortCut(QString("xyzstage%1_x10").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick speed x10").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(speedX10()));
+                           connect(addShortCut(QString("xyzstage%1_d2").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick speed /2").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(speedD2()));
+                           connect(addShortCut(QString("xyzstage%1_d10").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick speed /10").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(speedD10()));
+                           connect(addShortCut(QString("xyzstage%1_stepx").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: step x").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepX()));
+                           connect(addShortCut(QString("xyzstage%1_stepmx").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: step -x").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepMinusX()));
+                           connect(addShortCut(QString("xyzstage%1_stepy").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: step y").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepY()));
+                           connect(addShortCut(QString("xyzstage%1_stepmy").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: step -y").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepMinusY()));
+                           connect(addShortCut(QString("xyzstage%1_stepz").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: step z").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepZ()));
+                           connect(addShortCut(QString("xyzstage%1_stepmz").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: step -z").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepMinusZ()));
+                           connect(addShortCut(QString("xyzstage%1_joysticktoggle").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: toggle joystick").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(toggleJoystick()));
+                           connect(addShortCut(QString("xyzstage%1_joystick_on").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick on").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(joystickOn()));
+                           connect(addShortCut(QString("xyzstage%1_joystick_off").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick off").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(joystickOff()));
+
+
                            ui_stageconfigs[id]=w;
                        } else if (type=="shutter") {
                            QFShutterConfigWidget* w=new QFShutterConfigWidget(this);
@@ -349,9 +358,32 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            l->setBuddy(w);
                            ingroupLayout->addWidget(l, y,x, rowSpan, 1, Qt::AlignTop|Qt::AlignLeft);
                            ingroupLayout->addWidget(w, y,x+1, rowSpan, qMax(1,colSpan-1));
-                           if (special_role=="main_shutter") {
-                               shutterMain=w;
-                               ui->tbMainShutter->setDefaultAction(w->getStateAction());
+                           if (special_role.contains("main_shutter")) {
+                               MainShutterMember ms;
+                               ms.shutter=w;
+                               ms.mode=msComplete;
+                               shutterMain.append(ms);
+                               //shutterMain=w;
+                               //ui->tbMainShutter->setDefaultAction(w->getStateAction());
+                           } else if (special_role.contains("main_shutter_open_only")) {
+                               MainShutterMember ms;
+                               ms.shutter=w;
+                               ms.mode=msOpenOnly;
+                               shutterMain.append(ms);
+                           } else if (special_role.contains("main_shutter_close_only")) {
+                               MainShutterMember ms;
+                               ms.shutter=w;
+                               ms.mode=msCloseOnly;
+                               shutterMain.append(ms);
+                           }
+                           if (special_role.contains("laser1_shutter")) {
+                               shutterLaser1=w;
+                           }
+                           if (special_role.contains("laser2_shutter")) {
+                               shutterLaser2=w;
+                           }
+                           if (special_role.contains("transmission_shutter")) {
+                               shutterTransmission=w;
                            }
                            if (!used_by.isEmpty()) {
                                if (ui_cameras.contains(used_by)) {
@@ -362,10 +394,11 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                                }
                                if (ui_lightsource.contains(used_by)) ui_lightsource[used_by].shutter=id;
                            }
-                           connect(addShortCut(id+"_toggle", title+" toggle"), SIGNAL(activated()), w, SLOT(toggleShutter()));
-                           connect(addShortCut(id+"_on",     title+" on"), SIGNAL(activated()), w, SLOT(shutterOn()));
-                           connect(addShortCut(id+"_off",    title+" off"), SIGNAL(activated()), w, SLOT(shutterOff()));
+                           connect(addShortCut(id+"_toggle", id+" toggle"), SIGNAL(activated()), w, SLOT(toggleShutter()));
+                           connect(addShortCut(id+"_on",     id+" on"), SIGNAL(activated()), w, SLOT(shutterOn()));
+                           connect(addShortCut(id+"_off",    id+" off"), SIGNAL(activated()), w, SLOT(shutterOff()));
                            ui_shutter[id]=w;
+                           shutterIndex<<id;
                        } else if (type=="lightsource") {
                            QFLightSourceConfigWidget* w=new QFLightSourceConfigWidget(this);
                            w->init(m_log, m_pluginServices);
@@ -474,26 +507,46 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
     } else {
         m_log->log_error(tr("\nERROR: The optSetup-file '%1' does not exist!\n").arg(filename));
     }
+
     updateMagnifications();
 }
 
 void QFESPIMB040OpticsSetup2::lockStages() {
-    //ui->stageSetup->lockStages();
+    QMap<QString, QFESPIMB040SampleStageConfig*>::const_iterator it1;
+    for (it1=ui_stageconfigs.constBegin(); it1 != ui_stageconfigs.constEnd(); ++it1) {
+        it1.value()->lockStages();
+    }
+    QMap<QString, QFStageConfigWidget*>::const_iterator it2; ;
+    for (it2=ui_stages.constBegin(); it2 != ui_stages.constEnd(); ++it2) {
+        it2.value()->lockStages();
+    }
+
 }
 
 void QFESPIMB040OpticsSetup2::unlockStages() {
-    //ui->stageSetup->unlockStages();
+    QMap<QString, QFESPIMB040SampleStageConfig*>::const_iterator it1;
+    for (it1=ui_stageconfigs.constBegin(); it1 != ui_stageconfigs.constEnd(); ++it1) {
+        it1.value()->unlockStages();
+    }
+    QMap<QString, QFStageConfigWidget*>::const_iterator it2; ;
+    for (it2=ui_stages.constBegin(); it2 != ui_stages.constEnd(); ++it2) {
+        it2.value()->unlockStages();
+    }
 }
 
 void QFESPIMB040OpticsSetup2::closeEvent(QCloseEvent * event) {
-    //ui->camConfig1->close();
-    //ui->camConfig2->close();
+    QMap<QString, CameraWidgets>::const_iterator it2; ;
+    for (it2=ui_cameras.constBegin(); it2 != ui_cameras.constEnd(); ++it2) {
+        it2.value().config->close();
+    }
     event->accept();
 }
 
 void QFESPIMB040OpticsSetup2::showEvent( QShowEvent * event ) {
-    //ui->camConfig1->show();
-    //ui->camConfig2->show();
+    QMap<QString, CameraWidgets>::const_iterator it2; ;
+    for (it2=ui_cameras.constBegin(); it2 != ui_cameras.constEnd(); ++it2) {
+        it2.value().config->show();
+    }
 }
 
 QShortcut *QFESPIMB040OpticsSetup2::addShortCut(const QString &id, const QString &label, const QKeySequence& sequence) {
@@ -1092,6 +1145,27 @@ void QFESPIMB040OpticsSetup2::changeDVenabledState()
     }
 }
 
+void QFESPIMB040OpticsSetup2::mainShutterToggled(bool checked)
+{
+    if (checked) {
+        actMainShutter->setIcon(QIcon(":/spimb040/shutter_opened.png"));
+    } else {
+        actMainShutter->setIcon(QIcon(":/spimb040/shutter_closed.png"));
+    }
+
+    setMainIlluminationShutter(checked, true);
+}
+
+void QFESPIMB040OpticsSetup2::mainShutterOn()
+{
+    actMainShutter->setChecked(true);
+}
+
+void QFESPIMB040OpticsSetup2::mainShutterOff()
+{
+    actMainShutter->setChecked(false);
+}
+
 
 void QFESPIMB040OpticsSetup2::updateMagnifications() {
     /*double m=ui->objDetection->objective().magnification*ui->objTube1->objective().magnification;
@@ -1244,15 +1318,39 @@ QFCameraConfigComboBoxStartResume* QFESPIMB040OpticsSetup2::getStopRelease(int c
 }
 
 bool QFESPIMB040OpticsSetup2::setMainIlluminationShutter(bool opened, bool blocking) {
-    /*if (!isMainIlluminationShutterAvailable()) return false;
+    if (!isMainIlluminationShutterAvailable()) return false;
 
-    ui->shutterMainIllumination->setShutter(opened);
-    if (!opened) ui->shutterTransmission->setShutter(false);
+    waitForMainShutter.clear();
+    for (int i=0; i<shutterMain.size(); i++) {
+        if (shutterMain[i].mode==msComplete) {
+            shutterMain[i].shutter->setShutter(opened);
+            waitForMainShutter.insert(i);
+        } else if (shutterMain[i].mode==msOpenOnly && opened==true) {
+            shutterMain[i].shutter->setShutter(true);
+            waitForMainShutter.insert(i);
+        } else if (shutterMain[i].mode==msCloseOnly && opened==false) {
+            shutterMain[i].shutter->setShutter(false);
+            waitForMainShutter.insert(i);
+        }
+    }
 
     if (blocking) {
         QTime t;
         t.start();
-        while (getMainIlluminationShutter()!=opened && t.elapsed()<10000) {
+        bool ok=false;
+        while (!ok && t.elapsed()<10000) {
+            ok=true;
+            for (int i=0; i<shutterMain.size(); i++) {
+                if (shutterMain[i].mode==msComplete) {
+                    ok=ok&&(shutterMain[i].shutter->getShutterState()==opened);
+                } else if (shutterMain[i].mode==msOpenOnly && opened==true) {
+                    ok=ok&&(shutterMain[i].shutter->getShutterState()==opened);
+                } else if (shutterMain[i].mode==msCloseOnly && opened==false) {
+                    ok=ok&&(shutterMain[i].shutter->getShutterState()==opened);
+                }
+            }
+
+
             QApplication::processEvents();
         }
 
@@ -1261,23 +1359,23 @@ bool QFESPIMB040OpticsSetup2::setMainIlluminationShutter(bool opened, bool block
             return false;
         }
         return true;
-    }*/
+    }
     return true;
 }
 
 
-void QFESPIMB040OpticsSetup2::setShutter(int shutter, bool opened, bool blocking)
+void QFESPIMB040OpticsSetup2::setSpecialShutter(int shutter, bool opened, bool blocking)
 {
-    /*if (shutter==QFESPIMB040OpticsSetup2::ShutterMain) {
+    if (shutter==QFESPIMB040OpticsSetup2::ShutterMain) {
         setMainIlluminationShutter(opened, blocking);
-    } else if (shutter==QFESPIMB040OpticsSetup2::ShutterLaser1) {
-        ui->shutterLaser1->setShutter(opened);
-        if (!opened) ui->shutterLaser1->setShutter(false);
+    } else if (shutter==QFESPIMB040OpticsSetup2::ShutterLaser1 && shutterLaser1) {
+        shutterLaser1->setShutter(opened);
+        if (!opened) shutterLaser1->setShutter(false);
 
         if (blocking) {
             QTime t;
             t.start();
-            while (ui->shutterLaser1->getShutterState()!=opened && t.elapsed()<10000) {
+            while (shutterLaser1->getShutterState()!=opened && t.elapsed()<10000) {
                 QApplication::processEvents();
             }
 
@@ -1285,14 +1383,14 @@ void QFESPIMB040OpticsSetup2::setShutter(int shutter, bool opened, bool blocking
                 m_log->log_error("laser 1 shutter timed out after 10s!\n");
             }
         }
-    } else if (shutter==QFESPIMB040OpticsSetup2::ShutterLaser2) {
-        ui->shutterLaser2->setShutter(opened);
-        if (!opened) ui->shutterLaser2->setShutter(false);
+    } else if (shutter==QFESPIMB040OpticsSetup2::ShutterLaser2 && shutterLaser2) {
+        shutterLaser2->setShutter(opened);
+        if (!opened) shutterLaser2->setShutter(false);
 
         if (blocking) {
             QTime t;
             t.start();
-            while (ui->shutterLaser2->getShutterState()!=opened && t.elapsed()<10000) {
+            while (shutterLaser2->getShutterState()!=opened && t.elapsed()<10000) {
                 QApplication::processEvents();
             }
 
@@ -1300,14 +1398,14 @@ void QFESPIMB040OpticsSetup2::setShutter(int shutter, bool opened, bool blocking
                 m_log->log_error("laser 2 shutter timed out after 10s!\n");
             }
         }
-    } else if (shutter==QFESPIMB040OpticsSetup2::ShutterTransmission) {
-        ui->shutterTransmission->setShutter(opened);
-        if (!opened) ui->shutterTransmission->setShutter(false);
+    } else if (shutter==QFESPIMB040OpticsSetup2::ShutterTransmission && shutterTransmission) {
+        shutterTransmission->setShutter(opened);
+        if (!opened) shutterTransmission->setShutter(false);
 
         if (blocking) {
             QTime t;
             t.start();
-            while (ui->shutterTransmission->getShutterState()!=opened && t.elapsed()<10000) {
+            while (shutterTransmission->getShutterState()!=opened && t.elapsed()<10000) {
                 QApplication::processEvents();
             }
 
@@ -1315,19 +1413,52 @@ void QFESPIMB040OpticsSetup2::setShutter(int shutter, bool opened, bool blocking
                 m_log->log_error("transmission shutter timed out after 10s!\n");
             }
         }
-    }*/
+    }
+}
+
+void QFESPIMB040OpticsSetup2::setShutter(int shutter, bool opened, bool blocking)
+{
+    if (shutter>=0 && shutter<getShutterCount()) {
+        QFShutterConfigWidget* shutterW=ui_shutter.value(shutterIndex.value(shutter, ""), NULL);
+        if (shutterW) {
+            shutterW->setShutter(opened);
+            if (!opened) shutterW->setShutter(false);
+
+            if (blocking) {
+                QTime t;
+                t.start();
+                while (shutterW->getShutterState()!=opened && t.elapsed()<10000) {
+                    QApplication::processEvents();
+                }
+
+                if (t.elapsed()>=10000) {
+                    m_log->log_error(tr("shutter %1 timed out after 10s!\n").arg(shutter));
+                }
+            }
+        }
+
+    } else {
+        m_log->log_error(tr("shutter %1 not available!\n").arg(shutter));
+    }
 }
 
 int QFESPIMB040OpticsSetup2::getShutterCount() const
 {
-    return 4;
+    return ui_shutter.size();
 }
 
 
 
 bool QFESPIMB040OpticsSetup2::getMainIlluminationShutter() {
-    //return ui->shutterMainIllumination->getShutterState();
-    return false;
+    bool opened=true;
+
+    for (int i=0; i<shutterMain.size(); i++) {
+        if (shutterMain[i].mode==msComplete) {
+            opened=opened&&shutterMain[i].shutter->getShutterState();
+        }
+    }
+
+    return opened;
 }
 
 QString QFESPIMB040OpticsSetup2::getCurrentLightpathFilename() const {
@@ -1380,8 +1511,7 @@ void QFESPIMB040OpticsSetup2::emitLighpathesChanged() {
 }
 
 bool QFESPIMB040OpticsSetup2::isMainIlluminationShutterAvailable()  {
-    //return ui->shutterMainIllumination->isShutterConnected();
-    return false;
+    return !shutterMain.isEmpty();
 }
 
 

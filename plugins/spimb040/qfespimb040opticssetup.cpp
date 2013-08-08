@@ -849,7 +849,7 @@ bool QFESPIMB040OpticsSetup::setMainIlluminationShutter(bool opened, bool blocki
 }
 
 
-void QFESPIMB040OpticsSetup::setShutter(int shutter, bool opened, bool blocking)
+void QFESPIMB040OpticsSetup::setSpecialShutter(int shutter, bool opened, bool blocking)
 {
     if (shutter==QFESPIMB040OpticsSetup::ShutterMain) {
         setMainIlluminationShutter(opened, blocking);
@@ -899,6 +899,11 @@ void QFESPIMB040OpticsSetup::setShutter(int shutter, bool opened, bool blocking)
             }
         }
     }
+}
+
+void QFESPIMB040OpticsSetup::setShutter(int shutter, bool opened, bool blocking)
+{
+    setSpecialShutter(shutter, opened, blocking);
 }
 
 int QFESPIMB040OpticsSetup::getShutterCount() const

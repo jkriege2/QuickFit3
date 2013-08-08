@@ -180,7 +180,9 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
 
 
 
-        /** \brief set main illumination shutter state */
+        /** \brief set a special shutter state */
+        void setSpecialShutter(int shutter, bool opened, bool blocking=false);
+        /** \brief set a shutter state */
         void setShutter(int shutter, bool opened, bool blocking=false);
         /*! returns the number of available shutters */
         virtual int getShutterCount() const;
@@ -245,6 +247,9 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
 
         void changeDVenabledState();
 
+        void mainShutterToggled(bool checked);
+        void mainShutterOn();
+        void mainShutterOff();
 
     protected:
         void closeEvent(QCloseEvent * event);
@@ -254,6 +259,7 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         void storePluginGlobalSettings(QSettings& settings, QString prefix) const;
         void loadPluginGlobalSettings(QSettings& settings, QObject *extensionObject, QString prefix);
         void storePluginGlobalSettings(QSettings& settings, QObject* extensionObject, QString prefix) const;
+
 
     private:
         Ui::QFESPIMB040OpticsSetup2 *ui;
@@ -278,6 +284,8 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         QShortcut* addShortCut(const QString& id, const QString& label, const QKeySequence& sequence=QKeySequence());
 
         QFTableModel* lightpathConfigModel;
+
+        QAction* actMainShutter;
 
 
 
@@ -316,8 +324,25 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         QMap<QString, QFStageConfigWidget*> ui_stages;
         QMap<QString, QFFilterChangerConfigWidget*> ui_filterchangers;
         QMap<QString, QFShutterConfigWidget*> ui_shutter;
+        QStringList shutterIndex;
 
-        QFShutterConfigWidget* shutterMain;
+        enum MainShutterMode {
+            msComplete=0, // when main shutter is closed, this shutter is close. Hwen main shutter is opened this shutter is opened
+            msOpenOnly,   // when main shutter is closed, this shutter is not operated. Hwen main shutter is opened this shutter is opened
+            msCloseOnly   // when main shutter is closed, this shutter is closed. Hwen main shutter is opened this shutter is not operated
+        };
+
+        struct MainShutterMember {
+            QFShutterConfigWidget* shutter;
+            MainShutterMode mode;
+        };
+
+        QList<MainShutterMember> shutterMain;
+        QSet<int> waitForMainShutter;
+
+        QFShutterConfigWidget* shutterTransmission;
+        QFShutterConfigWidget* shutterLaser2;
+        QFShutterConfigWidget* shutterLaser1;
 
         struct LightsourceWidgets {
             LightsourceWidgets() {
@@ -330,6 +355,7 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
             QString shutter;
         };
         QMap<QString, LightsourceWidgets> ui_lightsource;
+        QMap<QString, QTabWidget*> ui_tabs;
 };
 
 #endif // QFESPIMB040OPTICSSETUP2_H

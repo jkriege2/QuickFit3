@@ -3,15 +3,19 @@
 #
 #
 #
-[group_illumination]
-type=group
+[tab_left]
+type=tabwidget
 x=0
 y=0
+
+[page_illumination]
+type=tabpage
+inwidget=tab_left
 title=Illumination
 
 [group_transmission]
 type=group
-ingroup=group_illumination
+ingroup=page_illumination
 title="transmission illumination"
 colstretch="0,1"
 
@@ -29,13 +33,14 @@ ingroup=group_transmission
 type=shutter
 title="shutter:"
 ingroup=group_transmission
+special_role="main_shutter_close_only,transmission_shutter"
 
 
 
 
 [group_laser1]
 type=group
-ingroup=group_illumination
+ingroup=page_illumination
 title="laser source 1"
 colstretch="0,1"
 
@@ -53,12 +58,14 @@ ingroup=group_laser1
 type=shutter
 title="shutter:"
 ingroup=group_laser1
+special_role=laser1_shutter
+
 
 
 
 [group_laser2]
 type=group
-ingroup=group_illumination
+ingroup=page_illumination
 title="laser source 2"
 colstretch="0,1"
 
@@ -76,6 +83,7 @@ ingroup=group_laser2
 type=shutter
 title="shutter:"
 ingroup=group_laser2
+special_role=laser2_shutter
 
 
 
@@ -84,7 +92,7 @@ ingroup=group_laser2
 
 [group_lightsheet]
 type=group
-ingroup=group_illumination
+ingroup=page_illumination
 title=lightsheet formation
 colstretch="0,1"
 
@@ -102,10 +110,18 @@ special_role=projection_objective
 
 [stretch_illumination]
 type=vertical_stretch
-ingroup=group_illumination
+ingroup=page_illumination
 
 
 
+
+
+
+
+[page_measurements]
+type=tabpage
+inwidget=tab_left
+title=Measurements
 
 
 

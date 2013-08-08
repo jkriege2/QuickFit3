@@ -101,21 +101,22 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::setShutter(const QString& 
     if (shutter=="main") {
         opticsSetup->setMainIlluminationShutter(state, true);
     } else if (shutter=="laser1") {
-        opticsSetup->setShutter(QFESPIMB040OpticsSetupBase::ShutterLaser1, state, true);
+        opticsSetup->setSpecialShutter(QFESPIMB040OpticsSetupBase::ShutterLaser1, state, true);
     } else if (shutter=="laser2") {
-        opticsSetup->setShutter(QFESPIMB040OpticsSetupBase::ShutterLaser2, state, true);
+        opticsSetup->setSpecialShutter(QFESPIMB040OpticsSetupBase::ShutterLaser2, state, true);
     } else if (shutter=="transmission") {
-        opticsSetup->setShutter(QFESPIMB040OpticsSetupBase::ShutterTransmission, state, true);
+        opticsSetup->setSpecialShutter(QFESPIMB040OpticsSetupBase::ShutterTransmission, state, true);
     } else {
         bool ok=false;
         int ID=shutter.toInt(&ok);
         if (ok && ID>=0 && ID<opticsSetup->getShutterCount()) {
-            opticsSetup->setShutter(ID, state, true);
+            opticsSetup->setSpecialShutter(ID, state, true);
         } else {
             throwEngineException(QObject::tr("setShutter('%1'): unknown shutter!").arg(shutter));
         }
     }
 }
+
 
 void QFESPIMB040ScriptedAcquisitionInstrumentControl::moveStageRel(const QString &stage, double newPos)
 {

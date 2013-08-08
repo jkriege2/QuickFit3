@@ -163,6 +163,7 @@ class QFESPIMB040OpticsSetup : public QFESPIMB040OpticsSetupBase {
 
 
         /** \brief set main illumination shutter state */
+        void setSpecialShutter(int shutter, bool opened, bool blocking=false);
         void setShutter(int shutter, bool opened, bool blocking=false);
         /*! returns the number of available shutters */
         virtual int getShutterCount() const;
