@@ -29,6 +29,7 @@ HEADERS += qfimfccsfitevaluation.h \
     qfimfccsparameterinputtable.h \
     qfimfccsparameterinputdelegate.h \
     qfimfccsrelativeccfdialog.h \
+    qfimfccsrelativeintensitydialog.h \
     qfimfccsfilesetsmodel.h \
     qfimfccsfitchi2landscapedialog.h \
     ../interfaces/qffitfunctionconfigforglobalfitinterface.h \
@@ -48,6 +49,7 @@ SOURCES += qfimfccsfitevaluation.cpp \
     qfimfccsparameterinputtable.cpp \
     qfimfccsparameterinputdelegate.cpp \
     qfimfccsrelativeccfdialog.cpp \
+    qfimfccsrelativeintensitydialog.cpp \
     qfimfccsfilesetsmodel.cpp \
     qfimfccsfitchi2landscapedialog.cpp \
     ../base_classes/qffitresultsbyindexevaluationfitthread.cpp
@@ -55,6 +57,7 @@ SOURCES += qfimfccsfitevaluation.cpp \
 FORMS = qfimfccsfitevaluation_editor.ui \   
     optionswidget.ui \
     qfimfccsrelativeccfdialog.ui \
+    qfimfccsrelativeintensitydialog.ui \
     qfimfccsfitchi2landscapedialog.ui
 
 RESOURCES += qfimfccsfitevaluation.qrc \

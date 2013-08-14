@@ -4,6 +4,7 @@
 #include "qffcstools.h"
 #include "optionswidget.h"
 #include "qfimfccsrelativeccfdialog.h"
+#include "qfimfccsrelativeintensitydialog.h"
 #include "qfrdrimagetoruninterface.h"
 #include <stdint.h>
 #include "qfmathtools.h"
@@ -13,6 +14,7 @@ QFImFCCSFitEvaluation::QFImFCCSFitEvaluation(QObject* parent):
     QObject(parent)
 {
     dlgRelCCF=NULL;
+    dlgRelInten=NULL;
     QFPluginServices::getInstance()->registerSettingsPane(this);
 }
 
@@ -40,6 +42,9 @@ void QFImFCCSFitEvaluation::init()
     QAction* actCCF=new QAction(tr("calculate &relative CCF amplitude"), menu);
     connect(actCCF, SIGNAL(triggered()), this, SLOT(calcRelativeCCF()));
     menu->addAction(actCCF);
+    QAction* actI=new QAction(tr("calculate &relative intensity"), menu);
+    connect(actI, SIGNAL(triggered()), this, SLOT(calcRelativeIntensity()));
+    menu->addAction(actI);
 
     QFPluginServices::getInstance()->getMenu("tools")->addMenu(menu);
 }
@@ -70,11 +75,18 @@ void QFImFCCSFitEvaluation::insertEvaluation() {
 
 void QFImFCCSFitEvaluation::calcRelativeCCF()
 {
-    qDebug()<<"calcRelativeCCF";
+    //qDebug()<<"calcRelativeCCF";
     if (!dlgRelCCF) dlgRelCCF=new QFImFCCSRelativeCCFDialog(NULL);
-    qDebug()<<"calcRelativeCCF1";
+    //qDebug()<<"calcRelativeCCF1";
     dlgRelCCF->show();
-    qDebug()<<"calcRelativeCCF2";
+    //qDebug()<<"calcRelativeCCF2";
+}
+
+void QFImFCCSFitEvaluation::calcRelativeIntensity()
+{
+    if (!dlgRelInten) dlgRelInten=new QFImFCCSRelativeIntensityDialog(NULL);
+    dlgRelInten->show();
+
 }
 
 

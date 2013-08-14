@@ -6,6 +6,7 @@
 #include "qfpluginservices.h"
 
 class QFImFCCSRelativeCCFDialog;//forward
+class QFImFCCSRelativeIntensityDialog;//forward
 
 /*!
     \defgroup qf3rdrdp_imfccsfit Evaluation Item Plugin for imaging Fluorescence Crosscorrelation Spectroscopy Fits
@@ -74,10 +75,13 @@ class QFImFCCSFitEvaluation : public QObject, public QFPluginEvaluationItemBase,
 
         /** \brief calculates the fraction of CCF amplitude */
         void calcRelativeCCF();
+        /** \brief calculates the relative intensity */
+        void calcRelativeIntensity();
 
     private:
 
         QPointer<QFImFCCSRelativeCCFDialog> dlgRelCCF;
+        QPointer<QFImFCCSRelativeIntensityDialog> dlgRelInten;
 };
 
 #endif // QFIMFCCSFITEVALUATION_H
