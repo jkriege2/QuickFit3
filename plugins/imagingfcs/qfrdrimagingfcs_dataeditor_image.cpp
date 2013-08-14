@@ -5236,6 +5236,9 @@ void QFRDRImagingFCSImageEditor::copyGroupACFsToTable() {
                     if (sel.size()<=0) {
                         cf<<(m->getCorrelationMean())[n];
                         cstd<<(m->getCorrelationStdDev())[n];
+                    } else if (sel.size()==1){
+                        cf<<(m->getCorrelationRun(sel[0]))[n];
+                        cstd<<(m->getCorrelationRunError(sel[0]))[n];
                     } else {
                         QVector<double> dat;
                         for (int s=0; s<sel.size(); s++) {

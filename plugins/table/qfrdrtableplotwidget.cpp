@@ -507,7 +507,7 @@ void QFRDRTablePlotWidget::updateGraph() {
         QFont keyf(p.fontName);
         keyf.setPointSizeF(p.keyFontSize);
         QFontMetricsF keyfm(keyf);
-        ui->plotter->get_plotter()->set_key_item_height(qMax(15.0, 1.0*keyfm.height()));
+        //ui->plotter->get_plotter()->set_key_item_height(qMax(15.0, 1.0*keyfm.height()));
         ui->plotter->setGrid(p.grid);
         QColor kb=QColor("white");
         kb.setAlphaF(p.keyTransparency);

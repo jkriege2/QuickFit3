@@ -173,9 +173,9 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
                             int g=item->getLinkParameter(cols, fp.id);
                             if (g>=0) {
                                 QBrush b(getCycleColor(g, 10, 0.5, 0.8));
-                                if (g>=10) b.setStyle(Qt::BDiagPattern);
+                                if (g>=10) b.setStyle(Qt::CrossPattern);
                                 if (g>=20) b.setStyle(Qt::DiagCrossPattern);
-                                if (g>=30) b.setStyle(Qt::CrossPattern);
+                                if (g>=30) b.setStyle(Qt::BDiagPattern);
                                 return b;
                             }
                         }
