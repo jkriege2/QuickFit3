@@ -59,8 +59,8 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         void loadSettings(QSettings& settings, QString prefix, bool dontLoadDevices=false);
         void loadSettings(QFManyFilesSettings& settings, QString prefix, bool dontLoadDevices=false);
         /** \brief save settings */
-        void storeSettings(QSettings& settings, QString prefix);
-        void storeSettings(QFManyFilesSettings& settings, QString prefix);
+        void saveSettings(QSettings& settings, QString prefix);
+        void saveSettings(QFManyFilesSettings& settings, QString prefix);
 
         /** \brief connect to all selected stages */
         void connectStages();

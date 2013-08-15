@@ -41,6 +41,8 @@
 #include "qfstageconfigwidget.h"
 #include "qffilterchangerconfigwidget.h"
 
+#include <qalgorithms.h>
+
 class QFESPIMB040MainWindow; // forward
 namespace Ui {
     class QFESPIMB040OpticsSetup2; // forward
@@ -356,6 +358,19 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         };
         QMap<QString, LightsourceWidgets> ui_lightsource;
         QMap<QString, QTabWidget*> ui_tabs;
+
+
+
+
+        template <class T>
+        friend void loadValueSettingsForAllInMap(T map_begin, T map_end, QSettings& settings, const QString& prefix);
+        template <class T>
+        friend void saveValueSettingsForAllInMap(T map_begin, T map_end, QSettings& settings, const QString& prefix);
+
+
+
 };
+
+
 
 #endif // QFESPIMB040OPTICSSETUP2_H

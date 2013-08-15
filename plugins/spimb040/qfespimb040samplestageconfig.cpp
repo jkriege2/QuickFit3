@@ -168,7 +168,7 @@ void QFESPIMB040SampleStageConfig::loadSettings(QFManyFilesSettings &settings, Q
     m_stepZ=settings.value(prefix+"step_z", m_stepZ).toDouble();
 }
 
-void QFESPIMB040SampleStageConfig::storeSettings(QSettings& settings, QString prefix) {
+void QFESPIMB040SampleStageConfig::saveSettings(QSettings& settings, QString prefix) {
     /*settings.setValue(prefix+"stage_x", cmbStageX->currentIndex());
     settings.setValue(prefix+"stage_y", cmbStageY->currentIndex());
     settings.setValue(prefix+"stage_z", cmbStageZ->currentIndex());*/
@@ -183,7 +183,7 @@ void QFESPIMB040SampleStageConfig::storeSettings(QSettings& settings, QString pr
     settings.setValue(prefix+"step_z", m_stepZ);
 }
 
-void QFESPIMB040SampleStageConfig::storeSettings(QFManyFilesSettings &settings, QString prefix)
+void QFESPIMB040SampleStageConfig::saveSettings(QFManyFilesSettings &settings, QString prefix)
 {
     /*settings.setValue(prefix+"stage_x", cmbStageX->currentIndex());
     settings.setValue(prefix+"stage_y", cmbStageY->currentIndex());

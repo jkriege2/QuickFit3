@@ -131,7 +131,7 @@ void QFStageConfigWidget::loadSettings(QFManyFilesSettings &settings, QString pr
     m_stepX=settings.value(prefix+"step_x", m_stepX).toDouble();
 }
 
-void QFStageConfigWidget::storeSettings(QSettings& settings, QString prefix) {
+void QFStageConfigWidget::saveSettings(QSettings& settings, QString prefix) {
     /*settings.setValue(prefix+"stage_x", cmbStageX->currentIndex());
     settings.setValue(prefix+"stage_y", cmbStageY->currentIndex());
     settings.setValue(prefix+"stage_z", cmbStageZ->currentIndex());*/
@@ -142,7 +142,7 @@ void QFStageConfigWidget::storeSettings(QSettings& settings, QString prefix) {
     settings.setValue(prefix+"step_x", m_stepX);
 }
 
-void QFStageConfigWidget::storeSettings(QFManyFilesSettings &settings, QString prefix)
+void QFStageConfigWidget::saveSettings(QFManyFilesSettings &settings, QString prefix)
 {
     /*settings.setValue(prefix+"stage_x", cmbStageX->currentIndex());
     settings.setValue(prefix+"stage_y", cmbStageY->currentIndex());

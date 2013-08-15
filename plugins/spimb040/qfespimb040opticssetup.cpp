@@ -193,7 +193,7 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
 void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) {
     ui->camConfig1->storeSettings(settings, prefix+"cam_config1/");
     ui->camConfig2->storeSettings(settings, prefix+"cam_config2/");
-    ui->stageSetup->storeSettings(settings, prefix+"stages/");
+    ui->stageSetup->saveSettings(settings, prefix+"stages/");
     ui->filtDetection11->saveSettings(settings, prefix+"filters/detection11");
     ui->filtDetection21->saveSettings(settings, prefix+"filters/detection21");
     ui->filtSplitter->saveSettings(settings, prefix+"filters/detection_splitter");

@@ -7,6 +7,95 @@
 #include "qfespimb040shortcutconfigdialog.h"
 #include "qfespimb040lightpathsavedialog.h"
 
+
+
+
+template <class T>
+void loadValueSettingsForAllInMap(T map_begin, T map_end, QSettings& settings, const QString& prefix) {
+    for (T it=map_begin; it!=map_end; it++) {
+        it.value()->loadSettings(settings, prefix+it.key()+"/");
+    }
+}
+
+template <class T>
+void saveValueSettingsForAllInMap(T map_begin, T map_end, QSettings& settings, const QString& prefix) {
+    for (T it=map_begin; it!=map_end; it++) {
+        it.value()->saveSettings(settings, prefix+it.key()+"/");
+    }
+}
+
+template <>
+void loadValueSettingsForAllInMap( QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> >::const_iterator map_begin, QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> >::const_iterator map_end, QSettings& settings, const QString& prefix) {
+    for (QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> >::const_iterator it=map_begin; it!=map_end; it++) {
+        settings.setValue(prefix+it.key()+"/activated", it.value().first->isChecked());
+        it.value().second->loadSettings(settings, prefix+it.key()+"/");
+    }
+}
+
+template <>
+void saveValueSettingsForAllInMap( QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> >::const_iterator map_begin, QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> >::const_iterator map_end, QSettings& settings, const QString& prefix) {
+    for (QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> >::const_iterator it=map_begin; it!=map_end; it++) {
+        it.value().first->setChecked(settings.value(prefix+it.key()+"/activated", it.value().first->isChecked()).toBool());
+        it.value().second->saveSettings(settings, prefix+it.key()+"/");
+    }
+}
+
+template <>
+void loadValueSettingsForAllInMap(QMap<QString, QFESPIMB040OpticsSetup2::LightsourceWidgets>::const_iterator map_begin, QMap<QString, QFESPIMB040OpticsSetup2::LightsourceWidgets>::const_iterator map_end, QSettings& settings, const QString& prefix) {
+    for (QMap<QString, QFESPIMB040OpticsSetup2::LightsourceWidgets>::const_iterator it=map_begin; it!=map_end; it++) {
+        it.value().config->loadSettings(settings, prefix+it.key()+"/");
+    }
+}
+
+template <>
+void saveValueSettingsForAllInMap(QMap<QString, QFESPIMB040OpticsSetup2::LightsourceWidgets>::const_iterator map_begin, QMap<QString, QFESPIMB040OpticsSetup2::LightsourceWidgets>::const_iterator map_end, QSettings& settings, const QString& prefix) {
+    for (QMap<QString, QFESPIMB040OpticsSetup2::LightsourceWidgets>::const_iterator it=map_begin; it!=map_end; it++) {
+        it.value().config->saveSettings(settings, prefix+it.key()+"/");
+    }
+}
+
+template <>
+void loadValueSettingsForAllInMap(QMap<QString, QFESPIMB040OpticsSetup2::CameraWidgets>::const_iterator map_begin, QMap<QString, QFESPIMB040OpticsSetup2::CameraWidgets>::const_iterator map_end, QSettings& settings, const QString& prefix) {
+    for (QMap<QString, QFESPIMB040OpticsSetup2::CameraWidgets>::const_iterator it=map_begin; it!=map_end; it++) {
+        it.value().config->loadSettings(settings, prefix+it.key()+"/");
+    }
+}
+
+template <>
+void saveValueSettingsForAllInMap(QMap<QString, QFESPIMB040OpticsSetup2::CameraWidgets>::const_iterator map_begin, QMap<QString, QFESPIMB040OpticsSetup2::CameraWidgets>::const_iterator map_end, QSettings& settings, const QString& prefix) {
+    for (QMap<QString, QFESPIMB040OpticsSetup2::CameraWidgets>::const_iterator it=map_begin; it!=map_end; it++) {
+        it.value().config->storeSettings(settings, prefix+it.key()+"/");
+    }
+}
+
+template <class T>
+void loadValueSettingsForAllInMap(const T& map, QSettings& settings, const QString& prefix) {
+    loadValueSettingsForAllInMap(map.constBegin(), map.constEnd(), settings, prefix);
+}
+template <class T>
+void saveValueSettingsForAllInMap(const T& map, QSettings& settings, const QString& prefix) {
+    saveValueSettingsForAllInMap(map.constBegin(), map.constEnd(), settings, prefix);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 QFESPIMB040OpticsSetup2::QFESPIMB040OpticsSetup2(QWidget* pluginMainWidget, QWidget* parent,  QFPluginLogService* log, QFPluginServices* pluginServices) :
     QFESPIMB040OpticsSetupBase(parent),
     ui(new Ui::QFESPIMB040OpticsSetup2)
@@ -586,6 +675,18 @@ void QFESPIMB040OpticsSetup2::storePluginGlobalSettings(QSettings &settings, QOb
 void QFESPIMB040OpticsSetup2::loadSettings(QSettings& settings, QString prefix) {
     bool updt=updatesEnabled();
     if (updt) setUpdatesEnabled(false);
+
+    loadValueSettingsForAllInMap(ui_filters, settings, prefix+"optSetup2/");
+    loadValueSettingsForAllInMap(ui_objectives, settings, prefix+"optSetup2/");
+    loadValueSettingsForAllInMap(ui_dualviews, settings, prefix+"optSetup2/");
+    loadValueSettingsForAllInMap(ui_cameras, settings, prefix+"optSetup2/");
+    loadValueSettingsForAllInMap(ui_stageconfigs, settings, prefix+"optSetup2/");
+    loadValueSettingsForAllInMap(ui_stages, settings, prefix+"optSetup2/");
+    loadValueSettingsForAllInMap(ui_filterchangers, settings, prefix+"optSetup2/");
+    loadValueSettingsForAllInMap(ui_shutter, settings, prefix+"optSetup2/");
+    loadValueSettingsForAllInMap(ui_lightsource, settings, prefix+"optSetup2/");
+
+
     /*ui->camConfig1->loadSettings(settings, prefix+"cam_config1/");
     ui->camConfig2->loadSettings(settings, prefix+"cam_config2/");
     ui->stageSetup->loadSettings(settings, prefix+"stages/");
@@ -629,6 +730,18 @@ void QFESPIMB040OpticsSetup2::loadSettings(QSettings& settings, QString prefix) 
 }
 
 void QFESPIMB040OpticsSetup2::storeSettings(QSettings& settings, QString prefix) {
+
+    saveValueSettingsForAllInMap(ui_filters, settings, prefix+"optSetup2/");
+    saveValueSettingsForAllInMap(ui_objectives, settings, prefix+"optSetup2/");
+    saveValueSettingsForAllInMap(ui_dualviews, settings, prefix+"optSetup2/");
+    saveValueSettingsForAllInMap(ui_cameras, settings, prefix+"optSetup2/");
+    saveValueSettingsForAllInMap(ui_stageconfigs, settings, prefix+"optSetup2/");
+    saveValueSettingsForAllInMap(ui_stages, settings, prefix+"optSetup2/");
+    saveValueSettingsForAllInMap(ui_filterchangers, settings, prefix+"optSetup2/");
+    saveValueSettingsForAllInMap(ui_shutter, settings, prefix+"optSetup2/");
+    saveValueSettingsForAllInMap(ui_lightsource, settings, prefix+"optSetup2/");
+
+
     /*ui->camConfig1->storeSettings(settings, prefix+"cam_config1/");
     ui->camConfig2->storeSettings(settings, prefix+"cam_config2/");
     ui->stageSetup->storeSettings(settings, prefix+"stages/");
