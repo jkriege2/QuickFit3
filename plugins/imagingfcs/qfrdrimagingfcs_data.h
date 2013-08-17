@@ -203,6 +203,8 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief if this returns \c true, the user may change the RDRs role in the QFRawDataPropertyEditor, default: \c false */
         virtual bool isRoleUserEditable() const;
 
+        QFRDRImagingFCSData* getRoleFromThisGroup(const QString& role);
+
     protected:
 
         /** \brief indicates whether the internal data representation is "dual view", this is independent of dualViewMode() and setDualViewMode() which only influences the data display! */

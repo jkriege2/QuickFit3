@@ -35,6 +35,10 @@
 #include "qfrdrtableinterface.h"
 #include "qfrdrcolumngraphsinterface.h"
 #include "qfplottercopytotabledialog.h"
+
+class QFRDRImagingFCSData; // forward
+
+
 /*! \brief editor for FCS fit parameter images, created from QFRDRImagingFCSData
     \ingroup qf3rdrdp_imaging_fcs
 
@@ -115,6 +119,11 @@ protected:
          * as a slot for a signal with an integer parameter.
          */
         void replotData();
+
+        void plotAverage(QFRDRImagingFCSData *m, QFPlotter* plotter, int c_tau_in, int* c_tau_out=NULL, QVector<double>* tau_out=NULL, QVector<double>* corr_out=NULL, QVector<double>* errcorr_out=NULL, QColor overrideColor=QColor());
+        void plotRun(QFRDRImagingFCSData *m, int i, bool plotFit, QFPlotter* plotter, QFPlotter* plotterResid, QFTableModel *tabFitvals=NULL, int c_tau=-1, QVector<double>* tau_out=NULL, QVector<double>* corr_out=NULL, QVector<double>* errcorr_out=NULL, QColor overrideColor=QColor());
+        void plotRunsAvg(QFRDRImagingFCSData *m, QSet<int32_t> selected, bool plotFit, QFPlotter* plotter, QFPlotter* plotterResid, QFTableModel *tabFitvals=NULL, int c_tau=-1, QVector<double>* tau_out=NULL, QVector<double>* corr_out=NULL, QVector<double>* errcorr_out=NULL, QColor overrideColor=QColor(), const QString& overrideTitle=QString());
+
 
         /** \brief draw overview plot */
         void replotImage();
@@ -286,6 +295,10 @@ protected:
         QCheckBox* chkKeys;
         /** \brief combobox to select selection display options for the correlation /table plot */
         QComboBox* cmbSeletionCorrDisplayMode;
+        QComboBox* cmbCrosstalkDirection;
+        QDoubleSpinBox* spinCrosstalk;
+        QSpinBox* spinCrosstalkAvg;
+        QComboBox* cmbCrosstalkMode;
 
 
 
@@ -491,7 +504,7 @@ protected:
                     not output data in fit. If the function is well defined it is evaluated for every given
                     tau. The result is saved in fit.
          */
-        bool evaluateFitFunction(const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation, int index);
+        bool evaluateFitFunction(QFRawDataRecord* current, const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation, int index);
 
         void createReportDoc(QTextDocument* document);
 

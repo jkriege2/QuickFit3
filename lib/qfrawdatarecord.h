@@ -95,6 +95,8 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         QString getGroupName() const;
         /** \brief returns all members (including this record) of the records group */
         QList<QFRawDataRecord*> getGroupMembers() const;
+        /** \brief get all records with a given role from the group of the current record */
+        QList<QFRawDataRecord*> getRecordsWithRoleFromGroup(const QString& role) const;
         /** \brief return the description  */
         inline QString getDescription() const { return description; }
         /** \brief return the list of linked files */

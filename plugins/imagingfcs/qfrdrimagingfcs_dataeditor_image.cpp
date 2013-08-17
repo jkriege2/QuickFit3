@@ -15,7 +15,7 @@
 #include "qftools.h"
 #include "qfrawdatapropertyeditor.h"
 #include "qfselectionlistdialog.h"
-
+#include "statistics_tools.h"
 #define sqr(x) qfSqr(x)
 
 #define CLICK_UPDATE_TIMEOUT 500
@@ -520,7 +520,37 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbSeletionCorrDisplayMode=new QComboBox(this);
     cmbSeletionCorrDisplayMode->addItem(tr("display average"));
     cmbSeletionCorrDisplayMode->addItem(tr("display all"));
+    cmbSeletionCorrDisplayMode->addItem(tr("FCCS display"));
     gl->addRow(tr("selection display:"), cmbSeletionCorrDisplayMode);
+
+    QWidget* wcrosstalk=new QWidget(this);
+    QGridLayout* wclayout=new QGridLayout(wcrosstalk);
+    wcrosstalk->setLayout(wclayout);
+    wclayout->setContentsMargins(0,0,0,0);
+    spinCrosstalk=new QDoubleSpinBox(wcrosstalk);
+    spinCrosstalk->setRange(0,1000);
+    spinCrosstalk->setSuffix(tr(" %"));
+    spinCrosstalk->setValue(0);
+    wclayout->addWidget(spinCrosstalk,0,0,1,2);
+    cmbCrosstalkDirection=new QComboBox(wcrosstalk);
+    cmbCrosstalkDirection->addItem(tr("0 -> 1"));
+    cmbCrosstalkDirection->addItem(tr("1 -> 0"));
+    cmbCrosstalkDirection->addItem(tr("none"));
+    cmbCrosstalkDirection->setCurrentIndex(0);
+    wclayout->addWidget(new QLabel(tr("dir.: "), wcrosstalk),0,2);
+    wclayout->addWidget(cmbCrosstalkDirection,0,3);
+    spinCrosstalkAvg=new QSpinBox(wcrosstalk);
+    spinCrosstalkAvg->setRange(0,1000);
+    spinCrosstalkAvg->setValue(4);
+    wclayout->addWidget(new QLabel(tr("avg.: "), wcrosstalk),1,0);
+    wclayout->addWidget(spinCrosstalkAvg,1,1);
+    gl->addRow(tr("crosstalk:"), wcrosstalk);
+    cmbCrosstalkMode=new QComboBox(wcrosstalk);
+    cmbCrosstalkMode->addItem(tr("corrected"));
+    cmbCrosstalkMode->addItem(tr("explained"));
+    cmbCrosstalkMode->setCurrentIndex(0);
+    wclayout->addWidget(new QLabel(tr("mode: "), wcrosstalk),1,2);
+    wclayout->addWidget(cmbCrosstalkMode,1,3);
 
 
     connectImageWidgets(true);
@@ -1736,6 +1766,20 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
     correlationMaskTools->setRDR(current);
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
+        if (m->isFCCS()) {
+            if (cmbSeletionCorrDisplayMode->count()<=2) {
+                cmbSeletionCorrDisplayMode->addItem(tr("FCCS display"));
+            }
+        } else {
+            if (cmbSeletionCorrDisplayMode->count()>2) {
+                cmbSeletionCorrDisplayMode->removeItem(2);
+            }
+        }
+        cmbCrosstalkDirection->setEnabled(m->isFCCS());
+        cmbCrosstalkMode->setEnabled(m->isFCCS());
+        spinCrosstalk->setEnabled(m->isFCCS());
+        spinCrosstalkAvg->setEnabled(m->isFCCS());
+
         sliders->disableSliderSignals();
         sliders->set_min(0);
         sliders->set_max(m->getCorrelationN());
@@ -2767,6 +2811,431 @@ void QFRDRImagingFCSImageEditor::replotMask() {
 #endif
 }
 
+
+
+void QFRDRImagingFCSImageEditor::plotAverage(QFRDRImagingFCSData* m, QFPlotter* plotter, int c_tau_in, int* c_tau_out, QVector<double>* tau_out, QVector<double>* corr_out, QVector<double>* errcorr_out, QColor overrideColor) {
+    JKQTPdatastore* ds=plotter->getDatastore();
+
+    JKQTPerrorPlotstyle avgerrorstyle=cmbAverageErrorStyle->getErrorStyle();
+    bool avgLine=cmbAverageStyle->getDrawLine();
+    JKQTPgraphSymbols avgSymbol=cmbAverageStyle->getSymbol();
+
+
+
+    size_t c_tau=0;
+    if (c_tau_in<0) c_tau=ds->addColumn(m->getCorrelationT(), m->getCorrelationN(), "tau");
+    else c_tau=c_tau_in;
+    if (c_tau_out) *c_tau_out=c_tau;
+
+
+    //QTime t;
+    //t.start();
+    //////////////////////////////////////////////////////////////////////////////////
+    // Plot average + error markers
+    //////////////////////////////////////////////////////////////////////////////////
+    size_t c_mean=ds->addColumn(m->getCorrelationMean(), m->getCorrelationN(), "cmean");
+    size_t c_std=ds->addColumn(m->getCorrelationStdDev(), m->getCorrelationN(), "cstddev");
+
+    if (tau_out) ds->getColumn(c_tau).copyData(*tau_out);
+    if (corr_out) ds->getColumn(c_mean).copyData(*corr_out);
+    if (errcorr_out) ds->getColumn(c_std).copyData(*errcorr_out);
+
+    JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
+    //g->set_color(QColor("blue"));
+    if (overrideColor.isValid()) g->set_color(overrideColor);
+    QColor cerr=g->get_color().lighter();
+    g->set_errorColor(cerr);
+    cerr.setAlphaF(0.5);
+    g->set_errorFillColor(cerr);
+    g->set_lineWidth(2);
+    g->set_xColumn(c_tau);
+    g->set_yColumn(c_mean);
+    g->set_yErrorColumn(c_std);
+    g->set_title(tr("average"));
+    g->set_yErrorStyle(avgerrorstyle);
+    g->set_xErrorStyle(JKQTPnoError);
+    g->set_datarange_start(sliders->get_userMin());
+    g->set_datarange_end(sliders->get_userMax());
+    g->set_drawLine(avgLine);
+    g->set_symbolSize(5);
+    g->set_symbol(avgSymbol);
+    plotter->addGraph(g);
+}
+
+
+void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plotFit, QFPlotter *plotter, QFPlotter *plotterResid, QFTableModel* tabFitvals, int c_tau_in, QVector<double>* tau_out, QVector<double>* corr_out, QVector<double>* errcorr_out, QColor overrideColor) {
+    JKQTPdatastore* ds=plotter->getDatastore();
+    JKQTPerrorPlotstyle runerrorstyle=cmbRunErrorStyle->getErrorStyle();
+    bool runLine=cmbRunStyle->getDrawLine();
+    JKQTPgraphSymbols runSymbol=cmbRunStyle->getSymbol();
+
+    size_t c_tau=0;
+    if (c_tau_in<0) c_tau=ds->addColumn(m->getCorrelationT(), m->getCorrelationN(), "tau");
+    else c_tau=c_tau_in;
+
+    size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
+    size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("pixel error %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
+
+    if (tau_out) ds->getColumn(c_tau).copyData(*tau_out);
+    if (corr_out) ds->getColumn(c_run).copyData(*corr_out);
+    if (errcorr_out) ds->getColumn(c_rune).copyData(*errcorr_out);
+
+    JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
+    g->set_lineWidth(1);
+    g->set_xColumn(c_tau);
+    g->set_yColumn(c_run);
+    g->set_drawLine(runLine);
+    g->set_symbol(runSymbol);
+    g->set_title(tr("run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
+    g->set_datarange_start(sliders->get_userMin());
+    g->set_datarange_end(sliders->get_userMax());
+    g->set_yErrorColumn(c_rune);
+    g->set_yErrorStyle(runerrorstyle);
+    g->set_xErrorStyle(JKQTPnoError);
+    g->set_symbolSize(5);
+    g->set_errorWidth(1);
+    if (m->leaveoutRun(i)) {
+        g->set_color(QColor("grey"));
+    }
+
+    if (overrideColor.isValid()) g->set_color(overrideColor);
+
+    QColor cerr=g->get_color().lighter();
+    g->set_errorColor(cerr);
+    cerr.setAlphaF(0.5);
+    g->set_errorFillColor(cerr);
+    plotter->addGraph(g);
+
+#ifdef DEBUG_TIMIMNG
+     //qDebug()<<"replotData   add graph "<<i<<": "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
+
+    double* corr=(double*)calloc(m->getCorrelationN(), sizeof(double));
+    double* resid=(double*)calloc(m->getCorrelationN(), sizeof(double));
+    QStringList names, units, unitlabels, namelabels;
+    QList<double> values, errors;
+    QList<bool> fix;
+
+    // search for the evaluationID that matches the current group(has to be in evals)  and run (i)
+#ifdef DEBUG_TIMIMNG
+    QElapsedTimer t1;
+    t1.start();
+#endif
+    QStringList evals=m->resultsCalcEvaluationsInGroup(currentEvalGroup());
+#ifdef DEBUG_TIMIMNG
+    double resultsCalcEvaluationsInGroupElapsed=t1.nsecsElapsed()/1000;
+#endif
+
+    bool evalFound=false;
+    bool listEval=false;
+    QString resultID="";
+
+
+    for (register int ev=0; ev<evals.size(); ev++) {
+        //en=evals[i];
+        if (m->resultsGetEvaluationGroupIndex(evals[ev])==i) {
+            resultID=evals[ev];
+            evalFound=true;
+            break;
+        }
+    }
+
+    if (!evalFound) {
+        if (evals.size()>0 && evals.size()<=2) {
+            for (register int ev=0; ev<evals.size(); ev++) {
+                if (m->resultsGetEvaluationGroupIndex(evals[ev])>=0) {
+                    resultID=evals[ev];
+                    listEval=true;
+                    evalFound=true;
+                }
+            }
+        }
+    }
+
+#ifdef DEBUG_TIMIMNG
+    //qDebug()<<"replotData   search eval "<<i<<" (evals.size()="<<evals.size()<< "   resultsCalcEvaluationsInGroup="<<resultsCalcEvaluationsInGroupElapsed<<" nsecs): "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
+
+    // try to evaluate the fit function. If it succeeds, add plots and store the parameters & description to the display model!
+    if (plotFit && evaluateFitFunction(m, m->getCorrelationT(), corr, m->getCorrelationN(), names, namelabels, values, errors, fix, units, unitlabels, resultID, i)) {
+        double* acf=m->getCorrelationRun(i);
+        for (int nn=0; nn< m->getCorrelationN(); nn++) {
+            resid[nn]=corr[nn]-acf[nn];
+        }
+        size_t c_fit=ds->addCopiedColumn(corr, m->getCorrelationN(), QString("fit to pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
+        size_t c_resid=ds->addCopiedColumn(resid, m->getCorrelationN(), QString("residuals for pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
+        JKQTPxyLineGraph* gfit=new JKQTPxyLineGraph();
+        gfit->set_lineWidth(1.5);
+        gfit->set_xColumn(c_tau);
+        gfit->set_yColumn(c_fit);
+        gfit->set_drawLine(true);
+        gfit->set_style(Qt::DotLine);
+        gfit->set_symbol(JKQTPnoSymbol);
+        gfit->set_title(tr("fit to run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
+        gfit->set_datarange_start(sliders->get_userMin());
+        gfit->set_datarange_end(sliders->get_userMax());
+        gfit->set_symbolSize(5);
+        gfit->set_color(g->get_color());
+        plotter->addGraph(gfit);
+#ifdef DEBUG_TIMIMNG
+        //qDebug()<<"replotData   add fit graph "<<i<<": " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
+        JKQTPxyLineGraph* gr=new JKQTPxyLineGraph();
+        gr->set_lineWidth(1.5);
+        gr->set_xColumn(c_tau);
+        gr->set_yColumn(c_resid);
+        gr->set_drawLine(runLine);
+        gr->set_style(Qt::DotLine);
+        gr->set_symbol(runSymbol);
+        gr->set_title(tr("residuals for run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
+        gr->set_datarange_start(sliders->get_userMin());
+        gr->set_datarange_end(sliders->get_userMax());
+        gr->set_symbolSize(5);
+        gr->set_color(g->get_color());
+        plotterResid->addGraph(gr);
+#ifdef DEBUG_TIMIMNG
+        //qDebug()<<"replotData   add resid graph "<<i<<": " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
+
+        if (tabFitvals) {
+            tabFitvals->appendColumn();
+            tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
+            int col=tabFitvals->columnCount()-1;
+            tabFitvals->appendColumn();
+            tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("error"));
+            tabFitvals->appendColumn();
+            tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString(""));
+            for (int ii=0; ii<names.size(); ii++) {
+                int row=tabFitvals->getAddRow(0, namelabels[ii]);
+                tabFitvals->setCellEditRole(row, 0, names[ii]);
+                tabFitvals->setCell(row, col, values[ii]);
+                tabFitvals->setCell(row, col+1, errors[ii]);
+                tabFitvals->setCell(row, col+2, unitlabels[ii]);
+                tabFitvals->setCellEditRole(row, col+2, units[ii]);
+                QBrush c=QBrush(g->get_color().lighter(170));
+                tabFitvals->setCellBackgroundRole(row, col, c);
+                tabFitvals->setCellBackgroundRole(row, col+1, c);
+                tabFitvals->setCellBackgroundRole(row, col+2, c);
+                if (fix[ii]) tabFitvals->setCellCheckedRole(row, col, Qt::Checked);
+                else tabFitvals->setCellCheckedRole(row, col, Qt::Unchecked);
+
+            }
+        }
+#ifdef DEBUG_TIMIMNG
+        //qDebug()<<"replotData   set table cells "<<i<<": "<< t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+#endif
+
+    }
+
+    free(corr);
+    free(resid);
+}
+
+
+void QFRDRImagingFCSImageEditor::plotRunsAvg(QFRDRImagingFCSData *m, QSet<int32_t> selected, bool plotFit, QFPlotter *plotter, QFPlotter *plotterResid, QFTableModel* tabFitvals, int c_tau_in, QVector<double>* tau_out, QVector<double>* corr_out, QVector<double>* errcorr_out, QColor overrideColor, const QString& overrideTitle) {
+    JKQTPdatastore* ds=plotter->getDatastore();
+    JKQTPerrorPlotstyle runerrorstyle=cmbRunErrorStyle->getErrorStyle();
+    bool runLine=cmbRunStyle->getDrawLine();
+    JKQTPgraphSymbols runSymbol=cmbRunStyle->getSymbol();
+
+    size_t c_tau=0;
+    if (c_tau_in<0) c_tau=ds->addColumn(m->getCorrelationT(), m->getCorrelationN(), "tau");
+    else c_tau=c_tau_in;
+
+    int avgs=1;
+    if (cmbDualView->currentIndex()>0)  avgs=2;
+    for (int avgIdx=0; avgIdx<avgs; avgIdx++) {
+        double* corr=(double*)calloc(m->getCorrelationN(), sizeof(double));
+        double* cerr=(double*)calloc(m->getCorrelationN(), sizeof(double));
+        double* corr1=(double*)calloc(m->getCorrelationN(), sizeof(double));
+        QList<QList<double> > gvalues;
+        QStringList names, units, unitlabels, namelabels;
+        QList<Qt::CheckState> gfix;
+        for (int i=0; i<m->getCorrelationN(); i++) { corr[i]=0; cerr[i]=0; }
+        double N=0, Nfit=0;
+        for (int i=0; i<m->getCorrelationRuns(); i++) {
+            //qDebug()<<"r"<<i<<"  "<<indexIsDualView2(i);
+            if (selected.contains(i) && !m->leaveoutRun(i) && ((avgs==1)||(avgIdx==0 && !indexIsDualView2(i)) || (avgIdx==1 && indexIsDualView2(i)))) {
+                double* tmp=m->getCorrelationRun(i);
+                for (int jj=0; jj<m->getCorrelationN(); jj++) {
+                    corr[jj]=corr[jj]+tmp[jj];
+                    cerr[jj]=cerr[jj]+tmp[jj]*tmp[jj];
+                }
+
+                QList<double> values, errors;
+                QList<bool> fix;
+
+                QStringList evals=m->resultsCalcEvaluationsInGroup(currentEvalGroup());
+                bool evalFound=false;
+                bool listEval=false;
+                QString resultID="";
+
+
+                for (register int ev=0; ev<evals.size(); ev++) {
+                    //en=evals[i];
+                    if (m->resultsGetEvaluationGroupIndex(evals[ev])==i) {
+                        resultID=evals[ev];
+                        evalFound=true;
+                        break;
+                    }
+                }
+
+                if (!evalFound) {
+                    if (evals.size()>0 && evals.size()<=2) {
+                        for (register int ev=0; ev<evals.size(); ev++) {
+                            if (m->resultsGetEvaluationGroupIndex(evals[ev])>=0) {
+                                resultID=evals[ev];
+                                listEval=true;
+                                evalFound=true;
+                            }
+                        }
+                    }
+                }
+
+
+                if (evaluateFitFunction(m, m->getCorrelationT(), corr1, m->getCorrelationN(), names, namelabels, values, errors, fix, units, unitlabels, resultID, i)) {
+                    if (Nfit==0) {
+                        for (int jj=0; jj<fix.size(); jj++) {
+                            gfix.append(fix[jj]?Qt::Checked:Qt::Unchecked);
+                        }
+                        for (int jj=0; jj<values.size(); jj++) {
+                            QList<double> v;
+                            v.append(values[jj]);
+                            gvalues.append(v);
+                        }
+
+                    } else {
+                        for (int jj=0; jj<fix.size(); jj++) {
+                            if (gfix[jj]!=fix[jj]) gfix[jj]=Qt::PartiallyChecked;
+                        }
+                        for (int jj=0; jj<values.size(); jj++) {
+                            gvalues[jj].append(values[jj]);
+                        }
+                    }
+
+                    Nfit++;
+                }
+
+                N++;
+            }
+        }
+
+
+        for (int jj=0; jj<m->getCorrelationN(); jj++) {
+            cerr[jj]=sqrt((cerr[jj]-corr[jj]*corr[jj]/N)/(N-1.0));
+            corr[jj]=corr[jj]/N;
+        }
+        if (N==1) {
+            for (int jj=0; jj<m->getCorrelationN(); jj++) {
+                cerr[jj]=0;
+            }
+        }
+
+        QColor graphCol;
+        if (avgIdx==0) graphCol=QColor("darkgreen");
+        else graphCol=QColor("darkred");
+
+        if (overrideColor.isValid()) graphCol=overrideColor;
+
+        if (N>0) {
+            size_t c_avg=ds->addCopiedColumn(corr, m->getCorrelationN(), QString("%1: avg. of selected pixels").arg(overrideTitle));
+            size_t c_sd=ds->addCopiedColumn(cerr, m->getCorrelationN(), QString("%1: std. dev. of selected pixels").arg(overrideTitle));
+
+            if (tau_out) ds->getColumn(c_tau).copyData(*tau_out);
+            if (corr_out) ds->getColumn(c_avg).copyData(*corr_out);
+            if (errcorr_out) ds->getColumn(c_sd).copyData(*errcorr_out);
+
+
+            JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
+            g->set_lineWidth(1);
+            g->set_xColumn(c_tau);
+            g->set_yColumn(c_avg);
+            g->set_drawLine(runLine);
+            g->set_lineWidth(2);
+            g->set_symbol(runSymbol);
+            g->set_title(tr("avg. over %1 runs").arg(N));
+            if (avgs>1) {
+                if (avgIdx==0) g->set_title(tr("CH1: avg. over %1 runs").arg(N));
+                if (avgIdx==1) g->set_title(tr("CH2: avg. over %1 runs").arg(N));
+            }
+            if (!overrideTitle.isEmpty()) {
+                g->set_title(overrideTitle);
+            }
+            g->set_datarange_start(sliders->get_userMin());
+            g->set_datarange_end(sliders->get_userMax());
+            g->set_yErrorColumn(c_sd);
+            g->set_yErrorStyle(runerrorstyle);
+            g->set_xErrorStyle(JKQTPnoError);
+            g->set_symbolSize(5);
+            g->set_errorWidth(1);
+            g->set_color(graphCol);
+            QColor colerr=g->get_color().lighter();
+            g->set_errorColor(colerr);
+            colerr.setAlphaF(0.5);
+            g->set_errorFillColor(colerr);
+            plotter->addGraph(g);
+        }
+
+
+
+        if (tabFitvals && Nfit>0) {
+            tabFitvals->appendColumn();
+            tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("avg. %1 pixels").arg((int)round(Nfit)));
+            if (avgIdx==0 && avgs>1) tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("CH1: avg. %1 pixels").arg((int)round(Nfit)));
+            if (avgIdx==1) tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("CH2: avg. %1 pixels").arg((int)round(Nfit)));
+            if (!overrideTitle.isEmpty()) tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("%2: avg. %1 pixels").arg((int)round(Nfit)).arg(overrideTitle));
+            int col=tabFitvals->columnCount()-1;
+            tabFitvals->appendColumn();
+            tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString("std. dev."));
+            tabFitvals->appendColumn();
+            tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString(""));
+            tabFitvals->appendColumn();
+            tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString("25% quantile"));
+            tabFitvals->appendColumn();
+            tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString("median"));
+            tabFitvals->appendColumn();
+            tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString("75% quantile"));
+            tabFitvals->appendColumn();
+            tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString("min"));
+            tabFitvals->appendColumn();
+            tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString("max"));
+            for (int ii=0; ii<names.size(); ii++) {
+                int row=tabFitvals->getAddRow(0, namelabels[ii]);
+                tabFitvals->setCellEditRole(row, 0, names[ii]);
+                tabFitvals->setCell(row, col, qfstatisticsAverage(gvalues[ii]));
+                tabFitvals->setCell(row, col+1, sqrt(qfstatisticsVariance(gvalues[ii])));
+                tabFitvals->setCell(row, col+2, unitlabels[ii]);
+                tabFitvals->setCellEditRole(row, col+2, units[ii]);
+
+                qSort(gvalues[ii]);
+                tabFitvals->setCell(row, col+3, qfstatisticsSortedQuantile(gvalues[ii], 0.25));
+                tabFitvals->setCell(row, col+4, qfstatisticsSortedMedian(gvalues[ii]));
+                tabFitvals->setCell(row, col+5, qfstatisticsSortedQuantile(gvalues[ii], 0.75));
+                tabFitvals->setCell(row, col+6, qfstatisticsSortedMin(gvalues[ii]));
+                tabFitvals->setCell(row, col+7, qfstatisticsSortedMax(gvalues[ii]));
+
+                QBrush c=QBrush(graphCol.lighter(170));
+                tabFitvals->setCellBackgroundRole(row, col, c);
+                tabFitvals->setCellBackgroundRole(row, col+1, c);
+                tabFitvals->setCellBackgroundRole(row, col+2, c);
+                tabFitvals->setCellBackgroundRole(row, col+3, c);
+                tabFitvals->setCellBackgroundRole(row, col+4, c);
+                tabFitvals->setCellBackgroundRole(row, col+5, c);
+                tabFitvals->setCellBackgroundRole(row, col+6, c);
+                tabFitvals->setCellBackgroundRole(row, col+7, c);
+                tabFitvals->setCellCheckedRole(row, col, gfix[ii]);
+            }
+        }
+
+
+        free(corr);
+        free(cerr);
+        free(corr1);
+    }
+}
+
+
+
 void QFRDRImagingFCSImageEditor::replotData() {
 #ifdef DEBUG_TIMIMNG
     //qDebug()<<"replotData";
@@ -2796,73 +3265,23 @@ void QFRDRImagingFCSImageEditor::replotData() {
     plotterResid->set_emitSignals(false);
     sliders->set_min(0);
     sliders->set_max(m->getCorrelationN());
-#ifdef DEBUG_TIMIMNG
-    //qDebug()<<"replotData   settings sliders: "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
-#endif
     plotter->clearGraphs();
     plotterResid->clearGraphs();
-#ifdef DEBUG_TIMIMNG
-    //qDebug()<<"replotData   clearing graphs: "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
-#endif
     plotter->get_plotter()->set_showKey(chkKeys->isChecked());
     plotterResid->get_plotter()->set_showKey(chkKeys->isChecked());
-#ifdef DEBUG_TIMIMNG
-    //qDebug()<<"replotData   setting show_key: "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
-#endif
     ds->clear();
-#ifdef DEBUG_TIMIMNG
-    //qDebug()<<"replotData   ds->clear: "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
-#endif
 
 
     if (m->getCorrelationN()>0) {
 
 
-        JKQTPerrorPlotstyle runerrorstyle=cmbRunErrorStyle->getErrorStyle();
-        bool runLine=cmbRunStyle->getDrawLine();
-        JKQTPgraphSymbols runSymbol=cmbRunStyle->getSymbol();
-
-        JKQTPerrorPlotstyle avgerrorstyle=cmbAverageErrorStyle->getErrorStyle();
-        bool avgLine=cmbAverageStyle->getDrawLine();
-        JKQTPgraphSymbols avgSymbol=cmbAverageStyle->getSymbol();
-
-
-
         size_t c_tau=ds->addColumn(m->getCorrelationT(), m->getCorrelationN(), "tau");
 
-
-        //QTime t;
-        //t.start();
         //////////////////////////////////////////////////////////////////////////////////
         // Plot average + error markers
         //////////////////////////////////////////////////////////////////////////////////
-        if (chkDisplayAverage->isChecked()) {
-            size_t c_mean=ds->addColumn(m->getCorrelationMean(), m->getCorrelationN(), "cmean");
-            size_t c_std=ds->addColumn(m->getCorrelationStdDev(), m->getCorrelationN(), "cstddev");
+        if (chkDisplayAverage->isChecked()) plotAverage(m, plotter, c_tau);
 
-            JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
-            //g->set_color(QColor("blue"));
-            QColor cerr=g->get_color().lighter();
-            g->set_errorColor(cerr);
-            cerr.setAlphaF(0.5);
-            g->set_errorFillColor(cerr);
-            g->set_lineWidth(2);
-            g->set_xColumn(c_tau);
-            g->set_yColumn(c_mean);
-            g->set_yErrorColumn(c_std);
-            g->set_title(tr("average"));
-            g->set_yErrorStyle(avgerrorstyle);
-            g->set_xErrorStyle(JKQTPnoError);
-            g->set_datarange_start(sliders->get_userMin());
-            g->set_datarange_end(sliders->get_userMax());
-            g->set_drawLine(avgLine);
-            g->set_symbolSize(5);
-            g->set_symbol(avgSymbol);
-            plotter->addGraph(g);
-        }
-#ifdef DEBUG_TIMIMNG
-        //qDebug()<<"replotData   add avg: "<<t.elapsed(); t.start();
-#endif
 
        //////////////////////////////////////////////////////////////////////////////////
        // Plot ALL RUNS (left out runs in gray)
@@ -2873,345 +3292,107 @@ void QFRDRImagingFCSImageEditor::replotData() {
         tabFitvals->clear();
         tabFitvals->appendColumn();
         tabFitvals->setColumnTitle(0, tr("parameter"));
-        int maxSingleItems=1;
-        if (cmbDualView->currentIndex()>0) maxSingleItems=2;
-        if ((cmbSeletionCorrDisplayMode->currentIndex()==1) || (cmbSeletionCorrDisplayMode->currentIndex()==0 && selected.size()<=maxSingleItems)) {
+
+
+        QFRDRImagingFCSData* acf0=m->getRoleFromThisGroup("acf0");
+        QFRDRImagingFCSData* acf1=m->getRoleFromThisGroup("acf1");
+
+        if (m->isFCCS() && cmbSeletionCorrDisplayMode->currentIndex()==2 && acf0 && acf1) {
+            QVector<double> dataTauACF0, dataCorrACF0, dataCorrErrACF0;
+            QVector<double> dataTauACF1, dataCorrACF1, dataCorrErrACF1;
+            QVector<double> dataTauCCF,  dataCorrCCF,  dataCorrErrCCF;
+            QFRDRImagingFCSData* fccs=m;
+
+            int ctAvg=spinCrosstalkAvg->value();
+            double crosstalk=spinCrosstalk->value()/100.0;
+
+            QList<double> IACF0, IACF1, CACF0, CACF1, CCCF;
             for (int i=0; i<m->getCorrelationRuns(); i++) {
-                if (selected.contains(i)) {
-                    size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
-                    size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("pixel error %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
-                    JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
-                    g->set_lineWidth(1);
-                    g->set_xColumn(c_tau);
-                    g->set_yColumn(c_run);
-                    g->set_drawLine(runLine);
-                    g->set_symbol(runSymbol);
-                    g->set_title(tr("run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
-                    g->set_datarange_start(sliders->get_userMin());
-                    g->set_datarange_end(sliders->get_userMax());
-                    g->set_yErrorColumn(c_rune);
-                    g->set_yErrorStyle(runerrorstyle);
-                    g->set_xErrorStyle(JKQTPnoError);
-                    g->set_symbolSize(5);
-                    g->set_errorWidth(1);
-                    if (m->leaveoutRun(i)) {
-                        g->set_color(QColor("grey"));
-                    }
-                    QColor cerr=g->get_color().lighter();
-                    g->set_errorColor(cerr);
-                    cerr.setAlphaF(0.5);
-                    g->set_errorFillColor(cerr);
-                    plotter->addGraph(g);
-
-    #ifdef DEBUG_TIMIMNG
-                     //qDebug()<<"replotData   add graph "<<i<<": "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
-    #endif
-
-                    double* corr=(double*)calloc(m->getCorrelationN(), sizeof(double));
-                    double* resid=(double*)calloc(m->getCorrelationN(), sizeof(double));
-                    QStringList names, units, unitlabels, namelabels;
-                    QList<double> values, errors;
-                    QList<bool> fix;
-
-                    // search for the evaluationID that matches the current group(has to be in evals)  and run (i)
-    #ifdef DEBUG_TIMIMNG
-                    QElapsedTimer t1;
-                    t1.start();
-    #endif
-                    QStringList evals=current->resultsCalcEvaluationsInGroup(currentEvalGroup());
-    #ifdef DEBUG_TIMIMNG
-                    double resultsCalcEvaluationsInGroupElapsed=t1.nsecsElapsed()/1000;
-    #endif
-
-                    bool evalFound=false;
-                    bool listEval=false;
-                    QString resultID="";
-
-
-                    for (register int ev=0; ev<evals.size(); ev++) {
-                        //en=evals[i];
-                        if (current->resultsGetEvaluationGroupIndex(evals[ev])==i) {
-                            resultID=evals[ev];
-                            evalFound=true;
-                            break;
-                        }
-                    }
-
-                    if (!evalFound) {
-                        if (evals.size()>0 && evals.size()<=2) {
-                            for (register int ev=0; ev<evals.size(); ev++) {
-                                if (current->resultsGetEvaluationGroupIndex(evals[ev])>=0) {
-                                    resultID=evals[ev];
-                                    listEval=true;
-                                    evalFound=true;
-                                }
-                            }
-                        }
-                    }
-
-    #ifdef DEBUG_TIMIMNG
-                    //qDebug()<<"replotData   search eval "<<i<<" (evals.size()="<<evals.size()<< "   resultsCalcEvaluationsInGroup="<<resultsCalcEvaluationsInGroupElapsed<<" nsecs): "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
-    #endif
-
-                    // try to evaluate the fit function. If it succeeds, add plots and store the parameters & description to the display model!
-                    if (evaluateFitFunction(m->getCorrelationT(), corr, m->getCorrelationN(), names, namelabels, values, errors, fix, units, unitlabels, resultID, i)) {
-                        double* acf=m->getCorrelationRun(i);
-                        for (int nn=0; nn< m->getCorrelationN(); nn++) {
-                            resid[nn]=corr[nn]-acf[nn];
-                        }
-                        size_t c_fit=ds->addCopiedColumn(corr, m->getCorrelationN(), QString("fit to pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
-                        size_t c_resid=ds->addCopiedColumn(resid, m->getCorrelationN(), QString("residuals for pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
-                        JKQTPxyLineGraph* gfit=new JKQTPxyLineGraph();
-                        gfit->set_lineWidth(1.5);
-                        gfit->set_xColumn(c_tau);
-                        gfit->set_yColumn(c_fit);
-                        gfit->set_drawLine(true);
-                        gfit->set_style(Qt::DotLine);
-                        gfit->set_symbol(JKQTPnoSymbol);
-                        gfit->set_title(tr("fit to run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
-                        gfit->set_datarange_start(sliders->get_userMin());
-                        gfit->set_datarange_end(sliders->get_userMax());
-                        gfit->set_symbolSize(5);
-                        gfit->set_color(g->get_color());
-                        plotter->addGraph(gfit);
-    #ifdef DEBUG_TIMIMNG
-                        //qDebug()<<"replotData   add fit graph "<<i<<": " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
-    #endif
-                        JKQTPxyLineGraph* gr=new JKQTPxyLineGraph();
-                        gr->set_lineWidth(1.5);
-                        gr->set_xColumn(c_tau);
-                        gr->set_yColumn(c_resid);
-                        gr->set_drawLine(runLine);
-                        gr->set_style(Qt::DotLine);
-                        gr->set_symbol(runSymbol);
-                        gr->set_title(tr("residuals for run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
-                        gr->set_datarange_start(sliders->get_userMin());
-                        gr->set_datarange_end(sliders->get_userMax());
-                        gr->set_symbolSize(5);
-                        gr->set_color(g->get_color());
-                        plotterResid->addGraph(gr);
-    #ifdef DEBUG_TIMIMNG
-                        //qDebug()<<"replotData   add resid graph "<<i<<": " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
-    #endif
-
-                        tabFitvals->appendColumn();
-                        tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
-                        int col=tabFitvals->columnCount()-1;
-                        tabFitvals->appendColumn();
-                        tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("error"));
-                        tabFitvals->appendColumn();
-                        tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString(""));
-                        for (int ii=0; ii<names.size(); ii++) {
-                            int row=tabFitvals->getAddRow(0, namelabels[ii]);
-                            tabFitvals->setCellEditRole(row, 0, names[ii]);
-                            tabFitvals->setCell(row, col, values[ii]);
-                            tabFitvals->setCell(row, col+1, errors[ii]);
-                            tabFitvals->setCell(row, col+2, unitlabels[ii]);
-                            tabFitvals->setCellEditRole(row, col+2, units[ii]);
-                            QBrush c=QBrush(g->get_color().lighter(170));
-                            tabFitvals->setCellBackgroundRole(row, col, c);
-                            tabFitvals->setCellBackgroundRole(row, col+1, c);
-                            tabFitvals->setCellBackgroundRole(row, col+2, c);
-                            if (fix[ii]) tabFitvals->setCellCheckedRole(row, col, Qt::Checked);
-                            else tabFitvals->setCellCheckedRole(row, col, Qt::Unchecked);
-                        }
-    #ifdef DEBUG_TIMIMNG
-                        //qDebug()<<"replotData   set table cells "<<i<<": "<< t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
-    #endif
-
-                    }
-
-                    free(corr);
-                    free(resid);
+                if (selected.contains(i) && i<acf0->getCorrelationRuns() && i<acf1->getCorrelationRuns()) {
+                    IACF0<<fccs->getSimpleCountrateAverage(i,0);
+                    IACF1<<fccs->getSimpleCountrateAverage(i,1);
+                    CACF0<<statisticsAverage(acf0->getCorrelationRun(i), qMin(acf0->getCorrelationRuns(), ctAvg));
+                    CACF1<<statisticsAverage(acf1->getCorrelationRun(i), qMin(acf1->getCorrelationRuns(), ctAvg));
+                    CCCF<<statisticsAverage(fccs->getCorrelationRun(i), qMin(fccs->getCorrelationRuns(), ctAvg));
                 }
             }
-        } else if (cmbSeletionCorrDisplayMode->currentIndex()==0) {
-            int avgs=1;
-            if (cmbDualView->currentIndex()>0)  avgs=2;
-            for (int avgIdx=0; avgIdx<avgs; avgIdx++) {
-                double* corr=(double*)calloc(m->getCorrelationN(), sizeof(double));
-                double* cerr=(double*)calloc(m->getCorrelationN(), sizeof(double));
-                double* corr1=(double*)calloc(m->getCorrelationN(), sizeof(double));
-                QList<QList<double> > gvalues;
-                QStringList names, units, unitlabels, namelabels;
-                QList<Qt::CheckState> gfix;
-                for (int i=0; i<m->getCorrelationN(); i++) { corr[i]=0; cerr[i]=0; }
-                double N=0, Nfit=0;
+
+
+            plotRunsAvg(acf0, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
+            plotRunsAvg(acf1, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
+            plotRunsAvg(fccs, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauCCF, &dataCorrCCF, &dataCorrErrCCF, QColor("blue"), tr("CCF"));
+
+            if (cmbCrosstalkDirection->currentIndex()>=0 && cmbCrosstalkDirection->currentIndex()<=1) {
+                double I0=qfstatisticsAverage(IACF0);
+                double I1=qfstatisticsAverage(IACF1);
+                double C0=qfstatisticsAverage(CACF0);
+                double C1=qfstatisticsAverage(CACF1);
+                double CC=qfstatisticsAverage(CCCF);
+                double CCFLevel=0;
+                double ACFLevel=0;
+                QColor ACFColor=QColor("darkgreen");
+                QColor CCFColor=QColor("darkblue");
+                // see Bacia, Petrasek, Schwille, "Correcting Spectral Cross-Talk in Dual-Color FCCS", DOI: 10.1002/cphc.201100801
+                if (cmbCrosstalkDirection->currentIndex()==0) { // ACF0 -> 1   => correct ACF1
+                    CCFLevel=(I1*CC-crosstalk*I0*C0)/(I1-crosstalk*I0);
+                    ACFColor=QColor("darkred");
+                    ACFLevel=(crosstalk*crosstalk*I0*I0*C0+I1*I1*C1-2*crosstalk*I0*I1*CC)/qfSqr(I1-crosstalk*I0);
+                    if (cmbCrosstalkMode->currentIndex()==1) {
+                        CCFLevel=CC-CCFLevel;
+                        ACFLevel=C1-ACFLevel;
+                    }
+                } else { // ACF 1 -> 0  => correct ACF0
+                    CCFLevel=(I0*CC-crosstalk*I1*C1)/(I0-crosstalk*I1);
+                    ACFColor=QColor("darkgreen");
+                    ACFLevel=(crosstalk*crosstalk*I1*I1*C1+I0*I0*C0-2*crosstalk*I1*I0*CC)/qfSqr(I0-crosstalk*I1);
+                    if (cmbCrosstalkMode->currentIndex()==1) {
+                        CCFLevel=CC-CCFLevel;
+                        ACFLevel=C0-ACFLevel;
+                    }
+                }
+                /*qDebug()<<"I0="<<I0;
+                qDebug()<<"I1="<<I1;
+                qDebug()<<"kappa="<<crosstalk;
+                qDebug()<<"C0="<<C0;
+                qDebug()<<"C1="<<C1;
+                qDebug()<<"CC="<<CC;
+                qDebug()<<"CCFLevel="<<CCFLevel;
+                qDebug()<<"ACFLevel="<<ACFLevel;*/
+
+                JKQTPhorizontalRange* p_r=NULL;
+                p_r=new JKQTPhorizontalRange(plotter->get_plotter());
+                p_r->setDrawCenterLineOnly();
+                p_r->set_centerColor(CCFColor);
+                p_r->set_centerLineWidth(2);
+                p_r->set_centerStyle(Qt::DashLine);
+                p_r->set_rangeCenter(CCFLevel);
+                plotter->addGraph(p_r);
+                p_r=new JKQTPhorizontalRange(plotter->get_plotter());
+                p_r->setDrawCenterLineOnly();
+                p_r->set_centerColor(ACFColor);
+                p_r->set_centerLineWidth(2);
+                p_r->set_centerStyle(Qt::DotLine);
+                p_r->set_rangeCenter(ACFLevel);
+                plotter->addGraph(p_r);
+            }
+
+        } else {
+            int maxSingleItems=1;
+            if (cmbDualView->currentIndex()>0) maxSingleItems=2;
+            if ((cmbSeletionCorrDisplayMode->currentIndex()==1) || (cmbSeletionCorrDisplayMode->currentIndex()==0 && selected.size()<=maxSingleItems)) {
                 for (int i=0; i<m->getCorrelationRuns(); i++) {
-                    //qDebug()<<"r"<<i<<"  "<<indexIsDualView2(i);
-                    if (selected.contains(i) && !m->leaveoutRun(i) && ((avgs==1)||(avgIdx==0 && !indexIsDualView2(i)) || (avgIdx==1 && indexIsDualView2(i)))) {
-                        double* tmp=m->getCorrelationRun(i);
-                        for (int jj=0; jj<m->getCorrelationN(); jj++) {
-                            corr[jj]=corr[jj]+tmp[jj];
-                            cerr[jj]=cerr[jj]+tmp[jj]*tmp[jj];
-                        }
-
-                        QList<double> values, errors;
-                        QList<bool> fix;
-
-                        QStringList evals=current->resultsCalcEvaluationsInGroup(currentEvalGroup());
-                        bool evalFound=false;
-                        bool listEval=false;
-                        QString resultID="";
-
-
-                        for (register int ev=0; ev<evals.size(); ev++) {
-                            //en=evals[i];
-                            if (current->resultsGetEvaluationGroupIndex(evals[ev])==i) {
-                                resultID=evals[ev];
-                                evalFound=true;
-                                break;
-                            }
-                        }
-
-                        if (!evalFound) {
-                            if (evals.size()>0 && evals.size()<=2) {
-                                for (register int ev=0; ev<evals.size(); ev++) {
-                                    if (current->resultsGetEvaluationGroupIndex(evals[ev])>=0) {
-                                        resultID=evals[ev];
-                                        listEval=true;
-                                        evalFound=true;
-                                    }
-                                }
-                            }
-                        }
-
-
-                        if (evaluateFitFunction(m->getCorrelationT(), corr1, m->getCorrelationN(), names, namelabels, values, errors, fix, units, unitlabels, resultID, i)) {
-                            if (Nfit==0) {
-                                for (int jj=0; jj<fix.size(); jj++) {
-                                    gfix.append(fix[jj]?Qt::Checked:Qt::Unchecked);
-                                }
-                                for (int jj=0; jj<values.size(); jj++) {
-                                    QList<double> v;
-                                    v.append(values[jj]);
-                                    gvalues.append(v);
-                                }
-
-                            } else {
-                                for (int jj=0; jj<fix.size(); jj++) {
-                                    if (gfix[jj]!=fix[jj]) gfix[jj]=Qt::PartiallyChecked;
-                                }
-                                for (int jj=0; jj<values.size(); jj++) {
-                                    gvalues[jj].append(values[jj]);
-                                }
-                            }
-
-                            Nfit++;
-                        }
-
-                        N++;
+                    if (selected.contains(i)) {
+                        plotRun(m, i, true, plotter, plotterResid, tabFitvals, c_tau);
                     }
                 }
-
-
-                for (int jj=0; jj<m->getCorrelationN(); jj++) {
-                    cerr[jj]=sqrt((cerr[jj]-corr[jj]*corr[jj]/N)/(N-1.0));
-                    corr[jj]=corr[jj]/N;
-                }
-                if (N==1) {
-                    for (int jj=0; jj<m->getCorrelationN(); jj++) {
-                        cerr[jj]=0;
-                    }
-                }
-
-                QColor graphCol;
-                if (avgIdx==0) graphCol=QColor("darkgreen");
-                else graphCol=QColor("darkred");
-                if (N>0) {
-                    size_t c_avg=ds->addCopiedColumn(corr, m->getCorrelationN(), QString("avg. of selected pixels"));
-                    size_t c_sd=ds->addCopiedColumn(cerr, m->getCorrelationN(), QString("std. dev. of selected pixels"));
-                    JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
-                    g->set_lineWidth(1);
-                    g->set_xColumn(c_tau);
-                    g->set_yColumn(c_avg);
-                    g->set_drawLine(runLine);
-                    g->set_lineWidth(2);
-                    g->set_symbol(runSymbol);
-                    g->set_title(tr("avg. over %1 runs").arg(N));
-                    if (avgIdx==0 && avgs>1) g->set_title(tr("CH1: avg. over %1 runs").arg(N));
-                    if (avgIdx==1) g->set_title(tr("CH2: avg. over %1 runs").arg(N));
-                    g->set_datarange_start(sliders->get_userMin());
-                    g->set_datarange_end(sliders->get_userMax());
-                    g->set_yErrorColumn(c_sd);
-                    g->set_yErrorStyle(runerrorstyle);
-                    g->set_xErrorStyle(JKQTPnoError);
-                    g->set_symbolSize(5);
-                    g->set_errorWidth(1);
-                    g->set_color(graphCol);
-                    QColor colerr=g->get_color().lighter();
-                    g->set_errorColor(colerr);
-                    colerr.setAlphaF(0.5);
-                    g->set_errorFillColor(colerr);
-                    plotter->addGraph(g);
-                }
-
-
-
-                if (Nfit>0) {
-                    tabFitvals->appendColumn();
-                    tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("avg. %1 pixels").arg((int)round(Nfit)));
-                    if (avgIdx==0 && avgs>1) tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("CH1: avg. %1 pixels").arg((int)round(Nfit)));
-                    if (avgIdx==1) tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("CH2: avg. %1 pixels").arg((int)round(Nfit)));
-                    int col=tabFitvals->columnCount()-1;
-                    tabFitvals->appendColumn();
-                    tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString("std. dev."));
-                    tabFitvals->appendColumn();
-                    tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString(""));
-                    tabFitvals->appendColumn();
-                    tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString("25% quantile"));
-                    tabFitvals->appendColumn();
-                    tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString("median"));
-                    tabFitvals->appendColumn();
-                    tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString("75% quantile"));
-                    tabFitvals->appendColumn();
-                    tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString("min"));
-                    tabFitvals->appendColumn();
-                    tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, QString("max"));
-                    for (int ii=0; ii<names.size(); ii++) {
-                        int row=tabFitvals->getAddRow(0, namelabels[ii]);
-                        tabFitvals->setCellEditRole(row, 0, names[ii]);
-                        tabFitvals->setCell(row, col, qfstatisticsAverage(gvalues[ii]));
-                        tabFitvals->setCell(row, col+1, sqrt(qfstatisticsVariance(gvalues[ii])));
-                        tabFitvals->setCell(row, col+2, unitlabels[ii]);
-                        tabFitvals->setCellEditRole(row, col+2, units[ii]);
-
-                        qSort(gvalues[ii]);
-                        tabFitvals->setCell(row, col+3, qfstatisticsSortedQuantile(gvalues[ii], 0.25));
-                        tabFitvals->setCell(row, col+4, qfstatisticsSortedMedian(gvalues[ii]));
-                        tabFitvals->setCell(row, col+5, qfstatisticsSortedQuantile(gvalues[ii], 0.75));
-                        tabFitvals->setCell(row, col+6, qfstatisticsSortedMin(gvalues[ii]));
-                        tabFitvals->setCell(row, col+7, qfstatisticsSortedMax(gvalues[ii]));
-
-                        QBrush c=QBrush(graphCol.lighter(170));
-                        tabFitvals->setCellBackgroundRole(row, col, c);
-                        tabFitvals->setCellBackgroundRole(row, col+1, c);
-                        tabFitvals->setCellBackgroundRole(row, col+2, c);
-                        tabFitvals->setCellBackgroundRole(row, col+3, c);
-                        tabFitvals->setCellBackgroundRole(row, col+4, c);
-                        tabFitvals->setCellBackgroundRole(row, col+5, c);
-                        tabFitvals->setCellBackgroundRole(row, col+6, c);
-                        tabFitvals->setCellBackgroundRole(row, col+7, c);
-                        tabFitvals->setCellCheckedRole(row, col, gfix[ii]);
-                    }
-                }
-
-
-                free(corr);
-                free(cerr);
-                free(corr1);
+            } else if (cmbSeletionCorrDisplayMode->currentIndex()==0 || cmbSeletionCorrDisplayMode->currentIndex()==2) {
+                plotRunsAvg(m, selected, true, plotter, plotterResid, tabFitvals, c_tau);
             }
-
-
         }
         tabFitvals->setReadonly(true);
         tvParams->setModel(tabFitvals);
         tvParams->resizeColumnsToContents();
 
-
-#ifdef DEBUG_TIMIMNG
-        //qDebug()<<"replotData   add plots: "<< t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
-#endif
 
 
 
@@ -3220,31 +3401,16 @@ void QFRDRImagingFCSImageEditor::replotData() {
         plotterResid->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
         plotterResid->setX(plotter->getXMin(), plotter->getXMax());
         plotterResid->zoomToFit(false, true, !chkLogTauAxis->isChecked(),false);
-#ifdef DEBUG_TIMIMNG
-        //qDebug()<<"replotData   zoom: " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
-#endif
 
     }
     plotter->set_doDrawing(true);
     plotter->set_emitSignals(true);
     plotterResid->set_doDrawing(true);
     plotterResid->set_emitSignals(true);
-#ifdef DEBUG_TIMIMNG
-    //qDebug()<<"replotData   emit signals: " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
-#endif
-    //QTime t;
-    //t.start();
     plotter->update_plot();
     plotterResid->update_plot();
-#ifdef DEBUG_TIMIMNG
-    //qDebug()<<"replotData   update plots: " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
-#endif
     QApplication::restoreOverrideCursor();
-    //qDebug()<<"replotData ... done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
-#ifdef DEBUG_TIMIMNG
-    //qDebug()<<"replotData ... DONE = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
-#endif
-};
+}
 
 
 void QFRDRImagingFCSImageEditor::readSettings() {
@@ -3260,6 +3426,11 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     chkMaskVisible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/mask_visible"), false).toBool());
     chkKeys->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/display_keys"), false).toBool());
     cmbSeletionCorrDisplayMode->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/corr_seldisplaymode"), 0).toInt());
+    if (cmbSeletionCorrDisplayMode->currentIndex()<0) cmbSeletionCorrDisplayMode->setCurrentIndex(0);
+    cmbCrosstalkDirection->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/crosstalk_direction"), 0).toInt());
+    cmbCrosstalkMode->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/crosstalk_mode"), 0).toInt());
+    spinCrosstalk->setValue(settings->getQSettings()->value(QString("imfcsimageeditor/crosstalk"), 0).toDouble());
+    spinCrosstalkAvg->setValue(settings->getQSettings()->value(QString("imfcsimageeditor/crosstalk_avg"), 4).toInt());
     chkDisplayResiduals->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/display_resid"), true).toBool());
     chkDisplayAverage->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/display_avg"), true).toBool());
     cmbAverageStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/avg_style"), 0).toInt());
@@ -3297,6 +3468,13 @@ void QFRDRImagingFCSImageEditor::writeSettings() {
     //settings->getQSettings()->setValue(QString("imfcsimageeditor/colmax"), edtColMax->value());
     //settings->getQSettings()->setValue(QString("imfcsimageeditor/log_tau_axis"), chkLogTauAxis->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/corr_seldisplaymode"), cmbSeletionCorrDisplayMode->currentIndex());
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/crosstalk_direction"), cmbCrosstalkDirection->currentIndex());
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/crosstalk_mode"), cmbCrosstalkMode->currentIndex());
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/crosstalk"), spinCrosstalk->value());
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/crosstalk_avg"), spinCrosstalkAvg->value());
+
+
+
     settings->getQSettings()->setValue(QString("imfcsimageeditor/display_keys"), chkKeys->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/image_overlays"), chkDisplayImageOverlay->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/image_overlay_style"), cmbSelectionStyle->currentIndex());
@@ -3499,7 +3677,13 @@ void QFRDRImagingFCSImageEditor::connectImageWidgets(bool connectTo) {
             connect(chkDisplayResiduals, SIGNAL(toggled(bool)), this, SLOT(replotData()));
             connect(chkKeys, SIGNAL(toggled(bool)), this, SLOT(replotData()));
             connect(cmbSeletionCorrDisplayMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+            connect(cmbCrosstalkDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+            connect(cmbCrosstalkMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+            connect(spinCrosstalk, SIGNAL(valueChanged(double)), this, SLOT(replotData()));
+            connect(spinCrosstalkAvg, SIGNAL(valueChanged(int)), this, SLOT(replotData()));
         }
+
+
     } else {
         connectImageWidgetsCounter++;
         disconnect(chkDisplayAverage, SIGNAL(toggled(bool)), this, SLOT(replotData()));
@@ -3511,6 +3695,10 @@ void QFRDRImagingFCSImageEditor::connectImageWidgets(bool connectTo) {
         disconnect(chkDisplayResiduals, SIGNAL(toggled(bool)), this, SLOT(replotData()));
         disconnect(chkKeys, SIGNAL(toggled(bool)), this, SLOT(replotData()));
         disconnect(cmbSeletionCorrDisplayMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        disconnect(cmbCrosstalkDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        disconnect(cmbCrosstalkMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        disconnect(spinCrosstalk, SIGNAL(valueChanged(double)), this, SLOT(replotData()));
+        disconnect(spinCrosstalkAvg, SIGNAL(valueChanged(int)), this, SLOT(replotData()));
     }
 }
 
@@ -3799,7 +3987,7 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_i
 
 }
 
-bool QFRDRImagingFCSImageEditor::evaluateFitFunction(const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation, int index) {
+bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation, int index) {
     QString fitfunc="";
     bool isMatrixResults=false;
     //qDebug()<<evaluation<<fitfunc<<m_fitFunctions.size();
@@ -4172,7 +4360,7 @@ void QFRDRImagingFCSImageEditor::getCurrentResultNamesAndLabels(QStringList& nam
             }
 
 
-            evaluateFitFunction(m->getCorrelationT(), corr1, m->getCorrelationN(), names, labels, values, errors, fix, units, unitlabels, resultID, i);
+            evaluateFitFunction(current, m->getCorrelationT(), corr1, m->getCorrelationN(), names, labels, values, errors, fix, units, unitlabels, resultID, i);
             break;
         }
     }
@@ -4292,7 +4480,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                     }
 
 
-                    if (evaluateFitFunction(m->getCorrelationT(), corr1, m->getCorrelationN(), d.names, d.namelabels, values, errors, fix, d.units, d.unitlabels, resultID, i)) {
+                    if (evaluateFitFunction(current, m->getCorrelationT(), corr1, m->getCorrelationN(), d.names, d.namelabels, values, errors, fix, d.units, d.unitlabels, resultID, i)) {
                         if (d.Nfit==0) {
                             for (int jj=0; jj<fix.size(); jj++) {
                                 d.gfix.append(fix[jj]?Qt::Checked:Qt::Unchecked);

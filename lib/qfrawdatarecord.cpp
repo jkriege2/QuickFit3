@@ -165,6 +165,18 @@ QList<QFRawDataRecord *> QFRawDataRecord::getGroupMembers() const
     return project->getRDRGroupMembers(group);
 }
 
+QList<QFRawDataRecord *> QFRawDataRecord::getRecordsWithRoleFromGroup(const QString &role) const
+{
+    QList<QFRawDataRecord *> res=getGroupMembers(), out;
+
+    for (int i=0; i<res.size(); i++) {
+        if (res[i] && res[i]->getRole().toLower().trimmed()==role) {
+            out<<res[i];
+        }
+    }
+    return out;
+}
+
 QString QFRawDataRecord::getFileForType(const QString &type) {
     QStringList sl=getFilesForType(type);
     if (sl.size()>0) return sl[0];

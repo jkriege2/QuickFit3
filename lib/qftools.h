@@ -556,6 +556,19 @@ inline QStringList constructQStringListFromItems(const QString& item1, const QSt
 
 
 
+/*! \brief returns a list which only contains those items of the input list that could be cast to the given \tparam TFilter class
+    \ingroup qf3lib_tools
+*/
+template <class T, class TFilter>
+QList<TFilter*> filterListForClass(const QList<T*>& list_in) {
+    QList<TFilter*> list;
+    for (int i=0; i<list_in.size(); i++) {
+        if (dynamic_cast<TFilter*>(list_in[i])) {
+            list<<dynamic_cast<TFilter*>(list_in[i]);
+        }
+    }
+    return list;
+}
 
 
 

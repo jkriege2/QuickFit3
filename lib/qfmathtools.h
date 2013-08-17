@@ -295,7 +295,8 @@ double qfstatisticsAverageVariance(double& var, const T& value) {
 template <class T>
 double qfstatisticsAverage(const T& value) {
     long long N=value.size();
-    if (N<=1) return 0;
+    if (N==1) return value[0];
+    if (N<=0) return 0;
     register double sum=0;
     long long NN=0;
     for (register long long i=0; i<N; i++) {

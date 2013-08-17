@@ -2360,6 +2360,13 @@ bool QFRDRImagingFCSData::isRoleUserEditable() const
     return false;
 }
 
+QFRDRImagingFCSData *QFRDRImagingFCSData::getRoleFromThisGroup(const QString &role)
+{
+    QList<QFRDRImagingFCSData*> items=filterListForClass<QFRawDataRecord, QFRDRImagingFCSData>(getRecordsWithRoleFromGroup(role));
+    if (items.size()>0) return items.first();
+    return NULL;
+}
+
 int QFRDRImagingFCSData::internalDualViewModeChannel() const
 {
     return getProperty("INTERNAL_DUALVIEW_MODE_CHANNEL", 0).toInt();
