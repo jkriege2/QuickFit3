@@ -85,6 +85,51 @@ QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int colX, 
 
     ui->cmbFitAlgorithm->setCurrentIndex(0);
     ui->cmbFitFunction->setCurrentIndex(0);
+
+
+
+
+
+
+    ui->pltResiduals->set_displayToolbar(false);
+    ui->pltResiduals->getXAxis()->set_axisLabel(tr("X"));
+    //ui->pltResiduals->getXAxis()->set_logAxis(true);
+    ui->pltResiduals->getYAxis()->set_axisLabel(tr("residuals"));
+    ui->pltDistribution->getXAxis()->set_axisLabel("");
+    ui->pltDistribution->getYAxis()->set_axisLabel(tr("Y"));
+    ui->pltDistribution->getXAxis()->set_drawMode1(JKQTPCADMticks);
+    ui->pltResiduals->getXAxis()->set_drawMode1(JKQTPCADMcomplete);
+    ui->pltResiduals->get_plotter()->setBorder(1,1,1,1);
+    ui->pltDistribution->get_plotter()->setBorder(1,1,1,1);
+    ui->pltResiduals->synchronizeToMaster(ui->pltDistribution, true, false);
+    ui->pltDistribution->get_plotter()->set_useAntiAliasingForSystem(true);
+    ui->pltDistribution->get_plotter()->set_useAntiAliasingForGraphs(true);
+    ui->pltResiduals->get_plotter()->set_useAntiAliasingForSystem(true);
+    ui->pltResiduals->get_plotter()->set_useAntiAliasingForGraphs(true);
+    ui->pltResiduals->set_displayMousePosition(false);
+    ui->pltDistribution->set_displayMousePosition(false);
+    ui->pltDistribution->get_plotter()->set_keyFontSize(9);
+    ui->pltResiduals->get_plotter()->set_keyFontSize(9);
+    ui->pltResiduals->useExternalDatastore(ui->pltDistribution->getDatastore());
+    ui->pltResiduals->setMinimumHeight(75);
+    ui->pltResiduals->get_plotter()->set_showKey(false);
+    ui->pltDistribution->setMinimumHeight(75);
+    ui->pltDistribution->get_plotter()->setBorder(1,1,1,1);
+    ui->pltDistribution->get_plotter()->set_useAntiAliasingForSystem(true);
+    ui->pltDistribution->get_plotter()->set_useAntiAliasingForGraphs(true);
+    ui->pltDistribution->get_plotter()->set_keyFontSize(9);
+    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
+    QColor cb("white");
+    cb.setAlphaF(0.5);
+    ui->pltDistribution->get_plotter()->set_keyBackgroundColor(cb);
+    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
+
+    connect(ui->pltDistribution->get_plotter()->get_actZoomAll(), SIGNAL(triggered()), ui->pltResiduals, SLOT(zoomToFit()));
+    connect(ui->pltResiduals->get_plotter(), SIGNAL(zoomChangedLocally(double,double,double,double,JKQtBasePlotter*)), ui->pltDistribution, SLOT(pzoomChangedLocally(double,double,double,double,JKQtBasePlotter*)));
+    connect(ui->pltDistribution->get_plotter(), SIGNAL(zoomChangedLocally(double,double,double,double,JKQtBasePlotter*)), ui->pltResiduals, SLOT(pzoomChangedLocally(double,double,double,double,JKQtBasePlotter*)));
+
+
+
     methodChanged(ui->cmbFitAlgorithm->currentIndex());
     connectSignals(true);
     on_btnFit_clicked();
@@ -127,14 +172,14 @@ void QFRDRTableCurveFitDialog::saveResults()
             } else {
                 table->colgraphAddFunctionPlot(g, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, lastResultD);
             }
-            table->colgraphSetPlotTitle(g, table->colgraphGetPlotCount(g)-1, resultComment);
+            table->colgraphSetPlotTitle(g, table->colgraphGetPlotCount(g)-1, resultComment+", "+resultStat);
         } else if (saveGraph>=2){
             if (savedTo>=0) {
                 table->colgraphAddFunctionPlot(saveGraph-2, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, savedTo);
             } else {
                 table->colgraphAddFunctionPlot(saveGraph-2, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, lastResultD);
             }
-            table->colgraphSetPlotTitle(saveGraph-2, table->colgraphGetPlotCount(saveGraph-2)-1, resultComment);
+            table->colgraphSetPlotTitle(saveGraph-2, table->colgraphGetPlotCount(saveGraph-2)-1, resultComment+", "+resultStat);
         }
         delete model;
     }
@@ -207,6 +252,7 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
         progress->reportStatus(tr("setting up curve fit ..."));
         progress->setProgressMax(100);
         progress->setProgress(0);
+        progress->show();
         algorithm->setReporter(progressReporter);
 
         QFFitAlgorithm::FitResult res;
@@ -270,13 +316,6 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
 
 
 
-
-        /*QFFitAlgorithm::FitResult res=algorithm->fit(fitParamsOut.data(), fitParamsErrOut.data(), dx, dy, dw, items, model, fitParamsIn.data(), fitFix.data(), fitParamsMin.data(), fitParamsMax.data());
-        for (int i=0; i<ids.size(); i++) {
-            qDebug()<<"out: "<<ids[i]<<" = "<<fitParamsOut[i]<<fitParamsErrOut[i];
-        }
-        OK=true;*/
-
         lastResults.clear();
         lastResultD.clear();
         resultComment="";
@@ -296,80 +335,177 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
         }
 
 
+        if (progress) {
+            algorithm->setReporter(NULL);
+            delete progressReporter;
+            progress->close();
+            progress->deleteLater();
+        }
 
 
-        // estimate goodness-of-fit
-/*        if (residuals.size()>0) {
-            double chi2=0;
-            double chi2w=0;
-            double TSS=0;
-            double obsMean=0;
-            for (int i=0; i<=items; i++) {
-                obsMean+=dataY[i];
-            }
-            obsMean=obsMean/double(items);
-            for (int i=0; i<=items; i++) {
-                chi2+=qfSqr(residuals[i]);
-                chi2w+=qfSqr(residuals_weighted[i]);
-                TSS+=qfSqr(dataY[i]-obsMean);
-            }
-            double R2=1.0-chi2/TSS;
-            paramMap["R2"].value=R2;
-            paramMap["R2"].error=0;
-            paramMap["R2"].fix=false;
-            paramMap["R2"].editable=false;
-            resultComment+=tr(", R^2=%1").arg(R2);
 
-        }*/
+
+
     }
+
+    updateFitStatistics();
 
     QApplication::restoreOverrideCursor();
     parameterTable->rebuildModel();
     replotGraph();
     if (!ok) {
-        QMessageBox::critical(this, tr("Fit Error"), tr("an error occured during the regression analysis.\nerror message:\n    %1").arg(error));
+        QMessageBox::critical(this, tr("Fit Error"), tr("an error occured during the model fit.\nerror message:\n    %1").arg(error));
     }
     connectSignals(true);
-    delete model;
-    delete algorithm;
+    if (model) delete model;
+    if (algorithm) delete algorithm;
+}
+
+void QFRDRTableCurveFitDialog::on_btnGuess_clicked()
+{
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    connectSignals(false);
+
+    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance(this);
+
+    int rmin=getRangeMin();
+    int rmax=getRangeMax();
+
+    QVector<double> datX;
+    QVector<double> datY;
+    QVector<double> datW;
+
+    for (int i=0; i<datapoints; i++) {
+        if (dataX[i]>=ui->datacut->get_userMin() && dataX[i]<=ui->datacut->get_userMax()) {
+            datX<<dataX[i];
+            datY<<dataY[i];
+            datW<<dataW[i];
+        }
+    }
+    double* dx=datX.data();
+    double* dy=datY.data();
+    double* dw=datW.data();
+    int items=datX.size();
+
+
+    bool ok=false;
+    QString error="";
+
+    if (model && items>1) {
+        QVector<double> fitParams, fitParamsErrs, fitParamsMin, fitParamsMax;
+        QVector<bool> fitFix;
+        QStringList ids=model->getParameterIDs();
+        bool hasFixed=false;
+        for (int i=0; i<ids.size(); i++) {
+            QFFitFunction::ParameterDescription d=model->getDescription(ids[i]);
+            fitParams<<getParamValue(ids[i], d.initialValue);
+            fitParamsMin<<getParamMin(ids[i], d.minValue);
+            fitParamsMax<<getParamMax(ids[i], d.maxValue);
+            fitFix<<getParamFix(ids[i], d.initialFix);
+            hasFixed=hasFixed||fitFix.last();
+            fitParamsErrs<<0;
+        }
+        QVector<double> fitParamsInit=fitParams;
+        ok=model->estimateInitial(fitParams.data(), dx, dy, items, fitFix.data());
+
+        model->calcParameter(fitParams.data(), fitParamsErrs.data());
+        model->sortParameter(fitParams.data(), fitParamsErrs.data(), fitFix.data());
+        model->calcParameter(fitParams.data(), fitParamsErrs.data());
+
+
+
+
+
+
+
+
+        lastResults.clear();
+        lastResultD.clear();
+        resultComment="";
+
+        bool replaceFixed=true;
+        if (hasFixed) {
+            bool fixedChanged=false;
+            for (int i=0; i<ids.size(); i++) {
+                if (fitFix[i] && fitParamsInit[i]!=fitParams[i]) {
+                    fixedChanged=true;
+                    break;
+                }
+            }
+            if (fixedChanged) {
+                replaceFixed=(QMessageBox::question(this, tr("Parameter guess"), tr("The fit function returned guessed values for fixed parameters.\nDo you want to overwrite this fixed parameter values?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
+            }
+
+        }
+
+        if (ok) {
+            for (int i=0; i<ids.size(); i++) {
+                if (!fitFix[i] || (fitFix[i] && replaceFixed)) {
+                    paramMap[ids[i]].value=fitParams[i];
+                    paramMap[ids[i]].error=0;
+                    paramMap[ids[i]].fix=fitFix[i];
+                    lastResults<<fitParams[i];
+                    lastResultD<<fitParams[i];
+                } else {
+                    paramMap[ids[i]].value=fitParamsInit[i];
+                    paramMap[ids[i]].error=0;
+                    paramMap[ids[i]].fix=fitFix[i];
+                    lastResults<<fitParamsInit[i];
+                    lastResultD<<fitParamsInit[i];
+                }
+            }
+            resultComment=tr("guess result for: %1").arg(model->shortName());
+            ok=true;
+        } else {
+            error=tr("Guess failed.");
+            ok=false;
+        }
+
+
+
+
+
+    }
+
+    updateFitStatistics();
+
+    QApplication::restoreOverrideCursor();
+    parameterTable->rebuildModel();
+    replotGraph();
+    if (!ok) {
+        QMessageBox::critical(this, tr("Guess Error"), tr("an error occured during the model parameter guess.\nerror message:\n    %1").arg(error));
+    }
+
+    connectSignals(true);
+    if (model) delete model;
 }
 
 
 void QFRDRTableCurveFitDialog::replotGraph()
 {
-    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance(this);
-
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance(this);
+    updateFitStatistics();
+
     ui->pltDistribution->set_doDrawing(false);
     ui->pltDistribution->set_emitSignals(false);
-    ui->pltDistribution->getXAxis()->set_labelFontSize(11);
-    ui->pltDistribution->getXAxis()->set_tickLabelFontSize(10);
+    ui->pltResiduals->set_doDrawing(false);
+    ui->pltResiduals->set_emitSignals(false);
+    ui->pltResiduals->getXAxis()->set_logAxis(ui->chkLogX->isChecked());
     ui->pltDistribution->getXAxis()->set_logAxis(ui->chkLogX->isChecked());
-    ui->pltDistribution->getXAxis()->set_drawMode1(JKQTPCADMcomplete);
-    ui->pltDistribution->getYAxis()->set_labelFontSize(11);
-    ui->pltDistribution->getYAxis()->set_tickLabelFontSize(10);
     ui->pltDistribution->getYAxis()->set_logAxis(ui->chkLogY->isChecked());
-    ui->pltDistribution->get_plotter()->setBorder(1,1,1,1);
-    ui->pltDistribution->get_plotter()->set_useAntiAliasingForSystem(true);
-    ui->pltDistribution->get_plotter()->set_useAntiAliasingForGraphs(true);
-    ui->pltDistribution->get_plotter()->set_keyFontSize(9);
-    ui->pltDistribution->get_plotter()->set_keyXMargin(2);
-    ui->pltDistribution->get_plotter()->set_keyYMargin(2);
-    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
-    QColor cb("white");
-    cb.setAlphaF(0.5);
-    ui->pltDistribution->get_plotter()->set_keyBackgroundColor(cb);
-    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
-
-
     ui->pltDistribution->get_plotter()->clearGraphs(true);
     ui->pltDistribution->get_plotter()->clearOverlayElement(true);
+    ui->pltResiduals->get_plotter()->clearGraphs(true);
+    ui->pltResiduals->get_plotter()->clearOverlayElement(true);
 
     JKQTPdatastore* ds=ui->pltDistribution->get_plotter()->getDatastore();
     ds->clear();
     size_t c_X=ds->addCopiedColumn(dataX.data(), dataX.size(), tr("x-data"));
     size_t c_Y=ds->addCopiedColumn(dataY.data(), dataY.size(), tr("y-data"));
     size_t c_W=ds->addCopiedColumn(dataW.data(), dataW.size(), tr("weight"));
+    size_t c_ResY=ds->addCopiedColumn(residualsY.data(), residualsY.size(), tr("residuals"));
+    size_t c_ResYW=ds->addCopiedColumn(residualsYW.data(), residualsYW.size(), tr("weighted residuals"));
 
 
     JKQTPxyLineErrorGraph* g_dist=new JKQTPxyLineErrorGraph(ui->pltDistribution->get_plotter());
@@ -412,7 +548,26 @@ void QFRDRTableCurveFitDialog::replotGraph()
     }
 
 
+    JKQTPxyLineGraph* g_res=new JKQTPxyLineGraph(ui->pltResiduals->get_plotter());
+    g_res->set_drawLine(true);
+    g_res->set_xColumn(c_X);
+    if (ui->chkWeightedResiduals->isChecked()) {
+        g_res->set_title(tr("weighted residuals"));
+        g_res->set_yColumn(c_ResYW);
+    } else {
+        g_res->set_title(tr("residuals"));
+        g_res->set_yColumn(c_ResY);
+    }
+    g_res->set_color(g_dist->get_color());
+    g_res->set_symbol(JKQTPcross);
+    g_res->set_symbolSize(7);
+    ui->pltResiduals->addGraph(g_res);
 
+
+    ui->pltResiduals->set_doDrawing(true);
+    ui->pltResiduals->set_emitSignals(true);
+    ui->pltResiduals->zoomToFit();
+    ui->pltResiduals->update_plot();
     ui->pltDistribution->set_doDrawing(true);
     ui->pltDistribution->set_emitSignals(true);
     ui->pltDistribution->zoomToFit();
@@ -448,6 +603,8 @@ void QFRDRTableCurveFitDialog::methodChanged(int method)
         paramMap[ids[i]].editable=d.userEditable;
     }
 
+    ui->btnGuess->setEnabled(model->estimateInitial(NULL, NULL, NULL, 0));
+
     parameterTable->setWriteTo(&paramMap, model, true);
     parameterTable->setDoRebuildModel(true);
     ui->tabParams->setUpdatesEnabled(false);
@@ -468,6 +625,71 @@ void QFRDRTableCurveFitDialog::methodChanged(int method)
     //on_btnFit_clicked();
 }
 
+void QFRDRTableCurveFitDialog::updateFitStatistics()
+{
+    QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance(this);
+    if (model) {
+        QStringList ids=model->getParameterIDs();
+        QVector<double> vecP;
+        for (int i=0; i<ids.size(); i++) {
+            QFFitFunction::ParameterDescription d=model->getDescription(ids[i]);
+            vecP<<getParamValue(ids[i], d.initialValue);
+        }
+        residualsY.clear();
+        residualsYW.clear();
+
+        for (int i=0; i<dataX.size(); i++) {
+            double v=model->evaluate(dataX[i], vecP.data());
+            if (i<dataY.size()) {
+                residualsY<<dataY[i]-v;
+            } else {
+                break;
+            }
+            if (i<dataY.size() && i<dataW.size()) {
+                residualsYW<<(dataY[i]-v)/dataW[i];
+            }
+        }
+
+        int items=residualsY.size();
+
+        // estimate goodness-of-fit
+        resultStat="";
+        if (residualsY.size()>0) {
+            double chi2=0;
+            double chi2w=0;
+            double TSS=0;
+            double obsMean=0;
+            for (int i=0; i<items; i++) {
+                obsMean+=dataY[i];
+            }
+            obsMean=obsMean/double(items);
+            for (int i=0; i<items; i++) {
+                chi2+=qfSqr(residualsY[i]);
+                chi2w+=qfSqr(residualsYW[i]);
+                TSS+=qfSqr(dataY[i]-obsMean);
+            }
+            double R2=1.0-chi2/TSS;
+            paramMap["chi2"].value=chi2;
+            paramMap["chi2"].error=0;
+            paramMap["chi2"].fix=false;
+            paramMap["chi2"].editable=false;
+            resultStat+=tr("\\chi^2=%1").arg(chi2);
+            paramMap["R2"].value=R2;
+            paramMap["R2"].error=0;
+            paramMap["R2"].fix=false;
+            paramMap["R2"].editable=false;
+            resultStat+=tr(", R^2=%1").arg(R2);
+
+        }
+
+        ui->labFitResult->setText(resultStat);
+
+
+        delete model;
+    }
+
+}
+
 void QFRDRTableCurveFitDialog::connectSignals(bool connectS)
 {
     if (connectS) {
@@ -477,6 +699,7 @@ void QFRDRTableCurveFitDialog::connectSignals(bool connectS)
         connect(ui->chkLogY, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         connect(ui->chkPlotErrors, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         connect(ui->datacut, SIGNAL(slidersChanged(double,double,double,double)), this, SLOT(replotGraph()));
+        connect(ui->chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
     } else {
         disconnect(parameterTable, SIGNAL(fitParamChanged()), this, SLOT(replotGraph()));
         disconnect(ui->cmbFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(methodChanged(int)));
@@ -484,6 +707,7 @@ void QFRDRTableCurveFitDialog::connectSignals(bool connectS)
         disconnect(ui->chkLogY, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         disconnect(ui->chkPlotErrors, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         disconnect(ui->datacut, SIGNAL(slidersChanged(double,double,double,double)), this, SLOT(replotGraph()));
+        disconnect(ui->chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
     }
 }
 

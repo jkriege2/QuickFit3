@@ -63,6 +63,17 @@ QFRDRTable::GraphInfo::GraphInfo() {
     modifierMode=JKQTPMathImage::ModifyValue;
     functionType=gtfString;
 
+    rangeStart=0;
+    rangeEnd=1;
+    rangeCenter=0.5;
+    rangeInverted=false;
+    rangeFill=true;
+    rangeDrawCenter=true;
+    rangeCenterColor=color.darker();
+    rangeCenterColorTransparent=1;
+    rangeCenterStyle=Qt::DashLine;
+    rangeCenterWidth=1;
+
 }
 
 QFRDRTable::PlotInfo::PlotInfo()
@@ -1198,12 +1209,12 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 plot.ymin=CQStringToDouble(te.attribute("ymin", "0"));
                 plot.ymax=CQStringToDouble(te.attribute("ymax", "10"));
                 plot.fontName=te.attribute("fontname", "Arial");
-                plot.keyFontSize=te.attribute("keyfontsize", "12").toDouble();
-                plot.axisFontSize=te.attribute("axisfontsize", "10").toDouble();
-                plot.axisLabelFontSize=te.attribute("axislabelfontsize", "12").toDouble();
-                plot.labelFontSize=te.attribute("labelFontSize", "16").toDouble();
+                plot.keyFontSize=CQStringToDouble(te.attribute("keyfontsize", "12"));
+                plot.axisFontSize=CQStringToDouble(te.attribute("axisfontsize", "10"));
+                plot.axisLabelFontSize=CQStringToDouble(te.attribute("axislabelfontsize", "12"));
+                plot.labelFontSize=CQStringToDouble(te.attribute("labelFontSize", "16"));
 
-                plot.keyTransparency=te.attribute("keytransparency", "0.5").toDouble();
+                plot.keyTransparency=CQStringToDouble(te.attribute("keytransparency", "0.5"));
                 plot.keyPosition=String2JKQTPkeyPosition(te.attribute("keyposition", "inside_right"));
                 plot.keyLayout=String2JKQTPkeyLayout(te.attribute("keylayout", "one_column"));
 
@@ -1215,7 +1226,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 plot.backgroundColor=QStringToQColor(te.attribute("background_color", "white"));
                 plot.gridColor=QStringToQColor(te.attribute("grid_color", "darkgrey"));
                 plot.gridStyle=String2QPenStyle(te.attribute("grid_style", "dash"));
-                plot.gridWidth=te.attribute("grid_width", "1").toDouble();
+                plot.gridWidth=CQStringToDouble(te.attribute("grid_width", "1"));
                 plot.xdigits=te.attribute("xdigits", "3").toInt();
                 plot.ydigits=te.attribute("ydigits", "3").toInt();
                 plot.xminTicks=te.attribute("xmin_ticks", "7").toInt();
@@ -1248,8 +1259,8 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.q75column=ge.attribute("q75column", "-1").toInt();
                     graph.maxcolumn=ge.attribute("maxcolumn", "-1").toInt();
 
-                    graph.linewidth=ge.attribute("linewidth", "1").toDouble();
-                    graph.symbolSize=ge.attribute("symbolSize", "1").toDouble();
+                    graph.linewidth=CQStringToDouble(ge.attribute("linewidth", "1"));
+                    graph.symbolSize=CQStringToDouble(ge.attribute("symbolSize", "1"));
                     graph.color=QStringToQColor(ge.attribute("color", "blue"));
                     graph.errorColor=QStringToQColor(ge.attribute("errorcolor", "darkblue"));
                     graph.fillColor=QStringToQColor(ge.attribute("fillcolor", "blue"));
@@ -1257,34 +1268,34 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.style=String2QPenStyle(ge.attribute("style", "solid"));
                     graph.symbol=String2JKQTPgraphSymbols(ge.attribute("symbol", "symbol_cross"));
                     graph.errorStyle=String2JKQTPerrorPlotstyle(ge.attribute("errorStyle", "error_none"));
-                    graph.colorTransparent=ge.attribute("color_trans", "1").toDouble();
-                    graph.errorColorTransparent=ge.attribute("errorcolor_trans", "1").toDouble();
-                    graph.fillColorTransparent=ge.attribute("fillcolor_trans", "0.3").toDouble();
+                    graph.colorTransparent=CQStringToDouble(ge.attribute("color_trans", "1"));
+                    graph.errorColorTransparent=CQStringToDouble(ge.attribute("errorcolor_trans", "1"));
+                    graph.fillColorTransparent=CQStringToDouble(ge.attribute("fillcolor_trans", "0.3"));
 
                     graph.stride=ge.attribute("stride", "1").toInt();
                     graph.strideStart=ge.attribute("stride_start", "1").toInt();
                     graph.isStrided=QStringToBool(ge.attribute("is_strided", "false"));
-                    graph.width=ge.attribute("width", "0.9").toDouble();
-                    graph.shift=ge.attribute("shift", "0").toDouble();
+                    graph.width=CQStringToDouble(ge.attribute("width", "0.9"));
+                    graph.shift=CQStringToDouble(ge.attribute("shift", "0"));
 
                     graph.imageTrueColor=QStringToQColor(ge.attribute("image_truecolor", "blue"));
-                    graph.imageTrueTransparent=ge.attribute("image_truecolor_trans", "0.5").toDouble();
+                    graph.imageTrueTransparent=CQStringToDouble(ge.attribute("image_truecolor_trans", "0.5"));
                     graph.imageFalseColor=QStringToQColor(ge.attribute("image_falsecolor", "red"));
-                    graph.imageFalseTransparent=ge.attribute("image_falsecolor_trans", "1.0").toDouble();
+                    graph.imageFalseTransparent=CQStringToDouble(ge.attribute("image_falsecolor_trans", "1.0"));
                     graph.imagePixelWidth=ge.attribute("image_pixelwidth", "1").toInt();
-                    graph.imageX=ge.attribute("image_x", "0").toDouble();
-                    graph.imageY=ge.attribute("image_y", "0").toDouble();
-                    graph.imageWidth=ge.attribute("image_width", "1").toDouble();
-                    graph.imageHeight=ge.attribute("image_height", "1").toDouble();
+                    graph.imageX=CQStringToDouble(ge.attribute("image_x", "0"));
+                    graph.imageY=CQStringToDouble(ge.attribute("image_y", "0"));
+                    graph.imageWidth=CQStringToDouble(ge.attribute("image_width", "1"));
+                    graph.imageHeight=CQStringToDouble(ge.attribute("image_height", "1"));
                     graph.imagePalette=JKQTPMathImage::ColorPalette(ge.attribute("image_palette", "8").toInt());
-                    graph.imageMin=ge.attribute("image_min", "0").toDouble();
-                    graph.imageMax=ge.attribute("image_max", "0").toDouble();
+                    graph.imageMin=CQStringToDouble(ge.attribute("image_min", "0"));
+                    graph.imageMax=CQStringToDouble(ge.attribute("image_max", "0"));
                     graph.imageAutoRange=QStringToBool(ge.attribute("image_autorange", "true"));
 
                     graph.imageColorbarRight=QStringToBool(ge.attribute("image_colorbarright", "true"));
                     graph.imageColorbarTop=QStringToBool(ge.attribute("image_colorbartop", "false"));
-                    graph.colorbarWidth=ge.attribute("image_colorbarwidth", "20").toDouble();
-                    graph.colorbarRelativeHeight=ge.attribute("image_colorbarrelativeheight", "0.75").toDouble();
+                    graph.colorbarWidth=CQStringToDouble(ge.attribute("image_colorbarwidth", "20"));
+                    graph.colorbarRelativeHeight=CQStringToDouble(ge.attribute("image_colorbarrelativeheight", "0.75"));
                     graph.imageLegend=ge.attribute("image_legend", "");
                     graph.imageLegendG=ge.attribute("image_legend_g", "");
                     graph.imageLegendB=ge.attribute("image_legend_b", "");
@@ -1293,6 +1304,18 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.functionType=String2GTFunctionType(ge.attribute("functiontype", "string"));
                     graph.modifierMode=JKQTPMathImage::StringToModifierMode(ge.attribute("modifier_mode", "none"));
                     graph.functionParameters=stringToDoubleArray_base64(ge.attribute("fparams", ""));
+
+
+                    graph.rangeStart=CQStringToDouble(ge.attribute("range_start", "0"));
+                    graph.rangeEnd=CQStringToDouble(ge.attribute("range_end", "1"));
+                    graph.rangeCenter=CQStringToDouble(ge.attribute("range_center", "0.5"));
+                    graph.rangeCenterWidth=CQStringToDouble(ge.attribute("range_cwidth", "0.5"));
+                    graph.rangeCenterColor=QStringToQColor(ge.attribute("range_ccolor", "darkred"));
+                    graph.rangeCenterColorTransparent=CQStringToDouble(ge.attribute("range_ccolort", "1"));
+                    graph.rangeCenterStyle=String2QPenStyle(ge.attribute("range_cstyle", "dash"));
+                    graph.rangeInverted=QStringToBool(ge.attribute("range_inverted", "false"));
+                    graph.rangeFill=QStringToBool(ge.attribute("range_fill", "true"));
+                    graph.rangeDrawCenter=QStringToBool(ge.attribute("range_drawcenter", "true"));
 
 
                     plot.graphs.append(graph);
@@ -1421,37 +1444,37 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("width", CDoubleToQString(plots[i].graphs[g].width));
             w.writeAttribute("shift", CDoubleToQString(plots[i].graphs[g].shift));
 
-            w.writeAttribute("linewidth", QString::number(plots[i].graphs[g].linewidth));
-            w.writeAttribute("symbolSize", QString::number(plots[i].graphs[g].symbolSize));
+            w.writeAttribute("linewidth", CDoubleToQString(plots[i].graphs[g].linewidth));
+            w.writeAttribute("symbolSize", CDoubleToQString(plots[i].graphs[g].symbolSize));
             w.writeAttribute("style", QPenStyle2String(plots[i].graphs[g].style));
             w.writeAttribute("color", QColor2String(plots[i].graphs[g].color));
             w.writeAttribute("errorcolor", QColor2String(plots[i].graphs[g].errorColor));
             w.writeAttribute("fillcolor", QColor2String(plots[i].graphs[g].fillColor));
             w.writeAttribute("symbol", JKQTPgraphSymbols2String(plots[i].graphs[g].symbol));
             w.writeAttribute("errorStyle", JKQTPerrorPlotstyle2String(plots[i].graphs[g].errorStyle));
-            w.writeAttribute("color_trans", QString::number(plots[i].graphs[g].colorTransparent));
-            w.writeAttribute("errorcolor_trans", QString::number(plots[i].graphs[g].errorColorTransparent));
-            w.writeAttribute("fillcolor_trans", QString::number(plots[i].graphs[g].fillColorTransparent));
+            w.writeAttribute("color_trans", CDoubleToQString(plots[i].graphs[g].colorTransparent));
+            w.writeAttribute("errorcolor_trans", CDoubleToQString(plots[i].graphs[g].errorColorTransparent));
+            w.writeAttribute("fillcolor_trans", CDoubleToQString(plots[i].graphs[g].fillColorTransparent));
 
 
             w.writeAttribute("image_truecolor", QColor2String(plots[i].graphs[g].imageTrueColor));
-            w.writeAttribute("image_truecolor_trans", QString::number(plots[i].graphs[g].imageTrueTransparent));
+            w.writeAttribute("image_truecolor_trans", CDoubleToQString(plots[i].graphs[g].imageTrueTransparent));
             w.writeAttribute("image_falsecolor", QColor2String(plots[i].graphs[g].imageFalseColor));
-            w.writeAttribute("image_falsecolor_trans", QString::number(plots[i].graphs[g].imageFalseTransparent));
+            w.writeAttribute("image_falsecolor_trans", CDoubleToQString(plots[i].graphs[g].imageFalseTransparent));
             w.writeAttribute("image_pixelwidth", QString::number(plots[i].graphs[g].imagePixelWidth));
-            w.writeAttribute("image_x", QString::number(plots[i].graphs[g].imageX));
-            w.writeAttribute("image_y", QString::number(plots[i].graphs[g].imageY));
-            w.writeAttribute("image_width", QString::number(plots[i].graphs[g].imageWidth));
-            w.writeAttribute("image_height", QString::number(plots[i].graphs[g].imageHeight));
+            w.writeAttribute("image_x", CDoubleToQString(plots[i].graphs[g].imageX));
+            w.writeAttribute("image_y", CDoubleToQString(plots[i].graphs[g].imageY));
+            w.writeAttribute("image_width", CDoubleToQString(plots[i].graphs[g].imageWidth));
+            w.writeAttribute("image_height", CDoubleToQString(plots[i].graphs[g].imageHeight));
             w.writeAttribute("image_palette", QString::number(plots[i].graphs[g].imagePalette));
-            w.writeAttribute("image_min", QString::number(plots[i].graphs[g].imageMin));
-            w.writeAttribute("image_max", QString::number(plots[i].graphs[g].imageMax));
+            w.writeAttribute("image_min", CDoubleToQString(plots[i].graphs[g].imageMin));
+            w.writeAttribute("image_max", CDoubleToQString(plots[i].graphs[g].imageMax));
             w.writeAttribute("image_autorange", boolToQString(plots[i].graphs[g].imageAutoRange));
 
             w.writeAttribute("image_colorbarright", boolToQString(plots[i].graphs[g].imageColorbarRight));
             w.writeAttribute("image_colorbartop", boolToQString(plots[i].graphs[g].imageColorbarTop));
             w.writeAttribute("image_colorbarwidth", QString::number(plots[i].graphs[g].colorbarWidth));
-            w.writeAttribute("image_colorbarrelativeheight", QString::number(plots[i].graphs[g].colorbarRelativeHeight));
+            w.writeAttribute("image_colorbarrelativeheight", CDoubleToQString(plots[i].graphs[g].colorbarRelativeHeight));
             w.writeAttribute("image_legend", plots[i].graphs[g].imageLegend);
             w.writeAttribute("image_legend_g", plots[i].graphs[g].imageLegendG);
             w.writeAttribute("image_legend_b", plots[i].graphs[g].imageLegendB);
@@ -1463,6 +1486,27 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("stride_start", QString::number(plots[i].graphs[g].strideStart));
             w.writeAttribute("is_strided", boolToQString(plots[i].graphs[g].isStrided));
             w.writeAttribute("modifier_mode", JKQTPMathImage::ModifierModeToString(plots[i].graphs[g].modifierMode));
+
+
+
+
+
+            w.writeAttribute("range_start", CDoubleToQString(plots[i].graphs[g].rangeStart));
+            w.writeAttribute("range_end", CDoubleToQString(plots[i].graphs[g].rangeEnd));
+            w.writeAttribute("range_center", CDoubleToQString(plots[i].graphs[g].rangeCenter));
+            w.writeAttribute("range_cwidth", CDoubleToQString(plots[i].graphs[g].rangeCenterWidth));
+            w.writeAttribute("range_ccolort", CDoubleToQString(plots[i].graphs[g].rangeCenterColorTransparent));
+
+            w.writeAttribute("range_ccolor", QColor2String(plots[i].graphs[g].rangeCenterColor));
+            w.writeAttribute("range_cstyle", QPenStyle2String(plots[i].graphs[g].rangeCenterStyle));
+
+            w.writeAttribute("range_inverted", boolToQString( plots[i].graphs[g].rangeInverted));
+            w.writeAttribute("range_fill", boolToQString( plots[i].graphs[g].rangeFill));
+            w.writeAttribute("range_drawcenter", boolToQString( plots[i].graphs[g].rangeDrawCenter));
+
+
+
+
 
             w.writeEndElement();
         }

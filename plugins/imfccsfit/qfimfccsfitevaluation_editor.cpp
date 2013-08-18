@@ -101,11 +101,11 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     ui->pltResiduals->set_displayMousePosition(false);
     ui->pltData->set_displayMousePosition(false);
     ui->pltData->get_plotter()->set_keyFontSize(9);
-    ui->pltData->get_plotter()->set_keyXMargin(2);
-    ui->pltData->get_plotter()->set_keyYMargin(2);
+    //ui->pltData->get_plotter()->set_keyXMargin(2);
+    //ui->pltData->get_plotter()->set_keyYMargin(2);
     ui->pltResiduals->get_plotter()->set_keyFontSize(9);
-    ui->pltResiduals->get_plotter()->set_keyXMargin(2);
-    ui->pltResiduals->get_plotter()->set_keyYMargin(2);
+    //ui->pltResiduals->get_plotter()->set_keyXMargin(2);
+    //ui->pltResiduals->get_plotter()->set_keyYMargin(2);
     ui->pltResiduals->useExternalDatastore(ui->pltData->getDatastore());
     ui->pltResiduals->setMinimumHeight(75);
     ui->pltData->setMinimumHeight(75);

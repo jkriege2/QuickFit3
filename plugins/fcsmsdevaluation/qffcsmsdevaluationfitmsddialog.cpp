@@ -114,8 +114,8 @@ void QFFCSMSDEvaluationFitMSDDialog::replotGraph()
     ui->pltDistribution->get_plotter()->set_useAntiAliasingForSystem(true);
     ui->pltDistribution->get_plotter()->set_useAntiAliasingForGraphs(true);
     ui->pltDistribution->get_plotter()->set_keyFontSize(9);
-    ui->pltDistribution->get_plotter()->set_keyXMargin(2);
-    ui->pltDistribution->get_plotter()->set_keyYMargin(2);
+    //ui->pltDistribution->get_plotter()->set_keyXMargin(2);
+    //ui->pltDistribution->get_plotter()->set_keyYMargin(2);
     ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
     QColor cb("white");
     cb.setAlphaF(0.5);

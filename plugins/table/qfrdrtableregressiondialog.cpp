@@ -102,6 +102,55 @@ QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int co
     ui->cmbFitType->addItem(tr("power-law regression, robust"), 4);
 
     ui->cmbFitType->setCurrentIndex(0);
+
+
+
+
+
+
+    ui->pltResiduals->set_displayToolbar(false);
+    ui->pltResiduals->getXAxis()->set_axisLabel(tr("X"));
+    //ui->pltResiduals->getXAxis()->set_logAxis(true);
+    ui->pltResiduals->getYAxis()->set_axisLabel(tr("residuals"));
+    ui->pltDistribution->getXAxis()->set_axisLabel("");
+    ui->pltDistribution->getYAxis()->set_axisLabel(tr("Y"));
+    ui->pltDistribution->getXAxis()->set_drawMode1(JKQTPCADMticks);
+    ui->pltResiduals->getXAxis()->set_drawMode1(JKQTPCADMcomplete);
+    ui->pltResiduals->get_plotter()->setBorder(1,1,1,1);
+    ui->pltDistribution->get_plotter()->setBorder(1,1,1,1);
+    ui->pltResiduals->synchronizeToMaster(ui->pltDistribution, true, false);
+    ui->pltDistribution->get_plotter()->set_useAntiAliasingForSystem(true);
+    ui->pltDistribution->get_plotter()->set_useAntiAliasingForGraphs(true);
+    ui->pltResiduals->get_plotter()->set_useAntiAliasingForSystem(true);
+    ui->pltResiduals->get_plotter()->set_useAntiAliasingForGraphs(true);
+    ui->pltResiduals->set_displayMousePosition(false);
+    ui->pltDistribution->set_displayMousePosition(false);
+    ui->pltDistribution->get_plotter()->set_keyFontSize(9);
+    ui->pltResiduals->get_plotter()->set_keyFontSize(9);
+    ui->pltResiduals->useExternalDatastore(ui->pltDistribution->getDatastore());
+    ui->pltResiduals->setMinimumHeight(75);
+    ui->pltResiduals->get_plotter()->set_showKey(false);
+    ui->pltDistribution->setMinimumHeight(75);
+    ui->pltDistribution->get_plotter()->setBorder(1,1,1,1);
+    ui->pltDistribution->get_plotter()->set_useAntiAliasingForSystem(true);
+    ui->pltDistribution->get_plotter()->set_useAntiAliasingForGraphs(true);
+    ui->pltDistribution->get_plotter()->set_keyFontSize(9);
+    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
+    QColor cb("white");
+    cb.setAlphaF(0.5);
+    ui->pltDistribution->get_plotter()->set_keyBackgroundColor(cb);
+    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
+
+    connect(ui->pltDistribution->get_plotter()->get_actZoomAll(), SIGNAL(triggered()), ui->pltResiduals, SLOT(zoomToFit()));
+    connect(ui->pltResiduals->get_plotter(), SIGNAL(zoomChangedLocally(double,double,double,double,JKQtBasePlotter*)), ui->pltDistribution, SLOT(pzoomChangedLocally(double,double,double,double,JKQtBasePlotter*)));
+    connect(ui->pltDistribution->get_plotter(), SIGNAL(zoomChangedLocally(double,double,double,double,JKQtBasePlotter*)), ui->pltResiduals, SLOT(pzoomChangedLocally(double,double,double,double,JKQtBasePlotter*)));
+
+
+
+
+
+
+
     methodChanged(ui->cmbFitType->currentIndex());
     connectSignals(true);
     on_btnFit_clicked();
@@ -147,6 +196,7 @@ void QFRDRTableRegressionDialog::saveResults()
                     table->colgraphAddFunctionPlot(g, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, lastResultD);
                 }
             }
+            table->colgraphSetPlotTitle(g, table->colgraphGetPlotCount(g)-1, resultComment+", "+resultStat);
         } else if (saveGraph>=2){
             if (method>=0 && method<=2) {
                 if (savedTo>=0) {
@@ -161,6 +211,7 @@ void QFRDRTableRegressionDialog::saveResults()
                     table->colgraphAddFunctionPlot(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, lastResultD);
                 }
             }
+            table->colgraphSetPlotTitle(saveGraph-2, table->colgraphGetPlotCount(saveGraph-2)-1, resultComment+", "+resultStat);
         }
     }
     accept();
@@ -233,11 +284,6 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
             lastResults<<a<<b;
             lastResultD<<a<<b;
             resultComment=tr("regression result");
-            for (int i=0; i<dataX.size(); i++) {
-                funeval<<a+b*dataX[i];
-                residuals<<dataY[i]-funeval[i];
-                residuals_weighted<<residuals[i];
-            }
             ok=true;
         } else if (method==1 && dataW.size()==datapoints) {
             statisticsLinearWeightedRegression(dx, dy, dww, items, a, b, afix, bfix);
@@ -245,11 +291,6 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
             lastResults<<a<<b;
             lastResultD<<a<<b;
             resultComment=tr("weighted regression result");
-            for (int i=0; i<dataX.size(); i++) {
-                funeval<<a+b*dataX[i];
-                residuals<<dataY[i]-funeval[i];
-                residuals_weighted<<residuals[i]*weights[i];
-            }
             ok=true;
         } else if (method==2) {
             int iterations=getParamValue("iterations", 100);
@@ -259,11 +300,6 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
             lastResults<<a<<b;
             lastResultD<<a<<b;
             resultComment=tr("robust regression result");
-            for (int i=0; i<dataX.size(); i++) {
-                funeval<<a+b*dataX[i];
-                residuals<<dataY[i]-funeval[i];
-                residuals_weighted<<residuals[i];
-            }
             ok=true;
         } else  if (method==3) {
             double ia=log(a);
@@ -275,11 +311,6 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
             lastResults<<a<<b;
             lastResultD<<a<<b;
             resultComment=tr("regression result");
-            for (int i=0; i<dataX.size(); i++) {
-                funeval<<a*pow(dataX[i],b);
-                residuals<<dataY[i]-funeval[i];
-                residuals_weighted<<residuals[i];
-            }
             ok=true;
         } else if (method==4) {
             int iterations=getParamValue("iterations", 100);
@@ -293,40 +324,14 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
             lastResults<<a<<b;
             lastResultD<<a<<b;
             resultComment=tr("robust regression result");
-            for (int i=0; i<dataX.size(); i++) {
-                funeval<<a*pow(dataX[i],b);
-                residuals<<dataY[i]-funeval[i];
-                residuals_weighted<<residuals[i];
-            }
             ok=true;
 
         } else {
         }
 
-        // estimate goodness-of-fit
-        if (residuals.size()>0) {
-            double chi2=0;
-            double chi2w=0;
-            double TSS=0;
-            double obsMean=0;
-            for (int i=0; i<=items; i++) {
-                obsMean+=dataY[i];
-            }
-            obsMean=obsMean/double(items);
-            for (int i=0; i<=items; i++) {
-                chi2+=qfSqr(residuals[i]);
-                chi2w+=qfSqr(residuals_weighted[i]);
-                TSS+=qfSqr(dataY[i]-obsMean);
-            }
-            double R2=1.0-chi2/TSS;
-            paramMap["R2"].value=R2;
-            paramMap["R2"].error=0;
-            paramMap["R2"].fix=false;
-            paramMap["R2"].editable=false;
-            resultComment+=tr(", R^2=%1").arg(R2);
-
-        }
     }
+
+    updateFitStatistics();
 
     if (ok) {
         paramMap["a"].value=a;
@@ -345,40 +350,100 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
     connectSignals(true);
 }
 
+void QFRDRTableRegressionDialog::updateFitStatistics()
+{
+    double a=getParamValue("a", 0);
+    double b=getParamValue("b", 1);
+    int method=ui->cmbFitType->itemData(ui->cmbFitType->currentIndex()).toInt();
+
+    int items=dataX.size();
+    QVector<double> funeval, residuals, residuals_weighted;
+
+
+
+    if (items>1) {
+        if (method>=0 && method<=2) {
+            for (int i=0; i<dataX.size(); i++) {
+                fitresult=tr("regression: f(x)= %1 + %2 \\cdot x").arg(floattolatexstr(a).c_str()).arg(floattolatexstr(b).c_str());
+                funeval<<a+b*dataX[i];
+                residuals<<dataY[i]-funeval[i];
+                residuals_weighted<<residuals[i]/dataW[i];
+            }
+        } else  if (method>=3 && method<=4) {
+            fitresult=tr("regression: f(x)= %1 \\cdot x^{%2}").arg(floattolatexstr(a).c_str()).arg(floattolatexstr(b).c_str());
+            for (int i=0; i<dataX.size(); i++) {
+                funeval<<a*pow(dataX[i],b);
+                residuals<<dataY[i]-funeval[i];
+                residuals_weighted<<residuals[i]/dataW[i];
+            }
+        } else {
+        }
+
+        residualsY=residuals;
+        residualsYW=residuals_weighted;
+
+        // estimate goodness-of-fit
+        resultStat="";
+        if (residuals.size()>0) {
+            double chi2=0;
+            double chi2w=0;
+            double TSS=0;
+            double obsMean=0;
+            for (int i=0; i<items; i++) {
+                obsMean+=dataY[i];
+            }
+            obsMean=obsMean/double(items);
+            for (int i=0; i<items; i++) {
+                chi2+=qfSqr(residuals[i]);
+                chi2w+=qfSqr(residuals_weighted[i]);
+                TSS+=qfSqr(dataY[i]-obsMean);
+            }
+            paramMap["chi2"].value=chi2;
+            paramMap["chi2"].error=0;
+            paramMap["chi2"].fix=false;
+            paramMap["chi2"].editable=false;
+            resultStat+=tr("\\chi^2=%1").arg(chi2);
+
+            double R2=1.0-chi2/TSS;
+            paramMap["R2"].value=R2;
+            paramMap["R2"].error=0;
+            paramMap["R2"].fix=false;
+            paramMap["R2"].editable=false;
+            resultStat+=tr(", R^2=%1").arg(R2);
+
+            ui->labFitResult->setText(resultStat);
+
+        }
+    }
+
+}
+
 void QFRDRTableRegressionDialog::replotGraph()
 {
-    int method=ui->cmbFitType->itemData(ui->cmbFitType->currentIndex()).toInt();
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    int method=ui->cmbFitType->itemData(ui->cmbFitType->currentIndex()).toInt();
+    updateFitStatistics();
     ui->pltDistribution->set_doDrawing(false);
     ui->pltDistribution->set_emitSignals(false);
-    ui->pltDistribution->getXAxis()->set_labelFontSize(11);
-    ui->pltDistribution->getXAxis()->set_tickLabelFontSize(10);
+    ui->pltResiduals->set_doDrawing(false);
+    ui->pltResiduals->set_emitSignals(false);
     ui->pltDistribution->getXAxis()->set_logAxis(ui->chkLogX->isChecked());
-    ui->pltDistribution->getXAxis()->set_drawMode1(JKQTPCADMcomplete);
-    ui->pltDistribution->getYAxis()->set_labelFontSize(11);
-    ui->pltDistribution->getYAxis()->set_tickLabelFontSize(10);
+    ui->pltResiduals->getXAxis()->set_logAxis(ui->chkLogX->isChecked());
     ui->pltDistribution->getYAxis()->set_logAxis(ui->chkLogY->isChecked());
-    ui->pltDistribution->get_plotter()->setBorder(1,1,1,1);
-    ui->pltDistribution->get_plotter()->set_useAntiAliasingForSystem(true);
-    ui->pltDistribution->get_plotter()->set_useAntiAliasingForGraphs(true);
-    ui->pltDistribution->get_plotter()->set_keyFontSize(9);
-    ui->pltDistribution->get_plotter()->set_keyXMargin(2);
-    ui->pltDistribution->get_plotter()->set_keyYMargin(2);
-    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
-    QColor cb("white");
-    cb.setAlphaF(0.5);
-    ui->pltDistribution->get_plotter()->set_keyBackgroundColor(cb);
-    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
 
 
     ui->pltDistribution->get_plotter()->clearGraphs(true);
     ui->pltDistribution->get_plotter()->clearOverlayElement(true);
+    ui->pltResiduals->get_plotter()->clearGraphs(true);
+    ui->pltResiduals->get_plotter()->clearOverlayElement(true);
 
     JKQTPdatastore* ds=ui->pltDistribution->get_plotter()->getDatastore();
     ds->clear();
     size_t c_X=ds->addCopiedColumn(dataX.data(), dataX.size(), tr("x-data"));
     size_t c_Y=ds->addCopiedColumn(dataY.data(), dataY.size(), tr("y-data"));
     size_t c_W=ds->addCopiedColumn(dataW.data(), dataW.size(), tr("weight"));
+    size_t c_ResY=ds->addCopiedColumn(residualsY.data(), residualsY.size(), tr("residuals"));
+    size_t c_ResYW=ds->addCopiedColumn(residualsYW.data(), residualsYW.size(), tr("weighted residuals"));
 
 
     JKQTPxyLineErrorGraph* g_dist=new JKQTPxyLineErrorGraph(ui->pltDistribution->get_plotter());
@@ -425,7 +490,26 @@ void QFRDRTableRegressionDialog::replotGraph()
     }
 
 
+    JKQTPxyLineGraph* g_res=new JKQTPxyLineGraph(ui->pltResiduals->get_plotter());
+    g_res->set_drawLine(true);
+    g_res->set_xColumn(c_X);
+    g_res->set_yColumn(c_ResY);
+    if (ui->chkWeightedResiduals->isChecked()) {
+        g_res->set_title(tr("weighted residuals"));
+        g_res->set_yColumn(c_ResYW);
+    } else {
+        g_res->set_title(tr("residuals"));
+        g_res->set_yColumn(c_ResY);
+    }
+    g_res->set_color(g_dist->get_color());
+    g_res->set_symbol(JKQTPcross);
+    g_res->set_symbolSize(7);
+    ui->pltResiduals->addGraph(g_res);
 
+    ui->pltResiduals->set_doDrawing(true);
+    ui->pltResiduals->set_emitSignals(true);
+    ui->pltResiduals->zoomToFit();
+    ui->pltResiduals->update_plot();
     ui->pltDistribution->set_doDrawing(true);
     ui->pltDistribution->set_emitSignals(true);
     ui->pltDistribution->zoomToFit();
@@ -479,6 +563,7 @@ void QFRDRTableRegressionDialog::connectSignals(bool connectS)
         connect(ui->chkLogX, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         connect(ui->chkLogY, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         connect(ui->chkPlotErrors, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
+        connect(ui->chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         connect(ui->datacut, SIGNAL(slidersChanged(double,double,double,double)), this, SLOT(replotGraph()));
     } else {
         disconnect(parameterTable, SIGNAL(fitParamChanged()), this, SLOT(replotGraph()));
@@ -486,6 +571,7 @@ void QFRDRTableRegressionDialog::connectSignals(bool connectS)
         disconnect(ui->chkLogX, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         disconnect(ui->chkLogY, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         disconnect(ui->chkPlotErrors, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
+        disconnect(ui->chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         disconnect(ui->datacut, SIGNAL(slidersChanged(double,double,double,double)), this, SLOT(replotGraph()));
     }
 }

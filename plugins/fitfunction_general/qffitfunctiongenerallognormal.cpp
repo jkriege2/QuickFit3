@@ -49,7 +49,7 @@ bool QFFitFunctionGeneralLogNormal::get_implementsDerivatives()
 void QFFitFunctionGeneralLogNormal::evaluateDerivatives(double* derivatives, double t, const double* data) const {
 }
 
-bool QFFitFunctionGeneralLogNormal::estimateInitial(double *params, const double *dataX, const double *dataY, long N)
+bool QFFitFunctionGeneralLogNormal::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
 

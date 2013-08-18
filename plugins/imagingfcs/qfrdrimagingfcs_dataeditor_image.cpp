@@ -862,11 +862,11 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     plotter->set_displayMousePosition(false);
     plotterResid->set_displayMousePosition(false);
     plotter->get_plotter()->set_keyFontSize(9);
-    plotter->get_plotter()->set_keyXMargin(2);
-    plotter->get_plotter()->set_keyYMargin(2);
+    //plotter->get_plotter()->set_keyXMargin(2);
+    //plotter->get_plotter()->set_keyYMargin(2);
     plotterResid->get_plotter()->set_keyFontSize(9);
-    plotterResid->get_plotter()->set_keyXMargin(2);
-    plotterResid->get_plotter()->set_keyYMargin(2);
+    //plotterResid->get_plotter()->set_keyXMargin(2);
+    //plotterResid->get_plotter()->set_keyYMargin(2);
     plotterResid->useExternalDatastore(plotter->getDatastore());
     connect(plotter, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(acfZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
 

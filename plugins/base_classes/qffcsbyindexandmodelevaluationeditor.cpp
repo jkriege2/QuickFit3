@@ -210,11 +210,11 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     pltData->set_displayMousePosition(false);
     pltResiduals->set_displayMousePosition(false);
     pltData->get_plotter()->set_keyFontSize(9);
-    pltData->get_plotter()->set_keyXMargin(2);
-    pltData->get_plotter()->set_keyYMargin(2);
+    //pltData->get_plotter()->set_keyXMargin(2);
+    //pltData->get_plotter()->set_keyYMargin(2);
     pltResiduals->get_plotter()->set_keyFontSize(9);
-    pltResiduals->get_plotter()->set_keyXMargin(2);
-    pltResiduals->get_plotter()->set_keyYMargin(2);
+    //pltResiduals->get_plotter()->set_keyXMargin(2);
+    //pltResiduals->get_plotter()->set_keyYMargin(2);
     pltResiduals->useExternalDatastore(pltData->getDatastore());
     pltResiduals->setMinimumHeight(75);
 

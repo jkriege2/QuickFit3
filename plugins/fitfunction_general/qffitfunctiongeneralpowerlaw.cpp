@@ -44,7 +44,7 @@ bool QFFitFunctionGeneralPowerLaw::get_implementsDerivatives()
 void QFFitFunctionGeneralPowerLaw::evaluateDerivatives(double* derivatives, double t, const double* data) const {
 }
 
-bool QFFitFunctionGeneralPowerLaw::estimateInitial(double *params, const double *dataX, const double *dataY, long N)
+bool QFFitFunctionGeneralPowerLaw::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
 

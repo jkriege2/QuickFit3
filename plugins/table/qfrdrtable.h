@@ -48,7 +48,9 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             gtImage,
             gtRGBImage,
             gtMaskImage,
-            gtFunction
+            gtFunction,
+            gtHorizontalRange,
+            gtVerticalRange
         };
 
         enum GTFunctionType {
@@ -96,6 +98,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
                 case gtRGBImage: return QString("rgbimage");
                 case gtMaskImage: return QString("maskimage");
                 case gtFunction: return QString("function");
+                case gtHorizontalRange: return QString("hrange");
+                case gtVerticalRange: return QString("vrange");
             }
             return QString("");
         }
@@ -117,6 +121,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
                 case gtRGBImage: return QIcon(":/table/icons/plot_rgbimage.png");
                 case gtMaskImage: return QIcon(":/table/icons/plot_maskimage.png");
                 case gtFunction: return QIcon(":/table/icons/plot_function.png");
+                case gtHorizontalRange: return QIcon(":/table/icons/plot_hrange.png");
+                case gtVerticalRange: return QIcon(":/table/icons/plot_vrange.png");
             }
             return QIcon();
         }
@@ -138,6 +144,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             if (s=="rgbimage") return gtRGBImage;
             if (s=="maskimage") return gtMaskImage;
             if (s=="function") return gtFunction;
+            if (s=="vrange") return gtVerticalRange;
+            if (s=="hrange") return gtHorizontalRange;
             return gtLines;
         }
 
@@ -198,6 +206,17 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             QString function;
             GTFunctionType functionType;
             QVector<double> functionParameters;
+
+            double rangeStart;
+            double rangeEnd;
+            double rangeCenter;
+            bool rangeInverted;
+            bool rangeFill;
+            QColor rangeCenterColor;
+            double rangeCenterColorTransparent;
+            Qt::PenStyle rangeCenterStyle;
+            double rangeCenterWidth;
+            bool rangeDrawCenter;
 
         };
 

@@ -85,7 +85,7 @@ bool QFFitFunctionGeneralPolynom::get_implementsDerivatives()
 void QFFitFunctionGeneralPolynom::evaluateDerivatives(double* derivatives, double t, const double* data) const {
 }
 
-bool QFFitFunctionGeneralPolynom::estimateInitial(double *params, const double *dataX, const double *dataY, long N)
+bool QFFitFunctionGeneralPolynom::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
 

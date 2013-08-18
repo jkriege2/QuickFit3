@@ -42,9 +42,18 @@ bool QFFitFunctionGeneralLine::get_implementsDerivatives()
 void QFFitFunctionGeneralLine::evaluateDerivatives(double* derivatives, double t, const double* data) const {
 }
 
-bool QFFitFunctionGeneralLine::estimateInitial(double *params, const double *dataX, const double *dataY, long N)
+bool QFFitFunctionGeneralLine::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
+    if (params && dataX && dataY) {
+        double a=params[PARAM_OFFSET];
+        double b=params[PARAM_SLOPE];
+        if (fix) statisticsLinearRegression(dataX, dataY, N, a, b, fix[PARAM_OFFSET], fix[PARAM_SLOPE]);
+        else statisticsLinearRegression(dataX, dataY, N, a, b, false, false);
 
-    return QFFitFunction::estimateInitial(params, dataX, dataY, N);
+        params[PARAM_OFFSET]=a;
+        params[PARAM_SLOPE]=b;
+    }
+
+    return true;
 }

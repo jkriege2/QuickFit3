@@ -51,7 +51,7 @@ bool QFFitFunctionGeneralDblExp::get_implementsDerivatives()
 void QFFitFunctionGeneralDblExp::evaluateDerivatives(double* derivatives, double t, const double* data) const {
 }
 
-bool QFFitFunctionGeneralDblExp::estimateInitial(double *params, const double *dataX, const double *dataY, long N)
+bool QFFitFunctionGeneralDblExp::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
 

@@ -200,6 +200,8 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
             case 12: graph.type=QFRDRTable::gtRGBImage; break;
             case 13: graph.type=QFRDRTable::gtMaskImage; break;
             case 14: graph.type=QFRDRTable::gtFunction; break;
+            case 15: graph.type=QFRDRTable::gtHorizontalRange; break;
+            case 16: graph.type=QFRDRTable::gtVerticalRange; break;
             case 0:
             default: graph.type=QFRDRTable::gtLines; break;
         }
@@ -218,21 +220,32 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.width=ui->edtWidth->value()/100.0;
         graph.shift=ui->edtShift->value()/100.0;
         QColor oldColor=graph.color;
+        QColor oldRangeColor=graph.rangeCenterColor;
         QColor oldDefaultErrorColor=oldColor.darker();
         QColor oldDefaultFillColor=oldColor.lighter();
         graph.color=ui->cmbLineColor->currentColor();
-        if (graph.errorColor!=oldDefaultErrorColor) graph.errorColor=ui->cmbErrorColor->currentColor();
-        else {
+        if (graph.errorColor!=oldDefaultErrorColor) {
+            graph.errorColor=ui->cmbErrorColor->currentColor();
+        } else {
             graph.errorColor=graph.color.darker();
             ui->cmbErrorColor->setCurrentColor(graph.errorColor);
         }
         //qDebug()<<graph.fillColor.name()<<oldDefaultFillColor.name();
 
-        qDebug()<<graph.fillColor.name()<<oldDefaultFillColor.name();
-        if (graph.fillColor!=oldDefaultFillColor) graph.fillColor=ui->cmbFillColor->currentColor();
-        else {
+        //qDebug()<<graph.fillColor.name()<<oldDefaultFillColor.name();
+        graph.fillColor=ui->cmbFillColor->currentColor();
+        if (graph.fillColor!=oldDefaultFillColor) {
+            graph.fillColor=ui->cmbFillColor->currentColor();
+        } else {
             graph.fillColor=graph.color.lighter();
             ui->cmbFillColor->setCurrentColor(graph.fillColor);
+        }
+        graph.rangeCenterColor=ui->cmbRangeCenterColor->currentColor();
+        if (graph.rangeCenterColor!=oldRangeColor) {
+            graph.rangeCenterColor=ui->cmbRangeCenterColor->currentColor();
+        } else {
+            graph.rangeCenterColor=graph.color.lighter();
+            ui->cmbRangeCenterColor->setCurrentColor(graph.rangeCenterColor);
         }
         graph.errorStyle=ui->cmbErrorStyle->getErrorStyle();
         graph.symbol=ui->cmbSymbol->getSymbol();
@@ -275,6 +288,18 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
             graph.function=ui->cmbQFFitFunction->currentFitFunctionID();
         }
         graph.functionParameters=fitfuncValues;
+
+
+        graph.rangeCenter=ui->edtRangeCenter->value();
+        graph.rangeStart=ui->edtRangeStart->value();
+        graph.rangeEnd=ui->edtRangeEnd->value();
+        graph.rangeCenterWidth=ui->spinRangeCenterWidth->value();
+        graph.rangeCenterColor=ui->cmbRangeCenterColor->currentColor();
+        graph.rangeCenterColorTransparent=double(ui->sliderRangeCenterTransparency->value())/255.0;
+        graph.rangeCenterStyle=ui->cmbRangeCenterStyle->currentLineStyle();
+        graph.rangeFill=ui->chkRangeFillRange->isChecked();
+        graph.rangeInverted=ui->chkRangeInverted->isChecked();
+        graph.rangeDrawCenter=ui->chkRangeDrawCenter->isChecked();
 
 
         updating=false;
@@ -335,6 +360,12 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
         case QFRDRTable::gtFunction:
             ui->cmbGraphType->setCurrentIndex(14);
             break;
+        case QFRDRTable::gtHorizontalRange:
+            ui->cmbGraphType->setCurrentIndex(15);
+            break;
+        case QFRDRTable::gtVerticalRange:
+            ui->cmbGraphType->setCurrentIndex(16);
+            break;
         case QFRDRTable::gtLines:
         default:
             ui->cmbGraphType->setCurrentIndex(0);
@@ -393,6 +424,19 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->tabFunctionParameters->resizeColumnsToContents();
     ui->tabFunctionParameters->resizeRowsToContents();
 
+
+    ui->edtRangeCenter->setValue(graph.rangeCenter);
+    ui->edtRangeStart->setValue(graph.rangeStart);
+    ui->edtRangeEnd->setValue(graph.rangeEnd);
+    ui->spinRangeCenterWidth->setValue(graph.rangeCenterWidth);
+    ui->cmbRangeCenterColor->setCurrentColor(graph.rangeCenterColor);
+    ui->sliderRangeCenterTransparency->setValue(graph.rangeCenterColorTransparent*255.0);
+    ui->cmbRangeCenterStyle->setCurrentLineStyle(graph.rangeCenterStyle);
+    ui->chkRangeFillRange->setChecked(graph.rangeFill);
+    ui->chkRangeInverted->setChecked(graph.rangeInverted);
+    ui->chkRangeDrawCenter->setChecked(graph.rangeDrawCenter);
+
+
     updating=false;
 }
 
@@ -401,23 +445,13 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
     if (current) {
         if (this->plot<0 || this->plot>=current->getPlotCount()) return;
 
+        bool updt=updatesEnabled();
+        setUpdatesEnabled(false);
 
+        this->setVisible(true);
 
-        /*ui->cmbErrorColor->setVisible(true);
-        ui->cmbErrorStyle->setVisible(true);
-        ui->cmbLinesXError->setVisible(true);
-        ui->cmbLinesYError->setVisible(true);
-        ui->chkDrawLine->setVisible(true);
-        ui->cmbSymbol->setVisible(true);
-        ui->spinSymbolSize->setVisible(true);
-        ui->cmbFillColor->setVisible(true);
-        ui->cmbLineStyle->setVisible(true);
-        ui->sliderErrorTransparent->setVisible(true);
-        ui->sliderFillTransparent->setVisible(true);
-        ui->sliderPlotTransparent->setVisible(true);*/
         ui->widErrorStyle->setVisible(true);
         ui->widFillColor->setVisible(true);
-        this->setVisible(true);
         ui->widImage->setVisible(true);
         ui->widLineStyle->setVisible(true);
         ui->widSymbol->setVisible(true);
@@ -493,6 +527,11 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
         ui->edtShift->setVisible(false);
         ui->widWidth->setVisible(false);
         ui->labWidth->setText(tr("Width:"));
+
+        ui->labRangeData->setVisible(false);
+        ui->labRangeStyle->setVisible(false);
+        ui->widRangeData->setVisible(false);
+        ui->widRangeStyle->setVisible(false);
 
         switch(ui->cmbGraphType->currentIndex()) {
 
@@ -861,12 +900,46 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                     }
                 }
 
+            case 15: case 16: // horicontal/vertical range
+                ui->btnFit->setVisible(false);
+                ui->labRangeData->setVisible(true);
+                ui->labRangeStyle->setVisible(true);
+                ui->widRangeData->setVisible(true);
+                ui->widRangeStyle->setVisible(true);
 
-
-                /*ui->widLineStyle->setVisible(false);
                 ui->cmbLinesXError->setVisible(false);
-                ui->chkDrawLine->setVisible(false);
-                ui->cmbLineStyle->setVisible(false);*/
+                ui->labErrorX->setVisible(false);
+                ui->labSymbol->setVisible(false);
+                ui->widSymbol->setVisible(false);
+                ui->labImage->setVisible(false);
+                ui->widImage->setVisible(false);
+
+                ui->widErrorStyle->setVisible(false);
+                ui->widFillColor->setVisible(true);
+                ui->widImage->setVisible(false);
+                ui->widSymbol->setVisible(false);
+                ui->labErrorStyle->setVisible(false);
+                ui->labDataX->setVisible(false);
+                ui->labDataY->setVisible(false);
+                ui->labErrorX->setVisible(false);
+                ui->labErrorY->setVisible(false);
+                ui->labImage->setVisible(false);
+                ui->labSymbol->setVisible(false);
+                ui->labTitle->setVisible(true);
+                ui->labType->setVisible(true);
+                ui->chkDrawLine->setVisible(true);
+                ui->cmbLineStyle->setVisible(true);
+                ui->cmbLinesXData->setVisible(false);
+                ui->cmbLinesXError->setVisible(false);
+                ui->cmbLinesYData->setVisible(false);
+                ui->cmbLinesYError->setVisible(false);
+                ui->widFunction->setVisible(false);
+                ui->labFuction->setVisible(false);
+                ui->chkSTrided->setVisible(false);
+                ui->widStride->setVisible(false);
+
+
+
                 break;
 
             case 0:
@@ -877,6 +950,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 break;
         }
 
+        setUpdatesEnabled(updt);
 
     }
 }
@@ -938,6 +1012,20 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->spinStrideStart, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
     connect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
+
+
+    connect(ui->cmbRangeCenterColor, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
+    connect(ui->cmbRangeCenterStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
+    connect(ui->chkRangeDrawCenter, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    connect(ui->chkRangeFillRange, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    connect(ui->chkRangeInverted, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    connect(ui->spinRangeCenterWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->edtRangeCenter, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->edtRangeStart, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->edtRangeEnd, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->sliderRangeCenterTransparency, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+
+
     connect(fitfuncValuesTable, SIGNAL(fitParamChanged()), this, SLOT(writeGraphData()));
 }
 
@@ -998,6 +1086,16 @@ void QFTableGraphSettings::disconnectWidgets()
 
     disconnect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
     disconnect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
+    disconnect(ui->cmbRangeCenterColor, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
+    disconnect(ui->cmbRangeCenterStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
+    disconnect(ui->chkRangeDrawCenter, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    disconnect(ui->chkRangeFillRange, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    disconnect(ui->chkRangeInverted, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinRangeCenterWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->edtRangeCenter, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->edtRangeStart, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->edtRangeEnd, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->sliderRangeCenterTransparency, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     disconnect(fitfuncValuesTable, SIGNAL(fitParamChanged()), this, SLOT(writeGraphData()));
 }
 

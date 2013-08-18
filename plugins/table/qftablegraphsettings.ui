@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>582</width>
-    <height>850</height>
+    <height>955</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -183,6 +183,24 @@
       <property name="icon">
        <iconset resource="qfrdrtable.qrc">
         <normaloff>:/table/icons/plot_function.png</normaloff>:/table/icons/plot_function.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>horizontal range</string>
+      </property>
+      <property name="icon">
+       <iconset resource="qfrdrtable.qrc">
+        <normaloff>:/table/icons/plot_hrange.png</normaloff>:/table/icons/plot_hrange.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>vertical range</string>
+      </property>
+      <property name="icon">
+       <iconset resource="qfrdrtable.qrc">
+        <normaloff>:/table/icons/plot_vrange.png</normaloff>:/table/icons/plot_vrange.png</iconset>
       </property>
      </item>
     </widget>
@@ -469,7 +487,7 @@
      </layout>
     </widget>
    </item>
-   <item row="14" column="0">
+   <item row="15" column="0">
     <widget class="QLabel" name="labColor">
      <property name="font">
       <font>
@@ -485,7 +503,7 @@
      </property>
     </widget>
    </item>
-   <item row="14" column="1">
+   <item row="15" column="1">
     <widget class="QWidget" name="widColor" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_17" stretch="1,0,0,0">
       <property name="margin">
@@ -560,7 +578,7 @@
       <item>
        <widget class="QSpinBox" name="spinBox_8">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="font">
          <font>
@@ -578,7 +596,7 @@
      </layout>
     </widget>
    </item>
-   <item row="15" column="0">
+   <item row="16" column="0">
     <widget class="QLabel" name="labLinestyle">
      <property name="font">
       <font>
@@ -594,7 +612,7 @@
      </property>
     </widget>
    </item>
-   <item row="15" column="1">
+   <item row="16" column="1">
     <widget class="QWidget" name="widLineStyle" native="true">
      <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0,0,0,0,0">
       <property name="margin">
@@ -620,25 +638,6 @@
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QDoubleSpinBox" name="spinLineWidth">
-        <property name="prefix">
-         <string/>
-        </property>
-        <property name="suffix">
-         <string/>
-        </property>
-        <property name="maximum">
-         <double>100.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>5.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -668,10 +667,29 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="3">
+       <widget class="QDoubleSpinBox" name="spinLineWidth">
+        <property name="prefix">
+         <string/>
+        </property>
+        <property name="suffix">
+         <string/>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
-   <item row="16" column="0">
+   <item row="17" column="0">
     <widget class="QLabel" name="labFillColor">
      <property name="font">
       <font>
@@ -687,7 +705,7 @@
      </property>
     </widget>
    </item>
-   <item row="16" column="1">
+   <item row="17" column="1">
     <widget class="QWidget" name="widFillColor" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="1,0,0">
       <property name="margin">
@@ -752,7 +770,7 @@
       <item>
        <widget class="QSpinBox" name="spinBox_7">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="font">
          <font>
@@ -770,7 +788,7 @@
      </layout>
     </widget>
    </item>
-   <item row="17" column="0">
+   <item row="18" column="0">
     <widget class="QLabel" name="labSymbol">
      <property name="font">
       <font>
@@ -786,7 +804,7 @@
      </property>
     </widget>
    </item>
-   <item row="17" column="1">
+   <item row="18" column="1">
     <widget class="QWidget" name="widSymbol" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_22" stretch="1,0,0">
       <property name="margin">
@@ -837,7 +855,7 @@
      </layout>
     </widget>
    </item>
-   <item row="19" column="0">
+   <item row="20" column="0">
     <widget class="QLabel" name="labErrorStyle">
      <property name="font">
       <font>
@@ -853,7 +871,7 @@
      </property>
     </widget>
    </item>
-   <item row="19" column="1">
+   <item row="20" column="1">
     <widget class="QWidget" name="widErrorStyle" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="1,0,1,0,0,0">
       <property name="margin">
@@ -936,7 +954,7 @@
       <item>
        <widget class="QSpinBox" name="spinBox_4">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="font">
          <font>
@@ -954,7 +972,7 @@
      </layout>
     </widget>
    </item>
-   <item row="20" column="0">
+   <item row="21" column="0">
     <widget class="QLabel" name="labImage">
      <property name="font">
       <font>
@@ -970,7 +988,7 @@
      </property>
     </widget>
    </item>
-   <item row="20" column="1">
+   <item row="21" column="1">
     <widget class="QWidget" name="widImage" native="true">
      <layout class="QGridLayout" name="gridLayout_5" rowminimumheight="0,0,0,0,0,0,0,0,0,0,0">
       <property name="margin">
@@ -1411,7 +1429,7 @@
          <item>
           <widget class="QSpinBox" name="spinBox_9">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="font">
             <font>
@@ -1478,7 +1496,7 @@
          <item>
           <widget class="QSpinBox" name="spinBox_10">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="font">
             <font>
@@ -1539,7 +1557,7 @@
      </layout>
     </widget>
    </item>
-   <item row="22" column="1">
+   <item row="24" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -1751,7 +1769,7 @@
      </property>
     </widget>
    </item>
-   <item row="18" column="0">
+   <item row="19" column="0">
     <widget class="QLabel" name="labWidth">
      <property name="font">
       <font>
@@ -1767,9 +1785,12 @@
      </property>
     </widget>
    </item>
-   <item row="18" column="1">
+   <item row="19" column="1">
     <widget class="QWidget" name="widWidth" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="margin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QDoubleSpinBox" name="edtWidth">
         <property name="sizePolicy">
@@ -1840,9 +1861,249 @@
      </layout>
     </widget>
    </item>
+   <item row="14" column="0">
+    <widget class="QLabel" name="labRangeData">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>range data:</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmbColormap</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="1">
+    <widget class="QWidget" name="widRangeData" native="true">
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>start:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QFDoubleEdit" name="edtRangeStart">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>end:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QFDoubleEdit" name="edtRangeEnd">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>center:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QFDoubleEdit" name="edtRangeCenter">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="22" column="0">
+    <widget class="QLabel" name="labRangeStyle">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>range style:</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmbColormap</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="22" column="1">
+    <widget class="QWidget" name="widRangeStyle" native="true">
+     <layout class="QGridLayout" name="gridLayout_3">
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <item row="2" column="1">
+       <widget class="LineStyleComboBox" name="cmbRangeCenterStyle">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="ColorComboBox" name="cmbRangeCenterColor">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLabel" name="label9_2">
+        <property name="text">
+         <string>width: </string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="chkRangeDrawCenter">
+        <property name="text">
+         <string>center line</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QSpinBox" name="spinBox_5">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>7</pointsize>
+         </font>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::NoButtons</enum>
+        </property>
+        <property name="maximum">
+         <number>255</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" colspan="2">
+       <widget class="QSlider" name="sliderRangeCenterTransparency">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>32</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximum">
+         <number>255</number>
+        </property>
+        <property name="singleStep">
+         <number>5</number>
+        </property>
+        <property name="pageStep">
+         <number>50</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="invertedAppearance">
+         <bool>true</bool>
+        </property>
+        <property name="invertedControls">
+         <bool>false</bool>
+        </property>
+        <property name="tickPosition">
+         <enum>QSlider::NoTicks</enum>
+        </property>
+        <property name="tickInterval">
+         <number>50</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3" colspan="2">
+       <widget class="QDoubleSpinBox" name="spinRangeCenterWidth">
+        <property name="prefix">
+         <string/>
+        </property>
+        <property name="suffix">
+         <string/>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" colspan="3">
+       <widget class="QCheckBox" name="chkRangeInverted">
+        <property name="text">
+         <string>inverted</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="chkRangeFillRange">
+        <property name="text">
+         <string>fill range</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QFFitFunctionComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qffitfunctioncombobox.h</header>
+  </customwidget>
   <customwidget>
    <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
@@ -1876,19 +2137,14 @@
    <extends>QComboBox</extends>
    <header>jkqtpimageelements.h</header>
   </customwidget>
-  <customwidget>
-   <class>QFFitFunctionComboBox</class>
-   <extends>QComboBox</extends>
-   <header>qffitfunctioncombobox.h</header>
-  </customwidget>
  </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="qfrdrtable.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="qfrdrtable.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
@@ -1899,12 +2155,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>591</x>
-     <y>254</y>
+     <x>544</x>
+     <y>474</y>
     </hint>
     <hint type="destinationlabel">
-     <x>638</x>
-     <y>254</y>
+     <x>572</x>
+     <y>475</y>
     </hint>
    </hints>
   </connection>
@@ -1915,12 +2171,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>586</x>
-     <y>302</y>
+     <x>544</x>
+     <y>520</y>
     </hint>
     <hint type="destinationlabel">
-     <x>634</x>
-     <y>302</y>
+     <x>572</x>
+     <y>521</y>
     </hint>
    </hints>
   </connection>
@@ -1931,12 +2187,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>601</x>
-     <y>352</y>
+     <x>544</x>
+     <y>589</y>
     </hint>
     <hint type="destinationlabel">
-     <x>638</x>
-     <y>354</y>
+     <x>572</x>
+     <y>590</y>
     </hint>
    </hints>
   </connection>
@@ -1947,12 +2203,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>72</x>
-     <y>224</y>
+     <x>81</x>
+     <y>400</y>
     </hint>
     <hint type="destinationlabel">
-     <x>161</x>
-     <y>235</y>
+     <x>299</x>
+     <y>403</y>
     </hint>
    </hints>
   </connection>
@@ -1963,12 +2219,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>157</x>
-     <y>525</y>
+     <x>214</x>
+     <y>755</y>
     </hint>
     <hint type="destinationlabel">
-     <x>230</x>
-     <y>524</y>
+     <x>350</x>
+     <y>755</y>
     </hint>
    </hints>
   </connection>
@@ -1979,12 +2235,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>522</y>
+     <x>214</x>
+     <y>755</y>
     </hint>
     <hint type="destinationlabel">
-     <x>422</x>
-     <y>530</y>
+     <x>430</x>
+     <y>755</y>
     </hint>
    </hints>
   </connection>
@@ -1995,12 +2251,124 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>113</x>
-     <y>521</y>
+     <x>214</x>
+     <y>755</y>
     </hint>
     <hint type="destinationlabel">
-     <x>512</x>
-     <y>531</y>
+     <x>566</x>
+     <y>755</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_8</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sliderPlotTransparent</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>567</x>
+     <y>463</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>494</x>
+     <y>465</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_7</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sliderFillTransparent</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>555</x>
+     <y>509</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>498</x>
+     <y>510</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_4</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sliderErrorTransparent</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>566</x>
+     <y>577</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>490</x>
+     <y>581</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliderImageTrueColor</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_10</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>500</x>
+     <y>677</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>560</x>
+     <y>677</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliderImageFalseColor</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_9</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>518</x>
+     <y>693</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>564</x>
+     <y>687</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_10</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sliderImageTrueColor</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>563</x>
+     <y>674</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>488</x>
+     <y>675</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_9</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sliderImageFalseColor</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>557</x>
+     <y>687</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>502</x>
+     <y>687</y>
     </hint>
    </hints>
   </connection>

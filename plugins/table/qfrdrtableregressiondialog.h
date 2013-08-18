@@ -22,6 +22,7 @@ class QFRDRTableRegressionDialog : public QDialog
     protected slots:
         void saveResults();
         void on_btnFit_clicked();
+        void updateFitStatistics();
         void replotGraph();
         void showHelp();
         void methodChanged(int method);
@@ -30,10 +31,11 @@ class QFRDRTableRegressionDialog : public QDialog
     private:
         Ui::QFRDRTableRegressionDialog *ui;
         QFRDRTable* table;
-        QVector<double> dataY, dataX, dataW, weights;
+        QVector<double> dataY, dataX, dataW, weights, residualsY, residualsYW;
         QList<QVariant> lastResults;
         QVector<double> lastResultD;
         QString resultComment;
+        QString resultStat;
         int datapoints;
         QString fitresult;
         int colX,  colY,  colW;

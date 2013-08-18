@@ -4,7 +4,7 @@
 #include <cmath>
 #include"qftools.h"
 
-bool QFFitFunction::estimateInitial(double *params, const double *dataX, const double *dataY, long N)
+bool QFFitFunction::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
 {
     return false;
 }

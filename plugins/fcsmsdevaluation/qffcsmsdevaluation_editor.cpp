@@ -183,8 +183,8 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     pltDistribution->get_plotter()->set_useAntiAliasingForGraphs(true);
     pltDistribution->set_displayMousePosition(false);
     pltDistribution->get_plotter()->set_keyFontSize(9);
-    pltDistribution->get_plotter()->set_keyXMargin(2);
-    pltDistribution->get_plotter()->set_keyYMargin(2);
+    //pltDistribution->get_plotter()->set_keyXMargin(2);
+    //pltDistribution->get_plotter()->set_keyYMargin(2);
     pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
 
     ovlDistRange=new JKQTPoverlayVerticalRange(0,0, pltDistribution->get_plotter());

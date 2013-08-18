@@ -204,8 +204,11 @@ class QFLIB_EXPORT QFFitFunction {
         */
         virtual QString transformParametersForAdditionalPlot(int plot, double* params) { return QString(""); }
 
-        /*! \brief if implemented (and returns \c true) this function tries to estimate the initial parameters of a fit function from provided data. */
-        virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N);
+        /*! \brief if implemented (and returns \c true) this function tries to estimate the initial parameters of a fit function from provided data. If called with NULL parameters, this should still return, whether guessing is possible at all!
+
+            The parameter fix is optional and may be ignored by the function. It indicates which values should be fixed to the value given in params for the estimation.
+         */
+        virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N, const bool *fix=NULL);
 
         /*! \brief numerically estimates the fitting function derivatives  \f$ J_n=\frac{\partial f}{\partial p_n}(x, \vec{p}) \f$ at the position
                    \f$ x \f$ with the given parameter vector \f$ \vec{p} \f$

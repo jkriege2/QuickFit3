@@ -1019,6 +1019,63 @@ void QFRDRTablePlotWidget::updateGraph() {
                 //pg->set_fillColor(fc);
                 //pg->set_style(g.style);
                 ui->plotter->addGraph(pg);
+            } else if (g.type==QFRDRTable::gtHorizontalRange) {
+                JKQTPhorizontalRange* pg=new JKQTPhorizontalRange(ui->plotter->get_plotter());
+                pg->set_title(g.title);
+                pg->set_lineWidth(g.linewidth);
+                QColor c=g.color;
+                c.setAlphaF(g.colorTransparent);
+                pg->set_color(c);
+
+                c=g.rangeCenterColor;
+                c.setAlphaF(g.rangeCenterColorTransparent);
+                pg->set_centerColor(c);
+
+                QColor fc=g.fillColor;
+                fc.setAlphaF(g.fillColorTransparent);
+                pg->set_fillColor(fc);
+                pg->set_style(g.style);
+                pg->set_fillRange(g.rangeFill);
+                pg->set_invertedRange(g.rangeInverted);
+                pg->set_plotCenterLine(g.rangeDrawCenter);
+                pg->set_plotRangeLines(g.drawLine);
+                pg->set_rangeMin(g.rangeStart);
+                pg->set_rangeMax(g.rangeEnd);
+                pg->set_rangeCenter(g.rangeCenter);
+                pg->set_centerStyle(g.rangeCenterStyle);
+                pg->set_centerLineWidth(g.rangeCenterStyle);
+                pg->set_lineWidth(g.linewidth);
+
+                ui->plotter->addGraph(pg);
+            } else if (g.type==QFRDRTable::gtVerticalRange) {
+                JKQTPverticalRange* pg=new JKQTPverticalRange(ui->plotter->get_plotter());
+                pg->set_title(g.title);
+                pg->set_lineWidth(g.linewidth);
+                QColor c=g.color;
+                c.setAlphaF(g.colorTransparent);
+                pg->set_color(c);
+
+                c=g.rangeCenterColor;
+                c.setAlphaF(g.rangeCenterColorTransparent);
+                pg->set_centerColor(c);
+
+                QColor fc=g.fillColor;
+                fc.setAlphaF(g.fillColorTransparent);
+                pg->set_fillColor(fc);
+                pg->set_style(g.style);
+                pg->set_fillRange(g.rangeFill);
+                pg->set_invertedRange(g.rangeInverted);
+                pg->set_plotCenterLine(g.rangeDrawCenter);
+                pg->set_plotRangeLines(g.drawLine);
+                pg->set_rangeMin(g.rangeStart);
+                pg->set_rangeMax(g.rangeEnd);
+                pg->set_rangeCenter(g.rangeCenter);
+                pg->set_centerLineWidth(g.rangeCenterStyle);
+                pg->set_centerStyle(g.rangeCenterStyle);
+                pg->set_lineWidth(g.linewidth);
+
+                ui->plotter->addGraph(pg);
+
             } else if (g.type==QFRDRTable::gtBoxplotY) {
                 JKQTPboxplotHorizontalGraph* pg=new JKQTPboxplotHorizontalGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);

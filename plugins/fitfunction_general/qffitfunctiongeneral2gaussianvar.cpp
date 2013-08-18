@@ -1,6 +1,7 @@
 #include "qffitfunctiongeneral2gaussianvar.h"
 #include "qfmathtools.h"
 #include <cmath>
+#include "statistics_tools.h"
 
 QFFitFunctionGeneral2GaussianVar::QFFitFunctionGeneral2GaussianVar() {
     //           type,         id,                        name,                                                    label (HTML),                      unit,          unitlabel (HTML),        fit,       userEditable, userRangeEditable, displayError, initialFix,                initialValue, minValue, maxValue, inc, absMin, absMax
@@ -51,4 +52,34 @@ QString QFFitFunctionGeneral2GaussianVar::transformParametersForAdditionalPlot(i
 bool QFFitFunctionGeneral2GaussianVar::get_implementsDerivatives()
 {
     return false;
+}
+
+bool QFFitFunctionGeneral2GaussianVar::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+{
+    if (params && dataX && dataY) {
+        double pW=0;
+        double pB=0;
+        double pH=0;
+        double pP=0;
+        double pW2=0;
+        double pH2=0;
+        double pP2=0;
+        if (statistics2PeakFind(pP, pW, pP2, pW2, dataX, dataY, N, 0.0, NAN, &pB, &pH, &pH2)) {
+            params[PARAM_OFFSET]=pB;
+            params[PARAM_AMPLITUDE]=pH;
+            params[PARAM_POSITION]=pP;
+            params[PARAM_WIDTH]=pW/2.3548;
+            if (statisticsFloatIsOK(pP2)) {
+                params[PARAM_AMPLITUDE2]=pH2;
+                params[PARAM_POSITION2]=pP2;
+                params[PARAM_WIDTH2]=pW2/2.3548;
+            }
+            return true;
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    return true;
 }

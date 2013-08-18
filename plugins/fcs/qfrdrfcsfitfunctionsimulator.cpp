@@ -27,8 +27,8 @@ QFRDRFCSFitFunctionSimulator::QFRDRFCSFitFunctionSimulator(QFPluginServices* ser
     ui->pltFunction->get_plotter()->set_useAntiAliasingForSystem(true);
     ui->pltFunction->get_plotter()->set_useAntiAliasingForGraphs(true);
     ui->pltFunction->get_plotter()->set_keyFontSize(9);
-    ui->pltFunction->get_plotter()->set_keyXMargin(2);
-    ui->pltFunction->get_plotter()->set_keyYMargin(2);
+    //ui->pltFunction->get_plotter()->set_keyXMargin(2);
+    //ui->pltFunction->get_plotter()->set_keyYMargin(2);
 
     tbEditRanges=new QTabBar(this);
     tbEditRanges->addTab(tr("Parameter Values"));

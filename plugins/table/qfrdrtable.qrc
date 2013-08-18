@@ -54,5 +54,7 @@
         <file alias="regression.png">icons/regression.png</file>
         <file>icons/plot_boxplotsx.png</file>
         <file>icons/plot_boxplotsy.png</file>
+        <file>icons/plot_hrange.png</file>
+        <file>icons/plot_vrange.png</file>
     </qresource>
 </RCC>

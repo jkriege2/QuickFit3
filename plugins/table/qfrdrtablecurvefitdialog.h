@@ -22,19 +22,22 @@ class QFRDRTableCurveFitDialog : public QDialog
     protected slots:
         void saveResults();
         void on_btnFit_clicked();
+        void on_btnGuess_clicked();
         void replotGraph();
         void showHelp();
         void methodChanged(int method);
+        void updateFitStatistics();
     protected:
         void connectSignals(bool connectS=true);
 
     private:
         Ui::QFRDRTableCurveFitDialog *ui;
         QFRDRTable* table;
-        QVector<double> dataY, dataX, dataW, weights;
+        QVector<double> dataY, dataX, dataW, weights, residualsY, residualsYW;
         QList<QVariant> lastResults;
         QVector<double> lastResultD;
         QString resultComment;
+        QString resultStat;
         int datapoints;
         QString fitresult;
         int colX,  colY,  colW;
