@@ -148,6 +148,13 @@ QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int co
 
 
 
+    QSettings* set=ProgramOptions::getInstance()->getQSettings();
+    if (set) {
+        loadWidgetGeometry(*set, this, pos(), size(), "QFRDRTableRegressionDialog/windowsize");
+        ui->chkPlotErrors->setChecked(set->value("QFRDRTableRegressionDialog/ploterrors", ui->chkPlotErrors->isChecked()).toBool());
+        ui->chkWeightedResiduals->setChecked(set->value("QFRDRTableRegressionDialog/weightedresiduals", ui->chkWeightedResiduals->isChecked()).toBool());
+        ui->cmbFitType->setCurrentIndex(set->value("QFRDRTableRegressionDialog/method", ui->cmbFitType->currentIndex()).toInt());
+    }
 
 
 
@@ -159,6 +166,13 @@ QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int co
 
 QFRDRTableRegressionDialog::~QFRDRTableRegressionDialog()
 {
+    QSettings* set=ProgramOptions::getInstance()->getQSettings();
+    if (set) {
+        saveWidgetGeometry(*set, this, "QFRDRTableRegressionDialog/windowsize");
+        set->setValue("QFRDRTableRegressionDialog/ploterrors", ui->chkPlotErrors->isChecked());
+        set->setValue("QFRDRTableRegressionDialog/weightedresiduals", ui->chkWeightedResiduals->isChecked());
+        set->setValue("QFRDRTableRegressionDialog/method", ui->cmbFitType->currentIndex());
+    }
     delete ui;
 }
 

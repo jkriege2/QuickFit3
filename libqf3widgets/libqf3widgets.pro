@@ -114,7 +114,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/qt/jkautooutputtimer.h \
     qfrecentfilesmenu.h \
     qfstageconfigwidgetthread.h \
-    qfstageconfigwidget.h
+    qfstageconfigwidget.h \
+    ../../../../LIB/trunk/qt/fillstylecombobox.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -191,7 +192,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     ../../../../LIB/trunk/qt/jkautooutputtimer.cpp \
     qfrecentfilesmenu.cpp \
     qfstageconfigwidgetthread.cpp \
-    qfstageconfigwidget.cpp
+    qfstageconfigwidget.cpp \
+    ../../../../LIB/trunk/qt/fillstylecombobox.cpp
 
 
 FORMS += qfdlg_csvparameters.ui \

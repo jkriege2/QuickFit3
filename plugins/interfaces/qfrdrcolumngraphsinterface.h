@@ -26,7 +26,14 @@ class QFRDRColumnGraphsInterface {
             cgtQFFitFunction,
             cgtImage,
             cgtRGBImage,
-            cgtMaskImage
+            cgtMaskImage,
+            cgtHorizontalRange,
+            cgtVerticalRange
+        };
+
+        enum Orientation {
+            cgoHorizontal,
+            cgoVertical
         };
 
         enum ErrorGraphTypes {
@@ -91,6 +98,8 @@ class QFRDRColumnGraphsInterface {
             cgsTarget=12
         };
 
+
+
         /** \brief add a plot of  columnX against columnY to the given graph */
         virtual void colgraphAddPlot(int graph, int columnX, int columnY, ColumnGraphTypes type, const QString&  title)=0;
         /** \brief add a plot of  columnX against columnY to the given graph */
@@ -109,6 +118,14 @@ class QFRDRColumnGraphsInterface {
         virtual void colgraphSetGraphTitle(int graph, const QString&  title)=0;
         /** \brief returns the graph title */
         virtual QString colgraphGetGraphTitle(int graph)=0;
+
+        /** \brief set the line style of the graph */
+        virtual void colgraphSetPlotLineStyle(int graph,  int plot,  Qt::PenStyle  style)=0;
+        /** \brief set the line width of the graph */
+        virtual void colgraphSetPlotLineWidth(int graph,  int plot,  double width)=0;
+        /** \brief set the line style of the graph */
+        virtual void colgraphSetPlotFillStyle(int graph,  int plot,  Qt::BrushStyle  style)=0;
+
         /** \brief set the color of the graph, the fill and error color are determined automatically */
         virtual void colgraphSetPlotColor(int graph,  int plot,  QColor  color)=0;
         /** \brief set the color of the graph, the error color is determined automatically */
@@ -165,6 +182,9 @@ class QFRDRColumnGraphsInterface {
         /** \brief add a mask image plot which
          */
         virtual void colgraphAddImageMaskPlot(int graph, int imageColumn, double x, double y, double width, double height, int Nx, const QString& title, QColor trueColor=QColor("black"), QColor falseColor=QColor("transparent"))=0;
+        /** \brief add a range plot
+         */
+        virtual void colgraphAddRangePlot(int graph, Orientation orientation, double rangeStart, double rangeEnd, double rangeCenter, const QString& title, bool invertRange=false, bool fillrange=true, bool drawRangeLines=true, bool drawRangeCenter=true, QColor centerColor=QColor("red"),  Qt::PenStyle centerStyle=Qt::SolidLine, double centerWidth=1.0)=0;
         /** \brief add an RGB image plot which
          */
         virtual void colgraphAddRGBImagePlot(int graph, int imageRColumn, int imageGColumn, int imageBColumn, double x, double y, double width, double height, int Nx, const QString& title)=0;

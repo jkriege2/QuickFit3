@@ -698,7 +698,7 @@
       </font>
      </property>
      <property name="text">
-      <string>fill color:</string>
+      <string>fill style:</string>
      </property>
      <property name="buddy">
       <cstring>cmbFillColor</cstring>
@@ -707,7 +707,7 @@
    </item>
    <item row="17" column="1">
     <widget class="QWidget" name="widFillColor" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="1,0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="0,0,0,0,0">
       <property name="margin">
        <number>0</number>
       </property>
@@ -784,6 +784,19 @@
          <number>255</number>
         </property>
        </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_34">
+        <property name="text">
+         <string> style: </string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="FillStyleComboBox" name="cmbFillStyle"/>
       </item>
      </layout>
     </widget>
@@ -2137,6 +2150,11 @@
    <extends>QComboBox</extends>
    <header>jkqtpimageelements.h</header>
   </customwidget>
+  <customwidget>
+   <class>FillStyleComboBox</class>
+   <extends>QComboBox</extends>
+   <header>fillstylecombobox.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
@@ -2145,6 +2163,7 @@
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>

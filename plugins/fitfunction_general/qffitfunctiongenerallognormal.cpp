@@ -49,9 +49,26 @@ bool QFFitFunctionGeneralLogNormal::get_implementsDerivatives()
 void QFFitFunctionGeneralLogNormal::evaluateDerivatives(double* derivatives, double t, const double* data) const {
 }
 
-bool QFFitFunctionGeneralLogNormal::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
+bool QFFitFunctionGeneralLogNormal::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
+    if (params && dataX && dataY) {
+        StatisticsScopedPointer<double> dX=statisticsDuplicateAndApply(dataX, N, log);
+        double pW=0;
+        double pB=0;
+        double pH=0;
+        double pP=statisticsPeakFind(pW, dX.data(), dataY, N, 0.0, NAN, &pB, &pH);
+        if (statisticsFloatIsOK(pP)) {
+            params[PARAM_OFFSET]=pB;
+            params[PARAM_AMPLITUDE]=pH;
+            params[PARAM_POSITION]=pP;
+            params[PARAM_WIDTH]=pW/2.3548;
+            return true;
+        } else {
+            return false;
+        }
+        return true;
+    }
 
-    return QFFitFunction::estimateInitial(params, dataX, dataY, N);
+    return true;
 }

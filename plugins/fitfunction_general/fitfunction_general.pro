@@ -19,6 +19,7 @@ HEADERS += qfgeneralfitfunctionsplugin.h \
     qffitfunctiongeneralpolynom.h \
     qffitfunctiongeneralsine.h \
     qffitfunctiongenerallognormal.h \
+    qffitfunctiongeneral2lognormal.h \
     qffitfunctiongeneralline.h \
     qffitfunctiongeneral3gaussianvar.h \
     qffitfunctiongeneral2gaussianvar.h
@@ -34,6 +35,7 @@ SOURCES += qfgeneralfitfunctionsplugin.cpp\
     qffitfunctiongeneralsine.cpp \
     qffitfunctiongeneralpolynom.cpp \
     qffitfunctiongenerallognormal.cpp \
+    qffitfunctiongeneral2lognormal.cpp \
     qffitfunctiongeneralline.cpp \
     qffitfunctiongeneral3gaussianvar.cpp \
     qffitfunctiongeneral2gaussianvar.cpp

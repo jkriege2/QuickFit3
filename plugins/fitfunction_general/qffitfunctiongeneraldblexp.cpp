@@ -51,9 +51,30 @@ bool QFFitFunctionGeneralDblExp::get_implementsDerivatives()
 void QFFitFunctionGeneralDblExp::evaluateDerivatives(double* derivatives, double t, const double* data) const {
 }
 
-bool QFFitFunctionGeneralDblExp::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
+
+bool QFFitFunctionGeneralDblExp::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
+    if (params && dataX && dataY) {
 
-    return QFFitFunction::estimateInitial(params, dataX, dataY, N);
+        StatisticsScopedPointer<double> dY=statisticsDuplicateAndApply(dataY, N, log);
+
+
+        double a=log(params[PARAM_AMPLITUDE]);
+        double b=-1.0/params[PARAM_LIFETIME];
+
+
+        if (fix) statisticsLinearRegression(dataX, dY.data(), N, a, b, fix[PARAM_AMPLITUDE], fix[PARAM_LIFETIME]);
+        else statisticsLinearRegression(dataX, dY.data(), N, a, b, false, false);
+
+        params[PARAM_OFFSET]=0;
+        params[PARAM_POSITION]=0;
+        params[PARAM_AMPLITUDE2]=params[PARAM_AMPLITUDE]=exp(a);
+        params[PARAM_LIFETIME2]=params[PARAM_LIFETIME]=-1.0/b;
+    }
+
+    return true;
+
 }
+
+

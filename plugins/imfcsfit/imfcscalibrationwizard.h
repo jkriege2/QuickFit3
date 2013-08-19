@@ -26,6 +26,8 @@ class ImFCSCalibrationWizard : public QWidget
         void showTutorial();
         void loadFile();
         void correlate();
+    protected:
+        void closeEvent(QCloseEvent *event);
     protected slots:
         void on_btnReset_clicked();
         void on_btnUnlock_clicked();

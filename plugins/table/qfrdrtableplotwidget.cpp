@@ -556,6 +556,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 fc.setAlphaF(g.fillColorTransparent);
                 //pg->set_fillColor(fc);
                 //pg->set_style(g.style);
+                //pg->set_fillStyle(g.fillStyle);
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtImpulsesHorizontal) {
                 JKQTPimpulsesHorizontalErrorGraph* pg=new JKQTPimpulsesHorizontalErrorGraph(ui->plotter->get_plotter());
@@ -630,6 +631,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 fc.setAlphaF(g.fillColorTransparent);
                 pg->set_fillColor(fc);
                 pg->set_style(g.style);
+                pg->set_fillStyle(g.fillStyle);
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtBarsVertical) {
                 JKQTPbarHorizontalGraph* pg=new JKQTPbarHorizontalGraph(ui->plotter->get_plotter());
@@ -668,6 +670,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 fc.setAlphaF(g.fillColorTransparent);
                 pg->set_fillColor(fc);
                 pg->set_style(g.style);
+                pg->set_fillStyle(g.fillStyle);
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtFilledCurveX) {
                 JKQTPfilledCurveXErrorGraph* pg=new JKQTPfilledCurveXErrorGraph(ui->plotter->get_plotter());
@@ -703,6 +706,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
                 pg->set_fillColor(fc);
+                pg->set_fillStyle(g.fillStyle);
                 pg->set_style(g.style);
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtFilledCurveY) {
@@ -734,6 +738,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
                 pg->set_fillColor(fc);
+                pg->set_fillStyle(g.fillStyle);
                 pg->set_style(g.style);
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtStepsHorizontal) {
@@ -771,6 +776,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
                 pg->set_fillColor(fc);
+                pg->set_fillStyle(g.fillStyle);
                 pg->set_style(g.style);
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtStepsVertical) {
@@ -808,6 +814,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
                 pg->set_fillColor(fc);
+                pg->set_fillStyle(g.fillStyle);
                 pg->set_style(g.style);
                 ui->plotter->addGraph(pg);
 
@@ -992,6 +999,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                     QColor fc=g.fillColor;
                     fc.setAlphaF(g.fillColorTransparent);
                     pg->set_fillColor(fc);
+                    pg->set_fillStyle(g.fillStyle);
                     pg->set_style(g.style);
                     ui->plotter->addGraph(pg);
                 }
@@ -1034,6 +1042,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
                 pg->set_fillColor(fc);
+                pg->set_fillStyle(g.fillStyle);
                 pg->set_style(g.style);
                 pg->set_fillRange(g.rangeFill);
                 pg->set_invertedRange(g.rangeInverted);
@@ -1062,6 +1071,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
                 pg->set_fillColor(fc);
+                pg->set_fillStyle(g.fillStyle);
                 pg->set_style(g.style);
                 pg->set_fillRange(g.rangeFill);
                 pg->set_invertedRange(g.rangeInverted);

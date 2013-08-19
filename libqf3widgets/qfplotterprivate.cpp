@@ -121,6 +121,8 @@ void QFPlotterPrivate::copyToTable()
                         JKQTPColumnMathImage* colig=dynamic_cast<JKQTPColumnMathImage*>(g);
                         JKQTPColumnRGBMathImage* colrgbg=dynamic_cast<JKQTPColumnRGBMathImage*>(g);
                         JKQTPColumnOverlayImageEnhanced* colmask=dynamic_cast<JKQTPColumnOverlayImageEnhanced*>(g);
+                        JKQTPhorizontalRange* hrange=dynamic_cast<JKQTPhorizontalRange*>(g);
+                        JKQTPverticalRange* vrange=dynamic_cast<JKQTPverticalRange*>(g);
                         QFRDRColumnGraphsInterface::ColumnGraphTypes type=QFRDRColumnGraphsInterface::cgtLinesPoints;
                         QFRDRColumnGraphsInterface::ColumnGraphSymbols symbol=QFRDRColumnGraphsInterface::cgsFilledCircle;
 
@@ -129,6 +131,7 @@ void QFPlotterPrivate::copyToTable()
                         JKQTPOverlayImage* mask=dynamic_cast<JKQTPOverlayImage*>(g);
 
                         double symbolSize=15.0;
+                        Qt::BrushStyle fillstyle=Qt::SolidPattern;
 
                         if (xyg) {
                             QColor color=QColor("red");
@@ -144,9 +147,18 @@ void QFPlotterPrivate::copyToTable()
                                 else if (!xylg->get_drawLine() && xylg->get_symbol()!=JKQTPnoSymbol) type=QFRDRColumnGraphsInterface::cgtPoints;
                             }
                             if (dynamic_cast<JKQTPimpulsesHorizontalGraph*>(g) || dynamic_cast<JKQTPimpulsesVerticalGraph*>(g)) type=QFRDRColumnGraphsInterface::cgtImpulses;
-                            if (dynamic_cast<JKQTPfilledCurveXGraph*>(g) || dynamic_cast<JKQTPfilledCurveYGraph*>(g)) ;
-                            if (dynamic_cast<JKQTPstepHorizontalGraph*>(g) || dynamic_cast<JKQTPstepVerticalGraph*>(g)) type=QFRDRColumnGraphsInterface::cgtSteps;
-                            if (dynamic_cast<JKQTPbarHorizontalGraph*>(g) || dynamic_cast<JKQTPbarVerticalGraph*>(g)) type=QFRDRColumnGraphsInterface::cgtBars;
+                            if (dynamic_cast<JKQTPfilledCurveXGraph*>(g) || dynamic_cast<JKQTPfilledCurveYGraph*>(g)) {
+                                fillstyle=dynamic_cast<JKQTPfilledCurveXGraph*>(g)->get_fillStyle();
+                            }
+                            if (dynamic_cast<JKQTPstepHorizontalGraph*>(g) || dynamic_cast<JKQTPstepVerticalGraph*>(g)) {
+                                type=QFRDRColumnGraphsInterface::cgtSteps;
+                                fillstyle=dynamic_cast<JKQTPstepHorizontalGraph*>(g)->get_fillStyle();
+                            }
+                            if (dynamic_cast<JKQTPbarHorizontalGraph*>(g) || dynamic_cast<JKQTPbarVerticalGraph*>(g)) {
+                                type=QFRDRColumnGraphsInterface::cgtBars;
+                                fillstyle=dynamic_cast<JKQTPbarHorizontalGraph*>(g)->get_fillStyle();
+
+                            }
 
                             int xcol=columns.value(xyg->get_xColumn(), -1);
                             int ycol=columns.value(xyg->get_yColumn(), -1);
@@ -179,6 +191,7 @@ void QFPlotterPrivate::copyToTable()
                                 cols->colgraphSetPlotErrorColor(graph, cols->colgraphGetPlotCount(graph)-1, errorColor);
                             }
                             cols->colgraphSetPlotSymbol(graph, cols->colgraphGetPlotCount(graph)-1, symbol, symbolSize);
+                            cols->colgraphSetPlotFillStyle(graph, cols->colgraphGetPlotCount(graph)-1, fillstyle);
 
                         } else if (colig) {
                             cols->colgraphAddImagePlot(graph, columns.value(colig->get_imageColumn(),-1), QFRDRColumnGraphsInterface::ImageColorPalette((int)colig->get_palette()), colig->get_x(), colig->get_y(), colig->get_width(), colig->get_height(), colig->get_Nx(), colig->get_title());
@@ -261,7 +274,6 @@ void QFPlotterPrivate::copyToTable()
                             color=qfffg->get_color();
                             fillColor=qfffg->get_fillColor();
 
-
                             int pcol=columns.value(qfffg->get_parameterColumn(), -1);
 
                             if (pcol>=0) cols->colgraphAddFunctionPlot(graph, qfffg->get_fitFunction()->id(), type, qfffg->get_title(), pcol );
@@ -276,6 +288,9 @@ void QFPlotterPrivate::copyToTable()
                             if (errorColor!=QColor("red").darker()) {
                                 cols->colgraphSetPlotErrorColor(graph, cols->colgraphGetPlotCount(graph)-1, errorColor);
                             }
+                            fillstyle=qfffg->get_fillStyle();
+                            cols->colgraphSetPlotFillStyle(graph, cols->colgraphGetPlotCount(graph)-1, fillstyle);
+
                         } else if(qfmpg) {
                             QColor color=QColor("red");
                             QColor fillColor=color.lighter();
@@ -299,7 +314,30 @@ void QFPlotterPrivate::copyToTable()
                             if (errorColor!=QColor("red").darker()) {
                                 cols->colgraphSetPlotErrorColor(graph, cols->colgraphGetPlotCount(graph)-1, errorColor);
                             }
+                            fillstyle=qfffg->get_fillStyle();
+                            cols->colgraphSetPlotFillStyle(graph, cols->colgraphGetPlotCount(graph)-1, fillstyle);
+                        } else if (hrange) {
+                            QColor color=QColor("red");
+                            QColor fillColor=color.lighter();
+                            color=hrange->get_color();
+                            fillColor=hrange->get_fillColor();
+                            QFRDRColumnGraphsInterface::Orientation ori = QFRDRColumnGraphsInterface::cgoHorizontal;
+                            if (vrange) ori=QFRDRColumnGraphsInterface::cgoVertical;
 
+
+                            // ADD PLOT
+                            cols->colgraphAddRangePlot(graph, ori, hrange->get_rangeMin(), hrange->get_rangeMax(), hrange->get_rangeCenter(), hrange->get_title(),
+                                                       hrange->get_invertedRange(), hrange->get_fillRange(), hrange->get_plotRangeLines(), hrange->get_plotCenterLine(),
+                                                       hrange->get_centerColor(), hrange->get_centerStyle(), hrange->get_centerLineWidth());
+
+                            if (color!=QColor("red")) {
+                                cols->colgraphSetPlotColor(graph, cols->colgraphGetPlotCount(graph)-1, color);
+                            }
+                            if (fillColor!=QColor("red").lighter()) {
+                                cols->colgraphSetPlotFillColor(graph, cols->colgraphGetPlotCount(graph)-1, fillColor);
+                            }
+                            fillstyle=hrange->get_fillStyle();
+                            cols->colgraphSetPlotFillStyle(graph, cols->colgraphGetPlotCount(graph)-1, fillstyle);
                         }
                     }
                 }

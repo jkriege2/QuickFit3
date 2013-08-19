@@ -26,6 +26,7 @@ QFRDRTable::GraphInfo::GraphInfo() {
     width=0.9;
     shift=0;
     style=Qt::SolidLine;
+    fillStyle=Qt::SolidPattern;
     color=QColor("red");
     errorColor=color.darker();
     linewidth=1;
@@ -420,6 +421,12 @@ void QFRDRTable::colgraphToolsSetGraphtype(QFRDRTable::GraphInfo &g, QFRDRColumn
         case QFRDRColumnGraphsInterface::cgtQFFitFunction:
             g.type=gtFunction;
             break;
+        case QFRDRColumnGraphsInterface::cgtHorizontalRange:
+            g.type=gtHorizontalRange;
+            break;
+        case QFRDRColumnGraphsInterface::cgtVerticalRange:
+            g.type=gtVerticalRange;
+            break;
     }
 }
 
@@ -590,7 +597,34 @@ void QFRDRTable::colgraphAddRGBImagePlot(int graph, int imageRColumn, int imageG
 
         setPlot(graph, plt);
         emitRebuildPlotWidgets();
-     }
+    }
+}
+
+void QFRDRTable::colgraphAddRangePlot(int graph, QFRDRTable::Orientation orientation, double rangeStart, double rangeEnd, double rangeCenter, const QString &title, bool invertRange, bool fillrange, bool drawRangeLines, bool drawRangeCenter, QColor centerColor, Qt::PenStyle centerStyle, double centerWidth)
+{
+    if (graph>=0 && graph<plots.size()) {
+
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        QFRDRTable::GraphInfo g;
+        g.type=QFRDRTable::gtHorizontalRange;
+        if (orientation==QFRDRTable::cgoVertical) g.type=QFRDRTable::gtVerticalRange;
+        g.title=title;
+        g.rangeCenter=rangeCenter;
+        g.rangeCenterColor=centerColor;
+        g.rangeCenterColorTransparent=centerColor.alphaF();
+        g.rangeCenterStyle=centerStyle;
+        g.rangeCenterWidth=centerWidth;
+        g.rangeDrawCenter=drawRangeCenter;
+        g.rangeEnd=rangeEnd;
+        g.rangeFill=fillrange;
+        g.rangeInverted=invertRange;
+        g.rangeStart=rangeStart;
+        g.drawLine=drawRangeLines;
+        plt.graphs.append(g);
+
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
 }
 
 void QFRDRTable::colgraphSetImagePlotModifier(int graph, int plot, int imageModifierColumn, QFRDRColumnGraphsInterface::ImageModifierMode mode)
@@ -665,6 +699,43 @@ void QFRDRTable::colgraphRemovePlot(int graph, int plot)
         setPlot(graph, plt);
         emitRebuildPlotWidgets();
     }
+}
+
+void QFRDRTable::colgraphSetPlotLineStyle(int graph, int plot, Qt::PenStyle style)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            plt.graphs[plot].style=style;
+        }
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetPlotLineWidth(int graph, int plot, double width)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            plt.graphs[plot].linewidth=width;
+        }
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetPlotFillStyle(int graph, int plot, Qt::BrushStyle style)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            plt.graphs[plot].fillStyle=style;
+        }
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
+
 }
 
 void QFRDRTable::colgraphSetPlotColor(int graph, int plot, QColor color)
@@ -1266,6 +1337,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.fillColor=QStringToQColor(ge.attribute("fillcolor", "blue"));
                     //qDebug()<<ge.attribute("type")<<ge.attribute("fillcolor", "blue");
                     graph.style=String2QPenStyle(ge.attribute("style", "solid"));
+                    graph.fillStyle=String2QBrushStyle(ge.attribute("fill_style", "solid"));
                     graph.symbol=String2JKQTPgraphSymbols(ge.attribute("symbol", "symbol_cross"));
                     graph.errorStyle=String2JKQTPerrorPlotstyle(ge.attribute("errorStyle", "error_none"));
                     graph.colorTransparent=CQStringToDouble(ge.attribute("color_trans", "1"));
@@ -1447,6 +1519,7 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("linewidth", CDoubleToQString(plots[i].graphs[g].linewidth));
             w.writeAttribute("symbolSize", CDoubleToQString(plots[i].graphs[g].symbolSize));
             w.writeAttribute("style", QPenStyle2String(plots[i].graphs[g].style));
+            w.writeAttribute("fill_style", QBrushStyle2String(plots[i].graphs[g].fillStyle));
             w.writeAttribute("color", QColor2String(plots[i].graphs[g].color));
             w.writeAttribute("errorcolor", QColor2String(plots[i].graphs[g].errorColor));
             w.writeAttribute("fillcolor", QColor2String(plots[i].graphs[g].fillColor));

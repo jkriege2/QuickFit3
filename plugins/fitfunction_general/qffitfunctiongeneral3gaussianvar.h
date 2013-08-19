@@ -39,6 +39,7 @@ class QFFitFunctionGeneral3GaussianVar: public QFFitFunction {
 
         /*! \copydoc QFFitFunction::evaluateDerivatives()   */
         virtual void evaluateDerivatives(double* derivatives, double t, const double* parameters) const ;
+        bool estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix=NULL);
 };
 
 #endif // QFFitFunctionGeneral3GaussianVar_H

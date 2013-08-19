@@ -250,6 +250,7 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.errorStyle=ui->cmbErrorStyle->getErrorStyle();
         graph.symbol=ui->cmbSymbol->getSymbol();
         graph.style=ui->cmbLineStyle->currentLineStyle();
+        graph.fillStyle=ui->cmbFillStyle->currentFillStyle();
         graph.linewidth=ui->spinLineWidth->value();
         graph.symbolSize=ui->spinSymbolSize->value();
         graph.drawLine=ui->chkDrawLine->isChecked();
@@ -381,6 +382,7 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->cmbErrorStyle->setSymbol(graph.errorStyle);
     ui->cmbSymbol->setSymbol(graph.symbol);
     ui->cmbLineStyle->setCurrentLineStyle(graph.style);
+    ui->cmbFillStyle->setCurrentFillStyle(graph.fillStyle);
     ui->spinLineWidth->setValue(graph.linewidth);
     ui->spinSymbolSize->setValue(graph.symbolSize);
     ui->chkDrawLine->setChecked(graph.drawLine);
@@ -979,6 +981,7 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->cmbErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbLineColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbLineStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbFillStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbSymbol, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->chkDrawLine, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->spinLineWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
@@ -1052,6 +1055,7 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->cmbErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbLineColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbLineStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbFillStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbSymbol, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbModifierMode, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->chkDrawLine, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));

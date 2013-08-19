@@ -1,24 +1,24 @@
-#ifndef QFFitFunctionGeneralLorentzian_H
-#define QFFitFunctionGeneralLorentzian_H
+#ifndef QFFitFunctionGeneral2LogNormal_H
+#define QFFitFunctionGeneral2LogNormal_H
 #include "qfpluginfitfunction.h"
 
 
 
 
 /*! \brief QFFitFunction class for fit function
-    \ingroup qf3fitfunp_fitfunctions_general
+    \ingroup qf3fitfunp_fitfunction_general
 
 */
-class QFFitFunctionGeneralLorentzian: public QFFitFunction {
+class QFFitFunctionGeneral2LogNormal: public QFFitFunction {
     public:
-        QFFitFunctionGeneralLorentzian();
-        virtual ~QFFitFunctionGeneralLorentzian() {}
+        QFFitFunctionGeneral2LogNormal();
+        virtual ~QFFitFunctionGeneral2LogNormal() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QObject::tr("Peaks: Lorentzian function"); };
+        virtual QString name() const { return QObject::tr("Peaks: Double Log-Normal distribution"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return name(); };
+        virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("gen_lorentzian"); };
+        virtual QString id() const { return QString("gen_2lognormal"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
@@ -39,7 +39,10 @@ class QFFitFunctionGeneralLorentzian: public QFFitFunction {
 
         /*! \copydoc QFFitFunction::evaluateDerivatives()   */
         virtual void evaluateDerivatives(double* derivatives, double t, const double* parameters) const ;
-        bool estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix=NULL);
+
+        /*! \brief if implemented (and returns \c true) this function tries to estimate the initial parameters of a fit function from provided data. */
+        virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N, const bool *fix=NULL);
+
 };
 
-#endif // QFFitFunctionGeneralLorentzian_H
+#endif // QFFitFunctionGeneral2LogNormal_H

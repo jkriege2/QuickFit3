@@ -19,8 +19,12 @@ ImFCSCalibrationWizard::ImFCSCalibrationWizard(QWidget *parent) :
 
 ImFCSCalibrationWizard::~ImFCSCalibrationWizard()
 {
-    saveWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "ImFCSCalibrationWizard");
     delete ui;
+}
+
+void ImFCSCalibrationWizard::closeEvent(QCloseEvent *event) {
+    saveWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "ImFCSCalibrationWizard");
+    QWidget::closeEvent(event);
 }
 
 QFPlotter *ImFCSCalibrationWizard::getPltD() const

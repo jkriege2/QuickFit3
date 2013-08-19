@@ -16,6 +16,7 @@
 #include "qfrawdatapropertyeditor.h"
 #include "qfselectionlistdialog.h"
 #include "statistics_tools.h"
+#include "qffcstools.h"
 #define sqr(x) qfSqr(x)
 
 #define CLICK_UPDATE_TIMEOUT 500
@@ -3328,23 +3329,24 @@ void QFRDRImagingFCSImageEditor::replotData() {
                 double C0=qfstatisticsAverage(CACF0);
                 double C1=qfstatisticsAverage(CACF1);
                 double CC=qfstatisticsAverage(CCCF);
-                double CCFLevel=0;
+
+                qfFCCSCrosstalkCorrection(C0, C1, CC, I0, I1, crosstalk,cmbCrosstalkDirection->currentIndex());
+                double CCFLevel=CC;
                 double ACFLevel=0;
+
                 QColor ACFColor=QColor("darkgreen");
                 QColor CCFColor=QColor("darkblue");
                 // see Bacia, Petrasek, Schwille, "Correcting Spectral Cross-Talk in Dual-Color FCCS", DOI: 10.1002/cphc.201100801
                 if (cmbCrosstalkDirection->currentIndex()==0) { // ACF0 -> 1   => correct ACF1
-                    CCFLevel=(I1*CC-crosstalk*I0*C0)/(I1-crosstalk*I0);
                     ACFColor=QColor("darkred");
-                    ACFLevel=(crosstalk*crosstalk*I0*I0*C0+I1*I1*C1-2*crosstalk*I0*I1*CC)/qfSqr(I1-crosstalk*I0);
+                    ACFLevel=C1;
                     if (cmbCrosstalkMode->currentIndex()==1) {
                         CCFLevel=CC-CCFLevel;
                         ACFLevel=C1-ACFLevel;
                     }
                 } else { // ACF 1 -> 0  => correct ACF0
-                    CCFLevel=(I0*CC-crosstalk*I1*C1)/(I0-crosstalk*I1);
                     ACFColor=QColor("darkgreen");
-                    ACFLevel=(crosstalk*crosstalk*I1*I1*C1+I0*I0*C0-2*crosstalk*I1*I0*CC)/qfSqr(I0-crosstalk*I1);
+                    ACFLevel=C0;
                     if (cmbCrosstalkMode->currentIndex()==1) {
                         CCFLevel=CC-CCFLevel;
                         ACFLevel=C0-ACFLevel;
@@ -3878,7 +3880,11 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_i
     uint16_t arraysize=width*height;
     for (register uint16_t i=0; i<arraysize; i++) {
         image[i]=NAN;
-        gof_image[i]=0;
+    }
+    if (gof_image) {
+        for (register uint16_t i=0; i<arraysize; i++) {
+            gof_image[i]=0;
+        }
     }
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if ( (!m) || evalGroup.isEmpty() || fitParam.isEmpty() ) return;
@@ -3940,7 +3946,7 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_i
                 image[y*width+x]=dvec[i];
             }
         }
-        if (!usedGof.isEmpty()) {
+        if (gof_image && !usedGof.isEmpty()) {
             readGOF=true;
             QVector<double> dvec=current->resultsGetAsDoubleList(usedEval, gofParam);
             for (uint32_t i=0; i<qMin(dvec.size(), width*height); i++) {
@@ -3965,7 +3971,7 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_i
             }
         }
     }
-    if (!readGOF) {
+    if (gof_image && !readGOF) {
         readGOF=true;
         for (register int i=0; i<evals.size(); i++) {
             const QString& en=evals[i];
@@ -3980,7 +3986,7 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_i
         }
     }
     transformImage(image, width, height, tranFitParam);
-    transformImage(gof_image, width, height, tranGofParam);
+    if (gof_image) transformImage(gof_image, width, height, tranGofParam);
 #ifdef DEBUG_TIMING
     //qDebug()<<"QFRDRImagingFCSImageEditor::readParameterImage("<<evalGroup<<fitParam<<") finished after "<<time.elapsed()<<"ms";
 #endif

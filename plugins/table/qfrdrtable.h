@@ -164,6 +164,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             double width;
             double shift;
             Qt::PenStyle style;
+            Qt::BrushStyle fillStyle;
             QColor color;
             double colorTransparent;
             QColor errorColor;
@@ -324,6 +325,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual void colgraphAddImagePlot(int graph, int imageColumn, ImageColorPalette palette, double x, double y, double width, double height, int Nx, const QString& title);
         virtual void colgraphAddImageMaskPlot(int graph, int imageColumn, double x, double y, double width, double height, int Nx, const QString& title, QColor trueColor=QColor("black"), QColor falseColor=QColor("transparent"));
         virtual void colgraphAddRGBImagePlot(int graph, int imageRColumn, int imageGColumn, int imageBColumn, double x, double y, double width, double height, int Nx, const QString& title);
+        virtual void colgraphAddRangePlot(int graph, Orientation orientation, double rangeStart, double rangeEnd, double rangeCenter, const QString& title, bool invertRange=false, bool fillrange=true, bool drawRangeLines=true, bool drawRangeCenter=true, QColor centerColor=QColor("red"),  Qt::PenStyle centerStyle=Qt::SolidLine, double centerWidth=1.0);
         virtual void colgraphSetImagePlotModifier(int graph, int plot, int imageModifierColumn, ImageModifierMode mode);
         virtual void colgraphSetImagePlotRange(int graph, int plot, ImagePlotRangeChannel channel, bool autoRange, double min=0, double max=0);
 
@@ -332,6 +334,12 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual int colgraphGetGraphCount() const;
         virtual void colgraphRemoveGraph(int graph) ;
         virtual void colgraphRemovePlot(int graph, int plot);
+
+        virtual void colgraphSetPlotLineStyle(int graph,  int plot,  Qt::PenStyle  style);
+        virtual void colgraphSetPlotLineWidth(int graph,  int plot,  double width);
+        virtual void colgraphSetPlotFillStyle(int graph,  int plot,  Qt::BrushStyle  style);
+
+
         virtual void colgraphSetPlotColor(int graph,  int plot, QColor color);
         virtual void colgraphSetPlotColor(int graph,  int plot, QColor  color, QColor  fillColor);
         virtual void colgraphSetPlotColor(int graph,  int plot, QColor  color, QColor  fillColor, QColor errorColor);

@@ -170,7 +170,7 @@ QList<QFRawDataRecord *> QFRawDataRecord::getRecordsWithRoleFromGroup(const QStr
     QList<QFRawDataRecord *> res=getGroupMembers(), out;
 
     for (int i=0; i<res.size(); i++) {
-        if (res[i] && res[i]->getRole().toLower().trimmed()==role) {
+        if (res[i] && res[i]->getRole().toLower().trimmed()==role.toLower().trimmed()) {
             out<<res[i];
         }
     }

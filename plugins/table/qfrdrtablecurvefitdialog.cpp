@@ -2,6 +2,8 @@
 #include "ui_qfrdrtablecurvefitdialog.h"
 #include "dlgqfprogressdialog.h"
 #include "qffitalgorithmthreaddedfit.h"
+#include "programoptions.h"
+#include "qftools.h"
 
 QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph) :
     QDialog(parent),
@@ -129,14 +131,31 @@ QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int colX, 
     connect(ui->pltDistribution->get_plotter(), SIGNAL(zoomChangedLocally(double,double,double,double,JKQtBasePlotter*)), ui->pltResiduals, SLOT(pzoomChangedLocally(double,double,double,double,JKQtBasePlotter*)));
 
 
+    QSettings* set=ProgramOptions::getInstance()->getQSettings();
+    if (set) {
+        loadWidgetGeometry(*set, this, pos(), size(), "QFRDRTableCurveFitDialog/windowsize");
+        ui->chkPlotErrors->setChecked(set->value("QFRDRTableCurveFitDialog/ploterrors", ui->chkPlotErrors->isChecked()).toBool());
+        ui->chkWeightedResiduals->setChecked(set->value("QFRDRTableCurveFitDialog/weightedresiduals", ui->chkWeightedResiduals->isChecked()).toBool());
+        ui->cmbFitAlgorithm->setCurrentAlgorithm(set->value("QFRDRTableCurveFitDialog/algorithm", ui->cmbFitAlgorithm->currentFitAlgorithmID()).toString());
+        ui->cmbFitFunction->setCurrentFitFunction(set->value("QFRDRTableCurveFitDialog/model", ui->cmbFitFunction->currentFitFunctionID()).toString());
+    }
 
-    methodChanged(ui->cmbFitAlgorithm->currentIndex());
+    methodChanged(ui->cmbFitFunction->currentIndex());
     connectSignals(true);
     on_btnFit_clicked();
 }
 
 QFRDRTableCurveFitDialog::~QFRDRTableCurveFitDialog()
 {
+    QSettings* set=ProgramOptions::getInstance()->getQSettings();
+    if (set) {
+        saveWidgetGeometry(*set, this, "QFRDRTableCurveFitDialog/windowsize");
+        set->setValue("QFRDRTableCurveFitDialog/ploterrors", ui->chkPlotErrors->isChecked());
+        set->setValue("QFRDRTableCurveFitDialog/weightedresiduals", ui->chkWeightedResiduals->isChecked());
+        set->setValue("QFRDRTableCurveFitDialog/algorithm", ui->cmbFitAlgorithm->currentFitAlgorithmID());
+        set->setValue("QFRDRTableCurveFitDialog/model", ui->cmbFitFunction->currentFitFunctionID());
+    }
+
     delete ui;
 }
 

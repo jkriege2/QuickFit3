@@ -297,3 +297,22 @@ bool qfFCSOverrideFitFunctionPresetFix(const QFEvaluationItem* eval, const QFRaw
 
 
 
+
+
+void qfFCCSCrosstalkCorrection(double &acf0, double &acf1, double &ccf, double I0, double I1, double crosstalk, int crosstalk_direction)
+{
+    if (crosstalk>0.0) {
+        double CC=ccf;
+        double C0=acf0;
+        double C1=acf1;
+        // see Bacia, Petrasek, Schwille, "Correcting Spectral Cross-Talk in Dual-Color FCCS", DOI: 10.1002/cphc.201100801
+        if (crosstalk_direction==0) { // ACF0 -> 1   => correct ACF1
+            ccf=(I1*CC-crosstalk*I0*C0)/(I1-crosstalk*I0);
+            acf1=(crosstalk*crosstalk*I0*I0*C0+I1*I1*C1-2*crosstalk*I0*I1*CC)/qfSqr(I1-crosstalk*I0);
+        } else { // ACF 1 -> 0  => correct ACF0
+            ccf=(I0*CC-crosstalk*I1*C1)/(I0-crosstalk*I1);
+            acf0=(crosstalk*crosstalk*I1*I1*C1+I0*I0*C0-2*crosstalk*I1*I0*CC)/qfSqr(I0-crosstalk*I1);
+        }
+    }
+
+}

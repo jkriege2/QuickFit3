@@ -63,13 +63,20 @@ QFImFCCSRelativeCCFDialog::QFImFCCSRelativeCCFDialog(QWidget *parent) :
     }
     //qDebug()<<9;
 
-    loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "ImFCSCalibrationWizard");
+    loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "ImFCSCalibrationWizard/pos");
+    ui->spinAvg->setValue(ProgramOptions::getConfigValue("ImFCSCalibrationWizard/avg", ui->spinAvg->value()).toDouble());
     connect(ui->cmbACF, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbACF_currentIndexChanged(int)));
     connect(ui->cmbCCF, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCCF_currentIndexChanged(int)));
     cmbACF_currentIndexChanged(ui->cmbACF->currentIndex());
 
     //qDebug()<<10;
 
+}
+void QFImFCCSRelativeCCFDialog::closeEvent(QCloseEvent *event)
+{
+    ProgramOptions::setConfigValue("ImFCSCalibrationWizard/avg", ui->spinAvg->value());
+    saveWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "ImFCSCalibrationWizard/pos");
+    QWidget::closeEvent(event);
 }
 
 QFImFCCSRelativeCCFDialog::~QFImFCCSRelativeCCFDialog()

@@ -6,6 +6,7 @@
 #include "qfpluginservices.h"
 
 class QFImFCCSRelativeCCFDialog;//forward
+class QFImFCCSRelativeCCFCrosstalkDialog;
 class QFImFCCSRelativeIntensityDialog;//forward
 
 /*!
@@ -75,12 +76,15 @@ class QFImFCCSFitEvaluation : public QObject, public QFPluginEvaluationItemBase,
 
         /** \brief calculates the fraction of CCF amplitude */
         void calcRelativeCCF();
+        /** \brief calculates the fraction of CCF amplitude */
+        void calcRelativeCCFCrosstalk();
         /** \brief calculates the relative intensity */
         void calcRelativeIntensity();
 
     private:
 
         QPointer<QFImFCCSRelativeCCFDialog> dlgRelCCF;
+        QPointer<QFImFCCSRelativeCCFCrosstalkDialog> dlgRelCCFCrosstalk;
         QPointer<QFImFCCSRelativeIntensityDialog> dlgRelInten;
 };
 

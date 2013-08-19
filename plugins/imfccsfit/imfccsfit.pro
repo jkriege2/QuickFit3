@@ -33,7 +33,8 @@ HEADERS += qfimfccsfitevaluation.h \
     qfimfccsfilesetsmodel.h \
     qfimfccsfitchi2landscapedialog.h \
     ../interfaces/qffitfunctionconfigforglobalfitinterface.h \
-    ../base_classes/qffitresultsbyindexevaluationfitthread.h
+    ../base_classes/qffitresultsbyindexevaluationfitthread.h \
+    qfimfccsrelativeccfcrosstalkdialog.h
 
 SOURCES += qfimfccsfitevaluation.cpp \
            qfimfccsfitevaluation_item.cpp \
@@ -52,16 +53,19 @@ SOURCES += qfimfccsfitevaluation.cpp \
     qfimfccsrelativeintensitydialog.cpp \
     qfimfccsfilesetsmodel.cpp \
     qfimfccsfitchi2landscapedialog.cpp \
-    ../base_classes/qffitresultsbyindexevaluationfitthread.cpp
+    ../base_classes/qffitresultsbyindexevaluationfitthread.cpp \
+    qfimfccsrelativeccfcrosstalkdialog.cpp
 
 FORMS = qfimfccsfitevaluation_editor.ui \   
     optionswidget.ui \
     qfimfccsrelativeccfdialog.ui \
     qfimfccsrelativeintensitydialog.ui \
-    qfimfccsfitchi2landscapedialog.ui
+    qfimfccsfitchi2landscapedialog.ui \
+    qfimfccsrelativeccfcrosstalkdialog.ui
 
 RESOURCES += qfimfccsfitevaluation.qrc \
-    ../base_classes/qfrdrmaskeditor.qrc
+    ../base_classes/qfrdrmaskeditor.qrc \
+    ../../lib/lib.qrc
 
 TRANSLATIONS= ./translations/de.imfccs_fit.ts
 

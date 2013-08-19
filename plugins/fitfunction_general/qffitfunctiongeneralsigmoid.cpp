@@ -49,6 +49,31 @@ void QFFitFunctionGeneralSigmoid::evaluateDerivatives(double* derivatives, doubl
 bool QFFitFunctionGeneralSigmoid::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
+    if (params && dataX && dataY) {
 
-    return QFFitFunction::estimateInitial(params, dataX, dataY, N);
+        StatisticsScopedPointer<double> dX=statisticsDuplicateArray(dataX, N);
+        StatisticsScopedPointer<double> dY=statisticsDuplicateArray(dataY, N);
+
+        statisticsSort2(dX.data(), dY.data(), N);
+
+        double mi=0, ma=0;
+
+        statisticsMinMax(dY.data(), N, mi, ma);
+
+        double p=statisticsXatY50Sorted(dX.data(), dY.data(), N);
+        double range=(dX[N-1]-dX[0])/5.0;
+        if (dY[N-1]-dY[0]<0) {
+            range=range*-1.0;
+        }
+
+        params[PARAM_BASE]=mi;
+        params[PARAM_MAX]=ma;
+        params[PARAM_POSITION]=p;
+        params[PARAM_RATE]=range/5.0;
+
+
+    }
+
+    return true;
+
 }
