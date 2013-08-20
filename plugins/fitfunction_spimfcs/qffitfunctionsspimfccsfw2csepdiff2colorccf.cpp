@@ -1,11 +1,11 @@
-#include "qffitfunctionsspimfccsfw2cdiff2colorccf.h"
+#include "qffitfunctionsspimfccsfw2csepdiff2colorccf.h"
 #include "qfmathtools.h"
 #include <cmath>
 #include "imfcstools.h"
 #include <QDebug>
 
 
-QFFitFunctionsSPIMFCCSFW2CDiff2ColorCCF::QFFitFunctionsSPIMFCCSFW2CDiff2ColorCCF() {
+QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorCCF::QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorCCF() {
     //           type,         id,                        name,                                                   label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,               initialFIx,  initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(FloatNumber,  "concentration_a",         "concentration of species a in focus",         "C<sub>a</sub>",           "nM",         "nM",                              true,      true,          true,              QFFitFunction::DisplayError, false, 10,          0,        1e50,     1    );
     #define FCCSDiff_concentrationa 0
@@ -24,89 +24,60 @@ QFFitFunctionsSPIMFCCSFW2CDiff2ColorCCF::QFFitFunctionsSPIMFCCSFW2CDiff2ColorCCF
 
     addParameter(FloatNumber,  "disscciation_constant",     "disscciation constant KD of reaction ab <-> a+b",      "K<sub>d</sub>",            "nM",           "nM",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
     #define FCCSDiff_KD 7
-    addParameter(FloatNumber,  "diff_coeff_a",            "diffusion coefficient of species a",                  "D<sub>a</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
-    #define FCCSDiff_diff_coeffa 8
 
-
-    addParameter(FloatNumber,  "diff_coeff2_a",            "diffusion coefficient of second diffusion component of species a",                  "D<sub>2,a</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 100,           1e-10,    1e50,     1    );
-    #define FCCSDiff_diff_coeff2a 9
-    addParameter(FloatNumber,  "diff_rho2_a",            "fraction of second diffusion component of species a",   "&rho;<sub>2,a</sub>",            "", "",    true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,           0,    1,     1    );
-    #define FCCSDiff_diff_rho2a 10
-
-
-    addParameter(FloatNumber,  "diff_coeff_b",            "diffusion coefficient of species b",                  "D<sub>b</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
-    #define FCCSDiff_diff_coeffb 11
-
-
-    addParameter(FloatNumber,  "diff_coeff2_b",            "diffusion coefficient of second diffusion component of species b",                  "D<sub>2,b</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 100,           1e-10,    1e50,     1    );
-    #define FCCSDiff_diff_coeff2b 12
-    addParameter(FloatNumber,  "diff_rho2_b",            "fraction of second diffusion component of species b",   "&rho;<sub>2,b</sub>",            "", "",    true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,           0,    1,     1    );
-    #define FCCSDiff_diff_rho2b 13
-
-
-    addParameter(FloatNumber,  "diff_coeff_ab",            "diffusion coefficient of species ab",                  "D<sub>ab</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
-    #define FCCSDiff_diff_coeffab 14
-
-
-    addParameter(FloatNumber,  "diff_coeff2_ab",            "diffusion coefficient of second diffusion component of species ab",                  "D<sub>2,ab</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 100,           1e-10,    1e50,     1    );
-    #define FCCSDiff_diff_coeff2ab 15
-    addParameter(FloatNumber,  "diff_rho2_ab",            "fraction of second diffusion component of species ab",   "&rho;<sub>2,ab</sub>",            "", "",    true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,           0,    1,     1    );
-    #define FCCSDiff_diff_rho2ab 16
+    addParameter(FloatNumber,  "diff_coeff1",            "diffusion coefficient of species a",                  "D<sub>a</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    #define FCCSDiff_diff_coeff1 8
+    addParameter(FloatNumber,  "diff_coeff2",            "diffusion coefficient of second diffusion component of species a",                  "D<sub>2,a</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 100,           1e-10,    1e50,     1    );
+    #define FCCSDiff_diff_coeff2 9
+    addParameter(FloatNumber,  "diff_rho2",            "fraction of second diffusion component of species a",   "&rho;<sub>2,a</sub>",            "", "",    true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,           0,    1,     1    );
+    #define FCCSDiff_diff_rho2 10
 
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                   "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
-    #define FCCSDiff_offset 17
+    #define FCCSDiff_offset 11
     addParameter(FloatNumber,  "crosstalk",               "crosstalk coefficient",                                "&kappa;",                  "",         "",                         true,      true,         true,             QFFitFunction::EditError,    true, 0,           0,     1,      0.1, 0, 1  );
-    #define FCCSDiff_crosstalk 18
+    #define FCCSDiff_crosstalk 12
     addParameter(FloatNumber,  "focus_distance_x",         "foci: lateral distance in x-direction",               "d<sub>x</sub>",            "nm",         "nm",                     true,      true,         true,             QFFitFunction::EditError,    true, 0,           -1e6,     1e6,      10  );
-    #define FCCSDiff_focus_distancex 19
+    #define FCCSDiff_focus_distancex 13
     addParameter(FloatNumber,  "focus_distance_y",         "foci: lateral distance in y-direction",               "d<sub>y</sub>",            "nm",         "nm",                     true,      true,         true,             QFFitFunction::EditError,    true, 0,              -1e6,     1e6,      10  );
-    #define FCCSDiff_focus_distancey 20
+    #define FCCSDiff_focus_distancey 14
     addParameter(FloatNumber,  "focus_distance_z",         "foci: longitudinal distance in z-direction",          "d<sub>z</sub>",            "nm",         "nm",                     true,      true,         true,             QFFitFunction::EditError,    true, 0,              -1e6,     1e6,      10  );
-    #define FCCSDiff_focus_distancez 21
+    #define FCCSDiff_focus_distancez 15
     addParameter(FloatNumber,  "focus_height1",            "green PSF: axial radius (1/e² radius)",               "z<sub>g</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 1240,         0.01,     1e5,      10  );
-    #define FCCSDiff_focus_height1 22
+    #define FCCSDiff_focus_height1 16
     addParameter(FloatNumber,  "focus_width1",             "green PSF: lateral radius (1/e² radius)",             "w<sub>g</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 600,          0,        1e4,      10    );
-    #define FCCSDiff_focus_width1 23
+    #define FCCSDiff_focus_width1 17
     addParameter(FloatNumber,  "focus_height2",            "red PSF: axial radius (1/e² radius)",               "z<sub>r</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 1300,         0.01,     1e5,      10  );
-    #define FCCSDiff_focus_height2 24
+    #define FCCSDiff_focus_height2 18
     addParameter(FloatNumber,  "focus_width2",             "red PSF: lateral radius (1/e² radius)",             "w<sub>r</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 660,          0,        1e4,      10    );
-    #define FCCSDiff_focus_width2 25
+    #define FCCSDiff_focus_width2 19
     addParameter(FloatNumber,  "pixel_width",             "pixel width",                                           "a",                        "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 400,          0,        1e4,      10    );
-    #define FCCSDiff_pixel_width 26
+    #define FCCSDiff_pixel_width 20
     addParameter(FloatNumber,  "count_rate1",              "count rate green, during measurement",                      "&lang;F<sub>g</sub>&rang;",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_count_rate1 27
+    #define FCCSDiff_count_rate1 21
     addParameter(FloatNumber,  "background1",              "background count rate green, during measurement",           "B<sub>g</sub>",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_background1 28
+    #define FCCSDiff_background1 22
     addParameter(FloatNumber,  "count_rate2",              "count rate red, during measurement",                      "&lang;F<sub>r</sub>&rang;",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_count_rate2 29
+    #define FCCSDiff_count_rate2 23
     addParameter(FloatNumber,  "background2",              "background count rate red, during measurement",           "B<sub>r</sub>",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_background2 30
+    #define FCCSDiff_background2 24
     addParameter(FloatNumber,  "brightness_a",             "molar brightness of fluorophore on A",           "&eta;<sub>a</sub>",            "counts/nM",           "counts/nM",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
-    #define FCCSDiff_brightness_a 31
+    #define FCCSDiff_brightness_a 25
     addParameter(FloatNumber,  "brightness_b",             "molar brightness of fluorophore on B",           "&eta;<sub>b</sub>",            "counts/nM",           "counts/nM",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
-    #define FCCSDiff_brightness_b 32
+    #define FCCSDiff_brightness_b 26
 
 }
 
 
-double QFFitFunctionsSPIMFCCSFW2CDiff2ColorCCF::evaluate(double t, const double* data) const {
+double QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorCCF::evaluate(double t, const double* data) const {
     const double cab=data[FCCSDiff_concentrationab]*6.022e-1; // FCCSDiff_concentrationab given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
     const double ca=data[FCCSDiff_concentrationa]*6.022e-1; // FCCSDiff_concentrationa given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
     const double cb=data[FCCSDiff_concentrationb]*6.022e-1; // FCCSDiff_concentrationb given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
-    const double Da=data[FCCSDiff_diff_coeffa];
-    const double Db=data[FCCSDiff_diff_coeffb];
-    const double Dab=data[FCCSDiff_diff_coeffab];
 
-    const double D2a=data[FCCSDiff_diff_coeff2a];
-    const double D2ab=data[FCCSDiff_diff_coeff2ab];
-    const double D2b=data[FCCSDiff_diff_coeff2b];
-    const double rho2a=data[FCCSDiff_diff_rho2a];
-    const double rho2ab=data[FCCSDiff_diff_rho2ab];
-    const double rho2b=data[FCCSDiff_diff_rho2b];
+    const double D1=data[FCCSDiff_diff_coeff1];
+    const double D2=data[FCCSDiff_diff_coeff2];
+    const double rho2=data[FCCSDiff_diff_rho2];
 
-    const double rho1a=1.0-rho2a;
-    const double rho1ab=1.0-rho2ab;
-    const double rho1b=1.0-rho2b;
+    const double rho1=1.0-rho2;
 
     const double dx=data[FCCSDiff_focus_distancex]/1000.0;
     const double dy=data[FCCSDiff_focus_distancey]/1000.0;
@@ -131,28 +102,18 @@ double QFFitFunctionsSPIMFCCSFW2CDiff2ColorCCF::evaluate(double t, const double*
     double backfactor=(cr1-background1)/(cr1) * (cr2-background2)/(cr2);
     if (fabs(cr1)<1e-15 || fabs(cr2)<1e-15 || (fabs(background1)<1e-15 && fabs(background2)<1e-15)) backfactor=1;
 
-    const double etaG=(cr1-background1)/(ca+cab);
-    const double etaR=(cr2-background2-kappa*(cr1-background1))/(cb+cab);
-    const double Fg=etaG*(ca+cab);
-    const double Fr=etaR*(cb+cab)+kappa*Fg;
+    const double etag=(cr1-background1)/(ca+cab);
+    const double etar=(cr2-background2-kappa*(cr1-background1))/(cb+cab);
+    const double Fg=etag*(ca+cab);
+    const double Fr=etar*(cb+cab)+kappa*Fg;
 
-  // double Grr_b=etaR*etaR*cb*  (rho1b  *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, Db, t, wxyR, wxyR, wzR, wzR) + rho2b  *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, D2b, t, wxyR, wxyR, wzR, wzR));
-  // double Grr_ab=etaR*etaR*cab*(rho1ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, Dab, t, wxyR, wxyR, wzR, wzR)+ rho2ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, D2ab, t, wxyR, wxyR, wzR, wzR));
-     double Ggg_a=etaG*etaG*ca*  (rho1a  *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, Da, t, wxyG, wxyG, wzG, wzG) + rho2a  *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, D2a, t, wxyG, wxyG, wzG, wzG));
-     double Ggg_ab=etaG*etaG*cab*(rho1ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, Dab, t, wxyG, wxyG, wzG, wzG)+ rho2ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, D2ab, t, wxyG, wxyG, wzG, wzG));
-     double Ggr_ab=etaG*etaR*cab*(rho1ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, t, wxyG, wxyR, wzG, wzR)+ rho2ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, D2ab, t, wxyG, wxyR, wzG, wzR));
-    if (fabs(ca)<1e-15) Ggg_a=0;
-    //if (fabs(cb)<1e-15) Grr_b=0;
-    if (fabs(cab)<1e-15) /*Grr_ab=*/Ggg_ab=Ggr_ab=0;
+    const double corrfunction=(  rho1  *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, D1, t, wxyG, wxyR, wzG, wzR)
+                               + rho2  *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, D2, t, wxyG, wxyR, wzG, wzR));
 
-
-    //qDebug()<<"CCF: etaG="<<etaG<<" etaR="<<etaR<<" ca="<<ca<<" cab="<<cab<<" Fg="<<Fg<<" Fr="<<Fr<<" Ggg_a="<<Ggg_a<<" Ggg_ab="<<Ggg_ab<<" Ggr_ab="<<Ggr_ab;
-    const double cfac=Ggr_ab+kappa*(Ggg_a+Ggg_ab);
-
-    return offset+backfactor*cfac/(Fg*Fr);
+    return offset+backfactor*(etag*etar*cab+kappa*etag*etar*ca+kappa*etag*etag*cab)*corrfunction/(Fg*Fr);
 }
 
-void QFFitFunctionsSPIMFCCSFW2CDiff2ColorCCF::calcParameter(double* data, double* error) const {
+void QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorCCF::calcParameter(double* data, double* error) const {
     const double cab=data[FCCSDiff_concentrationab]*6.022e-1; // FCCSDiff_concentrationab given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
     double ecab=0;
     const double ca=data[FCCSDiff_concentrationa]*6.022e-1; // FCCSDiff_concentrationa given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
@@ -253,14 +214,14 @@ void QFFitFunctionsSPIMFCCSFW2CDiff2ColorCCF::calcParameter(double* data, double
 
 }
 
-bool QFFitFunctionsSPIMFCCSFW2CDiff2ColorCCF::isParameterVisible(int parameter, const double* data) const {
+bool QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorCCF::isParameterVisible(int parameter, const double* data) const {
     return true;
 }
 
-unsigned int QFFitFunctionsSPIMFCCSFW2CDiff2ColorCCF::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorCCF::getAdditionalPlotCount(const double* params) {
     return 0;
 }
 
-QString QFFitFunctionsSPIMFCCSFW2CDiff2ColorCCF::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorCCF::transformParametersForAdditionalPlot(int plot, double* params) {
     return "";
 }

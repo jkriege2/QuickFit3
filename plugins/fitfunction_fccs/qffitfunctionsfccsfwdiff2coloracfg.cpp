@@ -83,10 +83,10 @@ double QFFitFunctionsFCCSFWDiff2ColorACFG::evaluate(double t, const double* data
     const double etaG=(cr1-background1)/(ca+cab);
     const double Fg=etaG*(ca+cab);
 
-    // double Grr_b=etaR*etaR*cb*QFFitFunctionsFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Db, t, wxyR, wxyR, wzR, wzR);
-    // double Grr_ab=etaR*etaR*cab*QFFitFunctionsFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, t, wxyR, wxyR, wzR, wzR);
-     double Ggg_a=etaG*etaG*ca*QFFitFunctionFCCSFWTriplet(nNonFl, t, thetaT_a, tauT_a)*QFFitFunctionsFCCSFWDiff2ColorCCF_corrfactor(dx, dy, dz, Da, t, wxyG, wxyG, wzG, wzG);
-     double Ggg_ab=etaG*etaG*cab*QFFitFunctionFCCSFWTriplet(nNonFl, t, thetaT_ab, tauT_ab)*QFFitFunctionsFCCSFWDiff2ColorCCF_corrfactor(dx, dy, dz, Dab, t, wxyG, wxyG, wzG, wzG);
+    // double Grr_b=etaR*etaR*cb*QFFitFunctionsFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, Db, t, wxyR, wxyR, wzR, wzR);
+    // double Grr_ab=etaR*etaR*cab*QFFitFunctionsFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, Dab, t, wxyR, wxyR, wzR, wzR);
+     double Ggg_a=etaG*etaG*ca*QFFitFunctionFCCSFWTriplet(nNonFl, t, thetaT_a, tauT_a)*QFFitFunctionsFCCSFWDiff2ColorCCF_corrfactor(0, 0, 0, Da, t, wxyG, wxyG, wzG, wzG);
+     double Ggg_ab=etaG*etaG*cab*QFFitFunctionFCCSFWTriplet(nNonFl, t, thetaT_ab, tauT_ab)*QFFitFunctionsFCCSFWDiff2ColorCCF_corrfactor(0, 0, 0, Dab, t, wxyG, wxyG, wzG, wzG);
     // double Ggr_ab=etaG*etaR*cab*QFFitFunctionsFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, t, wxyG, wxyR, wzG, wzR);
     if (fabs(ca)<1e-15) Ggg_a=0;
     //if (fabs(cb)<1e-15) Grr_b=0;

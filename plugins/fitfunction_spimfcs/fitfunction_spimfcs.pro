@@ -33,7 +33,10 @@ HEADERS += qfpfitfunctionsspimfcs.h \
     qffitfunctionsspimfccsfw2cdiff2coloracfr.h \
     qffitfunctionsspimfccsfw2cdiff2coloracfg.h \
     qffitfunctionsspimfccsdiff.h \
-    ../interfaces/qffitfunctionconfigforglobalfitinterface.h
+    ../interfaces/qffitfunctionconfigforglobalfitinterface.h \
+    qffitfunctionsspimfccsfw2csepdiff2colorccf.h \
+    qffitfunctionsspimfccsfw2csepdiff2coloracfr.h \
+    qffitfunctionsspimfccsfw2csepdiff2coloracfg.h
 
 
 SOURCES += qfpfitfunctionsspimfcs.cpp\
@@ -60,7 +63,10 @@ SOURCES += qfpfitfunctionsspimfcs.cpp\
     qffitfunctionsspimfccsfw2cdiff2colorccf.cpp \
     qffitfunctionsspimfccsfw2cdiff2coloracfr.cpp \
     qffitfunctionsspimfccsfw2cdiff2coloracfg.cpp \
-    qffitfunctionsspimfccsdiff.cpp
+    qffitfunctionsspimfccsdiff.cpp \
+    qffitfunctionsspimfccsfw2csepdiff2colorccf.cpp \
+    qffitfunctionsspimfccsfw2csepdiff2coloracfr.cpp \
+    qffitfunctionsspimfccsfw2csepdiff2coloracfg.cpp
 
 FORMS =
 

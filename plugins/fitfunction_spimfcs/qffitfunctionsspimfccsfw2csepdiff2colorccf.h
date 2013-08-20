@@ -1,5 +1,5 @@
-#ifndef QFFitFunctionsSPIMFCCSFWDiff2ColorACFG_H
-#define QFFitFunctionsSPIMFCCSFWDiff2ColorACFG_H
+#ifndef QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorCCF_H
+#define QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorCCF_H
 #include "qfpluginfitfunction.h"
 
 
@@ -8,16 +8,16 @@
 /*! \brief QFFitFunction class for a SPIM-FCCS fit model with pure diffusion for 2-color crosscorrelation and 1/sqrt(e) lateral width
     \ingroup qf3fitfunp_fitfunctions_spimfcs
 */
-class QFFitFunctionsSPIMFCCSFWDiff2ColorACFG: public QFFitFunction {
+class QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorCCF: public QFFitFunction {
     public:
-        QFFitFunctionsSPIMFCCSFWDiff2ColorACFG();
-        virtual ~QFFitFunctionsSPIMFCCSFWDiff2ColorACFG() {}
+        QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorCCF();
+        virtual ~QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorCCF() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCCS: Diffusion, 2-color, species A+B+AB, ACF green (1/e² radii)"); }
+        virtual QString name() const { return QString("SPIM-FCCS: 2-component Diffusion, no specific species, 2-color, CCF (1/e² radii)"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("SPIM-FCCS: Diffusion A+B+AB, 2-color, ACF green (1/e² radii)"); }
+        virtual QString shortName() const { return QObject::tr("SPIM-FCCS: 2-comp. Diffusion, no spec. species, 2-color, CCF (1/e² radii)"); }
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("fccs_spim_fw_diff2coloracfg"); }
+        virtual QString id() const { return QString("fccs_spim_fw_2csepdiff2colorccf"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
@@ -37,4 +37,4 @@ class QFFitFunctionsSPIMFCCSFWDiff2ColorACFG: public QFFitFunction {
         virtual bool get_implementsDerivatives() { return false; }
 };
 
-#endif // QFFitFunctionsSPIMFCCSFWDiff2ColorACFG_H
+#endif // QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorCCF_H

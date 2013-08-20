@@ -118,10 +118,10 @@ double QFFitFunctionsSPIMFCCSFW2CDiff2ColorACFR::evaluate(double t, const double
     const double Fg=etaG*(ca+cab);
     const double Fr=etaR*(cb+cab)+kappa*Fg;
 
-       double Grr_b=etaR*etaR*cb*  (rho1b  *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Db, t, wxyR, wxyR, wzR, wzR) + rho2b  *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, D2b, t, wxyR, wxyR, wzR, wzR));
-       double Grr_ab=etaR*etaR*cab*(rho1ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, t, wxyR, wxyR, wzR, wzR)+ rho2ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, D2ab, t, wxyR, wxyR, wzR, wzR));
-       double Ggg_a=etaG*etaG*ca*  (rho1a  *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Da, t, wxyG, wxyG, wzG, wzG) + rho2a  *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, D2a, t, wxyG, wxyG, wzG, wzG));
-       double Ggg_ab=etaG*etaG*cab*(rho1ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, t, wxyG, wxyG, wzG, wzG)+ rho2ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, D2ab, t, wxyG, wxyG, wzG, wzG));
+       double Grr_b=etaR*etaR*cb*  (rho1b  *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, Db, t, wxyR, wxyR, wzR, wzR) + rho2b  *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, D2b, t, wxyR, wxyR, wzR, wzR));
+       double Grr_ab=etaR*etaR*cab*(rho1ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, Dab, t, wxyR, wxyR, wzR, wzR)+ rho2ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, D2ab, t, wxyR, wxyR, wzR, wzR));
+       double Ggg_a=etaG*etaG*ca*  (rho1a  *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, Da, t, wxyG, wxyG, wzG, wzG) + rho2a  *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, D2a, t, wxyG, wxyG, wzG, wzG));
+       double Ggg_ab=etaG*etaG*cab*(rho1ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, Dab, t, wxyG, wxyG, wzG, wzG)+ rho2ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, D2ab, t, wxyG, wxyG, wzG, wzG));
        double Ggr_ab=etaG*etaR*cab*(rho1ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, Dab, t, wxyG, wxyR, wzG, wzR)+ rho2ab *QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx, dy, dz, D2ab, t, wxyG, wxyR, wzG, wzR));
     if (fabs(ca)<1e-15) Ggg_a=0;
     if (fabs(cb)<1e-15) Grr_b=0;
