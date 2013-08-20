@@ -391,26 +391,16 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbOutOfRangeMode->addItem(tr("blue"));
     gli->addRow(tr("out-&of-range mode:"), cmbOutOfRangeMode);
 
-    chkDisplayImageOverlay=new QCheckBox(wimg);
-    gli->addRow(tr("show &overlays:"), chkDisplayImageOverlay);
 
-    cmbSelectionStyle=new QComboBox(wimg);
-    QPixmap selPix(15,15);
-    selPix.fill(ovlSelCol);
-    cmbSelectionStyle->addItem(QIcon(selPix), tr("overlay image"));
-    selPix.fill(QColor(Qt::transparent));
-    plotSymbol(selPix, 7, 7, JKQTPtarget, 15, 1, ovlSelCol, ovlSelCol.lighter());
-    cmbSelectionStyle->addItem(QIcon(selPix), tr("symbol"));
-    selPix.fill(QColor(Qt::transparent));
-    plotSymbol(selPix, 7, 7, JKQTPtarget, 15, 1, QColor("black"), QColor("black").lighter());
-    cmbSelectionStyle->addItem(QIcon(selPix), tr("black symbol"));
-    selPix.fill(QColor(Qt::transparent));
-    plotSymbol(selPix, 7, 7, JKQTPtarget, 15, 1, QColor("white"), QColor("white").lighter());
-    cmbSelectionStyle->addItem(QIcon(selPix), tr("white symbol"));
-    selPix.fill(QColor(Qt::transparent));
-    plotSymbol(selPix, 7, 7, JKQTPtarget, 15, 1, QColor("grey"), QColor("grey").lighter());
-    cmbSelectionStyle->addItem(QIcon(selPix), tr("grey symbol"));
-    gli->addRow(tr("selection style:"), cmbSelectionStyle);
+    QGroupBox* wsels=new QGroupBox(tr(" selection style "), this);
+    chkDisplayImageOverlay=new QCheckBox(wimg);
+    gli->addRow(tr("&enabled:"), chkDisplayImageOverlay);
+    wsels->setFlat(true);
+    vbl->addWidget(wsels);
+    gli=new QFormLayout(this);
+    wsels->setLayout(gli);
+    cmbSelectionStyle=new QFRDRImagingFCSOverlayStyleCombobox(wimg);
+    gli->addRow(tr("&style:"), cmbSelectionStyle);
 
 
     ///////////////////////////////////////////////////////////////
@@ -694,34 +684,14 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QWidget* wpltImage=new QWidget(this);
     QVBoxLayout* lpltImage=new QVBoxLayout();
     wpltImage->setLayout(lpltImage);
-    pltImage=new QFPlotter(wpltImage);
-    pltImage->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
+    pltImage=new QFRDRImagingFCSImagePlotter(wpltImage);
     pltImage->setObjectName("pltImage");
     pltImage->get_plotter()->set_plotLabel(tr("\\textbf{Parameter Image}"));
-    pltImage->get_plotter()->set_plotLabelFontSize(10);
 
     //lpltImage->addWidget((labParamImage=new QLabel(tr("Parameter Image:"))));
     lpltImage->addWidget(pltImage, 1);
 
-    pltImage->set_displayMousePosition(false);
-    pltImage->set_displayToolbar(true);
-    pltImage->get_plotter()->set_maintainAspectRatio(true);
-    pltImage->get_plotter()->set_aspectRatio(1);
-    pltImage->get_plotter()->set_maintainAxisAspectRatio(true);
-    pltImage->get_plotter()->set_axisAspectRatio(1);
-    pltImage->setXY(0,0,1,1);
-    pltImage->setAbsoluteXY(0,1,0,1);
 
-    pltImage->get_plotter()->getXAxis()->set_axisMinWidth(1);
-    pltImage->get_plotter()->getYAxis()->set_axisMinWidth(1);
-    pltImage->get_plotter()->getXAxis()->set_tickLabelFontSize(8);
-    pltImage->get_plotter()->getYAxis()->set_tickLabelFontSize(8);
-    pltImage->get_plotter()->getXAxis()->set_axisLabel("");
-    pltImage->get_plotter()->getYAxis()->set_axisLabel("");
-    pltImage->get_plotter()->setGrid(false);
-    pltImage->get_plotter()->set_useAntiAliasingForSystem(true);
-    pltImage->get_plotter()->set_useAntiAliasingForGraphs(true);
-    pltImage->set_userActionCompositionMode(QPainter::CompositionMode_Xor);
     connect(pltImage, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     connect(pltImage, SIGNAL(userClickFinished(double,double,Qt::KeyboardModifiers)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
     connect(pltImage, SIGNAL(userScribbleClick(double,double,Qt::KeyboardModifiers, bool, bool)), this, SLOT(imageScribbled(double,double,Qt::KeyboardModifiers,bool,bool)));
@@ -731,7 +701,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(pltImage, SIGNAL(userEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)));
     connect(pltImage, SIGNAL(userLineFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageLineFinished(double,double,double,double,Qt::KeyboardModifiers)));
 
-    plteImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::GRAY, pltImage->get_plotter());
+    plteImage=pltImage->get_imagePlot();
+    plteImageSelected  =pltImage->get_selectionPlot();
+    plteImageExcluded=pltImage->get_maskPlot();
+    /*plteImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::GRAY, pltImage->get_plotter());
     pltImage->addGraph(plteImage);
 
 
@@ -742,7 +715,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     plteImageExcluded=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlExCol, pltImage->get_plotter());
     plteImageExcluded->set_rectanglesAsImageOverlay(OverlayRectanglesAsImageOverlay);
-    //pltImage->addGraph(plteImageExcluded);
+    //pltImage->addGraph(plteImageExcluded);*/
 
     plteImageData=NULL;
 
@@ -810,7 +783,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     plteImageData=NULL;
 
     connect(pltOverview, SIGNAL(beforePlotScalingRecalculate()), this, SLOT(moveColorbarsAuto()));
-    connect(pltImage, SIGNAL(beforePlotScalingRecalculate()), this, SLOT(moveColorbarsAuto()));
+    //connect(pltImage, SIGNAL(beforePlotScalingRecalculate()), this, SLOT(moveColorbarsAuto()));
     connect(pltGofImage, SIGNAL(beforePlotScalingRecalculate()), this, SLOT(moveColorbarsAuto()));
 
 
@@ -1285,7 +1258,8 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
         QString egroup=filenameize(currentEvalGroup());
         QString param=filenameize(currentFitParameter());
         if (egroup.isEmpty() || param.isEmpty()) {
-            writeSettings();
+            readSettings();
+            //writeSettings();
         } else if (settings) {
             double mi=0, ma=1;
             connectParameterWidgets(false);
@@ -1392,10 +1366,10 @@ void QFRDRImagingFCSImageEditor::updateOverlaySettings() {
         pltMask->addGraph(plteMaskSelected);
     }
 
-    setSelectedOverlayStyle(plteOverviewSelected);
-    setSelectedOverlayStyle(plteImageSelected);
-    setSelectedOverlayStyle(plteGofImageSelected);
-    setSelectedOverlayStyle(plteMaskSelected);
+    cmbSelectionStyle->setSelectedOverlayStyle(plteOverviewSelected);
+    cmbSelectionStyle->setSelectedOverlayStyle(plteImageSelected);
+    cmbSelectionStyle->setSelectedOverlayStyle(plteGofImageSelected);
+    cmbSelectionStyle->setSelectedOverlayStyle(plteMaskSelected);
 
     if (cmbImageStyle->currentIndex()<cmbImageStyle->count()-1) {
         pltImage->deleteGraph(plteImageExcluded, false);
@@ -2488,29 +2462,6 @@ void QFRDRImagingFCSImageEditor::updateSelectionArrays() {
     //qDebug()<<"updateSelectionArrays ... end";
 }
 
-void QFRDRImagingFCSImageEditor::setSelectedOverlayStyle(JKQTPOverlayImageEnhanced* plot) {
-    if (cmbSelectionStyle->currentIndex()==1) {
-        plot->set_drawAsRectangles(false);
-        plot->set_trueColor(QColor("red"));
-        plot->set_symbolSizeFactor(0.7);
-    } else if (cmbSelectionStyle->currentIndex()==2) {
-        plot->set_drawAsRectangles(false);
-        plot->set_trueColor(QColor("black"));
-        plot->set_symbolSizeFactor(0.7);
-    } else if (cmbSelectionStyle->currentIndex()==3) {
-        plot->set_drawAsRectangles(false);
-        plot->set_trueColor(QColor("white"));
-        plot->set_symbolSizeFactor(0.7);
-    } else if (cmbSelectionStyle->currentIndex()==4) {
-        plot->set_drawAsRectangles(false);
-        plot->set_trueColor(QColor("grey"));
-        plot->set_symbolSizeFactor(0.7);
-    } else {
-        plot->set_drawAsRectangles(true);
-        plot->set_trueColor(selectionColor);
-        plot->set_symbolSizeFactor(0.7);
-    }
-}
 
 void QFRDRImagingFCSImageEditor::selectedInsert(int idx)
 {
@@ -2864,7 +2815,7 @@ void QFRDRImagingFCSImageEditor::plotAverage(QFRDRImagingFCSData* m, QFPlotter* 
 }
 
 
-void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plotFit, QFPlotter *plotter, QFPlotter *plotterResid, QFTableModel* tabFitvals, int c_tau_in, QVector<double>* tau_out, QVector<double>* corr_out, QVector<double>* errcorr_out, QColor overrideColor) {
+void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plotFit, QFPlotter *plotter, QFPlotter *plotterResid, QFTableModel* tabFitvals, int c_tau_in, QVector<double>* tau_out, QVector<double>* corr_out, QVector<double>* errcorr_out, QColor overrideColor, const QString& overrideTitle) {
     JKQTPdatastore* ds=plotter->getDatastore();
     JKQTPerrorPlotstyle runerrorstyle=cmbRunErrorStyle->getErrorStyle();
     bool runLine=cmbRunStyle->getDrawLine();
@@ -2874,8 +2825,8 @@ void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plo
     if (c_tau_in<0) c_tau=ds->addColumn(m->getCorrelationT(), m->getCorrelationN(), "tau");
     else c_tau=c_tau_in;
 
-    size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
-    size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("pixel error %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
+    size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("%3: pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)).arg(overrideTitle));
+    size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("%3: pixel error %1 %2").arg(i).arg(m->getCorrelationRunName(i)).arg(overrideTitle));
 
     if (tau_out) ds->getColumn(c_tau).copyData(*tau_out);
     if (corr_out) ds->getColumn(c_run).copyData(*corr_out);
@@ -2888,6 +2839,10 @@ void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plo
     g->set_drawLine(runLine);
     g->set_symbol(runSymbol);
     g->set_title(tr("run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
+    if (!overrideTitle.isEmpty()) {
+        g->set_title(QString("%1: %2").arg(overrideTitle).arg(m->getCorrelationRunName(i)));
+    }
+
     g->set_datarange_start(sliders->get_userMin());
     g->set_datarange_end(sliders->get_userMax());
     g->set_yErrorColumn(c_rune);
@@ -2973,6 +2928,9 @@ void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plo
         gfit->set_style(Qt::DotLine);
         gfit->set_symbol(JKQTPnoSymbol);
         gfit->set_title(tr("fit to run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
+        if (!overrideTitle.isEmpty()) {
+            g->set_title(QString("fit to %1: %2").arg(overrideTitle).arg(m->getCorrelationRunName(i)));
+        }
         gfit->set_datarange_start(sliders->get_userMin());
         gfit->set_datarange_end(sliders->get_userMax());
         gfit->set_symbolSize(5);
@@ -2989,6 +2947,9 @@ void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plo
         gr->set_style(Qt::DotLine);
         gr->set_symbol(runSymbol);
         gr->set_title(tr("residuals for run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
+        if (!overrideTitle.isEmpty()) {
+            g->set_title(QString("residuals for %1: %2").arg(overrideTitle).arg(m->getCorrelationRunName(i)));
+        }
         gr->set_datarange_start(sliders->get_userMin());
         gr->set_datarange_end(sliders->get_userMax());
         gr->set_symbolSize(5);
@@ -3000,7 +2961,13 @@ void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plo
 
         if (tabFitvals) {
             tabFitvals->appendColumn();
-            tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
+            if (!overrideTitle.isEmpty()) {
+                tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("%2: %1").arg(m->getCorrelationRunName(i)).arg(overrideTitle));
+            } else {
+                tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
+            }
+
+
             int col=tabFitvals->columnCount()-1;
             tabFitvals->appendColumn();
             tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("error"));
@@ -3181,7 +3148,12 @@ void QFRDRImagingFCSImageEditor::plotRunsAvg(QFRDRImagingFCSData *m, QSet<int32_
 
         if (tabFitvals && Nfit>0) {
             tabFitvals->appendColumn();
-            tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("avg. %1 pixels").arg((int)round(Nfit)));
+            if (!overrideTitle.isEmpty()) {
+                tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("%2: avg. %1 pixels").arg((int)round(Nfit)).arg(overrideTitle));
+            } else {
+                tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("avg. %1 pixels").arg((int)round(Nfit)));
+            }
+
             if (avgIdx==0 && avgs>1) tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("CH1: avg. %1 pixels").arg((int)round(Nfit)));
             if (avgIdx==1) tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("CH2: avg. %1 pixels").arg((int)round(Nfit)));
             if (!overrideTitle.isEmpty()) tabFitvals->setColumnTitle(tabFitvals->columnCount()-1, tr("%2: avg. %1 pixels").arg((int)round(Nfit)).arg(overrideTitle));
@@ -3319,9 +3291,15 @@ void QFRDRImagingFCSImageEditor::replotData() {
             }
 
 
-            plotRunsAvg(acf0, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
-            plotRunsAvg(acf1, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
-            plotRunsAvg(fccs, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauCCF, &dataCorrCCF, &dataCorrErrCCF, QColor("blue"), tr("CCF"));
+            if (selected.size()==1) {
+                plotRun(acf0, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
+                plotRun(acf1, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
+                plotRun(fccs, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauCCF, &dataCorrCCF, &dataCorrErrCCF, QColor("blue"), tr("CCF"));
+            } else {
+                plotRunsAvg(acf0, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
+                plotRunsAvg(acf1, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
+                plotRunsAvg(fccs, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauCCF, &dataCorrCCF, &dataCorrErrCCF, QColor("blue"), tr("CCF"));
+            }
 
             if (cmbCrosstalkDirection->currentIndex()>=0 && cmbCrosstalkDirection->currentIndex()<=1) {
                 double I0=qfstatisticsAverage(IACF0);

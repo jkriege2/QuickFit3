@@ -35,6 +35,9 @@
 #include "qfrdrtableinterface.h"
 #include "qfrdrcolumngraphsinterface.h"
 #include "qfplottercopytotabledialog.h"
+#include "qfrdrimagingfcsimageplotter.h"
+#include "qfrdrimagingfcsimageparametergroupbox.h"
+#include "qfrdrimagingfcsoverlaystylecombobox.h"
 
 class QFRDRImagingFCSData; // forward
 
@@ -121,7 +124,7 @@ protected:
         void replotData();
 
         void plotAverage(QFRDRImagingFCSData *m, QFPlotter* plotter, int c_tau_in, int* c_tau_out=NULL, QVector<double>* tau_out=NULL, QVector<double>* corr_out=NULL, QVector<double>* errcorr_out=NULL, QColor overrideColor=QColor());
-        void plotRun(QFRDRImagingFCSData *m, int i, bool plotFit, QFPlotter* plotter, QFPlotter* plotterResid, QFTableModel *tabFitvals=NULL, int c_tau=-1, QVector<double>* tau_out=NULL, QVector<double>* corr_out=NULL, QVector<double>* errcorr_out=NULL, QColor overrideColor=QColor());
+        void plotRun(QFRDRImagingFCSData *m, int i, bool plotFit, QFPlotter* plotter, QFPlotter* plotterResid, QFTableModel *tabFitvals=NULL, int c_tau=-1, QVector<double>* tau_out=NULL, QVector<double>* corr_out=NULL, QVector<double>* errcorr_out=NULL, QColor overrideColor=QColor(), const QString& overrideTitle=QString());
         void plotRunsAvg(QFRDRImagingFCSData *m, QSet<int32_t> selected, bool plotFit, QFPlotter* plotter, QFPlotter* plotterResid, QFTableModel *tabFitvals=NULL, int c_tau=-1, QVector<double>* tau_out=NULL, QVector<double>* corr_out=NULL, QVector<double>* errcorr_out=NULL, QColor overrideColor=QColor(), const QString& overrideTitle=QString());
 
 
@@ -281,7 +284,7 @@ protected:
         JKQTPerrorPlotstyleComboBox* cmbAverageErrorStyle;
 
         /** \brief a combobox to select how to display the selected pixel */
-        QComboBox* cmbSelectionStyle;
+        QFRDRImagingFCSOverlayStyleCombobox* cmbSelectionStyle;
 
         /** \brief a combobox to select how the runs are displayed */
         JKQTPLinePlotStyleComboBox* cmbRunStyle;
@@ -330,7 +333,7 @@ protected:
         JKQTPOverlayImageEnhanced* plteMaskSelected;
 
         /** \brief  plotter for parameter image */
-        QFPlotter* pltImage;
+        QFRDRImagingFCSImagePlotter* pltImage;
         /** \brief plot for the parameter image in pltImage */
         JKQTPMathImage* plteImage;
         double* plteImageData;
@@ -449,7 +452,6 @@ protected:
         QColor selectionColor;
         QColor excludedColor;
 
-        void setSelectedOverlayStyle(JKQTPOverlayImageEnhanced* plot);
 
 
 

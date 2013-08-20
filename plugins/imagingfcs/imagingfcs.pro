@@ -55,7 +55,10 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcssimulationthread.h \
     ../../extlibs/MersenneTwister.h \
     ../interfaces/qfrdrimfcscorrelatorremote.h \
-    ../base_classes/qffcstools.h
+    ../base_classes/qffcstools.h \
+    qfrdrimagingfcsimageplotter.h \
+    qfrdrimagingfcsimageparametergroupbox.h \
+    qfrdrimagingfcsoverlaystylecombobox.h
 
 
 
@@ -86,7 +89,10 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcsedittools.cpp \
     qfrdrimagingfcssimulator.cpp \
     qfrdrimagingfcssimulationthread.cpp \
-    ../base_classes/qffcstools.cpp
+    ../base_classes/qffcstools.cpp \
+    qfrdrimagingfcsimageplotter.cpp \
+    qfrdrimagingfcsimageparametergroupbox.cpp \
+    qfrdrimagingfcsoverlaystylecombobox.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \
