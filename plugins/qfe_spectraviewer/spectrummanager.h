@@ -104,6 +104,7 @@ class SpectrumManager {
             QString name;
             QString description;
             QString manufacturer;
+            QString folder;
             /** \brief the fluorescence efficiency of the fluorophor [0..1] */
             double fluorescence_efficiency;
             /** \brief fluorescence lifetime [sec] */
@@ -135,6 +136,7 @@ class SpectrumManager {
             QString description;
             QString manufacturer;
             QString orderNo;
+            QString folder;
             /** \brief absorption specturm */
             int spectrum;
             /** \brief reference/source of data */
@@ -150,6 +152,7 @@ class SpectrumManager {
             QString description;
             QString manufacturer;
             QString orderNo;
+            QString folder;
             /** \brief absorption specturm */
             int spectrum;
             /** \brief reference/source of data */
@@ -166,6 +169,7 @@ class SpectrumManager {
             QString description;
             QString manufacturer;
             QString orderNo;
+            QString folder;
             /** \brief absorption specturm */
             int spectrum;
             /** \brief reference/source of data */

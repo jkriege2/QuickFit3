@@ -70,7 +70,9 @@ QF3FilterCombobox::QF3FilterCombobox(QWidget* parent):
     hbl->setContentsMargins(0,0,0,0);
     hbl->setSpacing(1);
     cmbFilters=new QEnhancedComboBox(this);
-    cmbFilters->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    cmbFilters->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
+    cmbFilters->setMinimumContentsLength(10);
+    cmbFilters->view()->setTextElideMode(Qt::ElideRight);
     connect(cmbFilters, SIGNAL(currentIndexChanged(int)), this, SLOT(currentFilterChanged(int)));
     hbl->addWidget(cmbFilters);
 

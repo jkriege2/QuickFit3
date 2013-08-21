@@ -58,7 +58,7 @@ bool QFFitFunctionGeneralLorentzian::estimateInitial(double *params, const doubl
         double pW=0;
         double pB=0;
         double pH=0;
-        double pP=statisticsPeakFind(pW, dataX, dataY, N, 0.0, NAN, &pB, &pH);
+        double pP=statisticsPeakFind(pW, dataX, dataY, N, 0.0, (double)NAN, &pB, &pH);
         if (statisticsFloatIsOK(pP)) {
             params[PARAM_OFFSET]=pB;
             params[PARAM_AMPLITUDE]=pH;

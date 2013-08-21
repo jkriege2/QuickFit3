@@ -31,6 +31,13 @@ QFESpectraViewerDialog::QFESpectraViewerDialog(QFESpectraViewer *plugin, QWidget
     manager=plugin->getSpectrumManager();
 
     ui->setupUi(this);
+
+
+    ui->cmbLaserLine->addItem(tr("Ar:Kr laser / 488nm"), QPointF(488,1));
+    ui->cmbLaserLine->addItem(tr("Ar:Kr laser / 561nm"), QPointF(561,1));
+    ui->cmbLaserLine->addItem(tr("Ar:Kr laser / 647nm"), QPointF(647,1));
+
+
     QToolBar* mainToolbar=new QToolBar(plugin->getID()+"maintoolbar", this);
     ui->mainLayout->insertWidget(0,mainToolbar);
     QAction* actClose=new QAction(QIcon(":/lib/exit.png"), tr("&Close"), this);
@@ -780,7 +787,10 @@ void QFESpectraViewerDialog::writeSettings() {
             saveWidgetGeometry(*set, this, plugin->getID()+"/widget/");
             //saveSplitter(*set, ui->splitter, plugin->getID()+"/splitter/");
             saveSpectraConfig(*set,plugin->getID()+QString("/lastSpectra/") );
-            //set->setValue(plugin->getID()+"/chkSmoothSpectra", ui->chkSmoothSpectra->isChecked());
+            set->setValue(plugin->getID()+"/spinWavelengthMin", ui->spinWavelengthMin->value());
+            set->setValue(plugin->getID()+"/spinWavelengthMax", ui->spinWavelengthMax->value());
+            set->setValue(plugin->getID()+"/chkAUtorange", ui->chkAUtorange->isChecked());
+
 
         }
     }
@@ -795,7 +805,13 @@ void QFESpectraViewerDialog::readSettings() {
             loadWidgetGeometry(*set, this, plugin->getID()+"/widget/");
             //loadSplitter(*set, ui->splitter, plugin->getID()+"/splitter/");
             loadSpectraConfig(*set,plugin->getID()+QString("/lastSpectra/") );
-            //ui->chkSmoothSpectra->setChecked(set->value(plugin->getID()+"/chkSmoothSpectra", true).toBool());
+
+
+            ui->spinWavelengthMin->setValue(set->value(plugin->getID()+"/spinWavelengthMin", 400).toDouble());
+            ui->spinWavelengthMax->setValue(set->value(plugin->getID()+"/spinWavelengthMax", 800).toDouble());
+            ui->chkAUtorange->setChecked(set->value(plugin->getID()+"/chkAUtorange", true).toBool());
+
+
 
 
         }
@@ -814,6 +830,13 @@ void QFESpectraViewerDialog::updatePlots()
 
     ui->plotter->getXAxis()->set_axisLabel(tr("wavelength \\lambda [nm]"));
     ui->plotter->getYAxis()->set_axisLabel(tr("relative intensity/absorbtion [%]"));
+    ui->plotter->get_plotter()->setAbsoluteY(0,1.1);
+    if (ui->chkAUtorange->isChecked()) {
+        ui->plotter->get_plotter()->setAbsoluteX(0, 1e10);
+    } else {
+        ui->plotter->get_plotter()->setAbsoluteX(ui->spinWavelengthMin->value(), ui->spinWavelengthMax->value());
+        ui->plotter->get_plotter()->setX(ui->spinWavelengthMin->value(), ui->spinWavelengthMax->value());
+    }
 
     for (int i=0; i<plotItems.size(); i++) {
         QFESpectraViewerPlotItem item=plotItems[i];
@@ -832,6 +855,7 @@ void QFESpectraViewerDialog::updatePlots()
                     g->set_style(Qt::DashLine);
                     g->set_xColumn(cWL);
                     g->set_yColumn(cSP);
+                    g->set_drawSelectionLine(ui->lstSpectra->currentRow()==i);
                     g->set_color(wavelengthToColor(spec->getSpectrumMaxWavelength()));
                     if (manager->spectrumExists(fl.spectrum_fl))  {
                         SpectrumManager::Spectrum* spec1=manager->getSpectrum(fl.spectrum_fl);
@@ -853,6 +877,7 @@ void QFESpectraViewerDialog::updatePlots()
                     g->set_color(col);
                     col.setAlphaF(0.5);
                     g->set_fillColor(col);
+                    g->set_drawSelectionLine(ui->lstSpectra->currentRow()==i);
                     g->set_xColumn(cWL);
                     g->set_yColumn(cSP);
                     g->set_title(tr("fl: %1").arg(fl.name));
@@ -1003,6 +1028,7 @@ void QFESpectraViewerDialog::updatePlots()
                 g->set_style(Qt::DashLine);
                 g->set_xColumn(cWL);
                 g->set_yColumn(cSP);
+                g->set_drawSelectionLine(ui->lstSpectra->currentRow()==i);
                 QColor col=wavelengthToColor(ls.typical_wavelength);
                 g->set_color(col);
                 col.setAlphaF(0.25);
@@ -1024,6 +1050,7 @@ void QFESpectraViewerDialog::updatePlots()
                     g->set_style(Qt::DashLine);
                     g->set_xColumn(cWL);
                     g->set_yColumn(cSP);
+                    g->set_drawSelectionLine(ui->lstSpectra->currentRow()==i);
                     QColor col=QColor("darkgrey");
                     g->set_color(col);
                     col.setAlphaF(0.25);
@@ -1065,6 +1092,7 @@ void QFESpectraViewerDialog::updatePlots()
                     g->set_style(Qt::DotLine);
                     g->set_xColumn(cWL);
                     g->set_yColumn(cSP);
+                    g->set_drawSelectionLine(ui->lstSpectra->currentRow()==i);
                     QColor col=QColor("darkgrey");
                     g->set_color(col);
                     col.setAlphaF(0.25);
@@ -1295,4 +1323,41 @@ void QFESpectraViewerDialog::on_cmbFilterType_currentIndexChanged(int i)
     if (i==ui->cmbFilterType->count()-1) ui->stackFilter->setCurrentIndex(2);
     else if (i==0||i==3) ui->stackFilter->setCurrentIndex(0);
     else ui->stackFilter->setCurrentIndex(1);
+}
+
+void QFESpectraViewerDialog::on_cmbLaserLine_currentIndexChanged(int i)
+{
+    if (i<0) return;
+    QVariant var=ui->cmbLaserLine->itemData(i);
+    QPointF data=QPointF(var.toDouble(), 1);
+    if (var.canConvert(QVariant::PointF)) data=var.toPointF();
+    if (data.x()>0) {
+        ui->spinLaserCentral->setValue(data.x());
+        if (data.y()<=0) ui->spinLaserLinewidth->setValue(1);
+        else ui->spinLaserLinewidth->setValue(data.y());
+    }
+}
+
+void QFESpectraViewerDialog::on_spinLaserCentral_valueChanged(double value)
+{
+    ui->cmbLaserLine->setCurrentIndex(findLaserLineIndex(ui->spinFilterCentral->value(), ui->spinFilterLinewidth->value()));
+}
+
+void QFESpectraViewerDialog::on_spinLaserLinewidth_valueChanged(double value)
+{
+    ui->cmbLaserLine->setCurrentIndex(findLaserLineIndex(ui->spinFilterCentral->value(), ui->spinFilterLinewidth->value()));
+}
+
+int QFESpectraViewerDialog::findLaserLineIndex(double line, double width) {
+    for (int i=0; i<ui->cmbLaserLine->count(); i++)  {
+        QVariant var=ui->cmbLaserLine->itemData(i);
+        QPointF data=QPointF(var.toDouble(), 1);
+        if (var.canConvert(QVariant::PointF)) data=var.toPointF();
+        if (data.x()>0) {
+            if (data.x()==line && (width<=0 || width==data.y())) {
+                return i;
+            }
+        }
+    }
+    return -1;
 }

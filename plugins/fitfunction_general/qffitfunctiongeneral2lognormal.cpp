@@ -69,7 +69,7 @@ bool QFFitFunctionGeneral2LogNormal::estimateInitial(double *params, const doubl
         double pW2=0;
         double pH2=0;
         double pP2=0;
-        if (statistics2PeakFind(pP, pW, pP2, pW2, dX.data(), dataY, N, 0.0, NAN, &pB, &pH, &pH2)) {
+        if (statistics2PeakFind(pP, pW, pP2, pW2, dX.data(), dataY, N, 0.0, (double)NAN, &pB, &pH, &pH2)) {
             params[PARAM_OFFSET]=pB;
             params[PARAM_AMPLITUDE]=pH;
             params[PARAM_POSITION]=pP;

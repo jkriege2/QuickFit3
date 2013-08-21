@@ -105,7 +105,7 @@ void appendCategorizedFilesFromB040SPIMConfig(QSettings& settings, QStringList& 
                 files_descriptions<<inifiledescriptions[i];
             } else {
                 files<<inifiles[i];
-                files_types<<"image";
+                files_types<<"image_other";
                 files_descriptions<<inifiledescriptions[i];
             }
         } else if (inifiletypes[i].toLower().contains("csv")) {
@@ -243,7 +243,7 @@ QString findFileWithExtensionForVideoCorrelatorFile(const QString& vidCorrFile, 
 
 }
 
-int getEvalsettingsDV2Mode(const QString& filename, const QString& datafilename, bool* isFCCS, bool* isACF) {
+int getEvalsettingsDV2Mode(const QString& filename, const QString& datafilename, bool* isFCCS, bool* isACF, QString* inputFilename) {
     int dvMode=0;
     bool fnIsFCCS=false;
     bool fnIsACF=false;
@@ -315,6 +315,8 @@ int getEvalsettingsDV2Mode(const QString& filename, const QString& datafilename,
                     dccfdx=value.toInt();
                 } else if (isNumber && name=="dccf delta y") {
                     dccfdy=value.toInt();
+                } else if (name=="input file") {
+                    if (inputFilename) *inputFilename=value;
 
                 /*} else if (name=="") {
                     initParams[""]=value.toInt();

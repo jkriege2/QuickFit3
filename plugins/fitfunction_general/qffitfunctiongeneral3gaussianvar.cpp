@@ -75,7 +75,7 @@ bool QFFitFunctionGeneral3GaussianVar::estimateInitial(double *params, const dou
         double pW3=0;
         double pH3=0;
         double pP3=0;
-        if (statistics3PeakFind(pP, pW, pP2, pW2, pP3, pW3, dataX, dataY, N, 0.0, NAN, &pB, &pH, &pH2, &pH3)) {
+        if (statistics3PeakFind(pP, pW, pP2, pW2, pP3, pW3, dataX, dataY, N, 0.0, (double)NAN, &pB, &pH, &pH2, &pH3)) {
             params[PARAM_OFFSET]=pB;
             params[PARAM_AMPLITUDE]=pH;
             params[PARAM_POSITION]=pP;

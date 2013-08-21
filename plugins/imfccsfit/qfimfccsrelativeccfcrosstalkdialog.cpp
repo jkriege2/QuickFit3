@@ -7,7 +7,7 @@
 #include "qfimfccsfitevaluation_item.h"
 #include "qffcstools.h"
 #include "optionswidget.h"
-#include "QFImFCCSRelativeCCFCrosstalkDialog.h"
+#include "qfimfccsrelativeccfcrosstalkdialog.h"
 #include "qfrdrimagetoruninterface.h"
 #include <stdint.h>
 #include "qfmathtools.h"

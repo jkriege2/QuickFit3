@@ -3038,7 +3038,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
 
             QList<double> IACF0, IACF1, CACF0, CACF1, CCCF;
             for (int i=0; i<m->getCorrelationRuns(); i++) {
-                if (selected.contains(i) && i<acf0->getCorrelationRuns() && i<acf1->getCorrelationRuns()) {
+                if (selected.contains(i) && (acf0&&i<acf0->getCorrelationRuns()) && (acf1&&i<acf1->getCorrelationRuns())) {
                     IACF0<<fccs->getSimpleCountrateAverage(i,0);
                     IACF1<<fccs->getSimpleCountrateAverage(i,1);
                     if (acf0) CACF0<<statisticsAverage(acf0->getCorrelationRun(i), qMin(acf0->getCorrelationRuns(), ctAvg));

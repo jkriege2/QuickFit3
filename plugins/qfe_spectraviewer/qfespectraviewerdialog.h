@@ -50,6 +50,7 @@ class QFESpectraViewerDialog : public QDialog
 
         void loadSpectraConfig(QSettings& settings, const QString& prefix=QString(""));
         void saveSpectraConfig(QSettings& settings, const QString& prefix=QString(""));
+        int findLaserLineIndex(double line, double width=-1);
     protected slots:
         void updatePlots();
         void on_btnAddFluorophore_clicked();
@@ -76,6 +77,9 @@ class QFESpectraViewerDialog : public QDialog
         void on_btnMailFilter_clicked();
         void on_btnMailDetector_clicked();
         void on_cmbFilterType_currentIndexChanged(int i);
+        void on_cmbLaserLine_currentIndexChanged(int i);
+        void on_spinLaserCentral_valueChanged(double value);
+        void on_spinLaserLinewidth_valueChanged(double value);
     protected:
         Ui::QFESpectraViewerDialog *ui;
         QFESpectraViewer* plugin;

@@ -36,6 +36,52 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QCheckBox" name="chkAUtorange">
+       <property name="text">
+        <string>autorange wavelength: </string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="spinWavelengthMin">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="suffix">
+        <string> nm</string>
+       </property>
+       <property name="maximum">
+        <double>10000.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_15">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="spinWavelengthMax">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="suffix">
+        <string> nm</string>
+       </property>
+       <property name="maximum">
+        <double>10000.000000000000000</double>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -174,7 +220,7 @@
         <item>
          <widget class="QStackedWidget" name="stackSpectraEditor">
           <property name="currentIndex">
-           <number>3</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="widFilter">
            <layout class="QFormLayout" name="formLayout_2">
@@ -209,7 +255,7 @@
             <item row="2" column="0" colspan="2">
              <widget class="QStackedWidget" name="stackFilter">
               <property name="currentIndex">
-               <number>1</number>
+               <number>2</number>
               </property>
               <widget class="QWidget" name="widFilterBandpass">
                <layout class="QFormLayout" name="formLayout_7">
@@ -289,7 +335,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QComboBox" name="cmbFilter"/>
+                 <widget class="QFTreeViewComboBox" name="cmbFilter"/>
                 </item>
                 <item row="1" column="1">
                  <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -411,18 +457,18 @@
             <item row="1" column="0" colspan="2">
              <widget class="QStackedWidget" name="stackLightsource">
               <property name="currentIndex">
-               <number>1</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="widLSLaser">
                <layout class="QFormLayout" name="formLayout_4">
-                <item row="1" column="0">
+                <item row="2" column="0">
                  <widget class="QLabel" name="label_6">
                   <property name="text">
                    <string>central wavelength:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="1">
+                <item row="2" column="1">
                  <widget class="QDoubleSpinBox" name="spinLaserCentral">
                   <property name="suffix">
                    <string> nm</string>
@@ -435,14 +481,14 @@
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="0">
+                <item row="3" column="0">
                  <widget class="QLabel" name="label_7">
                   <property name="text">
                    <string>linewidth:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="1">
+                <item row="3" column="1">
                  <widget class="QDoubleSpinBox" name="spinLaserLinewidth">
                   <property name="suffix">
                    <string> nm</string>
@@ -454,6 +500,16 @@
                    <double>1.000000000000000</double>
                   </property>
                  </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_14">
+                  <property name="text">
+                   <string>line:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QFTreeViewComboBox" name="cmbLaserLine"/>
                 </item>
                </layout>
               </widget>
@@ -467,7 +523,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QComboBox" name="cmbLightsource"/>
+                 <widget class="QFTreeViewComboBox" name="cmbLightsource"/>
                 </item>
                 <item row="1" column="1">
                  <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -517,7 +573,7 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QComboBox" name="cmbDetector"/>
+             <widget class="QFTreeViewComboBox" name="cmbDetector"/>
             </item>
             <item row="1" column="1">
              <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -565,7 +621,7 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QComboBox" name="cmbFluorophore"/>
+             <widget class="QFTreeViewComboBox" name="cmbFluorophore"/>
             </item>
             <item row="2" column="1">
              <widget class="QCheckBox" name="chkFluorophoreShowExcitation">
@@ -655,13 +711,19 @@
    <header>qfplotter.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>QFTreeViewComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qftreeviewcombobox.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="qfespectraviewer.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="qfespectraviewer.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
@@ -673,8 +735,8 @@
    <slot>setCurrentIndex(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>501</x>
-     <y>387</y>
+     <x>905</x>
+     <y>345</y>
     </hint>
     <hint type="destinationlabel">
      <x>501</x>
@@ -689,8 +751,8 @@
    <slot>updateItemPropertiesModel()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>492</x>
-     <y>369</y>
+     <x>517</x>
+     <y>363</y>
     </hint>
     <hint type="destinationlabel">
      <x>434</x>
@@ -705,8 +767,8 @@
    <slot>updateItemPropertiesModel()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>499</x>
-     <y>387</y>
+     <x>508</x>
+     <y>319</y>
     </hint>
     <hint type="destinationlabel">
      <x>388</x>
@@ -721,12 +783,108 @@
    <slot>updateItemPropertiesModel()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>458</x>
-     <y>443</y>
+     <x>499</x>
+     <y>336</y>
     </hint>
     <hint type="destinationlabel">
      <x>434</x>
      <y>705</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkAUtorange</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinWavelengthMin</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>30</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>785</x>
+     <y>19</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkAUtorange</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_15</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>30</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>806</x>
+     <y>32</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkAUtorange</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinWavelengthMax</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>676</x>
+     <y>22</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>869</x>
+     <y>18</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkAUtorange</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFESpectraViewerDialog</receiver>
+   <slot>updatePlots()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>546</x>
+     <y>21</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>601</x>
+     <y>37</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinWavelengthMin</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFESpectraViewerDialog</receiver>
+   <slot>updatePlots()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>750</x>
+     <y>26</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>749</x>
+     <y>37</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinWavelengthMax</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFESpectraViewerDialog</receiver>
+   <slot>updatePlots()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>871</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>903</x>
+     <y>38</y>
     </hint>
    </hints>
   </connection>

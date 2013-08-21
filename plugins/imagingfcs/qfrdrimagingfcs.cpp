@@ -207,17 +207,19 @@ void QFRDRImagingFCSPlugin::insertRecord() {
                 QString evalsettings=findEvalsettingsFileForVideoCorrelatorFile(filename);
                 bool isFCCS=false;
                 bool isACF=false;
-                int dv2mode=getEvalsettingsDV2Mode(evalsettings, filename, &isFCCS, &isACF);
+                QString group=filename;
+                int dv2mode=getEvalsettingsDV2Mode(evalsettings, filename, &isFCCS, &isACF, &group);
+                group=QFileInfo(group).completeBaseName();
                 if ((dv2mode==0) || !isFCCS || (isFCCS && dv2mode!=1 && dv2mode!=2)) {
-                    insertVideoCorrelatorFile(filename, overview, evalsettings, false, "", 0, 0, true, true, QFileInfo(filename).completeBaseName());
+                    insertVideoCorrelatorFile(filename, overview, evalsettings, false, "", 0, 0, true, true, group);
                 } else if (dv2mode==1||dv2mode==2) {
                     if (isFCCS) {
-                        insertVideoCorrelatorFile(filename, overview, evalsettings, false, QString("FCCS"), dv2mode, 0, true, true, QFileInfo(filename).completeBaseName());
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, false, QString("FCCS"), dv2mode, 0, true, true, group);
                     } else if (isACF) {
-                        insertVideoCorrelatorFile(filename, overview, evalsettings, false, QString("ACF0"), dv2mode, 0, true, true, QFileInfo(filename).completeBaseName());
-                        insertVideoCorrelatorFile(filename, overview, evalsettings, false, QString("ACF1"), dv2mode, 1, true, true, QFileInfo(filename).completeBaseName());
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, false, QString("ACF0"), dv2mode, 0, true, true, group);
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, false, QString("ACF1"), dv2mode, 1, true, true, group);
                     } else {
-                        insertVideoCorrelatorFile(filename, overview, evalsettings, false, QString(""), dv2mode, 0, true, true, QFileInfo(filename).completeBaseName());
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, false, QString(""), dv2mode, 0, true, true, group);
                     }
                 }
             } else if (current_format_name==format_binVideoCorrelator) {
@@ -229,21 +231,23 @@ void QFRDRImagingFCSPlugin::insertRecord() {
                 //qDebug()<<"evalset: "<<evalsettings;
                 bool isFCCS=false;
                 bool isACF=false;
-                int dv2mode=getEvalsettingsDV2Mode(evalsettings, filename, &isFCCS, &isACF);
+                QString group=filename;
+                int dv2mode=getEvalsettingsDV2Mode(evalsettings, filename, &isFCCS, &isACF, &group);
+                group=QFileInfo(group).completeBaseName();
                 //qDebug()<<"isFCCS: "<<isFCCS;
                 //qDebug()<<"isACF: "<<isACF;
                 //qDebug()<<"dv2mode: "<<dv2mode;
                 if (dv2mode==1||dv2mode==2) {
                     if (isFCCS) {
-                        insertVideoCorrelatorFile(filename, overview, evalsettings, true, QString("FCCS"), dv2mode, 0, true, true, QFileInfo(filename).completeBaseName());
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, true, QString("FCCS"), dv2mode, 0, true, true, group);
                     } else if (isACF) {
-                        insertVideoCorrelatorFile(filename, overview, evalsettings, true, QString("ACF0"), dv2mode, 0, true, true, QFileInfo(filename).completeBaseName());
-                        insertVideoCorrelatorFile(filename, overview, evalsettings, true, QString("ACF1"), dv2mode, 1, true, true, QFileInfo(filename).completeBaseName());
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, true, QString("ACF0"), dv2mode, 0, true, true, group);
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, true, QString("ACF1"), dv2mode, 1, true, true, group);
                     } else {
-                        insertVideoCorrelatorFile(filename, overview, evalsettings, true, QString(""), dv2mode, 0, true, true, QFileInfo(filename).completeBaseName());
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, true, QString(""), dv2mode, 0, true, true, group);
                     }
                 } else {
-                    insertVideoCorrelatorFile(filename, overview, evalsettings, true, "", 0, 0, true, true, QFileInfo(filename).completeBaseName());
+                    insertVideoCorrelatorFile(filename, overview, evalsettings, true, "", 0, 0, true, true, group);
                 }
             } else if (current_format_name==format_RH2Cor) {
                 QString filename=*it;

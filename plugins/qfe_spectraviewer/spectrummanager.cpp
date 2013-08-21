@@ -654,11 +654,13 @@ bool SpectrumManager::fluorophoreExists(const QString &f)
 SpectrumManager::FilterData::FilterData()
 {
     spectrum=-1;
+    folder="";
 }
 
 SpectrumManager::LightSourceData::LightSourceData()
 {
     spectrum=-1;
+    folder="";
 }
 
 SpectrumManager::FluorophoreData::FluorophoreData()
@@ -669,10 +671,12 @@ SpectrumManager::FluorophoreData::FluorophoreData()
     extiction_coefficient_wavelength=0;
     spectrum_abs=-1;
     spectrum_fl=-1;
+    folder="";
 }
 
 SpectrumManager::DetectorData::DetectorData()
 {
     spectrum=-1;
+    folder="";
 }
 
