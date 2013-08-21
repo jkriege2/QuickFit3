@@ -25,11 +25,11 @@ QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorCCF::QFFitFunctionsSPIMFCCSFW2CSepDiff2Co
     addParameter(FloatNumber,  "disscciation_constant",     "disscciation constant KD of reaction ab <-> a+b",      "K<sub>d</sub>",            "nM",           "nM",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
     #define FCCSDiff_KD 7
 
-    addParameter(FloatNumber,  "diff_coeff1",            "diffusion coefficient of species a",                  "D<sub>a</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "diff_coeff1",            "CCF: diffusion coefficient of component 1",                  "D<sub>1</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
     #define FCCSDiff_diff_coeff1 8
-    addParameter(FloatNumber,  "diff_coeff2",            "diffusion coefficient of second diffusion component of species a",                  "D<sub>2,a</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 100,           1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "diff_coeff2",            "CCF: diffusion coefficient of component 2",                  "D<sub>2</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 100,           1e-10,    1e50,     1    );
     #define FCCSDiff_diff_coeff2 9
-    addParameter(FloatNumber,  "diff_rho2",            "fraction of second diffusion component of species a",   "&rho;<sub>2,a</sub>",            "", "",    true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,           0,    1,     1    );
+    addParameter(FloatNumber,  "diff_rho2",            "CCF: fraction of diffusion component 2",   "&rho;<sub>2</sub>",            "", "",    true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,           0,    1,     1    );
     #define FCCSDiff_diff_rho2 10
 
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                   "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
