@@ -310,7 +310,15 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         connect(item->getParameterInputTableModel(), SIGNAL(fitParamChanged()), this, SLOT(displayEvaluation()));
         connect(ui->lstFileSets, SIGNAL(clicked(QModelIndex)), this, SLOT(filesSetActivated(QModelIndex)));
         connect(item->getParameterInputTableModel(), SIGNAL(modelRebuilt()), this, SLOT(setParameterTableSpans()));
-        ui->pltOverview->setRDR(item->getFitFile(0));
+        QFRawDataRecord* ovr=item->getFitFile(0);
+        for (int i=0; i<item->getFitFileCount(); i++) {
+            QFRawDataRecord* r=item->getFitFile(i);
+            if (r && (r->getRole().toLower().contains("fccs") || r->getRole().toLower().contains("ccf"))) {
+                ovr=r;
+                break;
+            }
+        }
+        ui->pltOverview->setRDR(ovr);
         updatingData=false;
     }
 
@@ -694,7 +702,15 @@ void QFImFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
 void QFImFCCSFitEvaluationEditor::fileChanged(int num, QFRawDataRecord *file)
 {
     QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
-    if (num==0) ui->pltOverview->setRDR(file);
+    QFRawDataRecord* ovr=eval->getFitFile(0);
+    for (int i=0; i<eval->getFitFileCount(); i++) {
+        QFRawDataRecord* r=eval->getFitFile(i);
+        if (r && (r->getRole().toLower().contains("fccs") || r->getRole().toLower().contains("ccf"))) {
+            ovr=r;
+            break;
+        }
+    }
+    if (ovr!=ui->pltOverview->getRDR()) ui->pltOverview->setRDR(ovr);
     if (!eval) return;
 
     ui->datacut->disableSliderSignals();

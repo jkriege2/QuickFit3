@@ -19,23 +19,36 @@ class QFRDRImagingFCSImagePlotter : public QFPlotter
         explicit QFRDRImagingFCSImagePlotter(bool datastore_internal, QWidget* parent=NULL, JKQTPdatastore* datast=NULL);
         explicit QFRDRImagingFCSImagePlotter(QWidget *parent = 0);
 
+        ~QFRDRImagingFCSImagePlotter();
+
         JKQTPMathImage* get_imagePlot() const { return plteImage; }
         JKQTPOverlayImageEnhanced* get_selectionPlot() const { return plteImageSelected; }
         JKQTPOverlayImageEnhanced* get_maskPlot() const { return plteImageExcluded; }
+
+        double* getData() const;
+        void getDataAtBR(int idx, double& value);
+        double getDataAt(int idx, double defaultValue=0);
+        int32_t getDataSize() const;
+        bool* getExcluded() const;
+        bool* getSelected() const;
 
         void connectTo(QFRDRImagingFCSImageParameterGroupBox* paramGrp, QFRDRImagingFCSOverlayStyleCombobox* overlayCmb);
         void setSelectedData(bool* plteOverviewSelectedData,  bool* plteOverviewExcludedData);
     signals:
         void saveImageSettings();
     public slots:
-        void updateImage();
-        void updateImage(double* data, bool *plteOverviewSelectedData, bool *plteOverviewExcludedData, int width, int height, const QString& label, bool deleteData=false);
-        void updateOverlays();
-        void setDisplayOverlay(bool displayOverlay, bool displayMask);
+        void updatePlot();
+        void updateImage(double* data, bool *plteOverviewSelectedData, bool *plteOverviewExcludedData, int width, int height, const QString& label, bool deleteData=false, bool clearDatastore=false);
+        void updateOverlays(double* avgOut=NULL, double* sdOut=NULL);
+        void updateOverlays(bool *plteOverviewSelectedData, bool *plteOverviewExcludedData, double* avgOut=NULL, double* sdOut=NULL);
+        void setDisplayOverlay(bool displayOverlay, double* avgOut=NULL, double* sdOut=NULL);
         void setCurrent(QFRawDataRecord* current);
+        void clearImage();
     protected slots:
+        void updateImage();
         void moveColorbarsAuto();
         void overlayStyleChanged();
+        void setCopyableData();
     protected:
         void initImFCSPlotter();
 
@@ -64,5 +77,6 @@ class QFRDRImagingFCSImagePlotter : public QFPlotter
 
         QFRawDataRecord* current;
 };
+
 
 #endif // QFRDRIMAGINGFCSIMAGEPLOTTER_H

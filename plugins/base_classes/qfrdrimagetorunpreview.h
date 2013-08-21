@@ -26,6 +26,7 @@ class QFRDRImageToRunPreview : public QWidget
         explicit QFRDRImageToRunPreview(QWidget *parent = 0);
     virtual  ~QFRDRImageToRunPreview();
         void setRDR(QFRawDataRecord* record);
+        QFRawDataRecord* getRDR() const;
 
         int getCurrentRun() const;
         void setRunSelectWidgetActive(bool active);

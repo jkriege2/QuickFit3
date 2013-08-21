@@ -191,7 +191,6 @@ protected:
         /** \brief connect/disconnect widgets for image settings to their slots */
         void connectImageWidgets(bool connectTo=true);
         /** \brief called when the user selects a new palette */
-        void paletteChanged();
         void ovrPaletteChanged();
         void histogramSettingsChanged();
         /** \brief called when the user selects to display overlays or not */
@@ -304,6 +303,7 @@ protected:
         QComboBox* cmbCrosstalkMode;
 
 
+        QFRDRImagingFCSImageParameterGroupBox* grpImage;
 
 
         /** \brief label over the parameter image plot */
@@ -335,14 +335,14 @@ protected:
         /** \brief  plotter for parameter image */
         QFRDRImagingFCSImagePlotter* pltImage;
         /** \brief plot for the parameter image in pltImage */
-        JKQTPMathImage* plteImage;
-        double* plteImageData;
+        //JKQTPMathImage* plteImage;
+        //double* plteImageData;
         int32_t plteImageSize;
 
         /** \brief plot for the selected runs in pltImage, plot plteImageSelectedData */
-        JKQTPOverlayImageEnhanced* plteImageSelected;
+        //JKQTPOverlayImageEnhanced* plteImageSelected;
         /** \brief plot for the excluded runs in pltImage, plot plteImageSelectedData */
-        JKQTPOverlayImageEnhanced* plteImageExcluded;
+        //JKQTPOverlayImageEnhanced* plteImageExcluded;
 
 
         /** \brief  plotter for goodnes of fit image */
@@ -370,18 +370,18 @@ protected:
         JKQTPMathImageColorPalette* cmbColorbarGof;
 
         /** \brief combobox for the color bar of plteImage */
-        JKQTPMathImageColorPalette* cmbColorbar;
+        //JKQTPMathImageColorPalette* cmbColorbar;
         /** \brief combobox for the display style of plteImage */
-        QComboBox* cmbImageStyle;
+       // QComboBox* cmbImageStyle;
         /** \brief cobobox to select what should happen to the out-of-range pixels */
-        QComboBox* cmbOutOfRangeMode;
+        //QComboBox* cmbOutOfRangeMode;
 
 
         /** \brief checkbox to en-/disable automatic color bar scaling */
-        QCheckBox* chkImageAutoScale;
+        //QCheckBox* chkImageAutoScale;
 
-        QFDoubleEdit* edtColMin;
-        QFDoubleEdit* edtColMax;
+        //QFDoubleEdit* edtColMin;
+        //QFDoubleEdit* edtColMax;
 
         /** \brief toolbar to work with parameter images */
         QToolBar* tbParameterImage;

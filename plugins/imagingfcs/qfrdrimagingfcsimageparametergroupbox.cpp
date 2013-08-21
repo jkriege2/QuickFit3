@@ -19,11 +19,11 @@ QFRDRImagingFCSImageParameterGroupBox::QFRDRImagingFCSImageParameterGroupBox(con
 void QFRDRImagingFCSImageParameterGroupBox::setSelectedMaskStyle(JKQTPOverlayImageEnhanced *plot) const
 {
     QColor col=maskColors.value(cmbImageStyle->currentIndex(), QColor("red"));
-    plot->set_trueColor(Qt::transparent);
+    plot->set_trueColor(col);
     plot->set_symbolSizeFactor(0.7);
     plot->set_drawAsRectangles(true);
     plot->set_symbol(JKQTPnoSymbol);
-    plot->set_falseColor(col);
+    plot->set_falseColor(Qt::transparent);
     //plot->set_symbolWidth();
 
 
@@ -40,7 +40,7 @@ void QFRDRImagingFCSImageParameterGroupBox::setSelectedMaskStyle(JKQTPOverlayIma
     }*/
 }
 
-void QFRDRImagingFCSImageParameterGroupBox::setSelectedImageStyle(JKQTPMathImage *plteImage, bool* plteOverviewExcludedData)
+void QFRDRImagingFCSImageParameterGroupBox::setSelectedImageStyle(JKQTPMathImage *plteImage, bool* plteOverviewExcludedData, bool emitSignals)
 {
 
     plteImage->set_palette(cmbColorbar->colorPalette());
@@ -100,13 +100,21 @@ void QFRDRImagingFCSImageParameterGroupBox::setSelectedImageStyle(JKQTPMathImage
     if (chkImageAutoScale->isChecked()) {
         //double mi=0, ma=0;
         //if (mi==ma) plteImage->getDataMinMax(mi, ma);
-        edtColMin->setValue(mi);
-        edtColMax->setValue(ma);
+        //qDebug()<<"mi="<<mi<<" ma="<<ma<<" edtMin="<<edtColMin->value()<<" edtMax="<<edtColMax->value();
+        //qDebug()<<"mi="<<mi-edtColMin->value()<<" ma="<<ma-edtColMax->value();
+        if (edtColMin->value()!=mi || edtColMax->value()!=ma) {
+            disconnect(edtColMax, SIGNAL(valueChanged(double)), this, SLOT(emitSettingsChanged()));
+            disconnect(edtColMin, SIGNAL(valueChanged(double)), this, SLOT(emitSettingsChanged()));
+            edtColMin->setValue(mi);
+            edtColMax->setValue(ma);
+            connect(edtColMax, SIGNAL(valueChanged(double)), this, SLOT(emitSettingsChanged()));
+            connect(edtColMin, SIGNAL(valueChanged(double)), this, SLOT(emitSettingsChanged()));
+            if (emitSignals) emit settingsChanged();
+        }
     }
     plteImage->set_imageMin(edtColMin->value());
     plteImage->set_imageMax(edtColMax->value());
 
-    emit settingsChanged();
 }
 
 int QFRDRImagingFCSImageParameterGroupBox::getMaskStyle() const
@@ -117,6 +125,77 @@ int QFRDRImagingFCSImageParameterGroupBox::getMaskStyle() const
 void QFRDRImagingFCSImageParameterGroupBox::setMaskStyle(int idx)
 {
     cmbImageStyle->setCurrentIndex(idx);
+}
+
+bool QFRDRImagingFCSImageParameterGroupBox::isColorAutoscale() const
+{
+    return chkImageAutoScale->isChecked();
+}
+
+void QFRDRImagingFCSImageParameterGroupBox::setColorAutoscale(bool enable)
+{
+    chkImageAutoScale->setChecked(enable);
+}
+
+double QFRDRImagingFCSImageParameterGroupBox::getColMin() const
+{
+    return edtColMin->value();
+}
+
+double QFRDRImagingFCSImageParameterGroupBox::getColMax() const
+{
+    return edtColMax->value();
+}
+
+void QFRDRImagingFCSImageParameterGroupBox::setColMin(double value)
+{
+    edtColMin->setValue(value);
+}
+
+void QFRDRImagingFCSImageParameterGroupBox::setColMax(double value)
+{
+    edtColMax->setValue(value);
+}
+
+int QFRDRImagingFCSImageParameterGroupBox::getImageStyle() const
+{
+    return cmbImageStyle->currentIndex();
+}
+
+bool QFRDRImagingFCSImageParameterGroupBox::getImageStyleDisplayMask() const
+{
+    return cmbImageStyle->currentIndex()<cmbImageStyle->count()-1;
+
+}
+
+void QFRDRImagingFCSImageParameterGroupBox::setImageStyle(int i)
+{
+    cmbImageStyle->setCurrentIndex(i);
+}
+
+int QFRDRImagingFCSImageParameterGroupBox::getOutOfRangeMode() const
+{
+    return cmbOutOfRangeMode->currentIndex();
+}
+
+void QFRDRImagingFCSImageParameterGroupBox::setOutOfRangeMode(int i)
+{
+    cmbOutOfRangeMode->setCurrentIndex(i);
+}
+
+QString QFRDRImagingFCSImageParameterGroupBox::getColorbarName() const
+{
+    return cmbColorbar->currentText();
+}
+
+QString QFRDRImagingFCSImageParameterGroupBox::getImageStyleName() const
+{
+    return cmbImageStyle->currentText();
+}
+
+QString QFRDRImagingFCSImageParameterGroupBox::getOutOfRangeName() const
+{
+    return cmbOutOfRangeMode->currentText();
 }
 
 JKQTPMathImage::ColorPalette QFRDRImagingFCSImageParameterGroupBox::colorPalette() const
@@ -142,13 +221,9 @@ void QFRDRImagingFCSImageParameterGroupBox::saveConfig(QFRawDataRecord *current,
 
 }
 
-void QFRDRImagingFCSImageParameterGroupBox::loadConfig(QFRawDataRecord *current, const QString &egroup, const QString &param, const QString &imageID, const QString &prefix)
+void QFRDRImagingFCSImageParameterGroupBox::loadConfig(QFRawDataRecord *current, const QString &egroup, const QString &param, const QString &imageID, const QString &prefix, double mi, double ma)
 {
-    double mi=0, ma=1;
-    /*connectParameterWidgets(false);
-    //histogram->connectParameterWidgets(false);
-    plteImage->getDataMinMax(mi, ma);
-    //statisticsMaskedMinMax(plteImage->get_data(), plteOverviewExcludedData, plteImage->get_Nx()+plteImage->get_Ny(), mi, ma, false);*/
+
     int d=current->getProperty(QString("imfcs_imed_colorbar_%1_%3_%2").arg(egroup).arg(param).arg(imageID),
                                current->getProperty(QString("imfcs_imed_colorbar_%1_%2").arg(egroup).arg(param),
                                ProgramOptions::getInstance()->getQSettings()->value(prefix+QString("colorbar"), cmbColorbar->currentIndex()))).toInt();
@@ -177,6 +252,32 @@ void QFRDRImagingFCSImageParameterGroupBox::readSettings(QSettings &settings, co
     cmbImageStyle->setCurrentIndex(settings.value(prefix+QString("paramstyle"), 0).toInt());
     cmbOutOfRangeMode->setCurrentIndex(settings.value(prefix+QString("outofrange_mode"), 1).toInt());
 
+}
+
+void QFRDRImagingFCSImageParameterGroupBox::connectWidgets(bool connectTo)
+{
+    if (connectTo) {
+        connect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(emitSettingsChanged()));
+        connect(cmbImageStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(emitSettingsChanged()));
+        connect(cmbOutOfRangeMode, SIGNAL(currentIndexChanged(int)), this, SLOT(emitSettingsChanged()));
+        connect(chkImageAutoScale, SIGNAL(toggled(bool)), this, SLOT(emitSettingsChanged()));
+        connect(edtColMax, SIGNAL(valueChanged(double)), this, SLOT(emitSettingsChanged()));
+        connect(edtColMin, SIGNAL(valueChanged(double)), this, SLOT(emitSettingsChanged()));
+    } else {
+        disconnect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(emitSettingsChanged()));
+        disconnect(cmbImageStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(emitSettingsChanged()));
+        disconnect(cmbOutOfRangeMode, SIGNAL(currentIndexChanged(int)), this, SLOT(emitSettingsChanged()));
+        disconnect(chkImageAutoScale, SIGNAL(toggled(bool)), this, SLOT(emitSettingsChanged()));
+        disconnect(edtColMax, SIGNAL(valueChanged(double)), this, SLOT(emitSettingsChanged()));
+        disconnect(edtColMin, SIGNAL(valueChanged(double)), this, SLOT(emitSettingsChanged()));
+    }
+}
+
+void QFRDRImagingFCSImageParameterGroupBox::emitSettingsChanged()
+{
+    edtColMin->setEnabled(!chkImageAutoScale->isChecked());
+    edtColMax->setEnabled(!chkImageAutoScale->isChecked());
+    emit settingsChanged();
 }
 
 void QFRDRImagingFCSImageParameterGroupBox::initGrp()

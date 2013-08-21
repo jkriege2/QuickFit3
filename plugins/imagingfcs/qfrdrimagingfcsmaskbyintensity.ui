@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>814</width>
-    <height>421</height>
+    <width>954</width>
+    <height>564</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Mask from Image ...</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -49,7 +49,21 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QFDoubleEdit" name="edtLevel"/>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QFDoubleEdit" name="edtLevel"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFDoubleEdit" name="edtLevel_2"/>
+         </item>
+        </layout>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_5">
@@ -62,35 +76,53 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QFDoubleEdit" name="edtLevel2"/>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QFDoubleEdit" name="edtLevel2"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFDoubleEdit" name="edtLevel2_2"/>
+         </item>
+        </layout>
        </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
           <string>Mode:</string>
          </property>
-         <property name="buddy">
-          <cstring>radMaskSmaller</cstring>
-         </property>
         </widget>
        </item>
        <item row="3" column="1">
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QRadioButton" name="radMaskSmaller">
-           <property name="text">
-            <string>mask smaller pixels</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="radMaskLarger">
-           <property name="text">
-            <string>mask larger pixels</string>
-           </property>
+          <widget class="QComboBox" name="cmbMaskingMode">
+           <item>
+            <property name="text">
+             <string>mask out-of-range pixels</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>mask in-range pixels</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>mask smaller threshold</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>mask larger threshold</string>
+            </property>
+           </item>
           </widget>
          </item>
         </layout>
@@ -99,9 +131,6 @@
         <widget class="QLabel" name="label_6">
          <property name="text">
           <string>DualView:</string>
-         </property>
-         <property name="buddy">
-          <cstring>radMaskSmaller</cstring>
          </property>
         </widget>
        </item>
@@ -135,6 +164,26 @@
           </property>
          </item>
         </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QCheckBox" name="chkEqualChannels">
+         <property name="text">
+          <string>both channels equal</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item row="7" column="1">
         <widget class="QPushButton" name="pushButton">
@@ -185,26 +234,6 @@
          </item>
         </widget>
        </item>
-       <item row="6" column="1">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="5" column="1">
-        <widget class="QCheckBox" name="chkEqualChannels">
-         <property name="text">
-          <string>both channels equal</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
     </layout>
@@ -248,8 +277,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>257</x>
-     <y>411</y>
+     <x>266</x>
+     <y>554</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -264,44 +293,12 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>325</x>
-     <y>411</y>
+     <x>334</x>
+     <y>554</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radMaskLarger</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
-   <slot>updateMask()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>801</x>
-     <y>122</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>355</x>
-     <y>143</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radMaskSmaller</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
-   <slot>updateMask()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>801</x>
-     <y>99</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>405</x>
-     <y>152</y>
     </hint>
    </hints>
   </connection>
@@ -312,8 +309,8 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>802</x>
-     <y>49</y>
+     <x>784</x>
+     <y>50</y>
     </hint>
     <hint type="destinationlabel">
      <x>361</x>
@@ -328,8 +325,8 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>802</x>
-     <y>49</y>
+     <x>784</x>
+     <y>50</y>
     </hint>
     <hint type="destinationlabel">
      <x>408</x>
@@ -344,8 +341,8 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>802</x>
-     <y>247</y>
+     <x>942</x>
+     <y>233</y>
     </hint>
     <hint type="destinationlabel">
      <x>397</x>
@@ -360,8 +357,8 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>802</x>
-     <y>49</y>
+     <x>784</x>
+     <y>50</y>
     </hint>
     <hint type="destinationlabel">
      <x>390</x>
@@ -376,8 +373,8 @@
    <slot>updateDualView()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>717</x>
-     <y>136</y>
+     <x>942</x>
+     <y>135</y>
     </hint>
     <hint type="destinationlabel">
      <x>613</x>
@@ -392,8 +389,8 @@
    <slot>updateDualView()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>696</x>
-     <y>163</y>
+     <x>942</x>
+     <y>158</y>
     </hint>
     <hint type="destinationlabel">
      <x>621</x>
@@ -430,6 +427,54 @@
     <hint type="destinationlabel">
      <x>616</x>
      <y>26</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbMaskingMode</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateMask()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>808</x>
+     <y>97</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>582</x>
+     <y>77</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtLevel2_2</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateMask()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>838</x>
+     <y>65</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>578</x>
+     <y>58</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtLevel_2</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateMask()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>829</x>
+     <y>46</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>579</x>
+     <y>42</y>
     </hint>
    </hints>
   </connection>

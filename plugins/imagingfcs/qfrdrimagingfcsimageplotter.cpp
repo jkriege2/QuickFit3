@@ -5,6 +5,7 @@
 #include "qfrdrimagingfcs_data.h"
 #include "qfrdrimagingfcsimageparametergroupbox.h"
 #include "qfrdrimagingfcsoverlaystylecombobox.h"
+#include "statistics_tools.h"
 
 #define OverlayRectanglesAsImageOverlay true
 
@@ -21,14 +22,70 @@ QFRDRImagingFCSImagePlotter::QFRDRImagingFCSImagePlotter(QWidget *parent) :
     initImFCSPlotter();
 }
 
+QFRDRImagingFCSImagePlotter::~QFRDRImagingFCSImagePlotter()
+{
+    if (plteImageData) free(plteImageData);
+}
+
+double *QFRDRImagingFCSImagePlotter::getData() const
+{
+    return plteImageData;
+}
+
+void QFRDRImagingFCSImagePlotter::getDataAtBR(int idx, double &value)
+{
+    if (plteImageData && idx>0 && idx<plteImageSize) value=plteImageData[idx];
+}
+
+double QFRDRImagingFCSImagePlotter::getDataAt(int idx, double defaultValue)
+{
+    if (plteImageData && idx>0 && idx<plteImageSize) return plteImageData[idx];
+    return defaultValue;
+}
+
+int32_t QFRDRImagingFCSImagePlotter::getDataSize() const
+{
+    return plteImageSize;
+}
+
+bool *QFRDRImagingFCSImagePlotter::getExcluded() const
+{
+    return plteOverviewExcludedData;
+}
+
+bool *QFRDRImagingFCSImagePlotter::getSelected() const
+{
+    return plteOverviewSelectedData;
+}
+
 
 
 void QFRDRImagingFCSImagePlotter::connectTo(QFRDRImagingFCSImageParameterGroupBox *paramGrp, QFRDRImagingFCSOverlayStyleCombobox *overlayCmb)
 {
+    if (this->paramGrp) disconnect(this->paramGrp, SIGNAL(settingsChanged()), this, SLOT(updatePlot()));
+    if (this->overlayCmb) disconnect(this->overlayCmb, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlot()));
     this->paramGrp=paramGrp;
     this->overlayCmb=overlayCmb;
+    if (paramGrp) connect(paramGrp, SIGNAL(settingsChanged()), this, SLOT(updatePlot()));
+    if (overlayCmb) connect(overlayCmb, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlot()));
 }
 
+
+void QFRDRImagingFCSImagePlotter::updatePlot()
+{
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    bool draw=get_doDrawing();
+    set_doDrawing(false);
+
+
+    updateImage();
+    updateOverlays();
+
+    setCopyableData();
+    set_doDrawing(draw);
+    if (draw) update_plot();
+    QApplication::restoreOverrideCursor();
+}
 
 void QFRDRImagingFCSImagePlotter::updateImage()
 {
@@ -74,22 +131,25 @@ void QFRDRImagingFCSImagePlotter::updateImage()
         plteImage->set_width(w);
         plteImage->set_height(h);
         if (paramGrp) {
-            paramGrp->setSelectedImageStyle(plteImage, plteOverviewExcludedData);
+            paramGrp->setSelectedImageStyle(plteImage, plteOverviewExcludedData, false);
         }
+
 
     }
 
-    updateImage();
+    setCopyableData();
     set_doDrawing(draw);
     if (draw) update_plot();
     QApplication::restoreOverrideCursor();
 }
 
-void QFRDRImagingFCSImagePlotter::updateImage(double *data, bool *plteOverviewSelectedData, bool *plteOverviewExcludedData, int width, int height, const QString& label, bool deleteData)
+void QFRDRImagingFCSImagePlotter::updateImage(double *data, bool *plteOverviewSelectedData, bool *plteOverviewExcludedData, int width, int height, const QString& label, bool deleteData, bool clearDatastore)
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     bool draw=get_doDrawing();
     set_doDrawing(false);
+
+    if (clearDatastore) getDatastore()->clear();
 
     this->plteOverviewSelectedData=plteOverviewSelectedData;
     this->plteOverviewExcludedData=plteOverviewExcludedData;
@@ -109,15 +169,23 @@ void QFRDRImagingFCSImagePlotter::updateImage(double *data, bool *plteOverviewSe
 
 
 
-    updateImage();
+    updatePlot();
     set_doDrawing(draw);
     if (draw) update_plot();
     QApplication::restoreOverrideCursor();
 }
 
-void QFRDRImagingFCSImagePlotter::updateOverlays()
+void QFRDRImagingFCSImagePlotter::updateOverlays(double *avgOut, double *sdOut)
 {
-    setDisplayOverlay(displayOverlay, displayMask);
+    setDisplayOverlay(displayOverlay/*, displayMask*/, avgOut, sdOut);
+}
+
+void QFRDRImagingFCSImagePlotter::updateOverlays(bool *plteOverviewSelectedData, bool *plteOverviewExcludedData, double *avgOut, double *sdOut)
+{
+    this->plteOverviewSelectedData=plteOverviewSelectedData;
+    this->plteOverviewExcludedData=plteOverviewExcludedData;
+
+    updateOverlays(avgOut, sdOut);
 }
 
 void QFRDRImagingFCSImagePlotter::initImFCSPlotter()
@@ -196,9 +264,14 @@ void QFRDRImagingFCSImagePlotter::overlayStyleChanged()
 }
 
 
-void QFRDRImagingFCSImagePlotter::setDisplayOverlay(bool displayOverlay, bool displayMask)
+void QFRDRImagingFCSImagePlotter::setDisplayOverlay(bool displayOverlay, double *avgOut, double *sdOut)
 {
-    this->displayMask=displayMask;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    bool draw=get_doDrawing();
+    set_doDrawing(false);
+
+    this->displayMask=true;
+    if (paramGrp) displayMask=paramGrp->getImageStyleDisplayMask();
     this->displayOverlay=displayOverlay;
     if (!displayOverlay) {
         deleteGraph(plteImageSelected, false);
@@ -220,12 +293,79 @@ void QFRDRImagingFCSImagePlotter::setDisplayOverlay(bool displayOverlay, bool di
     if (paramGrp) paramGrp->setSelectedMaskStyle(plteImageExcluded);
 
     if (containsGraph(plteImageSelected)) moveGraphTop(plteImageSelected);
+
+    if ((avgOut || sdOut)&&plteOverviewSelectedData&&plteOverviewExcludedData) {
+        bool *msk=(bool*)calloc(plteImageWidth*plteImageHeight, sizeof(bool));
+        int cnt=0;
+        for (int i=0; i<plteImageWidth*plteImageHeight; i++) {
+            msk[i]=plteOverviewSelectedData[i]&&(!plteOverviewExcludedData[i]);
+            if (msk[i]) cnt++;
+        }
+        double imgAvg=0;
+        double imgVar=0;
+        //imgAvg=statisticsAverageVarianceMasked(imgVar, plteOverviewSelectedData, plteImageData, qMin(plteOverviewSize, plteImageWidth*plteImageHeight));
+        if (cnt>1){
+            imgAvg=statisticsAverageVarianceMasked(imgVar, msk, plteImageData, plteImageWidth*plteImageHeight);
+        } else {
+            imgAvg=statisticsAverageVarianceMasked(imgVar, plteOverviewExcludedData, plteImageData, plteImageWidth*plteImageHeight, false);
+        }
+        free(msk);
+
+        if (avgOut) *avgOut=imgAvg;
+        if (sdOut) *sdOut=sqrt(imgVar);
+    }
+
+    double w=plteImageWidth;
+    double h=plteImageHeight;
+    if ((w<=0) || (h<=0)) {
+        w=h=1;
+    }
+
+    plteImageSelected->set_width(w);
+    plteImageSelected->set_height(h);
+    plteImageSelected->set_data(plteOverviewSelectedData, plteImageWidth, plteImageHeight);
+
+
+    plteImageExcluded->set_width(w);
+    plteImageExcluded->set_height(h);
+    plteImageExcluded->set_data(plteOverviewExcludedData, plteImageWidth, plteImageHeight);
+
     emit saveImageSettings();
 
-    updateImage();
+    //updateImage();
+
+    set_doDrawing(draw);
+    if (draw) update_plot();
+    QApplication::restoreOverrideCursor();
+
 }
 
 void QFRDRImagingFCSImagePlotter::setCurrent(QFRawDataRecord *current)
 {
     this->current=current;
 }
+
+void QFRDRImagingFCSImagePlotter::clearImage()
+{
+    if (plteImageData) free(plteImageData);
+    plteImageData=NULL;
+    plteImageSize=0;
+    plteImageWidth=0;
+    plteImageHeight=0;
+
+    updatePlot();
+}
+
+void QFRDRImagingFCSImagePlotter::setCopyableData()
+{
+    getDatastore()->clear();
+    if (plteImageData && plteOverviewSelectedData && plteOverviewExcludedData && plteImageSize>0) {
+        getDatastore()->addCopiedColumn(plteImageData, plteImageSize, plteImageLabel);
+        getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteImageSize, tr("selection"));
+        getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteImageSize, tr("mask"));
+    }
+}
+
+
+
+

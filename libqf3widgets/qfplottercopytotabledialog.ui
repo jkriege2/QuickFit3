@@ -7,20 +7,26 @@
     <x>0</x>
     <y>0</y>
     <width>807</width>
-    <height>380</height>
+    <height>446</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Add plot data to table ...</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,1,2,0,1,0">
    <item>
-    <widget class="QLabel" name="labDescription">
-     <property name="text">
-      <string/>
+    <widget class="QTextBrowser" name="labDescription">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="wordWrap">
-      <bool>true</bool>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>64</height>
+      </size>
      </property>
     </widget>
    </item>
@@ -81,6 +87,12 @@
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
       <string> Add to graph? </string>
      </property>

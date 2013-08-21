@@ -107,6 +107,11 @@ void QFRDRImageToRunPreview::setRDR(QFRawDataRecord *record)
     setCurrentRun(currentRun, true);
 }
 
+QFRawDataRecord *QFRDRImageToRunPreview::getRDR() const
+{
+    return record;
+}
+
 int QFRDRImageToRunPreview::getCurrentRun() const
 {
     return currentRun;
