@@ -166,10 +166,17 @@ double QFRDRImagingFCSData::getMeasurementDuration() const
     if (propertyExists("MEASUREMENT_DURATION_MS")) return getProperty("MEASUREMENT_DURATION_MS", 0.0).toDouble()/1000.0;
     if (propertyExists("FRAME_COUNT") || propertyExists("FRAMECOUNT") || propertyExists("FRAMES")) {
         double frames=getProperty("FRAME_COUNT", getProperty("FRAMECOUNT", getProperty("FRAMES", 0).toLongLong()).toLongLong()).toLongLong();
-        if (propertyExists("FRAMETIME_MS")) return frames*getProperty("FRAMETIME_MS", 1.0/1000.0).toDouble()/1000.0;
-        if (propertyExists("FRAME_TIME")) return frames*getProperty("FRAME_TIME", 1).toDouble();
-        if (propertyExists("FRAMETIME")) return frames*getProperty("FRAMETIME", 1).toDouble();
+        return frames*getFrameTime();
     }
+    return 0;
+}
+
+double QFRDRImagingFCSData::getFrameTime() const
+{
+    if (propertyExists("FRAMETIME_MS")) return getProperty("FRAMETIME_MS", 0).toDouble()/1000.0;
+    if (propertyExists("FRAME_TIME")) return getProperty("FRAME_TIME", 0).toDouble();
+    if (propertyExists("FRAMETIME")) return getProperty("FRAMETIME", 0).toDouble();
+    if (tau && N>0) return tau[0];
     return 0;
 }
 

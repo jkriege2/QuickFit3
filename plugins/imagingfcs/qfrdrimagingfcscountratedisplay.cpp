@@ -181,7 +181,7 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
         ds->clear();
         ui->pltIntensity->set_doDrawing(false);
         double duration=m->getMeasurementDuration();
-        double exposure=m->getProperty("FRAMETIME_MS", 0).toDouble();
+        double exposure=m->getFrameTime();
         int segments=m->getSegmentCount();
         int sumframes=m->getProperty("VIDEO_AVGFRAMES", 0).toInt();
 

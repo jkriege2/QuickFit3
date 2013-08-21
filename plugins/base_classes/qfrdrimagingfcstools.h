@@ -36,6 +36,10 @@ void appendCategorizedFilesFromB040SPIMConfig(QSettings& settings, QStringList& 
 
 QString findB040ExperimentDescriptionForData(const QString& filename);
 
+QString findEvalsettingsFileForVideoCorrelatorFile(const QString& vidCorrFile);
+QString findOverviewFileForVideoCorrelatorFile(const QString& vidCorrFile);
 
+QString findFileWithExtensionForVideoCorrelatorFile(const QString& vidCorrFile, const QString& newExtension);
 
+int getEvalsettingsDV2Mode(const QString& filename, const QString &datafilename=QString(""), bool *isFCCS=NULL, bool *isACF=NULL);
 #endif // QFRDRIMAGINGFCSTOOLS_H

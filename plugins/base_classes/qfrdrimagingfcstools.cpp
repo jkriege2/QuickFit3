@@ -192,3 +192,140 @@ QString findB040ExperimentDescriptionForData(const QString& filename) {
 
     return inputconfigfile;
 }
+
+
+QString findEvalsettingsFileForVideoCorrelatorFile(const QString& vidCorrFile) {
+    return findFileWithExtensionForVideoCorrelatorFile(vidCorrFile, ".evalsettings.txt");
+}
+
+
+QString findOverviewFileForVideoCorrelatorFile(const QString& vidCorrFile) {
+    QString ovr=findFileWithExtensionForVideoCorrelatorFile(vidCorrFile, ".overview_float.tif");
+    if (!QFile::exists(ovr) || ovr==vidCorrFile) {
+        ovr=findFileWithExtensionForVideoCorrelatorFile(vidCorrFile, ".overview.tif");
+    }
+    if (!QFile::exists(ovr) || ovr==vidCorrFile) {
+        ovr=findFileWithExtensionForVideoCorrelatorFile(vidCorrFile, ".overview_uncorrected.tif");
+    }
+    if (!QFile::exists(ovr) || ovr==vidCorrFile) {
+        ovr="";
+    }
+    return ovr;
+}
+
+QString findFileWithExtensionForVideoCorrelatorFile(const QString& vidCorrFile, const QString& newExtension) {
+    QRegExp rxdccf("\\.dccf(\\d+)?\\.(dat|bin)");
+    rxdccf.setCaseSensitivity(Qt::CaseInsensitive);
+    rxdccf.setMinimal(true);
+    QRegExp rxacf("\\.(autocorrelation|acf|autocorrelation0|acf0|autocorrelation1|acf1)\\.(dat|bin)");
+    rxacf.setCaseSensitivity(Qt::CaseInsensitive);
+    rxacf.setMinimal(true);
+    QRegExp rxccf("\\.(crosscorrelation|ccf|fccs|dccf)\\.(dat|bin)");
+    rxccf.setCaseSensitivity(Qt::CaseInsensitive);
+    rxccf.setMinimal(true);
+
+    QString overview=vidCorrFile;
+    overview=overview.replace(rxdccf, newExtension);
+    //qDebug()<<"   test: "<<overview;
+    if (!QFile::exists(overview) || overview==vidCorrFile) {
+        overview=vidCorrFile;
+        overview=overview.replace(rxacf, newExtension);
+        //qDebug()<<"   test: "<<overview;
+    }
+    if (!QFile::exists(overview) || overview==vidCorrFile) {
+        overview=vidCorrFile;
+        overview=overview.replace(rxccf, newExtension);
+        //qDebug()<<"   test: "<<overview;
+    }
+    if (!QFile::exists(overview) || overview==vidCorrFile) overview="";
+
+    return overview;
+
+}
+
+int getEvalsettingsDV2Mode(const QString& filename, const QString& datafilename, bool* isFCCS, bool* isACF) {
+    int dvMode=0;
+    bool fnIsFCCS=false;
+    bool fnIsACF=false;
+    if (   datafilename.endsWith(".autocorrelation.bin", Qt::CaseInsensitive)
+           || datafilename.endsWith(".acf.bin", Qt::CaseInsensitive)
+           || datafilename.endsWith(".acf.dat", Qt::CaseInsensitive)
+           || datafilename.endsWith(".autocorrelation.dat", Qt::CaseInsensitive)) {
+        fnIsACF=true;
+    }
+    int w=0, h=0, dccfdx=0, dccfdy=0;
+    if (QFile::exists(filename)) {
+        QFile file(filename);
+        QDir d=QFileInfo(filename).absoluteDir();
+        //qDebug()<<"readEvalSettings: "<<evalFilename;
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QTextStream stream(&file);
+            QString line;
+            QRegExp reg("(.*)(:\\s*)([+-]?\\d*\\.?\\d+([eE][+-]?\\d+)?)");
+            do {
+                line = stream.readLine();
+
+                int colon_idx=line.indexOf(':');
+                QString name=line.left(colon_idx).toLower().trimmed();
+                QString value=line.mid(colon_idx+1).trimmed();
+                if (colon_idx<0) {
+                    name="";
+                    value="";
+                }
+                bool isNumber=false;
+                if (reg.indexIn(line)>-1) {
+                    name=reg.cap(1).toLower().trimmed();
+                    value=reg.cap(3);
+                    isNumber=true;
+                }
+
+
+                QRegExp rxdccfp("dccf\\s+(\\d+\\s+)?(delta x|delta y|frame width|frame height|role)");
+                rxdccfp.setMinimal(true);
+                rxdccfp.setCaseSensitivity(Qt::CaseInsensitive);
+                bool isDCCFParam=rxdccfp.indexIn(name)>=0;
+                QString dccfParam=rxdccfp.cap(2).toLower();
+                int dccfParamID=-1;
+                if (!rxdccfp.cap(1).isEmpty()) dccfParamID=rxdccfp.cap(1).toInt();
+
+
+                //qDebug()<<name <<"  =  "<<value;
+
+                //qDebug()<<name <<"  =  "<<value<<"     dccfp="<<isDCCFParam<< " role="<<dccfParam<<" id="<<dccfParamID;
+                if (isDCCFParam && dccfParam=="role"){
+                    /*qDebug()<<"test dccf role: ID="<<dccfParamID;
+                    qDebug()<<"    dccs value: "<<value;
+                    qDebug()<<"        datafn: "<<datafilename;
+                    qDebug()<<"       endtest: "<<QString(".dccf%1.bin").arg(dccfParamID, 3, 10, QLatin1Char('0'));
+                    qDebug()<<"       endtest: "<<QString(".dccf%1.dat").arg(dccfParamID, 3, 10, QLatin1Char('0'));*/
+                    if (value.toUpper().trimmed()=="FCCS" && (datafilename.endsWith(QString(".dccf%1.bin").arg(dccfParamID, 3, 10, QLatin1Char('0')), Qt::CaseInsensitive)||datafilename.endsWith(QString(".dccf%1.dat").arg(dccfParamID, 3, 10, QLatin1Char('0')), Qt::CaseInsensitive))) {
+                        fnIsFCCS=true;
+                    }
+                } else if (isNumber && isDCCFParam && dccfParam=="delta x"  && (datafilename.endsWith(QString(".dccf%1.bin").arg(dccfParamID, 3, 10, QLatin1Char('0')), Qt::CaseInsensitive)||datafilename.endsWith(QString(".dccf%1.dat").arg(dccfParamID, 3, 10, QLatin1Char('0')), Qt::CaseInsensitive))) {
+                    dccfdx=value.toInt();
+                } else if (isNumber && isDCCFParam && dccfParam=="delta y"  && (datafilename.endsWith(QString(".dccf%1.bin").arg(dccfParamID, 3, 10, QLatin1Char('0')), Qt::CaseInsensitive)||datafilename.endsWith(QString(".dccf%1.dat").arg(dccfParamID, 3, 10, QLatin1Char('0')), Qt::CaseInsensitive))) {
+                    dccfdy=value.toInt();
+                } else if (isNumber && name=="dualview mode") {
+                    dvMode=value.toInt();
+                } else if (isNumber && name=="width") {
+                    w=value.toInt();
+                } else if (isNumber && name=="height") {
+                    h=value.toInt();
+                } else if (isNumber && name=="dccf delta x") {
+                    dccfdx=value.toInt();
+                } else if (isNumber && name=="dccf delta y") {
+                    dccfdy=value.toInt();
+
+                /*} else if (name=="") {
+                    initParams[""]=value.toInt();
+                    paramsReadonly<<"";*/
+                }
+
+            } while (!line.isNull());
+            file.close();
+        }
+    }
+    if (isFCCS) *isFCCS = fnIsFCCS;
+    if (isACF) *isACF = fnIsACF;
+    return dvMode;
+}

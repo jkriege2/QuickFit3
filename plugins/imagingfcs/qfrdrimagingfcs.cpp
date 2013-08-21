@@ -203,48 +203,48 @@ void QFRDRImagingFCSPlugin::insertRecord() {
             QApplication::processEvents();
             if (current_format_name==format_videoCorrelator) {
                 QString filename=*it;
-                QString overview=filename;
-                overview=overview.replace(".autocorrelation.dat", ".overview.tif");
-                if (!QFile::exists(overview)) {
-                    overview=filename;
-                    overview=overview.replace(".crosscorrelation.dat", ".overview.tif");
+                QString overview=findOverviewFileForVideoCorrelatorFile(filename);
+                QString evalsettings=findEvalsettingsFileForVideoCorrelatorFile(filename);
+                bool isFCCS=false;
+                bool isACF=false;
+                int dv2mode=getEvalsettingsDV2Mode(evalsettings, filename, &isFCCS, &isACF);
+                if ((dv2mode==0) || !isFCCS || (isFCCS && dv2mode!=1 && dv2mode!=2)) {
+                    insertVideoCorrelatorFile(filename, overview, evalsettings, false, "", 0, 0, true, true, QFileInfo(filename).completeBaseName());
+                } else if (dv2mode==1||dv2mode==2) {
+                    if (isFCCS) {
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, false, QString("FCCS"), dv2mode, 0, true, true, QFileInfo(filename).completeBaseName());
+                    } else if (isACF) {
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, false, QString("ACF0"), dv2mode, 0, true, true, QFileInfo(filename).completeBaseName());
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, false, QString("ACF1"), dv2mode, 1, true, true, QFileInfo(filename).completeBaseName());
+                    } else {
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, false, QString(""), dv2mode, 0, true, true, QFileInfo(filename).completeBaseName());
+                    }
                 }
-                if (!QFile::exists(overview)) {
-                    overview=filename;
-                    overview=overview.replace(rxdccf, ".overview.tif");
-                }
-                if (!QFile::exists(overview)) {
-                    overview=filename;
-                    overview=overview.replace(".ccf.dat", ".overview.tif");
-                }
-                if (!QFile::exists(overview)) {
-                    overview=filename;
-                    overview=overview.replace(".acf.dat", ".overview.tif");
-                }
-                if (!QFile::exists(overview)) overview="";
-                insertVideoCorrelatorFile(filename, overview, QString(""), false);
             } else if (current_format_name==format_binVideoCorrelator) {
                 QString filename=*it;
-                QString overview=filename;
-                overview=overview.replace(".autocorrelation.bin", ".overview.tif");
-                if (!QFile::exists(overview)) {
-                    overview=filename;
-                    overview=overview.replace(".crosscorrelation.bin", ".overview.tif");
+                //qDebug()<<"file: "<<filename;
+                QString overview=findOverviewFileForVideoCorrelatorFile(filename);
+                //qDebug()<<"ovr: "<<overview;
+                QString evalsettings=findEvalsettingsFileForVideoCorrelatorFile(filename);
+                //qDebug()<<"evalset: "<<evalsettings;
+                bool isFCCS=false;
+                bool isACF=false;
+                int dv2mode=getEvalsettingsDV2Mode(evalsettings, filename, &isFCCS, &isACF);
+                //qDebug()<<"isFCCS: "<<isFCCS;
+                //qDebug()<<"isACF: "<<isACF;
+                //qDebug()<<"dv2mode: "<<dv2mode;
+                if (dv2mode==1||dv2mode==2) {
+                    if (isFCCS) {
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, true, QString("FCCS"), dv2mode, 0, true, true, QFileInfo(filename).completeBaseName());
+                    } else if (isACF) {
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, true, QString("ACF0"), dv2mode, 0, true, true, QFileInfo(filename).completeBaseName());
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, true, QString("ACF1"), dv2mode, 1, true, true, QFileInfo(filename).completeBaseName());
+                    } else {
+                        insertVideoCorrelatorFile(filename, overview, evalsettings, true, QString(""), dv2mode, 0, true, true, QFileInfo(filename).completeBaseName());
+                    }
+                } else {
+                    insertVideoCorrelatorFile(filename, overview, evalsettings, true, "", 0, 0, true, true, QFileInfo(filename).completeBaseName());
                 }
-                if (!QFile::exists(overview)) {
-                    overview=filename;
-                    overview=overview.replace(rxdccf, ".overview.tif");
-                }
-                if (!QFile::exists(overview)) {
-                    overview=filename;
-                    overview=overview.replace(".ccf.bin", ".overview.tif");
-                }
-                if (!QFile::exists(overview)) {
-                    overview=filename;
-                    overview=overview.replace(".acf.bin", ".overview.tif");
-                }
-                if (!QFile::exists(overview)) overview="";
-                insertVideoCorrelatorFile(filename, overview, QString(""), true);
             } else if (current_format_name==format_RH2Cor) {
                 QString filename=*it;
                 insertRH2CorFile(filename, "ACF");
@@ -874,6 +874,12 @@ bool QFRDRImagingFCSPlugin::readEvalSettings(const QString &evalFilename, bool i
                 } else if (name=="correlation segments") {
                     initParams["SEGMENTS"]=value.toInt();
                     paramsReadonly<<"SEGMENTS";
+                } else if (name=="frametime (ms)") {
+                    initParams["FRAMETIME_MS"]=value.toInt();
+                    paramsReadonly<<"FRAMETIME_MS";
+                } else if (name=="frametime (s)") {
+                    initParams["FRAMETIME"]=value.toInt();
+                    paramsReadonly<<"FRAMETIME";
                 } else if (name=="correlator s") {
                     initParams["CORR_S"]=value.toInt();
                     paramsReadonly<<"CORR_S";

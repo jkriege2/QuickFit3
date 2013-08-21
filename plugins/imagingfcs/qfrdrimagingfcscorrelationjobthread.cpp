@@ -779,6 +779,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     text<<"pixel width                 : "<<outLocale.toString(job.cameraPixelWidth) << "\n";
                                     text<<"pixel height                : "<<outLocale.toString(job.cameraPixelHeight) << "\n";
                                 }
+                                text<<"frametime (ms)              : "<<job.frameTime*1.0e3 << "\n";
+                                text<<"frametime (s)               : "<<job.frameTime << "\n";
                                 text<<"dualview mode               : "<<job.dualViewMode << "\n";
                                 text<<"binning                     : "<<outLocale.toString(reader->getBinning()) << "\n";
                                 text<<"interleaved binning         : "<< QString((reader->getInterleavedBinning())?"true":"false") << "\n";

@@ -3027,7 +3027,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
         QFRDRImagingFCSData* acf0=m->getRoleFromThisGroup("acf0");
         QFRDRImagingFCSData* acf1=m->getRoleFromThisGroup("acf1");
 
-        if (m->isFCCS() && cmbSeletionCorrDisplayMode->currentIndex()==2 && acf0 && acf1) {
+        if (m->isFCCS() && cmbSeletionCorrDisplayMode->currentIndex()==2 ) {
             QVector<double> dataTauACF0, dataCorrACF0, dataCorrErrACF0;
             QVector<double> dataTauACF1, dataCorrACF1, dataCorrErrACF1;
             QVector<double> dataTauCCF,  dataCorrCCF,  dataCorrErrCCF;
@@ -3041,24 +3041,24 @@ void QFRDRImagingFCSImageEditor::replotData() {
                 if (selected.contains(i) && i<acf0->getCorrelationRuns() && i<acf1->getCorrelationRuns()) {
                     IACF0<<fccs->getSimpleCountrateAverage(i,0);
                     IACF1<<fccs->getSimpleCountrateAverage(i,1);
-                    CACF0<<statisticsAverage(acf0->getCorrelationRun(i), qMin(acf0->getCorrelationRuns(), ctAvg));
-                    CACF1<<statisticsAverage(acf1->getCorrelationRun(i), qMin(acf1->getCorrelationRuns(), ctAvg));
+                    if (acf0) CACF0<<statisticsAverage(acf0->getCorrelationRun(i), qMin(acf0->getCorrelationRuns(), ctAvg));
+                    if (acf1) CACF1<<statisticsAverage(acf1->getCorrelationRun(i), qMin(acf1->getCorrelationRuns(), ctAvg));
                     CCCF<<statisticsAverage(fccs->getCorrelationRun(i), qMin(fccs->getCorrelationRuns(), ctAvg));
                 }
             }
 
 
             if (selected.size()==1) {
-                plotRun(acf0, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
-                plotRun(acf1, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
+                if (acf0) plotRun(acf0, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
+                if (acf1) plotRun(acf1, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
                 plotRun(fccs, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauCCF, &dataCorrCCF, &dataCorrErrCCF, QColor("blue"), tr("CCF"));
             } else {
-                plotRunsAvg(acf0, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
-                plotRunsAvg(acf1, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
+                if (acf0) plotRunsAvg(acf0, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
+                if (acf1) plotRunsAvg(acf1, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
                 plotRunsAvg(fccs, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauCCF, &dataCorrCCF, &dataCorrErrCCF, QColor("blue"), tr("CCF"));
             }
 
-            if (cmbCrosstalkDirection->currentIndex()>=0 && cmbCrosstalkDirection->currentIndex()<=1) {
+            if (acf0 && acf1 && cmbCrosstalkDirection->currentIndex()>=0 && cmbCrosstalkDirection->currentIndex()<=1) {
                 double I0=qfstatisticsAverage(IACF0);
                 double I1=qfstatisticsAverage(IACF1);
                 double C0=qfstatisticsAverage(CACF0);

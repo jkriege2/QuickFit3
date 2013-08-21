@@ -372,7 +372,7 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
     int frames=m->getImageStackFrames(cmbVideo->currentIndex());
     int channels=m->getImageStackChannels(cmbVideo->currentIndex());
     double duration=m->getMeasurementDuration();
-    double exposure=m->getProperty("FRAMETIME_MS", 0).toDouble();
+    double exposure=m->getFrameTime();
     int segments=m->getProperty("SEGMENTS", 0).toInt();
     int sumframes=m->getProperty("VIDEO_AVGFRAMES", 0).toInt();
 

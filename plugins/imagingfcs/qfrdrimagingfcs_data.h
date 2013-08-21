@@ -81,6 +81,8 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         double getSegmentDuration() const;
         /** \brief returns the length of the whole measurement in seconds */
         double getMeasurementDuration() const;
+        /** \brief returns the frametime in seconds */
+        double getFrameTime() const;
         /** \brief returns \c true, if the specified segment is used in the per-pixel-avg. */
         bool segmentUsed(int segment) const;
         /** \brief returns \c true if all segments are used (non excluded) */
