@@ -61,6 +61,7 @@ void DlgCalcDiffCoeff::updateD() {
 
 
 
+
     // calculate solution properties
     tab->setReadonly(false);
     tab->clear();
@@ -75,6 +76,7 @@ void DlgCalcDiffCoeff::updateD() {
 
     QList<QFEDiffusionCoefficientCalculator::Component> comps;
     if (ui->cmbCType1->currentIndex()>0) {
+        ui->spinCConcentration1->setSuffix(QString(" %1").arg(plugin->getComponentUnit(ui->cmbCType1->currentIndex()-1)));
         ui->spinCConcentration1->setRange(0, plugin->getComponentCMax(ui->cmbCType1->currentIndex()-1)*1000.0);
         QFEDiffusionCoefficientCalculator::Component c;
         c.id=ui->cmbCType1->currentIndex()-1;
@@ -83,6 +85,7 @@ void DlgCalcDiffCoeff::updateD() {
     }
     if (ui->cmbCType2->currentIndex()>0) {
         ui->spinCConcentration2->setRange(0, plugin->getComponentCMax(ui->cmbCType2->currentIndex()-1)*1000.0);
+        ui->spinCConcentration2->setSuffix(QString(" %1").arg(plugin->getComponentUnit(ui->cmbCType2->currentIndex()-1)));
         QFEDiffusionCoefficientCalculator::Component c;
         c.id=ui->cmbCType2->currentIndex()-1;
         c.concentration_molar=ui->spinCConcentration2->value()/1000.0;
@@ -90,6 +93,7 @@ void DlgCalcDiffCoeff::updateD() {
     }
     if (ui->cmbCType3->currentIndex()>0) {
         ui->spinCConcentration3->setRange(0, plugin->getComponentCMax(ui->cmbCType3->currentIndex()-1)*1000.0);
+        ui->spinCConcentration3->setSuffix(QString(" %1").arg(plugin->getComponentUnit(ui->cmbCType3->currentIndex()-1)));
         QFEDiffusionCoefficientCalculator::Component c;
         c.id=ui->cmbCType3->currentIndex()-1;
         c.concentration_molar=ui->spinCConcentration3->value()/1000.0;
@@ -97,6 +101,7 @@ void DlgCalcDiffCoeff::updateD() {
     }
     if (ui->cmbCType4->currentIndex()>0) {
         ui->spinCConcentration4->setRange(0, plugin->getComponentCMax(ui->cmbCType4->currentIndex()-1)*1000.0);
+        ui->spinCConcentration4->setSuffix(QString(" %1").arg(plugin->getComponentUnit(ui->cmbCType4->currentIndex()-1)));
         QFEDiffusionCoefficientCalculator::Component c;
         c.id=ui->cmbCType4->currentIndex()-1;
         c.concentration_molar=ui->spinCConcentration4->value()/1000.0;
@@ -104,6 +109,7 @@ void DlgCalcDiffCoeff::updateD() {
     }
     if (ui->cmbCType5->currentIndex()>0) {
         ui->spinCConcentration5->setRange(0, plugin->getComponentCMax(ui->cmbCType5->currentIndex()-1)*1000.0);
+        ui->spinCConcentration5->setSuffix(QString(" %1").arg(plugin->getComponentUnit(ui->cmbCType5->currentIndex()-1)));
         QFEDiffusionCoefficientCalculator::Component c;
         c.id=ui->cmbCType5->currentIndex()-1;
         c.concentration_molar=ui->spinCConcentration5->value()/1000.0;

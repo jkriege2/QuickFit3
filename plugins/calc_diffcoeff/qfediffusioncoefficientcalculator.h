@@ -58,6 +58,7 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         int getComponentCount() const;
         QString getComponentName(int index) const;
         QString getComponentReference(int index) const;
+        QString getComponentUnit(int index) const;
         double getComponentMolarMass(int index) const;
         double getComponentCMax(int index) const;
         double evaluateComponentViscosity20degC(int index, double concentration) const;
@@ -138,6 +139,7 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         QMap<QString, QVariant> reportVals;
 
         struct ComponentData {
+            QString unit;
             QString name;
             QString reference;
             double molar_mass;
