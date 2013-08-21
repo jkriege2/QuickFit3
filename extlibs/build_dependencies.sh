@@ -172,7 +172,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	export LDFLAGS="${LDFLAGS} -fPIC "
         export CFLAGS="${CFLAGS} -fPIC "
         export CPPFLAGS="${CPPFLAGS} -fPIC"
-	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit  CFLAGS="-fPIC ${MORECFLAGS}" CPPFLAGS="-fPIC ${MORECFLAGS}"
+	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit  CFLAGS="-fPIC ${MORECFLAGS}" CPPFLAGS="-fPIC ${MORECFLAGS}"	
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
@@ -357,8 +357,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd libtiff
 	mkdir build
-	tar xvf tiff-3.9.5.tar.gz -C ./build/
-	cd build/tiff-3.9.5
+	tar xvf tiff-4.0.3.tar.gz -C ./build/
+	cd build/tiff-4.0.3
 	if [ -e ../../../zlib/lib/libz.a ] ; then
 		./configure --enable-static --disable-shared --disable-jpeg --disable-jpeg --disable-old-jpeg --disable-jbig --with-zlib-include-dir=${CURRENTDIR}/zlib/include/ --with-zlib-lib-dir=${CURRENTDIR}/zlib/lib/ --prefix=${CURRENTDIR}/libtiff
 	else
@@ -405,8 +405,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd gsl
 	mkdir build
-	tar xvf gsl-1.15.tar.gz -C ./build/
-	cd build/gsl-1.15
+	tar xvf gsl-1.16.tar.gz -C ./build/
+	cd build/gsl-1.16
 	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/gsl   CFLAGS="-fPIC ${MORECFLAGS}" CPPFLAGS="-fPIC ${MORECFLAGS}"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
@@ -571,8 +571,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir doc
 	mkdir include
 	mkdir include/Eigen
-	tar xvf ./eigen-3.0.4.tar.bz2 -C ./build/
-	cd build/eigen-eigen-13a11181fc5a/
+	tar xvf ./eigen-3.2.0.tar.gz -C ./build/
+	cd build/eigen-eigen-ffa86ffb5570/
 	cp -r ./Eigen/* ../../include/Eigen
 	libOK=$?
 	cp -r ./doc/* ../../doc
@@ -588,6 +588,37 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	cd ${CURRENTDIR}
 	
 	eigenOK=$libOK
+
+fi
+
+
+
+cimgOK=-1
+read -p "Do you want to build 'cimg' (y/n)? " -n 1 INSTALL_ANSWER
+echo -e  "\n"
+if [ $INSTALL_ANSWER == "y" ] ; then
+	echo -e  "------------------------------------------------------------------------\n"\
+	"-- BUILDING: cimg                                                     --\n"\
+	"------------------------------------------------------------------------\n\n"\
+
+	cd cimg
+	mkdir build
+	tar xvf ./CImg-1.5.6.tar.bz2 -C ./build/
+	cd build/
+	cp -r * ../
+	libOK=$?
+	if [ $libOK -ne 0 ] ; then		
+		libOK=-4
+	else
+		libOK=0
+	fi
+	cd ../
+	if [ $KEEP_BUILD_DIR == "n" ] ; then
+		rm -rf build
+	fi
+	cd ${CURRENTDIR}
+	
+	cimgOK=$libOK
 
 fi
 
@@ -665,4 +696,5 @@ print_result "gsl" $libgslOK
 print_result "libusb" $libusbOK
 print_result "libNIDAQmx" $libnidaqmxOK
 print_result "eigen" $eigenOK
+print_result "cimg" $cimgOK
 print_result "qt-3d (for Qt4)" $libqt3dOK
