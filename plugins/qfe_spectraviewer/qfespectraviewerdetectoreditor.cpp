@@ -181,7 +181,7 @@ int QFESpectraViewerDetectorEditor::addSpectrum(SpectrumManager *manager, QStrin
         //qDebug()<<"saving spectrum to "<<d.absoluteFilePath(filename);
         modSpectrum.saveCSV(d.absoluteFilePath(filename), ", ", '.', "#");
         if (filenameOut) *filenameOut=filename;
-        return m->addSpectrum(filename, 0, false, ui->edtReference->text());
+        return m->addSpectrum(filename, 0, false, ui->edtReference->text(), false);
     }
     return -1;
 }

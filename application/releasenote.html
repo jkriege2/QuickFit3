@@ -21,11 +21,12 @@
 
 -->
 
+
 <!--
-		<li><a name="2442"><b>2013-07-19 (SVN: 2442)</b>-->
+		<li><a name="2602"><b>2013-08-22 (SVN: 2602)</b>-->
 		<ul>
 		  <li><b>new plugins:</b><ul>
-		    <li><b>general_fitfunctions</b>: several gener fit functions (exponential, power law, polynomial, distributions, sigmoidals ... for fits in table plugin</li>
+		    <li><b>general_fitfunctions</b>: several general fit functions (exponential, power law, polynomial, distributions, sigmoidals ...) for fits in table plugin. These mostly also include routines to guess initial parameters for the fits!</li>
 		    <li><b>importers_simpletcspcimporter</b>: added this plugin to import simple TTTR files that are made up of 64-bit records which contain channel/special record flags in the first 7 bits and a macrotime with given resolution in the rest.</li>
 		  </ul></li>
 		  <li><b>QuickFit</b><ul>
@@ -35,33 +36,80 @@
 		    <li>added random vector functions to QFMathParser</li>
 		    <li>QFPlotter should now be able to copy EVERY image plot to a table (also if data was not saved in columns!)</li>
 		    <li>JKQtPlotter: added additional color palettes</li>
+			<li>added tool to set RDR properties using a regular expression and some other property as input</li>
+			<li>you can add new colors to a color combobox with a right-click (context-menu)</li>
+			<li>color combobox remebers newly added colors</li>
+			<li>JKQtPlotter: improved export to vector formats (PDF, PS, SVG): e.g. font size is now the same as on screen</li>
+			<li>JKQtPlotter: improved display of keys</li>
+			<li>added several new library versions: GSL 1.16, Eigen 3.2.0, CImg, libtiff 4.0.3, ...</li>
 
 		  </ul></li>
-		  <li><b>imagingFCCS</b><ul>
+		  <li><b>imagingFCCS fit</b><ul>
 		    <li>fixed crash in "calc relative CCF amplitude" tool</li>
 		    <li>added "don't fit masked pixels" checkbox </li>
 		    <li>started tool to inspect chi2 landscape</li>
 		    <li>bugfix: "reset current" does not reset all pixels now!</li>
 		    <li>now save g(0) as additional fit parameter (on default)</li>
+			<li>added "reset all" button</li>
+			<li>added tool to calculate relative intensities</li>
+			<li>added tool to calculate the relative crosscorrelation amplitude with crosstalk correction</li>
 		  </ul></li>	
-		  <li><b>qfe_spectraviewer</b><ul>
+		  <li><b>spectra viewer</b><ul>
 		    <li>added possibility to display detector spectra</li>
 		    <li>added a few common image sensors/SPADs</li>
 		    <li>added additional lamps and QDot/TetraSpec beads spectra</li>
 		    <li>added sunlight spectra as lightsources</li>
+			<li>added additional fluorophores (EtBr, mApple, PA-GFP, SYBR Gold, SYBR Green, TagRFP, Hoechst 33258, Hoechst 34560, Quinine, wtGFP)</li>
+			<li>added several standard filter spectra</li>
+			<li>added combobox with common laser lines</li>
+			<li>added edits to set plot range (wavelength)</li>
+			<li>all fluorophores, lightsources, ... are now organized in folders</li>
+			<li>currently selected spectrum is highlighted now</li>
 		  </ul></li>	
 		  <li><b>ImagingFCS</b><ul>
 		    <li>added more bleach correction functions (exp(poly2), exp(poly3)) to correlator</li>
 		    <li>now save g(0) as additional fit parameter (on default)</li>
+			<li>added lateral shift of foci to simulation</li>
+			<li>"copy CFs from group to table" now also copies single CFs!</li>
+			<li>added possibility to display ACF0+ACF1+FCCS for FCCS-record. This also calculates the corrected CCF-amplitude.</li>
+			<li>improved mask-by-image dialog</li>
+			<li>bugfix: frametime was not correctly read/set/stored, when data from another microscope than the B040SPIM was used (missing configuration.ini file leads to non-set frametime), thanks to Philipp Struntz, Uni Bayreuth for the bug report</li>
+			<li>improved import of DualView-correlation data (if imported from file, not from correlator dialog: now splits the data correctly!</li>
+		  </ul></li>	
+		  <li><b>spim_fcs_fitfunctions: </b><ul>
+			<li>bugfix in anomalous diffusion, c as parameter: c is a fit parameter now</li>
+		  </ul></li>	
+		  <li><b>FCS maximum entropy evaluation: </b><ul>
+			<li>added widgets to enter two ranges over which the relative particle numbers are calculated</li>
 		  </ul></li>	
 		  <li><b>spim_fccs_fitfunctions: </b><ul>
 		    <li>added 2-component diffusion models</li>
 		    <li>added fit function for 2-pixel crosscorrelation with diffusion only</li>
 		    <li>added SPIM-FCCS fit-functions for 1-comp. normal diffusion with Db=Fb*Da and Dab=Fab*Da</li>
+			<li>SPIM-FCCS-models now support linking all D's per channel!</li>
+			<li>BUGFIX: there was a typo in all SPIM-FCCS models if dx!=0 and/or dy!=0!!! ... a + instead of - leads to too high CCF-amplitudes if shifted laterall!!! This is corrected now.</li>
+			<li>added fit models for SPIM-FCCS where not every species, but every channel has two Ds (D1, D2) => simplified model for complex FCCS applications.</li>
+			<li>BUGFIX for all fit functions for global fitting: In the ACF-term, the focus distance has to be 0 always (used the dx, dy, dz parameters). Now the distance only plays into the crosscorrelation terms G_rg/G_gr!</li>
+		  </ul></li>	
+		  <li><b>fccs_fitfunctions: </b><ul>
+			<li>FCCS-models now support linking all D's per channel!</li>
+			<li>BUGFIX for all fit functions for global fitting: In the ACF-term, the focus distance has to be 0 always (used the dx, dy, dz parameters). Now the distance only plays into the crosscorrelation terms G_rg/G_gr!</li>
+		  </ul></li>	
+		  <li><b>number and brightness plugin: </b><ul>
+			<li>bugfix: sometimes the acquisition background file was loaded, not the overview!</li>
 		  </ul></li>	
 		  <li><b>table</b><ul>
 		    <li>improved curve fit tool with progress dialog and threaded fit (may be canceled)</li>
 		    <li>bugfixes in fit&regression (improved collection of dataset for fit)</li>
+			<li>added function to autocolor graphs from a colorbar</li>
+			<li>plot can be given a custom size (uses scrollbars for display, if needed)</li>
+			<li>reorganized graph settings into several subtabs</li>
+			<li>added horizontal/vertical range plots</li>
+			<li>added residuals to regression dialog</li>
+			<li>added residuals to curve fit dialog</li>
+			<li>added "guess parameters" button to curve fit dialog</li>
+			<li>bugfix: fixed possible crash in residuals dialog</li>
+			<li>the fill style may be set now</li>
 		  </ul></li>	
 		  <li><b>imFCS Fit</b><ul>
 		    <li> added tool to plot chi2 landscapes</li>
@@ -73,7 +121,26 @@
 		    <li> added tool to plot chi2 landscapes</li>
 		    <li>now save g(0) as additional fit parameter (on default)</li>		  
 		  </ul></li>	
-
+		  <li><b>FCCS Fit</b><ul>
+		    <li>added "reset all" button</li>
+		    <li>added "fit all filesets" menu entry</li>		  
+			<li>added "reset all" button</li>
+		  </ul></li>	
+		  <li><b>lmfit</b><ul>
+		    <li>  added IRSL-LM implementation (robust fit using iteratively reweighted least squares = IRLS)</li>		  
+		  </ul></li>	
+		  <li><b>FCS</b><ul>
+		    <li>ALV5000 import should be able to read inf/nan/...</li>
+			<li>ALV5000/6000 import now supports a property "ALV_TIMEFACTOR" that is multiplied to the time in the file (e.g. if seconds instead of ms are written into the file, use ALV_TIMEFACTOR=1000). It's default value is 1, i.e. it does not affect the data!</li>
+		  </ul></li>	
+		  <li><b>Diffusion coefficient calculator</b><ul>
+		    <li>added possibility to give a diffusion coefficient in the current solution at ANY temperature -> renormalizes the temperature!</li>
+		  </ul></li>	
+		  <li><b>SPIM B040 control plugin</b><ul>
+			<li>started to implement a parser for optSetup files (so far only as test code, no functionality yet!!! ... wait for next release)</li>
+			<li>acquisition now also save preview background images</li>
+			<li>image stacks now save a background image before the stack</li>
+		  </ul></li>	
 		</ul>
 		
 		<li><a name="2379"><b>2013-06-20 (SVN: 2379)</b>

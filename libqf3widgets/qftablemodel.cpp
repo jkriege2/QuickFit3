@@ -1314,9 +1314,19 @@ void QFTableModel::paste(int row_start, int column_start) {
         char sep='\t';
         char dec=loc.decimalPoint().toLatin1();
         if (sl.size()>0) {
-            QString d=sl[0];
-            int icntDot=d.count('.');
-            int icntCom=d.count(',');
+            QString d;
+            int i=0;
+            int cntl=0;
+            while (i<sl.size() && cntl<20) {
+                QChar c0=sl[i].trimmed().at(0);
+                if (c0.isDigit() || c0=='-' || c0=='+' || c0=='#') {
+                    d=d+sl[i]+"\n";
+                    cntl++;
+                }
+                i++;
+            }
+            double icntDot=d.count('.');
+            double icntCom=d.count(',');
             d=d.remove(dec);
             int cnt=d.count('\n');
             int cntSem=d.count(';');
@@ -1330,6 +1340,7 @@ void QFTableModel::paste(int row_start, int column_start) {
             if (sep!=',' && dec==',' && icntCom==0 && icntDot>0) dec='.';
             if (sep!=',' && dec=='.' && icntCom>0 && icntDot==0) dec=',';
             if (dec==',' && icntCom<=0 && icntDot>0 ) dec='.';
+            if (icntDot>0 && icntCom>0) { dec='.'; sep=',';}
             qDebug()<<"icntDot="<<icntDot;
             qDebug()<<"icntCom="<<icntCom;
             qDebug()<<"cnt="<<cnt;

@@ -60,7 +60,8 @@ class SpectrumManager {
                 /** \brief this stores the spline calculated from the data in the file for absorbance */
                 gsl_spline *spline;
                 bool loaded;
-                void internalInit(const QVector<double>& wavelength, const QVector<double>& spectrum);
+                bool normalizeSpectrum;
+                void internalInit(const QVector<double>& wavelength, const QVector<double>& spectrum, bool normalizeSpectrum=true);
 
             public:
                 Spectrum();
@@ -69,8 +70,8 @@ class SpectrumManager {
 
                 void ensureSpectrum();
 
-                void init(const QVector<double>& wavelength, const QVector<double>& spectrum);
-                void init(const QString& filename, int ID=0, bool separateWavelengths=false);
+                void init(const QVector<double>& wavelength, const QVector<double>& spectrum, bool normalizeSPectrum=true);
+                void init(const QString& filename, int ID=0, bool separateWavelengths=false, bool normalizeSPectrum=true);
                 void clear();
                 double getSpectrumAt(double wavelength);
                 double getSpectrumIntegral(double lambda_start, double lambda_end) ;
@@ -256,7 +257,7 @@ class SpectrumManager {
 
 
         /** \brief add a spectrum file to the internal database */
-        int addSpectrum(const QString &filename, int ID=0, bool separateWavelengths=false, const QString &reference=QString(""));
+        int addSpectrum(const QString &filename, int ID=0, bool separateWavelengths=false, const QString &reference=QString(""), bool normalizeSPectrum=true);
         /** \brief return the i-th spectrum */
         Spectrum *getSpectrum(int i);
         /** \brief return the i-th spectrum */

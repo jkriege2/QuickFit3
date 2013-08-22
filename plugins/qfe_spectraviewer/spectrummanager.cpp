@@ -251,7 +251,7 @@ void SpectrumManager::loadFilterDatabase(const QString &ininame, const QStringLi
             fnID=set.value(gn+"spectrum_id", 0).toInt();
             fnSepWL=set.value(gn+"spectrum_separatewavelengths", false).toBool();
             if (QFile::exists(fn)) {
-                d.spectrum=addSpectrum(fn, fnID, fnSepWL, set.value(gn+"spectrum_reference", d.reference).toString());
+                d.spectrum=addSpectrum(fn, fnID, fnSepWL, set.value(gn+"spectrum_reference", d.reference).toString(), false);
             }
             if ((!QFFloatIsOK(d.typical_wavelength) || d.typical_wavelength<=0) && spectrumExists(d.spectrum)) {
                 spectra[d.spectrum]->ensureSpectrum();
@@ -357,7 +357,7 @@ void SpectrumManager::loadDetectorDatabase(const QString &ininame, const QString
             fnID=set.value(gn+"spectrum_id", 0).toInt();
             fnSepWL=set.value(gn+"spectrum_separatewavelengths", false).toBool();
             if (QFile::exists(fn)) {
-                d.spectrum=addSpectrum(fn, fnID, fnSepWL, set.value(gn+"spectrum_reference", d.reference).toString());
+                d.spectrum=addSpectrum(fn, fnID, fnSepWL, set.value(gn+"spectrum_reference", d.reference).toString(), false);
             }
             if ((!QFFloatIsOK(d.peak_wavelength) || d.peak_wavelength<=0) && spectrumExists(d.spectrum)) {
                 spectra[d.spectrum]->ensureSpectrum();
@@ -376,7 +376,7 @@ void SpectrumManager::loadDetectorDatabase(const QString &ininame, const QString
     }
 }
 
-int SpectrumManager::addSpectrum(const QString& filename, int ID, bool separateWavelengths, const QString& reference) {
+int SpectrumManager::addSpectrum(const QString& filename, int ID, bool separateWavelengths, const QString& reference, bool normalizeSPectrum) {
     for (int i=0; i<spectra.size(); i++) {
         if (QFileInfo(spectra[i]->getFilename())==QFileInfo(filename) && spectra[i]->getID()==ID && spectra[i]->getSeparateWavelengthsInFile()==separateWavelengths) {
             spectra[i]->reference=reference;
@@ -385,7 +385,7 @@ int SpectrumManager::addSpectrum(const QString& filename, int ID, bool separateW
     }
 
     Spectrum* s=new Spectrum();
-    s->init(filename, ID, separateWavelengths);
+    s->init(filename, ID, separateWavelengths, normalizeSPectrum);
     s->reference=reference;
     spectra.append(s);
     return spectra.size()-1;
@@ -460,7 +460,7 @@ void SpectrumManager::Spectrum::ensureSpectrum()
                 wl.remove(i, sp.size()-1-i);
             }
 
-            internalInit(wl, sp);
+            internalInit(wl, sp, normalizeSpectrum);
             loaded=true;
             //qDebug()<<"loaded spectrum"<<wavelength<<spectrum<<N<<accel<<spline;
         } catch(datatable2_exception e) {   // error handling with exceptions
@@ -470,9 +470,9 @@ void SpectrumManager::Spectrum::ensureSpectrum()
 
 }
 
-void SpectrumManager::Spectrum::init(const QVector<double> &wavelength, const QVector<double> &spectrum)
+void SpectrumManager::Spectrum::init(const QVector<double> &wavelength, const QVector<double> &spectrum, bool normalizeSpectrum)
 {
-    internalInit(wavelength, spectrum);
+    internalInit(wavelength, spectrum, normalizeSpectrum);
     filename="";
 }
 
@@ -643,8 +643,9 @@ double SpectrumManager::Spectrum::getSpectrumFullIntegral()
 }
 
 
-void SpectrumManager::Spectrum::internalInit(const QVector<double> &lambda, const QVector<double> &eff)
+void SpectrumManager::Spectrum::internalInit(const QVector<double> &lambda, const QVector<double> &eff, bool normalizeSpectrum)
 {
+    this->normalizeSpectrum=normalizeSpectrum;
     if (lambda.size()>0&&eff.size()>0) {
         N=qMin(lambda.size(), eff.size());
         this->wavelength=(double*)realloc(this->wavelength, N*sizeof(double));
@@ -674,7 +675,11 @@ void SpectrumManager::Spectrum::internalInit(const QVector<double> &lambda, cons
         //qDebug()<<arrayToString(this->spectrum, N);
 
         double m=statisticsMax(this->spectrum, N);
-        for (int i=0; i<N; i++) this->spectrum[i]=this->spectrum[i]/m;
+        if (normalizeSpectrum) {
+            for (int i=0; i<N; i++) this->spectrum[i]=this->spectrum[i]/m;
+        } else if (m>1.2 && m<110) { // seems to be 0..100%
+            for (int i=0; i<N; i++) this->spectrum[i]=this->spectrum[i]/100.0;
+        }
 
 
 
@@ -697,9 +702,10 @@ void SpectrumManager::Spectrum::internalInit(const QVector<double> &lambda, cons
     loaded=true;
 }
 
-void SpectrumManager::Spectrum::init(const QString &filename, int ID, bool separateWavelengths)
+void SpectrumManager::Spectrum::init(const QString &filename, int ID, bool separateWavelengths, bool normalizeSPectrum)
 {
     clear();
+    this->normalizeSpectrum=normalizeSPectrum;
     this->filename=QFileInfo(filename).absoluteFilePath();
     this->spectrumIDInFile=ID;
     this->separateWavelengthsInFile=separateWavelengths;

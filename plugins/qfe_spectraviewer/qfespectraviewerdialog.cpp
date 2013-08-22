@@ -836,7 +836,7 @@ void QFESpectraViewerDialog::updatePlots()
     ds->clear();
 
     ui->plotter->getXAxis()->set_axisLabel(tr("wavelength \\lambda [nm]"));
-    ui->plotter->getYAxis()->set_axisLabel(tr("relative intensity/absorbtion [%]"));
+    ui->plotter->getYAxis()->set_axisLabel(tr("relative intensity/absorbtion [0..1]"));
     ui->plotter->get_plotter()->setAbsoluteY(0,1.1);
     if (ui->chkAUtorange->isChecked()) {
         ui->plotter->get_plotter()->setAbsoluteX(0, 1e10);
