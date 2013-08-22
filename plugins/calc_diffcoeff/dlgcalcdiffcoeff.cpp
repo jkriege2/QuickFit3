@@ -75,44 +75,95 @@ void DlgCalcDiffCoeff::updateD() {
     tab->setColumnTitle(3, tr("density [kg/l]"));
 
     QList<QFEDiffusionCoefficientCalculator::Component> comps;
-    if (ui->cmbCType1->currentIndex()>0) {
-        ui->spinCConcentration1->setSuffix(QString(" %1").arg(plugin->getComponentUnit(ui->cmbCType1->currentIndex()-1)));
-        ui->spinCConcentration1->setRange(0, plugin->getComponentCMax(ui->cmbCType1->currentIndex()-1)*1000.0);
+    QComboBox* cmb;
+    cmb=ui->cmbCType1;
+    if (cmb->currentIndex()>0) {
+        QDoubleSpinBox* spin=ui->spinCConcentration1;
+        QString unit=plugin->getComponentUnit(cmb->currentIndex()-1);
+        double cmax=plugin->getComponentCMax(cmb->currentIndex()-1);
+        if (unit=="M") {
+            spin->setRange(0, cmax*1000.0);
+            spin->setSuffix(QString(" nM"));
+        } else {
+            spin->setSuffix(QString(" %1").arg(unit));
+            spin->setRange(0, cmax);
+        }
         QFEDiffusionCoefficientCalculator::Component c;
-        c.id=ui->cmbCType1->currentIndex()-1;
-        c.concentration_molar=ui->spinCConcentration1->value()/1000.0;
+        c.id=cmb->currentIndex()-1;
+        if (unit=="M") c.concentration_molar=spin->value()/1000.0;
+        else c.concentration_molar=spin->value();
         comps.append(c);
     }
-    if (ui->cmbCType2->currentIndex()>0) {
-        ui->spinCConcentration2->setRange(0, plugin->getComponentCMax(ui->cmbCType2->currentIndex()-1)*1000.0);
-        ui->spinCConcentration2->setSuffix(QString(" %1").arg(plugin->getComponentUnit(ui->cmbCType2->currentIndex()-1)));
+    cmb=ui->cmbCType2;
+    if (cmb->currentIndex()>0) {
+        QDoubleSpinBox* spin=ui->spinCConcentration2;
+        QString unit=plugin->getComponentUnit(cmb->currentIndex()-1);
+        double cmax=plugin->getComponentCMax(cmb->currentIndex()-1);
+        if (unit=="M") {
+            spin->setRange(0, cmax*1000.0);
+            spin->setSuffix(QString(" nM"));
+        } else {
+            spin->setSuffix(QString(" %1").arg(unit));
+            spin->setRange(0, cmax);
+        }
         QFEDiffusionCoefficientCalculator::Component c;
-        c.id=ui->cmbCType2->currentIndex()-1;
-        c.concentration_molar=ui->spinCConcentration2->value()/1000.0;
+        c.id=cmb->currentIndex()-1;
+        if (unit=="M") c.concentration_molar=spin->value()/1000.0;
+        else c.concentration_molar=spin->value();
         comps.append(c);
     }
-    if (ui->cmbCType3->currentIndex()>0) {
-        ui->spinCConcentration3->setRange(0, plugin->getComponentCMax(ui->cmbCType3->currentIndex()-1)*1000.0);
-        ui->spinCConcentration3->setSuffix(QString(" %1").arg(plugin->getComponentUnit(ui->cmbCType3->currentIndex()-1)));
+    cmb=ui->cmbCType3;
+    if (cmb->currentIndex()>0) {
+        QDoubleSpinBox* spin=ui->spinCConcentration3;
+        QString unit=plugin->getComponentUnit(cmb->currentIndex()-1);
+        double cmax=plugin->getComponentCMax(cmb->currentIndex()-1);
+        if (unit=="M") {
+            spin->setRange(0, cmax*1000.0);
+            spin->setSuffix(QString(" nM"));
+        } else {
+            spin->setSuffix(QString(" %1").arg(unit));
+            spin->setRange(0, cmax);
+        }
         QFEDiffusionCoefficientCalculator::Component c;
-        c.id=ui->cmbCType3->currentIndex()-1;
-        c.concentration_molar=ui->spinCConcentration3->value()/1000.0;
+        c.id=cmb->currentIndex()-1;
+        if (unit=="M") c.concentration_molar=spin->value()/1000.0;
+        else c.concentration_molar=spin->value();
         comps.append(c);
     }
-    if (ui->cmbCType4->currentIndex()>0) {
-        ui->spinCConcentration4->setRange(0, plugin->getComponentCMax(ui->cmbCType4->currentIndex()-1)*1000.0);
-        ui->spinCConcentration4->setSuffix(QString(" %1").arg(plugin->getComponentUnit(ui->cmbCType4->currentIndex()-1)));
+    cmb=ui->cmbCType4;
+    if (cmb->currentIndex()>0) {
+        QDoubleSpinBox* spin=ui->spinCConcentration4;
+        QString unit=plugin->getComponentUnit(cmb->currentIndex()-1);
+        double cmax=plugin->getComponentCMax(cmb->currentIndex()-1);
+        if (unit=="M") {
+            spin->setRange(0, cmax*1000.0);
+            spin->setSuffix(QString(" nM"));
+        } else {
+            spin->setSuffix(QString(" %1").arg(unit));
+            spin->setRange(0, cmax);
+        }
         QFEDiffusionCoefficientCalculator::Component c;
-        c.id=ui->cmbCType4->currentIndex()-1;
-        c.concentration_molar=ui->spinCConcentration4->value()/1000.0;
+        c.id=cmb->currentIndex()-1;
+        if (unit=="M") c.concentration_molar=spin->value()/1000.0;
+        else c.concentration_molar=spin->value();
         comps.append(c);
     }
-    if (ui->cmbCType5->currentIndex()>0) {
-        ui->spinCConcentration5->setRange(0, plugin->getComponentCMax(ui->cmbCType5->currentIndex()-1)*1000.0);
-        ui->spinCConcentration5->setSuffix(QString(" %1").arg(plugin->getComponentUnit(ui->cmbCType5->currentIndex()-1)));
+    cmb=ui->cmbCType5;
+    if (cmb->currentIndex()>0) {
+        QDoubleSpinBox* spin=ui->spinCConcentration5;
+        QString unit=plugin->getComponentUnit(cmb->currentIndex()-1);
+        double cmax=plugin->getComponentCMax(cmb->currentIndex()-1);
+        if (unit=="M") {
+            spin->setRange(0, cmax*1000.0);
+            spin->setSuffix(QString(" nM"));
+        } else {
+            spin->setSuffix(QString(" %1").arg(unit));
+            spin->setRange(0, cmax);
+        }
         QFEDiffusionCoefficientCalculator::Component c;
-        c.id=ui->cmbCType5->currentIndex()-1;
-        c.concentration_molar=ui->spinCConcentration5->value()/1000.0;
+        c.id=cmb->currentIndex()-1;
+        if (unit=="M") c.concentration_molar=spin->value()/1000.0;
+        else c.concentration_molar=spin->value();
         comps.append(c);
     }
     temp.clear();

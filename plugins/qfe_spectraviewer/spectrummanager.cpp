@@ -7,10 +7,20 @@
 #include "statistics_tools.h"
 
 SpectrumManager::SpectrumManager(){
+    laserlinesTree=new QFSimpleTreeModel(NULL);
+    fluorophoresTree=new QFSimpleTreeModel(NULL);
+    lightsourcesTree=new QFSimpleTreeModel(NULL);
+    filtersTree=new QFSimpleTreeModel(NULL);
+    detectorsTree=new QFSimpleTreeModel(NULL);
 }
 
 SpectrumManager::~SpectrumManager() {
     clear();
+    delete laserlinesTree;
+    delete fluorophoresTree;
+    delete lightsourcesTree;
+    delete filtersTree;
+    delete detectorsTree;
 }
 
 int SpectrumManager::getSpectraCount() const
@@ -58,6 +68,31 @@ QStringList SpectrumManager::getDetectors() const
     return detectors.keys();
 }
 
+QFSimpleTreeModel *SpectrumManager::getFluorophoresTree() const
+{
+    return fluorophoresTree;
+}
+
+QFSimpleTreeModel *SpectrumManager::getLightSourcesTree() const
+{
+    return lightsourcesTree;
+}
+
+QFSimpleTreeModel *SpectrumManager::getFiltersTree() const
+{
+    return filtersTree;
+}
+
+QFSimpleTreeModel *SpectrumManager::getDetectorsTree() const
+{
+    return detectorsTree;
+}
+
+QFSimpleTreeModel *SpectrumManager::getLaserlinesTree() const
+{
+    return laserlinesTree;
+}
+
 void SpectrumManager::clear()
 {
     for (int i=0; i<spectra.size(); i++) {
@@ -67,6 +102,46 @@ void SpectrumManager::clear()
     filters.clear();
     lightsources.clear();
     spectra.clear();
+
+    laserlinesTree->clear();
+    fluorophoresTree->clear();
+    lightsourcesTree->clear();
+    filtersTree->clear();
+    detectorsTree->clear();
+
+}
+
+void SpectrumManager::loadLaserlinesDatabase(const QString &ininame, const QStringList &directories)
+{
+    QFManyFilesSettings set;
+    if (directories.size()>0) {
+        for (int i=0; i<directories.size(); i++) {
+            set.addSettings(new QSettings(QDir(directories[i]).absoluteFilePath(ininame), QSettings::IniFormat), true);
+        }
+    } else {
+        set.addSettings(new QSettings(ininame, QSettings::IniFormat), true);
+    }
+
+    laserlinesTree->clear();
+    QStringList groups=set.childGroups();
+    for (int i=0; i<groups.size(); i++) {
+        QString gn=groups[i].toLower();
+        if (!gn.isEmpty() && gn.size()>0) {
+            QString laser=set.value(gn+"/laser", "").toString();
+            if (laser.isEmpty()) laser=QObject::tr("other lasers");
+            QString lines=set.value(gn+"/lines", "").toString();
+            QStringList linessl=lines.split(';');
+            //qDebug()<<"laser: "<<laser<<lines;
+            for (int i=0; i<linessl.size(); i++) {
+                QString line=linessl.value(i, "");
+                bool ok=false;
+                double wl=line.toDouble(&ok);
+                if (ok && wl>0) {
+                    laserlinesTree->addFolderedItem(QString("%2/%1 nm").arg(wl).arg(laser), QPointF(wl, 1.0));
+                }
+            }
+        }
+    }
 }
 
 void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStringList &directories)
@@ -87,6 +162,7 @@ void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStr
             gn+="/";
             FluorophoreData d=fluorophores.value(groups[i], FluorophoreData());
 
+            d.folder=set.value(gn+"folder", "").toString();
             d.name=set.value(gn+"name", groups[i]).toString();
             d.description=set.value(gn+"description", "").toString();
             d.manufacturer=set.value(gn+"manufacturer", "").toString();
@@ -130,6 +206,12 @@ void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStr
             d.extiction_coefficient_wavelength=set.value(gn+"molar_extinction_wavelength", d.excitation_maxwavelength).toDouble();
             fluorophores[groups[i]]=d;
 
+            if (d.folder.isEmpty()) {
+                fluorophoresTree->addFolderedItem(d.name, groups[i]);
+            } else {
+                fluorophoresTree->addFolderedItem(d.folder+"/"+d.name, groups[i]);
+            }
+
         }
     }
 
@@ -153,6 +235,7 @@ void SpectrumManager::loadFilterDatabase(const QString &ininame, const QStringLi
             gn+="/";
             FilterData d=filters.value(groups[i], FilterData());
 
+            d.folder=set.value(gn+"folder", "").toString();
             d.name=set.value(gn+"name", groups[i]).toString();
             d.description=set.value(gn+"description", "").toString();
             d.manufacturer=set.value(gn+"manufacturer", "").toString();
@@ -176,7 +259,11 @@ void SpectrumManager::loadFilterDatabase(const QString &ininame, const QStringLi
             }
 
             filters[groups[i]]=d;
-
+            if (d.folder.isEmpty()) {
+                filtersTree->addFolderedItem(d.name, groups[i]);
+            } else {
+                filtersTree->addFolderedItem(d.folder+"/"+d.name, groups[i]);
+            }
         }
     }
 }
@@ -199,6 +286,7 @@ void SpectrumManager::loadLightSourceDatabase(const QString &ininame, const QStr
             gn+="/";
             LightSourceData d=lightsources.value(groups[i], LightSourceData());
 
+            d.folder=set.value(gn+"folder", "").toString();
             d.name=set.value(gn+"name", groups[i]).toString();
             d.description=set.value(gn+"description", "").toString();
             d.manufacturer=set.value(gn+"manufacturer", "").toString();
@@ -223,6 +311,12 @@ void SpectrumManager::loadLightSourceDatabase(const QString &ininame, const QStr
 
             lightsources[groups[i]]=d;
 
+            if (d.folder.isEmpty()) {
+                lightsourcesTree->addFolderedItem(d.name, groups[i]);
+            } else {
+                lightsourcesTree->addFolderedItem(d.folder+"/"+d.name, groups[i]);
+            }
+
         }
     }
 }
@@ -245,6 +339,7 @@ void SpectrumManager::loadDetectorDatabase(const QString &ininame, const QString
             gn+="/";
             DetectorData d=detectors.value(groups[i], DetectorData());
 
+            d.folder=set.value(gn+"folder", "").toString();
             d.name=set.value(gn+"name", groups[i]).toString();
             d.description=set.value(gn+"description", "").toString();
             d.manufacturer=set.value(gn+"manufacturer", "").toString();
@@ -270,6 +365,12 @@ void SpectrumManager::loadDetectorDatabase(const QString &ininame, const QString
             }
 
             detectors[groups[i]]=d;
+
+            if (d.folder.isEmpty()) {
+                detectorsTree->addFolderedItem(d.name, groups[i]);
+            } else {
+                detectorsTree->addFolderedItem(d.folder+"/"+d.name, groups[i]);
+            }
 
         }
     }

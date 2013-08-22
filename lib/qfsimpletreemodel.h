@@ -19,16 +19,20 @@ class QFLIB_EXPORT  QFSimpleTreeModel : public QAbstractItemModel
 {
     Q_OBJECT
 public:
-    explicit QFSimpleTreeModel(const QString &data, QObject *parent = 0);
+    explicit QFSimpleTreeModel(QObject *parent = 0);
     ~QFSimpleTreeModel();
     
-    QVariant data(const QModelIndex &index, int role) const;
+     QVariant data(const QModelIndex &index, int role) const;
      Qt::ItemFlags flags(const QModelIndex &index) const;
      QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
      QModelIndex index(int row, int column,  const QModelIndex &parent = QModelIndex()) const;
      QModelIndex parent(const QModelIndex &index) const;
      int rowCount(const QModelIndex &parent = QModelIndex()) const;
      int columnCount(const QModelIndex &parent = QModelIndex()) const;
+
+     QFSimpleTreeModelItem* addFolderedItem(const QString& name, const QVariant& userData, QChar separator=QLatin1Char('/'));
+
+     void clear();
 
  private:
      void setupModelData(const QStringList &lines, QFSimpleTreeModelItem *parent);
@@ -45,10 +49,13 @@ public:
 
 
 
- class QFLIB_EXPORT QFSimpleTreeModelItem
- {
+ class QFLIB_EXPORT QFSimpleTreeModelItem {
  public:
-     QFSimpleTreeModelItem(const QList<QVariant> &data, QFSimpleTreeModelItem *parent = 0);
+         QFSimpleTreeModelItem(const QString &text, QFSimpleTreeModelItem *parent = 0);
+         QFSimpleTreeModelItem(const QString &text, const QVariant& userRoleData, QFSimpleTreeModelItem *parent = 0);
+         QFSimpleTreeModelItem(bool folder, const QString &text, QFSimpleTreeModelItem *parent = 0);
+         QFSimpleTreeModelItem(bool folder, const QString &text, const QVariant& userRoleData, QFSimpleTreeModelItem *parent = 0);
+     QFSimpleTreeModelItem(QIcon icon, const QString &text, const QVariant& userRoleData, QFSimpleTreeModelItem *parent = 0);
      ~QFSimpleTreeModelItem();
 
      void appendChild(QFSimpleTreeModelItem *child);
@@ -56,14 +63,19 @@ public:
      QFSimpleTreeModelItem *child(int row);
      int childCount() const;
      int columnCount() const;
-     QVariant data(int column) const;
+     QVariant displayText() const;
+     QVariant data(int role) const;
+     void setData(QVariant data, int role=Qt::UserRole);
      int row() const;
      QFSimpleTreeModelItem *parent();
+     bool isFolder() const;
+     void setFolder(bool folder);
 
  private:
      QList<QFSimpleTreeModelItem*> childItems;
-     QList<QVariant> itemData;
+     QMap<int, QVariant> userData;
      QFSimpleTreeModelItem *parentItem;
+     bool folder;
  };
 
 #endif // QFSIMPLETREEMODEL_H

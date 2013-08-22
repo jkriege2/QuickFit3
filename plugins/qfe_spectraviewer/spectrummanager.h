@@ -23,6 +23,7 @@
 #include "jkiniparser2.h"
 #include <QStringList>
 #include <QSettings>
+#include "qfsimpletreemodel.h"
 
 /** \brief this class is used to manage fluorophor properties and spectra
  *  \ingroup diff4_tools
@@ -193,12 +194,18 @@ class SpectrumManager {
 
         /** \brief fluorophor database */
         QMap<QString, FluorophoreData> fluorophores;
+        QFSimpleTreeModel* fluorophoresTree;
         /** \brief lightsource database */
         QMap<QString, LightSourceData> lightsources;
+        QFSimpleTreeModel* lightsourcesTree;
         /** \brief filter database */
         QMap<QString, FilterData> filters;
+        QFSimpleTreeModel* filtersTree;
         /** \brief detector database */
         QMap<QString, DetectorData> detectors;
+        QFSimpleTreeModel* detectorsTree;
+
+        QFSimpleTreeModel* laserlinesTree;
 
     private:
 
@@ -228,8 +235,20 @@ class SpectrumManager {
         /** \brief get detector IDs */
         QStringList getDetectors() const;
 
+        /** \brief get fluorophore IDs */
+        QFSimpleTreeModel* getFluorophoresTree() const;
+        /** \brief get lightsource IDs */
+        QFSimpleTreeModel* getLightSourcesTree() const;
+        /** \brief get filter IDs*/
+        QFSimpleTreeModel* getFiltersTree() const;
+        /** \brief get detector IDs */
+        QFSimpleTreeModel* getDetectorsTree() const;
+        /** \brief get detector IDs */
+        QFSimpleTreeModel* getLaserlinesTree() const;
+
         void clear();
 
+        void loadLaserlinesDatabase(const QString& ininame, const QStringList& directories=QStringList() );
         void loadFluorophoreDatabase(const QString& ininame, const QStringList& directories=QStringList() );
         void loadFilterDatabase(const QString& ininame, const QStringList& directories=QStringList() );
         void loadLightSourceDatabase(const QString& ininame, const QStringList& directories=QStringList() );

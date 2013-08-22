@@ -76,6 +76,8 @@ void QFESpectraViewer::reloadDatabases()
     manager->loadLightSourceDatabase("ligtsources.ini", directories);
     log_text(tr("   loading detectors database ...\n"));
     manager->loadDetectorDatabase("detectors.ini", directories);
+    log_text(tr("   loading laserline database ...\n"));
+    manager->loadLaserlinesDatabase("laserlines.ini", directories);
 
     log_text(tr("   loaded %1 fluorophores\n").arg(manager->getFluorophoreCount()));
     log_text(tr("   loaded %1 filters\n").arg(manager->getFilterCount()));

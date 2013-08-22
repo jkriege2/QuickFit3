@@ -115,7 +115,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfrecentfilesmenu.h \
     qfstageconfigwidgetthread.h \
     qfstageconfigwidget.h \
-    ../../../../LIB/trunk/qt/fillstylecombobox.h
+    ../../../../LIB/trunk/qt/fillstylecombobox.h \
+    qfsimplecurvefitdialog.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -193,7 +194,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfrecentfilesmenu.cpp \
     qfstageconfigwidgetthread.cpp \
     qfstageconfigwidget.cpp \
-    ../../../../LIB/trunk/qt/fillstylecombobox.cpp
+    ../../../../LIB/trunk/qt/fillstylecombobox.cpp \
+    qfsimplecurvefitdialog.cpp
 
 
 FORMS += qfdlg_csvparameters.ui \
@@ -201,7 +203,8 @@ FORMS += qfdlg_csvparameters.ui \
     qf3filtereditor.ui \
     qfselectionlistdialog.ui \
     qfselectrdrdialog.ui \
-    qfplottercopytotabledialog.ui
+    qfplottercopytotabledialog.ui \
+    qfsimplecurvefitdialog.ui
 
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/qspecialtoolbutton.qrc \

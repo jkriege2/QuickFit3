@@ -57,7 +57,7 @@ QString QFEDiffusionCoefficientCalculator::getComponentReference(int index) cons
 QString QFEDiffusionCoefficientCalculator::getComponentUnit(int index) const
 {
     if (index>=0 && index<components.size()) return components[index].unit;
-    return "nM";
+    return "M";
 }
 
 QVector<double> QFEDiffusionCoefficientCalculator::getComponentModelParamaters(int index) const {
@@ -325,7 +325,7 @@ void QFEDiffusionCoefficientCalculator::loadComponents(QSettings& settings, bool
         cdata.c_max=settings.value("c_max", 0).toDouble();
         cdata.comment=settings.value("comment", "").toString();
         cdata.comment_html=settings.value("comment_html", "").toString();
-        cdata.unit=settings.value("unit", "nM").toString();
+        cdata.unit=settings.value("unit", "M").toString();
         QStringList keys=settings.childKeys();
         QString key="p1";
         int id=1;

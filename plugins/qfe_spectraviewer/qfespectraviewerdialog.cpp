@@ -33,9 +33,10 @@ QFESpectraViewerDialog::QFESpectraViewerDialog(QFESpectraViewer *plugin, QWidget
     ui->setupUi(this);
 
 
-    ui->cmbLaserLine->addItem(tr("Ar:Kr laser / 488nm"), QPointF(488,1));
+    /*ui->cmbLaserLine->addItem(tr("Ar:Kr laser / 488nm"), QPointF(488,1));
     ui->cmbLaserLine->addItem(tr("Ar:Kr laser / 561nm"), QPointF(561,1));
-    ui->cmbLaserLine->addItem(tr("Ar:Kr laser / 647nm"), QPointF(647,1));
+    ui->cmbLaserLine->addItem(tr("Ar:Kr laser / 647nm"), QPointF(647,1));*/
+    ui->cmbLaserLine->setModel(manager->getLaserlinesTree());
 
 
     QToolBar* mainToolbar=new QToolBar(plugin->getID()+"maintoolbar", this);
@@ -99,7 +100,7 @@ void QFESpectraViewerDialog::reloadComboboxes()
     currentIndex=-1;
     spectrumSelected();
 
-    QStringList sl=manager->getFluorophores();
+    /*QStringList sl=manager->getFluorophores();
     ui->cmbFluorophore->clear();
     ui->cmbFluorophore->setUpdatesEnabled(false);
     for (int i=0; i<sl.size(); i++) {
@@ -110,8 +111,13 @@ void QFESpectraViewerDialog::reloadComboboxes()
             //ui->cmbFluorophore->addItem(sl[i], sl[i]);
         }
     }
-    ui->cmbFluorophore->setUpdatesEnabled(true);
+    ui->cmbFluorophore->setUpdatesEnabled(true);*/
+    ui->cmbFluorophore->setModel(manager->getFluorophoresTree());
+    ui->cmbFilter->setModel(manager->getFiltersTree());
+    ui->cmbDetector->setModel(manager->getDetectorsTree());
+    ui->cmbLightsource->setModel(manager->getLightSourcesTree());
 
+    /*QStringList sl;
     sl=manager->getLightSources();
     ui->cmbLightsource->clear();
     ui->cmbLightsource->setUpdatesEnabled(false);
@@ -147,7 +153,7 @@ void QFESpectraViewerDialog::reloadComboboxes()
             ui->cmbDetector->addItem(manager->getDetectorData(sl[i]).name, sl[i]);
         }
     }
-    ui->cmbDetector->setUpdatesEnabled(true);
+    ui->cmbDetector->setUpdatesEnabled(true);*/
 
     ui->lstSpectra->setCurrentRow(0);
     spectrumSelected();
@@ -321,7 +327,7 @@ void QFESpectraViewerDialog::saveFromWidgets()
     if (currentIndex<0 || currentIndex>=plotItems.size()) return;
     if (ui->stackSpectraEditor->currentWidget()==ui->widFluorophore)  {
         plotItems[currentIndex].type=qfesFluorohpore;
-        plotItems[currentIndex].name=ui->cmbFluorophore->itemData(ui->cmbFluorophore->currentIndex()).toString();
+        plotItems[currentIndex].name=ui->cmbFluorophore->getCurrentIndexData(Qt::UserRole).toString();
         plotItems[currentIndex].showEmission=ui->chkFluorophoreShowEmission->isChecked();
         plotItems[currentIndex].showExcitation=ui->chkFluorophoreShowExcitation->isChecked();
         plotItems[currentIndex].displayName=ui->cmbFluorophore->currentText();
@@ -331,7 +337,7 @@ void QFESpectraViewerDialog::saveFromWidgets()
         }
     } else if (ui->stackSpectraEditor->currentWidget()==ui->widDetector)  {
         plotItems[currentIndex].type=qfesDetector;
-        plotItems[currentIndex].name=ui->cmbDetector->itemData(ui->cmbDetector->currentIndex()).toString();
+        plotItems[currentIndex].name=ui->cmbDetector->getCurrentIndexData(Qt::UserRole).toString();//itemData(ui->cmbDetector->currentIndex()).toString();
         plotItems[currentIndex].displayName=ui->cmbDetector->currentText();
         if (ui->lstSpectra->item(currentIndex)) {
             ui->lstSpectra->item(currentIndex)->setText(plotItems[currentIndex].displayName);
@@ -359,7 +365,7 @@ void QFESpectraViewerDialog::saveFromWidgets()
             plotItems[currentIndex].spectralWidth=ui->spinFilterLinewidth->value();
         } else {
             plotItems[currentIndex].type=qfesFilterSpectrum;
-            plotItems[currentIndex].name=ui->cmbFilter->itemData(ui->cmbFilter->currentIndex()).toString();
+            plotItems[currentIndex].name=ui->cmbFilter->getCurrentIndexData(Qt::UserRole).toString();//itemData(ui->cmbFilter->currentIndex()).toString();
             plotItems[currentIndex].displayName=ui->cmbFilter->currentText();
         }
         plotItems[currentIndex].filterIsExcitation=ui->cmbFilterUsage->currentIndex()==0;
@@ -377,7 +383,7 @@ void QFESpectraViewerDialog::saveFromWidgets()
             plotItems[currentIndex].spectralWidth=ui->spinLaserLinewidth->value();
         } else {
             plotItems[currentIndex].type=qfesLightSourceSpectrum;
-            plotItems[currentIndex].name=ui->cmbLightsource->itemData(ui->cmbLightsource->currentIndex()).toString();
+            plotItems[currentIndex].name=ui->cmbLightsource->getCurrentIndexData(Qt::UserRole).toString();//itemData(ui->cmbLightsource->currentIndex()).toString();
             plotItems[currentIndex].displayName=ui->cmbLightsource->currentText();
         }
         if (ui->lstSpectra->item(currentIndex)) {
@@ -413,7 +419,8 @@ void QFESpectraViewerDialog::loadToWidgets()
     } else {
         if (plotItems[currentIndex].type==qfesFluorohpore)  {
             ui->stackSpectraEditor->setCurrentWidget(ui->widFluorophore);
-            ui->cmbFluorophore->setCurrentIndex(ui->cmbFluorophore->findData(plotItems[currentIndex].name));
+            //ui->cmbFluorophore->setCurrentIndex(ui->cmbFluorophore->findData(plotItems[currentIndex].name));
+            ui->cmbFluorophore->setCurrentFromModelData(plotItems[currentIndex].name);
             ui->chkFluorophoreShowEmission->setChecked(plotItems[currentIndex].showEmission);
             ui->chkFluorophoreShowExcitation->setChecked(plotItems[currentIndex].showExcitation);
             connect(ui->chkFluorophoreShowEmission, SIGNAL(toggled(bool)), this, SLOT(saveFromWidgets()));
@@ -423,7 +430,7 @@ void QFESpectraViewerDialog::loadToWidgets()
              ui->stackSpectraEditor->setCurrentWidget(ui->widLightSource);
              ui->stackLightsource->setCurrentWidget(ui->widLSLaser);
              ui->cmbLightSourceType->setCurrentIndex(0);
-             ui->cmbLightsource->setCurrentIndex(ui->cmbLightsource->findData(plotItems[currentIndex].name));
+             ui->cmbLightsource->setCurrentFromModelData(plotItems[currentIndex].name);//setCurrentIndex(ui->cmbLightsource->findData(plotItems[currentIndex].name));
              ui->spinLaserCentral->setValue(plotItems[currentIndex].centralWavelength);
              ui->spinLaserLinewidth->setValue(plotItems[currentIndex].spectralWidth);
              connect(ui->spinLaserCentral, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
@@ -434,7 +441,7 @@ void QFESpectraViewerDialog::loadToWidgets()
              ui->stackSpectraEditor->setCurrentWidget(ui->widLightSource);
              ui->stackLightsource->setCurrentWidget(ui->widLSSpectrum);
              ui->cmbLightSourceType->setCurrentIndex(1);
-             ui->cmbLightsource->setCurrentIndex(ui->cmbLightsource->findData(plotItems[currentIndex].name));
+             ui->cmbLightsource->setCurrentFromModelData(plotItems[currentIndex].name);//setCurrentIndex(ui->cmbLightsource->findData(plotItems[currentIndex].name));
              ui->spinLaserCentral->setValue(plotItems[currentIndex].centralWavelength);
              ui->spinLaserLinewidth->setValue(plotItems[currentIndex].spectralWidth);
              connect(ui->spinLaserCentral, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
@@ -443,14 +450,14 @@ void QFESpectraViewerDialog::loadToWidgets()
              connect(ui->cmbLightsource, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
         } else  if (plotItems[currentIndex].type==qfesDetector)  {
              ui->stackSpectraEditor->setCurrentWidget(ui->widDetector);
-             ui->cmbDetector->setCurrentIndex(ui->cmbDetector->findData(plotItems[currentIndex].name));
+             ui->cmbDetector->setCurrentFromModelData(plotItems[currentIndex].name);//setCurrentIndex(ui->cmbDetector->findData(plotItems[currentIndex].name));
              connect(ui->cmbDetector, SIGNAL(currentIndexChanged(int)), this, SLOT(saveFromWidgets()));
         } else  if (plotItems[currentIndex].type==qfesFilterBandpass || plotItems[currentIndex].type==qfesFilterNotch)  {
              ui->stackSpectraEditor->setCurrentWidget(ui->widFilter);
              ui->stackFilter->setCurrentWidget(ui->widFilterBandpass);
              if (plotItems[currentIndex].type==qfesFilterNotch) ui->cmbFilterType->setCurrentIndex(3);
              else ui->cmbFilterType->setCurrentIndex(0);
-             ui->cmbFilter->setCurrentIndex(ui->cmbFilter->findData(plotItems[currentIndex].name));
+             ui->cmbFilter->setCurrentFromModelData(plotItems[currentIndex].name);//setCurrentIndex(ui->cmbFilter->findData(plotItems[currentIndex].name));
              ui->spinFilterCentral->setValue(plotItems[currentIndex].centralWavelength);
              ui->spinFilterLinewidth->setValue(plotItems[currentIndex].spectralWidth);
              connect(ui->spinFilterCentral, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
@@ -462,7 +469,7 @@ void QFESpectraViewerDialog::loadToWidgets()
              ui->stackFilter->setCurrentWidget(ui->widFilterShortpass);
              if (plotItems[currentIndex].type==qfesFilterLongpass) ui->cmbFilterType->setCurrentIndex(1);
              else ui->cmbFilterType->setCurrentIndex(2);
-             ui->cmbFilter->setCurrentIndex(ui->cmbFilter->findData(plotItems[currentIndex].name));
+             ui->cmbFilter->setCurrentFromModelData(plotItems[currentIndex].name);//setCurrentIndex(ui->cmbFilter->findData(plotItems[currentIndex].name));
              ui->spinFilterCutWavelength->setValue(plotItems[currentIndex].centralWavelength);
              ui->spinFilterLinewidth->setValue(plotItems[currentIndex].spectralWidth);
              connect(ui->spinFilterCutWavelength, SIGNAL(valueChanged(double)), this, SLOT(saveFromWidgets()));
@@ -472,7 +479,7 @@ void QFESpectraViewerDialog::loadToWidgets()
              ui->stackSpectraEditor->setCurrentWidget(ui->widFilter);
              ui->stackFilter->setCurrentWidget(ui->widFilterSpectrum);
              ui->cmbFilterType->setCurrentIndex(ui->cmbFilterType->count()-1);
-             ui->cmbFilter->setCurrentIndex(ui->cmbFilter->findData(plotItems[currentIndex].name));
+             ui->cmbFilter->setCurrentFromModelData(plotItems[currentIndex].name);//setCurrentIndex(ui->cmbFilter->findData(plotItems[currentIndex].name));
              ui->spinFilterCentral->setValue(plotItems[currentIndex].centralWavelength);
              ui->spinFilterCutWavelength->setValue(plotItems[currentIndex].centralWavelength);
              ui->spinFilterLinewidth->setValue(plotItems[currentIndex].spectralWidth);
@@ -944,7 +951,7 @@ void QFESpectraViewerDialog::updatePlots()
             g->set_sizeMax(1);
             g->set_style(Qt::SolidLine);
             g->set_unlimitedSizeMax(false);
-            g->set_unlimitedSizeMin(false);
+            g->set_unlimitedSizeMin(false);            
             //g->set_rangeCenter(item.centralWavelength);
             QColor col=wavelengthToColor(item.centralWavelength);
             g->set_centerColor(col);
@@ -1328,7 +1335,9 @@ void QFESpectraViewerDialog::on_cmbFilterType_currentIndexChanged(int i)
 void QFESpectraViewerDialog::on_cmbLaserLine_currentIndexChanged(int i)
 {
     if (i<0) return;
-    QVariant var=ui->cmbLaserLine->itemData(i);
+    //QVariant var=ui->cmbLaserLine->itemData(i);
+    QVariant var=ui->cmbLaserLine->getCurrentIndexData(Qt::UserRole);
+    //qDebug()<<var;
     QPointF data=QPointF(var.toDouble(), 1);
     if (var.canConvert(QVariant::PointF)) data=var.toPointF();
     if (data.x()>0) {
@@ -1340,12 +1349,16 @@ void QFESpectraViewerDialog::on_cmbLaserLine_currentIndexChanged(int i)
 
 void QFESpectraViewerDialog::on_spinLaserCentral_valueChanged(double value)
 {
-    ui->cmbLaserLine->setCurrentIndex(findLaserLineIndex(ui->spinFilterCentral->value(), ui->spinFilterLinewidth->value()));
+    QPointF pnt=QPointF(ui->spinLaserCentral->value(), ui->spinLaserLinewidth->value());
+    //ui->cmbLaserLine->setCurrentFromModelData(pnt);
+    //ui->cmbLaserLine->setCurrentIndex(findLaserLineIndex(ui->spinLaserCentral->value(), ui->spinLaserLinewidth->value()));
 }
 
 void QFESpectraViewerDialog::on_spinLaserLinewidth_valueChanged(double value)
 {
-    ui->cmbLaserLine->setCurrentIndex(findLaserLineIndex(ui->spinFilterCentral->value(), ui->spinFilterLinewidth->value()));
+    QPointF pnt=QPointF(ui->spinLaserCentral->value(), ui->spinLaserLinewidth->value());
+    //ui->cmbLaserLine->setCurrentFromModelData(pnt);
+    //ui->cmbLaserLine->setCurrentIndex(findLaserLineIndex(ui->spinLaserCentral->value(), ui->spinLaserLinewidth->value()));
 }
 
 int QFESpectraViewerDialog::findLaserLineIndex(double line, double width) {

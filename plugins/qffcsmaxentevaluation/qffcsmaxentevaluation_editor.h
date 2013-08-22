@@ -60,6 +60,7 @@
 #include "qffitalgorithmmanager.h"
 #include "qfdoubleedit.h"
 #include "qffcsweightingtools.h"
+#include "qfdoubleedit.h"
 ////////////
 
 
@@ -83,6 +84,7 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         void NdistChanged(int Ndist);
         void NumIterChanged(int NumIter);
         void chkShowDChanged();
+        void chkShowrangesChanged();
 
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old);
@@ -108,6 +110,8 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         virtual void updateFitFunctions();
         virtual void displayParameters();
 
+        virtual void sumRangesChanged();
+
     protected:       
         /*! \brief create an evaluation report for the current record */
         void createReportDoc(QTextDocument* document);
@@ -129,8 +133,16 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         QToolBar* tbPlot;
         QToolBar* tbPlotDistribution;
 
+        QFDoubleEdit* edtRange1Min;
+        QFDoubleEdit* edtRange1Max;
+        QFDoubleEdit* edtRange2Min;
+        QFDoubleEdit* edtRange2Max;
+        QLabel* labRange1;
+        QLabel* labRange2;
+
         QFDoubleEdit* edtWxy;
         QComboBox* cmbXAxisType;
+        QCheckBox* chkShowRanges;
 
 
     private:

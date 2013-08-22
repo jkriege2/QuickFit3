@@ -1,13 +1,12 @@
 #include "qfsimpletreemodel.h"
 #include <QStringList>
+#include <QIcon>
 
-QFSimpleTreeModel::QFSimpleTreeModel(const QString &data, QObject *parent) :
+
+QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
     QAbstractItemModel(parent)
 {
-    QList<QVariant> rootData;
-    rootData << "Title" << "Summary";
-    rootItem = new QFSimpleTreeModelItem(rootData);
-    setupModelData(data.split(QString("\n")), rootItem);
+    rootItem = new QFSimpleTreeModelItem("");
 }
 
 
@@ -24,17 +23,60 @@ QFSimpleTreeModel::QFSimpleTreeModel(const QString &data, QObject *parent) :
          return rootItem->columnCount();
  }
 
+ QFSimpleTreeModelItem *QFSimpleTreeModel::addFolderedItem(const QString &name, const QVariant &userData, QChar separator)
+ {
+     QStringList folders=name.split(separator);
+     if (folders.size()<=0) return NULL;
+     QFSimpleTreeModelItem* root=rootItem;
+
+     for (int i=0; i<folders.size()-1; i++) {
+         QFSimpleTreeModelItem* newroot=root;
+         for (int j=0; j<root->childCount(); j++) {
+             QFSimpleTreeModelItem* child=root->child(j);
+             if (child && child->displayText()==folders[i] && child->isFolder()) {
+                 newroot=child;
+                 break;
+             }
+         }
+         if (newroot==root) {
+             newroot=new QFSimpleTreeModelItem(folders[i], root);
+             newroot->setFolder(true);
+             root->appendChild(newroot);
+         }
+         root=newroot;
+     }
+     QFSimpleTreeModelItem* item=new QFSimpleTreeModelItem(folders.last(), root);
+     if (userData.isValid()) item->setData(userData);
+     root->appendChild(item);
+     return item;
+
+ }
+
+ void QFSimpleTreeModel::clear()
+ {
+     QFSimpleTreeModelItem *oldrootItem=rootItem;
+     rootItem = new QFSimpleTreeModelItem("");
+     delete oldrootItem;
+     reset();
+ }
+
  QVariant QFSimpleTreeModel::data(const QModelIndex &index, int role) const
  {
      if (!index.isValid())
          return QVariant();
 
-     if (role != Qt::DisplayRole)
-         return QVariant();
-
      QFSimpleTreeModelItem *item = static_cast<QFSimpleTreeModelItem*>(index.internalPointer());
 
-     return item->data(index.column());
+     if (!item) return QVariant();
+
+     if (role==Qt::DecorationRole) {
+         if (item->isFolder()) return QIcon("lib/projecttree_folder.png");
+         else return item->data(role);
+     }
+
+     if (role==Qt::DisplayRole) return  item->displayText();
+
+     return item->data(role);
  }
 
  Qt::ItemFlags QFSimpleTreeModel::flags(const QModelIndex &index) const
@@ -42,14 +84,18 @@ QFSimpleTreeModel::QFSimpleTreeModel(const QString &data, QObject *parent) :
      if (!index.isValid())
          return 0;
 
-     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+     QFSimpleTreeModelItem *item = static_cast<QFSimpleTreeModelItem*>(index.internalPointer());
+     if (item && item->isFolder()) {
+         return Qt::ItemIsEnabled;
+     } else {
+         return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+     }
  }
 
- QVariant QFSimpleTreeModel::headerData(int section, Qt::Orientation orientation,
-                                int role) const
+ QVariant QFSimpleTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
  {
      if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-         return rootItem->data(section);
+         return rootItem->data(role);
 
      return QVariant();
  }
@@ -102,54 +148,6 @@ QFSimpleTreeModel::QFSimpleTreeModel(const QString &data, QObject *parent) :
      return parentItem->childCount();
  }
 
- void QFSimpleTreeModel::setupModelData(const QStringList &lines, QFSimpleTreeModelItem *parent)
- {
-     QList<QFSimpleTreeModelItem*> parents;
-     QList<int> indentations;
-     parents << parent;
-     indentations << 0;
-
-     int number = 0;
-
-     while (number < lines.count()) {
-         int position = 0;
-         while (position < lines[number].length()) {
-             if (lines[number].mid(position, 1) != " ")
-                 break;
-             position++;
-         }
-
-         QString lineData = lines[number].mid(position).trimmed();
-
-         if (!lineData.isEmpty()) {
-             // Read the column data from the rest of the line.
-             QStringList columnStrings = lineData.split("\t", QString::SkipEmptyParts);
-             QList<QVariant> columnData;
-             for (int column = 0; column < columnStrings.count(); ++column)
-                 columnData << columnStrings[column];
-
-             if (position > indentations.last()) {
-                 // The last child of the current parent is now the new parent
-                 // unless the current parent has no children.
-
-                 if (parents.last()->childCount() > 0) {
-                     parents << parents.last()->child(parents.last()->childCount()-1);
-                     indentations << position;
-                 }
-             } else {
-                 while (position < indentations.last() && parents.count() > 0) {
-                     parents.pop_back();
-                     indentations.pop_back();
-                 }
-             }
-
-             // Append a new item to the current parent's list of children.
-             parents.last()->appendChild(new QFSimpleTreeModelItem(columnData, parents.last()));
-         }
-
-         number++;
-     }
- }
 
 
 
@@ -172,10 +170,44 @@ QFSimpleTreeModel::QFSimpleTreeModel(const QString &data, QObject *parent) :
 
 
 
- QFSimpleTreeModelItem::QFSimpleTreeModelItem(const QList<QVariant> &data, QFSimpleTreeModelItem *parent)
+
+ QFSimpleTreeModelItem::QFSimpleTreeModelItem(const QString &text, QFSimpleTreeModelItem *parent)
  {
      parentItem = parent;
-     itemData = data;
+     userData[Qt::DisplayRole] = text;
+     folder=false;
+ }
+
+ QFSimpleTreeModelItem::QFSimpleTreeModelItem(const QString &text, const QVariant &userRoleData, QFSimpleTreeModelItem *parent)
+ {
+     parentItem = parent;
+     userData[Qt::DisplayRole] = text;
+     userData[Qt::UserRole] = userRoleData;
+     folder=false;
+ }
+
+ QFSimpleTreeModelItem::QFSimpleTreeModelItem(bool folder, const QString &text, QFSimpleTreeModelItem *parent)
+ {
+     parentItem = parent;
+     userData[Qt::DisplayRole] = text;
+     this->folder=folder;
+ }
+
+ QFSimpleTreeModelItem::QFSimpleTreeModelItem(bool folder, const QString &text, const QVariant &userRoleData, QFSimpleTreeModelItem *parent)
+ {
+     parentItem = parent;
+     userData[Qt::DisplayRole] = text;
+     userData[Qt::UserRole] = userRoleData;
+     this->folder=folder;
+ }
+
+ QFSimpleTreeModelItem::QFSimpleTreeModelItem(QIcon icon, const QString &text, const QVariant &userRoleData, QFSimpleTreeModelItem *parent)
+ {
+     parentItem = parent;
+     userData[Qt::DisplayRole] = text;
+     userData[Qt::DecorationRole] = icon;
+     userData[Qt::UserRole] = userRoleData;
+     folder=false;
  }
 
  QFSimpleTreeModelItem::~QFSimpleTreeModelItem()
@@ -200,17 +232,37 @@ QFSimpleTreeModel::QFSimpleTreeModel(const QString &data, QObject *parent) :
 
  int QFSimpleTreeModelItem::columnCount() const
  {
-     return itemData.count();
+     return 1;
  }
 
- QVariant QFSimpleTreeModelItem::data(int column) const
+ QVariant QFSimpleTreeModelItem::displayText() const
  {
-     return itemData.value(column);
+     return data(Qt::DisplayRole);
+ }
+
+ QVariant QFSimpleTreeModelItem::data(int role) const
+ {
+     return userData.value(role, QVariant());
+ }
+
+ void QFSimpleTreeModelItem::setData(QVariant data, int role)
+ {
+     userData[role]=data;
  }
 
  QFSimpleTreeModelItem *QFSimpleTreeModelItem::parent()
  {
      return parentItem;
+ }
+
+ bool QFSimpleTreeModelItem::isFolder() const
+ {
+     return this->folder;
+ }
+
+ void QFSimpleTreeModelItem::setFolder(bool folder)
+ {
+     this->folder=folder;
  }
 
  int QFSimpleTreeModelItem::row() const

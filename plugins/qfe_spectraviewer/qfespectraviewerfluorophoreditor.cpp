@@ -30,6 +30,9 @@ QFESpectraViewerFluorophoreEditor::QFESpectraViewerFluorophoreEditor(QWidget *pa
     ui->edtSpectrumReference_2->setCompleter(c);
     ui->edtSpectrumReference_2->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter,ui->edtSpectrumReference,ui->edtSpectrumReference));
     c->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"completers/qfe_spectraviewer/specref.txt");
+    ui->edtFolder->setCompleter(c=new QFCompleterFromFile);
+    ui->edtFolder->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter,ui->edtFolder,ui->edtFolder));
+    c->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"completers/qfe_spectraviewer/flfolder.txt");
 
 
     ui->edtSpectrumReference->setCompleter(c=new QFCompleterFromFile);
@@ -78,6 +81,7 @@ void QFESpectraViewerFluorophoreEditor::setFromData(const QString &ID, const Spe
     ui->spinFlEff->setValue(data.fluorescence_efficiency);
     ui->spinFlEffWL->setValue(data.fluorescence_efficiency_wavelength);
     ui->spinLifetime->setValue(data.fluorescence_lifetime);
+    ui->edtFolder->setText(data.folder);
     this->oldspectrum=data.spectrum_abs;
     this->oldspectrum_2=data.spectrum_fl;
     this->manager=manager;
@@ -271,6 +275,7 @@ SpectrumManager::FluorophoreData QFESpectraViewerFluorophoreEditor::getData() co
     data.spectrum_abs=oldspectrum;
     data.spectrum_fl=oldspectrum_2;
     data.description=ui->edtDescription->text();
+    data.folder=ui->edtFolder->text();
     data.condition=ui->edtCondition->text();
     if (spectrumchanged) {
         data.spectrum_abs=-1;
@@ -352,6 +357,7 @@ QString QFESpectraViewerFluorophoreEditor::addDataAndSpectrum(QSettings& databas
     }
     //qDebug()<<data.spectrum_abs<<data.spectrum_fl<<specFilename<<spec2Filename;
     database.setValue(QString("%1/name").arg(ID), data.name);
+    database.setValue(QString("%1/folder").arg(ID), ui->edtFolder->text());
     database.setValue(QString("%1/manufacturer").arg(ID), data.manufacturer);
     database.setValue(QString("%1/oder_no").arg(ID), data.orderNo);
     database.setValue(QString("%1/reference").arg(ID), data.reference);

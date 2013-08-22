@@ -31,6 +31,9 @@ QFESpectraViewerDetectorEditor::QFESpectraViewerDetectorEditor(QWidget *parent) 
     ui->edtUnit->setCompleter(c=new QFCompleterFromFile);
     ui->edtUnit->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter,ui->edtUnit,ui->edtUnit));
     c->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"completers/qfe_spectraviewer/effunits.txt");
+    ui->edtFolder->setCompleter(c=new QFCompleterFromFile);
+    ui->edtFolder->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter,ui->edtFolder,ui->edtFolder));
+    c->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"completers/qfe_spectraviewer/detfolder.txt");
 
 
     modSpectrum.setReadonly(false);
@@ -60,6 +63,7 @@ void QFESpectraViewerDetectorEditor::setFromData(const QString &ID, const Spectr
     ui->spinWavelength->setValue(data.peak_wavelength);
     ui->spinSensitivity->setValue(data.peak_sensitivity);
     ui->edtUnit->setText(data.peak_sensitivity_unit);
+    ui->edtFolder->setText(data.folder);
     this->oldspectrum=data.spectrum;
     this->manager=manager;
     this->spectrumchanged=false;
@@ -154,6 +158,7 @@ SpectrumManager::DetectorData QFESpectraViewerDetectorEditor::getData() const
     data.peak_sensitivity=ui->spinSensitivity->value();
     data.spectrum=oldspectrum;
     data.description=ui->edtDescription->text();
+    data.folder=ui->edtFolder->text();
     if (spectrumchanged) data.spectrum=-1;
     return data;
 }
@@ -194,6 +199,7 @@ QString QFESpectraViewerDetectorEditor::addDataAndSpectrum(QSettings& database, 
         else specFilename=QFileInfo(database.fileName()).absoluteDir().relativeFilePath(m->getSpectrum(data.spectrum)->getFilename());
     }
     database.setValue(QString("%1/name").arg(ID), data.name);
+    database.setValue(QString("%1/folder").arg(ID), ui->edtFolder->text());
     database.setValue(QString("%1/manufacturer").arg(ID), data.manufacturer);
     database.setValue(QString("%1/oder_no").arg(ID), data.orderNo);
     database.setValue(QString("%1/reference").arg(ID), data.reference);

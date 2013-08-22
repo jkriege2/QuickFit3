@@ -28,6 +28,9 @@ QFESpectraViewerLightsourceEditor::QFESpectraViewerLightsourceEditor(QWidget *pa
     ui->edtSpectrumReference->setCompleter(c=new QFCompleterFromFile);
     ui->edtSpectrumReference->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter,ui->edtSpectrumReference,ui->edtSpectrumReference));
     c->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"completers/qfe_spectraviewer/specref.txt");
+    ui->edtFolder->setCompleter(c=new QFCompleterFromFile);
+    ui->edtFolder->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter,ui->edtFolder,ui->edtFolder));
+    c->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"completers/qfe_spectraviewer/lsfolder.txt");
 
 
     modSpectrum.setReadonly(false);
@@ -55,6 +58,7 @@ void QFESpectraViewerLightsourceEditor::setFromData(const QString &ID, const Spe
     ui->edtOrder->setText(data.orderNo);
     ui->edtReference->setText(data.reference);
     ui->spinWavelength->setValue(data.typical_wavelength);
+    ui->edtFolder->setText(data.folder);
     this->oldspectrum=data.spectrum;
     this->manager=manager;
     this->spectrumchanged=false;
@@ -147,6 +151,7 @@ SpectrumManager::LightSourceData QFESpectraViewerLightsourceEditor::getData() co
     data.typical_wavelength=ui->spinWavelength->value();
     data.spectrum=oldspectrum;
     data.description=ui->edtDescription->text();
+    data.folder=ui->edtFolder->text();
     if (spectrumchanged) data.spectrum=-1;
     return data;
 }
@@ -187,6 +192,7 @@ QString QFESpectraViewerLightsourceEditor::addDataAndSpectrum(QSettings& databas
         else specFilename=QFileInfo(database.fileName()).absoluteDir().relativeFilePath(m->getSpectrum(data.spectrum)->getFilename());
     }
     database.setValue(QString("%1/name").arg(ID), data.name);
+    database.setValue(QString("%1/folder").arg(ID), ui->edtFolder->text());
     database.setValue(QString("%1/manufacturer").arg(ID), data.manufacturer);
     database.setValue(QString("%1/oder_no").arg(ID), data.orderNo);
     database.setValue(QString("%1/reference").arg(ID), data.reference);

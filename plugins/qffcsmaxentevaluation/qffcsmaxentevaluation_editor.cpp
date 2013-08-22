@@ -58,7 +58,44 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     edtNumIter=new QSpinBox(this);
     edtNumIter->setRange(10, INT_MAX);
     flAlgorithmParams->addRow(tr("MaxEnt: <i>&Iterations/Step = </i>"), edtNumIter);
-////////////////////////////////////////
+
+    QWidget* wrange;
+    QHBoxLayout* lrange;
+    wrange=new QWidget(this);
+    lrange=new QHBoxLayout(wrange);
+    wrange->setLayout(lrange);
+    lrange->setContentsMargins(0,0,0,0);
+    edtRange1Min=new QFDoubleEdit(wrange);
+    edtRange1Min->setLogScale(true);
+    edtRange1Min->setValue(1e-5);
+    edtRange1Max=new QFDoubleEdit(wrange);
+    edtRange1Min->setLogScale(true);
+    edtRange1Min->setValue(1e-4);
+    lrange->addWidget(edtRange1Min);
+    lrange->addWidget(new QLabel(" ... "));
+    lrange->addWidget(edtRange1Max);
+    flAlgorithmParams->addRow(tr("sum range 1:"), wrange);
+    flAlgorithmParams->addRow("", labRange1=new QLabel(this));
+    labRange1->setTextInteractionFlags(Qt::TextSelectableByMouse|Qt::TextSelectableByKeyboard);
+
+    wrange=new QWidget(this);
+    lrange=new QHBoxLayout(wrange);
+    wrange->setLayout(lrange);
+    lrange->setContentsMargins(0,0,0,0);
+    edtRange2Min=new QFDoubleEdit(wrange);
+    edtRange2Min->setLogScale(true);
+    edtRange2Min->setValue(1e-3);
+    edtRange2Max=new QFDoubleEdit(wrange);
+    edtRange2Min->setLogScale(true);
+    edtRange2Min->setValue(1e-2);
+    lrange->addWidget(edtRange2Min);
+    lrange->addWidget(new QLabel(" ... "));
+    lrange->addWidget(edtRange2Max);
+
+    flAlgorithmParams->addRow(tr("sum range 2:"), wrange);
+    flAlgorithmParams->addRow("", labRange2=new QLabel(this));
+    labRange2->setTextInteractionFlags(Qt::TextSelectableByMouse|Qt::TextSelectableByKeyboard);
+    ////////////////////////////////////////
 
 
 
@@ -137,10 +174,11 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     cmbXAxisType=new QComboBox(this);//(tr("show D-axis"));
     cmbXAxisType->addItem(tr("time-axis"));
     cmbXAxisType->addItem(tr("FCS diffusion coefficient"));
+    chkShowRanges=new QCheckBox(tr("ranges"), this);
     tbPlotDistribution->addSeparator();
     tbPlotDistribution->addWidget(new QLabel("x-axis: "));
     tbPlotDistribution->addWidget(cmbXAxisType);
-
+    tbPlotDistribution->addWidget(chkShowRanges);
 
     QWidget* wPltDist=new QWidget(this);
     QVBoxLayout* layPltDist=new QVBoxLayout(this);
@@ -156,6 +194,7 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     /////
     connect(pltDistribution, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMove(double,double)));
     connect(cmbXAxisType, SIGNAL(currentIndexChanged(int)), this, SLOT(chkShowDChanged()));
+    connect(chkShowRanges, SIGNAL(toggled(bool)), this, SLOT(chkShowrangesChanged()));
     /////
 
 }
@@ -178,6 +217,11 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         disconnect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
         disconnect(edtNdist, SIGNAL(valueChanged(int)),this,SLOT(NdistChanged(int)));
         disconnect(edtNumIter, SIGNAL(valueChanged(int)),this,SLOT(NumIterChanged(int)));
+
+        disconnect(edtRange1Min, SIGNAL(valueChanged(double)),this,SLOT(sumRangesChanged()));
+        disconnect(edtRange1Max, SIGNAL(valueChanged(double)),this,SLOT(sumRangesChanged()));
+        disconnect(edtRange2Min, SIGNAL(valueChanged(double)),this,SLOT(sumRangesChanged()));
+        disconnect(edtRange2Max, SIGNAL(valueChanged(double)),this,SLOT(sumRangesChanged()));
     }
 
     QFFCSMaxEntEvaluationItem* item=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
@@ -202,7 +246,17 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
 
 
         cmbXAxisType->setCurrentIndex(current->getProperty("show_daxis", 0).toInt());
+        chkShowRanges->setChecked(current->getProperty("show_ranges", true).toBool());
 
+        edtRange1Min->setValue(current->getProperty(QString("rdr%1_range1min").arg(item->getHighlightedRecord()?item->getHighlightedRecord()->getID():0), current->getProperty("range1min", 1e-5)).toDouble());
+        edtRange1Max->setValue(current->getProperty(QString("rdr%1_range1max").arg(item->getHighlightedRecord()?item->getHighlightedRecord()->getID():0), current->getProperty("range1max", 1e-4)).toDouble());
+        edtRange2Min->setValue(current->getProperty(QString("rdr%1_range2min").arg(item->getHighlightedRecord()?item->getHighlightedRecord()->getID():0), current->getProperty("range2min", 1e-3)).toDouble());
+        edtRange2Max->setValue(current->getProperty(QString("rdr%1_range2max").arg(item->getHighlightedRecord()?item->getHighlightedRecord()->getID():0), current->getProperty("range2max", 1e-2)).toDouble());
+        connect(edtRange1Min, SIGNAL(valueChanged(double)),this,SLOT(sumRangesChanged()));
+        connect(edtRange1Max, SIGNAL(valueChanged(double)),this,SLOT(sumRangesChanged()));
+        connect(edtRange2Min, SIGNAL(valueChanged(double)),this,SLOT(sumRangesChanged()));
+        connect(edtRange2Max, SIGNAL(valueChanged(double)),this,SLOT(sumRangesChanged()));
+        sumRangesChanged();
 
         dataEventsEnabled=true;
     }
@@ -243,6 +297,11 @@ void QFFCSMaxEntEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRec
         edtNdist->setValue(eval->getNdist());
         edtNumIter->setRange(1,10000); //qMax(0,data->getCorrelationN())
         edtNumIter->setValue(eval->getNumIter());
+        edtRange1Min->setValue(current->getProperty(QString("rdr%1_range1min").arg(eval->getHighlightedRecord()?eval->getHighlightedRecord()->getID():0), current->getProperty("range1min", 1e-5)).toDouble());
+        edtRange1Max->setValue(current->getProperty(QString("rdr%1_range1max").arg(eval->getHighlightedRecord()?eval->getHighlightedRecord()->getID():0), current->getProperty("range1max", 1e-4)).toDouble());
+        edtRange2Min->setValue(current->getProperty(QString("rdr%1_range2min").arg(eval->getHighlightedRecord()?eval->getHighlightedRecord()->getID():0), current->getProperty("range2min", 1e-3)).toDouble());
+        edtRange2Max->setValue(current->getProperty(QString("rdr%1_range2max").arg(eval->getHighlightedRecord()?eval->getHighlightedRecord()->getID():0), current->getProperty("range2max", 1e-2)).toDouble());
+        sumRangesChanged();
         dataEventsEnabled=oldde;
     }
 
@@ -462,6 +521,7 @@ void QFFCSMaxEntEvaluationEditor::displayData() {
 
 
 void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
+
     if (!current) return;
     if (!cmbModel) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
@@ -695,6 +755,35 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 } else {
                     if (cmbXAxisType->currentIndex()==0) pltDistribution->setXY(pltData->getXMin(), pltData->getXMax(), pltData->getYMin(), pltData->getYMax());
                 }
+
+                if (chkShowRanges->isChecked()) {
+                    JKQTPverticalRange* g_r1=new JKQTPverticalRange(pltDistribution->get_plotter());
+                    g_r1->set_rangeMin(edtRange1Min->value());
+                    g_r1->set_rangeMax(edtRange1Max->value());
+                    //g_r1->set_plotCenterLine(false);
+                    //g_r1->set_plotRangeLines(false);
+                    g_r1->set_title(tr("range 1"));
+                    //g_r1->set_fillRange(true);
+                    QColor col=QColor("lightsalmon");
+                    g_r1->set_color(col);
+                    col.setAlphaF(0.5);
+                    g_r1->set_fillColor(col);
+                    pltDistribution->addGraph(g_r1);
+
+                    JKQTPverticalRange* g_r2=new JKQTPverticalRange(pltDistribution->get_plotter());
+                    g_r2->set_rangeMin(edtRange2Min->value());
+                    g_r2->set_rangeMax(edtRange2Max->value());
+                    //g_r2->set_plotCenterLine(false);
+                    //g_r2->set_plotRangeLines(false);
+                    g_r2->set_title(tr("range 2"));
+                    //g_r2->set_fillRange(true);
+                    col=QColor("lightskyblue");
+                    g_r1->set_color(col);
+                    col.setAlphaF(0.5);
+                    g_r2->set_fillColor(col);
+                    pltDistribution->addGraph(g_r2);
+                }
+
                 JKQTPxyLineGraph* g_dist=new JKQTPxyLineGraph(pltDistribution->get_plotter());
                 g_dist->set_drawLine(true);
                 g_dist->set_title("MaxEnt distribution");
@@ -829,6 +918,7 @@ void QFFCSMaxEntEvaluationEditor::displayParameters() {
     }
 
 }
+
 
 
 
@@ -1076,6 +1166,67 @@ void QFFCSMaxEntEvaluationEditor::NumIterChanged(int NumIter) {
     if (data) data->setNumIter(NumIter);
 }
 
+
+void QFFCSMaxEntEvaluationEditor::sumRangesChanged()
+{
+
+    QFFCSMaxEntEvaluationItem* eval=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+    if (eval) {
+        if (current->getHighlightedRecord()) {
+            current->setQFProperty(QString("rdr%1_range1min").arg(current->getHighlightedRecord()?current->getHighlightedRecord()->getID():0), edtRange1Min->value());
+            current->setQFProperty(QString("rdr%1_range1max").arg(current->getHighlightedRecord()?current->getHighlightedRecord()->getID():0), edtRange1Max->value());
+            current->setQFProperty(QString("rdr%1_range2min").arg(current->getHighlightedRecord()?current->getHighlightedRecord()->getID():0), edtRange2Min->value());
+            current->setQFProperty(QString("rdr%1_range2max").arg(current->getHighlightedRecord()?current->getHighlightedRecord()->getID():0), edtRange2Max->value());
+
+            QVector<double> tau;
+            if (cmbXAxisType->currentIndex()==1) tau=eval->getDistributionDs(current->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel());
+            else tau=eval->getDistributionTaus(current->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel());
+            QVector<double> dist=eval->getDistribution(current->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel());
+
+
+            double r1min=edtRange1Min->value();
+            double r1max=edtRange1Max->value();
+            if (r1min>r1max) qSwap(r1min, r1max);
+            double r2min=edtRange2Min->value();
+            double r2max=edtRange2Max->value();
+            if (r2min>r2max) qSwap(r2min, r2max);
+            double sum=0, cnt=0;
+            double sumr1=0, sumr2=0;
+            for (int i=0; i<qMin(tau.size(), dist.size()); i++) {
+                double t=tau[i];
+                double d=dist[i];
+                sum=sum+d;
+                if (r1min<=t && t<=r1max) sumr1+=d;
+                if (r2min<=t && t<=r2max) sumr2+=d;
+                cnt++;
+            }
+
+            labRange1->setText(QString::number(sumr1/sum*100.0)+QString(" %"));
+            labRange2->setText(QString::number(sumr2/sum*100.0)+QString(" %"));
+            QString param="";
+            eval->setFitResultValue(current->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel(), param="range1_sum", sumr1);
+            eval->setFitResultGroup(current->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel(), param, tr("distribution analysis"));
+            eval->setFitResultValue(current->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel(), param="range1_relcontents", sumr1/sum);
+            eval->setFitResultGroup(current->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel(), param, tr("distribution analysis"));
+            eval->setFitResultValue(current->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel(), param="range2_sum", sumr2);
+            eval->setFitResultGroup(current->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel(), param, tr("distribution analysis"));
+            eval->setFitResultValue(current->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel(), param="range2_relcontents", sumr2/sum);
+            eval->setFitResultGroup(current->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel(), param, tr("distribution analysis"));
+            eval->setFitResultValue(current->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel(), param="range_sumall", sum);
+            eval->setFitResultGroup(current->getHighlightedRecord(), eval->getCurrentIndex(), eval->getCurrentModel(), param, tr("distribution analysis"));
+
+
+        }
+        current->setQFProperty(QString("range1min"), edtRange1Min->value());
+        current->setQFProperty(QString("range1max"), edtRange1Max->value());
+        current->setQFProperty(QString("range2min"), edtRange2Min->value());
+        current->setQFProperty(QString("range2max"), edtRange2Max->value());
+
+        if (dataEventsEnabled) displayData();
+
+    }
+}
+
 void QFFCSMaxEntEvaluationEditor::chkShowDChanged() {
     if (!current) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -1085,6 +1236,14 @@ void QFFCSMaxEntEvaluationEditor::chkShowDChanged() {
     QApplication::restoreOverrideCursor();
 }
 
+void QFFCSMaxEntEvaluationEditor::chkShowrangesChanged() {
+    if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    //QFUsesResultsByIndexAndModelEvaluation* data=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);
+    current->setQFProperty("show_ranges", chkShowRanges->isChecked(), false, false);
+    displayData();
+    QApplication::restoreOverrideCursor();
+}
 
 void QFFCSMaxEntEvaluationEditor::weightsChanged(int weights) {
     if (!dataEventsEnabled) return;
