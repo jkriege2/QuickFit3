@@ -1,15 +1,15 @@
 reset
 set xlabel 'concentration [M]'
 set ylabel 'viscosity [Pa*s]'
-a=1.002
-b=1
+a=1.00633
+b=0
 c=1
 d=1
 e=1
 model1(conc,a,b,c,d,e)=a+b*1e-3*sqrt(conc)+c*1e-2*conc+d*1e-3*conc*conc+e*1e-3*conc*conc*conc
-fit model1(x,a,b,c,d,e) 'solutioncomponent015.dat' using 1:4 via a,b,c,d,e
-fit model1(x,a,b,c,d,e) 'solutioncomponent015.dat' using 1:4 via a,b,c,d,e
-fit model1(x,a,b,c,d,e) 'solutioncomponent015.dat' using 1:4 via a,b,c,d,e
+fit model1(x,a,b,c,d,e) 'solutioncomponent015.dat' using 1:4 via c,d,e
+fit model1(x,a,b,c,d,e) 'solutioncomponent015.dat' using 1:4 via c,d,e
+fit model1(x,a,b,c,d,e) 'solutioncomponent015.dat' using 1:4 via c,d,e
 set multiplot layout 3,1
 set origin 0,0.33
 set size 1,0.66

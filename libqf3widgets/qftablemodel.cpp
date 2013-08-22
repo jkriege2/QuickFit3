@@ -1321,13 +1321,24 @@ void QFTableModel::paste(int row_start, int column_start) {
             int cnt=d.count('\n');
             int cntSem=d.count(';');
             int cntCom=d.count(',');
-            if (cntSem>cnt && ';'!=dec) sep=';';
-            if (cntCom>cnt && ','!=dec) sep=',';
+            int cntTab=d.count('\t');
+            if (cntSem>=cnt && ';'!=dec) sep=';';
+            if (cntCom>=cnt && ','!=dec) sep=',';
+            if (cntTab>=cnt && cntSem<=0) sep='\t';
+            if (cntTab>=cnt && cntSem<=0 && (cntCom<=0 || (cntCom>0 && icntDot>0))) sep='\t';
             if (dec==',' && sep==',') dec='.';
             if (sep!=',' && dec==',' && icntCom==0 && icntDot>0) dec='.';
             if (sep!=',' && dec=='.' && icntCom>0 && icntDot==0) dec=',';
+            if (dec==',' && icntCom<=0 && icntDot>0 ) dec='.';
+            qDebug()<<"icntDot="<<icntDot;
+            qDebug()<<"icntCom="<<icntCom;
+            qDebug()<<"cnt="<<cnt;
+            qDebug()<<"cntSem="<<cntSem;
+            qDebug()<<"cntCom="<<cntCom;
+            qDebug()<<"cntTab="<<cntTab;
         }
-        //qDebug()<<"sep='"<<sep<<"'    dec='"<<dec<<"'";
+
+        qDebug()<<"sep='"<<sep<<"'    dec='"<<dec<<"'";
         readCSV(in, sep, dec, "#!", '#', row, column, false);
     }
     doEmitSignals=oldEmit;
