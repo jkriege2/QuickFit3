@@ -52,6 +52,22 @@ bool QFTreeViewComboBox::setCurrentFromModelData(const QVariant &data, const QMo
     return false;
 }
 
+int getMaxTextWidth(QAbstractItemModel* model, QModelIndex parent, const QFontMetrics& fm) {
+    int width=0;
+    for (int i=0; i<model->rowCount(parent); i++) {
+        QModelIndex idx=model->index(i,0,parent);
+        if (idx.isValid()) {
+            int w=fm.width(idx.data().toString());
+            if (w>width) width=w;
+            if (model->hasChildren(idx)) {
+                int w=getMaxTextWidth(model, idx, fm)+16;
+                if (w>width) width=w;
+            }
+        }
+    }
+    return width;
+}
+
 void QFTreeViewComboBox::showPopup()
 {
     setRootModelIndex(QModelIndex());
@@ -61,6 +77,16 @@ void QFTreeViewComboBox::showPopup()
 
     _treeView->expandAll();
     _treeView->setItemsExpandable(false);
+
+    QFontMetrics fm(view()->font());
+    int width=this->width();
+    int w=getMaxTextWidth(model(), _treeView->rootIndex(), fm);
+    if (w>width) width=w;
+
+    view()->setMinimumWidth(qMax(width, this->width()));
+    view()->setGeometry(0,0,width, view()->size().height());
+
+
     QComboBox::showPopup();
 }
 
@@ -77,3 +103,5 @@ void QFTreeViewComboBox::indexSelected(const QModelIndex &idx)
     //qDebug()<<"indexSelected("<<idx<<")";
     currentItemIndex=idx;
 }
+
+

@@ -830,7 +830,7 @@ bool QFESPIMB040OpticsSetup::setMainIlluminationShutter(bool opened, bool blocki
     if (!isMainIlluminationShutterAvailable()) return false;
 
     ui->shutterMainIllumination->setShutter(opened);
-    if (opened==false) ui->shutterTransmission->setShutter(false);
+    //if (opened==false) ui->shutterTransmission->setShutter(false);
 
     if (blocking) {
         QTime t;

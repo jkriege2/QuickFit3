@@ -257,7 +257,7 @@ void QFESPIMB040MainWindow2::doDeviceParameterStack()
 
 
 
-bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& previewSettingsFilename, const QString& filename, QString* filename32, QMap<QString, QVariant>* acquisitionDescription, const QString& acquisitionDescriptionPrefix) {
+bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& previewSettingsFilename, const QString& filename, QString* filename32, QMap<QString, QVariant>* acquisitionDescription, const QString& acquisitionDescriptionPrefix, bool mainShutterOpenOnlyForAcquisition) {
     //////////////////////////////////////////////////////////////////////////////////////
     // INIT variables
     //////////////////////////////////////////////////////////////////////////////////////
@@ -269,6 +269,14 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
     if (filename32) *filename32="";
 
 
+    bool oldShutterState=false;
+    if (!optSetup->isMainIlluminationShutterAvailable()) oldShutterState=optSetup->getMainIlluminationShutter();
+    //////////////////////////////////////////////////////////////////////////////////////
+    // Close Main shutter
+    //////////////////////////////////////////////////////////////////////////////////////
+    if (mainShutterOpenOnlyForAcquisition && oldShutterState && optSetup->isMainIlluminationShutterAvailable()) {
+        optSetup->setMainIlluminationShutter(false, true);
+    }
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -289,12 +297,25 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
 
 
     //////////////////////////////////////////////////////////////////////////////////////
+    // Open Main shutter
+    //////////////////////////////////////////////////////////////////////////////////////
+    if (mainShutterOpenOnlyForAcquisition && optSetup->isMainIlluminationShutterAvailable()) {
+        optSetup->setMainIlluminationShutter(true, true);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////
     // OPEN OUTPUT TIFF FILES
     //////////////////////////////////////////////////////////////////////////////////////
     if (ok) {
         QMap<QString, QVariant> acqD;
         QTime time=QTime::currentTime();
         if (ecamera->acquireOnCamera(camera, buffer, NULL, &acqD)) {
+            //////////////////////////////////////////////////////////////////////////////////////
+            // Close Main shutter
+            //////////////////////////////////////////////////////////////////////////////////////
+            if (mainShutterOpenOnlyForAcquisition && optSetup->isMainIlluminationShutterAvailable()) {
+                optSetup->setMainIlluminationShutter(false, true);
+            }
             if (acquisitionDescription) {
                 QMapIterator<QString, QVariant> it(acqD);
                 while (it.hasNext()) {
@@ -342,6 +363,14 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
         }
         if (buffer) free(buffer);
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // Reset Main shutter
+    //////////////////////////////////////////////////////////////////////////////////////
+    if (mainShutterOpenOnlyForAcquisition && optSetup->isMainIlluminationShutterAvailable()) {
+        optSetup->setMainIlluminationShutter(oldShutterState, true);
+    }
+
 
     return ok;
 }
@@ -702,7 +731,17 @@ bool QFESPIMB040MainWindow2::connectStageForAcquisition(QFExtensionLinearStage* 
     return ok;
 }
 
-bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathFilename, const QString& lightpathName, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& previewSettingsFilename1, const QString& outputFilename, const QString& imageID, const QString& imageDescription, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, QMap<QString, QVariant>& acquisitionDescription1) {
+bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathFilename, const QString& lightpathName, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& previewSettingsFilename1, const QString& outputFilename, const QString& imageID, const QString& imageDescription, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, QMap<QString, QVariant>& acquisitionDescription1, bool mainShutterOpenOnlyForAcquisition) {
+
+
+    bool oldShutterState=false;
+    if (!optSetup->isMainIlluminationShutterAvailable()) oldShutterState=optSetup->getMainIlluminationShutter();
+    //////////////////////////////////////////////////////////////////////////////////////
+    // Close Main shutter
+    //////////////////////////////////////////////////////////////////////////////////////
+    if (mainShutterOpenOnlyForAcquisition && oldShutterState && optSetup->isMainIlluminationShutterAvailable()) {
+        optSetup->setMainIlluminationShutter(false, true);
+    }
 
     if (!lightpathFilename.isEmpty()) {
         if (!QFile::exists(lightpathFilename)) {
@@ -720,7 +759,7 @@ bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathF
 
     QDateTime time=QDateTime::currentDateTime();
     QString filename32="";
-    bool ok=savePreview(extension1, ecamera1, camera1, previewSettingsFilename1, outputFilename, &filename32, &acquisitionDescription1, imageID+"/");
+    bool ok=savePreview(extension1, ecamera1, camera1, previewSettingsFilename1, outputFilename, &filename32, &acquisitionDescription1, imageID+"/", mainShutterOpenOnlyForAcquisition);
     if (ok) {
         log_text(tr("  - acquired %1!\n").arg(imageDescription));
         acquisitionDescription1[imageID+"/image_width"]=ecamera1->getCameraImageWidth(camera1);
@@ -743,6 +782,14 @@ bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathF
             moreFiles1.append(d);
         }
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // Reset Main shutter
+    //////////////////////////////////////////////////////////////////////////////////////
+    if (mainShutterOpenOnlyForAcquisition  && optSetup->isMainIlluminationShutterAvailable()) {
+        optSetup->setMainIlluminationShutter(oldShutterState, true);
+    }
+
     return ok;
 }
 

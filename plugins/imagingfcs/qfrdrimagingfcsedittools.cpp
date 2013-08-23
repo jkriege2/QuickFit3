@@ -56,5 +56,48 @@ void QFRDRImagingFCSEditTools::excludeSegments() {
         }
         imFCS->recalcSegmentedAverages();
 
+        QList<QFRDRImagingFCSData*> grp= filterListForClass<QFRawDataRecord, QFRDRImagingFCSData>(imFCS->getGroupMembers());
+        QList<QFRDRImagingFCSData*> inpt=filterListForClass<QFRawDataRecord, QFRDRImagingFCSData>(imFCS->getProject()->getRawDataList());
+        if (imFCS->getFilesForType("input").size()<=0) inpt.clear();
+        else {
+            for (int i=inpt.size()-1; i>=0; i--) {
+                if (!inpt[i]->getFilesForType("input").contains(imFCS->getFilesForType("input").first())) {
+                    inpt.removeAt(i);
+                }
+            }
+        }
+
+        if (grp.size()>1 || inpt.size()>1) {
+            bool ok=false;
+            QStringList sl;
+            sl<<tr("in same group (%1 more files)").arg(grp.size()-1);
+            sl<<tr("with same input dataset (%1 more files)").arg(inpt.size()-1);
+            sl<<tr("do not set in other files");
+            int option=sl.indexOf(QInputDialog::getItem(NULL, tr("Exclude Segments"), tr("exclude these segments also in the selected files"), sl, 0, false, &ok));
+            if (ok && option>=0 && option<=1) {
+                if (option==0) { // in group
+                    for (int j=0; j<grp.size(); j++) {
+                        if (grp[j]!=imFCS && grp[j]) {
+                            QList<bool> used=dlg->getSelectedBoolList();
+                            for (int i=0; i<used.size(); i++) {
+                                grp[j]->setSegmentUsed(i, used[i]);
+                            }
+                            grp[j]->recalcSegmentedAverages();
+                        }
+                    }
+                } else if (option==1) { // same input
+                    for (int j=0; j<inpt.size(); j++) {
+                        if (inpt[j]!=imFCS && inpt[j]) {
+                            QList<bool> used=dlg->getSelectedBoolList();
+                            for (int i=0; i<used.size(); i++) {
+                                inpt[j]->setSegmentUsed(i, used[i]);
+                            }
+                            inpt[j]->recalcSegmentedAverages();
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }

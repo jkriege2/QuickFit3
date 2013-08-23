@@ -82,6 +82,7 @@ QFESPIMB040AcquisitionConfigWidget2::~QFESPIMB040AcquisitionConfigWidget2()
 
 void QFESPIMB040AcquisitionConfigWidget2::loadSettings(QSettings& settings, QString prefix) {
     ui->chkOverview->setChecked(settings.value(prefix+"overview", true).toBool());
+    ui->chkCloseMainShutter->setChecked(settings.value(prefix+"chkCloseMainShutter", false).toBool());
     ui->chkBackground->setChecked(settings.value(prefix+"background", true).toBool());
     ui->spinBackgroundFrames1->setValue(settings.value(prefix+"background_frames1", 1000).toInt());
     ui->spinBackgroundFrames2->setValue(settings.value(prefix+"background_frames2", 1000).toInt());
@@ -125,6 +126,7 @@ void QFESPIMB040AcquisitionConfigWidget2::storeSettings(QSettings& settings, QSt
     settings.setValue(prefix+"prefix1", ui->edtPrefix1->text());
     settings.setValue(prefix+"prefix2", ui->edtPrefix2->text());
     settings.setValue(prefix+"overview", ui->chkOverview->isChecked());
+    settings.setValue(prefix+"chkCloseMainShutter", ui->chkCloseMainShutter->isChecked());
     settings.setValue(prefix+"background", ui->chkBackground->isChecked());
     settings.setValue(prefix+"background_frames1", ui->spinBackgroundFrames1->value());
     settings.setValue(prefix+"background_frames2", ui->spinBackgroundFrames2->value());
@@ -687,6 +689,15 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         progress.setItemText(0, tr("performing run %1/%2").arg(repeatCnt+1).arg(repeats()));
 
 
+        //////////////////////////////////////////////////////////////////////////////////////
+        // switch off light
+        //////////////////////////////////////////////////////////////////////////////////////
+        if (opticsSetup->isMainIlluminationShutterAvailable()){
+            log->log_text(tr("  - switch main shutter on!\n"));
+            opticsSetup->setMainIlluminationShutter(false, false);
+        }
+
+
         progress.setLabelText(tr("setting up acquisition %1/%2 ...").arg(repeatCnt+1).arg(repeats()));
         ok=true;
         //////////////////////////////////////////////////////////////////////////////////////
@@ -725,13 +736,6 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             ok=false;
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////
-        // switch off light
-        //////////////////////////////////////////////////////////////////////////////////////
-        if (opticsSetup->isMainIlluminationShutterAvailable()){
-            log->log_text(tr("  - switch main shutter on!\n"));
-            opticsSetup->setMainIlluminationShutter(false, true);
-        }
 
         //////////////////////////////////////////////////////////////////////////////////////
         // lock cameras for use by this routine
@@ -906,7 +910,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                         acquisitionPrefix=acquisitionPrefix1+QString("_overview.tif");
                         prefix=QString("overview");
                     }
-                    ok=acqTools->acquireImageWithLightpath(lightpathFilenamePreview(ovrImg), lightpathPreview(ovrImg), extension1, ecamera1, camera1, currentPreviewConfigFilename(0,ovrImg), acquisitionPrefix, prefix, tr("overview before acquisition with lightpath %1 for camera 1").arg(ovrImg+1), moreFiles1, acquisitionDescription1);
+                    ok=acqTools->acquireImageWithLightpath(lightpathFilenamePreview(ovrImg), lightpathPreview(ovrImg), extension1, ecamera1, camera1, currentPreviewConfigFilename(0,ovrImg), acquisitionPrefix, prefix, tr("overview before acquisition with lightpath %1 for camera 1").arg(ovrImg+1), moreFiles1, acquisitionDescription1, ui->chkCloseMainShutter->isChecked());
                     if (!ok) {
                         ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 1, lightpath %1!\n").arg(ovrImg+1));
                     } else {
@@ -923,7 +927,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                         acquisitionPrefix=acquisitionPrefix1+QString("_overview.tif");
                         prefix=QString("overview");
                     }
-                    ok=acqTools->acquireImageWithLightpath(lightpathFilenamePreview(ovrImg), lightpathPreview(ovrImg), extension2, ecamera2, camera2, currentPreviewConfigFilename(1,ovrImg), acquisitionPrefix2+QString("_overviewlp%1.tif").arg(ovrImg+1), QString("overview_lightpath%1").arg(ovrImg+1), tr("overview before acquisition with lightpath %1 for camera 2").arg(ovrImg+1), moreFiles2, acquisitionDescription2);
+                    ok=acqTools->acquireImageWithLightpath(lightpathFilenamePreview(ovrImg), lightpathPreview(ovrImg), extension2, ecamera2, camera2, currentPreviewConfigFilename(1,ovrImg), acquisitionPrefix2+QString("_overviewlp%1.tif").arg(ovrImg+1), QString("overview_lightpath%1").arg(ovrImg+1), tr("overview before acquisition with lightpath %1 for camera 2").arg(ovrImg+1), moreFiles2, acquisitionDescription2, ui->chkCloseMainShutter->isChecked());
                     if (!ok) {
                         ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 2, lightpath %1!\n").arg(ovrImg+1));
                     } else {
@@ -931,6 +935,13 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                     }
                 }
             }
+        }
+        //////////////////////////////////////////////////////////////////////////////////////
+        // switch off light
+        //////////////////////////////////////////////////////////////////////////////////////
+        if (opticsSetup->isMainIlluminationShutterAvailable()) {
+            log->log_text(tr("  - switch main shutter off!\n"));
+            ok=ok&opticsSetup->setMainIlluminationShutter(false, false);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////
@@ -946,6 +957,13 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                 opticsSetup->loadLightpathConfig(lightpathFilename(), true);
                 log->log_text(tr("  - setting acquisition lightpath settings '%1' ... DONE\n").arg(lightpath()));
             }
+        }
+        //////////////////////////////////////////////////////////////////////////////////////
+        // switch on light
+        //////////////////////////////////////////////////////////////////////////////////////
+        if (opticsSetup->isMainIlluminationShutterAvailable()) {
+            log->log_text(tr("  - switch main shutter back on!\n"));
+            ok=ok&opticsSetup->setMainIlluminationShutter(true, true);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////
@@ -966,9 +984,6 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         } else {
             log->log_text(tr("  - acquired image series!\n"));
         }
-
-
-
 
 
         //////////////////////////////////////////////////////////////////////////////////////
@@ -996,7 +1011,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                         acquisitionPrefix=acquisitionPrefix1+QString("_overview_after.tif");
                         prefix=QString("overview_after");
                     }
-                    ok=acqTools->acquireImageWithLightpath(lightpathFilenamePreview(ovrImg), lightpathPreview(ovrImg), extension1, ecamera1, camera1, currentPreviewConfigFilename(0,ovrImg), acquisitionPrefix, prefix, tr("overview after acquisition with lightpath %1 for camera 1").arg(ovrImg+1), moreFiles1, acquisitionDescription1);
+                    ok=acqTools->acquireImageWithLightpath(lightpathFilenamePreview(ovrImg), lightpathPreview(ovrImg), extension1, ecamera1, camera1, currentPreviewConfigFilename(0,ovrImg), acquisitionPrefix, prefix, tr("overview after acquisition with lightpath %1 for camera 1").arg(ovrImg+1), moreFiles1, acquisitionDescription1, ui->chkCloseMainShutter->isChecked());
                     if (!ok) {
                         ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 1, lightpath %1!\n").arg(ovrImg+1));
                     } else {
@@ -1013,7 +1028,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                         acquisitionPrefix=acquisitionPrefix1+QString("_overview_after.tif");
                         prefix=QString("overview_after");
                     }
-                    ok=acqTools->acquireImageWithLightpath(lightpathFilenamePreview(ovrImg), lightpathPreview(ovrImg), extension2, ecamera2, camera2, currentPreviewConfigFilename(1,ovrImg), acquisitionPrefix, prefix, tr("overview after acquisition with lightpath %1 for camera 2").arg(ovrImg+1), moreFiles2, acquisitionDescription2);
+                    ok=acqTools->acquireImageWithLightpath(lightpathFilenamePreview(ovrImg), lightpathPreview(ovrImg), extension2, ecamera2, camera2, currentPreviewConfigFilename(1,ovrImg), acquisitionPrefix, prefix, tr("overview after acquisition with lightpath %1 for camera 2").arg(ovrImg+1), moreFiles2, acquisitionDescription2, ui->chkCloseMainShutter->isChecked());
                     if (!ok) {
                         ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 2, lightpath %1!\n").arg(ovrImg+1));
                     } else {
@@ -1023,6 +1038,13 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             }
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////
+        // switch off light
+        //////////////////////////////////////////////////////////////////////////////////////
+        if (opticsSetup->isMainIlluminationShutterAvailable()) {
+            log->log_text(tr("  - switch main shutter off!\n"));
+            ok=ok&opticsSetup->setMainIlluminationShutter(false, false);
+        }
 
         progress.nextItem();
         QApplication::processEvents();
@@ -1114,6 +1136,15 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         if (ok && useCam2) log->log_text(tr("  - stored files with prefix 2: '%1'\n").arg(acquisitionPrefix2));
         repeatCnt++;
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // switch on light
+    //////////////////////////////////////////////////////////////////////////////////////
+    if (opticsSetup->isMainIlluminationShutterAvailable()) {
+        log->log_text(tr("  - switch main shutter back on!\n"));
+        ok=ok&opticsSetup->setMainIlluminationShutter(true, true);
+    }
+
     opticsSetup->unlockLightpath();
     log->log_text(tr("image series acquisition DONE!\n"));
     opticsSetup->ensureLightpath();
