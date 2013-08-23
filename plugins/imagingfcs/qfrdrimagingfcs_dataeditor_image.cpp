@@ -493,17 +493,15 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     spinCrosstalkAvg->setValue(4);
     wclayout->addWidget(new QLabel(tr("avg.: "), wcrosstalk),1,0);
     wclayout->addWidget(spinCrosstalkAvg,1,1);
-    gl->addRow(tr("crosstalk:"), wcrosstalk);
     cmbCrosstalkMode=new QComboBox(wcrosstalk);
     cmbCrosstalkMode->addItem(tr("corrected"));
     cmbCrosstalkMode->addItem(tr("explained"));
     cmbCrosstalkMode->setCurrentIndex(0);
     wclayout->addWidget(new QLabel(tr("mode: "), wcrosstalk),1,2);
     wclayout->addWidget(cmbCrosstalkMode,1,3);
-    wclayout->addWidget(new QLabel(tr("rel. crosstalk: "), wcrosstalk),1,4);
-    wclayout->addWidget(labRelCCF=new QLabel(wcrosstalk),1,5);
-    labRelCCF->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
+    gl->addRow(tr("rel. ccf amplitude:"), labRelCCF=new QLabel(wcrosstalk));
+    labRelCCF->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
     connectImageWidgets(true);
 

@@ -104,7 +104,7 @@ void QFRDRImagingFCSMaskByIntensity::updateMask() {
                     ll=level2l;
                 }
             }
-            m_mask[i]=!((m_image[i]>=ll)&&(m_image[i]<=l));
+            m_mask[i]=(m_image[i]>=ll)&&(m_image[i]<=l);
         }
     } else if (ui->cmbMaskingMode->currentIndex()==1) {
         for (uint16_t i=0; i<m_width*m_height; i++) {
@@ -122,7 +122,7 @@ void QFRDRImagingFCSMaskByIntensity::updateMask() {
                 }
             }
 
-            m_mask[i]=(m_image[i]>=ll)&&(m_image[i]<=l);
+            m_mask[i]=!((m_image[i]>=ll)&&(m_image[i]<=l));
         }
     } else if (ui->cmbMaskingMode->currentIndex()==2) {
         for (uint16_t i=0; i<m_width*m_height; i++) {
