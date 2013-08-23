@@ -499,6 +499,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbCrosstalkMode->setCurrentIndex(0);
     wclayout->addWidget(new QLabel(tr("mode: "), wcrosstalk),1,2);
     wclayout->addWidget(cmbCrosstalkMode,1,3);
+    gl->addRow(tr("crosstalk:"), wcrosstalk);
+
 
     gl->addRow(tr("rel. ccf amplitude:"), labRelCCF=new QLabel(wcrosstalk));
     labRelCCF->setTextInteractionFlags(Qt::TextBrowserInteraction);
