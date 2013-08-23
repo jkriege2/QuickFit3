@@ -500,6 +500,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbCrosstalkMode->setCurrentIndex(0);
     wclayout->addWidget(new QLabel(tr("mode: "), wcrosstalk),1,2);
     wclayout->addWidget(cmbCrosstalkMode,1,3);
+    wclayout->addWidget(new QLabel(tr("rel. crosstalk: "), wcrosstalk),1,4);
+    wclayout->addWidget(labRelCCF=new QLabel(wcrosstalk),1,5);
+    labRelCCF->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
 
     connectImageWidgets(true);
@@ -3001,6 +3004,8 @@ void QFRDRImagingFCSImageEditor::replotData() {
     plotterResid->get_plotter()->set_showKey(chkKeys->isChecked());
     ds->clear();
 
+    labRelCCF->setText("");
+
 
     if (m->getCorrelationN()>0) {
 
@@ -3111,6 +3116,8 @@ void QFRDRImagingFCSImageEditor::replotData() {
                 p_r->set_centerStyle(Qt::DotLine);
                 p_r->set_rangeCenter(ACFLevel);
                 plotter->addGraph(p_r);
+
+                labRelCCF->setText(tr("CCF/ACF0 = %1%3,  CCF/ACF1 = %2%3").arg(CC/C0*100.0).arg(CC/C1*100.0).arg("%"));
             }
 
         } else {

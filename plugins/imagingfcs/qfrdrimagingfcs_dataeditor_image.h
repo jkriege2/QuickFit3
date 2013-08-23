@@ -301,6 +301,7 @@ protected:
         QDoubleSpinBox* spinCrosstalk;
         QSpinBox* spinCrosstalkAvg;
         QComboBox* cmbCrosstalkMode;
+        QLabel* labRelCCF;
 
 
         QFRDRImagingFCSImageParameterGroupBox* grpImage;
