@@ -14,11 +14,11 @@ QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorACFR::QFFitFunctionsSPIMFCCSFW2CSepDiff2C
 
 
     addParameter(FloatNumber,  "diff_coeff1",            "red ACF: diffusion coefficient of component 1",                  "D<sub>1</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
-    #define FCCSDiff_diff_coeff1 2
+    #define FCCSDiff_diff_coeff1 3
     addParameter(FloatNumber,  "diff_coeff2",            "red ACF: diffusion coefficient of component 2",                  "D<sub>2</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 100,           1e-10,    1e50,     1    );
-    #define FCCSDiff_diff_coeff2 3
+    #define FCCSDiff_diff_coeff2 4
     addParameter(FloatNumber,  "diff_rho2",            "red ACF: fraction of diffusion component  2",   "&rho;<sub>2</sub>",            "", "",    true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,           0,    1,     1    );
-    #define FCCSDiff_diff_rho2 4
+    #define FCCSDiff_diff_rho2 5
 
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                   "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
     #define FCCSDiff_offset 6
