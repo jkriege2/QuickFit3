@@ -1923,11 +1923,11 @@ void MainWindow::clearView(const QString &name)
 void MainWindow::addHistogramToView(const QString &name, const QFHistogramService::Histogram &histogram)
 {
     if (histograms.contains(name)) {
-        double* d=(double*)malloc(histogram.data.size()*sizeof(double));
+        /*double* d=(double*)malloc(histogram.data.size()*sizeof(double));
         for (int i=0; i<histogram.data.size(); i++) {
             d[i]=histogram.data[i];
-        }
-        histograms[name]->addHistogram(histogram.name, d, histogram.data.size());
+        }*/
+        histograms[name]->addHistogram(histogram.name, histogram.data.data(), histogram.data.size());
         histograms[name]->updateHistogram(true);
     }
 }

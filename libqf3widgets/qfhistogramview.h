@@ -32,14 +32,23 @@
     \ingroup qf3rdrdp_imaging_fcs
 
 
+
 */
 class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         Q_OBJECT
     public:
         struct Histogram {
+            Histogram() {
+                data=NULL;
+                external=true;
+                size=0;
+                name="";
+            }
+
             QString name;
             double* data;
             int32_t size;
+            bool external;
         };
 
 
@@ -84,14 +93,21 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         void setMax(double max);
 
         void clear();
-        int addHistogram(QString name, double* data, int32_t size);
-        void setHistogram(int i, QString name, double* data, int32_t size);
+        /** \brief add a histogram for the given dataset, copies the data to this widget, if \c external=false */
+        int addHistogram(QString name, double* data, int32_t size, bool external);
+        /** \brief add a histogram for the given dataset, copies the data to this widget */
+        int addCopiedHistogram(QString name, const double* data, int32_t size);
+        /** \brief set the given dataset in the given histogram \a i, copies the data to this widget, if \c external=false */
+        void setHistogram(int i, QString name, double* data, int32_t size, bool external);
+        void setCopiedHistogram(int i, QString name, const double* data, int32_t size);
         void removeHistogram(int i);
         int histogramCount() const;
 
         void setHistogramXLabel(const QString label, bool update=false);
 
         void writeReport(QTextCursor& cursor, QTextDocument* document);
+
+        void setSpaceSavingMode(bool enabled);
     signals:
         void settingsChanged();
     public slots:
@@ -121,6 +137,8 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         QFDoubleEdit* edtHistogramMax;
         QFormLayout* flHistSet;
         QString histLabel;
+        QVBoxLayout* laySplitterTable;
+        QGridLayout* layHist;
 
 
 

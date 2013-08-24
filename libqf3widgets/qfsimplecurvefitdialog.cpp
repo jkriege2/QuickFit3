@@ -538,7 +538,7 @@ void QFSimpleCurveFitDialog::replotGraph()
 }
 void QFSimpleCurveFitDialog::showHelp()
 {
-    QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("table")+"fit.html");
+    QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getMainHelpDirectory()+"curvefitdlg.html");
 }
 
 

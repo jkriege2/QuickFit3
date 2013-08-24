@@ -808,17 +808,18 @@ void QFRDROverviewImageDisplay::showHistograms(double *data, int size)
         histogram->clear();
     } else if (histogram->histogramCount()<histCount) {
         histogram->clear();
-        double* d=(double*)calloc(size,sizeof(double));
-        memcpy(d, data, sizeof(double)*size);
-        histogram->addHistogram( tr("full"), d, size);
-        if (selected.size()>0) histogram->addHistogram( tr("selection"), hs, selected.size());
+        //double* d=(double*)calloc(size,sizeof(double));
+        //memcpy(d, data, sizeof(double)*size);
+        histogram->addHistogram( tr("full"), data, size, false);
+        if (selected.size()>0) histogram->addHistogram( tr("selection"), hs, selected.size(), false);
     } else {
-        double* d=(double*)calloc(size,sizeof(double));
-        memcpy(d, data, sizeof(double)*size);
-        histogram->setHistogram(0, tr("full"), d, size);
-        if (selected.size()>0) histogram->setHistogram(1, tr("selection"), hs, selected.size());
+        //double* d=(double*)calloc(size,sizeof(double));
+        //memcpy(d, data, sizeof(double)*size);
+        histogram->setHistogram(0, tr("full"), data, size, false);
+        if (selected.size()>0) histogram->setHistogram(1, tr("selection"), hs, selected.size(), false);
     }
     histogram->updateHistogram(true);
+    if (hs) free(hs);
 }
 
 

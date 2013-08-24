@@ -364,9 +364,10 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
         }
         histNumber->clear();
         histNumber->setHistogramXLabel(tr("particle number $N$"));
-        histNumber->addHistogram("complete", data, dataSize);
-        if (dataSelSize>1) histNumber->addHistogram("selection", dataSel, dataSelSize);
-        else free(dataSel);
+        histNumber->addHistogram("complete", data, dataSize, false);
+        free(data);
+        if (dataSelSize>1) histNumber->addHistogram("selection", dataSel, dataSelSize, false);
+        free(dataSel);
 
 
         dataSize=m->getWidth()*m->getHeight();
@@ -388,9 +389,10 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
         }
         histBrightness->clear();
         histBrightness->setHistogramXLabel(tr("particle brightness $\\epsilon$"));
-        histBrightness->addHistogram("complete", data, dataSize);
-        if (dataSelSize>1) histBrightness->addHistogram("selection", dataSel, dataSelSize);
-        else free(dataSel);
+        histBrightness->addHistogram("complete", data, dataSize, false);
+        free(data);
+        if (dataSelSize>1) histBrightness->addHistogram("selection", dataSel, dataSelSize, false);
+        free(dataSel);
 
         histNumber->updateHistogram(true);
         histBrightness->updateHistogram(true);

@@ -25,7 +25,10 @@ QFHistogramView::QFHistogramView(QWidget *parent) :
 }
 
 QFHistogramView::~QFHistogramView() {
-    clear();
+    for (int i=0; i<histograms.size(); i++) {
+        if (histograms[i].data && !histograms[i].external) free(histograms[i].data);
+    }
+    histograms.clear();
 }
 
 void QFHistogramView::createWidgets() {
@@ -34,17 +37,21 @@ void QFHistogramView::createWidgets() {
     // HISTOGRAM TAB
     //////////////////////////////////////////////////////////////////////////////////////////
     QWidget* widHist=this;
-    QGridLayout* layHist=new QGridLayout();
+    layHist=new QGridLayout();
     widHist->setLayout(layHist);
 
     // HISTOGRAM SETTINGS/////////////////////////////////////////////////////////////////////
+    QHBoxLayout* coll;
     grpHistogramSettings=new QGroupBox(tr("histogram style"), this);
     flHistSet=new QFormLayout(grpHistogramSettings);
     grpHistogramSettings->setLayout(flHistSet);
     spinHistogramBins=new QSpinBox(this);
     spinHistogramBins->setRange(5,99999);
     spinHistogramBins->setValue(50);
-    flHistSet->addRow(tr("# bins:"), spinHistogramBins);
+    coll=new QHBoxLayout();
+    coll->addWidget(spinHistogramBins);
+    coll->addStretch();
+    flHistSet->addRow(tr("# bins:"), coll);
     chkLogHistogram=new QCheckBox("", grpHistogramSettings);
     flHistSet->addRow(tr("log-scale:"), chkLogHistogram);
     chkNormalizedHistograms=new QCheckBox("", grpHistogramSettings);
@@ -57,10 +64,11 @@ void QFHistogramView::createWidgets() {
     edtHistogramMax=new QFDoubleEdit(this);
     edtHistogramMax->setCheckBounds(false, false);
     edtHistogramMax->setValue(10);
-    QHBoxLayout* coll=new QHBoxLayout();
+    coll=new QHBoxLayout();
     coll->addWidget(edtHistogramMin,1);
     coll->addWidget(new QLabel(" ... "));
     coll->addWidget(edtHistogramMax,1);
+    coll->addStretch();
     coll->setContentsMargins(0,0,0,0);
     flHistSet->addRow(QString(""), coll);
 
@@ -97,11 +105,16 @@ void QFHistogramView::createWidgets() {
     tvHistogramParameters->verticalHeader()->setDefaultSectionSize((int)round((double)tvfm.height()*1.5));
 
 
+    QWidget* widHTab=new QWidget(this);
+    laySplitterTable=new QVBoxLayout(widHTab);
+    laySplitterTable->setContentsMargins(0,0,0,0);
+    widHTab->setLayout(laySplitterTable);
+    laySplitterTable->addWidget(tvHistogramParameters);
 
 
     splitterHistogram->setChildrenCollapsible(false);
     splitterHistogram->addWidget(pltParamHistogram);
-    splitterHistogram->addWidget(tvHistogramParameters);
+    splitterHistogram->addWidget(widHTab);
     layHist->addWidget(splitterHistogram, 0, 0);
     layHist->addWidget(grpHistogramSettings, 0, 1);
     layHist->setColumnStretch(0,5);
@@ -109,6 +122,20 @@ void QFHistogramView::createWidgets() {
 
     //connectParameterWidgets(true);
 
+    setSpaceSavingMode(true);
+}
+
+
+void QFHistogramView::setSpaceSavingMode(bool enabled)
+{
+    laySplitterTable->removeWidget(grpHistogramSettings);
+    layHist->removeWidget(grpHistogramSettings);
+    if (enabled) {
+        laySplitterTable->insertWidget(0, grpHistogramSettings);
+    } else {
+        layHist->addWidget(grpHistogramSettings, 0, 1);
+        layHist->setColumnStretch(0,5);
+    }
 }
 
 void QFHistogramView::addSettingsWidget(const QString& label, QWidget* widget) {
@@ -203,35 +230,62 @@ void QFHistogramView::writeSettings(QSettings& settings, const QString& prefix) 
 
 void QFHistogramView::clear() {
     for (int i=0; i<histograms.size(); i++) {
-        if (histograms[i].data) free(histograms[i].data);
+        if (histograms[i].data && !histograms[i].external) free(histograms[i].data);
     }
     histograms.clear();
     updateHistogram(true);
 }
 
-int QFHistogramView::addHistogram(QString name, double* data, int32_t size) {
+int QFHistogramView::addHistogram(QString name, double* data, int32_t size, bool external) {
     QFHistogramView::Histogram h;
     h.data=data;
+    if (!external) h.data=duplicateArray(data, size);
     h.name=name;
     h.size=size;
+    h.external=external;
     histograms.append(h);
 
     return histograms.size()-1;
 }
 
-void QFHistogramView::setHistogram(int i, QString name, double* data, int32_t size) {
-    if (i<0 || i>=histograms.size()) return;
-    QFHistogramView::Histogram h=histograms[i];
-    if (h.data) free(h.data);
-    h.data=data;
+int QFHistogramView::addCopiedHistogram(QString name, const double *data, int32_t size) {
+    QFHistogramView::Histogram h;
+    h.data=duplicateArray(data, size);
     h.name=name;
     h.size=size;
+    h.external=false;
+    histograms.append(h);
+
+    return histograms.size()-1;
+}
+
+void QFHistogramView::setHistogram(int i, QString name, double* data, int32_t size, bool external) {
+    if (i<0 || i>=histograms.size()) return;
+    QFHistogramView::Histogram h=histograms[i];
+    if (h.data && !h.external) free(h.data);
+    h.data=data;
+    if (!external) h.data=duplicateArray(data, size);
+    h.name=name;
+    h.size=size;
+    h.external=external;
+    histograms[i]=h;
+}
+
+void QFHistogramView::setCopiedHistogram(int i, QString name, const double *data, int32_t size)
+{
+    if (i<0 || i>=histograms.size()) return;
+    QFHistogramView::Histogram h=histograms[i];
+    if (h.data && !h.external) free(h.data);
+    if (!external) h.data=duplicateArray(data, size);
+    h.name=name;
+    h.size=size;
+    h.external=false;
     histograms[i]=h;
 }
 
 void QFHistogramView::removeHistogram(int i) {
     if (i<0 || i>=histograms.size()) return;
-    if (histograms[i].data) free(histograms[i].data);
+    if (histograms[i].data && !histograms[i].external) free(histograms[i].data);
     histograms.removeAt(i);
 }
 
@@ -249,6 +303,9 @@ void QFHistogramView::setHistogramXLabel(const QString label, bool update)
 void QFHistogramView::replotHistogram() {
     pltParamHistogram->set_doDrawing(false);
     pltParamHistogram->getYAxis()->set_logAxis(chkLogHistogram->isChecked());
+    if (chkLogHistogram->isChecked()) {
+        pltParamHistogram->get_plotter()->setY(0.1, qMax(1.0 ,pltParamHistogram->getYMax()));
+    }
     pltParamHistogram->getXAxis()->set_axisLabel(histLabel);
     if (chkNormalizedHistograms->isChecked()) pltParamHistogram->getYAxis()->set_axisLabel(tr("normalized frequency"));
     else pltParamHistogram->getYAxis()->set_axisLabel(tr("frequency"));
@@ -550,3 +607,4 @@ void QFHistogramView::writeReport(QTextCursor& cursor, QTextDocument* document) 
     }
     cursor.movePosition(QTextCursor::End);
 }
+

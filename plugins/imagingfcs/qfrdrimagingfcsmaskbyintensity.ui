@@ -49,19 +49,33 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="1">
           <widget class="QFDoubleEdit" name="edtLevel"/>
          </item>
-         <item>
+         <item row="0" column="2">
           <widget class="QLabel" name="label_7">
            <property name="text">
             <string>...</string>
            </property>
           </widget>
          </item>
-         <item>
+         <item row="0" column="3">
           <widget class="QFDoubleEdit" name="edtLevel_2"/>
+         </item>
+         <item row="1" column="1">
+          <widget class="QFDoubleSlider" name="sldLevel">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QFDoubleSlider" name="sldLevel_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -76,19 +90,33 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="0" column="0">
           <widget class="QFDoubleEdit" name="edtLevel2"/>
          </item>
-         <item>
+         <item row="0" column="2">
+          <widget class="QFDoubleEdit" name="edtLevel2_2"/>
+         </item>
+         <item row="0" column="1">
           <widget class="QLabel" name="label_8">
            <property name="text">
             <string>...</string>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QFDoubleEdit" name="edtLevel2_2"/>
+         <item row="1" column="0">
+          <widget class="QFDoubleSlider" name="sldLevel2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QFDoubleSlider" name="sldLevel2_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -105,12 +133,12 @@
           <widget class="QComboBox" name="cmbMaskingMode">
            <item>
             <property name="text">
-             <string>mask out-of-range pixels</string>
+             <string>mask in-range pixels</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>mask in-range pixels</string>
+             <string>mask out-of-range pixels</string>
             </property>
            </item>
            <item>
@@ -252,18 +280,28 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QFPlotter</class>
+   <extends>QWidget</extends>
+   <header>qfplotter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
    <header>qfdoubleedit.h</header>
    <slots>
     <signal>valueChanged(double)</signal>
+    <slot>setValue(double)</slot>
    </slots>
   </customwidget>
   <customwidget>
-   <class>QFPlotter</class>
-   <extends>QWidget</extends>
-   <header>qfplotter.h</header>
-   <container>1</container>
+   <class>QFDoubleSlider</class>
+   <extends>QSlider</extends>
+   <header>qfdoubleslider.h</header>
+   <slots>
+    <signal>dsliderMoved(double)</signal>
+    <slot>setDValue(double)</slot>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources>
@@ -342,7 +380,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>942</x>
-     <y>233</y>
+     <y>283</y>
     </hint>
     <hint type="destinationlabel">
      <x>397</x>
@@ -374,7 +412,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>942</x>
-     <y>135</y>
+     <y>185</y>
     </hint>
     <hint type="destinationlabel">
      <x>613</x>
@@ -390,7 +428,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>942</x>
-     <y>158</y>
+     <y>208</y>
     </hint>
     <hint type="destinationlabel">
      <x>621</x>
@@ -405,8 +443,8 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>732</x>
-     <y>70</y>
+     <x>784</x>
+     <y>103</y>
     </hint>
     <hint type="destinationlabel">
      <x>657</x>
@@ -421,8 +459,8 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>698</x>
-     <y>66</y>
+     <x>784</x>
+     <y>103</y>
     </hint>
     <hint type="destinationlabel">
      <x>616</x>
@@ -437,8 +475,8 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>808</x>
-     <y>97</y>
+     <x>941</x>
+     <y>156</y>
     </hint>
     <hint type="destinationlabel">
      <x>582</x>
@@ -453,8 +491,8 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>838</x>
-     <y>65</y>
+     <x>941</x>
+     <y>103</y>
     </hint>
     <hint type="destinationlabel">
      <x>578</x>
@@ -475,6 +513,198 @@
     <hint type="destinationlabel">
      <x>579</x>
      <y>42</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtLevel</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>sldLevel</receiver>
+   <slot>setDValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>702</x>
+     <y>42</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>700</x>
+     <y>69</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sldLevel</sender>
+   <signal>dsliderMoved(double)</signal>
+   <receiver>edtLevel</receiver>
+   <slot>setValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>737</x>
+     <y>67</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>737</x>
+     <y>37</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtLevel_2</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>sldLevel_2</receiver>
+   <slot>setDValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>938</x>
+     <y>36</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>935</x>
+     <y>58</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sldLevel_2</sender>
+   <signal>dsliderMoved(double)</signal>
+   <receiver>edtLevel_2</receiver>
+   <slot>setValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>914</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>916</x>
+     <y>34</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtLevel2</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>sldLevel2</receiver>
+   <slot>setDValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>762</x>
+     <y>88</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>762</x>
+     <y>120</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sldLevel2</sender>
+   <signal>dsliderMoved(double)</signal>
+   <receiver>edtLevel2</receiver>
+   <slot>setValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>749</x>
+     <y>114</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>748</x>
+     <y>87</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtLevel2_2</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>sldLevel2_2</receiver>
+   <slot>setDValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>863</x>
+     <y>98</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>864</x>
+     <y>117</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sldLevel2_2</sender>
+   <signal>dsliderMoved(double)</signal>
+   <receiver>edtLevel2_2</receiver>
+   <slot>setValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>834</x>
+     <y>119</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>834</x>
+     <y>92</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sldLevel</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateMask()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>673</x>
+     <y>70</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>633</x>
+     <y>69</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sldLevel_2</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateMask()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>821</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>639</x>
+     <y>52</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sldLevel2</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateMask()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>675</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>599</x>
+     <y>127</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sldLevel2_2</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateMask()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>867</x>
+     <y>125</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>617</x>
+     <y>144</y>
     </hint>
    </hints>
   </connection>

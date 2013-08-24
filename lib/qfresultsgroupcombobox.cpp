@@ -6,6 +6,11 @@ QFResultsGroupComboBox::QFResultsGroupComboBox(QWidget *parent) :
     rdr=NULL;
     containsParamInGroup="";
     doFilter=false;
+    view()->setTextElideMode(Qt::ElideMiddle);
+    setMaximumWidth(500);
+    //setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
+    setMinimumContentsLength(50);
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(myCurrentIndexChanged(int)));
 }
 

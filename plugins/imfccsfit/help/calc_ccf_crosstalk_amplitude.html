@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>imFCCS Tool: Calculate crosstalk-corrected relative CCF amplitude</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$  
+     
+
+<h2>Function</h2>
+<p>This tool calculates the crosstalk-corrected relative crosscorrelation amplitudes:
+$$bmath:\mbox{RCCF}_{0}(x,y)=\frac{\hat{\mbox{CCF}}(x,y)}{\hat{\mbox{ACF0}}(x,y)}$$
+$$bmath:\mbox{RCCF}_{1}(x,y)=\frac{\hat{\mbox{CCF}}(x,y)}{\hat{\mbox{ACF1}}(x,y)}$$
+where $$math:\hat{\mbox{CCF}}(x,y)$$, $$math:\hat{\mbox{ACF0}}(x,y)$$ and $$math:\hat{\mbox{ACF1}}(x,y)$$ are the crosstlak-corrected crosscorrelation and autocorrelation (of channel 0 and 1) functions.
+</p>	
+     
+     
+
+<h2>User Interface</h2>
+<p>The tool can be opened by clicking in the main window on the menu entry <tt>Tools|imFCCS|calculate relative CCF amplitude, crosstalk corrected</tt>.
+Subsequently a window will open up where a file for the autocorrelations and a file for the crosscorrelation can be selected. If a FCCS file is selected, the dialog will try to guess the ACF files that belong to it. Buttons next to these file-selection comboboxes allows to move on to the next FCCS file to process. 
+If all files are selected, overview images of the files are displayed below. A second row of plots shows the $$math:\mbox{RCCF}_{0/1}(x,y)$$ images calculated from the selected files.
+</p>
+<p>The function of the single buttons:
+<ul>
+    <li>"<b>store result</b>" will save the RCCF images in the CCF file.</li>
+    <li>"<b>store all results</b>" will walk through all files (basically by clicking "next ACF" and stores the resulting RCCF map. If  for every measurement one CCF and two ACFs are present in the project, this will calculate two RCCFs (one for each ACF).</li>
+</li>
+    
+<li>"<b>next </b>": will select the next CCF file in the list (and the fitting CCF file</li>
+</p>
+
+  </body>
+
+</html>

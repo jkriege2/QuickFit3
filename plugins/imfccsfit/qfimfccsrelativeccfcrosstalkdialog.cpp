@@ -32,6 +32,7 @@ QFImFCCSRelativeCCFCrosstalkDialog::QFImFCCSRelativeCCFCrosstalkDialog(QWidget *
     ui->cmbACF1->init(project, matchFunctor);
     //qDebug()<<4;
     ui->cmbCCF->init(project, matchFunctor);
+
     //qDebug()<<5;
 
     ui->widOverviewACF0->setRDR(NULL);
@@ -66,16 +67,23 @@ QFImFCCSRelativeCCFCrosstalkDialog::QFImFCCSRelativeCCFCrosstalkDialog(QWidget *
         if (okCCF) break;
     }
 
-    loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "QFImFCCSRelativeCCFCrosstalkDialog/size");
+    ui->cmbACF0ResultSet->setRDR(ui->cmbACF0->currentRDR());
+    ui->cmbACF1ResultSet->setRDR(ui->cmbACF1->currentRDR());
+    ui->cmbCCFResultSet->setRDR(ui->cmbCCF->currentRDR());
     ui->spinCrosstalk->setValue(ProgramOptions::getConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/crosstalk", ui->spinCrosstalk->value()).toDouble());
     ui->spinAvg->setValue(ProgramOptions::getConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/avg", ui->spinAvg->value()).toDouble());
     ui->cmbCrosstalkDirection->setCurrentIndex(ProgramOptions::getConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/crosstalk_dir", ui->cmbCrosstalkDirection->currentIndex()).toInt());
+    ui->cmbAmplitudeSource->setCurrentIndex(ProgramOptions::getConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/amplitude_source", ui->cmbAmplitudeSource->currentIndex()).toInt());
     connect(ui->cmbACF0, SIGNAL(currentIndexChanged(int)), this, SLOT(replotImages()));
     connect(ui->cmbACF1, SIGNAL(currentIndexChanged(int)), this, SLOT(replotImages()));
     connect(ui->cmbCCF, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCCF_currentIndexChanged(int)));
     connect(ui->cmbCrosstalkDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(replotImages()));
     connect(ui->spinCrosstalk, SIGNAL(valueChanged(double)), this, SLOT(replotImages()));
+    connect(ui->cmbACF0ResultSet, SIGNAL(currentIndexChanged(int)), this, SLOT(replotImages()));
+    connect(ui->cmbACF1ResultSet, SIGNAL(currentIndexChanged(int)), this, SLOT(replotImages()));
+    connect(ui->cmbCCFResultSet, SIGNAL(currentIndexChanged(int)), this, SLOT(replotImages()));
     cmbCCF_currentIndexChanged(ui->cmbCCF->currentIndex());
+    loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, QPoint(10,10), QSize(800,600), "QFImFCCSRelativeCCFCrosstalkDialog/size");
 
     //qDebug()<<10;
 
@@ -93,6 +101,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::closeEvent(QCloseEvent *event)
     ProgramOptions::setConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/avg", ui->spinAvg->value());
     ProgramOptions::setConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/crosstalk", ui->spinCrosstalk->value());
     ProgramOptions::setConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/crosstalk_dir", ui->cmbCrosstalkDirection->currentIndex());
+    ProgramOptions::setConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/amplitude_source", ui->cmbAmplitudeSource->currentIndex());
     QWidget::closeEvent(event);
 }
 QFRawDataRecord *QFImFCCSRelativeCCFCrosstalkDialog::getACF0() const
@@ -110,7 +119,7 @@ QFRawDataRecord *QFImFCCSRelativeCCFCrosstalkDialog::getCCF() const
     return ui->cmbCCF->currentRDR();
 }
 
-bool QFImFCCSRelativeCCFCrosstalkDialog::calculateRelCCF(QFRawDataRecord *acf0, QFRawDataRecord *acf1, QFRawDataRecord *ccf, double **rel_out0, double **rel_error_out0, double **rel_out1, double **rel_error_out1, int&w, int& h, int avgCount, double crosstalk, int crosstalkDir, bool showErrorMessage)
+bool QFImFCCSRelativeCCFCrosstalkDialog::calculateRelCCF(QFRawDataRecord *acf0, QFRawDataRecord *acf1, QFRawDataRecord *ccf, double **rel_out0, double **rel_error_out0, double **rel_out1, double **rel_error_out1, int &w, int &h, int avgCount, double crosstalk, int crosstalkDir, bool showErrorMessage, int source, const QString &resultGroupACF0, const QString &resultGroupACF1, const QString &resultGroupCCF, const QString &param)
 {
     //JKAutoOutputTimer tim(QString("calculateRelCCF"));
     if (!acf0 || !acf1 || !ccf) return false;
@@ -141,9 +150,49 @@ bool QFImFCCSRelativeCCFCrosstalkDialog::calculateRelCCF(QFRawDataRecord *acf0, 
             double* ccfD=ccfFCS->getCorrelation();
             double* ccfS=ccfFCS->getCorrelationRunErrors();
             int ccfN=ccfFCS->getCorrelationN();
+            bool ok=true;
+
+            QVector<double> acf0AmplitudeParameter, acf1AmplitudeParameter, ccfAmplitudeParameter;
+            if (source==1) {
+                bool okOut=false;
+                QStringList evals;
+
+                evals=acf0->resultsCalcEvaluationsInGroup(resultGroupACF0);
+                for (int ie=0; ie<evals.size(); ie++) {
+                    okOut=false;
+                    acf0AmplitudeParameter=acf0->resultsGetAsDoubleList(evals[ie], param, &okOut);
+                    if (okOut && acf0AmplitudeParameter.size()>=w*h) break;
+                    okOut=false;
+                }
+                ok=ok&&okOut;
+                //qDebug()<<okOut<<resultGroupACF0<<listToString(acf0AmplitudeParameter);
+
+                evals=acf1->resultsCalcEvaluationsInGroup(resultGroupACF1);
+                for (int ie=0; ie<evals.size(); ie++) {
+                    okOut=false;
+                    acf1AmplitudeParameter=acf1->resultsGetAsDoubleList(evals[ie], param, &okOut);
+                    if (okOut && acf1AmplitudeParameter.size()>=w*h) break;
+                    okOut=false;
+                }
+                ok=ok&&okOut;
+                //qDebug()<<okOut<<resultGroupACF1<<listToString(acf1AmplitudeParameter);
+
+                evals=ccf->resultsCalcEvaluationsInGroup(resultGroupCCF);
+                for (int ie=0; ie<evals.size(); ie++) {
+                    okOut=false;
+                    ccfAmplitudeParameter=ccf->resultsGetAsDoubleList(evals[ie], param, &okOut);
+                    if (okOut && ccfAmplitudeParameter.size()>=w*h) break;
+                    okOut=false;
+                }
+                ok=ok&&okOut;
+                //qDebug()<<okOut<<resultGroupCCF<<listToString(ccfAmplitudeParameter);
+
+                if (!ok && showErrorMessage) QMessageBox::critical(NULL, tr("Calculate Relative CCF"), tr("Can't read g(0) values from all RDRs."));
+
+            }
             //tim.write(QString("1: acfN=%1, ccfN=%2 w=%3 h=%4").arg(acfN).arg(ccfN).arg(w).arg(h));
 
-            if (acf0D && acf0S && acf1D && acf1S && ccfD && ccfS && acf0N>0 && acf1N>0 && ccfN>0) {
+            if (ok && acf0D && acf0S && acf1D && acf1S && ccfD && ccfS && acf0N>0 && acf1N>0 && ccfN>0) {
                 //tim.write("2");
                 double* rel0=(double*)malloc(w*h*sizeof(double));
                 double* rel0_error=(double*)malloc(w*h*sizeof(double));
@@ -153,43 +202,53 @@ bool QFImFCCSRelativeCCFCrosstalkDialog::calculateRelCCF(QFRawDataRecord *acf0, 
                 uint64_t idxA1=0;
                 uint64_t idxC=0;
                 for (int i=0; i<w*h; i++) {
-                    //tim.write(QString("3: %1 [%2...%3] avgCount=%4").arg(i).arg(w).arg(h).arg(avgCount));
-                    double D=ccfD[idxC];
-                    //tim.write(QString("3:   ---"));
-                    double A0=acf0D[idxA0];
-                    double A1=acf1D[idxA1];
-                    //tim.write(QString("3:   ---"));
-                    double eD=ccfS[idxC];
-                    //tim.write(QString("3:   ---"));
-                    double eA0=acf0S[idxA0];
-                    double eA1=acf1S[idxA1];
-                    //tim.write(QString("3:   ---"));
+                    double D=0, A0=0, A1=0,eD=0, eA1=0, eA0=0;
 
-                    if (avgCount>1) {
-                        int avg0A=qMin(avgCount, acf0N);
-                        int avg1A=qMin(avgCount, acf1N);
-                        int avgC=qMin(avgCount, ccfN);
+                    if (source==0) {
+                        //tim.write(QString("3: %1 [%2...%3] avgCount=%4").arg(i).arg(w).arg(h).arg(avgCount));
+                        D=ccfD[idxC];
+                        //tim.write(QString("3:   ---"));
+                        A0=acf0D[idxA0];
+                        A1=acf1D[idxA1];
+                        //tim.write(QString("3:   ---"));
+                        eD=ccfS[idxC];
+                        //tim.write(QString("3:   ---"));
+                        eA0=acf0S[idxA0];
+                        eA1=acf1S[idxA1];
+                        //tim.write(QString("3:   ---"));
 
-                        for (int j=1; j<avg0A; j++) {
-                            A0=A0+acf0D[idxA0+j];
-                            eA0=eA0+acf0S[idxA0+j];
+                        if (avgCount>1) {
+                            int avg0A=qMin(avgCount, acf0N);
+                            int avg1A=qMin(avgCount, acf1N);
+                            int avgC=qMin(avgCount, ccfN);
+
+                            for (int j=1; j<avg0A; j++) {
+                                A0=A0+acf0D[idxA0+j];
+                                eA0=eA0+acf0S[idxA0+j];
+                            }
+                            A0=A0/double(avg0A);
+                            eA0=eA0/double(avg0A);
+
+                            for (int j=1; j<avg1A; j++) {
+                                A1=A1+acf1D[idxA1+j];
+                                eA1=eA1+acf1S[idxA1+j];
+                            }
+                            A1=A1/double(avg1A);
+                            eA1=eA1/double(avg1A);
+
+                            for (int j=1; j<avgC; j++) {
+                                D=D+ccfD[idxC+j];
+                                eD=eD+ccfS[idxC+j];
+                            }
+                            D=D/double(avgC);
+                            eD=eD/double(avgC);
                         }
-                        A0=A0/double(avg0A);
-                        eA0=eA0/double(avg0A);
+                    } else if (source==1) {
+                        eA0=eA1=eD=0;
+                        D=ccfAmplitudeParameter.value(idxC, 0);
+                        A0=acf0AmplitudeParameter.value(idxA0, 0);
+                        A1=acf1AmplitudeParameter.value(idxA1, 0);
 
-                        for (int j=1; j<avg1A; j++) {
-                            A1=A1+acf1D[idxA1+j];
-                            eA1=eA1+acf1S[idxA1+j];
-                        }
-                        A1=A1/double(avg1A);
-                        eA1=eA1/double(avg1A);
-
-                        for (int j=1; j<avgC; j++) {
-                            D=D+ccfD[idxC+j];
-                            eD=eD+ccfS[idxC+j];
-                        }
-                        D=D/double(avgC);
-                        eD=eD/double(avgC);
                     }
                     //tim.write(QString("3:   ---"));
 
@@ -211,9 +270,15 @@ bool QFImFCCSRelativeCCFCrosstalkDialog::calculateRelCCF(QFRawDataRecord *acf0, 
                     if (acf1S && ccfS) rel1_error[i]=sqrt(qfSqr(eA1*D/qfSqr(A1)) + qfSqr(eD/A1));
                     if (!QFFloatIsOK(rel1_error[i])) rel1_error[i]=0;
 
-                    idxA0=idxA0+acf0N;
-                    idxA1=idxA1+acf1N;
-                    idxC=idxC+ccfN;
+                    if (source==0) {
+                        idxA0=idxA0+acf0N;
+                        idxA1=idxA1+acf1N;
+                        idxC=idxC+ccfN;
+                    } else if (source==1) {
+                        idxA0++;
+                        idxA1++;
+                        idxC++;
+                    }
                 }
                 if (rel_out0) *rel_out0=rel0;
                 else if (rel0) free(rel0);
@@ -294,7 +359,9 @@ void QFImFCCSRelativeCCFCrosstalkDialog::replotImages()
     double* rel1=NULL;
     double* rel1_error=NULL;
     int w=0, h=0;
-    if (calculateRelCCF(ui->cmbACF0->currentRDR(), ui->cmbACF1->currentRDR(), ui->cmbCCF->currentRDR(), &rel0, &rel0_error, &rel1, &rel1_error, w, h, ui->spinAvg->value(), ui->spinCrosstalk->value()/100.0, ui->cmbCrosstalkDirection->currentIndex(), false)) {
+    ui->labError->setText("");
+    if (calculateRelCCF(ui->cmbACF0->currentRDR(), ui->cmbACF1->currentRDR(), ui->cmbCCF->currentRDR(), &rel0, &rel0_error, &rel1, &rel1_error, w, h, ui->spinAvg->value(), ui->spinCrosstalk->value()/100.0, ui->cmbCrosstalkDirection->currentIndex(), false, ui->cmbAmplitudeSource->currentIndex(), ui->cmbACF0ResultSet->currentEvaluationGroup(), ui->cmbACF1ResultSet->currentEvaluationGroup(), ui->cmbCCFResultSet->currentEvaluationGroup())) {
+
         for (int i=0; i<2; i++) {
             QFPlotter* pltData=ui->pltData0;
             double* rel=rel0;
@@ -338,6 +405,8 @@ void QFImFCCSRelativeCCFCrosstalkDialog::replotImages()
             if (rel) free(rel);
             if (rel_error) free(rel_error);
         }
+    } else {
+        ui->labError->setText("<font color=\"red\"><b>ERROR CALCULATING REL: CCF</b></font>");
     }
     //ui->pltData->zoomToFit();
     ui->pltData0->set_doDrawing(true);
@@ -358,7 +427,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
     QFRawDataRecord* acf0=getACF0();
     QFRawDataRecord* acf1=getACF1();
     QFRawDataRecord* ccf=getCCF();
-    if (acf0&&acf1&&ccf&&calculateRelCCF(acf0, acf1, ccf, &rel0, &rel0_error, &rel1, &rel1_error, w, h, ui->spinAvg->value(), ui->spinCrosstalk->value()/100.0, ui->cmbCrosstalkDirection->currentIndex(), true)) {
+    if (acf0&&acf1&&ccf&&calculateRelCCF(acf0, acf1, ccf, &rel0, &rel0_error, &rel1, &rel1_error, w, h, ui->spinAvg->value(), ui->spinCrosstalk->value()/100.0, ui->cmbCrosstalkDirection->currentIndex(), true, ui->cmbAmplitudeSource->currentIndex(), ui->cmbACF0ResultSet->currentEvaluationGroup(), ui->cmbACF1ResultSet->currentEvaluationGroup(), ui->cmbCCFResultSet->currentEvaluationGroup())) {
 
         for (int i=0; i<2; i++) {
             QFRawDataRecord* acf=acf0;
@@ -370,15 +439,22 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
                 rel_error=rel1_error;
             }
 
-            QString evalName=QString("CalcRelCCFCrosstalkCorrected_ACF%1_ACF%2_CCF_ct%3").arg(acf0->getID()).arg(acf1->getID()).arg(ui->spinCrosstalk->value());
+            QString evalName=QString("CalcRelCCFCrosstalkCorrected_ACF%1_ACF%2_CCF_ct%3_avg%4").arg(acf0->getID()).arg(acf1->getID()).arg(ui->spinCrosstalk->value()).arg(ui->spinAvg->value());
+            if (ui->cmbAmplitudeSource->currentIndex()==1) {
+                evalName=QString("CalcRelCCFCrosstalkCorrected_ACF%1_ACF%2_CCF_ct%3_g0").arg(acf0->getID()).arg(acf1->getID()).arg(ui->spinCrosstalk->value());
+            }
             QString group="results";
             QString egroup=evalName;
             QString acfName=acf->getRole();
             if (acfName.isEmpty()) acfName=acf->getName();
             QString ccfName=ccf->getRole();
             if (ccfName.isEmpty()) ccfName=ccf->getName();
-            QString egrouplabel=tr("rel. CCF amlitude,%1%2 crosstalk corrected").arg(ui->spinCrosstalk->value()).arg("%");
+            QString egrouplabel=tr("rel. CCF amlitude (avg. %3 taus), %1%2 crosstalk corrected").arg(ui->spinCrosstalk->value()).arg("%").arg(ui->spinAvg->value());
             QString rn=QString("relative_ccf_acf%1_amplitude").arg(i);
+            if (ui->cmbAmplitudeSource->currentIndex()==1) {
+                egrouplabel=tr("rel. CCF g(0) amlitude, %1%2 crosstalk corrected").arg(ui->spinCrosstalk->value()).arg("%");
+                rn=QString("relative_ccf_acf%1_g0_amplitude").arg(i);
+            }
 
             ccf->resultsSetEvaluationGroup(evalName, egroup);
             ccf->resultsSetEvaluationGroupLabel(egroup, egrouplabel);
@@ -397,7 +473,16 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
             ccf->resultsSetString(evalName, "ccf_file_name", ccf->getName());
             ccf->resultsSetString(evalName, "crosstalk_direction", ui->cmbCrosstalkDirection->currentText());
             ccf->resultsSetNumber(evalName, "crosstalk", ui->spinCrosstalk->value()/100.0);
-            ccf->resultsSetInteger(evalName, "average_channels", ui->spinAvg->value());
+            if (ui->cmbAmplitudeSource->currentIndex()==0) {
+                ccf->resultsSetString(evalName, "amplitude_source", tr("CF channel average"));
+                ccf->resultsSetInteger(evalName, "average_channels", ui->spinAvg->value());
+                ccf->resultsSetInteger(evalName, "average_channels", ui->spinAvg->value());
+            } else {
+                ccf->resultsSetString(evalName, "amplitude_source", tr("g(0) fit result"));
+                ccf->resultsSetString(evalName, "acf0_resultset", ui->cmbACF0ResultSet->currentEvaluationGroup());
+                ccf->resultsSetString(evalName, "acf1_resultset", ui->cmbACF1ResultSet->currentEvaluationGroup());
+                ccf->resultsSetString(evalName, "ccf_resultset", ui->cmbCCFResultSet->currentEvaluationGroup());
+            }
 
 
 
@@ -461,11 +546,49 @@ bool QFImFCCSRelativeCCFCrosstalkDialog::nextCCF()
     return false;
 }
 
+bool QFImFCCSRelativeCCFCrosstalkDialog::prevCCF()
+{
+    QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
+    if (!(matchFunctor && project&&getCCF()) ) return false;
+    QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
+    int current=lst.indexOf(getCCF());
+    if (current>0 && current<lst.size()) {
+        for (int i=current-1; i>=0; i--) {
+            if (isCCF(lst[i])) {
+                ui->cmbCCF->setCurrentRDR(lst[i]);
+                QList<QFRawDataRecord*> lsta=lst[i]->getRecordsWithRoleFromGroup("acf0");
+                if (!lsta.isEmpty()) {
+                    ui->cmbACF0->setCurrentRDR(lsta.first());
+                } else {
+                    ui->cmbACF0->setCurrentRDR(0);
+                }
+                lsta=lst[i]->getRecordsWithRoleFromGroup("acf1");
+                if (!lsta.isEmpty()) {
+                    ui->cmbACF1->setCurrentRDR(lsta.first());
+                } else {
+                    ui->cmbACF1->setCurrentRDR(0);
+                }
+                replotImages();
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 
 
 void QFImFCCSRelativeCCFCrosstalkDialog::on_btnHelp_clicked()
 {
     QFPluginServices::getInstance()->displayPluginHelpWindow("imfccs_fit", "calc_ccf_crosstalk_amplitude.html");
+}
+
+void QFImFCCSRelativeCCFCrosstalkDialog::on_cmbAmplitudeSource_currentIndexChanged(int index)
+{
+    ui->cmbACF0ResultSet->setEnabled(index>=0);
+    ui->cmbACF1ResultSet->setEnabled(index>=0);
+    ui->cmbCCFResultSet->setEnabled(index>=0);
+    ui->spinAvg->setEnabled(index==0);
 }
 
 

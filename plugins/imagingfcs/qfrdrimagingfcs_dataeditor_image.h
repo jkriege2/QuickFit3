@@ -370,19 +370,7 @@ protected:
         /** \brief combobox for the color bar of gof image */
         JKQTPMathImageColorPalette* cmbColorbarGof;
 
-        /** \brief combobox for the color bar of plteImage */
-        //JKQTPMathImageColorPalette* cmbColorbar;
-        /** \brief combobox for the display style of plteImage */
-       // QComboBox* cmbImageStyle;
-        /** \brief cobobox to select what should happen to the out-of-range pixels */
-        //QComboBox* cmbOutOfRangeMode;
 
-
-        /** \brief checkbox to en-/disable automatic color bar scaling */
-        //QCheckBox* chkImageAutoScale;
-
-        //QFDoubleEdit* edtColMin;
-        //QFDoubleEdit* edtColMax;
 
         /** \brief toolbar to work with parameter images */
         QToolBar* tbParameterImage;
@@ -445,8 +433,8 @@ protected:
         QFHistogramView* histogram2;
         QCheckBox* chkExcludeExcludedRunsFromHistogram;
         QCheckBox* chkExcludeExcludedRunsFromHistogram2;
-        double* datahist;
-        double* datahistsel;
+        //double* datahist;
+        //double* datahistsel;
         int32_t datasize;
         int32_t datasizesel;
 

@@ -16,10 +16,12 @@ DEFINES += QFLIB_TEST
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    ../../qfdoubleedit.cpp
+    ../../qfdoubleedit.cpp \
+    ../../qfdoubleslider.cpp
 
 HEADERS  += mainwindow.h \
     ../../qfdoubleedit.h \
-    ../../lib_imexport.h
+    ../../lib_imexport.h \
+    ../../qfdoubleslider.h
 
 FORMS    += mainwindow.ui

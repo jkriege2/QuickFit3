@@ -6,6 +6,7 @@ QFRDRComboBox::QFRDRComboBox(QWidget *parent) :
     project=NULL;
     matchFunctor=NULL;
     functorPrivate=false;
+    view()->setTextElideMode(Qt::ElideMiddle);
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(myCurrentIndexChanged(int)));
 }
 

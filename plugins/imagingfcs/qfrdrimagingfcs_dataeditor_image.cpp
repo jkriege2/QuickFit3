@@ -38,7 +38,7 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     lastSavePath="";
     connectImageWidgetsCounter=0;
     connectParameterWidgetsCounter=0;
-    datahist=datahistsel=NULL;
+    //datahist=datahistsel=NULL;
     datasize=datasizesel=0;
     timUpdateAfterClick=new QTimer(this);
     timUpdateAfterClick->setSingleShot(true);
@@ -59,8 +59,8 @@ QFRDRImagingFCSImageEditor::~QFRDRImagingFCSImageEditor()
     plteOverviewExcludedData=NULL;
     if (plteGofImageData) free(plteGofImageData);
     plteGofImageData=NULL;
-    datahist=NULL;
-    datahistsel=NULL;
+    //datahist=NULL;
+    //datahistsel=NULL;
 }
 
 
@@ -4854,7 +4854,7 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
 
     if (plteImageData && (plteImageSize>=m->getImageFromRunsWidth()*m->getImageFromRunsHeight())) {
         int imageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
-        datahist=(double*)malloc(imageSize*sizeof(double));
+        double* datahist=(double*)malloc(imageSize*sizeof(double));
         datasize=0;
         if (chkExcludeExcludedRunsFromHistogram->isChecked()) {
             for (register int32_t i=0; i<imageSize; i++) {
@@ -4871,15 +4871,16 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
                 }
             }
         }
-        histogram->addHistogram(tr("complete"), datahist, datasize);
+        histogram->addHistogram(tr("complete"), datahist, datasize, false);
         histogram->setHistogramXLabel(cmbParameter->currentText());
+        if (datahist) free(datahist);
     }
     if (dv) {
         histogram2->setVisible(true);
         histogram2->clear();
         if (plteImageData && (plteImageSize>=m->getImageFromRunsWidth()*m->getImageFromRunsHeight())) {
             int imageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
-            datahist=(double*)malloc(imageSize*sizeof(double));
+            double* datahist=(double*)malloc(imageSize*sizeof(double));
             datasize=0;
             if (chkExcludeExcludedRunsFromHistogram2->isChecked()) {
                 for (register int32_t i=0; i<imageSize; i++) {
@@ -4896,8 +4897,9 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
                     }
                 }
             }
-            histogram2->addHistogram(tr("complete"), datahist, datasize);
+            histogram2->addHistogram(tr("complete"), datahist, datasize, false);
             histogram2->setHistogramXLabel(cmbParameter->currentText());
+            if (datahist) free(datahist);
         }
     }
 
@@ -4921,7 +4923,7 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
 
     if (plteImageData && (plteImageSize>=m->getImageFromRunsWidth()*m->getImageFromRunsHeight())) {
         int imageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
-        datahistsel=(double*)malloc(imageSize*sizeof(double));
+        double* datahistsel=(double*)malloc(imageSize*sizeof(double));
         datasizesel=0;
         int32_t ii=0;
         if (chkExcludeExcludedRunsFromHistogram->isChecked()) {
@@ -4941,10 +4943,10 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
         }
         if (datasizesel>2) {
             if (histogram->histogramCount()>1) {
-                histogram->setHistogram(1, tr("selection"), datahistsel, datasizesel);
+                histogram->setHistogram(1, tr("selection"), datahistsel, datasizesel, false);
                 histogram->setHistogramXLabel(cmbParameter->currentText());
             } else {
-                histogram->addHistogram(tr("selection"), datahistsel, datasizesel);
+                histogram->addHistogram(tr("selection"), datahistsel, datasizesel, false);
                 histogram->setHistogramXLabel(cmbParameter->currentText());
             }
         } else {
@@ -4953,12 +4955,13 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
             }
             histogram->updateHistogram(true, -1);
         }
+        if (datahistsel) free(datahistsel);
     }
     if (dv) {
         histogram2->setVisible(true);
         if (plteImageData && (plteImageSize>=m->getImageFromRunsWidth()*m->getImageFromRunsHeight())) {
             int imageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
-            datahistsel=(double*)malloc(imageSize*sizeof(double));
+            double* datahistsel=(double*)malloc(imageSize*sizeof(double));
             datasizesel=0;
             int32_t ii=0;
             if (chkExcludeExcludedRunsFromHistogram2->isChecked()) {
@@ -4978,10 +4981,10 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
             }
             if (datasizesel>2) {
                 if (histogram2->histogramCount()>1) {
-                    histogram2->setHistogram(1, tr("selection"), datahistsel, datasizesel);
+                    histogram2->setHistogram(1, tr("selection"), datahistsel, datasizesel, false);
                     histogram2->setHistogramXLabel(cmbParameter->currentText());
                 } else {
-                    histogram2->addHistogram(tr("selection"), datahistsel, datasizesel);
+                    histogram2->addHistogram(tr("selection"), datahistsel, datasizesel, false);
                     histogram2->setHistogramXLabel(cmbParameter->currentText());
                 }
             } else {
@@ -4990,6 +4993,7 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
                 }
                 histogram2->updateHistogram(true, -1);
             }
+            if (datahistsel) free(datahistsel);
         }
         if (replot) histogram2->updateHistogram(true, 1);
     }
