@@ -18,11 +18,17 @@ QFHTMLDelegate::QFHTMLDelegate(QObject* parent):
     m_displayRichTextEditor=true;
     rxHTML=QRegExp("(<\\s*\\w+.*>)|(<\\s*/\\s*\\w+\\s*>)|(\\&\\w+\\;)");
     rxHTML.setMinimal(true);
+    m_printMode=false;
 }
 
 QFHTMLDelegate::~QFHTMLDelegate()
 {
     //dtor
+}
+
+void QFHTMLDelegate::setPrintMode(bool enabled)
+{
+    m_printMode=enabled;
 }
 
 bool QFHTMLDelegate::displayRichTextEditor() const {
@@ -40,24 +46,45 @@ void QFHTMLDelegate::drawCheck(QPainter *painter,
     if (!rect.isValid())
         return;
 
-    QStyleOptionViewItem opt(option);
-    opt.rect = rect;
-    opt.state = opt.state & ~QStyle::State_HasFocus;
+    if (!m_printMode) {
+        QStyleOptionViewItem opt(option);
+        opt.rect = rect;
+        opt.state = opt.state & ~QStyle::State_HasFocus;
 
-    switch (state) {
-    case Qt::Unchecked:
-        opt.state |= QStyle::State_Off;
-        break;
-    case Qt::PartiallyChecked:
-        opt.state |= QStyle::State_NoChange;
-        break;
-    case Qt::Checked:
-        opt.state |= QStyle::State_On;
-        break;
+        switch (state) {
+            case Qt::Unchecked:
+                opt.state |= QStyle::State_Off;
+                break;
+            case Qt::PartiallyChecked:
+                opt.state |= QStyle::State_NoChange;
+                break;
+            case Qt::Checked:
+                opt.state |= QStyle::State_On;
+                break;
+        }
+        QStyle *style = QApplication::style();
+        style->drawPrimitive(QStyle::PE_IndicatorViewItemCheck, &opt, painter, NULL);
+    } else {
+        double lw=qMax(0.1, double(rect.width())/15.0);
+        painter->save();
+        painter->translate(rect.width()/10, rect.height()/10);
+        painter->scale(0.8,0.8);
+        QPen p=QPen(option.palette.color(QPalette::Dark));
+        p.setWidthF(lw);
+        QRectF r=QRectF(QPointF(rect.topLeft())+QPointF(lw,lw), QPointF(rect.bottomRight())-QPointF(lw,lw));
+        painter->setPen(p);
+        painter->setBrush(QBrush(option.palette.color(QPalette::QPalette::Base)));
+        painter->drawRect(r);
+
+        if (state==Qt::Checked) {
+            p.setColor(option.palette.color(QPalette::WindowText));
+            painter->setPen(p);
+            painter->drawLine(rect.topLeft()+, rect.bottomRight());
+            painter->drawLine(rect.topRight(), rect.bottomLeft());
+        }
+
+        painter->restore();
     }
-
-    QStyle *style = QApplication::style();
-    style->drawPrimitive(QStyle::PE_IndicatorViewItemCheck, &opt, painter, NULL);
 }
 
 QString QFHTMLDelegate::calcDisplayedText(const QModelIndex &index, const QStyleOptionViewItem &option, QPoint& offset, bool& isHTML, QPixmap* imgOut) const {
@@ -168,28 +195,35 @@ void QFHTMLDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
         //qDebug()<<"   draw html dT="<<double(et.nsecsElapsed())/1000000.0<<"ms";
         painter->save();
         painter->translate(option.rect.topLeft()+offset);
+
         QRect r(QPoint(0, 0), option.rect.size()-QSize(offset.x(), 0));
-        QString id=QString::number(r.width())+"_"+QString::number(r.height())+"_"+text;
-        QPixmap pix;
-        if (!QPixmapCache::find(id, &pix)) {
-            //qDebug()<<"   draw html: create pixmap dT="<<double(et.nsecsElapsed())/1000000.0<<"ms";
-            {
-                QImage img=QImage(r.width(), r.height(), QImage::Format_ARGB32_Premultiplied);
-                img.fill(Qt::transparent);
-                QPainter pixp;
-                pixp.begin(&img);
-                QTextDocument doc;
-                doc.setHtml(text);
-                doc.drawContents(&pixp, r);
-                pixp.end();
-                pix=QPixmap::fromImage(img);
+        if (m_printMode) {
+            QTextDocument doc;
+            doc.setHtml(text);
+            doc.drawContents(painter, r);
+        } else {
+            QString id=QString::number(r.width())+"_"+QString::number(r.height())+"_"+text;
+            QPixmap pix;
+            if (!QPixmapCache::find(id, &pix)) {
+                //qDebug()<<"   draw html: create pixmap dT="<<double(et.nsecsElapsed())/1000000.0<<"ms";
+                {
+                    QImage img=QImage(r.width(), r.height(), QImage::Format_ARGB32_Premultiplied);
+                    img.fill(Qt::transparent);
+                    QPainter pixp;
+                    pixp.begin(&img);
+                    QTextDocument doc;
+                    doc.setHtml(text);
+                    doc.drawContents(&pixp, r);
+                    pixp.end();
+                    pix=QPixmap::fromImage(img);
+                }
+                /*bool ok=*/
+                QPixmapCache::insert(id, pix);;
+                //qDebug()<<" inserted pixmap: "<<ok<<"   cache_limit="<<QPixmapCache::cacheLimit();
             }
-            /*bool ok=*/
-            QPixmapCache::insert(id, pix);;
-            //qDebug()<<" inserted pixmap: "<<ok<<"   cache_limit="<<QPixmapCache::cacheLimit();
+            painter->drawPixmap(0,0, pix);
         }
 
-        painter->drawPixmap(0,0, pix);
         painter->restore();
 
     } else if (!text.isEmpty()) {

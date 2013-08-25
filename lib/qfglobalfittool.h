@@ -183,19 +183,27 @@ class QFLIB_EXPORT QFGlobalFitTool {
         void clear();
 
         void setRepeats(int fitRepeat);
+        void setGlobalLocalRepeats(int fitRepeat);
 
         void setDoRecalculateInternals(bool enabled);
 
+        void createLocalFitFunctors();
 
-        QFFitAlgorithm::FitResult fit(QList<double *> paramsOut, QList<double *> paramErrorsOut, QList<double *> initialParams, QList<double *> paramErrorsIn);
-        void evalueCHi2Landscape(double* chi2Landscape, int paramXFile, int paramXID, const QVector<double>& paramXValues, int paramYFile, int paramYID, const QVector<double>& paramYvalues, QList<double *> initialParams);
+
+        QFFitAlgorithm::FitResult fit(const QList<double *>& paramsOut, const QList<double *>& paramErrorsOut, const QList<double *>& initialParams, const QList<double *>& paramErrorsIn);
+        void evalueCHi2Landscape(double* chi2Landscape, int paramXFile, int paramXID, const QVector<double>& paramXValues, int paramYFile, int paramYID, const QVector<double>& paramYvalues, const QList<double *>& initialParams);
 
         QFFitMultiQFFitFunctionFunctor* getFunctor() const;
     protected:
 
         QFFitAlgorithm* m_algorithm;
         QFFitMultiQFFitFunctionFunctor* functor;
+        QList<QFFitAlgorithm::FitQFFitFunctionFunctor*> localFunctors;
         int m_repeatFit;
+        int m_globalLocalRepeats;
+
+        QFFitAlgorithm::FitResult fitGlobal(const QList<double *>& paramsOut, const QList<double *>& paramErrorsOut/*, const QList<double *>& initialParams, const QList<double *>& paramErrorsIn*/);
+        QList<QFFitAlgorithm::FitResult> fitLocal(const QList<double *>& paramsOut, const QList<double *>& paramErrorsOut/*, const QList<double *>& initialParams, const QList<double *>& paramErrorsIn*/);
 };
 
 

@@ -155,6 +155,8 @@ QFFitAlgorithm::FitQFFitFunctionFunctor::FitQFFitFunctionFunctor(QFFitFunction* 
     functorFromModel=NULL;
     modelFromFunctor=NULL;
 
+    m_modelparamsFix=duplicateArray(fixParams, m_N);
+
     // now we calculate the mapping of the data
     m_paramCount=0;
     for (int i=0; i<m_N; i++) {
@@ -190,6 +192,7 @@ QFFitAlgorithm::FitQFFitFunctionFunctor::~FitQFFitFunctionFunctor() {
     free(functorFromModel);
     free(modelFromFunctor);
     free(m_modelParams);
+    free(m_modelparamsFix);
 }
 
 double* QFFitAlgorithm::FitQFFitFunctionFunctor::createMappedArrayForFunctor(const double* modelData) {

@@ -830,6 +830,7 @@ void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<
         }
     }
     tool.setDoRecalculateInternals(true);
+    tool.createLocalFitFunctors();
 
     if (fitDataOut) *fitDataOut=fitData;
 }
@@ -923,6 +924,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
     QFGlobalFitTool tool(falg);
     tool.clear();
     tool.setRepeats(qMax(1,getProperty("repeatFit", 1).toInt()));
+    tool.setGlobalLocalRepeats(qMax(0,getProperty("localGlobalFitIterations", 0).toInt()));
     tool.setDoRecalculateInternals(false);
 
     QFRDRRunSelectionsInterface* runsel=qobject_cast<QFRDRRunSelectionsInterface*>(records.first());
@@ -966,6 +968,8 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
 
 
     setupGlobalFitTool(tool, &fitData, iparams, paramsVector, initialParamsVector, errorsVector, errorsVectorI, records, run, rangeMinDatarange, rangeMaxDatarange, doLog);
+
+
 
     bool OK=true;
     try {
@@ -1224,6 +1228,7 @@ void QFImFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord 
     QFGlobalFitTool tool(falg);
     tool.clear();
     tool.setRepeats(qMax(1,getProperty("repeatFit", 1).toInt()));
+    tool.setGlobalLocalRepeats(qMax(0,getProperty("localGlobalFitIterations", 0).toInt()));
     tool.setDoRecalculateInternals(false);
 
     QFRDRRunSelectionsInterface* runsel=qobject_cast<QFRDRRunSelectionsInterface*>(records.first());

@@ -276,7 +276,7 @@ void QFHistogramView::setCopiedHistogram(int i, QString name, const double *data
     if (i<0 || i>=histograms.size()) return;
     QFHistogramView::Histogram h=histograms[i];
     if (h.data && !h.external) free(h.data);
-    if (!external) h.data=duplicateArray(data, size);
+    h.data=duplicateArray(data, size);
     h.name=name;
     h.size=size;
     h.external=false;

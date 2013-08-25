@@ -327,6 +327,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
                 /** \brief return a pointer to the stored initial fit parameters */
                 double* getModelParams() const { return m_modelParams; }
+                /** \brief return a pointer to an array indicating which parameters are fixed */
+                bool* getModelParamsFix() const { return m_modelparamsFix; }
                 /** \brief return the number of to the stored initial fit parameters */
                 int getModelParamsCount() const { return m_model->paramCount(); }
             protected:
@@ -344,6 +346,8 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 int* modelFromFunctor;
                 /** \brief copy of the current model parameter vector (size m_N) */
                 double* m_modelParams;
+                /** \brief vector containing which parameters are fixed */
+                bool* m_modelparamsFix;
         };
 
 

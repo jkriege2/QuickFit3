@@ -18,6 +18,8 @@
 #include <QHeaderView>
 #include <QPrintDialog>
 #include <QDialogButtonBox>
+#include "qfhtmldelegate.h"
+#include <QSvgGenerator>
 
 QEnhancedTableView::QEnhancedTableView(QWidget* parent):
     QTableView(parent)
@@ -34,6 +36,9 @@ QEnhancedTableView::QEnhancedTableView(QWidget* parent):
     actCopyMatlab=new QAction(QIcon(":/lib/copy16_matlab.png"), tr("Copy Selection to clipboard (Matlab)"), this);
     connect(actCopyMatlab, SIGNAL(triggered()), this, SLOT(copySelectionToMatlabNoHead()));
     addAction(actCopyMatlab);
+    actCopyImage=new QAction(QIcon(":/lib/copy16.png"), tr("Copy table as image"), this);
+    connect(actCopyImage, SIGNAL(triggered()), this, SLOT(copyAsImage()));
+    addAction(actCopyImage);
     actPrint=new QAction(QIcon(":/lib/print.png"), tr("&Print Table"), this);
     actPrint->setShortcut(QKeySequence::Print);
     connect(actPrint, SIGNAL(triggered()), this, SLOT(print()));
@@ -723,6 +728,74 @@ void QEnhancedTableView::print()
     }
 }
 
+void QEnhancedTableView::copyAsImage()
+{
+    clearSelection();
+
+
+    /// PRINT HERE //////////////////////////////////////////////////////////////////////////////////
+    // calculate the total width/height table would need without scaling
+    const int rows = model()->rowCount();
+    const int cols = model()->columnCount();
+    double vhw=verticalHeader()->width()+8;
+    double totalWidth = vhw;
+    double minWidth=1e33;
+    double maxWidth=0;
+    for (int c = -1; c < cols; ++c)
+    {
+        double w=columnWidth(c);
+        totalWidth += w;
+        if (w<minWidth) minWidth=w;
+        if (w>maxWidth) maxWidth=w;
+    }
+    double hhh=horizontalHeader()->height()+8;
+    double totalHeight = hhh;
+    double minHeight=1e33;
+    double maxHeight=0;
+    for (int r = 0; r < rows; ++r)
+    {
+       double h=rowHeight(r);
+       totalHeight += h;
+       if (h<minHeight) minHeight=h;
+       if (h>maxHeight) maxHeight=h;
+    }
+
+    QFHTMLDelegate* htmld=dynamic_cast<QFHTMLDelegate*>(itemDelegate());
+    if (htmld) {
+        htmld->setPrintMode(true);
+    }
+
+    QPixmap pix(totalWidth, totalHeight);
+
+    {
+        QPainter painter(&pix);
+        paint(painter);
+        painter.end();
+    }
+
+
+    QByteArray svg;
+    {
+        QSvgGenerator generator;
+        QBuffer buffer(&svg);
+        generator.setOutputDevice(&buffer);
+        QPainter painter(&generator);
+        paint(painter);
+        painter.end();
+    }
+
+    QClipboard *clipboard = QApplication::clipboard();
+    QMimeData* mime=new QMimeData();
+    mime->setImageData(pix);
+    mime->setData("image/svg+xml", svg);
+    clipboard->setMimeData(mime);
+
+    QFHTMLDelegate* htmld=dynamic_cast<QFHTMLDelegate*>(itemDelegate());
+    if (htmld) {
+        htmld->setPrintMode(false);
+    }
+}
+
 
 
 void QEnhancedTableView::print(QPrinter *printer, bool onePageWide, bool onePageHigh)
@@ -822,9 +895,17 @@ void QEnhancedTableView::print(QPrinter *printer, bool onePageWide, bool onePage
          if (pageRows.size()==1) pageRows<<rows;
      }
 
+
+     QFHTMLDelegate* htmld=dynamic_cast<QFHTMLDelegate*>(itemDelegate());
+     if (htmld) {
+         htmld->setPrintMode(true);
+     }
      QPainter painter(p);
      paint(painter, scale, -1, hhh, vhw, pageCols, pageRows, p);
      painter.end();
+     if (htmld) {
+         htmld->setPrintMode(false);
+     }
 
 
 

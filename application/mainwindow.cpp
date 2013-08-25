@@ -1927,7 +1927,7 @@ void MainWindow::addHistogramToView(const QString &name, const QFHistogramServic
         for (int i=0; i<histogram.data.size(); i++) {
             d[i]=histogram.data[i];
         }*/
-        histograms[name]->addHistogram(histogram.name, histogram.data.data(), histogram.data.size());
+        histograms[name]->addCopiedHistogram(histogram.name, histogram.data.data(), histogram.data.size());
         histograms[name]->updateHistogram(true);
     }
 }

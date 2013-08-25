@@ -1,0 +1,56 @@
+date/time                   : 2013/08/25 19:01:57
+input file                  : ../plugins/imfccsfit/examples/test_simulated2cdiffusion.tif
+input description file      : ../test_simulated2cdiffusion.configuration.ini
+overview image file         : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.overview.tif
+overview image file real    : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.overview_float.tif
+overview std image          : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.overviewstd.tif
+background image file       : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.background.tif
+background stddev           : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.backgroundstd.tif
+uncorr. overview image file : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.overview_uncorrected.tif
+uncorr. overview std image  : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.overviewstd_uncorrected.tif
+video file                  : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.video.tif
+uncorrected video file      : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.videouncorr.tif
+statistics file             : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.statistics.dat
+background statistics file  : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.backstatistics.dat
+uncorrected statistics file : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.uncorrstatistics.dat
+statistics file DV1         : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.statistics_dv1.dat
+background statistics file DV1 : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.backstatistics_dv1.dat
+uncorrected statistics file DV1 : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.uncorrstatistics_dv1.dat
+statistics file DV2         : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.statistics_dv2.dat
+background statistics file DV2 : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.backstatistics_dv2.dat
+uncorrected statistics file DV2 : test_simulated2cdiffusion_corrdirectavg_backimgoffset_bin01_.uncorrstatistics_dv2.dat
+width                       : 8
+height                      : 4
+frametime (ms)              : 0.1
+frametime (s)               : 0.0001
+dualview mode               : 1
+binning                     : 1
+interleaved binning         : false
+averaging binning           : false
+frame count in file         : 50000
+frame count                 : 50000
+first frame                 : 0
+last frame                  : 49999
+correlation segments        : 1
+correlator S                : 11
+correlator m                : 2
+correlator P                : 16
+correlator type             : 2
+correlator type name        : direct with averaging
+smallest tau [s]            : 0.0001
+baseline                    : 0
+video sum up                : 50
+video frames                : 1000
+video avgMin                : -2.46
+video avgMax                : 55.2
+video uncorrected avgMin    : 97.96
+video uncorrected avgMax    : 155.04
+statistics over             : 50
+DCCF 0 role                   : FCCS
+DCCF 0 Delta x                : 4
+DCCF 0 Delta y                : 0
+DCCF 0 frame width            : 8
+DCCF 0 frame height           : 4
+bleach correction           : remove frame average
+bleach average frames       : 20
+duration [s]                : 11.037

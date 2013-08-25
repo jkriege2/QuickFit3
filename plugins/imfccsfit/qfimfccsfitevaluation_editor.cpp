@@ -296,6 +296,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         ui->chkSaveStrings->setChecked(!item->getProperty("dontSaveFitResultMessage", true).toBool());
         ui->chkDontFitMasked->setChecked(item->getProperty("dontFitMaskedPixels", true).toBool());
         ui->spinFitRepeats->setValue(item->getProperty("repeatFit", 1).toInt());
+        ui->spinFitLocalGlobals->setValue(item->getProperty("localGlobalFitIterations", 0).toInt());
         ui->lstFileSets->setModel(item->getFileSetsModel());
 
         ui->tableView->setModel(item->getParameterInputTableModel());
@@ -1408,6 +1409,12 @@ void QFImFCCSFitEvaluationEditor::on_spinFitRepeats_valueChanged(int value)
 {
     if (!current) return;
     current->setQFProperty("repeatFit", value, false, false);
+}
+
+void QFImFCCSFitEvaluationEditor::on_spinFitLocalGlobals_valueChanged(int value)
+{
+    if (!current) return;
+    current->setQFProperty("localGlobalFitIterations", value, false, false);
 }
 
 void QFImFCCSFitEvaluationEditor::on_chkDontFitMasked_toggled(bool checked)

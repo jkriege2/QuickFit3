@@ -16,6 +16,13 @@
   <layout class="QGridLayout" name="gridLayout" columnstretch="1,0">
    <item row="1" column="1" rowspan="2">
     <layout class="QGridLayout" name="gridLayout_3">
+     <item row="6" column="1">
+      <widget class="QSpinBox" name="spinFitRepeats">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
      <item row="2" column="0">
       <widget class="QToolButton" name="btnEvaluateCurrent">
        <property name="sizePolicy">
@@ -36,7 +43,7 @@
        </property>
       </widget>
      </item>
-     <item row="7" column="1">
+     <item row="8" column="1">
       <widget class="QToolButton" name="btnClearAllPixels">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -75,14 +82,14 @@
        </property>
       </widget>
      </item>
-     <item row="9" column="0" colspan="2">
+     <item row="10" column="0" colspan="2">
       <widget class="Line" name="line_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
-     <item row="10" column="0">
+     <item row="11" column="0">
       <widget class="QToolButton" name="btnSaveReport">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -122,7 +129,7 @@
        </property>
       </widget>
      </item>
-     <item row="10" column="1">
+     <item row="11" column="1">
       <widget class="QToolButton" name="btnPrintReport">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -142,7 +149,7 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="0">
+     <item row="9" column="0">
       <widget class="QToolButton" name="btnCopyToInitial">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -169,7 +176,7 @@
        </property>
       </widget>
      </item>
-     <item row="7" column="0">
+     <item row="8" column="0">
       <widget class="QToolButton" name="btnClearCurrent">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -189,7 +196,7 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="0" colspan="2">
+     <item row="7" column="0" colspan="2">
       <widget class="Line" name="line_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -230,17 +237,30 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
-      <widget class="QSpinBox" name="spinFitRepeats">
-       <property name="minimum">
-        <number>1</number>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>repeat fits:</string>
        </property>
       </widget>
      </item>
      <item row="5" column="0">
-      <widget class="QLabel" name="label_7">
+      <widget class="QLabel" name="label_8">
        <property name="text">
-        <string>repeat fits:</string>
+        <string>local-global iterations:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QSpinBox" name="spinFitLocalGlobals">
+       <property name="specialValueText">
+        <string>global only</string>
+       </property>
+       <property name="minimum">
+        <number>0</number>
+       </property>
+       <property name="value">
+        <number>2</number>
        </property>
       </widget>
      </item>
@@ -552,6 +572,7 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>

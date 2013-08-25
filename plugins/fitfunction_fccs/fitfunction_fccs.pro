@@ -20,7 +20,13 @@ HEADERS += qfpfitfunctionsfccs.h \
     qffitfunctionsfccsfwdiff2colortcccf.h \
     qffitfunctionsfccsfwdiff2colortcacfr.h \
     qffitfunctionsfccsfwdiff2colortcacfg.h \
-    ../interfaces/qffitfunctionconfigforglobalfitinterface.h
+    ../interfaces/qffitfunctionconfigforglobalfitinterface.h \
+    qffitfunctionsfccsfwdiff2colortcsepccf.h \
+    qffitfunctionsfccsfwdiff2colortcsepacfr.h \
+    qffitfunctionsfccsfwdiff2colortcsepacfg.h \
+    qffitfunctionsfccsfwdiff2colorsepccf.h \
+    qffitfunctionsfccsfwdiff2colorsepacfr.h \
+    qffitfunctionsfccsfwdiff2colorsepacfg.h
 
 SOURCES += qfpfitfunctionsfccs.cpp\
            qffitfunctionfccsnormaldiff3d.cpp \
@@ -33,7 +39,13 @@ SOURCES += qfpfitfunctionsfccs.cpp\
     fcstools.cpp \
     qffitfunctionsfccsfwdiff2colortcccf.cpp \
     qffitfunctionsfccsfwdiff2colortcacfr.cpp \
-    qffitfunctionsfccsfwdiff2colortcacfg.cpp
+    qffitfunctionsfccsfwdiff2colortcacfg.cpp \
+    qffitfunctionsfccsfwdiff2colortcsepccf.cpp \
+    qffitfunctionsfccsfwdiff2colortcsepacfr.cpp \
+    qffitfunctionsfccsfwdiff2colortcsepacfg.cpp \
+    qffitfunctionsfccsfwdiff2colorsepccf.cpp \
+    qffitfunctionsfccsfwdiff2colorsepacfr.cpp \
+    qffitfunctionsfccsfwdiff2colorsepacfg.cpp
 
 FORMS =
 

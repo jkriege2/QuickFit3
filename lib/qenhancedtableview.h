@@ -40,6 +40,7 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         void keyPressed(int key, Qt::KeyboardModifiers modifiers, QString text);
     public slots:
         void print();
+        void copyAsImage();
         void copySelectionToExcel(int copyrole=Qt::EditRole, bool storeHead=true);
         void copySelectionToExcelNoHead(int copyrole=Qt::EditRole);
         void copySelectionToMatlabNoHead(int copyrole=Qt::EditRole);
@@ -57,6 +58,7 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         QAction* actCopyExcelNoHead;
         QAction* actCopyMatlab;
         QAction* actPrint;
+        QAction* actCopyImage;
 };
 
 #endif // QENHANCEDTABLEVIEW_H

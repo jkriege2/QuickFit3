@@ -18,6 +18,8 @@ class QFLIB_EXPORT QFHTMLDelegate : public QStyledItemDelegate {
         QFHTMLDelegate(QObject* parent=NULL);
         virtual ~QFHTMLDelegate();
 
+        void setPrintMode(bool enabled);
+
         bool displayRichTextEditor() const;
         void setDisplayRichTextEditor(bool d);
 
@@ -30,6 +32,7 @@ class QFLIB_EXPORT QFHTMLDelegate : public QStyledItemDelegate {
     private:
         bool m_displayRichTextEditor;
         QRegExp rxHTML;
+        bool m_printMode;
     protected:
         void drawCheck(QPainter *painter,
                        const QStyleOptionViewItem &option,

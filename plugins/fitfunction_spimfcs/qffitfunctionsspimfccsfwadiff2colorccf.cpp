@@ -16,7 +16,7 @@ QFFitFunctionsSPIMFCCSFWADiff2ColorCCF::QFFitFunctionsSPIMFCCSFWADiff2ColorCCF()
     #define FCCSDiff_fraction_ab 4
     addParameter(FloatNumber,  "fraction_abmax",     "relative concentration of species ab in focus cAB/max(cA,cB)",      "C<sub>ab</sub>/max(C<sub>a</sub>, C<sub>b</sub>)", "",  "",            false,      false,          false,              QFFitFunction::DisplayError, false, 0.2,           0,     1,      0.1, 0, 1     );
     #define FCCSDiff_fraction_abmax 5
-    addParameter(FloatNumber,  "disscciation_constant",     "disscciation constant KD of reaction ab <-> a+b",      "K<sub>d</sub>",            "nM",           "nM",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
+    addParameter(FloatNumber,  "dissociation_constant",     "disscciation constant KD of reaction ab <-> a+b",      "K<sub>d</sub>",            "nM",           "nM",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
     #define FCCSDiff_KD 6
     addParameter(FloatNumber,  "diff_acoeff_a",            "diffusion coefficient of species a",                  "&Gamma;<sub>a</sub>",            "micron^2/s^alpha", "&mu;m<sup>2</sup>/s<sup>&alpha;</sup>",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
     #define FCCSDiff_diff_acoeffa 7

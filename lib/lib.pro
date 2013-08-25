@@ -15,7 +15,7 @@ release {
 INCLUDEPATH += .
 
 
-QT += gui xml
+QT += gui xml svg
 
 DESTDIR = $$QFOUTPUT
 

@@ -182,6 +182,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void setParameterTableSpans();
 
 
+        void on_spinFitLocalGlobals_valueChanged(int value);
 };
 
 #endif // QFIMFCCSFITEVALUATIONEDITOR_H

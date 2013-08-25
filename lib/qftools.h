@@ -608,7 +608,7 @@ template <class T>
 QVector<T> arrayToVector(const T* input, long long N) {
     T dummy;
     QVector<T> out(N, dummy);
-    memcpy(out.data(), input, N*sizeof(T));
+    if (input && N>0) memcpy(out.data(), input, N*sizeof(T));
     return out;
 }
 
@@ -618,7 +618,7 @@ QVector<T> arrayToVector(const T* input, long long N) {
 */
 template <class T>
 T* copyArray(T* out, const T* input, long long N) {
-    memcpy(out, input, N*sizeof(T));
+    if (out && input && N>0) memcpy(out, input, N*sizeof(T));
     return out;
 }
 
@@ -805,6 +805,27 @@ QList<T2> qfSelectFromVector(const T1& selection, T2* data) {
         res<<data[selection[i]];
     }
     return res;
+}
+
+/*! \brief delete items in container (if \c !=NULL )
+    \ingroup qf3lib_tools
+
+*/
+template <class T>
+void qfClearContainer(T first, T last) {
+    for (T it=first; it!=last; it++) {
+        if (*it) delete *it;
+    }
+}
+
+/*! \brief delete items in container (if \c !=NULL ) and clear container finally if \c clear==true
+    \ingroup qf3lib_tools
+
+*/
+template <class T>
+void qfClearContainer(T& container, bool clear=true) {
+    qfClearContainer(container.begin(), container.end());
+    if (clear) container.clear();
 }
 
 

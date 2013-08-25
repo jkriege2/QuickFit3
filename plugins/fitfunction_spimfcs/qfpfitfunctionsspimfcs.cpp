@@ -26,6 +26,9 @@
 #include "qffitfunctionsspimfccsfw2csepdiff2colorccf.h"
 #include "qffitfunctionsspimfccsfw2csepdiff2coloracfg.h"
 #include "qffitfunctionsspimfccsfw2csepdiff2coloracfr.h"
+#include "qffitfunctionsspimfccsfwsepdiff2colorccf.h"
+#include "qffitfunctionsspimfccsfwsepdiff2coloracfg.h"
+#include "qffitfunctionsspimfccsfwsepdiff2coloracfr.h"
 
 #include "qftools.h"
 
@@ -53,6 +56,10 @@ QStringList QFPFitFunctionsSPIMFCS::getIDs() const {
     res<<"fccs_spim_fw_factordiff2colorccf";
     res<<"fccs_spim_fw_factordiff2coloracfg";
     res<<"fccs_spim_fw_factordiff2coloracfr";
+
+    res<<"fccs_spim_fw_sepdiff2coloracfg";
+    res<<"fccs_spim_fw_sepdiff2coloracfr";
+    res<<"fccs_spim_fw_sepdiff2colorccf";
 
     res<<"fccs_spim_fw_2cdiff2colorccf";
     res<<"fccs_spim_fw_2cdiff2coloracfg";
@@ -121,6 +128,12 @@ QFFitFunction* QFPFitFunctionsSPIMFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorACFR();
     } else if (id=="fccs_spim_fw_2csepdiff2colorccf") {
         return new QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorCCF();
+    } else if (id=="fccs_spim_fw_sepdiff2coloracfg") {
+        return new QFFitFunctionsSPIMFCCSFWSepDiff2ColorACFG();
+    } else if (id=="fccs_spim_fw_sepdiff2coloracfr") {
+        return new QFFitFunctionsSPIMFCCSFWSepDiff2ColorACFR();
+    } else if (id=="fccs_spim_fw_sepdiff2colorccf") {
+        return new QFFitFunctionsSPIMFCCSFWSepDiff2ColorCCF();
 
     }
     return NULL;
@@ -139,7 +152,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
     QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig res;
     if (i==c++) { // fccs_spim_fw_diff2coloracfg, fccs_spim_fw_diff2coloracfr, fccs_spim_fw_diff2colorccf
         res.groupLabel=spimfccslabel;
-        res.menuEntryLabel=tr("... 2-color, 1-component normal diffusion");
+        res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c/D per species");
         res.models<<"fccs_spim_fw_diff2coloracfg"<<"fccs_spim_fw_diff2coloracfr"<<"fccs_spim_fw_diff2colorccf";
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
@@ -164,7 +177,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
 
     } else if (i==c++) { // fccs_spim_fw_diff2coloracfg, fccs_spim_fw_diff2coloracfr, fccs_spim_fw_diff2colorccf
         res.groupLabel=spimfccslabel;
-        res.menuEntryLabel=tr("... 2-color, 1-component normal diffusion, Da=Db=Dab");
+        res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c/D per species, Da=Db=Dab");
         res.models<<"fccs_spim_fw_diff2coloracfg"<<"fccs_spim_fw_diff2coloracfr"<<"fccs_spim_fw_diff2colorccf";
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
@@ -186,7 +199,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
 
     } else if (i==c++) { // fccs_spim_fw_diff2coloracfg, fccs_spim_fw_diff2coloracfr, fccs_spim_fw_diff2colorccf
         res.groupLabel=spimfccslabel;
-        res.menuEntryLabel=tr("... 2-color, 1-component normal diffusion, Da=Db, Dab");
+        res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c/D per species, Da=Db, Dab");
         res.models<<"fccs_spim_fw_diff2coloracfg"<<"fccs_spim_fw_diff2coloracfr"<<"fccs_spim_fw_diff2colorccf";
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
@@ -207,39 +220,11 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
         res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
 
-    } else if (i==c++) { // fccs_spim_fw_diff2coloracfg, fccs_spim_fw_diff2coloracfr, fccs_spim_fw_diff2colorccf
-        res.groupLabel=spimfccslabel;
-        res.menuEntryLabel=tr("... 2-color, 1-component normal diffusion, one independent D for each channels");
-        res.models<<"fccs_spim_fw_diff2coloracfg"<<"fccs_spim_fw_diff2coloracfr"<<"fccs_spim_fw_diff2colorccf";
-        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
-        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
-        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
-
-        QStringList Ds;
-        Ds<<"diff_coeff_a"<<"diff_coeff_b"<<"diff_coeff_ab";
-        res.globalParams << constructQListFromItems(Ds,QStringList(),QStringList());
-        res.globalParams << constructQListFromItems(QStringList(),Ds,QStringList());
-        res.globalParams << constructQListFromItems(QStringList(),QStringList(),Ds);
-
-        res.globalParams << constructQListWithMultipleItems(QStringList("crosstalk"), 3);
-        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_x"), 3);
-        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_y"), 3);
-        res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_z"), 3);
-        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width1"), 3);
-        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width2"), 3);
-        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height1"), 3);
-        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height2"), 3);
-        res.globalParams << constructQListWithMultipleItems(QStringList("pixel_width"), 3);
-        res.globalParams << constructQListWithMultipleItems(QStringList("count_rate1"), 3);
-        res.globalParams << constructQListWithMultipleItems(QStringList("count_rate2"), 3);
-        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
-        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
-
 
 
     } else if (i==c++) { // fccs_spim_fw_factordiff2coloracfg, fccs_spim_fw_factordiff2coloracfr, fccs_spim_fw_factordiff2colorccf
        res.groupLabel=spimfccslabel;
-       res.menuEntryLabel=tr("... 2-color, 1-component normal diffusion, Da, Db=Fb*Da, Dab=Fab*Da");
+       res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c/D per species, Da, Db=Fb*Da, Dab=Fab*Da");
        res.models<<"fccs_spim_fw_factordiff2coloracfg"<<"fccs_spim_fw_factordiff2coloracfr"<<"fccs_spim_fw_factordiff2colorccf";
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
@@ -263,13 +248,34 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
 
 
 
+    } else    if (i==c++) { // fccs_spim_fw_sepdiff2coloracfg, fccs_spim_fw_sepdiff2coloracfr, fccs_spim_fw_sepdiff2colorccf
+       res.groupLabel=spimfccslabel;
+       res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c per species, D per channel");
+       res.models<<"fccs_spim_fw_sepdiff2coloracfg"<<"fccs_spim_fw_sepdiff2coloracfr"<<"fccs_spim_fw_sepdiff2colorccf";
 
+       res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
+
+       res.globalParams << constructQListWithMultipleItems(QStringList("crosstalk"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_x"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_y"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_z"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_width1"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_width2"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_height1"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_height2"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("pixel_width"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("count_rate1"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("count_rate2"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
 
 
 
     } else    if (i==c++) { // fccs_spim_fw_2cdiff2coloracfg, fccs_spim_fw_2cdiff2coloracfr, fccs_spim_fw_2cdiff2colorccf
        res.groupLabel=spimfccslabel;
-       res.menuEntryLabel=tr("... 2-color, 2-component normal diffusion");
+       res.menuEntryLabel=tr("... 2-comp. normal diffusion, species A+B+AB, c/D1/D2 per species");
        res.models<<"fccs_spim_fw_2cdiff2coloracfg"<<"fccs_spim_fw_2cdiff2coloracfr"<<"fccs_spim_fw_2cdiff2colorccf";
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
@@ -296,46 +302,11 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
        res.globalParams << constructQListWithMultipleItems(QStringList("count_rate2"), 3);
        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
-    } else    if (i==c++) { // fccs_spim_fw_2cdiff2coloracfg, fccs_spim_fw_2cdiff2coloracfr, fccs_spim_fw_2cdiff2colorccf
-       res.groupLabel=spimfccslabel;
-       res.menuEntryLabel=tr("... 2-color, 2-component normal diffusion, two independent D's for each channels");
-       res.models<<"fccs_spim_fw_2cdiff2coloracfg"<<"fccs_spim_fw_2cdiff2coloracfr"<<"fccs_spim_fw_2cdiff2colorccf";
 
-       res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
-       res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
-       res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
-
-       QStringList Ds, D2s, rhos;
-       Ds<<"diff_coeff_a"<<"diff_coeff_b"<<"diff_coeff_ab";
-       D2s<<"diff_coeff2_a"<<"diff_coeff2_b"<<"diff_coeff2_ab";
-       rhos<<"diff_rho2_a"<<"diff_rho2_b"<<"diff_rho2_ab";
-       res.globalParams << constructQListFromItems(Ds,QStringList(),QStringList());
-       res.globalParams << constructQListFromItems(QStringList(),Ds,QStringList());
-       res.globalParams << constructQListFromItems(QStringList(),QStringList(),Ds);
-       res.globalParams << constructQListFromItems(D2s,QStringList(),QStringList());
-       res.globalParams << constructQListFromItems(QStringList(),D2s,QStringList());
-       res.globalParams << constructQListFromItems(QStringList(),QStringList(),D2s);
-       res.globalParams << constructQListFromItems(rhos,QStringList(),QStringList());
-       res.globalParams << constructQListFromItems(QStringList(),rhos,QStringList());
-       res.globalParams << constructQListFromItems(QStringList(),QStringList(),rhos);
-
-       res.globalParams << constructQListWithMultipleItems(QStringList("crosstalk"), 3);
-       res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_x"), 3);
-       res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_y"), 3);
-       res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_z"), 3);
-       res.globalParams << constructQListWithMultipleItems(QStringList("focus_width1"), 3);
-       res.globalParams << constructQListWithMultipleItems(QStringList("focus_width2"), 3);
-       res.globalParams << constructQListWithMultipleItems(QStringList("focus_height1"), 3);
-       res.globalParams << constructQListWithMultipleItems(QStringList("focus_height2"), 3);
-       res.globalParams << constructQListWithMultipleItems(QStringList("pixel_width"), 3);
-       res.globalParams << constructQListWithMultipleItems(QStringList("count_rate1"), 3);
-       res.globalParams << constructQListWithMultipleItems(QStringList("count_rate2"), 3);
-       res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
-       res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
 
     } else    if (i==c++) { // fccs_spim_fw_2csepdiff2coloracfg, fccs_spim_fw_2csepdiff2coloracfr, fccs_spim_fw_2csepdiff2colorccf
        res.groupLabel=spimfccslabel;
-       res.menuEntryLabel=tr("... 2-color, 2-component normal diffusion, no specific D's for each species");
+       res.menuEntryLabel=tr("... 2-comp. normal diffusion, species A+B+AB, c per species, D1/D2 per channel");
        res.models<<"fccs_spim_fw_2csepdiff2coloracfg"<<"fccs_spim_fw_2csepdiff2coloracfr"<<"fccs_spim_fw_2csepdiff2colorccf";
 
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
@@ -358,7 +329,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
 
     } else if (i==c++) { // fccs_spim_fw_adiff2coloracfg, fccs_spim_fw_adiff2coloracfr, fccs_spim_fw_adiff2colorccf
         res.groupLabel=spimfccslabel;
-        res.menuEntryLabel=tr("... 2-color, 1-component anomalous diffusion");
+        res.menuEntryLabel=tr("... anomalous diffusion, species A+B+AB, c/Gamma/alpha per species");
         res.models<<"fccs_spim_fw_adiff2coloracfg"<<"fccs_spim_fw_adiff2coloracfr"<<"fccs_spim_fw_adiff2colorccf";
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
