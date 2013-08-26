@@ -3184,7 +3184,7 @@ void MainWindow::showUpdateInfo(QNetworkReply* reply) {
                     }
                     lastUpdateRequestUser=NULL;
                 } else if (lastUpdateRequest==reply) {
-                    labUpgrade->setText(tr("<!--%3--><b>new QuickFit 3.0 version (SVN version: %3, date: %2) available: <a href=\"%1\">go to download</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small><a href=\"close_labupdate\">close message</a><br>&nbsp;&nbsp;&nbsp;&nbsp;description: <i>%4</i>").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description));
+                    labUpgrade->setText(tr("<b>new QuickFit 3.0 version (SVN version: %3, date: %2) available: <a href=\"%1\">go to download</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small><a href=\"close_labupdate\">close message</a></small><br>&nbsp;&nbsp;&nbsp;&nbsp;description: <i>%4</i>").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description));
                     labUpgrade->setVisible(true);
                     lastUpdateRequest=NULL;
                 }
@@ -3209,8 +3209,10 @@ void MainWindow::openLabelLink(const QString &link)
 {
     if (link=="close_labupdate") {
         labUpgrade->setVisible(false);
+    } else {
+        if (QMessageBox::question(this, tr("open URL"), tr("opne the URL\n   %1\nin the system's main webbrowser?").arg(link), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) QDesktopServices::openUrl(link);
     }
-    if (QMessageBox::question(this, tr("open URL"), tr("opne the URL\n   %1\nin the system's main webbrowser?").arg(link), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) QDesktopServices::openUrl(link);
+
 }
 
 QFRawDataRecordFactory *MainWindow::getRawDataRecordFactory() const
