@@ -79,7 +79,7 @@ void QFHTMLDelegate::drawCheck(QPainter *painter,
         if (state==Qt::Checked) {
             p.setColor(option.palette.color(QPalette::WindowText));
             painter->setPen(p);
-            painter->drawLine(rect.topLeft()+, rect.bottomRight());
+            painter->drawLine(rect.topLeft(), rect.bottomRight());
             painter->drawLine(rect.topRight(), rect.bottomLeft());
         }
 

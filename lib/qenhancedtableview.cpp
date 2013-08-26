@@ -790,7 +790,6 @@ void QEnhancedTableView::copyAsImage()
     mime->setData("image/svg+xml", svg);
     clipboard->setMimeData(mime);
 
-    QFHTMLDelegate* htmld=dynamic_cast<QFHTMLDelegate*>(itemDelegate());
     if (htmld) {
         htmld->setPrintMode(false);
     }

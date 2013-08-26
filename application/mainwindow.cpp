@@ -977,6 +977,8 @@ void MainWindow::createActions() {
     connect(helpContactMaillinglist, SIGNAL(triggered()), this, SLOT(contactMailinglist()));
     helpOpenWebpageAct=new QAction(QIcon(":/lib/help/www.png"), tr("QuickFit &Webpage"), this);
     connect(helpOpenWebpageAct, SIGNAL(triggered()), this, SLOT(openWebpage()));
+    actCheckUpdate=new QAction(QIcon(":/lib/help/www.png"), tr("Check for updates ..."), this);
+    connect(actCheckUpdate, SIGNAL(triggered()), this, SLOT(checkUpdates());
 
     helpActList.append(helpAct);
     helpActList.append(helpCopyrightAct);
@@ -1104,6 +1106,8 @@ void MainWindow::createMenus() {
     helpMenu->addAction(aboutAct);
     helpMenu->addAction(aboutPluginsAct);
     helpMenu->addAction(aboutQtAct);
+    helpMenu->addSeparator();
+    helpMenu->addAction(actCheckUpdate);
     helpMenu->addSeparator();
     helpMenu->addAction(helpOpenWebpageAct);
     helpMenu->addAction(helpContactAuthors);
@@ -3062,6 +3066,12 @@ void MainWindow::setRDRPropertyByRegExp()
     }
     delete dlg;
 }
+
+void MainWindow::checkUpdates(bool userRequest)
+{
+    // TODO: implement using QNetworkRequest and http://qt-project.org/doc/qt-4.8/network-download-main-cpp.html
+}
+
 
 QFRawDataRecordFactory *MainWindow::getRawDataRecordFactory() const
 {

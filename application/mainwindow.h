@@ -302,6 +302,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
         void renameGroups();
         void setRDRPropertyByRegExp();
+
+        /** \brief check the update.xml file on the QF3 webpage for a new version. If \a userRequest is \c true, the method waits until the request completes, before returning control to the user, otherwise it runs in the background */
+        void checkUpdates(bool userRequest=true);
     private:
         void createWidgets();
         void createActions();
@@ -376,6 +379,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QAction* helpContactAuthors;
         QAction* helpContactMaillinglist;
         QAction* helpOpenWebpageAct;
+        QAction* actCheckUpdate;
 
 
         QAction* optionsAct;
