@@ -611,6 +611,26 @@ int getApplicationBitDepth() {
     return 8*sizeof(void*);
 }
 
+QString getOSShortName() {
+    QString result="???";
+
+
+#ifdef Q_WS_X11
+    result="linux";
+#endif
+
+#ifdef Q_WS_WIN
+    result="win";
+#endif
+
+#ifdef Q_WS_MAC
+    result="mac";
+#endif
+
+    return result+QString::number(getApplicationBitDepth());
+}
+
+
 QString getOSName() {
     QString result="unknown OS";
 
@@ -888,4 +908,15 @@ QString getNewFilename(const QString& filename, const QDir& dir) {
         i++;
     }
     return newFilename;
+}
+
+int qfReadFirstInt(const QString& text, bool* ok) {
+    QString num="";
+    for (int i=0; i<text.size(); i++) {
+        if (text[i].isDigit()) num+=text[i];
+        else if (!num.isEmpty()) {
+            break;
+        }
+    }
+    return num.toInt(ok);
 }

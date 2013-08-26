@@ -5,6 +5,8 @@
 #include <QtGui>
 #include "lib_imexport.h"
 
+#include <QNetworkProxy>
+
 /*! \brief this class manages the overall program options (and may also display an options Dialog
     \ingroup qf3lib_settings
 
@@ -80,6 +82,15 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         /** \brief returns the directory of the QuickFit main application */
         QString getApplicationDirectory() const;
 
+        QNetworkProxy getProxy() const;
+
+        void setProxyHost(const QString& host);
+        void setProxyPort(quint16 port);
+        quint16 getProxyPort() const;
+        QString getProxyHost() const;
+        int getProxyType() const;
+        void setProxyType(QNetworkProxy::ProxyType type);
+
         bool getUserSaveAfterFirstEdit() const;
         void setUserSaveAfterFirstEdit(bool set);
         bool getChildWindowsStayOnTop() const;
@@ -120,7 +131,7 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         /** \brief the application this object manages the properties for */
         QApplication* app;
 
-
+        QNetworkProxy proxy;
 
         /** \brief style to use in the application */
         QString style;

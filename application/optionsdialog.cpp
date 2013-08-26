@@ -80,6 +80,10 @@ void OptionsDialog::open(ProgramOptions* options) {
     chkProjectWindowsStayOnTop->setChecked(options->getProjectWindowsStayOnTop());
     chkHelpWindowsStayOnTop->setChecked(options->getHelpWindowsStayOnTop());
     chkDebugMessages->setChecked(options->debugLogVisible());
+    spinProxyPort->setValue(options->getProxyPort());
+    edtProxyHost->setText(options->getProxyHost());
+    cmbProxyType->setCurrentIndex(qBound(0,options->getProxyType(),2));
+    chkUpdates->setChecked(options->getConfigValue("quickfit/checkupdates", true).toBool());
 
 
     // find all available stylesheets
@@ -108,6 +112,11 @@ void OptionsDialog::open(ProgramOptions* options) {
         options->setHelpWindowsStayOnTop(chkHelpWindowsStayOnTop->isChecked());
         options->setProjectWindowsStayOnTop(chkProjectWindowsStayOnTop->isChecked());
         options->setDebugLogVisible(chkDebugMessages->isChecked());
+        options->setProxyHost(edtProxyHost->text());
+        options->setProxyPort(spinProxyPort->value());
+        options->setProxyType((QNetworkProxy::ProxyType)cmbProxyType->currentIndex());
+        options->setConfigValue("quickfit/checkupdates", chkUpdates->isChecked());
+
         for (int i=0; i<m_plugins.size(); i++) {
             m_plugins[i]->writeSettings(options);
         }

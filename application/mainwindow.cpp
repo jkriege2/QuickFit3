@@ -14,6 +14,8 @@
 #include "jkmathparser.h"
 #include "qfhtmlhelptools.h"
 #include "renamegroupsdialog.h"
+#include <QNetworkRequest>
+
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
 
@@ -65,6 +67,11 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     splashPix=splash->pixmap();
     project=NULL;
     helpWindow=NULL;
+    lastUpdateRequest=NULL;
+    lastUpdateRequestUser=NULL;
+    connect(&networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(showUpdateInfo(QNetworkReply*)));
+
+    networkManager.setProxy(s->getProxy());
 
     newProjectTimer.setInterval(2500);
     newProjectTimer.stop();
@@ -220,6 +227,8 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     timerAutosave->start();
 
     setWindowIcon(QIcon(":/icon_large.png"));
+
+    if (settings->getConfigValue("quickfit/checkupdates", true).toBool() ) QTimer::singleShot(2000, this, SLOT(checkUpdatesAutomatic()));
 }
 
 
@@ -835,10 +844,23 @@ void MainWindow::aboutPlugins() {
 }
 
 void MainWindow::createWidgets() {
+    QWidget* widgetMain=new QWidget(this);
+    QVBoxLayout* layMain=new QVBoxLayout(widgetMain);
+    widgetMain->setLayout(layMain);
+    layMain->setContentsMargins(2,2,2,2);
+    labUpgrade=new QLabel("", this);
+    labUpgrade->setVisible(false);
+    labUpgrade->setMargin(9);
+    labUpgrade->setStyleSheet("background: khaki; border: 1px solid blue; font: black ");
+    labUpgrade->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    labUpgrade->setWordWrap(true);
+    connect(labUpgrade, SIGNAL(linkActivated(QString)), this, SLOT(openLabelLink(QString)));
+    layMain->addWidget(labUpgrade);
     spCenter=new QVisibleHandleSplitter(Qt::Horizontal, this);
     spCenter->setOrientation(Qt::Horizontal);
     spMain=new QVisibleHandleSplitter(Qt::Vertical, this);
     spMain->setOrientation(Qt::Vertical);
+    layMain->addWidget(spMain);
     tvMain=new QTreeView(this);
     tvMain->setHeaderHidden(true);
     tvMain->setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -847,7 +869,7 @@ void MainWindow::createWidgets() {
     spCenter->addWidget(tvMain);
     QShortcut* shortcut = new QShortcut(QKeySequence(tr("Del")), tvMain);
     connect(shortcut, SIGNAL(activated()), this, SLOT(deleteItem()));
-    setCentralWidget(spMain);
+    setCentralWidget(widgetMain);
 
     QWidget* w=new QWidget(spCenter);
     QFormLayout* fl=new QFormLayout(w);
@@ -978,7 +1000,7 @@ void MainWindow::createActions() {
     helpOpenWebpageAct=new QAction(QIcon(":/lib/help/www.png"), tr("QuickFit &Webpage"), this);
     connect(helpOpenWebpageAct, SIGNAL(triggered()), this, SLOT(openWebpage()));
     actCheckUpdate=new QAction(QIcon(":/lib/help/www.png"), tr("Check for updates ..."), this);
-    connect(actCheckUpdate, SIGNAL(triggered()), this, SLOT(checkUpdates());
+    connect(actCheckUpdate, SIGNAL(triggered()), this, SLOT(checkUpdates()));
 
     helpActList.append(helpAct);
     helpActList.append(helpCopyrightAct);
@@ -1449,6 +1471,41 @@ void MainWindow::setCurrentProject(const QString &fileName) {
 
 QString MainWindow::strippedName(const QString &fullFileName) {
     return QFileInfo(fullFileName).fileName();
+}
+
+MainWindow::updateInfo MainWindow::readUpdateInfo(QIODevice *io)
+{
+    MainWindow::updateInfo res;
+    res.valid=false;
+    QDomDocument xml;
+    xml.setContent(io);
+    QDomElement e=xml.firstChildElement("updates");
+    if (!e.isNull()) {
+        e=e.firstChildElement("product");
+        if (!e.isNull()) {
+            QString pname=e.attribute("name").toLower().trimmed();
+            int version=e.attribute("version").toLower().trimmed().toInt();
+            if (pname=="quickfit") {
+                res.valid=true;
+                res.latestVersion=version;
+                res.date=e.firstChildElement("date").text();
+                res.releasenotes=e.firstChildElement("releasenotes").text();
+                res.link=e.firstChildElement("link").text();
+                res.description=e.firstChildElement("description").text();
+                QString os=getOSShortName();
+                QDomElement ee=e.firstChildElement("directlink");
+                while (!ee.isNull()) {
+                    if (ee.attribute("os").toLower().trimmed()==os) {
+                        res.download=ee.text();
+                        res.os=ee.attribute("os");
+                        break;
+                    }
+                    ee=ee.nextSiblingElement("directlink");
+                }
+            }
+        }
+    }
+    return res;
 }
 
 void MainWindow::projectElementDoubleClicked ( const QModelIndex & index ) {
@@ -3069,9 +3126,92 @@ void MainWindow::setRDRPropertyByRegExp()
 
 void MainWindow::checkUpdates(bool userRequest)
 {
-    // TODO: implement using QNetworkRequest and http://qt-project.org/doc/qt-4.8/network-download-main-cpp.html
+    networkManager.setProxy(settings->getProxy());
+
+    QUrl url = qfUpdateXMLURL();
+    QNetworkRequest request(url);
+    //qDebug()<<"request updates from: "<<qfUpdateXMLURL();
+    //qDebug()<<"user request "<<userRequest;
+    QNetworkReply *reply = networkManager.get(request);
+    if (!userRequest) lastUpdateRequest=reply;
+    else {
+        //qDebug()<<"  user request !";
+        lastUpdateRequestUser=reply;
+        QModernProgressDialog progress(tr("getting update information ..."), tr("Cancel"), this);
+        progress.open();
+        QElapsedTimer time;
+        time.start();
+        while (!reply->atEnd() && time.elapsed()<60000) {
+            QApplication::processEvents();
+            if (progress.wasCanceled()) {
+                lastUpdateRequestUser=NULL;
+                reply->abort();
+                //delete reply;
+            }
+            //qDebug()<<"  user request ! "<<time.elapsed();
+        }
+        progress.hide();
+    }
 }
 
+void MainWindow::checkUpdatesAutomatic()
+{
+    checkUpdates(false);
+}
+
+void MainWindow::showUpdateInfo(QNetworkReply* reply) {
+    if (reply) {
+        if (reply->error()==QNetworkReply::NoError) {
+            MainWindow::updateInfo info=MainWindow::readUpdateInfo(reply);
+            bool ok=false;
+            int svn=qfReadFirstInt(qfInfoSVNVersion(), &ok);
+
+            if (info.valid) {
+                log_global_text("update info from "+reply->url().toString()+":\n");
+                log_global_text("   current version: "+QString::number(svn)+"\n");
+                log_global_text("   newest version "+QString::number(info.latestVersion)+":\n");
+                log_global_text("      date:         "+info.date+"\n");
+                log_global_text("      os:           "+info.os+"\n");
+                log_global_text("      description:  "+info.description+"\n");
+                log_global_text("      download:     "+info.download+"\n");
+                log_global_text("      link:         "+info.link+"\n");
+                log_global_text("      releasenotes: "+info.releasenotes+"\n");
+            }
+            if (ok && info.valid && svn<info.latestVersion) {
+                if (lastUpdateRequestUser==reply) {
+                    if (QMessageBox::information(this, tr("QuickFit updates"), tr("new QuickFit 3.0 version (SVN version: %3, date: %2) available:\n  %4\n\n  %1\n Go to Download site?").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+                        QDesktopServices::openUrl(info.link);
+                    }
+                    lastUpdateRequestUser=NULL;
+                } else if (lastUpdateRequest==reply) {
+                    labUpgrade->setText(tr("<!--%3--><b>new QuickFit 3.0 version (SVN version: %3, date: %2) available: <a href=\"%1\">go to download</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small><a href=\"close_labupdate\">close message</a><br>&nbsp;&nbsp;&nbsp;&nbsp;description: <i>%4</i>").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description));
+                    labUpgrade->setVisible(true);
+                    lastUpdateRequest=NULL;
+                }
+            } else {
+                labUpgrade->setText("");
+                labUpgrade->setVisible(false);
+                if (lastUpdateRequestUser==reply) {
+                    QMessageBox::information(this, tr("QuickFit updates"), tr("no updates available"));
+                    lastUpdateRequestUser=NULL;
+                } else if (lastUpdateRequest==reply) {
+                    lastUpdateRequest=NULL;
+                }
+            }
+        } else {
+            log_warning(tr("\n could not acquire update information: %1\n\n").arg(reply->errorString()));
+        }
+        //delete reply;
+    }
+}
+
+void MainWindow::openLabelLink(const QString &link)
+{
+    if (link=="close_labupdate") {
+        labUpgrade->setVisible(false);
+    }
+    if (QMessageBox::question(this, tr("open URL"), tr("opne the URL\n   %1\nin the system's main webbrowser?").arg(link), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) QDesktopServices::openUrl(link);
+}
 
 QFRawDataRecordFactory *MainWindow::getRawDataRecordFactory() const
 {

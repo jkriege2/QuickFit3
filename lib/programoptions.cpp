@@ -33,6 +33,8 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     projectWindowStayOnTop=false;
     m_debugLogVisible=false;
 
+    proxy=QNetworkProxy::applicationProxy();
+
     QFileInfo fi(app->applicationFilePath());
     appDir=app->applicationDirPath();
     #if defined(Q_OS_MAC)
@@ -110,6 +112,9 @@ void ProgramOptions::writeSettings() {
     settings->setValue("quickfit/helpWindowsStayOnTop", helpWindowsStayOnTop);
     settings->setValue("quickfit/projectWindowStayOnTop", projectWindowStayOnTop);
     settings->setValue("quickfit/debugLogVisible", m_debugLogVisible);
+    settings->setValue("quickfit/proxy/host", proxy.hostName());
+    settings->setValue("quickfit/proxy/port", proxy.port());
+    settings->setValue("quickfit/proxy/type", proxy.type());
 }
 
 
@@ -132,6 +137,11 @@ void ProgramOptions::readSettings() {
     helpWindowsStayOnTop=settings->value("quickfit/helpWindowsStayOnTop", helpWindowsStayOnTop).toBool();
     projectWindowStayOnTop=settings->value("quickfit/projectWindowStayOnTop", projectWindowStayOnTop).toBool();
     m_debugLogVisible=settings->value("quickfit/debugLogVisible", m_debugLogVisible).toBool();
+
+    proxy.setHostName(settings->value("quickfit/proxy/host", proxy.hostName()).toString());
+    proxy.setPort(settings->value("quickfit/proxy/port", proxy.port()).toUInt());
+    proxy.setType((QNetworkProxy::ProxyType)settings->value("quickfit/proxy/type", (int)proxy.type()).toInt());
+
 
     languageID=settings->value("quickfit/language", languageID).toString();
     if (languageID != "en") { // english is default
@@ -204,6 +214,43 @@ QString ProgramOptions::getMainHelpDirectory() const
 QString ProgramOptions::getApplicationDirectory() const {
     return appDir;
 }
+
+QNetworkProxy ProgramOptions::getProxy() const
+{
+    return proxy;
+}
+
+void ProgramOptions::setProxyHost(const QString &host)
+{
+    proxy.setHostName(host);
+}
+
+void ProgramOptions::setProxyPort(quint16 port)
+{
+    proxy.setPort(port);
+}
+
+quint16 ProgramOptions::getProxyPort() const
+{
+    return proxy.port();
+}
+
+QString ProgramOptions::getProxyHost() const
+{
+    return proxy.hostName();
+}
+
+int ProgramOptions::getProxyType() const
+{
+    return proxy.type();
+}
+
+void ProgramOptions::setProxyType(QNetworkProxy::ProxyType type)
+{
+    if (type<0) proxy.setType(QNetworkProxy::DefaultProxy);
+    else proxy.setType(type);
+}
+
 
 bool ProgramOptions::getUserSaveAfterFirstEdit() const
 {

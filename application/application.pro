@@ -81,7 +81,7 @@ win32 {
     RC_FILE = quickfit3.rc
 }
 
-QT += gui xml
+QT += gui xml network
 CONFIG +=  exceptions rtti stl link_prl
 
 !release {

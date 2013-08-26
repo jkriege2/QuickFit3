@@ -2,6 +2,7 @@
 #define QFVERSION_H
 
 #include <QString>
+#include <QUrl>
 #include "lib_imexport.h"
 
 QFLIB_EXPORT QString qfInfoVersion();
@@ -18,5 +19,6 @@ QFLIB_EXPORT QString qfInfoLicense();
 QFLIB_EXPORT QString qfInfoSVNVersion();
 QFLIB_EXPORT QString qfInfoCompiler();
 QFLIB_EXPORT QString qfInfoCompileDate();
+QFLIB_EXPORT QUrl qfUpdateXMLURL();
 
 #endif //QFVERSION_H

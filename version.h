@@ -25,6 +25,8 @@
 
 #define QF_WEBLINK "http://www.dkfz.de/Macromol/quickfit/"
 
+#define QF_UPDATEXMLURL "http://www.dkfz.de/Macromol/quickfit/update.xml"
+
 #define QF_LICENSE QT_TR_NOOP("<b>This is POSTCARD-ware, so if you like the program and use it, please let us know by sending a nice postcard from your place on the world to:</b><br>DKFZ (German Cancer Research Center)<br>Dept. B040 (Biophysics of Macromolecules)<br>z.H. Jan Krieger<br>Im Neuenheimer Feld 580<br>D-69120 Heidelberg<br>GERMANY")
 
 #endif //VERSION_H

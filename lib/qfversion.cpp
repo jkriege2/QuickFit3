@@ -58,3 +58,7 @@ QString qfInfoCompileDate() {
     return QString(COMPILEDATE);
 }
 
+
+QUrl qfUpdateXMLURL() {
+    return QUrl::fromEncoded(QString(QF_UPDATEXMLURL).toLocal8Bit());
+}

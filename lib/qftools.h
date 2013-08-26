@@ -393,6 +393,11 @@ QFLIB_EXPORT int getApplicationBitDepth();
  */
 QFLIB_EXPORT QString getOSName();
 
+/*! \brief returns the operating system's name as a QString
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QString getOSShortName();
+
 /*! \brief convert the given string to a string suitable for use in filenames
     \ingroup qf3lib_tools
 */
@@ -403,6 +408,11 @@ QFLIB_EXPORT QString cleanStringForFilename(const QString& text, int maxLen=127,
 */
 QFLIB_EXPORT QString getNewFilename(const QString& filename, const QDir& dir=QDir());
 
+
+/*! \brief reads the string until it finds an integer number and reads until the number end, so from "SVN2345AB" it will return 2345
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT int qfReadFirstInt(const QString& text, bool* ok=NULL);
 
 /*! \brief convert the given string to a string suitable for use in filenames
     \ingroup qf3lib_tools

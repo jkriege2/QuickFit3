@@ -83,7 +83,7 @@ if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 		cp /mingw/bin/mingwm10.dll ../output/
 		cp /mingw/bin/libstdc++-6.dll ../output/
 		
-		USEDQTMODULES="QtCore4 QtGui4 QtOpenGL4 QtScript4 QtScriptTools4 QtSvg4 QtXml4"
+		USEDQTMODULES="QtCore4 QtGui4 QtOpenGL4 QtScript4 QtScriptTools4 QtSvg4 QtXml4 QtNetwork4"
 		USEDQTPLUGINS= "imageformats/*.dll"
 		mkdir ../output/qtplugins
 		for f in $USEDQTMODULES

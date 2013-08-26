@@ -108,6 +108,7 @@ DEFINES += QTLIB_IN_DLL LIB_IN_DLL
 
 CONFIG += link_prl
 
+QT += network
 
 include(../libquickfit.pri)
 

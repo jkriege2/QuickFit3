@@ -113,6 +113,15 @@
      </property>
      <item>
       <property name="text">
+       <string>General Settings</string>
+      </property>
+      <property name="icon">
+       <iconset resource="quickfit3.qrc">
+        <normaloff>:/icon.png</normaloff>:/icon.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>View &amp; Language</string>
       </property>
       <property name="icon">
@@ -167,6 +176,76 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
+         <widget class="QWidget" name="page_2">
+          <layout class="QFormLayout" name="formLayout_6">
+           <item row="0" column="0" colspan="2">
+            <widget class="QGroupBox" name="grpProxy">
+             <property name="title">
+              <string>Network Proxy</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_5">
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_12">
+                <property name="text">
+                 <string>hostname:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="edtProxyHost"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_13">
+                <property name="text">
+                 <string>port</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="spinProxyPort">
+                <property name="maximum">
+                 <number>65535</number>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_14">
+                <property name="text">
+                 <string>type:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="cmbProxyType">
+                <item>
+                 <property name="text">
+                  <string>system settings</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>give proxy below</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>no proxy</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="chkUpdates">
+             <property name="text">
+              <string>check for updates on startup</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
          <widget class="QWidget" name="stackedWidgetPage1">
           <layout class="QFormLayout" name="formLayout">
            <property name="fieldGrowthPolicy">
@@ -466,6 +545,10 @@ p, li { white-space: pre-wrap; }
   <include location="../lib/lib.qrc"/>
   <include location="../lib/lib.qrc"/>
   <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -475,8 +558,8 @@ p, li { white-space: pre-wrap; }
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>728</x>
-     <y>352</y>
+     <x>887</x>
+     <y>553</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -491,8 +574,8 @@ p, li { white-space: pre-wrap; }
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>728</x>
-     <y>352</y>
+     <x>887</x>
+     <y>553</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

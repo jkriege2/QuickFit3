@@ -28,9 +28,10 @@
 #include "qfhistogramview.h"
 #include "qfelidedlabel.h"
 #include "qfmathparser.h"
-
-
-
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include "qmodernprogresswidget.h"
 /*! \brief main widget for QuickFit
     \ingroup qf3app
 */
@@ -305,6 +306,10 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
         /** \brief check the update.xml file on the QF3 webpage for a new version. If \a userRequest is \c true, the method waits until the request completes, before returning control to the user, otherwise it runs in the background */
         void checkUpdates(bool userRequest=true);
+        void checkUpdatesAutomatic();
+        void showUpdateInfo(QNetworkReply *reply);
+        void openLabelLink(const QString& link);
+
     private:
         void createWidgets();
         void createActions();
@@ -451,6 +456,26 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
         /** \brief used to store the splash screen pixmap, as given to the constructor. This pixmap may be used for info dialogs. */
         QPixmap splashPix;
+
+        QNetworkAccessManager networkManager;
+        QNetworkReply* lastUpdateRequest;
+        QNetworkReply* lastUpdateRequestUser;
+        QLabel* labUpgrade;
+
+        struct updateInfo {
+            QString description;
+            int latestVersion;
+            QString date;
+            QString releasenotes;
+            QString link;
+            QString download;
+            QString os;
+            bool valid;
+        };
+
+        updateInfo readUpdateInfo(QIODevice* io);
 };
+
+
 
 #endif
