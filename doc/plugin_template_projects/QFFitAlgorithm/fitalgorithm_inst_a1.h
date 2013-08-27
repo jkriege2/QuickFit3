@@ -21,15 +21,17 @@ class QFFitAlgorithmInst_A1: public QFFitAlgorithm {
         /** \brief class destructor */
         virtual ~QFFitAlgorithmInst_A1() {}
         /** \copydoc QFFitAlgorithm::name() */
-        virtual QString name() const { return QObject::tr("long fit algorithm name"); };
+        virtual QString name() const { return QObject::tr("long fit algorithm name"); }
         /** \copydoc QFFitAlgorithm::shortName() */
-        virtual QString shortName() const { return QObject::tr("short name"); };
+        virtual QString shortName() const { return QObject::tr("short name"); }
         /** \copydoc QFFitAlgorithm::id() */
-        virtual QString id() const { return QString("fa_id"); };
+        virtual QString id() const { return QString("fa_id"); }
         /** \copydoc QFFitAlgorithm::get_supportsBoxConstraints() */
-        virtual bool get_supportsBoxConstraints() const { return true; };
+        virtual bool get_supportsBoxConstraints() const { return true; }
         /** \copydoc QFFitAlgorithm::displayConfig() */
         virtual bool displayConfig();
+        /** \copydoc QFFitAlgorithm::isThreadSafe() */
+        virtual bool isThreadSafe() const { return false; }
 };
 
 

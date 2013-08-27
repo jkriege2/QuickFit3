@@ -95,6 +95,10 @@ SUBDIRS += plg_fitalgorithm_fit_lmfit
 plg_fitalgorithm_fit_lmfit.subdir=./plugins/fitalgorithm_fit_lmfit
 plg_fitalgorithm_fit_lmfit.depends = lib libqf3widgets
 
+SUBDIRS += plg_fitalgorithm_fit_gsl
+plg_fitalgorithm_fit_gsl.subdir=./plugins/fitalgorithm_fit_gsl
+plg_fitalgorithm_fit_gsl.depends = lib libqf3widgets
+
 SUBDIRS += plg_basicimageimporters
 plg_basicimageimporters.subdir=./plugins/basicimageimporters
 plg_basicimageimporters.depends = lib

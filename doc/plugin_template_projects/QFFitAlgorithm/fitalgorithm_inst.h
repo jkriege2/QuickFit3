@@ -2,7 +2,6 @@
 #define HEADER_H
 
 #include "qfpluginfitalgorithm.h"
-#include <levmar/levmar.h>
 
 /*!
     \defgroup doxygen_GROUPNAME Levmar Fitting Algorithm Plugin
@@ -32,12 +31,12 @@ class QFFitAlgorithmInstPlugin : public QObject, public QFPluginFitAlgorithm {
 
         /** \brief name for the plugin */
         virtual QString getName() const {
-            return tr(/* plugin name */);
+            return QObject::tr(/* plugin name */);
         };
 
         /** \brief short description for the plugin */
         virtual QString getDescription() const {
-            return tr(/* plugin description */);
+            return QObject::tr(/* plugin description */);
         };
 
         /** \brief author the plugin */
@@ -47,12 +46,12 @@ class QFFitAlgorithmInstPlugin : public QObject, public QFPluginFitAlgorithm {
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr(/* plugin copyright */);
+            return QObject::tr(/* plugin copyright */);
         };
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const {
-            return tr(/* plugin weblink */);
+            return QObject::tr(/* plugin weblink */);
         };
 
 

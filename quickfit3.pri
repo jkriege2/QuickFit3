@@ -5,6 +5,8 @@ MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/
 RCC_DIR = ./.rccs/
 OBJECTS_DIR = ./.objs/
+GPL3LICENSE = ../doc/gpl-3.0.txt
+
 
 include("autoversioning.pri")
 

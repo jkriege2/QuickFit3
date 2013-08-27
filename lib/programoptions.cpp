@@ -2,6 +2,7 @@
 #include <iostream>
 #include <QtCore>
 #include <QDir>
+#include <QNetworkProxy>
 
 #ifndef __WINDOWS__
 # if defined(WIN32) || defined(WIN64) || defined(_MSC_VER) || defined(_WIN32)
@@ -33,7 +34,9 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     projectWindowStayOnTop=false;
     m_debugLogVisible=false;
 
-    proxy=QNetworkProxy::applicationProxy();
+    proxyHost=QNetworkProxy::applicationProxy().hostName();
+    proxyType=QNetworkProxy::applicationProxy().type();
+    proxyPort=QNetworkProxy::applicationProxy().port();
 
     QFileInfo fi(app->applicationFilePath());
     appDir=app->applicationDirPath();
@@ -112,9 +115,9 @@ void ProgramOptions::writeSettings() {
     settings->setValue("quickfit/helpWindowsStayOnTop", helpWindowsStayOnTop);
     settings->setValue("quickfit/projectWindowStayOnTop", projectWindowStayOnTop);
     settings->setValue("quickfit/debugLogVisible", m_debugLogVisible);
-    settings->setValue("quickfit/proxy/host", proxy.hostName());
-    settings->setValue("quickfit/proxy/port", proxy.port());
-    settings->setValue("quickfit/proxy/type", proxy.type());
+    settings->setValue("quickfit/proxy/host", proxyHost);
+    settings->setValue("quickfit/proxy/port", proxyPort);
+    settings->setValue("quickfit/proxy/type", proxyType);
 }
 
 
@@ -138,9 +141,9 @@ void ProgramOptions::readSettings() {
     projectWindowStayOnTop=settings->value("quickfit/projectWindowStayOnTop", projectWindowStayOnTop).toBool();
     m_debugLogVisible=settings->value("quickfit/debugLogVisible", m_debugLogVisible).toBool();
 
-    proxy.setHostName(settings->value("quickfit/proxy/host", proxy.hostName()).toString());
-    proxy.setPort(settings->value("quickfit/proxy/port", proxy.port()).toUInt());
-    proxy.setType((QNetworkProxy::ProxyType)settings->value("quickfit/proxy/type", (int)proxy.type()).toInt());
+    proxyHost=(settings->value("quickfit/proxy/host", proxyHost).toString());
+    proxyPort=(settings->value("quickfit/proxy/port", proxyPort).toUInt());
+    proxyType=((QNetworkProxy::ProxyType)settings->value("quickfit/proxy/type", proxyType).toInt());
 
 
     languageID=settings->value("quickfit/language", languageID).toString();
@@ -215,40 +218,41 @@ QString ProgramOptions::getApplicationDirectory() const {
     return appDir;
 }
 
-QNetworkProxy ProgramOptions::getProxy() const
-{
-    return proxy;
-}
 
 void ProgramOptions::setProxyHost(const QString &host)
 {
-    proxy.setHostName(host);
+    //proxy.setHostName(host);
+    proxyHost=host;
 }
 
 void ProgramOptions::setProxyPort(quint16 port)
 {
-    proxy.setPort(port);
+    //proxy.setPort(port);
+    proxyPort=port;
 }
 
 quint16 ProgramOptions::getProxyPort() const
 {
-    return proxy.port();
+    //return proxy.port();
+    return proxyPort;
 }
 
 QString ProgramOptions::getProxyHost() const
 {
-    return proxy.hostName();
+    //return proxy.hostName();
+    return proxyHost;
 }
 
 int ProgramOptions::getProxyType() const
 {
-    return proxy.type();
+    //return proxy.type();
+    return proxyType;
 }
 
-void ProgramOptions::setProxyType(QNetworkProxy::ProxyType type)
+void ProgramOptions::setProxyType(int type)
 {
-    if (type<0) proxy.setType(QNetworkProxy::DefaultProxy);
-    else proxy.setType(type);
+    if (type<0) proxyType=0; //proxy.setType(QNetworkProxy::DefaultProxy);
+    else proxyType=type; //proxy.setType(type);
 }
 
 

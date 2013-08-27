@@ -15,7 +15,7 @@ OBJECTS_DIR = ./.objs/
 QFOUTPUT = ../../$${OUTPUTDIR_NAME}
 DESTDIR = $$QFOUTPUT/plugins
 
-
+GPL3LICENSE = ../../doc/gpl-3.0.txt
 
 #release {
 #    QFOUTPUT = ../../output_release
@@ -108,7 +108,6 @@ DEFINES += QTLIB_IN_DLL LIB_IN_DLL
 
 CONFIG += link_prl
 
-QT += network
 
 include(../libquickfit.pri)
 

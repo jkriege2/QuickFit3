@@ -4,7 +4,8 @@ function replace_in_all {
 	echo "replace: " $1 
 	for i in ./$DIRNAME/*.cpp ./$DIRNAME/*.h ./$DIRNAME/*.pro ./$DIRNAME/*.qrc ./$DIRNAME/help/*.html; do 
 	  echo "  -> " $i
-	  sed $1 $i > $i.temp | mv $i.temp $i
+	  sed $1 $i > $i.temp 
+	  mv $i.temp $i
 	done
 }
 

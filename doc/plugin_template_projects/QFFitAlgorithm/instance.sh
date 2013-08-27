@@ -2,9 +2,10 @@
 
 function replace_in_all {
 	echo "replace: " $1 
-	for i in ./$DIRNAME/*.cpp ./$DIRNAME/*.h ./$DIRNAME/*.pro ./$DIRNAME/*.qrc ./$DIRNAME/help/*.html; do 
+	for i in ./$DIRNAME/*.cpp ./$DIRNAME/*.h ./$DIRNAME/*.pro ./$DIRNAME/*.qrc ./$DIRNAME/*.ui ./$DIRNAME/help/*.html; do 
 	  echo "  -> " $i
-	  sed $1 $i > $i.temp | mv $i.temp $i
+	  sed $1 $i > $i.temp 
+	  mv $i.temp $i
 	done
 }
 
@@ -91,6 +92,7 @@ replace_in_all 's/fa_id/'$FITALGCNAME'/g'
 
 replace_in_all 's/'$BASENAME'_a1config.h/'$FNAMEFF'config.h/g'
 replace_in_all 's/'$BASENAME'_a1config.cpp/'$FNAMEFF'config.cpp/g'
+replace_in_all 's/'$BASENAME'_a1config.ui/'$FNAMEFF'config.ui/g'
 replace_in_all 's/'$BASENAME'_a1.h/'$FNAMEFF'.h/g'
 replace_in_all 's/'$BASENAME'_a1.cpp/'$FNAMEFF'.cpp/g'
 replace_in_all 's/HEADER_A1_H/'$CLASSNAMEFA_UC'_H/g'

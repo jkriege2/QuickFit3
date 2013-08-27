@@ -9,6 +9,12 @@
 #include <QSpinBox>
 #include <QDoubleSpinBox>
 #include <QCheckBox>
+#include "qffitalgorithm.h"
+
+namespace Ui {
+    class QFFitAlgorithmInst_A1ConfigDialog;
+}
+
 
 /*! \brief This class represents a configuration dialog for ...
     \ingroup doxygen_GROUPNAME
@@ -18,15 +24,14 @@ class QFFitAlgorithmInst_A1ConfigDialog : public QDialog {
     public:
         /** \brief class constructor */
         QFFitAlgorithmInst_A1ConfigDialog(QWidget *parent = 0);
+		~QFFitAlgorithmInst_A1ConfigDialog();
 
-        /** \brief set the gradDelta value before displaying the dialog and also (optionally) its increment */
-        void setParamName(double value=10, double inc=1);
-        /** \brief returns the current gradDelta value */
-        inline double getParamName() { return spinParam->value(); };
-
-    protected:
-        QDoubleSpinBox* spinParam;
-        QDialogButtonBox* buttons;
+        /** \brief initialize the dialog from the parameters in the given algorithm */
+        void init(const QFFitAlgorithm* algorithm);
+        /** \brief store the parameters to the given algorithm */
+        void storeParams(QFFitAlgorithm* algorithm) const;
+    private:
+        Ui::QFFitAlgorithmInst_A1ConfigDialog *ui;
 };
 
 #endif //HEADER_A1_CONFIG_H

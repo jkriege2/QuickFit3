@@ -15,7 +15,7 @@
 #include "qfhtmlhelptools.h"
 #include "renamegroupsdialog.h"
 #include <QNetworkRequest>
-
+#include <QNetworkProxy>
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
 
@@ -71,7 +71,9 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     lastUpdateRequestUser=NULL;
     connect(&networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(showUpdateInfo(QNetworkReply*)));
 
-    networkManager.setProxy(s->getProxy());
+    QNetworkProxy proxy;
+    ProgramOptionsSetQNetworkProxy(proxy);
+    networkManager.setProxy(proxy);
 
     newProjectTimer.setInterval(2500);
     newProjectTimer.stop();
@@ -3126,7 +3128,10 @@ void MainWindow::setRDRPropertyByRegExp()
 
 void MainWindow::checkUpdates(bool userRequest)
 {
-    networkManager.setProxy(settings->getProxy());
+    //networkManager.setProxy(settings->getProxy());
+    QNetworkProxy proxy;
+    ProgramOptionsSetQNetworkProxy(proxy);
+    networkManager.setProxy(proxy);
 
     QUrl url = qfUpdateXMLURL();
     QNetworkRequest request(url);

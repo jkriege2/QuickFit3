@@ -26,27 +26,27 @@ class QFFitAlgorithmInst : public QObject, public QFPluginFitFunction {
 
         /** \brief name for the plugin */
         virtual QString getName() const {
-            return tr("");
+            return QObject::tr("");
         };
 
         /** \brief short description for the plugin */
         virtual QString getDescription() const {
-            return tr("");
+            return QObject::tr("");
         };
 
         /** \brief author the plugin */
         virtual QString getAuthor() const {
-            return QString("");
+            return QObject::tr("");
         };
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("");
+            return QObject::tr("");
         };
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const {
-            return tr("");
+            return QObject::tr("");
         };
 
         /** \copydoc QFPlugin::getID()  */

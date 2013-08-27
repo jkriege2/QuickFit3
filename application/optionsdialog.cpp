@@ -114,7 +114,7 @@ void OptionsDialog::open(ProgramOptions* options) {
         options->setDebugLogVisible(chkDebugMessages->isChecked());
         options->setProxyHost(edtProxyHost->text());
         options->setProxyPort(spinProxyPort->value());
-        options->setProxyType((QNetworkProxy::ProxyType)cmbProxyType->currentIndex());
+        options->setProxyType(cmbProxyType->currentIndex());
         options->setConfigValue("quickfit/checkupdates", chkUpdates->isChecked());
 
         for (int i=0; i<m_plugins.size(); i++) {

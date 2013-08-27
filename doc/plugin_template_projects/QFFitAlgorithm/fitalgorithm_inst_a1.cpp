@@ -19,7 +19,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmInst_A1::intFit(double* paramsOut, doubl
 	// DO YOU FIT HERE
 	//////////////////////////////////////////////////////////////////////
 
-    result.params["param_name"]=param;
+    result.addNumber("param_name", param);
 
     result.message=QObject::tr("<b>fit was successfull</b>");
     result.messageSimple=QObject::tr("fit was successfull");;
@@ -31,11 +31,11 @@ bool QFFitAlgorithmInst_A1::displayConfig() {
     QFFitAlgorithmInst_A1ConfigDialog* dlg=new QFFitAlgorithmInst_A1ConfigDialog(0);
 
 	// init widget here:
-    //dlg->setParam(getParameter("param_name").toDouble());
+    dlg->init(this);
 
     if (dlg->exec()==QDialog::Accepted) {
 		// read back entered values here
-        //setParameter("param_name", dlg->getParamName());
+        dlg->storeParams(this);
         delete dlg;
         return true;
     } else {

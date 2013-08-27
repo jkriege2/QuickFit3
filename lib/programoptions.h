@@ -5,7 +5,6 @@
 #include <QtGui>
 #include "lib_imexport.h"
 
-#include <QNetworkProxy>
 
 /*! \brief this class manages the overall program options (and may also display an options Dialog
     \ingroup qf3lib_settings
@@ -82,14 +81,13 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         /** \brief returns the directory of the QuickFit main application */
         QString getApplicationDirectory() const;
 
-        QNetworkProxy getProxy() const;
 
         void setProxyHost(const QString& host);
         void setProxyPort(quint16 port);
         quint16 getProxyPort() const;
         QString getProxyHost() const;
         int getProxyType() const;
-        void setProxyType(QNetworkProxy::ProxyType type);
+        void setProxyType(int type);
 
         bool getUserSaveAfterFirstEdit() const;
         void setUserSaveAfterFirstEdit(bool set);
@@ -131,7 +129,10 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         /** \brief the application this object manages the properties for */
         QApplication* app;
 
-        QNetworkProxy proxy;
+        //QNetworkProxy proxy;
+        quint16 proxyPort;
+        QString proxyHost;
+        int proxyType;
 
         /** \brief style to use in the application */
         QString style;
@@ -201,5 +202,12 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
             inst->settings->sync();
         }
 };
+
+
+#define ProgramOptionsSetQNetworkProxy(proxy) { \
+    proxy.setHostName(ProgramOptions::getInstance()->getProxyHost()); \
+    proxy.setPort(ProgramOptions::getInstance()->getProxyPort()); \
+    proxy.setType((QNetworkProxy::ProxyType)ProgramOptions::getInstance()->getProxyType()); \
+}
 
 #endif // PROGRAMOPTIONS_H

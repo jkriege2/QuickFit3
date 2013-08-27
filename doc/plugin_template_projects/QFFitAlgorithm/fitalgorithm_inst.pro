@@ -18,7 +18,7 @@ SOURCES += fitalgorithm_inst.cpp \
            fitalgorithm_inst_a1config.cpp \
 		   fitalgorithm_inst_a1.cpp
 
-FORMS +=
+FORMS += fitalgorithm_inst_a1config.ui
 
 RESOURCES +=
 

@@ -57,5 +57,6 @@ SRC_DISTRIBUTED.files = $$HEADERS \
                         $$SOURCES \
                         $$FORMS \
                         $$RESOURCES \
-                        $$TRANSLATIONS
+                        $$TRANSLATIONS \
+                        $$GPL3LICENSE
 

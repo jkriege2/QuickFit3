@@ -3,7 +3,7 @@
 #include <cmath>
 #include "lmmin.h"
 
-struct evalData {
+struct QFFItAlgorithmGSL_evalData {
     QFFitAlgorithm::Functor* model;
     const double* paramsMin;
     const double* paramsMax;
@@ -11,7 +11,7 @@ struct evalData {
 };
 
 void lmfit_eval(const double *par, int m_dat, const void *data, double *fvec, int *info) {
-    evalData* edata=(evalData*)data;
+    QFFItAlgorithmGSL_evalData* edata=(QFFItAlgorithmGSL_evalData*)data;
     double* p=(double*)malloc(edata->pcount*sizeof(double));
     for (int i=0; i<edata->pcount; i++) {
         p[i]=par[i];
@@ -52,7 +52,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFit::intFit(double* paramsOut, double*
     control.stepbound=getParameter("stepbound").toDouble();
     control.maxcall=getParameter("max_iterations").toInt();
 
-    evalData d;
+    QFFItAlgorithmGSL_evalData d;
     d.model=model;
     d.paramsMin=paramsMin;
     d.paramsMax=paramsMax;
