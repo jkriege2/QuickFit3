@@ -172,9 +172,15 @@ Section "${PRODUCT_NAME} ${PRODUCT_VERSION}" sec_main
 	createShortCut "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}_readme.lnk" "$INSTDIR\README.txt" "" "" 0 SW_SHOWNORMAL "" "Read Me" 
 	createShortCut "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}_uninstall.lnk" "$INSTDIR\Uninstall.exe" "" 
 	
-	# store to registry, whether special version
-	WriteRegStr HKLM  "${REG_KEY}" "SpecialVersion" "%%STORESPECIALVERSION%%"
 	
+	# store to registry, whether special version
+	SetRegView 64
+	WriteRegStr HKLM  "${REG_KEY}" 'SpecialVersion' '%%STORESPECIALVERSION%%'
+	WriteRegStr HKCU  "${REG_KEY}" 'SpecialVersion' '%%STORESPECIALVERSION%%'
+	SetRegView 32
+	WriteRegStr HKLM  "${REG_KEY}" 'SpecialVersion' '%%STORESPECIALVERSION%%'
+	WriteRegStr HKCU  "${REG_KEY}" 'SpecialVersion' '%%STORESPECIALVERSION%%'
+
 	
 !insertmacro MUI_STARTMENU_WRITE_END
 	
