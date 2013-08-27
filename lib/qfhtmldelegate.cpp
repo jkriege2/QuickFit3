@@ -66,21 +66,22 @@ void QFHTMLDelegate::drawCheck(QPainter *painter,
         style->drawPrimitive(QStyle::PE_IndicatorViewItemCheck, &opt, painter, NULL);
     } else {
         double lw=qMax(0.1, double(rect.width())/15.0);
+        double offset=double(rect.width())/10.0;
         painter->save();
-        painter->translate(rect.width()/10, rect.height()/10);
-        painter->scale(0.8,0.8);
         QPen p=QPen(option.palette.color(QPalette::Dark));
         p.setWidthF(lw);
-        QRectF r=QRectF(QPointF(rect.topLeft())+QPointF(lw,lw), QPointF(rect.bottomRight())-QPointF(lw,lw));
+        QRectF r=QRectF(QPointF(rect.topLeft())+QPointF(lw+offset,lw+offset), QPointF(rect.bottomRight())-QPointF(lw+offset,lw+offset));
         painter->setPen(p);
         painter->setBrush(QBrush(option.palette.color(QPalette::QPalette::Base)));
         painter->drawRect(r);
 
+
         if (state==Qt::Checked) {
             p.setColor(option.palette.color(QPalette::WindowText));
+            r=QRectF(QPointF(r.topLeft())+QPointF(lw,lw), QPointF(r.bottomRight())-QPointF(lw,lw));
             painter->setPen(p);
-            painter->drawLine(rect.topLeft(), rect.bottomRight());
-            painter->drawLine(rect.topRight(), rect.bottomLeft());
+            painter->drawLine(r.topLeft(), r.bottomRight());
+            painter->drawLine(r.topRight(), r.bottomLeft());
         }
 
         painter->restore();
