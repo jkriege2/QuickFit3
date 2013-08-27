@@ -23,7 +23,47 @@
 
 
 <!--
-		<li><a name="2602"><b>2013-08-22 (SVN: 2602)</b>-->
+		<li><a name="2623"><b>2013-08-27 (SVN: 2624)</b>-->
+		
+		<ul>
+		  <li><b>new plugins:</b><ul>
+		    <li><b>fitalgorithms_gsl</b>: this plugin makes the fit and minimization algorithms in the GNU SCIENTIFIC LIBRARY (GSL) available to QuickFit (implemented simplex, randomized simplex, BFGS2, steepest descent, conjugate gradient minimizer)</li>
+		  </ul></li>
+		  <li><b>QuickFit</b><ul>
+		    <li>made histograms use less space by default</li>
+		    <li>improved print quality of fancy text/check marks in enhanced tables</li>
+		    <li>tables can be copied as image to clipboard</li>
+		    <li>can set network proxy in settings Dialog</li>
+		    <li>added automatic and manual (Help menu) updates check</li>
+		    <li>can select whether automatically check for updates in settings dialog</li>
+		  </ul></li>	
+		  <li><b>imagingFCS</b><ul>
+		    <li>added label with the relative CCF amplitudes to the FCCS-mode widgets</li>
+		    <li>bugfixes in "mask by image" dialog (mixed up selection names of modes)</li>
+		    <li>added sliders to "mask by image" dialog </li>
+		  </ul></li>	
+		  <li><b>qfe_spectraviewer</b><ul>
+		    <li> added spectra (PHE, TYR, TRP, FAH, NADH, anthracene)</li>
+		    <li>added chlorophyll spectra</li>
+		  </ul></li>	
+		  <li><b>imFCCSFit</b><ul>
+		    <li>"calculate crosstalk-corrected relative CCF amplitude" now can also use the g(0) fit result as input data!</li>
+		    <li>added global-local iterations to QFGlobalFitTool</li>
+		  </ul></li>	
+		  <li><b>spim_fcs_fitmodels</b><ul>
+		    <li>bugfix in new "D for every channel" model: THe D2 of the red channel was not used correctly!</li>
+		    <li>added fit function with one and two D's per channel, not per species</li>
+		    <li>FCCS fit function have been renamed (clearer notation)</li>
+		  </ul></li>	
+		  <li><b>fccs_fitmodels</b><ul>
+		    <li>added fit function with one and two D's per channel, not per species</li>
+		    <li>FCCS fit function have been renamed (clearer notation)</li>
+		  </ul></li>	
+
+		</ul>
+
+		
+		<li><a name="2602"><b>2013-08-22 (SVN: 2602)</b>
 		<ul>
 		  <li><b>new plugins:</b><ul>
 		    <li><b>general_fitfunctions</b>: several general fit functions (exponential, power law, polynomial, distributions, sigmoidals ...) for fits in table plugin. These mostly also include routines to guess initial parameters for the fits!</li>
