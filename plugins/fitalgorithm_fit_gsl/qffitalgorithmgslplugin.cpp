@@ -17,7 +17,7 @@ QStringList QFFitAlgorithmGSLPluginPlugin::getIDs() const {
     sl<<"fit_gsl_simplexrand";
     sl<<"fit_gsl_bfgs2";
     sl<<"fit_gsl_steepest_descent";
-    sl<<"fit_gsl_steepest_descent";
+    sl<<"fit_gsl_conjugate_pr";
     sl<<"fit_gsl_conjugate_fr";
     return sl;
 }

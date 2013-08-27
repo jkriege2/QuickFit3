@@ -19,6 +19,7 @@ QFLIB_EXPORT QString qfInfoLicense();
 QFLIB_EXPORT QString qfInfoSVNVersion();
 QFLIB_EXPORT QString qfInfoCompiler();
 QFLIB_EXPORT QString qfInfoCompileDate();
+QFLIB_EXPORT bool qfIsSpecialVersion();
 QFLIB_EXPORT QUrl qfUpdateXMLURL();
 
 #endif //QFVERSION_H

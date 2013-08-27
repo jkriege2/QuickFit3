@@ -23,6 +23,12 @@ QFFitAlgorithm::FitResult QFFitAlgorithmGSLSimplexRand::intFit(double* paramsOut
     QFFitAlgorithm::FitResult result;
 
     int paramCount=model->get_paramcount(); // number of parameters
+    if (paramCount<=0) {
+        result.fitOK=false;
+        result.message=QObject::tr("no parameters to optimize");
+        result.messageSimple=result.message;
+        return result;
+    }
 
 
     QFFItAlgorithmGSL_evalData d;

@@ -8,6 +8,7 @@
 class QFImFCCSRelativeCCFDialog;//forward
 class QFImFCCSRelativeCCFCrosstalkDialog;
 class QFImFCCSRelativeIntensityDialog;//forward
+class QFImFCCSAmplitudeFitDialog;
 
 /*!
     \defgroup qf3rdrdp_imfccsfit Evaluation Item Plugin for imaging Fluorescence Crosscorrelation Spectroscopy Fits
@@ -81,11 +82,14 @@ class QFImFCCSFitEvaluation : public QObject, public QFPluginEvaluationItemBase,
         /** \brief calculates the relative intensity */
         void calcRelativeIntensity();
 
+        void calcAmplitudeFit();
+
     private:
 
         QPointer<QFImFCCSRelativeCCFDialog> dlgRelCCF;
         QPointer<QFImFCCSRelativeCCFCrosstalkDialog> dlgRelCCFCrosstalk;
         QPointer<QFImFCCSRelativeIntensityDialog> dlgRelInten;
+        QPointer<QFImFCCSAmplitudeFitDialog> dlgAmpFit;
 };
 
 #endif // QFIMFCCSFITEVALUATION_H

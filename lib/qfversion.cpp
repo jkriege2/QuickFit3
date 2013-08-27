@@ -1,6 +1,7 @@
 #include "qfversion.h"
-
+#include <QSettings>
 #include "../version.h"
+#include "qftools.h"
 
 QString qfInfoVersion() {
     return QString(QF_VERSION);
@@ -60,5 +61,11 @@ QString qfInfoCompileDate() {
 
 
 QUrl qfUpdateXMLURL() {
+    if (qfIsSpecialVersion())  return QUrl::fromEncoded(QString(QF_UPDATESPECIALXMLURL).toLocal8Bit());
     return QUrl::fromEncoded(QString(QF_UPDATEXMLURL).toLocal8Bit());
+}
+
+bool qfIsSpecialVersion() {
+    QSettings settings("HKEY_LOCAL_MACHINE\\Software\\QuickFit3_"+QString::number(getApplicationBitDepth()), QSettings::NativeFormat);
+    return settings.value("SpecialVersion", "std").toString().toLower().trimmed()=="special";
 }

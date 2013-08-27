@@ -388,6 +388,17 @@ sed "s/%%INSTALLER_INSTDIR%%/$INSTALLER_INSTDIR/" nsis_basicscript.~si > nsis_ba
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
 
+if [ "${deployspecials}" == "1" ]; then
+	sed "s/%%STORESPECIALVERSION%%/special/" nsis_basicscript.~si > nsis_basicscript.~~s
+	cp -f nsis_basicscript.~~s nsis_basicscript.~si
+	ls -l *.~*
+else
+	sed "s/%%STORESPECIALVERSION%%/std/" nsis_basicscript.~si > nsis_basicscript.~~s
+	cp -f nsis_basicscript.~~s nsis_basicscript.~si
+	ls -l *.~*
+fi
+
+
 cp nsis_basicscript.~si ${INSTALLER_BASENAME}.nsi
 #rm nsis_basicscript.~si
 rm *.~*

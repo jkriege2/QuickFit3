@@ -10,6 +10,7 @@
 #include "qfmathtools.h"
 #include "qfrawdatarecord.h"
 #include "qfimfccsrelativeccfcrosstalkdialog.h"
+#include "qfimfccsamplitudefitdialog.h"
 
 QFImFCCSFitEvaluation::QFImFCCSFitEvaluation(QObject* parent):
     QObject(parent)
@@ -17,12 +18,31 @@ QFImFCCSFitEvaluation::QFImFCCSFitEvaluation(QObject* parent):
     dlgRelCCF=NULL;
     dlgRelCCFCrosstalk=NULL;
     dlgRelInten=NULL;
+    dlgAmpFit=NULL;
     QFPluginServices::getInstance()->registerSettingsPane(this);
 }
 
 QFImFCCSFitEvaluation::~QFImFCCSFitEvaluation()
 {
-    //dtor
+    if (dlgRelCCF) {
+        dlgRelCCF->close();
+        dlgRelCCF->deleteLater();
+    }
+
+    if (dlgRelCCFCrosstalk) {
+        dlgRelCCFCrosstalk->close();
+        dlgRelCCFCrosstalk->deleteLater();
+    }
+
+    if (dlgRelInten) {
+        dlgRelInten->close();
+        dlgRelInten->deleteLater();
+    }
+
+    if (dlgAmpFit) {
+        dlgAmpFit->close();
+        dlgAmpFit->deleteLater();
+    }
 }
 
 QFEvaluationItem* QFImFCCSFitEvaluation::createRecord(QFProject* parent) {
@@ -41,15 +61,21 @@ void QFImFCCSFitEvaluation::init()
 {
     QMenu* menu=new QMenu(tr("imFCCS"));
     menu->setIcon(QIcon(getIconFilename()));
+    QAction* actI=new QAction(tr("calculate &relative intensity"), menu);
+    connect(actI, SIGNAL(triggered()), this, SLOT(calcRelativeIntensity()));
+    menu->addAction(actI);
+    menu->addSeparator();
     QAction* actCCF=new QAction(tr("calculate &rel. CCF amplitude"), menu);
     connect(actCCF, SIGNAL(triggered()), this, SLOT(calcRelativeCCF()));
     menu->addAction(actCCF);
     QAction* actCCFCT=new QAction(tr("calculate &rel. CCF amplitude, crosstalk correction"), menu);
     connect(actCCFCT, SIGNAL(triggered()), this, SLOT(calcRelativeCCFCrosstalk()));
     menu->addAction(actCCFCT);
-    QAction* actI=new QAction(tr("calculate &relative intensity"), menu);
-    connect(actI, SIGNAL(triggered()), this, SLOT(calcRelativeIntensity()));
-    menu->addAction(actI);
+    menu->addSeparator();
+    QAction* actAmpFit=new QAction(tr("imFCCS amplitude fit"), menu);
+    connect(actAmpFit, SIGNAL(triggered()), this, SLOT(calcAmplitudeFit()));
+    menu->addAction(actAmpFit);
+    actAmpFit->setEnabled(false);
 
     QFPluginServices::getInstance()->getMenu("tools")->addMenu(menu);
 }
@@ -102,6 +128,12 @@ void QFImFCCSFitEvaluation::calcRelativeIntensity()
     if (!dlgRelInten) dlgRelInten=new QFImFCCSRelativeIntensityDialog(NULL);
     dlgRelInten->show();
 
+}
+
+void QFImFCCSFitEvaluation::calcAmplitudeFit()
+{
+    if (!dlgAmpFit) dlgAmpFit=new QFImFCCSAmplitudeFitDialog(NULL);
+    dlgAmpFit->show();
 }
 
 

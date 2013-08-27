@@ -462,6 +462,11 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QNetworkReply* lastUpdateRequestUser;
         QLabel* labUpgrade;
 
+        struct updateWarning {
+            int warnSince;
+            QString message;
+        };
+
         struct updateInfo {
             QString description;
             int latestVersion;
@@ -470,6 +475,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
             QString link;
             QString download;
             QString os;
+            QList<updateWarning> warnings;
             bool valid;
         };
 

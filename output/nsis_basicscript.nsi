@@ -149,10 +149,11 @@ Section "${PRODUCT_NAME} ${PRODUCT_VERSION}" sec_main
 	WriteRegStr HKLM  "${UNINSTALL_KEY}" "Publisher" "$\"${COMPANY_NAME}$\""
 	WriteRegStr HKLM  "${UNINSTALL_KEY}" "URLUpdateInfo" "$\"${UPDATEURL}$\""
 	WriteRegStr HKLM  "${UNINSTALL_KEY}" "URLInfoAbout" "$\"${HELPURL}$\""
-	WriteRegStr HKLM  "${UNINSTALL_KEY}" "DisplayVersion" "$\"${PRODUCT_VERSION}$\""
+	
 	# There is no option for modifying or repairing the install
 	WriteRegDWORD HKLM  "${UNINSTALL_KEY}" "NoModify" 1
 	WriteRegDWORD HKLM  "${UNINSTALL_KEY}" "NoRepair" 1
+	
 	# Set the INSTALLSIZE constant (!defined at the top of this script) so Add/Remove Programs can accurately report the size
 	 ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
 	IntFmt $0 "0x%08X" $0
@@ -169,8 +170,12 @@ Section "${PRODUCT_NAME} ${PRODUCT_VERSION}" sec_main
 	createShortCut "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}_releasenotes.lnk" "$INSTDIR\releasenotes.html" "" "" 0 SW_SHOWNORMAL "" "Release Notes" 
 	createShortCut "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}_license.lnk" "$INSTDIR\LICENSE.txt" "" "" 0 SW_SHOWNORMAL "" "License" 
 	createShortCut "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}_readme.lnk" "$INSTDIR\README.txt" "" "" 0 SW_SHOWNORMAL "" "Read Me" 
-
 	createShortCut "$SMPROGRAMS\$StartMenuFolder\${PRODUCT_NAME}_uninstall.lnk" "$INSTDIR\Uninstall.exe" "" 
+	
+	# store to registry, whether special version
+	WriteRegStr HKLM  "${REG_KEY}" "SpecialVersion" "%%STORESPECIALVERSION%%"
+	
+	
 !insertmacro MUI_STARTMENU_WRITE_END
 	
 	Pop $OUTDIR ; Restore the original output directory

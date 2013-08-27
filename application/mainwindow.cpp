@@ -1475,40 +1475,6 @@ QString MainWindow::strippedName(const QString &fullFileName) {
     return QFileInfo(fullFileName).fileName();
 }
 
-MainWindow::updateInfo MainWindow::readUpdateInfo(QIODevice *io)
-{
-    MainWindow::updateInfo res;
-    res.valid=false;
-    QDomDocument xml;
-    xml.setContent(io);
-    QDomElement e=xml.firstChildElement("updates");
-    if (!e.isNull()) {
-        e=e.firstChildElement("product");
-        if (!e.isNull()) {
-            QString pname=e.attribute("name").toLower().trimmed();
-            int version=e.attribute("version").toLower().trimmed().toInt();
-            if (pname=="quickfit") {
-                res.valid=true;
-                res.latestVersion=version;
-                res.date=e.firstChildElement("date").text();
-                res.releasenotes=e.firstChildElement("releasenotes").text();
-                res.link=e.firstChildElement("link").text();
-                res.description=e.firstChildElement("description").text();
-                QString os=getOSShortName();
-                QDomElement ee=e.firstChildElement("directlink");
-                while (!ee.isNull()) {
-                    if (ee.attribute("os").toLower().trimmed()==os) {
-                        res.download=ee.text();
-                        res.os=ee.attribute("os");
-                        break;
-                    }
-                    ee=ee.nextSiblingElement("directlink");
-                }
-            }
-        }
-    }
-    return res;
-}
 
 void MainWindow::projectElementDoubleClicked ( const QModelIndex & index ) {
     if (project) {
@@ -3181,15 +3147,37 @@ void MainWindow::showUpdateInfo(QNetworkReply* reply) {
                 log_global_text("      download:     "+info.download+"\n");
                 log_global_text("      link:         "+info.link+"\n");
                 log_global_text("      releasenotes: "+info.releasenotes+"\n");
+                for (int i=0; i<info.warnings.size(); i++) {
+                    if (svn<=info.warnings[i].warnSince) log_global_text("      warning (cur. version <= "+QString::number(info.warnings[i].warnSince)+"): "+info.warnings[i].message+"\n");
+                }
             }
             if (ok && info.valid && svn<info.latestVersion) {
                 if (lastUpdateRequestUser==reply) {
-                    if (QMessageBox::information(this, tr("QuickFit updates"), tr("new QuickFit 3.0 version (SVN version: %3, date: %2) available:\n  %4\n\n  %1\n Go to Download site?").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+                    QString warning="";
+                    if (info.warnings.size()>0) {
+                        warning+=tr("\n\nIt is no longer advised to use your current version (SVN%1). Reasons:").arg(svn);
+                    }
+                    for (int i=0; i<info.warnings.size(); i++) {
+                        if (svn<=info.warnings[i].warnSince) {
+                            warning+=tr("\n   warning (older than SVN%1): %2").arg(info.warnings[i].warnSince).arg(info.warnings[i].message);
+                        }
+                    }
+
+                    if (QMessageBox::information(this, tr("QuickFit updates"), tr("new QuickFit 3.0 version (SVN version: %3, date: %2) available:\n\n  %4%5\n\n  Link: %1\n Go to Download site?").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description).arg(warning), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
                         QDesktopServices::openUrl(info.link);
                     }
                     lastUpdateRequestUser=NULL;
                 } else if (lastUpdateRequest==reply) {
-                    labUpgrade->setText(tr("<b>new QuickFit 3.0 version (SVN version: %3, date: %2) available: <a href=\"%1\">go to download</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small><a href=\"close_labupdate\">close message</a></small><br>&nbsp;&nbsp;&nbsp;&nbsp;description: <i>%4</i>").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description));
+                    QString message=tr("<b>new QuickFit 3.0 version (SVN version: %3, date: %2) available: <a href=\"%1\">go to download</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small><a href=\"close_labupdate\">close message</a></small><br>&nbsp;&nbsp;&nbsp;&nbsp;description: <i>%4</i>").arg(info.link).arg(info.date).arg(info.latestVersion).arg(info.description);
+                    if (info.warnings.size()>0) {
+                        message+=tr("<br>&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"darkred\">It is no longer advised to use your current version (SVN%1). Reasons:</font>").arg(svn);
+                    }
+                    for (int i=0; i<info.warnings.size(); i++) {
+                        if (svn<=info.warnings[i].warnSince) {
+                            message+=tr("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"darkred\">warning (older than %1): <i>%2</i></font>").arg(info.warnings[i].warnSince).arg(info.warnings[i].message);
+                        }
+                    }
+                    labUpgrade->setText(message);
                     labUpgrade->setVisible(true);
                     lastUpdateRequest=NULL;
                 }
@@ -3223,4 +3211,47 @@ void MainWindow::openLabelLink(const QString &link)
 QFRawDataRecordFactory *MainWindow::getRawDataRecordFactory() const
 {
     return rawDataFactory;
+}
+
+MainWindow::updateInfo MainWindow::readUpdateInfo(QIODevice *io)
+{
+    MainWindow::updateInfo res;
+    res.valid=false;
+    QDomDocument xml;
+    xml.setContent(io);
+    QDomElement e=xml.firstChildElement("updates");
+    if (!e.isNull()) {
+        e=e.firstChildElement("product");
+        if (!e.isNull()) {
+            QString pname=e.attribute("name").toLower().trimmed();
+            int version=e.attribute("version").toLower().trimmed().toInt();
+            if (pname=="quickfit") {
+                res.valid=true;
+                res.latestVersion=version;
+                res.date=e.firstChildElement("date").text();
+                res.releasenotes=e.firstChildElement("releasenotes").text();
+                res.link=e.firstChildElement("link").text();
+                res.description=e.firstChildElement("description").text();
+                QString os=getOSShortName();
+                QDomElement ee=e.firstChildElement("directlink");
+                while (!ee.isNull()) {
+                    if (ee.attribute("os").toLower().trimmed()==os) {
+                        res.download=ee.text();
+                        res.os=ee.attribute("os");
+                        break;
+                    }
+                    ee=ee.nextSiblingElement("directlink");
+                }
+                ee=e.firstChildElement("warning");
+                while (!ee.isNull()) {
+                    updateWarning w;
+                    w.warnSince=ee.attribute("fromversion").toLower().trimmed().toInt();
+                    w.message=ee.text();
+                    res.warnings.append(w);
+                    ee=ee.nextSiblingElement("warning");
+                }
+            }
+        }
+    }
+    return res;
 }
