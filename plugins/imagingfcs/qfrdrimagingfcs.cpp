@@ -879,10 +879,10 @@ bool QFRDRImagingFCSPlugin::readEvalSettings(const QString &evalFilename, bool i
                     initParams["SEGMENTS"]=value.toInt();
                     paramsReadonly<<"SEGMENTS";
                 } else if (name=="frametime (ms)") {
-                    initParams["FRAMETIME_MS"]=value.toInt();
+                    initParams["FRAMETIME_MS"]=value.toDouble();
                     paramsReadonly<<"FRAMETIME_MS";
                 } else if (name=="frametime (s)") {
-                    initParams["FRAMETIME"]=value.toInt();
+                    initParams["FRAMETIME"]=value.toDouble();
                     paramsReadonly<<"FRAMETIME";
                 } else if (name=="correlator s") {
                     initParams["CORR_S"]=value.toInt();
