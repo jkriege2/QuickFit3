@@ -14,11 +14,18 @@
 #include "programoptions.h"
 #include "qftools.h"
 #include "jkautooutputtimer.h"
+#include <QRegExpValidator>
+
 
 QFImFCCSAmplitudeFitDialog::QFImFCCSAmplitudeFitDialog(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QFImFCCSAmplitudeFitDialog)
 {
+
+    tableBrightness=new QFFitFunctionValueInputTable(this);
+    tableBrightness->setWriteTo(&mapBrightness, mapBrightness.keys());
+    tableResults=new QFFitFunctionValueInputTable(this);
+    tableBrightness->setWriteTo(&mapResults, mapResults.keys());
 
     //qDebug()<<1;
     plt=NULL;
@@ -67,6 +74,9 @@ QFImFCCSAmplitudeFitDialog::QFImFCCSAmplitudeFitDialog(QWidget *parent) :
         if (okCCF) break;
     }
 
+
+    //ui->edtSpecies->setValidator(new QRegExpValidator(QRegExp("[A-Za-z0-9_]+(\\s*,\\s*[A-Za-z0-9_]+)*")));
+
     ui->cmbACF0ResultSet->setRDR(ui->cmbACF0->currentRDR());
     ui->cmbACF1ResultSet->setRDR(ui->cmbACF1->currentRDR());
     ui->cmbCCFResultSet->setRDR(ui->cmbCCF->currentRDR());
@@ -84,6 +94,7 @@ QFImFCCSAmplitudeFitDialog::QFImFCCSAmplitudeFitDialog(QWidget *parent) :
     connect(ui->cmbCCFResultSet, SIGNAL(currentIndexChanged(int)), this, SLOT(replotImages()));
     cmbCCF_currentIndexChanged(ui->cmbCCF->currentIndex());
     loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, QPoint(10,10), QSize(800,600), "QFImFCCSAmplitudeFitDialog/size");
+    on_cmbModel_currentIndexChanged(0);
 
     //qDebug()<<10;
 
@@ -599,6 +610,41 @@ void QFImFCCSAmplitudeFitDialog::on_cmbAmplitudeSource_currentIndexChanged(int i
     ui->cmbACF1ResultSet->setEnabled(index>=0);
     ui->cmbCCFResultSet->setEnabled(index>=0);
     ui->spinAvg->setEnabled(index==0);
+}
+
+void QFImFCCSAmplitudeFitDialog::on_cmbModel_currentIndexChanged(int index)
+{
+    mapBrightness.clear();
+    mapResults.clear();
+    if (index==0) {
+        mapResults["cA"].value=10;
+        mapResults["cA"].editable=true;
+        mapResults["cB"].value=10;
+        mapResults["cB"].editable=true;
+        mapResults["cAB"].value=10;
+        mapResults["cAB"].editable=true;
+
+        mapBrightness["eta_g_A"].value=1;
+        mapBrightness["eta_g_A"].editable=true;
+
+        mapBrightness["eta_r_A"].value=0.05;
+        mapBrightness["eta_r_A"].editable=true;
+
+        mapBrightness["eta_g_B"].value=0;
+        mapBrightness["eta_g_B"].editable=true;
+
+        mapBrightness["eta_r_B"].value=1;
+        mapBrightness["eta_r_B"].editable=true;
+
+        mapBrightness["eta_g_AB"].value=1;
+        mapBrightness["eta_g_AB"].editable=true;
+
+        mapBrightness["eta_r_AB"].value=1;
+        mapBrightness["eta_r_AB"].editable=true;
+    }
+    tableBrightness->setWriteTo(&mapBrightness, mapBrightness.keys());
+    tableBrightness->setWriteTo(&mapResults, mapResults.keys());
+
 }
 
 

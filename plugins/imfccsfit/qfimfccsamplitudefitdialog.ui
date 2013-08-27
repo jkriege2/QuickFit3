@@ -7,16 +7,188 @@
     <x>0</x>
     <y>0</y>
     <width>984</width>
-    <height>765</height>
+    <height>793</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Calculate Relative CCF Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,1,0">
    <item>
     <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,1,1,0">
-     <item row="6" column="1" colspan="2">
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_14">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Result Set</string>
+       </property>
+       <property name="buddy">
+        <cstring>cmbCCF</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_13">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Raw Data record</string>
+       </property>
+       <property name="buddy">
+        <cstring>cmbCCF</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QFResultsGroupComboBox" name="cmbACF0ResultSet">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QFRDRComboBox" name="cmbACF1">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>ACF0 (green):</string>
+       </property>
+       <property name="buddy">
+        <cstring>cmbACF0</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QFRDRComboBox" name="cmbACF0">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QFResultsGroupComboBox" name="cmbCCFResultSet">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>CCF:</string>
+       </property>
+       <property name="buddy">
+        <cstring>cmbCCF</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QFResultsGroupComboBox" name="cmbACF1ResultSet">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QPushButton" name="btnNextCCF">
+       <property name="text">
+        <string>&amp;next</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/prop_next.png</normaloff>:/lib/prop_next.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QFRDRComboBox" name="cmbCCF"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_10">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>ACF1 (red):</string>
+       </property>
+       <property name="buddy">
+        <cstring>cmbACF0</cstring>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="labError">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout_4">
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_29">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>brightnesses:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <property name="buddy">
+        <cstring>spinCrosstalk01</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QLabel" name="label_3">
@@ -74,228 +246,201 @@
       </layout>
      </item>
      <item row="3" column="2">
-      <widget class="QFResultsGroupComboBox" name="cmbACF1ResultSet">
-       <property name="enabled">
-        <bool>false</bool>
+      <widget class="QLabel" name="label_19">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
        </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_10">
        <property name="text">
-        <string>ACF1 (red):</string>
+        <string>focus 1 (red):</string>
        </property>
-       <property name="buddy">
-        <cstring>cmbACF0</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>CCF:</string>
-       </property>
-       <property name="buddy">
-        <cstring>cmbCCF</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QFRDRComboBox" name="cmbACF1">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QFRDRComboBox" name="cmbCCF"/>
-     </item>
-     <item row="2" column="1">
-      <widget class="QFRDRComboBox" name="cmbACF0">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>ACF0 (green):</string>
-       </property>
-       <property name="buddy">
-        <cstring>cmbACF0</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="3">
-      <widget class="QPushButton" name="btnNextCCF">
-       <property name="text">
-        <string>&amp;next</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../lib/lib.qrc">
-         <normaloff>:/lib/prop_next.png</normaloff>:/lib/prop_next.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QFResultsGroupComboBox" name="cmbCCFResultSet">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0" colspan="3">
-      <widget class="Line" name="line">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="2">
-      <widget class="QFResultsGroupComboBox" name="cmbACF0ResultSet">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="label_14">
-       <property name="text">
-        <string>Result Set</string>
-       </property>
-       <property name="buddy">
-        <cstring>cmbCCF</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="label_13">
-       <property name="text">
-        <string>Raw Data record</string>
-       </property>
-       <property name="buddy">
-        <cstring>cmbCCF</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="label_15">
-       <property name="text">
-        <string>amplitude source:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="label_9">
-       <property name="text">
-        <string>crosstalk:</string>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
        </property>
        <property name="buddy">
         <cstring>spinCrosstalk01</cstring>
        </property>
       </widget>
      </item>
-     <item row="5" column="1" colspan="2">
-      <layout class="QHBoxLayout" name="horizontalLayout_5">
-       <item>
-        <widget class="QComboBox" name="cmbAmplitudeSource">
-         <item>
-          <property name="text">
-           <string>avg. from first correlation curve channels</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>g(0) from fit</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_6">
+     <item row="3" column="3">
+      <layout class="QGridLayout" name="gridLayout_7">
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_23">
          <property name="text">
-          <string>average channels:</string>
-         </property>
-         <property name="buddy">
-          <cstring>spinAvg</cstring>
+          <string>wxy=</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QSpinBox" name="spinAvg">
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>100</number>
-         </property>
-         <property name="singleStep">
-          <number>3</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </item>
-     <item row="7" column="0">
-      <widget class="QLabel" name="label_11">
-       <property name="text">
-        <string>background:</string>
-       </property>
-       <property name="buddy">
-        <cstring>spinCrosstalk01</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="1" colspan="2">
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>channel 0:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QDoubleSpinBox" name="spinBack0">
+       <item row="1" column="1">
+        <widget class="QDoubleSpinBox" name="spinWXY1">
          <property name="suffix">
-          <string> kHz</string>
+          <string> nm</string>
          </property>
          <property name="decimals">
           <number>3</number>
          </property>
          <property name="maximum">
-          <double>100000000.000000000000000</double>
+          <double>100000.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>600.000000000000000</double>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QLabel" name="label_12">
+       <item row="1" column="2">
+        <widget class="QLabel" name="label_24">
          <property name="text">
-          <string>channel 1:</string>
+          <string>wz=</string>
          </property>
         </widget>
        </item>
-       <item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_25">
+         <property name="text">
+          <string>pixel size</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QDoubleSpinBox" name="spinPixel1">
+         <property name="suffix">
+          <string> nm</string>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>400.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3">
+        <widget class="QDoubleSpinBox" name="spinWZ1">
+         <property name="suffix">
+          <string> nm</string>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>1300.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="label_27">
+         <property name="text">
+          <string>Veff1 = </string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLabel" name="labVEFF1">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="3" column="1">
+      <layout class="QGridLayout" name="gridLayout_6">
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_21">
+         <property name="text">
+          <string>wxy=</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QDoubleSpinBox" name="spinWXY0">
+         <property name="suffix">
+          <string> nm</string>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>500.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QLabel" name="label_22">
+         <property name="text">
+          <string>wz=</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_20">
+         <property name="text">
+          <string>pixel size</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QDoubleSpinBox" name="spinPixel0">
+         <property name="suffix">
+          <string> nm</string>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>400.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3">
+        <widget class="QDoubleSpinBox" name="spinWZ0">
+         <property name="suffix">
+          <string> nm</string>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>1200.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="label_26">
+         <property name="text">
+          <string>Veff0 = </string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLabel" name="labVEFF0">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="1" column="3">
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="3">
         <widget class="QDoubleSpinBox" name="spinBack1">
          <property name="suffix">
           <string> kHz</string>
@@ -308,14 +453,20 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QLabel" name="label_16">
-         <property name="text">
-          <string>&lt;small&gt;for camera data: multiply pixel-value by 1000!!!&lt;/small&gt;</string>
+       <item row="0" column="1">
+        <widget class="QDoubleSpinBox" name="spinBack0">
+         <property name="suffix">
+          <string> kHz</string>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="maximum">
+          <double>100000000.000000000000000</double>
          </property>
         </widget>
        </item>
-       <item>
+       <item row="0" column="4">
         <spacer name="horizontalSpacer_6">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -328,10 +479,134 @@
          </property>
         </spacer>
        </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="label_12">
+         <property name="text">
+          <string>channel 1:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>channel 0:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" colspan="3">
+        <widget class="QLabel" name="label_16">
+         <property name="text">
+          <string>&lt;small&gt;for camera data: multiply pixel-value by 1000!!!&lt;/small&gt;</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
-     <item row="8" column="0">
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_18">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>focus 0 (green):</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <property name="buddy">
+        <cstring>spinCrosstalk01</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="cmbAmplitudeSource">
+       <item>
+        <property name="text">
+         <string>avg. from first correlation curve channels</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>g(0) from fit</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_9">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>crosstalk:</string>
+       </property>
+       <property name="buddy">
+        <cstring>spinCrosstalk01</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_6">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>average channels:</string>
+       </property>
+       <property name="buddy">
+        <cstring>spinAvg</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_15">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>amplitude source:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLabel" name="label_11">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>background:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <property name="buddy">
+        <cstring>spinCrosstalk01</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
       <widget class="QLabel" name="label_17">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="text">
         <string>foci:</string>
        </property>
@@ -340,56 +615,117 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
-      <widget class="QComboBox" name="cmbFocus"/>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="cmbFocus">
+       <item>
+        <property name="text">
+         <string>SPIM-FCS volumes</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>confocal volumes</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QSpinBox" name="spinAvg">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="singleStep">
+        <number>3</number>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="3">
+      <widget class="QComboBox" name="cmbBrightnessMode">
+       <item>
+        <property name="text">
+         <string>relative</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>absolute</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="5" column="2">
+      <widget class="QLabel" name="label_30">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>brightness mode:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <property name="buddy">
+        <cstring>spinCrosstalk01</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_28">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>model:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <property name="buddy">
+        <cstring>spinCrosstalk01</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QComboBox" name="cmbModel">
+       <item>
+        <property name="text">
+         <string>A + B &lt;--&gt; AB</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="6" column="1" colspan="3">
+      <widget class="QEnhancedTableView" name="tabBrightness"/>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0" columnstretch="1,0,0">
-     <item row="1" column="2">
-      <widget class="QFRDRImageToRunPreview" name="widOverviewCCF" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>100</height>
-        </size>
-       </property>
-      </widget>
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout_8" columnstretch="1,1">
+     <property name="margin">
+      <number>1</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QEnhancedTableView" name="tabResults"/>
      </item>
-     <item row="2" column="0" colspan="2">
-      <widget class="QLabel" name="labError">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>CCF intensity image</string>
-       </property>
-       <property name="buddy">
-        <cstring>widOverviewCCF</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="2">
-      <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,0">
+     <item row="0" column="1">
+      <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0">
        <item row="1" column="1">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="4" column="1">
         <widget class="QPushButton" name="btnStoreDataAll">
          <property name="text">
           <string>&amp;store all results</string>
@@ -403,7 +739,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="1" column="0">
         <widget class="QPushButton" name="btnStoreData">
          <property name="text">
           <string>&amp;store this result</string>
@@ -417,26 +753,30 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>store rel. CCF plot to CCF RDR as a result:</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QPushButton" name="btnReplot">
-         <property name="text">
-          <string>&amp;replot</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../../lib/lib.qrc">
-           <normaloff>:/lib/refresh16.png</normaloff>:/lib/refresh16.png</iconset>
-         </property>
-        </widget>
+       <item row="0" column="0" colspan="2">
+        <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,1,0" columnstretch="0">
+         <item row="2" column="0">
+          <widget class="QFRDRImageToRunPreview" name="widOverviewCCF" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>100</height>
+            </size>
+           </property>
+           <zorder>label_4</zorder>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>CCF intensity image</string>
+           </property>
+           <property name="buddy">
+            <cstring>widOverviewCCF</cstring>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -506,6 +846,11 @@
     <slot>setRDR(QFRawDataRecord*)</slot>
    </slots>
   </customwidget>
+  <customwidget>
+   <class>QEnhancedTableView</class>
+   <extends>QTableView</extends>
+   <header>qenhancedtableview.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>cmbCCF</tabstop>
@@ -521,22 +866,6 @@
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
-  <connection>
-   <sender>btnReplot</sender>
-   <signal>clicked()</signal>
-   <receiver>QFImFCCSAmplitudeFitDialog</receiver>
-   <slot>replotImages()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>973</x>
-     <y>143</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>488</x>
-     <y>310</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>btnStoreData</sender>
    <signal>clicked()</signal>

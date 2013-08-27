@@ -5,6 +5,8 @@
 #include "qfimfccsfitevaluation_item.h"
 #include "qfplotter.h"
 #include "qmodernprogresswidget.h"
+#include "qffitfunctionvalueinputtable.h"
+#include "qffitfunctionvalueinputdelegate.h"
 
 namespace Ui {
     class QFImFCCSAmplitudeFitDialog;
@@ -33,12 +35,18 @@ class QFImFCCSAmplitudeFitDialog : public QWidget
         void on_btnStoreDataAll_clicked();
         void on_btnHelp_clicked();
         void on_cmbAmplitudeSource_currentIndexChanged(int index);
+        void on_cmbModel_currentIndexChanged(int index);
     protected:
         void closeEvent(QCloseEvent * event);
     private:
         Ui::QFImFCCSAmplitudeFitDialog *ui;
         QFImFCCSMatchRDRFunctor* matchFunctor;
         JKQTPColumnMathImage* plt;
+
+        QFFitFunctionValueInputTable* tableBrightness;
+        QMap<QString, QFFitFunctionValueInputTableFitParamData> mapBrightness;
+        QFFitFunctionValueInputTable* tableResults;
+        QMap<QString, QFFitFunctionValueInputTableFitParamData> mapResults;
 
         bool nextCCF();
         bool prevCCF();
