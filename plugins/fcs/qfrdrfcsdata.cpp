@@ -2048,7 +2048,16 @@ bool QFRDRFCSData::loadOlegData(QString filename)
 
             int csize=lags.size();
             // cut off back part of CFs
-            while (csize>2 && (lags[csize-1]==0.0 || !QFFloatIsOK(lags[csize-1]) || (runtime>0 && lags[csize-1]>runtime))) {
+            bool dontUse=false;
+            while (csize>2 && ( dontUse || lags[csize-1]==0.0 || lags[csize-1]==-1.0 || !QFFloatIsOK(lags[csize-1]) || (runtime>0 && lags[csize-1]>runtime))) {
+                dontUse=true;
+                for (int r=0; r<runs; r++) {
+                    const double cv=corr.value(r*lags.size()+csize-1);
+                    if (cv!=0.0 && cv!=-1.0) {
+                        dontUse=false;
+                        break;
+                    }
+                }
                 csize--;
             }
             int cutfront=0;
