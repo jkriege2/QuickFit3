@@ -26,27 +26,27 @@ class QFGeneralFitFunctionsPlugin : public QObject, public QFPluginFitFunction {
 
         /** \brief name for the plugin */
         virtual QString getName() const {
-            return tr("");
+            return tr("General FIt Functions Plugin");
         };
 
         /** \brief short description for the plugin */
         virtual QString getDescription() const {
-            return tr("");
+            return tr("implements several very common fit functions for QuickFit");
         };
 
         /** \brief author the plugin */
         virtual QString getAuthor() const {
-            return QString("");
+            return QString("Jan W. Krieger");
         };
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("");
+            return tr("(c) 2013 by Jan W. Krieger");
         };
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const {
-            return tr("");
+            return tr("http://www.dkfz.de/Macromol/quickfit/");
         };
 
         /** \copydoc QFPlugin::getID()  */

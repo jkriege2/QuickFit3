@@ -3878,8 +3878,9 @@ void QFRDRImagingFCSImageEditor::setCopyableData()
 
     if (m) {
         //pltImage->getDatastore()->addCopiedColumn(plteImageData, plteImageSize, formatTransformAndParameter(cmbParameter, cmbParameterTransform));
-        pltImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));
-        pltImage->getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteOverviewSize, tr("mask"));
+        //pltImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));
+        //pltImage->getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteOverviewSize, tr("mask"));
+        //pltImage->setCopyableData();
 
         pltGofImage->getDatastore()->addCopiedColumn(plteGofImageData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform));
         pltGofImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));

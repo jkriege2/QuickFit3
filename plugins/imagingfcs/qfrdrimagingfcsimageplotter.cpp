@@ -170,9 +170,11 @@ void QFRDRImagingFCSImagePlotter::updateImage(double *data, bool *plteOverviewSe
 
 
     updatePlot();
+    setCopyableData();
     set_doDrawing(draw);
     if (draw) update_plot();
     QApplication::restoreOverrideCursor();
+
 }
 
 void QFRDRImagingFCSImagePlotter::updateOverlays(double *avgOut, double *sdOut)

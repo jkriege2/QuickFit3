@@ -218,6 +218,30 @@ uint32_t binfileReadUint32(QFile& file) {
     return qFromLittleEndian(d);
 }
 
+int32_t binfileReadInt32(QFile& file) {
+    int32_t d=0;
+    file.read((char*)&d, sizeof(d));
+    return qFromLittleEndian(d);
+}
+
+int16_t binfileReadInt16(QFile& file) {
+    int16_t d=0;
+    file.read((char*)&d, sizeof(d));
+    return qFromLittleEndian(d);
+}
+
+int8_t binfileReadInt8(QFile& file) {
+    uint32_t d=0;
+    file.read((char*)&d, sizeof(d));
+    return qFromLittleEndian(d);
+}
+
+int64_t binfileReadInt64(QFile& file) {
+    uint64_t d=0;
+    file.read((char*)&d, sizeof(d));
+    return qFromLittleEndian(d);
+}
+
 void binfileWriteUint16(QFile& file, uint16_t data) {
     uint16_t w=qToLittleEndian(data);
     file.write((char*)(&w), sizeof(w));
@@ -273,6 +297,25 @@ void binfileReadDoubleArray(QFile& file, double* data, uint32_t dataN) {
     }
 }
 
+double* binfileReadDoubleArray(QFile& file, uint32_t dataN) {
+    if (dataN<=0) return NULL;
+    double* res=(double*)malloc(dataN*sizeof(double));
+    binfileReadDoubleArray(file, res, dataN);
+    return res;
+}
+
+QVector<double> binfileReadDoubleArrayV(QFile& file, uint32_t dataN) {
+    QVector<double> res;
+    if (dataN>0) binfileReadDoubleArray(file, res, dataN);
+    return res;
+}
+
+void binfileReadDoubleArray(QFile& file, QVector<double>& dataOut, uint32_t dataN) {
+    dataOut.resize(dataN);
+    if (dataN>0) {
+        binfileReadDoubleArray(file, dataOut.data(), dataN);
+    }
+}
 
 void binfileReadUInt16Array(QFile& file, uint16_t* data, uint32_t dataN) {
     file.read((char*)data, dataN*sizeof(uint16_t));

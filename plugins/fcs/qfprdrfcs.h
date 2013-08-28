@@ -51,7 +51,7 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=3;
+            minor=4;
         };
 
         /** \brief icon for the plugin */
@@ -99,6 +99,8 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         */
         void insertALBAFile(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
         void insertDiffusion4File(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
+        void insertOlegFile(const QStringList &filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
+
     private:
 };
 

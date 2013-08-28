@@ -1,5 +1,6 @@
 #include "qfrdrfcscorrelationeditor.h"
 #include "qfrdrfcsdata.h"
+#include "qfrawdatapropertyeditor.h"
 
 
 QFRDRFCSCorrelationEditorRunsModel::QFRDRFCSCorrelationEditorRunsModel(QObject* parent):
@@ -93,6 +94,9 @@ QFRDRFCSCorrelationEditor::~QFRDRFCSCorrelationEditor()
 }
 
 void QFRDRFCSCorrelationEditor::createWidgets() {
+    correlationMaskTools=new QFCorrelationMaskTools(this);
+    connect(correlationMaskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChangedRecalc()));
+
     QVBoxLayout* l=new QVBoxLayout(this);
     setLayout(l);
     splitter=new QVisibleHandleSplitter(Qt::Horizontal, this);
@@ -184,11 +188,17 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     splitter->setStretchFactor(0,5);
     splitter->setStretchFactor(1,1);
 
+    menuMask=propertyEditor->addMenu("&Selection/Mask", 0);
+    correlationMaskTools->registerMaskToolsToMenu(menuMask);
+    menuMask->addSeparator();
+    correlationMaskTools->registerCorrelationToolsToMenu(menuMask);
+
 };
 
 void QFRDRFCSCorrelationEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
     if (old) disconnect(old, 0, this, 0);
     QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
+    correlationMaskTools->setRDR(current);
     if (m) {
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
         runs.setCurrent(current);
@@ -222,6 +232,15 @@ void QFRDRFCSCorrelationEditor::runsModeChanged(int c) {
 
 void QFRDRFCSCorrelationEditor::rawDataChanged() {
     replotData();
+}
+
+void QFRDRFCSCorrelationEditor::rawDataChangedRecalc()
+{
+    QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
+     //qDebug()<<"rawDataChangedRecalc()  m="<<m;
+     if (m) m->recalculateCorrelations();
+     replotData();
+     runs.setCurrent(current);
 };
 
 void QFRDRFCSCorrelationEditor::slidersChanged(int userMin, int userMax, int min, int max) {

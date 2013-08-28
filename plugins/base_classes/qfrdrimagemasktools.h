@@ -6,7 +6,7 @@
 class QFRDRImageMaskTools : public QFRDRImageMaskInterface {
     public:
         QFRDRImageMaskTools();
-        ~QFRDRImageMaskTools();
+        virtual ~QFRDRImageMaskTools();
 
         virtual void maskLoad(const QString& filename);
         virtual void maskLoadFromString(const QString &maskstring);

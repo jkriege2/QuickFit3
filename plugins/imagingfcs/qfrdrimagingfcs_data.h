@@ -27,6 +27,7 @@
 #include "qfrdrimageselectioninterface.h"
 #include "qfrdrrunselection.h"
 #include "qfrdrimagemask.h"
+#include "qfrdrrunselectiontools.h"
 #include "qfrdrimagemasktools.h"
 
 
@@ -34,7 +35,7 @@
     \ingroup qf3rdrdp_imaging_fcs
 
 */
-class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDROverviewImageInterface, public QFRDRImageStackInterface, public QFRDRSimpleCountRatesInterface, public QFRDRImageSelectionInterface, public QFRDRRunSelectionsInterface, public QFRDRImageMaskTools {
+class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDROverviewImageInterface, public QFRDRImageStackInterface, public QFRDRSimpleCountRatesInterface, public QFRDRImageSelectionInterface, public QFRDRRunSelectionTools, public QFRDRImageMaskTools {
         Q_OBJECT
         Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDROverviewImageInterface QFRDRImageStackInterface QFRDRSimpleCountRatesInterface QFRDRImageSelectionInterface QFRDRRunSelectionsInterface QFRDRImageMaskInterface)
     public:

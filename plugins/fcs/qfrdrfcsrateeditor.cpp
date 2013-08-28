@@ -1,6 +1,6 @@
 #include "qfrdrfcsrateeditor.h"
 #include "qfrdrfcsdata.h"
-
+#include "qfrawdatapropertyeditor.h"
 
 QFRDRFCSRateEditor::runsModel::runsModel(QObject* parent):
     QAbstractTableModel(parent)
@@ -86,6 +86,8 @@ QFRDRFCSRateEditor::~QFRDRFCSRateEditor()
 }
 
 void QFRDRFCSRateEditor::createWidgets() {
+
+
     QVBoxLayout* l=new QVBoxLayout(this);
     setLayout(l);
 
@@ -188,11 +190,13 @@ void QFRDRFCSRateEditor::createWidgets() {
     splitter->setStretchFactor(0,5);
     splitter->setStretchFactor(1,1);
 
+
 };
 
 void QFRDRFCSRateEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
     if (old) disconnect(old, 0, this, 0);
     QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
+
     if (m) {
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
         runs.setCurrent(current);
@@ -221,6 +225,14 @@ void QFRDRFCSRateEditor::runsModeChanged(int c) {
 
 void QFRDRFCSRateEditor::rawDataChanged() {
     replotData();
+}
+
+void QFRDRFCSRateEditor::rawDataChangedRecalc()
+{    QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
+     //qDebug()<<"rawDataChangedRecalc()  m="<<m;
+     if (m) m->recalculateCorrelations();
+     replotData();
+
 };
 
 void QFRDRFCSRateEditor::slidersChanged(int userMin, int userMax, int min, int max) {

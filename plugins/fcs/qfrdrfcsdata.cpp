@@ -2,6 +2,85 @@
 #include <errno.h>
 #include <QtXml>
 #include "jkiniparser2.h"
+#include "binarydatatools.h"
+
+
+
+#define loadSeveral(res, filenames, loadFunction) {\
+    res=false; \
+    if (filenames.size()>0) { \
+        res=true; \
+        QList<dataArr> otherdata; \
+        for (int i=0; i<filenames.size(); i++) { \
+            res=res&&loadFunction(filenames[i]); \
+            dataArr t_; \
+            t_.correlationRuns=correlationRuns; \
+            t_.correlationN=correlationN; \
+            t_.rateRuns=rateRuns; \
+            t_.rateN=rateN; \
+            t_.rateChannels=rateChannels; \
+            t_.correlationT=duplicateArray(correlationT, t_.correlationN); \
+            t_.correlation=duplicateArray(correlation, t_.correlationRuns*t_.correlationN); \
+            t_.correlationErrors=duplicateArray(correlationErrors, t_.correlationRuns*t_.correlationN); \
+            t_.rateT=duplicateArray(rateT, t_.rateN); \
+            t_.rate=duplicateArray(rate, t_.rateRuns*t_.rateN*t_.rateChannels); \
+            otherdata<<t_; \
+        } \
+        if (res && otherdata.size()>1) { \
+            int cruns=0; \
+            int rruns=0; \
+            for (int i=0; res && i<otherdata.size(); i++) { \
+                res=res&&(rateN==otherdata[i].rateN)&&(rateChannels==otherdata[i].rateChannels)&&(correlationN==otherdata[i].correlationN); \
+                if (res) { \
+                    for (int t=0; t<correlationN; t++) { \
+                        if (correlationT[t]!=otherdata[i].correlationT[t]) { \
+                            res=false; \
+                            setError(tr("error loading file '%1': lag-time axis does not equal the previous files").arg(filenames.size())); \
+                        } \
+                    } \
+                    for (int t=0; t<rateN; t++) { \
+                        if (rateT[t]!=otherdata[i].rateT[t]) { \
+                            res=false; \
+                            setError(tr("error loading file '%1': rate time-axis does not equal the previous files").arg(filenames.size())); \
+                        } \
+                    } \
+                } \
+                if (res) { \
+                    cruns=cruns+otherdata[i].correlationRuns; \
+                    rruns=rruns+otherdata[i].rateRuns; \
+                } \
+            } \
+            if (res) { \
+                resizeCorrelations(correlationN, cruns); \
+                resizeRates(rateN, rruns, rateChannels); \
+                copyArray(correlationT, otherdata.first().correlationT, correlationN); \
+                copyArray(rateT, otherdata.first().rateT, rateN); \
+                long long rstart=0; \
+                long long cstart=0; \
+                for (int i=0; res && i<otherdata.size(); i++) { \
+                    dataArr t_=otherdata[i]; \
+                    copyArray(&(correlation[cstart]), t_.correlation, t_.correlationRuns* t_.correlationN); \
+                    copyArray(&(correlationErrors[cstart]), t_.correlationErrors, t_.correlationRuns* t_.correlationN); \
+                    for (int c=0; c<t_.rateChannels; c++) { \
+                        copyArray(&(rate[c*rateRuns*rateN+ rstart]), &(t_.rate[c*t_.rateRuns* t_.rateN]), t_.rateRuns* t_.rateN); \
+                    } \
+                    cstart=cstart+t_.correlationRuns* t_.correlationN; \
+                    rstart=rstart+t_.rateN*t_.rateRuns; \
+                } \
+                recalculateCorrelations();\
+            } \
+            for (int i=0; res && i<otherdata.size(); i++) { \
+                dataArr t_=otherdata[i]; \
+                if (t_.correlation) free(t_.correlation); \
+                if (t_.correlationErrors) free(t_.correlationErrors); \
+                if (t_.correlationT) free(t_.correlationT); \
+                if (t_.rateT) free(t_.rateT); \
+                if (t_.rate) free(t_.rate); \
+            } \
+            otherdata.clear(); \
+        } \
+    } \
+}
 
 QFRDRFCSData::QFRDRFCSData(QFProject* parent):
     QFRawDataRecord(parent)
@@ -124,6 +203,7 @@ void QFRDRFCSData::resizeBinnedRates(long long N) {
     emitRawDataChanged();
 }
 
+
 void QFRDRFCSData::calcBinnedRate() {
     if (autoCalcRateN<=0) return;
     long long d=0;
@@ -176,6 +256,7 @@ bool QFRDRFCSData::selectNewFiles(QStringList &files, QStringList &types, QStrin
     QString filetype=getProperty("FILETYPE", "unknown").toString().toUpper();
     if (filetype=="ALV5000") filter=tr("ALV-5000 file (*.asc)");
     if (filetype=="ALV6000") filter=tr("ALV-6000 file (*.asc)");
+    if (filetype=="OLEGKRIECHEVSKYBINARY") filter=tr("Oleg Kriechevsky's Binary format(*. *.dat)");
     if (filetype=="CSV_CORR") filter=tr("ASCII Data Files (*.txt *.dat *.csv)");
     if (filetype=="ISS_ALBA") filter=tr("ISS Alba Files (*.csv)");
     if (filetype=="DIFFUSION4_SIMRESULTS") filter=tr("Diffusion4 simulation results (*corr.dat *bts.dat)");
@@ -1434,7 +1515,7 @@ bool QFRDRFCSData::loadFromALV6000Files(QStringList filenames) {
                                 }
                             //}
                             if (getRateChannelsSwapped()) {
-                                qDebug()<<"swapping in "<<getName();
+                                //qDebug()<<"swapping in "<<getName();
                                 qSwap(rate[0*rateN*rateRuns+run0*rateN+i], rate[1*rateN*rateRuns+run0*rateN+i]);
                             }
                         } else if (runs>1) {
@@ -1454,7 +1535,7 @@ bool QFRDRFCSData::loadFromALV6000Files(QStringList filenames) {
                                 }
                             //}
                             if (getRateChannelsSwapped()) {
-                                qDebug()<<"swapping in "<<getName();
+                                //qDebug()<<"swapping in "<<getName();
                                 qSwap(rate[0*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i], rate[1*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]);
                             }
                         }
@@ -1656,6 +1737,18 @@ bool QFRDRFCSData::reloadFromFiles() {
           return false;
        }
        return loadFromALV6000Files(files);
+    } else if (filetype.toUpper()=="OLEGKRIECHEVSKYBINARY") {
+       if (files.size()<=0) {
+          setError(tr("there are no files in the FCS record!"));
+          return false;
+       }
+       bool res=false;
+       if (files.size()==1) {
+           res=loadOlegData(files[0]);
+       } else if (files.size()>1) {
+           loadSeveral(res, files, loadOlegData);
+       }
+       return res;
     } else if (filetype.toUpper()=="ISS_ALBA") {
         if (files.size()<=0) {
             setError(tr("there are no files in the FCS record!"));
@@ -1825,6 +1918,194 @@ int QFRDRFCSData::getSimpleCountrateChannels() const
 }
 
 
+bool QFRDRFCSData::loadOlegData(QString filename)
+{
+    bool ok=true;
+    //if (filenames.size()<=0) ok=false;
+    //for (int i=0; i<filenames.size(); i++) {
+        //QString filename=filenames.first();
+        QFile f(filename);
+        if (f.open(QIODevice::ReadOnly)) {
+            uint16_t version=binfileReadUint16(f);
+            uint32_t runs=0;
+            uint32_t runsDemanded=0;
+            double runtime=0;
+            int32_t corrN=0;
+            int32_t cntN=0;
+            int cntRuns=0;
+            double AIClockDivider=0;
+            double dt=0;
+            double speed=0;
+            QVector<double> lags;
+            QVector<double> cnt;
+            QVector<double> corr;
+            QVector<double> cfcr;
+            QVector<double> afterpulse;
+            QString logbook;
+            if (version==0) {
+                runsDemanded=binfileReadUint32(f); // read demanded runs
+                runs=binfileReadUint32(f); // read performed runs
+                runtime=binfileReadDouble(f);
+                corrN=binfileReadInt32(f);
+                cntN=binfileReadInt32(f);
+                lags= binfileReadDoubleArrayV(f, corrN);
+                corr= binfileReadDoubleArrayV(f, corrN*runs);
+                cntRuns=runs;
+                cnt= binfileReadDoubleArrayV(f, cntN*cntRuns);
+                for (int i=0; i<cntN*runs; i++) {
+                    cnt[i]=cnt[i]/1000.0;
+                }
+            } else if (version==1) {
+                int32_t datatype=binfileReadInt32(f);
+                if (datatype==100){
+                    int32_t logbooksize=binfileReadInt32(f);
+                    logbook=f.read(logbooksize);
+                    runsDemanded=binfileReadUint32(f); // read demanded runs
+                    runs=binfileReadUint32(f); // read performed runs
+                    runtime=binfileReadDouble(f);
+                    corrN=binfileReadInt32(f);
+                    runs=binfileReadInt32(f);
+                    cntN=binfileReadInt32(f);
+                    cntRuns=binfileReadInt32(f);
+                    lags= binfileReadDoubleArrayV(f, corrN);
+                    afterpulse= binfileReadDoubleArrayV(f, corrN);
+                    runs=(runs-2)/2;
+                    corr=binfileReadDoubleArrayV(f, corrN*runs);
+                    cfcr=binfileReadDoubleArrayV(f, corrN*runs);
+                    cntN=binfileReadInt32(f);
+                    cntRuns=binfileReadInt32(f);
+                    cnt=binfileReadDoubleArrayV(f, cntN*cntRuns);
+                }
+            } else if (version==7) {
+                int32_t datatype=binfileReadInt32(f);
+                if (datatype==100){
+                    int32_t TotalSaves=binfileReadInt32(f);         // A.TotalSaves =fread(fid, 1, 'int32');
+                    speed=binfileReadDouble(f);              // A.Speed = fread(fid, 1, 'double');
+                    int32_t logbooksize=binfileReadInt32(f);        // LogBookSize=fread(fid, 1, 'int32');
+                    logbook=f.read(logbooksize);                    // A.LogBook = fscanf(fid, '%c', LogBookSize);
+                    binfileReadInt32(f);                            // A.lag = fread(fid, APSize(2), 'double');
+                    corrN=binfileReadInt32(f);
+                    lags= binfileReadDoubleArrayV(f, corrN);            // APSize = fread(fid, 2, 'int32');
+                    afterpulse= binfileReadDoubleArrayV(f, corrN);      // A.AfterPulse = fread(fid, APSize(2), 'double');
+                    AIClockDivider=binfileReadDouble(f); // A.AIClockDivider  = fread(fid, 1, 'double');
+                    dt=0;
+                    runs=0;
+                    for (int s=0; s<TotalSaves; s++) {
+                        runsDemanded=binfileReadUint32(f);          // A.NrunsDemanded   =  fread(fid, 1, 'uint32');
+                        int32_t lruns=binfileReadInt32(f);                   // A.NrunsPerformed  =  fread(fid, 1, 'int32');
+                        runtime=binfileReadDouble(f);               // A.RunTime         =  fread(fid, 1, 'double');
+                        lruns=binfileReadInt32(f);                  // ArraysLength      =  fread(fid, 4, 'int32');
+                        corrN=binfileReadInt32(f);
+                        int32_t lcntRuns=binfileReadInt32(f);
+                        cntN=binfileReadInt32(f);
+
+                        lruns=lruns/2;
+                        runs=runs+lruns;
+                        cntRuns=cntRuns+lcntRuns;
+                        //qDebug()<<"s="<<s<<"   runsDemanded="<<runsDemanded<<"   runs="<<lruns<<"   runtime="<<runtime<<"   corrN="<<corrN<<"   runs="<<lruns<<"   cntN="<<cntN<<"   cntRuns="<<lcntRuns;
+
+                        /*
+                            if i == 1,
+                                A.corrfunc =  [A.corrfunc, CorrArrays(:, 2:(ArraysLength(1)+1)/2)] ;
+                                A.CF_CR    =  [A.CF_CR, CorrArrays(:, (ArraysLength(1)+3)/2:ArraysLength(1))] ;
+                            else
+                                A.corrfunc =  [A.corrfunc, CorrArrays(:, 1:(ArraysLength(1)/2))] ;
+                                A.CF_CR    =  [A.CF_CR, CorrArrays(:, (ArraysLength(1)/2+1):ArraysLength(1))] ;
+                            end;
+                         */
+                        if (s==0) {
+                            binfileReadDoubleArrayV(f, corrN);              // ignore on first ???
+                            corr=binfileReadDoubleArrayV(f, corrN*lruns);
+                            cfcr=binfileReadDoubleArrayV(f, corrN*lruns);
+                        } else {
+                            corr<<binfileReadDoubleArrayV(f, corrN*lruns);
+                            cfcr<<binfileReadDoubleArrayV(f, corrN*lruns);
+                        }
+                        cnt<<binfileReadDoubleArrayV(f, cntN*lcntRuns);       // Trace = fread(fid, [ArraysLength(4), ArraysLength(3)], 'double');
+                        dt=binfileReadDouble(f);                         // A.dt              =  fread(fid, 1, 'double');
+
+                        int32_t ca1=binfileReadInt32(f);                  // CoordArrayLength  =  fread(fid, 2, 'int32');
+                        int32_t ca2=binfileReadInt32(f);
+                        //qDebug()<<"ca1="<<ca1<<"   ca2="<<ca2;
+                        if (ca1>0 && ca2>0){
+                            QVector<double> ca=binfileReadDoubleArrayV(f, ca1*ca2);                 // CoordArray        =  fread(fid, [CoordArrayLength(2), CoordArrayLength(1)], 'double');%remove tag (before the dot-coma)
+                        }
+                        int32_t ia1=binfileReadInt32(f);                  // ImageArrayLength  =  fread(fid, 3, 'int32');
+                        int32_t ia2=binfileReadInt32(f);
+                        int32_t ia3=binfileReadInt32(f);
+                        //qDebug()<<"ia1="<<ia1<<"   ia2="<<ia2<<"   ia3="<<ia3;
+                        QVector<double> ia=binfileReadDoubleArrayV(f, ia1*ia2*ia3);  //  ImageArray        =  fread(fid, [ImageArrayLength(3)*ImageArrayLength(2), ImageArrayLength(1)], 'double');%remove tag (before the dot-coma)
+                    }
+
+                }
+            } else {
+                setError(tr("error reading Oleg file '%1': unknown version %2").arg(filename).arg(version));
+                return false;
+            }
+
+            //qDebug()<<"runs="<<runs<<"   cntRuns="<<cntRuns;
+            //qDebug()<<"corr.size()="<<corr.size()<<"   lags.size()="<<lags.size()<<"   cnt.size()="<<cnt.size();
+
+            int csize=lags.size();
+            // cut off back part of CFs
+            while (csize>2 && (lags[csize-1]==0.0 || !QFFloatIsOK(lags[csize-1]) || (runtime>0 && lags[csize-1]>runtime))) {
+                csize--;
+            }
+            int cutfront=0;
+            while (cutfront<csize && lags[cutfront]==0) {
+                cutfront++;
+            }
+
+            csize=csize-cutfront;
+            //qDebug()<<"cutfront="<<cutfront<<"   csize="<<csize;
+
+            if (csize>0) {
+                resizeCorrelations(csize, runs);
+                for (int t=0; t<correlationN; t++) {
+                    correlationT[t]=lags.value(cutfront+t, 0);
+                }
+                long nn=0;
+                for (uint32_t r=0; r<runs; r++) {
+                    for (int t=0; t<correlationN; t++) {
+                        correlation[nn]=corr.value(r*lags.size()+cutfront+t, 0);
+                        nn++;
+                    }
+                }
+
+                resizeRates(cntN,cntRuns, 1);
+                if (cntN>0 && cntRuns>0) {
+                    for (int t=0; t<rateN; t++) {
+                        rateT[t]=double(t)*runtime/double(cntN);
+                    }
+                    nn=0;
+                    for (uint32_t r=0; r<rateRuns; r++) {
+                        for (int t=0; t<rateN; t++) {
+                            rate[nn]=cnt.value(nn, 0)/1000.0;
+                            nn++;
+                        }
+                    }
+                }
+
+                if (!getDescription().contains(logbook))  setDescription(getDescription()+QString("\n\n\nlogbook = ")+logbook);
+
+                setQFProperty("file_version", version, false, true);
+                setQFProperty("AIClockDivider", AIClockDivider, false, true);
+                setQFProperty("dt", dt, false, true);
+                setQFProperty("speed", speed, false, true);
+                setQFProperty("runtime", runtime, false, true);
+            } else {
+                setError(tr("error reading Oleg file '%1': no correlation channels found").arg(filename));
+                return false;
+            }
+
+            f.close();
+        }
+    //}
+    recalculateCorrelations();
+    emitRawDataChanged();
+
+    return ok;
+}
 
 
 

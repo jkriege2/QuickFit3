@@ -12,20 +12,30 @@ include(../../libquickfitwidgets.pri)
 
 # Input
 HEADERS += dlgcsvparameters.h \
-           alv5000tools.h \
-           alv6000tools.h \
-           qfrdrfcscorrelationeditor.h \
-           qfrdrfcsdata.h \
-           qfrdrfcsrateeditor.h \
-             qfprdrfcs.h \
-             ../interfaces/qfrdrfcsdatainterface.h \
-             ../interfaces/qfrdrcountratesinterface.h \
-    ../../../../../LIB/trunk/qt/completertextedit.h \
-    qfrdrfcsfitfunctionsimulator.h \
-    ../interfaces/qfrdrrunselection.h \
-    ../../../../../LIB/trunk/jkmathparser.h \
-    ../../../../../LIB/trunk/jkiniparser2.h \
-    ../interfaces/qfrdrsimplecountrateinterface.h
+            alv5000tools.h \
+            alv6000tools.h \
+            qfrdrfcscorrelationeditor.h \
+            qfrdrfcsdata.h \
+            qfrdrfcsrateeditor.h \
+            qfprdrfcs.h \
+            ../../../../../LIB/trunk/qt/completertextedit.h \
+            qfrdrfcsfitfunctionsimulator.h \
+            ../../../../../LIB/trunk/jkmathparser.h \
+            ../../../../../LIB/trunk/jkiniparser2.h \
+            ../interfaces/qfrdrsimplecountrateinterface.h \
+            ../base_classes/qfcorrelationmasktools.h \
+            ../base_classes/qfrdrimagemasktools.h \
+            ../base_classes/qffinderroneouscorrelationdlg.h \
+            ../base_classes/qfrdrimagemaskedittools.h \
+            ../base_classes/qffcstools.h \
+            ../interfaces/qfrdrrunselection.h \
+            ../interfaces/qfrdrfcsdatainterface.h \
+            ../interfaces/qfrdrcountratesinterface.h \
+            ../interfaces/qfrdrfcsdatainterface.h \
+            ../interfaces/qfrdrimageselectioninterface.h \
+            ../interfaces/qfrdrrunselection.h \
+    ../base_classes/qfrdrrunselectiontools.h
+
 
 
 SOURCES += dlgcsvparameters.cpp \
@@ -38,13 +48,23 @@ SOURCES += dlgcsvparameters.cpp \
     ../../../../../LIB/trunk/qt/completertextedit.cpp \
     qfrdrfcsfitfunctionsimulator.cpp \
     ../../../../../LIB/trunk/jkmathparser.cpp \
-    ../../../../../LIB/trunk/jkiniparser2.cpp
+    ../../../../../LIB/trunk/jkiniparser2.cpp \
+    ../base_classes/qfcorrelationmasktools.cpp \
+    ../base_classes/qfrdrimagemasktools.cpp \
+    ../base_classes/qffinderroneouscorrelationdlg.cpp \
+    ../base_classes/qfrdrimagemaskedittools.cpp \
+    ../base_classes/qffcstools.cpp \
+    ../base_classes/qfrdrrunselectiontools.cpp
+
 
 
 FORMS = dlg_csvparameters.ui \
-    qfrdrfcsfitfunctionsimulator.ui
+    qfrdrfcsfitfunctionsimulator.ui \
+    ../base_classes/qffcsfitchi2landscapedialog.ui \
+    ../base_classes/qffinderroneouscorrelationdlg.ui
 
-RESOURCES += qfrdrfcs.qrc
+RESOURCES += qfrdrfcs.qrc \
+    ../base_classes/qfrdrmaskeditor.qrc
 
 TRANSLATIONS= ./translations/de.fcs.ts
 

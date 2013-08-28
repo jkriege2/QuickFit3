@@ -92,6 +92,26 @@ QFLIB_EXPORT QByteArray boolArrayToString(const QVector<bool>& data);
  */
 QFLIB_EXPORT uint32_t binfileReadUint32(QFile& file);
 
+/** \brief read a int32_t from a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT int64_t binfileReadInt64(QFile& file);
+
+/** \brief read a int32_t from a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT int32_t binfileReadInt32(QFile& file);
+
+/** \brief read a int32_t from a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT int16_t binfileReadInt16(QFile& file);
+
+/** \brief read a int32_t from a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT int8_t binfileReadInt8(QFile& file);
+
 /** \brief write a uint32_t to a binary file
  *  \ingroup qf3lib_mathtools
  */
@@ -157,6 +177,18 @@ QFLIB_EXPORT void binfileWriteDoubleArrayMinus1(QFile& file, const double* data,
  *  \ingroup qf3lib_mathtools
  */
 QFLIB_EXPORT void binfileReadDoubleArray(QFile& file, double* data, uint32_t dataN);
+/** \brief read an array of dataN doubles from a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT double* binfileReadDoubleArray(QFile& file, uint32_t dataN);
+/** \brief read an array of dataN doubles from a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT QVector<double> binfileReadDoubleArrayV(QFile& file, uint32_t dataN);
+/** \brief read an array of dataN doubles from a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT void binfileReadDoubleArray(QFile& file, QVector<double>& dataOut, uint32_t dataN);
 
 
 /** \brief read an array of dataN uint16s from a binary file

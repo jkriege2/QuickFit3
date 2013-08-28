@@ -26,7 +26,7 @@
 #include "qfrdrfcsfitfunctionsimulator.h"
 #include "qfrdrrunselection.h"
 #include "qfrdrsimplecountrateinterface.h"
-
+#include "qfrdrrunselectiontools.h"
 
 /*! \brief manages a FCS dataset (set of correlation curves with multiple runs)
     \ingroup qf3rdrdp_fcs
@@ -46,7 +46,7 @@
   account for the correlation average. This may be usefull, if only some few of the runs in a file are damaged
   (e.g. by agregates moving through the focus ...).
 */
-class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRCountRatesInterface, public QFRDRRunSelectionsInterface, public QFRDRSimpleCountRatesInterface {
+class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRCountRatesInterface, public QFRDRRunSelectionTools, public QFRDRSimpleCountRatesInterface {
         Q_OBJECT
         Q_INTERFACES(QFRDRFCSDataInterface QFRDRCountRatesInterface QFRDRRunSelectionsInterface QFRDRSimpleCountRatesInterface)
     public:
@@ -356,6 +356,9 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
          */
         double* binnedRate;
 
+        /** \brief load private data format of Oleg Kriechevsky's group */
+        bool loadOlegData(QString filenames);
+
         /** \brief load a CSV file containing a count rate curve */
         bool loadCountRatesFromCSV(QStringList filenames, int rateChannels=1);
         /** \brief load a CSV file containing a correlation curve */
@@ -387,6 +390,23 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
          */
         bool loadInternal(QDomElement* e);
         void saveInternal(QXmlStreamWriter& w) const;
+
+
+        struct dataArr {
+            int correlationRuns;
+            long long correlationN;
+            double* correlationT;
+            double* correlation;
+            double* correlationErrors;
+            int rateRuns;
+            int rateChannels;
+            long long rateN;
+            double* rateT;
+            double* rate;
+        };
+
+
+
 
     private:
 };

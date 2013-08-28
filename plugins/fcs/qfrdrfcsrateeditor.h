@@ -12,6 +12,7 @@
 #include <QGroupBox>
 #include <QAbstractTableModel>
 #include "qvisiblehandlesplitter.h"
+#include "qfcorrelationmasktools.h"
 
 // forward declaration
 class QFRDRFCSData;
@@ -44,6 +45,7 @@ class QFRDRFCSRateEditor : public QFRawDataEditor {
     protected slots:
         /** \brief connected to the rawDataChanged() signal of the current record */
         virtual void rawDataChanged();
+        void rawDataChangedRecalc();
         /** \brief displays the data from the current data element in the plotter widget
          *
          * the parameter dummy has no function it is only there so this function may be used
@@ -106,6 +108,7 @@ class QFRDRFCSRateEditor : public QFRawDataEditor {
         QCheckBox* chkIncludeRate0;
         /** \brief acivate overlay of other raw data records data */
         QCheckBox* chkOverlay;
+
     private:
 };
 

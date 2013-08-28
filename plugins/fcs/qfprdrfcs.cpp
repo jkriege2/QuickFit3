@@ -63,6 +63,7 @@ void QFPRDRFCS::insertALV5000File(const QStringList& filename, const QMap<QStrin
         }else  {
             e->setRole(QString("FCCS").arg(i));
         }
+        if (cc>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
 
         if (e->error()) {
             QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV5000 file '%1' (channel %3/%4):\n%2").arg(filename.value(0, "")).arg(e->errorDescription()).arg(i+1).arg(cc));
@@ -94,6 +95,7 @@ void QFPRDRFCS::insertALV6000File(const QStringList& filename, const QMap<QStrin
         }else  {
             e->setRole(QString("FCCS").arg(i));
         }
+        if (cc>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
 
         if (e->error()) {
             QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV6000 file '%1' (channel %3/%4):\n%2").arg(filename.value(0, "")).arg(e->errorDescription()).arg(i+1).arg(cc));
@@ -132,6 +134,16 @@ void QFPRDRFCS::insertDiffusion4File(const QStringList& filename, const QMap<QSt
     }
 }
 
+void QFPRDRFCS::insertOlegFile(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly)
+{
+    QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename.value(0, "")).fileName(), filename, paramValues, paramReadonly);
+    if (e->error()) {
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename.value(0, "")).arg(e->errorDescription()));
+        services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));
+        project->deleteRawData(e->getID());
+    }
+}
+
 void QFPRDRFCS::insertFCS() {
     if (project) {
         QString alvf=tr("ALV-5000 file (*.asc)");
@@ -139,11 +151,12 @@ void QFPRDRFCS::insertFCS() {
         QString asciif=tr("ASCII Data Files (*.txt *.dat *.csv)");
         QString albaf=tr("ISS Alba Files (*.csv)");
         QString diff4f=tr("diffusion4 correlation (*corr.dat)");
+        QString olegf=tr("Oleg Kriechevsky's Binary format(*. *.dat)");
         QString currentFCSFileFormatFilter=settings->getQSettings()->value("fcs/current_fcs_format_filter", alvf).toString();
         QStringList files = qfGetOpenFileNames(parentWidget,
                               tr("Select FCS Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
-                              alvf+";;"+alvf6+";;"+asciif+";;"+albaf+";;"+diff4f, &currentFCSFileFormatFilter);
+                              alvf+";;"+alvf6+";;"+asciif+";;"+albaf+";;"+diff4f+";;"+olegf, &currentFCSFileFormatFilter);
         //std::cout<<"filter: "<<currentFCSFileFormatFilter.toStdString()<<std::endl;
         if (files.size()>0) {
             settings->getQSettings()->setValue("fcs/current_fcs_format_filter", currentFCSFileFormatFilter);
@@ -155,6 +168,9 @@ void QFPRDRFCS::insertFCS() {
                p["FILETYPE"]="ALV6000";
                p["CHANNEL"]=0;
                //qDebug() << "test 3";
+            } else if (currentFCSFileFormatFilter==olegf){
+               p["FILETYPE"]="OLEGKRIECHEVSKYBINARY";
+               p["CHANNEL"]=0;
             } else if (currentFCSFileFormatFilter==asciif) {
                 p["FILETYPE"]="CSV_CORR";
                 p["CSV_SEPARATOR"]=QString(",");
@@ -217,6 +233,8 @@ void QFPRDRFCS::insertFCS() {
                         insertALV5000File(QStringList(*it), p, paramsReadonly);
                     } else if (currentFCSFileFormatFilter==alvf6) {
                        insertALV6000File(QStringList(*it), p, paramsReadonly);
+                    } else if (currentFCSFileFormatFilter==olegf) {
+                       insertOlegFile(QStringList(*it), p, paramsReadonly);
                     } else if (currentFCSFileFormatFilter==albaf) {
                         insertALBAFile(QStringList(*it), p, paramsReadonly);
                     } else if (currentFCSFileFormatFilter==diff4f) {
@@ -248,11 +266,12 @@ void QFPRDRFCS::insertMultiFileFCS()
         QString asciif=tr("ASCII Data Files (*.txt *.dat *.csv)");
         QString albaf=tr("ISS Alba Files (*.csv)");
         QString diff4f=tr("diffusion4 correlation (*corr.dat)");
+        QString olegf=tr("Oleg Kriechevsky's Binary format(*. *.dat)");
         QString currentFCSFileFormatFilter=settings->getQSettings()->value("fcs/current_fcs_format_filter", alvf).toString();
         QStringList files = qfGetOpenFileNames(parentWidget,
                               tr("Select FCS Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
-                              alvf+";;"+alvf6+";;"+asciif+";;"+albaf+";;"+diff4f, &currentFCSFileFormatFilter);
+                              alvf+";;"+alvf6+";;"+asciif+";;"+albaf+";;"+diff4f+";;"+olegf, &currentFCSFileFormatFilter);
         //std::cout<<"filter: "<<currentFCSFileFormatFilter.toStdString()<<std::endl;
         if (files.size()>0) {
             settings->getQSettings()->setValue("fcs/current_fcs_format_filter", currentFCSFileFormatFilter);
@@ -263,6 +282,9 @@ void QFPRDRFCS::insertMultiFileFCS()
             } else if (currentFCSFileFormatFilter==alvf6){
                //qDebug() << "test 1";
                p["FILETYPE"]="ALV6000";
+               p["CHANNEL"]=0;
+            } else if (currentFCSFileFormatFilter==olegf){
+               p["FILETYPE"]="OLEGKRIECHEVSKYBINARY";
                p["CHANNEL"]=0;
             } else if (currentFCSFileFormatFilter==asciif) {
                 p["FILETYPE"]="CSV_CORR";
@@ -319,6 +341,8 @@ void QFPRDRFCS::insertMultiFileFCS()
                 insertALV5000File(files, p, paramsReadonly);
             } else if (currentFCSFileFormatFilter==alvf6) {
                 insertALV6000File(files, p, paramsReadonly);
+            } else if (currentFCSFileFormatFilter==olegf) {
+                insertOlegFile(files, p, paramsReadonly);
                 //qDebug() << "test 2";
             } else if (currentFCSFileFormatFilter==albaf) {
                 insertALBAFile(files, p, paramsReadonly);

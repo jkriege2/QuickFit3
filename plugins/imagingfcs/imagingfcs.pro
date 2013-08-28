@@ -18,6 +18,21 @@ HEADERS += qfrdrimagingfcs.h \
            qfrdrimagingfcs_data.h \
 		   qfrdrimagingfcs_dataeditor.h \
            ../interfaces/qfrdrfcsdatainterface.h \
+    ../interfaces/qfrdrimagetoruninterface.h \
+    ../interfaces/qfrdroverviewimageinterface.h \
+    ../base_classes/qfrdrimagingfcstools.h \
+    ../base_classes/qfrdrimagemasktools.h \
+    ../base_classes/qfcorrelationmasktools.h \
+    ../base_classes/qffinderroneouscorrelationdlg.h \
+    ../base_classes/qfrdrimagemaskedittools.h \
+    ../base_classes/qffcstools.h \
+    ../interfaces/qfrdrimagestackinterface.h \
+    ../interfaces/qfrdrsimplecountrateinterface.h \
+    ../interfaces/qfrdrimageselectioninterface.h \
+    ../base_classes/qfrdroverviewimagedisplay.h \
+    ../interfaces/qfrdrrunselection.h \
+    ../interfaces/qfrdrimagemask.h \
+    ../interfaces/qfrdrimfcscorrelatorremote.h \
     qfrdrimagingfcs_dataeditor_image.h \
     qfrdrimagingfcsrunsmodel.h \
     qfrdrimagingfcscorrelationdialog.h \
@@ -32,33 +47,19 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcsdataexplorer.h \
     qfrdrimagingfcsmaskbyintensity.h \
     qfrdrimagingfcscountratedisplay.h \
-    ../interfaces/qfrdrimagetoruninterface.h \
-    ../interfaces/qfrdroverviewimageinterface.h \
     qfrdrimagingfcsoverviewrateeditor.h \
-    ../base_classes/qfrdrimagingfcstools.h \
-    ../interfaces/qfrdrimagestackinterface.h \
-    ../interfaces/qfrdrsimplecountrateinterface.h \
     ../../../../../LIB/trunk/yaid_rh.h \
     qfrdrimagingfcsseriesdialog.h \
     qfrdrimagingfcscopydataselectdialog.h \
-    ../interfaces/qfrdrimageselectioninterface.h \
-    ../base_classes/qfrdroverviewimagedisplay.h \
-    ../interfaces/qfrdrrunselection.h \
     qfrdrimagingfcs_dataeditor_countrate.h \
-    ../interfaces/qfrdrimagemask.h \
-    ../base_classes/qfrdrimagemasktools.h \
-    ../base_classes/qfcorrelationmasktools.h \
-    ../base_classes/qffinderroneouscorrelationdlg.h \
-    ../base_classes/qfrdrimagemaskedittools.h \
     qfrdrimagingfcsedittools.h \
     qfrdrimagingfcssimulator.h \
     qfrdrimagingfcssimulationthread.h \
     ../../extlibs/MersenneTwister.h \
-    ../interfaces/qfrdrimfcscorrelatorremote.h \
-    ../base_classes/qffcstools.h \
     qfrdrimagingfcsimageplotter.h \
     qfrdrimagingfcsimageparametergroupbox.h \
-    qfrdrimagingfcsoverlaystylecombobox.h
+    qfrdrimagingfcsoverlaystylecombobox.h \
+    ../base_classes/qfrdrrunselectiontools.h
 
 
 
@@ -92,7 +93,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     ../base_classes/qffcstools.cpp \
     qfrdrimagingfcsimageplotter.cpp \
     qfrdrimagingfcsimageparametergroupbox.cpp \
-    qfrdrimagingfcsoverlaystylecombobox.cpp
+    qfrdrimagingfcsoverlaystylecombobox.cpp \
+    ../base_classes/qfrdrrunselectiontools.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \

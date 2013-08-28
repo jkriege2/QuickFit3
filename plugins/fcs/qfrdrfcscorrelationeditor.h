@@ -13,6 +13,7 @@
 #include <QAbstractTableModel>
 #include "datacutslider.h"
 #include "qvisiblehandlesplitter.h"
+#include "qfcorrelationmasktools.h"
 /*! \brief model for runs in QFRDRFCSCorrelationEditor
     \ingroup qf3rdrdp_fcs
 */
@@ -48,6 +49,8 @@ class QFRDRFCSCorrelationEditor : public QFRawDataEditor {
     protected slots:
         /** \brief connected to the rawDataChanged() signal of the current record */
         virtual void rawDataChanged();
+        void rawDataChangedRecalc();
+
         /** \brief displays the data from the current data element in the plotter widget
          *
          * the parameter dummy has no function it is only there so this function may be used
@@ -100,6 +103,9 @@ class QFRDRFCSCorrelationEditor : public QFRawDataEditor {
         QLabel* labRuns;
         /** \brief label for the number of points in the correlation function */
         QLabel* labCorrelationPoints;
+        QMenu* menuMask;
+        QFCorrelationMaskTools* correlationMaskTools;
+
     private:
 };
 

@@ -161,14 +161,14 @@ void QFRDRImageMaskEditTools::setRDR(QFRawDataRecord *rdr)
     this->rdr=rdr;
     imagemask=qobject_cast<QFRDRImageMaskInterface*>(rdr);
     runselection=qobject_cast<QFRDRRunSelectionsInterface*>(rdr);
-    actSaveMask->setEnabled(imagemask);
-    actLoadMask->setEnabled(imagemask);
-    actCopyMask->setEnabled(imagemask);
-    actPasteMask->setEnabled(imagemask);
-    actClearMask->setEnabled(imagemask);
-    actInvertMask->setEnabled(imagemask);
-    actMaskBorder->setEnabled(imagemask);
-    actCopyMaskToGroup->setEnabled(rdr && rdr->getGroup()>=0);
+    actSaveMask->setVisible(imagemask||runselection);
+    actLoadMask->setVisible(imagemask||runselection);
+    actCopyMask->setVisible(imagemask||runselection);
+    actPasteMask->setVisible(imagemask||runselection);
+    actClearMask->setVisible(imagemask||runselection);
+    actInvertMask->setVisible(imagemask||runselection);
+    actMaskBorder->setVisible(imagemask);
+    actCopyMaskToGroup->setVisible((imagemask||runselection) && rdr && rdr->getGroup()>=0);
 
     if (rdr)  {
         undos=rdr->getProperty(settingsPrefix+"QFRDRImageMaskEditTools_undostack",QStringList()).toStringList();
@@ -218,6 +218,15 @@ void QFRDRImageMaskEditTools::signalMaskChanged(bool delayed, bool updateUndoRed
         //qDebug()<<"undos: size="<<undos.size()<<"pos="<<undoPos;
         updateUndoActions();
     }
+    if (runselection && updateUndoRedo)  {
+        for (int i=undos.size()-1; i>undoPos; i--) {
+            undos.removeAt(i);
+        }
+        undos.append(runselection->leaveoutToString());
+        undoPos=undos.size()-1;
+        //qDebug()<<"undos: size="<<undos.size()<<"pos="<<undoPos;
+        updateUndoActions();
+    }
 
     if (delayed && useDelay) {
         timUpdateAfterClick->setSingleShot(true);
@@ -231,8 +240,8 @@ void QFRDRImageMaskEditTools::signalMaskChanged(bool delayed, bool updateUndoRed
 
 void QFRDRImageMaskEditTools::updateUndoActions()
 {
-    actUndoMask->setEnabled(imagemask&&(undoPos>=0)&&(undoPos<undos.size()) );
-    actRedoMask->setEnabled(imagemask&&(undoPos<undos.size()-1) );
+    actUndoMask->setEnabled((imagemask||runselection)&&(undoPos>=0)&&(undoPos<undos.size()) );
+    actRedoMask->setEnabled((imagemask||runselection)&&(undoPos<undos.size()-1) );
 }
 
 void QFRDRImageMaskEditTools::updateAfterClick()
@@ -244,12 +253,14 @@ void QFRDRImageMaskEditTools::updateAfterClick()
 
 
 void QFRDRImageMaskEditTools::loadMask() {
-    if (!imagemask) return;
+    if (!imagemask && !runselection) return;
     QString lastMaskDir=ProgramOptions::getConfigValue("QFRDRImageMaskEditTools/lastmaskdir", "").toString();
     QString filename= qfGetOpenFileName(parentWidget, tr("select mask file to open ..."), lastMaskDir, tr("mask files (*.msk)"));
     if (QFile::exists(filename)) {
         if (imagemask) {
             imagemask->maskLoad(filename);
+        } else if (runselection) {
+            runselection->leaveoutLoad(filename);
         }
         ProgramOptions::setConfigValue("QFRDRImageMaskEditTools/lastmaskdir", lastMaskDir);
     }
@@ -259,13 +270,16 @@ void QFRDRImageMaskEditTools::loadMask() {
 
 void QFRDRImageMaskEditTools::pasteMask()
 {
-    if (!imagemask) return;
+    if (!imagemask && !runselection) return;
 
     QClipboard* clipboard=QApplication::clipboard();
 
     const QMimeData* mime=clipboard->mimeData();
     if (mime->hasFormat("quickfit3/pixelselection")) {
-        imagemask->maskLoadFromString(QString::fromUtf8(mime->data("quickfit3/pixelselection")));
+        if (imagemask) imagemask->maskLoadFromString(QString::fromUtf8(mime->data("quickfit3/pixelselection")));
+    }
+    if (mime->hasFormat("quickfit3/runselection")) {
+        if (runselection) runselection->leaveoutLoadFromString(QString::fromUtf8(mime->data("quickfit3/runselection")));
     }
 
     signalMaskChanged(false);
@@ -273,41 +287,63 @@ void QFRDRImageMaskEditTools::pasteMask()
 
 void QFRDRImageMaskEditTools::saveMask()
 {
-    if (!imagemask) return;
+    if (!imagemask && !runselection) return;
     QString lastMaskDir=ProgramOptions::getConfigValue("QFRDRImageMaskEditTools/lastmaskdir", "").toString();
     QString filename= qfGetSaveFileName(parentWidget, tr("save mask as ..."), lastMaskDir, tr("mask files (*.msk)"));
     if (!filename.isEmpty()) {
-        imagemask->maskSave(filename);
+        if (imagemask) imagemask->maskSave(filename);
+        else if (runselection) runselection->leaveoutSave(filename);
         ProgramOptions::setConfigValue("QFRDRImageMaskEditTools/lastmaskdir", lastMaskDir);
     }
 }
 
 void QFRDRImageMaskEditTools::copyMask()
 {
-    if (!imagemask) return;
-    QString mask=imagemask->maskToString();
+    if (!imagemask && !runselection) return;
+    QString mask;
+    if (imagemask) mask=imagemask->maskToString();
+    else if (runselection) mask=runselection->leaveoutToString();
     QClipboard* clipboard=QApplication::clipboard();
     QMimeData* mime=new QMimeData();
     mime->setText(mask);
-    mime->setData("quickfit3/pixelselection", mask.toUtf8());
+    if (imagemask) mime->setData("quickfit3/pixelselection", mask.toUtf8());
+    else if (runselection) mime->setData("quickfit3/runselection", mask.toUtf8());
     clipboard->setMimeData(mime);
 }
 
 void QFRDRImageMaskEditTools::copyMaskToGroup()
 {
-    if (!imagemask || !rdr) return;
+    if ((!runselection&&!imagemask) || !rdr) return;
     int g=rdr->getGroup();
-    QString mask=imagemask->maskToString();
+    QString mask;
+    if (imagemask) mask=imagemask->maskToString();
+    else if (runselection) mask=runselection->leaveoutToString();
 
-    for (int r=0; r<rdr->getProject()->getRawDataCount(); r++) {
-        QFRawDataRecord* rd=rdr->getProject()->getRawDataByNum(r);
-        if (rd && rd->getGroup()==g) {
-            QFRDRImageMaskInterface* rm=qobject_cast<QFRDRImageMaskInterface*>(rd);
-            if (rm) {
-                rm->maskClear();
-                rm->maskLoadFromString(mask);
-                rm->maskMaskChangedEvent();
+    if (imagemask) {
+        for (int r=0; r<rdr->getProject()->getRawDataCount(); r++) {
+            QFRawDataRecord* rd=rdr->getProject()->getRawDataByNum(r);
+            if (rd && rd->getGroup()==g) {
+                QFRDRImageMaskInterface* rm=qobject_cast<QFRDRImageMaskInterface*>(rd);
+                if (rm) {
+                    rm->maskClear();
+                    rm->maskLoadFromString(mask);
+                    rm->maskMaskChangedEvent();
+                }
             }
+
+        }
+    } else if (runselection) {
+        for (int r=0; r<rdr->getProject()->getRawDataCount(); r++) {
+            QFRawDataRecord* rd=rdr->getProject()->getRawDataByNum(r);
+            if (rd && rd->getGroup()==g) {
+                QFRDRRunSelectionsInterface* rm=qobject_cast<QFRDRRunSelectionsInterface*>(rd);
+                if (rm) {
+                    rm->leaveoutClear();
+                    rm->leaveoutLoadFromString(mask);
+                    rm->leaveoutChangedEvent();
+                }
+            }
+
         }
 
     }
@@ -318,29 +354,36 @@ void QFRDRImageMaskEditTools::copyMaskToGroup()
 
 void QFRDRImageMaskEditTools::clearMask()
 {
-    if (!imagemask) return;
-    imagemask->maskClear();
+    if (!imagemask && !runselection) return;
+    if (imagemask) imagemask->maskClear();
+    else if (runselection) runselection->leaveoutClear();
 
     signalMaskChanged(false);
 }
 
 void QFRDRImageMaskEditTools::invertMask()
 {
-    //qDebug()<<"invertmask()   imagemask="<<imagemask;
-    if (!imagemask) return;
-    imagemask->maskInvert();
+    if (!imagemask && !runselection) return;
+    if (imagemask) imagemask->maskInvert();
+    else if (runselection) runselection->leaveoutInvert();
 
     signalMaskChanged(false);
 }
 
 void QFRDRImageMaskEditTools::undoMask()
 {
-    if (!imagemask) return;
+    if (!imagemask && !runselection) return;
 
     if (undoPos>=0) {
         QString mask=undos.value(undoPos, "");
-        imagemask->maskClear();
-        imagemask->maskLoadFromString(mask);
+        if (imagemask) {
+            imagemask->maskClear();
+            imagemask->maskLoadFromString(mask);
+        } else if (runselection){
+            runselection->leaveoutClear();
+            runselection->leaveoutLoadFromString(mask);
+
+        }
         undoPos--;
     }
 
@@ -350,12 +393,18 @@ void QFRDRImageMaskEditTools::undoMask()
 
 void QFRDRImageMaskEditTools::redoMask()
 {
-    if (!imagemask) return;
+    if (!imagemask && !runselection) return;
 
     if (undoPos+1<undos.size()) {
         QString mask=undos.value(undoPos+1, "");
-        imagemask->maskClear();
-        imagemask->maskLoadFromString(mask);
+        if (imagemask) {
+            imagemask->maskClear();
+            imagemask->maskLoadFromString(mask);
+        } else if (runselection){
+            runselection->leaveoutClear();
+            runselection->leaveoutLoadFromString(mask);
+
+        }
         undoPos++;
     }
 
