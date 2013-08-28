@@ -107,6 +107,9 @@ namespace QFMathParser_Private {
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC_SIMPLE(fSinh, sinh)
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC_SIMPLE(fCosh, cosh)
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC_SIMPLE(fTanh, tanh)
+    QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC_SIMPLE(fASinh, asinh)
+    QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC_SIMPLE(fACosh, acosh)
+    QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC_SIMPLE(fATanh, atanh)
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC_SIMPLE(fErf, erf)
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC_SIMPLE(fErfc, erfc)
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC_SIMPLE(flGamma, lgamma)
@@ -594,6 +597,9 @@ void QFMathParser::addStandardFunctions(){
     addFunction("sinh", QFMathParser_Private::fSinh, NULL, sinh);
     addFunction("cosh", QFMathParser_Private::fCosh, NULL, cosh);
     addFunction("tanh", QFMathParser_Private::fTanh, NULL, tanh);
+    addFunction("asinh", QFMathParser_Private::fASinh, NULL, sinh);
+    addFunction("acosh", QFMathParser_Private::fACosh, NULL, cosh);
+    addFunction("atanh", QFMathParser_Private::fATanh, NULL, tanh);
     addFunction("log", QFMathParser_Private::fLog, NULL, log);
     addFunction("log2", QFMathParser_Private::fLog2, NULL, log2);
     addFunction("log10", QFMathParser_Private::fLog10, NULL, log10);

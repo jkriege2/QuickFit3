@@ -1,5 +1,5 @@
-#ifndef QFFITALGORITHMLMFIT_H
-#define QFFITALGORITHMLMFIT_H
+#ifndef QFFitAlgorithmLMFitBox_H
+#define QFFitAlgorithmLMFitBox_H
 #include "qffitalgorithm.h"
 
 
@@ -8,7 +8,7 @@
 
 
 */
-class QFFitAlgorithmLMFit: public QFFitAlgorithm {
+class QFFitAlgorithmLMFitBox: public QFFitAlgorithm {
     protected:
 
         /** \copydoc QFFitAlgorithm::intFit() */
@@ -17,15 +17,15 @@ class QFFitAlgorithmLMFit: public QFFitAlgorithm {
 
     public:
         /** \brief class constructor */
-        QFFitAlgorithmLMFit();
+        QFFitAlgorithmLMFitBox();
         /** \brief class destructor */
-        virtual ~QFFitAlgorithmLMFit() {}
+        virtual ~QFFitAlgorithmLMFitBox() {}
         /** \copydoc QFFitAlgorithm::name() */
-        virtual QString name() const { return QObject::tr("lmfit: Levenberg-Marquard fit (without box constraints)"); };
+        virtual QString name() const { return QObject::tr("lmfit: Levenberg-Marquard fit (with box constraints)"); };
         /** \copydoc QFFitAlgorithm::shortName() */
         virtual QString shortName() const { return QObject::tr("lmfit: Levenberg-Marquard fit"); };
         /** \copydoc QFFitAlgorithm::id() */
-        virtual QString id() const { return QString("fit_lmfit_nobox"); };
+        virtual QString id() const { return QString("fit_lmfit"); };
         /** \copydoc QFFitAlgorithm::get_supportsBoxConstraints() */
         virtual bool get_supportsBoxConstraints() const { return true; };
         /** \copydoc QFFitAlgorithm::displayConfig() */
@@ -36,4 +36,4 @@ class QFFitAlgorithmLMFit: public QFFitAlgorithm {
 };
 
 
-#endif // QFFITALGORITHMLMFIT_H
+#endif // QFFitAlgorithmLMFitBox_H

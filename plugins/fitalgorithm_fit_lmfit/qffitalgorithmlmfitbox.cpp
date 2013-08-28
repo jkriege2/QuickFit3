@@ -1,4 +1,4 @@
-#include "qffitalgorithmlmfit.h"
+#include "qffitalgorithmlmfitbox.h"
 #include "qffitalgorithmlmfitconfig.h"
 #include <cmath>
 #include "lmmin.h"
@@ -11,22 +11,23 @@ struct QFFItAlgorithmGSL_evalData {
     int pcount;
 };
 
-void lmfit_eval(const double *par, int m_dat, const void *data, double *fvec, int *info) {
+void lmfit_evalboxtanh(const double *par, int m_dat, const void *data, double *fvec, int *info) {
     QFFItAlgorithmGSL_evalData* edata=(QFFItAlgorithmGSL_evalData*)data;
-    double* p=edata->p;
-   /* if ( edata->paramsMin && edata->paramsMax) {
+    if ( edata->paramsMin && edata->paramsMax ) {
+        double* p=edata->p;
         for (int i=0; i<edata->pcount; i++) {
-            p[i]=par[i];
-            if (par[i]>edata->paramsMax[i]) p[i]=edata->paramsMax[i];
-            if (par[i]<edata->paramsMin[i]) p[i]=edata->paramsMin[i];
+            const double mi=edata->paramsMin[i];
+            const double ma=edata->paramsMax[i];
+            const double pv=tanh(par[i]);
+            p[i]=mi+(pv+1.0)*(ma-mi)/2.0;
         }
         edata->model->evaluate(fvec, p);
-    } else {*/
+    } else {
         edata->model->evaluate(fvec, par);
-    //}
+    }
 }
 
-QFFitAlgorithmLMFit::QFFitAlgorithmLMFit() {
+QFFitAlgorithmLMFitBox::QFFitAlgorithmLMFitBox() {
     // set default parameter values
     lm_control_struct control = lm_control_double;
     setParameter("ftol", control.ftol);
@@ -37,7 +38,7 @@ QFFitAlgorithmLMFit::QFFitAlgorithmLMFit() {
     setParameter("max_iterations", control.maxcall);
 }
 
-QFFitAlgorithm::FitResult QFFitAlgorithmLMFit::intFit(double* paramsOut, double* paramErrorsOut, const double* initialParams, QFFitAlgorithm::Functor* model, const double* paramsMin, const double* paramsMax) {
+QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, double* paramErrorsOut, const double* initialParams, QFFitAlgorithm::Functor* model, const double* paramsMin, const double* paramsMax) {
     QFFitAlgorithm::FitResult result;
 
     int paramCount=model->get_paramcount(); // number of parameters
@@ -63,15 +64,29 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFit::intFit(double* paramsOut, double*
     d.pcount=paramCount;
     d.p=(double*)malloc(paramCount*sizeof(double));
 
-    lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_eval, &control, &status, NULL );
+    bool transformParams=paramsMin&&paramsMax;
 
-    if ( paramsMin && paramsMax) {
+    if (!transformParams) {
+        lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxtanh, &control, &status, NULL );
+    } else {
         for (int i=0; i<paramCount; i++) {
-            const double& par=paramsOut[i];
-            if (par>paramsMax[i]) paramsOut[i]=paramsMax[i];
-            if (par<paramsMin[i]) paramsOut[i]=paramsMin[i];
+            const double mi=paramsMin[i];
+            const double ma=paramsMax[i];
+            const double pv=2.0*(paramsOut[i]-mi)/(ma-mi)-1.0;
+            paramsOut[i]=atanh(pv);
+            if (pv>=1.0) paramsOut[i]=1e15;
+            if (pv<=-1.0) paramsOut[i]=-1e15;
+        }
+
+        lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxtanh, &control, &status, NULL );
+        for (int i=0; i<paramCount; i++) {
+            const double mi=paramsMin[i];
+            const double ma=paramsMax[i];
+            const double pv=tanh(paramsOut[i]);
+            paramsOut[i]=mi+(pv+1.0)*(ma-mi)/2.0;
         }
     }
+
 
     result.addNumber("error_sum", status.fnorm);
     result.addNumber("iterations", status.nfev);
@@ -79,13 +94,12 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFit::intFit(double* paramsOut, double*
     result.fitOK=QString(lm_infmsg[status.info]).contains("success");
     result.message=QString(lm_infmsg[status.info]);
     result.messageSimple=QString(lm_infmsg[status.info]);
-
     if (d.p) free(d.p);
 
     return result;
 }
 
-bool QFFitAlgorithmLMFit::displayConfig() {
+bool QFFitAlgorithmLMFitBox::displayConfig() {
     QFFitAlgorithmLMFitConfigDialog* dlg=new QFFitAlgorithmLMFitConfigDialog(0);
 
     // init widget here:
@@ -107,7 +121,7 @@ bool QFFitAlgorithmLMFit::displayConfig() {
     }
 }
 
-bool QFFitAlgorithmLMFit::isThreadSafe() const
+bool QFFitAlgorithmLMFitBox::isThreadSafe() const
 {
     return true;
 }

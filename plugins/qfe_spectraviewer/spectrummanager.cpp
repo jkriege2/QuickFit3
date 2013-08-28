@@ -158,9 +158,10 @@ void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStr
     QStringList groups=set.childGroups();
     for (int i=0; i<groups.size(); i++) {
         QString gn=groups[i].toLower();
+        QString gns=gn;
         if (!gn.isEmpty() && gn.size()>0) {
             gn+="/";
-            FluorophoreData d=fluorophores.value(groups[i], FluorophoreData());
+            FluorophoreData d=fluorophores.value(gns, FluorophoreData());
 
             d.folder=set.value(gn+"folder", "").toString();
             d.name=set.value(gn+"name", groups[i]).toString();
@@ -204,12 +205,12 @@ void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStr
             }
             d.fluorescence_efficiency_wavelength=set.value(gn+"q_fluor_wavelength", d.emission_maxwavelength).toDouble();
             d.extiction_coefficient_wavelength=set.value(gn+"molar_extinction_wavelength", d.excitation_maxwavelength).toDouble();
-            fluorophores[groups[i]]=d;
+            fluorophores[gns]=d;
 
             if (d.folder.isEmpty()) {
-                fluorophoresTree->addFolderedItem(d.name, groups[i]);
+                fluorophoresTree->addFolderedItem(d.name, gns);
             } else {
-                fluorophoresTree->addFolderedItem(d.folder+"/"+d.name, groups[i]);
+                fluorophoresTree->addFolderedItem(d.folder+"/"+d.name, gns);
             }
 
         }
@@ -231,9 +232,10 @@ void SpectrumManager::loadFilterDatabase(const QString &ininame, const QStringLi
     QStringList groups=set.childGroups();
     for (int i=0; i<groups.size(); i++) {
         QString gn=groups[i].toLower();
+        QString gns=gn;
         if (!gn.isEmpty() && gn.size()>0) {
             gn+="/";
-            FilterData d=filters.value(groups[i], FilterData());
+            FilterData d=filters.value(gns, FilterData());
 
             d.folder=set.value(gn+"folder", "").toString();
             d.name=set.value(gn+"name", groups[i]).toString();
@@ -258,11 +260,11 @@ void SpectrumManager::loadFilterDatabase(const QString &ininame, const QStringLi
                 d.typical_wavelength=spectra[d.spectrum]->getSpectrumMaxWavelength();
             }
 
-            filters[groups[i]]=d;
+            filters[gns]=d;
             if (d.folder.isEmpty()) {
-                filtersTree->addFolderedItem(d.name, groups[i]);
+                filtersTree->addFolderedItem(d.name, gns);
             } else {
-                filtersTree->addFolderedItem(d.folder+"/"+d.name, groups[i]);
+                filtersTree->addFolderedItem(d.folder+"/"+d.name, gns);
             }
         }
     }
@@ -282,9 +284,10 @@ void SpectrumManager::loadLightSourceDatabase(const QString &ininame, const QStr
     QStringList groups=set.childGroups();
     for (int i=0; i<groups.size(); i++) {
         QString gn=groups[i].toLower();
+        QString gns=gn;
         if (!gn.isEmpty() && gn.size()>0) {
             gn+="/";
-            LightSourceData d=lightsources.value(groups[i], LightSourceData());
+            LightSourceData d=lightsources.value(gns, LightSourceData());
 
             d.folder=set.value(gn+"folder", "").toString();
             d.name=set.value(gn+"name", groups[i]).toString();
@@ -309,12 +312,12 @@ void SpectrumManager::loadLightSourceDatabase(const QString &ininame, const QStr
                 d.typical_wavelength=spectra[d.spectrum]->getSpectrumMaxWavelength();
             }
 
-            lightsources[groups[i]]=d;
+            lightsources[gns]=d;
 
             if (d.folder.isEmpty()) {
-                lightsourcesTree->addFolderedItem(d.name, groups[i]);
+                lightsourcesTree->addFolderedItem(d.name, gns);
             } else {
-                lightsourcesTree->addFolderedItem(d.folder+"/"+d.name, groups[i]);
+                lightsourcesTree->addFolderedItem(d.folder+"/"+d.name, gns);
             }
 
         }
@@ -335,9 +338,10 @@ void SpectrumManager::loadDetectorDatabase(const QString &ininame, const QString
     QStringList groups=set.childGroups();
     for (int i=0; i<groups.size(); i++) {
         QString gn=groups[i].toLower();
+        QString gns=gn;
         if (!gn.isEmpty() && gn.size()>0) {
             gn+="/";
-            DetectorData d=detectors.value(groups[i], DetectorData());
+            DetectorData d=detectors.value(gns, DetectorData());
 
             d.folder=set.value(gn+"folder", "").toString();
             d.name=set.value(gn+"name", groups[i]).toString();
@@ -364,12 +368,12 @@ void SpectrumManager::loadDetectorDatabase(const QString &ininame, const QString
                 d.peak_wavelength=spectra[d.spectrum]->getSpectrumMaxWavelength();
             }
 
-            detectors[groups[i]]=d;
+            detectors[gns]=d;
 
             if (d.folder.isEmpty()) {
-                detectorsTree->addFolderedItem(d.name, groups[i]);
+                detectorsTree->addFolderedItem(d.name, gns);
             } else {
-                detectorsTree->addFolderedItem(d.folder+"/"+d.name, groups[i]);
+                detectorsTree->addFolderedItem(d.folder+"/"+d.name, gns);
             }
 
         }

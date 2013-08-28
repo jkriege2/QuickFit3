@@ -5,6 +5,7 @@
 #include <QObject>
 #include "qfextension.h"
 #include "qfpluginoptionsdialog.h"
+#include <QThread>
 
 /*!
     \defgroup qf3ext_qfe_spectraviewer QFExtension implementation
@@ -12,6 +13,21 @@
 */
 class SpectrumManager;
 class QFESpectraViewerDialog;
+class QFESpectraViewer;
+
+class QFESpectraViewerLoadThread: public QThread {
+        Q_OBJECT
+    public:
+        QFESpectraViewerLoadThread(SpectrumManager*manager, QFESpectraViewer* parent=NULL);
+    signals:
+        void slog_text(const QString& text);
+    protected:
+        void log_text(const QString& text);
+        SpectrumManager* manager;
+        virtual void run();
+        QFESpectraViewer* sv;
+};
+
 
 /*! \brief QFExtension implementation
     \ingroup qf3ext_qfe_spectraviewer
@@ -59,6 +75,8 @@ class QFESpectraViewer : public QObject, public QFExtensionBase, public QFPlugin
 
         SpectrumManager* getSpectrumManager() const;
         void reloadDatabases();
+    public:
+        static QString intReloadDatabases(SpectrumManager* manager, const QString &id);
 
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */
@@ -89,10 +107,12 @@ class QFESpectraViewer : public QObject, public QFExtensionBase, public QFPlugin
         QFPluginLogService* logService;
         QFESpectraViewerDialog* dlg;
         SpectrumManager* manager;
+        QFESpectraViewerLoadThread* loadThread;
 		
 	protected slots:
 	    /** \brief target, used in example code in initExtension() */
         void showViewer();
+        void doLog(const QString& text);
 
 };
 

@@ -6,7 +6,7 @@
 
 
 QFFitAlgorithmLMFitIRLS::QFFitAlgorithmLMFitIRLS():
-    QFFitAlgorithmLMFit()
+    QFFitAlgorithmLMFitBox()
 {
     setParameter("irls_parameter", 1.1);
     setParameter("irls_iterations", 10);
@@ -22,7 +22,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitIRLS::intFit(double* paramsOut, dou
         copyArray(paramsOut, initialParams, model->get_paramcount());
         QFFitAlgorithm::IRLSFunctorAdaptor irls_functor(ffFunctor, irls_parameter);
         for (int i=0; i<irls_iterations; i++) {
-            result= QFFitAlgorithmLMFit::intFit(paramsOut, paramErrorsOut, paramsOut, &irls_functor, paramsMin, paramsMax);
+            result= QFFitAlgorithmLMFitBox::intFit(paramsOut, paramErrorsOut, paramsOut, &irls_functor, paramsMin, paramsMax);
             irls_functor.irlsReweight(paramsOut);
         }
         return result;

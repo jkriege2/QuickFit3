@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QList>
 #include <QStringList>
+#include "qftablepluginmodel.h"
 
 namespace Ui {
     class QFRDRTableHistogramDialog;
@@ -19,22 +20,23 @@ class QFRDRTableHistogramDialog : public QDialog
         explicit QFRDRTableHistogramDialog(QWidget *parent = 0);
         ~QFRDRTableHistogramDialog();
 
-        void setColumnData(const QMap<int, QList<double> > &data);
-        void readProperties(QFProperties* props);
-        void setColumnTitles(const QStringList& titles);
+        void setTable(QFTablePluginModel* table);
+        void setSelectedColumn(int col);
         void init();
 
 
-        QMap<int, QList<double> > getHistograms() const;
+        QMap<int, QVector<double> > getHistograms() const;
         QMap<int, QString> getHeaderNames() const;
     protected slots:
-        void updateHistograms();
+        void updateHistograms(bool estimateBinWidth=false);
+        void on_edtRangeMax_valueChanged(double value);
+        void on_edtRangeMin_valueChanged(double value);
+        void on_edtBinWidth_valueChanged(double value);
+        void on_spinBins_valueChanged(int value);
     private:
         Ui::QFRDRTableHistogramDialog *ui;
-        QMap<int, QList<double> > data;
-        QFProperties* props;
-        QStringList columnTitles;
-        QMap<int, QList<double> > histograms;
+
+        QMap<int, QVector<double> > histograms;
         QMap<int, QString> headerNames;
         struct colStatistics {
             double min;
@@ -46,6 +48,8 @@ class QFRDRTableHistogramDialog : public QDialog
             int values;
         };
         QMap<int, colStatistics> columnStatistics;
+        int selected;
+        QFTablePluginModel* table;
 };
 
 #endif // QFRDRTABLEHISTOGRAMDIALOG_H

@@ -87,15 +87,17 @@ void QFHistogramView::createWidgets() {
     tabHistogramParameters->setColumnTitle(1, tr("complete histogram"));
     tabHistogramParameters->appendColumn();
     tabHistogramParameters->setColumnTitle(2, tr("selection histogram"));
-    for (int r=0; r<8; r++) tabHistogramParameters->appendRow();
-    tabHistogramParameters->setCell(0, 0, tr("data points N"));
-    tabHistogramParameters->setCell(1, 0, tr("average"));
-    tabHistogramParameters->setCell(2, 0, tr("median"));
-    tabHistogramParameters->setCell(3, 0, tr("std. dev. &sigma;"));
-    tabHistogramParameters->setCell(4, 0, tr("min"));
-    tabHistogramParameters->setCell(5, 0, tr("25% quantile"));
-    tabHistogramParameters->setCell(6, 0, tr("75% quantile"));
-    tabHistogramParameters->setCell(7, 0, tr("max"));
+    //for (int r=0; r<8; r++) tabHistogramParameters->appendRow();
+    tabHistogramParameters->setCellCreate(0, 0, tr("data points N"));
+    tabHistogramParameters->setCellCreate(1, 0, tr("average"));
+    tabHistogramParameters->setCellCreate(2, 0, tr("median"));
+    tabHistogramParameters->setCellCreate(3, 0, tr("std. dev. &sigma;"));
+    tabHistogramParameters->setCellCreate(4, 0, tr("min"));
+    tabHistogramParameters->setCellCreate(5, 0, tr("25% quantile"));
+    tabHistogramParameters->setCellCreate(6, 0, tr("75% quantile"));
+    tabHistogramParameters->setCellCreate(7, 0, tr("max"));
+    tabHistogramParameters->setCellCreate(8, 0, tr("skewness &gamma;<sub>1</sub>"));
+    tabHistogramParameters->setCellCreate(9, 0, tr("invalid values"));
     tabHistogramParameters->setReadonly(true);
 
     tvHistogramParameters->setModel(tabHistogramParameters);
@@ -372,13 +374,17 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
             if (hist.data && (hist.size>0)) {
                 int imageSize=hist.size;
                 double* datahist=(double*)malloc(imageSize*sizeof(double));
-                int32_t datasize=0;
-                for (register int32_t i=0; i<imageSize; i++) {
-                    datahist[i]=hist.data[i];
-                    datasize++;
+                long long datasize=0;
+                for (register long long i=0; i<imageSize; i++) {
+                    const double v=hist.data[i];
+                    if (statisticsFloatIsOK(v)) {
+                        datahist[datasize]=v;
+                        datasize++;
+                    }
                 }
                 double dmin, dmax;
                 statisticsSort(datahist, datasize);
+                //datasize=statisticsFilterGoodFloat(datahist, datasize);
                 dmin=statisticsSortedMin(datahist, datasize);
                 dmax=statisticsSortedMax(datahist, datasize);
                 if (first) {
@@ -405,13 +411,17 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 double mmax=edtHistogramMax->value();
                 if (chkHistogramRangeAuto->isChecked() && hh==0) {
                     for (register int32_t i=0; i<imageSize; i++) {
-                        datahist[i]=hist.data[i];
-                        datasize++;
+                        const double v=hist.data[i];
+                        if (statisticsFloatIsOK(v)) {
+                            datahist[i]=v;
+                            datasize++;
+                        }
                     }
                 } else {
                     for (register int32_t i=0; i<imageSize; i++) {
-                        if ((hist.data[i]>=mmin) && (hist.data[i]<=mmax)) {
-                            datahist[datasize]=hist.data[i];
+                        const double v=hist.data[i];
+                        if (statisticsFloatIsOK(v)&&(v>=mmin) && (v<=mmax)) {
+                            datahist[datasize]=v;
                             datasize++;
                         }
                     }
@@ -419,7 +429,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
 
 
                 statisticsSort(datahist, datasize);
-                double dmean, dstd, dmin, dmax, dmedian, dq25, dq75;
+                double dmean, dstd, dmin, dmax, dmedian, dq25, dq75, dskew;
                 dmean=statisticsAverageVariance(dstd, datahist, datasize);
                 dstd=sqrt(dstd);
                 dmin=statisticsSortedMin(datahist, datasize);
@@ -427,6 +437,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 dmedian=statisticsSortedMedian(datahist, datasize);
                 dq25=statisticsSortedQuantile(datahist, datasize, 0.25);
                 dq75=statisticsSortedQuantile(datahist, datasize, 0.75);
+                dskew=statisticsSkewness(datahist, datasize);
                 tabHistogramParameters->setCellCreate(0, hh+1, datasize);
                 tabHistogramParameters->setCellCreate(1, hh+1, dmean);
                 tabHistogramParameters->setCellCreate(2, hh+1, dmedian);
@@ -435,6 +446,8 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 tabHistogramParameters->setCellCreate(5, hh+1, dq25);
                 tabHistogramParameters->setCellCreate(6, hh+1, dq75);
                 tabHistogramParameters->setCellCreate(7, hh+1, dmax);
+                tabHistogramParameters->setCellCreate(8, hh+1, dskew);
+                tabHistogramParameters->setCellCreate(9, hh+1, imageSize-datasize);
                 tabHistogramParameters->setColumnTitle(hh+1, hist.name);
 
                 if (chkHistogramRangeAuto->isChecked() && hh==0) {

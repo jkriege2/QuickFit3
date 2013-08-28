@@ -14,12 +14,14 @@ include(../../libquickfitwidgets.pri)
 HEADERS += qfpfitalgorithmlmfit.h \
 		   qffitalgorithmlmfit.h \ 
     qffitalgorithmlmfitconfig.h \
-    qffitalgorithmlmfitirls.h
+    qffitalgorithmlmfitirls.h \
+    qffitalgorithmlmfitbox.h
 
 SOURCES += qfpfitalgorithmlmfit.cpp \
 		   qffitalgorithmlmfit.cpp \
     qffitalgorithmlmfitconfig.cpp \
-    qffitalgorithmlmfitirls.cpp
+    qffitalgorithmlmfitirls.cpp \
+    qffitalgorithmlmfitbox.cpp
 
 FORMS += \
     qffitalgorithmlmfitconfig.ui

@@ -42,6 +42,12 @@ QFFitAlgorithm::FitResult QFFitAlgorithmGSLDerivativeBase::intFit(double* params
     d.paramsMin=paramsMin;
     d.paramsMax=paramsMax;
     d.pcount=paramCount;
+    d.out=gsl_vector_alloc(model->get_evalout());
+    d.out_ast=gsl_vector_alloc(model->get_evalout());
+    d.params=gsl_vector_alloc(paramCount);
+    d.params_ast=gsl_vector_alloc(paramCount);
+
+
 
     int iter = 0;
     int maxIter = getParameter("max_iterations").toInt();
@@ -52,11 +58,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmGSLDerivativeBase::intFit(double* params
     gsl_multimin_fdfminimizer *s;
 
     // set starting value to initial parameters
-    gsl_vector *x;
-    x = gsl_vector_alloc(paramCount);
-    for (int i=0; i<paramCount; i++) {
-        gsl_vector_set (x, i, initialParams[i]);
-    }
+    gsl_vector *x=QFFitAlgorithmGSL_transformParams(initialParams, paramCount, paramsMin, paramsMax);
 
     gsl_multimin_function_fdf my_func;
     my_func.n = paramCount;
@@ -93,12 +95,13 @@ QFFitAlgorithm::FitResult QFFitAlgorithmGSLDerivativeBase::intFit(double* params
     } while (status == GSL_CONTINUE && iter < maxIter);
 
 
-    for (int i=0; i<paramCount; i++) {
+    /*for (int i=0; i<paramCount; i++) {
         const double par=gsl_vector_get(s->x, i);
         paramsOut[i]=par;
         if (par>paramsMax[i]) paramsOut[i]=paramsMax[i];
         if (par<paramsMin[i]) paramsOut[i]=paramsMin[i];
-    }
+    }*/
+    QFFitAlgorithmGSL_backTransformParams(paramsOut, paramCount, s->x, paramsMin, paramsMax);
 
     result.addNumber("error_sum", s->f);
     result.addNumber("iterations", iter);
@@ -125,6 +128,10 @@ QFFitAlgorithm::FitResult QFFitAlgorithmGSLDerivativeBase::intFit(double* params
 
     gsl_multimin_fdfminimizer_free (s);
     gsl_vector_free (x);
+    gsl_vector_free(d.params);
+    gsl_vector_free(d.params_ast);
+    gsl_vector_free(d.out);
+    gsl_vector_free(d.out_ast);
 
     return result;
 }

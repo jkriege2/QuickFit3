@@ -1,6 +1,7 @@
 #ifndef QFFITALGORITHMGSLSIMPLEX_H
 #define QFFITALGORITHMGSLSIMPLEX_H
 #include "qffitalgorithm.h"
+#include "gsl/gsl_multimin.h"
 
 
 /*! \brief QQFFitAlgorithm implementation
@@ -14,7 +15,7 @@ class QFFitAlgorithmGSLSimplex: public QFFitAlgorithm {
         /** \copydoc QFFitAlgorithm::intFit() */
         virtual FitResult intFit(double* paramsOut, double* paramErrorsOut, const double* initialParams, Functor* model, const double* paramsMin, const double* paramsMax);
 
-
+        const gsl_multimin_fminimizer_type *T;
     public:
         /** \brief class constructor */
         QFFitAlgorithmGSLSimplex();

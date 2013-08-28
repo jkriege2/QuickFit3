@@ -15,6 +15,8 @@ QFESpectraViewer::QFESpectraViewer(QObject* parent):
 	logService=NULL;
     dlg=NULL;
     manager=new SpectrumManager();
+    loadThread=new QFESpectraViewerLoadThread(manager, this);
+    connect(loadThread, SIGNAL(slog_text(QString)), this, SLOT(doLog(QString)));
 }
 
 QFESpectraViewer::~QFESpectraViewer() {
@@ -54,36 +56,43 @@ SpectrumManager *QFESpectraViewer::getSpectrumManager() const
 
 void QFESpectraViewer::reloadDatabases()
 {
-    log_text(tr("   loading databases from:\n"));
+    log_text(intReloadDatabases(manager, getID()));
+}
+
+QString QFESpectraViewer::intReloadDatabases(SpectrumManager *manager, const QString& id)
+{
+    QString result="";
+    result+=(tr("   loading databases from:\n"));
     QStringList directories;
     QList<bool> readonly;
-    directories<<services->getPluginAssetsDirectory(getID());
+    directories<<QFPluginServices::getInstance()->getPluginAssetsDirectory(id);
     readonly<<true;
     directories<<ProgramOptions::getConfigValue("qfe_spectraviewer/user_database", QFPluginServices::getInstance()->getPluginConfigDirectory("qfe_spectraviewer")).toString();
     readonly<<false;
     for (int i=0; i<directories.size(); i++) {
         QString ro="";
         if (readonly.value(i, false)) ro=tr(" [readonly]");
-        log_text(tr("     - %1%2\n").arg(directories[i]).arg(ro));
+        result+=(tr("     - %1%2\n").arg(directories[i]).arg(ro));
     }
 
     manager->clear();
-    log_text(tr("   loading fluorophore database ...\n"));
+    result+=(tr("   loading fluorophore database ...\n"));
     manager->loadFluorophoreDatabase("fluorophors.ini", directories);
-    log_text(tr("   loading filters database ...\n"));
+    result+=(tr("   loading filters database ...\n"));
     manager->loadFilterDatabase("filters.ini", directories);
-    log_text(tr("   loading lightsources database ...\n"));
+    result+=(tr("   loading lightsources database ...\n"));
     manager->loadLightSourceDatabase("ligtsources.ini", directories);
-    log_text(tr("   loading detectors database ...\n"));
+    result+=(tr("   loading detectors database ...\n"));
     manager->loadDetectorDatabase("detectors.ini", directories);
-    log_text(tr("   loading laserline database ...\n"));
+    result+=(tr("   loading laserline database ...\n"));
     manager->loadLaserlinesDatabase("laserlines.ini", directories);
 
-    log_text(tr("   loaded %1 fluorophores\n").arg(manager->getFluorophoreCount()));
-    log_text(tr("   loaded %1 filters\n").arg(manager->getFilterCount()));
-    log_text(tr("   loaded %1 lightsources\n").arg(manager->getLightSourceCount()));
-    log_text(tr("   loaded %1 detectors\n").arg(manager->getDetectorCount()));
-    log_text(tr("   loaded %1 spectra\n").arg(manager->getSpectraCount()));
+    result+=(tr("   loaded %1 fluorophores\n").arg(manager->getFluorophoreCount()));
+    result+=(tr("   loaded %1 filters\n").arg(manager->getFilterCount()));
+    result+=(tr("   loaded %1 lightsources\n").arg(manager->getLightSourceCount()));
+    result+=(tr("   loaded %1 detectors\n").arg(manager->getDetectorCount()));
+    result+=(tr("   loaded %1 spectra\n").arg(manager->getSpectraCount()));
+    return result;
 }
 
 void QFESpectraViewer::projectChanged(QFProject* oldProject, QFProject* project) {
@@ -98,6 +107,7 @@ void QFESpectraViewer::initExtension() {
 	// some example code that may be used to register a menu and a tool button:
     log_text(tr("initializing ...\n"));
     log_text(tr("   registering plugin ...\n"));
+    loadThread->start();
     QAction* actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Spectra Viewer"), this);
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(showViewer()));
     QToolBar* exttb=services->getToolbar("tools");
@@ -108,7 +118,7 @@ void QFESpectraViewer::initExtension() {
     if (extm) {
         extm->addAction(actStartPlugin);
     }
-    reloadDatabases();
+
     log_text(tr("initializing ... DONE\n"));
 }
 
@@ -147,10 +157,36 @@ void QFESpectraViewer::log_error(QString message) {
 
 void QFESpectraViewer::showViewer()
 {
+    if (loadThread->isRunning()) return;
     if (!dlg) dlg=new QFESpectraViewerDialog(this, NULL);
     dlg->show();
     dlg->raise();
 }
 
+void QFESpectraViewer::doLog(const QString &text)
+{
+    log_text(text);
+}
+
+
+
+QFESpectraViewerLoadThread::QFESpectraViewerLoadThread(SpectrumManager *manager, QFESpectraViewer *parent): QThread(parent)
+{
+    this->manager=manager;
+    sv=parent;
+}
+
+void QFESpectraViewerLoadThread::log_text(const QString &text)
+{
+    emit slog_text(text);
+}
+
+void QFESpectraViewerLoadThread::run()
+{
+    log_text(QFESpectraViewer::intReloadDatabases(manager, sv->getID()));
+}
+
+
 
 Q_EXPORT_PLUGIN2(qfe_spectraviewer, QFESpectraViewer)
+

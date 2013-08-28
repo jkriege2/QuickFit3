@@ -901,6 +901,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                         ui->tabFunctionParameters->setVisible(true);
                     }
                 }
+                break;
 
             case 15: case 16: // horicontal/vertical range
                 ui->btnFit->setVisible(false);

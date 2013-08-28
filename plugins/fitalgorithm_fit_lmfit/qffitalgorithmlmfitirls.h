@@ -2,13 +2,14 @@
 #define QFFitAlgorithmLMFitIRLSIRLS_H
 #include "qffitalgorithm.h"
 #include "qffitalgorithmlmfit.h"
+#include "qffitalgorithmlmfitbox.h"
 
 /*! \brief QQFFitAlgorithm implementation
     \ingroup qf3fitfunp_fit_lmfit
 
 
 */
-class QFFitAlgorithmLMFitIRLS: public QFFitAlgorithmLMFit {
+class QFFitAlgorithmLMFitIRLS: public QFFitAlgorithmLMFitBox {
     protected:
 
         /** \copydoc QFFitAlgorithm::intFit() */
@@ -21,7 +22,7 @@ class QFFitAlgorithmLMFitIRLS: public QFFitAlgorithmLMFit {
         /** \brief class destructor */
         virtual ~QFFitAlgorithmLMFitIRLS() {}
         /** \copydoc QFFitAlgorithm::name() */
-        virtual QString name() const { return QObject::tr("irls_lmfit: Iteratively reweightes Levenberg-Marquard fit (outlier-robust fit)"); };
+        virtual QString name() const { return QObject::tr("irls_lmfit: Iteratively reweightes Levenberg-Marquard fit (outlier-robust fit, with box-constraints)"); };
         /** \copydoc QFFitAlgorithm::shortName() */
         virtual QString shortName() const { return QObject::tr("irls_lmfit: IRLS Levenberg-Marquard fit"); };
         /** \copydoc QFFitAlgorithm::id() */
