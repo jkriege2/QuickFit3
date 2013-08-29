@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>PI Mercury C-863 Motion Stage Controller Plugin</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$ $$qf_commondoc_header.separator$$ <a href="$$mainhelpdir$$ext_stages.html">Motion Stage Plugins</a> $$qf_commondoc_header.end$$ 
+	 <p>This plugin makes motion stages available to QuickFit that are controlled by a <a href="http://www.physikinstrumente.de/de/produkte/prdetail.php?sortnr=900606">Mercury C-863 Controller</a> from Physik Intrumente.
+	 It can also handle several daisy-chained controllers.</p>
+	 <p>The controllers are configured by a global configuration file <tt>stage_pi863.ini</tt>. It is stored in the global configuration directory. You may change some of the configuration options in the associated
+	 config directory which will show up, if - and only if - you have write access to this file. If the file does not exist, the plugin will load (but not write) to the file <tt>stage_pi863.ini</tt> either in
+	 the user config directory, or in the assets directory (<tt>[AssetsDir]/plugins/stage_pi863/</tt>) for the plugin.
+	 </p>
+	 <p>In the <tt>stage_pi863.ini</tt> you will have to tell the plugin which stages are available:
+	 <blockquote><tt>
+[<b>driver</b>]<br>
+<b>port</b> = <i>port name (e.g. COM1 or /dev/tty0)</i><br>
+<b>port_speed</b> = <i>port speed (9600 | 19200 | 38400)</i><br>
+<b>pterm</b> = <i>p term of the stage PID loop</i><br>
+<b>iterm</b> = <i>i term of the stage PID loop</i><br>
+<b>dterm</b> = <i>d term of the stage PID loop</i><br>
+<b>ilimit</b> = <i>i term limit of the stage PID loop</i><br>
+<b>acceleration</b> = <i>maximum acceleration for the stages</i><br>
+<b>initvelocity</b> = <i>initial velocity for the stages</i><br>
+<b>maxvelocity</b> = <i>maximum velocity for the stages</i><br>
+<br>
+[<b>axis</b><i>n</i>] <i># group for the n-th stage (n=0,1,2,...)<br>
+<b>id</b> = <i>id of the stage (0,1,2,...)</i><br>
+<br>
+	 </tt></blockquote
+	 </p>
+	 <p>Here is an example configuration file for windows and three stages:
+	 <blockquote><tt>
+[driver]<br>
+port=COM1<br>
+port_speed=38400<br>
+pterm=150<br>
+iterm=45<br>
+dterm=300<br>
+ilimit=2000<br>
+acceleration=1000000<br>
+initvelocity=1000<br>
+maxvelocity=2000<br>
+<br>
+[axis0]<br>
+id=0<br>
+<br>
+[axis1]<br>
+id=1<br>
+<br>
+[axis2]<br>
+id=2<br>
+	 </tt></blockquote></p>
+
+
+<p>On Linux you have to make sure that the FTDI USB-to-serial converter inside the Mercury drivers is used with the correct drivers. This does not work with the default FTDI driver, as PI changed the device and vendor ID of the chip, so it is not recognized by Linux. 
+You can achieve the accessability of the MErcury USB converter by a udev rule like this:
+<blockquote><tt>
+#for the PI stage chain<br>
+#Product ID: 0x1007, Vendor ID: 0x1a72<br>
+SUBSYSTEMS=="usb", ATTRS{idProduct}=="1007", ATTRS{idVendor}=="1a72", RUN+="/root/bin/pi_mercury.sh"<br>
+KERNEL=="ttyUSB*", SUBSYSTEMS=="usb", ATTRS{idVendor}=="1a72", ATTRS{idProduct}=="1007", ATTRS{product}=="PI C-863 Mercury", SYMLINK+="ttyUSB_PI"
+</tt></blockquote>
+This will call the  shell scrip <code>/root/bin/pi_mercury.sh</code> when the PI stage is connected. Finally the stage is connected to the device file <code>/dev/ttyUSB_PI</code>. the contents of <code>/root/bin/pi_mercury.sh</code> is:
+<blockquote><tt>
+#!/bin/bash<br>
+/bin/echo "1a72 1007" > /sys/bus/usb-serial/drivers/ftdi_sio/new_id<br>
+logger "STAGE ACTIVATED"
+</tt></blockquote>
+This will modify the list of devices that are recognized by the kernel driver ftdi_sio.
+</p>
+
+<p>See also the help page on <a href="$$mainhelpdir$$ext_usbdevices_linux.html">Linux hardware enumeration with udev</a> for further information</p>
+
+  </body>
+</html>
