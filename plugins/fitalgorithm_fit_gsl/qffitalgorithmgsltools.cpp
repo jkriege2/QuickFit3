@@ -10,9 +10,8 @@ double QFFitAlgorithmGSL_f (const gsl_vector *v, void *eparams)
   gsl_vector * out=p->out;
   gsl_vector * params=p->params;
   if (p->paramsMin&& p->paramsMax) {
-      gsl_vector * params=p->params;
 
-      for (int i=0; i<p->pcount; i++) {
+      /*for (int i=0; i<p->pcount; i++) {
           const double mi=p->paramsMin[i];
           const double ma=p->paramsMax[i];
           double val=gsl_vector_get(v, i);
@@ -21,7 +20,15 @@ double QFFitAlgorithmGSL_f (const gsl_vector *v, void *eparams)
               val=mi+(pv+1.0)*(ma-mi)/2.0;
           }
           gsl_vector_set(params, i, val);
-      }
+      }*/
+      for (int i=0; i<p->pcount; i++) {
+           const double mi=p->paramsMin[i];
+           const double ma=p->paramsMax[i];
+           double val=gsl_vector_get(v, i);
+
+           gsl_vector_set(params, i, qBound(mi, val, ma));
+       }
+
   } else {
       for (int i=0; i<p->pcount; i++) {
           const double val=gsl_vector_get(v, i);
@@ -52,9 +59,8 @@ void QFFitAlgorithmGSL_df (const gsl_vector *v, void *eparams, gsl_vector * g)
 
 
   if (p->paramsMin&& p->paramsMax) {
-      gsl_vector * params=p->params;
 
-      for (int i=0; i<p->pcount; i++) {
+      /*for (int i=0; i<p->pcount; i++) {
           const double mi=p->paramsMin[i];
           const double ma=p->paramsMax[i];
           double val=gsl_vector_get(v, i);
@@ -64,7 +70,16 @@ void QFFitAlgorithmGSL_df (const gsl_vector *v, void *eparams, gsl_vector * g)
           }
           gsl_vector_set(params, i, val);
           gsl_vector_set(params_ast, i, val);
-      }
+
+      }*/
+      for (int i=0; i<p->pcount; i++) {
+           const double mi=p->paramsMin[i];
+           const double ma=p->paramsMax[i];
+           double val=qBound(mi, gsl_vector_get(v, i), ma);
+
+           gsl_vector_set(params, i, val);
+           gsl_vector_set(params_ast, i, val);
+       }
   } else {
       for (int i=0; i<p->pcount; i++) {
           const double val=gsl_vector_get(v, i);
@@ -124,7 +139,7 @@ void QFFitAlgorithmGSL_fdf (const gsl_vector *x, void *params, double *f, gsl_ve
 
 gsl_vector* QFFitAlgorithmGSL_transformParams(const double* paramsOut, int N, const double* paramsMin, const double* paramsMax) {
     gsl_vector* res=gsl_vector_alloc(N);
-    if (paramsMin&&paramsMax) {
+    /*if (paramsMin&&paramsMax) {
         for (int i=0; i<N; i++) {
             const double mi=paramsMin[i];
             const double ma=paramsMax[i];
@@ -138,18 +153,18 @@ gsl_vector* QFFitAlgorithmGSL_transformParams(const double* paramsOut, int N, co
                 gsl_vector_set(res, i, paramsOut[i]);
             }
         }
-    } else {
+    } else {*/
         for (int i=0; i<N; i++) {
             gsl_vector_set(res, i, paramsOut[i]);
         }
-    }
+    //}
     return res;
 }
 
 
 void QFFitAlgorithmGSL_backTransformParams(double* paramsOut, int N, const gsl_vector* input, const double* paramsMin, const double* paramsMax) {
     if (paramsMin&&paramsMax) {
-        for (int i=0; i<N; i++) {
+        /*for (int i=0; i<N; i++) {
             const double mi=paramsMin[i];
             const double ma=paramsMax[i];
             if (fabs(mi)<RANGE_MAXVAL && fabs(ma)<RANGE_MAXVAL) {
@@ -158,6 +173,17 @@ void QFFitAlgorithmGSL_backTransformParams(double* paramsOut, int N, const gsl_v
             } else {
                 paramsOut[i]=gsl_vector_get(input, i);
             }
+        }*/
+        for (int i=0; i<N; i++) {
+            const double mi=paramsMin[i];
+            const double ma=paramsMax[i];
+            /*if (fabs(mi)<RANGE_MAXVAL && fabs(ma)<RANGE_MAXVAL) {
+                const double pv=tanh(gsl_vector_get(input, i));
+                paramsOut[i]=mi+(pv+1.0)*(ma-mi)/2.0;
+            } else {
+                paramsOut[i]=gsl_vector_get(input, i);
+            }*/
+            paramsOut[i]=qBound(mi, gsl_vector_get(input, i), ma);
         }
     } else {
         for (int i=0; i<N; i++) {

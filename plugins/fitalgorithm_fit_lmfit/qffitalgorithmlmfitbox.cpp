@@ -16,18 +16,35 @@ struct QFFItAlgorithmGSL_evalData {
 void lmfit_evalboxtanh(const double *par, int m_dat, const void *data, double *fvec, int *info) {
     QFFItAlgorithmGSL_evalData* edata=(QFFItAlgorithmGSL_evalData*)data;
     if ( edata->paramsMin && edata->paramsMax ) {
-        double* p=edata->p;
+        /*double* p=edata->p;
         for (int i=0; i<edata->pcount; i++) {
             const double mi=edata->paramsMin[i];
             const double ma=edata->paramsMax[i];
-            const double pv=tanh(par[i]);
             if (fabs(mi)<RANGE_MAXVAL && fabs(ma)<RANGE_MAXVAL) {
+                const double pv=tanh(par[i]);
                 p[i]=mi+(pv+1.0)*(ma-mi)/2.0;
             } else {
                 p[i]=par[i];
             }
 
+        }*/
+
+        double* p=edata->p;
+        for (int i=0; i<edata->pcount; i++) {
+            const double mi=edata->paramsMin[i];
+            const double ma=edata->paramsMax[i];
+            p[i]=qBound(mi, par[i], ma);
+            /*if (fabs(mi)<RANGE_MAXVAL && fabs(ma)<RANGE_MAXVAL) {
+                const double pv=tanh(par[i]);
+                p[i]=mi+(pv+1.0)*(ma-mi)/2.0;
+            } else {
+                p[i]=par[i];
+            }*/
+
         }
+
+        //qDebug()<<arrayToString(p, edata->pcount);
+
         edata->model->evaluate(fvec, p);
     } else {
         edata->model->evaluate(fvec, par);
@@ -73,7 +90,16 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
 
     bool transformParams=paramsMin&&paramsMax;
 
-    if (!transformParams) {
+    lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxtanh, &control, &status, NULL );
+    if (paramsMin && paramsMax) {
+        for (int i=0; i<paramCount; i++) {
+            const double mi=paramsMin[i];
+            const double ma=paramsMax[i];
+            paramsOut[i]=qBound(mi, paramsOut[i], ma);
+        }
+    }
+
+   /* if (!transformParams) {
         lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxtanh, &control, &status, NULL );
     } else {
         for (int i=0; i<paramCount; i++) {
@@ -84,20 +110,20 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
                 paramsOut[i]=atanh(pv);
                 if (pv>=1.0) paramsOut[i]=1e15;
                 if (pv<=-1.0) paramsOut[i]=-1e15;
-                //qDebug()<<i<<": "<<pv<<paramsOut[i]<<"   "<<mi<<"..."<<ma;
             }
+            qDebug()<<i<<": I"<<initialParams[i]<<"   V"<<paramsOut[i]<<" -> "<<pv<<"   "<<mi<<"..."<<ma<<"   ma-mi="<<ma-mi;
         }
 
         lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxtanh, &control, &status, NULL );
         for (int i=0; i<paramCount; i++) {
             const double mi=paramsMin[i];
             const double ma=paramsMax[i];
-            const double pv=tanh(paramsOut[i]);
             if (fabs(mi)<RANGE_MAXVAL && fabs(ma)<RANGE_MAXVAL) {
+                const double pv=tanh(paramsOut[i]);
                 paramsOut[i]=mi+(pv+1.0)*(ma-mi)/2.0;
             }
         }
-    }
+    }*/
 
 
     result.addNumber("error_sum", status.fnorm);
