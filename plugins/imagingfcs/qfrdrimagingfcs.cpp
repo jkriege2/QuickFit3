@@ -6,9 +6,12 @@
 #include "yaid_rh.h"
 #include "qfrdrimagingfcssimulator.h"
 
+QFRDRImagingFCSPlugin* QFRDRImagingFCSPlugin::instance=NULL;
+
 QFRDRImagingFCSPlugin::QFRDRImagingFCSPlugin(QObject* parent):
     QObject(parent), QFPluginRawDataRecordBase()
 {
+    if (instance==NULL) instance=this;
     //constructor
     dlgCorrelate=NULL;
     dlgSimulate=NULL;
@@ -16,6 +19,7 @@ QFRDRImagingFCSPlugin::QFRDRImagingFCSPlugin(QObject* parent):
 
 QFRDRImagingFCSPlugin::~QFRDRImagingFCSPlugin()
 {
+    if (instance==this) instance=NULL;
 }
 
 void QFRDRImagingFCSPlugin::deinit() {

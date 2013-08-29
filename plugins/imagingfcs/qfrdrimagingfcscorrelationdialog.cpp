@@ -809,6 +809,17 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddSeriesJob_clicked(const QString 
 
 }
 
+void QFRDRImagingFCSCorrelationDialog::on_btnAddBin12Job_clicked()
+{
+    setEditControlsEnabled(false);
+    for (int i=0; i<2; i++) {
+        IMFCSJob job=initJob(i+1);
+        job.binning=i+1;
+        addJob(job);
+    }
+
+}
+
 void QFRDRImagingFCSCorrelationDialog::frameTimeChanged(double value) {
     if (value!=0) {
         disconnect(ui->edtFrameRate, SIGNAL(valueChanged(double)), this, SLOT(frameRateChanged(double)));

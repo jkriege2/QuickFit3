@@ -51,6 +51,7 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         void on_btnSelectBackgroundFile_clicked();
         void on_btnAddJob_clicked();
         void on_btnAddSeriesJob_clicked(const QString& parameter=QString(""), double start=-1, double end=-1, double inc=-1);
+        void on_btnAddBin12Job_clicked();
         void on_btnLoad_clicked();
         void on_btnLoadNoCount_clicked();
         void on_btnHelp_clicked();

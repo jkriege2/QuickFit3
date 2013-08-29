@@ -17,6 +17,7 @@
 #include "qfselectionlistdialog.h"
 #include "statistics_tools.h"
 #include "qffcstools.h"
+#include "qfrdrimagingfcs.h"
 #define sqr(x) qfSqr(x)
 
 #define CLICK_UPDATE_TIMEOUT 500
@@ -1000,6 +1001,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     actCopyGroupACFsToTable=new QAction("copy all CFs from group to table", this);
     connect(actCopyGroupACFsToTable, SIGNAL(triggered()), this, SLOT(copyGroupACFsToTable()));
 
+    actRecorrelate=new QAction("recorrelate file", this);
+    connect(actRecorrelate, SIGNAL(triggered()), this, SLOT(recorrelate()));
 
 
 
@@ -1132,6 +1135,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     menuImagingFCSTools=propertyEditor->addOrFindMenu(tr("ImagingFCS Tools"));
     menuImagingFCSTools->addAction(actCopyGroupACFsToTable);
+    menuImagingFCSTools->addAction(actRecorrelate);
 
     setUpdatesEnabled(true);
 }
@@ -5225,6 +5229,20 @@ void QFRDRImagingFCSImageEditor::copyGroupACFsToTable() {
                 }
             }
 
+        }
+    }
+}
+
+void QFRDRImagingFCSImageEditor::recorrelate()
+{
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (m) {
+        QString input=m->getFileForType("input");
+        if (QFile::exists(input)) {
+            if (QFRDRImagingFCSPlugin::getInstance())
+                QFRDRImagingFCSPlugin::getInstance()->imfcsCorrRemoteSelectFile(input);
+        } else {
+            QMessageBox::critical(this, tr("recorrelate imFCS record"), tr("didn't find input file!"));
         }
     }
 }

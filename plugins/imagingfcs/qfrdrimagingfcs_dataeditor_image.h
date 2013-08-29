@@ -242,6 +242,8 @@ protected:
 
         void copyGroupACFsToTable();
 
+        void recorrelate();
+
     protected:
         /** \brief map with all available fit functions */
         QMap<QString, QFFitFunction*> m_fitFunctions;
@@ -575,6 +577,7 @@ protected:
         QAction* actCopyDataAsColumns;
 
         QAction* actCopyGroupACFsToTable;
+        QAction* actRecorrelate;
 
         QMenu* menuData;
         QMenu* menuMask;

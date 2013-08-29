@@ -114,6 +114,9 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase, 
 
         bool parseSPIMSettings(const QString& filename_settings, QString& description, QMap<QString,QVariant>& initParams, QStringList& paramsReadonly, QStringList& files, QStringList& files_types, QStringList& files_descriptions);
 
+        static QFRDRImagingFCSPlugin* instance;
+    public:
+        static QFRDRImagingFCSPlugin* getInstance()  { return instance; }
 };
 
 #endif // QFRDRIMAGINGFCS_H

@@ -151,8 +151,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>996</width>
-           <height>533</height>
+           <width>970</width>
+           <height>591</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -2034,6 +2034,32 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="btnAddBin12Job">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>35</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>execute the correlation job, as defined above</string>
+           </property>
+           <property name="text">
+            <string>add &amp;bin 1+2</string>
+           </property>
+           <property name="icon">
+            <iconset resource="qfrdrimagingfcs.qrc">
+             <normaloff>:/imaging_fcs/add_job.png</normaloff>:/imaging_fcs/add_job.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="btnAddSeriesJob">
            <property name="minimumSize">
             <size>
@@ -2190,8 +2216,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1062</width>
-           <height>98</height>
+           <width>1058</width>
+           <height>96</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -2332,6 +2358,7 @@ p, li { white-space: pre-wrap; }
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="qfrdrimagingfcs.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
