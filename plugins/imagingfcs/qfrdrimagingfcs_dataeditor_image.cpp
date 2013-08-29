@@ -734,7 +734,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     connect(pltOverview, SIGNAL(beforePlotScalingRecalculate()), this, SLOT(moveColorbarsAuto()));
-    connect(pltGofImage, SIGNAL(beforePlotScalingRecalculate()), this, SLOT(moveColorbarsAuto()));
+    //connect(pltGofImage, SIGNAL(beforePlotScalingRecalculate()), this, SLOT(moveColorbarsAuto()));
 
 
 
@@ -1572,6 +1572,7 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         spinCrosstalkAvg->setEnabled(m->isFCCS());
 
         pltImage->setCurrent(current);
+        pltGofImage->setCurrent(current);
 
         sliders->disableSliderSignals();
         sliders->set_min(0);
@@ -1689,7 +1690,7 @@ void QFRDRImagingFCSImageEditor::imageMouseMoved(double x, double y) {
     }
     if (sender()==pltGofImage) {
         name=tr("GOF");
-        pltImage->getDataAtBR(idx, value);
+        pltGofImage->getDataAtBR(idx, value);
         //if (plteGofImageData) value=plteGofImageData[idx];
     }
     if (sender()==pltMask) {
@@ -3620,7 +3621,7 @@ void QFRDRImagingFCSImageEditor::transformImage(double* image, uint16_t width, u
 
 void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, QString gofParam, QFRDRImagingFCSImageEditor::ImageTransforms tranGofParam) {
     uint16_t arraysize=width*height;
-    qDebug()<<"readParameterImage("<<image<<gof_image<<width<<height<<evalGroup;
+    //qDebug()<<"readParameterImage("<<image<<gof_image<<width<<height<<evalGroup;
     if (image) {
         for (register uint16_t i=0; i<arraysize; i++) {
             image[i]=NAN;
