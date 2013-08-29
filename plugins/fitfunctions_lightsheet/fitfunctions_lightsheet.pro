@@ -11,12 +11,14 @@ DESTDIR = $$QFOUTPUT/plugins
 HEADERS += qffitfunctionslightsheet.h \
            qffitfunctionlightsheetgaussian.h \
            qffitfunctionlightsheetslit.h \
-           qffitfunctionlightsheetgaussianvar.h
+           qffitfunctionlightsheetgaussianvar.h \
+    ../../../../../LIB/trunk/statistics_tools.h
 
 SOURCES += qffitfunctionslightsheet.cpp\
            qffitfunctionlightsheetgaussian.cpp \
            qffitfunctionlightsheetslit.cpp \
-           qffitfunctionlightsheetgaussianvar.cpp
+           qffitfunctionlightsheetgaussianvar.cpp \
+    ../../../../../LIB/trunk/statistics_tools.cpp
 
 FORMS =
 

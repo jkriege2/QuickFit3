@@ -1,6 +1,6 @@
 #include "qffitalgorithmgsltools.h"
 
-
+#define RANGE_MAXVAL (DBL_MAX/10.0)
 
 double QFFitAlgorithmGSL_f (const gsl_vector *v, void *eparams)
 {
@@ -10,15 +10,18 @@ double QFFitAlgorithmGSL_f (const gsl_vector *v, void *eparams)
   gsl_vector * out=p->out;
   gsl_vector * params=p->params;
   if (p->paramsMin&& p->paramsMax) {
+      gsl_vector * params=p->params;
 
       for (int i=0; i<p->pcount; i++) {
           const double mi=p->paramsMin[i];
           const double ma=p->paramsMax[i];
-          const double pv=tanh(gsl_vector_get(v, i));
-          gsl_vector_set(params, i, mi+(pv+1.0)*(ma-mi)/2.0);
+          double val=gsl_vector_get(v, i);
+          if (fabs(mi)<RANGE_MAXVAL && fabs(ma)<RANGE_MAXVAL) {
+              const double pv=tanh(val);
+              val=mi+(pv+1.0)*(ma-mi)/2.0;
+          }
+          gsl_vector_set(params, i, val);
       }
-
-
   } else {
       for (int i=0; i<p->pcount; i++) {
           const double val=gsl_vector_get(v, i);
@@ -54,8 +57,11 @@ void QFFitAlgorithmGSL_df (const gsl_vector *v, void *eparams, gsl_vector * g)
       for (int i=0; i<p->pcount; i++) {
           const double mi=p->paramsMin[i];
           const double ma=p->paramsMax[i];
-          const double pv=tanh(gsl_vector_get(v, i));
-          const double val=mi+(pv+1.0)*(ma-mi)/2.0;
+          double val=gsl_vector_get(v, i);
+          if (fabs(mi)<RANGE_MAXVAL && fabs(ma)<RANGE_MAXVAL) {
+              const double pv=tanh(val);
+              val=mi+(pv+1.0)*(ma-mi)/2.0;
+          }
           gsl_vector_set(params, i, val);
           gsl_vector_set(params_ast, i, val);
       }
@@ -122,11 +128,15 @@ gsl_vector* QFFitAlgorithmGSL_transformParams(const double* paramsOut, int N, co
         for (int i=0; i<N; i++) {
             const double mi=paramsMin[i];
             const double ma=paramsMax[i];
-            const double pv=2.0*(paramsOut[i]-mi)/(ma-mi)-1.0;
-            double v=atanh(pv);
-            if (pv>=1.0) v=1e15;
-            if (pv<=-1.0) v=-1e15;
-            gsl_vector_set(res, i, v);
+            if (fabs(mi)<RANGE_MAXVAL && fabs(ma)<RANGE_MAXVAL) {
+                const double pv=2.0*(paramsOut[i]-mi)/(ma-mi)-1.0;
+                double v=atanh(pv);
+                if (pv>=1.0) v=1e15;
+                if (pv<=-1.0) v=-1e15;
+                gsl_vector_set(res, i, v);
+            } else {
+                gsl_vector_set(res, i, paramsOut[i]);
+            }
         }
     } else {
         for (int i=0; i<N; i++) {
@@ -136,13 +146,18 @@ gsl_vector* QFFitAlgorithmGSL_transformParams(const double* paramsOut, int N, co
     return res;
 }
 
+
 void QFFitAlgorithmGSL_backTransformParams(double* paramsOut, int N, const gsl_vector* input, const double* paramsMin, const double* paramsMax) {
     if (paramsMin&&paramsMax) {
         for (int i=0; i<N; i++) {
             const double mi=paramsMin[i];
             const double ma=paramsMax[i];
-            const double pv=tanh(gsl_vector_get(input, i));
-            paramsOut[i]=mi+(pv+1.0)*(ma-mi)/2.0;
+            if (fabs(mi)<RANGE_MAXVAL && fabs(ma)<RANGE_MAXVAL) {
+                const double pv=tanh(gsl_vector_get(input, i));
+                paramsOut[i]=mi+(pv+1.0)*(ma-mi)/2.0;
+            } else {
+                paramsOut[i]=gsl_vector_get(input, i);
+            }
         }
     } else {
         for (int i=0; i<N; i++) {
@@ -150,5 +165,7 @@ void QFFitAlgorithmGSL_backTransformParams(double* paramsOut, int N, const gsl_v
         }
     }
 }
+
+
 
 

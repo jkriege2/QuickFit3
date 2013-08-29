@@ -172,6 +172,8 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
 
             }
 
+            model->estimateInitial(paramOut, dataX, dataY, data_count);
+
 
             //lmcurve_fit(4, par, wi, dataX, dataY, QFSPIMLightsheetEvaluationItem_fGauss, &control, &status);
 

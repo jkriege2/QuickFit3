@@ -39,6 +39,9 @@ class QFFitFunctionLightsheetSlit: public QFFitFunction {
 
         /*! \copydoc QFFitFunction::evaluateDerivatives()   */
         virtual void evaluateDerivatives(double* derivatives, double t, const double* parameters) const ;
+        /*! \copydoc QFFitFunction::estimateInitial()   */
+        virtual bool estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix);
+
 };
 
 #endif // QFFITFUNCTIONLIGHTSHEETSLIT_H

@@ -3,6 +3,8 @@
 #include <cmath>
 #include "lmmin.h"
 
+#define RANGE_MAXVAL (DBL_MAX/10.0)
+
 struct QFFItAlgorithmGSL_evalData {
     QFFitAlgorithm::Functor* model;
     const double* paramsMin;
@@ -19,7 +21,12 @@ void lmfit_evalboxtanh(const double *par, int m_dat, const void *data, double *f
             const double mi=edata->paramsMin[i];
             const double ma=edata->paramsMax[i];
             const double pv=tanh(par[i]);
-            p[i]=mi+(pv+1.0)*(ma-mi)/2.0;
+            if (fabs(mi)<RANGE_MAXVAL && fabs(ma)<RANGE_MAXVAL) {
+                p[i]=mi+(pv+1.0)*(ma-mi)/2.0;
+            } else {
+                p[i]=par[i];
+            }
+
         }
         edata->model->evaluate(fvec, p);
     } else {
@@ -73,9 +80,12 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
             const double mi=paramsMin[i];
             const double ma=paramsMax[i];
             const double pv=2.0*(paramsOut[i]-mi)/(ma-mi)-1.0;
-            paramsOut[i]=atanh(pv);
-            if (pv>=1.0) paramsOut[i]=1e15;
-            if (pv<=-1.0) paramsOut[i]=-1e15;
+            if (fabs(mi)<RANGE_MAXVAL && fabs(ma)<RANGE_MAXVAL) {
+                paramsOut[i]=atanh(pv);
+                if (pv>=1.0) paramsOut[i]=1e15;
+                if (pv<=-1.0) paramsOut[i]=-1e15;
+                qDebug()<<i<<": "<<pv<<paramsOut[i]<<"   "<<mi<<"..."<<ma;
+            }
         }
 
         lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxtanh, &control, &status, NULL );
@@ -83,7 +93,9 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
             const double mi=paramsMin[i];
             const double ma=paramsMax[i];
             const double pv=tanh(paramsOut[i]);
-            paramsOut[i]=mi+(pv+1.0)*(ma-mi)/2.0;
+            if (fabs(mi)<RANGE_MAXVAL && fabs(ma)<RANGE_MAXVAL) {
+                paramsOut[i]=mi+(pv+1.0)*(ma-mi)/2.0;
+            }
         }
     }
 
