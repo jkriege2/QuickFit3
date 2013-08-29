@@ -84,7 +84,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
                 paramsOut[i]=atanh(pv);
                 if (pv>=1.0) paramsOut[i]=1e15;
                 if (pv<=-1.0) paramsOut[i]=-1e15;
-                qDebug()<<i<<": "<<pv<<paramsOut[i]<<"   "<<mi<<"..."<<ma;
+                //qDebug()<<i<<": "<<pv<<paramsOut[i]<<"   "<<mi<<"..."<<ma;
             }
         }
 
