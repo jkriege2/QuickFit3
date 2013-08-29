@@ -19,7 +19,7 @@ QFRDRImagingFCSMaskByIntensity::QFRDRImagingFCSMaskByIntensity(QWidget *parent) 
     ui->pltMain->addGraph(plteMask);
     min=max=0;
 
-    ui->cmbMaskingMode->setCurrentIndex(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskByIntensity/maskingmode",0).toInt());
+    ui->cmbMaskingMode->setCurrentIndex(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskByIntensity/maskingmode",1).toInt());
     ui->cmbMaskMode->setCurrentIndex(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskByIntensity/maskmode", 0).toInt());
     ui->chkEqualChannels->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskByIntensity/channelsequal", true).toBool());
     loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "QFRDRImagingFCSMaskByIntensity/pos");
@@ -71,14 +71,12 @@ int QFRDRImagingFCSMaskByIntensity::getMaskMode() const {
 }
 
 void QFRDRImagingFCSMaskByIntensity::updateMask() {
-    ui->edtLevel->setEnabled(ui->cmbMaskingMode->currentIndex()<2);
-    ui->edtLevel2->setEnabled(ui->cmbDualView->currentIndex()>0  &&  !ui->chkEqualChannels->isChecked() && ui->cmbMaskingMode->currentIndex()<2);
-
+    updateEnabledWidgets();
     double levell=ui->edtLevel->value();
     double level2l=ui->edtLevel2->value();
     double level=ui->edtLevel_2->value();
     double level2=ui->edtLevel2_2->value();
-    if (ui->cmbMaskingMode->currentIndex()==0) {
+    if (ui->cmbMaskingMode->currentIndex()==0) { // in-range
         for (uint16_t i=0; i<m_width*m_height; i++) {
             double l=level;
             double ll=levell;
@@ -95,7 +93,7 @@ void QFRDRImagingFCSMaskByIntensity::updateMask() {
             }
             m_mask[i]=(m_image[i]>=ll)&&(m_image[i]<=l);
         }
-    } else if (ui->cmbMaskingMode->currentIndex()==1) {
+    } else if (ui->cmbMaskingMode->currentIndex()==1) { // out-of-range
         for (uint16_t i=0; i<m_width*m_height; i++) {
             double l=level;
             double ll=levell;
@@ -113,22 +111,22 @@ void QFRDRImagingFCSMaskByIntensity::updateMask() {
 
             m_mask[i]=!((m_image[i]>=ll)&&(m_image[i]<=l));
         }
-    } else if (ui->cmbMaskingMode->currentIndex()==2) {
+    } else if (ui->cmbMaskingMode->currentIndex()==2) { // < threshold
         for (uint16_t i=0; i<m_width*m_height; i++) {
-            double l=level;
+            double l=levell;
             if (ui->cmbDualView->currentIndex()==1) {
                 if (i%m_width>=m_width/2) {
-                    l=level2;
+                    l=level2l;
                 }
             } else if (ui->cmbDualView->currentIndex()==2) {
                 if (i/m_width>=m_height/2) {
-                    l=level2;
+                    l=level2l;
                 }
             }
 
             m_mask[i]=m_image[i]<=l;
         }
-    } else if (ui->cmbMaskingMode->currentIndex()==3) {
+    } else if (ui->cmbMaskingMode->currentIndex()==3) { // > threshold
         for (uint16_t i=0; i<m_width*m_height; i++) {
             double l=level;
             if (ui->cmbDualView->currentIndex()==1) {
@@ -166,12 +164,51 @@ void QFRDRImagingFCSMaskByIntensity::updateMask() {
     ui->pltMain->update_plot();
 }
 
+void QFRDRImagingFCSMaskByIntensity::updateEnabledWidgets()
+{
+    bool twocolor=ui->cmbDualView->currentIndex()>0;
+    ui->chkEqualChannels->setEnabled(twocolor);
+
+
+    if (ui->cmbMaskingMode->currentIndex()==0) { // in-range
+        ui->edtLevel->setEnabled(true);
+        ui->edtLevel_2->setEnabled(true);
+
+        ui->edtLevel2->setEnabled(twocolor);
+        ui->edtLevel2_2->setEnabled(twocolor);
+     } else if (ui->cmbMaskingMode->currentIndex()==1) { // out-of-range
+        ui->edtLevel->setEnabled(true);
+        ui->edtLevel_2->setEnabled(true);
+
+        ui->edtLevel2->setEnabled(twocolor);
+        ui->edtLevel2_2->setEnabled(twocolor);
+    } else if (ui->cmbMaskingMode->currentIndex()==2) { // < threshold
+        ui->edtLevel->setEnabled(true);
+        ui->edtLevel_2->setEnabled(false);
+
+        ui->edtLevel2->setEnabled(twocolor);
+        ui->edtLevel2_2->setEnabled(false);
+    } else if (ui->cmbMaskingMode->currentIndex()==3) { // > threshold
+        ui->edtLevel->setEnabled(false);
+        ui->edtLevel_2->setEnabled(true);
+
+        ui->edtLevel2->setEnabled(false);
+        ui->edtLevel2_2->setEnabled(twocolor);
+    }
+
+
+    ui->sldLevel->setEnabled(ui->edtLevel->isEnabled());
+    ui->sldLevel_2->setEnabled(ui->edtLevel_2->isEnabled());
+    ui->sldLevel2->setEnabled(ui->edtLevel2->isEnabled());
+    ui->sldLevel2_2->setEnabled(ui->edtLevel2_2->isEnabled());
+
+}
+
+
+
 void QFRDRImagingFCSMaskByIntensity::updateDualView()
 {
-    ui->chkEqualChannels->setEnabled(ui->cmbDualView->currentIndex()>0);
-    ui->edtLevel->setEnabled(ui->cmbMaskingMode->currentIndex()<2);
-    ui->edtLevel2->setEnabled(ui->cmbDualView->currentIndex()>0  &&  !ui->chkEqualChannels->isChecked() && ui->cmbMaskingMode->currentIndex()<2);
-    ui->edtLevel2_2->setEnabled(ui->cmbDualView->currentIndex()>0  &&  !ui->chkEqualChannels->isChecked());
+    updateEnabledWidgets();
 
     double l1=ui->edtLevel->value();
     double l2=ui->edtLevel2->value();
@@ -193,19 +230,19 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->labRange->setText(tr("%1 ... %2").arg(min).arg(max));
 
 
-            ui->sldLevel->setDRange(min-1.0, max+1.0);
-            ui->sldLevel_2->setDRange(min-1.0, max+1.0);
-            ui->edtLevel->setRange(min-1.0, max+1.0);
-            ui->edtLevel_2->setRange(min-1.0, max+1.0);
+            ui->sldLevel->setDRange(min-10.0, max+10.0);
+            ui->sldLevel_2->setDRange(min-10.0, max+10.0);
+            ui->edtLevel->setRange(min-10.0, max+10.0);
+            ui->edtLevel_2->setRange(min-10.0, max+10.0);
 
             ui->edtLevel->setValue(min+0.2*(max-min));
             ui->edtLevel_2->setValue(max);
 
 
-            ui->sldLevel2->setDRange(min-1.0, max+1.0);
-            ui->sldLevel2_2->setDRange(min-1.0, max+1.0);
-            ui->edtLevel2->setRange(min-1.0, max+1.0);
-            ui->edtLevel2_2->setRange(min-1.0, max+1.0);
+            ui->sldLevel2->setDRange(min-10.0, max+10.0);
+            ui->sldLevel2_2->setDRange(min-10.0, max+10.0);
+            ui->edtLevel2->setRange(min-10.0, max+10.0);
+            ui->edtLevel2_2->setRange(min-10.0, max+10.0);
 
             ui->edtLevel_2->setValue(min+0.2*(max-min));
             ui->edtLevel2_2->setValue(max);
@@ -240,19 +277,19 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
                 }
             }
             ui->labRange->setText(tr("%1 ... %2\n%3 ... %4").arg(min).arg(max).arg(min2).arg(max2));
-            ui->sldLevel->setDRange(min-1.0, max+1.0);
-            ui->sldLevel_2->setDRange(min-1.0, max+1.0);
-            ui->edtLevel->setRange(min-1.0, max+1.0);
-            ui->edtLevel_2->setRange(min-1.0, max+1.0);
+            ui->sldLevel->setDRange(min-10.0, max+10.0);
+            ui->sldLevel_2->setDRange(min-10.0, max+10.0);
+            ui->edtLevel->setRange(min-10.0, max+10.0);
+            ui->edtLevel_2->setRange(min-10.0, max+10.0);
 
             ui->edtLevel->setValue(min+0.2*(max-min));
             ui->edtLevel_2->setValue(max);
 
 
-            ui->sldLevel2->setDRange(min2-1.0, max2+1.0);
-            ui->sldLevel2_2->setDRange(min2-1.0, max2+1.0);
-            ui->edtLevel2->setRange(min2-1.0, max2+1.0);
-            ui->edtLevel2_2->setRange(min2-1.0, max2+1.0);
+            ui->sldLevel2->setDRange(min2-10.0, max2+10.0);
+            ui->sldLevel2_2->setDRange(min2-10.0, max2+10.0);
+            ui->edtLevel2->setRange(min2-10.0, max2+10.0);
+            ui->edtLevel2_2->setRange(min2-10.0, max2+10.0);
 
             ui->edtLevel_2->setValue(min2+0.2*(max2-min2));
             ui->edtLevel2_2->setValue(max2);
@@ -279,19 +316,19 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
                 }
             }
             ui->labRange->setText(tr("%1 ... %2\n%3 ... %4").arg(min).arg(max).arg(min2).arg(max2));
-            ui->sldLevel->setDRange(min-1.0, max+1.0);
-            ui->sldLevel_2->setDRange(min-1.0, max+1.0);
-            ui->edtLevel->setRange(min-1.0, max+1.0);
-            ui->edtLevel_2->setRange(min-1.0, max+1.0);
+            ui->sldLevel->setDRange(min-10.0, max+10.0);
+            ui->sldLevel_2->setDRange(min-10.0, max+10.0);
+            ui->edtLevel->setRange(min-10.0, max+10.0);
+            ui->edtLevel_2->setRange(min-10.0, max+10.0);
 
             ui->edtLevel->setValue(min+0.2*(max-min));
             ui->edtLevel_2->setValue(max);
 
 
-            ui->sldLevel2->setDRange(min2-1.0, max2+1.0);
-            ui->sldLevel2_2->setDRange(min2-1.0, max2+1.0);
-            ui->edtLevel2->setRange(min2-1.0, max2+1.0);
-            ui->edtLevel2_2->setRange(min2-1.0, max2+1.0);
+            ui->sldLevel2->setDRange(min2-10.0, max2+10.0);
+            ui->sldLevel2_2->setDRange(min2-10.0, max2+10.0);
+            ui->edtLevel2->setRange(min2-10.0, max2+10.0);
+            ui->edtLevel2_2->setRange(min2-10.0, max2+10.0);
 
             ui->edtLevel_2->setValue(min2+0.2*(max2-min2));
             ui->edtLevel2_2->setValue(max2);
@@ -299,3 +336,4 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
     }
     updateMask();
 }
+

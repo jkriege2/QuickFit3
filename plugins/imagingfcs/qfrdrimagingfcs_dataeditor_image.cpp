@@ -34,7 +34,7 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     plteOverviewExcludedData=NULL;
     plteOverviewSize=0;
     //plteImageData=NULL;
-    plteGofImageData=NULL;
+    //plteGofImageData=NULL;
     plteImageSize=0;
     lastSavePath="";
     connectImageWidgetsCounter=0;
@@ -58,8 +58,8 @@ QFRDRImagingFCSImageEditor::~QFRDRImagingFCSImageEditor()
     plteOverviewSelectedData=NULL;
     if (plteOverviewExcludedData) free(plteOverviewExcludedData);
     plteOverviewExcludedData=NULL;
-    if (plteGofImageData) free(plteGofImageData);
-    plteGofImageData=NULL;
+    //if (plteGofImageData) free(plteGofImageData);
+    //plteGofImageData=NULL;
     //datahist=NULL;
     //datahistsel=NULL;
 }
@@ -360,6 +360,11 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbSelectionStyle=new QFRDRImagingFCSOverlayStyleCombobox(wsels);
     gli->addRow(tr("&style:"), cmbSelectionStyle);
 
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: parameter image style
+    ///////////////////////////////////////////////////////////////
+    grpGof=new QFRDRImagingFCSImageParameterGroupBox(tr(" GOF image style "), this);
+    vbl->addWidget(grpGof);
 
 
     ///////////////////////////////////////////////////////////////
@@ -678,16 +683,17 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QWidget* wpltGofImage=new QWidget(this);
     QVBoxLayout* lpltGofImage=new QVBoxLayout();
     wpltGofImage->setLayout(lpltGofImage);
-    pltGofImage=new QFPlotter(wpltGofImage);
+    pltGofImage=new QFRDRImagingFCSImagePlotter(wpltGofImage);
     pltGofImage->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltGofImage->setObjectName("pltGofImage");
     pltGofImage->get_plotter()->set_plotLabel(tr("\\textbf{\"Goodnes of Fit\" Image}"));
-    pltGofImage->get_plotter()->set_plotLabelFontSize(10);
+    pltGofImage->connectTo(grpGof, cmbSelectionStyle);
+    //pltGofImage->get_plotter()->set_plotLabelFontSize(10);
 
     //lpltGofImage->addWidget((labParamImage=new QLabel(tr("\"Goodnes of Fit\" Image:"))));
     lpltGofImage->addWidget(pltGofImage, 1);
 
-    pltGofImage->set_displayMousePosition(false);
+    /*pltGofImage->set_displayMousePosition(false);
     pltGofImage->set_displayToolbar(true);
     pltGofImage->get_plotter()->set_maintainAspectRatio(true);
     pltGofImage->get_plotter()->set_aspectRatio(1);
@@ -705,7 +711,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltGofImage->get_plotter()->setGrid(false);
     pltGofImage->get_plotter()->set_useAntiAliasingForSystem(true);
     pltGofImage->get_plotter()->set_useAntiAliasingForGraphs(true);
-    pltGofImage->set_userActionCompositionMode(QPainter::CompositionMode_Xor);
+    pltGofImage->set_userActionCompositionMode(QPainter::CompositionMode_Xor);*/
     connect(pltGofImage, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     connect(pltGofImage, SIGNAL(userClickFinished(double,double,Qt::KeyboardModifiers)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
     connect(pltGofImage, SIGNAL(userScribbleClick(double,double,Qt::KeyboardModifiers, bool, bool)), this, SLOT(imageScribbled(double,double,Qt::KeyboardModifiers,bool,bool)));
@@ -714,16 +720,17 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(pltGofImage, SIGNAL(userCircleFinished(double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageCircleFinished(double,double,double,Qt::KeyboardModifiers)));
     connect(pltGofImage, SIGNAL(userEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)));
     connect(pltGofImage, SIGNAL(userLineFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageLineFinished(double,double,double,double,Qt::KeyboardModifiers)));
+    connect(pltGofImage, SIGNAL(saveImageSettings()), this, SLOT(saveImageSettings()));
 
 
-    plteGofImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::GRAY, pltGofImage->get_plotter());
+    /*plteGofImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::GRAY, pltGofImage->get_plotter());
     pltGofImage->addGraph(plteGofImage);
 
 
     plteGofImageSelected=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlSelCol, pltGofImage->get_plotter());
     plteGofImageSelected->set_rectanglesAsImageOverlay(OverlayRectanglesAsImageOverlay);
     plteGofImageExcluded=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlExCol, pltGofImage->get_plotter());
-    plteGofImageExcluded->set_rectanglesAsImageOverlay(OverlayRectanglesAsImageOverlay);
+    plteGofImageExcluded->set_rectanglesAsImageOverlay(OverlayRectanglesAsImageOverlay);*/
 
 
     connect(pltOverview, SIGNAL(beforePlotScalingRecalculate()), this, SLOT(moveColorbarsAuto()));
@@ -1148,6 +1155,7 @@ void QFRDRImagingFCSImageEditor::saveImageSettings() {
             writeSettings();
         } else {
             grpImage->saveConfig(current, egroup, param, "image1");
+            grpGof->saveConfig(current, egroup, param, "gof");
 
             current->setQFProperty(QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), chkDisplayImageOverlay->isChecked(), false, false);
             current->setQFProperty(QString("imfcs_imed_ovstyle_%1_%2").arg(egroup).arg(param), cmbSelectionStyle->currentIndex(), false, false);
@@ -1199,6 +1207,7 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
             pltImage->get_imagePlot()->getDataMinMax(mi, ma);
 
             grpImage->loadConfig(current, egroup, param, "image1", "imfcsimageeditor/", mi, ma);
+            grpGof->loadConfig(current, egroup, param, "gof", "imfcsimageeditor/", mi, ma);
 
             chkDisplayImageOverlay->setChecked(current->getProperty(QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), true).toBool());
             cmbSelectionStyle->setCurrentIndex(current->getProperty(QString("imfcs_imed_ovstyle_%1_%2").arg(egroup).arg(param), false).toBool());
@@ -1260,18 +1269,19 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
 
 void QFRDRImagingFCSImageEditor::updateOverlaySettings() {
     pltImage->setDisplayOverlay(chkDisplayImageOverlay->isChecked()/*, cmbImageStyle->currentIndex()<cmbImageStyle->count()-1*/);
+    pltGofImage->setDisplayOverlay(chkDisplayImageOverlay->isChecked()/*, cmbImageStyle->currentIndex()<cmbImageStyle->count()-1*/);
     if (!chkDisplayImageOverlay->isChecked()) {
-        pltGofImage->deleteGraph(plteGofImageSelected, false);
-        pltGofImage->deleteGraph(plteGofImageExcluded, false);
+        //pltGofImage->deleteGraph(plteGofImageSelected, false);
+        //pltGofImage->deleteGraph(plteGofImageExcluded, false);
         pltMask->deleteGraph(plteMaskSelected, false);
     } else {
-        pltGofImage->addGraph(plteGofImageSelected);
-        pltGofImage->addGraph(plteGofImageExcluded);
+        //pltGofImage->addGraph(plteGofImageSelected);
+        //pltGofImage->addGraph(plteGofImageExcluded);
         pltMask->addGraph(plteMaskSelected);
     }
 
     cmbSelectionStyle->setSelectedOverlayStyle(plteOverviewSelected);
-    cmbSelectionStyle->setSelectedOverlayStyle(plteGofImageSelected);
+    //cmbSelectionStyle->setSelectedOverlayStyle(plteGofImageSelected);
     cmbSelectionStyle->setSelectedOverlayStyle(plteMaskSelected);
 
 
@@ -1422,7 +1432,7 @@ void QFRDRImagingFCSImageEditor::excludeByParamIntensity() {
 }
 
 void QFRDRImagingFCSImageEditor::excludeByGOFIntensity() {
-    excludeByImage(plteGofImageData);
+    excludeByImage(pltGofImage->getData());
 }
 
 
@@ -1679,7 +1689,8 @@ void QFRDRImagingFCSImageEditor::imageMouseMoved(double x, double y) {
     }
     if (sender()==pltGofImage) {
         name=tr("GOF");
-        if (plteGofImageData) value=plteGofImageData[idx];
+        pltImage->getDataAtBR(idx, value);
+        //if (plteGofImageData) value=plteGofImageData[idx];
     }
     if (sender()==pltMask) {
         name=tr("mask");
@@ -2139,24 +2150,25 @@ void QFRDRImagingFCSImageEditor::replotImage() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     //pltImage->set_doDrawing(false);
-    pltGofImage->set_doDrawing(false);
+    //pltGofImage->set_doDrawing(false);
 
 
 
     if (!m) {
         pltImage->updateImage(NULL, NULL, NULL, 0, 0, "", false, true);
-        plteGofImage->set_data(NULL, 0, 0, JKQTPMathImageBase::DoubleArray);
+        pltGofImage->updateImage(NULL, NULL, NULL, 0, 0, "", false, true);
+        /*plteGofImage->set_data(NULL, 0, 0, JKQTPMathImageBase::DoubleArray);
         plteGofImage->get_colorBarRightAxis()->set_labelFontSize(8);
         plteGofImage->get_colorBarRightAxis()->set_axisLabel("");
         plteGofImage->get_colorBarTopAxis()->set_labelFontSize(8);
-        plteGofImage->get_colorBarTopAxis()->set_axisLabel("");
+        plteGofImage->get_colorBarTopAxis()->set_axisLabel("");*/
     } else {
         double w=m->getImageFromRunsWidth();
         double h=m->getImageFromRunsHeight();
         if ((w==0) || (h==0)) {
             w=h=1;
         }
-        pltGofImage->getDatastore()->clear();
+        /*pltGofImage->getDatastore()->clear();
 
 
         pltGofImage->setAbsoluteXY(0, w, 0, h);
@@ -2185,34 +2197,38 @@ void QFRDRImagingFCSImageEditor::replotImage() {
         if (plteImageSize!=m->getImageFromRunsWidth()*m->getImageFromRunsHeight()) {
             plteImageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
             plteGofImageData=(double*)realloc(plteGofImageData, plteImageSize*sizeof(double));
-        }
+        }*/
 
         double* plteImageData=0;
+        double* plteGofImageData=0;
+        plteImageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
         if (plteImageSize>0) {
             plteImageData=(double*)malloc(plteImageSize*sizeof(double));
+            plteGofImageData=(double*)malloc(plteImageSize*sizeof(double));
         }
-
         readParameterImage(plteImageData, plteGofImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), currentFitParameterTransfrom(), currentGofParameter(), currentGofParameterTransfrom());
 
+
         pltImage->updateImage(plteImageData, plteOverviewSelectedData, plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), formatTransformAndParameter(cmbParameter, cmbParameterTransform), false, true);
+        pltGofImage->updateImage(plteGofImageData, plteOverviewSelectedData, plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform), false, true);
 
         if (plteImageData) free(plteImageData);
 
 
-        plteGofImage->set_data(plteGofImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::DoubleArray);
+        /*plteGofImage->set_data(plteGofImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::DoubleArray);
         plteGofImage->set_width(w);
         plteGofImage->set_height(h);
         plteGofImage->set_autoImageRange(false);
         double mi, ma;
         if (plteGofImageData && plteOverviewExcludedData) statisticsMaskedMinMax(plteGofImageData, plteOverviewExcludedData, plteImageSize, mi, ma, false);
         plteGofImage->set_imageMin(mi);
-        plteGofImage->set_imageMax(ma);
+        plteGofImage->set_imageMax(ma);*/
 
     }
     setCopyableData();
 
-    pltGofImage->set_doDrawing(true);
-    pltGofImage->update_plot();
+    //pltGofImage->set_doDrawing(true);
+    //pltGofImage->update_plot();
     QApplication::restoreOverrideCursor();
     //qDebug()<<"replotImage ...  done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
 }
@@ -2308,7 +2324,7 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
 #endif
     pltOverview->set_doDrawing(false);
     //pltImage->set_doDrawing(false);
-    pltGofImage->set_doDrawing(false);
+    //pltGofImage->set_doDrawing(false);
     pltMask->set_doDrawing(false);
 
     saveImageSettings();
@@ -2320,12 +2336,13 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
     double imgAvg=0;
     double imgVar=0;
     pltImage->updateOverlays(&imgAvg, &imgVar);
+    pltGofImage->updateOverlays();
 
     if (!m) {
         plteOverviewSelected->set_data(NULL, 1, 1);
         plteOverviewExcluded->set_data(NULL, 1, 1);
-        plteGofImageSelected->set_data(NULL, 1, 1);
-        plteGofImageExcluded->set_data(NULL, 1, 1);
+        //plteGofImageSelected->set_data(NULL, 1, 1);
+        //plteGofImageExcluded->set_data(NULL, 1, 1);
         plteMask->set_data(NULL, 1, 1);
         plteMaskSelected->set_data(NULL, 1, 1);
         labImageAvg->clear();
@@ -2361,13 +2378,13 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
 
 
 
-        plteGofImageSelected->set_width(w);
+        /*plteGofImageSelected->set_width(w);
         plteGofImageSelected->set_height(h);
         plteGofImageSelected->set_data(plteOverviewSelectedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
 
         plteGofImageExcluded->set_width(w);
         plteGofImageExcluded->set_height(h);
-        plteGofImageExcluded->set_data(plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        plteGofImageExcluded->set_data(plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());*/
 
         plteMaskSelected->set_width(w);
         plteMaskSelected->set_height(h);
@@ -2387,12 +2404,12 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
     setCopyableData();
 
     pltOverview->set_doDrawing(true);
-    pltGofImage->set_doDrawing(true);
+    //pltGofImage->set_doDrawing(true);
     pltMask->set_doDrawing(true);
     if (replot) {
         pltOverview->update_plot();
         //pltImage->update_plot();
-        pltGofImage->update_plot();
+        //pltGofImage->update_plot();
         pltMask->update_plot();
     }
     QApplication::restoreOverrideCursor();
@@ -3355,8 +3372,9 @@ void QFRDRImagingFCSImageEditor::clearImage() {
     plteImageData=NULL;*/
     plteImageSize=0;
     pltImage->clearImage();
-    if (plteGofImageData) free(plteGofImageData);
-    plteGofImageData=NULL;
+    pltGofImage->clearImage();
+    //if (plteGofImageData) free(plteGofImageData);
+    //plteGofImageData=NULL;
 }
 
 void QFRDRImagingFCSImageEditor::fillParameterSet() {
@@ -3440,6 +3458,7 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
         if (connectParameterWidgetsCounter<=0) {
             connectParameterWidgetsCounter=0;
             grpImage->connectWidgets(true);
+            grpGof->connectWidgets(true);
 
             connect(cmbResultGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterSetChanged()));
             connect(cmbParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
@@ -3469,6 +3488,7 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
     } else {
         connectParameterWidgetsCounter++;
         grpImage->connectWidgets(false);
+        grpGof->connectWidgets(false);
 
         disconnect(cmbResultGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterSetChanged()));
         disconnect(cmbParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
@@ -3600,8 +3620,11 @@ void QFRDRImagingFCSImageEditor::transformImage(double* image, uint16_t width, u
 
 void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, QString gofParam, QFRDRImagingFCSImageEditor::ImageTransforms tranGofParam) {
     uint16_t arraysize=width*height;
-    for (register uint16_t i=0; i<arraysize; i++) {
-        image[i]=NAN;
+    qDebug()<<"readParameterImage("<<image<<gof_image<<width<<height<<evalGroup;
+    if (image) {
+        for (register uint16_t i=0; i<arraysize; i++) {
+            image[i]=NAN;
+        }
     }
     if (gof_image) {
         for (register uint16_t i=0; i<arraysize; i++) {
@@ -3875,8 +3898,8 @@ void QFRDRImagingFCSImageEditor::printReport() {
 void QFRDRImagingFCSImageEditor::setCopyableData()
 {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    pltImage->getDatastore()->clear();
-    pltGofImage->getDatastore()->clear();
+    //pltImage->getDatastore()->clear();
+    //pltGofImage->getDatastore()->clear();
     pltOverview->getDatastore()->clear();
     pltMask->getDatastore()->clear();
 
@@ -3886,9 +3909,10 @@ void QFRDRImagingFCSImageEditor::setCopyableData()
         //pltImage->getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteOverviewSize, tr("mask"));
         //pltImage->setCopyableData();
 
-        pltGofImage->getDatastore()->addCopiedColumn(plteGofImageData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform));
-        pltGofImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));
-        pltGofImage->getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteOverviewSize, tr("mask"));
+        //pltGofImage->getDatastore()->addCopiedColumn(plteGofImageData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform));
+        //pltGofImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));
+        //pltGofImage->getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteOverviewSize, tr("mask"));
+        //pltGofImage->setCopyableData();
 
         pltMask->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));
         pltMask->getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteOverviewSize, tr("mask"));
@@ -4625,7 +4649,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             }
         } else if (selFilter==filters[5]) {
             if (saveParam) pltImage->get_imagePlot()->drawImage().save(fileNameParam, "PNG");
-            if (saveGof) plteGofImage->drawImage().save(fileNameGof, "PNG");
+            if (saveGof) pltGofImage->get_imagePlot()->drawImage().save(fileNameGof, "PNG");
             if (saveMask) plteMask->drawImage().save(fileNameMask, "PNG");
             if (saveOverview) {
                 if (plteOverview->get_visible()) plteOverview->drawImage().save(fileNameOverview, "PNG");
@@ -5014,13 +5038,13 @@ void QFRDRImagingFCSImageEditor::moveColorbarsAuto() {
         rightVisible=!rightVisible;
     }
 
-    if ((double)pltGofImage->width()<=(double)pltGofImage->height()) {
+    /*if ((double)pltGofImage->width()<=(double)pltGofImage->height()) {
         plteGofImage->set_colorBarRightVisible(rightVisible);
         plteGofImage->set_colorBarTopVisible(!rightVisible);
     } else {
         plteGofImage->set_colorBarRightVisible(!rightVisible);
         plteGofImage->set_colorBarTopVisible(rightVisible);
-    }
+    }*/
     if ((double)pltOverview->width()<=(double)pltOverview->height()) {
         plteOverview->set_colorBarRightVisible(rightVisible);
         plteOverview->set_colorBarTopVisible(!rightVisible);

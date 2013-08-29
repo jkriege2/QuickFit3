@@ -29,6 +29,7 @@ class QFRDRImagingFCSMaskByIntensity : public QDialog
     protected slots:
         void updateMask();
         void updateDualView();
+        void updateEnabledWidgets();
         
     private:
         Ui::QFRDRImagingFCSMaskByIntensity *ui;

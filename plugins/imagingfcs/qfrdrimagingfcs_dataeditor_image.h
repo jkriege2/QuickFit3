@@ -307,6 +307,7 @@ protected:
 
 
         QFRDRImagingFCSImageParameterGroupBox* grpImage;
+        QFRDRImagingFCSImageParameterGroupBox* grpGof;
 
 
         /** \brief label over the parameter image plot */
@@ -349,16 +350,16 @@ protected:
 
 
         /** \brief  plotter for goodnes of fit image */
-        QFPlotter* pltGofImage;
+        QFRDRImagingFCSImagePlotter* pltGofImage;
         /** \brief plot for the  goodnes of fit image in pltOverview */
-        JKQTPMathImage* plteGofImage;
-        double* plteGofImageData;
+        //JKQTPMathImage* plteGofImage;
+        //double* plteGofImageData;
 
 
         /** \brief plot for the selected runs in pltGofImage, plot plteImageSelectedData */
-        JKQTPOverlayImageEnhanced* plteGofImageSelected;
+        //JKQTPOverlayImageEnhanced* plteGofImageSelected;
         /** \brief plot for the excluded runs in pltGofImage, plot plteImageSelectedData */
-        JKQTPOverlayImageEnhanced* plteGofImageExcluded;
+        //JKQTPOverlayImageEnhanced* plteGofImageExcluded;
 
 
         /** \brief combobox for the color bar of overview image */
