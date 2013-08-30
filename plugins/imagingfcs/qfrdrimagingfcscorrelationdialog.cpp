@@ -778,44 +778,85 @@ void QFRDRImagingFCSCorrelationDialog::addJob(IMFCSJob jobin, bool ignoreDualVie
     }*/
 }
 
+bool QFRDRImagingFCSCorrelationDialog::correctJobCropAndDV()
+{
+    bool ok=false;
+    QStringList sl;
+    sl<<tr("add job as set");
+    sl<<tr("set DualView mode to none (click again to add job)");
+    sl<<tr("switch off cropping (click again to add job)");
+    int what=sl.indexOf(QInputDialog::getItem(this, tr("add correlation job"), tr("You selected cropping and a DualView mode. Is this correct?\n    Note: This is a usually arising mistake when setting the parameters, so I ask!\n\nWhat should be done? Please select:"), sl, 0, false, &ok));
+    if (ok) {
+        if (what<=0) return true;
+        else if (what==1) {
+            ui->cmbDualView->setCurrentIndex(0);
+            /*QApplication::processEvents();
+            job=initJob();
+            addJob(job);*/
+        } else if (what==2) {
+            ui->chkCrop->setChecked(false);
+            /*QApplication::processEvents();
+            job=initJob();
+            addJob(job);*/
+        }
+    }
+    return false;
+}
+
 void QFRDRImagingFCSCorrelationDialog::on_btnAddJob_clicked() {
     IMFCSJob job=initJob();
-    addJob(job);
+    if (job.use_cropping && job.dualViewMode>0) {
+        if (correctJobCropAndDV()) addJob(job);
+    } else {
+        addJob(job);
+    }
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_btnAddSeriesJob_clicked(const QString &parameter, double start, double end, double inc) {
-
-    QFRDRImagingFCSSeriesDialog* dlg=new QFRDRImagingFCSSeriesDialog(this);
-    if (!parameter.isEmpty()) {
-        dlg->setParameter(parameter);
-        dlg->setRange(start, end, inc);
+    IMFCSJob job=initJob();
+    bool ok=true;
+    if (job.use_cropping && job.dualViewMode>0) {
+        ok=correctJobCropAndDV();
     }
 
-    if (dlg->exec()) {
-        QList<double> vals=dlg->getValues();
-
-        setEditControlsEnabled(false);
-        for (int i=0; i<vals.size(); i++) {
-            IMFCSJob job=initJob(vals[i]);
-            if (dlg->getParameter()==0) { //binning
-                job.binning=vals[i];
-            }
-
-
-            addJob(job);
+    if (ok){
+        QFRDRImagingFCSSeriesDialog* dlg=new QFRDRImagingFCSSeriesDialog(this);
+        if (!parameter.isEmpty()) {
+            dlg->setParameter(parameter);
+            dlg->setRange(start, end, inc);
         }
+
+        if (dlg->exec()) {
+            QList<double> vals=dlg->getValues();
+
+            setEditControlsEnabled(false);
+            for (int i=0; i<vals.size(); i++) {
+                if (dlg->getParameter()==0) { //binning
+                    IMFCSJob job=initJob(vals[i]);
+                    job.binning=vals[i];
+                    addJob(job);
+                }
+            }
+        }
+        delete dlg;
     }
-    delete dlg;
 
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_btnAddBin12Job_clicked()
 {
-    setEditControlsEnabled(false);
-    for (int i=0; i<2; i++) {
-        IMFCSJob job=initJob(i+1);
-        job.binning=i+1;
-        addJob(job);
+    IMFCSJob job=initJob();
+    bool ok=true;
+    if (job.use_cropping && job.dualViewMode>0) {
+        ok=correctJobCropAndDV();
+    }
+    if (ok){
+        setEditControlsEnabled(false);
+        for (int i=0; i<2; i++) {
+            IMFCSJob job=initJob(i+1);
+            job.binning=i+1;
+            addJob(job);
+        }
     }
 
 }
@@ -1142,4 +1183,6 @@ void QFRDRImagingFCSCorrelationDialog::clickAddJobSeries(const QString &paramete
 {
     on_btnAddSeriesJob_clicked(parameter, start, end, inc);
 }
+
+
 

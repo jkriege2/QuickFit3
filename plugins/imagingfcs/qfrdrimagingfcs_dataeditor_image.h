@@ -38,6 +38,7 @@
 #include "qfrdrimagingfcsimageplotter.h"
 #include "qfrdrimagingfcsimageparametergroupbox.h"
 #include "qfrdrimagingfcsoverlaystylecombobox.h"
+#include "qfparametercorrelationview.h"
 
 class QFRDRImagingFCSData; // forward
 
@@ -81,11 +82,11 @@ protected:
         /** \brief return the currently selected fit parameter (or an empty string, if none selected, or no evalGroup selected) */
         QString currentFitParameter() const;
         /** \brief return the currently selected goodnes of fit parameter (or an empty string, if none selected, or no evalGroup selected) */
-        QString currentGofParameter() const;
+        QString currentFit2Parameter() const;
         /** \brief return the currently selected fit parameter transformation */
         ImageTransforms currentFitParameterTransfrom() const;
         /** \brief return the currently selected goodnes of fit parameter transformation */
-        ImageTransforms currentGofParameterTransfrom() const;
+        ImageTransforms currentFit2ParameterTransfrom() const;
 
         QString formatTransformAndParameter(QComboBox* cmbParameter, QComboBox* cmbTransform);
 
@@ -111,6 +112,12 @@ protected:
 
         /** \brief recalculate histogram over all pixels */
         void updateHistogram();
+
+        /** \brief fill the given histogram widget with data */
+        void updateHistogram(QFHistogramView *histogram, QFRDRImagingFCSData *m, double *plteImageData, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram);
+        /** \brief fill the given correlation widget with data */
+        void updateCorrelation(QFParameterCorrelationView *corrView, QFRDRImagingFCSData *m, double *data1, double *data2, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram, int mode, int channel=0, const QString& label1=QString(), const QString label2=QString());
+
 
         /** \brief recalculate histogram over selected pixels */
         void updateSelectionHistogram(bool replot=false);
@@ -149,8 +156,8 @@ protected:
         void excludeByIntensity();
         /** \brief exclude runs by intensity in the parameter image */
         void excludeByParamIntensity();
-        /** \brief exclude runs by intensity in the gof image */
-        void excludeByGOFIntensity();
+        /** \brief exclude runs by intensity in the parameter image 2 */
+        void excludeByParan2Intensity();
 
         /** \brief save selection to harddisk */
         void saveSelection();
@@ -254,9 +261,10 @@ protected:
         /** \brief indicates whether the overview plot is visible */
         QCheckBox* chkOverviewVisible;
         /** \brief indicates whether the goodnes of fit plot is visible */
-        QCheckBox* chkGofVisible;
+        QCheckBox* chkParamImage2Visible;
         /** \brief indicates whether the mask plot is visible */
         QCheckBox* chkMaskVisible;
+
 
 
         /** \brief plotter widget for the correlation curve */
@@ -307,7 +315,7 @@ protected:
 
 
         QFRDRImagingFCSImageParameterGroupBox* grpImage;
-        QFRDRImagingFCSImageParameterGroupBox* grpGof;
+        QFRDRImagingFCSImageParameterGroupBox* grpImage2;
 
 
         /** \brief label over the parameter image plot */
@@ -338,28 +346,14 @@ protected:
 
         /** \brief  plotter for parameter image */
         QFRDRImagingFCSImagePlotter* pltImage;
-        /** \brief plot for the parameter image in pltImage */
-        //JKQTPMathImage* plteImage;
-        //double* plteImageData;
+
         int32_t plteImageSize;
 
-        /** \brief plot for the selected runs in pltImage, plot plteImageSelectedData */
-        //JKQTPOverlayImageEnhanced* plteImageSelected;
-        /** \brief plot for the excluded runs in pltImage, plot plteImageSelectedData */
-        //JKQTPOverlayImageEnhanced* plteImageExcluded;
 
 
         /** \brief  plotter for goodnes of fit image */
-        QFRDRImagingFCSImagePlotter* pltGofImage;
-        /** \brief plot for the  goodnes of fit image in pltOverview */
-        //JKQTPMathImage* plteGofImage;
-        //double* plteGofImageData;
+        QFRDRImagingFCSImagePlotter* pltParamImage2;
 
-
-        /** \brief plot for the selected runs in pltGofImage, plot plteImageSelectedData */
-        //JKQTPOverlayImageEnhanced* plteGofImageSelected;
-        /** \brief plot for the excluded runs in pltGofImage, plot plteImageSelectedData */
-        //JKQTPOverlayImageEnhanced* plteGofImageExcluded;
 
 
         /** \brief combobox for the color bar of overview image */
@@ -370,8 +364,6 @@ protected:
         QFDoubleEdit* edtOvr2Min;
         QFDoubleEdit* edtOvr2Max;
 
-        /** \brief combobox for the color bar of gof image */
-        JKQTPMathImageColorPalette* cmbColorbarGof;
 
 
 
@@ -403,10 +395,10 @@ protected:
         QLabel* labParameterTransform;
         QComboBox* cmbParameterTransform;
         /** \brief combobox to select a goodnes of fit parameter from the result group */
-        QComboBox* cmbGofParameter;
-        QLabel* labGofParameter;
-        QLabel* labGofParameterTransform;
-        QComboBox* cmbGofParameterTransform;
+        QComboBox* cmbParameter2;
+        QLabel* labParameter2;
+        QLabel* labParameter2Transform;
+        QComboBox* cmbParameter2Transform;
 
         /** \brief table for the fit params */
         QEnhancedTableView* tvParams;
@@ -431,15 +423,19 @@ protected:
 
 
         /** \brief plotter widget for the parameter histogram */
-
+        QGridLayout* histLay;
         QFHistogramView* histogram;
-        QFHistogramView* histogram2;
+        QFHistogramView* histogram_2;
         QCheckBox* chkExcludeExcludedRunsFromHistogram;
+        QCheckBox* chkExcludeExcludedRunsFromHistogram_2;
+        QFHistogramView* histogram2;
+        QFHistogramView* histogram2_2;
         QCheckBox* chkExcludeExcludedRunsFromHistogram2;
-        //double* datahist;
-        //double* datahistsel;
-        int32_t datasize;
-        int32_t datasizesel;
+        QCheckBox* chkExcludeExcludedRunsFromHistogram2_2;
+
+        QComboBox* cmbCorrelationDisplayMode;
+        QSpinBox* spinCorrelationChannel;
+        QFParameterCorrelationView* corrView;
 
         QColor selectionColor;
         QColor excludedColor;
@@ -475,7 +471,7 @@ protected:
 
 
         /** \brief create a parameter image with the given evalGroup and fitParam */
-        void readParameterImage(double* image, double* gof_image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam, ImageTransforms tranFitParam, QString gofParam, ImageTransforms tranGofParam);
+        void readParameterImage(double* image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam, ImageTransforms tranFitParam);
 
         /** \brief apply the given transformation to the image */
         void transformImage(double *image, uint16_t width, uint16_t height, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam);
@@ -521,8 +517,8 @@ protected:
         QToolButton* btnInvertMask;
         /** \brief button to mask pixels by intensity */
         QToolButton* btnMaskByIntensity;
-        /** \brief button to mask pixels by gof image */
-        QToolButton* btnMaskByGofIntensity;
+        /** \brief button to mask pixels by parameter image 2 */
+        QToolButton* btnMaskByParam2Intensity;
         /** \brief button to mask pixels by parameter image */
         QToolButton* btnMaskByParamIntensity;
 
@@ -558,8 +554,8 @@ protected:
         QAction* actInvertMask;
         /** \brief button to mask pixels by intensity */
         QAction* actMaskByIntensity;
-        /** \brief button to mask pixels by gof image */
-        QAction* actMaskByGofIntensity;
+        /** \brief button to mask pixels by parameter image 2 */
+        QAction* actMaskByParam2Intensity;
         /** \brief button to mask pixels by parameter image */
         QAction* actMaskByParamIntensity;
 

@@ -17,7 +17,7 @@ public:
 
     bool copyParam() const;
     bool copyOvf() const;
-    bool copyGOF() const;
+    bool copyParam2() const;
     bool copyMask() const;
     bool copyID() const;
     bool copyCoordinates() const;

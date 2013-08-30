@@ -37,7 +37,7 @@ bool QFRDRImagingFCSCopyDataSelectDialog::copyOvf() const
     return ui->chkOverview->isChecked();
 }
 
-bool QFRDRImagingFCSCopyDataSelectDialog::copyGOF() const
+bool QFRDRImagingFCSCopyDataSelectDialog::copyParam2() const
 {
     return ui->chkGOF->isChecked();
 }

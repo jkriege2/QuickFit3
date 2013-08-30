@@ -53,7 +53,7 @@
      <item row="3" column="1">
       <widget class="QCheckBox" name="chkGOF">
        <property name="text">
-        <string>goodnes of fit image</string>
+        <string>parameter image 2</string>
        </property>
        <property name="checked">
         <bool>true</bool>

@@ -46,6 +46,7 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         void clickAddJobSeries(const QString& parameter, double start, double end, double inc);
 
     protected slots:
+        bool correctJobCropAndDV();
         void on_btnSelectImageFile_clicked();
         void on_btnSelectImageFileNoCount_clicked();
         void on_btnSelectBackgroundFile_clicked();

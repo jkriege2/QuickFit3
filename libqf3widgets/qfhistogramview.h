@@ -27,6 +27,7 @@
 #include <QSettings>
 #include <QTextDocument>
 #include "libwid_imexport.h"
+#include "qfproperties.h"
 
 /*! \brief This class displays a histogram together with some statistical data on it
     \ingroup qf3rdrdp_imaging_fcs
@@ -58,6 +59,9 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         void readSettings(QSettings& settings, const QString& prefix=QString("histogram/"));
         /** \brief write the settings */
         void writeSettings(QSettings& settings, const QString& prefix=QString("histogram/"));
+
+        void writeQFProperties(QFProperties* current, const QString& prefix, const QString& egroup, const QString& param);
+        void readQFProperties(QFProperties* current, const QString& prefix, const QString& egroup, const QString& param);
 
         /** \brief connect/disconnect cmbResultGroups, cmbParameters, ... to their slots */
         void connectParameterWidgets(bool connectTo=true);

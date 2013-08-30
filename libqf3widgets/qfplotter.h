@@ -20,6 +20,8 @@ class QFWIDLIB_EXPORT QFPlotter : public JKQtPlotter
         QToolBar* createToolbar(QWidget* parent=NULL, const QString& name=QString(""));
         virtual void populateToolbar(QToolBar* toolbar) const;
 
+        QAction* get_actCopyToTable() const;
+        QAction* get_actHelp() const;
     signals:
         
     public slots:

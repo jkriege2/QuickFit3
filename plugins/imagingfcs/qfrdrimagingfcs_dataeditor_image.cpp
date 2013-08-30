@@ -34,13 +34,11 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     plteOverviewExcludedData=NULL;
     plteOverviewSize=0;
     //plteImageData=NULL;
-    //plteGofImageData=NULL;
     plteImageSize=0;
     lastSavePath="";
     connectImageWidgetsCounter=0;
     connectParameterWidgetsCounter=0;
     //datahist=datahistsel=NULL;
-    datasize=datasizesel=0;
     timUpdateAfterClick=new QTimer(this);
     timUpdateAfterClick->setSingleShot(true);
     timUpdateAfterClick->setInterval(CLICK_UPDATE_TIMEOUT);
@@ -58,10 +56,6 @@ QFRDRImagingFCSImageEditor::~QFRDRImagingFCSImageEditor()
     plteOverviewSelectedData=NULL;
     if (plteOverviewExcludedData) free(plteOverviewExcludedData);
     plteOverviewExcludedData=NULL;
-    //if (plteGofImageData) free(plteGofImageData);
-    //plteGofImageData=NULL;
-    //datahist=NULL;
-    //datahistsel=NULL;
 }
 
 
@@ -119,20 +113,20 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     topgrid->addWidget(cmbParameterTransform, row, 6);
 
     row++;
-    cmbGofParameter=new QComboBox(this);
-    cmbGofParameter->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    topgrid->addWidget((labGofParameter=new QLabel(tr("&goodness of fit:"))), row, 3);
-    labGofParameter->setBuddy(cmbGofParameter);
-    topgrid->addWidget(cmbGofParameter, row, 4);
-    cmbGofParameterTransform=new QComboBox(this);
-    cmbGofParameterTransform->addItem(QIcon(":/imaging_fcs/none.png"), tr("none"));
-    cmbGofParameterTransform->addItem(QIcon(":/imaging_fcs/abs.png"), tr("abs"));
-    cmbGofParameterTransform->addItem(QIcon(":/imaging_fcs/log.png"), tr("log"));
-    cmbGofParameterTransform->addItem(QIcon(":/imaging_fcs/reci.png"), tr("reciprocal"));
-    cmbGofParameterTransform->addItem(QIcon(":/imaging_fcs/sqrt.png"), tr("sqrt"));
-    topgrid->addWidget((labGofParameterTransform=new QLabel(tr("    tr&ansform:"))), row, 5);
-    labGofParameterTransform->setBuddy(cmbGofParameterTransform);
-    topgrid->addWidget(cmbGofParameterTransform, row, 6);
+    cmbParameter2=new QComboBox(this);
+    cmbParameter2->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    topgrid->addWidget((labParameter2=new QLabel(tr("paramater &2:"))), row, 3);
+    labParameter2->setBuddy(cmbParameter2);
+    topgrid->addWidget(cmbParameter2, row, 4);
+    cmbParameter2Transform=new QComboBox(this);
+    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/none.png"), tr("none"));
+    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/abs.png"), tr("abs"));
+    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/log.png"), tr("log"));
+    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/reci.png"), tr("reciprocal"));
+    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/sqrt.png"), tr("sqrt"));
+    topgrid->addWidget((labParameter2Transform=new QLabel(tr("    tr&ansform:"))), row, 5);
+    labParameter2Transform->setBuddy(cmbParameter2Transform);
+    topgrid->addWidget(cmbParameter2Transform, row, 6);
 
 
 
@@ -156,6 +150,23 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     area->setWidget(w);
     QVBoxLayout* vbl=new QVBoxLayout();
     w->setLayout(vbl);
+    QString stylesheetGroupBox=
+            QString("QGroupBox {"
+                    //"  background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 %1, stop: 1 %2);"
+                    "  border-top: 2px solid gray;"
+                    "  border-left: 2px solid gray;"
+                    "  border-radius: 2px;"
+                    "  margin-top: 1ex; "
+                    "  margin-left: 1ex; "
+                    "  font-weight: bold;"
+                    "} "
+                    "QGroupBox::title {"
+                    "  subcontrol-origin: margin;"
+                    "  subcontrol-position: top left; "
+                    "  padding: 0 8px;"
+                    //"  border: 1px solid gray;"
+                    "}").arg(palette().color(QPalette::Window).name()).arg(palette().color(QPalette::Window).lighter(120).name());
+    w->setStyleSheet(w->styleSheet()+QString("\n\n")+stylesheetGroupBox);
 
 
 
@@ -172,12 +183,12 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     grpVisiblePlots->setLayout(glVisPlots);
     chkOverviewVisible=new QCheckBox(tr("overview"), grpVisiblePlots);
     chkOverviewVisible->setChecked(true);
-    chkGofVisible=new QCheckBox(tr("goodnes of fit"), grpVisiblePlots);
-    chkGofVisible->setChecked(false);
+    chkParamImage2Visible=new QCheckBox(tr("parameter 2"), grpVisiblePlots);
+    chkParamImage2Visible->setChecked(false);
     chkMaskVisible=new QCheckBox(tr("mask"), grpVisiblePlots);
     chkMaskVisible->setChecked(false);
     glVisPlots->addWidget(chkOverviewVisible, 0,0);
-    glVisPlots->addWidget(chkGofVisible, 0,1);
+    glVisPlots->addWidget(chkParamImage2Visible, 0,1);
     glVisPlots->addWidget(chkMaskVisible, 0,2);
 
     cmbDualView=new QComboBox(this);
@@ -195,6 +206,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     ///////////////////////////////////////////////////////////////
     QGroupBox* wmask=new QGroupBox(tr(" mask options "), this);
     wmask->setFlat(true);
+    //wmask->setStyleSheet(wmask->styleSheet()+QString("\n\n")+ stylesheetGroupBox);
     vbl->addWidget(wmask);
     QGridLayout* glmask=new QGridLayout(this);
     glmask->setHorizontalSpacing(2);
@@ -221,24 +233,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(actInvertMask, SIGNAL(triggered()), this, SLOT(invertMask()));
     mskgrpRow++;
 
-    /*
-    btnSaveMask=createButtonAndActionShowText(actSaveMask, QIcon(":/imaging_fcs/savemask.png"), tr("&save"), w);
-    actSaveMask->setToolTip(tr("save the mask to harddisk"));
-    glmask->addWidget(btnSaveMask, mskgrpRow, 0);
-    connect(actSaveMask, SIGNAL(triggered()), this, SLOT(saveMask()));
-    btnLoadMask=createButtonAndActionShowText(actLoadMask, QIcon(":/imaging_fcs/loadmask.png"), tr("&load"), w);
-    actLoadMask->setToolTip(tr("load a mask from harddisk"));
-    glmask->addWidget(btnLoadMask, mskgrpRow, 1);
-    connect(actLoadMask, SIGNAL(triggered()), this, SLOT(loadMask()));
-    btnCopyMask=createButtonAndActionShowText(actCopyMask, QIcon(":/imaging_fcs/copymask.png"), tr("&copy"), w);
-    actCopyMask->setToolTip(tr("copy the mask to clipboard"));
-    glmask->addWidget(btnCopyMask, mskgrpRow, 2);
-    connect(actCopyMask, SIGNAL(triggered()), this, SLOT(copyMask()));
-    btnPasteMask=createButtonAndActionShowText(actPasteMask, QIcon(":/imaging_fcs/pastemask.png"), tr("&paste"), w);
-    actPasteMask->setToolTip(tr("paste a mask from clipboard"));
-    glmask->addWidget(btnPasteMask, mskgrpRow, 3);
-    connect(actPasteMask, SIGNAL(triggered()), this, SLOT(pasteMask()));
-*/
+
     btnSaveMask=createButtonForActionShowText(correlationMaskTools->get_actSaveMask(), w);
     glmask->addWidget(btnSaveMask, mskgrpRow, 0);
     btnLoadMask=createButtonForActionShowText(correlationMaskTools->get_actLoadMask(), w);
@@ -262,13 +257,13 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
     glmask->addWidget(btnMaskByIntensity, mskgrpRow, 0);
     connect(actMaskByIntensity, SIGNAL(triggered()), this, SLOT(excludeByIntensity()));
-    btnMaskByGofIntensity=createButtonAndActionShowText(actMaskByGofIntensity, tr("m. by &GOF"), w);
-    actMaskByGofIntensity->setToolTip(tr("create a mask according to the <b>goodnes-of-fit image</b>:\n"
+    btnMaskByParam2Intensity=createButtonAndActionShowText(actMaskByParam2Intensity, tr("m. by param &2"), w);
+    actMaskByParam2Intensity->setToolTip(tr("create a mask according to the <b>parameter image 2</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
-    glmask->addWidget(btnMaskByGofIntensity, mskgrpRow, 1);
-    connect(actMaskByGofIntensity, SIGNAL(triggered()), this, SLOT(excludeByGOFIntensity()));
+    glmask->addWidget(btnMaskByParam2Intensity, mskgrpRow, 1);
+    connect(actMaskByParam2Intensity, SIGNAL(triggered()), this, SLOT(excludeByParan2Intensity()));
     btnMaskByParamIntensity=createButtonAndActionShowText(actMaskByParamIntensity, tr("m. by &param"), w);
     actMaskByParamIntensity->setToolTip(tr("create a mask according to the <b>parameter image</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
@@ -283,6 +278,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     QGroupBox* wsel=new QGroupBox(tr(" selection options "), this);
     wsel->setFlat(true);
+    //wsel->setStyleSheet(wsel->styleSheet()+QString("\n\n")+ stylesheetGroupBox);
     vbl->addWidget(wsel);
     QGridLayout* glsel=new QGridLayout(this);
     glsel->setHorizontalSpacing(2);
@@ -348,6 +344,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     ///////////////////////////////////////////////////////////////
     grpImage=new QFRDRImagingFCSImageParameterGroupBox(tr(" parameter image style "), this);
     vbl->addWidget(grpImage);
+    //grpImage->setStyleSheet(grpImage->styleSheet()+QString("\n\n")+ stylesheetGroupBox);
 
 
     QGroupBox* wsels=new QGroupBox(tr(" selection style "), this);
@@ -363,8 +360,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     ///////////////////////////////////////////////////////////////
     // GROUPBOX: parameter image style
     ///////////////////////////////////////////////////////////////
-    grpGof=new QFRDRImagingFCSImageParameterGroupBox(tr(" GOF image style "), this);
-    vbl->addWidget(grpGof);
+    grpImage2=new QFRDRImagingFCSImageParameterGroupBox(tr(" parameter 2 image style "), this);
+    vbl->addWidget(grpImage2);
+    //connect(chkParamImage2Visible, SIGNAL(toggled(bool)), grpImage2, SLOT(setVisible(bool)));
+    //grpImage2->setVisible(chkParamImage2Visible->isChecked());
 
 
     ///////////////////////////////////////////////////////////////
@@ -413,6 +412,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     ///////////////////////////////////////////////////////////////
     QGroupBox* wcp=new QGroupBox(tr(" correlation plot styles "), this);
     wcp->setFlat(true);
+    //wcp->setStyleSheet(wcp->styleSheet()+QString("\n\n")+ stylesheetGroupBox);
     vbl->addWidget(wcp);
     QFormLayout* gl=new QFormLayout(this);
     gl->setSpacing(2);
@@ -677,64 +677,33 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     ///////////////////////////////////////////////////////////////
-    // WIDGET: goodnes of fit image plot
+    // WIDGET: parameter image 2 plot
     ///////////////////////////////////////////////////////////////
 
-    QWidget* wpltGofImage=new QWidget(this);
-    QVBoxLayout* lpltGofImage=new QVBoxLayout();
-    wpltGofImage->setLayout(lpltGofImage);
-    pltGofImage=new QFRDRImagingFCSImagePlotter(wpltGofImage);
-    pltGofImage->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
-    pltGofImage->setObjectName("pltGofImage");
-    pltGofImage->get_plotter()->set_plotLabel(tr("\\textbf{\"Goodnes of Fit\" Image}"));
-    pltGofImage->connectTo(grpGof, cmbSelectionStyle);
-    //pltGofImage->get_plotter()->set_plotLabelFontSize(10);
-
-    //lpltGofImage->addWidget((labParamImage=new QLabel(tr("\"Goodnes of Fit\" Image:"))));
-    lpltGofImage->addWidget(pltGofImage, 1);
-
-    /*pltGofImage->set_displayMousePosition(false);
-    pltGofImage->set_displayToolbar(true);
-    pltGofImage->get_plotter()->set_maintainAspectRatio(true);
-    pltGofImage->get_plotter()->set_aspectRatio(1);
-    pltGofImage->get_plotter()->set_maintainAxisAspectRatio(true);
-    pltGofImage->get_plotter()->set_axisAspectRatio(1);
-    pltGofImage->setXY(0,0,1,1);
-    pltGofImage->setAbsoluteXY(0,1,0,1);
-
-    pltGofImage->get_plotter()->getXAxis()->set_tickLabelFontSize(8);
-    pltGofImage->get_plotter()->getYAxis()->set_tickLabelFontSize(8);
-    pltGofImage->get_plotter()->getXAxis()->set_axisLabel("");
-    pltGofImage->get_plotter()->getYAxis()->set_axisLabel("");
-    pltGofImage->get_plotter()->getXAxis()->set_axisMinWidth(1);
-    pltGofImage->get_plotter()->getYAxis()->set_axisMinWidth(1);
-    pltGofImage->get_plotter()->setGrid(false);
-    pltGofImage->get_plotter()->set_useAntiAliasingForSystem(true);
-    pltGofImage->get_plotter()->set_useAntiAliasingForGraphs(true);
-    pltGofImage->set_userActionCompositionMode(QPainter::CompositionMode_Xor);*/
-    connect(pltGofImage, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
-    connect(pltGofImage, SIGNAL(userClickFinished(double,double,Qt::KeyboardModifiers)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
-    connect(pltGofImage, SIGNAL(userScribbleClick(double,double,Qt::KeyboardModifiers, bool, bool)), this, SLOT(imageScribbled(double,double,Qt::KeyboardModifiers,bool,bool)));
-    connect(pltGofImage, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
-    connect(pltGofImage, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
-    connect(pltGofImage, SIGNAL(userCircleFinished(double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageCircleFinished(double,double,double,Qt::KeyboardModifiers)));
-    connect(pltGofImage, SIGNAL(userEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)));
-    connect(pltGofImage, SIGNAL(userLineFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageLineFinished(double,double,double,double,Qt::KeyboardModifiers)));
-    connect(pltGofImage, SIGNAL(saveImageSettings()), this, SLOT(saveImageSettings()));
+    QWidget* wpltImage2=new QWidget(this);
+    QVBoxLayout* lpltImage2=new QVBoxLayout();
+    wpltImage2->setLayout(lpltImage2);
+    pltParamImage2=new QFRDRImagingFCSImagePlotter(wpltImage2);
+    pltParamImage2->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
+    pltParamImage2->setObjectName("pltImage2");
+    pltParamImage2->get_plotter()->set_plotLabel(tr("\\textbf{\"Parameter Image 2\" Image}"));
+    pltParamImage2->connectTo(grpImage2, cmbSelectionStyle);
+    lpltImage2->addWidget(pltParamImage2, 1);
 
 
-    /*plteGofImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::GRAY, pltGofImage->get_plotter());
-    pltGofImage->addGraph(plteGofImage);
+    connect(pltParamImage2, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(imageZoomChangedLocally(double,double,double,double,JKQtPlotter*)));
+    connect(pltParamImage2, SIGNAL(userClickFinished(double,double,Qt::KeyboardModifiers)), this, SLOT(imageClicked(double,double,Qt::KeyboardModifiers)));
+    connect(pltParamImage2, SIGNAL(userScribbleClick(double,double,Qt::KeyboardModifiers, bool, bool)), this, SLOT(imageScribbled(double,double,Qt::KeyboardModifiers,bool,bool)));
+    connect(pltParamImage2, SIGNAL(plotMouseMove(double,double)), this, SLOT(imageMouseMoved(double,double)));
+    connect(pltParamImage2, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
+    connect(pltParamImage2, SIGNAL(userCircleFinished(double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageCircleFinished(double,double,double,Qt::KeyboardModifiers)));
+    connect(pltParamImage2, SIGNAL(userEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageEllipseFinished(double,double,double,double,Qt::KeyboardModifiers)));
+    connect(pltParamImage2, SIGNAL(userLineFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(imageLineFinished(double,double,double,double,Qt::KeyboardModifiers)));
+    connect(pltParamImage2, SIGNAL(saveImageSettings()), this, SLOT(saveImageSettings()));
 
-
-    plteGofImageSelected=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlSelCol, pltGofImage->get_plotter());
-    plteGofImageSelected->set_rectanglesAsImageOverlay(OverlayRectanglesAsImageOverlay);
-    plteGofImageExcluded=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0, 0, ovlExCol, pltGofImage->get_plotter());
-    plteGofImageExcluded->set_rectanglesAsImageOverlay(OverlayRectanglesAsImageOverlay);*/
 
 
     connect(pltOverview, SIGNAL(beforePlotScalingRecalculate()), this, SLOT(moveColorbarsAuto()));
-    //connect(pltGofImage, SIGNAL(beforePlotScalingRecalculate()), this, SLOT(moveColorbarsAuto()));
 
 
 
@@ -815,7 +784,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     splitterTopBot=new QVisibleHandleSplitter(Qt::Vertical, this);
     splitterTop=new QVisibleHandleSplitter(Qt::Horizontal, this);
     splitterTop->addWidget(wpltImage);
-    splitterTop->addWidget(wpltGofImage);
+    splitterTop->addWidget(wpltImage2);
     splitterTop->addWidget(wpltMask);
     splitterTop->addWidget(wpltOverview);
     splitterTopBot->addWidget(splitterTop);
@@ -847,7 +816,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QGridLayout* grdTop=new QGridLayout(this);
     btnPrintReport = createButtonAndActionShowText(actPrintReport, QIcon(":/imaging_fcs/report_print.png"), tr("&Print report"), this);
     actPrintReport->setToolTip(tr("print a report which contains all data on the current screen:<br><ul>"
-                                  "<li>all images (parameter, mask, goodnes-of-fit, overview</li>"
+                                  "<li>all images (parameter, mask, parameter 2, overview</li>"
                                   "<li>correlation curves and fit parameters</li>"
                                   "<li>histpgram and statistics</li>"
                                   "<li>additional data (files, description configuration ...)</li>"
@@ -856,24 +825,24 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
     btnSaveReport = createButtonAndActionShowText(actSaveReport, QIcon(":/imaging_fcs/report_save.png"), tr("&Save report"), this);
     actSaveReport->setToolTip(tr("save a report which contains all data on the current screen as PDF or PostScript file:<br><ul>"
-                                  "<li>all images (parameter, mask, goodnes-of-fit, overview)</li>"
+                                  "<li>all images (parameter, mask, parameter 2, overview)</li>"
                                   "<li>correlation curves and fit parameters</li>"
                                   "<li>histpgram and statistics</li>"
                                   "<li>additional data (files, description configuration ...)</li>"
                                   "</ul>"));
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
     btnSaveData = createButtonAndActionShowText(actSaveData, QIcon(":/imaging_fcs/preview_savedata.png"), tr("Save &data"), this);
-    actSaveData->setToolTip(tr("save the currently displayed images (parameter, mask, goodnes-of-fit, overview)\nas image files (e.g. TIFF), so they can be processed in other programs."));
+    actSaveData->setToolTip(tr("save the currently displayed images (parameter, mask, parameter 2, overview)\nas image files (e.g. TIFF), so they can be processed in other programs."));
     connect(actSaveData, SIGNAL(triggered()), this, SLOT(saveData()));
 
     actInsertSelectedCorrelationsAsFCSRDR=new QAction(tr("Insert Correlation Curves as new RDR into Project"), this);
     connect(actInsertSelectedCorrelationsAsFCSRDR, SIGNAL(triggered()), this, SLOT(insertSelectedCorrelationsAsFCSRDR()));
 
     btnCopyDataToMatlab = createButtonAndActionShowText(actCopyDataToMatlab, QIcon(":/imaging_fcs/copydatatomatlab.png"), tr("Copy Images to &Matlab"), this);
-    actCopyDataToMatlab->setToolTip(tr("copy the currently dispalyed images (parameter, mask, goodnes-of-fit, overview) as a Matlab script."));
+    actCopyDataToMatlab->setToolTip(tr("copy the currently dispalyed images (parameter, mask, parameter 2, overview) as a Matlab script."));
     connect(actCopyDataToMatlab, SIGNAL(triggered()), this, SLOT(copyToMatlab()));
     btnCopyDataAsColumns = createButtonAndActionShowText(actCopyDataAsColumns, QIcon(":/imaging_fcs/copydata.png"), tr("Copy Images as &Columns"), this);
-    actCopyDataAsColumns->setToolTip(tr("copy the currently dispalyed images (parameter, mask, goodnes-of-fit, overview) as columns of data to the clipboard. The data may be pasted e.g. into a spreadsheet program like Excel"));
+    actCopyDataAsColumns->setToolTip(tr("copy the currently dispalyed images (parameter, mask, parameter 2, overview) as columns of data to the clipboard. The data may be pasted e.g. into a spreadsheet program like Excel"));
     connect(actCopyDataAsColumns, SIGNAL(triggered()), this, SLOT(copyDataAsColumns()));
 
     actCopyFitResultStatistics=new QAction(tr("copy fit result statistics for Excel/Origin..."), this);
@@ -1029,35 +998,86 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     //////////////////////////////////////////////////////////////////////////////////////////
-    // HISTOGRAM TAB
+    // HISTOGRAM 1 TAB
     //////////////////////////////////////////////////////////////////////////////////////////
     histogram=new QFHistogramView(this);
     histogram->setMinimumHeight(200);
-    histogram2=new QFHistogramView(this);
-    histogram2->setMinimumHeight(200);
+    histogram_2=new QFHistogramView(this);
+    histogram_2->setMinimumHeight(200);
     chkExcludeExcludedRunsFromHistogram=new QCheckBox("", this);
     chkExcludeExcludedRunsFromHistogram->setToolTip(tr("if this option is activated the histograms are only calculated for those pixels that are not excluded."));
-    chkExcludeExcludedRunsFromHistogram2=new QCheckBox("", this);
-    chkExcludeExcludedRunsFromHistogram2->setToolTip(tr("if this option is activated the histograms are only calculated for those pixels that are not excluded."));
-    histogram->addSettingsWidget(tr("mind excluded runs:"), chkExcludeExcludedRunsFromHistogram);
-    histogram2->addSettingsWidget(tr("mind excluded runs:"), chkExcludeExcludedRunsFromHistogram2);
-    histogram2->setVisible(false);
+    chkExcludeExcludedRunsFromHistogram_2=new QCheckBox("", this);
+    chkExcludeExcludedRunsFromHistogram_2->setToolTip(tr("if this option is activated the histograms are only calculated for those pixels that are not excluded."));
+    histogram->addSettingsWidget(tr("w/o excluded:"), chkExcludeExcludedRunsFromHistogram);
+    histogram_2->addSettingsWidget(tr("w/o excluded:"), chkExcludeExcludedRunsFromHistogram_2);
+    histogram_2->setVisible(false);
 
     QWidget* widHist=new QWidget(this); //=histogram;
-    QVBoxLayout* histLay=new QVBoxLayout(this);
+    histLay=new QGridLayout(this);
     widHist->setLayout(histLay);
-    histLay->addWidget(histogram, 5);
-    histLay->addWidget(histogram2, 5);
-    histLay->addStretch(3);
+    histLay->addWidget(histogram,0,0);
+    histLay->addWidget(histogram_2,0,1);
 
 
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // HISTOGRAM 2 TAB
+    //////////////////////////////////////////////////////////////////////////////////////////
+    histogram2=new QFHistogramView(this);
+    histogram2->setMinimumHeight(200);
+    histogram2_2=new QFHistogramView(this);
+    histogram2_2->setMinimumHeight(200);
+    chkExcludeExcludedRunsFromHistogram2=new QCheckBox("", this);
+    chkExcludeExcludedRunsFromHistogram2->setToolTip(tr("if this option is activated the histograms are only calculated for those pixels that are not excluded."));
+    chkExcludeExcludedRunsFromHistogram2_2=new QCheckBox("", this);
+    chkExcludeExcludedRunsFromHistogram2_2->setToolTip(tr("if this option is activated the histograms are only calculated for those pixels that are not excluded."));
+    histogram2->addSettingsWidget(tr("w/o excluded:"), chkExcludeExcludedRunsFromHistogram2);
+    histogram2_2->addSettingsWidget(tr("w/o excluded:"), chkExcludeExcludedRunsFromHistogram2_2);
+    histogram2_2->setVisible(false);
+
+    histLay->addWidget(histogram2,1,0);
+    histLay->addWidget(histogram2_2,1,1);
+    //histLay->addWidget(new QWidget(this),2,0);
+
+    histLay->setColumnStretch(0,1);
+    histLay->setColumnStretch(1,0);
+    histLay->setRowStretch(0,1);
+    histLay->setRowStretch(1,1);
+    //histLay->setRowStretch(2,3);
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // CORRELATION TAB
+    //////////////////////////////////////////////////////////////////////////////////////////
+    corrView=new QFParameterCorrelationView(this);
+    cmbCorrelationDisplayMode=new QComboBox(this);
+    cmbCorrelationDisplayMode->addItem(tr("parameter 1 vs. 2"));
+    cmbCorrelationDisplayMode->addItem(tr("parameter 1 vs. image"));
+    cmbCorrelationDisplayMode->addItem(tr("parameter 2 vs. image"));
+    spinCorrelationChannel=new QSpinBox(this);
+    spinCorrelationChannel->setRange(0,0);
+    spinCorrelationChannel->setValue(0);
+
+    QWidget* widCorr=new QWidget(this);
+    QVBoxLayout* corrLay=new QVBoxLayout(this);
+    QHBoxLayout* layCorrCombo=new QHBoxLayout(this);
+    corrLay->addLayout(layCorrCombo);
+    layCorrCombo->addStretch();
+    layCorrCombo->addWidget(new QLabel(tr("correlation plot mode:"), this));
+    layCorrCombo->addWidget(cmbCorrelationDisplayMode);
+    layCorrCombo->addWidget(new QLabel(tr("  channel:"), this));
+    layCorrCombo->addWidget(spinCorrelationChannel);
+    layCorrCombo->addStretch();
+    widCorr->setLayout(corrLay);
+    corrLay->addWidget(corrView,0,0);
 
     //////////////////////////////////////////////////////////////////////////////////////////
     // PUT EVERYTHING TOGETHER
     //////////////////////////////////////////////////////////////////////////////////////////
     tabDisplay=new QTabWidget(this);
-    tabDisplay->addTab(widACFs, tr("&Correlations"));
-    tabDisplay->addTab(widHist, tr("&Histogram"));
+    tabDisplay->addTab(widACFs, tr("&Images/Data"));
+    tabDisplay->addTab(widHist, tr("&Histograms"));
+    tabDisplay->addTab(widCorr, tr("&Correlations"));
 
 
     //lb->addWidget(grpTop, 1, 0, 1, 2);
@@ -1067,7 +1087,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     connect(chkOverviewVisible, SIGNAL(toggled(bool)), this, SLOT(showHidePlots()));
-    connect(chkGofVisible, SIGNAL(toggled(bool)), this, SLOT(showHidePlots()));
+    connect(chkParamImage2Visible, SIGNAL(toggled(bool)), this, SLOT(showHidePlots()));
     connect(chkMaskVisible, SIGNAL(toggled(bool)), this, SLOT(showHidePlots()));
 
 
@@ -1089,7 +1109,11 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuData->addAction(actPrintReport);
     menuData->addSeparator();
     QMenu* m;
-    m=menuData->addMenu(tr("parameter image  plot"));
+    m=menuData->addMenu(tr("parameter image plot"));
+    m->addAction(pltImage->get_plotter()->get_actShowPlotData());
+    m->addSeparator();
+    m->addAction(pltImage->get_actCopyToTable());
+    m->addSeparator();
     m->addAction(pltImage->get_plotter()->get_actSaveData());
     m->addAction(pltImage->get_plotter()->get_actCopyData());
     m->addAction(pltImage->get_plotter()->get_actCopyMatlab());
@@ -1097,20 +1121,32 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     m->addAction(pltImage->get_plotter()->get_actSavePlot());
     m->addAction(pltImage->get_plotter()->get_actPrint());
     m=menuData->addMenu(tr("overview image plot"));
+    m->addAction(pltOverview->get_plotter()->get_actShowPlotData());
+    m->addSeparator();
+    m->addAction(pltOverview->get_actCopyToTable());
+    m->addSeparator();
     m->addAction(pltOverview->get_plotter()->get_actSaveData());
     m->addAction(pltOverview->get_plotter()->get_actCopyData());
     m->addAction(pltOverview->get_plotter()->get_actCopyMatlab());
     m->addAction(pltOverview->get_plotter()->get_actCopyPixelImage());
     m->addAction(pltOverview->get_plotter()->get_actSavePlot());
     m->addAction(pltOverview->get_plotter()->get_actPrint());
-    m=menuData->addMenu(tr("goodness-of-fit plot"));
-    m->addAction(pltGofImage->get_plotter()->get_actSaveData());
-    m->addAction(pltGofImage->get_plotter()->get_actCopyData());
-    m->addAction(pltGofImage->get_plotter()->get_actCopyMatlab());
-    m->addAction(pltGofImage->get_plotter()->get_actCopyPixelImage());
-    m->addAction(pltGofImage->get_plotter()->get_actSavePlot());
-    m->addAction(pltGofImage->get_plotter()->get_actPrint());
+    m=menuData->addMenu(tr("parameter image 2 plot"));
+    m->addAction(pltParamImage2->get_plotter()->get_actShowPlotData());
+    m->addSeparator();
+    m->addAction(pltParamImage2->get_actCopyToTable());
+    m->addSeparator();
+    m->addAction(pltParamImage2->get_plotter()->get_actSaveData());
+    m->addAction(pltParamImage2->get_plotter()->get_actCopyData());
+    m->addAction(pltParamImage2->get_plotter()->get_actCopyMatlab());
+    m->addAction(pltParamImage2->get_plotter()->get_actCopyPixelImage());
+    m->addAction(pltParamImage2->get_plotter()->get_actSavePlot());
+    m->addAction(pltParamImage2->get_plotter()->get_actPrint());
     m=menuData->addMenu(tr("correlation function/residual plot"));
+    m->addAction(plotter->get_plotter()->get_actShowPlotData());
+    m->addSeparator();
+    m->addAction(plotter->get_actCopyToTable());
+    m->addSeparator();
     m->addAction(plotter->get_plotter()->get_actSaveData());
     m->addAction(plotter->get_plotter()->get_actCopyData());
     m->addAction(plotter->get_plotter()->get_actCopyMatlab());
@@ -1128,7 +1164,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuMask->addAction(actClearMask);
     menuMask->addAction(actInvertMask);
     menuMask->addAction(actMaskByIntensity);
-    menuMask->addAction(actMaskByGofIntensity);
+    menuMask->addAction(actMaskByParam2Intensity);
     menuMask->addAction(actMaskByParamIntensity);
     correlationMaskTools->registerCorrelationToolsToMenu(menuMask);
 
@@ -1155,29 +1191,23 @@ void QFRDRImagingFCSImageEditor::saveImageSettings() {
             writeSettings();
         } else {
             grpImage->saveConfig(current, egroup, param, "image1");
-            grpGof->saveConfig(current, egroup, param, "gof");
+            grpImage2->saveConfig(current, egroup, param, "image2");
 
             current->setQFProperty(QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), chkDisplayImageOverlay->isChecked(), false, false);
             current->setQFProperty(QString("imfcs_imed_ovstyle_%1_%2").arg(egroup).arg(param), cmbSelectionStyle->currentIndex(), false, false);
-            current->setQFProperty(QString("imfcs_imed_histbins_%1_%2").arg(egroup).arg(param), histogram->getBins(), false, false);
-            current->setQFProperty(QString("imfcs_imed_histnorm_%1_%2").arg(egroup).arg(param), histogram->getNormalized(), false, false);
-            current->setQFProperty(QString("imfcs_imed_histlog_%1_%2").arg(egroup).arg(param), histogram->getLog(), false, false);
-            current->setQFProperty(QString("imfcs_imed_histex_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram->isChecked(), false, false);
-            current->setQFProperty(QString("imfcs_imed_histrauto_%1_%2").arg(egroup).arg(param), histogram->getAutorange(), false, false);
-            if (!histogram->getAutorange()) {
-                current->setQFProperty(QString("imfcs_imed_histrmin_%1_%2").arg(egroup).arg(param), histogram->getMin(), false, false);
-                current->setQFProperty(QString("imfcs_imed_histrmax_%1_%2").arg(egroup).arg(param), histogram->getMax(), false, false);
-            }
 
-            current->setQFProperty(QString("imfcs_imed_hist2bins_%1_%2").arg(egroup).arg(param), histogram2->getBins(), false, false);
-            current->setQFProperty(QString("imfcs_imed_hist2norm_%1_%2").arg(egroup).arg(param), histogram2->getNormalized(), false, false);
-            current->setQFProperty(QString("imfcs_imed_hist2log_%1_%2").arg(egroup).arg(param), histogram2->getLog(), false, false);
-            current->setQFProperty(QString("imfcs_imed_hist2ex_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false);
-            current->setQFProperty(QString("imfcs_imed_hist2rauto_%1_%2").arg(egroup).arg(param), histogram2->getAutorange(), false, false);
-            if (!histogram2->getAutorange()) {
-                current->setQFProperty(QString("imfcs_imed_hist2rmin_%1_%2").arg(egroup).arg(param), histogram2->getMin(), false, false);
-                current->setQFProperty(QString("imfcs_imed_hist2rmax_%1_%2").arg(egroup).arg(param), histogram2->getMax(), false, false);
-            }
+            corrView->writeQFProperties(current, "imfcs_imed_corrview", egroup, param);
+            histogram->writeQFProperties(current, "imfcs_imed_hist", egroup, param);
+            histogram_2->writeQFProperties(current, "imfcs_imed_hist2", egroup, param);
+            histogram2->writeQFProperties(current, "imfcs_imed_hist_p2", egroup, param);
+            histogram2_2->writeQFProperties(current, "imfcs_imed_hist_p22", egroup, param);
+
+            current->setQFProperty(QString("imfcs_imed_histex_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram->isChecked(), false, false);
+            current->setQFProperty(QString("imfcs_imed_hist2ex_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram_2->isChecked(), false, false);
+            current->setQFProperty(QString("imfcs_imed_hist_p2ex_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false);
+            current->setQFProperty(QString("eimfcs_imed_hist_p22x_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram2_2->isChecked(), false, false);
+            current->setQFProperty(QString("eimfcs_imed_corrmode_%1_%2").arg(egroup).arg(param), cmbCorrelationDisplayMode->currentIndex(), false, false);
+            current->setQFProperty(QString("eimfcs_imed_corrchannel_%1_%2").arg(egroup).arg(param), spinCorrelationChannel->value(), false, false);
 
             current->setQFProperty(QString("imfcs_imed_ovrcolorbar_%1").arg(egroup), cmbColorbarOverview->currentIndex(), false, false);
             current->setQFProperty(QString("imfcs_imed_ovrautorange_%1").arg(egroup), chkAutorangeOverview->isChecked(), false, false);
@@ -1207,29 +1237,24 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
             pltImage->get_imagePlot()->getDataMinMax(mi, ma);
 
             grpImage->loadConfig(current, egroup, param, "image1", "imfcsimageeditor/", mi, ma);
-            grpGof->loadConfig(current, egroup, param, "gof", "imfcsimageeditor/", mi, ma);
+            grpImage2->loadConfig(current, egroup, param, "image2", "imfcsimageeditor/", mi, ma);
 
             chkDisplayImageOverlay->setChecked(current->getProperty(QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), true).toBool());
             cmbSelectionStyle->setCurrentIndex(current->getProperty(QString("imfcs_imed_ovstyle_%1_%2").arg(egroup).arg(param), false).toBool());
-            histogram->setBins(current->getProperty(QString("imfcs_imed_histbins_%1_%2").arg(egroup).arg(param), 100).toInt());
-            histogram->setNormalized(current->getProperty(QString("imfcs_imed_histnorm_%1_%2").arg(egroup).arg(param), true).toBool());
-            histogram->setLog(current->getProperty(QString("imfcs_imed_histlog_%1_%2").arg(egroup).arg(param), false).toBool());
-            chkExcludeExcludedRunsFromHistogram->setChecked(current->getProperty(QString("imfcs_imed_histex_%1_%2").arg(egroup).arg(param), true).toBool());
-            histogram->setAutorange(current->getProperty(QString("imfcs_imed_histrauto_%1_%2").arg(egroup).arg(param), true).toBool());
-            if (!histogram->getAutorange()) {
-                histogram->setMin(current->getProperty(QString("imfcs_imed_histrmin_%1_%2").arg(egroup).arg(param), 0).toDouble());
-                histogram->setMax(current->getProperty(QString("imfcs_imed_histrmax_%1_%2").arg(egroup).arg(param), 10).toDouble());
-            }
+            corrView->readQFProperties(current, "imfcs_imed_corrview", egroup, param);
+            histogram->readQFProperties(current, "imfcs_imed_hist", egroup, param);
+            histogram_2->readQFProperties(current, "imfcs_imed_hist2", egroup, param);
+            histogram2->readQFProperties(current, "imfcs_imed_hist_p2", egroup, param);
+            histogram2_2->readQFProperties(current, "imfcs_imed_hist_p22", egroup, param);
 
-            histogram2->setBins(current->getProperty(QString("imfcs_imed_hist2bins_%1_%2").arg(egroup).arg(param), 100).toInt());
-            histogram2->setNormalized(current->getProperty(QString("imfcs_imed_hist2norm_%1_%2").arg(egroup).arg(param), true).toBool());
-            histogram2->setLog(current->getProperty(QString("imfcs_imed_hist2log_%1_%2").arg(egroup).arg(param), false).toBool());
-            chkExcludeExcludedRunsFromHistogram2->setChecked(current->getProperty(QString("imfcs_imed_hist2ex_%1_%2").arg(egroup).arg(param), true).toBool());
-            histogram2->setAutorange(current->getProperty(QString("imfcs_imed_hist2rauto_%1_%2").arg(egroup).arg(param), true).toBool());
-            if (!histogram2->getAutorange()) {
-                histogram2->setMin(current->getProperty(QString("imfcs_imed_hist2rmin_%1_%2").arg(egroup).arg(param), 0).toDouble());
-                histogram2->setMax(current->getProperty(QString("imfcs_imed_hist2rmax_%1_%2").arg(egroup).arg(param), 10).toDouble());
-            }
+            chkExcludeExcludedRunsFromHistogram->setChecked(current->getProperty(QString("imfcs_imed_histex_%1_%2").arg(egroup).arg(param), true).toBool());
+            chkExcludeExcludedRunsFromHistogram_2->setChecked(current->getProperty(QString("imfcs_imed_hist2ex_%1_%2").arg(egroup).arg(param), true).toBool());
+            chkExcludeExcludedRunsFromHistogram2->setChecked(current->getProperty(QString("imfcs_imed_hist_p2ex_%1_%2").arg(egroup).arg(param), true).toBool());
+            chkExcludeExcludedRunsFromHistogram2_2->setChecked(current->getProperty(QString("imfcs_imed_hist_p22ex_%1_%2").arg(egroup).arg(param), true).toBool());
+            cmbCorrelationDisplayMode->setCurrentIndex(current->getProperty(QString("eimfcs_imed_corrmode_%1_%2").arg(egroup).arg(param), 0).toInt());
+            spinCorrelationChannel->setValue(current->getProperty(QString("eimfcs_imed_corrchannel_%1_%2").arg(egroup).arg(param), 0).toInt());
+
+
             mi=0, ma=1;
             double mi2=0, ma2=1;
             if (plteOverview->get_visible()) plteOverview->getDataMinMax(mi, ma);
@@ -1269,19 +1294,14 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
 
 void QFRDRImagingFCSImageEditor::updateOverlaySettings() {
     pltImage->setDisplayOverlay(chkDisplayImageOverlay->isChecked()/*, cmbImageStyle->currentIndex()<cmbImageStyle->count()-1*/);
-    pltGofImage->setDisplayOverlay(chkDisplayImageOverlay->isChecked()/*, cmbImageStyle->currentIndex()<cmbImageStyle->count()-1*/);
+    pltParamImage2->setDisplayOverlay(chkDisplayImageOverlay->isChecked()/*, cmbImageStyle->currentIndex()<cmbImageStyle->count()-1*/);
     if (!chkDisplayImageOverlay->isChecked()) {
-        //pltGofImage->deleteGraph(plteGofImageSelected, false);
-        //pltGofImage->deleteGraph(plteGofImageExcluded, false);
         pltMask->deleteGraph(plteMaskSelected, false);
     } else {
-        //pltGofImage->addGraph(plteGofImageSelected);
-        //pltGofImage->addGraph(plteGofImageExcluded);
         pltMask->addGraph(plteMaskSelected);
     }
 
     cmbSelectionStyle->setSelectedOverlayStyle(plteOverviewSelected);
-    //cmbSelectionStyle->setSelectedOverlayStyle(plteGofImageSelected);
     cmbSelectionStyle->setSelectedOverlayStyle(plteMaskSelected);
 
 
@@ -1357,8 +1377,12 @@ void QFRDRImagingFCSImageEditor::ovrPaletteChanged() {
 }
 
 void QFRDRImagingFCSImageEditor::histogramSettingsChanged() {
+    spinCorrelationChannel->setEnabled(cmbCorrelationDisplayMode->currentIndex()>0);
     histogram->histogramSettingsChanged(false);
+    histogram_2->histogramSettingsChanged(false);
     histogram2->histogramSettingsChanged(false);
+    histogram2_2->histogramSettingsChanged(false);
+    corrView->dataSettingsChanged(false);
     updateHistogram();
     saveImageSettings();
 }
@@ -1431,8 +1455,8 @@ void QFRDRImagingFCSImageEditor::excludeByParamIntensity() {
     excludeByImage(pltImage->getData());
 }
 
-void QFRDRImagingFCSImageEditor::excludeByGOFIntensity() {
-    excludeByImage(pltGofImage->getData());
+void QFRDRImagingFCSImageEditor::excludeByParan2Intensity() {
+    excludeByImage(pltParamImage2->getData());
 }
 
 
@@ -1572,7 +1596,7 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         spinCrosstalkAvg->setEnabled(m->isFCCS());
 
         pltImage->setCurrent(current);
-        pltGofImage->setCurrent(current);
+        pltParamImage2->setCurrent(current);
 
         sliders->disableSliderSignals();
         sliders->set_min(0);
@@ -1580,6 +1604,7 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         sliders->set_userMin(current->getProperty("imfcs_imed_datacut_min", 0).toInt());
         sliders->set_userMax(current->getProperty("imfcs_imed_datacut_max", m->getCorrelationN()).toInt());
         sliders->enableSliderSignals();
+        spinCorrelationChannel->setRange(0, m->getImageFromRunsChannels()-1);
         selected.clear();
         cmbDualView->setCurrentIndex(int(m->dualViewMode()));
         cmbDualView->setEnabled(m->dualViewModeUserEditable());
@@ -1686,12 +1711,10 @@ void QFRDRImagingFCSImageEditor::imageMouseMoved(double x, double y) {
     if (sender()==pltImage) {
         name=tr("paramImg");
         pltImage->getDataAtBR(idx, value);
-        //if (plteImageData) value=plteImageData[idx];
     }
-    if (sender()==pltGofImage) {
-        name=tr("GOF");
-        pltGofImage->getDataAtBR(idx, value);
-        //if (plteGofImageData) value=plteGofImageData[idx];
+    if (sender()==pltParamImage2) {
+        name=tr("paramImg2");
+        pltParamImage2->getDataAtBR(idx, value);
     }
     if (sender()==pltMask) {
         name=tr("mask");
@@ -2001,37 +2024,37 @@ void QFRDRImagingFCSImageEditor::setImageEditMode() {
         pltImage->set_mouseActionMode(JKQtPlotter::ZoomRectangle);
         pltOverview->set_mouseActionMode(JKQtPlotter::ZoomRectangle);
         pltMask->set_mouseActionMode(JKQtPlotter::ZoomRectangle);
-        pltGofImage->set_mouseActionMode(JKQtPlotter::ZoomRectangle);
+        pltParamImage2->set_mouseActionMode(JKQtPlotter::ZoomRectangle);
     } else if (actImagesDrawPoints->isChecked()) {
         pltImage->set_mouseActionMode(JKQtPlotter::ClickEvents);
         pltOverview->set_mouseActionMode(JKQtPlotter::ClickEvents);
         pltMask->set_mouseActionMode(JKQtPlotter::ClickEvents);
-        pltGofImage->set_mouseActionMode(JKQtPlotter::ClickEvents);
+        pltParamImage2->set_mouseActionMode(JKQtPlotter::ClickEvents);
     } else if (actImagesDrawRectangle->isChecked()) {
         pltImage->set_mouseActionMode(JKQtPlotter::RectangleEvents);
         pltOverview->set_mouseActionMode(JKQtPlotter::RectangleEvents);
         pltMask->set_mouseActionMode(JKQtPlotter::RectangleEvents);
-        pltGofImage->set_mouseActionMode(JKQtPlotter::RectangleEvents);
+        pltParamImage2->set_mouseActionMode(JKQtPlotter::RectangleEvents);
     } else if (actImagesDrawLine->isChecked()) {
         pltImage->set_mouseActionMode(JKQtPlotter::LineEvents);
         pltOverview->set_mouseActionMode(JKQtPlotter::LineEvents);
         pltMask->set_mouseActionMode(JKQtPlotter::LineEvents);
-        pltGofImage->set_mouseActionMode(JKQtPlotter::LineEvents);
+        pltParamImage2->set_mouseActionMode(JKQtPlotter::LineEvents);
     } else if (actImagesDrawCircle->isChecked()) {
         pltImage->set_mouseActionMode(JKQtPlotter::CircleEvents);
         pltOverview->set_mouseActionMode(JKQtPlotter::CircleEvents);
         pltMask->set_mouseActionMode(JKQtPlotter::CircleEvents);
-        pltGofImage->set_mouseActionMode(JKQtPlotter::CircleEvents);
+        pltParamImage2->set_mouseActionMode(JKQtPlotter::CircleEvents);
     } else if (actImagesDrawEllipse->isChecked()) {
         pltImage->set_mouseActionMode(JKQtPlotter::EllipseEvents);
         pltOverview->set_mouseActionMode(JKQtPlotter::EllipseEvents);
         pltMask->set_mouseActionMode(JKQtPlotter::EllipseEvents);
-        pltGofImage->set_mouseActionMode(JKQtPlotter::EllipseEvents);
+        pltParamImage2->set_mouseActionMode(JKQtPlotter::EllipseEvents);
     } else if (actImagesScribble->isChecked()) {
         pltImage->set_mouseActionMode(JKQtPlotter::ScribbleEvents);
         pltOverview->set_mouseActionMode(JKQtPlotter::ScribbleEvents);
         pltMask->set_mouseActionMode(JKQtPlotter::ScribbleEvents);
-        pltGofImage->set_mouseActionMode(JKQtPlotter::ScribbleEvents);
+        pltParamImage2->set_mouseActionMode(JKQtPlotter::ScribbleEvents);
     }
 
 }
@@ -2073,7 +2096,7 @@ void QFRDRImagingFCSImageEditor::resultsChanged(const QString& evalName, const Q
     //if (evalName.isEmpty()) {
         QString egroup=currentEvalGroup();
         QString fp=currentFitParameter();
-        QString gfp=currentGofParameter();
+        QString gfp=currentFit2Parameter();
         //qDebug()<<"QFRDRImagingFCSImageEditor::resultsChanged(evalName="<<evalName<<"   resultName="<<resultName<<"   delete="<<deleted<<")\n   egroup="<<egroup<<"  fp="<<fp<<"   gfp="<<gfp;
         fillParameterSet();
         int grp=cmbResultGroup->findData(egroup);
@@ -2093,11 +2116,11 @@ void QFRDRImagingFCSImageEditor::resultsChanged(const QString& evalName, const Q
                 cmbParameter->setCurrentIndex(dc);
             }
 
-            p=cmbGofParameter->findData(gfp);
+            p=cmbParameter2->findData(gfp);
             if (p>=0) {
-                cmbGofParameter->setCurrentIndex(p);
-            } else if (cmbGofParameter->count()>0) {
-                cmbGofParameter->setCurrentIndex(0);
+                cmbParameter2->setCurrentIndex(p);
+            } else if (cmbParameter2->count()>0) {
+                cmbParameter2->setCurrentIndex(0);
             }
         } else if (cmbResultGroup->count()>0) {
             cmbResultGroup->setCurrentIndex(0);
@@ -2147,89 +2170,41 @@ void QFRDRImagingFCSImageEditor::slidersChanged(int userMin, int userMax, int mi
 }
 
 void QFRDRImagingFCSImageEditor::replotImage() {
-    //qDebug()<<"replotImage";
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    //pltImage->set_doDrawing(false);
-    //pltGofImage->set_doDrawing(false);
 
 
 
     if (!m) {
         pltImage->updateImage(NULL, NULL, NULL, 0, 0, "", false, true);
-        pltGofImage->updateImage(NULL, NULL, NULL, 0, 0, "", false, true);
-        /*plteGofImage->set_data(NULL, 0, 0, JKQTPMathImageBase::DoubleArray);
-        plteGofImage->get_colorBarRightAxis()->set_labelFontSize(8);
-        plteGofImage->get_colorBarRightAxis()->set_axisLabel("");
-        plteGofImage->get_colorBarTopAxis()->set_labelFontSize(8);
-        plteGofImage->get_colorBarTopAxis()->set_axisLabel("");*/
+        pltParamImage2->updateImage(NULL, NULL, NULL, 0, 0, "", false, true);
     } else {
         double w=m->getImageFromRunsWidth();
         double h=m->getImageFromRunsHeight();
         if ((w==0) || (h==0)) {
             w=h=1;
         }
-        /*pltGofImage->getDatastore()->clear();
-
-
-        pltGofImage->setAbsoluteXY(0, w, 0, h);
-        pltGofImage->get_plotter()->set_maintainAspectRatio(true);
-        pltGofImage->get_plotter()->set_aspectRatio(w/h);//qMax(0.01, qMin(100.0, w/h)));
-        pltGofImage->get_plotter()->set_maintainAxisAspectRatio(true);
-        pltGofImage->get_plotter()->set_axisAspectRatio(1.0*w/h);
-
-        plteGofImage->set_data(NULL, 0, 0, JKQTPMathImageBase::DoubleArray);
-        plteGofImage->get_colorBarRightAxis()->set_labelFontSize(8);
-        plteGofImage->get_colorBarRightAxis()->set_axisLabel(formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform));
-        plteGofImage->get_colorBarTopAxis()->set_labelFontSize(8);
-        plteGofImage->get_colorBarTopAxis()->set_axisLabel(formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform));
-
-        if (w>3*h) {
-            pltGofImage->get_plotter()->getXAxis()->set_minTicks(3);
-            plteGofImage->get_colorBarRightAxis()->set_minTicks(3);
-            plteGofImage->get_colorBarTopAxis()->set_minTicks(5);
-        } else {
-            pltGofImage->get_plotter()->getXAxis()->set_minTicks(7);
-            plteGofImage->get_colorBarRightAxis()->set_minTicks(5);
-            plteGofImage->get_colorBarTopAxis()->set_minTicks(3);
-        }
-        pltGofImage->setXY(0, w, 0, h);
-
-        if (plteImageSize!=m->getImageFromRunsWidth()*m->getImageFromRunsHeight()) {
-            plteImageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
-            plteGofImageData=(double*)realloc(plteGofImageData, plteImageSize*sizeof(double));
-        }*/
-
         double* plteImageData=0;
-        double* plteGofImageData=0;
+        double* plteImage2ImageData=0;
         plteImageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
         if (plteImageSize>0) {
             plteImageData=(double*)malloc(plteImageSize*sizeof(double));
-            plteGofImageData=(double*)malloc(plteImageSize*sizeof(double));
+            plteImage2ImageData=(double*)malloc(plteImageSize*sizeof(double));
         }
-        readParameterImage(plteImageData, plteGofImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), currentFitParameterTransfrom(), currentGofParameter(), currentGofParameterTransfrom());
+        readParameterImage(plteImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), currentFitParameterTransfrom());
+        readParameterImage(plteImage2ImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFit2Parameter(), currentFit2ParameterTransfrom());
 
 
         pltImage->updateImage(plteImageData, plteOverviewSelectedData, plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), formatTransformAndParameter(cmbParameter, cmbParameterTransform), false, true);
-        pltGofImage->updateImage(plteGofImageData, plteOverviewSelectedData, plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform), false, true);
+        pltParamImage2->updateImage(plteImage2ImageData, plteOverviewSelectedData, plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), formatTransformAndParameter(cmbParameter2, cmbParameter2Transform), false, true);
 
         if (plteImageData) free(plteImageData);
 
 
-        /*plteGofImage->set_data(plteGofImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), JKQTPMathImageBase::DoubleArray);
-        plteGofImage->set_width(w);
-        plteGofImage->set_height(h);
-        plteGofImage->set_autoImageRange(false);
-        double mi, ma;
-        if (plteGofImageData && plteOverviewExcludedData) statisticsMaskedMinMax(plteGofImageData, plteOverviewExcludedData, plteImageSize, mi, ma, false);
-        plteGofImage->set_imageMin(mi);
-        plteGofImage->set_imageMax(ma);*/
 
     }
     setCopyableData();
 
-    //pltGofImage->set_doDrawing(true);
-    //pltGofImage->update_plot();
     QApplication::restoreOverrideCursor();
     //qDebug()<<"replotImage ...  done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
 }
@@ -2324,8 +2299,6 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
     time.start();
 #endif
     pltOverview->set_doDrawing(false);
-    //pltImage->set_doDrawing(false);
-    //pltGofImage->set_doDrawing(false);
     pltMask->set_doDrawing(false);
 
     saveImageSettings();
@@ -2337,13 +2310,11 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
     double imgAvg=0;
     double imgVar=0;
     pltImage->updateOverlays(&imgAvg, &imgVar);
-    pltGofImage->updateOverlays();
+    pltParamImage2->updateOverlays();
 
     if (!m) {
         plteOverviewSelected->set_data(NULL, 1, 1);
         plteOverviewExcluded->set_data(NULL, 1, 1);
-        //plteGofImageSelected->set_data(NULL, 1, 1);
-        //plteGofImageExcluded->set_data(NULL, 1, 1);
         plteMask->set_data(NULL, 1, 1);
         plteMaskSelected->set_data(NULL, 1, 1);
         labImageAvg->clear();
@@ -2379,13 +2350,6 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
 
 
 
-        /*plteGofImageSelected->set_width(w);
-        plteGofImageSelected->set_height(h);
-        plteGofImageSelected->set_data(plteOverviewSelectedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
-
-        plteGofImageExcluded->set_width(w);
-        plteGofImageExcluded->set_height(h);
-        plteGofImageExcluded->set_data(plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());*/
 
         plteMaskSelected->set_width(w);
         plteMaskSelected->set_height(h);
@@ -2405,12 +2369,9 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
     setCopyableData();
 
     pltOverview->set_doDrawing(true);
-    //pltGofImage->set_doDrawing(true);
     pltMask->set_doDrawing(true);
     if (replot) {
         pltOverview->update_plot();
-        //pltImage->update_plot();
-        //pltGofImage->update_plot();
         pltMask->update_plot();
     }
     QApplication::restoreOverrideCursor();
@@ -3190,7 +3151,7 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     plotter->loadSettings(*(settings->getQSettings()), QString("imfcsimageeditor/corrplot"));
     chkLogTauAxis->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/log_tau_axis"), true).toBool());
     chkOverviewVisible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/overview_visible"), true).toBool());
-    chkGofVisible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/gof_visible"), false).toBool());
+    chkParamImage2Visible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/image2_visible"), false).toBool());
     chkMaskVisible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/mask_visible"), false).toBool());
     chkKeys->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/display_keys"), false).toBool());
     int defCDM=0;
@@ -3213,8 +3174,11 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     loadSplitter(*(settings->getQSettings()), splitterTop, "imfcsimageeditor/splittertopSizes");
     loadSplitter(*(settings->getQSettings()), splitterTopBot, "imfcsimageeditor/splittertopbotSizes");
     loadSplitter(*(settings->getQSettings()), splitterBot, "imfcsimageeditor/splitterbotSizes");
+    corrView->readSettings(*(settings->getQSettings()), "imfcsimageeditor/corrView/");
     histogram->readSettings(*(settings->getQSettings()), "imfcsimageeditor/");
-    histogram2->readSettings(*(settings->getQSettings()), "imfcsimageeditor/histogram2/");
+    histogram_2->readSettings(*(settings->getQSettings()), "imfcsimageeditor/histogram2/");
+    histogram2->readSettings(*(settings->getQSettings()), "imfcsimageeditor/histogramp2");
+    histogram2_2->readSettings(*(settings->getQSettings()), "imfcsimageeditor/histogramp2_2/");
     connectParameterWidgets(true);
     rawDataChanged();
     connectImageWidgets(true);
@@ -3244,13 +3208,16 @@ void QFRDRImagingFCSImageEditor::writeSettings() {
     settings->getQSettings()->setValue(QString("imfcsimageeditor/run_style"), cmbRunStyle->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/run_error_style"), cmbRunErrorStyle->currentIndex());
     settings->getQSettings()->value(QString("imfcsimageeditor/overview_visible"), chkOverviewVisible->isChecked());
-    settings->getQSettings()->value(QString("imfcsimageeditor/gof_visible"), chkGofVisible->isChecked());
+    settings->getQSettings()->value(QString("imfcsimageeditor/image2_visible"), chkParamImage2Visible->isChecked());
     settings->getQSettings()->value(QString("imfcsimageeditor/mask_visible"), chkMaskVisible->isChecked());
     saveSplitter(*(settings->getQSettings()), splitterTop, "imfcsimageeditor/splittertopSizes");
     saveSplitter(*(settings->getQSettings()), splitterBot, "imfcsimageeditor/splitterbotSizes");
     saveSplitter(*(settings->getQSettings()), splitterTopBot, "imfcsimageeditor/splittertopbotSizes");
+    corrView->writeSettings(*(settings->getQSettings()), "imfcsimageeditor/corrView/");
     histogram->writeSettings(*(settings->getQSettings()), "imfcsimageeditor/");
-    histogram2->writeSettings(*(settings->getQSettings()), "imfcsimageeditor/histogram2/");
+    histogram_2->writeSettings(*(settings->getQSettings()), "imfcsimageeditor/histogram2/");
+    histogram2->writeSettings(*(settings->getQSettings()), "imfcsimageeditor/histogramp2/");
+    histogram2_2->writeSettings(*(settings->getQSettings()), "imfcsimageeditor/histogramp2_2/");
 }
 
 
@@ -3262,13 +3229,13 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
         cmbParameter->setEnabled(false);
         labParameterTransform->setEnabled(false);
         cmbParameterTransform->setEnabled(false);
-        labGofParameter->setEnabled(false);
-        cmbGofParameter->setEnabled(false);
-        labGofParameterTransform->setEnabled(false);
-        cmbGofParameterTransform->setEnabled(false);
+        labParameter2->setEnabled(false);
+        cmbParameter2->setEnabled(false);
+        labParameter2Transform->setEnabled(false);
+        cmbParameter2Transform->setEnabled(false);
         clearImage();
         cmbParameter->clear();
-        cmbGofParameter->clear();
+        cmbParameter2->clear();
         //cmbParameter->setCurrentIndex(-1);
     } else {
         connectParameterWidgets(false);
@@ -3277,10 +3244,10 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
         cmbParameter->setEnabled(true);
         labParameterTransform->setEnabled(true);
         cmbParameterTransform->setEnabled(true);
-        labGofParameter->setEnabled(true);
-        cmbGofParameter->setEnabled(true);
-        labGofParameterTransform->setEnabled(true);
-        cmbGofParameterTransform->setEnabled(true);
+        labParameter2->setEnabled(true);
+        cmbParameter2->setEnabled(true);
+        labParameter2Transform->setEnabled(true);
+        cmbParameter2Transform->setEnabled(true);
         //QStringList egroup=m->resultsCalcEvalGroups();
         QString egroup=currentEvalGroup();
         QList<QPair<QString, QString> > params=m->resultsCalcNamesAndLabels("", "fit results", egroup);
@@ -3289,18 +3256,18 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
         params.append(params1);
         params.append(params2);
         cmbParameter->clear();
-        cmbGofParameter->clear();
+        cmbParameter2->clear();
         for (int i=0; i<params.size(); i++) {
             if (!params[i].second.endsWith("_fix")) {
                 cmbParameter->addItem(params[i].first, params[i].second);
-                cmbGofParameter->addItem(params[i].first, params[i].second);
+                cmbParameter2->addItem(params[i].first, params[i].second);
                 //qDebug()<<params[i].second;
             }
         }
         for (int i=0; i<params.size(); i++) {
             if (params[i].second.endsWith("_fix")) {
                 cmbParameter->addItem(params[i].first, params[i].second);
-                cmbGofParameter->addItem(params[i].first, params[i].second);
+                cmbParameter2->addItem(params[i].first, params[i].second);
             }
         }
 
@@ -3308,13 +3275,13 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
         for (int i=0; i<params.size(); i++) {
             if (!params[i].second.endsWith("_fix")) {
                 cmbParameter->addItem(params[i].first, params[i].second);
-                cmbGofParameter->insertItem(0, params[i].first, params[i].second);
+                cmbParameter2->insertItem(0, params[i].first, params[i].second);
             }
         }
         for (int i=0; i<params.size(); i++) {
             if (params[i].second.endsWith("_fix")) {
                 cmbParameter->addItem(params[i].first, params[i].second);
-                cmbGofParameter->insertItem(0, params[i].first, params[i].second);
+                cmbParameter2->insertItem(0, params[i].first, params[i].second);
             }
         }
         int d=cmbParameter->findData(current->getProperty(QString("imfcs_imed_param_%1").arg(filenameize(egroup)), ""));
@@ -3325,9 +3292,9 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
         if (d<0) d=cmbParameter->findData("fitparam_diff_coeff2");
         if (d>=0) cmbParameter->setCurrentIndex(d);
         else cmbParameter->setCurrentIndex(0);
-        d=cmbGofParameter->findData(current->getProperty(QString("imfcs_imed_gofparam_%1").arg(filenameize(egroup)), "fitalg_error_sum"));
-        if (d>=0) cmbGofParameter->setCurrentIndex(d);
-        cmbGofParameterTransform->setCurrentIndex(current->getProperty(QString("imfcs_imed_gofparamtrans_%1_%2").arg(filenameize(egroup)).arg(cmbGofParameter->currentIndex()), 0).toInt());
+        d=cmbParameter2->findData(current->getProperty(QString("imfcs_imed_image2param_%1").arg(filenameize(egroup)), "fitalg_error_sum"));
+        if (d>=0) cmbParameter2->setCurrentIndex(d);
+        cmbParameter2Transform->setCurrentIndex(current->getProperty(QString("imfcs_imed_image2paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter2->currentIndex()), 0).toInt());
         cmbParameterTransform->setCurrentIndex(current->getProperty(QString("imfcs_imed_paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter->currentIndex()), 0).toInt());
         connectParameterWidgets(true);
 
@@ -3344,11 +3311,11 @@ void QFRDRImagingFCSImageEditor::parameterChanged() {
     QString egroup=currentEvalGroup();
 
     connectParameterWidgets(false);
-    cmbGofParameterTransform->setCurrentIndex(current->getProperty(QString("imfcs_imed_gofparamtrans_%1_%2").arg(filenameize(egroup)).arg(cmbGofParameter->currentIndex()), 0).toInt());
+    cmbParameter2Transform->setCurrentIndex(current->getProperty(QString("imfcs_imed_image2paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter2->currentIndex()), 0).toInt());
     cmbParameterTransform->setCurrentIndex(current->getProperty(QString("imfcs_imed_paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter->currentIndex()), 0).toInt());
 
     current->setQFProperty(QString("imfcs_imed_param_%1").arg(filenameize(egroup)), cmbParameter->itemData(cmbParameter->currentIndex()).toString(), false, false);
-    current->setQFProperty(QString("imfcs_imed_gofparam_%1").arg(filenameize(egroup)), cmbGofParameter->itemData(cmbGofParameter->currentIndex()).toString(), false, false);
+    current->setQFProperty(QString("imfcs_imed_image2param_%1").arg(filenameize(egroup)), cmbParameter2->itemData(cmbParameter2->currentIndex()).toString(), false, false);
     connectParameterWidgets(true);
 
     transformChanged();
@@ -3356,7 +3323,7 @@ void QFRDRImagingFCSImageEditor::parameterChanged() {
 
 void QFRDRImagingFCSImageEditor::transformChanged() {
     QString egroup=currentEvalGroup();
-    current->setQFProperty(QString("imfcs_imed_gofparamtrans_%1_%2").arg(filenameize(egroup)).arg(cmbGofParameter->currentIndex()), cmbGofParameterTransform->currentIndex(), false, false);
+    current->setQFProperty(QString("imfcs_imed_image2paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter2->currentIndex()), cmbParameter2Transform->currentIndex(), false, false);
     current->setQFProperty(QString("imfcs_imed_paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter->currentIndex()), cmbParameterTransform->currentIndex(), false, false);
     connectParameterWidgets(false);
     loadImageSettings();
@@ -3369,13 +3336,9 @@ void QFRDRImagingFCSImageEditor::transformChanged() {
 
 
 void QFRDRImagingFCSImageEditor::clearImage() {
-    /*if (plteImageData) free(plteImageData);
-    plteImageData=NULL;*/
     plteImageSize=0;
     pltImage->clearImage();
-    pltGofImage->clearImage();
-    //if (plteGofImageData) free(plteGofImageData);
-    //plteGofImageData=NULL;
+    pltParamImage2->clearImage();
 }
 
 void QFRDRImagingFCSImageEditor::fillParameterSet() {
@@ -3459,17 +3422,21 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
         if (connectParameterWidgetsCounter<=0) {
             connectParameterWidgetsCounter=0;
             grpImage->connectWidgets(true);
-            grpGof->connectWidgets(true);
+            grpImage2->connectWidgets(true);
 
             connect(cmbResultGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterSetChanged()));
             connect(cmbParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
-            connect(cmbGofParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
+            connect(cmbParameter2, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
             connect(cmbParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
-            connect(cmbGofParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
+            connect(cmbParameter2Transform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
             connect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(replotSelection()));
             connect(cmbSelectionStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotSelection()));
             connect(chkExcludeExcludedRunsFromHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+            connect(chkExcludeExcludedRunsFromHistogram_2, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
             connect(chkExcludeExcludedRunsFromHistogram2, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+            connect(chkExcludeExcludedRunsFromHistogram2_2, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+            connect(cmbCorrelationDisplayMode, SIGNAL(currentIndexChanged(int)), this, SLOT(histogramSettingsChanged()));
+            connect(spinCorrelationChannel, SIGNAL(valueChanged(int)), this, SLOT(histogramSettingsChanged()));
 
             connect(cmbColorbarOverview, SIGNAL(currentIndexChanged(int)), this, SLOT(ovrPaletteChanged()));
             connect(chkAutorangeOverview, SIGNAL(toggled(bool)), this, SLOT(ovrPaletteChanged()));
@@ -3479,27 +3446,36 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
             connect(edtOvr2Max, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
 
 
+            corrView->connectParameterWidgets(connectTo);
 
             histogram->connectParameterWidgets(connectTo);
-            histogram2->connectParameterWidgets(connectTo);
+            histogram_2->connectParameterWidgets(connectTo);
             connect(histogram, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
+            connect(histogram_2, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
+            histogram2->connectParameterWidgets(connectTo);
+            histogram2_2->connectParameterWidgets(connectTo);
             connect(histogram2, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
+            connect(histogram2_2, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
 
         }
     } else {
         connectParameterWidgetsCounter++;
         grpImage->connectWidgets(false);
-        grpGof->connectWidgets(false);
+        grpImage2->connectWidgets(false);
 
         disconnect(cmbResultGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterSetChanged()));
         disconnect(cmbParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
-        disconnect(cmbGofParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
+        disconnect(cmbParameter2, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
         disconnect(cmbParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
-        disconnect(cmbGofParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
+        disconnect(cmbParameter2Transform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
         disconnect(chkDisplayImageOverlay, SIGNAL(toggled(bool)), this, SLOT(replotSelection()));
         disconnect(cmbSelectionStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(replotSelection()));
         disconnect(chkExcludeExcludedRunsFromHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+        disconnect(chkExcludeExcludedRunsFromHistogram_2, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
         disconnect(chkExcludeExcludedRunsFromHistogram2, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+        disconnect(chkExcludeExcludedRunsFromHistogram2_2, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+        disconnect(cmbCorrelationDisplayMode, SIGNAL(currentIndexChanged(int)), this, SLOT(histogramSettingsChanged()));
+        disconnect(spinCorrelationChannel, SIGNAL(valueChanged(int)), this, SLOT(histogramSettingsChanged()));
 
         disconnect(cmbColorbarOverview, SIGNAL(currentIndexChanged(int)), this, SLOT(ovrPaletteChanged()));
         disconnect(chkAutorangeOverview, SIGNAL(toggled(bool)), this, SLOT(ovrPaletteChanged()));
@@ -3508,11 +3484,16 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
         disconnect(edtOvr2Min, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
         disconnect(edtOvr2Max, SIGNAL(valueChanged(double)), this, SLOT(ovrPaletteChanged()));
 
+        corrView->connectParameterWidgets(connectTo);
 
         histogram->connectParameterWidgets(connectTo);
-        histogram2->connectParameterWidgets(connectTo);
+        histogram_2->connectParameterWidgets(connectTo);
         disconnect(histogram, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
+        disconnect(histogram_2, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
+        histogram2->connectParameterWidgets(connectTo);
+        histogram2_2->connectParameterWidgets(connectTo);
         disconnect(histogram2, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
+        disconnect(histogram2_2, SIGNAL(settingsChanged()), this, SLOT(saveImageSettings()));
     }
 
     //qDebug()<<"connectParameterWidgets ...  done ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
@@ -3522,19 +3503,19 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
 void QFRDRImagingFCSImageEditor::imageZoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter* sender) {
     if (sender==pltImage) {
         pltOverview->setXY(newxmin, newxmax, newymin, newymax);
-        pltGofImage->setXY(newxmin, newxmax, newymin, newymax);
+        pltParamImage2->setXY(newxmin, newxmax, newymin, newymax);
         pltMask->setXY(newxmin, newxmax, newymin, newymax);
-    } else if (sender==pltGofImage) {
+    } else if (sender==pltParamImage2) {
         pltOverview->setXY(newxmin, newxmax, newymin, newymax);
         pltImage->setXY(newxmin, newxmax, newymin, newymax);
         pltMask->setXY(newxmin, newxmax, newymin, newymax);
     } else if (sender==pltOverview) {
-        pltGofImage->setXY(newxmin, newxmax, newymin, newymax);
+        pltParamImage2->setXY(newxmin, newxmax, newymin, newymax);
         pltImage->setXY(newxmin, newxmax, newymin, newymax);
         pltMask->setXY(newxmin, newxmax, newymin, newymax);
     } else if (sender==pltMask) {
         pltOverview->setXY(newxmin, newxmax, newymin, newymax);
-        pltGofImage->setXY(newxmin, newxmax, newymin, newymax);
+        pltParamImage2->setXY(newxmin, newxmax, newymin, newymax);
         pltImage->setXY(newxmin, newxmax, newymin, newymax);
     }
 }
@@ -3560,9 +3541,9 @@ QString QFRDRImagingFCSImageEditor::currentFitParameter() const {
     return cmbParameter->itemData(cmbParameter->currentIndex()).toString();
 }
 
-QString QFRDRImagingFCSImageEditor::currentGofParameter() const {
-    if (cmbGofParameter->currentIndex()<0) return "";
-    return cmbGofParameter->itemData(cmbGofParameter->currentIndex()).toString();
+QString QFRDRImagingFCSImageEditor::currentFit2Parameter() const {
+    if (cmbParameter2->currentIndex()<0) return "";
+    return cmbParameter2->itemData(cmbParameter2->currentIndex()).toString();
 }
 
 QFRDRImagingFCSImageEditor::ImageTransforms QFRDRImagingFCSImageEditor::currentFitParameterTransfrom() const {
@@ -3572,10 +3553,10 @@ QFRDRImagingFCSImageEditor::ImageTransforms QFRDRImagingFCSImageEditor::currentF
 
 }
 
-QFRDRImagingFCSImageEditor::ImageTransforms QFRDRImagingFCSImageEditor::currentGofParameterTransfrom() const {
+QFRDRImagingFCSImageEditor::ImageTransforms QFRDRImagingFCSImageEditor::currentFit2ParameterTransfrom() const {
     //return QFRDRImagingFCSImageEditor::itSqrt;
-    if (cmbGofParameterTransform->currentIndex()<0) return QFRDRImagingFCSImageEditor::itNone;
-    return (QFRDRImagingFCSImageEditor::ImageTransforms)cmbGofParameterTransform->currentIndex();
+    if (cmbParameter2Transform->currentIndex()<0) return QFRDRImagingFCSImageEditor::itNone;
+    return (QFRDRImagingFCSImageEditor::ImageTransforms)cmbParameter2Transform->currentIndex();
 }
 
 QString QFRDRImagingFCSImageEditor::formatTransformAndParameter(QComboBox *cmbParameter, QComboBox *cmbTransform)
@@ -3619,17 +3600,14 @@ void QFRDRImagingFCSImageEditor::transformImage(double* image, uint16_t width, u
 
 
 
-void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, QString gofParam, QFRDRImagingFCSImageEditor::ImageTransforms tranGofParam) {
+
+void QFRDRImagingFCSImageEditor::readParameterImage(double *image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam)
+{
     uint16_t arraysize=width*height;
     //qDebug()<<"readParameterImage("<<image<<gof_image<<width<<height<<evalGroup;
     if (image) {
         for (register uint16_t i=0; i<arraysize; i++) {
             image[i]=NAN;
-        }
-    }
-    if (gof_image) {
-        for (register uint16_t i=0; i<arraysize; i++) {
-            gof_image[i]=0;
         }
     }
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
@@ -3643,10 +3621,8 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_i
     QStringList evals=current->resultsCalcEvaluationsInGroup(evalGroup);
     //qDebug()<<"evals.size() = "<<evals.size()<<"\n   "<<evals;
     bool readImage=false;
-    bool readGOF=false;
     if (evals.size()>0  && evals.size()<=2) {
         QString usedEval="";
-        QString usedGof="";
         for (int i=0; i<evals.size(); i++) {
             if (current->resultsExists(evals[i], fitParam)) {
                 QFRawDataRecord::evaluationResultType typ=current->resultsGetType(evals[i], fitParam);
@@ -3665,22 +3641,6 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_i
                     default:
                         break;
                 }
-                typ=current->resultsGetType(evals[i], gofParam);
-
-                switch (typ) {
-                    case QFRawDataRecord::qfrdreNumberVector:
-                    case QFRawDataRecord::qfrdreNumberMatrix:
-                    case QFRawDataRecord::qfrdreNumberErrorVector:
-                    case QFRawDataRecord::qfrdreNumberErrorMatrix:
-                    case QFRawDataRecord::qfrdreIntegerVector:
-                    case QFRawDataRecord::qfrdreIntegerMatrix:
-                    case QFRawDataRecord::qfrdreBooleanVector:
-                    case QFRawDataRecord::qfrdreBooleanMatrix:
-                        usedGof=evals[i];
-                        break;
-                    default:
-                        break;
-                }
             }
         }
         if (!usedEval.isEmpty()) {
@@ -3690,15 +3650,6 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_i
                 int x=m->runToX(i);
                 int y=m->runToY(i);
                 image[y*width+x]=dvec[i];
-            }
-        }
-        if (gof_image && !usedGof.isEmpty()) {
-            readGOF=true;
-            QVector<double> dvec=current->resultsGetAsDoubleList(usedEval, gofParam);
-            for (uint32_t i=0; i<qMin(dvec.size(), width*height); i++) {
-                int x=m->runToX(i);
-                int y=m->runToY(i);
-                gof_image[y*width+x]=dvec[i];
             }
         }
     }
@@ -3717,22 +3668,7 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double* image, double* gof_i
             }
         }
     }
-    if (gof_image && !readGOF) {
-        readGOF=true;
-        for (register int i=0; i<evals.size(); i++) {
-            const QString& en=evals[i];
-            int grpIdx=current->resultsGetEvaluationGroupIndex(en);
-            int x=m->runToX(grpIdx);
-            int y=m->runToY(grpIdx);
-            if (x>=0 && x<width && y>=0 && y<height) {
-                if (current->resultsExists(en, gofParam)) {
-                    gof_image[y*width+x]=current->resultsGetAsDouble(en, gofParam);
-                }
-            }
-        }
-    }
     transformImage(image, width, height, tranFitParam);
-    if (gof_image) transformImage(gof_image, width, height, tranGofParam);
 #ifdef DEBUG_TIMING
     //qDebug()<<"QFRDRImagingFCSImageEditor::readParameterImage("<<evalGroup<<fitParam<<") finished after "<<time.elapsed()<<"ms";
 #endif
@@ -3899,21 +3835,10 @@ void QFRDRImagingFCSImageEditor::printReport() {
 void QFRDRImagingFCSImageEditor::setCopyableData()
 {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
-    //pltImage->getDatastore()->clear();
-    //pltGofImage->getDatastore()->clear();
     pltOverview->getDatastore()->clear();
     pltMask->getDatastore()->clear();
 
     if (m) {
-        //pltImage->getDatastore()->addCopiedColumn(plteImageData, plteImageSize, formatTransformAndParameter(cmbParameter, cmbParameterTransform));
-        //pltImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));
-        //pltImage->getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteOverviewSize, tr("mask"));
-        //pltImage->setCopyableData();
-
-        //pltGofImage->getDatastore()->addCopiedColumn(plteGofImageData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform));
-        //pltGofImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));
-        //pltGofImage->getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteOverviewSize, tr("mask"));
-        //pltGofImage->setCopyableData();
 
         pltMask->getDatastore()->addCopiedColumn(plteOverviewSelectedData, plteOverviewSize, tr("selection"));
         pltMask->getDatastore()->addCopiedColumn(plteOverviewExcludedData, plteOverviewSize, tr("mask"));
@@ -4023,7 +3948,18 @@ void QFRDRImagingFCSImageEditor::dualviewChanged(int mode) {
         if (mode==1) m->setDualViewMode(QFRDRImagingFCSData::dvHorizontal);
         else if (mode==2) m->setDualViewMode(QFRDRImagingFCSData::dvVertical);
         else m->setDualViewMode(QFRDRImagingFCSData::dvNone);
-        histogram2->setVisible(mode!=QFRDRImagingFCSData::dvNone);
+        if (mode!=QFRDRImagingFCSData::dvNone) {
+            histogram_2->setVisible(true);
+            histogram2_2->setVisible(true);
+            histLay->setColumnStretch(0,1);
+            histLay->setColumnStretch(1,1);
+        } else {
+            histogram_2->setVisible(false);
+            histogram2_2->setVisible(false);
+            histLay->setColumnStretch(0,1);
+            histLay->setColumnStretch(1,0);
+
+        }
         rawDataChanged();
     }
 }
@@ -4398,10 +4334,11 @@ void QFRDRImagingFCSImageEditor::copyToMatlab() {
 
     if (m) {
         JKImage<double> image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
-        JKImage<double> gof_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        JKImage<double> image2(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         JKImage<uint16_t> mask_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         JKImage<double> overview_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
-        readParameterImage(image.data(), gof_image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone, currentGofParameter(), QFRDRImagingFCSImageEditor::itNone);
+        readParameterImage(image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone);
+        readParameterImage(image2.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFit2Parameter(), QFRDRImagingFCSImageEditor::itNone);
         overview_image.assign(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         //mask_image.assign(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
         for (int32_t i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
@@ -4410,7 +4347,7 @@ void QFRDRImagingFCSImageEditor::copyToMatlab() {
 
         QString data="";
         data.append(image.to_matlab("parameterImage").c_str());
-        data.append(gof_image.to_matlab("goodnesOfFit").c_str());
+        data.append(image2.to_matlab("parameterImage2").c_str());
         data.append(overview_image.to_matlab("overview").c_str());
         data.append(mask_image.to_matlab("mask").c_str());
 
@@ -4428,10 +4365,11 @@ void QFRDRImagingFCSImageEditor::copyDataAsColumns() {
         QFRDRImagingFCSCopyDataSelectDialog* dlg=new QFRDRImagingFCSCopyDataSelectDialog(this);
         if (dlg->exec()) {
             JKImage<double> image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
-            JKImage<double> gof_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+            JKImage<double> image2(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
             JKImage<uint16_t> mask_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
             JKImage<double> overview_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
-            readParameterImage(image.data(), gof_image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone, currentGofParameter(), QFRDRImagingFCSImageEditor::itNone);
+            readParameterImage(image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone);
+            readParameterImage(image2.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFit2Parameter(), QFRDRImagingFCSImageEditor::itNone);
             overview_image.assign(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
             //mask_image.assign(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
             for (int32_t i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
@@ -4442,7 +4380,7 @@ void QFRDRImagingFCSImageEditor::copyDataAsColumns() {
             loc.setNumberOptions(QLocale::OmitGroupSeparator);
 
             QStringList pim= QString(image.to_csv_column("\n", '.').c_str()).split('\n');
-            QStringList gim= QString(gof_image.to_csv_column("\n", '.').c_str()).split('\n');
+            QStringList gim= QString(image2.to_csv_column("\n", '.').c_str()).split('\n');
             QStringList oim= QString(overview_image.to_csv_column("\n", '.').c_str()).split('\n');
             QStringList mim= QString(mask_image.to_csv_column("\n", '.').c_str()).split('\n');
 
@@ -4456,7 +4394,7 @@ void QFRDRImagingFCSImageEditor::copyDataAsColumns() {
             if (dlg->copyID()) data+="\"pixel number\"";
             if (dlg->copyCoordinates()) { if (!data.isEmpty()) data.append("; "); data+="\"x\"; \"y\""; }
             if (dlg->copyParam()) { if (!data.isEmpty()) data.append("; ");  data+="\""+formatTransformAndParameter(cmbParameter, cmbParameterTransform).replace('\"', '_')+"\""; }
-            if (dlg->copyGOF()) { if (!data.isEmpty()) data.append("; ");  data+="\""+formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform).replace('\"', '_')+"\""; }
+            if (dlg->copyParam2()) { if (!data.isEmpty()) data.append("; ");  data+="\""+formatTransformAndParameter(cmbParameter2, cmbParameter2Transform).replace('\"', '_')+"\""; }
             if (dlg->copyOvf()) { if (!data.isEmpty()) data.append("; ");  data+="\"overview\""; }
             if (dlg->copyMask()) { if (!data.isEmpty()) data.append("; ");  data+="\"mask\""; }
             data+="\n";
@@ -4464,7 +4402,7 @@ void QFRDRImagingFCSImageEditor::copyDataAsColumns() {
             if (dlg->copyID()) qfdata+="\"pixel number\"";
             if (dlg->copyCoordinates()) { if (!qfdata.isEmpty()) qfdata.append(", "); qfdata+="\"x\", \"y\""; }
             if (dlg->copyParam()) { if (!qfdata.isEmpty()) qfdata.append(", ");  qfdata+="\""+formatTransformAndParameter(cmbParameter, cmbParameterTransform).replace('\"', '_')+"\""; }
-            if (dlg->copyGOF()) { if (!qfdata.isEmpty()) qfdata.append(", ");  qfdata+="\""+formatTransformAndParameter(cmbGofParameter, cmbGofParameterTransform).replace('\"', '_')+"\""; }
+            if (dlg->copyParam2()) { if (!qfdata.isEmpty()) qfdata.append(", ");  qfdata+="\""+formatTransformAndParameter(cmbParameter2, cmbParameter2Transform).replace('\"', '_')+"\""; }
             if (dlg->copyOvf()) { if (!qfdata.isEmpty()) qfdata.append(", ");  qfdata+="\"overview\""; }
             if (dlg->copyMask()) { if (!qfdata.isEmpty()) qfdata.append(", ");  qfdata+="\"mask\""; }
             qfdata="#! "+qfdata+"\n";
@@ -4473,7 +4411,7 @@ void QFRDRImagingFCSImageEditor::copyDataAsColumns() {
                 if (dlg->copyID()) { if (!line.isEmpty()) line.append("; "); line+=QString::number(i); }
                 if (dlg->copyCoordinates()) { if (!line.isEmpty()) line.append("; "); line+=QString::number(i%image.width())+"; "+QString::number(i/image.width()); }
                 if (dlg->copyParam()) { if (!line.isEmpty()) line.append("; "); line+=pim.value(i, "").replace('.', loc.decimalPoint()); }
-                if (dlg->copyGOF()) { if (!line.isEmpty()) line.append("; ");  line+=gim.value(i, "").replace('.', loc.decimalPoint()); }
+                if (dlg->copyParam2()) { if (!line.isEmpty()) line.append("; ");  line+=gim.value(i, "").replace('.', loc.decimalPoint()); }
                 if (dlg->copyOvf())  { if (!line.isEmpty()) line.append("; "); line+=oim.value(i, "").replace('.', loc.decimalPoint()); }
                 if (dlg->copyMask())  { if (!line.isEmpty()) line.append("; ");  line+=mim.value(i, "").replace('.', loc.decimalPoint()); }
                 data+=line+"\n";
@@ -4482,7 +4420,7 @@ void QFRDRImagingFCSImageEditor::copyDataAsColumns() {
                 if (dlg->copyID()) { if (!line.isEmpty()) line.append(", "); line+=QString::number(i); }
                 if (dlg->copyCoordinates()) { if (!line.isEmpty()) line.append(", "); line+=QString::number(i%image.width())+", "+QString::number(i/image.width()); }
                 if (dlg->copyParam()) { if (!line.isEmpty()) line.append(", "); line+=pim.value(i, ""); }
-                if (dlg->copyGOF()) { if (!line.isEmpty()) line.append(", ");  line+=gim.value(i, ""); }
+                if (dlg->copyParam2()) { if (!line.isEmpty()) line.append(", ");  line+=gim.value(i, ""); }
                 if (dlg->copyOvf())  { if (!line.isEmpty()) line.append(", "); line+=oim.value(i, ""); }
                 if (dlg->copyMask())  { if (!line.isEmpty()) line.append(", ");  line+=mim.value(i, ""); }
                 qfdata+=(line+"\n");
@@ -4532,14 +4470,14 @@ void QFRDRImagingFCSImageEditor::saveData() {
         if (path.right(1)!="/") path=path+"/";
 
         QString fileNameParam=path+base+".param."+ext;
-        QString fileNameGof=path+base+".gof."+ext;
+        QString fileNameParam2=path+base+".param2."+ext;
         QString fileNameMask=path+base+".mask."+ext;
         QString fileNameOverview=path+base+".overview."+ext;
         QString fileNameOverview2=path+base+".overview2."+ext;
         QString fileNameMatlab=path+base+".m";
 
         bool saveParam=true;
-        bool saveGof=true;
+        bool saveParam2=true;
         bool saveMask=true;
         bool saveOverview=true;
         bool saveMatlab=true;
@@ -4547,8 +4485,8 @@ void QFRDRImagingFCSImageEditor::saveData() {
             if (QFile::exists(fileNameParam)) {
                 saveParam=(QMessageBox::question(this, tr("imFCS: Save Parameter Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameParam), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
             }
-            if (QFile::exists(fileNameGof)) {
-                saveGof=(QMessageBox::question(this, tr("imFCS: Save Goodnes-of-Fit Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameGof), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
+            if (QFile::exists(fileNameParam2)) {
+                saveParam2=(QMessageBox::question(this, tr("imFCS: Save Parameter 2 Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameParam2), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
             }
             if (QFile::exists(fileNameMask)) {
                 saveMask=(QMessageBox::question(this, tr("imFCS: Save Mask Image"), tr("The file '%1' already exists.\n Overwrite?").arg(fileNameMask), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
@@ -4566,11 +4504,12 @@ void QFRDRImagingFCSImageEditor::saveData() {
         }
 
         JKImage<double> image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
-        JKImage<double> gof_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+        JKImage<double> image2(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         JKImage<uint16_t> mask_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         JKImage<double> overview_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         JKImage<double> overview_image2(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
-        readParameterImage(image.data(), gof_image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone, currentGofParameter(), QFRDRImagingFCSImageEditor::itNone);
+        readParameterImage(image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone);
+        readParameterImage(image2.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFit2Parameter(), QFRDRImagingFCSImageEditor::itNone);
         //mask_image.assign(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
         overview_image.assign(m->getImageFromRunsPreview(0), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         if (m->getImageFromRunsChannelsAdvised()>1) overview_image2.assign(m->getImageFromRunsPreview(1), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
@@ -4579,7 +4518,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
         }
         if (selFilter==filters[0]) {
             if (saveParam) image.save_csv(fileNameParam.toStdString(), ", ", '.');
-            if (saveGof) gof_image.save_csv(fileNameGof.toStdString(), ", ", '.');
+            if (saveParam2) image2.save_csv(fileNameParam2.toStdString(), ", ", '.');
             if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), ", ", '.');
             if (saveOverview) {
                 overview_image.save_csv(fileNameOverview.toStdString(), ", ", '.');
@@ -4587,7 +4526,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             }
         } else if (selFilter==filters[1]) {
             if (saveParam) image.save_csv(fileNameParam.toStdString(), "; ", ',');
-            if (saveGof) gof_image.save_csv(fileNameGof.toStdString(), "; ", ',');
+            if (saveParam2) image2.save_csv(fileNameParam2.toStdString(), "; ", ',');
             if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), "; ", ',');
             if (saveOverview) {
                 overview_image.save_csv(fileNameOverview.toStdString(), "; ", ',');
@@ -4595,7 +4534,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             }
         } else if (selFilter==filters[7]) {
             if (saveParam) image.save_csv(fileNameParam.toStdString(), "\t", '.');
-            if (saveGof) gof_image.save_csv(fileNameGof.toStdString(), "\t", '.');
+            if (saveParam2) image2.save_csv(fileNameParam2.toStdString(), "\t", '.');
             if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), "\t", '.');
             if (saveOverview) {
                 overview_image.save_csv(fileNameOverview.toStdString(), "\t", '.');
@@ -4603,7 +4542,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             }
         } else if (selFilter==filters[8]) {
             if (saveParam) image.save_csv(fileNameParam.toStdString(), "; ", '.');
-            if (saveGof) gof_image.save_csv(fileNameGof.toStdString(), "; ", '.');
+            if (saveParam2) image2.save_csv(fileNameParam2.toStdString(), "; ", '.');
             if (saveMask) mask_image.save_csv(fileNameMask.toStdString(), "; ", '.');
             if (saveOverview) {
                 overview_image.save_csv(fileNameOverview.toStdString(), "; ", '.');
@@ -4611,7 +4550,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             }
         } else if (selFilter==filters[2]) {
             if (saveParam)  image.save_sylk(fileNameParam.toStdString());
-            if (saveGof) gof_image.save_sylk(fileNameGof.toStdString());
+            if (saveParam2) image2.save_sylk(fileNameParam2.toStdString());
             if (saveMask) mask_image.save_sylk(fileNameMask.toStdString());
             if (saveOverview) {
                 overview_image.save_sylk(fileNameOverview.toStdString());
@@ -4619,7 +4558,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             }
         } else if (selFilter==filters[3]) {
             if (saveParam) image.save_tifffloat(fileNameParam.toStdString());
-            if (saveGof) gof_image.save_tifffloat(fileNameGof.toStdString());
+            if (saveParam2) image2.save_tifffloat(fileNameParam2.toStdString());
             if (saveMask) mask_image.save_tifffloat(fileNameMask.toStdString());
             if (saveOverview) {
                 overview_image.save_tifffloat(fileNameOverview.toStdString());
@@ -4627,7 +4566,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             }
         } else if (selFilter==filters[4]) {
             if (saveParam) image.save_tiffuint16(fileNameParam.toStdString());
-            if (saveGof) gof_image.save_tiffuint16(fileNameGof.toStdString());
+            if (saveParam2) image2.save_tiffuint16(fileNameParam2.toStdString());
             if (saveMask) mask_image.save_tiffuint16(fileNameMask.toStdString());
             if (saveOverview) {
                 overview_image.save_tiffuint16(fileNameOverview.toStdString());
@@ -4637,7 +4576,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             if (saveMatlab) {
                 QString data="";
                 data.append(image.to_matlab("parameterImage").c_str());
-                data.append(gof_image.to_matlab("goodnesOfFit").c_str());
+                data.append(image2.to_matlab("parameterImage2").c_str());
                 data.append(mask_image.to_matlab("mask").c_str());
                 data.append(overview_image.to_matlab("overview").c_str());
                 if (m->getImageFromRunsChannelsAdvised()>1) data.append(overview_image2.to_matlab("overview2").c_str());
@@ -4650,7 +4589,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
             }
         } else if (selFilter==filters[5]) {
             if (saveParam) pltImage->get_imagePlot()->drawImage().save(fileNameParam, "PNG");
-            if (saveGof) pltGofImage->get_imagePlot()->drawImage().save(fileNameGof, "PNG");
+            if (saveParam2) pltParamImage2->get_imagePlot()->drawImage().save(fileNameParam2, "PNG");
             if (saveMask) plteMask->drawImage().save(fileNameMask, "PNG");
             if (saveOverview) {
                 if (plteOverview->get_visible()) plteOverview->drawImage().save(fileNameOverview, "PNG");
@@ -4719,9 +4658,9 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         tabCursor=table->cellAt(1, 1).firstCursorPosition();
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>transform:</i> <b>%1</b></small>").arg(cmbParameterTransform->currentText())));
         tabCursor=table->cellAt(2, 0).firstCursorPosition();
-        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>goodnes of fit:</i> <b>%1</b></small>").arg(cmbGofParameter->currentText())));
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>parameter 2:</i> <b>%1</b></small>").arg(cmbParameter2->currentText())));
         tabCursor=table->cellAt(2, 1).firstCursorPosition();
-        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>transform:</i> <b>%1</b></small>").arg(cmbGofParameterTransform->currentText())));
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>transform:</i> <b>%1</b></small>").arg(cmbParameter2Transform->currentText())));
         tabCursor=table->cellAt(3, 0).firstCursorPosition();
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>color palette:</i> <b>%1</b></small>").arg(grpImage->getColorbarName())));
         tabCursor=table->cellAt(3, 1).firstCursorPosition();
@@ -4736,7 +4675,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     cursor.insertBlock();
     cursor.insertText(tr("Parameter Images:\n").arg(m->getName()), fHeading2);
     double w1=pltImage->width();
-    double w2=(chkGofVisible->isChecked())?pltGofImage->width():0;
+    double w2=(chkParamImage2Visible->isChecked())?pltParamImage2->width():0;
     double w3=(chkOverviewVisible->isChecked())?pltOverview->width():0;
     double w4=(chkMaskVisible->isChecked())?pltMask->width():0;
 
@@ -4754,15 +4693,15 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
     }
     QApplication::processEvents();
-    if (chkGofVisible->isChecked()) {
+    if (chkParamImage2Visible->isChecked()) {
         QTextCursor tabCursor=table->cellAt(0, 1).firstCursorPosition();
         QPicture pic;
         QPainter* painter=new QPainter(&pic);
-        pltGofImage->get_plotter()->draw(*painter, QRect(0,0,pltGofImage->width(),pltGofImage->height()));
+        pltParamImage2->get_plotter()->draw(*painter, QRect(0,0,pltParamImage2->width(),pltParamImage2->height()));
         delete painter;
         double scale=document->textWidth()*w2/allwidth*0.9/pic.boundingRect().width();
         if (scale<=0) scale=1;
-        tabCursor.insertText(tr("goodnes of fit image:\n"), fTextBoldSmall);
+        tabCursor.insertText(tr("parameter image 2:\n"), fTextBoldSmall);
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
     }
     QApplication::processEvents();
@@ -4834,7 +4773,10 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
 
 
     histogram->writeReport(cursor, document);
-    if (cmbDualView->currentIndex()>0) histogram2->writeReport(cursor, document);
+    if (cmbDualView->currentIndex()>0) histogram_2->writeReport(cursor, document);
+    histogram2->writeReport(cursor, document);
+    if (cmbDualView->currentIndex()>0) histogram2_2->writeReport(cursor, document);
+    corrView->writeReport(cursor, document);
     cursor.movePosition(QTextCursor::End);
     QApplication::processEvents();
 
@@ -4867,8 +4809,152 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
 
 void QFRDRImagingFCSImageEditor::replotHistogram() {
     histogram->replotHistogram();
-    if (cmbDualView->currentIndex()>0) histogram2->replotHistogram();
+    histogram2->replotHistogram();
+    corrView->replotCorrelation();
+    if (cmbDualView->currentIndex()>0) histogram_2->replotHistogram();
+    if (cmbDualView->currentIndex()>0) histogram2_2->replotHistogram();
 }
+
+void QFRDRImagingFCSImageEditor::updateHistogram(QFHistogramView* histogram, QFRDRImagingFCSData* m, double* plteImageData, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram) {
+    int32_t datasize=0;
+    double* datahist=(double*)malloc(plteImageSize*sizeof(double));
+    if (dv) {
+        histogram->clear();
+        if (plteImageData && (plteImageSize>=0)) {
+            if (excludeExcluded) {
+                for (register int32_t i=0; i<plteImageSize; i++) {
+                    if ((!selHistogram || selected.contains(i)) && !m->leaveoutRun(i) && indexIsDualView2(i)) {
+                        datahist[datasize]=plteImageData[i];
+                        datasize++;
+                    }
+                }
+            } else  {
+                for (register int32_t i=0; i<plteImageSize; i++) {
+                    if ((!selHistogram || selected.contains(i)) && indexIsDualView2(i)) {
+                        datahist[datasize]=plteImageData[i];
+                        datasize++;
+                    }
+                }
+            }
+        }
+    } else {
+        if (plteImageData && (plteImageSize>=0)) {
+            if (excludeExcluded) {
+                for (register int32_t i=0; i<plteImageSize; i++) {
+                    if ((!selHistogram || selected.contains(i)) && !m->leaveoutRun(i) && (!dv || (dv && !indexIsDualView2(i)))) {
+                        datahist[datasize]=plteImageData[i];
+                        datasize++;
+                    }
+                }
+            } else  {
+                for (register int32_t i=0; i<plteImageSize; i++) {
+                    if ((!selHistogram || selected.contains(i)) && (!dv || (dv && !indexIsDualView2(i)))) {
+                        datahist[datasize]=plteImageData[i];
+                        datasize++;
+                    }
+                }
+            }
+        }
+    }
+    if (selHistogram) {
+        if (datasize>2) {
+            if (histogram->histogramCount()>1) {
+                histogram->setHistogram(1, tr("selection"), datahist, datasize, false);
+            } else {
+                histogram->addHistogram(tr("selection"), datahist, datasize, false);
+            }
+        } else {
+            while (histogram->histogramCount()>1) {
+                histogram->removeHistogram(histogram->histogramCount()-1);
+            }
+            histogram->updateHistogram(true, -1);
+        }
+    } else histogram->addHistogram(tr("complete"), datahist, datasize, false);
+    if (datahist) free(datahist);
+
+}
+
+void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *corrView, QFRDRImagingFCSData *m, double *data1, double *data2, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram, int mode, int channel, const QString &label1, const QString label2)
+{
+    int32_t datasize=0;
+    double* datac1=(double*)malloc(plteImageSize*sizeof(double));
+    double* datac2=(double*)malloc(plteImageSize*sizeof(double));
+    double* datai=(double*)malloc(plteImageSize*sizeof(double));
+
+    if (plteImageSize<=0) {
+        corrView->clear();
+        return;
+    }
+
+    double* image=m->getImageFromRunsPreview(channel);
+    if (!dv) {
+        if ((plteImageSize>=0) && (plteImageSize<=m->getImageFromRunsWidth()*m->getImageFromRunsHeight())) {
+            if (excludeExcluded) {
+                for (register int32_t i=0; i<plteImageSize; i++) {
+                    if ((!selHistogram || selected.contains(i)) && !m->leaveoutRun(i) && (!dv || (dv && !indexIsDualView2(i)))) {
+                        if (data1) datac1[datasize]=data1[i];
+                        if (data2) datac2[datasize]=data2[i];
+                        if (image) datai[datasize]=image[i];
+                        datasize++;
+                    }
+                }
+            } else  {
+                for (register int32_t i=0; i<plteImageSize; i++) {
+                    if ((!selHistogram || selected.contains(i)) && (!dv || (dv && !indexIsDualView2(i)))) {
+                        if (data1) datac1[datasize]=data1[i];
+                        if (data2) datac2[datasize]=data2[i];
+                        if (image) datai[datasize]=image[i];
+                        datasize++;
+                    }
+                }
+            }
+        }
+    }
+
+    double* cd1=datac1;
+    double* cd2=datac2;
+    QString l1=label1;
+    QString l2=label2;
+
+    if (mode==1) {
+        cd2=image;
+        l2=tr("intensity, ch.%1").arg(channel+1);
+    } else if (mode==2) {
+        cd1=datac2;
+        l1=label2;
+        cd2=image;
+        l2=tr("intensity, ch.%1").arg(channel+1);
+    }
+
+    corrView->setCorrelation1Label(l1);
+    corrView->setCorrelation2Label(l2);
+
+    if (cd1&&cd2) {
+        if (selHistogram) {
+            if (datasize>2) {
+                if (corrView->CorrelationCount()>1) {
+                    corrView->setCorrelation(1, tr("selection"), cd1, cd2, datasize, false);
+                } else {
+                    corrView->addCorrelation(tr("selection"), cd1, cd2, datasize, false);
+                }
+            } else {
+                while (corrView->CorrelationCount()>1) {
+                    corrView->removeCorrelation(corrView->CorrelationCount()-1);
+                }
+                corrView->updateCorrelation(true);
+            }
+        } else corrView->addCorrelation(tr("complete"), cd1, cd2, datasize, false);
+
+    } else {
+        corrView->clear();
+    }
+
+
+    if (datac1) free(datac1);
+    if (datac2) free(datac2);
+    if (datai) free(datai);
+}
+
 
 void QFRDRImagingFCSImageEditor::updateHistogram() {
 
@@ -4878,157 +4964,77 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
 
 
     bool dv=cmbDualView->currentIndex()>0;
-    histogram->clear();
-    double* plteImageData=pltImage->getData();
-    int32_t plteImageSize=pltImage->getDataSize();
 
-    if (plteImageData && (plteImageSize>=m->getImageFromRunsWidth()*m->getImageFromRunsHeight())) {
-        int imageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
-        double* datahist=(double*)malloc(imageSize*sizeof(double));
-        datasize=0;
-        if (chkExcludeExcludedRunsFromHistogram->isChecked()) {
-            for (register int32_t i=0; i<imageSize; i++) {
-                if (!m->leaveoutRun(i) && (!dv || (dv && !indexIsDualView2(i)))) {
-                    datahist[datasize]=plteImageData[i];
-                    datasize++;
-                }
-            }
-        } else  {
-            for (register int32_t i=0; i<imageSize; i++) {
-                if (!dv || (dv && !indexIsDualView2(i))) {
-                    datahist[datasize]=plteImageData[i];
-                    datasize++;
-                }
-            }
-        }
-        histogram->addHistogram(tr("complete"), datahist, datasize, false);
-        histogram->setHistogramXLabel(cmbParameter->currentText());
-        if (datahist) free(datahist);
-    }
+    corrView->clear();
+    histogram->clear();
+    updateHistogram(histogram, m, pltImage->getData(), pltImage->getDataSize(), chkExcludeExcludedRunsFromHistogram->isChecked(), false, false);
+    histogram->setHistogramXLabel(cmbParameter->currentText());
+
+    histogram2->clear();
+    updateHistogram(histogram2, m, pltParamImage2->getData(), pltParamImage2->getDataSize(), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false);
+    histogram2->setHistogramXLabel(cmbParameter2->currentText());
+
+    corrView->clear();
+    updateCorrelation(corrView, m, pltImage->getData(), pltParamImage2->getData(), qMin(pltImage->getDataSize(), pltParamImage2->getDataSize()), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false, cmbCorrelationDisplayMode->currentIndex(), spinCorrelationChannel->value(), cmbParameter->currentText(), cmbParameter2->currentText());
+
+    histogram_2->clear();
+    histogram2_2->clear();
     if (dv) {
-        histogram2->setVisible(true);
-        histogram2->clear();
-        if (plteImageData && (plteImageSize>=m->getImageFromRunsWidth()*m->getImageFromRunsHeight())) {
-            int imageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
-            double* datahist=(double*)malloc(imageSize*sizeof(double));
-            datasize=0;
-            if (chkExcludeExcludedRunsFromHistogram2->isChecked()) {
-                for (register int32_t i=0; i<imageSize; i++) {
-                    if (!m->leaveoutRun(i) && indexIsDualView2(i)) {
-                        datahist[datasize]=plteImageData[i];
-                        datasize++;
-                    }
-                }
-            } else  {
-                for (register int32_t i=0; i<imageSize; i++) {
-                    if (indexIsDualView2(i)) {
-                        datahist[datasize]=plteImageData[i];
-                        datasize++;
-                    }
-                }
-            }
-            histogram2->addHistogram(tr("complete"), datahist, datasize, false);
-            histogram2->setHistogramXLabel(cmbParameter->currentText());
-            if (datahist) free(datahist);
-        }
+
+        updateHistogram(histogram_2, m, pltImage->getData(), pltImage->getDataSize(), chkExcludeExcludedRunsFromHistogram_2->isChecked(), dv, false);
+        histogram_2->setHistogramXLabel(cmbParameter->currentText());
+
+        updateHistogram(histogram2_2, m, pltParamImage2->getData(), pltParamImage2->getDataSize(), chkExcludeExcludedRunsFromHistogram2_2->isChecked(), dv, false);
+        histogram2_2->setHistogramXLabel(cmbParameter2->currentText());
     }
+
+
 
     updateSelectionHistogram(false);
     histogram->updateHistogram(true);
-    if (dv) histogram2->updateHistogram(true);
+    if (dv) histogram_2->updateHistogram(true);
+    histogram2->updateHistogram(true);
+    if (dv) histogram2_2->updateHistogram(true);
 
 }
 
 void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
-
-
     if (!current) return;
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (!m) return;
 
+
     bool dv=cmbDualView->currentIndex()>0;
 
-    double* plteImageData=pltImage->getData();
-    int32_t plteImageSize=pltImage->getDataSize();
+    updateHistogram(histogram, m, pltImage->getData(), pltImage->getDataSize(), chkExcludeExcludedRunsFromHistogram->isChecked(), false, true);
+    histogram->setHistogramXLabel(cmbParameter->currentText());
 
-    if (plteImageData && (plteImageSize>=m->getImageFromRunsWidth()*m->getImageFromRunsHeight())) {
-        int imageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
-        double* datahistsel=(double*)malloc(imageSize*sizeof(double));
-        datasizesel=0;
-        int32_t ii=0;
-        if (chkExcludeExcludedRunsFromHistogram->isChecked()) {
-            for (register int32_t i=0; i<imageSize; i++) {
-                if (selected.contains(i) && !m->leaveoutRun(i) && (!dv || (dv && !indexIsDualView2(i)))) {
-                    datahistsel[datasizesel]=plteImageData[i];
-                    datasizesel++;
-                }
-            }
-        } else  {
-            for (register int32_t i=0; i<imageSize; i++) {
-                if (selected.contains(i) && (!dv || (dv && !indexIsDualView2(i)))) {
-                    datahistsel[datasizesel]=plteImageData[i];
-                    datasizesel++;
-                }
-            }
-        }
-        if (datasizesel>2) {
-            if (histogram->histogramCount()>1) {
-                histogram->setHistogram(1, tr("selection"), datahistsel, datasizesel, false);
-                histogram->setHistogramXLabel(cmbParameter->currentText());
-            } else {
-                histogram->addHistogram(tr("selection"), datahistsel, datasizesel, false);
-                histogram->setHistogramXLabel(cmbParameter->currentText());
-            }
-        } else {
-            while (histogram->histogramCount()>1) {
-                histogram->removeHistogram(histogram->histogramCount()-1);
-            }
-            histogram->updateHistogram(true, -1);
-        }
-        if (datahistsel) free(datahistsel);
-    }
+    updateHistogram(histogram2, m, pltParamImage2->getData(), pltParamImage2->getDataSize(), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, true);
+    histogram2->setHistogramXLabel(cmbParameter2->currentText());
+
+    updateCorrelation(corrView, m, pltImage->getData(), pltParamImage2->getData(), qMin(pltImage->getDataSize(), pltParamImage2->getDataSize()), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false, cmbCorrelationDisplayMode->currentIndex(), spinCorrelationChannel->value(), cmbParameter->currentText(), cmbParameter2->currentText());
+
     if (dv) {
-        histogram2->setVisible(true);
-        if (plteImageData && (plteImageSize>=m->getImageFromRunsWidth()*m->getImageFromRunsHeight())) {
-            int imageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
-            double* datahistsel=(double*)malloc(imageSize*sizeof(double));
-            datasizesel=0;
-            int32_t ii=0;
-            if (chkExcludeExcludedRunsFromHistogram2->isChecked()) {
-                for (register int32_t i=0; i<imageSize; i++) {
-                    if (selected.contains(i) && !m->leaveoutRun(i) && indexIsDualView2(i)) {
-                        datahistsel[datasizesel]=plteImageData[i];
-                        datasizesel++;
-                    }
-                }
-            } else  {
-                for (register int32_t i=0; i<imageSize; i++) {
-                    if (selected.contains(i) && indexIsDualView2(i)) {
-                        datahistsel[datasizesel]=plteImageData[i];
-                        datasizesel++;
-                    }
-                }
-            }
-            if (datasizesel>2) {
-                if (histogram2->histogramCount()>1) {
-                    histogram2->setHistogram(1, tr("selection"), datahistsel, datasizesel, false);
-                    histogram2->setHistogramXLabel(cmbParameter->currentText());
-                } else {
-                    histogram2->addHistogram(tr("selection"), datahistsel, datasizesel, false);
-                    histogram2->setHistogramXLabel(cmbParameter->currentText());
-                }
-            } else {
-                while (histogram2->histogramCount()>1) {
-                    histogram2->removeHistogram(histogram2->histogramCount()-1);
-                }
-                histogram2->updateHistogram(true, -1);
-            }
-            if (datahistsel) free(datahistsel);
-        }
-        if (replot) histogram2->updateHistogram(true, 1);
+
+        updateHistogram(histogram_2, m, pltImage->getData(), pltImage->getDataSize(), chkExcludeExcludedRunsFromHistogram_2->isChecked(), dv, true);
+        histogram_2->setHistogramXLabel(cmbParameter->currentText());
+
+        updateHistogram(histogram2_2, m, pltParamImage2->getData(), pltParamImage2->getDataSize(), chkExcludeExcludedRunsFromHistogram2_2->isChecked(), dv, true);
+        histogram2_2->setHistogramXLabel(cmbParameter2->currentText());
     }
 
-    if (replot) histogram->updateHistogram(true, 1);
+
+
+    if (replot) {
+        corrView->updateCorrelation(true);
+        histogram->updateHistogram(true,1);
+        if (dv) histogram_2->updateHistogram(true,1);
+        histogram2->updateHistogram(true,1);
+        if (dv) histogram2_2->updateHistogram(true,1);
+
+    }
+
+
 
 }
 
@@ -5039,13 +5045,6 @@ void QFRDRImagingFCSImageEditor::moveColorbarsAuto() {
         rightVisible=!rightVisible;
     }
 
-    /*if ((double)pltGofImage->width()<=(double)pltGofImage->height()) {
-        plteGofImage->set_colorBarRightVisible(rightVisible);
-        plteGofImage->set_colorBarTopVisible(!rightVisible);
-    } else {
-        plteGofImage->set_colorBarRightVisible(!rightVisible);
-        plteGofImage->set_colorBarTopVisible(rightVisible);
-    }*/
     if ((double)pltOverview->width()<=(double)pltOverview->height()) {
         plteOverview->set_colorBarRightVisible(rightVisible);
         plteOverview->set_colorBarTopVisible(!rightVisible);
@@ -5060,7 +5059,7 @@ void QFRDRImagingFCSImageEditor::moveColorbarsAuto() {
 }
 
 void QFRDRImagingFCSImageEditor::showHidePlots()  {
-    bool changed=  (splitterTop->widget(1)->isVisible() != chkGofVisible->isChecked())
+    bool changed=  (splitterTop->widget(1)->isVisible() != chkParamImage2Visible->isChecked())
                  ||(splitterTop->widget(2)->isVisible() != chkMaskVisible->isChecked())
                  ||(splitterTop->widget(3)->isVisible() != chkOverviewVisible->isChecked());
 
@@ -5071,11 +5070,11 @@ void QFRDRImagingFCSImageEditor::showHidePlots()  {
         if (splitterTop->widget(3)->isVisible()) oldcnt++;
 
         int cnt=1;
-        if (chkGofVisible->isChecked()) cnt++;
+        if (chkParamImage2Visible->isChecked()) cnt++;
         if (chkMaskVisible->isChecked()) cnt++;
         if (chkOverviewVisible->isChecked()) cnt++;
 
-        splitterTop->widget(1)->setVisible(chkGofVisible->isChecked());
+        splitterTop->widget(1)->setVisible(chkParamImage2Visible->isChecked());
         splitterTop->widget(2)->setVisible(chkMaskVisible->isChecked());
         splitterTop->widget(3)->setVisible(chkOverviewVisible->isChecked());
 

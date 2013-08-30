@@ -230,6 +230,31 @@ void QFHistogramView::writeSettings(QSettings& settings, const QString& prefix) 
     saveSplitter(settings, splitterHistogram, prefix+"splitterhistogramSizes");
 }
 
+void QFHistogramView::writeQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)
+{
+    current->setQFProperty(prefix+QString("bins_%1_%2").arg(egroup).arg(param), getBins(), false, false);
+    current->setQFProperty(prefix+QString("norm_%1_%2").arg(egroup).arg(param), getNormalized(), false, false);
+    current->setQFProperty(prefix+QString("log_%1_%2").arg(egroup).arg(param), getLog(), false, false);
+    current->setQFProperty(prefix+QString("rauto_%1_%2").arg(egroup).arg(param), getAutorange(), false, false);
+    if (!getAutorange()) {
+        current->setQFProperty(prefix+QString("rmin_%1_%2").arg(egroup).arg(param), getMin(), false, false);
+        current->setQFProperty(prefix+QString("rmax_%1_%2").arg(egroup).arg(param), getMax(), false, false);
+    }
+}
+
+void QFHistogramView::readQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)
+{
+    setBins(current->getProperty(prefix+QString("bins_%1_%2").arg(egroup).arg(param), 50).toInt());
+    setNormalized(current->getProperty(prefix+QString("norm_%1_%2").arg(egroup).arg(param), true).toBool());
+    setLog(current->getProperty(prefix+QString("log_%1_%2").arg(egroup).arg(param), false).toBool());
+    setAutorange(current->getProperty(prefix+QString("rauto_%1_%2").arg(egroup).arg(param), true).toBool());
+    if (!getAutorange()) {
+        setMin(current->getProperty(prefix+QString("rmin_%1_%2").arg(egroup).arg(param), 0).toDouble());
+        setMax(current->getProperty(prefix+QString("rmax_%1_%2").arg(egroup).arg(param), 10).toDouble());
+    }
+}
+
+
 void QFHistogramView::clear() {
     for (int i=0; i<histograms.size(); i++) {
         if (histograms[i].data && !histograms[i].external) free(histograms[i].data);
@@ -614,7 +639,7 @@ void QFHistogramView::writeReport(QTextCursor& cursor, QTextDocument* document) 
         delete painter;
         scale=0.4*document->textWidth()/double(picT.boundingRect().width());
         if (scale<=0) scale=1;
-        tabCursor.insertText(tr("fit results table:\n"), fTextBoldSmall);
+        tabCursor.insertText(tr("statistics table:\n"), fTextBoldSmall);
         insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale);
 
     }

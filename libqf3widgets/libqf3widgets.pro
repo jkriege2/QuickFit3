@@ -116,7 +116,9 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfstageconfigwidgetthread.h \
     qfstageconfigwidget.h \
     ../../../../LIB/trunk/qt/fillstylecombobox.h \
-    qfsimplecurvefitdialog.h
+    qfsimplecurvefitdialog.h \
+    qfparametercorrelationview.h \
+    ../../../../LIB/trunk/statistics_tools.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -195,7 +197,9 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfstageconfigwidgetthread.cpp \
     qfstageconfigwidget.cpp \
     ../../../../LIB/trunk/qt/fillstylecombobox.cpp \
-    qfsimplecurvefitdialog.cpp
+    qfsimplecurvefitdialog.cpp \
+    qfparametercorrelationview.cpp \
+    ../../../../LIB/trunk/statistics_tools.cpp
 
 
 FORMS += qfdlg_csvparameters.ui \

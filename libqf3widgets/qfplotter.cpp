@@ -49,3 +49,13 @@ void QFPlotter::populateToolbar(QToolBar *toolbar) const
     toolbar->addSeparator();
     toolbar->addAction(p->actHelp);
 }
+
+QAction *QFPlotter::get_actCopyToTable() const
+{
+    return p->actCopyToTable;
+}
+
+QAction *QFPlotter::get_actHelp() const
+{
+    return p->actHelp;
+}
