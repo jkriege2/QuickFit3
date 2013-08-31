@@ -10,26 +10,64 @@ QFExtensionLinearStagePI2::QFExtensionLinearStagePI2(QObject* parent):
     QObject(parent)
 {
 	logService=NULL;
-    PTerm=150;
-    iTerm=45;
-    DTerm=300;
-    iLimit=2000;
-    acceleration=1000000;
-    maxVelocity=2000;
-    initVelocity=1000;
-    COMPort="COM1";
-    COMPortSpeed=38400;
-    currentID=-1;
-    lengthFactor=6.9e-3;
-    velocityFactor=6.9e-3;
-    accelerationFactor=6.9e-3;
-    mutexSerial=new QMutex(QMutex::Recursive);
 }
 
 QFExtensionLinearStagePI2::~QFExtensionLinearStagePI2() {
-    delete mutexSerial;
 }
 
+void QFExtensionLinearStagePI2::initExtension() {
+    /* do initializations here but do not yet connect to the camera! */
+    QString ini=services->getGlobalConfigFileDirectory()+QString("/stage_pi863_2.ini");
+    if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+QString("/stage_pi863_2.ini");
+    if (!QFile::exists(ini)) ini=services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/stage_pi863_2.ini");
+    QSettings inifile(ini, QSettings::IniFormat);
+
+
+    AxisDescription defaultAD;
+
+    int axisCount=inifile.value("axis_count", 0).toUInt();
+
+
+    axes.clear();
+    for (int i=0; i<axisCount; i++) {
+        QString axisname=QString("axis%1").arg(i);
+        if (inifile.contains(axisname+"/id")) {
+            AxisDescription d;
+            QString s=inifile.value(axisname+"/id", '0').toString();
+            d.ID='0';
+            if (s.size()>0) d.ID=s[0];
+
+            d.port=ports.addCOMPort(inifile, axisname+"/", 38400);
+            d.serial=new QFExtensionLinearStagePI2ProtocolHandler(ports.getCOMPort(d.port), ports.getMutex(d.port), getName());
+
+            d.PTerm=inifile.value(axisname+"/pterm", PTerm).toUInt();
+            d.iTerm=inifile.value(axisname+"/iterm", iTerm).toUInt();
+            d.DTerm=inifile.value(axisname+"/dterm", DTerm).toUInt();
+            d.iLimit=inifile.value(axisname+"/ilimit", iLimit).toUInt();
+            d.acceleration=inifile.value(axisname+"/acceleration", acceleration).toDouble();
+            d.initVelocity=inifile.value(axisname+"/initvelocity", initVelocity).toDouble();
+            d.maxVelocity=inifile.value(axisname+"/maxvelocity", maxVelocity).toDouble();
+
+
+
+            d.velocity=initVelocity;
+            d.joystickEnabled=false;
+            d.state=QFExtensionLinearStage::Disconnected;
+            d.name=axisname;
+            d.label=inifile.value(axisname+"/label", tr("PI Mercury 863, axis %1").arg(i)).toString();
+            axes.append(d);
+        }
+    }
+
+    actCalibrateJoysticks=new QAction(QIcon(":/stage_pi/pi_joystick.png"), tr("calibrate PI stage joysticks, v2"), this);
+    connect(actCalibrateJoysticks, SIGNAL(triggered()), this, SLOT(calibrateJoysticks()));
+    if (services) {
+        QMenu* m=services->getMenu("extensions");
+        if (m) {
+            m->addAction(actCalibrateJoysticks);
+        }
+    }
+}
 
 void QFExtensionLinearStagePI2::deinit() {
 	/* add code for cleanup here */
@@ -59,48 +97,6 @@ void QFExtensionLinearStagePI2::projectChanged(QFProject* oldProject, QFProject*
 	 */
 }
 
-void QFExtensionLinearStagePI2::initExtension() {
-    /* do initializations here but do not yet connect to the camera! */
-    QString ini=services->getGlobalConfigFileDirectory()+QString("/stage_pi863_2.ini");
-    if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+QString("/stage_pi863_2.ini");
-    if (!QFile::exists(ini)) ini=services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/stage_pi863_2.ini");
-    QSettings inifile(ini, QSettings::IniFormat);
-    COMPort=inifile.value("driver/port", COMPort).toString();
-    COMPortSpeed=inifile.value("driver/port_speed", COMPortSpeed).toUInt();
-    PTerm=inifile.value("driver/pterm", PTerm).toUInt();
-    iTerm=inifile.value("driver/iterm", iTerm).toUInt();
-    DTerm=inifile.value("driver/dterm", DTerm).toUInt();
-    iLimit=inifile.value("driver/ilimit", iLimit).toUInt();
-    acceleration=inifile.value("driver/acceleration", acceleration).toDouble();
-    initVelocity=inifile.value("driver/initvelocity", initVelocity).toDouble();
-    maxVelocity=inifile.value("driver/maxvelocity", maxVelocity).toDouble();
-
-    axes.clear();
-    for (int i=0; i<=15; i++) {
-        QString axisname=QString("axis%1").arg(i);
-        if (inifile.contains(axisname+"/id")) {
-            AxisDescription d;
-            QString s=inifile.value(axisname+"/id", '0').toString();
-            d.ID='0';
-            if (s.size()>0) d.ID=s[0];
-            d.velocity=initVelocity;
-            d.joystickEnabled=false;
-            d.state=QFExtensionLinearStage::Disconnected;
-            d.name=axisname;
-            d.label=inifile.value(axisname+"/label", tr("PI Mercury 863, axis %1").arg(i)).toString();
-            axes.append(d);
-        }
-    }
-
-    actCalibrateJoysticks=new QAction(QIcon(":/stage_pi/pi_joystick.png"), tr("calibrate PI stage joysticks, v2"), this);
-    connect(actCalibrateJoysticks, SIGNAL(triggered()), this, SLOT(calibrateJoysticks()));
-    if (services) {
-        QMenu* m=services->getMenu("extensions");
-        if (m) {
-            m->addAction(actCalibrateJoysticks);
-        }
-    }
-}
 
 void QFExtensionLinearStagePI2::loadSettings(ProgramOptions* settingspo) {
 	/* here you could read config information from the quickfit.ini file using settings object */

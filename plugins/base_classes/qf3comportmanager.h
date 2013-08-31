@@ -21,7 +21,7 @@ class QF3ComPortManager {
 
         void clear();
 
-        int addCOMPort(QSettings& settings, QString prefix=QString(""));
+        int addCOMPort(QSettings& settings, QString prefix=QString(""), int defaultSpeed=9600, JKSCdatabits databits=JKSC8databits,  JKSCparity parity=JKSCnoParity, JKSChandshaking handshaking=JKSCnoHandshaking, JKSCstopbits stopbits=JKSConeStopbit, int defaulttimeout=500);
         void storeCOMPort(int port, QSettings& settings, QString prefix=QString(""));
 
         JKSerialConnection* getCOMPort(int port) const;

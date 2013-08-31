@@ -18,12 +18,14 @@ HEADERS += stage_pi2.h \
            ../interfaces/qfextensionlinearstage.h \
            ../../../../../LIB/trunk/jkserialconnection.h \
     pimercury863calibrationdialog.h \
-    ../base_classes/qf3comportmanager.h
+    ../base_classes/qf3comportmanager.h \
+    qfextensionlinearstagepi2protocolhandler.h
 
 SOURCES += stage_pi2.cpp \
            ../../../../../LIB/trunk/jkserialconnection.cpp \
     pimercury863calibrationdialog.cpp \
-    ../base_classes/qf3comportmanager.cpp
+    ../base_classes/qf3comportmanager.cpp \
+    qfextensionlinearstagepi2protocolhandler.cpp
 
 FORMS =
 

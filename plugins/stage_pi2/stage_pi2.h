@@ -7,6 +7,8 @@
 #include "qfextension.h"
 #include "../interfaces/qfextensionlinearstage.h"
 #include "../../../../../LIB/trunk/jkserialconnection.h"
+#include "../base_classes/qf3comportmanager.h"
+#include "qfextensionlinearstagepi2protocolhandler.h"
 
 /*!
     \defgroup qf3ext_StagePI QFExtensionLinearStage implementation for PI mercury stages
@@ -14,7 +16,7 @@
 */
 
 /*! \brief QFExtensionLinearStage implementation for PI mercury stages
-    \ingroup qf3ext_StagePI
+    \ingroup qf3ext_StagePI2
  */
 class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public QFExtensionLinearStage {
         Q_OBJECT
@@ -122,17 +124,6 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
         virtual void log_error(QString message);
 
 
-        bool checkComConnected();
-
-        void selectAxis(int i);
-        /** \brief send a command to the Mercury controller (this automatically adds a command terminating character (carriage return) */
-        void sendCommand(std::string command);
-
-        /** \brief send a command to the Mercury controller (this automatically adds a command terminating character (carriage return)
-         *         and returns the result (the standard finishing sequence CR LF ETX will be cut from the string) */
-        std::string queryCommand(std::string command);
-        void checkComError();
-
     protected slots:
         void calibrateJoysticks();
 
@@ -141,12 +132,28 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
         QAction* actCalibrateJoysticks;
 
         struct AxisDescription {
+            AxisDescription() {
+                PTerm=150;
+                iTerm=45;
+                DTerm=300;
+                iLimit=2000;
+                acceleration=1000000;
+                maxVelocity=2000;
+                initVelocity=1000;
+                lengthFactor=6.9e-3;
+                velocityFactor=6.9e-3;
+                accelerationFactor=6.9e-3;
+            }
+
             /** \brief ID of the Mercury C-863 controller for the axis
              *
              * This contains the address character (!!!) of the controller in a daisy chain. The character is either
              * \c '0' ... \c '9' or \c 'A' ... \c 'F'
              */
              QChar ID;
+
+             int port;
+             QFExtensionLinearStagePI2ProtocolHandler* serial;
 
              QFExtensionLinearStage::AxisState state;
              /** \brief indicates whether the joystick is enabled or not */
@@ -156,44 +163,34 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
 
              QString name;
              QString label;
+             /** \brief settings of P-Term */
+             unsigned int PTerm;
+             /** \brief settings of i-Term */
+             unsigned int iTerm;
+             /** \brief settings of D-Term */
+             unsigned int DTerm;
+             /** \brief settings of i-Limit */
+             unsigned int iLimit;
+             /** \brief settings of acceleration */
+             double acceleration;
+             /** \brief the initial velocity of all axes */
+             double initVelocity;
+             /** \brief settings of max. velocity */
+             double maxVelocity;
+
+             /** \brief this factor is used to get the control electronics position from the position in micron, given in microns/unit */
+             double lengthFactor;
+
+             /** \brief this factor is used to get the control electronics velocity from the velocity in micron/sec, given in (micron/sec)/unit */
+             double velocityFactor;
+
+             /** \brief this factor is used to get the control electronics acceleration from the acceleration in micron/sec^2, given in (micron/sec^2)/unit */
+             double accelerationFactor;
         };
 
-        QChar currentID;
+        QF3ComPortManager ports;
 
         QVector<AxisDescription> axes;
-
-        /** \brief tty port */
-        QString COMPort;
-        /** \brief speed of com port */
-        int COMPortSpeed;
-        /** \brief serial connection object */
-        JKSerialConnection com;
-
-        QMutex* mutexSerial;
-        /** \brief settings of P-Term */
-        unsigned int PTerm;
-        /** \brief settings of i-Term */
-        unsigned int iTerm;
-        /** \brief settings of D-Term */
-        unsigned int DTerm;
-        /** \brief settings of i-Limit */
-        unsigned int iLimit;
-        /** \brief settings of acceleration */
-        double acceleration;
-        /** \brief the initial velocity of all axes */
-        double initVelocity;
-        /** \brief settings of max. velocity */
-        double maxVelocity;
-
-        /** \brief this factor is used to get the control electronics position from the position in micron, given in microns/unit */
-        double lengthFactor;
-
-        /** \brief this factor is used to get the control electronics velocity from the velocity in micron/sec, given in (micron/sec)/unit */
-        double velocityFactor;
-
-        /** \brief this factor is used to get the control electronics acceleration from the acceleration in micron/sec^2, given in (micron/sec^2)/unit */
-        double accelerationFactor;
-
 };
 
 #endif // STAGE_PI2_H

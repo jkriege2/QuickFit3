@@ -19,19 +19,18 @@ void QF3ComPortManager::clear()
     coms.clear();
 }
 
-
-int QF3ComPortManager::addCOMPort(QSettings& settings, QString prefix) {
+int QF3ComPortManager::addCOMPort(QSettings &settings, QString prefix, int defaultSpeed, JKSCdatabits defaultdatabits, JKSCparity defaultparity, JKSChandshaking defaulthandshaking, JKSCstopbits defaultstopbits, int defaulttimeout) {
 #ifdef Q_OS_WIN32
     QString port=settings.value(prefix+"port", "COM1").toString();
 #else
     QString port=settings.value(prefix+"port", "/dev/ttyS0").toString();
 #endif
-    int speed=settings.value(prefix+"port_speed", "9600").toInt();
-    JKSCdatabits databits=string2JKSCdatabits(settings.value(prefix+"port_databits", "8").toString().toStdString());
-    JKSCparity parity=string2JKSCparity(settings.value(prefix+"port_parity", "none").toString().toStdString());
-    JKSChandshaking handshaking=string2JKSChandshaking(settings.value(prefix+"port_handshaking", "none").toString().toStdString());
-    JKSCstopbits stopbits=string2JKSCstopbits(settings.value(prefix+"port_stopbits", "1").toString().toStdString());
-    unsigned int timeout=settings.value(prefix+"port_timeout", 500).toInt();
+    int speed=settings.value(prefix+"port_speed", defaultSpeed).toInt();
+    JKSCdatabits databits=string2JKSCdatabits(settings.value(prefix+"port_databits", JKSCdatabits2string(defaultdatabits).c_str()).toString().toStdString());
+    JKSCparity parity=string2JKSCparity(settings.value(prefix+"port_parity", JKSChandshaking2string(defaulthandshaking).c_str()).toString().toStdString());
+    JKSChandshaking handshaking=string2JKSChandshaking(settings.value(prefix+"port_handshaking", JKSCparity2string(defaultparity).c_str()).toString().toStdString());
+    JKSCstopbits stopbits=string2JKSCstopbits(settings.value(prefix+"port_stopbits", JKSCstopbits2string(defaultstopbits).c_str()).toString().toStdString());
+    unsigned int timeout=settings.value(prefix+"port_timeout", defaulttimeout).toInt();
 
     int portID=-1;
     for (int i=0; i<coms.size(); i++) {
