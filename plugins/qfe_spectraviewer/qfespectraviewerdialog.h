@@ -58,7 +58,7 @@ class QFESpectraViewerDialog : public QDialog
         void on_btnAddLightsource_clicked();
         void on_btnAddDetector_clicked();
         void on_btnDelete_clicked();
-        void spectrumSelected();
+        void spectrumSelected(bool force=false);
         void saveFromWidgets();
         void loadToWidgets();
         void updateItemPropertiesModel();
