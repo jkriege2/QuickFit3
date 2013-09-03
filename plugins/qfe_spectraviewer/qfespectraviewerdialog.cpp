@@ -293,13 +293,27 @@ void QFESpectraViewerDialog::on_btnDelete_clicked()
 {
     //JKAutoOutputTimer tim("on_btnDelete_clicked");
     if (currentIndex<0 || currentIndex>=plotItems.size()) return;
-    int delIdx=currentIndex;
+
+    QList<QListWidgetItem*> sel=ui->lstSpectra->selectedItems();
+    if (sel.size()>0) {
+        int delIdx=currentIndex;
+
+
+        for (int i=0; i<sel.size(); i++) {
+            delete sel[i];
+        }
+
+        if (plotItems.size()<=0) currentIndex=0;
+        if (delIdx>0 && delIdx<plotItems.size()) currentIndex=delIdx;
+    }
+
+    /*int delIdx=currentIndex;
     ui->lstSpectra->setCurrentRow(-1);
     QListWidgetItem* item=ui->lstSpectra->takeItem(delIdx);
     delete item;
     plotItems.removeAt(delIdx);
     if (plotItems.size()<=0) currentIndex=0;
-    if (delIdx>0 && delIdx<plotItems.size()) currentIndex=delIdx;
+    if (delIdx>0 && delIdx<plotItems.size()) currentIndex=delIdx;*/
 
     ui->lstSpectra->setCurrentRow(currentIndex);
     spectrumSelected();

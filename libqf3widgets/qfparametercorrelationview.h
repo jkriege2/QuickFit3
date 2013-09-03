@@ -28,6 +28,7 @@
 #include <QTextDocument>
 #include "libwid_imexport.h"
 #include "qfproperties.h"
+#include "jkqtptools.h"
 
 /*! \brief This class displays a correlation graph, i.e. it plots two parameters against each other
     \ingroup qf3rdrdp_imaging_fcs
@@ -138,7 +139,10 @@ protected:
     int connectParameterWidgetsCounter;
 
     /** \brief plotter widget for the parameter histogram */
-    QFPlotter* pltParamHistogram;
+    QFPlotter* pltParamCorrelation;
+
+    QFPlotter* pltParamHistogramX;
+    QFPlotter* pltParamHistogramY;
 
     QSpinBox* spinHistogramBins1;
     QSpinBox* spinHistogramBins2;
@@ -158,6 +162,9 @@ protected:
     QCheckBox* chkHistogramRangeAuto2;
     QFDoubleEdit* edtHistogramMin2;
     QFDoubleEdit* edtHistogramMax2;
+
+    JKQTPSymbolComboBox* cmbSymbol;
+    QSpinBox* spinSymbolSize;
 
 
 

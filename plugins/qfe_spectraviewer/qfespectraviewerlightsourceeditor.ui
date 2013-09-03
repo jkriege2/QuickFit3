@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -235,21 +235,22 @@
  </customwidgets>
  <tabstops>
   <tabstop>edtID</tabstop>
+  <tabstop>edtFolder</tabstop>
   <tabstop>edtName</tabstop>
   <tabstop>edtOrder</tabstop>
   <tabstop>edtManufacturer</tabstop>
   <tabstop>edtReference</tabstop>
   <tabstop>spinWavelength</tabstop>
   <tabstop>edtDescription</tabstop>
-  <tabstop>buttonBox</tabstop>
-  <tabstop>tabWidget</tabstop>
+  <tabstop>edtSpectrumReference</tabstop>
   <tabstop>btnLoadSpectrumFile</tabstop>
   <tabstop>btnPasteSpectrum</tabstop>
   <tabstop>btnDeleteRow</tabstop>
   <tabstop>btnDeleteColumn</tabstop>
   <tabstop>btnClearSpectrum</tabstop>
   <tabstop>tableView</tabstop>
-  <tabstop>edtSpectrumReference</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
   <include location="../../lib/lib.qrc"/>

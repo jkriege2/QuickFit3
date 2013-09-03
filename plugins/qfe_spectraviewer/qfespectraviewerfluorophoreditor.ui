@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -468,6 +468,7 @@
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>edtID</tabstop>
+  <tabstop>edtFolder</tabstop>
   <tabstop>edtName</tabstop>
   <tabstop>edtOrder</tabstop>
   <tabstop>edtManufacturer</tabstop>
@@ -481,21 +482,21 @@
   <tabstop>spinLifetime</tabstop>
   <tabstop>edtCondition</tabstop>
   <tabstop>edtDescription</tabstop>
-  <tabstop>buttonBox</tabstop>
-  <tabstop>btnLoadSpectrumFile</tabstop>
-  <tabstop>btnPasteSpectrum</tabstop>
+  <tabstop>edtSpectrumReference</tabstop>
+  <tabstop>edtSpectrumReference_2</tabstop>
   <tabstop>btnDeleteRow</tabstop>
   <tabstop>btnDeleteColumn</tabstop>
   <tabstop>btnClearSpectrum</tabstop>
   <tabstop>tableView</tabstop>
-  <tabstop>edtSpectrumReference</tabstop>
+  <tabstop>btnLoadSpectrumFile</tabstop>
   <tabstop>btnLoadSpectrumFile_2</tabstop>
   <tabstop>btnPasteSpectrum_2</tabstop>
   <tabstop>btnDeleteRow_2</tabstop>
   <tabstop>btnDeleteColumn_2</tabstop>
   <tabstop>btnClearSpectrum_2</tabstop>
   <tabstop>tableView_2</tabstop>
-  <tabstop>edtSpectrumReference_2</tabstop>
+  <tabstop>btnPasteSpectrum</tabstop>
+  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
   <include location="../../lib/lib.qrc"/>
