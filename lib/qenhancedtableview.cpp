@@ -914,6 +914,13 @@ void QEnhancedTableView::print(QPrinter *printer, bool onePageWide, bool onePage
 
 void QEnhancedTableView::paint(QPainter &painter, QRect pageRect)
 {
+    QFHTMLDelegate* htmld=dynamic_cast<QFHTMLDelegate*>(itemDelegate());
+    bool oldP=false;
+    if (htmld) {
+        oldP=htmld->getPrintMode();
+        htmld->setPrintMode(true);
+    }
+
     QRect pageRec=pageRect;
     if (pageRec.width()==0 || pageRec.height()==0) pageRec=QRect(QPoint(0,0), getTotalSize().toSize());
     painter.save();
@@ -929,6 +936,10 @@ void QEnhancedTableView::paint(QPainter &painter, QRect pageRect)
     pageRows<<0<<model()->rowCount();
     paint(painter, scale, -1, hhh, vhw, pageCols, pageRows);
     painter.restore();
+
+    if (htmld) {
+        htmld->setPrintMode(oldP);
+    }
 }
 
 QSizeF QEnhancedTableView::getTotalSize() const

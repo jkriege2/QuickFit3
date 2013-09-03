@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>QuickFit $$version$$ Online-Help: User-defined fit functions</title>
+</head>
+<body>
+$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+<h2>Introduction</h2>
+<p>
+In addition to the fit functions available as plugins (i.e. implemented in and 
+compiled from C++), it is possible to define simple fit functions by simply making 
+the expression known to QuickFit. These fit functions do not support all features 
+that are possible with compiled functions (e.g. currently you can not define additional plots
+or calculated parameters), but the basic functionality of evaluating a function 
+$$math:f(x;\vec{p})$$ depending on one "running" variable $$math:x$$ and a vector/set
+of parameters $$math:\vec{p}$$ is implemented.
+</p>
+<h2>Defining Fit Functions</h2>
+<p>Each fit function is stored in a file ending on <tt>.qff</tt>, stored (initially) in
+the directory <tt>$$configdir$$/userfitfunctions</tt> and <tt>$$assetsdir$$/userfitfunctions</tt>. </p>
+
+$$note:The directory where QuickFit searches for user-defined fit functions can be changed in the <a href="qf3_settings.html"> application settings dialog</a>.$$
+
+
+<p>We will now create a fit function for $$math:f(x; o, A, X_0)=o+A\cdot(x-X_0)^2$$:
+<ol>
+  <li>In one of these directories, you will have to create a new text file for your fit function, e.g. <tt>parabola.qff</tt>. </li>
+  <li>The file should have a contents like this:<br>
+<blockquote><tt>
+[function]<br>
+id="general_parabola"<br>
+name="General: Parabola" <br>
+short_name="parabola"<br>
+expression="offset+amplitude*(x-center)^2"<br>
+param_count=3;<br>
+<br>
+<br>
+[parameter1]<br>
+id="offset"<br>
+name="offset"<br>
+label="offset"<br>
+unit=<br>
+unit_html=<br>
+init_value=0<br>
+init_fix=false<br>
+min=-10<br>
+max=10<br>
+<br>
+<br>
+[parameter2]<br>
+id="amplitude"<br>
+init_value=1<br>
+<br>
+<br>
+[parameter3]<br>
+id="center"<br>
+label="X&lt;sub&gt;0&lt;/sub&gt;"
+init_value=0<br>
+init_fix=false
+</tt></blockquote>
+</li>
+  <li>The basic parameters of the fit functions will be defined in the <tt>[function]</tt> block:<ul> 
+    <li><small><b>(required):</b></small>&nbsp;&nbsp;&nbsp;Each fit function needs a unique ID (here <tt>general_parabola</tt>), which is internally used to identify it. If two fit functions have the same ID, the last one to be read will be used. Also plugin fit functions superseed user-defined fit functions!</li>
+    <li>Then you can give a human-readable name, here <tt>"General: Parabola"</tt></li>
+    <li>You can also give a shortened name, which is used in some places of QuickFit, but this is strictly optional.</li>
+    <li><small><b>(required):</b></small>&nbsp;&nbsp;&nbsp;The expression is noted behind <tt>expression</tt> using the syntax of <a href="mathparser.html">QuickFit's expression parser</a>. 
+        $$note: Not all expressions are supported: e.g. the expression should retunr a single number (no vectors)$$</li>
+    <li><small><b>(required):</b></small>&nbsp;&nbsp;&nbsp;Finally you will have to define the number of parameters in $$math:\vec{p}$$ (here <tt>3</tt>) as <tt>param_count</tt></li>
+  <ul>
+  </ul></li>
+  <li>Then you have to define the properties of each fit parameter. For each parameter, generate a section <tt>[parameter</tt><i>N</i><tt>]</tt>, where <i>N</i> is a 1-based, increasing number. Here we have the sections <tt>[parameter1], [parameter2]</tt> and <tt>[parameter3]</tt>. In each section you can define these properties:
+    <ul>
+        <li><small><b>(required):</b></small>&nbsp;<tt>id:</tt>&nbsp;&nbsp;The internal parameter ID, e.g. <tt>offset</tt> for $$math:o$$, <tt>amplitude</tt> for $$math:A$$ and <tt>center</tt> for $$math:X_0$$.</li>
+        <li><tt>name:</tt> a human-readable name without markup</li>
+        <li><tt>label:</tt> a human-readable name, using HTML markup for formating, e.g. <tt>X&lt;sub&gt;0&lt;/sub&gt;</tt></li>
+        <li><tt>unit:</tt> a unit in which the parameter is measured (e.g. <tt>m^2/s</tt>)</li>
+        <li><tt>unit_html:</tt> a unit in which the parameter is measured, using HTML markup (e.g. <tt>m&lt;sup&gt;2&lt;/sup&gt;/s</tt>)</li>
+        <li><tt>fit</tt> <i>= (true|false)</i>: is this a fit parameter? (default: true)</li>
+        <li><tt>editable</tt> <i>= (true|false)</i>: indicates whether the parameter is user-editable (default: <tt>true</tt>)</tt>
+        <li><tt>init_value:</tt> initial value of the parameter (default: 0)</tt>
+        <li><tt>init_fix</tt> <i>= (true|false)</i>: indicates whether the parameter is initialy fixed (default: <tt>false</tt>)</tt>
+        <li><tt>inc:</tt> increment for parameter input widgets (default: 1)</li>
+        <li><tt>min:</tt> lower end of the parameter's range (default: largest possible negative number). The user may be able to change this in some fit dialog!</li>
+        <li><tt>max:</tt> upper end of the parameter's range (default: largest possible positive number). The user may be able to change this in some fit dialog!</li>
+        <li><tt>abs_min:</tt> lower end of the absolute parameter's range (default: largest possible negative number). The use cannot change this!</li>
+        <li><tt>abs_max:</tt> upper end of the absolute parameter's range (default: largest possible positive number). The use cannot change this!</li>
+        <li><tt>type</tt> <i>= (<u>float</u>|log|int_combo|int)</i> type of the parameter input widget (float is a normal number input widget, log is a number input widget for logarithmic scaling, int_combo is a combobox which allows to select an integer and int is a spinbox, which allows to enter an integer)</li>
+    </ul></li>
+</ol>
+</body>
+</html>
+ 

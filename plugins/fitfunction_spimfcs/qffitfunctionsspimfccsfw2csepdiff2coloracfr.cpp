@@ -57,6 +57,10 @@ QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorACFR::QFFitFunctionsSPIMFCCSFW2CSepDiff2C
     addParameter(FloatNumber,  "brightness_b",             "molar brightness of fluorophore on B",           "&eta;<sub>b</sub>",            "counts/nM",           "counts/nM",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
     #define FCCSDiff_brightness_b 23
 
+    addParameter(FloatNumber,  "molbrightness_a",             "molecular brightness of fluorophore on A",           "CPM<sub>a</sub>",            "cpm",           "cpm",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
+    #define FCCSDiff_molbrightness_a 24
+    addParameter(FloatNumber,  "molbrightness_b",             "molecular brightness of fluorophore on B",           "CPM<sub>b</sub>",            "cpm",           "cpm",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
+    #define FCCSDiff_molbrightness_b 25
 }
 
 
@@ -129,10 +133,10 @@ void QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorACFR::calcParameter(double* data, do
 //    const double dz=data[FCCSDiff_focus_distancez]/1000.0;
 //    double edz=0;
 
-    //const double wzG=data[FCCSDiff_focus_height1]/1.0e3;
-    //double ewzG=0;
-    //const double wxyG=data[FCCSDiff_focus_width1]/1.0e3;
-    //double ewxyG=0;
+    const double wzG=data[FCCSDiff_focus_height1]/1.0e3;
+    double ewzG=0;
+    const double wxyG=data[FCCSDiff_focus_width1]/1.0e3;
+    double ewxyG=0;
 
     const double wzR=data[FCCSDiff_focus_height2]/1.0e3;
     double ewzR=0;
@@ -142,8 +146,8 @@ void QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorACFR::calcParameter(double* data, do
     const double a=data[FCCSDiff_pixel_width]/1.0e3;
     double ea=0;
 
-//    const double offset=data[FCCSDiff_offset];
-//    double eoffset=0;
+    const double offset=data[FCCSDiff_offset];
+    double eoffset=0;
 
     const double kappa=data[FCCSDiff_crosstalk];
     double ekappa=0;
@@ -166,8 +170,8 @@ void QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorACFR::calcParameter(double* data, do
 //        edx=error[FCCSDiff_focus_distancex]/1000.0;
 //        edy=error[FCCSDiff_focus_distancey]/1000.0;
 //        edz=error[FCCSDiff_focus_distancez]/1000.0;
-        //ewzG=error[FCCSDiff_focus_height1]/1.0e3;
-        //ewxyG=error[FCCSDiff_focus_width1]/1.0e3;
+        ewzG=error[FCCSDiff_focus_height1]/1.0e3;
+        ewxyG=error[FCCSDiff_focus_width1]/1.0e3;
         ewzR=error[FCCSDiff_focus_height2]/1.0e3;
         ewxyR=error[FCCSDiff_focus_width2]/1.0e3;
         ea=error[FCCSDiff_pixel_width]/1.0e3;
@@ -178,16 +182,22 @@ void QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorACFR::calcParameter(double* data, do
         ebackground2=error[FCCSDiff_background2];
         ecr2=error[FCCSDiff_count_rate2];
     }
-    //data[FCCSDiff_brightness_a]=(cr1-background1)/(ca+cab);
-    //if (error) error[FCCSDiff_brightness_a]=0;
+    data[FCCSDiff_brightness_a]=(cr1-background1)/(ca+cab);
+    if (error) error[FCCSDiff_brightness_a]=0;
     data[FCCSDiff_brightness_b]=(cr2-background2-kappa*(cr1-background1))/(cb+cab);
     if (error) error[FCCSDiff_brightness_b]=0;
 
-    //data[FCSSDiff_focus_volume1]=SPIMFCS_newVeff(a, wxyG, wzG);
-    //if (error) error[FCSSDiff_focus_volume1]=SPIMFCS_newVeffError(a, ea, wxyG, ewxyG, wzG, ewzG);
+    data[FCSSDiff_focus_volume1]=SPIMFCS_newVeff(a, wxyG, wzG);
+    if (error) error[FCSSDiff_focus_volume1]=SPIMFCS_newVeffError(a, ea, wxyG, ewxyG, wzG, ewzG);
 
     data[FCSSDiff_focus_volume2]=SPIMFCS_newVeff(a, wxyR, wzR);
     if (error) error[FCSSDiff_focus_volume2]=SPIMFCS_newVeffError(a, ea, wxyR, ewxyR, wzR, ewzR);
+
+    data[FCCSDiff_molbrightness_a]=data[FCCSDiff_brightness_a]/(QF_NAVOGADRO*1e-24*data[FCSSDiff_focus_volume1]);
+    if (error) error[FCCSDiff_molbrightness_a]=0;
+    data[FCCSDiff_molbrightness_b]=data[FCCSDiff_brightness_b]/(QF_NAVOGADRO*1e-24*data[FCSSDiff_focus_volume2]);
+    if (error) error[FCCSDiff_molbrightness_b]=0;
+
 }
 
 bool QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorACFR::isParameterVisible(int parameter, const double* data) const {

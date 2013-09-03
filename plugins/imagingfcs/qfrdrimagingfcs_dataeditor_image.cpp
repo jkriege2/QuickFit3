@@ -4943,7 +4943,10 @@ void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *c
                 }
                 corrView->updateCorrelation(true);
             }
-        } else corrView->addCorrelation(tr("complete"), cd1, cd2, datasize, false);
+        } else {
+            corrView->clear();
+            corrView->addCorrelation(tr("complete"), cd1, cd2, datasize, false);
+        }
 
     } else {
         corrView->clear();
@@ -4995,6 +4998,7 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
     if (dv) histogram_2->updateHistogram(true);
     histogram2->updateHistogram(true);
     if (dv) histogram2_2->updateHistogram(true);
+    corrView->updateCorrelation(true);
 
 }
 
@@ -5012,7 +5016,7 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
     updateHistogram(histogram2, m, pltParamImage2->getData(), pltParamImage2->getDataSize(), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, true);
     histogram2->setHistogramXLabel(cmbParameter2->currentText());
 
-    updateCorrelation(corrView, m, pltImage->getData(), pltParamImage2->getData(), qMin(pltImage->getDataSize(), pltParamImage2->getDataSize()), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false, cmbCorrelationDisplayMode->currentIndex(), spinCorrelationChannel->value(), cmbParameter->currentText(), cmbParameter2->currentText());
+    updateCorrelation(corrView, m, pltImage->getData(), pltParamImage2->getData(), qMin(pltImage->getDataSize(), pltParamImage2->getDataSize()), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, true, cmbCorrelationDisplayMode->currentIndex(), spinCorrelationChannel->value(), cmbParameter->currentText(), cmbParameter2->currentText());
 
     if (dv) {
 

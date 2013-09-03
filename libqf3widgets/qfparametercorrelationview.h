@@ -82,30 +82,6 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
         void addSettingsWidget(const QString& label, QWidget* widget);
 
 
-        int getHistBins1() const;
-        void setHistBins1(int bins);
-
-        int getHistBins2() const;
-        void setHistBins2(int bins);
-
-
-        bool getAutorange1() const;
-        void setAutorange1(bool autorange);
-
-        bool getAutorange2() const;
-        void setAutorange2(bool autorange);
-
-        double getMin1() const;
-        void setMin1(double min);
-
-        double getMax1() const;
-        void setMax1(double max);
-
-        double getMin2() const;
-        void setMin2(double min);
-
-        double getMax2() const;
-        void setMax2(double max);
 
         void clear();
         /** \brief add a histogram for the given dataset, copies the data to this widget, if \c external=false */
@@ -129,6 +105,7 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
         void settingsChanged();
     public slots:
         void dataSettingsChanged(bool update=true);
+        void showPlotPosition(double x, double y);
 
 protected:
 
@@ -173,6 +150,8 @@ protected:
     QString histLabelY;
     QVBoxLayout* laySplitterTable;
     QGridLayout* layHist;
+
+    QLabel* labPlotPos;
 
     
 };

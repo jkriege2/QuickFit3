@@ -888,7 +888,7 @@ class QFLIB_EXPORT QFMathParser
         class qfmpNode; // forward
 
         struct QFLIB_EXPORT ByteCodeEnvironment {
-                ByteCodeEnvironment(QFMathParser* parser);
+                ByteCodeEnvironment(QFMathParser* parser=NULL);
 
                 void init(QFMathParser* parser);
 

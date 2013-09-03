@@ -31,6 +31,11 @@ void QFHTMLDelegate::setPrintMode(bool enabled)
     m_printMode=enabled;
 }
 
+bool QFHTMLDelegate::getPrintMode() const
+{
+    return m_printMode;
+}
+
 bool QFHTMLDelegate::displayRichTextEditor() const {
     return m_displayRichTextEditor;
 }

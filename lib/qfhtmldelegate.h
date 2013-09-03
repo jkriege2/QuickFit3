@@ -19,6 +19,7 @@ class QFLIB_EXPORT QFHTMLDelegate : public QStyledItemDelegate {
         virtual ~QFHTMLDelegate();
 
         void setPrintMode(bool enabled);
+        bool getPrintMode() const;
 
         bool displayRichTextEditor() const;
         void setDisplayRichTextEditor(bool d);

@@ -2,17 +2,59 @@
 #include <QDir>
 #include <QtPlugin>
 #include <QPluginLoader>
+#include "qffitfunctionparsed.h"
 
 QFFitFunctionManager::QFFitFunctionManager(ProgramOptions* options, QObject* parent):
     QObject(parent)
 {
     m_options=options;
     mutex=new QMutex();
+    reloadUserFitFunctions();
 }
 
 QFFitFunctionManager::~QFFitFunctionManager()
 {
     delete mutex;
+}
+
+void QFFitFunctionManager::reloadUserFitFunctions()
+{
+    QMutexLocker locker(mutex);
+
+    QMap<QString, QString> userFF;
+
+    for (int d=0; d<2; d++ ) {
+        QString userffDir;
+        if (d==0) userffDir=QFPluginServices::getInstance()->getAssetsDirectory()+"/userfitfunctions/";
+        if (d==1) userffDir=ProgramOptions::getInstance()->getConfigValue("quickfit/user_fitfunctions", QFPluginServices::getInstance()->getConfigFileDirectory()+"/userfitfunctions/").toString();
+        QDir dir(userffDir);
+        emit showLongMessage(tr("searching in directory '%1' for user fit functions:").arg(userffDir));
+        if (dir.exists()) {
+            QStringList ff=dir.entryList(QStringList("*.qff"), QDir::Files);
+            for (int i=0; i<ff.size(); i++) {
+                QString fn=dir.absoluteFilePath(ff[i]);
+                QSettings set(fn, QSettings::IniFormat);
+                //qDebug()<<set.allKeys().join("\n")<<"\n\n";
+                QString id=set.value("function/id", "").toString();
+                if (!id.isEmpty()) {
+                    QString isOK=tr("OK");
+                    QFFitFunctionParsed* f=new QFFitFunctionParsed(fn);
+                    if (!f->isValid()) {
+                        isOK=tr("INVALID\n         ")+f->getErrors();
+                    }
+                    emit showLongMessage(tr("    * adding function %1 from '%2' ... %3").arg(id).arg(fn).arg(isOK));
+                    if (f->isValid()) {
+                        userFF[id]=fn;
+                    }
+                } else {
+                    emit showLongMessage(tr("    * no ID found in '%1'").arg(fn));
+                }
+            }
+        }
+    }
+
+    userFitFunctions=userFF;
+    emit fitFunctionsChanged();
 }
 
 void QFFitFunctionManager::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData>& tooltips) {
@@ -68,6 +110,9 @@ void QFFitFunctionManager::searchPlugins(QString directory, QList<QFPluginServic
             }
         }
     }
+
+    reloadUserFitFunctions();
+
 }
 
 
@@ -84,6 +129,15 @@ QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start, 
         }
     }
 
+    QMap<QString, QString>::const_iterator it;
+    for (it=userFitFunctions.begin(); it!=userFitFunctions.end(); ++it) {
+        if (id_start.isEmpty() || it.key().startsWith(id_start)) {
+            QFFitFunctionParsed* f=new QFFitFunctionParsed(it.value());
+            if ( f && f->isValid() && !res.contains(it.key())) res[it.key()]=f;
+            else if (f) delete f;
+        }
+    }
+
     return res;
 }
 
@@ -94,6 +148,13 @@ QFFitFunction *QFFitFunctionManager::createFunction(QString ID, QObject *parent)
         if (ids.contains(ID)) {
             return fitPlugins[i]->get(ID, parent);
         }
+    }
+
+    if (userFitFunctions.contains(ID)) {
+        QFFitFunctionParsed* f=new QFFitFunctionParsed(userFitFunctions[ID]);
+        if (f->isValid()) return f;
+        delete f;
+        return NULL;
     }
     return NULL;
 }
@@ -142,7 +203,7 @@ bool QFFitFunctionManager::contains(const QString &ID)
 {
     for (int i=0; i<fitPlugins.size(); i++)
         if (fitPlugins[i]->getID()==ID) return true;
-    return false;
+    return userFitFunctions.contains(ID);
 }
 
 QObject *QFFitFunctionManager::getPluginObject(int i) const

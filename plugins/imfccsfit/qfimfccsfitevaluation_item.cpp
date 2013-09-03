@@ -15,7 +15,8 @@ QFImFCCSMatchRDRFunctor::QFImFCCSMatchRDRFunctor()
 
 bool QFImFCCSMatchRDRFunctor::matches(const QFRawDataRecord *record) const
 {
-    return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
+
+    return record && record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
 }
 
 QFImFCCSFitEvaluationItem::QFImFCCSFitEvaluationItem(QFProject* parent):

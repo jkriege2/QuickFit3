@@ -40,9 +40,10 @@ QFFitFunctionsSPIMFCCSFW2CDiff2ColorACFG::QFFitFunctionsSPIMFCCSFW2CDiff2ColorAC
     #define FCCSDiff_count_rate1 16
     addParameter(FloatNumber,  "background1",              "background count rate green, during measurement",           "B<sub>g</sub>",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
     #define FCCSDiff_background1 17
-    addParameter(FloatNumber,  "brightness_a",             "molar brightness of fluorophore on A",           "&eta;<sub>a</sub>",            "counts/nM",           "counts/nM",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
+    addParameter(FloatNumber,  "brightness_a",             "molar brightness of fluorophore on A",           "CPM<sub>a</sub>",            "counts/nM",           "counts/nM",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
     #define FCCSDiff_brightness_a 18
-
+    addParameter(FloatNumber,  "molbrightness_a",             "molecular brightness of fluorophore on A",           "CPM<sub>a</sub>",            "cpm",           "cpm",    false,      false,          false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e-50,     1     );
+    #define FCCSDiff_molbrightness_a 19
 }
 
 
@@ -176,6 +177,9 @@ void QFFitFunctionsSPIMFCCSFW2CDiff2ColorACFG::calcParameter(double* data, doubl
 
     data[FCSSDiff_focus_volume]=SPIMFCS_newVeff(a, wxyG, wzG);
     if (error) error[FCSSDiff_focus_volume]=SPIMFCS_newVeffError(a, ea, wxyG, ewxyG, wzG, ewzG);
+
+    data[FCCSDiff_molbrightness_a]=data[FCCSDiff_brightness_a]/(QF_NAVOGADRO*1e-24*data[FCSSDiff_focus_volume]);
+    if (error) error[FCCSDiff_molbrightness_a]=0;
 }
 
 bool QFFitFunctionsSPIMFCCSFW2CDiff2ColorACFG::isParameterVisible(int parameter, const double* data) const {

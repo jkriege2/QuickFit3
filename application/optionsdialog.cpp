@@ -1,11 +1,14 @@
 #include "optionsdialog.h"
 #include "qfpluginservices.h"
 #include <iostream>
+#include "qfstyledbutton.h"
 
 OptionsDialog::OptionsDialog(QWidget* parent):
     QDialog(parent)
 {
     setupUi(this);
+    QFStyledButton* btn=new QFStyledButton(QFStyledButton::SelectDirectory, edtUserFitFunctions, edtUserFitFunctions);
+    edtUserFitFunctions->addButton(btn);
 }
 
 OptionsDialog::~OptionsDialog()
@@ -84,6 +87,7 @@ void OptionsDialog::open(ProgramOptions* options) {
     edtProxyHost->setText(options->getProxyHost());
     cmbProxyType->setCurrentIndex(qBound(0,options->getProxyType(),2));
     chkUpdates->setChecked(options->getConfigValue("quickfit/checkupdates", true).toBool());
+    edtUserFitFunctions->setText(options->getConfigValue("quickfit/user_fitfunctions", QFPluginServices::getInstance()->getConfigFileDirectory()+"/userfitfunctions/").toString());
 
 
     // find all available stylesheets
@@ -116,7 +120,9 @@ void OptionsDialog::open(ProgramOptions* options) {
         options->setProxyPort(spinProxyPort->value());
         options->setProxyType(cmbProxyType->currentIndex());
         options->setConfigValue("quickfit/checkupdates", chkUpdates->isChecked());
-
+        options->setConfigValue("quickfit/user_fitfunctions", edtUserFitFunctions->text());
+        QDir dir(edtUserFitFunctions->text());
+        if (!dir.exists()) dir.mkpath(dir.absolutePath());
         for (int i=0; i<m_plugins.size(); i++) {
             m_plugins[i]->writeSettings(options);
         }

@@ -19,10 +19,12 @@ QFRDRImagingFCSMaskByIntensity::QFRDRImagingFCSMaskByIntensity(QWidget *parent) 
     ui->pltMain->addGraph(plteMask);
     min=max=0;
 
-    ui->cmbMaskingMode->setCurrentIndex(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskByIntensity/maskingmode",1).toInt());
+    ui->cmbMaskingMode->setCurrentIndex(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskByIntensity/maskingmode",2).toInt());
     ui->cmbMaskMode->setCurrentIndex(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskByIntensity/maskmode", 0).toInt());
     ui->chkEqualChannels->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskByIntensity/channelsequal", true).toBool());
     loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "QFRDRImagingFCSMaskByIntensity/pos");
+    updateDualView();
+    updateEnabledWidgets();
 }
 
 QFRDRImagingFCSMaskByIntensity::~QFRDRImagingFCSMaskByIntensity() {
@@ -244,17 +246,10 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel2->setRange(min-10.0, max+10.0);
             ui->edtLevel2_2->setRange(min-10.0, max+10.0);
 
-            ui->edtLevel_2->setValue(min+0.2*(max-min));
+            ui->edtLevel2->setValue(min+0.2*(max-min));
             ui->edtLevel2_2->setValue(max);
 
-            /*ui->edtLevel->setRange(min, max);
-            ui->edtLevel->setValue(0);
-            ui->edtLevel2->setRange(min, max);
-            ui->edtLevel2->setValue(0);
-            ui->edtLevel_2->setRange(min, max);
-            ui->edtLevel_2->setValue(min+0.2*(max-min));
-            ui->edtLevel2_2->setRange(min, max);
-            ui->edtLevel2_2->setValue(min+0.2*(max-min));*/
+
         } else if (ui->cmbDualView->currentIndex()==1) {
             bool first=true, first2=true;
             for (uint16_t i=1; i<m_width*m_height; i++) {
@@ -291,7 +286,7 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel2->setRange(min2-10.0, max2+10.0);
             ui->edtLevel2_2->setRange(min2-10.0, max2+10.0);
 
-            ui->edtLevel_2->setValue(min2+0.2*(max2-min2));
+            ui->edtLevel2->setValue(min2+0.2*(max2-min2));
             ui->edtLevel2_2->setValue(max2);
 
         } else if (ui->cmbDualView->currentIndex()==2) {
@@ -330,7 +325,7 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel2->setRange(min2-10.0, max2+10.0);
             ui->edtLevel2_2->setRange(min2-10.0, max2+10.0);
 
-            ui->edtLevel_2->setValue(min2+0.2*(max2-min2));
+            ui->edtLevel2->setValue(min2+0.2*(max2-min2));
             ui->edtLevel2_2->setValue(max2);
         }
     }

@@ -156,6 +156,11 @@
         <normaloff>:/quickfit3/optionsdlg_icons/debugging.png</normaloff>:/quickfit3/optionsdlg_icons/debugging.png</iconset>
       </property>
      </item>
+     <item>
+      <property name="text">
+       <string>User Content</string>
+      </property>
+     </item>
     </widget>
    </item>
    <item row="0" column="1">
@@ -174,7 +179,7 @@
        <item>
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>5</number>
          </property>
          <widget class="QWidget" name="page_2">
           <layout class="QFormLayout" name="formLayout_6">
@@ -529,6 +534,36 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="page_3">
+          <layout class="QFormLayout" name="formLayout_7">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_16">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>user fitfunctions folder:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QFEnhancedLineEdit" name="edtUserFitFunctions"/>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLabel" name="label_15">
+             <property name="text">
+              <string>&lt;b&gt;Note:&lt;/b&gt; If you change the user database and have already save some data in there, remember to also copy the old file to the new location!</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>
@@ -537,6 +572,13 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFEnhancedLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfenhancedlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>cmbLanguage</tabstop>
  </tabstops>

@@ -27,6 +27,8 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         /** Default destructor */
         virtual ~QFFitFunctionManager();
 
+        void reloadUserFitFunctions();
+
         /** \brief return a list of all implemented IDs */
         QStringList getIDList(int i) const ;
 
@@ -109,7 +111,10 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         /** \brief long message reporting the loaded plugins, emitted during searchPlugins() */
         void showLongMessage(const QString& message);
 
+        void fitFunctionsChanged();
+
     private:
+        QMap<QString, QString> userFitFunctions;
         QList<QFPluginFitFunction*> fitPlugins;
         QList<QObject*> fitPluginObjects;
         QStringList filenames;
