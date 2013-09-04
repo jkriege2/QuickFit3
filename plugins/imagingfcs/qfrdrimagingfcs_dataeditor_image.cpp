@@ -3052,6 +3052,9 @@ void QFRDRImagingFCSImageEditor::replotData() {
                 double C0=qfstatisticsAverage(CACF0);
                 double C1=qfstatisticsAverage(CACF1);
                 double CC=qfstatisticsAverage(CCCF);
+                double ncC0=C0;
+                double ncC1=C1;
+                double ncCC=CC;
 
                 qfFCCSCrosstalkCorrection(C0, C1, CC, I0, I1, crosstalk,cmbCrosstalkDirection->currentIndex());
                 double CCFLevel=CC;
@@ -3064,15 +3067,15 @@ void QFRDRImagingFCSImageEditor::replotData() {
                     ACFColor=QColor("darkred");
                     ACFLevel=C1;
                     if (cmbCrosstalkMode->currentIndex()==1) {
-                        CCFLevel=CC-CCFLevel;
-                        ACFLevel=C1-ACFLevel;
+                        CCFLevel=ncCC-CCFLevel;
+                        ACFLevel=ncC1-ACFLevel;
                     }
                 } else { // ACF 1 -> 0  => correct ACF0
                     ACFColor=QColor("darkgreen");
                     ACFLevel=C0;
                     if (cmbCrosstalkMode->currentIndex()==1) {
-                        CCFLevel=CC-CCFLevel;
-                        ACFLevel=C0-ACFLevel;
+                        CCFLevel=ncCC-CCFLevel;
+                        ACFLevel=ncC0-ACFLevel;
                     }
                 }
                 /*qDebug()<<"I0="<<I0;
