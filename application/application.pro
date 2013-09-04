@@ -43,7 +43,8 @@ HEADERS += mainwindow.h \
     dlgselectprojectsubset.h \
     dlgfixfilepaths.h \
     renamegroupsdialog.h \
-    dlgsetrdrpropertybyregexp.h
+    dlgsetrdrpropertybyregexp.h \
+    userfitfunctionseditor.h
 
 SOURCES += main.cpp \
            mainwindow.cpp \
@@ -56,7 +57,8 @@ SOURCES += main.cpp \
     dlgselectprojectsubset.cpp \
     dlgfixfilepaths.cpp \
     renamegroupsdialog.cpp \
-    dlgsetrdrpropertybyregexp.cpp
+    dlgsetrdrpropertybyregexp.cpp \
+    userfitfunctionseditor.cpp
 
 FORMS =    optionsdialog.ui \
            about.ui \
@@ -68,7 +70,8 @@ FORMS =    optionsdialog.ui \
     dlgselectprojectsubset.ui \
     dlgfixfilepaths.ui \
     renamegroupsdialog.ui \
-    dlgsetrdrpropertybyregexp.ui
+    dlgsetrdrpropertybyregexp.ui \
+    userfitfunctionseditor.ui
 
 RESOURCES += quickfit3.qrc
 

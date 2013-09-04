@@ -17,6 +17,10 @@ class QFWIDLIB_EXPORT QFFitFunctionComboBox : public QComboBox
     public slots:
         void updateFitFunctions(const QString& filter=QString(""));
         void setCurrentFitFunction(const QString& id);
+    protected slots:
+        void reloadFitFunctions();
+    protected:
+        QString m_filter;
 
 };
 

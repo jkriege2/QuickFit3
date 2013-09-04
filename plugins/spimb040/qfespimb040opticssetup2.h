@@ -321,10 +321,12 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
             QString dualview;
         };
         QMap<QString, CameraWidgets> ui_cameras;
+        QMap<int, QString> ui_camindexes;
 
         QMap<QString, QFESPIMB040SampleStageConfig*> ui_stageconfigs;
         QMap<QString, QFStageConfigWidget*> ui_stages;
         QMap<QString, QFFilterChangerConfigWidget*> ui_filterchangers;
+        QFFilterChangerConfigWidget* filtercDetection;
         QMap<QString, QFShutterConfigWidget*> ui_shutter;
         QStringList shutterIndex;
 
@@ -366,6 +368,7 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         friend void loadValueSettingsForAllInMap(T map_begin, T map_end, QSettings& settings, const QString& prefix);
         template <class T>
         friend void saveValueSettingsForAllInMap(T map_begin, T map_end, QSettings& settings, const QString& prefix);
+
 
 
 

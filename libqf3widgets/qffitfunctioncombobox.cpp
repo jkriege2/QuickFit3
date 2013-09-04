@@ -5,6 +5,7 @@ QFFitFunctionComboBox::QFFitFunctionComboBox(QWidget *parent) :
     QComboBox(parent)
 {
     updateFitFunctions("");
+    connect(QFFitFunctionManager::getInstance(), SIGNAL(fitFunctionsChanged()), this, SLOT(reloadFitFunctions()));
 }
 
 QString QFFitFunctionComboBox::currentFitFunctionID() const
@@ -25,8 +26,16 @@ void QFFitFunctionComboBox::setCurrentFitFunction(const QString &id)
     else setCurrentIndex(0);
 }
 
+void QFFitFunctionComboBox::reloadFitFunctions()
+{
+    QString id=currentFitFunctionID();
+    updateFitFunctions(m_filter);
+    setCurrentFitFunction(id);
+}
+
 void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
 {
+    m_filter=filter;
     QFFitFunctionManager* manager=QFFitFunctionManager::getInstance();
     bool upd=updatesEnabled();
     setUpdatesEnabled(false);

@@ -105,6 +105,8 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
             return NULL;
         }
 
+        QStringList getUserFitFunctionIDs() const;
+
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

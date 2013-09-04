@@ -96,6 +96,13 @@ void saveValueSettingsForAllInMap(const T& map, QSettings& settings, const QStri
 
 
 
+
+
+
+
+
+
+
 QFESPIMB040OpticsSetup2::QFESPIMB040OpticsSetup2(QWidget* pluginMainWidget, QWidget* parent,  QFPluginLogService* log, QFPluginServices* pluginServices) :
     QFESPIMB040OpticsSetupBase(parent),
     ui(new Ui::QFESPIMB040OpticsSetup2)
@@ -112,6 +119,7 @@ QFESPIMB040OpticsSetup2::QFESPIMB040OpticsSetup2(QWidget* pluginMainWidget, QWid
     shutterLaser1=NULL;
     objProjection=NULL;
     objDetection=NULL;
+    filtercDetection=NULL;
 
     ui->setupUi(this);
 
@@ -356,6 +364,7 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            connect(addShortCut(QString("cam%1_acquire_continuous_stop").arg(ui_cameras.size()), QString("camera %1: stop preview").arg(ui_cameras.size())), SIGNAL(activated()), w, SLOT(stopPreview()));
 
 
+                           ui_camindexes[ui_cameras.size()]=id;
                            ui_cameras[id].config=w;
                        } else if (type=="stage") {
                            QFStageConfigWidget* w=new QFStageConfigWidget(this);
@@ -401,6 +410,11 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                                }
                                if (ui_lightsource.contains(used_by)) ui_lightsource[used_by].filters.append(id);
                            }
+
+                           if (special_role=="detection_filterchanger" || special_role=="detection" || special_role=="detection_filterwheel" || special_role=="detection_filter") {
+                               filtercDetection=w;
+                           }
+
 
                            connect(addShortCut(QString("filterchanger_%1_filter1").arg(ui_filterchangers.size()), QString("filter changer %1: set filter #1").arg(ui_filterchangers.size())), SIGNAL(activated()), w, SLOT(setFilter0()));
                            connect(addShortCut(QString("filterchanger_%1_filter2").arg(ui_filterchangers.size()), QString("filter changer %1: set filter #2").arg(ui_filterchangers.size())), SIGNAL(activated()), w, SLOT(setFilter1()));
@@ -687,39 +701,7 @@ void QFESPIMB040OpticsSetup2::loadSettings(QSettings& settings, QString prefix) 
     loadValueSettingsForAllInMap(ui_lightsource, settings, prefix+"optSetup2/");
 
 
-    /*ui->camConfig1->loadSettings(settings, prefix+"cam_config1/");
-    ui->camConfig2->loadSettings(settings, prefix+"cam_config2/");
-    ui->stageSetup->loadSettings(settings, prefix+"stages/");
-    ui->filtDetection11->loadSettings(settings, prefix+"filters/detection11");
-    ui->filtDetection21->loadSettings(settings, prefix+"filters/detection21");
-    ui->filtSplitter->loadSettings(settings, prefix+"filters/detection_splitter");
-    ui->filtTransmission->loadSettings(settings, prefix+"filters/illumination_transmission");
-    ui->filtDetection->loadSettings(settings, prefix+"filters/detection");
 
-    ui->filtDualView1Long->loadSettings(settings, prefix+"filters/dv1_long");
-    ui->filtDualView1Short->loadSettings(settings, prefix+"filters/dv1_short");
-    ui->filtDualView1Splitter->loadSettings(settings, prefix+"filters/dv1_splitter");
-    ui->filtDualView2Long->loadSettings(settings, prefix+"filters/dv2_long");
-    ui->filtDualView2Short->loadSettings(settings, prefix+"filters/dv2_short");
-    ui->filtDualView2Splitter->loadSettings(settings, prefix+"filters/dv2_splitter");
-    ui->chkDualView1->setChecked(settings.value(prefix+"filters/dv1_enabled", false).toBool());
-    ui->chkDualView2->setChecked(settings.value(prefix+"filters/dv2_enabled", false).toBool());
-    ui->cmbDualViewOrientation->setCurrentIndex(settings.value(prefix+"filters/dv1_orientation", 0).toInt());
-    ui->cmbDualView2Orientation->setCurrentIndex(settings.value(prefix+"filters/dv2_orientation", 0).toInt());
-
-    ui->objDetection->loadSettings(settings, prefix+"objectives/detection");
-    ui->objProjection->loadSettings(settings, prefix+"objectives/projection");
-    ui->objTube1->loadSettings(settings, prefix+"objectives/tubelens1");
-    ui->objTube2->loadSettings(settings, prefix+"objectives/tubelens2");
-    ui->shutterMainIllumination->loadSettings(settings, prefix+"main_illumination_shutter");
-    ui->shutterLaser1->loadSettings(settings, prefix+"laser1_shutter");
-    ui->shutterLaser2->loadSettings(settings, prefix+"laser2_shutter");
-    ui->shutterTransmission->loadSettings(settings, prefix+"transmission_shutter");
-    ui->lsLaser1->loadSettings(settings, prefix+"lightsource_laser1");
-    ui->lsLaser2->loadSettings(settings, prefix+"lightsource_laser2");
-    ui->lsTransmission->loadSettings(settings, prefix+"lightsource_transmission");
-    ui->filtcDetection->loadSettings(settings, prefix+"filterchanger_detection");
-    ui->chkDetectionFilterWheel->setChecked(settings.value(prefix+"filterchanger_detection", false).toBool());*/
 
     for (int i=0; i<shortcuts.size(); i++) {
         QKeySequence seq(settings.value(prefix+"shortcut_"+shortcuts[i].id, shortcuts[i].shortcut->key().toString()).toString());
@@ -742,39 +724,6 @@ void QFESPIMB040OpticsSetup2::storeSettings(QSettings& settings, QString prefix)
     saveValueSettingsForAllInMap(ui_lightsource, settings, prefix+"optSetup2/");
 
 
-    /*ui->camConfig1->storeSettings(settings, prefix+"cam_config1/");
-    ui->camConfig2->storeSettings(settings, prefix+"cam_config2/");
-    ui->stageSetup->storeSettings(settings, prefix+"stages/");
-    ui->filtDetection11->saveSettings(settings, prefix+"filters/detection11");
-    ui->filtDetection21->saveSettings(settings, prefix+"filters/detection21");
-    ui->filtSplitter->saveSettings(settings, prefix+"filters/detection_splitter");
-    ui->filtTransmission->saveSettings(settings, prefix+"filters/illumination_transmission");
-    ui->filtDetection->saveSettings(settings, prefix+"filters/detection");
-    ui->objDetection->saveSettings(settings, prefix+"objectives/detection");
-    ui->objProjection->saveSettings(settings, prefix+"objectives/projection");
-    ui->objTube1->saveSettings(settings, prefix+"objectives/tubelens1");
-    ui->objTube2->saveSettings(settings, prefix+"objectives/tubelens2");
-    ui->shutterMainIllumination->saveSettings(settings, prefix+"main_illumination_shutter");
-    ui->shutterLaser1->saveSettings(settings, prefix+"laser1_shutter");
-    ui->shutterLaser2->saveSettings(settings, prefix+"laser2_shutter");
-    ui->filtcDetection->saveSettings(settings, prefix+"filterchanger_detection");
-    ui->shutterTransmission->saveSettings(settings, prefix+"transmission_shutter");
-    ui->lsLaser1->saveSettings(settings, prefix+"lightsource_laser1");
-    ui->lsLaser2->saveSettings(settings, prefix+"lightsource_laser2");
-    ui->lsTransmission->saveSettings(settings, prefix+"lightsource_transmission");
-    ui->filtDualView1Long->saveSettings(settings, prefix+"filters/dv1_long");
-    ui->filtDualView1Short->saveSettings(settings, prefix+"filters/dv1_short");
-    ui->filtDualView1Splitter->saveSettings(settings, prefix+"filters/dv1_splitter");
-    ui->filtDualView2Long->saveSettings(settings, prefix+"filters/dv2_long");
-    ui->filtDualView2Short->saveSettings(settings, prefix+"filters/dv2_short");
-    ui->filtDualView2Splitter->saveSettings(settings, prefix+"filters/dv2_splitter");
-    settings.setValue(prefix+"filters/dv1_enabled", ui->chkDualView1->isChecked());
-    settings.setValue(prefix+"filters/dv2_enabled", ui->chkDualView2->isChecked());
-    settings.setValue(prefix+"filters/dv1_orientation", ui->cmbDualViewOrientation->currentIndex());
-    settings.setValue(prefix+"filters/dv2_orientation", ui->cmbDualView2Orientation->currentIndex());
-
-    settings.setValue(prefix+"filterchanger_detection", ui->chkDetectionFilterWheel->isChecked());*/
-
     for (int i=0; i<shortcuts.size(); i++) {
         settings.setValue(prefix+"shortcut_"+shortcuts[i].id, shortcuts[i].shortcut->key().toString());
     }
@@ -789,198 +738,146 @@ QWidget *QFESPIMB040OpticsSetup2::takeLightpathWidget() const
     return NULL;
 }
 
+#define ITERATEWIDGETMAPAROUND(MAP_TYPE, MAP, FUNCTION) \
+    for (QMap<QString, MAP_TYPE>::const_iterator it=MAP.begin(); it!=MAP.end(); it++) { \
+        FUNCTION; \
+    }
+#define ITERATEWIDGETMAPAROUND2(MAP_TYPE, MAP, FUNCTION, FUNCTION2) \
+    for (QMap<QString, MAP_TYPE>::const_iterator it=MAP.begin(); it!=MAP.end(); it++) { \
+        FUNCTION; \
+        FUNCTION2; \
+    }
+#define ITERATEWIDGETMAPAROUND3(MAP_TYPE, MAP, FUNCTION, FUNCTION2, FUNCTION3) \
+    for (QMap<QString, MAP_TYPE>::const_iterator it=MAP.begin(); it!=MAP.end(); it++) { \
+        FUNCTION; \
+        FUNCTION2; \
+        FUNCTION3; \
+    }
+#define ITERATEWIDGETMAP(MAP_TYPE, MAP, FUNCTION) \
+    for (QMap<QString, MAP_TYPE>::const_iterator it=MAP.begin(); it!=MAP.end(); it++) { \
+        it.value()->FUNCTION; \
+    }
+#define ITERATEWIDGETMAPMID(MAP_TYPE, MAP, MID, FUNCTION) \
+    for (QMap<QString, MAP_TYPE>::const_iterator it=MAP.begin(); it!=MAP.end(); it++) { \
+        it.value().MID->FUNCTION; \
+    }
+
+#define ITERATEWIDGETMAP_LOADGLOBAL(MAP_TYPE, MAP, GETEXTENSIONFUNCTION, SETTINGS, PREFIX) \
+    for (QMap<QString, MAP_TYPE>::const_iterator it=MAP.begin(); it!=MAP.end(); it++) { \
+        loadPluginGlobalSettings(SETTINGS, it.value()->GETEXTENSIONFUNCTION(), PREFIX); \
+    }
+
+#define ITERATEWIDGETMAP_STOREGLOBAL(MAP_TYPE, MAP, GETEXTENSIONFUNCTION, SETTINGS, PREFIX) \
+    for (QMap<QString, MAP_TYPE>::const_iterator it=MAP.begin(); it!=MAP.end(); it++) { \
+        storePluginGlobalSettings(SETTINGS, it.value()->GETEXTENSIONFUNCTION(), PREFIX); \
+    }
+
+#define ITERATEWIDGETMAP_LOADGLOBALMID(MAP_TYPE, MAP, MID, GETEXTENSIONFUNCTION, SETTINGS, PREFIX) \
+    for (QMap<QString, MAP_TYPE>::const_iterator it=MAP.begin(); it!=MAP.end(); it++) { \
+        loadPluginGlobalSettings(SETTINGS, it.value().MID->GETEXTENSIONFUNCTION(), PREFIX); \
+    }
+
+#define ITERATEWIDGETMAP_STOREGLOBALMID(MAP_TYPE, MAP, MID, GETEXTENSIONFUNCTION, SETTINGS, PREFIX) \
+    for (QMap<QString, MAP_TYPE>::const_iterator it=MAP.begin(); it!=MAP.end(); it++) { \
+        storePluginGlobalSettings(SETTINGS, it.value().MID->GETEXTENSIONFUNCTION(), PREFIX); \
+    }
+
 void QFESPIMB040OpticsSetup2::loadPluginGlobalSettings(QSettings &settings, QString prefix) {
-    /*loadPluginGlobalSettings(settings, ui->lsLaser1->getLightSourceExtensionObject(), prefix);
-    loadPluginGlobalSettings(settings, ui->lsLaser2->getLightSourceExtensionObject(), prefix);
-    loadPluginGlobalSettings(settings, ui->lsTransmission->getLightSourceExtensionObject(), prefix);
-    loadPluginGlobalSettings(settings, ui->shutterLaser1->getShutterExtensionObject(), prefix);
-    loadPluginGlobalSettings(settings, ui->shutterLaser2->getShutterExtensionObject(), prefix);
-    loadPluginGlobalSettings(settings, ui->shutterMainIllumination->getShutterExtensionObject(), prefix);
-    loadPluginGlobalSettings(settings, ui->shutterTransmission->getShutterExtensionObject(), prefix);
-    loadPluginGlobalSettings(settings, ui->filtcDetection->getFilterChangerExtensionObject(), prefix);
-    loadPluginGlobalSettings(settings, ui->camConfig1->cameraComboBox()->currentCameraQObject(), prefix);
-    loadPluginGlobalSettings(settings, ui->camConfig2->cameraComboBox()->currentCameraQObject(), prefix);
-    loadPluginGlobalSettings(settings, ui->stageSetup->getXStageExtensionObject(), prefix);
-    loadPluginGlobalSettings(settings, ui->stageSetup->getYStageExtensionObject(), prefix);
-    loadPluginGlobalSettings(settings, ui->stageSetup->getZStageExtensionObject(), prefix);*/
+    ITERATEWIDGETMAP_LOADGLOBALMID(CameraWidgets, ui_cameras, config, cameraComboBox()->currentCameraQObject, settings, prefix)
+    ITERATEWIDGETMAP_LOADGLOBALMID(LightsourceWidgets, ui_lightsource, config, getLightSourceExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_LOADGLOBAL(QFESPIMB040SampleStageConfig*, ui_stageconfigs, getXStageExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_LOADGLOBAL(QFESPIMB040SampleStageConfig*, ui_stageconfigs, getYStageExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_LOADGLOBAL(QFESPIMB040SampleStageConfig*, ui_stageconfigs, getZStageExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_LOADGLOBAL(QFStageConfigWidget*, ui_stages, getXStageExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_LOADGLOBAL(QFFilterChangerConfigWidget*, ui_filterchangers, getFilterChangerExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_LOADGLOBAL(QFShutterConfigWidget*, ui_shutter, getShutterExtensionObject, settings, prefix)
 }
 
 void QFESPIMB040OpticsSetup2::storePluginGlobalSettings(QSettings &settings, QString prefix) const {
-    /*storePluginGlobalSettings(settings, ui->lsLaser1->getLightSourceExtensionObject(), prefix);
-    storePluginGlobalSettings(settings, ui->lsLaser2->getLightSourceExtensionObject(), prefix);
-    storePluginGlobalSettings(settings, ui->lsTransmission->getLightSourceExtensionObject(), prefix);
-    storePluginGlobalSettings(settings, ui->shutterLaser1->getShutterExtensionObject(), prefix);
-    storePluginGlobalSettings(settings, ui->shutterLaser2->getShutterExtensionObject(), prefix);
-    storePluginGlobalSettings(settings, ui->shutterMainIllumination->getShutterExtensionObject(), prefix);
-    storePluginGlobalSettings(settings, ui->shutterTransmission->getShutterExtensionObject(), prefix);
-    storePluginGlobalSettings(settings, ui->filtcDetection->getFilterChangerExtensionObject(), prefix);
-    storePluginGlobalSettings(settings, ui->camConfig1->cameraComboBox()->currentCameraQObject(), prefix);
-    storePluginGlobalSettings(settings, ui->camConfig2->cameraComboBox()->currentCameraQObject(), prefix);
-    storePluginGlobalSettings(settings, ui->stageSetup->getXStageExtensionObject(), prefix);
-    storePluginGlobalSettings(settings, ui->stageSetup->getYStageExtensionObject(), prefix);
-    storePluginGlobalSettings(settings, ui->stageSetup->getZStageExtensionObject(), prefix);*/
+    ITERATEWIDGETMAP_STOREGLOBALMID(CameraWidgets, ui_cameras, config, cameraComboBox()->currentCameraQObject, settings, prefix)
+    ITERATEWIDGETMAP_STOREGLOBALMID(LightsourceWidgets, ui_lightsource, config, getLightSourceExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_STOREGLOBAL(QFESPIMB040SampleStageConfig*, ui_stageconfigs, getXStageExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_STOREGLOBAL(QFESPIMB040SampleStageConfig*, ui_stageconfigs, getYStageExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_STOREGLOBAL(QFESPIMB040SampleStageConfig*, ui_stageconfigs, getZStageExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_STOREGLOBAL(QFStageConfigWidget*, ui_stages, getXStageExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_STOREGLOBAL(QFFilterChangerConfigWidget*, ui_filterchangers, getFilterChangerExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_STOREGLOBAL(QFShutterConfigWidget*, ui_shutter, getShutterExtensionObject, settings, prefix)
 }
 
 
 double QFESPIMB040OpticsSetup2::getCameraMagnification(int setup_cam) const {
-    /*if (setup_cam==0) {
-        return ui->objDetection->objective().magnification*ui->objTube1->objective().magnification;
-    } else if (setup_cam==1) {
-        return ui->objDetection->objective().magnification*ui->objTube2->objective().magnification;
-    }*/
-    return 1;
+    QString id=ui_camindexes.value(setup_cam, "");
+    if (ui_cameras.contains(id)) {
+        QString tl=ui_cameras[id].tubelens;
+        double m=1;
+        if (ui_objectives.contains(tl)) {
+            m=m*ui_objectives[tl]->objective().magnification;
+        }
+        if (objDetection) {
+            m=m*objDetection->objective().magnification;
+        }
+        return m;
+    } else {
+        return 1;
+    }
+}
+
+void saveFilter(QMap<QString, QVariant>& setup, const QString& prefix, const QString& id, const FilterDescription& filter) {
+    if (filter.isValid) {
+        setup[prefix+QString("%1/name").arg(id)]=filter.name;
+        setup[prefix+QString("%1/type").arg(id)]=filter.type;
+        setup[prefix+QString("%1/manufacturer").arg(id)]=filter.manufacturer;
+    }
+}
+
+void saveObjective(QMap<QString, QVariant>& setup, const QString& prefix, const QString& id, const ObjectiveDescription& filter) {
+    setup[prefix+QString("%1/name").arg(id)]=filter.name;
+    setup[prefix+QString("%1/NA").arg(id)]=filter.NA;
+    setup[prefix+QString("%1/magnification").arg(id)]=filter.magnification;
+    setup[prefix+QString("%1/manufacturer").arg(id)]=filter.manufacturer;
 }
 
 QMap<QString, QVariant> QFESPIMB040OpticsSetup2::getSetup(int setup_cam) const {
     QMap<QString, QVariant> setup;
 
-    /*FilterDescription filter=ui->filtDetection->filter();
-    if (filter.isValid) {
-        setup["filters/detection/name"]=filter.name;
-        setup["filters/detection/type"]=filter.type;
-        setup["filters/detection/manufacturer"]=filter.manufacturer;
+    for (QMap<QString, QF3FilterCombobox*>::const_iterator it=ui_filters.begin(); it!=ui_filters.end(); it++) {
+        saveFilter(setup, "filters/", it.key(), it.value()->filter());
     }
+    for (QMap<QString, QFFilterChangerConfigWidget*>::const_iterator it=ui_filterchangers.begin(); it!=ui_filterchangers.end(); it++) {
+        saveFilter(setup, "filters/", it.key(), it.value()->getCurrentFilterDescription());
+    }
+    for (QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> >::const_iterator it=ui_dualviews.begin(); it!=ui_dualviews.end(); it++) {
+        if (it.value().first->isChecked()) {
+            if (it.value().second->orientation()==QF3DualViewWidget::Horizontal) setup[QString("filters/%1/orientation").arg(it.key())]=QString("horizontal");
+            else setup[QString("filters/%1/orientation").arg(it.key())]=QString("vertical");
 
-    if (ui->chkDetectionFilterWheel->isChecked()) {
-        FilterDescription filter=ui->filtcDetection->getCurrentFilterDescription();
-        if (filter.isValid) {
-            setup["filters/detection_filterchanger/name"]=filter.name;
-            setup["filters/detection_filterchanger/type"]=filter.type;
-            setup["filters/detection_filterchanger/manufacturer"]=filter.manufacturer;
+            saveFilter(setup, "filters/filter_splitter/", it.key(), it.value().second->filterSplitter());
+            saveFilter(setup, "filters/filter_short/", it.key(), it.value().second->filterShort());
+            saveFilter(setup, "filters/filter_long/", it.key(), it.value().second->filterLong());
         }
     }
+    for (QMap<QString, QF3ObjectiveCombobox*>::const_iterator it=ui_objectives.begin(); it!=ui_objectives.end(); it++) {
+        saveObjective(setup, "objectives/", it.key(), it.value()->objective());
+    }
 
-    if (setup_cam<0 || setup_cam==0) {
-        filter=ui->filtDetection11->filter();
-        if (filter.isValid) {
-            setup["filters/detection_cam1/name"]=filter.name;
-            setup["filters/detection_cam1/type"]=filter.type;
-            setup["filters/detection_cam1/manufacturer"]=filter.manufacturer;
+    for (QMap<QString, QFShutterConfigWidget*>::const_iterator it=ui_shutter.begin(); it!=ui_shutter.end(); it++) {
+        setup[QString("shutters/%1/state").arg(it.key())]= it.value()->getShutterState();
+    }
+
+    for (QMap<QString,LightsourceWidgets>::const_iterator it=ui_lightsource.begin(); it!=ui_lightsource.end(); it++) {
+        QString prefix=QString("lightsource/%1/").arg(it.key());
+        if (ui_shutter.contains(it.value().shutter) && ui_shutter[it.value().shutter]) {
+            setup[prefix+"shutter"]=ui_shutter[it.value().shutter]->getShutterState();
         }
-        if (ui->chkDualView1->isChecked()) {
-            if (ui->cmbDualViewOrientation->currentIndex()==0) setup["filters/dualview_cam1/orientation"]=QString("horicontal");
-            else setup["filters/dualview_cam1/orientation"]=QString("vertical");
-            filter=ui->filtDualView1Long->filter();
-            if (filter.isValid) {
-                setup["filters/dualview_cam1/detection_long/name"]=filter.name;
-                setup["filters/dualview_cam1/detection_long/type"]=filter.type;
-                setup["filters/dualview_cam1/detection_long/manufacturer"]=filter.manufacturer;
-            }
-            filter=ui->filtDualView1Short->filter();
-            if (filter.isValid) {
-                setup["filters/dualview_cam1/detection_short/name"]=filter.name;
-                setup["filters/dualview_cam1/detection_short/type"]=filter.type;
-                setup["filters/dualview_cam1/detection_short/manufacturer"]=filter.manufacturer;
-            }
-            filter=ui->filtDualView1Splitter->filter();
-            if (filter.isValid) {
-                setup["filters/dualview_cam1/detection_splitter/name"]=filter.name;
-                setup["filters/dualview_cam1/detection_splitter/type"]=filter.type;
-                setup["filters/dualview_cam1/detection_splitter/manufacturer"]=filter.manufacturer;
-            }
+        for (int i=0; i<it.value().config->getLineCount(); i++) {
+            setup[prefix+QString("line%1/name").arg(i+1)]=it.value().config->getLineDescription(i);
+            setup[prefix+QString("line%1/enabled").arg(i+1)]=it.value().config->isLineEnabled(i);
+            setup[prefix+QString("line%1/set_power").arg(i+1)]=it.value().config->getSetPower(i);
+            setup[prefix+QString("line%1/measured_power").arg(i+1)]=it.value().config->getMeasuredPower(i);
+            setup[prefix+QString("line%1/unit").arg(i+1)]=it.value().config->getLineUnit(i);
         }
-    }
 
-    if (setup_cam<0 || setup_cam==1) {
-        filter=ui->filtDetection21->filter();
-        if (filter.isValid) {
-            setup["filters/detection_cam2/name"]=filter.name;
-            setup["filters/detection_cam2/type"]=filter.type;
-            setup["filters/detection_cam2/manufacturer"]=filter.manufacturer;
-        }
-        if (ui->chkDualView2->isChecked()) {
-            if (ui->cmbDualView2Orientation->currentIndex()==0) setup["filters/dualview_cam2/orientation"]=QString("horicontal");
-            else setup["filters/dualview_cam2/orientation"]=QString("vertical");
-            filter=ui->filtDualView2Long->filter();
-            if (filter.isValid) {
-                setup["filters/dualview_cam2/detection_long/name"]=filter.name;
-                setup["filters/dualview_cam2/detection_long/type"]=filter.type;
-                setup["filters/dualview_cam2/detection_long/manufacturer"]=filter.manufacturer;
-            }
-            filter=ui->filtDualView2Short->filter();
-            if (filter.isValid) {
-                setup["filters/dualview_cam2/detection_short/name"]=filter.name;
-                setup["filters/dualview_cam2/detection_short/type"]=filter.type;
-                setup["filters/dualview_cam2/detection_short/manufacturer"]=filter.manufacturer;
-            }
-            filter=ui->filtDualView2Splitter->filter();
-            if (filter.isValid) {
-                setup["filters/dualview_cam2/detection_splitter/name"]=filter.name;
-                setup["filters/dualview_cam2/detection_splitter/type"]=filter.type;
-                setup["filters/dualview_cam2/detection_splitter/manufacturer"]=filter.manufacturer;
-            }
-        }
     }
-
-    filter=ui->filtSplitter->filter();
-    if (filter.isValid) {
-        setup["filters/detection_splitter/name"]=filter.name;
-        setup["filters/detection_splitter/type"]=filter.type;
-        setup["filters/detection_splitter/manufacturer"]=filter.manufacturer;
-    }
-
-    filter=ui->filtTransmission->filter();
-    if (filter.isValid) {
-        setup["filters/illumination_transmission/name"]=filter.name;
-        setup["filters/illumination_transmission/type"]=filter.type;
-        setup["filters/illumination_transmission/manufacturer"]=filter.manufacturer;
-    }
-
-    ObjectiveDescription objective=ui->objDetection->objective();
-    setup["objectives/detection/name"]=objective.name;
-    setup["objectives/detection/manufacturer"]=objective.manufacturer;
-    setup["objectives/detection/NA"]=objective.NA;
-    setup["objectives/detection/magnification"]=objective.magnification;
-
-    objective=ui->objProjection->objective();
-    setup["objectives/projection/name"]=objective.name;
-    setup["objectives/projection/manufacturer"]=objective.manufacturer;
-    setup["objectives/projection/NA"]=objective.NA;
-    setup["objectives/projection/magnification"]=objective.magnification;
-
-    if (setup_cam<0 || setup_cam==0) {
-        objective=ui->objTube1->objective();
-        setup["objectives/tube_lens1/name"]=objective.name;
-        setup["objectives/tube_lens1/manufacturer"]=objective.manufacturer;
-        setup["objectives/tube_lens1/NA"]=objective.NA;
-        setup["objectives/tube_lens1/magnification"]=objective.magnification;
-    }
-
-    if (setup_cam<0 || setup_cam==1) {
-        objective=ui->objTube2->objective();
-        setup["objectives/tube_lens2/name"]=objective.name;
-        setup["objectives/tube_lens2/manufacturer"]=objective.manufacturer;
-        setup["objectives/tube_lens2/NA"]=objective.NA;
-        setup["objectives/tube_lens2/magnification"]=objective.magnification;
-    }
-
-    setup["main_illumination/shutter"]=ui->shutterMainIllumination->getShutterState();
-    setup["transmission_illumination/shutter"]=ui->shutterTransmission->getShutterState();
-    for (int i=0; i<ui->lsTransmission->getLineCount(); i++) {
-        setup[QString("transmission_illumination/line%1/name").arg(i+1)]=ui->lsTransmission->getLineDescription(i);
-        setup[QString("transmission_illumination/line%1/enabled").arg(i+1)]=ui->lsTransmission->isLineEnabled(i);
-        setup[QString("transmission_illumination/line%1/set_power").arg(i+1)]=ui->lsTransmission->getSetPower(i);
-        setup[QString("transmission_illumination/line%1/measured_power").arg(i+1)]=ui->lsTransmission->getMeasuredPower(i);
-        setup[QString("transmission_illumination/line%1/unit").arg(i+1)]=ui->lsTransmission->getLineUnit(i);
-    }
-    setup["laser1/shutter"]=ui->shutterLaser1->getShutterState();
-    for (int i=0; i<ui->lsLaser1->getLineCount(); i++) {
-        setup[QString("laser1/line%1/name").arg(i+1)]=ui->lsLaser1->getLineDescription(i);
-        setup[QString("laser1/line%1/enabled").arg(i+1)]=ui->lsLaser1->isLineEnabled(i);
-        setup[QString("laser1/line%1/set_power").arg(i+1)]=ui->lsLaser1->getSetPower(i);
-        setup[QString("laser1/line%1/measured_power").arg(i+1)]=ui->lsLaser1->getMeasuredPower(i);
-        setup[QString("laser1/line%1/unit").arg(i+1)]=ui->lsLaser1->getLineUnit(i);
-    }
-    setup["laser2/shutter"]=ui->shutterLaser2->getShutterState();
-    for (int i=0; i<ui->lsLaser2->getLineCount(); i++) {
-        setup[QString("laser2/line%1/name").arg(i+1)]=ui->lsLaser2->getLineDescription(i);
-        setup[QString("laser2/line%1/enabled").arg(i+1)]=ui->lsLaser2->isLineEnabled(i);
-        setup[QString("laser2/line%1/set_power").arg(i+1)]=ui->lsLaser2->getSetPower(i);
-        setup[QString("laser2/line%1/measured_power").arg(i+1)]=ui->lsLaser2->getMeasuredPower(i);
-        setup[QString("laser2/line%1/unit").arg(i+1)]=ui->lsLaser2->getLineUnit(i);
-    }
-    if (ui->chkDetectionFilterWheel->isChecked()) setup["filterchangers/detection/filter"]=ui->filtcDetection->getFilterChangerState();*/
-
 
     return setup;
 }
@@ -993,54 +890,54 @@ int QFESPIMB040OpticsSetup2::getCameraCount() const
 
 void QFESPIMB040OpticsSetup2::setLogging(QFPluginLogService* log) {
     m_log=log;
-    /*ui->camConfig1->setLog(m_log);
-    ui->camConfig2->setLog(m_log);
-    ui->stageSetup->setLog(m_log);
-    ui->shutterMainIllumination->setLog(m_log);
-    ui->shutterLaser1->setLog(m_log);
-    ui->shutterLaser2->setLog(m_log);
-    ui->filtcDetection->setLog(m_log);
-    ui->shutterTransmission->setLog(m_log);
-    ui->lsLaser1->setLog(m_log);
-    ui->lsLaser2->setLog(m_log);
-    ui->lsTransmission->setLog(m_log);*/
+    ITERATEWIDGETMAPMID(CameraWidgets, ui_cameras, config, setLog(m_log))
+    ITERATEWIDGETMAPMID(LightsourceWidgets, ui_lightsource, config, setLog(m_log))
+    ITERATEWIDGETMAP(QFFilterChangerConfigWidget*, ui_filterchangers, setLog(m_log))
+    ITERATEWIDGETMAP(QFStageConfigWidget*, ui_stages, setLog(m_log))
+    ITERATEWIDGETMAP(QFESPIMB040SampleStageConfig*, ui_stageconfigs, setLog(m_log))
+    ITERATEWIDGETMAP(QFShutterConfigWidget*, ui_shutter, setLog(m_log))
 }
 
 bool QFESPIMB040OpticsSetup2::lockCamera(int setup_cam, QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* previewSettingsFilename) {
-    /*switch(setup_cam) {
-        case 0: return ui->camConfig1->lockCamera(extension, ecamera, camera,  previewSettingsFilename);
-        case 1: return ui->camConfig2->lockCamera(extension, ecamera, camera,  previewSettingsFilename);
-    }*/
+    QString id=ui_camindexes.value(setup_cam, "");
+    if (ui_cameras.contains(id)) {
+        return ui_cameras[id].config->lockCamera(extension, ecamera, camera,  previewSettingsFilename);
+    }
     return false;
 }
 
 void QFESPIMB040OpticsSetup2::releaseCamera(int setup_cam) {
-    /*switch(setup_cam) {
-        case 0: ui->camConfig1->releaseCamera(); break;
-        case 1: ui->camConfig2->releaseCamera(); break;
-    }*/
+    QString id=ui_camindexes.value(setup_cam, "");
+    if (ui_cameras.contains(id)) {
+        ui_cameras[id].config->releaseCamera();
+    }
 }
 
 void QFESPIMB040OpticsSetup2::overrideCameraPreview(int setup_cam, const QString &camera_settings, const QString &lightpath)
 {
-    /*if (!lightpath.isEmpty() && QFile::exists(lightpath)) {
+    if (!lightpath.isEmpty() && QFile::exists(lightpath)) {
         ui->cmbLightpathConfig->setEnabled(false);
         lockLightpath();
         loadLightpathConfig(lightpath, true);
         unlockLightpath();
     }
-    if (setup_cam==0) ui->camConfig1->overridePreview(camera_settings);
-    if (setup_cam==1) ui->camConfig2->overridePreview(camera_settings);
-    loadLightpathConfig(lightpath, true);*/
+
+    QString id=ui_camindexes.value(setup_cam, "");
+    if (ui_cameras.contains(id)) {
+        ui_cameras[id].config->overridePreview(camera_settings);
+    }
+    loadLightpathConfig(lightpath, true);
 }
 
 void QFESPIMB040OpticsSetup2::resetCameraPreview(int setup_cam)
 {
 
-    /*if (setup_cam==0) ui->camConfig1->resetPreview();
-    if (setup_cam==1) ui->camConfig2->resetPreview();
+    QString id=ui_camindexes.value(setup_cam, "");
+    if (ui_cameras.contains(id)) {
+        ui_cameras[id].config->resetPreview();
+    }
     ensureLightpath();
-    ui->cmbLightpathConfig->setEnabled(true);*/
+    ui->cmbLightpathConfig->setEnabled(true);
 }
 
 void QFESPIMB040OpticsSetup2::on_btnConnectDevices_clicked() {
@@ -1048,45 +945,24 @@ void QFESPIMB040OpticsSetup2::on_btnConnectDevices_clicked() {
     dlg->setWindowModality(Qt::WindowModal);
     dlg->setWindowIcon(windowIcon());
     dlg->setWindowTitle(tr("Connecting devices ..."));
-    dlg->addItem(tr("shutter: main"));
-    dlg->addItem(tr("shutter: laser 1"));
-    dlg->addItem(tr("shutter: laser 2"));
-    dlg->addItem(tr("shutter: transmission illumination"));
-    dlg->addItem(tr("lightsource: laser 1"));
-    dlg->addItem(tr("lightsource: laser 2"));
-    dlg->addItem(tr("lightsource: transmission"));
-    dlg->addItem(tr("stage"));
-    dlg->addItem(tr("filterwheel: detection"));
+
+    ITERATEWIDGETMAPAROUND(QFShutterConfigWidget*, ui_shutter, dlg->addItem(tr("shutter: ")+it.key()))
+    ITERATEWIDGETMAPAROUND(LightsourceWidgets, ui_lightsource, dlg->addItem(tr("lightsource: ")+it.key()))
+    ITERATEWIDGETMAPAROUND(QFFilterChangerConfigWidget*, ui_filterchangers, dlg->addItem(tr("filterwheel: ")+it.key()))
+    ITERATEWIDGETMAPAROUND(QFStageConfigWidget*, ui_stages, dlg->addItem(tr("stage: ")+it.key()))
+    ITERATEWIDGETMAPAROUND(QFESPIMB040SampleStageConfig*, ui_stageconfigs, dlg->addItem(tr("stage: ")+it.key()))
+
+
     dlg->setHasCancelButton(true);
     dlg->show();
     dlg->start();
 
-/*    if (!dlg->wasCanceled()) ui->shutterMainIllumination->connectShutter();
-    dlg->nextItem((ui->shutterMainIllumination->isShutterConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
-    QApplication::processEvents();
-    if (!dlg->wasCanceled()) ui->shutterLaser1->connectShutter();
-    dlg->nextItem((ui->shutterLaser1->isShutterConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
-    QApplication::processEvents();
-    if (!dlg->wasCanceled()) ui->shutterLaser2->connectShutter();
-    dlg->nextItem((ui->shutterLaser2->isShutterConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
-    QApplication::processEvents();
-    if (!dlg->wasCanceled()) ui->shutterTransmission->connectShutter();
-    dlg->nextItem((ui->shutterTransmission->isShutterConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
-    QApplication::processEvents();
-    if (!dlg->wasCanceled()) ui->lsLaser1->connectLightSource();
-    dlg->nextItem((ui->lsLaser1->isLightSourceConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
-    QApplication::processEvents();
-    if (!dlg->wasCanceled()) ui->lsLaser2->connectLightSource();
-    dlg->nextItem((ui->lsLaser2->isLightSourceConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
-    QApplication::processEvents();
-    if (!dlg->wasCanceled()) ui->lsTransmission->connectLightSource();
-    dlg->nextItem((ui->lsTransmission->isLightSourceConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
-    QApplication::processEvents();
-    if (!dlg->wasCanceled()) ui->stageSetup->connectStages();
-    dlg->nextItem((ui->stageSetup->isXStageConnected()||ui->stageSetup->isYStageConnected()||ui->stageSetup->isZStageConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
-    QApplication::processEvents();
-    if (!dlg->wasCanceled()) if (ui->chkDetectionFilterWheel->isChecked()) ui->filtcDetection->connectFilterChanger();
-    dlg->nextItem((ui->filtcDetection->isFilterChangerConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));*/
+    ITERATEWIDGETMAPAROUND3(QFShutterConfigWidget*, ui_shutter, if (!dlg->wasCanceled()) it.value()->connectShutter(), dlg->nextItem((it.value()->isShutterConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
+    ITERATEWIDGETMAPAROUND3(LightsourceWidgets, ui_lightsource, if (!dlg->wasCanceled()) it.value().config->connectLightSource(), dlg->nextItem((it.value().config->isLightSourceConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
+    ITERATEWIDGETMAPAROUND3(QFFilterChangerConfigWidget*, ui_filterchangers, if (!dlg->wasCanceled()) it.value()->connectFilterChanger(), dlg->nextItem((it.value()->isFilterChangerConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
+    ITERATEWIDGETMAPAROUND3(QFStageConfigWidget*, ui_stages, if (!dlg->wasCanceled()) it.value()->connectStages(), dlg->nextItem((it.value()->isXStageConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
+    ITERATEWIDGETMAPAROUND3(QFESPIMB040SampleStageConfig*, ui_stageconfigs, if (!dlg->wasCanceled()) it.value()->connectStages(), dlg->nextItem((it.value()->isXStageConnected()||it.value()->isYStageConnected()||it.value()->isZStageConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
+
     dlg->close();
     delete dlg;
 }
@@ -1096,47 +972,21 @@ void QFESPIMB040OpticsSetup2::on_btnDisconnectDevices_clicked() {
     dlg->setWindowModality(Qt::WindowModal);
     dlg->setWindowIcon(windowIcon());
     dlg->setWindowTitle(tr("Disconnecting devices ..."));
-    dlg->addItem(tr("shutter: main"));
-    dlg->addItem(tr("shutter: laser 1"));
-    dlg->addItem(tr("shutter: laser 2"));
-    dlg->addItem(tr("shutter: transmission illumination"));
-    dlg->addItem(tr("lightsource: laser 1"));
-    dlg->addItem(tr("lightsource: laser 2"));
-    dlg->addItem(tr("lightsource: transmission"));
-    dlg->addItem(tr("stage"));
-    dlg->addItem(tr("filterwheel: detection"));
+    ITERATEWIDGETMAPAROUND(QFShutterConfigWidget*, ui_shutter, dlg->addItem(tr("shutter: ")+it.key()))
+    ITERATEWIDGETMAPAROUND(LightsourceWidgets, ui_lightsource, dlg->addItem(tr("lightsource: ")+it.key()))
+    ITERATEWIDGETMAPAROUND(QFFilterChangerConfigWidget*, ui_filterchangers, dlg->addItem(tr("filterwheel: ")+it.key()))
+    ITERATEWIDGETMAPAROUND(QFStageConfigWidget*, ui_stages, dlg->addItem(tr("stage: ")+it.key()))
+    ITERATEWIDGETMAPAROUND(QFESPIMB040SampleStageConfig*, ui_stageconfigs, dlg->addItem(tr("stage: ")+it.key()))
     dlg->setHasCancelButton(false);
     dlg->show();
     dlg->start();
 
-    /*ui->shutterMainIllumination->disconnectShutter();
-    dlg->nextItem();
-    QApplication::processEvents();
-    ui->shutterLaser1->disconnectShutter();
-    dlg->nextItem();
-    QApplication::processEvents();
-    ui->shutterLaser2->disconnectShutter();
-    dlg->nextItem();
-    QApplication::processEvents();
-    ui->shutterTransmission->disconnectShutter();
-    dlg->nextItem();
-    QApplication::processEvents();
-    ui->lsLaser1->disconnectLightSource();
-    dlg->nextItem();
-    QApplication::processEvents();
-    ui->lsLaser2->disconnectLightSource();
-    dlg->nextItem();
-    QApplication::processEvents();
-    ui->lsTransmission->disconnectLightSource();
-    dlg->nextItem();
-    QApplication::processEvents();
-    ui->stageSetup->disconnectStages();
-    dlg->nextItem();
-    QApplication::processEvents();
-    if (ui->chkDetectionFilterWheel->isChecked()) ui->filtcDetection->disconnectFilterChanger();
-    dlg->nextItem();
-    QApplication::processEvents();
-    dlg->close();*/
+    ITERATEWIDGETMAPAROUND3(QFShutterConfigWidget*, ui_shutter, it.value()->disconnectShutter(), dlg->nextItem(), QApplication::processEvents())
+    ITERATEWIDGETMAPAROUND3(LightsourceWidgets, ui_lightsource, it.value().config->disconnectLightSource(), dlg->nextItem(), QApplication::processEvents())
+    ITERATEWIDGETMAPAROUND3(QFFilterChangerConfigWidget*, ui_filterchangers, it.value()->disconnectFilterChanger(), dlg->nextItem(), QApplication::processEvents())
+    ITERATEWIDGETMAPAROUND3(QFStageConfigWidget*, ui_stages, it.value()->disconnectStages(), dlg->nextItem(), QApplication::processEvents())
+    ITERATEWIDGETMAPAROUND3(QFESPIMB040SampleStageConfig*, ui_stageconfigs, it.value()->disconnectStages(), dlg->nextItem(), QApplication::processEvents())
+
     delete dlg;
 }
 void QFESPIMB040OpticsSetup2::on_btnConnectCameras_clicked() {
@@ -1144,18 +994,12 @@ void QFESPIMB040OpticsSetup2::on_btnConnectCameras_clicked() {
     dlg->setWindowModality(Qt::WindowModal);
     dlg->setWindowIcon(windowIcon());
     dlg->setWindowTitle(tr("Connecting cameras ..."));
-    dlg->addItem(tr("camera 1"));
-    dlg->addItem(tr("camera 2"));
+    ITERATEWIDGETMAPAROUND(CameraWidgets, ui_cameras, dlg->addItem(tr("camera: ")+it.key()))
     dlg->setHasCancelButton(true);
     dlg->show();
     dlg->start();
 
-    /*if (!dlg->wasCanceled()) ui->camConfig1->connectCamera();
-    dlg->nextItem((ui->camConfig1->isCameraConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
-    QApplication::processEvents();
-    if (!dlg->wasCanceled()) ui->camConfig2->connectCamera();
-    dlg->nextItem((ui->camConfig2->isCameraConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
-    QApplication::processEvents();*/
+    ITERATEWIDGETMAPAROUND3(CameraWidgets, ui_cameras, if (!dlg->wasCanceled()) it.value().config->connectCamera(), dlg->nextItem((it.value().config->isCameraConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
 
     dlg->close();
     delete dlg;
@@ -1168,18 +1012,12 @@ void QFESPIMB040OpticsSetup2::on_btnDisconnectCameras_clicked() {
     dlg->setWindowModality(Qt::WindowModal);
     dlg->setWindowIcon(windowIcon());
     dlg->setWindowTitle(tr("Disconnecting cameras ..."));
-    dlg->addItem(tr("camera 1"));
-    dlg->addItem(tr("camera 2"));
+    ITERATEWIDGETMAPAROUND(CameraWidgets, ui_cameras, dlg->addItem(tr("camera: ")+it.key()))
     dlg->setHasCancelButton(true);
     dlg->show();
     dlg->start();
 
-    /*if (!dlg->wasCanceled()) ui->camConfig1->disconnectCamera();
-    dlg->nextItem();
-    QApplication::processEvents();
-    if (!dlg->wasCanceled()) ui->camConfig2->disconnectCamera();
-    dlg->nextItem();
-    QApplication::processEvents();*/
+    ITERATEWIDGETMAPAROUND3(CameraWidgets, ui_cameras, if (!dlg->wasCanceled()) it.value().config->disconnectCamera(), dlg->nextItem(), QApplication::processEvents())
 
     dlg->close();
     delete dlg;
@@ -1281,10 +1119,6 @@ void QFESPIMB040OpticsSetup2::mainShutterOff()
 
 
 void QFESPIMB040OpticsSetup2::updateMagnifications() {
-    /*double m=ui->objDetection->objective().magnification*ui->objTube1->objective().magnification;
-    ui->camConfig1->setMagnification(m);
-    m=ui->objDetection->objective().magnification*ui->objTube2->objective().magnification;
-    ui->camConfig2->setMagnification(m);*/
     QMap<QString, CameraWidgets>::const_iterator i;
     for (i = ui_cameras.constBegin(); i != ui_cameras.constEnd(); ++i) {
         double m=1;
@@ -1301,12 +1135,15 @@ void QFESPIMB040OpticsSetup2::updateMagnifications() {
 
 QFExtensionFilterChanger *QFESPIMB040OpticsSetup2::getFilterChanger(int changer) const
 {
-    //if (changer==FilterChangerDetection) return ui->filtcDetection->getFilterChanger();
+    if (changer==FilterChangerDetection && filtercDetection) return filtercDetection->getFilterChanger();
     return NULL;
 }
 
 int QFESPIMB040OpticsSetup2::getFilterChangerID(int changer) const
 {
+// ========================================================================================================================================================================================
+// TODO: IMPLEMENT FROM HERE!!!
+// ========================================================================================================================================================================================
    // if (changer==0) return ui->filtcDetection->getFilterChangerID();
     return -1;
 }
