@@ -12,7 +12,11 @@
 <p>This tool calculates the crosstalk-corrected relative crosscorrelation amplitudes:
 $$bmath:\mbox{RCCF}_{0}(x,y)=\frac{\hat{\mbox{CCF}}(x,y)}{\hat{\mbox{ACF0}}(x,y)}$$
 $$bmath:\mbox{RCCF}_{1}(x,y)=\frac{\hat{\mbox{CCF}}(x,y)}{\hat{\mbox{ACF1}}(x,y)}$$
-where $$math:\hat{\mbox{CCF}}(x,y)$$, $$math:\hat{\mbox{ACF0}}(x,y)$$ and $$math:\hat{\mbox{ACF1}}(x,y)$$ are the crosstlak-corrected crosscorrelation and autocorrelation (of channel 0 and 1) functions.
+where $$math:\hat{\mbox{CCF}}(x,y)$$, $$math:\hat{\mbox{ACF0}}(x,y)$$ and $$math:\hat{\mbox{ACF1}}(x,y)$$ are the crosstlak-corrected crosscorrelation and autocorrelation (of channel 0 and 1) functions: $$ref:BACIA2012:Bacia, Kirsten, Zden�?k Petrášek, and Petra Schwille. "Correcting for Spectral Cross-Talk in Dual-Color Fluorescence Cross-Correlation Spectroscopy." ChemPhysChem 13(5) (2012): 1221-1231.$$
+
+$$bmath:\hat{\mbox{ACF0}}(x,y)=\mbox{ACF0}(x,y)$$
+$$bmath:\hat{\mbox{ACF1}}(x,y)=\frac{\kappa^2I_0^2\cdot\mbox{ACF0}(x,y)+I_1^2\cdot\mbox{ACF1}(x,y)- 2\kappa I_0 I_1\cdot\mbox{CCF}(x,y)}{(I_1- \kappa I_0)^2}$$
+$$bmath:\hat{\mbox{CCF}}(x,y)=\frac{I_1\mbox{CCF}(x,y)-\kappa I_0\cdot\mbox{ACF0}(x,y)}{I_1- \kappa I_0}$$
 </p>	
      
      
@@ -31,6 +35,8 @@ If all files are selected, overview images of the files are displayed below. A s
 <li>"<b>next </b>": will select the next CCF file in the list (and the fitting CCF file</li>
 </p>
 
+<h2>References</h2>
+$$references$$
   </body>
 
 </html>

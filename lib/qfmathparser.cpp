@@ -156,6 +156,12 @@ namespace QFMathParser_Private {
     QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(fDSort, dsort, QFMathParser_dsort)
     QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(fShuffle, shuffle, QFMathParser_shuffle)
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fMean, sum, qfstatisticsAverage)
+
+    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fSkewness, skewness, qfstatisticsSkewness)
+    QFMATHPARSER_DEFINE_2PARAM1VEC_VECTONUM_FUNC(fCentralMoment, moment, qfstatisticsCentralMoment)
+    QFMATHPARSER_DEFINE_2PARAM1VEC_VECTONUM_FUNC(fNonCentralMoment, ncmoment, qfstatisticsMoment)
+    QFMATHPARSER_DEFINE_2PARAM2VEC_VECTONUM_FUNC(fCorrcoeff, corrcoeff, qfstatisticsCorrCoeff)
+
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fSum, sum, qfstatisticsSum)
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fCount, count, qfstatisticsCount)
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fProd, prod, qfstatisticsProd)
@@ -659,6 +665,10 @@ void QFMathParser::addStandardFunctions(){
     addFunction("sum", QFMathParser_Private::fSum);
     addFunction("sum2", QFMathParser_Private::fSum2);
     addFunction("mean", QFMathParser_Private::fMean);
+    addFunction("corrcoeff", QFMathParser_Private::fCorrcoeff);
+    addFunction("skewness", QFMathParser_Private::fSkewness);
+    addFunction("moment", QFMathParser_Private::fCentralMoment);
+    addFunction("ncmoment", QFMathParser_Private::fNonCentralMoment);
     addFunction("std", QFMathParser_Private::fStd);
     addFunction("var", QFMathParser_Private::fVar);
     addFunction("median", QFMathParser_Private::fMedian);

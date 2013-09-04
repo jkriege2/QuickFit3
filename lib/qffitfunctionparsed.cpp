@@ -58,16 +58,24 @@ QFFitFunctionParsed::QFFitFunctionParsed(const QString &configfile) :
             QFMathParser::qfmpNode* n=parser.parse(m_expression);
             bcenv=QFMathParser::ByteCodeEnvironment(&parser);
             bcenv.init(&parser);
+            pnode=NULL;
+            useBytecode=false;
             if (n->createByteCode(bprog, &bcenv)) {
+                delete n;
+                useBytecode=true;
+                m_valid=true;
+            } else if (!parser.hasErrorOccured()) {
+                pnode=n;
                 m_valid=true;
             } else {
+                delete n;
                 m_errors=QObject::tr("error generating bytecode:\n   + %1").arg(parser.getLastErrors().join("\n   + "));
             }
         } else {
             m_errors=QObject::tr("no parameters specified");
         }
     }
-    qDebug()<<"user FF: "<<m_expression<<"   valid: "<<m_valid;
+    //qDebug()<<"user FF: "<<m_expression<<"   valid: "<<m_valid;
 }
 
 QFFitFunctionParsed::~QFFitFunctionParsed()
@@ -83,6 +91,11 @@ bool QFFitFunctionParsed::isValid() const
 QString QFFitFunctionParsed::getErrors() const
 {
     return m_errors;
+}
+
+bool QFFitFunctionParsed::usesBytecode() const
+{
+    return useBytecode;
 }
 
 QString QFFitFunctionParsed::name() const
@@ -134,5 +147,12 @@ double QFFitFunctionParsed::evaluate(double t, const double *parameters) const
 {
     copyArray(params.data(), parameters, paramCount());
     x=t;
-    return parser.evaluateBytecode(bprog);
+    if (useBytecode){
+        return parser.evaluateBytecode(bprog);
+    } else if (pnode) {
+        qfmpResult res;
+        pnode->evaluate(res);
+        return res.asNumber();
+    }
+    return 0;
 }

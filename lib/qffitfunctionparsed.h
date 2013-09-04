@@ -12,6 +12,7 @@ class QFLIB_EXPORT QFFitFunctionParsed : public QFFitFunction{
 
         bool isValid() const;
         QString getErrors() const;
+        bool usesBytecode() const;
 
 
 
@@ -50,6 +51,8 @@ class QFLIB_EXPORT QFFitFunctionParsed : public QFFitFunction{
         mutable QFMathParser parser;
         QFMathParser::ByteCodeProgram bprog;
         QFMathParser::ByteCodeEnvironment bcenv;
+        QFMathParser::qfmpNode* pnode;
+        bool useBytecode;
         mutable QVector<double> params;
         mutable double x;
 

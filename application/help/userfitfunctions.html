@@ -65,7 +65,7 @@ init_fix=false
     <li>Then you can give a human-readable name, here <tt>"General: Parabola"</tt></li>
     <li>You can also give a shortened name, which is used in some places of QuickFit, but this is strictly optional.</li>
     <li><small><b>(required):</b></small>&nbsp;&nbsp;&nbsp;The expression is noted behind <tt>expression</tt> using the syntax of <a href="mathparser.html">QuickFit's expression parser</a>. 
-        $$note: Not all expressions are supported: e.g. the expression should retunr a single number (no vectors)$$</li>
+        $$note: You can use all possible expression, but the final result will be converted to a single number (e.g. the first vector element, or true -&gt; 1, false -&gt; 0. It is also possible to use more complex values, such as vectors inside the expression, but this might be much slower in evaluation. The highest speed, you will achieve when only operations and functions on simple numbers appear in the expression.$$</li>
     <li><small><b>(required):</b></small>&nbsp;&nbsp;&nbsp;Finally you will have to define the number of parameters in $$math:\vec{p}$$ (here <tt>3</tt>) as <tt>param_count</tt></li>
   <ul>
   </ul></li>

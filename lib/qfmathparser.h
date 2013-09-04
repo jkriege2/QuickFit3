@@ -166,6 +166,34 @@ void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParse
     return; \
 }
 
+/*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
+           has two numeric vector arguments and returns a number, e.g. qfstatisticsCorrelationCoefficient()
+
+    The resulting function will:
+      - check the number of arguments and their type
+      - apply the C-function to the argument
+    .
+
+    \param FName name of the function to declare
+    \param NAME_IN_PARSER name the function should have in the parser (used for error messages only)
+    \param CFUNC name of the C function to call
+*/
+#define QFMATHPARSER_DEFINE_2PARAM2VEC_VECTONUM_FUNC(FName, NAME_IN_PARSER, CFUNC) \
+void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    if (n!=2) {\
+        p->qfmpError(QObject::tr("%1(x, y) needs exactly 2 argument").arg(#NAME_IN_PARSER));\
+        r.setInvalid();\
+        return; \
+    }\
+    if(params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector) {\
+        r.setDouble(CFUNC(params[0].asVector(), params[1].asVector()));\
+    } else {\
+        p->qfmpError(QObject::tr("%1(x, y) arguments x and y have to be a vector of numbers").arg(#NAME_IN_PARSER));\
+        r.setInvalid();\
+    }\
+    return; \
+}
+
 
 /*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
            has one string (QString!!!) argument, e.g. sin(x)

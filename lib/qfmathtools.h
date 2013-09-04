@@ -308,6 +308,120 @@ double qfstatisticsAverage(const T& value) {
     return sum/(double)NN;
 }
 
+/*! \brief calculate the correlation coefficient
+    \ingroup qf3lib_mathtools
+
+    \f[ \text{Kor}(x,y)=\frac{\sum\limits_{i=0}^{N-1}(x_i-\overline{x})(y_i-\overline{y})}{\sqrt{\sum\limits_{i=0}^{N-1}(x_i-\overline{x})^2\cdot\sum\limits_{i=0}^{N-1}(y_i-\overline{y})^2}} \f]
+
+*/
+template <class T>
+double qfstatisticsCorrCoeff(const T& X, const T& Y) {
+    long long N=qMin(X.size(), Y.size());
+    if (N<=1) return 0;
+    register double xbar=0;
+    register double ybar=0;
+    register double NN=0;
+    for (long long i=0; i<N; i++) {
+        const double xm=X[i];
+        const double ym=Y[i];
+        if (QFFloatIsOK(xm) && QFFloatIsOK(ym)) {
+            xbar=xbar+xm;
+            ybar=ybar+ym;
+            NN++;
+        }
+    }
+    xbar=xbar/NN;
+    ybar=ybar/NN;
+    register double sumxy=0;
+    register double sumx=0;
+    register double sumy=0;
+    for (long long i=0; i<N; i++) {
+        const double xm=X[i]-xbar;
+        const double ym=Y[i]-ybar;
+        if (QFFloatIsOK(xm) && QFFloatIsOK(ym)) {
+            sumxy=sumxy+xm*ym;
+            sumx=sumx+xm*xm;
+            sumy=sumy+ym*ym;
+        }
+    }
+    return sumxy/sqrt(sumx*sumy);
+}
+
+/*! \brief calculate the skewness of a dataset
+    \ingroup qf3lib_mathtools
+
+    \f[ \gamma_1=\mathbb{E}\left[\left(\frac{X-\mu}{\sigma}\right)^3\right]= \frac{m_3}{m_2^{3/2}}  = \frac{\frac{1}{n} \sum_{i=1}^n (x_i-\overline{x})^3}{\left(\frac{1}{n} \sum_{i=1}^n (x_i-\overline{x})^2\right)^{3/2}} \f]
+    where \f$\mu\f$ is the mean and \f$\sigma\f$ the standard deviation of a random variable \f$X\f$ and \f$\overline{x}\f$ is the average (calculated using statisticsAverage() ) of
+    the input dataset \f$ x_i\f$.
+*/
+template <class T>
+double qfstatisticsSkewness(const T& value) {
+    long long N=value.size();
+    if (N<=0) return 0;
+    register double avg=qfstatisticsAverage(value);
+    register double sum3=0;
+    register double sum2=0;
+    register double NN=0;
+    for (register long long i=0; i<N; i++) {
+        const double v=value[i]-avg;
+        if (QFFloatIsOK(v)) {
+            sum3=sum3+(double)(v*v*v);
+            sum2=sum2+(double)(v*v);
+            NN++;
+        }
+    }
+    const double down=qfCube(sum2/double(NN));
+    return sum3/double(NN)/sqrt(down);
+}
+
+
+/*! \brief calculate the given central  moment
+    \ingroup qf3lib_mathtools
+
+    \f[ \langle X^n\rangle= \mathbb{E}\left[\left(X-\mu\right)^n\right] \f]
+    where \f$\mu\f$ is the mean of a random variable \f$X\f$ and \f$\overline{x}\f$ is the average (calculated using statisticsAverage() ) of
+    the input dataset \f$ x_i\f$.
+*/
+template <class T>
+double qfstatisticsCentralMoment(const T& value, int order) {
+    int N=value.size();
+    if (N<=0) return 0;
+    register double avg=qfstatisticsAverage(value);
+    register double sum=0;
+    register double NN=0;
+    for (register long long i=0; i<N; i++) {
+        const double v=value[i]-avg;
+        if (QFFloatIsOK(v)) {
+            sum=sum+pow(v, order);
+            NN++;
+        }
+    }
+    return sum/double(NN);
+}
+
+
+/*! \brief calculate the given non-central  moment
+    \ingroup qf3lib_mathtools
+
+    \f[ \langle X^n\rangle= \mathbb{E}\left[X^n\right] \f]
+    where \f$\mu\f$ is the mean of a random variable \f$X\f$ and \f$\overline{x}\f$ is the average (calculated using statisticsAverage() ) of
+    the input dataset \f$ x_i\f$.
+*/
+template <class T>
+double qfstatisticsMoment(const T& value, int order) {
+    int N=value.size();
+    if (N<=0) return 0;
+    register double sum=0;
+    register double NN=0;
+    for (register long long i=0; i<N; i++) {
+        const double v=value[i];
+        if (QFFloatIsOK(v)) {
+            sum=sum+pow(v, order);
+            NN++;
+        }
+    }
+    return sum/double(NN);
+}
 
 /*! \brief calculate the number of elements in \a value that contain a valid float
     \ingroup qf3lib_mathtools

@@ -10,14 +10,8 @@
     <x>0</x>
     <y>0</y>
     <width>898</width>
-    <height>565</height>
+    <height>601</height>
    </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Settings</string>
@@ -179,7 +173,7 @@
        <item>
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>5</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="page_2">
           <layout class="QFormLayout" name="formLayout_6">

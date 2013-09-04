@@ -41,7 +41,14 @@ void QFFitFunctionManager::reloadUserFitFunctions()
                     QFFitFunctionParsed* f=new QFFitFunctionParsed(fn);
                     if (!f->isValid()) {
                         isOK=tr("INVALID\n         ")+f->getErrors();
+                    } else {
+                        if(f->usesBytecode()) {
+                            isOK=isOK+tr(" [BYTECODE, FAST!]");
+                        } else {
+                            isOK=isOK+tr(" [TREE-EVALUATION, SLOW!]");
+                        }
                     }
+
                     emit showLongMessage(tr("    * adding function %1 from '%2' ... %3").arg(id).arg(fn).arg(isOK));
                     if (f->isValid()) {
                         userFF[id]=fn;
