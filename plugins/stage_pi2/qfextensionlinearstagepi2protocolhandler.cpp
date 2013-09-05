@@ -7,6 +7,7 @@ QFExtensionLinearStagePI2ProtocolHandler::QFExtensionLinearStagePI2ProtocolHandl
     this->LOG_PREFIX="";
     this->name=name;
     this->mutexSerial=mutexSerial;
+    currentID[com]=QChar(0);
 }
 
 void QFExtensionLinearStagePI2ProtocolHandler::setLogging(QFPluginLogService* log, QString LOG_PREFIX) {
@@ -14,68 +15,59 @@ void QFExtensionLinearStagePI2ProtocolHandler::setLogging(QFPluginLogService* lo
     this->LOG_PREFIX=LOG_PREFIX;
 }
 
+void QFExtensionLinearStagePI2ProtocolHandler::resetCurrentAxis()
+{
+    currentID[com]=QChar(0);
+}
+
 bool QFExtensionLinearStagePI2ProtocolHandler::checkComConnected()
 {
-    QMutexLocker lock(mutexSerial);
-    bool c=com.isConnectionOpen();
-    if (!c) {
-        if (log) log->log->log_error(tr(LOG_PREFIX+ " Could not connect to Mercury C-863 Motor Controller!!!\n"));
-        if (log) log->log_error(tr(LOG_PREFIX+ " reason: %1\n").arg(com.getLastError().c_str()));
-        for (int i=0; i<axes.size(); i++) {
-            axes[i].state=QFExtensionLinearStage::Error;
-        }
-    }
+    bool c=com->isConnectionOpen();
+
     return c;
 }
 
-void QFExtensionLinearStagePI2ProtocolHandler::selectAxis(int i)
+void QFExtensionLinearStagePI2ProtocolHandler::selectAxis(QChar ID)
 {
-    QMutexLocker lock(mutexSerial);
-    if ((i>=0)&&(i<axes.size())) {
-        QChar IDx=axes[i].ID;
-        if (currentID!=IDx) {
-            //std::cout<<"selecting motor "<<IDx<<"\n";
-            std::string s(2, IDx.toLatin1());
-            s[0]=1;
-            com.write(s);
-            //com.write(s);
-            checkComError();
-            queryCommand("TB");
-            currentID=IDx;
-        }
+    if (!currentID.contains(com) || currentID[com]!=ID) {
+        //std::cout<<"selecting motor "<<IDx<<"\n";
+        std::string s(2, ID.toLatin1());
+        s[0]=1;
+        com->write(s);
+        //com->write(s);
+        queryCommand("TB");
+        currentID[com]=ID;
     }
 }
 
 void QFExtensionLinearStagePI2ProtocolHandler::sendCommand(std::string command)
 {
-    com.write(command+"\x0D");
+    com->write(command+"\x0D");
 }
 
 std::string QFExtensionLinearStagePI2ProtocolHandler::queryCommand(std::string command)
 {
     std::string res="";
     //std::cout<<"\n\ncommand (stage "<<currentID<<"): '"<<command<<"'";
-    com.clearBuffer();
-    if (com.write(command+"\x0D")) {
-        res=com.readUntil(3);
+    com->clearBuffer();
+    if (com->write(command+"\x0D")) {
+        res=com->readUntil(3);
         //std::cout<<" ... reading ... ";
     }
     //std::cout<<"   direct_result: '"<<toprintablestr(res)<<"' ";
-    checkComError();
     if (res.size()>=3) res=res.erase(res.size()-3, 3);
     //std::cout<<"   returned_result: '"<<toprintablestr(res)<<"'\n\n";
     return res;
 }
 
-void QFExtensionLinearStagePI2ProtocolHandler::checkComError()
+QMutex *QFExtensionLinearStagePI2ProtocolHandler::getMutex() const
 {
-    QMutexLocker lock(mutexSerial);
-    if (com.hasErrorOccured()) {
-        for (int i=0; i<axes.size(); i++) {
-            axes[i].state=QFExtensionLinearStage::Error;
-            if (log) log->log_error(tr(LOG_PREFIX+ " serial port error: %1\n").arg(com.getLastError().c_str()));
-        }
-    }
+    return mutexSerial;
+}
+
+JKSerialConnection *QFExtensionLinearStagePI2ProtocolHandler::getCOM() const
+{
+    return com;
 }
 
 

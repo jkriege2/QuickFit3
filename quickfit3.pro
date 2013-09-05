@@ -194,7 +194,7 @@ plg_qfe_defaultmathparserextensions.depends = lib libqf3widgets
     plg_stage_pi.subdir=./plugins/stage_pi
     plg_stage_pi.depends = lib libqf3widgets
 
-#    SUBDIRS += plg_stage_pi2
+    SUBDIRS += plg_stage_pi2
     plg_stage_pi2.subdir=./plugins/stage_pi2
     plg_stage_pi2.depends = lib libqf3widgets
 

@@ -6,6 +6,8 @@ PIMercury863CalibrationDialog::PIMercury863CalibrationDialog(QWidget* parent, QF
     QDialog(parent)
 {
     this->stage=stage;
+    this->com=stage->axes[axis].serial->getCOM();
+    this->serial=stage->axes[axis].serial;
     this->axis=axis;
     maxX=-10000;
     minX=-10000;
@@ -80,14 +82,15 @@ PIMercury863CalibrationDialog::~PIMercury863CalibrationDialog()
 }
 
 void PIMercury863CalibrationDialog::resetCal() {
+    QMutexLocker locker(serial->getMutex());
 
     // write calibration to controllers
     std::cout<<"\n\ncalX[...]=\n";
     for (int i=0; i<256; i++) {
-        stage->selectAxis(axis);
-        stage->sendCommand("SI"+inttostr(i));
+        serial->selectAxis(stage->axes[axis].ID);
+        serial->sendCommand("SI"+inttostr(i));
         int c=(int)round(1024.0*((double)i-127.0)/128.0);
-        stage->sendCommand("SJ"+inttostr(c));
+        serial->sendCommand("SJ"+inttostr(c));
         //std::cout<<"   "<<i<<":  "<<c<<std::endl;
         calX[i]=i;
     }
@@ -98,14 +101,15 @@ void PIMercury863CalibrationDialog::resetCal() {
 }
 
 void PIMercury863CalibrationDialog::acceptCal() {
+    QMutexLocker locker(serial->getMutex());
     accepted=true;
     // write calibration to controllers
     stage->log_text(tr("sending calibration table for axis %1:\n").arg(axis));
     stage->log_text(tr("  cal[i]=\tvalue\n").arg(axis));
     for (int i=0; i<256; i++) {
-        stage->selectAxis(axis);
-        stage->sendCommand("SI"+inttostr(i));
-        stage->sendCommand("SJ"+inttostr(calX[i]));
+        serial->selectAxis(stage->axes[axis].ID);
+        serial->sendCommand("SI"+inttostr(i));
+        serial->sendCommand("SJ"+inttostr(calX[i]));
         stage->log_text(tr("  %1\t%2\n").arg(i).arg(calX[i]));
         //qDebug()<<stage->queryCommand("SI?").c_str()<<stage->queryCommand("SJ?").c_str();
     }
@@ -153,11 +157,12 @@ void PIMercury863CalibrationDialog::calibrate() {
 }
 
 void PIMercury863CalibrationDialog::center() {
-    if (stage->isConnected(axis)) {
+    QMutexLocker locker(serial->getMutex());
+    if (com->isConnectionOpen()) {
         //stage->resetError();
         std::string r;
-        stage->selectAxis(axis);
-        r=stage->queryCommand("TA5")+"\n";
+        serial->selectAxis(stage->axes[axis].ID);
+        r=serial->queryCommand("TA5")+"\n";
         //if (!stage->hasErrorOccured())
             sscanf(r.c_str(), "A5:%d", &zeroX);
     }
@@ -168,12 +173,13 @@ void PIMercury863CalibrationDialog::center() {
 }
 
 void PIMercury863CalibrationDialog::getJoystickValues() {
-    if (stage->isConnected(axis)) {
+    QMutexLocker locker(serial->getMutex());
+    if (com->isConnectionOpen()) {
         int jx=0, jy=0, jz=0;
         std::string r;
-        stage->selectAxis(axis);
-        r=stage->queryCommand("TA5")+"\n";
-        //if (!stage->hasErrorOccured())
+        serial->selectAxis(stage->axes[axis].ID);
+        r=serial->queryCommand("TA5")+"\n";
+        //if (!serial->hasErrorOccured())
             sscanf(r.c_str(), "A5:%d", &jx);
 
         int jjx=jx;

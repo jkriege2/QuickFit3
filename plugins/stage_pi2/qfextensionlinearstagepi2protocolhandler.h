@@ -26,17 +26,20 @@ class QFExtensionLinearStagePI2ProtocolHandler {
         QString getLastError();
         void setLogging(QFPluginLogService *log, QString LOG_PREFIX);
 
+        void resetCurrentAxis();
 
         bool checkComConnected();
 
-        void selectAxis(int i);
+        void selectAxis(QChar ID);
         /** \brief send a command to the Mercury controller (this automatically adds a command terminating character (carriage return) */
         void sendCommand(std::string command);
 
         /** \brief send a command to the Mercury controller (this automatically adds a command terminating character (carriage return)
          *         and returns the result (the standard finishing sequence CR LF ETX will be cut from the string) */
         std::string queryCommand(std::string command);
-        void checkComError();
+
+        QMutex* getMutex() const;
+        JKSerialConnection* getCOM() const;
 
 
 private:
@@ -45,6 +48,7 @@ private:
         QString LOG_PREFIX;
         QString name;
         QMutex* mutexSerial;
+        static QMap<JKSerialConnection*, QChar> currentID;
 };
 
 #endif // QFEXTENSIONLINEARSTAGEPI2PROTOCOLHANDLER_H

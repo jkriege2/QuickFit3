@@ -7,6 +7,8 @@
 #include <QLabel>
 #include <stdint.h>
 #include <QCheckBox>
+#include "jkserialconnection.h"
+#include "qfextensionlinearstagepi2protocolhandler.h"
 
 class QFExtensionLinearStagePI2; // forward
 
@@ -26,6 +28,8 @@ class PIMercury863CalibrationDialog : public QDialog {
         void resetCal();
     protected:
         QFExtensionLinearStagePI2* stage;
+        JKSerialConnection* com;
+        QFExtensionLinearStagePI2ProtocolHandler* serial;
         QProgressBar* prgX;
         QPushButton* btnOK;
         QPushButton* btnCancel;

@@ -9,6 +9,7 @@
 #include "../../../../../LIB/trunk/jkserialconnection.h"
 #include "../base_classes/qf3comportmanager.h"
 #include "qfextensionlinearstagepi2protocolhandler.h"
+#include "pimercury863calibrationdialog.h"
 
 /*!
     \defgroup qf3ext_StagePI QFExtensionLinearStage implementation for PI mercury stages
@@ -191,6 +192,8 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
         QF3ComPortManager ports;
 
         QVector<AxisDescription> axes;
+
+        friend class PIMercury863CalibrationDialog;
 };
 
 #endif // STAGE_PI2_H
