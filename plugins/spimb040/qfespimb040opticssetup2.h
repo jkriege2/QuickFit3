@@ -77,6 +77,17 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         virtual QWidget* takeLightpathWidget() const;
 
 
+        /** \brief returns the ID (int) of the given special shutter */
+        virtual int getSpecialShutterID(Shutters shutter) const;
+
+        /** \brief returns the ID (int) of the given special shutter */
+        virtual int getSpecialStageID(specialStages shutter) const;
+
+        /** \brief returns the ID (int) of the given special shutter */
+        virtual int getSpecialBrightfieldID(specialBrightfieldSources shutter) const;
+
+        /** \brief returns the ID (int) of the given special shutter */
+        virtual int getSpecialFilterChangerID(specialFilterChangers shutter) const;
 
 
         /*! \brief lock access to stages: stop the thread used for stage access by this widget
@@ -302,8 +313,8 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         QMap<QString, QF3ObjectiveCombobox*> ui_objectives;
         QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> > ui_dualviews;
 
-        QF3ObjectiveCombobox* objProjection;
-        QF3ObjectiveCombobox* objDetection;
+        QString objProjection;
+        QString objDetection;
 
         struct CameraWidgets {
             CameraWidgets() {
@@ -321,12 +332,15 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
             QString dualview;
         };
         QMap<QString, CameraWidgets> ui_cameras;
-        QMap<int, QString> ui_camindexes;
+        QStringList cameraIndex;
 
         QMap<QString, QFESPIMB040SampleStageConfig*> ui_stageconfigs;
         QMap<QString, QFStageConfigWidget*> ui_stages;
+        /** \brief a list of all stages, if the ID is member of ui_stages, the int is ignored, otherwise the int specifies whether this is the x, the y or the z stage in a ui_stageconfigs */
+        QList<QPair<QString, int> > stageIndex;
         QMap<QString, QFFilterChangerConfigWidget*> ui_filterchangers;
-        QFFilterChangerConfigWidget* filtercDetection;
+        QStringList filterChangerIndex;
+        QString filtercDetection;
         QMap<QString, QFShutterConfigWidget*> ui_shutter;
         QStringList shutterIndex;
 
@@ -344,9 +358,12 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         QList<MainShutterMember> shutterMain;
         QSet<int> waitForMainShutter;
 
-        QFShutterConfigWidget* shutterTransmission;
-        QFShutterConfigWidget* shutterLaser2;
-        QFShutterConfigWidget* shutterLaser1;
+        //QFShutterConfigWidget* shutterTransmission;
+        QString shutterTransmissionID;
+        //QFShutterConfigWidget* shutterLaser2;
+        QString shutterLaser2ID;
+        //QFShutterConfigWidget* shutterLaser1;
+        QString shutterLaser1ID;
 
         struct LightsourceWidgets {
             LightsourceWidgets() {
@@ -359,6 +376,9 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
             QString shutter;
         };
         QMap<QString, LightsourceWidgets> ui_lightsource;
+        QStringList lightsourceIndex;
+        QStringList laserIndex;
+        QStringList brightfieldIndex;
         QMap<QString, QTabWidget*> ui_tabs;
 
 

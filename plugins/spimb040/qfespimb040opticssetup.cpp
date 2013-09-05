@@ -238,6 +238,26 @@ QWidget *QFESPIMB040OpticsSetup::takeLightpathWidget() const
     return NULL;
 }
 
+int QFESPIMB040OpticsSetup::getSpecialShutterID(QFESPIMB040OpticsSetupBase::Shutters shutter) const
+{
+    return (int) shutter;
+}
+
+int QFESPIMB040OpticsSetup::getSpecialStageID(QFESPIMB040OpticsSetupBase::specialStages shutter) const
+{
+    return (int) shutter;
+}
+
+int QFESPIMB040OpticsSetup::getSpecialBrightfieldID(QFESPIMB040OpticsSetupBase::specialBrightfieldSources shutter) const
+{
+    return (int) shutter;
+}
+
+int QFESPIMB040OpticsSetup::getSpecialFilterChangerID(QFESPIMB040OpticsSetupBase::specialFilterChangers shutter) const
+{
+    return (int) shutter;
+}
+
 void QFESPIMB040OpticsSetup::loadPluginGlobalSettings(QSettings &settings, QString prefix) {
     loadPluginGlobalSettings(settings, ui->lsLaser1->getLightSourceExtensionObject(), prefix);
     loadPluginGlobalSettings(settings, ui->lsLaser2->getLightSourceExtensionObject(), prefix);

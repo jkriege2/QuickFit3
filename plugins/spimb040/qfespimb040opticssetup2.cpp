@@ -114,12 +114,12 @@ QFESPIMB040OpticsSetup2::QFESPIMB040OpticsSetup2(QWidget* pluginMainWidget, QWid
     m_pluginServices=pluginServices;
     m_pluginMainWidget=pluginMainWidget;
     m_log=log;
-    shutterTransmission=NULL;
-    shutterLaser2=NULL;
-    shutterLaser1=NULL;
-    objProjection=NULL;
-    objDetection=NULL;
-    filtercDetection=NULL;
+    shutterTransmissionID="";
+    shutterLaser2ID="";
+    shutterLaser1ID="";
+    objProjection="";
+    objDetection="";
+    filtercDetection="";
 
     ui->setupUi(this);
 
@@ -364,7 +364,7 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            connect(addShortCut(QString("cam%1_acquire_continuous_stop").arg(ui_cameras.size()), QString("camera %1: stop preview").arg(ui_cameras.size())), SIGNAL(activated()), w, SLOT(stopPreview()));
 
 
-                           ui_camindexes[ui_cameras.size()]=id;
+                           cameraIndex<<id;
                            ui_cameras[id].config=w;
                        } else if (type=="stage") {
                            QFStageConfigWidget* w=new QFStageConfigWidget(this);
@@ -388,7 +388,8 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            connect(addShortCut(QString("stage%1_joystick_off").arg(ui_stages.size()), QString("stage %1: joystick off").arg(ui_stages.size())), SIGNAL(activated()), w, SLOT(joystickOff()));
 
 
-                                   ui_stages[id]=w;
+                            ui_stages[id]=w;
+                            stageIndex<<qMakePair(id, 0);
                        } else if (type=="filterchanger") {
                            QFFilterChangerConfigWidget* w=new QFFilterChangerConfigWidget(this);
                            widNew=w;
@@ -412,7 +413,7 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            }
 
                            if (special_role=="detection_filterchanger" || special_role=="detection" || special_role=="detection_filterwheel" || special_role=="detection_filter") {
-                               filtercDetection=w;
+                               filtercDetection=id;
                            }
 
 
@@ -428,6 +429,7 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            connect(addShortCut(QString("filterchanger_%1_filter10").arg(ui_filterchangers.size()), QString("filter changer %1: set filter #10").arg(ui_filterchangers.size())), SIGNAL(activated()), w, SLOT(setFilter9()));
 
                            ui_filterchangers[id]=w;
+                           filterChangerIndex<<id;
                        } else if (type=="stages_xyz") {
                            QFESPIMB040SampleStageConfig* w=new QFESPIMB040SampleStageConfig(this);
                            widNew=w;
@@ -452,6 +454,9 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
 
 
                            ui_stageconfigs[id]=w;
+                           stageIndex<<qMakePair(id, 0);
+                           stageIndex<<qMakePair(id, 1);
+                           stageIndex<<qMakePair(id, 2);
                        } else if (type=="shutter") {
                            QFShutterConfigWidget* w=new QFShutterConfigWidget(this);
                            w->init(m_log, m_pluginServices);
@@ -480,13 +485,16 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                                shutterMain.append(ms);
                            }
                            if (special_role.contains("laser1_shutter")) {
-                               shutterLaser1=w;
+                               //shutterLaser1=w;
+                               shutterLaser1ID=id;
                            }
                            if (special_role.contains("laser2_shutter")) {
-                               shutterLaser2=w;
+                               //shutterLaser2=w;
+                               shutterLaser2ID=id;
                            }
                            if (special_role.contains("transmission_shutter")) {
-                               shutterTransmission=w;
+                               //shutterTransmission=w;
+                               shutterTransmissionID=id;
                            }
                            if (!used_by.isEmpty()) {
                                if (ui_cameras.contains(used_by)) {
@@ -512,6 +520,9 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            ingroupLayout->addWidget(l, y,x, rowSpan, 1, Qt::AlignTop|Qt::AlignLeft);
                            ingroupLayout->addWidget(w, y,x+1, rowSpan, qMax(1,colSpan-1));
                            ui_lightsource[id].config=w;
+                           lightsourceIndex<<id;
+                           if (subtype=="laser") laserIndex<<id;
+                           if (subtype=="brightfield") brightfieldIndex<<id;
                        } else if (type=="dualview") {
                            QF3DualViewWidget* w=new QF3DualViewWidget(this);
                            widNew=w;
@@ -556,9 +567,9 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            ingroupLayout->addWidget(w, y,x+1, rowSpan, qMax(1,colSpan-1));
                            ui_objectives[id]=w;
                            if (special_role=="detection_objective") {
-                               objDetection=w;
+                               objDetection=id;
                            } else if (special_role=="projection_objective") {
-                               objProjection=w;
+                               objProjection=id;
                            }
                            if (!used_by.isEmpty()) {
                                if (ui_cameras.contains(used_by))  {
@@ -738,6 +749,33 @@ QWidget *QFESPIMB040OpticsSetup2::takeLightpathWidget() const
     return NULL;
 }
 
+int QFESPIMB040OpticsSetup2::getSpecialShutterID(QFESPIMB040OpticsSetupBase::Shutters shutter) const
+{
+    switch(shutter) {
+        case ShutterMain: if (shutterMain.size()>0) { return shutterIndex.indexOf(ui_shutter.key(shutterMain.first().shutter)); } break;
+        case ShutterLaser1: if (!shutterLaser1ID.isEmpty()) { return shutterIndex.indexOf(shutterLaser1ID); } break;
+        case ShutterLaser2: if (!shutterLaser2ID.isEmpty()) { return shutterIndex.indexOf(shutterLaser2ID); } break;
+        case ShutterTransmission: if (!shutterTransmissionID.isEmpty()) { return shutterIndex.indexOf(shutterTransmissionID); } break;
+    }
+    return -1;
+}
+
+int QFESPIMB040OpticsSetup2::getSpecialStageID(QFESPIMB040OpticsSetupBase::specialStages shutter) const
+{
+    return -1;
+}
+
+int QFESPIMB040OpticsSetup2::getSpecialBrightfieldID(QFESPIMB040OpticsSetupBase::specialBrightfieldSources shutter) const
+{
+    return -1;
+}
+
+int QFESPIMB040OpticsSetup2::getSpecialFilterChangerID(QFESPIMB040OpticsSetupBase::specialFilterChangers shutter) const
+{
+    return -1;
+
+}
+
 #define ITERATEWIDGETMAPAROUND(MAP_TYPE, MAP, FUNCTION) \
     for (QMap<QString, MAP_TYPE>::const_iterator it=MAP.begin(); it!=MAP.end(); it++) { \
         FUNCTION; \
@@ -806,15 +844,15 @@ void QFESPIMB040OpticsSetup2::storePluginGlobalSettings(QSettings &settings, QSt
 
 
 double QFESPIMB040OpticsSetup2::getCameraMagnification(int setup_cam) const {
-    QString id=ui_camindexes.value(setup_cam, "");
+    QString id=cameraIndex.value(setup_cam, "");
     if (ui_cameras.contains(id)) {
         QString tl=ui_cameras[id].tubelens;
         double m=1;
         if (ui_objectives.contains(tl)) {
             m=m*ui_objectives[tl]->objective().magnification;
         }
-        if (objDetection) {
-            m=m*objDetection->objective().magnification;
+        if (ui_objectives.contains(objDetection) && ui_objectives[objDetection]) {
+            m=m*ui_objectives[objDetection]->objective().magnification;
         }
         return m;
     } else {
@@ -899,7 +937,7 @@ void QFESPIMB040OpticsSetup2::setLogging(QFPluginLogService* log) {
 }
 
 bool QFESPIMB040OpticsSetup2::lockCamera(int setup_cam, QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* previewSettingsFilename) {
-    QString id=ui_camindexes.value(setup_cam, "");
+    QString id=cameraIndex.value(setup_cam, "");
     if (ui_cameras.contains(id)) {
         return ui_cameras[id].config->lockCamera(extension, ecamera, camera,  previewSettingsFilename);
     }
@@ -907,7 +945,7 @@ bool QFESPIMB040OpticsSetup2::lockCamera(int setup_cam, QFExtension** extension,
 }
 
 void QFESPIMB040OpticsSetup2::releaseCamera(int setup_cam) {
-    QString id=ui_camindexes.value(setup_cam, "");
+    QString id=cameraIndex.value(setup_cam, "");
     if (ui_cameras.contains(id)) {
         ui_cameras[id].config->releaseCamera();
     }
@@ -922,7 +960,7 @@ void QFESPIMB040OpticsSetup2::overrideCameraPreview(int setup_cam, const QString
         unlockLightpath();
     }
 
-    QString id=ui_camindexes.value(setup_cam, "");
+    QString id=cameraIndex.value(setup_cam, "");
     if (ui_cameras.contains(id)) {
         ui_cameras[id].config->overridePreview(camera_settings);
     }
@@ -932,7 +970,7 @@ void QFESPIMB040OpticsSetup2::overrideCameraPreview(int setup_cam, const QString
 void QFESPIMB040OpticsSetup2::resetCameraPreview(int setup_cam)
 {
 
-    QString id=ui_camindexes.value(setup_cam, "");
+    QString id=cameraIndex.value(setup_cam, "");
     if (ui_cameras.contains(id)) {
         ui_cameras[id].config->resetPreview();
     }
@@ -1122,7 +1160,7 @@ void QFESPIMB040OpticsSetup2::updateMagnifications() {
     QMap<QString, CameraWidgets>::const_iterator i;
     for (i = ui_cameras.constBegin(); i != ui_cameras.constEnd(); ++i) {
         double m=1;
-        if (objDetection) m=objDetection->objective().magnification;
+        if (ui_objectives.contains(objDetection) && ui_objectives[objDetection]) m=ui_objectives[objDetection]->objective().magnification;
         if (ui_objectives.contains(i.value().tubelens)) {
             m=m*ui_objectives[i.value().tubelens]->objective().magnification;
         }
@@ -1135,7 +1173,7 @@ void QFESPIMB040OpticsSetup2::updateMagnifications() {
 
 QFExtensionFilterChanger *QFESPIMB040OpticsSetup2::getFilterChanger(int changer) const
 {
-    if (changer==FilterChangerDetection && filtercDetection) return filtercDetection->getFilterChanger();
+    if (changer==FilterChangerDetection && ui_filterchangers.contains(filtercDetection) && ui_filterchangers[filtercDetection]) return ui_filterchangers[filtercDetection]->getFilterChanger();
     return NULL;
 }
 
@@ -1318,14 +1356,14 @@ void QFESPIMB040OpticsSetup2::setSpecialShutter(int shutter, bool opened, bool b
 {
     if (shutter==QFESPIMB040OpticsSetup2::ShutterMain) {
         setMainIlluminationShutter(opened, blocking);
-    } else if (shutter==QFESPIMB040OpticsSetup2::ShutterLaser1 && shutterLaser1) {
-        shutterLaser1->setShutter(opened);
-        if (!opened) shutterLaser1->setShutter(false);
+    } else if (shutter==QFESPIMB040OpticsSetup2::ShutterLaser1 && ui_shutter.contains(shutterLaser1ID) && ui_shutter[shutterLaser1ID]) {
+        ui_shutter[shutterLaser1ID]->setShutter(opened);
+        if (!opened) ui_shutter[shutterLaser1ID]->setShutter(false);
 
         if (blocking) {
             QTime t;
             t.start();
-            while (shutterLaser1->getShutterState()!=opened && t.elapsed()<10000) {
+            while (ui_shutter[shutterLaser1ID]->getShutterState()!=opened && t.elapsed()<10000) {
                 QApplication::processEvents();
             }
 
@@ -1333,14 +1371,14 @@ void QFESPIMB040OpticsSetup2::setSpecialShutter(int shutter, bool opened, bool b
                 m_log->log_error("laser 1 shutter timed out after 10s!\n");
             }
         }
-    } else if (shutter==QFESPIMB040OpticsSetup2::ShutterLaser2 && shutterLaser2) {
-        shutterLaser2->setShutter(opened);
-        if (!opened) shutterLaser2->setShutter(false);
+    } else if (shutter==QFESPIMB040OpticsSetup2::ShutterLaser2 && ui_shutter.contains(shutterLaser2ID) && ui_shutter[shutterLaser2ID]) {
+        ui_shutter[shutterLaser2ID]->setShutter(opened);
+        if (!opened) ui_shutter[shutterLaser2ID]->setShutter(false);
 
         if (blocking) {
             QTime t;
             t.start();
-            while (shutterLaser2->getShutterState()!=opened && t.elapsed()<10000) {
+            while (ui_shutter[shutterLaser2ID]->getShutterState()!=opened && t.elapsed()<10000) {
                 QApplication::processEvents();
             }
 
@@ -1348,14 +1386,14 @@ void QFESPIMB040OpticsSetup2::setSpecialShutter(int shutter, bool opened, bool b
                 m_log->log_error("laser 2 shutter timed out after 10s!\n");
             }
         }
-    } else if (shutter==QFESPIMB040OpticsSetup2::ShutterTransmission && shutterTransmission) {
-        shutterTransmission->setShutter(opened);
-        if (!opened) shutterTransmission->setShutter(false);
+    } else if (shutter==QFESPIMB040OpticsSetup2::ShutterTransmission && ui_shutter.contains(shutterTransmissionID) && ui_shutter[shutterTransmissionID]) {
+        ui_shutter[shutterTransmissionID]->setShutter(opened);
+        if (!opened) ui_shutter[shutterTransmissionID]->setShutter(false);
 
         if (blocking) {
             QTime t;
             t.start();
-            while (shutterTransmission->getShutterState()!=opened && t.elapsed()<10000) {
+            while (ui_shutter[shutterTransmissionID]->getShutterState()!=opened && t.elapsed()<10000) {
                 QApplication::processEvents();
             }
 

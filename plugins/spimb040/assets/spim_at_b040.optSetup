@@ -23,6 +23,7 @@ colstretch="0,1"
 type=lightsource
 title="source:"
 ingroup=group_transmission
+special_role=brightfield
 
 [transmission_filter]
 type=filter
@@ -48,6 +49,7 @@ colstretch="0,1"
 type=lightsource
 title="source:"
 ingroup=group_laser1
+special_role=laser
 
 [laser1_filter]
 type=filter
@@ -73,6 +75,7 @@ colstretch="0,1"
 type=lightsource
 title="source:"
 ingroup=group_laser2
+special_role=laser
 
 [laser2_filter]
 type=filter
@@ -160,6 +163,7 @@ ingroup=group_center
 title="XYZ sample translation stages:"
 x=0
 colspan=2
+special_role=xyz
 
 [stages_r]
 type=stage

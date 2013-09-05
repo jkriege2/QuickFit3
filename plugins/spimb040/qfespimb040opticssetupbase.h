@@ -47,6 +47,23 @@ class QFESPIMB040OpticsSetupBase: public QWidget {
             FilterChangerDetection=0
         };
 
+
+        /** \brief returns the ID (int) of the given special shutter */
+        virtual int getSpecialShutterID(Shutters shutter) const=0;
+
+        /** \brief returns the ID (int) of the given special shutter */
+        virtual int getSpecialStageID(specialStages shutter) const=0;
+
+        /** \brief returns the ID (int) of the given special shutter */
+        virtual int getSpecialBrightfieldID(specialBrightfieldSources shutter) const=0;
+
+        /** \brief returns the ID (int) of the given special shutter */
+        virtual int getSpecialFilterChangerID(specialFilterChangers shutter) const=0;
+
+
+
+
+
         struct measuredValues {
             QDateTime time;
             QMap<QString, QVariant> data;

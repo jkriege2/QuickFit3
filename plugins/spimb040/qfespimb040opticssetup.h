@@ -57,6 +57,17 @@ class QFESPIMB040OpticsSetup : public QFESPIMB040OpticsSetupBase {
         virtual QWidget* takeLightpathWidget() const;
 
 
+        /** \brief returns the ID (int) of the given special shutter */
+        virtual int getSpecialShutterID(Shutters shutter) const;
+
+        /** \brief returns the ID (int) of the given special shutter */
+        virtual int getSpecialStageID(specialStages shutter) const;
+
+        /** \brief returns the ID (int) of the given special shutter */
+        virtual int getSpecialBrightfieldID(specialBrightfieldSources shutter) const;
+
+        /** \brief returns the ID (int) of the given special shutter */
+        virtual int getSpecialFilterChangerID(specialFilterChangers shutter) const;
 
 
         /*! \brief lock access to stages: stop the thread used for stage access by this widget
