@@ -1,5 +1,7 @@
 #include "qfextensionlinearstagepi2protocolhandler.h"
 
+QMap<JKSerialConnection*, QChar> QFExtensionLinearStagePI2ProtocolHandler::currentID=QMap<JKSerialConnection*, QChar>();
+
 QFExtensionLinearStagePI2ProtocolHandler::QFExtensionLinearStagePI2ProtocolHandler(JKSerialConnection *com, QMutex* mutexSerial, QString name)
 {
     this->com=com;
