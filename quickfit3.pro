@@ -214,8 +214,12 @@ plg_qfe_defaultmathparserextensions.depends = lib libqf3widgets
     plg_lights_pccsled.subdir=./plugins/lights_pccsled
     plg_lights_pccsled.depends = lib libqf3widgets
 
-    SUBDIRS += plg_lights_b040laserbox
-    plg_lights_b040laserbox.subdir=./plugins/lights_b040laserbox
+    SUBDIRS += plg_lights_coboltlaser
+    plg_lights_coboltlaser.subdir=./plugins/lights_coboltlaser
+    plg_lights_coboltlaser.depends = lib libqf3widgets
+
+    SUBDIRS += plg_qfextensioncoboltlaser
+    plg_qfextensioncoboltlaser.subdir=./plugins/lights_b040laserbox
     plg_lights_b040laserbox.depends = lib libqf3widgets
 
 #    SUBDIRS += plg_b040_ffmcontrol

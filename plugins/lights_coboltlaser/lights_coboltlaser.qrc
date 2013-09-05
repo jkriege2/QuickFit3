@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="lights_coboltlaser/lights_coboltlaser.png">lights_coboltlaser.png</file>
+</qresource>
+</RCC>
