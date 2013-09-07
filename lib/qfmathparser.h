@@ -417,10 +417,10 @@ struct QFLIB_EXPORT qfmpResult {
          QFLIB_EXPORT void setInvalid();
          QFLIB_EXPORT void setVoid();
         /** \brief convert the value this struct representens into a QString */
-         QFLIB_EXPORT QString toString() const;
+         QFLIB_EXPORT QString toString(int precision=10) const;
 
         /** \brief convert the value this struct representens into a QString and adds the name of the datatype in \c [...] */
-         QFLIB_EXPORT QString toTypeString() const;
+         QFLIB_EXPORT QString toTypeString(int precision=10) const;
 
         /** \brief convert the value this struct to an integer */
          QFLIB_EXPORT int32_t toInteger() const;
@@ -1928,12 +1928,17 @@ class QFLIB_EXPORT QFMathParser
         void putbackStream(QTextStream* stream, QChar ch);
         bool getFromStream(QTextStream* stream, QChar& ch);
 
+        QMap<QString, QVariant> m_generalData;
+
 	public:
         /** \brief class constructor */
         QFMathParser();
 
         /** \brief class destructor */
         virtual ~QFMathParser();
+
+        void setGeneralData(const QString& id, const QVariant& data);
+        QVariant getGeneraldata(const QString& id, const QVariant& defaultData=QVariant());
 
         /** \brief returns whether an error has occured since the last call to resetError() */
         bool hasErrorOccured() const;

@@ -88,6 +88,8 @@ class QFExtensionB040ResistorHeater : public QObject, public QFExtensionBase, pu
 
         /** \copydoc QFExtensionMeasurementAndControlDevice::getMeasurementDeviceCount() */
         virtual unsigned int getMeasurementDeviceCount();
+        /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceName() */
+        virtual QString getMeasurementDeviceName(unsigned int measuremenDevice);
 
         /** \copydoc QFExtensionMeasurementAndControlDevice::showMeasurementDeviceSettingsDialog() */
         virtual void showMeasurementDeviceSettingsDialog(unsigned int measuremenDevice, QWidget* parent=NULL);
@@ -113,6 +115,10 @@ class QFExtensionB040ResistorHeater : public QObject, public QFExtensionBase, pu
         virtual void setMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value, const QVariant& data);
         /** \copydoc QFExtensionMeasurementAndControlDevice::getMeasurementDeviceEditableValueType() */
         virtual QVariant::Type getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value);
+        /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceValueWidget() */
+        virtual WidgetTypes getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList* comboboxEntries=NULL);
+        /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceEditableValueRange() */
+        virtual void getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double& minimum, double& maximum);
 
 	protected:
         QFPluginLogService* logService;
@@ -126,6 +132,7 @@ class QFExtensionB040ResistorHeater : public QObject, public QFExtensionBase, pu
             int port;
             QString infoMessage;
             QTime lastAction;
+            QString label;
         };
 
         QList<DEVICEINFO> devices;

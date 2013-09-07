@@ -122,6 +122,8 @@ class QFExtensionShutterShuterArduino : public QObject, public QFExtensionBase, 
             /** \brief duration of a shutter operation in milliseconds */
             int shutter_operation_duration;
             QString infoMessage;
+            QString label;
+            QString description;
             QTime lastAction;
         };
 

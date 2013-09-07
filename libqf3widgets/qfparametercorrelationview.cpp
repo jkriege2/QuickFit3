@@ -39,6 +39,8 @@ void QFParameterCorrelationView::readSettings(QSettings &settings, const QString
 {
     connectParameterWidgets(false);
     loadSplitter(settings, splitterHistogram, prefix+"splitterhistogramSizes");
+    chkScatterPlot->setChecked(settings.value(prefix+"/show_scatter", false).toBool());
+    cmb2DHistogram->setCurrentIndex(settings.value(prefix+"/show_2dhist", 2).toInt());
     cmbSymbol->setCurrentIndex(settings.value(prefix+"/symbol", JKQTPfilledCircle).toInt());
     spinSymbolSize->setValue(settings.value(prefix+"/symbolsize", 5).toInt());
     connectParameterWidgets(true);
@@ -53,6 +55,11 @@ void QFParameterCorrelationView::writeSettings(QSettings &settings, const QStrin
 
 void QFParameterCorrelationView::writeQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)
 {
+    current->setQFProperty(prefix+QString("show_scatter_%1_%2").arg(egroup).arg(param), chkScatterPlot->isChecked(), false, false);
+    current->setQFProperty(prefix+QString("show_2dhist_%1_%2").arg(egroup).arg(param), cmb2DHistogram->currentIndex(), false, false);
+    current->setQFProperty(prefix+QString("hist2dbins1_%1_%2").arg(egroup).arg(param), spin2DHistogramBins1->value(), false, false);
+    current->setQFProperty(prefix+QString("hist2dbins2_%1_%2").arg(egroup).arg(param), spin2DHistogramBins2->value(), false, false);
+
     current->setQFProperty(prefix+QString("symbol_%1_%2").arg(egroup).arg(param), cmbSymbol->currentIndex(), false, false);
     current->setQFProperty(prefix+QString("symbsize_%1_%2").arg(egroup).arg(param), spinSymbolSize->value(), false, false);
     current->setQFProperty(prefix+QString("bins1_%1_%2").arg(egroup).arg(param), spinHistogramBins1->value(), false, false);
@@ -72,17 +79,25 @@ void QFParameterCorrelationView::writeQFProperties(QFProperties *current, const 
 
 void QFParameterCorrelationView::readQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)
 {
-    cmbSymbol->setCurrentIndex(current->getProperty(prefix+QString("symbol_%1_%2").arg(egroup).arg(param)).toInt());
-    spinSymbolSize->setValue(current->getProperty(prefix+QString("symbsize_%1_%2").arg(egroup).arg(param)).toInt());
-    spinHistogramBins1->setValue(current->getProperty(prefix+QString("bins1_%1_%2").arg(egroup).arg(param), 50).toInt());
+
+    chkScatterPlot->setChecked(current->getProperty(prefix+QString("show_scatter_%1_%2").arg(egroup).arg(param), true).toBool());
+    cmb2DHistogram->setCurrentIndex(current->getProperty(prefix+QString("show_2dhist_%1_%2").arg(egroup).arg(param), 0).toInt());
+    spin2DHistogramBins1->setValue(current->getProperty(prefix+QString("hist2dbins1_%1_%2").arg(egroup).arg(param), 30).toInt());
+    spin2DHistogramBins2->setValue(current->getProperty(prefix+QString("hist2dbins2_%1_%2").arg(egroup).arg(param), 30).toInt());
+
+
+
+    cmbSymbol->setCurrentIndex(current->getProperty(prefix+QString("symbol_%1_%2").arg(egroup).arg(param), JKQTPfilledCircle).toInt());
+    spinSymbolSize->setValue(current->getProperty(prefix+QString("symbsize_%1_%2").arg(egroup).arg(param), 3).toInt());
+    spinHistogramBins1->setValue(current->getProperty(prefix+QString("bins1_%1_%2").arg(egroup).arg(param), 30).toInt());
     chkHistogramRangeAuto1->setChecked(current->getProperty(prefix+QString("rauto1_%1_%2").arg(egroup).arg(param), true).toBool());
     if (!chkHistogramRangeAuto1->isChecked()) {
         edtHistogramMin1->setValue(current->getProperty(prefix+QString("rmin1_%1_%2").arg(egroup).arg(param), 0).toDouble());
         edtHistogramMax1->setValue(current->getProperty(prefix+QString("rmax1_%1_%2").arg(egroup).arg(param), 10).toDouble());
     }
 
-    spinHistogramBins2->setValue(current->getProperty(prefix+QString("bins2_%1_%2").arg(egroup).arg(param), 50).toInt());
-    chkHistogramRangeAuto1->setChecked(current->getProperty(prefix+QString("rauto2_%1_%2").arg(egroup).arg(param), true).toBool());
+    spinHistogramBins2->setValue(current->getProperty(prefix+QString("bins2_%1_%2").arg(egroup).arg(param), 30).toInt());
+    chkHistogramRangeAuto2->setChecked(current->getProperty(prefix+QString("rauto2_%1_%2").arg(egroup).arg(param), true).toBool());
     if (!chkHistogramRangeAuto2->isChecked()) {
         edtHistogramMin2->setValue(current->getProperty(prefix+QString("rmin2_%1_%2").arg(egroup).arg(param), 0).toDouble());
         edtHistogramMax2->setValue(current->getProperty(prefix+QString("rmax2_%1_%2").arg(egroup).arg(param), 10).toDouble());
@@ -104,6 +119,13 @@ void QFParameterCorrelationView::connectParameterWidgets(bool connectTo)
         connect(chkHistogramRangeAuto2, SIGNAL(toggled(bool)), this, SLOT(dataSettingsChanged()));
         connect(edtHistogramMin2, SIGNAL(valueChanged(double)), this, SLOT(dataSettingsChanged()));
         connect(edtHistogramMax2, SIGNAL(valueChanged(double)), this, SLOT(dataSettingsChanged()));
+
+
+        connect(spin2DHistogramBins1, SIGNAL(valueChanged(int)), this, SLOT(dataSettingsChanged()));
+        connect(spin2DHistogramBins2, SIGNAL(valueChanged(int)), this, SLOT(dataSettingsChanged()));
+        connect(chkScatterPlot, SIGNAL(toggled(bool)), this, SLOT(dataSettingsChanged()));
+        connect(cmb2DHistogram, SIGNAL(currentIndexChanged(int)), this, SLOT(dataSettingsChanged()));
+
     } else {
         disconnect(spinSymbolSize, SIGNAL(valueChanged(int)), this, SLOT(dataSettingsChanged()));
         disconnect(cmbSymbol, SIGNAL(currentIndexChanged(int)), this, SLOT(dataSettingsChanged()));
@@ -117,6 +139,11 @@ void QFParameterCorrelationView::connectParameterWidgets(bool connectTo)
         disconnect(chkHistogramRangeAuto2, SIGNAL(toggled(bool)), this, SLOT(dataSettingsChanged()));
         disconnect(edtHistogramMin2, SIGNAL(valueChanged(double)), this, SLOT(dataSettingsChanged()));
         disconnect(edtHistogramMax2, SIGNAL(valueChanged(double)), this, SLOT(dataSettingsChanged()));
+
+        disconnect(spin2DHistogramBins1, SIGNAL(valueChanged(int)), this, SLOT(dataSettingsChanged()));
+        disconnect(spin2DHistogramBins2, SIGNAL(valueChanged(int)), this, SLOT(dataSettingsChanged()));
+        disconnect(chkScatterPlot, SIGNAL(toggled(bool)), this, SLOT(dataSettingsChanged()));
+        disconnect(cmb2DHistogram, SIGNAL(currentIndexChanged(int)), this, SLOT(dataSettingsChanged()));
     }
 }
 
@@ -269,11 +296,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 long histBinsX=spinHistogramBins1->value();
                 double* histXX=(double*)malloc(histBinsX*sizeof(double));
                 double* histXY=(double*)malloc(histBinsX*sizeof(double));
-                if (chkHistogramRangeAuto1->isChecked() && hh==0) {
-                    statisticsHistogramRanged<double, double>(d1r, datasize, mmin1, mmax1, histXX, histXY, histBinsX, false);
-                } else {
-                    statisticsHistogramRanged<double, double>(d1r, datasize, mmin1, mmax1, histXX, histXY, histBinsX, false);
-                }
+                statisticsHistogramRanged<double, double>(d1r, datasize, mmin1, mmax1, histXX, histXY, histBinsX, false);
 
 
                 dmean=statisticsAverageVariance(dstd, d2, datasize);
@@ -308,22 +331,67 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 long histBinsY=spinHistogramBins2->value();
                 double* histYX=(double*)malloc(histBinsY*sizeof(double));
                 double* histYY=(double*)malloc(histBinsY*sizeof(double));
-                if (chkHistogramRangeAuto2->isChecked() && hh==0) {
-                    statisticsHistogramRanged<double, double>(d2r, datasize, mmin2, mmax2, histYX, histYY, histBinsY, false);
-                } else {
-                    statisticsHistogramRanged<double, double>(d2r, datasize, mmin2, mmax2, histYX, histYY, histBinsY, false);
+                statisticsHistogramRanged<double, double>(d2r, datasize, mmin2, mmax2, histYX, histYY, histBinsY, false);
+
+                long hist2DBinsX=spin2DHistogramBins1->value();
+                long hist2DBinsY=spin2DHistogramBins2->value();
+                double* hist2DX=(double*)malloc(hist2DBinsX*sizeof(double));
+                double* hist2DY=(double*)malloc(hist2DBinsY*sizeof(double));
+                double* hist2D=(double*)calloc(hist2DBinsX*hist2DBinsY,sizeof(double));
+                double* kde2D=(double*)calloc(hist2DBinsX*hist2DBinsY,sizeof(double));
+                double bwX=(mmax1-mmin1)/double(hist2DBinsX);
+                double bwY=(mmax2-mmin2)/double(hist2DBinsY);
+                if (cmb2DHistogram->currentIndex()==2) statistics2DKDEHistogramRanged(d1r, d2r, datasize, statisticsKernel2DGaussian, bwX, bwY, mmin1, mmax1, mmin2, mmax2, hist2DX, hist2DY, kde2D, hist2DBinsX, hist2DBinsY);
+                if (cmb2DHistogram->currentIndex()==1) statisticsHistogram2DRanged(d1r, d2r, datasize, mmin1, mmax1, mmin2, mmax2, hist2DX, hist2DY, hist2D, hist2DBinsX, hist2DBinsY);
+
+                //qDebug()<<"bwX="<<bwX;
+                //qDebug()<<"bwY="<<bwY;
+                //qDebug()<<"x="<<arrayToString(hist2DX, hist2DBinsX);
+                //qDebug()<<"y="<<arrayToString(hist2DY, hist2DBinsY);
+
+                if (cmb2DHistogram->currentIndex()>0) {
+                    int g_i=-1;
+                    if (cmb2DHistogram->currentIndex()==1) {
+                        g_i=pltParamCorrelation->getDatastore()->addCopiedImageAsColumn(hist2D, hist2DBinsX, hist2DBinsY, tr("corr%1_2DHISTOGRAM").arg(hh));
+                    }
+                    if (cmb2DHistogram->currentIndex()==2) {
+                        g_i=pltParamCorrelation->getDatastore()->addCopiedImageAsColumn(kde2D, hist2DBinsX, hist2DBinsY, tr("corr%1_2DDENSITY").arg(hh));
+                    }
+                    JKQTPColumnMathImage* g=new JKQTPColumnMathImage(pltParamCorrelation->get_plotter());
+                    g->set_title(tr("density: %1").arg(hist.name));
+                    g->set_imageColumn(g_i);
+                    g->set_Nx(hist2DBinsX);
+                    g->set_Ny(hist2DBinsY);
+                    g->set_x(mmin1);
+                    g->set_y(mmin2);
+                    g->set_width(mmax1-mmin1);
+                    g->set_height(mmax2-mmin2);
+                    g->set_palette(JKQTPMathImage::INVERTED_OCEAN);
+                    g->set_autoImageRange(true);
+                    pltParamCorrelation->addGraph(g);
+
                 }
 
+                QColor scatterColor=QColor("red");
+                if (hh%5==1) scatterColor=QColor("darkorange");
+                if (hh%5==2) scatterColor=QColor("gold");
+                if (hh%5==3) scatterColor=QColor("deeppink");
+                if (hh%5==4) scatterColor=QColor("purple");
 
-                JKQTPxyLineGraph* g=new JKQTPxyLineGraph(pltParamCorrelation->get_plotter());
-                int g_x=pltParamCorrelation->getDatastore()->addCopiedColumn(d1r, datasize, tr("corr%1_X").arg(hh));
-                int g_y=pltParamCorrelation->getDatastore()->addCopiedColumn(d2r, datasize, tr("corr%1_Y").arg(hh));
-                g->set_title(hist.name);
-                g->set_xColumn(g_x);
-                g->set_yColumn(g_y);
-                g->set_symbol(cmbSymbol->getSymbol());
-                g->set_symbolSize(spinSymbolSize->value());
-                g->set_drawLine(false);
+                if (chkScatterPlot->isChecked()) {
+                    JKQTPxyLineGraph* g=new JKQTPxyLineGraph(pltParamCorrelation->get_plotter());
+                    int g_x=pltParamCorrelation->getDatastore()->addCopiedColumn(d1r, datasize, tr("corr%1_X").arg(hh));
+                    int g_y=pltParamCorrelation->getDatastore()->addCopiedColumn(d2r, datasize, tr("corr%1_Y").arg(hh));
+                    g->set_title(tr("scatter: %1").arg(hist.name));
+                    g->set_xColumn(g_x);
+                    g->set_yColumn(g_y);
+                    g->set_symbol(cmbSymbol->getSymbol());
+                    g->set_symbolSize(spinSymbolSize->value());
+                    g->set_drawLine(false);
+                    g->set_color(scatterColor);
+                    g->set_fillColor(scatterColor.lighter());
+                    pltParamCorrelation->addGraph(g);
+                }
 
 
 
@@ -332,7 +400,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 JKQTPbarHorizontalGraph* plteParamHistogramX=new JKQTPbarHorizontalGraph(pltParamHistogramX->get_plotter());
                 int g_hxx=pltParamCorrelation->getDatastore()->addCopiedColumn(histXX, histBinsX, tr("hist%1_X_histogram_X").arg(hh));
                 int g_hxy=pltParamCorrelation->getDatastore()->addCopiedColumn(histXY, histBinsX, tr("hist%1_X_histogram_Y").arg(hh));
-                QColor fill=g->get_color();
+                QColor fill=scatterColor;
                 plteParamHistogramX->set_color(fill);
                 fill.setAlphaF(0.7);
                 plteParamHistogramX->set_fillColor(fill);
@@ -346,7 +414,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 JKQTPbarVerticalGraph* plteParamHistogramY=new JKQTPbarVerticalGraph(pltParamHistogramY->get_plotter());
                 int g_hyx=pltParamCorrelation->getDatastore()->addCopiedColumn(histYX, histBinsY, tr("hist%1_Y_histogram_X").arg(hh));
                 int g_hyy=pltParamCorrelation->getDatastore()->addCopiedColumn(histYY, histBinsY, tr("hist%1_Y_histogram_Y").arg(hh));
-                fill=g->get_color();
+                fill=scatterColor;
                 plteParamHistogramY->set_color(fill);
                 fill.setAlphaF(0.7);
                 plteParamHistogramY->set_fillColor(fill);
@@ -364,12 +432,17 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 free(histYX);
                 free(histYY);
 
+                free(hist2DX);
+                free(hist2DY);
+                free(hist2D);
+                free(kde2D);
+
                 free(d1);
                 free(d2);
                 free(d1r);
                 free(d2r);
 
-                pltParamCorrelation->addGraph(g);
+
 
             }
         }
@@ -394,88 +467,6 @@ void QFParameterCorrelationView::addSettingsWidget(const QString &label, QWidget
     flHistSet->addRow(label, widget);
 }
 
-/*int QFParameterCorrelationView::getHistBins1() const
-{
-    return spinHistogramBins1->value();
-}
-
-void QFParameterCorrelationView::setHistBins1(int bins)
-{
-    spinHistogramBins1->setValue(bins);
-}
-
-int QFParameterCorrelationView::getHistBins2() const
-{
-    return spinHistogramBins2->value();
-}
-
-void QFParameterCorrelationView::setHistBins2(int bins)
-{
-    spinHistogramBins2->setValue(bins);
-}
-
-bool QFParameterCorrelationView::getAutorange1() const
-{
-    return chkHistogramRangeAuto1->isChecked();
-}
-
-void QFParameterCorrelationView::setAutorange1(bool autorange)
-{
-    chkHistogramRangeAuto1->setChecked(autorange);
-}
-
-bool QFParameterCorrelationView::getAutorange2() const
-{
-    return chkHistogramRangeAuto2->isChecked();
-}
-
-void QFParameterCorrelationView::setAutorange2(bool autorange)
-{
-    chkHistogramRangeAuto2->setChecked(autorange);
-}
-
-double QFParameterCorrelationView::getMin1() const
-{
-    return edtHistogramMin1->value();
-}
-
-void QFParameterCorrelationView::setMin1(double min)
-{
-    edtHistogramMin1->setValue(min);
-}
-
-double QFParameterCorrelationView::getMax1() const
-{
-    return edtHistogramMax1->value();
-}
-
-void QFParameterCorrelationView::setMax1(double max)
-{
-    edtHistogramMax1->setValue(max);
-}
-
-double QFParameterCorrelationView::getMin2() const
-{
-    return edtHistogramMin2->value();
-
-}
-
-void QFParameterCorrelationView::setMin2(double min)
-{
-    edtHistogramMin2->setValue(min);
-
-}
-
-double QFParameterCorrelationView::getMax2() const
-{
-    return edtHistogramMax2->value();
-
-}
-
-void QFParameterCorrelationView::setMax2(double max)
-{
-    edtHistogramMax2->setValue(max);
-}*/
 
 void QFParameterCorrelationView::clear()
 {
@@ -617,13 +608,14 @@ void QFParameterCorrelationView::writeReport(QTextCursor &cursor, QTextDocument 
     QTextTable* table = cursor.insertTable(2,3, tableFormat1);
     table->mergeCells(0,2,2,1);
     {
+        double scale=1.0;
         QTextCursor tabCursor=table->cellAt(0,1).firstCursorPosition();
         {
             QPicture pic;
             QPainter* painter=new QPainter(&pic);
             pltParamCorrelation->get_plotter()->draw(*painter, QRect(0,0,pltParamCorrelation->width(),pltParamCorrelation->height()));
             delete painter;
-            double scale=0.5*document->textWidth()/double(pic.boundingRect().width());
+            scale=0.5*document->textWidth()/double(pic.boundingRect().width());
             if (scale<=0) scale=1;
             insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
         }
@@ -634,8 +626,6 @@ void QFParameterCorrelationView::writeReport(QTextCursor &cursor, QTextDocument 
             QPainter* painter=new QPainter(&pic);
             pltParamHistogramY->get_plotter()->draw(*painter, QRect(0,0,pltParamCorrelation->width(),pltParamCorrelation->height()));
             delete painter;
-            double scale=0.2*document->textWidth()/double(pic.boundingRect().width());
-            if (scale<=0) scale=1;
             insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
         }
         tabCursor=table->cellAt(1, 1).firstCursorPosition();
@@ -644,8 +634,6 @@ void QFParameterCorrelationView::writeReport(QTextCursor &cursor, QTextDocument 
             QPainter* painter=new QPainter(&pic);
             pltParamHistogramX->get_plotter()->draw(*painter, QRect(0,0,pltParamCorrelation->width(),pltParamCorrelation->height()));
             delete painter;
-            double scale=0.5*document->textWidth()/double(pic.boundingRect().width());
-            if (scale<=0) scale=1;
             insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
         }
 
@@ -656,7 +644,7 @@ void QFParameterCorrelationView::writeReport(QTextCursor &cursor, QTextDocument 
         QPainter* painter=new QPainter(&picT);
         tvHistogramParameters->paint(*painter);
         delete painter;
-        double scale=0.3*document->textWidth()/double(picT.boundingRect().width());
+        scale=0.3*document->textWidth()/double(picT.boundingRect().width());
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("statistics table:\n"), fTextBoldSmall);
         insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale);
@@ -706,22 +694,62 @@ void QFParameterCorrelationView::createWidgets()
 
     // HISTOGRAM SETTINGS/////////////////////////////////////////////////////////////////////
     QHBoxLayout* coll;
-    grpHistogramSettings=new QGroupBox(tr("histogram style"), this);
+    grpHistogramSettings=new QGroupBox(tr("plot style"), this);
     flHistSet=new QFormLayout(grpHistogramSettings);
     grpHistogramSettings->setLayout(flHistSet);
 
     cmbSymbol=new JKQTPSymbolComboBox(this);
+
+    chkScatterPlot=new QCheckBox("", this);
+    chkScatterPlot->setChecked(true);
+    cmb2DHistogram=new QComboBox(this);
+    cmb2DHistogram->addItem(tr("none"));
+    cmb2DHistogram->addItem(tr("histogram"));
+    cmb2DHistogram->addItem(tr("kernel density"));
+    cmb2DHistogram->setCurrentIndex(2);
+    coll=new QHBoxLayout();
+    coll->addWidget(new QLabel(tr("scatter: ")));
+    coll->addWidget(chkScatterPlot,1);
+    coll->addSpacing(16);
+    coll->addWidget(new QLabel(tr("density: ")));
+    coll->addWidget(cmb2DHistogram,1);
+    coll->addStretch();
+    coll->setContentsMargins(0,0,0,0);
+    flHistSet->addRow(tr("<b>plots:</b>"), coll);
+
+    spin2DHistogramBins1=new QSpinBox(this);
+    spin2DHistogramBins1->setRange(5, 1000);
+    spin2DHistogramBins1->setValue(35);
+    spin2DHistogramBins2=new QSpinBox(this);
+    spin2DHistogramBins2->setRange(5, 1000);
+    spin2DHistogramBins2->setValue(35);
+    coll=new QHBoxLayout();
+    coll->addWidget(new QLabel("x: "));
+    coll->addWidget(spin2DHistogramBins1,1);
+    coll->addWidget(new QLabel("    y: "));
+    coll->addWidget(spin2DHistogramBins2,1);
+    coll->addStretch();
+    coll->setContentsMargins(0,0,0,0);
+    flHistSet->addRow(tr("density bins:"), coll);
+    connect(cmb2DHistogram, SIGNAL(currentIndexChanged(int)), spin2DHistogramBins1, SLOT(setEnabled(bool)));
+    connect(cmb2DHistogram, SIGNAL(currentIndexChanged(int)), spin2DHistogramBins2, SLOT(setEnabled(bool)));
+
+
     flHistSet->addRow(tr("<b>symbol:</b>"), cmbSymbol);
     spinSymbolSize=new QSpinBox(this);
     spinSymbolSize->setRange(1,30);
     spinSymbolSize->setValue(5);
     flHistSet->addRow(tr("<b>symbol size:</b>"), spinSymbolSize);
+    connect(chkScatterPlot, SIGNAL(toggled(bool)), cmbSymbol, SLOT(setEnabled(bool)));
+    connect(chkScatterPlot, SIGNAL(toggled(bool)), spinSymbolSize, SLOT(setEnabled(bool)));
+
 
 
     spinHistogramBins1=new QSpinBox(this);
     spinHistogramBins1->setRange(5,99999);
     spinHistogramBins1->setValue(50);
     coll=new QHBoxLayout();
+    coll->setContentsMargins(0,0,0,0);
     coll->addWidget(spinHistogramBins1);
     coll->addStretch();
     flHistSet->addRow(tr("<b>Data X:</b>"), new QWidget(this));

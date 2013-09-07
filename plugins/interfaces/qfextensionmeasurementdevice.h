@@ -45,6 +45,8 @@ class QFExtensionMeasurementAndControlDevice {
 
         /** \brief return the number of measured values in a measurement devices */
         virtual unsigned int getMeasurementDeviceValueCount(unsigned int measuremenDevice)=0;
+        /** \brief returns the name (or given label) of a measurement devices */
+        virtual QString getMeasurementDeviceName(unsigned int measuremenDevice)=0;
 
         /** \brief return a measured value from a specified measurement devices */
         virtual QVariant getMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value)=0;
@@ -63,6 +65,24 @@ class QFExtensionMeasurementAndControlDevice {
 
         /** \brief returns the datatype of a measurement device editable value */
         virtual QVariant::Type getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value)=0;
+
+        enum WidgetTypes {
+            mdDoubleEdit=0,
+            mdIntEdit,
+            mdCheckBox,
+            mdIntCombobBox,
+            mdDoubleSlider,
+            mdIntSlider,
+
+
+            mdDefault=mdDoubleEdit
+        };
+
+        /** \brief returns the widget to be used for a measurement device' editable's value value */
+        virtual WidgetTypes getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList* comboboxEntries=NULL)=0;
+
+        /** \brief returns the range of a measurement device editable value */
+        virtual void getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double& minimum, double& maximum)=0;
 
 };
 

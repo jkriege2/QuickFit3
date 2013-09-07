@@ -1369,6 +1369,11 @@ void QFExtensionCameraAndor::disconnectMeasurementDevice(unsigned int measuremen
 {
 }
 
+QString QFExtensionCameraAndor::getMeasurementDeviceName(unsigned int measuremenDevice)
+{
+    return getCameraName(measuremenDevice);
+}
+
 void QFExtensionCameraAndor::setMeasurementDeviceLogging(QFPluginLogService *logService)
 {
     setCameraLogging(logService);
@@ -1421,6 +1426,16 @@ void QFExtensionCameraAndor::setMeasurementDeviceValue(unsigned int measuremenDe
 QVariant::Type QFExtensionCameraAndor::getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value)
 {
     return QVariant::Invalid;
+}
+
+QFExtensionMeasurementAndControlDevice::WidgetTypes QFExtensionCameraAndor::getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList *comboboxEntries)
+{
+    return QFExtensionMeasurementAndControlDevice::mdDefault;
+}
+
+void QFExtensionCameraAndor::getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double &minimum, double &maximum)
+{
+
 }
 
 Q_EXPORT_PLUGIN2(cam_andor, QFExtensionCameraAndor)

@@ -50,6 +50,7 @@ void QFExtensionB040ResistorHeater::initExtension() {
         s.infoMessage="";
         s.lastAction=QTime::currentTime();
         s.serial=new QF3SimpleB040SerialProtocolHandler(ports.getCOMPort(s.port), getName());
+        s.label=inifile.value("device"+QString::number(i+1)+"/label", tr("B040 Temperature Controller #%1").arg(i+1)).toString();
         devices.append(s);
     }
 }
@@ -92,6 +93,14 @@ unsigned int QFExtensionB040ResistorHeater::getMeasurementDeviceCount()
 {
     return devices.size();
 
+}
+
+QString QFExtensionB040ResistorHeater::getMeasurementDeviceName(unsigned int measuremenDevice)
+{
+    if (measuremenDevice>=0 && measuremenDevice<devices.size()) {
+        return devices[measuremenDevice].label;
+    }
+    return QString();
 }
 
 void QFExtensionB040ResistorHeater::showMeasurementDeviceSettingsDialog(unsigned int measuremenDevice, QWidget *parent)
@@ -268,6 +277,35 @@ QVariant::Type QFExtensionB040ResistorHeater::getMeasurementDeviceEditableValueT
     }
 
     return QVariant::Invalid;
+
+}
+
+QFExtensionMeasurementAndControlDevice::WidgetTypes QFExtensionB040ResistorHeater::getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList *comboboxEntries)
+{
+    switch (value) {
+        case 0: return QFExtensionMeasurementAndControlDevice::mdDoubleEdit;
+        case 1: return QFExtensionMeasurementAndControlDevice::mdDoubleEdit;
+        case 2: return QFExtensionMeasurementAndControlDevice::mdCheckBox;
+        case 3: return QFExtensionMeasurementAndControlDevice::mdDoubleEdit;
+        case 4: return QFExtensionMeasurementAndControlDevice::mdDoubleEdit;
+        default: return QFExtensionMeasurementAndControlDevice::mdDefault;
+    }
+
+    return QFExtensionMeasurementAndControlDevice::mdDefault;
+
+}
+
+void QFExtensionB040ResistorHeater::getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double &minimum, double &maximum)
+{
+    switch (value) {
+        case 0: minimum=-100; maximum=200; break;
+        case 1: minimum=-100; maximum=200; break;
+        case 2: minimum=0; maximum=1; break;
+        case 3: minimum=0; maximum=100; break;
+        case 4: minimum=0; maximum=100; break;
+    }
+
+    return;
 
 }
 

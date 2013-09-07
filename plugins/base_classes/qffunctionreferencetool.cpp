@@ -1,7 +1,7 @@
 #include "qffunctionreferencetool.h"
 #include "qfpluginservices.h"
 #include "qfhtmlhelptools.h"
-
+#include <QTextCursor>
 QFFunctionReferenceToolDocSearchThread::QFFunctionReferenceToolDocSearchThread(QStringList files, QObject *parent):
     QThread(parent)
 {
@@ -327,6 +327,12 @@ void QFFunctionReferenceTool::registerEditor(QLineEdit *edtFormula)
     edtFormula->setCompleter(compExpression);
 }
 
+void QFFunctionReferenceTool::registerEditor(QPlainTextEdit *edtFormula)
+{
+    connect(edtFormula, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
+    //edtFormula->setCompleter(compExpression);
+}
+
 bool QFFunctionReferenceTool::hasFunction(const QString name)
 {
     return functionhelp.contains(name.toLower());
@@ -443,12 +449,28 @@ void QFFunctionReferenceTool::showCurrentFunctionHelp()
 }
 
 
-void QFFunctionReferenceTool::onCursorPositionChanged(int /*old*/, int newPos)
+void QFFunctionReferenceTool::onCursorPositionChanged(int /*old*/, int newPosIn)
 {
     QString text="";
+    int newPos=-1;
 
     QLineEdit* edit=qobject_cast<QLineEdit*>(sender());
-    if (edit) text=edit->text();
+    if (edit) {
+        text=edit->text();
+        newPos=newPosIn;
+    }
+    QPlainTextEdit* pte=qobject_cast<QPlainTextEdit*>(sender());
+    if (pte) {
+        text=pte->toPlainText();
+        text=text.replace("\n\r", "\n");
+        text=text.replace("\r\n", "\n");
+        QStringList sl=text.split("\n");
+        newPos=0;
+        for (int i=0; i<pte->textCursor().blockNumber(); i++) {
+            newPos+=sl.value(i, "").size()+1;
+        }
+        newPos=newPos+pte->textCursor().columnNumber();
+    }
 
     if (text.size()>0) {
         if (newPos>=0 && newPos<text.size()) {
@@ -485,3 +507,4 @@ void QFFunctionReferenceTool::onCursorPositionChanged(int /*old*/, int newPos)
 
     }
 }
+

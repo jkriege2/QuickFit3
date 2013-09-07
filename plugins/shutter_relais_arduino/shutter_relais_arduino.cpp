@@ -54,6 +54,8 @@ void QFExtensionShutterShuterArduino::initExtension() {
         s.lastAction=QTime::currentTime();
         s.serial=new QF3SimpleB040SerialProtocolHandler(ports.getCOMPort(s.port), getName());
         s.shutter_operation_duration=inifile.value("shutter"+QString::number(i+1)+"/shutter_operation_duration", 500).toInt();
+        s.label=inifile.value("shutter"+QString::number(i+1)+"/label", tr("%1 #%2").arg(getName()).arg(i+1)).toString();
+        s.description=inifile.value("shutter"+QString::number(i+1)+"/description", tr("%1 #%2").arg(getDescription())).toString();
         shutters.append(s);
     }
 }
@@ -167,11 +169,13 @@ bool QFExtensionShutterShuterArduino::isLastShutterActionFinished(unsigned int s
 }
 
 QString QFExtensionShutterShuterArduino::getShutterDescription(unsigned int shutter)  {
-    return getDescription();
+    if (shutter<0 || shutter>=getShutterCount()) return getDescription();
+    return shutters[shutter].description;
 }
 
 QString QFExtensionShutterShuterArduino::getShutterShortName(unsigned int shutter)  {
-    return getName();
+    if (shutter<0 || shutter>=getShutterCount()) return getName();
+    return shutters[shutter].label;
 }
 
 

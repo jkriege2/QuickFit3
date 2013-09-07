@@ -1,0 +1,2 @@
+<li><b><a href="$$plugin_info:helpdir:qfe_defaultmathparserextensions$$/parserreference/output.html">calculator print/output functions</a></b></li>
+<!--<li><b><a href="$$plugin_info:helpdir:qfe_defaultmathparserextensions$$/parserreference/.html"></a></b></li>-->

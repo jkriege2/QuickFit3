@@ -41,7 +41,7 @@ class QFExtensionShutterServoArduino : public QObject, public QFExtensionBase, p
         /** \copydoc QFExtension::getAuthor() */
         virtual QString getAuthor() const  { return tr("Jan W. Krieger"); }
         /** \copydoc QFExtension::getCopyright() */
-        virtual QString getCopyright() const  { return tr("(c) 2011 by Jan W. Krieger"); }
+        virtual QString getCopyright() const  { return tr("(c) 2011-2013 by Jan W. Krieger"); }
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr(""); }
         /** \copydoc QFExtension::getIconFilename() */
@@ -51,7 +51,7 @@ class QFExtensionShutterServoArduino : public QObject, public QFExtensionBase, p
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=1;
+            minor=2;
         };
 
 
@@ -123,6 +123,8 @@ class QFExtensionShutterServoArduino : public QObject, public QFExtensionBase, p
             int shutter_operation_duration;
             QString infoMessage;
             QTime lastAction;
+            QString label;
+            QString description;
         };
 
         QList<SHUTTER> shutters;

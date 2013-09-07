@@ -2109,6 +2109,16 @@ QFMathParser::~QFMathParser()
     clearVariables();
 }
 
+void QFMathParser::setGeneralData(const QString &id, const QVariant &data)
+{
+    m_generalData[id]=data;
+}
+
+QVariant QFMathParser::getGeneraldata(const QString &id, const QVariant &defaultData)
+{
+    return m_generalData.value(id, defaultData);
+}
+
 bool QFMathParser::hasErrorOccured() const
 {
     return errors>0;
@@ -4241,11 +4251,11 @@ void qfmpResult::setVoid()
     type=qfmpVoid;
 }
 
-QString qfmpResult::toString() const
+QString qfmpResult::toString(int precision) const
 {
     switch(type) {
-        case qfmpDouble: return doubleToQString(num);
-        case qfmpDoubleVector: return QString("[ ")+doubleVecToQString(numVec)+QString(" ]");
+        case qfmpDouble: return doubleToQString(num, precision);
+        case qfmpDoubleVector: return QString("[ ")+doubleVecToQString(numVec, precision)+QString(" ]");
         case qfmpStringVector: return QString("[ ")+strVec.join(", ")+QString(" ]");
         case qfmpBoolVector: return QString("[ ")+boolvectorToQString(boolVec)+QString(" ]");
         case qfmpString: return str;
@@ -4256,12 +4266,12 @@ QString qfmpResult::toString() const
 
 }
 
-QString qfmpResult::toTypeString() const
+QString qfmpResult::toTypeString(int precision) const
 {
     if (!isValid) return QObject::tr("[INVALID]");
     switch(type) {
-        case qfmpDouble: return doubleToQString(num)+QObject::tr(" [number]");
-        case qfmpDoubleVector: return QString("[ ")+doubleVecToQString(numVec)+QObject::tr(" ] [number vector]");
+        case qfmpDouble: return doubleToQString(num, precision)+QObject::tr(" [number]");
+        case qfmpDoubleVector: return QString("[ ")+doubleVecToQString(numVec, precision)+QObject::tr(" ] [number vector]");
         case qfmpStringVector: return QString("[ ")+strVec.join(", ")+QObject::tr(" ] [string vector]");
         case qfmpBoolVector: return QString("[ ")+boolvectorToQString(boolVec)+QObject::tr(" ] [boolean vector]");
         case qfmpString: return str+QObject::tr(" [string]");

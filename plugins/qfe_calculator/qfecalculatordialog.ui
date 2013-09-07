@@ -18,85 +18,14 @@
     <normaloff>:/qfe_calculator/qfecalculator.png</normaloff>:/qfe_calculator/qfecalculator.png</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>&amp;expression:</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-     <property name="buddy">
-      <cstring>edtExpression</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QFEnhancedLineEdit" name="edtExpression">
-     <property name="placeholderText">
-      <string>enter expression to evaluate</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="3">
-    <widget class="QPushButton" name="btnEvaluate">
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>e&amp;valuate</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>&amp;History/results:</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-     <property name="buddy">
-      <cstring>edtExpression</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QPlainTextEdit" name="edtHistory">
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3">
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <widget class="QPushButton" name="btnClearHistory">
-       <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
-       </property>
-       <property name="text">
-        <string>&amp;clear history</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item row="3" column="0">
+   <item row="4" column="0">
     <widget class="QLabel" name="label_4">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="text">
       <string>Help:</string>
      </property>
@@ -108,7 +37,81 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="2" rowspan="2">
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>&amp;History/results:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="buddy">
+      <cstring>edtExpression</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QPushButton" name="btnEvaluate">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>e&amp;valuate</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="4">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="text">
+        <string>&amp;Help</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="text">
+        <string>&amp;Close</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/exit.png</normaloff>:/lib/exit.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="4" column="2" rowspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="6,0,0,0,3,3">
      <item>
       <widget class="QScrollArea" name="scrollArea">
@@ -120,8 +123,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>330</width>
-          <height>171</height>
+          <width>322</width>
+          <height>71</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -210,52 +213,7 @@
      </item>
     </layout>
    </item>
-   <item row="5" column="0" colspan="4">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
-       </property>
-       <property name="text">
-        <string>&amp;Help</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../lib/lib.qrc">
-         <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
-       </property>
-       <property name="text">
-        <string>&amp;Close</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../lib/lib.qrc">
-         <normaloff>:/lib/exit.png</normaloff>:/lib/exit.png</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="3" column="3" rowspan="2">
+   <item row="4" column="3" rowspan="2">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="QPushButton" name="btnClearCache">
@@ -282,7 +240,7 @@
      </item>
     </layout>
    </item>
-   <item row="1" column="2" colspan="2">
+   <item row="2" column="2" colspan="2">
     <widget class="QLabel" name="labError">
      <property name="text">
       <string/>
@@ -291,6 +249,134 @@
       <enum>Qt::RichText</enum>
      </property>
     </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QPlainTextEdit" name="edtHistory">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="btnClearHistory">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="text">
+        <string>&amp;clear history</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="0" colspan="4">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>significant digits:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="spinDigits">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="value">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="2">
+    <layout class="QVBoxLayout" name="verticalLayout_5">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QFEnhancedLineEdit" name="edtExpression">
+       <property name="placeholderText">
+        <string>enter expression to evaluate</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPlainTextEdit" name="pteExpression"/>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0" rowspan="2">
+    <layout class="QVBoxLayout" name="verticalLayout_6">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>&amp;expression:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <property name="buddy">
+        <cstring>edtExpression</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkMultiline">
+       <property name="text">
+        <string>multi-line</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
@@ -302,14 +388,15 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>edtExpression</tabstop>
   <tabstop>edtHistory</tabstop>
   <tabstop>btnClearHistory</tabstop>
  </tabstops>
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfecalculator.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
@@ -323,7 +410,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>933</x>
-     <y>519</y>
+     <y>451</y>
     </hint>
     <hint type="destinationlabel">
      <x>708</x>
@@ -339,7 +426,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>84</x>
-     <y>519</y>
+     <y>451</y>
     </hint>
     <hint type="destinationlabel">
      <x>270</x>
@@ -354,8 +441,8 @@
    <slot>on_btnEvaluate_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>441</x>
-     <y>15</y>
+     <x>537</x>
+     <y>53</y>
     </hint>
     <hint type="destinationlabel">
      <x>597</x>

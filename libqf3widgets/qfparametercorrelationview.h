@@ -125,6 +125,11 @@ protected:
     QSpinBox* spinHistogramBins2;
 
     QGroupBox* grpHistogramSettings;
+    QCheckBox* chkScatterPlot;
+    QComboBox* cmb2DHistogram;
+    QSpinBox* spin2DHistogramBins1;
+    QSpinBox* spin2DHistogramBins2;
+
 
     QEnhancedTableView* tvHistogramParameters;
     QFTableModel* tabHistogramParameters;

@@ -694,6 +694,29 @@ QString listToString(const T& input, bool withIDs=false) {
     return QString("[ %1 ]").arg(res);
 }
 
+/*! \brief builds a string out of a given container (with size() and operator[]). If \a withIDs is \c true, the index will be output in front of each value.
+    \ingroup qf3lib_tools
+
+*/
+template <class T>
+QString numlistToString(const T& input, bool withIDs=false, int precision=10) {
+    QString res;
+    {
+        QTextStream txt(&res, QIODevice::WriteOnly);
+        bool first=true;
+        for (int i=0; i<input.size(); i++) {
+            if (!first) {
+                txt<<QString(", ");
+            }
+            if (withIDs) {
+                txt<<i<<":";
+            }
+            txt<<QString::number(input[i], 'g', precision);
+            first=false;
+        }
+    }
+    return QString("[ %1 ]").arg(res);
+}
 /*! \brief returns a list of all items in the list that have a given value
     \ingroup qf3lib_tools
 

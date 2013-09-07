@@ -85,6 +85,7 @@ class QFFunctionReferenceTool : public QObject
 
         /** \brief registers a QLineEdit as formula editor (basically the function showCurrentFunctionHelp() can be used to show help for the word currently under the cursor */
         void registerEditor(QLineEdit* edtFormula);
+        void registerEditor(QPlainTextEdit* edtFormula);
 
         bool hasFunction(const QString name);
         void setCurrentHelpButton(QAbstractButton* button);
@@ -100,7 +101,7 @@ class QFFunctionReferenceTool : public QObject
         /** \brief opens an online-help window and displays the help entry for the function currentyl under the cursor */
         void showCurrentFunctionHelp();
     protected slots:
-        void onCursorPositionChanged(int old, int newPos);
+        void onCursorPositionChanged(int old=0, int newPos=0);
         void threadFinished();
         void delayedStartSearchThreads();
         void addFunction(QString name, QString templ, QString help, QString helplink);

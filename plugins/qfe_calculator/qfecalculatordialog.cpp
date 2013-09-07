@@ -2,12 +2,69 @@
 #include "ui_qfecalculatordialog.h"
 #include "qfecalculator.h"
 
+qfmpResult fDisp(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+  QFECalculatorDialog* dlg=(QFECalculatorDialog*)p->getGeneraldata("QFECalculatorDialog/pointer", NULL).toInt();
+  if (dlg) {
+      QPlainTextEdit* h=dlg->getHistory();
+
+      QString t="";
+      for (int i=0; i<n; i++) {
+          t=t+params[i].toString(dlg->getPrecision());
+      }
+
+      QTextCursor cur1(h->document());
+      cur1.movePosition(QTextCursor::End);
+      cur1.insertFragment(QTextDocumentFragment::fromPlainText(t+"\n"));
+
+  }
+  return qfmpResult::voidResult();
+}
+
+qfmpResult fDispNLB(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+  QFECalculatorDialog* dlg=(QFECalculatorDialog*)p->getGeneraldata("QFECalculatorDialog/pointer", NULL).toInt();
+  if (dlg) {
+      QPlainTextEdit* h=dlg->getHistory();
+
+      QString t="";
+      for (int i=0; i<n; i++) {
+          t=t+params[i].toString(dlg->getPrecision());
+      }
+
+      QTextCursor cur1(h->document());
+      cur1.movePosition(QTextCursor::End);
+      cur1.insertFragment(QTextDocumentFragment::fromPlainText(t));
+
+  }
+  return qfmpResult::voidResult();
+}
+
+qfmpResult fDispType(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+  QFECalculatorDialog* dlg=(QFECalculatorDialog*)p->getGeneraldata("QFECalculatorDialog/pointer", NULL).toInt();
+  if (dlg) {
+      QPlainTextEdit* h=dlg->getHistory();
+
+      QString t="";
+      for (int i=0; i<n; i++) {
+          t=t+params[i].toTypeString(dlg->getPrecision());
+      }
+
+      QTextCursor cur1(h->document());
+      cur1.movePosition(QTextCursor::End);
+      cur1.insertFragment(QTextDocumentFragment::fromPlainText(t+"\n"));
+
+  }
+  return qfmpResult::voidResult();
+}
+
+
+
 QFECalculatorDialog::QFECalculatorDialog(QFECalculator *calc, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QFECalculatorDialog)
 {
     this->calc=calc;
     parser=new QFMathParser();
+    setupParser(parser);
 
     functionRef=new QFFunctionReferenceTool(NULL);
     functionRef->setCompleterFile(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+calc->getID()+"/table_expression.txt");
@@ -17,6 +74,7 @@ QFECalculatorDialog::QFECalculatorDialog(QFECalculator *calc, QWidget *parent) :
     ui->edtExpression->setUseHistory(true);
 
     functionRef->registerEditor(ui->edtExpression);
+    functionRef->registerEditor(ui->pteExpression);
     functionRef->setCurrentHelpButton(ui->btnFunctionHelp);
     functionRef->setLabHelp(ui->labHelp);
     functionRef->setDefaultHelp(QFPluginServices::getInstance()->getPluginHelp(calc->getID()));
@@ -31,13 +89,36 @@ QFECalculatorDialog::QFECalculatorDialog(QFECalculator *calc, QWidget *parent) :
 
     functionRef->addDefaultWords(defaultWords);
 
+    ui->spinDigits->setValue(ProgramOptions::getConfigValue("QFECalculatorDialog/digits", 10).toDouble());
+
     QTimer::singleShot(10, this, SLOT(delayedStartSearch()));
+    on_chkMultiline_toggled(ui->chkMultiline->isChecked());
+}
+
+void QFECalculatorDialog::setupParser(QFMathParser *parser) const
+{
+    parser->setGeneralData("QFECalculatorDialog/pointer", (int)this);
+    parser->addFunction("write", fDispNLB);
+    parser->addFunction("writeln", fDisp);
+    parser->addFunction("disp", fDisp);
+    parser->addFunction("dispType", fDispType);
 }
 
 QFECalculatorDialog::~QFECalculatorDialog()
 {
+
     delete ui;
     delete parser;
+}
+
+int QFECalculatorDialog::getPrecision() const
+{
+    return ui->spinDigits->value();
+}
+
+QPlainTextEdit *QFECalculatorDialog::getHistory() const
+{
+    return ui->edtHistory;
 }
 
 void QFECalculatorDialog::showHelp()
@@ -54,7 +135,7 @@ void QFECalculatorDialog::showCache()
     QList<QPair<QString, QFMathParser::qfmpVariable> > vars= parser->getVariables();
     for (int i=0; i<vars.size(); i++) {
         QString v=QString("%1 = ").arg(vars[i].first);
-        v+=vars[i].second.toResult().toTypeString();
+        v+=vars[i].second.toResult().toTypeString(ui->spinDigits->value());
         ui->lstCache->addItem(v);
     }
     QList<QPair<QString, QFMathParser::qfmpFunctionDescriptor> > funs= parser->getFunctions();
@@ -68,10 +149,12 @@ void QFECalculatorDialog::showCache()
 
 void QFECalculatorDialog::on_btnEvaluate_clicked()
 {
+    ProgramOptions::setConfigValue("QFECalculatorDialog/digits", ui->spinDigits->value());
     QString expression=ui->edtExpression->text();
-    QTextCursor cur(ui->edtHistory->document());
-    cur.movePosition(QTextCursor::Start);
-    cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&gt;&gt; <i>%1</i></tt><br>").arg(expression)));
+    if (ui->chkMultiline->isChecked()) expression=ui->pteExpression->toPlainText();
+    QTextCursor cur1(ui->edtHistory->document());
+    cur1.movePosition(QTextCursor::End);
+    cur1.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&gt;&gt; <i>%1</i></tt><br>").arg(expression)));
     parser->resetErrors();
     qfmpResult r=parser->evaluate(expression);
 
@@ -80,9 +163,9 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
         if (r.type==qfmpBool) {
             result=tr("<font color=\"blue\">[boolean] %1</font>").arg(boolToQString(r.boolean));
         } else if (r.type==qfmpDouble) {
-            result=tr("<font color=\"blue\">[float] %1</font>").arg(r.num);
+            result=tr("<font color=\"blue\">[float] %1</font>").arg(r.num, 0, 'g', ui->spinDigits->value());
         } else if (r.type==qfmpDoubleVector) {
-            result=tr("<font color=\"blue\">[float vector] %1</font>").arg(listToString(r.numVec));
+            result=tr("<font color=\"blue\">[float vector] %1</font>").arg(numlistToString(r.numVec));
         } else if (r.type==qfmpStringVector) {
             result=tr("<font color=\"blue\">[string vector] %1</font>").arg(listToString(r.strVec));
         } else if (r.type==qfmpBoolVector) {
@@ -111,19 +194,25 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
         result=tr("<font color=\"red\">invalid result</font>");
     }
 
+    QTextCursor cur(ui->edtHistory->document());
+    cur.movePosition(QTextCursor::End);
     cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;&nbsp; = %1</tt><br>").arg(result)));
     if (parser->hasErrorOccured()) {
         cur.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&nbsp;&nbsp;&nbsp;&nbsp; <font color=\"red\">ERROR: %1</font></tt><br>").arg(parser->getLastErrors().join("<br>ERROR: "))));
     }
     calc->setHistory(ui->edtHistory->document()->toHtml("UTF-8"));
-    ui->edtHistory->moveCursor(QTextCursor::Start);
+    ui->edtHistory->moveCursor(QTextCursor::End);
     showCache();
-    ui->edtExpression->setFocus();
+
+    on_chkMultiline_toggled(ui->chkMultiline->isChecked());
+    if (ui->chkMultiline->isChecked()) ui->pteExpression->setFocus();
+    else ui->edtExpression->setFocus();
 }
 
 void QFECalculatorDialog::on_edtExpression_textChanged(QString text) {
     ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>"));
     QFMathParser mp; // instanciate
+    setupParser(&mp);
     QFMathParser::qfmpNode* n=NULL;
     // parse some numeric expression
     n=mp.parse(text);
@@ -136,6 +225,13 @@ void QFECalculatorDialog::on_edtExpression_textChanged(QString text) {
 
 }
 
+void QFECalculatorDialog::on_chkMultiline_toggled(bool enabled)
+{
+    ui->edtExpression->setVisible(!enabled);
+    ui->pteExpression->setVisible(enabled);
+}
+
+
 void QFECalculatorDialog::on_btnClearHistory_clicked()
 {
     history.clear();
@@ -147,6 +243,8 @@ void QFECalculatorDialog::on_btnClearCache_clicked()
 {
     delete parser;
     parser=new QFMathParser();
+    setupParser(parser);
+    parser->setGeneralData("QFECalculatorDialog/pointer", (int)this);
     showCache();
 }
 

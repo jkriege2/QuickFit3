@@ -125,6 +125,8 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         virtual void connectMeasurementDevice(unsigned int measurementDevice);
         /** \copydoc QFExtensionMeasurementDevice::disconnectmeasurementDevice() */
         virtual void disconnectMeasurementDevice(unsigned int measurementDevice);
+        /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceName() */
+        virtual QString getMeasurementDeviceName(unsigned int measuremenDevice);
         /** \copydoc QFExtensionMeasurementDevice::setmeasurementDeviceLogging() */
         virtual void setMeasurementDeviceLogging(QFPluginLogService* logService);
         /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceValueCount() */
@@ -141,7 +143,10 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         virtual void setMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value, const QVariant& data);
         /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceEditableValueType() */
         virtual QVariant::Type getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value);
-
+        /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceValueWidget() */
+        virtual WidgetTypes getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList* comboboxEntries=NULL);
+        /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceEditableValueRange() */
+        virtual void getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double& minimum, double& maximum);
 
 
     /////////////////////////////////////////////////////////////////////////////
