@@ -1,5 +1,5 @@
-#ifndef SHUTTER_SERVO_ARDUINO_H
-#define SHUTTER_SERVO_ARDUINO_H
+#ifndef SHUTTER_RELAIS_ARDUINO_H
+#define SHUTTER_RELAIS_ARDUINO_H
 
 #include <time.h>
 #include <QObject>
@@ -12,46 +12,46 @@
 #include "../../../../../LIB/trunk/jkserialconnection.h"
 
 /*!
-    \defgroup qf3ext_ShutterArduinoB040 QFExtensionShutter implementation for RC-servos switchable between two states using a custom C program running on an Arduino Nano 3.0 board
+    \defgroup qf3ext_ShutterArduinoB040 QFExtensionShutter implementation for Relais converted to shutters and controlled by an Arduino UNO
     \ingroup qf3extensionplugins
 */
 
-/*! \brief QFExtensionShutter implementation for RC-servos switchable between two states using a custom C program running on an Arduino Nano 3.0 board
+/*! \brief QFExtensionShutter implementation for Relais converted to shutters and controlled by an Arduino UNO
     \ingroup qf3ext_ShutterArduinoB040
  */
-class QFExtensionShutterServoArduino : public QObject, public QFExtensionBase, public QFExtensionShutter, public QFPluginLogService {
+class QFExtensionShutterShuterArduino : public QObject, public QFExtensionBase, public QFExtensionShutter, public QFPluginLogService {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionShutter QFPluginLogService)
     public:
         /** Default constructor */
-        QFExtensionShutterServoArduino(QObject* parent=NULL);
+        QFExtensionShutterShuterArduino(QObject* parent=NULL);
         /** Default destructor */
-        virtual ~QFExtensionShutterServoArduino();
+        virtual ~QFExtensionShutterShuterArduino();
 
 
     /////////////////////////////////////////////////////////////////////////////
     // QFExtension routines
     /////////////////////////////////////////////////////////////////////////////
         /** \copydoc QFExtension::getID() */
-        virtual QString getID() const  { return QString("shutter_servo_arduino"); }
+        virtual QString getID() const  { return QString("shutter_relais_arduino"); }
         /** \copydoc QFExtension::getName() */
-        virtual QString getName() const  { return tr("Arduino Servo Shutter (B040)"); }
+        virtual QString getName() const  { return tr("Arduino Relais Shutter (B040)"); }
         /** \copydoc QFExtension::getDescription() */
-        virtual QString getDescription() const  { return tr("Servo Shutter Driver for Arduino (B040)"); }
+        virtual QString getDescription() const  { return tr("Relais Shutter Driver for Arduino (B040)"); }
         /** \copydoc QFExtension::getAuthor() */
         virtual QString getAuthor() const  { return tr("Jan W. Krieger"); }
         /** \copydoc QFExtension::getCopyright() */
-        virtual QString getCopyright() const  { return tr("(c) 2011 by Jan W. Krieger"); }
+        virtual QString getCopyright() const  { return tr("(c) 2013 by Jan W. Krieger"); }
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr(""); }
         /** \copydoc QFExtension::getIconFilename() */
-        virtual QString getIconFilename() const  { return QString(":/shutter_servo_arduino.png"); }
+        virtual QString getIconFilename() const  { return QString(":/shutter_shutter_arduino.png"); }
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=1;
+            minor=0;
         };
 
 
@@ -129,4 +129,4 @@ class QFExtensionShutterServoArduino : public QObject, public QFExtensionBase, p
 
 };
 
-#endif // SHUTTER_SERVO_ARDUINO_H
+#endif // SHUTTER_RELAIS_ARDUINO_H

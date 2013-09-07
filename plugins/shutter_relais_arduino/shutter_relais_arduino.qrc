@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <!-- RENAME THE ALIAS !!! -->
+    <file alias="shutter_relais_arduino.png">shutter_relais_arduino.png</file>
+</qresource>
+</RCC>
