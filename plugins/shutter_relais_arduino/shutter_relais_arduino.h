@@ -45,7 +45,7 @@ class QFExtensionShutterShuterArduino : public QObject, public QFExtensionBase, 
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr(""); }
         /** \copydoc QFExtension::getIconFilename() */
-        virtual QString getIconFilename() const  { return QString(":/shutter_shutter_arduino.png"); }
+        virtual QString getIconFilename() const  { return QString(":/shutter_relais_arduino.png"); }
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
         /** \brief plugin version  */
