@@ -8,7 +8,23 @@ inline double SPIMFCS_newVeff(double a, double wxy, double wz) {
     return QF_SQRTPI*qfSqr(a)*wz/qfSqr(erf(a/wxy)+wxy/QF_SQRTPI/a*(exp(-qfSqr(a/wxy))-1.0));
 }
 
+inline double SPIMFCS_newAeff(double a, double wxy, double wz) {
+    return qfSqr(a)/qfSqr(erf(a/wxy)+wxy/QF_SQRTPI/a*(exp(-qfSqr(a/wxy))-1.0));
+}
+
+inline double SPIMFCS_newAeff_xz(double a, double wxy, double wz) {
+    return QF_SQRTPI*wz*a/(erf(a/wxy)+wxy/QF_SQRTPI/a*(exp(-qfSqr(a/wxy))-1.0));
+}
+
 inline double SPIMFCS_newVeffError(double a, double ea, double wxy, double ewxy, double wz, double ewz){
+    return 0;
+}
+
+inline double SPIMFCS_newAeffError(double a, double ea, double wxy, double ewxy, double wz, double ewz){
+    return 0;
+}
+
+inline double SPIMFCS_newAeffError_xz(double a, double ea, double wxy, double ewxy, double wz, double ewz){
     return 0;
 }
 
@@ -28,6 +44,21 @@ inline double QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(double dz, double
 inline double QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(double a, double dx, double dy, double dz, double D, double t, double wg, double wr, double zg, double zr) {
     return QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_pixelcorrfactor(a, dx, D, t, wg, wr)*
            QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_pixelcorrfactor(a, dy, D, t, wg, wr)*
+           QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(dz, D, t, zg, zr);
+}
+
+inline double QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor_2Dxy(double a, double dx, double dy, double D, double t, double wg, double wr, double zg, double zr) {
+    return QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_pixelcorrfactor(a, dx, D, t, wg, wr)*
+           QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_pixelcorrfactor(a, dy, D, t, wg, wr);
+}
+
+inline double QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor_2Dxz(double a, double dx, double dz, double D, double t, double wg, double wr, double zg, double zr) {
+    return QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_pixelcorrfactor(a, dx, D, t, wg, wr)*
+           QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(dz, D, t, zg, zr);
+}
+
+inline double QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor_2Dyz(double a, double dx, double dy, double dz, double D, double t, double wg, double wr, double zg, double zr) {
+    return QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_pixelcorrfactor(a, dy, D, t, wg, wr)*
            QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(dz, D, t, zg, zr);
 }
 

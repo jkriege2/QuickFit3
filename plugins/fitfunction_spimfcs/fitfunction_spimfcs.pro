@@ -37,6 +37,12 @@ HEADERS += qfpfitfunctionsspimfcs.h \
     qffitfunctionsspimfccsfw2csepdiff2colorccf.h \
     qffitfunctionsspimfccsfw2csepdiff2coloracfr.h \
     qffitfunctionsspimfccsfw2csepdiff2coloracfg.h \
+    qffitfunctionsspimfccsfw2csep2ddiffxy2colorccf.h \
+    qffitfunctionsspimfccsfw2csep2ddiffxy2coloracfr.h \
+    qffitfunctionsspimfccsfw2csep2ddiffxy2coloracfg.h \
+    qffitfunctionsspimfccsfw2csep2ddiffxz2colorccf.h \
+    qffitfunctionsspimfccsfw2csep2ddiffxz2coloracfr.h \
+    qffitfunctionsspimfccsfw2csep2ddiffxz2coloracfg.h \
     qffitfunctionsspimfccsfwsepdiff2colorccf.h \
     qffitfunctionsspimfccsfwsepdiff2coloracfr.h \
     qffitfunctionsspimfccsfwsepdiff2coloracfg.h
@@ -70,6 +76,12 @@ SOURCES += qfpfitfunctionsspimfcs.cpp\
     qffitfunctionsspimfccsfw2csepdiff2colorccf.cpp \
     qffitfunctionsspimfccsfw2csepdiff2coloracfr.cpp \
     qffitfunctionsspimfccsfw2csepdiff2coloracfg.cpp \
+    qffitfunctionsspimfccsfw2csep2ddiffxy2colorccf.cpp \
+    qffitfunctionsspimfccsfw2csep2ddiffxy2coloracfr.cpp \
+    qffitfunctionsspimfccsfw2csep2ddiffxy2coloracfg.cpp \
+    qffitfunctionsspimfccsfw2csep2ddiffxz2colorccf.cpp \
+    qffitfunctionsspimfccsfw2csep2ddiffxz2coloracfr.cpp \
+    qffitfunctionsspimfccsfw2csep2ddiffxz2coloracfg.cpp \
     qffitfunctionsspimfccsfwsepdiff2colorccf.cpp \
     qffitfunctionsspimfccsfwsepdiff2coloracfr.cpp \
     qffitfunctionsspimfccsfwsepdiff2coloracfg.cpp

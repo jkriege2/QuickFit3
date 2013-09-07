@@ -3154,7 +3154,7 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     plotter->loadSettings(*(settings->getQSettings()), QString("imfcsimageeditor/corrplot"));
     chkLogTauAxis->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/log_tau_axis"), true).toBool());
     chkOverviewVisible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/overview_visible"), true).toBool());
-    chkParamImage2Visible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/image2_visible"), false).toBool());
+    chkParamImage2Visible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/image2_visible"), true).toBool());
     chkMaskVisible->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/mask_visible"), false).toBool());
     chkKeys->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/display_keys"), false).toBool());
     int defCDM=0;
