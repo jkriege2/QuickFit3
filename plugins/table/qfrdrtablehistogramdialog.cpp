@@ -37,6 +37,10 @@ void QFRDRTableHistogramDialog::init() {
     ui->cmbOutput->setCurrentIndex(0);
     ui->cmbInput->setCurrentIndex(ui->cmbInput->findData(selected));
     updateHistograms();
+    calcAutoBandwidth();
+    calcAutoBinwidth();
+    calcAutoBins();
+    updateHistograms();
 }
 
 QMap<int, QVector<double> > QFRDRTableHistogramDialog::getHistograms() const
@@ -76,6 +80,14 @@ void QFRDRTableHistogramDialog::updateHistograms(bool estimateBinWidth)
         double dataSD=statisticsStdDev(data.data(), datasize);
         double dataQ25=statisticsSortedQuantile(data.data(), datasize, 0.25);
         double dataQ75=statisticsSortedQuantile(data.data(), datasize, 0.75);
+        stat.max=dataMax;
+        stat.min=dataMin;
+        stat.median=statisticsSortedMedian(data.data(), datasize);
+        stat.mean=dataAvg;
+        stat.q25=dataQ25;
+        stat.q75=dataQ75;
+        stat.var=dataSD*dataSD;
+        stat.values=datasize;
 
         ui->labStatistics->setText(tr("N=%1,   &lang;X&rang;=%2,   &sigma;<sub>X</sub>=%3<br>min(X)=%4,   max(X)=%5,  q<sub>25%</sub>=%6,  q<sub>75%</sub>=%7")
                                    .arg(datasize).arg(dataAvg).arg(dataSD).arg(dataMin).arg(dataMax).arg(dataQ25).arg(dataQ75));
@@ -113,21 +125,47 @@ void QFRDRTableHistogramDialog::updateHistograms(bool estimateBinWidth)
         QVector<double> histX, histY;
         histX.resize(ui->spinBins->value());
         histY.resize(ui->spinBins->value());
-        statisticsHistogramRanged(data.data(), datasize, hmin, hmax, histX.data(), histY.data(), ui->spinBins->value());
+
+        if (ui->cmbMethod->currentIndex()==0) statisticsHistogramRanged(data.data(), datasize, hmin, hmax, histX.data(), histY.data(), ui->spinBins->value());
+        else if (ui->cmbMethod->currentIndex()==1) statisticsKDEHistogramRanged(data.data(), datasize, statisticsKernel1DGaussian, ui->edtBandwidth->value(), hmin, hmax, histX.data(), histY.data(), ui->spinBins->value());
+        else if (ui->cmbMethod->currentIndex()==2) statisticsKDEHistogramRanged(data.data(), datasize, statisticsKernel1DCauchy, ui->edtBandwidth->value(), hmin, hmax, histX.data(), histY.data(), ui->spinBins->value());
+        else if (ui->cmbMethod->currentIndex()==3) statisticsKDEHistogramRanged(data.data(), datasize, statisticsKernel1DPicard, ui->edtBandwidth->value(), hmin, hmax, histX.data(), histY.data(), ui->spinBins->value());
+        else if (ui->cmbMethod->currentIndex()==4) statisticsKDEHistogramRanged(data.data(), datasize, statisticsKernel1DEpanechnikov, ui->edtBandwidth->value(), hmin, hmax, histX.data(), histY.data(), ui->spinBins->value());
+        else if (ui->cmbMethod->currentIndex()==5) statisticsKDEHistogramRanged(data.data(), datasize, statisticsKernel1DUniform, ui->edtBandwidth->value(), hmin, hmax, histX.data(), histY.data(), ui->spinBins->value());
+        else if (ui->cmbMethod->currentIndex()==6) statisticsKDEHistogramRanged(data.data(), datasize, statisticsKernel1DTriangle, ui->edtBandwidth->value(), hmin, hmax, histX.data(), histY.data(), ui->spinBins->value());
+        else if (ui->cmbMethod->currentIndex()==7) statisticsKDEHistogramRanged(data.data(), datasize, statisticsKernel1DQuartic, ui->edtBandwidth->value(), hmin, hmax, histX.data(), histY.data(), ui->spinBins->value());
+        else if (ui->cmbMethod->currentIndex()==8) statisticsKDEHistogramRanged(data.data(), datasize, statisticsKernel1DTriweight, ui->edtBandwidth->value(), hmin, hmax, histX.data(), histY.data(), ui->spinBins->value());
+        else if (ui->cmbMethod->currentIndex()==9) statisticsKDEHistogramRanged(data.data(), datasize, statisticsKernel1DTricube, ui->edtBandwidth->value(), hmin, hmax, histX.data(), histY.data(), ui->spinBins->value());
+        else if (ui->cmbMethod->currentIndex()==10) statisticsKDEHistogramRanged(data.data(), datasize, statisticsKernel1DCosine, ui->edtBandwidth->value(), hmin, hmax, histX.data(), histY.data(), ui->spinBins->value());
+
+
+
+        QString hname="";
+        if (ui->chkNormalized->isChecked()) {
+            statisticsNormalize(histY.data(), histY.size());
+            hname+=tr("normalized");
+        }
+        if (ui->chkCumulative->isChecked()) {
+            statisticsAccumulateHistogram(histY.data(), histY.size());
+            hname+=tr(" accumulated");
+        }
+
 
 
         headerNames[col_start]=tr("hist(%1): bins").arg(ui->cmbInput->currentText());
-        headerNames[col_start+1]=tr("hist(%1): frequency").arg(ui->cmbInput->currentText());
+        if (ui->chkCumulative->isChecked()) headerNames[col_start+1]=tr("hist(%1): %2 frequency").arg(ui->cmbInput->currentText()).arg(hname);
+        else headerNames[col_start+1]=tr("hist(%1): %2 frequency").arg(ui->cmbInput->currentText()).arg(hname);
         histograms[col_start]=histX;
         histograms[col_start+1]=histY;
 
         int c_bins=ui->plotter->getDatastore()->addCopiedColumn(histX.data(), histX.size(), tr("bins"));
-        int c_hist=ui->plotter->getDatastore()->addCopiedColumn(histY.data(), histY.size(), tr("histogram"));
+        int c_hist=ui->plotter->getDatastore()->addCopiedColumn(histY.data(), histY.size(), tr("%2 histogram").arg(hname));
         JKQTPbarHorizontalGraph* g=new JKQTPbarHorizontalGraph(ui->plotter->get_plotter());
         g->set_xColumn(c_bins);
         g->set_yColumn(c_hist);
-        g->set_title(0);
+        g->set_title("");
         ui->plotter->addGraph(g);
+        ui->plotter->getYAxis()->set_axisLabel(tr("%2 frequency").arg(hname));
     }
     ui->plotter->zoomToFit();
     ui->plotter->set_doDrawing(true);
@@ -153,5 +191,44 @@ void QFRDRTableHistogramDialog::on_edtBinWidth_valueChanged(double value)
 void QFRDRTableHistogramDialog::on_spinBins_valueChanged(int value)
 {
     if (ui->chkAutoBinWidth->isChecked()) updateHistograms();
+}
+
+void QFRDRTableHistogramDialog::on_cmbMethod_currentIndexChanged(int current)
+{
+    ui->edtBandwidth->setEnabled(current>0);
+    ui->btnAutoBandwidth->setEnabled(current>0);
+}
+
+void QFRDRTableHistogramDialog::on_btnAutoBinwidth_clicked()
+{
+    calcAutoBinwidth();
+    updateHistograms();
+}
+
+void QFRDRTableHistogramDialog::on_btnAutoBandwidth_clicked()
+{
+    calcAutoBandwidth();
+    updateHistograms();
+}
+
+void QFRDRTableHistogramDialog::on_btnAutoBins_clicked()
+{
+    calcAutoBins();
+    updateHistograms();
+}
+
+void QFRDRTableHistogramDialog::calcAutoBinwidth()
+{
+    ui->edtBinWidth->setValue(2.0*(stat.q75-stat.q25)/cbrt(stat.values));
+}
+
+void QFRDRTableHistogramDialog::calcAutoBandwidth()
+{
+    ui->edtBandwidth->setValue(1.06*stat.var/pow(stat.values, 1.0/5.0));
+}
+
+void QFRDRTableHistogramDialog::calcAutoBins()
+{
+    ui->spinBins->setValue(sqrt(stat.values));
 }
 

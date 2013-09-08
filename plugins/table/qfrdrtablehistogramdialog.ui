@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>554</width>
-    <height>499</height>
+    <width>567</width>
+    <height>542</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,9 +49,16 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="btnAutoBins">
+         <property name="text">
+          <string>auto</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="chkAutoBinWidth">
          <property name="text">
-          <string>automatic bin width:</string>
+          <string>by bin width:</string>
          </property>
          <property name="checked">
           <bool>true</bool>
@@ -62,6 +69,16 @@
         <widget class="QFDoubleEdit" name="edtBinWidth">
          <property name="enabled">
           <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnAutoBinwidth">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>auto</string>
          </property>
         </widget>
        </item>
@@ -145,14 +162,14 @@
        </item>
       </layout>
      </item>
-     <item row="5" column="0">
+     <item row="8" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
         <string>output:</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="8" column="1">
       <widget class="QComboBox" name="cmbOutput"/>
      </item>
      <item row="1" column="1">
@@ -162,12 +179,143 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
-      <widget class="QCheckBox" name="chkNormalized">
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_7">
        <property name="text">
-        <string>normalized</string>
+        <string>method:</string>
        </property>
       </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>bandwidth:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QComboBox" name="cmbMethod">
+       <item>
+        <property name="text">
+         <string>histogram</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KDE: Gaussian</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KDE: Cauchy</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KDE: Picard</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KDE: Epanechnikov</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KDE: Uniform</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KDE: Triangle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KDE: Quartic</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KDE: Triweight</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KDE: Tricube</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KDE: Cosine</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QFDoubleEdit" name="edtBandwidth">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnAutoBandwidth">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>auto</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="4" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QCheckBox" name="chkNormalized">
+         <property name="text">
+          <string>normalized</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="chkCumulative">
+         <property name="text">
+          <string>cumulative</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
@@ -197,6 +345,9 @@
    <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
    <header>qfdoubleedit.h</header>
+   <slots>
+    <signal>valueChanged(double)</signal>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources/>
@@ -272,8 +423,8 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>206</x>
-     <y>72</y>
+     <x>315</x>
+     <y>75</y>
     </hint>
     <hint type="destinationlabel">
      <x>330</x>
@@ -288,8 +439,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>175</x>
-     <y>61</y>
+     <x>315</x>
+     <y>75</y>
     </hint>
     <hint type="destinationlabel">
      <x>105</x>
@@ -320,8 +471,8 @@
    <slot>updateHistograms()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>510</x>
-     <y>148</y>
+     <x>543</x>
+     <y>213</y>
     </hint>
     <hint type="destinationlabel">
      <x>549</x>
@@ -342,6 +493,86 @@
     <hint type="destinationlabel">
      <x>547</x>
      <y>121</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkAutoBinWidth</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnAutoBinwidth</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>315</x>
+     <y>75</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>78</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkAutoBinWidth</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnAutoBins</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>250</x>
+     <y>67</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>196</x>
+     <y>68</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkCumulative</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFRDRTableHistogramDialog</receiver>
+   <slot>updateHistograms()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>337</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>231</x>
+     <y>136</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbMethod</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFRDRTableHistogramDialog</receiver>
+   <slot>updateHistograms()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>121</x>
+     <y>161</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>62</x>
+     <y>216</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtBandwidth</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFRDRTableHistogramDialog</receiver>
+   <slot>updateHistograms()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>147</x>
+     <y>188</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>53</x>
+     <y>198</y>
     </hint>
    </hints>
   </connection>

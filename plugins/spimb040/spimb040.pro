@@ -20,7 +20,6 @@ HEADERS += spimb040.h \
            ../interfaces/qfextensioncamera.h \
            ../../../../../LIB/trunk/jkimage.h  \
            ../../../../../LIB/trunk/highrestimer.h \
-           ../../../../../LIB/trunk/statistics_tools.h \
            ../../../../../LIB/trunk/tinytiffwriter.h \
            ../../../../../LIB/trunk/libtiff_tools.h \
            ../interfaces/qfextensionlinearstage.h \
@@ -60,7 +59,6 @@ SOURCES += spimb040.cpp \
            qfespimb040cameraview.cpp \
            qfespimb040samplestageconfig.cpp \
            ../../../../../LIB/trunk/highrestimer.cpp \
-           ../../../../../LIB/trunk/statistics_tools.cpp \
            ../../../../../LIB/trunk/tinytiffwriter.cpp \
            ../../../../../LIB/trunk/libtiff_tools.cpp \
     qfespimb040opticssetup.cpp \

@@ -16,7 +16,6 @@ HEADERS += qfpevalimfcsfit.h \
            qfimfcsfitevaluationeditor.h \
            ../interfaces/qfrdrfcsdatainterface.h \
 		   ../interfaces/qfrdrcountratesinterface.h \
-           ../../../../../LIB/trunk/statistics_tools.h \
     ../base_classes/qffitresultsevaluation.h \
     ../base_classes/qffitresultsbyindexevaluation.h \
     ../base_classes/qffitresultsevaluationeditorbase.h \
@@ -42,7 +41,6 @@ HEADERS += qfpevalimfcsfit.h \
 SOURCES += qfpevalimfcsfit.cpp \
            qfimfcsfitevaluation.cpp \
            qfimfcsfitevaluationeditor.cpp \
-           ../../../../../LIB/trunk/statistics_tools.cpp \
     ../base_classes/qffitresultsbyindexevaluation.cpp \
     ../base_classes/qffitresultsevaluationeditorbase.cpp\
     ../base_classes/qffitresultsbyindexevaluationeditorbase.cpp \

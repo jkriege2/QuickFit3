@@ -33,6 +33,13 @@ class QFRDRTableHistogramDialog : public QDialog
         void on_edtRangeMin_valueChanged(double value);
         void on_edtBinWidth_valueChanged(double value);
         void on_spinBins_valueChanged(int value);
+        void on_cmbMethod_currentIndexChanged(int current);
+        void on_btnAutoBinwidth_clicked();
+        void on_btnAutoBandwidth_clicked();
+        void on_btnAutoBins_clicked();
+        void calcAutoBinwidth();
+        void calcAutoBandwidth();
+        void calcAutoBins();
     private:
         Ui::QFRDRTableHistogramDialog *ui;
 
@@ -45,9 +52,11 @@ class QFRDRTableHistogramDialog : public QDialog
             double q75;
             double mean;
             double median;
+            double var;
             int values;
         };
-        QMap<int, colStatistics> columnStatistics;
+        colStatistics stat;
+        //QMap<int, colStatistics> columnStatistics;
         int selected;
         QFTablePluginModel* table;
 };

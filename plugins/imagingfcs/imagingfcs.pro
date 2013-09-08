@@ -40,7 +40,6 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcscorrelationjobthread.h \
     ../../../../../LIB/trunk/tinytiffwriter.h \
     ../../../../../LIB/trunk/libtiff_tools.h \
-    ../../../../../LIB/trunk/statistics_tools.h \
     ../../../../../LIB/trunk/shiftregister.h \
     ../../../../../LIB/trunk/multitau-correlator.h \
     ../../../../../LIB/trunk/correlator_multitau.h \
@@ -73,7 +72,6 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcscorrelationjobthread.cpp \
     ../../../../../LIB/trunk/tinytiffwriter.cpp \
     ../../../../../LIB/trunk/libtiff_tools.cpp \
-    ../../../../../LIB/trunk/statistics_tools.cpp \
     qfrdrimagingfcsdataexplorer.cpp \
     qfrdrimagingfcsmaskbyintensity.cpp \
     qfrdrimagingfcscountratedisplay.cpp \

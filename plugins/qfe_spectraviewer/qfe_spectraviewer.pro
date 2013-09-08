@@ -17,7 +17,6 @@ HEADERS += qfespectraviewer.h \
     optionswidget.h \
     spectrummanager.h \
     qfespectraviewerlightsourceeditor.h \
-    ../../../../../LIB/trunk/statistics_tools.h \
     qfespectraviewerfluorophoreditor.h \
     qfespectraviewerfiltereditor.h \
     qfespectraviewerspilloverdialog.h \
@@ -28,7 +27,6 @@ SOURCES += qfespectraviewer.cpp \
     optionswidget.cpp \
     spectrummanager.cpp \
     qfespectraviewerlightsourceeditor.cpp \
-    ../../../../../LIB/trunk/statistics_tools.cpp \
     qfespectraviewerfluorophoreditor.cpp \
     qfespectraviewerfiltereditor.cpp \
     qfespectraviewerspilloverdialog.cpp \

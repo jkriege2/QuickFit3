@@ -16,7 +16,6 @@ HEADERS +=  qfpevalfcsfit.h \
             qffcsfitevaluationeditor.h \
             ../interfaces/qfrdrfcsdatainterface.h \
             ../interfaces/qfrdrcountratesinterface.h \
-            ../../../../../LIB/trunk/statistics_tools.h \
             dlgestimatefocalvolume.h \
             ../base_classes/qffitresultsevaluation.h \
             ../base_classes/qffitresultsbyindexevaluation.h \
@@ -38,7 +37,6 @@ HEADERS +=  qfpevalfcsfit.h \
 SOURCES +=  qfpevalfcsfit.cpp \
             qffcsfitevaluation.cpp \
             qffcsfitevaluationeditor.cpp \
-            ../../../../../LIB/trunk/statistics_tools.cpp \
             dlgestimatefocalvolume.cpp \
             ../base_classes/qffitresultsevaluation.cpp \
             ../base_classes/qffitresultsbyindexevaluation.cpp \

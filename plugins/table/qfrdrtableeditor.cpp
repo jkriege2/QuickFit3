@@ -706,7 +706,9 @@ void QFRDRTableEditor::slDelete() {
     if (m) {
         if (m->model()) {
             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+            m->model()->disableSignals();
             m->model()->deleteCells(tvMain->selectionModel()->selectedIndexes());
+            m->model()->enableSignals(true);
             QApplication::restoreOverrideCursor();
         }
     }
