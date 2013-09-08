@@ -206,6 +206,10 @@ plg_qfe_defaultmathparserextensions.depends = lib libqf3widgets
     plg_shutter_relais_arduino.subdir=./plugins/shutter_relais_arduino
     plg_shutter_relais_arduino.depends = lib libqf3widgets
 
+    SUBDIRS += plg_servo_pololu_maestro
+    plg_servo_pololu_maestro.subdir=./plugins/servo_pololu_maestro
+    plg_servo_pololu_maestro.depends = lib libqf3widgets
+
     SUBDIRS += plg_meas_b040resheater
     plg_meas_b040resheater.subdir=./plugins/meas_b040resheater
     plg_meas_b040resheater.depends = lib libqf3widgets

@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <!-- RENAME THE ALIAS !!! -->
+    <file alias="servo_pololu_maestro.png">servo_pololu_maestro.png</file>
+</qresource>
+</RCC>

@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Pololu Maestro Servo Controller Plugin</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+	 <p>This plugin controls servos connected to a <a href="http://www.pololu.com/catalog/category/12">Popolu Maestro Servo controller</a>.</p>
+	 <p>The controllers are configured by a global configuration file <tt>servo_pololu_maestro.ini</tt>. It is stored in the global configuration directory. You may change some of the configuration options in the associated
+	 config directory which will show up, if - and only if - you have write access to this file. If the file does not exist, the plugin will load (but not write) to the file <tt>servo_pololu_maestro.ini</tt> either in
+	 the user config directory, or in the assets directory (<tt>[AssetsDir]/plugins/servo_pololu_maestro/</tt>) for the plugin.
+	 </p>
+	 <p>In the <tt>servo_pololu_maestro.ini</tt> you will have to tell the plugin which stages are available and which serial ports they use. This is done inside a <tt>[<b>device</b><i>N</i>]</tt> block for each shutter <i>N</i> (default values are <u>underlined</u>):
+	 <blockquote><tt>
+[<b>device</b><i>N</i>]<br>
+<b>port</b> = <i>port name (e.g. COM1 or /dev/tty0)</i><br>
+<b>id</b> = <i>id of the servo in the driver connected to the given port (0 | 1 | 2 | 3 | ...)</i><br>
+<b>port_speed</b> = <i>port speed (<u>9600</u> | 19200 | 38400 | ...)</i><br>
+<b>port_databits</b> = <i>data bits used for the communication (5 | 6 | 7 | <u>8</u> | 9)</i><br>
+<b>port_parity</b> = <i>parity bit (<u>none</u> | odd | even)</i><br>
+<b>port_handshaking</b> = <i>handshaking mode (<u>none</u> | xonxoff | hardware)</i><br>
+<b>port_stopbits</b> = <i>port speed (<u>1</u> | 1.5 | 2)</i><br>
+<b>port_timeout</b> = <i>port timeout in milliseconds (default: <u>500</u>)</i><br>
+<b>operation_duration</b> = <i>time for switching the shutter in milliseconds (default: <u>500</u>)</i><br>
+<b>type</b> = <i>data bits used for the communication (<u>shutter</u> | filterchanger)</i><br>
+<b>filterchanger_positions</b> = <i>number of filters in the filterchanger</i><br>
+<b>filterchanger_position</b><i>M</i> = <i>output value to move the filterchanger servo to position M=1,2,3,... This is only valud, if <tt>filterchanger_positions=filterchanger</tt></i><br>
+<br>
+	 </tt></blockquote> 
+	 The number of devices is stored in the variable <tt>device_count</tt>.
+	 </p>
+	 <p>Here is an example configuration file for windows and three servos on two controllers connected to COM1 and COM5:
+	 <blockquote><tt>
+device_count=3<br><br>
+[device]<br>
+port=COM1<br>
+id=0<br>
+type=shutter<br>
+port_speed=9600<br>
+operation_duration=250<br><br>
+[device]<br>
+port=COM1<br>
+id=1<br>
+type=shutter<br>
+operation_duration=500<br><br>
+[device]<br>
+port=COM5<br>
+port_speed=19200
+type=filterchanger<br>
+filterchanger_positions=3<br>
+filterchanger_position1=0<br>
+filterchanger_position2=500<br>
+filterchanger_position3=1000<br>
+id=0<br>
+operation_duration=750
+	 </tt></blockquote></p>
+
+<p>See also the help page on <a href="$$mainhelpdir$$ext_usbdevices_linux.html">Linux hardware enumeration with udev</a> for further information</p>
+
+  </body>
+</html>

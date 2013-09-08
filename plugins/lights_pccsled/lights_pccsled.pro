@@ -13,18 +13,18 @@ DESTDIR = $${QFOUTPUT}/plugins/
 
 # Input
 HEADERS += \
-    ../base_classes/qf3simpleb040serialprotocolhandler.h \
     ../base_classes/qf3comportmanager.h \
     ../interfaces/qfextensionlightsource.h \
     ../../../../../LIB/trunk/jkserialconnection.h \
     qfextensionpccsled.h \
-    ../interfaces/qfextensionshutter.h
+    ../interfaces/qfextensionshutter.h \
+    ../base_classes/qf3simpleb040serialprotocolhandler.h
 
 SOURCES += \
-    ../base_classes/qf3simpleb040serialprotocolhandler.cpp \
     ../base_classes/qf3comportmanager.cpp \
     ../../../../../LIB/trunk/jkserialconnection.cpp \
-    qfextensionpccsled.cpp
+    qfextensionpccsled.cpp \
+    ../base_classes/qf3simpleb040serialprotocolhandler.cpp
 
 FORMS =
 
