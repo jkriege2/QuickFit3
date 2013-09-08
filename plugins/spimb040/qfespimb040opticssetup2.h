@@ -40,6 +40,7 @@
 #include "qfshutterconfigwidget.h"
 #include "qfstageconfigwidget.h"
 #include "qffilterchangerconfigwidget.h"
+#include "qfmeasurementdeviceconfigwidget.h"
 
 #include <qalgorithms.h>
 
@@ -62,16 +63,22 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
 
 
         void loadOptSetup(const QString& filename);
+        QString getLastOptSetup() const;
 
 
 
 
         void setLogging(QFPluginLogService* log);
 
+
         /** \brief load settings */
-        void loadSettings(QSettings& settings, QString prefix);
+        void loadSettings(QFManyFilesSettings& settings, QString prefix=QString(""));
+        void loadSettings(const QString& settingsFilename, QString prefix=QString(""));
+        void loadSettings(const QStringList& settingsFilenames, QString prefix=QString(""), bool firstReadonly=true);
         /** \brief save settings */
-        void storeSettings(QSettings& settings, QString prefix);
+        void storeSettings(QFManyFilesSettings& settings, QString prefix=QString(""));
+        void storeSettings(const QString& settingsFilename, QString prefix=QString(""));
+        void storeSettings(const QStringList& settingsFilenames, QString prefix=QString(""), bool firstReadonly=true);
 
         /** \brief removes the lightpath widget from it's place in the dialog and returns a pointer to it. */
         virtual QWidget* takeLightpathWidget() const;
@@ -302,7 +309,7 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
 
 
 
-
+        QString lastOptSetup;
 
 
 
@@ -334,6 +341,8 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         QMap<QString, CameraWidgets> ui_cameras;
         QStringList cameraIndex;
 
+        QMap<QString, QFMeasurementDeviceConfigWidget*> ui_measurementdevices;
+        QStringList measurementdeviceIndex;
         QMap<QString, QFESPIMB040SampleStageConfig*> ui_stageconfigs;
         QMap<QString, QFStageConfigWidget*> ui_stages;
         /** \brief a list of all stages, if the ID is member of ui_stages, the int is ignored, otherwise the int specifies whether this is the x, the y or the z stage in a ui_stageconfigs */
@@ -384,10 +393,10 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
 
 
 
-        template <class T>
-        friend void loadValueSettingsForAllInMap(T map_begin, T map_end, QSettings& settings, const QString& prefix);
-        template <class T>
-        friend void saveValueSettingsForAllInMap(T map_begin, T map_end, QSettings& settings, const QString& prefix);
+        template <class T, class TSet>
+        friend void loadValueSettingsForAllInMap(T map_begin, T map_end, TSet& settings, const QString& prefix);
+        template <class T, class TSet>
+        friend void saveValueSettingsForAllInMap(T map_begin, T map_end, TSet& settings, const QString& prefix);
 
 
 

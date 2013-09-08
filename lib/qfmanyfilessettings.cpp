@@ -102,6 +102,11 @@ void QFManyFilesSettings::endGroup()
     }
 }
 
+int QFManyFilesSettings::levels() const
+{
+    return settings.size();
+}
+
 
 
 

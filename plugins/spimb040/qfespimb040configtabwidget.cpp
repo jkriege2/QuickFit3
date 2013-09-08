@@ -1,6 +1,8 @@
 #include "qfespimb040configtabwidget.h"
 #include "ui_qfespimb040configtabwidget.h"
 #include "programoptions.h"
+#include "qfpluginservices.h"
+#include "qfstyledbutton.h"
 
 QPointer<QFESPIMB040ConfigTabWidget> QFESPIMB040ConfigTabWidget::instance=NULL;
 
@@ -9,6 +11,14 @@ QFESPIMB040ConfigTabWidget::QFESPIMB040ConfigTabWidget(QWidget *parent) :
     ui(new Ui::QFESPIMB040ConfigTabWidget)
 {
     ui->setupUi(this);
+
+    QFStyledButton* btn;
+    ui->edtOptSetup->addButton(btn=new QFStyledButton(QFStyledButton::SelectFile, ui->edtOptSetup, ui->edtOptSetup));
+    btn->setFilter(tr("Optics Setups Files (*.optSetup);;All files (*.*"));
+    ui->edtOptSetupGlobalConfig->addButton(btn=new QFStyledButton(QFStyledButton::SelectFile, ui->edtOptSetupGlobalConfig, ui->edtOptSetupGlobalConfig));
+    btn->setFilter(tr("Optics Setup Configuration Files (*.optSetup.ini *.ini);;Configuration Files (*.ini);;All files (*.*"));
+    ui->edtOptSetupUserConfig->addButton(btn=new QFStyledButton(QFStyledButton::SelectFile, ui->edtOptSetupUserConfig, ui->edtOptSetupUserConfig));
+    btn->setFilter(tr("Optics Setup Configuration Files (*.optSetup.ini *.ini);;Configuration Files (*.ini);;All files (*.*"));
 
     reloadStylesheets(true);
 
@@ -26,6 +36,9 @@ void QFESPIMB040ConfigTabWidget::loadSettings(QSettings& settings, QString prefi
     ui->cmbStyle->setCurrentIndex(ui->cmbStyle->findText(settings.value(prefix+"style", ProgramOptions::getInstance()->getStyle()).toString(), Qt::MatchExactly ));
     ui->cmbStylesheet->setCurrentIndex(ui->cmbStylesheet->findText(settings.value(prefix+"stylesheet", ProgramOptions::getInstance()->getStylesheet()).toString(), Qt::MatchExactly ));
     emit styleChanged(getStyle(), getStylesheet());
+    ui->edtOptSetupGlobalConfig->setText(settings.value(prefix+"optsetup_config_filename_readonly", QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/spim_at_b040.optSetup.ini").toString());
+    ui->edtOptSetupUserConfig->setText(settings.value(prefix+"optsetup_config_filename", QFPluginServices::getInstance()->getConfigFileDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString());
+    ui->edtOptSetup->setText(settings.value(prefix+"optsetup_filename",QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/spim_at_b040.optSetup").toString());
 }
 
 QString QFESPIMB040ConfigTabWidget::getStylesheet()
@@ -44,6 +57,9 @@ QString QFESPIMB040ConfigTabWidget::getStyle()
 void QFESPIMB040ConfigTabWidget::storeSettings(QSettings& settings, QString prefix) const {
     settings.setValue(prefix+"style", ui->cmbStyle->currentText());
     settings.setValue(prefix+"stylesheet", ui->cmbStylesheet->currentText());
+    settings.setValue(prefix+"optsetup_config_filename_readonly", ui->edtOptSetupGlobalConfig->text());
+    settings.setValue(prefix+"optsetup_config_filename", ui->edtOptSetupUserConfig->text());
+    settings.setValue(prefix+"optsetup_filename", ui->edtOptSetup->text());
 }
 
 
@@ -110,5 +126,16 @@ void QFESPIMB040ConfigTabWidget::reloadStylesheets(bool forSure)
     }
 
     //QTimer::singleShot(120000, this, SLOT(reloadStylesheets())); // rescan directory every 2 minutes
+}
+
+void QFESPIMB040ConfigTabWidget::on_btnAutosetConfigs_clicked()
+{
+    QString optset=ui->edtOptSetup->text();
+    QFileInfo fi(optset);
+    ui->edtOptSetupGlobalConfig->setText(optset+".ini");
+    ui->edtOptSetupUserConfig->setText(QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/spimb040/"+fi.fileName()+".ini");
+
+    QDir().mkpath(QFileInfo(ui->edtOptSetupGlobalConfig->text()).absolutePath());
+    QDir().mkpath(QFileInfo(ui->edtOptSetupUserConfig->text()).absolutePath());
 }
 

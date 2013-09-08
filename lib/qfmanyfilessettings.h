@@ -46,6 +46,7 @@ class QFLIB_EXPORT QFManyFilesSettings: public QObject {
         void beginGroup(const QString& prefix);
         void endGroup();
 
+        int levels() const;
 
     protected:
         QList<QPointer<QSettings> > settings;

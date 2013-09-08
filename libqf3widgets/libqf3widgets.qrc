@@ -72,6 +72,11 @@
         <file alias="dvhor.png">icons/dvhor.png</file>
         <file alias="dvver.png">icons/dvver.png</file>
 
+        <file alias="measurementdevice.png">icons/measurementdevice.png</file>
+        <file alias="measurementdevice_none.png">icons/measurementdevice_none.png</file>
+        <file alias="configure_measurementdevice.png">icons/measurementdevice_config.png</file>
+        <file alias="connect_measurementdevice.png">icons/connect_measurementdevice.png</file>
+        <file alias="disconnect_measurementdevice.png">icons/disconnect_measurementdevice.png</file>
 
         <file alias="stagesettings.png">icons/configure_alt.png</file>
         <file alias="stagemove.png">icons/2rightarrow.png</file>

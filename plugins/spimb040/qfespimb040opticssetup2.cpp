@@ -10,15 +10,15 @@
 
 
 
-template <class T>
-void loadValueSettingsForAllInMap(T map_begin, T map_end, QSettings& settings, const QString& prefix) {
+template <class T, class TSet>
+void loadValueSettingsForAllInMap(T map_begin, T map_end, TSet& settings, const QString& prefix) {
     for (T it=map_begin; it!=map_end; it++) {
         it.value()->loadSettings(settings, prefix+it.key()+"/");
     }
 }
 
-template <class T>
-void saveValueSettingsForAllInMap(T map_begin, T map_end, QSettings& settings, const QString& prefix) {
+template <class T, class TSet>
+void saveValueSettingsForAllInMap(T map_begin, T map_end, TSet& settings, const QString& prefix) {
     for (T it=map_begin; it!=map_end; it++) {
         it.value()->saveSettings(settings, prefix+it.key()+"/");
     }
@@ -68,12 +68,68 @@ void saveValueSettingsForAllInMap(QMap<QString, QFESPIMB040OpticsSetup2::CameraW
     }
 }
 
-template <class T>
-void loadValueSettingsForAllInMap(const T& map, QSettings& settings, const QString& prefix) {
+
+
+
+
+
+
+template <>
+void loadValueSettingsForAllInMap( QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> >::const_iterator map_begin, QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> >::const_iterator map_end, QFManyFilesSettings& settings, const QString& prefix) {
+    for (QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> >::const_iterator it=map_begin; it!=map_end; it++) {
+        settings.setValue(prefix+it.key()+"/activated", it.value().first->isChecked());
+        it.value().second->loadSettings(settings, prefix+it.key()+"/");
+    }
+}
+
+template <>
+void saveValueSettingsForAllInMap( QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> >::const_iterator map_begin, QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> >::const_iterator map_end, QFManyFilesSettings& settings, const QString& prefix) {
+    for (QMap<QString, QPair<QCheckBox*, QF3DualViewWidget*> >::const_iterator it=map_begin; it!=map_end; it++) {
+        it.value().first->setChecked(settings.value(prefix+it.key()+"/activated", it.value().first->isChecked()).toBool());
+        it.value().second->saveSettings(settings, prefix+it.key()+"/");
+    }
+}
+
+template <>
+void loadValueSettingsForAllInMap(QMap<QString, QFESPIMB040OpticsSetup2::LightsourceWidgets>::const_iterator map_begin, QMap<QString, QFESPIMB040OpticsSetup2::LightsourceWidgets>::const_iterator map_end, QFManyFilesSettings& settings, const QString& prefix) {
+    for (QMap<QString, QFESPIMB040OpticsSetup2::LightsourceWidgets>::const_iterator it=map_begin; it!=map_end; it++) {
+        it.value().config->loadSettings(settings, prefix+it.key()+"/");
+    }
+}
+
+template <>
+void saveValueSettingsForAllInMap(QMap<QString, QFESPIMB040OpticsSetup2::LightsourceWidgets>::const_iterator map_begin, QMap<QString, QFESPIMB040OpticsSetup2::LightsourceWidgets>::const_iterator map_end, QFManyFilesSettings& settings, const QString& prefix) {
+    for (QMap<QString, QFESPIMB040OpticsSetup2::LightsourceWidgets>::const_iterator it=map_begin; it!=map_end; it++) {
+        it.value().config->saveSettings(settings, prefix+it.key()+"/");
+    }
+}
+
+template <>
+void loadValueSettingsForAllInMap(QMap<QString, QFESPIMB040OpticsSetup2::CameraWidgets>::const_iterator map_begin, QMap<QString, QFESPIMB040OpticsSetup2::CameraWidgets>::const_iterator map_end, QFManyFilesSettings& settings, const QString& prefix) {
+    for (QMap<QString, QFESPIMB040OpticsSetup2::CameraWidgets>::const_iterator it=map_begin; it!=map_end; it++) {
+        it.value().config->loadSettings(settings, prefix+it.key()+"/");
+    }
+}
+
+template <>
+void saveValueSettingsForAllInMap(QMap<QString, QFESPIMB040OpticsSetup2::CameraWidgets>::const_iterator map_begin, QMap<QString, QFESPIMB040OpticsSetup2::CameraWidgets>::const_iterator map_end, QFManyFilesSettings& settings, const QString& prefix) {
+    for (QMap<QString, QFESPIMB040OpticsSetup2::CameraWidgets>::const_iterator it=map_begin; it!=map_end; it++) {
+        it.value().config->storeSettings(settings, prefix+it.key()+"/");
+    }
+}
+
+
+
+
+
+
+
+template <class T, class TSet>
+void loadValueSettingsForAllInMap(const T& map, TSet& settings, const QString& prefix) {
     loadValueSettingsForAllInMap(map.constBegin(), map.constEnd(), settings, prefix);
 }
-template <class T>
-void saveValueSettingsForAllInMap(const T& map, QSettings& settings, const QString& prefix) {
+template <class T, class TSet>
+void saveValueSettingsForAllInMap(const T& map, TSet& settings, const QString& prefix) {
     saveValueSettingsForAllInMap(map.constBegin(), map.constEnd(), settings, prefix);
 }
 
@@ -120,6 +176,7 @@ QFESPIMB040OpticsSetup2::QFESPIMB040OpticsSetup2(QWidget* pluginMainWidget, QWid
     objProjection="";
     objDetection="";
     filtercDetection="";
+    lastOptSetup="";
 
     ui->setupUi(this);
 
@@ -154,6 +211,7 @@ QFESPIMB040OpticsSetup2::~QFESPIMB040OpticsSetup2()
 void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
 {
     if (QFile::exists(filename)) {
+        lastOptSetup=filename;
         m_log->log_text(tr("loading optSetup-file '%1' ... \n").arg(filename));
         /*QFManyFilesSettings settings;
         QSettings setMain(filename, QSettings::IniFormat);
@@ -366,6 +424,19 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
 
                            cameraIndex<<id;
                            ui_cameras[id].config=w;
+                       } else if (type=="measurement_device") {
+                           QFMeasurementDeviceConfigWidget* w=new QFMeasurementDeviceConfigWidget(this);
+                           widNew=w;
+                           w->setLog(m_log);
+                           w->init(m_log, m_pluginServices);
+                           QLabel* l=new QLabel(title, this);
+                           l->setTextFormat(Qt::AutoText);
+                           l->setBuddy(w);
+                           ingroupLayout->addWidget(l, y,x, rowSpan, 1, Qt::AlignTop|Qt::AlignLeft);
+                           ingroupLayout->addWidget(w, y,x+1, rowSpan, qMax(1,colSpan-1));
+
+                           measurementdeviceIndex<<id;
+                           ui_measurementdevices[id]=w;
                        } else if (type=="stage") {
                            QFStageConfigWidget* w=new QFStageConfigWidget(this);
                            widNew=w;
@@ -625,6 +696,11 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
     updateMagnifications();
 }
 
+QString QFESPIMB040OpticsSetup2::getLastOptSetup() const
+{
+    return lastOptSetup;
+}
+
 void QFESPIMB040OpticsSetup2::lockStages() {
     QMap<QString, QFESPIMB040SampleStageConfig*>::const_iterator it1;
     for (it1=ui_stageconfigs.constBegin(); it1 != ui_stageconfigs.constEnd(); ++it1) {
@@ -697,9 +773,15 @@ void QFESPIMB040OpticsSetup2::storePluginGlobalSettings(QSettings &settings, QOb
         extensionRW->writeGlobalSettings(settings, prefix+extension->getID()+"/");
     }
 }
-void QFESPIMB040OpticsSetup2::loadSettings(QSettings& settings, QString prefix) {
+void QFESPIMB040OpticsSetup2::loadSettings(QFManyFilesSettings &settings, QString prefix) {
     bool updt=updatesEnabled();
     if (updt) setUpdatesEnabled(false);
+
+   /* qDebug()<<"QFESPIMB040OpticsSetup2::loadSettings():";
+    for (int i=0; i<settings.levels(); i++) {
+        qDebug()<<"   "<<i<<":";
+        if (settings.getSettings(i)) qDebug()<<"     "<<settings.getSettings(i)->fileName();
+    }*/
 
     loadValueSettingsForAllInMap(ui_filters, settings, prefix+"optSetup2/");
     loadValueSettingsForAllInMap(ui_objectives, settings, prefix+"optSetup2/");
@@ -710,6 +792,7 @@ void QFESPIMB040OpticsSetup2::loadSettings(QSettings& settings, QString prefix) 
     loadValueSettingsForAllInMap(ui_filterchangers, settings, prefix+"optSetup2/");
     loadValueSettingsForAllInMap(ui_shutter, settings, prefix+"optSetup2/");
     loadValueSettingsForAllInMap(ui_lightsource, settings, prefix+"optSetup2/");
+    loadValueSettingsForAllInMap(ui_measurementdevices, settings, prefix+"optSetup2/");
 
 
 
@@ -722,8 +805,31 @@ void QFESPIMB040OpticsSetup2::loadSettings(QSettings& settings, QString prefix) 
     if (updt) setUpdatesEnabled(updt);
 }
 
-void QFESPIMB040OpticsSetup2::storeSettings(QSettings& settings, QString prefix) {
+void QFESPIMB040OpticsSetup2::loadSettings(const QString &settingsFilename, QString prefix)
+{
+    QFManyFilesSettings settings;
+    QSettings set(settingsFilename, QSettings::IniFormat);
+    settings.addSettings(&set, false);
+    loadSettings(settings, prefix);
+}
 
+void QFESPIMB040OpticsSetup2::loadSettings(const QStringList &settingsFilenames, QString prefix, bool firstReadonly)
+{
+    QFManyFilesSettings settings;
+    for (int i=0; i<settingsFilenames.size(); i++) {
+        QSettings* set=new QSettings(settingsFilenames[i], QSettings::IniFormat);
+        settings.addSettings(set, true, (i==0)&&firstReadonly);
+    }
+    loadSettings(settings, prefix);
+}
+
+void QFESPIMB040OpticsSetup2::storeSettings(QFManyFilesSettings &settings, QString prefix) {
+
+    /*qDebug()<<"QFESPIMB040OpticsSetup2::storeSettings():";
+    for (int i=0; i<settings.levels(); i++) {
+        qDebug()<<"   "<<i<<":";
+        if (settings.getSettings(i)) qDebug()<<"     "<<settings.getSettings(i)->fileName();
+    }*/
     saveValueSettingsForAllInMap(ui_filters, settings, prefix+"optSetup2/");
     saveValueSettingsForAllInMap(ui_objectives, settings, prefix+"optSetup2/");
     saveValueSettingsForAllInMap(ui_dualviews, settings, prefix+"optSetup2/");
@@ -733,11 +839,30 @@ void QFESPIMB040OpticsSetup2::storeSettings(QSettings& settings, QString prefix)
     saveValueSettingsForAllInMap(ui_filterchangers, settings, prefix+"optSetup2/");
     saveValueSettingsForAllInMap(ui_shutter, settings, prefix+"optSetup2/");
     saveValueSettingsForAllInMap(ui_lightsource, settings, prefix+"optSetup2/");
+    saveValueSettingsForAllInMap(ui_measurementdevices, settings, prefix+"optSetup2/");
 
 
     for (int i=0; i<shortcuts.size(); i++) {
         settings.setValue(prefix+"shortcut_"+shortcuts[i].id, shortcuts[i].shortcut->key().toString());
     }
+}
+
+void QFESPIMB040OpticsSetup2::storeSettings(const QString &settingsFilename, QString prefix)
+{
+    QFManyFilesSettings settings;
+    QSettings set(settingsFilename, QSettings::IniFormat);
+    settings.addSettings(&set, false);
+    storeSettings(settings, prefix);
+}
+
+void QFESPIMB040OpticsSetup2::storeSettings(const QStringList &settingsFilenames, QString prefix, bool firstReadonly)
+{
+    QFManyFilesSettings settings;
+    for (int i=0; i<settingsFilenames.size(); i++) {
+        QSettings* set=new QSettings(settingsFilenames[i], QSettings::IniFormat);
+        settings.addSettings(set, true, (i==0)&&firstReadonly);
+    }
+    storeSettings(settings, prefix);
 }
 
 QWidget *QFESPIMB040OpticsSetup2::takeLightpathWidget() const
@@ -820,6 +945,24 @@ int QFESPIMB040OpticsSetup2::getSpecialFilterChangerID(QFESPIMB040OpticsSetupBas
         storePluginGlobalSettings(SETTINGS, it.value().MID->GETEXTENSIONFUNCTION(), PREFIX); \
     }
 
+#define ITERATEWIDGETMAP_LOADGLOBAL_LIST(MAP_TYPE, MAP, GETEXTENSIONFUNCTION, SETTINGS, PREFIX) \
+    for (QMap<QString, MAP_TYPE>::const_iterator it=MAP.begin(); it!=MAP.end(); it++) { \
+        QList<QObject*> l=it.value()->GETEXTENSIONFUNCTION(); \
+        for (int jj=0; jj<l.size(); jj++) {\
+            loadPluginGlobalSettings(SETTINGS, l[jj], PREFIX); \
+        }\
+    }
+
+#define ITERATEWIDGETMAP_STOREGLOBAL_LIST(MAP_TYPE, MAP, GETEXTENSIONFUNCTION, SETTINGS, PREFIX) \
+    for (QMap<QString, MAP_TYPE>::const_iterator it=MAP.begin(); it!=MAP.end(); it++) { \
+        QList<QObject*> l=it.value()->GETEXTENSIONFUNCTION(); \
+        for (int jj=0; jj<l.size(); jj++) {\
+            storePluginGlobalSettings(SETTINGS, l[jj], PREFIX); \
+        }\
+    }
+
+
+
 void QFESPIMB040OpticsSetup2::loadPluginGlobalSettings(QSettings &settings, QString prefix) {
     ITERATEWIDGETMAP_LOADGLOBALMID(CameraWidgets, ui_cameras, config, cameraComboBox()->currentCameraQObject, settings, prefix)
     ITERATEWIDGETMAP_LOADGLOBALMID(LightsourceWidgets, ui_lightsource, config, getLightSourceExtensionObject, settings, prefix)
@@ -829,6 +972,7 @@ void QFESPIMB040OpticsSetup2::loadPluginGlobalSettings(QSettings &settings, QStr
     ITERATEWIDGETMAP_LOADGLOBAL(QFStageConfigWidget*, ui_stages, getXStageExtensionObject, settings, prefix)
     ITERATEWIDGETMAP_LOADGLOBAL(QFFilterChangerConfigWidget*, ui_filterchangers, getFilterChangerExtensionObject, settings, prefix)
     ITERATEWIDGETMAP_LOADGLOBAL(QFShutterConfigWidget*, ui_shutter, getShutterExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_LOADGLOBAL(QFMeasurementDeviceConfigWidget*, ui_measurementdevices, getMeasurementDeviceExtensionObject, settings, prefix)
 }
 
 void QFESPIMB040OpticsSetup2::storePluginGlobalSettings(QSettings &settings, QString prefix) const {
@@ -840,6 +984,7 @@ void QFESPIMB040OpticsSetup2::storePluginGlobalSettings(QSettings &settings, QSt
     ITERATEWIDGETMAP_STOREGLOBAL(QFStageConfigWidget*, ui_stages, getXStageExtensionObject, settings, prefix)
     ITERATEWIDGETMAP_STOREGLOBAL(QFFilterChangerConfigWidget*, ui_filterchangers, getFilterChangerExtensionObject, settings, prefix)
     ITERATEWIDGETMAP_STOREGLOBAL(QFShutterConfigWidget*, ui_shutter, getShutterExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_STOREGLOBAL(QFMeasurementDeviceConfigWidget*, ui_measurementdevices, getMeasurementDeviceExtensionObject, settings, prefix)
 }
 
 
@@ -922,7 +1067,7 @@ QMap<QString, QVariant> QFESPIMB040OpticsSetup2::getSetup(int setup_cam) const {
 
 int QFESPIMB040OpticsSetup2::getCameraCount() const
 {
-    return 0;
+    return ui_cameras.size();
 }
 
 
@@ -934,6 +1079,7 @@ void QFESPIMB040OpticsSetup2::setLogging(QFPluginLogService* log) {
     ITERATEWIDGETMAP(QFStageConfigWidget*, ui_stages, setLog(m_log))
     ITERATEWIDGETMAP(QFESPIMB040SampleStageConfig*, ui_stageconfigs, setLog(m_log))
     ITERATEWIDGETMAP(QFShutterConfigWidget*, ui_shutter, setLog(m_log))
+    ITERATEWIDGETMAP(QFMeasurementDeviceConfigWidget*, ui_measurementdevices, setLog(m_log))
 }
 
 bool QFESPIMB040OpticsSetup2::lockCamera(int setup_cam, QFExtension** extension, QFExtensionCamera** ecamera, int* camera, QString* previewSettingsFilename) {
@@ -989,7 +1135,7 @@ void QFESPIMB040OpticsSetup2::on_btnConnectDevices_clicked() {
     ITERATEWIDGETMAPAROUND(QFFilterChangerConfigWidget*, ui_filterchangers, dlg->addItem(tr("filterwheel: ")+it.key()))
     ITERATEWIDGETMAPAROUND(QFStageConfigWidget*, ui_stages, dlg->addItem(tr("stage: ")+it.key()))
     ITERATEWIDGETMAPAROUND(QFESPIMB040SampleStageConfig*, ui_stageconfigs, dlg->addItem(tr("stage: ")+it.key()))
-
+    ITERATEWIDGETMAPAROUND(QFMeasurementDeviceConfigWidget*, ui_measurementdevices, dlg->addItem(tr("measurement: ")+it.key()))
 
     dlg->setHasCancelButton(true);
     dlg->show();
@@ -1000,6 +1146,7 @@ void QFESPIMB040OpticsSetup2::on_btnConnectDevices_clicked() {
     ITERATEWIDGETMAPAROUND3(QFFilterChangerConfigWidget*, ui_filterchangers, if (!dlg->wasCanceled()) it.value()->connectFilterChanger(), dlg->nextItem((it.value()->isFilterChangerConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
     ITERATEWIDGETMAPAROUND3(QFStageConfigWidget*, ui_stages, if (!dlg->wasCanceled()) it.value()->connectStages(), dlg->nextItem((it.value()->isXStageConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
     ITERATEWIDGETMAPAROUND3(QFESPIMB040SampleStageConfig*, ui_stageconfigs, if (!dlg->wasCanceled()) it.value()->connectStages(), dlg->nextItem((it.value()->isXStageConnected()||it.value()->isYStageConnected()||it.value()->isZStageConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
+    ITERATEWIDGETMAPAROUND3(QFMeasurementDeviceConfigWidget*, ui_measurementdevices, if (!dlg->wasCanceled()) it.value()->connectMeasurementDevice(), dlg->nextItem((it.value()->isMeasurementDeviceConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
 
     dlg->close();
     delete dlg;
@@ -1015,6 +1162,7 @@ void QFESPIMB040OpticsSetup2::on_btnDisconnectDevices_clicked() {
     ITERATEWIDGETMAPAROUND(QFFilterChangerConfigWidget*, ui_filterchangers, dlg->addItem(tr("filterwheel: ")+it.key()))
     ITERATEWIDGETMAPAROUND(QFStageConfigWidget*, ui_stages, dlg->addItem(tr("stage: ")+it.key()))
     ITERATEWIDGETMAPAROUND(QFESPIMB040SampleStageConfig*, ui_stageconfigs, dlg->addItem(tr("stage: ")+it.key()))
+    ITERATEWIDGETMAPAROUND(QFMeasurementDeviceConfigWidget*, ui_measurementdevices, dlg->addItem(tr("measurement: ")+it.key()))
     dlg->setHasCancelButton(false);
     dlg->show();
     dlg->start();
@@ -1024,6 +1172,7 @@ void QFESPIMB040OpticsSetup2::on_btnDisconnectDevices_clicked() {
     ITERATEWIDGETMAPAROUND3(QFFilterChangerConfigWidget*, ui_filterchangers, it.value()->disconnectFilterChanger(), dlg->nextItem(), QApplication::processEvents())
     ITERATEWIDGETMAPAROUND3(QFStageConfigWidget*, ui_stages, it.value()->disconnectStages(), dlg->nextItem(), QApplication::processEvents())
     ITERATEWIDGETMAPAROUND3(QFESPIMB040SampleStageConfig*, ui_stageconfigs, it.value()->disconnectStages(), dlg->nextItem(), QApplication::processEvents())
+    ITERATEWIDGETMAPAROUND3(QFMeasurementDeviceConfigWidget*, ui_measurementdevices, it.value()->disconnectMeasurementDevice(), dlg->nextItem(), QApplication::processEvents())
 
     delete dlg;
 }
@@ -1179,58 +1328,69 @@ QFExtensionFilterChanger *QFESPIMB040OpticsSetup2::getFilterChanger(int changer)
 
 int QFESPIMB040OpticsSetup2::getFilterChangerID(int changer) const
 {
-// ========================================================================================================================================================================================
-// TODO: IMPLEMENT FROM HERE!!!
-// ========================================================================================================================================================================================
-   // if (changer==0) return ui->filtcDetection->getFilterChangerID();
+    if (changer==FilterChangerDetection && ui_filterchangers.contains(filtercDetection) && ui_filterchangers[filtercDetection]) return ui_filterchangers[filtercDetection]->getFilterChangerID();
     return -1;
 }
 
 QString QFESPIMB040OpticsSetup2::getFilterChangerName(int changer) const
 {
-    //if (changer==0) return tr("detection");
+    if (changer==FilterChangerDetection && ui_filterchangers.contains(filtercDetection) && ui_filterchangers[filtercDetection]) return tr("detection");
     return QString();
 }
 
 int QFESPIMB040OpticsSetup2::getFilterChangerCount() const
 {
-    return 1;
+    if (ui_filterchangers.contains(filtercDetection) && ui_filterchangers[filtercDetection]) return 1;
+    return 0;
 }
 
 QFExtensionLightSource *QFESPIMB040OpticsSetup2::getLaser(int laser)
 {
-    /*if (laser==0) return ui->lsLaser1->getLightSource();
-    if (laser==1) return ui->lsLaser2->getLightSource();*/
+    if (laser>=0 && laser<laserIndex.size()) {
+        if (ui_lightsource.contains(laserIndex[laser]) && ui_lightsource[laserIndex[laser]].config) return ui_lightsource[laserIndex[laser]].config->getLightSource();
+    }
+
     return NULL;
 }
 
 
-QFExtensionLightSource *QFESPIMB040OpticsSetup2::getBrightfieldLightSource(int source)
+QFExtensionLightSource *QFESPIMB040OpticsSetup2::getBrightfieldLightSource(int laser)
 {
-    //if (source==0) return ui->lsTransmission->getLightSource();
+    if (laser>=0 && laser<brightfieldIndex.size()) {
+        if (ui_lightsource.contains(brightfieldIndex[laser]) && ui_lightsource[brightfieldIndex[laser]].config) return ui_lightsource[brightfieldIndex[laser]].config->getLightSource();
+    }
+
     return NULL;
 }
 
 int QFESPIMB040OpticsSetup2::getLaserID(int laser)
 {
-    /*if (laser==0) return ui->lsLaser1->getLightSourceID();
-    if (laser==1) return ui->lsLaser2->getLightSourceID();*/
-    return NULL;
+    if (laser>=0 && laser<laserIndex.size()) {
+        if (ui_lightsource.contains(laserIndex[laser]) && ui_lightsource[laserIndex[laser]].config) return ui_lightsource[laserIndex[laser]].config->getLightSourceID();
+    }
+
+    return -1;
 }
 
 
-int QFESPIMB040OpticsSetup2::getBrightfieldLightSourceID(int source)
+int QFESPIMB040OpticsSetup2::getBrightfieldLightSourceID(int laser)
 {
-    //if (source==0) return ui->lsTransmission->getLightSourceID();
-    return NULL;
+    if (laser>=0 && laser<brightfieldIndex.size()) {
+        if (ui_lightsource.contains(brightfieldIndex[laser]) && ui_lightsource[brightfieldIndex[laser]].config) return ui_lightsource[brightfieldIndex[laser]].config->getLightSourceID();
+    }
+
+    return -1;
 }
 
 int QFESPIMB040OpticsSetup2::getLaserCount() const
 {
-    return 2;
+    return laserIndex.size();
 }
 
 bool QFESPIMB040OpticsSetup2::isStageConnected(QFExtensionLinearStage* stage, int id, bool& found) {
+    // ========================================================================================================================================================================================
+    // TODO: IMPLEMENT FROM HERE!!!
+    // ========================================================================================================================================================================================
     found=false;
     if (!stage || id<0) return false;
     found=true;
@@ -1911,7 +2071,9 @@ void QFESPIMB040OpticsSetup2::on_btnLoadSetup_clicked() {
     QString filename=qfGetOpenFileName(this, tr("open optics setup ..."), dir, tr("optics setup configuration (*.osi)"))    ;
     if (!filename.isEmpty()) {
         QSettings set(filename, QSettings::IniFormat);
-        loadSettings(set, "optics_setup/");
+        QFManyFilesSettings settings;
+        settings.addSettings(&set, false);
+        loadSettings(settings, "optics_setup/");
         loadPluginGlobalSettings(set, "plugin_global/");
     }
     ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ExperimentDescription/lastopticssetupdir", dir);
@@ -1932,7 +2094,9 @@ void QFESPIMB040OpticsSetup2::on_btnSaveSetup_clicked()  {
         }
         if (ok) {
             QSettings set(filename, QSettings::IniFormat);
-            storeSettings(set, "optics_setup/");
+            QFManyFilesSettings settings;
+            settings.addSettings(&set, false);
+            storeSettings(settings, "optics_setup/");
             storePluginGlobalSettings(set, "plugin_global/");
         }
     }

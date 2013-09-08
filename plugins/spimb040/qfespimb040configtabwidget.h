@@ -34,6 +34,7 @@ class QFESPIMB040ConfigTabWidget : public QWidget{
         void on_cmbStyle_currentIndexChanged(const QString &text);
         void on_cmbStyle_highlighted(const QString &text);
         void reloadStylesheets(bool forSure=false);
+        void on_btnAutosetConfigs_clicked();
     private:
         Ui::QFESPIMB040ConfigTabWidget *ui;
         static QPointer<QFESPIMB040ConfigTabWidget> instance;

@@ -57,7 +57,6 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     objectives.h \
     ../plugins/interfaces/qfrdrfcsdatainterface.h \
     ../plugins/interfaces/qfrdrcountratesinterface.h \
-    ../plugins/interfaces/qfextensionparameterdevice.h \
     ../plugins/interfaces/qfextensionlinearstage.h \
     ../plugins/interfaces/qfextensioncamera.h \
     libwid_imexport.h \
@@ -118,7 +117,11 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/qt/fillstylecombobox.h \
     qfsimplecurvefitdialog.h \
     qfparametercorrelationview.h \
-    ../../../../LIB/trunk/statistics_tools.h
+    ../../../../LIB/trunk/statistics_tools.h \
+    qfmeasurementtable.h \
+    qfmeasurementdevicecombobox.h \
+    qfmeasurementdeviceconfigwidgetthread.h \
+    qfmeasurementdeviceconfigwidget.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -199,7 +202,11 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     ../../../../LIB/trunk/qt/fillstylecombobox.cpp \
     qfsimplecurvefitdialog.cpp \
     qfparametercorrelationview.cpp \
-    ../../../../LIB/trunk/statistics_tools.cpp
+    ../../../../LIB/trunk/statistics_tools.cpp \
+    qfmeasurementtable.cpp \
+    qfmeasurementdevicecombobox.cpp \
+    qfmeasurementdeviceconfigwidgetthread.cpp \
+    qfmeasurementdeviceconfigwidget.cpp
 
 
 FORMS += qfdlg_csvparameters.ui \

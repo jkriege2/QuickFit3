@@ -127,7 +127,14 @@ inwidget=tab_left
 title=Measurements
 
 
+[measurement_tempcontrol]
+type=measurement_device
+ingroup=page_measurements
+title="temperature<br>control:"
 
+[stretch_measurements]
+type=vertical_stretch
+ingroup=page_measurements
 
 
 

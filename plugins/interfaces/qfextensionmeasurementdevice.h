@@ -4,6 +4,7 @@
 #include <QVariant>
 #include <QWidget>
 #include <QString>
+#include "qfpluginservices.h"
 
 /*! \brief QuickFit QFExtension to read arbitrary measured values from a device
     \ingroup qf3extensionplugins
@@ -73,6 +74,7 @@ class QFExtensionMeasurementAndControlDevice {
             mdIntCombobBox,
             mdDoubleSlider,
             mdIntSlider,
+            mdLabel,
 
 
             mdDefault=mdDoubleEdit

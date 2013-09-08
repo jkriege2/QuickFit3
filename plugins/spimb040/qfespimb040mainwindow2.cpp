@@ -40,6 +40,7 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     jkloadWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
     jkloadSplitter((*settings->getQSettings()), splitter, "plugin_spim_b040/");
     if (optSetup) optSetup->loadSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
+
     if (widExperimentDescription) widExperimentDescription->loadSettings((*settings->getQSettings()), "plugin_spim_b040/expdescription/");
     if (widAcquisitionDescription) widAcquisitionDescription->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acqdescription/");
     if (widScriptedAcquisition) widScriptedAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acqscripted/");
@@ -65,6 +66,24 @@ void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
     jksaveWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
     jksaveSplitter((*settings->getQSettings()), splitter, "plugin_spim_b040/");
     if (optSetup) optSetup->storeSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
+
+    if (optSetup2) {
+        QString optSetupFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup").toString();
+
+        if (QFile::exists(optSetup2->getLastOptSetup()) && QFileInfo(optSetupFile)==QFileInfo(optSetup2->getLastOptSetup())) {
+
+            QString optSetupGlobalConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename_readonly", m_pluginServices->getGlobalConfigFileDirectory()+"/spim_at_b040.optSetup.ini").toString();
+            QString optSetupUserConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename", m_pluginServices->getConfigFileDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();
+            QStringList optSetupFiles;
+            QDir().mkpath(QFileInfo(optSetupUserConfigFile).absolutePath());
+            QDir().mkpath(QFileInfo(optSetupGlobalConfigFile).absolutePath());
+            optSetupFiles<<optSetupGlobalConfigFile;
+            optSetupFiles<<optSetupUserConfigFile;
+            optSetup2->storeSettings(optSetupFiles, "", true);
+        }
+    }
+
+
     if (widExperimentDescription) widExperimentDescription->storeSettings((*settings->getQSettings()), "plugin_spim_b040/expdescription/");
     if (widAcquisitionDescription) widAcquisitionDescription->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acqdescription/");
     if (widScriptedAcquisition) widScriptedAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acqscripted/");
@@ -218,7 +237,18 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
         // optics setup tab
         ////////////////////////////////////////////////////////////////////////////////////////////////
         optSetup2=new QFESPIMB040OpticsSetup2(this, this, this, m_pluginServices);
-        optSetup2->loadOptSetup(ProgramOptions::getConfigValue("spimb040/optsetup_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup").toString());
+        QString optSetupFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup").toString();
+        QString optSetupGlobalConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename_readonly", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();
+        QString optSetupUserConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename", m_pluginServices->getConfigFileDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();
+        optSetup2->loadOptSetup(optSetupFile);
+        //optSetup2->loadSettings(ProgramOptions::getConfigValue("spimb040/optsetup_config_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString());
+        QStringList optSetupFiles;
+        QDir().mkpath(QFileInfo(optSetupUserConfigFile).absolutePath());
+        QDir().mkpath(QFileInfo(optSetupGlobalConfigFile).absolutePath());
+        optSetupFiles<<optSetupGlobalConfigFile;
+        optSetupFiles<<optSetupUserConfigFile;
+        optSetup2->loadSettings(optSetupFiles, "", true);
+
         tabMain->addTab(optSetup2, tr("TESTING: Instrument Setup 2"));
 
         optSetup->emitLighpathesChanged();
