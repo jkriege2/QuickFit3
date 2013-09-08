@@ -3,7 +3,7 @@
 #include "qfecalculator.h"
 
 qfmpResult fDisp(const qfmpResult* params, unsigned int  n, QFMathParser* p){
-  QFECalculatorDialog* dlg=(QFECalculatorDialog*)p->getGeneraldata("QFECalculatorDialog/pointer", NULL).toInt();
+  QFECalculatorDialog* dlg=(QFECalculatorDialog*)(p->getGeneraldata("QFECalculatorDialog/pointer", 0).toLongLong());
   if (dlg) {
       QPlainTextEdit* h=dlg->getHistory();
 
@@ -21,7 +21,7 @@ qfmpResult fDisp(const qfmpResult* params, unsigned int  n, QFMathParser* p){
 }
 
 qfmpResult fDispNLB(const qfmpResult* params, unsigned int  n, QFMathParser* p){
-  QFECalculatorDialog* dlg=(QFECalculatorDialog*)p->getGeneraldata("QFECalculatorDialog/pointer", NULL).toInt();
+    QFECalculatorDialog* dlg=(QFECalculatorDialog*)(p->getGeneraldata("QFECalculatorDialog/pointer", 0).toLongLong());
   if (dlg) {
       QPlainTextEdit* h=dlg->getHistory();
 
@@ -39,7 +39,7 @@ qfmpResult fDispNLB(const qfmpResult* params, unsigned int  n, QFMathParser* p){
 }
 
 qfmpResult fDispType(const qfmpResult* params, unsigned int  n, QFMathParser* p){
-  QFECalculatorDialog* dlg=(QFECalculatorDialog*)p->getGeneraldata("QFECalculatorDialog/pointer", NULL).toInt();
+    QFECalculatorDialog* dlg=(QFECalculatorDialog*)(p->getGeneraldata("QFECalculatorDialog/pointer", 0).toLongLong());
   if (dlg) {
       QPlainTextEdit* h=dlg->getHistory();
 
@@ -97,7 +97,7 @@ QFECalculatorDialog::QFECalculatorDialog(QFECalculator *calc, QWidget *parent) :
 
 void QFECalculatorDialog::setupParser(QFMathParser *parser) const
 {
-    parser->setGeneralData("QFECalculatorDialog/pointer", (int)this);
+    parser->setGeneralData("QFECalculatorDialog/pointer", (qlonglong)this);
     parser->addFunction("write", fDispNLB);
     parser->addFunction("writeln", fDisp);
     parser->addFunction("disp", fDisp);
@@ -244,7 +244,7 @@ void QFECalculatorDialog::on_btnClearCache_clicked()
     delete parser;
     parser=new QFMathParser();
     setupParser(parser);
-    parser->setGeneralData("QFECalculatorDialog/pointer", (int)this);
+    parser->setGeneralData("QFECalculatorDialog/pointer", (qlonglong)this);
     showCache();
 }
 

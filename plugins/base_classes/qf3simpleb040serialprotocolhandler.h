@@ -38,11 +38,13 @@ class QF3SimpleB040SerialProtocolHandler {
 
         bool hasErrorOccured();
         QString getLastError();
+        void setAddToCommand(const QString& add);
     private:
         JKSerialConnection* com;
         QFPluginLogService* log;
         QString LOG_PREFIX;
         QString name;
+        QString addToCommand;
 };
 
 #endif // QF3SIMPLEB040SERIALPROTOCOLHANDLER_H

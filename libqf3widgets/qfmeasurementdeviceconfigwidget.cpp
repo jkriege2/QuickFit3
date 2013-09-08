@@ -366,7 +366,7 @@ void QFMeasurementDeviceConfigWidget::updateMDWidgets() {
             MDWidgets w;
             w.labelName=new QLabel(this);
             int line=widgetLayout->rowCount();
-            linesLayout->addWidget(w.labelName, line, 0);
+            linesLayout->addWidget(w.labelName, i+1, 0);
             mdWidgets.append(w);
         }
     }
@@ -437,7 +437,7 @@ void QFMeasurementDeviceConfigWidget::updateMDWidgets() {
                 wadd=w.label=new QLabel(this);
             }
         }
-        if (wadd) linesLayout->addWidget(wadd, i, 1);
+        if (wadd) linesLayout->addWidget(wadd, i+1, 1);
 
         double mi=0, ma=0;
         device->getMeasurementDeviceEditableValueRange(id, i, mi, ma);
@@ -529,7 +529,7 @@ void QFMeasurementDeviceConfigWidget::setValue(int line, const QVariant &power) 
 void QFMeasurementDeviceConfigWidget::valuesChanged(QTime time, QList<QVariant> values, QStringList lineNames, QList<bool> widgetsEnabled) {
     if (dontAccessWidgets) return;
     bool updt=updatesEnabled(); setUpdatesEnabled(false);
-    //qDebug()<<"linesChanged("<< lineenabled<< setValues <<measuredValues<<")";
+    //qDebug()<<"QFMeasurementDeviceConfigWidget::valuesChanged("<< time<< values <<lineNames<<")";
     for (int i=0; i<mdWidgets.size(); i++) {
         if (i<values.size()) {
 

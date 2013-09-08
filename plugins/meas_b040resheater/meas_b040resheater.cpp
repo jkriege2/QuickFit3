@@ -50,6 +50,7 @@ void QFExtensionB040ResistorHeater::initExtension() {
         s.infoMessage="";
         s.lastAction=QTime::currentTime();
         s.serial=new QF3SimpleB040SerialProtocolHandler(ports.getCOMPort(s.port), getName());
+        //s.serial->setAddToCommand("");
         s.label=inifile.value("device"+QString::number(i+1)+"/label", tr("B040 Temperature Controller #%1").arg(i+1)).toString();
         devices.append(s);
     }
@@ -143,6 +144,8 @@ void QFExtensionB040ResistorHeater::connectMeasurementDevice(unsigned int measur
             com->close();
             log_error(tr("%1 Could not connect to B040 Temperature Controller [port=%1  baud=%2]!!!\n").arg(com->get_port().c_str()).arg(com->get_baudrate()));
             log_error(tr("%1 reason: received wrong ID string from B040 Temperature Controller: string was '%2'\n").arg(LOG_PREFIX).arg(devices[measuremenDevice].infoMessage));
+        } else {
+            log_text(tr("%1 Connected to 040 Temperature Controller [port=%2  baud=%3] \n%1 welcome message:'%4'\n").arg(LOG_PREFIX).arg(com->get_port().c_str()).arg(com->get_baudrate()).arg(devices[measuremenDevice].infoMessage));
         }
     } else {
         log_error(tr("%1 Could not connect to B040 Temperature Controller [port=%1  baud=%2]!!!\n").arg(com->get_port().c_str()).arg(com->get_baudrate()));
@@ -184,19 +187,22 @@ QVariant QFExtensionB040ResistorHeater::getMeasurementDeviceValue(unsigned int m
     QMutexLocker locker(mutex);
     if (!com->isConnectionOpen()) return QVariant();
 
+
     bool ok=false;
     if (value==0) {
-        double r=serial->queryCommand("1").toDouble(&ok);
-        if (ok) return r;
+        QString rs=serial->queryCommand("1");
+        double r=rs.toDouble(&ok)/10.0;
+        //qDebug()<<rs<<r<<ok;
+        if (ok&&r<1000) return r;
     } else if (value==1) {
-        double r=serial->queryCommand("2").toDouble(&ok);
-        if (ok) return r;
+        double r=serial->queryCommand("2").toDouble(&ok)/10.0;
+        if (ok&&r<1000) return r;
     } else if (value==2) {
         double r=serial->queryCommand("o").toDouble(&ok);
-        if (ok) return r;
+        if (ok) return r!=0;
     } else if (value==3) {
-        double r=serial->queryCommand("t").toDouble(&ok);
-        if (ok) return r;
+        double r=serial->queryCommand("t").toDouble(&ok)/10.0;
+        if (ok&&r<1000) return r;
     } else if (value==4) {
         double r=serial->queryCommand("v").toDouble(&ok)/255.0*100.0;
         if (ok) return r;
@@ -223,8 +229,7 @@ void QFExtensionB040ResistorHeater::setMeasurementDeviceValue(unsigned int measu
         if (data.toBool()) serial->sendCommand("O1");
         else  serial->sendCommand("O0");
     } else if (value==3) {
-        if (data.toBool()) serial->sendCommand("T1");
-        else  serial->sendCommand(QString("T")+QString::number(round(data.toDouble()*10.0)));
+        serial->sendCommand(QString("T")+QString::number(round(data.toDouble()*10.0)));
     } else if (value==4) {
         // can not be set
     }

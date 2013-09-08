@@ -8,6 +8,7 @@ QF3SimpleB040SerialProtocolHandler::QF3SimpleB040SerialProtocolHandler(JKSerialC
     this->log=NULL;
     this->LOG_PREFIX="";
     this->name=name;
+    addToCommand="\n";
 }
 
 void QF3SimpleB040SerialProtocolHandler::setLogging(QFPluginLogService* log, QString LOG_PREFIX) {
@@ -17,26 +18,26 @@ void QF3SimpleB040SerialProtocolHandler::setLogging(QFPluginLogService* log, QSt
 
 void QF3SimpleB040SerialProtocolHandler::sendCommand(QString command) {
     if (!com) return;
-    com->write(QString(command+"\n").toStdString());
+    com->write(QString(command+addToCommand).toStdString());
 }
 
 QString QF3SimpleB040SerialProtocolHandler::queryCommand(QString command) {
     if (!com) return "";
     std::string res="";
-    //std::cout<<"\n\ncommand: '"<<command<<"'\n";
+    //qDebug()<<"\n\ncommand: '"<<command<<"'";
     com->clearBuffer();
     com->clearBuffer();
-    if (com->write(QString(command+"\n").toStdString())) {
+    if (com->write(QString(command+addToCommand).toStdString())) {
         QTime t;
         t.start();
         //while (t.elapsed()<1);
         res=com->readUntil("\n\n");
         //std::cout<<" ... reading ... ";
     }
-    //std::cout<<"   direct_result: '"<<toprintablestr(res)<<"' ";
+    //qDebug()<<"   direct_result: '"<<toprintablestr(res).c_str()<<"' ";
     checkComError();
     //if (res.size()>=2) res=res.erase(res.size()-2, 2);
-    //std::cout<<"   returned_result: '"<<toprintablestr(res)<<"'\n\n";
+    //qDebug()<<"   returned_result: '"<<toprintablestr(res).c_str()<<"'";
     QString data="";
     for (unsigned int i=0; i<res.size(); i++) {
         if (res[i]>0) data+=QLatin1Char(res[i]);
@@ -60,6 +61,11 @@ bool QF3SimpleB040SerialProtocolHandler::hasErrorOccured() {
 QString QF3SimpleB040SerialProtocolHandler::getLastError() {
     if (!com) return QObject::tr("no COM port given to QF3SimpleB040SerialProtocolHandler");
     return com->getLastError().c_str();
+}
+
+void QF3SimpleB040SerialProtocolHandler::setAddToCommand(const QString &add)
+{
+    addToCommand=add;
 }
 
 bool QF3SimpleB040SerialProtocolHandler::checkComConnected() {
