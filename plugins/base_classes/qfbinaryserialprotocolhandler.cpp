@@ -20,6 +20,7 @@ void QFBinarySerialProtocolHandler::setLogging(QFPluginLogService* log, QString 
 
 void QFBinarySerialProtocolHandler::sendCommand(const QByteArray &command) {
     if (!com) return;
+    qDebug()<<"sending: "<<command.toHex();
     com->write((uint8_t*)command.data(), command.size());
 }
 
@@ -29,13 +30,15 @@ QByteArray QFBinarySerialProtocolHandler::queryCommand(const QByteArray &command
     std::string res="";
     com->clearBuffer();
     com->clearBuffer();
-    result.resize(resultSize);
+    result=QByteArray(resultSize, 0);
+    qDebug()<<"querying: "<<command.toHex()<<"   expecting "<<resultSize<<" bytes back!";
     //qDebug()<<"querying: "<<QString(toprintablestr(QString(command+sendTerminationString).toStdString()).c_str())<<"   timeout="<<com->get_timeout_ms()<<"ms";
     if (com->write((uint8_t*)command.data(), command.size())) {
         QTime t;
         t.start();
         com->read((uint8_t*)result.data(), resultSize);
     }
+    qDebug()<<"received: "<<result.toHex();
     //qDebug()<<"  received: "<<QString(toprintablestr(res).c_str());
     checkComError();
     QString data="";

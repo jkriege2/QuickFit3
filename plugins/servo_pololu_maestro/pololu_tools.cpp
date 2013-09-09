@@ -4,8 +4,10 @@
 QByteArray pololuMaestroBuildGetPosCommand(int channel)
 {
     QByteArray command(2, 0);
-    command[0]=0x90;
-    command[1]=channel;
+    int cnt=0;
+    //command[cnt++]=0xAA;
+    command[cnt++]=0x90;
+    command[cnt++]=channel;
     return command;
 }
 
@@ -13,11 +15,13 @@ QByteArray pololuMaestroBuildGetPosCommand(int channel)
 QByteArray pololuMaestroBuildSetPosCommand(int channel, int pos_microseconds)
 {
     int target=pos_microseconds*4;
+    int cnt=0;
     QByteArray command(4, 0);
-    command[0]=0x84;
-    command[1]=channel;
-    command[2]=target & 0x7F;
-    command[3]=target >> 7 & 0x7F;
+    command[cnt++]=0x84;
+    command[cnt++]=channel;
+    command[cnt++]=target & 0x7F;
+    command[cnt++]=(target >> 7) & 0x7F;
+
     return command;
 }
 

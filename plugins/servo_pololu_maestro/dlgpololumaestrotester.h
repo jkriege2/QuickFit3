@@ -21,7 +21,7 @@ class DlgPololuMaestroTester : public QDialog
     protected slots:
         void updateRead();
         void on_spinSet_valueChanged(int value);
-        void on_btnConnect_clicked();
+        void on_btnConnect_clicked(bool checked);
         void on_cmbBaudrate_currentIndexChanged(int index);
     private:
         Ui::DlgPololuMaestroTester *ui;
