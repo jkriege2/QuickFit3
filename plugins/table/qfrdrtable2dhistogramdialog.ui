@@ -1,0 +1,812 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFRDRTable2DHistogramDialog</class>
+ <widget class="QDialog" name="QFRDRTable2DHistogramDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>567</width>
+    <height>590</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Calculate Histogram</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>input column X:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="cmbInputX"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>input column Y:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="cmbInputY"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="labStatistics">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>X:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>bins:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="spinBins">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>1000000</number>
+         </property>
+         <property name="value">
+          <number>30</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnAutoBins">
+         <property name="text">
+          <string>auto</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="chkAutoBinWidth">
+         <property name="text">
+          <string>by bin width:</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFDoubleEdit" name="edtBinWidth">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnAutoBinwidth">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>auto</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="4" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="label_14">
+         <property name="text">
+          <string>range:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="chkRangeMin">
+         <property name="text">
+          <string>min:</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFDoubleEdit" name="edtRangeMin">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>  ...  </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="chkRangeMax">
+         <property name="text">
+          <string>max:</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFDoubleEdit" name="edtRangeMax">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>method:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QComboBox" name="cmbMethod">
+       <item>
+        <property name="text">
+         <string>histogram</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KDE: Gaussian</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KDE: Uniform</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>bandwidth:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>X: </string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QPushButton" name="btnAutoBandwidth">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>auto</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QFDoubleEdit" name="edtBandwidth">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>Y: </string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QFDoubleEdit" name="edtBandwidthY">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QPushButton" name="btnAutoBandwidthY">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>auto</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="10" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>output:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="1">
+      <widget class="QComboBox" name="cmbOutput"/>
+     </item>
+     <item row="5" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_12">
+         <property name="text">
+          <string>bins:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="spinBinsY">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>1000000</number>
+         </property>
+         <property name="value">
+          <number>30</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnAutoBinsY">
+         <property name="text">
+          <string>auto</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="chkAutoBinWidthY">
+         <property name="text">
+          <string>by bin width:</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFDoubleEdit" name="edtBinWidthY">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnAutoBinwidthY">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>auto</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="6" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QLabel" name="label_15">
+         <property name="text">
+          <string>range:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="chkRangeMinY">
+         <property name="text">
+          <string>min:</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFDoubleEdit" name="edtRangeMinY">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>  ...  </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="chkRangeMaxY">
+         <property name="text">
+          <string>max:</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFDoubleEdit" name="edtRangeMaxY">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Y:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QCheckBox" name="chkNormalized">
+       <property name="text">
+        <string>normalized</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QFPlotter" name="plotter" native="true"/>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFPlotter</class>
+   <extends>QWidget</extends>
+   <header>qfplotter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfdoubleedit.h</header>
+   <slots>
+    <signal>valueChanged(double)</signal>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>QFRDRTable2DHistogramDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>396</x>
+     <y>580</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>QFRDRTable2DHistogramDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>464</x>
+     <y>580</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkRangeMin</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtRangeMin</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>170</x>
+     <y>130</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>302</x>
+     <y>132</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkRangeMax</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtRangeMax</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>385</x>
+     <y>130</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>132</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkAutoBinWidth</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtBinWidth</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>353</x>
+     <y>101</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>460</x>
+     <y>102</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkAutoBinWidth</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinBins</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>353</x>
+     <y>101</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>181</x>
+     <y>102</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbInputX</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFRDRTable2DHistogramDialog</receiver>
+   <slot>updateHistograms()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>319</x>
+     <y>16</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>474</x>
+     <y>32</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbOutput</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFRDRTable2DHistogramDialog</receiver>
+   <slot>updateHistograms()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>556</x>
+     <y>327</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>549</x>
+     <y>148</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkAutoBinWidth</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnAutoBinwidth</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>353</x>
+     <y>101</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>541</x>
+     <y>104</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkAutoBinWidth</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnAutoBins</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>353</x>
+     <y>101</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>262</x>
+     <y>104</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbMethod</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFRDRTable2DHistogramDialog</receiver>
+   <slot>updateHistograms()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>210</x>
+     <y>218</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>62</x>
+     <y>216</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtBandwidth</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFRDRTable2DHistogramDialog</receiver>
+   <slot>updateHistograms()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>365</x>
+     <y>269</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>53</x>
+     <y>198</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbInputY</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFRDRTable2DHistogramDialog</receiver>
+   <slot>updateHistograms()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>110</x>
+     <y>39</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>79</x>
+     <y>59</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkAutoBinWidthY</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnAutoBinsY</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>284</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>215</x>
+     <y>150</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkAutoBinWidthY</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinBinsY</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>337</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>158</x>
+     <y>155</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkAutoBinWidthY</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtBinWidthY</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>342</x>
+     <y>155</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>404</x>
+     <y>155</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkAutoBinWidthY</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnAutoBinwidthY</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>349</x>
+     <y>145</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>511</x>
+     <y>159</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkRangeMinY</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtRangeMinY</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>142</x>
+     <y>175</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>212</x>
+     <y>177</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkRangeMaxY</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtRangeMaxY</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>367</x>
+     <y>181</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>416</x>
+     <y>183</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtBandwidthY</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFRDRTable2DHistogramDialog</receiver>
+   <slot>updateHistograms()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>298</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>62</x>
+     <y>261</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkNormalized</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFRDRTable2DHistogramDialog</receiver>
+   <slot>updateHistograms()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>113</x>
+     <y>233</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>18</x>
+     <y>235</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>updateHistograms()</slot>
+ </slots>
+</ui>

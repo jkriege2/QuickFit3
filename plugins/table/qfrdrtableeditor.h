@@ -71,6 +71,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slRecalcAll();
         void slSort();
         void slHistogram();
+        void slHistogram2D();
 
         void setActionsEnabled(bool enabled);
         void setActionsDisabled(bool disabled);
@@ -114,6 +115,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actCut;
         QAction* actPaste;
         QAction* actHistogram;
+        QAction * actHistogram2D;
 
         QToolBar* tbMain;
 

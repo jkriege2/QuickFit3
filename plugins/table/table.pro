@@ -34,7 +34,8 @@ HEADERS += dlgcsvparameters.h \
     qfrdrtablecolumneditor.h \
     qfrdrtablecurvefitdialog.h \
     qfrdrtableregressiondialog.h \
-    dlgcolorbarcoloring.h
+    dlgcolorbarcoloring.h \
+    qfrdrtable2dhistogramdialog.h
 
 SOURCES += dlgcsvparameters.cpp \
            qfrdrtable.cpp \
@@ -57,7 +58,8 @@ SOURCES += dlgcsvparameters.cpp \
     qfrdrtablecolumneditor.cpp \
     qfrdrtablecurvefitdialog.cpp \
     qfrdrtableregressiondialog.cpp \
-    dlgcolorbarcoloring.cpp
+    dlgcolorbarcoloring.cpp \
+    qfrdrtable2dhistogramdialog.cpp
 
 FORMS = dlg_csvparameters.ui \
     tableresizedialog.ui \
@@ -70,7 +72,8 @@ FORMS = dlg_csvparameters.ui \
     qfrdrtablecolumneditor.ui \
     qfrdrtablecurvefitdialog.ui \
     qfrdrtableregressiondialog.ui \
-    dlgcolorbarcoloring.ui
+    dlgcolorbarcoloring.ui \
+    qfrdrtable2dhistogramdialog.ui
 
 RESOURCES += qfrdrtable.qrc \
     ../../lib/lib.qrc

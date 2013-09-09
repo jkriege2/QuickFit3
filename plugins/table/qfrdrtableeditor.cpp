@@ -8,6 +8,7 @@
 #include "qfrdrtablecolumneditor.h"
 #include "qfrdrtablecurvefitdialog.h"
 #include "qfrdrtableregressiondialog.h"
+#include "qfrdrtable2dhistogramdialog.h"
 
 QFRDRTableEditor::QFRDRTableEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent):
     QFRawDataEditor(services, propEditor, parent)
@@ -181,6 +182,12 @@ void QFRDRTableEditor::createWidgets() {
     connect(actHistogram, SIGNAL(triggered()), this, SLOT(slHistogram()));
     connect(this, SIGNAL(enableActions(bool)), actHistogram, SLOT(setEnabled(bool)));
 
+    actHistogram2D=new QAction(tr("calculate 2D histogramn"), this);
+    actHistogram2D->setToolTip(tr("calculate and insert 2D histograms of the selected columns"));
+    actHistogram2D->setVisible(true);
+    connect(actHistogram2D, SIGNAL(triggered()), this, SLOT(slHistogram2D()));
+    connect(this, SIGNAL(enableActions(bool)), actHistogram2D, SLOT(setEnabled(bool)));
+
     actSort=new QAction(QIcon(":/table/sort_inc.png"), tr("sort selected cells"), this);
     actSort->setToolTip(tr("sort the selected cells"));
     connect(actSort, SIGNAL(triggered()), this, SLOT(slSort()));
@@ -241,6 +248,7 @@ void QFRDRTableEditor::createWidgets() {
     tvMain->addAction(actClearExpression);
     tvMain->addAction(actRecalcAll);
     tvMain->addAction(actHistogram);
+    tvMain->addAction(actHistogram2D);
     tvMain->addAction(actSort);
 
     l->addWidget(tvMain);
@@ -283,6 +291,7 @@ void QFRDRTableEditor::createWidgets() {
     menuTab->addAction(actClearExpression);
     menuTab->addAction(actRecalcAll);
     menuTab->addAction(actHistogram);
+    menuTab->addAction(actHistogram2D);
     menuTab->addAction(actSort);
     menuTab->addSeparator();
     menuTab->addAction(actClear);
@@ -1223,6 +1232,105 @@ void QFRDRTableEditor::slHistogram()
                             itD1.next();
                             const QVector<double>& dat=itD1.value();
                             int col=itD1.key();
+                            for (int i=0; i<dat.size(); i++) {
+                                m->model()->setCellCreate(i, col, dat[i]);
+                            }
+                        }
+                        QMapIterator<int, QString> itN(histNames);
+                        while (itN.hasNext()) {
+                            itN.next();
+                            m->model()->setColumnTitleCreate(itN.key(), itN.value());
+                        }
+
+
+
+                        m->model()->enableSignals(true);
+                        tvMain->selectionModel()->select(sel, QItemSelectionModel::Select);
+                        tvMain->selectionModel()->setCurrentIndex(cur, QItemSelectionModel::Current);
+                        QApplication::restoreOverrideCursor();
+                    }
+                    delete dlg;
+                }
+            }
+        }
+    }
+}
+
+void QFRDRTableEditor::slHistogram2D()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            QMap<int, QList<double> > colData;
+            //QMap<int, QString> colNames;
+            QItemSelectionModel* smod=tvMain->selectionModel();
+            int sel=-1;
+            int selY=-1;
+            if (smod->hasSelection()) {
+                QModelIndexList idxs=smod->selectedIndexes();
+                for (int i=0; i<idxs.size(); i++) {
+                    QVariant v=idxs[i].data();
+                    bool okDouble=false;
+                    double dv=v.toDouble(&okDouble);
+                    if (v.type()==QVariant::Double || v.type()==QVariant::UInt || v.type()==QVariant::Int || v.type()==QVariant::ULongLong || v.type()==QVariant::LongLong || v.type()==QVariant::Bool || v.type()==QVariant::DateTime || v.type()==QVariant::Char || (v.type()==QVariant::String && okDouble)) {
+                        colData[idxs[i].column()].append(dv);
+                        //colNames[idxs[i].column()]=m->model()->headerData(idxs[i].column(), Qt::Horizontal).toString();
+                    }
+                    if (sel<0 && colData[idxs[i].column()].size()>0) sel=idxs[i].column();
+                    if (selY<0 && sel<idxs[i].column() && colData[idxs[i].column()].size()>0) selY=idxs[i].column();
+                }
+                if (colData.size()>0/* && colNames>0*/) {
+                    QFRDRTable2DHistogramDialog* dlg=new QFRDRTable2DHistogramDialog(this);
+                    dlg->setTable(m->model());
+                    dlg->setSelectedColumn(sel, selY);
+                    dlg->init();
+                    if (dlg->exec()) {
+                        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+                        QItemSelection sel=tvMain->selectionModel()->selection();
+                        QModelIndex cur=tvMain->selectionModel()->currentIndex();
+                        m->model()->disableSignals();
+
+                        QMap<int, QVector<double> > histData=dlg->getHistograms();
+                        QMap<int, QVector<QVariant> > histData2=dlg->getHistograms2();
+                        QMap<int, QString> histNames=dlg->getHeaderNames();
+
+                        QMapIterator<int, QVector<double> > itD(histData);
+                        while (itD.hasNext()) {
+                            itD.next();
+                            if (itD.key()>=m->model()->columnCount()) {
+                                while (itD.key()>=m->model()->columnCount()) {
+                                    m->model()->appendColumn();
+                                }
+                            } else {
+                                m->model()->emptyColumn(itD.key());
+                            }
+                        }
+                        QMapIterator<int, QVector<QVariant> > itD2(histData2);
+                        while (itD2.hasNext()) {
+                            itD2.next();
+                            if (itD2.key()>=m->model()->columnCount()) {
+                                while (itD2.key()>=m->model()->columnCount()) {
+                                    m->model()->appendColumn();
+                                }
+                            } else {
+                                m->model()->emptyColumn(itD2.key());
+                            }
+                        }
+                        QMapIterator<int, QVector<double> > itD1(histData);
+                        while (itD1.hasNext()) {
+                            itD1.next();
+                            const QVector<double>& dat=itD1.value();
+                            int col=itD1.key();
+                            for (int i=0; i<dat.size(); i++) {
+                                m->model()->setCellCreate(i, col, dat[i]);
+                            }
+                        }
+                        QMapIterator<int, QVector<QVariant> > itD21(histData2);
+                        while (itD21.hasNext()) {
+                            itD21.next();
+                            const QVector<QVariant>& dat=itD21.value();
+                            int col=itD21.key();
                             for (int i=0; i<dat.size(); i++) {
                                 m->model()->setCellCreate(i, col, dat[i]);
                             }
