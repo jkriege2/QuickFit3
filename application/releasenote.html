@@ -21,13 +21,20 @@
 
 -->
 
-
 <!--
-		<li><a name="2623"><b>2013-08-27 (SVN: 2624)</b>-->
+
+-->
+<!--
+		<li><a name="2687"><b>2013-09-09 (SVN: 2687)</b>-->
 		
 		<ul>
 		  <li><b>new plugins:</b><ul>
 		    <li><b>fitalgorithms_gsl</b>: this plugin makes the fit and minimization algorithms in the GNU SCIENTIFIC LIBRARY (GSL) available to QuickFit (implemented simplex, randomized simplex, BFGS2, steepest descent, conjugate gradient minimizer)</li>
+			<li><b>lights_coboltlaser</b>: plugin to control Cobolt lasers as lightsources via a serial interface </li>
+			<li><b>stage_pi863_2</b>: plugin to control PI Mercury stages, which allows several controllers to be connected to different ports </li>
+			<li><b>meas_b040resheater</b>: plugin to control our B040 Temperature Controller </li>
+			<li><b>servo_pololu_maestro</b>:  plugin to control filterwheels and shutters built from servos connected to a Pololu Maestro controller (http://www.pololu.com/docs/pdf/0J40/maestro.pdf)</li>
+			<li><b>shutter_relais_arduino</b>: plugin to control our B040 Relais Shutter Driver </li>
 		  </ul></li>
 		  <li><b>QuickFit</b><ul>
 		    <li>made histograms use less space by default</li>
@@ -36,24 +43,65 @@
 		    <li>can set network proxy in settings Dialog</li>
 		    <li>added automatic and manual (Help menu) updates check</li>
 		    <li>can select whether automatically check for updates in settings dialog</li>
+			<li>mathparser: added functions atanh, asinh, acosh</li>
+			<li>added more statistical function to expression parser: corrcoeff(), skewness(), moment(), ncmoment()</li>
+			<li>added initial support for user-defined fit functions</li>
 		  </ul></li>	
 		  <li><b>imagingFCS</b><ul>
 		    <li>added label with the relative CCF amplitudes to the FCCS-mode widgets</li>
 		    <li>bugfixes in "mask by image" dialog (mixed up selection names of modes)</li>
 		    <li>added sliders to "mask by image" dialog </li>
+			<li> bugfix: could not copy image data from parameter image plot itself</li>
+			<li>added "add bin 1+2" button to correlator dialog, which add two jobs, one with binning 1 and one with binning 2</li>
+			<li>added menu entry "imagingFCS Tools|recorrelate" which load the input file belonging to the current record into the correlator.</li>
+			<li>renamed "goodness of fit" image parameter to "parameter 2" and added configuration widgets (range, colorscale ...)</li>
+			<li>added second histogramn for parameter 2 </li>
+			<li>added correlation plot between image intensity and/or parameter 1 and/or parameter 2, this plot can show a scatterplot + a histogram or kernel density estimate of the distribution (bandwidth==binwidth)</li>
+		  </ul></li>	
+		  <li><b>table</b><ul>
+		    <li>bugfix: controls were not correctly displayed, when plotting a function</li>
+			<li>added 1D histogram tool, also supports Kernel Density Estimation </li>
+			<li>added 2D histograms/Kernel Density Estimation</li>
+		  </ul></li>	
+		  <li><b>qfe_calculator</b><ul>
+		    <li>added multiline expression editor widget</li>
+			<li>added widget to set the precision (significant digits) of the output</li>
+			<li>added write()/writeln()/disp() functions to allow user to make additional outputs</li>
 		  </ul></li>	
 		  <li><b>qfe_spectraviewer</b><ul>
-		    <li> added spectra (PHE, TYR, TRP, FAH, NADH, anthracene)</li>
+		    <li> added spectra for simple compounds (PHE, TYR, TRP, FAH, NADH, anthracene)</li>
 		    <li>added chlorophyll spectra</li>
+			<li>added mCFP, acGFP, citrine (YFP)</li>
+			<li>made startup fast: initial database read is done in a thread</li>
+			<li>added several Atto-dyes and some more Tsien fluorescent proteins</li>
+			<li>added several Alexa dyes</li>
+			<li>"delete" removes all selected items</li>
 		  </ul></li>	
 		  <li><b>imFCCSFit</b><ul>
 		    <li>"calculate crosstalk-corrected relative CCF amplitude" now can also use the g(0) fit result as input data!</li>
 		    <li>added global-local iterations to QFGlobalFitTool</li>
 		  </ul></li>	
+		  <li><b>spim_lighsheet_analysis</b><ul>
+		    <li>now employs parameter guessingbefore fit!</li>
+		  </ul></li>	
+		  <li><b>fitfunctions_lightsheet:</b><ul>
+		    <li>all functions now support parameter guessing</li>
+		  </ul></li>	
+		  <li><b>fcs</b><ul>
+		    <li>added some runselection tools to the correlation function tab (mask outliers ...)</li>
+			<li>added fucntions to read Oleg Kriechevsky's internal binary dataformat</li>
+		  </ul></li>	
+		  <li><b>fitalgorithm_lmfit</b><ul>
+		    <li>speed improvement by removing several malloc/free calls</li>
+		  </ul></li>	
 		  <li><b>spim_fcs_fitmodels</b><ul>
 		    <li>bugfix in new "D for every channel" model: THe D2 of the red channel was not used correctly!</li>
 		    <li>added fit function with one and two D's per channel, not per species</li>
 		    <li>FCCS fit function have been renamed (clearer notation)</li>
+			<li>dded counts/molecule as second calculated parameter, in addition to counts/nM</li>
+			<li>all CFs (ACFG, ACFR, CCF) have all applicable focal volumes as calculated fit parameter now</li>
+			<li>added fit function for 2-component 2D diffusion (xy) with separate diffusion coefficients per channel </li>
+			<li>added fit function for 2-component 2D diffusion (xz) with separate diffusion coefficients per channel</li>
 		  </ul></li>	
 		  <li><b>fccs_fitmodels</b><ul>
 		    <li>added fit function with one and two D's per channel, not per species</li>

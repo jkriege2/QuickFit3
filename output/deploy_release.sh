@@ -120,7 +120,7 @@ if [ "${BITDEPTH}" == "64" ]; then
 	ZIPFILESPIM=quickfit3_64bit${SPECIALS}_spimplugins_${SVNVER}.zip
 	ZIPFILESPECIAL=quickfit3_64bit${SPECIALS}_special_${SVNVER}.zip
 fi
-SPIMPLUGINS=" cam_testcamera stage_pi863 cam_andor spimb040 shutter_servo_arduino filterc_test cam_systemcam filterc_tmcl lights_b040laserbox lights_pccsled lights_coboltlaser stage_pi863_2"
+SPIMPLUGINS=" cam_testcamera stage_pi863 cam_andor spimb040 shutter_servo_arduino filterc_test cam_systemcam filterc_tmcl lights_b040laserbox lights_pccsled lights_coboltlaser stage_pi863_2 meas_b040resheater lights_coboltlaser servo_pololu_maestro shutter_relais_arduino"
 SPECIALPLUGINS=" imfccs_fit"
 if [ "${deployspecials}" == "1" ]; then
 	SPECIALPLUGINS=
