@@ -8,14 +8,22 @@ DlgPololuMaestroTester::DlgPololuMaestroTester(QWidget *parent) :
 {
     serial=new QFBinarySerialProtocolHandler(&com, "popolu maestro");
     ui->setupUi(this);
-    ui->edtPort->setText(ProgramOptions::getConfigValue("DlgPololuMaestroTester/port", "COM1").toString());
+    ui->cmbPort->clear();
+    std::vector<std::string> ports=JKSerialConnection::listPorts();
+    for (size_t i=0; i<ports.size(); i++) {
+        ui->cmbPort->addItem(ports[i].c_str());
+    }
+
+
+    ui->cmbPort->setEditText(ProgramOptions::getConfigValue("DlgPololuMaestroTester/port", "COM1").toString());
     ui->cmbBaudrate->setCurrentIndex(ProgramOptions::getConfigValue("DlgPololuMaestroTester/baudrate", 0).toInt());
+
     QTimer::singleShot(50, this, SLOT(updateRead()));
 }
 
 DlgPololuMaestroTester::~DlgPololuMaestroTester()
 {
-    ProgramOptions::setConfigValue("DlgPololuMaestroTester/port", ui->edtPort->text());
+    ProgramOptions::setConfigValue("DlgPololuMaestroTester/port", ui->cmbPort->currentText());
     ProgramOptions::setConfigValue("DlgPololuMaestroTester/baudrate", ui->cmbBaudrate->currentIndex());
     delete ui;
     com.close();
@@ -68,7 +76,7 @@ void DlgPololuMaestroTester::on_btnConnect_clicked(bool checked)
         ui->w3->setEnabled(false);
         //qDebug()<<"close connection";
     } else {
-        com.open(ui->edtPort->text().toLocal8Bit().data(), ui->cmbBaudrate->currentText().toInt());
+        com.open(ui->cmbPort->currentText().toLocal8Bit().data(), ui->cmbBaudrate->currentText().toInt());
         //qDebug()<<"opening connection "<<com.isConnectionOpen();
         if (com.isConnectionOpen()) {
             ui->btnConnect->setChecked(true);
@@ -93,7 +101,7 @@ void DlgPololuMaestroTester::on_cmbBaudrate_currentIndexChanged(int index)
 {
     if (com.isConnectionOpen()) {
         com.close();
-        com.open(ui->edtPort->text().toLocal8Bit().data(), ui->cmbBaudrate->currentText().toInt());
+        com.open(ui->cmbPort->currentText().toLocal8Bit().data(), ui->cmbBaudrate->currentText().toInt());
         if (com.isConnectionOpen()) {
             ui->btnConnect->setChecked(true);
             ui->btnConnect->setText(tr("&Disconnect"));

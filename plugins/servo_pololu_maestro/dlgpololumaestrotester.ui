@@ -23,13 +23,6 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="edtPort">
-       <property name="text">
-        <string>COM1</string>
-       </property>
-      </widget>
-     </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
@@ -249,6 +242,13 @@
          </widget>
         </item>
        </layout>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="cmbPort">
+       <property name="editable">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
     </layout>
