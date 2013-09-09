@@ -68,6 +68,7 @@ QMap<int, QString> QFRDRTable2DHistogramDialog::getHeaderNames() const
 void QFRDRTable2DHistogramDialog::updateHistograms(bool estimateBinWidth)
 {
     histograms.clear();
+    histograms2.clear();
     headerNames.clear();
 
     ui->plotter->set_doDrawing(false);
@@ -221,7 +222,7 @@ void QFRDRTable2DHistogramDialog::updateHistograms(bool estimateBinWidth)
         histograms2[col_start+3]=d;
         d.clear();
         d<<ui->spinBins->value()<<ui->spinBinsY->value()<<stat.min<<statY.min<<(stat.max-stat.min)<<(statY.max-statY.min);
-        histograms2[col_start+3]=d;
+        histograms2[col_start+4]=d;
 
         int c_hist=ui->plotter->getDatastore()->addCopiedColumn(histogram.data(), histogram.size(), tr("%2 histogram").arg(hname));
         JKQTPColumnMathImage* g=new JKQTPColumnMathImage(ui->plotter->get_plotter());
