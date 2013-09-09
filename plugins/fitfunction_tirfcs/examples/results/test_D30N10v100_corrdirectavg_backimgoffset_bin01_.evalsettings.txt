@@ -1,0 +1,45 @@
+date/time                   : 2013/09/10 00:44:12
+input file                  : ../plugins/fitfunction_tirfcs/examples/test_D30N10v100.tif
+input description file      : ../test_D30N10v100.configuration.ini
+overview image file         : test_D30N10v100_corrdirectavg_backimgoffset_bin01_.overview.tif
+overview image file real    : test_D30N10v100_corrdirectavg_backimgoffset_bin01_.overview_float.tif
+overview std image          : test_D30N10v100_corrdirectavg_backimgoffset_bin01_.overviewstd.tif
+background image file       : test_D30N10v100_corrdirectavg_backimgoffset_bin01_.background.tif
+background stddev           : test_D30N10v100_corrdirectavg_backimgoffset_bin01_.backgroundstd.tif
+uncorr. overview image file : test_D30N10v100_corrdirectavg_backimgoffset_bin01_.overview_uncorrected.tif
+uncorr. overview std image  : test_D30N10v100_corrdirectavg_backimgoffset_bin01_.overviewstd_uncorrected.tif
+video file                  : test_D30N10v100_corrdirectavg_backimgoffset_bin01_.video.tif
+uncorrected video file      : test_D30N10v100_corrdirectavg_backimgoffset_bin01_.videouncorr.tif
+statistics file             : test_D30N10v100_corrdirectavg_backimgoffset_bin01_.statistics.dat
+background statistics file  : test_D30N10v100_corrdirectavg_backimgoffset_bin01_.backstatistics.dat
+uncorrected statistics file : test_D30N10v100_corrdirectavg_backimgoffset_bin01_.uncorrstatistics.dat
+width                       : 4
+height                      : 4
+frametime (ms)              : 0.1
+frametime (s)               : 0.0001
+dualview mode               : 0
+binning                     : 1
+interleaved binning         : false
+averaging binning           : false
+frame count in file         : 20000
+frame count                 : 20000
+first frame                 : 0
+last frame                  : 19999
+correlation segments        : 1
+correlator S                : 9
+correlator m                : 2
+correlator P                : 16
+correlator type             : 2
+correlator type name        : direct with averaging
+smallest tau [s]            : 0.0001
+baseline                    : 0
+video sum up                : 20
+video frames                : 1000
+video avgMin                : -3.78
+video avgMax                : 43.01
+video uncorrected avgMin    : 96.6
+video uncorrected avgMax    : 143.25
+statistics over             : 20
+bleach correction           : remove frame average
+bleach average frames       : 8
+duration [s]                : 3.47

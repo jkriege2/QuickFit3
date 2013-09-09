@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>TIR-FCCS fit model 2D diffusion+flow, 1/e²-radii</title>
+	</head>
+	<body>
+		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+		<h2>TIR-FCCS fit model 2D diffusion+flow, 1/e²-radii</h2>
+		<p>This function implements a 1-component diffusion+flow model for data acquired with a camera in TIR illumination mode. It assumes that the time series of two distant pixels were cross-correlated. $$ref:Sankaran2013:Sankaran, J.; Bag, N.; Kraut, R.S.; Wohland, T. Accuracy and precision in camera-based fluorescence correlation spectroscopy measurements, Anal. Chem. 85 (8) (2013) 3948-54. $$  $$ref:Sankaran2010:Sankaran, J.; Shi, X.; Ho, L.Y.; Stelzer, E.H.; Wohland, T. ImFCS: a software for imaging FCS data analysis and visualization, Opt Express, 18 (2010) 25468-25481$$
+		The fit function is defined as:
+		$$bmath:g(\tau)=G_\infty + \frac{(I-B)^2}{I^2}\cdot\frac{1}{N/A_{\text{eff}}}\cdot g_{xy}(\tau; d_x, v_x)\cdot g_{xy}(\tau; d_y, v_y)$$
+		$$bmath:\mathrm{with:} g_{xy}(\tau;v,d)=\frac{1}{2a^2}\cdot\left[(a-d+v\tau)\cdot\mbox{erf}\left(\frac{a-d+v\tau}{\sqrt{4D\tau+w_{xy}^2}}\right)+ -2(d-v\tau)\cdot\mbox{erf}\left(\frac{d-v\tau}{\sqrt{4D\tau+w_{xy}^2}}\right)+ (a+d-v\tau)\cdot\mbox{erf}\left(\frac{a+d-v\tau}{\sqrt{4D\tau+w_{xy}^2}}\right)+ \frac{\sqrt{4D\tau+w_{xy}^2}}{2\sqrt{\pi}\cdot\left[\exp\left(-\frac{(a+d-v\tau)^2}{4D\tau+w_{xy}^2}\right)+\exp\left(-\frac{(a-d+v\tau)^2}{4D\tau+w_{xy}^2}\right)-2\exp\left(-\frac{(d-v\tau)^2}{4D\tau+w_{xy}^2}\right)\right]\right]^2$$
+		$$bmath:A_{\text{eff}}=\frac{a^2}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
+
+		
+		The parameters are:
+		<blockquote><table border=1>
+		  <tr><th>var.</th><th>Parameter</th></tr>
+		  <tr><td>$$math:G_\infty$$</i></td><td>constant offset</td></tr>
+		  <tr><td><i>N</i></td><td>particle number in the observation volume</td></tr>
+		  <tr><td><i>D</i></td><td> diffusion coefficient</td></tr>
+    		  <tr><td>$$math:v_x$$</td><td> flow velocity in x-direction</td></tr>
+    		  <tr><td>$$math:v_y$$</td><td> flow velocity in y-direction </td></tr>
+		      <tr><td><i>a</i></td><td>width of a (square) pixel in the image plane (i.e. pixel size of camera divided by the magnification)</td></tr>
+		      <tr><td><i>&sigma;<sub>xy</sub></i></td><td>lateral radius of the point-spread function (PSF), 1/e²-radius</td></tr>
+    		  <tr><td>$$math:d_x$$</td><td> distance between pixels in x-direction</td></tr>
+    		  <tr><td>$$math:d_y$$</td><td> distance between pixels in y-direction </td></tr>
+			  <tr><td>$$math:I$$</td><td>average measured intensity in focus during measurement</td></tr>
+    		  <tr><td>$$math:B$$</td><td>average background intenisty in focus during measurement</td></tr>
+		</table>  </blockquote>
+		</p>
+		$$bmath:\Delta A_{eff}=0$$
+		$$bmath:\Delta C=\sqrt{\left(\frac{\Delta N}{A_{eff}}\right)^2+\left(\frac{\Delta A_{eff}\cdot N}{A_{eff}^2}\right)^2}$$
+		</p>
+		<h2>References</h2>
+		$$references$$
+		</body>
+</html>

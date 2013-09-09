@@ -74,6 +74,8 @@ EXAMPLESTEST_DATA_FILES.files = ./examples/test_data/*.*
 EXAMPLESTEST_DATA_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/test_data/
 EXAMPLESDATA_FILES.files = ./examples/data/*.*
 EXAMPLESDATA_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/data/
+EXAMPLESRESULTS_FILES.files = ./examples/results/*.*
+EXAMPLESRESULTS_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/results/
 
 INSTALLS += HELP_FILES \
             HELPPIC_FILES \
@@ -86,7 +88,8 @@ INSTALLS += HELP_FILES \
             HELPPARSERREFPIC_FILES \
             EXAMPLESTESTDATA_FILES \
             EXAMPLESTEST_DATA_FILES \
-            EXAMPLESDATA_FILES
+            EXAMPLESDATA_FILES \
+            EXAMPLESRESULTS_FILES
 
 win32 {
     INSTALLS += GLOBALCONFIGWIN32_FILES

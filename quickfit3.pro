@@ -71,6 +71,9 @@ plg_fitfunction_dls.subdir=./plugins/fitfunction_dls
 SUBDIRS += plg_fitfunction_spimfcs
 plg_fitfunction_spimfcs.subdir=./plugins/fitfunction_spimfcs
 
+SUBDIRS += plg_fitfunction_tirfcs
+plg_fitfunction_tirfcs.subdir=./plugins/fitfunction_tirfcs
+
 SUBDIRS += plg_fitfunction_fcsdistribution
 plg_fitfunction_fcsdistribution.subdir=./plugins/fitfunction_fcsdistribution
 
