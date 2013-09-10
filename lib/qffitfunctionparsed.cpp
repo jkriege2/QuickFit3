@@ -14,7 +14,7 @@ QFFitFunctionParsed::QFFitFunctionParsed(const QString &configfile) :
         m_expression=set.value("function/expression", "").toString();
 
         int paramCount=set.value("function/param_count", 0).toInt();
-        if (paramCount>0) {
+        //if (paramCount>0) {
             for (int i=0; i<paramCount; i++) {
                 QString grp=QString("parameter%1/").arg(i+1);
                 ParameterType type=FloatNumber;
@@ -71,9 +71,9 @@ QFFitFunctionParsed::QFFitFunctionParsed(const QString &configfile) :
                 delete n;
                 m_errors=QObject::tr("error generating bytecode:\n   + %1").arg(parser.getLastErrors().join("\n   + "));
             }
-        } else {
+        /*} else {
             m_errors=QObject::tr("no parameters specified");
-        }
+        }*/
     }
     //qDebug()<<"user FF: "<<m_expression<<"   valid: "<<m_valid;
 }

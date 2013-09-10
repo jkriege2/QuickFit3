@@ -251,6 +251,11 @@ QStringList QFFitFunctionManager::getUserFitFunctionIDs() const
     return userFitFunctions.keys();
 }
 
+QString QFFitFunctionManager::getUserFitFunctionFile(const QString &id) const
+{
+    return userFitFunctions.value(id, "");
+}
+
 QString QFFitFunctionManager::getIconFilename(int i) const {
     if ((i<0) || (i>=fitPlugins.size())) return "";
     QString ic= fitPlugins[i]->getIconFilename();

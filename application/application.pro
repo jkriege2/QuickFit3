@@ -44,7 +44,10 @@ HEADERS += mainwindow.h \
     dlgfixfilepaths.h \
     renamegroupsdialog.h \
     dlgsetrdrpropertybyregexp.h \
-    userfitfunctionseditor.h
+    userfitfunctionseditor.h \
+    userfitfunctionmodel.h \
+    userfitfunctiondelegate.h \
+    ../plugins/base_classes/qffunctionreferencetool.h
 
 SOURCES += main.cpp \
            mainwindow.cpp \
@@ -58,7 +61,10 @@ SOURCES += main.cpp \
     dlgfixfilepaths.cpp \
     renamegroupsdialog.cpp \
     dlgsetrdrpropertybyregexp.cpp \
-    userfitfunctionseditor.cpp
+    userfitfunctionseditor.cpp \
+    userfitfunctionmodel.cpp \
+    userfitfunctiondelegate.cpp \
+    ../plugins/base_classes/qffunctionreferencetool.cpp
 
 FORMS =    optionsdialog.ui \
            about.ui \

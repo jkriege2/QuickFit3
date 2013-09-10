@@ -40,6 +40,7 @@
         <file alias="www.png">icons/www.png</file>
     </qresource>
     <qresource prefix="/lib">
+        <file alias="edit_fitfunction.png">icons/edit_fitfunction.png</file>
         <file alias="delete16.png">icons/delete16.png</file>
         <file alias="fitalg_icon.png">icons/fitalg_icon.png</file>
         <file alias="fitalg_icon_mt.png">icons/fitalg_icon_mt.png</file>

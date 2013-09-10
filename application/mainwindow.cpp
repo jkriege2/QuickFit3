@@ -14,6 +14,7 @@
 #include "jkmathparser.h"
 #include "qfhtmlhelptools.h"
 #include "renamegroupsdialog.h"
+#include "userfitfunctionseditor.h"
 #include <QNetworkRequest>
 #include <QNetworkProxy>
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
@@ -59,6 +60,7 @@ void myMessageOutput(QtMsgType type, const char *msg)
 MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     QMainWindow(NULL)
 {
+    dlgUserFitFunctionEditor=NULL;
     projectModeEnabled=true;
     nonprojectTitle=tr("non-project mode");
     projectFileFilter=tr("QuickFit Project (*.qfp);;QuickFit Project Autosave (*.qfp.autosave *.qfp.autosave.backup);;QuickFit Project backup (*.qfp.backup)");
@@ -1049,6 +1051,8 @@ void MainWindow::createActions() {
     actSetRDRPropertyByRegExp=new QAction(tr("set RDR property by RegExp"), this);
     connect(actSetRDRPropertyByRegExp, SIGNAL(triggered()), this, SLOT(setRDRPropertyByRegExp()));
 
+    actUserFitfunctionsEditor=new QAction(QIcon(":/lib/edit_fitfunction.png"), tr("edit user fit functions"), this);
+    connect(actUserFitfunctionsEditor, SIGNAL(triggered()), this, SLOT(editUserFitFunctions()));
     actPerformanceTest=new QAction(tr("test QFProject performance"), this);
     connect(actPerformanceTest, SIGNAL(triggered()), this, SLOT(projectPerformanceTest()));
 
@@ -1101,7 +1105,9 @@ void MainWindow::createMenus() {
 
     extensionMenu=menuBar()->addMenu(tr("&Extensions"));
     toolsMenu=menuBar()->addMenu(tr("&Tools"));
+    toolsMenu->addAction(actUserFitfunctionsEditor);
     projectToolsMenu=toolsMenu->addMenu(tr("project tools"));
+    projectToolsMenu->addSeparator();
     projectToolsMenu->addAction(actRDRReplace);
     projectToolsMenu->addAction(actRDRUndoReplace);
     projectToolsMenu->addSeparator();
@@ -1893,6 +1899,7 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
     actRenameGroups->setEnabled(projectModeEnabled);
     actSetRDRPropertyByRegExp->setEnabled(projectModeEnabled);
     actRDRReplace->setEnabled(projectModeEnabled);
+    actUserFitfunctionsEditor->setEnabled(projectModeEnabled);
     actRDRUndoReplace->setEnabled(projectModeEnabled);
     actPerformanceTest->setEnabled(projectModeEnabled);
     actRDRSetProperty->setEnabled(projectModeEnabled);
@@ -3090,6 +3097,21 @@ void MainWindow::setRDRPropertyByRegExp()
 
     }
     delete dlg;
+}
+
+void MainWindow::editUserFitFunctions()
+{
+    if (!dlgUserFitFunctionEditor) {
+        dlgUserFitFunctionEditor=new UserFitFunctionsEditor(NULL);
+        connect(dlgUserFitFunctionEditor, SIGNAL(accepted()), this, SLOT(closeUserFitEditor()));
+    }
+    dlgUserFitFunctionEditor->show();
+
+}
+
+void MainWindow::closeUserFitEditor()
+{
+    QFFitFunctionManager::getInstance()->reloadUserFitFunctions();
 }
 
 void MainWindow::checkUpdates(bool userRequest)

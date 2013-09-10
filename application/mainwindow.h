@@ -32,6 +32,7 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include "qmodernprogresswidget.h"
+#include "userfitfunctionseditor.h"
 /*! \brief main widget for QuickFit
     \ingroup qf3app
 */
@@ -304,6 +305,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         void renameGroups();
         void setRDRPropertyByRegExp();
 
+        void editUserFitFunctions();
+        void closeUserFitEditor();
+
         /** \brief check the update.xml file on the QF3 webpage for a new version. If \a userRequest is \c true, the method waits until the request completes, before returning control to the user, otherwise it runs in the background */
         void checkUpdates(bool userRequest=true);
         void checkUpdatesAutomatic();
@@ -348,6 +352,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QMap<QString, QVariant> globalParameterStore;
         QString lastHistogram;
 
+        QPointer<UserFitFunctionsEditor> dlgUserFitFunctionEditor;
         QTimer newProjectTimer;
 
         QMenu *toolsMenu;
@@ -387,6 +392,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QAction* actCheckUpdate;
 
 
+        QAction* actUserFitfunctionsEditor;
         QAction* optionsAct;
         QAction* actRDRReplace;
         QAction* actRDRUndoReplace;

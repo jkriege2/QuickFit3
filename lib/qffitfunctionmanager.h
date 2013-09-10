@@ -106,6 +106,7 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         }
 
         QStringList getUserFitFunctionIDs() const;
+        QString getUserFitFunctionFile(const QString& id) const;
 
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
