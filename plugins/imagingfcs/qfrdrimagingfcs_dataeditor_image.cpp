@@ -29,6 +29,29 @@
 QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent):
     QFRawDataEditor(services, propEditor, parent)
 {
+    param1Default<<"fitparam_diff_coeff";
+    param1Default<<"fitparam_diff_coeff1";
+    param1Default<<"fitparam_diff_coeff";
+    param1Default<<"fitparam_diff_tau1";
+    param1Default<<"fitparam_diff_tau";
+    param1Default<<"fitparam_diff_coeff2";
+    param1Default<<"fitparam_diff_coeff2";
+    param1Default<<"fitparam_diff_coeff_a";
+    param1Default<<"fitparam_diff_coeff_b";
+    param1Default<<"fitparam_diff_coeff_ab";
+    param1Default<<"fitparam_diff_alpha_a";
+    param1Default<<"fitparam_diff_alpha_b";
+    param1Default<<"fitparam_diff_alpha_ab";
+
+    param2Default<<"fitparam_n_particle";
+    param2Default<<"fitparam_concentration";
+    param2Default<<"fitparam_concentration_a";
+    param2Default<<"fitparam_concentration_b";
+    param2Default<<"fitparam_concentration_ab";
+    param2Default<<"fitparam_1n_particle";
+    param2Default<<"fitparam_g0";
+
+
     m_fitFunctions=QFPluginServices::getInstance()->getFitFunctionManager()->getModels("", this);
     plteOverviewSelectedData=NULL;
     plteOverviewExcludedData=NULL;
@@ -2102,26 +2125,27 @@ void QFRDRImagingFCSImageEditor::resultsChanged(const QString& evalName, const Q
         int grp=cmbResultGroup->findData(egroup);
         if (grp>=0) {
             cmbResultGroup->setCurrentIndex(grp);
-            int p=cmbParameter->findData(fp);
-            if (p>=0) {
-                cmbParameter->setCurrentIndex(p);
-            } else if (cmbParameter->count()>0) {
-                int dc=      cmbParameter->findData("fitparam_diff_coeff1");
-                if (dc<0) dc=cmbParameter->findData("fitparam_diff_coeff");
-                if (dc<0) dc=cmbParameter->findData("fitparam_diff_tau1");
-                if (dc<0) dc=cmbParameter->findData("fitparam_diff_tau");
-                if (dc<0) dc=cmbParameter->findData("fitparam_diff_coeff2");
 
-                if (dc<0) dc=0;
-                cmbParameter->setCurrentIndex(dc);
+
+
+
+
+            int d=cmbParameter->findData(fp);
+            for (int i=1; i<param1Default.size(); i++) {
+                if (d<0) d=cmbParameter->findData(param1Default[i]);
+            }
+            if (d>=0) cmbParameter->setCurrentIndex(d);
+            else cmbParameter->setCurrentIndex(0);
+            int d1=cmbParameter->currentIndex();
+
+            d=cmbParameter2->findData(gfp);
+            for (int i=1; i<param2Default.size(); i++) {
+                if (d<0 || d==d1) d=cmbParameter2->findData(param2Default[i]);
             }
 
-            p=cmbParameter2->findData(gfp);
-            if (p>=0) {
-                cmbParameter2->setCurrentIndex(p);
-            } else if (cmbParameter2->count()>0) {
-                cmbParameter2->setCurrentIndex(0);
-            }
+            if (d>=0) cmbParameter2->setCurrentIndex(d);
+            else cmbParameter2->setCurrentIndex(0);
+
         } else if (cmbResultGroup->count()>0) {
             cmbResultGroup->setCurrentIndex(0);
         }
@@ -3287,16 +3311,22 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
                 cmbParameter2->insertItem(0, params[i].first, params[i].second);
             }
         }
-        int d=cmbParameter->findData(current->getProperty(QString("imfcs_imed_param_%1").arg(filenameize(egroup)), ""));
-        if (d<0) d=cmbParameter->findData("fitparam_diff_coeff1");
-        if (d<0) d=cmbParameter->findData("fitparam_diff_coeff");
-        if (d<0) d=cmbParameter->findData("fitparam_diff_tau1");
-        if (d<0) d=cmbParameter->findData("fitparam_diff_tau");
-        if (d<0) d=cmbParameter->findData("fitparam_diff_coeff2");
+        int d=cmbParameter->findData(current->getProperty(QString("imfcs_imed_param_%1").arg(filenameize(egroup)), param1Default.value(0, "fitparam_diff_coeff")));
+        for (int i=1; i<param1Default.size(); i++) {
+            if (d<0) d=cmbParameter->findData(param1Default[i]);
+        }
         if (d>=0) cmbParameter->setCurrentIndex(d);
         else cmbParameter->setCurrentIndex(0);
-        d=cmbParameter2->findData(current->getProperty(QString("imfcs_imed_image2param_%1").arg(filenameize(egroup)), "fitalg_error_sum"));
+        int d1=cmbParameter->currentIndex();
+
+        d=cmbParameter2->findData(current->getProperty(QString("imfcs_imed_image2param_%1").arg(filenameize(egroup)), param2Default.value(0, "fitparam_n_particle")));
+        for (int i=1; i<param2Default.size(); i++) {
+            if (d<0 || d==d1) d=cmbParameter2->findData(param2Default[i]);
+        }
+
+
         if (d>=0) cmbParameter2->setCurrentIndex(d);
+        else cmbParameter2->setCurrentIndex(1);
         cmbParameter2Transform->setCurrentIndex(current->getProperty(QString("imfcs_imed_image2paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter2->currentIndex()), 0).toInt());
         cmbParameterTransform->setCurrentIndex(current->getProperty(QString("imfcs_imed_paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter->currentIndex()), 0).toInt());
         connectParameterWidgets(true);

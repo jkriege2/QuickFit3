@@ -582,6 +582,9 @@ protected:
         QMenu* menuImagingFCSTools;
 
         QFCorrelationMaskTools* correlationMaskTools;
+
+        QStringList param1Default;
+        QStringList param2Default;
 };
 
 #endif // QFRDRIMAGINGFCSEDITORIMAGE_H
