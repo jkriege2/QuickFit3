@@ -10,6 +10,8 @@
 
 #define DEFAULT_EDITVAL double(0.0)
 
+
+
 QFRDRTable::GraphInfo::GraphInfo() {
     title="";
     isStrided=false;
@@ -31,7 +33,7 @@ QFRDRTable::GraphInfo::GraphInfo() {
     errorColor=color.darker();
     linewidth=1;
     symbol=JKQTPfilledCircle;
-    symbolSize=15;
+    symbolSize=8;
     errorStyle=JKQTPnoError;
     drawLine=true;
     errorStyle=JKQTPerrorBars;
@@ -58,6 +60,16 @@ QFRDRTable::GraphInfo::GraphInfo() {
     imageLegendMod="";
     imageColorbarRight=true;
     imageColorbarTop=false;
+
+    imageTicks=6;
+    imageModTicks=2;
+    imageColorbarFontsize=7;
+    imageColorbarTicklength=3;
+
+    imageColorbarLabelType=JKQTPCALTexponent;
+    imageColorbarLabelDigits=3;
+
+
     colorbarWidth=20;
     colorbarRelativeHeight=0.75;
     function="";
@@ -77,20 +89,49 @@ QFRDRTable::GraphInfo::GraphInfo() {
 
 }
 
+QFRDRTable::AxisInfo::AxisInfo()
+{
+    label="x";
+    log=false;
+    min=0;
+    max=10;
+    axisFontSize=12;
+    axisLabelFontSize=12;
+    axis0=true;
+
+
+     labelPos=JKQTPlabelCenter;
+     labelType=JKQTPCALTexponent;
+     labelMode1=JKQTPCADMcomplete;
+     labelMode2=JKQTPCADMticks;
+     digits=3;
+     minTicks=5;
+     minorTicks=1;
+
+
+
+
+     TickSpacing=10;
+     AutoTicks=true;
+     AxisTickWidth=1.5;
+     AxisMinorTickWidth=1;
+     AxisInverted=false;
+     TickInsideLength=3;
+     TickOutsideLength=3;
+     MinorTickInsideLength=1;
+     MinorTickOutsideLength=1;
+}
+
 QFRDRTable::PlotInfo::PlotInfo()
 {
     graphAutosize=true;
-    graphWidth=1000;
-    graphHeight=500;
+    graphWidth=150;
+    graphHeight=150;
     title="";
-    xlabel="x";
-    ylabel="y";
-    xlog=false;
-    ylog=false;
-    xmin=0;
-    xmax=10;
-    ymin=0;
-    ymax=10;
+    xAxis=AxisInfo();
+    yAxis=AxisInfo();
+    xAxis.label="x";
+    yAxis.label="y";
     showKey=true;
     grid=true;
     QStringList fdb=QFontDatabase().families();
@@ -109,30 +150,13 @@ QFRDRTable::PlotInfo::PlotInfo()
     keepDataAspectRatio=false;
     dataAspectRatio=1;
     axisAspectRatio=1;
-    x0axis=true;
-    y0axis=true;
 
 
 
      backgroundColor=QColor("white");
      gridColor=QColor("darkgrey");
      gridStyle=Qt::DashLine;
-     gridWidth=1;
-     xlabelPos=JKQTPlabelCenter;
-     xlabelType=JKQTPCALTexponent;
-     xlabelMode1=JKQTPCADMcomplete;
-     xlabelMode2=JKQTPCADMticks;
-     xdigits=3;
-     xminTicks=7;
-     xminorTicks=1;
-     ylabelPos=JKQTPlabelCenter;
-     ylabelType=JKQTPCALTexponent;
-     ylabelMode1=JKQTPCADMcomplete;
-     ylabelMode2=JKQTPCADMticks;
-     ydigits=3;
-     yminTicks=5;
-     yminorTicks=1;
-
+     gridWidth=1.5;
 }
 
 
@@ -664,10 +688,10 @@ void QFRDRTable::colgraphAddGraph(const QString &title, const QString &xLabel, c
 {
     PlotInfo info;
     info.title=title;
-    info.xlabel=xLabel;
-    info.ylabel=yLabel;
-    info.xlog=logX;
-    info.ylog=logY;
+    info.xAxis.label=xLabel;
+    info.yAxis.label=yLabel;
+    info.xAxis.log=logX;
+    info.yAxis.log=logY;
     addPlot(info);
     emitRebuildPlotWidgets();
 }
@@ -812,8 +836,8 @@ void QFRDRTable::colgraphSetGraphXAxisProps(int graph, const QString &xLabel, bo
 {
     if (graph>=0 && graph<plots.size()) {
         QFRDRTable::PlotInfo plt=getPlot(graph);
-        plt.xlabel=xLabel;
-        plt.xlog=logX;
+        plt.xAxis.label=xLabel;
+        plt.xAxis.log=logX;
         setPlot(graph, plt);
         emitRebuildPlotWidgets();
     }
@@ -824,8 +848,8 @@ void QFRDRTable::colgraphSetGraphYAxisProps(int graph, const QString &yLabel, bo
 {
     if (graph>=0 && graph<plots.size()) {
         QFRDRTable::PlotInfo plt=getPlot(graph);
-        plt.ylabel=yLabel;
-        plt.ylog=logY;
+        plt.yAxis.label=yLabel;
+        plt.yAxis.log=logY;
         setPlot(graph, plt);
         emitRebuildPlotWidgets();
     }
@@ -835,8 +859,8 @@ void QFRDRTable::colgraphsetXRange(int graph, double xmin, double xmax)
 {
     if (graph>=0 && graph<plots.size()) {
         QFRDRTable::PlotInfo plt=getPlot(graph);
-        plt.xmin=xmin;
-        plt.xmax=xmax;
+        plt.xAxis.min=xmin;
+        plt.xAxis.max=xmax;
         setPlot(graph, plt);
         emitRebuildPlotWidgets();
     }
@@ -846,8 +870,8 @@ void QFRDRTable::colgraphsetYRange(int graph, double xmin, double xmax)
 {
     if (graph>=0 && graph<plots.size()) {
         QFRDRTable::PlotInfo plt=getPlot(graph);
-        plt.ymin=xmin;
-        plt.ymax=xmax;
+        plt.yAxis.min=xmin;
+        plt.yAxis.max=xmax;
         setPlot(graph, plt);
         emitRebuildPlotWidgets();
     }
@@ -1265,20 +1289,10 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 PlotInfo plot;
                 plot.title=te.attribute("title", tr("graph title"));
                 plot.graphAutosize=QStringToBool(te.attribute("autosize", "true"));
-                plot.graphWidth=te.attribute("gwidth", "1000").toInt();
-                plot.graphHeight=te.attribute("gheight", "1000").toInt();
-                plot.xlabel=te.attribute("xlabel", "x");
-                plot.ylabel=te.attribute("ylabel", "y");
-                plot.xlog=QStringToBool( te.attribute("xlog", "false"));
-                plot.ylog=QStringToBool( te.attribute("ylog", "false"));
-                plot.x0axis=QStringToBool( te.attribute("x0axis", "true"));
-                plot.y0axis=QStringToBool( te.attribute("y0axis", "true"));
+                plot.graphWidth=te.attribute("gwidth", "150").toInt();
+                plot.graphHeight=te.attribute("gheight", "150").toInt();
                 plot.grid=QStringToBool( te.attribute("grid", "true"));
                 plot.showKey=QStringToBool( te.attribute("showkey"));
-                plot.xmin=CQStringToDouble(te.attribute("xmin", "0"));
-                plot.xmax=CQStringToDouble(te.attribute("xmax", "10"));
-                plot.ymin=CQStringToDouble(te.attribute("ymin", "0"));
-                plot.ymax=CQStringToDouble(te.attribute("ymax", "10"));
                 plot.fontName=te.attribute("fontname", "Arial");
                 plot.keyFontSize=CQStringToDouble(te.attribute("keyfontsize", "12"));
                 plot.axisFontSize=CQStringToDouble(te.attribute("axisfontsize", "10"));
@@ -1298,21 +1312,54 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 plot.gridColor=QStringToQColor(te.attribute("grid_color", "darkgrey"));
                 plot.gridStyle=String2QPenStyle(te.attribute("grid_style", "dash"));
                 plot.gridWidth=CQStringToDouble(te.attribute("grid_width", "1"));
-                plot.xdigits=te.attribute("xdigits", "3").toInt();
-                plot.ydigits=te.attribute("ydigits", "3").toInt();
-                plot.xminTicks=te.attribute("xmin_ticks", "7").toInt();
-                plot.xminorTicks=te.attribute("xminor_ticks", "1").toInt();
-                plot.yminTicks=te.attribute("ymin_ticks", "7").toInt();
-                plot.yminorTicks=te.attribute("yminor_ticks", "1").toInt();
-                plot.xlabelPos=String2JKQTPlabelPosition(te.attribute("xlabel_pos", "center"));
-                plot.ylabelPos=String2JKQTPlabelPosition(te.attribute("ylabel_pos", "center"));
-                plot.xlabelType=String2JKQTPCAlabelType(te.attribute("xlabel_type", "exponent"));
-                plot.ylabelType=String2JKQTPCAlabelType(te.attribute("ylabel_type", "exponent"));
-                plot.xlabelMode1=String2JKQTPCAdrawMode(te.attribute("xlabel_mode1", "all"));
-                plot.xlabelMode2=String2JKQTPCAdrawMode(te.attribute("xlabel_mode2", "ticks"));
-                plot.ylabelMode1=String2JKQTPCAdrawMode(te.attribute("ylabel_mode1", "all"));
-                plot.ylabelMode2=String2JKQTPCAdrawMode(te.attribute("ylabel_mode2", "ticks"));
 
+
+                plot.xAxis.min=CQStringToDouble(te.attribute("xmin", "0"));
+                plot.xAxis.max=CQStringToDouble(te.attribute("xmax", "10"));
+                plot.xAxis.label=te.attribute("xlabel", "x");
+                plot.xAxis.log=QStringToBool( te.attribute("xlog", "false"));
+                plot.xAxis.axis0=QStringToBool( te.attribute("x0axis", "true"));
+                plot.xAxis.digits=te.attribute("xdigits", "3").toInt();
+                plot.xAxis.minTicks=te.attribute("xmin_ticks", "7").toInt();
+                plot.xAxis.minorTicks=te.attribute("xminor_ticks", "1").toInt();
+                plot.xAxis.labelPos=String2JKQTPlabelPosition(te.attribute("xlabel_pos", "center"));
+                plot.xAxis.labelType=String2JKQTPCAlabelType(te.attribute("xlabel_type", "exponent"));
+                plot.xAxis.labelMode1=String2JKQTPCAdrawMode(te.attribute("xlabel_mode1", "all"));
+                plot.xAxis.labelMode2=String2JKQTPCAdrawMode(te.attribute("xlabel_mode2", "ticks"));
+
+                plot.xAxis.AutoTicks=QStringToBool( te.attribute("xautoticks", "true"));
+                plot.xAxis.AxisInverted=QStringToBool( te.attribute("xaxisinverted", "false"));
+                plot.xAxis.TickSpacing=CQStringToDouble(te.attribute("xtickspacing", "10"));
+                plot.xAxis.AxisTickWidth=CQStringToDouble(te.attribute("xtickwidth", "1.5"));
+                plot.xAxis.AxisMinorTickWidth=CQStringToDouble(te.attribute("xmintickwidth", "1"));
+                plot.xAxis.TickInsideLength=CQStringToDouble(te.attribute("xtickilength", "3"));
+                plot.xAxis.TickOutsideLength=CQStringToDouble(te.attribute("xtickolength", "3"));
+                plot.xAxis.MinorTickInsideLength=CQStringToDouble(te.attribute("xmintickilength", "2"));
+                plot.xAxis.MinorTickOutsideLength=CQStringToDouble(te.attribute("xmintickolength", "2"));
+
+
+                plot.yAxis.min=CQStringToDouble(te.attribute("ymin", "0"));
+                plot.yAxis.max=CQStringToDouble(te.attribute("ymax", "10"));
+                plot.yAxis.label=te.attribute("ylabel", "y");
+                plot.yAxis.log=QStringToBool( te.attribute("ylog", "false"));
+                plot.yAxis.axis0=QStringToBool( te.attribute("y0axis", "true"));
+                plot.yAxis.minTicks=te.attribute("ymin_ticks", "7").toInt();
+                plot.yAxis.minorTicks=te.attribute("yminor_ticks", "1").toInt();
+                plot.yAxis.labelPos=String2JKQTPlabelPosition(te.attribute("ylabel_pos", "center"));
+                plot.yAxis.labelType=String2JKQTPCAlabelType(te.attribute("ylabel_type", "exponent"));
+                plot.yAxis.digits=te.attribute("ydigits", "3").toInt();
+                plot.yAxis.labelMode1=String2JKQTPCAdrawMode(te.attribute("ylabel_mode1", "all"));
+                plot.yAxis.labelMode2=String2JKQTPCAdrawMode(te.attribute("ylabel_mode2", "ticks"));
+
+                plot.yAxis.AutoTicks=QStringToBool( te.attribute("yautoticks", "true"));
+                plot.yAxis.AxisInverted=QStringToBool( te.attribute("yaxisinverted", "false"));
+                plot.yAxis.TickSpacing=CQStringToDouble(te.attribute("ytickspacing", "10"));
+                plot.yAxis.AxisTickWidth=CQStringToDouble(te.attribute("ytickwidth", "1.5"));
+                plot.yAxis.AxisMinorTickWidth=CQStringToDouble(te.attribute("ymintickwidth", "1"));
+                plot.yAxis.TickInsideLength=CQStringToDouble(te.attribute("ytickilength", "3"));
+                plot.yAxis.TickOutsideLength=CQStringToDouble(te.attribute("ytickolength", "3"));
+                plot.yAxis.MinorTickInsideLength=CQStringToDouble(te.attribute("ymintickilength", "2"));
+                plot.yAxis.MinorTickOutsideLength=CQStringToDouble(te.attribute("ymintickolength", "2"));
 
 
                 QDomElement ge=te.firstChildElement("graph");
@@ -1363,6 +1410,13 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.imageMin=CQStringToDouble(ge.attribute("image_min", "0"));
                     graph.imageMax=CQStringToDouble(ge.attribute("image_max", "0"));
                     graph.imageAutoRange=QStringToBool(ge.attribute("image_autorange", "true"));
+
+                    graph.imageColorbarTicklength=CQStringToDouble(ge.attribute("image_colorbar_ticklen", "3"));
+                    graph.imageColorbarFontsize=CQStringToDouble(ge.attribute("image_colorbar_fontsize", "7"));
+                    graph.imageTicks=ge.attribute("image_ticks", "6").toInt();
+                    graph.imageModTicks=ge.attribute("image_modticks", "2").toInt();
+                    graph.imageColorbarLabelType=String2JKQTPCAlabelType(te.attribute("image_labeltype", "exponent"));
+                    graph.imageColorbarLabelDigits=te.attribute("image_digits", "3").toInt();
 
                     graph.imageColorbarRight=QStringToBool(ge.attribute("image_colorbarright", "true"));
                     graph.imageColorbarTop=QStringToBool(ge.attribute("image_colorbartop", "false"));
@@ -1453,18 +1507,9 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
         w.writeAttribute("gwidth", QString::number(plots[i].graphWidth));
         w.writeAttribute("gheight", QString::number(plots[i].graphHeight));
 
-        w.writeAttribute("xlabel", plots[i].xlabel);
-        w.writeAttribute("ylabel", plots[i].ylabel);
         w.writeAttribute("showkey", boolToQString(plots[i].showKey));
         w.writeAttribute("grid", boolToQString(plots[i].grid));
-        w.writeAttribute("xlog", boolToQString(plots[i].xlog));
-        w.writeAttribute("ylog", boolToQString(plots[i].ylog));
-        w.writeAttribute("x0axis", boolToQString(plots[i].x0axis));
-        w.writeAttribute("y0axis", boolToQString(plots[i].y0axis));
-        w.writeAttribute("xmin", CDoubleToQString(plots[i].xmin));
-        w.writeAttribute("xmax", CDoubleToQString(plots[i].xmax));
-        w.writeAttribute("ymin", CDoubleToQString(plots[i].ymin));
-        w.writeAttribute("ymax", CDoubleToQString(plots[i].ymax));
+
         w.writeAttribute("keyfontsize", CDoubleToQString(plots[i].keyFontSize));
         w.writeAttribute("axisfontsize", CDoubleToQString(plots[i].axisFontSize));
         w.writeAttribute("axislabelfontsize", CDoubleToQString(plots[i].axisLabelFontSize));
@@ -1478,26 +1523,61 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
         w.writeAttribute("keep_axisaspect", boolToQString(plots[i].keepAxisAspectRatio));
         w.writeAttribute("axisaspect", CDoubleToQString(plots[i].dataAspectRatio));
 
+        w.writeAttribute("xlabel", plots[i].xAxis.label);
+        w.writeAttribute("ylabel", plots[i].yAxis.label);
         w.writeAttribute("grid_width", CDoubleToQString(plots[i].gridWidth));
         w.writeAttribute("background_color", QColor2String(plots[i].backgroundColor));
         w.writeAttribute("grid_color", QColor2String(plots[i].gridColor));
         w.writeAttribute("grid_style", QPenStyle2String(plots[i].gridStyle));
 
-        w.writeAttribute("xdigits", QString::number(plots[i].xdigits));
-        w.writeAttribute("ydigits", QString::number(plots[i].ydigits));
-        w.writeAttribute("xmin_ticks", QString::number(plots[i].xminTicks));
-        w.writeAttribute("xminor_ticks", QString::number(plots[i].xminorTicks));
-        w.writeAttribute("ymin_ticks", QString::number(plots[i].yminTicks));
-        w.writeAttribute("yminor_ticks", QString::number(plots[i].yminorTicks));
-        w.writeAttribute("xlabel_pos", JKQTPlabelPosition2String(plots[i].xlabelPos));
-        w.writeAttribute("ylabel_pos", JKQTPlabelPosition2String(plots[i].ylabelPos));
-        w.writeAttribute("xlabel_type", JKQTPCAlabelType2String(plots[i].xlabelType));
-        w.writeAttribute("ylabel_type", JKQTPCAlabelType2String(plots[i].ylabelType));
+        w.writeAttribute("xdigits", QString::number(plots[i].xAxis.digits));
+        w.writeAttribute("ydigits", QString::number(plots[i].yAxis.digits));
+        w.writeAttribute("xmin_ticks", QString::number(plots[i].xAxis.minTicks));
+        w.writeAttribute("xminor_ticks", QString::number(plots[i].xAxis.minorTicks));
+        w.writeAttribute("ymin_ticks", QString::number(plots[i].yAxis.minTicks));
+        w.writeAttribute("yminor_ticks", QString::number(plots[i].yAxis.minorTicks));
+        w.writeAttribute("xlabel_pos", JKQTPlabelPosition2String(plots[i].xAxis.labelPos));
+        w.writeAttribute("ylabel_pos", JKQTPlabelPosition2String(plots[i].yAxis.labelPos));
+        w.writeAttribute("xlabel_type", JKQTPCAlabelType2String(plots[i].xAxis.labelType));
+        w.writeAttribute("ylabel_type", JKQTPCAlabelType2String(plots[i].yAxis.labelType));
 
-        w.writeAttribute("xlabel_mode1", JKQTPCAdrawMode2String(plots[i].xlabelMode1));
-        w.writeAttribute("xlabel_mode2", JKQTPCAdrawMode2String(plots[i].xlabelMode2));
-        w.writeAttribute("ylabel_mode1", JKQTPCAdrawMode2String(plots[i].ylabelMode1));
-        w.writeAttribute("ylabel_mode2", JKQTPCAdrawMode2String(plots[i].ylabelMode2));
+        w.writeAttribute("xlabel_mode1", JKQTPCAdrawMode2String(plots[i].xAxis.labelMode1));
+        w.writeAttribute("xlabel_mode2", JKQTPCAdrawMode2String(plots[i].xAxis.labelMode2));
+        w.writeAttribute("ylabel_mode1", JKQTPCAdrawMode2String(plots[i].yAxis.labelMode1));
+        w.writeAttribute("ylabel_mode2", JKQTPCAdrawMode2String(plots[i].yAxis.labelMode2));
+
+        w.writeAttribute("xlog", boolToQString(plots[i].xAxis.log));
+        w.writeAttribute("ylog", boolToQString(plots[i].yAxis.log));
+        w.writeAttribute("x0axis", boolToQString(plots[i].xAxis.axis0));
+        w.writeAttribute("y0axis", boolToQString(plots[i].yAxis.axis0));
+        w.writeAttribute("xmin", CDoubleToQString(plots[i].xAxis.min));
+        w.writeAttribute("xmax", CDoubleToQString(plots[i].xAxis.max));
+        w.writeAttribute("ymin", CDoubleToQString(plots[i].yAxis.min));
+        w.writeAttribute("ymax", CDoubleToQString(plots[i].yAxis.max));
+
+        w.writeAttribute("xautoticks", boolToQString(plots[i].xAxis.AutoTicks));
+        w.writeAttribute("xaxisinverted", boolToQString(plots[i].xAxis.AxisInverted));
+        w.writeAttribute("xtickspacing", CDoubleToQString(plots[i].xAxis.TickSpacing));
+        w.writeAttribute("xtickwidth", CDoubleToQString(plots[i].xAxis.AxisTickWidth));
+        w.writeAttribute("xmintickwidth", CDoubleToQString(plots[i].xAxis.AxisMinorTickWidth));
+        w.writeAttribute("xtickilength", CDoubleToQString(plots[i].xAxis.TickInsideLength));
+        w.writeAttribute("xtickolength", CDoubleToQString(plots[i].xAxis.TickOutsideLength));
+        w.writeAttribute("xmintickilength", CDoubleToQString(plots[i].xAxis.MinorTickInsideLength));
+        w.writeAttribute("xmintickolength", CDoubleToQString(plots[i].xAxis.MinorTickOutsideLength));
+
+
+        w.writeAttribute("yautoticks", boolToQString(plots[i].yAxis.AutoTicks));
+        w.writeAttribute("yaxisinverted", boolToQString(plots[i].yAxis.AxisInverted));
+        w.writeAttribute("ytickspacing", CDoubleToQString(plots[i].yAxis.TickSpacing));
+        w.writeAttribute("ytickwidth", CDoubleToQString(plots[i].yAxis.AxisTickWidth));
+        w.writeAttribute("ymintickwidth", CDoubleToQString(plots[i].yAxis.AxisMinorTickWidth));
+        w.writeAttribute("ytickilength", CDoubleToQString(plots[i].yAxis.TickInsideLength));
+        w.writeAttribute("ytickolength", CDoubleToQString(plots[i].yAxis.TickOutsideLength));
+        w.writeAttribute("ymintickilength", CDoubleToQString(plots[i].yAxis.MinorTickInsideLength));
+        w.writeAttribute("ymintickolength", CDoubleToQString(plots[i].yAxis.MinorTickOutsideLength));
+
+
+
 
 
         for (int g=0; g<plots[i].graphs.size(); g++) {
@@ -1542,6 +1622,17 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("image_palette", QString::number(plots[i].graphs[g].imagePalette));
             w.writeAttribute("image_min", CDoubleToQString(plots[i].graphs[g].imageMin));
             w.writeAttribute("image_max", CDoubleToQString(plots[i].graphs[g].imageMax));
+
+            w.writeAttribute("image_colorbar_ticklen", CDoubleToQString(plots[i].graphs[g].imageColorbarTicklength));
+            w.writeAttribute("image_colorbar_fontsize", CDoubleToQString(plots[i].graphs[g].imageColorbarFontsize));
+            w.writeAttribute("image_ticks", QString::number(plots[i].graphs[g].imageTicks));
+            w.writeAttribute("image_modticks", QString::number(plots[i].graphs[g].imageModTicks));
+            w.writeAttribute("image_labeltype", JKQTPCAlabelType2String(plots[i].graphs[g].imageColorbarLabelType));
+            w.writeAttribute("image_digits", QString::number(plots[i].graphs[g].imageColorbarLabelDigits));
+
+
+
+
             w.writeAttribute("image_autorange", boolToQString(plots[i].graphs[g].imageAutoRange));
 
             w.writeAttribute("image_colorbarright", boolToQString(plots[i].graphs[g].imageColorbarRight));
@@ -1592,4 +1683,6 @@ void QFRDRTable::didRebuildPlotWidgets()
 {
     //emittedRebuildPlotWidgets=false;
 }
+
+
 

@@ -639,17 +639,20 @@ void QFRDRTableEditor::slEditColumnProperties(int col) {
                 if (col>=0) c=col;
                 QString t=m->model()->columnTitle(c);
                 QVariant comment=m->model()->getColumnHeaderData(c, QFRDRTable::ColumnCommentRole);
+                QVariant imwid=m->model()->getColumnHeaderData(c, QFRDRTable::ColumnImageWidth);
                 QVariant exp=m->model()->getColumnHeaderData(c, QFRDRTable::ColumnExpressionRole);
 
                 QFRDRTableColumnEditor* edt=new QFRDRTableColumnEditor(this);
                 edt->setColumnTitle(t);
                 edt->setComment(comment.toString());
+                edt->setImageWidth(imwid.toInt());
                 edt->setExpression(exp.isValid() && exp.canConvert(QVariant::String), exp.toString());
 
                 if (edt->exec()) {
                      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
                      m->model()->setColumnTitle(c, edt->getColumnTitle());
                      m->model()->setColumnHeaderData(c, QFRDRTable::ColumnCommentRole, edt->getComment());
+                     m->model()->setColumnHeaderData(c, QFRDRTable::ColumnImageWidth, edt->getImageWidth());
                      if (edt->getExpressionEnabled()) {
                          m->model()->setColumnHeaderData(c, QFRDRTable::ColumnExpressionRole, edt->getExpression());
                          slRecalcAll();
@@ -1294,6 +1297,7 @@ void QFRDRTableEditor::slHistogram2D()
                         QMap<int, QVector<double> > histData=dlg->getHistograms();
                         QMap<int, QVector<QVariant> > histData2=dlg->getHistograms2();
                         QMap<int, QString> histNames=dlg->getHeaderNames();
+                        QMap<int, QMap<int, QVariant> > extraData=dlg->getExtraData();
 
                         QMapIterator<int, QVector<double> > itD(histData);
                         while (itD.hasNext()) {
@@ -1341,6 +1345,17 @@ void QFRDRTableEditor::slHistogram2D()
                             m->model()->setColumnTitleCreate(itN.key(), itN.value());
                         }
 
+                        QMapIterator<int, QMap<int, QVariant> > itED(extraData);
+                        while (itED.hasNext()) {
+                            itED.next();
+                            const QMap<int, QVariant>& dat=itED.value();
+                            int col=itED.key();
+                            QMapIterator<int, QVariant> i(dat);
+                            while (i.hasNext()) {
+                                i.next();
+                                m->model()->setColumnHeaderData(col, i.key(), i.value());
+                            }
+                        }
 
 
                         m->model()->enableSignals(true);

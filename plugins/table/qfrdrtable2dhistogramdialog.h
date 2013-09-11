@@ -28,6 +28,7 @@ class QFRDRTable2DHistogramDialog : public QDialog
         QMap<int, QVector<double> > getHistograms() const;
         QMap<int, QVector<QVariant> > getHistograms2() const;
         QMap<int, QString> getHeaderNames() const;
+        QMap<int, QMap<int, QVariant> > getExtraData() const;
     protected slots:
         void updateHistograms(bool estimateBinWidth=false);
         void on_edtRangeMax_valueChanged(double value);
@@ -57,6 +58,8 @@ class QFRDRTable2DHistogramDialog : public QDialog
         QMap<int, QVector<double> > histograms;
         QMap<int, QVector<QVariant> > histograms2;
         QMap<int, QString> headerNames;
+        QMap<int, QMap<int, QVariant> > extraData;
+
         struct colStatistics {
             double min;
             double max;

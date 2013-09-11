@@ -61,6 +61,16 @@ QFRDRTableColumnEditor::~QFRDRTableColumnEditor()
     delete ui;
 }
 
+void QFRDRTableColumnEditor::setImageWidth(int width)
+{
+    ui->spinImageWidth->setValue(width);
+}
+
+int QFRDRTableColumnEditor::getImageWidth() const
+{
+    return ui->spinImageWidth->value();
+}
+
 void QFRDRTableColumnEditor::setComment(const QString &comment)
 {
     ui->edtComment->setText(comment);

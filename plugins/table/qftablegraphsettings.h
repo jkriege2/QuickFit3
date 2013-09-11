@@ -48,6 +48,8 @@ class QFTableGraphSettings : public QWidget
         void on_edtFunction_textChanged(const QString &text);
         void cmbFunctionTypeCurrentIndexChanged(int index);
 
+        void on_btnAutoImageSizes_clicked();
+
         void writeGraphData();
         void reloadColumns(QComboBox* combo);
 

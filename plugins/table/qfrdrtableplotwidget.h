@@ -42,11 +42,9 @@ class QFRDRTablePlotWidget : public QWidget
         void on_btnDeleteGraph_clicked();
         void on_btnCloneGraph_clicked();
         void on_btnAddGraph_clicked();
-        void on_btnAutoscaleX_clicked();
-        void on_btnAutoscaleY_clicked();
+        void doAutoscaleX();
+        void doAutoscaleY();
         void on_plotter_plotMouseMove(double x, double y);
-        void on_btnLoadSystem_clicked();
-        void on_btnSaveSystem_clicked();
         void on_btnMoveUp_clicked();
         void on_btnMoveDown_clicked();
         void on_btnResetColoring_clicked();

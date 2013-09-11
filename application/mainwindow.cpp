@@ -1071,12 +1071,11 @@ void MainWindow::createMenus() {
         recentMenu->addAction(recentFileActs[i]);
     updateRecentFileActions();*/
     recentMenu=new QRecentFilesMenu(fileMenu);
-    recentMenu->setMaxRecentFilesCount(20);
     recentMenu->setDefaultIcon(QIcon(":/qf3fileicon.png"));
     recentMenu->setUseSystemFileIcons(false);
     recentMenu->setIcon(QIcon(":/project_open_recent.png"));
     recentMenu->setTitle(tr("&Recent Files"));
-    recentMenu->setMaxRecentFilesCount(10);
+    recentMenu->setMaxRecentFilesCount(20);
     QSettings* s=settings->getQSettings();
     recentMenu->readSettings(*s, "mainwindow/recentfilelist");
     connect(recentMenu, SIGNAL(openRecentFile(QString)), this, SLOT(openRecentProject(QString)));

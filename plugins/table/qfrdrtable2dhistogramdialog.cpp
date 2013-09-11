@@ -1,6 +1,7 @@
 #include "qfrdrtable2dhistogramdialog.h"
 #include "ui_qfrdrtable2dhistogramdialog.h"
 #include "statistics_tools.h"
+#include "qfrdrtable.h"
 
 QFRDRTable2DHistogramDialog::QFRDRTable2DHistogramDialog(QWidget *parent) :
     QDialog(parent),
@@ -63,6 +64,11 @@ QMap<int, QVector<QVariant> > QFRDRTable2DHistogramDialog::getHistograms2() cons
 QMap<int, QString> QFRDRTable2DHistogramDialog::getHeaderNames() const
 {
     return headerNames;
+}
+
+QMap<int, QMap<int, QVariant> > QFRDRTable2DHistogramDialog::getExtraData() const
+{
+    return extraData;
 }
 
 void QFRDRTable2DHistogramDialog::updateHistograms(bool estimateBinWidth)
@@ -211,6 +217,15 @@ void QFRDRTable2DHistogramDialog::updateHistograms(bool estimateBinWidth)
         headerNames[col_start]=tr("hist(%1): binsX").arg(ui->cmbInputX->currentText());
         headerNames[col_start+1]=tr("hist(%1): binsY").arg(ui->cmbInputX->currentText());
         headerNames[col_start+2]=tr("hist(%1 vs. %2): %3 frequency").arg(ui->cmbInputX->currentText()).arg(ui->cmbInputY->currentText()).arg(hname);
+
+        extraData[col_start+2].clear();
+        extraData[col_start+2].insert(QFRDRTable::ColumnImageWidth, stat.max-stat.min);
+        extraData[col_start+2].insert(QFRDRTable::ColumnImageHeight, statY.max-statY.min);
+        extraData[col_start+2].insert(QFRDRTable::ColumnImagePixWidth, ui->spinBins->value());
+        extraData[col_start+2].insert(QFRDRTable::ColumnImagePixHeight, ui->spinBinsY->value());
+        extraData[col_start+2].insert(QFRDRTable::ColumnImageX, stat.min);
+        extraData[col_start+2].insert(QFRDRTable::ColumnImageY, statY.min);
+
         headerNames[col_start+3]=tr("hist(%1 vs. %2): parameter names").arg(ui->cmbInputX->currentText()).arg(ui->cmbInputY->currentText());
         headerNames[col_start+4]=tr("hist(%1 vs. %2): parameters").arg(ui->cmbInputX->currentText()).arg(ui->cmbInputY->currentText());
         histograms[col_start]=histX;

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>582</width>
-    <height>955</height>
+    <height>1053</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -673,7 +673,7 @@
          <string/>
         </property>
         <property name="suffix">
-         <string/>
+         <string> pt</string>
         </property>
         <property name="maximum">
          <double>100.000000000000000</double>
@@ -852,7 +852,7 @@
          <string/>
         </property>
         <property name="suffix">
-         <string/>
+         <string> pt</string>
         </property>
         <property name="maximum">
          <double>100.000000000000000</double>
@@ -1003,268 +1003,15 @@
    </item>
    <item row="21" column="1">
     <widget class="QWidget" name="widImage" native="true">
-     <layout class="QGridLayout" name="gridLayout_5" rowminimumheight="0,0,0,0,0,0,0,0,0,0,0">
+     <layout class="QGridLayout" name="gridLayout_5" rowminimumheight="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
       <property name="margin">
        <number>0</number>
       </property>
       <property name="spacing">
        <number>3</number>
       </property>
-      <item row="8" column="1">
-       <widget class="QFDoubleEdit" name="edtImageMin">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="ColorComboBox" name="cmbImageFalseColor">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
-       <widget class="QFDoubleEdit" name="edtImageWidth">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="2">
-       <widget class="QLabel" name="labImageRange">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>&lt;center&gt;...&lt;/center&gt;</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_54">
-        <property name="text">
-         <string>width [pixels]:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="3">
-       <widget class="QFDoubleEdit" name="edtImageHeight">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="2">
-       <widget class="QLabel" name="labTransparencyFalse">
-        <property name="text">
-         <string>   transparency:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="2">
-       <widget class="QLabel" name="label_56">
-        <property name="text">
-         <string>image height:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="3">
-       <widget class="QFDoubleEdit" name="edtImageMax">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="ColorComboBox" name="cmbImageTrueColor">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="2">
-       <widget class="QLabel" name="labTransparencyTrue">
-        <property name="text">
-         <string>   transparency:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="labFalseColor">
-        <property name="text">
-         <string>false color:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="labTrueColor">
-        <property name="text">
-         <string>true color:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="spinImageWidth">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>10000</number>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="labColormap">
-        <property name="text">
-         <string>color map:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1" colspan="5">
-       <widget class="JKQTPMathImageColorPalette" name="cmbColormap">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0">
-       <widget class="QLabel" name="label_61">
-        <property name="text">
-         <string>x:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="1">
-       <widget class="QFDoubleEdit" name="edtImageX">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="2">
-       <widget class="QLabel" name="label_62">
-        <property name="text">
-         <string>y:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="3">
-       <widget class="QFDoubleEdit" name="edtImageY">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="0">
-       <widget class="QCheckBox" name="chkImageAutorange">
-        <property name="text">
-         <string>autorange:</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="labColorbarLabel">
-        <property name="text">
-         <string>bar label:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label_64">
-        <property name="text">
-         <string>image width:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QLineEdit" name="edtColorbarLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="0">
-       <widget class="QLabel" name="label_65">
-        <property name="text">
-         <string>colorbar width:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="1">
-       <widget class="QDoubleSpinBox" name="spinColorbarWidth">
+      <item row="11" column="3">
+       <widget class="QDoubleSpinBox" name="spinColorbarFontsize">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -1272,7 +1019,7 @@
          </sizepolicy>
         </property>
         <property name="suffix">
-         <string> pix</string>
+         <string> pt</string>
         </property>
         <property name="decimals">
          <number>1</number>
@@ -1282,46 +1029,35 @@
         </property>
        </widget>
       </item>
-      <item row="9" column="2">
-       <widget class="QLabel" name="label_66">
+      <item row="12" column="1">
+       <widget class="QSpinBox" name="spinColorbarTicks">
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="13" column="0">
+       <widget class="QLabel" name="label_70">
         <property name="text">
-         <string>colorbar pos.:</string>
+         <string>tick length</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="9" column="3">
-       <layout class="QHBoxLayout" name="horizontalLayout_21">
-        <item>
-         <widget class="QCheckBox" name="chkImageColorbarRight">
-          <property name="text">
-           <string>right</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="chkImageColorbarTop">
-          <property name="text">
-           <string>top</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="10" column="0">
-       <widget class="QLabel" name="label_67">
+      <item row="12" column="0">
+       <widget class="QLabel" name="label_72">
         <property name="text">
-         <string>colorbar height:</string>
+         <string>min. ticks:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="10" column="1">
-       <widget class="QDoubleSpinBox" name="spinColorbarHeight">
+      <item row="13" column="1">
+       <widget class="QDoubleSpinBox" name="spinColorbarTickLength">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -1329,67 +1065,30 @@
          </sizepolicy>
         </property>
         <property name="suffix">
-         <string> %</string>
+         <string> pt</string>
         </property>
         <property name="decimals">
          <number>1</number>
         </property>
         <property name="maximum">
-         <double>100.000000000000000</double>
+         <double>100000.000000000000000</double>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="labModifierMode">
+      <item row="9" column="0">
+       <widget class="QLabel" name="label_71">
         <property name="text">
-         <string>modifier mode:</string>
+         <string>&lt;b&gt;colorbar:&lt;/b&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="12" column="2">
+       <widget class="QLabel" name="label_73">
+        <property name="text">
+         <string>modifier ticks:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QComboBox" name="cmbModifierMode">
-        <item>
-         <property name="text">
-          <string>none</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>value</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>saturation</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>alpha</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="3" column="2">
-       <widget class="QLabel" name="labColorbarLabelMod">
-        <property name="text">
-         <string>modifier label:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="3">
-       <widget class="QLineEdit" name="edtColorbarLabelMod">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
         </property>
        </widget>
       </item>
@@ -1527,13 +1226,176 @@
         </layout>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="labColorbarLabelG">
+      <item row="12" column="3">
+       <widget class="QSpinBox" name="spinColorbarModTicks">
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="13" column="2">
+       <widget class="QLabel" name="label_74">
         <property name="text">
-         <string>G bar label:</string>
+         <string>label type:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
+       <widget class="QFDoubleEdit" name="edtImageMin">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="ColorComboBox" name="cmbImageFalseColor">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="cmbModifierMode">
+        <item>
+         <property name="text">
+          <string>none</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>value</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>saturation</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>alpha</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLineEdit" name="edtColorbarLabelB">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="labModifierMode">
+        <property name="text">
+         <string>modifier mode:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="2">
+       <widget class="QLabel" name="label_66">
+        <property name="text">
+         <string>position:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLineEdit" name="edtColorbarLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="3">
+       <widget class="QFDoubleEdit" name="edtImageHeight">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="0">
+       <widget class="QLabel" name="label_67">
+        <property name="text">
+         <string>height:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="1">
+       <widget class="QDoubleSpinBox" name="spinColorbarWidth">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="suffix">
+         <string> pt</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>100000.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="labFalseColor">
+        <property name="text">
+         <string>false color:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="3">
+       <widget class="QFDoubleEdit" name="edtImageMax">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="1">
+       <widget class="QDoubleSpinBox" name="spinColorbarHeight">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="suffix">
+         <string> %</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -1557,13 +1419,287 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
-       <widget class="QLineEdit" name="edtColorbarLabelB">
+      <item row="10" column="0">
+       <widget class="QLabel" name="label_65">
+        <property name="text">
+         <string> width:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QFDoubleEdit" name="edtImageX">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="2">
+       <widget class="QLabel" name="label_56">
+        <property name="text">
+         <string>image height:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="ColorComboBox" name="cmbImageTrueColor">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QLineEdit" name="edtColorbarLabelMod">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="labTrueColor">
+        <property name="text">
+         <string>true color:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="3">
+       <layout class="QHBoxLayout" name="horizontalLayout_21">
+        <item>
+         <widget class="QCheckBox" name="chkImageColorbarRight">
+          <property name="text">
+           <string>right</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chkImageColorbarTop">
+          <property name="text">
+           <string>top</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="4" column="2">
+       <widget class="QLabel" name="labTransparencyTrue">
+        <property name="text">
+         <string>   transparency:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLabel" name="labColorbarLabelMod">
+        <property name="text">
+         <string>modifier label:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2">
+       <widget class="QLabel" name="labTransparencyFalse">
+        <property name="text">
+         <string>   transparency:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="labColormap">
+        <property name="text">
+         <string>color map:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="2">
+       <widget class="QLabel" name="label_62">
+        <property name="text">
+         <string>y:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labColorbarLabelG">
+        <property name="text">
+         <string>G bar label:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_64">
+        <property name="text">
+         <string>image width:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="5">
+       <widget class="JKQTPMathImageColorPalette" name="cmbColormap">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QFDoubleEdit" name="edtImageWidth">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="labColorbarLabel">
+        <property name="text">
+         <string>bar label:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="2">
+       <widget class="QLabel" name="labImageRange">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>&lt;center&gt;...&lt;/center&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_61">
+        <property name="text">
+         <string>x:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="QCheckBox" name="chkImageAutorange">
+        <property name="text">
+         <string>autorange:</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="2">
+       <widget class="QLabel" name="label_69">
+        <property name="text">
+         <string>fontsize:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_54">
+        <property name="text">
+         <string>width [pixels]:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="spinImageWidth">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>10000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="3">
+       <widget class="QFDoubleEdit" name="edtImageY">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="13" column="3">
+       <widget class="JKQTPCAlabelTypeComboBox" name="cmbColorbarLabelType"/>
+      </item>
+      <item row="14" column="0">
+       <widget class="QLabel" name="label_75">
+        <property name="text">
+         <string>label digits:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="14" column="1">
+       <widget class="QSpinBox" name="spinColorbarLabelDigits">
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="14" column="3">
+       <widget class="QPushButton" name="btnAutoImageSizes">
+        <property name="text">
+         <string>auto image sizes</string>
         </property>
        </widget>
       </item>
@@ -2079,7 +2215,7 @@
          <string/>
         </property>
         <property name="suffix">
-         <string/>
+         <string> pt</string>
         </property>
         <property name="maximum">
          <double>100.000000000000000</double>
@@ -2092,17 +2228,17 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2" colspan="3">
-       <widget class="QCheckBox" name="chkRangeInverted">
-        <property name="text">
-         <string>inverted</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QCheckBox" name="chkRangeFillRange">
         <property name="text">
          <string>fill range</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" colspan="3">
+       <widget class="QCheckBox" name="chkRangeInverted">
+        <property name="text">
+         <string>inverted</string>
         </property>
        </widget>
       </item>
@@ -2155,14 +2291,19 @@
    <extends>QComboBox</extends>
    <header>fillstylecombobox.h</header>
   </customwidget>
+  <customwidget>
+   <class>JKQTPCAlabelTypeComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>

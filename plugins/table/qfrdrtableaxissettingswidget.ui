@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFRDRTableAxisSettingsWidget</class>
+ <widget class="QWidget" name="QFRDRTableAxisSettingsWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>539</width>
+    <height>392</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>label:</string>
+     </property>
+     <property name="buddy">
+      <cstring>edtXLabel</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLineEdit" name="edtXLabel"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_26">
+       <property name="text">
+        <string>position:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="JKQTPlabelPositionComboBox" name="cmbXLabelPosition"/>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>range:</string>
+     </property>
+     <property name="buddy">
+      <cstring>edtXMin</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QCheckBox" name="chkLogX">
+       <property name="text">
+        <string>x log-scale</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFDoubleEdit" name="edtXMin"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_13">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFDoubleEdit" name="edtXMax"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnAutoscaleX">
+       <property name="text">
+        <string>autoscale</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_12">
+     <property name="text">
+      <string>ticks:</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmbXMode1</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <layout class="QGridLayout" name="gridLayout_5" columnstretch="1,0,0,0,0">
+     <item row="0" column="2">
+      <widget class="JKQTPCAlabelTypeComboBox" name="cmbXLabel"/>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>digits:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="JKQTPCAdrawModeComboBox" name="cmbXMode1"/>
+     </item>
+     <item row="0" column="4">
+      <widget class="QSpinBox" name="spinXAxisDigits">
+       <property name="value">
+        <number>3</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="JKQTPCAdrawModeComboBox" name="cmbXMode2"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>tick spacing:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QCheckBox" name="chkXAutoTicks">
+       <property name="text">
+        <string>min. #ticks / #minor ticks:</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" colspan="4">
+      <layout class="QHBoxLayout" name="horizontalLayout_9">
+       <item>
+        <widget class="QSpinBox" name="spinXAxisMinTicks">
+         <property name="value">
+          <number>10</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="spinXAxisMinorTicks">
+         <property name="value">
+          <number>10</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="1" colspan="4">
+      <widget class="QFDoubleEdit" name="edtXTickSpacing">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="1">
+    <layout class="QGridLayout" name="gridLayout_7">
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_50">
+       <property name="text">
+        <string>major ticks</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QDoubleSpinBox" name="spinXTickMinWidth">
+       <property name="suffix">
+        <string> pt</string>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.500000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_47">
+       <property name="text">
+        <string>width:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QDoubleSpinBox" name="spinXILength">
+       <property name="suffix">
+        <string> pt</string>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.500000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_52">
+       <property name="text">
+        <string>outside length:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QDoubleSpinBox" name="spinXMinILength">
+       <property name="suffix">
+        <string> pt</string>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.500000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_51">
+       <property name="text">
+        <string>minor ticks</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QDoubleSpinBox" name="spinXOLength">
+       <property name="suffix">
+        <string> pt</string>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.500000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_46">
+       <property name="text">
+        <string>inside length:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QDoubleSpinBox" name="spinXTickWidth">
+       <property name="suffix">
+        <string> pt</string>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.500000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QDoubleSpinBox" name="spinXMinOLength">
+       <property name="suffix">
+        <string> pt</string>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.500000000000000</double>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_31">
+     <property name="text">
+      <string>properties:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <item>
+      <widget class="QCheckBox" name="chkX0Axis">
+       <property name="text">
+        <string>0-axis</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkXInverted">
+       <property name="text">
+        <string>inverted</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+  <action name="actAddGraph">
+   <property name="icon">
+    <iconset resource="qfrdrtable.qrc">
+     <normaloff>:/table/plot_add.png</normaloff>:/table/plot_add.png</iconset>
+   </property>
+   <property name="text">
+    <string>add graph</string>
+   </property>
+  </action>
+  <action name="actDeleteGraph">
+   <property name="icon">
+    <iconset resource="qfrdrtable.qrc">
+     <normaloff>:/table/plot_delete.png</normaloff>:/table/plot_delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>delete graph</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfdoubleedit.h</header>
+   <slots>
+    <signal>valueChanged(double)</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>JKQTPCAdrawModeComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>JKQTPCAlabelTypeComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>JKQTPlabelPositionComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>edtXLabel</tabstop>
+  <tabstop>cmbXLabelPosition</tabstop>
+  <tabstop>chkLogX</tabstop>
+  <tabstop>edtXMin</tabstop>
+  <tabstop>edtXMax</tabstop>
+  <tabstop>btnAutoscaleX</tabstop>
+  <tabstop>cmbXMode1</tabstop>
+  <tabstop>cmbXMode2</tabstop>
+  <tabstop>cmbXLabel</tabstop>
+  <tabstop>spinXAxisDigits</tabstop>
+ </tabstops>
+ <resources>
+  <include location="qfrdrtable.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>chkXAutoTicks</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinXAxisMinTicks</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>151</x>
+     <y>155</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>366</x>
+     <y>164</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkXAutoTicks</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinXAxisMinorTicks</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>138</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>441</x>
+     <y>164</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkXAutoTicks</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_4</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>132</x>
+     <y>153</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>201</x>
+     <y>186</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkXAutoTicks</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtXTickSpacing</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>115</x>
+     <y>155</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>441</x>
+     <y>190</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>graphDataChanged()</slot>
+  <slot>plotDataChanged()</slot>
+  <slot>plotColorChanged()</slot>
+ </slots>
+</ui>

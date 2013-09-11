@@ -46,6 +46,8 @@ class QFRDRTableColumnEditor : public QDialog
         explicit QFRDRTableColumnEditor(QWidget *parent = 0);
         ~QFRDRTableColumnEditor();
 
+        void setImageWidth(int width);
+        int getImageWidth() const;
         void setComment(const QString& comment);
         QString getComment() const;
         QString getExpression() const;

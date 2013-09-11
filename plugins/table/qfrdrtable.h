@@ -29,7 +29,13 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             TableExpressionRole = Qt::UserRole+1,
             TableCommentRole = Qt::UserRole+2,
             ColumnExpressionRole = Qt::UserRole+10,
-            ColumnCommentRole = Qt::UserRole+11
+            ColumnCommentRole = Qt::UserRole+11,
+            ColumnImagePixWidth = Qt::UserRole+12,
+            ColumnImagePixHeight = Qt::UserRole+13,
+            ColumnImageWidth = Qt::UserRole+14,
+            ColumnImageHeight = Qt::UserRole+15,
+            ColumnImageX = Qt::UserRole+16,
+            ColumnImageY = Qt::UserRole+17
         };
 
 
@@ -181,6 +187,14 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             int strideStart;
             bool isStrided;
 
+            int imageTicks;
+            int imageModTicks;
+            double imageColorbarFontsize;
+            double imageColorbarTicklength;
+
+            JKQTPCAlabelType imageColorbarLabelType;
+            int imageColorbarLabelDigits;
+
             QColor imageTrueColor;
             double imageTrueTransparent;
             QColor imageFalseColor;
@@ -221,13 +235,44 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
         };
 
+
+
+        struct AxisInfo {
+            AxisInfo();
+            QString label;
+            double min, max;
+            bool log;
+            QColor axisColor;
+            double axisWidth;
+            double axisFontSize;
+            double axisLabelFontSize;
+            JKQTPlabelPosition labelPos;
+            JKQTPCAlabelType labelType;
+            int digits;
+            JKQTPCAdrawMode labelMode1;
+            JKQTPCAdrawMode labelMode2;
+
+            int minTicks;
+            int minorTicks;
+            bool axis0;
+
+            double TickSpacing;
+            bool AutoTicks;
+            double AxisTickWidth;
+            double AxisMinorTickWidth;
+            bool AxisInverted;
+            double TickInsideLength;
+            double TickOutsideLength;
+            double MinorTickInsideLength;
+            double MinorTickOutsideLength;
+
+        };
+
+
+
         struct PlotInfo {
             PlotInfo();
             QString title;
-            QString xlabel;
-            QString ylabel;
-            double xmin, xmax, ymin, ymax;
-            bool xlog, ylog;
             bool grid;
             bool showKey;
 
@@ -236,10 +281,6 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             double dataAspectRatio;
             double axisAspectRatio;
 
-            /*bool showKeyBorder;
-            double keyBorderWidth;
-            QColor keyBorderColor;
-            QColor keyBackgroundColor;*/
             QColor axisColor;
             double axisWidth;
             QString fontName;
@@ -258,22 +299,9 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             QColor gridColor;
             Qt::PenStyle gridStyle;
             double gridWidth;
-            JKQTPlabelPosition xlabelPos;
-            JKQTPCAlabelType xlabelType;
-            JKQTPCAdrawMode xlabelMode1;
-            JKQTPCAdrawMode xlabelMode2;
-            int xdigits;
-            int xminTicks;
-            int xminorTicks;
-            JKQTPlabelPosition ylabelPos;
-            JKQTPCAlabelType ylabelType;
-            JKQTPCAdrawMode ylabelMode1;
-            JKQTPCAdrawMode ylabelMode2;
-            int ydigits;
-            int yminTicks;
-            int yminorTicks;
-            bool x0axis;
-            bool y0axis;
+
+            AxisInfo xAxis;
+            AxisInfo yAxis;
 
             bool graphAutosize;
             int graphWidth;

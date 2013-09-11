@@ -66,6 +66,7 @@ QFTableGraphSettings::~QFTableGraphSettings()
 void QFTableGraphSettings::setRecord(QFRDRTable *record, int plot)
 {
     if (current) {
+        disconnect(current->model(), SIGNAL(modelReset()), this, SLOT(updateComboboxes()));
         disconnect(current->model(), SIGNAL(layoutChanged()), this, SLOT(updateComboboxes()));
         disconnect(current->model(), SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(updateComboboxes()));
     }
@@ -86,6 +87,7 @@ void QFTableGraphSettings::setRecord(QFRDRTable *record, int plot)
     ui->cmbLinesMean->setModel(headerModel);
     ui->cmbLinesQ75->setModel(headerModel);*/
     if (current) {
+        connect(current->model(), SIGNAL(modelReset()), this, SLOT(updateComboboxes()));
         connect(current->model(), SIGNAL(layoutChanged()), this, SLOT(updateComboboxes()));
         connect(current->model(), SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(updateComboboxes()));
     }
@@ -276,6 +278,16 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.imageLegendG=ui->edtColorbarLabelG->text();
         graph.imageLegendB=ui->edtColorbarLabelB->text();
         graph.imageLegendMod=ui->edtColorbarLabelMod->text();
+
+
+
+        graph.imageColorbarTicklength=ui->spinColorbarTickLength->value();
+        graph.imageColorbarFontsize=ui->spinColorbarFontsize->value();
+        graph.imageTicks=ui->spinColorbarTicks->value();
+        graph.imageModTicks=ui->spinColorbarModTicks->value();
+        graph.imageColorbarLabelType=ui->cmbColorbarLabelType->getLabelType();
+        graph.imageColorbarLabelDigits=ui->spinColorbarLabelDigits->value();
+
         graph.colorbarWidth=ui->spinColorbarWidth->value();
         graph.colorbarRelativeHeight=ui->spinColorbarHeight->value()/100.0;
         graph.function=ui->edtFunction->text();
@@ -403,6 +415,13 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->cmbColormap->setColorPalette(graph.imagePalette);
     ui->chkImageAutorange->setChecked(graph.imageAutoRange);
 
+    ui->cmbColorbarLabelType->setLabelType(graph.imageColorbarLabelType);
+    ui->spinColorbarLabelDigits->setValue(graph.imageColorbarLabelDigits);
+
+    ui->spinColorbarTickLength->setValue(graph.imageColorbarTicklength);
+    ui->spinColorbarFontsize->setValue(graph.imageColorbarFontsize);
+    ui->spinColorbarTicks->setValue(graph.imageTicks);
+    ui->spinColorbarModTicks->setValue(graph.imageModTicks);
 
     ui->chkImageColorbarRight->setChecked(graph.imageColorbarRight);
     ui->chkImageColorbarTop->setChecked(graph.imageColorbarTop);
@@ -1028,9 +1047,16 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->edtRangeStart, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
     connect(ui->edtRangeEnd, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
     connect(ui->sliderRangeCenterTransparency, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
-
-
     connect(fitfuncValuesTable, SIGNAL(fitParamChanged()), this, SLOT(writeGraphData()));
+
+    connect(ui->spinColorbarModTicks, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->spinColorbarTicks, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->spinColorbarTickLength, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->spinColorbarFontsize, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+
+
+    connect(ui->cmbColorbarLabelType, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->spinColorbarLabelDigits, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
 }
 
 void QFTableGraphSettings::disconnectWidgets()
@@ -1102,6 +1128,13 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->edtRangeEnd, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
     disconnect(ui->sliderRangeCenterTransparency, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     disconnect(fitfuncValuesTable, SIGNAL(fitParamChanged()), this, SLOT(writeGraphData()));
+    disconnect(ui->spinColorbarModTicks, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinColorbarTicks, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinColorbarTickLength, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinColorbarFontsize, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+
+    disconnect(ui->cmbColorbarLabelType, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinColorbarLabelDigits, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
 }
 
 void QFTableGraphSettings::doFit()
@@ -1176,6 +1209,19 @@ void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)
     }
     updatePlotWidgetVisibility();
     writeGraphData();
+}
+
+void QFTableGraphSettings::on_btnAutoImageSizes_clicked()
+{
+
+    if (ui->cmbGraphType->currentIndex()==11 || ui->cmbGraphType->currentIndex()==12 || ui->cmbGraphType->currentIndex()==13) {
+        if (current->model()->hasColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImagePixWidth)) ui->spinImageWidth->setValue(current->model()->getColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImagePixWidth).toInt());
+        if (current->model()->hasColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageWidth)) ui->edtImageWidth->setValue(current->model()->getColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageWidth).toDouble());
+        if (current->model()->hasColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageHeight)) ui->edtImageHeight->setValue(current->model()->getColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageHeight).toDouble());
+        if (current->model()->hasColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageX)) ui->edtImageX->setValue(current->model()->getColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageX).toDouble());
+        if (current->model()->hasColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageY)) ui->edtImageY->setValue(current->model()->getColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageY).toDouble());
+
+    }
 }
 
 void QFTableGraphSettings::on_btnFunctionHelp_clicked()
