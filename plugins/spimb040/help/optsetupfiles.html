@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>SPIM Control Plugin: Optics Setup Configuration Files</title>
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+    <h2>Introduction</h2>
+    <p>In newer version of this plugin, the optics setup can be freely described by the user, by defining an <tt>.optSetup</tt> file. This file describes how the optics setup tab will look for a certain instrument. Then in a second step, the user can assign certain devices to each widget on the tab. This mapping of device to widget is NOT saved in the optics setup, but in a separate INI file, that usually resides in the same directory, but with the suffix <tt>.optSetup.ini</tt>. To allow for preconfiguration of the microscope by a system administrator, there may be two configuration files:
+    <ol>
+      <li>A global file that is write-protected and can be used to preconfigure everthing. Usually this file and the optSetup-file reside in the same  user-read-only directory.</li>
+      <li>A local file which stores changes that the suer makes to his configuration (changes in appearence, different devices, filters, lenses ...). By removing this file, the user will again see the basic interface.</li>
+    </ol>
+    All three files can be selected in the tab <b>Configuration|Optics Setup 2</b>. The files selected there are the ones the plugin will load on startup.
+    $$note: If you change a <tt>.optSetup</tt> file, you will have to restart QuickFit (not just close and reopen the plugin window) in oder to have the changes take effect!$$
+    </p>
+    
+    <h2>File Definition</h2>
+    <h3>Syntax</h3>
+    <p>An <tt>.optSetup</tt>-file is a basic ini file, split into section (started by <tt>[<i>SECTIONNAME</i>]</tt>). Then each section is made up of a list of <tt><i>PROPERTYNAME</i>=<i>VALUE</i></tt> pairs. The value may be a number, a string (optionally in <tt>""</tt>), a boolean etc. Comments start with a <tt>#</tt> and end at the end of the line.</p>
+    <h3>Structure</h3>
+    <ul>
+        <li>There is only one special group <tt>[global]</tt>, which contains global configuration values. These properties are available:
+        <ul>
+          <li><tt>global_objectives</tt> points to an INI-file containing the objectives available to this microscope. If not set, the default global file <tt>$$globalconfigdir$$/spimb040_objectives.ini</tt> will be used. Use this to preset a list of objectives available in your microscope.</li>
+          <li><tt>global_filters</tt> points to an INI-file containing the filters available to this microscope. If not set, the default global file <tt>$$globalconfigdir$$/spimb040_filters.ini</tt> will be used. Use this to preset a list of filters available in your microscope.</li>
+          <li><tt>stylesheet</tt> points to a Qt stylesheet file used to style the tab</li>
+          <li><a name="stretch"><tt>colstretch</tt> list of integer numbers (<tt>0,1,2,0</tt>) defining the ratios in which to stretch the global columns. A column with value 2 will be twice as wide as a column with value 1 ... A column with value 0 will only take as much space as needed.</li>
+          <li><tt>rowstretch</tt> list of integer numbers (<tt>0,1,2,0</tt>) defining the ratios in which to stretch the global rows.</li>
+        </ul></li>
+        <li>Each group specifies one widget in the tab and the group name is used as the widget ID to further reference the widget. The type of widget is given in the property <tt>type</tt> (The available widget types are listed below). </li>
+        <li>Widgets can be stacked, by assigning the parent's ID/groupname to the <tt>ingroup</tt> property of the child. Each widget that can have sub-widgets will order them in a grid. Usually the first column contains a label with a text given in the <tt>title</tt> property. Then the widget will reside in the second column. New widgets (in the order in which they appear in the file) are added at the bottom of the parent widget. This behaviour can be changed with these properties:<a name="defprops"><ul>
+          <li><tt>x</tt> specifies the column (0-based) in which the widget should be placed</li>
+          <li><tt>y</tt> specifies the row (0-based) in which the widget should be placed</li>
+          <li><tt>colspan</tt> specifies how many columns the widget should span</li>
+          <li><tt>rowspan</tt> specifies how many rows the widget should span</li>
+          <li><tt>colstretch</tt> specifies how the columns with sub-widgets are stretched (see <a href="#stretch">above</a>)</li>
+          <li><tt>rowstretch</tt> specifies how the rows with sub-widgets are stretched (see <a href="#stretch">above</a>)</li>
+        </ul>
+        Here is an example of a group (group_transmission) widget inside the first tab (page_illumination) of a tab widget (tab_left):
+<pre>
+[tab_left]
+type=tabwidget
+x=0
+y=0
+
+[page_illumination]
+type=tabpage
+inwidget=tab_left
+title=Illumination
+
+[group_transmission]
+type=group
+ingroup=page_illumination
+title="transmission illumination"
+colstretch="0,1"
+</pre>
+        </li>
+        <li>The widgets listed below are available. Only the non-standard properties are listed (so, x, y, ... are available for all widgets, see <a href="#defprops">above</a>)
+        <ul>
+          <li><tt><b>group box</b></tt> (type = <tt>group</tt>): This can carry subwidgets!
+            <ul>
+              <li><tt>title</tt>: title of the groupbox, displayed in its header</li>
+              <li><tt>checkable</tt>: group box has a checkbox in the title</li>
+              <li><tt>checked</tt>: initial check state</li>
+              <li><tt>flat</tt>: flat style of the group box</li>
+            </ul>
+          </li>
+          <li><tt><b>framed box</b></tt> (type = <tt>frame</tt>): This can carry subwidgets!
+            <ul>
+              <li><tt>shadow</tt> (raised|plain|sunken): style of the shadow</li>
+              <li><tt>shape</tt> (panel|none|box|styledpanel|hline|vline|winpanel): shape of the box</li>
+              <li><tt>linewidth</tt>: width of the frame's' line (in pixels))</li>
+              <li><tt>midlinewidth</tt>: width of the frame's mid' line (in pixels))</li>
+            </ul>
+          </li>
+          <li><tt><b>Tab Widget</b></tt> (type = <tt>tabwidget</tt>): This widget can carry "tabpage widgets as subwidgets only"
+          </li>
+          <li><tt><b>Tab Page inside a tab widget</b></tt> (type = <tt>tabpage</tt>): This can carry subwidgets! 
+              <ul>
+                <li><tt>title</tt>: title of the page</li>
+              </ul>
+          </li>
+          <li><tt><b>Label</b></tt> (type = <tt>label</tt>):
+            <ul>
+              <li><tt>title</tt>: text displayed in the widget</li>
+              <li><tt>image</tt>: if this points to a valid image file (.png, .svg ...) the image will be displayed instead of the title</li>
+            </ul>
+          </li>
+          <li><tt><b></b></tt> (type = <tt></tt>):
+            <ul>
+              <li><tt></tt>: </li>
+            </ul>
+          </li>
+          <li><tt><b></b></tt> (type = <tt></tt>):
+            <ul>
+              <li><tt></tt>: </li>
+            </ul>
+          </li>
+          <li><tt><b></b></tt> (type = <tt></tt>):
+            <ul>
+              <li><tt></tt>: </li>
+            </ul>
+          </li>
+
+<!--
+          <li><tt><b></b></tt> (type = <tt></tt>):
+            <ul>
+              <li><tt></tt>: </li>
+            </ul>
+          </li>
+
+-->
+          </ul>
+        </li>
+        
+    </ul>
+    </p>
+
+  </body>
+</html>

@@ -343,6 +343,24 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
 
         QMap<QString, QFMeasurementDeviceConfigWidget*> ui_measurementdevices;
         QStringList measurementdeviceIndex;
+
+        struct SpecialStage {
+            SpecialStage() {
+                device='x';
+                stageconfig=NULL;
+                stage=NULL;
+            }
+
+            QFESPIMB040SampleStageConfig* stageconfig;
+            QFStageConfigWidget* stage;
+            char device;
+        };
+
+        SpecialStage specialStageX;
+        SpecialStage specialStageY;
+        SpecialStage specialStageZ;
+        SpecialStage specialStageR;
+
         QMap<QString, QFESPIMB040SampleStageConfig*> ui_stageconfigs;
         QMap<QString, QFStageConfigWidget*> ui_stages;
         /** \brief a list of all stages, if the ID is member of ui_stages, the int is ignored, otherwise the int specifies whether this is the x, the y or the z stage in a ui_stageconfigs */

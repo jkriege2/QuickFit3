@@ -458,7 +458,19 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            connect(addShortCut(QString("stage%1_joystick_on").arg(ui_stages.size()), QString("stage %1: joystick on").arg(ui_stages.size())), SIGNAL(activated()), w, SLOT(joystickOn()));
                            connect(addShortCut(QString("stage%1_joystick_off").arg(ui_stages.size()), QString("stage %1: joystick off").arg(ui_stages.size())), SIGNAL(activated()), w, SLOT(joystickOff()));
 
-
+                           if (special_role=="x") {
+                               specialStageX.stage=w;
+                               specialStageX.device='x';
+                           } else if (special_role=="y") {
+                               specialStageY.stage=w;
+                               specialStageY.device='x';
+                           } else if (special_role=="z") {
+                               specialStageZ.stage=w;
+                               specialStageZ.device='x';
+                           } else if (special_role=="r") {
+                               specialStageR.stage=w;
+                               specialStageR.device='x';
+                           }
                             ui_stages[id]=w;
                             stageIndex<<qMakePair(id, 0);
                        } else if (type=="filterchanger") {
@@ -523,6 +535,25 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            connect(addShortCut(QString("xyzstage%1_joystick_on").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick on").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(joystickOn()));
                            connect(addShortCut(QString("xyzstage%1_joystick_off").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick off").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(joystickOff()));
 
+                           for (int ri=0; ri<qMin(3,special_role.size()); ri++) {
+                               QChar sr=special_role[ri].toLower();
+                               char dev='x';
+                               if (ri==1) dev='y';
+                               if (ri==2) dev='z';
+                               if (sr=='x') {
+                                   specialStageX.stageconfig=w;
+                                   specialStageX.device=ri;
+                               } else if (sr=='y') {
+                                   specialStageY.stageconfig=w;
+                                   specialStageY.device=ri;
+                               } else if (sr=='z') {
+                                   specialStageZ.stageconfig=w;
+                                   specialStageZ.device=ri;
+                               } else if (sr=='r') {
+                                   specialStageR.stageconfig=w;
+                                   specialStageR.device=ri;
+                               }
+                           }
 
                            ui_stageconfigs[id]=w;
                            stageIndex<<qMakePair(id, 0);
@@ -1388,21 +1419,32 @@ int QFESPIMB040OpticsSetup2::getLaserCount() const
 }
 
 bool QFESPIMB040OpticsSetup2::isStageConnected(QFExtensionLinearStage* stage, int id, bool& found) {
-    // ========================================================================================================================================================================================
-    // TODO: IMPLEMENT FROM HERE!!!
-    // ========================================================================================================================================================================================
-    found=false;
     if (!stage || id<0) return false;
-    found=true;
-    /*if (stage==getStage(QFESPIMB040OpticsSetupBase::StageX) && id==getStageAxis(QFESPIMB040OpticsSetupBase::StageX)) return isStageConnected(QFESPIMB040OpticsSetupBase::StageX);
-    if (stage==getStage(QFESPIMB040OpticsSetupBase::StageY) && id==getStageAxis(QFESPIMB040OpticsSetupBase::StageY)) return isStageConnected(QFESPIMB040OpticsSetupBase::StageY);
-    if (stage==getStage(QFESPIMB040OpticsSetupBase::StageZ) && id==getStageAxis(QFESPIMB040OpticsSetupBase::StageZ)) return isStageConnected(QFESPIMB040OpticsSetupBase::StageZ);*/
-    found=false;
+    {
+        QMapIterator<QString, QFESPIMB040SampleStageConfig*> it(ui_stageconfigs);
+        while (it.hasNext())  {
+            it.next();
+            if (it.value() && stage==it.value()->getXStage()) return it.value()->isXStageConnected();
+            if (it.value() && stage==it.value()->getYStage()) return it.value()->isYStageConnected();
+            if (it.value() && stage==it.value()->getZStage()) return it.value()->isZStageConnected();
+        }
+    }
+    {
+        QMapIterator<QString, QFStageConfigWidget*> it2(ui_stages);
+        while (it2.hasNext())  {
+            it2.next();
+            if (it2.value() && stage==it2.value()->getXStage()) return it2.value()->isXStageConnected();
+        }
+    }
     return false;
+
 }
 
 int QFESPIMB040OpticsSetup2::getStageAxis(int stage)
 {
+    // ========================================================================================================================================================================================
+    // TODO: IMPLEMENT FROM HERE!!!
+    // ========================================================================================================================================================================================
     /*if (stage==QFESPIMB040OpticsSetupBase::StageX) return ui->stageSetup->getXStageAxis();
     if (stage==QFESPIMB040OpticsSetupBase::StageY) return ui->stageSetup->getYStageAxis();
     if (stage==QFESPIMB040OpticsSetupBase::StageZ) return ui->stageSetup->getZStageAxis();*/

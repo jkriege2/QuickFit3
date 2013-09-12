@@ -24,6 +24,8 @@ QFTableGraphSettings::QFTableGraphSettings(QWidget *parent) :
     connect(actRegression, SIGNAL(triggered()), this, SLOT(doRegression()));
 
 
+
+
     updating=true;
 
     ui->setupUi(this);
@@ -49,6 +51,31 @@ QFTableGraphSettings::QFTableGraphSettings(QWidget *parent) :
     ui->edtImageX->setCheckBounds(true, false);
     ui->edtImageY->setCheckBounds(true, false);
     ui->cmbGraphType->setCurrentIndex(0);
+
+
+
+
+    ui->cmbGraphType->clear();
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_pointslines.png"), tr("lines/scatter plot"), QFRDRTable::gtLines);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_vimpulses.png"), tr("vertical impulses"), QFRDRTable::gtImpulsesVertical);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_himpulses.png"), tr("horizontal impulses"), QFRDRTable::gtImpulsesHorizontal);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_xfilledcurve.png"), tr("illed curve X"), QFRDRTable::gtFilledCurveX);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_yfilledcurve.png"), tr("filles curve Y"), QFRDRTable::gtFilledCurveY);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_vsteps.png"), tr("vertical steps"), QFRDRTable::gtStepsVertical);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_hsteps.png"), tr("horizontal steps"), QFRDRTable::gtStepsHorizontal);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_vbars.png"), tr("vertical bars"), QFRDRTable::gtBarsVertical);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_hbars.png"), tr("horizontal bars"), QFRDRTable::gtBarsHorizontal);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_boxplotsx.png"), tr("boxplot X"), QFRDRTable::gtBoxplotX);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_boxplotsy.png"), tr("boxplot Y"), QFRDRTable::gtBoxplotY);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_image.png"), tr("image"), QFRDRTable::gtImage);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_rgbimage.png"), tr("RGB image"), QFRDRTable::gtRGBImage);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_maskimage.png"), tr("mask image"), QFRDRTable::gtMaskImage);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_function.png"), tr("function (lines)"), QFRDRTable::gtFunction);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_hrange.png"), tr("horizontal range"), QFRDRTable::gtHorizontalRange);
+    ui->cmbGraphType->addItem(QIcon(":/table/icons/plot_vrange.png"), tr("vertical range"), QFRDRTable::gtVerticalRange);
+
+
+
     current=NULL;
     this->plot=-1;
     updating=false;
@@ -187,7 +214,9 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
 
         graph.title=ui->edtGraphTitle->text();
 
-        switch(ui->cmbGraphType->currentIndex()) {
+        graph.type=(QFRDRTable::GraphType)ui->cmbGraphType->itemData(ui->cmbGraphType->currentIndex()).toInt();
+
+        /*switch(ui->cmbGraphType->currentIndex()) {
             case 1: graph.type=QFRDRTable::gtImpulsesVertical; break;
             case 2: graph.type=QFRDRTable::gtImpulsesHorizontal; break;
             case 3: graph.type=QFRDRTable::gtFilledCurveX; break;
@@ -206,7 +235,7 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
             case 16: graph.type=QFRDRTable::gtVerticalRange; break;
             case 0:
             default: graph.type=QFRDRTable::gtLines; break;
-        }
+        }*/
         updatePlotWidgetVisibility();
 
 
@@ -330,7 +359,8 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->cmbLinesMax->setCurrentIndex(graph.maxcolumn+1);
     ui->cmbLinesMean->setCurrentIndex(graph.meancolumn+1);
     ui->cmbLinesQ75->setCurrentIndex(graph.q75column+1);
-    switch(graph.type) {
+    ui->cmbGraphType->setCurrentIndex(ui->cmbGraphType->findData((int)graph.type));
+    /*switch(graph.type) {
         case QFRDRTable::gtImpulsesVertical:
             ui->cmbGraphType->setCurrentIndex(1);
             break;
@@ -383,7 +413,7 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
         default:
             ui->cmbGraphType->setCurrentIndex(0);
             break;
-    }
+    }*/
     ui->edtWidth->setValue(graph.width*100.0);
     ui->edtShift->setValue(graph.shift*100.0);
 
@@ -554,10 +584,10 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
         ui->widRangeData->setVisible(false);
         ui->widRangeStyle->setVisible(false);
 
-        switch(ui->cmbGraphType->currentIndex()) {
+        switch(ui->cmbGraphType->itemData(ui->cmbGraphType->currentIndex()).toInt()) {
 
 
-            case 1:
+            case QFRDRTable::gtImpulsesVertical:
                 //graph.type=QFRDRTable::gtImpulsesVertical;
                 ui->cmbLinesXError->setVisible(false);
                 ui->labErrorX->setVisible(false);
@@ -571,7 +601,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->chkDrawLine->setVisible(false);
                 ui->cmbLineStyle->setVisible(false);*/
                 break;
-            case 2:
+            case QFRDRTable::gtImpulsesHorizontal:
                 //graph.type=QFRDRTable::gtImpulsesHorizontal;
                 ui->cmbLinesXError->setVisible(false);
                 ui->labErrorX->setVisible(false);
@@ -592,7 +622,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->cmbLineStyle->setVisible(false);                */
 
                 break;
-            case 3:
+            case QFRDRTable::gtFilledCurveX:
                 //graph.type=QFRDRTable::gtFilledCurveX;
                 ui->cmbLinesXError->setVisible(false);
                 ui->labErrorX->setVisible(false);
@@ -611,7 +641,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->cmbFillColor->setVisible(true);
                 ui->cmbLineStyle->setVisible(true);*/
                 break;
-            case 4:
+            case QFRDRTable::gtFilledCurveY:
                 //graph.type=QFRDRTable::gtFilledCurveY;
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
@@ -631,7 +661,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->cmbFillColor->setVisible(true);
                 ui->cmbLineStyle->setVisible(true);*/
                 break;
-            case 5:
+            case QFRDRTable::gtStepsVertical:
                 //graph.type=QFRDRTable::gtStepsVertical;
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
@@ -652,7 +682,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->spinSymbolSize->setVisible(false);
                 ui->sliderErrorTransparent->setVisible(false);*/
                 break;
-            case 6:
+            case QFRDRTable::gtStepsHorizontal:
                 //graph.type=QFRDRTable::gtStepsHorizontal;
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
@@ -675,7 +705,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->spinSymbolSize->setVisible(false);
                 ui->sliderErrorTransparent->setVisible(false);*/
                 break;
-            case 7:
+            case QFRDRTable::gtBarsVertical:
                 //graph.type=QFRDRTable::gtbarsVertical;
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
@@ -703,7 +733,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->spinSymbolSize->setVisible(false);
                 ui->sliderErrorTransparent->setVisible(false);*/
                 break;
-            case 8:
+            case QFRDRTable::gtBarsHorizontal:
                 //graph.type=QFRDRTable::gtbarsHorizontal;
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
@@ -723,8 +753,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->edtShift->setVisible(true);
                 ui->widWidth->setVisible(true);
                 break;
-            case 9:
-            case 10:
+            case QFRDRTable::gtBoxplotX:
+            case QFRDRTable::gtBoxplotY:
                 //graph.type=QFRDRTable::gtBoxplotX, gtBoxplotY;
                 ui->labMax->setVisible(true);
                 ui->labMean->setVisible(true);
@@ -754,7 +784,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->edtShift->setVisible(false);
                 ui->widWidth->setVisible(true);
                 break;
-            case 11:
+            case QFRDRTable::gtImage:
                 //graph.type=QFRDRTable::gtImage;
                 ui->btnFit->setVisible(false);
                 ui->cmbLinesXError->setVisible(false);
@@ -794,7 +824,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->edtColorbarLabelMod->setVisible(true);
 
                 break;
-            case 12:
+            case QFRDRTable::gtRGBImage:
                 //graph.type=QFRDRTable::gtRGBImage;
                 ui->btnFit->setVisible(false);
                 ui->cmbLinesXError->setVisible(true);
@@ -841,7 +871,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labColorbarLabel->setText(tr("R bar label:"));
 
                 break;
-            case 13:
+            case QFRDRTable::gtMaskImage:
                 //graph.type=QFRDRTable::gtMaskImage;
                 ui->btnFit->setVisible(false);
                 ui->labDataX->setText(tr("Mask Column:"));
@@ -882,7 +912,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->edtColorbarLabelMod->setVisible(false);
 
                 break;
-            case 14:
+            case QFRDRTable::gtFunction:
                 //graph.type=QFRDRTable::gtFunction;
                 ui->btnFit->setVisible(false);
                 ui->labDataY->setText(tr("function parameter column"));
@@ -922,7 +952,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 }
                 break;
 
-            case 15: case 16: // horicontal/vertical range
+            case QFRDRTable::gtHorizontalRange: case QFRDRTable::gtVerticalRange: // horicontal/vertical range
                 ui->btnFit->setVisible(false);
                 ui->labRangeData->setVisible(true);
                 ui->labRangeStyle->setVisible(true);
@@ -964,7 +994,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
 
                 break;
 
-            case 0:
+            case QFRDRTable::gtLines:
             default:
                 //graph.type=QFRDRTable::gtLines;
                 ui->labImage->setVisible(false);

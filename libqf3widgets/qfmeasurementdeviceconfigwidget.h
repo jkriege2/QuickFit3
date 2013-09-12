@@ -168,6 +168,9 @@ class QFWIDLIB_EXPORT QFMeasurementDeviceConfigWidget : public QFrame {
         QGridLayout* linesLayout;
         QWidget* linesLayoutWidget;
 
+
+
+
         void updateMDWidgets();
 
         int getMDByWidget(QObject *widget);

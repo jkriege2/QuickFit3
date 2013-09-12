@@ -239,6 +239,8 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
 
             ui->edtLevel->setValue(min+0.2*(max-min));
             ui->edtLevel_2->setValue(max);
+            ui->sldLevel->setValue(min+0.2*(max-min));
+            ui->sldLevel_2->setValue(max);
 
 
             ui->sldLevel2->setDRange(min-10.0, max+10.0);
@@ -248,6 +250,8 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
 
             ui->edtLevel2->setValue(min+0.2*(max-min));
             ui->edtLevel2_2->setValue(max);
+            ui->sldLevel2->setValue(min+0.2*(max-min));
+            ui->sldLevel2_2->setValue(max);
 
 
         } else if (ui->cmbDualView->currentIndex()==1) {
@@ -279,6 +283,8 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
 
             ui->edtLevel->setValue(min+0.2*(max-min));
             ui->edtLevel_2->setValue(max);
+            ui->sldLevel->setValue(min+0.2*(max-min));
+            ui->sldLevel_2->setValue(max);
 
 
             ui->sldLevel2->setDRange(min2-10.0, max2+10.0);
@@ -288,6 +294,8 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
 
             ui->edtLevel2->setValue(min2+0.2*(max2-min2));
             ui->edtLevel2_2->setValue(max2);
+            ui->sldLevel2->setValue(min2+0.2*(max2-min2));
+            ui->sldLevel2_2->setValue(max2);
 
         } else if (ui->cmbDualView->currentIndex()==2) {
             bool first=true, first2=true;
@@ -318,6 +326,8 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
 
             ui->edtLevel->setValue(min+0.2*(max-min));
             ui->edtLevel_2->setValue(max);
+            ui->sldLevel->setValue(min+0.2*(max-min));
+            ui->sldLevel_2->setValue(max);
 
 
             ui->sldLevel2->setDRange(min2-10.0, max2+10.0);
@@ -327,6 +337,8 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
 
             ui->edtLevel2->setValue(min2+0.2*(max2-min2));
             ui->edtLevel2_2->setValue(max2);
+            ui->sldLevel2->setValue(min2+0.2*(max2-min2));
+            ui->sldLevel2_2->setValue(max2);
         }
     }
     updateMask();

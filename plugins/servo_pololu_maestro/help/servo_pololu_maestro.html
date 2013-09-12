@@ -6,7 +6,13 @@
   </head>
   <body>
      $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+
+<h2>Introduction</h2>
 	 <p>This plugin controls servos connected to a <a href="http://www.pololu.com/catalog/category/12">Popolu Maestro Servo controller</a>.</p>
+$$note:The Pololu Maestro is delivered in a state where it does NOT accept commands on the USB port. Also the ranges of each output is limited for standard servos to rotate +/-45°. To change this, first use the software provided by Pololu. Only then the plugin can control the servos.$$
+<p>To test the servos/interface before you configure it, there is a test tool in the Tools-menu, that allows you to control any given servo. Just type in the correct serial port and connect (at 9600 baud, usually). The n select a servo and you can change it's position with the provided slider. This can also be used to find out which control values for the servo to use, when using it as a filter wheel or shutter.</p>
+<h2>Configure the Plugin </h2>
+<h3>Configuration files</h3>
 	 <p>The controllers are configured by a global configuration file <tt>servo_pololu_maestro.ini</tt>. It is stored in the global configuration directory. You may change some of the configuration options in the associated
 	 config directory which will show up, if - and only if - you have write access to this file. If the file does not exist, the plugin will load (but not write) to the file <tt>servo_pololu_maestro.ini</tt> either in
 	 the user config directory, or in the assets directory (<tt>[AssetsDir]/plugins/servo_pololu_maestro/</tt>) for the plugin.
@@ -55,8 +61,12 @@ filterchanger_position3=1000<br>
 id=0<br>
 operation_duration=750
 	 </tt></blockquote></p>
-
-<p>See also the help page on <a href="$$mainhelpdir$$ext_usbdevices_linux.html">Linux hardware enumeration with udev</a> for further information</p>
+<h3>Linux hints (udev)</h3>
+<p>See also the help page on <a href="$$mainhelpdir$$ext_usbdevices_linux.html">Linux hardware enumeration with udev</a> for further information. Here is an example udev-rule for a device with serial number 00057479:
+<blockquote><tt>#POLOLU Maestro Servo controller<br>
+KERNEL=="ttyACM*", SUBSYSTEMS=="usb", ENV{ID_SERIAL_SHORT}=="00057479", ENV{ID_USB_INTERFACE_NUM}=="00", SYMLINK+="ttyUSB_POLOLUMaestro"
+</tt></blockquote>
+This rule will create a new symlink <tt>/dev/ttyUSB_POLOLUMaestro</tt> that allows to access the control port of the Pololu Maestro.</p>
 
   </body>
 </html>
