@@ -445,7 +445,24 @@ int main(int argc, char *argv[])
     TEST("x");
     TEST("x[[1,3,5,7,9]]");
     TEST("x[0:2:9]");
+    TEST("concat(1,2,3,4)");
+    TEST("concat(\"1\",\"1\",\"1\",\"1\")");
+    TEST("removeall([\"1\",\"2\",\"3\",\"1\"], \"1\")");
+    TEST("removeall([\"1\",\"2\",\"3\",\"1\"], \"0\")");
+    TEST("removeall([\"1\",\"2\",\"3\",\"1\"], \"3\")");
+    TEST("concat(true, false, true, false)");
+    TEST("concat(1, false, \"a\", false)");
+    TEST("concat(true, false, \"a\", false)");
+    TEST("x=[1,2,3,4,5,6,7,8,9]");
+    TEST("y=reverse(x)");
+    TEST("idxb=(trunc(x%2)==0)");
+    TEST("idx=find(trunc(x%2)==0)");
+    TEST("idx=find(trunc(x%2), 0)");
+    TEST("x[idx]");
+    TEST("y[idx]");
+    TEST("select(y, x%2==0)");
     //speed_test(doByteCode, showBytecode);
 
     return 0;
 }
+

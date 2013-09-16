@@ -414,62 +414,66 @@ struct QFLIB_EXPORT qfmpResult {
         //explicit qfmpResult(qfmpResult value);
         qfmpResult& operator=(const qfmpResult &value);
 
-         QFLIB_EXPORT void setInvalid();
-         QFLIB_EXPORT void setVoid();
+        QFLIB_EXPORT void setInvalid();
+        QFLIB_EXPORT void setVoid();
         /** \brief convert the value this struct representens into a QString */
-         QFLIB_EXPORT QString toString(int precision=10) const;
+        QFLIB_EXPORT QString toString(int precision=10) const;
 
         /** \brief convert the value this struct representens into a QString and adds the name of the datatype in \c [...] */
-         QFLIB_EXPORT QString toTypeString(int precision=10) const;
+        QFLIB_EXPORT QString toTypeString(int precision=10) const;
 
         /** \brief convert the value this struct to an integer */
-         QFLIB_EXPORT int32_t toInteger() const;
+        QFLIB_EXPORT int32_t toInteger() const;
         /** \brief convert the value this struct to an integer */
-         QFLIB_EXPORT uint32_t toUInt() const;
+        QFLIB_EXPORT uint32_t toUInt() const;
         /** \brief is this result convertible to integer? */
-         QFLIB_EXPORT bool isInteger() const;
+        QFLIB_EXPORT bool isInteger() const;
         /** \brief is this result convertible to unsigned integer? */
-         QFLIB_EXPORT bool isUInt() const;
+        QFLIB_EXPORT bool isUInt() const;
         /** \brief returns the size of the result (number of characters for string, numbers of entries in vectors, 0 for void and 1 else) */
-         QFLIB_EXPORT int length() const;
+        QFLIB_EXPORT int length() const;
 
-         QFLIB_EXPORT void setDouble(double val);
-         QFLIB_EXPORT void setBoolean(bool val);
-         QFLIB_EXPORT void setString(const QString& val);
-         QFLIB_EXPORT void setDoubleVec(const QVector<double>& val);
-         QFLIB_EXPORT void setDoubleVec(int size=0, double defaultVal=0);
-         QFLIB_EXPORT void setBoolVec(const QVector<bool>& val);
-         QFLIB_EXPORT void setBoolVec(int size=0, bool defaultVal=false);
-         QFLIB_EXPORT void setStringVec(const QStringList& val);
-         QFLIB_EXPORT void setStringVec(int size=0, const QString& defaultVal=QString(""));
+        QFLIB_EXPORT void setDouble(double val);
+        QFLIB_EXPORT void setBoolean(bool val);
+        QFLIB_EXPORT void setString(const QString& val);
+        QFLIB_EXPORT void setDoubleVec(const QVector<double>& val);
+        QFLIB_EXPORT void setDoubleVec(int size=0, double defaultVal=0);
+        QFLIB_EXPORT void setBoolVec(const QVector<bool>& val);
+        QFLIB_EXPORT void setBoolVec(int size=0, bool defaultVal=false);
+        QFLIB_EXPORT void setStringVec(const QStringList& val);
+        QFLIB_EXPORT void setStringVec(int size=0, const QString& defaultVal=QString(""));
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
-         QFLIB_EXPORT QVector<double> asVector() const;
+        QFLIB_EXPORT QVector<double> asVector() const;
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
-         QFLIB_EXPORT QStringList asStrVector() const;
+        QFLIB_EXPORT QStringList asStrVector() const;
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
-         QFLIB_EXPORT QVector<bool> asBoolVector() const;
+        QFLIB_EXPORT QVector<bool> asBoolVector() const;
         /** \brief returns \c true, if the result may be converted to a vector of number */
-         QFLIB_EXPORT bool  convertsToVector() const;
+        QFLIB_EXPORT bool  convertsToVector() const;
+        /** \brief returns \c true, if the result may be converted to a vector of number */
+        QFLIB_EXPORT bool  convertsToBoolVector() const;
+        /** \brief returns \c true, if the result may be converted to a vector of number */
+        QFLIB_EXPORT bool  convertsToStringVector() const;
         /** \brief converst the result to a vector of integers (numbers and number vectors are converted!) */
-         QFLIB_EXPORT QVector<int> asIntVector() const;
+        QFLIB_EXPORT QVector<int> asIntVector() const;
         /** \brief returns \c true, if the result may be converted to a vector of integers */
-         QFLIB_EXPORT bool  convertsToIntVector() const;
+        QFLIB_EXPORT bool  convertsToIntVector() const;
         /** \brief returns \c true if the result is valid and not void */
-         QFLIB_EXPORT bool isUsableResult() const;
+        QFLIB_EXPORT bool isUsableResult() const;
         /** \brief converst the result to a number (numbers are converted!) */
-         QFLIB_EXPORT double asNumber() const;
-         /** \brief converst the result to a number (numbers are converted and from a number vector the first element is returned!) */
-          QFLIB_EXPORT double asNumberAlsoVector() const;
-          /** \brief converst the result to a number (numbers are converted and from a number vector the first element is returned!) */
-           QFLIB_EXPORT QString asStringAlsoVector() const;
-           /** \brief converst the result to a number (numbers are converted and from a number vector the first element is returned!) */
-            QFLIB_EXPORT bool asBooleanAlsoVector() const;
+        QFLIB_EXPORT double asNumber() const;
+        /** \brief converst the result to a number (numbers are converted and from a number vector the first element is returned!) */
+        QFLIB_EXPORT double asNumberAlsoVector() const;
+        /** \brief converst the result to a number (numbers are converted and from a number vector the first element is returned!) */
+        QFLIB_EXPORT QString asStringAlsoVector() const;
+        /** \brief converst the result to a number (numbers are converted and from a number vector the first element is returned!) */
+        QFLIB_EXPORT bool asBooleanAlsoVector() const;
         /** \brief converst the result to a string (strings are converted!) */
-         QFLIB_EXPORT QString asString() const;
+        QFLIB_EXPORT QString asString() const;
         /** \brief converst the result to a boolean (numbers and booleans are converted!) */
-         QFLIB_EXPORT bool asBool() const;
+        QFLIB_EXPORT bool asBool() const;
         /** \brief returns the type */
-         QFLIB_EXPORT qfmpResultType getType() const;
+        QFLIB_EXPORT qfmpResultType getType() const;
         /** \brief returns a string, describing the type of this result */
         QFLIB_EXPORT QString typeName() const;
 
