@@ -26,7 +26,6 @@ HEADERS += dlgcsvparameters.h \
             ../base_classes/qfcorrelationmasktools.h \
             ../base_classes/qfrdrimagemasktools.h \
             ../base_classes/qffinderroneouscorrelationdlg.h \
-            ../base_classes/qfrdrimagemaskedittools.h \
             ../base_classes/qffcstools.h \
             ../interfaces/qfrdrrunselection.h \
             ../interfaces/qfrdrfcsdatainterface.h \
@@ -52,7 +51,6 @@ SOURCES += dlgcsvparameters.cpp \
     ../base_classes/qfcorrelationmasktools.cpp \
     ../base_classes/qfrdrimagemasktools.cpp \
     ../base_classes/qffinderroneouscorrelationdlg.cpp \
-    ../base_classes/qfrdrimagemaskedittools.cpp \
     ../base_classes/qffcstools.cpp \
     ../base_classes/qfrdrrunselectiontools.cpp
 
@@ -63,8 +61,7 @@ FORMS = dlg_csvparameters.ui \
     ../base_classes/qffcsfitchi2landscapedialog.ui \
     ../base_classes/qffinderroneouscorrelationdlg.ui
 
-RESOURCES += qfrdrfcs.qrc \
-    ../base_classes/qfrdrmaskeditor.qrc
+RESOURCES += qfrdrfcs.qrc
 
 TRANSLATIONS= ./translations/de.fcs.ts
 

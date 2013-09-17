@@ -75,9 +75,6 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
         void setCurrentRun(int run);
 
-        void configureForSPIMFCCS();
-        void configureFor2CSPIMFCCS();
-        void configureForASPIMFCCS();
 
 
         void onConfigureGlobalItemClicked();

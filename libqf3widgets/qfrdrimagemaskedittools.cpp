@@ -139,7 +139,11 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
 
     actImagesZoom->setChecked(true);
 
-
+    menuSpecials=new QMenu(tr("specials"), parentWidget);
+    menuSpecials->addAction(actUndoMask);
+    menuSpecials->addAction(actRedoMask);
+    menuSpecials->addAction(actCopyMaskToGroup);
+    menuSpecials->addAction(actMaskBorder);
 
     timUpdateAfterClick=new QTimer(this);
     timUpdateAfterClick->setSingleShot(true);
@@ -517,6 +521,19 @@ void QFRDRImageMaskEditTools::registerMaskToolsToMenu(QMenu *menu) const
 
 }
 
+void QFRDRImageMaskEditTools::registerMaskToolsToToolbar(QToolBar *menu) const
+{
+    menu->addAction(actLoadMask);
+    menu->addAction(actSaveMask);
+    menu->addAction(actCopyMask);
+    menu->addAction(actPasteMask);
+    menu->addSeparator();
+    menu->addAction(actClearMask);
+    menu->addAction(actInvertMask);
+    menu->addSeparator();
+    menu->addAction(menuSpecials->menuAction());
+}
+
 void QFRDRImageMaskEditTools::registerPlotter(JKQtPlotter *plot)
 {
     plotters.removeAll(plot);
@@ -559,11 +576,29 @@ void QFRDRImageMaskEditTools::setUseDelay(bool use)
 
 void QFRDRImageMaskEditTools::setAllowEditSelection(bool enabled, bool *selectionArray, int width, int height)
 {
-    actMode->setVisible(enabled);
     this->selection=selectionArray;
     this->selectionWidth=width;
     this->selectionHeight=height;
     this->selectionEditing=enabled;
+    if (selectionEditing && !maskEditing) cmbMode->setCurrentIndex(1);
+    if (maskEditing && !selectionEditing) cmbMode->setCurrentIndex(0);
+    if (maskEditing && selectionEditing) cmbMode->setCurrentIndex(1);
+    actMode->setVisible(maskEditing&&selectionEditing);
+}
+
+bool QFRDRImageMaskEditTools::getAllowEditSelection() const
+{
+    return selectionEditing;
+}
+
+void QFRDRImageMaskEditTools::setMaskEditing(bool enabled)
+{
+    maskEditing=enabled;
+
+    if (selectionEditing && !maskEditing) cmbMode->setCurrentIndex(1);
+    if (maskEditing && !selectionEditing) cmbMode->setCurrentIndex(0);
+    if (maskEditing && selectionEditing) cmbMode->setCurrentIndex(1);
+    actMode->setVisible(maskEditing&&selectionEditing);
 }
 
 
@@ -571,7 +606,7 @@ void QFRDRImageMaskEditTools::imageClicked(double x, double y, Qt::KeyboardModif
 {
     int xx=(int)floor(x);
     int yy=(int)floor(y);
-    if (!selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0)) {
+    if (maskEditing &&( !selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0))) {
         if (!imagemask) return;
         if (xx>=0 && xx<imagemask->maskGetWidth() && yy>=0 && yy<imagemask->maskGetHeight()) {
 
@@ -604,7 +639,7 @@ void QFRDRImageMaskEditTools::imageScribbled(double x, double y, Qt::KeyboardMod
     int xx=(int)floor(x);
     int yy=(int)floor(y);
 
-    if (!selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0)) {
+    if (maskEditing && (!selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0))) {
         if (!imagemask) return;
         if (xx>=0 && xx<imagemask->maskGetWidth() && yy>=0 && yy<imagemask->maskGetHeight()) {
 
@@ -636,7 +671,7 @@ void QFRDRImageMaskEditTools::imageRectangleFinished(double x, double y, double 
 {
     //qDebug()<<"QFRDRImageMaskEditTools::imageRectangleFinished("<<x<<y<<width<<height<<")";
 
-    if (!selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0)) {
+    if (maskEditing && (!selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0))) {
 
         if (!imagemask) return;
         int xx1=qBound(0,(int)floor(x), imagemask->maskGetWidth()-1);
@@ -713,7 +748,7 @@ void QFRDRImageMaskEditTools::imageRectangleFinished(double x, double y, double 
 
 void QFRDRImageMaskEditTools::imageLineFinished(double x1, double y1, double x2, double y2, Qt::KeyboardModifiers modifiers)
 {
-    if (!selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0)) {
+    if (maskEditing && (!selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0))) {
         if (!imagemask) return;
 
         QLineF line(x1, y1, x2, y2);
@@ -778,7 +813,7 @@ void QFRDRImageMaskEditTools::imageLineFinished(double x1, double y1, double x2,
 
 void QFRDRImageMaskEditTools::imageCircleFinished(double x, double y, double radius, Qt::KeyboardModifiers modifiers)
 {
-    if (!selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0)) {
+    if (maskEditing && (!selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0))) {
         if (!imagemask) return;
 
 
@@ -851,7 +886,7 @@ void QFRDRImageMaskEditTools::imageCircleFinished(double x, double y, double rad
 
 void QFRDRImageMaskEditTools::imageEllipseFinished(double x, double y, double radiusX, double radiusY, Qt::KeyboardModifiers modifiers)
 {
-    if (!selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0)) {
+    if (maskEditing && (!selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0))) {
         if (!imagemask) return;
 
         int xx1=qBound(0,(int)floor(x-radiusX), imagemask->maskGetWidth()-1);
@@ -950,4 +985,10 @@ void QFRDRImageMaskEditTools::setImageEditMode() {
 
 void QFRDRImageMaskEditTools::cmbModeChanged(int index)
 {
+}
+
+
+bool QFRDRImageMaskEditTools::getMaskEditing() const
+{
+    return maskEditing;
 }

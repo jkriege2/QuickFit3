@@ -15,8 +15,11 @@
 #include "jkqtplotter.h"
 #include <QToolBar>
 #include <QWidgetAction>
+#include <QToolBar>
+#include "libwid_imexport.h"
 
-class QFRDRImageMaskEditTools: public QObject {
+
+class QFWIDLIB_EXPORT QFRDRImageMaskEditTools: public QObject {
         Q_OBJECT
     public:
         QFRDRImageMaskEditTools(QWidget *parentWidget = 0, const QString& settingsPrefix="");
@@ -24,6 +27,7 @@ class QFRDRImageMaskEditTools: public QObject {
 
         virtual void setRDR(QFRawDataRecord* rdr);
         virtual void registerMaskToolsToMenu(QMenu* menu) const;
+        virtual void registerMaskToolsToToolbar(QToolBar* menu) const;
 
         QAction* get_actCopyMask() const { return actCopyMask; }
         QAction* get_actPasteMask() const { return actPasteMask; }
@@ -41,7 +45,9 @@ class QFRDRImageMaskEditTools: public QObject {
         void setUseDelay(bool use);
 
         void setAllowEditSelection(bool enabled, bool* selectionArray=NULL, int width=0, int height=0);
-
+        bool getAllowEditSelection() const;
+        void setMaskEditing(bool enabled);
+        bool getMaskEditing() const;
     public slots:
         void loadMask();
         void pasteMask();
@@ -98,6 +104,8 @@ class QFRDRImageMaskEditTools: public QObject {
         QComboBox* cmbMode;
         QWidgetAction* actMode;
 
+        QMenu* menuSpecials;
+
 
         QList<QPointer<JKQtPlotter> > plotters;
 
@@ -114,6 +122,7 @@ class QFRDRImageMaskEditTools: public QObject {
         int selectionWidth;
         int selectionHeight;
         bool selectionEditing;
+        bool maskEditing;
 
 };
 

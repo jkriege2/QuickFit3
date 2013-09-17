@@ -121,7 +121,9 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfmeasurementtable.h \
     qfmeasurementdevicecombobox.h \
     qfmeasurementdeviceconfigwidgetthread.h \
-    qfmeasurementdeviceconfigwidget.h
+    qfmeasurementdeviceconfigwidget.h \
+    qfrdrimagetorunpreview.h \
+    qfrdrimagemaskedittools.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -206,7 +208,9 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfmeasurementtable.cpp \
     qfmeasurementdevicecombobox.cpp \
     qfmeasurementdeviceconfigwidgetthread.cpp \
-    qfmeasurementdeviceconfigwidget.cpp
+    qfmeasurementdeviceconfigwidget.cpp \
+    qfrdrimagetorunpreview.cpp \
+    qfrdrimagemaskedittools.cpp
 
 
 FORMS += qfdlg_csvparameters.ui \

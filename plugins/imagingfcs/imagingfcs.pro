@@ -24,7 +24,6 @@ HEADERS += qfrdrimagingfcs.h \
     ../base_classes/qfrdrimagemasktools.h \
     ../base_classes/qfcorrelationmasktools.h \
     ../base_classes/qffinderroneouscorrelationdlg.h \
-    ../base_classes/qfrdrimagemaskedittools.h \
     ../base_classes/qffcstools.h \
     ../interfaces/qfrdrimagestackinterface.h \
     ../interfaces/qfrdrsimplecountrateinterface.h \
@@ -84,7 +83,6 @@ SOURCES += qfrdrimagingfcs.cpp \
     ../base_classes/qfrdrimagemasktools.cpp\
     ../base_classes/qfcorrelationmasktools.cpp \
     ../base_classes/qffinderroneouscorrelationdlg.cpp \
-    ../base_classes/qfrdrimagemaskedittools.cpp \
     qfrdrimagingfcsedittools.cpp \
     qfrdrimagingfcssimulator.cpp \
     qfrdrimagingfcssimulationthread.cpp \
@@ -105,8 +103,7 @@ FORMS = \
     ../base_classes/qffinderroneouscorrelationdlg.ui \
     qfrdrimagingfcssimulator.ui
 
-RESOURCES += qfrdrimagingfcs.qrc \
-    ../base_classes/qfrdrmaskeditor.qrc
+RESOURCES += qfrdrimagingfcs.qrc
 
 TRANSLATIONS= ./translations/de.imaging_fcs.ts
 

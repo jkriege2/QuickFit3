@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <cfloat>
+#include <stdint.h>
 #include <QSettings>
 #include <QWidget>
 #include <QSplitter>

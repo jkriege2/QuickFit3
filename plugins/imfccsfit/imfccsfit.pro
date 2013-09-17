@@ -25,7 +25,6 @@ HEADERS += qfimfccsfitevaluation.h \
     ../base_classes/qffcsweightingtools.h \
     ../base_classes/qffcstools.h \
     optionswidget.h \
-    ../base_classes/qfrdrimagetorunpreview.h \
     qfimfccsparameterinputtable.h \
     qfimfccsparameterinputdelegate.h \
     qfimfccsrelativeccfdialog.h \
@@ -47,7 +46,6 @@ SOURCES += qfimfccsfitevaluation.cpp \
     ../base_classes/qffcsweightingtools.cpp \
     ../base_classes/qffcstools.cpp \
     optionswidget.cpp \
-    ../base_classes/qfrdrimagetorunpreview.cpp \
     qfimfccsparameterinputtable.cpp \
     qfimfccsparameterinputdelegate.cpp \
     qfimfccsrelativeccfdialog.cpp \
@@ -66,8 +64,7 @@ FORMS = qfimfccsfitevaluation_editor.ui \
     qfimfccsrelativeccfcrosstalkdialog.ui  \
     qfimfccsamplitudefitdialog.ui
 
-RESOURCES += qfimfccsfitevaluation.qrc \
-    ../base_classes/qfrdrmaskeditor.qrc \
+RESOURCES += qfimfccsfitevaluation.qrc  \
     ../../lib/lib.qrc
 
 TRANSLATIONS= ./translations/de.imfccs_fit.ts

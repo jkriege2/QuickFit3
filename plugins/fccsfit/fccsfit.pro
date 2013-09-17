@@ -51,8 +51,7 @@ FORMS = qffccsfitevaluation_editor.ui \
     optionswidget.ui \
     dlgfccsfitallconfiguration.ui
 
-RESOURCES += qffccsfitevaluation.qrc \
-    ../base_classes/qfrdrmaskeditor.qrc
+RESOURCES += qffccsfitevaluation.qrc
 
 TRANSLATIONS= ./translations/de.fccs_fit.ts
 

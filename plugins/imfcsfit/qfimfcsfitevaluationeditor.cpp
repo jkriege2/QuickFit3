@@ -79,6 +79,8 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
     layButtons->addWidget(chkLeaveoutMasked, layButtons->rowCount(),0,1,2);
 
     pltOverview=new QFRDRImageToRunPreview(this);
+    pltOverview->setMaskEditable(true);
+    pltOverview->setSelectionEditable(true);
     tabResidulas->insertTab(0, pltOverview, tr("Overview"));
     tabResidulas->setCurrentIndex(0);
 

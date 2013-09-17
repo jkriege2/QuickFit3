@@ -30,7 +30,8 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
 
     // setup widgets
     ui->setupUi(this);
-    ui->pltOverview->setRunSelectWidgetActive(true);
+    ui->pltOverview->setMaskEditable(true);
+    ui->pltOverview->setSelectionEditable(true);
     connect(ui->pltOverview, SIGNAL(currentRunChanged(int)), this, SLOT(setCurrentRun(int)));
     ui->splitter->setChildrenCollapsible(false);
     ui->splitter->setStretchFactor(0,3);
@@ -178,21 +179,10 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     ui->btnPrintReport->setDefaultAction(actPrintReport);
     menuEvaluation->addAction(actPrintReport);
 
-    actChi2Landscape=new QAction(tr("&Plot &Chi2 Landscape"), this);
+    actChi2Landscape=new QAction(tr("Plot &Chi^2 Landscape"), this);
     connect(actChi2Landscape, SIGNAL(triggered()), this, SLOT(plotChi2Landscape()));
     menuImFCCSFit->addAction(actChi2Landscape);
 
-    /*QMenu* m=menuImFCCSFit->addMenu(tr("configure evaluation for ..."));
-
-    actConfigureForSPIMFCCS=new QAction(tr("SPIM-FCCS: normal diffusion"), this);
-    connect(actConfigureForSPIMFCCS, SIGNAL(triggered()), this, SLOT(configureForSPIMFCCS()));
-    m->addAction(actConfigureForSPIMFCCS);
-    actConfigureForSPIMFCCS2CompD=new QAction(tr("SPIM-FCCS: 2-component normal diffusion"), this);
-    connect(actConfigureForSPIMFCCS2CompD, SIGNAL(triggered()), this, SLOT(configureFor2CSPIMFCCS()));
-    m->addAction(actConfigureForSPIMFCCS2CompD);
-    actConfigureForASPIMFCCS=new QAction(tr("SPIM-FCCS: anomalous diffusion"), this);
-    connect(actConfigureForASPIMFCCS, SIGNAL(triggered()), this, SLOT(configureForASPIMFCCS()));
-    m->addAction(actConfigureForASPIMFCCS);*/
 
 
 
@@ -487,110 +477,6 @@ void QFImFCCSFitEvaluationEditor::setCurrentRun(int run)
     QApplication::restoreOverrideCursor();
 }
 
-void QFImFCCSFitEvaluationEditor::configureForSPIMFCCS() {
-    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
-    if (!data) return;
-
-    if (data->getFitFileCount()<3) {
-        while (data->getFitFileCount()<3) {
-            data->addFitFile();
-        }
-    } else if (data->getFitFileCount()>3) {
-        while (data->getFitFileCount()>3) {
-            data->removeFitFile();
-        }
-    }
-
-    data->setFitFunction(0, "fccs_spim_fw_diff2coloracfg");
-    data->setFitFunction(1, "fccs_spim_fw_diff2coloracfr");
-    data->setFitFunction(2, "fccs_spim_fw_diff2colorccf");
-    data->clearLinkParameters();
-
-    QStringList globals;
-    globals<<"concentration_a"<<"concentration_b"<<"concentration_ab"
-          <<"diff_coeff_a"  <<"diff_coeff_b"  <<"diff_coeff_ab"
-         <<"crosstalk"<<"focus_distance_x"  <<"focus_distance_y"  <<"focus_distance_z"
-        <<"focus_width1"  <<"focus_width2"  <<"focus_height1"  <<"focus_height2"
-       <<"pixel_width"<<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
-
-    for (int g=0; g<globals.size(); g++) {
-        data->setLinkParameter(0, globals[g], g);
-        data->setLinkParameter(1, globals[g], g);
-        data->setLinkParameter(2, globals[g], g);
-    }
-
-}
-
-void QFImFCCSFitEvaluationEditor::configureFor2CSPIMFCCS()
-{
-    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
-    if (!data) return;
-
-    if (data->getFitFileCount()<3) {
-        while (data->getFitFileCount()<3) {
-            data->addFitFile();
-        }
-    } else if (data->getFitFileCount()>3) {
-        while (data->getFitFileCount()>3) {
-            data->removeFitFile();
-        }
-    }
-
-    data->setFitFunction(0, "fccs_spim_fw_2cdiff2coloracfg");
-    data->setFitFunction(1, "fccs_spim_fw_2cdiff2coloracfr");
-    data->setFitFunction(2, "fccs_spim_fw_2cdiff2colorccf");
-    data->clearLinkParameters();
-
-    QStringList globals;
-    globals<<"concentration_a"<<"concentration_b"<<"concentration_ab"
-          <<"diff_coeff_a"  <<"diff_coeff_b"  <<"diff_coeff_ab"
-         <<"diff_coeff2_a"  <<"diff_coeff2_b"  <<"diff_coeff2_ab"
-        <<"diff_rho2_a"  <<"diff_rho2_b"  <<"diff_rho2_ab"
-         <<"crosstalk"<<"focus_distance_x"  <<"focus_distance_y"  <<"focus_distance_z"
-        <<"focus_width1"  <<"focus_width2"  <<"focus_height1"  <<"focus_height2"
-       <<"pixel_width"<<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
-
-    for (int g=0; g<globals.size(); g++) {
-        data->setLinkParameter(0, globals[g], g);
-        data->setLinkParameter(1, globals[g], g);
-        data->setLinkParameter(2, globals[g], g);
-    }
-}
-
-void QFImFCCSFitEvaluationEditor::configureForASPIMFCCS() {
-    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
-    if (!data) return;
-
-    if (data->getFitFileCount()<3) {
-        while (data->getFitFileCount()<3) {
-            data->addFitFile();
-        }
-    } else if (data->getFitFileCount()>3) {
-        while (data->getFitFileCount()>3) {
-            data->removeFitFile();
-        }
-    }
-
-    data->setFitFunction(0, "fccs_spim_fw_adiff2coloracfg");
-    data->setFitFunction(1, "fccs_spim_fw_adiff2coloracfr");
-    data->setFitFunction(2, "fccs_spim_fw_adiff2colorccf");
-    data->clearLinkParameters();
-
-    QStringList globals;
-    globals<<"concentration_a"<<"concentration_b"<<"concentration_ab"
-          <<"diff_acoeff_a"  <<"diff_acoeff_b"  <<"diff_acoeff_ab"
-         <<"diff_alpha_a"  <<"diff_alpha_b"  <<"diff_alpha_ab"
-         <<"crosstalk"<<"focus_distance_x"  <<"focus_distance_y"  <<"focus_distance_z"
-        <<"focus_width1"  <<"focus_width2"  <<"focus_height1"  <<"focus_height2"
-       <<"pixel_width"<<"count_rate1"<<"count_rate2"<<"background1"<<"background2";
-
-    for (int g=0; g<globals.size(); g++) {
-        data->setLinkParameter(0, globals[g], g);
-        data->setLinkParameter(1, globals[g], g);
-        data->setLinkParameter(2, globals[g], g);
-    }
-
-}
 
 void QFImFCCSFitEvaluationEditor::onConfigureGlobalItemClicked()
 {

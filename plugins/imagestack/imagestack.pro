@@ -18,19 +18,16 @@ HEADERS += qfrdrimagestack.h \
 		   qfrdrimagestack_dataeditor.h \
     ../interfaces/qfrdrimagestackinterface.h \
     ../interfaces/qfrdrimagemask.h \
-    ../base_classes/qfrdrimagemasktools.h \
-    ../base_classes/qfrdrimagemaskedittools.h
+    ../base_classes/qfrdrimagemasktools.h
 
 SOURCES += qfrdrimagestack.cpp \
            qfrdrimagestack_data.cpp \
 		   qfrdrimagestack_dataeditor.cpp \
-    ../base_classes/qfrdrimagemasktools.cpp \
-    ../base_classes/qfrdrimagemaskedittools.cpp
+    ../base_classes/qfrdrimagemasktools.cpp
 
 FORMS = 
 
-RESOURCES += qfrdrimagestack.qrc \
-    ../base_classes/qfrdrmaskeditor.qrc
+RESOURCES += qfrdrimagestack.qrc
 
 TRANSLATIONS= ./translations/de.image_stack.ts
 

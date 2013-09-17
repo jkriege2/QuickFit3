@@ -17,9 +17,13 @@
 #include "qfrawdatarecord.h"
 #include "qfrdrrunselection.h"
 #include "qfrdrfcsdatainterface.h"
+#include "jkqtplotter.h"
+#include "qfplotter.h"
+#include <QToolBar>
+#include "qfrdrimagemaskedittools.h"
+#include "libwid_imexport.h"
 
-
-class QFRDRImageToRunPreview : public QWidget
+class QFWIDLIB_EXPORT QFRDRImageToRunPreview : public QWidget
 {
         Q_OBJECT
     public:
@@ -40,17 +44,21 @@ class QFRDRImageToRunPreview : public QWidget
         void setCurrentRun(int run, bool replotAlways=false);
         void setCurrentPixel(int x, int y);
         void setMaskEditable(bool editable);
+        void setSelectionEditable(bool editable);
 
     protected slots:
         /** \brief draw overview plot */
         void replotOverview();
 
-        void previewClicked(double x, double y, Qt::KeyboardModifiers modifiers);
-
+        void previewClicked(double x, double y, Qt::KeyboardModifiers modifiers, Qt::MouseButton button=Qt::LeftButton);
+        void moveColorbarsAuto();
     protected:
         QFRawDataRecord* record;
         QFRDRImageToRunInterface* rrRecord;
         QFRDRFCSDataInterface* rfcs;
+
+        QToolBar* tbEdit;
+        QFRDRImageMaskEditTools* maskEditTools;
 
         int currentRun;
         int runmax;
@@ -59,22 +67,38 @@ class QFRDRImageToRunPreview : public QWidget
 
         QGridLayout* gl;
         QLabel* labInfo;
-         /** \brief fast plotter for overview image */
-        JKQTFastPlotter* pltOverview;
+//         /** \brief fast plotter for overview image */
+//        JKQTFastPlotter* pltOverview;
+//        /** \brief plot for the overview image in pltOverview */
+//        JKQTFPimagePlot* plteOverview;
+//        /** \brief plot for the 2-channel overview image in pltOverview */
+//        JKQTFPRGBImageOverlayPlot* plteOverviewRGB;
+//        /** \brief plot for the selected runs in pltOverview, plot plteOverviewSelectedData */
+//        JKQTFPimageOverlayPlot* plteOverviewSelected;
+//        /** \brief plot for the excluded runs in pltOverview, plot plteOverviewSelectedData */
+//        JKQTFPimageOverlayPlot* plteOverviewExcluded;
+//         /** \brief fast plotter for overview image */
+        QFPlotter* pltOverview;
         /** \brief plot for the overview image in pltOverview */
-        JKQTFPimagePlot* plteOverview;
+        JKQTPMathImage* plteOverview;
         /** \brief plot for the 2-channel overview image in pltOverview */
-        JKQTFPRGBImageOverlayPlot* plteOverviewRGB;
+        JKQTPRGBMathImage* plteOverviewRGB;
         /** \brief plot for the selected runs in pltOverview, plot plteOverviewSelectedData */
-        JKQTFPimageOverlayPlot* plteOverviewSelected;
+        JKQTPOverlayImageEnhanced* plteOverviewSelected;
         /** \brief plot for the excluded runs in pltOverview, plot plteOverviewSelectedData */
-        JKQTFPimageOverlayPlot* plteOverviewExcluded;
+        JKQTPOverlayImageEnhanced* plteOverviewExcluded;
+
+        JKQTPxyLineGraph* plteCurrentPixel;
+
+
         /** \brief data in plteOverviewSelected */
         bool* plteOverviewSelectedData;
         /** \brief data in plteOverviewExcluded */
         bool* plteOverviewExcludedData;
         /** \brief size of plteOverviewSelectedData */
         int plteOverviewSelectedSize;
+        int plteOverviewSelectedW;
+        int plteOverviewSelectedH;
 
         QSpinBox* spinRun;
         QLabel* labRun;

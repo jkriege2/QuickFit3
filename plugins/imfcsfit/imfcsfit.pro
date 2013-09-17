@@ -31,7 +31,6 @@ HEADERS += qfpevalimfcsfit.h \
     ../base_classes/qffcsweightingtools.h \
     ../base_classes/qffitresultsbyindexevaluationfittools.h \
     ../base_classes/qffcstools.h \
-    ../base_classes/qfrdrimagetorunpreview.h \
     qfimfcssetparamfromfiledialog.h \
     imfcscalibrationwizard.h \
     ../interfaces/qfrdrimfcscorrelatorremote.h \
@@ -53,7 +52,6 @@ SOURCES += qfpevalimfcsfit.cpp \
     ../base_classes/qffcsweightingtools.cpp \
     ../base_classes/qffitresultsbyindexevaluationfittools.cpp \
     ../base_classes/qffcstools.cpp \
-    ../base_classes/qfrdrimagetorunpreview.cpp \
     qfimfcssetparamfromfiledialog.cpp \
     imfcscalibrationwizard.cpp \
     ../base_classes/qffcsfitchi2landscapedialog.cpp
