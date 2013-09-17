@@ -203,6 +203,28 @@ QFLIB_EXPORT QVariant getQVariantFromString(const QString& type, const QString& 
 
 */
 QFLIB_EXPORT QString doubleToQString(double value, int prec = 10, char f = 'g', QChar decimalSeparator='.' );
+
+/*! \brief convert an integer to a QString in decimal representation
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString intToQString(int64_t value);
+/*! \brief convert an integer to a QString in binary representation
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString intToBinaryQString(int64_t value);
+/*! \brief convert an integer to a QString in hexadecimal representation
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString intToHexQString(int64_t value);
+/*! \brief convert an integer to a QString in octal representation
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString intToOctQString(int64_t value);
+
 /*! \brief convert a vector of numbers to a QString with a given decimalSeparator
     \ingroup qf3lib_tools
 

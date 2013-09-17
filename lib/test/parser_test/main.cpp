@@ -461,6 +461,14 @@ int main(int argc, char *argv[])
     TEST("x[idx]");
     TEST("y[idx]");
     TEST("select(y, x%2==0)");
+    TEST("num2str(x)");
+    TEST("tosystempathseparator(\"bla\\bla/bla\")");
+    TEST("tosystempathseparator([\"bla\\bla/bla\", \"bla/bla\\bla\"])");
+    TEST("shuffle(x)");
+    TEST("shuffle([true, true, true, true, false, false, false, false])");
+    TEST("shuffle(num2str(x))");
+    TEST("x==x");
+    TEST("x==y");
     //speed_test(doByteCode, showBytecode);
 
     return 0;

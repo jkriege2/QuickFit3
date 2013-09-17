@@ -920,3 +920,26 @@ int qfReadFirstInt(const QString& text, bool* ok) {
     }
     return num.toInt(ok);
 }
+
+
+QString intToQString(int64_t value)
+{
+    return QString::number(value);
+}
+
+
+QString intToBinaryQString(int64_t value)
+{
+    return QString::number(value, 2);
+}
+
+
+QString intToHexQString(int64_t value)
+{
+    return QString::number(value, 16);
+}
+
+QString intToOctQString(int64_t value)
+{
+    return QString::number(value, 8);
+}

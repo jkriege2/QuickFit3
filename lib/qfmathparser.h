@@ -45,7 +45,7 @@ class QFMathParser; // forward
 /*@{*/
 
 /*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
-           has one numeric argument, e.g. sin(x)
+           is numeric->numeric, e.g. sin(x). The result is numeric->numeric or num_vector->num_vector
 
     The resulting function will:
       - check the number of arguments
@@ -83,7 +83,7 @@ void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParse
 
 
 /*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
-           has one numeric vector argument and returns a vector
+           is numeric_vector->numeric_vector (QVector<double> -> QVector<double>)
 
     The resulting function will:
       - check the number of arguments and their type
@@ -110,8 +110,44 @@ void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParse
     return; \
 }
 
+
+/*! \brief This macro allows to easily define functions for QFMathParser from a C template-function that
+           is vector->vector it has to accept QList and QVector as arguments! The result of the parser
+           function will have the same type as the input!
+
+    The resulting function will:
+      - check the number of arguments and their type
+      - apply the C-function to any number parameter
+    .
+
+    \param FName name of the function to declare
+    \param NAME_IN_PARSER name the function should have in the parser (used for error messages only)
+    \param CFUNC name of the C function to call
+*/
+#define QFMATHPARSER_DEFINE_1PARAM_VECTOR_FUNC(FName, NAME_IN_PARSER, CFUNC) \
+void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    if (n!=1) {\
+        p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg(#NAME_IN_PARSER));\
+        r.setInvalid();\
+        return; \
+    }\
+    if(params[0].type==qfmpDoubleVector) {\
+        r.setDoubleVec(CFUNC(params[0].numVec));\
+    } else if(params[0].type==qfmpStringVector) {\
+        r.setStringVec(CFUNC(params[0].strVec));\
+    } else if(params[0].type==qfmpBoolVector) {\
+        r.setBoolVec(CFUNC(params[0].boolVec));\
+    } else {\
+        p->qfmpError(QObject::tr("%1(x) argument has to be a vector of numbers/booleans/strings").arg(#NAME_IN_PARSER));\
+        r.setInvalid();\
+    }\
+    return; \
+}
+
+
+
 /*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
-           has one numeric vector argument and returns a number, e.g. qfstatisticsMedian()
+           is numeric_vector->numeric (QVector<double> -> double), e.g. qfstatisticsMedian()
 
     The resulting function will:
       - check the number of arguments and their type
@@ -139,7 +175,7 @@ void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParse
 }
 
 /*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
-           has one numeric vector argument and one numeric argument and returns a number, e.g. qfstatisticsQuantile()
+           is (numeric_vector, numeric)->number , e.g. qfstatisticsQuantile()
 
     The resulting function will:
       - check the number of arguments and their type
@@ -167,7 +203,7 @@ void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParse
 }
 
 /*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
-           has two numeric vector arguments and returns a number, e.g. qfstatisticsCorrelationCoefficient()
+           is (numeric_vector, numeric_vector)->numeric, e.g. qfstatisticsCorrelationCoefficient()
 
     The resulting function will:
       - check the number of arguments and their type
@@ -196,11 +232,12 @@ void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParse
 
 
 /*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
-           has one string (QString!!!) argument, e.g. sin(x)
+           is string->string.  The result is string->string or str_vector->str_vector.
 
     The resulting function will:
       - check the number of arguments
       - apply the C-function to any string parameter
+      - apply the C-function item-wise to any string vector parameter item
       - result is also string
     .
 
@@ -219,19 +256,149 @@ void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParse
     }\
     if (params[0].type==qfmpString) {\
         r.str=CFUNC(params[0].str);\
+    } else if (params[0].type==qfmpStringVector) {\
+        r.setStringVec(params[0].strVec.size());\
+        for (int i=0; i<params[0].strVec.size(); i++) {\
+            r.strVec[i]=CFUNC(params[0].strVec[i]);\
+        }\
     } else {\
-        p->qfmpError(QObject::tr("%1(...) argument has to be a string").arg(#NAME_IN_PARSER));\
+        p->qfmpError(QObject::tr("%1(...) argument has to be a string or string-vector").arg(#NAME_IN_PARSER));\
         r.setInvalid();\
     }\
     return; \
 }
 
-/** \brief same as QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(FName, NAME_IN_PARSER, CFUNC), but NAME_IN_PARSER==CFUNC */
+/** \brief same as QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC_SIMPLE(FName, NAME_IN_PARSER, CFUNC), but NAME_IN_PARSER==CFUNC */
 #define QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC_SIMPLE(FName, CFUNC) QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(FName, CFUNC, CFUNC)
 
 
 /*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
-           has two numeric argument, e.g. yn(p, x), p is a number, x may be a vector
+           is numeric->bool.  The result is numeric->bool or num_vector->bool_vector.
+
+    The resulting function will:
+      - check the number of arguments
+      - apply the C-function to any string parameter
+      - apply the C-function item-wise to any string vector parameter item
+      - result is also string
+    .
+
+    \param FName name of the function to declare
+    \param NAME_IN_PARSER name the function should have in the parser (used for error messages only)
+    \param CFUNC name of the C function to call
+*/
+#define QFMATHPARSER_DEFINE_1PARAM_NUM2BOOL_FUNC(FName, NAME_IN_PARSER, CFUNC) \
+void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    r.type=qfmpBool;\
+    r.isValid=false;\
+    if (n!=1) {\
+        p->qfmpError(QObject::tr("%1(...) needs exacptly 1 argument").arg(#NAME_IN_PARSER));\
+        r.setInvalid();\
+        return; \
+    }\
+    if (params[0].type==qfmpDouble) {\
+        r.setBoolean(CFUNC(params[0].num));\
+    } else if (params[0].type==qfmpDoubleVector) {\
+        r.setBoolVec(params[0].numVec.size());\
+        for (int i=0; i<params[0].numVec.size(); i++) {\
+            r.boolVec[i]=CFUNC(params[0].numVec[i]);\
+        }\
+    } else {\
+        p->qfmpError(QObject::tr("%1(...) argument has to be a number or number-vector").arg(#NAME_IN_PARSER));\
+        r.setInvalid();\
+    }\
+    return; \
+}
+
+/** \brief same as QFMATHPARSER_DEFINE_1PARAM_NUM2BOOL_FUNC_SIMPLE(FName, NAME_IN_PARSER, CFUNC), but NAME_IN_PARSER==CFUNC */
+#define QFMATHPARSER_DEFINE_1PARAM_NUM2BOOL_FUNC_SIMPLE(FName, CFUNC) QFMATHPARSER_DEFINE_1PARAM_NUM2STRING_FUNC(FName, CFUNC, CFUNC)
+
+
+
+/*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
+           is numeric->string.  The result is numeric->string or num_vector->str_vector.
+
+    The resulting function will:
+      - check the number of arguments
+      - apply the C-function to any string parameter
+      - apply the C-function item-wise to any string vector parameter item
+      - result is also string
+    .
+
+    \param FName name of the function to declare
+    \param NAME_IN_PARSER name the function should have in the parser (used for error messages only)
+    \param CFUNC name of the C function to call
+*/
+#define QFMATHPARSER_DEFINE_1PARAM_NUM2STRING_FUNC(FName, NAME_IN_PARSER, CFUNC) \
+void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    r.type=qfmpString;\
+    r.isValid=true;\
+    if (n!=1) {\
+        p->qfmpError(QObject::tr("%1(...) needs exacptly 1 argument").arg(#NAME_IN_PARSER));\
+        r.setInvalid();\
+        return; \
+    }\
+    if (params[0].type==qfmpDouble) {\
+        r.str=CFUNC(params[0].num);\
+    } else if (params[0].type==qfmpDoubleVector) {\
+        r.setStringVec(params[0].numVec.size());\
+        for (int i=0; i<params[0].numVec.size(); i++) {\
+            r.strVec[i]=CFUNC(params[0].numVec[i]);\
+        }\
+    } else {\
+        p->qfmpError(QObject::tr("%1(...) argument has to be a number or number-vector").arg(#NAME_IN_PARSER));\
+        r.setInvalid();\
+    }\
+    return; \
+}
+
+/** \brief same as QFMATHPARSER_DEFINE_1PARAM_NUM2STRING_FUNC_SIMPLE(FName, NAME_IN_PARSER, CFUNC), but NAME_IN_PARSER==CFUNC */
+#define QFMATHPARSER_DEFINE_1PARAM_NUM2STRING_FUNC_SIMPLE(FName, CFUNC) QFMATHPARSER_DEFINE_1PARAM_NUM2STRING_FUNC(FName, CFUNC, CFUNC)
+
+
+/*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
+           is bool->string.  The result is bool->string or bool_vector->str_vector.
+
+    The resulting function will:
+      - check the number of arguments
+      - apply the C-function to any bool parameter
+      - apply the C-function item-wise to any bool vector parameter item
+      - result is also string
+    .
+
+    \param FName name of the function to declare
+    \param NAME_IN_PARSER name the function should have in the parser (used for error messages only)
+    \param CFUNC name of the C function to call
+*/
+#define QFMATHPARSER_DEFINE_1PARAM_BOOL2STRING_FUNC(FName, NAME_IN_PARSER, CFUNC) \
+void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    r.type=qfmpString;\
+    r.isValid=true;\
+    if (n!=1) {\
+        p->qfmpError(QObject::tr("%1(...) needs exacptly 1 argument").arg(#NAME_IN_PARSER));\
+        r.setInvalid();\
+        return; \
+    }\
+    if (params[0].type==qfmpBool) {\
+        r.str=CFUNC(params[0].boolean);\
+    } else if (params[0].type==qfmpBoolVector) {\
+        r.setStringVec(params[0].boolVec.size());\
+        for (int i=0; i<params[0].boolVec.size(); i++) {\
+            r.strVec[i]=CFUNC(params[0].boolVec[i]);\
+        }\
+    } else {\
+        p->qfmpError(QObject::tr("%1(...) argument has to be a boolean or boolean-vector").arg(#NAME_IN_PARSER));\
+        r.setInvalid();\
+    }\
+    return; \
+}
+
+/** \brief same as QFMATHPARSER_DEFINE_1PARAM_BOOL2STRING_FUNC_SIMPLE(FName, NAME_IN_PARSER, CFUNC), but NAME_IN_PARSER==CFUNC */
+#define QFMATHPARSER_DEFINE_1PARAM_BOOL2STRING_FUNC_SIMPLE(FName, CFUNC) QFMATHPARSER_DEFINE_1PARAM_NUM2STRING_FUNC(FName, CFUNC, CFUNC)
+
+
+
+/*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
+           is (numeric, numeric_vector)->numeric.  The result is (numeric, numeric)->numeric or (numeric, num_vector)->num_vector.
 
     The resulting function will:
       - check the number of arguments
@@ -276,7 +443,8 @@ void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParse
 }
 
 /*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
-           has two numeric argument, e.g. yn(x, p), p is a number, x may be a vector
+           is (numeric_vector, numeric)->numeric, e.g. yn(x, p), p is a number, x may be a vector
+             The result is (numeric, numeric)->numeric or (num_vector, numeric)->num_vector.
 
     The resulting function will:
       - check the number of arguments
@@ -322,7 +490,7 @@ void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParse
 
 
 /*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
-           has two numeric argument, e.g. fmod(x, y),  x and y may be a vector (both, same length) or a number (both)
+           is (numeric,numeric)->numeric, e.g. fmod(x, y).  The result is (numeric, numeric)->numeric or (num_vector, num_vector)->num_vector.
 
     The resulting function will:
       - check the number of arguments

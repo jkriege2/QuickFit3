@@ -30,14 +30,51 @@
   <!-- /func:sum -->  
   </li>
     
-  <li><a name="prod"/><!-- func:sum -->
+  <li><a name="prod"/><!-- func:prod -->
   <b><tt><!-- template -->prod(VAR, start, delta, end, expression)<!-- /template --></tt>, <tt>prod(VAR, start, end, expression)</tt> or <tt>prod(VAR, value_vector, expression)</tt> - <i>returns the product of <tt>expression</tt>, evaluated one time for every value in the vector <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration</i>:</b> <br>example: <code>prod(i,1,2,5,i^2)</code> will return <code>1^2*3^2*5^2=225</code>
-  <!-- /func:sum -->  
+  <!-- /func:prod -->  
   </li>
 
   </ul>
 
-  <h2>Special Functions</h2>
+  
+  
+  
+  <h2>Floating Point Number Functions</h2>
+  <ul>
+    
+    
+  <li><a name="isnan"/><!-- func:isnan -->
+  <b><tt><!-- template -->isnan(x)<!-- /template --></tt> - <i>returns <tt>true</tt> if the given number <tt>x</tt> is not-a-number, if <tt>x</tt> is a vector of numbers, the function will return a vector of booleans.</i>:</b> <br>
+  <!-- /func:isnan -->  
+  </li>
+
+   
+  <li><a name="isinf"/><!-- func:isinf -->
+  <b><tt><!-- template -->isinf(x)<!-- /template --></tt> - <i>returns <tt>true</tt> if the given number <tt>x</tt> is infinite, if <tt>x</tt> is a vector of numbers, the function will return a vector of booleans.</i>:</b> <br>
+  <!-- /func:isinf -->  
+  </li>
+
+   
+  <li><a name="isfinite"/><!-- func:isfinite -->
+  <b><tt><!-- template -->isfinite(x)<!-- /template --></tt> - <i>returns <tt>true</tt> if the given number <tt>x</tt> is finite, if <tt>x</tt> is a vector of numbers, the function will return a vector of booleans.</i>:</b> <br>
+  <!-- /func:isfinite -->  
+  </li>
+
+   
+  <li><a name="isnumok"/><!-- func:isnumok -->
+  <b><tt><!-- template -->isnumok(x)<!-- /template --></tt> - <i>returns <tt>true</tt> if the given number <tt>x</tt> is a valid float (it is finite, not NAN and not infinite), if <tt>x</tt> is a vector of numbers, the function will return a vector of booleans.</i>:</b> <br>
+  <!-- /func:isnumok -->  
+  </li>
+
+  </ul>
+
+  
+  
+  
+  
+  
+  <h2>Special Mathematical Functions</h2>
   <ul>
   <li><a name="sigmoid"/><!-- func:sigmoid -->
   <b><tt><!-- template -->sigmoid(x)<!-- /template --></tt> - <i>sigmoidal function </i>:</b><br>

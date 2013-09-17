@@ -17,76 +17,29 @@
 
 
 namespace QFMathParser_Private {
-    qfmpResult fdoubleToQString(const qfmpResult* params, unsigned int  n, QFMathParser* p){
-      qfmpResult r;
-      r.type=qfmpString;
-      if (n!=1) p->qfmpError(QObject::tr("num2str accepts 1 argument"));
-      if (params[0].type!=qfmpDouble) p->qfmpError(QObject::tr("num2str needs double argument"));
-      r.str=doubleToQString(params[0].num);
-      return r;
+
+    QFMATHPARSER_DEFINE_1PARAM_NUM2STRING_FUNC(fdoubleToQString, num2str, doubleToQString)
+    QFMATHPARSER_DEFINE_1PARAM_NUM2STRING_FUNC(fIntToStr, int2str, intToQString)
+    QFMATHPARSER_DEFINE_1PARAM_NUM2STRING_FUNC(fIntToBinStr, int2bin, intToBinaryQString)
+    QFMATHPARSER_DEFINE_1PARAM_NUM2STRING_FUNC(fIntToHexStr, int2hex, intToHexQString)
+    QFMATHPARSER_DEFINE_1PARAM_NUM2STRING_FUNC(fIntToOctStr, int2oct, intToOctQString)
+    QFMATHPARSER_DEFINE_1PARAM_BOOL2STRING_FUNC(fboolToQString, bool2str, boolToQString)
+
+    QFMATHPARSER_DEFINE_1PARAM_NUM2BOOL_FUNC(fIsNan, isnan, std::isnan)
+    QFMATHPARSER_DEFINE_1PARAM_NUM2BOOL_FUNC(fIsInf, isinf, std::isinf)
+    QFMATHPARSER_DEFINE_1PARAM_NUM2BOOL_FUNC(fIsFinite, isfinite, std::isfinite)
+    QFMATHPARSER_DEFINE_1PARAM_NUM2BOOL_FUNC(fIsFloatOK, isnumok, QFFloatIsOK)
+
+    QString ptosystempathseparator(const QString& param) {
+        QString r;
+        for (int i=0; i<param.size(); i++) {
+            QChar ch=param[i];
+            if (ch=='/' || ch=='\\') ch=QDir::separator();
+            r+=ch;
+        }
+        return r;
     }
-
-
-    qfmpResult fIntToStr(const qfmpResult* params, unsigned int  n, QFMathParser* p){
-      qfmpResult r;
-      r.type=qfmpString;
-      if (n!=1) p->qfmpError(QObject::tr("int2str accepts 1 argument"));
-      if (params[0].type!=qfmpDouble) p->qfmpError(QObject::tr("int2str needs double argument"));
-      r.str=QString::number(params[0].toInteger());
-      return r;
-    }
-
-    qfmpResult fIntToBinStr(const qfmpResult* params, unsigned int  n, QFMathParser* p){
-      qfmpResult r;
-      r.type=qfmpString;
-      if (n!=1) p->qfmpError(QObject::tr("int2bin accepts 1 argument"));
-      if (params[0].type!=qfmpDouble) p->qfmpError(QObject::tr("int2bin needs double argument, but argument is %1").arg(params[0].toTypeString()));
-      r.str=QString("0b")+QString::number(params[0].toInteger(), 2);
-      return r;
-    }
-
-    qfmpResult fIntToHexStr(const qfmpResult* params, unsigned int  n, QFMathParser* p){
-      qfmpResult r;
-      r.type=qfmpString;
-      if (n!=1) p->qfmpError(QObject::tr("int2hex accepts 1 argument"));
-      if (params[0].type!=qfmpDouble) p->qfmpError(QObject::tr("int2hex needs double argument"));
-      r.str=QString("0x")+QString::number(params[0].toInteger(), 16).toUpper();
-      return r;
-    }
-
-    qfmpResult fIntToOctStr(const qfmpResult* params, unsigned int  n, QFMathParser* p){
-      qfmpResult r;
-      r.type=qfmpString;
-      if (n!=1) p->qfmpError(QObject::tr("int2oct accepts 1 argument"));
-      if (params[0].type!=qfmpDouble) p->qfmpError(QObject::tr("int2oct needs double argument"));
-      r.str=QString("0o")+QString::number(params[0].toInteger(), 8);
-      return r;
-    }
-
-    qfmpResult fboolToQString(const qfmpResult* params, unsigned int  n, QFMathParser* p){
-      qfmpResult r;
-      r.type=qfmpString;
-      if (n!=1) p->qfmpError(QObject::tr("bool2str accepts 1 argument"));
-      if (params[0].type!=qfmpBool) p->qfmpError(QObject::tr("bool2str needs bool argument"));
-      r.str=(r.boolean)?"true":"false";
-      return r;
-    }
-
-
-    qfmpResult fToSystemPathSeparator(const qfmpResult* params, unsigned int  n, QFMathParser* p){
-      qfmpResult r;
-      r.type=qfmpString;
-      if (n!=1) p->qfmpError(QObject::tr("tosystempathseparator accepts 1 argument"));
-      if (params[0].type!=qfmpString) p->qfmpError(QObject::tr("tosystempathseparator needs string argument"));
-      r.str="";
-      for (int i=0; i<params[0].str.size(); i++) {
-          QChar ch=params[0].str[i];
-          if (ch=='/' || ch=='\\') ch=QDir::separator();
-          r.str+=ch;
-      }
-
-      return r;
-    }
+    QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fToSystemPathSeparator,tosystempathseparator, ptosystempathseparator )
 
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(fSinc, sinc, qfSinc)
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(fTanc, tanc, qfTanc)
@@ -128,33 +81,171 @@ namespace QFMathParser_Private {
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(fDegToRad, deg2rad, qfDegToRad)
     QFMATHPARSER_DEFINE_1PARAM_NUMERIC_FUNC(fRadToDeg, rad2deg, qfRadToDeg)
 
-    QVector<double> QFMathParser_sort(const QVector<double>& value) {
-        QVector<double> m=value;
+    template <class T>
+    T QFMathParser_sort(const T& value) {
+        T m=value;
         qSort(m);
         return m;
     }
 
-    bool compareGreaterThan(const double &s1, const double &s2)
+    QFMATHPARSER_DEFINE_1PARAM_VECTOR_FUNC(fSort, sort, QFMathParser_sort)
+
+    template <class T>
+    bool compareGreaterThan(const T &s1, const T &s2)
      {
          return s1 > s2;
      }
 
     QVector<double> QFMathParser_dsort(const QVector<double>& value) {
         QVector<double> m=value;
-        qSort(m.begin(), m.end(), compareGreaterThan);
+        qSort(m.begin(), m.end(), compareGreaterThan<double>);
         return m;
     }
 
-    QVector<double> QFMathParser_shuffle(const QVector<double>& value) {
+    QVector<bool> QFMathParser_dsort(const QVector<bool>& value) {
+        QVector<bool> m=value;
+        qSort(m.begin(), m.end(), compareGreaterThan<bool>);
+        return m;
+    }
+    QStringList QFMathParser_dsort(const QStringList& value) {
+        QStringList m=value;
+        qSort(m.begin(), m.end(), compareGreaterThan<QString>);
+        return m;
+    }
+
+
+    QFMATHPARSER_DEFINE_1PARAM_VECTOR_FUNC(fDSort, dsort, QFMathParser_dsort)
+
+
+    QVector<double> QFMathParser_shuffleD(const QVector<double>& value) {
         std::vector<double> mm=value.toStdVector();
         std::random_shuffle( mm.begin(), mm.end() );
         return QVector<double>::fromStdVector(mm);
     }
+    QVector<bool> QFMathParser_shuffleB(const QVector<bool>& value) {
+        std::vector<bool> mm=value.toStdVector();
+        std::random_shuffle( mm.begin(), mm.end() );
+        return QVector<bool>::fromStdVector(mm);
+    }
+    QStringList QFMathParser_shuffleS(const QStringList& value) {
+        std::vector<QString> mm;
+        for (int i=0; i<value.size(); i++) {
+            mm.push_back(value[i]);
+        }
+        std::random_shuffle( mm.begin(), mm.end() );
+        QStringList res;
+        for (size_t i=0; i<mm.size(); i++) {
+            res<<mm[i];
+        }
+        return res;
+    }
+
+    void fShuffle(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("shuffle"));
+            r.setInvalid();
+            return;
+        }
+        if(params[0].type==qfmpDoubleVector) {
+            r.setDoubleVec(QFMathParser_shuffleD(params[0].numVec));
+        } else if(params[0].type==qfmpStringVector) {
+            r.setStringVec(QFMathParser_shuffleS(params[0].strVec));
+        } else if(params[0].type==qfmpBoolVector) {
+            r.setBoolVec(QFMathParser_shuffleB(params[0].boolVec));
+        } else {
+            p->qfmpError(QObject::tr("%1(x) argument has to be a vector of numbers/booleans/strings").arg("shuffle"));
+            r.setInvalid();
+        }
+        return;
+    }
 
 
-    QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(fSort, sort, QFMathParser_sort)
-    QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(fDSort, dsort, QFMathParser_dsort)
-    QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(fShuffle, shuffle, QFMathParser_shuffle)
+    void fAllTrue(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("alltrue"));
+            r.setInvalid();
+            return;
+        }
+        if(params[0].type==qfmpBoolVector) {
+            bool res=true;
+            for (int i=0; i<params[0].boolVec.size(); i++) {
+                if (!params[0].boolVec[i]) {
+                    res=false;
+                    break;
+                }
+            }
+            r.setBoolVec(res);
+        } else if(params[0].type==qfmpBool) {
+            r.setBoolVec(params[0].boolean);
+         } else {
+            p->qfmpError(QObject::tr("%1(x) argument has to be a vector of booleans").arg("alltrue"));
+            r.setInvalid();
+        }
+        return;
+    }
+
+    void fAllFalse(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("allfalse"));
+            r.setInvalid();
+            return;
+        }
+        if(params[0].type==qfmpBoolVector) {
+            bool res=true;
+            for (int i=0; i<params[0].boolVec.size(); i++) {
+                if (params[0].boolVec[i]) {
+                    res=false;
+                    break;
+                }
+            }
+            r.setBoolVec(res);
+        } else if(params[0].type==qfmpBool) {
+            r.setBoolVec(!params[0].boolean);
+         } else {
+            p->qfmpError(QObject::tr("%1(x) argument has to be a vector of booleans").arg("allfalse"));
+            r.setInvalid();
+        }
+        return;
+    }
+
+    void fContains(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x, value) needs exacptly 2 arguments").arg("contains"));
+            r.setInvalid();
+            return;
+        }
+        if(params[0].type==qfmpDoubleVector && params[1].type==qfmpDouble) {
+            r.setBoolean(params[0].numVec.contains(params[1].num));
+        } else if(params[0].type==qfmpStringVector && params[1].type==qfmpString) {
+            r.setBoolean(params[0].strVec.contains(params[1].str));
+        } else if(params[0].type==qfmpBoolVector && params[1].type==qfmpBool) {
+            r.setBoolean(params[0].boolVec.contains(params[1].boolean));
+        } else {
+            p->qfmpError(QObject::tr("%1(x, value) argument 1 has to be a vector of numbers/booleans/strings and argument 2 the according item type number/string/boolean").arg("contains"));
+            r.setInvalid();
+        }
+        return;
+    }
+    void fCountOccurences(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x, value) needs exacptly 2 arguments").arg("countoccurences"));
+            r.setInvalid();
+            return;
+        }
+        if(params[0].type==qfmpDoubleVector && params[1].type==qfmpDouble) {
+            r.setBoolean(params[0].numVec.count(params[1].num));
+        } else if(params[0].type==qfmpStringVector && params[1].type==qfmpString) {
+            r.setBoolean(params[0].strVec.count(params[1].str));
+        } else if(params[0].type==qfmpBoolVector && params[1].type==qfmpBool) {
+            r.setBoolean(params[0].boolVec.count(params[1].boolean));
+        } else {
+            p->qfmpError(QObject::tr("%1(x, value) argument 1 has to be a vector of numbers/booleans/strings and argument 2 the according item type number/string/boolean").arg("countoccurences"));
+            r.setInvalid();
+        }
+        return;
+    }
+
+
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fMean, sum, qfstatisticsAverage)
 
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fSkewness, skewness, qfstatisticsSkewness)
@@ -856,6 +947,16 @@ void QFMathParser::addStandardFunctions(){
     addFunction("deg2rad", QFMathParser_Private::fDegToRad, NULL, qfDegToRad);
     addFunction("rad2deg", QFMathParser_Private::fRadToDeg, NULL, qfRadToDeg);
     addFunction("dot", QFMathParser_Private::fDot);
+    addFunction("alltrue", QFMathParser_Private::fAllTrue);
+    addFunction("allfalse", QFMathParser_Private::fAllFalse);
+    addFunction("contains", QFMathParser_Private::fContains);
+    addFunction("countoccurences", QFMathParser_Private::fCountOccurences);
+
+    addFunction("isnan", QFMathParser_Private::fIsNan);
+    addFunction("isinf", QFMathParser_Private::fIsInf);
+    addFunction("isfinite", QFMathParser_Private::fIsFinite);
+    addFunction("isnumok", QFMathParser_Private::fIsFloatOK);
+
 
     for (int i=0; i<externalGlobalFunctions.size(); i++) {
         addFunction(externalGlobalFunctions[i].first, externalGlobalFunctions[i].second);
@@ -1519,33 +1620,84 @@ void qfmpResult::compareequal(qfmpResult& res, const qfmpResult &l, const qfmpRe
         case (qfmpDouble<<8)+qfmpDouble:
             res.setBoolean(l.num==r.num);
             break;
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector:
-            res.setBoolean(l.numVec==r.numVec);
-            break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
-            res.setBoolVec();
+        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+            if (l.numVec.size()!=r.numVec.size()) {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("vectors in comparison '==' have different length"));
+                return;
+            }
+            res.setBoolVec(l.numVec.size());
             for (int i=0; i<l.numVec.size(); i++) {
-                res.boolVec<<(l.numVec[i]==r.num);
+                res.boolVec[i]=(l.numVec[i]==r.numVec[i]);
+            }
+            } break;
+        case (qfmpDoubleVector<<8)+qfmpDouble: {
+            res.setBoolVec(l.numVec.size());
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]==r.num);
             }
             } break;
         case (qfmpDouble<<8)+qfmpDoubleVector: {
-            res.setBoolVec();
+            res.setBoolVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
-                res.boolVec<<(r.numVec[i]==l.num);
+                res.boolVec[i]=(r.numVec[i]==l.num);
             }
             } break;
+
         case (qfmpString<<8)+qfmpString:
             res.setBoolean(l.str==r.str);
             break;
+        case (qfmpStringVector<<8)+qfmpStringVector: {
+            if (l.strVec.size()!=r.strVec.size()) {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("vectors in comparison '==' have different length"));
+                return;
+            }
+            res.setBoolVec(l.strVec.size());
+            for (int i=0; i<l.strVec.size(); i++) {
+                res.boolVec[i]=(l.strVec[i]==r.strVec[i]);
+            }
+            } break;
+        case (qfmpStringVector<<8)+qfmpString: {
+            res.setBoolVec(l.strVec.size());
+            for (int i=0; i<l.strVec.size(); i++) {
+                res.boolVec[i]=(l.strVec[i]==r.str);
+            }
+            } break;
+        case (qfmpString<<8)+qfmpStringVector: {
+            res.setBoolVec(r.strVec.size());
+            for (int i=0; i<r.strVec.size(); i++) {
+                res.boolVec[i]=(r.strVec[i]==l.str);
+            }
+            } break;
+
+
         case (qfmpBool<<8)+qfmpBool:
             res.setBoolean(l.boolean==r.boolean);
             break;
-        case (qfmpBoolVector<<8)+qfmpBoolVector:
-            res.setBoolean(l.boolVec==r.boolVec);
-            break;
-        case (qfmpStringVector<<8)+qfmpStringVector:
-            res.setBoolean(l.strVec==r.strVec);
-            break;
+        case (qfmpBoolVector<<8)+qfmpBoolVector: {
+            if (l.boolVec.size()!=r.boolVec.size()) {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("vectors in comparison '==' have different length"));
+                return;
+            }
+            res.setBoolVec(l.boolVec.size());
+            for (int i=0; i<l.boolVec.size(); i++) {
+                res.boolVec[i]=(l.boolVec[i]==r.boolVec[i]);
+            }
+            } break;
+        case (qfmpBoolVector<<8)+qfmpBool: {
+            res.setBoolVec(l.boolVec.size());
+            for (int i=0; i<l.boolVec.size(); i++) {
+                res.boolVec[i]=(l.boolVec[i]==r.boolean);
+            }
+            } break;
+        case (qfmpBool<<8)+qfmpBoolVector: {
+            res.setBoolVec(r.boolVec.size());
+            for (int i=0; i<r.boolVec.size(); i++) {
+                res.boolVec[i]=(r.boolVec[i]==l.boolean);
+            }
+            } break;
         default:
             res.setInvalid();
             if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '=='").arg(l.typeName()).arg(r.typeName()));
@@ -1553,27 +1705,90 @@ void qfmpResult::compareequal(qfmpResult& res, const qfmpResult &l, const qfmpRe
     }
 }
 
-void qfmpResult::comparenotequal(qfmpResult &res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
+void qfmpResult::comparenotequal(qfmpResult& res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
     switch((uint16_t(l.type)<<8)+uint16_t(r.type)) {
         case (qfmpDouble<<8)+qfmpDouble:
             res.setBoolean(l.num!=r.num);
             break;
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector:
-            res.setBoolean(l.numVec!=r.numVec);
-            break;
+        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+            if (l.numVec.size()!=r.numVec.size()) {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("vectors in comparison '!=' have different length"));
+                return;
+            }
+            res.setBoolVec(l.numVec.size());
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]!=r.numVec[i]);
+            }
+            } break;
+        case (qfmpDoubleVector<<8)+qfmpDouble: {
+            res.setBoolVec(l.numVec.size());
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]!=r.num);
+            }
+            } break;
+        case (qfmpDouble<<8)+qfmpDoubleVector: {
+            res.setBoolVec(r.numVec.size());
+            for (int i=0; i<r.numVec.size(); i++) {
+                res.boolVec[i]=(r.numVec[i]!=l.num);
+            }
+            } break;
+
         case (qfmpString<<8)+qfmpString:
             res.setBoolean(l.str!=r.str);
             break;
+        case (qfmpStringVector<<8)+qfmpStringVector: {
+            if (l.strVec.size()!=r.strVec.size()) {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("vectors in comparison '!=' have different length"));
+                return;
+            }
+            res.setBoolVec(l.strVec.size());
+            for (int i=0; i<l.strVec.size(); i++) {
+                res.boolVec[i]=(l.strVec[i]!=r.strVec[i]);
+            }
+            } break;
+        case (qfmpStringVector<<8)+qfmpString: {
+            res.setBoolVec(l.strVec.size());
+            for (int i=0; i<l.strVec.size(); i++) {
+                res.boolVec[i]=(l.strVec[i]!=r.str);
+            }
+            } break;
+        case (qfmpString<<8)+qfmpStringVector: {
+            res.setBoolVec(r.strVec.size());
+            for (int i=0; i<r.strVec.size(); i++) {
+                res.boolVec[i]=(r.strVec[i]!=l.str);
+            }
+            } break;
+
+
         case (qfmpBool<<8)+qfmpBool:
             res.setBoolean(l.boolean!=r.boolean);
             break;
-        case (qfmpBoolVector<<8)+qfmpBoolVector:
-            res.setBoolean(l.boolVec!=r.boolVec);
-            break;
-        case (qfmpStringVector<<8)+qfmpStringVector:
-            res.setBoolean(l.strVec!=r.strVec);
-            break;
+        case (qfmpBoolVector<<8)+qfmpBoolVector: {
+            if (l.boolVec.size()!=r.boolVec.size()) {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("vectors in comparison '!=' have different length"));
+                return;
+            }
+            res.setBoolVec(l.boolVec.size());
+            for (int i=0; i<l.boolVec.size(); i++) {
+                res.boolVec[i]=(l.boolVec[i]!=r.boolVec[i]);
+            }
+            } break;
+        case (qfmpBoolVector<<8)+qfmpBool: {
+            res.setBoolVec(l.boolVec.size());
+            for (int i=0; i<l.boolVec.size(); i++) {
+                res.boolVec[i]=(l.boolVec[i]!=r.boolean);
+            }
+            } break;
+        case (qfmpBool<<8)+qfmpBoolVector: {
+            res.setBoolVec(r.boolVec.size());
+            for (int i=0; i<r.boolVec.size(); i++) {
+                res.boolVec[i]=(r.boolVec[i]!=l.boolean);
+            }
+            } break;
         default:
             res.setInvalid();
             if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '!='").arg(l.typeName()).arg(r.typeName()));
@@ -1581,15 +1796,65 @@ void qfmpResult::comparenotequal(qfmpResult &res, const qfmpResult &l, const qfm
     }
 }
 
-void qfmpResult::comparegreater(qfmpResult &res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
+
+void qfmpResult::comparegreater(qfmpResult& res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
     switch((uint16_t(l.type)<<8)+uint16_t(r.type)) {
         case (qfmpDouble<<8)+qfmpDouble:
             res.setBoolean(l.num>r.num);
             break;
+        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+            if (l.numVec.size()!=r.numVec.size()) {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("vectors in comparison '>' have different length"));
+                return;
+            }
+            res.setBoolVec(l.numVec.size());
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]>r.numVec[i]);
+            }
+            } break;
+        case (qfmpDoubleVector<<8)+qfmpDouble: {
+            res.setBoolVec(l.numVec.size());
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]>r.num);
+            }
+            } break;
+        case (qfmpDouble<<8)+qfmpDoubleVector: {
+            res.setBoolVec(r.numVec.size());
+            for (int i=0; i<r.numVec.size(); i++) {
+                res.boolVec[i]=(l.num>r.numVec[i]);
+            }
+            } break;
+
         case (qfmpString<<8)+qfmpString:
             res.setBoolean(l.str>r.str);
             break;
+        case (qfmpStringVector<<8)+qfmpStringVector: {
+            if (l.strVec.size()!=r.strVec.size()) {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("vectors in comparison '>' have different length"));
+                return;
+            }
+            res.setBoolVec(l.strVec.size());
+            for (int i=0; i<l.strVec.size(); i++) {
+                res.boolVec[i]=(l.strVec[i]>r.strVec[i]);
+            }
+            } break;
+        case (qfmpStringVector<<8)+qfmpString: {
+            res.setBoolVec(l.strVec.size());
+            for (int i=0; i<l.strVec.size(); i++) {
+                res.boolVec[i]=(l.strVec[i]>r.str);
+            }
+            } break;
+        case (qfmpString<<8)+qfmpStringVector: {
+            res.setBoolVec(r.strVec.size());
+            for (int i=0; i<r.strVec.size(); i++) {
+                res.boolVec[i]=(l.str>r.strVec[i]);
+            }
+            } break;
+
+
         default:
             res.setInvalid();
             if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '>'").arg(l.typeName()).arg(r.typeName()));
@@ -1597,15 +1862,66 @@ void qfmpResult::comparegreater(qfmpResult &res, const qfmpResult &l, const qfmp
     }
 }
 
-void qfmpResult::comparegreaterequal(qfmpResult &res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
+
+
+void qfmpResult::comparegreaterequal(qfmpResult& res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
     switch((uint16_t(l.type)<<8)+uint16_t(r.type)) {
         case (qfmpDouble<<8)+qfmpDouble:
             res.setBoolean(l.num>=r.num);
             break;
+        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+            if (l.numVec.size()!=r.numVec.size()) {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("vectors in comparison '>=' have different length"));
+                return;
+            }
+            res.setBoolVec(l.numVec.size());
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]>=r.numVec[i]);
+            }
+            } break;
+        case (qfmpDoubleVector<<8)+qfmpDouble: {
+            res.setBoolVec(l.numVec.size());
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]>=r.num);
+            }
+            } break;
+        case (qfmpDouble<<8)+qfmpDoubleVector: {
+            res.setBoolVec(r.numVec.size());
+            for (int i=0; i<r.numVec.size(); i++) {
+                res.boolVec[i]=(l.num>=r.numVec[i]);
+            }
+            } break;
+
         case (qfmpString<<8)+qfmpString:
             res.setBoolean(l.str>=r.str);
             break;
+        case (qfmpStringVector<<8)+qfmpStringVector: {
+            if (l.strVec.size()!=r.strVec.size()) {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("vectors in comparison '>=' have different length"));
+                return;
+            }
+            res.setBoolVec(l.strVec.size());
+            for (int i=0; i<l.strVec.size(); i++) {
+                res.boolVec[i]=(l.strVec[i]>=r.strVec[i]);
+            }
+            } break;
+        case (qfmpStringVector<<8)+qfmpString: {
+            res.setBoolVec(l.strVec.size());
+            for (int i=0; i<l.strVec.size(); i++) {
+                res.boolVec[i]=(l.strVec[i]>=r.str);
+            }
+            } break;
+        case (qfmpString<<8)+qfmpStringVector: {
+            res.setBoolVec(r.strVec.size());
+            for (int i=0; i<r.strVec.size(); i++) {
+                res.boolVec[i]=(l.str>=r.strVec[i]);
+            }
+            } break;
+
+
         default:
             res.setInvalid();
             if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '>='").arg(l.typeName()).arg(r.typeName()));
@@ -1613,15 +1929,68 @@ void qfmpResult::comparegreaterequal(qfmpResult &res, const qfmpResult &l, const
     }
 }
 
-void qfmpResult::comparesmaller(qfmpResult &res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
+
+
+
+
+void qfmpResult::comparesmaller(qfmpResult& res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
     switch((uint16_t(l.type)<<8)+uint16_t(r.type)) {
         case (qfmpDouble<<8)+qfmpDouble:
             res.setBoolean(l.num<r.num);
             break;
+        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+            if (l.numVec.size()!=r.numVec.size()) {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("vectors in comparison '<' have different length"));
+                return;
+            }
+            res.setBoolVec(l.numVec.size());
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]<r.numVec[i]);
+            }
+            } break;
+        case (qfmpDoubleVector<<8)+qfmpDouble: {
+            res.setBoolVec(l.numVec.size());
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]<r.num);
+            }
+            } break;
+        case (qfmpDouble<<8)+qfmpDoubleVector: {
+            res.setBoolVec(r.numVec.size());
+            for (int i=0; i<r.numVec.size(); i++) {
+                res.boolVec[i]=(l.num<r.numVec[i]);
+            }
+            } break;
+
         case (qfmpString<<8)+qfmpString:
             res.setBoolean(l.str<r.str);
             break;
+        case (qfmpStringVector<<8)+qfmpStringVector: {
+            if (l.strVec.size()!=r.strVec.size()) {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("vectors in comparison '<' have different length"));
+                return;
+            }
+            res.setBoolVec(l.strVec.size());
+            for (int i=0; i<l.strVec.size(); i++) {
+                res.boolVec[i]=(l.strVec[i]<r.strVec[i]);
+            }
+            } break;
+        case (qfmpStringVector<<8)+qfmpString: {
+            res.setBoolVec(l.strVec.size());
+            for (int i=0; i<l.strVec.size(); i++) {
+                res.boolVec[i]=(l.strVec[i]<r.str);
+            }
+            } break;
+        case (qfmpString<<8)+qfmpStringVector: {
+            res.setBoolVec(r.strVec.size());
+            for (int i=0; i<r.strVec.size(); i++) {
+                res.boolVec[i]=(l.str<r.strVec[i]);
+            }
+            } break;
+
+
         default:
             res.setInvalid();
             if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '<'").arg(l.typeName()).arg(r.typeName()));
@@ -1629,21 +1998,82 @@ void qfmpResult::comparesmaller(qfmpResult &res, const qfmpResult &l, const qfmp
     }
 }
 
-void qfmpResult::comparesmallerequal(qfmpResult &res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
+
+void qfmpResult::comparesmallerequal(qfmpResult& res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
     switch((uint16_t(l.type)<<8)+uint16_t(r.type)) {
         case (qfmpDouble<<8)+qfmpDouble:
             res.setBoolean(l.num<=r.num);
             break;
+        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+            if (l.numVec.size()!=r.numVec.size()) {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("vectors in comparison '<=' have different length"));
+                return;
+            }
+            res.setBoolVec(l.numVec.size());
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]<=r.numVec[i]);
+            }
+            } break;
+        case (qfmpDoubleVector<<8)+qfmpDouble: {
+            res.setBoolVec(l.numVec.size());
+            for (int i=0; i<l.numVec.size(); i++) {
+                res.boolVec[i]=(l.numVec[i]<=r.num);
+            }
+            } break;
+        case (qfmpDouble<<8)+qfmpDoubleVector: {
+            res.setBoolVec(r.numVec.size());
+            for (int i=0; i<r.numVec.size(); i++) {
+                res.boolVec[i]=(l.num<=r.numVec[i]);
+            }
+            } break;
+
         case (qfmpString<<8)+qfmpString:
             res.setBoolean(l.str<=r.str);
             break;
+        case (qfmpStringVector<<8)+qfmpStringVector: {
+            if (l.strVec.size()!=r.strVec.size()) {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("vectors in comparison '<=' have different length"));
+                return;
+            }
+            res.setBoolVec(l.strVec.size());
+            for (int i=0; i<l.strVec.size(); i++) {
+                res.boolVec[i]=(l.strVec[i]<=r.strVec[i]);
+            }
+            } break;
+        case (qfmpStringVector<<8)+qfmpString: {
+            res.setBoolVec(l.strVec.size());
+            for (int i=0; i<l.strVec.size(); i++) {
+                res.boolVec[i]=(l.strVec[i]<=r.str);
+            }
+            } break;
+        case (qfmpString<<8)+qfmpStringVector: {
+            res.setBoolVec(r.strVec.size());
+            for (int i=0; i<r.strVec.size(); i++) {
+                res.boolVec[i]=(l.str<=r.strVec[i]);
+            }
+            } break;
+
+
         default:
             res.setInvalid();
             if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '<='").arg(l.typeName()).arg(r.typeName()));
             break;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

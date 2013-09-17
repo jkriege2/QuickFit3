@@ -48,16 +48,48 @@
   <!-- /func:remove -->
   </li>
   
+  <li><a name="find"/><!-- func:find -->
+  <b><tt><!-- template -->find(x, v)<!-- /template -->, find(x)</tt> - <i>returns a list with the array indices of all occurences of <tt>v</tt> in the vector <tt>x</tt>. If <tt>v</tt> is omitted, the functions expects a boolean vector as <tt>x</tt> and finds all occurences of <tt>true</tt> </i>:</b><br>
+  This function can be used to select items from an array with a logic expression, e.g. <tt>find(x==4)</tt> will return the index list of all items in x that have the value 4. The result can be used in an array access, i.e. <tt>x[find(x>4)]</tt> will return a vector containing only those elements in x where the value is larger than 4 $$see:<a href="#select">select()</a>$$
+  <!-- /func:find -->
+  </li>
+  
+  <li><a name="select"/><!-- func:select -->
+  <b><tt><!-- template -->select(x, cond)<!-- /template --></tt> - <i>returns only those elements of a vector <tt>x</tt> where the boolean vector <tt>cond</tt> contains <tt>true</tt>. Both vectors have to have the same number of elements. </i>:</b><br>
+  This function can be used to filter vectors according to a boolean expression, e.g. <tt>select(x, x>4)</tt> will return a vector containing only those elements in x where the value is larger than 4. This can also be implemented using <tt>x[<a href="#find">find</a>(x>4)]</tt>. So this function is a more expressive short-form for that,. $$see:<a href="#find">find()</a>$$
+  <!-- /func:select -->
+  </li>
+  
   <li><a name="length"/><!-- func:length -->
   <b><tt><!-- template -->length(x)<!-- /template --></tt> - <i>returns the length of vector <tt>x</tt> </i>:</b><br>
   <!-- /func:length -->
   </li>
 
   <li><a name="dot"/><!-- func:dot -->
-  <b><tt><!-- template -->dot(x,y)<!-- /template --></tt> - <i>returns the dot product of vectors <tt>x</tt> and  <tt>x</tt> </i>:</b><br>
+  <b><tt><!-- template -->dot(x,y)<!-- /template --></tt> - <i>returns the dot product of two numeric vectors <tt>x</tt> and  <tt>x</tt> </i>:</b><br>
   <!-- /func:dot -->
   </li>
+     
+  <li><a name="alltrue"/><!-- func:alltrue -->
+  <b><tt><!-- template -->alltrue(x)<!-- /template --></tt> - <i>returns <tt>true</tt> if all elements of the boolean vector <tt>x</tt> are <tt>true</tt> </i>:</b><br>
+  <!-- /func:alltrue -->
+  </li>   
   
+  <li><a name="allfalse"/><!-- func:allfalse -->
+  <b><tt><!-- template -->allfalse(x)<!-- /template --></tt> - <i>returns <tt>true</tt> if all elements of the boolean vector <tt>x</tt> are <tt>false</tt> </i>:</b><br>
+  <!-- /func:allfalse-->
+  </li>
+  
+  <li><a name="contains"/><!-- func:contains -->
+  <b><tt><!-- template -->contains(x, value)<!-- /template --></tt> - <i>returns <tt>true</tt> if the vector <tt>x</tt> contains at least one element of value <tt>value</tt> </i>:</b><br>
+  <!-- /func:contains-->
+  </li>
+  
+  <li><a name="countoccurences"/><!-- func:countoccurences -->
+  <b><tt><!-- template -->countoccurences(x, value)<!-- /template --></tt> - <i>returns the number of elements in the vector <tt>x</tt> that have value <tt>value</tt> </i>:</b><br>
+  <!-- /func:countoccurences-->
+  </li>
+
   
   </ul>
   
