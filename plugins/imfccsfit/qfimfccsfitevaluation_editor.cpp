@@ -298,6 +298,10 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         ui->spinFitRepeats->setValue(item->getProperty("repeatFit", 1).toInt());
         ui->spinFitLocalGlobals->setValue(item->getProperty("localGlobalFitIterations", 0).toInt());
         ui->lstFileSets->setModel(item->getFileSetsModel());
+        if (ui->lstFileSets->model()->rowCount()>0) {
+            ui->lstFileSets->setCurrentIndex(ui->lstFileSets->model()->index(0,0));
+            filesSetActivated(ui->lstFileSets->currentIndex());
+        }
 
         ui->tableView->setModel(item->getParameterInputTableModel());
         connect(item->getParameterInputTableModel(), SIGNAL(modelRebuilt()), this, SLOT(ensureCorrectParamaterModelDisplay()));
@@ -765,103 +769,104 @@ void QFImFCCSFitEvaluationEditor::displayData() {
 
             QFRDRFCSDataInterface* fcs=dynamic_cast<QFRDRFCSDataInterface*>(rec);
             QFRDRImageToRunInterface* runintf=dynamic_cast<QFRDRImageToRunInterface*>(rec);
-
-            double* data=fcs->getCorrelationRun(eval->getCurrentIndex());
-            double* tau=fcs->getCorrelationT();
-            bool wOK=false;
-            double* sigma=eval->allocWeights(&wOK, rec, eval->getCurrentIndex(), ui->datacut->get_userMin(), ui->datacut->get_userMax());//fcs->getCorrelationRunError(eval->getCurrentIndex());
-            if (!wOK && sigma) {
-                free(sigma);
-                sigma=NULL;
-            }
-            long N=fcs->getCorrelationN();
-            if (data && tau) {
-                size_t c_tau=ds->addCopiedColumn(tau, N, tr("file%1: tau [s]").arg(file+1));
-                size_t c_data=ds->addCopiedColumn(data, N, tr("file%1: g(tau)").arg(file+1));
-                int c_error=-1;
-                if (sigma && eval->getFitDataWeighting()!=QFFCSWeightingTools::EqualWeighting) c_error=ds->addCopiedColumn(sigma, N, tr("file%1: errors").arg(file+1));
-                //qDebug()<<c_tau<<c_data<<c_error;
-                JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(ui->pltData->get_plotter());
-                QString plotname=QString("\\verb{")+rec->getName()+QString(": ")+fcs->getCorrelationRunName(eval->getCurrentIndex())+QString("}");
-                g->set_title(plotname);
-                g->set_xColumn(c_tau);
-                g->set_yColumn(c_data);
-                g->set_xErrorColumn(-1);
-                g->set_yErrorColumn(c_error);
-                g->set_color(cols.value(file, g->get_color()));
-                g->set_fillColor(g->get_color().lighter());
-                QColor ec=g->get_color().lighter();
-                g->set_errorColor(ec);
-                ec.setAlphaF(0.5);
-                g->set_errorFillColor(ec);
-                g->set_symbol(ui->cmbDisplayData->getSymbol());
-                g->set_drawLine(ui->cmbDisplayData->getDrawLine());
-                g->set_symbolSize(ui->cmbDisplayData->getSymbolSize());
-                g->set_lineWidth(1);
-                g->set_xErrorStyle(JKQTPnoError);
-                g->set_yErrorStyle(ui->cmbErrorDisplay->getErrorStyle());
-                g->set_datarange_start(ui->datacut->get_userMin());
-                g->set_datarange_end(ui->datacut->get_userMax());
-                ui->pltData->get_plotter()->addGraph(g);
-
-                //qDebug()<<ff<<ff->name();
-
-                double* params=eval->allocFillParameters(rec, eval->getCurrentIndex(), ff);
-                double* err=eval->allocFillParameterErrors(rec, eval->getCurrentIndex(), ff);
-                bool* fix=eval->allocFillFix(rec, eval->getCurrentIndex(), ff);
-                QVector<double> paramsV;
-                for (int i=0; i<ff->paramCount(); i++) {
-                    paramsV<<params[i];
-                    //qDebug()<<ff->getParameterID(i)<<" = "<<params[i];
+            if (fcs) {
+                double* data=fcs->getCorrelationRun(eval->getCurrentIndex());
+                double* tau=fcs->getCorrelationT();
+                bool wOK=false;
+                double* sigma=eval->allocWeights(&wOK, rec, eval->getCurrentIndex(), ui->datacut->get_userMin(), ui->datacut->get_userMax());//fcs->getCorrelationRunError(eval->getCurrentIndex());
+                if (!wOK && sigma) {
+                    free(sigma);
+                    sigma=NULL;
                 }
-                JKQTPxQFFitFunctionLineGraph* g_fit=new JKQTPxQFFitFunctionLineGraph();
-                g_fit->set_title(tr("fit: %1").arg(plotname));
-                g_fit->set_fitFunction(ff, false);
-                g_fit->set_params(paramsV);
-                g_fit->set_color(g->get_color());
-                g_fit->set_style(Qt::DashLine);
-                g_fit->set_lineWidth(2);
-                g_fit->set_minSamples(30);
-                g_fit->set_maxRefinementDegree(4);
-                g_fit->set_plotRefinement(true);
-                ui->pltData->get_plotter()->addGraph(g_fit);
+                long N=fcs->getCorrelationN();
+                if (data && tau) {
+                    size_t c_tau=ds->addCopiedColumn(tau, N, tr("file%1: tau [s]").arg(file+1));
+                    size_t c_data=ds->addCopiedColumn(data, N, tr("file%1: g(tau)").arg(file+1));
+                    int c_error=-1;
+                    if (sigma && eval->getFitDataWeighting()!=QFFCSWeightingTools::EqualWeighting) c_error=ds->addCopiedColumn(sigma, N, tr("file%1: errors").arg(file+1));
+                    //qDebug()<<c_tau<<c_data<<c_error;
+                    JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(ui->pltData->get_plotter());
+                    QString plotname=QString("\\verb{")+rec->getName()+QString(": ")+fcs->getCorrelationRunName(eval->getCurrentIndex())+QString("}");
+                    g->set_title(plotname);
+                    g->set_xColumn(c_tau);
+                    g->set_yColumn(c_data);
+                    g->set_xErrorColumn(-1);
+                    g->set_yErrorColumn(c_error);
+                    g->set_color(cols.value(file, g->get_color()));
+                    g->set_fillColor(g->get_color().lighter());
+                    QColor ec=g->get_color().lighter();
+                    g->set_errorColor(ec);
+                    ec.setAlphaF(0.5);
+                    g->set_errorFillColor(ec);
+                    g->set_symbol(ui->cmbDisplayData->getSymbol());
+                    g->set_drawLine(ui->cmbDisplayData->getDrawLine());
+                    g->set_symbolSize(ui->cmbDisplayData->getSymbolSize());
+                    g->set_lineWidth(1);
+                    g->set_xErrorStyle(JKQTPnoError);
+                    g->set_yErrorStyle(ui->cmbErrorDisplay->getErrorStyle());
+                    g->set_datarange_start(ui->datacut->get_userMin());
+                    g->set_datarange_end(ui->datacut->get_userMax());
+                    ui->pltData->get_plotter()->addGraph(g);
 
-                QFFitStatistics fstat=ff->calcFitStatistics(N, tau, data, sigma, ui->datacut->get_userMin(), ui->datacut->get_userMax(), params, err, fix, 3, 100);
+                    //qDebug()<<ff<<ff->name();
 
-                size_t c_resid=ds->addCopiedColumn(fstat.residuals, N, tr("file%1: residuals").arg(file+1));
-                size_t c_residw=ds->addCopiedColumn(fstat.residuals_weighted, N, tr("file%1: weighted residuals").arg(file+1));
-                size_t c_residat=ds->addCopiedColumn(fstat.tau_runavg, fstat.runAvgN, tr("file%1: tau for avg. res.").arg(file+1));
-                size_t c_resida=ds->addCopiedColumn(fstat.residuals_runavg, N, tr("file%1: avg. residuals").arg(file+1));
-                size_t c_residaw=ds->addCopiedColumn(fstat.residuals_runavg_weighted, N, tr("file%1: weighted avg. residuals").arg(file+1));
-                JKQTPxyLineGraph* g_res=new JKQTPxyLineGraph();
-                g_res->set_xColumn(c_tau);
-                g_res->set_yColumn(c_resid);
-                g_res->set_color(g->get_color());
-                g_res->set_fillColor(g->get_fillColor());
-                g_res->set_symbol(ui->cmbDisplayData->getSymbol());
-                g_res->set_symbolSize(ui->cmbDisplayData->getSymbolSize());
-                g_res->set_lineWidth(1);
-                g_res->set_drawLine(ui->cmbDisplayData->getDrawLine());
-                g_res->set_datarange_start(ui->datacut->get_userMin());
-                g_res->set_datarange_end(ui->datacut->get_userMax());
-                ui->pltResiduals->get_plotter()->addGraph(g_res);
-                JKQTPxyLineGraph* g_resa=new JKQTPxyLineGraph();
-                g_resa->set_xColumn(c_residat);
-                g_resa->set_yColumn(c_resida);
-                g_resa->set_color(g->get_color());
-                g_resa->set_drawLine(true);
-                g_resa->set_symbol(JKQTPnoSymbol);
-                ui->pltResiduals->get_plotter()->addGraph(g_resa);
-                fstat.free();
+                    double* params=eval->allocFillParameters(rec, eval->getCurrentIndex(), ff);
+                    double* err=eval->allocFillParameterErrors(rec, eval->getCurrentIndex(), ff);
+                    bool* fix=eval->allocFillFix(rec, eval->getCurrentIndex(), ff);
+                    QVector<double> paramsV;
+                    for (int i=0; i<ff->paramCount(); i++) {
+                        paramsV<<params[i];
+                        //qDebug()<<ff->getParameterID(i)<<" = "<<params[i];
+                    }
+                    JKQTPxQFFitFunctionLineGraph* g_fit=new JKQTPxQFFitFunctionLineGraph();
+                    g_fit->set_title(tr("fit: %1").arg(plotname));
+                    g_fit->set_fitFunction(ff, false);
+                    g_fit->set_params(paramsV);
+                    g_fit->set_color(g->get_color());
+                    g_fit->set_style(Qt::DashLine);
+                    g_fit->set_lineWidth(2);
+                    g_fit->set_minSamples(30);
+                    g_fit->set_maxRefinementDegree(4);
+                    g_fit->set_plotRefinement(true);
+                    ui->pltData->get_plotter()->addGraph(g_fit);
+
+                    QFFitStatistics fstat=ff->calcFitStatistics(N, tau, data, sigma, ui->datacut->get_userMin(), ui->datacut->get_userMax(), params, err, fix, 3, 100);
+
+                    size_t c_resid=ds->addCopiedColumn(fstat.residuals, N, tr("file%1: residuals").arg(file+1));
+                    size_t c_residw=ds->addCopiedColumn(fstat.residuals_weighted, N, tr("file%1: weighted residuals").arg(file+1));
+                    size_t c_residat=ds->addCopiedColumn(fstat.tau_runavg, fstat.runAvgN, tr("file%1: tau for avg. res.").arg(file+1));
+                    size_t c_resida=ds->addCopiedColumn(fstat.residuals_runavg, N, tr("file%1: avg. residuals").arg(file+1));
+                    size_t c_residaw=ds->addCopiedColumn(fstat.residuals_runavg_weighted, N, tr("file%1: weighted avg. residuals").arg(file+1));
+                    JKQTPxyLineGraph* g_res=new JKQTPxyLineGraph();
+                    g_res->set_xColumn(c_tau);
+                    g_res->set_yColumn(c_resid);
+                    g_res->set_color(g->get_color());
+                    g_res->set_fillColor(g->get_fillColor());
+                    g_res->set_symbol(ui->cmbDisplayData->getSymbol());
+                    g_res->set_symbolSize(ui->cmbDisplayData->getSymbolSize());
+                    g_res->set_lineWidth(1);
+                    g_res->set_drawLine(ui->cmbDisplayData->getDrawLine());
+                    g_res->set_datarange_start(ui->datacut->get_userMin());
+                    g_res->set_datarange_end(ui->datacut->get_userMax());
+                    ui->pltResiduals->get_plotter()->addGraph(g_res);
+                    JKQTPxyLineGraph* g_resa=new JKQTPxyLineGraph();
+                    g_resa->set_xColumn(c_residat);
+                    g_resa->set_yColumn(c_resida);
+                    g_resa->set_color(g->get_color());
+                    g_resa->set_drawLine(true);
+                    g_resa->set_symbol(JKQTPnoSymbol);
+                    ui->pltResiduals->get_plotter()->addGraph(g_resa);
+                    fstat.free();
 
 
 
 
-                free(params);
-                free(err);
-                free(fix);
+                    free(params);
+                    free(err);
+                    free(fix);
+                }
+                if (sigma) free(sigma);
             }
-            if (sigma) free(sigma);
 
             ui->pltData->zoomToFit();
             ui->pltResiduals->zoomToFit();
