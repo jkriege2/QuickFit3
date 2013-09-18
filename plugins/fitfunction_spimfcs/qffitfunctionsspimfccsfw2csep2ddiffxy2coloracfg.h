@@ -13,7 +13,7 @@ class QFFitFunctionsSPIMFCCSFW2CSep2DDiffXY2ColorACFG: public QFFitFunction {
         QFFitFunctionsSPIMFCCSFW2CSep2DDiffXY2ColorACFG();
         virtual ~QFFitFunctionsSPIMFCCSFW2CSep2DDiffXY2ColorACFG() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCCS: 2-comp. 2D diffusion (xy), species A+B+AB, c per species, D1/D2 per channel, ACF green (1/e² radii)"); }
+        virtual QString name() const { return QString("SPIM-FCCS: 2-comp. 2D diffusion (xy), species A+B+AB, c per species, D1/D2 per channel, ACF green (1/eï¿½ radii)"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fccs_spim_fw_2csep2ddiffxy2coloracfg"); }
 
@@ -33,6 +33,7 @@ class QFFitFunctionsSPIMFCCSFW2CSep2DDiffXY2ColorACFG: public QFFitFunction {
 
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
         virtual bool get_implementsDerivatives() { return false; }
+        void sortParameter(double *parameterValues, double *error, bool *fix) const;
 };
 
 #endif // QFFitFunctionsSPIMFCCSFW2CSep2DDiffXY2ColorACFG_H
