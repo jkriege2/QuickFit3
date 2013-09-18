@@ -852,6 +852,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     text<<"bleach time file            : "<<d.relativeFilePath(bleachTimeFilename) << "\n";
                                     text<<"bleach polynomial factor file : "<<d.relativeFilePath(bleachPoly2Filename) << "\n";
                                     text<<"bleach polynomial factor 3 file : "<<d.relativeFilePath(bleachPoly3Filename) << "\n";
+                                    text<<"bleach polynomial shift file : "<<d.relativeFilePath(bleachPoly2offsetFilename) << "\n";
                                     text<<"bleach fit success          : "<<d.relativeFilePath(bleachFitSuccessFilename) << "\n";
                                     text<<"bleach timeseries t file    : "<<d.relativeFilePath(bleachtimesFilename) << "\n";
                                     text<<"bleach timeseries I file    : "<<d.relativeFilePath(bleachframesFilename) << "\n";

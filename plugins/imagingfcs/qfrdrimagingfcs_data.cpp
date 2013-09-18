@@ -313,7 +313,7 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
             loadQFPropertiesFromB040SPIMSettingsFile(settings);
 
             QStringList lfiles, lfiles_types, lfiles_descriptions;
-            appendCategorizedFilesFromB040SPIMConfig(settings, lfiles, lfiles_types, lfiles_descriptions);
+            appendCategorizedFilesFromB040SPIMConfig(settings, lfiles, lfiles_types, lfiles_descriptions);            
             //qDebug()<<getID()<<lfiles<<"\n"<<lfiles_types;
             for (int i=0; i<lfiles.size(); i++) {
                 // now we have to do a really thorough check of all files in files, as the file pathes may be a bit
@@ -336,23 +336,28 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
             }
         }
 
+
         // first we load the correlation curves:
         // so far we do not care about the internal dualView mode. For now all data is loaded and it will be split/discarded afterwards.
         QString loadRH2Overview="";
+        QString mainDataFile="";
         for (int i=0; i<files.size(); i++) {
             if (i<files_types.size()) {
                 QString ft=files_types[i].toLower().trimmed();
                 if (ft=="acf" || ft=="ccf" || ft=="dccf") {
                     if (!dataLoaded) {
                         if (filetype.toUpper()=="VIDEO_CORRELATOR_BIN") {
+                            mainDataFile=files[i];
                             loadVideoCorrelatorFileBin(files[i]);
                             dataLoaded=true;
                             //qDebug()<<getID()<<"loaded vidcorbin "<<width<<"x"<<height<<" x "<<N;
                         } else if (filetype.toUpper()=="VIDEO_CORRELATOR") {
+                            mainDataFile=files[i];
                             loadVideoCorrelatorFile(files[i]);
                             dataLoaded=true;
                             //qDebug()<<getID()<<"loaded vidcorn "<<width<<"x"<<height<<" x "<<N;
                         } else if (filetype.toUpper()=="RADHARD2") {
+                            mainDataFile=files[i];
                             loadRadhard2File(files[i], false);
                             loadRH2Overview=files[i];
                             dataLoaded=true;
@@ -367,6 +372,78 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                 }
             }
         }
+
+        // workaround for bug: try and find .evalsettings.txt file:
+        QString evalsettingsFile=getFileForType("eval_settings");
+        if (evalsettingsFile.isEmpty() || !QFile::exists(evalsettingsFile)) {
+            evalsettingsFile=findEvalsettingsFileForVideoCorrelatorFile(mainDataFile);
+        }
+        // read missing data from .evalsettngs.txt
+        if (QFile::exists(evalsettingsFile)) {
+
+            // add evalsettings file, if it doesn't exist yet
+            bool found=false;
+            for (int j=0; j<files.size(); j++) {
+                if (QFileInfo(files[j]).canonicalFilePath()==QFileInfo(evalsettingsFile).canonicalFilePath()) {
+                    found=true;
+                    break;
+                }
+            }
+            if (!found) {
+                files<<QFileInfo(evalsettingsFile).canonicalFilePath();
+                files_types<<"eval_settings";
+                while (files_desciptions.size()+1<files_types.size()) files_desciptions<<"";
+                files_desciptions<<tr("valuation settings");
+            }
+
+
+
+            QString role="";
+            int dccfid=-1;
+            bool isJanBFile=false;
+            bool isCross=false;
+            bool isDCCF=false;
+            QString evalFilenameH="";
+            imFCSFilenameHeuristics(mainDataFile, &evalFilenameH, &isCross, &isDCCF, &dccfid, &isJanBFile, &role);
+            QMap<QString, QVariant> initParams;
+            QStringList paramsReadonly;
+            int width;
+            int height;
+            QStringList lfiles;
+            QStringList lfiles_types;
+            QStringList lfiles_descriptions;
+            QString filename_settings;
+            QString filename_acquisition;
+            QString filename_overview;
+            QString filename_overviewstd;
+            QString filename_background;
+            QString filename_backgroundstddev;
+            bool overviewReal;
+            bool ok=readEvalSettingsFile(evalsettingsFile, isDCCF, initParams, paramsReadonly, width, height, lfiles, lfiles_types, lfiles_descriptions, filename_settings, filename_acquisition, filename_overview, filename_overviewstd, filename_background, filename_backgroundstddev, role, dccfid, overviewReal);
+
+            for (int i=0; i<lfiles.size(); i++) {
+                // now we have to do a really thorough check of all files in files, as the file pathes may be a bit
+                // different although they point to the same file.
+                bool found=false;
+                for (int j=0; j<files.size(); j++) {
+                    if (QFileInfo(files[j]).canonicalFilePath()==QFileInfo(lfiles[i]).canonicalFilePath()) {
+                        found=true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    files<<QFileInfo(lfiles[i]).canonicalFilePath();
+                    files_types<<lfiles_types.value(i, "");
+                    while (files_desciptions.size()+1<files_types.size()) files_desciptions<<"";
+                    files_desciptions<<lfiles_descriptions.value(i, "");
+                }
+
+
+            }
+        }
+
+
+
         // if in internal dualview mode, we have now loaded the full size data
         // and have to split it and resize the internal datastructures
         // Note: afterwards width/height will be changed!

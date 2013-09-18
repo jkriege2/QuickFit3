@@ -519,7 +519,12 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
                                 }
                             }
                         }
-                        //qDebug()<<"background="<<background<<"   bleachAmplitude="<<bleachAmplitude<<"   bleachTime="<<bleachTime;
+                        qDebug()<<"background="<<background;
+                        qDebug()<<"bleachAmplitude="<<hasBA<<bleachAmplitude;
+                        qDebug()<<"bleachTime="<<hasBTime<<bleachTime;
+                        qDebug()<<"bleachFactor="<<hasBFactor<<bleachFactor;
+                        qDebug()<<"bleachFactor3="<<hasBFactor3<<bleachFactor3;
+                        qDebug()<<"bleachOffset="<<hasBOffset<<bleachOffset;
                         if (hasBTime && hasBA) {
                             double* d=(double*)malloc(frames*sizeof(double));
                             double timeFactor=m->getProperty("FRAME_COUNT", 1).toDouble()/double(frames);
@@ -528,7 +533,7 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
                                     double time=double(tt)*timeFactor;
                                     d[tt]=background+bleachAmplitude*exp(-(bleachOffset+time+bleachFactor*qfSqr(time)+bleachFactor3*qfCube(time))/bleachTime);
                                 }
-                            }else if (hasBFactor&&hasBOffset) {
+                            } else if (hasBFactor&&hasBOffset) {
                                     for (int tt=0; tt<frames; tt++) {
                                         double time=double(tt)*timeFactor;
                                         d[tt]=background+bleachAmplitude*exp(-(bleachOffset+time+bleachFactor*qfSqr(time))/bleachTime);
