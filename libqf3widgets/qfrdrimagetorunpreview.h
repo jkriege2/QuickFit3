@@ -28,7 +28,7 @@ class QFWIDLIB_EXPORT QFRDRImageToRunPreview : public QWidget
         Q_OBJECT
     public:
         explicit QFRDRImageToRunPreview(QWidget *parent = 0);
-    virtual  ~QFRDRImageToRunPreview();
+        virtual  ~QFRDRImageToRunPreview();
         void setRDR(QFRawDataRecord* record);
         QFRawDataRecord* getRDR() const;
 
@@ -52,6 +52,9 @@ class QFWIDLIB_EXPORT QFRDRImageToRunPreview : public QWidget
 
         void previewClicked(double x, double y, Qt::KeyboardModifiers modifiers, Qt::MouseButton button=Qt::LeftButton);
         void moveColorbarsAuto();
+
+        void excludeByImage();
+
     protected:
         QFRawDataRecord* record;
         QFRDRImageToRunInterface* rrRecord;
@@ -105,6 +108,9 @@ class QFWIDLIB_EXPORT QFRDRImageToRunPreview : public QWidget
 
         QToolButton* btnEditSlected;
         QAction* actEditSelection;
+        QAction* actMaskByImage;
+
+
 
         
 };

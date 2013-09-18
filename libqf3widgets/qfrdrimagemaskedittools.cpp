@@ -20,6 +20,13 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
     selectionHeight=0;
     selectionEditing=false;
 
+    actMaskSelected=new QAction(QIcon(":/qfrdrmaskeditor/mask.png"), tr("mask &selected pixels"), this);
+    actMaskSelected->setToolTip(tr("mask all currently selected pixels"));
+    connect(actMaskSelected, SIGNAL(triggered()), this, SLOT(maskSelected()));
+
+    actUnmaskSelected=new QAction(QIcon(":/qfrdrmaskeditor/unmask.png"), tr("unmask &selected pixels"), this);
+    actUnmaskSelected->setToolTip(tr("unmask all currently selected pixels"));
+    connect(actUnmaskSelected, SIGNAL(triggered()), this, SLOT(unmaskSelected()));
 
     actSaveMask=new QAction(QIcon(":/qfrdrmaskeditor/savemask.png"), tr("&save mask"), parentWidget);
     actSaveMask->setToolTip(tr("save the mask to harddisk"));
@@ -173,6 +180,8 @@ void QFRDRImageMaskEditTools::setRDR(QFRawDataRecord *rdr)
     actInvertMask->setVisible(imagemask||runselection);
     actMaskBorder->setVisible(imagemask);
     actCopyMaskToGroup->setVisible((imagemask||runselection) && rdr && rdr->getGroup()>=0);
+    actMaskSelected->setVisible((imagemask||runselection)&&maskEditing&&selectionEditing);
+    actUnmaskSelected->setVisible((imagemask||runselection)&&maskEditing&&selectionEditing);
 
     if (rdr)  {
         undos=rdr->getProperty(settingsPrefix+"QFRDRImageMaskEditTools_undostack",QStringList()).toStringList();
@@ -355,6 +364,46 @@ void QFRDRImageMaskEditTools::copyMaskToGroup()
 
 }
 
+void QFRDRImageMaskEditTools::maskSelected()
+{
+    if (!(maskEditing&&selectionEditing&&selection&&selectionWidth>0&&selectionHeight>0)) return;
+    if (imagemask) {
+        for (int i=0; i<selectionWidth*selectionHeight; i++) {
+            if (selection[i]) {
+                int x=i%imagemask->maskGetWidth();
+                int y=i/imagemask->maskGetWidth();
+                imagemask->maskSet(x, y);
+            }
+        }
+        signalMaskChanged(false, true);
+    } else if (runselection) {
+        for (int i=0; i<selectionWidth*selectionHeight; i++) {
+            if (selection[i]) runselection->leaveoutAddRun(i);
+        }
+        signalMaskChanged(false);
+    }
+}
+
+void QFRDRImageMaskEditTools::unmaskSelected()
+{
+    if (!(maskEditing&&selectionEditing&&selection&&selectionWidth>0&&selectionHeight>0)) return;
+    if (imagemask) {
+        for (int i=0; i<selectionWidth*selectionHeight; i++) {
+            if (selection[i]) {
+                int x=i%imagemask->maskGetWidth();
+                int y=i/imagemask->maskGetWidth();
+                imagemask->maskUnset(x, y);
+            }
+        }
+        signalMaskChanged(false, true);
+    } else if (runselection) {
+        for (int i=0; i<selectionWidth*selectionHeight; i++) {
+            if (selection[i]) runselection->leaveoutRemoveRun(i);
+        }
+        signalMaskChanged(false);
+    }
+}
+
 
 void QFRDRImageMaskEditTools::clearMask()
 {
@@ -515,6 +564,9 @@ void QFRDRImageMaskEditTools::registerMaskToolsToMenu(QMenu *menu) const
     menu->addAction(actPasteMask);
     menu->addAction(actCopyMaskToGroup);
     menu->addSeparator();
+    menu->addAction(actMaskSelected);
+    menu->addAction(actUnmaskSelected);
+    menu->addSeparator();
     menu->addAction(actClearMask);
     menu->addAction(actInvertMask);
     menu->addAction(actMaskBorder);
@@ -527,6 +579,9 @@ void QFRDRImageMaskEditTools::registerMaskToolsToToolbar(QToolBar *menu) const
     menu->addAction(actSaveMask);
     menu->addAction(actCopyMask);
     menu->addAction(actPasteMask);
+    menu->addSeparator();
+    menu->addAction(actMaskSelected);
+    menu->addAction(actUnmaskSelected);
     menu->addSeparator();
     menu->addAction(actClearMask);
     menu->addAction(actInvertMask);
@@ -584,6 +639,9 @@ void QFRDRImageMaskEditTools::setAllowEditSelection(bool enabled, bool *selectio
     if (maskEditing && !selectionEditing) cmbMode->setCurrentIndex(0);
     if (maskEditing && selectionEditing) cmbMode->setCurrentIndex(1);
     actMode->setVisible(maskEditing&&selectionEditing);
+    actMaskSelected->setVisible((imagemask||runselection)&&maskEditing&&selectionEditing);
+    actUnmaskSelected->setVisible((imagemask||runselection)&&maskEditing&&selectionEditing);
+
 }
 
 bool QFRDRImageMaskEditTools::getAllowEditSelection() const
@@ -599,6 +657,8 @@ void QFRDRImageMaskEditTools::setMaskEditing(bool enabled)
     if (maskEditing && !selectionEditing) cmbMode->setCurrentIndex(0);
     if (maskEditing && selectionEditing) cmbMode->setCurrentIndex(1);
     actMode->setVisible(maskEditing&&selectionEditing);
+    actMaskSelected->setVisible((imagemask||runselection)&&maskEditing&&selectionEditing);
+    actUnmaskSelected->setVisible((imagemask||runselection)&&maskEditing&&selectionEditing);
 }
 
 
@@ -618,6 +678,7 @@ void QFRDRImageMaskEditTools::imageClicked(double x, double y, Qt::KeyboardModif
                 if (!actImagesScribble->isChecked()) imagemask->maskClear();
                 imagemask->maskSet(xx,yy);
             }
+            //qDebug()<<actImagesScribble->isChecked()<<modifiers;
             signalMaskChanged(true);
         }
     } else if (selectionEditing&& cmbMode->currentIndex()==1 && selection && (xx>=0 && xx<selectionWidth && yy>=0 && yy<selectionHeight)) {
@@ -627,6 +688,9 @@ void QFRDRImageMaskEditTools::imageClicked(double x, double y, Qt::KeyboardModif
             } else if (modifiers==Qt::ShiftModifier) {
                 selection[yy*selectionWidth+xx]=false;
             } else {
+                if (!actImagesScribble->isChecked()) {
+                    for (int i=0; i<selectionWidth*selectionHeight; i++) selection[i]=false;
+                }
                 selection[yy*selectionWidth+xx]=true;
             }
             signalMaskChanged(true, false);
@@ -991,4 +1055,31 @@ void QFRDRImageMaskEditTools::cmbModeChanged(int index)
 bool QFRDRImageMaskEditTools::getMaskEditing() const
 {
     return maskEditing;
+}
+
+void QFRDRImageMaskEditTools::copyMask(bool *data, int maskSize)
+{
+    if (!(maskEditing)) return;
+    if (imagemask) {
+        memcpy(data, imagemask->maskGet(), imagemask->maskGetWidth()*imagemask->maskGetHeight()*sizeof(bool));
+    } else if (runselection) {
+        QList<int> l = runselection->leaveoutToIndexList();
+        for (int i=0; i<maskSize; i++) {
+            data[i]=l.contains(i);
+        }
+    }
+
+}
+
+void QFRDRImageMaskEditTools::setMask(bool *data, int maskSize)
+{
+    if (!(maskEditing)) return;
+    if (imagemask) {
+        memcpy( imagemask->maskGet(), data, qMin(maskSize, imagemask->maskGetWidth()*imagemask->maskGetHeight())*sizeof(bool));
+    } else if (runselection) {
+        for (int i=0; i<maskSize; i++) {
+            if (data[i]) runselection->leaveoutAddRun(i);
+            else runselection->leaveoutRemoveRun(i);
+        }
+    }
 }

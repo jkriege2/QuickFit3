@@ -38,6 +38,8 @@ class QFWIDLIB_EXPORT QFRDRImageMaskEditTools: public QObject {
         QAction* get_actUndoMask() const { return actUndoMask; }
         QAction* get_actRedoMask() const { return actRedoMask; }
         QAction* get_actMaskBorder() const { return actMaskBorder; }
+        QAction* get_actMaskSelected() const { return actMaskSelected; }
+        QAction* get_actUnmaskSelected() const { return actUnmaskSelected; }
 
         void registerPlotter(JKQtPlotter* plot);
         void unregisterPlotter(JKQtPlotter* plot);
@@ -48,6 +50,8 @@ class QFWIDLIB_EXPORT QFRDRImageMaskEditTools: public QObject {
         bool getAllowEditSelection() const;
         void setMaskEditing(bool enabled);
         bool getMaskEditing() const;
+        void copyMask(bool* data, int maskSize);
+        void setMask(bool* data, int maskSize);
     public slots:
         void loadMask();
         void pasteMask();
@@ -59,6 +63,9 @@ class QFWIDLIB_EXPORT QFRDRImageMaskEditTools: public QObject {
         void redoMask();
         void maskBorder();
         void copyMaskToGroup();
+        void maskSelected();
+        void unmaskSelected();
+
     signals:
         void rawDataChanged();
 
@@ -92,7 +99,8 @@ class QFWIDLIB_EXPORT QFRDRImageMaskEditTools: public QObject {
 
         QAction* actUndoMask;
         QAction* actRedoMask;
-
+        QAction* actMaskSelected;
+        QAction* actUnmaskSelected;
         QAction* actImagesZoom;
         QAction* actImagesDrawPoints;
         QAction* actImagesDrawRectangle;

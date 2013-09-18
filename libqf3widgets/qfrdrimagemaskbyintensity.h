@@ -1,5 +1,5 @@
-#ifndef QFRDRIMAGINGFCSMASKBYINTENSITY_H
-#define QFRDRIMAGINGFCSMASKBYINTENSITY_H
+#ifndef QFRDRIMAGEMASKBYINTENSITY_H
+#define QFRDRIMAGEMASKBYINTENSITY_H
 
 #include <QDialog>
 #include <stdint.h>
@@ -7,31 +7,31 @@
 #include "jkqtpimagetools.h"
 
 namespace Ui {
-    class QFRDRImagingFCSMaskByIntensity;
+    class QFRDRImageMaskByIntensity;
 }
 
 /*! \brief This dialog allows to select pixels by intensity
     \ingroup qf3rdrdp_imaging_fcs
 */
-class QFRDRImagingFCSMaskByIntensity : public QDialog
+class QFRDRImageMaskByIntensity : public QDialog
 {
         Q_OBJECT
         
     public:
-        explicit QFRDRImagingFCSMaskByIntensity(QWidget *parent = 0);
-        ~QFRDRImagingFCSMaskByIntensity();
+        explicit QFRDRImageMaskByIntensity(QWidget *parent = 0);
+        ~QFRDRImageMaskByIntensity();
 
-        void init(bool* mask, double* image, uint16_t width, uint16_t height, int dualView);
+        void init(bool* mask, double* image, uint16_t width, uint16_t height);
 
         int getMaskMode() const;
 
     protected slots:
         void updateMask();
-        void updateDualView();
         void updateEnabledWidgets();
+        void updateWidgets();
         
     private:
-        Ui::QFRDRImagingFCSMaskByIntensity *ui;
+        Ui::QFRDRImageMaskByIntensity *ui;
 
         bool* m_mask;
         double* m_image;
@@ -45,4 +45,4 @@ class QFRDRImagingFCSMaskByIntensity : public QDialog
         JKQTPOverlayImageEnhanced* plteMask;
 };
 
-#endif // QFRDRIMAGINGFCSMASKBYINTENSITY_H
+#endif // QFRDRIMAGEMASKBYINTENSITY_H

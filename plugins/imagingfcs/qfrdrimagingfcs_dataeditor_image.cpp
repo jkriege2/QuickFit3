@@ -1596,7 +1596,7 @@ void QFRDRImagingFCSImageEditor::excludeByIntensity() {
     if (!current) return;
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
-        QFRDRImagingFCSMaskByIntensity* dialog=new QFRDRImagingFCSMaskByIntensity(this);
+        //QFRDRImagingFCSMaskByIntensity* dialog=new QFRDRImagingFCSMaskByIntensity(this);
         double* image=m->getImageFromRunsPreview();
         excludeByImage(image);
     }

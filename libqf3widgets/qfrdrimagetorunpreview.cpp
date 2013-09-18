@@ -1,9 +1,12 @@
 #include "qfrdrimagetorunpreview.h"
+#include "qfrdrimagemaskbyintensity.h"
 
 QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
     QWidget(parent)
 {
 
+    actMaskByImage=new QAction(QIcon(":/qfrdrmaskeditor/maskbyimage.png"), tr("create a mask from the current overview image ..."), this);
+    connect(actMaskByImage, SIGNAL(triggered()), this, SLOT(excludeByImage()));
     runSelectWidget=false;
     int row=0;
     spinRun=0;
@@ -28,6 +31,8 @@ QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
     tbEdit=new QToolBar(tr("mask edit toolbar"), this);
     tbEdit->setVisible(false);
     maskEditTools->registerMaskToolsToToolbar(tbEdit);
+    tbEdit->addAction(actMaskByImage);
+    tbEdit->addSeparator();
     maskEditTools->registerPlotterMaskToolsToToolbar(tbEdit);
     gl->addWidget(tbEdit, row, 0,1,2);
     row++;
@@ -396,6 +401,7 @@ void QFRDRImageToRunPreview::moveColorbarsAuto()
     }
 }
 
+
 void QFRDRImageToRunPreview::setCurrentRun(int runIn, bool replotAlways)
 {
     int run=runIn;
@@ -443,3 +449,55 @@ void QFRDRImageToRunPreview::setSelectionEditable(bool editable)
     }
     tbEdit->setVisible(maskEditTools->getMaskEditing() || maskEditTools->getAllowEditSelection());
 }
+
+
+void QFRDRImageToRunPreview::excludeByImage() {
+    if (!(rrRecord&&maskEditTools->getMaskEditing()&&rrRecord)) return;
+
+
+        bool* mask=(bool*)malloc(rrRecord->getImageFromRunsWidth()*rrRecord->getImageFromRunsHeight()*sizeof(bool));
+        bool* newMask=duplicateArray(mask, rrRecord->getImageFromRunsWidth()*rrRecord->getImageFromRunsHeight());
+        maskEditTools->copyMask(mask, rrRecord->getImageFromRunsWidth()*rrRecord->getImageFromRunsHeight());
+
+        QFRDRImageMaskByIntensity* dialog=new QFRDRImageMaskByIntensity(this);
+
+        int channel=0;
+        if (rrRecord->getImageFromRunsChannels()>1) {
+            bool ok=false;
+            QStringList sl;
+            for (int i=0; i<rrRecord->getImageFromRunsChannels(); i++) {
+                sl<<tr("Channel %1").arg(i+1);
+            }
+            channel=sl.indexOf(QInputDialog::getItem(this, tr("Mask by image"), tr("select the channel to use for masking"), sl, channel, false, &ok));
+            if (!ok) channel=-1;
+        }
+        if (channel>=0) {
+            double* image=rrRecord->getImageFromRunsPreview(channel);
+
+            dialog->init(mask, image, rrRecord->getImageFromRunsWidth(), rrRecord->getImageFromRunsHeight());
+            if (dialog->exec()==QDialog::Accepted) {
+                if (dialog->getMaskMode()==2) {
+                    for (int i=0; i<rrRecord->getImageFromRunsWidth()*rrRecord->getImageFromRunsHeight(); i++) {
+                        newMask[i]=newMask[i] && (!mask[i]);
+                    }
+                } else if (dialog->getMaskMode()==1) {
+                    for (int i=0; i<rrRecord->getImageFromRunsWidth()*rrRecord->getImageFromRunsHeight(); i++) {
+                        newMask[i]=newMask[i]||mask[i];
+                    }
+                } else {
+                    memcpy(newMask, mask, rrRecord->getImageFromRunsWidth()*rrRecord->getImageFromRunsHeight()*sizeof(bool));
+                }
+                //if (rfcs) rfcs->recalcCorrelations();
+                maskEditTools->setMask(newMask, rrRecord->getImageFromRunsWidth()*rrRecord->getImageFromRunsHeight());
+
+            }
+        }
+        delete dialog;
+        free(mask);
+        free(newMask);
+        replotOverview();
+
+}
+
+
+

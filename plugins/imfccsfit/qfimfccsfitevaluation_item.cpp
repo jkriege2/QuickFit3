@@ -994,8 +994,8 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
                 if (t.elapsed()>10) {
                     QApplication::processEvents(QEventLoop::AllEvents, 10);
                     if (dlgFitProgress && dlgFitProgress->isCanceled()) {
-                      doFitThread->terminate();
-                      break;
+                      //doFitThread->terminate();
+                      //break;
                     }
                     t.start();
                 }

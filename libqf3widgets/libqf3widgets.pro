@@ -123,7 +123,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfmeasurementdeviceconfigwidgetthread.h \
     qfmeasurementdeviceconfigwidget.h \
     qfrdrimagetorunpreview.h \
-    qfrdrimagemaskedittools.h
+    qfrdrimagemaskedittools.h \
+    qfrdrimagemaskbyintensity.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -210,7 +211,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfmeasurementdeviceconfigwidgetthread.cpp \
     qfmeasurementdeviceconfigwidget.cpp \
     qfrdrimagetorunpreview.cpp \
-    qfrdrimagemaskedittools.cpp
+    qfrdrimagemaskedittools.cpp \
+    qfrdrimagemaskbyintensity.cpp
 
 
 FORMS += qfdlg_csvparameters.ui \
@@ -219,7 +221,8 @@ FORMS += qfdlg_csvparameters.ui \
     qfselectionlistdialog.ui \
     qfselectrdrdialog.ui \
     qfplottercopytotabledialog.ui \
-    qfsimplecurvefitdialog.ui
+    qfsimplecurvefitdialog.ui \
+    qfrdrimagemaskbyintensity.ui
 
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/qspecialtoolbutton.qrc \

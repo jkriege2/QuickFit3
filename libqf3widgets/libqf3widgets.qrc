@@ -16,6 +16,7 @@
         <file alias="draw_circle.png">icons/draw_circle.png</file>
         <file alias="draw_ellipse.png">icons/draw_ellipse.png</file>
         <file alias="zoom.png">icons/zoom.png</file>
+        <file alias="maskbyimage.png">icons/maskbyimage.png</file>
     </qresource>
     <qresource prefix="/libqf3widgets">
         <file alias="config_add.png">icons/list_add.png</file>
@@ -89,13 +90,11 @@
         <file alias="stage_none.png">icons/stage_none.png</file>
         <file alias="dvhor.png">icons/dvhor.png</file>
         <file alias="dvver.png">icons/dvver.png</file>
-
         <file alias="measurementdevice.png">icons/measurementdevice.png</file>
         <file alias="measurementdevice_none.png">icons/measurementdevice_none.png</file>
         <file alias="configure_measurementdevice.png">icons/measurementdevice_config.png</file>
         <file alias="connect_measurementdevice.png">icons/connect_measurementdevice.png</file>
         <file alias="disconnect_measurementdevice.png">icons/disconnect_measurementdevice.png</file>
-
         <file alias="stagesettings.png">icons/configure_alt.png</file>
         <file alias="stagemove.png">icons/2rightarrow.png</file>
         <file alias="stage_error.png">icons/stage_error.png</file>
@@ -105,6 +104,5 @@
         <file alias="stage_disconnected.png">icons/stage_disconnected.png</file>
         <file alias="stage_joystick.png">icons/joystick.png</file>
         <file alias="stage_nojoystick.png">icons/nojoystick.png</file>
-
     </qresource>
 </RCC>
