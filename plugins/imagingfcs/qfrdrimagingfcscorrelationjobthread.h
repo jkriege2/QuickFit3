@@ -34,6 +34,7 @@ class QFRDRImagingFCSCorrelationJobThread; // forward
 #define BLEACH_EXPREG 3
 #define BLEACH_EXP_POLY2 4
 #define BLEACH_EXP_POLY3 5
+#define BLEACH_DBL_EXP 6
 
 /*! \brief job description for correlation
     \ingroup qf3rdrdp_imaging_fcs
@@ -242,6 +243,11 @@ class QFRDRImagingFCSCorrelationJobThread : public QThread {
     public slots:
         void cancel();
     protected:
+        inline double bleachCorrectExp(const double &intensity, int i, double t);
+        inline double bleachCorrectExpPoly2(const double &intensity, int i, double t);
+        inline double bleachCorrectExpPoly3(const double &intensity, int i, double t);
+        inline double bleachCorrectDblExp(const double &intensity, int i, double t);
+
         /*! \brief replace some special substrings in the output filename pre- and postfix
 
             These sequences are replaced (case-insensitive):
@@ -526,6 +532,8 @@ data                                                   size [bytes]             
         float* bleachOffset;
         float* bleachAmplitude;
         float* bleachTime;
+        float* bleachAmplitude2;
+        float* bleachTime2;
         float* bleachPoly2;
         float* bleachPoly3;
         float* bleachPolyShift;

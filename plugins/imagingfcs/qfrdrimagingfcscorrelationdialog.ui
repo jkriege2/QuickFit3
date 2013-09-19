@@ -1149,6 +1149,11 @@ p, li { white-space: pre-wrap; }
                    <string>1-exponential(poly3) LM-fit</string>
                   </property>
                  </item>
+                 <item>
+                  <property name="text">
+                   <string>2-exponential LM-fit</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
                <item>
@@ -2304,6 +2309,7 @@ p, li { white-space: pre-wrap; }
    <header>qfdoubleedit.h</header>
    <slots>
     <signal>valueChanged(double)</signal>
+    <slot>setValue(double)</slot>
    </slots>
   </customwidget>
   <customwidget>
