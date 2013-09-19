@@ -392,9 +392,9 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
     public:
 
         /*! \brief if splitImage() will split it's image and the given inputImage has the correct (double) size, this will read the oldIndex-th pixel from the left or right subimage! */
-        double readValueFromPossiblySplitImage(const double *inputImage, uint32_t nx, uint32_t ny, int oldIndex);
+        double readValueFromPossiblySplitImage(const double *inputImage, uint32_t nx, uint32_t ny, int oldIndex, bool readOtherChannel=false);
         /*! \brief if splitImage() will split it's image and the given inputImage has the correct (double) size, this will read the oldIndex-th pixel from the left or right subimage! */
-        float readValueFromPossiblySplitImage(const float *inputImage, uint32_t nx, uint32_t ny, int oldIndex);
+        float readValueFromPossiblySplitImage(const float *inputImage, uint32_t nx, uint32_t ny, int oldIndex, bool readOtherChannel=false);
 
     protected:
         /** \brief allocate memory to store a \a x by \a y set of correlation curves (+ additional data, like average and sigmas) with \a N datapoints each */

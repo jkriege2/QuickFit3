@@ -1825,20 +1825,21 @@ void QFRDRImagingFCSData::splitImage(double* overviewF, double* overviewF2, cons
     }
 }
 
-double QFRDRImagingFCSData::readValueFromPossiblySplitImage(const double *inputImage, uint32_t nx, uint32_t ny, int oldIndex)
+double QFRDRImagingFCSData::readValueFromPossiblySplitImage(const double *inputImage, uint32_t nx, uint32_t ny, int oldIndex, bool readOtherChannel)
 {
     //qDebug()<<getID()<<"splitImage(overviewF="<<overviewF<<",  overviewF2="<<overviewF2<<",  nx="<<nx<<",  ny="<<ny<<")   width = "<<width<<"   height = "<<height<<"   intDV2="<<internalDualViewMode()<<",channel="<<internalDualViewModeChannel();
     if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && nx>=2*width && ny==height) {
         int shift1=0;
-        int shift2=width;
         if (!isFCCS()) {
             if (internalDualViewModeChannel()==0) {
                 shift1=0;
-                shift2=width;
             } else {
                 shift1=width;
-                shift2=0;
             }
+        }
+        if (readOtherChannel) {
+            if (shift1==0) shift1=width;
+            else if (shift1==width) shift1=0;
         }
         if (inputImage) {
             int y=oldIndex/width;
@@ -1849,15 +1850,16 @@ double QFRDRImagingFCSData::readValueFromPossiblySplitImage(const double *inputI
         }
     } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && nx==width && ny>=2*height) {
         int shift1=0;
-        int shift2=height;
         if (!isFCCS()) {
             if (internalDualViewModeChannel()==0) {
                 shift1=0;
-                shift2=height;
             } else {
                 shift1=height;
-                shift2=0;
             }
+        }
+        if (readOtherChannel) {
+            if (shift1==0) shift1=height;
+            else if (shift1==height) shift1=0;
         }
         if (inputImage) {
             int y=oldIndex/width;
@@ -1876,20 +1878,21 @@ double QFRDRImagingFCSData::readValueFromPossiblySplitImage(const double *inputI
     return NAN;
 }
 
-float QFRDRImagingFCSData::readValueFromPossiblySplitImage(const float *inputImage, uint32_t nx, uint32_t ny, int oldIndex)
+float QFRDRImagingFCSData::readValueFromPossiblySplitImage(const float *inputImage, uint32_t nx, uint32_t ny, int oldIndex, bool readOtherChannel)
 {
     //qDebug()<<getID()<<"splitImage(overviewF="<<overviewF<<",  overviewF2="<<overviewF2<<",  nx="<<nx<<",  ny="<<ny<<")   width = "<<width<<"   height = "<<height<<"   intDV2="<<internalDualViewMode()<<",channel="<<internalDualViewModeChannel();
     if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && nx>=2*width && ny==height) {
         int shift1=0;
-        int shift2=width;
         if (!isFCCS()) {
             if (internalDualViewModeChannel()==0) {
                 shift1=0;
-                shift2=width;
             } else {
                 shift1=width;
-                shift2=0;
             }
+        }
+        if (readOtherChannel) {
+            if (shift1==0) shift1=width;
+            else if (shift1==width) shift1=0;
         }
         if (inputImage) {
             int y=oldIndex/width;
@@ -1900,15 +1903,16 @@ float QFRDRImagingFCSData::readValueFromPossiblySplitImage(const float *inputIma
         }
     } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && nx==width && ny>=2*height) {
         int shift1=0;
-        int shift2=height;
         if (!isFCCS()) {
             if (internalDualViewModeChannel()==0) {
                 shift1=0;
-                shift2=height;
             } else {
                 shift1=height;
-                shift2=0;
             }
+        }
+        if (readOtherChannel) {
+            if (shift1==0) shift1=height;
+            else if (shift1==height) shift1=0;
         }
         if (inputImage) {
             int y=oldIndex/width;

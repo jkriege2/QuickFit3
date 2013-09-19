@@ -503,25 +503,25 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
                                 if (ft=="background" || ft=="background frame") background=d[i];
                                 if (ft=="display_image") {
                                     if (name.toLower().contains(tr("bleach amplitude 2"))) {
-                                        bleachAmplitude2=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i);
+                                        bleachAmplitude2=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i, c>0);
                                         hasBA2=true;
                                     } else if (name.toLower().contains(tr("bleach time 2 file"))) {
-                                        bleachTime2=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i);
+                                        bleachTime2=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i, c>0);
                                         hasBTime2=true;
                                     } else if (name.toLower().contains(tr("bleach amplitude"))) {
-                                        bleachAmplitude=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i);
+                                        bleachAmplitude=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i, c>0);
                                         hasBA=true;
                                     } else if (name.toLower().contains(tr("bleach time file"))) {
-                                        bleachTime=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i);
+                                        bleachTime=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i, c>0);
                                         hasBTime=true;
                                     } else if (name.toLower().contains(tr("bleach polynomial factor file"))) {
-                                        bleachFactor=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i);
+                                        bleachFactor=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i, c>0);
                                         hasBFactor=true;
                                     } else if (name.toLower().contains(tr("bleach polynomial factor 3 file"))) {
-                                        bleachFactor3=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i);
+                                        bleachFactor3=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i, c>0);
                                         hasBFactor3=true;
                                     } else if (name.toLower().contains(tr("bleach polynomial shift file")) || name.toLower().contains(tr("bleach polynomial offset file"))) {
-                                        bleachOffset=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i);
+                                        bleachOffset=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i, c>0);
                                         hasBOffset=true;
                                     }
                                 }
