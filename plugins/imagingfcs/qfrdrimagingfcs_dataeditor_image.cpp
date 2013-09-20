@@ -753,6 +753,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     plotter->get_plotter()->addGridPrintingPlotter(0,1,plotterResid->get_plotter());
     plotter->set_displayToolbar(true);
     plotterResid->set_displayToolbar(false);
+
+
     plotterResid->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
     plotterResid->getXAxis()->set_labelFontSize(11);
     plotterResid->getXAxis()->set_tickLabelFontSize(10);
@@ -3092,14 +3094,14 @@ void QFRDRImagingFCSImageEditor::replotData() {
                     ACFLevel=C1;
                     if (cmbCrosstalkMode->currentIndex()==1) {
                         CCFLevel=ncCC-CCFLevel;
-                        ACFLevel=ncC1-ACFLevel;
+                        //ACFLevel=ncC1-ACFLevel;
                     }
                 } else { // ACF 1 -> 0  => correct ACF0
                     ACFColor=QColor("darkgreen");
                     ACFLevel=C0;
                     if (cmbCrosstalkMode->currentIndex()==1) {
                         CCFLevel=ncCC-CCFLevel;
-                        ACFLevel=ncC0-ACFLevel;
+                        //ACFLevel=ncC0-ACFLevel;
                     }
                 }
                 /*qDebug()<<"I0="<<I0;
@@ -3157,6 +3159,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
         plotterResid->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
         plotterResid->setX(plotter->getXMin(), plotter->getXMax());
         plotterResid->zoomToFit(false, true, !chkLogTauAxis->isChecked(),false);
+        //qDebug()<<plotterResid->getYMin()<<plotterResid->getYMax();
 
     }
     plotter->set_doDrawing(true);

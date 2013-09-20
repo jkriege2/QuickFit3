@@ -25,10 +25,11 @@
 
 -->
 <!--
-		<li><a name="2687"><b>2013-09-09 (SVN: 2687)</b>-->
+		<li><a name="2719"><b>2013-09-20 (SVN: 2719)</b>-->
 		
 		<ul>
 		  <li><b>new plugins:</b><ul>
+		    <li><b>fitfunctions_tifcs</b>: fit functions for imaging TIR-FCS (so far: 2D normal and anomalous diffusion + 2D diffusion+flow)</li>
 		    <li><b>fitalgorithms_gsl</b>: this plugin makes the fit and minimization algorithms in the GNU SCIENTIFIC LIBRARY (GSL) available to QuickFit (implemented simplex, randomized simplex, BFGS2, steepest descent, conjugate gradient minimizer)</li>
 			<li><b>lights_coboltlaser</b>: plugin to control Cobolt lasers as lightsources via a serial interface </li>
 			<li><b>stage_pi863_2</b>: plugin to control PI Mercury stages, which allows several controllers to be connected to different ports </li>
@@ -43,9 +44,16 @@
 		    <li>can set network proxy in settings Dialog</li>
 		    <li>added automatic and manual (Help menu) updates check</li>
 		    <li>can select whether automatically check for updates in settings dialog</li>
-			<li>mathparser: added functions atanh, asinh, acosh</li>
-			<li>added more statistical function to expression parser: corrcoeff(), skewness(), moment(), ncmoment()</li>
+			<li>QFMathParser: added functions atanh, asinh, acosh</li>
+			<li>QFMathParser: added more statistical function to expression parser: corrcoeff(), skewness(), moment(), ncmoment()</li>
 			<li>added initial support for user-defined fit functions</li>
+			<li>added tool to edit user fit functions</li>
+			<li>QFMathParser: added functions find() and select() to QFMathParser  => documentation still needed</li>
+			<li>QFMathParser: improved functions remove(), removeAll(), concat(), ... they all support vectors of all types now (not just numbers)</li>
+			<li>QFMathParser: implemented compare operations between vectors and single values</li>
+			<li>QFMathParser: all comparisons work on vectors element-wise now (where it makes sense, e.g. [1,2,3]>[1,1,1] will return [false, true, true])</li>
+			<li>QFMathParser: added functions countoccurences(), alltrue(), allfalse(), contains(), isnan(), isinf(), isfinite(), isnumok()</li>
+			<li>QFMathParser: comparisons == and !0 between vectors return a boolean vector now</li>
 		  </ul></li>	
 		  <li><b>imagingFCS</b><ul>
 		    <li>added label with the relative CCF amplitudes to the FCCS-mode widgets</li>
@@ -57,11 +65,20 @@
 			<li>renamed "goodness of fit" image parameter to "parameter 2" and added configuration widgets (range, colorscale ...)</li>
 			<li>added second histogramn for parameter 2 </li>
 			<li>added correlation plot between image intensity and/or parameter 1 and/or parameter 2, this plot can show a scatterplot + a histogram or kernel density estimate of the distribution (bandwidth==binwidth)</li>
+			<li>improved which parameters are displayed initially</li>
+			<li>bugfix: RDR did not display the bleach correction shift term in some cases</li>
+			<li>added double-exponential bleach correction</li>
+			<li>changed bleach correction in load-single-frame mode from divide by bleach-function to the more complex expression by Ries etal.</li>
+			<li>residuals plot is now properly displayed also when there i no data (tau-axis visible)</li>
 		  </ul></li>	
 		  <li><b>table</b><ul>
 		    <li>bugfix: controls were not correctly displayed, when plotting a function</li>
 			<li>added 1D histogram tool, also supports Kernel Density Estimation </li>
 			<li>added 2D histograms/Kernel Density Estimation</li>
+			<li>all sizes in plots (line widths, tick lengths, font sizes ...) are now given in system-indipentent DTP-points (1/72 inch)</li>
+			<li>added several options to format coordinate axes and plots</li>
+			<li>2D histogram also outputs image size as column properties, so image sizes can be read by the according button when plotting!</li>
+			<li>plots: added mor plot symbols (star, asterisk, pentagon,...) and simplified error bars</li>
 		  </ul></li>	
 		  <li><b>qfe_calculator</b><ul>
 		    <li>added multiline expression editor widget</li>
@@ -80,6 +97,11 @@
 		  <li><b>imFCCSFit</b><ul>
 		    <li>"calculate crosstalk-corrected relative CCF amplitude" now can also use the g(0) fit result as input data!</li>
 		    <li>added global-local iterations to QFGlobalFitTool</li>
+			<li>image mask can be edited in the image preview widget</li>
+			<li>added mask by image option to preview widget</li>
+		  </ul></li>	
+		  <li><b>imFCSFit</b><ul>
+		    <li>fixed possible crash</li>
 		  </ul></li>	
 		  <li><b>spim_lighsheet_analysis</b><ul>
 		    <li>now employs parameter guessingbefore fit!</li>
@@ -102,6 +124,8 @@
 			<li>all CFs (ACFG, ACFR, CCF) have all applicable focal volumes as calculated fit parameter now</li>
 			<li>added fit function for 2-component 2D diffusion (xy) with separate diffusion coefficients per channel </li>
 			<li>added fit function for 2-component 2D diffusion (xz) with separate diffusion coefficients per channel</li>
+			<li>all fitfunctions with D1/D2 per channel sort the diffusion coefficients now (D1>D2)</li>
+			<li>all 1/e^2-widths should be w and all 1/sqrt(e) width should be sigma now </li>
 		  </ul></li>	
 		  <li><b>fccs_fitmodels</b><ul>
 		    <li>added fit function with one and two D's per channel, not per species</li>
