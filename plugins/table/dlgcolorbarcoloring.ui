@@ -33,7 +33,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="JKQTPMathImageColorPalette" name="cmbColorbar"/>
+      <widget class="JKQTPMathImageColorPaletteComboBox" name="cmbColorbar"/>
      </item>
      <item row="1" column="0">
       <widget class="QRadioButton" name="radBar2">
@@ -105,7 +105,7 @@
    <header>colorcombobox.h</header>
   </customwidget>
   <customwidget>
-   <class>JKQTPMathImageColorPalette</class>
+   <class>JKQTPMathImageColorPaletteComboBox</class>
    <extends>QComboBox</extends>
    <header>jkqtpimageelements.h</header>
   </customwidget>

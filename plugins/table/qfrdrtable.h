@@ -204,7 +204,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             double imageY;
             double imageWidth;
             double imageHeight;
-            JKQTPMathImage::ColorPalette imagePalette;
+            JKQTPMathImageColorPalette imagePalette;
             double imageMin;
             double imageMax;
             bool imageAutoRange;

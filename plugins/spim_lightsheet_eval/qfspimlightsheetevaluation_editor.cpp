@@ -45,7 +45,7 @@ QFSPIMLightsheetEvaluationEditor::QFSPIMLightsheetEvaluationEditor(QFPluginServi
 
     prepareImagePlotter(ui->pltImage);
 
-    plteImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0, 0, JKQTPMathImage::GRAY, ui->pltImage->get_plotter());
+    plteImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0, 0, JKQTPMathImageGRAY, ui->pltImage->get_plotter());
     ui->pltImage->addGraph(plteImage);
     c_markDataX=ui->pltImage->getDatastore()->addColumn(markDataX, 2, "mark X");
     c_markDataY=ui->pltImage->getDatastore()->addColumn(markDataY, 2, "mark Y");

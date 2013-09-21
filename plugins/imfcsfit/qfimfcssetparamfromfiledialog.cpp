@@ -85,7 +85,7 @@ void QFImFCSSetParamFromFileDialog::replotOvr()
             size_t col=ds->addCopiedColumn(d.data(), d.size(), getResultID());
 
             plt=new JKQTPColumnMathImage(ui->pltData->get_plotter());
-            plt->set_palette(JKQTPMathImage::MATLAB);
+            plt->set_palette(JKQTPMathImageMATLAB);
             plt->set_imageColumn(col);
             plt->set_Nx(w);
             plt->set_Ny(h);

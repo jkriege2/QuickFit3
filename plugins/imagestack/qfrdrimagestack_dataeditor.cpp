@@ -153,7 +153,7 @@ void QFRDRImageStackDataEditor::createWidgets() {
     mainLay->addStretch();
 
 
-    image=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0, 0, JKQTPMathImage::GRAY, pltImage->get_plotter());
+    image=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0, 0, JKQTPMathImageGRAY, pltImage->get_plotter());
     image->get_colorBarRightAxis()->set_labelType(JKQTPCALTdefault);
     image->get_colorBarRightAxis()->set_labelDigits(2);
     image->get_colorBarRightAxis()->set_minTicks(3);
@@ -252,7 +252,7 @@ void QFRDRImageStackDataEditor::readSettings() {
     player->setFPS(settings->getQSettings()->value(prefix+"player_fps", player->getFPS()).toDouble());
     player->setReplay(settings->getQSettings()->value(prefix+"player_replay", player->getReplay()).toBool());
     cmbChannelMode->setCurrentIndex(settings->getQSettings()->value(prefix+"imagemode", 0).toInt());
-    cmbColorbar->setCurrentIndex(settings->getQSettings()->value(prefix+"colorbar", JKQTPMathImage::GRAY).toInt());
+    cmbColorbar->setCurrentIndex(settings->getQSettings()->value(prefix+"colorbar", JKQTPMathImageGRAY).toInt());
     cmbModifierMode->setCurrentIndex(settings->getQSettings()->value(prefix+"modifiermode", JKQTPMathImageBase::ModifyAlpha).toInt());
     spinBins->setValue(settings->getQSettings()->value(prefix+"bins", 100).toInt());
     loadSplitter(*(settings->getQSettings()), splitter, prefix);

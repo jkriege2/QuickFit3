@@ -54,8 +54,8 @@ QFRDRImagingFCSDataExplorer::QFRDRImagingFCSDataExplorer(QWidget *parent) :
     statRangedMin=0;
     N=0;
     ui->setupUi(this);
-    image=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::FloatArray, NULL, 0, 0, JKQTPMathImage::GRAY, ui->pltImage->get_plotter());
-    imageRaw=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::FloatArray, NULL, 0, 0, JKQTPMathImage::GRAY, ui->pltImageRaw->get_plotter());
+    image=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::FloatArray, NULL, 0, 0, JKQTPMathImageGRAY, ui->pltImage->get_plotter());
+    imageRaw=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::FloatArray, NULL, 0, 0, JKQTPMathImageGRAY, ui->pltImageRaw->get_plotter());
     cropRegion=new JKQTPgeoRectangle(ui->pltImageRaw->get_plotter(), 0,0,1,1,QColor("red"),1);
     binRegion=new JKQTPgeoRectangle(ui->pltImageRaw->get_plotter(), 0,0,1,1,QColor("salmon"),1);
     ui->pltImage->addGraph(image);

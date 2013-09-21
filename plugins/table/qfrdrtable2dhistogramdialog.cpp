@@ -242,7 +242,7 @@ void QFRDRTable2DHistogramDialog::updateHistograms(bool estimateBinWidth)
         int c_hist=ui->plotter->getDatastore()->addCopiedColumn(histogram.data(), histogram.size(), tr("%2 histogram").arg(hname));
         JKQTPColumnMathImage* g=new JKQTPColumnMathImage(ui->plotter->get_plotter());
         g->set_imageColumn(c_hist);
-        g->set_palette(JKQTPMathImage::INVERTED_OCEAN);
+        g->set_palette(JKQTPMathImageINVERTED_OCEAN);
         g->set_title("");
         g->set_x(stat.min);
         g->set_y(statY.min);

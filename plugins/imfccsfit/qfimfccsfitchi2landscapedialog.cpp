@@ -101,7 +101,7 @@ void QFImFCCSFitChi2LandscapeDialog::on_btnPlot_clicked()
     img->set_y(ui->spinYMin->value());
     img->set_width(ui->spinXMax->value()-ui->spinXMin->value());
     img->set_height(ui->spinYMax->value()-ui->spinYMin->value());
-    img->set_palette(JKQTPMathImage::MATLAB);
+    img->set_palette(JKQTPMathImageMATLAB);
     img->set_autoImageRange(true);
 
     ui->plotter->addGraph(img);

@@ -221,7 +221,7 @@ void QFRDRImagingFCSImagePlotter::initImFCSPlotter()
     get_plotter()->set_useAntiAliasingForGraphs(true);
     set_userActionCompositionMode(QPainter::CompositionMode_Xor);
 
-    plteImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::GRAY, get_plotter());
+    plteImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImageGRAY, get_plotter());
     addGraph(plteImage);
 
     QColor ovlSelCol=QColor("red");

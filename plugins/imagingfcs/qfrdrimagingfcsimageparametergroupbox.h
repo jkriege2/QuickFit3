@@ -40,8 +40,8 @@ class QFRDRImagingFCSImageParameterGroupBox : public QGroupBox
         QString getImageStyleName() const;
         QString getOutOfRangeName() const;
 
-        JKQTPMathImage::ColorPalette colorPalette() const;
-        void setColorPalette(JKQTPMathImage::ColorPalette palette);
+        JKQTPMathImageColorPalette colorPalette() const;
+        void setColorPalette(JKQTPMathImageColorPalette palette);
 
         void saveConfig(QFRawDataRecord* record, const QString& egroup, const QString &param, const QString& imageID);
         void loadConfig(QFRawDataRecord* record, const QString& egroup, const QString &param, const QString& imageID, const QString& prefix=QString(), double mi=0, double ma=1);
@@ -56,7 +56,7 @@ class QFRDRImagingFCSImageParameterGroupBox : public QGroupBox
         void emitSettingsChanged();
     protected:
         /** \brief combobox for the color bar of plteImage */
-        JKQTPMathImageColorPalette* cmbColorbar;
+        JKQTPMathImageColorPaletteComboBox* cmbColorbar;
         /** \brief combobox for the display style of plteImage */
         QComboBox* cmbImageStyle;
         /** \brief cobobox to select what should happen to the out-of-range pixels */

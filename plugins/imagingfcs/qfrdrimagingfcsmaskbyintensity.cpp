@@ -11,7 +11,7 @@ QFRDRImagingFCSMaskByIntensity::QFRDRImagingFCSMaskByIntensity(QWidget *parent) 
     m_width=0;
     m_height=0;
     ui->setupUi(this);
-    plteImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0,JKQTPMathImage::GRAY, ui->pltMain->get_plotter());
+    plteImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0,JKQTPMathImageGRAY, ui->pltMain->get_plotter());
     ui->pltMain->addGraph(plteImage);
     QColor colTrue=QColor("red");
     colTrue.setAlphaF(0.7);

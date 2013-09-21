@@ -366,7 +366,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                     g->set_y(mmin2);
                     g->set_width(mmax1-mmin1);
                     g->set_height(mmax2-mmin2);
-                    g->set_palette(JKQTPMathImage::INVERTED_OCEAN);
+                    g->set_palette(JKQTPMathImageINVERTED_OCEAN);
                     g->set_autoImageRange(true);
                     pltParamCorrelation->addGraph(g);
 

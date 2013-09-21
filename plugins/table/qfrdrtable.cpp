@@ -50,7 +50,7 @@ QFRDRTable::GraphInfo::GraphInfo() {
     imageY=0;
     imageWidth=1;
     imageHeight=1;
-    imagePalette=JKQTPMathImage::MATLAB;
+    imagePalette=JKQTPMathImageMATLAB;
     imageMin=0;
     imageMax=0;
     imageAutoRange=true;
@@ -568,7 +568,7 @@ void QFRDRTable::colgraphAddImagePlot(int graph, int imageColumn, QFRDRColumnGra
         g.imageHeight=height;
         g.imagePixelWidth=Nx;
         g.title=title;
-        g.imagePalette=JKQTPMathImage::ColorPalette((int)palette);
+        g.imagePalette=JKQTPMathImageColorPalette((int)palette);
         plt.graphs.append(g);
 
         setPlot(graph, plt);
@@ -1406,7 +1406,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.imageY=CQStringToDouble(ge.attribute("image_y", "0"));
                     graph.imageWidth=CQStringToDouble(ge.attribute("image_width", "1"));
                     graph.imageHeight=CQStringToDouble(ge.attribute("image_height", "1"));
-                    graph.imagePalette=JKQTPMathImage::ColorPalette(ge.attribute("image_palette", "8").toInt());
+                    graph.imagePalette=JKQTPMathImageColorPalette(ge.attribute("image_palette", "8").toInt());
                     graph.imageMin=CQStringToDouble(ge.attribute("image_min", "0"));
                     graph.imageMax=CQStringToDouble(ge.attribute("image_max", "0"));
                     graph.imageAutoRange=QStringToBool(ge.attribute("image_autorange", "true"));

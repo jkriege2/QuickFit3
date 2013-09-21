@@ -111,7 +111,7 @@ void QFRDROverviewImageDisplay::createWidgets() {
 
 
 
-    image=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0, 0, JKQTPMathImage::GRAY, pltImage->get_plotter());
+    image=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0, 0, JKQTPMathImageGRAY, pltImage->get_plotter());
     image->get_colorBarRightAxis()->set_labelType(JKQTPCALTdefault);
     image->get_colorBarRightAxis()->set_labelDigits(2);
     image->get_colorBarRightAxis()->set_minTicks(3);

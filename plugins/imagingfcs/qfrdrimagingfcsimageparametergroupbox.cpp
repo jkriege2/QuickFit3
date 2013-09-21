@@ -55,41 +55,41 @@ void QFRDRImagingFCSImageParameterGroupBox::setSelectedImageStyle(JKQTPMathImage
     //qDebug()<<"paletteChanged():  "<<plteImageData << plteOverviewExcludedData<<":     "<<mi<<"..."<<ma;
     switch(cmbOutOfRangeMode->currentIndex()) {
         case 0:
-            plteImage->set_rangeMinFailAction(JKQTPMathImage::LastPaletteColor);
-            plteImage->set_rangeMaxFailAction(JKQTPMathImage::LastPaletteColor);
+            plteImage->set_rangeMinFailAction(JKQTPMathImageLastPaletteColor);
+            plteImage->set_rangeMaxFailAction(JKQTPMathImageLastPaletteColor);
             break;
         default:
         case 1:
-            plteImage->set_rangeMinFailAction(JKQTPMathImage::GivenColor);
-            plteImage->set_rangeMaxFailAction(JKQTPMathImage::GivenColor);
+            plteImage->set_rangeMinFailAction(JKQTPMathImageGivenColor);
+            plteImage->set_rangeMaxFailAction(JKQTPMathImageGivenColor);
             plteImage->set_rangeMinFailColor(QColor("black"));
             plteImage->set_rangeMaxFailColor(QColor("black"));
             break;
         case 2:
-            plteImage->set_rangeMinFailAction(JKQTPMathImage::GivenColor);
-            plteImage->set_rangeMaxFailAction(JKQTPMathImage::GivenColor);
+            plteImage->set_rangeMinFailAction(JKQTPMathImageGivenColor);
+            plteImage->set_rangeMaxFailAction(JKQTPMathImageGivenColor);
             plteImage->set_rangeMinFailColor(QColor("white"));
             plteImage->set_rangeMaxFailColor(QColor("white"));
             break;
         case 3:
-            plteImage->set_rangeMinFailAction(JKQTPMathImage::Transparent);
-            plteImage->set_rangeMaxFailAction(JKQTPMathImage::Transparent);
+            plteImage->set_rangeMinFailAction(JKQTPMathImageTransparent);
+            plteImage->set_rangeMaxFailAction(JKQTPMathImageTransparent);
             break;
         case 4:
-            plteImage->set_rangeMinFailAction(JKQTPMathImage::GivenColor);
-            plteImage->set_rangeMaxFailAction(JKQTPMathImage::GivenColor);
+            plteImage->set_rangeMinFailAction(JKQTPMathImageGivenColor);
+            plteImage->set_rangeMaxFailAction(JKQTPMathImageGivenColor);
             plteImage->set_rangeMinFailColor(QColor("red"));
             plteImage->set_rangeMaxFailColor(QColor("red"));
             break;
         case 5:
-            plteImage->set_rangeMinFailAction(JKQTPMathImage::GivenColor);
-            plteImage->set_rangeMaxFailAction(JKQTPMathImage::GivenColor);
+            plteImage->set_rangeMinFailAction(JKQTPMathImageGivenColor);
+            plteImage->set_rangeMaxFailAction(JKQTPMathImageGivenColor);
             plteImage->set_rangeMinFailColor(QColor("green"));
             plteImage->set_rangeMaxFailColor(QColor("green"));
             break;
         case 6:
-            plteImage->set_rangeMinFailAction(JKQTPMathImage::GivenColor);
-            plteImage->set_rangeMaxFailAction(JKQTPMathImage::GivenColor);
+            plteImage->set_rangeMinFailAction(JKQTPMathImageGivenColor);
+            plteImage->set_rangeMaxFailAction(JKQTPMathImageGivenColor);
             plteImage->set_rangeMinFailColor(QColor("blue"));
             plteImage->set_rangeMaxFailColor(QColor("blue"));
             break;
@@ -198,12 +198,12 @@ QString QFRDRImagingFCSImageParameterGroupBox::getOutOfRangeName() const
     return cmbOutOfRangeMode->currentText();
 }
 
-JKQTPMathImage::ColorPalette QFRDRImagingFCSImageParameterGroupBox::colorPalette() const
+JKQTPMathImageColorPalette QFRDRImagingFCSImageParameterGroupBox::colorPalette() const
 {
     return cmbColorbar->colorPalette();
 }
 
-void QFRDRImagingFCSImageParameterGroupBox::setColorPalette(JKQTPMathImage::ColorPalette palette)
+void QFRDRImagingFCSImageParameterGroupBox::setColorPalette(JKQTPMathImageColorPalette palette)
 {
     cmbColorbar->setColorPalette(palette);
 }
@@ -228,7 +228,7 @@ void QFRDRImagingFCSImageParameterGroupBox::loadConfig(QFRawDataRecord *current,
                                current->getProperty(QString("imfcs_imed_colorbar_%1_%2").arg(egroup).arg(param),
                                ProgramOptions::getInstance()->getQSettings()->value(prefix+QString("colorbar"), cmbColorbar->currentIndex()))).toInt();
     if (d>=0) cmbColorbar->setCurrentIndex(d);
-    else if (cmbColorbar->count()>0) cmbColorbar->setColorPalette(JKQTPMathImage::MATLAB);
+    else if (cmbColorbar->count()>0) cmbColorbar->setColorPalette(JKQTPMathImageMATLAB);
     cmbImageStyle->setCurrentIndex(current->getProperty(QString("imfcs_imed_style_%1_%3_%2").arg(egroup).arg(param).arg(imageID), current->getProperty(QString("imfcs_imed_style_%1_%2").arg(egroup).arg(param), cmbImageStyle->currentIndex())).toInt());
     cmbOutOfRangeMode->setCurrentIndex(current->getProperty(QString("imfcs_imed_oorc_%1_%3_%2").arg(egroup).arg(param).arg(imageID), current->getProperty(QString("imfcs_imed_oorc_%1_%2").arg(egroup).arg(param), cmbOutOfRangeMode->currentIndex())).toInt());
     chkImageAutoScale->setChecked(current->getProperty(QString("imfcs_imed_autorange_%1_%3_%2").arg(egroup).arg(param).arg(imageID), current->getProperty(QString("imfcs_imed_autorange_%1_%2").arg(egroup).arg(param), true)).toBool());
@@ -248,7 +248,7 @@ void QFRDRImagingFCSImageParameterGroupBox::writeSettings(QSettings &settings, c
 
 void QFRDRImagingFCSImageParameterGroupBox::readSettings(QSettings &settings, const QString &prefix)
 {
-    cmbColorbar->setCurrentIndex(settings.value(prefix+QString("colorbar"),  JKQTPMathImage::MATLAB).toInt());
+    cmbColorbar->setCurrentIndex(settings.value(prefix+QString("colorbar"),  JKQTPMathImageMATLAB).toInt());
     cmbImageStyle->setCurrentIndex(settings.value(prefix+QString("paramstyle"), 0).toInt());
     cmbOutOfRangeMode->setCurrentIndex(settings.value(prefix+QString("outofrange_mode"), 1).toInt());
 
@@ -316,8 +316,8 @@ void QFRDRImagingFCSImageParameterGroupBox::initGrp()
     gli->addRow(tr("st&yle:"), cmbImageStyle);
 
 
-    cmbColorbar=new JKQTPMathImageColorPalette(this);
-    cmbColorbar->setColorPalette(JKQTPMathImage::MATLAB);
+    cmbColorbar=new JKQTPMathImageColorPaletteComboBox(this);
+    cmbColorbar->setColorPalette(JKQTPMathImageMATLAB);
     gli->addRow(tr("color &palette:"), cmbColorbar);
 
     chkImageAutoScale=new QCheckBox("auto", this);

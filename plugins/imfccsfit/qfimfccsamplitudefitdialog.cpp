@@ -399,7 +399,7 @@ void QFImFCCSAmplitudeFitDialog::replotImages()
             size_t col=ds->addCopiedColumn(rel, w*h, tr("rel. CCF amplitude"));
             size_t cole=ds->addCopiedColumn(rel_error, w*h, tr("rel. CCF amplitude error"));
             plt=new JKQTPColumnMathImage(pltData->get_plotter());
-            plt->set_palette(JKQTPMathImage::MATLAB);
+            plt->set_palette(JKQTPMathImageMATLAB);
             plt->set_imageColumn(col);
             plt->set_Nx(w);
             plt->set_Ny(h);

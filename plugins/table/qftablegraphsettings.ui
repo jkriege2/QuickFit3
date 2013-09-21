@@ -1562,7 +1562,7 @@
        </widget>
       </item>
       <item row="2" column="1" colspan="5">
-       <widget class="JKQTPMathImageColorPalette" name="cmbColormap">
+       <widget class="JKQTPMathImageColorPaletteComboBox" name="cmbColormap">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -2282,7 +2282,7 @@
    <header>jkqtptools.h</header>
   </customwidget>
   <customwidget>
-   <class>JKQTPMathImageColorPalette</class>
+   <class>JKQTPMathImageColorPaletteComboBox</class>
    <extends>QComboBox</extends>
    <header>jkqtpimageelements.h</header>
   </customwidget>

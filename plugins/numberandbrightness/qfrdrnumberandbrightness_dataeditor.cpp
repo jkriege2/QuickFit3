@@ -34,7 +34,7 @@ QFRDRNumberAndBrightnessDataEditor::~QFRDRNumberAndBrightnessDataEditor()
 void QFRDRNumberAndBrightnessDataEditor::addPlotter(QFPlotter *&plotter, JKQTPMathImage *&plot, JKQTPOverlayImage *&plteSelected, JKQTPOverlayImage *&plteExcluded)
 {
     plotter=new QFPlotter(this);
-    plot=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImage::MATLAB, plotter->get_plotter());
+    plot=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0, JKQTPMathImageMATLAB, plotter->get_plotter());
     plotter->addGraph(plot);
     plteExcluded=new JKQTPOverlayImage(0,0,1,1,NULL, 0, 0, selectionColor, plotter->get_plotter());
     plotter->addGraph(plteExcluded);

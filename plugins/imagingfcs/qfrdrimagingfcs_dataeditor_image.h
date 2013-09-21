@@ -357,7 +357,7 @@ protected:
 
 
         /** \brief combobox for the color bar of overview image */
-        JKQTPMathImageColorPalette* cmbColorbarOverview;
+        JKQTPMathImageColorPaletteComboBox* cmbColorbarOverview;
         QCheckBox* chkAutorangeOverview;
         QFDoubleEdit* edtOvrMin;
         QFDoubleEdit* edtOvrMax;
