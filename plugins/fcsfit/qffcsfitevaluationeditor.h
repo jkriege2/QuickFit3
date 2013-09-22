@@ -119,6 +119,7 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWithW
          */
         virtual void createReportDoc(QTextDocument* document);
 
+        void calibrateFocalVolume_readParam(int run, double &particles, double &tauD, double &particles_error, double &tauD_error, double &wxy, double &wxy_error, double &gamma, double &gamma_error, bool &has_tauD, bool &has_nparticles, bool &has_gamma);
     protected slots:
         /** \brief calibrate the focal volume */
         void calibrateFocalVolume();

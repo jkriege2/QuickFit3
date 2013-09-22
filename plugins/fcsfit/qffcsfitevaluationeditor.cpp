@@ -742,6 +742,63 @@ void QFFCSFitEvaluationEditor::replotData() {
 /////////////////////////////////////////////////////////////////////
 // CALIBRATING FOCAL VOLUME
 /////////////////////////////////////////////////////////////////////
+void QFFCSFitEvaluationEditor::calibrateFocalVolume_readParam(int run,  double& particles, double& tauD, double& particles_error, double& tauD_error, double& wxy, double& wxy_error, double& gamma, double& gamma_error, bool& has_tauD, bool& has_nparticles, bool& has_gamma) {
+     particles=1;
+     tauD=10;
+     particles_error=0;
+     tauD_error=0;
+     wxy=0;
+     wxy_error=0;
+     gamma=6;
+     gamma_error=1;
+     has_tauD=false;
+     has_nparticles=false;
+     has_gamma=false;
+
+
+
+     if (!current) return;
+     if (!cmbModel) return;
+     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
+     QFFitFunction* ffunc=eval->getFitFunction();
+     if (!ffunc || !eval) return;
+
+     //read input parameters
+     for (int i=0; i<ffunc->paramCount(); i++) {
+         QString id=ffunc->getParameterID(i);
+         QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+
+         if (id.toLower()=="n_particle") {
+             particles=eval->getFitValue(eval->getHighlightedRecord(), run, id);
+             particles_error=eval->getFitError(eval->getHighlightedRecord(), run, id);
+             has_nparticles=true;
+         }
+         if ((id.toLower()=="1n_particle") && (!has_nparticles)) {
+             particles=1.0/eval->getFitValue(id);
+             particles_error=fabs(eval->getFitError(eval->getHighlightedRecord(), run, id)/(eval->getFitValue(eval->getHighlightedRecord(), run, id)*eval->getFitValue(eval->getHighlightedRecord(), run, id)));
+             has_nparticles=true;
+         }
+         if ((id.toLower()=="focus_struct_fac") && (!has_gamma)) {
+             gamma=eval->getFitValue(eval->getHighlightedRecord(), run, id);
+             gamma_error=eval->getFitError(eval->getHighlightedRecord(), run, id);
+             has_gamma=true;
+         }
+         if ((id.toLower()=="diff_tau1") || (id.toLower()=="diff_tau")) {
+             double factor=1;
+             if (d.unit=="msec") { factor=1000; }
+             if (d.unit=="ms") { factor=1000; }
+             if (d.unit=="msecs") { factor=1000; }
+             if (d.unit=="milliseconds") { factor=1000; }
+             if (d.unit=="sec") { factor=1000000; }
+             if (d.unit=="s") { factor=1000000; }
+             if (d.unit=="secs") { factor=1000000; }
+             if (d.unit=="seconds") { factor=1000000; }
+             tauD=factor*eval->getFitValue(eval->getHighlightedRecord(), run, id);
+             tauD_error=factor*eval->getFitError(eval->getHighlightedRecord(), run, id);
+             has_tauD=true;
+         }
+     }
+}
 
 void QFFCSFitEvaluationEditor::calibrateFocalVolume() {
     double particles=1;
@@ -755,78 +812,95 @@ void QFFCSFitEvaluationEditor::calibrateFocalVolume() {
     bool has_gamma=false;
 
     if (!current) return;
+    if (!current->getHighlightedRecord()) return;
     if (!cmbModel) return;
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     QFFitFunction* ffunc=eval->getFitFunction();
     if (!ffunc || !eval) return;
 
     //read input parameters
-    for (int i=0; i<ffunc->paramCount(); i++) {
-        QString id=ffunc->getParameterID(i);
-        QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
-        if (id.toLower()=="n_particle") {
-            particles=eval->getFitValue(id);
-            particles_error=eval->getFitError(id);
-            has_nparticles=true;
-        }
-        if ((id.toLower()=="1n_particle") && (!has_nparticles)) {
-            particles=1.0/eval->getFitValue(id);
-            particles_error=fabs(eval->getFitError(id)/(eval->getFitValue(id)*eval->getFitValue(id)));
-            has_nparticles=true;
-        }
-        if ((id.toLower()=="focus_struct_fac") && (!has_gamma)) {
-            gamma=eval->getFitValue(id);
-            gamma_error=eval->getFitError(id);
-            has_gamma=true;
-        }
-        if ((id.toLower()=="diff_tau1") || (id.toLower()=="diff_tau")) {
-            double factor=1;
-            if (d.unit=="msec") { factor=1000; }
-            if (d.unit=="ms") { factor=1000; }
-            if (d.unit=="msecs") { factor=1000; }
-            if (d.unit=="milliseconds") { factor=1000; }
-            if (d.unit=="sec") { factor=1000000; }
-            if (d.unit=="s") { factor=1000000; }
-            if (d.unit=="secs") { factor=1000000; }
-            if (d.unit=="seconds") { factor=1000000; }
-            tauD=factor*eval->getFitValue(id);
-            tauD_error=factor*eval->getFitError(id);
-            has_tauD=true;
-        }
-    }
+    calibrateFocalVolume_readParam(eval->getCurrentIndex(),   particles,  tauD,  particles_error,  tauD_error,  wxy,  wxy_error,  gamma,  gamma_error,  has_tauD,  has_nparticles,  has_gamma);
 
     dlgEstimateFocalVolume* dlg=new dlgEstimateFocalVolume(settings, this);
     dlg->init(particles,  particles_error, has_nparticles, tauD, tauD_error, has_tauD, gamma, gamma_error, has_gamma);
 
-    bool ok= ( dlg->exec() == QDialog::Accepted);
-    wxy=dlg->get_wxy();
-    wxy_error=dlg->get_wxyerror();
 
-    delete dlg;
     //write back output parameters
-    if (ok) {
+    if (dlg->exec() == QDialog::Accepted) {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        for (int i=0; i<ffunc->paramCount(); i++) {
-            QString id=ffunc->getParameterID(i);
-            QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
-            if (id.toLower()=="focus_width") {
 
-                double factor=1;
-                if (d.unit=="micron") { factor=1000; }
-                if (d.unit=="µm") { factor=1000; }
-                if (d.unit=="um") { factor=1000; }
-                if (d.unit=="microns") { factor=1000; }
-                if (d.unit=="m") { factor=1000000; }
-                if (d.unit=="meter") { factor=1000000; }
-                if (d.unit=="meters") { factor=1000000; }
-                eval->setFitValue(id, wxy/factor);
-                eval->setFitError(id, wxy_error/factor);
+        if (dlg->allRuns()) {
+            //qDebug()<<"runs="<<eval->getIndexMin(eval->getHighlightedRecord())<<"..."<<eval->getIndexMax(eval->getHighlightedRecord());
+            eval->getHighlightedRecord()->enableEmitResultsChanged(false);
+            eval->set_doEmitResultsChanged(false);
+            QProgressDialog progress(tr("Calibrating all runs..."), tr("Cancel"), eval->getIndexMin(eval->getHighlightedRecord()), eval->getIndexMax(eval->getHighlightedRecord()), this);
+            progress.setWindowModality(Qt::WindowModal);
+            progress.show();
+            for (int run=eval->getIndexMin(eval->getHighlightedRecord()); run<=eval->getIndexMax(eval->getHighlightedRecord()); run++) {
+                //qDebug()<<"run "<<run<<"  reading";
+                calibrateFocalVolume_readParam(run,   particles,  tauD,  particles_error,  tauD_error,  wxy,  wxy_error,  gamma,  gamma_error,  has_tauD,  has_nparticles,  has_gamma);
+                dlg->get_wxy(particles, particles_error, tauD, tauD_error, gamma, gamma_error, wxy, wxy_error);
+                //qDebug()<<"run "<<run<<"  wxy = ("<<wxy<<"+/-"<<wxy_error<<")";
+
+                double* p=eval->allocFillParameters(eval->getHighlightedRecord(), run, ffunc);
+                double* pe=eval->allocFillParameterErrors(eval->getHighlightedRecord(), run, ffunc);
+                for (int i=0; i<ffunc->paramCount(); i++) {
+                    QString id=ffunc->getParameterID(i);
+                    QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+                    if (id.toLower()=="focus_width") {
+
+                        double factor=1;
+                        if (d.unit=="micron") { factor=1000; }
+                        if (d.unit=="µm") { factor=1000; }
+                        if (d.unit=="um") { factor=1000; }
+                        if (d.unit=="microns") { factor=1000; }
+                        if (d.unit=="m") { factor=1000000; }
+                        if (d.unit=="meter") { factor=1000000; }
+                        if (d.unit=="meters") { factor=1000000; }
+                        //eval->setFitValue(eval->getHighlightedRecord(), run, id, wxy/factor);
+                        //eval->setFitError(eval->getHighlightedRecord(), run, id, wxy_error/factor);
+                        p[i]=wxy/factor;
+                        pe[i]=wxy_error/factor;
+                    }
+                }
+                ffunc->calcParameter(p, pe);
+                eval->setFitResultValuesVisible(eval->getHighlightedRecord(), run, p, pe);
+                free(p);
+                free(pe);
+                progress.setValue(run);
+                QApplication::processEvents();
+                if (progress.wasCanceled()) break;
+            }
+            eval->getHighlightedRecord()->enableEmitResultsChanged(true);
+            eval->set_doEmitResultsChanged(true);
+        } else {
+
+            wxy=dlg->get_wxy();
+            wxy_error=dlg->get_wxyerror();
+            for (int i=0; i<ffunc->paramCount(); i++) {
+                QString id=ffunc->getParameterID(i);
+                QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+                if (id.toLower()=="focus_width") {
+
+                    double factor=1;
+                    if (d.unit=="micron") { factor=1000; }
+                    if (d.unit=="µm") { factor=1000; }
+                    if (d.unit=="um") { factor=1000; }
+                    if (d.unit=="microns") { factor=1000; }
+                    if (d.unit=="m") { factor=1000000; }
+                    if (d.unit=="meter") { factor=1000000; }
+                    if (d.unit=="meters") { factor=1000000; }
+                    eval->setFitValue(id, wxy/factor);
+                    eval->setFitError(id, wxy_error/factor);
+                }
             }
         }
+
         displayModel(true);
         replotData();
         QApplication::restoreOverrideCursor();
     }
+    delete dlg;
 }
 
 

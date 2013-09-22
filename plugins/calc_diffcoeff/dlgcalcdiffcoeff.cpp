@@ -83,7 +83,7 @@ void DlgCalcDiffCoeff::updateD() {
         double cmax=plugin->getComponentCMax(cmb->currentIndex()-1);
         if (unit=="M") {
             spin->setRange(0, cmax*1000.0);
-            spin->setSuffix(QString(" nM"));
+            spin->setSuffix(QString(" mM"));
         } else {
             spin->setSuffix(QString(" %1").arg(unit));
             spin->setRange(0, cmax);
@@ -101,7 +101,7 @@ void DlgCalcDiffCoeff::updateD() {
         double cmax=plugin->getComponentCMax(cmb->currentIndex()-1);
         if (unit=="M") {
             spin->setRange(0, cmax*1000.0);
-            spin->setSuffix(QString(" nM"));
+            spin->setSuffix(QString(" mM"));
         } else {
             spin->setSuffix(QString(" %1").arg(unit));
             spin->setRange(0, cmax);
@@ -119,7 +119,7 @@ void DlgCalcDiffCoeff::updateD() {
         double cmax=plugin->getComponentCMax(cmb->currentIndex()-1);
         if (unit=="M") {
             spin->setRange(0, cmax*1000.0);
-            spin->setSuffix(QString(" nM"));
+            spin->setSuffix(QString(" mM"));
         } else {
             spin->setSuffix(QString(" %1").arg(unit));
             spin->setRange(0, cmax);
@@ -137,7 +137,7 @@ void DlgCalcDiffCoeff::updateD() {
         double cmax=plugin->getComponentCMax(cmb->currentIndex()-1);
         if (unit=="M") {
             spin->setRange(0, cmax*1000.0);
-            spin->setSuffix(QString(" nM"));
+            spin->setSuffix(QString(" mM"));
         } else {
             spin->setSuffix(QString(" %1").arg(unit));
             spin->setRange(0, cmax);
@@ -155,7 +155,7 @@ void DlgCalcDiffCoeff::updateD() {
         double cmax=plugin->getComponentCMax(cmb->currentIndex()-1);
         if (unit=="M") {
             spin->setRange(0, cmax*1000.0);
-            spin->setSuffix(QString(" nM"));
+            spin->setSuffix(QString(" mM"));
         } else {
             spin->setSuffix(QString(" %1").arg(unit));
             spin->setRange(0, cmax);
@@ -465,6 +465,7 @@ void DlgCalcDiffCoeff::readSettings() {
             ui->cmbPlot->setCurrentIndex(set->value(plugin->getID()+"/plot", 0).toInt());
             ui->tabWidget->setCurrentIndex(set->value(plugin->getID()+"/sample", 0).toInt());
             ui->cmbPlot->setCurrentIndex(set->value(plugin->getID()+"/plot", 0).toInt());
+            ui->spinExperimentTemperature->setValue(set->value(plugin->getID()+"/etemperature", 21).toDouble());
             ui->spinSolutionTemperature->setValue(set->value(plugin->getID()+"/temperature", 10).toDouble());
             ui->spinSolutionTemperatureEnd->setValue(set->value(plugin->getID()+"/temperature_end", 40).toDouble());
             ui->spinSolutionTemperatureDelta->setValue(set->value(plugin->getID()+"/temperature_delta", 0.5).toDouble());
@@ -512,6 +513,7 @@ void DlgCalcDiffCoeff::writeSettings() {
             set->setValue(plugin->getID()+"/sample", ui->tabWidget->currentIndex());
             set->setValue(plugin->getID()+"/plot", ui->cmbPlot->currentIndex());
             set->setValue(plugin->getID()+"/temperature", ui->spinSolutionTemperature->value());
+            set->setValue(plugin->getID()+"/etemperature", ui->spinExperimentTemperature->value());
             set->setValue(plugin->getID()+"/temperature_end", ui->spinSolutionTemperatureEnd->value());
             set->setValue(plugin->getID()+"/temperature_delta", ui->spinSolutionTemperatureDelta->value());
             set->setValue(plugin->getID()+"/givenDInSolution/D", ui->spinGivenDInSolution->value());
@@ -633,6 +635,7 @@ void DlgCalcDiffCoeff::on_btnUseD_clicked() {
     plugin->setReportVal("temperature", ui->spinExperimentTemperature->value());
     plugin->setReportVal("diff_coeff", ui->edtExperimentD->value());
     plugin->setReportVal("viscosity", ui->edtExperimentVisc->value());
+    close();
 }
 
 void DlgCalcDiffCoeff::on_btnCHelp1_clicked()

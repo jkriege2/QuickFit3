@@ -28,10 +28,10 @@ QFRDRTableAxisSettingsWidget::QFRDRTableAxisSettingsWidget(QWidget *parent) :
     //ui->tabWidget->setCornerWidget(ui->widSaveCoordSettings);
 
 
-    ui->edtXMin->setCheckBounds(false, true);
-    ui->edtXMax->setCheckBounds(true, false);
-    connect(ui->edtXMin, SIGNAL(valueChanged(double)), ui->edtXMax, SLOT(setMinimum(double)));
-    connect(ui->edtXMax, SIGNAL(valueChanged(double)), ui->edtXMin, SLOT(setMaximum(double)));
+    ui->edtXMin->setCheckBounds(false, false);
+    ui->edtXMax->setCheckBounds(false, false);
+    //connect(ui->edtXMin, SIGNAL(valueChanged(double)), ui->edtXMax, SLOT(setMinimum(double)));
+    //connect(ui->edtXMax, SIGNAL(valueChanged(double)), ui->edtXMin, SLOT(setMaximum(double)));
 
     updating=false;
 

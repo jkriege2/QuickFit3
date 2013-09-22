@@ -49,6 +49,7 @@ void dlgEstimateFocalVolume::init(double particles, double particles_error, bool
     spinCError->setValue(settings->getQSettings()->value("fcsfitevaleditor/estimate_focal_volume.c_error", 0.1).toDouble());
     spinD->setValue(settings->getQSettings()->value("fcsfitevaleditor/estimate_focal_volume.d", 500).toDouble());
     spinDError->setValue(settings->getQSettings()->value("fcsfitevaleditor/estimate_focal_volume.d_error", 1).toDouble());
+    chkAllRuns->setChecked(settings->getQSettings()->value("fcsfitevaleditor/estimate_focal_volume.allruns", false).toBool());
 
     labNParticles->setText(QString("%1 &plusmn; %2").arg(floattohtmlstr(roundWithError(particles, particles_error,2), 6, true, -1).c_str()).arg(floattohtmlstr(roundError(particles_error,2), 6, true, -1).c_str()));
     labGamma->setText(QString("%1 &plusmn; %2").arg(floattohtmlstr(roundWithError(gamma, gamma_error,2), 6, true, -1).c_str()).arg(floattohtmlstr(roundError(gamma_error,2), 6, true, -1).c_str()));
@@ -71,12 +72,86 @@ void dlgEstimateFocalVolume::init(double particles, double particles_error, bool
 
 }
 
+
+
+
+
+void dlgEstimateFocalVolume::calc_from_C() {
+    if (tabWidget->currentIndex()==1) {
+        calc_from_D();
+    } else {
+        double C=spinC->value();
+        double Ce=spinCError->value();
+        double p32=sqrt(M_PI*M_PI*M_PI);
+        double h = 1.0e10/F_AVOGADRO_PRE/p32/C/gamma;
+        double h23=cbrt(sqr(particles*h)); // ^2/3
+        wxy=cbrt(particles*1.0e10/F_AVOGADRO_PRE/p32/C/gamma);
+        wxy_error=sqrt(sqr(particles_error*h/3.0/h23)+sqr(gamma_error*particles*h/gamma/h23/3.0)+sqr(Ce*particles*h/3.0/C/h23));
+        labFocusparamConcentration->setText(QString("(%1 &plusmn; %2) nm").arg(floattohtmlstr(roundWithError(wxy, wxy_error,2), 6, true, -1).c_str()).arg(floattohtmlstr(roundError(wxy_error,2), 6, true, -1).c_str()));
+    }
+}
+
+void dlgEstimateFocalVolume::calc_from_D() {
+    if (tabWidget->currentIndex()==0) {
+        calc_from_C();
+    } else {
+        double D=spinD->value();
+        double De=spinDError->value();
+        wxy=sqrt(4.0*tauD*D*1.0e-6)*1000.0;
+        //wxy_error=sqrt(sqr(spinDError->value()*tauD/sqrt(spinD->value()*tauD)) + sqr(tauD_error*spinD->value()/sqrt(spinD->value()*tauD)));
+        wxy_error=sqrt(tauD*De*De*1.0e-6/D + D*tauD_error*tauD_error*1.0e-6/tauD)*1000.0;
+        labFocusparamDiffusion->setText(QString("(%1 &plusmn; %2) nm").arg(floattohtmlstr(roundWithError(wxy, wxy_error,2), 6, true, -1).c_str()).arg(floattohtmlstr(roundError(wxy_error,2), 6, true, -1).c_str()));
+    }
+}
+
+
+
+
+
+void dlgEstimateFocalVolume::get_wxy(double particles, double particles_error, double tauD, double tauD_error, double gamma, double gamma_error, double& wxy, double& wxy_error)
+{
+    if (tabWidget->currentIndex()==1) {
+        double D=spinD->value();
+        double De=spinDError->value();
+        wxy=sqrt(4.0*tauD*D*1.0e-6)*1000.0;
+        //wxy_error=sqrt(sqr(spinDError->value()*tauD/sqrt(spinD->value()*tauD)) + sqr(tauD_error*spinD->value()/sqrt(spinD->value()*tauD)));
+        wxy_error=sqrt(tauD*De*De*1.0e-6/D + D*tauD_error*tauD_error*1.0e-6/tauD)*1000.0;
+    } else {
+        double C=spinC->value();
+        double Ce=spinCError->value();
+        double p32=sqrt(M_PI*M_PI*M_PI);
+        double h = 1.0e10/F_AVOGADRO_PRE/p32/C/gamma;
+        double h23=cbrt(sqr(particles*h)); // ^2/3
+        wxy=cbrt(particles*1.0e10/F_AVOGADRO_PRE/p32/C/gamma);
+        wxy_error=sqrt(sqr(particles_error*h/3.0/h23)+sqr(gamma_error*particles*h/gamma/h23/3.0)+sqr(Ce*particles*h/3.0/C/h23));
+    }
+
+}
+
+double dlgEstimateFocalVolume::get_wxy(double particles, double particles_error, double tauD, double tauD_error, double gamma, double gamma_error) {
+    double wxy, wxy_error;
+    get_wxy(particles, particles_error, tauD, tauD_error, gamma, gamma_error, wxy, wxy_error);
+    return wxy;
+}
+
+double dlgEstimateFocalVolume::get_wxyerror(double particles, double particles_error, double tauD, double tauD_error, double gamma, double gamma_error) {
+    double wxy, wxy_error;
+    get_wxy(particles, particles_error, tauD, tauD_error, gamma, gamma_error, wxy, wxy_error);
+    return wxy_error;
+}
+
+bool dlgEstimateFocalVolume::allRuns( )const
+{
+    return chkAllRuns->isChecked();
+}
+
 void dlgEstimateFocalVolume::on_buttonBox_accepted() {
     settings->getQSettings()->setValue("fcsfitevaleditor/estimate_focal_volume.c", spinC->value());
     settings->getQSettings()->setValue("fcsfitevaleditor/estimate_focal_volume.c_error", spinCError->value());
     settings->getQSettings()->setValue("fcsfitevaleditor/estimate_focal_volume.d", spinD->value());
     settings->getQSettings()->setValue("fcsfitevaleditor/estimate_focal_volume.d_error", spinDError->value());
     settings->getQSettings()->setValue("fcsfitevaleditor/estimate_focal_volume.last_tab", tabWidget->currentIndex());
+    settings->getQSettings()->setValue("fcsfitevaleditor/estimate_focal_volume.allruns", chkAllRuns->isChecked());
     settings->getQSettings()->sync();
     calc_from_C();
     calc_from_D();
@@ -113,33 +188,7 @@ void dlgEstimateFocalVolume::on_btnDCalculator_clicked() {
 
 }
 
-void dlgEstimateFocalVolume::calc_from_C() {
-    if (tabWidget->currentIndex()==1) {
-        calc_from_D();
-    } else {
-        double C=spinC->value();
-        double Ce=spinCError->value();
-        double p32=sqrt(M_PI*M_PI*M_PI);
-        double h = 1.0e10/F_AVOGADRO_PRE/p32/C/gamma;
-        double h23=cbrt(sqr(particles*h)); // ^2/3
-        wxy=cbrt(particles*1.0e10/F_AVOGADRO_PRE/p32/C/gamma);
-        wxy_error=sqrt(sqr(particles_error*h/3.0/h23)+sqr(gamma_error*particles*h/gamma/h23/3.0)+sqr(Ce*particles*h/3.0/C/h23));
-        labFocusparamConcentration->setText(QString("(%1 &plusmn; %2) nm").arg(floattohtmlstr(roundWithError(wxy, wxy_error,2), 6, true, -1).c_str()).arg(floattohtmlstr(roundError(wxy_error,2), 6, true, -1).c_str()));
-    }
-}
 
-void dlgEstimateFocalVolume::calc_from_D() {
-    if (tabWidget->currentIndex()==0) {
-        calc_from_C();
-    } else {
-        double D=spinD->value();
-        double De=spinDError->value();
-        wxy=sqrt(4.0*tauD*D*1.0e-6)*1000.0;
-        //wxy_error=sqrt(sqr(spinDError->value()*tauD/sqrt(spinD->value()*tauD)) + sqr(tauD_error*spinD->value()/sqrt(spinD->value()*tauD)));
-        wxy_error=sqrt(tauD*De*De*1.0e-6/D + D*tauD_error*tauD_error*1.0e-6/tauD)*1000.0;
-        labFocusparamDiffusion->setText(QString("(%1 &plusmn; %2) nm").arg(floattohtmlstr(roundWithError(wxy, wxy_error,2), 6, true, -1).c_str()).arg(floattohtmlstr(roundError(wxy_error,2), 6, true, -1).c_str()));
-    }
-}
 
 void dlgEstimateFocalVolume::checkToolVal() {
     if (toolDCalcReport) {

@@ -34,6 +34,14 @@ class dlgEstimateFocalVolume : public QDialog, private Ui::dlgEstimateFocalVolum
         double get_wxy() { return wxy; }
         double get_wxyerror() { return wxy_error; }
 
+        void get_wxy(double particles, double particles_error, double tauD, double tauD_error, double gamma, double gamma_error, double &wxy, double &wxy_error);
+        double get_wxy(double particles, double particles_error, double tauD, double tauD_error, double gamma, double gamma_error);
+        double get_wxyerror(double particles, double particles_error, double tauD, double tauD_error, double gamma, double gamma_error);
+
+        bool allRuns() const;
+
+
+
     protected:
         double particles;
         double particles_error;
