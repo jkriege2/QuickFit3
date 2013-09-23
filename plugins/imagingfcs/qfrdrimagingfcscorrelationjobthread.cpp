@@ -1536,7 +1536,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                         uint64_t idx=t*frame_width*frame_height+i;
                         //image_series[idx]=image_series[idx]*firstFrames[i]/(bleachOffset[i]+bleachAmplitude[i]*exp(-1.0*(double)t/bleachTime[i]));
                         if (bleachFitOK[i]!=0) {
-                            image_series[idx]=bleachCorrectExp(image_series[idx], idx, t);
+                            image_series[idx]=bleachCorrectExp(image_series[idx], i, t);
                                               //*firstFrames[i]/(bleachOffset[i]+bleachAmplitude[i]*exp(-1.0*(double)t/bleachTime[i]));
                         }
                     }
@@ -1547,7 +1547,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                             uint64_t idx=t*frame_width*frame_height+i;
                             //image_series[idx]=image_series[idx]*firstFrames[i]/(bleachOffset[i]+bleachAmplitude[i]*exp(-1.0*(double)t/bleachTime[i]));
                             if (bleachFitOK[i]!=0) {
-                                image_series[idx]=bleachCorrectExpPoly2(image_series[idx], idx, t);
+                                image_series[idx]=bleachCorrectExpPoly2(image_series[idx], i, t);
                                                   //*firstFrames[i]/(bleachOffset[i]+bleachAmplitude[i]*exp(-1.0*(double)t/bleachTime[i]));
                             }
                         }
@@ -1558,7 +1558,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                             uint64_t idx=t*frame_width*frame_height+i;
                             //image_series[idx]=image_series[idx]*firstFrames[i]/(bleachOffset[i]+bleachAmplitude[i]*exp(-1.0*(double)t/bleachTime[i]));
                             if (bleachFitOK[i]!=0) {
-                                image_series[idx]=bleachCorrectExpPoly3(image_series[idx], idx, t);
+                                image_series[idx]=bleachCorrectExpPoly3(image_series[idx], i, t);
                                                   //*firstFrames[i]/(bleachOffset[i]+bleachAmplitude[i]*exp(-1.0*(double)t/bleachTime[i]));
                             }
                         }
@@ -1569,7 +1569,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                             uint64_t idx=t*frame_width*frame_height+i;
                             //image_series[idx]=image_series[idx]*firstFrames[i]/(bleachOffset[i]+bleachAmplitude[i]*exp(-1.0*(double)t/bleachTime[i]));
                             if (bleachFitOK[i]!=0) {
-                                image_series[idx]=bleachCorrectDblExp(image_series[idx], idx, t);
+                                image_series[idx]=bleachCorrectDblExp(image_series[idx], i, t);
                                                   //*firstFrames[i]/(bleachOffset[i]+bleachAmplitude[i]*exp(-1.0*(double)t/bleachTime[i]));
                             }
                         }
