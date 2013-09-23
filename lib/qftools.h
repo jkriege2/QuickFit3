@@ -204,6 +204,18 @@ QFLIB_EXPORT QVariant getQVariantFromString(const QString& type, const QString& 
 
 */
 QFLIB_EXPORT QString doubleToQString(double value, int prec = 10, char f = 'g', QChar decimalSeparator='.' );
+/*! \brief convert a number to a QString with a given decimalSeparator, remove trailing 0
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString doubleToQStringNoTrail(double value, int prec = 10, QChar decimalSeparator='.' );
+
+
+/*! \brief convert a number to a QString in exponential form using LaTeX markup
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString doubleToLatexQString(double data, int precision=10, bool remove_trail0=true, double belowIsZero=1e-16, double minNoExponent=1e-3, double maxNoExponent=1e4);
 
 /*! \brief convert an integer to a QString in decimal representation
     \ingroup qf3lib_tools

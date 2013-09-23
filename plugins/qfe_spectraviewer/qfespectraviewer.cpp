@@ -183,7 +183,11 @@ void QFESpectraViewerLoadThread::log_text(const QString &text)
 
 void QFESpectraViewerLoadThread::run()
 {
-    log_text(QFESpectraViewer::intReloadDatabases(manager, sv->getID()));
+    try {
+        log_text(QFESpectraViewer::intReloadDatabases(manager, sv->getID()));
+    } catch(std::exception& E) {
+        log_text(tr("error loading spectra viewer database: %1\n").arg(E.what()));
+    }
 }
 
 

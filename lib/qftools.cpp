@@ -290,6 +290,17 @@ QString doubleToQString(double value, int prec, char f, QChar decimalSeparator) 
     return res;
 }
 
+QString doubleToQStringNoTrail(double value, int prec, QChar decimalSeparator ) {
+    QString res=doubleToQString(value, prec, 'f', decimalSeparator).trimmed();
+    int i=res.size()-1;
+    while (i>=0 && res[i]=='0') {
+        i--;
+    }
+    res=res.left(i);
+    if (res.right(1)==QString(decimalSeparator)) res=res.left(res.size()-1);
+    return res;
+}
+
 QString doubleVecToQString(const QVector<double>& value, int prec, char f, QChar decimalSeparator, const QString itemSeparator) {
     QLocale loc=QLocale::c();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
@@ -942,4 +953,25 @@ QString intToHexQString(int64_t value)
 QString intToOctQString(int64_t value)
 {
     return QString::number(value, 8);
+}
+
+
+QString doubleToLatexQString(double data, int precision, bool remove_trail0, double belowIsZero, double minNoExponent, double maxNoExponent){
+  if ((belowIsZero>0) && (fabs(data)<belowIsZero)) return "\\rm{0}";
+  if (data==0) return "\\rm{0}";
+  double adata=fabs(data);
+  QString res;
+  if (remove_trail0) res=doubleToQStringNoTrail(data, precision);
+  else res=doubleToQString(data, precision, 'f');
+
+  long exp=(long)floor(log(adata)/log(10.0));
+  if ((minNoExponent<=fabs(data)) && (fabs(data)<=maxNoExponent)) return res;
+
+  QString v;
+  if (remove_trail0) v=doubleToQStringNoTrail(data/pow(10.0, (double)exp), precision);
+  else v=doubleToQString(data/pow(10.0, (double)exp), precision, 'f');
+
+  if (v!="1" && v!="10")  return v+QString("{\\times}10^{")+intToQString(exp)+"}";
+  if (v=="10") exp=exp+1;
+  return QString("10^{")+intToQString(exp)+"}";
 }

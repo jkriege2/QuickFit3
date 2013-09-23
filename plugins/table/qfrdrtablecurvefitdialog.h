@@ -34,10 +34,11 @@ class QFRDRTableCurveFitDialog : public QDialog
         Ui::QFRDRTableCurveFitDialog *ui;
         QFRDRTable* table;
         QVector<double> dataY, dataX, dataW, weights, residualsY, residualsYW;
-        QList<QVariant> lastResults;
+        QList<QVariant> lastResults, lastResultsErrors;
         QVector<double> lastResultD;
         QString resultComment;
         QString resultStat;
+        QString resultPars;
         int datapoints;
         QString fitresult;
         int colX,  colY,  colW;

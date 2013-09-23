@@ -188,11 +188,23 @@ void QFRDRTableRegressionDialog::saveResults()
         if (saveCol==1) {
             savedTo=table->tableGetColumnCount();
             table->tableSetColumnData(savedTo, lastResults);
-
+            table->tableSetColumnTitle(savedTo, tr("regression results, %1").arg(ui->cmbFitType->currentText()));
+            table->tableSetColumnData(savedTo+1, lastResultErrors);
+            table->tableSetColumnTitle(savedTo+1, tr("regression errors, %1").arg(ui->cmbFitType->currentText()));
+            for (int i=0; i<lastResults.size(); i++) {
+                table->tableSetComment(i, savedTo, parameterNames.value(i, "")+"/"+parameterLabels.value(i, ""));
+                table->tableSetComment(i, savedTo+1, parameterNames.value(i, "")+"/"+parameterLabels.value(i, ""));
+            }
         } else if (saveCol>=2){
             savedTo=saveCol-2;
             table->tableSetColumnData(savedTo, lastResults);
-        }
+            table->tableSetColumnTitle(savedTo, tr("regression results, %1").arg(ui->cmbFitType->currentText()));
+            table->tableSetColumnData(savedTo+1, lastResultErrors);
+            table->tableSetColumnTitle(savedTo+1, tr("regression errors, %1").arg(ui->cmbFitType->currentText()));
+            for (int i=0; i<lastResults.size(); i++) {
+                table->tableSetComment(i, savedTo, parameterNames.value(i, "")+"/"+parameterLabels.value(i, ""));
+                table->tableSetComment(i, savedTo+1, parameterNames.value(i, "")+"/"+parameterLabels.value(i, ""));
+            }        }
         if (saveGraph==1) {
             table->colgraphAddGraph(tr("regression results"), ui->pltDistribution->getXAxis()->get_axisLabel(), ui->pltDistribution->getYAxis()->get_axisLabel(), ui->pltDistribution->getXAxis()->get_logAxis(), ui->pltDistribution->getYAxis()->get_logAxis());
             int g=table->colgraphGetGraphCount()-1;
@@ -210,7 +222,7 @@ void QFRDRTableRegressionDialog::saveResults()
                     table->colgraphAddFunctionPlot(g, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, lastResultD);
                 }
             }
-            table->colgraphSetPlotTitle(g, table->colgraphGetPlotCount(g)-1, resultComment+", "+resultStat);
+            table->colgraphSetPlotTitle(g, table->colgraphGetPlotCount(g)-1,fitresult+", "+resultStat);
         } else if (saveGraph>=2){
             if (method>=0 && method<=2) {
                 if (savedTo>=0) {
@@ -225,7 +237,7 @@ void QFRDRTableRegressionDialog::saveResults()
                     table->colgraphAddFunctionPlot(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, lastResultD);
                 }
             }
-            table->colgraphSetPlotTitle(saveGraph-2, table->colgraphGetPlotCount(saveGraph-2)-1, resultComment+", "+resultStat);
+            table->colgraphSetPlotTitle(saveGraph-2, table->colgraphGetPlotCount(saveGraph-2)-1, fitresult+", "+resultStat);
         }
     }
     accept();
@@ -280,7 +292,7 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
     double* dw=datW.data();
     double* dww=datWW.data();
     int items=datX.size();
-    qDebug()<<"items="<<items;
+    //qDebug()<<"items="<<items;
 
     QVector<double> funeval, residuals, residuals_weighted;
 
@@ -291,20 +303,24 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
         error=tr("unknown regression method!");
         lastResults.clear();
         lastResultD.clear();
+        lastResultErrors.clear();
         resultComment="";
+        resultParams="";
         if (method==0) {
             statisticsLinearRegression(dx, dy, items, a, b, afix, bfix);
             fitresult=tr("regression: f(x)= %1 + %2 \\cdot x").arg(floattolatexstr(a).c_str()).arg(floattolatexstr(b).c_str());
             lastResults<<a<<b;
             lastResultD<<a<<b;
-            resultComment=tr("regression result");
+            lastResultErrors<<0<<0;
+            resultComment=tr("regression ");
             ok=true;
         } else if (method==1 && dataW.size()==datapoints) {
             statisticsLinearWeightedRegression(dx, dy, dww, items, a, b, afix, bfix);
             fitresult=tr("weighted regression: f(x)= %1 + %2 \\cdot x").arg(floattolatexstr(a).c_str()).arg(floattolatexstr(b).c_str());
             lastResults<<a<<b;
             lastResultD<<a<<b;
-            resultComment=tr("weighted regression result");
+            lastResultErrors<<0<<0;
+            resultComment=tr("weighted regression ");
             ok=true;
         } else if (method==2) {
             int iterations=getParamValue("iterations", 100);
@@ -313,7 +329,9 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
             fitresult=tr("robust regression: f(x)= %1 + %2 \\cdot x").arg(floattolatexstr(a).c_str()).arg(floattolatexstr(b).c_str());
             lastResults<<a<<b;
             lastResultD<<a<<b;
-            resultComment=tr("robust regression result");
+            lastResultErrors<<0<<0;
+
+            resultComment=tr("robust regression ");
             ok=true;
         } else  if (method==3) {
             double ia=log(a);
@@ -324,7 +342,9 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
             fitresult=tr("regression: f(x)= %1 \\cdot x^{%2}").arg(floattolatexstr(a).c_str()).arg(floattolatexstr(b).c_str());
             lastResults<<a<<b;
             lastResultD<<a<<b;
-            resultComment=tr("regression result");
+            lastResultErrors<<0<<0;
+
+            resultComment=tr("regression ");
             ok=true;
         } else if (method==4) {
             int iterations=getParamValue("iterations", 100);
@@ -337,7 +357,9 @@ void QFRDRTableRegressionDialog::on_btnFit_clicked()
             fitresult=tr("regression: f(x)= %1 \\cdot x^{%2}").arg(floattolatexstr(a).c_str()).arg(floattolatexstr(b).c_str());
             lastResults<<a<<b;
             lastResultD<<a<<b;
-            resultComment=tr("robust regression result");
+            lastResultErrors<<0<<0;
+
+            resultComment=tr("robust regression ");
             ok=true;
 
         } else {

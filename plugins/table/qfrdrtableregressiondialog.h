@@ -32,9 +32,9 @@ class QFRDRTableRegressionDialog : public QDialog
         Ui::QFRDRTableRegressionDialog *ui;
         QFRDRTable* table;
         QVector<double> dataY, dataX, dataW, weights, residualsY, residualsYW;
-        QList<QVariant> lastResults;
+        QList<QVariant> lastResults, lastResultErrors;
         QVector<double> lastResultD;
-        QString resultComment;
+        QString resultComment, resultParams;
         QString resultStat;
         int datapoints;
         QString fitresult;

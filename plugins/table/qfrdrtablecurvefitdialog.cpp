@@ -171,15 +171,23 @@ void QFRDRTableCurveFitDialog::saveResults()
         if (saveCol==1) {
             savedTo=table->tableGetColumnCount();
             table->tableSetColumnData(savedTo, lastResults);
+            table->tableSetColumnTitle(savedTo, tr("fit results, %1").arg(model->id()));
+            table->tableSetColumnData(savedTo+1, lastResultsErrors);
+            table->tableSetColumnTitle(savedTo+1, tr("fit errors, %1").arg(model->id()));
             for (int i=0; i<lastResults.size(); i++) {
                 table->tableSetComment(i, savedTo, parameterNames.value(i, "")+"/"+parameterLabels.value(i, ""));
+                table->tableSetComment(i, savedTo+1, parameterNames.value(i, "")+"/"+parameterLabels.value(i, ""));
             }
 
         } else if (saveCol>=2){
             savedTo=saveCol-2;
             table->tableSetColumnData(savedTo, lastResults);
+            table->tableSetColumnTitle(savedTo, tr("fit results, %1").arg(model->id()));
+            table->tableSetColumnData(savedTo+1, lastResultsErrors);
+            table->tableSetColumnTitle(savedTo+1, tr("fit errors, %1").arg(model->id()));
             for (int i=0; i<lastResults.size(); i++) {
                 table->tableSetComment(i, savedTo, parameterNames.value(i, "")+"/"+parameterLabels.value(i, ""));
+                table->tableSetComment(i, savedTo+1, parameterNames.value(i, "")+"/"+parameterLabels.value(i, ""));
             }
         }
         if (saveGraph==1) {
@@ -191,14 +199,14 @@ void QFRDRTableCurveFitDialog::saveResults()
             } else {
                 table->colgraphAddFunctionPlot(g, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, lastResultD);
             }
-            table->colgraphSetPlotTitle(g, table->colgraphGetPlotCount(g)-1, resultComment+", "+resultStat);
+            table->colgraphSetPlotTitle(g, table->colgraphGetPlotCount(g)-1, resultComment+", "+resultPars+", "+resultStat);
         } else if (saveGraph>=2){
             if (savedTo>=0) {
                 table->colgraphAddFunctionPlot(saveGraph-2, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, savedTo);
             } else {
                 table->colgraphAddFunctionPlot(saveGraph-2, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, lastResultD);
             }
-            table->colgraphSetPlotTitle(saveGraph-2, table->colgraphGetPlotCount(saveGraph-2)-1, resultComment+", "+resultStat);
+            table->colgraphSetPlotTitle(saveGraph-2, table->colgraphGetPlotCount(saveGraph-2)-1, resultComment+", "+resultPars+", "+resultStat);
         }
         delete model;
     }
@@ -336,17 +344,30 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
 
 
         lastResults.clear();
+        lastResultsErrors.clear();
+        parameterNames.clear();
+        parameterLabels.clear();
+
         lastResultD.clear();
         resultComment="";
+        resultPars="";
         if (ok && res.fitOK) {
             for (int i=0; i<ids.size(); i++) {
                 paramMap[ids[i]].value=fitParamsOut[i];
                 paramMap[ids[i]].error=fitParamsErrOut[i];
                 paramMap[ids[i]].fix=fitFix[i];
                 lastResults<<fitParamsOut[i];
+                lastResultsErrors<<fitParamsErrOut[i];
                 lastResultD<<fitParamsOut[i];
+                if (model->isParameterVisible(i, fitParamsOut.data())) {
+                    if (!resultPars.isEmpty()) resultPars+=tr(", ");
+                    resultPars+=QString("%1=(%2{\\pm}%3)").arg(ids[i]).arg(doubleToLatexQString(roundWithError(fitParamsOut[i], fitParamsErrOut[i]))).arg(doubleToLatexQString(roundError(fitParamsErrOut[i])));
+                }
+                parameterNames<<ids[i];
+                parameterLabels<<model->getDescription(i).name;
+
             }
-            resultComment=tr("fit result for: %1").arg(model->shortName());
+            resultComment=tr("fit: %1").arg(model->shortName());
             ok=true;
         } else {
             error=tr("Fit failed.\n  Reason: %1.").arg(res.messageSimple);
@@ -439,6 +460,10 @@ void QFRDRTableCurveFitDialog::on_btnGuess_clicked()
 
 
         lastResults.clear();
+        lastResultsErrors.clear();
+        parameterNames.clear();
+        parameterLabels.clear();
+
         lastResultD.clear();
         resultComment="";
 
@@ -464,16 +489,23 @@ void QFRDRTableCurveFitDialog::on_btnGuess_clicked()
                     paramMap[ids[i]].error=0;
                     paramMap[ids[i]].fix=fitFix[i];
                     lastResults<<fitParams[i];
+                    lastResultsErrors<<0;
                     lastResultD<<fitParams[i];
+                    parameterNames<<ids[i];
+                    parameterLabels<<model->getDescription(i).name;
                 } else {
                     paramMap[ids[i]].value=fitParamsInit[i];
                     paramMap[ids[i]].error=0;
                     paramMap[ids[i]].fix=fitFix[i];
                     lastResults<<fitParamsInit[i];
+                    lastResultsErrors<<0;
                     lastResultD<<fitParamsInit[i];
+                    parameterNames<<ids[i];
+                    parameterLabels<<model->getDescription(i).name;
                 }
+                resultPars+=QString("%1=%2").arg(ids[i]).arg(doubleToLatexQString(fitParamsInit[i]));
             }
-            resultComment=tr("guess result for: %1").arg(model->shortName());
+            resultComment=tr("guess: %1").arg(model->shortName());
             ok=true;
         } else {
             error=tr("Guess failed.");
