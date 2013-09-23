@@ -84,6 +84,19 @@ QStringList QFManyFilesSettings::childGroups() const
     return sl;
 }
 
+QStringList QFManyFilesSettings::allKeys() const
+{
+    QStringList sl;
+    for (int i=settings.size()-1; i>=0; i--) {
+        if (settings[i]) {
+            sl<<settings[i]->allKeys();
+        }
+    }
+    sl.removeDuplicates();
+    return sl;
+
+}
+
 void QFManyFilesSettings::beginGroup(const QString &prefix)
 {
     for (int i=settings.size()-1; i>=0; i--) {

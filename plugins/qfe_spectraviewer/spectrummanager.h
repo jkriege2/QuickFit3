@@ -1,6 +1,7 @@
 #ifndef SPECTRUMMANAGER_H
 #define SPECTRUMMANAGER_H
 
+#include "qfmanyfilessettings.h"
 #include <cmath>
 #include <iostream>
 #include <string>
@@ -129,6 +130,8 @@ class SpectrumManager {
             /** \brief conditions of measurements for the above given properties */
             QString condition;
             QString orderNo;
+
+            QMap<QString, QVariant> moreData;
         };
 
         /** \brief specifies the properties of a lightsource */
@@ -145,6 +148,8 @@ class SpectrumManager {
             QString reference;
             /** \brief typical emission wavelength [nm] */
             double typical_wavelength;
+
+            QMap<QString, QVariant> moreData;
         };
 
         /** \brief specifies the properties of a filter */
@@ -161,6 +166,8 @@ class SpectrumManager {
             QString reference;
             /** \brief typical emission wavelength [nm] */
             double typical_wavelength;
+
+            QMap<QString, QVariant> moreData;
 
         };
 
@@ -182,6 +189,8 @@ class SpectrumManager {
             double peak_sensitivity;
             /** \brief peak detection sensitivity unit */
             QString peak_sensitivity_unit;
+
+            QMap<QString, QVariant> moreData;
 
         };
 
@@ -277,6 +286,8 @@ class SpectrumManager {
          LightSourceData getLightSourceData(const QString& name)  ;
          FilterData getFilterData(const QString& name)  ;
          DetectorData getDetectorData(const QString& name)  ;
+
+         static void loadMoreData(QMap<QString, QVariant>& store, QFManyFilesSettings& settings, const QString& prefix, const QStringList& readprops);
 
 };
 #endif // SPECTRUMMANAGER_H

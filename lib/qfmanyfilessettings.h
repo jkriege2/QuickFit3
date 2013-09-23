@@ -43,6 +43,7 @@ class QFLIB_EXPORT QFManyFilesSettings: public QObject {
         bool setValue(const QString& key, const QVariant& value, int* level=NULL);
 
         QStringList childGroups() const;
+        QStringList allKeys() const;
         void beginGroup(const QString& prefix);
         void endGroup();
 

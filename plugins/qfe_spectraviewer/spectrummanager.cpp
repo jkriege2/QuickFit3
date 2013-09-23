@@ -163,22 +163,25 @@ void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStr
             gn+="/";
             FluorophoreData d=fluorophores.value(gns, FluorophoreData());
 
-            d.folder=set.value(gn+"folder", "").toString();
-            d.name=set.value(gn+"name", groups[i]).toString();
-            d.description=set.value(gn+"description", "").toString();
-            d.manufacturer=set.value(gn+"manufacturer", "").toString();
-            d.reference=set.value(gn+"reference", "").toString();
-            d.condition=set.value(gn+"condition", "").toString();
-            d.orderNo=set.value(gn+"oder_no", "").toString();
-            d.fluorescence_efficiency=set.value(gn+"q_fluor", NAN).toDouble();
-            d.fluorescence_lifetime=set.value(gn+"tau_fluor", NAN).toDouble();
-            d.extiction_coefficient=set.value(gn+"molar_extinction",0).toDouble();
-            d.excitation_maxwavelength=set.value(gn+"excitation_max", NAN).toDouble();
-            d.emission_maxwavelength=set.value(gn+"emission_max", NAN).toDouble();
+            QStringList read;
+
+            d.folder=set.value(gn+"folder", "").toString(); read<<"folder";
+            d.name=set.value(gn+"name", groups[i]).toString(); read<<"name";
+            d.description=set.value(gn+"description", "").toString(); read<<"description";
+            d.manufacturer=set.value(gn+"manufacturer", "").toString(); read<<"manufacturer";
+            d.reference=set.value(gn+"reference", "").toString(); read<<"reference";
+            d.condition=set.value(gn+"condition", "").toString(); read<<"condition";
+            d.orderNo=set.value(gn+"oder_no", "").toString(); read<<"oder_no";
+            d.fluorescence_efficiency=set.value(gn+"q_fluor", NAN).toDouble(); read<<"q_fluor";
+            d.fluorescence_lifetime=set.value(gn+"tau_fluor", NAN).toDouble(); read<<"tau_fluor";
+            d.extiction_coefficient=set.value(gn+"molar_extinction",0).toDouble(); read<<"molar_extinction";
+            d.excitation_maxwavelength=set.value(gn+"excitation_max", NAN).toDouble(); read<<"excitation_max";
+            d.emission_maxwavelength=set.value(gn+"emission_max", NAN).toDouble(); read<<"emission_max";
             QString fn;
             int fnID=0;
             bool fnSepWL;
             int level=-1;
+            read<<"spectrum_abs"<<"spectrum_abs_id"<<"spectrum_abs_separatewavelengths"<<"spectrum_abs_reference";
             fn=set.value(gn+"spectrum_abs", "", &level).toString();
             if (fn.size()>0 && level>=0) fn=QFileInfo(set.getSettings(level)->fileName()).absoluteDir().absoluteFilePath(fn);
             fnID=set.value(gn+"spectrum_abs_id", 0).toInt();
@@ -192,6 +195,7 @@ void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStr
             }
 
             level=-1;
+            read<<"spectrum_fl"<<"spectrum_fl_id"<<"spectrum_fl_separatewavelengths"<<"spectrum_fl_reference";
             fn=set.value(gn+"spectrum_fl", "", &level).toString();
             if (fn.size()>0 && level>=0) fn=QFileInfo(set.getSettings(level)->fileName()).absoluteDir().absoluteFilePath(fn);
             fnID=set.value(gn+"spectrum_fl_id", 1).toInt();
@@ -203,8 +207,9 @@ void SpectrumManager::loadFluorophoreDatabase(const QString &ininame, const QStr
                 spectra[d.spectrum_fl]->ensureSpectrum();
                 d.emission_maxwavelength=spectra[d.spectrum_fl]->getSpectrumMaxWavelength();
             }
-            d.fluorescence_efficiency_wavelength=set.value(gn+"q_fluor_wavelength", d.emission_maxwavelength).toDouble();
-            d.extiction_coefficient_wavelength=set.value(gn+"molar_extinction_wavelength", d.excitation_maxwavelength).toDouble();
+            d.fluorescence_efficiency_wavelength=set.value(gn+"q_fluor_wavelength", d.emission_maxwavelength).toDouble(); read<<"q_fluor_wavelength";
+            d.extiction_coefficient_wavelength=set.value(gn+"molar_extinction_wavelength", d.excitation_maxwavelength).toDouble(); read<<"molar_extinction_wavelength";
+            loadMoreData(d.moreData, set, gn, read);
             fluorophores[gns]=d;
 
             if (d.folder.isEmpty()) {
@@ -235,19 +240,21 @@ void SpectrumManager::loadFilterDatabase(const QString &ininame, const QStringLi
         QString gns=gn;
         if (!gn.isEmpty() && gn.size()>0) {
             gn+="/";
+            QStringList read;
             FilterData d=filters.value(gns, FilterData());
 
-            d.folder=set.value(gn+"folder", "").toString();
-            d.name=set.value(gn+"name", groups[i]).toString();
-            d.description=set.value(gn+"description", "").toString();
-            d.manufacturer=set.value(gn+"manufacturer", "").toString();
-            d.reference=set.value(gn+"reference", "").toString();
-            d.orderNo=set.value(gn+"oder_no", "").toString();
-            d.typical_wavelength=set.value(gn+"typical_wavelength", NAN).toDouble();
+            d.folder=set.value(gn+"folder", "").toString(); read<<"folder";
+            d.name=set.value(gn+"name", groups[i]).toString(); read<<"name";
+            d.description=set.value(gn+"description", "").toString(); read<<"description";
+            d.manufacturer=set.value(gn+"manufacturer", "").toString(); read<<"manufacturer";
+            d.reference=set.value(gn+"reference", "").toString(); read<<"reference";
+            d.orderNo=set.value(gn+"oder_no", "").toString(); read<<"oder_no";
+            d.typical_wavelength=set.value(gn+"typical_wavelength", NAN).toDouble(); read<<"typical_wavelength";
             QString fn;
             int fnID=0;
             bool fnSepWL;
             int level=-1;
+            read<<"spectrum"<<"spectrum_id"<<"spectrum_separatewavelengths"<<"spectrum_reference";
             fn=set.value(gn+"spectrum", "", &level).toString();
             if (fn.size()>0 && level>=0) fn=QFileInfo(set.getSettings(level)->fileName()).absoluteDir().absoluteFilePath(fn);
             fnID=set.value(gn+"spectrum_id", 0).toInt();
@@ -260,6 +267,7 @@ void SpectrumManager::loadFilterDatabase(const QString &ininame, const QStringLi
                 d.typical_wavelength=spectra[d.spectrum]->getSpectrumMaxWavelength();
             }
 
+            loadMoreData(d.moreData, set, gn, read);
             filters[gns]=d;
             if (d.folder.isEmpty()) {
                 filtersTree->addFolderedItem(d.name, gns);
@@ -287,19 +295,21 @@ void SpectrumManager::loadLightSourceDatabase(const QString &ininame, const QStr
         QString gns=gn;
         if (!gn.isEmpty() && gn.size()>0) {
             gn+="/";
+            QStringList read;
             LightSourceData d=lightsources.value(gns, LightSourceData());
 
-            d.folder=set.value(gn+"folder", "").toString();
-            d.name=set.value(gn+"name", groups[i]).toString();
-            d.description=set.value(gn+"description", "").toString();
-            d.manufacturer=set.value(gn+"manufacturer", "").toString();
-            d.reference=set.value(gn+"reference", "").toString();
-            d.orderNo=set.value(gn+"oder_no", "").toString();
-            d.typical_wavelength=set.value(gn+"typical_wavelength", NAN).toDouble();
+            d.folder=set.value(gn+"folder", "").toString(); read<<"folder";
+            d.name=set.value(gn+"name", groups[i]).toString(); read<<"name";
+            d.description=set.value(gn+"description", "").toString(); read<<"description";
+            d.manufacturer=set.value(gn+"manufacturer", "").toString(); read<<"manufacturer";
+            d.reference=set.value(gn+"reference", "").toString(); read<<"reference";
+            d.orderNo=set.value(gn+"oder_no", "").toString(); read<<"oder_no";
+            d.typical_wavelength=set.value(gn+"typical_wavelength", NAN).toDouble(); read<<"typical_wavelength";
             QString fn;
             int fnID=0;
             bool fnSepWL;
             int level=-1;
+            read<<"spectrum"<<"spectrum_id"<<"spectrum_separatewavelengths"<<"spectrum_reference";
             fn=set.value(gn+"spectrum", "", &level).toString();
             if (fn.size()>0 && level>=0) fn=QFileInfo(set.getSettings(level)->fileName()).absoluteDir().absoluteFilePath(fn);
             fnID=set.value(gn+"spectrum_id", 0).toInt();
@@ -311,6 +321,8 @@ void SpectrumManager::loadLightSourceDatabase(const QString &ininame, const QStr
                 spectra[d.spectrum]->ensureSpectrum();
                 d.typical_wavelength=spectra[d.spectrum]->getSpectrumMaxWavelength();
             }
+
+            loadMoreData(d.moreData, set, gn, read);
 
             lightsources[gns]=d;
 
@@ -342,20 +354,22 @@ void SpectrumManager::loadDetectorDatabase(const QString &ininame, const QString
         if (!gn.isEmpty() && gn.size()>0) {
             gn+="/";
             DetectorData d=detectors.value(gns, DetectorData());
+            QStringList read;
 
-            d.folder=set.value(gn+"folder", "").toString();
-            d.name=set.value(gn+"name", groups[i]).toString();
-            d.description=set.value(gn+"description", "").toString();
-            d.manufacturer=set.value(gn+"manufacturer", "").toString();
-            d.reference=set.value(gn+"reference", "").toString();
-            d.orderNo=set.value(gn+"oder_no", "").toString();
-            d.peak_wavelength=set.value(gn+"peak_wavelength", NAN).toDouble();
-            d.peak_sensitivity=set.value(gn+"peak_sensitivity", NAN).toDouble();
-            d.peak_sensitivity_unit=set.value(gn+"peak_sensitivity_unit", "").toString();
+            d.folder=set.value(gn+"folder", "").toString(); read<<"folder";
+            d.name=set.value(gn+"name", groups[i]).toString(); read<<"name";
+            d.description=set.value(gn+"description", "").toString(); read<<"description";
+            d.manufacturer=set.value(gn+"manufacturer", "").toString(); read<<"manufacturer";
+            d.reference=set.value(gn+"reference", "").toString(); read<<"reference";
+            d.orderNo=set.value(gn+"oder_no", "").toString(); read<<"oder_no";
+            d.peak_wavelength=set.value(gn+"peak_wavelength", NAN).toDouble(); read<<"peak_wavelength";
+            d.peak_sensitivity=set.value(gn+"peak_sensitivity", NAN).toDouble(); read<<"peak_sensitivity";
+            d.peak_sensitivity_unit=set.value(gn+"peak_sensitivity_unit", "").toString(); read<<"peak_sensitivity_unit";
             QString fn;
             int fnID=0;
             bool fnSepWL;
             int level=-1;
+            read<<"spectrum"<<"spectrum_id"<<"spectrum_separatewavelengths"<<"spectrum_reference";
             fn=set.value(gn+"spectrum", "", &level).toString();
             if (fn.size()>0 && level>=0) fn=QFileInfo(set.getSettings(level)->fileName()).absoluteDir().absoluteFilePath(fn);
             fnID=set.value(gn+"spectrum_id", 0).toInt();
@@ -367,7 +381,7 @@ void SpectrumManager::loadDetectorDatabase(const QString &ininame, const QString
                 spectra[d.spectrum]->ensureSpectrum();
                 d.peak_wavelength=spectra[d.spectrum]->getSpectrumMaxWavelength();
             }
-
+            loadMoreData(d.moreData, set, gn, read);
             detectors[gns]=d;
 
             if (d.folder.isEmpty()) {
@@ -749,6 +763,19 @@ SpectrumManager::FilterData SpectrumManager::getFilterData(const QString &name)
 SpectrumManager::DetectorData SpectrumManager::getDetectorData(const QString &name)
 {
     return detectors[name];
+}
+
+void SpectrumManager::loadMoreData(QMap<QString, QVariant> &store, QFManyFilesSettings &settings, const QString &prefix, const QStringList &readprops)
+{
+    settings.beginGroup(prefix);
+    QStringList keys=settings.allKeys();
+    QSet<QString> ks=readprops.toSet();
+    for (int i=0; i<keys.size(); i++) {
+        if (!ks.contains(keys[i])) {
+            store[keys[i]]=settings.value(keys[i]);
+        }
+    }
+    settings.endGroup();
 }
 
 

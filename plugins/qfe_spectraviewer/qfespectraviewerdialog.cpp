@@ -578,6 +578,7 @@ void QFESpectraViewerDialog::updateItemPropertiesModel()
                 modItemProperties.setCellCreate(row,0, tr("abs. crosssection [cm²]"));
                 modItemProperties.setCellCreate(row,1, tr("%1 @ %2nm").arg(fl.extiction_coefficient*3.82e-21).arg(fl.extiction_coefficient_wavelength));
                 row++;
+                loadMoredata(fl.moreData, row);
             }
         } else  if (plotItems[currentIndex].type==qfesLightSourceSpectrum)  {
              if (manager->lightsourceExists(plotItems[currentIndex].name)) {
@@ -601,6 +602,7 @@ void QFESpectraViewerDialog::updateItemPropertiesModel()
                  modItemProperties.setCellCreate(row,0, tr("typical wavelength [nm]"));
                  modItemProperties.setCellCreate(row,1, ls.typical_wavelength);
                  row++;
+                 loadMoredata(ls.moreData, row);
              }
         } else  if (plotItems[currentIndex].type==qfesDetector)  {
              if (manager->lightsourceExists(plotItems[currentIndex].name)) {
@@ -627,6 +629,7 @@ void QFESpectraViewerDialog::updateItemPropertiesModel()
                  modItemProperties.setCellCreate(row,0, tr("peak sensitivity [%1/W]").arg(ls.peak_sensitivity_unit));
                  modItemProperties.setCellCreate(row,1, ls.peak_sensitivity);
                  row++;
+                 loadMoredata(ls.moreData, row);
              }
         } else  if (plotItems[currentIndex].type==qfesFilterSpectrum)  {
              if (manager->filterExists(plotItems[currentIndex].name)) {
@@ -650,6 +653,7 @@ void QFESpectraViewerDialog::updateItemPropertiesModel()
                  modItemProperties.setCellCreate(row,0, tr("typical wavelength [nm]"));
                  modItemProperties.setCellCreate(row,1, ls.typical_wavelength);
                  row++;
+                 loadMoredata(ls.moreData, row);
              }
         }
     }
@@ -1389,6 +1393,19 @@ void QFESpectraViewerDialog::on_spinLaserLinewidth_valueChanged(double value)
     QPointF pnt=QPointF(ui->spinLaserCentral->value(), ui->spinLaserLinewidth->value());
     //ui->cmbLaserLine->setCurrentFromModelData(pnt);
     //ui->cmbLaserLine->setCurrentIndex(findLaserLineIndex(ui->spinLaserCentral->value(), ui->spinLaserLinewidth->value()));
+}
+
+int QFESpectraViewerDialog::loadMoredata(const QMap<QString, QVariant> &data, int row0)
+{
+    int row=row0;
+    QMapIterator<QString, QVariant> it(data);
+    while (it.hasNext()) {
+        it.next();
+        modItemProperties.setCellCreate(row,0, it.key());
+        modItemProperties.setCellCreate(row,1, it.value());
+        row++;
+    }
+    return row;
 }
 
 int QFESpectraViewerDialog::findLaserLineIndex(double line, double width) {

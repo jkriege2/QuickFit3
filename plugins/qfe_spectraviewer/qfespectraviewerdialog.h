@@ -87,6 +87,8 @@ class QFESpectraViewerDialog : public QDialog
 
         QFTableModel modItemProperties;
 
+        int loadMoredata(const QMap<QString, QVariant>& data, int row0);
+
         int currentIndex;
 
         QList<QFESpectraViewerPlotItem> plotItems;

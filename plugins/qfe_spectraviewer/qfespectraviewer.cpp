@@ -62,6 +62,10 @@ void QFESpectraViewer::reloadDatabases()
 QString QFESpectraViewer::intReloadDatabases(SpectrumManager *manager, const QString& id)
 {
     QString result="";
+    if (!manager) {
+        result+=tr("   INTERNAL ERROR: no fluorophore manager available\n");
+        return result;
+    }
     result+=(tr("   loading databases from:\n"));
     QStringList directories;
     QList<bool> readonly;
@@ -75,17 +79,43 @@ QString QFESpectraViewer::intReloadDatabases(SpectrumManager *manager, const QSt
         result+=(tr("     - %1%2\n").arg(directories[i]).arg(ro));
     }
 
-    manager->clear();
+    try {
+        manager->clear();
+    } catch (std::exception& E) {
+        result+=tr("   ERROR when clearing manager\n");
+    }
+
     result+=(tr("   loading fluorophore database ...\n"));
-    manager->loadFluorophoreDatabase("fluorophors.ini", directories);
+    try {
+        manager->loadFluorophoreDatabase("fluorophors.ini", directories);
+    } catch (std::exception& E) {
+        result+=tr("      ERROR \n");
+    }
+
     result+=(tr("   loading filters database ...\n"));
-    manager->loadFilterDatabase("filters.ini", directories);
+    try {
+        manager->loadFilterDatabase("filters.ini", directories);
+    } catch (std::exception& E) {
+        result+=tr("      ERROR \n");
+    }
     result+=(tr("   loading lightsources database ...\n"));
-    manager->loadLightSourceDatabase("ligtsources.ini", directories);
+    try {
+        manager->loadLightSourceDatabase("ligtsources.ini", directories);
+    } catch (std::exception& E) {
+        result+=tr("      ERROR \n");
+    }
     result+=(tr("   loading detectors database ...\n"));
-    manager->loadDetectorDatabase("detectors.ini", directories);
+    try {
+        manager->loadDetectorDatabase("detectors.ini", directories);
+    } catch (std::exception& E) {
+        result+=tr("      ERROR \n");
+    }
     result+=(tr("   loading laserline database ...\n"));
-    manager->loadLaserlinesDatabase("laserlines.ini", directories);
+    try {
+        manager->loadLaserlinesDatabase("laserlines.ini", directories);
+    } catch (std::exception& E) {
+        result+=tr("      ERROR \n");
+    }
 
     result+=(tr("   loaded %1 fluorophores\n").arg(manager->getFluorophoreCount()));
     result+=(tr("   loaded %1 filters\n").arg(manager->getFilterCount()));
@@ -107,7 +137,6 @@ void QFESpectraViewer::initExtension() {
 	// some example code that may be used to register a menu and a tool button:
     log_text(tr("initializing ...\n"));
     log_text(tr("   registering plugin ...\n"));
-    loadThread->start();
     QAction* actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Spectra Viewer"), this);
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(showViewer()));
     QToolBar* exttb=services->getToolbar("tools");
@@ -120,6 +149,7 @@ void QFESpectraViewer::initExtension() {
     }
 
     log_text(tr("initializing ... DONE\n"));
+    loadThread->start();
 }
 
 void QFESpectraViewer::loadSettings(ProgramOptions* settingspo) {
