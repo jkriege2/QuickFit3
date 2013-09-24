@@ -217,7 +217,7 @@ void QFFitFunctionsSPIMFCCSFW2CSep2DDiffXZ2ColorACFR::sortParameter(double *para
     const double D2=parameterValues[FCCSDiff_diff_coeff2];
     const double rho2=parameterValues[FCCSDiff_diff_rho2];
 
-    if (D1<D2 && (!fix || fix[FCCSDiff_diff_coeff1] || fix[FCCSDiff_diff_coeff2])) {
+    if (D1<D2 && (fix && !fix[FCCSDiff_diff_coeff1] && !fix[FCCSDiff_diff_coeff2] && !fix[FCCSDiff_diff_rho2])) {
         qSwap(parameterValues[FCCSDiff_diff_coeff1], parameterValues[FCCSDiff_diff_coeff2]);
         if (error) qSwap(error[FCCSDiff_diff_coeff1], error[FCCSDiff_diff_coeff2]);
         if (fix) qSwap(fix[FCCSDiff_diff_coeff1], fix[FCCSDiff_diff_coeff2]);
