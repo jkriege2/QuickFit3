@@ -212,7 +212,7 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
     int resI=index.row();
     if (!evaluation || !index.isValid()) return QVariant();
     if (resNameI<0) {
-        if (role==Qt::DisplayRole || role==ValueRole) {
+        if (role==Qt::DisplayRole || role==Qt::EditRole || role==ValueRole || (role==AvgRole) || (role==SumRole) || (role==MedianRole)) {
             if (resI<lastResults.size()) {
                 QFRawDataRecord* record=lastResults[resI].first;
                 QString propname=displayProperties.value(index.column(), "");
@@ -221,6 +221,23 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 }
             } else if (resI==lastResults.size()) {
                 return QVariant();
+            }
+        } else if (role==CountRole) {
+            return 1;
+        } else if (role==SDRole) {
+            return 0;
+        } else if ((role==Qt::ToolTipRole)||(role==Qt::StatusTipRole)) {
+            if (resI<lastResults.size()) {
+                QFRawDataRecord* record=lastResults[resI].first;
+                QString propname=displayProperties.value(index.column(), "");
+                QVariant v=record->getProperty(propname, QVariant());
+                return QVariant(tr("property: %1<br>contents: %2<br><i>&nbsp;&nbsp;&nbsp;%3</i>").arg(propname).arg(v.toString()).arg(v.typeName()));
+            }
+        } else if ((role==NameRole)) {
+            if (resI<lastResults.size()) {
+                QFRawDataRecord* record=lastResults[resI].first;
+                QString propname=displayProperties.value(index.column(), "");
+                return propname;
             }
         } else if (role==Qt::BackgroundColorRole) {
             return QColor("lightgrey");
