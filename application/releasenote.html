@@ -25,7 +25,7 @@
 
 -->
 <!--
-		<li><a name="2719"><b>2013-09-20 (SVN: 2719)</b>-->
+		<li><a name="2733"><b>2013-09-24 (SVN: 2733)</b>-->
 		
 		<ul>
 		  <li><b>new plugins:</b><ul>
@@ -54,6 +54,8 @@
 			<li>QFMathParser: all comparisons work on vectors element-wise now (where it makes sense, e.g. [1,2,3]>[1,1,1] will return [false, true, true])</li>
 			<li>QFMathParser: added functions countoccurences(), alltrue(), allfalse(), contains(), isnan(), isinf(), isfinite(), isnumok()</li>
 			<li>QFMathParser: comparisons == and !0 between vectors return a boolean vector now</li>
+			<li>evaluationeditor: results table: property columns may be copied and have a tooltip now (thanks to Tabea)</li>
+			<li>evaluationeditor: results table: with of vertical header is limited to 750px now (so very long file names are elided)</li>
 		  </ul></li>	
 		  <li><b>imagingFCS</b><ul>
 		    <li>added label with the relative CCF amplitudes to the FCCS-mode widgets</li>
@@ -70,6 +72,7 @@
 			<li>added double-exponential bleach correction</li>
 			<li>changed bleach correction in load-single-frame mode from divide by bleach-function to the more complex expression by Ries etal.</li>
 			<li>residuals plot is now properly displayed also when there i no data (tau-axis visible)</li>
+			<li>bugfix (thanks to Nikki): plugin crashed while performing bleach correction</li>
 		  </ul></li>	
 		  <li><b>table</b><ul>
 		    <li>bugfix: controls were not correctly displayed, when plotting a function</li>
@@ -79,6 +82,9 @@
 			<li>added several options to format coordinate axes and plots</li>
 			<li>2D histogram also outputs image size as column properties, so image sizes can be read by the according button when plotting!</li>
 			<li>plots: added mor plot symbols (star, asterisk, pentagon,...) and simplified error bars</li>
+			<li>curve fit + regression now output the parameters+errors as label for the fit function</li>
+			<li>curve fit + regression output the parameter errors in their own column</li>
+			<li>bugfix: autoscale for axes didn't work anymore</li>
 		  </ul></li>	
 		  <li><b>qfe_calculator</b><ul>
 		    <li>added multiline expression editor widget</li>
@@ -93,6 +99,8 @@
 			<li>added several Atto-dyes and some more Tsien fluorescent proteins</li>
 			<li>added several Alexa dyes</li>
 			<li>"delete" removes all selected items</li>
+			<li>viewer may display additional data entries from .ini files now (e.g. pKa for some fluorescent proteins ...)</li>
+			<li>added saveguard against possible crash while reading database</li>
 		  </ul></li>	
 		  <li><b>imFCCSFit</b><ul>
 		    <li>"calculate crosstalk-corrected relative CCF amplitude" now can also use the g(0) fit result as input data!</li>
@@ -113,8 +121,14 @@
 		    <li>added some runselection tools to the correlation function tab (mask outliers ...)</li>
 			<li>added fucntions to read Oleg Kriechevsky's internal binary dataformat</li>
 		  </ul></li>	
+		  <li><b>fcsfit</b><ul>
+		    <li>added option to automatically calibrate all runs of current record.</li>
+		  </ul></li>	
 		  <li><b>fitalgorithm_lmfit</b><ul>
 		    <li>speed improvement by removing several malloc/free calls</li>
+		  </ul></li>	
+		  <li><b>diffusion coefficient calculator</b><ul>
+		    <li>bugfix: corrected the displayed units for solution components (nM was wrong ... I meant mM of course) -> thanks to Tabea</li>
 		  </ul></li>	
 		  <li><b>spim_fcs_fitmodels</b><ul>
 		    <li>bugfix in new "D for every channel" model: THe D2 of the red channel was not used correctly!</li>
