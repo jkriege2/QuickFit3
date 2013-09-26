@@ -36,7 +36,8 @@
 #include "../base_classes/qffitresultsevaluationeditorbase.h"
 #include "../base_classes/qffitresultsbyindexevaluationeditorbase.h"
 #include "../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h"
-
+#include "qftools.h"
+#include "statistics_tools.h"
 
 /*! \brief editor class for FCS least-square fits
     \ingroup qf3evalp_fcsfit

@@ -65,6 +65,8 @@ class QFRDRFCSCorrelationEditor : public QFRawDataEditor {
         void selectionChanged(const QItemSelection & current, const QItemSelection & previous );
         void runsModeChanged(int c);
         void slidersChanged(int userMin, int userMax, int min, int max);
+
+        void copyNormalizedACFs();
     protected:
         /** \brief create widgets on object creation */
         void createWidgets();
@@ -104,7 +106,10 @@ class QFRDRFCSCorrelationEditor : public QFRawDataEditor {
         /** \brief label for the number of points in the correlation function */
         QLabel* labCorrelationPoints;
         QMenu* menuMask;
+        QMenu* menuData;
         QFCorrelationMaskTools* correlationMaskTools;
+
+        QAction* actCopyNormalizedACF;
 
     private:
 };

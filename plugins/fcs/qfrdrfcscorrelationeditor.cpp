@@ -188,10 +188,17 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     splitter->setStretchFactor(0,5);
     splitter->setStretchFactor(1,1);
 
+    actCopyNormalizedACF=new QAction(tr("copy normalized CFs to table"), this);
+    connect(actCopyNormalizedACF, SIGNAL(triggered()), this, SLOT(copyNormalizedACFs()));
+
     menuMask=propertyEditor->addMenu("&Selection/Mask", 0);
     correlationMaskTools->registerMaskToolsToMenu(menuMask);
     menuMask->addSeparator();
     correlationMaskTools->registerCorrelationToolsToMenu(menuMask);
+
+    menuData=propertyEditor->addOrFindMenu(tr("&Data"), -1);
+    menuData->addAction(actCopyNormalizedACF);
+
 
 };
 
@@ -248,6 +255,10 @@ void QFRDRFCSCorrelationEditor::slidersChanged(int userMin, int userMax, int min
     current->setQFProperty("fcscorreditor_datacut_min", userMin, false, false);
     current->setQFProperty("fcscorreditor_datacut_max", userMax, false, false);
     replotData();
+}
+
+void QFRDRFCSCorrelationEditor::copyNormalizedACFs()
+{
 }
 
 void QFRDRFCSCorrelationEditor::replotData(int dummy) {

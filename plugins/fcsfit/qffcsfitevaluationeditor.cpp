@@ -190,6 +190,8 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 int runAvgWidth=11;
                 double* tauvals=data->getCorrelationT();
                 double* corrdata=NULL;
+                double* corrdataNorm=NULL;
+                double* weightsNorm=NULL;
 
                 if (eval->getCurrentIndex()<0) {
                     corrdata=data->getCorrelationMean();
@@ -219,6 +221,51 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 record->disableEmitResultsChanged();
                 QFFitStatistics fitResults=eval->calcFitStatistics(eval->hasFit(record, run), ffunc, N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins, record, run);
                 record->enableEmitResultsChanged();
+
+                /////////////////////////////////////////////////////////////////////////////////
+                // try and find particle number for normalized CF
+                /////////////////////////////////////////////////////////////////////////////////
+                bool hasN=false;
+                bool has1N=false;
+                double pN=0, peN=0;
+                double p1N, pe1N=0;
+                for (int i=0;i<ffunc->paramCount(); i++) {
+                    QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+                    if (ffunc->isParameterVisible(i, fullParams)) {
+                        if (d.id=="n_particle") {
+                            hasN=true;
+                            pN=fullParams[i];
+                            if (errors) peN=errors[i];
+                            break;
+                        } else if (d.id=="1n_particle") {
+                            has1N=true;
+                            p1N=fullParams[i];
+                            if (errors) pe1N=errors[i];
+                        }
+                    }
+                }
+
+                if (!hasN && has1N) {
+                    pN=1.0/p1N;
+                    peN=qfErrorDiv(1, 0, p1N, pe1N);
+                    hasN=true;
+                }
+                if (hasN && corrdata) {
+                    corrdataNorm=duplicateArray(corrdata, N);
+                    if (weights) weightsNorm=duplicateArray(weights, N);
+                    if (corrdataNorm) {
+                        for (int i=0; i<N; i++) {
+                            corrdataNorm[i]=pN*corrdata[i];
+                        }
+                        ds->addCopiedColumn(corrdataNorm, N, "normalized_corrdata");
+                    }
+                    if (weightsNorm) {
+                        for (int i=0; i<N; i++) {
+                            weightsNorm[i]=qfErrorMul(pN, peN, corrdata[i], weights[i]);
+                        }
+                        ds->addCopiedColumn(weightsNorm, N, "normalized_corrdata_error");
+                    }
+                }
 
 
                 size_t c_fit = ds->addCopiedColumn(fitResults.fitfunc, N, "fit_model");
@@ -431,6 +478,8 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 free(errors);
                 free(weights);
                 free(paramsFix);
+                if (weightsNorm) free(weightsNorm);
+                if (corrdataNorm) free(corrdataNorm);
                 fitResults.free();
 
                 //qDebug()<<"    n "<<t.elapsed()<<" ms";
