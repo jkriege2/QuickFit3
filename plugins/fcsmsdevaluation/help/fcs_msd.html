@@ -73,6 +73,13 @@
 			   Here the focal parameters $$math:w_{xy}$$ and  $$math:\gamma$$ and the particle number $$math:N$$ have to be measured independently. The focus can be measured using a standard calibration solution (e.g. 20nM Alexa-488 in water). And the particle number $$math:N$$ can be extracted from a multi-component fit to the same measured ACF. 
 			   <br>This plugin uses the LM library <a href="copyright.html">lmfit by Joachim Wuttke</a>.
 		  </li>
+                           
+                      <li><b>FCS: simple 2D model, with triplet correction</b>: This is the same model, as above but with an additional correction of a triplet term $$math:X(\tau)$$ (divide measured curve $$math:\hat{g}(\tau)$$ by this term: $$math:\hat{g}(\tau)/X(\tau)$$) before calculating the MSD:
+                      $$bmath:X(\tau)=\frac{1-\theta_T+\theta_T\cdot\exp(-\tau/\tau_T)}{1-\theta_T}$$
+                      </li>
+                      <li><b>FCS: simple 3D model, with triplet correction</b>: This is the same model, as above but with an additional correction of a triplet term $$math:X(\tau)$$ (divide measured curve $$math:\hat{g}(\tau)$$ by this term: $$math:\hat{g}(\tau)/X(\tau)$$) before calculating the MSD:
+                      $$bmath:X(\tau)=\frac{1-\theta_T+\theta_T\cdot\exp(-\tau/\tau_T)}{1-\theta_T}$$
+                      </li>
 		</ol>
 		
 		

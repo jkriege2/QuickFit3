@@ -27,7 +27,8 @@ HEADERS += qffcsmsdevaluation.h \
     ../base_classes/qffcsweightingtools.h \
     qffcsmsdevaluationaveragechannelsdialog.h \
     qffcsmsdevaluationgetnfromfits.h \
-    qffcsmsdevaluationfitallmsddialog.h
+    qffcsmsdevaluationfitallmsddialog.h \
+    ../base_classes/qffcstools.h
 
 SOURCES += qffcsmsdevaluation.cpp \
            qffcsmsdevaluation_item.cpp \
@@ -42,7 +43,8 @@ SOURCES += qffcsmsdevaluation.cpp \
     ../base_classes/qffcsweightingtools.cpp \
     qffcsmsdevaluationaveragechannelsdialog.cpp \
     qffcsmsdevaluationgetnfromfits.cpp \
-    qffcsmsdevaluationfitallmsddialog.cpp
+    qffcsmsdevaluationfitallmsddialog.cpp \
+    ../base_classes/qffcstools.cpp
 
 FORMS = \   
     qffcsmsdevaluationfitmsddialog.ui \

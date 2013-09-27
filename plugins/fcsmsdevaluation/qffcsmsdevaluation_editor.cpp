@@ -264,12 +264,13 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     cmbDistResultsMode=new QComboBox(this);
     cmbDistResultsMode->addItem(tr("local alpha"));
     cmbDistResultsMode->addItem(tr("local D"));
-    cmbDistResultsMode->addItem(tr("MSD/(6*tau)"));
-    cmbDistResultsMode->addItem(tr("MSD/(4*tau)"));
-    cmbDistResultsMode->addItem(tr("MSD/(P0*D0*tau)"));
-    cmbDistResultsMode->addItem(tr("MSD/(P1*D1*tau)"));
-    cmbDistResultsMode->addItem(tr("MSD/(P2*D2*tau)"));
-    cmbDistResultsMode->addItem(tr("MSD/(P3*D3*tau)"));
+    cmbDistResultsMode->addItem(tr("MSD / (6*tau)"));
+    cmbDistResultsMode->addItem(tr("MSD / (4*tau)"));
+    cmbDistResultsMode->addItem(tr("MSD / (P0*D0*tau)"));
+    cmbDistResultsMode->addItem(tr("MSD / (P1*D1*tau)"));
+    cmbDistResultsMode->addItem(tr("MSD / (P2*D2*tau)"));
+    cmbDistResultsMode->addItem(tr("MSD / (P3*D3*tau)"));
+    cmbDistResultsMode->addItem(tr("MSD - P0*D0*tau"));
     connect(cmbDistResultsMode, SIGNAL(currentIndexChanged(int)), this, SLOT(updateDistributionResults()));
     tbPlotDistResults->addSeparator();
     tbPlotDistResults->addWidget(new QLabel(tr("   parameter: ")));
@@ -838,6 +839,7 @@ void QFFCSMSDEvaluationEditor::updateFitFunctions() {
     QFFCSMSDEvaluationItem* eval=qobject_cast<QFFCSMSDEvaluationItem*>(current);
     int index=eval->getCurrentIndex();
     int model=eval->getCurrentModel();
+    //qDebug()<<"model="<<model;
     JKQTPdatastore* ds=pltData->getDatastore();
     JKQTPdatastore* dsres=pltResiduals->getDatastore();
     JKQTPdatastore* dsresh=pltResidualHistogram->getDatastore();
@@ -1360,9 +1362,11 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
 
 
         QString evalGroup=dlg->getEvalGroup();
-        QString readParam=dlg->getParameter();
+        QString readParamN=dlg->getParameterN();
+        QString readParamTF=dlg->getParameterTripletTheta();
+        QString readParamTTau=dlg->getParameterTripletTau();
         //qDebug()<<evalGroup<<readParam;
-        QModernProgressDialog progress(tr("reading N (parameter '%1') from fit results ...").arg(readParam), tr("Cancel"), this);
+        QModernProgressDialog progress(tr("reading parameters from fit results ..."), tr("Cancel"), this);
         progress.show();
         progress.setMode(true, true);
         progress.setRange(0, applyTo.size());
@@ -1374,6 +1378,8 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
             int run=applyTo[i].run;
 
             double N=-1;
+            double tauT=-1;
+            double thetaT=-1;
 
 
             if (record) {
@@ -1381,14 +1387,33 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
                 QStringList eval=record->resultsCalcEvaluationsInGroup(evalGroup);
                 QString runid="_runavg";
                 if (run>=0) runid=QString("_run%1").arg(run);
+                bool hasTrip=false;
+                bool hasN=false;
+                bool hasTripT=false;
                 for (int ei=0; ei<eval.size(); ei++) {
                     if (eval[ei].endsWith(runid)) {
-                        if (record->resultsExists(eval[ei], readParam)) {
+                        if (! hasN && dlg->getN() && record->resultsExists(eval[ei], readParamN)) {
                             bool ok=false;
-                            double NN=record->resultsGetAsDouble(eval[ei], readParam, &ok);
+                            double NN=record->resultsGetAsDouble(eval[ei], readParamN, &ok);
                             if (ok) {
                                 N=NN;
-                                break;
+                                hasN=true;
+                            }
+                        }
+                        if (!hasTripT && dlg->getTriplet() && record->resultsExists(eval[ei], readParamTTau)) {
+                            bool ok=false;
+                            double NN=record->resultsGetAsDouble(eval[ei], readParamTTau, &ok);
+                            if (ok) {
+                                tauT=NN;
+                                hasTripT=true;
+                            }
+                        }
+                        if (!hasTrip && dlg->getTriplet() && record->resultsExists(eval[ei], readParamTF)) {
+                            bool ok=false;
+                            double NN=record->resultsGetAsDouble(eval[ei], readParamTF, &ok);
+                            if (ok) {
+                                thetaT=NN;
+                                hasTrip=true;
                             }
                         }
                     }
@@ -1397,15 +1422,35 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
             }
 
 
-            if (N>=0) {
-                for (int j=0; j<eval->getParameterCount(eval->getCurrentModel()); j++) {
-                    QString pid=eval->getParameterID(eval->getCurrentModel(), j);
-                    //qDebug()<<pid<<1.0/avg;
-                    if (pid=="n_particle") {
-                        if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, N);
-                        eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, N);
-                    }
+
+            /*for (int j=0; j<eval->getParameterCount(eval->getCurrentModel()); j++) {
+                QString pid=eval->getParameterID(eval->getCurrentModel(), j);
+                //qDebug()<<pid<<1.0/avg;
+                if (dlg->getN() && N>0 && pid=="n_particle") {
+                    if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, N);
+                    eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, N);
+                } else if (dlg->getTriplet() && thetaT>0 && pid=="nonfl_theta1") {
+                    if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, thetaT);
+                    eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, thetaT);
+                } else if (dlg->getTriplet() && tauT>0 && pid=="nonfl_tau1") {
+                    if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, tauT);
+                    eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, tauT);
                 }
+            }*/
+            QString pid="n_particle";
+            if (dlg->getN() && N>0) {
+                //if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, N);
+                eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, N);
+            }
+            pid="nonfl_theta1";
+            if (dlg->getTriplet() && thetaT>0) {
+                //if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, thetaT);
+                eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, thetaT);
+            }
+            pid="nonfl_tau1";
+            if (dlg->getTriplet() && tauT>0) {
+                //if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, tauT);
+                eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, tauT);
             }
             QApplication::processEvents();
             if (progress.wasCanceled()) break;
@@ -1898,6 +1943,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
     dsdist->deleteAllColumns("msdtransform_div6tau");
     dsdist->deleteAllColumns("msdtransform_div4tau");
     dsdist->deleteAllColumns("msdtransform_divPD0tau");
+    dsdist->deleteAllColumns("msdtransform_minusPD0tau");
     dsdist->deleteAllColumns("msdtransform_divPD1tau");
     dsdist->deleteAllColumns("msdtransform_divPD2tau");
     dsdist->deleteAllColumns("msdtransform_divPD3tau");
@@ -1956,6 +2002,13 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
             mored[i]=dist[i]/(P*D*distTau[i]);
         }
         int c_msdtransformPD3tau=dsdist->addCopiedColumn(mored.data(), mored.size(), "msdtransform_divPD3tau");
+        mored=dist;
+        P=eval->getTheoryPre(0, eval->getHighlightedRecord(), eval->getCurrentIndex());
+        D=eval->getTheoryD(0, eval->getHighlightedRecord(), eval->getCurrentIndex());
+        for (int i=0; i<dist.size(); i++) {
+            mored[i]=dist[i]-(P*D*distTau[i]);
+        }
+        int c_msdtransformMinusPD0tau=dsdist->addCopiedColumn(mored.data(), mored.size(), "msdtransform_minusPD0tau");
 
 
         int c_msdtau=dsdist->addCopiedColumn(fitTau.data(), fitTau.size(), "msdfit_tau");
@@ -1964,8 +2017,8 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
         dsdist->addCopiedColumn(fitTauStart.data(), fitTauStart.size(), "msdfit_tau_start");
         dsdist->addCopiedColumn(fitTauEnd.data(), fitTauEnd.size(), "msdfit_tau_end");
 
-        qDebug()<<dsdist->getColumnCount();
-        qDebug()<<c_msdtransformPD0tau<<c_msdtransformPD1tau<<c_msdtransformPD2tau<<c_msdtransformPD3tau<<c_msdtau<<c_msdD<<c_msdA;
+        //qDebug()<<dsdist->getColumnCount();
+        //qDebug()<<c_msdtransformPD0tau<<c_msdtransformPD1tau<<c_msdtransformPD2tau<<c_msdtransformPD3tau<<c_msdtau<<c_msdD<<c_msdA;
         //qDebug()<<fitTau.size()<<fitTau;
         //qDebug()<<fitD.size()<<fitD;
         //qDebug()<<fitA.size()<<fitA;
@@ -2012,7 +2065,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
             g_msdfit->set_color(QColor("red"));
             pltDistResults->addGraph(g_msdfit);
             pltDistResults->getYAxis()->set_axisLabel("local $D$ [\\mu m^2/s]");
-        } else if (cmbDistResultsMode->currentIndex()>=2 && cmbDistResultsMode->currentIndex()<=7 )  {
+        } else if (cmbDistResultsMode->currentIndex()>=2 && cmbDistResultsMode->currentIndex()<=8 )  {
             JKQTPxyLineGraph* g_msdtransform=new JKQTPxyLineGraph(pltDistribution->get_plotter());
             if (cmbDistResultsMode->currentIndex()==2) {
                 g_msdtransform->set_title("\\langle r^2(\\tau)\\rangle/(6\\tau)");
@@ -2056,6 +2109,13 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
                 g_msdtransform->set_color(QColor("red"));
                 pltDistResults->getYAxis()->set_axisLabel("\\langle r^2(\\tau)\\rangle/(P_3D_3\\tau) [s^{\\alpha-1}]");
                 pltDistResults->getYAxis()->set_logAxis(true);
+            } else if (cmbDistResultsMode->currentIndex()==8) {
+                g_msdtransform->set_title("\\langle r^2(\\tau)\\rangle-P_0D_0\\tau");
+                g_msdtransform->set_xColumn(c_tau);
+                g_msdtransform->set_yColumn(c_msdtransformMinusPD0tau);
+                g_msdtransform->set_color(QColor("red"));
+                pltDistResults->getYAxis()->set_axisLabel("\\langle r^2(\\tau)\\rangle - P_0D_0\\tau [\\mu m^2]");
+                pltDistResults->getYAxis()->set_logAxis(false);
             }
 
             g_msdtransform->set_drawLine(true);

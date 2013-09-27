@@ -24,6 +24,7 @@ QFPlotterCopyToTableDialog::QFPlotterCopyToTableDialog(QWidget *parent) :
     ui->radAlsoAddGraphs->setChecked(QFPluginServices::getInstance()->getCurrentProject()->getProperty("QFPlotterCopyToTableDialog/alsoaddgraph", true).toBool());
     ui->chkShowTableEditor->setChecked(QFPluginServices::getInstance()->getCurrentProject()->getProperty("QFPlotterCopyToTableDialog/showEditor", false).toBool());
     ui->chkOnlyForPlots->setChecked(QFPluginServices::getInstance()->getCurrentProject()->getProperty("QFPlotterCopyToTableDialog/chkOnlyForPlots", false).toBool());
+    ui->labDescription->setVisible(false);
 }
 
 QFPlotterCopyToTableDialog::~QFPlotterCopyToTableDialog()
@@ -88,7 +89,8 @@ bool QFPlotterCopyToTableDialog::getShowEditor() const
 
 void QFPlotterCopyToTableDialog::setDescription(const QString &text)
 {
-    ui->labDescription->setText(text);
+    ui->labDescription->setPlainText(text);
+    ui->labDescription->setVisible(!text.isEmpty());
 }
 
 bool QFPlotterCopyToTableDialog::copyOnlyPlotData() const

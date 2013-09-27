@@ -10,22 +10,17 @@ QFFCSMSDEvaluationGetNFromFits::QFFCSMSDEvaluationGetNFromFits(QFRawDataRecord *
 {
     ui->setupUi(this);
     ui->cmbApplyTo->setCurrentIndex(ProgramOptions::getConfigValue("QFFCSMSDEvaluationGetNFromFits/applyto", 0).toInt());
-    //QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
-    /*int idx=0;
-    for (int i=0; i<project->getEvaluationCount(); i++) {
-        QFEvaluationItem* it=project->getEvaluationByNum(i);
-        if (it->getType().toLower()=="fcs_fit") {
-            ui->cmbEval->addItem(it->getSmallIcon(), it->getName(), it->getID());
-        }
-    }
-    ui->cmbEval->setCurrentIndex(idx);*/
+    ui->chkGetN->setChecked(ProgramOptions::getConfigValue("QFFCSMSDEvaluationGetNFromFits/getN", true).toBool());
+    ui->chkGetTriplet->setChecked(ProgramOptions::getConfigValue("QFFCSMSDEvaluationGetNFromFits/getTriplet", true).toBool());
+
     ui->cmbEval->setRDR(current);
-    //ui->cmbEval->setContainedParam("fitparam_n_particle");
 }
 
 QFFCSMSDEvaluationGetNFromFits::~QFFCSMSDEvaluationGetNFromFits()
 {
     ProgramOptions::setConfigValue("QFFCSMSDEvaluationGetNFromFits/applyto", getApplyTo());
+    ProgramOptions::setConfigValue("QFFCSMSDEvaluationGetNFromFits/getN", getN());
+    ProgramOptions::setConfigValue("QFFCSMSDEvaluationGetNFromFits/getTriplet", getTriplet());
     delete ui;
 }
 
@@ -39,8 +34,28 @@ QString QFFCSMSDEvaluationGetNFromFits::getEvalGroup() const
     return ui->cmbEval->currentEvaluationGroup();
 }
 
-QString QFFCSMSDEvaluationGetNFromFits::getParameter() const
+QString QFFCSMSDEvaluationGetNFromFits::getParameterN() const
 {
     return "fitparam_n_particle";
+}
+
+QString QFFCSMSDEvaluationGetNFromFits::getParameterTripletTheta() const
+{
+    return "fitparam_nonfl_theta1";
+}
+
+QString QFFCSMSDEvaluationGetNFromFits::getParameterTripletTau() const
+{
+    return "fitparam_nonfl_tau1";
+}
+
+bool QFFCSMSDEvaluationGetNFromFits::getN() const
+{
+    return ui->chkGetN->isChecked();
+}
+
+bool QFFCSMSDEvaluationGetNFromFits::getTriplet() const
+{
+    return ui->chkGetTriplet->isChecked();
 }
 

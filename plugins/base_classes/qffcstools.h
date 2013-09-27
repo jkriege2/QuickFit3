@@ -6,6 +6,7 @@
 
 bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid, double &value, double &error) ;
 
+double qfFCSTripletTerm(double tau, double thetaT, double tauT);
 
 bool qfFCSOverrideFitFunctionPreset(const QFEvaluationItem* eval, const QFRawDataRecord* r, QString paramid, double &value, bool checkPositive=false);
 bool qfFCSOverrideFitFunctionPresetError(const QFEvaluationItem *eval, const QFRawDataRecord* r, QString paramid, double &value, bool checkPositive=false);

@@ -122,6 +122,8 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
         void setFitRangeLimited(bool rangeLimit, QFRawDataRecord* record, int run);
         int getFitType(QFRawDataRecord* record, int run) const;
         void setFitType(int type, QFRawDataRecord* record, int run);
+
+
     protected:
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */

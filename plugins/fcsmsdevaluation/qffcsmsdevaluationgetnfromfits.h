@@ -18,7 +18,11 @@ class QFFCSMSDEvaluationGetNFromFits : public QDialog
 
         int getApplyTo() const;
         QString getEvalGroup() const;
-        QString getParameter() const;
+        QString getParameterN() const;
+        QString getParameterTripletTheta() const;
+        QString getParameterTripletTau() const;
+        bool getN() const;
+        bool getTriplet() const;
     private:
         Ui::QFFCSMSDEvaluationGetNFromFits *ui;
 };

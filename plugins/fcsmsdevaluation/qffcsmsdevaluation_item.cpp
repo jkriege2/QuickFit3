@@ -2,7 +2,7 @@
 #include "qffcsmsdevaluation_editor.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
 #include "qfmathtools.h"
-
+#include "qffcstools.h"
 
 
 #define sqr(x) ((x)*(x))
@@ -122,6 +122,8 @@ void QFFCSMSDEvaluationItem::setFitType(int type, QFRawDataRecord* record, int r
 {
     setFitValue(record, run, getCurrentModel(), QString("msd_fittype"), type);
 }
+
+
 
 void QFFCSMSDEvaluationItem::setFitWidth(int width, QFRawDataRecord* record, int run) {
     setFitValue(record, run, getCurrentModel(), QString("msd_fitwidth"), width);
@@ -378,6 +380,7 @@ void QFFCSMSDEvaluationItem::calcMSDFits(QVector<double> &taus_out, QVector<doub
 
 
 QFFitStatistics QFFCSMSDEvaluationItem::calcFitStatistics(QFRawDataRecord *record, int index, int model, double *taus, double* modelValsIn, uint32_t N, uint32_t MaxEntParams, int datacut_min, int datacut_max, int runAvgWidth, int residualHistogramBins) {
+    qDebug()<<"calcFitStatistics model="<<model;
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     if (data) {
 
@@ -479,7 +482,7 @@ QFFitStatistics QFFCSMSDEvaluationItem::calcFitStatistics(QFRawDataRecord *recor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, int model, double *taus, double *modelEval, uint32_t N, double* msdTaus, double* msd, uint32_t Nmsd) const {
     if (!taus || !modelEval) return;
-    //qDebug()<<"evalModel(N="<<N<<"  distributionN="<<distributionN<<")";
+    qDebug()<<"evalModel(model="<<model<<")";
 
     bool ok=false;
     int first=-1, last=-1;
@@ -554,6 +557,40 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
                 k++;
             }
 
+        } else if (model==2) { // simple 2D model with triplet-correction
+
+            // first we read the stored fit parameters:
+            double gamma=getFitValue(record, index, model, "focus_struct_fac");
+            double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
+            double N_particle=getFitValue(record,index,model,"n_particle");;
+            double fT=getFitValue(record,index,model,"nonfl_theta1");
+            double tauT=getFitValue(record,index,model,"nonfl_tau1")*1e-6;
+
+            int k=0;
+            for (uint32_t i=first; i<=last; i++) {
+                const double tau=msdTaus[k];
+                const double ms=msd[k];
+                modelEval[i]=1.0/N_particle/(1.0+2.0/3.0*ms/sqr(wxy))*qfFCSTripletTerm(tau, fT, tauT);
+                k++;
+            }
+
+        } else if (model==3) { // simple 3D model with triplet-correction
+
+            // first we read the stored fit parameters:
+            double gamma=getFitValue(record, index, model, "focus_struct_fac");
+            double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
+            double N_particle=getFitValue(record,index,model,"n_particle");;
+            double fT=getFitValue(record,index,model,"nonfl_theta1");
+            double tauT=getFitValue(record,index,model,"nonfl_tau1")*1e-6;
+
+            int k=0;
+            for (uint32_t i=first; i<=last; i++) {
+                const double tau=msdTaus[k];
+                const double ms=msd[k];
+                modelEval[i]=1.0/N_particle/(1.0+2.0/3.0*ms/sqr(wxy))/sqrt(1.0+2.0/3.0*ms/sqr(wxy)/sqr(gamma))*qfFCSTripletTerm(tau, fT, tauT);
+                k++;
+            }
+
         }
     }
 }
@@ -566,6 +603,8 @@ QString QFFCSMSDEvaluationItem::getModelName(int model) const {
     switch(model) {
         case 0: return tr("FCS: simple 2D model");
         case 1: return tr("FCS: simple 3D model");
+        case 2: return tr("FCS: simple 2D model + triplet correction");
+        case 3: return tr("FCS: simple 3D model + triplet correction");
         //case 2: return tr("FCS: simple 3D model as one optimization problem");
     }
 
@@ -637,6 +676,49 @@ bool QFFCSMSDEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QStri
                 defaultValue.value=6;
                 return true;
             }
+            break;
+        case 2:
+        //case 2:
+            if (parameterID=="n_particle") {
+                defaultValue.value=1;
+                return true;
+                }
+            if (parameterID=="focus_width") {
+                defaultValue.value=250;
+                return true;
+                }
+            if (parameterID=="nonfl_theta1") {
+                defaultValue.value=0.2;
+                return true;
+            }
+            if (parameterID=="nonfl_tau1") {
+                defaultValue.value=3;
+                return true;
+            }
+            break;
+        case 3:
+        //case 2:
+            if (parameterID=="n_particle") {
+                defaultValue.value=1;
+                return true;
+                }
+            if (parameterID=="focus_width") {
+                defaultValue.value=250;
+                return true;
+                }
+            if (parameterID=="nonfl_theta1") {
+                defaultValue.value=0.2;
+                return true;
+            }
+            if (parameterID=="nonfl_tau1") {
+                defaultValue.value=3;
+                return true;
+            }
+            if (parameterID=="focus_struct_fac") {
+                defaultValue.value=6;
+                return true;
+            }
+
             break;
      }
 
@@ -753,6 +835,12 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
         double gamma=getFitValue(record, index, model, "focus_struct_fac");
         double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
         double N_particle=getFitValue(record,index,model,"n_particle");
+        double fT=0;
+        double tauT=1e-10;
+        if (model==2||model==3) {
+            fT=getFitValue(record,index,model,"nonfl_theta1");
+            tauT=getFitValue(record,index,model,"nonfl_tau1")*1e-6;
+        }
         QVector<double> msd=getMSD(record, index, model);
         QVector<double> msd_tau=getMSDTaus(record, index, model);
 
@@ -763,26 +851,31 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
         /////////////////////////////////////////////////////////
         /// MSD Implementation ///////////////////////////////
         /////////////////////////////////////////////////////////
-        if (model==0) {
+        if ((model==0)||(model==2)) {
             for (int i=0; i<Ndist; i++) {
-                distTaus[i]=taus[rangeMinDatarange+i];
-                dist[i]=3.0*sqr(wxy)/2.0*(1.0/N_particle/corrdata[rangeMinDatarange+i]-1.0);
-            }
-        } else if (model==1) {
-            for (int i=0; i<Ndist; i++) {
-                distTaus[i]=taus[rangeMinDatarange+i];
-                const double meas_acf=corrdata[rangeMinDatarange+i];
+                double meas_acf=corrdata[rangeMinDatarange+i];
                 const double tau=taus[rangeMinDatarange+i];
+                if (model==2) {
+                    meas_acf=meas_acf/qfFCSTripletTerm(tau, fT, tauT);
+                }
+                distTaus[i]=tau;
+                dist[i]=3.0*sqr(wxy)/2.0*(1.0/N_particle/meas_acf-1.0);
+            }
+        } else if ((model==1) || (model==3)) {
+            for (int i=0; i<Ndist; i++) {
+                distTaus[i]=taus[rangeMinDatarange+i];
+                double meas_acf=corrdata[rangeMinDatarange+i];
+                const double tau=taus[rangeMinDatarange+i];
+
+                if (model==3) {
+                    double t=meas_acf;
+                    meas_acf=meas_acf/qfFCSTripletTerm(tau, fT, tauT);
+                    qDebug()<<t<<meas_acf<<fT<<tauT;
+                }
 
                 lm_status_struct status;
                 lm_control_struct control = lm_control_double;
                 control.printflags = 0; // monitor status (+1) and parameters (+2)
-                /*control.ftol=getParameter("ftol").toDouble();
-                control.xtol=getParameter("xtol").toDouble();
-                control.gtol=getParameter("gtol").toDouble();
-                control.epsilon=getParameter("epsilon").toDouble();
-                control.stepbound=getParameter("stepbound").toDouble();
-                control.maxcall=getParameter("max_iterations").toInt();*/
 
                 msd_diff3d_params d = {wxy, gamma, N_particle, meas_acf};
                 double r=3.0*sqr(wxy)/2.0*(1.0/N_particle/corrdata[rangeMinDatarange+i]-1.0);
@@ -794,26 +887,7 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
                 dist[i]=r;
 
             }
-        /*} else if (model==2) {
-            for (int i=0; i<Ndist; i++) {
-                distTaus[i]=taus[rangeMinDatarange+i];
-                if (msd.size()==Ndist && msd_tau.size()==Ndist && msd_tau[i]==distTaus[i]) {
-                    dist[i]=msd[i];
-                } else {
-                    dist[i]=60.0*distTaus[i];
-                }
-            }
 
-
-            lm_status_struct status;
-            lm_control_struct control = lm_control_double;
-            control.printflags = 0; // monitor status (+1) and parameters (+2)
-
-
-            msd_diff3dall_params d = {wxy, gamma, N_particle, &corrdata[rangeMinDatarange], Ndist};
-
-
-            lmmin(Ndist, dist, Ndist, &d, lmfit_msd_diff3dall, &control, &status, NULL );*/
         }
 
         fitSuccess=true;
@@ -929,6 +1003,19 @@ QString QFFCSMSDEvaluationItem::getParameterName(int model, int id, bool html) c
             if (id==1) return (html)?tr("focus size w<sub>xy</sub> [nm]"):tr("focus size [nm]");
             if (id==2) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
             break;
+        case 2: // simple 3D model, triplet corrected
+            if (id==0) return (html)?tr("particle number N"):tr("particle number");
+            if (id==1) return (html)?tr("focus size w<sub>xy</sub> [nm]"):tr("focus size [nm]");
+            if (id==2) return (html)?tr("triplet fraction &theta;<sub>T</sub>"):tr("triplet fraction");
+            if (id==3) return (html)?tr("triplet time &tau;<sub>T</sub> [탎]"):tr("triplet time [탎]");
+            break;
+        case 3: // simple 3D model, triplet corrected
+            if (id==0) return (html)?tr("particle number N"):tr("particle number");
+            if (id==1) return (html)?tr("focus size w<sub>xy</sub> [nm]"):tr("focus size [nm]");
+            if (id==2) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
+            if (id==3) return (html)?tr("triplet fraction &theta;<sub>T</sub>"):tr("triplet fraction");
+            if (id==4) return (html)?tr("triplet time &tau;<sub>T</sub> [탎]"):tr("triplet time [탎]");
+            break;
         /*case 2: // simple 3D model, one optimization problem
             if (id==0) return (html)?tr("particle number N"):tr("particle number");
             if (id==1) return (html)?tr("focus size w<sub>xy</sub> [nm]"):tr("focus size [nm]");
@@ -944,11 +1031,25 @@ QString QFFCSMSDEvaluationItem::getParameterUnit(int model, int id, bool html) c
         case 0:
             if (id==0) return QString("");
             if (id==1) return tr("nm");
+            break;
         case 1:
-        //case 2:
             if (id==0) return QString("");
             if (id==1) return tr("nm");
             if (id==2) return QString("");
+            break;
+        case 2:
+            if (id==0) return QString("");
+            if (id==1) return tr("nm");
+            if (id==2) return QString("");
+            if (id==3) return tr("탎");
+            break;
+        case 3:
+            if (id==0) return QString("");
+            if (id==1) return tr("nm");
+            if (id==2) return QString("");
+            if (id==3) return QString("");
+            if (id==4) return tr("탎");
+            break;
     }
     return QString();
 }
@@ -957,8 +1058,11 @@ int QFFCSMSDEvaluationItem::getParameterCount(int model) const {
         case 0:
             return 2;
         case 1:
-        //case 2:
             return 3;
+        case 2:
+            return 4;
+        case 3:
+            return 5;
     }
     return 0;
 }
@@ -970,15 +1074,27 @@ QString QFFCSMSDEvaluationItem::getParameterID(int model, int id) const {
             if (id==1) return tr("focus_width");
             break;
         case 1:
-        //case 2:
             if (id==0) return tr("n_particle");
             if (id==1) return tr("focus_width");
             if (id==2) return tr("focus_struct_fac");
+            break;
+        case 2:
+            if (id==0) return tr("n_particle");
+            if (id==1) return tr("focus_width");
+            if (id==2) return tr("nonfl_theta1");
+            if (id==3) return tr("nonfl_tau1");
+            break;
+        case 3:
+            if (id==0) return tr("n_particle");
+            if (id==1) return tr("focus_width");
+            if (id==2) return tr("focus_struct_fac");
+            if (id==3) return tr("nonfl_theta1");
+            if (id==4) return tr("nonfl_tau1");
             break;
     }
     return QString("m%1_p%2").arg(model).arg(id);
 }
 
 int QFFCSMSDEvaluationItem::getModelCount(QFRawDataRecord *r, int index) const {
-    return 2;
+    return 4;
 }
