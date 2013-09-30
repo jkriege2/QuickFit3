@@ -2622,11 +2622,11 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                 int npar=4;
                 if (job.bleach==BLEACH_EXP_POLY3_NOSHIFT) npar=3;
                 //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
-                lmcurve_fit(4, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
+                lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
                 par[4]=par[3];
                 par[3]=0;
                 npar++;
-                lmcurve_fit(5, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
+                lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
                 //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 
                 bleachAmplitude[i]=exp(par[0]);
