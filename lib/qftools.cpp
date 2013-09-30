@@ -975,3 +975,12 @@ QString doubleToLatexQString(double data, int precision, bool remove_trail0, dou
   if (v=="10") exp=exp+1;
   return QString("10^{")+intToQString(exp)+"}";
 }
+
+QFLIB_EXPORT QString qfShortenString(const QString& input, int maxLen, int keepend, const QString& ellipsis) {
+    if (input.size()<=maxLen) return input;
+    QString res;
+    int len=qMax(0, maxLen-ellipsis.size()-keepend);
+    res=input.left(len)+ellipsis;
+    if (keepend>0) res+=input.right(keepend);
+    return res;
+}

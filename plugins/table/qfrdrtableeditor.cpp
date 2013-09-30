@@ -163,6 +163,7 @@ void QFRDRTableEditor::createWidgets() {
 
     actCalculateColumn=new QAction(QIcon(":/table/formula.png"), tr("evaluate math expression"), this);
     actCalculateColumn->setToolTip(tr("set the value of the selected columns by a freely defineable mathematical expression"));
+    actCalculateColumn->setShortcut(tr("="));
     connect(actCalculateColumn, SIGNAL(triggered()), this, SLOT(slCalcColumn()));
     connect(this, SIGNAL(enableActions(bool)), actCalculateColumn, SLOT(setEnabled(bool)));
 

@@ -1036,4 +1036,10 @@ QFLIB_EXPORT QColor wavelengthToColor(double wavelength);
 
 QFLIB_EXPORT QIcon qfGetColorIcon(QColor color, QSize size=QSize(16,16));
 
+/*! \brief shorten the given string to the given maxLen and keeping \a keepend characters at the end
+    \ingroup qf3lib_tools
+
+ */
+QFLIB_EXPORT QString qfShortenString(const QString& input, int maxLen=250, int keepend=0, const QString& ellipsis=QString("..."));
 #endif // QFTOOLS_H
+

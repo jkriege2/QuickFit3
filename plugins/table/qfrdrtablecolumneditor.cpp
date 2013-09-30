@@ -125,7 +125,9 @@ void QFRDRTableColumnEditor::on_edtFormula_textChanged(QString text) {
     if (mp.hasErrorOccured()) {
         ui->labError->setText(tr("<font color=\"red\">ERROR:<br>&nbsp;&nbsp;&nbsp;&nbsp;%1</font>").arg(mp.getLastErrors().join("<br>&nbsp;&nbsp;&nbsp;&nbsp;")));
     } else {
-        ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>"));
+        QString testout=qfShortenString(n->evaluate().toTypeString(), 250, 30, tr(" ... "));
+
+        ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>&nbsp;&nbsp;&nbsp;&nbsp;<i>test output:</i>&nbsp;&nbsp;%1").arg(testout));
     }
 
 }
