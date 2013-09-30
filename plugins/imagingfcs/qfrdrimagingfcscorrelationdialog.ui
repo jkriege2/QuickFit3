@@ -1154,6 +1154,16 @@ p, li { white-space: pre-wrap; }
                    <string>2-exponential LM-fit</string>
                   </property>
                  </item>
+                 <item>
+                  <property name="text">
+                   <string>1-exponential(poly2), no shift term, LM-fit</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>1-exponential(poly3), no shift term, LM-fit</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
                <item>
@@ -2363,10 +2373,10 @@ p, li { white-space: pre-wrap; }
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrimagingfcs.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>

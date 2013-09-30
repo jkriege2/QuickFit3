@@ -35,6 +35,9 @@ class QFRDRImagingFCSCorrelationJobThread; // forward
 #define BLEACH_EXP_POLY2 4
 #define BLEACH_EXP_POLY3 5
 #define BLEACH_DBL_EXP 6
+#define BLEACH_EXP_POLY2_NOSHIFT 7
+#define BLEACH_EXP_POLY3_NOSHIFT 8
+
 
 /*! \brief job description for correlation
     \ingroup qf3rdrdp_imaging_fcs
