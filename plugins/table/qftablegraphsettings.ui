@@ -1820,7 +1820,7 @@
     </widget>
    </item>
    <item row="12" column="1">
-    <widget class="QTableView" name="tabFunctionParameters"/>
+    <widget class="QEnhancedTableView" name="tabFunctionParameters"/>
    </item>
    <item row="9" column="0">
     <widget class="QLabel" name="labMean">
@@ -2296,14 +2296,19 @@
    <extends>QComboBox</extends>
    <header>jkqtptools.h</header>
   </customwidget>
+  <customwidget>
+   <class>QEnhancedTableView</class>
+   <extends>QTableView</extends>
+   <header>qenhancedtableview.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
