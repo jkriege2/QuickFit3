@@ -4129,6 +4129,10 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
 
     dlg->addWidget(tr("which statistics?"), listMode);
 
+    QCheckBox* chkCopyNumber=new QCheckBox("", dlg);
+    chkCopyNumber->setChecked(settings->value(prefix+"chkCopyNumber", false).toBool());
+    dlg->addWidget(tr("add number of pixels"), chkCopyNumber);
+
     QComboBox* cmbMode=new QComboBox(dlg);
     cmbMode->addItem(tr("one column per parameter"));
     cmbMode->addItem(tr("one row per parameter"));
@@ -4256,6 +4260,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
         settings->setValue(prefix+"copymax", listMode->item(6)->checkState());
         settings->setValue(prefix+"cmbMode", cmbMode->currentIndex());
         settings->setValue(prefix+"chkHeaders", chkHeaders->isChecked());
+        settings->setValue(prefix+"chkCopyNumber", chkCopyNumber->isChecked());
 
         QList<QList<double> > result;
         QList<int> items=dlg->getSelectedIndexes();
@@ -4269,7 +4274,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                     QList<double> r;
                     r.clear();
                     QList<double> gvalues, gvalues_s;
-                    gvalues_s=gvalues=data[d].gvalues.value(items[i], QList<double>());
+                    gvalues_s=gvalues=qfstatisticsFilter(data[d].gvalues.value(items[i], QList<double>()));
                     qSort(gvalues_s);
                     if (listMode->item(0)->checkState()==Qt::Checked) { r.append(qfstatisticsAverage(gvalues)); if (i==0) colNames<<tr("average"); }
                     if (listMode->item(1)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMedian(gvalues_s)); if (i==0) colNames<<tr("median"); }
@@ -4278,6 +4283,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                     if (listMode->item(4)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.75)); if (i==0) colNames<<tr("quantile75"); }
                     if (listMode->item(5)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMin(gvalues_s)); if (i==0) colNames<<tr("minimum"); }
                     if (listMode->item(6)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMax(gvalues_s)); if (i==0) colNames<<tr("maximum"); }
+                    if (chkCopyNumber->isChecked()) { r.append(qfstatisticsCount(gvalues_s)); if (i==0) colNames<<tr("pixel_count"); }
                     result<<r;
                 }
             }
@@ -4296,7 +4302,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
             for (int d=0; d<data.size(); d++) {
                 for (int i=0; i<items.size(); i++) {
                     QList<double> gvalues, gvalues_s;
-                    gvalues_s=gvalues=data[d].gvalues.value(items[i], QList<double>());
+                    gvalues_s=gvalues=qfstatisticsFilter(data[d].gvalues.value(items[i], QList<double>()));
                     qSort(gvalues_s);
                     if (listMode->item(0)->checkState()==Qt::Checked) { r.append(qfstatisticsAverage(gvalues)); colNames<<tr("average(%1)").arg(names.value(items[i], "")); }
                     if (listMode->item(1)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMedian(gvalues_s)); colNames<<tr("median(%1)").arg(names.value(items[i], "")); }
@@ -4305,6 +4311,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                     if (listMode->item(4)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.75)); colNames<<tr("quantile75(%1)").arg(names.value(items[i], "")); }
                     if (listMode->item(5)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMin(gvalues_s)); colNames<<tr("minimum(%1)").arg(names.value(items[i], "")); }
                     if (listMode->item(6)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMax(gvalues_s)); colNames<<tr("maximum(%1)").arg(names.value(items[i], "")); }
+                    if (chkCopyNumber->isChecked()) { r.append(qfstatisticsCount(gvalues_s)); colNames<<tr("pixel_count(%1)").arg(names.value(items[i], "")); }
                 }
             }
             result<<r;

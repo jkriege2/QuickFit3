@@ -1188,6 +1188,8 @@ void QFRDRTable::exportData(const QString& format, const QString& filename)const
         datamodel->saveCSV(filename, ";", ',');
     } else if (f=="SLK" || f=="SYLK") {
         datamodel->saveSYLK(filename);
+    } else if (f=="QFTABLEXML") {
+        datamodel->saveXML(filename);
     }
 }
 

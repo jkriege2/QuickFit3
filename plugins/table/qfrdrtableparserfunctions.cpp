@@ -61,12 +61,29 @@ qfmpResult fQFRDRTableEditor_column(const qfmpResult* params, unsigned int  n, Q
     QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            if (n!=1) p->qfmpError("column(column) needs 1 argument");
-            if ((params[0].type!=qfmpDouble)) p->qfmpError("column(column) needs one integer arguments");
-            int c=floor(params[0].num-1);
-            if (c>=0 && c<d->model->columnCount()) {
+            if (n==1) {
+                if ((params[0].type!=qfmpDouble)) p->qfmpError("column(column) needs one integer arguments");
+                int c=floor(params[0].num-1);
+                if (c>=0 && c<d->model->columnCount()) {
 
-                res.setDoubleVec(d->model->getColumnDataAsNumbers(c, Qt::EditRole));
+                    res.setDoubleVec(d->model->getColumnDataAsNumbers(c, Qt::EditRole));
+                }
+            } else if (n==2) {
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble&&params[1].type!=qfmpDoubleVector)) p->qfmpError("column(column, rows) needs one integer and one integer vector arguments");
+                int c=floor(params[0].num-1);
+                QVector<int> r=params[1].asIntVector();
+                if (c>=0 && c<d->model->columnCount()) {
+                    QVector<double> dat=d->model->getColumnDataAsNumbers(c, Qt::EditRole);
+                    QVector<double> dat1;
+                    for (int i=0; i<r.size(); i++) {
+                        if (r[i]>=0 && r[i]<dat.size()) {
+                            dat1<<dat[r[i]];
+                        }
+                    }
+                    res.setDoubleVec(dat1);
+                }
+            } else {
+                p->qfmpError("column(column)/column(column, rows) needs 1 or 2 arguments");
             }
         }
     }
@@ -749,7 +766,7 @@ qfmpResult fQFRDRTableEditor_indexedColStd(const qfmpResult* params, unsigned in
                 QVector<double> idxdv;
                 QStringList idxsl;
                 bool isNumber=true;
-                for (int i=0; i<idxvl.size(); i++) {
+                for (int i=0; i<qMin(idxvl.size(), data.size()); i++) {
                     bool ok=false;
                     if (idxvl[i].canConvert(QVariant::Double)) {
                         double d=idxvl[i].toDouble(&ok);
@@ -765,7 +782,7 @@ qfmpResult fQFRDRTableEditor_indexedColStd(const qfmpResult* params, unsigned in
                     QVector<double> dvu;
                     for (int i=0; i<idxdv.size(); i++) {
                         if (!dvu.contains(idxdv[i])) dvu<<idxdv[i];
-                        datasets[idxdv[i]].append(data[i]);
+                        if (i<data.size()) datasets[idxdv[i]].append(data[i]);
                     }
                     for (int i=0; i<dvu.size(); i++) {
                         resvec<<qfstatisticsStd(datasets[dvu[i]]);
@@ -775,7 +792,7 @@ qfmpResult fQFRDRTableEditor_indexedColStd(const qfmpResult* params, unsigned in
                     QStringList slu;
                     for (int i=0; i<idxsl.size(); i++) {
                         if (!slu.contains(idxsl[i])) slu<<idxsl[i];
-                        datasets[idxsl[i]].append(data[i]);
+                        if (i<data.size()) datasets[idxsl[i]].append(data[i]);
                     }
                     for (int i=0; i<slu.size(); i++) {
                         resvec<<qfstatisticsStd(datasets[slu[i]]);

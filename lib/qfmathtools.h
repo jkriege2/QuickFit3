@@ -490,6 +490,23 @@ typename T::value_type qfstatisticsMax(const T& value) {
 }
 
 
+/*! \brief filter the vecor for NAN ....
+    \ingroup qf3lib_mathtools
+
+*/
+template <class T>
+T qfstatisticsFilter(const T& value) {
+    long long N=value.size();
+    if (N<=1) return T();
+    T res;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i])) {
+            res<<(double)(value[i]);
+        }
+    }
+    return res;
+}
+
 /*! \brief calculate the sum of data
     \ingroup qf3lib_mathtools
 

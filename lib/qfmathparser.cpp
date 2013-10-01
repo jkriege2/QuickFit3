@@ -208,6 +208,55 @@ namespace QFMathParser_Private {
         return;
     }
 
+
+    void fAnyTrue(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("anytrue"));
+            r.setInvalid();
+            return;
+        }
+        if(params[0].type==qfmpBoolVector) {
+            bool res=false;
+            for (int i=0; i<params[0].boolVec.size(); i++) {
+                if (params[0].boolVec[i]) {
+                    res=true;
+                    break;
+                }
+            }
+            r.setBoolVec(res);
+        } else if(params[0].type==qfmpBool) {
+            r.setBoolVec(params[0].boolean);
+         } else {
+            p->qfmpError(QObject::tr("%1(x) argument has to be a vector of booleans").arg("anytrue"));
+            r.setInvalid();
+        }
+        return;
+    }
+
+    void fAnyFalse(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("anyfalse"));
+            r.setInvalid();
+            return;
+        }
+        if(params[0].type==qfmpBoolVector) {
+            bool res=false;
+            for (int i=0; i<params[0].boolVec.size(); i++) {
+                if (!params[0].boolVec[i]) {
+                    res=true;
+                    break;
+                }
+            }
+            r.setBoolVec(res);
+        } else if(params[0].type==qfmpBool) {
+            r.setBoolVec(!params[0].boolean);
+         } else {
+            p->qfmpError(QObject::tr("%1(x) argument has to be a vector of booleans").arg("anyfalse"));
+            r.setInvalid();
+        }
+        return;
+    }
+
     void fContains(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
         if (n!=1) {
             p->qfmpError(QObject::tr("%1(x, value) needs exacptly 2 arguments").arg("contains"));
@@ -949,6 +998,8 @@ void QFMathParser::addStandardFunctions(){
     addFunction("dot", QFMathParser_Private::fDot);
     addFunction("alltrue", QFMathParser_Private::fAllTrue);
     addFunction("allfalse", QFMathParser_Private::fAllFalse);
+    addFunction("anytrue", QFMathParser_Private::fAnyTrue);
+    addFunction("anyfalse", QFMathParser_Private::fAnyFalse);
     addFunction("contains", QFMathParser_Private::fContains);
     addFunction("countoccurences", QFMathParser_Private::fCountOccurences);
 

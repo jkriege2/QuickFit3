@@ -8,7 +8,8 @@
 #include "qftablemodel.h"
 #include <QStringListModel>
 #include "qffunctionreferencetool.h"
-
+#include "qftablepluginmodel.h"
+#include "qfrdrtableparserfunctions.h"
 
 
 
@@ -43,8 +44,10 @@ class QFRDRTableColumnEditor : public QDialog
 
 
     public:
-        explicit QFRDRTableColumnEditor(QWidget *parent = 0);
+        explicit QFRDRTableColumnEditor(QFTablePluginModel* model, int col, QWidget *parent = 0);
         ~QFRDRTableColumnEditor();
+
+
 
         void setImageWidth(int width);
         int getImageWidth() const;
@@ -65,6 +68,11 @@ class QFRDRTableColumnEditor : public QDialog
         void delayedStartSearch();
     protected:
         Ui::QFRDRTableColumnEditor *ui;
+
+        QFTablePluginModel* model;
+        int col;
+        QFMathParserData mpdata;
+        QStringList defaultWords;
 
         QFFunctionReferenceTool* functionRef;
 

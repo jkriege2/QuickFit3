@@ -223,6 +223,7 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
 
             \param selection copy only these cells, or all if this is empty (default)
             \param createXMLFragment if this is \c true, the output will not be a complete XML document (incl. header etc.), but only a raw fragment
+            \param template_only if this is \c true, the output will only contain the header and header metadata, but no actual data
             \returns the selection as XML
 
             The format in the clipboard is XML and the MIME type is called \c quickfit3/qfrdrtable, the encoding is UTF-8:
@@ -248,15 +249,15 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
 </qfrdrtable>
 \endverbatim
           */
-        QString saveXML(QModelIndexList selection=QModelIndexList(), bool createXMLFragment=false);
+        QString saveXML(QModelIndexList selection=QModelIndexList(), bool createXMLFragment=false, bool template_only=false);
         /** \brief saves the given \a selection as XML into a file \a filename */
-        bool saveXML(const QString& filename, QModelIndexList selection=QModelIndexList());
+        bool saveXML(const QString& filename, QModelIndexList selection=QModelIndexList(), bool createXMLFragment=false, bool template_only=false);
         /** \brief reads an XML-encoded table (see saveXML() ) from the string \a data and inserts it ito the table, starting at \a start_row, \a start_col */
-        bool readXML(const QString& data, int start_row=0, int start_col=0, bool clearTable=false);
+        bool readXML(const QString& data, int start_row=0, int start_col=0, bool clearTable=false, bool read_template_only=false);
         /** \brief reads an XML-encoded table (see saveXML() ) from the file \a filename */
-        bool readXML(const QString& filename);
+        bool readXMLFile(const QString& filename, int start_row=0, int start_col=0, bool clearTable=true, bool read_template_only=false);
         /** \brief copies the given selection (or all cells, if the selection is empty) to the clipboard in an XML format (see saveXML() ) */
-        void copy(QModelIndexList selection=QModelIndexList(), bool createXMLFragment=false);
+        void copy(QModelIndexList selection=QModelIndexList(), bool createXMLFragment=false, bool template_only=false);
         /*! \brief pastes data from the cklipboard into the table, starting from the given position ... the table is resized if needed */
         void paste(int row_start=0, int column_start=0);
 

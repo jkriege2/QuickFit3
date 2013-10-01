@@ -9,10 +9,10 @@
 	<a name="functions"/><h2>Table Access Functions</h2>
 	<ul>
 		<li><a name="column"/><!-- func:column -->
-		<b><tt><!-- template -->column(column)<!-- /template --></tt> - <i> access a table column, returns a number vector</i>:</b><br>
+		<b><tt><!-- template -->column(column)<!-- /template -->, column(column, rows)</tt> - <i> access a table column, returns a number vector</i>:</b><br>
 		returns the contents of the given table <tt>column</tt>  as a vector of numbers. So to divide column 1 by column 2, one could use the column expression
 		$$cexample:column(1)/column(2)$$
-		
+		If the second argument <tt>rows</tt> is given, only the given rows are selected from the full column.
 		
 		<!-- /func:column -->
 		</li>

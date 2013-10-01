@@ -421,13 +421,13 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportFiletypes() */
         QStringList getExportFiletypes() {
             QStringList sl;
-            sl << "CSV" << "SSV" << "GERMANEXCEL" << "SYLK";
+            sl << "CSV" << "SSV" << "GERMANEXCEL" << "SYLK" << "QFTABLEXML";
             return sl;
         };
         /** \brief returns the title of the Export file dialog */
         QString getExportDialogTitle() { return tr("Export Data Table ..."); };
         /** \brief returns the filetype of the Export file dialog */
-        QString getExportDialogFiletypes() { return tr("Comma Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files [german Excel] (*.csv, *.txt);;SYLK File (*.sylk, *.slk)"); };
+        QString getExportDialogFiletypes() { return tr("Comma Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files [german Excel] (*.csv, *.txt);;SYLK File (*.sylk, *.slk);;Table XML file (*.qftxml)"); };
 
         QVariant evaluateExpression(QFMathParser &mp, QFMathParser::qfmpNode *n, QModelIndex cell, bool *ok, const QString &expression, QString *error, bool columnMode=false);
     protected slots:

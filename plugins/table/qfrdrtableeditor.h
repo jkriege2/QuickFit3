@@ -65,8 +65,13 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slCut();
         void slDelete();
 
+        void slCopyTableTemplate();
+        void slPasteTableTemplate();
+        void slSaveTableTemplate();
+        void slLoadTableTemplate();
+
         void slSetColumnValues();
-        void slCalcColumn();
+        void slCalcCell();
         void slClearExpression();
         void slRecalcAll();
         void slSort();
@@ -116,6 +121,12 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actPaste;
         QAction* actHistogram;
         QAction * actHistogram2D;
+
+        QAction* actSaveTableTemplate;
+        QAction* actLoadTableTemplate;
+        QAction* actCopyTemplate;
+        QAction* actPasteTemplate;
+
 
         QToolBar* tbMain;
 

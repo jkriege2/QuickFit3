@@ -1168,7 +1168,7 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
     return true;
 }
 
-QString QFTableModel::saveXML(QModelIndexList selection, bool createXMLFragment)
+QString QFTableModel::saveXML(QModelIndexList selection, bool createXMLFragment, bool template_only)
 {
     QString xml;
     {
@@ -1211,62 +1211,69 @@ QString QFTableModel::saveXML(QModelIndexList selection, bool createXMLFragment)
             }
         }
         w.writeEndElement();
-        w.writeStartElement("data");
-        for (int r=0; r<rowCount(); r++) {
-            for (int c=0; c<columnCount(); c++) {
-                if (selection.isEmpty() || selection.contains(index(r, c))) {
-                    w.writeStartElement("cell");
-                    w.writeAttribute("row", QString::number(r-smallestRow));
-                    w.writeAttribute("col", QString::number(c-smallestColumn));
-                    QVariant check=data(index(r, c), Qt::CheckStateRole);
-                    if (check.isValid()) w.writeAttribute("check", QString::number(check.toInt()));
-                    QVariant d=cell(r,c);
-                    quint32 a=xyAdressToUInt32(r,c);
-                    w.writeAttribute("type", getQVariantType(d));
-                    if (dataCheckedMap.contains(a)) w.writeAttribute("checked", QString::number(dataCheckedMap[a].toInt()));
-                    if (moreDataMap.contains(a)) {
-                        QHashIterator<int, QVariant> it(moreDataMap[a]);
-                        while (it.hasNext()) {
-                            it.next();
-                            w.writeAttribute(QString("more_type%1").arg(it.key()), getQVariantType(it.value()));
-                            w.writeAttribute(QString("more_data%1").arg(it.key()), getQVariantData(it.value()));
+        if (!template_only) {
+            w.writeStartElement("data");
+            for (int r=0; r<rowCount(); r++) {
+                for (int c=0; c<columnCount(); c++) {
+                    if (selection.isEmpty() || selection.contains(index(r, c))) {
+                        w.writeStartElement("cell");
+                        w.writeAttribute("row", QString::number(r-smallestRow));
+                        w.writeAttribute("col", QString::number(c-smallestColumn));
+                        QVariant check=data(index(r, c), Qt::CheckStateRole);
+                        if (check.isValid()) w.writeAttribute("check", QString::number(check.toInt()));
+                        QVariant d=cell(r,c);
+                        quint32 a=xyAdressToUInt32(r,c);
+                        w.writeAttribute("type", getQVariantType(d));
+                        if (dataCheckedMap.contains(a)) w.writeAttribute("checked", QString::number(dataCheckedMap[a].toInt()));
+                        if (moreDataMap.contains(a)) {
+                            QHashIterator<int, QVariant> it(moreDataMap[a]);
+                            while (it.hasNext()) {
+                                it.next();
+                                w.writeAttribute(QString("more_type%1").arg(it.key()), getQVariantType(it.value()));
+                                w.writeAttribute(QString("more_data%1").arg(it.key()), getQVariantData(it.value()));
 
+                            }
                         }
+                        w.writeCharacters(getQVariantData(d));
+                        w.writeEndElement();
                     }
-                    w.writeCharacters(getQVariantData(d));
-                    w.writeEndElement();
                 }
             }
+            w.writeEndElement();
         }
-        w.writeEndElement();
         w.writeEndElement();
         if (!createXMLFragment)  w.writeEndDocument();
     }
     return xml;
 }
 
-bool QFTableModel::saveXML(const QString &filename, QModelIndexList selection)
+bool QFTableModel::saveXML(const QString &filename, QModelIndexList selection, bool createXMLFragment, bool template_only)
 {
     QFile f(filename);
     if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
         QTextStream out(&f);
-        out<<saveXML(selection, false);
+        out<<saveXML(selection, createXMLFragment, template_only);
         f.close();
         return true;
     }
     return false;
 }
 
-void QFTableModel::copy(QModelIndexList selection, bool createXMLFragment) {
-    QString xml=saveXML(selection, createXMLFragment);
+void QFTableModel::copy(QModelIndexList selection, bool createXMLFragment, bool template_only) {
+    QString xml=saveXML(selection, createXMLFragment, template_only);
     QMimeData* mime=new QMimeData();
-    mime->setData("quickfit3/qfrdrtable", xml.toUtf8());
-    QString csv;
-    QTextStream out(&csv);
-    QLocale loc;
-    loc.setNumberOptions(QLocale::OmitGroupSeparator);
-    saveCSV(out, "\t", loc.decimalPoint().toLatin1());
-    mime->setText(csv);
+    if (template_only) {
+        qDebug()<<"template:"<<xml;
+        mime->setData("quickfit3/qfrdrtable_template", xml.toUtf8());
+    } else {
+        mime->setData("quickfit3/qfrdrtable", xml.toUtf8());
+        QString csv;
+        QTextStream out(&csv);
+        QLocale loc;
+        loc.setNumberOptions(QLocale::OmitGroupSeparator);
+        saveCSV(out, "\t", loc.decimalPoint().toLatin1());
+        mime->setText(csv);
+    }
     QApplication::clipboard()->setMimeData(mime);
 }
 
@@ -1292,6 +1299,10 @@ void QFTableModel::paste(int row_start, int column_start) {
         QString data=QString::fromUtf8(mime->data("quickfit3/qfrdrtable").data());
         //qDebug()<<"pasting quickfit3/qfrdrtable";
         readXML(data, row, column, false);
+    } else if (mime && mime->hasFormat("quickfit3/qfrdrtable_template")) {
+        QString data=QString::fromUtf8(mime->data("quickfit3/qfrdrtable_template").data());
+        //qDebug()<<"pasting quickfit3/qfrdrtable";
+        readXML(data, row, column, false, true);
     } else if (mime && mime->hasFormat("jkqtplotter/csv")) {
         QString data=QString::fromUtf8(mime->data("jkqtplotter/csv").data());
         //qDebug()<<"pasting jkqtplotter/csv: \n"<<data;
@@ -1372,7 +1383,7 @@ void QFTableModel::disableSignals()
     doEmitSignals=false;
 }
 
-bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bool clearTable) {
+bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bool clearTable, bool read_template_only) {
     bool oldEmit=doEmitSignals;
     doEmitSignals=false;
     int srow=start_row;
@@ -1386,7 +1397,7 @@ bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bo
     if (doc.setContent(data)) {
         QDomElement er=doc.firstChildElement("qfrdrtable");
         if (!er.isNull()) {
-            if (clearTable) {
+            if (clearTable || read_template_only) {
                 QDomElement e=er.firstChildElement("columns");
                 if (!e.isNull()) {
                     e=e.firstChildElement("col");
@@ -1419,7 +1430,7 @@ bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bo
                 }
             }
             QDomElement e=er.firstChildElement("data");
-            if (!e.isNull()) {
+            if (!read_template_only && !e.isNull()) {
                 e=e.firstChildElement("cell");
                 while (!e.isNull()) {
                     int r=srow+e.attribute("row").toInt();
@@ -1463,10 +1474,10 @@ bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bo
     return false;
 }
 
-bool QFTableModel::readXML(const QString &filename) {
+bool QFTableModel::readXMLFile(const QString &filename, int start_row, int start_col, bool clearTable, bool read_template_only) {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return false;
-    return readXML(file.readAll(), 0, 0, true);
+    return readXML(file.readAll(), start_row, start_col, clearTable, read_template_only);
 }
 
 

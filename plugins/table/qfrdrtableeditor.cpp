@@ -87,6 +87,16 @@ void QFRDRTableEditor::createWidgets() {
     connect(actPaste, SIGNAL(triggered()), this, SLOT(slPaste()));
 
 
+    actSaveTableTemplate=new QAction(tr("save table template"), this);
+    connect(actSaveTableTemplate, SIGNAL(triggered()), this, SLOT(slSaveTableTemplate()));
+    actLoadTableTemplate=new QAction(tr("load table template"), this);
+    connect(actLoadTableTemplate, SIGNAL(triggered()), this, SLOT(slLoadTableTemplate()));
+    actCopyTemplate=new QAction(tr("copy selected table column template"), this);
+    connect(actCopyTemplate, SIGNAL(triggered()), this, SLOT(slCopyTableTemplate()));
+    actPasteTemplate=new QAction(tr("paste selected table column  template"), this);
+    connect(actPasteTemplate, SIGNAL(triggered()), this, SLOT(slPasteTableTemplate()));
+
+
     actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy selection for clipboard (for Excel ...)"), this);
     actCopyResultsNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy selection to clipboard (for Excel ...) without herader rows/columns"), this);
     connect(actCopyResults, SIGNAL(triggered()), tvMain, SLOT(copySelectionToExcel()));
@@ -164,7 +174,7 @@ void QFRDRTableEditor::createWidgets() {
     actCalculateColumn=new QAction(QIcon(":/table/formula.png"), tr("evaluate math expression"), this);
     actCalculateColumn->setToolTip(tr("set the value of the selected columns by a freely defineable mathematical expression"));
     actCalculateColumn->setShortcut(tr("="));
-    connect(actCalculateColumn, SIGNAL(triggered()), this, SLOT(slCalcColumn()));
+    connect(actCalculateColumn, SIGNAL(triggered()), this, SLOT(slCalcCell()));
     connect(this, SIGNAL(enableActions(bool)), actCalculateColumn, SLOT(setEnabled(bool)));
 
     actClearExpression=new QAction(QIcon(":/table/formulaclear.png"), tr("clear math expression"), this);
@@ -259,6 +269,9 @@ void QFRDRTableEditor::createWidgets() {
     menuFile->addAction(actLoadTable);
     menuFile->addAction(actSaveTable);
     menuFile->addSeparator();
+    menuFile->addAction(actLoadTableTemplate);
+    menuFile->addAction(actSaveTableTemplate);
+    menuFile->addSeparator();
     menuFile->addAction(tvMain->getActPrint());
 
     QMenu* menuEdit=propertyEditor->addMenu("&Edit", 0);
@@ -277,6 +290,9 @@ void QFRDRTableEditor::createWidgets() {
     menuEdit->addAction(actCalculateColumn);
 
     QMenu* menuTab=propertyEditor->addMenu("&Table", 0);
+    menuTab->addAction(actCopyTemplate);
+    menuTab->addAction(actPasteTemplate);
+    menuTab->addSeparator();
     menuTab->addAction(actAppendRow);
     menuTab->addAction(actInsertRow);
     menuTab->addAction(actAppendColumn);
@@ -368,41 +384,47 @@ void QFRDRTableEditor::slLoadTable() {
             QStringList filter;
             filter<<tr("Comma Separated Values, Decimal Dot (*.txt *.csv *.dat)")
                   <<tr("Semicolon Separated Values, Decimal Dot (*.txt *.csv *.dat)")
-                  <<tr("Semicolon Separated Values, Decimal Comma (*.txt *.csv *.dat)");
+                  <<tr("Semicolon Separated Values, Decimal Comma (*.txt *.csv *.dat)")
+                  <<tr("Table XML file (*.qftxml)");
             QString fileName = qfGetOpenFileName(this, tr("Load Table ..."), currentTableDir, filter.join(";;"), &selectedFilter);
             //std::cout<<"selectedFilter: "<<selectedFilter.toStdString()<<std::endl;
             if (!fileName.isNull()) {
                 QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
                 int f=filter.indexOf(selectedFilter);
 
-                dlgCSVParameters* csvDlg=new dlgCSVParameters(this, settings->getQSettings()->value("table/column_separator_save", ",").toString(),
-                                                              settings->getQSettings()->value("table/decimal_separator_save", ".").toString(),
-                                                              settings->getQSettings()->value("table/comment_start_save", "#").toString(),
-                                                              settings->getQSettings()->value("table/header_start_save", "#!").toString());
-                if (f==0) {
-                    csvDlg->column_separator=',';
-                    csvDlg->decimal_separator='.';
-                    csvDlg->comment_start='#';
-                    csvDlg->header_start="#!";
-                } else if (f==1) {
-                    csvDlg->column_separator=';';
-                    csvDlg->decimal_separator='.';
-                    csvDlg->comment_start='#';
-                    csvDlg->header_start="#!";
-                } else if (f==2) {
-                    csvDlg->column_separator=';';
-                    csvDlg->decimal_separator=',';
-                    csvDlg->comment_start='#';
-                    csvDlg->header_start="#!";
-                }
-                csvDlg->setFileContents(fileName);
-                if (csvDlg->exec()==QDialog::Accepted) {
-                    QMap<QString, QVariant> p;
-                    settings->getQSettings()->setValue("table/column_separator_save", QString(csvDlg->column_separator));
-                    settings->getQSettings()->setValue("table/decimal_separator_save", QString(csvDlg->decimal_separator));
-                    settings->getQSettings()->setValue("table/comment_start_save", QString(csvDlg->comment_start));
-                    settings->getQSettings()->setValue("table/header_start_save", QString(csvDlg->header_start));
-                    m->model()->readCSV(fileName, csvDlg->column_separator, csvDlg->decimal_separator, csvDlg->header_start, csvDlg->comment_start);
+                if (f==filter.size()-1) {
+                    m->model()->readXMLFile(fileName, 0, 0, false);
+                } else {
+
+                    dlgCSVParameters* csvDlg=new dlgCSVParameters(this, settings->getQSettings()->value("table/column_separator_save", ",").toString(),
+                                                                  settings->getQSettings()->value("table/decimal_separator_save", ".").toString(),
+                                                                  settings->getQSettings()->value("table/comment_start_save", "#").toString(),
+                                                                  settings->getQSettings()->value("table/header_start_save", "#!").toString());
+                    if (f==0) {
+                        csvDlg->column_separator=',';
+                        csvDlg->decimal_separator='.';
+                        csvDlg->comment_start='#';
+                        csvDlg->header_start="#!";
+                    } else if (f==1) {
+                        csvDlg->column_separator=';';
+                        csvDlg->decimal_separator='.';
+                        csvDlg->comment_start='#';
+                        csvDlg->header_start="#!";
+                    } else if (f==2) {
+                        csvDlg->column_separator=';';
+                        csvDlg->decimal_separator=',';
+                        csvDlg->comment_start='#';
+                        csvDlg->header_start="#!";
+                    }
+                    csvDlg->setFileContents(fileName);
+                    if (csvDlg->exec()==QDialog::Accepted) {
+                        QMap<QString, QVariant> p;
+                        settings->getQSettings()->setValue("table/column_separator_save", QString(csvDlg->column_separator));
+                        settings->getQSettings()->setValue("table/decimal_separator_save", QString(csvDlg->decimal_separator));
+                        settings->getQSettings()->setValue("table/comment_start_save", QString(csvDlg->comment_start));
+                        settings->getQSettings()->setValue("table/header_start_save", QString(csvDlg->header_start));
+                        m->model()->readCSV(fileName, csvDlg->column_separator, csvDlg->decimal_separator, csvDlg->header_start, csvDlg->comment_start);
+                    }
                 }
                 QApplication::restoreOverrideCursor();
             }
@@ -410,6 +432,47 @@ void QFRDRTableEditor::slLoadTable() {
     }
 }
 
+
+void QFRDRTableEditor::slSaveTableTemplate()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            QString selectedFilter="";
+            QString filter= tr("Table Templates (*.ttmpl);;All files (*.*)");
+            QString fileName = qfGetSaveFileName(this, m->getExportDialogTitle(), currentTableDir, filter, &selectedFilter);
+            if ((!fileName.isEmpty())&&(!fileName.isNull())) {
+                QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+                int f=filter.split(";;").indexOf(selectedFilter);
+                m->model()->saveXML(fileName, QModelIndexList(), false, true);
+            }
+            QApplication::restoreOverrideCursor();
+        }
+    }
+
+}
+
+void QFRDRTableEditor::slLoadTableTemplate()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            QString selectedFilter="";
+            QStringList filter;
+            filter<<tr("Table Templates (*.ttmpl)")
+                  <<tr("All files (*.*)");
+            QString fileName = qfGetOpenFileName(this, tr("Load Table ..."), currentTableDir, filter.join(";;"), &selectedFilter);
+            //std::cout<<"selectedFilter: "<<selectedFilter.toStdString()<<std::endl;
+            if (!fileName.isNull()) {
+                QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+                m->model()->readXMLFile(fileName, 0, 0, false, true);
+
+                QApplication::restoreOverrideCursor();
+            }
+        }
+    }
+}
 
 void QFRDRTableEditor::slClear() {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
@@ -643,7 +706,7 @@ void QFRDRTableEditor::slEditColumnProperties(int col) {
                 QVariant imwid=m->model()->getColumnHeaderData(c, QFRDRTable::ColumnImageWidth);
                 QVariant exp=m->model()->getColumnHeaderData(c, QFRDRTable::ColumnExpressionRole);
 
-                QFRDRTableColumnEditor* edt=new QFRDRTableColumnEditor(this);
+                QFRDRTableColumnEditor* edt=new QFRDRTableColumnEditor(m->model(), c, this);
                 edt->setColumnTitle(t);
                 edt->setComment(comment.toString());
                 edt->setImageWidth(imwid.toInt());
@@ -707,6 +770,37 @@ void QFRDRTableEditor::slPaste() {
     }
 }
 
+void QFRDRTableEditor::slCopyTableTemplate()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+            m->model()->copy(tvMain->selectionModel()->selectedIndexes(), false, true);
+            QApplication::restoreOverrideCursor();
+        }
+    }
+
+}
+
+void QFRDRTableEditor::slPasteTableTemplate()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            if (QApplication::clipboard()->mimeData()&&QApplication::clipboard()->mimeData()->hasFormat("quickfit3/qfrdrtable_template")) {
+                QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+                QModelIndex c=tvMain->selectionModel()->currentIndex();
+                m->model()->paste(c.row(), c.column());
+                QApplication::restoreOverrideCursor();
+            } else {
+                QMessageBox::critical(this, tr("Paste table template"), tr("No table template data in clipboard!"));
+            }
+        }
+    }
+}
+
+
 void QFRDRTableEditor::slCut() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     slCopy();
@@ -726,6 +820,7 @@ void QFRDRTableEditor::slDelete() {
         }
     }
 }
+
 
 void QFRDRTableEditor::slSetColumnValues() {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
@@ -786,15 +881,17 @@ void QFRDRTableEditor::slSetColumnValues() {
 }
 
 
-void QFRDRTableEditor::slCalcColumn() {
+void QFRDRTableEditor::slCalcCell() {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
         if (m->model()) {
             QModelIndex ci=tvMain->currentIndex();
             if (ci.isValid()) {
-                if (!dlgMathExpression) dlgMathExpression=new QFRDRTableFormulaDialog(this);
                 QItemSelectionModel* smod=tvMain->selectionModel();
+                QModelIndex cur=tvMain->currentIndex();
                 if (smod->hasSelection()) {
+                    if (!dlgMathExpression) dlgMathExpression=new QFRDRTableFormulaDialog(m->model(), smod->currentIndex().column(), smod->currentIndex().row(), this);
+                    else dlgMathExpression->init(m->model(), cur.column(), cur.row());
                     QModelIndexList idxs=smod->selectedIndexes();
                     QString exp=dlgMathExpression->getExpression();
                     bool first=true;
@@ -808,6 +905,7 @@ void QFRDRTableEditor::slCalcColumn() {
                         }
                     }
                     dlgMathExpression->setExpression(exp);
+                    dlgMathExpression->init(m->model(), cur.column(), cur.row());
                     if (dlgMathExpression->exec()) {
                         if (idxs.size()>0) {
                             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -918,7 +1016,7 @@ QVariant QFRDRTableEditor::evaluateExpression(QFMathParser& mp, QFMathParser::qf
 void QFRDRTableEditor::editExpression(const QModelIndex &index)
 {
     tvMain->setCurrentIndex(index);
-    slCalcColumn();
+    slCalcCell();
 }
 
 void QFRDRTableEditor::slRecalcAll()

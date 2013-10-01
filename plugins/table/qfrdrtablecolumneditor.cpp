@@ -11,10 +11,12 @@ qfmpResult QFRDRTableColumnEditor_dummy(const qfmpResult* params, unsigned int n
     return res;
 }
 
-QFRDRTableColumnEditor::QFRDRTableColumnEditor(QWidget *parent) :
+QFRDRTableColumnEditor::QFRDRTableColumnEditor(QFTablePluginModel *model, int col, QWidget *parent):
     QDialog(parent),
     ui(new Ui::QFRDRTableColumnEditor)
 {
+    this->model=model;
+    this->col=col;
     functionRef=new QFFunctionReferenceTool(NULL);
     functionRef->setCompleterFile(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/table/table_expression.txt");
     functionRef->setDefaultWordsMathExpression();
@@ -30,7 +32,7 @@ QFRDRTableColumnEditor::QFRDRTableColumnEditor(QWidget *parent) :
 
 
 
-    QStringList defaultWords;
+
     defaultWords<<"rows";
     defaultWords<<"columns";
     defaultWords<<"row";
@@ -41,8 +43,9 @@ QFRDRTableColumnEditor::QFRDRTableColumnEditor(QWidget *parent) :
     defaultWords<<"dataleft";
 
 
-    QFMathParser mp; // instanciate
-    addQFRDRTableFunctions(&mp, &defaultWords);
+    mpdata.column=col;
+    mpdata.row=0;
+    mpdata.model=model;
 
     functionRef->addDefaultWords(defaultWords);
 
@@ -53,6 +56,8 @@ QFRDRTableColumnEditor::QFRDRTableColumnEditor(QWidget *parent) :
     QTimer::singleShot(10, this, SLOT(delayedStartSearch()));
 
 }
+
+
 
 QFRDRTableColumnEditor::~QFRDRTableColumnEditor()
 {
@@ -109,26 +114,26 @@ QString QFRDRTableColumnEditor::getColumnTitle() const
 
 void QFRDRTableColumnEditor::on_edtFormula_textChanged(QString text) {
 
+
+
+
     QFMathParser mp; // instanciate
-    addQFRDRTableFunctions(&mp);
-    mp.addVariableDouble("row", 0.0);
-    mp.addVariableDouble("rows", 1.0);
-    mp.addVariableDouble("col", 0.0);
-    //mp.addVariableDouble("column", 0.0);
-    mp.addVariableDouble("columns", 1.0);
-    mp.addFunction("column", QFRDRTableColumnEditor_dummy);
-    mp.addFunction("columndata", QFRDRTableColumnEditor_dummy);
+    addQFRDRTableFunctions(&mp, &defaultWords, true);
+    mp.addVariableDouble("col", col+1);
+    mp.addVariableDouble("columns", model->columnCount());
+    mp.addVariableDouble("rows", model->rowCount());
+    mp.set_data(&mpdata);
     QFMathParser::qfmpNode* n;
     // parse some numeric expression
     n=mp.parse(getExpression());
-    delete n;
     if (mp.hasErrorOccured()) {
         ui->labError->setText(tr("<font color=\"red\">ERROR:<br>&nbsp;&nbsp;&nbsp;&nbsp;%1</font>").arg(mp.getLastErrors().join("<br>&nbsp;&nbsp;&nbsp;&nbsp;")));
     } else {
         QString testout=qfShortenString(n->evaluate().toTypeString(), 250, 30, tr(" ... "));
 
-        ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>&nbsp;&nbsp;&nbsp;&nbsp;<i>test output:</i>&nbsp;&nbsp;%1").arg(testout));
+        ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>&nbsp;&nbsp;&nbsp;&nbsp;<i>expression result preview:</i>&nbsp;&nbsp;%1").arg(testout));
     }
+    delete n;
 
 }
 

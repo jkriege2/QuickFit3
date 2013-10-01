@@ -11,7 +11,7 @@ qfmpResult QFRDRTableFormulaDialog_dummy(const qfmpResult* params, unsigned char
     return res;
 }
 
-QFRDRTableFormulaDialog::QFRDRTableFormulaDialog(QWidget *parent) :
+QFRDRTableFormulaDialog::QFRDRTableFormulaDialog(QFTablePluginModel *model, int col, int row, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QFRDRTableFormulaDialog)
 {
@@ -30,7 +30,7 @@ QFRDRTableFormulaDialog::QFRDRTableFormulaDialog(QWidget *parent) :
 
 
 
-    QStringList defaultWords;
+
     defaultWords<<"rows";
     defaultWords<<"columns";
     defaultWords<<"row";
@@ -40,8 +40,8 @@ QFRDRTableFormulaDialog::QFRDRTableFormulaDialog(QWidget *parent) :
     defaultWords<<"dataleft";
 
 
-    QFMathParser mp; // instanciate
-    addQFRDRTableFunctions(&mp, &defaultWords);
+    init(model, col, row);
+
 
     functionRef->addDefaultWords(defaultWords);
 
@@ -60,6 +60,16 @@ QFRDRTableFormulaDialog::~QFRDRTableFormulaDialog()
     delete ui;
 }
 
+void QFRDRTableFormulaDialog::init(QFTablePluginModel *model, int col, int row)
+{
+    this->model=model;
+    this->col=col;
+    this->row=row;
+    mpdata.column=col;
+    mpdata.row=row;
+    mpdata.model=model;
+}
+
 QString QFRDRTableFormulaDialog::getExpression() const
 {
     return ui->edtFormula->text();
@@ -74,20 +84,22 @@ void QFRDRTableFormulaDialog::on_edtFormula_textChanged(QString text) {
 
     QFMathParser mp; // instanciate
     addQFRDRTableFunctions(&mp);
-    mp.addVariableDouble("row", 0.0);
-    mp.addVariableDouble("rows", 1.0);
-    mp.addVariableDouble("col", 0.0);
-    mp.addVariableDouble("column", 0.0);
-    mp.addVariableDouble("columns", 1.0);
+    mp.addVariableDouble("row", row+1);
+    mp.addVariableDouble("rows", model->rowCount());
+    mp.addVariableDouble("col", col+1);
+    mp.addVariableDouble("column", col+1);
+    mp.addVariableDouble("columns", model->columnCount());
+    mp.set_data(&mpdata);
     QFMathParser::qfmpNode* n;
     // parse some numeric expression
     n=mp.parse(getExpression());
-    delete n;
     if (mp.hasErrorOccured()) {
         ui->labError->setText(tr("<font color=\"red\">ERROR:<br>&nbsp;&nbsp;&nbsp;&nbsp;%1</font>").arg(mp.getLastErrors().join("<br>&nbsp;&nbsp;&nbsp;&nbsp;")));
     } else {
-        ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>"));
+        QString testout=qfShortenString(n->evaluate().toTypeString(), 250, 30, tr(" ... "));
+        ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>&nbsp;&nbsp;&nbsp;&nbsp;<i>expression result preview:</i>&nbsp;&nbsp;%1").arg(testout));
     }
+    delete n;
 
 }
 

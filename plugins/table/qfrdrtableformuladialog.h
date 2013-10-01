@@ -8,7 +8,7 @@
 #include "qftablemodel.h"
 #include <QStringListModel>
 #include "qffunctionreferencetool.h"
-
+#include "qfrdrtableparserfunctions.h"
 
 
 
@@ -43,8 +43,10 @@ class QFRDRTableFormulaDialog : public QDialog
 
 
     public:
-        explicit QFRDRTableFormulaDialog(QWidget *parent = 0);
+        explicit QFRDRTableFormulaDialog(QFTablePluginModel* model, int col, int row, QWidget *parent = 0);
         ~QFRDRTableFormulaDialog();
+
+        void init(QFTablePluginModel* model, int col, int row);
 
         QString getExpression() const;
         void setExpression(const QString& exp);
@@ -59,7 +61,13 @@ class QFRDRTableFormulaDialog : public QDialog
     protected:
         Ui::QFRDRTableFormulaDialog *ui;
 
+        QFTablePluginModel* model;
+        int col;
+        int row;
+        QFMathParserData mpdata;
         QFFunctionReferenceTool* functionRef;
+
+        QStringList defaultWords;
 
         QString getFunctionTemplate(QString name);
         QString getFunctionHelp(QString name);
