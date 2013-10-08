@@ -299,7 +299,7 @@ void QFExtensionCameraRadhard2::disconnectCameraDevice(unsigned int camera) {
 }
 
 double QFExtensionCameraRadhard2::getCameraExposureTime(unsigned int camera) {
-	return calcExposureTime(iterations, divider);
+    return calcExposureTime(iterations, divider)/1.0e6;
 }
 
 double QFExtensionCameraRadhard2::calcExposureTime(double piterations, double pdivider) {
