@@ -1194,7 +1194,7 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename, bool loadOve
     cfr->processFrames(1);
 
     //qDebug()<<getID()<<"loadRadhard2File("<<cfr->getTotalLagCount();
-    if (loadOverview) {
+    if (!loadOverview) {
         allocateContents(width,height,cfr->getTotalLagCount()-1);
         //load correlation data
         for(int i=0; i<width*height; i++) {

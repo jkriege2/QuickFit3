@@ -444,44 +444,47 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
             if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
                 for (int c=0; c<channels; c++) {
                     double* d=m->getImageStack(cmbVideo->currentIndex(),0, c);
-                    size_t c_run=ds->addCopiedColumn(&(d[i]),frames, vidW*vidH, QString("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
-                    size_t c_rune=-1;
-                    JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
-                    g->set_lineWidth(1);
-                    g->set_xColumn(c_tau);
-                    g->set_yColumn(c_run);
-                    g->set_drawLine(runLine);
-                    g->set_symbol(runSymbol);
-                    g->set_title(tr("run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
-                    QColor col;
-                    if (cnt>1) {
-                        col.setHsvF(cc/cnt,1.0,1.0);
-                        if (c%3==0) g->set_color(col);
-                        else g->set_color(col.darker(150));
-                        if (c%3==1) g->set_style(Qt::DashLine);
-                        if (c%3==2) g->set_style(Qt::DashDotLine);
-                    } else  {
-                        col=QColor("green");
-                        if (c==1) col=QColor("red");
-                        if (c==2) col=QColor("blue");
-                        if (c==3) col=QColor("magenta");
-                        g->set_color(col);
-                        g->set_style(Qt::SolidLine);
+                    QColor col=QColor("green");
+                    if (d) {
+                        size_t c_run=ds->addCopiedColumn(&(d[i]),frames, vidW*vidH, QString("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
+                        size_t c_rune=-1;
+                        JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
+                        g->set_lineWidth(1);
+                        g->set_xColumn(c_tau);
+                        g->set_yColumn(c_run);
+                        g->set_drawLine(runLine);
+                        g->set_symbol(runSymbol);
+                        g->set_title(tr("run %1: %2").arg(i).arg(m->getCorrelationRunName(i)));
+
+                        if (cnt>1) {
+                            col.setHsvF(cc/cnt,1.0,1.0);
+                            if (c%3==0) g->set_color(col);
+                            else g->set_color(col.darker(150));
+                            if (c%3==1) g->set_style(Qt::DashLine);
+                            if (c%3==2) g->set_style(Qt::DashDotLine);
+                        } else  {
+                            col=QColor("green");
+                            if (c==1) col=QColor("red");
+                            if (c==2) col=QColor("blue");
+                            if (c==3) col=QColor("magenta");
+                            g->set_color(col);
+                            g->set_style(Qt::SolidLine);
+                        }
+
+
+
+                        g->set_yErrorColumn(c_rune);
+                        g->set_yErrorStyle(runerrorstyle);
+                        g->set_xErrorStyle(JKQTPnoError);
+                        QColor errc=g->get_color().lighter();
+                        g->set_errorColor(errc);
+                        errc.setAlphaF(0.5);
+                        g->set_errorFillColor(errc);
+                        g->set_symbolSize(5);
+                        g->set_errorWidth(1);
+
+                        plotter->addGraph(g);
                     }
-
-
-
-                    g->set_yErrorColumn(c_rune);
-                    g->set_yErrorStyle(runerrorstyle);
-                    g->set_xErrorStyle(JKQTPnoError);
-                    QColor errc=g->get_color().lighter();
-                    g->set_errorColor(errc);
-                    errc.setAlphaF(0.5);
-                    g->set_errorFillColor(errc);
-                    g->set_symbolSize(5);
-                    g->set_errorWidth(1);
-
-                    plotter->addGraph(g);
 
 
                     if (cmbVideo->currentText().toLower().contains("uncorrected") || cmbVideo->currentText().toLower().contains("uncorr")) {
