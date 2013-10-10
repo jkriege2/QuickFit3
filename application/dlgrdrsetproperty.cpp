@@ -98,7 +98,7 @@ QList<QVariant> dlgRDRSetProperty::getNewPropValues() const
         l<<QStringToDouble( ui->edtValue->text());
     } else if (ui->cmbType->currentIndex()==2) {
         l<<ui->edtValue->text().toInt();
-    } else if (ui->cmbType->currentIndex()==1) {
+    } else if (ui->cmbType->currentIndex()==3) {
         l<<QStringToBool(ui->edtValue->text());
     } else {
         l<<QString("");

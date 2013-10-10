@@ -1248,7 +1248,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                         int role=rx.cap(1).toInt(&ok);
                         if (ok&&role>=0 && !te.attribute(a).isEmpty()) {
                             QVariant v= getQVariantFromString( te.attribute(QString("colpart%1").arg(role), "string"), te.attribute(a));
-                            datamodel->setColumnHeaderData(columns-1, ColumnExpressionRole, v);
+                            datamodel->setColumnHeaderData(columns-1, role, v);
                         }
                     }
                 }
