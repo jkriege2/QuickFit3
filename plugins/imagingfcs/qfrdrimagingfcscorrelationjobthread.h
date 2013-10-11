@@ -249,6 +249,8 @@ class QFRDRImagingFCSCorrelationJobThread : public QThread {
         inline double bleachCorrectExp(const double &intensity, int i, double t);
         inline double bleachCorrectExpPoly2(const double &intensity, int i, double t);
         inline double bleachCorrectExpPoly3(const double &intensity, int i, double t);
+        inline double bleachCorrectExpPoly4(const double &intensity, int i, double t);
+        inline double bleachCorrectExpPoly5(const double &intensity, int i, double t);
         inline double bleachCorrectDblExp(const double &intensity, int i, double t);
 
         /*! \brief replace some special substrings in the output filename pre- and postfix

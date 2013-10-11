@@ -489,6 +489,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                             if (job.bleach==BLEACH_EXP || job.bleach==BLEACH_EXP_POLY2 || job.bleach==BLEACH_EXP_POLY3  || job.bleach==BLEACH_EXP_POLY4 || job.bleach==BLEACH_EXP_POLY5  || job.bleach==BLEACH_DBL_EXP || job.bleach==BLEACH_EXPREG) {
                                 emit messageChanged(tr("saving bleach parameter images ..."));
                                 QString localFilename;
+                                TIFF* tif;
+                                bool error=false;
 
                                 localFilename=bleachAmplitudeFilename=outputFilenameBase+".bleachamplitude.tif";
                                 tif = TIFFOpen(localFilename.toAscii().data(),"w");
