@@ -23,8 +23,11 @@
 	  <li><b>remove fitted function (exponential, exponential(poly2), exponential(poly3)):</b> This method assumes that the intensity of every pixel decays with one of these functions:
 	  <ol>
 	    <li><b><i>mono-exponential:</i></b> $$math:f(t)=A\cdot\exp\left(-\frac{t}{\tau_{bleach}}\right) $$
-	    <li><b><i>mono-exponential(poly2):</i></b> $$math:f(t)=A\cdot\exp\left(-\frac{o+t+f_2\cdot t^2}{\tau_{bleach}}\right) $$
-	    <li><b><i>mono-exponential(poly3):</i></b> $$math:f(t)=A\cdot\exp\left(-\frac{o+t+f_2\cdot t^2+f_3\cdot t^3}{\tau_{bleach}}\right) $$
+	    <li><b><i>mono-exponential(poly2):</i></b> $$math:f(t)=A\cdot\exp\left(-\frac{t+f_2\cdot t^2}{\tau_{bleach}}\right) $$
+	    <li><b><i>mono-exponential(poly3):</i></b> $$math:f(t)=A\cdot\exp\left(-\frac{t+f_2\cdot t^2+f_3\cdot t^3}{\tau_{bleach}}\right) $$
+	    <li><b><i>mono-exponential(poly4):</i></b> $$math:f(t)=A\cdot\exp\left(-\frac{t+f_2\cdot t^2+f_3\cdot t^3+f_4\cdot t^4}{\tau_{bleach}}\right) $$
+	    <li><b><i>mono-exponential(poly5):</i></b> $$math:f(t)=A\cdot\exp\left(-\frac{t+f_2\cdot t^2+f_3\cdot t^3+f_4\cdot t^4+f_5\cdot t^5}{\tau_{bleach}}\right) $$
+	    <li><b><i>double-exponential:</i></b> $$math:f(t)=A_1\cdot\exp\left(-\frac{t}{\tau_{b1}}\right)+A_2\cdot\exp\left(-\frac{t}{\tau_{b2}}\right) $$
 	  </ol>	
 	  For each pixel, a fit to a subset of max. 500 frames from complete image series is performed to determine the parameters in the equation above. This fit is automated and unsupervised!!! The results will be stored as TIFF images when the correlation is done. Each pixel may then be corrected according to (See references <a href="#references">[5,6]</a> for details on this method):
 	  <blockquote>

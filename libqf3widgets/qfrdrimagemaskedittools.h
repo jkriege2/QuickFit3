@@ -52,6 +52,7 @@ class QFWIDLIB_EXPORT QFRDRImageMaskEditTools: public QObject {
         bool getMaskEditing() const;
         void copyMask(bool* data, int maskSize);
         void setMask(bool* data, int maskSize);
+        void setEditingMode(int idx);
     public slots:
         void loadMask();
         void pasteMask();

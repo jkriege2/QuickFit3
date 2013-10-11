@@ -637,7 +637,7 @@ void QFRDRImageMaskEditTools::setAllowEditSelection(bool enabled, bool *selectio
     this->selectionEditing=enabled;
     if (selectionEditing && !maskEditing) cmbMode->setCurrentIndex(1);
     if (maskEditing && !selectionEditing) cmbMode->setCurrentIndex(0);
-    if (maskEditing && selectionEditing) cmbMode->setCurrentIndex(1);
+    //if (maskEditing && selectionEditing) cmbMode->setCurrentIndex(1);
     actMode->setVisible(maskEditing&&selectionEditing);
     actMaskSelected->setVisible((imagemask||runselection)&&maskEditing&&selectionEditing);
     actUnmaskSelected->setVisible((imagemask||runselection)&&maskEditing&&selectionEditing);
@@ -655,7 +655,7 @@ void QFRDRImageMaskEditTools::setMaskEditing(bool enabled)
 
     if (selectionEditing && !maskEditing) cmbMode->setCurrentIndex(1);
     if (maskEditing && !selectionEditing) cmbMode->setCurrentIndex(0);
-    if (maskEditing && selectionEditing) cmbMode->setCurrentIndex(1);
+    //if (maskEditing && selectionEditing) cmbMode->setCurrentIndex(1);
     actMode->setVisible(maskEditing&&selectionEditing);
     actMaskSelected->setVisible((imagemask||runselection)&&maskEditing&&selectionEditing);
     actUnmaskSelected->setVisible((imagemask||runselection)&&maskEditing&&selectionEditing);
@@ -734,6 +734,7 @@ void QFRDRImageMaskEditTools::imageScribbled(double x, double y, Qt::KeyboardMod
 void QFRDRImageMaskEditTools::imageRectangleFinished(double x, double y, double width, double height, Qt::KeyboardModifiers modifiers)
 {
     //qDebug()<<"QFRDRImageMaskEditTools::imageRectangleFinished("<<x<<y<<width<<height<<")";
+    //qDebug()<<"maskEditing="<<maskEditing<<"   selectionEditing="<<selectionEditing<<"   cmbMode->currentIndex()="<<cmbMode->currentIndex();
 
     if (maskEditing && (!selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0))) {
 
@@ -1082,4 +1083,9 @@ void QFRDRImageMaskEditTools::setMask(bool *data, int maskSize)
             else runselection->leaveoutRemoveRun(i);
         }
     }
+}
+
+void QFRDRImageMaskEditTools::setEditingMode(int idx)
+{
+    cmbMode->setCurrentIndex(idx);
 }

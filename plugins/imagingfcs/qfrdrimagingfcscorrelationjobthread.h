@@ -35,8 +35,8 @@ class QFRDRImagingFCSCorrelationJobThread; // forward
 #define BLEACH_EXP_POLY2 4
 #define BLEACH_EXP_POLY3 5
 #define BLEACH_DBL_EXP 6
-#define BLEACH_EXP_POLY2_NOSHIFT 7
-#define BLEACH_EXP_POLY3_NOSHIFT 8
+#define BLEACH_EXP_POLY4 7
+#define BLEACH_EXP_POLY5 8
 
 
 /*! \brief job description for correlation
@@ -532,14 +532,14 @@ data                                                   size [bytes]             
 
         float* backgroundImage;
         float* backgroundImageStd;
-        float* bleachOffset;
         float* bleachAmplitude;
         float* bleachTime;
         float* bleachAmplitude2;
         float* bleachTime2;
         float* bleachPoly2;
         float* bleachPoly3;
-        float* bleachPolyShift;
+        float* bleachPoly4;
+        float* bleachPoly5;
         uint8_t* bleachFitOK;
         float* firstFrames;
         float* lastFrames;

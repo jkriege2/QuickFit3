@@ -493,10 +493,12 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
                         double bleachAmplitude=0;
                         double bleachTime2=0;
                         double bleachAmplitude2=0;
-                        double bleachFactor=0;
+                        double bleachFactor2=0;
                         double bleachFactor3=0;
+                        double bleachFactor4=0;
+                        double bleachFactor5=0;
                         double bleachOffset=0;
-                        bool hasBTime=false, hasBA=false, hasBTime2=false, hasBA2=false, hasBFactor=false, hasBFactor3=false, hasBOffset=false;
+                        bool hasBTime=false, hasBA=false, hasBTime2=false, hasBA2=false, hasBFactor2=false, hasBFactor3=false, hasBFactor4=false, hasBFactor5=false, hasBOffset=false;
                         for (int id=0; id<m->getOverviewImageCount(); id++) {
                             QString ft=m->getOverviewImageID(id);
                             QString name=m->getOverviewImageName(id);
@@ -518,11 +520,17 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
                                         bleachTime=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i, c>0);
                                         hasBTime=true;
                                     } else if (name.toLower().contains(tr("bleach polynomial factor file"))) {
-                                        bleachFactor=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i, c>0);
-                                        hasBFactor=true;
+                                        bleachFactor2=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i, c>0);
+                                        hasBFactor2=true;
                                     } else if (name.toLower().contains(tr("bleach polynomial factor 3 file"))) {
                                         bleachFactor3=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i, c>0);
                                         hasBFactor3=true;
+                                    } else if (name.toLower().contains(tr("bleach polynomial factor 4 file"))) {
+                                        bleachFactor4=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i, c>0);
+                                        hasBFactor4=true;
+                                    } else if (name.toLower().contains(tr("bleach polynomial factor 5 file"))) {
+                                        bleachFactor5=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i, c>0);
+                                        hasBFactor5=true;
                                     } else if (name.toLower().contains(tr("bleach polynomial shift file")) || name.toLower().contains(tr("bleach polynomial offset file"))) {
                                         bleachOffset=m->readValueFromPossiblySplitImage(d, m->getOverviewImageWidth(id), m->getOverviewImageHeight(id), i, c>0);
                                         hasBOffset=true;
@@ -539,15 +547,25 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
                         if (hasBTime && hasBA) {
                             double* d=(double*)malloc(frames*sizeof(double));
                             double timeFactor=m->getProperty("FRAME_COUNT", 1).toDouble()/double(frames);
-                            if (hasBFactor&&hasBFactor3&&hasBOffset) {
+                            if (hasBFactor2&&hasBFactor3&&hasBFactor4&&hasBFactor5) {
                                 for (int tt=0; tt<frames; tt++) {
                                     double time=double(tt)*timeFactor;
-                                    d[tt]=background+bleachAmplitude*exp(-(bleachOffset+time+bleachFactor*qfSqr(time)+bleachFactor3*qfCube(time))/bleachTime);
+                                    d[tt]=background+bleachAmplitude*exp(-(bleachOffset+time+bleachFactor2*qfSqr(time)+bleachFactor3*qfCube(time)+bleachFactor4*qfPow4(time)+bleachFactor5*qfPow5(time))/bleachTime);
                                 }
-                            } else if (hasBFactor&&hasBOffset) {
+                            } else if (hasBFactor2&&hasBFactor3&&hasBFactor4) {
                                 for (int tt=0; tt<frames; tt++) {
                                     double time=double(tt)*timeFactor;
-                                    d[tt]=background+bleachAmplitude*exp(-(bleachOffset+time+bleachFactor*qfSqr(time))/bleachTime);
+                                    d[tt]=background+bleachAmplitude*exp(-(bleachOffset+time+bleachFactor2*qfSqr(time)+bleachFactor3*qfCube(time)+bleachFactor4*qfPow4(time))/bleachTime);
+                                }
+                            } else if (hasBFactor2&&hasBFactor3) {
+                                for (int tt=0; tt<frames; tt++) {
+                                    double time=double(tt)*timeFactor;
+                                    d[tt]=background+bleachAmplitude*exp(-(bleachOffset+time+bleachFactor2*qfSqr(time)+bleachFactor3*qfCube(time))/bleachTime);
+                                }
+                            } else if (hasBFactor2) {
+                                for (int tt=0; tt<frames; tt++) {
+                                    double time=double(tt)*timeFactor;
+                                    d[tt]=background+bleachAmplitude*exp(-(bleachOffset+time+bleachFactor2*qfSqr(time))/bleachTime);
                                 }
                             } else if (hasBTime2 && hasBA2) {
                                 for (int tt=0; tt<frames; tt++) {
@@ -569,14 +587,66 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
                             gl->set_drawLine(true);
                             gl->set_lineWidth(2);
                             gl->set_style(Qt::DashLine);
-                            if (hasBFactor3&&hasBFactor&&hasBOffset) {
-                                gl->set_title(tr("run %1: exp(pol3) fit (b=%2, A=%3, o=%5, f=%6, f_3=%7, \\tau_B=%4 s)").arg(i).arg(background).arg(floattolatexstr(bleachAmplitude, 2, true, 1e-16, 1e-3, 1e5).c_str()).arg(floattolatexstr(bleachTime/m->getProperty("FRAME_COUNT", 1).toDouble()*m->getMeasurementDuration(), 2, true, 1e-16, 1e-3, 1e5).c_str()).arg(bleachOffset).arg(bleachFactor).arg(bleachFactor3));
-                            } else if (hasBFactor&&hasBOffset) {
-                                gl->set_title(tr("run %1: exp(pol2) fit (b=%2, A=%3, o=%5, f=%6, \\tau_B=%4 s)").arg(i).arg(background).arg(floattolatexstr(bleachAmplitude, 2, true, 1e-16, 1e-3, 1e5).c_str()).arg(floattolatexstr(bleachTime/m->getProperty("FRAME_COUNT", 1).toDouble()*m->getMeasurementDuration(), 2, true, 1e-16, 1e-3, 1e5).c_str()).arg(bleachOffset).arg(bleachFactor));
+                            QString ostr="";
+                            if (hasBOffset && bleachOffset!=0) ostr=tr(", o=%1").arg(floattolatexstr(bleachOffset, 2, true, 1e-16, 1e-3, 1e5).c_str());
+                            if (hasBFactor3&&hasBFactor2&&hasBFactor4&&hasBFactor5) {
+                                gl->set_title(tr("run %1: exp(pol5) fit (b=%2, A=%3%5, f_2=%6, f_3=%7, f_4=%8, f_5=%9, \\tau_B=%4 s)")
+                                                  .arg(i)
+                                                  .arg(background)
+                                                  .arg(floattolatexstr(bleachAmplitude, 2, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(floattolatexstr(bleachTime/m->getProperty("FRAME_COUNT", 1).toDouble()*m->getMeasurementDuration(), 2, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(ostr)
+                                                  .arg(floattolatexstr(bleachFactor2, 3, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(floattolatexstr(bleachFactor3, 3, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(floattolatexstr(bleachFactor4, 3, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(floattolatexstr(bleachFactor5, 3, true, 1e-16, 1e-3, 1e5).c_str())
+                                              );
+                            } else if (hasBFactor3&&hasBFactor2&&hasBFactor4) {
+                                gl->set_title(tr("run %1: exp(pol4) fit (b=%2, A=%3%5, f_2=%6, f_3=%7, f_4=%8, \\tau_B=%4 s)")
+                                                  .arg(i)
+                                                  .arg(background)
+                                                  .arg(floattolatexstr(bleachAmplitude, 2, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(floattolatexstr(bleachTime/m->getProperty("FRAME_COUNT", 1).toDouble()*m->getMeasurementDuration(), 2, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(ostr)
+                                                  .arg(floattolatexstr(bleachFactor2, 3, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(floattolatexstr(bleachFactor3, 3, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(floattolatexstr(bleachFactor4, 3, true, 1e-16, 1e-3, 1e5).c_str())
+                                              );
+                            } else if (hasBFactor3&&hasBFactor2) {
+                                gl->set_title(tr("run %1: exp(pol3) fit (b=%2, A=%3%5, f_2=%6, f_3=%7, \\tau_B=%4 s)")
+                                                  .arg(i)
+                                                  .arg(background)
+                                                  .arg(floattolatexstr(bleachAmplitude, 2, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(floattolatexstr(bleachTime/m->getProperty("FRAME_COUNT", 1).toDouble()*m->getMeasurementDuration(), 2, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(ostr)
+                                                  .arg(floattolatexstr(bleachFactor2, 3, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(floattolatexstr(bleachFactor3, 3, true, 1e-16, 1e-3, 1e5).c_str())
+                                                );
+                            } else if (hasBFactor2) {
+                                gl->set_title(tr("run %1: exp(pol2) fit (b=%2, A=%3%5, f_2=%6, \\tau_B=%4 s)")
+                                                  .arg(i)
+                                                  .arg(background)
+                                                  .arg(floattolatexstr(bleachAmplitude, 2, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(floattolatexstr(bleachTime/m->getProperty("FRAME_COUNT", 1).toDouble()*m->getMeasurementDuration(), 2, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(ostr)
+                                                  .arg(floattolatexstr(bleachFactor2, 3, true, 1e-16, 1e-3, 1e5).c_str())
+                                              );
                             } else if (hasBTime2 && hasBA2) {
-                                gl->set_title(tr("run %1: dblexp fit (b=%2, A=%3, \\tau_B=%4 s, A2=%5, \\tau_{B2}=%6 s)").arg(i).arg(background).arg(floattolatexstr(bleachAmplitude, 2, true, 1e-16, 1e-3, 1e5).c_str()).arg(floattolatexstr(bleachTime/m->getProperty("FRAME_COUNT", 1).toDouble()*m->getMeasurementDuration(), 2, true, 1e-16, 1e-3, 1e5).c_str()).arg(floattolatexstr(bleachAmplitude2, 2, true, 1e-16, 1e-3, 1e5).c_str()).arg(floattolatexstr(bleachTime2/m->getProperty("FRAME_COUNT", 1).toDouble()*m->getMeasurementDuration(), 2, true, 1e-16, 1e-3, 1e5).c_str()));
+                                gl->set_title(tr("run %1: dblexp fit (b=%2, A=%3, \\tau_B=%4 s, A2=%5, \\tau_{B2}=%6 s)")
+                                                  .arg(i)
+                                                  .arg(background)
+                                                  .arg(floattolatexstr(bleachAmplitude, 2, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(floattolatexstr(bleachTime/m->getProperty("FRAME_COUNT", 1).toDouble()*m->getMeasurementDuration(), 2, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(floattolatexstr(bleachAmplitude2, 2, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(floattolatexstr(bleachTime2/m->getProperty("FRAME_COUNT", 1).toDouble()*m->getMeasurementDuration(), 2, true, 1e-16, 1e-3, 1e5).c_str())
+                                              );
                             } else {
-                                gl->set_title(tr("run %1: exp fit (b=%2, A=%3, \\tau_B=%4 s)").arg(i).arg(background).arg(floattolatexstr(bleachAmplitude, 2, true, 1e-16, 1e-3, 1e5).c_str()).arg(floattolatexstr(bleachTime/m->getProperty("FRAME_COUNT", 1).toDouble()*m->getMeasurementDuration(), 2, true, 1e-16, 1e-3, 1e5).c_str()));
+                                gl->set_title(tr("run %1: exp fit (b=%2, A=%3, \\tau_B=%4 s)")
+                                                  .arg(i)
+                                                  .arg(background)
+                                                  .arg(floattolatexstr(bleachAmplitude, 2, true, 1e-16, 1e-3, 1e5).c_str())
+                                                  .arg(floattolatexstr(bleachTime/m->getProperty("FRAME_COUNT", 1).toDouble()*m->getMeasurementDuration(), 2, true, 1e-16, 1e-3, 1e5).c_str())
+                                              );
                             }
                             plotter->addGraph(gl);
                         }

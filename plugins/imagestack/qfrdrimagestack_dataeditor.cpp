@@ -187,6 +187,8 @@ void QFRDRImageStackDataEditor::createWidgets() {
     toolbar->addAction(pltImage->get_plotter()->get_actZoomIn());
     toolbar->addAction(pltImage->get_plotter()->get_actZoomOut());
     toolbar->addSeparator();
+    maskTools->registerMaskToolsToToolbar(toolbar);
+    toolbar->addSeparator();
     maskTools->registerPlotterMaskToolsToToolbar(toolbar);
 
 
@@ -363,6 +365,8 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
         plteOverviewSelected->set_width(width);
         plteOverviewSelected->set_height(height);
         maskTools->setAllowEditSelection(selection, selection, selectionWidth, selectionHeight);
+        maskTools->setMaskEditing(true);
+        maskTools->setEditingMode(0);
         if (selection&&ar) {
             double var, vara;
             double avg=statisticsAverageVarianceMasked(var, selection, ar, width*height, true);
