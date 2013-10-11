@@ -114,8 +114,11 @@ QString DlgSetRDRPropertyByRegExp::getResult(QFRawDataRecord *rdr, bool* apply, 
             return rx.cap(3);
         }
     } else if (ui->cmbMode->currentIndex()==6) {
+        int idx=rx.indexIn(input);
         QString o=output;
-        for (int i=0; i<rx.captureCount(); i++) {
+        //qDebug()<<"output="<<output<<" n="<<rx.captureCount()<<"   idx="<<idx;
+        for (int i=0; i<=rx.captureCount(); i++) {
+            //qDebug()<<QString("%")+QString::number(i)<<"  =  "<<rx.cap(i);
             o=o.replace(QString("%")+QString::number(i), rx.cap(i));
         }
         if (apply) *apply=true;
