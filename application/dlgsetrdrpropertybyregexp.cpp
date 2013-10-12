@@ -64,6 +64,21 @@ QString DlgSetRDRPropertyByRegExp::getInputString(QFRawDataRecord *rdr) const
     if (ui->cmbInputData->currentIndex()==0) {
         return rdr->getName();
     }
+    if (ui->cmbInputData->currentIndex()==1) {
+        return rdr->getFolder();
+    }
+    if (ui->cmbInputData->currentIndex()==2) {
+        return rdr->getGroupName();
+    }
+    if (ui->cmbInputData->currentIndex()==3) {
+        return rdr->getRole();
+    }
+    if (ui->cmbInputData->currentIndex()==4) {
+        return rdr->getFileName(0);
+    }
+    if (ui->cmbInputData->currentIndex()==5) {
+        return QString::number(rdr->getID());
+    }
     return QString();
 }
 
@@ -81,12 +96,12 @@ QString DlgSetRDRPropertyByRegExp::getResult(QFRawDataRecord *rdr, bool* apply, 
     if (ui->cmbMode->currentIndex()==0) {
         if (rx.exactMatch(input)) {
             if (apply) *apply=true;
-            return output;
+            return transformOutput(rdr,output);
         }
     } else if (ui->cmbMode->currentIndex()==1) {
         if (!rx.exactMatch(input)) {
             if (apply) *apply=true;
-            return output;
+            return transformOutput(rdr,output);
         }
     } else if (ui->cmbMode->currentIndex()==2) {
         int idx=rx.indexIn(input);
@@ -122,10 +137,20 @@ QString DlgSetRDRPropertyByRegExp::getResult(QFRawDataRecord *rdr, bool* apply, 
             o=o.replace(QString("%")+QString::number(i), rx.cap(i));
         }
         if (apply) *apply=true;
-        return o;
+        return transformOutput(rdr,o);
     }
     if (apply) *apply=false;
     return QString();
+}
+
+QString DlgSetRDRPropertyByRegExp::transformOutput(QFRawDataRecord *rdr, const QString &oo) const
+{
+    QString o=oo;
+    o=o.replace("%name%", rdr->getName());
+    o=o.replace("%group%", rdr->getGroupName());
+    o=o.replace("%id%", QString::number(rdr->getID()));
+    o=o.replace("%role%", rdr->getRole());
+    return o;
 }
 
 void DlgSetRDRPropertyByRegExp::applyResult(QFRawDataRecord *rdr)

@@ -655,6 +655,7 @@ void QFImFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &fi
                     QList<QFRawDataRecord*> newset;
                     bool ok=false;
                     for (int j=0; j<roles.size(); j++) newset<<NULL;
+                    //qDebug()<<"  checking group "<<project->getRDRGroupName(i)<<" with "<<rlist.size()<<" files";
                     for (int j=0; j<rlist.size(); j++) {
                         if (rlist[j]) {
                             int idx=roles.indexOf(rlist[j]->getRole());
@@ -664,6 +665,7 @@ void QFImFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &fi
                             }
                         }
                     }
+                    //qDebug()<<"    ok="<<ok<<" newset="<<newset<<" in_guessed="<<guessedFileSets.contains(newset)<<" in_fitted="<<fittedFileSets.contains(newset);
                     if (ok && !guessedFileSets.contains(newset) && !fittedFileSets.contains(newset) && !newset.contains(NULL)) guessedFileSets.append(newset);
                 }
             } else if (sameFolder) {
@@ -691,7 +693,7 @@ void QFImFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &fi
     }
     //qDebug()<<"guessed:"<<guessedFileSets.size();
 
-    if (emitChangedSignal && guessedFileSets.size()!=oldS) emit filesetsChanged();
+    if (emitChangedSignal || (emitChangedSignal && guessedFileSets.size()!=oldS)) emit filesetsChanged();
 }
 
 

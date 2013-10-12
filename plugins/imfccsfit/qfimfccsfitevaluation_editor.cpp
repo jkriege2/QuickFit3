@@ -523,6 +523,7 @@ void QFImFCCSFitEvaluationEditor::guessFromCurrentFileSet()
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     if (!data) return;
     data->guessFileSets(data->getFitFiles(), true);
+
 }
 
 void QFImFCCSFitEvaluationEditor::filesSetActivated(const QModelIndex &idx)
@@ -663,9 +664,10 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                 if (!wOK && sigma) {
                     free(sigma);
                     sigma=NULL;
-                }
-                long N=fcs->getCorrelationN();
+                }                
+                long N=fcs->getCorrelationN();                
                 if (data && tau) {
+                    //qDebug()<<arrayToString(tau, N);
                     size_t c_tau=ds->addCopiedColumn(tau, N, tr("file%1: tau [s]").arg(file+1));
                     size_t c_data=ds->addCopiedColumn(data, N, tr("file%1: g(tau)").arg(file+1));
                     int c_error=-1;

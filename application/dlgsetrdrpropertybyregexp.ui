@@ -30,6 +30,31 @@
          <string>name</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>folder</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>group</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>role</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>first file</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>ID</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item row="1" column="0">
@@ -98,14 +123,14 @@
      <item row="5" column="1">
       <widget class="QLineEdit" name="edtOutputValue"/>
      </item>
-     <item row="8" column="0">
+     <item row="9" column="0">
       <widget class="QLabel" name="label_5">
        <property name="text">
         <string>property to set:</string>
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
+     <item row="9" column="1">
       <widget class="QComboBox" name="cmbOutput">
        <item>
         <property name="text">
@@ -129,14 +154,14 @@
        </item>
       </widget>
      </item>
-     <item row="6" column="0">
+     <item row="7" column="0">
       <widget class="QLabel" name="label_6">
        <property name="text">
         <string>test result:</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
+     <item row="7" column="1">
       <widget class="QLabel" name="labTest">
        <property name="text">
         <string/>
@@ -157,10 +182,17 @@
        </property>
       </widget>
      </item>
-     <item row="7" column="1">
+     <item row="8" column="1">
       <widget class="QLabel" name="labError">
        <property name="text">
         <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;font size=&quot;-1&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;special replaces:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;&lt;ul&gt;&lt;li&gt;%name%: RDR name&lt;/li&gt;&lt;li&gt;%group%: RDR group&lt;/li&gt;&lt;li&gt;%id$%: RDR ID&lt;/li&gt;&lt;li&gt;%role%: RDR role&lt;/li&gt;&lt;/ul&gt;&lt;/span&gt;&lt;/font&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
