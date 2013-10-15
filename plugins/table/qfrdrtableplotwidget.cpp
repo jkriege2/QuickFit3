@@ -323,6 +323,8 @@ void QFRDRTablePlotWidget::updateGraph() {
         //qDebug()<<"updateGraph";
         QFRDRTable::PlotInfo p=current->getPlot(this->plot);
 
+        //qDebug()<<logicalDpiX()<<"dpi:   "<<p.graphWidth<<"mm = "<<ui->plotter->get_plotter()->mm2px(p.graphWidth, logicalDpiX())<<"px";
+
         ui->plotter->set_doDrawing(false);
         ui->plotter->set_emitSignals(false);
 

@@ -870,7 +870,278 @@ namespace QFMathParser_Private {
     }
 
 
+
+    qfmpResult fUnique(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        qfmpResult res=qfmpResult::invalidResult();
+        if (n!=1) {
+            p->qfmpError("unique(data) needs 1 argument");
+            return res;
+        }
+        if ((params[0].type==qfmpDouble) || (params[0].type==qfmpString) || (params[0].type==qfmpBool)) return params[0];
+
+        if (params[0].type==qfmpDoubleVector) {
+            QVector<double> out;
+            const QVector<double>& in=params[0].numVec;
+
+            for (int i=0; i<in.size(); i++) {
+                if (!out.contains(in[i])) out<<in[i];
+            }
+
+            return qfmpResult(out);
+        }
+
+        if (params[0].type==qfmpStringVector) {
+            QStringList out;
+            const QStringList& in=params[0].strVec;
+
+            for (int i=0; i<in.size(); i++) {
+                if (!out.contains(in[i])) out<<in[i];
+            }
+
+            return qfmpResult(out);
+        }
+
+        if (params[0].type==qfmpBoolVector) {
+            QVector<bool> out;
+            const QVector<bool>& in=params[0].boolVec;
+
+            for (int i=0; i<in.size(); i++) {
+                if (!out.contains(in[i])) out<<in[i];
+                if (out.size()>1) break;
+            }
+
+            return qfmpResult(out);
+        }
+        return res;
+    }
+
+
+
+
+
+
+    qfmpResult fIndexedAvg(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        qfmpResult res=qfmpResult::invalidResult();
+
+        if (n!=2) p->qfmpError("indexedmean(data, index) needs 2 argument");
+        if (((params[0].type==qfmpDoubleVector)||(params[0].type==qfmpDouble)) && params[0].length()==params[1].length()) {
+            QVector<double> d=params[0].asVector();
+
+            if (params[1].type==qfmpDouble || params[1].type==qfmpDoubleVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asVector(), qfstatisticsAverage<QVector<double> >));
+            }
+            if (params[1].type==qfmpBool || params[1].type==qfmpBoolVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asBoolVector(), qfstatisticsAverage<QVector<double> >));
+            }
+            if (params[1].type==qfmpString || params[1].type==qfmpStringVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asStrVector(), qfstatisticsAverage<QVector<double> >));
+            }
+        } else {
+            p->qfmpError("indexedmean(data, index) needs a number vector as data argument and an equal sized index array of any type");
+        }
+
+        return res;
+    }
+
+    qfmpResult fIndexedVar(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        qfmpResult res=qfmpResult::invalidResult();
+
+        if (n!=2) p->qfmpError("indexedvar(data, index) needs 2 argument");
+        if (((params[0].type==qfmpDoubleVector)||(params[0].type==qfmpDouble)) && params[0].length()==params[1].length()) {
+            QVector<double> d=params[0].asVector();
+
+            if (params[1].type==qfmpDouble || params[1].type==qfmpDoubleVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asVector(), qfstatisticsVariance<QVector<double> >));
+            }
+            if (params[1].type==qfmpBool || params[1].type==qfmpBoolVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asBoolVector(), qfstatisticsVariance<QVector<double> >));
+            }
+            if (params[1].type==qfmpString || params[1].type==qfmpStringVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asStrVector(), qfstatisticsVariance<QVector<double> >));
+            }
+        } else {
+            p->qfmpError("indexedvar(data, index) needs a number vector as data argument and an equal sized index array of any type");
+        }
+
+        return res;
+    }
+
+    qfmpResult fIndexedStd(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        qfmpResult res=qfmpResult::invalidResult();
+
+        if (n!=2) p->qfmpError("indexedstd(data, index) needs 2 argument");
+        if (((params[0].type==qfmpDoubleVector)||(params[0].type==qfmpDouble)) && params[0].length()==params[1].length()) {
+            QVector<double> d=params[0].asVector();
+
+            if (params[1].type==qfmpDouble || params[1].type==qfmpDoubleVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asVector(), qfstatisticsStd<QVector<double> >));
+            }
+            if (params[1].type==qfmpBool || params[1].type==qfmpBoolVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asBoolVector(), qfstatisticsStd<QVector<double> >));
+            }
+            if (params[1].type==qfmpString || params[1].type==qfmpStringVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asStrVector(), qfstatisticsStd<QVector<double> >));
+            }
+        } else {
+            p->qfmpError("indexedstd(data, index) needs a number vector as data argument and an equal sized index array of any type");
+        }
+
+        return res;
+    }
+
+    qfmpResult fIndexedSum(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        qfmpResult res=qfmpResult::invalidResult();
+
+        if (n!=2) p->qfmpError("indexedsum(data, index) needs 2 argument");
+        if (((params[0].type==qfmpDoubleVector)||(params[0].type==qfmpDouble)) && params[0].length()==params[1].length()) {
+            QVector<double> d=params[0].asVector();
+
+            if (params[1].type==qfmpDouble || params[1].type==qfmpDoubleVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asVector(), qfstatisticsSum<QVector<double> >));
+            }
+            if (params[1].type==qfmpBool || params[1].type==qfmpBoolVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asBoolVector(), qfstatisticsSum<QVector<double> >));
+            }
+            if (params[1].type==qfmpString || params[1].type==qfmpStringVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asStrVector(), qfstatisticsSum<QVector<double> >));
+            }
+        } else {
+            p->qfmpError("indexedsum(data, index) needs a number vector as data argument and an equal sized index array of any type");
+        }
+
+        return res;
+    }
+
+    qfmpResult fIndexedSum2(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        qfmpResult res=qfmpResult::invalidResult();
+
+        if (n!=2) p->qfmpError("indexedsum2(data, index) needs 2 argument");
+        if (((params[0].type==qfmpDoubleVector)||(params[0].type==qfmpDouble)) && params[0].length()==params[1].length()) {
+            QVector<double> d=params[0].asVector();
+
+            if (params[1].type==qfmpDouble || params[1].type==qfmpDoubleVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asVector(), qfstatisticsSum2<QVector<double> >));
+            }
+            if (params[1].type==qfmpBool || params[1].type==qfmpBoolVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asBoolVector(), qfstatisticsSum2<QVector<double> >));
+            }
+            if (params[1].type==qfmpString || params[1].type==qfmpStringVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asStrVector(), qfstatisticsSum2<QVector<double> >));
+            }
+        } else {
+            p->qfmpError("indexedsum2(data, index) needs a number vector as data argument and an equal sized index array of any type");
+        }
+
+        return res;
+    }
+
+
+    qfmpResult fIndexedMedian(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        qfmpResult res=qfmpResult::invalidResult();
+
+        if (n!=2) p->qfmpError("indexedmedian(data, index) needs 2 argument");
+        if (((params[0].type==qfmpDoubleVector)||(params[0].type==qfmpDouble)) && params[0].length()==params[1].length()) {
+            QVector<double> d=params[0].asVector();
+
+            if (params[1].type==qfmpDouble || params[1].type==qfmpDoubleVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asVector(), qfstatisticsMedian<QVector<double> >));
+            }
+            if (params[1].type==qfmpBool || params[1].type==qfmpBoolVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asBoolVector(), qfstatisticsMedian<QVector<double> >));
+            }
+            if (params[1].type==qfmpString || params[1].type==qfmpStringVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asStrVector(), qfstatisticsMedian<QVector<double> >));
+            }
+        } else {
+            p->qfmpError("indexedmedian(data, index) needs a number vector as data argument and an equal sized index array of any type");
+        }
+
+        return res;
+    }
+
+    qfmpResult fIndexedMin(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        qfmpResult res=qfmpResult::invalidResult();
+
+        if (n!=2) p->qfmpError("indexedmin(data, index) needs 2 argument");
+        if (((params[0].type==qfmpDoubleVector)||(params[0].type==qfmpDouble)) && params[0].length()==params[1].length()) {
+            QVector<double> d=params[0].asVector();
+
+            if (params[1].type==qfmpDouble || params[1].type==qfmpDoubleVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asVector(), qfstatisticsMin<QVector<double> >));
+            }
+            if (params[1].type==qfmpBool || params[1].type==qfmpBoolVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asBoolVector(), qfstatisticsMin<QVector<double> >));
+            }
+            if (params[1].type==qfmpString || params[1].type==qfmpStringVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asStrVector(), qfstatisticsMin<QVector<double> >));
+            }
+        } else {
+            p->qfmpError("indexedmin(data, index) needs a number vector as data argument and an equal sized index array of any type");
+        }
+
+        return res;
+    }
+
+    qfmpResult fIndexedMax(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        qfmpResult res=qfmpResult::invalidResult();
+
+        if (n!=2) p->qfmpError("indexedmax(data, index) needs 2 argument");
+        if (((params[0].type==qfmpDoubleVector)||(params[0].type==qfmpDouble)) && params[0].length()==params[1].length()) {
+            QVector<double> d=params[0].asVector();
+
+            if (params[1].type==qfmpDouble || params[1].type==qfmpDoubleVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asVector(), qfstatisticsMax<QVector<double> >));
+            }
+            if (params[1].type==qfmpBool || params[1].type==qfmpBoolVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asBoolVector(), qfstatisticsMax<QVector<double> >));
+            }
+            if (params[1].type==qfmpString || params[1].type==qfmpStringVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asStrVector(), qfstatisticsMax<QVector<double> >));
+            }
+        } else {
+            p->qfmpError("indexedmax(data, index) needs a number vector as data argument and an equal sized index array of any type");
+        }
+
+        return res;
+    }
+
+    qfmpResult fIndexedQuantile(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        qfmpResult res=qfmpResult::invalidResult();
+
+        if (n!=3) p->qfmpError("indexedquantile(data, index, quantile) needs 3 argument");
+        if (((params[0].type==qfmpDoubleVector)||(params[0].type==qfmpDouble)) && params[0].length()==params[1].length() && params[2].type==qfmpDouble) {
+            QVector<double> d=params[0].asVector();
+
+            if (params[1].type==qfmpDouble || params[1].type==qfmpDoubleVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asVector(), qfstatisticsQuantile<QVector<double> >, params[2].num));
+            }
+            if (params[1].type==qfmpBool || params[1].type==qfmpBoolVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asBoolVector(), qfstatisticsQuantile<QVector<double> >, params[2].num));
+            }
+            if (params[1].type==qfmpString || params[1].type==qfmpStringVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asStrVector(), qfstatisticsQuantile<QVector<double> >, params[2].num));
+            }
+        } else {
+            p->qfmpError("indexedquantile(data, index, quantile) needs a number vector as data argument and an equal sized index array of any type");
+        }
+
+        return res;
+    }
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 void QFMathParser::addStandardVariables(){
     addVariableDouble("pi", M_PI);
@@ -1007,6 +1278,17 @@ void QFMathParser::addStandardFunctions(){
     addFunction("isinf", QFMathParser_Private::fIsInf);
     addFunction("isfinite", QFMathParser_Private::fIsFinite);
     addFunction("isnumok", QFMathParser_Private::fIsFloatOK);
+
+    addFunction("unique", QFMathParser_Private::fUnique);
+    addFunction("indexedmean", QFMathParser_Private::fIndexedAvg);
+    addFunction("indexedvar", QFMathParser_Private::fIndexedVar);
+    addFunction("indexedstd", QFMathParser_Private::fIndexedStd);
+    addFunction("indexedmin", QFMathParser_Private::fIndexedMin);
+    addFunction("indexedmax", QFMathParser_Private::fIndexedMax);
+    addFunction("indexedmedian", QFMathParser_Private::fIndexedMedian);
+    addFunction("indexedsum", QFMathParser_Private::fIndexedSum);
+    addFunction("indexedsum2", QFMathParser_Private::fIndexedSum2);
+    addFunction("indexedquantile", QFMathParser_Private::fIndexedQuantile);
 
 
     for (int i=0; i<externalGlobalFunctions.size(); i++) {
@@ -5103,6 +5385,31 @@ QVector<double> qfmpResult::asVector() const
     else if (type==qfmpBoolVector) return boolvectorToNumVec(boolVec, 1.0, 0.0);
     else if (type==qfmpDouble) return QVector<double>(1, num);
     return QVector<double>();
+}
+
+QVariantList qfmpResult::asVariantList() const
+{
+    QVariantList vl;
+    if (type==qfmpDouble) {
+        vl<<num;
+    } else if (type==qfmpString) {
+        vl<<str;
+    } else if (type==qfmpBool) {
+        vl<<boolean;
+    } else if (type==qfmpDoubleVector) {
+        for (int i=0; i<numVec.size(); i++) {
+            vl<<numVec[i];
+        }
+    } else if (type==qfmpStringVector) {
+        for (int i=0; i<strVec.size(); i++) {
+            vl<<strVec[i];
+        }
+    } else if (type==qfmpBoolVector) {
+        for (int i=0; i<boolVec.size(); i++) {
+            vl<<boolVec[i];
+        }
+    }
+    return vl;
 }
 
 QStringList qfmpResult::asStrVector() const

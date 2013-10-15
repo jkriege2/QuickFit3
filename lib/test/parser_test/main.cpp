@@ -469,6 +469,22 @@ int main(int argc, char *argv[])
     TEST("shuffle(num2str(x))");
     TEST("x==x");
     TEST("x==y");
+    TEST("x=[1,2,3,4,5,6,7,8,9]");
+    TEST("unique(x)");
+    TEST("idx=[1,3,2,1,2,3,3,2,1]");
+    TEST("unique(idx)");
+    TEST("idx=[1,2,3,1,2,3,1,2,3]");
+    TEST("unique(idx)");
+    TEST("indexedmean(x, idx)");
+    TEST("indexedsum(x, idx)");
+    TEST("indexedsum2(x, idx)");
+    TEST("indexedvar(x, idx)");
+    TEST("indexedstd(x, idx)");
+    TEST("indexedmin(x, idx)");
+    TEST("indexedmax(x, idx)");
+    TEST("indexedmedian(x, idx)");
+    TEST("indexedquantile(x, idx, 0.25)");
+    TEST("indexedquantile(x, idx, 0.75)");
     //speed_test(doByteCode, showBytecode);
 
     return 0;

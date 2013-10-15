@@ -264,14 +264,14 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         //qDebug()<<graph.fillColor.name()<<oldDefaultFillColor.name();
 
         //qDebug()<<graph.fillColor.name()<<oldDefaultFillColor.name();
-        graph.fillColor=ui->cmbFillColor->currentColor();
+        //graph.fillColor=ui->cmbFillColor->currentColor();
         if (graph.fillColor!=oldDefaultFillColor) {
             graph.fillColor=ui->cmbFillColor->currentColor();
         } else {
             graph.fillColor=graph.color.lighter();
             ui->cmbFillColor->setCurrentColor(graph.fillColor);
         }
-        graph.rangeCenterColor=ui->cmbRangeCenterColor->currentColor();
+        //graph.rangeCenterColor=ui->cmbRangeCenterColor->currentColor();
         if (graph.rangeCenterColor!=oldRangeColor) {
             graph.rangeCenterColor=ui->cmbRangeCenterColor->currentColor();
         } else {
@@ -1023,8 +1023,8 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->cmbLinesMax, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbLinesMean, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbLinesYError, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
-    connect(ui->edtWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    connect(ui->edtShift, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->edtWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtShift, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
 
     connect(ui->cmbFillColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbErrorColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
@@ -1034,8 +1034,8 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->cmbFillStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbSymbol, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->chkDrawLine, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
-    connect(ui->spinLineWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    connect(ui->spinSymbolSize, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->spinLineWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->spinSymbolSize, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->sliderErrorTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->sliderFillTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->sliderPlotTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
@@ -1043,26 +1043,26 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->cmbImageTrueColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbColormap, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbModifierMode, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
-    connect(ui->spinImageWidth, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
-    connect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    connect(ui->edtImageMax, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    connect(ui->edtImageMin, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    connect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    connect(ui->edtImageX, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    connect(ui->edtImageY, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->spinImageWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtImageHeight, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtImageMax, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtImageMin, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtImageHeight, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtImageX, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtImageY, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->sliderImageFalseColor, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->sliderImageTrueColor, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->edtColorbarLabel, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->edtColorbarLabelB, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->edtColorbarLabelG, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
-    connect(ui->spinColorbarWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    connect(ui->spinColorbarHeight, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->spinColorbarWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->spinColorbarHeight, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->chkImageColorbarRight, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->chkImageColorbarTop, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->chkImageAutorange, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->chkSTrided, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
-    connect(ui->spinStride, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
-    connect(ui->spinStrideStart, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->spinStride, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->spinStrideStart, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
     connect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
 
@@ -1072,29 +1072,29 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->chkRangeDrawCenter, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->chkRangeFillRange, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->chkRangeInverted, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
-    connect(ui->spinRangeCenterWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    connect(ui->edtRangeCenter, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    connect(ui->edtRangeStart, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    connect(ui->edtRangeEnd, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->spinRangeCenterWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtRangeCenter, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtRangeStart, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtRangeEnd, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->sliderRangeCenterTransparency, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     connect(fitfuncValuesTable, SIGNAL(fitParamChanged()), this, SLOT(writeGraphData()));
 
-    connect(ui->spinColorbarModTicks, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
-    connect(ui->spinColorbarTicks, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
-    connect(ui->spinColorbarTickLength, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    connect(ui->spinColorbarFontsize, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    connect(ui->spinColorbarModTicks, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->spinColorbarTicks, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->spinColorbarTickLength, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->spinColorbarFontsize, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
 
 
     connect(ui->cmbColorbarLabelType, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
-    connect(ui->spinColorbarLabelDigits, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->spinColorbarLabelDigits, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
 }
 
 void QFTableGraphSettings::disconnectWidgets()
 {
     //qDebug()<<"disconnectWidgets";
 
-    disconnect(ui->edtWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    disconnect(ui->edtShift, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->edtWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtShift, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
 
 
     disconnect(ui->edtFunction, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
@@ -1116,34 +1116,34 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->cmbSymbol, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbModifierMode, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->chkDrawLine, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
-    disconnect(ui->spinLineWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    disconnect(ui->spinSymbolSize, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinLineWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->spinSymbolSize, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     disconnect(ui->sliderErrorTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->sliderFillTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->sliderPlotTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbImageFalseColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbImageTrueColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbColormap, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
-    disconnect(ui->spinImageWidth, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
-    disconnect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    disconnect(ui->edtImageMax, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    disconnect(ui->edtImageMin, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    disconnect(ui->edtImageHeight, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    disconnect(ui->edtImageX, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    disconnect(ui->edtImageY, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinImageWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtImageHeight, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtImageMax, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtImageMin, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtImageHeight, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtImageX, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtImageY, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     disconnect(ui->sliderImageFalseColor, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->sliderImageTrueColor, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->edtColorbarLabel, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     disconnect(ui->edtColorbarLabelB, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     disconnect(ui->edtColorbarLabelG, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
-    disconnect(ui->spinColorbarWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    disconnect(ui->spinColorbarHeight, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinColorbarWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->spinColorbarHeight, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     disconnect(ui->chkImageColorbarRight, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     disconnect(ui->chkImageColorbarTop, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     disconnect(ui->chkImageAutorange, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     disconnect(ui->chkSTrided, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
-    disconnect(ui->spinStride, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
-    disconnect(ui->spinStrideStart, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinStride, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->spinStrideStart, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
 
     disconnect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
     disconnect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
@@ -1152,19 +1152,19 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->chkRangeDrawCenter, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     disconnect(ui->chkRangeFillRange, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     disconnect(ui->chkRangeInverted, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
-    disconnect(ui->spinRangeCenterWidth, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    disconnect(ui->edtRangeCenter, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    disconnect(ui->edtRangeStart, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    disconnect(ui->edtRangeEnd, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinRangeCenterWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtRangeCenter, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtRangeStart, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtRangeEnd, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     disconnect(ui->sliderRangeCenterTransparency, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     disconnect(fitfuncValuesTable, SIGNAL(fitParamChanged()), this, SLOT(writeGraphData()));
-    disconnect(ui->spinColorbarModTicks, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
-    disconnect(ui->spinColorbarTicks, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
-    disconnect(ui->spinColorbarTickLength, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
-    disconnect(ui->spinColorbarFontsize, SIGNAL(valueChanged(double)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinColorbarModTicks, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->spinColorbarTicks, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->spinColorbarTickLength, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->spinColorbarFontsize, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
 
     disconnect(ui->cmbColorbarLabelType, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
-    disconnect(ui->spinColorbarLabelDigits, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->spinColorbarLabelDigits, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
 }
 
 void QFTableGraphSettings::doFit()

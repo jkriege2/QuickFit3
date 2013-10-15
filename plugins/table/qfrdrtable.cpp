@@ -33,7 +33,7 @@ QFRDRTable::GraphInfo::GraphInfo() {
     errorColor=color.darker();
     linewidth=1;
     symbol=JKQTPfilledCircle;
-    symbolSize=8;
+    symbolSize=6;
     errorStyle=JKQTPnoError;
     drawLine=true;
     errorStyle=JKQTPerrorBars;
@@ -95,8 +95,8 @@ QFRDRTable::AxisInfo::AxisInfo()
     log=false;
     min=0;
     max=10;
-    axisFontSize=12;
-    axisLabelFontSize=12;
+    axisFontSize=8;
+    axisLabelFontSize=10;
     axis0=true;
 
 
@@ -139,10 +139,10 @@ QFRDRTable::PlotInfo::PlotInfo()
     if (fdb.contains("DejaVu Sans")) fontName="DejaVu Sans";
     else if (fdb.contains("Arial")) fontName="Arial";
     else if (fdb.contains("Helvetica")) fontName="Helvetica";
-    keyFontSize=12;
-    axisFontSize=14;
-    axisLabelFontSize=18;
-    labelFontSize=18;
+    keyFontSize=10;
+    axisFontSize=8;
+    axisLabelFontSize=10;
+    labelFontSize=12;
     keyTransparency=0.5;
     keyPosition=JKQTPkeyInsideTopRight;
     keyLayout=JKQTPkeyLayoutOneColumn;

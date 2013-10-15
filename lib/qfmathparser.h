@@ -612,6 +612,7 @@ struct QFLIB_EXPORT qfmpResult {
         QFLIB_EXPORT void setStringVec(int size=0, const QString& defaultVal=QString(""));
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
         QFLIB_EXPORT QVector<double> asVector() const;
+        QFLIB_EXPORT QVariantList asVariantList() const;
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
         QFLIB_EXPORT QStringList asStrVector() const;
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */

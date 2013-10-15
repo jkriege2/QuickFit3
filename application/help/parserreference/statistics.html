@@ -98,6 +98,136 @@
   
   </ul>
   
+  
+  
+  
+  
+  
+  
+  
+  
+  <h2>Indexed Statistics Functions</h2>
+  <ul>
+
+  <li><a name="indexedmean"/><!-- func:indexedmean -->
+  <b><tt><!-- template -->indexedmean(x, idx)<!-- /template --></tt> - <i>returns a vector of the averages of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>
+  Example:<blockquote><tt>
+    x=[1,2,3,4,5,6,7,8,9];<br>
+	i=[1,2,3,1,2,3,1,2,3];<br>
+	indexedmean(x,i) -> [4,5,6]
+  </tt></blockquote>
+  
+  <!-- /func:indexedmean -->
+  </li>
+  
+  <li><a name="indexedstd"/><!-- func:indexedstd -->
+  <b><tt><!-- template -->indexedstd(x, idx)<!-- /template --></tt> - <i>returns a vector of the standard deviations of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>
+  Example:<blockquote><tt>
+    x=[1,2,3,4,5,6,7,8,9];<br>
+	i=[1,2,3,1,2,3,1,2,3];<br>
+	indexedstd(x,i) -> [3,3,3]
+  </tt></blockquote>
+  
+  <!-- /func:indexedstd -->
+  </li>
+  
+  <li><a name="indexedvar"/><!-- func:indexedvar -->
+  <b><tt><!-- template -->indexedvar(x, idx)<!-- /template --></tt> - <i>returns a vector of the variances of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>
+  Example:<blockquote><tt>
+    x=[1,2,3,4,5,6,7,8,9];<br>
+	i=[1,2,3,1,2,3,1,2,3];<br>
+	indexedvar(x,i) -> [9,9,9]
+  </tt></blockquote>
+  
+  <!-- /func:indexedvar -->
+  </li>
+  
+    
+  <li><a name="indexedsum"/><!-- func:indexedsum -->
+  <b><tt><!-- template -->indexedsum(x, idx)<!-- /template --></tt> - <i>returns a vector of the sum of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>
+  Example:<blockquote><tt>
+    x=[1,2,3,4,5,6,7,8,9];<br>
+	i=[1,2,3,1,2,3,1,2,3];<br>
+	indexedsum(x,i) -> [12,15,18]
+  </tt></blockquote>
+  
+  <!-- /func:indexedsum -->
+  </li>
+  
+    
+  <li><a name="indexedsum2"/><!-- func:indexedsum2 -->
+  <b><tt><!-- template -->indexedsum2(x, idx)<!-- /template --></tt> - <i>returns a vector of the sum of the squared values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>
+  Example:<blockquote><tt>
+    x=[1,2,3,4,5,6,7,8,9];<br>
+	i=[1,2,3,1,2,3,1,2,3];<br>
+	indexedsum2(x,i) -> [66,93,126]
+  </tt></blockquote>
+  
+  <!-- /func:indexedsum2 -->
+  </li>
+  
+    
+  <li><a name="indexedmin"/><!-- func:indexedmin -->
+  <b><tt><!-- template -->indexedmin(x, idx)<!-- /template --></tt> - <i>returns a vector of the minimums of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>
+  Example:<blockquote><tt>
+    x=[1,2,3,4,5,6,7,8,9];<br>
+	i=[1,2,3,1,2,3,1,2,3];<br>
+	indexedmin(x,i) -> [1,2,3]
+  </tt></blockquote>
+  
+  <!-- /func:indexedmin -->
+  </li>
+  
+    
+  <li><a name="indexedmax"/><!-- func:indexedmax -->
+  <b><tt><!-- template -->indexedmax(x, idx)<!-- /template --></tt> - <i>returns a vector of the maximums of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>
+  Example:<blockquote><tt>
+    x=[1,2,3,4,5,6,7,8,9];<br>
+	i=[1,2,3,1,2,3,1,2,3];<br>
+	indexedmax(x,i) -> [7,8,9]
+  </tt></blockquote>
+  
+  <!-- /func:indexedmax -->
+  </li>
+  
+    
+  <li><a name="indexedmedian"/><!-- func:indexedmedian -->
+  <b><tt><!-- template -->indexedmedian(x, idx)<!-- /template --></tt> - <i>returns a vector of the medians of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>
+  Example:<blockquote><tt>
+    x=[1,2,3,4,5,6,7,8,9];<br>
+	i=[1,2,3,1,2,3,1,2,3];<br>
+	indexedmedian(x,i) -> [4,5,6]
+  </tt></blockquote>
+  
+  <!-- /func:indexedmedian -->
+  </li>
+  
+    
+  <li><a name="indexedquantile"/><!-- func:indexedquantile -->
+  <b><tt><!-- template -->indexedquantile(x, idx, q)<!-- /template --></tt> - <i>returns a vector of the <tt>q</tt>-th quantiles of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>
+  Example:<blockquote><tt>
+    x=[1,2,3,4,5,6,7,8,9];<br>
+	i=[1,2,3,1,2,3,1,2,3];<br>
+	indexedquantile(x,i, 0.25) -> [4,5,6]
+  </tt></blockquote>
+  
+  <!-- /func:indexedquantile -->
+  </li>
+  
+  
+  
+  
+  </ul>
+  
   </body>
   </html>
   
