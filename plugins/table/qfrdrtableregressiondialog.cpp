@@ -154,6 +154,7 @@ QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int co
         ui->chkPlotErrors->setChecked(set->value("QFRDRTableRegressionDialog/ploterrors", ui->chkPlotErrors->isChecked()).toBool());
         ui->chkWeightedResiduals->setChecked(set->value("QFRDRTableRegressionDialog/weightedresiduals", ui->chkWeightedResiduals->isChecked()).toBool());
         ui->cmbFitType->setCurrentIndex(set->value("QFRDRTableRegressionDialog/method", ui->cmbFitType->currentIndex()).toInt());
+        loadSplitter(*set, ui->splitter, "QFRDRTableRegressionDialog/splitter/");
     }
 
 
@@ -172,6 +173,7 @@ QFRDRTableRegressionDialog::~QFRDRTableRegressionDialog()
         set->setValue("QFRDRTableRegressionDialog/ploterrors", ui->chkPlotErrors->isChecked());
         set->setValue("QFRDRTableRegressionDialog/weightedresiduals", ui->chkWeightedResiduals->isChecked());
         set->setValue("QFRDRTableRegressionDialog/method", ui->cmbFitType->currentIndex());
+        saveSplitter(*set, ui->splitter, "QFRDRTableRegressionDialog/splitter/");
     }
     delete ui;
 }

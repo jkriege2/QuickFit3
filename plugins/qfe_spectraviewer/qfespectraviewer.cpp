@@ -148,8 +148,9 @@ void QFESpectraViewer::initExtension() {
         extm->addAction(actStartPlugin);
     }
 
+    log_text(QFESpectraViewer::intReloadDatabases(manager, getID()));
     log_text(tr("initializing ... DONE\n"));
-    loadThread->start();
+    //loadThread->start();
 }
 
 void QFESpectraViewer::loadSettings(ProgramOptions* settingspo) {

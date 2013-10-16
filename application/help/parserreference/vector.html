@@ -110,6 +110,24 @@
   </li>
 
   
+  <li><a name="first"/><!-- func:first -->
+  <b><tt><!-- template -->first(x)<!-- /template --></tt> - <i>returns the first element in the vector <tt>x</tt></i>:</b><br>
+  <!-- /func:first-->
+  </li>
+
+  <li><a name="last"/><!-- func:last -->
+  <b><tt><!-- template -->last(x)<!-- /template --></tt> - <i>returns the last element in the vector <tt>x</tt></i>:</b><br>
+  <!-- /func:last-->
+  </li>
+  
+  <li><a name="item"/><!-- func:item -->
+  <b><tt><!-- template -->item(x, idx)<!-- /template --></tt> - <i>If <tt>idx</tt>is an integer vector, this function returns the elements of vector <tt>x</tt> referenced by integer vector <tt>idx</tt></i>. If <tt>idx</tt>is vector of boolean, this function returns the elements of vector <tt>x</tt> where the according element in <tt>idx</tt> is <tt>true</tt></i>. The argument <tt>x</tt> may be a vector of numbers, boolean or strings, or a string. In the latter case the function accesses characters in the string.</b><br>
+  $$example:<tt>item([1,2,3,4,5,6,7,8,9], [1,3,5])</tt> will return <tt>[2,4,6]</tt>$$
+  $$example:<tt>item([1,2,3,4,5,6,7,8,9], [true,true,true,false,false,false,true,false,true])</tt> will return <tt>[1,2,3,7,9]</tt>$$
+  $$example:<tt>item("abcdefghij", [1,3,5])</tt> will return <tt>"bdf"</tt>$$
+  $$example:<tt>item("abcdefghi", [true,true,true,false,false,false,true,false,true])</tt> will return <tt>"abcgi"</tt>$$
+  <!-- /func:item-->
+  </li>
   </ul>
   
   </body>

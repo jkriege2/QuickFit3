@@ -37,6 +37,11 @@ QFRDRTable::GraphInfo::GraphInfo() {
     errorStyle=JKQTPnoError;
     drawLine=true;
     errorStyle=JKQTPerrorBars;
+
+    errorWidth=1;
+    errorLineStyle=Qt::SolidLine;
+    errorBarSize=7;
+
     colorTransparent=1;
     errorColorTransparent=1;
     fillColorTransparent=0.3;
@@ -86,6 +91,11 @@ QFRDRTable::GraphInfo::GraphInfo() {
     rangeCenterColorTransparent=1;
     rangeCenterStyle=Qt::DashLine;
     rangeCenterWidth=1;
+
+    errorColorAuto=true;
+    fillColorAuto=true;
+    centerColorAuto=true;
+
 
 }
 
@@ -1393,6 +1403,13 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.errorColorTransparent=CQStringToDouble(ge.attribute("errorcolor_trans", "1"));
                     graph.fillColorTransparent=CQStringToDouble(ge.attribute("fillcolor_trans", "0.3"));
 
+
+                    graph.errorWidth=CQStringToDouble(ge.attribute("error_width", "1"));
+                    graph.errorLineStyle=String2QPenStyle(ge.attribute("error_line_style", "solid"));
+                    graph.errorBarSize=CQStringToDouble(ge.attribute("error_barsize", "7"));
+
+
+
                     graph.stride=ge.attribute("stride", "1").toInt();
                     graph.strideStart=ge.attribute("stride_start", "1").toInt();
                     graph.isStrided=QStringToBool(ge.attribute("is_strided", "false"));
@@ -1444,6 +1461,10 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.rangeInverted=QStringToBool(ge.attribute("range_inverted", "false"));
                     graph.rangeFill=QStringToBool(ge.attribute("range_fill", "true"));
                     graph.rangeDrawCenter=QStringToBool(ge.attribute("range_drawcenter", "true"));
+
+                    graph.errorColorAuto=QStringToBool(ge.attribute("error_color_auto", "true"));
+                    graph.fillColorAuto=QStringToBool(ge.attribute("fill_color_auto", "true"));
+                    graph.centerColorAuto=QStringToBool(ge.attribute("center_color_auto", "true"));
 
 
                     plot.graphs.append(graph);
@@ -1654,6 +1675,9 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("modifier_mode", JKQTPMathImage::ModifierModeToString(plots[i].graphs[g].modifierMode));
 
 
+            w.writeAttribute("error_width", CDoubleToQString(plots[i].graphs[g].errorWidth));
+            w.writeAttribute("error_line_style", QPenStyle2String(plots[i].graphs[g].errorLineStyle));
+            w.writeAttribute("error_barsize", CDoubleToQString(plots[i].graphs[g].errorBarSize));
 
 
 
@@ -1671,7 +1695,9 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("range_drawcenter", boolToQString( plots[i].graphs[g].rangeDrawCenter));
 
 
-
+            w.writeAttribute("error_color_auto", boolToQString( plots[i].graphs[g].errorColorAuto));
+            w.writeAttribute("fill_color_auto", boolToQString( plots[i].graphs[g].fillColorAuto));
+            w.writeAttribute("center_color_auto", boolToQString( plots[i].graphs[g].centerColorAuto));
 
 
             w.writeEndElement();

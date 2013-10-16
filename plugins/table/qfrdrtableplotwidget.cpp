@@ -456,6 +456,10 @@ void QFRDRTablePlotWidget::updateGraph() {
                 efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
                 pg->set_errorFillColor(efc);
 
+                pg->set_errorWidth(g.errorWidth);
+                pg->set_errorStyle(g.errorLineStyle);
+                pg->set_errorbarSize(g.errorBarSize);
+
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
                 //pg->set_fillColor(fc);
@@ -492,6 +496,9 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor efc=g.errorColor;
                 efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
                 pg->set_errorFillColor(efc);
+                pg->set_errorWidth(g.errorWidth);
+                pg->set_errorStyle(g.errorLineStyle);
+                pg->set_errorbarSize(g.errorBarSize);
 
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
@@ -530,6 +537,9 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor efc=g.errorColor;
                 efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
                 //pg->set_errorFillColor(efc);
+//                pg->set_errorWidth(g.errorWidth);
+//                pg->set_errorStyle(g.errorLineStyle);
+//                pg->set_errorbarSize(g.errorbarSize);
 
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
@@ -569,6 +579,9 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor efc=g.errorColor;
                 efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
                 //pg->set_errorFillColor(efc);
+//                pg->set_errorWidth(g.errorWidth);
+//                pg->set_errorStyle(g.errorLineStyle);
+//                pg->set_errorbarSize(g.errorbarSize);
 
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
@@ -606,6 +619,9 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor efc=g.errorColor;
                 efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
                 pg->set_errorFillColor(efc);
+                pg->set_errorWidth(g.errorWidth);
+                pg->set_errorStyle(g.errorLineStyle);
+                pg->set_errorbarSize(g.errorBarSize);
 
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
@@ -638,6 +654,9 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor efc=g.errorColor;
                 efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
                 pg->set_errorFillColor(efc);
+                pg->set_errorWidth(g.errorWidth);
+                pg->set_errorStyle(g.errorLineStyle);
+                pg->set_errorbarSize(g.errorBarSize);
 
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
@@ -676,6 +695,9 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor efc=g.errorColor;
                 efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
                 //pg->set_errorFillColor(efc);
+//                pg->set_errorWidth(g.errorWidth);
+//                pg->set_errorStyle(g.errorLineStyle);
+//                pg->set_errorbarSize(g.errorbarSize);
 
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
@@ -986,6 +1008,10 @@ void QFRDRTablePlotWidget::updateGraph() {
                     QColor efc=g.errorColor;
                     efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
                     pg->set_errorFillColor(efc);
+                    pg->set_errorLineWidth(g.errorWidth);
+                    pg->set_errorStyle(g.errorLineStyle);
+                    //pg->set_errorbarSize(g.errorbarSize);
+
                     QColor fc=g.fillColor;
                     fc.setAlphaF(g.fillColorTransparent);
                     pg->set_fillColor(fc);
@@ -1011,6 +1037,11 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor c=g.color;
                 c.setAlphaF(g.colorTransparent);
                 pg->set_color(c);
+
+//                pg->set_errorWidth(g.errorWidth);
+//                pg->set_errorFillStyle(g.errorFillStyle);
+//                pg->set_errorbarSize(g.errorbarSize);
+
 
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
@@ -1117,6 +1148,9 @@ void QFRDRTablePlotWidget::updateGraph() {
                 } else {
                     pg->set_yErrorStyle(JKQTPnoError);
                 }
+                pg->set_errorWidth(g.errorWidth);
+                pg->set_errorStyle(g.errorLineStyle);
+                pg->set_errorbarSize(g.errorBarSize);
 
                 //qDebug()<<g.title<<pg->get_xColumn()<<pg->get_yColumn();
                 pg->set_drawLine(g.drawLine);

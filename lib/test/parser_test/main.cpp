@@ -470,7 +470,9 @@ int main(int argc, char *argv[])
     TEST("x==x");
     TEST("x==y");
     TEST("x=[1,2,3,4,5,6,7,8,9]");
+    TEST("y=[1,8,3.1,4,5,3,7,2,3.1]");
     TEST("unique(x)");
+    TEST("unique(y)");
     TEST("idx=[1,3,2,1,2,3,3,2,1]");
     TEST("unique(idx)");
     TEST("idx=[1,2,3,1,2,3,1,2,3]");
@@ -485,6 +487,30 @@ int main(int argc, char *argv[])
     TEST("indexedmedian(x, idx)");
     TEST("indexedquantile(x, idx, 0.25)");
     TEST("indexedquantile(x, idx, 0.75)");
+    TEST("indexedskewness(x, [1,2,1,2,1,2,1,2,1])");
+    TEST("indexedprod(x, idx)");
+    TEST("indexedcount(x, idx)");
+    TEST("indexedmoment(x, idx, 3)");
+    TEST("indexedncmoment(x, idx, 3)");
+    TEST("indexedcorrcoeff(x, y, idx)");
+
+    TEST("last(x)");
+    TEST("first(x)");
+    TEST("last(\"abc\")");
+    TEST("first(\"abc\")");
+    TEST("last([\"abc\",\"def\",\"ghi\"])");
+    TEST("first([\"abc\",\"def\",\"ghi\"])");
+    TEST("last([true,true,false])");
+    TEST("first([true,true,false])");
+    TEST("first(true)");
+    TEST("last(false)");
+    TEST("returnfirst(a=1,a=a+1,a=a+1,a*2)");
+    TEST("returnlast(a=1,a=a+1,a=a+1,a*2)");
+    TEST("a");
+    TEST("item([1,2,3,4,5,6,7,8,9], [1,3,5])");
+    TEST("item([1,2,3,4,5,6,7,8,9], [true,true,true,false,false,false,true,false,true])");
+    TEST("item(\"abcdefghij\", [1,3,5])");
+    TEST("item(\"abcdefghi\", [true,true,true,false,false,false,true,false,true])");
     //speed_test(doByteCode, showBytecode);
 
     return 0;

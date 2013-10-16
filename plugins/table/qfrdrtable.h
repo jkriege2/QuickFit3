@@ -183,6 +183,11 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             JKQTPerrorPlotstyle errorStyle;
             bool drawLine;
 
+            double errorWidth;
+            Qt::PenStyle errorLineStyle;
+            double errorBarSize;
+
+
             int stride;
             int strideStart;
             bool isStrided;
@@ -232,6 +237,10 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             Qt::PenStyle rangeCenterStyle;
             double rangeCenterWidth;
             bool rangeDrawCenter;
+
+            bool errorColorAuto;
+            bool fillColorAuto;
+            bool centerColorAuto;
 
         };
 

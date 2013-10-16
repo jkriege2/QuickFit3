@@ -138,6 +138,7 @@ QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int colX, 
         ui->chkWeightedResiduals->setChecked(set->value("QFRDRTableCurveFitDialog/weightedresiduals", ui->chkWeightedResiduals->isChecked()).toBool());
         ui->cmbFitAlgorithm->setCurrentAlgorithm(set->value("QFRDRTableCurveFitDialog/algorithm", ui->cmbFitAlgorithm->currentFitAlgorithmID()).toString());
         ui->cmbFitFunction->setCurrentFitFunction(set->value("QFRDRTableCurveFitDialog/model", ui->cmbFitFunction->currentFitFunctionID()).toString());
+        loadSplitter(*set, ui->splitter, "QFRDRTableCurveFitDialog/splitter/");
     }
 
     methodChanged(ui->cmbFitFunction->currentIndex());
@@ -154,6 +155,7 @@ QFRDRTableCurveFitDialog::~QFRDRTableCurveFitDialog()
         set->setValue("QFRDRTableCurveFitDialog/weightedresiduals", ui->chkWeightedResiduals->isChecked());
         set->setValue("QFRDRTableCurveFitDialog/algorithm", ui->cmbFitAlgorithm->currentFitAlgorithmID());
         set->setValue("QFRDRTableCurveFitDialog/model", ui->cmbFitFunction->currentFitFunctionID());
+        saveSplitter(*set, ui->splitter, "QFRDRTableCurveFitDialog/splitter/");
     }
 
     delete ui;

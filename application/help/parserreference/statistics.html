@@ -223,9 +223,82 @@
   <!-- /func:indexedquantile -->
   </li>
   
+  <li><a name="indexedskewness"/><!-- func:indexedskewness -->
+  <b><tt><!-- template -->indexedskewness(x, idx)<!-- /template --></tt> - <i>returns a vector of the skewnesses of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>
+  Example:<blockquote><tt>
+    x=[1,2,3,4,5,6,7,8,9];<br>
+	i=[1,2,1,2,1,2,1,2,1];<br>
+	indexedskewness(x,i) -> []
+  </tt></blockquote>
+  
+  <!-- /func:indexedskewness -->
+  </li>
+  
+  <li><a name="indexedprod"/><!-- func:indexedprod -->
+  <b><tt><!-- template -->indexedprod(x, idx)<!-- /template --></tt> - <i>returns a vector of the products of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>
+  Example:<blockquote><tt>
+    x=[1,2,3,4,5,6,7,8,9];<br>
+	i=[1,2,3,1,2,3,1,2,3];<br>
+	indexedprod(x,i) -> [28, 80, 162]
+  </tt></blockquote>
+  
+  <!-- /func:indexedprod -->
+  </li>
+  
+  
+  <li><a name="indexedcount"/><!-- func:indexedcount -->
+  <b><tt><!-- template -->indexedcount(x, idx)<!-- /template --></tt> - <i>returns a vector of the number of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>
+  Example:<blockquote><tt>
+    x=[1,2,3,4,5,6,7,8,9];<br>
+	i=[1,2,3,1,2,3,1,2,3];<br>
+	indexedcount(x,i) -> [3,3,3]
+  </tt></blockquote>
+  
+  <!-- /func:indexedcount -->
+  </li>
   
   
   
+  <li><a name="indexedmoment"/><!-- func:indexedmoment -->
+  <b><tt><!-- template -->indexedmoment(x, idx, order)<!-- /template --></tt> - <i>returns a vector of the <tt>order</tt>-th central moments of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>
+  Example:<blockquote><tt>
+    x=[1,2,3,4,5,6,7,8,9];<br>
+	i=[1,2,3,1,2,3,1,2,3];<br>
+	indexedmoment(x,i, 3) -> [5.782411587e-19, 5.782411587e-19, 5.782411587e-19]
+  </tt></blockquote>
+  
+  <!-- /func:indexedmoment -->
+  </li>
+  
+  <li><a name="indexedncmoment"/><!-- func:indexedncmoment -->
+  <b><tt><!-- template -->indexedncmoment(x, idx, order)<!-- /template --></tt> - <i>returns a vector of the <tt>order</tt>-th non-central central moments of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>
+  Example:<blockquote><tt>
+    x=[1,2,3,4,5,6,7,8,9];<br>
+	i=[1,2,3,1,2,3,1,2,3];<br>
+	indexedncmoment(x,i, 3) -> [ 136, 215, 324]
+  </tt></blockquote>
+  
+  <!-- /func:indexedncmoment -->
+  </li>
+  
+  
+  <li><a name="indexedcorrcoeff"/><!-- func:indexedcorrcoeff -->
+  <b><tt><!-- template -->indexedcorrcoeff(x, idx, order)<!-- /template --></tt> - <i>returns a vector of the <tt>order</tt>-th non-central central moments of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>
+  Example:<blockquote><tt>
+    x=[1,2,3,4,5,6,7,8,9];<br>
+    y=[1,8,3.1,4,5,3,7,2,3.1];<br>
+	i=[1,2,3,1,2,3,1,2,3];<br>
+	indexedcorrcoeff(x,y,i) -> [ 1, -1, 6.259644161e-19]
+  </tt></blockquote>
+  
+  <!-- /func:indexedcorrcoeff -->
+  </li>
   </ul>
   
   </body>

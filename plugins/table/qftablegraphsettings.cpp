@@ -255,24 +255,29 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         QColor oldDefaultErrorColor=oldColor.darker();
         QColor oldDefaultFillColor=oldColor.lighter();
         graph.color=ui->cmbLineColor->currentColor();
-        if (graph.errorColor!=oldDefaultErrorColor) {
+
+        graph.centerColorAuto=ui->chkCenterColAuto->isChecked();
+        graph.fillColorAuto=ui->chkFillColAuto->isChecked();
+        graph.errorColorAuto=ui->chkErrorColAuto->isChecked();
+
+
+
+
+        if (!ui->chkErrorColAuto->isChecked()) {
             graph.errorColor=ui->cmbErrorColor->currentColor();
         } else {
             graph.errorColor=graph.color.darker();
             ui->cmbErrorColor->setCurrentColor(graph.errorColor);
         }
-        //qDebug()<<graph.fillColor.name()<<oldDefaultFillColor.name();
 
-        //qDebug()<<graph.fillColor.name()<<oldDefaultFillColor.name();
-        //graph.fillColor=ui->cmbFillColor->currentColor();
-        if (graph.fillColor!=oldDefaultFillColor) {
+        if (!ui->chkFillColAuto->isChecked()) {
             graph.fillColor=ui->cmbFillColor->currentColor();
         } else {
             graph.fillColor=graph.color.lighter();
             ui->cmbFillColor->setCurrentColor(graph.fillColor);
         }
-        //graph.rangeCenterColor=ui->cmbRangeCenterColor->currentColor();
-        if (graph.rangeCenterColor!=oldRangeColor) {
+
+        if (!ui->chkCenterColAuto->isChecked()) {
             graph.rangeCenterColor=ui->cmbRangeCenterColor->currentColor();
         } else {
             graph.rangeCenterColor=graph.color.lighter();
@@ -342,6 +347,12 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.rangeFill=ui->chkRangeFillRange->isChecked();
         graph.rangeInverted=ui->chkRangeInverted->isChecked();
         graph.rangeDrawCenter=ui->chkRangeDrawCenter->isChecked();
+
+
+        graph.errorLineStyle=ui->cmbErrorLineStyle->currentLineStyle();
+        graph.errorBarSize=ui->spinErrorBarWidth->value();
+        graph.errorWidth=ui->spinErrorLineWidth->value();
+
 
 
         updating=false;
@@ -486,6 +497,14 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->chkRangeFillRange->setChecked(graph.rangeFill);
     ui->chkRangeInverted->setChecked(graph.rangeInverted);
     ui->chkRangeDrawCenter->setChecked(graph.rangeDrawCenter);
+
+    ui->cmbErrorLineStyle->setCurrentLineStyle(graph.errorLineStyle);
+    ui->spinErrorBarWidth->setValue(graph.errorBarSize);
+    ui->spinErrorLineWidth->setValue(graph.errorWidth);
+
+    ui->chkCenterColAuto->setChecked(graph.centerColorAuto);
+    ui->chkFillColAuto->setChecked(graph.fillColorAuto);
+    ui->chkErrorColAuto->setChecked(graph.errorColorAuto);
 
 
     updating=false;
@@ -1084,6 +1103,10 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->spinColorbarTickLength, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->spinColorbarFontsize, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
 
+    connect(ui->spinErrorLineWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->spinErrorBarWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->cmbErrorLineStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+
 
     connect(ui->cmbColorbarLabelType, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->spinColorbarLabelDigits, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
@@ -1165,6 +1188,10 @@ void QFTableGraphSettings::disconnectWidgets()
 
     disconnect(ui->cmbColorbarLabelType, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->spinColorbarLabelDigits, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+
+    disconnect(ui->spinErrorLineWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->spinErrorBarWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbErrorLineStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
 }
 
 void QFTableGraphSettings::doFit()

@@ -1160,6 +1160,82 @@ QVector<T> qfUniqueApplyFunction(const QVector<T>& input, const QList<TIDX>& ind
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*! \brief group the data in \a input and \a inputY according to the labels given in \a index. Then return a vector where the function \a func is applied to every vector of values from \a input and \a inputY, which all have the same index in \a index.
+    \ingroup qf3lib_tools
+
+ */
+template <typename T, typename TIDX, typename TFUNC>
+QVector<T> qfUniqueApplyFunction2I(const QVector<T>& input, const QVector<T>& inputY, const QVector<TIDX>& index, TFUNC func) {
+    QVector<T> res;
+    QMap<TIDX, QPair<QVector<T> , QVector<T> > > dataset;
+    QList<TIDX> idxl;
+    for (int i=0; i<qMin(input.size(), index.size()); i++) {
+        dataset[index[i]].first.append(input[i]);
+        dataset[index[i]].second.append(inputY[i]);
+        if (!idxl.contains(index[i])) idxl<<index[i];
+    }
+    for (int i=0; i<idxl.size(); i++) {
+        res<<func(dataset[idxl[i]].first, dataset[idxl[i]].second);
+    }
+    return res;
+}
+
+/*! \brief group the data in \a input and \a inputY according to the labels given in \a index. Then return a vector where the function \a func is applied to every vector of values from \a input and \a inputY, which all have the same index in \a index.
+    \ingroup qf3lib_tools
+
+ */template <typename T, typename TIDX, typename TFUNC>
+QList<T> qfUniqueApplyFunction2I(const QList<T>& input, const QVector<T>& inputY, const QList<TIDX>& index, TFUNC func) {
+    QList<T> res;
+    QMap<TIDX, QPair<QVector<T> , QVector<T> > > dataset;
+    QList<TIDX> idxl;
+    for (int i=0; i<qMin(input.size(), index.size()); i++) {
+        dataset[index[i]].first.append(input[i]);
+        dataset[index[i]].second.append(inputY[i]);
+        if (!idxl.contains(index[i])) idxl<<index[i];
+    }
+    for (int i=0; i<idxl.size(); i++) {
+        res<<func(dataset[idxl[i]].first, dataset[idxl[i]].second);
+    }
+    return res;
+}
+
+/*! \brief group the data in \a input and \a inputY according to the labels given in \a index. Then return a vector where the function \a func is applied to every vector of values from \a input and \a inputY, which all have the same index in \a index.
+    \ingroup qf3lib_tools
+
+ */template <typename T, typename TIDX, typename TFUNC>
+QVector<T> qfUniqueApplyFunction2I(const QVector<T>& input, const QVector<T>& inputY, const QList<TIDX>& index, TFUNC func) {
+    QVector<T> res;
+    QMap<TIDX, QPair<QVector<T> , QVector<T> > > dataset;
+    QList<TIDX> idxl;
+    for (int i=0; i<qMin(input.size(), index.size()); i++) {
+        dataset[index[i]].first.append(input[i]);
+        dataset[index[i]].second.append(inputY[i]);
+        if (!idxl.contains(index[i])) idxl<<index[i];
+    }
+    for (int i=0; i<idxl.size(); i++) {
+        res<<func(dataset[idxl[i]].first, dataset[idxl[i]].second);
+    }
+    return res;
+}
+
+
+
 #endif // QFTOOLS_H
 
 

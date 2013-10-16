@@ -7,6 +7,33 @@
   <body> 
   $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
   
+  
+  
+  
+  
+  <h2>General Special Functions</h2>
+  <ul>
+    
+    
+  <li><a name="returnfirst"/><!-- func:returnfirst -->
+  <b><tt><!-- template -->returnfirst(x1,x2,x3,...)<!-- /template --></tt> - <i>evaluates all parameters <tt>x1</tt>, <tt>x2</tt>, ... and finally returns the value of the first expression</i>:</b> <br>
+  Example: $$example:<code>returnfirst(a=1,a=a+1,a=a+1,a*2)</code> will return <code>1</code>. The variable <tt>a</tt> will be defined and have the value <tt>3&nbsp;<i>[=1+1+1]</i></tt> afterwards$$
+  <!-- /func:returnfirst -->  
+  </li>
+
+   
+    
+  <li><a name="returnlast"/><!-- func:returnlast -->
+  <b><tt><!-- template -->returnlast(x1,x2,x3,...)<!-- /template --></tt> - <i>evaluates all parameters <tt>x1</tt>, <tt>x2</tt>, ... and finally returns the value of the last expression</i>:</b> <br>
+  Example: $$example:<code>returnlast(a=1,a=a+1,a=a+1,a*2)</code> will return <code>6 <i>[=(1+1+1)*2]</i></code>. The variable <tt>a</tt> will be defined and have the value <tt>3&nbsp;<i>[=1+1+1]</i></tt> afterwards$$
+  <!-- /func:returnlast -->  
+  </li>
+   
+
+
+  </ul>
+  
+  
   <h2>Function-Like Constructs</h2>
   <ul>
     

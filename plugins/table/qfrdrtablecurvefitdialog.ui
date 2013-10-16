@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>731</width>
-    <height>797</height>
+    <width>1009</width>
+    <height>633</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,252 +20,265 @@
    <iconset resource="qfrdrtable.qrc">
     <normaloff>:/table/regression.png</normaloff>:/table/regression.png</iconset>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="3,1,0,2,0">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1,0">
    <item>
-    <widget class="QFPlotter" name="pltDistribution" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>100</height>
-      </size>
+    <layout class="QFormLayout" name="formLayout_2">
+     <property name="topMargin">
+      <number>6</number>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QFPlotter" name="pltResiduals" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>100</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,0,0,0">
-     <item>
-      <widget class="DoubleDataCutSliders" name="datacut" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>10</height>
-        </size>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>algorithm:</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="chkLogX">
+     <item row="0" column="1">
+      <widget class="QFFitAlgorithmComboBox" name="cmbFitAlgorithm"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="text">
-        <string>log x</string>
+        <string>model:</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="chkLogY">
-       <property name="text">
-        <string>log y</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="chkPlotErrors">
-       <property name="text">
-        <string>plot errors</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="chkWeightedResiduals">
-       <property name="text">
-        <string>weighted residuals</string>
-       </property>
-      </widget>
+     <item row="1" column="1">
+      <widget class="QFFitFunctionComboBox" name="cmbFitFunction"/>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string> Curve Fit Configuration </string>
+    <widget class="QVisibleHandleSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <layout class="QFormLayout" name="formLayout">
-      <property name="fieldGrowthPolicy">
-       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+     <widget class="QWidget" name="layoutWidget">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="3,1,0">
+       <item>
+        <widget class="QFPlotter" name="pltDistribution" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>100</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFPlotter" name="pltResiduals" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>100</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,0,0,0">
+         <item>
+          <widget class="DoubleDataCutSliders" name="datacut" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>10</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkLogX">
+           <property name="text">
+            <string>log x</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkLogY">
+           <property name="text">
+            <string>log y</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkPlotErrors">
+           <property name="text">
+            <string>plot errors</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkWeightedResiduals">
+           <property name="text">
+            <string>weighted residuals</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string> Curve Fit Configuration </string>
       </property>
-      <property name="leftMargin">
-       <number>9</number>
-      </property>
-      <property name="topMargin">
-       <number>2</number>
-      </property>
-      <property name="rightMargin">
-       <number>9</number>
-      </property>
-      <property name="bottomMargin">
-       <number>9</number>
-      </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_7">
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>algorithm:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QFFitAlgorithmComboBox" name="cmbFitAlgorithm"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label">
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>model:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QFFitFunctionComboBox" name="cmbFitFunction"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>parameters:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QTableView" name="tabParams">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>80</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QPushButton" name="btnFit">
-          <property name="font">
-           <font>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>&amp;Fit</string>
-          </property>
-          <property name="icon">
-           <iconset resource="../fcsmsdevaluation/fcsmsdevaluation.qrc">
-            <normaloff>:/fcsmsdevaluation/fit_fitcurrent.png</normaloff>:/fcsmsdevaluation/fit_fitcurrent.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btnGuess">
-          <property name="text">
-           <string>&amp;Guess parameters</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>add graph:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QComboBox" name="cmbAddGraph"/>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>save results as column:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
-       <widget class="QComboBox" name="cmbSaveColumn"/>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>fit results:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="JKQTMathTextLabel" name="labFitResult">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-     </layout>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="leftMargin">
+        <number>9</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>9</number>
+       </property>
+       <property name="bottomMargin">
+        <number>9</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>parameters:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QPushButton" name="btnFit">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>&amp;Fit</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../fcsmsdevaluation/fcsmsdevaluation.qrc">
+             <normaloff>:/fcsmsdevaluation/fit_fitcurrent.png</normaloff>:/fcsmsdevaluation/fit_fitcurrent.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnGuess">
+           <property name="text">
+            <string>&amp;Guess parameters</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTableView" name="tabParams">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>80</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>fit results:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="JKQTMathTextLabel" name="labFitResult">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>add graph:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="cmbAddGraph"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>save results as column:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="cmbSaveColumn"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -323,9 +336,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>DoubleDataCutSliders</class>
-   <extends>QWidget</extends>
-   <header>doubledatacutsliders.h</header>
+   <class>QVisibleHandleSplitter</class>
+   <extends>QSplitter</extends>
+   <header>qvisiblehandlesplitter.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -334,17 +347,24 @@
    <header>qffitfunctioncombobox.h</header>
   </customwidget>
   <customwidget>
-   <class>QFFitAlgorithmComboBox</class>
-   <extends>QComboBox</extends>
-   <header>qffitalgorithmcombobox.h</header>
+   <class>DoubleDataCutSliders</class>
+   <extends>QWidget</extends>
+   <header>doubledatacutsliders.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>JKQTMathTextLabel</class>
    <extends>QLabel</extends>
    <header>jkqtmathtext.h</header>
   </customwidget>
+  <customwidget>
+   <class>QFFitAlgorithmComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qffitalgorithmcombobox.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../fcsmsdevaluation/fcsmsdevaluation.qrc"/>
   <include location="../../lib/lib.qrc"/>
