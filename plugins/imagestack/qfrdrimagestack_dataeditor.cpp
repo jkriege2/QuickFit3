@@ -11,7 +11,7 @@ QFRDRImageStackDataEditor::QFRDRImageStackDataEditor(QFPluginServices* services,
     selectionWidth=0;
     selectionHeight=0;
     createWidgets();
-    connect(maskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
+
 }
 
 QFRDRImageStackDataEditor::~QFRDRImageStackDataEditor()
@@ -193,6 +193,7 @@ void QFRDRImageStackDataEditor::createWidgets() {
 
 
     menuMask=propertyEditor->addMenu("&Mask", 0);
+    menuTools=propertyEditor->addMenu("Stack &Tools", -1);
 
     maskTools->registerMaskToolsToMenu(menuMask);
 
@@ -219,6 +220,7 @@ void QFRDRImageStackDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
             if (n.isEmpty()) n=tr("stack %1").arg(i+1);
             cmbImageStack->addItem(QIcon(":/image_stack/image.png"), n);
         }
+        maskTools->clearSelection();
     }
 
 
@@ -310,6 +312,7 @@ void QFRDRImageStackDataEditor::connectWidgets()
     connect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     connect(cmbModifierMode, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     connect(cmbMaskColor, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    connect(maskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
 }
 
 void QFRDRImageStackDataEditor::disconnectWidgets()
@@ -321,6 +324,7 @@ void QFRDRImageStackDataEditor::disconnectWidgets()
     disconnect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     disconnect(cmbModifierMode, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     disconnect(cmbMaskColor, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
+    disconnect(maskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
 }
 
 
@@ -559,6 +563,7 @@ void QFRDRImageStackDataEditor::displayImage() {
     QFRDRImageStackData* mv=qobject_cast<QFRDRImageStackData*>(current);
     player->setVisible(false);
     player->pause();
+    bool dd=pltImage->get_doDrawing();
     pltImage->set_doDrawing(false);
     if (mv) {
         int idx=cmbImageStack->currentIndex();
@@ -588,9 +593,11 @@ void QFRDRImageStackDataEditor::displayImage() {
         player->setVisible(false);
         player->setRange(0,100);
     }
-    pltImage->set_doDrawing(true);
-    //pltImage->zoomToFit();
-    pltImage->update_plot();
+    if (dd) {
+        pltImage->set_doDrawing(true);
+        //pltImage->zoomToFit();
+        pltImage->update_plot();
+    }
     //qDebug()<<"displayImage(): done";
 }
 

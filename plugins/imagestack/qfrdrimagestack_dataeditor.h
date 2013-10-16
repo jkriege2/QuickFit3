@@ -20,6 +20,7 @@
 #include "statistics_tools.h"
 #include "colorcombobox.h"
 #include "qfrdrimagemaskedittools.h"
+#include "qfhistogramview.h"
 
 /*! \brief editor for QFRawDataRecord
     \ingroup qf3rdrdp_image_stack
@@ -51,6 +52,7 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         QLabel* labDescription;
         QFPlotter* pltImage;
         QFPlotter* pltData;
+        QFHistogramView* histogram;
         QToolBar* toolbar;
         QComboBox* cmbImageStack;
         QComboBox* cmbChannelR;
@@ -68,6 +70,7 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         QLabel* labFrame;
         QVisibleHandleSplitter* splitter;
         QMenu* menuMask;
+        QMenu* menuTools;
         QLabel* labSelectiondata;
 
         QString lastMaskDir;

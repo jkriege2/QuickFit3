@@ -84,7 +84,7 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
                                  "<li>SHIFT: pixel will be removed from current mask</li>"
                                  "</ul>"));
     actImagesDrawPoints->setCheckable(true);
-    actImagesDrawRectangle=new QAction(QIcon(":/imaging_fcs/draw_rectangle.png"), tr("rectangular mask editing"), this);
+    actImagesDrawRectangle=new QAction(QIcon(":/qfrdrmaskeditor/draw_rectangle.png"), tr("rectangular mask editing"), this);
     actImagesDrawRectangle->setToolTip(tr("in this mode the user may draw a rectangle.<br>"
                                  "All pixels inside the rectangle will be selected<br>"
                                  "when the user releases the left mouse key. You may<br>"
@@ -401,6 +401,16 @@ void QFRDRImageMaskEditTools::unmaskSelected()
             if (selection[i]) runselection->leaveoutRemoveRun(i);
         }
         signalMaskChanged(false);
+    }
+}
+
+void QFRDRImageMaskEditTools::clearSelection()
+{
+    if (selection && selectionWidth*selectionHeight>0 && selectionEditing) {
+        for (int i=0; i<selectionWidth*selectionHeight; i++) {
+            selection[i]=false;
+        }
+        signalMaskChanged(true, false);
     }
 }
 

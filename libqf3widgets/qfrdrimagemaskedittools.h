@@ -67,6 +67,8 @@ class QFWIDLIB_EXPORT QFRDRImageMaskEditTools: public QObject {
         void maskSelected();
         void unmaskSelected();
 
+        void clearSelection();
+
     signals:
         void rawDataChanged();
 
