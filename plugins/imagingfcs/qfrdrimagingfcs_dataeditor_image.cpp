@@ -3741,6 +3741,7 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, c
                     break;
                 case QFRawDataRecord::qfrdreString:
                     fitfunc=current->resultsGetAsString(evaluation, "fit_model_name");
+
                     break;
                 default:
                     break;
@@ -3764,6 +3765,7 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, c
     unitlabels.clear();
 
     QStringList pids;
+    bool recheckedmatrix=false;
     //qDebug()<<"ff->paramCount()="<<ff->paramCount();
     for (int i=0; i<ff->paramCount(); i++) {
         QString id=ff->getParameterID(i);
@@ -3782,7 +3784,12 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, c
             if (current->resultsExists(evaluation, "fitparam_"+id+"_fix")) {
                 fixs[i]=current->resultsGetAsBoolean(evaluation, "fitparam_"+id+"_fix");
             }
-        } else {
+            if (!recheckedmatrix && current->resultsGet(evaluation, "fitparam_"+id).getVectorMatrixItems()>1) {
+                isMatrixResults=true;
+                recheckedmatrix=recheckedmatrix;
+            }
+        }
+        if (isMatrixResults){
             if (current->resultsExists(evaluation, "fitparam_"+id)) {
                 params[i]=current->resultsGetInNumberList(evaluation, "fitparam_"+id, index);
                 errs[i]=current->resultsGetErrorInNumberErrorList(evaluation, "fitparam_"+id, index);

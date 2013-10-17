@@ -1092,8 +1092,8 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
 
 
                     if (run<0) record->resultsSetString(evalID, "fit_model_name", dfd.ffunc->id());
-                    else if (saveLongStrings) record->resultsSetInStringList(evalID, "fit_model_name", run, dfd.ffunc->id());
-                    else record->resultsSetString(evalID, "fit_model_name", dfd.ffunc->id());
+                    else record->resultsSetInStringList(evalID, "fit_model_name", run, dfd.ffunc->id());
+                    //else record->resultsSetString(evalID, "fit_model_name", dfd.ffunc->id());
                     record->resultsSetGroup(evalID, param, group);
                     record->resultsSetLabel(evalID, param, tr("fit: model"));
 
