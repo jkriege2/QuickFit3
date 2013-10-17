@@ -3715,15 +3715,29 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, c
     QString fitfunc="";
     bool isMatrixResults=false;
     //qDebug()<<evaluation<<fitfunc<<m_fitFunctions.size();
+    //qDebug()<<"idx="<<index<<"  eval="<<evaluation;
     if (index<0) {
         fitfunc=current->resultsGetAsString(evaluation, "fit_model_name");
     } else {
+        //qDebug()<<current->resultsExists(evaluation, "fit_model_name")<<"   "<<evaluationResultType2String(current->resultsGetType(evaluation, "fit_model_name"));
         if (current->resultsExists(evaluation, "fit_model_name")) {
             switch (current->resultsGetType(evaluation, "fit_model_name")) {
                 case QFRawDataRecord::qfrdreStringVector:
                 case QFRawDataRecord::qfrdreStringMatrix:
                     fitfunc=current->resultsGetInStringList(evaluation, "fit_model_name", index);
                     isMatrixResults=true;
+                    if (fitfunc.isEmpty()) {
+                        bool ok=false;
+                        QStringList sl=current->resultsGetAsStringList(evaluation, "fit_model_name", &ok);
+                        if (ok) {
+                            for (int i=0; i<sl.size(); i++) {
+                                if (!sl[i].isEmpty()) {
+                                    fitfunc=sl[i];
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     break;
                 case QFRawDataRecord::qfrdreString:
                     fitfunc=current->resultsGetAsString(evaluation, "fit_model_name");
