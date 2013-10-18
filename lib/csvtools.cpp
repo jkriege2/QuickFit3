@@ -166,7 +166,7 @@ void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames,
             if (!columnsNames.value(i, "").isEmpty()) {
 
                 QString strans=columnsNames.value(i, "");
-                strans=strans.replace("\"", "\\\"").replace("'", "\\\'").replace("\n", " ").replace("\r", " ");
+                strans=strans.replace("\"", "").replace("'", "").replace("\n", " ").replace("\r", " ");
                 strans=QString("\"%1\"").arg(strans);
                 csv+=strans;
                 csvLocale+=strans;
@@ -180,10 +180,14 @@ void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames,
     for (int r=0; r<datas; r++) {
         if (rowNames.size()>0) {
             QString strans=rowNames.value(r, "");
-            strans=strans.replace("\"", "\\\"").replace("'", "\\\'").replace("\n", " ").replace("\r", " ");
+            strans=strans.replace("\"", "\\\"").replace("'", "\\\'").replace("\n", " ").replace("\r", " ").replace("\t", " ");
             strans=QString("\"%1\"").arg(strans);
-            csv+=strans+", ";
-            csvLocale+=strans+"; ";
+            QString strans_nc=strans;
+            strans_nc=strans_nc.replace(',', ';');
+            QString strans_ns=strans;
+            strans_ns=strans_ns.replace(';', ',');
+            csv+=strans_nc+", ";
+            csvLocale+=strans_ns+"; ";
             excel+=strans+"\t";
         }
         for (int c=0; c<data.size(); c++) {
