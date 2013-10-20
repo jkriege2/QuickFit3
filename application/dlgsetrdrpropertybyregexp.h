@@ -31,7 +31,7 @@ class DlgSetRDRPropertyByRegExp : public QDialog
     protected slots:
         void on_btnSelectNone_clicked();
         void on_btnSelectAll_clicked();
-
+        void showHelp();
     public slots:
         void updateTest();
     private:

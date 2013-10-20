@@ -1,6 +1,7 @@
 #include "qfrdrreplacedialog.h"
 #include "programoptions.h"
 #include "ui_qfrdrreplacedialog.h"
+#include "qfpluginservices.h"
 
 QFRDRReplaceDialog::QFRDRReplaceDialog(QWidget *parent) :
     QDialog(parent),
@@ -47,4 +48,10 @@ QString QFRDRReplaceDialog::getReplaceString() const
 bool QFRDRReplaceDialog::getCaseSensitivity() const
 {
     return ui->chkCaseSensitive->isChecked();
+}
+
+void QFRDRReplaceDialog::showHelp()
+{
+    QFPluginServices::getInstance()->displayMainHelpWindow("dlgrdrreplace.html");
+
 }

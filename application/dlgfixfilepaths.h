@@ -22,6 +22,8 @@ private:
     Ui::DlgFixFilepaths *ui;
     QString lastDir;
 protected slots:
+    void showHelp();
+protected slots:
     void selectFile();
     void on_btnApply_clicked();
     void on_btnIgnore_clicked();

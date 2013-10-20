@@ -18,6 +18,8 @@ class RenameGroupsDialog : public QDialog
 
         void setStrings(const QStringList& list);
         QStringList getStrings() const;
+    protected slots:
+        void showHelp();
     private:
         Ui::RenameGroupsDialog *ui;
 

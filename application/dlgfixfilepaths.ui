@@ -82,6 +82,13 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>&amp;Help</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -132,6 +139,10 @@
   <include location="../lib/lib.qrc"/>
   <include location="../lib/lib.qrc"/>
   <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -141,8 +152,8 @@
    <slot>selectFile()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>784</x>
-     <y>74</y>
+     <x>868</x>
+     <y>114</y>
     </hint>
     <hint type="destinationlabel">
      <x>338</x>
@@ -150,8 +161,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>DlgFixFilepaths</receiver>
+   <slot>showHelp()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>47</x>
+     <y>151</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>82</x>
+     <y>131</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>selectFile()</slot>
+  <slot>showHelp()</slot>
  </slots>
 </ui>

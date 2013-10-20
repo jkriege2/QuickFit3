@@ -27,3 +27,9 @@ DlgSelectProjectSubset::~DlgSelectProjectSubset()
     saveWidgetGeometry(*(ProgramOptions::staticGetQSettings()), this, "DlgSelectProjectSubset/window");
     delete ui;
 }
+
+void DlgSelectProjectSubset::showHelp()
+{
+    QFPluginServices::getInstance()->displayMainHelpWindow("dlgselectprojectsubset.html");
+
+}

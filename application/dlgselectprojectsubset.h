@@ -16,6 +16,8 @@ class DlgSelectProjectSubset : public QDialog
     public:
         explicit DlgSelectProjectSubset(QFProject* project, QWidget *parent = 0);
         ~DlgSelectProjectSubset();
+    protected slots:
+        void showHelp();
         
     private:
         Ui::DlgSelectProjectSubset *ui;

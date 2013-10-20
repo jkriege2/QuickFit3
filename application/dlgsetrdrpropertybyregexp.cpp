@@ -189,6 +189,12 @@ void DlgSetRDRPropertyByRegExp::on_btnSelectAll_clicked()
     }
 }
 
+void DlgSetRDRPropertyByRegExp::showHelp()
+{
+    QFPluginServices::getInstance()->displayMainHelpWindow("dlgsetrdrpropertybyregexp.html");
+
+}
+
 
 void DlgSetRDRPropertyByRegExp::updateTest()
 {

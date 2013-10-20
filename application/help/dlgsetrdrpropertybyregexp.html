@@ -1,0 +1,30 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Online-Help: Set RDR property by Regular Expression Dialog</title>
+  <link rel="previous" href="plots.html"> 
+  <link rel="contents" href="table.html"> 
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	<h2>Set RDR property by Regular Expression Dialog</h2>
+	<p>In many cases it is desireable to set the raw data records properties (name, filder, group, ...) from other data available in the RDR. The menu entry $$bqtt:Tools | project tools | set RDR property by RegExp$$ opens a dialog, which allows to set some RDR properties using a <a href="qf3_qtregexp.html">regular expression</a>.
+	<ol>
+	  <li>First select the RDRs in which to set properties</li>
+	  <li>select the property, which is matched agains the regular expression (RegExp).</li>
+	  <li>set the regular expression</li>
+	  <li>select the property to set. This is the property that is replaced by the "output string", if the regular expression mathces. For different matching/replace modes, see the next property.</li>
+	  <li>With <i>mode</i> you can choose how to use the RegExp:<ul>
+	    <li>"use output string, when matches": set the output property to the "output string", when the regular expression matches the input property</li>
+	    <li>"use output string, when mismatches": set the output property to the "output string", when the regular expression does not matchthe input property</li>
+	    <li>"use match": set the output property to the matching part of the input property</li>
+	    <li>"use capture 1"...: set the output property to the capture part of the RegExp in the input property (you can set matches with parantheses in the regular expression)</li>
+	    <li>"replace %0, %1, ... in output string by captures": set the output property to the output string, but replace in the output string every occurence of %0 by the complete match, %1 by the first capture, 52 by the second capture, ... </li>
+	  </ul></li>
+	  <li></li>
+	</ol>
+	$$note:There are some additional replaces in the output string: The strings %name%, %group%, %id%, %role% are ALWAYS replaced by the according information from the raw data record!$$
+	</p>
+  </body>
+</html>

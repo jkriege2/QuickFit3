@@ -81,6 +81,11 @@ void dlgRDRSetProperty::on_btnSelectAll_clicked()
     }
 }
 
+void dlgRDRSetProperty::showHelp()
+{
+    QFPluginServices::getInstance()->displayMainHelpWindow("dlgrdrsetproperty.html");
+}
+
 
 QStringList dlgRDRSetProperty::getNewPropNames() const
 {

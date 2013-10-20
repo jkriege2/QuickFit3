@@ -1,5 +1,6 @@
 #include "renamegroupsdialog.h"
 #include "ui_renamegroupsdialog.h"
+#include "qfpluginservices.h"
 
 RenameGroupsDialog::RenameGroupsDialog(QWidget *parent) :
     QDialog(parent),
@@ -23,4 +24,10 @@ void RenameGroupsDialog::setStrings(const QStringList &list)
 QStringList RenameGroupsDialog::getStrings() const
 {
     return model.stringList();
+}
+
+void RenameGroupsDialog::showHelp()
+{
+    QFPluginServices::getInstance()->displayMainHelpWindow("dlgrenamegroups.html");
+
 }

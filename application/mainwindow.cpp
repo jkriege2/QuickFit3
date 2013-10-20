@@ -2743,7 +2743,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$insert:<filename>$$ and $$insertglobal:<filename>$$ items
-            QRegExp rxInsert("\\$\\$(insert|insertglobal|see|note|info|warning|example|codeexample|cexample|tt|code)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxInsert("\\$\\$(insert|insertglobal|see|note|info|warning|example|codeexample|cexample|tt|code|bqtt|bqcode)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxInsert.setMinimal(true);
             count = 0;
             pos = 0;
@@ -2812,6 +2812,10 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                    result=result.replace(rxInsert.cap(0), rep);
                 } else if (QFPluginServices::getInstance()&&(command=="tt"||command=="code")) {
                    QString rep=tr("<tt>%1</tt>").arg(file);
+
+                   result=result.replace(rxInsert.cap(0), rep);
+                } else if (QFPluginServices::getInstance()&&(command=="bqtt"||command=="bqcode")) {
+                   QString rep=tr("<blockquote><tt>%1</tt></blockquote>").arg(file);
 
                    result=result.replace(rxInsert.cap(0), rep);
                 }

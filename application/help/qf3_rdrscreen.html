@@ -17,19 +17,19 @@ The screen shows at least three tabs at the top. The button <b><img src=":/help.
 <p>The first tab <b>Properties</b> (see image above) may be used to enter these:
 <ul>
 <li>the <em>internal unique ID</em> (an integer number) of the raw data record</li>
-<li>a <em>desciption of the evaluation type</em> </li>
-<li>a <em>name</em> for the raw data record (which will also appear in the project tree)</li>
-<li>a <em>group</em> to which the RDR belongs, Select "--- new group ---" to create a new group. A dialog will pop up into which the name for the new group is entered.</li>
-<li>a <em>role</em>: Each RDR may have a certain role within the project. this can e.g. be used to specify whether an FCS correlation record represents an ACF or a CCF</li>
-<li>a <em>description text</em>. In the description you may e.g. note how the data was taken, which experiment you did, which instruments you used, ...</li>
-<li>a <em>path</em> (with slash '<tt>/</tt>' as separator), which is used to group the records in the project tree. Simply enter a path like "<tt>mypath/subfolder</tt>" and the record will be inside the folders <tt>mypath</tt> and the <tt>subfolder</tt> below the raw data record nodes.</li>
+<li>a <a name="#description"><em>desciption of the evaluation type</em> </li>
+<li>a <a name="#name"><em>name</em> for the raw data record (which will also appear in the project tree)</li>
+<li>a <a name="#group"><em>group</em> to which the RDR belongs, Select "--- new group ---" to create a new group. A dialog will pop up into which the name for the new group is entered.</li>
+<li>a <a name="#role"><em>role</em>: Each RDR may have a certain role within the project. this can e.g. be used to specify whether an FCS correlation record represents an ACF or a CCF</li>
+<li>a <a name="#description"><em>description text</em>. In the description you may e.g. note how the data was taken, which experiment you did, which instruments you used, ...</li>
+<li>a <a name="#path"><em>path</em> (with slash '<tt>/</tt>' as separator), which is used to group the records in the project tree. Simply enter a path like "<tt>mypath/subfolder</tt>" and the record will be inside the folders <tt>mypath</tt> and the <tt>subfolder</tt> below the raw data record nodes.</li>
 <li>a <em>list of all files</em> associated with the record. Although these files are shown with their absolute path, only relative pathes are saved in the project where possible (e.g. when the files are on the same drive as the project file on a windows system).</li>
 <li>a list of <em>properties</em>. A property is key/name (string) together with an arbitrary value (string, integer,floating-point number, boolean) that may e.g. be used to describe some additional information about the record, or the ambient conditions of the experiment, or any metadata, you like. These values are readable by evaluations. You may add a new property using the <img src=":/lib/prop_add.png"> button to add a new property and <img src=":/lib/prop_delete.png"> to remove the selected proeprty. You may edit the property value directly in the table, but note that some properties may be system-properties and are not editable. Any property you added by hand is editable in any case. To start editing of the parameter name, type or value, double-click into a table cell. <br><small>It is also possible to make a non-editable property editable, using the properties context menu. But note that this changed property may be overwritten when the project is loaded again, as read-only properties are often used to display data read from input files!</small></li>
 </ul>
 </p> 
 <p> </p>
 
-<a name="#properties"><h2>Evaluation Results</h2>
+<a name="#results"><h2>Evaluation Results</h2>
 <p>The second last tab <b>Evaluation Results</b> may be used to view the results of all evaluation objects that were used together with the current raw data record. These results (but only for one evaluation item) are also visible on the <a href="qf3_evalscreen.html">evaluation screen</a>.
       <center><img src="./pic/qf3_rdr_results.png"></center>
 Features of the <b>evaluation screen</b> tab:

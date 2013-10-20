@@ -3,7 +3,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFile>
-
+#include "qfpluginservices.h"
 
 DlgFixFilepaths::DlgFixFilepaths(const QString& oldName, const QString& lastDir, QWidget *parent) :
     QDialog(parent),
@@ -65,5 +65,11 @@ void DlgFixFilepaths::init(const QString &oldName, const QString &lastDir)
     } else {
         this->lastDir=lastDir;
     }
+
+}
+
+void DlgFixFilepaths::showHelp()
+{
+    QFPluginServices::getInstance()->displayMainHelpWindow("dlgfixfilepaths.html");
 
 }

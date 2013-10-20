@@ -20,7 +20,9 @@ class QFRDRReplaceDialog : public QDialog
         QString getFindString() const;
         QString getReplaceString() const;
         bool getCaseSensitivity() const;
-        
+    protected slots:
+        void showHelp();
+
     private:
         Ui::QFRDRReplaceDialog *ui;
 };

@@ -234,6 +234,13 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
+          <widget class="QPushButton" name="pushButton">
+           <property name="text">
+            <string>&amp;Help</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -354,6 +361,22 @@
     <hint type="destinationlabel">
      <x>5</x>
      <y>279</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>UserFitFunctionsEditor</receiver>
+   <slot>showHelp()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>400</x>
+     <y>520</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>372</x>
+     <y>548</y>
     </hint>
    </hints>
   </connection>

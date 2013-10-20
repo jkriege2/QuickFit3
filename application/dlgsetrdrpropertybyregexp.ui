@@ -249,7 +249,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
@@ -352,7 +352,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>573</x>
-     <y>126</y>
+     <y>172</y>
     </hint>
     <hint type="destinationlabel">
      <x>358</x>
@@ -368,7 +368,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>573</x>
-     <y>171</y>
+     <y>309</y>
     </hint>
     <hint type="destinationlabel">
      <x>353</x>
@@ -392,8 +392,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>helpRequested()</signal>
+   <receiver>DlgSetRDRPropertyByRegExp</receiver>
+   <slot>showHelp()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>313</x>
+     <y>472</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>890</x>
+     <y>322</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>updateTest()</slot>
+  <slot>showHelp()</slot>
  </slots>
 </ui>

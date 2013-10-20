@@ -268,13 +268,25 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$references$$");
 
 
-    menu=new QMenu(tr("insert Additional Markup"), this);
+    menu=new QMenu(tr("insert Figures"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
     addInsertAction(menu, "$$fig:FILENAME:CAPTION$$");
+
+
+    menu=new QMenu(tr("insert Info boxes"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
     addInsertAction(menu, "$$see:Text$$");
     addInsertAction(menu, "$$note:Text$$");
     addInsertAction(menu, "$$info:Text$$");
     addInsertAction(menu, "$$warning:Text$$");
+    addInsertAction(menu, "$$bqtt:Text$$");
+    addInsertAction(menu, "$$bqcode:Text$$");
+
+
+    menu=new QMenu(tr("insert other markups"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "$$tt:Text$$");
+    addInsertAction(menu, "$$code:Text$$");
     //addInsertAction(menu, "$$$$");
 
 }

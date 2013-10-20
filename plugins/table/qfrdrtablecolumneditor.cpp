@@ -53,6 +53,8 @@ QFRDRTableColumnEditor::QFRDRTableColumnEditor(QFTablePluginModel *model, int co
     ui->edtFormula->setText(ProgramOptions::getConfigValue("QFRDRTableColumnEditor/expression", "sin(column(0)/10*2*pi)").toString());
     ui->lstFunctions->setModel(functionRef->getHelpModel());
 
+    //ui->edtFormula(QFEnhancedLineEdit)
+
     QTimer::singleShot(10, this, SLOT(delayedStartSearch()));
 
 }

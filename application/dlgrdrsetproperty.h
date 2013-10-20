@@ -29,6 +29,7 @@ class dlgRDRSetProperty : public QDialog {
     protected slots:
         void on_btnSelectNone_clicked();
         void on_btnSelectAll_clicked();
+        void showHelp();
     private:
         Ui::dlgRDRSetProperty *ui;
         QFProject* project;
