@@ -54,6 +54,10 @@ QFRDRTableColumnEditor::QFRDRTableColumnEditor(QFTablePluginModel *model, int co
     ui->lstFunctions->setModel(functionRef->getHelpModel());
 
     //ui->edtFormula(QFEnhancedLineEdit)
+    for (int i=0; i<model->columnCount(); i++) {
+        ui->edtFormula->addInsertContextMenuEntry(tr("insert 'column(###)';;&%1: %2").arg(i+1).arg(model->columnTitle(i)), QString("column(%1)").arg(i+1));
+        ui->edtFormula->addInsertContextMenuEntry(tr("insert column id;;&%1: %2").arg(i+1).arg(model->columnTitle(i)), QString("%1").arg(i+1));
+    }
 
     QTimer::singleShot(10, this, SLOT(delayedStartSearch()));
 

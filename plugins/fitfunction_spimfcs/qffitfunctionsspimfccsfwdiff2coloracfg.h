@@ -5,7 +5,7 @@
 
 
 
-/*! \brief QFFitFunction class for a SPIM-FCCS fit model with pure diffusion for 2-color crosscorrelation and 1/sqrt(e) lateral width
+/*! \brief QFFitFunction class for a SPIM-FCCS fit model with pure diffusion for 2-color crosscorrelation and 1/e^2 lateral width
     \ingroup qf3fitfunp_fitfunctions_spimfcs
 */
 class QFFitFunctionsSPIMFCCSFWDiff2ColorACFG: public QFFitFunction {

@@ -38,10 +38,6 @@ inline double QFFitFunctionsTIRFCCSFWADiff2ColorCCF_pixelcorrfactor(double a, do
             (2.0*a*a);
 }
 
-inline double QFFitFunctionsTIRFCCSFWADiff2ColorCCF_corrfactor(double dz, double Gamma, double alpha, double t, double wg, double wr) {
-    const double dt_sigma=sqrt(8.0*Gamma*pow(t, alpha)+wg*wg+wr*wr);
-    return exp(-2.0*dz*dz/dt_sigma)/dt_sigma*sqrt(2.0/M_PI);
-}
 
 inline double QFFitFunctionsTIRFCCSFWADiff2ColorCCF_corrfactor_2Dxy(double a, double dx, double dy, double Gamma, double alpha, double t, double wg, double wr) {
     return QFFitFunctionsTIRFCCSFWADiff2ColorCCF_pixelcorrfactor(a, dx, Gamma, alpha, t, wg, wr)*

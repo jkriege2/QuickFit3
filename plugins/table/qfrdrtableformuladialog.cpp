@@ -45,6 +45,14 @@ QFRDRTableFormulaDialog::QFRDRTableFormulaDialog(QFTablePluginModel *model, int 
 
     functionRef->addDefaultWords(defaultWords);
 
+    ui->edtFormula->addInsertContextMenuEntry(tr("insert 'row'"), QString("row"));
+    ui->edtFormula->addInsertContextMenuEntry(tr("insert 'column'"), QString("column"));
+    ui->edtFormula->addInsertContextMenuEntry(tr("insert row id"), QString("%1").arg(row+1));
+    ui->edtFormula->addInsertContextMenuEntry(tr("insert column id"), QString("%1").arg(col+1));
+    for (int i=0; i<model->columnCount(); i++) {
+        ui->edtFormula->addInsertContextMenuEntry(tr("insert column id;;&%1: %2").arg(i+1).arg(model->columnTitle(i)), QString("%1").arg(i+1));
+        ui->edtFormula->addInsertContextMenuEntry(tr("insert 'column(###)';;&%1: %2").arg(i+1).arg(model->columnTitle(i)), QString("column(%1)").arg(i+1));
+    }
 
     ui->edtFormula->setText(ProgramOptions::getConfigValue("QFRDRTableFormulaDialog/expression", "sin(row/10*2*pi)").toString());
     ui->lstFunctions->setModel(functionRef->getHelpModel());

@@ -14,6 +14,10 @@
        - When this QLineEdit looses focus its contents is added to its completer (if any is defined)
        - it is possible to add QAbstractButton to the widget that will appear inside the line edit.
     .
+
+    If you add context menu entries, it is possibly to easily build a tree structure of submenus, by using
+    \c ';;' as sepearators. E.g. \c "Menu;;Submenu;;ActionName" will create a contextmenu entry with name
+    \c ActionName in the menu \c Submenu, which is a submenu of \c Menu.
  */
 class QFLIB_EXPORT QFEnhancedLineEdit : public QLineEdit {
         Q_OBJECT
@@ -63,12 +67,14 @@ class QFLIB_EXPORT QFEnhancedLineEdit : public QLineEdit {
         int getButtonsWidth(int i);
         void moveButtons();
         void invalidateButtons();
+        void intInsertAction(QString name, QAction* act);
     protected slots:
         void insertActTriggered();
     private:
         int m_buttonDistance;
         QList<QAbstractButton*> buttons;
         QList<QAction*> contextmenuActions;
+        QList<QMenu*> submenus;
 
         int m_historyposition;
         QStringList history;

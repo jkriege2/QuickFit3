@@ -34,7 +34,11 @@ void QFEDefaultMathParserExtensions::initExtension() {
     
     // make the additional documentation known to the main help
     QFPluginServices::getInstance()->appendOrAddHTMLReplacement("qfmathparser_ref", QString("$$insert:%1/parserref.inc$$").arg(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())));
-    QFPluginServices::getInstance()->setGlobalConfigValue("QFMathParser_ref", QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
+    QStringList sl=QFPluginServices::getInstance()->getGlobalConfigValue("QFMathParser_ref").toStringList();
+    sl.append(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
+    QFPluginServices::getInstance()->setGlobalConfigValue("QFMathParser_ref", sl);
+
+
     QFMathParser::addGlobalFunction("regression", fRegression);
     QFMathParser::addGlobalFunction("weighted_regression", fWeightedRegression);
     QFMathParser::addGlobalFunction("irls", fIRLS);

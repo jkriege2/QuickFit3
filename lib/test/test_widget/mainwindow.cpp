@@ -8,6 +8,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->edtLogDouble->setLogScale(true);
     ui->edtInt->setIntegerWidget(true);
+
+    ui->lineEdit->addInsertContextMenuEntry("test1", "test1");
+    ui->lineEdit->addInsertContextMenuEntry("test2", "test2");
+    ui->lineEdit->addInsertContextMenuEntry("test;;test1", "ttest1");
+    ui->lineEdit->addInsertContextMenuEntry("test;;test2", "ttest2");
+    ui->lineEdit->addInsertContextMenuEntry("test;;testsub;;test1", "tttest1");
+    ui->lineEdit->addInsertContextMenuEntry("test;;test3", "ttest3");
+    ui->lineEdit->addInsertContextMenuEntry("test;;testsub2;;test1", "tt2test1");
+    ui->lineEdit->addInsertContextMenuEntry("test;;testsub;;test2", "tttest2");
+    ui->lineEdit->addInsertContextMenuEntry("sub;;test1", "stest1");
+
     updateWidgets();
 
 }

@@ -5,7 +5,7 @@
 
 
 
-/*! \brief QFFitFunction class for a SPIM-FCCS fit model with pure diffusion for 2-color crosscorrelation and 1/sqrt(e) lateral width
+/*! \brief QFFitFunction class for a SPIM-FCCS fit model with pure diffusion for 2-color crosscorrelation and 1/e^2 lateral width
     \ingroup qf3fitfunp_fitfunctions_spimfcs
 */
 class QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorACFR: public QFFitFunction {
@@ -13,7 +13,7 @@ class QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorACFR: public QFFitFunction {
         QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorACFR();
         virtual ~QFFitFunctionsSPIMFCCSFW2CSepDiff2ColorACFR() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCCS: 2-comp. normal diffusion, species A+B+AB, c per species, D1/D2 per channel, ACF red (1/eï¿½ radii)"); }
+        virtual QString name() const { return QString("SPIM-FCCS: 2-comp. normal diffusion, species A+B+AB, c per species, D1/D2 per channel, ACF red (1/e² radii)"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fccs_spim_fw_2csepdiff2coloracfr"); }
 

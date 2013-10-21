@@ -76,7 +76,9 @@ QFFunctionReferenceTool::QFFunctionReferenceTool(QObject *parent) :
     compExpression=new QFCompleterFromFile(this);
     defaultHelp="";
     rxDefinition=QRegExp("<!--\\s*func:([\\w]*)\\s*-->(.*)<!--\\s*/func:\\1\\s*-->");
+    rxDefinition.setMinimal(false);
     rxTemplate=QRegExp("<!--\\s*template\\s*-->(.*)<!--\\s*/template\\s*-->");
+    rxTemplate.setMinimal(false);
     btnCurrentHelp=NULL;
     labHelp=NULL;
     labTemplate=NULL;
@@ -474,6 +476,9 @@ void QFFunctionReferenceTool::onCursorPositionChanged(int /*old*/, int newPosIn)
 
     if (text.size()>0) {
         if (newPos>=0 && newPos<text.size()) {
+            while (!text[newPos].isLetter() && newPos>0) {
+                newPos--;
+            }
             QString word;
             word+=text[newPos];
             int p=newPos-1;

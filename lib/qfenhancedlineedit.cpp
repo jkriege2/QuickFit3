@@ -65,6 +65,62 @@ void QFEnhancedLineEdit::invalidateButtons() {
     moveButtons();
 }
 
+void QFEnhancedLineEdit::intInsertAction(QString name, QAction *act)
+{
+    if (!name.contains(";;")) {
+        addAction(act);
+        contextmenuActions.append(act);
+    } else {
+        QStringList sl=name.split(";;");
+        QMenu* m=NULL;
+        for (int i=0; i<submenus.size(); i++) {
+            if (submenus[i]->title()==sl.first()) {
+                m=submenus[i];
+                break;
+            }
+        }
+        QString n=sl.last();
+        act->setText(n);
+        if (m) {
+            for (int i=1; i<sl.size()-1; i++) {
+                QList<QAction*> al=m->actions();
+                QMenu* mn=NULL;
+                for (int j=0; j<al.size(); j++) {
+                    if (al[j]->menu() && al[j]->menu()->title()==sl[i]) {
+                        mn=al[j]->menu();
+                        break;
+                    }
+                }
+                if (!mn) {
+                    mn=new QMenu(sl[i], this);
+                    m->addAction(mn->menuAction());
+
+                }
+                m=mn;
+            }
+        } else {
+            for (int i=0; i<sl.size()-1; i++) {
+                QMenu* mn=new QMenu(sl[i], this);
+                if (i==0) {
+                    contextmenuActions.append(mn->menuAction());
+                    addAction(mn->menuAction());
+                    submenus.append(mn);
+                }
+                if (m) m->addMenu(mn);
+                m=mn;
+            }
+        }
+        if (m) {
+            m->addAction(act);
+            contextmenuActions.append(act);
+        } else {
+            addAction(act);
+            contextmenuActions.append(act);
+        }
+        //addAction(act);
+    }
+}
+
 void QFEnhancedLineEdit::insertActTriggered() {
     QAction* act=qobject_cast<QAction*>(sender());
     if (act) {
@@ -147,8 +203,7 @@ void QFEnhancedLineEdit::addContextMenuEntry(const QString &name, QVariant data)
 void QFEnhancedLineEdit::addContextMenuEntry(const QIcon& icon, const QString &name, QVariant data) {
     QAction* act=new QAction(icon, name, this);
     act->setData(data);
-    addAction(act);
-    contextmenuActions.append(act);
+    intInsertAction(name, act);
 }
 
 
@@ -159,8 +214,7 @@ void QFEnhancedLineEdit::addContextMenuEntry(const QString &name, const QObject 
 void QFEnhancedLineEdit::addContextMenuEntry(const QIcon &icon, const QString &name, const QObject *receiver, const char *method) {
     QAction* act=new QAction(icon, name, this);
     connect(act, SIGNAL(triggered()), receiver, method);
-    addAction(act);
-    contextmenuActions.append(act);
+    intInsertAction(name, act);
 }
 
 void QFEnhancedLineEdit::addInsertContextMenuEntry(const QString &name, const QString &insert) {
@@ -171,16 +225,25 @@ void QFEnhancedLineEdit::addInsertContextMenuEntry(const QIcon &icon, const QStr
     QAction* act=new QAction(icon, name, this);
     act->setData(insert);
     connect(act, SIGNAL(triggered()), this, SLOT(insertActTriggered()));
-    addAction(act);
-    contextmenuActions.append(act);
+    intInsertAction(name, act);
 }
 
 void QFEnhancedLineEdit::clearContextMenu() {
     foreach(QAction* act, contextmenuActions) {
         removeAction(act);
         act->disconnect();
+        if (!act->menu()) delete act;
+    }
+    foreach(QMenu* act, submenus) {
         delete act;
     }
+    contextmenuActions.clear();
+    submenus.clear();
+    /*QMapIterator<QString, QMenu*> i(submenus);
+    while (i.hasNext()) {
+        i.next();
+        delete i.value();
+    }*/
 }
 
 bool QFEnhancedLineEdit::useHistory() const

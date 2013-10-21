@@ -17,11 +17,13 @@ DEFINES += QFLIB_TEST
 SOURCES += main.cpp\
         mainwindow.cpp \
     ../../qfdoubleedit.cpp \
-    ../../qfdoubleslider.cpp
+    ../../qfdoubleslider.cpp \
+    ../../qfenhancedlineedit.cpp
 
 HEADERS  += mainwindow.h \
     ../../qfdoubleedit.h \
     ../../lib_imexport.h \
-    ../../qfdoubleslider.h
+    ../../qfdoubleslider.h \
+    ../../qfenhancedlineedit.h
 
 FORMS    += mainwindow.ui

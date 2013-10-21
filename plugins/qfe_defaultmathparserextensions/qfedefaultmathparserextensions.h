@@ -29,7 +29,7 @@ class QFEDefaultMathParserExtensions : public QObject, public QFExtensionBase {
         /** \copydoc QFExtension::getID() */
         virtual QString getID() const  { return QString("qfe_defaultmathparserextensions"); };
         /** \copydoc QFExtension::getName() */
-        virtual QString getName() const  { return tr("deafult extensions for QFMathParser"); };
+        virtual QString getName() const  { return tr("default extensions for QFMathParser"); };
         /** \copydoc QFExtension::getDescription() */
         virtual QString getDescription() const  { return getName(); };
         /** \copydoc QFExtension::getAuthor() */
