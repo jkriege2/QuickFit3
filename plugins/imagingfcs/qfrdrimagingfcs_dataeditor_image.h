@@ -441,6 +441,10 @@ protected:
         QColor excludedColor;
 
 
+        /*QCheckBox* chkOtherFileP2;
+        QComboBox* cmbOtherFilesResultGroup;
+        QComboBox* cmbOtherFileRole;*/
+
 
 
 
@@ -471,7 +475,7 @@ protected:
 
 
         /** \brief create a parameter image with the given evalGroup and fitParam */
-        void readParameterImage(double* image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam, ImageTransforms tranFitParam);
+        void readParameterImage(double* image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam, ImageTransforms tranFitParam, bool thisRDR=true, const QString otherRDRRole=QString(""));
 
         /** \brief apply the given transformation to the image */
         void transformImage(double *image, uint16_t width, uint16_t height, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam);

@@ -135,6 +135,25 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     labParameterTransform->setBuddy(cmbParameterTransform);
     topgrid->addWidget(cmbParameterTransform, row, 6);
 
+    /*row++;
+    QHBoxLayout* hblp2=new QHBoxLayout(this);
+    topgrid->addLayout(hblp2, row, 3, 1, 4);
+    chkOtherFileP2=new QCheckBox(tr("other RDR for parameter 2, role:"), this);
+    hblp2->addWidget(chkOtherFileP2);
+    cmbOtherFileRole=new QComboBox(this);
+    cmbOtherFileRole->setEnabled(false);
+    hblp2->addWidget(cmbOtherFileRole);
+    hblp2->addWidget(new QLabel(tr("result set:")));
+    cmbOtherFilesResultGroup=new QComboBox(this);
+    cmbOtherFilesResultGroup->setMaximumWidth(700);
+    cmbOtherFilesResultGroup->view()->setTextElideMode(Qt::ElideMiddle);
+    cmbOtherFilesResultGroup->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    cmbOtherFilesResultGroup->setEnabled(false);
+    hblp2->addWidget(cmbOtherFilesResultGroup);
+    connect(chkOtherFileP2, SIGNAL(toggled(bool)), cmbOtherFileRole, SLOT(setEnabled(bool)));
+    connect(chkOtherFileP2, SIGNAL(toggled(bool)), cmbOtherFilesResultGroup, SLOT(setEnabled(bool)));*/
+
+
     row++;
     cmbParameter2=new QComboBox(this);
     cmbParameter2->setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -3637,7 +3656,7 @@ void QFRDRImagingFCSImageEditor::transformImage(double* image, uint16_t width, u
 
 
 
-void QFRDRImagingFCSImageEditor::readParameterImage(double *image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam)
+void QFRDRImagingFCSImageEditor::readParameterImage(double *image, uint16_t width, uint16_t height, QString evalGroupIn, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, bool thisRDR, const QString& otherRDRRole, const QString& otherRDRevalGroup)
 {
     uint16_t arraysize=width*height;
     //qDebug()<<"readParameterImage("<<image<<gof_image<<width<<height<<evalGroup;
@@ -3647,6 +3666,23 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double *image, uint16_t widt
         }
     }
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    QString evalGroup=evalGroupIn;
+
+    if (!thisRDR && current && current->getGroup()>=0) {
+        evalGroup=otherRDRevalGroup;
+        QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRGroupMembers(current->getGroup());
+        for (int i=0; i<rdrs.size(); i++) {
+            QFRDRImagingFCSData* mm=qobject_cast<QFRDRImagingFCSData*>(rdrs[i]);
+            if (mm && mm->getRole().toUpper()==otherRDRRole.toUpper()) {
+                if (mm->getImageFromRunsWidth()==width && mm->getImageFromRunsHeight()==height) {
+                    m=mm;
+                    break;
+                }
+            }
+            mm=NULL;
+        }
+    }
+
     if ( (!m) || evalGroup.isEmpty() || fitParam.isEmpty() ) return;
 
 #ifdef DEBUG_TIMING
@@ -3654,14 +3690,14 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double *image, uint16_t widt
     time.start();
 #endif
 
-    QStringList evals=current->resultsCalcEvaluationsInGroup(evalGroup);
+    QStringList evals=m->resultsCalcEvaluationsInGroup(evalGroup);
     //qDebug()<<"evals.size() = "<<evals.size()<<"\n   "<<evals;
     bool readImage=false;
     if (evals.size()>0  && evals.size()<=2) {
         QString usedEval="";
         for (int i=0; i<evals.size(); i++) {
-            if (current->resultsExists(evals[i], fitParam)) {
-                QFRawDataRecord::evaluationResultType typ=current->resultsGetType(evals[i], fitParam);
+            if (m->resultsExists(evals[i], fitParam)) {
+                QFRawDataRecord::evaluationResultType typ=m->resultsGetType(evals[i], fitParam);
 
                 switch (typ) {
                     case QFRawDataRecord::qfrdreNumberVector:
@@ -3681,7 +3717,7 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double *image, uint16_t widt
         }
         if (!usedEval.isEmpty()) {
             readImage=true;
-            QVector<double> dvec=current->resultsGetAsDoubleList(usedEval, fitParam);
+            QVector<double> dvec=m->resultsGetAsDoubleList(usedEval, fitParam);
             for (uint32_t i=0; i<qMin(dvec.size(), width*height); i++) {
                 int x=m->runToX(i);
                 int y=m->runToY(i);
@@ -3694,12 +3730,12 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double *image, uint16_t widt
         readImage=true;
         for (register int i=0; i<evals.size(); i++) {
             const QString& en=evals[i];
-            int grpIdx=current->resultsGetEvaluationGroupIndex(en);
+            int grpIdx=m->resultsGetEvaluationGroupIndex(en);
             int x=m->runToX(grpIdx);
             int y=m->runToY(grpIdx);
             if (x>=0 && x<width && y>=0 && y<height) {
-                if (current->resultsExists(en, fitParam)) {
-                    image[y*width+x]=current->resultsGetAsDouble(en, fitParam);
+                if (m->resultsExists(en, fitParam)) {
+                    image[y*width+x]=m->resultsGetAsDouble(en, fitParam);
                 }
             }
         }
