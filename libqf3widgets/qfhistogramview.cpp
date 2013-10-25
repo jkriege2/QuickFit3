@@ -15,6 +15,12 @@
 #include <QPicture>
 #include <QTextDocumentFragment>
 #include "programoptions.h"
+#include "qftools.h"
+#include "matlabtools.h"
+#include "csvtools.h"
+#include "programoptions.h"
+#include <QProgressDialog>
+#include "datatools.h"
 
 QFHistogramView::QFHistogramView(QWidget *parent) :
     QWidget(parent)
@@ -51,6 +57,27 @@ void QFHistogramView::createWidgets() {
     coll=new QHBoxLayout();
     coll->addWidget(spinHistogramBins);
     coll->addStretch();
+
+    QToolButton* tb;
+    actPrintReport=createActionAndButton(tb, QIcon(":/lib/printreport.png"), tr("Print histogram report"), this);
+    connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
+    coll->addWidget(tb);
+    actSaveReport=createActionAndButton(tb, QIcon(":/lib/savereport.png"), tr("Save histogram report"), this);
+    connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
+    coll->addWidget(tb);
+
+    actCopyData=createActionAndButton(tb, QIcon(":/lib/copy16.png"), tr("Copy data used for histogram"), this);
+    connect(actCopyData, SIGNAL(triggered()), this, SLOT(copyData()));
+    coll->addWidget(tb);
+    actCopyDataMatlab=createActionAndButton(tb, QIcon(":/lib/copy16_matlab.png"), tr("Copy data used for histogram as Matlab script"), this);
+    connect(actCopyDataMatlab, SIGNAL(triggered()), this, SLOT(copyDataMatlab()));
+    coll->addWidget(tb);
+    actSaveData=createActionAndButton(tb, QIcon(":/lib/savedata.png"), tr("Save data used for histogram"), this);
+    connect(actSaveData, SIGNAL(triggered()), this, SLOT(saveData()));
+    coll->addWidget(tb);
+
+
+
     flHistSet->addRow(tr("# bins:"), coll);
     chkLogHistogram=new QCheckBox("", grpHistogramSettings);
     flHistSet->addRow(tr("log-scale:"), chkLogHistogram);
@@ -417,7 +444,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                     amax=dmax;
                 } else {
                     amin=qMin(amin, dmin);
-                    amax=qMin(amax, dmax);
+                    amax=qMax(amax, dmax);
                 }
                 first=false;
                 free(datahist);
@@ -578,6 +605,131 @@ void QFHistogramView::histogramSettingsChanged(bool update) {
     edtHistogramMax->setEnabled(!chkHistogramRangeAuto->isChecked());
     if (update) updateHistogram(true);
     emit settingsChanged();
+}
+
+void QFHistogramView::printReport()
+{
+    /* it is often a good idea to have a possibility to save or print a report about the fit results.
+       This is implemented in a generic way here.    */
+    QPrinter* p=new QPrinter();
+
+    p->setPageMargins(15,15,15,15,QPrinter::Millimeter);
+    p->setOrientation(QPrinter::Portrait);
+    QPrintDialog *dialog = new QPrintDialog(p, this);
+    dialog->setWindowTitle(tr("Print Report"));
+    if (dialog->exec() != QDialog::Accepted) {
+        delete p;
+        return;
+    }
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QTextDocument* doc=new QTextDocument();
+    doc->setTextWidth(p->pageRect().size().width());
+    QTextCursor cur(doc);
+    writeReport(cur, doc);
+    doc->print(p);
+    delete p;
+    delete doc;
+    QApplication::restoreOverrideCursor();
+}
+
+void QFHistogramView::saveReport()
+{
+    /* it is often a good idea to have a possibility to save or print a report about the fit results.
+       This is implemented in a generic way here.    */
+
+    QString currentSaveDirectory="";
+    currentSaveDirectory=ProgramOptions::getConfigValue(QString("QFHistogramView/last_report_directory"), currentSaveDirectory).toString();
+
+    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
+                                currentSaveDirectory,
+                                tr("PDF File (*.pdf);;PostScript File (*.ps);;Open Document file (*.odf);;HTML file (*.html)"));
+
+
+    if (!fn.isEmpty()) {
+        currentSaveDirectory=QFileInfo(fn).absolutePath();
+        ProgramOptions::setConfigValue(QString("QFHistogramView/last_report_directory"), currentSaveDirectory);
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        QProgressDialog progress(tr("Exporting ..."), "", 0,100,NULL);
+        progress.setWindowModality(Qt::WindowModal);
+        //progress.setHasCancel(false);
+        progress.setLabelText(tr("saving report <br> to '%1' ...").arg(fn));
+        progress.show();
+        progress.setValue(50);
+
+        QFileInfo fi(fn);
+        QPrinter* printer=new QPrinter();//QPrinter::HighResolution);
+        printer->setPaperSize(QPrinter::A4);
+        printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
+        printer->setOrientation(QPrinter::Portrait);
+        printer->setOutputFormat(QPrinter::PdfFormat);
+        QTextDocument* doc=new QTextDocument();
+        doc->setTextWidth(printer->pageRect().size().width());
+        QTextCursor cur(doc);
+        writeReport(cur, doc);
+        if (fi.suffix().toLower()=="ps" || fi.suffix().toLower()=="pdf") {
+            if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
+            printer->setOutputFileName(fn);
+            doc->print(printer);
+        } else if (fi.suffix().toLower()=="odf") {
+            QTextDocumentWriter writer(fn, "odf");
+            writer.write(doc);
+        } else if ((fi.suffix().toLower()=="html")||(fi.suffix().toLower()=="htm")) {
+            QTextDocumentWriter writer(fn, "html");
+            writer.write(doc);
+        }
+        //qDebug()<<doc->toHtml();
+        delete doc;
+        delete printer;
+        progress.accept();
+        QApplication::restoreOverrideCursor();
+    }
+}
+
+void QFHistogramView::copyData()
+{
+    QList<QVector<double> > data;
+    QStringList headers;
+    fillDataArray(data, headers);
+
+    csvCopy(data, headers);
+}
+
+void QFHistogramView::copyDataMatlab()
+{
+    QList<QVector<double> > data;
+    QStringList headers;
+    fillDataArray(data, headers);
+
+    matlabCopy(data);
+}
+
+void QFHistogramView::saveData()
+{
+    QList<QVector<double> > data;
+    QStringList headers;
+    fillDataArray(data, headers);
+    QStringList f=QFDataExportHandler::getFormats();
+    QString lastDir=ProgramOptions::getConfigValue("QFHistogramView/lastDataDir", "").toString();
+    QString selFilter=ProgramOptions::getConfigValue("QFHistogramView/lastDataFilter", "").toString();
+    QString fn=qfGetOpenFileName(this, tr("Save data to file"), lastDir, f.join(";;"), &selFilter);
+    if (fn.size()>0) {
+        QFDataExportHandler::save(data, f.indexOf(selFilter), fn, headers, QStringList());
+        ProgramOptions::setConfigValue("QFHistogramView/lastDataDir", lastDir);
+        ProgramOptions::setConfigValue("QFHistogramView/lastDataFilter", selFilter);
+    }
+}
+
+void QFHistogramView::fillDataArray(QList<QVector<double> > &data, QStringList& headers)
+{
+    data.clear();
+    headers.clear();
+    for (int i=0; i<histograms.size(); i++) {
+        QVector<double> d(histograms[i].size, 0.0);
+        memcpy(d.data(), histograms[i].data, histograms[i].size*sizeof(double));
+        data.append(d);
+        headers.append(histograms[i].name);
+    }
 }
 
 

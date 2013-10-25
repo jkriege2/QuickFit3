@@ -101,7 +101,9 @@ HEADERS += dlgnewproperty.h \
     qftreeviewcombobox.h \
     qfsimpletreemodel.h \
     qfdoubleslider.h \
-    qffitfunctionparsed.h
+    qffitfunctionparsed.h \
+    qfparametercorrelationservice.h \
+    datatools.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -171,7 +173,9 @@ SOURCES += dlgnewproperty.cpp \
     qftreeviewcombobox.cpp \
     qfsimpletreemodel.cpp \
     qfdoubleslider.cpp \
-    qffitfunctionparsed.cpp
+    qffitfunctionparsed.cpp \
+    qfparametercorrelationservice.cpp \
+    datatools.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

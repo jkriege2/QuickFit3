@@ -13,7 +13,7 @@
 
 
 
-/*! \brief wrapper class that allows plugins to access basic logging services
+/*! \brief wrapper class that allows plugins to access basic histogramming services
     \ingroup qf3plugintools
 */
 class QFLIB_EXPORT QFHistogramService {

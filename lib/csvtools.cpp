@@ -266,3 +266,37 @@ QList<QList<double> > csvDataRotate(const QList<QList<double> >& data) {
     }
     return result;
 }
+
+
+QString toCSV(const QList<QVector<double> >& data, const QStringList& columnNames, const QStringList& rowNames, QChar decimalSep, const QString colSep, bool withHeaders, QChar stringDelimiter, const QString& headerSep, int precision) {
+    QString res;
+    int cols=data.size();
+    int rows=0;
+    for (int i=0; i<data.size(); i++) {
+        rows=qMax(rows, data[i].size());
+    }
+    if (columnNames.size()>0 && withHeaders) {
+        res+=headerSep;
+        for (int i=0; i<cols; i++) {
+            if (i>0 || rowNames.size()>0) res+=colSep;
+            QString h=columnNames.value(i, "");
+            h=h.replace(colSep, "_").replace(',', "_").replace(';', "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_");
+            res+=stringDelimiter+h+stringDelimiter;
+        }
+        res+="\n";
+    }
+
+    for (int r=0; r<rows; r++) {
+        if (rowNames.size()>0 && withHeaders) {
+            QString h=rowNames.value(r, "");
+            h=h.replace(colSep, "_").replace(',', "_").replace(';', "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_");
+            res+=stringDelimiter+h+stringDelimiter+colSep;
+        }
+        for (int c=0; c<cols; c++) {
+            if (c>0 || rowNames.size()>0) res+=colSep;
+            if (c<data[c].size()) res+=doubleToQString(data[c].value(r, 0), precision, 'g', decimalSep);
+        }
+        res+="\n";
+    }
+    return res;
+}

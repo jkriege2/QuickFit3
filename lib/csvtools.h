@@ -34,4 +34,9 @@ QFLIB_EXPORT QList<QVector<double> > csvDataRotate(const QList<QVector<double> >
 */
 QFLIB_EXPORT QList<QList<double> > csvDataRotate(const QList<QList<double> >& data);
 
+/*! \brief convert the given data to CSV
+    \ingroup qf3lib_tools
+*/
+QFLIB_EXPORT QString toCSV(const QList<QVector<double> >& data, const QStringList& columnsNames, const QStringList& rowNames, QChar decimalSep='.', const QString colSep=QString(", "), bool withHeaders=true, QChar stringDelimiter=QLatin1Char('\"'), const QString& headerSep=QString("#! "), int precision=15);
+
 #endif // CSVTOOLS_H

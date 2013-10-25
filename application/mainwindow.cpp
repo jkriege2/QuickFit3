@@ -15,6 +15,7 @@
 #include "qfhtmlhelptools.h"
 #include "renamegroupsdialog.h"
 #include "userfitfunctionseditor.h"
+#include "qfparametercorrelationview.h"
 #include <QNetworkRequest>
 #include <QNetworkProxy>
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
@@ -295,13 +296,27 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         extensionManager->deinit();
         newProjectTimer.stop();
         helpWindow->close();
-        QMapIterator<QString, QFHistogramView*> ii(histograms);
-        while (ii.hasNext()) {
-            ii.next();
-            QString name=ii.key();
-            histograms[name]->writeSettings(*(ProgramOptions::getInstance()->getQSettings()), "histograms/"+cleanStringForFilename(name)+"/");
-            histograms[name]->close();
-            histograms[name]->deleteLater();
+        {
+            QMapIterator<QString, QFHistogramView*> ii(histograms);
+            while (ii.hasNext()) {
+                ii.next();
+                QString name=ii.key();
+                histograms[name]->writeSettings(*(ProgramOptions::getInstance()->getQSettings()), "histograms/"+cleanStringForFilename(name)+"/");
+                histograms[name]->close();
+                histograms[name]->deleteLater();
+            }
+            histograms.clear();
+        }
+        {
+            QMapIterator<QString, QFParameterCorrelationView*> ii(correlationViews);
+            while (ii.hasNext()) {
+                ii.next();
+                QString name=ii.key();
+                correlationViews[name]->writeSettings(*(ProgramOptions::getInstance()->getQSettings()), "paramcorr/"+cleanStringForFilename(name)+"/");
+                correlationViews[name]->close();
+                correlationViews[name]->deleteLater();
+            }
+            correlationViews.clear();
         }
         ProgramOptions::setConfigValue("quickfit/lastrunsvn", qfInfoSVNVersion());
         event->accept();
@@ -1952,19 +1967,67 @@ void MainWindow::clearView(const QString &name)
     if (histograms.contains(name)) {
         histograms[name]->clear();
         histograms[name]->updateHistogram(true);
+        //qDebug()<<"cleared histogram "<<name;
     }
 }
 
 void MainWindow::addHistogramToView(const QString &name, const QFHistogramService::Histogram &histogram)
 {
     if (histograms.contains(name)) {
-        /*double* d=(double*)malloc(histogram.data.size()*sizeof(double));
-        for (int i=0; i<histogram.data.size(); i++) {
-            d[i]=histogram.data[i];
-        }*/
         histograms[name]->addCopiedHistogram(histogram.name, histogram.data.data(), histogram.data.size());
         histograms[name]->updateHistogram(true);
+        //qDebug()<<"added "<<histogram.data.size()<<" to histogram "<<name<<" (name: "<<histogram.name<<")";
     }
+}
+
+QWidget *MainWindow::getCreateParameterCorrelationView(const QString &name, const QString &title)
+{
+    if (!correlationViews.contains(name)) {
+        correlationViews[name]=new QFParameterCorrelationView(NULL);
+    }
+    correlationViews[name]->setWindowTitle(title);
+    correlationViews[name]->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+    correlationViews[name]->setWindowIcon(QIcon(":/lib/result_correlation_icon.png"));
+    correlationViews[name]->show();
+    correlationViews[name]->raise();
+    //correlationViews[name]->setAttribute(Qt::WA_DeleteOnClose);
+    if (correlationViews.size()>1) {
+        QSize s=ProgramOptions::getConfigValue("QFParameterCorrelationView/size", QSize(800,600)).toSize();
+        QPoint p=correlationViews[name]->pos();
+        if (correlationViews.contains(lastParamCorr)) {
+            p=correlationViews[lastParamCorr]->pos();
+            s=correlationViews[lastParamCorr]->size();
+        }
+
+        correlationViews[name]->move(p+QPoint(32,32));
+        correlationViews[name]->resize(s);
+    } else {
+        correlationViews[name]->resize(QSize(500,300));
+    }
+    correlationViews[name]->readSettings(*(ProgramOptions::getInstance()->getQSettings()), "paramcorr/"+cleanStringForFilename(name)+"/");
+    lastParamCorr=name;
+    return correlationViews[name];
+
+}
+
+void MainWindow::clearParameterCorrelationView(const QString &name)
+{
+    if (correlationViews.contains(name)) {
+        correlationViews[name]->clear();
+        correlationViews[name]->updateCorrelation(true);
+    }
+
+}
+
+void MainWindow::addCorrelationToView(const QString &name, const QFParameterCorrelationService::ParameterCorrelation &data)
+{
+    if (correlationViews.contains(name)) {
+        correlationViews[name]->addCopiedCorrelation(data.nameX+tr(" vs. ")+data.nameY, data.dataX.data(), data.dataY.data(), qMin(data.dataX.size(), data.dataY.size()));
+        correlationViews[name]->setCorrelation1Label(data.nameX);
+        correlationViews[name]->setCorrelation2Label(data.nameY);
+        correlationViews[name]->updateCorrelation(true);
+    }
+
 }
 
 QString MainWindow::getPluginHelp(const QString& pluginID) {

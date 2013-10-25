@@ -12,6 +12,10 @@
     \ingroup qf3lib_tools
 */
 QFLIB_EXPORT QString toMatlab(const QList<QList<double> >& data, bool noVarDef=false);
+/*! \brief convert the given data columns as Matlab script
+    \ingroup qf3lib_tools
+*/
+QFLIB_EXPORT QString toMatlab(const QList<QVector<double> >& data, bool noVarDef=false);
 /*! \brief copy the given data columns as Matlab script to the clipboard
     \ingroup qf3lib_tools
 */

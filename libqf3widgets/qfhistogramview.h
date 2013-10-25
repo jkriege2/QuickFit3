@@ -117,7 +117,13 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
     public slots:
         void histogramSettingsChanged(bool update=true);
 
+        void printReport();
+        void saveReport();
 
+        void copyData();
+        void saveData();
+        void copyDataMatlab();
+        void fillDataArray(QList<QVector<double> >& data, QStringList &headers);
     protected:
 
         QList<Histogram> histograms;
@@ -144,7 +150,11 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         QVBoxLayout* laySplitterTable;
         QGridLayout* layHist;
 
-
+        QAction* actPrintReport;
+        QAction* actSaveReport;
+        QAction* actCopyData;
+        QAction* actCopyDataMatlab;
+        QAction* actSaveData;
 
 
 

@@ -10,6 +10,9 @@
 #include <QSysInfo>
 #include <QProcess>
 #include <QPainter>
+#include <QFile>
+#include <QTextStream>
+#include <QTextCodec>
 
 #ifndef __LINUX__
 # if defined(linux)
@@ -976,11 +979,23 @@ QString doubleToLatexQString(double data, int precision, bool remove_trail0, dou
   return QString("10^{")+intToQString(exp)+"}";
 }
 
-QFLIB_EXPORT QString qfShortenString(const QString& input, int maxLen, int keepend, const QString& ellipsis) {
+QString qfShortenString(const QString& input, int maxLen, int keepend, const QString& ellipsis) {
     if (input.size()<=maxLen) return input;
     QString res;
     int len=qMax(0, maxLen-ellipsis.size()-keepend);
     res=input.left(len)+ellipsis;
     if (keepend>0) res+=input.right(keepend);
     return res;
+}
+
+void saveStringToFile(const QString& filename, const QString& text, const QString& codec) {
+    QFile data(filename);
+    if (data.open(QFile::WriteOnly | QFile::Text | QIODevice::Truncate)) {
+        QTextStream out(&data);
+        QTextCodec* c=QTextCodec::codecForName(codec.toAscii());
+        if (c==NULL) c=QTextCodec::codecForCStrings();
+        if (c==NULL) c=QTextCodec::codecForLocale();
+        out.setCodec(c);
+        out << text;
+    }
 }

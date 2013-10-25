@@ -33,10 +33,12 @@
 #include <QNetworkReply>
 #include "qmodernprogresswidget.h"
 #include "userfitfunctionseditor.h"
+#include "qfparametercorrelationservice.h"
+#include "qfparametercorrelationview.h"
 /*! \brief main widget for QuickFit
     \ingroup qf3app
 */
-class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogramService {
+class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogramService, public QFParameterCorrelationService {
         Q_OBJECT
         Q_INTERFACES(QFPluginServices)
     public:
@@ -205,6 +207,13 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual QWidget* getCreateView(const QString& name, const QString& title);
         virtual void clearView(const QString& name);
         virtual void addHistogramToView(const QString& name, const Histogram& histogram);
+
+
+        virtual QWidget* getCreateParameterCorrelationView(const QString& name, const QString& title);
+        virtual void clearParameterCorrelationView(const QString& name);
+        virtual void addCorrelationToView(const QString& name, const ParameterCorrelation& data);
+
+
         virtual QMap<QString, QFToolTipsData> getTooltips() const;
     protected:
         void closeEvent(QCloseEvent *event);
@@ -349,8 +358,10 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
         QList<QFPluginOptionsDialogInterface*> pluginOptionDialogs;
         QMap<QString, QFHistogramView*> histograms;
+        QMap<QString, QFParameterCorrelationView*> correlationViews;
         QMap<QString, QVariant> globalParameterStore;
         QString lastHistogram;
+        QString lastParamCorr;
 
         QPointer<UserFitFunctionsEditor> dlgUserFitFunctionEditor;
         QTimer newProjectTimer;

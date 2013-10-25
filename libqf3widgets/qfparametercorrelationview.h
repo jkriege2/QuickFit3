@@ -107,6 +107,13 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
         void dataSettingsChanged(bool update=true);
         void showPlotPosition(double x, double y);
 
+        void printReport();
+        void saveReport();
+        void copyData();
+        void saveData();
+        void copyDataMatlab();
+        void fillDataArray(QList<QVector<double> >& data, QStringList &headers);
+
 protected:
 
     QList<CorrelationItem> histograms;
@@ -157,8 +164,11 @@ protected:
     QGridLayout* layHist;
 
     QLabel* labPlotPos;
-
-    
+    QAction* actPrintReport;
+    QAction* actSaveReport;
+    QAction* actCopyData;
+    QAction* actCopyDataMatlab;
+    QAction* actSaveData;
 };
 
 #endif // QFPARAMETERCORRELATIONVIEW_H

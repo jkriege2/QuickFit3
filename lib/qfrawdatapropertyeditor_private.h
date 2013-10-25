@@ -144,6 +144,7 @@ class QFRawDataPropertyEditor_private : public QObject
         QAction* actCopyMedianQuantilesNoHead;
         QAction* actStatistics;
         QAction* actStatisticsComparing;
+        QAction* actCorrelation;
 
         QFEnhancedLineEdit* edtFilterEvaluation;
         QFEnhancedLineEdit* edtFilterResults;
@@ -257,6 +258,7 @@ class QFRawDataPropertyEditor_private : public QObject
 
         void showStatistics();
         void showStatisticsComparing();
+        void showCorrelation();
 
         void setCurrent(QFRawDataRecord* c);
 

@@ -39,6 +39,36 @@ QString toMatlab(const QList<QList<double> >& data, bool noVarDef) {
     return matlab;
 }
 
+QString toMatlab(const QList<QVector<double> >& data, bool noVarDef) {
+
+    QString matlab="M = [";
+    if (noVarDef) matlab="[";
+    int datas=0;
+    for (int r=0; r<data.size(); r++) {
+        if (data[r].size()>datas) datas=data[r].size();
+    }
+
+    for (int r=0; r<datas; r++) {
+        for (int c=0; c<data.size(); c++) {
+            if (c>0) {
+                matlab+=", ";
+            }
+            if (r<data[c].size()) {
+                double d=data[c].at(r);
+
+                matlab+=CDoubleToQString(d);
+            }
+        }
+        if (r<datas-1) matlab+=";   ";
+    }
+
+
+
+    if (noVarDef) matlab+="]";
+    else matlab+="];";
+    return matlab;
+}
+
 void matlabCopy(const QList<QList<double> >& data) {
 
     QString matlab=toMatlab(data, false);

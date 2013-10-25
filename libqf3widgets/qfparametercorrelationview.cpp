@@ -16,6 +16,7 @@
 #include <QPicture>
 #include <QTextDocumentFragment>
 #include "programoptions.h"
+#include "datatools.h"
 
 QFParameterCorrelationView::QFParameterCorrelationView(QWidget *parent) :
     QWidget(parent)
@@ -682,6 +683,92 @@ void QFParameterCorrelationView::showPlotPosition(double x, double y)
     labPlotPos->setText(tr("(%1, %2").arg(x).arg(y));
 }
 
+
+
+
+
+void QFParameterCorrelationView::printReport()
+{
+    /* it is often a good idea to have a possibility to save or print a report about the fit results.
+       This is implemented in a generic way here.    */
+    QPrinter* p=new QPrinter();
+
+    p->setPageMargins(15,15,15,15,QPrinter::Millimeter);
+    p->setOrientation(QPrinter::Portrait);
+    QPrintDialog *dialog = new QPrintDialog(p, this);
+    dialog->setWindowTitle(tr("Print Report"));
+    if (dialog->exec() != QDialog::Accepted) {
+        delete p;
+        return;
+    }
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QTextDocument* doc=new QTextDocument();
+    doc->setTextWidth(p->pageRect().size().width());
+    QTextCursor cur(doc);
+    writeReport(cur, doc);
+    doc->print(p);
+    delete p;
+    delete doc;
+    QApplication::restoreOverrideCursor();
+}
+
+void QFParameterCorrelationView::saveReport()
+{
+    /* it is often a good idea to have a possibility to save or print a report about the fit results.
+       This is implemented in a generic way here.    */
+
+    QString currentSaveDirectory="";
+    currentSaveDirectory=ProgramOptions::getConfigValue(QString("QFParameterCorrelationView/last_report_directory"), currentSaveDirectory).toString();
+
+    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
+                                currentSaveDirectory,
+                                tr("PDF File (*.pdf);;PostScript File (*.ps)"));
+
+
+    if (!fn.isEmpty()) {
+        currentSaveDirectory=QFileInfo(fn).absolutePath();
+        ProgramOptions::getConfigValue(QString("QFParameterCorrelationView/last_report_directory"), currentSaveDirectory);
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        QProgressDialog progress(tr("Exporting ..."), "", 0,100,NULL);
+        progress.setWindowModality(Qt::WindowModal);
+        progress.setLabelText(tr("saving report <br> to '%1' ...").arg(fn));
+        progress.show();
+        progress.setValue(50);
+
+        QFileInfo fi(fn);
+        QPrinter* printer=new QPrinter();//QPrinter::HighResolution);
+        printer->setPaperSize(QPrinter::A4);
+        printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
+        printer->setOrientation(QPrinter::Portrait);
+        printer->setOutputFormat(QPrinter::PdfFormat);
+        QTextDocument* doc=new QTextDocument();
+        QTextCursor cur(doc);
+        doc->setTextWidth(printer->pageRect().size().width());
+        writeReport(cur, doc);
+        if (fi.suffix().toLower()=="ps" || fi.suffix().toLower()=="pdf") {
+            if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
+            printer->setOutputFileName(fn);
+            doc->print(printer);
+        } else if (fi.suffix().toLower()=="odf") {
+            QTextDocumentWriter writer(fn, "odf");
+            writer.write(doc);
+        } else if ((fi.suffix().toLower()=="html")||(fi.suffix().toLower()=="htm")) {
+            QTextDocumentWriter writer(fn, "html");
+            writer.write(doc);
+        }
+        //qDebug()<<doc->toHtml();
+        delete doc;
+        delete printer;
+        progress.accept();
+        QApplication::restoreOverrideCursor();
+    }
+}
+
+
+
+
+
 void QFParameterCorrelationView::createWidgets()
 {
 
@@ -697,6 +784,33 @@ void QFParameterCorrelationView::createWidgets()
     grpHistogramSettings=new QGroupBox(tr("plot style"), this);
     flHistSet=new QFormLayout(grpHistogramSettings);
     grpHistogramSettings->setLayout(flHistSet);
+
+
+
+    coll=new QHBoxLayout();
+    coll->addStretch();
+    coll->setContentsMargins(0,0,0,0);
+    QToolButton* tb;
+    actPrintReport=createActionAndButton(tb, QIcon(":/lib/printreport.png"), tr("Print Histogram Report"), this);
+    connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
+    coll->addWidget(tb);
+    actSaveReport=createActionAndButton(tb, QIcon(":/lib/savereport.png"), tr("Save Histogram Report"), this);
+    connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
+    coll->addWidget(tb);
+
+
+    actCopyData=createActionAndButton(tb, QIcon(":/lib/copy16.png"), tr("Copy data used for histogram"), this);
+    connect(actCopyData, SIGNAL(triggered()), this, SLOT(copyData()));
+    coll->addWidget(tb);
+    actCopyDataMatlab=createActionAndButton(tb, QIcon(":/lib/copy16_matlab.png"), tr("Copy data used for histogram as Matlab script"), this);
+    connect(actCopyDataMatlab, SIGNAL(triggered()), this, SLOT(copyDataMatlab()));
+    coll->addWidget(tb);
+    actSaveData=createActionAndButton(tb, QIcon(":/lib/savedata.png"), tr("Save data used for histogram"), this);
+    connect(actSaveData, SIGNAL(triggered()), this, SLOT(saveData()));
+    coll->addWidget(tb);
+
+    flHistSet->addRow("", coll);
+
 
     cmbSymbol=new JKQTPSymbolComboBox(this);
 
@@ -914,3 +1028,56 @@ void QFParameterCorrelationView::createWidgets()
 }
 
 
+void QFParameterCorrelationView::copyData()
+{
+    QList<QVector<double> > data;
+    QStringList headers;
+    fillDataArray(data, headers);
+
+    csvCopy(data, headers);
+}
+
+void QFParameterCorrelationView::copyDataMatlab()
+{
+    QList<QVector<double> > data;
+    QStringList headers;
+    fillDataArray(data, headers);
+
+    matlabCopy(data);
+}
+
+void QFParameterCorrelationView::saveData()
+{
+    QList<QVector<double> > data;
+    QStringList headers;
+    fillDataArray(data, headers);
+    QStringList f=QFDataExportHandler::getFormats();
+    QString lastDir=ProgramOptions::getConfigValue("QFParameterCorrelationView/lastDataDir", "").toString();
+    QString selFilter=ProgramOptions::getConfigValue("QFParameterCorrelationView/lastDataFilter", "").toString();
+    QString fn=qfGetOpenFileName(this, tr("Save data to file"), lastDir, f.join(";;"), &selFilter);
+    if (fn.size()>0) {
+        QFDataExportHandler::save(data, f.indexOf(selFilter), fn, headers, QStringList());
+        ProgramOptions::setConfigValue("QFParameterCorrelationView/lastDataDir", lastDir);
+        ProgramOptions::setConfigValue("QFParameterCorrelationView/lastDataFilter", selFilter);
+    }
+}
+
+void QFParameterCorrelationView::fillDataArray(QList<QVector<double> > &data, QStringList& headers)
+{
+    data.clear();
+    headers.clear();
+    for (int i=0; i<histograms.size(); i++) {
+        {
+            QVector<double> d(histograms[i].size, 0.0);
+            memcpy(d.data(), histograms[i].data1, histograms[i].size*sizeof(double));
+            data.append(d);
+        }
+        {
+            QVector<double> d(histograms[i].size, 0.0);
+            memcpy(d.data(), histograms[i].data2, histograms[i].size*sizeof(double));
+            data.append(d);
+        }
+        headers.append(histLabelX+" ("+histograms[i].name+")");
+        headers.append(histLabelY+" ("+histograms[i].name+")");
+    }
+}

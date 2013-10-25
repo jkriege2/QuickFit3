@@ -3,6 +3,7 @@
 #include "qfevaluationpropertyeditor.h"
 #include <QCloseEvent>
 #include <QDebug>
+#include <QProgressDialog>
 
 QFEvaluationEditor::QFEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor *propEditor, QWidget *parent):
     QWidget(parent)
@@ -57,35 +58,53 @@ bool QFEvaluationEditor::event(QEvent * ev) {
 
 
 void QFEvaluationEditor::saveReport() {
+
     /* it is often a good idea to have a possibility to save or print a report about the fit results.
        This is implemented in a generic way here.    */
 
     QString currentSaveDirectory="";
-    if (settings && current) settings->getQSettings()->value(QString("%2/evaluationeditor%1/last_report_directory").arg(peID).arg(current->getType()), currentSaveDirectory).toString();
+    if (settings && current) currentSaveDirectory=settings->getQSettings()->value(QString("%2/evaluationeditor%1/last_report_directory").arg(peID).arg(current->getType()), currentSaveDirectory).toString();
 
     QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
                                 currentSaveDirectory,
                                 tr("PDF File (*.pdf);;PostScript File (*.ps)"));
 
+
     if (!fn.isEmpty()) {
+        settings->getQSettings()->setValue(QString("%2/evaluationeditor%1/last_report_directory").arg(peID).arg(current->getType()), currentSaveDirectory);
         currentSaveDirectory=QFileInfo(fn).absolutePath();
-        if (settings && current) settings->getQSettings()->setValue(QString("%2/evaluationeditor%1/last_report_directory").arg(peID).arg(current->getType()), currentSaveDirectory);
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        QProgressDialog progress(tr("Exporting ..."), "", 0, 100, NULL);
+        progress.setWindowModality(Qt::WindowModal);
+        //progress.setHasCancel(false);
+        progress.setLabelText(tr("saving report <br> to '%1' ...").arg(fn));
+        progress.setValue(50);
+        progress.show();
 
         QFileInfo fi(fn);
-        QPrinter* printer=new QPrinter();
+        QPrinter* printer=new QPrinter();//QPrinter::HighResolution);
         printer->setPaperSize(QPrinter::A4);
         printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
         printer->setOrientation(QPrinter::Portrait);
         printer->setOutputFormat(QPrinter::PdfFormat);
-        if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
-        printer->setOutputFileName(fn);
         QTextDocument* doc=new QTextDocument();
         doc->setTextWidth(printer->pageRect().size().width());
         createReportDoc(doc);
-        doc->print(printer);
+        if (fi.suffix().toLower()=="ps" || fi.suffix().toLower()=="pdf") {
+            if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
+            printer->setOutputFileName(fn);
+            doc->print(printer);
+        } else if (fi.suffix().toLower()=="odf") {
+            QTextDocumentWriter writer(fn, "odf");
+            writer.write(doc);
+        } else if ((fi.suffix().toLower()=="html")||(fi.suffix().toLower()=="htm")) {
+            QTextDocumentWriter writer(fn, "html");
+            writer.write(doc);
+        }
+        //qDebug()<<doc->toHtml();
         delete doc;
         delete printer;
+        progress.accept();
         QApplication::restoreOverrideCursor();
     }
 }

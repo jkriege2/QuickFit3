@@ -10,6 +10,7 @@
 #include "qfhistogramservice.h"
 #include <QItemSelectionModel>
 #include <QItemSelection>
+#include "qfparametercorrelationservice.h"
 
 QFRawDataPropertyEditor_private::QFRawDataPropertyEditor_private(QFRawDataPropertyEditor *parent) :
     QObject(parent)
@@ -418,6 +419,8 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     tbResults->addAction(actStatistics);
     actStatisticsComparing=new QAction(QIcon(":/lib/result_statistics_compare.png"), tr("Result statistics, comparing cells"), d);
     tbResults->addAction(actStatisticsComparing);
+    actCorrelation=new QAction(QIcon(":/lib/result_correlation.png"), tr("Result correlation"), d);
+    tbResults->addAction(actCorrelation);
 
     tbResults->addSeparator();
     actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete selected records"), d);
@@ -518,6 +521,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     connect(actCopyMedianQuantilesResults, SIGNAL(triggered()), this, SLOT(copyMedianQuantilesResults()));
     connect(actCopyMedianQuantilesNoHead, SIGNAL(triggered()), this, SLOT(copyMedianQuantilesResultsNoHead()));
 
+    connect(actCorrelation, SIGNAL(triggered()), this, SLOT(showCorrelation()));
     connect(actStatistics, SIGNAL(triggered()), this, SLOT(showStatistics()));
     connect(actStatisticsComparing, SIGNAL(triggered()), this, SLOT(showStatisticsComparing()));
 
@@ -528,6 +532,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     tvResults->addAction(actDeleteResults);
     tvResults->addAction(actStatistics);
     tvResults->addAction(actStatisticsComparing);
+    tvResults->addAction(actCorrelation);
 
     menuResults->addAction(actSaveResults);
     menuResults->addAction(actSaveResultsAveraged);
@@ -545,6 +550,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     menuResults->addSeparator();
     menuResults->addAction(actStatistics);
     menuResults->addAction(actStatisticsComparing);
+    menuResults->addAction(actCorrelation);
 
 
     tabMain->addTab(widResults, tr("Evaluation &Results"));
@@ -1109,6 +1115,49 @@ void QFRawDataPropertyEditor_private::showStatisticsComparing()
             }
         }
     }
+}
+
+void QFRawDataPropertyEditor_private::showCorrelation()
+{
+    QFParameterCorrelationService* hs=QFParameterCorrelationService::getParameterCorrelationInstance();
+    if (hs&&current) {
+        QModelIndexList idxs=tvResults->selectionModel()->selectedIndexes();
+        QMap<int, QVector<double> > hists;
+        QMap<int, QString > names;
+        QSet<int> cols;
+        for (int i=0; i<idxs.size(); i++) {
+            QVector<double> h;
+            int col=idxs[i].row();
+            if (!hists.contains(col)) {
+                names[col]=current->resultsGetModel()->headerData(col, Qt::Vertical).toString();
+                hists[col]=h;
+            }
+            QString ename=current->resultsGetModel()->data(idxs[i], QFRDRResultsModel::EvalNameRole).toString();
+            QString rname=current->resultsGetModel()->data(idxs[i], QFRDRResultsModel::ResultNameRole).toString();
+
+            hists[col]<<current->resultsGetAsDoubleList(ename, rname);
+            cols.insert(col);
+        }
+
+        if (cols.size()==2) {
+            QList<int> cs=cols.toList();
+            QString histID=QString("pcorr")+current->getType()+QString::number(current->getID());
+            hs->getCreateParameterCorrelationView(histID, tr("Correlation from %1").arg(current->getName()));
+            hs->clearParameterCorrelationView(histID);
+            int i1=cs.first();
+            int i2=cs.last();
+            QString n=names.value(i1)+tr(" vs. ")+names.value(i2);
+            QFParameterCorrelationService::ParameterCorrelation d;
+            d.nameX=names.value(i1);
+            d.nameY=names.value(i2);
+            d.dataX=hists.value(i1);
+            d.dataY=hists.value(i2);
+            hs->addCorrelationToView(histID, d);
+        } else {
+            QMessageBox::critical(d, tr("Data Correlation"), tr("You have to select data from exactly two rows for data correlation!"));
+        }
+    }
+
 }
 
 void QFRawDataPropertyEditor_private::showEditFilesWarning(bool activated) {
