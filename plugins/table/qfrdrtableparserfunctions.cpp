@@ -1,5 +1,5 @@
 #include "qfrdrtableparserfunctions.h"
-
+#include "qfrdrtable.h"
 
 
 
@@ -15,6 +15,9 @@ void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names, bool colum
     parser->addFunction("colmax", fQFRDRTableEditor_colmax);
     parser->addFunction("colmedian", fQFRDRTableEditor_colmedian);
     parser->addFunction("colquantile", fQFRDRTableEditor_colquantile);
+    parser->addFunction("colimagewidth", fQFRDRTableEditor_colimagewidth);
+    parser->addFunction("colimageheight", fQFRDRTableEditor_colimageheight);
+    parser->addFunction("collength", fQFRDRTableEditor_collength);
     //if (columnMode) {
         parser->addFunction("column", fQFRDRTableEditor_column);
         parser->addFunction("uniquecolumn", fQFRDRTableEditor_columnUnique);
@@ -46,7 +49,7 @@ void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names, bool colum
               <<"colmedian"<<"colquantile"
               <<"uniquecolumn"<<"indexedavg"<<"indexedstd";
         //if (columnMode) {
-            *names<<"column"<<"columndata";
+        *names<<"column"<<"columndata"<<"colimagewidth"<<"colimageheight"<<"collength";
         //}
     }
 }
@@ -1093,4 +1096,84 @@ qfmpResult fQFRDRTableEditor_indexedColQuantile(const qfmpResult* params, unsign
         }
     }
     return res;
+}
+
+/*
+ *m->model()->setColumnHeaderData(c, QFRDRTable::ColumnCommentRole, edt->getComment());
+                     m->model()->setColumnHeaderData(c, QFRDRTable::ColumnImageWidth, edt->getImageWidth());
+ **/
+
+qfmpResult fQFRDRTableEditor_colimagewidth(const qfmpResult *params, unsigned int n, QFMathParser *p)
+{
+    qfmpResult res=qfmpResult::invalidResult();
+    res.num=NAN;
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            if (n==1) {
+                if ((params[0].type!=qfmpDouble)) p->qfmpError("colimagewidth(column) needs one integer arguments");
+                int c=floor(params[0].num-1);
+                if (c>=0 && c<d->model->columnCount()) {
+                    QVariant v=d->model->getColumnHeaderData(c, QFRDRTable::ColumnImageWidth);
+                    double w=1;
+                    if (v.canConvert(QVariant::Int)) {
+                        if (v.toInt()>0) w=v.toInt();
+                    }
+                    res.setDouble(w);
+                }
+            } else {
+                p->qfmpError("colimagewidth(column) needs 1 argument");
+            }
+        }
+    }
+    return res;
+}
+
+
+qfmpResult fQFRDRTableEditor_colimageheight(const qfmpResult *params, unsigned int n, QFMathParser *p)
+{
+    qfmpResult res=qfmpResult::invalidResult();
+    res.num=NAN;
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            if (n==1) {
+                if ((params[0].type!=qfmpDouble)) p->qfmpError("colimagewidth(column) needs one integer arguments");
+                int c=floor(params[0].num-1);
+                if (c>=0 && c<d->model->columnCount()) {
+                    QVariant v=d->model->getColumnHeaderData(c, QFRDRTable::ColumnImageWidth);
+                    int w=1;
+                    if (v.canConvert(QVariant::Int)) {
+                        if (v.toInt()>0) w=v.toInt();
+                    }
+                    res.setDouble(d->model->getColumnDataAsNumbers(c, Qt::EditRole).size()/w);
+                }
+            } else {
+                p->qfmpError("colimagewidth(column) needs 1 argument");
+            }
+        }
+    }
+    return res;
+}
+
+qfmpResult fQFRDRTableEditor_collength(const qfmpResult *params, unsigned int n, QFMathParser *p)
+{
+    qfmpResult res=qfmpResult::invalidResult();
+    res.num=NAN;
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            if (n==1) {
+                if ((params[0].type!=qfmpDouble)) p->qfmpError("collength(column) needs one integer arguments");
+                int c=floor(params[0].num-1);
+                if (c>=0 && c<d->model->columnCount()) {
+
+                    res.setDouble(d->model->getColumnDataAsNumbers(c, Qt::EditRole).size());
+                }
+            } else {
+                p->qfmpError("collength(column) needs 1 arguments");
+            }
+        }
+    }
+    return res;    
 }

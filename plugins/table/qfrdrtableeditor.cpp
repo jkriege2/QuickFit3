@@ -59,6 +59,7 @@ void QFRDRTableEditor::createWidgets() {
 
     tvMain=new QFRDRTableEnhancedTableView(this);
     connect(tvMain, SIGNAL(editExpression(QModelIndex)), this, SLOT(editExpression(QModelIndex)));
+    connect(tvMain, SIGNAL(keyPressed(int,Qt::KeyboardModifiers,QString)), this, SLOT(tableKeyPressed(int,Qt::KeyboardModifiers,QString)));
 
     tbMain=new QToolBar("tbtablemain", this);
     l->addWidget(tbMain);
@@ -150,7 +151,7 @@ void QFRDRTableEditor::createWidgets() {
 
     actDelete=new QAction(QIcon(":/table/cell_clear.png"), "delete contents", this);
     actDelete->setToolTip(tr("Delete contents from selected cells ..."));
-    actDelete->setShortcut(QKeySequence::Delete);
+    //actDelete->setShortcut(QKeySequence::Delete);
     connect(actDelete, SIGNAL(triggered()), this, SLOT(slDelete()));
     connect(this, SIGNAL(enableActions(bool)), actDelete, SLOT(setEnabled(bool)));
 
@@ -204,6 +205,10 @@ void QFRDRTableEditor::createWidgets() {
     connect(actSort, SIGNAL(triggered()), this, SLOT(slSort()));
     connect(this, SIGNAL(enableActions(bool)), actSort, SLOT(setEnabled(bool)));
 
+    actUndo=new QAction(QIcon(":/lib/undo.png"), "undo", this);
+    actUndo->setShortcut(QKeySequence::Undo);
+    actRedo=new QAction(QIcon(":/lib/redo.png"), "redo", this);
+    actRedo->setShortcut(QKeySequence::Redo);
 
 
     tbMain->addAction(actLoadTable);
@@ -235,6 +240,9 @@ void QFRDRTableEditor::createWidgets() {
 
 
 
+    tvMain->addAction(actUndo);
+    tvMain->addAction(actRedo);
+    tvMain->addAction(actPaste);
     tvMain->addAction(actCopy);
     tvMain->addAction(actCopyResults);
     tvMain->addAction(actCopyResultsNoHead);
@@ -275,6 +283,9 @@ void QFRDRTableEditor::createWidgets() {
     menuFile->addAction(tvMain->getActPrint());
 
     QMenu* menuEdit=propertyEditor->addMenu("&Edit", 0);
+    menuEdit->addAction(actUndo);
+    menuEdit->addAction(actRedo);
+    menuEdit->addSeparator();
     menuEdit->addAction(actCopy);
     menuEdit->addAction(actCut);
     menuEdit->addAction(actPaste);
@@ -321,8 +332,14 @@ void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord*
     if (old) {
         QFRDRTable* m=qobject_cast<QFRDRTable*>(old);
         if (m && m->model()) {
+            disconnect(actUndo, SIGNAL(triggered()), m->model(), SLOT(undo()));
+            disconnect(m->model(), SIGNAL(undoAvailable(bool)), actUndo, SLOT(setEnabled(bool)));
+            disconnect(actRedo, SIGNAL(triggered()), m->model(), SLOT(redo()));
+            disconnect(m->model(), SIGNAL(redoAvailable(bool)), actRedo, SLOT(setEnabled(bool)));
             disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), this, SLOT(setActionsEnabled(bool)));
             disconnect(tvMain->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(slEditColumnProperties(int)));
+
+
         }
     }
     //std::cout<<"qobject_cast ... ";
@@ -333,7 +350,12 @@ void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord*
         tvMain->setModel(m->model());
         connect(m->model(), SIGNAL(notReadonlyChanged(bool)), this, SLOT(setActionsEnabled(bool)));
         connect(tvMain->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(slEditColumnProperties(int)));
+        connect(actUndo, SIGNAL(triggered()), m->model(), SLOT(undo()));
+        connect(m->model(), SIGNAL(undoAvailable(bool)), actUndo, SLOT(setEnabled(bool)));
+        connect(actRedo, SIGNAL(triggered()), m->model(), SLOT(redo()));
+        connect(m->model(), SIGNAL(redoAvailable(bool)), actRedo, SLOT(setEnabled(bool)));
         m->model()->setReadonly(m->model()->isReadonly());
+        m->model()->emitUndoRedoSignals(true);
         setActionsEnabled(!m->model()->isReadonly());
     } else {
         tvMain->setModel(NULL);
@@ -1017,6 +1039,14 @@ void QFRDRTableEditor::editExpression(const QModelIndex &index)
 {
     tvMain->setCurrentIndex(index);
     slCalcCell();
+}
+
+void QFRDRTableEditor::tableKeyPressed(int key, Qt::KeyboardModifiers modifiers, QString text)
+{
+    qDebug()<<"key="<<key<<"   mods="<<modifiers<<"   text="<<text;
+    if (key==Qt::Key_Delete && modifiers==Qt::NoModifier) {
+        slDelete();
+    }
 }
 
 void QFRDRTableEditor::slRecalcAll()

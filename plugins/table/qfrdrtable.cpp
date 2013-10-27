@@ -210,6 +210,7 @@ QFRDRTable::~QFRDRTable()
 QFTablePluginModel* QFRDRTable::model() {
     if (!datamodel) {
         datamodel=new QFTablePluginModel(this);
+        datamodel->setUndoEnabled(true);
         datamodel->setDefaultEditValue(DEFAULT_EDITVAL);
         datamodel->setVerticalHeaderShowRowNumbers(true);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
@@ -221,6 +222,7 @@ QFTablePluginModel* QFRDRTable::model() {
 QVariant QFRDRTable::getModelData(quint16 row, quint16 column) {
     if (!datamodel) {
         datamodel=new QFTablePluginModel(this);
+        datamodel->setUndoEnabled(true);
         datamodel->setVerticalHeaderShowRowNumbers(true);
         datamodel->setDefaultEditValue(DEFAULT_EDITVAL);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
@@ -240,7 +242,7 @@ QVariant QFRDRTable::tableGetData(quint16 row, quint16 column) const
 void QFRDRTable::tableSetData(quint16 row, quint16 column, const QVariant &data) {
     //qDebug()<<"tableSetData("<<row<<", "<<column<<",    "<<data<<")";
     if (datamodel)  {
-        datamodel->setCellCreate(row, column, data);
+        datamodel->setCellCreate(row, column, data);        
     }
 }
 
@@ -458,8 +460,14 @@ void QFRDRTable::colgraphToolsSetGraphtype(QFRDRTable::GraphInfo &g, QFRDRColumn
         case QFRDRColumnGraphsInterface::cgtHorizontalRange:
             g.type=gtHorizontalRange;
             break;
-        case QFRDRColumnGraphsInterface::cgtVerticalRange:
-            g.type=gtVerticalRange;
+        case QFRDRColumnGraphsInterface::cgtImage:
+            g.type=gtImage;
+            break;
+        case QFRDRColumnGraphsInterface::cgtMaskImage:
+            g.type=gtMaskImage;
+            break;
+        case QFRDRColumnGraphsInterface::cgtRGBImage:
+            g.type=gtRGBImage;
             break;
     }
 }
@@ -1208,11 +1216,15 @@ void QFRDRTable::exportData(const QString& format, const QString& filename)const
 void QFRDRTable::intReadData(QDomElement* e) {
     if (!datamodel) {
         datamodel=new QFTablePluginModel(this);
+        datamodel->setUndoEnabled(true);
         datamodel->setVerticalHeaderShowRowNumbers(true);
         datamodel->setDefaultEditValue(DEFAULT_EDITVAL);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
     }
+
+    datamodel->startMultiUndo();
+
     datamodel->clear();
     datamodel->setReadonly(false);
     if (files.size()>0) {
@@ -1291,6 +1303,10 @@ void QFRDRTable::intReadData(QDomElement* e) {
         }
         datamodel->resetChanged();
     }
+
+    datamodel->endMultiUndo();
+    datamodel->clearUndo();
+    //datamodel->addUndoStep();
 
     if (e) {
         QDomElement te=e->firstChildElement("plots");
@@ -1481,6 +1497,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
 void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
     if (!datamodel) {
         datamodel=new QFTablePluginModel(this);
+        datamodel->setUndoEnabled(true);
         datamodel->setVerticalHeaderShowRowNumbers(true);
         datamodel->setDefaultEditValue(DEFAULT_EDITVAL);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));

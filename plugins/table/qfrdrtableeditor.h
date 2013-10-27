@@ -82,6 +82,8 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void setActionsDisabled(bool disabled);
 
         void editExpression(const QModelIndex& index);
+
+        void tableKeyPressed(int key, Qt::KeyboardModifiers modifiers, QString text);
     signals:
         void enableActions(bool enabled);
         void disableActions(bool enabled);
@@ -126,6 +128,9 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actLoadTableTemplate;
         QAction* actCopyTemplate;
         QAction* actPasteTemplate;
+
+        QAction* actUndo;
+        QAction* actRedo;
 
 
         QToolBar* tbMain;

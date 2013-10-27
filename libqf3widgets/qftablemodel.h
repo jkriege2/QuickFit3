@@ -22,6 +22,7 @@
 #include <QClipboard>
 #include <QModelIndex>
 #include "libwid_imexport.h"
+#include <QLinkedList>
 
 /*! \brief this class is used to manage a table of values (QVariant)
     \ingroup qf3lib_widgets
@@ -43,6 +44,83 @@
      - row and column count are stored externally.
      - data is stored in a QFTableModel object which is also externally accessible for data access.
     .
+
+
+    \section undoreotable Undo & Redo
+    This class supports undo/redo while editing. By default this function is disabled.
+    If enabled up to undoMaxSteps table states are stored in undoList and the user can go through the list using
+    the slots undo() and redo(). The data memeber undoCurrentPosition stores the current position in the undo/redo list:
+
+    There are different possible states. If the list is empty, the undoCurrentPosition has to be -1, no undo/redo is possible, we can only add an item
+\verbatim
+                     <-- undoCurrentPosition = -1
++------------------+     list size = 0
++------------------+
+\endverbatim
+    Adding an item will alter the state:
+\verbatim
+
++------------------+     list size = 1
+0 newest           | <-- undoCurrentPosition = 0
++------------------+
+\endverbatim
+    Now we can undo, but not redo.
+
+    If the undo/redo list is non-empty. We can distinguish different cases: If the undoCurrentPosition<=0, we can undo, but not redo
+\verbatim
+
++------------------+     list size = 6
+0 newest           | <-- undoCurrentPosition = 0
++------------------+
+1                  |
++------------------+
+2                  |
++------------------+
+3                  |
++------------------+
+4                  |
++------------------+
+5 oldes            |
++------------------+
+\endverbatim
+    If the undo/redo list is non-empty. We can distinguish different cases: If the undoCurrentPosition>0, we can undo and redo
+    (unless undoCurrentPosition >= list size, then we can only redo, as no further undo steps are available:
+\verbatim
+
++------------------+     list size = 6
+0 newest           |
++------------------+
+1                  |
++------------------+
+2                  |
++------------------+
+3                  |
++------------------+
+4                  |
++------------------+
+5 oldes            | <-- undoCurrentPosition = 5
++------------------+
+\endverbatim
+
+   So the functions do as follows:
+     - undo() will set the internal state to the state stored at undoCurrentPosition in the list, undoCurrentPosition will be increased by 1, so the
+       next call of undo() will undo the next step ... until the end of the list is reached.
+     - redo() will set the inertal state to the state stored at undoCurrentPosition-1 and decrease undoCurrentPosition by 1.
+   .
+
+   There are some special cases:
+     - if undo() is called while undoCurrentPosition=-1, then the internal state is set to the state stored at position 0 and before that the current state is
+       prepended to the list. This way we can undo this undo by calling redo().
+   .
+
+   If the contents of the table is altered, while undoCurrentPosition>0, all undo steps between 0 and undoCurrentPosition will be deleted!
+
+   New states are always prepended to the list!
+
+   The class will automatically generate undo steps, whenever data is changed. This can be prevented, if operations are grouped between startMultiUndo()
+   and endMultiUndo() (several levels are possible!!!). Only the last call to endMultiUndo() will create an undo step! clearMultiUndo() will leave the current
+   hierarchy immediately and create an undo-step.
+
  */
 class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         Q_OBJECT
@@ -69,25 +147,30 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
 
         QVariant defaultEditValue;
 
-        /** \brief the number of rows */
-        quint16 rows;
-        /** \brief the number of columns */
-        quint16 columns;
-        /** \brief this map is used to store tha data */
-        QHash<quint32, QVariant> dataMap;
-        /** \brief this map is used to store tha data for the edit role (if this does not contain an entry, the data from dataMap is returned ... writing always occurs in dataMap except with setCellEditRole() ) */
-        QHash<quint32, QVariant> dataEditMap;
-        /** \brief this map is used to store tha data for the background role (if this does not contain an entry, the data from dataMap is returned ... writing always occurs in dataMap except with setCellEditRole() ) */
-        QHash<quint32, QVariant> dataBackgroundMap;
-        /** \brief this map is used to store tha data for the background role (if this does not contain an entry, the data from dataMap is returned ... writing always occurs in dataMap except with setCellEditRole() ) */
-        QHash<quint32, QVariant> dataCheckedMap;
-        /** \brief this map is used to store additional data for roles >=Qt::UserRole */
-        QHash<quint32, QHash<int, QVariant> > moreDataMap;
+        struct TableState {
+                /** \brief the number of rows */
+                quint16 rows;
+                /** \brief the number of columns */
+                quint16 columns;
+                /** \brief this map is used to store tha data */
+                QHash<quint32, QVariant> dataMap;
+                /** \brief this map is used to store tha data for the edit role (if this does not contain an entry, the data from dataMap is returned ... writing always occurs in dataMap except with setCellEditRole() ) */
+                QHash<quint32, QVariant> dataEditMap;
+                /** \brief this map is used to store tha data for the background role (if this does not contain an entry, the data from dataMap is returned ... writing always occurs in dataMap except with setCellEditRole() ) */
+                QHash<quint32, QVariant> dataBackgroundMap;
+                /** \brief this map is used to store tha data for the background role (if this does not contain an entry, the data from dataMap is returned ... writing always occurs in dataMap except with setCellEditRole() ) */
+                QHash<quint32, QVariant> dataCheckedMap;
+                /** \brief this map is used to store additional data for roles >=Qt::UserRole */
+                QHash<quint32, QHash<int, QVariant> > moreDataMap;
 
-        QHash<quint32, QHash<int, QVariant> > headerDataMap;
+                QHash<quint32, QHash<int, QVariant> > headerDataMap;
 
-        /** \brief string list that contains the column names */
-        QStringList columnNames;
+                /** \brief string list that contains the column names */
+                QStringList columnNames;
+        };
+
+        TableState state;
+
         /** \brief indicates whether the model is readonly (via the QAbstractTableModel interface!!!) or not */
         bool readonly;
         /** \brief indicates whether the model is still checkable when readonly */
@@ -97,6 +180,25 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
 
         /** \brief indicates whether the vertical header should show row numbers */
         bool verticalHeaderShowRowNumbers;
+
+
+
+        /** \brief if \c true, undo/redo is activated */
+        bool undoEnabled;
+        /** \brief indicates whether we are currently in an undo multi-step operation */
+        int undoIsMultiStep;
+        /** \brief number of undo steps */
+        int undoMaxSteps;
+        /** \brief undo/redo list */
+        QList<TableState> undoList;
+        int rdlID;
+        QList<int> undoListT;
+        /** \brief current position in undo/redo list */
+        int undoCurrentPosition;
+
+        QAction* actUndo;
+        QAction* actRedo;
+
     public:
 
 
@@ -266,11 +368,25 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         void disableSignals();
         /*void deleteRows(QList<quint16> rs);
         void deleteColumns(QList<quint16> rs);*/
+
+
+
+        void clearUndo();
+        void startMultiUndo();
+        void endMultiUndo();
+        void clearMultiUndo();
+        void setUndoEnabled(bool enabled);
+        void emitUndoRedoSignals( bool alwaysEmit=false);
+        void addUndoStep();
+
+        QAction* getUndoAction() const;
+        QAction* getRedoAction() const;
+
     public slots:
         /** \brief append a new row */
-        inline void appendRow() { resize(rows+1, columns); }
+        inline void appendRow() { resize(state.rows+1, state.columns); }
         /** \brief append a new column */
-        inline void appendColumn() { resize(rows, columns+1); }
+        inline void appendColumn() { resize(state.rows, state.columns+1); }
         /** \brief empty the table and reset its size to (0,0) */
         void clear();
         /** \brief insert a new row before current row */
@@ -288,6 +404,14 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         /** \brief delete all contents from the given cells */
         void deleteCells(QModelIndexList selection);
 
+
+        /** \brief undo the last change */
+        void undo();
+        /** \brief redo the next change in the undo/redo list */
+        void redo();
+
+
+
     signals:
         /** \brief emitted when the readonly status changes (may be used to en-/disable widgets */
         void readonlyChanged(bool readonly);
@@ -298,7 +422,12 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         void columnRemoved(int i);
         void columnAdded(int i);
         void columnTitleChanged(int i);
+
+        void undoAvailable(bool available);
+        void redoAvailable(bool available);
+
     private:
+
 };
 
 class QFWIDLIB_EXPORT QFTableModelColumnHeaderModel : public QAbstractListModel {
