@@ -50,6 +50,9 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     param2Default<<"fitparam_concentration_ab";
     param2Default<<"fitparam_1n_particle";
     param2Default<<"fitparam_g0";
+    param2Default<<"fitparam_diff_alpha_a";
+    param2Default<<"fitparam_diff_alpha_b";
+    param2Default<<"fitparam_diff_alpha_ab";
 
 
     m_fitFunctions=QFPluginServices::getInstance()->getFitFunctionManager()->getModels("", this);
@@ -135,7 +138,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     labParameterTransform->setBuddy(cmbParameterTransform);
     topgrid->addWidget(cmbParameterTransform, row, 6);
 
-    /*row++;
+    row++;
     QHBoxLayout* hblp2=new QHBoxLayout(this);
     topgrid->addLayout(hblp2, row, 3, 1, 4);
     chkOtherFileP2=new QCheckBox(tr("other RDR for parameter 2, role:"), this);
@@ -151,7 +154,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbOtherFilesResultGroup->setEnabled(false);
     hblp2->addWidget(cmbOtherFilesResultGroup);
     connect(chkOtherFileP2, SIGNAL(toggled(bool)), cmbOtherFileRole, SLOT(setEnabled(bool)));
-    connect(chkOtherFileP2, SIGNAL(toggled(bool)), cmbOtherFilesResultGroup, SLOT(setEnabled(bool)));*/
+    connect(chkOtherFileP2, SIGNAL(toggled(bool)), cmbOtherFilesResultGroup, SLOT(setEnabled(bool)));
 
 
     row++;
@@ -1098,6 +1101,12 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbCorrelationDisplayMode->addItem(tr("parameter 1 vs. 2"));
     cmbCorrelationDisplayMode->addItem(tr("parameter 1 vs. image"));
     cmbCorrelationDisplayMode->addItem(tr("parameter 2 vs. image"));
+    cmbCorrelationDisplayMode->addItem(tr("parameter 1 vs. x-coordinate"));
+    cmbCorrelationDisplayMode->addItem(tr("parameter 2 vs. x-coordinate"));
+    cmbCorrelationDisplayMode->addItem(tr("parameter 1 vs. y-coordinate"));
+    cmbCorrelationDisplayMode->addItem(tr("parameter 2 vs. y-coordinate"));
+    cmbCorrelationDisplayMode->addItem(tr("parameter 1 vs. center distance"));
+    cmbCorrelationDisplayMode->addItem(tr("parameter 2 vs. center distance"));
     spinCorrelationChannel=new QSpinBox(this);
     spinCorrelationChannel->setRange(0,0);
     spinCorrelationChannel->setValue(0);
@@ -1633,6 +1642,19 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
     correlationMaskTools->setRDR(current);
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
+
+        cmbOtherFileRole->clear();
+        QList<QFRawDataRecord*> ing=current->getGroupMembers();
+        QStringList roles;
+        for (int i=0; i<ing.size(); i++) {
+            if (ing[i] && dynamic_cast<QFRDRImagingFCSData*>(ing[i]) && !roles.contains(ing[i]->getRole())) {
+                roles.append(ing[i]->getRole());
+                cmbOtherFileRole->addItem(roles.last(), roles.last());
+            }
+            //qDebug()<<i<<" "<<ing[i]->getRole()<<" "<<ing[i]->getName();
+        }
+        cmbOtherFileRole->setCurrentIndex(m->getProperty("imfcs_imed_otherfilegroup",roles.indexOf(current->getRole())).toInt());
+        chkOtherFileP2->setChecked(m->getProperty("imfcs_imed_otherfile", false).toBool());
 
         cmbCrosstalkDirection->setEnabled(m->isFCCS());
         cmbCrosstalkMode->setEnabled(m->isFCCS());
@@ -2237,7 +2259,7 @@ void QFRDRImagingFCSImageEditor::replotImage() {
             plteImage2ImageData=(double*)malloc(plteImageSize*sizeof(double));
         }
         readParameterImage(plteImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), currentFitParameterTransfrom());
-        readParameterImage(plteImage2ImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFit2Parameter(), currentFit2ParameterTransfrom());
+        readParameterImage(plteImage2ImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFit2Parameter(), currentFit2ParameterTransfrom(), !chkOtherFileP2->isChecked(), cmbOtherFileRole->itemData(cmbOtherFileRole->currentIndex()).toString(), cmbOtherFilesResultGroup->itemData(cmbOtherFilesResultGroup->currentIndex()).toString());
 
 
         pltImage->updateImage(plteImageData, plteOverviewSelectedData, plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), formatTransformAndParameter(cmbParameter, cmbParameterTransform), false, true);
@@ -3269,6 +3291,72 @@ void QFRDRImagingFCSImageEditor::writeSettings() {
     histogram2_2->writeSettings(*(settings->getQSettings()), "imfcsimageeditor/histogramp2_2/");
 }
 
+void QFRDRImagingFCSImageEditor::fillParameterComboBox(QComboBox* cmbParameter, QFRDRImagingFCSData* m, const QString& egroup, const QStringList& param1Default, const QString& otherParameter, const QString &indexPropertyName, const QString &parameterDefault, int idxDefault) {
+    cmbParameter->setEnabled(true);
+    QList<QPair<QString, QString> > params=m->resultsCalcNamesAndLabels("", "fit results", egroup);
+    QList<QPair<QString, QString> > params1=m->resultsCalcNamesAndLabels("", "results", egroup);
+    QList<QPair<QString, QString> > params2=m->resultsCalcNamesAndLabels("", "evaluation results", egroup);
+    params.append(params1);
+    params.append(params2);
+    cmbParameter->clear();
+    for (int i=0; i<params.size(); i++) {
+        if (!params[i].second.endsWith("_fix")) {
+            cmbParameter->addItem(params[i].first, params[i].second);
+            //qDebug()<<params[i].second;
+        }
+    }
+    for (int i=0; i<params.size(); i++) {
+        if (params[i].second.endsWith("_fix")) {
+            cmbParameter->addItem(params[i].first, params[i].second);
+        }
+    }
+
+    params=m->resultsCalcNamesAndLabels("", "fit properties", egroup);
+    for (int i=0; i<params.size(); i++) {
+        if (!params[i].second.endsWith("_fix")) {
+            cmbParameter->addItem(params[i].first, params[i].second);
+        }
+    }
+    for (int i=0; i<params.size(); i++) {
+        if (params[i].second.endsWith("_fix")) {
+            cmbParameter->addItem(params[i].first, params[i].second);
+        }
+    }
+    int d=cmbParameter->findData(current->getProperty(indexPropertyName, param1Default.value(0, parameterDefault)));
+    for (int i=1; i<param1Default.size(); i++) {
+        if (d<0 || param1Default[i]==otherParameter) d=cmbParameter->findData(param1Default[i]);
+    }
+    if (d>=0) cmbParameter->setCurrentIndex(d);
+    else cmbParameter->setCurrentIndex(idxDefault);
+    //int d1=cmbParameter->currentIndex();
+
+
+
+}
+
+QFRDRImagingFCSData* QFRDRImagingFCSImageEditor::getRDRForParameter2(const QString &otherRDRRole) const {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+
+    if (chkOtherFileP2->isChecked() && current && current->getGroup()>=0) {
+        //QString otherRDRRole=cmbOtherFileRole->itemData(cmbOtherFileRole->currentIndex()).toString();
+        //evalGroup=cmbOtherFilesResultGroup->itemData(cmbOtherFilesResultGroup->currentIndex()).toString();
+        QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRGroupMembers(current->getGroup());
+        int width=m->getImageFromRunsWidth();
+        int height=m->getImageFromRunsHeight();
+        for (int i=0; i<rdrs.size(); i++) {
+            QFRDRImagingFCSData* mm=qobject_cast<QFRDRImagingFCSData*>(rdrs[i]);
+            if (mm && mm->getRole().toUpper()==otherRDRRole.toUpper()) {
+                if (mm->getImageFromRunsWidth()==width && mm->getImageFromRunsHeight()==height) {
+                    m=mm;
+                    break;
+                }
+            }
+            mm=NULL;
+        }
+    }
+
+    return m;
+}
 
 void QFRDRImagingFCSImageEditor::parameterSetChanged() {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
@@ -3285,10 +3373,14 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
         clearImage();
         cmbParameter->clear();
         cmbParameter2->clear();
+        chkOtherFileP2->setChecked(false);
         //cmbParameter->setCurrentIndex(-1);
     } else {
         connectParameterWidgets(false);
-        m->setQFProperty("imfcs_imed_evalgroup", grp, false, false);
+        m->setQFProperty("imfcs_imed_evalgroup", cmbResultGroup->itemData(grp).toString(), false, false);
+        m->setQFProperty("imfcs_imed_otherfileevalgroup", cmbOtherFilesResultGroup->currentIndex(), false, false);
+        m->setQFProperty("imfcs_imed_otherfilegroup", cmbOtherFileRole->currentIndex(), false, false);
+        m->setQFProperty("imfcs_imed_otherfile", chkOtherFileP2->isChecked(), false, false);
         labParameter->setEnabled(true);
         cmbParameter->setEnabled(true);
         labParameterTransform->setEnabled(true);
@@ -3297,58 +3389,18 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
         cmbParameter2->setEnabled(true);
         labParameter2Transform->setEnabled(true);
         cmbParameter2Transform->setEnabled(true);
-        //QStringList egroup=m->resultsCalcEvalGroups();
+
+        QFRDRImagingFCSData* m2=getRDRForParameter2(cmbOtherFileRole->itemData(cmbOtherFileRole->currentIndex()).toString());
+        if (!m2) m2=m;
         QString egroup=currentEvalGroup();
-        QList<QPair<QString, QString> > params=m->resultsCalcNamesAndLabels("", "fit results", egroup);
-        QList<QPair<QString, QString> > params1=m->resultsCalcNamesAndLabels("", "results", egroup);
-        QList<QPair<QString, QString> > params2=m->resultsCalcNamesAndLabels("", "evaluation results", egroup);
-        params.append(params1);
-        params.append(params2);
-        cmbParameter->clear();
-        cmbParameter2->clear();
-        for (int i=0; i<params.size(); i++) {
-            if (!params[i].second.endsWith("_fix")) {
-                cmbParameter->addItem(params[i].first, params[i].second);
-                cmbParameter2->addItem(params[i].first, params[i].second);
-                //qDebug()<<params[i].second;
-            }
-        }
-        for (int i=0; i<params.size(); i++) {
-            if (params[i].second.endsWith("_fix")) {
-                cmbParameter->addItem(params[i].first, params[i].second);
-                cmbParameter2->addItem(params[i].first, params[i].second);
-            }
-        }
+        QString egroup2=egroup;
 
-        params=m->resultsCalcNamesAndLabels("", "fit properties", egroup);
-        for (int i=0; i<params.size(); i++) {
-            if (!params[i].second.endsWith("_fix")) {
-                cmbParameter->addItem(params[i].first, params[i].second);
-                cmbParameter2->insertItem(0, params[i].first, params[i].second);
-            }
-        }
-        for (int i=0; i<params.size(); i++) {
-            if (params[i].second.endsWith("_fix")) {
-                cmbParameter->addItem(params[i].first, params[i].second);
-                cmbParameter2->insertItem(0, params[i].first, params[i].second);
-            }
-        }
-        int d=cmbParameter->findData(current->getProperty(QString("imfcs_imed_param_%1").arg(filenameize(egroup)), param1Default.value(0, "fitparam_diff_coeff")));
-        for (int i=1; i<param1Default.size(); i++) {
-            if (d<0) d=cmbParameter->findData(param1Default[i]);
-        }
-        if (d>=0) cmbParameter->setCurrentIndex(d);
-        else cmbParameter->setCurrentIndex(0);
-        int d1=cmbParameter->currentIndex();
-
-        d=cmbParameter2->findData(current->getProperty(QString("imfcs_imed_image2param_%1").arg(filenameize(egroup)), param2Default.value(0, "fitparam_n_particle")));
-        for (int i=1; i<param2Default.size(); i++) {
-            if (d<0 || d==d1) d=cmbParameter2->findData(param2Default[i]);
-        }
+        if (chkOtherFileP2->isChecked()) egroup2=cmbOtherFilesResultGroup->itemData(cmbOtherFilesResultGroup->currentIndex()).toString();
 
 
-        if (d>=0) cmbParameter2->setCurrentIndex(d);
-        else cmbParameter2->setCurrentIndex(1);
+        fillParameterComboBox(cmbParameter, m, egroup, param1Default, "", QString("imfcs_imed_param_%1").arg(filenameize(egroup)), "fitparam_diff_coeff", 0);
+        fillParameterComboBox(cmbParameter2, m2, egroup2, param2Default, cmbParameter->itemData(cmbParameter->currentIndex()).toString(), QString("imfcs_imed_image2param_%1").arg(filenameize(egroup)), "fitparam_n_particle", 1);
+
         cmbParameter2Transform->setCurrentIndex(current->getProperty(QString("imfcs_imed_image2paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter2->currentIndex()), 0).toInt());
         cmbParameterTransform->setCurrentIndex(current->getProperty(QString("imfcs_imed_paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter->currentIndex()), 0).toInt());
         connectParameterWidgets(true);
@@ -3399,25 +3451,44 @@ void QFRDRImagingFCSImageEditor::clearImage() {
 void QFRDRImagingFCSImageEditor::fillParameterSet() {
     //qDebug()<<"fillParameterSet";
 
+
     if (!current) {
         //cmbResultGroup->setEnabled(false);
         cmbResultGroup->clear();
+        cmbOtherFilesResultGroup->clear();
+        cmbOtherFileRole->clear();
         //cmbResultGroup->setCurrentIndex(-1);
     } else {
         connectParameterWidgets(false);
         //cmbResultGroup->setEnabled(true);
         cmbResultGroup->clear();
+        cmbOtherFilesResultGroup->clear();
+        //cmbOtherFileRole->clear();
 
         // fill the list of available fit result groups
         QStringList egroups=current->resultsCalcEvalGroups();
-        //qDebug()<<"egroups="<<egroups;
         for (int i=0; i<egroups.size(); i++) {
             cmbResultGroup->addItem(QString("%1").arg(current->resultsGetLabelForEvaluationGroup(egroups[i])), egroups[i]);
-            //qDebug()<<"egroup["<<i<<"/"<<cmbResultGroup->count()<<"]: "<<egroups[i];
         }
         int d=cmbResultGroup->findData(current->getProperty("imfcs_imed_evalgroup", "").toString());
         if (d>=0) cmbResultGroup->setCurrentIndex(d);
         else if (cmbResultGroup->count()>0) cmbResultGroup->setCurrentIndex(0);
+
+        if (chkOtherFileP2->isChecked()) {
+            QFRawDataRecord* cur=getRDRForParameter2(cmbOtherFileRole->itemData(cmbOtherFileRole->currentIndex()).toString());
+            if (cur) {
+                egroups=cur->resultsCalcEvalGroups();
+                for (int i=0; i<egroups.size(); i++) {
+                    cmbOtherFilesResultGroup->addItem(QString("%1").arg(cur->resultsGetLabelForEvaluationGroup(egroups[i])), egroups[i]);
+                }
+
+                int d=cmbOtherFilesResultGroup->findData(cur->getProperty("imfcs_imed_otherfileevalgroup", "").toString());
+                if (d>=0) cmbOtherFilesResultGroup->setCurrentIndex(d);
+                else if (cmbOtherFilesResultGroup->count()>0) cmbOtherFilesResultGroup->setCurrentIndex(0);
+            } else {
+                chkOtherFileP2->setChecked(false);
+            }
+        }
         connectParameterWidgets(true);
 
     }
@@ -3479,7 +3550,10 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
             grpImage->connectWidgets(true);
             grpImage2->connectWidgets(true);
 
+            connect(chkOtherFileP2, SIGNAL(toggled(bool)), this, SLOT(fillParameterSet()));
+            connect(cmbOtherFileRole, SIGNAL(currentIndexChanged(int)), this, SLOT(fillParameterSet()));
             connect(cmbResultGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterSetChanged()));
+            connect(cmbOtherFilesResultGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterSetChanged()));
             connect(cmbParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
             connect(cmbParameter2, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
             connect(cmbParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
@@ -3518,7 +3592,10 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
         grpImage->connectWidgets(false);
         grpImage2->connectWidgets(false);
 
+        disconnect(chkOtherFileP2, SIGNAL(toggled(bool)), this, SLOT(fillParameterSet()));
+        disconnect(cmbOtherFileRole, SIGNAL(currentIndexChanged(int)), this, SLOT(fillParameterSet()));
         disconnect(cmbResultGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterSetChanged()));
+        disconnect(cmbOtherFilesResultGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterSetChanged()));
         disconnect(cmbParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
         disconnect(cmbParameter2, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterChanged()));
         disconnect(cmbParameterTransform, SIGNAL(currentIndexChanged(int)), this, SLOT(transformChanged()));
@@ -3669,17 +3746,13 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double *image, uint16_t widt
     QString evalGroup=evalGroupIn;
 
     if (!thisRDR && current && current->getGroup()>=0) {
-        evalGroup=otherRDRevalGroup;
-        QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRGroupMembers(current->getGroup());
-        for (int i=0; i<rdrs.size(); i++) {
-            QFRDRImagingFCSData* mm=qobject_cast<QFRDRImagingFCSData*>(rdrs[i]);
-            if (mm && mm->getRole().toUpper()==otherRDRRole.toUpper()) {
-                if (mm->getImageFromRunsWidth()==width && mm->getImageFromRunsHeight()==height) {
-                    m=mm;
-                    break;
-                }
-            }
-            mm=NULL;
+        QFRDRImagingFCSData* mm=getRDRForParameter2(otherRDRRole);
+        if (mm) {
+            m=mm;
+            evalGroup=otherRDRevalGroup;
+            /*qDebug()<<"plot: "<<evalGroup;
+            qDebug()<<"      "<<m->getName();
+            qDebug()<<"      "<<m->getRole();*/
         }
     }
 
@@ -4438,7 +4511,7 @@ void QFRDRImagingFCSImageEditor::copyToMatlab() {
         JKImage<uint16_t> mask_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         JKImage<double> overview_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         readParameterImage(image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone);
-        readParameterImage(image2.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFit2Parameter(), QFRDRImagingFCSImageEditor::itNone);
+        readParameterImage(image2.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFit2Parameter(), QFRDRImagingFCSImageEditor::itNone, !chkOtherFileP2->isChecked(), cmbOtherFileRole->itemData(cmbOtherFileRole->currentIndex()).toString(), cmbOtherFilesResultGroup->itemData(cmbOtherFilesResultGroup->currentIndex()).toString());
         overview_image.assign(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         //mask_image.assign(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
         for (int32_t i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
@@ -4469,7 +4542,7 @@ void QFRDRImagingFCSImageEditor::copyDataAsColumns() {
             JKImage<uint16_t> mask_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
             JKImage<double> overview_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
             readParameterImage(image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone);
-            readParameterImage(image2.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFit2Parameter(), QFRDRImagingFCSImageEditor::itNone);
+            readParameterImage(image2.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFit2Parameter(), QFRDRImagingFCSImageEditor::itNone, !chkOtherFileP2->isChecked(), cmbOtherFileRole->itemData(cmbOtherFileRole->currentIndex()).toString(), cmbOtherFilesResultGroup->itemData(cmbOtherFilesResultGroup->currentIndex()).toString());
             overview_image.assign(m->getImageFromRunsPreview(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
             //mask_image.assign(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
             for (int32_t i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
@@ -4609,7 +4682,7 @@ void QFRDRImagingFCSImageEditor::saveData() {
         JKImage<double> overview_image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         JKImage<double> overview_image2(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         readParameterImage(image.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), QFRDRImagingFCSImageEditor::itNone);
-        readParameterImage(image2.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFit2Parameter(), QFRDRImagingFCSImageEditor::itNone);
+        readParameterImage(image2.data(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFit2Parameter(), QFRDRImagingFCSImageEditor::itNone, !chkOtherFileP2->isChecked(), cmbOtherFileRole->itemData(cmbOtherFileRole->currentIndex()).toString(), cmbOtherFilesResultGroup->itemData(cmbOtherFilesResultGroup->currentIndex()).toString());
         //mask_image.assign(plteOverviewExcludedData, m->getDataImageWidth(), m->getDataImageHeight());
         overview_image.assign(m->getImageFromRunsPreview(0), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
         if (m->getImageFromRunsChannelsAdvised()>1) overview_image2.assign(m->getImageFromRunsPreview(1), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
@@ -4748,7 +4821,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
     QTextTableFormat tableFormat1=tableFormat;
     tableFormat1.setWidth(QTextLength(QTextLength::VariableLength, 1));
-    QTextTable* table = cursor.insertTable(5, 2, tableFormat);
+    QTextTable* table = cursor.insertTable(6, 2, tableFormat);
     table->mergeCells(0,0,1,2);
     {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
@@ -4758,7 +4831,15 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         tabCursor=table->cellAt(1, 1).firstCursorPosition();
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>transform:</i> <b>%1</b></small>").arg(cmbParameterTransform->currentText())));
         tabCursor=table->cellAt(2, 0).firstCursorPosition();
-        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>parameter 2:</i> <b>%1</b></small>").arg(cmbParameter2->currentText())));
+        QString otherFileName="";
+        if (chkOtherFileP2->isChecked()) {
+            QFRDRImagingFCSData* mmo=getRDRForParameter2(cmbOtherFileRole->itemData(cmbOtherFileRole->currentIndex()).toString());
+            if (mmo) {
+                otherFileName=tr(" (%1 / %2)").arg(mmo->getName()).arg(mmo->getRole());
+            }
+
+        }
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>parameter 2:</i> <b>%1</b>%2</small>").arg(cmbParameter2->currentText()).arg(otherFileName)));
         tabCursor=table->cellAt(2, 1).firstCursorPosition();
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>transform:</i> <b>%1</b></small>").arg(cmbParameter2Transform->currentText())));
         tabCursor=table->cellAt(3, 0).firstCursorPosition();
@@ -4769,6 +4850,13 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>color range:</i> <b>%1 ... %2</b></small>").arg(grpImage->getColMin()).arg(grpImage->getColMax())));
         tabCursor=table->cellAt(4, 1).firstCursorPosition();
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>out-of-range mode:</i> <b>%1</b></small>").arg(grpImage->getOutOfRangeName())));
+        if (cmbSeletionCorrDisplayMode->currentIndex()==2) {
+            tabCursor=table->cellAt(5, 0).firstCursorPosition();
+            tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>crosstalk:</i> <b>%1%%</b>, <i>crosstalk-dir:</i> <b>%2</b>, <i>avg:</i> <b>%3</b></small>").arg(spinCrosstalk->value()).arg(cmbCrosstalkMode->currentText()).arg(spinCrosstalkAvg->value())));
+            tabCursor=table->cellAt(5, 1).firstCursorPosition();
+            tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><b>%1</b></small>").arg(labRelCCF->text())));
+
+        }
     }
     QApplication::processEvents();
     cursor.movePosition(QTextCursor::End);
@@ -4974,17 +5062,20 @@ void QFRDRImagingFCSImageEditor::updateHistogram(QFHistogramView* histogram, QFR
 
 }
 
-void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *corrView, QFRDRImagingFCSData *m, double *data1, double *data2, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram, int mode, int channel, const QString &label1, const QString label2)
+void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *corrView, QFRDRImagingFCSData *m, double *data1, double *data2, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram, int mode, int channel, const QString &label1, const QString label2, int width, int height)
 {
-    int32_t datasize=0;
-    double* datac1=(double*)malloc(plteImageSize*sizeof(double));
-    double* datac2=(double*)malloc(plteImageSize*sizeof(double));
-    double* datai=(double*)malloc(plteImageSize*sizeof(double));
-
     if (plteImageSize<=0) {
         corrView->clear();
         return;
     }
+
+    int32_t datasize=0;
+    double* datac1=(double*)malloc(plteImageSize*sizeof(double));
+    double* datac2=(double*)malloc(plteImageSize*sizeof(double));
+    double* datai=(double*)malloc(plteImageSize*sizeof(double));
+    double* dataX=(double*)malloc(plteImageSize*sizeof(double));
+    double* dataY=(double*)malloc(plteImageSize*sizeof(double));
+    double* dataC=(double*)malloc(plteImageSize*sizeof(double));
 
     double* image=m->getImageFromRunsPreview(channel);
     if (!dv) {
@@ -4995,6 +5086,9 @@ void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *c
                         if (data1) datac1[datasize]=data1[i];
                         if (data2) datac2[datasize]=data2[i];
                         if (image) datai[datasize]=image[i];
+                        if (dataX) dataX[datasize]=i%width;
+                        if (dataY) dataY[datasize]=i/width;
+                        if (dataC) dataC[datasize]=sqrt(qfSqr(double(i%width)-double(width)/2.0)+qfSqr(double(i/width)-double(height)/2.0));
                         datasize++;
                     }
                 }
@@ -5004,6 +5098,9 @@ void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *c
                         if (data1) datac1[datasize]=data1[i];
                         if (data2) datac2[datasize]=data2[i];
                         if (image) datai[datasize]=image[i];
+                        if (dataX) dataX[datasize]=i%width;
+                        if (dataY) dataY[datasize]=i/width;
+                        if (dataC) dataC[datasize]=sqrt(qfSqr(double(i%width)-double(width)/2.0)+qfSqr(double(i/width)-double(height)/2.0));
                         datasize++;
                     }
                 }
@@ -5017,13 +5114,37 @@ void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *c
     QString l2=label2;
 
     if (mode==1) {
-        cd2=image;
+        cd2=datai;
         l2=tr("intensity, ch.%1").arg(channel+1);
     } else if (mode==2) {
         cd1=datac2;
         l1=label2;
-        cd2=image;
+        cd2=datai;
         l2=tr("intensity, ch.%1").arg(channel+1);
+    } else if (mode==3) {
+        cd2=dataX;
+        l2=tr("x-position [pix]");
+    } else if (mode==4) {
+        cd1=datac2;
+        l1=label2;
+        cd2=dataX;
+        l2=tr("x-position [pix]");
+    } else if (mode==5) {
+        cd2=dataY;
+        l2=tr("y-position [pix]");
+    } else if (mode==6) {
+        cd1=datac2;
+        l1=label2;
+        cd2=dataY;
+        l2=tr("y-position [pix]");
+    } else if (mode==7) {
+        cd2=dataC;
+        l2=tr("center distance [pix]");
+    } else if (mode==8) {
+        cd1=datac2;
+        l1=label2;
+        cd2=dataC;
+        l2=tr("center distance [pix]");
     }
 
     corrView->setCorrelation1Label(l1);
@@ -5056,6 +5177,9 @@ void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *c
     if (datac1) free(datac1);
     if (datac2) free(datac2);
     if (datai) free(datai);
+    if (dataX) free(dataX);
+    if (dataY) free(dataY);
+    if (dataC) free(dataC);
 }
 
 
@@ -5078,7 +5202,7 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
     histogram2->setHistogramXLabel(cmbParameter2->currentText());
 
     corrView->clear();
-    updateCorrelation(corrView, m, pltImage->getData(), pltParamImage2->getData(), qMin(pltImage->getDataSize(), pltParamImage2->getDataSize()), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false, cmbCorrelationDisplayMode->currentIndex(), spinCorrelationChannel->value(), cmbParameter->currentText(), cmbParameter2->currentText());
+    updateCorrelation(corrView, m, pltImage->getData(), pltParamImage2->getData(), qMin(pltImage->getDataSize(), pltParamImage2->getDataSize()), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false, cmbCorrelationDisplayMode->currentIndex(), spinCorrelationChannel->value(), cmbParameter->currentText(), cmbParameter2->currentText(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
 
     histogram_2->clear();
     histogram2_2->clear();
@@ -5116,7 +5240,7 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
     updateHistogram(histogram2, m, pltParamImage2->getData(), pltParamImage2->getDataSize(), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, true);
     histogram2->setHistogramXLabel(cmbParameter2->currentText());
 
-    updateCorrelation(corrView, m, pltImage->getData(), pltParamImage2->getData(), qMin(pltImage->getDataSize(), pltParamImage2->getDataSize()), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, true, cmbCorrelationDisplayMode->currentIndex(), spinCorrelationChannel->value(), cmbParameter->currentText(), cmbParameter2->currentText());
+    updateCorrelation(corrView, m, pltImage->getData(), pltParamImage2->getData(), qMin(pltImage->getDataSize(), pltParamImage2->getDataSize()), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, true, cmbCorrelationDisplayMode->currentIndex(), spinCorrelationChannel->value(), cmbParameter->currentText(), cmbParameter2->currentText(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
 
     if (dv) {
 

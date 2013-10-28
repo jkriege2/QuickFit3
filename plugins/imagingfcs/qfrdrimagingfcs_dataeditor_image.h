@@ -116,7 +116,7 @@ protected:
         /** \brief fill the given histogram widget with data */
         void updateHistogram(QFHistogramView *histogram, QFRDRImagingFCSData *m, double *plteImageData, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram);
         /** \brief fill the given correlation widget with data */
-        void updateCorrelation(QFParameterCorrelationView *corrView, QFRDRImagingFCSData *m, double *data1, double *data2, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram, int mode, int channel=0, const QString& label1=QString(), const QString label2=QString());
+        void updateCorrelation(QFParameterCorrelationView *corrView, QFRDRImagingFCSData *m, double *data1, double *data2, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram, int mode, int channel=0, const QString& label1=QString(), const QString label2=QString(), int width=0, int height=0);
 
 
         /** \brief recalculate histogram over selected pixels */
@@ -441,9 +441,9 @@ protected:
         QColor excludedColor;
 
 
-        /*QCheckBox* chkOtherFileP2;
+        QCheckBox* chkOtherFileP2;
         QComboBox* cmbOtherFilesResultGroup;
-        QComboBox* cmbOtherFileRole;*/
+        QComboBox* cmbOtherFileRole;
 
 
 
@@ -499,6 +499,12 @@ protected:
                     tau. The result is saved in fit.
          */
         bool evaluateFitFunction(QFRawDataRecord* current, const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation, int index);
+
+        /*! \brief fill a QComboBox with the names (and IDs as data) of all plotable fit parameters */
+        void fillParameterComboBox(QComboBox* cmbParameter, QFRDRImagingFCSData* m, const QString& egroup, const QStringList &param1Default, const QString& otherParameter=QString(), const QString& indexPropertyName=QString(""), const QString& parameterDefault=QString("fitparam_n_particle"), int idxDefault=0);
+
+        /*! \brief returns the RDR from which to read fit parameter 2 */
+        QFRDRImagingFCSData* getRDRForParameter2(const QString& otherRDRRole) const;
 
         void createReportDoc(QTextDocument* document);
 

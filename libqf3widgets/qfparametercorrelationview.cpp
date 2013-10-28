@@ -568,7 +568,7 @@ void QFParameterCorrelationView::setCorrelation2Label(const QString label, bool 
 
 void QFParameterCorrelationView::writeReport(QTextCursor &cursor, QTextDocument *document)
 {
-
+    repaint();
     int PicTextFormat=QTextFormat::UserObject + 1;
     QObject *picInterface = new QPictureTextObject;
     document->documentLayout()->registerHandler(PicTextFormat, picInterface);
@@ -940,7 +940,7 @@ void QFParameterCorrelationView::createWidgets()
 
     pltParamHistogramY=new QFPlotter(false, this, pltParamCorrelation->getDatastore());
     pltParamHistogramY->setMinimumWidth(100);
-    pltParamHistogramY->get_plotter()->synchronizeToMaster(pltParamCorrelation->get_plotter(), true, false);
+    pltParamHistogramY->get_plotter()->synchronizeToMaster(pltParamCorrelation->get_plotter(), false, true);
     pltParamHistogramY->getXAxis()->set_inverted(true);
     pltParamHistogramY->getYAxis()->set_drawMode1(JKQTPCADMticks);
     pltParamHistogramY->get_plotter()->set_showKey(false);

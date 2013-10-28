@@ -47,8 +47,8 @@ void QFExtensionImplementation::initExtension() {
 	*/
 }
 
-void QFExtensionImplementation::startPlugin() {
-}
+/*void QFExtensionImplementation::startPlugin() {
+}*/
 
 void QFExtensionImplementation::loadSettings(ProgramOptions* settingspo) {
 	/* here you could read config information from the quickfit.ini file using settings object */
@@ -69,7 +69,6 @@ void QFExtensionImplementation::storeSettings(ProgramOptions* settingspo) {
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
 	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
 
-	}
 }
 
 void QFExtensionImplementation::log_text(QString message) {

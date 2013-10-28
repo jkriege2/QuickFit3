@@ -734,6 +734,7 @@ void QFHistogramView::fillDataArray(QList<QVector<double> > &data, QStringList& 
 
 
 void QFHistogramView::writeReport(QTextCursor& cursor, QTextDocument* document) {
+    repaint();
     int PicTextFormat=QTextFormat::UserObject + 1;
     QObject *picInterface = new QPictureTextObject;
     document->documentLayout()->registerHandler(PicTextFormat, picInterface);
