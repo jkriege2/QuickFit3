@@ -17,6 +17,7 @@ INCLUDEPATH += ../../../../LIB/trunk/ \
                ../plugins/interfaces/
 
 include(../libquickfit.pri)
+include(../../../../LIB/trunk/qt/qfvisualize3dshaders.pri)
 
 QT += gui xml svg opengl
 
@@ -124,7 +125,11 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfmeasurementdeviceconfigwidget.h \
     qfrdrimagetorunpreview.h \
     qfrdrimagemaskedittools.h \
-    qfrdrimagemaskbyintensity.h
+    qfrdrimagemaskbyintensity.h \
+    ../../../../LIB/trunk/qt/qfvisualize3dglwidget.h \
+    ../../../../LIB/trunk/qt/qfvisualize3dgleditor.h \
+    ../../../../LIB/trunk/qt/qfluteditor.h \
+    ../../../../LIB/trunk/highrestimer.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -212,7 +217,11 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfmeasurementdeviceconfigwidget.cpp \
     qfrdrimagetorunpreview.cpp \
     qfrdrimagemaskedittools.cpp \
-    qfrdrimagemaskbyintensity.cpp
+    qfrdrimagemaskbyintensity.cpp \
+    ../../../../LIB/trunk/qt/qfvisualize3dglwidget.cpp \
+    ../../../../LIB/trunk/qt/qfvisualize3dgleditor.cpp \
+    ../../../../LIB/trunk/qt/qfluteditor.cpp \
+    ../../../../LIB/trunk/highrestimer.cpp
 
 
 FORMS += qfdlg_csvparameters.ui \
@@ -222,7 +231,8 @@ FORMS += qfdlg_csvparameters.ui \
     qfselectrdrdialog.ui \
     qfplottercopytotabledialog.ui \
     qfsimplecurvefitdialog.ui \
-    qfrdrimagemaskbyintensity.ui
+    qfrdrimagemaskbyintensity.ui \
+    ../../../../LIB/trunk/qt/qfvisualize3dgleditor.ui
 
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/qspecialtoolbutton.qrc \
@@ -233,7 +243,8 @@ RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              libqf3widgets.qrc \
     ../../../../LIB/trunk/qt/qprogresslistwidget.qrc \
     ../../../../LIB/trunk/qt/qtlogfile.qrc \
-    ../extlibs/xits.qrc
+    ../extlibs/xits.qrc \
+    ../../../../LIB/trunk/qt/qfvisualize3d.qrc
 
 TRANSLATIONS= ./translations/de.quickfit3widgets.ts
 

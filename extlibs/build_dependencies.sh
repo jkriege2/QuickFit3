@@ -43,16 +43,16 @@ read -p "Do you want to optimize libraries for your local machine? (y/n)? " -n 1
 echo -e  "\n"
 
 #sh ../output/get_bit_depth.sh
-MORECFLAGS="-m128bit-long-double -mtune=generic -msse -msse2 -mmmx -m3dnow -mfpmath=sse "
+MORECFLAGS=" -mtune=generic -msse -msse2 -mmmx -m3dnow -mfpmath=sse "
 if [ $MAKE_COMPILEFORLOCAL == "y" ] ; then
 	if [ $MAKE_AGRESSIVEOPTIMIZATIONS == "y" ] ; then
-		MORECFLAGS="-m128bit-long-double -mtune=native -msse -msse2 -mmmx -m3dnow -mfpmath=sse -ftree-vectorize -ftree-vectorizer-verbose=5"
+		MORECFLAGS=" -mtune=native -msse -msse2 -mmmx -m3dnow -mfpmath=sse -ftree-vectorize -ftree-vectorizer-verbose=1"
 	else
-		MORECFLAGS="-m128bit-long-double -mtune=native -msse -msse2 -mmmx -m3dnow -mfpmath=sse "
+		MORECFLAGS=" -mtune=native -msse -msse2 -mmmx -m3dnow -mfpmath=sse "
 	fi
 else
 	if [ $MAKE_AGRESSIVEOPTIMIZATIONS == "y" ] ; then
-		MORECFLAGS="-m128bit-long-double -mtune=generic -msse -msse2 -mmmx -m3dnow -mfpmath=sse -ftree-vectorize -ftree-vectorizer-verbose=5"
+		MORECFLAGS=" -mtune=generic -msse -msse2 -mmmx -m3dnow -mfpmath=sse -ftree-vectorize -ftree-vectorizer-verbose=1"
 	fi
 fi
 
@@ -112,8 +112,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd zlib
 	mkdir build
-	tar xvf zlib-1.2.5.tar.gz -C ./build/
-	cd build/zlib-1.2.5
+	tar xvf zlib-1.2.8.tar.gz -C ./build/
+	cd build/zlib-1.2.8
 	ISMSYS=`uname -o`
 	echo $ISMSYS
 	if [ "$ISMSYS" != "${string/Msys/}" ] ; then
@@ -121,7 +121,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 		INCLUDE_PATH='../../include'
 		LIBRARY_PATH='../../lib'
 		
-		echo -e 'BINARY_PATH='$BINARY_PATH'\nINCLUDE_PATH='$INCLUDE_PATH'\nLIBRARY_PATH='$LIBRARY_PATH'\nLOC='$MORECFLAGS|cat - ./win32/Makefile.gcc > ./Makefile.gcc
+		echo -e 'BINARY_PATH='$BINARY_PATH'\nINCLUDE_PATH='$INCLUDE_PATH'\nLIBRARY_PATH='$LIBRARY_PATH'\nLOC='-fPIC $MORECFLAGS|cat - ./win32/Makefile.gcc > ./Makefile.gcc
 		
 		MAKEFILE="Makefile.gcc"
 	else
@@ -201,6 +201,51 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	cd ${CURRENTDIR}
 	
 	lmfitOK=$libOK
+
+fi
+
+
+lmfit5OK=-1
+read -p "Do you want to build 'lmfit v5' (y/n)? " -n 1 INSTALL_ANSWER
+echo -e  "\n"
+if [ $INSTALL_ANSWER == "y" ] ; then
+	echo -e  "\n------------------------------------------------------------------------\n"\
+	"-- BUILDING: lmfit v5                                                 --\n"\
+	"------------------------------------------------------------------------\n\n"\
+
+	cd lmfit5
+	mkdir build
+	tar xvf lmfit-5.1.tar -C ./build/
+	cd build/lmfit-5.1
+	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS=" ${MORECFLAGS}" CPPFLAGS=" ${MORECFLAGS}"	
+	libOK=$?
+	if [ $libOK -eq 0 ] ; then
+		make -j${MAKE_PARALLEL_BUILDS}
+		
+		libOK=$?
+		if [ $libOK -eq 0 ] ; then		
+		    mkdir ${CURRENTDIR}/lmfit5/include
+		    cp ./lib/*.h ${CURRENTDIR}/lmfit5/include
+			make -j${MAKE_PARALLEL_BUILDS} install
+			libOK=$?
+			if [ $libOK -ne 0 ] ; then		
+				libOK=-4
+			fi
+		else
+			libOK=-3
+		fi
+	else
+	    libOK=-2
+	fi
+	
+
+	cd ../../
+	if [ $KEEP_BUILD_DIR == "n" ] ; then
+		rm -rf build
+	fi
+	cd ${CURRENTDIR}
+	
+	lmfit5OK=$libOK
 
 fi
 
@@ -627,58 +672,6 @@ fi
 
 
 
-libqt3dOK=-1
-read -p "Do you want to build 'qt-3d (for Qt4)' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
-if [ $INSTALL_ANSWER == "y" ] ; then
-	echo -e  "\n------------------------------------------------------------------------\n"\
-	"-- BUILDING: qt-3d (for Qt4)                                          --\n"\
-	"------------------------------------------------------------------------\n\n"\
-
-	cd qt3d_qt4
-	mkdir build
-	tar xvf qt-qt3d-qt4.tar.gz -C ./build/
-	cd build/qt-qt3d
-	qmake qt3d.pro "CONFIG+=release debug"
-	libOK=$?
-	if [ $libOK -eq 0 ] ; then
-	    echo "patching the assip lib inside Qt3D!!!"
-		ASSIMPFILES="./3rdparty/assimp/include/aiTypes.h"
-		for i in $ASSIMPFILES; do
-			sed 's/ ::strlen/std::strlen/g' $i > $i.temp | mv $i.temp $i 
-			sed 's/ ::strcmp/std::strcmp/g' $i > $i.temp | mv $i.temp $i 
-			sed 's/<math.h>/<cmath>/g' $i > $i.temp | mv $i.temp $i 
-			sed 's/#define AI_TYPES_H_INC/#define AI_TYPES_H_INC \
-			#include <cstring>/g' $i > $i.temp | mv $i.temp $i 
-		done
-	
-		make 
-		make release
-		
-		libOK=$?
-		if [ $libOK -eq 0 ] ; then		
-			cp "${QT_INFO_BIN}/Qt3Dd.dll"  "../../../../output/"
-			cp "${QT_INFO_BIN}/Qt3D.dll"  "../../../../output/"
-			ibOK=0
-		else
-			libOK=-3
-		fi
-	else
-	    libOK=-2
-	fi
-	
-
-	cd ../../
-	#if [ $KEEP_BUILD_DIR == "n" ] ; then
-	#	rm -rf build
-	#fi
-	cd ${CURRENTDIR}
-	
-	libqt3dOK=$libOK
-
-fi
-
-
 
 
 
@@ -689,6 +682,7 @@ echo -e  "\n--------------------------------------------------------------------
 print_result "Qt DLLs copy" $qtOK
 print_result "zlib" $zlibOK
 print_result "lmfit" $lmfitOK
+print_result "lmfit v5" $lmfit5OK
 print_result "levmar" $levmarOK
 print_result "libpng" $libpngOK
 print_result "libtiff" $libtiffOK
@@ -697,4 +691,4 @@ print_result "libusb" $libusbOK
 print_result "libNIDAQmx" $libnidaqmxOK
 print_result "eigen" $eigenOK
 print_result "cimg" $cimgOK
-print_result "qt-3d (for Qt4)" $libqt3dOK
+
