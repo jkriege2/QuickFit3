@@ -2,6 +2,7 @@
 #include <float.h>
 #include <QDebug>
 
+
 double qfTanc( double x ) {
     if (x==0) return 1;
     return tan(x)/x;

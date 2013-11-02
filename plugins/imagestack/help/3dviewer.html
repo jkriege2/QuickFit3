@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Image stack: 3D Viewer</title>
+  </head>
+  <body>
+$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+<a name="#intro"><h2>Introduction</h2>
+<p>This dialog allows to view an image stack as a 3D image. It uses OpenGL to render the 3D image stack to screen. These render modes are available:
+<ul>
+  <li><b>Texture Rendering:</b>$$ref:WIKI_TEXTUREMAP:<a href="https://en.wikipedia.org/wiki/Volume_rendering#Texture_mapping">https://en.wikipedia.org/wiki/Volume_rendering#Texture_mapping</a>$$$$ref:GPURENDER_UNSIEGEN:<a href="http://www.cg.informatik.uni-siegen.de/data/Tutorials/EG2006/RTVG03_VolumeRendering.pdf">http://www.cg.informatik.uni-siegen.de/data/Tutorials/EG2006/RTVG03_VolumeRendering.pdf</a>$$ creates a stack of planes in the 3D space, where each plane of the image stack is drawn as a texture on one plane. This creates a relatively good 3D representation of the dataset, especially of some parts of the volume are transparent or semi-transparent.</li>
+</ul>
+This plugin assumes that the image stack is a 3D stack (xyz) with possibly several color channels. 
+        Each color channel is treated as a separate volume dataset with its own settings. 
+</p>
+
+<h2>User Interface</h2>
+<p>You can start the 3D viewer by clicking on the menu entry <b>"Stack Tools | 3D Viewer"</b> after opening the RDR editor of any image stack in the project. If you select a new record, the data from this record will be automatically displayed in the 3D viewer window.</p>
+<p>The 3D viewer dialog looks like this:
+<center><a name="3dviewer_pic000"><img src="./pic/3dviewer_pic000.png" border="1"></center>
+On the left part of the dialog you see the 3D view. It can be rotated and zoomed:<ul>
+  <li>rotate: by keeping the left or right mouse button pressed and dragging the mouse over the view. Depending on the mouse button, different angles are rotated</li>
+  <li>rotate: you can set the rotation around the X, Y and Z-axis directly in the <b>"View" group</b> on the right.</li>
+  <li>zoom: you can zoom in and out using the mouse wheel</li>
+</ul>
+Above the 3D view, there are several buttons:<ul>
+<li><img src=":/image_stack/saveimage.png"> saves a pixel image (same resolution as on screen) of the current view to a file (PNG, JPEG, TIFF, ...)</li>
+<li><img src=":/image_stack/copyimage.png"> copies a pixel image (same resolution as on screen) of the current view to a file</li>
+<li><img src=":/image_stack/printimage.png"> prints the current view (same resolution as on screen) </li>
+</ul>
+On the right hand side, several widgets allow to set the properties of the 3D visualization. Some properties apply to the whole view:
+<ul>
+<li><b>background color:</b> sets the views background color. If you want to add a color, right-click on the combobox.</li>
+<li><b>blending:</b> sets the alpha blending mode: The standard mode is <b>alpha blending</b> which leads to a standard representation. You can also select <a href="https://en.wikipedia.org/wiki/Maximum_intensity_projection"><b>maximum intensity projection</b></a>. In the latter case you might want to set the transparency LUT to high values for the pixels that should be taken into account. Then the MIP is calculated from the grey values only.</li>
+<li><b>ambient color:</b> sets the color of the ambient light</li>
+<li><b>interpolation:</b> sets the interpolation mode between neighboring pixels, i.e. the smoothnes of the 3D representation:
+<center>
+  <i>no interpolation:</i> --- <i>linear interpolation:</i><br>
+	<a name="3dviewer_pic003"><img src="./pic/3dviewer_pic003.png" border="1"> --- <a name="3dviewer_pic002"><img src="./pic/3dviewer_pic002.png" border="1">
+</center>
+</li>
+<li><b>bounding box:</b> switches the bounding box (red: x-direction, green: y-direction, bright-blue: z-direction) on and off
+<center><a name="3dviewer_pic004"><img src="./pic/3dviewer_pic004.png" border="1"></center></li>
+<li></li>
+</ul>
+Other properties apply to each 3D volume datset separately. These are grouped in the <b>"Geometry" group</b>. First select the datset to edit in <b>"current geometry", then edit its properties below:</b>
+<ul>
+  <li><b>Basics | visible:</b> switches the selected volume data set on and off</li>
+  <li><b>Basics | mode:</b> sets the rendering mode: currently only "texture rendering" is available (see <a href="#intro">introduction</a>)</li>
+  <li><b>Basics | color LUT:</b> allows to edit the transfer function (lookup table/LUT) between pixel value and displayed color. Below the LUT editor, you can select the color palette used for the display. The LUT itself is a piecewise linear function, that you can edit by dragging its nodes (small circles) over the editor with the mouse (left button). Double-clicking an existing node deletes it and double-clicking in empty space will add a node. A histogram of the 3D stack's values is shown in the back of the LUT editor (in logarithmic scalig on the y-axis!)</li>
+  <li><b>Basics | color LUT | palette:</b> allows to select a color palette for the 3D volume data.</li>
+  <li><b>Basics | transparency LUT:</b> allows to edit the transfer function (lookup table/LUT) between pixel value and alpha value used for display. The LUT itself is a piecewise linear function, that you can edit by dragging its nodes (small circles) over the editor with the mouse (left button). Double-clicking an existing node deletes it and double-clicking in empty space will add a node. A histogram of the 3D stack's values is shown in the back of the LUT editor (in logarithmic scalig on the y-axis!)</li>
+  <li><b>Basics  | transparency LUT| alpha range:</b> These values allow to limit the range of pixels to display. Each value ranges from 0 to 1, where 0 represents the lowest pixel value in the image stack and 1 the highest pixel value. So, if the lower range is 0.1, all pixels below 10% of the maximum pixel values are invisible. the same works for the upper rande, i.e. if it is set to 0.9 all pixel with an intensity above 90% of the maximum pixel intensity are set invisible/transparent. </li>
+</ul>
+</p>
+
+<h2>References</h2>
+$$references$$
+
+  </body>
+</html>

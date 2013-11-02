@@ -21,6 +21,7 @@
 #include "colorcombobox.h"
 #include "qfrdrimagemaskedittools.h"
 #include "qfhistogramview.h"
+#include "qfrdrimagestack3dviewer.h"
 
 /*! \brief editor for QFRawDataRecord
     \ingroup qf3rdrdp_image_stack
@@ -43,6 +44,8 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         void displayImage();
         void stackChanged();
         void channelModeChanged();
+
+        void show3DViewer();
 
     signals:
         void displayedFrame(double time);
@@ -72,6 +75,10 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         QMenu* menuMask;
         QMenu* menuTools;
         QLabel* labSelectiondata;
+
+        QAction* act3DViewer;
+
+        QPointer<QFRDRImageStack3DViewer> viewer3D;
 
         QString lastMaskDir;
 

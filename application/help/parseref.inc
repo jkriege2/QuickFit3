@@ -5,7 +5,7 @@
 <li><b><a href="$$mainhelpdir$$/parserreference/power_roots.html">powers and roots</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/round_abs.html">rounding and absolute values</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/special.html">special functions</a></b></li>
-<li><b><a href="$$mainhelpdir$$/parserreference/special.html">special functions</a></b></li>
+<li><b><a href="$$mainhelpdir$$/parserreference/polynomials.html">polynomial functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/distributions.html">distribution functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/string.html">string functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/vector.html">vector manipulation functions</a></b></li>

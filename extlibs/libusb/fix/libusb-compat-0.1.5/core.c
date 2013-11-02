@@ -30,7 +30,17 @@
 #include "usb.h"
 #include "usbi.h"
 
-#define ENODATA         111     /* No data available */
+#ifndef ENODATA
+#  define ENODATA         111
+#endif
+
+#ifndef ETIMEDOUT
+#  define ETIMEDOUT         110
+#endif
+
+#ifndef EOVERFLOW
+#  define EOVERFLOW         75
+#endif
 
 static libusb_context *ctx = NULL;
 static int usb_debug = 0;

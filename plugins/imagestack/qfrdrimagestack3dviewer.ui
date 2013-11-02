@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFRDRImageStack3DViewer</class>
+ <widget class="QWidget" name="QFRDRImageStack3DViewer">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>856</width>
+    <height>532</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>image stack 3D viewer</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="qfrdrimagestack.qrc">
+    <normaloff>:/image_stack/viewer3d.png</normaloff>:/image_stack/viewer3d.png</iconset>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+   <item>
+    <widget class="QFrame" name="frame">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Panel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="margin">
+       <number>2</number>
+      </property>
+      <item>
+       <widget class="QToolButton" name="toolButton">
+        <property name="toolTip">
+         <string>Close window</string>
+        </property>
+        <property name="text">
+         <string>Close window</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../lib/lib.qrc">
+          <normaloff>:/lib/exit.png</normaloff>:/lib/exit.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButton_3">
+        <property name="toolTip">
+         <string>copy image to clipboard</string>
+        </property>
+        <property name="text">
+         <string>copy image</string>
+        </property>
+        <property name="icon">
+         <iconset resource="qfrdrimagestack.qrc">
+          <normaloff>:/image_stack/copyimage.png</normaloff>:/image_stack/copyimage.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButton_4">
+        <property name="toolTip">
+         <string>save image</string>
+        </property>
+        <property name="text">
+         <string>save image</string>
+        </property>
+        <property name="icon">
+         <iconset resource="qfrdrimagestack.qrc">
+          <normaloff>:/image_stack/saveimage.png</normaloff>:/image_stack/saveimage.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButton_5">
+        <property name="toolTip">
+         <string>print image</string>
+        </property>
+        <property name="text">
+         <string>print image</string>
+        </property>
+        <property name="icon">
+         <iconset resource="qfrdrimagestack.qrc">
+          <normaloff>:/image_stack/printimage.png</normaloff>:/image_stack/printimage.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QFElidedLabel" name="labInfo">
+        <property name="text">
+         <string>&lt;b&gt; bla &lt;/b&gt;</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButton_2">
+        <property name="toolTip">
+         <string>Show help for this dialog</string>
+        </property>
+        <property name="text">
+         <string>Show Help</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../lib/lib.qrc">
+          <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFVisualize3DGLEditor" name="widget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>250</width>
+       <height>250</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFVisualize3DGLEditor</class>
+   <extends>QWidget</extends>
+   <header>qfvisualize3dgleditor.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFElidedLabel</class>
+   <extends>QLabel</extends>
+   <header>qfelidedlabel.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="qfrdrimagestack.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>toolButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QFRDRImageStack3DViewer</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>19</x>
+     <y>24</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>36</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>QFRDRImageStack3DViewer</receiver>
+   <slot>showHelp()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>840</x>
+     <y>25</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>849</x>
+     <y>36</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton_3</sender>
+   <signal>clicked()</signal>
+   <receiver>QFRDRImageStack3DViewer</receiver>
+   <slot>copyImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>59</x>
+     <y>25</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>7</x>
+     <y>87</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton_4</sender>
+   <signal>clicked()</signal>
+   <receiver>QFRDRImageStack3DViewer</receiver>
+   <slot>saveImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>81</x>
+     <y>27</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>131</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton_5</sender>
+   <signal>clicked()</signal>
+   <receiver>QFRDRImageStack3DViewer</receiver>
+   <slot>printImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>98</x>
+     <y>21</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>172</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>showHelp()</slot>
+  <slot>copyImage()</slot>
+  <slot>saveImage()</slot>
+  <slot>printImage()</slot>
+ </slots>
+</ui>

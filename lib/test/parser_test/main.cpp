@@ -511,6 +511,10 @@ int main(int argc, char *argv[])
     TEST("item([1,2,3,4,5,6,7,8,9], [true,true,true,false,false,false,true,false,true])");
     TEST("item(\"abcdefghij\", [1,3,5])");
     TEST("item(\"abcdefghi\", [true,true,true,false,false,false,true,false,true])");
+    TEST("p=[1,2,3,4,5]");
+    TEST("polyval(0,p)");
+    TEST("polyval([0,1,2],p)");
+    TEST("polyder(p)");
     //speed_test(doByteCode, showBytecode);
 
     return 0;

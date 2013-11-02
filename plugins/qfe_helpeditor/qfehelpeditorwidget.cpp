@@ -22,7 +22,11 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     QWidget(parent),
     ui(new Ui::QFEHelpEditorWidget)
 {
+    modified=false;
     ui->setupUi(this);
+
+    connect(ui->edtScript->getEditor()->document(), SIGNAL(contentsChanged()), this, SLOT(documentWasModified()));
+
     findDlg=new FindDialog(this);
     replaceDlg=new ReplaceDialog(this);
 
@@ -152,7 +156,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
 
 
 
-    setScriptFilename(tr("new_help.html"));
+    setScriptFilename("");
     QMenu* menu;
     menu=new QMenu(tr("directories"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
@@ -312,6 +316,11 @@ void QFEHelpEditorWidget::storeSettings(QSettings &settings, QString prefix) con
     recentHelpFiles->storeSettings(settings, prefix+"recentScripts/");
 }
 
+void QFEHelpEditorWidget::documentWasModified()
+{
+    modified=ui->edtScript->getEditor()->document()->isModified();
+}
+
 
 void QFEHelpEditorWidget::on_btnExecute_clicked()
 {
@@ -335,43 +344,79 @@ void QFEHelpEditorWidget::on_btnNew_clicked()
 {
     if (maybeSave()) {
         ui->edtScript->getEditor()->setPlainText("");
-        setScriptFilename(tr("new_help.html"));
+        setScriptFilename("");
         lastScript=ui->edtScript->getEditor()->toPlainText();
     }
 }
 
 void QFEHelpEditorWidget::on_btnOpen_clicked()
 {
-    openScript("last", true);
+    //openScript("last", true);
+    if (maybeSave()) {
+        openScript("last", true);
+    }
 }
 
-void QFEHelpEditorWidget::on_btnSave_clicked()
-{
-    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastScriptDir", ProgramOptions::getInstance()->getMainHelpDirectory()).toString();
+bool QFEHelpEditorWidget::save() {
+    /*QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastScriptDir", ProgramOptions::getInstance()->getMainHelpDirectory()).toString();
     QDir d(dir);
     QString filename=qfGetSaveFileName(this, tr("save acquisition script ..."), d.absoluteFilePath(currentScript), tr("QuickFit 3 help (*.html *.htm *.inc);;All Files (*.*)"));
     if (!filename.isEmpty()) {
         bool ok=true;
-        /*if (QFile::exists(filename)) {
-            ok=false;
-            if (QMessageBox::question(this, tr("save acquisition script ..."), tr("The file\n  '%1'\nalready exists. Overwrite?").arg(filename), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
-                ok=true;
-            }
-        }*/
         if (ok) {
-            QFile f(filename);
-            if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
-                QTextStream s(&f);
-                s<<ui->edtScript->getEditor()->toPlainText().toUtf8();
-                lastScript=ui->edtScript->getEditor()->toPlainText();
-                f.close();
-                setScriptFilename(filename);
-                dir=QFileInfo(filename).absolutePath();
-            }
-
+            saveFile(filename);
+            dir=QFileInfo(filename).absolutePath();
         }
     }
-    ProgramOptions::getInstance()->getQSettings()->setValue("QFEHelpEditorWidget/lasttemplatedir", dir);
+    ProgramOptions::getInstance()->getQSettings()->setValue("QFEHelpEditorWidget/lastScriptDir", dir);
+    return true;*/
+    if (currentScript.isEmpty()) {
+        return saveAs();
+    } else {
+        return saveFile(currentScript);
+    }
+
+}
+
+bool QFEHelpEditorWidget::saveFile(const QString &filename)
+{
+    QFile f(filename);
+    //qDebug()<<"saving to "<<filename;
+    if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
+        QTextStream s(&f);
+        s<<ui->edtScript->getEditor()->toPlainText().toUtf8();
+        lastScript=ui->edtScript->getEditor()->toPlainText();
+        f.close();
+        setScriptFilename(filename);
+    }
+    return true;
+}
+
+void QFEHelpEditorWidget::on_btnSave_clicked()
+{
+    save();
+}
+
+bool QFEHelpEditorWidget::saveAs()
+{
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastScriptDir", ProgramOptions::getInstance()->getMainHelpDirectory()).toString();
+    QDir d(dir);
+    QString filename=qfGetSaveFileName(this, tr("save acquisition script ..."), d.absoluteFilePath(currentScript), tr("QuickFit 3 help (*.html *.htm *.inc *.ini);;All Files (*.*)"));
+    if (!filename.isEmpty()) {
+        bool ok=true;
+        if (ok) {
+            bool res=saveFile(filename);
+            dir=QFileInfo(filename).absolutePath();
+            ProgramOptions::getInstance()->getQSettings()->setValue("QFEHelpEditorWidget/lastScriptDir", dir);
+            return res;
+        }
+    }
+    return false;
+}
+
+void QFEHelpEditorWidget::on_btnSaveAs_clicked()
+{
+    saveAs();
 }
 
 
@@ -384,6 +429,12 @@ void QFEHelpEditorWidget::on_btnOpenExample_clicked()
 void QFEHelpEditorWidget::on_btnOpenTemplate_clicked()
 {
     openScript(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/qfe_helpeditor/templates/", false);
+    setScriptFilename("");
+}
+
+void QFEHelpEditorWidget::on_btnOpenTemplate2_clicked()
+{
+    on_btnOpenTemplate_clicked();
 }
 
 void QFEHelpEditorWidget::edtScript_cursorPositionChanged()
@@ -426,24 +477,38 @@ void QFEHelpEditorWidget::on_btnHelp_clicked()
 }
 
 bool QFEHelpEditorWidget::maybeSave() {
-    if (ui->edtScript->getEditor()->toPlainText().isEmpty()) return true;
-    if (ui->edtScript->getEditor()->toPlainText()==lastScript) return true;
-    int r=QMessageBox::question(this, tr("save help file ..."), tr("The current script has not been saved.\n  Delete?\n    Yes: Any changes will be lost.\n    No: You will be asked for a filename for the script.\n    Cancel: return to editing the script."), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::No);
-    if (r==QMessageBox::Yes) {
-        return true;
-    } else if (r==QMessageBox::No) {
-        on_btnSave_clicked();
-        return true;
+    //if (ui->edtScript->getEditor()->toPlainText().isEmpty()) return true;
+    //if (ui->edtScript->getEditor()->toPlainText()==lastScript) return true;
+    if (ui->edtScript->getEditor()->document()->isModified()) {
+        int r=QMessageBox::question(this, tr("save help file ..."), tr("The document has been modified.\n"
+                                                                       "Do you want to save your changes?"), QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
+        if (r==QMessageBox::Save) {
+            return save();
+        } else if (r==QMessageBox::Cancel) {
+            return false;
+        }
     }
 
-    return false;
+    return true;
 }
 
 void QFEHelpEditorWidget::setScriptFilename(QString filename)
 {
     currentScript=filename;
     recentHelpFiles->addRecentFile(filename);
-    ui->labScriptFilename->setText(tr("current file: <tt><i>%1</i></tt>").arg(QFileInfo(filename).fileName()));
+    if (filename.isEmpty()) ui->labScriptFilename->setText(tr("current file: <tt><i>NEW FILE</i></tt>"));
+    else ui->labScriptFilename->setText(tr("current file: <tt><i>%1</i></tt>").arg(QFileInfo(filename).fileName()));
+    ui->edtScript->getEditor()->document()->setModified(false);
+    modified=false;
+}
+
+void QFEHelpEditorWidget::closeEvent(QCloseEvent *event)
+{
+    if (maybeSave()) {
+        event->accept();
+    } else {
+        event->ignore();
+    }
 }
 
 
@@ -499,12 +564,13 @@ void QFEHelpEditorWidget::addInsertAction(QMenu *menu, const QString &label, con
 }
 
 
-void QFEHelpEditorWidget::openScript(QString dir, bool saveDir) {
+void QFEHelpEditorWidget::openScript(QString dir, bool saveDir, const QString &filename_in) {
     if (maybeSave()) {
         if (dir=="last") {
             dir=ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastScriptDir", ProgramOptions::getInstance()->getMainHelpDirectory()).toString();
         }
-        QString filename=qfGetOpenFileName(this, tr("Open help file ..."), dir, tr("QuickFit 3 help (*.html *.htm *.inc);;All Files (*.*)"))    ;
+        QString filename=filename_in;
+        if (filename.isEmpty()) filename=qfGetOpenFileName(this, tr("Open help file ..."), dir, tr("QuickFit 3 Help (*.html *.htm *.inc *.ini);;All Files (*.*)"))    ;
         if (QFile::exists(filename)) {
             QFile f(filename);
             if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
@@ -567,7 +633,7 @@ void QFEHelpEditorWidget::on_btnLink_clicked()
     QStringList links;
     links<<"http://";
     QString txt=ui->edtScript->getEditor()->toPlainText();
-    QRegExp rxLink("<a\\s*[^>]*name\\s*=\\s*\"\#([^\"']*)\"[^>]*>", Qt::CaseInsensitive);
+    QRegExp rxLink("<a\\s*[^>]*name\\s*=\\s*\"\\#([^\"']*)\"[^>]*>", Qt::CaseInsensitive);
     rxLink.setMinimal(false);
     int count = 0;
     int pos = 0;

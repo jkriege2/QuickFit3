@@ -18,10 +18,14 @@ TEMPLATE = app
 SOURCES += main.cpp \
     ../../qftools.cpp \
     ../../qfmathtools.cpp \
-    ../../qfmathparser.cpp
+    ../../qfmathparser.cpp \
+    ../../qfmathparserdefaultlib.cpp \
+    ../../qfmathparsertools.cpp
 
 HEADERS += \
     ../../qftools.h \
     ../../qfmathtools.h \
     ../../qfmathparser.h \
-    ../../lib_imexport.h
+    ../../lib_imexport.h \
+    ../../qfmathparserdefaultlib.h \
+    ../../qfmathparsertools.h

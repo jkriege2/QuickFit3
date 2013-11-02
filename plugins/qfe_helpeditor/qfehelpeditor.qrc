@@ -55,5 +55,8 @@
         <file>icons/bformula.png</file>
         <file>icons/formula.png</file>
         <file>icons/insert_code.png</file>
+        <file alias="script_saveas.png">icons/script_saveas.png</file>
+        <file>icons/openexample.png</file>
+        <file>icons/opentemplate.png</file>
     </qresource>
 </RCC>

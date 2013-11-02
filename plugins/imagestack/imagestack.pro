@@ -18,14 +18,17 @@ HEADERS += qfrdrimagestack.h \
 		   qfrdrimagestack_dataeditor.h \
     ../interfaces/qfrdrimagestackinterface.h \
     ../interfaces/qfrdrimagemask.h \
-    ../base_classes/qfrdrimagemasktools.h
+    ../base_classes/qfrdrimagemasktools.h \
+    qfrdrimagestack3dviewer.h
 
 SOURCES += qfrdrimagestack.cpp \
            qfrdrimagestack_data.cpp \
 		   qfrdrimagestack_dataeditor.cpp \
-    ../base_classes/qfrdrimagemasktools.cpp
+    ../base_classes/qfrdrimagemasktools.cpp \
+    qfrdrimagestack3dviewer.cpp
 
-FORMS = 
+FORMS = \ 
+    qfrdrimagestack3dviewer.ui
 
 RESOURCES += qfrdrimagestack.qrc
 
@@ -40,7 +43,7 @@ ASSETS_TESTDATA.files = ./examples/testdata/*.*
 ASSETS_TESTDATA.path = $${QFOUTPUT}/examples/$${TARGET}/testdata/
 INSTALLS += ASSETS_TESTDATA
 
-QT += gui xml core
+QT += gui xml core opengl
 CONFIG += exceptions rtti stl
 
 OTHER_FILES += \

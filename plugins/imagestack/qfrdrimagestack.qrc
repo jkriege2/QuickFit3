@@ -16,5 +16,10 @@
         <file alias="singlefile_stack.png">images/singlefile_stack.png</file>
         <file alias="singlefile_dvh_stack.png">images/singlefile_dvh_stack.png</file>
         <file alias="singlefile_dvv_stack.png">images/singlefile_dvv_stack.png</file>
+        <file alias="viewer3d.png">images/viewer3d.png</file>
+        <file alias="copyimagetomatlab.png">images/copyimagetomatlab.png</file>
+        <file alias="saveimage.png">images/saveimage.png</file>
+        <file alias="copyimage.png">images/copyimage.png</file>
+        <file alias="printimage.png">images/printimage.png</file>
     </qresource>
 </RCC>

@@ -15,5 +15,5 @@ INCLUDEPATH += $$QFOUTPUT/../libqf3widgets/
 
 RESOURCES +=
 
-
+QT += opengl
 

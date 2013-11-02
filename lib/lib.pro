@@ -103,7 +103,9 @@ HEADERS += dlgnewproperty.h \
     qfdoubleslider.h \
     qffitfunctionparsed.h \
     qfparametercorrelationservice.h \
-    datatools.h
+    datatools.h \
+    qfmathparsertools.h \
+    qfmathparserdefaultlib.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -175,7 +177,9 @@ SOURCES += dlgnewproperty.cpp \
     qfdoubleslider.cpp \
     qffitfunctionparsed.cpp \
     qfparametercorrelationservice.cpp \
-    datatools.cpp
+    datatools.cpp \
+    qfmathparsertools.cpp \
+    qfmathparserdefaultlib.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

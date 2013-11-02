@@ -129,7 +129,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/qt/qfvisualize3dglwidget.h \
     ../../../../LIB/trunk/qt/qfvisualize3dgleditor.h \
     ../../../../LIB/trunk/qt/qfluteditor.h \
-    ../../../../LIB/trunk/highrestimer.h
+    ../../../../LIB/trunk/highrestimer.h \
+    ../../../../LIB/trunk/ticktock.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \

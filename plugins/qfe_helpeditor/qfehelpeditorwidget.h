@@ -32,16 +32,22 @@ class QFEHelpEditorWidget : public QWidget {
 
 
     protected slots:
+        void documentWasModified();
         void on_btnExecute_clicked();
         void on_btnNew_clicked();
         void on_btnOpen_clicked();
+        bool save();
+        bool saveAs();
+        bool saveFile(const QString &filename);
         void on_btnSave_clicked();
+        void on_btnSaveAs_clicked();
         void on_btnOpenExample_clicked();
         void on_btnOpenTemplate_clicked();
+        void on_btnOpenTemplate2_clicked();
         void edtScript_cursorPositionChanged();
         void on_btnHelp_clicked();
 
-        void openScript(QString dir, bool saveDir=true);
+        void openScript(QString dir, bool saveDir=true, const QString& filename=QString());
         void openScriptNoAsk(QString filename);
 
         void on_btnBold_clicked();
@@ -105,6 +111,7 @@ class QFEHelpEditorWidget : public QWidget {
     protected:
         bool maybeSave();
         void setScriptFilename(QString filename);
+        void closeEvent(QCloseEvent* event);
 
         QString currentScript;
     private:
@@ -113,6 +120,8 @@ class QFEHelpEditorWidget : public QWidget {
 
         QStringList defaultWords;
         QString lastScript;
+
+        bool modified;
 
         QFHTMLHighlighter* highlighter;
         QAction *cutAct;

@@ -135,6 +135,43 @@ inline double qfSlit(double x, double a) {
     return 0;
 }
 
+/** \brief evaluate the polynomial defined by coefficients at the position x
+    \ingroup qf3lib_mathtools
+ */
+inline double qfEvalPolynomial(double x, const double* coefficients, int NC) {
+    register double r=0;
+    register double xf=1;
+    for (register int i=0; i<NC; i++) {
+        r+=coefficients[i]*xf;
+        xf=xf*x;
+    }
+    return r;
+}
+
+/** \brief evaluate the polynomial defined by coefficients at the position x
+    \ingroup qf3lib_mathtools
+ */
+inline double qfEvalPolynomial(double x, const QVector<double>& coefficients) {
+    return qfEvalPolynomial(x, coefficients.data(), coefficients.size());
+}
+
+
+/** \brief derive the polynomial defined by coefficients at the position x
+    \ingroup qf3lib_mathtools
+ */
+inline QVector<double> qfDerivePolynomial(const QVector<double>& coefficients) {
+    QVector<double> r;
+    if (coefficients.size()<=1) {
+        r<<0.0;
+        return r;
+    }
+    for (int i=1; i<coefficients.size(); i++) {
+        r<<coefficients[i]*double(i);
+    }
+    return r;
+}
+
+
 /** \brief convert degrees (0..360) ro radians (0..2pi)
     \ingroup qf3lib_mathtools
  */

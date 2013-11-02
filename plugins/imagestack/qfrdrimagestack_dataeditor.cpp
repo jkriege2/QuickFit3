@@ -10,12 +10,18 @@ QFRDRImageStackDataEditor::QFRDRImageStackDataEditor(QFPluginServices* services,
     selection=NULL;
     selectionWidth=0;
     selectionHeight=0;
+    viewer3D=NULL;
     createWidgets();
 
 }
 
 QFRDRImageStackDataEditor::~QFRDRImageStackDataEditor()
 {
+    if (viewer3D) {
+        viewer3D->close();
+        delete viewer3D;
+        viewer3D=NULL;
+    }
     if (selection) free(selection);
 }
 
@@ -191,9 +197,14 @@ void QFRDRImageStackDataEditor::createWidgets() {
     toolbar->addSeparator();
     maskTools->registerPlotterMaskToolsToToolbar(toolbar);
 
+    act3DViewer=new QAction(QIcon(":/image_stack/viewer3d.png"), tr("&3D viewer"), this);
+    connect(act3DViewer, SIGNAL(triggered()), this, SLOT(show3DViewer()));
+
 
     menuMask=propertyEditor->addMenu("&Mask", 0);
     menuTools=propertyEditor->addMenu("Stack &Tools", -1);
+    menuTools->addAction(act3DViewer);
+
 
     maskTools->registerMaskToolsToMenu(menuMask);
 
@@ -236,6 +247,9 @@ void QFRDRImageStackDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
     //connect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)));
     //channelModeChanged();
     stackChanged();
+    if (viewer3D) {
+        viewer3D->init(m, cmbImageStack->currentIndex());
+    }
 };
 
 void QFRDRImageStackDataEditor::rawDataChanged() {
@@ -657,6 +671,19 @@ void QFRDRImageStackDataEditor::channelModeChanged() {
 
     connectWidgets();
     displayImage();
+}
+
+void QFRDRImageStackDataEditor::show3DViewer()
+{
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QFRDRImageStackData* mv=qobject_cast<QFRDRImageStackData*>(current);
+    int idx=cmbImageStack->currentIndex();
+    if (!viewer3D) {
+        viewer3D=new QFRDRImageStack3DViewer(NULL);
+    }
+    viewer3D->init(mv, idx);
+    viewer3D->show();
+    QApplication::restoreOverrideCursor();
 }
 
 
