@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+<meta name="qrichtext" content="1" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Plot Widget Color Palettes</title>
+</head>
+<body>
+$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+<p> The <a href="jkqtplotter.html">plot widgets</a> in QuickFit use a common set of color palettes that may be used to draw false-color images. A set of approx. 50 palettes is hardcoded in QuickFit. This set can be extended with color palette files in the directory <tt>$$assetsdir$$/colorpalettes/</tt>. Every palette is made up of a list of colors (as red, green and blue combonents <tt>r,g,b</tt> and an according positions <tt>x</tt> in the palette. The position has to be in increasing order. The values in between the given colors are linearly interpolated. E.g. the following palette would create a color scale starting at blue, changing to green and ending at red:
+<pre>
+  # x, r, g, b<br>
+  0.0, 0, 0, 255<br>
+  0.5, 0, 255, 0<br>
+  1.0, 255, 0, 0<br>
+</pre>
+<a name="colorpalettes_pic000"><img src="./pic/colorpalettes_pic001.png" border="1"><br>
+If the <tt>x</tt>-column is changed, also the position of the defined colors changes:
+<pre>
+  # x, r, g, b<br>
+  0.0, 0, 0, 255<br>
+  0.25, 0, 255, 0<br>
+  1.0, 255, 0, 0<br>
+</pre>
+<a name="colorpalettes_pic001"><img src="./pic/colorpalettes_pic000.png" border="1">
+</p>
+<p>
+Several fileformats are allowed:<ul>
+  <li><b><a href="http://paraview.org/Wiki/Colormaps">ParaView XML Format (*.xml)</a>:</b> Palettes in this format are stored as XML file of the form:
+<pre>
+  &lt;doc&gt;<br>
+  &lt;ColorMap name="example BGR" space="RGB"&gt;<br>
+    &lt;Point x="0" r="0" g="0" b="1.0"/&gt;<br>
+    &lt;Point x="0.5" r="0" g="1.00" b="0"/&gt;<br>
+    &lt;Point x="1" r="1" g="0" b="0"/&gt;<br>
+  &lt;/ColorMap&gt;<br>
+  &lt;/doc&gt;<br>
+</pre>  
+  Several ColorMap tags are allowed per file, each defining a color map with the given <tt>name</tt>. Currently only the color space <tt>RGB</tt> is supported by QuickFit. All color values (r,g,b) have to be in the range 0..1.
+  </li>
+  <li><b>Text palette format (*.csv *.pal *.rgb):</b> This format is a simple comma/tab/space separated file format. The files may contain 3 (r,g,b) or 4 columns (x,r,g,b) and the RGB-values have to scale between 0..1 or 0..255 (the same on a per-file basis). If no x-column is given, x is linearly spaced. Here are two examples, which generate the two colorbars above:
+<pre>
+  # r g b<br>
+  0 0 1<br>
+  0 1 0<br>
+  1 0 0<br>
+</pre>
+Or with XRGB:
+<pre>
+  # x, r, g, b<br>
+  0.0, 0, 0, 255<br>
+  0.25, 0, 255, 0<br>
+  1.0, 255, 0, 0<br>
+</pre>
+The name of the palette will be the same as the filename.
+  </li>
+</ul>
+</p>
+
+
+
+$$qf_commondoc_footer.start$$ $$qf_commondoc_footer.end$$
+</body>
+</html>
