@@ -31,7 +31,6 @@ FORMS = \
     qfrdrimagestack3dviewer.ui
 
 RESOURCES += qfrdrimagestack.qrc
-
 TRANSLATIONS= ./translations/de.image_stack.ts
 
 INCLUDEPATH += ../../lib/ \
@@ -45,9 +44,6 @@ INSTALLS += ASSETS_TESTDATA
 
 QT += gui xml core opengl
 CONFIG += exceptions rtti stl
-
-OTHER_FILES += \
-    ../base_classes/mask*
 
 
 

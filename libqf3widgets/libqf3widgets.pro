@@ -126,11 +126,11 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfrdrimagetorunpreview.h \
     qfrdrimagemaskedittools.h \
     qfrdrimagemaskbyintensity.h \
-    ../../../../LIB/trunk/qt/qfvisualize3dglwidget.h \
-    ../../../../LIB/trunk/qt/qfvisualize3dgleditor.h \
     ../../../../LIB/trunk/qt/qfluteditor.h \
     ../../../../LIB/trunk/highrestimer.h \
-    ../../../../LIB/trunk/ticktock.h
+    ../../../../LIB/trunk/ticktock.h \
+    ../../../../LIB/trunk/qt/qfvisualize3dglwidget.h \
+    ../../../../LIB/trunk/qt/qfvisualize3dgleditor.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -219,10 +219,10 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfrdrimagetorunpreview.cpp \
     qfrdrimagemaskedittools.cpp \
     qfrdrimagemaskbyintensity.cpp \
-    ../../../../LIB/trunk/qt/qfvisualize3dglwidget.cpp \
-    ../../../../LIB/trunk/qt/qfvisualize3dgleditor.cpp \
     ../../../../LIB/trunk/qt/qfluteditor.cpp \
-    ../../../../LIB/trunk/highrestimer.cpp
+    ../../../../LIB/trunk/highrestimer.cpp \
+    ../../../../LIB/trunk/qt/qfvisualize3dglwidget.cpp \
+    ../../../../LIB/trunk/qt/qfvisualize3dgleditor.cpp
 
 
 FORMS += qfdlg_csvparameters.ui \
@@ -235,6 +235,7 @@ FORMS += qfdlg_csvparameters.ui \
     qfrdrimagemaskbyintensity.ui \
     ../../../../LIB/trunk/qt/qfvisualize3dgleditor.ui
 
+
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
              ../../../../LIB/trunk/qt/qspecialtoolbutton.qrc \
              ../../../../LIB/trunk/qt/jkstyledbutton.qrc \
@@ -246,6 +247,7 @@ RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \
     ../../../../LIB/trunk/qt/qtlogfile.qrc \
     ../extlibs/xits.qrc \
     ../../../../LIB/trunk/qt/qfvisualize3d.qrc
+
 
 TRANSLATIONS= ./translations/de.quickfit3widgets.ts
 
