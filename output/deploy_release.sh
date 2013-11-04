@@ -266,6 +266,7 @@ if [ "${create_deploy}" != "0" ]; then
 	rm *.nsi
 	rm *.~*
 	rm ATMCD32D.DLL
+	rm plugins/ATMCD32D.DLL
 	rm *setup.exe
 	rm test*.*
 	rm untitled*.*

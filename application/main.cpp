@@ -40,6 +40,10 @@ int main(int argc, char * argv[])
     Q_INIT_RESOURCE(quickfit3);
     QApplication app(argc, argv);
 
+    if (!QFile::exists(app.applicationDirPath()+"plugins/ATMCD32D.dll") && QFile::exists(app.applicationDirPath()+"ATMCD32D.dll")) {
+        QFile::copy(app.applicationDirPath()+"ATMCD32D.dll", app.applicationDirPath()+"plugins/ATMCD32D.dll");
+    }
+
     app.setOrganizationName("German Cancer Research Center: B040 (Biophysics of Macromolecules)");
     app.setApplicationName(QString("QuickFit %1 (SVN %2 DATE %3)").arg(qfInfoVersionFull()).arg(QString(qfInfoSVNVersion()).trimmed()).arg(QString(qfInfoCompileDate()).trimmed()));
     app.setOrganizationDomain("http://www.dkfz.de/Macromol");
