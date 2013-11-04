@@ -25,37 +25,53 @@
 
 -->
 <!--
-		<li><a name="2733"><b>2013-09-24 (SVN: 2733)</b>-->
+		<li><a name="2863"><b>2013-11-04 (SVN: 2863)</b>-->
 		
 		<ul>
 		  <li><b>new plugins:</b><ul>
-		    <li><b>fitfunctions_tifcs</b>: fit functions for imaging TIR-FCS (so far: 2D normal and anomalous diffusion + 2D diffusion+flow)</li>
+		    <li><b>fitfunctions_tifcs</b>: fit functions for imaging TIR-FCS (so far: 2D normal and anomalous diffusion + 2D diffusion+flow and FCCS models all with a pixel-detector)</li>
 		    <li><b>fitalgorithms_gsl</b>: this plugin makes the fit and minimization algorithms in the GNU SCIENTIFIC LIBRARY (GSL) available to QuickFit (implemented simplex, randomized simplex, BFGS2, steepest descent, conjugate gradient minimizer)</li>
 			<li><b>lights_coboltlaser</b>: plugin to control Cobolt lasers as lightsources via a serial interface </li>
 			<li><b>stage_pi863_2</b>: plugin to control PI Mercury stages, which allows several controllers to be connected to different ports </li>
 			<li><b>meas_b040resheater</b>: plugin to control our B040 Temperature Controller </li>
 			<li><b>servo_pololu_maestro</b>:  plugin to control filterwheels and shutters built from servos connected to a Pololu Maestro controller (http://www.pololu.com/docs/pdf/0J40/maestro.pdf)</li>
 			<li><b>shutter_relais_arduino</b>: plugin to control our B040 Relais Shutter Driver </li>
+			<li><b>qfe_gslmathparserextensions</b>: added this plugin which encapsulates some of the GSL functions into the internal expression parser </li>
+			<li><b>qfe_plotterexporterlatex</b>: added this plugin, which registers special image export formats for JKQtPlotter, which output Pgf/Tikz LaTeX files. </li>
 		  </ul></li>
 		  <li><b>QuickFit</b><ul>
+			<li>updated online help for tools</li>
 		    <li>made histograms use less space by default</li>
 		    <li>improved print quality of fancy text/check marks in enhanced tables</li>
 		    <li>tables can be copied as image to clipboard</li>
 		    <li>can set network proxy in settings Dialog</li>
 		    <li>added automatic and manual (Help menu) updates check</li>
 		    <li>can select whether automatically check for updates in settings dialog</li>
-			<li>QFMathParser: added functions atanh, asinh, acosh</li>
-			<li>QFMathParser: added more statistical function to expression parser: corrcoeff(), skewness(), moment(), ncmoment()</li>
 			<li>added initial support for user-defined fit functions</li>
 			<li>added tool to edit user fit functions</li>
-			<li>QFMathParser: added functions find() and select() to QFMathParser  => documentation still needed</li>
-			<li>QFMathParser: improved functions remove(), removeAll(), concat(), ... they all support vectors of all types now (not just numbers)</li>
-			<li>QFMathParser: implemented compare operations between vectors and single values</li>
-			<li>QFMathParser: all comparisons work on vectors element-wise now (where it makes sense, e.g. [1,2,3]>[1,1,1] will return [false, true, true])</li>
-			<li>QFMathParser: added functions countoccurences(), alltrue(), allfalse(), contains(), isnan(), isinf(), isfinite(), isnumok()</li>
-			<li>QFMathParser: comparisons == and !0 between vectors return a boolean vector now</li>
+			<li>QFMathParser: <ul>
+			  <li>added functions find() and select() to QFMathParser  => documentation still needed</li>
+			  <li>improved functions remove(), removeAll(), concat(), ... they all support vectors of all types now (not just numbers)</li>
+			  <li>implemented compare operations between vectors and single values</li>
+			  <li>all comparisons work on vectors element-wise now (where it makes sense, e.g. [1,2,3]>[1,1,1] will return [false, true, true])</li>
+			  <li>added functions countoccurences(), alltrue(), allfalse(), contains(), isnan(), isinf(), isfinite(), isnumok()</li>
+			  <li>comparisons == and !0 between vectors return a boolean vector now</li>
+			  <li>added more statistical function to expression parser: corrcoeff(), skewness(), moment(), ncmoment()</li>
+			  <li>added functions atanh, asinh, acosh</li>
+			  <li>added indexed statistics functions: unique, indexedmean, indexedsum, indexedsum2, indexedmin, indexedmax, indexedmedian, indexedstd, indexedvar, indexedquantile, indexedskewness, indexedprod, indexedcount, indexedmoment, indexedncmoment, indexedcorrcoeff</li>
+			  <li>added vector functions: item, last, first, returnlast, returnfirst</li>
+			  <li>added functions for polynomials: polyval(), polyder()</li>
+			</ul></li>
 			<li>evaluationeditor: results table: property columns may be copied and have a tooltip now (thanks to Tabea)</li>
 			<li>evaluationeditor: results table: with of vertical header is limited to 750px now (so very long file names are elided)</li>
+			<li>bugfix: "set property in RDR" did not work for boolean properties</li>
+			<li>bugfix: set RDR property by RegExp didn't work for the %0,%1,... replace option</li>
+			<li>set RDR property by RegExp: added more options for output-replacement, can use more than just "name" as input</li>
+			<li>plotter widgets: symbols are plotted more precisely now (changed some params from int to double)</li>
+			<li>histogram and parameter correlation view now have buttons to save/print a report</li>
+			<li>histogram and parameter correlation view now have buttons to copy/save the data used for the histogram</li>
+			<li>bugfix: fixed auto-range for histogram view, if multiple histograms are present!</li>
+			<li>added functions to read user-defined color palettes from assets/colorpalettes (+documentation on this)</li>
 		  </ul></li>	
 		  <li><b>imagingFCS</b><ul>
 		    <li>added label with the relative CCF amplitudes to the FCCS-mode widgets</li>
@@ -73,6 +89,13 @@
 			<li>changed bleach correction in load-single-frame mode from divide by bleach-function to the more complex expression by Ries etal.</li>
 			<li>residuals plot is now properly displayed also when there i no data (tau-axis visible)</li>
 			<li>bugfix (thanks to Nikki): plugin crashed while performing bleach correction</li>
+			<li>added possibility to copy number of pixels, used for the statistics in "Copy Result statistics to..."</li>
+			<li>median/min/max/... omits NAN/INF/... now on "Copy Result statistics to..."</li>
+			<li>bleach correction models exp(poly2) and exp(poly3) no longer have an offset term (e.g. A*exp(-(o+t+f2*t^2)) is now A*exp(-(t+f2*t^2)) ), as this offset term was superfluous (the amplitude A does the same!)</li>
+			<li>added two bleach model with 4th and 5th order polynomials: exp(poly4) and exp(poly5) [USE WITH CARE, as they may overfit!!!]</li>
+			<li>added the possibility to select a parameter image FROM ANOTHER FILE (from the same group) AND FILESET (also in the current file), instead of from the current file</li>
+			<li>can now also plot correlation between any parameter and the x-coordinate/y-coordinate/pixel distance from center of image</li>
+			<li>fixed correlation parameter vs. image, which didn't work (image-axis had wrong values!)</li>
 		  </ul></li>	
 		  <li><b>table</b><ul>
 		    <li>bugfix: controls were not correctly displayed, when plotting a function</li>
@@ -85,6 +108,18 @@
 			<li>curve fit + regression now output the parameters+errors as label for the fit function</li>
 			<li>curve fit + regression output the parameter errors in their own column</li>
 			<li>bugfix: autoscale for axes didn't work anymore</li>
+			<li>column-expression parser: column() command takes a second (optional) argument now, which specifies which rows to read</li>
+			<li>the shortcut "=" starts expression editing in a cell</li>
+			<li>added result preview to column and cell expression editors</li>
+			<li>added options to load/save/copy/paste the (selected) table layout</li>
+			<li>bugfix: column expression was overwritten with 0 on read</li>
+			<li>bugfix: improved handling of plot colors</li>
+			<li>added widgets to set error-bar width, error-bar linestyle, error linewidth</li>
+			<li>improved regression and curve-fit dialogs (splitter and parameters are now besides the plots)</li>
+			<li>added auto-checkboxes for fill-, error- and centerline-color (chen checked the color is set according to the graph's color, else it is user-defined)</li>
+			<li>in column/cell expression editors: added context menu to expression editor edit, which allows to insert the column ID or 'column(ID)' by choosing a column from the menu!</li>
+			<li>added undo/redo functionality to table editor</li>
+			<li>added  functions collength, colimagewidth, colimageheight to table expression parser</li>
 		  </ul></li>	
 		  <li><b>qfe_calculator</b><ul>
 		    <li>added multiline expression editor widget</li>
@@ -101,12 +136,14 @@
 			<li>"delete" removes all selected items</li>
 			<li>viewer may display additional data entries from .ini files now (e.g. pKa for some fluorescent proteins ...)</li>
 			<li>added saveguard against possible crash while reading database</li>
+			<li>bugfix: shouldn't crash on win32 anymore on startup</li>
 		  </ul></li>	
 		  <li><b>imFCCSFit</b><ul>
 		    <li>"calculate crosstalk-corrected relative CCF amplitude" now can also use the g(0) fit result as input data!</li>
 		    <li>added global-local iterations to QFGlobalFitTool</li>
 			<li>image mask can be edited in the image preview widget</li>
 			<li>added mask by image option to preview widget</li>
+			<li>bugfix: guessed file sets didn't show up in some cases</li>
 		  </ul></li>	
 		  <li><b>imFCSFit</b><ul>
 		    <li>fixed possible crash</li>
@@ -117,12 +154,17 @@
 		  <li><b>fitfunctions_lightsheet:</b><ul>
 		    <li>all functions now support parameter guessing</li>
 		  </ul></li>	
+		  <li><b>fitfunctions_fcs:</b><ul>
+		    <li>added fitfunction with flow and v,D,wxy as parameters</li>
+			<li>added functions for circle-scanning FCS</li>
+		  </ul></li>	
 		  <li><b>fcs</b><ul>
 		    <li>added some runselection tools to the correlation function tab (mask outliers ...)</li>
 			<li>added fucntions to read Oleg Kriechevsky's internal binary dataformat</li>
 		  </ul></li>	
 		  <li><b>fcsfit</b><ul>
 		    <li>added option to automatically calibrate all runs of current record.</li>
+			<li>the plot contains two data columns for the NORMALIZED correlation function (and it's transformed weights) now. Normalization is done ONLY if a fit parameter n_particle (N) or 1n_particle (1/N) is present in the current model. After a fit which gives a proper N the normalized data is there and can be copied (right-click plot and display data table or copy data ...). Normalization is done by multiplying the CF with the extracted N. For the transformed weights standard gaussian error propagation for the product ist used.</li>
 		  </ul></li>	
 		  <li><b>fitalgorithm_lmfit</b><ul>
 		    <li>speed improvement by removing several malloc/free calls</li>
@@ -142,9 +184,21 @@
 			<li>all 1/e^2-widths should be w and all 1/sqrt(e) width should be sigma now </li>
 			<li>bugfix: sorting of D-s was corrupted in some models [sorted also if one of the Ds was fixed] (thanks to Agata)</li>
 		  </ul></li>	
-		  <li><b>fccs_fitmodels</b><ul>
+		  <li><b>fitfunctions_fccs</b><ul>
 		    <li>added fit function with one and two D's per channel, not per species</li>
 		    <li>FCCS fit function have been renamed (clearer notation)</li>
+		  </ul></li>	
+		  <li><b>fcsfit_msd</b><ul>
+		    <li>added 2D and 3D model with triplet correction</li>
+		  </ul></li>	
+		  <li><b>image_stack</b><ul>
+		    <li>bugfix: mask editing works again</li>
+			<li>added 3D viewer (in "Stack Tools" menu) ... THIS FEATURE IS EXPERIMENTAL AND NOT GUARANTEED TO BE STABLE!!!</li>
+		  </ul></li>	
+		  <li><b>qfe_helpeditor</b><ul>
+		    <li>made new/open/save/saveAs more like standard editors!</li>
+			<li>new icon</li>
+			<li>added several templates</li>
 		  </ul></li>	
 
 		</ul>
