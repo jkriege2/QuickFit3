@@ -83,6 +83,8 @@ fi
 
 echo -e "DEPLOYING QUICKFIT\n  in order to deploy without recompiling, call with option --nomake"
 
+svn update
+svn update ../output
 echo -e "\n\ndetermining SVN version:"
 SVNVER=`svnversion`
 #if [ -z $SVNVER]
@@ -266,9 +268,11 @@ if [ "${create_deploy}" != "0" ]; then
 	rm *.nsi
 	rm *.~*
 	rm ATMCD32D.DLL
-	rm plugins/ATMCD32D.DLL
 	rm atmcd64d.DLL
-	rm plugins/atmcd64d.DLL
+	cd plugins
+	rm ATMCD32D.DLL
+	rm atmcd64d.DLL
+	cd ..
 	rm *setup.exe
 	rm test*.*
 	rm untitled*.*
@@ -314,7 +318,7 @@ UNINSTALLER_FILES=
 for f in `find . -type f`
 do
     fn=${f//\//\\\\}
-	fn=${fn//.\\/}
+	fn=${fn//.\\\\/}
     INSTALLER_FILES="${INSTALLER_FILES}\\
 File \"\\/oname=$fn\" \"$fn\""
     UNINSTALLER_FILES="${UNINSTALLER_FILES}\\
@@ -324,7 +328,7 @@ INSTALLER_DIRS=
 for f in `find . -type d`
 do
     fn=${f//\//\\\\}
-	fn=${fn//.\\/}
+	fn=${fn//.\\\\/}
     INSTALLER_DIRS="${INSTALLER_DIRS}\\
 CreateDirectory  \"\$INSTDIR\\$fn\""
     
@@ -337,7 +341,7 @@ SPIMUNINSTALLER_FILES=
 for f in `find . -type f`
 do
     fn=${f//\//\\\\}
-	fn=${fn//.\\/}
+	fn=${fn//.\\\\/}
     SPIMINSTALLER_FILES="${SPIMINSTALLER_FILES}\\
 File \"\\/oname=$fn\" \"$fn\""
     SPIMUNINSTALLER_FILES="${SPIMUNINSTALLER_FILES}\\
@@ -347,7 +351,7 @@ SPIMINSTALLER_DIRS=
 for f in `find . -type d`
 do
     fn=${f//\//\\\\}
-	fn=${fn//.\\/}
+	fn=${fn//.\\\\/}
     SPIMINSTALLER_DIRS="${SPIMINSTALLER_DIRS}\\
 CreateDirectory  \"\$INSTDIR\\$fn\""
     
@@ -359,19 +363,19 @@ echo $SPIMUNINSTALLER_FILES
 echo $SPIMINSTALLER_DIRS
 
 sed "s/%%INSTALLER_FILES%%/$INSTALLER_FILES/" nsis_basicscript.nsi > nsis_basicscript.~si
-ls-l *.~*
+ls -l *.~*
 sed "s/%%UNINSTALLER_FILES%%/$UNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
-ls-l *.~*
+ls -l *.~*
 sed "s/%%SPIMINSTALLER_FILES%%/$SPIMINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
-ls-l *.~*
+ls -l *.~*
 sed "s/%%SPIMUNINSTALLER_FILES%%/$SPIMUNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
-ls-l *.~*
+ls -l *.~*
 sed "s/%%INSTALLER_BASENAME%%/$INSTALLER_BASENAME/" nsis_basicscript.~si > nsis_basicscript.~~s 
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
-ls-l *.~*
+ls -l *.~*
 sed "s/%%SVNVER%%/$SVNVER/" nsis_basicscript.~si > nsis_basicscript.~~s
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
