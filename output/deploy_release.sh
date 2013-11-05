@@ -327,9 +327,14 @@ done
 INSTALLER_DIRS=
 for f in `find . -type d`
 do
+	echo "$fn"
     fn=${f//\//\\\\}
-	fn=${fn//.\\\\/}
+	echo "$fn"
+	fn=${fn//.\\/}
+	echo "$fn"
     INSTALLER_DIRS="${INSTALLER_DIRS}\\
+CreateDirectory  \"\$INSTDIR\\$fn\""
+	echo "BLA\\
 CreateDirectory  \"\$INSTDIR\\$fn\""
     
 done
