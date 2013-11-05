@@ -40,9 +40,9 @@ sed '/CALLS_HERE/ {
 
 
 echo 'LIBRARY atmcd32d.dll
-EXPORTS' > atmcd32d.def
+EXPORTS' > atmcd64d.def
 
-dlltool -d atmcd32d.def --dllname atmcd32d.dll --output-lib libandor.a
+dlltool -d atmcd64d.def --dllname atmcd64d.dll --output-lib libandor.a
 
 cp test.cpp test1.cpp
 sed 's/EXPNETTYPE unsigned int WINAPI /    /g' test1.cpp > test1.~cp 
@@ -105,10 +105,10 @@ cp err.~tx err.txt
 sed 's/.*undefined reference.*//g' err.txt > err.~tx
 cp err.~tx err.txt
 
-sed '$r err.txt' <atmcd32d.def >atmcd32d.~def
-cp atmcd32d.~def atmcd32d.def
-dlltool -d atmcd32d.def --dllname atmcd32d.dll --output-lib libandor.a -k
-#rm -f test.~cpp test1.cpp err.~tx  err.txt test1.exe atmcd32d.~h atmcd32d.~hh
+sed '$r err.txt' <atmcd64d.def >atmcd64d.~def
+cp atmcd64d.~def atmcd64d.def
+dlltool -d atmcd64d.def --dllname atmcd64d.dll --output-lib libandor.a -k
+rm -f test.~cpp test1.cpp err.~tx  err.txt test1.exe atmcd32d.~h atmcd32d.~hh
 
 
 

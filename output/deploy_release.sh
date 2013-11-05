@@ -267,6 +267,8 @@ if [ "${create_deploy}" != "0" ]; then
 	rm *.~*
 	rm ATMCD32D.DLL
 	rm plugins/ATMCD32D.DLL
+	rm atmcd64d.DLL
+	rm plugins/atmcd64d.DLL
 	rm *setup.exe
 	rm test*.*
 	rm untitled*.*
