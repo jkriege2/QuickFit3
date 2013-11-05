@@ -101,6 +101,13 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         void insertDiffusion4File(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
         void insertOlegFile(const QStringList &filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
 
+        /*! \brief add a Zeiss Confocor3 file to the current project
+
+            \param filename filename of the Confocor3 file
+            \param paramValues values for parameters in paramNames
+            \param paramReadonly names of initial parameters that should be declared readonly
+        */
+        void insertConfocor3File(const QStringList &filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
     private:
 };
 

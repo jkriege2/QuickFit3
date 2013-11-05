@@ -33,7 +33,8 @@ HEADERS += dlgcsvparameters.h \
             ../interfaces/qfrdrfcsdatainterface.h \
             ../interfaces/qfrdrimageselectioninterface.h \
             ../interfaces/qfrdrrunselection.h \
-    ../base_classes/qfrdrrunselectiontools.h
+    ../base_classes/qfrdrrunselectiontools.h \
+    confocor3tools.h
 
 
 
@@ -52,7 +53,8 @@ SOURCES += dlgcsvparameters.cpp \
     ../base_classes/qfrdrimagemasktools.cpp \
     ../base_classes/qffinderroneouscorrelationdlg.cpp \
     ../base_classes/qffcstools.cpp \
-    ../base_classes/qfrdrrunselectiontools.cpp
+    ../base_classes/qfrdrrunselectiontools.cpp \
+    confocor3tools.cpp
 
 
 

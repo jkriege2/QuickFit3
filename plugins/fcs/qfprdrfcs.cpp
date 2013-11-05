@@ -144,6 +144,39 @@ void QFPRDRFCS::insertOlegFile(const QStringList &filename, const QMap<QString, 
     }
 }
 
+void QFPRDRFCS::insertConfocor3File(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly)
+{
+    /*unsigned int cc=1;
+    QString mode="";
+    unsigned int runCount=0;
+    bool crossCorrelation=false;
+    try {
+        ALV6_analyze(filename.value(0, ""), mode, cc, runCount, crossCorrelation);
+    } catch (std::exception& E) {
+        cc=0;
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV6000 file '%1':\n%2").arg(filename.value(0, "")).arg(E.what()));
+        services->log_error(tr("Error while importing ALV6000 file '%1':\n    %2\n").arg(filename.value(0, "")).arg(E.what()));
+
+    }
+    for (unsigned int i=0; i<cc; i++) {
+        QMap<QString, QVariant> p=paramValues;
+        p["CHANNEL"]=i;
+        QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - CH%2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(i), filename, p, paramReadonly);
+        if (crossCorrelation) {
+            e->setRole(QString("ACF%1").arg(i));
+        }else  {
+            e->setRole(QString("FCCS").arg(i));
+        }
+        if (cc>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
+
+        if (e->error()) {
+            QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV6000 file '%1' (channel %3/%4):\n%2").arg(filename.value(0, "")).arg(e->errorDescription()).arg(i+1).arg(cc));
+            services->log_error(tr("Error while importing ALV6000 file '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));
+            project->deleteRawData(e->getID());
+        }
+    }*/
+}
+
 void QFPRDRFCS::insertFCS() {
     if (project) {
         QString alvf=tr("ALV-5000 file (*.asc)");
