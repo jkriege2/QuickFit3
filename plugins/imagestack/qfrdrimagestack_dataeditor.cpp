@@ -245,7 +245,7 @@ void QFRDRImageStackDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
     connect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
     connect(cmbChannelMode, SIGNAL(currentIndexChanged(int)), this, SLOT(channelModeChanged()));
     //connect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)));
-    //channelModeChanged();
+    channelModeChanged();
     stackChanged();
     if (viewer3D) {
         viewer3D->init(m, cmbImageStack->currentIndex());

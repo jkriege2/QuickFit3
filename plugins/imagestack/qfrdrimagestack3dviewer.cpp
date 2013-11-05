@@ -44,13 +44,14 @@ void QFRDRImageStack3DViewer::init(QFRDRImageStackData *rdr, int stack)
                 double wz=2.0/double(sX);
                 //qDebug()<<"    stack="<<rdr->getImageStack(stack, 0, channel);
                 //qDebug()<<"    w="<<wx<<wy<<wz;
-                ui->widget->addCopiedVolumeData(rdr->getImageStack(stack, 0, channel), sX, sY, sZ,wx, wy, wz, rdr->getImageStackChannelName(stack, channel));
+                ui->widget->addCopiedVolumeData(rdr->getImageStack(stack, 0, channel), sX, sY, sZ,wx, wy, wz, rdr->getImageStackChannelName(stack, channel));                
             }
         }
         //qDebug()<<"read from "<<rdr->getID()<<": "<<rdr->getProperty(QString("3DVIEWERCONFIG_STACK%1").arg(stack)).toString();
         ui->widget->setConfig(rdr->getProperty(QString("3DVIEWERCONFIG_STACK%1").arg(stack)).toString());
         ui->widget->set_doUpdate(true);
         ui->labInfo->setText(tr("<b>file:</b> %1").arg(rdr->getName()));
+        ui->labInfo->setTextFormat(Qt::RichText);
     } else {
         ui->labInfo->setText(tr("<b>no RDR selected ...</b>"));
     }

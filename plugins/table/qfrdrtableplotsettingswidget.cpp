@@ -78,12 +78,13 @@ void QFRDRTablePlotSettingsWidget::setRecord(QFRDRTable *record, int graph)
 
             ui->chkGrid->setChecked(g.grid);
             ui->chkShowKey->setChecked(g.showKey);
+            ui->cmbKeyPosition->setCurrentIndex(g.keyPosition);
+            ui->spinKeyFontSize->setValue(g.keyFontSize);
 
             ui->cmbFontname->setCurrentFont(QFont(g.fontName));
             ui->spinAxisFontSize->setValue(g.axisFontSize);
             ui->spinAxisLabelFontSize->setValue(g.axisLabelFontSize);
             ui->spinTitleFontSize->setValue(g.labelFontSize);
-            ui->spinKeyFontSize->setValue(g.keyFontSize);
             ui->chkKeepAxisAspect->setChecked(g.keepAxisAspectRatio);
             ui->chkKeepDataAspect->setChecked(g.keepDataAspectRatio);
             ui->edtAxisAspect->setValue(g.axisAspectRatio);
@@ -93,7 +94,8 @@ void QFRDRTablePlotSettingsWidget::setRecord(QFRDRTable *record, int graph)
             ui->cmbBackgroundColor->setCurrentColor(g.backgroundColor);
             ui->cmbGridLinestyle->setCurrentLineStyle(g.gridStyle);
             ui->spinGridWidth->setValue(g.gridWidth);
-
+            ui->sliderKeyTransparency->setValue(g.keyTransparency*255.0);
+            ui->cmbKeyLayout->setCurrentIndex(g.keyLayout);
 
         } else {
             setEnabled(false);
