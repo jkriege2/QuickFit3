@@ -317,7 +317,7 @@ QFExtensionCoboltLaser::CoboltLaserTypes QFExtensionCoboltLaser::string2CoboltLa
         return cltDPSS5;
     } else if (t=="DPSS6" || t=="6") {
         return cltDPSS6;
-    } else if (t=="MLD6" || t=="DIODE6") {
+    } else if (t=="MLD6" || t=="MLD" || t=="DIODE6") {
         return cltMLD6;
     }
     return cltGeneric;

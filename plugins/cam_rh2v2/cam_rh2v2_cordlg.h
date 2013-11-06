@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "jkqtfastplotter.h"
+#include <QDoubleSpinBox>
 
 namespace Ui {
 class cam_rh2v2_cordlg;
