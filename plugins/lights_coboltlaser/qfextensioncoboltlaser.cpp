@@ -51,6 +51,11 @@ void QFExtensionCoboltLaser::initExtension() {
         if (inifile.contains("lightsource"+QString::number(i+1)+"/power_send_factor")) {
             s.powerFactor_ParamToSend=inifile.value("lightsource"+QString::number(i+1)+"/power_send_factor", 0.001).toDouble();
         }
+        s.powerFactor_ParamRead=1;
+        if (s.type==cltMLD6) s.powerFactor_ParamRead=1.0/s.powerFactor_ParamToSend;
+        if (inifile.contains("lightsource"+QString::number(i+1)+"/power_read_factor")) {
+            s.powerFactor_ParamRead=inifile.value("lightsource"+QString::number(i+1)+"/power_read_factor", s.powerFactor_ParamRead).toDouble();
+        }
         s.max_power=inifile.value("lightsource"+QString::number(i+1)+"/max_power", 25).toDouble();
         s.wavelength=inifile.value("lightsource"+QString::number(i+1)+"/wavelength", 0).toDouble();
         s.label=inifile.value("lightsource"+QString::number(i+1)+"/label", tr("Cobolt %3: %1 %2nm").arg(coboltLaserType2HumanReadableString(s.type)).arg(s.wavelength).arg(i+1)).toString();
@@ -131,19 +136,27 @@ void QFExtensionCoboltLaser::lightSourceConnect(unsigned int lightSource) {
         //qDebug()<<"serialNumber '"<<sources[lightSource].serialNumber<<"'";
         if (sources[lightSource].serial->hasErrorOccured()) {
             com->close();
-            log_error(tr("%1 Could not connect to Cobolt Laser [port=%1  baud=%2]!!!\n").arg(com->get_port().c_str()).arg(com->get_baudrate()));
+            log_error(tr("%1 Could not connect to Cobolt Laser [port=%2  baud=%3]!!!\n").arg(LOG_PREFIX).arg(com->get_port().c_str()).arg(com->get_baudrate()));
             log_error(tr("%1 reason: Could not read serial number! Error message was: %2\n").arg(LOG_PREFIX).arg(sources[lightSource].serial->getLastError()));
         } else {
+            log_text(tr("%1 connected to Cobolt Laser [port=%2  baud=%3]!!!\n").arg(LOG_PREFIX).arg(com->get_port().c_str()).arg(com->get_baudrate()));
+            log_text(tr("%1 label: %2\n").arg(LOG_PREFIX).arg(sources[lightSource].label));
+            log_text(tr("%1 serial number: %2\n").arg(LOG_PREFIX).arg(sources[lightSource].serialNumber));
+            log_text(tr("%1 laser type: %2\n").arg(LOG_PREFIX).arg(coboltLaserType2HumanReadableString(sources[lightSource].type)));
+            log_text(tr("%1 wavelength: %2 nm\n").arg(LOG_PREFIX).arg(sources[lightSource].wavelength));
+            log_text(tr("%1 max. power: %2 mW\n").arg(LOG_PREFIX).arg(sources[lightSource].max_power));
+
+            if (sources[lightSource].type==cltMLD6) {
+                log_text(tr("%1 laser head operating hours: %2\n").arg(LOG_PREFIX).arg(sources[lightSource].serial->queryCommand("hrs?")));
+                log_text(tr("%1 entering constant power mode\n").arg(LOG_PREFIX));
+                serial->sendCommand(QString("cp"));
+
+            }
             sources[lightSource].setPower=serial->queryCommand("p?").toDouble();
             sources[lightSource].line_enabled=serial->queryCommand("pa?").toDouble()>0.0;
             if (sources[lightSource].line_enabled) serial->sendCommand(QString("p %1").arg(sources[lightSource].setPower*sources[lightSource].powerFactor_ParamToSend,0,'f'));
             else  serial->sendCommand(QString("p 0"));
-            log_text(tr("%1 connected to Cobolt Laser [port=%1  baud=%2]!!!\n").arg(com->get_port().c_str()).arg(com->get_baudrate()));
-            log_text(tr("%1 label: %1\n").arg(LOG_PREFIX).arg(sources[lightSource].label));
-            log_text(tr("%1 serial number: %1\n").arg(LOG_PREFIX).arg(sources[lightSource].serialNumber));
-            log_text(tr("%1 laser type: %1\n").arg(LOG_PREFIX).arg(coboltLaserType2HumanReadableString(sources[lightSource].type)));
-            log_text(tr("%1 wavelength: %1 nm\n").arg(LOG_PREFIX).arg(sources[lightSource].wavelength));
-            log_text(tr("%1 max. power: %1 mW\n").arg(LOG_PREFIX).arg(sources[lightSource].max_power));
+
         }
     } else {
         log_error(tr("%1 Could not connect to Cobolt Laser [port=%1  baud=%2]!!!\n").arg(com->get_port().c_str()).arg(com->get_baudrate()));
@@ -205,8 +218,14 @@ void QFExtensionCoboltLaser::setLightSourcePower(unsigned int lightSource, unsig
     if (!com || !serial) return ;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
     QMutexLocker locker(mutex);
-    if (sources[lightSource].line_enabled) serial->sendCommand(QString("p %1").arg(power*sources[lightSource].powerFactor_ParamToSend,0,'f'));
-    else serial->sendCommand(QString("p 0"));
+    if (sources[lightSource].type==cltMLD6) {
+        serial->sendCommand(QString("cp "));
+    }
+
+    if (sources[lightSource].line_enabled) {
+        serial->sendCommand(QString("p %1").arg(power*sources[lightSource].powerFactor_ParamToSend,0,'f'));
+        qDebug()<<"sending :"<<QString("p %1").arg(power*sources[lightSource].powerFactor_ParamToSend,0,'f')<<"\n";
+    } else serial->sendCommand(QString("p 0"));
     sources[lightSource].lastAction=QTime::currentTime();
     sources[lightSource].setPower=power;
 }
@@ -229,7 +248,7 @@ double QFExtensionCoboltLaser::getLightSourceCurrentMeasuredPower(unsigned int l
     if (!com || !serial) return 0;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
     QMutexLocker locker(mutex);
-    return serial->queryCommand("pa?").toDouble();
+    return serial->queryCommand("pa?").toDouble()*sources[lightSource].powerFactor_ParamRead;
 
 }
 

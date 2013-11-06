@@ -149,6 +149,7 @@ class QFExtensionCoboltLaser : public QObject, public QFExtensionBase, public QF
             double max_power;
             /** \brief any power given to setLightSourcePower() is multiplied by this factor before beeing sent to the controller (usually 0.001 to go from mW to W) */
             double powerFactor_ParamToSend;
+            double powerFactor_ParamRead;
             CoboltLaserTypes type;
             QString serialNumber;
             bool line_enabled;
