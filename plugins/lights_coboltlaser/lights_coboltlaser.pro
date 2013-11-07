@@ -18,7 +18,8 @@ HEADERS += \
     ../../../../../LIB/trunk/jkserialconnection.h \
     qfextensioncoboltlaser.h \
     qfcoboltlaserprotocolhandler.h \
-    ../base_classes/qfsimpleserialprotocolhandler.h
+    ../base_classes/qfsimpleserialprotocolhandler.h \
+    ../interfaces/qfextensionmeasurementdevice.h
 
 
 SOURCES += \

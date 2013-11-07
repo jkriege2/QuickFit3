@@ -30,6 +30,8 @@ class QFESPIMB040AcquisitionDescription : public QWidget, public QFESPIMB040File
         QString getPrefix() const;
 
         void setOtherSettingWidgets(QFESPIMB040OpticsSetupBase *setup, QFESPIMB040ExperimentDescription *exp);
+    public slots:
+        void nextCell();
     protected slots:
         void on_btnClearAll_clicked();
         void on_btnNextCell_clicked();

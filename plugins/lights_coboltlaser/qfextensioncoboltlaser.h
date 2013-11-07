@@ -9,6 +9,7 @@
 #include "qfcoboltlaserprotocolhandler.h"
 #include "../base_classes/qf3comportmanager.h"
 #include "../../../../../LIB/trunk/jkserialconnection.h"
+#include "qfextensionmeasurementdevice.h"
 
 #include "qfextensionlightsource.h"
 
@@ -20,7 +21,7 @@
 /*! \brief QFExtensionLightSource implementation to control Cobolt Lasers (MLD+DPSS, series 3-5)
     \ingroup qf3ext_lights_cobolt
  */
-class QFExtensionCoboltLaser : public QObject, public QFExtensionBase, public QFExtensionLightSource {
+class QFExtensionCoboltLaser : public QObject, public QFExtensionBase, public QFExtensionLightSource, public QFExtensionMeasurementAndControlDevice {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionLightSource)
     public:
@@ -95,6 +96,41 @@ class QFExtensionCoboltLaser : public QObject, public QFExtensionBase, public QF
         /*! \copydoc QFExtensionLightSource::showLightSourceSettingsDialog() */
         virtual void showLightSourceSettingsDialog(unsigned int lightSource, QWidget* parent=NULL);
 
+        /////////////////////////////////////////////////////////////////////////////
+        // QFExtensionMeasurementAndControlDevice routines
+        /////////////////////////////////////////////////////////////////////////////
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+        virtual unsigned int getMeasurementDeviceCount();
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+         virtual void showMeasurementDeviceSettingsDialog(unsigned int measuremenDevice, QWidget* parent=NULL);
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+         virtual bool isMeasurementDeviceConnected(unsigned int measuremenDevice);
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+         virtual void connectMeasurementDevice(unsigned int measuremenDevice);
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+         virtual void disconnectMeasurementDevice(unsigned int measuremenDevice);
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+         virtual void setMeasurementDeviceLogging(QFPluginLogService* logService);
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+        virtual unsigned int getMeasurementDeviceValueCount(unsigned int measuremenDevice);
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+        virtual QString getMeasurementDeviceName(unsigned int measuremenDevice);
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+        virtual QVariant getMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value);
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+        virtual QString getMeasurementDeviceValueName(unsigned int measuremenDevice, unsigned int value);
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+        virtual QString getMeasurementDeviceValueShortName(unsigned int measuremenDevice, unsigned int value);
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+        virtual bool isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value);
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+        virtual void setMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value, const QVariant& data);
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+        virtual QVariant::Type getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value);
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+        virtual WidgetTypes getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList* comboboxEntries=NULL);
+        /*! \copydoc QFExtensionMeasurementAndControlDevice::showLightSourceSettingsDialog() */
+        virtual void getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double& minimum, double& maximum);
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */
         virtual void projectChanged(QFProject* oldProject, QFProject* project);

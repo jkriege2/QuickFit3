@@ -1594,9 +1594,22 @@ void MainWindow::deleteItem() {
                     ok = (QMessageBox::question(this, tr("QuickFit 3.0"), tr("Dou you really want to delete all %1 child items of the selected node?").arg(children.size()), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes);
                 }
                 if (ok) {
+                    // build lists of the IDs to delete
+                    QList<int> evalIDs, rdrIDs;
                     for (int i=0; i<children.size(); i++) {
-                        if (children[i]->type()==QFProjectTreeModelNode::qfpntEvaluationRecord && children[i]->evaluationItem()) project->deleteEvaluation(children[i]->evaluationItem()->getID());
-                        if (children[i]->type()==QFProjectTreeModelNode::qfpntRawDataRecord && children[i]->rawDataRecord()) project->deleteRawData(children[i]->rawDataRecord()->getID());
+                        if (children[i]->type()==QFProjectTreeModelNode::qfpntEvaluationRecord && children[i]->evaluationItem())
+                            evalIDs<<children[i]->evaluationItem()->getID();
+                            //project->deleteEvaluation(children[i]->evaluationItem()->getID());
+                        if (children[i]->type()==QFProjectTreeModelNode::qfpntRawDataRecord && children[i]->rawDataRecord())
+                            rdrIDs<<children[i]->rawDataRecord()->getID();
+                            //project->deleteRawData(children[i]->rawDataRecord()->getID());
+                    }
+                    // delete IDs
+                    for (int i=0; i<evalIDs.size(); i++)  {
+                        project->deleteEvaluation(evalIDs[i]);
+                    }
+                    for (int i=0; i<rdrIDs.size(); i++)  {
+                        project->deleteRawData(rdrIDs[i]);
                     }
                 }
             }

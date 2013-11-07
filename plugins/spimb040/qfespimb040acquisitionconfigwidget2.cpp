@@ -10,7 +10,7 @@
 #include <QtCore>
 #include "qfcompleterfromfile.h"
 #include "qfstyledbutton.h"
-
+#include "qfespimb040acquisitiondescription.h"
 
 QFESPIMB040AcquisitionConfigWidget2::QFESPIMB040AcquisitionConfigWidget2(QFESPIMB040AcquisitionTools* acqTools, QFPluginLogService* log, QWidget* parent, QFPluginServices* pluginServices, QFESPIMB040OpticsSetupBase* opticsSetup, QFESPIMB040AcquisitionDescription* acqDescription, QFESPIMB040ExperimentDescription* expDescription, QString configDirectory) :
     QWidget(parent),
@@ -302,6 +302,12 @@ void QFESPIMB040AcquisitionConfigWidget2::on_btnAcquire_clicked() {
     emit doAcquisition();
     QApplication::processEvents();
     performAcquisition();
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcquireNext_clicked()
+{
+    acqDescription->nextCell();
+    on_btnAcquire_clicked();
 }
 
 void QFESPIMB040AcquisitionConfigWidget2::on_chkUse1_toggled(bool enabled) {

@@ -384,5 +384,87 @@ void QFExtensionCoboltLaser::showLightSourceSettingsDialog(unsigned int lightSou
     QMessageBox::information(parent, getName(), tr("There is no configuration dialog for this device. Set all config in the appropriate ini file:\n  %1\n  or: %2\n  or: %3").arg(ini1).arg(ini2).arg(ini3));
 }
 
+unsigned int QFExtensionCoboltLaser::getMeasurementDeviceCount()
+{
+    return getLightSourceCount();
+}
+
+void QFExtensionCoboltLaser::showMeasurementDeviceSettingsDialog(unsigned int measuremenDevice, QWidget *parent)
+{
+    showLightSourceSettingsDialog(measuremenDevice, parent);
+}
+
+bool QFExtensionCoboltLaser::isMeasurementDeviceConnected(unsigned int measuremenDevice)
+{
+    return isLightSourceConnected(measuremenDevice);
+}
+
+void QFExtensionCoboltLaser::connectMeasurementDevice(unsigned int measuremenDevice)
+{
+    lightSourceConnect(measuremenDevice);
+}
+
+void QFExtensionCoboltLaser::disconnectMeasurementDevice(unsigned int measuremenDevice)
+{
+    lightSourceDisonnect(measuremenDevice);
+}
+
+void QFExtensionCoboltLaser::setMeasurementDeviceLogging(QFPluginLogService *logService)
+{
+    setLightSourceLogging(logService);
+}
+
+QString QFExtensionCoboltLaser::getMeasurementDeviceName(unsigned int measuremenDevice)
+{
+    return getLightSourceShortName(measuremenDevice);
+}
+
+
+
+
+
+unsigned int QFExtensionCoboltLaser::getMeasurementDeviceValueCount(unsigned int measuremenDevice)
+{
+    return 0;
+}
+
+QVariant QFExtensionCoboltLaser::getMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value)
+{
+    return QVariant();
+}
+
+QString QFExtensionCoboltLaser::getMeasurementDeviceValueName(unsigned int measuremenDevice, unsigned int value)
+{
+    return QString();
+}
+
+QString QFExtensionCoboltLaser::getMeasurementDeviceValueShortName(unsigned int measuremenDevice, unsigned int value)
+{
+    return QString();
+}
+
+bool QFExtensionCoboltLaser::isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value)
+{
+    return false;
+}
+
+void QFExtensionCoboltLaser::setMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value, const QVariant &data)
+{
+}
+
+QVariant::Type QFExtensionCoboltLaser::getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value)
+{
+    return QVariant::String;
+}
+
+QFExtensionMeasurementAndControlDevice::WidgetTypes QFExtensionCoboltLaser::getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList *comboboxEntries)
+{
+    return QFExtensionMeasurementAndControlDevice::mdDefault;
+}
+
+void QFExtensionCoboltLaser::getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double &minimum, double &maximum)
+{
+}
+
 
 Q_EXPORT_PLUGIN2(TARGETNAME, QFExtensionCoboltLaser)

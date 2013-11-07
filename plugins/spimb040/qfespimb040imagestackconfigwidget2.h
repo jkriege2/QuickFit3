@@ -100,6 +100,7 @@ class QFESPIMB040ImageStackConfigWidget2 : public QWidget, public QFESPIMB040Fil
         void performStack();
     protected slots:
         void on_btnAcquire_clicked();
+        void on_btnAcquireNext_clicked();
         void on_chkUse1_clicked(bool enabled);
         void on_chkUse2_clicked(bool enabled);
 

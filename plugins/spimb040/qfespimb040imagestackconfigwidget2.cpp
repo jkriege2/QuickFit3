@@ -313,6 +313,12 @@ void QFESPIMB040ImageStackConfigWidget2::on_btnAcquire_clicked() {
     emit doStack();
 }
 
+void QFESPIMB040ImageStackConfigWidget2::on_btnAcquireNext_clicked()
+{
+    acqDescription->nextCell();
+    on_btnAcquire_clicked();
+}
+
 void QFESPIMB040ImageStackConfigWidget2::actGetCurrent_clicked() {
     if (ui->chkStackRelative->isChecked()) { lastGetC=actGetCurrent->isChecked(); updateLabel(); return; }
 
