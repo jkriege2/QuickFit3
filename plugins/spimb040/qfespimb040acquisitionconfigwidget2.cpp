@@ -312,6 +312,7 @@ void QFESPIMB040AcquisitionConfigWidget2::on_btnAcquireNext_clicked()
 
 void QFESPIMB040AcquisitionConfigWidget2::on_chkUse1_toggled(bool enabled) {
     ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
+    ui->btnAcquireNext->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->chkOverview->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->chkBackground->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->edtPrefix1->setEnabled(ui->chkUse1->isChecked());
@@ -322,6 +323,7 @@ void QFESPIMB040AcquisitionConfigWidget2::on_chkUse1_toggled(bool enabled) {
 
 void QFESPIMB040AcquisitionConfigWidget2::on_chkUse2_toggled(bool enabled) {
     ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
+    ui->btnAcquireNext->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->chkOverview->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->chkBackground->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->edtPrefix2->setEnabled(ui->chkUse2->isChecked());

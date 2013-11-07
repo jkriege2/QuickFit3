@@ -409,6 +409,7 @@ void QFESPIMB040ImageStackConfigWidget2::on_chkUse1_clicked(bool enabled) {
     bool updt=updatesEnabled();
     setUpdatesEnabled(false);
     ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
+    ui->btnAcquireNext->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->widStage->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->chkStage2->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->chkStage3->setEnabled((ui->chkUse1->isChecked() || ui->chkUse2->isChecked()) && ui->chkStage2->isChecked());
@@ -423,6 +424,7 @@ void QFESPIMB040ImageStackConfigWidget2::on_chkUse2_clicked(bool enabled) {
     bool updt=updatesEnabled();
     setUpdatesEnabled(false);
     ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
+    ui->btnAcquireNext->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->widStage->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->chkStage2->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->chkStage3->setEnabled((ui->chkUse1->isChecked() || ui->chkUse2->isChecked()) && ui->chkStage2->isChecked());
