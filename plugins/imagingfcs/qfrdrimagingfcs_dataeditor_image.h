@@ -35,10 +35,11 @@
 #include "qfrdrtableinterface.h"
 #include "qfrdrcolumngraphsinterface.h"
 #include "qfplottercopytotabledialog.h"
-#include "qfrdrimagingfcsimageplotter.h"
-#include "qfrdrimagingfcsimageparametergroupbox.h"
-#include "qfrdrimagingfcsoverlaystylecombobox.h"
+#include "qfimageplotter.h"
+#include "qfimageparametergroupbox.h"
+#include "qfoverlaystylecombobox.h"
 #include "qfparametercorrelationview.h"
+#include "frawdataimageeditor.h"
 
 class QFRDRImagingFCSData; // forward
 
@@ -53,7 +54,7 @@ class QFRDRImagingFCSData; // forward
 
     Only fit results from the result group <code>"fit results"</code> can be used for plotting.
 */
-class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
+class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor {
         Q_OBJECT
     public:
 
@@ -61,7 +62,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {
         QFRDRImagingFCSImageEditor(QFPluginServices* services, QFRawDataPropertyEditor* propEditor, QWidget* parent);
         /** Default destructor */
         virtual ~QFRDRImagingFCSImageEditor();
-protected:
+    protected:
         enum ImageTransforms {
             itNone=0,
             itAbs=1,
@@ -293,7 +294,7 @@ protected:
         JKQTPerrorPlotstyleComboBox* cmbAverageErrorStyle;
 
         /** \brief a combobox to select how to display the selected pixel */
-        QFRDRImagingFCSOverlayStyleCombobox* cmbSelectionStyle;
+        QFOverlayStyleCombobox* cmbSelectionStyle;
 
         /** \brief a combobox to select how the runs are displayed */
         JKQTPLinePlotStyleComboBox* cmbRunStyle;
@@ -314,8 +315,8 @@ protected:
         QLabel* labRelCCF;
 
 
-        QFRDRImagingFCSImageParameterGroupBox* grpImage;
-        QFRDRImagingFCSImageParameterGroupBox* grpImage2;
+        QFImageParameterGroupBox* grpImage;
+        QFImageParameterGroupBox* grpImage2;
 
 
         /** \brief label over the parameter image plot */
@@ -345,14 +346,14 @@ protected:
         JKQTPOverlayImageEnhanced* plteMaskSelected;
 
         /** \brief  plotter for parameter image */
-        QFRDRImagingFCSImagePlotter* pltImage;
+        QFImagePlotter* pltImage;
 
         int32_t plteImageSize;
 
 
 
         /** \brief  plotter for goodnes of fit image */
-        QFRDRImagingFCSImagePlotter* pltParamImage2;
+        QFImagePlotter* pltParamImage2;
 
 
 
@@ -475,7 +476,7 @@ protected:
 
 
         /** \brief create a parameter image with the given evalGroup and fitParam */
-        void readParameterImage(double* image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam, ImageTransforms tranFitParam, bool thisRDR=true, const QString& otherRDRRole=QString(""), const QString& otherRDRevalGroup=QString(""));
+        void readParameterImage(double* image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, bool thisRDR=true, const QString& otherRDRRole=QString(""), const QString& otherRDRevalGroup=QString(""));
 
         /** \brief apply the given transformation to the image */
         void transformImage(double *image, uint16_t width, uint16_t height, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam);

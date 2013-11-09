@@ -1,5 +1,5 @@
-#ifndef QFRDRIMAGINGFCSOVERLAYSTYLECOMBOBOX_H
-#define QFRDRIMAGINGFCSOVERLAYSTYLECOMBOBOX_H
+#ifndef QFOVERLAYSTYLECOMBOBOX_H
+#define QFOVERLAYSTYLECOMBOBOX_H
 
 #include <QComboBox>
 #include <QList>
@@ -7,11 +7,11 @@
 
 class JKQTPOverlayImageEnhanced; // forward
 
-class QFRDRImagingFCSOverlayStyleCombobox : public QComboBox
+class QFOverlayStyleCombobox : public QComboBox
 {
         Q_OBJECT
     public:
-        explicit QFRDRImagingFCSOverlayStyleCombobox(QWidget *parent = 0);
+        explicit QFOverlayStyleCombobox(QWidget *parent = 0);
         
         void setSelectedOverlayStyle(JKQTPOverlayImageEnhanced* plot) const;
 
@@ -22,4 +22,4 @@ class QFRDRImagingFCSOverlayStyleCombobox : public QComboBox
         QList<QColor> selColors;
 };
 
-#endif // QFRDRIMAGINGFCSOVERLAYSTYLECOMBOBOX_H
+#endif // QFOVERLAYSTYLECOMBOBOX_H

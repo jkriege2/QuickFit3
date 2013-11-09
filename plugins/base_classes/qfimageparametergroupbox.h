@@ -1,5 +1,5 @@
-#ifndef QFRDRIMAGINGFCSIMAGEPARAMETERGROUPBOX_H
-#define QFRDRIMAGINGFCSIMAGEPARAMETERGROUPBOX_H
+#ifndef QFIMAGEPARAMETERGROUPBOX_H
+#define QFIMAGEPARAMETERGROUPBOX_H
 
 #include <QGroupBox>
 #include "jkqtptools.h"
@@ -12,12 +12,12 @@
 
 class QFRawDataRecord;
 
-class QFRDRImagingFCSImageParameterGroupBox : public QGroupBox
+class QFImageParameterGroupBox : public QGroupBox
 {
         Q_OBJECT
     public:
-        explicit QFRDRImagingFCSImageParameterGroupBox(QWidget *parent = 0);
-        explicit QFRDRImagingFCSImageParameterGroupBox(const QString& title, QWidget *parent = 0);
+        explicit QFImageParameterGroupBox(QWidget *parent = 0);
+        explicit QFImageParameterGroupBox(const QString& title, QWidget *parent = 0);
 
         void setSelectedMaskStyle(JKQTPOverlayImageEnhanced* plteImageExcluded) const;
         void setSelectedImageStyle(JKQTPMathImage* plteImage, bool* plteOverviewExcludedData, bool emitSignals=true);
@@ -74,4 +74,4 @@ class QFRDRImagingFCSImageParameterGroupBox : public QGroupBox
 };
 
 
-#endif // QFRDRIMAGINGFCSIMAGEPARAMETERGROUPBOX_H
+#endif // QFIMAGEPARAMETERGROUPBOX_H

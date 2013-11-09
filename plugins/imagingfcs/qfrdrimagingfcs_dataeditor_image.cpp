@@ -1,5 +1,5 @@
 #include "qfrdrimagingfcs_dataeditor_image.h"
-#include "qfrdrimagingfcscopydataselectdialog.h"
+#include "qfrdrimagecopydataselectdialog.h"
 #include "qfrdrimagingfcs_data.h"
 #include <QDebug>
 #include <math.h>
@@ -387,7 +387,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     ///////////////////////////////////////////////////////////////
     // GROUPBOX: parameter image style
     ///////////////////////////////////////////////////////////////
-    grpImage=new QFRDRImagingFCSImageParameterGroupBox(tr(" parameter image style "), this);
+    grpImage=new QFImageParameterGroupBox(tr(" parameter image style "), this);
     vbl->addWidget(grpImage);
     //grpImage->setStyleSheet(grpImage->styleSheet()+QString("\n\n")+ stylesheetGroupBox);
 
@@ -399,13 +399,13 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     gli->addRow(tr("&enabled:"), chkDisplayImageOverlay);
     wsels->setFlat(true);
     vbl->addWidget(wsels);
-    cmbSelectionStyle=new QFRDRImagingFCSOverlayStyleCombobox(wsels);
+    cmbSelectionStyle=new QFOverlayStyleCombobox(wsels);
     gli->addRow(tr("&style:"), cmbSelectionStyle);
 
     ///////////////////////////////////////////////////////////////
     // GROUPBOX: parameter image style
     ///////////////////////////////////////////////////////////////
-    grpImage2=new QFRDRImagingFCSImageParameterGroupBox(tr(" parameter 2 image style "), this);
+    grpImage2=new QFImageParameterGroupBox(tr(" parameter 2 image style "), this);
     vbl->addWidget(grpImage2);
     //connect(chkParamImage2Visible, SIGNAL(toggled(bool)), grpImage2, SLOT(setVisible(bool)));
     //grpImage2->setVisible(chkParamImage2Visible->isChecked());
@@ -696,7 +696,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QWidget* wpltImage=new QWidget(this);
     QVBoxLayout* lpltImage=new QVBoxLayout();
     wpltImage->setLayout(lpltImage);
-    pltImage=new QFRDRImagingFCSImagePlotter(wpltImage);
+    pltImage=new QFImagePlotter(wpltImage);
     pltImage->setObjectName("pltImage");
     pltImage->get_plotter()->set_plotLabel(tr("\\textbf{Parameter Image}"));
     pltImage->connectTo(grpImage, cmbSelectionStyle);
@@ -728,7 +728,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QWidget* wpltImage2=new QWidget(this);
     QVBoxLayout* lpltImage2=new QVBoxLayout();
     wpltImage2->setLayout(lpltImage2);
-    pltParamImage2=new QFRDRImagingFCSImagePlotter(wpltImage2);
+    pltParamImage2=new QFImagePlotter(wpltImage2);
     pltParamImage2->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltParamImage2->setObjectName("pltImage2");
     pltParamImage2->get_plotter()->set_plotLabel(tr("\\textbf{\"Parameter Image 2\" Image}"));
@@ -1369,7 +1369,7 @@ void QFRDRImagingFCSImageEditor::ovrPaletteChanged() {
     pltOverview->set_doDrawing(false);
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
 
     plteOverview->set_palette(cmbColorbarOverview->colorPalette());
     plteOverview->set_autoImageRange(false);//chkAutorangeOverview->isChecked());
@@ -1515,7 +1515,7 @@ void QFRDRImagingFCSImageEditor::excludeByParan2Intensity() {
 
 QString QFRDRImagingFCSImageEditor::selectionToString()  {
     if (!current) return "";
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
     if (!m) return "";
 
     QString data="";
@@ -1532,7 +1532,7 @@ QString QFRDRImagingFCSImageEditor::selectionToString()  {
 
 void QFRDRImagingFCSImageEditor::loadSelectionFromString(QString sel) {
     if (!current) return;
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
     if (!m) return;
     QTextStream str(&sel);
     selected.clear();
@@ -1555,7 +1555,7 @@ bool QFRDRImagingFCSImageEditor::indexIsDualView2(int32_t sel) {
 
 void QFRDRImagingFCSImageEditor::saveSelection() {
     if (!current) return;
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
     if (!m) return;
     QString filename= qfGetSaveFileName(this, tr("save selection as ..."), lastMaskDir, tr("mask files (*.msk)"));
     if (!filename.isEmpty()) {
@@ -1570,7 +1570,7 @@ void QFRDRImagingFCSImageEditor::saveSelection() {
 
 void QFRDRImagingFCSImageEditor::loadSelection() {
     if (!current) return;
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
     if (!m) return;
     QString filename= qfGetOpenFileName(this, tr("select mask file to open ..."), lastMaskDir, tr("mask files (*.msk)"));
     if (QFile::exists(filename)) {
@@ -1590,7 +1590,7 @@ void QFRDRImagingFCSImageEditor::loadSelection() {
 
 void QFRDRImagingFCSImageEditor::copySelection() {
     if (!current) return;
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
     if (!m) return;
     QString mask=selectionToString();
     QClipboard* clipboard=QApplication::clipboard();
@@ -1603,7 +1603,7 @@ void QFRDRImagingFCSImageEditor::copySelection() {
 
 void QFRDRImagingFCSImageEditor::pasteSelection() {
     if (!current) return;
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
     if (!m) return;
 
     QClipboard* clipboard=QApplication::clipboard();
@@ -1624,7 +1624,7 @@ void QFRDRImagingFCSImageEditor::pasteSelection() {
 
 void QFRDRImagingFCSImageEditor::excludeByIntensity() {
     if (!current) return;
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
     if (m) {
         //QFRDRImagingFCSMaskByIntensity* dialog=new QFRDRImagingFCSMaskByIntensity(this);
         double* image=m->getImageFromRunsPreview();
@@ -1760,7 +1760,7 @@ void QFRDRImagingFCSImageEditor::imageScribbled(double x, double y, Qt::Keyboard
 }
 
 void QFRDRImagingFCSImageEditor::imageMouseMoved(double x, double y) {
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
     if (!m) return;
     int xx=(int)floor(x);
     int yy=(int)floor(y);
@@ -2238,7 +2238,7 @@ void QFRDRImagingFCSImageEditor::slidersChanged(int userMin, int userMax, int mi
 
 void QFRDRImagingFCSImageEditor::replotImage() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
 
 
 
@@ -4535,7 +4535,7 @@ void QFRDRImagingFCSImageEditor::copyDataAsColumns() {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 
     if (m) {
-        QFRDRImagingFCSCopyDataSelectDialog* dlg=new QFRDRImagingFCSCopyDataSelectDialog(this);
+        QFRDRImageCopyDataSelectDialog* dlg=new QFRDRImageCopyDataSelectDialog(this);
         if (dlg->exec()) {
             JKImage<double> image(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
             JKImage<double> image2(m->getImageFromRunsWidth(), m->getImageFromRunsHeight());

@@ -1,7 +1,7 @@
-#include "qfrdrimagingfcsoverlaystylecombobox.h"
+#include "qfoverlaystylecombobox.h"
 #include "jkqtpimageelements.h"
 
-QFRDRImagingFCSOverlayStyleCombobox::QFRDRImagingFCSOverlayStyleCombobox(QWidget *parent) :
+QFOverlayStyleCombobox::QFOverlayStyleCombobox(QWidget *parent) :
     QComboBox(parent)
 {
     QPixmap selPix(15,15);
@@ -71,7 +71,7 @@ QFRDRImagingFCSOverlayStyleCombobox::QFRDRImagingFCSOverlayStyleCombobox(QWidget
 
 }
 
-void QFRDRImagingFCSOverlayStyleCombobox::setSelectedOverlayStyle(JKQTPOverlayImageEnhanced *plot) const
+void QFOverlayStyleCombobox::setSelectedOverlayStyle(JKQTPOverlayImageEnhanced *plot) const
 {
     QColor col=selColors.value(currentIndex(), QColor("red"));
     plot->set_trueColor(col);

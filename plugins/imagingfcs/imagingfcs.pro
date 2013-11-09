@@ -48,16 +48,17 @@ HEADERS += qfrdrimagingfcs.h \
     qfrdrimagingfcsoverviewrateeditor.h \
     ../../../../../LIB/trunk/yaid_rh.h \
     qfrdrimagingfcsseriesdialog.h \
-    qfrdrimagingfcscopydataselectdialog.h \
     qfrdrimagingfcs_dataeditor_countrate.h \
     qfrdrimagingfcsedittools.h \
     qfrdrimagingfcssimulator.h \
     qfrdrimagingfcssimulationthread.h \
     ../../extlibs/MersenneTwister.h \
-    qfrdrimagingfcsimageplotter.h \
-    qfrdrimagingfcsimageparametergroupbox.h \
-    qfrdrimagingfcsoverlaystylecombobox.h \
-    ../base_classes/qfrdrrunselectiontools.h
+    ../base_classes/qfrdrrunselectiontools.h \
+    ../base_classes/frawdataimageeditor.h \
+    ../base_classes/qfrdrimagecopydataselectdialog.h \
+    ../base_classes/qfoverlaystylecombobox.h \
+    ../base_classes/qfimageplotter.h \
+    ../base_classes/qfimageparametergroupbox.h
 
 
 
@@ -77,7 +78,6 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcsoverviewrateeditor.cpp \
     ../base_classes/qfrdrimagingfcstools.cpp \
     qfrdrimagingfcsseriesdialog.cpp \
-    qfrdrimagingfcscopydataselectdialog.cpp \
     ../base_classes/qfrdroverviewimagedisplay.cpp \
     qfrdrimagingfcs_dataeditor_countrate.cpp \
     ../base_classes/qfrdrimagemasktools.cpp\
@@ -87,10 +87,12 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcssimulator.cpp \
     qfrdrimagingfcssimulationthread.cpp \
     ../base_classes/qffcstools.cpp \
-    qfrdrimagingfcsimageplotter.cpp \
-    qfrdrimagingfcsimageparametergroupbox.cpp \
-    qfrdrimagingfcsoverlaystylecombobox.cpp \
-    ../base_classes/qfrdrrunselectiontools.cpp
+    ../base_classes/qfrdrrunselectiontools.cpp \
+    ../base_classes/frawdataimageeditor.cpp \
+    ../base_classes/qfrdrimagecopydataselectdialog.cpp \
+    ../base_classes/qfoverlaystylecombobox.cpp \
+    ../base_classes/qfimageplotter.cpp \
+    ../base_classes/qfimageparametergroupbox.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \
@@ -99,9 +101,9 @@ FORMS = \
     qfrdrimagingfcsmaskbyintensity.ui \
     qfrdrimagingfcscountratedisplay.ui \
     qfrdrimagingfcsseriesdialog.ui \
-    qfrdrimagingfcscopydataselectdialog.ui \
     ../base_classes/qffinderroneouscorrelationdlg.ui \
-    qfrdrimagingfcssimulator.ui
+    qfrdrimagingfcssimulator.ui \
+    ../base_classes/qfrdrimagecopydataselectdialog.ui
 
 RESOURCES += qfrdrimagingfcs.qrc
 

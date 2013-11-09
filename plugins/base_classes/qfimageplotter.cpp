@@ -1,66 +1,65 @@
-#include "qfrdrimagingfcsimageplotter.h"
+#include "qfimageplotter.h"
 #include "qfrdrimagetoruninterface.h"
 #include "qfrawdatarecord.h"
 #include "qfplotter.h"
-#include "qfrdrimagingfcs_data.h"
-#include "qfrdrimagingfcsimageparametergroupbox.h"
-#include "qfrdrimagingfcsoverlaystylecombobox.h"
+#include "qfimageparametergroupbox.h"
+#include "qfoverlaystylecombobox.h"
 #include "statistics_tools.h"
 
 #define OverlayRectanglesAsImageOverlay true
 
-QFRDRImagingFCSImagePlotter::QFRDRImagingFCSImagePlotter(bool datastore_internal, QWidget *parent, JKQTPdatastore *datast):
+QFImagePlotter::QFImagePlotter(bool datastore_internal, QWidget *parent, JKQTPdatastore *datast):
     QFPlotter(datastore_internal, parent, datast)
 {
     initImFCSPlotter();
 }
 
 
-QFRDRImagingFCSImagePlotter::QFRDRImagingFCSImagePlotter(QWidget *parent) :
+QFImagePlotter::QFImagePlotter(QWidget *parent) :
     QFPlotter(parent)
 {
     initImFCSPlotter();
 }
 
-QFRDRImagingFCSImagePlotter::~QFRDRImagingFCSImagePlotter()
+QFImagePlotter::~QFImagePlotter()
 {
     if (plteImageData) free(plteImageData);
 }
 
-double *QFRDRImagingFCSImagePlotter::getData() const
+double *QFImagePlotter::getData() const
 {
     return plteImageData;
 }
 
-void QFRDRImagingFCSImagePlotter::getDataAtBR(int idx, double &value)
+void QFImagePlotter::getDataAtBR(int idx, double &value)
 {
     if (plteImageData && idx>0 && idx<plteImageSize) value=plteImageData[idx];
 }
 
-double QFRDRImagingFCSImagePlotter::getDataAt(int idx, double defaultValue)
+double QFImagePlotter::getDataAt(int idx, double defaultValue)
 {
     if (plteImageData && idx>0 && idx<plteImageSize) return plteImageData[idx];
     return defaultValue;
 }
 
-int32_t QFRDRImagingFCSImagePlotter::getDataSize() const
+int32_t QFImagePlotter::getDataSize() const
 {
     return plteImageSize;
 }
 
-bool *QFRDRImagingFCSImagePlotter::getExcluded() const
+bool *QFImagePlotter::getExcluded() const
 {
     return plteOverviewExcludedData;
 }
 
-bool *QFRDRImagingFCSImagePlotter::getSelected() const
+bool *QFImagePlotter::getSelected() const
 {
     return plteOverviewSelectedData;
 }
 
 
 
-void QFRDRImagingFCSImagePlotter::connectTo(QFRDRImagingFCSImageParameterGroupBox *paramGrp, QFRDRImagingFCSOverlayStyleCombobox *overlayCmb)
+void QFImagePlotter::connectTo(QFImageParameterGroupBox *paramGrp, QFOverlayStyleCombobox *overlayCmb)
 {
     if (this->paramGrp) disconnect(this->paramGrp, SIGNAL(settingsChanged()), this, SLOT(updatePlot()));
     if (this->overlayCmb) disconnect(this->overlayCmb, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePlot()));
@@ -71,7 +70,7 @@ void QFRDRImagingFCSImagePlotter::connectTo(QFRDRImagingFCSImageParameterGroupBo
 }
 
 
-void QFRDRImagingFCSImagePlotter::updatePlot()
+void QFImagePlotter::updatePlot()
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     bool draw=get_doDrawing();
@@ -87,7 +86,7 @@ void QFRDRImagingFCSImagePlotter::updatePlot()
     QApplication::restoreOverrideCursor();
 }
 
-void QFRDRImagingFCSImagePlotter::updateImage()
+void QFImagePlotter::updateImage()
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     bool draw=get_doDrawing();
@@ -143,7 +142,7 @@ void QFRDRImagingFCSImagePlotter::updateImage()
     QApplication::restoreOverrideCursor();
 }
 
-void QFRDRImagingFCSImagePlotter::updateImage(double *data, bool *plteOverviewSelectedData, bool *plteOverviewExcludedData, int width, int height, const QString& label, bool deleteData, bool clearDatastore)
+void QFImagePlotter::updateImage(double *data, bool *plteOverviewSelectedData, bool *plteOverviewExcludedData, int width, int height, const QString& label, bool deleteData, bool clearDatastore)
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     bool draw=get_doDrawing();
@@ -177,12 +176,12 @@ void QFRDRImagingFCSImagePlotter::updateImage(double *data, bool *plteOverviewSe
 
 }
 
-void QFRDRImagingFCSImagePlotter::updateOverlays(double *avgOut, double *sdOut)
+void QFImagePlotter::updateOverlays(double *avgOut, double *sdOut)
 {
     setDisplayOverlay(displayOverlay/*, displayMask*/, avgOut, sdOut);
 }
 
-void QFRDRImagingFCSImagePlotter::updateOverlays(bool *plteOverviewSelectedData, bool *plteOverviewExcludedData, double *avgOut, double *sdOut)
+void QFImagePlotter::updateOverlays(bool *plteOverviewSelectedData, bool *plteOverviewExcludedData, double *avgOut, double *sdOut)
 {
     this->plteOverviewSelectedData=plteOverviewSelectedData;
     this->plteOverviewExcludedData=plteOverviewExcludedData;
@@ -190,7 +189,7 @@ void QFRDRImagingFCSImagePlotter::updateOverlays(bool *plteOverviewSelectedData,
     updateOverlays(avgOut, sdOut);
 }
 
-void QFRDRImagingFCSImagePlotter::initImFCSPlotter()
+void QFImagePlotter::initImFCSPlotter()
 {
     paramGrp=NULL;
     overlayCmb=NULL;
@@ -244,7 +243,7 @@ void QFRDRImagingFCSImagePlotter::initImFCSPlotter()
 }
 
 
-void QFRDRImagingFCSImagePlotter::moveColorbarsAuto()
+void QFImagePlotter::moveColorbarsAuto()
 {
         QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
         bool rightVisible=false;
@@ -260,13 +259,13 @@ void QFRDRImagingFCSImagePlotter::moveColorbarsAuto()
         }
 }
 
-void QFRDRImagingFCSImagePlotter::overlayStyleChanged()
+void QFImagePlotter::overlayStyleChanged()
 {
     if (overlayCmb) overlayCmb->setSelectedOverlayStyle(plteImageSelected);
 }
 
 
-void QFRDRImagingFCSImagePlotter::setDisplayOverlay(bool displayOverlay, double *avgOut, double *sdOut)
+void QFImagePlotter::setDisplayOverlay(bool displayOverlay, double *avgOut, double *sdOut)
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     bool draw=get_doDrawing();
@@ -342,12 +341,12 @@ void QFRDRImagingFCSImagePlotter::setDisplayOverlay(bool displayOverlay, double 
 
 }
 
-void QFRDRImagingFCSImagePlotter::setCurrent(QFRawDataRecord *current)
+void QFImagePlotter::setCurrent(QFRawDataRecord *current)
 {
     this->current=current;
 }
 
-void QFRDRImagingFCSImagePlotter::clearImage()
+void QFImagePlotter::clearImage()
 {
     if (plteImageData) free(plteImageData);
     plteImageData=NULL;
@@ -358,7 +357,7 @@ void QFRDRImagingFCSImagePlotter::clearImage()
     updatePlot();
 }
 
-void QFRDRImagingFCSImagePlotter::setCopyableData()
+void QFImagePlotter::setCopyableData()
 {
     getDatastore()->clear();
     if (plteImageData && plteOverviewSelectedData && plteOverviewExcludedData && plteImageSize>0) {

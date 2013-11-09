@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QFRDRImagingFCSCopyDataSelectDialog</class>
- <widget class="QDialog" name="QFRDRImagingFCSCopyDataSelectDialog">
+ <class>QFRDRImageCopyDataSelectDialog</class>
+ <widget class="QDialog" name="QFRDRImageCopyDataSelectDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -112,7 +112,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>QFRDRImagingFCSCopyDataSelectDialog</receiver>
+   <receiver>QFRDRImageCopyDataSelectDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -128,7 +128,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>QFRDRImagingFCSCopyDataSelectDialog</receiver>
+   <receiver>QFRDRImageCopyDataSelectDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

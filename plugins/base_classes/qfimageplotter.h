@@ -1,5 +1,5 @@
-#ifndef QFRDRIMAGINGFCSIMAGEPLOTTER_H
-#define QFRDRIMAGINGFCSIMAGEPLOTTER_H
+#ifndef QFIMAGEPLOTTER_H
+#define QFIMAGEPLOTTER_H
 
 #include <stdint.h>
 #include <QWidget>
@@ -8,18 +8,18 @@
 
 class JKQTPMathImage; //forward
 class JKQTPOverlayImageEnhanced; //forward
-class QFRDRImagingFCSImageParameterGroupBox; //forward
-class QFRDRImagingFCSOverlayStyleCombobox; //forward
+class QFImageParameterGroupBox; //forward
+class QFOverlayStyleCombobox; //forward
 class QFRawDataRecord; //forward
 
-class QFRDRImagingFCSImagePlotter : public QFPlotter
+class QFImagePlotter : public QFPlotter
 {
         Q_OBJECT
     public:
-        explicit QFRDRImagingFCSImagePlotter(bool datastore_internal, QWidget* parent=NULL, JKQTPdatastore* datast=NULL);
-        explicit QFRDRImagingFCSImagePlotter(QWidget *parent = 0);
+        explicit QFImagePlotter(bool datastore_internal, QWidget* parent=NULL, JKQTPdatastore* datast=NULL);
+        explicit QFImagePlotter(QWidget *parent = 0);
 
-        ~QFRDRImagingFCSImagePlotter();
+        ~QFImagePlotter();
 
         JKQTPMathImage* get_imagePlot() const { return plteImage; }
         JKQTPOverlayImageEnhanced* get_selectionPlot() const { return plteImageSelected; }
@@ -32,7 +32,7 @@ class QFRDRImagingFCSImagePlotter : public QFPlotter
         bool* getExcluded() const;
         bool* getSelected() const;
 
-        void connectTo(QFRDRImagingFCSImageParameterGroupBox* paramGrp, QFRDRImagingFCSOverlayStyleCombobox* overlayCmb);
+        void connectTo(QFImageParameterGroupBox* paramGrp, QFOverlayStyleCombobox* overlayCmb);
         void setSelectedData(bool* plteOverviewSelectedData,  bool* plteOverviewExcludedData);
     signals:
         void saveImageSettings();
@@ -72,11 +72,11 @@ class QFRDRImagingFCSImagePlotter : public QFPlotter
         bool displayOverlay;
         bool displayMask;
 
-        QFRDRImagingFCSImageParameterGroupBox* paramGrp;
-        QFRDRImagingFCSOverlayStyleCombobox* overlayCmb;
+        QFImageParameterGroupBox* paramGrp;
+        QFOverlayStyleCombobox* overlayCmb;
 
         QFRawDataRecord* current;
 };
 
 
-#endif // QFRDRIMAGINGFCSIMAGEPLOTTER_H
+#endif // QFIMAGEPLOTTER_H
