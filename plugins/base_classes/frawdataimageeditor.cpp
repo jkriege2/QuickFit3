@@ -934,11 +934,11 @@ void FRawDataImageEditor::createWidgets()
     labParameter->setBuddy(cmbParameter);
     topgrid->addWidget(cmbParameter, row, 4);
     cmbParameterTransform=new QComboBox(this);
-    cmbParameterTransform->addItem(QIcon(":/imaging_fcs/none.png"), tr("none"));
-    cmbParameterTransform->addItem(QIcon(":/imaging_fcs/abs.png"), tr("abs"));
-    cmbParameterTransform->addItem(QIcon(":/imaging_fcs/log.png"), tr("log"));
-    cmbParameterTransform->addItem(QIcon(":/imaging_fcs/reci.png"), tr("reciprocal"));
-    cmbParameterTransform->addItem(QIcon(":/imaging_fcs/sqrt.png"), tr("sqrt"));
+    cmbParameterTransform->addItem(QIcon(":/lib/none.png"), tr("none"));
+    cmbParameterTransform->addItem(QIcon(":/lib/abs.png"), tr("abs"));
+    cmbParameterTransform->addItem(QIcon(":/lib/log.png"), tr("log"));
+    cmbParameterTransform->addItem(QIcon(":/lib/reci.png"), tr("reciprocal"));
+    cmbParameterTransform->addItem(QIcon(":/lib/sqrt.png"), tr("sqrt"));
     topgrid->addWidget((labParameterTransform=new QLabel(tr("    &transform:"))), row, 5);
     labParameterTransform->setBuddy(cmbParameterTransform);
     topgrid->addWidget(cmbParameterTransform, row, 6);
@@ -969,11 +969,11 @@ void FRawDataImageEditor::createWidgets()
     labParameter2->setBuddy(cmbParameter2);
     topgrid->addWidget(cmbParameter2, row, 4);
     cmbParameter2Transform=new QComboBox(this);
-    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/none.png"), tr("none"));
-    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/abs.png"), tr("abs"));
-    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/log.png"), tr("log"));
-    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/reci.png"), tr("reciprocal"));
-    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/sqrt.png"), tr("sqrt"));
+    cmbParameter2Transform->addItem(QIcon(":/lib/none.png"), tr("none"));
+    cmbParameter2Transform->addItem(QIcon(":/lib/abs.png"), tr("abs"));
+    cmbParameter2Transform->addItem(QIcon(":/lib/log.png"), tr("log"));
+    cmbParameter2Transform->addItem(QIcon(":/lib/reci.png"), tr("reciprocal"));
+    cmbParameter2Transform->addItem(QIcon(":/lib/sqrt.png"), tr("sqrt"));
     topgrid->addWidget((labParameter2Transform=new QLabel(tr("    tr&ansform:"))), row, 5);
     labParameter2Transform->setBuddy(cmbParameter2Transform);
     topgrid->addWidget(cmbParameter2Transform, row, 6);
@@ -1042,9 +1042,9 @@ void FRawDataImageEditor::createWidgets()
     glVisPlots->addWidget(chkMaskVisible, 0,2);
 
     cmbDualView=new QComboBox(this);
-    cmbDualView->addItem(QIcon(":/imaging_fcs/dvnone.png"), tr("none"));
-    cmbDualView->addItem(QIcon(":/imaging_fcs/dvhor.png"), tr("split horizontal"));
-    cmbDualView->addItem(QIcon(":/imaging_fcs/dvver.png"), tr("split vertical"));
+    cmbDualView->addItem(QIcon(":/lib/dvnone.png"), tr("none"));
+    cmbDualView->addItem(QIcon(":/lib/dvhor.png"), tr("split horizontal"));
+    cmbDualView->addItem(QIcon(":/lib/dvver.png"), tr("split vertical"));
     glVisPlots->addWidget(new QLabel("DualView mode:"), 1, 0);
     glVisPlots->addWidget(cmbDualView, 1, 1, 1, 2);
     vbl->addWidget(grpVisiblePlots);
@@ -1064,20 +1064,20 @@ void FRawDataImageEditor::createWidgets()
     wmask->setLayout(glmask);
 
     int mskgrpRow=0;
-    btnDontUse=createButtonAndActionShowText(actDontUse, QIcon(":/imaging_fcs/mask.png"), tr("&mask sel."), w);
+    btnDontUse=createButtonAndActionShowText(actDontUse, QIcon(":/lib/mask.png"), tr("&mask sel."), w);
     actDontUse->setToolTip(tr("add the selected pixels to the current mask (so don't use it's data)\nand recalculate the average correlation curve accordingly"));
     connect(actDontUse, SIGNAL(triggered()), this, SLOT(excludeRuns()));
     glmask->addWidget(btnDontUse, mskgrpRow, 0);
-    btnUse=createButtonAndActionShowText(actUse, QIcon(":/imaging_fcs/unmask.png"), tr("&unmask sel."), w);
+    btnUse=createButtonAndActionShowText(actUse, QIcon(":/lib/unmask.png"), tr("&unmask sel."), w);
     actUse->setToolTip(tr("remove the selected pixels from the current mask (so use it's data)\nand recalculate the average correlation curve accordingly"));
     connect(actUse, SIGNAL(triggered()), this, SLOT(includeRuns()));
     glmask->addWidget(btnUse, mskgrpRow, 1);
 
-    btnUseAll=createButtonAndActionShowText(actClearMask, QIcon(":/imaging_fcs/clearmask.png"), tr("&clear "), w);
+    btnUseAll=createButtonAndActionShowText(actClearMask, QIcon(":/lib/clearmask.png"), tr("&clear "), w);
     actClearMask->setToolTip(tr("clear the mask and recalculate the average correlation curve accordingly"));
     glmask->addWidget(btnUseAll, mskgrpRow, 2);
     connect(actClearMask, SIGNAL(triggered()), this, SLOT(includeAll()));
-    btnInvertMask=createButtonAndActionShowText(actInvertMask, QIcon(":/imaging_fcs/invertmask.png"), tr("&invert mask"), w);
+    btnInvertMask=createButtonAndActionShowText(actInvertMask, QIcon(":/lib/invertmask.png"), tr("&invert mask"), w);
     actInvertMask->setToolTip(tr("invert the current mask (all masked pixel are unmasked and vice versa)\nand recalculate the average correlation curve accordingly"));
     glmask->addWidget(btnInvertMask, mskgrpRow, 3);
     connect(actInvertMask, SIGNAL(triggered()), this, SLOT(invertMask()));
@@ -1137,21 +1137,21 @@ void FRawDataImageEditor::createWidgets()
 
     int selgrpRow=0;
 
-    btnSaveSelection=createButtonAndActionShowText(actSaveSelection, QIcon(":/imaging_fcs/saveselection.png"), tr("&save sel."), w);
+    btnSaveSelection=createButtonAndActionShowText(actSaveSelection, QIcon(":/lib/saveselection.png"), tr("&save sel."), w);
     actSaveSelection->setToolTip(tr("save the selection to harddisk"));
     glsel->addWidget(btnSaveSelection, selgrpRow, 0);
     connect(actSaveSelection, SIGNAL(triggered()), this, SLOT(saveSelection()));
-    btnLoadSelection=createButtonAndActionShowText(actLoadSelection, QIcon(":/imaging_fcs/loadselection.png"), tr("&load sel."), w);
+    btnLoadSelection=createButtonAndActionShowText(actLoadSelection, QIcon(":/lib/loadselection.png"), tr("&load sel."), w);
     actLoadSelection->setToolTip(tr("load a selection from harddisk"));
     glsel->addWidget(btnLoadSelection, selgrpRow, 1);
     connect(actLoadSelection, SIGNAL(triggered()), this, SLOT(loadSelection()));
 
 
-    btnCopySelection=createButtonAndActionShowText(actCopySelection, QIcon(":/imaging_fcs/copyselection.png"), tr("&copy sel."), w);
+    btnCopySelection=createButtonAndActionShowText(actCopySelection, QIcon(":/lib/copyselection.png"), tr("&copy sel."), w);
     actCopySelection->setToolTip(tr("copy the selection to clipboard"));
     glsel->addWidget(btnCopySelection, selgrpRow, 2);
     connect(actCopySelection, SIGNAL(triggered()), this, SLOT(copySelection()));
-    btnPasteSelection=createButtonAndActionShowText(actPasteSelection, QIcon(":/imaging_fcs/pasteselection.png"), tr("&paste sel."), w);
+    btnPasteSelection=createButtonAndActionShowText(actPasteSelection, QIcon(":/lib/pasteselection.png"), tr("&paste sel."), w);
     actPasteSelection->setToolTip(tr("paste a selection from clipboard"));
     glsel->addWidget(btnPasteSelection, selgrpRow, 3);
     connect(actPasteSelection, SIGNAL(triggered()), this, SLOT(pasteSelection()));
@@ -1170,11 +1170,11 @@ void FRawDataImageEditor::createWidgets()
     selgrpRow++;
     cmbStoredSelections=new QComboBox(this);
     ssell->addWidget(cmbStoredSelections, 1);
-    btnSaveSelectionToStored=createButtonAndActionShowText(actSaveSelectionToStored, QIcon(":/imaging_fcs/storeselection.png"), tr("store selection "), w);
+    btnSaveSelectionToStored=createButtonAndActionShowText(actSaveSelectionToStored, QIcon(":/lib/storeselection.png"), tr("store selection "), w);
     btnSaveSelectionToStored->setToolButtonStyle(Qt::ToolButtonIconOnly);
     actSaveSelectionToStored->setToolTip(tr("save the current selection under a new name to the drop-down field above (record)"));
     ssell->addWidget(btnSaveSelectionToStored);
-    btnDeleteStoredSelection=createButtonAndActionShowText(actDeleteStoredSelection, QIcon(":/imaging_fcs/deleteselection.png"), tr("delete selection "), w);
+    btnDeleteStoredSelection=createButtonAndActionShowText(actDeleteStoredSelection, QIcon(":/lib/deleteselection.png"), tr("delete selection "), w);
     btnDeleteStoredSelection->setToolButtonStyle(Qt::ToolButtonIconOnly);
     actDeleteStoredSelection->setToolTip(tr("delete the current named selection from the drop-down field above"));
     ssell->addWidget(btnDeleteStoredSelection);
@@ -1666,7 +1666,7 @@ void FRawDataImageEditor::createWidgets()
     ///////////////////////////////////////////////////////////////
 
     QGridLayout* grdTop=new QGridLayout(this);
-    btnPrintReport = createButtonAndActionShowText(actPrintReport, QIcon(":/imaging_fcs/report_print.png"), tr("&Print report"), this);
+    btnPrintReport = createButtonAndActionShowText(actPrintReport, QIcon(":/lib/report_print.png"), tr("&Print report"), this);
     actPrintReport->setToolTip(tr("print a report which contains all data on the current screen:<br><ul>"
                                   "<li>all images (parameter, mask, parameter 2, overview</li>"
                                   "<li>correlation curves and fit parameters</li>"
@@ -1675,7 +1675,7 @@ void FRawDataImageEditor::createWidgets()
                                   "</ul>"));
 
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
-    btnSaveReport = createButtonAndActionShowText(actSaveReport, QIcon(":/imaging_fcs/report_save.png"), tr("&Save report"), this);
+    btnSaveReport = createButtonAndActionShowText(actSaveReport, QIcon(":/lib/report_save.png"), tr("&Save report"), this);
     actSaveReport->setToolTip(tr("save a report which contains all data on the current screen as PDF or PostScript file:<br><ul>"
                                   "<li>all images (parameter, mask, parameter 2, overview)</li>"
                                   "<li>correlation curves and fit parameters</li>"
@@ -1683,17 +1683,17 @@ void FRawDataImageEditor::createWidgets()
                                   "<li>additional data (files, description configuration ...)</li>"
                                   "</ul>"));
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
-    btnSaveData = createButtonAndActionShowText(actSaveData, QIcon(":/imaging_fcs/preview_savedata.png"), tr("Save &data"), this);
+    btnSaveData = createButtonAndActionShowText(actSaveData, QIcon(":/lib/preview_savedata.png"), tr("Save &data"), this);
     actSaveData->setToolTip(tr("save the currently displayed images (parameter, mask, parameter 2, overview)\nas image files (e.g. TIFF), so they can be processed in other programs."));
     connect(actSaveData, SIGNAL(triggered()), this, SLOT(saveData()));
 
     actInsertSelectedCorrelationsAsFCSRDR=new QAction(tr("Insert Correlation Curves as new RDR into Project"), this);
     connect(actInsertSelectedCorrelationsAsFCSRDR, SIGNAL(triggered()), this, SLOT(insertSelectedCorrelationsAsFCSRDR()));
 
-    btnCopyDataToMatlab = createButtonAndActionShowText(actCopyDataToMatlab, QIcon(":/imaging_fcs/copydatatomatlab.png"), tr("Copy Images to &Matlab"), this);
+    btnCopyDataToMatlab = createButtonAndActionShowText(actCopyDataToMatlab, QIcon(":/lib/copydatatomatlab.png"), tr("Copy Images to &Matlab"), this);
     actCopyDataToMatlab->setToolTip(tr("copy the currently dispalyed images (parameter, mask, parameter 2, overview) as a Matlab script."));
     connect(actCopyDataToMatlab, SIGNAL(triggered()), this, SLOT(copyToMatlab()));
-    btnCopyDataAsColumns = createButtonAndActionShowText(actCopyDataAsColumns, QIcon(":/imaging_fcs/copydata.png"), tr("Copy Images as &Columns"), this);
+    btnCopyDataAsColumns = createButtonAndActionShowText(actCopyDataAsColumns, QIcon(":/lib/copydata.png"), tr("Copy Images as &Columns"), this);
     actCopyDataAsColumns->setToolTip(tr("copy the currently dispalyed images (parameter, mask, parameter 2, overview) as columns of data to the clipboard. The data may be pasted e.g. into a spreadsheet program like Excel"));
     connect(actCopyDataAsColumns, SIGNAL(triggered()), this, SLOT(copyDataAsColumns()));
 
@@ -1721,10 +1721,10 @@ void FRawDataImageEditor::createWidgets()
     ///////////////////////////////////////////////////////////////
     // TOOLBAR & ACTIONS: edit image plots
     ///////////////////////////////////////////////////////////////
-    actImagesZoom=new QAction(QIcon(":/imaging_fcs/zoom.png"), tr("zoom"), this);
+    actImagesZoom=new QAction(QIcon(":/lib/zoom.png"), tr("zoom"), this);
     actImagesZoom->setToolTip(tr("in this mode the user may zoom into a plot by drawing a rectangle (draging with the left mouse key)\nA click toggles the current selection/mask position."));
     actImagesZoom->setCheckable(true);
-    actImagesDrawRectangle=new QAction(QIcon(":/imaging_fcs/draw_rectangle.png"), tr("rectangular selection"), this);
+    actImagesDrawRectangle=new QAction(QIcon(":/lib/draw_rectangle.png"), tr("rectangular selection"), this);
     actImagesDrawRectangle->setToolTip(tr("in this mode the user may draw a rectangle.<br>"
                                  "All pixels inside the rectangle will be selected<br>"
                                  "when the user releases the left mouse key. You may<br>"
@@ -1734,7 +1734,7 @@ void FRawDataImageEditor::createWidgets()
                                  "</ul>"));
     actImagesDrawRectangle->setCheckable(true);
 
-    actImagesDrawPoints=new QAction(QIcon(":/imaging_fcs/draw_point.png"), tr("point-wise selection"), this);
+    actImagesDrawPoints=new QAction(QIcon(":/lib/draw_point.png"), tr("point-wise selection"), this);
     actImagesDrawPoints->setToolTip(tr("in this mode the user may click on single points.<br>"
                                  "to add and remove them to/from the mask/selection. A click<br>"
                                  "will toggle the state of the clicked pixel<ul>"
@@ -1743,7 +1743,7 @@ void FRawDataImageEditor::createWidgets()
                                  "</ul>"));
     actImagesDrawPoints->setCheckable(true);
 
-    actImagesDrawCircle=new QAction(QIcon(":/imaging_fcs/draw_circle.png"), tr("circular selection"), this);
+    actImagesDrawCircle=new QAction(QIcon(":/lib/draw_circle.png"), tr("circular selection"), this);
     actImagesDrawCircle->setToolTip(tr("in this mode the user may draw a circle.<br>"
                                  "All pixels inside the cirle will be selected<br>"
                                  "when the user releases the left mouse key. The point of first<br>"
@@ -1753,7 +1753,7 @@ void FRawDataImageEditor::createWidgets()
                                  "<li>SHIFT: selection will be removed from current selection</li>"
                                  "</ul>"));
     actImagesDrawCircle->setCheckable(true);
-    actImagesDrawEllipse=new QAction(QIcon(":/imaging_fcs/draw_ellipse.png"), tr("elliptical selection"), this);
+    actImagesDrawEllipse=new QAction(QIcon(":/lib/draw_ellipse.png"), tr("elliptical selection"), this);
     actImagesDrawEllipse->setToolTip(tr("in this mode the user may draw a ellipse.<br>"
                                  "All pixels inside the ellipse will be selected<br>"
                                 "when the user releases the left mouse key. The point of first<br>"
@@ -1763,7 +1763,7 @@ void FRawDataImageEditor::createWidgets()
                                  "<li>SHIFT: selection will be removed from current selection</li>"
                                  "</ul>"));
     actImagesDrawEllipse->setCheckable(true);
-    actImagesDrawLine=new QAction(QIcon(":/imaging_fcs/draw_line.png"), tr("line selection"), this);
+    actImagesDrawLine=new QAction(QIcon(":/lib/draw_line.png"), tr("line selection"), this);
     actImagesDrawLine->setToolTip(tr("in this mode the user may draw a line.<br>"
                                  "All pixels on the line will be selected<br>"
                                  "when the user releases the left mouse key. You may<br>"
@@ -1773,7 +1773,7 @@ void FRawDataImageEditor::createWidgets()
                                  "</ul>"));
     actImagesDrawLine->setCheckable(true);
 
-    actImagesScribble=new QAction(QIcon(":/imaging_fcs/draw_scribble.png"), tr("scribble selection"), this);
+    actImagesScribble=new QAction(QIcon(":/lib/draw_scribble.png"), tr("scribble selection"), this);
     actImagesScribble->setToolTip(tr("in this mode the user may select/deselect pixels by.<br>"
                                  "keeping the left mouse button pressed and moving the mouse<br>"
                                  "over the image. Depending on the key pressed on the keyboard,<br>"
