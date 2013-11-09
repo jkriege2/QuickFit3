@@ -524,6 +524,8 @@ p, li { white-space: pre-wrap; }
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
   <connection>

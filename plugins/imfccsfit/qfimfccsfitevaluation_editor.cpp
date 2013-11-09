@@ -32,6 +32,7 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     ui->setupUi(this);
     ui->pltOverview->setMaskEditable(true);
     ui->pltOverview->setSelectionEditable(true);
+    ui->pltOverview->setRunSelectWidgetActive(true);
     connect(ui->pltOverview, SIGNAL(currentRunChanged(int)), this, SLOT(setCurrentRun(int)));
     ui->splitter->setChildrenCollapsible(false);
     ui->splitter->setStretchFactor(0,3);
@@ -482,7 +483,7 @@ void QFImFCCSFitEvaluationEditor::onConfigureGlobalItemClicked()
 {
     QAction* act=qobject_cast<QAction*>(sender());
     int idx=actsGlobalConfig.indexOf(act);
-    qDebug()<<"sender()="<<sender()<<" type="<<sender()->metaObject()->className()<<"   act="<<act<<"   idx="<<idx;
+    //qDebug()<<"sender()="<<sender()<<" type="<<sender()->metaObject()->className()<<"   act="<<act<<"   idx="<<idx;
     if (act&&idx>=0&&idx<globalConfig.size()) {
         QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
         if (!data) return;
@@ -666,6 +667,7 @@ void QFImFCCSFitEvaluationEditor::displayData() {
                     sigma=NULL;
                 }                
                 long N=fcs->getCorrelationN();                
+                //qDebug()<<eval->getFitDataWeighting()<<sigma<<N;
                 if (data && tau) {
                     //qDebug()<<arrayToString(tau, N);
                     size_t c_tau=ds->addCopiedColumn(tau, N, tr("file%1: tau [s]").arg(file+1));

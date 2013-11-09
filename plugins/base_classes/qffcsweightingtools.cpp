@@ -117,7 +117,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *rec
 
 QFFCSWeightingTools::DataWeight QFFCSWeightingTools::indexToWeight(int index)
 {
-    if (index<0 || index>=QFFCSWeightingTools::DataWeightingMax) return QFFCSWeightingTools::EqualWeighting;
+    if (index<0 || index>QFFCSWeightingTools::DataWeightingMax) return QFFCSWeightingTools::EqualWeighting;
     return (QFFCSWeightingTools::DataWeight)index;
 
 }

@@ -34,7 +34,7 @@ QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
     tbEdit->addAction(actMaskByImage);
     tbEdit->addSeparator();
     maskEditTools->registerPlotterMaskToolsToToolbar(tbEdit);
-    gl->addWidget(tbEdit, row, 0,1,2);
+    gl->addWidget(tbEdit, row, 0,1,3);
     row++;
 
     pltOverview=new QFPlotter(this);
