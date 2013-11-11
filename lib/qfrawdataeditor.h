@@ -41,12 +41,18 @@ class QFLIB_EXPORT QFRawDataEditor : public QWidget {
         virtual void connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) =0;
         /** \brief connected to the rawDataChanged() signal of the current record */
         virtual void rawDataChanged() {};
+        /** \brief save a report of the evaluation results */
+        virtual void saveReport();
+        /** \brief print a report of the evaluation results */
+        virtual void printReport();
     public slots:
         /** \brief read the settings */
         virtual void readSettings() =0;
         /** \brief write the settings */
         virtual void writeSettings() =0;
     protected:
+        virtual void createReportDoc(QTextDocument* doc);
+
         virtual void closeEvent( QCloseEvent * event );
         /** \brief points to the record currently displayed */
         QFRawDataRecord* current;
@@ -58,6 +64,12 @@ class QFLIB_EXPORT QFRawDataEditor : public QWidget {
         QFPluginServices* services;
         /** \brief the propertyEditor class holding this widget */
         QFRawDataPropertyEditor* propertyEditor;
+
+        /** \brief action to print report */
+        QAction* actPrintReport;
+        /** \brief action to save report */
+        QAction* actSaveReport;
+
     private:
 };
 

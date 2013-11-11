@@ -211,39 +211,42 @@ void loadSplitter(QSettings& settings, QSplitter* splitter, QString prefix) {
 
 QString getQVariantType(const QVariant& variant) {
     QString t="invalid";
-    switch(variant.type()) {
-        case QVariant::Bool: t="bool"; break;
-        case QVariant::Char: t="char"; break;
-        case QVariant::Date: t="date"; break;
-        case QVariant::DateTime: t="datetime"; break;
-        case QVariant::Double: t="double"; break;
-        case QVariant::Int: t="int"; break;
-        case QVariant::LongLong: t="longlong"; break;
-        case QVariant::String: t="string"; break;
-        case QVariant::StringList: t="stringlist"; break;
-        case QVariant::UInt: t="uint"; break;
-        case QVariant::ULongLong: t="ulonglong"; break;
-        case QVariant::Time: t="time"; break;
-        case QVariant::Point: t="point"; break;
-        case QVariant::Size: t="size"; break;
-        case QVariant::SizeF: t="sizef"; break;
-        case QVariant::BitArray: t="bitarray"; break;
-        case QVariant::ByteArray: t="bytearray"; break;
-        case QVariant::Color: t="color"; break;
-        case QVariant::Font: t="font"; break;
-        case QVariant::Hash: t="hash"; break;
-        case QVariant::List: t="list"; break;
-        case QVariant::Map: t="map"; break;
-        case QVariant::Rect: t="rect"; break;
-        case QVariant::RectF: t="rectf"; break;
-        case QVariant::Invalid: t="invalid"; break;
-        case QVariant::Url: t="url"; break;
-        default: t="unknown"; break;
+    if (variant.isValid()) {
+        switch(variant.type()) {
+            case QVariant::Bool: t="bool"; break;
+            case QVariant::Char: t="char"; break;
+            case QVariant::Date: t="date"; break;
+            case QVariant::DateTime: t="datetime"; break;
+            case QVariant::Double: t="double"; break;
+            case QVariant::Int: t="int"; break;
+            case QVariant::LongLong: t="longlong"; break;
+            case QVariant::String: t="string"; break;
+            case QVariant::StringList: t="stringlist"; break;
+            case QVariant::UInt: t="uint"; break;
+            case QVariant::ULongLong: t="ulonglong"; break;
+            case QVariant::Time: t="time"; break;
+            case QVariant::Point: t="point"; break;
+            case QVariant::Size: t="size"; break;
+            case QVariant::SizeF: t="sizef"; break;
+            case QVariant::BitArray: t="bitarray"; break;
+            case QVariant::ByteArray: t="bytearray"; break;
+            case QVariant::Color: t="color"; break;
+            case QVariant::Font: t="font"; break;
+            case QVariant::Hash: t="hash"; break;
+            case QVariant::List: t="list"; break;
+            case QVariant::Map: t="map"; break;
+            case QVariant::Rect: t="rect"; break;
+            case QVariant::RectF: t="rectf"; break;
+            case QVariant::Invalid: t="invalid"; break;
+            case QVariant::Url: t="url"; break;
+            default: t="unknown"; break;
+        }
     }
     return t;
 }
 
 QString getQVariantData(const QVariant& variant) {
+    if (!variant.isValid()) return QString();
     QString t="";
     QLocale loc=QLocale::c();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);

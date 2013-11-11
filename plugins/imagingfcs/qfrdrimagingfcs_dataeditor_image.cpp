@@ -861,7 +861,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     ///////////////////////////////////////////////////////////////
 
     QGridLayout* grdTop=new QGridLayout(this);
-    btnPrintReport = createButtonAndActionShowText(actPrintReport, QIcon(":/imaging_fcs/report_print.png"), tr("&Print report"), this);
+    btnPrintReport = createButtonForActionShowText(actPrintReport/*, QIcon(":/imaging_fcs/report_print.png"), tr("&Print report")*/, this);
     actPrintReport->setToolTip(tr("print a report which contains all data on the current screen:<br><ul>"
                                   "<li>all images (parameter, mask, parameter 2, overview</li>"
                                   "<li>correlation curves and fit parameters</li>"
@@ -870,14 +870,13 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
                                   "</ul>"));
 
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
-    btnSaveReport = createButtonAndActionShowText(actSaveReport, QIcon(":/imaging_fcs/report_save.png"), tr("&Save report"), this);
+    btnSaveReport = createButtonForActionShowText(actSaveReport/*, QIcon(":/imaging_fcs/report_save.png"), tr("&Save report")*/, this);
     actSaveReport->setToolTip(tr("save a report which contains all data on the current screen as PDF or PostScript file:<br><ul>"
                                   "<li>all images (parameter, mask, parameter 2, overview)</li>"
                                   "<li>correlation curves and fit parameters</li>"
                                   "<li>histpgram and statistics</li>"
                                   "<li>additional data (files, description configuration ...)</li>"
                                   "</ul>"));
-    connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
     btnSaveData = createButtonAndActionShowText(actSaveData, QIcon(":/imaging_fcs/preview_savedata.png"), tr("Save &data"), this);
     actSaveData->setToolTip(tr("save the currently displayed images (parameter, mask, parameter 2, overview)\nas image files (e.g. TIFF), so they can be processed in other programs."));
     connect(actSaveData, SIGNAL(triggered()), this, SLOT(saveData()));
@@ -3933,70 +3932,7 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, c
     return true;
 }
 
-void QFRDRImagingFCSImageEditor::saveReport() {
-    /* it is often a good idea to have a possibility to save or print a report about the fit results.
-       This is implemented in a generic way here.    */
 
-    QString fn = qfGetSaveFileName(this, tr("Save Report"),
-                                lastSavePath,
-                                tr("PDF File (*.pdf);;PostScript File (*.ps)"));
-
-    if (!fn.isEmpty()) {
-        lastSavePath=QFileInfo(fn).absolutePath();
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-        int i=tabDisplay->currentIndex();
-        tabDisplay->setCurrentIndex(0);
-        tabDisplay->setCurrentIndex(1);
-        tabDisplay->setCurrentIndex(i);
-
-
-        QFileInfo fi(fn);
-        QPrinter* printer=new QPrinter();
-        printer->setPaperSize(QPrinter::A4);
-        printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-        printer->setOrientation(QPrinter::Portrait);
-        printer->setOutputFormat(QPrinter::PdfFormat);
-        if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
-        printer->setOutputFileName(fn);
-        QTextDocument* doc=new QTextDocument();
-        doc->setTextWidth(printer->pageRect().size().width());
-        createReportDoc(doc);
-        doc->print(printer);
-        delete doc;
-        delete printer;
-        QApplication::restoreOverrideCursor();
-    }
-}
-
-
-void QFRDRImagingFCSImageEditor::printReport() {
-    /* it is often a good idea to have a possibility to save or print a report about the fit results.
-       This is implemented in a generic way here.    */
-    QPrinter* p=new QPrinter();
-
-    p->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-    p->setOrientation(QPrinter::Portrait);
-    QPrintDialog *dialog = new QPrintDialog(p, this);
-    dialog->setWindowTitle(tr("Print Report"));
-    if (dialog->exec() != QDialog::Accepted) {
-        delete p;
-        return;
-    }
-
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    int i=tabDisplay->currentIndex();
-    tabDisplay->setCurrentIndex(0);
-    tabDisplay->setCurrentIndex(1);
-    tabDisplay->setCurrentIndex(i);
-    QTextDocument* doc=new QTextDocument();
-    doc->setTextWidth(p->pageRect().size().width());
-    createReportDoc(doc);
-    doc->print(p);
-    delete p;
-    delete doc;
-    QApplication::restoreOverrideCursor();
-}
 
 void QFRDRImagingFCSImageEditor::setCopyableData()
 {
@@ -4788,6 +4724,13 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (!m) return;
 
+    QApplication::processEvents();
+    int idx=tabDisplay->currentIndex();
+    for (int i=0; i<tabDisplay->count(); i++) {
+        tabDisplay->setCurrentIndex(i);
+        QApplication::processEvents();
+    }
+    tabDisplay->setCurrentIndex(idx);
 
     QTextCursor cursor(document);
     QTextCharFormat fText=cursor.charFormat();

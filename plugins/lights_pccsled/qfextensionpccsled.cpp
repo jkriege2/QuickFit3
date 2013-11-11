@@ -250,7 +250,7 @@ QString QFExtensionPCCSLED::getLightSourceDescription(unsigned int lightSource) 
     JKSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
     QF3SimpleB040SerialProtocolHandler* serial=sources[lightSource].serial;
     if (!com || !serial) return QString("");
-    return tr("Programmable Constant Current SOurce for LEDs");
+    return tr("Programmable Constant Current Source for LEDs");
 }
 
 QString QFExtensionPCCSLED::getLightSourceShortName(unsigned int lightSource) {

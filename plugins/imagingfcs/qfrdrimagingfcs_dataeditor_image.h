@@ -221,16 +221,12 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
 
         void debugInfo();
 
-        /** \brief save a report of the evaluation results */
-        void saveReport();
         /** \brief save the displayed images as data files (TIFF, CSV, ...) */
         void saveData();
         /** \brief copy displayed images to Matlab */
         void copyToMatlab();
         /** \brief copy the shown images as columns of values */
         void copyDataAsColumns();
-        /** \brief print a report of the evaluation results */
-        void printReport();
 
         /** \brief copy image data into datastores of the image plots, so they can be copied to other applications. */
         void setCopyableData();
@@ -507,7 +503,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         /*! \brief returns the RDR from which to read fit parameter 2 */
         QFRDRImagingFCSData* getRDRForParameter2(const QString& otherRDRRole) const;
 
-        void createReportDoc(QTextDocument* document);
+        virtual void createReportDoc(QTextDocument* document);
 
 
         QString selectionToString();
@@ -572,11 +568,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
 
         QAction* actLoadSelection;
         QAction* actSaveSelection;
-        /** \brief action to print a report */
-        QAction* actPrintReport;
 
-        /** \brief action to save a report */
-        QAction* actSaveReport;
         /** \brief action to save image data */
         QAction* actSaveData;
         /** \brief action to copy image data to Matlab */

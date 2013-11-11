@@ -446,6 +446,8 @@ QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam) const {
 
     setup["main_illumination/shutter"]=ui->shutterMainIllumination->getShutterState();
     setup["transmission_illumination/shutter"]=ui->shutterTransmission->getShutterState();
+    setup["transmission_illumination/lightsource_description"]=ui->lsTransmission->getLightSource()->getLightSourceDescription(ui->lsTransmission->getLightSourceID());
+    setup["transmission_illumination/short_name"]=ui->lsTransmission->getLightSource()->getLightSourceShortName(ui->lsTransmission->getLightSourceID());
     for (int i=0; i<ui->lsTransmission->getLineCount(); i++) {
         setup[QString("transmission_illumination/line%1/name").arg(i+1)]=ui->lsTransmission->getLineDescription(i);
         setup[QString("transmission_illumination/line%1/enabled").arg(i+1)]=ui->lsTransmission->isLineEnabled(i);
@@ -454,6 +456,8 @@ QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam) const {
         setup[QString("transmission_illumination/line%1/unit").arg(i+1)]=ui->lsTransmission->getLineUnit(i);
     }
     setup["laser1/shutter"]=ui->shutterLaser1->getShutterState();
+    setup["laser1/lightsource_description"]=ui->lsLaser1->getLightSource()->getLightSourceDescription(ui->lsLaser1->getLightSourceID());
+    setup["laser1/short_name"]=ui->lsLaser1->getLightSource()->getLightSourceShortName(ui->lsLaser1->getLightSourceID());
     for (int i=0; i<ui->lsLaser1->getLineCount(); i++) {
         setup[QString("laser1/line%1/name").arg(i+1)]=ui->lsLaser1->getLineDescription(i);
         setup[QString("laser1/line%1/enabled").arg(i+1)]=ui->lsLaser1->isLineEnabled(i);
@@ -462,6 +466,8 @@ QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam) const {
         setup[QString("laser1/line%1/unit").arg(i+1)]=ui->lsLaser1->getLineUnit(i);
     }
     setup["laser2/shutter"]=ui->shutterLaser2->getShutterState();
+    setup["laser2/lightsource_description"]=ui->lsLaser2->getLightSource()->getLightSourceDescription(ui->lsLaser2->getLightSourceID());
+    setup["laser2/short_name"]=ui->lsLaser2->getLightSource()->getLightSourceShortName(ui->lsLaser2->getLightSourceID());
     for (int i=0; i<ui->lsLaser2->getLineCount(); i++) {
         setup[QString("laser2/line%1/name").arg(i+1)]=ui->lsLaser2->getLineDescription(i);
         setup[QString("laser2/line%1/enabled").arg(i+1)]=ui->lsLaser2->isLineEnabled(i);

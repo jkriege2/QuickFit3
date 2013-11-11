@@ -146,15 +146,18 @@ void QFExtensionCoboltLaser::lightSourceConnect(unsigned int lightSource) {
             log_text(tr("%1 wavelength: %2 nm\n").arg(LOG_PREFIX).arg(sources[lightSource].wavelength));
             log_text(tr("%1 max. power: %2 mW\n").arg(LOG_PREFIX).arg(sources[lightSource].max_power));
 
+            sources[lightSource].setPower=CQStringToDouble(serial->queryCommand("p?"));
+            sources[lightSource].line_enabled=CQStringToDouble(serial->queryCommand("pa?"))>0.0;
+
+            sources[lightSource].hours=0;
             if (sources[lightSource].type==cltMLD6) {
-                log_text(tr("%1 laser head operating hours: %2\n").arg(LOG_PREFIX).arg(sources[lightSource].serial->queryCommand("hrs?")));
+                sources[lightSource].hours=CQStringToDouble(sources[lightSource].serial->queryCommand("hrs?"));
+                log_text(tr("%1 laser head operating hours: %2\n").arg(LOG_PREFIX).arg(sources[lightSource].hours));
                 log_text(tr("%1 entering constant power mode\n").arg(LOG_PREFIX));
                 serial->sendCommand(QString("cp"));
 
             }
-            sources[lightSource].setPower=serial->queryCommand("p?").toDouble();
-            sources[lightSource].line_enabled=serial->queryCommand("pa?").toDouble()>0.0;
-            if (sources[lightSource].line_enabled) serial->sendCommand(QString("p %1").arg(sources[lightSource].setPower*sources[lightSource].powerFactor_ParamToSend,0,'f'));
+           if (sources[lightSource].line_enabled) serial->sendCommand(QString("p %1").arg(sources[lightSource].setPower*sources[lightSource].powerFactor_ParamToSend,0,'f'));
             else  serial->sendCommand(QString("p 0"));
 
         }
@@ -224,7 +227,7 @@ void QFExtensionCoboltLaser::setLightSourcePower(unsigned int lightSource, unsig
 
     if (sources[lightSource].line_enabled) {
         serial->sendCommand(QString("p %1").arg(power*sources[lightSource].powerFactor_ParamToSend,0,'f'));
-        qDebug()<<"sending :"<<QString("p %1").arg(power*sources[lightSource].powerFactor_ParamToSend,0,'f')<<"\n";
+        //qDebug()<<"sending :"<<QString("p %1").arg(power*sources[lightSource].powerFactor_ParamToSend,0,'f')<<"\n";
     } else serial->sendCommand(QString("p 0"));
     sources[lightSource].lastAction=QTime::currentTime();
     sources[lightSource].setPower=power;
@@ -282,7 +285,15 @@ bool QFExtensionCoboltLaser::isLastLightSourceActionFinished(unsigned int lightS
 
 QString QFExtensionCoboltLaser::getLightSourceDescription(unsigned int lightSource) {
     if (lightSource<0 || lightSource>=getLightSourceCount()) return "";
-    return sources[lightSource].label;
+
+    QString d=tr("Cobolt Laser %1 sn.%2 (maxPower=%3mW, wavelength=%4nm, opHours=%5)")
+              .arg(coboltLaserType2HumanReadableString(sources[lightSource].type))
+              .arg(sources[lightSource].serialNumber)
+              .arg(sources[lightSource].max_power)
+              .arg(sources[lightSource].wavelength)
+              .arg(sources[lightSource].hours);
+
+    return d;
 }
 
 QString QFExtensionCoboltLaser::getLightSourceShortName(unsigned int lightSource) {
@@ -425,23 +436,54 @@ QString QFExtensionCoboltLaser::getMeasurementDeviceName(unsigned int measuremen
 
 unsigned int QFExtensionCoboltLaser::getMeasurementDeviceValueCount(unsigned int measuremenDevice)
 {
-    return 0;
-}
-
-QVariant QFExtensionCoboltLaser::getMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value)
-{
-    return QVariant();
+    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return false;
+    int cnt=2;
+    if (sources[measuremenDevice].type==cltMLD6) {
+        cnt += 0;
+    }
+    return cnt;
 }
 
 QString QFExtensionCoboltLaser::getMeasurementDeviceValueName(unsigned int measuremenDevice, unsigned int value)
 {
+    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return false;
+    if (value==0) return tr("measured power [mW]");
+    if (value==1) return tr("drive current [mA]");
+    if (sources[measuremenDevice].type==cltMLD6) {
+
+    }
     return QString();
 }
 
 QString QFExtensionCoboltLaser::getMeasurementDeviceValueShortName(unsigned int measuremenDevice, unsigned int value)
 {
+    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return false;
+    if (value==0) return tr("measured_power_mW");
+    if (value==1) return tr("drive_current_mA");
+    if (sources[measuremenDevice].type==cltMLD6) {
+
+    }
     return QString();
+
 }
+QVariant QFExtensionCoboltLaser::getMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value)
+{
+    if (measuremenDevice<0 || measuremenDevice>=getMeasurementDeviceCount()) return false;
+    if (value==0) return getLightSourceCurrentMeasuredPower(measuremenDevice, 0);
+
+    JKSerialConnection* com=ports.getCOMPort(sources[measuremenDevice].port);
+    QFCoboltLaserProtocolHandler* serial=sources[measuremenDevice].serial;
+    if (!com || !serial) return QVariant();
+    QMutex* mutex=ports.getMutex(sources[measuremenDevice].port);
+    QMutexLocker locker(mutex);
+    if (value==1) return serial->queryCommand("i?").toDouble();
+    if (sources[measuremenDevice].type==cltMLD6) {
+
+    }
+    return QString();
+
+}
+
 
 bool QFExtensionCoboltLaser::isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value)
 {

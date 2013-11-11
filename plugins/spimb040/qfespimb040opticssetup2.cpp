@@ -1036,6 +1036,20 @@ double QFESPIMB040OpticsSetup2::getCameraMagnification(int setup_cam) const {
     }
 }
 
+void saveMeasurementDevice(QMap<QString, QVariant>& setup, const QString& prefix, const QString& name, QFExtensionMeasurementAndControlDevice* device, int id) {
+    for (int i=0; i<device->getMeasurementDeviceValueCount(id); i++) {
+        setup[prefix+QString("%2/%1").arg(device->getMeasurementDeviceValueShortName(id, i)).arg(name)]=device->getMeasurementDeviceValue(id, i);
+    }
+}
+
+template<class T>
+void saveMeasurementDeviceCast(QMap<QString, QVariant>& setup, const QString& prefix, const QString& name, T* device, int id) {
+    QFExtensionMeasurementAndControlDevice* md=dynamic_cast<QFExtensionMeasurementAndControlDevice*>(device);
+    if (md) {
+        saveMeasurementDevice(setup, prefix, name, md, id);
+    }
+}
+
 void saveFilter(QMap<QString, QVariant>& setup, const QString& prefix, const QString& id, const FilterDescription& filter) {
     if (filter.isValid) {
         setup[prefix+QString("%1/name").arg(id)]=filter.name;
@@ -1083,6 +1097,8 @@ QMap<QString, QVariant> QFESPIMB040OpticsSetup2::getSetup(int setup_cam) const {
         if (ui_shutter.contains(it.value().shutter) && ui_shutter[it.value().shutter]) {
             setup[prefix+"shutter"]=ui_shutter[it.value().shutter]->getShutterState();
         }
+        setup[prefix+"lightsource_description"]=it.value().config->getLightSource()->getLightSourceDescription(it.value().config->getLightSourceID());
+        setup[prefix+"lightsource_short_name"]=it.value().config->getLightSource()->getLightSourceShortName(it.value().config->getLightSourceID());
         for (int i=0; i<it.value().config->getLineCount(); i++) {
             setup[prefix+QString("line%1/name").arg(i+1)]=it.value().config->getLineDescription(i);
             setup[prefix+QString("line%1/enabled").arg(i+1)]=it.value().config->isLineEnabled(i);

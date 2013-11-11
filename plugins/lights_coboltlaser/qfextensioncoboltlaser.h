@@ -10,8 +10,8 @@
 #include "../base_classes/qf3comportmanager.h"
 #include "../../../../../LIB/trunk/jkserialconnection.h"
 #include "qfextensionmeasurementdevice.h"
-
 #include "qfextensionlightsource.h"
+#include "qftools.h"
 
 /*!
     \defgroup qf3ext_lights_cobolt QFExtensionLightSource implementation to control Cobolt Lasers (MLD+DPSS, series 3-5)
@@ -183,6 +183,7 @@ class QFExtensionCoboltLaser : public QObject, public QFExtensionBase, public QF
             QString label;
             double wavelength;
             double max_power;
+            double hours;
             /** \brief any power given to setLightSourcePower() is multiplied by this factor before beeing sent to the controller (usually 0.001 to go from mW to W) */
             double powerFactor_ParamToSend;
             double powerFactor_ParamRead;
