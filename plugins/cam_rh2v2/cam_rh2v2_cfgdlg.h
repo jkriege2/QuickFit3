@@ -27,7 +27,10 @@ protected slots:
     void on_cbBinning_currentIndexChanged(int index);
     void on_cbCorr_stateChanged(int state);
     void on_cbRaw_stateChanged(int state);
-    void on_sbFrameCnt_valueChanged(int value);
+    void on_sbFrameCnt_valueChanged(double value);
+
+    void mul2();
+    void div2();
 
     void updateRuntime();
 

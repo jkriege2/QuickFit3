@@ -146,7 +146,7 @@ void QFExtensionCoboltLaser::lightSourceConnect(unsigned int lightSource) {
             log_text(tr("%1 wavelength: %2 nm\n").arg(LOG_PREFIX).arg(sources[lightSource].wavelength));
             log_text(tr("%1 max. power: %2 mW\n").arg(LOG_PREFIX).arg(sources[lightSource].max_power));
 
-            sources[lightSource].setPower=CQStringToDouble(serial->queryCommand("p?"));
+            sources[lightSource].setPower=CQStringToDouble(serial->queryCommand("p?"))*sources[lightSource].powerFactor_ParamRead;
             sources[lightSource].line_enabled=CQStringToDouble(serial->queryCommand("pa?"))>0.0;
 
             sources[lightSource].hours=0;

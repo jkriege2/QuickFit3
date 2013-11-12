@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>419</width>
-    <height>300</height>
+    <width>525</width>
+    <height>350</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,6 +18,9 @@
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
       <layout class="QFormLayout" name="formLayout">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
@@ -43,23 +46,28 @@
          <property name="text">
           <string>Number of frames to be read-out (acquisition only)</string>
          </property>
-         <property name="buddy">
-          <cstring>sbFrameCnt</cstring>
-         </property>
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QSpinBox" name="sbFrameCnt">
-         <property name="maximum">
-          <number>16777216</number>
-         </property>
-         <property name="singleStep">
-          <number>1024</number>
-         </property>
-         <property name="value">
-          <number>131072</number>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QFDoubleEdit" name="sbFrameCnt"/>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnMul2">
+           <property name="text">
+            <string>*2</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnDiv2">
+           <property name="text">
+            <string>/2</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_3">
@@ -111,6 +119,19 @@
          </property>
         </widget>
        </item>
+       <item row="4" column="1">
+        <widget class="QDoubleSpinBox" name="dsbFrameTime">
+         <property name="decimals">
+          <number>2</number>
+         </property>
+         <property name="minimum">
+          <double>0.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>1000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
        <item row="5" column="0">
         <widget class="QLabel" name="label_6">
          <property name="text">
@@ -135,35 +156,6 @@
          </item>
         </widget>
        </item>
-       <item row="4" column="1">
-        <widget class="QDoubleSpinBox" name="dsbFrameTime">
-         <property name="decimals">
-          <number>2</number>
-         </property>
-         <property name="minimum">
-          <double>0.000000000000000</double>
-         </property>
-         <property name="maximum">
-          <double>1000.000000000000000</double>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QCheckBox" name="cbCorr">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
        <item row="6" column="0">
         <widget class="QLabel" name="label_7">
          <property name="text">
@@ -174,39 +166,8 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0" colspan="2">
-        <widget class="QLabel" name="labRuntime">
-         <property name="font">
-          <font>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="text">
-          <string>TextLabel</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="7" column="1">
-        <widget class="QCheckBox" name="cbRaw">
+       <item row="6" column="1">
+        <widget class="QCheckBox" name="cbCorr">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -231,6 +192,53 @@
          </property>
         </widget>
        </item>
+       <item row="7" column="1">
+        <widget class="QCheckBox" name="cbRaw">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="9" column="0" colspan="2">
+        <widget class="QLabel" name="labRuntime">
+         <property name="font">
+          <font>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
     </layout>
@@ -247,6 +255,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfdoubleedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
@@ -256,8 +271,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>256</x>
-     <y>189</y>
+     <x>265</x>
+     <y>310</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -272,8 +287,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>324</x>
-     <y>189</y>
+     <x>333</x>
+     <y>310</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -281,8 +296,42 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>btnMul2</sender>
+   <signal>clicked()</signal>
+   <receiver>cam_rh2v2_cfgdlg</receiver>
+   <slot>mul2()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>471</x>
+     <y>55</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>263</x>
+     <y>79</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnDiv2</sender>
+   <signal>clicked()</signal>
+   <receiver>cam_rh2v2_cfgdlg</receiver>
+   <slot>div2()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>508</x>
+     <y>55</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>276</x>
+     <y>111</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>changeSet1()</slot>
+  <slot>mul2()</slot>
+  <slot>div2()</slot>
  </slots>
 </ui>

@@ -173,7 +173,7 @@ void QFRDRImagingFCSPlugin::insertRecord() {
         QString format_binVideoCorrelator_short=tr("binary imFCS correlation data");
         QString format_videoCorrelator=tr("CSV imFCS Correlations (*.autocorrelation.dat *.acf.dat *.crosscorrelation.dat *.ccf.dat *.dccf.dat *.qf.dat *.dat)");
         QString format_videoCorrelator_short=tr("CSV imFCS correlation data");
-        QString format_RH2Cor=tr("RH2 hw correlator dump (*.cor.dat)");
+        QString format_RH2Cor=tr("RH2 hw correlator dump (*.cor.dat *.valid)");
         QString format_RH2Cor_short=tr("RH2 hw cor dump");
         QStringList formats, formats_short;
         formats<<format_binVideoCorrelator<<format_videoCorrelator<<format_RH2Cor;

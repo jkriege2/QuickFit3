@@ -7,6 +7,12 @@ cam_rh2v2_cfgdlg::cam_rh2v2_cfgdlg(QWidget *parent) :
     isEditing(false)
 {
     ui->setupUi(this);
+
+    ui->sbFrameCnt->setIncrement(1024);
+    ui->sbFrameCnt->setCheckBounds(true, false);
+    ui->sbFrameCnt->setMinimum(1);
+    ui->sbFrameCnt->setIntegerWidget(true);
+    ui->sbFrameCnt->setDecimals(15);
     isCalculating=false;
     updateRuntime();
 }
@@ -84,8 +90,20 @@ void cam_rh2v2_cfgdlg::on_cbRaw_stateChanged(int state)
     updateRuntime();
 }
 
-void cam_rh2v2_cfgdlg::on_sbFrameCnt_valueChanged(int value)
+void cam_rh2v2_cfgdlg::on_sbFrameCnt_valueChanged(double value)
 {
+    updateRuntime();
+}
+
+void cam_rh2v2_cfgdlg::mul2()
+{
+    ui->sbFrameCnt->setValue(ui->sbFrameCnt->value()*2.0);
+    updateRuntime();
+}
+
+void cam_rh2v2_cfgdlg::div2()
+{
+    ui->sbFrameCnt->setValue(ui->sbFrameCnt->value()/2.0);
     updateRuntime();
 }
 
