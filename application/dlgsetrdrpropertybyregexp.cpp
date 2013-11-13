@@ -14,6 +14,8 @@ DlgSetRDRPropertyByRegExp::DlgSetRDRPropertyByRegExp(QWidget *parent) :
     ui->cmbOutput->setCurrentIndex(ProgramOptions::getConfigValue("DlgSetRDRPropertyByRegExp/output", ui->cmbOutput->currentIndex()).toInt());
     ui->edtOutputValue->setText(ProgramOptions::getConfigValue("DlgSetRDRPropertyByRegExp/output_val", ui->edtOutputValue->text()).toString());
     ui->edtRegExp->setText(ProgramOptions::getConfigValue("DlgSetRDRPropertyByRegExp/regexp", ui->edtRegExp->text()).toString());
+    ui->cmbPropertyName->setEditText(ProgramOptions::getConfigValue("DlgSetRDRPropertyByRegExp/propname", ui->cmbPropertyName->currentText()).toString());
+    ui->cmbPropertyType->setCurrentIndex(ProgramOptions::getConfigValue("DlgSetRDRPropertyByRegExp/proptype", ui->cmbPropertyType->currentIndex()).toInt());
 }
 
 DlgSetRDRPropertyByRegExp::~DlgSetRDRPropertyByRegExp()
@@ -25,6 +27,8 @@ DlgSetRDRPropertyByRegExp::~DlgSetRDRPropertyByRegExp()
     ProgramOptions::setConfigValue("DlgSetRDRPropertyByRegExp/output", ui->cmbOutput->currentIndex());
     ProgramOptions::setConfigValue("DlgSetRDRPropertyByRegExp/output_val", ui->edtOutputValue->text());
     ProgramOptions::setConfigValue("DlgSetRDRPropertyByRegExp/regexp", ui->edtRegExp->text());
+    ProgramOptions::setConfigValue("DlgSetRDRPropertyByRegExp/propname", ui->cmbPropertyName->currentText());
+    ProgramOptions::setConfigValue("DlgSetRDRPropertyByRegExp/proptype", ui->cmbPropertyType->currentIndex());
     delete ui;
 }
 
@@ -32,18 +36,24 @@ void DlgSetRDRPropertyByRegExp::setProject(QFProject *project)
 {
     this->project=project;
 
-    rdrs.clear();
-    for (int i=0; i<project->getRawDataCount(); i++) {
-        QPointer<QFRawDataRecord> r=project->getRawDataByNum(i);
-        rdrs.append(r);
-        QListWidgetItem* item=new QListWidgetItem(r->getName(), ui->lstRDR);
-        item->setCheckState(Qt::Checked);
-        item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
-        item->setData(Qt::UserRole, r->getID());
-        item->setIcon(r->getSmallIcon());
-        ui->lstRDR->addItem(item);
+    if (project) {
+        QString n=ui->cmbPropertyName->currentText();
+        ui->cmbPropertyName->clear();
+        ui->cmbPropertyName->addItems(project->getAllPropertyNames());
+        ui->cmbPropertyName->setEditText(n);
+        rdrs.clear();
+        for (int i=0; i<project->getRawDataCount(); i++) {
+            QPointer<QFRawDataRecord> r=project->getRawDataByNum(i);
+            rdrs.append(r);
+            QListWidgetItem* item=new QListWidgetItem(r->getName(), ui->lstRDR);
+            item->setCheckState(Qt::Checked);
+            item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
+            item->setData(Qt::UserRole, r->getID());
+            item->setIcon(r->getSmallIcon());
+            ui->lstRDR->addItem(item);
+        }
+        ui->lstRDR->setCurrentRow(0);
     }
-    ui->lstRDR->setCurrentRow(0);
 
 }
 
@@ -171,6 +181,26 @@ void DlgSetRDRPropertyByRegExp::applyResult(QFRawDataRecord *rdr)
             case 3: // name
                 rdr->setName(res);
                 break;
+            case 4: // property name
+                if(!ui->cmbPropertyName->currentText().isEmpty()) {
+                    switch(ui->cmbPropertyType->currentIndex()) {
+                        case 1:
+                            rdr->setQFProperty(ui->cmbPropertyName->currentText(), res.toInt());
+                            break;
+                        case 2:
+                            rdr->setQFProperty(ui->cmbPropertyName->currentText(), CQStringToDouble(res));
+                            break;
+                        case 3:
+                            rdr->setQFProperty(ui->cmbPropertyName->currentText(), QStringToBool(res));
+                            break;
+                        case 0:
+                        default:
+                            rdr->setQFProperty(ui->cmbPropertyName->currentText(), res);
+                            break;
+                    }
+
+                }
+                break;
         }
     }
 }
@@ -198,6 +228,8 @@ void DlgSetRDRPropertyByRegExp::showHelp()
 
 void DlgSetRDRPropertyByRegExp::updateTest()
 {
+    ui->cmbPropertyName->setEnabled(ui->cmbOutput->currentIndex()==4);
+    ui->cmbPropertyType->setEnabled(ui->cmbOutput->currentIndex()==4);
     int idx=ui->lstRDR->currentRow();
     QFRawDataRecord* rdr=rdrs.value(idx, NULL);
     QString error;

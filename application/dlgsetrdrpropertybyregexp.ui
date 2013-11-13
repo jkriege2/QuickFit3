@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>DlgSetRDRPropertyByRegExp</class>
  <widget class="QDialog" name="DlgSetRDRPropertyByRegExp">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -152,6 +155,11 @@
          <string>name</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>RDR property (add or set)</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item row="7" column="0">
@@ -194,6 +202,65 @@
        <property name="text">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;font size=&quot;-1&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;special replaces:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;&lt;ul&gt;&lt;li&gt;%name%: RDR name&lt;/li&gt;&lt;li&gt;%group%: RDR group&lt;/li&gt;&lt;li&gt;%id$%: RDR ID&lt;/li&gt;&lt;li&gt;%role%: RDR role&lt;/li&gt;&lt;/ul&gt;&lt;/span&gt;&lt;/font&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
+      </widget>
+     </item>
+     <item row="10" column="0">
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>property name:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="1">
+      <widget class="QComboBox" name="cmbPropertyName">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="editable">
+        <bool>true</bool>
+       </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <item>
+        <property name="text">
+         <string>NEW_PROPERTY</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="11" column="0">
+      <widget class="QLabel" name="label_11">
+       <property name="text">
+        <string>property type:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="1">
+      <widget class="QComboBox" name="cmbPropertyType">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <item>
+        <property name="text">
+         <string>string</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>integer number</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>floating-point number</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>boolean</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>
