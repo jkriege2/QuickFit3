@@ -472,7 +472,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
     }
 
     for (int i=graphs_img.size()-1; i>=0; i--) {
-        pltParamCorrelation->moveGraphTop(graphs_img[i]);
+        pltParamCorrelation->moveGraphBottom(graphs_img[i]);
     }
 
 
