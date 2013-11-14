@@ -444,7 +444,8 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 plteLinFit->set_color(scatterColor.darker());
                 plteLinFit->set_lineWidth(1.5);
                 plteLinFit->set_style(Qt::DashLine);
-                plteLinFit->set_title(tr("f(x)= %1 + %2 \cdotx").arg(doubleToLatexQString(linfitA, 2)).arg(doubleToLatexQString(linfitB, 2)));
+                plteLinFit->set_title(tr("f(x)= %1 + %2 \\cdot x").arg(doubleToLatexQString(linfitA, 2)).arg(doubleToLatexQString(linfitB, 2)));
+                pltParamCorrelation->addGraph(plteLinFit);
 
 
 
