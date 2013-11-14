@@ -516,6 +516,46 @@ double SpectrumManager::Spectrum::getSpectrumAt(double lambda)
     return gsl_spline_eval(spline,lambda, accel);
 }
 
+double SpectrumManager::Spectrum::getSpectrumIntegral(double lambda_start, double lambda_end, double wavelength_factctor)
+{
+    if (lambda_start>=lambda_end) return 0;
+    //ensureSpectrum();
+    if (!wavelength || !spectrum || N<=0) return 0;
+
+    QVector<double> wl;
+    QVector<double> sp;
+    if (lambda_start<wavelength[0]) {
+        wl<<lambda_start*wavelength_factctor;
+        sp<<0;
+    }
+
+    for (int i=0; i<N; i++) {
+        wl<<wavelength[i]*wavelength_factctor;
+        sp<<spectrum[i];
+    }
+
+    if (lambda_end>wavelength[N-1]) {
+        wl<<lambda_end*wavelength_factctor;
+        sp<<0;
+    }
+
+    gsl_interp_accel *accel= gsl_interp_accel_alloc();
+    gsl_spline *spline=gsl_spline_alloc(spectral_interpolation_type,wl.size());
+    gsl_spline_init(spline, wl.data(), sp.data(), wl.size());
+    double res;
+    if (gsl_spline_eval_integ_e(spline, lambda_start*wavelength_factctor, lambda_end*wavelength_factctor, accel, &res)) {
+        res=0;
+    }
+    //qDebug()<<"int "<<filename<<"*"<<multWith->filename<<"    "<<lambda_start<<" ... "<<lambda_end<<"   = "<<res;
+    //qDebug()<<"    "<<arrayToString(wl.data(), wl.size());
+    //qDebug()<<"    "<<arrayToString(sp.data(), sp.size());
+
+    gsl_interp_accel_free(accel);
+    gsl_spline_free(spline);
+    //qDebug()<<"int "<<filename<<"    "<<st<<" ... "<<en<<"   = "<<res;
+    return res;
+}
+
 double SpectrumManager::Spectrum::getSpectrumIntegral(double lambda_start, double lambda_end)
 {
     if (lambda_start>=lambda_end) return 0;
@@ -606,6 +646,85 @@ double SpectrumManager::Spectrum::getMulSpectrumIntegral(SpectrumManager::Spectr
 
 }
 
+double SpectrumManager::Spectrum::getMulSpectrumIntegral(SpectrumManager::Spectrum *multWith, double lambda_start, double lambda_end, double lambda_power, double wavelength_factctor, double spectrum_factor)
+{
+    //qDebug()<<"lambda="<<lambda_start<<lambda_end<<"  pow="<<lambda_power;
+    try {
+        QVector<double> wl;
+        QVector<double> sp;
+
+        int inBetweenThis=0;
+        int thisStart=-1;
+        for (int i=0; i<N; i++) {
+            if (wavelength[i]>lambda_start && wavelength[i]<=lambda_end) {
+                if (thisStart<0) thisStart=i;
+                inBetweenThis++;
+            }
+        }
+        if (thisStart>0) {
+            thisStart--;
+            inBetweenThis++;
+        }
+        if (inBetweenThis<N) {
+            inBetweenThis++;
+        }
+
+        int inBetweenOther=0;
+        int otherStart=-1;
+        for (int i=0; i<multWith->N; i++) {
+            if (multWith->wavelength[i]>lambda_start && multWith->wavelength[i]<=lambda_end) {
+                if (otherStart<0) otherStart=i;
+                inBetweenOther++;
+            }
+        }
+        if (otherStart>0) {
+            otherStart--;
+            inBetweenOther++;
+        }
+        if (inBetweenOther<multWith->N) {
+            inBetweenOther++;
+        }
+
+
+        if (inBetweenThis>inBetweenOther) {
+            for (int i=thisStart; i<thisStart+inBetweenThis; i++) {
+                wl<<wavelength[i]*wavelength_factctor;
+                sp<<spectrum[i]*multWith->getSpectrumAt(wavelength[i])*pow(wavelength[i]*wavelength_factctor, lambda_power)*spectrum_factor;
+            }
+        } else {
+            for (int i=otherStart; i<otherStart+inBetweenOther; i++) {
+                wl<<multWith->wavelength[i]*wavelength_factctor;
+                sp<<multWith->spectrum[i]*getSpectrumAt(multWith->wavelength[i])*pow(wavelength[i]*wavelength_factctor, lambda_power)*spectrum_factor;
+            }
+        }
+
+
+        for (int i=0; i<wl.size(); i++) {
+            if (!QFFloatIsOK(sp[i])) sp[i]=0;
+        }
+
+        gsl_interp_accel *accel= gsl_interp_accel_alloc();
+        gsl_spline *spline=gsl_spline_alloc(spectral_interpolation_type,wl.size());
+        gsl_spline_init(spline, wl.data(), sp.data(), wl.size());
+        double res;
+        if (gsl_spline_eval_integ_e(spline, lambda_start*wavelength_factctor, lambda_end*wavelength_factctor, accel, &res)) {
+            res=0;
+        }
+
+
+        qDebug()<<"int "<<filename<<"*"<<multWith->filename<<"    "<<lambda_start<<" ... "<<lambda_end<<"   = "<<res;
+        qDebug()<<"    "<<arrayToString(wl.data(), wl.size());
+        qDebug()<<"    "<<arrayToString(sp.data(), sp.size());
+
+        gsl_interp_accel_free(accel);
+        gsl_spline_free(spline);
+        return res;
+    } catch (std::exception& E) {
+        //qDebug()<<"ERROR: "<<E.what();
+        return 0;
+    }
+}
+
 double SpectrumManager::Spectrum::getMulSpectrumIntegral(SpectrumManager::Spectrum *multWith)
 {
     double lstart=getWavelengthMin();
@@ -613,6 +732,15 @@ double SpectrumManager::Spectrum::getMulSpectrumIntegral(SpectrumManager::Spectr
     if (multWith->getWavelengthMin()>lstart) lstart=multWith->getWavelengthMin();
     if (multWith->getWavelengthMax()<lend) lend=multWith->getWavelengthMax();
     return getMulSpectrumIntegral(multWith, lstart, lend);
+}
+
+double SpectrumManager::Spectrum::getMulSpectrumIntegral(SpectrumManager::Spectrum *multWith, double lambda_power)
+{
+    double lstart=getWavelengthMin();
+    double lend=getWavelengthMax();
+    if (multWith->getWavelengthMin()>lstart) lstart=multWith->getWavelengthMin();
+    if (multWith->getWavelengthMax()<lend) lend=multWith->getWavelengthMax();
+    return getMulSpectrumIntegral(multWith, lstart, lend, lambda_power);
 }
 
 double SpectrumManager::Spectrum::getWavelengthMin()

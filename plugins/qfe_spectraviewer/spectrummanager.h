@@ -76,8 +76,11 @@ class SpectrumManager {
                 void clear();
                 double getSpectrumAt(double wavelength);
                 double getSpectrumIntegral(double lambda_start, double lambda_end) ;
+                double getSpectrumIntegral(double lambda_start, double lambda_end, double wavelength_factctor) ;
                 double getMulSpectrumIntegral(Spectrum* multWith, double lambda_start, double lambda_end) ;
+                double getMulSpectrumIntegral(Spectrum* multWith, double lambda_start, double lambda_end, double lambda_power, double wavelength_factctor=1, double spectrum_factor=1) ;
                 double getMulSpectrumIntegral(Spectrum* multWith) ;
+                double getMulSpectrumIntegral(Spectrum* multWith, double lambda_power) ;
                 double getWavelengthMin() ;
                 double getWavelengthMax() ;
                 double getSpectrumMin() ;

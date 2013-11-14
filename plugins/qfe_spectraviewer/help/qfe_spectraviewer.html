@@ -18,6 +18,13 @@
   And can perform some simple calculations on these spectra:
   <ul>
     <li>The "spillover table" calculates how much of each fluorophore's fluorescence spectrum is detected in each of the filters.</li>
+	<li>The "FRET Calculator" estimates the Förtser radius (in Angstrom=0.1nm) between any two fluorophores. It uses the formulas:
+	$$bmath:{R_0}^6 = \frac{9000\cdot Q_0\cdot (\ln 10) \kappa^2 \cdot J}{128 \cdot \pi^5 \cdot n^4 \cdot N_A}$$
+	where $$math:Q_0$$ is the quantum efficiency of the donor without the acceptor, $$math:n$$ is the refractive index of the solvent and $$math:N_A$$ is Avogadros number. The factor $$math:\kappa^2$$ is the dipole orientation factor. The overlap integral
+	$$bmath:J=\int f_{\rm D}(\lambda) \, \epsilon_{\rm A}(\lambda) \, \lambda^4 \, d\lambda$$
+	is calculated from the normalized donor spectrum $$math:f_{\rm D}(\lambda)$$ and the absorption spectrum $$math:\epsilon_{\rm A}(\lambda)$$ of the acceptor.
+	   
+	</li>
   </ul>
   </p>
   

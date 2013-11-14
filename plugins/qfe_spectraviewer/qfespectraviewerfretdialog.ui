@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFESpectraViewerFRETDialog</class>
+ <widget class="QDialog" name="QFESpectraViewerFRETDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>590</width>
+    <height>458</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>FRET Calculator</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Parameters:</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>refracticve index:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="spinN">
+        <property name="decimals">
+         <number>4</number>
+        </property>
+        <property name="value">
+         <double>1.330000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>dipole orientation factor &amp;kappa;&lt;sup&gt;2&lt;/sup&gt;:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="spinKappa2">
+        <property name="decimals">
+         <number>4</number>
+        </property>
+        <property name="value">
+         <double>0.666700000000000</double>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Förster Radii between any two fluorophore pairs [Angstrom = 0.1nm]:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QEnhancedTableView" name="tableView"/>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QEnhancedTableView</class>
+   <extends>QTableView</extends>
+   <header>qenhancedtableview.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>QFESpectraViewerFRETDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>257</x>
+     <y>448</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>QFESpectraViewerFRETDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>325</x>
+     <y>448</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinN</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFESpectraViewerFRETDialog</receiver>
+   <slot>updateFRET()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>170</x>
+     <y>46</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>586</x>
+     <y>96</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinKappa2</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFESpectraViewerFRETDialog</receiver>
+   <slot>updateFRET()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>369</x>
+     <y>71</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>590</x>
+     <y>160</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>updateFRET()</slot>
+ </slots>
+</ui>

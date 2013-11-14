@@ -12,6 +12,7 @@
 #include <QSettings>
 #include "qfespectraviewerspilloverdialog.h"
 #include "qfversion.h"
+#include "qfespectraviewerfretdialog.h"
 
 double plotFunctionSpectralLine(double x, void* data) {
     double* d=(double*)data;
@@ -44,6 +45,10 @@ QFESpectraViewerDialog::QFESpectraViewerDialog(QFESpectraViewer *plugin, QWidget
     QAction* actClose=new QAction(QIcon(":/lib/exit.png"), tr("&Close"), this);
     connect(actClose, SIGNAL(triggered()), this, SLOT(close()));
     mainToolbar->addAction(actClose);
+    mainToolbar->addSeparator();
+    QAction* actHelp=new QAction(QIcon(":/lib/help.png"), tr("Online-&Help"), this);
+    connect(actHelp, SIGNAL(triggered()), this, SLOT(showHelp()));
+    mainToolbar->addAction(actHelp);
     mainToolbar->addSeparator();
 
     //QToolButton* btn=new QToolButton(this);
@@ -78,6 +83,10 @@ QFESpectraViewerDialog::QFESpectraViewerDialog(QFESpectraViewer *plugin, QWidget
     QAction* actSpillover=new QAction(tr("&Spillover Table"), this);
     connect(actSpillover, SIGNAL(triggered()), this, SLOT(calcSpilloverTable()));
     mainToolbar->addAction(actSpillover);
+    QAction* actFRET=new QAction(tr("&FRET Calculator"), this);
+    connect(actFRET, SIGNAL(triggered()), this, SLOT(FRETCalculator()));
+    mainToolbar->addAction(actFRET);
+    actFRET->setVisible(false);
 
     /*mainToolbar->addSeparator();
     ui->plotter->populateToolbar(mainToolbar);*/
@@ -162,6 +171,14 @@ void QFESpectraViewerDialog::reloadComboboxes()
 void QFESpectraViewerDialog::calcSpilloverTable()
 {
     QFESpectraViewerSpilloverDialog* dlg=new QFESpectraViewerSpilloverDialog(this);
+    dlg->init(plotItems, manager);
+    dlg->exec();
+    delete dlg;
+}
+
+void QFESpectraViewerDialog::FRETCalculator()
+{
+    QFESpectraViewerFRETDialog* dlg=new QFESpectraViewerFRETDialog(this);
     dlg->init(plotItems, manager);
     dlg->exec();
     delete dlg;
@@ -1393,6 +1410,11 @@ void QFESpectraViewerDialog::on_spinLaserLinewidth_valueChanged(double value)
     QPointF pnt=QPointF(ui->spinLaserCentral->value(), ui->spinLaserLinewidth->value());
     //ui->cmbLaserLine->setCurrentFromModelData(pnt);
     //ui->cmbLaserLine->setCurrentIndex(findLaserLineIndex(ui->spinLaserCentral->value(), ui->spinLaserLinewidth->value()));
+}
+
+void QFESpectraViewerDialog::showHelp()
+{
+    QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelp(plugin->getID()));
 }
 
 int QFESpectraViewerDialog::loadMoredata(const QMap<QString, QVariant> &data, int row0)

@@ -72,6 +72,7 @@ class QFESpectraViewerDialog : public QDialog
         void on_btnEditFluorophore_clicked();
         void reloadComboboxes();
         void calcSpilloverTable();
+        void FRETCalculator();
         void on_btnMailFluorophore_clicked();
         void on_btnMailLightsource_clicked();
         void on_btnMailFilter_clicked();
@@ -80,6 +81,7 @@ class QFESpectraViewerDialog : public QDialog
         void on_cmbLaserLine_currentIndexChanged(int i);
         void on_spinLaserCentral_valueChanged(double value);
         void on_spinLaserLinewidth_valueChanged(double value);
+        void showHelp();
     protected:
         Ui::QFESpectraViewerDialog *ui;
         QFESpectraViewer* plugin;

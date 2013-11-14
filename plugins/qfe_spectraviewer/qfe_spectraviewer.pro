@@ -20,7 +20,8 @@ HEADERS += qfespectraviewer.h \
     qfespectraviewerfluorophoreditor.h \
     qfespectraviewerfiltereditor.h \
     qfespectraviewerspilloverdialog.h \
-    qfespectraviewerdetectoreditor.h
+    qfespectraviewerdetectoreditor.h \
+    qfespectraviewerfretdialog.h
 
 SOURCES += qfespectraviewer.cpp \
     qfespectraviewerdialog.cpp \
@@ -30,7 +31,8 @@ SOURCES += qfespectraviewer.cpp \
     qfespectraviewerfluorophoreditor.cpp \
     qfespectraviewerfiltereditor.cpp \
     qfespectraviewerspilloverdialog.cpp \
-    qfespectraviewerdetectoreditor.cpp
+    qfespectraviewerdetectoreditor.cpp \
+    qfespectraviewerfretdialog.cpp
 
 FORMS = \
     qfespectraviewerdialog.ui \
@@ -39,7 +41,8 @@ FORMS = \
     qfespectraviewerfluorophoreditor.ui \
     qfespectraviewerfiltereditor.ui \
     qfespectraviewerspilloverdialog.ui \
-    qfespectraviewerdetectoreditor.ui
+    qfespectraviewerdetectoreditor.ui \
+    qfespectraviewerfretdialog.ui
 
 RESOURCES += qfespectraviewer.qrc \
     ../../lib/lib.qrc
