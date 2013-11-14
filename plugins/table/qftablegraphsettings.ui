@@ -1550,7 +1550,7 @@
        </widget>
       </item>
       <item row="6" column="2">
-       <widget class="QLabel" name="label_56">
+       <widget class="QLabel" name="labImageHeight">
         <property name="text">
          <string>image height:</string>
         </property>
@@ -1642,7 +1642,7 @@
        </widget>
       </item>
       <item row="7" column="2">
-       <widget class="QLabel" name="label_62">
+       <widget class="QLabel" name="labImageY">
         <property name="text">
          <string>y:</string>
         </property>
@@ -1662,7 +1662,7 @@
        </widget>
       </item>
       <item row="6" column="0">
-       <widget class="QLabel" name="label_64">
+       <widget class="QLabel" name="labImageWidth">
         <property name="text">
          <string>image width:</string>
         </property>
@@ -1721,7 +1721,7 @@
        </widget>
       </item>
       <item row="7" column="0">
-       <widget class="QLabel" name="label_61">
+       <widget class="QLabel" name="labImageX">
         <property name="text">
          <string>x:</string>
         </property>
@@ -1751,7 +1751,7 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="label_54">
+       <widget class="QLabel" name="labImageWidthPixels">
         <property name="text">
          <string>width [pixels]:</string>
         </property>
@@ -2430,8 +2430,8 @@
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>

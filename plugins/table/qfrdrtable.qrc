@@ -56,5 +56,6 @@
         <file>icons/plot_boxplotsy.png</file>
         <file>icons/plot_hrange.png</file>
         <file>icons/plot_vrange.png</file>
+        <file>icons/plot_pscatter.png</file>
     </qresource>
 </RCC>

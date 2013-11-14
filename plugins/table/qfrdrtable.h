@@ -56,7 +56,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             gtMaskImage,
             gtFunction,
             gtHorizontalRange,
-            gtVerticalRange
+            gtVerticalRange,
+            gtParametrizedScatter
         };
 
         enum GTFunctionType {
@@ -106,6 +107,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
                 case gtFunction: return QString("function");
                 case gtHorizontalRange: return QString("hrange");
                 case gtVerticalRange: return QString("vrange");
+                case gtParametrizedScatter: return QString("pscatter");
             }
             return QString("");
         }
@@ -129,6 +131,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
                 case gtFunction: return QIcon(":/table/icons/plot_function.png");
                 case gtHorizontalRange: return QIcon(":/table/icons/plot_hrange.png");
                 case gtVerticalRange: return QIcon(":/table/icons/plot_vrange.png");
+                case gtParametrizedScatter: return QIcon(":/table/icons/plot_pscatter.png");
             }
             return QIcon();
         }
@@ -152,6 +155,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             if (s=="function") return gtFunction;
             if (s=="vrange") return gtVerticalRange;
             if (s=="hrange") return gtHorizontalRange;
+            if (s=="pscatter") return gtParametrizedScatter;
             return gtLines;
         }
 

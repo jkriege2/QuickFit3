@@ -743,7 +743,89 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_fillStyle(g.fillStyle);
                 pg->set_style(g.style);
                 ui->plotter->addGraph(pg);
+            } else if (g.type==QFRDRTable::gtParametrizedScatter) { // gtLines etc.
+                JKQTPxyParametrizedErrorScatterGraph* pg=new JKQTPxyParametrizedErrorScatterGraph(ui->plotter->get_plotter());
+                pg->set_title(g.title);
+                pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
+                pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                pg->set_colorColumn(getColumnWithStride(g.meancolumn, g));
+                pg->set_sizeColumn(getColumnWithStride(g.q75column, g));
+                pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
+                if (pg->get_xErrorColumn()>=0) {
+                    pg->set_xErrorStyle(g.errorStyle);
+                } else {
+                    pg->set_xErrorStyle(JKQTPnoError);
+                }
+                pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
+                if (pg->get_yErrorColumn()>=0) {
+                    pg->set_yErrorStyle(g.errorStyle);
+                } else {
+                    pg->set_yErrorStyle(JKQTPnoError);
+                }
+                pg->set_errorWidth(g.errorWidth);
+                pg->set_errorStyle(g.errorLineStyle);
+                pg->set_errorbarSize(g.errorBarSize);
 
+                //qDebug()<<g.title<<pg->get_xColumn()<<pg->get_yColumn();
+                pg->set_drawLine(g.drawLine);
+                pg->set_symbol(g.symbol);
+                pg->set_symbolSize(g.symbolSize);
+                pg->set_lineWidth(g.linewidth);
+                QColor c=g.color;
+                c.setAlphaF(g.colorTransparent);
+                pg->set_color(c);
+                QColor ec=g.errorColor;
+                ec.setAlphaF(g.errorColorTransparent);
+                pg->set_errorColor(ec);
+                QColor efc=g.errorColor;
+                efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
+                pg->set_errorFillColor(efc);
+                QColor fc=g.fillColor;
+                fc.setAlphaF(g.fillColorTransparent);
+                pg->set_fillColor(fc);
+                pg->set_style(g.style);
+
+
+                pg->set_showColorBar(true);
+                pg->set_palette(g.imagePalette);
+                pg->set_colorBarRightVisible(g.imageColorbarRight);
+                pg->set_colorBarTopVisible(g.imageColorbarTop);
+                pg->set_colorBarRelativeHeight(g.colorbarRelativeHeight);
+                pg->set_colorBarWidth(g.colorbarWidth);
+                pg->get_colorBarRightAxis()->set_tickLabelFont(p.fontName);
+                pg->get_colorBarRightAxis()->set_tickLabelFontSize(g.imageColorbarFontsize);
+                pg->get_colorBarRightAxis()->set_axisLabel(g.imageLegend);
+                pg->get_colorBarRightAxis()->set_labelFont(p.fontName);
+                pg->get_colorBarRightAxis()->set_labelFontSize(g.imageColorbarFontsize);
+                pg->get_colorBarRightAxis()->set_minorTickInsideLength(0);
+                pg->get_colorBarRightAxis()->set_tickInsideLength(0);
+
+                pg->get_colorBarRightAxis()->set_minorTickOutsideLength(g.imageColorbarTicklength/2.0);
+                pg->get_colorBarRightAxis()->set_tickOutsideLength(g.imageColorbarTicklength);
+                pg->get_colorBarRightAxis()->set_minTicks(g.imageTicks);
+                pg->get_colorBarRightAxis()->set_minorTicks(0);
+                pg->get_colorBarTopAxis()->set_minorTickOutsideLength(g.imageColorbarTicklength/2.0);
+                pg->get_colorBarTopAxis()->set_tickOutsideLength(g.imageColorbarTicklength);
+                pg->get_colorBarTopAxis()->set_minTicks(g.imageTicks);
+                pg->get_colorBarTopAxis()->set_minorTicks(0);
+
+
+                pg->get_colorBarRightAxis()->set_labelType(g.imageColorbarLabelType);
+                pg->get_colorBarRightAxis()->set_autoLabelDigits(false);
+                pg->get_colorBarRightAxis()->set_labelDigits(g.imageColorbarLabelDigits);
+                pg->get_colorBarTopAxis()->set_labelType(g.imageColorbarLabelType);
+                pg->get_colorBarTopAxis()->set_autoLabelDigits(false);
+                pg->get_colorBarTopAxis()->set_labelDigits(g.imageColorbarLabelDigits);
+
+
+                pg->get_colorBarTopAxis()->set_tickLabelFont(p.fontName);
+                pg->get_colorBarTopAxis()->set_tickLabelFontSize(g.imageColorbarFontsize);
+                pg->get_colorBarTopAxis()->set_axisLabel(g.imageLegend);
+                pg->get_colorBarTopAxis()->set_labelFont(p.fontName);
+                pg->get_colorBarTopAxis()->set_labelFontSize(g.imageColorbarFontsize);
+
+
+                ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtImage) {
                 JKQTPColumnMathImage* pg=new JKQTPColumnMathImage(ui->plotter->get_plotter());
                 pg->set_title(g.title);
@@ -1131,6 +1213,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 //pg->set_fillColor(fc);
                 //pg->set_style(g.style);
                 ui->plotter->addGraph(pg);
+
             } else { // gtLines etc.
                 JKQTPxyLineErrorGraph* pg=new JKQTPxyLineErrorGraph(ui->plotter->get_plotter());
                 pg->set_title(g.title);
@@ -1171,7 +1254,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_fillColor(fc);
                 pg->set_style(g.style);
                 ui->plotter->addGraph(pg);
-            }
+             }
         }
 
         ui->plotter->set_doDrawing(true);

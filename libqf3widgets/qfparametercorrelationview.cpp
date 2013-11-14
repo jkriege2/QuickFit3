@@ -221,6 +221,8 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
         histStart=which;
         histEnd=which+1;
     }
+    QList<JKQTPgraph*> graphs_img;
+    QList<JKQTPgraph*> graphs_scatter;
 
     for (int hh=histStart; hh<histEnd; hh++) {
         //qDebug()<<hh<<histograms.size();
@@ -260,6 +262,12 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
 
                 int col=0;
                 tabHistogramParameters->setCellCreate(col++, hh+1, statisticsCorrelationCoefficient(d1r, d2r, datasize)*100.0);
+                double linfitA=0, linfitB=1;
+                statisticsIterativelyReweightedLeastSquaresRegression(d1r, d2r, datasize, linfitA, linfitB);
+                tabHistogramParameters->setCellCreate(col++, hh+1, linfitA);
+                tabHistogramParameters->setCellCreate(col++, hh+1, linfitB);
+
+
 
                 statisticsSort(d1, datasize);
                 statisticsSort(d2, datasize);
@@ -273,6 +281,8 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 dq25=statisticsSortedQuantile(d1, datasize, 0.25);
                 dq75=statisticsSortedQuantile(d1, datasize, 0.75);
                 dskew=statisticsSkewness(d1, datasize);
+
+
                 tabHistogramParameters->setCellCreate(col++, hh+1, datasize);
                 tabHistogramParameters->setCellCreate(col++, hh+1, dmean);
                 tabHistogramParameters->setCellCreate(col++, hh+1, dmedian);
@@ -370,7 +380,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                     g->set_palette(JKQTPMathImageINVERTED_OCEAN);
                     g->set_autoImageRange(true);
                     pltParamCorrelation->addGraph(g);
-
+                    graphs_img<<g;
                 }
 
                 QColor scatterColor=QColor("red");
@@ -392,6 +402,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                     g->set_color(scatterColor);
                     g->set_fillColor(scatterColor.lighter());
                     pltParamCorrelation->addGraph(g);
+                    graphs_scatter<<g;
                 }
 
 
@@ -425,6 +436,17 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 plteParamHistogramY->set_title("");
                 pltParamHistogramY->addGraph(plteParamHistogramY);
 
+                JKQTPxFunctionLineGraph *plteLinFit=new JKQTPxFunctionLineGraph(pltParamCorrelation->get_plotter());
+                plteLinFit->setSpecialFunction(JKQTPxFunctionLineGraph::Polynomial);
+                QVector<double> linfitParams;
+                linfitParams<<linfitA<<linfitB;
+                plteLinFit->set_params(linfitParams);
+                plteLinFit->set_color(scatterColor.darker());
+                plteLinFit->set_lineWidth(1.5);
+                plteLinFit->set_style(Qt::DashLine);
+                plteLinFit->set_title(tr("f(x)= %1 + %2 \cdotx").arg(doubleToLatexQString(linfitA, 2)).arg(doubleToLatexQString(linfitB, 2)));
+
+
 
 
                 free(histXX);
@@ -447,6 +469,10 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
 
             }
         }
+    }
+
+    for (int i=graphs_img.size()-1; i>=0; i--) {
+        pltParamCorrelation->moveGraphTop(graphs_img[i]);
     }
 
 
@@ -975,6 +1001,8 @@ void QFParameterCorrelationView::createWidgets()
     //for (int r=0; r<8; r++) tabHistogramParameters->appendRow();
     int col=0;
     tabHistogramParameters->setCellCreate(col++, 0, tr("correlation r<sub>X,Y</sub> [%]"));
+    tabHistogramParameters->setCellCreate(col++, 0, tr("IRLS regr. offset"));
+    tabHistogramParameters->setCellCreate(col++, 0, tr("IRLS regr. factor"));
 
 
     tabHistogramParameters->setCellCreate(col++, 0, tr("X: data points N"));

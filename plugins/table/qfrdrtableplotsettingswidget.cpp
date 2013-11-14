@@ -78,7 +78,7 @@ void QFRDRTablePlotSettingsWidget::setRecord(QFRDRTable *record, int graph)
 
             ui->chkGrid->setChecked(g.grid);
             ui->chkShowKey->setChecked(g.showKey);
-            ui->cmbKeyPosition->setCurrentIndex(g.keyPosition);
+            ui->cmbKeyPosition->setPosition(g.keyPosition);
             ui->spinKeyFontSize->setValue(g.keyFontSize);
 
             ui->cmbFontname->setCurrentFont(QFont(g.fontName));

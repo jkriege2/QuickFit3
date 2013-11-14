@@ -1043,7 +1043,7 @@ void QFRDRTableEditor::editExpression(const QModelIndex &index)
 
 void QFRDRTableEditor::tableKeyPressed(int key, Qt::KeyboardModifiers modifiers, QString text)
 {
-    qDebug()<<"key="<<key<<"   mods="<<modifiers<<"   text="<<text;
+    //qDebug()<<"key="<<key<<"   mods="<<modifiers<<"   text="<<text;
     if (key==Qt::Key_Delete && modifiers==Qt::NoModifier) {
         slDelete();
     }
