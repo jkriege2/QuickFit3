@@ -246,6 +246,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             bool fillColorAuto;
             bool centerColorAuto;
 
+            QMap<QString, QVariant> moreProperties;
+
         };
 
 
@@ -369,6 +371,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual void colgraphAddRangePlot(int graph, Orientation orientation, double rangeStart, double rangeEnd, double rangeCenter, const QString& title, bool invertRange=false, bool fillrange=true, bool drawRangeLines=true, bool drawRangeCenter=true, QColor centerColor=QColor("red"),  Qt::PenStyle centerStyle=Qt::SolidLine, double centerWidth=1.0);
         virtual void colgraphSetImagePlotModifier(int graph, int plot, int imageModifierColumn, ImageModifierMode mode);
         virtual void colgraphSetImagePlotRange(int graph, int plot, ImagePlotRangeChannel channel, bool autoRange, double min=0, double max=0);
+        virtual void colgraphSetPlotProperty(int graph, int plot, const QString& name, const QVariant& value);
+        virtual QVariant colgraphGetPlotProperty(int graph, int plot, const QString& name, const QVariant& defaultValue=QVariant());
 
         virtual void colgraphAddGraph(const QString&  title, const QString& xLabel=QString("x"), const QString& yLabel=QString("y"), bool logX=false, bool logY=false);
         virtual int colgraphGetPlotCount(int graph) const;

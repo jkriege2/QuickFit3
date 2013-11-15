@@ -195,6 +195,13 @@ class QFRDRColumnGraphsInterface {
          */
         virtual void colgraphSetImagePlotRange(int graph, int plot, ImagePlotRangeChannel channel, bool autoRange, double min=0, double max=0)=0;
 
+        /** \brief set a named property in the given plot
+         */
+        virtual void colgraphSetPlotProperty(int graph, int plot, const QString& name, const QVariant& value)=0;
+        /** \brief get a named property in the given plot
+         */
+        virtual QVariant colgraphGetPlotProperty(int graph, int plot, const QString& name, const QVariant& defaultValue=QVariant())=0;
+
 };
 
 Q_DECLARE_INTERFACE( QFRDRColumnGraphsInterface,

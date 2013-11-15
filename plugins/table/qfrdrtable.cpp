@@ -13,6 +13,7 @@
 
 
 QFRDRTable::GraphInfo::GraphInfo() {
+    moreProperties.clear();
     title="";
     isStrided=false;
     stride=1;
@@ -700,6 +701,29 @@ void QFRDRTable::colgraphSetImagePlotRange(int graph, int plot, QFRDRColumnGraph
         setPlot(graph, plt);
         emitRebuildPlotWidgets();
     }
+}
+
+void QFRDRTable::colgraphSetPlotProperty(int graph, int plot, const QString &name, const QVariant &value)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            plt.graphs[plot].moreProperties[name]=value;
+        }
+        setPlot(graph, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+QVariant QFRDRTable::colgraphGetPlotProperty(int graph, int plot, const QString &name, const QVariant &defaultValue)
+{
+    if (graph>=0 && graph<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(graph);
+        if (plot>=0 && plot<plt.graphs.size()) {
+            return plt.graphs[plot].moreProperties.value(name, defaultValue);
+        }
+    }
+    return defaultValue;
 }
 
 void QFRDRTable::colgraphAddGraph(const QString &title, const QString &xLabel, const QString &yLabel, bool logX, bool logY)
@@ -1482,6 +1506,19 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.fillColorAuto=QStringToBool(ge.attribute("fill_color_auto", "true"));
                     graph.centerColorAuto=QStringToBool(ge.attribute("center_color_auto", "true"));
 
+                    graph.moreProperties.clear();
+                    QDomElement gmp=ge.firstChildElement("property");
+                    while (!gmp.isNull()) {
+                        QString name=gmp.attribute("name");
+                        QString type=gmp.attribute("type");
+                        QString value=gmp.text();
+                        if (!name.isEmpty() && !type.isEmpty()) {
+                            graph.moreProperties[name]=getQVariantFromString(type, value);
+                        }
+                        gmp=gmp.nextSiblingElement("property");
+                    }
+
+
 
                     plot.graphs.append(graph);
                     ge = ge.nextSiblingElement("graph");
@@ -1716,6 +1753,17 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("fill_color_auto", boolToQString( plots[i].graphs[g].fillColorAuto));
             w.writeAttribute("center_color_auto", boolToQString( plots[i].graphs[g].centerColorAuto));
 
+
+
+            QMapIterator<QString, QVariant> mit(plots[i].graphs[g].moreProperties);
+            while (mit.hasNext()) {
+                 mit.next();
+                 w.writeStartElement("property");
+                 w.writeAttribute("name", mit.key());
+                 w.writeAttribute("type", getQVariantType(mit.value()));
+                 w.writeCDATA(mit.value().toString());
+                 w.writeEndElement();
+            }
 
             w.writeEndElement();
         }

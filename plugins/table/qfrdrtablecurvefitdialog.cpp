@@ -9,6 +9,14 @@ QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int colX, 
     QDialog(parent),
     ui(new Ui::QFRDRTableCurveFitDialog)
 {
+    intInit(table,  colX,  colY,  colW, parent,  logX,  logY,  resultColumn,  addGraph);
+}
+
+void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph)
+{
+    this->colX=colX;
+    this->colY=colY;
+    this->colW=colW;
     ui->setupUi(this);
     this->table=table;
     ui->chkLogX->setChecked(logX);
@@ -202,6 +210,7 @@ void QFRDRTableCurveFitDialog::saveResults()
                 table->colgraphAddFunctionPlot(g, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, lastResultD);
             }
             table->colgraphSetPlotTitle(g, table->colgraphGetPlotCount(g)-1, resultComment+", "+resultPars+", "+resultStat);
+            writeFitProperties(g, table->colgraphGetPlotCount(g)-1);
         } else if (saveGraph>=2){
             if (savedTo>=0) {
                 table->colgraphAddFunctionPlot(saveGraph-2, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, savedTo);
@@ -209,6 +218,7 @@ void QFRDRTableCurveFitDialog::saveResults()
                 table->colgraphAddFunctionPlot(saveGraph-2, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, lastResultD);
             }
             table->colgraphSetPlotTitle(saveGraph-2, table->colgraphGetPlotCount(saveGraph-2)-1, resultComment+", "+resultPars+", "+resultStat);
+            writeFitProperties(saveGraph-2, table->colgraphGetPlotCount(saveGraph-2)-1);
         }
         delete model;
     }
@@ -826,5 +836,25 @@ double QFRDRTableCurveFitDialog::getParamMin(const QString &param, double defaul
 double QFRDRTableCurveFitDialog::getParamMax(const QString &param, double defaultVal) const
 {
     return paramMap.value(param, QFFitFunctionValueInputTableFitParamData(0,0,false,defaultVal)).max;
+}
+
+void QFRDRTableCurveFitDialog::writeFitProperties(int g, int p)
+{
+    table->colgraphSetPlotProperty(g, p, "FIT_TYPE", "LEAST_SQUARES");
+    table->colgraphSetPlotProperty(g, p, "FIT_COLX", colX);
+    table->colgraphSetPlotProperty(g, p, "FIT_COLY", colY);
+    table->colgraphSetPlotProperty(g, p, "FIT_COLW", colW);
+    table->colgraphSetPlotProperty(g, p, "FIT_ALGORITHM", ui->cmbFitAlgorithm->currentFitAlgorithmID());
+    table->colgraphSetPlotProperty(g, p, "FIT_MODEL", ui->cmbFitFunction->currentFitFunctionID());
+    table->colgraphSetPlotProperty(g, p, "FIT_CUTLOW", ui->datacut->get_userMin());
+    table->colgraphSetPlotProperty(g, p, "FIT_CUTHIGH", ui->datacut->get_userMax());
+    table->colgraphSetPlotProperty(g, p, "FIT_LOGX", ui->chkLogX->isChecked());
+    table->colgraphSetPlotProperty(g, p, "FIT_LOGY", ui->chkLogY->isChecked());
+
+}
+
+void QFRDRTableCurveFitDialog::readFitProperties(int g, int p)
+{
+
 }
 
