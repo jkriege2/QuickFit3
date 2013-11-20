@@ -3,6 +3,7 @@
 
 #include <QtPlugin>
 #include <QColor>
+#include <QVariant>
 
 /*! \brief interface for column oriented graphs
     \ingroup qf3rdrdp_fcs
