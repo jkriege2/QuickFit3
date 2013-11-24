@@ -162,7 +162,7 @@ class FRawDataImageEditor : public QFRawDataEditor {
         void updateHistogram();
 
         /** \brief fill the given histogram widget with data */
-        void updateHistogram(QFHistogramView *histogram, QFRawDataRecord *m, double *plteImageData, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram);
+        void updateHistogram(QFHistogramView *histogram, QFRDRRunSelectionsInterface *m, double *plteImageData, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram);
         /** \brief fill the given correlation widget with data */
         void updateCorrelation(QFParameterCorrelationView *corrView, QFRawDataRecord *m, double *data1, double *data2, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram, int mode, int channel=0, const QString& label1=QString(), const QString label2=QString(), int width=0, int height=0);
 
@@ -284,7 +284,6 @@ class FRawDataImageEditor : public QFRawDataEditor {
         void deleteSelection();
         void selectionEdited();
 
-        void dualviewChanged(int mode);
 
         void copyFitResultStatistics();
         void copyMaskToAll();
@@ -438,13 +437,9 @@ class FRawDataImageEditor : public QFRawDataEditor {
         /** \brief plotter widget for the parameter histogram */
         QGridLayout* histLay;
         QFHistogramView* histogram;
-        QFHistogramView* histogram_2;
         QCheckBox* chkExcludeExcludedRunsFromHistogram;
-        QCheckBox* chkExcludeExcludedRunsFromHistogram_2;
         QFHistogramView* histogram2;
-        QFHistogramView* histogram2_2;
         QCheckBox* chkExcludeExcludedRunsFromHistogram2;
-        QCheckBox* chkExcludeExcludedRunsFromHistogram2_2;
 
         QComboBox* cmbCorrelationDisplayMode;
         QSpinBox* spinCorrelationChannel;
@@ -514,7 +509,6 @@ class FRawDataImageEditor : public QFRawDataEditor {
         /** \brief action to copy image data as column table (CSV) */
         QToolButton* btnCopyDataAsColumns;
 
-        QComboBox* cmbDualView;
 
 
 

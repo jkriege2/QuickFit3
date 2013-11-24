@@ -92,9 +92,7 @@ void FRawDataImageEditor::readSettings()
     loadSplitter(*(settings->getQSettings()), splitterBot, "imfcsimageeditor/splitterbotSizes");
     corrView->readSettings(*(settings->getQSettings()), "imfcsimageeditor/corrView/");
     histogram->readSettings(*(settings->getQSettings()), "imfcsimageeditor/");
-    histogram_2->readSettings(*(settings->getQSettings()), "imfcsimageeditor/histogram2/");
     histogram2->readSettings(*(settings->getQSettings()), "imfcsimageeditor/histogramp2");
-    histogram2_2->readSettings(*(settings->getQSettings()), "imfcsimageeditor/histogramp2_2/");
     readAdditionalSettings();
     connectParameterWidgets(true);
     rawDataChanged();
@@ -132,9 +130,7 @@ void FRawDataImageEditor::writeSettings()
     saveSplitter(*(settings->getQSettings()), splitterTopBot, "imfcsimageeditor/splittertopbotSizes");
     corrView->writeSettings(*(settings->getQSettings()), "imfcsimageeditor/corrView/");
     histogram->writeSettings(*(settings->getQSettings()), "imfcsimageeditor/");
-    histogram_2->writeSettings(*(settings->getQSettings()), "imfcsimageeditor/histogram2/");
     histogram2->writeSettings(*(settings->getQSettings()), "imfcsimageeditor/histogramp2/");
-    histogram2_2->writeSettings(*(settings->getQSettings()), "imfcsimageeditor/histogramp2_2/");
 
 }
 
@@ -548,52 +544,352 @@ void FRawDataImageEditor::showHidePlots()
 
 void FRawDataImageEditor::moveColorbarsAuto()
 {
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
+    bool rightVisible=false;
+    if (m && m->getImageFromRunsHeight() < m->getImageFromRunsWidth()) { // wider than high, i.e. "landscape"
+        rightVisible=!rightVisible;
+    }
 
+    if ((double)pltOverview->width()<=(double)pltOverview->height()) {
+        plteOverview->set_colorBarRightVisible(rightVisible);
+        plteOverview->set_colorBarTopVisible(!rightVisible);
+        plteOverviewRGB->set_colorBarRightVisible(rightVisible);
+        plteOverviewRGB->set_colorBarTopVisible(!rightVisible);
+    } else {
+        plteOverview->set_colorBarRightVisible(!rightVisible);
+        plteOverview->set_colorBarTopVisible(rightVisible);
+        plteOverviewRGB->set_colorBarRightVisible(!rightVisible);
+        plteOverviewRGB->set_colorBarTopVisible(rightVisible);
+    }
 }
 
 void FRawDataImageEditor::rawDataChanged()
 {
-
+    //qDebug()<<"QFRDRImagingFCSImageEditor::rawDataChanged()";
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    updateSelectionCombobox();
+    replotSelection(false);
+    replotOverview();
+    replotImage();
+    replotData();
+    replotMask();
+    /*if (!chkAutorangeOverview->isChecked()) */ovrPaletteChanged();
+    updateHistogram();
+    QApplication::restoreOverrideCursor();
 }
 
 void FRawDataImageEditor::maskChanged()
 {
-
+    rawDataChanged();
 }
 
 void FRawDataImageEditor::updateAfterClick()
 {
-
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    replotData();
+    //replotSelection(true);
+    replotMask();
+    updateSelectionHistogram(true);
+    QApplication::restoreOverrideCursor();
 }
 
 void FRawDataImageEditor::connectWidgets(QFRawDataRecord *current, QFRawDataRecord *old)
 {
+    if (old) {
+        //saveImageSettings();
+        disconnect(old, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(resultsChanged(QString,QString,bool)));
+        disconnect(old, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
+    }
+    correlationMaskTools->setRDR(current);
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
+    if (m) {
 
+        cmbOtherFileRole->clear();
+        QList<QFRawDataRecord*> ing=current->getGroupMembers();
+        QStringList roles;
+        for (int i=0; i<ing.size(); i++) {
+            if (ing[i] && ing[i]->getType()==current->getType() && !roles.contains(ing[i]->getRole())) {
+                roles.append(ing[i]->getRole());
+                cmbOtherFileRole->addItem(roles.last(), roles.last());
+            }
+            //qDebug()<<i<<" "<<ing[i]->getRole()<<" "<<ing[i]->getName();
+        }
+        cmbOtherFileRole->setCurrentIndex(current->getProperty("imfcs_imed_otherfilegroup",roles.indexOf(current->getRole())).toInt());
+        chkOtherFileP2->setChecked(current->getProperty("imfcs_imed_otherfile", false).toBool());
+
+        pltImage->setCurrent(current);
+        pltParamImage2->setCurrent(current);
+
+
+        spinCorrelationChannel->setRange(0, m->getImageFromRunsChannels()-1);
+        selected.clear();
+        selectedInsert(0);
+        selectionEdited();
+        connect(current, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(resultsChanged(QString,QString,bool)));
+        connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
+    } else {
+        selected.clear();
+    }
+    updateSelectionCombobox();
+    loadImageSettings();
+    fillParameterSet();
 }
 
 void FRawDataImageEditor::replotHistogram()
 {
-
+    histogram->replotHistogram();
+    histogram2->replotHistogram();
+    corrView->replotCorrelation();
 }
 
 void FRawDataImageEditor::updateHistogram()
 {
 
+    if (!current) return;
+
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
+    QFRDRRunSelectionsInterface* msel=qobject_cast<QFRDRRunSelectionsInterface*>(current);
+    if (!m || !msel) return;
+
+    corrView->clear();
+    histogram->clear();
+    updateHistogram(histogram, msel, pltImage->getData(), pltImage->getDataSize(), chkExcludeExcludedRunsFromHistogram->isChecked(), false, false);
+    histogram->setHistogramXLabel(cmbParameter->currentText());
+
+    histogram2->clear();
+    updateHistogram(histogram2, msel, pltParamImage2->getData(), pltParamImage2->getDataSize(), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false);
+    histogram2->setHistogramXLabel(cmbParameter2->currentText());
+
+    corrView->clear();
+    updateCorrelation(corrView, current, pltImage->getData(), pltParamImage2->getData(), qMin(pltImage->getDataSize(), pltParamImage2->getDataSize()), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false, cmbCorrelationDisplayMode->currentIndex(), spinCorrelationChannel->value(), cmbParameter->currentText(), cmbParameter2->currentText(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+
+    updateSelectionHistogram(false);
+    histogram->updateHistogram(true);
+    histogram2->updateHistogram(true);
+    corrView->updateCorrelation(true);
 }
 
-void FRawDataImageEditor::updateHistogram(QFHistogramView *histogram, QFRawDataRecord *m, double *plteImageData, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram)
+void FRawDataImageEditor::updateHistogram(QFHistogramView *histogram, QFRDRRunSelectionsInterface *m, double *plteImageData, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram)
 {
+    int32_t datasize=0;
+    double* datahist=(double*)malloc(plteImageSize*sizeof(double));
+    if (dv) {
+        histogram->clear();
+        if (plteImageData && (plteImageSize>=0)) {
+            if (excludeExcluded) {
+                for (register int32_t i=0; i<plteImageSize; i++) {
+                    if ((!selHistogram || selected.contains(i)) && !m->leaveoutRun(i) && indexIsDualView2(i)) {
+                        datahist[datasize]=plteImageData[i];
+                        datasize++;
+                    }
+                }
+            } else  {
+                for (register int32_t i=0; i<plteImageSize; i++) {
+                    if ((!selHistogram || selected.contains(i)) && indexIsDualView2(i)) {
+                        datahist[datasize]=plteImageData[i];
+                        datasize++;
+                    }
+                }
+            }
+        }
+    } else {
+        if (plteImageData && (plteImageSize>=0)) {
+            if (excludeExcluded) {
+                for (register int32_t i=0; i<plteImageSize; i++) {
+                    if ((!selHistogram || selected.contains(i)) && !m->leaveoutRun(i) && (!dv || (dv && !indexIsDualView2(i)))) {
+                        datahist[datasize]=plteImageData[i];
+                        datasize++;
+                    }
+                }
+            } else  {
+                for (register int32_t i=0; i<plteImageSize; i++) {
+                    if ((!selHistogram || selected.contains(i)) && (!dv || (dv && !indexIsDualView2(i)))) {
+                        datahist[datasize]=plteImageData[i];
+                        datasize++;
+                    }
+                }
+            }
+        }
+    }
+    if (selHistogram) {
+        if (datasize>2) {
+            if (histogram->histogramCount()>1) {
+                histogram->setHistogram(1, tr("selection"), datahist, datasize, false);
+            } else {
+                histogram->addHistogram(tr("selection"), datahist, datasize, false);
+            }
+        } else {
+            while (histogram->histogramCount()>1) {
+                histogram->removeHistogram(histogram->histogramCount()-1);
+            }
+            histogram->updateHistogram(true, -1);
+        }
+    } else histogram->addHistogram(tr("complete"), datahist, datasize, false);
+    if (datahist) free(datahist);
 
 }
 
-void FRawDataImageEditor::updateCorrelation(QFParameterCorrelationView *corrView, QFRawDataRecord *m, double *data1, double *data2, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram, int mode, int channel, const QString &label1, const QString label2, int width, int height)
+void FRawDataImageEditor::updateCorrelation(QFParameterCorrelationView *corrView, QFRawDataRecord *m_in, double *data1, double *data2, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram, int mode, int channel, const QString &label1, const QString label2, int width, int height)
 {
+    if (plteImageSize<=0) {
+        corrView->clear();
+        return;
+    }
 
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(m_in);
+    QFRDRRunSelectionsInterface* msel=qobject_cast<QFRDRRunSelectionsInterface*>(m_in);
+    if (!m || !msel) return;
+
+
+    int32_t datasize=0;
+    double* datac1=(double*)malloc(plteImageSize*sizeof(double));
+    double* datac2=(double*)malloc(plteImageSize*sizeof(double));
+    double* datai=(double*)malloc(plteImageSize*sizeof(double));
+    double* dataX=(double*)malloc(plteImageSize*sizeof(double));
+    double* dataY=(double*)malloc(plteImageSize*sizeof(double));
+    double* dataC=(double*)malloc(plteImageSize*sizeof(double));
+
+
+    double* image=m->getImageFromRunsPreview(channel);
+    if (!dv) {
+        if ((plteImageSize>=0) && (plteImageSize<=m->getImageFromRunsWidth()*m->getImageFromRunsHeight())) {
+            if (excludeExcluded) {
+                for (register int32_t i=0; i<plteImageSize; i++) {
+                    if ((!selHistogram || selected.contains(i)) && !msel->leaveoutRun(i) && (!dv || (dv && !indexIsDualView2(i)))) {
+                        if (data1) datac1[datasize]=data1[i];
+                        if (data2) datac2[datasize]=data2[i];
+                        if (image) datai[datasize]=image[i];
+                        if (dataX) dataX[datasize]=i%width;
+                        if (dataY) dataY[datasize]=i/width;
+                        if (dataC) dataC[datasize]=sqrt(qfSqr(double(i%width)-double(width)/2.0)+qfSqr(double(i/width)-double(height)/2.0));
+
+
+                        datasize++;
+                    }
+                }
+            } else  {
+                for (register int32_t i=0; i<plteImageSize; i++) {
+                    if ((!selHistogram || selected.contains(i)) && (!dv || (dv && !indexIsDualView2(i)))) {
+                        if (data1) datac1[datasize]=data1[i];
+                        if (data2) datac2[datasize]=data2[i];
+                        if (image) datai[datasize]=image[i];
+                        if (dataX) dataX[datasize]=i%width;
+                        if (dataY) dataY[datasize]=i/width;
+                        if (dataC) dataC[datasize]=sqrt(qfSqr(double(i%width)-double(width)/2.0)+qfSqr(double(i/width)-double(height)/2.0));
+
+
+                        datasize++;
+                    }
+                }
+            }
+        }
+    }
+
+    double* cd1=datac1;
+    double* cd2=datac2;
+    QString l1=label1;
+    QString l2=label2;
+
+    if (mode==1) {
+        cd2=datai;
+        l2=tr("intensity, ch.%1").arg(channel+1);
+    } else if (mode==2) {
+        cd1=datac2;
+        l1=label2;
+        cd2=datai;
+        l2=tr("intensity, ch.%1").arg(channel+1);
+    } else if (mode==3) {
+        cd2=dataX;
+        l2=tr("x-position [pix]");
+    } else if (mode==4) {
+        cd1=datac2;
+        l1=label2;
+        cd2=dataX;
+        l2=tr("x-position [pix]");
+    } else if (mode==5) {
+        cd2=dataY;
+        l2=tr("y-position [pix]");
+    } else if (mode==6) {
+        cd1=datac2;
+        l1=label2;
+        cd2=dataY;
+        l2=tr("y-position [pix]");
+    } else if (mode==7) {
+        cd2=dataC;
+        l2=tr("center distance [pix]");
+    } else if (mode==8) {
+        cd1=datac2;
+        l1=label2;
+        cd2=dataC;
+        l2=tr("center distance [pix]");
+    }
+
+    if (mode>0) {
+        qSwap(cd1, cd2);
+        qSwap(l1, l2);
+
+    }
+
+    corrView->setCorrelation1Label(l1);
+    corrView->setCorrelation2Label(l2);
+
+    if (cd1&&cd2) {
+        if (selHistogram) {
+            if (datasize>2) {
+                if (corrView->CorrelationCount()>1) {
+                    corrView->setCorrelation(1, tr("selection"), cd1, cd2, datasize, false);
+                } else {
+                    corrView->addCorrelation(tr("selection"), cd1, cd2, datasize, false);
+                }
+            } else {
+                while (corrView->CorrelationCount()>1) {
+                    corrView->removeCorrelation(corrView->CorrelationCount()-1);
+                }
+                corrView->updateCorrelation(true);
+            }
+        } else {
+            corrView->clear();
+            corrView->addCorrelation(tr("complete"), cd1, cd2, datasize, false);
+        }
+
+    } else {
+        corrView->clear();
+    }
+
+
+    if (datac1) free(datac1);
+    if (datac2) free(datac2);
+    if (datai) free(datai);
+    if (dataX) free(dataX);
+    if (dataY) free(dataY);
+    if (dataC) free(dataC);
 }
 
 void FRawDataImageEditor::updateSelectionHistogram(bool replot)
 {
+    if (!current) return;
 
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
+    QFRDRRunSelectionsInterface* msel=qobject_cast<QFRDRRunSelectionsInterface*>(current);
+    if (!m || !msel) return;
+
+    updateHistogram(histogram, msel, pltImage->getData(), pltImage->getDataSize(), chkExcludeExcludedRunsFromHistogram->isChecked(), false, true);
+    histogram->setHistogramXLabel(cmbParameter->currentText());
+
+    updateHistogram(histogram2, msel, pltParamImage2->getData(), pltParamImage2->getDataSize(), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, true);
+    histogram2->setHistogramXLabel(cmbParameter2->currentText());
+
+    updateCorrelation(corrView, current, pltImage->getData(), pltParamImage2->getData(), qMin(pltImage->getDataSize(), pltParamImage2->getDataSize()), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, true, cmbCorrelationDisplayMode->currentIndex(), spinCorrelationChannel->value(), cmbParameter->currentText(), cmbParameter2->currentText(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
+
+
+
+
+    if (replot) {
+        corrView->updateCorrelation(true);
+        histogram->updateHistogram(true,1);
+        histogram2->updateHistogram(true,1);
+
+    }
 }
 
 void FRawDataImageEditor::replotData()
@@ -856,10 +1152,6 @@ void FRawDataImageEditor::selectionEdited()
 
 }
 
-void FRawDataImageEditor::dualviewChanged(int mode)
-{
-
-}
 
 void FRawDataImageEditor::copyFitResultStatistics()
 {
@@ -1041,13 +1333,6 @@ void FRawDataImageEditor::createWidgets()
     glVisPlots->addWidget(chkParamImage2Visible, 0,1);
     glVisPlots->addWidget(chkMaskVisible, 0,2);
 
-    cmbDualView=new QComboBox(this);
-    cmbDualView->addItem(QIcon(":/lib/dvnone.png"), tr("none"));
-    cmbDualView->addItem(QIcon(":/lib/dvhor.png"), tr("split horizontal"));
-    cmbDualView->addItem(QIcon(":/lib/dvver.png"), tr("split vertical"));
-    glVisPlots->addWidget(new QLabel("DualView mode:"), 1, 0);
-    glVisPlots->addWidget(cmbDualView, 1, 1, 1, 2);
-    vbl->addWidget(grpVisiblePlots);
 
 
 
@@ -1848,21 +2133,14 @@ void FRawDataImageEditor::createWidgets()
     //////////////////////////////////////////////////////////////////////////////////////////
     histogram=new QFHistogramView(this);
     histogram->setMinimumHeight(200);
-    histogram_2=new QFHistogramView(this);
-    histogram_2->setMinimumHeight(200);
     chkExcludeExcludedRunsFromHistogram=new QCheckBox("", this);
     chkExcludeExcludedRunsFromHistogram->setToolTip(tr("if this option is activated the histograms are only calculated for those pixels that are not excluded."));
-    chkExcludeExcludedRunsFromHistogram_2=new QCheckBox("", this);
-    chkExcludeExcludedRunsFromHistogram_2->setToolTip(tr("if this option is activated the histograms are only calculated for those pixels that are not excluded."));
     histogram->addSettingsWidget(tr("w/o excluded:"), chkExcludeExcludedRunsFromHistogram);
-    histogram_2->addSettingsWidget(tr("w/o excluded:"), chkExcludeExcludedRunsFromHistogram_2);
-    histogram_2->setVisible(false);
 
     QWidget* widHist=new QWidget(this); //=histogram;
     histLay=new QGridLayout(this);
     widHist->setLayout(histLay);
     histLay->addWidget(histogram,0,0);
-    histLay->addWidget(histogram_2,0,1);
 
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -1870,18 +2148,11 @@ void FRawDataImageEditor::createWidgets()
     //////////////////////////////////////////////////////////////////////////////////////////
     histogram2=new QFHistogramView(this);
     histogram2->setMinimumHeight(200);
-    histogram2_2=new QFHistogramView(this);
-    histogram2_2->setMinimumHeight(200);
     chkExcludeExcludedRunsFromHistogram2=new QCheckBox("", this);
     chkExcludeExcludedRunsFromHistogram2->setToolTip(tr("if this option is activated the histograms are only calculated for those pixels that are not excluded."));
-    chkExcludeExcludedRunsFromHistogram2_2=new QCheckBox("", this);
-    chkExcludeExcludedRunsFromHistogram2_2->setToolTip(tr("if this option is activated the histograms are only calculated for those pixels that are not excluded."));
     histogram2->addSettingsWidget(tr("w/o excluded:"), chkExcludeExcludedRunsFromHistogram2);
-    histogram2_2->addSettingsWidget(tr("w/o excluded:"), chkExcludeExcludedRunsFromHistogram2_2);
-    histogram2_2->setVisible(false);
 
     histLay->addWidget(histogram2,1,0);
-    histLay->addWidget(histogram2_2,1,1);
     //histLay->addWidget(new QWidget(this),2,0);
 
     histLay->setColumnStretch(0,1);

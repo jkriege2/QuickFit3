@@ -690,6 +690,83 @@ typename T::value_type qfstatisticsMedian(const T& input_in) {
 }
 
 
+
+
+
+/*! \brief calculates the median absolute deviation about the median (MAD), a robust measure of sample deviation, the data has to be a sorted array!
+
+    \f[ \mbox{MAD}(\vec{x})=\mbox{Med}\left\{|\vec{x}-\mbox{Med}(\vec{x})|\right\} \f]
+
+    If \a median is \c !=NULL, the median is returned in this parameter
+
+    \see Ricardo A. Maronna, R. Douglas Martin, Victor J. Yohai: "Robust Statistics: Theory and Methods", Wiley, 2006, ISBN: 978-0-470-01092-1
+
+*/
+template <typename T>
+typename T::value_type qfstatisticsSortedMAD(const T& value, typename T::value_type* median=NULL) {
+    long long N=value.size();
+    if (N<=1) return 0;
+    register typename T::value_type med=qfstatisticsSortedMedian(value);
+    T sorted=value;
+    for (int i=0; i<N; i++) {
+        sorted[i]=fabs(value[i]-med);
+    }
+    qSort(sorted);
+    register typename T::value_type res=qfstatisticsSortedMedian(sorted);
+    if (median) *median=med;
+    return res;
+}
+
+/*! \brief calculates the normalized median absolute deviation about the median (NMAD), a robust measure of sample deviation, the data has to be a sorted array!
+
+    \f[ \mbox{NMAD}(\vec{x})=\frac{\mbox{MAD}(\vec{x})}{0.6745}=\frac{\mbox{Med}\left\{|\vec{x}-\mbox{Med}(\vec{x})|\right\}}{0.6745} \f]
+
+    If \a median is \c !=NULL, the median is returned in this parameter
+
+    \see Ricardo A. Maronna, R. Douglas Martin, Victor J. Yohai: "Robust Statistics: Theory and Methods", Wiley, 2006, ISBN: 978-0-470-01092-1
+
+*/
+template <typename T>
+typename T::value_type qfstatisticsSortedNMAD(const T& value, typename T::value_type* median=NULL) {
+    return qfstatisticsSortedMAD(value, median)/0.6745;
+}
+
+
+/*! \brief calculates the median absolute deviation about the median (MAD), a robust measure of sample deviation, the data has to be a sorted array!
+
+    \f[ \mbox{MAD}(\vec{x})=\mbox{Med}\left\{|\vec{x}-\mbox{Med}(\vec{x})|\right\} \f]
+
+    If \a median is \c !=NULL, the median is returned in this parameter
+
+    \see Ricardo A. Maronna, R. Douglas Martin, Victor J. Yohai: "Robust Statistics: Theory and Methods", Wiley, 2006, ISBN: 978-0-470-01092-1
+
+*/
+template <typename T>
+typename T::value_type qfstatisticsMAD(const T& value, typename T::value_type* median=NULL) {
+    long long N=value.size();
+    if (N<=1) return 0;
+    T sorted=value;
+    qSort(sorted);
+    register typename T::value_type res=qfstatisticsSortedMAD(sorted, median);
+    return res;
+}
+
+/*! \brief calculates the normalized median absolute deviation about the median (NMAD), a robust measure of sample deviation, the data has to be a sorted array!
+
+    \f[ \mbox{NMAD}(\vec{x})=\frac{\mbox{MAD}(\vec{x})}{0.6745}=\frac{\mbox{Med}\left\{|\vec{x}-\mbox{Med}(\vec{x})|\right\}}{0.6745} \f]
+
+    If \a median is \c !=NULL, the median is returned in this parameter
+
+    \see Ricardo A. Maronna, R. Douglas Martin, Victor J. Yohai: "Robust Statistics: Theory and Methods", Wiley, 2006, ISBN: 978-0-470-01092-1
+
+*/
+template <typename T>
+double qfstatisticsNMAD(const T& value, typename T::value_type* median=NULL) {
+    return double(qfstatisticsMAD(value, median))/0.6745;
+}
+
+
+
 /*! \brief return the given quantile from a sorted array
     \ingroup tools_math_stat
 

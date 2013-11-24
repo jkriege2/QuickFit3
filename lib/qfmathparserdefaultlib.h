@@ -138,6 +138,8 @@ namespace QFMathParser_DefaultLib {
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fVar, var, qfstatisticsVariance)
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fStd, std, qfstatisticsStd)
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fMedian, median, qfstatisticsMedian)
+    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fMAD, mad, qfstatisticsMAD)
+    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fNMAD, nmad, qfstatisticsNMAD)
     QFMATHPARSER_DEFINE_2PARAM1VEC_VECTONUM_FUNC(fQuantile, quantile, qfstatisticsQuantile)
 
 

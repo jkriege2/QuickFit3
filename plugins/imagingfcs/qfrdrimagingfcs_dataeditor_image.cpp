@@ -1106,6 +1106,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbCorrelationDisplayMode->addItem(tr("parameter 2 vs. y-coordinate"));
     cmbCorrelationDisplayMode->addItem(tr("parameter 1 vs. center distance"));
     cmbCorrelationDisplayMode->addItem(tr("parameter 2 vs. center distance"));
+    cmbCorrelationDisplayMode->addItem(tr("parameter 1 vs. correlation amplitude"));
+    cmbCorrelationDisplayMode->addItem(tr("parameter 2 vs. correlation amplitude"));
     spinCorrelationChannel=new QSpinBox(this);
     spinCorrelationChannel->setRange(0,0);
     spinCorrelationChannel->setValue(0);
@@ -5020,7 +5022,9 @@ void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *c
     double* dataY=(double*)malloc(plteImageSize*sizeof(double));
     double* dataC=(double*)malloc(plteImageSize*sizeof(double));
 
-    double* image=m->getImageFromRunsPreview(channel);
+    double* dataCorrA=(double*)malloc(plteImageSize*sizeof(double));
+
+    double* image=m->getImageFromRunsPreview(channel);    
     if (!dv) {
         if ((plteImageSize>=0) && (plteImageSize<=m->getImageFromRunsWidth()*m->getImageFromRunsHeight())) {
             if (excludeExcluded) {
@@ -5032,6 +5036,10 @@ void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *c
                         if (dataX) dataX[datasize]=i%width;
                         if (dataY) dataY[datasize]=i/width;
                         if (dataC) dataC[datasize]=sqrt(qfSqr(double(i%width)-double(width)/2.0)+qfSqr(double(i/width)-double(height)/2.0));
+
+                        double* corrA=m->getCorrelationRun(i);
+                        if (dataCorrA) dataCorrA[datasize]=statisticsAverage(corrA, qMin(3ll, m->getCorrelationN()));
+
                         datasize++;
                     }
                 }
@@ -5044,6 +5052,10 @@ void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *c
                         if (dataX) dataX[datasize]=i%width;
                         if (dataY) dataY[datasize]=i/width;
                         if (dataC) dataC[datasize]=sqrt(qfSqr(double(i%width)-double(width)/2.0)+qfSqr(double(i/width)-double(height)/2.0));
+
+                        double* corrA=m->getCorrelationRun(i);
+                        if (dataCorrA) dataCorrA[datasize]=statisticsAverage(corrA, qMin(3ll, m->getCorrelationN()));
+
                         datasize++;
                     }
                 }
@@ -5088,6 +5100,20 @@ void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *c
         l1=label2;
         cd2=dataC;
         l2=tr("center distance [pix]");
+    } else if (mode==9) {
+        cd2=dataCorrA;
+        l2=tr("correlation amplitude");
+    } else if (mode==10) {
+        cd1=datac2;
+        l1=label2;
+        cd2=dataCorrA;
+        l2=tr("correlation amplitude");
+    }
+
+    if (mode>0) {
+        qSwap(cd1, cd2);
+        qSwap(l1, l2);
+
     }
 
     corrView->setCorrelation1Label(l1);
@@ -5123,6 +5149,7 @@ void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *c
     if (dataX) free(dataX);
     if (dataY) free(dataY);
     if (dataC) free(dataC);
+    if (dataCorrA) free(dataCorrA);
 }
 
 
