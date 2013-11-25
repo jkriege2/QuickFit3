@@ -460,16 +460,16 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
 
                            if (special_role=="x") {
                                specialStageX.stage=w;
-                               specialStageX.device='x';
+                               specialStageX.device=0;
                            } else if (special_role=="y") {
                                specialStageY.stage=w;
-                               specialStageY.device='x';
+                               specialStageY.device=0;
                            } else if (special_role=="z") {
                                specialStageZ.stage=w;
-                               specialStageZ.device='x';
+                               specialStageZ.device=0;
                            } else if (special_role=="r") {
                                specialStageR.stage=w;
-                               specialStageR.device='x';
+                               specialStageR.device=0;
                            }
                             ui_stages[id]=w;
                             stageIndex<<qMakePair(id, 0);
@@ -537,9 +537,9 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
 
                            for (int ri=0; ri<qMin(3,special_role.size()); ri++) {
                                QChar sr=special_role[ri].toLower();
-                               char dev='x';
+                               /*char dev='x';
                                if (ri==1) dev='y';
-                               if (ri==2) dev='z';
+                               if (ri==2) dev='z';*/
                                if (sr=='x') {
                                    specialStageX.stageconfig=w;
                                    specialStageX.device=ri;
@@ -916,8 +916,21 @@ int QFESPIMB040OpticsSetup2::getSpecialShutterID(QFESPIMB040OpticsSetupBase::Shu
     return -1;
 }
 
-int QFESPIMB040OpticsSetup2::getSpecialStageID(QFESPIMB040OpticsSetupBase::specialStages shutter) const
+int QFESPIMB040OpticsSetup2::getSpecialStageID(QFESPIMB040OpticsSetupBase::specialStages stage) const
 {
+    /*switch(stage) {
+        case StageX: {
+                if (specialStageX.stage) {
+                    for (int i=0; i<stageIndex.size(); i++) {
+                        if ()
+                    }
+                }
+
+            } break;
+        case StageY: if (!shutterLaser1ID.isEmpty()) { return shutterIndex.indexOf(shutterLaser1ID); } break;
+        case StageZ: if (!shutterLaser2ID.isEmpty()) { return shutterIndex.indexOf(shutterLaser2ID); } break;
+        case StageR: if (!shutterTransmissionID.isEmpty()) { return shutterIndex.indexOf(shutterTransmissionID); } break;
+    }*/
     return -1;
 }
 
@@ -929,7 +942,6 @@ int QFESPIMB040OpticsSetup2::getSpecialBrightfieldID(QFESPIMB040OpticsSetupBase:
 int QFESPIMB040OpticsSetup2::getSpecialFilterChangerID(QFESPIMB040OpticsSetupBase::specialFilterChangers shutter) const
 {
     return -1;
-
 }
 
 #define ITERATEWIDGETMAPAROUND(MAP_TYPE, MAP, FUNCTION) \
@@ -1458,6 +1470,16 @@ bool QFESPIMB040OpticsSetup2::isStageConnected(QFExtensionLinearStage* stage, in
 
 int QFESPIMB040OpticsSetup2::getStageAxis(int stage)
 {
+    if (stage>=0 && stage<stageIndex.size()) {
+        if (ui_stages.contains(stageIndex[stage].first) && ui_stages[stageIndex[stage].first]) return ui_stages[stageIndex[stage].first]->getXStageAxis();
+        if (ui_stageconfigs.contains(stageIndex[stage].first) && ui_stageconfigs[stageIndex[stage].first]) {
+            if (stageIndex[stage].second==0) return ui_stageconfigs[stageIndex[stage].first]->getXStageAxis();
+            if (stageIndex[stage].second==1) return ui_stageconfigs[stageIndex[stage].first]->getXStageAxis();
+            if (stageIndex[stage].second==2) return ui_stageconfigs[stageIndex[stage].first]->getXStageAxis();
+        }
+    }
+
+
     // ========================================================================================================================================================================================
     // TODO: IMPLEMENT FROM HERE!!!
     // ========================================================================================================================================================================================

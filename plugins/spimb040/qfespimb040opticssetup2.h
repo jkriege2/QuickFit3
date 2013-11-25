@@ -346,14 +346,14 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
 
         struct SpecialStage {
             SpecialStage() {
-                device='x';
+                device=0;
                 stageconfig=NULL;
                 stage=NULL;
             }
 
             QFESPIMB040SampleStageConfig* stageconfig;
             QFStageConfigWidget* stage;
-            char device;
+            int device;
         };
 
         SpecialStage specialStageX;
