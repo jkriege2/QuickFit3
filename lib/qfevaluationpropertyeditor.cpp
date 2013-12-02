@@ -3,7 +3,7 @@
 #include "qfevaluationitemfactory.h"
 #include "qfversion.h"
 #include "qfproject.h"
-
+#include "qfevaluationpropertyeditorprivate.h"
 
 QFEvaluationRawDataModelProxy::QFEvaluationRawDataModelProxy(QObject *parent):
     QSortFilterProxyModel(parent)
@@ -101,27 +101,28 @@ QFEvaluationPropertyEditor::QFEvaluationPropertyEditor(QFPluginServices* service
     QWidget(parent, f)
 {
     setAttribute(Qt::WA_DeleteOnClose, true);
+    p=new QFEvaluationPropertyEditorPrivate(this);
     //std::cout<<"creating QFEvaluationPropertyEditor ... \n";
-    this->id=id;
+    p->id=id;
     this->current=NULL;
-    this->services=services;
-    layWidgets=NULL;
+    p->services=services;
+    p->layWidgets=NULL;
     resultsModel=new QFEvaluationResultsModel(this);
     resultsModel->init(NULL, "*");
 
     rdrModel=new QFProjectRawDataModel(NULL);
     rdrProxy=new QFEvaluationRawDataModelProxy(rdrModel);
     rdrProxy->setSourceModel(rdrModel);
-    lstRawData=NULL;
-    splitMain=NULL;
-    filesListFiltered=true;
+    p->lstRawData=NULL;
+    p->splitMain=NULL;
+    p->filesListFiltered=true;
 
     resize(400,300);
     move(5,5);
 
     setSettings(set);
     //std::cout<<"creating QFEvaluationPropertyEditor ... creating widgets ...\n";
-    createWidgets();
+    p->createWidgets();
 
     resize(400,300);
     move(5,5);
@@ -150,25 +151,25 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
     //int oldEditorCount=0;
     if (current) {
         //std::cout<<"disconnecting old ...\n";
-        lstRawData->setModel(NULL);
+        p->lstRawData->setModel(NULL);
         rdrProxy->setEvaluation(NULL);
         rdrProxy->setEditor(NULL);
         rdrModel->setProject(NULL);
         resultsModel->init(NULL, "*");
         oldType=current->getType();
         //oldEditorCount=current->getEditorCount();
-        disconnect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
-        disconnect(current->getProject(), SIGNAL(evaluationAboutToBeDeleted(QFEvaluationItem*)), this, SLOT(evaluationAboutToBeDeleted(QFEvaluationItem*)));
-        disconnect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
-        disconnect(pteDescription, SIGNAL(textChanged()), this, SLOT(descriptionChanged()));
-        disconnect(current, SIGNAL(propertiesChanged(const QString&,bool)), this, SLOT(propsChanged(QString,bool)));
-        disconnect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
-        disconnect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
-        disconnect(current, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), this, SLOT(resultsChanged(QFRawDataRecord*,QString,QString)));
-        disconnect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
-        disconnect(edtFilterRecords, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsChanged()));
-        disconnect(edtFilterRecordsNot, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsChanged()));
-        disconnect(chkFilterRecordsRegExp, SIGNAL(toggled(bool)), this, SLOT(filterRecordsChanged()));
+        disconnect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), p, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
+        disconnect(current->getProject(), SIGNAL(evaluationAboutToBeDeleted(QFEvaluationItem*)), p, SLOT(evaluationAboutToBeDeleted(QFEvaluationItem*)));
+        disconnect(p->edtName, SIGNAL(textChanged(const QString&)), p, SLOT(nameChanged(const QString&)));
+        disconnect(p->pteDescription, SIGNAL(textChanged()), p, SLOT(descriptionChanged()));
+        disconnect(current, SIGNAL(propertiesChanged(const QString&,bool)), p, SLOT(propsChanged(QString,bool)));
+        disconnect(p->lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), p, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
+        disconnect(rdrProxy, SIGNAL(modelReset()), p, SLOT(rdrModelReset()));
+        disconnect(current, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), p, SLOT(resultsChanged(QFRawDataRecord*,QString,QString)));
+        disconnect(p->tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), p, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));
+        disconnect(p->edtFilterRecords, SIGNAL(textChanged(QString)), p, SLOT(filterRecordsChanged()));
+        disconnect(p->edtFilterRecordsNot, SIGNAL(textChanged(QString)), p, SLOT(filterRecordsChanged()));
+        disconnect(p->chkFilterRecordsRegExp, SIGNAL(toggled(bool)), p, SLOT(filterRecordsChanged()));
         if (c) {
             if (c->getType()!=oldType) {
                 /*for (int i=oldEditorCount; i>=0; i--) {
@@ -178,11 +179,11 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
                     w->deleteLater();
                     //delete w;
                 }*/
-                if (editor) {
-                    editor->close();
-                    editor->setSettings(NULL, id);
-                    layWidgets->removeWidget(editor);
-                    editor->deleteLater();
+                if (p->editor) {
+                    p->editor->close();
+                    p->editor->setSettings(NULL, p->id);
+                    p->layWidgets->removeWidget(p->editor);
+                    p->editor->deleteLater();
                 }
             }
         }
@@ -195,764 +196,120 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         rdrProxy->setEvaluation(current);
         rdrProxy->setEditor(this);
         resultsModel->init(current, current->getResultsDisplayFilter());
-        widRDRList->setVisible(current->getShowRDRList());
+        p->widRDRList->setVisible(current->getShowRDRList());
         if (current->getType()!=oldType) {
             //editorList.clear();
             //for (int i=0; i<current->getEditorCount(); i++) {
                 QString n=current->getEditorName();
                 //std::cout<<"creating tab '"<<n.toStdString()<<"' ... \n";
-                QFEvaluationEditor* e=current->createEditor(services, this, this);
+                QFEvaluationEditor* e=current->createEditor(p->services, this, this);
                 //std::cout<<"creating tab '"<<n.toStdString()<<"' ... reading settings\n";
-                e->setSettings(settings, id);
+                e->setSettings(p->settings, p->id);
                 //std::cout<<"creating tab '"<<n.toStdString()<<"' ... setting current\n";
-                e->setCurrent(current, id);
+                e->setCurrent(current, p->id);
                 //std::cout<<"creating tab '"<<n.toStdString()<<"' ... adding tab\n";
                 //tabEditors->addTab(e, n);
-                layWidgets->addWidget(e);
+                p->layWidgets->addWidget(e);
                 //std::cQFEvaluationPropertyEditor::setSettings(out<<"creating tab '"<<n.toStdString()<<"' ... done\n";
-                editor=e;
+                p->editor=e;
             //}
         } else {
-            editor->setCurrent(current, id);
+            p->editor->setCurrent(current, p->id);
         }
-        edtName->setText(current->getName());
-        edtName->setEnabled(true);
-        pteDescription->setPlainText(current->getDescription());
-        pteDescription->setEnabled(true);
-        labID->setText(QString::number(current->getID()));
+        p->edtName->setText(current->getName());
+        p->edtName->setEnabled(true);
+        p->pteDescription->setPlainText(current->getDescription());
+        p->pteDescription->setEnabled(true);
+        p->labID->setText(QString::number(current->getID()));
         /*labTopIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
         labTop->setText(tr("<b>%1</b>").arg(current->getName()));*/
         setWindowTitle(current->getName());
         setWindowIcon(current->getSmallIcon());
 
-        if (filesListFiltered && current->getShowRDRList()) {
-            edtFilterRecords->setText(current->getNameFilter());
-            edtFilterRecordsNot->setText(current->getNameNotFilter());
-            chkFilterRecordsRegExp->setChecked(current->getNameFilterRegExp());
+        if (p->filesListFiltered && current->getShowRDRList()) {
+            p->edtFilterRecords->setText(current->getNameFilter());
+            p->edtFilterRecordsNot->setText(current->getNameNotFilter());
+            p->chkFilterRecordsRegExp->setChecked(current->getNameFilterRegExp());
             setFilesListFilteres(true);
         } else {
             setFilesListFilteres(false);
         }
 
 
-        labType->setText(current->getTypeDescription());
-        labTypeIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
-        lstRawData->setModel(rdrProxy);
-        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
-        connect(pteDescription, SIGNAL(textChanged()), this, SLOT(descriptionChanged()));
-        connect(current->getProject(), SIGNAL(evaluationAboutToBeDeleted(QFEvaluationItem*)), this, SLOT(evaluationAboutToBeDeleted(QFEvaluationItem*)));
-        connect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
-        connect(current, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(propsChanged(QString,bool)));
+        p->labType->setText(current->getTypeDescription());
+        p->labTypeIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
+        p->lstRawData->setModel(rdrProxy);
+        connect(p->edtName, SIGNAL(textChanged(const QString&)), p, SLOT(nameChanged(const QString&)));
+        connect(p->pteDescription, SIGNAL(textChanged()), p, SLOT(descriptionChanged()));
+        connect(current->getProject(), SIGNAL(evaluationAboutToBeDeleted(QFEvaluationItem*)), p, SLOT(evaluationAboutToBeDeleted(QFEvaluationItem*)));
+        connect(current->getProject(), SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), p, SLOT(recordAboutToBeDeleted(QFRawDataRecord*)));
+        connect(current, SIGNAL(propertiesChanged(QString,bool)), p, SLOT(propsChanged(QString,bool)));
         if (current->getShowRDRList()) {
-            connect(edtFilterRecords, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsChanged()));
-            connect(edtFilterRecordsNot, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsChanged()));
-            connect(chkFilterRecordsRegExp, SIGNAL(toggled(bool)), this, SLOT(filterRecordsChanged()));
-            lstRawData->selectionModel()->select(rdrProxy->index(0,0), QItemSelectionModel::SelectCurrent);
-            selectionChanged(rdrProxy->index(0,0), rdrProxy->index(0,0));//std::cout<<"new connected ...\n";
+            connect(p->edtFilterRecords, SIGNAL(textChanged(QString)), p, SLOT(filterRecordsChanged()));
+            connect(p->edtFilterRecordsNot, SIGNAL(textChanged(QString)), p, SLOT(filterRecordsChanged()));
+            connect(p->chkFilterRecordsRegExp, SIGNAL(toggled(bool)), p, SLOT(filterRecordsChanged()));
+            p->lstRawData->selectionModel()->select(rdrProxy->index(0,0), QItemSelectionModel::SelectCurrent);
+            p->selectionChanged(rdrProxy->index(0,0), rdrProxy->index(0,0));//std::cout<<"new connected ...\n";
         }
-        connect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
-        connect(rdrProxy, SIGNAL(modelReset()), this, SLOT(rdrModelReset()));
-        connect(current, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), this, SLOT(resultsChanged(QFRawDataRecord*,QString,QString)));
-        connect(tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));        connect(edtName, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
+        connect(p->lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), p, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
+        connect(rdrProxy, SIGNAL(modelReset()), p, SLOT(rdrModelReset()));
+        connect(current, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), p, SLOT(resultsChanged(QFRawDataRecord*,QString,QString)));
+        connect(p->tvResults->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), p, SLOT(tvResultsSelectionChanged(const QItemSelection&, const QItemSelection&)));
 
 
         QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/");
-        compFilterFiles->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterfiles.txt");
-        compFilterFilesNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterfilesnot.txt");
-        compFilterResults->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterresults.txt");
-        compFilterResultsNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterresults_not.txt");
-        compFilterRecords->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterrecords.txt");
-        compFilterRecordsNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterrecordsnot.txt");
+        p->compFilterFiles->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterfiles.txt");
+        p->compFilterFilesNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterfilesnot.txt");
+        p->compFilterResults->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterresults.txt");
+        p->compFilterResultsNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterresults_not.txt");
+        p->compFilterRecords->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterrecords.txt");
+        p->compFilterRecordsNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterrecordsnot.txt");
 
-        edtFilterFiles->setText(current->getProperty("FILES_FILTER", "").toString());
-        edtFilterFilesNot->setText(current->getProperty("FILES_FILTERNOT", "").toString());
-        chkFilterFilesRegExp->setChecked(current->getProperty("FILES_FILTER_REGEXP", false).toBool());
-        edtFilterResults->setText(current->getProperty("RESULTS_FILTER", "").toString());
-        edtFilterResultsNot->setText(current->getProperty("RESULTS_FILTERNOT", "").toString());
-        chkFilterResultsRegExp->setChecked(current->getProperty("RESULTS_FILTER_REGEXP", false).toBool());
+        p->edtFilterFiles->setText(current->getProperty("FILES_FILTER", "").toString());
+        p->edtFilterFilesNot->setText(current->getProperty("FILES_FILTERNOT", "").toString());
+        p->chkFilterFilesRegExp->setChecked(current->getProperty("FILES_FILTER_REGEXP", false).toBool());
+        p->edtFilterResults->setText(current->getProperty("RESULTS_FILTER", "").toString());
+        p->edtFilterResultsNot->setText(current->getProperty("RESULTS_FILTERNOT", "").toString());
+        p->chkFilterResultsRegExp->setChecked(current->getProperty("RESULTS_FILTER_REGEXP", false).toBool());
 
-        filterRecordsChanged();
+        p->filterRecordsChanged();
 
         /*helpWidget->clear();
         QString dll=current->getProject()->getEvaluationItemFactory()->getPluginHelp(current->getType());
         helpWidget->updateHelp(dll);*/
 
     } else {
-        edtName->setText("");
-        edtName->setEnabled(false);
-        pteDescription->setPlainText("");
-        pteDescription->setEnabled(false);
+        p->edtName->setText("");
+        p->edtName->setEnabled(false);
+        p->pteDescription->setPlainText("");
+        p->pteDescription->setEnabled(false);
         /*labTopIcon->setText("");
         labTop->setText("");*/
-        labID->setText("");
-        labType->setText("");
-        labTypeIcon->setText("");
-        lstRawData->setModel(NULL);
+        p->labID->setText("");
+        p->labType->setText("");
+        p->labTypeIcon->setText("");
+        p->lstRawData->setModel(NULL);
         rdrProxy->setEvaluation(NULL);
         rdrProxy->setEditor(NULL);
         rdrModel->setProject(NULL);
-        compFilterFiles->setFilename("");
-        compFilterFilesNot->setFilename("");
-        compFilterResults->setFilename("");
-        compFilterResultsNot->setFilename("");
+        p->compFilterFiles->setFilename("");
+        p->compFilterFilesNot->setFilename("");
+        p->compFilterResults->setFilename("");
+        p->compFilterResultsNot->setFilename("");
 
     }
-    if (tabMain->count()>2) tabMain->setCurrentIndex(1);
-    showAvgClicked(chkShowAvg->isChecked());
-    checkHelpAvailable();
+    if (p->tabMain->count()>2) p->tabMain->setCurrentIndex(1);
+    p->showAvgClicked(p->chkShowAvg->isChecked());
+    p->checkHelpAvailable();
 }
 
-void QFEvaluationPropertyEditor::resultsChanged(QFRawDataRecord* record, const QString& evalName, const QString& resultName) {
-    if (!resultsModel) return;
-    //resultsModel->resultsChanged();
-    if (tvResults->model()->columnCount()*tvResults->model()->rowCount()<10000) tvResults->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
-}
-
-void QFEvaluationPropertyEditor::refreshResults()
-{
-    resultsModel->resultsChanged();
-    resultsChanged();
-}
-
-void QFEvaluationPropertyEditor::displayHelp() {
-    if (tabMain->currentIndex()==0 || tabMain->currentIndex()==tabMain->count()-1) {
-        displayHelpEval();
-    } else {
-        displayHelpPlugin();
-    }
-
-}
-
-void QFEvaluationPropertyEditor::displayHelpPlugin()
-{
-    QString dll=current->getProject()->getEvaluationItemFactory()->getPluginHelp(current->getType());
-    services->displayHelpWindow(dll);
-}
-
-void QFEvaluationPropertyEditor::displayHelpPluginTutorial()
-{
-    QString dll=current->getProject()->getEvaluationItemFactory()->getPluginTutorial(current->getType());
-    services->displayHelpWindow(dll);
-}
-
-void QFEvaluationPropertyEditor::displayHelpPluginCopyright()
-{
-    QString dll=current->getProject()->getEvaluationItemFactory()->getPluginCopyrightFile(current->getType());
-    services->displayHelpWindow(dll);
-}
-
-void QFEvaluationPropertyEditor::displayHelpEval()
-{
-    QString dll=services->getOptions()->getAssetsDirectory()+QString("/help/qf3_evalscreen.html");
-    services->displayHelpWindow(dll);
-}
-
-void QFEvaluationPropertyEditor::copyValErrResults() {
-    tvResults->copySelectionAsValueErrorToExcel(QFEvaluationResultsModel::AvgRole, QFEvaluationResultsModel::SDRole);
-}
-
-void QFEvaluationPropertyEditor::copyValErrResultsNoHead() {
-    tvResults->copySelectionAsValueErrorToExcel(QFEvaluationResultsModel::AvgRole, QFEvaluationResultsModel::SDRole, false);
-}
-
-void QFEvaluationPropertyEditor::copyMedianQuantilesResults(){
-    tvResults->copySelectionAsMedianQuantilesToExcel(QFEvaluationResultsModel::MedianRole, QFEvaluationResultsModel::Quantile25Role, QFEvaluationResultsModel::Quantile75Role);
-}
-
-void QFEvaluationPropertyEditor::copyMedianQuantilesResultsNoHead() {
-    tvResults->copySelectionAsMedianQuantilesToExcel(QFEvaluationResultsModel::MedianRole, QFEvaluationResultsModel::Quantile25Role, QFEvaluationResultsModel::Quantile75Role, false);
-}
-
-void QFEvaluationPropertyEditor::currentTabChanged(int tab)
-{
-    int idx=tab-1;
-    for (int i=0; i<menus.size(); i++) {
-        if (menus[i].first==-1 || (idx>=0 && menus[i].first==idx)) {
-            menus[i].second->menuAction()->setVisible(true);
-        } else {
-            menus[i].second->menuAction()->setVisible(false);
-        }
-    }
-    menuResults->menuAction()->setVisible(tab==tabMain->count()-1);
-}
-
-void QFEvaluationPropertyEditor::checkHelpAvailable()
-{
-    if (!current) {
-        actHelpPlugin->setVisible(false);
-        actHelpPluginTutorial->setVisible(false);
-        actHelpPluginCopyright->setVisible(false);
-    } else {
-        QString dll=current->getProject()->getEvaluationItemFactory()->getPluginHelp(current->getType());
-        actHelpPlugin->setVisible(QFile::exists(dll));
-        dll=current->getProject()->getEvaluationItemFactory()->getPluginTutorial(current->getType());
-        actHelpPluginTutorial->setVisible(QFile::exists(dll));
-        dll=current->getProject()->getEvaluationItemFactory()->getPluginCopyrightFile(current->getType());
-        actHelpPluginCopyright->setVisible(QFile::exists(dll));
-    }
-
-}
-
-void QFEvaluationPropertyEditor::propertiesTextChanged(const QString &text) {
-    if (!current) return;
-    if (!resultsModel) return;
-    if (text.isEmpty()) {
-        resultsModel->setDisplayProperties(QStringList());
-    } else {
-        QStringList p=text.split(",");
-        for (int i=0; i<p.size(); i++) {
-            p[i]=p[i].trimmed();
-        }
-        resultsModel->setDisplayProperties(p);
-    }
-}
-
-void QFEvaluationPropertyEditor::filterRecordsChanged()
-{
-    setFilesListFilteres(filesListFiltered);
-}
-
-void QFEvaluationPropertyEditor::deleteSelectedRecords() {
-    if (!current) return;
-    QModelIndexList sel=tvResults->selectionModel()->selectedIndexes();
-    if (sel.size()>0) {
-        QMessageBox::StandardButton ret;
-        ret = QMessageBox::question(this, tr("QuickFit %1").arg(qfInfoVersion()),
-                     tr("Do you really want to delete the selected results?"),
-                     QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-        if (ret == QMessageBox::Yes) {
-
-            QSet<QFRawDataRecord*> recs;
-            for (int i=0; i<sel.size(); i++) {
-                QString en=sel[i].data(QFEvaluationResultsModel::EvalNameRole).toString();
-                QString rn=sel[i].data(QFEvaluationResultsModel::ResultNameRole).toString();
-                int rid=sel[i].data(QFEvaluationResultsModel::ResultIDRole).toInt();
-                if (rid>=0) {
-                    QFRawDataRecord* r=current->getProject()->getRawDataByID(rid);
-                    if (r) {
-                        recs.insert(r);
-                        r->disableEmitResultsChanged();
-                        r->resultsRemove(en, rn, false);
-                    }
-                }
-            }
-            QSetIterator<QFRawDataRecord *> i(recs);
-            while (i.hasNext()) {
-                i.next()->enableEmitResultsChanged(true);
-            }
-        }
-    }
-}
-
-void QFEvaluationPropertyEditor::showAvgClicked(bool checked)
-{
-    if (current && resultsModel) {
-        resultsModel->setShowVectorMatrixAvg(checked);
-    }
-}
-
-void QFEvaluationPropertyEditor::showStatistics()
-{
-
-    QFHistogramService* hs=QFHistogramService::getInstance();
-    if (hs&&current) {
-        QModelIndexList idxs=tvResults->selectionModel()->selectedIndexes();
-        QMap<int, QFHistogramService::Histogram> hists;
-        for (int i=0; i<idxs.size(); i++) {
-            QFHistogramService::Histogram h;
-            int col=idxs[i].column();
-            if (!hists.contains(col)) {
-                h.name=resultsModel->headerData(col, Qt::Horizontal).toString();
-                hists[col]=h;
-            }
-            QString ename=resultsModel->data(idxs[i], QFEvaluationResultsModel::EvalNameRole).toString();
-            QString rname=resultsModel->data(idxs[i], QFEvaluationResultsModel::ResultNameRole).toString();
-            int rid=resultsModel->data(idxs[i], QFEvaluationResultsModel::ResultIDRole).toInt();
-
-            QFRawDataRecord* record=current->getProject()->getRawDataByID(rid);
-
-            if (record) hists[col].data<<record->resultsGetAsDoubleList(ename, rname);
-        }
-
-        bool onePerCol=true;
-        if (hists.size()>1) {
-            onePerCol=QMessageBox::question(this, tr("Data histogram"), tr("You selected %1 columns.\nShould QuickFit open\n   [Yes] one histogram window per column, or\n   [No]  combine all data into one window?").arg(hists.size()), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
-        }
-
-        if (onePerCol) {
-            QMapIterator<int, QFHistogramService::Histogram> ii(hists);
-            while (ii.hasNext()) {
-                ii.next();
-                QString histID=QString("hist")+current->getType()+QString::number(current->getID())+"_"+QString::number(ii.key());
-                hs->getCreateView(histID, tr("Histogram from %1").arg(current->getName()));
-                hs->clearView(histID);
-                hs->addHistogramToView(histID, ii.value());
-            }
-        } else {
-            QString histID=QString("hist")+current->getType()+QString::number(current->getID());
-            hs->getCreateView(histID, tr("Histogram from %1").arg(current->getName()));
-            hs->clearView(histID);
-            QMapIterator<int, QFHistogramService::Histogram> ii(hists);
-            while (ii.hasNext()) {
-                ii.next();
-                hs->addHistogramToView(histID, ii.value());
-            }
-        }
-    }
-
-}
-
-void QFEvaluationPropertyEditor::showStatisticsComparing()
-{
-
-    QFHistogramService* hs=QFHistogramService::getInstance();
-    if (hs&&current) {
-        QModelIndexList idxs=tvResults->selectionModel()->selectedIndexes();
-        QMap<int, QList<QFHistogramService::Histogram> > hists;
-        for (int i=0; i<idxs.size(); i++) {
-            QFHistogramService::Histogram h;
-            int col=idxs[i].column();
-            if (!hists.contains(col)) {
-                QList<QFHistogramService::Histogram> l;
-                hists[col]=l;
-            }
-            QString ename=resultsModel->data(idxs[i], QFEvaluationResultsModel::EvalNameRole).toString();
-            QString rname=resultsModel->data(idxs[i], QFEvaluationResultsModel::ResultNameRole).toString();
-            int rid=resultsModel->data(idxs[i], QFEvaluationResultsModel::ResultIDRole).toInt();
-            QFRawDataRecord* record=current->getProject()->getRawDataByID(rid);
-
-            h.name=resultsModel->headerData(col, Qt::Vertical).toString();
-            if (record) h.data<<record->resultsGetAsDoubleList(ename, rname);
-            hists[col].append(h);
-        }
-
-        bool onePerCol=true;
-        if (hists.size()>1) {
-            onePerCol=QMessageBox::question(this, tr("Data histogram"), tr("You selected %1 columns.\nShould QuickFit open\n   [Yes] one histogram window per column, or\n   [No]  combine all data into one window?").arg(hists.size()), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
-        }
-
-        if (onePerCol) {
-            QMapIterator<int, QList<QFHistogramService::Histogram> > ii(hists);
-            while (ii.hasNext()) {
-                ii.next();
-                QString histID=QString("hist")+current->getType()+QString::number(current->getID())+"_"+QString::number(ii.key());
-                hs->getCreateView(histID, tr("Histogram from %1").arg(current->getName()));
-                hs->clearView(histID);
-                for (int i=0; i<ii.value().size(); i++) {
-                    hs->addHistogramToView(histID, ii.value().at(i));
-                }
-            }
-        } else {
-            QString histID=QString("hist")+current->getType()+QString::number(current->getID());
-            hs->getCreateView(histID, tr("Histogram from %1").arg(current->getName()));
-            hs->clearView(histID);
-            QMapIterator<int,  QList<QFHistogramService::Histogram> > ii(hists);
-            while (ii.hasNext()) {
-                ii.next();
-                for (int i=0; i<ii.value().size(); i++) {
-                    hs->addHistogramToView(histID, ii.value().at(i));
-                }
-            }
-        }
-    }
-
-}
-
-void QFEvaluationPropertyEditor::nameChanged(const QString& text) {
-    if (current) {
-        current->setName(text);
-    }
-}
-
-void QFEvaluationPropertyEditor::descriptionChanged() {
-    if (current) {
-        current->setDescription(pteDescription->toPlainText());
-    }
-}
-
-void QFEvaluationPropertyEditor::evaluationAboutToBeDeleted(QFEvaluationItem* r) {
-    if ((current==r) && current) {
-        close();
-    }
-}
-
-
-void QFEvaluationPropertyEditor::propsChanged(const QString& property, bool visible) {
-    if (current) {
-        if (current->getName()!=edtName->text()) {
-            edtName->setText(current->getName());
-        }
-        if (current->getDescription()!=pteDescription->toPlainText()) {
-            pteDescription->setPlainText(current->getDescription());
-        }
-        /*labTopIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
-        labTop->setText(tr("<b>%1</b>").arg(current->getName()));*/
-        setWindowTitle(current->getName());
-        setWindowIcon(current->getSmallIcon());
-        labID->setText(QString::number(current->getID()));
-        labType->setText(current->getTypeDescription());
-        labTypeIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
-    }
-}
-
-
-void QFEvaluationPropertyEditor::createWidgets() {
-    QVBoxLayout* ml=new QVBoxLayout(this);
-    setLayout(ml);
-    ml->setContentsMargins(2,2,2,2);
-    /*QHBoxLayout* vl=new QHBoxLayout(this);
-    ml->addLayout(vl);
-    labTopIcon=new QLabel(this);
-    vl->addWidget(labTopIcon);
-    labTop=new QLabel(this);
-    vl->addWidget(labTop);
-    vl->addStretch();*/
-
-    menuBar=new QMenuBar(this);
-    menuBar->setVisible(true);
-    ml->addWidget(menuBar);
-    menuResults=menuBar->addMenu("&Results");
-    menuHelp=menuBar->addMenu("&Help");
-
-    tabMain=new QTabWidget(this);
-    ml->addWidget(tabMain);
-
-    QWidget* w=new QWidget(tabMain);
-    QFormLayout* fl=new QFormLayout(w);
-    w->setLayout(fl);
-    tabMain->addTab(w, tr("&Properties"));
-    labID=new QLabel(w);
-    fl->addRow(tr("ID:"), labID);
-    labType=new QLabel(w);
-    labTypeIcon=new QLabel(w);
-    QHBoxLayout* ptl=new QHBoxLayout(this);
-    ptl->setContentsMargins(0,0,0,0);
-    ptl->addWidget(labTypeIcon);
-    ptl->addWidget(labType);
-    ptl->addStretch();
-    fl->addRow(tr("Type:"), ptl);
-    edtName=new QLineEdit(w);
-    fl->addRow(tr("&Name:"), edtName);
-    pteDescription=new QPlainTextEdit(w);
-    fl->addRow(tr("&Description:"), pteDescription);
-
-    splitMain=new QVisibleHandleSplitter(tabMain);
-    lstRawData=new QListView(splitMain);
-    //tabEditors=new QTabWidget(splitMain);
-    layWidgets=new QHBoxLayout(this);
-    QWidget* wl=new QWidget(this);
-    wl->setLayout(layWidgets);
-    //splitMain->addWidget(tabEditors);
-    splitMain->addWidget(wl);
-    //splitMain->addWidget(lstRawData);
-    QVBoxLayout* lstvbl=new QVBoxLayout(splitMain);
-    widRDRList=new QWidget(splitMain);
-    widRDRList->setLayout(lstvbl);
-
-    widFilterRecords=new QWidget(this);
-    QHBoxLayout* lFilterRecords=new QHBoxLayout(this);
-    widFilterRecords->setLayout(lFilterRecords);
-    lFilterRecords->addWidget(new QLabel("filter: "));
-    edtFilterRecords=new QFEnhancedLineEdit(this);
-    edtFilterRecords->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterRecords, edtFilterRecords));
-    edtFilterRecords->setCompleter(new QFCompleterFromFile());
-    compFilterRecords=new QFCompleterFromFile(this);
-    edtFilterRecords->setCompleter(compFilterRecords);
-    lFilterRecords->addWidget(edtFilterRecords);
-    lFilterRecords->addWidget(new QLabel(tr(" <span style=\"text-decoration: overline\">filter</span>: "), this));
-    edtFilterRecordsNot=new QFEnhancedLineEdit(this);
-    edtFilterRecordsNot->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterRecordsNot, edtFilterRecordsNot));
-    compFilterRecordsNot=new QFCompleterFromFile(this);
-    edtFilterRecordsNot->setCompleter(compFilterRecordsNot);
-    lFilterRecords->addWidget(edtFilterRecordsNot);
-    chkFilterRecordsRegExp=new QCheckBox(tr("RegExp"), this);
-    chkFilterRecordsRegExp->setChecked(false);
-    lFilterRecords->addWidget(chkFilterRecordsRegExp);
-    edtFilterRecords->setToolTip(tr("use this to filter the contents of the rdr list<br><br>"
-                                       "Simply enter a filter string and the list will only display those"
-                                       "rows where the raw data record name contains a match to the filter string."
-                                       "Depending on whether <i>RegExp</i> is checked or not, you can use"
-                                       "either simple text with wildcards '<tt>*</tt>' (match any characters) and '<tt>?</tt>'"
-                                       "(match a single character), or full regular expressions in the filter string."
-                                  "<br><br><font color=\"darkred\">red text</font> means you entered an invalid regular expression"));
-    edtFilterRecordsNot->setToolTip(tr("use this to filter the contents of the rdr list<br><br>"
-                                       "Simply enter a filter string and the list will only display those"
-                                       "rows where the raw data record name contains NO match to the filter string."
-                                       "Depending on whether <i>RegExp</i> is checked or not, you can use"
-                                       "either simple text with wildcards '<tt>*</tt>' (match any characters) and '<tt>?</tt>'"
-                                       "(match a single character), or full regular expressions in the filter string."
-                                     "<br><br><font color=\"darkred\">red text</font> means you entered an invalid regular expression"));
-    connect(edtFilterRecordsNot, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsTextChanged(QString)));
-    connect(edtFilterRecords, SIGNAL(textChanged(QString)), this, SLOT(filterRecordsTextChanged(QString)));
-
-    lstvbl->addWidget(widFilterRecords);
-
-    lstvbl->addWidget(lstRawData, 10);
-    btnRemoveRawData=new QPushButton(QIcon(":/lib/item_delete.png"), tr("remove record"), widRDRList);
-    btnRemoveRawData->setToolTip(tr("remove the current raw data record from the project"));
-    connect(btnRemoveRawData, SIGNAL(clicked()), this, SLOT(removeRawData()));
-    lstvbl->addWidget(btnRemoveRawData);
-
-    splitMain->addWidget(widRDRList);
-
-    splitMain->setCollapsible(0, false);
-    splitMain->setCollapsible(1, false);
-    splitMain->setStretchFactor(0,5);
-    splitMain->setStretchFactor(1,1);
-
-    //connect(lstRawData, SIGNAL(activated(const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&)));
-    //connect(lstRawData, SIGNAL(clicked(const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&)));
-    //connect(lstRawData, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&)));
-    //connect(lstRawData->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectionChanged(const QModelIndex&, const QModelIndex&)));
-
-    //QItemSelectionModel::SelectCurrent
-
-    tabMain->addTab(splitMain, tr("&Evaluation"));
-
-
-
-
-    widResults=new QWidget(this);
-    QVBoxLayout* rwvlayout=new QVBoxLayout(this);
-    widResults->setLayout(rwvlayout);
-
-    tvResults=new QEnhancedTableView(widResults);
-    actCopyResults=tvResults->getActCopyExcel();
-    actCopyResultsNoHead=tvResults->getActCopyExcelNoHead();
-    tvResults->setAlternatingRowColors(true);
-    tvResults->setItemDelegate(new QFHTMLDelegate(tvResults));
-    QFontMetrics fm(font());
-    tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
-    tvResults->verticalHeader()->setResizeMode(QHeaderView::Interactive);
-    tvResults->verticalHeader()->setTextElideMode(Qt::ElideMiddle);
-    tvResults->verticalHeader()->setMaximumWidth(750);
-    tvResults->setModel(resultsModel);
-    tvResults->setContextMenuPolicy(Qt::ActionsContextMenu);
-
-
-    tbResults=new QToolBar("toolbar_eval_results", this);
-    rwvlayout->addWidget(tbResults);
-    actRefreshResults=new QAction(QIcon(":/lib/refresh16.png"), tr("Refresh results ..."), this);
-    actRefreshResults->setShortcut(tr("F5"));
-    tbResults->addAction(actRefreshResults);
-    tbResults->addSeparator();
-    actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete selected results"), this);
-    actDeleteResults->setShortcut(QKeySequence::Delete);
-    tbResults->addAction(actDeleteResults);
-    tbResults->addSeparator();
-
-    /*actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to clipboard (for Excel ...)"), this);
-    tbResults->addAction(actCopyResults);
-    actCopyResultsNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy Selection without header"), this);
-    tbResults->addAction(actCopyResultsNoHead);*/
-    tvResults->addActionsToToolbar(tbResults);
-    actCopyValErrResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as value+error pairs"), this);
-    tbResults->addAction(actCopyValErrResults);
-    actCopyValErrResultsNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as value+error pairs, w/o header"), this);
-    tbResults->addAction(actCopyValErrResultsNoHead);
-
-    actCopyMedianQuantilesResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as median+q25+q75"), this);
-    actCopyMedianQuantilesNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as median+q25+q75, w/o header"), this);
-
-    actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), this);
-    tbResults->addAction(actSaveResults);
-    actSaveResultsAveraged=new QAction(tr("Save all results to file, averaged vector/matrix results"), this);
-
-    tbResults->addSeparator();
-    actStatistics=new QAction(QIcon(":/lib/result_statistics.png"), tr("Result statistics, summarizing cells"), this);
-    tbResults->addAction(actStatistics);
-    actStatisticsComparing=new QAction(QIcon(":/lib/result_statistics_compare.png"), tr("Result statistics, comparing cells"), this);
-    tbResults->addAction(actStatisticsComparing);
-
-    tbResults->addSeparator();
-    chkShowAvg=new QCheckBox(tr("show Avg+/-SD for vector/matrix resuts"), this);
-    tbResults->addWidget(chkShowAvg);
-    chkShowAvg->setChecked(true);
-    connect(chkShowAvg, SIGNAL(toggled(bool)), this, SLOT(showAvgClicked(bool)));
-    tbResults->addSeparator();
-    tbResults->addWidget(new QLabel(" display properties: "));
-    edtDisplayProperties=new QFEnhancedLineEdit(this);
-    edtDisplayProperties->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtDisplayProperties, edtDisplayProperties));
-    edtDisplayProperties->setToolTip(tr("put a comma ',' separated list of properties here that should be part of the results table. <br><b>Note:</b> These properties can NOT be filtered with the filters below."));
-    connect(edtDisplayProperties, SIGNAL(textChanged(QString)), this, SLOT(propertiesTextChanged(QString)));
-    tbResults->addWidget(edtDisplayProperties);
-
-
-
-
-    tbResultsFilter=new QToolBar("toolbar_eval_results2", this);
-    rwvlayout->addWidget(tbResultsFilter);
-    tbResultsFilter->addWidget(new QLabel(" filter: file contains "));
-    edtFilterFiles=new QFEnhancedLineEdit(this);
-    edtFilterFiles->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterFiles, edtFilterFiles));
-    edtFilterFiles->setCompleter(new QFCompleterFromFile());
-    compFilterFiles=new QFCompleterFromFile(this);
-    edtFilterFiles->setCompleter(compFilterFiles);
-    connect(edtFilterFiles, SIGNAL(textChanged(QString)), resultsModel, SLOT(setFilesFilter(QString)));
-    tbResultsFilter->addWidget(edtFilterFiles);
-    tbResultsFilter->addWidget(new QLabel(tr("  and not contains "), this));
-    edtFilterFilesNot=new QFEnhancedLineEdit(this);
-    edtFilterFilesNot->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterFilesNot, edtFilterFilesNot));
-    compFilterFilesNot=new QFCompleterFromFile(this);
-    edtFilterFilesNot->setCompleter(compFilterFilesNot);
-    connect(edtFilterFilesNot, SIGNAL(textChanged(QString)), resultsModel, SLOT(setFilesFilterNot(QString)));
-    tbResultsFilter->addWidget(edtFilterFilesNot);
-    chkFilterFilesRegExp=new QCheckBox(tr("RegExp"), this);
-    chkFilterFilesRegExp->setChecked(false);
-    tbResultsFilter->addWidget(chkFilterFilesRegExp);
-    connect(chkFilterFilesRegExp, SIGNAL(clicked(bool)), resultsModel, SLOT(setFilesFilterUsesRegExp(bool)));
-    edtFilterFiles->setToolTip(tr("use this to filter the contents of the results table<br><br>"
-                                       "Simply enter a filter string and the table will only display those"
-                                       "rows where the raw data record name contains a match to the filter string."
-                                       "Depending on whether <i>RegExp</i> is checked or not, you can use"
-                                       "either simple text with wildcards '<tt>*</tt>' (match any characters) and '<tt>?</tt>'"
-                                       "(match a single character), or full regular expressions in the filter string."
-                                  "<br><br><font color=\"darkred\">red text</font> means you entered an invalid regular expression"));
-    edtFilterFilesNot->setToolTip(tr("use this to filter the contents of the results table<br><br>"
-                                       "Simply enter a filter string and the table will only display those"
-                                       "rows where the raw data record name contains NO match to the filter string."
-                                       "Depending on whether <i>RegExp</i> is checked or not, you can use"
-                                       "either simple text with wildcards '<tt>*</tt>' (match any characters) and '<tt>?</tt>'"
-                                       "(match a single character), or full regular expressions in the filter string."
-                                     "<br><br><font color=\"darkred\">red text</font> means you entered an invalid regular expression"));
-
-    tbResultsFilter->addSeparator();
-    tbResultsFilter->addWidget(new QLabel(" filter: result contains: "));
-    edtFilterResults=new QFEnhancedLineEdit(this);
-    edtFilterResults->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterResults, edtFilterResults));
-    edtFilterResults->setToolTip(tr("use this to filter the contents of the results table<br><br>"
-                                       "Simply enter a filter string and the table will only display those"
-                                       "columns where the result name contains a match to the filter string."
-                                       "Depending on whether <i>RegExp</i> is checked or not, you can use"
-                                       "either simple text with wildcards '<tt>*</tt>' (match any characters) and '<tt>?</tt>'"
-                                       "(match a single character), or full regular expressions in the filter string."
-                                       "<br><br><font color=\"darkred\">red text</font> means you entered an invalid regular expression"));
-    compFilterResults=new QFCompleterFromFile(this);
-    edtFilterResults->setCompleter(compFilterResults);
-    connect(edtFilterResults, SIGNAL(textChanged(QString)), resultsModel, SLOT(setResultFilter(QString)));
-    tbResultsFilter->addWidget(edtFilterResults);
-    tbResultsFilter->addWidget(new QLabel(tr("  and not contains "), this));
-    edtFilterResultsNot=new QFEnhancedLineEdit(this);
-    edtFilterResultsNot->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterResultsNot, edtFilterResultsNot));
-    compFilterResultsNot=new QFCompleterFromFile(this);
-    edtFilterResultsNot->setCompleter(compFilterResultsNot);
-    connect(edtFilterResultsNot, SIGNAL(textChanged(QString)), resultsModel, SLOT(setResultFilterNot(QString)));
-    tbResultsFilter->addWidget(edtFilterResultsNot);
-    chkFilterResultsRegExp=new QCheckBox(tr("RegExp"), this);
-    chkFilterResultsRegExp->setChecked(false);
-    tbResultsFilter->addWidget(chkFilterResultsRegExp);
-    connect(chkFilterResultsRegExp, SIGNAL(clicked(bool)), resultsModel, SLOT(setResultFilterUsesRegExp(bool)));
-    edtFilterResultsNot->setToolTip(tr("use this to filter the contents of the results table<br><br>"
-                                       "Simply enter a filter string and the table will only display those"
-                                       "columns where the result name contains NO match to the filter string."
-                                       "Depending on whether <i>RegExp</i> is checked or not, you can use"
-                                       "either simple text with wildcards '<tt>*</tt>' (match any characters) and '<tt>?</tt>'"
-                                       "(match a single character), or full regular expressions in the filter string."
-                                       "<br><br><font color=\"darkred\">red text</font> means you entered an invalid regular expression"));
-
-
-
-    connect(edtFilterResultsNot, SIGNAL(textChanged(QString)), this, SLOT(filterResultsTextChanged(QString)));
-    connect(edtFilterResults, SIGNAL(textChanged(QString)), this, SLOT(filterResultsTextChanged(QString)));
-    connect(edtFilterFiles, SIGNAL(textChanged(QString)), this, SLOT(filterFilesTextChanged(QString)));
-    connect(edtFilterFilesNot, SIGNAL(textChanged(QString)), this, SLOT(filterFilesTextChanged(QString)));
-
-
-    rwvlayout->addWidget(tvResults);
-    labAveragedresults=new QLabel(widResults);
-    labAveragedresults->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    labAveragedresults->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
-    labAveragedresults->setMaximumHeight(200);
-    labAveragedresults->setMaximumHeight(200);
-    labAveragedresults->setSizePolicy(QSizePolicy::Ignored, labAveragedresults->sizePolicy().verticalPolicy());
-    rwvlayout->addWidget(labAveragedresults);
-
-    //connect(actCopyResults, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcel()));
-    //connect(actCopyResultsNoHead, SIGNAL(triggered()), tvResults, SLOT(copySelectionToExcelNoHead()));
-    connect(actCopyValErrResults, SIGNAL(triggered()), this, SLOT(copyValErrResults()));
-    connect(actCopyValErrResultsNoHead, SIGNAL(triggered()), this, SLOT(copyValErrResultsNoHead()));
-    connect(actCopyMedianQuantilesResults, SIGNAL(triggered()), this, SLOT(copyMedianQuantilesResults()));
-    connect(actCopyMedianQuantilesNoHead, SIGNAL(triggered()), this, SLOT(copyMedianQuantilesResultsNoHead()));
-    connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
-    connect(actSaveResultsAveraged, SIGNAL(triggered()), this, SLOT(saveResultsAveraged()));
-    connect(actRefreshResults, SIGNAL(triggered()), this, SLOT(refreshResults()));
-    connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedRecords()));
-    connect(actStatistics, SIGNAL(triggered()), this, SLOT(showStatistics()));
-    connect(actStatisticsComparing, SIGNAL(triggered()), this, SLOT(showStatisticsComparing()));
-
-    tabMain->addTab(widResults, tr("Evaluation &Results"));
-
-
-    actHelp=new QAction(QIcon(":/lib/help.png"), tr("&Help"), this);
-    actHelp->setToolTip(tr("display online-help"));
-    connect(actHelp, SIGNAL(triggered()), this, SLOT(displayHelp()));
-
-    actHelpPlugin=new QAction(QIcon(":/lib/help.png"), tr("&Plugin Help"), this);
-    actHelpPlugin->setToolTip(tr("display online-help for the specific plugin"));
-    connect(actHelpPlugin, SIGNAL(triggered()), this, SLOT(displayHelpPlugin()));
-
-    actHelpPluginTutorial=new QAction(QIcon(":/lib/help/help_tutorial.png"), tr("&Plugin Tutorial"), this);
-    actHelpPluginTutorial->setToolTip(tr("display the tutorial for the specific plugin"));
-    connect(actHelpPluginTutorial, SIGNAL(triggered()), this, SLOT(displayHelpPluginTutorial()));
-
-    actHelpPluginCopyright=new QAction(QIcon(":/lib/help/help_copyright.png"), tr("&Plugin Copyright"), this);
-    actHelpPluginCopyright->setToolTip(tr("display copyright note for the specific plugin"));
-    connect(actHelpPluginCopyright, SIGNAL(triggered()), this, SLOT(displayHelpPluginCopyright()));
-
-    actHelpEval=new QAction(QIcon(":/lib/help_rdr.png"), tr("&Evaluation item help"), this);
-    actHelpEval->setToolTip(tr("display online-help common to all plugins, i.e. for the basic evaluation editor dialog"));
-    connect(actHelpEval, SIGNAL(triggered()), this, SLOT(displayHelpEval()));
-
-    menuHelp->addAction(actHelpEval);
-    menuHelp->addAction(actHelpPlugin);
-    menuHelp->addAction(actHelpPluginTutorial);
-    menuHelp->addAction(actHelpPluginCopyright);
-
-    btnHelp=new QToolButton(this);
-    btnHelp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    btnHelp->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    btnHelp->setDefaultAction(actHelp);
-    tabMain->setCornerWidget(btnHelp);
-
-    connect(tabMain, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
-
-    tvResults->addAction(actCopyValErrResults);
-    tvResults->addAction(actCopyValErrResultsNoHead);
-    tvResults->addAction(actSaveResults);
-    tvResults->addAction(actSaveResultsAveraged);
-    tvResults->addAction(actRefreshResults);
-    tvResults->addAction(actDeleteResults);
-    tvResults->addAction(actStatistics);
-    tvResults->addAction(actStatisticsComparing);
-
-    menuResults->addAction(actRefreshResults);
-    menuResults->addSeparator();
-    menuResults->addAction(actDeleteResults);
-    menuResults->addSeparator();
-    menuResults->addAction(actSaveResults);
-    menuResults->addAction(actSaveResultsAveraged);
-    menuResults->addSeparator();
-    tvResults->addActionsToMenu(menuResults);
-    menuResults->addSeparator();
-    //menuResults->addAction(actCopyResults);
-    //menuResults->addAction(actCopyResultsNoHead);
-    menuResults->addAction(actCopyValErrResults);
-    menuResults->addAction(actCopyValErrResultsNoHead);
-    menuResults->addAction(actCopyMedianQuantilesResults);
-    menuResults->addAction(actCopyMedianQuantilesNoHead);
-    menuResults->addSeparator();
-    menuResults->addAction(actStatistics);
-    menuResults->addAction(actStatisticsComparing);
-
-    currentTabChanged(0);
-}
 
 void QFEvaluationPropertyEditor::setSettings(ProgramOptions* settings) {
-    this->settings=settings;
+    p->settings=settings;
     //std::cout<<"QFEvaluationPropertyEditor::setSettings("<<settings<<")\n";
-    if (current && layWidgets) {
-        if (editor) {
-            editor->setSettings(settings, id);
+    if (current && p->layWidgets) {
+        if (p->editor) {
+            p->editor->setSettings(p->settings, p->id);
         }
     }
     readSettings();
@@ -961,19 +318,19 @@ void QFEvaluationPropertyEditor::setSettings(ProgramOptions* settings) {
 void QFEvaluationPropertyEditor::setFilesListFilteres(bool filtered)
 {
     if (!current) return;
-    filesListFiltered=filtered;
-    widFilterRecords->setVisible(filtered);
+    p->filesListFiltered=filtered;
+    p->widFilterRecords->setVisible(filtered);
     if (!filtered) {
         current->setNameNameNotFilter("", "", false, false);
     } else {
-        current->setNameNameNotFilter(edtFilterRecords->text(), edtFilterRecordsNot->text(), chkFilterRecordsRegExp->isChecked(), chkFilterRecordsRegExp->isChecked());
+        current->setNameNameNotFilter(p->edtFilterRecords->text(), p->edtFilterRecordsNot->text(), p->chkFilterRecordsRegExp->isChecked(), p->chkFilterRecordsRegExp->isChecked());
     }
     rdrProxy->invalidate();
 }
 
 bool QFEvaluationPropertyEditor::isFilesListFiltered() const
 {
-    return filesListFiltered;
+    return p->filesListFiltered;
 }
 
 QFEvaluationItem *QFEvaluationPropertyEditor::getCurrent() const
@@ -983,48 +340,53 @@ QFEvaluationItem *QFEvaluationPropertyEditor::getCurrent() const
 
 
 void QFEvaluationPropertyEditor::readSettings() {
-    if (!settings) return;
-    settings->getQSettings()->sync();
-    if (tabMain) {
+    if (!p->settings) return;
+    p->settings->getQSettings()->sync();
+    if (p->tabMain) {
         //int idx=settings->getQSettings()->value("evalpropeditor/currentTab", 0).toInt();
     }
-    loadWidgetGeometry(*(settings->getQSettings()), this, QPoint(10, 10), QSize(800, 600), "evalpropeditor/");
-    if (splitMain) loadSplitter(*(settings->getQSettings()), splitMain, "evalpropeditor/");
-    if (editor) editor->readSettings();
-    currentSaveDir=settings->getQSettings()->value("evalpropeditor/lastSaveDir", currentSaveDir).toString();
+    loadWidgetGeometry(*(p->settings->getQSettings()), this, QPoint(10, 10), QSize(800, 600), "evalpropeditor/");
+    if (p->splitMain) loadSplitter(*(p->settings->getQSettings()), p->splitMain, "evalpropeditor/");
+    if (p->editor) p->editor->readSettings();
+    p->currentSaveDir=p->settings->getQSettings()->value("evalpropeditor/lastSaveDir", p->currentSaveDir).toString();
 }
 
 void QFEvaluationPropertyEditor::writeSettings() {
-    if (!settings) return;
-    saveWidgetGeometry(*(settings->getQSettings()), this, "evalpropeditor/");
-    saveSplitter(*(settings->getQSettings()), splitMain, "evalpropeditor/");
-    if (tabMain) {
-        settings->getQSettings()->setValue("evalpropeditor/currentTab", tabMain->currentIndex());
+    if (!p->settings) return;
+    saveWidgetGeometry(*(p->settings->getQSettings()), this, "evalpropeditor/");
+    saveSplitter(*(p->settings->getQSettings()), p->splitMain, "evalpropeditor/");
+    if (p->tabMain) {
+        p->settings->getQSettings()->setValue("evalpropeditor/currentTab", p->tabMain->currentIndex());
     }
 
-    if (editor) editor->writeSettings();
-    settings->getQSettings()->setValue("evalpropeditor/lastSaveDir", currentSaveDir);
+    if (p->editor) p->editor->writeSettings();
+    p->settings->getQSettings()->setValue("evalpropeditor/lastSaveDir", p->currentSaveDir);
+}
+
+int QFEvaluationPropertyEditor::getID()
+{
+    return p->id;
 }
 
 void QFEvaluationPropertyEditor::deselectCurrent() {
-    if (lstRawData && lstRawData->model()) {
-        QModelIndex current=lstRawData->selectionModel()->currentIndex();
-        int rows=lstRawData->model()->rowCount();
+    if (p->lstRawData && p->lstRawData->model()) {
+        QModelIndex current=p->lstRawData->selectionModel()->currentIndex();
+        int rows=p->lstRawData->model()->rowCount();
 
         QModelIndex next;
 
         //qDebug()<<current<<current.row()<<rows;
 
         if (current.row()>0) {
-            next=lstRawData->model()->index(current.row()-1, current.column());
+            next=p->lstRawData->model()->index(current.row()-1, current.column());
 
         } else {
-            if (rows>1) next=lstRawData->model()->index(rows-1, current.column());
+            if (rows>1) next=p->lstRawData->model()->index(rows-1, current.column());
         }
         //qDebug()<<next;
         //lstRawData->selectionModel()->select(next, QItemSelectionModel::SelectCurrent);
         if (next.isValid()) {
-            lstRawData->selectionModel()->setCurrentIndex(next, QItemSelectionModel::SelectCurrent);
+            p->lstRawData->selectionModel()->setCurrentIndex(next, QItemSelectionModel::SelectCurrent);
         } else {
             close();
         }
@@ -1033,46 +395,46 @@ void QFEvaluationPropertyEditor::deselectCurrent() {
 
 QMenuBar *QFEvaluationPropertyEditor::getMenuBar() const
 {
-    return menuBar;
+    return p->menuBar;
 }
 
 void QFEvaluationPropertyEditor::setMenuBarVisible(bool visible)
 {
-    menuBar->setVisible(visible);
+    p->menuBar->setVisible(visible);
 }
 
 QMenu *QFEvaluationPropertyEditor::addMenu(const QString &title, int editor)
 {
-    menuBar->removeAction(menuHelp->menuAction());
-    QMenu* m=menuBar->addMenu(title);
-    menuBar->addAction(menuHelp->menuAction());
-    menus.append(qMakePair(editor, m));
-    currentTabChanged(tabMain->currentIndex());
+    p->menuBar->removeAction(p->menuHelp->menuAction());
+    QMenu* m=p->menuBar->addMenu(title);
+    p->menuBar->addAction(p->menuHelp->menuAction());
+    p->menus.append(qMakePair(editor, m));
+    p->currentTabChanged(p->tabMain->currentIndex());
     return m;
 }
 
 QMenu *QFEvaluationPropertyEditor::addOrFindMenu(const QString &title, int editor)
 {
-    for (int i=0; i<menus.size(); i++)  {
-        if ((menus[i].first==editor || menus[i].first<0) && menus[i].second && menus[i].second->title()==title) return menus[i].second;
+    for (int i=0; i<p->menus.size(); i++)  {
+        if ((p->menus[i].first==editor || p->menus[i].first<0) && p->menus[i].second && p->menus[i].second->title()==title) return p->menus[i].second;
     }
     return addMenu(title, editor);
 }
 
 void QFEvaluationPropertyEditor::registerMenu(QMenu *menu, int editor)
 {
-    menus.append(qMakePair(editor, menu));
-    currentTabChanged(tabMain->currentIndex());
+    p->menus.append(qMakePair(editor, menu));
+    p->currentTabChanged(p->tabMain->currentIndex());
 }
 
 QMenu *QFEvaluationPropertyEditor::getHelpMenu() const
 {
-    return menuHelp;
+    return p->menuHelp;
 }
 
 QPointer<QFEvaluationEditor> QFEvaluationPropertyEditor::getEditor() const
 {
-    return editor;
+    return p->editor;
 }
 
 void QFEvaluationPropertyEditor::sendEditorCommand(const QString &command, const QVariant &param1, const QVariant &param2, const QVariant &param3, const QVariant &param4, const QVariant &param5)
@@ -1082,205 +444,9 @@ void QFEvaluationPropertyEditor::sendEditorCommand(const QString &command, const
     }
 }
 
-void QFEvaluationPropertyEditor::selectionChanged(const QModelIndex& index, const QModelIndex& oldindex) {
-    if (rdrProxy!=NULL) {
-        QFRawDataRecord* rec=current->getProject()->getRawDataByID(rdrProxy->data(index, Qt::UserRole).toInt());
-        if (rec!=NULL) {
-            current->setHighlightedRecord(rec);
-        } else {
-            //std::cout<<"!!!   QFEvaluationPropertyEditor::selectionChanged() with NULL new record\n";
-        }
-
-        if (lstRawData->model()->rowCount()<=0) close();
-    }
-}
-
-void QFEvaluationPropertyEditor::rdrModelReset() {
-    //std::cout<<"!!!   QFEvaluationPropertyEditor::rdrModelReset() called\n";
-    if (!current) return;
-    if (!current->getHighlightedRecord()) return;
-    if ((!rdrModel) || (!rdrProxy)) return;
-    QModelIndex idx=rdrModel->index(current->getProject()->getRawDataIndex(current->getHighlightedRecord()));
-    QModelIndex pidx=rdrProxy->mapFromSource(idx);
-    lstRawData->selectionModel()->select(pidx, QItemSelectionModel::SelectCurrent);
-}
-
-
-
-void QFEvaluationPropertyEditor::tvResultsSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected) {
-    QModelIndexList sel=tvResults->selectionModel()->selectedIndexes();
-    QMap<int, QString> names;
-    QMap<int, double> sum, sum2, count;
-    for (int i=0; i<sel.size(); i++) {
-        //int c=sel[i].row();
-        int r=sel[i].column();
-        QVariant dataS=sel[i].data(QFEvaluationResultsModel::SumRole);
-        QVariant dataS2=sel[i].data(QFEvaluationResultsModel::Sum2Role);
-        QVariant dataC=sel[i].data(QFEvaluationResultsModel::CountRole);
-        QString name=sel[i].data(QFEvaluationResultsModel::NameRole).toString();
-        double d=0;
-        bool ok=false;
-        if (dataS.canConvert(QVariant::Double) && dataS2.canConvert(QVariant::Double) && dataC.canConvert(QVariant::LongLong)) {
-            if (names.contains(r)) {
-                sum[r] = sum[r]+dataS.toDouble();
-                sum2[r] = sum2[r]+dataS2.toDouble();
-                count[r] = count[r]+dataC.toLongLong();
-            } else {
-                sum[r] = dataS.toDouble();
-                sum2[r] = dataS2.toDouble();
-                count[r] = dataC.toLongLong();
-                names[r] = name;
-            }
-
-        }
-        /*if (data.canConvert(QVariant::Double)) {
-            d=data.toDouble();
-            ok=true;
-        }
-        if (data.canConvert(QVariant::PointF)) {
-            d=data.toPointF().x();
-            ok=true;
-        }
-        if (data.type()==QVariant::String) { ok=false; }
-        if (ok) {
-            if (names.contains(r)) {
-                sum[r] = sum[r]+d;
-                sum2[r] = sum2[r]+d*d;
-                count[r] = count[r]+1;
-            } else {
-                sum[r] = d;
-                sum2[r] = d*d;
-                count[r] = 1;
-                names[r] = name;
-            }
-        }*/
-    }
-
-    int lineHeight=labAveragedresults->fontMetrics().lineSpacing();
-    int maxheight=labAveragedresults->maximumHeight();
-    int linespercol=maxheight/(2*lineHeight)-1;
-    QStringList datalist;
-    QMapIterator<int, QString> it(names);
-    while (it.hasNext()) {
-        it.next();
-        QString name=it.value();
-        int i=it.key();
-        if (count[i]>0) {
-            double avg=sum[i]/count[i];
-            double error=sqrt(sum2[i]/count[i]-sum[i]*sum[i]/count[i]/count[i]);
-            datalist.append(QString("<td align=\"right\"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%1:&nbsp;</b></td><td>&nbsp;&nbsp;%2 &plusmn; %3&nbsp;</td>").arg(name).arg(roundWithError(avg, error)).arg(roundError(error)));
-        }
-    }
-    QString results=tr("<table border=\"1\" cellspacing=\"0\"><tr>");
-    int cols=(int)ceil((double)datalist.size()/(double)linespercol);
-    for (int i=0; i<cols; i++) {
-        results+=tr("<th align=\"right\"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Field:&nbsp;</b></th><th><b>&nbsp;&nbsp;Average &plusmn; StdDev&nbsp;</b></th>");
-    }
-    results+=tr("</th>");
-    for (int r=0; r<linespercol; r++) {
-        results+=tr("<tr>");
-        for (int c=0; c<cols; c++) {
-            int idx=c*linespercol+r;
-            if ((idx>=0)&&(idx<datalist.size())) {
-                results+=datalist[idx];
-            } else {
-                results+=tr("<td></td><td></td>");
-            }
-        }
-        results+=tr("</tr>");
-    }
-    results+=tr("</table>");
-    labAveragedresults->setText(results);
-}
-
-
-
-void QFEvaluationPropertyEditor::saveResults() {
-    if (current) {
-        QString evalfilter=current->getResultsDisplayFilter();
-        QString selectedFilter="";
-        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;SYLK dataformat, flipped (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
-        QString fileName = qfGetSaveFileName(this, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
-        if ((!fileName.isEmpty())&&(!fileName.isNull())) {
-            int f=filter.split(";;").indexOf(selectedFilter);
-            bool ok=false;
-            if (f==1) {
-                ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, false, ';', ',', '"');
-            } else if (f==2) {
-                ok=current->getProject()->rdrResultsSaveToSYLK(evalfilter, fileName, false);
-            } else if (f==3) {
-                ok=current->getProject()->rdrResultsSaveToSYLK(evalfilter, fileName, false, true);
-            } else if (f==4) {
-                ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, false, '\t', '.', '"');
-            } else {
-                ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, false, ',', '.', '"');
-            }
-            currentSaveDir=QFileInfo(fileName).absolutePath();
-            if (!ok) QMessageBox::critical(NULL, tr("QuickFit"), tr("Could not save file '%1'.").arg(fileName));
-        }
-    }
-}
-
-void QFEvaluationPropertyEditor::saveResultsAveraged()
-{
-    if (current) {
-        QString evalfilter=current->getResultsDisplayFilter();
-        QString selectedFilter="";
-        QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;SYLK dataformat, flipped (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
-        QString fileName = qfGetSaveFileName(this, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
-        if ((!fileName.isEmpty())&&(!fileName.isNull())) {
-            int f=filter.split(";;").indexOf(selectedFilter);
-            bool ok=false;
-            if (f==1) {
-                ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, true, ';', ',', '"');
-            } else if (f==2) {
-                ok=current->getProject()->rdrResultsSaveToSYLK(evalfilter, fileName, true);
-            } else if (f==3) {
-                ok=current->getProject()->rdrResultsSaveToSYLK(evalfilter, fileName, true, true);
-            } else if (f==4) {
-                ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, true, '\t', '.', '"');
-            } else {
-                ok=current->getProject()->rdrResultsSaveToCSV(evalfilter, fileName, true, ',', '.', '"');
-            }
-            currentSaveDir=QFileInfo(fileName).absolutePath();
-            if (!ok) QMessageBox::critical(NULL, tr("QuickFit"), tr("Could not save file '%1'.").arg(fileName));
-        }
-    }
-}
 
 void QFEvaluationPropertyEditor::resizeEvent(QResizeEvent* event) {
-    labAveragedresults->setMaximumWidth(event->size().width());
-}
-
-void QFEvaluationPropertyEditor::removeRawData() {
-    if (current) {
-        QFRawDataRecord* r=current->getHighlightedRecord();
-        if (r) {
-            int ret = QMessageBox::question(this, tr("QuickFit %1").arg(qfInfoVersionFull()),
-                                    tr("Do you really want to delete the current record?\n   '%1'").arg(r->getName()),
-                                    QMessageBox::Yes | QMessageBox::No,
-                                    QMessageBox::No);
-            if (ret==QMessageBox::Yes) {
-                deselectCurrent();
-                current->getProject()->deleteRawData(r->getID());
-            }
-        }
-    }
-}
-
-void QFEvaluationPropertyEditor::recordAboutToBeDeleted(QFRawDataRecord* record) {
-    if (current) {
-        if (current->isFilteredAndApplicable(record)) {
-            int cnt=0;
-            QList<QFRawDataRecord*> list=current->getProject()->getRawDataList();
-            for (int i=0; i<list.size(); i++) {
-                if ((record!=list[i])&&(current->isFilteredAndApplicable(list[i]))) {
-                    cnt++;
-                }
-            }
-            if (cnt<=0) close();
-        }
-    }
+    p->labAveragedresults->setMaximumWidth(event->size().width());
 }
 
 /*
@@ -1301,61 +467,4 @@ bool QFEvaluationPropertyEditor::event(QEvent * ev) {
     bool ok=QWidget::event(ev);
     //qDebug()<<"~~~ QFEvaluationPropertyEditor::event("<<ev->type()<<") done: "<<t.elapsed()<<" ms";
     return ok;
-}
-
-void QFEvaluationPropertyEditor::filterFilesTextChanged(const QString &text)
-{
-    bool error=false;
-    if (chkFilterFilesRegExp->isChecked()) {
-        QRegExp rx(text);
-        error=!rx.isValid();
-    }
-    QWidget* s=qobject_cast<QWidget*>(sender());
-    if (s) {
-       QPalette p=s->palette();
-       if (error) {
-           p.setColor(QPalette::Text, QColor("darkred"));
-       } else {
-           p.setColor(QPalette::Text, edtName->palette().color(QPalette::Text));
-       }
-       s->setPalette(p);
-    }
-}
-
-void QFEvaluationPropertyEditor::filterResultsTextChanged(const QString &text)
-{
-    bool error=false;
-    if (chkFilterResultsRegExp->isChecked()) {
-        QRegExp rx(text);
-        error=!rx.isValid();
-    }
-    QWidget* s=qobject_cast<QWidget*>(sender());
-    if (s) {
-       QPalette p=s->palette();
-       if (error) {
-           p.setColor(QPalette::Text, QColor("darkred"));
-       } else {
-           p.setColor(QPalette::Text, edtName->palette().color(QPalette::Text));
-       }
-       s->setPalette(p);
-    }
-}
-
-void QFEvaluationPropertyEditor::filterRecordsTextChanged(const QString &text)
-{
-    bool error=false;
-    if (chkFilterRecordsRegExp->isChecked()) {
-        QRegExp rx(text);
-        error=!rx.isValid();
-    }
-    QWidget* s=qobject_cast<QWidget*>(sender());
-    if (s) {
-       QPalette p=s->palette();
-       if (error) {
-           p.setColor(QPalette::Text, QColor("darkred"));
-       } else {
-           p.setColor(QPalette::Text, edtName->palette().color(QPalette::Text));
-       }
-       s->setPalette(p);
-    }
 }

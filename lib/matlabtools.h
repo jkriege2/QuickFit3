@@ -10,31 +10,45 @@
 
 /*! \brief convert the given data columns as Matlab script
     \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
 */
 QFLIB_EXPORT QString toMatlab(const QList<QList<double> >& data, bool noVarDef=false);
 /*! \brief convert the given data columns as Matlab script
     \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
 */
 QFLIB_EXPORT QString toMatlab(const QList<QVector<double> >& data, bool noVarDef=false);
 /*! \brief copy the given data columns as Matlab script to the clipboard
     \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
 */
 QFLIB_EXPORT void matlabCopy(const QList<QList<double> >& data);
 /*! \brief copy the given data columns as Matlab script to the clipboard
     \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
 */
 QFLIB_EXPORT void matlabCopy(const QList<QVector<double> >& data);
 
 /*! \brief convert the given data columns as Matlab script
     \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
 */
 QFLIB_EXPORT QString toMatlab(const QList<QList<QVariant> >& data, bool noVarDef=false);
 /*! \brief copy the given data columns as Matlab script to the clipboard
     \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
 */
 QFLIB_EXPORT void matlabCopy(const QList<QList<QVariant> >& data);
 /*! \brief copy the given data columns as Matlab script to the clipboard
     \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
 */
 QFLIB_EXPORT void matlabCopy(const QList<QVector<QVariant> >& data);
 

@@ -389,6 +389,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             double getAsDouble() const;
             QVector<double> getAsDoubleVector() const;
             qfmpResult getAsMathParserResult() const;
+            QVariant getAsVariant() const;
             void setFromMathParserResult(const qfmpResult& result);
         };
 

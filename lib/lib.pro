@@ -105,7 +105,8 @@ HEADERS += dlgnewproperty.h \
     qfparametercorrelationservice.h \
     datatools.h \
     qfmathparsertools.h \
-    qfmathparserdefaultlib.h
+    qfmathparserdefaultlib.h \
+    qfevaluationpropertyeditorprivate.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -179,7 +180,8 @@ SOURCES += dlgnewproperty.cpp \
     qfparametercorrelationservice.cpp \
     datatools.cpp \
     qfmathparsertools.cpp \
-    qfmathparserdefaultlib.cpp
+    qfmathparserdefaultlib.cpp \
+    qfevaluationpropertyeditorprivate.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

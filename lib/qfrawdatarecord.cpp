@@ -4334,6 +4334,51 @@ qfmpResult QFRawDataRecord::evaluationResult::getAsMathParserResult() const
     return qfmpResult::invalidResult();
 }
 
+QVariant QFRawDataRecord::evaluationResult::getAsVariant() const
+{
+    switch (type) {
+        case QFRawDataRecord::qfrdreNumber:
+        case QFRawDataRecord::qfrdreNumberError:
+            return QVariant(dvalue);
+        case QFRawDataRecord::qfrdreInteger:
+            return QVariant((double)ivalue);
+        case QFRawDataRecord::qfrdreNumberVector:
+        case QFRawDataRecord::qfrdreNumberMatrix:
+        case QFRawDataRecord::qfrdreNumberErrorVector:
+        case QFRawDataRecord::qfrdreNumberErrorMatrix:{
+                QList<QVariant> dv;
+                for(int i=0; i<dvec.size(); i++) dv<<dvec[i];
+                return QVariant(dv);
+            } break;
+        case QFRawDataRecord::qfrdreIntegerVector:
+        case QFRawDataRecord::qfrdreIntegerMatrix:
+            {
+                QList<QVariant> dv;
+                for(int i=0; i<ivec.size(); i++) dv<<ivec[i];
+                return QVariant(dv);
+            } break;
+        case QFRawDataRecord::qfrdreString:
+            return QVariant(svalue);
+        case QFRawDataRecord::qfrdreStringVector:
+        case QFRawDataRecord::qfrdreStringMatrix:
+            if (!svec.isEmpty()) return QVariant(svec);
+            break;
+        case QFRawDataRecord::qfrdreBoolean:
+            return QVariant(bvalue);
+        case QFRawDataRecord::qfrdreBooleanVector:
+        case QFRawDataRecord::qfrdreBooleanMatrix:{
+            QList<QVariant> dv;
+                for(int i=0; i<bvec.size(); i++) dv<<bvec[i];
+                return QVariant(dv);
+            }
+            break;
+        case QFRawDataRecord::qfrdreInvalid:
+        default:
+            return QVariant();
+    }
+    return QVariant();
+}
+
 void QFRawDataRecord::evaluationResult::setFromMathParserResult(const qfmpResult &result)
 {
     if (result.isValid) {

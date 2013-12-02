@@ -20,6 +20,7 @@
 #include <QDialogButtonBox>
 #include "qfhtmldelegate.h"
 #include <QSvgGenerator>
+#include "datatools.h"
 
 QEnhancedTableView::QEnhancedTableView(QWidget* parent):
     QTableView(parent)
@@ -120,6 +121,89 @@ void QEnhancedTableView::copySelectionToMatlabNoHead(int copyrole)
     }
 }
 
+void QEnhancedTableView::copySelectionToExcelExpanded(int copyrole, bool storeHead)
+{
+    if (!model()) return;
+    if (!selectionModel()) return;
+    QList<QList<QVariant> > csvData;
+    QStringList colnames;
+    QStringList rownames;
+    getVariantDataTable(copyrole, csvData, colnames, rownames);
+    dataExpand(csvData, &colnames);
+    if (storeHead) QFDataExportHandler::copyCSV(csvData, colnames, rownames);
+    else QFDataExportHandler::copyCSV(csvData);
+}
+
+void QEnhancedTableView::copySelectionToMatlabExpandedNoHead(int copyrole)
+{
+    if (!model()) return;
+    if (!selectionModel()) return;
+    QList<QList<QVariant> > csvData;
+    QStringList colnames;
+    QStringList rownames;
+    getVariantDataTable(copyrole, csvData, colnames, rownames);
+    dataExpand(csvData, &colnames);
+    QFDataExportHandler::copyMatlab(csvData);
+}
+
+void QEnhancedTableView::getVariantDataTable(int copyrole, QList<QList<QVariant> > &csvData, QStringList &colnames, QStringList &rownames) const
+{
+    if (!model()) return;
+    if (!selectionModel()) return;
+    QModelIndexList sel=selectionModel()->selectedIndexes();
+    QLocale loc=QLocale::system();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    if (sel.size()==1) {
+        QVariant vdata=sel[0].data(copyrole);
+        csvData<<QList<QVariant>();
+        csvData.first()<<vdata;
+    } else {
+        QSet<int> rows, cols;
+        int colmin=0;
+        int rowmin=0;
+        for (int i=0; i<sel.size(); i++) {
+            int r=sel[i].row();
+            int c=sel[i].column();
+            rows.insert(r);
+            cols.insert(c);
+            if (i==0) {
+                colmin=c;
+                rowmin=r;
+            } else {
+                if (c<colmin) colmin=c;
+                if (r<rowmin) rowmin=r;
+            }
+        }
+        QList<int> rowlist=QList<int>::fromSet(rows);
+        qSort(rowlist.begin(), rowlist.end());
+        QList<int> collist=QList<int>::fromSet(cols);
+        qSort(collist.begin(), collist.end());
+        int rowcnt=rowlist.size();
+        int colcnt=collist.size();
+        csvData.clear();
+        colnames.clear();
+        rownames.clear();
+        for (int c=0; c<colcnt; c++) {
+            csvData.append(QList<QVariant>());
+            for (int r=0; r<rowcnt; r++) {
+                csvData[c].append(QVariant());
+            }
+            colnames<<model()->headerData(collist[c], Qt::Horizontal).toString();
+        }
+        for (int r=0; r<rowcnt; r++) {
+            rownames<<model()->headerData(rowlist[r], Qt::Vertical).toString();
+        }
+        for (int i=0; i<sel.size(); i++) {
+            int r=rowlist.indexOf(sel[i].row());
+            int c=collist.indexOf(sel[i].column());
+            int cc=collist.indexOf(c);
+            int rr=rowlist.indexOf(r);
+            if (cc>=0 && cc<colcnt && rr>=0 && rr<rowcnt) {
+                csvData[c].operator[](r)=sel[i].data(copyrole);
+            }
+        }
+    }
+}
 
 void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead) {
     if (!model()) return;
@@ -963,6 +1047,7 @@ QSizeF QEnhancedTableView::getTotalSize() const
 
     return QSizeF((totalWidth), (totalHeight));
 }
+
 
 void QEnhancedTableView::paint(QPainter &painter, double scale, int page, double hhh, double vhw, const QList<int>& pageCols, const QList<int>& pageRows, QPrinter* p)
 {

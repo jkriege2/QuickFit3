@@ -1,6 +1,7 @@
 #include "qfbasicimageimporters.h"
 #include "qfimagereaderradhard.h"
 #include "qfbasicimageimportersoptionswidget.h"
+#include "qfimagereaderdiffusion4binary.h"
 
 
 QStringList QFBasicImageImporters::getIDs() const {
@@ -8,6 +9,7 @@ QStringList QFBasicImageImporters::getIDs() const {
     res<<"imageimporter_libtiff";
     res<<"imageimporter_tinytiff";
     res<<"imageimporter_radhard";
+    res<<"imageimporter_diffusion4btsbinary";
     return res;
 }
 
@@ -20,6 +22,9 @@ QFImporter* QFBasicImageImporters::createImporter(QString id) const  {
     }
     if (id=="imageimporter_radhard") {
         return new QFImageReaderRadhard();
+    }
+    if (id=="imageimporter_diffusion4btsbinary") {
+        return new QFImageReaderDiffusion4Binary();
     }
     return NULL;
 }

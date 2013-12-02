@@ -145,6 +145,10 @@ class QFRawDataPropertyEditor_private : public QObject
         QAction* actStatistics;
         QAction* actStatisticsComparing;
         QAction* actCorrelation;
+        /** \brief action used to copy selection in tvResults to clipbord, in expanded form */
+        QAction* actCopyExpanded;
+        QAction* actCopyExpandedNoHead;
+        QAction* actCopyExpandedNoHeadMatlab;
 
         QFEnhancedLineEdit* edtFilterEvaluation;
         QFEnhancedLineEdit* edtFilterResults;
@@ -238,6 +242,10 @@ class QFRawDataPropertyEditor_private : public QObject
         void copyValErrResultsNoHead();
         void copyMedianQuantilesResults();
         void copyMedianQuantilesResultsNoHead();
+
+        void copyResultsExpanded();
+        void copyResultsExpandedNoHead();
+        void copyResultsExpandedNoHeadMatlab();
 
         void filterEvaluationTextChanged(const QString& text);
         void filterResultsTextChanged(const QString& text);

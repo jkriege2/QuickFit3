@@ -422,6 +422,10 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     actCorrelation=new QAction(QIcon(":/lib/result_correlation.png"), tr("Result correlation"), d);
     tbResults->addAction(actCorrelation);
 
+    actCopyExpanded=new QAction( tr("Copy Selection in expanded form, w/o header"), this);
+    actCopyExpandedNoHead=new QAction( tr("Copy Selection  in expanded form, w/o header"), this);
+    actCopyExpandedNoHeadMatlab=new QAction( tr("Copy Selection  in expanded form, to Matlab"), this);
+
     tbResults->addSeparator();
     actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete selected records"), d);
     actDeleteResults->setShortcut(QKeySequence::Delete);
@@ -520,6 +524,9 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedResults()));
     connect(actCopyMedianQuantilesResults, SIGNAL(triggered()), this, SLOT(copyMedianQuantilesResults()));
     connect(actCopyMedianQuantilesNoHead, SIGNAL(triggered()), this, SLOT(copyMedianQuantilesResultsNoHead()));
+    connect(actCopyExpanded, SIGNAL(triggered()), this, SLOT(copyResultsExpanded()));
+    connect(actCopyExpandedNoHead, SIGNAL(triggered()), this, SLOT(copyResultsExpandedNoHead()));
+    connect(actCopyExpandedNoHeadMatlab, SIGNAL(triggered()), this, SLOT(copyResultsExpandedNoHeadMatlab()));
 
     connect(actCorrelation, SIGNAL(triggered()), this, SLOT(showCorrelation()));
     connect(actStatistics, SIGNAL(triggered()), this, SLOT(showStatistics()));
@@ -547,6 +554,10 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     menuResults->addAction(actCopyValErrResultsNoHead);
     menuResults->addAction(actCopyMedianQuantilesResults);
     menuResults->addAction(actCopyMedianQuantilesNoHead);
+    menuResults->addSeparator();
+    menuResults->addAction(actCopyExpanded);
+    menuResults->addAction(actCopyExpandedNoHead);
+    menuResults->addAction(actCopyExpandedNoHeadMatlab);
     menuResults->addSeparator();
     menuResults->addAction(actStatistics);
     menuResults->addAction(actStatisticsComparing);
@@ -1546,6 +1557,21 @@ void QFRawDataPropertyEditor_private::copyMedianQuantilesResults()
 void QFRawDataPropertyEditor_private::copyMedianQuantilesResultsNoHead()
 {
     tvResults->copySelectionAsMedianQuantilesToExcel(QFRDRResultsModel::MedianRole, QFRDRResultsModel::Quantile25Role, QFRDRResultsModel::Quantile75Role, false, Qt::Vertical);
+}
+
+void QFRawDataPropertyEditor_private::copyResultsExpanded()
+{
+    tvResults->copySelectionToExcelExpanded(Qt::EditRole, true);
+}
+
+void QFRawDataPropertyEditor_private::copyResultsExpandedNoHead()
+{
+    tvResults->copySelectionToExcelExpanded(Qt::EditRole, false);
+}
+
+void QFRawDataPropertyEditor_private::copyResultsExpandedNoHeadMatlab()
+{
+    tvResults->copySelectionToMatlabExpandedNoHead(Qt::EditRole);
 }
 
 void QFRawDataPropertyEditor_private::currentTabChanged(int tab) {

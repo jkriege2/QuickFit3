@@ -18,25 +18,58 @@ QFLIB_EXPORT QVector<double> csvReadline(QTextStream& f, QChar separator_char=',
 
 /*! \brief copy the given data columns as CSV to the clipboard
     \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
 */
 QFLIB_EXPORT void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList());
+
+
 /*! \brief copy the given data columns as CSV to the clipboard
     \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
+*/
+QFLIB_EXPORT void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList());
+
+/*! \brief copy the given data columns as CSV to the clipboard
+    \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
 */
 QFLIB_EXPORT void csvCopy(const QList<QVector<double> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList());
 
 /*! \brief exchange rows and columns
     \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
 */
 QFLIB_EXPORT QList<QVector<double> > csvDataRotate(const QList<QVector<double> >& data);
 /*! \brief exchange rows and columns
     \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
 */
 QFLIB_EXPORT QList<QList<double> > csvDataRotate(const QList<QList<double> >& data);
 
+/*! \brief exchange rows and columns
+    \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
+*/
+QFLIB_EXPORT QList<QList<QVariant> > csvDataRotate(const QList<QList<QVariant> >& data);
+
 /*! \brief convert the given data to CSV
     \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
 */
 QFLIB_EXPORT QString toCSV(const QList<QVector<double> >& data, const QStringList& columnsNames, const QStringList& rowNames, QChar decimalSep='.', const QString colSep=QString(", "), bool withHeaders=true, QChar stringDelimiter=QLatin1Char('\"'), const QString& headerSep=QString("#! "), int precision=15);
+
+/*! \brief convert the given data to CSV
+    \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
+*/
+QFLIB_EXPORT QString toCSV(const QList<QList<QVariant> >& data, const QStringList& columnsNames, const QStringList& rowNames, QChar decimalSep='.', const QString colSep=QString(", "), bool withHeaders=true, QChar stringDelimiter=QLatin1Char('\"'), const QString& headerSep=QString("#! "), int precision=15);
 
 #endif // CSVTOOLS_H

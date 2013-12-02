@@ -36,6 +36,8 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         void paint(QPainter& painter, QRect pageRec=QRect());
         QSizeF getTotalSize() const;
 
+        void getVariantDataTable(int copyrole, QList<QList<QVariant> >& csvData, QStringList& colnames, QStringList& rownames) const;
+
     signals:
         void keyPressed(int key, Qt::KeyboardModifiers modifiers, QString text);
     public slots:
@@ -44,6 +46,11 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         void copySelectionToExcel(int copyrole=Qt::EditRole, bool storeHead=true);
         void copySelectionToExcelNoHead(int copyrole=Qt::EditRole);
         void copySelectionToMatlabNoHead(int copyrole=Qt::EditRole);
+
+        void copySelectionToExcelExpanded(int copyrole=Qt::EditRole, bool storeHead=true);
+        void copySelectionToMatlabExpandedNoHead(int copyrole=Qt::EditRole);
+
+
         void copySelectionAsValueErrorToExcel(int valuerole=Qt::EditRole, int errorrole=Qt::EditRole, bool storeHead=true, Qt::Orientation orientation=Qt::Horizontal);
         void copySelectionAsMedianQuantilesToExcel(int medianrole=Qt::EditRole, int q25role=-1, int q75role=-1, bool storeHead=true, Qt::Orientation orientation=Qt::Horizontal);
     protected:

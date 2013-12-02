@@ -328,9 +328,11 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
             \param separator column separator in the file
             \param decinmalPoint which character to sue as decimal point
             \param stringDelimiter strings are surrounded by this character (one in front,one behind)
+            \param filteredEvalIDs if this array is non-empty, only the evalIDs in the list will be exported
+            \param filtereRecords  if this array is non-empty, only the QFRawDataRecord, resultID pairs in the list will be exported
             \return \c true on success
         */
-        bool rdrResultsSaveToCSV(const QString& evalFilter, QString filename, bool vectorsToAvg=false, QChar separator=',', QChar decimalPoint='.', QChar stringDelimiter='"');
+        bool rdrResultsSaveToCSV(const QString& evalFilter, QString filename, bool vectorsToAvg=false, QChar separator=',', QChar decimalPoint='.', QChar stringDelimiter='"', const QStringList &filteredEvalIDs=QStringList(), const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords=QList<QPair<QPointer<QFRawDataRecord>, QString> >());
 
         /*! \brief save the  raw data record results stored in this project for a given evaluation to a SYLK file
 
@@ -343,9 +345,11 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
             \param filename the file to create
             \param vectorsToAvg if \c false vector/matrix results are expanded into several columns. Otherwise only the avg/stddev are stored in 2 columns
             \param flipTable if set \c true, the output will exchange X and Y coordinates of the cells, effectively flipping the result table
+            \param filteredEvalIDs if this array is non-empty, only the evalIDs in the list will be exported
+            \param filtereRecords  if this array is non-empty, only the QFRawDataRecord, resultID pairs in the list will be exported
             \return \c true on success
         */
-        bool rdrResultsSaveToSYLK(const QString& evalFilter, QString filename, bool vectorsToAvg=false, bool flipTable=false);
+        bool rdrResultsSaveToSYLK(const QString& evalFilter, QString filename, bool vectorsToAvg=false, bool flipTable=false, const QStringList &filteredEvalIDs=QStringList(), const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords=QList<QPair<QPointer<QFRawDataRecord>, QString> >());
 
         /** \brief returns a pointer to the projects RDR factory object */
         QFRawDataRecordFactory* getRawDataRecordFactory();
