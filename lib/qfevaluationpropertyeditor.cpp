@@ -100,8 +100,8 @@ void QFEvaluationRawDataModelProxy::selectionChanged(QList<QPointer<QFRawDataRec
 QFEvaluationPropertyEditor::QFEvaluationPropertyEditor(QFPluginServices* services, ProgramOptions* set, QFEvaluationItem* current, int id, QWidget* parent, Qt::WindowFlags f):
     QWidget(parent, f)
 {
-    setAttribute(Qt::WA_DeleteOnClose, true);
     p=new QFEvaluationPropertyEditorPrivate(this);
+    setAttribute(Qt::WA_DeleteOnClose, true);
     //std::cout<<"creating QFEvaluationPropertyEditor ... \n";
     p->id=id;
     this->current=NULL;
@@ -136,6 +136,10 @@ QFEvaluationPropertyEditor::QFEvaluationPropertyEditor(QFPluginServices* service
 QFEvaluationPropertyEditor::~QFEvaluationPropertyEditor() {
     //std::cout<<"deleting QFEvaluationPropertyEditor\n";
     //std::cout<<"deleting QFEvaluationPropertyEditor ... OK\n";
+    if (p) {
+        p->disconnect();
+        //delete p;
+    }
 }
 
 void QFEvaluationPropertyEditor::closeEvent ( QCloseEvent * event ) {

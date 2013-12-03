@@ -45,8 +45,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         /** \brief class constructor
          *  \param splash a splash screen to use for status output during startup/construction
          */
-        MainWindow(ProgramOptions* s, QSplashScreen* splash);
-        ~MainWindow();
+        explicit MainWindow(ProgramOptions* s, QSplashScreen* splash);
+        virtual ~MainWindow();
 
 
 

@@ -241,6 +241,7 @@ MainWindow::~MainWindow() {
 
     //std::cout<<"deleting MainWindow\n";
     if (project) delete project;
+    project=NULL;
     //std::cout<<"deleting MainWindow ... OK\n";
 }
 

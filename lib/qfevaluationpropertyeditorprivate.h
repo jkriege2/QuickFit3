@@ -30,7 +30,7 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
 
         explicit QFEvaluationPropertyEditorPrivate(QFEvaluationPropertyEditor *parent );
 
-        QFEvaluationPropertyEditor* d;
+        QPointer<QFEvaluationPropertyEditor> d;
 
         /** \brief create all widgets needed to display data */
         void createWidgets();

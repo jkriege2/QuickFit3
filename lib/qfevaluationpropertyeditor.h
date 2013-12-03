@@ -120,7 +120,7 @@ class QFLIB_EXPORT QFEvaluationPropertyEditor : public QWidget {
         /** \brief send the given command string to all edtor tabs */
         void sendEditorCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant());
     private:
-        QFEvaluationPropertyEditorPrivate* p;
+        QPointer<QFEvaluationPropertyEditorPrivate> p;
     protected:
         /** \brief points to the record currently displayed */
         QPointer<QFEvaluationItem> current;

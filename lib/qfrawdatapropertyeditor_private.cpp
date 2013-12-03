@@ -422,11 +422,11 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     actCorrelation=new QAction(QIcon(":/lib/result_correlation.png"), tr("Result correlation"), d);
     tbResults->addAction(actCorrelation);
 
-    actCopyExpanded=new QAction( tr("Copy Selection in expanded form"), this);
+    actCopyExpanded=new QAction( tr("Copy Selection in expanded form"), d);
     tvResults->addAction(actCopyExpanded);;
-    actCopyExpandedNoHead=new QAction( tr("Copy Selection in expanded form, w/o header"), this);
+    actCopyExpandedNoHead=new QAction( tr("Copy Selection in expanded form, w/o header"), d);
     tvResults->addAction(actCopyExpandedNoHead);;
-    actCopyExpandedNoHeadMatlab=new QAction( tr("Copy Selection in expanded form, to Matlab"), this);
+    actCopyExpandedNoHeadMatlab=new QAction( tr("Copy Selection in expanded form, to Matlab"), d);
     tvResults->addAction(actCopyExpandedNoHeadMatlab);;
 
     tbResults->addSeparator();

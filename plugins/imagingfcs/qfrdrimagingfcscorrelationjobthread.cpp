@@ -2585,7 +2585,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     bleachFitOK[i]=0;
                 }
                 qfFree(fit_I);
-                if (i%(frame_width*frame_height/20)==0) {
+                if (i>0 && i%(frame_width*frame_height/20)==0) {
                     emit messageChanged(tr("calculating bleach correction parameters (%1/%2) ...").arg(i+1).arg(frame_width*frame_height));
                 }
             }

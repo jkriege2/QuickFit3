@@ -495,27 +495,27 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     tvResults->addActionsToToolbar(tbResults);
     actCopyValErrResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as value+error pairs"), this);
     tbResults->addAction(actCopyValErrResults);
-    actCopyValErrResultsNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as value+error pairs, w/o header"), this);
+    actCopyValErrResultsNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as value+error pairs, w/o header"), d);
     tbResults->addAction(actCopyValErrResultsNoHead);
 
-    actCopyMedianQuantilesResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as median+q25+q75"), this);
-    actCopyMedianQuantilesNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as median+q25+q75, w/o header"), this);
+    actCopyMedianQuantilesResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as median+q25+q75"), d);
+    actCopyMedianQuantilesNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as median+q25+q75, w/o header"), d);
 
-    actCopyExpanded=new QAction( tr("Copy Selection in expanded form"), this);
+    actCopyExpanded=new QAction( tr("Copy Selection in expanded form"), d);
     tvResults->addAction(actCopyExpanded);
-    actCopyExpandedNoHead=new QAction( tr("Copy Selection in expanded form, w/o header"), this);
+    actCopyExpandedNoHead=new QAction( tr("Copy Selection in expanded form, w/o header"), d);
     tvResults->addAction(actCopyExpandedNoHead);
-    actCopyExpandedNoHeadMatlab=new QAction( tr("Copy Selection in expanded form, to Matlab"), this);
+    actCopyExpandedNoHeadMatlab=new QAction( tr("Copy Selection in expanded form, to Matlab"), d);
     tvResults->addAction(actCopyExpandedNoHeadMatlab);
 
-    actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), this);
+    actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), d);
     tbResults->addAction(actSaveResults);
-    actSaveResultsAveraged=new QAction(tr("Save all results to file, averaged vector/matrix results"), this);
+    actSaveResultsAveraged=new QAction(tr("Save all results to file, averaged vector/matrix results"), d);
 
     tbResults->addSeparator();
-    actStatistics=new QAction(QIcon(":/lib/result_statistics.png"), tr("Result statistics, summarizing cells"), this);
+    actStatistics=new QAction(QIcon(":/lib/result_statistics.png"), tr("Result statistics, summarizing cells"), d);
     tbResults->addAction(actStatistics);
-    actStatisticsComparing=new QAction(QIcon(":/lib/result_statistics_compare.png"), tr("Result statistics, comparing cells"), this);
+    actStatisticsComparing=new QAction(QIcon(":/lib/result_statistics_compare.png"), tr("Result statistics, comparing cells"), d);
     tbResults->addAction(actStatisticsComparing);
 
     tbResults->addSeparator();
@@ -643,23 +643,23 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 
 
-    actHelp=new QAction(QIcon(":/lib/help.png"), tr("&Help"), this);
+    actHelp=new QAction(QIcon(":/lib/help.png"), tr("&Help"), d);
     actHelp->setToolTip(tr("display online-help"));
     connect(actHelp, SIGNAL(triggered()), this, SLOT(displayHelp()));
 
-    actHelpPlugin=new QAction(QIcon(":/lib/help.png"), tr("&Plugin Help"), this);
+    actHelpPlugin=new QAction(QIcon(":/lib/help.png"), tr("&Plugin Help"), d);
     actHelpPlugin->setToolTip(tr("display online-help for the specific plugin"));
     connect(actHelpPlugin, SIGNAL(triggered()), this, SLOT(displayHelpPlugin()));
 
-    actHelpPluginTutorial=new QAction(QIcon(":/lib/help/help_tutorial.png"), tr("&Plugin Tutorial"), this);
+    actHelpPluginTutorial=new QAction(QIcon(":/lib/help/help_tutorial.png"), tr("&Plugin Tutorial"), d);
     actHelpPluginTutorial->setToolTip(tr("display the tutorial for the specific plugin"));
     connect(actHelpPluginTutorial, SIGNAL(triggered()), this, SLOT(displayHelpPluginTutorial()));
 
-    actHelpPluginCopyright=new QAction(QIcon(":/lib/help/help_copyright.png"), tr("&Plugin Copyright"), this);
+    actHelpPluginCopyright=new QAction(QIcon(":/lib/help/help_copyright.png"), tr("&Plugin Copyright"), d);
     actHelpPluginCopyright->setToolTip(tr("display copyright note for the specific plugin"));
     connect(actHelpPluginCopyright, SIGNAL(triggered()), this, SLOT(displayHelpPluginCopyright()));
 
-    actHelpEval=new QAction(QIcon(":/lib/help_rdr.png"), tr("&Evaluation item help"), this);
+    actHelpEval=new QAction(QIcon(":/lib/help_rdr.png"), tr("&Evaluation item help"), d);
     actHelpEval->setToolTip(tr("display online-help common to all plugins, i.e. for the basic evaluation editor dialog"));
     connect(actHelpEval, SIGNAL(triggered()), this, SLOT(displayHelpEval()));
 
