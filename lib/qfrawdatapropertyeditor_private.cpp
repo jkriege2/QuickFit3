@@ -422,9 +422,12 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     actCorrelation=new QAction(QIcon(":/lib/result_correlation.png"), tr("Result correlation"), d);
     tbResults->addAction(actCorrelation);
 
-    actCopyExpanded=new QAction( tr("Copy Selection in expanded form, w/o header"), this);
-    actCopyExpandedNoHead=new QAction( tr("Copy Selection  in expanded form, w/o header"), this);
-    actCopyExpandedNoHeadMatlab=new QAction( tr("Copy Selection  in expanded form, to Matlab"), this);
+    actCopyExpanded=new QAction( tr("Copy Selection in expanded form"), this);
+    tvResults->addAction(actCopyExpanded);;
+    actCopyExpandedNoHead=new QAction( tr("Copy Selection in expanded form, w/o header"), this);
+    tvResults->addAction(actCopyExpandedNoHead);;
+    actCopyExpandedNoHeadMatlab=new QAction( tr("Copy Selection in expanded form, to Matlab"), this);
+    tvResults->addAction(actCopyExpandedNoHeadMatlab);;
 
     tbResults->addSeparator();
     actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete selected records"), d);

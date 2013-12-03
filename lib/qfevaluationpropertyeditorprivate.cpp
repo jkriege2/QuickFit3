@@ -501,9 +501,12 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     actCopyMedianQuantilesResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as median+q25+q75"), this);
     actCopyMedianQuantilesNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as median+q25+q75, w/o header"), this);
 
-    actCopyExpanded=new QAction( tr("Copy Selection in expanded form, w/o header"), this);
-    actCopyExpandedNoHead=new QAction( tr("Copy Selection  in expanded form, w/o header"), this);
-    actCopyExpandedNoHeadMatlab=new QAction( tr("Copy Selection  in expanded form, to Matlab"), this);
+    actCopyExpanded=new QAction( tr("Copy Selection in expanded form"), this);
+    tvResults->addAction(actCopyExpanded);
+    actCopyExpandedNoHead=new QAction( tr("Copy Selection in expanded form, w/o header"), this);
+    tvResults->addAction(actCopyExpandedNoHead);
+    actCopyExpandedNoHeadMatlab=new QAction( tr("Copy Selection in expanded form, to Matlab"), this);
+    tvResults->addAction(actCopyExpandedNoHeadMatlab);
 
     actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), this);
     tbResults->addAction(actSaveResults);
@@ -850,13 +853,16 @@ void QFEvaluationPropertyEditorPrivate::saveResults() {
 
         }
 
+        qDebug()<<all<<exportAll<<indxs.size();
+
         QStringList evalIDs;
         QList<QPair<QPointer<QFRawDataRecord>, QString> > records;
         if (!exportAll) {
             for (int i=0; i<indxs.size(); i++) {
-                evalIDs.append(indxs[i].data(QFEvaluationResultsModel::EvalNameRole).toString());
+                evalIDs.append(indxs[i].data(QFEvaluationResultsModel::ResultNameRole).toString());
                 QPointer<QFRawDataRecord>  pp=d->current->getProject()->getRawDataByID(indxs[i].data(QFEvaluationResultsModel::ResultIDRole).toInt());
-                records.append(qMakePair(pp, indxs[i].data(QFEvaluationResultsModel::ResultNameRole).toString()));
+                records.append(qMakePair(pp, indxs[i].data(QFEvaluationResultsModel::EvalNameRole).toString()));
+                qDebug()<<evalIDs.last()<<records.last().first<<records.last().second;
             }
         }
 

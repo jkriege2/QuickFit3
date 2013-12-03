@@ -744,21 +744,22 @@ QStringList QFProject::rdrCalcMatchingResultsNames(const QString& evalFilter, co
     return lp;
 }
 
-bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename, bool vectorsToAvg, QChar separator, QChar decimalPoint, QChar stringDelimiter, const QStringList& filteredEvalIDs, const QList<QPair<QPointer<QFRawDataRecord>, QString> >& filtereRecords) {
+bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename, bool vectorsToAvg, QChar separator, QChar decimalPoint, QChar stringDelimiter, const QStringList& filteredFitParamIDs, const QList<QPair<QPointer<QFRawDataRecord>, QString> >& filtereRecords) {
     QString sdel=stringDelimiter;
     QString dp=decimalPoint;
     QList<QPair<QString,QString> > colnames=rdrCalcMatchingResultsNamesAndLabels(evalFilter);
     QList<QPair<QPointer<QFRawDataRecord>, QString> > records=rdrCalcMatchingResults(evalFilter);
 
-    if (filteredEvalIDs.size()>0) {
+    if (filteredFitParamIDs.size()>0) {
         for (int j=colnames.size()-1; j>=0; j--) {
             bool found=false;
-            for (int i=0; i<filteredEvalIDs.size(); i++) {
-                if (filteredEvalIDs[i]==colnames[j].second) {
+            for (int i=0; i<filteredFitParamIDs.size(); i++) {
+                if (filteredFitParamIDs[i]==colnames[j].second) {
                     found=true;
                     break;
                 }
             }
+            //qDebug()<<"check colname"<<colnames[j].second<<found;
             if (!found) colnames.removeAt(j);
         }
     }
@@ -772,6 +773,7 @@ bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename,
                     break;
                 }
             }
+            //qDebug()<<"check record"<<records[j].second<<found;
             if (!found) records.removeAt(j);
         }
     }
@@ -969,7 +971,7 @@ bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, QString filename,
     return true;
 }
 
-bool QFProject::rdrResultsSaveToSYLK(const QString &evalFilter, QString filename, bool vectorsToAvg, bool flipTable, const QStringList &filteredEvalIDs, const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords) {
+bool QFProject::rdrResultsSaveToSYLK(const QString &evalFilter, QString filename, bool vectorsToAvg, bool flipTable, const QStringList &filteredFitParamIDs, const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords) {
     QFile of(filename);
     if (of.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream out(&of);
@@ -987,11 +989,11 @@ bool QFProject::rdrResultsSaveToSYLK(const QString &evalFilter, QString filename
         QLocale loc=QLocale::c();
         loc.setNumberOptions(QLocale::OmitGroupSeparator);
 
-        if (filteredEvalIDs.size()>0) {
+        if (filteredFitParamIDs.size()>0) {
             for (int j=colnames.size()-1; j>=0; j--) {
                 bool found=false;
-                for (int i=0; i<filteredEvalIDs.size(); i++) {
-                    if (filteredEvalIDs[i]==colnames[j].second) {
+                for (int i=0; i<filteredFitParamIDs.size(); i++) {
+                    if (filteredFitParamIDs[i]==colnames[j].second) {
                         found=true;
                         break;
                     }

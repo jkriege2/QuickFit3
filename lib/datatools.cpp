@@ -65,12 +65,14 @@ void dataExpand(QList<QList<QVariant> >& data, QStringList* columnsNames) {
     QList<QList<QVariant> > d;
     for (int i=0; i<d.size(); i++) d.append(QList<QVariant>());
     QStringList cn;
-    if (columnsNames) cn=*columnsNames;
+    if (columnsNames) cn = (*columnsNames);
     int colid=0;
     for (int c=0; c<data.size(); c++) {
         int cols=1;
+        bool hasErrors=false;
         for (int r=0; r<data[c].size(); r++) {
             const QVariant& v=data[c].at(r);
+            //qDebug()<<"c="<<c<<"r="<<r<<" = "<<v;
             switch(v.type()) {
                 case QVariant::Line:
                 case QVariant::LineF:
@@ -94,9 +96,14 @@ void dataExpand(QList<QList<QVariant> >& data, QStringList* columnsNames) {
                 case QVariant::QVariant::Matrix4x4:
                     cols=qMax(cols, 16);
                     break;
-                case QVariant::List:
-                    cols=qMax(cols, v.toList().size());
-                    break;
+                case QVariant::List: {
+                    QVariantList vl=v.toList();
+                    if (vl.size()>0 && (vl.first().type()==QVariant::Point || vl.first().type()==QVariant::PointF)) {
+                        cols=qMax(cols, 2*vl.size());
+                    } else {
+                        cols=qMax(cols, vl.size());
+                    }
+                    } break;
                 case QVariant::StringList:
                     cols=qMax(cols, v.toStringList().size());
                     break;
@@ -147,9 +154,15 @@ void dataExpand(QList<QList<QVariant> >& data, QStringList* columnsNames) {
                             qreal* dd=v.value<QMatrix4x4>().data();
                             if (i<16 && i>=0) vo=dd[i];
                         } break;
-                    case QVariant::List:
-                        vo=v.toList().value(i, QVariant());
-                        break;
+                case QVariant::List: {
+                        QVariantList vl=v.toList();
+                        if (vl.size()>0 && (vl.first().type()==QVariant::Point || vl.first().type()==QVariant::PointF)) {
+                            if (i>=vl.size()) vo=vl.value(i-vl.size(), QVariant()).toPointF().y();
+                            else vo=vl.value(i, QVariant()).toPointF().x();
+                        } else {
+                            vo=v.toList().value(i, QVariant());
+                        }
+                        } break;
                     case QVariant::StringList:
                         if (i<v.toStringList().size()) vo=v.toStringList().value(i, "");
                         break;
@@ -162,7 +175,7 @@ void dataExpand(QList<QList<QVariant> >& data, QStringList* columnsNames) {
             d.append(newcol);
         }
         if (columnsNames) {
-            cn<<columnsNames[c];
+            cn<<columnsNames->value(c, "");
             for (int i=0; i<cols-1; i++) {
                 cn<<"";
             }

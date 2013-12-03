@@ -129,7 +129,9 @@ void QEnhancedTableView::copySelectionToExcelExpanded(int copyrole, bool storeHe
     QStringList colnames;
     QStringList rownames;
     getVariantDataTable(copyrole, csvData, colnames, rownames);
+    //qDebug()<<csvData.size()<<colnames.size();
     dataExpand(csvData, &colnames);
+    //qDebug()<<csvData.size()<<colnames.size();
     if (storeHead) QFDataExportHandler::copyCSV(csvData, colnames, rownames);
     else QFDataExportHandler::copyCSV(csvData);
 }
@@ -183,6 +185,8 @@ void QEnhancedTableView::getVariantDataTable(int copyrole, QList<QList<QVariant>
         csvData.clear();
         colnames.clear();
         rownames.clear();
+        //qDebug()<<rowlist<<collist;
+        //qDebug()<<rowcnt<<colcnt;
         for (int c=0; c<colcnt; c++) {
             csvData.append(QList<QVariant>());
             for (int r=0; r<rowcnt; r++) {
@@ -193,13 +197,16 @@ void QEnhancedTableView::getVariantDataTable(int copyrole, QList<QList<QVariant>
         for (int r=0; r<rowcnt; r++) {
             rownames<<model()->headerData(rowlist[r], Qt::Vertical).toString();
         }
+        //qDebug()<<colnames;
+        //qDebug()<<rownames;
         for (int i=0; i<sel.size(); i++) {
             int r=rowlist.indexOf(sel[i].row());
             int c=collist.indexOf(sel[i].column());
             int cc=collist.indexOf(c);
             int rr=rowlist.indexOf(r);
-            if (cc>=0 && cc<colcnt && rr>=0 && rr<rowcnt) {
+            if (c>=0 && c<colcnt && r>=0 && r<rowcnt) {
                 csvData[c].operator[](r)=sel[i].data(copyrole);
+                //qDebug()<<"rc="<<r<<c<<"  rrcc="<<rr<<cc<<"  val="<<sel[i].data(copyrole);
             }
         }
     }
