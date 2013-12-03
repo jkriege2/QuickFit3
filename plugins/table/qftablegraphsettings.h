@@ -40,6 +40,7 @@ class QFTableGraphSettings : public QWidget
         void graphDataChanged();
         void performFit(int xCol, int yCol, int sigmaCol, int plot, QString function);
         void performRegression(int xCol, int yCol, int sigmaCol, int  plot);
+        void performRefit(int plot);
     public slots:
         void initFocus();
 
@@ -58,6 +59,7 @@ class QFTableGraphSettings : public QWidget
 
         void doFit();
         void doRegression();
+        void doRefit();
 
         void updateComboboxes();
         void fitFunctionChanged();

@@ -41,6 +41,7 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
 
     //ui->scrollArea->setWidget();
 
+    connect(ui->widGraphSettings, SIGNAL(performRefit(int)), this, SLOT(doRefit(int)));
     connect(ui->widGraphSettings, SIGNAL(performFit(int,int,int,int,QString)), this, SLOT(doFit(int,int,int,int,QString)));
     connect(ui->widGraphSettings, SIGNAL(performRegression(int,int,int,int)), this, SLOT(doRegression(int,int,int,int)));
 
@@ -1468,5 +1469,10 @@ void QFRDRTablePlotWidget::doFit(int xCol, int yCol, int sigmaCol, int plot, QSt
 void QFRDRTablePlotWidget::doRegression(int xCol, int yCol, int sigmaCol, int plot)
 {
     emit performRegression(xCol, yCol, sigmaCol, plot, ui->widSystemSettings->getLogX(), ui->widSystemSettings->getLogY());
+}
+
+void QFRDRTablePlotWidget::doRefit(int plot)
+{
+    emit performRefit(plot);
 }
 

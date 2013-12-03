@@ -30,6 +30,8 @@ QFTableGraphSettings::QFTableGraphSettings(QWidget *parent) :
 
     ui->setupUi(this);
 
+    ui->btnRefit->setVisible(false);
+
     ui->tabFunctionParameters->setItemDelegate(new QFFitFunctionValueInputDelegate(ui->tabFunctionParameters));
     fitfuncValuesTable=new QFFitFunctionValueInputTable(this);
     fitfuncValuesTable->setEditErrors(false);
@@ -1184,10 +1186,16 @@ void QFTableGraphSettings::doFit()
     emit performFit(ui->cmbLinesXData->currentIndex()-1, ui->cmbLinesYData->currentIndex()-1, ui->cmbLinesYError->currentIndex()-1, plot, QString(""));
 }
 
+void QFTableGraphSettings::doRefit()
+{
+    emit performRefit(plot);
+}
+
 void QFTableGraphSettings::doRegression()
 {
     emit performRegression(ui->cmbLinesXData->currentIndex()-1, ui->cmbLinesYData->currentIndex()-1, ui->cmbLinesYError->currentIndex()-1, plot);
 }
+
 
 
 void QFTableGraphSettings::initFocus()

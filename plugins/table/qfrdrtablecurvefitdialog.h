@@ -17,7 +17,8 @@ class QFRDRTableCurveFitDialog : public QDialog
         Q_OBJECT
         
     public:
-        explicit QFRDRTableCurveFitDialog(QFRDRTable* table, int colX, int colY, int colW, QWidget *parent = 0, bool logX=false, bool logY=false, int resultColumn=-1, int addGraph=-1);
+    explicit QFRDRTableCurveFitDialog(QFRDRTable* table, int colX, int colY, int colW, QWidget *parent = 0, bool logX=false, bool logY=false, int resultColumn=-1, int addGraph=-1);
+    explicit QFRDRTableCurveFitDialog(QFRDRTable* table, int graph, int plot, QWidget *parent = 0);
         ~QFRDRTableCurveFitDialog();
     protected slots:
         void saveResults();
@@ -29,6 +30,8 @@ class QFRDRTableCurveFitDialog : public QDialog
         void updateFitStatistics();
     protected:
         void connectSignals(bool connectS=true);
+
+        void readDataFromTable();
 
     private:
         Ui::QFRDRTableCurveFitDialog *ui;
@@ -57,7 +60,7 @@ class QFRDRTableCurveFitDialog : public QDialog
         double getParamMax(const QString& param, double defaultVal=DBL_MAX) const;
 
         void writeFitProperties(int g, int p);
-        void readFitProperties(int g, int p);
+        void readFitProperties(int g, int p, int *resultColumn=NULL, int *addGraph=NULL);
         void intInit(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph);
 };
 

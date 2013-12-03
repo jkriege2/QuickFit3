@@ -278,6 +278,11 @@ void QFRDRPlotEditor::doRegression(int xCol, int yCol, int sigmaCol, int plot, b
     emit performRegression(xCol, yCol, sigmaCol, plot,xlog, ylog);
 }
 
+void QFRDRPlotEditor::doRefit(int plot)
+{
+    emit performRefit(plot);
+}
+
 
 
 

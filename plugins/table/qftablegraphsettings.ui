@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>582</width>
-    <height>1071</height>
+    <width>606</width>
+    <height>1236</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1832,6 +1832,26 @@
       </spacer>
      </item>
      <item>
+      <widget class="QToolButton" name="btnRefit">
+       <property name="text">
+        <string>refit</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfrdrtable.qrc">
+         <normaloff>:/table/fit.png</normaloff>:/table/fit.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="btnFit">
        <property name="text">
         <string>&amp;Fit</string>
@@ -2429,8 +2449,8 @@
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
@@ -2442,12 +2462,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>544</x>
-     <y>474</y>
+     <x>558</x>
+     <y>546</y>
     </hint>
     <hint type="destinationlabel">
-     <x>572</x>
-     <y>475</y>
+     <x>596</x>
+     <y>551</y>
     </hint>
    </hints>
   </connection>
@@ -2458,12 +2478,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>430</x>
-     <y>520</y>
+     <x>432</x>
+     <y>600</y>
     </hint>
     <hint type="destinationlabel">
-     <x>458</x>
-     <y>521</y>
+     <x>470</x>
+     <y>605</y>
     </hint>
    </hints>
   </connection>
@@ -2474,12 +2494,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>543</x>
-     <y>590</y>
+     <x>557</x>
+     <y>682</y>
     </hint>
     <hint type="destinationlabel">
-     <x>571</x>
-     <y>591</y>
+     <x>595</x>
+     <y>687</y>
     </hint>
    </hints>
   </connection>
@@ -2490,12 +2510,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>81</x>
-     <y>400</y>
+     <x>90</x>
+     <y>462</y>
     </hint>
     <hint type="destinationlabel">
-     <x>299</x>
-     <y>403</y>
+     <x>452</x>
+     <y>467</y>
     </hint>
    </hints>
   </connection>
@@ -2506,12 +2526,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>214</x>
-     <y>825</y>
+     <x>239</x>
+     <y>960</y>
     </hint>
     <hint type="destinationlabel">
-     <x>350</x>
-     <y>827</y>
+     <x>368</x>
+     <y>963</y>
     </hint>
    </hints>
   </connection>
@@ -2522,12 +2542,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>214</x>
-     <y>825</y>
+     <x>239</x>
+     <y>960</y>
     </hint>
     <hint type="destinationlabel">
-     <x>430</x>
-     <y>827</y>
+     <x>461</x>
+     <y>963</y>
     </hint>
    </hints>
   </connection>
@@ -2538,12 +2558,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>214</x>
-     <y>825</y>
+     <x>239</x>
+     <y>960</y>
     </hint>
     <hint type="destinationlabel">
-     <x>566</x>
-     <y>827</y>
+     <x>590</x>
+     <y>963</y>
     </hint>
    </hints>
   </connection>
@@ -2554,12 +2574,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>567</x>
-     <y>463</y>
+     <x>596</x>
+     <y>551</y>
     </hint>
     <hint type="destinationlabel">
-     <x>494</x>
-     <y>465</y>
+     <x>558</x>
+     <y>546</y>
     </hint>
    </hints>
   </connection>
@@ -2570,12 +2590,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>458</x>
-     <y>521</y>
+     <x>470</x>
+     <y>605</y>
     </hint>
     <hint type="destinationlabel">
-     <x>430</x>
-     <y>520</y>
+     <x>432</x>
+     <y>600</y>
     </hint>
    </hints>
   </connection>
@@ -2586,12 +2606,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>566</x>
-     <y>577</y>
+     <x>595</x>
+     <y>687</y>
     </hint>
     <hint type="destinationlabel">
-     <x>490</x>
-     <y>581</y>
+     <x>557</x>
+     <y>682</y>
     </hint>
    </hints>
   </connection>
@@ -2602,12 +2622,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>544</x>
-     <y>734</y>
+     <x>558</x>
+     <y>850</y>
     </hint>
     <hint type="destinationlabel">
-     <x>572</x>
-     <y>735</y>
+     <x>596</x>
+     <y>855</y>
     </hint>
    </hints>
   </connection>
@@ -2618,12 +2638,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>544</x>
-     <y>757</y>
+     <x>558</x>
+     <y>877</y>
     </hint>
     <hint type="destinationlabel">
-     <x>572</x>
-     <y>758</y>
+     <x>596</x>
+     <y>882</y>
     </hint>
    </hints>
   </connection>
@@ -2634,12 +2654,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>572</x>
-     <y>735</y>
+     <x>596</x>
+     <y>855</y>
     </hint>
     <hint type="destinationlabel">
-     <x>544</x>
-     <y>734</y>
+     <x>558</x>
+     <y>850</y>
     </hint>
    </hints>
   </connection>
@@ -2650,12 +2670,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>572</x>
-     <y>758</y>
+     <x>596</x>
+     <y>882</y>
     </hint>
     <hint type="destinationlabel">
-     <x>544</x>
-     <y>757</y>
+     <x>558</x>
+     <y>877</y>
     </hint>
    </hints>
   </connection>
@@ -2666,12 +2686,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>282</x>
-     <y>515</y>
+     <x>312</x>
+     <y>600</y>
     </hint>
     <hint type="destinationlabel">
-     <x>204</x>
-     <y>512</y>
+     <x>267</x>
+     <y>605</y>
     </hint>
    </hints>
   </connection>
@@ -2682,12 +2702,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>427</x>
-     <y>999</y>
+     <x>464</x>
+     <y>1161</y>
     </hint>
     <hint type="destinationlabel">
-     <x>361</x>
-     <y>998</y>
+     <x>419</x>
+     <y>1166</y>
     </hint>
    </hints>
   </connection>
@@ -2698,14 +2718,33 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>358</x>
-     <y>578</y>
+     <x>396</x>
+     <y>682</y>
     </hint>
     <hint type="destinationlabel">
-     <x>275</x>
-     <y>578</y>
+     <x>351</x>
+     <y>687</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnRefit</sender>
+   <signal>clicked()</signal>
+   <receiver>QFTableGraphSettings</receiver>
+   <slot>doRefit()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>522</x>
+     <y>1216</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>59</x>
+     <y>1214</y>
     </hint>
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>doRefit()</slot>
+ </slots>
 </ui>

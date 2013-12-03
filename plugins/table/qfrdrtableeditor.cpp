@@ -51,6 +51,19 @@ void QFRDRTableEditor::requestRegression(int xCol, int yCol, int sigmaCol, int p
     }
 }
 
+void QFRDRTableEditor::requestRefit(int plot)
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        //qDebug()<<"regression cX="<<xCol<<"  cY="<<yCol<<"  cW="<<sigmaCol<<"  plot="<<plot<<"  xlog="<<xlog<<"  ylog="<<ylog;
+        /*QFRDRTableRegressionDialog* dlg=new QFRDRTableRegressionDialog(m, xCol, yCol, sigmaCol, this, xlog, ylog, -1, plot);
+        if (dlg->exec()) {
+
+        }
+        delete dlg;*/
+    }
+}
+
 void QFRDRTableEditor::createWidgets() {
     QVBoxLayout* l=new QVBoxLayout(this);
     setLayout(l);

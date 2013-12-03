@@ -9,7 +9,18 @@ QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int colX, 
     QDialog(parent),
     ui(new Ui::QFRDRTableCurveFitDialog)
 {
+    ui->setupUi(this);
     intInit(table,  colX,  colY,  colW, parent,  logX,  logY,  resultColumn,  addGraph);
+}
+
+QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int graph, int plot, QWidget *parent):
+    QDialog(parent),
+    ui(new Ui::QFRDRTableCurveFitDialog)
+{
+    ui->setupUi(this);
+    int resultColumn=-1,  addGraph=-1;
+    readFitProperties(graph, plot, &resultColumn, &addGraph);
+    intInit(table,  colX,  colY,  colW, parent,  ui->chkLogX->isChecked(),  ui->chkLogY->isChecked(),  resultColumn,  addGraph);
 }
 
 void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph)
@@ -17,7 +28,6 @@ void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, in
     this->colX=colX;
     this->colY=colY;
     this->colW=colW;
-    ui->setupUi(this);
     this->table=table;
     ui->chkLogX->setChecked(logX);
     ui->chkLogY->setChecked(logY);
@@ -50,41 +60,9 @@ void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, in
     } else {
         ui->cmbSaveColumn->setCurrentIndex(resultColumn+2);
     }
-
-    dataX=table->tableGetColumnDataAsDouble(colX);
-    dataY=table->tableGetColumnDataAsDouble(colY);
-    //qDebug()<<"dataX.size="<<dataX.size();
-    //qDebug()<<"dataY.size="<<dataX.size();
-    datapoints=qMin(dataX.size(), dataY.size());
-    if (colW>=0) {
-        dataW=table->tableGetColumnDataAsDouble(colW);
-        //qDebug()<<"dataW.size="<<dataW.size();
-        if (dataW.size()>0 && dataW.size()<datapoints) datapoints=dataW.size();
-    } else {
-        dataW=QVector<double>(datapoints, 1);
-    }
-    if (dataX.size()>datapoints) dataX.remove(dataX.size()-(dataX.size()-datapoints), (dataX.size()-datapoints));
-    if (dataY.size()>datapoints) dataY.remove(dataY.size()-(dataY.size()-datapoints), (dataY.size()-datapoints));
-    if (dataW.size()>datapoints) dataW.remove(dataW.size()-(dataW.size()-datapoints), (dataW.size()-datapoints));
-
-    //qDebug()<<"datapoints="<<datapoints;
-    for (int i=datapoints-1; i>=0; i--) {
-        if (!QFFloatIsOK(dataX[i]) || !QFFloatIsOK(dataY[i]) || (dataW.size()==dataX.size() && !QFFloatIsOK(dataW[i]))) {
-            dataX.remove(i, 1);
-            dataY.remove(i, 1);
-            dataW.remove(i, 1);
-        }
-    }
-    datapoints=dataX.size();
-    weights.clear();
-    for (int i=0; i<dataW.size(); i++) weights<<1.0/qfSqr(dataW[i]);
-    //qDebug()<<"datapoints_after_clean="<<datapoints;
-
-    if (dataX.size()>0) {
-        ui->datacut->set_min(qfstatisticsMin(dataX));
-        ui->datacut->set_max(qfstatisticsMax(dataX));
-    }
     ui->datacut->setLogScale(logX, 20);
+
+    readDataFromTable();
 
     ui->tabParams->setItemDelegate(new QFFitFunctionValueInputDelegate(ui->tabParams));
     parameterTable=new QFFitFunctionValueInputTable(this);
@@ -95,6 +73,8 @@ void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, in
 
     ui->cmbFitAlgorithm->setCurrentIndex(0);
     ui->cmbFitFunction->setCurrentIndex(0);
+
+
 
 
 
@@ -774,6 +754,44 @@ void QFRDRTableCurveFitDialog::connectSignals(bool connectS)
     }
 }
 
+void QFRDRTableCurveFitDialog::readDataFromTable()
+{
+    dataX=table->tableGetColumnDataAsDouble(colX);
+    dataY=table->tableGetColumnDataAsDouble(colY);
+    //qDebug()<<"dataX.size="<<dataX.size();
+    //qDebug()<<"dataY.size="<<dataX.size();
+    datapoints=qMin(dataX.size(), dataY.size());
+    if (colW>=0) {
+        dataW=table->tableGetColumnDataAsDouble(colW);
+        //qDebug()<<"dataW.size="<<dataW.size();
+        if (dataW.size()>0 && dataW.size()<datapoints) datapoints=dataW.size();
+    } else {
+        dataW=QVector<double>(datapoints, 1);
+    }
+    if (dataX.size()>datapoints) dataX.remove(dataX.size()-(dataX.size()-datapoints), (dataX.size()-datapoints));
+    if (dataY.size()>datapoints) dataY.remove(dataY.size()-(dataY.size()-datapoints), (dataY.size()-datapoints));
+    if (dataW.size()>datapoints) dataW.remove(dataW.size()-(dataW.size()-datapoints), (dataW.size()-datapoints));
+
+    //qDebug()<<"datapoints="<<datapoints;
+    for (int i=datapoints-1; i>=0; i--) {
+        if (!QFFloatIsOK(dataX[i]) || !QFFloatIsOK(dataY[i]) || (dataW.size()==dataX.size() && !QFFloatIsOK(dataW[i]))) {
+            dataX.remove(i, 1);
+            dataY.remove(i, 1);
+            dataW.remove(i, 1);
+        }
+    }
+    datapoints=dataX.size();
+    weights.clear();
+    for (int i=0; i<dataW.size(); i++) weights<<1.0/qfSqr(dataW[i]);
+    //qDebug()<<"datapoints_after_clean="<<datapoints;
+
+    if (dataX.size()>0) {
+        ui->datacut->set_min(qfstatisticsMin(dataX));
+        ui->datacut->set_max(qfstatisticsMax(dataX));
+    }
+
+}
+
 int QFRDRTableCurveFitDialog::getRangeMin()
 {
     int rm=0;
@@ -850,11 +868,28 @@ void QFRDRTableCurveFitDialog::writeFitProperties(int g, int p)
     table->colgraphSetPlotProperty(g, p, "FIT_CUTHIGH", ui->datacut->get_userMax());
     table->colgraphSetPlotProperty(g, p, "FIT_LOGX", ui->chkLogX->isChecked());
     table->colgraphSetPlotProperty(g, p, "FIT_LOGY", ui->chkLogY->isChecked());
+    table->colgraphSetPlotProperty(g, p, "FIT_RESULTCOLUMN", ui->cmbSaveColumn->currentIndex());
+
 
 }
 
-void QFRDRTableCurveFitDialog::readFitProperties(int g, int p)
+void QFRDRTableCurveFitDialog::readFitProperties(int g, int p, int* resultColumn, int*addGraph)
 {
+    colX=table->colgraphGetPlotProperty(g, p, "FIT_COLX", colX).toInt();
+    colY=table->colgraphGetPlotProperty(g, p, "FIT_COLY", colY).toInt();
+    colW=table->colgraphGetPlotProperty(g, p, "FIT_COLW", colW).toInt();
+    ui->cmbFitAlgorithm->setCurrentAlgorithm(table->colgraphGetPlotProperty(g, p, "FIT_ALGORITHM", ui->cmbFitAlgorithm->currentFitAlgorithmID()).toString());
+    ui->cmbFitFunction->setCurrentFitFunction(table->colgraphGetPlotProperty(g, p, "FIT_MODEL", ui->cmbFitFunction->currentFitFunctionID()).toString());
+    ui->datacut->set_userMin(table->colgraphGetPlotProperty(g, p, "FIT_CUTLOW", ui->datacut->get_userMin()).toDouble());
+    ui->datacut->set_userMax(table->colgraphGetPlotProperty(g, p, "FIT_CUTHIGH", ui->datacut->get_userMax()).toDouble());
+    bool logX=false;
+    ui->chkLogX->setChecked(logX=table->colgraphGetPlotProperty(g, p, "FIT_LOGX", ui->chkLogX->isChecked()).toBool());
+    ui->chkLogY->setChecked(table->colgraphGetPlotProperty(g, p, "FIT_LOGY", ui->chkLogY->isChecked()).toBool());
+    ui->datacut->setLogScale(logX, 20);
 
+    if (addGraph) *addGraph=g;
+    if (resultColumn) *resultColumn=table->colgraphGetPlotProperty(g, p, "FIT_RESULTCOLUMN", -1).toInt();
+
+    readDataFromTable();
 }
 
