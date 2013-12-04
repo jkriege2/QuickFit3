@@ -14,14 +14,13 @@ QFImageReaderDiffusion4Binary::QFImageReaderDiffusion4Binary() {
     frame=0;
     frames=0;
     timestep=0;
-    framedata=NULL;
+    framedata.clear();
 }
 
 QFImageReaderDiffusion4Binary::~QFImageReaderDiffusion4Binary()
 {
     input.close();
-    if (framedata) free(framedata);
-    framedata=NULL;
+    framedata.clear();
 }
 
 QString QFImageReaderDiffusion4Binary::filter() const {
@@ -39,8 +38,7 @@ bool QFImageReaderDiffusion4Binary::open(QString filename) {
     frame=0;
     frames=0;
     this->filename="";
-    if (framedata) free(framedata);
-    framedata=NULL;
+    framedata.clear();
 
     input.setFileName(filename);
     if (input.open(QIODevice::ReadOnly)) {
@@ -52,8 +50,26 @@ bool QFImageReaderDiffusion4Binary::open(QString filename) {
         timestep=binfileReadDouble(input);
         frame=-1;
 
-        framedata=(uint64_t*)calloc(width*height, sizeof(uint64_t));
+        //framedata=(double*)calloc(width*height, sizeof(double));
+        framedata.clear();
+        for (int i=0; i<width*height; i++) framedata<<0.0;
 
+        /*qDebug()<<width<<height<<frames<<timestep;
+        qint64 p=input.pos();
+        int cnt=0;
+        while (cnt<100) {
+            nextFrame();
+            float f[width*height];
+            double d[width*height];
+            uint16_t ui16[width*height];
+            readFrameFloat(f);
+            readFrameDouble(d);
+            readFrameUINT16(ui16);
+            qDebug()<<cnt<<f[0]<<d[0]<<ui16[0];
+            cnt++;
+        }
+        input.seek(p);*/
+        frame=-1;
         return nextFrame();
     }
     return false;
@@ -72,8 +88,7 @@ void QFImageReaderDiffusion4Binary::close() {
     filename="";
     width=0;
     height=0;
-    if (framedata) free(framedata);
-    framedata=NULL;
+    framedata.clear();
 
 }
 
@@ -88,8 +103,21 @@ bool QFImageReaderDiffusion4Binary::nextFrame() {
     if (!(input.isOpen() && input.isReadable())) return false;
     if (input.atEnd()) return false;
     frame++;
-    const int rsize=width*height*sizeof(uint64_t);
-    return (input.read((char*)framedata, rsize)==rsize);
+    /*for (int i=0; i<width*height; i++) {
+        framedata[i]=binfileReadUint64(input);
+        qDebug()<<"   "<<framedata[i];
+    }*/
+    binfileReadDoubleArray(input, framedata, width*height);
+    return true;
+}
+
+QVariant QFImageReaderDiffusion4Binary::getFileProperty(const QString &name, const QVariant &defaultValue) const
+{
+    QString n=name.toUpper().trimmed();
+    if (n=="FRAMERATE") {
+        return 1.0/timestep;
+    }
+    return QFImporterImageSeries::getFileProperty(name, defaultValue);
 }
 
 uint16_t QFImageReaderDiffusion4Binary::intFrameWidth() {
@@ -106,7 +134,7 @@ uint16_t QFImageReaderDiffusion4Binary::intFrameHeight() {
 
 bool QFImageReaderDiffusion4Binary::intReadFrameFloat(float *data) {
     if (!(input.isOpen() && input.isReadable())) return false;
-    if (!framedata) return false;
+    if (framedata.isEmpty()) return false;
 
     for (int i=0; i<width*height; i++) data[i]=framedata[i];
 
@@ -115,7 +143,7 @@ bool QFImageReaderDiffusion4Binary::intReadFrameFloat(float *data) {
 
 bool QFImageReaderDiffusion4Binary::intReadFrameUINT16(uint16_t *data) {
     if (!(input.isOpen() && input.isReadable())) return false;
-    if (!framedata) return false;
+    if (framedata.isEmpty()) return false;
 
     for (int i=0; i<width*height; i++) data[i]=framedata[i];
 
@@ -124,7 +152,7 @@ bool QFImageReaderDiffusion4Binary::intReadFrameUINT16(uint16_t *data) {
 
 bool QFImageReaderDiffusion4Binary::intReadFrameDouble(double *data) {
     if (!(input.isOpen() && input.isReadable())) return false;
-    if (!framedata) return false;
+    if (framedata.isEmpty()) return false;
 
     for (int i=0; i<width*height; i++) data[i]=framedata[i];
 

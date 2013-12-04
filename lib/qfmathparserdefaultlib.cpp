@@ -183,6 +183,8 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("returnlast", QFMathParser_DefaultLib::fReturnLast);
     p->addFunction("returnfirst", QFMathParser_DefaultLib::fReturnFirst);
     p->addFunction("item", QFMathParser_DefaultLib::fItem);
+
+    p->addFunction("runningaverage", QFMathParser_DefaultLib::fRunningAverage);
 }
 
 
@@ -1481,4 +1483,33 @@ namespace QFMathParser_DefaultLib {
         p->qfmpError("item(x, idx): x had no entries or unrecognized type");
         return res;
     }
+
+    qfmpResult fRunningAverage(const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        qfmpResult res=qfmpResult::invalidResult();
+
+        if (n!=2) {
+            p->qfmpError("runningaverage(x,n) needs two arguments");
+            return res;
+        }
+        if (params[0].type==qfmpDoubleVector && params[1].isInteger() && params[1].toInteger()>0) {
+            const QVector<double>& iv=params[0].numVec;
+            int wid=params[1].toInteger();
+            res.setDoubleVec(QVector<double>());
+            for (int i=0; i<iv.size(); i+=wid) {
+                double s=0;
+                if (i+wid<iv.size()) {
+                    for (int j=0; j<wid; j++) {
+                        s+=iv[i+j];
+                    }
+                    res.numVec<<(s/double(wid));
+                }
+            }
+            return res;
+        } else {
+            p->qfmpError("runningaverage(x,n) requires a number vector as first and an integer number >1 as second argument");
+            return res;
+        }
+    }
+
 }

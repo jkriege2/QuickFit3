@@ -1121,6 +1121,13 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool count
                 QApplication::processEvents();
                 image_width=reader->frameWidth();
                 image_height=reader->frameHeight();
+                QVariant v=reader->getFileProperty("FRAMERATE");
+                if (v.canConvert(QVariant::Double) && v.toDouble()>0) {
+                    frametime=1.0/v.toDouble()*1e6;
+                    ui->edtFrameTime->setValue(frametime);
+                    frameTimeChanged(frametime);
+
+                }
                 if (countFrames) frame_count=reader->countFrames();
                 if (frame_count>0) {
                     ui->spinLastFrame->setMaximum(frame_count-1);

@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <QString>
+#include <QVariant>
 #include "qfimporter.h"
 
 /*! \brief interface for image reader classes
@@ -54,7 +55,15 @@ class QFLIB_EXPORT QFImporterImageSeries: public QFImporter {
         bool readFrameDouble(double* data);
         /** \brief read a new frame into the given array of integers */
         bool readFrameUINT16(uint16_t* data);
-
+        /** \brief get named properties stored in the file
+         *
+         *  standardized property names are:
+         *    - \c FRAMERATE framerate given in fps
+         *    - \c PIXEL_SIZE pixel size given in micrometer
+         *  .
+         * \returns This function returns the required value, or a default value supplied to the function
+         */
+        virtual QVariant getFileProperty(const QString& name, const QVariant& defaultValue=QVariant()) const;
 
         /** \brief set binning */
         void setBinning(int bin) { binning=bin; if (binning<1) binning=1; }

@@ -128,6 +128,14 @@
   $$example:<tt>item("abcdefghi", [true,true,true,false,false,false,true,false,true])</tt> will return <tt>"abcgi"</tt>$$
   <!-- /func:item-->
   </li>
+  
+  <li><a name="runningaverage"/><!-- func:runningaverage -->
+  <b><tt><!-- template -->runningaverage(x, width)<!-- /template --></tt> - <i>calculates the running average over vector <tt>x</tt> with width <tt>width</tt></i>. The argument <tt>x</tt> has to be a vector of numbers and <tt>width</tt> an integer >0</b><br>
+  The functions averages <tt>width</tt> consecutive entries in <tt>x</tt>, if less than <tt>width</tt> entries remain in <tt>x</tt>, they are omitted.
+  $$example:<tt>runningaverage([1,2,3,4,5,6,7,8,9], 3)</tt> will return <tt>[2,5,8]</tt>$$
+  
+  <!-- /func:runningaverage-->
+  </li>
   </ul>
   
   </body>

@@ -289,6 +289,11 @@ bool QFImporterImageSeries::readFrameUINT16(uint16_t* data) {
     return true;
 }
 
+QVariant QFImporterImageSeries::getFileProperty(const QString &name, const QVariant &defaultValue) const
+{
+    return defaultValue;
+}
+
 void QFImporterImageSeries::setCropping(int x0, int x1, int y0, int y1) {
     this->x0=x0;
     this->x1=x1;

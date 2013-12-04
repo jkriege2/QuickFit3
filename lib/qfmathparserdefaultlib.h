@@ -270,6 +270,7 @@ namespace QFMathParser_DefaultLib {
     qfmpResult fLast(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fFirst(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fItem(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    qfmpResult fRunningAverage(const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
 
 

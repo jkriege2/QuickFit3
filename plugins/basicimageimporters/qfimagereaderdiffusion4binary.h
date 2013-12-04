@@ -40,6 +40,7 @@ class QFImageReaderDiffusion4Binary: public QFImporterImageSeries
         virtual uint32_t countFrames();
         /** \brief move on to the next frame in the file. return \c false if no further image exists */
         virtual bool nextFrame();
+        virtual QVariant getFileProperty(const QString& name, const QVariant& defaultValue=QVariant()) const;
 
 
     protected:
@@ -59,7 +60,7 @@ class QFImageReaderDiffusion4Binary: public QFImporterImageSeries
         uint64_t frame;
         uint64_t frames;
         double timestep;
-        uint64_t* framedata;
+        QVector<double> framedata;
 
     public:
 };
