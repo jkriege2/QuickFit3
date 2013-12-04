@@ -178,6 +178,24 @@ class QFRDRColumnGraphsInterface {
          *        If any non-function type is used, the the type is automatically set to be cgtExpression.
          */
         virtual void colgraphAddFunctionGraph(int plot, const QString& expression, ColumnGraphTypes type, const QString&  title, const QVector<double>& params)=0;
+
+        /** \brief sets the given graph to be  a function graph which takes it's parameters from a column, or doesn't have parameters
+         *
+         *  \note This function only works with type==cgtExpression, cgtPolynomial, cgtExponential, cgtPowerLaw, cgtQFFitFunction. Depending on
+         *        the value of type, the parameter expression either contains a math expression, like \c "p1+p2*sin(p3*x)" or the name of an available QFFitFunction
+         *        For the special cases cgtPolynomial, cgtExponential, cgtPowerLaw, the expression is ignored!
+         *        If any non-function type is used, the the type is automatically set to be cgtExpression.
+         */
+        virtual void colgraphSetFunctionGraph(int plot, int graph, const QString& expression, ColumnGraphTypes type, const QString&  title, int columnParam=-1)=0;
+        /** \brief sets the given graph to be a function graph which takes it's parameters from a vector of numbers
+         *
+         *  \note This function only works with typ==cgtExpression, cgtPolynomial, cgtExponential, cgtPowerLaw, cgtQFFitFunction. Depending on
+         *        the value of type, the parameter expression either contains a math expression, like \c "p1+p2*sin(p3*x)" or the name of an available QFFitFunction
+         *        For the special cases cgtPolynomial, cgtExponential, cgtPowerLaw, the expression is ignored!
+         *        If any non-function type is used, the the type is automatically set to be cgtExpression.
+         */
+        virtual void colgraphSetFunctionGraph(int plot, int graph, const QString& expression, ColumnGraphTypes type, const QString&  title, const QVector<double>& params)=0;
+
         /** \brief add an image graph which
          */
         virtual void colgraphAddImageGraph(int plot, int imageColumn, ImageColorPalette palette, double x, double y, double width, double height, int Nx, const QString& title)=0;

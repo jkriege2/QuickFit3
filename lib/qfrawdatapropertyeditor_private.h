@@ -249,6 +249,9 @@ class QFRawDataPropertyEditor_private : public QObject
         void copyResultsExpanded();
         void copyResultsExpandedNoHead();
         void copyResultsExpandedNoHeadMatlab();
+        void copyResultsExpandedFlipped();
+        void copyResultsExpandedNoHeadFlipped();
+        void copyResultsExpandedNoHeadMatlabFlipped();
 
         void filterEvaluationTextChanged(const QString& text);
         void filterResultsTextChanged(const QString& text);

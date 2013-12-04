@@ -1589,6 +1589,20 @@ void QFRawDataPropertyEditor_private::copyResultsExpandedNoHeadMatlab()
     tvResults->copySelectionToMatlabExpandedNoHead(Qt::EditRole);
 }
 
+void QFRawDataPropertyEditor_private::copyResultsExpandedFlipped()
+{
+    tvResults->copySelectionToExcelExpanded(Qt::EditRole, true, true);
+}
+
+void QFRawDataPropertyEditor_private::copyResultsExpandedNoHeadFlipped()
+{
+    tvResults->copySelectionToExcelExpanded(Qt::EditRole, false, true);
+}
+
+void QFRawDataPropertyEditor_private::copyResultsExpandedNoHeadMatlabFlipped()
+{
+    tvResults->copySelectionToMatlabExpandedNoHead(Qt::EditRole, true);
+}
 void QFRawDataPropertyEditor_private::currentTabChanged(int tab) {
     int idx=tab-1;
     for (int i=0; i<menus.size(); i++) {

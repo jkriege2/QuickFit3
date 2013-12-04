@@ -557,6 +557,67 @@ void QFRDRTable::colgraphAddFunctionGraph(int plotid, const QString &expression,
     }
 }
 
+void QFRDRTable::colgraphSetFunctionGraph(int plotid, int graphid, const QString &expression, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, int columnParam)
+{
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            QFRDRTable::GraphInfo& g=plt.graphs[graphid];
+            g.ycolumn=columnParam;
+            g.color=autocolors.value((plt.graphs.size()-1)%autocolors.size(), QColor("red"));
+            g.errorColor=g.color.darker();
+            g.fillColor=g.color.lighter();
+            colgraphToolsSetGraphtype(g, type);
+            g.title=title;
+            g.function=expression;
+            switch (type) {
+                case cgtPowerLaw: g.functionType=gtfPowerLaw; break;
+                case cgtPolynomial: g.functionType=gtfPolynomial; break;
+                case cgtExponential: g.functionType=gtfExponential; break;
+                case cgtQFFitFunction: g.functionType=gtfQFFunction; break;
+                default:
+                case cgtExpression: g.functionType=gtfString; break;
+            }
+            g.functionParameters.clear();
+            g.drawLine=true;
+            g.symbol=JKQTPnoSymbol;
+        }
+        setPlot(plotid, plt);
+        emitRebuildPlotWidgets();
+    }
+
+}
+
+void QFRDRTable::colgraphSetFunctionGraph(int plotid, int graphid, const QString &expression, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, const QVector<double> &params)
+{
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            QFRDRTable::GraphInfo& g=plt.graphs[graphid];
+            g.ycolumn=-1;
+            g.color=autocolors.value((plt.graphs.size()-1)%autocolors.size(), QColor("red"));
+            g.errorColor=g.color.darker();
+            g.fillColor=g.color.lighter();
+            colgraphToolsSetGraphtype(g, type);
+            g.title=title;
+            g.function=expression;
+            switch (type) {
+                case cgtPowerLaw: g.functionType=gtfPowerLaw; break;
+                case cgtPolynomial: g.functionType=gtfPolynomial; break;
+                case cgtExponential: g.functionType=gtfExponential; break;
+                case cgtQFFitFunction: g.functionType=gtfQFFunction; break;
+                default:
+                case cgtExpression: g.functionType=gtfString; break;
+            }
+            g.functionParameters=params;
+            g.drawLine=true;
+            g.symbol=JKQTPnoSymbol;
+        }
+        setPlot(plotid, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
 void QFRDRTable::colgraphAddErrorGraph(int plotid, int columnX, int columnXError, int columnY, int columnYError, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, ErrorGraphTypes errorStyle)
 {
     if (plotid>=0 && plotid<plots.size()) {

@@ -10,20 +10,26 @@ QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int colX, 
     ui(new Ui::QFRDRTableCurveFitDialog)
 {
     ui->setupUi(this);
+    overwriteGraph=-1;
+    parameterTable=new QFFitFunctionValueInputTable(this);
     intInit(table,  colX,  colY,  colW, parent,  logX,  logY,  resultColumn,  addGraph);
 }
 
-QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int graph, int plot, QWidget *parent):
+QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int plotid, int graphid, QWidget *parent):
     QDialog(parent),
     ui(new Ui::QFRDRTableCurveFitDialog)
 {
     ui->setupUi(this);
     int resultColumn=-1,  addGraph=-1;
-    readFitProperties(graph, plot, &resultColumn, &addGraph);
-    intInit(table,  colX,  colY,  colW, parent,  ui->chkLogX->isChecked(),  ui->chkLogY->isChecked(),  resultColumn,  addGraph);
+    this->table=table;
+    parameterTable=new QFFitFunctionValueInputTable(this);
+    readFitProperties(plotid, graphid, &resultColumn, &addGraph);
+    overwriteGraph=graphid;
+    qDebug()<<"QFRDRTableCurveFitDialog("<<plotid<<graphid<<"): "<<overwriteGraph;
+    intInit(table,  colX,  colY,  colW, parent,  ui->chkLogX->isChecked(),  ui->chkLogY->isChecked(),  resultColumn,  addGraph, true);
 }
 
-void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph)
+void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph, bool propsAlreadySet)
 {
     this->colX=colX;
     this->colY=colY;
@@ -39,6 +45,7 @@ void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, in
     for (int i=0; i<table->colgraphGetPlotCount(); i++) {
         ui->cmbAddGraph->addItem(tr("add to: %1").arg(table->colgraphGetPlotTitle(i)));
     }
+    ui->cmbAddGraph->addItem(tr("--- overwrite old graph ---"));
     ui->cmbSaveColumn->clear();
     ui->cmbSaveColumn->addItem(tr("--- no ---"));
     ui->cmbSaveColumn->addItem(tr("--- add new column ---"));
@@ -55,6 +62,10 @@ void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, in
     } else {
         ui->cmbAddGraph->setCurrentIndex(addGraph+2);
     }
+    if (overwriteGraph>=0) {
+        ui->cmbAddGraph->setCurrentIndex(ui->cmbAddGraph->count()-1);
+        qDebug()<<"cmbAddGraph: "<<ui->cmbAddGraph->currentIndex();
+    }
     if (resultColumn<0) {
         ui->cmbSaveColumn->setCurrentIndex(1);
     } else {
@@ -62,17 +73,19 @@ void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, in
     }
     ui->datacut->setLogScale(logX, 20);
 
-    readDataFromTable();
 
     ui->tabParams->setItemDelegate(new QFFitFunctionValueInputDelegate(ui->tabParams));
-    parameterTable=new QFFitFunctionValueInputTable(this);
+
+    readDataFromTable();
 
     ui->tabParams->setModel(parameterTable);
 
 
 
-    ui->cmbFitAlgorithm->setCurrentIndex(0);
-    ui->cmbFitFunction->setCurrentIndex(0);
+    if (!propsAlreadySet) {
+        ui->cmbFitAlgorithm->setCurrentIndex(0);
+        ui->cmbFitFunction->setCurrentIndex(0);
+    }
 
 
 
@@ -120,7 +133,7 @@ void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, in
 
 
     QSettings* set=ProgramOptions::getInstance()->getQSettings();
-    if (set) {
+    if (set && !propsAlreadySet) {
         loadWidgetGeometry(*set, this, pos(), size(), "QFRDRTableCurveFitDialog/windowsize");
         ui->chkPlotErrors->setChecked(set->value("QFRDRTableCurveFitDialog/ploterrors", ui->chkPlotErrors->isChecked()).toBool());
         ui->chkWeightedResiduals->setChecked(set->value("QFRDRTableCurveFitDialog/weightedresiduals", ui->chkWeightedResiduals->isChecked()).toBool());
@@ -191,7 +204,7 @@ void QFRDRTableCurveFitDialog::saveResults()
             }
             table->colgraphSetGraphTitle(g, table->colgraphGetGraphCount(g)-1, resultComment+", "+resultPars+", "+resultStat);
             writeFitProperties(g, table->colgraphGetGraphCount(g)-1, savedTo);
-        } else if (saveGraph>=2){
+        } else if (saveGraph>=2 && saveGraph<ui->cmbAddGraph->count()-1){
             if (savedTo>=0) {
                 table->colgraphAddFunctionGraph(saveGraph-2, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, savedTo);
             } else {
@@ -199,6 +212,14 @@ void QFRDRTableCurveFitDialog::saveResults()
             }
             table->colgraphSetGraphTitle(saveGraph-2, table->colgraphGetGraphCount(saveGraph-2)-1, resultComment+", "+resultPars+", "+resultStat);
             writeFitProperties(saveGraph-2, table->colgraphGetGraphCount(saveGraph-2)-1, savedTo);
+        } else if (saveGraph<ui->cmbAddGraph->count()-1) {
+            if (savedTo>=0) {
+                table->colgraphSetFunctionGraph(saveGraph-2, overwriteGraph, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, savedTo);
+            } else {
+                table->colgraphSetFunctionGraph(saveGraph-2, overwriteGraph, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, lastResultD);
+            }
+            table->colgraphSetGraphTitle(saveGraph-2, overwriteGraph, resultComment+", "+resultPars+", "+resultStat);
+            writeFitProperties(saveGraph-2, overwriteGraph, savedTo);
         }
         delete model;
     }
@@ -238,6 +259,8 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
     double* dy=datY.data();
     double* dw=datW.data();
     int items=datX.size();
+
+    qDebug()<<"datapoints="<<datapoints<<"   items="<<items;
 
 
     bool ok=false;
@@ -786,8 +809,14 @@ void QFRDRTableCurveFitDialog::readDataFromTable()
     //qDebug()<<"datapoints_after_clean="<<datapoints;
 
     if (dataX.size()>0) {
-        ui->datacut->set_min(qfstatisticsMin(dataX));
-        ui->datacut->set_max(qfstatisticsMax(dataX));
+        double mi=qfstatisticsMin(dataX);
+        double mif=0.1*mi;
+        if (fabs(mif)<1e-15) mif=1;
+        ui->datacut->set_min(mi-mif);
+        double ma=qfstatisticsMax(dataX);
+        double maf=0.1*ma;
+        if (fabs(maf)<1e-15) maf=1;
+        ui->datacut->set_max(ma+maf);
     }
 
 }
@@ -872,6 +901,18 @@ void QFRDRTableCurveFitDialog::writeFitProperties(int pid, int gid, int saveToCo
     table->colgraphSetGraphProperty(pid, gid, "FIT_PLOT", pid);
     table->colgraphSetGraphProperty(pid, gid, "FIT_GRAPH", gid);
     table->colgraphSetGraphProperty(pid, gid, "FIT_SAVEDTOCOLUMN", saveToColumn);
+    QFFitFunction* ff=ui->cmbFitFunction->createCurrentInstance(NULL);
+    if (ff) {
+        QStringList fpids=ff->getParameterIDs();
+        QList<QVariant> fixparams, errparams;
+        for (int i=0; i<fpids.size(); i++) {
+            fixparams<<paramMap[fpids[i]].fix;
+            errparams<<paramMap[fpids[i]].error;
+        }
+        delete ff;
+        table->colgraphSetGraphProperty(pid, gid, "FIT_FIXEDPARAMS", fixparams);
+        table->colgraphSetGraphProperty(pid, gid, "FIT_ERRORPARAMS", errparams);
+    }
 
 
 }
@@ -890,8 +931,46 @@ void QFRDRTableCurveFitDialog::readFitProperties(int pid, int gid, int* resultCo
     ui->chkLogY->setChecked(table->colgraphGetGraphProperty(pid, gid, "FIT_LOGY", ui->chkLogY->isChecked()).toBool());
     ui->datacut->setLogScale(logX, 20);
 
+    int savedToColumn=table->colgraphGetGraphProperty(pid, gid, "FIT_SAVEDTOCOLUMN", -1).toInt();
+    QList<QVariant> fixparams=table->colgraphGetGraphProperty(pid, gid, "FIT_FIXEDPARAMS").toList();
+    QList<QVariant> errorparams=table->colgraphGetGraphProperty(pid, gid, "FIT_ERRORPARAMS").toList();
+
+    QFFitFunction* ff=ui->cmbFitFunction->createCurrentInstance(NULL);
+    qDebug()<<"readFitProperties :"<<ff<<savedToColumn;
+    if (ff) {
+        QStringList fpids=ff->getParameterIDs();
+        qDebug()<<"readFitProperties :"<<fpids;
+        if (savedToColumn>=0)  {
+            QList<QVariant> oldparams=table->tableGetColumnData(savedToColumn);
+            QList<QVariant> oldparams1;
+            if (savedToColumn+1<table->tableGetColumnCount()) oldparams1=table->tableGetColumnData(savedToColumn+1);
+            for (int i=0; i<fpids.size(); i++) {
+                paramMap[fpids[i]].value=oldparams.value(i, ff->getDescription(i).initialValue).toDouble();
+                paramMap[fpids[i]].error=oldparams1.value(i, 0).toDouble();
+                paramMap[fpids[i]].min=ff->getDescription(i).minValue;
+                paramMap[fpids[i]].max=ff->getDescription(i).maxValue;
+                paramMap[fpids[i]].fix=fixparams.value(i, ff->getDescription(i).initialFix).toBool();
+            }
+        } else {
+            if (pid>=0 && pid<table->getPlotCount()) {
+                const QFRDRTable::PlotInfo pi=table->getPlot(pid);
+                if (gid>=0 && gid<pi.graphs.size()) {
+                    for (int i=0; i<fpids.size(); i++) {
+                        paramMap[fpids[i]].value=pi.graphs[gid].functionParameters.value(i, ff->getDescription(i).initialValue);
+                        paramMap[fpids[i]].error=errorparams.value(i, 0).toDouble();
+                        paramMap[fpids[i]].min=ff->getDescription(i).minValue;
+                        paramMap[fpids[i]].max=ff->getDescription(i).maxValue;
+                        paramMap[fpids[i]].fix=fixparams.value(i, ff->getDescription(i).initialFix).toBool();
+                    }
+
+                }
+            }
+        }
+        delete ff;
+    }
+
     if (addGraph) *addGraph=gid;
-    if (resultColumn) *resultColumn=table->colgraphGetGraphProperty(pid, gid, "FIT_SAVEDTOCOLUMN", -1).toInt();
+    if (resultColumn) *resultColumn=savedToColumn;
 
     readDataFromTable();
 }

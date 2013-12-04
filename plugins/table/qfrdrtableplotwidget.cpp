@@ -96,6 +96,7 @@ void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
     this->plot=graph;
     updating=true;
     disconnectWidgets();
+    int oldrow=ui->listGraphs->currentRow();
     if (record) {
         if (graph>=0 && graph<record->getPlotCount()) {
             ui->tabSystem->setEnabled(true);
@@ -117,7 +118,7 @@ void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
             ui->tabSystem->setEnabled(false);
         }
     }
-    ui->listGraphs->setCurrentRow(0);
+    ui->listGraphs->setCurrentRow(qMax(0, oldrow));
     ui->widGraphSettings->setRecord(record, plot);
     updating=false;
     connectWidgets();

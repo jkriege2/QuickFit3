@@ -348,7 +348,7 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->edtGraphTitle->setText(graph.title);
 
     QString fit_type=graph.moreProperties.value("FIT_TYPE", "NONE").toString().toUpper().trimmed();
-    isFitResult= ((fit_type=="LEAST_SQUARES")||(fit_type=="FIT"));
+    isFitResult=false; // ((fit_type=="LEAST_SQUARES")||(fit_type=="FIT"));
 
     ui->cmbLinesXData->setCurrentIndex(graph.xcolumn+1);
     ui->cmbLinesXError->setCurrentIndex(graph.xerrorcolumn+1);
@@ -481,16 +481,16 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
         ui->chkSTrided->setVisible(true);
         ui->widStride->setVisible(true);
 
-        ui->labDataX->setText(tr("X Data Column:"));
-        ui->labDataY->setText(tr("Y Data Column:"));
-        ui->labErrorX->setText(tr("X Error Column:"));
-        ui->labErrorY->setText(tr("Y Error Column:"));
+        ui->labDataX->setText(tr("X data col.:"));
+        ui->labDataY->setText(tr("Y data col.:"));
+        ui->labErrorX->setText(tr("X error col.:"));
+        ui->labErrorY->setText(tr("Y error col.:"));
         ui->labMax->setVisible(false);
         ui->labMean->setVisible(false);
         ui->labQ75->setVisible(false);
-        ui->labMax->setText(tr("Maximum Column:"));
-        ui->labMean->setText(tr("Mean Column:"));
-        ui->labQ75->setText(tr("75% Quantile Column:"));
+        ui->labMax->setText(tr("max col.:"));
+        ui->labMean->setText(tr("mean col.:"));
+        ui->labQ75->setText(tr("Q75% col.:"));
         ui->labImage->setText(tr("image map:"));
 
         ui->cmbLinesMax->setVisible(false);
@@ -725,8 +725,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->widImage->setVisible(true);
                 ui->labMean->setVisible(true);
                 ui->labQ75->setVisible(true);
-                ui->labMean->setText(tr("Color Column:"));
-                ui->labQ75->setText(tr("Size Column:"));
+                ui->labMean->setText(tr("color col.:"));
+                ui->labQ75->setText(tr("size col.:"));
                 ui->cmbLinesMean->setVisible(true);
                 ui->cmbLinesQ75->setVisible(true);
 
@@ -768,13 +768,13 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labMax->setVisible(true);
                 ui->labMean->setVisible(true);
                 ui->labQ75->setVisible(true);
-                ui->labDataX->setText(tr("position Column:"));
-                ui->labErrorX->setText(tr("Minimum Column:"));
-                ui->labDataY->setText(tr("25% Quantile Column:"));
-                ui->labErrorY->setText(tr("Median Column:"));
-                ui->labMax->setText(tr("Maximum Column:"));
-                ui->labMean->setText(tr("Mean Column:"));
-                ui->labQ75->setText(tr("75% Quantile Column:"));
+                ui->labDataX->setText(tr("position col.:"));
+                ui->labErrorX->setText(tr("minimum col.:"));
+                ui->labDataY->setText(tr("Q25%  col.:"));
+                ui->labErrorY->setText(tr("median col.:"));
+                ui->labMax->setText(tr("max col.:"));
+                ui->labMean->setText(tr("mean col.:"));
+                ui->labQ75->setText(tr("Q75%  col.:"));
                 ui->cmbLinesMax->setVisible(true);
                 ui->cmbLinesMean->setVisible(true);
                 ui->cmbLinesQ75->setVisible(true);
@@ -787,7 +787,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->chkDrawLine->setVisible(false);
                 ui->btnFit->setVisible(false);
                 ui->labWidth->setVisible(true);
-                ui->labWidth->setText(tr("Boxplot Width:"));
+                ui->labWidth->setText(tr("boxplot Width:"));
                 ui->labShift->setVisible(false);
                 ui->edtWidth->setVisible(true);
                 ui->edtShift->setVisible(false);
@@ -812,8 +812,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labFillColor->setVisible(false);
                 ui->widLineStyle->setVisible(false);
                 ui->labLinestyle->setVisible(false);
-                ui->labDataX->setText(tr("Image Column:"));
-                ui->labDataY->setText(tr("Modifier Column:"));
+                ui->labDataX->setText(tr("image col.:"));
+                ui->labDataY->setText(tr("modifier col.:"));
 
                 ui->labTransparencyFalse->setVisible(false);
                 ui->widFalseTransparency->setVisible(false);
@@ -852,10 +852,10 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labFillColor->setVisible(false);
                 ui->widLineStyle->setVisible(false);
                 ui->labLinestyle->setVisible(false);
-                ui->labDataX->setText(tr("R Column:"));
-                ui->labErrorX->setText(tr("G Column:"));
-                ui->labDataY->setText(tr("B Column:"));
-                ui->labErrorY->setText(tr("Modifier Column:"));
+                ui->labDataX->setText(tr("R col.:"));
+                ui->labErrorX->setText(tr("G col.:"));
+                ui->labDataY->setText(tr("B col.:"));
+                ui->labErrorY->setText(tr("modifier col.:"));
 
                 ui->labTransparencyFalse->setVisible(false);
                 ui->widFalseTransparency->setVisible(false);
@@ -883,7 +883,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
             case QFRDRTable::gtMaskImage:
                 //graph.type=QFRDRTable::gtMaskImage;
                 ui->btnFit->setVisible(false);
-                ui->labDataX->setText(tr("Mask Column:"));
+                ui->labDataX->setText(tr("mask col.:"));
                 ui->cmbLinesXError->setVisible(false);
                 ui->labErrorX->setVisible(false);
                 ui->cmbLinesYData->setVisible(false);
@@ -924,7 +924,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
             case QFRDRTable::gtFunction:
                 //graph.type=QFRDRTable::gtFunction;
                 ui->btnFit->setVisible(false);
-                ui->labDataY->setText(tr("function parameter column"));
+                ui->labDataY->setText(tr("func. param. col."));
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
                 ui->cmbLinesXError->setVisible(false);
@@ -1256,10 +1256,14 @@ void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)
         fitfuncValuesTable->setWriteTo(&fitfuncValues, pn);
     } else if (ui->cmbFunctionType->currentIndex()==4) {
         QFFitFunction* ff(ui->cmbQFFitFunction->createCurrentInstance(fitfuncValuesTable));
-        fitfuncValues.clear();
+        //fitfuncValues.clear();
         if (ff) {
+            int vsize=ff->paramCount();
+            if (fitfuncValues.size()>vsize) {
+                fitfuncValues.remove(fitfuncValues.size()-(fitfuncValues.size()-vsize), fitfuncValues.size()-vsize);
+            }
             for (int i=0; i<ff->paramCount(); i++) {
-                fitfuncValues<<ff->getDescription(i).initialValue;
+                if (i>=fitfuncValues.size()) fitfuncValues<<ff->getDescription(i).initialValue;
             }
         }
         fitfuncValuesTable->setWriteTo(&fitfuncValues, ff, true);

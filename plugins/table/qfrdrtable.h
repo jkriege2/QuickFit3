@@ -40,7 +40,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
 
         enum GraphType {
-            gtLines,
+            gtLines=0,
             gtImpulsesVertical,
             gtImpulsesHorizontal,
             gtFilledCurveX,
@@ -364,6 +364,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual void colgraphAddGraph(int plotid, int columnX, int columnY, ColumnGraphTypes type, const QString&  title);
         virtual void colgraphAddFunctionGraph(int plotid, const QString& expression, ColumnGraphTypes type, const QString&  title, int columnParam=-1);
         virtual void colgraphAddFunctionGraph(int plotid, const QString& expression, ColumnGraphTypes type, const QString&  title, const QVector<double>& params);
+        virtual void colgraphSetFunctionGraph(int plotid, int graphid, const QString& expression, ColumnGraphTypes type, const QString&  title, int columnParam=-1);
+        virtual void colgraphSetFunctionGraph(int plotid, int graphid, const QString& expression, ColumnGraphTypes type, const QString&  title, const QVector<double>& params);
         virtual void colgraphAddErrorGraph(int plotid, int columnX, int columnXError, int columnY, int columnYError, ColumnGraphTypes type, const QString&  title, ErrorGraphTypes errorStyle=egtBars);
         virtual void colgraphAddImageGraph(int plotid, int imageColumn, ImageColorPalette palette, double x, double y, double width, double height, int Nx, const QString& title);
         virtual void colgraphAddImageMaskGraph(int plotid, int imageColumn, double x, double y, double width, double height, int Nx, const QString& title, QColor trueColor=QColor("black"), QColor falseColor=QColor("transparent"));
@@ -447,6 +449,10 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         QString getExportDialogFiletypes() { return tr("Comma Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files [german Excel] (*.csv, *.txt);;SYLK File (*.sylk, *.slk);;Table XML file (*.qftxml)"); };
 
         QVariant evaluateExpression(QFMathParser &mp, QFMathParser::qfmpNode *n, QModelIndex cell, bool *ok, const QString &expression, QString *error, bool columnMode=false);
+    public slots:
+        void emitRebuildPlotWidgets();
+
+
     protected slots:
         void tdataChanged( const QModelIndex & tl, const QModelIndex & br ) {
             emit rawDataChanged();
@@ -455,7 +461,6 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             emit rawDataChanged();
         }
 
-        void emitRebuildPlotWidgets();
 
         void didRebuildPlotWidgets();
     protected:

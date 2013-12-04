@@ -18,7 +18,7 @@ class QFRDRTableCurveFitDialog : public QDialog
         
     public:
     explicit QFRDRTableCurveFitDialog(QFRDRTable* table, int colX, int colY, int colW, QWidget *parent = 0, bool logX=false, bool logY=false, int resultColumn=-1, int addGraph=-1);
-    explicit QFRDRTableCurveFitDialog(QFRDRTable* table, int graph, int plot, QWidget *parent = 0);
+    explicit QFRDRTableCurveFitDialog(QFRDRTable* table, int plotid, int graphid, QWidget *parent = 0);
         ~QFRDRTableCurveFitDialog();
     protected slots:
         void saveResults();
@@ -45,6 +45,7 @@ class QFRDRTableCurveFitDialog : public QDialog
         int datapoints;
         QString fitresult;
         int colX,  colY,  colW;
+        int overwriteGraph;
 
 
         QFFitFunctionValueInputTable* parameterTable;
@@ -61,7 +62,7 @@ class QFRDRTableCurveFitDialog : public QDialog
 
         void writeFitProperties(int pid, int gid, int saveToColumn);
         void readFitProperties(int pid, int p, int *resultColumn=NULL, int *addGraph=NULL);
-        void intInit(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph);
+        void intInit(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph, bool propsAlreadySet=false);
 };
 
 #endif // QFRDRTABLECURVEFITDIALOG_H

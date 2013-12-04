@@ -62,6 +62,7 @@ void QFRDRTableEditor::requestRefit(int plot, int graph)
 
             }
             delete dlg;
+            m->emitRebuildPlotWidgets();
         }
         //qDebug()<<"regression cX="<<xCol<<"  cY="<<yCol<<"  cW="<<sigmaCol<<"  plot="<<plot<<"  xlog="<<xlog<<"  ylog="<<ylog;
         /*QFRDRTableRegressionDialog* dlg=new QFRDRTableRegressionDialog(m, xCol, yCol, sigmaCol, this, xlog, ylog, -1, plot);

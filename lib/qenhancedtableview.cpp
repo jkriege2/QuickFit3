@@ -56,9 +56,24 @@ void QEnhancedTableView::copySelectionToExcelNoHead(int copyrole) {
     copySelectionToExcel(copyrole, false);
 }
 
-void QEnhancedTableView::copySelectionToMatlabNoHead(int copyrole)
+void QEnhancedTableView::copySelectionToMatlabNoHead(int copyrole, bool flipped)
 {
     if (!model()) return;
+    if (!selectionModel()) return;
+    QList<QList<QVariant> > csvData;
+    QStringList colnames;
+    QStringList rownames;
+    getVariantDataTable(copyrole, csvData, colnames, rownames);
+
+    if (selectionModel()->selectedIndexes().size()==1) dataExpand(csvData, &colnames);
+
+    if (flipped)  {
+        csvData=dataRotate(csvData);
+        qSwap(colnames, rownames);
+    }
+    QFDataExportHandler::copyMatlab(csvData);
+
+    /*if (!model()) return;
     if (!selectionModel()) return;
     QModelIndexList sel=selectionModel()->selectedIndexes();
     QLocale loc=QLocale::system();
@@ -69,7 +84,7 @@ void QEnhancedTableView::copySelectionToMatlabNoHead(int copyrole)
         QList<QVariant> l;
         l<<vdata;
         data.append(l);
-
+        dataExpand(data);
         matlabCopy(data);
     } else {
         QSet<int> rows, cols;
@@ -118,7 +133,7 @@ void QEnhancedTableView::copySelectionToMatlabNoHead(int copyrole)
         }
 
         matlabCopy(data);
-    }
+    }*/
 }
 
 void QEnhancedTableView::copySelectionToExcelExpanded(int copyrole, bool storeHead, bool flipped)
@@ -220,8 +235,25 @@ void QEnhancedTableView::getVariantDataTable(int copyrole, QList<QList<QVariant>
     }
 }
 
-void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead) {
+void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead, bool flipped) {
     if (!model()) return;
+    if (!selectionModel()) return;
+    QList<QList<QVariant> > csvData;
+    QStringList colnames;
+    QStringList rownames;
+    getVariantDataTable(copyrole, csvData, colnames, rownames);
+
+    if (selectionModel()->selectedIndexes().size()==1) dataExpand(csvData, &colnames);
+
+    if (flipped)  {
+        csvData=dataRotate(csvData);
+        qSwap(colnames, rownames);
+    }
+    //qDebug()<<csvData.size()<<colnames.size();
+    if (storeHead) QFDataExportHandler::copyCSV(csvData, colnames, rownames);
+    else QFDataExportHandler::copyCSV(csvData);
+
+    /*if (!model()) return;
     if (!selectionModel()) return;
     QModelIndexList sel=selectionModel()->selectedIndexes();
     QLocale loc=QLocale::system();
@@ -330,7 +362,7 @@ void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead) {
             result+=data[r].join("\t")+"\n";
         }
         QApplication::clipboard()->setText(result);
-    }
+    }*/
 }
 
 int copySelectionAsValueErrorToExcelcompare_firstrole;

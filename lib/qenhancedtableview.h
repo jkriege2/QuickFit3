@@ -43,9 +43,9 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
     public slots:
         void print();
         void copyAsImage();
-        void copySelectionToExcel(int copyrole=Qt::EditRole, bool storeHead=true);
+        void copySelectionToExcel(int copyrole=Qt::EditRole, bool storeHead=true, bool flipped=false);
         void copySelectionToExcelNoHead(int copyrole=Qt::EditRole);
-        void copySelectionToMatlabNoHead(int copyrole=Qt::EditRole);
+        void copySelectionToMatlabNoHead(int copyrole=Qt::EditRole, bool flipped=false);
 
         void copySelectionToExcelExpanded(int copyrole=Qt::EditRole, bool storeHead=true, bool flipped=false);
         void copySelectionToMatlabExpandedNoHead(int copyrole=Qt::EditRole, bool flipped=false);
