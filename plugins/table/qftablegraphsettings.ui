@@ -424,7 +424,7 @@
       </font>
      </property>
      <property name="text">
-      <string>strided data:</string>
+      <string>strided:</string>
      </property>
     </widget>
    </item>
@@ -1942,7 +1942,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Function Parameters:</string>
+      <string>function params:</string>
      </property>
      <property name="buddy">
       <cstring>edtFunction</cstring>
@@ -1977,7 +1977,7 @@
       </font>
      </property>
      <property name="text">
-      <string>75% quantile column:</string>
+      <string>75% quantile col.:</string>
      </property>
      <property name="buddy">
       <cstring>cmbLinesYError</cstring>
@@ -2449,8 +2449,8 @@
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="qfrdrtable.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="qfrdrtable.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>

@@ -5356,8 +5356,8 @@ void QFRDRImagingFCSImageEditor::copyGroupACFsToTable() {
                     if (graphtitle.isEmpty()) {
                         graphtitle=tr("new graph");
                     }
-                    graph=cols->colgraphGetGraphCount();
-                    cols->colgraphAddGraph(graphtitle, tr("lag time \\tau [s]"), tr("correlation function g(\\tau)"), true, false);
+                    graph=cols->colgraphGetPlotCount();
+                    cols->colgraphAddPlot(graphtitle, tr("lag time \\tau [s]"), tr("correlation function g(\\tau)"), true, false);
                 }
             }
 
@@ -5428,19 +5428,19 @@ void QFRDRImagingFCSImageEditor::copyGroupACFsToTable() {
                     if (i==4) color=QColor("orange");
                     if (i==5) color=QColor("magenta");
 
-                    int plot=cols->colgraphGetPlotCount(graph);
-                    cols->colgraphAddErrorPlot(graph, ctau, -1, ctau+1, ctau+2, QFRDRColumnGraphsInterface::cgtLines, name, QFRDRColumnGraphsInterface::egtPolygons);
+                    int plot=cols->colgraphGetGraphCount(graph);
+                    cols->colgraphAddErrorGraph(graph, ctau, -1, ctau+1, ctau+2, QFRDRColumnGraphsInterface::cgtLines, name, QFRDRColumnGraphsInterface::egtPolygons);
                     QColor colf=color.lighter();
                     colf.setAlphaF(0.5);
                     QColor cole=color.darker();
                     cole.setAlphaF(0.5);
-                    cols->colgraphSetPlotColor(graph, plot, color, colf, cole);
+                    cols->colgraphSetGraphColor(graph, plot, color, colf, cole);
                 }
 
             }
             if (cols && dlg->getAddGraphs()) {
-                cols->colgraphsetXRange(graph, xmin, xmax);
-                cols->colgraphsetYRange(graph, ymin, ymax);
+                cols->colgraphSetPlotXRange(graph, xmin, xmax);
+                cols->colgraphSetPlotYRange(graph, ymin, ymax);
             }
 
             if (rdr && dlg->getShowEditor()) {

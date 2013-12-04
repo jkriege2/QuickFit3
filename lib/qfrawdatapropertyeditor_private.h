@@ -149,6 +149,9 @@ class QFRawDataPropertyEditor_private : public QObject
         QAction* actCopyExpanded;
         QAction* actCopyExpandedNoHead;
         QAction* actCopyExpandedNoHeadMatlab;
+        QAction* actCopyExpandedFlipped;
+        QAction* actCopyExpandedNoHeadFlipped;
+        QAction* actCopyExpandedNoHeadMatlabFlipped;
 
         QFEnhancedLineEdit* edtFilterEvaluation;
         QFEnhancedLineEdit* edtFilterResults;

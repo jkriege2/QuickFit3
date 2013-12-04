@@ -18,13 +18,13 @@ QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int co
     ui->cmbAddGraph->clear();
     ui->cmbAddGraph->addItem(tr("--- no ---"));
     ui->cmbAddGraph->addItem(tr("--- add new graph ---"));
-    for (int i=0; i<table->colgraphGetGraphCount(); i++) {
-        ui->cmbAddGraph->addItem(tr("add to: %1").arg(table->colgraphGetGraphTitle(i)));
+    for (int i=0; i<table->colgraphGetPlotCount(); i++) {
+        ui->cmbAddGraph->addItem(tr("add to: %1").arg(table->colgraphGetPlotTitle(i)));
     }
     ui->cmbSaveColumn->clear();
     ui->cmbSaveColumn->addItem(tr("--- no ---"));
     ui->cmbSaveColumn->addItem(tr("--- add new column ---"));
-    for (unsigned int i=0; i<table->tableGetColumnCount(); i++) {
+    for (unsigned int i=0; i<table->colgraphGetPlotCount(); i++) {
         ui->cmbSaveColumn->addItem(tr("add to column %1 [%2]").arg(i+1).arg(table->tableGetColumnTitle(i)));
     }
 
@@ -208,38 +208,38 @@ void QFRDRTableRegressionDialog::saveResults()
                 table->tableSetComment(i, savedTo+1, parameterNames.value(i, "")+"/"+parameterLabels.value(i, ""));
             }        }
         if (saveGraph==1) {
-            table->colgraphAddGraph(tr("regression results"), ui->pltDistribution->getXAxis()->get_axisLabel(), ui->pltDistribution->getYAxis()->get_axisLabel(), ui->pltDistribution->getXAxis()->get_logAxis(), ui->pltDistribution->getYAxis()->get_logAxis());
-            int g=table->colgraphGetGraphCount()-1;
-            table->colgraphAddPlot(g, colX, colY, QFRDRColumnGraphsInterface::cgtPoints, tr("data"));
+            table->colgraphAddPlot(tr("regression results"), ui->pltDistribution->getXAxis()->get_axisLabel(), ui->pltDistribution->getYAxis()->get_axisLabel(), ui->pltDistribution->getXAxis()->get_logAxis(), ui->pltDistribution->getYAxis()->get_logAxis());
+            int g=table->colgraphGetPlotCount()-1;
+            table->colgraphAddGraph(g, colX, colY, QFRDRColumnGraphsInterface::cgtPoints, tr("data"));
             if (method>=0 && method<=2) {
                 if (savedTo>=0) {
-                    table->colgraphAddFunctionPlot(g, "", QFRDRColumnGraphsInterface::cgtPolynomial, fitresult, savedTo);
+                    table->colgraphAddFunctionGraph(g, "", QFRDRColumnGraphsInterface::cgtPolynomial, fitresult, savedTo);
                 } else {
-                    table->colgraphAddFunctionPlot(g, "", QFRDRColumnGraphsInterface::cgtPolynomial, fitresult, lastResultD);
+                    table->colgraphAddFunctionGraph(g, "", QFRDRColumnGraphsInterface::cgtPolynomial, fitresult, lastResultD);
                 }
             } else if (method>=3 && method<=4) {
                 if (savedTo>=0) {
-                    table->colgraphAddFunctionPlot(g, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, savedTo);
+                    table->colgraphAddFunctionGraph(g, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, savedTo);
                 } else {
-                    table->colgraphAddFunctionPlot(g, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, lastResultD);
+                    table->colgraphAddFunctionGraph(g, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, lastResultD);
                 }
             }
-            table->colgraphSetPlotTitle(g, table->colgraphGetPlotCount(g)-1,fitresult+", "+resultStat);
+            table->colgraphSetGraphTitle(g, table->colgraphGetGraphCount(g)-1,fitresult+", "+resultStat);
         } else if (saveGraph>=2){
             if (method>=0 && method<=2) {
                 if (savedTo>=0) {
-                    table->colgraphAddFunctionPlot(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPolynomial, fitresult, savedTo);
+                    table->colgraphAddFunctionGraph(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPolynomial, fitresult, savedTo);
                 } else {
-                    table->colgraphAddFunctionPlot(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPolynomial, fitresult, lastResultD);
+                    table->colgraphAddFunctionGraph(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPolynomial, fitresult, lastResultD);
                 }
             } else if (method>=3 && method<=4) {
                 if (savedTo>=0) {
-                    table->colgraphAddFunctionPlot(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, savedTo);
+                    table->colgraphAddFunctionGraph(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, savedTo);
                 } else {
-                    table->colgraphAddFunctionPlot(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, lastResultD);
+                    table->colgraphAddFunctionGraph(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, lastResultD);
                 }
             }
-            table->colgraphSetPlotTitle(saveGraph-2, table->colgraphGetPlotCount(saveGraph-2)-1, fitresult+", "+resultStat);
+            table->colgraphSetGraphTitle(saveGraph-2, table->colgraphGetGraphCount(saveGraph-2)-1, fitresult+", "+resultStat);
         }
     }
     accept();

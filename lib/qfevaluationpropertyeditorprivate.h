@@ -82,6 +82,9 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
         QAction* actCopyExpanded;
         QAction* actCopyExpandedNoHead;
         QAction* actCopyExpandedNoHeadMatlab;
+        QAction* actCopyExpandedFlipped;
+        QAction* actCopyExpandedNoHeadFlipped;
+        QAction* actCopyExpandedNoHeadMatlabFlipped;
 
         /** \brief action used to save selection in tvResults to file */
         QAction* actSaveResults;
@@ -197,6 +200,9 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
         void copyExpandedResults();
         void copyExpandedResultsNoHead();
         void copyExpandedResultsNoHeadMatlab();
+        void copyExpandedResultsFlipped();
+        void copyExpandedResultsNoHeadFlipped();
+        void copyExpandedResultsNoHeadMatlabFlipped();
 
         void filterFilesTextChanged(const QString &text);
         void filterResultsTextChanged(const QString &text);

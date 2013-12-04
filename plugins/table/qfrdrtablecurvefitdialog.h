@@ -59,8 +59,8 @@ class QFRDRTableCurveFitDialog : public QDialog
         double getParamMin(const QString& param, double defaultVal=-DBL_MAX) const;
         double getParamMax(const QString& param, double defaultVal=DBL_MAX) const;
 
-        void writeFitProperties(int g, int p);
-        void readFitProperties(int g, int p, int *resultColumn=NULL, int *addGraph=NULL);
+        void writeFitProperties(int pid, int gid, int saveToColumn);
+        void readFitProperties(int pid, int p, int *resultColumn=NULL, int *addGraph=NULL);
         void intInit(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph);
 };
 

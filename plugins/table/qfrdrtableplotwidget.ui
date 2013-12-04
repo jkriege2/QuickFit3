@@ -245,9 +245,9 @@
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>

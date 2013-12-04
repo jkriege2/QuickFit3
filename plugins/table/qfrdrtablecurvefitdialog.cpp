@@ -36,8 +36,8 @@ void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, in
     ui->cmbAddGraph->clear();
     ui->cmbAddGraph->addItem(tr("--- no ---"));
     ui->cmbAddGraph->addItem(tr("--- add new graph ---"));
-    for (int i=0; i<table->colgraphGetGraphCount(); i++) {
-        ui->cmbAddGraph->addItem(tr("add to: %1").arg(table->colgraphGetGraphTitle(i)));
+    for (int i=0; i<table->colgraphGetPlotCount(); i++) {
+        ui->cmbAddGraph->addItem(tr("add to: %1").arg(table->colgraphGetPlotTitle(i)));
     }
     ui->cmbSaveColumn->clear();
     ui->cmbSaveColumn->addItem(tr("--- no ---"));
@@ -181,24 +181,24 @@ void QFRDRTableCurveFitDialog::saveResults()
             }
         }
         if (saveGraph==1) {
-            table->colgraphAddGraph(tr("curve fit results"), ui->pltDistribution->getXAxis()->get_axisLabel(), ui->pltDistribution->getYAxis()->get_axisLabel(), ui->pltDistribution->getXAxis()->get_logAxis(), ui->pltDistribution->getYAxis()->get_logAxis());
-            int g=table->colgraphGetGraphCount()-1;
-            table->colgraphAddPlot(g, colX, colY, QFRDRColumnGraphsInterface::cgtPoints, tr("data"));
+            table->colgraphAddPlot(tr("curve fit results"), ui->pltDistribution->getXAxis()->get_axisLabel(), ui->pltDistribution->getYAxis()->get_axisLabel(), ui->pltDistribution->getXAxis()->get_logAxis(), ui->pltDistribution->getYAxis()->get_logAxis());
+            int g=table->colgraphGetPlotCount()-1;
+            table->colgraphAddGraph(g, colX, colY, QFRDRColumnGraphsInterface::cgtPoints, tr("data"));
             if (savedTo>=0) {
-                table->colgraphAddFunctionPlot(g, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, savedTo);
+                table->colgraphAddFunctionGraph(g, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, savedTo);
             } else {
-                table->colgraphAddFunctionPlot(g, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, lastResultD);
+                table->colgraphAddFunctionGraph(g, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, lastResultD);
             }
-            table->colgraphSetPlotTitle(g, table->colgraphGetPlotCount(g)-1, resultComment+", "+resultPars+", "+resultStat);
-            writeFitProperties(g, table->colgraphGetPlotCount(g)-1);
+            table->colgraphSetGraphTitle(g, table->colgraphGetGraphCount(g)-1, resultComment+", "+resultPars+", "+resultStat);
+            writeFitProperties(g, table->colgraphGetGraphCount(g)-1, savedTo);
         } else if (saveGraph>=2){
             if (savedTo>=0) {
-                table->colgraphAddFunctionPlot(saveGraph-2, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, savedTo);
+                table->colgraphAddFunctionGraph(saveGraph-2, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, savedTo);
             } else {
-                table->colgraphAddFunctionPlot(saveGraph-2, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, lastResultD);
+                table->colgraphAddFunctionGraph(saveGraph-2, model->id(), QFRDRColumnGraphsInterface::cgtQFFitFunction, fitresult, lastResultD);
             }
-            table->colgraphSetPlotTitle(saveGraph-2, table->colgraphGetPlotCount(saveGraph-2)-1, resultComment+", "+resultPars+", "+resultStat);
-            writeFitProperties(saveGraph-2, table->colgraphGetPlotCount(saveGraph-2)-1);
+            table->colgraphSetGraphTitle(saveGraph-2, table->colgraphGetGraphCount(saveGraph-2)-1, resultComment+", "+resultPars+", "+resultStat);
+            writeFitProperties(saveGraph-2, table->colgraphGetGraphCount(saveGraph-2)-1, savedTo);
         }
         delete model;
     }
@@ -856,39 +856,42 @@ double QFRDRTableCurveFitDialog::getParamMax(const QString &param, double defaul
     return paramMap.value(param, QFFitFunctionValueInputTableFitParamData(0,0,false,defaultVal)).max;
 }
 
-void QFRDRTableCurveFitDialog::writeFitProperties(int g, int p)
+void QFRDRTableCurveFitDialog::writeFitProperties(int pid, int gid, int saveToColumn)
 {
-    table->colgraphSetPlotProperty(g, p, "FIT_TYPE", "LEAST_SQUARES");
-    table->colgraphSetPlotProperty(g, p, "FIT_COLX", colX);
-    table->colgraphSetPlotProperty(g, p, "FIT_COLY", colY);
-    table->colgraphSetPlotProperty(g, p, "FIT_COLW", colW);
-    table->colgraphSetPlotProperty(g, p, "FIT_ALGORITHM", ui->cmbFitAlgorithm->currentFitAlgorithmID());
-    table->colgraphSetPlotProperty(g, p, "FIT_MODEL", ui->cmbFitFunction->currentFitFunctionID());
-    table->colgraphSetPlotProperty(g, p, "FIT_CUTLOW", ui->datacut->get_userMin());
-    table->colgraphSetPlotProperty(g, p, "FIT_CUTHIGH", ui->datacut->get_userMax());
-    table->colgraphSetPlotProperty(g, p, "FIT_LOGX", ui->chkLogX->isChecked());
-    table->colgraphSetPlotProperty(g, p, "FIT_LOGY", ui->chkLogY->isChecked());
-    table->colgraphSetPlotProperty(g, p, "FIT_RESULTCOLUMN", ui->cmbSaveColumn->currentIndex());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_TYPE", "LEAST_SQUARES");
+    table->colgraphSetGraphProperty(pid, gid, "FIT_COLX", colX);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_COLY", colY);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_COLW", colW);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_ALGORITHM", ui->cmbFitAlgorithm->currentFitAlgorithmID());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_MODEL", ui->cmbFitFunction->currentFitFunctionID());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_CUTLOW", ui->datacut->get_userMin());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_CUTHIGH", ui->datacut->get_userMax());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_LOGX", ui->chkLogX->isChecked());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_LOGY", ui->chkLogY->isChecked());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_RESULTCOLUMN", ui->cmbSaveColumn->currentIndex());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_PLOT", pid);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_GRAPH", gid);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_SAVEDTOCOLUMN", saveToColumn);
 
 
 }
 
-void QFRDRTableCurveFitDialog::readFitProperties(int g, int p, int* resultColumn, int*addGraph)
+void QFRDRTableCurveFitDialog::readFitProperties(int pid, int gid, int* resultColumn, int*addGraph)
 {
-    colX=table->colgraphGetPlotProperty(g, p, "FIT_COLX", colX).toInt();
-    colY=table->colgraphGetPlotProperty(g, p, "FIT_COLY", colY).toInt();
-    colW=table->colgraphGetPlotProperty(g, p, "FIT_COLW", colW).toInt();
-    ui->cmbFitAlgorithm->setCurrentAlgorithm(table->colgraphGetPlotProperty(g, p, "FIT_ALGORITHM", ui->cmbFitAlgorithm->currentFitAlgorithmID()).toString());
-    ui->cmbFitFunction->setCurrentFitFunction(table->colgraphGetPlotProperty(g, p, "FIT_MODEL", ui->cmbFitFunction->currentFitFunctionID()).toString());
-    ui->datacut->set_userMin(table->colgraphGetPlotProperty(g, p, "FIT_CUTLOW", ui->datacut->get_userMin()).toDouble());
-    ui->datacut->set_userMax(table->colgraphGetPlotProperty(g, p, "FIT_CUTHIGH", ui->datacut->get_userMax()).toDouble());
+    colX=table->colgraphGetGraphProperty(pid, gid, "FIT_COLX", colX).toInt();
+    colY=table->colgraphGetGraphProperty(pid, gid, "FIT_COLY", colY).toInt();
+    colW=table->colgraphGetGraphProperty(pid, gid, "FIT_COLW", colW).toInt();
+    ui->cmbFitAlgorithm->setCurrentAlgorithm(table->colgraphGetGraphProperty(pid, gid, "FIT_ALGORITHM", ui->cmbFitAlgorithm->currentFitAlgorithmID()).toString());
+    ui->cmbFitFunction->setCurrentFitFunction(table->colgraphGetGraphProperty(pid, gid, "FIT_MODEL", ui->cmbFitFunction->currentFitFunctionID()).toString());
+    ui->datacut->set_userMin(table->colgraphGetGraphProperty(pid, gid, "FIT_CUTLOW", ui->datacut->get_userMin()).toDouble());
+    ui->datacut->set_userMax(table->colgraphGetGraphProperty(pid, gid, "FIT_CUTHIGH", ui->datacut->get_userMax()).toDouble());
     bool logX=false;
-    ui->chkLogX->setChecked(logX=table->colgraphGetPlotProperty(g, p, "FIT_LOGX", ui->chkLogX->isChecked()).toBool());
-    ui->chkLogY->setChecked(table->colgraphGetPlotProperty(g, p, "FIT_LOGY", ui->chkLogY->isChecked()).toBool());
+    ui->chkLogX->setChecked(logX=table->colgraphGetGraphProperty(pid, gid, "FIT_LOGX", ui->chkLogX->isChecked()).toBool());
+    ui->chkLogY->setChecked(table->colgraphGetGraphProperty(pid, gid, "FIT_LOGY", ui->chkLogY->isChecked()).toBool());
     ui->datacut->setLogScale(logX, 20);
 
-    if (addGraph) *addGraph=g;
-    if (resultColumn) *resultColumn=table->colgraphGetPlotProperty(g, p, "FIT_RESULTCOLUMN", -1).toInt();
+    if (addGraph) *addGraph=gid;
+    if (resultColumn) *resultColumn=table->colgraphGetGraphProperty(pid, gid, "FIT_SAVEDTOCOLUMN", -1).toInt();
 
     readDataFromTable();
 }

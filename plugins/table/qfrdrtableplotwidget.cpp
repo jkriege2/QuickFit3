@@ -1473,6 +1473,9 @@ void QFRDRTablePlotWidget::doRegression(int xCol, int yCol, int sigmaCol, int pl
 
 void QFRDRTablePlotWidget::doRefit(int plot)
 {
-    emit performRefit(plot);
+    int r=ui->listGraphs->currentRow();
+    //if (r>=0 && r<p.graphs.size()) {
+        emit performRefit(plot, r);
+    //}
 }
 

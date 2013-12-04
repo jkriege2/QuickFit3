@@ -424,10 +424,16 @@ void QFRawDataPropertyEditor_private::createWidgets() {
 
     actCopyExpanded=new QAction( tr("Copy Selection in expanded form"), d);
     tvResults->addAction(actCopyExpanded);;
+    actCopyExpandedFlipped=new QAction( tr("Copy Selection in expanded form, flipped"), d);
+    tvResults->addAction(actCopyExpandedFlipped);;
     actCopyExpandedNoHead=new QAction( tr("Copy Selection in expanded form, w/o header"), d);
     tvResults->addAction(actCopyExpandedNoHead);;
+    actCopyExpandedNoHeadFlipped=new QAction( tr("Copy Selection in expanded form, w/o header, flipped"), d);
+    tvResults->addAction(actCopyExpandedNoHeadFlipped);;
     actCopyExpandedNoHeadMatlab=new QAction( tr("Copy Selection in expanded form, to Matlab"), d);
     tvResults->addAction(actCopyExpandedNoHeadMatlab);;
+    actCopyExpandedNoHeadMatlabFlipped=new QAction( tr("Copy Selection in expanded form, to Matlab, flipped"), d);
+    tvResults->addAction(actCopyExpandedNoHeadMatlabFlipped);;
 
     tbResults->addSeparator();
     actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete selected records"), d);
@@ -530,6 +536,9 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     connect(actCopyExpanded, SIGNAL(triggered()), this, SLOT(copyResultsExpanded()));
     connect(actCopyExpandedNoHead, SIGNAL(triggered()), this, SLOT(copyResultsExpandedNoHead()));
     connect(actCopyExpandedNoHeadMatlab, SIGNAL(triggered()), this, SLOT(copyResultsExpandedNoHeadMatlab()));
+    connect(actCopyExpandedFlipped, SIGNAL(triggered()), this, SLOT(copyResultsExpandedFlipped()));
+    connect(actCopyExpandedNoHeadFlipped, SIGNAL(triggered()), this, SLOT(copyResultsExpandedNoHeadFlipped()));
+    connect(actCopyExpandedNoHeadMatlabFlipped, SIGNAL(triggered()), this, SLOT(copyResultsExpandedNoHeadMatlabFlipped()));
 
     connect(actCorrelation, SIGNAL(triggered()), this, SLOT(showCorrelation()));
     connect(actStatistics, SIGNAL(triggered()), this, SLOT(showStatistics()));
@@ -559,8 +568,11 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     menuResults->addAction(actCopyMedianQuantilesNoHead);
     menuResults->addSeparator();
     menuResults->addAction(actCopyExpanded);
+    menuResults->addAction(actCopyExpandedFlipped);
     menuResults->addAction(actCopyExpandedNoHead);
+    menuResults->addAction(actCopyExpandedNoHeadFlipped);
     menuResults->addAction(actCopyExpandedNoHeadMatlab);
+    menuResults->addAction(actCopyExpandedNoHeadMatlabFlipped);
     menuResults->addSeparator();
     menuResults->addAction(actStatistics);
     menuResults->addAction(actStatisticsComparing);

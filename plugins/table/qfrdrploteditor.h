@@ -35,11 +35,11 @@ class QFRDRPlotEditor : public QFRawDataEditor {
     signals:
         void performFit(int xCol, int yCol, int sigmaCol, int plot, QString function, bool xlog, bool ylog);
         void performRegression(int xCol, int yCol, int sigmaCol, int plot, bool xlog, bool ylog);
-        void performRefit(int plot);
+        void performRefit(int plot, int graph);
     protected slots:
         void doFit(int xCol, int yCol, int sigmaCol, int plot, QString function, bool xlog, bool ylog);
         void doRegression(int xCol, int yCol, int sigmaCol, int plot, bool xlog, bool ylog);
-        void doRefit(int plot);
+        void doRefit(int plot, int graph);
     protected slots:
         /** \brief create widgets on object creation */
         void createWidgets();

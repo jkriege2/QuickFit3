@@ -473,10 +473,10 @@ void QFRDRTable::colgraphToolsSetGraphtype(QFRDRTable::GraphInfo &g, QFRDRColumn
     }
 }
 
-void QFRDRTable::colgraphAddPlot(int graph, int columnX, int columnY, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title)
+void QFRDRTable::colgraphAddGraph(int plotid, int columnX, int columnY, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
         QFRDRTable::GraphInfo g;
         g.xcolumn=columnX;
         g.ycolumn=columnY;
@@ -487,16 +487,16 @@ void QFRDRTable::colgraphAddPlot(int graph, int columnX, int columnY, QFRDRColum
         g.title=title;
         plt.graphs.append(g);
 
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
 
     }
 }
 
-void QFRDRTable::colgraphAddFunctionPlot(int graph, const QString &expression, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, int columnParam)
+void QFRDRTable::colgraphAddFunctionGraph(int plotid, const QString &expression, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, int columnParam)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
         QFRDRTable::GraphInfo g;
         g.ycolumn=columnParam;
         g.color=autocolors.value((plt.graphs.size()-1)%autocolors.size(), QColor("red"));
@@ -519,16 +519,16 @@ void QFRDRTable::colgraphAddFunctionPlot(int graph, const QString &expression, Q
 
         plt.graphs.append(g);
 
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
 
     }
 }
 
-void QFRDRTable::colgraphAddFunctionPlot(int graph, const QString &expression, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, const QVector<double> &params)
+void QFRDRTable::colgraphAddFunctionGraph(int plotid, const QString &expression, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, const QVector<double> &params)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
         QFRDRTable::GraphInfo g;
         g.ycolumn=-1;
         g.color=autocolors.value((plt.graphs.size()-1)%autocolors.size(), QColor("red"));
@@ -551,33 +551,33 @@ void QFRDRTable::colgraphAddFunctionPlot(int graph, const QString &expression, Q
 
         plt.graphs.append(g);
 
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
 
     }
 }
 
-void QFRDRTable::colgraphAddErrorPlot(int graph, int columnX, int columnXError, int columnY, int columnYError, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, ErrorGraphTypes errorStyle)
+void QFRDRTable::colgraphAddErrorGraph(int plotid, int columnX, int columnXError, int columnY, int columnYError, QFRDRColumnGraphsInterface::ColumnGraphTypes type, const QString &title, ErrorGraphTypes errorStyle)
 {
-    if (graph>=0 && graph<plots.size()) {
+    if (plotid>=0 && plotid<plots.size()) {
 
-        colgraphAddPlot(graph, columnX, columnY, type, title);
+        colgraphAddGraph(plotid, columnX, columnY, type, title);
 
-        QFRDRTable::PlotInfo plt=getPlot(graph);
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
         plt.graphs.last().xerrorcolumn=columnXError;
         plt.graphs.last().yerrorcolumn=columnYError;
         plt.graphs.last().errorStyle=(JKQTPerrorPlotstyle)errorStyle;
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 
 }
 
-void QFRDRTable::colgraphAddImagePlot(int graph, int imageColumn, QFRDRColumnGraphsInterface::ImageColorPalette palette, double x, double y, double width, double height, int Nx, const QString &title)
+void QFRDRTable::colgraphAddImageGraph(int plotid, int imageColumn, QFRDRColumnGraphsInterface::ImageColorPalette palette, double x, double y, double width, double height, int Nx, const QString &title)
 {
-    if (graph>=0 && graph<plots.size()) {
+    if (plotid>=0 && plotid<plots.size()) {
 
-        QFRDRTable::PlotInfo plt=getPlot(graph);
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
         QFRDRTable::GraphInfo g;
         g.type=QFRDRTable::gtImage;
         g.xcolumn=imageColumn;
@@ -590,16 +590,16 @@ void QFRDRTable::colgraphAddImagePlot(int graph, int imageColumn, QFRDRColumnGra
         g.imagePalette=JKQTPMathImageColorPalette((int)palette);
         plt.graphs.append(g);
 
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
      }
 }
 
-void QFRDRTable::colgraphAddImageMaskPlot(int graph, int imageColumn, double x, double y, double width, double height, int Nx, const QString &title, QColor trueColor, QColor falseColor)
+void QFRDRTable::colgraphAddImageMaskGraph(int plotid, int imageColumn, double x, double y, double width, double height, int Nx, const QString &title, QColor trueColor, QColor falseColor)
 {
-    if (graph>=0 && graph<plots.size()) {
+    if (plotid>=0 && plotid<plots.size()) {
 
-        QFRDRTable::PlotInfo plt=getPlot(graph);
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
         QFRDRTable::GraphInfo g;
         g.type=QFRDRTable::gtMaskImage;
         g.xcolumn=imageColumn;
@@ -615,16 +615,16 @@ void QFRDRTable::colgraphAddImageMaskPlot(int graph, int imageColumn, double x, 
         g.imageFalseTransparent=falseColor.alphaF();
         plt.graphs.append(g);
 
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
      }
 }
 
-void QFRDRTable::colgraphAddRGBImagePlot(int graph, int imageRColumn, int imageGColumn, int imageBColumn, double x, double y, double width, double height, int Nx, const QString &title)
+void QFRDRTable::colgraphAddRGBImageGrph(int plotid, int imageRColumn, int imageGColumn, int imageBColumn, double x, double y, double width, double height, int Nx, const QString &title)
 {
-    if (graph>=0 && graph<plots.size()) {
+    if (plotid>=0 && plotid<plots.size()) {
 
-        QFRDRTable::PlotInfo plt=getPlot(graph);
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
         QFRDRTable::GraphInfo g;
         g.type=QFRDRTable::gtRGBImage;
         g.xcolumn=imageRColumn;
@@ -638,16 +638,16 @@ void QFRDRTable::colgraphAddRGBImagePlot(int graph, int imageRColumn, int imageG
         g.title=title;
         plt.graphs.append(g);
 
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphAddRangePlot(int graph, QFRDRTable::Orientation orientation, double rangeStart, double rangeEnd, double rangeCenter, const QString &title, bool invertRange, bool fillrange, bool drawRangeLines, bool drawRangeCenter, QColor centerColor, Qt::PenStyle centerStyle, double centerWidth)
+void QFRDRTable::colgraphAddRangeGraph(int plotid, QFRDRTable::Orientation orientation, double rangeStart, double rangeEnd, double rangeCenter, const QString &title, bool invertRange, bool fillrange, bool drawRangeLines, bool drawRangeCenter, QColor centerColor, Qt::PenStyle centerStyle, double centerWidth)
 {
-    if (graph>=0 && graph<plots.size()) {
+    if (plotid>=0 && plotid<plots.size()) {
 
-        QFRDRTable::PlotInfo plt=getPlot(graph);
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
         QFRDRTable::GraphInfo g;
         g.type=QFRDRTable::gtHorizontalRange;
         if (orientation==QFRDRTable::cgoVertical) g.type=QFRDRTable::gtVerticalRange;
@@ -665,68 +665,68 @@ void QFRDRTable::colgraphAddRangePlot(int graph, QFRDRTable::Orientation orienta
         g.drawLine=drawRangeLines;
         plt.graphs.append(g);
 
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetImagePlotModifier(int graph, int plot, int imageModifierColumn, QFRDRColumnGraphsInterface::ImageModifierMode mode)
+void QFRDRTable::colgraphSetImageGraphModifier(int plotid, int graphid, int imageModifierColumn, QFRDRColumnGraphsInterface::ImageModifierMode mode)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            if (plt.graphs[plot].type==QFRDRTable::gtRGBImage) {
-                plt.graphs[plot].yerrorcolumn=imageModifierColumn;
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            if (plt.graphs[graphid].type==QFRDRTable::gtRGBImage) {
+                plt.graphs[graphid].yerrorcolumn=imageModifierColumn;
             } else {
-                plt.graphs[plot].ycolumn=imageModifierColumn;
+                plt.graphs[graphid].ycolumn=imageModifierColumn;
             }
-            plt.graphs[plot].modifierMode=JKQTPMathImage::ModifierMode((int)mode);
+            plt.graphs[graphid].modifierMode=JKQTPMathImage::ModifierMode((int)mode);
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetImagePlotRange(int graph, int plot, QFRDRColumnGraphsInterface::ImagePlotRangeChannel channel, bool autoRange, double min, double max)
+void QFRDRTable::colgraphSetImageGraphRange(int plotid, int graphid, QFRDRColumnGraphsInterface::ImageGraphRangeChannel channel, bool autoRange, double min, double max)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
             if (channel!=cgtiModifierChannel) {
-                plt.graphs[plot].imageAutoRange=autoRange;
-                plt.graphs[plot].imageMin=autoRange;
-                plt.graphs[plot].imageMax=autoRange;
+                plt.graphs[graphid].imageAutoRange=autoRange;
+                plt.graphs[graphid].imageMin=autoRange;
+                plt.graphs[graphid].imageMax=autoRange;
             }
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetPlotProperty(int graph, int plot, const QString &name, const QVariant &value)
+void QFRDRTable::colgraphSetGraphProperty(int plotid, int graphid, const QString &name, const QVariant &value)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            plt.graphs[plot].moreProperties[name]=value;
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].moreProperties[name]=value;
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-QVariant QFRDRTable::colgraphGetPlotProperty(int graph, int plot, const QString &name, const QVariant &defaultValue)
+QVariant QFRDRTable::colgraphGetGraphProperty(int plotid, int graphid, const QString &name, const QVariant &defaultValue)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            return plt.graphs[plot].moreProperties.value(name, defaultValue);
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            return plt.graphs[graphid].moreProperties.value(name, defaultValue);
         }
     }
     return defaultValue;
 }
 
-void QFRDRTable::colgraphAddGraph(const QString &title, const QString &xLabel, const QString &yLabel, bool logX, bool logY)
+void QFRDRTable::colgraphAddPlot(const QString &title, const QString &xLabel, const QString &yLabel, bool logX, bool logY)
 {
     PlotInfo info;
     info.title=title;
@@ -738,296 +738,296 @@ void QFRDRTable::colgraphAddGraph(const QString &title, const QString &xLabel, c
     emitRebuildPlotWidgets();
 }
 
-int QFRDRTable::colgraphGetPlotCount(int graph) const
+int QFRDRTable::colgraphGetGraphCount(int plotid) const
 {
-    if (graph>=0 && graph<plots.size()) {
-        return plots[graph].graphs.size();
+    if (plotid>=0 && plotid<plots.size()) {
+        return plots[plotid].graphs.size();
     }
     return 0;
 }
 
-int QFRDRTable::colgraphGetGraphCount() const
+int QFRDRTable::colgraphGetPlotCount() const
 {
     return getPlotCount();
 }
 
-void QFRDRTable::colgraphRemoveGraph(int graph)
+void QFRDRTable::colgraphRemovePlot(int plotid)
 {
-    deletePlot(graph);
+    deletePlot(plotid);
     emitRebuildPlotWidgets();
 }
 
-void QFRDRTable::colgraphRemovePlot(int graph, int plot)
+void QFRDRTable::colgraphRemoveGraph(int plotid, int graphid)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        plt.graphs.removeAt(plot);
-        setPlot(graph, plt);
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        plt.graphs.removeAt(graphid);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetPlotLineStyle(int graph, int plot, Qt::PenStyle style)
+void QFRDRTable::colgraphSetGraphLineStyle(int plotid, int graphid, Qt::PenStyle style)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            plt.graphs[plot].style=style;
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].style=style;
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetPlotLineWidth(int graph, int plot, double width)
+void QFRDRTable::colgraphSetGraphLineWidth(int plotid, int graphid, double width)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            plt.graphs[plot].linewidth=width;
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].linewidth=width;
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetPlotFillStyle(int graph, int plot, Qt::BrushStyle style)
+void QFRDRTable::colgraphSetGraphFillStyle(int plotid, int graphid, Qt::BrushStyle style)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            plt.graphs[plot].fillStyle=style;
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].fillStyle=style;
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 
 }
 
-void QFRDRTable::colgraphSetPlotColor(int graph, int plot, QColor color)
+void QFRDRTable::colgraphSetGraphColor(int plotid, int graphid, QColor color)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            plt.graphs[plot].color=color;
-            plt.graphs[plot].colorTransparent=color.alphaF();
-            plt.graphs[plot].errorColor=plt.graphs[plot].color.darker();
-            plt.graphs[plot].errorColorTransparent=plt.graphs[plot].errorColor.alphaF();
-            plt.graphs[plot].fillColor=plt.graphs[plot].color.lighter();
-            plt.graphs[plot].fillColorTransparent=plt.graphs[plot].fillColor.alphaF();
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].color=color;
+            plt.graphs[graphid].colorTransparent=color.alphaF();
+            plt.graphs[graphid].errorColor=plt.graphs[graphid].color.darker();
+            plt.graphs[graphid].errorColorTransparent=plt.graphs[graphid].errorColor.alphaF();
+            plt.graphs[graphid].fillColor=plt.graphs[graphid].color.lighter();
+            plt.graphs[graphid].fillColorTransparent=plt.graphs[graphid].fillColor.alphaF();
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetPlotColor(int graph, int plot, QColor color, QColor fillColor)
+void QFRDRTable::colgraphSetGraphColor(int plotid, int graphid, QColor color, QColor fillColor)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            plt.graphs[plot].color=color;
-            plt.graphs[plot].colorTransparent=color.alphaF();
-            plt.graphs[plot].errorColor=plt.graphs[plot].color.darker();
-            plt.graphs[plot].errorColorTransparent=plt.graphs[plot].errorColor.alphaF();
-            plt.graphs[plot].fillColor=fillColor;
-            plt.graphs[plot].fillColorTransparent=plt.graphs[plot].fillColor.alphaF();
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].color=color;
+            plt.graphs[graphid].colorTransparent=color.alphaF();
+            plt.graphs[graphid].errorColor=plt.graphs[graphid].color.darker();
+            plt.graphs[graphid].errorColorTransparent=plt.graphs[graphid].errorColor.alphaF();
+            plt.graphs[graphid].fillColor=fillColor;
+            plt.graphs[graphid].fillColorTransparent=plt.graphs[graphid].fillColor.alphaF();
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetPlotColor(int graph, int plot, QColor color, QColor fillColor, QColor errorColor)
+void QFRDRTable::colgraphSetGraphColor(int plotid, int graphid, QColor color, QColor fillColor, QColor errorColor)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            plt.graphs[plot].color=color;
-            plt.graphs[plot].colorTransparent=color.alphaF();
-            plt.graphs[plot].errorColor=errorColor;
-            plt.graphs[plot].errorColorTransparent=plt.graphs[plot].errorColor.alphaF();
-            plt.graphs[plot].fillColor=fillColor;
-            plt.graphs[plot].fillColorTransparent=plt.graphs[plot].fillColor.alphaF();
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].color=color;
+            plt.graphs[graphid].colorTransparent=color.alphaF();
+            plt.graphs[graphid].errorColor=errorColor;
+            plt.graphs[graphid].errorColorTransparent=plt.graphs[graphid].errorColor.alphaF();
+            plt.graphs[graphid].fillColor=fillColor;
+            plt.graphs[graphid].fillColorTransparent=plt.graphs[graphid].fillColor.alphaF();
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetGraphTitle(int graph, const QString &title)
+void QFRDRTable::colgraphSetPlotTitle(int plotid, const QString &title)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
         plt.title=title;
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-QString QFRDRTable::colgraphGetGraphTitle(int graph)
+QString QFRDRTable::colgraphGetPlotTitle(int plotid)
 {
-    if (graph>=0 && graph<plots.size()) {
-        return getPlot(graph).title;
+    if (plotid>=0 && plotid<plots.size()) {
+        return getPlot(plotid).title;
     }
     return "";
 }
 
 
-void QFRDRTable::colgraphSetGraphXAxisProps(int graph, const QString &xLabel, bool logX)
+void QFRDRTable::colgraphSetPlotXAxisProps(int plotid, const QString &xLabel, bool logX)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
         plt.xAxis.label=xLabel;
         plt.xAxis.log=logX;
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 
 }
 
-void QFRDRTable::colgraphSetGraphYAxisProps(int graph, const QString &yLabel, bool logY)
+void QFRDRTable::colgraphSetPlotYAxisProps(int plotid, const QString &yLabel, bool logY)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
         plt.yAxis.label=yLabel;
         plt.yAxis.log=logY;
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphsetXRange(int graph, double xmin, double xmax)
+void QFRDRTable::colgraphSetPlotXRange(int plotid, double xmin, double xmax)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
         plt.xAxis.min=xmin;
         plt.xAxis.max=xmax;
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphsetYRange(int graph, double xmin, double xmax)
+void QFRDRTable::colgraphSetPlotYRange(int plotid, double xmin, double xmax)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
         plt.yAxis.min=xmin;
         plt.yAxis.max=xmax;
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetPlotTitle(int graph, int plot, const QString &title)
+void QFRDRTable::colgraphSetGraphTitle(int plotid, int graphid, const QString &title)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            plt.graphs[plot].title=title;
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].title=title;
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetPlotType(int graph, int plot, QFRDRColumnGraphsInterface::ColumnGraphTypes type)
+void QFRDRTable::colgraphSetGrphType(int plotid, int graphid, QFRDRColumnGraphsInterface::ColumnGraphTypes type)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-           colgraphToolsSetGraphtype(plt.graphs[plot], type);
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+           colgraphToolsSetGraphtype(plt.graphs[graphid], type);
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetPlotErrorStyle(int graph, int plot, QFRDRColumnGraphsInterface::ErrorGraphTypes errorStyle)
+void QFRDRTable::colgraphSetGraphErrorStyle(int plotid, int graphid, QFRDRColumnGraphsInterface::ErrorGraphTypes errorStyle)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            plt.graphs[plot].errorStyle=(JKQTPerrorPlotstyle)errorStyle;
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].errorStyle=(JKQTPerrorPlotstyle)errorStyle;
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetPlotErrorColor(int graph, int plot, QColor errorColor)
+void QFRDRTable::colgraphSetGraphErrorColor(int plotid, int graphid, QColor errorColor)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            plt.graphs[plot].errorColor=errorColor;
-            plt.graphs[plot].errorColorTransparent=errorColor.alphaF();
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].errorColor=errorColor;
+            plt.graphs[graphid].errorColorTransparent=errorColor.alphaF();
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetPlotFillColor(int graph, int plot, QColor fillColor)
+void QFRDRTable::colgraphSetGraphFillColor(int plotid, int graphid, QColor fillColor)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            plt.graphs[plot].fillColor=fillColor;
-            plt.graphs[plot].fillColorTransparent=fillColor.alphaF();
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].fillColor=fillColor;
+            plt.graphs[graphid].fillColorTransparent=fillColor.alphaF();
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetPlotErrorTransparency(int graph, int plot, double errorT)
+void QFRDRTable::colgraphSetGraphErrorTransparency(int plotid, int graphid, double errorT)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            plt.graphs[plot].errorColorTransparent=errorT;
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].errorColorTransparent=errorT;
         }
-        plt.graphs[plot];
-        setPlot(graph, plt);
+        plt.graphs[graphid];
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetPlotFillTransparency(int graph, int plot, double fillT)
+void QFRDRTable::colgraphSetGraphFillTransparency(int plotid, int graphid, double fillT)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            plt.graphs[plot].fillColorTransparent=fillT;
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].fillColorTransparent=fillT;
         }
-        plt.graphs[plot];
-        setPlot(graph, plt);
+        plt.graphs[graphid];
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetPlotPlotTransparency(int graph, int plot, double trans)
+void QFRDRTable::colgraphSetGraphTransparency(int plotid, int graphid, double trans)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            plt.graphs[plot].colorTransparent=trans;
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].colorTransparent=trans;
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
 
-void QFRDRTable::colgraphSetPlotSymbol(int graph, int plot, QFRDRColumnGraphsInterface::ColumnGraphSymbols symbol, double symbolSize)
+void QFRDRTable::colgraphSetGraphSymbol(int plotid, int graphid, QFRDRColumnGraphsInterface::ColumnGraphSymbols symbol, double symbolSize)
 {
-    if (graph>=0 && graph<plots.size()) {
-        QFRDRTable::PlotInfo plt=getPlot(graph);
-        if (plot>=0 && plot<plt.graphs.size()) {
-            plt.graphs[plot].symbol=(JKQTPgraphSymbols)symbol;
-            plt.graphs[plot].symbolSize=symbolSize;
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].symbol=(JKQTPgraphSymbols)symbol;
+            plt.graphs[graphid].symbolSize=symbolSize;
         }
-        setPlot(graph, plt);
+        setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }
 }
@@ -1095,6 +1095,9 @@ QVariant QFRDRTable::evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode
             mp.addVariableDouble("col", cell.column()+1);
             mp.addVariableDouble("rows", m->model()->rowCount());
             mp.addVariableDouble("columns", m->model()->columnCount());
+            QVector<double> rv;
+            for (int i=0; i<m->model()->rowCount(); i++) rv<<i+1;
+            mp.addVariableDoubleVector("rowsvec", rv);
         } else {
             mp.addVariableDouble("row", cell.row()+1);
             mp.addVariableDouble("col", cell.column()+1);
@@ -1208,7 +1211,7 @@ QFRawDataEditor *QFRDRTable::createEditor(QFPluginServices *services, QFRawDataP
             for (int j=0; j<propEditor->getEditorList().size(); j++) {
                 QFRDRTableEditor* tabEdt=qobject_cast<QFRDRTableEditor*>(propEditor->getEditorList().value(j, NULL));
                 if (tabEdt) {
-                    connect(edt, SIGNAL(performRefit(int)), tabEdt, SLOT(requestRefit(int)));
+                    connect(edt, SIGNAL(performRefit(int,int)), tabEdt, SLOT(requestRefit(int,int)));
                     connect(edt, SIGNAL(performFit(int,int,int,int,QString,bool,bool)), tabEdt, SLOT(requestFit(int,int,int,int,QString,bool,bool)));
                     connect(edt, SIGNAL(performRegression(int,int,int,int,bool,bool)), tabEdt, SLOT(requestRegression(int,int,int,int,bool,bool)));
                 }

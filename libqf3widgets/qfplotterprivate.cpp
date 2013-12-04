@@ -90,10 +90,10 @@ void QFPlotterPrivate::copyToTable()
             QMessageBox::critical(plotter, tr("Add data to table"), tr("No table selected or could not create table!\nCould not add data!"));
             ok=false;
         }
-        int graph=-1;
+        int plotid=-1;
         if (ok && dlg->getAddGraphs()) {
             if (cols) {
-                graph=dlg->getGraphID();
+                plotid=dlg->getGraphID();
                 QString graphtitle;
                 JKQtBasePlotter* p=plotter->get_plotter();
                 if (dlg->getNewGraph(graphtitle)) {
@@ -101,11 +101,11 @@ void QFPlotterPrivate::copyToTable()
                         graphtitle=tr("new graph");
                         if (!p->get_plotLabel().isEmpty()) graphtitle=p->get_plotLabel().isEmpty();
                     }
-                    graph=cols->colgraphGetGraphCount();
-                    cols->colgraphAddGraph(graphtitle, p->get_xAxis()->get_axisLabel(), p->get_yAxis()->get_axisLabel(), p->get_xAxis()->get_logAxis(), p->get_yAxis()->get_logAxis());
+                    plotid=cols->colgraphGetPlotCount();
+                    cols->colgraphAddPlot(graphtitle, p->get_xAxis()->get_axisLabel(), p->get_yAxis()->get_axisLabel(), p->get_xAxis()->get_logAxis(), p->get_yAxis()->get_logAxis());
                 }
-                cols->colgraphsetXRange(graph, p->getXMin(), p->getXMax());
-                cols->colgraphsetYRange(graph, p->getYMin(), p->getYMax());
+                cols->colgraphSetPlotXRange(plotid, p->getXMin(), p->getXMax());
+                cols->colgraphSetPlotYRange(plotid, p->getYMin(), p->getYMax());
                 for (int j=0; j<p->getGraphCount(); j++) {
                     JKQTPgraph* g=p->getGraph(j);
                     if (g && g->get_visible()) {
@@ -166,46 +166,46 @@ void QFPlotterPrivate::copyToTable()
 
 
                             if (yeg) {
-                                cols->colgraphAddErrorPlot(graph, xcol, -1,  ycol, columns.value(yeg->get_yErrorColumn(), -1), type, name, (QFRDRColumnGraphsInterface::ErrorGraphTypes)yeg->get_errorStyle());
+                                cols->colgraphAddErrorGraph(plotid, xcol, -1,  ycol, columns.value(yeg->get_yErrorColumn(), -1), type, name, (QFRDRColumnGraphsInterface::ErrorGraphTypes)yeg->get_errorStyle());
                                 errorColor=yeg->get_errorColor();
                                 //qDebug()<<"addyerrorg "<<yeg->get_yErrorColumn()<<columns.value(yeg->get_yErrorColumn(), -1);
                             } else if (xeg) {
-                                cols->colgraphAddErrorPlot(graph, xcol, columns.value(xeg->get_xErrorColumn(), -1),  ycol, -1, type, name, (QFRDRColumnGraphsInterface::ErrorGraphTypes)xeg->get_errorStyle());
+                                cols->colgraphAddErrorGraph(plotid, xcol, columns.value(xeg->get_xErrorColumn(), -1),  ycol, -1, type, name, (QFRDRColumnGraphsInterface::ErrorGraphTypes)xeg->get_errorStyle());
                                 errorColor=xeg->get_errorColor();
                                 //qDebug()<<"addxerrorg "<<xeg->get_xErrorColumn()<<columns.value(xeg->get_xErrorColumn(), -1);
                             } else if (xyeg) {
-                                cols->colgraphAddErrorPlot(graph, xcol, columns.value(xyeg->get_xErrorColumn(), -1),  ycol, columns.value(xyeg->get_yErrorColumn(), -1), type, name, (QFRDRColumnGraphsInterface::ErrorGraphTypes)xyeg->get_yErrorStyle());
+                                cols->colgraphAddErrorGraph(plotid, xcol, columns.value(xyeg->get_xErrorColumn(), -1),  ycol, columns.value(xyeg->get_yErrorColumn(), -1), type, name, (QFRDRColumnGraphsInterface::ErrorGraphTypes)xyeg->get_yErrorStyle());
                                 errorColor=xyeg->get_errorColor();
                                 //qDebug()<<"addxyerrorg "<<xyeg->get_xErrorColumn()<<columns.value(xyeg->get_xErrorColumn(), -1)<<xyeg->get_yErrorColumn()<<columns.value(xyeg->get_yErrorColumn(), -1);
                             } else {
-                                cols->colgraphAddPlot(graph, xcol, ycol, type, name);
+                                cols->colgraphAddGraph(plotid, xcol, ycol, type, name);
                             }
                             //qDebug()<<"color="<<color<<"   fillColor="<<fillColor;
                             if (color!=QColor("red")) {
-                                cols->colgraphSetPlotColor(graph, cols->colgraphGetPlotCount(graph)-1, color);
+                                cols->colgraphSetGraphColor(plotid, cols->colgraphGetGraphCount(plotid)-1, color);
                             }
                             if (fillColor!=QColor("red").lighter()) {
-                                cols->colgraphSetPlotFillColor(graph, cols->colgraphGetPlotCount(graph)-1, fillColor);
+                                cols->colgraphSetGraphFillColor(plotid, cols->colgraphGetGraphCount(plotid)-1, fillColor);
                             }
                             if (errorColor!=QColor("red").darker()) {
-                                cols->colgraphSetPlotErrorColor(graph, cols->colgraphGetPlotCount(graph)-1, errorColor);
+                                cols->colgraphSetGraphErrorColor(plotid, cols->colgraphGetGraphCount(plotid)-1, errorColor);
                             }
-                            cols->colgraphSetPlotSymbol(graph, cols->colgraphGetPlotCount(graph)-1, symbol, symbolSize);
-                            cols->colgraphSetPlotFillStyle(graph, cols->colgraphGetPlotCount(graph)-1, fillstyle);
+                            cols->colgraphSetGraphSymbol(plotid, cols->colgraphGetGraphCount(plotid)-1, symbol, symbolSize);
+                            cols->colgraphSetGraphFillStyle(plotid, cols->colgraphGetGraphCount(plotid)-1, fillstyle);
 
                         } else if (colig) {
-                            cols->colgraphAddImagePlot(graph, columns.value(colig->get_imageColumn(),-1), QFRDRColumnGraphsInterface::ImageColorPalette((int)colig->get_palette()), colig->get_x(), colig->get_y(), colig->get_width(), colig->get_height(), colig->get_Nx(), colig->get_title());
-                            cols->colgraphSetImagePlotModifier(graph, cols->colgraphGetPlotCount(graph)-1, colig->get_modifierColumn(),  QFRDRColumnGraphsInterface::ImageModifierMode((int)colig->get_modifierMode()));
-                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiDataChannel, colig->get_autoImageRange(), colig->get_imageMin(), colig->get_imageMax());
-                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiModifierChannel, colig->get_autoModifierRange(), colig->get_modifierMin(), colig->get_modifierMax());
+                            cols->colgraphAddImageGraph(plotid, columns.value(colig->get_imageColumn(),-1), QFRDRColumnGraphsInterface::ImageColorPalette((int)colig->get_palette()), colig->get_x(), colig->get_y(), colig->get_width(), colig->get_height(), colig->get_Nx(), colig->get_title());
+                            cols->colgraphSetImageGraphModifier(plotid, cols->colgraphGetGraphCount(plotid)-1, colig->get_modifierColumn(),  QFRDRColumnGraphsInterface::ImageModifierMode((int)colig->get_modifierMode()));
+                            cols->colgraphSetImageGraphRange(plotid, cols->colgraphGetGraphCount(plotid)-1, QFRDRColumnGraphsInterface::cgtiDataChannel, colig->get_autoImageRange(), colig->get_imageMin(), colig->get_imageMax());
+                            cols->colgraphSetImageGraphRange(plotid, cols->colgraphGetGraphCount(plotid)-1, QFRDRColumnGraphsInterface::cgtiModifierChannel, colig->get_autoModifierRange(), colig->get_modifierMin(), colig->get_modifierMax());
                         } else if (colmask) {
-                            cols->colgraphAddImageMaskPlot(graph, columns.value(colmask->get_imageColumn(),-1), colmask->get_x(), colmask->get_y(), colmask->get_width(), colmask->get_height(), colmask->get_Nx(), colmask->get_title(), colmask->get_trueColor(), colmask->get_falseColor());
+                            cols->colgraphAddImageMaskGraph(plotid, columns.value(colmask->get_imageColumn(),-1), colmask->get_x(), colmask->get_y(), colmask->get_width(), colmask->get_height(), colmask->get_Nx(), colmask->get_title(), colmask->get_trueColor(), colmask->get_falseColor());
                         } else if (colrgbg) {
-                            cols->colgraphAddRGBImagePlot(graph, columns.value(colrgbg->get_imageRColumn(),-1), columns.value(colrgbg->get_imageGColumn(),-1), columns.value(colrgbg->get_imageBColumn(),-1), colrgbg->get_x(), colrgbg->get_y(), colrgbg->get_width(), colrgbg->get_height(), colrgbg->get_Nx(), colrgbg->get_title());
-                            cols->colgraphSetImagePlotModifier(graph, cols->colgraphGetPlotCount(graph)-1, colrgbg->get_modifierColumn(),  QFRDRColumnGraphsInterface::ImageModifierMode((int)colrgbg->get_modifierMode()));
-                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiRedChannel, colrgbg->get_autoImageRange(), colrgbg->get_imageMin(), colrgbg->get_imageMax());
-                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiGreenChannel, colrgbg->get_autoImageRange(), colrgbg->get_imageMinG(), colrgbg->get_imageMaxG());
-                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiBlueChannel, colrgbg->get_autoImageRange(), colrgbg->get_imageMinB(), colrgbg->get_imageMaxB());
+                            cols->colgraphAddRGBImageGrph(plotid, columns.value(colrgbg->get_imageRColumn(),-1), columns.value(colrgbg->get_imageGColumn(),-1), columns.value(colrgbg->get_imageBColumn(),-1), colrgbg->get_x(), colrgbg->get_y(), colrgbg->get_width(), colrgbg->get_height(), colrgbg->get_Nx(), colrgbg->get_title());
+                            cols->colgraphSetImageGraphModifier(plotid, cols->colgraphGetGraphCount(plotid)-1, colrgbg->get_modifierColumn(),  QFRDRColumnGraphsInterface::ImageModifierMode((int)colrgbg->get_modifierMode()));
+                            cols->colgraphSetImageGraphRange(plotid, cols->colgraphGetGraphCount(plotid)-1, QFRDRColumnGraphsInterface::cgtiRedChannel, colrgbg->get_autoImageRange(), colrgbg->get_imageMin(), colrgbg->get_imageMax());
+                            cols->colgraphSetImageGraphRange(plotid, cols->colgraphGetGraphCount(plotid)-1, QFRDRColumnGraphsInterface::cgtiGreenChannel, colrgbg->get_autoImageRange(), colrgbg->get_imageMinG(), colrgbg->get_imageMaxG());
+                            cols->colgraphSetImageGraphRange(plotid, cols->colgraphGetGraphCount(plotid)-1, QFRDRColumnGraphsInterface::cgtiBlueChannel, colrgbg->get_autoImageRange(), colrgbg->get_imageMinB(), colrgbg->get_imageMaxB());
                             //cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph), QFRDRColumnGraphsInterface::cgtiModifierChannel, colrgbg->get_g, colrgbg->get_modifierMin(), colrgbg->get_modifierMax());
                         } else if (ig && tab) {
                             int cimg=-1;
@@ -221,10 +221,10 @@ void QFPlotterPrivate::copyToTable()
                                 tab->tableSetColumnTitle(cimg, tr("image modifier data \"%3\" Nx*Ny=%1*%2").arg(ig->get_Nx()).arg(ig->get_Ny()).arg(ig->get_title()));
                             }
 
-                            cols->colgraphAddImagePlot(graph, cimg, QFRDRColumnGraphsInterface::ImageColorPalette((int)ig->get_palette()), ig->get_x(), ig->get_y(), ig->get_width(), ig->get_height(), ig->get_Nx(), ig->get_title());
-                            cols->colgraphSetImagePlotModifier(graph, cols->colgraphGetPlotCount(graph)-1, cmod,  QFRDRColumnGraphsInterface::ImageModifierMode((int)ig->get_modifierMode()));
-                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiDataChannel, ig->get_autoImageRange(), ig->get_imageMin(), ig->get_imageMax());
-                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiModifierChannel, ig->get_autoModifierRange(), ig->get_modifierMin(), ig->get_modifierMax());
+                            cols->colgraphAddImageGraph(plotid, cimg, QFRDRColumnGraphsInterface::ImageColorPalette((int)ig->get_palette()), ig->get_x(), ig->get_y(), ig->get_width(), ig->get_height(), ig->get_Nx(), ig->get_title());
+                            cols->colgraphSetImageGraphModifier(plotid, cols->colgraphGetGraphCount(plotid)-1, cmod,  QFRDRColumnGraphsInterface::ImageModifierMode((int)ig->get_modifierMode()));
+                            cols->colgraphSetImageGraphRange(plotid, cols->colgraphGetGraphCount(plotid)-1, QFRDRColumnGraphsInterface::cgtiDataChannel, ig->get_autoImageRange(), ig->get_imageMin(), ig->get_imageMax());
+                            cols->colgraphSetImageGraphRange(plotid, cols->colgraphGetGraphCount(plotid)-1, QFRDRColumnGraphsInterface::cgtiModifierChannel, ig->get_autoModifierRange(), ig->get_modifierMin(), ig->get_modifierMax());
                         } else if (mask && tab) {
                             int cimg=-1;
                             if (mask->get_data()) {
@@ -233,7 +233,7 @@ void QFPlotterPrivate::copyToTable()
                                 tab->tableSetColumnTitle(cimg, tr("image mask data \"%3\", Nx*Ny=%1*%2").arg(mask->get_Nx()).arg(mask->get_Ny()).arg(mask->get_title()));
                             }
 
-                            cols->colgraphAddImageMaskPlot(graph, cimg, mask->get_x(), mask->get_y(), mask->get_width(), mask->get_height(), mask->get_Nx(), mask->get_title(), mask->get_trueColor(), mask->get_falseColor());
+                            cols->colgraphAddImageMaskGraph(plotid, cimg, mask->get_x(), mask->get_y(), mask->get_width(), mask->get_height(), mask->get_Nx(), mask->get_title(), mask->get_trueColor(), mask->get_falseColor());
                         } else if (rgbg && tab) {
                             int cimg=-1;
                             int cimgG=-1;
@@ -260,11 +260,11 @@ void QFPlotterPrivate::copyToTable()
                                 tab->tableSetColumnTitle(cimg, tr("image modifier data \"%3\" Nx*Ny=%1*%2").arg(rgbg->get_Nx()).arg(rgbg->get_Ny()).arg(rgbg->get_title()));
                             }
 
-                            cols->colgraphAddRGBImagePlot(graph, cimg, cimgG, cimgB, rgbg->get_x(), rgbg->get_y(), rgbg->get_width(), rgbg->get_height(), rgbg->get_Nx(), rgbg->get_title());
-                            cols->colgraphSetImagePlotModifier(graph, cols->colgraphGetPlotCount(graph)-1, cmod,  QFRDRColumnGraphsInterface::ImageModifierMode((int)rgbg->get_modifierMode()));
-                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiRedChannel, rgbg->get_autoImageRange(), rgbg->get_imageMin(), rgbg->get_imageMax());
-                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiGreenChannel, rgbg->get_autoImageRange(), rgbg->get_imageMinG(), rgbg->get_imageMaxG());
-                            cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph)-1, QFRDRColumnGraphsInterface::cgtiBlueChannel, rgbg->get_autoImageRange(), rgbg->get_imageMinB(), rgbg->get_imageMaxB());
+                            cols->colgraphAddRGBImageGrph(plotid, cimg, cimgG, cimgB, rgbg->get_x(), rgbg->get_y(), rgbg->get_width(), rgbg->get_height(), rgbg->get_Nx(), rgbg->get_title());
+                            cols->colgraphSetImageGraphModifier(plotid, cols->colgraphGetGraphCount(plotid)-1, cmod,  QFRDRColumnGraphsInterface::ImageModifierMode((int)rgbg->get_modifierMode()));
+                            cols->colgraphSetImageGraphRange(plotid, cols->colgraphGetGraphCount(plotid)-1, QFRDRColumnGraphsInterface::cgtiRedChannel, rgbg->get_autoImageRange(), rgbg->get_imageMin(), rgbg->get_imageMax());
+                            cols->colgraphSetImageGraphRange(plotid, cols->colgraphGetGraphCount(plotid)-1, QFRDRColumnGraphsInterface::cgtiGreenChannel, rgbg->get_autoImageRange(), rgbg->get_imageMinG(), rgbg->get_imageMaxG());
+                            cols->colgraphSetImageGraphRange(plotid, cols->colgraphGetGraphCount(plotid)-1, QFRDRColumnGraphsInterface::cgtiBlueChannel, rgbg->get_autoImageRange(), rgbg->get_imageMinB(), rgbg->get_imageMaxB());
                             //cols->colgraphSetImagePlotRange(graph, cols->colgraphGetPlotCount(graph), QFRDRColumnGraphsInterface::cgtiModifierChannel, rgbg->get_g, rgbg->get_modifierMin(), rgbg->get_modifierMax());
                         } else if(qfffg && qfffg->get_fitFunction()) {
                             QColor color=QColor("red");
@@ -276,20 +276,20 @@ void QFPlotterPrivate::copyToTable()
 
                             int pcol=columns.value(qfffg->get_parameterColumn(), -1);
 
-                            if (pcol>=0) cols->colgraphAddFunctionPlot(graph, qfffg->get_fitFunction()->id(), type, qfffg->get_title(), pcol );
-                            else cols->colgraphAddFunctionPlot(graph, qfffg->get_fitFunction()->id(), type, qfffg->get_title(), qfffg->get_internalParams() );
+                            if (pcol>=0) cols->colgraphAddFunctionGraph(plotid, qfffg->get_fitFunction()->id(), type, qfffg->get_title(), pcol );
+                            else cols->colgraphAddFunctionGraph(plotid, qfffg->get_fitFunction()->id(), type, qfffg->get_title(), qfffg->get_internalParams() );
 
                             if (color!=QColor("red")) {
-                                cols->colgraphSetPlotColor(graph, cols->colgraphGetPlotCount(graph)-1, color);
+                                cols->colgraphSetGraphColor(plotid, cols->colgraphGetGraphCount(plotid)-1, color);
                             }
                             if (fillColor!=QColor("red").lighter()) {
-                                cols->colgraphSetPlotFillColor(graph, cols->colgraphGetPlotCount(graph)-1, fillColor);
+                                cols->colgraphSetGraphFillColor(plotid, cols->colgraphGetGraphCount(plotid)-1, fillColor);
                             }
                             if (errorColor!=QColor("red").darker()) {
-                                cols->colgraphSetPlotErrorColor(graph, cols->colgraphGetPlotCount(graph)-1, errorColor);
+                                cols->colgraphSetGraphErrorColor(plotid, cols->colgraphGetGraphCount(plotid)-1, errorColor);
                             }
                             fillstyle=qfffg->get_fillStyle();
-                            cols->colgraphSetPlotFillStyle(graph, cols->colgraphGetPlotCount(graph)-1, fillstyle);
+                            cols->colgraphSetGraphFillStyle(plotid, cols->colgraphGetGraphCount(plotid)-1, fillstyle);
 
                         } else if(qfmpg) {
                             QColor color=QColor("red");
@@ -302,20 +302,20 @@ void QFPlotterPrivate::copyToTable()
 
                             int pcol=columns.value(qfmpg->get_parameterColumn(), -1);
 
-                            if (pcol>=0) cols->colgraphAddFunctionPlot(graph, qfmpg->get_function(), type, qfmpg->get_title(), pcol );
-                            else cols->colgraphAddFunctionPlot(graph, qfmpg->get_function(), type, qfmpg->get_title(), qfmpg->get_internalParams() );
+                            if (pcol>=0) cols->colgraphAddFunctionGraph(plotid, qfmpg->get_function(), type, qfmpg->get_title(), pcol );
+                            else cols->colgraphAddFunctionGraph(plotid, qfmpg->get_function(), type, qfmpg->get_title(), qfmpg->get_internalParams() );
 
                             if (color!=QColor("red")) {
-                                cols->colgraphSetPlotColor(graph, cols->colgraphGetPlotCount(graph)-1, color);
+                                cols->colgraphSetGraphColor(plotid, cols->colgraphGetGraphCount(plotid)-1, color);
                             }
                             if (fillColor!=QColor("red").lighter()) {
-                                cols->colgraphSetPlotFillColor(graph, cols->colgraphGetPlotCount(graph)-1, fillColor);
+                                cols->colgraphSetGraphFillColor(plotid, cols->colgraphGetGraphCount(plotid)-1, fillColor);
                             }
                             if (errorColor!=QColor("red").darker()) {
-                                cols->colgraphSetPlotErrorColor(graph, cols->colgraphGetPlotCount(graph)-1, errorColor);
+                                cols->colgraphSetGraphErrorColor(plotid, cols->colgraphGetGraphCount(plotid)-1, errorColor);
                             }
                             fillstyle=qfffg->get_fillStyle();
-                            cols->colgraphSetPlotFillStyle(graph, cols->colgraphGetPlotCount(graph)-1, fillstyle);
+                            cols->colgraphSetGraphFillStyle(plotid, cols->colgraphGetGraphCount(plotid)-1, fillstyle);
                         } else if (hrange) {
                             QColor color=QColor("red");
                             QColor fillColor=color.lighter();
@@ -326,18 +326,18 @@ void QFPlotterPrivate::copyToTable()
 
 
                             // ADD PLOT
-                            cols->colgraphAddRangePlot(graph, ori, hrange->get_rangeMin(), hrange->get_rangeMax(), hrange->get_rangeCenter(), hrange->get_title(),
+                            cols->colgraphAddRangeGraph(plotid, ori, hrange->get_rangeMin(), hrange->get_rangeMax(), hrange->get_rangeCenter(), hrange->get_title(),
                                                        hrange->get_invertedRange(), hrange->get_fillRange(), hrange->get_plotRangeLines(), hrange->get_plotCenterLine(),
                                                        hrange->get_centerColor(), hrange->get_centerStyle(), hrange->get_centerLineWidth());
 
                             if (color!=QColor("red")) {
-                                cols->colgraphSetPlotColor(graph, cols->colgraphGetPlotCount(graph)-1, color);
+                                cols->colgraphSetGraphColor(plotid, cols->colgraphGetGraphCount(plotid)-1, color);
                             }
                             if (fillColor!=QColor("red").lighter()) {
-                                cols->colgraphSetPlotFillColor(graph, cols->colgraphGetPlotCount(graph)-1, fillColor);
+                                cols->colgraphSetGraphFillColor(plotid, cols->colgraphGetGraphCount(plotid)-1, fillColor);
                             }
                             fillstyle=hrange->get_fillStyle();
-                            cols->colgraphSetPlotFillStyle(graph, cols->colgraphGetPlotCount(graph)-1, fillstyle);
+                            cols->colgraphSetGraphFillStyle(plotid, cols->colgraphGetGraphCount(plotid)-1, fillstyle);
                         }
                     }
                 }
@@ -349,7 +349,7 @@ void QFPlotterPrivate::copyToTable()
         if (ok && rdr && dlg->getShowEditor()) {
             QFRawDataPropertyEditor* editor=QFPluginServices::getInstance()->openRawDataEditor(rdr, false);
             if (editor) {
-                if (graph>=0) editor->sendEditorCommand("showPlot", graph);
+                if (plotid>=0) editor->sendEditorCommand("showPlot", plotid);
                 editor->showTab(2);
             }
         }

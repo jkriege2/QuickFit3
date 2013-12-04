@@ -203,6 +203,7 @@ void QFRDRPlotEditor::rebuildPlotWidgets(bool keepPosition) {
         while (plotWidgets.size()<current->getPlotCount()) {
             QFRDRTablePlotWidget* w=new QFRDRTablePlotWidget(tabPlots);
             connect(w, SIGNAL(performFit(int,int,int,int,QString,bool,bool)), this, SLOT(doFit(int,int,int,int,QString,bool,bool)));
+            connect(w, SIGNAL(performRefit(int,int)), this, SLOT(doRefit(int,int)));
             connect(w, SIGNAL(performRegression(int,int,int,int,bool,bool)), this, SLOT(doRegression(int,int,int,int,bool,bool)));
 
             plotWidgets.append(w);
@@ -278,9 +279,9 @@ void QFRDRPlotEditor::doRegression(int xCol, int yCol, int sigmaCol, int plot, b
     emit performRegression(xCol, yCol, sigmaCol, plot,xlog, ylog);
 }
 
-void QFRDRPlotEditor::doRefit(int plot)
+void QFRDRPlotEditor::doRefit(int plot, int graph)
 {
-    emit performRefit(plot);
+    emit performRefit(plot, graph);
 }
 
 

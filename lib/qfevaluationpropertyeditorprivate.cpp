@@ -110,6 +110,20 @@ void QFEvaluationPropertyEditorPrivate::copyExpandedResultsNoHeadMatlab()
     tvResults->copySelectionToMatlabExpandedNoHead(Qt::EditRole);
 }
 
+void QFEvaluationPropertyEditorPrivate::copyExpandedResultsFlipped()
+{
+    tvResults->copySelectionToExcelExpanded(Qt::EditRole, true, true);
+}
+
+void QFEvaluationPropertyEditorPrivate::copyExpandedResultsNoHeadFlipped()
+{
+    tvResults->copySelectionToExcelExpanded(Qt::EditRole, false, true);
+}
+
+void QFEvaluationPropertyEditorPrivate::copyExpandedResultsNoHeadMatlabFlipped()
+{
+    tvResults->copySelectionToMatlabExpandedNoHead(Qt::EditRole, true);
+}
 void QFEvaluationPropertyEditorPrivate::currentTabChanged(int tab)
 {
     int idx=tab-1;
@@ -503,10 +517,16 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
 
     actCopyExpanded=new QAction( tr("Copy Selection in expanded form"), d);
     tvResults->addAction(actCopyExpanded);
+    actCopyExpandedFlipped=new QAction( tr("Copy Selection in expanded form, flipped"), d);
+    tvResults->addAction(actCopyExpandedFlipped);
     actCopyExpandedNoHead=new QAction( tr("Copy Selection in expanded form, w/o header"), d);
     tvResults->addAction(actCopyExpandedNoHead);
+    actCopyExpandedNoHeadFlipped=new QAction( tr("Copy Selection in expanded form, w/o header, flipped"), d);
+    tvResults->addAction(actCopyExpandedNoHeadFlipped);
     actCopyExpandedNoHeadMatlab=new QAction( tr("Copy Selection in expanded form, to Matlab"), d);
     tvResults->addAction(actCopyExpandedNoHeadMatlab);
+    actCopyExpandedNoHeadMatlabFlipped=new QAction( tr("Copy Selection in expanded form, to Matlab, flipped"), d);
+    tvResults->addAction(actCopyExpandedNoHeadMatlabFlipped);
 
     actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), d);
     tbResults->addAction(actSaveResults);
@@ -638,6 +658,9 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     connect(actCopyExpanded, SIGNAL(triggered()), this, SLOT(copyExpandedResults()));
     connect(actCopyExpandedNoHead, SIGNAL(triggered()), this, SLOT(copyExpandedResultsNoHead()));
     connect(actCopyExpandedNoHeadMatlab, SIGNAL(triggered()), this, SLOT(copyExpandedResultsNoHeadMatlab()));
+    connect(actCopyExpandedFlipped, SIGNAL(triggered()), this, SLOT(copyExpandedResultsFlipped()));
+    connect(actCopyExpandedNoHeadFlipped, SIGNAL(triggered()), this, SLOT(copyExpandedResultsNoHeadFlipped()));
+    connect(actCopyExpandedNoHeadMatlabFlipped, SIGNAL(triggered()), this, SLOT(copyExpandedResultsNoHeadMatlabFlipped()));
 
 
     tabMain->addTab(widResults, tr("Evaluation &Results"));
@@ -703,8 +726,11 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     menuResults->addAction(actCopyMedianQuantilesNoHead);
     menuResults->addSeparator();
     menuResults->addAction(actCopyExpanded);
+    menuResults->addAction(actCopyExpandedFlipped);
     menuResults->addAction(actCopyExpandedNoHead);
+    menuResults->addAction(actCopyExpandedNoHeadFlipped);
     menuResults->addAction(actCopyExpandedNoHeadMatlab);
+    menuResults->addAction(actCopyExpandedNoHeadMatlabFlipped);
     menuResults->addSeparator();
     menuResults->addAction(actStatistics);
     menuResults->addAction(actStatisticsComparing);

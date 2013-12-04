@@ -5,7 +5,7 @@
 #include <QVector4D>
 #include <QMatrix4x4>
 
-QList<QVector<double> > dataDataRotate(const QList<QVector<double> >& data) {
+QList<QVector<double> > dataRotate(const QList<QVector<double> >& data) {
     QList<QVector<double> > result;
     int cols=0;
     for (int i=0; i<data.size(); i++) {
@@ -23,7 +23,7 @@ QList<QVector<double> > dataDataRotate(const QList<QVector<double> >& data) {
     return result;
 }
 
-QList<QList<double> > dataDataRotate(const QList<QList<double> >& data) {
+QList<QList<double> > dataRotate(const QList<QList<double> >& data) {
     QList<QList<double> > result;
     int cols=0;
     for (int i=0; i<data.size(); i++) {
@@ -42,7 +42,7 @@ QList<QList<double> > dataDataRotate(const QList<QList<double> >& data) {
     return result;
 }
 
-QList<QList<QVariant> > dataDataRotate(const QList<QList<QVariant> >& data) {
+QList<QList<QVariant> > dataRotate(const QList<QList<QVariant> >& data) {
     QList<QList<QVariant> > result;
     int cols=0;
     for (int i=0; i<data.size(); i++) {
@@ -65,7 +65,7 @@ void dataExpand(QList<QList<QVariant> >& data, QStringList* columnsNames) {
     QList<QList<QVariant> > d;
     for (int i=0; i<d.size(); i++) d.append(QList<QVariant>());
     QStringList cn;
-    if (columnsNames) cn = (*columnsNames);
+    //if (columnsNames) cn = (*columnsNames);
     int colid=0;
     for (int c=0; c<data.size(); c++) {
         int cols=1;
@@ -296,12 +296,17 @@ QString toSYLK(const QList<QList<QVariant> >& data, const QStringList& columnNam
 QStringList QFDataExportHandler::getFormats()  {
     QStringList sl;
     sl<<QObject::tr("Comma Separated Values (*.csv *.dat)");
+    sl<<QObject::tr("Comma Separated Values, flipped (*.csv *.dat)");
     sl<<QObject::tr("Semicolon Separated Values (*.dat *.txt *.csv)");
+    sl<<QObject::tr("Semicolon Separated Values, flipped (*.dat *.txt *.csv)");
     sl<<QObject::tr("Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv)");
+    sl<<QObject::tr("Semicolon Separated Values [for german Excel], flipped (*.dat *.txt *.csv)");
+    sl<<QObject::tr("Tab separated (*.dat *.txt *.tsv)");
+    sl<<QObject::tr("Tab separated, flipped (*.dat *.txt *.tsv)");
     sl<<QObject::tr("SYLK dataformat (*.slk *.sylk)");
     sl<<QObject::tr("SYLK dataformat, flipped (*.slk *.sylk)");
-    sl<<QObject::tr("Tab separated (*.dat *.txt *.tsv)");
     sl<<QObject::tr("Matlab script (*.m)");
+    sl<<QObject::tr("Matlab script, flipped (*.m)");
     return sl;
 }
 
@@ -309,18 +314,28 @@ void QFDataExportHandler::save(const QList<QVector<double> >& data, int format, 
 
     if (format==0) { // CSV
         saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, '.', ", ", true, '\"', "#! ", 15));
-    } else if (format==1) { // SSV
-        saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, '.', "; ", true, '\"', "#! ", 15));
+    } else  if (format==1) { // CSV
+        saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, '.', ", ", true, '\"', "#! ", 15));
     } else if (format==2) { // SSV
+        saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, '.', "; ", true, '\"', "#! ", 15));
+    } else if (format==3) { // SSV
+        saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, '.', "; ", true, '\"', "#! ", 15));
+    } else if (format==4) { // SSV,
         saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, ',', "; ", true, '\"', "#! ", 15));
-    } else if (format==3) { // SYLK
-        saveStringToFile(filename, toSYLK(data, columnHeaders, rowHeaders));
-    } else if (format==4) { // SYLK flipped
-        saveStringToFile(filename, toSYLK(dataDataRotate(data), columnHeaders, rowHeaders));
-    } else if (format==5) { // TSV
+    } else if (format==5) { // SSV,
+        saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, ',', "; ", true, '\"', "#! ", 15));
+    } else if (format==6) { // TSV
         saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, '.', "\t", true, '\"', "#! ", 15));
-    } else if (format==6) { // Matlab
+    } else if (format==7) { // TSV
+        saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, '.', "\t", true, '\"', "#! ", 15));
+    } else if (format==8) { // SYLK
+        saveStringToFile(filename, toSYLK(data, columnHeaders, rowHeaders));
+    } else if (format==9) { // SYLK flipped
+        saveStringToFile(filename, toSYLK(dataRotate(data), columnHeaders, rowHeaders));
+    } else if (format==10) { // Matlab
         saveStringToFile(filename, toMatlab(data, false));
+    } else if (format==11) { // Matlab
+        saveStringToFile(filename, toMatlab(dataRotate(data), false));
     }
 }
 
@@ -333,18 +348,28 @@ void QFDataExportHandler::save(const QList<QList<QVariant> >& data, int format, 
 
     if (format==0) { // CSV
         saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, '.', ", ", true, '\"', "#! ", 15));
-    } else if (format==1) { // SSV
-        saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, '.', "; ", true, '\"', "#! ", 15));
+    } else  if (format==1) { // CSV
+        saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, '.', ", ", true, '\"', "#! ", 15));
     } else if (format==2) { // SSV
+        saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, '.', "; ", true, '\"', "#! ", 15));
+    } else if (format==3) { // SSV
+        saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, '.', "; ", true, '\"', "#! ", 15));
+    } else if (format==4) { // SSV,
         saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, ',', "; ", true, '\"', "#! ", 15));
-    } else if (format==3) { // SYLK
-        saveStringToFile(filename, toSYLK(data, columnHeaders, rowHeaders));
-    } else if (format==4) { // SYLK flipped
-        saveStringToFile(filename, toSYLK(dataDataRotate(data), columnHeaders, rowHeaders));
-    } else if (format==5) { // TSV
+    } else if (format==5) { // SSV,
+        saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, ',', "; ", true, '\"', "#! ", 15));
+    } else if (format==6) { // TSV
         saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, '.', "\t", true, '\"', "#! ", 15));
-    } else if (format==6) { // Matlab
+    } else if (format==7) { // TSV
+        saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, '.', "\t", true, '\"', "#! ", 15));
+    } else if (format==8) { // SYLK
+        saveStringToFile(filename, toSYLK(data, columnHeaders, rowHeaders));
+    } else if (format==9) { // SYLK flipped
+        saveStringToFile(filename, toSYLK(dataRotate(data), columnHeaders, rowHeaders));
+    } else if (format==10) { // Matlab
         saveStringToFile(filename, toMatlab(data, false));
+    } else if (format==11) { // Matlab
+        saveStringToFile(filename, toMatlab(dataRotate(data), false));
     }
 }
 

@@ -346,6 +346,10 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
 {
     updating=true;
     ui->edtGraphTitle->setText(graph.title);
+
+    QString fit_type=graph.moreProperties.value("FIT_TYPE", "NONE").toString().toUpper().trimmed();
+    isFitResult= ((fit_type=="LEAST_SQUARES")||(fit_type=="FIT"));
+
     ui->cmbLinesXData->setCurrentIndex(graph.xcolumn+1);
     ui->cmbLinesXError->setCurrentIndex(graph.xerrorcolumn+1);
     ui->cmbLinesYData->setCurrentIndex(graph.ycolumn+1);
@@ -544,6 +548,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
         ui->labRangeStyle->setVisible(false);
         ui->widRangeData->setVisible(false);
         ui->widRangeStyle->setVisible(false);
+        ui->btnRefit->setVisible(false);
 
         switch(ui->cmbGraphType->itemData(ui->cmbGraphType->currentIndex()).toInt()) {
 
@@ -934,6 +939,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->widSymbol->setVisible(false);
                 ui->chkSTrided->setVisible(false);
                 ui->widStride->setVisible(false);
+
+                ui->btnRefit->setVisible(isFitResult);
 
                 ui->labFuctionType->setVisible(true);
                 ui->cmbFunctionType->setVisible(true);

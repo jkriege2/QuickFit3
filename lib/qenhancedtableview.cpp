@@ -121,7 +121,7 @@ void QEnhancedTableView::copySelectionToMatlabNoHead(int copyrole)
     }
 }
 
-void QEnhancedTableView::copySelectionToExcelExpanded(int copyrole, bool storeHead)
+void QEnhancedTableView::copySelectionToExcelExpanded(int copyrole, bool storeHead, bool flipped)
 {
     if (!model()) return;
     if (!selectionModel()) return;
@@ -131,12 +131,16 @@ void QEnhancedTableView::copySelectionToExcelExpanded(int copyrole, bool storeHe
     getVariantDataTable(copyrole, csvData, colnames, rownames);
     //qDebug()<<csvData.size()<<colnames.size();
     dataExpand(csvData, &colnames);
+    if (flipped)  {
+        csvData=dataRotate(csvData);
+        qSwap(colnames, rownames);
+    }
     //qDebug()<<csvData.size()<<colnames.size();
     if (storeHead) QFDataExportHandler::copyCSV(csvData, colnames, rownames);
     else QFDataExportHandler::copyCSV(csvData);
 }
 
-void QEnhancedTableView::copySelectionToMatlabExpandedNoHead(int copyrole)
+void QEnhancedTableView::copySelectionToMatlabExpandedNoHead(int copyrole, bool flipped)
 {
     if (!model()) return;
     if (!selectionModel()) return;
@@ -145,6 +149,10 @@ void QEnhancedTableView::copySelectionToMatlabExpandedNoHead(int copyrole)
     QStringList rownames;
     getVariantDataTable(copyrole, csvData, colnames, rownames);
     dataExpand(csvData, &colnames);
+    if (flipped)  {
+        csvData=dataRotate(csvData);
+        qSwap(colnames, rownames);
+    }
     QFDataExportHandler::copyMatlab(csvData);
 }
 

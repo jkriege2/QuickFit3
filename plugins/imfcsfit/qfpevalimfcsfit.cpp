@@ -436,26 +436,26 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
             graph->colgraphAddGraph("title");
             i++;
         }*/
-        graph->colgraphAddGraph("title");
-        gr=graph->colgraphGetGraphCount()-1;
+        graph->colgraphAddPlot("title");
+        gr=graph->colgraphGetPlotCount()-1;
 
         if (!isshifted) {
-            graph->colgraphSetGraphTitle(gr, tr("pixel size vs. diffusion coefficient"));
-            graph->colgraphSetGraphXAxisProps(gr, tr("pixel size [nm]"));
-            graph->colgraphsetXRange(gr, xmin, xmax);
+            graph->colgraphSetPlotTitle(gr, tr("pixel size vs. diffusion coefficient"));
+            graph->colgraphSetPlotXAxisProps(gr, tr("pixel size [nm]"));
+            graph->colgraphSetPlotXRange(gr, xmin, xmax);
         } else {
-            graph->colgraphSetGraphTitle(gr, tr("pixel shift vs. diffusion coefficient"));
-            graph->colgraphSetGraphXAxisProps(gr, tr("pixel shift [nm]"));
-            graph->colgraphsetXRange(gr, xmin, xmax_shift);
+            graph->colgraphSetPlotTitle(gr, tr("pixel shift vs. diffusion coefficient"));
+            graph->colgraphSetPlotXAxisProps(gr, tr("pixel shift [nm]"));
+            graph->colgraphSetPlotXRange(gr, xmin, xmax_shift);
         }
-        graph->colgraphSetGraphYAxisProps(gr, tr("diffusion coefficient [µm²/s]"));
-        while (graph->colgraphGetPlotCount(gr)>0){
-            graph->colgraphRemovePlot(gr, 0);
+        graph->colgraphSetPlotYAxisProps(gr, tr("diffusion coefficient [µm²/s]"));
+        while (graph->colgraphGetGraphCount(gr)>0){
+            graph->colgraphRemoveGraph(gr, 0);
         }
         for (int i=0; i<focus_widths.size(); i++) {
-            graph->colgraphAddPlot(gr, 0, 1+i*2, QFRDRColumnGraphsInterface::cgtLinesPoints, tr("w_{xy}=%1nm").arg(focus_widths[i]));
+            graph->colgraphAddGraph(gr, 0, 1+i*2, QFRDRColumnGraphsInterface::cgtLinesPoints, tr("w_{xy}=%1nm").arg(focus_widths[i]));
         }
-        graph->colgraphsetYRange(gr, ymin, ymax);
+        graph->colgraphSetPlotYRange(gr, ymin, ymax);
 
 
     }
@@ -669,28 +669,28 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool4()
                         int ggraph=e->getProperty("IMFCS_CALIBRATION_GRAPHS", -1).toInt();
                         if (ggraph<0) {
                             if (!isshifted) {
-                                graph->colgraphAddGraph(tr("pixel size vs. lat. focus size, D=%2µm²/s").arg(Dcalib));
+                                graph->colgraphAddPlot(tr("pixel size vs. lat. focus size, D=%2µm²/s").arg(Dcalib));
                             } else {
-                                graph->colgraphAddGraph(tr("pixel shift vs. lat. focus size, D=%2µm²/s").arg(Dcalib));
+                                graph->colgraphAddPlot(tr("pixel shift vs. lat. focus size, D=%2µm²/s").arg(Dcalib));
                             }
-                            ggraph=graph->colgraphGetGraphCount()-1;
+                            ggraph=graph->colgraphGetPlotCount()-1;
                         } else {
-                            graph->colgraphSetGraphTitle(ggraph, tr("pixel size vs. lat. focus size, D=%2µm²/s").arg(Dcalib));
+                            graph->colgraphSetPlotTitle(ggraph, tr("pixel size vs. lat. focus size, D=%2µm²/s").arg(Dcalib));
                         }
                         e->setQFProperty("IMFCS_CALIBRATION_GRAPHS", ggraph);
-                        graph->colgraphSetGraphTitle(ggraph, tr("pixel size vs. lat. focus size"));
+                        graph->colgraphSetPlotTitle(ggraph, tr("pixel size vs. lat. focus size"));
                         if (!isshifted) {
-                            graph->colgraphSetGraphXAxisProps(ggraph, tr("pixel size [nm]"));
+                            graph->colgraphSetPlotXAxisProps(ggraph, tr("pixel size [nm]"));
                         } else {
-                            graph->colgraphSetGraphXAxisProps(ggraph, tr("pixel shift [nm]"));
+                            graph->colgraphSetPlotXAxisProps(ggraph, tr("pixel shift [nm]"));
                         }
-                        graph->colgraphSetGraphYAxisProps(ggraph, tr("lateral focus size w_{xy} [nm]"));
-                        graph->colgraphAddErrorPlot(ggraph, cols, -1, cols+1, cols+2, QFRDRColumnGraphsInterface::cgtLinesPoints, tr("calibration D=(%1\\pm %2)µm²/s").arg(Dcalib).arg(DcalibE));
-                        graph->colgraphSetPlotColor(ggraph, graph->colgraphGetPlotCount(ggraph)-1, QColor("red"));
-                        graph->colgraphAddPlot(ggraph, cols, cols+3, QFRDRColumnGraphsInterface::cgtLines, tr("w_{xy}=(%1\\pm %2)nm").arg(qfstatisticsAverage(wxyvec)).arg(sqrt(qfstatisticsVariance(wxyvec))));
-                        graph->colgraphSetPlotColor(ggraph, graph->colgraphGetPlotCount(ggraph)-1, QColor("blue"));
-                        graph->colgraphsetXRange(ggraph, xmin, xmax);
-                        graph->colgraphsetYRange(ggraph, ymin, ymax);
+                        graph->colgraphSetPlotYAxisProps(ggraph, tr("lateral focus size w_{xy} [nm]"));
+                        graph->colgraphAddErrorGraph(ggraph, cols, -1, cols+1, cols+2, QFRDRColumnGraphsInterface::cgtLinesPoints, tr("calibration D=(%1\\pm %2)µm²/s").arg(Dcalib).arg(DcalibE));
+                        graph->colgraphSetGraphColor(ggraph, graph->colgraphGetGraphCount(ggraph)-1, QColor("red"));
+                        graph->colgraphAddGraph(ggraph, cols, cols+3, QFRDRColumnGraphsInterface::cgtLines, tr("w_{xy}=(%1\\pm %2)nm").arg(qfstatisticsAverage(wxyvec)).arg(sqrt(qfstatisticsVariance(wxyvec))));
+                        graph->colgraphSetGraphColor(ggraph, graph->colgraphGetGraphCount(ggraph)-1, QColor("blue"));
+                        graph->colgraphSetPlotXRange(ggraph, xmin, xmax);
+                        graph->colgraphSetPlotYRange(ggraph, ymin, ymax);
                         gr=ggraph;
 
                     }

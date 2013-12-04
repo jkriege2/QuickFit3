@@ -79,6 +79,8 @@ class QFTableGraphSettings : public QWidget
 
         QAction* actFit;
         QAction* actRegression;
+
+        bool isFitResult;
 };
 
 #endif // QFTABLEGRAPHSETTINGS_H

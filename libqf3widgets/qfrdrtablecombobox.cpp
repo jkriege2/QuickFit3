@@ -122,8 +122,8 @@ void QFRDRColumnGraphsComboBox::refill()
 
     clear();
     if (cols) {
-        for (int i=0; i<cols->colgraphGetGraphCount(); i++) {
-            addItem(cols->colgraphGetGraphTitle(i));
+        for (int i=0; i<cols->colgraphGetPlotCount(); i++) {
+            addItem(cols->colgraphGetPlotTitle(i));
         }
     }
 

@@ -1518,6 +1518,13 @@ class QFLIB_EXPORT QFMathParser
          * \param name name of the new variable
          * \param v initial value of this variable
          */
+        inline void addVariableDoubleVector(const QString& name, const QVector<double>& v) {
+            environment.addVariableDoubleVec(name, v);
+        }
+        /** \brief  register a new internal variable of type boolean vector
+         * \param name name of the new variable
+         * \param v initial value of this variable
+         */
         inline void addVariableStringVector(const QString& name, const QStringList& v) {
             environment.addVariableStringVec(name, v);
         }
