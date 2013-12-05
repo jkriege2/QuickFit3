@@ -372,7 +372,7 @@ void QFImFCCSFitEvaluationItem::intReadData(QDomElement *e)
                 if (okI && id>=0) {
                     QFRawDataRecord* rdr=project->getRawDataByID(id);                    
                     //qDebug()<<"       rdr="<<rdr<<" isApplicable="<<isApplicable(rdr);
-                    if (isApplicable(rdr)) {
+                    if (rdr&&isApplicable(rdr)) {
                         fileSet.append(rdr);
                     } else {
                         ok=false;
