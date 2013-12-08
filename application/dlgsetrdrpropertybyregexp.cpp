@@ -16,10 +16,22 @@ DlgSetRDRPropertyByRegExp::DlgSetRDRPropertyByRegExp(QWidget *parent) :
     ui->edtRegExp->setText(ProgramOptions::getConfigValue("DlgSetRDRPropertyByRegExp/regexp", ui->edtRegExp->text()).toString());
     ui->cmbPropertyName->setEditText(ProgramOptions::getConfigValue("DlgSetRDRPropertyByRegExp/propname", ui->cmbPropertyName->currentText()).toString());
     ui->cmbPropertyType->setCurrentIndex(ProgramOptions::getConfigValue("DlgSetRDRPropertyByRegExp/proptype", ui->cmbPropertyType->currentIndex()).toInt());
+
+    ui->widConfig->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/setrdrpropbyregexp.ini");
+    ui->widConfig->registerWidget("chkCaseSensitive", ui->chkCaseSensitive);
+    ui->widConfig->registerWidget("chkMinimal", ui->chkMinimal);
+    ui->widConfig->registerWidget("cmbInputData", ui->cmbInputData);
+    ui->widConfig->registerWidget("cmbMode", ui->cmbMode);
+    ui->widConfig->registerWidget("cmbOutput", ui->cmbOutput);
+    ui->widConfig->registerWidget("edtOutputValue", ui->edtOutputValue);
+    ui->widConfig->registerWidget("edtRegExp", ui->edtRegExp);
+    ui->widConfig->registerWidget("cmbPropertyName", ui->cmbPropertyName);
+    ui->widConfig->registerWidget("cmbPropertyType", ui->cmbPropertyType);
 }
 
 DlgSetRDRPropertyByRegExp::~DlgSetRDRPropertyByRegExp()
 {
+    ui->widConfig->unregisterWidgets();
     ProgramOptions::setConfigValue("DlgSetRDRPropertyByRegExp/case_sensitive", ui->chkCaseSensitive->isChecked());
     ProgramOptions::setConfigValue("DlgSetRDRPropertyByRegExp/minimal", ui->chkMinimal->isChecked());
     ProgramOptions::setConfigValue("DlgSetRDRPropertyByRegExp/input", ui->cmbInputData->currentIndex());

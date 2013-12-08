@@ -6,9 +6,9 @@
 #include <QAction>
 #include <QToolButton>
 #include <QSettings>
+#include "libwid_imexport.h"
 
-
-class QConfigComboboxWidget : public QWidget
+class QFWIDLIB_EXPORT QConfigComboboxWidget : public QWidget
 {
         Q_OBJECT
     public:
@@ -27,10 +27,13 @@ class QConfigComboboxWidget : public QWidget
         };
 
         explicit QConfigComboboxWidget(QString filename=QString("configcombobox.ini"), QWidget *parent = 0);
+        explicit QConfigComboboxWidget(QWidget *parent = 0);
+        virtual ~QConfigComboboxWidget();
 
         void registerWidget(const QString& id, QWidget* widget);
         void unregisterWidget(const QString& id);
         void unregisterWidget(QWidget* widget);
+        void unregisterWidgets();
         int currentConfig() const;
         QString currentConfigName() const;
         QString currentFilename() const;
@@ -59,7 +62,7 @@ class QConfigComboboxWidget : public QWidget
         QAction* actDelete;
 
         QString filename;
-        QSettings settings;
+        QSettings* settings;
         QMap<QString, QWidget*> widgets;
         QList<WidgetFunctions> widgetFunctions;
         

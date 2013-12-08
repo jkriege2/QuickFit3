@@ -263,14 +263,30 @@
        </item>
       </widget>
      </item>
+     <item row="12" column="1">
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="13" column="1">
+      <widget class="QConfigComboboxWidget" name="widConfig" native="true"/>
+     </item>
+     <item row="13" column="0">
+      <widget class="QLabel" name="label_12">
+       <property name="text">
+        <string>saved settings:</string>
+       </property>
+      </widget>
+     </item>
     </layout>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_7">
-     <property name="text">
-      <string>&lt;b&gt;set:&lt;/b&gt;</string>
-     </property>
-    </widget>
    </item>
    <item row="0" column="1">
     <widget class="QLabel" name="label_8">
@@ -327,8 +343,27 @@
      </property>
     </widget>
    </item>
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
+     <item>
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>&lt;b&gt;set:&lt;/b&gt;</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QConfigComboboxWidget</class>
+   <extends>QWidget</extends>
+   <header>qconfigcomboboxwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
