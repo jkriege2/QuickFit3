@@ -32,6 +32,7 @@ QEnhancedTableView::QEnhancedTableView(QWidget* parent):
     connect(actCopyExcel, SIGNAL(triggered()), this, SLOT(copySelectionToExcel()));
     addAction(actCopyExcel);
     actCopyExcelNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) without header row/column"), this);
+    actCopyExcelNoHead->setShortcut(QKeySequence::Copy);
     connect(actCopyExcelNoHead, SIGNAL(triggered()), this, SLOT(copySelectionToExcelNoHead()));
     addAction(actCopyExcelNoHead);
     actCopyMatlab=new QAction(QIcon(":/lib/copy16_matlab.png"), tr("Copy Selection to clipboard (Matlab)"), this);
@@ -44,6 +45,23 @@ QEnhancedTableView::QEnhancedTableView(QWidget* parent):
     actPrint->setShortcut(QKeySequence::Print);
     connect(actPrint, SIGNAL(triggered()), this, SLOT(print()));
     addAction(actPrint);
+
+    menuSave=new QMenu(tr("save table"), this);
+    menuSave->setIcon(QIcon(":/lib/save16.png"));
+    addAction(menuSave->menuAction());
+
+    actSave=new QAction(QIcon(":/lib/save16.png"), tr("&Save table"), this);
+    connect(actSave, SIGNAL(triggered()), this, SLOT(save()));
+    menuSave->addAction(actSave);
+    actSaveFlipped=new QAction(QIcon(":/lib/save16.png"), tr("&Save table, flipped"), this);
+    connect(actSaveFlipped, SIGNAL(triggered()), this, SLOT(saveFlipped()));
+    menuSave->addAction(actSaveFlipped);
+    actSaveExtended=new QAction(QIcon(":/lib/save16.png"), tr("&Save table, extended form"), this);
+    connect(actSaveExtended, SIGNAL(triggered()), this, SLOT(saveExtended()));
+    menuSave->addAction(actSaveExtended);
+    actSaveExtendedFlipped=new QAction(QIcon(":/lib/save16.png"), tr("&Save table, extended form, flipped"), this);
+    connect(actSaveExtendedFlipped, SIGNAL(triggered()), this, SLOT(saveExtendedFlipped()));
+    menuSave->addAction(actSaveExtendedFlipped);
 }
 
 QEnhancedTableView::~QEnhancedTableView()
@@ -66,6 +84,7 @@ void QEnhancedTableView::copySelectionToMatlabNoHead(int copyrole, bool flipped)
     getVariantDataTable(copyrole, csvData, colnames, rownames);
 
     if (selectionModel()->selectedIndexes().size()==1) dataExpand(csvData, &colnames);
+    else dataReduce(csvData, &colnames);
 
     if (flipped)  {
         csvData=dataRotate(csvData);
@@ -73,67 +92,6 @@ void QEnhancedTableView::copySelectionToMatlabNoHead(int copyrole, bool flipped)
     }
     QFDataExportHandler::copyMatlab(csvData);
 
-    /*if (!model()) return;
-    if (!selectionModel()) return;
-    QModelIndexList sel=selectionModel()->selectedIndexes();
-    QLocale loc=QLocale::system();
-    loc.setNumberOptions(QLocale::OmitGroupSeparator);
-    if (sel.size()==1) {
-        QVariant vdata=sel[0].data(copyrole);
-        QList<QList<QVariant> > data;
-        QList<QVariant> l;
-        l<<vdata;
-        data.append(l);
-        dataExpand(data);
-        matlabCopy(data);
-    } else {
-        QSet<int> rows, cols;
-        int colmin=0;
-        int rowmin=0;
-        for (int i=0; i<sel.size(); i++) {
-            int r=sel[i].row();
-            int c=sel[i].column();
-            rows.insert(r);
-            cols.insert(c);
-            if (i==0) {
-                colmin=c;
-                rowmin=r;
-            } else {
-                if (c<colmin) colmin=c;
-                if (r<rowmin) rowmin=r;
-            }
-        }
-        QList<int> rowlist=QList<int>::fromSet(rows);
-        qSort(rowlist.begin(), rowlist.end());
-        QList<int> collist=QList<int>::fromSet(cols);
-        qSort(collist.begin(), collist.end());
-        int rowcnt=rowlist.size();
-        int colcnt=collist.size();
-        QList<QList<QVariant> > data;
-
-
-
-        // now add dta rows:
-        //
-        //               <~~~~~~~~~ colcnt times ~~~~~~~~~~>
-        //                <EMPTY> | <EMPTY> | ... | <EMPTY>
-        for (int r=0; r<rowcnt; r++) {
-            QList<QVariant> row;
-            for (int c=0; c<colcnt; c++) {
-                row.append(QVariant()); // empty columns for data
-            }
-            data.append(row);
-        }
-        for (int i=0; i<sel.size(); i++) {
-            int r=rowlist.indexOf(sel[i].row());
-            int c=collist.indexOf(sel[i].column());
-            QVariant vdata=sel[i].data(copyrole);
-
-            if ((r>=0) && (c>=0) && (r<=data.size()) && (c<=colcnt)) data[r][c]=vdata;
-        }
-
-        matlabCopy(data);
-    }*/
 }
 
 void QEnhancedTableView::copySelectionToExcelExpanded(int copyrole, bool storeHead, bool flipped)
@@ -182,6 +140,9 @@ void QEnhancedTableView::getVariantDataTable(int copyrole, QList<QList<QVariant>
         QVariant vdata=sel[0].data(copyrole);
         csvData<<QList<QVariant>();
         csvData.first()<<vdata;
+        colnames<<model()->headerData(sel[0].column(), Qt::Horizontal).toString();
+        rownames<<model()->headerData(sel[0].row(), Qt::Vertical).toString();
+        //qDebug()<<vdata<<csvData<<csvData.first();
     } else {
         QSet<int> rows, cols;
         int colmin=0;
@@ -243,7 +204,9 @@ void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead, bool
     QStringList rownames;
     getVariantDataTable(copyrole, csvData, colnames, rownames);
 
-    if (selectionModel()->selectedIndexes().size()==1) dataExpand(csvData, &colnames);
+    //if (selectionModel()->selectedIndexes().size()==1) dataExpand(csvData, &colnames);
+    if (csvData.size()==1) dataExpand(csvData, &colnames);
+    else dataReduce(csvData, &colnames);
 
     if (flipped)  {
         csvData=dataRotate(csvData);
@@ -253,116 +216,7 @@ void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead, bool
     if (storeHead) QFDataExportHandler::copyCSV(csvData, colnames, rownames);
     else QFDataExportHandler::copyCSV(csvData);
 
-    /*if (!model()) return;
-    if (!selectionModel()) return;
-    QModelIndexList sel=selectionModel()->selectedIndexes();
-    QLocale loc=QLocale::system();
-    loc.setNumberOptions(QLocale::OmitGroupSeparator);
-    if (sel.size()==1) {
-        QVariant vdata=sel[0].data(copyrole);
-        QString txt="";
-        switch (vdata.type()) {
-            case QVariant::Int:
-            case QVariant::LongLong:
-            case QVariant::UInt:
-            case QVariant::ULongLong:
-            case QVariant::Bool:
-                txt=vdata.toString();
-                break;
-            case QVariant::Double:
-                txt=loc.toString(vdata.toDouble());
-                break;
-            case QVariant::PointF:
-                txt=loc.toString(vdata.toPointF().x());
-                break;
-            default:
-                txt=QString("\"%1\"").arg(vdata.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
-                break;
-        }
-         QApplication::clipboard()->setText(txt);
-    } else {
-        QSet<int> rows, cols;
-        int colmin=0;
-        int rowmin=0;
-        for (int i=0; i<sel.size(); i++) {
-            int r=sel[i].row();
-            int c=sel[i].column();
-            rows.insert(r);
-            cols.insert(c);
-            if (i==0) {
-                colmin=c;
-                rowmin=r;
-            } else {
-                if (c<colmin) colmin=c;
-                if (r<rowmin) rowmin=r;
-            }
-        }
-        QList<int> rowlist=QList<int>::fromSet(rows);
-        qSort(rowlist.begin(), rowlist.end());
-        QList<int> collist=QList<int>::fromSet(cols);
-        qSort(collist.begin(), collist.end());
-        int rowcnt=rowlist.size();
-        int colcnt=collist.size();
-        QList<QStringList> data;
 
-        // header row:
-        //
-        //  <EMPTY> | <HOR_HEDER1> | <HOR_HEADER2> | ...
-        QStringList hrow;
-        if (storeHead) {
-            hrow.append(""); // empty header for first column (vertical headers!)
-            for (int c=0; c<colcnt; c++) {
-                hrow.append(QString("\"%1\"").arg(model()->headerData(collist[c], Qt::Horizontal).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " ")));
-            }
-            data.append(hrow);
-        }
-
-        // now add dta rows:
-        //
-        //               <~~~~~~~~~ colcnt times ~~~~~~~~~~>
-        //  <VER_HEADER> | <EMPTY> | <EMPTY> | ... | <EMPTY>
-        for (int r=0; r<rowcnt; r++) {
-            QStringList row;
-            if (storeHead) row.append(QString("\"%1\"").arg(model()->headerData(rowlist[r], Qt::Vertical).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "))); // vertical header
-            for (int c=0; c<colcnt; c++) {
-                row.append(""); // empty columns for data
-            }
-            data.append(row);
-        }
-        for (int i=0; i<sel.size(); i++) {
-            int r=rowlist.indexOf(sel[i].row());
-            int c=collist.indexOf(sel[i].column());
-            QVariant vdata=sel[i].data(copyrole);
-            QString txt="";
-            switch (vdata.type()) {
-                case QVariant::Int:
-                case QVariant::LongLong:
-                case QVariant::UInt:
-                case QVariant::ULongLong:
-                case QVariant::Bool:
-                    txt=vdata.toString();
-                    break;
-                case QVariant::Double:
-                    txt=loc.toString(vdata.toDouble());
-                    break;
-                case QVariant::PointF:
-                    txt=loc.toString(vdata.toPointF().x());
-                    break;
-                default:
-                    txt=QString("\"%1\"").arg(vdata.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
-                    break;
-            }
-            int shift=0;
-            if (storeHead) shift=1;
-            if ((r>=0) && (c>=0) && (r<=data.size()) && (c<=colcnt))data[r+shift][c+shift]=txt;
-        }
-
-        QString result="";
-        for (int r=0; r<data.size(); r++) {
-            result+=data[r].join("\t")+"\n";
-        }
-        QApplication::clipboard()->setText(result);
-    }*/
 }
 
 int copySelectionAsValueErrorToExcelcompare_firstrole;
@@ -755,6 +609,16 @@ QAction *QEnhancedTableView::getActPrint() const
     return actPrint;
 }
 
+QAction *QEnhancedTableView::getActSave() const
+{
+    return actSave;
+}
+
+QAction *QEnhancedTableView::getActSaveExtended() const
+{
+    return actSaveExtended;
+}
+
 void QEnhancedTableView::addActionsToToolbar(QToolBar *tb) const
 {
     tb->addAction(actCopyExcel);
@@ -858,6 +722,61 @@ void QEnhancedTableView::print()
         delete tablePrinter;
     }
 }
+
+void QEnhancedTableView::save(int copyrole, bool flipped, bool storeHead)
+{
+    if (!model()) return;
+    if (!selectionModel()) return;
+    QList<QList<QVariant> > csvData;
+    QStringList colnames;
+    QStringList rownames;
+    getVariantDataTable(copyrole, csvData, colnames, rownames);
+
+    if (csvData.size()==1) dataExpand(csvData, &colnames);
+    else dataReduce(csvData, &colnames);
+
+    if (flipped)  {
+        csvData=dataRotate(csvData);
+        qSwap(colnames, rownames);
+    }
+    //qDebug()<<csvData.size()<<colnames.size();
+    if (storeHead) QFDataExportHandler::save(csvData, colnames, rownames);
+    else QFDataExportHandler::save(csvData);
+
+
+}
+
+void QEnhancedTableView::saveExtended(int copyrole, bool flipped, bool storeHead)
+{
+    if (!model()) return;
+    if (!selectionModel()) return;
+    QList<QList<QVariant> > csvData;
+    QStringList colnames;
+    QStringList rownames;
+    getVariantDataTable(copyrole, csvData, colnames, rownames);
+    //qDebug()<<csvData.size()<<colnames.size();
+    dataExpand(csvData, &colnames);
+    if (flipped)  {
+        csvData=dataRotate(csvData);
+        qSwap(colnames, rownames);
+    }
+    //qDebug()<<csvData.size()<<colnames.size();
+    if (storeHead) QFDataExportHandler::save(csvData, colnames, rownames);
+    else QFDataExportHandler::save(csvData);
+
+}
+
+void QEnhancedTableView::saveFlipped(int copyRole)
+{
+    save(copyRole, true, true);
+}
+
+void QEnhancedTableView::saveExtendedFlipped(int copyRole)
+{
+    saveExtended(copyRole, true, true);
+}
+
+
 
 void QEnhancedTableView::copyAsImage()
 {

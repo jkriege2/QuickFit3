@@ -166,6 +166,11 @@ SUBDIRS += plg_qfe_gslmathparserextensions
 plg_qfe_gslmathparserextensions.subdir=./plugins/qfe_gslmathparserextensions
 plg_qfe_gslmathparserextensions.depends = lib libqf3widgets
 
+SUBDIRS += plg_qfe_dataexportbasics
+plg_qfe_dataexportbasics.subdir=./plugins/qfe_dataexportbasics
+plg_qfe_dataexportbasics.depends = lib libqf3widgets
+
+
 !macx {
 
     SUBDIRS += plg_spimb040

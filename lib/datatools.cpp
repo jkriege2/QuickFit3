@@ -4,6 +4,7 @@
 #include <QVector3D>
 #include <QVector4D>
 #include <QMatrix4x4>
+#include "programoptions.h"
 
 QList<QVector<double> > dataRotate(const QList<QVector<double> >& data) {
     QList<QVector<double> > result;
@@ -154,7 +155,7 @@ void dataExpand(QList<QList<QVariant> >& data, QStringList* columnsNames) {
                             qreal* dd=v.value<QMatrix4x4>().data();
                             if (i<16 && i>=0) vo=dd[i];
                         } break;
-                case QVariant::List: {
+                    case QVariant::List: {
                         QVariantList vl=v.toList();
                         if (vl.size()>0 && (vl.first().type()==QVariant::Point || vl.first().type()==QVariant::PointF)) {
                             if (i>=vl.size()) vo=vl.value(i-vl.size(), QVariant()).toPointF().y();
@@ -181,6 +182,87 @@ void dataExpand(QList<QList<QVariant> >& data, QStringList* columnsNames) {
             }
         }
         colid=colid+cols;
+    }
+
+    if (columnsNames) *columnsNames=cn;
+    data=d;
+}
+
+void dataReduce(QList<QList<QVariant> >& data, QStringList* columnsNames) {
+    QList<QList<QVariant> > d;
+    for (int i=0; i<d.size(); i++) d.append(QList<QVariant>());
+    QStringList cn;
+    //if (columnsNames) cn = (*columnsNames);
+    int colid=0;
+    for (int c=0; c<data.size(); c++) {
+        int i=0;
+        {
+            QList<QVariant> newcol;
+            for (int r=0; r<data[c].size(); r++) {
+                QVariant vo=QVariant();
+                const QVariant& v=data[c].at(r);
+                switch(v.type()) {
+                    case QVariant::Line:
+                    case QVariant::LineF:
+                        if (i==0) vo=v.toLineF().x1();
+                        else if (i==1) vo=v.toLineF().y1();
+                        else if (i==2) vo=v.toLineF().x2();
+                        else if (i==3) vo=v.toLineF().y2();
+                        break;
+                    case QVariant::Point:
+                    case QVariant::PointF:
+                        if (i==0) vo=v.toPointF().x();
+                        else if (i==1) vo=v.toPointF().y();
+                        break;
+                    case QVariant::Size:
+                    case QVariant::SizeF:
+                        if (i==0) vo=v.toSizeF().width();
+                        else if (i==1) vo=v.toSizeF().height();
+                        break;
+                    case QVariant::Vector2D:
+                        if (i==0) vo=v.value<QVector2D>().x();
+                        else if (i==1) vo=v.value<QVector2D>().y();
+                        break;
+                    case QVariant::Vector3D:
+                        if (i==0) vo=v.value<QVector3D>().x();
+                        else if (i==1) vo=v.value<QVector3D>().y();
+                        else if (i==2) vo=v.value<QVector3D>().z();
+                        break;
+                    case QVariant::Vector4D:
+                        if (i==0) vo=v.value<QVector4D>().x();
+                        else if (i==1) vo=v.value<QVector4D>().y();
+                        else if (i==2) vo=v.value<QVector4D>().z();
+                        else if (i==3) vo=v.value<QVector4D>().w();
+                        break;
+                    case QVariant::QVariant::Matrix4x4: {
+                            qreal* dd=v.value<QMatrix4x4>().data();
+                            if (i<16 && i>=0) vo=dd[i];
+                        } break;
+                    case QVariant::List: {
+                        QVariantList vl=v.toList();
+                        if (vl.size()>0 && (vl.first().type()==QVariant::Point || vl.first().type()==QVariant::PointF)) {
+                            if (i>=vl.size()) vo=vl.value(i-vl.size(), QVariant()).toPointF().y();
+                            else vo=vl.value(i, QVariant()).toPointF().x();
+                        } else {
+                            vo=v.toList().value(i, QVariant());
+                        }
+                        } break;
+                    case QVariant::StringList:
+                        if (i<v.toStringList().size()) vo=v.toStringList().value(i, "");
+                        break;
+                    default:
+                        break;
+
+                }
+                newcol<<vo;
+            }
+            d.append(newcol);
+        }
+        if (columnsNames) {
+            cn<<columnsNames->value(c, "");
+
+        }
+        colid=colid+1;
     }
 
     if (columnsNames) *columnsNames=cn;
@@ -307,7 +389,18 @@ QStringList QFDataExportHandler::getFormats()  {
     sl<<QObject::tr("SYLK dataformat, flipped (*.slk *.sylk)");
     sl<<QObject::tr("Matlab script (*.m)");
     sl<<QObject::tr("Matlab script, flipped (*.m)");
+    for (int i=0; i<writers.size(); i++) {
+        sl<<writers[i]->getFilter();
+    }
     return sl;
+}
+
+
+QList<QFDataExportHandler::DataWriter*> QFDataExportHandler::writers=QList<QFDataExportHandler::DataWriter*>();
+
+void QFDataExportHandler::registerDataWriter(QFDataExportHandler::DataWriter *writer)
+{
+    writers.append(writer);
 }
 
 void QFDataExportHandler::save(const QList<QVector<double> >& data, int format, const QString& filename, const QStringList& columnHeaders, const QStringList& rowHeaders) {
@@ -336,7 +429,23 @@ void QFDataExportHandler::save(const QList<QVector<double> >& data, int format, 
         saveStringToFile(filename, toMatlab(data, false));
     } else if (format==11) { // Matlab
         saveStringToFile(filename, toMatlab(dataRotate(data), false));
+    } else if (format-12>=0 && format-12<writers.size()) {
+        writers[format-12]->save(data, filename, columnHeaders, rowHeaders);
     }
+}
+
+void QFDataExportHandler::save(const QList<QVector<double> > &data, const QStringList &columnHeaders, const QStringList &rowHeaders)
+{
+    QString lastDir=ProgramOptions::getConfigValue("QFDataExportHandler/saveLastDir", "").toString();
+    QString lastFilter=ProgramOptions::getConfigValue("QFDataExportHandler/savelastFilter", getFormats().first()).toString();
+    QString filename=qfGetSaveFileName(NULL, QObject::tr("select filename ..."), lastDir, getFormats().join(";;"), &lastFilter);
+    if (filename.size()>0) {
+        int format=getFormats().indexOf(lastFilter);
+        save(data, format, filename, columnHeaders, rowHeaders);
+        ProgramOptions::setConfigValue("QFDataExportHandler/saveLastDir", lastDir);
+        ProgramOptions::setConfigValue("QFDataExportHandler/savelastFilter", lastFilter);
+    }
+
 }
 
 void QFDataExportHandler::copyCSV(const QList<QList<double> > &data, const QStringList &columnHeaders, const QStringList &rowHeaders)
@@ -370,6 +479,21 @@ void QFDataExportHandler::save(const QList<QList<QVariant> >& data, int format, 
         saveStringToFile(filename, toMatlab(data, false));
     } else if (format==11) { // Matlab
         saveStringToFile(filename, toMatlab(dataRotate(data), false));
+    } else if (format-12>=0 && format-12<writers.size()) {
+        writers[format-12]->save(data, filename, columnHeaders, rowHeaders);
+    }
+}
+
+void QFDataExportHandler::save(const QList<QList<QVariant> > &data, const QStringList &columnHeaders, const QStringList &rowHeaders)
+{
+    QString lastDir=ProgramOptions::getConfigValue("QFDataExportHandler/saveLastDir", "").toString();
+    QString lastFilter=ProgramOptions::getConfigValue("QFDataExportHandler/savelastFilter", getFormats().first()).toString();
+    QString filename=qfGetSaveFileName(NULL, QObject::tr("select filename ..."), lastDir, getFormats().join(";;"), &lastFilter);
+    if (filename.size()>0) {
+        int format=getFormats().indexOf(lastFilter);
+        save(data, format, filename, columnHeaders, rowHeaders);
+        ProgramOptions::setConfigValue("QFDataExportHandler/saveLastDir", lastDir);
+        ProgramOptions::setConfigValue("QFDataExportHandler/savelastFilter", lastFilter);
     }
 }
 
@@ -386,4 +510,94 @@ void QFDataExportHandler::copyMatlab(const QList<QList<QVariant> > &data)
 void QFDataExportHandler::copyMatlab(const QList<QList<double> > &data)
 {
     matlabCopy(data);
+}
+
+QList<QList<QVariant> > dataToVariant(const QList<QList<double> >& data) {
+    QList<QList<QVariant> > res;
+    for (int i=0; i<data.size(); i++) {
+        res<<QList<QVariant>();
+        for (int j=0; j<data[i].size(); j++) {
+            res.last()<<data[i].at(j);
+        }
+    }
+    return res;
+}
+
+QList<QList<QVariant> > dataToVariant(const QList<QVector<double> >& data) {
+    QList<QList<QVariant> > res;
+    for (int i=0; i<data.size(); i++) {
+        res<<QList<QVariant>();
+        for (int j=0; j<data[i].size(); j++) {
+            res.last()<<data[i].at(j);
+        }
+    }
+    return res;
+}
+
+QList<QVector<double> > dataReduceToDouble(const QList<QList<QVariant> >& data, QStringList* columnsNames) {
+    QList<QVector<double> > res;
+    QList<QList<QVariant> > in=data;
+    dataReduce(in, columnsNames);
+    for (int i=0; i<in.size(); i++) {
+        res<<QVector<double>();
+        for (int j=0; j<in[i].size(); j++) {
+            bool ok=false;
+            double d=in[i].at(j).toDouble(&ok);
+            if (ok) {
+                res.last()<<d;
+            } else {
+                res.last()<<NAN;
+            }
+        }
+    }
+    return res;
+}
+
+QList<QVector<double> > dataExpandToDouble(const QList<QList<QVariant> >& data, QStringList* columnsNames) {
+    QList<QVector<double> > res;
+    QList<QList<QVariant> > in=data;
+    dataExpand(in, columnsNames);
+    for (int i=0; i<in.size(); i++) {
+        res<<QVector<double>();
+        for (int j=0; j<in[i].size(); j++) {
+            bool ok=false;
+            double d=in[i].at(j).toDouble(&ok);
+            if (ok) {
+                res.last()<<d;
+            } else {
+                res.last()<<NAN;
+            }
+        }
+    }
+    return res;
+}
+
+
+QList<QVector<double> > dataToDouble(const QList<QList<QVariant> >& data, QStringList* columnsNames) {
+    QList<QVector<double> > res;
+    QList<QList<QVariant> > in=data;
+    for (int i=0; i<in.size(); i++) {
+        res<<QVector<double>();
+        for (int j=0; j<in[i].size(); j++) {
+            bool ok=false;
+            double d=in[i].at(j).toDouble(&ok);
+            if (ok) {
+                res.last()<<d;
+            } else {
+                res.last()<<NAN;
+            }
+        }
+    }
+    return res;
+}
+
+
+void QFDataExportHandler::DataWriter::save(const QList<QVector<double> > &data, const QString &filename, const QStringList &columnHeaders, const QStringList &rowHeaders)
+{
+    save(dataToVariant(data), filename, columnHeaders, rowHeaders);
+}
+
+void QFDataExportHandler::DataWriter::save(const QList<QList<QVariant> > &data, const QString &filename, const QStringList &columnHeaders, const QStringList &rowHeaders)
+{
+    save(dataExpandToDouble(data), filename, columnHeaders, rowHeaders);
 }

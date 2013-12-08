@@ -1,0 +1,86 @@
+==========================================================
+xlslib - utility to create .xls files
+==========================================================
+
+$Id: README,v 1.3 2008/10/25 18:48:48 dhoerl Exp $
+
+== HOME ==
+The home for smartmontools is located at:
+    
+    http://xlslib.sourceforge.net/
+
+Please see this web site for updates, documentation, and for submitting
+patches and bug reports.
+
+Until we get the documentation sorted out, this archive contains
+"xlslibRefGuide.pdf", a PHP guide that can be used as well for the 
+C/C++ version.
+
+== COPYING ==
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * This file is part of xlslib -- A multiplatform, C/C++ library
+ * for dynamic generation of Excel(TM) files.
+ *
+ * Copyright 2004-6 Ruben D. Gonzále. All Rights Reserved.
+ * Copyright 2008-2011 David Hoerl All Rights Reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are
+ * permitted provided that the following conditions are met:
+ * 
+ *    1. Redistributions of source code must retain the above copyright notice, this list of
+ *       conditions and the following disclaimer.
+ * 
+ *    2. Redistributions in binary form must reproduce the above copyright notice, this list
+ *       of conditions and the following disclaimer in the documentation and/or other materials
+ *       provided with the distribution.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY David Hoerl ''AS IS'' AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL David Hoerl OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+== CREDITS ==
+This code was originally developed at Yeico S.A. de C.V. by
+Ruben D. Gonzalez and others. 0.2.5 and later developed by David Hoerl
+and Ger Hobbelt.
+
+
+== OVERVIEW ==
+xlslib permits programmatic creation of multi-sheet .xls files, which
+are then directly openable by MS Excel. This capability is useful when
+you need to save large data sets, perhaps with summary information, in
+a form that is easily viewable by others. The .xls format is as of
+Release 1.2 BIFF8. This format is documented in both the "Microsoft Excel97 
+Developer's Kit" [currently out of print but used copies can be obtained 
+on Amazon], and the OpenOffice.org's "Microsoft Excel File Format".
+
+== CONTENTS ==
+The suite contains the xlslib library, and a test application (easily
+modifiable) that demonstrates various modes of creating spreadsheets.
+
+There are three types of documentation: the source manual Manual.xls, 
+which can be printed or just used for referece. Secondlu a pdf version
+of this name xlslibRefGuide.pdf. Finally, refer to the main.cpp file in
+the targets/test folder to see how to use the library. If you want to 
+use this with a C app, then link in the library and include xlslib/xlslib.h.
+
+The C interfaces are documented in that file. Essentially you create a worksheet,
+then use that object as the first parameter of subsequent calls. When done, you
+would then call the delete function. An example file is included in the test
+folder: main.c There is also a test file that uses the "C" interface.
+
+== NOTES ==
+With the conversion to BIFF8 in Release 1.2, addition formatting capabilies become
+available. Unfortunately, these are not listed in the existing pdf document
+so to find them you will need to look at the xlslib.h header file.
+
+Important: the latest configure script does not seem to run using the Bash shell.
+If it appears to hang, then I suggest you run it with ksh (ie, "ksh ./configure").
+This noticed on Apple's 10.6.1 (Snow Leopard).

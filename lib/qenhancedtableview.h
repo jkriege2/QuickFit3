@@ -27,6 +27,8 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         QAction* getActCopyExcelNoHead() const;
         QAction* getActCopyMatlab() const;
         QAction* getActPrint() const;
+        QAction* getActSave() const;
+        QAction* getActSaveExtended() const;
 
         void addActionsToToolbar(QToolBar* tb) const;
         void addActionsToMenu(QMenu* m) const;
@@ -42,6 +44,10 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         void keyPressed(int key, Qt::KeyboardModifiers modifiers, QString text);
     public slots:
         void print();
+        void save(int copyrole=Qt::EditRole, bool flipped=false, bool storeHead=true);
+        void saveExtended(int copyrole=Qt::EditRole, bool flipped=false, bool storeHead=true);
+        void saveFlipped(int copyrole=Qt::EditRole);
+        void saveExtendedFlipped(int copyrole=Qt::EditRole);
         void copyAsImage();
         void copySelectionToExcel(int copyrole=Qt::EditRole, bool storeHead=true, bool flipped=false);
         void copySelectionToExcelNoHead(int copyrole=Qt::EditRole);
@@ -66,6 +72,11 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         QAction* actCopyMatlab;
         QAction* actPrint;
         QAction* actCopyImage;
+        QAction* actSave;
+        QAction* actSaveExtended;
+        QAction* actSaveFlipped;
+        QAction* actSaveExtendedFlipped;
+        QMenu* menuSave;
 };
 
 #endif // QENHANCEDTABLEVIEW_H

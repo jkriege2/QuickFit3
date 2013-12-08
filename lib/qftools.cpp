@@ -363,7 +363,7 @@ QVector<double> boolvectorToNumVec(const QVector<bool>& value, double trueValue,
 QString CDoubleToQString(double value) {
     QLocale loc=QLocale::c();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
-    return loc.toString(value, 'g', 10);
+    return loc.toString(value, 'g', 18);
 }
 
 QString CDoubleListToQString(const QList<double> values, const QString& separator) {
