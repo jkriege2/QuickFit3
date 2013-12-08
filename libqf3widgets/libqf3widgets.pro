@@ -130,7 +130,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/highrestimer.h \
     ../../../../LIB/trunk/ticktock.h \
     ../../../../LIB/trunk/qt/qfvisualize3dglwidget.h \
-    ../../../../LIB/trunk/qt/qfvisualize3dgleditor.h
+    ../../../../LIB/trunk/qt/qfvisualize3dgleditor.h \
+    qconfigcomboboxwidget.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -222,7 +223,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     ../../../../LIB/trunk/qt/qfluteditor.cpp \
     ../../../../LIB/trunk/highrestimer.cpp \
     ../../../../LIB/trunk/qt/qfvisualize3dglwidget.cpp \
-    ../../../../LIB/trunk/qt/qfvisualize3dgleditor.cpp
+    ../../../../LIB/trunk/qt/qfvisualize3dgleditor.cpp \
+    qconfigcomboboxwidget.cpp
 
 
 FORMS += qfdlg_csvparameters.ui \
