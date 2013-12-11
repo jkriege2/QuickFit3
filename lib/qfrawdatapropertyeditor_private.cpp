@@ -422,18 +422,21 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     actCorrelation=new QAction(QIcon(":/lib/result_correlation.png"), tr("Result correlation"), d);
     tbResults->addAction(actCorrelation);
 
+    QMenu* menuCopyExpanded=new QMenu(tr("Copy selection in expanded form"), tvResults);
+    menuCopyExpanded->setIcon(QIcon(":/lib/copy16.png"));
+    tvResults->addAction(menuCopyExpanded->menuAction());
     actCopyExpanded=new QAction( tr("Copy Selection in expanded form"), d);
-    tvResults->addAction(actCopyExpanded);;
+    menuCopyExpanded->addAction(actCopyExpanded);;
     actCopyExpandedFlipped=new QAction( tr("Copy Selection in expanded form, flipped"), d);
-    tvResults->addAction(actCopyExpandedFlipped);;
+    menuCopyExpanded->addAction(actCopyExpandedFlipped);;
     actCopyExpandedNoHead=new QAction( tr("Copy Selection in expanded form, w/o header"), d);
-    tvResults->addAction(actCopyExpandedNoHead);;
+    menuCopyExpanded->addAction(actCopyExpandedNoHead);;
     actCopyExpandedNoHeadFlipped=new QAction( tr("Copy Selection in expanded form, w/o header, flipped"), d);
-    tvResults->addAction(actCopyExpandedNoHeadFlipped);;
+    menuCopyExpanded->addAction(actCopyExpandedNoHeadFlipped);;
     actCopyExpandedNoHeadMatlab=new QAction( tr("Copy Selection in expanded form, to Matlab"), d);
-    tvResults->addAction(actCopyExpandedNoHeadMatlab);;
+    menuCopyExpanded->addAction(actCopyExpandedNoHeadMatlab);;
     actCopyExpandedNoHeadMatlabFlipped=new QAction( tr("Copy Selection in expanded form, to Matlab, flipped"), d);
-    tvResults->addAction(actCopyExpandedNoHeadMatlabFlipped);;
+    menuCopyExpanded->addAction(actCopyExpandedNoHeadMatlabFlipped);;
 
     tbResults->addSeparator();
     actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete selected records"), d);

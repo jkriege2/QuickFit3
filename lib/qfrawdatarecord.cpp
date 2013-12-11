@@ -3644,6 +3644,7 @@ bool QFRawDataRecord::resultsSaveToSYLK(const QString& filename, bool vectorsToA
 }
 
 
+
 bool QFRawDataRecord_StringPairCaseInsensitiveCompare(const QPair<QString, QString> &s1, const QPair<QString, QString> &s2) {
     return s1.first.toLower() < s2.first.toLower();
 }

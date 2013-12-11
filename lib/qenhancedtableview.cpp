@@ -625,7 +625,11 @@ void QEnhancedTableView::addActionsToToolbar(QToolBar *tb) const
     tb->addAction(actCopyExcelNoHead);
     tb->addAction(actCopyMatlab);
     tb->addSeparator();
+    tb->addAction(actCopyImage);
     tb->addAction(actPrint);
+    tb->addAction(menuSave->menuAction());
+
+
 }
 
 void QEnhancedTableView::addActionsToMenu(QMenu *tb) const
@@ -634,7 +638,9 @@ void QEnhancedTableView::addActionsToMenu(QMenu *tb) const
     tb->addAction(actCopyExcelNoHead);
     tb->addAction(actCopyMatlab);
     tb->addSeparator();
+    tb->addAction(actCopyImage);
     tb->addAction(actPrint);
+    tb->addAction(menuSave->menuAction());
 }
 
 
@@ -654,37 +660,6 @@ void QEnhancedTableView::changeHTMLFontSize(QTextDocument *txt, double fontSize)
 {
     txt->setHtml(toHtml(1, false, round(fontSize)));
 }
-
-/*void QEnhancedTableView::print()
-{
-    QTextDocument txt;
-    txt.setHtml(toHtml());
-    QPrinter* p=new QPrinter();
-    p->setPrinterName(ProgramOptions::getConfigValue("QEnhancedTableView/lastPrinter", p->printerName()).toString());
-
-    QPrintDialog *dialog = new QPrintDialog(p, NULL);
-    dialog->setWindowTitle(tr("Print Table"));
-    if (dialog->exec() != QDialog::Accepted) {
-        delete p;
-        return;
-    }
-    ProgramOptions::setConfigValue("QEnhancedTableView/lastPrinter", p->printerName());
-
-    p->setPageMargins(10,10,10,10,QPrinter::Millimeter);
-
-
-    QFTextDocumentPrintPreview* dlg=new QFTextDocumentPrintPreview(p, &txt, this, true);
-    connect(dlg, SIGNAL(setDocumentFontSize(QTextDocument*,double)), this, SLOT(changeHTMLFontSize(QTextDocument*,double)));
-    dlg->setWindowTitle(tr("Print Table: Preview"));
-    if (dlg->exec()) {
-        dlg->print();
-    }
-    delete dlg;
-    delete p;
-}
-*/
-
-
 
 
 
