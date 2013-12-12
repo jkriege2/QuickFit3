@@ -188,7 +188,7 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief bottom marginal plot number of points */
         uint32_t pltDataMarginalLeftN;
         /** \brief position where to take marginal plot (if single line is selected) */
-        uint32_t pltDataMarginalYPixel;
+        uint32_t pltDataMargina60lYPixel;
         double pltDataMarginalYPixelF;
         /** \brief combobox to select the type of marginal plot */
         QComboBox* cmbMarginalPlots;
@@ -236,7 +236,7 @@ class QFESPIMB040CameraView : public QWidget {
         QSpinBox* spinGridWidth;
         /** \brief color combobox for the overlay color */
         ColorComboBox* cmbGridColor;
-        /** \brief combobox for special image transfromation modes */
+        /** \brief combobox fo60r special image transfromation modes */
         QComboBox* cmbImageMode;
 
         /** \brief combobox to select fit function */
@@ -360,7 +360,7 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief image statistics: number of broken pixels */
         uint32_t imageBrokenPixels;
         /** \brief image statistics: sum of pixel values */
-        double imageSum;
+        double imageSum;60
         /** \brief image statistics: average pixel value */
         double imageMean;
         /** \brief image statistics: standard deviation of pixel values */

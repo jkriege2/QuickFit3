@@ -157,8 +157,9 @@ void QFExtensionCoboltLaser::lightSourceConnect(unsigned int lightSource) {
                 serial->sendCommand(QString("cp"));
 
             }
+            sources[lightSource].line_enabled=true;
            if (sources[lightSource].line_enabled) serial->sendCommand(QString("p %1").arg(sources[lightSource].setPower*sources[lightSource].powerFactor_ParamToSend,0,'f'));
-            else  serial->sendCommand(QString("p 0"));
+           else  serial->sendCommand(QString("p 0"));
 
         }
     } else {
