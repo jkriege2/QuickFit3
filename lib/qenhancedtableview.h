@@ -18,7 +18,7 @@
 class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         Q_OBJECT
     public:
-        QEnhancedTableView(QWidget* parent=NULL);
+        QEnhancedTableView(QWidget* parent=NULL, bool noCopyShortcut=false);
         virtual ~QEnhancedTableView();
 
         /** \brief return the contents of the table view as HTML fragment */
@@ -77,6 +77,7 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         QAction* actSaveFlipped;
         QAction* actSaveExtendedFlipped;
         QMenu* menuSave;
+        bool noCopyShortcut;
 };
 
 #endif // QENHANCEDTABLEVIEW_H

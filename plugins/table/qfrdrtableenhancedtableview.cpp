@@ -1,9 +1,11 @@
 #include "qfrdrtableenhancedtableview.h"
 
 QFRDRTableEnhancedTableView::QFRDRTableEnhancedTableView(QWidget *parent):
-    QEnhancedTableView(parent)
+    QEnhancedTableView(parent, false)
 {
     QFRDRTableDelegate* del=new QFRDRTableDelegate(this);
+
+    //getActCopyExcelNoHead()->setShortcut(QKeySequence::UnknownKey);
 
     setItemDelegate(del);
     connect(del, SIGNAL(closeEditorEnhanced(QWidget*,QFRDRTableDelegate::SpecialEndEditHint)), this, SLOT(closeEditorEnhanced(QWidget*,QFRDRTableDelegate::SpecialEndEditHint)));
@@ -76,5 +78,19 @@ void QFRDRTableEnhancedTableView::closeEditorEnhanced(QWidget *editor, QFRDRTabl
 
     if (callBaseClass) {
         QEnhancedTableView::closeEditor(editor, QAbstractItemDelegate::EditNextItem);
+    }
+}
+
+void QFRDRTableEnhancedTableView::keyPressEvent(QKeyEvent *event)
+{
+    qDebug()<<event->key()<<event->modifiers();
+    if (event->matches(QKeySequence::Copy)) {
+        qDebug()<<"COPY";
+        emit copyPressed();
+    } else if (event->matches(QKeySequence::Delete)) {
+        qDebug()<<"DELETE";
+        emit delPressed();
+    } else {
+        QEnhancedTableView::keyPressEvent(event);
     }
 }

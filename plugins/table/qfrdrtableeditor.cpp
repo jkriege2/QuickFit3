@@ -82,6 +82,8 @@ void QFRDRTableEditor::createWidgets() {
     tvMain=new QFRDRTableEnhancedTableView(this);
     connect(tvMain, SIGNAL(editExpression(QModelIndex)), this, SLOT(editExpression(QModelIndex)));
     connect(tvMain, SIGNAL(keyPressed(int,Qt::KeyboardModifiers,QString)), this, SLOT(tableKeyPressed(int,Qt::KeyboardModifiers,QString)));
+    connect(tvMain, SIGNAL(delPressed()), this, SLOT(slDelete()));
+    connect(tvMain, SIGNAL(copyPressed()), this, SLOT(slCopy()));
 
     tbMain=new QToolBar("tbtablemain", this);
     l->addWidget(tbMain);

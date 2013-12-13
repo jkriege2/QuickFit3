@@ -18,9 +18,13 @@ class QFRDRTableEnhancedTableView : public QEnhancedTableView {
 
     signals:
         void editExpression(const QModelIndex& index);
-
+        void copyPressed();
+        void delPressed();
     protected slots:
         virtual void closeEditorEnhanced(QWidget* editor, QFRDRTableDelegate::SpecialEndEditHint hint);
+
+    protected:
+        virtual void keyPressEvent(QKeyEvent* event);
 };
 
 #endif // QFRDRTABLEENHANCEDTABLEVIEW_H

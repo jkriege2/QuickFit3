@@ -22,17 +22,20 @@
 #include <QSvgGenerator>
 #include "datatools.h"
 
-QEnhancedTableView::QEnhancedTableView(QWidget* parent):
+QEnhancedTableView::QEnhancedTableView(QWidget* parent, bool noCopyShortcut):
     QTableView(parent)
 {
     setContextMenuPolicy(Qt::ActionsContextMenu);
     QAction* act;
+    this->noCopyShortcut=noCopyShortcut;
+
+    //qDebug()<<noCopyShortcut;
 
     actCopyExcel=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to Clipboard (for Excel ...)"), this);
     connect(actCopyExcel, SIGNAL(triggered()), this, SLOT(copySelectionToExcel()));
     addAction(actCopyExcel);
     actCopyExcelNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy Selection to clipboard (for Excel ...) without header row/column"), this);
-    actCopyExcelNoHead->setShortcut(QKeySequence::Copy);
+    if (!noCopyShortcut) actCopyExcelNoHead->setShortcut(QKeySequence::Copy);
     connect(actCopyExcelNoHead, SIGNAL(triggered()), this, SLOT(copySelectionToExcelNoHead()));
     addAction(actCopyExcelNoHead);
     actCopyMatlab=new QAction(QIcon(":/lib/copy16_matlab.png"), tr("Copy Selection to clipboard (Matlab)"), this);
@@ -646,7 +649,7 @@ void QEnhancedTableView::addActionsToMenu(QMenu *tb) const
 
 
 void QEnhancedTableView::keyPressEvent(QKeyEvent* event) {
-    if (event->matches(QKeySequence::Copy)) {
+    if (!noCopyShortcut && event->matches(QKeySequence::Copy)) {
         copySelectionToExcel(Qt::EditRole, false);
         event->accept();
     } else if (event->matches(QKeySequence::Print)) {
