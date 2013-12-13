@@ -103,5 +103,6 @@
         <file alias="script_unindent.png">icons/script_format-indent-less.png</file>
         <file alias="script_indent.png">icons/script_format-indent-more.png</file>
         <file alias="savemulti.png">icons/savemulti.png</file>
+        <file alias="savemultiseries.png">icons/savemultiseries.png</file>
     </qresource>
 </RCC>

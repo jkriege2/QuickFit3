@@ -32,7 +32,8 @@
 #include "qfrecentfilesmenu.h"
 #include "qftools.h"
 #include "qfmanyfilessettings.h"
-
+#include "qfespimb040acquisitiontools.h"
+#include "libtiff_tools.h"
 class QFESPIMB040OpticsSetupBase; // forward
 
 
@@ -137,7 +138,6 @@ class QFESPIMB040CameraView : public QWidget {
         QTabWidget* tabResults;
 
         QFESPIMB040OpticsSetupBase* opticsSetup;
-
         QFCameraConfigComboBoxStartResume* m_stopresume;
         int cameraID;
         QMap<QString, QVariant> imageParameters;
@@ -188,7 +188,7 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief bottom marginal plot number of points */
         uint32_t pltDataMarginalLeftN;
         /** \brief position where to take marginal plot (if single line is selected) */
-        uint32_t pltDataMargina60lYPixel;
+        uint32_t pltDataMarginalYPixel;
         double pltDataMarginalYPixelF;
         /** \brief combobox to select the type of marginal plot */
         QComboBox* cmbMarginalPlots;
@@ -300,6 +300,9 @@ class QFESPIMB040CameraView : public QWidget {
         QAction* actSaveRaw;
         /** \brief action to save the current raw image */
         QAction* actSaveMulti;
+        /** \brief action to save a series of image */
+        QAction* actSaveMultiSeries;
+        QSpinBox* spinSaveSeriesFrames;
         /** \brief action to save the current transformed image */
         QAction* actSaveTransformed;
         /** \brief action to activate/disactivate mask editing mode */
@@ -360,7 +363,7 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief image statistics: number of broken pixels */
         uint32_t imageBrokenPixels;
         /** \brief image statistics: sum of pixel values */
-        double imageSum;60
+        double imageSum;
         /** \brief image statistics: average pixel value */
         double imageMean;
         /** \brief image statistics: standard deviation of pixel values */
@@ -453,6 +456,7 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief save the current raw image (rawImage) */
         void saveRaw();
         void saveMulti();
+        void saveMultiSeries();
         /** \brief save the current transformed image (image) */
         void saveTransformedImage();
         void histogramMask();

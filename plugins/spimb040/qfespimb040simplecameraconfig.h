@@ -34,6 +34,7 @@
 #include "qfcameraconfigcombobox.h"
 #include "qfextensionmeasurementdevice.h"
 #include "qfmanyfilessettings.h"
+#include "qfespimb040acquisitiontools.h"
 
 class QFESPIMB040OpticsSetupBase; // forward
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) QGropBox with a set of controls that allow to control a camera
@@ -210,6 +211,7 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
         QAction* actPreviewSingle;
         /** \brief action to configure preview */
         QAction* actPreviewConfig;
+
 
 
         bool restartPreview;

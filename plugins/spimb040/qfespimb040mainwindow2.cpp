@@ -162,6 +162,7 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
     // optics setup tab
     ////////////////////////////////////////////////////////////////////////////////////////////////
     optSetup=new QFESPIMB040OpticsSetup(this, this, this, m_pluginServices);
+    optSetup->setAcquisitionTools(this);
     tabMain->addTab(optSetup, tr("Instrument Setup"));
     topl->insertWidget(0, optSetup->takeLightpathWidget());
 
@@ -237,6 +238,7 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
         // optics setup tab
         ////////////////////////////////////////////////////////////////////////////////////////////////
         optSetup2=new QFESPIMB040OpticsSetup2(this, this, this, m_pluginServices);
+        optSetup2->setAcquisitionTools(this);
         QString optSetupFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup").toString();
         QString optSetupGlobalConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename_readonly", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();
         QString optSetupUserConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename", m_pluginServices->getConfigFileDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();

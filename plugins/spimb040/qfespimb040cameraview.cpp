@@ -171,6 +171,11 @@ void QFESPIMB040CameraView::createMainWidgets() {
     //vbl->addWidget(splitHor);
     vbl->addWidget(splitVert);
 
+    spinSaveSeriesFrames=new QSpinBox(this);
+    spinSaveSeriesFrames->setRange(1,1000);
+    spinSaveSeriesFrames->setValue(5);
+
+
     QWidget* wPltMain=new QWidget(this);
     vbl=new QVBoxLayout(wPltMain);
     vbl->setContentsMargins(0,0,0,0);
@@ -534,6 +539,9 @@ void QFESPIMB040CameraView::createActions() {
     connect(actSaveTransformed, SIGNAL(triggered()), this, SLOT(saveTransformedImage()));
     actSaveMulti = new QAction(QIcon(":/spimb040/savemulti.png"), tr("Save &raw image as ..."), this);
     connect(actSaveMulti, SIGNAL(triggered()), this, SLOT(saveMulti()));
+    actSaveMultiSeries = new QAction(QIcon(":/spimb040/savemultiseries.png"), tr("Save &raw image series as ..."), this);
+    connect(actSaveMultiSeries, SIGNAL(triggered()), this, SLOT(saveMultiSeries()));
+
 
     actMaskClear = new QAction(QIcon(":/spimb040/maskclear.png"), tr("&Clear mask (broken pixels)"), this);
     connect(actMaskClear, SIGNAL(triggered()), this, SLOT(clearMask()));
@@ -577,6 +585,11 @@ void QFESPIMB040CameraView::createActions() {
     toolbar->addAction(actSaveData);
     toolbar->addAction(actSaveTransformed);
     toolbar->addAction(actSaveMulti);
+    toolbar->addSeparator();
+    toolbar->addWidget(new QLabel("<b>series:</b>  #="));
+    toolbar->addWidget(spinSaveSeriesFrames);
+    toolbar->addAction(actSaveMultiSeries);
+
     toolbar->addSeparator();
     toolbar->addAction(actSaveReport);
     toolbar->addAction(actPrintReport);
@@ -639,6 +652,7 @@ void QFESPIMB040CameraView::loadSettings(QSettings& settings, QString prefix) {
 
     chkGrid->setChecked(settings.value(prefix+"grid", false).toBool());
     spinGridWidth->setValue(settings.value(prefix+"grid_width", 32).toInt());
+    spinSaveSeriesFrames->setValue(settings.value(prefix+"saver_series_frames", 5).toInt());
     cmbGridColor->setCurrentIndex(settings.value(prefix+"grid_color", 15).toInt());
     cmbImageMode->setCurrentIndex(settings.value(prefix+"image_mode", 0).toInt());
 
@@ -695,6 +709,8 @@ void QFESPIMB040CameraView::loadSettings(QFManyFilesSettings &settings, QString 
 
      chkGrid->setChecked(settings.value(prefix+"grid", false).toBool());
      spinGridWidth->setValue(settings.value(prefix+"grid_width", 32).toInt());
+     spinSaveSeriesFrames->setValue(settings.value(prefix+"saver_series_frames", 5).toInt());
+
      cmbGridColor->setCurrentIndex(settings.value(prefix+"grid_color", 15).toInt());
      cmbImageMode->setCurrentIndex(settings.value(prefix+"image_mode", 0).toInt());
 
@@ -736,6 +752,7 @@ void QFESPIMB040CameraView::storeSettings(QSettings& settings, QString prefix) {
 
     settings.setValue(prefix+"grid", chkGrid->isChecked());
     settings.setValue(prefix+"grid_width", spinGridWidth->value());
+    settings.setValue(prefix+"saver_series_frames", spinSaveSeriesFrames->value());
     settings.setValue(prefix+"grid_color", cmbGridColor->currentIndex());
     settings.setValue(prefix+"image_mode", cmbImageMode->currentIndex());
 
@@ -778,6 +795,7 @@ void QFESPIMB040CameraView::storeSettings(QFManyFilesSettings &settings, QString
 
     settings.setValue(prefix+"grid", chkGrid->isChecked());
     settings.setValue(prefix+"grid_width", spinGridWidth->value());
+    settings.setValue(prefix+"saver_series_frames", spinSaveSeriesFrames->value());
     settings.setValue(prefix+"grid_color", cmbGridColor->currentIndex());
     settings.setValue(prefix+"image_mode", cmbImageMode->currentIndex());
 
@@ -1698,6 +1716,98 @@ void QFESPIMB040CameraView::saveMulti() {
 
     if (m_stopresume) m_stopresume->resume();
 }
+
+void QFESPIMB040CameraView::saveMultiSeries()
+{
+    if (m_stopresume) m_stopresume->stop();
+    //saveJKImage(rawImage, tr("Save Raw Image ..."));
+
+    JKImage<uint32_t> rawImage;
+    QFExtensionCamera* camExt=opticsSetup->cameraComboBox(cameraID)->currentExtensionCamera();
+    int camID=opticsSetup->cameraComboBox(cameraID)->currentCameraID();
+    int w=camExt->getCameraImageWidth(camID);
+    int h=camExt->getImageCameraHeight(camID);
+    int frames=spinSaveSeriesFrames->value();
+    QFESPIMB040AcquisitionTools* acqTools=opticsSetup->getAcquisitionTools();
+    rawImage.resize(w, h);
+
+
+    QString fileName = qfGetSaveFileName(this, tr("Save current image ..."),
+                            lastImagepath,
+                            "TIFF (*.tif)");
+
+    if (fileName.isEmpty()) {
+        if (m_stopresume) m_stopresume->resume();
+        return;
+    }
+    QFile file(fileName);
+    if (!file.open(QFile::WriteOnly | QFile::Text)) {
+        QMessageBox::warning(this, tr("QuickFit SPIM Control: Save current image ..."),
+                          tr("Cannot write file '%1':\nreason: %2.")
+                          .arg(fileName)
+                          .arg(file.errorString()));
+        if (m_stopresume) m_stopresume->resume();
+        return;
+    }
+    file.close();
+    file.remove();
+    lastImagepath=QFileInfo(fileName).absolutePath();
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+
+    QProgressDialog progress(tr("Acquiring image series ..."), tr("&Cancel"), 0, frames, this);
+
+    QFileInfo fi(fileName);
+    QString fn=fi.absolutePath()+"/"+fi.completeBaseName();
+    TIFF* tiff1=TIFFOpen(QString(fn+".tif").toAscii().data(), "w");
+    TIFF* tiff2=TIFFOpen(QString(fn+"_uint32.tif").toAscii().data(), "w");
+    TIFF* tiff3=TIFFOpen(QString(fn+"_float.tif").toAscii().data(), "w");
+    uint64_t timestamp=0;
+    QMap<QString, QVariant> camConfig;
+    QList<double> times;
+    QElapsedTimer timer;
+    timer.start();
+    if (tiff1&&tiff2&&tiff3) {
+        for (int i=0; i<frames; i++) {
+            if (camExt->acquireOnCamera(camID, rawImage.data(), &timestamp, &camConfig)) {
+                times.append(double(timer.elapsed())/1000.0);
+                TIFFTWriteUint16from32(tiff1, rawImage.data(), w, h, false);
+                TIFFWriteDirectory(tiff1);
+                TIFFTWriteUint32(tiff2, rawImage.data(), w, h);
+                TIFFWriteDirectory(tiff2);
+                TIFFTWriteFloatfrom32(tiff3, rawImage.data(), w, h);
+                TIFFWriteDirectory(tiff3);
+            }
+            if (progress.wasCanceled()) break;
+            progress.setValue(i);
+            QApplication::processEvents();
+        }
+    }
+    QFile f(QString(fn+"_timepoints.dat"));
+    if (f.open(QFile::WriteOnly|QFile::Text)) {
+        QTextStream str(&f);
+        for (int i=0; i<times.size(); i++) {
+            str<<CDoubleToQString(times[i])<<"\n";
+        }
+        f.close();
+    }
+
+
+    QSettings setting(QString(fn+".configuration.ini"), QSettings::IniFormat);
+    storeCameraConfig(setting);
+    QString acquisitionDescriptionPrefix="acquisition/";
+    if (camConfig.size()>0) {
+        QMapIterator<QString, QVariant> it(camConfig);
+        while (it.hasNext()) {
+            it.next();
+            setting.setValue(acquisitionDescriptionPrefix+it.key(), it.value());
+        }
+    }
+
+
+    if (m_stopresume) m_stopresume->resume();
+}
+
 void QFESPIMB040CameraView::storeCameraConfig(QSettings& setting) {
     QFExtensionCamera* cam=NULL;
     int camID=-1;

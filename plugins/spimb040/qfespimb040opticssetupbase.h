@@ -15,6 +15,8 @@
 #include "qfcameraconfigcombobox.h"
 #include "qfcameracombobox.h"
 
+class QFESPIMB040AcquisitionTools;//forward
+
 typedef QList<QTriple<QIcon, QString, QString> > QFESPIMB040OpticsSetupItems;
 
 class QFESPIMB040OpticsSetupBase: public QWidget {
@@ -22,6 +24,9 @@ class QFESPIMB040OpticsSetupBase: public QWidget {
     public:
         QFESPIMB040OpticsSetupBase(QWidget* parent=NULL);
         virtual ~QFESPIMB040OpticsSetupBase();
+
+        void setAcquisitionTools(QFESPIMB040AcquisitionTools* acqTools);
+        QFESPIMB040AcquisitionTools* getAcquisitionTools() const;
 
 
         enum Shutters  {
@@ -256,6 +261,9 @@ class QFESPIMB040OpticsSetupBase: public QWidget {
         virtual void userChangedLightpath(QString filename)=0;
         virtual void unlockLighpathCombobox()=0;
         virtual void lockLighpathCombobox()=0;
+
+    protected:
+        QFESPIMB040AcquisitionTools* acqTools;
 
 };
 
