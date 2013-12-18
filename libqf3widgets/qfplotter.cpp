@@ -1,6 +1,24 @@
 #include "qfplotter.h"
 #include "qfplotterprivate.h"
 #include "programoptions.h"
+#include "datatools.h"
+
+
+class DataToolsJKQTPSaveDataAdapter: public JKQtBasePlotter::JKQTPSaveDataAdapter {
+    public:
+        DataToolsJKQTPSaveDataAdapter(int format) {
+            this->format=format;
+        }
+
+        virtual QString getFilter() const {
+            return QFDataExportHandler::getFormats().value(format);
+        }
+        virtual void saveJKQTPData(const QString& filename, const QList<QVector<double> >& data, const QStringList& columnNames) const {
+            QFDataExportHandler::save(data, format, filename, columnNames);
+        }
+    protected:
+        int format;
+};
 
 QFPlotter::QFPlotter(QWidget *parent) :
     JKQtPlotter(parent)
@@ -33,6 +51,13 @@ void QFPlotter::initQFPlotter()
     toolbar->addSeparator();
     populateToolbar(toolbar);
 
+    QStringList formats=QFDataExportHandler::getFormats();
+    for (int i=0; i<formats.size(); i++) {
+        DataToolsJKQTPSaveDataAdapter* a=new DataToolsJKQTPSaveDataAdapter(i);
+        if (!JKQtBasePlotter::registerSaveDataAdapter(a)) {
+            delete a;
+        }
+    }
 }
 
 void QFPlotter::modifyContextMenu(QMenu *menu)

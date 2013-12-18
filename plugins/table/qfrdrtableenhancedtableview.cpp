@@ -1,7 +1,7 @@
 #include "qfrdrtableenhancedtableview.h"
 
 QFRDRTableEnhancedTableView::QFRDRTableEnhancedTableView(QWidget *parent):
-    QEnhancedTableView(parent, false)
+    QEnhancedTableView(parent, true)
 {
     QFRDRTableDelegate* del=new QFRDRTableDelegate(this);
 
@@ -81,16 +81,23 @@ void QFRDRTableEnhancedTableView::closeEditorEnhanced(QWidget *editor, QFRDRTabl
     }
 }
 
-void QFRDRTableEnhancedTableView::keyPressEvent(QKeyEvent *event)
+
+
+bool QFRDRTableEnhancedTableView::event(QEvent *event)
 {
-    qDebug()<<event->key()<<event->modifiers();
-    if (event->matches(QKeySequence::Copy)) {
-        qDebug()<<"COPY";
-        emit copyPressed();
-    } else if (event->matches(QKeySequence::Delete)) {
-        qDebug()<<"DELETE";
-        emit delPressed();
-    } else {
-        QEnhancedTableView::keyPressEvent(event);
+    if (event->type()==QEvent::ShortcutOverride) {
+        QKeyEvent* keyev=dynamic_cast<QKeyEvent*>(event);
+        if (keyev && keyev->matches(QKeySequence::Copy)) {
+            //qDebug()<<"COPY";
+            emit copyPressed();
+            event->accept();
+            return true;
+        } else if (keyev && keyev->matches(QKeySequence::Delete)) {
+            //qDebug()<<"DELETE";
+            emit delPressed();
+            event->accept();
+            return true;
+        }
     }
+    return QEnhancedTableView::event(event);
 }

@@ -396,6 +396,7 @@ QStringList QFDataExportHandler::getFormats()  {
 }
 
 
+
 QList<QFDataExportHandler::DataWriter*> QFDataExportHandler::writers=QList<QFDataExportHandler::DataWriter*>();
 
 void QFDataExportHandler::registerDataWriter(QFDataExportHandler::DataWriter *writer)

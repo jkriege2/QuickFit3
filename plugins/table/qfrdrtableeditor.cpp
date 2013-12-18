@@ -175,7 +175,7 @@ void QFRDRTableEditor::createWidgets() {
 
     actDelete=new QAction(QIcon(":/table/cell_clear.png"), "delete contents", this);
     actDelete->setToolTip(tr("Delete contents from selected cells ..."));
-    //actDelete->setShortcut(QKeySequence::Delete);
+    actDelete->setShortcut(QKeySequence::Delete);
     connect(actDelete, SIGNAL(triggered()), this, SLOT(slDelete()));
     connect(this, SIGNAL(enableActions(bool)), actDelete, SLOT(setEnabled(bool)));
 

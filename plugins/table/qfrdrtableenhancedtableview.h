@@ -24,7 +24,7 @@ class QFRDRTableEnhancedTableView : public QEnhancedTableView {
         virtual void closeEditorEnhanced(QWidget* editor, QFRDRTableDelegate::SpecialEndEditHint hint);
 
     protected:
-        virtual void keyPressEvent(QKeyEvent* event);
+        virtual bool event(QEvent *event);
 };
 
 #endif // QFRDRTABLEENHANCEDTABLEVIEW_H
