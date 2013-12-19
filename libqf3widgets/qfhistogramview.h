@@ -149,6 +149,7 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         QString histLabel;
         QVBoxLayout* laySplitterTable;
         QGridLayout* layHist;
+        QCheckBox* chkKey;
 
         QAction* actPrintReport;
         QAction* actSaveReport;

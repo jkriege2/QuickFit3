@@ -60,6 +60,7 @@ void QFParameterCorrelationView::writeQFProperties(QFProperties *current, const 
     current->setQFProperty(prefix+QString("show_2dhist_%1_%2").arg(egroup).arg(param), cmb2DHistogram->currentIndex(), false, false);
     current->setQFProperty(prefix+QString("hist2dbins1_%1_%2").arg(egroup).arg(param), spin2DHistogramBins1->value(), false, false);
     current->setQFProperty(prefix+QString("hist2dbins2_%1_%2").arg(egroup).arg(param), spin2DHistogramBins2->value(), false, false);
+    current->setQFProperty(prefix+QString("showkeys_%1_%2").arg(egroup).arg(param), chkKey->isChecked(), false, false);
 
     current->setQFProperty(prefix+QString("symbol_%1_%2").arg(egroup).arg(param), cmbSymbol->currentIndex(), false, false);
     current->setQFProperty(prefix+QString("symbsize_%1_%2").arg(egroup).arg(param), spinSymbolSize->value(), false, false);
@@ -85,6 +86,7 @@ void QFParameterCorrelationView::readQFProperties(QFProperties *current, const Q
     cmb2DHistogram->setCurrentIndex(current->getProperty(prefix+QString("show_2dhist_%1_%2").arg(egroup).arg(param), 0).toInt());
     spin2DHistogramBins1->setValue(current->getProperty(prefix+QString("hist2dbins1_%1_%2").arg(egroup).arg(param), 30).toInt());
     spin2DHistogramBins2->setValue(current->getProperty(prefix+QString("hist2dbins2_%1_%2").arg(egroup).arg(param), 30).toInt());
+    chkKey->setChecked(current->getProperty(prefix+QString("showkeys_%1_%2").arg(egroup).arg(param), true).toBool());
 
 
 
@@ -125,6 +127,7 @@ void QFParameterCorrelationView::connectParameterWidgets(bool connectTo)
         connect(spin2DHistogramBins1, SIGNAL(valueChanged(int)), this, SLOT(dataSettingsChanged()));
         connect(spin2DHistogramBins2, SIGNAL(valueChanged(int)), this, SLOT(dataSettingsChanged()));
         connect(chkScatterPlot, SIGNAL(toggled(bool)), this, SLOT(dataSettingsChanged()));
+        connect(chkKey, SIGNAL(toggled(bool)), this, SLOT(dataSettingsChanged()));
         connect(cmb2DHistogram, SIGNAL(currentIndexChanged(int)), this, SLOT(dataSettingsChanged()));
 
     } else {
@@ -144,6 +147,7 @@ void QFParameterCorrelationView::connectParameterWidgets(bool connectTo)
         disconnect(spin2DHistogramBins1, SIGNAL(valueChanged(int)), this, SLOT(dataSettingsChanged()));
         disconnect(spin2DHistogramBins2, SIGNAL(valueChanged(int)), this, SLOT(dataSettingsChanged()));
         disconnect(chkScatterPlot, SIGNAL(toggled(bool)), this, SLOT(dataSettingsChanged()));
+        disconnect(chkKey, SIGNAL(toggled(bool)), this, SLOT(dataSettingsChanged()));
         disconnect(cmb2DHistogram, SIGNAL(currentIndexChanged(int)), this, SLOT(dataSettingsChanged()));
     }
 }
@@ -182,6 +186,9 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
     pltParamHistogramY->set_doDrawing(false);
     tvHistogramParameters->setModel(NULL);
     tabHistogramParameters->setReadonly(false);
+    pltParamCorrelation->get_plotter()->set_showKey(chkKey->isChecked());
+    pltParamHistogramX->get_plotter()->set_showKey(chkKey->isChecked());
+    pltParamHistogramY->get_plotter()->set_showKey(chkKey->isChecked());
 
     JKQTPdatastore* ds=pltParamCorrelation->getDatastore();
     if (which<0) {
@@ -264,6 +271,10 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 tabHistogramParameters->setCellCreate(col++, hh+1, statisticsCorrelationCoefficient(d1r, d2r, datasize)*100.0);
                 double linfitA=0, linfitB=1;
                 statisticsIterativelyReweightedLeastSquaresRegression(d1r, d2r, datasize, linfitA, linfitB);
+                double linfitrA=0, linfitrB=1;
+                statisticsLinearRegression(d1r, d2r, datasize, linfitrA, linfitrB);
+                tabHistogramParameters->setCellCreate(col++, hh+1, linfitrA);
+                tabHistogramParameters->setCellCreate(col++, hh+1, linfitrB);
                 tabHistogramParameters->setCellCreate(col++, hh+1, linfitA);
                 tabHistogramParameters->setCellCreate(col++, hh+1, linfitB);
 
@@ -436,17 +447,28 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 plteParamHistogramY->set_title("");
                 pltParamHistogramY->addGraph(plteParamHistogramY);
 
+
+                JKQTPxFunctionLineGraph *plteRLinFit=new JKQTPxFunctionLineGraph(pltParamCorrelation->get_plotter());
+                plteRLinFit->setSpecialFunction(JKQTPxFunctionLineGraph::Polynomial);
+                QVector<double> linfitParams;
+                linfitParams<<linfitrA<<linfitrB;
+                plteRLinFit->set_params(linfitParams);
+                plteRLinFit->set_color(scatterColor.darker());
+                plteRLinFit->set_lineWidth(1.5);
+                plteRLinFit->set_style(Qt::DotLine);
+                plteRLinFit->set_title(tr("regression: f(x)= %1 + %2 \\cdot x").arg(doubleToLatexQString(linfitA, 2)).arg(doubleToLatexQString(linfitB, 2)));
+                pltParamCorrelation->addGraph(plteRLinFit);
+
                 JKQTPxFunctionLineGraph *plteLinFit=new JKQTPxFunctionLineGraph(pltParamCorrelation->get_plotter());
                 plteLinFit->setSpecialFunction(JKQTPxFunctionLineGraph::Polynomial);
-                QVector<double> linfitParams;
+                linfitParams.clear();
                 linfitParams<<linfitA<<linfitB;
                 plteLinFit->set_params(linfitParams);
                 plteLinFit->set_color(scatterColor.darker());
                 plteLinFit->set_lineWidth(1.5);
                 plteLinFit->set_style(Qt::DashLine);
-                plteLinFit->set_title(tr("f(x)= %1 + %2 \\cdot x").arg(doubleToLatexQString(linfitA, 2)).arg(doubleToLatexQString(linfitB, 2)));
+                plteLinFit->set_title(tr("IRLS: f(x)= %1 + %2 \\cdot x").arg(doubleToLatexQString(linfitA, 2)).arg(doubleToLatexQString(linfitB, 2)));
                 pltParamCorrelation->addGraph(plteLinFit);
-
 
 
 
@@ -884,6 +906,10 @@ void QFParameterCorrelationView::createWidgets()
     connect(chkScatterPlot, SIGNAL(toggled(bool)), cmbSymbol, SLOT(setEnabled(bool)));
     connect(chkScatterPlot, SIGNAL(toggled(bool)), spinSymbolSize, SLOT(setEnabled(bool)));
 
+    chkKey=new QCheckBox(this);
+    chkKey->setChecked(true);
+    flHistSet->addRow(tr("<b>keys visible:</b>"), chkKey);
+
 
 
     spinHistogramBins1=new QSpinBox(this);
@@ -1002,6 +1028,8 @@ void QFParameterCorrelationView::createWidgets()
     //for (int r=0; r<8; r++) tabHistogramParameters->appendRow();
     int col=0;
     tabHistogramParameters->setCellCreate(col++, 0, tr("correlation r<sub>X,Y</sub> [%]"));
+    tabHistogramParameters->setCellCreate(col++, 0, tr("regression offset"));
+    tabHistogramParameters->setCellCreate(col++, 0, tr("regression factor"));
     tabHistogramParameters->setCellCreate(col++, 0, tr("IRLS regr. offset"));
     tabHistogramParameters->setCellCreate(col++, 0, tr("IRLS regr. factor"));
 

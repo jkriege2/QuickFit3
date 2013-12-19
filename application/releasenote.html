@@ -23,10 +23,77 @@
 
 <!--
 
+  
+
 -->
 <!--
-		<li><a name="2871"><b>2013-11-05 (SVN: 2871)</b>-->
+		<li><a name="2992"><b>2013-12-19 (SVN: 2992)</b>-->
+		<ul>
+		  <li><b>new plugins:</b><ul>
+			<li><b>plg_qfe_dataexportbasics</b>:  added this plugin with data export routines for Excel 97</li>
+		  </ul></li>
+		  <li><b>QuickFit</b><ul>
+		    <li>plotter widgets:<ul>
+				<li>bugfix for wrong scaling of print preview (and print)</li>
+				<li>changed default appearance of colobars (smaller + no outside-ticks and no minor ticks)</li>
+				<li>bugfix: top colorbar distance to plot is now smaller</li>
+				<li>also displays smallest and largest tick now</li>
+				<li>set property by RegExp may now also set/create named RDR properties</li>
+				<li>improved plotting by drawing linegraphs as a polygon, not a bunch of lines ... if possible ... </li>
+				<li>plotter now also uses the data storage plugins to save data</li>
+			</ul></li>
+		    <li>math parser:<ul>
+				<li>added functions mad() and nmad() ([nromalized] median absolute deviation about the media) </li>
+				<li>added function runningaverage() </li>
+			</ul></li>
+		    <li>bugfix: if a directory was deleted from a project, not all RDRs/evals in it were also deleted.</li>
+		    <li>correlation plot: added robust linear regression to the correlation plot tool</li>
+		    <li>correlation plot: added normal regression to the plot</li>
+		    <li>correlation plot: added checkbox to switch off the keys' visibility</li>
+		    <li>evaluationeditor: saving data from the table will now only save the selected cells, not always the whole table</li>
+		    <li>evaluationeditor, rawdataeditor: added context menu entries to copy expanded data to Excel and Matlab from results table. This allows to copy cells which contain a vector of numbers in expanded form, i.e. not as a single cell with text, but as a bunch of cells each containing one value of the vector.</li>
+		    <li>evaluationeditor: moved most parts of the implementation to a private class</li>
+		    <li>set RDR property by RegExp now supports saving configs under a given name </li>
+		    <li>table widgets: added save functions (expanded/not expanded, flipped/normal) to the context menu of the table widgets, supports all generally supported dataformats (including Excel97 using the new plg_qfe_dataexportbasics plugin)</li>
+			<li>histogram views: added checkbox to change the visibility of the key</li>
+		  </ul></li>	
+		  <li><b>FCCSFit</b><ul>
+		    <li>bugfix: could not select per-run-error</li>
+		  </ul></li>	
+		  <li><b>imFCCSFit</b><ul>
+		    <li>bugfix: could not select per-run-error</li>
+		    <li>bugfix: added spinbox to enter the displayed run</li>
+		  </ul></li>	
+		  <li><b>imFCS</b><ul>
+		    <li>bugfix: didn't save report PDF in imFCS RDR editor</li>
+		    <li>added correlation plot against correlation amplitude</li>
+		    <li>swapped axes in correlation plot</li>
+			<li>bugfix: corrected FCCS amplitude (dashed line in FCCS correlation function plot) now minds the masked pixels</li>
+		    <li>correlation plot: added robust linear regression to the correlation plot tool</li>
+		  </ul></li>	
+		  <li><b>table</b><ul>
+		    <li>bugfix: empty rows in the middle of table columns were not saved correctly</li>
+		    <li>added new plot type: parametrized scatter plot (symbol/line color and/or size can be read from additional columns)</li>
+		    <li>bugfix: Ctrl+C, Del shortcuts in table now finally work!</li>
+		  </ul></li>	
+		  <li><b>qfe_spectraviewer</b><ul>
+		    <li>added mKate2 data</li>
+		  </ul></li>	
+		  <li><b>B040SPIM</b><ul>
+		    <li>added buttons to acquire and make an image stack for the "next cell" (= 1. press "next" 2. press "acquire")</li>
+		    <li>optics setup saves additional light source properties (description, ...) to the acquisition description file.</li>
+		    <li>added save image series button to camera preview dialog</li>
+		  </ul></li>	
+		  <li><b>cobol_driver</b><ul>
+		    <li>supports Cobolt MLD now!</li>
+		    <li>device description now contains operating hours, serial number, ...</li>
+		    <li>measurement device interface supports several data items</li>
+		  </ul></li>	
+
+		</ul></li>
 		
+		
+		<li><a name="2871"><b>2013-11-05 (SVN: 2871)</b>
 		<ul>
 		  <li><b>new plugins:</b><ul>
 		    <li><b>fitfunctions_tifcs</b>: fit functions for imaging TIR-FCS (so far: 2D normal and anomalous diffusion + 2D diffusion+flow and FCCS models all with a pixel-detector)</li>
@@ -202,7 +269,7 @@
 			<li>added several templates</li>
 		  </ul></li>	
 
-		</ul>
+		</ul></li>
 
 		
 		<li><a name="2602"><b>2013-08-22 (SVN: 2602)</b>
@@ -323,7 +390,7 @@
 			<li>acquisition now also save preview background images</li>
 			<li>image stacks now save a background image before the stack</li>
 		  </ul></li>	
-		</ul>
+		</ul></li>
 		
 		<li><a name="2379"><b>2013-06-20 (SVN: 2379)</b>
 		<ul>
@@ -345,7 +412,7 @@
 		    <li>"calculate relative correlation amplitude" tool had a bug which lead to a crash and is fixed now.</li>
 		  </ul></li>	
 
-		</ul>
+		</ul></li>
 
 		<li><a name="2367"><b>2013-06-17 (SVN: 2367)</b>
 		<ul>
@@ -566,7 +633,7 @@
 		  <li><b>cam_testcamera:</b><ul>
 		    <li>added DualView modes and a fixed grid testpattern</li>
 		  </ul></li>
-		</ul>
+		</ul></li>
 		
 		
 		
@@ -688,7 +755,7 @@
 		    <li>now support larger number of frames to acquire</li>
 		    <li>now the isCameraConnected() method returns a valid result</li>
 		  </ul></li>
-		  </ul>  
+		  </ul>  </li>
 
 		  <li><a name="1880"><b>2012-11-08 (SVN: 1880)</b>
 		<ul>
@@ -705,7 +772,7 @@
 		  <li><b>fcsMsd:</b><ul>
 		    <li>bugfix: alpha/D display more robust now</li>
 		  </ul></li>
-		</ul>  
+		</ul>  </li>
 		  
 		<li><a name="1856"><b>2012-10-29 (SVN: 1856)</b>
 		<ul>

@@ -98,6 +98,9 @@ void QFHistogramView::createWidgets() {
     coll->addStretch();
     coll->setContentsMargins(0,0,0,0);
     flHistSet->addRow(QString(""), coll);
+    chkKey=new QCheckBox(this);
+    chkKey->setChecked(true);
+    flHistSet->addRow(tr("show key"), chkKey);
 
     // HISTOGRAM PLOTS ///////////////////////////////////////////////////////////////////////
     splitterHistogram=new QVisibleHandleSplitter(this);
@@ -235,6 +238,7 @@ void QFHistogramView::connectParameterWidgets(bool connectTo) {
             connect(chkHistogramRangeAuto, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
             connect(edtHistogramMin, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
             connect(edtHistogramMax, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
+            connect(chkKey, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
         //}
     } else {
         //connectParameterWidgetsCounter++;
@@ -244,6 +248,7 @@ void QFHistogramView::connectParameterWidgets(bool connectTo) {
         disconnect(chkHistogramRangeAuto, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
         disconnect(edtHistogramMin, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
         disconnect(edtHistogramMax, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
+        disconnect(chkKey, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
     }
 }
 
@@ -263,6 +268,7 @@ void QFHistogramView::writeQFProperties(QFProperties *current, const QString &pr
     current->setQFProperty(prefix+QString("norm_%1_%2").arg(egroup).arg(param), getNormalized(), false, false);
     current->setQFProperty(prefix+QString("log_%1_%2").arg(egroup).arg(param), getLog(), false, false);
     current->setQFProperty(prefix+QString("rauto_%1_%2").arg(egroup).arg(param), getAutorange(), false, false);
+    current->setQFProperty(prefix+QString("showkey_%1_%2").arg(egroup).arg(param), chkKey->isChecked(), false, false);
     if (!getAutorange()) {
         current->setQFProperty(prefix+QString("rmin_%1_%2").arg(egroup).arg(param), getMin(), false, false);
         current->setQFProperty(prefix+QString("rmax_%1_%2").arg(egroup).arg(param), getMax(), false, false);
@@ -275,6 +281,7 @@ void QFHistogramView::readQFProperties(QFProperties *current, const QString &pre
     setNormalized(current->getProperty(prefix+QString("norm_%1_%2").arg(egroup).arg(param), true).toBool());
     setLog(current->getProperty(prefix+QString("log_%1_%2").arg(egroup).arg(param), false).toBool());
     setAutorange(current->getProperty(prefix+QString("rauto_%1_%2").arg(egroup).arg(param), true).toBool());
+    chkKey->setChecked(current->getProperty(prefix+QString("showkey_%1_%2").arg(egroup).arg(param), true).toBool());
     if (!getAutorange()) {
         setMin(current->getProperty(prefix+QString("rmin_%1_%2").arg(egroup).arg(param), 0).toDouble());
         setMax(current->getProperty(prefix+QString("rmax_%1_%2").arg(egroup).arg(param), 10).toDouble());
@@ -377,6 +384,8 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
     pltParamHistogram->set_doDrawing(false);
     tvHistogramParameters->setModel(NULL);
     tabHistogramParameters->setReadonly(false);
+
+    pltParamHistogram->get_plotter()->set_showKey(chkKey->isChecked());
 
     JKQTPdatastore* ds=pltParamHistogram->getDatastore();
     if (which<0) {
