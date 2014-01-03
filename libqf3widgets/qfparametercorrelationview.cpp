@@ -456,7 +456,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 plteRLinFit->set_color(scatterColor.darker());
                 plteRLinFit->set_lineWidth(1.5);
                 plteRLinFit->set_style(Qt::DotLine);
-                plteRLinFit->set_title(tr("regression: f(x)= %1 + %2 \\cdot x").arg(doubleToLatexQString(linfitA, 2)).arg(doubleToLatexQString(linfitB, 2)));
+                plteRLinFit->set_title(tr("regression: f(x)= %1 + %2 \\cdot x").arg(doubleToLatexQString(linfitrA, 4)).arg(doubleToLatexQString(linfitrB, 4)));
                 pltParamCorrelation->addGraph(plteRLinFit);
 
                 JKQTPxFunctionLineGraph *plteLinFit=new JKQTPxFunctionLineGraph(pltParamCorrelation->get_plotter());
@@ -467,7 +467,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 plteLinFit->set_color(scatterColor.darker());
                 plteLinFit->set_lineWidth(1.5);
                 plteLinFit->set_style(Qt::DashLine);
-                plteLinFit->set_title(tr("IRLS: f(x)= %1 + %2 \\cdot x").arg(doubleToLatexQString(linfitA, 2)).arg(doubleToLatexQString(linfitB, 2)));
+                plteLinFit->set_title(tr("IRLS: f(x)= %1 + %2 \\cdot x").arg(doubleToLatexQString(linfitA, 4)).arg(doubleToLatexQString(linfitB, 4)));
                 pltParamCorrelation->addGraph(plteLinFit);
 
 

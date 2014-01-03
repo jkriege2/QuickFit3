@@ -364,25 +364,26 @@ QVariant QFRDRResultsModel::data(const QModelIndex &index, int role) const {
                 QString rname=lastResultNames[resNameI];
                 if (record) {
                     const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
+                    QString common=tr("<small><font color=\"darkgrey\"><i><br><br>result name: %2<br>evaluation name: %1<br>group: %3</i></font></small>").arg(en).arg(rname).arg(r.group);
                     if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
                         || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
                         double var=0;
                         double mean=qfstatisticsAverageVariance(var, r.dvec);
-                        return QVariant(QString("mean: %1<br>S.D.: %2<br>count: %3<br><i>&nbsp;&nbsp;&nbsp;%4</i>").arg(mean).arg(sqrt(var)).arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type)));
+                        return QVariant(QString("mean: %1<br>S.D.: %2<br>count: %3<br><i>&nbsp;&nbsp;&nbsp;%4</i>").arg(mean).arg(sqrt(var)).arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type))+common);
                     } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
                         double var=0;
                         double mean=qfstatisticsAverageVariance(var, r.ivec);
-                        return QVariant(QString("mean: %1<br>S.D.: %2<br>count: %3<br><i>&nbsp;&nbsp;&nbsp;%4</i>").arg(mean).arg(sqrt(var)).arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type)));
+                        return QVariant(QString("mean: %1<br>S.D.: %2<br>count: %3<br><i>&nbsp;&nbsp;&nbsp;%4</i>").arg(mean).arg(sqrt(var)).arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type))+common);
                     } else if ((r.type==QFRawDataRecord::qfrdreBooleanVector) || (r.type==QFRawDataRecord::qfrdreBooleanMatrix) ) {
                         int cnt=0;
                         qCount(r.bvec, true, cnt);
-                        return QVariant(QString("[%2]<br>item: %1<br>true items: %3").arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type)).arg(cnt));
+                        return QVariant(QString("[%2]<br>item: %1<br>true items: %3").arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type)).arg(cnt)+common);
                     } else if ( (r.type==QFRawDataRecord::qfrdreStringVector) || (r.type==QFRawDataRecord::qfrdreStringMatrix) ) {
-                        return QVariant(QString("[%2]<br>count: %1").arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type)));
+                        return QVariant(QString("[%2]<br>count: %1").arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type))+common);
                     } else if ((r.type==QFRawDataRecord::qfrdreString)) {
-                        return QVariant(tr("contents: %2<br><i>&nbsp;&nbsp;&nbsp;%1</i>").arg(QFRawDataRecord::evaluationResultType2String(r.type)).arg(data(index, Qt::DisplayRole).toString()));
+                        return QVariant(tr("contents: %2<br><i>&nbsp;&nbsp;&nbsp;%1</i>").arg(QFRawDataRecord::evaluationResultType2String(r.type)).arg(data(index, Qt::DisplayRole).toString())+common);
                     }
-                    return QVariant(QString("[")+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]"));
+                    return QVariant(QString("[")+QFRawDataRecord::evaluationResultType2String(r.type)+QString("]")+common);
                 }
             }
         }

@@ -123,6 +123,7 @@ QFRawDataRecord *QFImFCCSRelativeCCFCrosstalkDialog::getCCF() const
 
 bool QFImFCCSRelativeCCFCrosstalkDialog::calculateRelCCF(QFRawDataRecord *acf0, QFRawDataRecord *acf1, QFRawDataRecord *ccf, double **rel_out0, double **rel_error_out0, double **rel_out1, double **rel_error_out1, double **acf0Amplitude, double **acf0UCAmplitude, double **acf1Amplitude, double **acf1UCAmplitude, double **ccfAmplitude, double **ccfUCAmplitude, int &w, int &h, int avgCount, double crosstalk, int crosstalkDir, bool showErrorMessage, int source, const QString &resultGroupACF0, const QString &resultGroupACF1, const QString &resultGroupCCF, const QString &param)
 {
+    //qDebug()<<acf0Amplitude<<acf0UCAmplitude<<acf1Amplitude<<acf1UCAmplitude<<ccfAmplitude<<ccfUCAmplitude;
     //JKAutoOutputTimer tim(QString("calculateRelCCF %1").arg((uint64_t)acf0Amplitude));
     if (!acf0 || !acf1 || !ccf) return false;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -466,6 +467,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
     QFRawDataRecord* acf1=getACF1();
     QFRawDataRecord* ccf=getCCF();
     if (acf0&&acf1&&ccf&&calculateRelCCF(acf0, acf1, ccf, &rel0, &rel0_error, &rel1, &rel1_error, &acf0Amplitude, &acf0UCAmplitude, &acf1Amplitude, &acf1UCAmplitude, &ccfAmplitude, &ccfUCAmplitude, w, h, ui->spinAvg->value(), ui->spinCrosstalk->value()/100.0, ui->cmbCrosstalkDirection->currentIndex(), true, ui->cmbAmplitudeSource->currentIndex(), ui->cmbACF0ResultSet->currentEvaluationGroup(), ui->cmbACF1ResultSet->currentEvaluationGroup(), ui->cmbCCFResultSet->currentEvaluationGroup())) {
+        //qDebug()<<"store: "<<acf0Amplitude<<acf0UCAmplitude<<acf1Amplitude<<acf1UCAmplitude<<ccfAmplitude<<ccfUCAmplitude;
 
         for (int i=0; i<2; i++) {
             QFRawDataRecord* acf=acf0;
@@ -506,13 +508,17 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
             if (ui->chkStoreAmplitudes->isChecked()) {
                 QString rn;
                 rn=rnbase+"_acf0_amplitude";
+                //qDebug()<<rn<<acf0Amplitude;
                 if (acf0Amplitude){
+
                     ccf->resultsSetNumberList(evalName, rn, acf0Amplitude, w*h);
                     ccf->resultsSetLabel(evalName, rn, tr("ACF0 amplitude, corrected"));
                     ccf->resultsSetGroup(evalName, rn, group);
 
                 }
                 rn=rnbase+"_acf0_amplitude_uncorrected";
+                //qDebug()<<rn<<acf0UCAmplitude;
+
                 if (acf0UCAmplitude) {
                     ccf->resultsSetNumberList(evalName, rn, acf0UCAmplitude, w*h);
                     ccf->resultsSetLabel(evalName, rn, tr("ACF0 amplitude, uncorrected"));
@@ -520,6 +526,8 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
 
                 }
                 rn=rnbase+"_acf1_amplitude";
+                //qDebug()<<rn<<acf1Amplitude;
+
                 if (acf1Amplitude) {
                     ccf->resultsSetNumberList(evalName, rn, acf1Amplitude, w*h);
                     ccf->resultsSetLabel(evalName, rn, tr("ACF1 amplitude, corrected"));
@@ -527,6 +535,8 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
 
                 }
                 rn=rnbase+"_acf1_amplitude_uncorrected";
+                //qDebug()<<rn<<acf1UCAmplitude;
+
                 if (acf1UCAmplitude) {
                     ccf->resultsSetNumberList(evalName, rn, acf1UCAmplitude, w*h);
                     ccf->resultsSetLabel(evalName, rn, tr("ACF1 amplitude, uncorrected"));
@@ -534,13 +544,17 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
 
                 }
                 rn=rnbase+"_ccf_amplitude";
+                //qDebug()<<rn<<ccfAmplitude;
+
                 if (ccfAmplitude) {
                     ccf->resultsSetNumberList(evalName, rn, ccfAmplitude, w*h);
                     ccf->resultsSetLabel(evalName, rn, tr("CCF amplitude, corrected"));
                     ccf->resultsSetGroup(evalName, rn, group);
 
                 }
-                rn=rnbase+"_acf1_amplitude_uncorrected";
+                rn=rnbase+"_ccf_amplitude_uncorrected";
+                //qDebug()<<rn<<ccfUCAmplitude;
+
                 if (ccfUCAmplitude) {
                     ccf->resultsSetNumberList(evalName, rn, ccfUCAmplitude, w*h);
                     ccf->resultsSetLabel(evalName, rn, tr("CCF amplitude, uncorrected"));
