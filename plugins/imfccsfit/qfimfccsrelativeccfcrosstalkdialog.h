@@ -22,7 +22,7 @@ class QFImFCCSRelativeCCFCrosstalkDialog : public QWidget
         QFRawDataRecord* getACF1() const;
         QFRawDataRecord* getCCF() const;
 
-        static bool calculateRelCCF(QFRawDataRecord *acf0, QFRawDataRecord *acf1, QFRawDataRecord *ccf, double **rel_out0, double **rel_error_out0, double **rel_out1, double **rel_error_out1, int&w, int& h, int avgCount, double crosstalk, int crosstalkDir, bool showErrorMessage=false, int source=0, const QString& resultGroupACF0=QString(), const QString& resultGroupACF1=QString(), const QString& resultGroupCCF=QString(), const QString& param="fitparam_g0");
+        static bool calculateRelCCF(QFRawDataRecord *acf0, QFRawDataRecord *acf1, QFRawDataRecord *ccf, double **rel_out0, double **rel_error_out0, double **rel_out1, double **rel_error_out1, double** acf0Amplitude, double **acf0UCAmplitude, double** acf1Amplitude, double **acf1UCAmplitude, double **ccfAmplitude, double **ccfUCAmplitude, int&w, int& h, int avgCount, double crosstalk, int crosstalkDir, bool showErrorMessage=false, int source=0, const QString& resultGroupACF0=QString(), const QString& resultGroupACF1=QString(), const QString& resultGroupCCF=QString(), const QString& param="fitparam_g0");
 
     protected slots:
         void cmbACF_currentIndexChanged(int index);

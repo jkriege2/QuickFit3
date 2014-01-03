@@ -42,6 +42,8 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     param1Default<<"fitparam_diff_alpha_a";
     param1Default<<"fitparam_diff_alpha_b";
     param1Default<<"fitparam_diff_alpha_ab";
+    param1Default<<"relative_ccf_acf0_g0_amplitude";
+    param1Default<<"relative_ccf_acf1_g0_amplitude";
 
     param2Default<<"fitparam_n_particle";
     param2Default<<"fitparam_concentration";
@@ -53,6 +55,8 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     param2Default<<"fitparam_diff_alpha_a";
     param2Default<<"fitparam_diff_alpha_b";
     param2Default<<"fitparam_diff_alpha_ab";
+    param1Default<<"relative_ccf_acf1_g0_amplitude";
+    param1Default<<"relative_ccf_acf0_g0_amplitude";
 
 
     m_fitFunctions=QFPluginServices::getInstance()->getFitFunctionManager()->getModels("", this);

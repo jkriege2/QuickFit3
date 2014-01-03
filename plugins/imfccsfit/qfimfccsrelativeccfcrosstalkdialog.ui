@@ -289,6 +289,13 @@
        </property>
       </widget>
      </item>
+     <item row="5" column="2">
+      <widget class="QCheckBox" name="chkStoreAmplitudes">
+       <property name="text">
+        <string>store mplitudes as fit results</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
