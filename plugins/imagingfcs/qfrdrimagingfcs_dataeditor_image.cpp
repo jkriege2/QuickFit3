@@ -55,8 +55,8 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     param2Default<<"fitparam_diff_alpha_a";
     param2Default<<"fitparam_diff_alpha_b";
     param2Default<<"fitparam_diff_alpha_ab";
-    param1Default<<"relative_ccf_acf1_g0_amplitude";
-    param1Default<<"relative_ccf_acf0_g0_amplitude";
+    param2Default<<"relative_ccf_acf1_g0_amplitude";
+    param2Default<<"relative_ccf_acf0_g0_amplitude";
 
 
     m_fitFunctions=QFPluginServices::getInstance()->getFitFunctionManager()->getModels("", this);

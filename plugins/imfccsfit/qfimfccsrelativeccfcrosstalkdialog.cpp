@@ -467,7 +467,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
     QFRawDataRecord* acf1=getACF1();
     QFRawDataRecord* ccf=getCCF();
     if (acf0&&acf1&&ccf&&calculateRelCCF(acf0, acf1, ccf, &rel0, &rel0_error, &rel1, &rel1_error, &acf0Amplitude, &acf0UCAmplitude, &acf1Amplitude, &acf1UCAmplitude, &ccfAmplitude, &ccfUCAmplitude, w, h, ui->spinAvg->value(), ui->spinCrosstalk->value()/100.0, ui->cmbCrosstalkDirection->currentIndex(), true, ui->cmbAmplitudeSource->currentIndex(), ui->cmbACF0ResultSet->currentEvaluationGroup(), ui->cmbACF1ResultSet->currentEvaluationGroup(), ui->cmbCCFResultSet->currentEvaluationGroup())) {
-        //qDebug()<<"store: "<<acf0Amplitude<<acf0UCAmplitude<<acf1Amplitude<<acf1UCAmplitude<<ccfAmplitude<<ccfUCAmplitude;
+        qDebug()<<"store: "<<acf0Amplitude<<acf0UCAmplitude<<acf1Amplitude<<acf1UCAmplitude<<ccfAmplitude<<ccfUCAmplitude;
 
         for (int i=0; i<2; i++) {
             QFRawDataRecord* acf=acf0;
@@ -561,12 +561,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
                     ccf->resultsSetGroup(evalName, rn, group);
                 }
             }
-            if(acf0Amplitude) free(acf0Amplitude);
-            if(acf0UCAmplitude) free(acf0UCAmplitude);
-            if(acf1Amplitude) free(acf1Amplitude);
-            if(acf1UCAmplitude) free(acf1UCAmplitude);
-            if(ccfAmplitude) free(ccfAmplitude);
-            if(ccfUCAmplitude) free(ccfUCAmplitude);
+
 
             ccf->resultsSetInteger(evalName, "acf0_file_id", acf0->getID());
             ccf->resultsSetString(evalName, "acf0_file_role", acf0->getRole());
@@ -595,6 +590,13 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
             if (rel) free(rel);
             if (rel_error) free(rel_error);
         }
+
+        if(acf0Amplitude) free(acf0Amplitude);
+        if(acf0UCAmplitude) free(acf0UCAmplitude);
+        if(acf1Amplitude) free(acf1Amplitude);
+        if(acf1UCAmplitude) free(acf1UCAmplitude);
+        if(ccfAmplitude) free(ccfAmplitude);
+        if(ccfUCAmplitude) free(ccfUCAmplitude);
     }
     QApplication::restoreOverrideCursor();
 }
