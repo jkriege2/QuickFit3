@@ -159,6 +159,14 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         void excludeByParamIntensity();
         /** \brief exclude runs by intensity in the parameter image 2 */
         void excludeByParan2Intensity();
+        /** \brief select pixel by intensity in the overview image */
+        void selectByIntensity();
+        /** \brief select pixel by intensity in the parameter image */
+        void selectByParamIntensity();
+        /** \brief select pixel by intensity in the parameter image 2 */
+        void selectByParam2Intensity();
+        /** \brief deselect masked pixels */
+        void deselectMask();
 
         /** \brief save selection to harddisk */
         void saveSelection();
@@ -467,6 +475,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
 
 
         void excludeByImage(double *imageIn);
+        void selectByImage(double *imageIn);
 
         void getCurrentResultNamesAndLabels(QStringList& names, QStringList& labels);
 
@@ -565,6 +574,14 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QAction* actMaskByParam2Intensity;
         /** \brief button to mask pixels by parameter image */
         QAction* actMaskByParamIntensity;
+        /** \brief action to select pixels by intensity */
+        QAction* actSelectionByIntensity;
+        /** \brief action to select pixels by parameter image 2 */
+        QAction* actSelectByParam2Intensity;
+        /** \brief action to select pixels by parameter image */
+        QAction* actSelectByParamIntensity;
+        /** \brief action to deselect masked pixels */
+        QAction* actDeselctMasked;
 
         QAction* actLoadSelection;
         QAction* actSaveSelection;

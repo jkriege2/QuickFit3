@@ -2,7 +2,7 @@
 #include "ui_qfrdrimagingfcsmaskbyintensity.h"
 #include "programoptions.h"
 #include "qftools.h"
-QFRDRImagingFCSMaskByIntensity::QFRDRImagingFCSMaskByIntensity(QWidget *parent) :
+QFRDRImagingFCSMaskByIntensity::QFRDRImagingFCSMaskByIntensity(QWidget *parent, bool selection) :
     QDialog(parent),
     ui(new Ui::QFRDRImagingFCSMaskByIntensity)
 {
@@ -19,19 +19,22 @@ QFRDRImagingFCSMaskByIntensity::QFRDRImagingFCSMaskByIntensity(QWidget *parent) 
     ui->pltMain->addGraph(plteMask);
     min=max=0;
 
-    ui->cmbMaskingMode->setCurrentIndex(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskByIntensity/maskingmode",2).toInt());
-    ui->cmbMaskMode->setCurrentIndex(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskByIntensity/maskmode", 0).toInt());
-    ui->chkEqualChannels->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskByIntensity/channelsequal", true).toBool());
-    loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "QFRDRImagingFCSMaskByIntensity/pos");
+    iniName="QFRDRImagingFCSMaskByIntensity";
+    if (selection) iniName="QFRDRImagingFCSSelectByIntensity";
+
+    ui->cmbMaskingMode->setCurrentIndex(ProgramOptions::getConfigValue(iniName+"/maskingmode",2).toInt());
+    ui->cmbMaskMode->setCurrentIndex(ProgramOptions::getConfigValue(iniName+"/maskmode", 0).toInt());
+    ui->chkEqualChannels->setChecked(ProgramOptions::getConfigValue(iniName+"/channelsequal", true).toBool());
+    loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, iniName+"/pos");
     updateDualView();
     updateEnabledWidgets();
 }
 
 QFRDRImagingFCSMaskByIntensity::~QFRDRImagingFCSMaskByIntensity() {
-    saveWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "QFRDRImagingFCSMaskByIntensity/pos");
-    ProgramOptions::setConfigValue("QFRDRImagingFCSMaskByIntensity/maskingmode",ui->cmbMaskingMode->currentIndex());
-    ProgramOptions::setConfigValue("QFRDRImagingFCSMaskByIntensity/maskmode", ui->cmbMaskMode->currentIndex());
-    ProgramOptions::setConfigValue("QFRDRImagingFCSMaskByIntensity/channelsequal", ui->chkEqualChannels->isChecked());
+    saveWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, iniName+"/pos");
+    ProgramOptions::setConfigValue(iniName+"/maskingmode",ui->cmbMaskingMode->currentIndex());
+    ProgramOptions::setConfigValue(iniName+"/maskmode", ui->cmbMaskMode->currentIndex());
+    ProgramOptions::setConfigValue(iniName+"/channelsequal", ui->chkEqualChannels->isChecked());
     delete ui;
 }
 

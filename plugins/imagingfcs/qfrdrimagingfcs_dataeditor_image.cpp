@@ -360,6 +360,32 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     glsel->addWidget(frame, selgrpRow, 0, 1, 4);
     selgrpRow++;
 
+
+
+    actSelectionByIntensity=new QAction( tr("select by &overview"), w);
+    actSelectionByIntensity->setToolTip(tr("create a selection according to the <b>overview image</b>:\n"
+                                      "A dialog will open up, which allows to mask some pixels\n"
+                                      "according to a given threshold. The mask created by this\n"
+                                      "is combined with the current mask using the set <i>mask edit mode</i>"));
+    connect(actSelectionByIntensity, SIGNAL(triggered()), this, SLOT(selectByIntensity()));
+    actSelectByParam2Intensity=new QAction( tr("select by param &2"), w);
+    actSelectByParam2Intensity->setToolTip(tr("create a selection according to the <b>parameter image 2</b>:\n"
+                                      "A dialog will open up, which allows to mask some pixels\n"
+                                      "according to a given threshold. The mask created by this\n"
+                                      "is combined with the current mask using the set <i>mask edit mode</i>"));
+    connect(actSelectByParam2Intensity, SIGNAL(triggered()), this, SLOT(selectByParam2Intensity()));
+    actSelectByParamIntensity=new QAction(tr("select by &param"), w);
+    actSelectByParamIntensity->setToolTip(tr("create a selection according to the <b>parameter image</b>:\n"
+                                      "A dialog will open up, which allows to mask some pixels\n"
+                                      "according to a given threshold. The mask created by this\n"
+                                      "is combined with the current mask using the set <i>mask edit mode</i>"));
+    connect(actSelectByParamIntensity, SIGNAL(triggered()), this, SLOT(selectByParamIntensity()));
+
+    actDeselctMasked=new QAction(tr("deselect masked pixels"), w);
+    connect(actDeselctMasked, SIGNAL(triggered()), this, SLOT(deselectMask()));
+
+
+
     glsel->addWidget(new QLabel(tr("stored selections:")), selgrpRow, 0);
     QWidget* ssel=new QWidget(this);
     QHBoxLayout* ssell=new QHBoxLayout(this);
@@ -1233,6 +1259,11 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuSelection->addSeparator();
     menuSelection->addAction(actCopySelection);
     menuSelection->addAction(actPasteSelection);
+    menuSelection->addSeparator();
+    menuSelection->addAction(actSelectionByIntensity);
+    menuSelection->addAction(actSelectByParam2Intensity);
+    menuSelection->addAction(actSelectByParamIntensity);
+    menuSelection->addAction(actDeselctMasked);
 
     menuImagingFCSTools=propertyEditor->addOrFindMenu(tr("ImagingFCS Tools"));
     menuImagingFCSTools->addAction(actCopyGroupACFsToTable);
@@ -1509,12 +1540,80 @@ void QFRDRImagingFCSImageEditor::excludeByImage(double* imageIn) {
     }
 }
 
+
+void QFRDRImagingFCSImageEditor::selectByImage(double* imageIn) {
+    if (!current) return;
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (m) {
+        QFRDRImagingFCSMaskByIntensity* dialog=new QFRDRImagingFCSMaskByIntensity(this, true);
+        bool* mask=(bool*)malloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(bool));
+        double* image=(double*)malloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(double));
+        for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+            mask[i]=false;
+            image[i]=imageIn[i];
+        }
+        dialog->init(mask, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), cmbDualView->currentIndex());
+        if (dialog->exec()==QDialog::Accepted) {
+            if (dialog->getMaskMode()==2) {
+                for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                    bool l=selected.contains(i) && (!mask[i]);
+                    if (l) selectedInsert(i); else selectedRemove(i);
+                }
+            } else if (dialog->getMaskMode()==1) {
+                for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                    bool l=selected.contains(i) || (mask[i]);
+                    if (l) selectedInsert(i); else selectedRemove(i);
+                }
+            } else {
+                for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                    bool l=mask[i];
+                    if (l) selectedInsert(i); else selectedRemove(i);
+                }
+            }
+            //m->recalcCorrelations();
+            selectionEdited();
+            rawDataChanged();
+        }
+        free(mask);
+        free(image);
+    }
+}
+
 void QFRDRImagingFCSImageEditor::excludeByParamIntensity() {
     excludeByImage(pltImage->getData());
 }
 
 void QFRDRImagingFCSImageEditor::excludeByParan2Intensity() {
     excludeByImage(pltParamImage2->getData());
+}
+
+void QFRDRImagingFCSImageEditor::selectByIntensity()
+{
+    if (!current) return;
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
+    if (m) {
+        double* image=m->getImageFromRunsPreview();
+        selectByImage(image);
+    }
+}
+
+void QFRDRImagingFCSImageEditor::selectByParamIntensity() {
+    selectByImage(pltImage->getData());
+}
+
+void QFRDRImagingFCSImageEditor::selectByParam2Intensity() {
+    selectByImage(pltParamImage2->getData());
+}
+
+void QFRDRImagingFCSImageEditor::deselectMask()
+{
+    if (!current) return;
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (m) {
+        for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+            if (m->leaveoutRun(i)) selectedRemove(i);
+        }
+    }
 }
 
 

@@ -18,7 +18,7 @@ class QFRDRImagingFCSMaskByIntensity : public QDialog
         Q_OBJECT
         
     public:
-        explicit QFRDRImagingFCSMaskByIntensity(QWidget *parent = 0);
+        explicit QFRDRImagingFCSMaskByIntensity(QWidget *parent = 0, bool selection=false);
         ~QFRDRImagingFCSMaskByIntensity();
 
         void init(bool* mask, double* image, uint16_t width, uint16_t height, int dualView);
@@ -43,6 +43,8 @@ class QFRDRImagingFCSMaskByIntensity : public QDialog
 
         JKQTPMathImage* plteImage;
         JKQTPOverlayImageEnhanced* plteMask;
+
+        QString iniName;
 };
 
 #endif // QFRDRIMAGINGFCSMASKBYINTENSITY_H
