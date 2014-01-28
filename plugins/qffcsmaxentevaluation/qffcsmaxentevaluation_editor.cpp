@@ -293,8 +293,9 @@ void QFFCSMaxEntEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRec
         edtWxy->setValue(eval->getWXY());
         edtAlpha->setValue(eval->getAlpha());
         cmbWeights->setCurrentWeight(eval->getFitDataWeighting());
-        edtNdist->setRange(10,data->getCorrelationN()); //qMax(0,data->getCorrelationN())
+        edtNdist->setRange(10,data->getCorrelationN()*10); //qMax(0,data->getCorrelationN())
         edtNdist->setValue(eval->getNdist());
+        edtNdist->setSuffix(QString(" / %1").arg(data->getCorrelationN()));
         edtNumIter->setRange(1,10000); //qMax(0,data->getCorrelationN())
         edtNumIter->setValue(eval->getNumIter());
         edtRange1Min->setValue(current->getProperty(QString("rdr%1_range1min").arg(eval->getHighlightedRecord()?eval->getHighlightedRecord()->getID():0), current->getProperty("range1min", 1e-5)).toDouble());
