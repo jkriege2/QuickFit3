@@ -1613,6 +1613,8 @@ void QFRDRImagingFCSImageEditor::deselectMask()
         for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
             if (m->leaveoutRun(i)) selectedRemove(i);
         }
+        selectionEdited();
+        rawDataChanged();
     }
 }
 
