@@ -299,44 +299,19 @@ void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index
                     param_vector[5]=getFitValue(record,index,model,"offset");
                     break;
 
+            case 5: //param_vector[0]=getFitValue(record,index,model,"maxent_wxy")*1e-3;
+                    param_vector[0]=getFitValue(record,index,model,"focus_height")*1e-3;
+                    param_vector[1]=getFitValue(record,index,model,"pixel_size")*1e-3;
+                    param_vector[2]=getFitValue(record,index,model,"offset");
+                    break;
 
          }
     double* params=param_vector.data();
 
     MaxEntB040 mem_eval;
-    mem_eval.evaluateModel(taus,modelEval,N,distTaus,dist,Ndist,params,model);
+    mem_eval.evaluateModel(taus,modelEval,N,distTaus,dist,Ndist,params,model,getFitValue(record,index,model,"maxent_wxy")*1e-3);
 
 
-
-    /*
-
-    if (model==0) { // 3D diffusion model
-
-        // first we read the stored fit parameters:
-        double gamma=getFitValue(record, index, model, "focus_struct_fac");
-        double trip_tau=getFitValue(record, index, model, "trip_tau")*1e-6; // stored in microseconds!!!
-        double trip_theta=getFitValue(record, index, model, "trip_theta");
-        double N_particle=1;
-
-
-
-        // now we evaluate the model
-        for (uint32_t i=0; i<N; i++) {
-            double trip_factor=(1.0-trip_theta+trip_theta*exp(-taus[i]/trip_tau))/(1.0-trip_theta);
-            //output[i]=trip_factor*1.0/N/(1+taus[i]/100e-6)/sqrt(1+taus[i]/100e-6/sqr(gamma));
-            register double sum=0;
-            if (distribution_tau && distribution && distributionN>0) {
-                for (register uint32_t j=0; j<distributionN; j++) {
-                    sum=sum+distribution[j]/(1+taus[i]/distribution_tau[j])/sqrt(1+taus[i]/distribution_tau[j]/sqr(gamma));
-
-                }
-            } else {
-                sum=1.0/double(N);
-            }
-            output[i]=sum/N_particle*trip_factor;
-        }
-    }
-    */
 }
 
 
@@ -346,11 +321,12 @@ void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index
 QString QFFCSMaxEntEvaluationItem::getModelName(int model) const {
     switch(model)
     {
-    case 0: return tr("FCS: 3D diffusion with Triplet");
-    case 1: return tr("FCS: 3D diffusion with 2 blinking components");
-    case 2: return tr("FCS: 2D diffusion with 2 blinking components");
-    case 3: return tr("Dynamic Light Scattering");
-    case 4: return tr("FCS Blinking with 3D diffusion");
+        case 0: return tr("FCS: 3D diffusion with Triplet");
+        case 1: return tr("FCS: 3D diffusion with 2 blinking components");
+        case 2: return tr("FCS: 2D diffusion with 2 blinking components");
+        case 3: return tr("Dynamic Light Scattering");
+        case 4: return tr("FCS Blinking with 3D diffusion");
+        case 5: return tr("SPIM-FCS 3D");
     }
     /*
     if (model==0) return tr("FCS: 3D diffusion with Triplet");
@@ -456,6 +432,21 @@ bool QFFCSMaxEntEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QS
                  defaultValue.value=0.0;
                  return true;
                      }
+
+
+        case 5:
+                 if (parameterID=="focus_height") {
+                     defaultValue.value=1200;
+                     return true;
+                     }
+                 if (parameterID=="pixel_size") {
+                     defaultValue.value=400;
+                     return true;
+                         }
+                 if (parameterID=="offset") {
+                     defaultValue.value=0.0;
+                     return true;
+                         }
 
 
     }
@@ -573,6 +564,13 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
                         param_vector[4]=getFitValue(record,index,model,"particle_number");
                         param_vector[5]=getFitValue(record,index,model,"offset");
                         break;
+                case 5: //param_vector[0]=getFitValue(record,index,model,"maxent_wxy")*1e-3;
+                        param_vector[0]=getFitValue(record,index,model,"focus_height")*1e-3;
+                        param_vector[1]=getFitValue(record,index,model,"pixel_size")*1e-3;
+                        param_vector[2]=getFitValue(record,index,model,"offset");
+                        break;
+
+
 
              }
 
@@ -626,7 +624,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         /// MaxEnt Implementation ///////////////////////////////
         /////////////////////////////////////////////////////////
         MaxEntB040 mem;
-        mem.setData(taus,corrdata,weights,N,rangeMinDatarange,rangeMaxDatarange,Ndist,dist,distTaus, model,getParameterCount(model),param_list);
+        mem.setData(taus,corrdata,weights,N,rangeMinDatarange,rangeMaxDatarange,Ndist,dist,distTaus, model,getParameterCount(model),param_list, getFitValue(record,index,model,"maxent_wxy")*1e-3);
         mem.run(alpha,NumIter,param_list,model,getParameterCount(model));
         fitSuccess=true;
         if (old_distribution==false)
@@ -802,13 +800,13 @@ QString QFFCSMaxEntEvaluationItem::getParameterName(int model, int id, bool html
         if (id==2) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
         if (id==3) return (html)?tr("dark state decay time &tau;<sub>D</sub> [&mu;s]"):tr("dark state decay time [microseconds]");
         if (id==4) return (html)?tr("dark state fraction &theta;<sub>D</sub> [0..1]"):tr("dark state fraction [0..1]");
-        if (id==5) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G<sub>&#x221E;</sub>");
+        if (id==5) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G_infinity");
     case 2:
         if (id==0) return (html)?tr("triplet decay time &tau;<sub>T</sub> [&mu;s]"):tr("triplet decay time [microseconds]");
         if (id==1) return (html)?tr("triplet fraction &theta;<sub>T</sub> [0..1]"):tr("triplet fraction [0..1]");
         if (id==2) return (html)?tr("dark state decay time &tau;<sub>D</sub> [&mu;s]"):tr("dark state decay time [microseconds]");
         if (id==3) return (html)?tr("dark state fraction &theta;<sub>D</sub> [0..1]"):tr("dark state fraction [0..1]");
-        if (id==4) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G<sub>&#x221E;</sub>");
+        if (id==4) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G_infinity");
     case 3: //3D diffusion with 2 blinking components
         if (id==0) return (html)?tr("A"):tr("A");
     case 4: //3D diffusion with 2 blinking components
@@ -818,6 +816,11 @@ QString QFFCSMaxEntEvaluationItem::getParameterName(int model, int id, bool html
         if (id==3) return (html)?tr("fraction &rho;"):tr("fraction");
         if (id==4) return (html)?tr("particle number"):tr("particle number");
         if (id==5) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G<sub>&#x221E;</sub>");
+    case 5: //3D SPIM-FCS
+        //if (id==0) return (html)?tr("focus 1/e<sup>2</sup>-width w<sub>xy</sub> [nm]"):tr("focus 1/e^2-width [nm]");
+        if (id==0) return (html)?tr("focus 1/e<sup>2</sup>-height w<sub>z</sub> [nm]"):tr("focus 1/e^2-height [nm]");
+        if (id==1) return (html)?tr("pixel size a [nm]"):tr("pixel size [nm]");
+        if (id==2) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G_infinity");
         }
         return QString();
 }
@@ -852,17 +855,22 @@ QString QFFCSMaxEntEvaluationItem::getParameterUnit(int model, int id, bool html
         if (id==3) return QString("");
         if (id==4) return QString("");
         if (id==5) return QString("");
+    case 5:
+        if (id==0) return (html)?tr("nm"):tr("nm");
+        if (id==1) return (html)?tr("nm"):tr("nm");
+        if (id==2) return QString("");
     }
     return QString();
 }
 int QFFCSMaxEntEvaluationItem::getParameterCount(int model) const {
     switch (model)
     {
-    case 0: return 3;
-    case 1: return 6;
-    case 2: return 5;
-    case 3: return 1;
-    case 4: return 6;
+        case 0: return 3;
+        case 1: return 6;
+        case 2: return 5;
+        case 3: return 1;
+        case 4: return 6;
+        case 5: return 3;
 
 
     }
@@ -898,11 +906,15 @@ QString QFFCSMaxEntEvaluationItem::getParameterID(int model, int id) const {
         if (id==3) return tr("fraction");
         if (id==4) return tr("particle_number");
         if (id==5) return tr("offset");
+    case 5:
+        if (id==0) return tr("focus_height");
+        if (id==1) return tr("pixel_size");
+        if (id==2) return tr("offset");
 
     }
     return QString("m%1_p%2").arg(model).arg(id);
 }
 
 int QFFCSMaxEntEvaluationItem::getModelCount(QFRawDataRecord *r, int index) const {
-    return 5;
+    return 6;
 }

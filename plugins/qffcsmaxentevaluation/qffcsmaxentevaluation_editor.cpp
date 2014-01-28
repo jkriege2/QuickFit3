@@ -68,9 +68,13 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     edtRange1Min=new QFDoubleEdit(wrange);
     edtRange1Min->setLogScale(true);
     edtRange1Min->setValue(1e-5);
+    edtRange1Min->setCheckBounds(false, false);
+
     edtRange1Max=new QFDoubleEdit(wrange);
     edtRange1Min->setLogScale(true);
     edtRange1Min->setValue(1e-4);
+    edtRange1Max->setCheckBounds(false, false);
+
     lrange->addWidget(edtRange1Min);
     lrange->addWidget(new QLabel(" ... "));
     lrange->addWidget(edtRange1Max);
@@ -85,9 +89,11 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     edtRange2Min=new QFDoubleEdit(wrange);
     edtRange2Min->setLogScale(true);
     edtRange2Min->setValue(1e-3);
+    edtRange2Min->setCheckBounds(false, false);
     edtRange2Max=new QFDoubleEdit(wrange);
     edtRange2Min->setLogScale(true);
     edtRange2Min->setValue(1e-2);
+    edtRange2Max->setCheckBounds(false, false);
     lrange->addWidget(edtRange2Min);
     lrange->addWidget(new QLabel(" ... "));
     lrange->addWidget(edtRange2Max);

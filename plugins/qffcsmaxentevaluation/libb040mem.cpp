@@ -21,7 +21,7 @@
 
 // Default Constructor
 MaxEntB040::MaxEntB040() {
-    
+    m_wxy=250;
     m_Nd=0; //initialisation
     m_kappa=6.0; //default if not overwritten by user
     m_tripTau=3.0*1e-6; //default if not overwritten by user (in microseconds)
@@ -42,11 +42,12 @@ MaxEntB040::~MaxEntB040(){}
 
 
 
-void MaxEntB040::setData(const double* taus, const double* correlation,\
-	const double* weights,unsigned long long Nd,int rangeMinDatarange,\
-    int rangeMaxDatarange,uint32_t Ndist,double * dist, double * distTaus, int model,\
-    int parameterCount,double * param_list)
+void MaxEntB040::setData(const double* taus, const double* correlation, \
+    const double* weights, unsigned long long Nd, int rangeMinDatarange, \
+    int rangeMaxDatarange, uint32_t Ndist, double * dist, double * distTaus, int model, \
+    int parameterCount, double * param_list, double wxy)
 	{
+    m_wxy=wxy;
     m_Nd=rangeMaxDatarange-rangeMinDatarange;
 	m_xdata.resize(rangeMaxDatarange-rangeMinDatarange);
     m_ydata.resize(rangeMaxDatarange-rangeMinDatarange);
@@ -183,6 +184,7 @@ void MaxEntB040::setTmatrix(){
     double fraction;
     double particle_number;
     double factor;
+    double gamma;
 
     qDebug() << "calling from setTmatrix with model= " << m_model;
 
@@ -287,6 +289,23 @@ void MaxEntB040::setTmatrix(){
                     }
             }
 
+    case 5://SPIM-FCS, 3D diffusion
+
+        m_wz=m_paramStore(0);
+        m_a=m_paramStore(1);
+        m_kappa=m_wz/m_wxy;
+
+
+        for (int i=0; i<m_Nd; i++)
+            {
+                for (int j=0; j<m_N; j++)
+                    {
+                        double fourDt=sqr(m_wxy)*(1.0+m_xdata(i)/m_taudiffs(j));
+                        value=(m_a*sqrt(M_PI)*erf(m_a/sqrt(fourDt))+sqrt(fourDt)*(exp(-sqr(m_a)/fourDt)-1.0))/sqrt(1.0+m_xdata(i)/m_taudiffs(j)/sqr(m_kappa))/sqr(m_a);
+                        m_T(i,j)=value;
+                    }
+            }
+        break;
 
     }
 }
@@ -456,7 +475,7 @@ void MaxEntB040::performIter()
 
 
 void MaxEntB040::evaluateModel(double * taus,double *modelEval,uint32_t N,\
-                              double* distTaus,double* dist,uint32_t Ndist, double* param_list, int model)
+                              double* distTaus,double* dist,uint32_t Ndist, double* param_list, int model, double wxy_micrometers)
 {
 
     double gamma;
@@ -473,6 +492,9 @@ void MaxEntB040::evaluateModel(double * taus,double *modelEval,uint32_t N,\
     double tau_2;
     double fraction;
     double factor,sum1,sum2;
+    //double wxy;
+    double a;
+    double wz;
 
 
     switch(model)
@@ -584,6 +606,26 @@ void MaxEntB040::evaluateModel(double * taus,double *modelEval,uint32_t N,\
                     }
             modelEval[i]=offset+(1+sum1/(1-sum2))*factor;
         }
+        break;
+
+        case 5://SPIM-FCS, 3D diffusion
+
+            wz=param_list[0];
+            a=param_list[1];
+            offset=param_list[2];
+            gamma=wz/wxy_micrometers;
+            for (uint32_t i=0; i<N; i++) {
+                sum=0;
+                if (distTaus && dist && Ndist>0) {
+                    for (register uint32_t j=0; j<Ndist; j++) {
+                        double fourDt=sqr(wxy_micrometers)*(1.0+taus[i]/distTaus[j]);
+                        sum=sum+dist[j]*(a*sqrt(M_PI)*erf(a/sqrt(fourDt))+sqrt(fourDt)*(exp(-sqr(a)/fourDt)-1.0))/sqrt(1.0+taus[i]/distTaus[j]/sqr(gamma));
+                    }
+                } else {
+                    sum=1.0/double(N);
+                }
+                modelEval[i]=offset+sum/sqr(a);
+            }
         break;
 
 

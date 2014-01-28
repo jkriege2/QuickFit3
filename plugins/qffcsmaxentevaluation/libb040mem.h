@@ -55,7 +55,7 @@ class MaxEntB040{
         void setData(const double* taus, const double* correlation,\
         	const double* weights,unsigned long long Nd,int rangeMinDatarange,\
             int rangeMaxDatarange,uint32_t Ndist, double * dist,double * distTaus,\
-            int model,int parameterCount, double *param_list);
+            int model,int parameterCount, double *param_list, double wxy);
 
 		void writeDistribution(double * dist);
 		
@@ -63,8 +63,8 @@ class MaxEntB040{
 
         bool run(double alpha,int NumIter,double * param_list,int model,int parameter_count);
 
-        static void evaluateModel(double * taus,double *modelEval,uint32_t N,double* distTaus, double* dist,\
-                           uint32_t Ndist, double* param_list,int model);
+        static void evaluateModel(double * taus, double *modelEval, uint32_t N, double* distTaus, double* dist, \
+                           uint32_t Ndist, double* param_list, int model, double wxy);
 
 
 
@@ -81,6 +81,9 @@ class MaxEntB040{
         double m_alpha;
         double m_tripTau;
         double m_tripTheta;
+        double m_wxy;
+        double m_wz;
+        double m_a;
         int NumIter;
         int m_model;
         Eigen::VectorXd m_xdata;
