@@ -1163,9 +1163,14 @@ QString QFTableModel::saveXML(QModelIndexList selection, bool createXMLFragment,
         w.writeStartElement("state.columns");
         int smallestRow=rowCount();
         int smallestColumn=columnCount();
-        for (int i=0; i<selection.size(); i++) {
-            if (selection[i].column()<smallestColumn) smallestColumn=selection[i].column();
-            if (selection[i].row()<smallestRow) smallestRow=selection[i].row();
+        if (selection.size()>0) {
+            for (int i=0; i<selection.size(); i++) {
+                if (selection[i].column()<smallestColumn) smallestColumn=selection[i].column();
+                if (selection[i].row()<smallestRow) smallestRow=selection[i].row();
+            }
+        } else {
+            smallestRow=0;
+            smallestColumn=0;
         }
         for (int c=0; c<columnCount(); c++) {
             bool used=selection.isEmpty();
@@ -1275,18 +1280,18 @@ void QFTableModel::paste(int row_start, int column_start) {
     doEmitSignals=false;
 
 
-    /*for (int i=0; i<mime->formats().size(); i++) {
+    for (int i=0; i<mime->formats().size(); i++) {
         //qDebug()<<mime->formats().at(i)<<":";
         //qDebug()<<mime->data(mime->formats().at(i));
         //qDebug()<<"----------------------------------------------------------------------------------";
-    }*/
-    if (mime && mime->hasFormat("quickfit3/qfrdrtable")) {
+    }
+    if (mime && (mime->hasFormat("quickfit3/qfrdrtable")|| mime->hasFormat("application/x-qt-windows-mime;value=\"quickfit3/qfrdrtable\""))) {
         QString data=QString::fromUtf8(mime->data("quickfit3/qfrdrtable").data());
         //qDebug()<<"pasting quickfit3/qfrdrtable";
-        readXML(data, row, column, false);
+        readXML(data, row, column, false, false, false);
     } else if (mime && mime->hasFormat("quickfit3/qfrdrtable_template")) {
         QString data=QString::fromUtf8(mime->data("quickfit3/qfrdrtable_template").data());
-        //qDebug()<<"pasting quickfit3/qfrdrtable";
+        //qDebug()<<"pasting quickfit3/qfrdrtable_template";
         readXML(data, row, column, false, true);
     } else if (mime && mime->hasFormat("jkqtplotter/csv")) {
         QString data=QString::fromUtf8(mime->data("jkqtplotter/csv").data());
@@ -1353,6 +1358,38 @@ void QFTableModel::paste(int row_start, int column_start) {
     endMultiUndo();
 }
 
+void QFTableModel::pasteHeaderTemplate(int row_start, int column_start)
+{
+    QClipboard* clip=QApplication::clipboard();
+    const QMimeData* mime=clip->mimeData();
+
+    startMultiUndo();
+
+    int row=row_start;
+    int column=column_start;
+    if (row_start<0) row=0;
+    if (column_start<0) column=0;
+
+    bool oldEmit=doEmitSignals;
+    doEmitSignals=false;
+
+
+
+    if (mime && (mime->hasFormat("quickfit3/qfrdrtable")|| mime->hasFormat("application/x-qt-windows-mime;value=\"quickfit3/qfrdrtable\""))) {
+        QString data=QString::fromUtf8(mime->data("quickfit3/qfrdrtable").data());
+        //qDebug()<<"pasting quickfit3/qfrdrtable";
+        readXML(data, row, column, false, true, false);
+    } else if (mime && mime->hasFormat("quickfit3/qfrdrtable_template")) {
+        QString data=QString::fromUtf8(mime->data("quickfit3/qfrdrtable_template").data());
+        //qDebug()<<"pasting quickfit3/qfrdrtable_template";
+        readXML(data, row, column, false, true);
+
+    }
+    doEmitSignals=oldEmit;
+    if (doEmitSignals) reset();
+    endMultiUndo();
+}
+
 bool QFTableModel::getDoEmitSignals() const
 {
     return doEmitSignals;
@@ -1370,7 +1407,7 @@ void QFTableModel::disableSignals()
 }
 
 
-bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bool clearTable, bool read_template_only) {
+bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bool clearTable, bool read_template_only, bool alsoReadHeaders) {
     bool oldEmit=doEmitSignals;
 
     doEmitSignals=false;
@@ -1386,7 +1423,7 @@ bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bo
         startMultiUndo();
         QDomElement er=doc.firstChildElement("qfrdrtable");
         if (!er.isNull()) {
-            if (clearTable || read_template_only) {
+            if (clearTable || read_template_only || alsoReadHeaders) {
                 QDomElement e=er.firstChildElement("state.columns");
                 if (!e.isNull()) {
                     e=e.firstChildElement("col");

@@ -13,10 +13,17 @@
 
 #include "Eigen/Dense"
 #include "Eigen/SVD"
+#include "math.h"
+#include "qfmathtools.h"
 
 
 #define QFFloatIsOK(v) (std::isfinite(v) && (!std::isinf(v)) && (!std::isnan(v)))
 #define sqr(x) ((x)*(x))
+
+// focal volume of SPIM-FCS
+inline double SPIMFCS_newVeff(double a, double wxy, double wz) {
+    return QF_SQRTPI*qfSqr(a)*wz/qfSqr(erf(a/wxy)+wxy/QF_SQRTPI/a*(exp(-qfSqr(a/wxy))-1.0));
+}
 
 
 // Default Constructor
@@ -289,26 +296,39 @@ void MaxEntB040::setTmatrix(){
                     }
             }
 
-    case 5://SPIM-FCS, 3D diffusion
+    case 5: {//SPIM-FCS, 3D diffusion
 
         m_wz=m_paramStore(0);
         m_a=m_paramStore(1);
         m_kappa=m_wz/m_wxy;
+        const double Veff=SPIMFCS_newVeff(m_a, m_wxy, m_wz);
+        const double sqpi=sqrt(M_PI);
+        const double pre=1.0/sqr(m_a)/sqpi/m_wz;
 
 
         for (int i=0; i<m_Nd; i++)
             {
-                for (int j=0; j<m_N; j++)
-                    {
-                        double fourDt=sqr(m_wxy)*(1.0+m_xdata(i)/m_taudiffs(j));
-                        value=(m_a*sqrt(M_PI)*erf(m_a/sqrt(fourDt))+sqrt(fourDt)*(exp(-sqr(m_a)/fourDt)-1.0))/sqrt(1.0+m_xdata(i)/m_taudiffs(j)/sqr(m_kappa))/sqr(m_a);
+                for (int j=0; j<m_N; j++) {
+                    const double dt_sigma2=sqr(m_wxy)*(1.0+m_xdata(i)/m_taudiffs(j));
+                    const double fac_z=sqrt(1.0+m_xdata(i)/m_taudiffs(j)/sqr(m_kappa));
+                    const double fac_xy=erf(m_a/sqrt(dt_sigma2))+sqrt(dt_sigma2)/(sqpi*m_a)*(exp(-sqr(m_a)/dt_sigma2)-1.0);
+
+                    //double fourDt=sqr(m_wxy)*(1.0+m_xdata(i)/m_taudiffs(j));
+                        value=Veff*pre/fac_z*sqr(fac_xy);
                         m_T(i,j)=value;
-                    }
+                }
             }
-        break;
+        } break;
 
     }
 }
+
+
+
+
+
+
+
 
 
 void MaxEntB040::performSVD()
@@ -608,25 +628,30 @@ void MaxEntB040::evaluateModel(double * taus,double *modelEval,uint32_t N,\
         }
         break;
 
-        case 5://SPIM-FCS, 3D diffusion
+        case 5: {//SPIM-FCS, 3D diffusion
 
             wz=param_list[0];
             a=param_list[1];
             offset=param_list[2];
             gamma=wz/wxy_micrometers;
+            const double Veff=SPIMFCS_newVeff(a, wxy_micrometers, wz);
+            const double sqpi=sqrt(M_PI);
+            const double pre=1.0/sqr(a)/sqpi/wz;
             for (uint32_t i=0; i<N; i++) {
                 sum=0;
                 if (distTaus && dist && Ndist>0) {
                     for (register uint32_t j=0; j<Ndist; j++) {
-                        double fourDt=sqr(wxy_micrometers)*(1.0+taus[i]/distTaus[j]);
-                        sum=sum+dist[j]*(a*sqrt(M_PI)*erf(a/sqrt(fourDt))+sqrt(fourDt)*(exp(-sqr(a)/fourDt)-1.0))/sqrt(1.0+taus[i]/distTaus[j]/sqr(gamma));
+                        const double dt_sigma2=sqr(wxy_micrometers)*(1.0+taus[i]/distTaus[j]);
+                        const double fac_z=sqrt(1.0+taus[i]/distTaus[j]/sqr(gamma));
+                        const double fac_xy=erf(a/sqrt(dt_sigma2))+sqrt(dt_sigma2)/(sqpi*a)*(exp(-sqr(a)/dt_sigma2)-1.0);
+                        sum=sum+dist[j]*Veff*pre/fac_z*sqr(fac_xy);
                     }
                 } else {
                     sum=1.0/double(N);
                 }
-                modelEval[i]=offset+sum/sqr(a);
+                modelEval[i]=offset+sum;
             }
-        break;
+        } break;
 
 
     }

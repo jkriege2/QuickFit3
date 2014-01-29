@@ -834,10 +834,10 @@ void QFRDRTableEditor::slPasteTableTemplate()
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
         if (m->model()) {
-            if (QApplication::clipboard()->mimeData()&&QApplication::clipboard()->mimeData()->hasFormat("quickfit3/qfrdrtable_template")) {
+            if (QApplication::clipboard()->mimeData()&&(QApplication::clipboard()->mimeData()->hasFormat("quickfit3/qfrdrtable_template")||QApplication::clipboard()->mimeData()->hasFormat("quickfit3/qfrdrtable"))) {
                 QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
                 QModelIndex c=tvMain->selectionModel()->currentIndex();
-                m->model()->paste(c.row(), c.column());
+                m->model()->pasteHeaderTemplate(c.row(), c.column());
                 QApplication::restoreOverrideCursor();
             } else {
                 QMessageBox::critical(this, tr("Paste table template"), tr("No table template data in clipboard!"));

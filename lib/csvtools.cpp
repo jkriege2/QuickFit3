@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <QMimeData>
 #include <QClipboard>
+#include "datatools.h"
 
 QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_char, double non_value, const QString& eolChars, const QString& ignoreChars) {
     //const QString line=f.readLine();
@@ -219,6 +220,7 @@ void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames,
     mime->setData("quickfit/csv", csv.toUtf8());
     mime->setData("text/csv", csv.toLocal8Bit());
     mime->setData("text/comma-separated-values", csv.toLocal8Bit());
+    mime->setData("quickfit3/qfrdrtable", toQFTableModelXML(dataToVariant(data), columnsNames, rowNames).toUtf8());
     clipboard->setMimeData(mime);
 }
 
@@ -322,6 +324,7 @@ void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsName
     mime->setData("quickfit/csv", csv.toUtf8());
     mime->setData("text/csv", csv.toLocal8Bit());
     mime->setData("text/comma-separated-values", csv.toLocal8Bit());
+    mime->setData("quickfit3/qfrdrtable", toQFTableModelXML(data, columnsNames, rowNames).toUtf8());
     clipboard->setMimeData(mime);
 }
 

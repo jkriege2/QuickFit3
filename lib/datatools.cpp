@@ -375,6 +375,68 @@ QString toSYLK(const QList<QList<QVariant> >& data, const QStringList& columnNam
     return out;
 }
 
+
+
+
+
+
+QString toQFTableModelXML(const QList<QVector<double> >& data, const QStringList& columnsNames, const QStringList& rowNames) {
+    return toQFTableModelXML(dataToVariant(data), columnsNames, rowNames);
+}
+
+
+QString toQFTableModelXML(const QList<QList<QVariant> >& data, const QStringList& columnsNames, const QStringList& rowNames) {
+    QString res;
+    QXmlStreamWriter w(&res);
+    int cols=qMax(data.size(), columnsNames.size());
+    int rows=0;
+    for (int i=0; i<data.size(); i++) {
+        rows=qMax(rows, data[i].size());
+    }
+    int coffset=0;
+    if (rowNames.size()>0) coffset=1;
+    w.writeStartDocument();
+        w.writeStartElement("qfrdrtable");
+            w.writeStartElement("state.columns");
+            for (int i=0; i<cols; i++) {
+                w.writeStartElement("col");
+                w.writeAttribute("col", QString::number(i));
+                w.writeAttribute("name", columnsNames.value(i));
+                w.writeEndElement();
+            }
+            w.writeEndElement();
+            w.writeStartElement("data");
+            for (int r=0; r<rowNames.size(); r++) {
+                w.writeStartElement("cell");
+                w.writeAttribute("row", QString::number(r));
+                w.writeAttribute("col", QString::number(0));
+                QVariant d=rowNames.value(r, "");
+                w.writeAttribute("type", getQVariantType(d));
+                w.writeCharacters(getQVariantData(d));
+                w.writeEndElement();
+            }
+            for (int c=0; c<data.size(); c++) {
+                for (int r=0; r<data[c].size(); r++) {
+                    w.writeStartElement("cell");
+                    w.writeAttribute("row", QString::number(r));
+                    w.writeAttribute("col", QString::number(coffset+c));
+                    QVariant d=data[c].value(r, QVariant());
+                    w.writeAttribute("type", getQVariantType(d));
+                    w.writeCharacters(getQVariantData(d));
+                    w.writeEndElement();
+                }
+            }
+            w.writeEndElement();
+        w.writeEndElement();
+    w.writeEndDocument();
+    return res;
+}
+
+
+
+
+
+
 QStringList QFDataExportHandler::getFormats()  {
     QStringList sl;
     sl<<QObject::tr("Comma Separated Values (*.csv *.dat)");
@@ -602,3 +664,4 @@ void QFDataExportHandler::DataWriter::save(const QList<QList<QVariant> > &data, 
 {
     save(dataExpandToDouble(data), filename, columnHeaders, rowHeaders);
 }
+

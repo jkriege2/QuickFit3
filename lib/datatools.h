@@ -94,6 +94,21 @@ QFLIB_EXPORT QString toSYLK(const QList<QVector<double> >& data, const QStringLi
 QFLIB_EXPORT QString toSYLK(const QList<QList<QVariant> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList());
 
 
+/*! \brief convert the given data to QFTableModel XML
+    \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
+*/
+QFLIB_EXPORT QString toQFTableModelXML(const QList<QVector<double> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList());
+
+/*! \brief convert the given data to QFTableModel XML
+    \ingroup qf3lib_tools
+
+    \note data is given as a list of columns
+*/
+QFLIB_EXPORT QString toQFTableModelXML(const QList<QList<QVariant> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList());
+
+
 
 
 /*! \brief this class groups static methods to export to different data formats
