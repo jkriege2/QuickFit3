@@ -304,6 +304,9 @@ void QFFCSMaxEntEvaluationItem::evaluateModel(QFRawDataRecord *record, int index
                     param_vector[1]=getFitValue(record,index,model,"pixel_size")*1e-3;
                     param_vector[2]=getFitValue(record,index,model,"offset");
                     break;
+            case 6: param_vector[0]=getFitValue(record,index,model,"pixel_size")*1e-3;
+                    param_vector[1]=getFitValue(record,index,model,"offset");
+                    break;
 
          }
     double* params=param_vector.data();
@@ -327,6 +330,7 @@ QString QFFCSMaxEntEvaluationItem::getModelName(int model) const {
         case 3: return tr("Dynamic Light Scattering");
         case 4: return tr("FCS Blinking with 3D diffusion");
         case 5: return tr("SPIM-FCS 3D");
+        case 6: return tr("camera TIR-FCS 3D");
     }
     /*
     if (model==0) return tr("FCS: 3D diffusion with Triplet");
@@ -351,7 +355,8 @@ bool QFFCSMaxEntEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QS
                 defaultValue.value=6;
                 return true;
             }
-       /* if (parameterID=="n_particle") {
+        break;
+            /* if (parameterID=="n_particle") {
             defaultValue.value=8;
             return true;
         }*/
@@ -380,6 +385,7 @@ bool QFFCSMaxEntEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QS
                 defaultValue.value=0.0;
                 return true;
                     }
+            break;
     case 2:
              if (parameterID=="trip_tau") {
                  defaultValue.value=3.0;
@@ -401,12 +407,14 @@ bool QFFCSMaxEntEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QS
                  defaultValue.value=0.0;
                  return true;
                      }
+            break;
     case 3:
              if (parameterID=="A") {
                  defaultValue.value=1.0;
                  return true;
                  }
 
+            break;
     case 4:
              if (parameterID=="tau_1") {
                  defaultValue.value=3.0;
@@ -434,6 +442,7 @@ bool QFFCSMaxEntEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QS
                      }
 
 
+            break;
         case 5:
                  if (parameterID=="focus_height") {
                      defaultValue.value=1200;
@@ -447,7 +456,18 @@ bool QFFCSMaxEntEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QS
                      defaultValue.value=0.0;
                      return true;
                          }
+            break;
+        case 6:
+                 if (parameterID=="pixel_size") {
+                     defaultValue.value=400;
+                     return true;
+                         }
+                 if (parameterID=="offset") {
+                     defaultValue.value=0.0;
+                     return true;
+                         }
 
+            break;
 
     }
 
@@ -568,6 +588,9 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
                         param_vector[0]=getFitValue(record,index,model,"focus_height")*1e-3;
                         param_vector[1]=getFitValue(record,index,model,"pixel_size")*1e-3;
                         param_vector[2]=getFitValue(record,index,model,"offset");
+                        break;
+                case 6: param_vector[0]=getFitValue(record,index,model,"pixel_size")*1e-3;
+                        param_vector[1]=getFitValue(record,index,model,"offset");
                         break;
 
 
@@ -790,37 +813,47 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
 QString QFFCSMaxEntEvaluationItem::getParameterName(int model, int id, bool html) const {
     switch (model)
     {
-    case 0: //3D diffusion with triplet
-        if (id==0) return (html)?tr("triplet decay time &tau;<sub>T</sub> [&mu;s]"):tr("triplet decay time [microseconds]");
-        if (id==1) return (html)?tr("triplet fraction &theta;<sub>T</sub> [0..1]"):tr("triplet fraction [0..1]");
-        if (id==2) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
-    case 1: //3D diffusion with 2 blinking components
-        if (id==0) return (html)?tr("triplet decay time &tau;<sub>T</sub> [&mu;s]"):tr("triplet decay time [microseconds]");
-        if (id==1) return (html)?tr("triplet fraction &theta;<sub>T</sub> [0..1]"):tr("triplet fraction [0..1]");
-        if (id==2) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
-        if (id==3) return (html)?tr("dark state decay time &tau;<sub>D</sub> [&mu;s]"):tr("dark state decay time [microseconds]");
-        if (id==4) return (html)?tr("dark state fraction &theta;<sub>D</sub> [0..1]"):tr("dark state fraction [0..1]");
-        if (id==5) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G_infinity");
-    case 2:
-        if (id==0) return (html)?tr("triplet decay time &tau;<sub>T</sub> [&mu;s]"):tr("triplet decay time [microseconds]");
-        if (id==1) return (html)?tr("triplet fraction &theta;<sub>T</sub> [0..1]"):tr("triplet fraction [0..1]");
-        if (id==2) return (html)?tr("dark state decay time &tau;<sub>D</sub> [&mu;s]"):tr("dark state decay time [microseconds]");
-        if (id==3) return (html)?tr("dark state fraction &theta;<sub>D</sub> [0..1]"):tr("dark state fraction [0..1]");
-        if (id==4) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G_infinity");
-    case 3: //3D diffusion with 2 blinking components
-        if (id==0) return (html)?tr("A"):tr("A");
-    case 4: //3D diffusion with 2 blinking components
-        if (id==0) return (html)?tr("decay time &tau;<sub>1</sub> [&mu;s]"):tr(" decay time 1 [microseconds]");
-        if (id==1) return (html)?tr("decay time &tau;<sub>2</sub> [&mu;s]"):tr(" decay time 2 [microseconds]");
-        if (id==2) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
-        if (id==3) return (html)?tr("fraction &rho;"):tr("fraction");
-        if (id==4) return (html)?tr("particle number"):tr("particle number");
-        if (id==5) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G<sub>&#x221E;</sub>");
-    case 5: //3D SPIM-FCS
-        //if (id==0) return (html)?tr("focus 1/e<sup>2</sup>-width w<sub>xy</sub> [nm]"):tr("focus 1/e^2-width [nm]");
-        if (id==0) return (html)?tr("focus 1/e<sup>2</sup>-height w<sub>z</sub> [nm]"):tr("focus 1/e^2-height [nm]");
-        if (id==1) return (html)?tr("pixel size a [nm]"):tr("pixel size [nm]");
-        if (id==2) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G_infinity");
+        case 0: //3D diffusion with triplet
+            if (id==0) return (html)?tr("triplet decay time &tau;<sub>T</sub> [&mu;s]"):tr("triplet decay time [microseconds]");
+            if (id==1) return (html)?tr("triplet fraction &theta;<sub>T</sub> [0..1]"):tr("triplet fraction [0..1]");
+            if (id==2) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
+            break;
+        case 1: //3D diffusion with 2 blinking components
+            if (id==0) return (html)?tr("triplet decay time &tau;<sub>T</sub> [&mu;s]"):tr("triplet decay time [microseconds]");
+            if (id==1) return (html)?tr("triplet fraction &theta;<sub>T</sub> [0..1]"):tr("triplet fraction [0..1]");
+            if (id==2) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
+            if (id==3) return (html)?tr("dark state decay time &tau;<sub>D</sub> [&mu;s]"):tr("dark state decay time [microseconds]");
+            if (id==4) return (html)?tr("dark state fraction &theta;<sub>D</sub> [0..1]"):tr("dark state fraction [0..1]");
+            if (id==5) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G_infinity");
+                break;
+        case 2:
+            if (id==0) return (html)?tr("triplet decay time &tau;<sub>T</sub> [&mu;s]"):tr("triplet decay time [microseconds]");
+            if (id==1) return (html)?tr("triplet fraction &theta;<sub>T</sub> [0..1]"):tr("triplet fraction [0..1]");
+            if (id==2) return (html)?tr("dark state decay time &tau;<sub>D</sub> [&mu;s]"):tr("dark state decay time [microseconds]");
+            if (id==3) return (html)?tr("dark state fraction &theta;<sub>D</sub> [0..1]"):tr("dark state fraction [0..1]");
+            if (id==4) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G_infinity");
+                break;
+        case 3: //3D diffusion with 2 blinking components
+            if (id==0) return (html)?tr("A"):tr("A");
+                break;
+        case 4: //3D diffusion with 2 blinking components
+            if (id==0) return (html)?tr("decay time &tau;<sub>1</sub> [&mu;s]"):tr(" decay time 1 [microseconds]");
+            if (id==1) return (html)?tr("decay time &tau;<sub>2</sub> [&mu;s]"):tr(" decay time 2 [microseconds]");
+            if (id==2) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
+            if (id==3) return (html)?tr("fraction &rho;"):tr("fraction");
+            if (id==4) return (html)?tr("particle number"):tr("particle number");
+            if (id==5) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G<sub>&#x221E;</sub>");
+            break;
+        case 5: //3D SPIM-FCS
+            //if (id==0) return (html)?tr("focus 1/e<sup>2</sup>-width w<sub>xy</sub> [nm]"):tr("focus 1/e^2-width [nm]");
+            if (id==0) return (html)?tr("focus 1/e<sup>2</sup>-height w<sub>z</sub> [nm]"):tr("focus 1/e^2-height [nm]");
+            if (id==1) return (html)?tr("pixel size a [nm]"):tr("pixel size [nm]");
+            if (id==2) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G_infinity");
+            break;
+        case 6: //2D SPIM-FCS
+            if (id==0) return (html)?tr("pixel size a [nm]"):tr("pixel size [nm]");
+            if (id==1) return (html)?tr("Offset G<sub>&#x221E;</sub>"):tr("Offset G_infinity");
+            break;
         }
         return QString();
 }
@@ -833,6 +866,7 @@ QString QFFCSMaxEntEvaluationItem::getParameterUnit(int model, int id, bool html
         if (id==0) return (html)?tr("&mu;s"):tr("microseconds");
         if (id==1) return QString("");
         if (id==2) return QString("");
+            break;
     case 1:
         if (id==0) return (html)?tr("&mu;s"):tr("microseconds");
         if (id==1) return QString("");
@@ -840,14 +874,17 @@ QString QFFCSMaxEntEvaluationItem::getParameterUnit(int model, int id, bool html
         if (id==3) return (html)?tr("&mu;s"):tr("microseconds");
         if (id==4) return QString("");
         if (id==5) return QString("");
+            break;
     case 2:
         if (id==0) return (html)?tr("&mu;s"):tr("microseconds");
         if (id==1) return QString("");
         if (id==2) return (html)?tr("&mu;s"):tr("microseconds");
         if (id==3) return QString("");
         if (id==4) return QString("");
+            break;
     case 3:
         if (id==0) return QString("");
+            break;
     case 4:
         if (id==0) return (html)?tr("&mu;s"):tr("microseconds");
         if (id==1) return (html)?tr("&mu;s"):tr("microseconds");
@@ -855,10 +892,16 @@ QString QFFCSMaxEntEvaluationItem::getParameterUnit(int model, int id, bool html
         if (id==3) return QString("");
         if (id==4) return QString("");
         if (id==5) return QString("");
+            break;
     case 5:
         if (id==0) return (html)?tr("nm"):tr("nm");
         if (id==1) return (html)?tr("nm"):tr("nm");
         if (id==2) return QString("");
+            break;
+    case 6:
+        if (id==0) return (html)?tr("nm"):tr("nm");
+        if (id==1) return QString("");
+            break;
     }
     return QString();
 }
@@ -871,6 +914,7 @@ int QFFCSMaxEntEvaluationItem::getParameterCount(int model) const {
         case 3: return 1;
         case 4: return 6;
         case 5: return 3;
+        case 6: return 2;
 
 
     }
@@ -884,6 +928,7 @@ QString QFFCSMaxEntEvaluationItem::getParameterID(int model, int id) const {
         if (id==0) return tr("trip_tau");
         if (id==1) return tr("trip_theta");
         if (id==2) return tr("focus_struct_fac");
+        break;
     case 1:
         if (id==0) return tr("trip_tau");
         if (id==1) return tr("trip_theta");
@@ -891,14 +936,17 @@ QString QFFCSMaxEntEvaluationItem::getParameterID(int model, int id) const {
         if (id==3) return tr("dark_tau");
         if (id==4) return tr("dark_theta");
         if (id==5) return tr("offset");
+            break;
     case 2:
         if (id==0) return tr("trip_tau");
         if (id==1) return tr("trip_theta");
         if (id==2) return tr("dark_tau");
         if (id==3) return tr("dark_theta");
         if (id==4) return tr("offset");
+            break;
     case 3:
         if (id==0) return tr("A");
+            break;
     case 4:
         if (id==0) return tr("tau_1");
         if (id==1) return tr("tau_2");
@@ -906,15 +954,21 @@ QString QFFCSMaxEntEvaluationItem::getParameterID(int model, int id) const {
         if (id==3) return tr("fraction");
         if (id==4) return tr("particle_number");
         if (id==5) return tr("offset");
+            break;
     case 5:
         if (id==0) return tr("focus_height");
         if (id==1) return tr("pixel_size");
         if (id==2) return tr("offset");
+            break;
+    case 6:
+        if (id==0) return tr("pixel_size");
+        if (id==1) return tr("offset");
+            break;
 
     }
     return QString("m%1_p%2").arg(model).arg(id);
 }
 
 int QFFCSMaxEntEvaluationItem::getModelCount(QFRawDataRecord *r, int index) const {
-    return 6;
+    return 7;
 }

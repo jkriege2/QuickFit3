@@ -24,7 +24,9 @@
 inline double SPIMFCS_newVeff(double a, double wxy, double wz) {
     return QF_SQRTPI*qfSqr(a)*wz/qfSqr(erf(a/wxy)+wxy/QF_SQRTPI/a*(exp(-qfSqr(a/wxy))-1.0));
 }
-
+inline double TIRFCS_newAeff(double a, double wxy) {
+    return qfSqr(a)/qfSqr(erf(a/wxy)+wxy/QF_SQRTPI/a*(exp(-qfSqr(a/wxy))-1.0));
+}
 
 // Default Constructor
 MaxEntB040::MaxEntB040() {
@@ -296,29 +298,49 @@ void MaxEntB040::setTmatrix(){
                     }
             }
 
-    case 5: {//SPIM-FCS, 3D diffusion
+        case 5: {//SPIM-FCS, 3D diffusion
 
-        m_wz=m_paramStore(0);
-        m_a=m_paramStore(1);
-        m_kappa=m_wz/m_wxy;
-        const double Veff=SPIMFCS_newVeff(m_a, m_wxy, m_wz);
-        const double sqpi=sqrt(M_PI);
-        const double pre=1.0/sqr(m_a)/sqpi/m_wz;
+            m_wz=m_paramStore(0);
+            m_a=m_paramStore(1);
+            m_kappa=m_wz/m_wxy;
+            const double Veff=SPIMFCS_newVeff(m_a, m_wxy, m_wz);
+            const double sqpi=sqrt(M_PI);
+            const double pre=1.0/sqr(m_a)/sqpi/m_wz;
 
 
-        for (int i=0; i<m_Nd; i++)
-            {
-                for (int j=0; j<m_N; j++) {
-                    const double dt_sigma2=sqr(m_wxy)*(1.0+m_xdata(i)/m_taudiffs(j));
-                    const double fac_z=sqrt(1.0+m_xdata(i)/m_taudiffs(j)/sqr(m_kappa));
-                    const double fac_xy=erf(m_a/sqrt(dt_sigma2))+sqrt(dt_sigma2)/(sqpi*m_a)*(exp(-sqr(m_a)/dt_sigma2)-1.0);
+            for (int i=0; i<m_Nd; i++)
+                {
+                    for (int j=0; j<m_N; j++) {
+                        const double dt_sigma2=sqr(m_wxy)*(1.0+m_xdata(i)/m_taudiffs(j));
+                        const double fac_z=sqrt(1.0+m_xdata(i)/m_taudiffs(j)/sqr(m_kappa));
+                        const double fac_xy=erf(m_a/sqrt(dt_sigma2))+sqrt(dt_sigma2)/(sqpi*m_a)*(exp(-sqr(m_a)/dt_sigma2)-1.0);
 
-                    //double fourDt=sqr(m_wxy)*(1.0+m_xdata(i)/m_taudiffs(j));
-                        value=Veff*pre/fac_z*sqr(fac_xy);
-                        m_T(i,j)=value;
+                        //double fourDt=sqr(m_wxy)*(1.0+m_xdata(i)/m_taudiffs(j));
+                            value=Veff*pre/fac_z*sqr(fac_xy);
+                            m_T(i,j)=value;
+                    }
                 }
-            }
-        } break;
+            } break;
+        case 6: {//camera TIR-FCS, 3D diffusion
+
+            m_a=m_paramStore(0);
+            const double Veff=TIRFCS_newAeff(m_a, m_wxy);
+            const double sqpi=sqrt(M_PI);
+            const double pre=1.0/sqr(m_a);
+
+
+            for (int i=0; i<m_Nd; i++)
+                {
+                    for (int j=0; j<m_N; j++) {
+                        const double dt_sigma2=sqr(m_wxy)*(1.0+m_xdata(i)/m_taudiffs(j));
+                        const double fac_xy=erf(m_a/sqrt(dt_sigma2))+sqrt(dt_sigma2)/(sqpi*m_a)*(exp(-sqr(m_a)/dt_sigma2)-1.0);
+
+                        //double fourDt=sqr(m_wxy)*(1.0+m_xdata(i)/m_taudiffs(j));
+                            value=Veff*pre*sqr(fac_xy);
+                            m_T(i,j)=value;
+                    }
+                }
+            } break;
 
     }
 }
@@ -653,6 +675,27 @@ void MaxEntB040::evaluateModel(double * taus,double *modelEval,uint32_t N,\
             }
         } break;
 
+        case 6: {//SPIM-FCS, 3D diffusion
+
+            a=param_list[0];
+            offset=param_list[1];
+            const double Veff=TIRFCS_newAeff(a, wxy_micrometers);
+            const double sqpi=sqrt(M_PI);
+            const double pre=1.0/sqr(a);
+            for (uint32_t i=0; i<N; i++) {
+                sum=0;
+                if (distTaus && dist && Ndist>0) {
+                    for (register uint32_t j=0; j<Ndist; j++) {
+                        const double dt_sigma2=sqr(wxy_micrometers)*(1.0+taus[i]/distTaus[j]);
+                        const double fac_xy=erf(a/sqrt(dt_sigma2))+sqrt(dt_sigma2)/(sqpi*a)*(exp(-sqr(a)/dt_sigma2)-1.0);
+                        sum=sum+dist[j]*Veff*pre*sqr(fac_xy);
+                    }
+                } else {
+                    sum=1.0/double(N);
+                }
+                modelEval[i]=offset+sum;
+            }
+        } break;
 
     }
 }
