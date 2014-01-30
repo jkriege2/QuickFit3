@@ -4457,7 +4457,12 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                     if (listMode->item(4)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.75)); if (i==0) colNames<<tr("quantile75"); }
                     if (listMode->item(5)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMin(gvalues_s)); if (i==0) colNames<<tr("minimum"); }
                     if (listMode->item(6)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMax(gvalues_s)); if (i==0) colNames<<tr("maximum"); }
-                    if (chkCopyNumber->isChecked()) { r.append(qfstatisticsCount(gvalues_s)); if (i==0) colNames<<tr("pixel_count"); }
+                    if (chkCopyNumber->isChecked()) {
+                        if (i==items.size()-1) {
+                            r.append(qfstatisticsCount(gvalues_s));
+                            colNames<<tr("pixel_count");
+                        }
+                    }
                     result<<r;
                 }
             }
@@ -4485,7 +4490,13 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                     if (listMode->item(4)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.75)); colNames<<tr("quantile75(%1)").arg(names.value(items[i], "")); }
                     if (listMode->item(5)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMin(gvalues_s)); colNames<<tr("minimum(%1)").arg(names.value(items[i], "")); }
                     if (listMode->item(6)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMax(gvalues_s)); colNames<<tr("maximum(%1)").arg(names.value(items[i], "")); }
-                    if (chkCopyNumber->isChecked()) { r.append(qfstatisticsCount(gvalues_s)); colNames<<tr("pixel_count(%1)").arg(names.value(items[i], "")); }
+                    if (chkCopyNumber->isChecked()) {
+                        if (i==items.size()-1) {
+                            r.append(qfstatisticsCount(gvalues_s));
+                            colNames<<tr("pixel_count");
+                        }
+                    }
+                    //if (chkCopyNumber->isChecked()) { r.append(qfstatisticsCount(gvalues_s)); colNames<<tr("pixel_count(%1)").arg(names.value(items[i], "")); }
                 }
             }
             result<<r;
