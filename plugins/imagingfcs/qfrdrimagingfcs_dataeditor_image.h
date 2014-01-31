@@ -165,6 +165,10 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         void selectByParamIntensity();
         /** \brief select pixel by intensity in the parameter image 2 */
         void selectByParam2Intensity();
+        /** \brief run selection builder */
+        void buildSelection(bool select_notmask=true);
+        /** \brief run mask builder */
+        void buildMask();
         /** \brief deselect masked pixels */
         void deselectMask();
 
@@ -389,6 +393,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QAction* actCopyFitResultStatistics;
         QComboBox* cmbMaskEditMode;
         QAction* actCopyMaskToAll;
+        QAction* actSelectionBuilder;
+        QAction* actMaskBuilder;
 
         /** \brief combobox to select a result group */
         QComboBox* cmbResultGroup;

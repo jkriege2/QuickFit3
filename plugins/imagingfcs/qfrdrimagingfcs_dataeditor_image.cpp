@@ -18,6 +18,7 @@
 #include "statistics_tools.h"
 #include "qffcstools.h"
 #include "qfrdrimagingfcs.h"
+#include "qfrdrimagingfcsmaskbuilder.h"
 #define sqr(x) qfSqr(x)
 
 #define CLICK_UPDATE_TIMEOUT 500
@@ -383,6 +384,12 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     actDeselctMasked=new QAction(tr("deselect masked pixels"), w);
     connect(actDeselctMasked, SIGNAL(triggered()), this, SLOT(deselectMask()));
+
+    actSelectionBuilder=new QAction(tr("selection builder"), w);
+    connect(actSelectionBuilder, SIGNAL(triggered()), this, SLOT(buildSelection()));
+
+    actMaskBuilder=new QAction(tr("mask builder"), w);
+    connect(actMaskBuilder, SIGNAL(triggered()), this, SLOT(buildMask()));
 
 
 
@@ -1250,6 +1257,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuMask->addAction(actMaskByIntensity);
     menuMask->addAction(actMaskByParam2Intensity);
     menuMask->addAction(actMaskByParamIntensity);
+    menuMask->addAction(actMaskBuilder);
     correlationMaskTools->registerCorrelationToolsToMenu(menuMask);
 
 
@@ -1264,6 +1272,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuSelection->addAction(actSelectByParam2Intensity);
     menuSelection->addAction(actSelectByParamIntensity);
     menuSelection->addAction(actDeselctMasked);
+    menuSelection->addAction(actSelectionBuilder);
 
     menuImagingFCSTools=propertyEditor->addOrFindMenu(tr("ImagingFCS Tools"));
     menuImagingFCSTools->addAction(actCopyGroupACFsToTable);
@@ -1603,6 +1612,142 @@ void QFRDRImagingFCSImageEditor::selectByParamIntensity() {
 
 void QFRDRImagingFCSImageEditor::selectByParam2Intensity() {
     selectByImage(pltParamImage2->getData());
+}
+
+void QFRDRImagingFCSImageEditor::buildSelection(bool select_notmask)
+{
+    if (!current) return;
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (m) {
+        QStringList params;
+        QStringList paramNames;
+        params.append("###IMAGE1###");
+        paramNames.append("Overview Image, Channel 1");
+        if (m->getImageFromRunsChannels()>1) {
+            params.append("###IMAGE2###");
+            paramNames.append("Overview Image, Channel 2");
+        }
+        for (int i=0; i<cmbParameter->count(); i++) {
+            params.append(cmbParameter->itemData(i).toString());
+            paramNames.append(cmbParameter->itemText(i));
+        }
+        QFRDRImagingFCSMaskBuilder* dlg=new   QFRDRImagingFCSMaskBuilder(params, paramNames, this);
+        bool* mask=(bool*)malloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(bool));
+        double* image=(double*)malloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(double));
+        for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+            mask[i]=true;
+        }
+        if (dlg->exec()==QDialog::Accepted) {
+
+            QString param;
+            int mode;
+            double t1, t2;
+            if (dlg->use1(param, mode, t1, t2)) {
+                if (param=="###IMAGE1###") {
+                    copyArray(image, m->getImageFromRunsPreview(0), m->getImageFromRunsWidth()*m->getImageFromRunsHeight());
+                } else if (param=="###IMAGE2###") {
+                    copyArray(image, m->getImageFromRunsPreview(1), m->getImageFromRunsWidth()*m->getImageFromRunsHeight());
+                } else {
+                    readParameterImage(image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), param, QFRDRImagingFCSImageEditor::itNone);
+                }
+                if (mode==0) { // in range
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (t1<=image[i] && image[i]<=t2);
+                    }
+                } else if (mode==1) { // out of range
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (image[i]<t1 && image[i]>t2);
+                    }
+                } else if (mode==2) { // >= threshold
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (image[i]>=t1);
+                    }
+                } else if (mode==3) { // <= threshold
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (image[i]<=t1);
+                    }
+                }
+            }
+            if (dlg->use2(param, mode, t1, t2)) {
+                if (param=="###IMAGE1###") {
+                    copyArray(image, m->getImageFromRunsPreview(0), m->getImageFromRunsWidth()*m->getImageFromRunsHeight());
+                } else if (param=="###IMAGE2###") {
+                    copyArray(image, m->getImageFromRunsPreview(1), m->getImageFromRunsWidth()*m->getImageFromRunsHeight());
+                } else {
+                    readParameterImage(image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), param, QFRDRImagingFCSImageEditor::itNone);
+                }
+                if (mode==0) { // in range
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (t1<=image[i] && image[i]<=t2);
+                    }
+                } else if (mode==1) { // out of range
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (image[i]<t1 && image[i]>t2);
+                    }
+                } else if (mode==2) { // >= threshold
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (image[i]>=t1);
+                    }
+                } else if (mode==3) { // <= threshold
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (image[i]<=t1);
+                    }
+                }
+            }
+            if (dlg->use3(param, mode, t1, t2)) {
+                if (param=="###IMAGE1###") {
+                    copyArray(image, m->getImageFromRunsPreview(0), m->getImageFromRunsWidth()*m->getImageFromRunsHeight());
+                } else if (param=="###IMAGE2###") {
+                    copyArray(image, m->getImageFromRunsPreview(1), m->getImageFromRunsWidth()*m->getImageFromRunsHeight());
+                } else {
+                    readParameterImage(image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), param, QFRDRImagingFCSImageEditor::itNone);
+                }
+                if (mode==0) { // in range
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (t1<=image[i] && image[i]<=t2);
+                    }
+                } else if (mode==1) { // out of range
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (image[i]<t1 && image[i]>t2);
+                    }
+                } else if (mode==2) { // >= threshold
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (image[i]>=t1);
+                    }
+                } else if (mode==3) { // <= threshold
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (image[i]<=t1);
+                    }
+                }
+            }
+
+            if (dlg->onlyMasked()) {
+                for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                    mask[i]=mask[i] && !m->maskGetIdx(i);
+                }
+            }
+
+            if (select_notmask) {
+                for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                    bool l=mask[i];
+                    if (l) selectedInsert(i); else selectedRemove(i);
+                }
+                selectionEdited();
+            } else {
+                memcpy(m->maskGet(), mask, m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(bool));
+                m->recalcCorrelations();
+            }
+            rawDataChanged();
+        }
+        free(mask);
+        free(image);
+        delete dlg;
+    }
+}
+
+void QFRDRImagingFCSImageEditor::buildMask()
+{
+    buildSelection(false);
 }
 
 void QFRDRImagingFCSImageEditor::deselectMask()

@@ -58,7 +58,8 @@ HEADERS += qfrdrimagingfcs.h \
     ../base_classes/qfrdrimagecopydataselectdialog.h \
     ../base_classes/qfoverlaystylecombobox.h \
     ../base_classes/qfimageplotter.h \
-    ../base_classes/qfimageparametergroupbox.h
+    ../base_classes/qfimageparametergroupbox.h \
+    qfrdrimagingfcsmaskbuilder.h
 
 
 
@@ -92,7 +93,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     ../base_classes/qfrdrimagecopydataselectdialog.cpp \
     ../base_classes/qfoverlaystylecombobox.cpp \
     ../base_classes/qfimageplotter.cpp \
-    ../base_classes/qfimageparametergroupbox.cpp
+    ../base_classes/qfimageparametergroupbox.cpp \
+    qfrdrimagingfcsmaskbuilder.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \
@@ -103,7 +105,8 @@ FORMS = \
     qfrdrimagingfcsseriesdialog.ui \
     ../base_classes/qffinderroneouscorrelationdlg.ui \
     qfrdrimagingfcssimulator.ui \
-    ../base_classes/qfrdrimagecopydataselectdialog.ui
+    ../base_classes/qfrdrimagecopydataselectdialog.ui \
+    qfrdrimagingfcsmaskbuilder.ui
 
 RESOURCES += qfrdrimagingfcs.qrc
 
