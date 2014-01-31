@@ -196,6 +196,11 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
 
     splitMorePLot->setCollapsible(splitMorePLot->indexOf(pltDistribution), false);
 
+    pltOverview=new QFRDRImageToRunPreview(this);
+    pltOverview->setMaskEditable(true);
+    pltOverview->setSelectionEditable(true);
+    tabResidulas->addTab(pltOverview, tr("Overview Image"));
+
 
     /////
     connect(pltDistribution, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMove(double,double)));
@@ -218,6 +223,7 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
     QFFCSByIndexAndModelEvaluationEditor::connectWidgets(current, old);
 
     if (old) {
+
         disconnect(edtWxy, SIGNAL(valueChanged(double)), this, SLOT(wxyChanged(double)));
         disconnect(edtAlpha, SIGNAL(valueChanged(double)), this, SLOT(alphaChanged(double)));
         disconnect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
@@ -234,6 +240,8 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
     //QFFCSMaxEntEvaluationItem* item_old=qobject_cast<QFFCSMaxEntEvaluationItem*>(old);
     if (item) {
         dataEventsEnabled=false;
+
+
 
         edtWxy->setValue(item->getWXY());
         connect(edtWxy, SIGNAL(valueChanged(double)), this, SLOT(wxyChanged(double)));
@@ -292,10 +300,24 @@ void QFFCSMaxEntEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRec
     QFFCSMaxEntEvaluationItem* eval=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
     //QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(currentRecord);
+    QFRDRImageToRunInterface* dataImg=qobject_cast<QFRDRImageToRunInterface*>(currentRecord);
 
+    disconnect(pltOverview, SIGNAL(currentRunChanged(int)), spinRun, SLOT(setValue(int)));
+    disconnect(spinRun, SIGNAL(valueChanged(int)), pltOverview, SLOT(setCurrentRun(int)));
     if (data && eval) {
         bool oldde=dataEventsEnabled;
         dataEventsEnabled=false;
+
+        if (dataImg) {
+            pltOverview->setRDR(currentRecord);
+            connect(pltOverview, SIGNAL(currentRunChanged(int)), spinRun, SLOT(setValue(int)));
+            connect(spinRun, SIGNAL(valueChanged(int)), pltOverview, SLOT(setCurrentRun(int)));
+            tabResidulas->setTabEnabled(tabResidulas->indexOf(pltOverview), true);
+        } else {
+            pltOverview->setRDR(0);
+            tabResidulas->setTabEnabled(tabResidulas->indexOf(pltOverview), false);
+        }
+
         edtWxy->setValue(eval->getWXY());
         edtAlpha->setValue(eval->getAlpha());
         cmbWeights->setCurrentWeight(eval->getFitDataWeighting());

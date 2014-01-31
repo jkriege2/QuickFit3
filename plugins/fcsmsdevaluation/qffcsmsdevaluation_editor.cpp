@@ -333,6 +333,11 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     menuResults->addSeparator();
     menuResults->addAction(actCopyAverageData);
 
+    pltOverview=new QFRDRImageToRunPreview(this);
+    pltOverview->setMaskEditable(true);
+    pltOverview->setSelectionEditable(true);
+    tabResidulas->addTab(pltOverview, tr("Overview Image"));
+
     /////
     connect(pltDistribution, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMove(double,double)));
     connect(pltDistribution, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(distzoomChangedLocally(double,double,double,double,JKQtPlotter*)));
@@ -585,10 +590,26 @@ void QFFCSMSDEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
     QFFCSMSDEvaluationItem* eval=qobject_cast<QFFCSMSDEvaluationItem*>(current);
     //QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(currentRecord);
+    QFRDRImageToRunInterface* dataImg=qobject_cast<QFRDRImageToRunInterface*>(currentRecord);
+
+    disconnect(pltOverview, SIGNAL(currentRunChanged(int)), spinRun, SLOT(setValue(int)));
+    disconnect(spinRun, SIGNAL(valueChanged(int)), pltOverview, SLOT(setCurrentRun(int)));
 
     if (data && eval) {
         bool oldde=dataEventsEnabled;
         dataEventsEnabled=false;
+
+        if (dataImg) {
+            pltOverview->setRDR(currentRecord);
+            connect(pltOverview, SIGNAL(currentRunChanged(int)), spinRun, SLOT(setValue(int)));
+            connect(spinRun, SIGNAL(valueChanged(int)), pltOverview, SLOT(setCurrentRun(int)));
+            tabResidulas->setTabEnabled(tabResidulas->indexOf(pltOverview), true);
+        } else {
+            pltOverview->setRDR(0);
+            tabResidulas->setTabEnabled(tabResidulas->indexOf(pltOverview), false);
+        }
+
+
         //edtAlpha->setValue(eval->getAlpha());
         cmbWeights->setCurrentWeight(eval->getFitDataWeighting());
         cmbFitType->setCurrentIndex(eval->getFitType(currentRecord, eval->getCurrentIndex()));

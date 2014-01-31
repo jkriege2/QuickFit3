@@ -61,6 +61,7 @@
 #include "qffitalgorithmmanager.h"
 ////////////
 #include "qffcsmsdevaluation_item.h"
+#include "qfrdrimagetorunpreview.h"
 
 
 
@@ -170,6 +171,7 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         QAction* actUpdateCalculated;
         JKQTPoverlayVerticalRange* ovlDistRange;
         JKQTPoverlayLine* ovlModel;
+        QFRDRImageToRunPreview* pltOverview;
 
     private:
         void createWidgets();

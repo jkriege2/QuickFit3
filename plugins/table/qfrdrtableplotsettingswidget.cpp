@@ -352,6 +352,12 @@ void QFRDRTablePlotSettingsWidget::on_btnSaveSystem_clicked() {
     ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRTablePlotSettingsWidget/lasttemplatedir", dir);
 }
 
+void QFRDRTablePlotSettingsWidget::on_btnAutoscaleXY_clicked()
+{
+    doAutoscaleX();
+    doAutoscaleY();
+}
+
 
 
 

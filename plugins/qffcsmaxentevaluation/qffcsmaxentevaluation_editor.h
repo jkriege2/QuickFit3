@@ -61,6 +61,7 @@
 #include "qfdoubleedit.h"
 #include "qffcsweightingtools.h"
 #include "qfdoubleedit.h"
+#include "qfrdrimagetorunpreview.h"
 ////////////
 
 
@@ -143,7 +144,7 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         QFDoubleEdit* edtWxy;
         QComboBox* cmbXAxisType;
         QCheckBox* chkShowRanges;
-
+        QFRDRImageToRunPreview* pltOverview;
 
     private:
         void createWidgets();

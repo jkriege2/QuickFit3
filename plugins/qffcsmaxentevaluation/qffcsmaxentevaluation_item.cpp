@@ -475,7 +475,7 @@ bool QFFCSMaxEntEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QS
         defaultValue.value=0.001;
         return true;
     } else if (parameterID=="maxent_Ndist") {
-        defaultValue.value=100;
+        defaultValue.value=300;
         return true;
     } else if (parameterID=="maxent_wxy") {
         defaultValue.value=250;
