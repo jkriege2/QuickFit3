@@ -69,6 +69,28 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     imageFilters.clear();
     ui->cmbFileformat->clear();
 
+    actCropCenter=new QAction(tr("crop center ..."), this);
+    connect(actCropCenter, SIGNAL(triggered()), this, SLOT(cropCenter()));
+    ui->btnSelCrop->addAction(actCropCenter);
+
+    actCropLeftCenter=new QAction(tr("crop left center ..."), this);
+    connect(actCropLeftCenter, SIGNAL(triggered()), this, SLOT(cropLeftCenter()));
+    ui->btnSelCrop->addAction(actCropLeftCenter);
+
+    actCropRightCenter=new QAction(tr("crop right center ..."), this);
+    connect(actCropRightCenter, SIGNAL(triggered()), this, SLOT(cropRightCenter()));
+    ui->btnSelCrop->addAction(actCropRightCenter);
+
+    actCropTopCenter=new QAction(tr("crop top center ..."), this);
+    connect(actCropTopCenter, SIGNAL(triggered()), this, SLOT(cropTopCenter()));
+    ui->btnSelCrop->addAction(actCropTopCenter);
+
+    actCropBottomCenter=new QAction(tr("crop bottom center ..."), this);
+    connect(actCropBottomCenter, SIGNAL(triggered()), this, SLOT(cropBottomCenter()));
+    ui->btnSelCrop->addAction(actCropBottomCenter);
+
+
+
     // add more fileformats here
     imageFilters=QFRDRImagingFCSCorrelationJobThread::getImageFilterList(pluginServices);
     imageFormatNames=QFRDRImagingFCSCorrelationJobThread::getImageFormatNameList(pluginServices);
@@ -199,6 +221,79 @@ void QFRDRImagingFCSCorrelationDialog::readBackgroundFramesize()
 
     prg.close();
     QApplication::restoreOverrideCursor();
+}
+
+void QFRDRImagingFCSCorrelationDialog::cropCenter()
+{
+    int cwidth=ProgramOptions::getConfigValue("imaging_fcs/dlg_correlate/crop_settings/width_center", qMin(image_width, image_height)).toInt();
+    bool ok=false;
+    cwidth=QInputDialog::getInt(this, tr("crop center"), tr("width of crop region:"), cwidth, 1, qMax(image_width, image_height), 1, &ok);
+    if (ok) {
+        ui->spinXFirst->setValue(image_width/2-cwidth/2);
+        ui->spinXLast->setValue(image_width/2-cwidth/2+cwidth-1);
+        ui->spinYFirst->setValue(image_height/2-cwidth/2);
+        ui->spinYLast->setValue(image_height/2-cwidth/2+cwidth-1);
+        ProgramOptions::setConfigValue("imaging_fcs/dlg_correlate/crop_settings/width_center", cwidth);
+    }
+}
+
+void QFRDRImagingFCSCorrelationDialog::cropLeftCenter()
+{
+    int cwidth=ProgramOptions::getConfigValue("imaging_fcs/dlg_correlate/crop_settings/width_dvcenter", qMin(image_width, image_height)).toInt();
+    bool ok=false;
+    cwidth=QInputDialog::getInt(this, tr("crop left center"), tr("width of crop region:"), cwidth, 1, qMax(image_width, image_height), 1, &ok);
+    if (ok) {
+        ui->spinXFirst->setValue(image_width/4-cwidth/2);
+        ui->spinXLast->setValue(image_width/4-cwidth/2+cwidth-1);
+        ui->spinYFirst->setValue(image_height/2-cwidth/2);
+        ui->spinYLast->setValue(image_height/2-cwidth/2+cwidth-1);
+        ProgramOptions::setConfigValue("imaging_fcs/dlg_correlate/crop_settings/width_dvcenter", cwidth);
+    }
+}
+
+void QFRDRImagingFCSCorrelationDialog::cropRightCenter()
+{
+    int cwidth=ProgramOptions::getConfigValue("imaging_fcs/dlg_correlate/crop_settings/width_dvcenter", qMin(image_width, image_height)).toInt();
+    bool ok=false;
+    cwidth=QInputDialog::getInt(this, tr("crop right center"), tr("width of crop region:"), cwidth, 1, qMax(image_width, image_height), 1, &ok);
+    if (ok) {
+        ui->spinXFirst->setValue(3*image_width/4-cwidth/2);
+        ui->spinXLast->setValue(3*image_width/4-cwidth/2+cwidth-1);
+        ui->spinYFirst->setValue(image_height/2-cwidth/2);
+        ui->spinYLast->setValue(image_height/2-cwidth/2+cwidth-1);
+        ProgramOptions::setConfigValue("imaging_fcs/dlg_correlate/crop_settings/width_dvcenter", cwidth);
+    }
+}
+
+void QFRDRImagingFCSCorrelationDialog::cropTopCenter()
+{
+    int cwidth=ProgramOptions::getConfigValue("imaging_fcs/dlg_correlate/crop_settings/width_dvcenter", qMin(image_width, image_height)).toInt();
+    bool ok=false;
+    cwidth=QInputDialog::getInt(this, tr("crop top center"), tr("width of crop region:"), cwidth, 1, qMax(image_width, image_height), 1, &ok);
+    if (ok) {
+        ui->spinXFirst->setValue(image_width/2-cwidth/2);
+        ui->spinXLast->setValue(image_width/2-cwidth/2+cwidth-1);
+        ui->spinYFirst->setValue(3*image_height/4-cwidth/2);
+        ui->spinYLast->setValue(3*image_height/4-cwidth/2+cwidth-1);
+        ProgramOptions::setConfigValue("imaging_fcs/dlg_correlate/crop_settings/width_dvcenter", cwidth);
+    }
+
+}
+
+void QFRDRImagingFCSCorrelationDialog::cropBottomCenter()
+{
+    int cwidth=ProgramOptions::getConfigValue("imaging_fcs/dlg_correlate/crop_settings/width_dvcenter", qMin(image_width, image_height)).toInt();
+    bool ok=false;
+    cwidth=QInputDialog::getInt(this, tr("crop bottom center"), tr("width of crop region:"), cwidth, 1, qMax(image_width, image_height), 1, &ok);
+    if (ok) {
+        ui->spinXFirst->setValue(image_width/2-cwidth/2);
+        ui->spinXLast->setValue(image_width/2-cwidth/2+cwidth-1);
+        ui->spinYFirst->setValue(image_height/4-cwidth/2);
+        ui->spinYLast->setValue(image_height/4-cwidth/2+cwidth-1);
+        ProgramOptions::setConfigValue("imaging_fcs/dlg_correlate/crop_settings/width_dvcenter", cwidth);
+    }
+
+
 }
 
 

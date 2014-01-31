@@ -14,11 +14,11 @@ QFImFCSFitEvaluation::QFImFCSFitEvaluation(QFProject* parent):
     m_currentIndex=-1;
     //mutexThreadedFit=new QMutex(QMutex::Recursive);
 
-    if (m_fitFunctions.contains("fcs_spim_diff")) {
+    if (m_fitFunctions.contains("fcs_spim_diffe2_newveff")) {
+        m_fitFunction="fcs_spim_diffe2_newveff";
+    } else if (m_fitFunctions.contains("fcs_spim_diff")) {
         m_fitFunction="fcs_spim_diff";
-    } /*else if (m_fitFunctions.contains("fcs_diff1")) {
-        m_fitFunction="fcs_diff1";
-    }*/
+    }
 
     if (m_fitAlgorithms.contains("fit_lmfit")) {
         m_fitAlgorithm="fit_lmfit";

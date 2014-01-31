@@ -881,6 +881,19 @@ p, li { white-space: pre-wrap; }
                    </widget>
                   </item>
                   <item>
+                   <widget class="QToolButton" name="btnSelCrop">
+                    <property name="text">
+                     <string>select ropping ...</string>
+                    </property>
+                    <property name="popupMode">
+                     <enum>QToolButton::InstantPopup</enum>
+                    </property>
+                    <property name="toolButtonStyle">
+                     <enum>Qt::ToolButtonTextOnly</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
                    <spacer name="horizontalSpacer_32">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>

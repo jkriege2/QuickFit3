@@ -83,6 +83,12 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         void on_btnDataExplorer_clicked();
         void readBackgroundFramesize();
 
+        void cropCenter();
+        void cropLeftCenter();
+        void cropRightCenter();
+        void cropTopCenter();
+        void cropBottomCenter();
+
     protected:
         void done(int status);
         bool allThreadsDone() const;
@@ -104,6 +110,12 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         QList<QFRDRImagingFCSCorrelationJobThread::Fileinfo> filesToAdd;
         bool closing;
         QString inputconfigfile;
+
+        QAction* actCropCenter;
+        QAction* actCropLeftCenter;
+        QAction* actCropRightCenter;
+        QAction* actCropTopCenter;
+        QAction* actCropBottomCenter;
 
 
 
