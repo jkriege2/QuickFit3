@@ -228,9 +228,15 @@ double QFEDiffusionCoefficientCalculator::getShapeDCoeff(int solution, double ro
             return DDD;
         }
     } else if (type==QFEDiffusionCoefficientCalculator::Cylinder){
-        double gamma=0.312+0.565/p+0.100/p/p;
         Re=pow(3.0/(2.0*p*p), 1.0/3.0)*rotation_axis_or_length_meter/2.0;
-        Ft=pow(2.0*p*p/3.0, 1.0/3.0)/(log(p)+gamma);
+
+        /*// Tirado and Garcý´a de la Torre for d/L\in [2:20]
+        double gamma=0.312+0.565/p+0.100/p/p;
+        Ft=pow(2.0*p*p/3.0, 1.0/3.0)/(log(p)+gamma);*/
+
+        //Hansen 2004
+        const double lnp=log(p);
+        Ft=1.0304+0.0193*pow(lnp,1)+0.06229*pow(lnp,2)+0.00476*pow(lnp,3)+0.00166*pow(lnp,4)+2.66e-6**pow(lnp,7);
     } else if (type==QFEDiffusionCoefficientCalculator::Sphere){
         Ft=1;
         Re=rotation_axis_or_length_meter/2.0;
