@@ -18,6 +18,8 @@ class QFRDRImagingFCSMaskBuilder : public QDialog
         bool use1(QString& parameter, int& mode, double& thresh1, double& thresh2);
         bool use2(QString& parameter, int& mode, double& thresh1, double& thresh2);
         bool use3(QString& parameter, int& mode, double& thresh1, double& thresh2);
+        bool use4(QString& parameter, int& mode, double& thresh1, double& thresh2);
+        bool use5(QString& parameter, int& mode, double& thresh1, double& thresh2);
         bool onlyMasked();
 
     private:

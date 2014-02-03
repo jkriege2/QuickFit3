@@ -1721,6 +1721,60 @@ void QFRDRImagingFCSImageEditor::buildSelection(bool select_notmask)
                 }
             }
 
+            if (dlg->use4(param, mode, t1, t2)) {
+                if (param=="###IMAGE1###") {
+                    copyArray(image, m->getImageFromRunsPreview(0), m->getImageFromRunsWidth()*m->getImageFromRunsHeight());
+                } else if (param=="###IMAGE2###") {
+                    copyArray(image, m->getImageFromRunsPreview(1), m->getImageFromRunsWidth()*m->getImageFromRunsHeight());
+                } else {
+                    readParameterImage(image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), param, QFRDRImagingFCSImageEditor::itNone);
+                }
+                if (mode==0) { // in range
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (t1<=image[i] && image[i]<=t2);
+                    }
+                } else if (mode==1) { // out of range
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (image[i]<t1 && image[i]>t2);
+                    }
+                } else if (mode==2) { // >= threshold
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (image[i]>=t1);
+                    }
+                } else if (mode==3) { // <= threshold
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (image[i]<=t1);
+                    }
+                }
+            }
+
+            if (dlg->use5(param, mode, t1, t2)) {
+                if (param=="###IMAGE1###") {
+                    copyArray(image, m->getImageFromRunsPreview(0), m->getImageFromRunsWidth()*m->getImageFromRunsHeight());
+                } else if (param=="###IMAGE2###") {
+                    copyArray(image, m->getImageFromRunsPreview(1), m->getImageFromRunsWidth()*m->getImageFromRunsHeight());
+                } else {
+                    readParameterImage(image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), param, QFRDRImagingFCSImageEditor::itNone);
+                }
+                if (mode==0) { // in range
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (t1<=image[i] && image[i]<=t2);
+                    }
+                } else if (mode==1) { // out of range
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (image[i]<t1 && image[i]>t2);
+                    }
+                } else if (mode==2) { // >= threshold
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (image[i]>=t1);
+                    }
+                } else if (mode==3) { // <= threshold
+                    for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                        mask[i]=mask[i] && (image[i]<=t1);
+                    }
+                }
+            }
+
             if (dlg->onlyMasked()) {
                 for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
                     mask[i]=mask[i] && !m->maskGetIdx(i);

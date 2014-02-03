@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>674</width>
-    <height>248</height>
+    <height>276</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,55 +23,8 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout" columnstretch="0,3,0,1,1">
-     <item row="4" column="1">
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="3" column="4">
-      <widget class="QFDoubleEdit" name="spinT32">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QComboBox" name="cmbMode1">
-       <item>
-        <property name="text">
-         <string>in-range</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>out-of-range</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>&gt;= threshold</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>&lt;= threshold</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="1" column="4">
-      <widget class="QFDoubleEdit" name="spinT12"/>
-     </item>
-     <item row="0" column="3">
-      <widget class="QLabel" name="label_3">
+     <item row="0" column="1">
+      <widget class="QLabel" name="label">
        <property name="font">
         <font>
          <weight>75</weight>
@@ -79,7 +32,7 @@
         </font>
        </property>
        <property name="text">
-        <string>range start/threshold</string>
+        <string>parameter</string>
        </property>
       </widget>
      </item>
@@ -95,6 +48,9 @@
         <string>mode</string>
        </property>
       </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QFDoubleEdit" name="spinT12"/>
      </item>
      <item row="3" column="2">
       <widget class="QComboBox" name="cmbMode3">
@@ -121,6 +77,128 @@
          <string>&lt;threshold</string>
         </property>
        </item>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLabel" name="label_3">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>range start/threshold</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="4">
+      <widget class="QFDoubleEdit" name="spinT42">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QFDoubleEdit" name="spinT11"/>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="cmbP3">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="4">
+      <widget class="QLabel" name="label_4">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>range end</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="2">
+      <widget class="QComboBox" name="cmbMode4">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <item>
+        <property name="text">
+         <string>in-range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>out-of-range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>&gt;threshold</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>&lt;threshold</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="4" column="3">
+      <widget class="QFDoubleEdit" name="spinT41">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QComboBox" name="cmbP4">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QCheckBox" name="chkUse4">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="cmbP2">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="QFDoubleEdit" name="spinT21">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="cmbP1"/>
+     </item>
+     <item row="2" column="4">
+      <widget class="QFDoubleEdit" name="spinT22">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="3">
+      <widget class="QFDoubleEdit" name="spinT31">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
      <item row="2" column="2">
@@ -150,77 +228,30 @@
        </item>
       </widget>
      </item>
-     <item row="1" column="3">
-      <widget class="QFDoubleEdit" name="spinT11"/>
+     <item row="6" column="1">
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
      </item>
-     <item row="3" column="1">
-      <widget class="QComboBox" name="cmbP3">
+     <item row="3" column="4">
+      <widget class="QFDoubleEdit" name="spinT32">
        <property name="enabled">
         <bool>false</bool>
        </property>
       </widget>
      </item>
-     <item row="0" column="4">
-      <widget class="QLabel" name="label_4">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
+     <item row="3" column="0">
+      <widget class="QCheckBox" name="chkUse3">
        <property name="text">
-        <string>range end</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QComboBox" name="cmbP2">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="cmbP1"/>
-     </item>
-     <item row="2" column="4">
-      <widget class="QFDoubleEdit" name="spinT22">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="3">
-      <widget class="QFDoubleEdit" name="spinT31">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="label">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>parameter</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="3">
-      <widget class="QFDoubleEdit" name="spinT21">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QCheckBox" name="chkMask">
-       <property name="text">
-        <string>non-masked only</string>
+        <string/>
        </property>
       </widget>
      </item>
@@ -231,10 +262,89 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QCheckBox" name="chkUse3">
+     <item row="7" column="1">
+      <widget class="QCheckBox" name="chkMask">
+       <property name="text">
+        <string>non-masked only</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QComboBox" name="cmbMode1">
+       <item>
+        <property name="text">
+         <string>in-range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>out-of-range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>&gt;= threshold</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>&lt;= threshold</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QCheckBox" name="chkUse5">
        <property name="text">
         <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QComboBox" name="cmbP5">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="2">
+      <widget class="QComboBox" name="cmbMode5">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <item>
+        <property name="text">
+         <string>in-range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>out-of-range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>&gt;threshold</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>&lt;threshold</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="5" column="3">
+      <widget class="QFDoubleEdit" name="spinT51">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="4">
+      <widget class="QFDoubleEdit" name="spinT52">
+       <property name="enabled">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -440,6 +550,134 @@
     <hint type="destinationlabel">
      <x>254</x>
      <y>112</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkUse4</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbP4</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>132</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>66</x>
+     <y>138</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkUse4</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbMode4</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>18</x>
+     <y>129</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>369</x>
+     <y>133</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkUse4</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinT41</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>15</x>
+     <y>138</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>456</x>
+     <y>136</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkUse4</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinT42</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>15</x>
+     <y>130</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>603</x>
+     <y>137</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkUse5</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbP5</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>19</x>
+     <y>159</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>58</x>
+     <y>167</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkUse5</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbMode5</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>15</x>
+     <y>159</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>350</x>
+     <y>168</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkUse5</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinT51</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>14</x>
+     <y>162</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>164</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkUse5</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinT52</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>13</x>
+     <y>163</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>611</x>
+     <y>166</y>
     </hint>
    </hints>
   </connection>
