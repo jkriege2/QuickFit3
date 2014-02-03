@@ -452,6 +452,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
     public slots:
         void emitRebuildPlotWidgets();
 
+        void columnsInserted(int start, int count, bool emitRebuild=true);
+        void columnsRemoved(int start, int count, bool emitRebuild=true);
 
     protected slots:
         void tdataChanged( const QModelIndex & tl, const QModelIndex & br ) {

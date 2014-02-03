@@ -41,7 +41,7 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         /** \copydoc QFExtension::getAuthor() */
         virtual QString getAuthor() const  { return tr("Jan W. Krieger"); };
         /** \copydoc QFExtension::getCopyright() */
-        virtual QString getCopyright() const  { return tr("(c) 2012 by Jan W. Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2012-2013 by Jan W. Krieger"); };
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); };
         /** \copydoc QFExtension::getIconFilename() */
@@ -86,13 +86,13 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         /** \brief returns the viscosity of the specified solution im Pa*s */
         double getSolutionViscosity(int solution, double temperature_K, QList<Component> components=QList<Component>());
         /** \brief returns the diffusion coefficient in m^2/s */
-        double getSphereDCoeff(int solution, double diameter_meter, double at_temperature_K, QList<Component> components=QList<Component>());
+        double getSphereDCoeff(int solution, double diameter_meter, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0);
         /** \brief returns the diffusion coefficient in m^2/s */
-        double getDCoeff_from_D20W(int solution, double D20W, double at_temperature_K, QList<Component> components=QList<Component>());
+        double getDCoeff_from_D20W(int solution, double D20W, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0);
         /** \brief returns the diffusion coefficient in m^2/s */
-        double getDCoeff_from_D(int solution, double D, double viscosity, double temp_K, double at_temperature_K, QList<Component> components=QList<Component>());
+        double getDCoeff_from_D(int solution, double D, double viscosity, double temp_K, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0);
         /** \brief returns the diffusion coefficient in m^2/s */
-        double getShapeDCoeff(int solution, double rotation_axis_or_length_meter, double second_axis_or_diameter_meter, SpheroidType type, double at_temperature_K, QList<Component> components=QList<Component>(), double* Dsphere=NULL, double* volume=NULL);
+        double getShapeDCoeff(int solution, double rotation_axis_or_length_meter, double second_axis_or_diameter_meter, SpheroidType type, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0, double* Dsphere=NULL, double* volume=NULL);
 
         virtual QAction* getToolStartAction();
         virtual void startTool();

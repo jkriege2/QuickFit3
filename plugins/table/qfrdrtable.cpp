@@ -1842,5 +1842,62 @@ void QFRDRTable::didRebuildPlotWidgets()
     //emittedRebuildPlotWidgets=false;
 }
 
+inline int QFRDRTableOffsetIfLarger(int value, int condition, int offset) {
+    if (value<0) return value;
+    if (value>=condition) return value+offset;
+    return value;
+}
+
+void QFRDRTable::columnsInserted(int start, int count, bool emitRebuild)
+{
+    if (!datamodel) return;
+
+    for (int ip=0; ip<plots.size(); ip++) {
+        PlotInfo& p=plots[ip];
+        for (int ig=0; ig<p.graphs.size(); ig++) {
+            GraphInfo& g=p.graphs[ig];
+            g.xcolumn=QFRDRTableOffsetIfLarger(g.xcolumn, start, count);
+            g.ycolumn=QFRDRTableOffsetIfLarger(g.ycolumn, start, count);
+            g.xerrorcolumn=QFRDRTableOffsetIfLarger(g.xerrorcolumn, start, count);
+            g.yerrorcolumn=QFRDRTableOffsetIfLarger(g.yerrorcolumn, start, count);
+            g.meancolumn=QFRDRTableOffsetIfLarger(g.meancolumn, start, count);
+            g.q75column=QFRDRTableOffsetIfLarger(g.q75column, start, count);
+            g.maxcolumn=QFRDRTableOffsetIfLarger(g.maxcolumn, start, count);
+        }
+    }
+
+    if (emitRebuild&&datamodel->getDoEmitSignals()) emitRebuildPlotWidgets();
+}
+
+inline int QFRDRTableOffsetIfLargerM1IfInRange(int value, int start, int count) {
+    if (value<0) return value;
+    if (value>=start) {
+        if (value<start+count) return -1;
+        else return value-count;
+    }
+    return value;
+}
+
+void QFRDRTable::columnsRemoved(int start, int count, bool emitRebuild)
+{
+    if (!datamodel) return;
+
+    for (int ip=0; ip<plots.size(); ip++) {
+        PlotInfo& p=plots[ip];
+        for (int ig=0; ig<p.graphs.size(); ig++) {
+            GraphInfo& g=p.graphs[ig];
+            g.xcolumn=QFRDRTableOffsetIfLargerM1IfInRange(g.xcolumn, start, count);
+            g.ycolumn=QFRDRTableOffsetIfLargerM1IfInRange(g.ycolumn, start, count);
+            g.xerrorcolumn=QFRDRTableOffsetIfLargerM1IfInRange(g.xerrorcolumn, start, count);
+            g.yerrorcolumn=QFRDRTableOffsetIfLargerM1IfInRange(g.yerrorcolumn, start, count);
+            g.meancolumn=QFRDRTableOffsetIfLargerM1IfInRange(g.meancolumn, start, count);
+            g.q75column=QFRDRTableOffsetIfLargerM1IfInRange(g.q75column, start, count);
+            g.maxcolumn=QFRDRTableOffsetIfLargerM1IfInRange(g.maxcolumn, start, count);
+        }
+    }
+
+    if (emitRebuild&&datamodel->getDoEmitSignals()) emitRebuildPlotWidgets();
+}
+
 
 

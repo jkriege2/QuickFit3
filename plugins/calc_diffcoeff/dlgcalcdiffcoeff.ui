@@ -455,38 +455,38 @@
           </item>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="2" column="0">
          <widget class="QLabel" name="label_14">
           <property name="text">
            <string>component 1:</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="3" column="0">
          <widget class="QLabel" name="label_15">
           <property name="text">
            <string>component 2:</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
+        <item row="4" column="0">
          <widget class="QLabel" name="label_16">
           <property name="text">
            <string>component 3:</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1" colspan="2">
+        <item row="2" column="1" colspan="2">
          <widget class="QComboBox" name="cmbCType1"/>
         </item>
-        <item row="1" column="4">
+        <item row="2" column="4">
          <widget class="QLabel" name="label_17">
           <property name="text">
            <string>concentration</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="5" colspan="2">
+        <item row="2" column="5" colspan="2">
          <widget class="QDoubleSpinBox" name="spinCConcentration1">
           <property name="suffix">
            <string> mM</string>
@@ -505,17 +505,17 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1" colspan="2">
+        <item row="3" column="1" colspan="2">
          <widget class="QComboBox" name="cmbCType2"/>
         </item>
-        <item row="2" column="4">
+        <item row="3" column="4">
          <widget class="QLabel" name="label_18">
           <property name="text">
            <string>concentration</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="5" colspan="2">
+        <item row="3" column="5" colspan="2">
          <widget class="QDoubleSpinBox" name="spinCConcentration2">
           <property name="suffix">
            <string> mM</string>
@@ -534,7 +534,7 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="5" colspan="2">
+        <item row="4" column="5" colspan="2">
          <widget class="QDoubleSpinBox" name="spinCConcentration3">
           <property name="suffix">
            <string> mM</string>
@@ -553,17 +553,17 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="4">
+        <item row="4" column="4">
          <widget class="QLabel" name="label_19">
           <property name="text">
            <string>concentration</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1" colspan="2">
+        <item row="4" column="1" colspan="2">
          <widget class="QComboBox" name="cmbCType3"/>
         </item>
-        <item row="1" column="3">
+        <item row="2" column="3">
          <widget class="QToolButton" name="btnCHelp1">
           <property name="toolTip">
            <string>open a dialog with extended info on the selected component</string>
@@ -577,7 +577,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="3">
+        <item row="3" column="3">
          <widget class="QToolButton" name="btnCHelp2">
           <property name="toolTip">
            <string>open a dialog with extended info on the selected component</string>
@@ -591,7 +591,7 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="3">
+        <item row="4" column="3">
          <widget class="QToolButton" name="btnCHelp3">
           <property name="toolTip">
            <string>open a dialog with extended info on the selected component</string>
@@ -605,17 +605,17 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
+        <item row="5" column="0">
          <widget class="QLabel" name="label_23">
           <property name="text">
            <string>component 4:</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="1" colspan="2">
+        <item row="5" column="1" colspan="2">
          <widget class="QComboBox" name="cmbCType4"/>
         </item>
-        <item row="4" column="3">
+        <item row="5" column="3">
          <widget class="QToolButton" name="btnCHelp4">
           <property name="toolTip">
            <string>open a dialog with extended info on the selected component</string>
@@ -629,14 +629,14 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="4">
+        <item row="5" column="4">
          <widget class="QLabel" name="label_24">
           <property name="text">
            <string>concentration</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="5" colspan="2">
+        <item row="5" column="5" colspan="2">
          <widget class="QDoubleSpinBox" name="spinCConcentration4">
           <property name="suffix">
            <string> mM</string>
@@ -655,17 +655,17 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="0">
+        <item row="7" column="0">
          <widget class="QLabel" name="label_25">
           <property name="text">
            <string>component 5:</string>
           </property>
          </widget>
         </item>
-        <item row="6" column="1" colspan="2">
+        <item row="7" column="1" colspan="2">
          <widget class="QComboBox" name="cmbCType5"/>
         </item>
-        <item row="6" column="3">
+        <item row="7" column="3">
          <widget class="QToolButton" name="btnCHelp5">
           <property name="toolTip">
            <string>open a dialog with extended info on the selected component</string>
@@ -679,14 +679,14 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="4">
+        <item row="7" column="4">
          <widget class="QLabel" name="label_26">
           <property name="text">
            <string>concentration</string>
           </property>
          </widget>
         </item>
-        <item row="6" column="5" colspan="2">
+        <item row="7" column="5" colspan="2">
          <widget class="QDoubleSpinBox" name="spinCConcentration5">
           <property name="suffix">
            <string> mM</string>
@@ -702,6 +702,39 @@
           </property>
           <property name="value">
            <double>0.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_36">
+          <property name="text">
+           <string>viscosity factor:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" colspan="2">
+         <widget class="QDoubleSpinBox" name="spinViscosityFactor">
+          <property name="suffix">
+           <string/>
+          </property>
+          <property name="decimals">
+           <number>3</number>
+          </property>
+          <property name="minimum">
+           <double>0.001000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>999999.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3" colspan="4">
+         <widget class="QLabel" name="label_37">
+          <property name="text">
+           <string>&lt;span style=&quot; font-size:small;&quot;&gt;the final viscosity is multiplied by this factor&lt;br&gt;(e.g. 3-10 to simulate the cytosol of cells)&lt;/span&gt;</string>
           </property>
          </widget>
         </item>
@@ -996,6 +1029,7 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfediffusioncoefficientcalculator.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
@@ -1061,7 +1095,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>931</x>
-     <y>368</y>
+     <y>325</y>
     </hint>
     <hint type="destinationlabel">
      <x>721</x>
@@ -1076,8 +1110,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>175</x>
-     <y>108</y>
+     <x>126</x>
+     <y>72</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1092,8 +1126,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>174</x>
-     <y>169</y>
+     <x>102</x>
+     <y>47</y>
     </hint>
     <hint type="destinationlabel">
      <x>2</x>
@@ -1108,8 +1142,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>174</x>
-     <y>199</y>
+     <x>102</x>
+     <y>50</y>
     </hint>
     <hint type="destinationlabel">
      <x>2</x>
@@ -1124,8 +1158,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>201</x>
-     <y>63</y>
+     <x>102</x>
+     <y>52</y>
     </hint>
     <hint type="destinationlabel">
      <x>724</x>
@@ -1140,8 +1174,8 @@
    <slot>updateGivenD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>168</x>
-     <y>73</y>
+     <x>95</x>
+     <y>60</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -1172,8 +1206,8 @@
    <slot>updatePlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>649</x>
-     <y>313</y>
+     <x>675</x>
+     <y>283</y>
     </hint>
     <hint type="destinationlabel">
      <x>484</x>
@@ -1188,8 +1222,8 @@
    <slot>updatePlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>771</x>
-     <y>313</y>
+     <x>787</x>
+     <y>283</y>
     </hint>
     <hint type="destinationlabel">
      <x>477</x>
@@ -1204,8 +1238,8 @@
    <slot>updatePlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>919</x>
-     <y>313</y>
+     <x>921</x>
+     <y>283</y>
     </hint>
     <hint type="destinationlabel">
      <x>479</x>
@@ -1332,8 +1366,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>652</x>
-     <y>369</y>
+     <x>676</x>
+     <y>326</y>
     </hint>
     <hint type="destinationlabel">
      <x>940</x>
@@ -1412,8 +1446,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>670</x>
-     <y>198</y>
+     <x>695</x>
+     <y>191</y>
     </hint>
     <hint type="destinationlabel">
      <x>526</x>
@@ -1428,8 +1462,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>670</x>
-     <y>234</y>
+     <x>695</x>
+     <y>219</y>
     </hint>
     <hint type="destinationlabel">
      <x>126</x>
@@ -1444,8 +1478,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>920</x>
-     <y>198</y>
+     <x>921</x>
+     <y>191</y>
     </hint>
     <hint type="destinationlabel">
      <x>61</x>
@@ -1460,8 +1494,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>920</x>
-     <y>234</y>
+     <x>921</x>
+     <y>219</y>
     </hint>
     <hint type="destinationlabel">
      <x>262</x>
@@ -1476,8 +1510,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>153</x>
-     <y>59</y>
+     <x>102</x>
+     <y>41</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1492,12 +1526,28 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>200</x>
-     <y>88</y>
+     <x>102</x>
+     <y>44</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
      <y>254</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinViscosityFactor</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DlgCalcDiffCoeff</receiver>
+   <slot>updateD()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>599</x>
+     <y>67</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>480</x>
+     <y>114</y>
     </hint>
    </hints>
   </connection>

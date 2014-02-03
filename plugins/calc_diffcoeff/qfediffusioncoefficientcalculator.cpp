@@ -194,22 +194,22 @@ double QFEDiffusionCoefficientCalculator::getSolutionViscosity(int solution, dou
 }
 
 
-double QFEDiffusionCoefficientCalculator::getDCoeff_from_D20W(int solution, double D20W, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components) {
-    return getDCoeff_from_D(solution, D20W, 1.002e-3, 20.0+273.15, at_temperature_K, components);
+double QFEDiffusionCoefficientCalculator::getDCoeff_from_D20W(int solution, double D20W, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components, double viscosity_factor) {
+    return getDCoeff_from_D(solution, D20W, 1.002e-3, 20.0+273.15, at_temperature_K, components, viscosity_factor);
 }
 
-double QFEDiffusionCoefficientCalculator::getDCoeff_from_D(int solution, double D, double viscosity, double temp_K, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components) {
-    double eta=getSolutionViscosity(solution, at_temperature_K, components);
+double QFEDiffusionCoefficientCalculator::getDCoeff_from_D(int solution, double D, double viscosity, double temp_K, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components, double viscosity_factor) {
+    double eta=getSolutionViscosity(solution, at_temperature_K, components)*viscosity_factor;
     return D*(at_temperature_K/temp_K)*viscosity/eta;
 }
 
-double QFEDiffusionCoefficientCalculator::getSphereDCoeff(int solution, double diameter_meter, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components) {
-    double eta=getSolutionViscosity(solution, at_temperature_K, components);
+double QFEDiffusionCoefficientCalculator::getSphereDCoeff(int solution, double diameter_meter, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components, double viscosity_factor) {
+    double eta=getSolutionViscosity(solution, at_temperature_K, components)*viscosity_factor;
     return K_BOLTZ*at_temperature_K/(6.0*M_PI*eta*diameter_meter/2.0);
 }
 
-double QFEDiffusionCoefficientCalculator::getShapeDCoeff(int solution, double rotation_axis_or_length_meter, double second_axis_or_diameter_meter, QFEDiffusionCoefficientCalculator::SpheroidType type, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components, double* Dsphere, double* volume) {
-    double eta=getSolutionViscosity(solution, at_temperature_K, components);
+double QFEDiffusionCoefficientCalculator::getShapeDCoeff(int solution, double rotation_axis_or_length_meter, double second_axis_or_diameter_meter, QFEDiffusionCoefficientCalculator::SpheroidType type, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components, double viscosity_factor, double* Dsphere, double* volume) {
+    double eta=getSolutionViscosity(solution, at_temperature_K, components)*viscosity_factor;
 
     double Re=0;
     double Ft=1;

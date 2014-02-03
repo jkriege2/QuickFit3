@@ -590,6 +590,7 @@ void QFRDRTableEditor::slInsertColumn() {
             QItemSelectionModel* sm=tvMain->selectionModel();
             if (!sm->hasSelection()) {
                 m->model()->insertColumn(0);
+                m->columnsInserted(0, 1, false);
             } else {
                 QModelIndexList l=sm->selectedIndexes();
                 quint16 i0=m->model()->columnCount();
@@ -598,7 +599,9 @@ void QFRDRTableEditor::slInsertColumn() {
                 }
                 //std::cout<<"insertColumn("<<i0<<")\n";
                 m->model()->insertColumn(i0);
+                m->columnsInserted(i0, 1, false);
             }
+            m->emitRebuildPlotWidgets();
             QApplication::restoreOverrideCursor();
         }
     }
@@ -657,8 +660,10 @@ void QFRDRTableEditor::slDeleteColumn() {
                     for (int i=rl.size()-1; i>=0; i--) {
                         //std::cout<<"deleting column "<<rl[i]<<std::endl;
                         m->model()->deleteColumn(rl[i]);
+                        m->columnsRemoved(rl[i], 1, false);
                     }
                     m->model()->enableSignals(true);
+                    m->emitRebuildPlotWidgets();
                     tvMain->selectionModel()->setCurrentIndex(cur, QItemSelectionModel::SelectCurrent);
                 }
             }

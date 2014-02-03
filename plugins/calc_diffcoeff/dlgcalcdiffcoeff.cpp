@@ -176,24 +176,24 @@ void DlgCalcDiffCoeff::updateD() {
     double DD=0;
     for (double T=ui->spinSolutionTemperature->value(); T<=ui->spinSolutionTemperatureEnd->value(); T=T+ui->spinSolutionTemperatureDelta->value()) {
         temp.append(T);
-        visc.append(plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+T, comps)*1000.0);
+        visc.append(plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+T, comps)*1000.0*ui->spinViscosityFactor->value());
         density.append(plugin->getSolutionDensity(ui->cmbSolutionName->currentIndex(), 273.15+T, comps));
         if (ui->tabWidget->currentWidget()==ui->tabStdSample) {
-                    D.append(plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15, 273.15+T, comps)*1e12);
-            Dsolution.append(plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15, 273.15+T)*1e12);
+                    D.append(plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15, 273.15+T, comps, ui->spinViscosityFactor->value())*1e12);
+            Dsolution.append(plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15, 273.15+T, QList<QFEDiffusionCoefficientCalculator::Component>(), ui->spinViscosityFactor->value())*1e12);
                Dwater.append(plugin->getDCoeff_from_D(0, ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15, 273.15+T)*1e12);
         } else if (ui->tabWidget->currentWidget()==ui->givenD) {
-                    D.append(plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->spinGivenDInSolution->value()/1e12, plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+ui->spinGivenDInSolutionT->value(), comps), ui->spinGivenDInSolutionT->value()+273.15, 273.15+T, comps)*1e12);
-            Dsolution.append(plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->spinGivenDInSolution->value()/1e12, plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+ui->spinGivenDInSolutionT->value(), comps), ui->spinGivenDInSolutionT->value()+273.15, 273.15+T)*1e12);
-               Dwater.append(plugin->getDCoeff_from_D(0, ui->spinGivenDInSolution->value()/1e12, plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+ui->spinGivenDInSolutionT->value(), comps), ui->spinGivenDInSolutionT->value()+273.15, 273.15+T)*1e12);
+                    D.append(plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->spinGivenDInSolution->value()/1e12, plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+ui->spinGivenDInSolutionT->value(), comps)*ui->spinViscosityFactor->value(), ui->spinGivenDInSolutionT->value()+273.15, 273.15+T, comps, ui->spinViscosityFactor->value())*1e12);
+            Dsolution.append(plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->spinGivenDInSolution->value()/1e12, plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+ui->spinGivenDInSolutionT->value(), comps)*ui->spinViscosityFactor->value(), ui->spinGivenDInSolutionT->value()+273.15, 273.15+T, QList<QFEDiffusionCoefficientCalculator::Component>(), ui->spinViscosityFactor->value())*1e12);
+               Dwater.append(plugin->getDCoeff_from_D(0, ui->spinGivenDInSolution->value()/1e12, plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+ui->spinGivenDInSolutionT->value(), comps)*ui->spinViscosityFactor->value(), ui->spinGivenDInSolutionT->value()+273.15, 273.15+T)*1e12);
         } else if (ui->tabWidget->currentWidget()==ui->givenD20W) {
-                    D.append(plugin->getDCoeff_from_D20W(ui->cmbSolutionName->currentIndex(), ui->spinGivenD20W->value()/1e12, 273.15+T, comps)*1e12);
-            Dsolution.append(plugin->getDCoeff_from_D20W(ui->cmbSolutionName->currentIndex(), ui->spinGivenD20W->value()/1e12, 273.15+T)*1e12);
+                    D.append(plugin->getDCoeff_from_D20W(ui->cmbSolutionName->currentIndex(), ui->spinGivenD20W->value()/1e12, 273.15+T, comps, ui->spinViscosityFactor->value())*1e12);
+            Dsolution.append(plugin->getDCoeff_from_D20W(ui->cmbSolutionName->currentIndex(), ui->spinGivenD20W->value()/1e12, 273.15+T, QList<QFEDiffusionCoefficientCalculator::Component>(), ui->spinViscosityFactor->value())*1e12);
                Dwater.append(plugin->getDCoeff_from_D20W(0, ui->spinGivenD20W->value()/1e12, 273.15+T)*1e12);
         } else if (ui->tabWidget->currentWidget()==ui->tabGeometry) {
             double DS=0;
-                    D.append(plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, comps, &DS)*1e12);
-            Dsolution.append(plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T)*1e12);
+                    D.append(plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, comps, ui->spinViscosityFactor->value(), &DS)*1e12);
+            Dsolution.append(plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, QList<QFEDiffusionCoefficientCalculator::Component>(), ui->spinViscosityFactor->value())*1e12);
                Dwater.append(plugin->getShapeDCoeff(0, ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T)*1e12);
               Dsphere.append(DS*1e12);
         } else  {
@@ -210,19 +210,19 @@ void DlgCalcDiffCoeff::updateD() {
     double T=ui->spinExperimentTemperature->value();
     if (ui->tabWidget->currentWidget()==ui->tabStdSample) {
         ui->labGivenDD20W->setText(tr("D<sub>20,W</sub> = %1 &mu;m<sup>2</sup>/s").arg(plugin->getDCoeff_from_D(0, ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15, 293.15)*1e12));
-        DD=plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15, 273.15+T, comps)*1e12;
+        DD=plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15, 273.15+T, comps, ui->spinViscosityFactor->value())*1e12;
     } else if (ui->tabWidget->currentWidget()==ui->givenD) {
-        double lvisc=plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+ui->spinGivenDInSolutionT->value(), comps);
+        double lvisc=plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+ui->spinGivenDInSolutionT->value(), comps)*ui->spinViscosityFactor->value();
         ui->labGivenDInSolutionVisc->setText(QString::number(lvisc*1000.0));
         DD=plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->spinGivenDInSolution->value()/1e12,
-                                          lvisc, ui->spinGivenDInSolutionT->value()+273.15, 273.15+T, comps)*1e12;
+                                          lvisc, ui->spinGivenDInSolutionT->value()+273.15, 273.15+T, comps, ui->spinViscosityFactor->value())*1e12;
     } else if (ui->tabWidget->currentWidget()==ui->givenD20W) {
-        DD=plugin->getDCoeff_from_D20W(ui->cmbSolutionName->currentIndex(), ui->spinGivenD20W->value()/1e12, 273.15+T, comps)*1e12;
+        DD=plugin->getDCoeff_from_D20W(ui->cmbSolutionName->currentIndex(), ui->spinGivenD20W->value()/1e12, 273.15+T, comps, ui->spinViscosityFactor->value())*1e12;
     } else if (ui->tabWidget->currentWidget()==ui->tabGeometry) {
-        DD=plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, comps)*1e12;
+        DD=plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, comps, ui->spinViscosityFactor->value())*1e12;
         double D20Wsphere=0;
         double volume=0;
-        double D20W=plugin->getShapeDCoeff(0, ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+20.0, QList<QFEDiffusionCoefficientCalculator::Component>(), &D20Wsphere, &volume)*1e12;
+        double D20W=plugin->getShapeDCoeff(0, ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+20.0, QList<QFEDiffusionCoefficientCalculator::Component>(), 1, &D20Wsphere, &volume)*1e12;
         D20Wsphere*=1e12;
         volume=volume*1e27;
         double dsphere=2.0*pow(volume/4.0*3.0/M_PI, 1.0/3.0);
@@ -231,7 +231,7 @@ void DlgCalcDiffCoeff::updateD() {
         DD=0;
     }
     ui->edtExperimentD->setValue(DD);
-    ui->edtExperimentVisc->setValue(plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+ui->spinExperimentTemperature->value(), comps)*1000.0);
+    ui->edtExperimentVisc->setValue(plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+ui->spinExperimentTemperature->value(), comps)*ui->spinViscosityFactor->value()*1000.0);
     tab->setReadonly(true);
     redoPlot();
     on_cmbShapeType_currentIndexChanged(ui->cmbShapeType->currentIndex());
@@ -490,6 +490,8 @@ void DlgCalcDiffCoeff::readSettings() {
             ui->cmbCType5->setCurrentIndex(set->value(plugin->getID()+"/solution/component5", 0).toInt());
             ui->spinCConcentration5->setValue(set->value(plugin->getID()+"/solution/cncentration5", 0).toDouble());
 
+            ui->spinViscosityFactor->setValue(set->value(plugin->getID()+"/solution/viscosityfactor", 1).toDouble());
+
             ui->spinRotationAxis->setValue(set->value(plugin->getID()+"/shape/rot", 4).toDouble());
             ui->spinOtherAxis->setValue(set->value(plugin->getID()+"/shape/other", 3).toDouble());
             ui->cmbShapeType->setCurrentIndex(set->value(plugin->getID()+"/shape/type", 0).toDouble());
@@ -543,6 +545,7 @@ void DlgCalcDiffCoeff::writeSettings() {
             set->setValue(plugin->getID()+"/solution/cncentration5", ui->spinCConcentration5->value());
 
 
+            set->setValue(plugin->getID()+"/solution/viscosityfactor", ui->spinViscosityFactor->value());
         }
     }
 }
