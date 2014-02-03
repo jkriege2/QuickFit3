@@ -4,7 +4,7 @@
 
 bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid, double &value, double &error)  {
     //qDebug()<<"qfFCSHasSpecial: "<<paramid;
-    if (paramid=="count_rate") {
+    /*if (paramid=="count_rate") {
         QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
         value=0;
         error=0;
@@ -18,7 +18,7 @@ bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid
             error=scrintf->getSimpleCountrateStdDev(index, true)*1000.0;
         }
         if (crintf||scrintf) return true;
-    } else if (paramid=="count_rate1") {
+    } else*/ if (paramid=="count_rate1" || paramid=="count_rate") {
         QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
         value=0;
         error=0;
