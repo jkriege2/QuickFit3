@@ -47,8 +47,8 @@ QFRDRImagingFCSMaskBuilder::QFRDRImagingFCSMaskBuilder(const QStringList& parame
     ui->chkMask->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/masked", true).toBool());
     ui->chkUse2->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/use2", false).toBool());
     ui->chkUse3->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/use3", false).toBool());
-    ui->chkUse4->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/use3", false).toBool());
-    ui->chkUse5->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/use3", false).toBool());
+    ui->chkUse4->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/use4", false).toBool());
+    ui->chkUse5->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/use5", false).toBool());
 }
 
 QFRDRImagingFCSMaskBuilder::~QFRDRImagingFCSMaskBuilder()
