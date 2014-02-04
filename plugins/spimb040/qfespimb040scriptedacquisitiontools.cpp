@@ -62,7 +62,11 @@ void QFESPIMB040ScriptedAcquisitionTools::sleepMS(int duration)
 void QFESPIMB040ScriptedAcquisitionTools::createTextFile(const QString &filename)
 {
     QFile f(filename);
-    if (f.open(QIODevice::WriteOnly|QIODevice::Text)) f.close();
+    if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
+        f.close();
+    } else {
+        throwEngineException(tr("\ncreateTextFile(): Could not write to file '%1':\n   %2\n").arg(filename).arg(f.errorString()));
+    }
 }
 
 void QFESPIMB040ScriptedAcquisitionTools::appendTextFile(const QString &filename, const QString &data)
@@ -71,6 +75,9 @@ void QFESPIMB040ScriptedAcquisitionTools::appendTextFile(const QString &filename
     if (f.open(QIODevice::WriteOnly|QIODevice::Text|QIODevice::Append)) {
         QTextStream out(&f);
         out<<data;
+        f.close();
+    } else {
+        throwEngineException(tr("\ncreateTextFile(): Could not write to file '%1':\n   %2\n").arg(filename).arg(f.errorString()));
     }
 }
 
@@ -240,6 +247,11 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDConnect(const QString &d
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
     if (md && id<md->getMeasurementDeviceCount()) {
         md->connectMeasurementDevice(id);
+        if (!md->isMeasurementDeviceConnected(id)) {
+            throwEngineException(tr("could not connect to measurement dveice '%1', %2").arg(device_name).arg(id));
+        }
+    } else {
+        throwEngineException(tr("no measurement device '%1', %2 available").arg(device_name).arg(id));
     }
 }
 
@@ -248,6 +260,8 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDDisconnect(const QString
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
     if (md && id<md->getMeasurementDeviceCount()) {
         md->disconnectMeasurementDevice(id);
+    } else {
+        throwEngineException(tr("no measurement device '%1', %2 available").arg(device_name).arg(id));
     }
 }
 
@@ -256,24 +270,30 @@ QVariant QFESPIMB040ScriptedAcquisitionInstrumentControl::MDGet(const QString &d
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
     if (md && id<md->getMeasurementDeviceCount()) {
         return md->getMeasurementDeviceValue(id, parameter);
+    } else {
+        throwEngineException(tr("no measurement device '%1', %2 available").arg(device_name).arg(id));
     }
     return QVariant();
 }
 
-int QFESPIMB040ScriptedAcquisitionInstrumentControl::mMDGetParamCount(const QString &device_name, int id)
+int QFESPIMB040ScriptedAcquisitionInstrumentControl::MDGetParamCount(const QString &device_name, int id)
 {
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
     if (md && id<md->getMeasurementDeviceCount()) {
         return md->getMeasurementDeviceValueCount(id);
+    } else {
+        throwEngineException(tr("no measurement device '%1', %2 available").arg(device_name).arg(id));
     }
     return 0;
 }
 
-QString QFESPIMB040ScriptedAcquisitionInstrumentControl::mMDGetParamName(const QString &device_name, int id, int parameter)
+QString QFESPIMB040ScriptedAcquisitionInstrumentControl::MDGetParamName(const QString &device_name, int id, int parameter)
 {
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
     if (md && id<md->getMeasurementDeviceCount()) {
         return md->getMeasurementDeviceValueShortName(id, parameter);
+    } else {
+        throwEngineException(tr("no measurement device '%1', %2 available").arg(device_name).arg(id));
     }
     return QString("");
 
