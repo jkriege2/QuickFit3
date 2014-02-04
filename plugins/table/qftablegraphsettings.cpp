@@ -269,6 +269,7 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.errorStyle=ui->cmbErrorStyle->getErrorStyle();
         graph.symbol=ui->cmbSymbol->getSymbol();
         graph.style=ui->cmbLineStyle->currentLineStyle();
+        graph.whiskerStyle=ui->cmbWhiskerStyle->currentLineStyle();
         graph.fillStyle=ui->cmbFillStyle->currentFillStyle();
         graph.linewidth=ui->spinLineWidth->value();
         graph.symbolSize=ui->spinSymbolSize->value();
@@ -389,6 +390,7 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->spinImageWidth->setValue(graph.imagePixelWidth);
     ui->cmbColormap->setColorPalette(graph.imagePalette);
     ui->chkImageAutorange->setChecked(graph.imageAutoRange);
+    ui->cmbWhiskerStyle->setCurrentLineStyle(graph.whiskerStyle);
 
     ui->cmbColorbarLabelType->setLabelType(graph.imageColorbarLabelType);
     ui->spinColorbarLabelDigits->setValue(graph.imageColorbarLabelDigits);
@@ -480,6 +482,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
         ui->labFuction->setVisible(false);
         ui->chkSTrided->setVisible(true);
         ui->widStride->setVisible(true);
+        ui->cmbWhiskerStyle->setVisible(false);
+        ui->labWhisker->setVisible(false);
 
         ui->labDataX->setText(tr("X data col.:"));
         ui->labDataY->setText(tr("Y data col.:"));
@@ -787,11 +791,13 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->chkDrawLine->setVisible(false);
                 ui->btnFit->setVisible(false);
                 ui->labWidth->setVisible(true);
-                ui->labWidth->setText(tr("boxplot Width:"));
+                ui->labWidth->setText(tr("boxplot width:"));
                 ui->labShift->setVisible(false);
                 ui->edtWidth->setVisible(true);
                 ui->edtShift->setVisible(false);
                 ui->widWidth->setVisible(true);
+                ui->cmbWhiskerStyle->setVisible(true);
+                ui->labWhisker->setVisible(true);
                 break;
             case QFRDRTable::gtImage:
                 //graph.type=QFRDRTable::gtImage;
@@ -1043,6 +1049,7 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->cmbErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbLineColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbLineStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbWhiskerStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbFillStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbSymbol, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->chkDrawLine, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
@@ -1129,6 +1136,7 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->cmbErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbLineColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbLineStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbWhiskerStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbFillStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbSymbol, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbModifierMode, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));

@@ -29,6 +29,7 @@ QFRDRTable::GraphInfo::GraphInfo() {
     width=0.9;
     shift=0;
     style=Qt::SolidLine;
+    whiskerStyle=Qt::SolidLine;
     fillStyle=Qt::SolidPattern;
     color=QColor("red");
     errorColor=color.darker();
@@ -1501,6 +1502,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.fillColor=QStringToQColor(ge.attribute("fillcolor", "blue"));
                     //qDebug()<<ge.attribute("type")<<ge.attribute("fillcolor", "blue");
                     graph.style=String2QPenStyle(ge.attribute("style", "solid"));
+                    graph.whiskerStyle=String2QPenStyle(ge.attribute("whisker_style", "solid"));
                     graph.fillStyle=String2QBrushStyle(ge.attribute("fill_style", "solid"));
                     graph.symbol=String2JKQTPgraphSymbols(ge.attribute("symbol", "symbol_cross"));
                     graph.errorStyle=String2JKQTPerrorPlotstyle(ge.attribute("errorStyle", "error_none"));
@@ -1741,6 +1743,7 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("linewidth", CDoubleToQString(plots[i].graphs[g].linewidth));
             w.writeAttribute("symbolSize", CDoubleToQString(plots[i].graphs[g].symbolSize));
             w.writeAttribute("style", QPenStyle2String(plots[i].graphs[g].style));
+            w.writeAttribute("whisker_style", QPenStyle2String(plots[i].graphs[g].whiskerStyle));
             w.writeAttribute("fill_style", QBrushStyle2String(plots[i].graphs[g].fillStyle));
             w.writeAttribute("color", QColor2String(plots[i].graphs[g].color));
             w.writeAttribute("errorcolor", QColor2String(plots[i].graphs[g].errorColor));

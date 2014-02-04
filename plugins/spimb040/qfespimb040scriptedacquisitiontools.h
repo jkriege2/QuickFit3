@@ -48,6 +48,8 @@ class QFESPIMB040ScriptedAcquisitionTools : public QObject, public QFESPIMB040Sc
         void logWarning(const QString& text);
         void setStatus(const QString& text);
         void sleepMS(int duration);
+        void createTextFile(const QString& filename);
+        void appendTextFile(const QString& filename, const QString& data);
 
     private:
         QFPluginServices* m_pluginServices;
@@ -75,7 +77,14 @@ class QFESPIMB040ScriptedAcquisitionInstrumentControl : public QObject, public Q
         void moveStageAbs(const QString& stage, double new_position);
         void setFilterWheel(const QString& wheel, int filter);
 
+        void MDConnect(const QString& device_name, int id);
+        void MDDisconnect(const QString& device_name, int id);
+        QVariant MDGet(const QString& device_name, int id, int parameter);
+        int mMDGetParamCount(const QString& device_name, int id);
+        QString mMDGetParamName(const QString& device_name, int id, int parameter);
+
     private:
+        QFExtensionMeasurementAndControlDevice* getMDevice(const QString& device_name);
         QFPluginServices* m_pluginServices;
         QFESPIMB040OpticsSetupBase* opticsSetup;
         QFESPIMB040AcquisitionDescription* acqDescription;

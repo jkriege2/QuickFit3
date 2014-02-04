@@ -22,6 +22,16 @@ SOURCES += qfeplotterexporterlatex.cpp \
     QTeXEngine/src/QTeXPaintEngine.cpp \
     QTeXEngine/src/QTeXPaintDevice.cpp
 
+win32 {
+  DEFINES += HAS_EMF_ENGINE
+  SOURCES += EmfEngine/src/EmfEngine.cpp \
+             EmfEngine/src/EmfPaintDevice.cpp \
+             jkqtpemfengineadapter.cpp
+
+  HEADERS += EmfEngine/src/EmfEngine.h \
+             jkqtpemfengineadapter.h
+}
+
 FORMS =
 
 RESOURCES += qfeplotterexporterlatex.qrc
@@ -45,4 +55,5 @@ SRC_DISTRIBUTED.files = $$HEADERS \
                         $$RESOURCES \
                         $$TRANSLATIONS \
                         $$GPL3LICENSE \
-                        QTeXEngine-0.3-opensource.zip
+                        QTeXEngine-0.3-opensource.zip \
+                        EmfEngine-opensource-0.8.zip

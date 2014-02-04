@@ -1121,6 +1121,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor c=g.color;
                 c.setAlphaF(g.colorTransparent);
                 pg->set_color(c);
+                pg->set_whiskerStyle(g.whiskerStyle);
 
 //                pg->set_errorWidth(g.errorWidth);
 //                pg->set_errorFillStyle(g.errorFillStyle);
@@ -1209,6 +1210,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor c=g.color;
                 c.setAlphaF(g.colorTransparent);
                 pg->set_color(c);
+                pg->set_whiskerStyle(g.whiskerStyle);
 
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);

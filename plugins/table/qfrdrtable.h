@@ -174,6 +174,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             double width;
             double shift;
             Qt::PenStyle style;
+            Qt::PenStyle whiskerStyle;
             Qt::BrushStyle fillStyle;
             QColor color;
             double colorTransparent;

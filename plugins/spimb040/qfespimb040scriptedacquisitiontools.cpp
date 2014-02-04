@@ -59,6 +59,21 @@ void QFESPIMB040ScriptedAcquisitionTools::sleepMS(int duration)
     }
 }
 
+void QFESPIMB040ScriptedAcquisitionTools::createTextFile(const QString &filename)
+{
+    QFile f(filename);
+    if (f.open(QIODevice::WriteOnly|QIODevice::Text)) f.close();
+}
+
+void QFESPIMB040ScriptedAcquisitionTools::appendTextFile(const QString &filename, const QString &data)
+{
+    QFile f(filename);
+    if (f.open(QIODevice::WriteOnly|QIODevice::Text|QIODevice::Append)) {
+        QTextStream out(&f);
+        out<<data;
+    }
+}
+
 
 
 
@@ -218,6 +233,60 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::setFilterWheel(const QStri
     if (t.elapsed()>=20000) {
         throwEngineException(QObject::tr("setFilterWheel('%1', %2): move timed out after 20s!").arg(wheel).arg(filter));
     }
+}
+
+void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDConnect(const QString &device_name, int id)
+{
+    QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
+    if (md && id<md->getMeasurementDeviceCount()) {
+        md->connectMeasurementDevice(id);
+    }
+}
+
+void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDDisconnect(const QString &device_name, int id)
+{
+    QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
+    if (md && id<md->getMeasurementDeviceCount()) {
+        md->disconnectMeasurementDevice(id);
+    }
+}
+
+QVariant QFESPIMB040ScriptedAcquisitionInstrumentControl::MDGet(const QString &device_name, int id, int parameter)
+{
+    QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
+    if (md && id<md->getMeasurementDeviceCount()) {
+        return md->getMeasurementDeviceValue(id, parameter);
+    }
+    return QVariant();
+}
+
+int QFESPIMB040ScriptedAcquisitionInstrumentControl::mMDGetParamCount(const QString &device_name, int id)
+{
+    QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
+    if (md && id<md->getMeasurementDeviceCount()) {
+        return md->getMeasurementDeviceValueCount(id);
+    }
+    return 0;
+}
+
+QString QFESPIMB040ScriptedAcquisitionInstrumentControl::mMDGetParamName(const QString &device_name, int id, int parameter)
+{
+    QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
+    if (md && id<md->getMeasurementDeviceCount()) {
+        return md->getMeasurementDeviceValueShortName(id, parameter);
+    }
+    return QString("");
+
+}
+
+QFExtensionMeasurementAndControlDevice *QFESPIMB040ScriptedAcquisitionInstrumentControl::getMDevice(const QString &device_name)
+{
+    QFExtensionManager* em=QFPluginServices::getInstance()->getExtensionManager();
+    if (em) {
+        QFExtension* ex=em->getInstance(device_name);
+        return dynamic_cast<QFExtensionMeasurementAndControlDevice*>(ex);
+    }
+    return NULL;
 }
 
 

@@ -3,6 +3,9 @@
 #include <QtPlugin>
 #include <iostream>
 #include "jkqtplatexengineadapter.h"
+#ifdef HAS_EMF_ENGINE
+#  include "jkqtpemfengineadapter.h"
+#endif
 #include "jkqtpbaseplotter.h"
 
 #define LOG_PREFIX QString("qfe_plotterexporterlatex >>> ").toUpper()
@@ -40,6 +43,9 @@ void QFEPlotterExporterLatex::initExtension() {
     JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(true, false, QTeXPaintDevice::Pgf));
     JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, true, QTeXPaintDevice::Pgf));
     JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, false, QTeXPaintDevice::Pgf));
+#ifdef HAS_EMF_ENGINE
+    //JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPEMFEngineAdapter());
+#endif
 }
 
 

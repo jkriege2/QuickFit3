@@ -2125,6 +2125,35 @@
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="labWhisker">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>whisker:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="LineStyleComboBox" name="cmbWhiskerStyle">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -2450,8 +2479,8 @@
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="qfrdrtable.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="qfrdrtable.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
