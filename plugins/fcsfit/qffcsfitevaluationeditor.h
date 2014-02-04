@@ -112,6 +112,7 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWithW
         QAction* actCalibrateFocalVolume;
         /** \brief button used to calculate the focal volume */
         QToolButton* btnCalibrateFocalVolume;
+        QSpinBox* spinRepeats;
 
 
         /** \brief create a report in a given QTextDocument object
@@ -143,6 +144,7 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWithW
 
         /** \brief called when the weights changes */
         void weightsChanged(int weight);
+        void repeatsChanged(int r);
 
     private:
         /** \brief create all widgets on the form */

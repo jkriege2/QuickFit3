@@ -24,7 +24,7 @@ class QFLIB_EXPORT QFFitAlgorithmThreadedFit: public QThread {
         virtual ~QFFitAlgorithmThreadedFit();
 
         /** \brief initialize the fit parameters */
-        void init(QFFitAlgorithm* algorithm, double* paramsOut, double* paramErrorsOut, double* dataX, double* dataY, double* dataWeight, uint64_t N, QFFitFunction* model, double* initialParams, bool* fixParams=NULL, double* paramsMin=NULL, double* paramsMax=NULL);
+        void init(QFFitAlgorithm* algorithm, double* paramsOut, double* paramErrorsOut, double* dataX, double* dataY, double* dataWeight, uint64_t N, QFFitFunction* model, double* initialParams, bool* fixParams=NULL, double* paramsMin=NULL, double* paramsMax=NULL, int repeats=1);
 
         /** \brief return the result of the last fit call */
         QFFitAlgorithm::FitResult getResult() const { return result; }
@@ -46,6 +46,8 @@ class QFLIB_EXPORT QFFitAlgorithmThreadedFit: public QThread {
         double* paramsMax;
         QFFitAlgorithm::FitResult result;
         double deltaTime;
+
+        int repeats;
 
         /** \brief here the fitting takes place */
         virtual void run();

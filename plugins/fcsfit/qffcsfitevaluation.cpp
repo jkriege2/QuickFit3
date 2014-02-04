@@ -132,6 +132,8 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
     if (defaultMinDatarange>=0) rangeMinDatarange=defaultMinDatarange;
     if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
 
+    int fitrepeats=qBound(1,getProperty("FIT_REPEATS", 1).toInt(),1000);
+
     restoreQFFitAlgorithmParameters(falg);
 
     //QFFCSFitEvaluation::DataWeight weighting=getFitDataWeighting();
@@ -234,7 +236,7 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
                         dlgFitProgress->reportStatus(tr("fitting ..."));
                         dlgFitProgress->setProgressMax(100);
                         dlgFitProgress->setProgress(0);
-                        doFitThread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
+                        doFitThread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax, fitrepeats);
                         doFitThread->start(QThread::HighPriority);
                         QTime t;
                         t.start();
@@ -253,7 +255,7 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
                         OK=!dlgFitProgress->isCanceled();
                     }
                 } else {
-                    doFitThread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
+                    doFitThread->init(falg, params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax, fitrepeats);
                     doFitThread->start(QThread::HighPriority);
                     QTime t;
                     t.start();
@@ -509,6 +511,7 @@ void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, i
     int rangeMaxDatarange=data->getCorrelationN();
     if (defaultMinDatarange>=0) rangeMinDatarange=defaultMinDatarange;
     if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
+    int fitrepeats=qBound(1,getProperty("FIT_REPEATS", 1).toInt(),1000);
 
     restoreQFFitAlgorithmParameters(falg);
 
@@ -601,7 +604,14 @@ void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, i
 
                 QElapsedTimer tstart;
                 tstart.start();
-                QFFitAlgorithm::FitResult result=falg->fit(params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
+                double* init=duplicateArray(initialparams, ffunc->paramCount());
+                QFFitAlgorithm::FitResult result;
+                for (int rep=0; rep<fitrepeats; rep++) {
+                    result=falg->fit(params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, init, paramsFix, paramsMin, paramsMax);
+                    copyArray(init, params, ffunc->paramCount());
+                }
+                free(init);
+
                 #if QT_VERSION >= 0x040800
                     double deltaTime=double(tstart.nsecsElapsed())/1.0e6;
                 #else

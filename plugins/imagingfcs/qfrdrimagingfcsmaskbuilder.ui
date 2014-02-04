@@ -388,6 +388,16 @@
   <tabstop>cmbMode3</tabstop>
   <tabstop>spinT31</tabstop>
   <tabstop>spinT32</tabstop>
+  <tabstop>chkUse4</tabstop>
+  <tabstop>cmbP4</tabstop>
+  <tabstop>cmbMode4</tabstop>
+  <tabstop>spinT41</tabstop>
+  <tabstop>spinT42</tabstop>
+  <tabstop>chkUse5</tabstop>
+  <tabstop>cmbP5</tabstop>
+  <tabstop>cmbMode5</tabstop>
+  <tabstop>spinT51</tabstop>
+  <tabstop>spinT52</tabstop>
   <tabstop>chkMask</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>

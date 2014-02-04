@@ -84,6 +84,7 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
 
         QCheckBox* chkDontSaveFitResultMessage;
         QCheckBox* chkLeaveoutMasked;
+        QSpinBox* spinRepeats;
 
         QFRDRImageToRunPreview* pltOverview;
 
@@ -122,6 +123,7 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
 
         void dontSaveFitResultMessageChanged(bool checked);
         void leavoutMasked(bool checked);
+        void repeatsChanged(int r);
 
         void overviewRunChanged(int run);
 

@@ -62,6 +62,16 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
     layAlgorithm->addWidget(cmbWeights);
     layAlgorithm->addStretch();
 
+
+    spinRepeats=new QSpinBox(this);
+    spinRepeats->setRange(1, 100);
+    spinRepeats->setValue(1);
+    spinRepeats->setToolTip(tr("repeats the fit the given number of times for every click of fit. The output of the first run is used as initial parameters for the second, ..."));
+    int row=layButtons->rowCount();
+    layButtons->addWidget(new QLabel(tr("repeats:"), this), row, 0);
+    layButtons->addWidget(spinRepeats, row, 1);
+    connect(spinRepeats, SIGNAL(valueChanged(int)), this, SLOT(repeatsChanged(int)));
+
     chkDontSaveFitResultMessage=new QCheckBox(tr("don't save fit messages"), this);
     chkDontSaveFitResultMessage->setToolTip(tr("this improves the speed of saving the project significantly!"));
     chkDontSaveFitResultMessage->setChecked(true);
@@ -134,6 +144,7 @@ void QFImFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerReco
     if (eval) {
         dataEventsEnabled=false;
         cmbWeights->setCurrentWeight(eval->getFitDataWeighting());
+        spinRepeats->setValue(current->getProperty("FIT_REPEATS", 1).toInt());
         chkDontSaveFitResultMessage->setChecked(current->getProperty("dontSaveFitResultMessage", true).toBool());
         chkLeaveoutMasked->setChecked(current->getProperty("LEAVEOUTMASKED", true).toBool());
         pltOverview->setRDR(currentRecord);
@@ -715,6 +726,12 @@ void QFImFCSFitEvaluationEditor::leavoutMasked(bool checked)
 {
     if (!current) return;
     current->setQFProperty("LEAVEOUTMASKED", checked, false, false);
+}
+
+void QFImFCSFitEvaluationEditor::repeatsChanged(int r)
+{
+    if (!current) return;
+    current->setQFProperty("FIT_REPEATS", r, false, false);
 }
 
 void QFImFCSFitEvaluationEditor::overviewRunChanged(int run)

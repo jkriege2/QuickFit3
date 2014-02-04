@@ -55,6 +55,17 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     layButtons->addWidget(btnCalibrateFocalVolume, 8, 0);
     connect(actCalibrateFocalVolume, SIGNAL(triggered()), this, SLOT(calibrateFocalVolume()));
 
+
+    spinRepeats=new QSpinBox(this);
+    spinRepeats->setRange(1, 100);
+    spinRepeats->setValue(1);
+    spinRepeats->setToolTip(tr("repeats the fit the given number of times for every click of fit. The output of the first run is used as initial parameters for the second, ..."));
+    int row=layButtons->rowCount();
+    layButtons->addWidget(new QLabel(tr("repeats:"), this), row, 0);
+    layButtons->addWidget(spinRepeats, row, 1);
+    connect(spinRepeats, SIGNAL(valueChanged(int)), this, SLOT(repeatsChanged(int)));
+
+
     menuFit->addSeparator();
     menuFit->addAction(actCalibrateFocalVolume);
 }
@@ -75,6 +86,7 @@ void QFFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
 
         dataEventsEnabled=false;
         cmbWeights->setCurrentIndex(current->getProperty("weights", 0).toInt());
+        spinRepeats->setValue(current->getProperty("FIT_REPEATS", 1).toInt());
         dataEventsEnabled=true;
     }
 
@@ -536,6 +548,13 @@ void QFFCSFitEvaluationEditor::weightsChanged(int model) {
     displayModel(true);
     replotData();
     QApplication::restoreOverrideCursor();
+}
+
+void QFFCSFitEvaluationEditor::repeatsChanged(int r)
+{
+    if (!current) return;
+    current->setQFProperty("FIT_REPEATS", r, false, false);
+
 }
 
 
