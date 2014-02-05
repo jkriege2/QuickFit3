@@ -23,11 +23,74 @@
 
 <!--
 
-  
 
 -->
+
 <!--
-		<li><a name="2992"><b>2013-12-19 (SVN: 2992)</b>-->
+		<li><a name="3062"><b>2014-02-05 (SVN: 3062)</b>-->
+		<ul>
+		  <li><b>new plugins:</b><ul>
+			<li><b>plg_qfe_dataexportbasics</b>:  added this plugin with data export routines for Excel 97</li>
+		  </ul></li>
+		  <li><b>QuickFit</b><ul>
+			<li>added display of internal result/evaluation names and groups [i.e. common information] to result tables tooltips in rdr and evaluation editors</li>
+			<li>bugfix: correlation view: regression parameters were not displayed correctly in plot key</li>
+			<li>bugfix: correlation view: show more digits in plot keys</li>
+			<li>improved copy data from a table functions: when interacting with table-RDR (column names were not copied appropriately)</li>
+		    <li>plotter widgets:<ul>
+				<li>boxplots plot only parts of the whole box if some columns are missing</li>
+				<li>added error boxes and error ellipses as additional error styles</li>
+			</ul></li>
+		  </ul></li>	
+		  <li><b>MaxEnt FCS Fit</b><ul>
+			<li>added camera SPIM-FCS 3D diffusion model</li>
+			<li>added camera TIR-FCS 2D diffusion model</li>
+			<li>added overview image tab (to the residuals statistics tabs at the bottom of screen) for imFCS records</li>
+		  </ul></li>	
+		  <li><b>MSD FCS Fit</b><ul>
+			<li>added camera SPIM-FCS 3D diffusion model</li>
+			<li>added camera TIR-FCS 2D diffusion model</li>
+			<li>added overview image tab (to the residuals statistics tabs at the bottom of screen) for imFCS records</li>
+		  </ul></li>	
+		  <li><b>imFCCSFit</b><ul>
+			<li>added option to save ACF/CCF amplitudes when calculating crosstalk-corrected relative CCF-amplitudes</li>
+		  </ul></li>	
+		  <li><b>imFCS</b><ul>
+			<li>parameter image RDR editor: added Selection-menu entries:<ul>
+			<li>deselect all masked pixels</li>
+			<li>select pixels by parameter images/overview image </li></ul></li>
+			<li>image editor: improved "copy fit result statistics" when interacting with table-RDR (column names were not copied appropriately)</li>
+			<li>bugfix: in "copy fit results to table", the pixel count column was contained several times</li>
+			<li>correlation dialog has a button with some preset croppings</li>
+			<li>added mask and selection builder dialogs (+ menu entries in the imFCS RDR Editor, "Selection" and "Mask" menus), which allow to build a selection/mask from up to three conditions to parameter images/overview images (in-range/out-of-range/>=threshold/<=threshold)</li>
+		  </ul></li>	
+		  <li><b>table</b><ul>
+			<li>bugfix: saved negative row/col numbers into QFTableXML-File, if the whole table was saved</li>
+			<li>boxplots plot only parts of the whole box if some columns are missing</li>
+			<li>added button to autoscale X&Y axis at the same time</li>
+			<li> when delete/adding a table column, the plot columns are altered accordingly, so the plots are no longer destroyed</li>
+			<li>added error boxes and error ellipses as additional error styles</li>
+		  </ul></li>	
+		  <li><b>B040SPIM</b><ul>
+			<li>added methods to access measurement devices with JavaScripts</li>
+			<li>added methods to create/write into text files from JavaScript</li>
+		  </ul></li>	
+		  <li><b>FCS Fit</b><ul>
+			<li>bugfix: countrate was read from RDR for some fit models</li>
+			<li>added spinbox to set number of repeated calls of the fit algorithm for each run/pixel</li>
+		  </ul></li>	
+		  <li><b>imFCS Fit</b><ul>
+			<li>bugfix: countrate was read from RDR for some fit models</li>
+			<li>added spinbox to set number of repeated calls of the fit algorithm for each run/pixel</li>
+		  </ul></li>	
+		  <li><b>Diffusion coefficient calculator</b><ul>
+			<li>added "viscosity factor", which is multiplied to any solution viscosity (e.g. to estimate diffusion in cells with eta_cell=3*eta_buffer)</li>
+			<li>diffusion coefficient of cylinder is estimated using the formula by [Hansen 2004] now. This has an extended range for the axial ratio  0.01<= L/d <=100</li>
+		  </ul></li>	
+
+		</ul></li>
+
+		<li><a name="2992"><b>2013-12-19 (SVN: 2992)</b>
 		<ul>
 		  <li><b>new plugins:</b><ul>
 			<li><b>plg_qfe_dataexportbasics</b>:  added this plugin with data export routines for Excel 97</li>
