@@ -276,6 +276,48 @@ QVariant QFESPIMB040ScriptedAcquisitionInstrumentControl::MDGet(const QString &d
     return QVariant();
 }
 
+void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDSet(const QString &device_name, int id, int parameter, const QVariant &value)
+{
+    QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
+    if (md && id<md->getMeasurementDeviceCount()) {
+        md->setMeasurementDeviceValue(id, parameter, value);
+    } else {
+        throwEngineException(tr("no measurement device '%1', %2 available").arg(device_name).arg(id));
+    }
+}
+
+QVariant QFESPIMB040ScriptedAcquisitionInstrumentControl::MDGetN(const QString &device_name, int id, const QString & parameter)
+{
+    QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
+    if (md) {
+        for (int i=0; i<md->getMeasurementDeviceValueCount(id); i++) {
+            if (parameter==md->getMeasurementDeviceValueShortName(id, i)) {
+                return md->getMeasurementDeviceValue(id, i);
+            }
+        }
+        throwEngineException(tr("measurement device '%1', %2 does not contain a parameter named '%3'").arg(device_name).arg(id).arg(parameter));
+    } else {
+        throwEngineException(tr("no measurement device '%1', %2 available").arg(device_name).arg(id));
+    }
+    return QVariant();
+}
+
+void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDSetN(const QString &device_name, int id, const QString &parameter, const QVariant &value)
+{
+    QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
+    if (md) {
+        for (int i=0; i<md->getMeasurementDeviceValueCount(id); i++) {
+            if (parameter==md->getMeasurementDeviceValueShortName(id, i)) {
+                md->setMeasurementDeviceValue(id, i, value);
+            }
+        }
+        throwEngineException(tr("measurement device '%1', %2 does not contain a parameter named '%3'").arg(device_name).arg(id).arg(parameter));
+    } else {
+        throwEngineException(tr("no measurement device '%1', %2 available").arg(device_name).arg(id));
+    }
+
+}
+
 int QFESPIMB040ScriptedAcquisitionInstrumentControl::MDGetParamCount(const QString &device_name, int id)
 {
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);

@@ -329,8 +329,8 @@ QString QFFCSMaxEntEvaluationItem::getModelName(int model) const {
         case 2: return tr("FCS: 2D diffusion with 2 blinking components");
         case 3: return tr("Dynamic Light Scattering");
         case 4: return tr("FCS Blinking with 3D diffusion");
-        case 5: return tr("SPIM-FCS 3D");
-        case 6: return tr("camera TIR-FCS 3D");
+        case 5: return tr("camera SPIM-FCS 3D");
+        case 6: return tr("camera TIR-FCS 2D");
     }
     /*
     if (model==0) return tr("FCS: 3D diffusion with Triplet");

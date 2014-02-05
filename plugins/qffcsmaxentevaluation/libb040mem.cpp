@@ -15,18 +15,12 @@
 #include "Eigen/SVD"
 #include "math.h"
 #include "qfmathtools.h"
+#include "imfcstools.h"
 
 
 #define QFFloatIsOK(v) (std::isfinite(v) && (!std::isinf(v)) && (!std::isnan(v)))
 #define sqr(x) ((x)*(x))
 
-// focal volume of SPIM-FCS
-inline double SPIMFCS_newVeff(double a, double wxy, double wz) {
-    return QF_SQRTPI*qfSqr(a)*wz/qfSqr(erf(a/wxy)+wxy/QF_SQRTPI/a*(exp(-qfSqr(a/wxy))-1.0));
-}
-inline double TIRFCS_newAeff(double a, double wxy) {
-    return qfSqr(a)/qfSqr(erf(a/wxy)+wxy/QF_SQRTPI/a*(exp(-qfSqr(a/wxy))-1.0));
-}
 
 // Default Constructor
 MaxEntB040::MaxEntB040() {

@@ -10,7 +10,7 @@ DESTDIR = $$QFOUTPUT/plugins
 # Input
 HEADERS += qfpfitfunctionstirfcs.h \
     ../interfaces/qffitfunctionconfigforglobalfitinterface.h \
-    imfcstools.h \
+    ../base_classes/imfcstools.h \
     qffitfunctionstirfcsdiffe2.h \
     qffitfunctionstirfcsadiffe2.h \
     qffitfunctionstirfccsdiffflowe2.h \
@@ -24,7 +24,7 @@ HEADERS += qfpfitfunctionstirfcs.h \
 
 
 SOURCES += qfpfitfunctionstirfcs.cpp\
-    imfcstools.cpp \
+    ../base_classes/imfcstools.cpp \
     qffitfunctionstirfcsdiffe2.cpp \
     qffitfunctionstirfcsadiffe2.cpp \
     qffitfunctionstirfccsdiffflowe2.cpp \

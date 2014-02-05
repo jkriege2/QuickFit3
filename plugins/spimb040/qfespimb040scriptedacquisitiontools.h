@@ -80,6 +80,9 @@ class QFESPIMB040ScriptedAcquisitionInstrumentControl : public QObject, public Q
         void MDConnect(const QString& device_name, int id);
         void MDDisconnect(const QString& device_name, int id);
         QVariant MDGet(const QString& device_name, int id, int parameter);
+        void MDSet(const QString& device_name, int id, int parameter, const QVariant& value);
+        QVariant MDGetN(const QString& device_name, int id, const QString &parameter);
+        void MDSetN(const QString& device_name, int id, const QString & parameter, const QVariant& value);
         int MDGetParamCount(const QString& device_name, int id);
         QString MDGetParamName(const QString& device_name, int id, int parameter);
 

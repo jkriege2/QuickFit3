@@ -74,12 +74,28 @@
 			   <br>This plugin uses the LM library <a href="copyright.html">lmfit by Joachim Wuttke</a>.
 		  </li>
                            
-                      <li><b>FCS: simple 2D model, with triplet correction</b>: This is the same model, as above but with an additional correction of a triplet term $$math:X(\tau)$$ (divide measured curve $$math:\hat{g}(\tau)$$ by this term: $$math:\hat{g}(\tau)/X(\tau)$$) before calculating the MSD:
-                      $$bmath:X(\tau)=\frac{1-\theta_T+\theta_T\cdot\exp(-\tau/\tau_T)}{1-\theta_T}$$
-                      </li>
-                      <li><b>FCS: simple 3D model, with triplet correction</b>: This is the same model, as above but with an additional correction of a triplet term $$math:X(\tau)$$ (divide measured curve $$math:\hat{g}(\tau)$$ by this term: $$math:\hat{g}(\tau)/X(\tau)$$) before calculating the MSD:
-                      $$bmath:X(\tau)=\frac{1-\theta_T+\theta_T\cdot\exp(-\tau/\tau_T)}{1-\theta_T}$$
-                      </li>
+		  <li><b>FCS: simple 2D model, with triplet correction</b>: This is the same model, as above but with an additional correction of a triplet term $$math:X(\tau)$$ (divide measured curve $$math:\hat{g}(\tau)$$ by this term: $$math:\hat{g}(\tau)/X(\tau)$$) before calculating the MSD:
+		  $$bmath:X(\tau)=\frac{1-\theta_T+\theta_T\cdot\exp(-\tau/\tau_T)}{1-\theta_T}$$
+		  </li>
+		  <li><b>FCS: simple 3D model, with triplet correction</b>: This is the same model, as above but with an additional correction of a triplet term $$math:X(\tau)$$ (divide measured curve $$math:\hat{g}(\tau)$$ by this term: $$math:\hat{g}(\tau)/X(\tau)$$) before calculating the MSD:
+		  $$bmath:X(\tau)=\frac{1-\theta_T+\theta_T\cdot\exp(-\tau/\tau_T)}{1-\theta_T}$$
+		  </li>
+		  
+		  <li>
+		  <b>SPIM-FCS: 3D Diffusion</b>: The model is given by:
+		        $$bmath:g(\tau)=\frac{1}{\sqrt{\pi}\cdot w_z\cdot a^2\cdot N/V_{\text{eff}}}\cdot\frac{1}{\sqrt{\pi}\cdot w_za^2}\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}}\right)+\sqrt{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}\right)-1\right]\right]^2\cdot\left[1+\frac{\frac{2}{3}\langle r^2\rangle}{w_z^2}\right]^{-1/2}$$
+		$$bmath:V_{\text{eff}}=\frac{\sqrt{\pi}\cdot a^2w_z}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
+		  As earlier <img src="./pic/09_Ginf.png"> describes an offset constant.
+            $$math:w_{xy}$$ and $$math:w_z$$ are the 1/e<sup>2</sup> focus width and height , $$math:a$$ is the pixel size and $$math:N$$ is the particle number
+		  </li>
+		  
+		  <li>
+		  <b>camera TIR-FCS: 2D Diffusion</b>: The model is given by:
+		        $$bmath:g(\tau)=\frac{1}{ a^2\cdot N/V_{\text{eff}}}\cdot\frac{1}{\sqrt{\pi}\cdot w_za^2}\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}}\right)+\sqrt{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{\frac{2}{3}\langle r^2\rangle+w_{xy}^2}\right)-1\right]\right]^2$$
+		$$bmath:V_{\text{eff}}=\frac{\cdot a^2}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
+		  As earlier <img src="./pic/09_Ginf.png"> describes an offset constant.
+            $$math:w_{xy}$$ and $$math:w_z$$ are the 1/e<sup>2</sup> focus width and height , $$math:a$$ is the pixel size and $$math:N$$ is the particle number
+		  </li>
 		</ol>
 		
 		

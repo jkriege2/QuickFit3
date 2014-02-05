@@ -73,8 +73,8 @@
 	  
 		  <li>
 		  <p>
-		  <b>SPIM-FCS: 3D Diffusion</b>: The model is given by:
-		        $$bmath:g(\tau)=G_\infty+\frac{1}{N/V_{\text{eff}}}\cdot\frac{1}{\sqrt{\pi}\cdot w_za^2}\cdot\sum_{i}\rho_i\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{4D_i\tau+w_{xy}^2}}\right)+\sqrt{4D_i\tau+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{4D_i\tau+w_{xy}^2}\right)-1\right]\right]^2\cdot\left[1+\frac{4D_i\tau}{w_z^2}\right]^{-1/2}$$
+		  <b>camera SPIM-FCS: 3D Diffusion</b>: The model is given by:
+		        $$bmath:g(\tau)=G_\infty+\frac{1}{\sqrt{\pi}\cdot w_z\cdot a^2\cdot N/V_{\text{eff}}}\cdot\frac{1}{\sqrt{\pi}\cdot w_za^2}\cdot\sum_{i}\rho_i\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{4D_i\tau+w_{xy}^2}}\right)+\sqrt{4D_i\tau+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{4D_i\tau+w_{xy}^2}\right)-1\right]\right]^2\cdot\left[1+\frac{4D_i\tau}{w_z^2}\right]^{-1/2}$$
 		$$bmath:V_{\text{eff}}=\frac{\sqrt{\pi}\cdot a^2w_z}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
 		  As earlier <img src="./pic/09_Ginf.png"> describes an offset constant.
             $$math:w_{xy}$$ and $$math:w_z$$ are the 1/e<sup>2</sup> focus width and height , $$math:a$$ is the pixel size and $$math:N$$ is the particle number
@@ -86,7 +86,7 @@
 		  <li>
 		  <p>
 		  <b>camera TIR-FCS: 2D Diffusion</b>: The model is given by:
-		        $$bmath:g(\tau)=G_\infty+\frac{1}{N/A_{\text{eff}}}\cdot\frac{1}{a^2}\cdot\sum_{i}\rho_i\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{4D_i\tau+w_{xy}^2}}\right)+\sqrt{4D_i\tau+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{4D_i\tau+w_{xy}^2}\right)-1\right]\right]^2$$
+		        $$bmath:g(\tau)=G_\infty+\frac{1}{\cdot a^2\cdot N/A_{\text{eff}}}\cdot\frac{1}{a^2}\cdot\sum_{i}\rho_i\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{4D_i\tau+w_{xy}^2}}\right)+\sqrt{4D_i\tau+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{4D_i\tau+w_{xy}^2}\right)-1\right]\right]^2$$
 		$$bmath:A_{\text{eff}}=\frac{a^2}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
 		  As earlier <img src="./pic/09_Ginf.png"> describes an offset constant.
             $$math:w_{xy}$$ is the 1/e<sup>2</sup> focus width, $$math:a$$ is the pixel size and $$math:N$$ is the particle number

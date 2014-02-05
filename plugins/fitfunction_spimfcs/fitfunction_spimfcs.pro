@@ -18,7 +18,7 @@ HEADERS += qfpfitfunctionsspimfcs.h \
     qffitfunctionsspimfcsdiffe2_newveff.h \
     qffitfunctionsspimfcsdiffce2.h \
     qffitfunctionsspimfcsadiffe2.h \
-    imfcstools.h \
+    ../base_classes/imfcstools.h \
     qffitfunctionsspimfcsadiffce2.h \
     qffitfunctionsspimfccsfwdiff2colorccf.h \
     qffitfunctionsspimfccsfwdiff2coloracfr.h \
@@ -58,7 +58,7 @@ SOURCES += qfpfitfunctionsspimfcs.cpp\
     qffitfunctionsspimfcsdiffe2_newveff.cpp \
     qffitfunctionsspimfcsdiffce2.cpp \
     qffitfunctionsspimfcsadiffe2.cpp \
-    imfcstools.cpp \
+    ../base_classes/imfcstools.cpp \
     qffitfunctionsspimfcsadiffce2.cpp \
     qffitfunctionsspimfccsfwdiff2coloracfg.cpp \
     qffitfunctionsspimfccsfwdiff2colorccf.cpp \

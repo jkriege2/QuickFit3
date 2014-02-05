@@ -3,6 +3,7 @@
 #include "../interfaces/qfrdrfcsdatainterface.h"
 #include "qfmathtools.h"
 #include "qffcstools.h"
+#include "imfcstools.h"
 
 
 #define sqr(x) ((x)*(x))
@@ -527,8 +528,8 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
         if (model==0) { // simple 2D model without triplet
 
             // first we read the stored fit parameters:
-            double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
-            double N_particle=getFitValue(record,index,model,"n_particle");;
+            const double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
+            const double N_particle=getFitValue(record,index,model,"n_particle");;
 
 
             // now we evaluate the model
@@ -545,9 +546,9 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
         } else if (model==1) { // simple 3D model without triplet
 
             // first we read the stored fit parameters:
-            double gamma=getFitValue(record, index, model, "focus_struct_fac");
-            double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
-            double N_particle=getFitValue(record,index,model,"n_particle");;
+            const double gamma=getFitValue(record, index, model, "focus_struct_fac");
+            const double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
+            const double N_particle=getFitValue(record,index,model,"n_particle");;
 
             int k=0;
             for (uint32_t i=first; i<=last; i++) {
@@ -560,11 +561,11 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
         } else if (model==2) { // simple 2D model with triplet-correction
 
             // first we read the stored fit parameters:
-            double gamma=getFitValue(record, index, model, "focus_struct_fac");
-            double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
-            double N_particle=getFitValue(record,index,model,"n_particle");;
-            double fT=getFitValue(record,index,model,"nonfl_theta1");
-            double tauT=getFitValue(record,index,model,"nonfl_tau1")*1e-6;
+            const double gamma=getFitValue(record, index, model, "focus_struct_fac");
+            const double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
+            const double N_particle=getFitValue(record,index,model,"n_particle");;
+            const double fT=getFitValue(record,index,model,"nonfl_theta1");
+            const double tauT=getFitValue(record,index,model,"nonfl_tau1")*1e-6;
 
             int k=0;
             for (uint32_t i=first; i<=last; i++) {
@@ -577,17 +578,61 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
         } else if (model==3) { // simple 3D model with triplet-correction
 
             // first we read the stored fit parameters:
-            double gamma=getFitValue(record, index, model, "focus_struct_fac");
-            double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
-            double N_particle=getFitValue(record,index,model,"n_particle");;
-            double fT=getFitValue(record,index,model,"nonfl_theta1");
-            double tauT=getFitValue(record,index,model,"nonfl_tau1")*1e-6;
+            const double gamma=getFitValue(record, index, model, "focus_struct_fac");
+            const double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
+            const double N_particle=getFitValue(record,index,model,"n_particle");;
+            const double fT=getFitValue(record,index,model,"nonfl_theta1");
+            const double tauT=getFitValue(record,index,model,"nonfl_tau1")*1e-6;
 
             int k=0;
             for (uint32_t i=first; i<=last; i++) {
                 const double tau=msdTaus[k];
                 const double ms=msd[k];
                 modelEval[i]=1.0/N_particle/(1.0+2.0/3.0*ms/sqr(wxy))/sqrt(1.0+2.0/3.0*ms/sqr(wxy)/sqr(gamma))*qfFCSTripletTerm(tau, fT, tauT);
+                k++;
+            }
+        } else if (model==4) { // SPIM-FCS simple 3D model
+
+            // first we read the stored fit parameters:
+            const double wz=getFitValue(record, index, model, "focus_height")/1.0e3;
+            const double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
+            const double N_particle=getFitValue(record,index,model,"n_particle");;
+            const double a=getFitValue(record,index,model,"pixel_size")/1.0e3;
+
+            const double Veff=SPIMFCS_newVeff(a, wxy, wz);
+            const double C=N/Veff;
+            const double sqpi=sqrt(M_PI);
+            const double pre=1.0/(sqpi*wz*qfSqr(a)*C);
+
+            int k=0;
+            for (uint32_t i=first; i<=last; i++) {
+                const double tau=msdTaus[k];
+                const double ms=msd[k];
+                const double fourdt=2.0/3.0*ms;
+                const double sqfourdtw=sqrt(fourdt+wxy*wxy);
+                modelEval[i]=pre*qfSqr(sqfourdtw/(sqpi*a)*(exp(-qfSqr(a/sqfourdtw))-1.0)+erf(a/sqfourdtw))/sqrt(1.0+fourdt/qfSqr(wz));
+                k++;
+            }
+
+        } else if (model==5) { // camera TIR-FCS simple 2D model
+
+            // first we read the stored fit parameters:
+            const double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
+            const double N_particle=getFitValue(record,index,model,"n_particle");;
+            const double a=getFitValue(record,index,model,"pixel_size")/1.0e3;
+
+            const double Veff=TIRFCS_newAeff(a, wxy);
+            const double C=N/Veff;
+            const double sqpi=sqrt(M_PI);
+            const double pre=1.0/(qfSqr(a)*C);
+
+            int k=0;
+            for (uint32_t i=first; i<=last; i++) {
+                const double tau=msdTaus[k];
+                const double ms=msd[k];
+                const double fourdt=2.0/3.0*ms;
+                const double sqfourdtw=sqrt(fourdt+wxy*wxy);
+                modelEval[i]=pre*qfSqr(sqfourdtw/(sqpi*a)*(exp(-qfSqr(a/sqfourdtw))-1.0)+erf(a/sqfourdtw));
                 k++;
             }
 
@@ -605,6 +650,8 @@ QString QFFCSMSDEvaluationItem::getModelName(int model) const {
         case 1: return tr("FCS: simple 3D model");
         case 2: return tr("FCS: simple 2D model + triplet correction");
         case 3: return tr("FCS: simple 3D model + triplet correction");
+        case 4: return tr("camera SPIM-FCS: simple 3D model");
+        case 5: return tr("camera TIR-FCS: simple 2D model");
         //case 2: return tr("FCS: simple 3D model as one optimization problem");
     }
 
@@ -720,6 +767,40 @@ bool QFFCSMSDEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QStri
             }
 
             break;
+        case 4:
+        //case 2:
+            if (parameterID=="n_particle") {
+                defaultValue.value=1;
+                return true;
+                }
+            if (parameterID=="focus_width") {
+                defaultValue.value=600;
+                return true;
+                }
+            if (parameterID=="focus_height") {
+                defaultValue.value=1200;
+                return true;
+            }
+            if (parameterID=="pixel_size") {
+                defaultValue.value=400;
+                return true;
+            }
+            break;
+        case 5:
+        //case 2:
+            if (parameterID=="n_particle") {
+                defaultValue.value=1;
+                return true;
+                }
+            if (parameterID=="focus_width") {
+                defaultValue.value=600;
+                return true;
+                }
+            if (parameterID=="pixel_size") {
+                defaultValue.value=400;
+                return true;
+            }
+            break;
      }
 
 
@@ -750,32 +831,55 @@ void lmfit_msd_diff3d(const double *par, int m_dat, const void *data, double *fv
     *fvec = f1*sqrt(f2)-1.0/(N*gmeasured);
 }
 
-struct msd_diff3dall_params {
+
+struct msd_diff3dspim_params {
     double wxy;
-    double gamma;
+    double wz;
     double N;
-    double* gmeasured;
-    int Nacf;
+    double a;
+    double gmeasured;
 };
+void lmfit_msd_SPIMdiff3dall(const double *par, int m_dat, const void *data, double *fvec, int *info) {
+    msd_diff3dspim_params* p=(msd_diff3dspim_params*)data;
 
 
-void lmfit_msd_diff3dall(const double *par, int m_dat, const void *data, double *fvec, int *info) {
-    msd_diff3dall_params* p=(msd_diff3dall_params*)data;
+    const double wz=p->wz;
+    const double wxy=p->wxy;
+    const double N=p->N;
+    const double a=p->a;
+
+    const double Veff=SPIMFCS_newVeff(a, wxy, wz);
+    const double C=N/Veff;
+    const double sqpi=sqrt(M_PI);
+    const double pre=1.0/(sqpi*wz*qfSqr(a)*C);
+
+    const double gmeasured = p->gmeasured;
+
+    const double ms=par[0];
+    const double fourdt=2.0/3.0*ms;
+    const double sqfourdtw=sqrt(fourdt+wxy*wxy);
+    *fvec = pre*qfSqr(sqfourdtw/(sqpi*a)*(exp(-qfSqr(a/sqfourdtw))-1.0)+erf(a/sqfourdtw))/sqrt(1.0+fourdt/qfSqr(wz))-gmeasured;
+}
+
+void lmfit_msd_TIRdiff3dall(const double *par, int m_dat, const void *data, double *fvec, int *info) {
+    msd_diff3dspim_params* p=(msd_diff3dspim_params*)data;
 
 
-    const double wxy2 = sqr(p->wxy);
-    const double gamma2 = sqr(p->gamma);
-    const double N = p->N;
-    const double* gmeasured = p->gmeasured;
-    const int Nacf=p->Nacf;
+    const double wxy=p->wxy;
+    const double N=p->N;
+    const double a=p->a;
 
+    const double Veff=TIRFCS_newAeff(a, wxy);
+    const double C=N/Veff;
+    const double sqpi=sqrt(M_PI);
+    const double pre=1.0/(qfSqr(a)*C);
 
-    for (int i=0; i<Nacf; i++) {
-        const double x = par[i];
-        const double f1=1.0+2.0/3.0*x/wxy2;
-        const double f2=1.0+2.0/3.0*x/wxy2/gamma2;
-        *fvec = f1*sqrt(f2)-1.0/(N*gmeasured[i]);
-    }
+    const double gmeasured = p->gmeasured;
+
+    const double ms=par[0];
+    const double fourdt=2.0/3.0*ms;
+    const double sqfourdtw=sqrt(fourdt+wxy*wxy);
+    *fvec = pre*qfSqr(sqfourdtw/(sqpi*a)*(exp(-qfSqr(a/sqfourdtw))-1.0)+erf(a/sqfourdtw))-gmeasured;
 }
 
 void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model, int defaultMinDatarange, int defaultMaxDatarange, int runAvgWidth, int residualHistogramBins) {
@@ -834,6 +938,8 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
         //////////Load Model Parameters//////////////////////////////////////////////////////
         double gamma=getFitValue(record, index, model, "focus_struct_fac");
         double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
+        double wz=getFitValue(record, index, model, "focus_height")/1.0e3;
+        double a_pixel=getFitValue(record, index, model, "pixel_size")/1.0e3;
         double N_particle=getFitValue(record,index,model,"n_particle");
         double fT=0;
         double tauT=1e-10;
@@ -870,7 +976,7 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
                 if (model==3) {
                     double t=meas_acf;
                     meas_acf=meas_acf/qfFCSTripletTerm(tau, fT, tauT);
-                    qDebug()<<t<<meas_acf<<fT<<tauT;
+                    //qDebug()<<t<<meas_acf<<fT<<tauT;
                 }
 
                 lm_status_struct status;
@@ -884,6 +990,29 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
                 }
 
                 lmmin(1, &r, 1, &d, lmfit_msd_diff3d, &control, &status, NULL );
+                dist[i]=r;
+
+            }
+        } else if ((model==4)||(model==5)) {
+            for (int i=0; i<Ndist; i++) {
+                distTaus[i]=taus[rangeMinDatarange+i];
+                double meas_acf=corrdata[rangeMinDatarange+i];
+                const double tau=taus[rangeMinDatarange+i];
+
+
+                lm_status_struct status;
+                lm_control_struct control = lm_control_double;
+                control.printflags = 0; // monitor status (+1) and parameters (+2)
+
+
+                msd_diff3dspim_params d = {wxy, wz, N_particle, a_pixel, meas_acf};
+                double r=3.0*sqr(wxy)/2.0*(1.0/N_particle/corrdata[rangeMinDatarange+i]-1.0);
+                if (msd.size()==Ndist && msd_tau.size()==Ndist && msd_tau[i]==distTaus[i]) {
+                    r=msd[i];
+                }
+
+                if (model==4) lmmin(1, &r, 1, &d, lmfit_msd_SPIMdiff3dall, &control, &status, NULL );
+                else if (model==5) lmmin(1, &r, 1, &d, lmfit_msd_TIRdiff3dall, &control, &status, NULL );
                 dist[i]=r;
 
             }
@@ -1016,6 +1145,17 @@ QString QFFCSMSDEvaluationItem::getParameterName(int model, int id, bool html) c
             if (id==3) return (html)?tr("triplet fraction &theta;<sub>T</sub>"):tr("triplet fraction");
             if (id==4) return (html)?tr("triplet time &tau;<sub>T</sub> [µs]"):tr("triplet time [µs]");
             break;
+        case 4: // SPIM-FCS 3D model
+            if (id==0) return (html)?tr("particle number N"):tr("particle number");
+            if (id==1) return (html)?tr("1/e<sup>2</sup>-focus width w<sub>xy</sub> [nm]"):tr("1/e^2 focus width [nm]");
+            if (id==2) return (html)?tr("1/e<sup>2</sup>-focus height w<sub>z</sub> [nm]"):tr("1/e^2 focus height [nm]");
+            if (id==3) return (html)?tr("pixel size a [nm]"):tr("pixel size [nm]");
+            break;
+        case 5: // TIR-FCS 3D model
+            if (id==0) return (html)?tr("particle number N"):tr("particle number");
+            if (id==1) return (html)?tr("1/e<sup>2</sup>-focus width w<sub>xy</sub> [nm]"):tr("1/e^2 focus width [nm]");
+            if (id==2) return (html)?tr("pixel size a [nm]"):tr("pixel size [nm]");
+            break;
         /*case 2: // simple 3D model, one optimization problem
             if (id==0) return (html)?tr("particle number N"):tr("particle number");
             if (id==1) return (html)?tr("focus size w<sub>xy</sub> [nm]"):tr("focus size [nm]");
@@ -1050,6 +1190,17 @@ QString QFFCSMSDEvaluationItem::getParameterUnit(int model, int id, bool html) c
             if (id==3) return QString("");
             if (id==4) return tr("µs");
             break;
+        case 4:
+            if (id==0) return QString("");
+            if (id==1) return tr("nm");
+            if (id==2) return QString("nm");
+            if (id==3) return QString("nm");
+            break;
+        case 5:
+            if (id==0) return QString("");
+            if (id==1) return tr("nm");
+            if (id==2) return QString("nm");
+            break;
     }
     return QString();
 }
@@ -1063,6 +1214,10 @@ int QFFCSMSDEvaluationItem::getParameterCount(int model) const {
             return 4;
         case 3:
             return 5;
+        case 4:
+            return 4;
+        case 5:
+            return 3;
     }
     return 0;
 }
@@ -1091,10 +1246,21 @@ QString QFFCSMSDEvaluationItem::getParameterID(int model, int id) const {
             if (id==3) return tr("nonfl_theta1");
             if (id==4) return tr("nonfl_tau1");
             break;
+        case 4:
+            if (id==0) return tr("n_particle");
+            if (id==1) return tr("focus_width");
+            if (id==2) return tr("focus_height");
+            if (id==3) return tr("pixel_size");
+            break;
+        case 5:
+            if (id==0) return tr("n_particle");
+            if (id==1) return tr("focus_width");
+            if (id==2) return tr("pixel_size");
+            break;
     }
     return QString("m%1_p%2").arg(model).arg(id);
 }
 
 int QFFCSMSDEvaluationItem::getModelCount(QFRawDataRecord *r, int index) const {
-    return 4;
+    return 6;
 }
