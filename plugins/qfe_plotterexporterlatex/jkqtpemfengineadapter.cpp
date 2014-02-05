@@ -49,7 +49,7 @@ bool JKQTPEMFEngineAdapter::isPrinter() const
 
 QPaintDevice *JKQTPEMFEngineAdapter::createPaintdevice(const QString &filename, int widthPix, int heightPix) const
 {
-    //qDebug()<<"create EMF-device for "<<filename<<QSize(widthPix, heightPix);
+    qDebug()<<"create EMF-device for "<<filename<<QSize(widthPix, heightPix);
     EmfPaintDevice * emf=new EmfPaintDevice(QSize(widthPix, heightPix), filename);
     return emf;
 }
