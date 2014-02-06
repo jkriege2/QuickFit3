@@ -1,9 +1,9 @@
-fn="/home/kriegerj/temperature_log.txt";
+fn="/home/kriegerj/temperature_P30_I1_D0_IMAX100_on_off_log.txt";
 dev="meas_b040resheater";
 devid=0;
 params=new Array("TEMP0", "TEMP1", "OUTPUT", "SET_TEMP");
-delay=250;
-repeats=60*60/(delay/1000);
+delay=1000;
+repeats=60*30/(delay/1000);
 
 tools.createTextFile(fn);
 tools.appendTextFile(fn, "# time [s]");
