@@ -280,7 +280,11 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDSet(const QString &devic
 {
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
     if (md && id<md->getMeasurementDeviceCount()) {
-        md->setMeasurementDeviceValue(id, parameter, value);
+        if (md->isMeasurementDeviceValueEditable(id, parameter)) {
+            md->setMeasurementDeviceValue(id, parameter, value);
+        } else {
+            throwEngineException(tr("in measurement device '%1', %2: parameter '%3' is not editable!").arg(device_name).arg(id).arg(md->getMeasurementDeviceValueShortName(id, parameter)));
+        }
     } else {
         throwEngineException(tr("no measurement device '%1', %2 available").arg(device_name).arg(id));
     }
@@ -308,7 +312,12 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDSetN(const QString &devi
     if (md) {
         for (int i=0; i<md->getMeasurementDeviceValueCount(id); i++) {
             if (parameter==md->getMeasurementDeviceValueShortName(id, i)) {
-                md->setMeasurementDeviceValue(id, i, value);
+                if (md->isMeasurementDeviceValueEditable(id, i)) {
+                    md->setMeasurementDeviceValue(id, i, value);
+                    return;
+                } else {
+                    throwEngineException(tr("in measurement device '%1', %2: parameter '%3' is not editable!").arg(device_name).arg(id).arg(md->getMeasurementDeviceValueShortName(id, i)));
+                }
             }
         }
         throwEngineException(tr("measurement device '%1', %2 does not contain a parameter named '%3'").arg(device_name).arg(id).arg(parameter));
