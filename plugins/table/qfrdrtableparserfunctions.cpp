@@ -31,6 +31,8 @@ void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names, bool colum
         parser->addFunction("indexedcolmedian", fQFRDRTableEditor_indexedColMedian);
         parser->addFunction("indexedcolquantile", fQFRDRTableEditor_indexedColQuantile);
         parser->addFunction("columndata", fQFRDRTableEditor_column);
+        parser->addFunction("columnstr", fQFRDRTableEditor_columnStr);
+        parser->addFunction("columnbool", fQFRDRTableEditor_columnBool);
 
         /*parser->addFunction("colsavg", fQFRDRTableEditor_colsavg);
         parser->addFunction("colssum", fQFRDRTableEditor_colssum);
@@ -55,8 +57,84 @@ void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names, bool colum
 }
 
 
+qfmpResult fQFRDRTableEditor_columnStr(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    qfmpResult res=qfmpResult::invalidResult();
+    res.num=NAN;
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            if (n==1) {
+                if ((params[0].type!=qfmpDouble)) p->qfmpError("columnstr(column) needs one integer arguments");
+                int c=floor(params[0].num-1);
+                if (c>=0 && c<d->model->columnCount()) {
+                    QVariantList vl=d->model->getColumnData(c, Qt::EditRole);
+                    QStringList sl;
+                    for (int i=0; i<vl.size(); i++) {
+                        sl.append(vl[i].toString());
+                    }
+                    res.setStringVec(sl);
+                }
+            } else if (n==2) {
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble&&params[1].type!=qfmpDoubleVector)) p->qfmpError("columnstr(column, rows) needs one integer and one integer vector arguments");
+                int c=floor(params[0].num-1);
+                QVector<int> r=params[1].asIntVector();
+                if (c>=0 && c<d->model->columnCount()) {
+                    QVariantList dat=d->model->getColumnData(c, Qt::EditRole);
+                    QStringList dat1;
+                    for (int i=0; i<r.size(); i++) {
+                        if (r[i]>=0 && r[i]<dat.size()) {
+                            dat1<<dat[r[i]].toString();
+                        }
+                    }
+                    res.setStringVec(dat1);
+                }
+            } else {
+                p->qfmpError("columnstr(column)/columnstr(column, rows) needs 1 or 2 arguments");
+            }
+        }
+    }
+    return res;
+}
 
 
+qfmpResult fQFRDRTableEditor_columnBool(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    qfmpResult res=qfmpResult::invalidResult();
+    res.num=NAN;
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            if (n==1) {
+                if ((params[0].type!=qfmpDouble)) p->qfmpError("columnbool(column) needs one integer arguments");
+                int c=floor(params[0].num-1);
+                if (c>=0 && c<d->model->columnCount()) {
+                    QVariantList vl=d->model->getColumnData(c, Qt::EditRole);
+                    QVector<bool> sl;
+                    for (int i=0; i<vl.size(); i++) {
+                        sl.append(vl[i].toBool());
+                    }
+                    res.setBoolVec(sl);
+                }
+            } else if (n==2) {
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble&&params[1].type!=qfmpDoubleVector)) p->qfmpError("columnbool(column, rows) needs one integer and one integer vector arguments");
+                int c=floor(params[0].num-1);
+                QVector<int> r=params[1].asIntVector();
+                if (c>=0 && c<d->model->columnCount()) {
+                    QVariantList dat=d->model->getColumnData(c, Qt::EditRole);
+                    QVector<bool> dat1;
+                    for (int i=0; i<r.size(); i++) {
+                        if (r[i]>=0 && r[i]<dat.size()) {
+                            dat1<<dat[r[i]].toBool();
+                        }
+                    }
+                    res.setBoolVec(dat1);
+                }
+            } else {
+                p->qfmpError("columnbool(column)/columnbool(column, rows) needs 1 or 2 arguments");
+            }
+        }
+    }
+    return res;
+}
 
 qfmpResult fQFRDRTableEditor_column(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
     qfmpResult res=qfmpResult::invalidResult();

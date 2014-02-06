@@ -41,6 +41,22 @@
   <!-- /func:bool2str -->
   </li>
 
+  <li><a name="str2num"/><!-- func:str2num -->
+  <b><tt><!-- template -->str2num(x)<!-- /template --></tt> - <i>returns the floating point number represented by the string x (interprets a comma or a dot '.' as decimal separator) </i>:</b><br>
+  <!-- /func:str2num -->
+  </li>
+  
+  <li><a name="cstr2num"/><!-- func:cstr2num -->
+  <b><tt><!-- template -->cstr2num(x)<!-- /template --></tt> - <i>returns the floating point number represented by the string x (using C locale for conversion, i.e. only a dot '.' as decimal separator) </i>:</b><br>
+  <!-- /func:cstr2num -->
+  </li>
+  
+  <li><a name="str2bool"/><!-- func:str2bool -->
+  <b><tt><!-- template -->str2bool(x)<!-- /template --></tt> - <i>returns the boolean represented by the string x </i>:</b><br>
+  <!-- /func:str2bool -->
+  </li>
+  
+
   <li><a name="tosystempathseparator"/><!-- func:tosystempathseparator -->
   <b><tt><!-- template -->tosystempathseparator(x)<!-- /template --></tt> - <i>converts all backslashes and slashes in the given string x to the system standard directory separator (backslash on windows, slash on linux)</i>:</b><br>
   <!-- /func:tosystempathseparator -->
@@ -58,6 +74,33 @@
   <li><a name="trimm"/><!-- tolower:trimm -->
   <b><tt><!-- template -->trimm(x)<!-- /template --></tt> - <i>trimms leading and trailing whitespaces from the string</i>:</b><br>
   <!-- /func:trimm -->
+  </li>
+
+  </ul>
+  
+  
+  
+  
+  
+  
+  
+  
+  <h2>Regular Expressions Functions</h2>
+  <p>This chapter groups QF math parser functions for regular expressions. Please see the <a href="../qf3_qtregexp.html">QuickFit regular expressions help page</a> for details on the supported set of regular expressions and their syntax.</p>
+  <ul>
+  <li><a name="regexpcap"/><!-- func:regexpcap -->
+  <b><tt><!-- template -->regexpcap(regexp, strings, cap_id=1, default_string="")<!-- /template --></tt> - <i>applies the given regular expression <tt>regexp</tt> to the given string or string vector in <tt>strings</tt>. The function returns the <tt>cap_id</tt>-th captured substring (the default is <tt>cap_id=1</tt>) </i>:</b><br>
+  If the regular expression does not match, the given <tt>default_string</tt> is returned.
+  <!-- /func:regexpcap -->
+  </li>
+
+  <li><a name="regexpcontains"/><!-- func:regexpcontains -->
+  <b><tt><!-- template -->regexpcontains(regexp, strings)<!-- /template --></tt> - <i>returns <tt>true</tt>, if the given regular expression <tt>regexp</tt> is present in the given string or string vector (item-wise for string vectors, i.e. returns a boolean vector) in <tt>strings</tt></i>:</b><br>
+  <!-- /func:regexpcontains -->
+  </li>
+  <li><a name="regexpindexin"/><!-- func:regexpindexin -->
+  <b><tt><!-- template -->regexpindexin(regexp, strings)<!-- /template --></tt> - <i>returns index of the first occurence (or -1), of the given regular expression <tt>regexp</tt> in the given string or string vector (item-wise for string vectors, i.e. returns a number vector) in <tt>strings</tt></i>:</b><br>
+  <!-- /func:regexpindexin -->
   </li>
 
   </ul>

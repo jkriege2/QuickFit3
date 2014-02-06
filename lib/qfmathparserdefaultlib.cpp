@@ -185,8 +185,16 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("item", QFMathParser_DefaultLib::fItem);
 
     p->addFunction("runningaverage", QFMathParser_DefaultLib::fRunningAverage);
-}
 
+    p->addFunction("regexpcap", QFMathParser_DefaultLib::fRegExpCapture);
+    p->addFunction("regexpcontains", QFMathParser_DefaultLib::fRegExpContains);
+    p->addFunction("regexpindexin", QFMathParser_DefaultLib::fRegExpIndexIn);
+
+
+    p->addFunction("str2bool", QFMathParser_DefaultLib::fStringToBool);
+    p->addFunction("str2num", QFMathParser_DefaultLib::fStringToNum);
+    p->addFunction("cstr2num", QFMathParser_DefaultLib::fCStringToNum);
+}
 
 
 
@@ -1510,6 +1518,136 @@ namespace QFMathParser_DefaultLib {
             p->qfmpError("runningaverage(x,n) requires a number vector as first and an integer number >1 as second argument");
             return res;
         }
+    }
+
+    void fRegExpCapture(qfmpResult& r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n<2 || n>4) {\
+            p->qfmpError(QObject::tr("regexpcap(regexp, strings, cap_id=1, default_string=\"\") needs 2 or 4 arguments"));\
+            r.setInvalid();\
+            return; \
+        }\
+        if(params[1].type==qfmpStringVector || params[1].type==qfmpString) {\
+            if(params[0].type==qfmpString) {\
+                int capid=1;
+                QString defaultStr="";
+                if (n>2) {
+                    if(params[2].type==qfmpDouble && params[2].toInteger()>=0) {\
+                        capid=params[2].toInteger();
+                    } else {
+                        p->qfmpError(QObject::tr("regexpcap(regexp, strings, cap_id, default_string) argument cap_id has to be a number >=0"));\
+                        r.setInvalid();\
+                        return;
+                    }
+                }
+                if (n>3) {
+                    if(params[3].type==qfmpString) {\
+                        defaultStr=params[3].str;
+                    } else {
+                        p->qfmpError(QObject::tr("regexpcap(regexp, strings, cap_id, default_string) argument default_string has to be a string"));\
+                        r.setInvalid();\
+                        return;
+                    }
+                }
+                QRegExp rx(params[0].str);
+                rx.setMinimal(false);
+                rx.setCaseSensitivity(Qt::CaseInsensitive);
+                if (params[1].type==qfmpStringVector) {
+                    r.setStringVec(params[1].strVec);
+                    for (int i=0; i<r.strVec.size(); i++) {
+                        if (rx.indexIn(r.strVec[i])<0) {
+                            r.strVec[i]=defaultStr;
+                        } else {
+                            r.strVec[i]=rx.cap(capid);
+                        }
+                    }
+                } else if (params[1].type==qfmpString) {
+                    r.setStringVec(params[1].strVec);
+                    if (rx.indexIn(r.str)<0) {
+                        r.str=defaultStr;
+                    } else {
+                        r.str=rx.cap(capid);
+                    }
+                }
+            } else {
+                p->qfmpError(QObject::tr("regexpcap(regexp, strings, cap_id=1, default_string=\"\") argument regexp has to be a string"));\
+                r.setInvalid();\
+                return;
+            }
+        } else {\
+            p->qfmpError(QObject::tr("regexpcap(regexp, strings, cap_id, default_string=\"\") argument strings has to be a vector of strings and a string"));\
+            r.setInvalid();\
+            return;
+        }\
+        return; \
+    }
+
+    void fRegExpContains(qfmpResult& r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n!=2) {\
+            p->qfmpError(QObject::tr("regexpcontains(regexp, strings) needs 2 arguments"));\
+            r.setInvalid();\
+            return; \
+        }\
+        if(params[1].type==qfmpStringVector || params[1].type==qfmpString) {\
+            if(params[0].type==qfmpString) {\
+                QRegExp rx(params[0].str);
+                rx.setMinimal(false);
+                rx.setCaseSensitivity(Qt::CaseInsensitive);
+                if (params[1].type==qfmpStringVector) {
+                    QVector<bool> bv;
+                    for (int i=0; i<r.strVec.size(); i++) {
+                        bv.append(rx.indexIn(r.strVec[i])>=0);
+                    }
+                    r.setBoolVec(bv);
+                } else if (params[1].type==qfmpString) {
+                    r.setBoolean(rx.indexIn(r.str)>=0);
+                }
+            } else {
+                p->qfmpError(QObject::tr("regexpcontains(regexp, strings) argument regexp has to be a string"));\
+                r.setInvalid();\
+                return;
+            }
+        } else {\
+            p->qfmpError(QObject::tr("regexpcontains(regexp, strings) argument strings has to be a vector of strings and a string"));\
+            r.setInvalid();\
+            return;
+        }\
+        return; \
+    }
+
+    void fRegExpIndexIn(qfmpResult& r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n!=2) {\
+            p->qfmpError(QObject::tr("regexpindexin(regexp, strings) needs 2 arguments"));\
+            r.setInvalid();\
+            return; \
+        }\
+        if(params[1].type==qfmpStringVector || params[1].type==qfmpString) {\
+            if(params[0].type==qfmpString) {\
+                QRegExp rx(params[0].str);
+                rx.setMinimal(false);
+                rx.setCaseSensitivity(Qt::CaseInsensitive);
+                if (params[1].type==qfmpStringVector) {
+                    QVector<double> bv;
+                    for (int i=0; i<r.strVec.size(); i++) {
+                        bv.append(rx.indexIn(r.strVec[i]));
+                    }
+                    r.setDoubleVec(bv);
+                } else if (params[1].type==qfmpString) {
+                    r.setDouble(rx.indexIn(r.str));
+                }
+            } else {
+                p->qfmpError(QObject::tr("regexpindexin(regexp, strings) argument regexp has to be a string"));\
+                r.setInvalid();\
+                return;
+            }
+        } else {\
+            p->qfmpError(QObject::tr("regexpindexin(regexp, strings) argument strings has to be a vector of strings and a string"));\
+            r.setInvalid();\
+            return;
+        }\
+        return; \
     }
 
 }

@@ -18,6 +18,10 @@ namespace QFMathParser_DefaultLib {
     QFMATHPARSER_DEFINE_1PARAM_NUM2STRING_FUNC(fIntToOctStr, int2oct, intToOctQString)
     QFMATHPARSER_DEFINE_1PARAM_BOOL2STRING_FUNC(fboolToQString, bool2str, boolToQString)
 
+    QFMATHPARSER_DEFINE_1PARAM_STRING2NUM_FUNC(fStringToNum, str2num, QStringToDouble)
+    QFMATHPARSER_DEFINE_1PARAM_STRING2NUM_FUNC(fCStringToNum, cstr2num, CQStringToDouble)
+    QFMATHPARSER_DEFINE_1PARAM_STRING2BOOL_FUNC(fStringToBool, str2bool, QStringToBool)
+
     QFMATHPARSER_DEFINE_1PARAM_NUM2BOOL_FUNC(fIsNan, isnan, std::isnan)
     QFMATHPARSER_DEFINE_1PARAM_NUM2BOOL_FUNC(fIsInf, isinf, std::isinf)
     QFMATHPARSER_DEFINE_1PARAM_NUM2BOOL_FUNC(fIsFinite, isfinite, std::isfinite)
@@ -272,6 +276,9 @@ namespace QFMathParser_DefaultLib {
     qfmpResult fItem(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fRunningAverage(const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
+    void fRegExpCapture(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRegExpContains(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRegExpIndexIn(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
 
 
