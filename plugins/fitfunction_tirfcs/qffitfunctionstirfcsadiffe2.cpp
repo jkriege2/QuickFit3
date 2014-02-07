@@ -54,6 +54,23 @@ QFFitFunctionsTIRFCSADiffE2::QFFitFunctionsTIRFCSADiffE2() {
     #define FCSSDiff_background 18
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0,            0,        1e50,     1    );
     #define FCSSDiff_cpm 19
+
+
+    addParameter(FloatNumber,  "msd_tau1",                "evaluate MSD at this time",                             "&tau;<sub>MSD</sub>",      "ms",         "ms",                     false,    true,         false,              QFFitFunction::NoError  ,   false, 1,            1e-10,        1e50,     1    );
+    #define FCSDiff_msd_tau 20
+    addParameter(FloatNumber,  "msd_at_tau1",              "MSD1 evaluated at given time tau_MSD",                  "MSD1(&tau;<sub>MSD</sub>)",  "micron^2",         "&mu;m<sup>2</sup>",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define FCSDiff_msd_at_tau1 21
+    addParameter(FloatNumber,  "msd_at_tau2",              "MSD2 evaluated at given time tau_MSD",                  "MSD2(&tau;<sub>MSD</sub>)",  "micron^2",         "&mu;m<sup>2</sup>",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define FCSDiff_msd_at_tau2 22
+    addParameter(FloatNumber,  "msd_at_tau3",              "MSD3 evaluated at given time tau_MSD",                  "MSD3(&tau;<sub>MSD</sub>)",  "micron^2",         "&mu;m<sup>2</sup>",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define FCSDiff_msd_at_tau3 23
+    addParameter(FloatNumber,  "msd_time_aeff1",              "time to leave effective focus area with MSD1",      "&tau;<sub>1</sub>(A<sub>eff</sub>)",  "ms",         "ms",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define FCSDiff_msd_time_aeff1 24
+    addParameter(FloatNumber,  "msd_time_aeff2",              "time to leave effective focus area with MSD2",      "&tau;<sub>2</sub>(A<sub>eff</sub>)",  "ms",         "ms",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define FCSDiff_msd_time_aeff2 25
+    addParameter(FloatNumber,  "msd_time_aeff3",              "time to leave effective focus area with MSD3",      "&tau;<sub>3</sub>(A<sub>eff</sub>)",  "ms",         "ms",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define FCSDiff_msd_time_aeff3 26
+
 }
 
 double QFFitFunctionsTIRFCSADiffE2::evaluate(double t, const double* data) const {
@@ -132,6 +149,15 @@ void QFFitFunctionsTIRFCSADiffE2::calcParameter(double* data, double* error) con
     double background=data[FCSSDiff_background];
     double ebackground=0;
 
+    double tau_msd=data[FCSDiff_msd_tau];
+    double etau_msd=0;
+    const double GAMMA1=data[FCSSDiff_diff_coeff1];
+    const double GAMMA2=data[FCSSDiff_diff_coeff2];
+    const double GAMMA3=data[FCSSDiff_diff_coeff3];
+    const double a1=data[FCSDiff_diff_alpha1];
+    const double a2=data[FCSDiff_diff_alpha2];
+    const double a3=data[FCSDiff_diff_alpha3];
+
     if (error) {
         eN=error[FCSSDiff_n_particle];
         eD1=error[FCSSDiff_diff_coeff1];
@@ -187,7 +213,7 @@ void QFFitFunctionsTIRFCSADiffE2::calcParameter(double* data, double* error) con
     if (error) error[FCSSDiff_1n_particle]=fabs(eN/N/N);
 
     // calculate Veff
-    data[FCSSDiff_focus_volume]=TIRFCS_newAeff(a, wxy);;
+    double Aeff=data[FCSSDiff_focus_volume]=TIRFCS_newAeff(a, wxy);;
     if (error) error[FCSSDiff_focus_volume]=TIRFCS_newAeffError(a, ea, wxy, ewxy);
 
     // calculate C = N / Veff
@@ -205,6 +231,18 @@ void QFFitFunctionsTIRFCSADiffE2::calcParameter(double* data, double* error) con
     data[FCSSDiff_cpm]=(cps-background)/N;
     error[FCSSDiff_cpm]=sqrt(sqr(ecps/N)+sqr(ebackground/N)+sqr(eN*(cps-background)/sqr(N)));
 
+    data[FCSDiff_msd_at_tau1]=6.0*GAMMA1*pow(tau_msd*1e-3, a1);
+    if (error) error[FCSDiff_msd_at_tau1]=0;
+    data[FCSDiff_msd_at_tau2]=6.0*GAMMA2*pow(tau_msd*1e-3, a2);
+    if (error) error[FCSDiff_msd_at_tau2]=0;
+    data[FCSDiff_msd_at_tau3]=6.0*GAMMA3*pow(tau_msd*1e-3, a3);
+    if (error) error[FCSDiff_msd_at_tau3]=0;
+    data[FCSDiff_msd_time_aeff1]=pow(Aeff/4.0*GAMMA1, 1.0/a1)*1e3;
+    if (error) error[FCSDiff_msd_time_aeff1]=0;
+    data[FCSDiff_msd_time_aeff2]=pow(Aeff/4.0*GAMMA2, 1.0/a2)*1e3;
+    if (error) error[FCSDiff_msd_time_aeff2]=0;
+    data[FCSDiff_msd_time_aeff3]=pow(Aeff/4.0*GAMMA3, 1.0/a3)*1e3;
+    if (error) error[FCSDiff_msd_time_aeff3]=0;
 }
 
 bool QFFitFunctionsTIRFCSADiffE2::isParameterVisible(int parameter, const double* data) const {
@@ -212,8 +250,8 @@ bool QFFitFunctionsTIRFCSADiffE2::isParameterVisible(int parameter, const double
     switch(parameter) {
         case FCSSDiff_diff_rho1:  return comp>1;
         case FCSSDiff_diff_coeff1: case FCSDiff_diff_alpha1: return comp>0;
-        case FCSSDiff_diff_rho2: case FCSSDiff_diff_coeff2: case FCSDiff_diff_alpha2: return comp>1;
-        case FCSSDiff_diff_rho3: case FCSSDiff_diff_coeff3: case FCSDiff_diff_alpha3: return comp>2;
+        case FCSSDiff_diff_rho2: case FCSSDiff_diff_coeff2: case FCSDiff_diff_alpha2: case FCSDiff_msd_at_tau2: case FCSDiff_msd_time_aeff2: return comp>1;
+        case FCSSDiff_diff_rho3: case FCSSDiff_diff_coeff3: case FCSDiff_diff_alpha3: case FCSDiff_msd_at_tau3: case FCSDiff_msd_time_aeff3: return comp>2;
     }
     return true;
 }

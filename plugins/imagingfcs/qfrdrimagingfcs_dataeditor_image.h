@@ -40,6 +40,8 @@
 #include "qfoverlaystylecombobox.h"
 #include "qfparametercorrelationview.h"
 #include "frawdataimageeditor.h"
+#include "qfselectrdrdialog.h"
+#include "datatools.h"
 
 class QFRDRImagingFCSData; // forward
 

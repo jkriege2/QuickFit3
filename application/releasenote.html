@@ -22,18 +22,14 @@
 -->
 
 <!--
-QuickFit3/lib/QFMathParser:
-  - 
-  - 
+QuickFit3/fitfunction_spimfcs:
   - 
 
-QuickFit3/table:
-  - added math parser functions to access rows rowdata(), rowstr(), rowbool()
+QuickFit3/fitfunction_tirfcs:
+  - all anomalous diffusion fit functions now calculate MSDs after a given timespan and the time to leave the focal effective area
 
-
-
-QuickFit3/table:
-  - added math parser functions to get a column as string vector or boolean vector (columnstr(), columnbool())
+QuickFit3/imagingFCS:
+  - 
 -->
 
 <!--
@@ -69,6 +65,12 @@ QuickFit3/table:
 		  <li><b>imFCCSFit</b><ul>
 			<li>added option to save ACF/CCF amplitudes when calculating crosstalk-corrected relative CCF-amplitudes</li>
 		  </ul></li>	
+		  <li><b>SPIM-FCS fit functions</b><ul>
+			<li>all anomalous diffusion fit functions now calculate MSDs after a given timespan and the time to leave the focal effective area</li>
+		  </ul></li>	
+		  <li><b>TIR-FCS fit functions</b><ul>
+			<li>all anomalous diffusion fit functions now calculate MSDs after a given timespan and the time to leave the focal effective area</li>
+		  </ul></li>	
 		  <li><b>imFCS</b><ul>
 			<li>parameter image RDR editor: added Selection-menu entries:<ul>
 			<li>deselect all masked pixels</li>
@@ -77,6 +79,7 @@ QuickFit3/table:
 			<li>bugfix: in "copy fit results to table", the pixel count column was contained several times</li>
 			<li>correlation dialog has a button with some preset croppings</li>
 			<li>added mask and selection builder dialogs (+ menu entries in the imFCS RDR Editor, "Selection" and "Mask" menus), which allow to build a selection/mask from up to three conditions to parameter images/overview images (in-range/out-of-range/>=threshold/<=threshold)</li>
+			<li>"copy fit results to excel" allows now to also save the results and to copy results from several (selectable) files.</li>
 		  </ul></li>	
 		  <li><b>table</b><ul>
 			<li>bugfix: saved negative row/col numbers into QFTableXML-File, if the whole table was saved</li>

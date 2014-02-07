@@ -47,7 +47,7 @@ QFFitFunctionsSPIMFCSADiff::QFFitFunctionsSPIMFCSADiff() {
     #define SPIMFCSADIFF_focus_width QFPPM_INC(SPIMFCSADIFF_focus_height)
     addParameter(FloatNumber,  "pixel_width",             "pixel width",                                           "a",                        "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 400,          0,        1e4,      10    );
     #define SPIMFCSADIFF_pixel_width QFPPM_INC(SPIMFCSADIFF_focus_width)
-    addParameter(FloatNumber,  "focus_volume",            "focus: effective colume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "focus_volume",            "focus: effective volume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
     #define SPIMFCSADIFF_focus_volume QFPPM_INC(SPIMFCSADIFF_pixel_width)
     addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
     #define SPIMFCSADIFF_concentration QFPPM_INC(SPIMFCSADIFF_focus_volume)
@@ -57,6 +57,25 @@ QFFitFunctionsSPIMFCSADiff::QFFitFunctionsSPIMFCSADiff() {
     #define SPIMFCSADIFF_background QFPPM_INC(SPIMFCSADIFF_count_rate)
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0,            0,        1e50,     1    );
     #define SPIMFCSADIFF_cpm QFPPM_INC(SPIMFCSADIFF_background)
+
+
+
+    addParameter(FloatNumber,  "msd_tau1",                "evaluate MSD at this time",                             "&tau;<sub>MSD</sub>",      "ms",         "ms",                     false,    true,         false,              QFFitFunction::NoError  ,   false, 1,            1e-10,        1e50,     1    );
+    #define SPIMFCSADIFF_msd_tau QFPPM_INC(SPIMFCSADIFF_cpm)
+    addParameter(FloatNumber,  "msd_at_tau1",              "MSD1 evaluated at given time tau_MSD",                  "MSD1(&tau;<sub>MSD</sub>)",  "micron^2",         "&mu;m<sup>2</sup>",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define SPIMFCSADIFF_msd_at_tau1 QFPPM_INC(SPIMFCSADIFF_msd_tau)
+    addParameter(FloatNumber,  "msd_at_tau2",              "MSD2 evaluated at given time tau_MSD",                  "MSD2(&tau;<sub>MSD</sub>)",  "micron^2",         "&mu;m<sup>2</sup>",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define SPIMFCSADIFF_msd_at_tau2 QFPPM_INC(SPIMFCSADIFF_msd_at_tau1)
+    addParameter(FloatNumber,  "msd_at_tau3",              "MSD3 evaluated at given time tau_MSD",                  "MSD3(&tau;<sub>MSD</sub>)",  "micron^2",         "&mu;m<sup>2</sup>",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define SPIMFCSADIFF_msd_at_tau3 QFPPM_INC(SPIMFCSADIFF_msd_at_tau2)
+    addParameter(FloatNumber,  "effective_area",            "focus: effective area (xy)",                          "A<sub>eff</sub>",          "micron^2",         "&mu;m<sup>2</sup>",       false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define SPIMFCSADIFF_focus_effA QFPPM_INC(SPIMFCSADIFF_msd_at_tau3)
+    addParameter(FloatNumber,  "msd_time_aeff1",              "time to leave effective focus area with MSD1",      "&tau;<sub>1</sub>(A<sub>eff</sub>)",  "ms",         "ms",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define SPIMFCSADIFF_msd_time_aeff1 QFPPM_INC(SPIMFCSADIFF_focus_effA)
+    addParameter(FloatNumber,  "msd_time_aeff2",              "time to leave effective focus area with MSD2",      "&tau;<sub>2</sub>(A<sub>eff</sub>)",  "ms",         "ms",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define SPIMFCSADIFF_msd_time_aeff2 QFPPM_INC(SPIMFCSADIFF_msd_time_aeff1)
+    addParameter(FloatNumber,  "msd_time_aeff3",              "time to leave effective focus area with MSD3",      "&tau;<sub>3</sub>(A<sub>eff</sub>)",  "ms",         "ms",             false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define SPIMFCSADIFF_msd_time_aeff3 QFPPM_INC(SPIMFCSADIFF_msd_time_aeff2)
 
 }
 
@@ -152,6 +171,14 @@ void QFFitFunctionsSPIMFCSADiff::calcParameter(double* data, double* error) cons
     double ecpm=0;
     double background=data[SPIMFCSADIFF_background];
     double ebackground=0;
+    double tau_msd=data[SPIMFCSADIFF_msd_tau];
+    double etau_msd=0;
+    const double GAMMA1=data[SPIMFCSADIFF_diff_acoeff1];
+    const double GAMMA2=data[SPIMFCSADIFF_diff_acoeff2];
+    const double GAMMA3=data[SPIMFCSADIFF_diff_acoeff3];
+    const double a1=data[SPIMFCSADIFF_diff_alpha1];
+    const double a2=data[SPIMFCSADIFF_diff_alpha2];
+    const double a3=data[SPIMFCSADIFF_diff_alpha3];
 
     if (error) {
         eN=error[SPIMFCSADIFF_n_particle];
@@ -224,6 +251,22 @@ void QFFitFunctionsSPIMFCSADiff::calcParameter(double* data, double* error) cons
     data[SPIMFCSADIFF_cpm]=(cps-background)/N;
     error[SPIMFCSADIFF_cpm]=sqrt(sqr(ecps/N)+sqr(ebackground/N)+sqr(eN*(cps-background)/sqr(N)));
 
+
+    double Aeff=data[SPIMFCSADIFF_focus_effA]=2.0*a*a;
+    if (error) error[SPIMFCSADIFF_focus_effA]=0;
+    data[SPIMFCSADIFF_msd_at_tau1]=6.0*GAMMA1*pow(tau_msd*1e-3, a1);
+    if (error) error[SPIMFCSADIFF_msd_at_tau1]=0;
+    data[SPIMFCSADIFF_msd_at_tau2]=6.0*GAMMA2*pow(tau_msd*1e-3, a2);
+    if (error) error[SPIMFCSADIFF_msd_at_tau2]=0;
+    data[SPIMFCSADIFF_msd_at_tau3]=6.0*GAMMA3*pow(tau_msd*1e-3, a3);
+    if (error) error[SPIMFCSADIFF_msd_at_tau3]=0;
+    data[SPIMFCSADIFF_msd_time_aeff1]=pow(Aeff/4.0*GAMMA1, 1.0/a1)*1e3;
+    if (error) error[SPIMFCSADIFF_msd_time_aeff1]=0;
+    data[SPIMFCSADIFF_msd_time_aeff2]=pow(Aeff/4.0*GAMMA2, 1.0/a2)*1e3;
+    if (error) error[SPIMFCSADIFF_msd_time_aeff2]=0;
+    data[SPIMFCSADIFF_msd_time_aeff3]=pow(Aeff/4.0*GAMMA3, 1.0/a3)*1e3;
+    if (error) error[SPIMFCSADIFF_msd_time_aeff3]=0;
+
 }
 
 bool QFFitFunctionsSPIMFCSADiff::isParameterVisible(int parameter, const double* data) const {
@@ -231,8 +274,8 @@ bool QFFitFunctionsSPIMFCSADiff::isParameterVisible(int parameter, const double*
     switch(parameter) {
         case SPIMFCSADIFF_diff_rho1:  return comp>1;
         case SPIMFCSADIFF_diff_acoeff1: case SPIMFCSADIFF_diff_alpha1: return comp>0;
-        case SPIMFCSADIFF_diff_rho2: case SPIMFCSADIFF_diff_acoeff2: case SPIMFCSADIFF_diff_alpha2: return comp>1;
-        case SPIMFCSADIFF_diff_rho3: case SPIMFCSADIFF_diff_acoeff3: case SPIMFCSADIFF_diff_alpha3: return comp>2;
+        case SPIMFCSADIFF_diff_rho2: case SPIMFCSADIFF_diff_acoeff2: case SPIMFCSADIFF_diff_alpha2: case SPIMFCSADIFF_msd_at_tau2: case SPIMFCSADIFF_msd_time_aeff2: return comp>1;
+        case SPIMFCSADIFF_diff_rho3: case SPIMFCSADIFF_diff_acoeff3: case SPIMFCSADIFF_diff_alpha3: case SPIMFCSADIFF_msd_at_tau3: case SPIMFCSADIFF_msd_time_aeff3: return comp>2;
     }
     return true;
 }
