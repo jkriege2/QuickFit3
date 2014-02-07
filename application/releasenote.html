@@ -22,16 +22,23 @@
 -->
 
 <!--
+QuickFit3/lib/QFMathParser:
+  - 
+  - 
+  - 
+
+QuickFit3/table:
+  - added math parser functions to access rows rowdata(), rowstr(), rowbool()
 
 
+
+QuickFit3/table:
+  - added math parser functions to get a column as string vector or boolean vector (columnstr(), columnbool())
 -->
 
 <!--
-		<li><a name="3062"><b>2014-02-05 (SVN: 3062)</b>-->
+		<li><a name="3070"><b>2014-02-05 (SVN: 3070)</b>-->
 		<ul>
-		  <li><b>new plugins:</b><ul>
-			<li><b>plg_qfe_dataexportbasics</b>:  added this plugin with data export routines for Excel 97</li>
-		  </ul></li>
 		  <li><b>QuickFit</b><ul>
 			<li>added display of internal result/evaluation names and groups [i.e. common information] to result tables tooltips in rdr and evaluation editors</li>
 			<li>bugfix: correlation view: regression parameters were not displayed correctly in plot key</li>
@@ -40,6 +47,13 @@
 		    <li>plotter widgets:<ul>
 				<li>boxplots plot only parts of the whole box if some columns are missing</li>
 				<li>added error boxes and error ellipses as additional error styles</li>
+			</ul></li>
+		    <li>expression parser:<ul>
+				<li>now supports functions for regular expressions (regexpcap(), regexpindexin() and regexpcontains())</li>
+				<li>now supports functions to convert strings (str2num(), cstr2num(), str2bool())</li>
+				<li>added functions to use regular expression in case-sensitive and minimal version</li>
+				<li>added function forsave() which is a save version of the for() construct (i.e. does not crash if any expressions evaluates to non-number)</li>
+				<li>added function filterfinit() which removoves all nan/inf values from a vector of numbers</li>
 			</ul></li>
 		  </ul></li>	
 		  <li><b>MaxEnt FCS Fit</b><ul>
@@ -70,6 +84,8 @@
 			<li>added button to autoscale X&Y axis at the same time</li>
 			<li> when delete/adding a table column, the plot columns are altered accordingly, so the plots are no longer destroyed</li>
 			<li>added error boxes and error ellipses as additional error styles</li>
+			<li>added math parser functions to access rows rowdata(), rowstr(), rowbool()</li>
+			<li>added math parser functions to get a column as string vector or boolean vector (columnstr(), columnbool())</li>
 		  </ul></li>	
 		  <li><b>B040SPIM</b><ul>
 			<li>added methods to access measurement devices with JavaScripts</li>

@@ -185,10 +185,25 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("item", QFMathParser_DefaultLib::fItem);
 
     p->addFunction("runningaverage", QFMathParser_DefaultLib::fRunningAverage);
+    p->addFunction("filterfinite", QFMathParser_DefaultLib::fFilterFinite);
+    p->addFunction("filternumok", QFMathParser_DefaultLib::fFilterFinite);
 
-    p->addFunction("regexpcap", QFMathParser_DefaultLib::fRegExpCapture);
-    p->addFunction("regexpcontains", QFMathParser_DefaultLib::fRegExpContains);
-    p->addFunction("regexpindexin", QFMathParser_DefaultLib::fRegExpIndexIn);
+    p->addFunction("regexpcap", QFMathParser_DefaultLib::fRegExpCaptureNCS);
+    p->addFunction("regexpcontains", QFMathParser_DefaultLib::fRegExpContainsNCS);
+    p->addFunction("regexpindexin", QFMathParser_DefaultLib::fRegExpIndexInNCS);
+
+    p->addFunction("regexpcap_minimal", QFMathParser_DefaultLib::fRegExpCaptureMNCS);
+    p->addFunction("regexpcontains_minimal", QFMathParser_DefaultLib::fRegExpContainsMNCS);
+    p->addFunction("regexpindexin_minimal", QFMathParser_DefaultLib::fRegExpIndexInMNCS);
+
+    p->addFunction("regexpcap_cs", QFMathParser_DefaultLib::fRegExpCaptureCS);
+    p->addFunction("regexpcontains_cs", QFMathParser_DefaultLib::fRegExpContainsCS);
+    p->addFunction("regexpindexin_cs", QFMathParser_DefaultLib::fRegExpIndexInCS);
+
+    p->addFunction("regexpcap_cs_minimal", QFMathParser_DefaultLib::fRegExpCaptureMCS);
+    p->addFunction("regexpcontains_cs_minimal", QFMathParser_DefaultLib::fRegExpContainsMCS);
+    p->addFunction("regexpindexin_cs_minimal", QFMathParser_DefaultLib::fRegExpIndexInMCS);
+
 
 
     p->addFunction("str2bool", QFMathParser_DefaultLib::fStringToBool);
@@ -768,6 +783,26 @@ namespace QFMathParser_DefaultLib {
             }
         } else {
             p->qfmpError(QObject::tr("removeall(x, value) need one number vector and one number argument"));
+        }
+        return r;
+    }
+
+
+    qfmpResult fFilterFinite(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        qfmpResult r;
+        r.isValid=false;
+        if (n==1 && params[0].type==qfmpDoubleVector) {
+            const QVector<double>& dat=params[0].numVec;
+            r.type=qfmpDoubleVector;
+            r.numVec.clear();
+            r.isValid=true;
+            for (int i=0; i<dat.size(); i++) {
+                if (QFFloatIsOK(dat[i])) {
+                    r.numVec<<dat[i];
+                }
+            }
+        } else {
+            p->qfmpError(QObject::tr("filterfinite(x) need one number vector argument"));
         }
         return r;
     }
@@ -1520,7 +1555,12 @@ namespace QFMathParser_DefaultLib {
         }
     }
 
-    void fRegExpCapture(qfmpResult& r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+
+
+
+
+
+    void fRegExpCapture(qfmpResult& r, const qfmpResult *params, unsigned int n, QFMathParser *p, bool minimal, Qt::CaseSensitivity casesens)
     {
         if (n<2 || n>4) {\
             p->qfmpError(QObject::tr("regexpcap(regexp, strings, cap_id=1, default_string=\"\") needs 2 or 4 arguments"));\
@@ -1550,8 +1590,8 @@ namespace QFMathParser_DefaultLib {
                     }
                 }
                 QRegExp rx(params[0].str);
-                rx.setMinimal(false);
-                rx.setCaseSensitivity(Qt::CaseInsensitive);
+                rx.setMinimal(minimal);
+                rx.setCaseSensitivity(casesens);
                 if (params[1].type==qfmpStringVector) {
                     r.setStringVec(params[1].strVec);
                     for (int i=0; i<r.strVec.size(); i++) {
@@ -1582,7 +1622,7 @@ namespace QFMathParser_DefaultLib {
         return; \
     }
 
-    void fRegExpContains(qfmpResult& r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    void fRegExpContains(qfmpResult& r, const qfmpResult *params, unsigned int n, QFMathParser *p, bool minimal, Qt::CaseSensitivity casesens)
     {
         if (n!=2) {\
             p->qfmpError(QObject::tr("regexpcontains(regexp, strings) needs 2 arguments"));\
@@ -1592,8 +1632,8 @@ namespace QFMathParser_DefaultLib {
         if(params[1].type==qfmpStringVector || params[1].type==qfmpString) {\
             if(params[0].type==qfmpString) {\
                 QRegExp rx(params[0].str);
-                rx.setMinimal(false);
-                rx.setCaseSensitivity(Qt::CaseInsensitive);
+                rx.setMinimal(minimal);
+                rx.setCaseSensitivity(casesens);
                 if (params[1].type==qfmpStringVector) {
                     QVector<bool> bv;
                     for (int i=0; i<r.strVec.size(); i++) {
@@ -1616,7 +1656,7 @@ namespace QFMathParser_DefaultLib {
         return; \
     }
 
-    void fRegExpIndexIn(qfmpResult& r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    void fRegExpIndexIn(qfmpResult& r, const qfmpResult *params, unsigned int n, QFMathParser *p, bool minimal, Qt::CaseSensitivity casesens)
     {
         if (n!=2) {\
             p->qfmpError(QObject::tr("regexpindexin(regexp, strings) needs 2 arguments"));\
@@ -1626,8 +1666,8 @@ namespace QFMathParser_DefaultLib {
         if(params[1].type==qfmpStringVector || params[1].type==qfmpString) {\
             if(params[0].type==qfmpString) {\
                 QRegExp rx(params[0].str);
-                rx.setMinimal(false);
-                rx.setCaseSensitivity(Qt::CaseInsensitive);
+                rx.setMinimal(minimal);
+                rx.setCaseSensitivity(casesens);
                 if (params[1].type==qfmpStringVector) {
                     QVector<double> bv;
                     for (int i=0; i<r.strVec.size(); i++) {

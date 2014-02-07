@@ -33,6 +33,9 @@ void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names, bool colum
         parser->addFunction("columndata", fQFRDRTableEditor_column);
         parser->addFunction("columnstr", fQFRDRTableEditor_columnStr);
         parser->addFunction("columnbool", fQFRDRTableEditor_columnBool);
+        parser->addFunction("rowdata", fQFRDRTableEditor_row);
+        parser->addFunction("rowstr", fQFRDRTableEditor_rowStr);
+        parser->addFunction("rowbool", fQFRDRTableEditor_rowBool);
 
         /*parser->addFunction("colsavg", fQFRDRTableEditor_colsavg);
         parser->addFunction("colssum", fQFRDRTableEditor_colssum);
@@ -64,7 +67,10 @@ qfmpResult fQFRDRTableEditor_columnStr(const qfmpResult* params, unsigned int  n
     if (d) {
         if (d->model) {
             if (n==1) {
-                if ((params[0].type!=qfmpDouble)) p->qfmpError("columnstr(column) needs one integer arguments");
+                if ((params[0].type!=qfmpDouble))  {
+                    p->qfmpError("columnstr(column) needs one integer arguments");
+                    return res;
+                }
                 int c=floor(params[0].num-1);
                 if (c>=0 && c<d->model->columnCount()) {
                     QVariantList vl=d->model->getColumnData(c, Qt::EditRole);
@@ -75,9 +81,13 @@ qfmpResult fQFRDRTableEditor_columnStr(const qfmpResult* params, unsigned int  n
                     res.setStringVec(sl);
                 }
             } else if (n==2) {
-                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble&&params[1].type!=qfmpDoubleVector)) p->qfmpError("columnstr(column, rows) needs one integer and one integer vector arguments");
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble&&params[1].type!=qfmpDoubleVector)) {
+                    p->qfmpError("columnstr(column, rows) needs one integer and one integer vector arguments");
+                    return res;
+                }
                 int c=floor(params[0].num-1);
                 QVector<int> r=params[1].asIntVector();
+                for (int i=0; i<r.size(); i++) r[i]=r[i]-1;
                 if (c>=0 && c<d->model->columnCount()) {
                     QVariantList dat=d->model->getColumnData(c, Qt::EditRole);
                     QStringList dat1;
@@ -104,7 +114,10 @@ qfmpResult fQFRDRTableEditor_columnBool(const qfmpResult* params, unsigned int  
     if (d) {
         if (d->model) {
             if (n==1) {
-                if ((params[0].type!=qfmpDouble)) p->qfmpError("columnbool(column) needs one integer arguments");
+                if ((params[0].type!=qfmpDouble)) {
+                    p->qfmpError("columnbool(column) needs one integer arguments");
+                    return res;
+                }
                 int c=floor(params[0].num-1);
                 if (c>=0 && c<d->model->columnCount()) {
                     QVariantList vl=d->model->getColumnData(c, Qt::EditRole);
@@ -115,9 +128,13 @@ qfmpResult fQFRDRTableEditor_columnBool(const qfmpResult* params, unsigned int  
                     res.setBoolVec(sl);
                 }
             } else if (n==2) {
-                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble&&params[1].type!=qfmpDoubleVector)) p->qfmpError("columnbool(column, rows) needs one integer and one integer vector arguments");
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble&&params[1].type!=qfmpDoubleVector)) {
+                    p->qfmpError("columnbool(column, rows) needs one integer and one integer vector arguments");
+                    return res;
+                }
                 int c=floor(params[0].num-1);
                 QVector<int> r=params[1].asIntVector();
+                for (int i=0; i<r.size(); i++) r[i]=r[i]-1;
                 if (c>=0 && c<d->model->columnCount()) {
                     QVariantList dat=d->model->getColumnData(c, Qt::EditRole);
                     QVector<bool> dat1;
@@ -143,16 +160,23 @@ qfmpResult fQFRDRTableEditor_column(const qfmpResult* params, unsigned int  n, Q
     if (d) {
         if (d->model) {
             if (n==1) {
-                if ((params[0].type!=qfmpDouble)) p->qfmpError("column(column) needs one integer arguments");
+                if ((params[0].type!=qfmpDouble)) {
+                    p->qfmpError("column(column) needs one integer arguments");
+                    return res;
+                }
                 int c=floor(params[0].num-1);
                 if (c>=0 && c<d->model->columnCount()) {
 
                     res.setDoubleVec(d->model->getColumnDataAsNumbers(c, Qt::EditRole));
                 }
             } else if (n==2) {
-                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble&&params[1].type!=qfmpDoubleVector)) p->qfmpError("column(column, rows) needs one integer and one integer vector arguments");
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble&&params[1].type!=qfmpDoubleVector)) {
+                    p->qfmpError("column(column, rows) needs one integer and one integer vector arguments");
+                    return res;
+                }
                 int c=floor(params[0].num-1);
                 QVector<int> r=params[1].asIntVector();
+                for (int i=0; i<r.size(); i++) r[i]=r[i]-1;
                 if (c>=0 && c<d->model->columnCount()) {
                     QVector<double> dat=d->model->getColumnDataAsNumbers(c, Qt::EditRole);
                     QVector<double> dat1;
@@ -172,6 +196,192 @@ qfmpResult fQFRDRTableEditor_column(const qfmpResult* params, unsigned int  n, Q
 }
 
 
+
+
+
+
+
+
+
+
+
+qfmpResult fQFRDRTableEditor_rowStr(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    qfmpResult res=qfmpResult::invalidResult();
+    res.num=NAN;
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            if (n==1) {
+                if ((params[0].type!=qfmpDouble)) {
+                    p->qfmpError("rownstr(row) needs one integer arguments");
+                    return res;
+                }
+                int r=floor(params[0].num-1);
+                if (r>=0 && r<d->model->columnCount()) {
+                    QVariantList vl;
+                    for (int i=0; i<d->model->columnCount(); i++) {
+                        vl<<d->model->data(d->model->index(r, i), Qt::EditRole);
+                    }
+                    QStringList sl;
+                    for (int i=0; i<vl.size(); i++) {
+                        sl.append(vl[i].toString());
+                    }
+                    res.setStringVec(sl);
+                }
+            } else if (n==2) {
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble&&params[1].type!=qfmpDoubleVector)) {
+                    p->qfmpError("rowstr(row, columns) needs one integer and one integer vector arguments");
+                    return res;
+                }
+                int r=floor(params[0].num-1);
+                QVector<int> cols=params[1].asIntVector();
+                for (int i=0; i<cols.size(); i++) cols[i]=cols[i]-1;
+                if (r>=0 && r<d->model->columnCount()) {
+                    QStringList dat1;
+                    for (int i=0; i<cols.size(); i++) {
+                        if (cols[i]>=0 && cols[i]<d->model->columnCount()) {
+                            dat1<<d->model->data(d->model->index(r, cols[i]), Qt::EditRole).toString();
+                        }
+                    }
+                    res.setStringVec(dat1);
+                }
+            } else {
+                p->qfmpError("rowstr(column)/rowstr(row, columns) needs 1 or 2 arguments");
+            }
+        }
+    }
+    return res;
+}
+
+
+qfmpResult fQFRDRTableEditor_rowBool(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    qfmpResult res=qfmpResult::invalidResult();
+    res.num=NAN;
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            if (n==1) {
+                if ((params[0].type!=qfmpDouble)){
+                    p->qfmpError("rowbool(row) needs one integer arguments");
+                    return res;
+                }
+                int r=floor(params[0].num-1);
+                if (r>=0 && r<d->model->columnCount()) {
+                    QVariantList vl;
+                    for (int i=0; i<d->model->columnCount(); i++) {
+                        vl<<d->model->data(d->model->index(r, i), Qt::EditRole);
+                    }
+                    QVector<bool> sl;
+                    for (int i=0; i<vl.size(); i++) {
+                        sl.append(vl[i].toBool());
+                    }
+                    res.setBoolVec(sl);
+                }
+            } else if (n==2) {
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble&&params[1].type!=qfmpDoubleVector)) {
+                    p->qfmpError("rowbool(row, columns) needs one integer and one integer vector arguments");
+                    return res;
+                }
+                int r=floor(params[0].num-1);
+                QVector<int> cols=params[1].asIntVector();
+                for (int i=0; i<cols.size(); i++) cols[i]=cols[i]-1;
+                if (r>=0 && r<d->model->columnCount()) {
+                    QVector<bool> dat1;
+                    for (int i=0; i<cols.size(); i++) {
+                        if (cols[i]>=0 && cols[i]<d->model->columnCount()) {
+                            dat1<<d->model->data(d->model->index(r, cols[i]), Qt::EditRole).toBool();
+                        }
+                    }
+                    res.setBoolVec(dat1);
+                }
+            } else {
+                p->qfmpError("rowbool(row)/rowbool(row, columns) needs 1 or 2 arguments");
+            }
+        }
+    }
+    return res;
+}
+
+qfmpResult fQFRDRTableEditor_row(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    qfmpResult res=qfmpResult::invalidResult();
+    res.num=NAN;
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            if (n==1) {
+                if ((params[0].type!=qfmpDouble)) {
+                    p->qfmpError("rowdata(row) needs one integer arguments");
+                    return res;
+                }
+                int r=floor(params[0].num-1);
+                if (r>=0 && r<d->model->columnCount()) {
+                    QVariantList vl;
+                    for (int i=0; i<d->model->columnCount(); i++) {
+                        vl<<d->model->data(d->model->index(r, i), Qt::EditRole);
+                    }
+                    QVector<double> sl;
+                    for (int i=0; i<vl.size(); i++) {
+                        //sl.append(vl[i].toBool());
+                        const QVariant& dv=vl[i];
+                        bool ok=false;
+                        double dd=dv.toDouble(&ok);
+                        if (dv.isValid() && (dv.type()==QVariant::Double || dv.type()==QVariant::Int || dv.type()==QVariant::UInt || dv.type()==QVariant::Bool || dv.type()==QVariant::LongLong || dv.type()==QVariant::ULongLong) && ok) {
+                            sl.append(dd);
+                        } else if (vl.size()>0) {
+                            sl.append(NAN);
+                        }
+                    }
+                    res.setDoubleVec(sl);
+                }
+            } else if (n==2) {
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble&&params[1].type!=qfmpDoubleVector)) {
+                    p->qfmpError("rowdata(row, columns) needs one integer and one integer vector arguments");
+                    return res;
+                }
+
+
+                int r=floor(params[0].num-1);
+                QVector<int> cols=params[1].asIntVector();
+                for (int i=0; i<cols.size(); i++) cols[i]=cols[i]-1;
+                if (r>=0 && r<d->model->columnCount()) {
+                    QVector<double> dat1;
+                    for (int i=0; i<cols.size(); i++) {
+                        if (cols[i]>=0 && cols[i]<d->model->columnCount()) {
+                            const QVariant& dv=d->model->data(d->model->index(r, cols[i]), Qt::EditRole);
+                            bool ok=false;
+                            double dd=dv.toDouble(&ok);
+                            if (dv.isValid() && (dv.type()==QVariant::Double || dv.type()==QVariant::Int || dv.type()==QVariant::UInt || dv.type()==QVariant::Bool || dv.type()==QVariant::LongLong || dv.type()==QVariant::ULongLong) && ok) {
+                                dat1.append(dd);
+                            } else {
+                                dat1.append(NAN);
+                            }
+                        }
+                    }
+                    res.setDoubleVec(dat1);
+                }
+
+            } else {
+                p->qfmpError("rowdata(row)/rowdata(row, columns) needs 1 or 2 arguments");
+            }
+        }
+    }
+    return res;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 qfmpResult fQFRDRTableEditor_data(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
     qfmpResult res;
     res.num=NAN;
@@ -179,8 +389,14 @@ qfmpResult fQFRDRTableEditor_data(const qfmpResult* params, unsigned int  n, QFM
     if (d) {
         if (d->model) {
             res.type=qfmpDouble;
-            if (n!=2) p->qfmpError("data(row, column) needs 2 argument");
-            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) p->qfmpError("data(row, column) needs two integer arguments");
+            if (n!=2) {
+                p->qfmpError("data(row, column) needs 2 argument");
+                return res;
+            }
+            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) {
+                p->qfmpError("data(row, column) needs two integer arguments");
+                return res;
+            }
             int r=floor(params[0].num-1);
             int c=floor(params[1].num-1);
             if (r>=0 && c>=0 && r<d->model->rowCount() && c<d->model->columnCount()) {
@@ -218,8 +434,14 @@ qfmpResult fQFRDRTableEditor_dataleft(const qfmpResult* params, unsigned int  n,
     if (d) {
         if (d->model) {
             res.type=qfmpDouble;
-            if (n!=1) p->qfmpError("dataleft(delta_column) needs 1 argument");
-            if ((params[0].type!=qfmpDouble)) p->qfmpError("dataleft(delta_column) needs one integer arguments");
+            if (n!=1) {
+                p->qfmpError("dataleft(delta_column) needs 1 argument");
+                return res;
+            }
+            if ((params[0].type!=qfmpDouble)) {
+                p->qfmpError("dataleft(delta_column) needs one integer arguments");
+                return res;
+            }
             int delta=floor(params[0].num);
             QVariant da= d->model->cell(d->row,d->column-delta);
             switch(da.type()) {
@@ -257,7 +479,10 @@ qfmpResult fQFRDRTableEditor_colavg(const qfmpResult* params, unsigned int  n, Q
             res.type=qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=qfmpDouble)) p->qfmpError("colavg(column) needs one integer argument");
+                if ((params[0].type!=qfmpDouble)) {
+                    p->qfmpError("colavg(column) needs one integer argument");
+                    return res;
+                }
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -265,7 +490,10 @@ qfmpResult fQFRDRTableEditor_colavg(const qfmpResult* params, unsigned int  n, Q
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) p->qfmpError("colavg(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) {
+                    p->qfmpError("colavg(column, range_start, range_end) needs three integer argument");
+                    return res;
+                }
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -274,6 +502,7 @@ qfmpResult fQFRDRTableEditor_colavg(const qfmpResult* params, unsigned int  n, Q
                 }
             } else {
                 p->qfmpError("colavg(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                return res;
             }
 
 
@@ -295,7 +524,10 @@ qfmpResult fQFRDRTableEditor_colsum(const qfmpResult* params, unsigned int  n, Q
             res.type=qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=qfmpDouble)) p->qfmpError("colsum(column) needs one integer argument");
+                if ((params[0].type!=qfmpDouble)) {
+                    p->qfmpError("colsum(column) needs one integer argument");
+                    return res;
+                }
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -303,7 +535,10 @@ qfmpResult fQFRDRTableEditor_colsum(const qfmpResult* params, unsigned int  n, Q
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) p->qfmpError("colsum(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) {
+                    p->qfmpError("colsum(column, range_start, range_end) needs three integer argument");
+                    return res;
+                }
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -312,6 +547,7 @@ qfmpResult fQFRDRTableEditor_colsum(const qfmpResult* params, unsigned int  n, Q
                 }
             } else {
                 p->qfmpError("colsum(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                return res;
             }
 
 
@@ -332,7 +568,10 @@ qfmpResult fQFRDRTableEditor_colsum2(const qfmpResult* params, unsigned int  n, 
             res.type=qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=qfmpDouble)) p->qfmpError("colsum2(column) needs one integer argument");
+                if ((params[0].type!=qfmpDouble)) {
+                    p->qfmpError("colsum2(column) needs one integer argument");
+                    return res;
+                }
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -340,7 +579,10 @@ qfmpResult fQFRDRTableEditor_colsum2(const qfmpResult* params, unsigned int  n, 
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) p->qfmpError("colsum2(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) {
+                    p->qfmpError("colsum2(column, range_start, range_end) needs three integer argument");
+                    return res;
+                }
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -349,6 +591,7 @@ qfmpResult fQFRDRTableEditor_colsum2(const qfmpResult* params, unsigned int  n, 
                 }
             } else {
                 p->qfmpError("colsum2(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                return res;
             }
 
 
@@ -371,7 +614,10 @@ qfmpResult fQFRDRTableEditor_colvar(const qfmpResult* params, unsigned int  n, Q
             res.type=qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=qfmpDouble)) p->qfmpError("colvar(column) needs one integer argument");
+                if ((params[0].type!=qfmpDouble)) {
+                    p->qfmpError("colvar(column) needs one integer argument");
+                    return res;
+                }
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -379,7 +625,10 @@ qfmpResult fQFRDRTableEditor_colvar(const qfmpResult* params, unsigned int  n, Q
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) p->qfmpError("colvar(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)){
+                    p->qfmpError("colvar(column, range_start, range_end) needs three integer argument");
+                    return res;
+                }
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -388,8 +637,8 @@ qfmpResult fQFRDRTableEditor_colvar(const qfmpResult* params, unsigned int  n, Q
                 }
             } else {
                 p->qfmpError("colvar(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                return res;
             }
-
 
             res.num=qfstatisticsVariance(data);
             res.type=qfmpDouble;
@@ -409,7 +658,10 @@ qfmpResult fQFRDRTableEditor_colstd(const qfmpResult* params, unsigned int  n, Q
             res.type=qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=qfmpDouble)) p->qfmpError("colstd(column) needs one integer argument");
+                if ((params[0].type!=qfmpDouble)) {
+                    p->qfmpError("colstd(column) needs one integer argument");
+                    return res;
+                }
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -417,7 +669,10 @@ qfmpResult fQFRDRTableEditor_colstd(const qfmpResult* params, unsigned int  n, Q
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) p->qfmpError("colstd(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) {
+                    p->qfmpError("colstd(column, range_start, range_end) needs three integer argument");
+                    return res;
+                }
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -426,8 +681,8 @@ qfmpResult fQFRDRTableEditor_colstd(const qfmpResult* params, unsigned int  n, Q
                 }
             } else {
                 p->qfmpError("colstd(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                return res;
             }
-
 
             res.num=sqrt(qfstatisticsVariance(data));
             res.type=qfmpDouble;
@@ -447,7 +702,10 @@ qfmpResult fQFRDRTableEditor_colmin(const qfmpResult* params, unsigned int  n, Q
             res.type=qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=qfmpDouble)) p->qfmpError("colmin(column) needs one integer argument");
+                if ((params[0].type!=qfmpDouble)) {
+                    p->qfmpError("colmin(column) needs one integer argument");
+                    return res;
+                }
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -455,7 +713,10 @@ qfmpResult fQFRDRTableEditor_colmin(const qfmpResult* params, unsigned int  n, Q
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) p->qfmpError("colmin(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) {
+                    p->qfmpError("colmin(column, range_start, range_end) needs three integer argument");
+                    return res;
+                }
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -464,8 +725,8 @@ qfmpResult fQFRDRTableEditor_colmin(const qfmpResult* params, unsigned int  n, Q
                 }
             } else {
                 p->qfmpError("colmin(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                return res;
             }
-
             qSort(data);
             res.num=qfstatisticsSortedMin(data);
             res.type=qfmpDouble;
@@ -485,7 +746,10 @@ qfmpResult fQFRDRTableEditor_colmax(const qfmpResult* params, unsigned int  n, Q
             res.type=qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=qfmpDouble)) p->qfmpError("colmax(column) needs one integer argument");
+                if ((params[0].type!=qfmpDouble)) {
+                    p->qfmpError("colmax(column) needs one integer argument");
+                    return res;
+                }
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -493,7 +757,10 @@ qfmpResult fQFRDRTableEditor_colmax(const qfmpResult* params, unsigned int  n, Q
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) p->qfmpError("colmax(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) {
+                    p->qfmpError("colmax(column, range_start, range_end) needs three integer argument");
+                    return res;
+                }
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -502,8 +769,8 @@ qfmpResult fQFRDRTableEditor_colmax(const qfmpResult* params, unsigned int  n, Q
                 }
             } else {
                 p->qfmpError("colmax(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                return res;
             }
-
             qSort(data);
             res.num=qfstatisticsSortedMax(data);
             res.type=qfmpDouble;
@@ -523,7 +790,10 @@ qfmpResult fQFRDRTableEditor_colmedian(const qfmpResult* params, unsigned int  n
             res.type=qfmpDouble;
             QList<double> data;
             if (n==1) {
-                if ((params[0].type!=qfmpDouble)) p->qfmpError("colmedian(column) needs one integer argument");
+                if ((params[0].type!=qfmpDouble)) {
+                    p->qfmpError("colmedian(column) needs one integer argument");
+                    return res;
+                }
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -531,7 +801,10 @@ qfmpResult fQFRDRTableEditor_colmedian(const qfmpResult* params, unsigned int  n
                     }
                 }
             } else if (n==3) {
-                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) p->qfmpError("colmedian(column, range_start, range_end) needs three integer argument");
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) {
+                    p->qfmpError("colmedian(column, range_start, range_end) needs three integer argument");
+                    return res;
+                }
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -540,8 +813,8 @@ qfmpResult fQFRDRTableEditor_colmedian(const qfmpResult* params, unsigned int  n
                 }
             } else {
                 p->qfmpError("colmedian(column [, range_start, range_end]) needs 1 or 3 arguments argument");
+                return res;
             }
-
             qSort(data);
             res.num=qfstatisticsSortedMedian(data);
             res.type=qfmpDouble;
@@ -563,7 +836,10 @@ qfmpResult fQFRDRTableEditor_colquantile(const qfmpResult* params, unsigned int 
             QList<double> data;
             double quantile=0;
             if (n==2) {
-                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) p->qfmpError("colquantile(column, quantile) needs two number argument");
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble))  {
+                    p->qfmpError("colquantile(column, quantile) needs two number argument");
+                    return res;
+                }
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -572,7 +848,10 @@ qfmpResult fQFRDRTableEditor_colquantile(const qfmpResult* params, unsigned int 
                 }
                 quantile=params[1].num;
             } else if (n==4) {
-                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)||(params[3].type!=qfmpDouble)) p->qfmpError("colquantile(column, range_start, range_end, quantile) needs four number argument");
+                if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)||(params[3].type!=qfmpDouble)) {
+                    p->qfmpError("colquantile(column, range_start, range_end, quantile) needs four number argument");
+                    return res;
+                }
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
                     if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
@@ -582,8 +861,8 @@ qfmpResult fQFRDRTableEditor_colquantile(const qfmpResult* params, unsigned int 
                 quantile=params[3].num;
             } else {
                 p->qfmpError("colquantile(column [, range_start, range_end], quantile) needs 2 or 4 arguments ");
+                return res;
             }
-
             qSort(data);
             res.num=qfstatisticsSortedQuantile(data, quantile);
             res.type=qfmpDouble;
@@ -613,8 +892,14 @@ qfmpResult fQFRDRTableEditor_columnUnique(const qfmpResult* params, unsigned int
     QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            if (n!=1) p->qfmpError("uniquecolumn(column) needs 1 argument");
-            if ((params[0].type!=qfmpDouble)) p->qfmpError("uniquecolumn(column) needs one integer arguments");
+            if (n!=1) {
+                p->qfmpError("uniquecolumn(column) needs 1 argument");
+                return res;
+            }
+            if ((params[0].type!=qfmpDouble)) {
+                p->qfmpError("uniquecolumn(column) needs one integer arguments");
+                return res;
+            }
             int c=floor(params[0].num-1);
             if (c>=0 && c<d->model->columnCount()) {
                 QVariantList vl=d->model->getColumnData(c, Qt::EditRole);
@@ -660,8 +945,14 @@ qfmpResult fQFRDRTableEditor_indexedColAvg(const qfmpResult* params, unsigned in
     QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            if (n!=2) p->qfmpError("indexedcolavg(column, index) needs 2 argument");
-            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) p->qfmpError("indexedcolavg(column, index) needs two integer arguments");
+            if (n!=2) {
+                p->qfmpError("indexedcolavg(column, index) needs 2 argument");
+                return res;
+            }
+            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) {
+                p->qfmpError("indexedcolavg(column, index) needs two integer arguments");
+                return res;
+            }
             int c=floor(params[0].num-1);
             int idx=floor(params[1].num-1);
             if (c>=0 && c<d->model->columnCount() && idx>=0 && idx<d->model->columnCount()) {
@@ -718,8 +1009,14 @@ qfmpResult fQFRDRTableEditor_indexedColSum(const qfmpResult* params, unsigned in
     QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            if (n!=2) p->qfmpError("indexedcolsum(column, index) needs 2 argument");
-            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) p->qfmpError("indexedcolsum(column, index) needs two integer arguments");
+            if (n!=2) {
+                p->qfmpError("indexedcolsum(column, index) needs 2 argument");
+                return res;
+            }
+            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) {
+                p->qfmpError("indexedcolsum(column, index) needs two integer arguments");
+                return res;
+            }
             int c=floor(params[0].num-1);
             int idx=floor(params[1].num-1);
             if (c>=0 && c<d->model->columnCount() && idx>=0 && idx<d->model->columnCount()) {
@@ -776,8 +1073,14 @@ qfmpResult fQFRDRTableEditor_indexedColSum2(const qfmpResult* params, unsigned i
     QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            if (n!=2) p->qfmpError("indexedcolsum2(column, index) needs 2 argument");
-            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) p->qfmpError("indexedcolsum2(column, index) needs two integer arguments");
+            if (n!=2) {
+                p->qfmpError("indexedcolsum2(column, index) needs 2 argument");
+                return res;
+            }
+            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) {
+                p->qfmpError("indexedcolsum2(column, index) needs two integer arguments");
+                return res;
+            }
             int c=floor(params[0].num-1);
             int idx=floor(params[1].num-1);
             if (c>=0 && c<d->model->columnCount() && idx>=0 && idx<d->model->columnCount()) {
@@ -836,8 +1139,14 @@ qfmpResult fQFRDRTableEditor_indexedColStd(const qfmpResult* params, unsigned in
     QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            if (n!=2) p->qfmpError("indexedcolstd(column, index) needs 2 argument");
-            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) p->qfmpError("indexedcolstd(column, index) needs two integer arguments");
+            if (n!=2) {
+                p->qfmpError("indexedcolstd(column, index) needs 2 argument");
+                return res;
+            }
+            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) {
+                p->qfmpError("indexedcolstd(column, index) needs two integer arguments");
+                return res;
+            }
             int c=floor(params[0].num-1);
             int idx=floor(params[1].num-1);
             if (c>=0 && c<d->model->columnCount() && idx>=0 && idx<d->model->columnCount()) {
@@ -895,8 +1204,14 @@ qfmpResult fQFRDRTableEditor_indexedColVar(const qfmpResult* params, unsigned in
     QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            if (n!=2) p->qfmpError("indexedcolvar(column, index) needs 2 argument");
-            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) p->qfmpError("indexedcolvar(column, index) needs two integer arguments");
+            if (n!=2)  {
+                p->qfmpError("indexedcolvar(column, index) needs 2 argument");
+                return res;
+            }
+            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) {
+                p->qfmpError("indexedcolvar(column, index) needs two integer arguments");
+                return res;
+            }
             int c=floor(params[0].num-1);
             int idx=floor(params[1].num-1);
             if (c>=0 && c<d->model->columnCount() && idx>=0 && idx<d->model->columnCount()) {
@@ -953,8 +1268,14 @@ qfmpResult fQFRDRTableEditor_indexedColMin(const qfmpResult* params, unsigned in
     QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            if (n!=2) p->qfmpError("indexedcolmin(column, index) needs 2 argument");
-            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) p->qfmpError("indexedcolmin(column, index) needs two integer arguments");
+            if (n!=2) {
+                p->qfmpError("indexedcolmin(column, index) needs 2 argument");
+                return res;
+            }
+            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) {
+                p->qfmpError("indexedcolmin(column, index) needs two integer arguments");
+                return res;
+            }
             int c=floor(params[0].num-1);
             int idx=floor(params[1].num-1);
             if (c>=0 && c<d->model->columnCount() && idx>=0 && idx<d->model->columnCount()) {
@@ -1010,8 +1331,14 @@ qfmpResult fQFRDRTableEditor_indexedColMax(const qfmpResult* params, unsigned in
     QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            if (n!=2) p->qfmpError("indexedcolmax(column, index) needs 2 argument");
-            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) p->qfmpError("indexedcolmax(column, index) needs two integer arguments");
+            if (n!=2) {
+                p->qfmpError("indexedcolmax(column, index) needs 2 argument");
+                return res;
+            }
+            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) {
+                p->qfmpError("indexedcolmax(column, index) needs two integer arguments");
+                return res;
+            }
             int c=floor(params[0].num-1);
             int idx=floor(params[1].num-1);
             if (c>=0 && c<d->model->columnCount() && idx>=0 && idx<d->model->columnCount()) {
@@ -1067,8 +1394,14 @@ qfmpResult fQFRDRTableEditor_indexedColMedian(const qfmpResult* params, unsigned
     QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            if (n!=2) p->qfmpError("indexedcolmedian(column, index) needs 2 argument");
-            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) p->qfmpError("indexedcolmedian(column, index) needs two integer arguments");
+            if (n!=2) {
+                p->qfmpError("indexedcolmedian(column, index) needs 2 argument");
+                return res;
+            }
+            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) {
+                p->qfmpError("indexedcolmedian(column, index) needs two integer arguments");
+                return res;
+            }
             int c=floor(params[0].num-1);
             int idx=floor(params[1].num-1);
             if (c>=0 && c<d->model->columnCount() && idx>=0 && idx<d->model->columnCount()) {
@@ -1125,8 +1458,14 @@ qfmpResult fQFRDRTableEditor_indexedColQuantile(const qfmpResult* params, unsign
     QFMathParserData* d=(QFMathParserData*)p->get_data();
     if (d) {
         if (d->model) {
-            if (n!=3) p->qfmpError("indexedcolmedian(column, index, quantile) needs 3 argument");
-            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) p->qfmpError("indexedcolmedian(column, index, quantile) needs three integer arguments");
+            if (n!=3) {
+                p->qfmpError("indexedcolmedian(column, index, quantile) needs 3 argument");
+                return res;
+            }
+            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)||(params[2].type!=qfmpDouble)) {
+                p->qfmpError("indexedcolmedian(column, index, quantile) needs three integer arguments");
+                return res;
+            }
             int c=floor(params[0].num-1);
             int idx=floor(params[1].num-1);
             double q=params[2].num;
@@ -1189,7 +1528,10 @@ qfmpResult fQFRDRTableEditor_colimagewidth(const qfmpResult *params, unsigned in
     if (d) {
         if (d->model) {
             if (n==1) {
-                if ((params[0].type!=qfmpDouble)) p->qfmpError("colimagewidth(column) needs one integer arguments");
+                if ((params[0].type!=qfmpDouble)) {
+                    p->qfmpError("colimagewidth(column) needs one integer arguments");
+                    return res;
+                }
                 int c=floor(params[0].num-1);
                 if (c>=0 && c<d->model->columnCount()) {
                     QVariant v=d->model->getColumnHeaderData(c, QFRDRTable::ColumnImageWidth);
@@ -1216,7 +1558,10 @@ qfmpResult fQFRDRTableEditor_colimageheight(const qfmpResult *params, unsigned i
     if (d) {
         if (d->model) {
             if (n==1) {
-                if ((params[0].type!=qfmpDouble)) p->qfmpError("colimagewidth(column) needs one integer arguments");
+                if ((params[0].type!=qfmpDouble))  {
+                    p->qfmpError("colimagewidth(column) needs one integer arguments");
+                    return res;
+                }
                 int c=floor(params[0].num-1);
                 if (c>=0 && c<d->model->columnCount()) {
                     QVariant v=d->model->getColumnHeaderData(c, QFRDRTable::ColumnImageWidth);
@@ -1242,7 +1587,10 @@ qfmpResult fQFRDRTableEditor_collength(const qfmpResult *params, unsigned int n,
     if (d) {
         if (d->model) {
             if (n==1) {
-                if ((params[0].type!=qfmpDouble)) p->qfmpError("collength(column) needs one integer arguments");
+                if ((params[0].type!=qfmpDouble)) {
+                    p->qfmpError("collength(column) needs one integer arguments");
+                    return res;
+                }
                 int c=floor(params[0].num-1);
                 if (c>=0 && c<d->model->columnCount()) {
 

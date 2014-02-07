@@ -252,6 +252,7 @@ namespace QFMathParser_DefaultLib {
     qfmpResult fConcat(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fRemoveAll(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fFind(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    qfmpResult fFilterFinite(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fSelect(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fUnique(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fIndexedAvg(const qfmpResult* params, unsigned int  n, QFMathParser* p);
@@ -276,9 +277,51 @@ namespace QFMathParser_DefaultLib {
     qfmpResult fItem(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fRunningAverage(const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
-    void fRegExpCapture(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
-    void fRegExpContains(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
-    void fRegExpIndexIn(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRegExpCapture(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p, bool minimal, Qt::CaseSensitivity casesens);
+
+    inline void fRegExpCaptureMCS(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        fRegExpCapture(r, params, n, p, true, Qt::CaseSensitive);
+    }
+    inline void fRegExpCaptureMNCS(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        fRegExpCapture(r, params, n, p, true, Qt::CaseInsensitive);
+    }
+    inline void fRegExpCaptureCS(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        fRegExpCapture(r, params, n, p, false, Qt::CaseSensitive);
+    }
+    inline void fRegExpCaptureNCS(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        fRegExpCapture(r, params, n, p, false, Qt::CaseInsensitive);
+    }
+
+
+    void fRegExpContains(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p, bool minimal, Qt::CaseSensitivity casesens);
+
+    inline void fRegExpContainsMCS(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        fRegExpContains(r, params, n, p, true, Qt::CaseSensitive);
+    }
+    inline void fRegExpContainsMNCS(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        fRegExpContains(r, params, n, p, true, Qt::CaseInsensitive);
+    }
+    inline void fRegExpContainsCS(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        fRegExpContains(r, params, n, p, false, Qt::CaseSensitive);
+    }
+    inline void fRegExpContainsNCS(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        fRegExpContains(r, params, n, p, false, Qt::CaseInsensitive);
+    }
+
+    void fRegExpIndexIn(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p, bool minimal, Qt::CaseSensitivity casesens);
+
+    inline void fRegExpIndexInMCS(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        fRegExpIndexIn(r, params, n, p, true, Qt::CaseSensitive);
+    }
+    inline void fRegExpIndexInMNCS(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        fRegExpIndexIn(r, params, n, p, true, Qt::CaseInsensitive);
+    }
+    inline void fRegExpIndexInCS(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        fRegExpIndexIn(r, params, n, p, false, Qt::CaseSensitive);
+    }
+    inline void fRegExpIndexInNCS(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        fRegExpIndexIn(r, params, n, p, false, Qt::CaseInsensitive);
+    }
 
 
 

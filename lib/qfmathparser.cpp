@@ -788,9 +788,9 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
                         }
                         cn->setElse(params.last());
                         res=cn;
-                    } else if (lvarname=="sum" || lvarname=="prod" || lvarname=="for") {
+                    } else if (lvarname=="sum" || lvarname=="prod" || lvarname=="for" || lvarname=="savefor") {
                         if (params.size()==1) {
-                            if (lvarname!="for") {
+                            if (lvarname!="for"&&lvarname!="savefor") {
                                 res=new qfmpFunctionNode(varname, params, this, NULL);
                             } else {
                                 qfmpError(QObject::tr("'for(NAME, start[, delta], end, expression)' expects 4 or 5 arguments, but '%1' found").arg(params.size()));
@@ -3198,7 +3198,7 @@ qfmpResult QFMathParser::qfmpVectorOperationNode::evaluate()
         }
     }
     if (itemVals.size()<=0) {
-        if (operationName=="for") {
+        if (operationName=="for"||operationName=="savefor") {
             return qfmpResult(QVector<double>());
         } else {
             return qfmpResult(0.0);
@@ -3224,20 +3224,22 @@ qfmpResult QFMathParser::qfmpVectorOperationNode::evaluate()
             case qfmpString:
                 if (operationName=="sum") {
                     strVec<<thisr.str;
-                } else {
+                } else if (operationName!="savefor") {
                     if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to number: but found %2 in iteration %3").arg(operationName).arg(resultTypeToString(resType)).arg(i+1));
                     return r;
                 }
                 break;
             default:
-                if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to string or number: but found %2 in iteration %3").arg(operationName).arg(resultTypeToString(resType)).arg(i+1));
-                return r;
+                if (operationName!="savefor") {
+                    if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to string or number: but found %2 in iteration %3").arg(operationName).arg(resultTypeToString(resType)).arg(i+1));
+                    return r;
+                }
         }
     }
     getParser()->leaveBlock();
 
     r.isValid=true;
-    if (operationName=="for") {
+    if (operationName=="for"||operationName=="savefor") {
         return qfmpResult(numVec);
     } else if (operationName=="sum") {
         if (resType==qfmpString) {
@@ -3304,7 +3306,7 @@ void QFMathParser::qfmpVectorOperationNode::evaluate(qfmpResult &r)
          }
      }
      if (itemVals.size()<=0) {
-         if (operationName=="for") {
+         if (operationName=="for"||operationName=="savefor") {
              r.setDoubleVec(QVector<double>());
              return;
          } else {
@@ -3334,22 +3336,24 @@ void QFMathParser::qfmpVectorOperationNode::evaluate(qfmpResult &r)
              case qfmpString:
                  if (operationName=="sum") {
                      strVec<<thisr.str;
-                 } else {
+                 } else if (operationName!="savefor")  {
                      if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to number: but found %2 in iteration %3").arg(operationName).arg(resultTypeToString(resType)).arg(i+1));
                      r.setInvalid();
                      return;
                  }
                  break;
              default:
-                 if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to string or number: but found %2 in iteration %3").arg(operationName).arg(resultTypeToString(resType)).arg(i+1));
-                 r.setInvalid();
+                 if (operationName!="savefor") {
+                     if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to string or number: but found %2 in iteration %3").arg(operationName).arg(resultTypeToString(resType)).arg(i+1));
+                     r.setInvalid();
+                 }
                  return;
          }
      }
      getParser()->leaveBlock();
 
      r.isValid=true;
-     if (operationName=="for") {
+     if (operationName=="for"||operationName=="savefor") {
          r.setDoubleVec(numVec);
      } else if (operationName=="sum") {
          if (resType==qfmpString) {
