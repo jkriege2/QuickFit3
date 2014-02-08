@@ -262,6 +262,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
 
         void recorrelate();
 
+        void setBackgroundFromSelection();
+
     protected:
         /** \brief map with all available fit functions */
         QMap<QString, QFFitFunction*> m_fitFunctions;
@@ -397,6 +399,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QAction* actCopyMaskToAll;
         QAction* actSelectionBuilder;
         QAction* actMaskBuilder;
+        QAction* actSetBackgroundFromSelection;
 
         /** \brief combobox to select a result group */
         QComboBox* cmbResultGroup;

@@ -391,6 +391,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     actMaskBuilder=new QAction(tr("mask builder"), w);
     connect(actMaskBuilder, SIGNAL(triggered()), this, SLOT(buildMask()));
 
+    actSetBackgroundFromSelection=new QAction(tr("set background from selection"), w);
+    connect(actSetBackgroundFromSelection, SIGNAL(triggered()), this, SLOT(setBackgroundFromSelection()));
 
 
     glsel->addWidget(new QLabel(tr("stored selections:")), selgrpRow, 0);
@@ -1273,6 +1275,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuSelection->addAction(actSelectByParamIntensity);
     menuSelection->addAction(actDeselctMasked);
     menuSelection->addAction(actSelectionBuilder);
+    menuSelection->addSeparator();
+    menuSelection->addAction(actSetBackgroundFromSelection);
 
     menuImagingFCSTools=propertyEditor->addOrFindMenu(tr("ImagingFCS Tools"));
     menuImagingFCSTools->addAction(actCopyGroupACFsToTable);
@@ -5864,6 +5868,66 @@ void QFRDRImagingFCSImageEditor::recorrelate()
                 QFRDRImagingFCSPlugin::getInstance()->imfcsCorrRemoteSelectFile(input);
         } else {
             QMessageBox::critical(this, tr("recorrelate imFCS record"), tr("didn't find input file!"));
+        }
+    }
+}
+
+void QFRDRImagingFCSImageEditor::setBackgroundFromSelection()
+{
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+
+    if (m) {
+        double w=m->getImageFromRunsWidth();
+        double h=m->getImageFromRunsHeight();
+        if ((w==0) || (h==0)) {
+            w=h=1;
+        }
+
+        double ovrAvg=0;
+        double ovrVar=0;
+        bool *msk=(bool*)calloc(w*h, sizeof(bool));
+        int cnt=0;
+        bool ignoreExclusion=QMessageBox::question(this, tr("set background from selection ..."), tr("Should the mask be considered?\n   YES: only non-masked pixels will be used for average\n   NO:  all pixels will be used for average"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::No;
+        for (int i=0; i<w*h; i++) {
+            msk[i]=plteOverviewSelectedData[i]&&(ignoreExclusion || !plteOverviewExcludedData[i]);
+            if (msk[i]) cnt++;
+        }
+        for (int i=0; i<m->getImageFromRunsChannels(); i++) {
+            if (cnt>1){
+                ovrAvg=statisticsAverageVarianceMasked(ovrVar, msk, m->getImageFromRunsPreview(i), w*h);
+            } else {
+                ovrAvg=statisticsAverageVarianceMasked(ovrVar, plteOverviewExcludedData, m->getImageFromRunsPreview(i), w*h, false);
+            }
+            m->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
+            m->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
+            if (i==m->getImageFromRunsChannelsAdvised()) {
+                m->setQFProperty(QString("BACKGROUND"), ovrAvg/m->getFrameTime());
+                m->setQFProperty(QString("BACKGROUND_STD"), sqrt(ovrVar)/m->getFrameTime());
+            }
+            if (m->isFCCS()) {
+                QList<QFRawDataRecord*> l=m->getRecordsWithRoleFromGroup("acf0");
+                for (int j=0; j<l.size(); j++) {
+                    if (l[j]) {
+                        l[j]->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
+                        l[j]->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
+                        if (i==0) {
+                            l[j]->setQFProperty(QString("BACKGROUND"), ovrAvg/m->getFrameTime());
+                            l[j]->setQFProperty(QString("BACKGROUND_STD"), sqrt(ovrVar)/m->getFrameTime());
+                        }
+                    }
+                }
+                l=m->getRecordsWithRoleFromGroup("acf1");
+                for (int j=0; j<l.size(); j++) {
+                    if (l[j]) {
+                        l[j]->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
+                        l[j]->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
+                        if (i==1) {
+                            l[j]->setQFProperty(QString("BACKGROUND"), ovrAvg/m->getFrameTime());
+                            l[j]->setQFProperty(QString("BACKGROUND_STD"), sqrt(ovrVar)/m->getFrameTime());
+                        }
+                    }
+                }
+            }
         }
     }
 }

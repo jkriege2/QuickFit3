@@ -162,6 +162,39 @@ bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid
         value=angle_deg;
         error=0;
         return true;
+    } else if (paramid=="background" || paramid=="background1") {
+        if (!r) return false;
+        if (r->propertyExists("BACKGROUND_INTENSITY") || r->propertyExists("BACKGROUND") || r->propertyExists("BACKGROUND_KHZ") ||
+            r->propertyExists("BACKGROUND_INTENSITY1") || r->propertyExists("BACKGROUND1") || r->propertyExists("BACKGROUND_KHZ1")) {
+            double back=r->getProperty("BACKGROUND_INTENSITY1", r->getProperty("BACKGROUND1",
+                                                               r->getProperty("BACKGROUND_INTENSITY",
+                                                               r->getProperty("BACKGROUND",
+                                                                              r->getProperty("BACKGROUND_KHZ1",
+                                                                              r->getProperty("BACKGROUND_KHZ", 0).toDouble()).toDouble()*1000.0).toDouble()).toDouble()).toDouble()).toDouble();
+            double backe=r->getProperty("BACKGROUND_INTENSITY_STD1", r->getProperty("BACKGROUND_STD1",
+                                                               r->getProperty("BACKGROUND_INTENSITY_STD",
+                                                               r->getProperty("BACKGROUND_STD",
+                                                                              r->getProperty("BACKGROUND_STD_KHZ1",
+                                                                              r->getProperty("BACKGROUND_STD_KHZ", 0).toDouble()).toDouble()*1000.0).toDouble()).toDouble()).toDouble()).toDouble();
+            value=back;
+            error=backe;
+            return true;
+        }
+        return false;
+
+    } else if (paramid=="background2") {
+        if (!r) return false;
+        if (r->propertyExists("BACKGROUND_INTENSITY2") || r->propertyExists("BACKGROUND2") || r->propertyExists("BACKGROUND_KHZ2") || r->propertyExists("BACKGROUND_INTENSITY") || r->propertyExists("BACKGROUND") || r->propertyExists("BACKGROUND_KHZ")) {
+                double back=r->getProperty("BACKGROUND_INTENSITY2", r->getProperty("BACKGROUND2", r->getProperty("BACKGROUND_INTENSITY", r->getProperty("BACKGROUND",
+                                                                                   r->getProperty("BACKGROUND_KHZ2", r->getProperty("BACKGROUND_KHZ", 0).toDouble()).toDouble()*1000.0
+                                                                                   ).toDouble()).toDouble()).toDouble()).toDouble();
+            double backe=r->getProperty("BACKGROUND_INTENSITY_STD2", r->getProperty("BACKGROUND_STD2", r->getProperty("BACKGROUND_STD_KHZ2", 0).toDouble()*1000.0).toDouble()).toDouble();
+            value=back;
+            error=backe;
+            return true;
+        }
+        return false;
+
     }
     QString param=paramid;
     if (param.contains("hieght")) {
