@@ -237,11 +237,11 @@ void QFFitFunctionsTIRFCSADiffE2::calcParameter(double* data, double* error) con
     if (error) error[FCSDiff_msd_at_tau2]=0;
     data[FCSDiff_msd_at_tau3]=6.0*GAMMA3*pow(tau_msd*1e-3, a3);
     if (error) error[FCSDiff_msd_at_tau3]=0;
-    data[FCSDiff_msd_time_aeff1]=pow(Aeff/4.0*GAMMA1, 1.0/a1)*1e3;
+    data[FCSDiff_msd_time_aeff1]=pow(Aeff/(4.0*GAMMA1), 1.0/a1)*1e3;
     if (error) error[FCSDiff_msd_time_aeff1]=0;
-    data[FCSDiff_msd_time_aeff2]=pow(Aeff/4.0*GAMMA2, 1.0/a2)*1e3;
+    data[FCSDiff_msd_time_aeff2]=pow(Aeff/(4.0*GAMMA2), 1.0/a2)*1e3;
     if (error) error[FCSDiff_msd_time_aeff2]=0;
-    data[FCSDiff_msd_time_aeff3]=pow(Aeff/4.0*GAMMA3, 1.0/a3)*1e3;
+    data[FCSDiff_msd_time_aeff3]=pow(Aeff/(4.0*GAMMA3), 1.0/a3)*1e3;
     if (error) error[FCSDiff_msd_time_aeff3]=0;
 }
 
