@@ -5889,8 +5889,8 @@ void QFRDRImagingFCSImageEditor::setBackgroundFromSelection()
         int cnt=0;
         bool ignoreExclusion=QMessageBox::question(this, tr("set background from selection ..."), tr("Should the mask be considered?\n   YES: only non-masked pixels will be used for average\n   NO:  all pixels will be used for average"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::No;
         bool alsoSetOtherACF=false;
-        if ((m->isFCCS() || m->isACF())&&(m->getProject()->getRDRGroupMembers(m->getGroup()).size()>11)) {
-            alsoSetOtherACF=QMessageBox::question(this, tr("set background from selection ..."), tr("Should the same pixels be used to set the background intensity in other RDRs from the same group (e.g. also set background in ACF0,ACF1 for an FCCS record)?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes;
+        if ((m->isFCCS() || m->isACF())&&(m->getProject()->getRDRGroupMembers(m->getGroup()).size()>1)) {
+            alsoSetOtherACF=QMessageBox::question(this, tr("set background from selection ..."), tr("Should the same pixels be used to set the background intensity in other RDRs from the same group (e.g. also set background in ACF0,ACF1 for an FCCS record)?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
         }
         for (int i=0; i<w*h; i++) {
             msk[i]=plteOverviewSelectedData[i]&&(ignoreExclusion || !plteOverviewExcludedData[i]);
@@ -5904,7 +5904,7 @@ void QFRDRImagingFCSImageEditor::setBackgroundFromSelection()
             }
             m->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
             m->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
-            if (i==m->getImageFromRunsChannelsAdvised()) {
+            if ((m->getRole().toLower()=="acf0" && i==0)||(m->getRole().toLower()=="acf1" && i==1)) {
                 m->setQFProperty(QString("BACKGROUND"), ovrAvg/m->getFrameTime());
                 m->setQFProperty(QString("BACKGROUND_STD"), sqrt(ovrVar)/m->getFrameTime());
             }
@@ -5969,10 +5969,6 @@ void QFRDRImagingFCSImageEditor::setBackgroundFromSelection()
                         if (mj && mj->getImageFromRunsWidth()==w && mj->getImageFromRunsHeight()==h && l[j]!=m) {
                             l[j]->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
                             l[j]->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
-                            if (i==1) {
-                                l[j]->setQFProperty(QString("BACKGROUND"), ovrAvg/m->getFrameTime());
-                                l[j]->setQFProperty(QString("BACKGROUND_STD"), sqrt(ovrVar)/m->getFrameTime());
-                            }
                         }
                     }
                 }

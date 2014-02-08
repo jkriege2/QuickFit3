@@ -23,7 +23,7 @@ bool PT3ReadConfiguration(FILE* fpin, PT3TxtHdr* txtHeader, PT3BinHdr* binHeader
     }
 
     if(strncmp(txtHeader->FormatVersion,"2.0",3)) {
-        error=QObject::tr("Input file version is %1. This program is for v5.0 only").arg(txtHeader->FormatVersion);
+        error=QObject::tr("Input file version is %1. This program is for v2.0 only").arg(txtHeader->FormatVersion);
         return false;
     }
 

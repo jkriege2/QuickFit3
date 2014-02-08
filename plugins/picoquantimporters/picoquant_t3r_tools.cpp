@@ -25,8 +25,8 @@ bool TTTRReadConfiguration(FILE* fpin, TTTRTxtHdr* txtHeader, TTTRBinHdr* binHea
 
 
     if (binHeader->NumberOfBoards != 1) {
-        error=QObject::tr("number of boards must be 1, but is %1.").arg(binHeader->NumberOfBoards);
-        return false;
+        //error=QObject::tr("number of boards must be 1, but is %1.").arg(binHeader->NumberOfBoards);
+        //return false;
     }
 
     result = fread( boardHeader, 1, sizeof(TTTRBoardHdr) ,fpin);

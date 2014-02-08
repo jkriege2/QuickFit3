@@ -34,6 +34,14 @@
 		</blockquote>
 		$$bmath:\Delta V_{eff}=0$$
 		$$bmath:\Delta C=\sqrt{\left(\frac{\Delta N}{V_{eff}}\right)^2+\left(\frac{\Delta V_{eff}\cdot N}{V_{eff}^2}\right)^2}$$
+				
+		For each component the mean squared displacement after a given time $$math:\tau_{MSD}$$ is calculated, as:
+		$$bmath:\mbox{MSD}_i(\tau_{MSD})=6\cdot D_i\cdot\tau_{MSD}.$$
+		Also the time, required for a particle to leave the effective area of the pixel is calculated:
+		$$bmath:\tau_i(MSD)=\frac{A_{eff}}{4\cdot D_i}.$$
+		with
+		$$bmath:A_{\text{eff}}=\frac{a^2}{\left(\mbox{erf}\left(\frac{a}{w_{xy}}\right)+\frac{w_{xy}}{\sqrt{\pi}\cdot a}\cdot\left(e^{-(a/w_{xy})^2}-1\right)\right)^2}$$
+
 		</p>
 	</body>
 </html>

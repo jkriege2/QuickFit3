@@ -1973,7 +1973,8 @@ int QFRDRImagingFCSData::getImageFromRunsChannels() const
     if (internalDualViewMode()==QFRDRImagingFCSData::dvNone) {
         return 1;
     } else {
-        if ((overviewF2 && propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL")) || isFCCS()) return 2;
+        if ((overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL"))) || isFCCS()) return 2;
+        //if ((overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL")&&getProperty("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL", false).toBool())) || isFCCS()) return 2;
         return 1;
     }
 }
@@ -1983,7 +1984,8 @@ int QFRDRImagingFCSData::getImageFromRunsChannelsAdvised() const
     if (internalDualViewMode()==QFRDRImagingFCSData::dvNone) {
         return 1;
     } else {
-        if ((overviewF2 && propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") && !isACF()) || isFCCS()) return 2;
+        if ((overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL")) && !isACF()) || isFCCS()) return 2;
+        //if ((overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL")&&getProperty("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL", false).toBool()) && !isACF()) || isFCCS()) return 2;
         return 1;
     }
 }
