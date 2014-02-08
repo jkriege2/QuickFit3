@@ -57,5 +57,6 @@
         <file>icons/plot_hrange.png</file>
         <file>icons/plot_vrange.png</file>
         <file>icons/plot_pscatter.png</file>
+        <file alias="wizard.png">icons/wizard.png</file>
     </qresource>
 </RCC>

@@ -475,8 +475,10 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
         ui->chkDrawLine->setVisible(true);
         ui->cmbLineStyle->setVisible(true);
         ui->cmbLinesXData->setVisible(true);
+        ui->btnAutoX->setVisible(true);
         ui->cmbLinesXError->setVisible(true);
         ui->cmbLinesYData->setVisible(true);
+        ui->btnAutoY->setVisible(true);
         ui->cmbLinesYError->setVisible(true);
         ui->widFunction->setVisible(false);
         ui->labFuction->setVisible(false);
@@ -893,6 +895,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->cmbLinesXError->setVisible(false);
                 ui->labErrorX->setVisible(false);
                 ui->cmbLinesYData->setVisible(false);
+                ui->btnAutoY->setVisible(false);
                 ui->labDataY->setVisible(false);
                 ui->cmbLinesYError->setVisible(false);
                 ui->labErrorY->setVisible(false);
@@ -936,6 +939,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->cmbLinesXError->setVisible(false);
                 ui->labErrorX->setVisible(false);
                 ui->cmbLinesXData->setVisible(false);
+                ui->btnAutoX->setVisible(false);
                 ui->labDataX->setVisible(false);
                 ui->cmbLinesYError->setVisible(false);
                 ui->labErrorY->setVisible(false);
@@ -999,8 +1003,10 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->chkDrawLine->setVisible(true);
                 ui->cmbLineStyle->setVisible(true);
                 ui->cmbLinesXData->setVisible(false);
+                ui->btnAutoX->setVisible(false);
                 ui->cmbLinesXError->setVisible(false);
                 ui->cmbLinesYData->setVisible(false);
+                ui->btnAutoY->setVisible(true);
                 ui->cmbLinesYError->setVisible(false);
                 ui->widFunction->setVisible(false);
                 ui->labFuction->setVisible(false);
@@ -1229,6 +1235,187 @@ void QFTableGraphSettings::on_edtFunction_textChanged(const QString &text)
     if (mp.hasErrorOccured()) {
         ui->labFunctionOK->setText(tr("<font color=\"red\">ERROR in function:<br>&nbsp;&nbsp;&nbsp;&nbsp;%1</font>").arg(mp.getLastErrors().join("<br>&nbsp;&nbsp;&nbsp;&nbsp;")));
     }
+}
+
+void QFTableGraphSettings::on_btnAutoX_clicked()
+{
+    QComboBox* cmbInput=ui->cmbLinesXData;
+    QString name=cmbInput->currentText();
+    QStringList searchPhrases;
+    QString id;
+    QString typ;
+    QRegExp rxID("(.*)\\:([^\\(\\[\\{]*)[\\[\\(\\{]+(.*)[\\]\\)\\}]+");
+    rxID.setCaseSensitivity(Qt::CaseInsensitive);
+
+    QFRDRTable::GraphType gt=(QFRDRTable::GraphType)ui->cmbGraphType->itemData(ui->cmbGraphType->currentIndex()).toInt();
+    if (gt==QFRDRTable::gtLines || gt==QFRDRTable::gtImpulsesVertical || gt==QFRDRTable::gtFilledCurveX || gt==QFRDRTable::gtStepsHorizontal
+        || gt==QFRDRTable::gtBarsHorizontal || gt==QFRDRTable::gtImpulsesHorizontal || gt==QFRDRTable::gtParametrizedScatter || gt==QFRDRTable::gtFilledCurveY
+        || gt==QFRDRTable::gtStepsVertical || gt==QFRDRTable::gtBarsVertical) {
+
+        if (rxID.indexIn(name)>=0) {
+            id=rxID.cap(3);
+            typ=rxID.cap(2).toLower();
+            if (typ.contains("mean") || typ.contains("average") || typ.contains("avg") || typ.contains("mittel") || typ.contains("median") || typ.contains("med")) {
+                searchPhrases<<"std"<<"stddev"<<"standard deviation"<<"sd"<<"s.d."<<"stabw"<<"stab"<<"iqr";
+            }
+
+            for (int i=0; i<cmbInput->count(); i++) {
+                QString en=cmbInput->itemText(i);
+                if (en!=name) {
+                    if (en.contains(id, Qt::CaseInsensitive)) {
+                        for (int j=0; j<searchPhrases.size(); j++) {
+                            if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
+                                ui->cmbLinesXError->setCurrentIndex(i);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+}
+
+void QFTableGraphSettings::on_btnAutoY_clicked()
+{
+    QComboBox* cmbInput=ui->cmbLinesYData;
+    QString name=cmbInput->currentText();
+    QStringList searchPhrases;
+    QString id;
+    QString typ;
+    QRegExp rxID("(.*)\\:([^\\(\\[\\{]*)[\\[\\(\\{]+(.*)[\\]\\)\\}]+");
+    rxID.setCaseSensitivity(Qt::CaseInsensitive);
+
+    QFRDRTable::GraphType gt=(QFRDRTable::GraphType)ui->cmbGraphType->itemData(ui->cmbGraphType->currentIndex()).toInt();
+    if (gt==QFRDRTable::gtLines || gt==QFRDRTable::gtImpulsesVertical || gt==QFRDRTable::gtFilledCurveX || gt==QFRDRTable::gtStepsHorizontal
+        || gt==QFRDRTable::gtBarsHorizontal || gt==QFRDRTable::gtImpulsesHorizontal || gt==QFRDRTable::gtParametrizedScatter || gt==QFRDRTable::gtFilledCurveY
+        || gt==QFRDRTable::gtStepsVertical || gt==QFRDRTable::gtBarsVertical) {
+
+        if (rxID.indexIn(name)>=0) {
+            id=rxID.cap(3);
+            typ=rxID.cap(2).toLower();
+            if (typ.contains("mean") || typ.contains("average") || typ.contains("avg") || typ.contains("mittel") || typ.contains("median") || typ.contains("med")) {
+                searchPhrases<<"std"<<"stddev"<<"standard deviation"<<"sd"<<"s.d."<<"stabw"<<"stab";
+            }
+
+            for (int i=0; i<cmbInput->count(); i++) {
+                QString en=cmbInput->itemText(i);
+                if (en!=name) {
+                    if (en.contains(id, Qt::CaseInsensitive)) {
+                        for (int j=0; j<searchPhrases.size(); j++) {
+                            if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
+                                ui->cmbLinesYError->setCurrentIndex(i);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    } else if (gt==QFRDRTable::gtBoxplotX || gt==QFRDRTable::gtBoxplotY) {
+        if (rxID.indexIn(name)>=0) {
+            id=rxID.cap(3);
+            typ=rxID.cap(2).toLower();
+            /*if (typ.contains("mean") || typ.contains("average") || typ.contains("avg") || typ.contains("mittel") || typ.contains("median") || typ.contains("med")) {
+                searchPhrases<<"std"<<"stddev"<<"standard deviation"<<"sd"<<"s.d."<<"stabw"<<"stab";
+            } else if (typ.contains("mean") || typ.contains("average") || typ.contains("avg") || typ.contains("mittel") || typ.contains("median") || typ.contains("med")) {
+                searchPhrases<<"std"<<"stddev"<<"standard deviation"<<"sd"<<"s.d."<<"stabw"<<"stab";
+            }*/
+
+            for (int i=0; i<cmbInput->count(); i++) {
+                QString en=cmbInput->itemText(i);
+                if (en!=name) {
+                    if (en.contains(id, Qt::CaseInsensitive)) {
+                        searchPhrases.clear();
+                        searchPhrases<<"minimum"<<"min";
+                        for (int j=0; j<searchPhrases.size(); j++) {
+                            if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
+                                ui->cmbLinesXError->setCurrentIndex(i);
+                                break;
+                            }
+                        }
+                        searchPhrases.clear();
+                        searchPhrases<<"quantile25"<<"q25"<<"0.25"<<"25";
+                        for (int j=0; j<searchPhrases.size(); j++) {
+                            if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
+                                ui->cmbLinesYData->setCurrentIndex(i);
+                                break;
+                            }
+                        }
+                        searchPhrases.clear();
+                        searchPhrases<<"median"<<"med"<<"quantile50"<<"q50";
+                        for (int j=0; j<searchPhrases.size(); j++) {
+                            if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
+                                ui->cmbLinesYError->setCurrentIndex(i);
+                                break;
+                            }
+                        }
+                        searchPhrases.clear();
+                        searchPhrases<<"quantile75"<<"q75"<<"0.75"<<"75";
+                        for (int j=0; j<searchPhrases.size(); j++) {
+                            if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
+                                ui->cmbLinesQ75->setCurrentIndex(i);
+                                break;
+                            }
+                        }
+                        searchPhrases.clear();
+                        searchPhrases<<"mean"<<"average"<<"avg"<<"mittel";
+                        for (int j=0; j<searchPhrases.size(); j++) {
+                            if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
+                                ui->cmbLinesMean->setCurrentIndex(i);
+                                break;
+                            }
+                        }
+                        searchPhrases.clear();
+                        searchPhrases<<"maximum"<<"max";
+                        for (int j=0; j<searchPhrases.size(); j++) {
+                            if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
+                                ui->cmbLinesMax->setCurrentIndex(i);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void QFTableGraphSettings::on_btnClearLinesXData_clicked()
+{
+    ui->cmbLinesXData->setCurrentIndex(0);
+}
+
+void QFTableGraphSettings::on_btnClearLinesXError_clicked()
+{
+    ui->cmbLinesXError->setCurrentIndex(0);
+}
+
+void QFTableGraphSettings::on_btnClearLinesYData_clicked()
+{
+    ui->cmbLinesYData->setCurrentIndex(0);
+}
+
+void QFTableGraphSettings::on_btnClearLinesYError_clicked()
+{
+    ui->cmbLinesYError->setCurrentIndex(0);
+}
+
+void QFTableGraphSettings::on_btnClearLinesMax_clicked()
+{
+    ui->cmbLinesMax->setCurrentIndex(0);
+}
+
+void QFTableGraphSettings::on_btnClearLinesMean_clicked()
+{
+    ui->cmbLinesMean->setCurrentIndex(0);
+}
+
+void QFTableGraphSettings::on_btnClearLinesQ75_clicked()
+{
+    ui->cmbLinesQ75->setCurrentIndex(0);
 }
 
 void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)

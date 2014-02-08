@@ -47,6 +47,18 @@ class QFTableGraphSettings : public QWidget
     protected slots:
         void on_btnFunctionHelp_clicked();
         void on_edtFunction_textChanged(const QString &text);
+        void on_btnAutoX_clicked();
+        void on_btnAutoY_clicked();
+
+
+        void on_btnClearLinesXData_clicked();
+        void on_btnClearLinesXError_clicked();
+        void on_btnClearLinesYData_clicked();
+        void on_btnClearLinesYError_clicked();
+        void on_btnClearLinesMax_clicked();
+        void on_btnClearLinesMean_clicked();
+        void on_btnClearLinesQ75_clicked();
+
         void cmbFunctionTypeCurrentIndexChanged(int index);
 
         void on_btnAutoImageSizes_clicked();
