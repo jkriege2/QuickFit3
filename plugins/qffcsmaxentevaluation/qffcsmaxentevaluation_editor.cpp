@@ -40,6 +40,8 @@ QFFCSMaxEntEvaluationEditor::~QFFCSMaxEntEvaluationEditor()
 
 
 void QFFCSMaxEntEvaluationEditor::createWidgets() {
+    QWidget* wrange;
+    QHBoxLayout* lrange;
     edtWxy=new QFDoubleEdit(this);
     edtWxy->setRange(1e-3,1e10);
     flAlgorithmParams->addRow(tr("<i>w<sub>xy</sub></i> [nm] <i>= </i>"), edtWxy);
@@ -55,12 +57,41 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     edtNdist=new QSpinBox(this);
     edtNdist->setRange(10, INT_MAX);
     flAlgorithmParams->addRow(tr("MaxEnt: <i>&Ndist = </i>"), edtNdist);
+
+    cmbTauMode=new QComboBox(this);
+    cmbTauMode->addItem(tr("correlation tau-axis"));
+    cmbTauMode->addItem(tr("custom logarithmic tau-axis"));
+    cmbTauMode->addItem(tr("custom linear tau-axis"));
+    cmbTauMode->addItem(tr("custom logarithmic diffusion coefficient axis"));
+    cmbTauMode->addItem(tr("custom linear diffusion coefficient axis"));
+    cmbTauMode->setCurrentIndex(0);
+    flAlgorithmParams->addRow(tr("dist. type:"), cmbTauMode);
+
+    wrange=new QWidget(this);
+    lrange=new QHBoxLayout(wrange);
+    wrange->setLayout(lrange);
+    lrange->setContentsMargins(0,0,0,0);
+    edtTauMin=new QFDoubleEdit(wrange);
+    edtTauMin->setLogScale(true);
+    edtTauMin->setValue(0.01);
+    edtTauMin->setCheckBounds(false, false);
+
+    edtTauMax=new QFDoubleEdit(wrange);
+    edtTauMin->setLogScale(true);
+    edtTauMin->setValue(1000);
+    edtTauMax->setCheckBounds(false, false);
+
+    lrange->addWidget(edtTauMin);
+    lrange->addWidget(new QLabel(" ... "));
+    lrange->addWidget(edtTauMax);
+    flAlgorithmParams->addRow(tr("dist. range:"), wrange);
+
+
+
     edtNumIter=new QSpinBox(this);
     edtNumIter->setRange(10, INT_MAX);
     flAlgorithmParams->addRow(tr("MaxEnt: <i>&Iterations/Step = </i>"), edtNumIter);
 
-    QWidget* wrange;
-    QHBoxLayout* lrange;
     wrange=new QWidget(this);
     lrange=new QHBoxLayout(wrange);
     wrange->setLayout(lrange);
@@ -234,6 +265,10 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         disconnect(edtRange1Max, SIGNAL(valueChanged(double)),this,SLOT(sumRangesChanged()));
         disconnect(edtRange2Min, SIGNAL(valueChanged(double)),this,SLOT(sumRangesChanged()));
         disconnect(edtRange2Max, SIGNAL(valueChanged(double)),this,SLOT(sumRangesChanged()));
+
+        disconnect(cmbTauMode, SIGNAL(currentIndexChanged(int)), this, SLOT(tauModeChanged(int)));
+        disconnect(edtTauMin, SIGNAL(valueChanged(double)),this,SLOT(tauMinMaxChanged()));
+        disconnect(edtTauMax, SIGNAL(valueChanged(double)),this,SLOT(tauMinMaxChanged()));
     }
 
     QFFCSMaxEntEvaluationItem* item=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
@@ -270,6 +305,13 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         connect(edtRange1Max, SIGNAL(valueChanged(double)),this,SLOT(sumRangesChanged()));
         connect(edtRange2Min, SIGNAL(valueChanged(double)),this,SLOT(sumRangesChanged()));
         connect(edtRange2Max, SIGNAL(valueChanged(double)),this,SLOT(sumRangesChanged()));
+
+        edtTauMin->setValue(item->getTauMin());
+        edtTauMax->setValue(item->getTauMax());
+        cmbTauMode->setCurrentIndex(item->getTauMode());
+        connect(cmbTauMode, SIGNAL(currentIndexChanged(int)), this, SLOT(tauModeChanged(int)));
+        connect(edtTauMin, SIGNAL(valueChanged(double)),this,SLOT(tauMinMaxChanged()));
+        connect(edtTauMax, SIGNAL(valueChanged(double)),this,SLOT(tauMinMaxChanged()));
         sumRangesChanged();
 
         dataEventsEnabled=true;
@@ -320,6 +362,9 @@ void QFFCSMaxEntEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRec
 
         edtWxy->setValue(eval->getWXY());
         edtAlpha->setValue(eval->getAlpha());
+        edtTauMin->setValue(eval->getTauMin());
+        edtTauMax->setValue(eval->getTauMax());
+        cmbTauMode->setCurrentIndex(eval->getTauMode());
         cmbWeights->setCurrentWeight(eval->getFitDataWeighting());
         edtNdist->setRange(10,data->getCorrelationN()*10); //qMax(0,data->getCorrelationN())
         edtNdist->setValue(eval->getNdist());
@@ -941,9 +986,15 @@ void QFFCSMaxEntEvaluationEditor::displayParameters() {
     if (eval->hasResults(record)) {
         datacut->setEnabled(false);
         edtNdist->setEnabled(false);
+        cmbTauMode->setEnabled(false);
+        edtTauMax->setEnabled(false);
+        edtTauMin->setEnabled(false);
     } else {
         datacut->setEnabled(true);
         edtNdist->setEnabled(true);
+        cmbTauMode->setEnabled(true);
+        edtTauMax->setEnabled(true);
+        edtTauMin->setEnabled(true);
     }
 
 }
@@ -1272,6 +1323,34 @@ void QFFCSMaxEntEvaluationEditor::chkShowrangesChanged() {
     current->setQFProperty("show_ranges", chkShowRanges->isChecked(), false, false);
     displayData();
     QApplication::restoreOverrideCursor();
+}
+
+void QFFCSMaxEntEvaluationEditor::tauModeChanged(int weights)
+{
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+
+    edtTauMin->setEnabled(weights>0 && data->hasResults(current->getHighlightedRecord(), data->getCurrentIndex(), data->getCurrentModel()));
+    edtTauMax->setEnabled(edtTauMin->isEnabled());
+    if (data) {
+        data->setTauMode(weights);
+    }
+}
+
+void QFFCSMaxEntEvaluationEditor::tauMinMaxChanged()
+{
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+
+    if (data)     {
+        data->setTauMin(edtTauMin->value());
+        data->setTauMax(edtTauMax->value());
+    }
+
 }
 
 void QFFCSMaxEntEvaluationEditor::weightsChanged(int weights) {

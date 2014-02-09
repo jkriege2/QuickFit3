@@ -50,12 +50,20 @@ class MaxEntB040{
         /** Default destructor */
         virtual ~MaxEntB040();
 
+        enum TauMode {
+            tmInputTaus=0,
+            tmLog=1,
+            tmLin=2,
+            tmDCoeffLog=3,
+            tmDCoeffLin=4
+        };
+
 
 
         void setData(const double* taus, const double* correlation,\
         	const double* weights,unsigned long long Nd,int rangeMinDatarange,\
             int rangeMaxDatarange,uint32_t Ndist, double * dist,double * distTaus,\
-            int model,int parameterCount, double *param_list, double wxy);
+            int model,int parameterCount, double *param_list, double wxy, TauMode tauMode=tmInputTaus, double tauMin=0, double tauMax=0);
 
 		void writeDistribution(double * dist);
 		
@@ -72,6 +80,9 @@ class MaxEntB040{
 
     protected:
         //protected member variables
+        TauMode tauMode;
+        double tauMin;
+        double tauMax;
         bool m_oldDist;
         int m_Nd;
         int m_N;
@@ -86,8 +97,9 @@ class MaxEntB040{
         double m_a;
         int NumIter;
         int m_model;
+        Eigen::VectorXd m_tau;
         Eigen::VectorXd m_xdata;
-		Eigen::VectorXd m_ydata;
+        Eigen::VectorXd m_ydata;
 		Eigen::VectorXd m_stdev;
 		Eigen::VectorXd m_taudiffs;
 		Eigen::MatrixXd m_T;

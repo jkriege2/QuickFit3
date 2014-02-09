@@ -37,6 +37,10 @@ MaxEntB040::MaxEntB040() {
     NumIter=200;
     m_model=0; //default
 
+    tauMode=tmInputTaus;
+    tauMin=0;
+    tauMax=0;
+
 }
 
 //Default Destructor
@@ -45,24 +49,28 @@ MaxEntB040::~MaxEntB040(){}
 
 
 
-void MaxEntB040::setData(const double* taus, const double* correlation, \
-    const double* weights, unsigned long long Nd, int rangeMinDatarange, \
-    int rangeMaxDatarange, uint32_t Ndist, double * dist, double * distTaus, int model, \
-    int parameterCount, double * param_list, double wxy)
-	{
+void MaxEntB040::setData(const double* taus, const double* correlation,\
+                         const double* weights,unsigned long long Nd,int rangeMinDatarange,\
+                         int rangeMaxDatarange,uint32_t Ndist, double * dist,double * distTaus,\
+                         int model,int parameterCount, double *param_list, double wxy, MaxEntB040::TauMode tauMode, double tauMin, double tauMax)
+{
     m_wxy=wxy;
     m_Nd=rangeMaxDatarange-rangeMinDatarange;
 	m_xdata.resize(rangeMaxDatarange-rangeMinDatarange);
+    m_tau.resize(rangeMaxDatarange-rangeMinDatarange);
     m_ydata.resize(rangeMaxDatarange-rangeMinDatarange);
     m_stdev.resize(rangeMaxDatarange-rangeMinDatarange);
-	for (int i=0; i<(rangeMaxDatarange-rangeMinDatarange); i++)
-        {
+    this->tauMax=tauMax;
+    this->tauMin=tauMin;
+    this->tauMode=tauMode;
+
+    for (int i=0; i<(rangeMaxDatarange-rangeMinDatarange); i++) {
         m_xdata(i)=taus[i+rangeMinDatarange];
         m_ydata(i)=correlation[i+rangeMinDatarange];
 		m_stdev(i)=fabs(weights[i+rangeMinDatarange]);
 		if (fabs(weights[i+rangeMinDatarange])<1e-3) m_stdev(i)=1e-3;
 		if (fabs(weights[i+rangeMinDatarange])>1e3) m_stdev(i)=1e3;
-        }
+    }
 	
     ///// model specific transformation of the ydata //////////
     switch (model)
@@ -151,26 +159,72 @@ bool MaxEntB040::run(double alpha,int NumIter,double * param_list,int model,int 
 
 
     return true;
-    }
+}
+
 
 
 
 void MaxEntB040::setTauGrid()
     {
     m_taudiffs.resize(m_N);
+
+
+    if (tauMode==MaxEntB040::tmLog && (tauMax>tauMin)) {
+        double lmin=log10(tauMin);
+        double lmax=log10(tauMax);
+        double cnt=m_N-1;
+        double dlog=(lmax-lmin)/cnt;
+        for (int i=0; i<(m_N); i++) {
+            m_taudiffs(i)=pow(10, lmin+double(i)*dlog);
+        }
+    } else if (tauMode==MaxEntB040::tmLin && (tauMax>tauMin)) {
+        double lmin=(tauMin);
+        double lmax=(tauMax);
+        double cnt=m_N-1;
+        double dlog=(lmax-lmin)/cnt;
+        for (int i=0; i<(m_N); i++) {
+            m_taudiffs(i)=lmin+double(i)*dlog;
+        }
+    } else if (tauMode==MaxEntB040::tmDCoeffLog && (tauMax>tauMin)) {
+        double lmin=log10(m_wxy*m_wxy/(4.0*tauMax));
+        double lmax=log10(m_wxy*m_wxy/(4.0*tauMin));
+        double cnt=m_N-1;
+        double dlog=(lmax-lmin)/cnt;
+        for (int i=0; i<(m_N); i++) {
+             m_taudiffs(i)=pow(10, lmin+double(i)*dlog);
+        }
+    } else if (tauMode==MaxEntB040::tmDCoeffLin && (tauMax>tauMin)) {
+        double lmin=(m_wxy*m_wxy/(4.0*tauMax));
+        double lmax=(m_wxy*m_wxy/(4.0*tauMin));
+        double cnt=m_N-1;
+        double dlog=(lmax-lmin)/cnt;
+        for (int i=0; i<(m_N); i++) {
+             m_taudiffs(i)= lmin+double(i)*dlog;
+        }
+    } else {
+        double taumin=m_xdata(0)+0.1*m_xdata(0);
+        double taumax=m_xdata(m_Nd-1)-0.1*m_xdata(m_Nd-1);
+        for (int i=0; i<m_N; i++) {
+            m_taudiffs(i) = taumin*exp(double(i)*log(10)*log10(taumax/(taumin))/double(m_N-1));
+        }
+    }
+
     /*
     double tminexp=floor(log10(m_xdata(0)));
 	double tmaxexp=ceil(log10(m_xdata(m_Nd-1)));
 	double taumin=pow(10.0,tminexp);
 	double taumax=pow(10.0,tmaxexp);
 	*/
+
+    /*
 	double taumin=m_xdata(0)+0.1*m_xdata(0);
 	double taumax=m_xdata(m_Nd-1)-0.1*m_xdata(m_Nd-1);
 	for (int i=0; i<m_N; i++)
         {
         m_taudiffs(i) = taumin*exp((i)*log(10)*log10(taumax/(taumin))/(m_N-1));
-        }   
-    }
+        }   */
+}
+
 
 
 void MaxEntB040::setTmatrix(){
@@ -401,26 +455,22 @@ void MaxEntB040::performIter()
 	
 	double value=m_N;
 	
-	if (m_oldDist==false)
-		{
+    if (m_oldDist==false) {
 		for (int i=0; i<m_N; i++){m_f(i)=1/value;}
-		}
+    }
 	for (int i=0; i<m_N; i++){m_m(i)=1/value;}
 	
-	if (m_oldDist==false)
-		{
+    if (m_oldDist==false) {
 			m_u=Eigen::VectorXd::Zero(m_s);	
-		}
-	else {	
-			Eigen::VectorXd temp_b(m_N);
-			double zahl;
-			for (int i=0; i<m_N; i++)
-				{
-				zahl=log(m_f(i)/m_m(i));
-				temp_b(i)=zahl;
-				}
-			m_u=m_Ured.colPivHouseholderQr().solve(temp_b);
-		 }	 
+    } else {
+        Eigen::VectorXd temp_b(m_N);
+        double zahl;
+        for (int i=0; i<m_N; i++){
+            zahl=log(m_f(i)/m_m(i));
+            temp_b(i)=zahl;
+         }
+        m_u=m_Ured.colPivHouseholderQr().solve(temp_b);
+    }
 		 
 	Eigen::VectorXd work(m_N);
 	Eigen::VectorXd work2(m_N);

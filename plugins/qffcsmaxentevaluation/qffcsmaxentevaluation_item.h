@@ -58,6 +58,14 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation,
         double getAlpha() const;
         /** \brief set the number of distribution points Ndist */
         void setNdist(uint32_t Ndist);
+
+        void setTauMode(int Ndist);
+        void setTauMin(double tauMin);
+        void setTauMax(double tauMax);
+        int getTauMode();
+        double getTauMin();
+        double getTauMax();
+
         /** \brief return the current number of distribution points Ndist */
         uint32_t getNdist() const;
         /** \brief set the number of distribution points Ndist */

@@ -445,6 +445,7 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
                 for (int c=0; c<channels; c++) {
                     double* d=m->getImageStack(cmbVideo->currentIndex(),0, c);
                     QColor col=QColor("green");
+                    double back=m->getProperty("BACKGROUND"+QString::number(c+1), m->getProperty("BACKGROUND", 0).toDouble()).toDouble();
                     if (d) {
                         size_t c_run=ds->addCopiedColumn(&(d[i]),frames, vidW*vidH, QString("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
                         size_t c_rune=-1;
@@ -655,6 +656,12 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
                             gb->set_title(tr("run %1: background (b=%2)").arg(i).arg(background));
                             plotter->addGraph(gb);
                         }
+                        back=back+background;
+                    }
+                    if (back!=0) {
+                        JKQTPgeoInfiniteLine* gb=new JKQTPgeoInfiniteLine(plotter->get_plotter(), 0, back, 1,0,col.darker(),2,Qt::DashLine);
+                        gb->set_title(tr("run %1: user background (b=%2)").arg(i).arg(back));
+                        plotter->addGraph(gb);
                     }
 
                 }

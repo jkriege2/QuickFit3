@@ -487,6 +487,14 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
         ui->cmbWhiskerStyle->setVisible(false);
         ui->labWhisker->setVisible(false);
 
+        ui->btnClearLinesXData->setVisible(true);
+        ui->btnClearLinesXError->setVisible(true);
+        ui->btnClearLinesYData->setVisible(true);
+        ui->btnClearLinesYError->setVisible(true);
+        ui->btnClearLinesMax->setVisible(false);
+        ui->btnClearLinesMean->setVisible(false);
+        ui->btnClearLinesQ75->setVisible(false);
+
         ui->labDataX->setText(tr("X data col.:"));
         ui->labDataY->setText(tr("Y data col.:"));
         ui->labErrorX->setText(tr("X error col.:"));
@@ -567,6 +575,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->cmbLineStyle->setVisible(false);
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
+                ui->btnClearLinesXError->setVisible(false);
 
                 /*ui->widLineStyle->setVisible(false);
                 ui->cmbLinesXError->setVisible(false);
@@ -582,6 +591,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
                 ui->btnFit->setVisible(false);
+                ui->btnClearLinesXError->setVisible(false);
 
                 /*ui->cmbErrorColor->setVisible(true);
                 ui->cmbErrorStyle->setVisible(true);
@@ -602,6 +612,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->widSymbol->setVisible(false);
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
+                ui->btnClearLinesXError->setVisible(false);
 
                 /*ui->cmbErrorColor->setVisible(true);
                 ui->cmbErrorStyle->setVisible(true);
@@ -622,6 +633,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
                 ui->btnFit->setVisible(false);
+                ui->btnClearLinesXError->setVisible(false);
 
                 /*ui->cmbErrorColor->setVisible(true);
                 ui->cmbErrorStyle->setVisible(true);
@@ -645,6 +657,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->widSymbol->setVisible(false);
                 ui->widErrorStyle->setVisible(false);
                 ui->labErrorStyle->setVisible(false);
+                ui->btnClearLinesXError->setVisible(false);
+                ui->btnClearLinesYError->setVisible(false);
 
                 /*ui->cmbErrorColor->setVisible(false);
                 ui->cmbErrorStyle->setVisible(false);
@@ -669,6 +683,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->widErrorStyle->setVisible(false);
                 ui->labErrorStyle->setVisible(false);
                 ui->btnFit->setVisible(false);
+                ui->btnClearLinesXError->setVisible(false);
+                ui->btnClearLinesYError->setVisible(false);
 /*                    ui->cmbErrorColor->setVisible(false);
                 ui->cmbErrorStyle->setVisible(false);
                 ui->cmbLinesXError->setVisible(false);
@@ -695,6 +711,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->edtWidth->setVisible(true);
                 ui->edtShift->setVisible(true);
                 ui->widWidth->setVisible(true);
+                ui->btnClearLinesXError->setVisible(false);
+                ui->btnClearLinesYError->setVisible(false);
 
 /*                    ui->cmbErrorColor->setVisible(false);
                 ui->cmbErrorStyle->setVisible(false);
@@ -724,6 +742,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->edtWidth->setVisible(true);
                 ui->edtShift->setVisible(true);
                 ui->widWidth->setVisible(true);
+                ui->btnClearLinesXError->setVisible(false);
+                ui->btnClearLinesYError->setVisible(false);
                 break;
             case QFRDRTable::gtParametrizedScatter:
                 ui->labImage->setVisible(true);
@@ -735,6 +755,9 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labQ75->setText(tr("size col.:"));
                 ui->cmbLinesMean->setVisible(true);
                 ui->cmbLinesQ75->setVisible(true);
+                ui->btnClearLinesMean->setVisible(true);
+                ui->btnClearLinesQ75->setVisible(true);
+
 
                 ui->labTransparencyFalse->setVisible(false);
                 ui->widFalseTransparency->setVisible(false);
@@ -784,6 +807,11 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->cmbLinesMax->setVisible(true);
                 ui->cmbLinesMean->setVisible(true);
                 ui->cmbLinesQ75->setVisible(true);
+
+                ui->btnClearLinesMax->setVisible(true);
+                ui->btnClearLinesMean->setVisible(true);
+                ui->btnClearLinesQ75->setVisible(true);
+
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
                 ui->labSymbol->setVisible(true);
@@ -822,6 +850,9 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labLinestyle->setVisible(false);
                 ui->labDataX->setText(tr("image col.:"));
                 ui->labDataY->setText(tr("modifier col.:"));
+                ui->btnClearLinesXError->setVisible(false);
+                ui->btnClearLinesYData->setVisible(true);
+                ui->btnClearLinesYError->setVisible(false);
 
                 ui->labTransparencyFalse->setVisible(false);
                 ui->widFalseTransparency->setVisible(false);
@@ -849,6 +880,9 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->cmbLinesYData->setVisible(true);
                 ui->labDataY->setVisible(true);
                 ui->cmbLinesYError->setVisible(true);
+                ui->btnClearLinesXError->setVisible(true);
+                ui->btnClearLinesYData->setVisible(true);
+                ui->btnClearLinesYError->setVisible(true);
                 ui->labErrorY->setVisible(true);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
@@ -898,6 +932,10 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->btnAutoY->setVisible(false);
                 ui->labDataY->setVisible(false);
                 ui->cmbLinesYError->setVisible(false);
+                ui->btnClearLinesXError->setVisible(false);
+                ui->btnClearLinesYData->setVisible(false);
+                ui->btnClearLinesYError->setVisible(false);
+
                 ui->labErrorY->setVisible(false);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
@@ -942,6 +980,9 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->btnAutoX->setVisible(false);
                 ui->labDataX->setVisible(false);
                 ui->cmbLinesYError->setVisible(false);
+                ui->btnClearLinesXError->setVisible(false);
+                ui->btnClearLinesYData->setVisible(false);
+                ui->btnClearLinesYError->setVisible(false);
                 ui->labErrorY->setVisible(false);
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
@@ -981,6 +1022,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->widRangeStyle->setVisible(true);
 
                 ui->cmbLinesXError->setVisible(false);
+                ui->cmbLinesXError->setVisible(false);
                 ui->labErrorX->setVisible(false);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
@@ -1012,6 +1054,14 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labFuction->setVisible(false);
                 ui->chkSTrided->setVisible(false);
                 ui->widStride->setVisible(false);
+                ui->btnClearLinesXData->setVisible(false);
+                ui->btnClearLinesXError->setVisible(false);
+                ui->btnClearLinesYData->setVisible(false);
+                ui->btnClearLinesYError->setVisible(false);
+                ui->btnClearLinesMax->setVisible(false);
+                ui->btnClearLinesMean->setVisible(false);
+                ui->btnClearLinesQ75->setVisible(false);
+
 
 
 

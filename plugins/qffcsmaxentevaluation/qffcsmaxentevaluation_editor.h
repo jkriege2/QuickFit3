@@ -86,6 +86,8 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         void NumIterChanged(int NumIter);
         void chkShowDChanged();
         void chkShowrangesChanged();
+        void tauModeChanged(int weights);
+        void tauMinMaxChanged();
 
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old);
@@ -133,6 +135,11 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         QFPlotter* pltDistribution;
         QToolBar* tbPlot;
         QToolBar* tbPlotDistribution;
+
+
+        QFDoubleEdit* edtTauMin;
+        QFDoubleEdit* edtTauMax;
+        QComboBox* cmbTauMode;
 
         QFDoubleEdit* edtRange1Min;
         QFDoubleEdit* edtRange1Max;
