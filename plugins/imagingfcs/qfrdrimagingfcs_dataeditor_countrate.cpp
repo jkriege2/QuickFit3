@@ -445,7 +445,7 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
                 for (int c=0; c<channels; c++) {
                     double* d=m->getImageStack(cmbVideo->currentIndex(),0, c);
                     QColor col=QColor("green");
-                    double back=m->getProperty("BACKGROUND"+QString::number(c+1), m->getProperty("BACKGROUND", 0).toDouble()).toDouble();
+                    double back=m->getProperty("BACKGROUND"+QString::number(c+1), m->getProperty("BACKGROUND", 0).toDouble()).toDouble()*m->getFrameTime();
                     if (d) {
                         size_t c_run=ds->addCopiedColumn(&(d[i]),frames, vidW*vidH, QString("pixel %1 %2").arg(i).arg(m->getCorrelationRunName(i)));
                         size_t c_rune=-1;

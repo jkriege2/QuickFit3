@@ -578,9 +578,9 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         if (!weightsOK) getProject()->getServices()->log_warning(tr("   - weights have invalid values => setting all weights to 1\n"));
 
         //////////Load Algorithm Parameters ////////////////////////////////////////////////
-        double alpha=getAlpha();
-        int NumIter=getNumIter();
-        uint32_t Ndist=getNdist();
+        double alpha=getFitValue(record,index,model,"maxent_alpha");
+        int NumIter=getFitValue(record,index,model,"maxent_numiter");
+        uint32_t Ndist=getFitValue(record,index,model,"maxent_Ndist");
         ////////////////////////////////////////////////////////////////////////////////////
         bool fitSuccess=false;
 
@@ -685,9 +685,9 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         /////////////////////////////////////////////////////////
         /// MaxEnt Implementation ///////////////////////////////
         /////////////////////////////////////////////////////////
-        double tau_min=getTauMin();
-        double tau_max=getTauMax();
-        MaxEntB040::TauMode tau_mode= (MaxEntB040::TauMode)getTauMode();
+        double tau_min=getFitValue(record,index,model,"maxent_taumin");
+        double tau_max=getFitValue(record,index,model,"maxent_taumax");
+        MaxEntB040::TauMode tau_mode= (MaxEntB040::TauMode)getFitValue(record,index,model,"maxent_taumode");
 
         MaxEntB040 mem;
         mem.setData(taus,corrdata,weights,N,rangeMinDatarange,rangeMaxDatarange,Ndist,dist,distTaus, model,getParameterCount(model),param_list, getFitValue(record,index,model,"maxent_wxy")*1e-3, tau_mode, tau_min, tau_max);
@@ -759,21 +759,36 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         setFitResultLabel(record, index, model, param, tr("MaxEnt distribution"), QString("MaxEnt distribution: <i>p(&tau;)</i>"));
         setFitResultSortPriority(record, index, model, param, true);
 
-        setFitResultValue(record, index, model, param="maxent_taumin", distTaus[0], QString("seconds"));
-        setFitResultGroup(record, index, model, param, tr("fit results"));
-        setFitResultLabel(record, index, model, param, tr("MaxEnt distribution: minimum distribution times"), QString("MaxEnt distribution: minimum distribution times <i>&tau;<sub>min</sub></i>"));
-        setFitResultSortPriority(record, index, model, param, true);
-
-        setFitResultValue(record, index, model, param="maxent_taumax", distTaus[Ndist-1], QString("seconds"));
-        setFitResultGroup(record, index, model, param, tr("fit results"));
-        setFitResultLabel(record, index, model, param, tr("MaxEnt distribution: maximum distribution times"), QString("MaxEnt distribution: maximum distribution times <i>&tau;<sub>max</sub></i>"));
-        setFitResultSortPriority(record, index, model, param, true);
-
         setFitResultValueInt(record, index, model, param="maxent_taumode", tau_mode);
         setFitResultGroup(record, index, model, param, tr("fit results"));
         setFitResultLabel(record, index, model, param, tr("MaxEnt distribution: tau mode"), tr("MaxEnt distribution: tau mode"));
         setFitResultSortPriority(record, index, model, param, true);
 
+        if (tau_mode>2) {
+
+            double wxy=getFitValue(record,index,model,"maxent_wxy")*1e-3;
+
+            setFitResultValue(record, index, model, param="maxent_taumax", wxy*wxy/(4.0*distTaus[0]), QString("seconds"));
+            setFitResultGroup(record, index, model, param, tr("fit results"));
+            setFitResultLabel(record, index, model, param, tr("MaxEnt distribution: minimum distribution times"), QString("MaxEnt distribution: minimum distribution times <i>&tau;<sub>min</sub></i>"));
+            setFitResultSortPriority(record, index, model, param, true);
+
+            setFitResultValue(record, index, model, param="maxent_taumin", wxy*wxy/(4.0*distTaus[Ndist-1]), QString("seconds"));
+            setFitResultGroup(record, index, model, param, tr("fit results"));
+            setFitResultLabel(record, index, model, param, tr("MaxEnt distribution: maximum distribution times"), QString("MaxEnt distribution: maximum distribution times <i>&tau;<sub>max</sub></i>"));
+            setFitResultSortPriority(record, index, model, param, true);
+        } else {
+            setFitResultValue(record, index, model, param="maxent_taumin", distTaus[0], QString("seconds"));
+            setFitResultGroup(record, index, model, param, tr("fit results"));
+            setFitResultLabel(record, index, model, param, tr("MaxEnt distribution: minimum distribution times"), QString("MaxEnt distribution: minimum distribution times <i>&tau;<sub>min</sub></i>"));
+            setFitResultSortPriority(record, index, model, param, true);
+
+            setFitResultValue(record, index, model, param="maxent_taumax", distTaus[Ndist-1], QString("seconds"));
+            setFitResultGroup(record, index, model, param, tr("fit results"));
+            setFitResultLabel(record, index, model, param, tr("MaxEnt distribution: maximum distribution times"), QString("MaxEnt distribution: maximum distribution times <i>&tau;<sub>max</sub></i>"));
+            setFitResultSortPriority(record, index, model, param, true);
+
+        }
 
 
         // save all the default values for all fit parameters as results.

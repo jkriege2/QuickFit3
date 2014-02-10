@@ -983,6 +983,9 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->btnClearLinesXError->setVisible(false);
                 ui->btnClearLinesYData->setVisible(false);
                 ui->btnClearLinesYError->setVisible(false);
+                ui->btnClearLinesQ75->setVisible(false);
+                ui->btnClearLinesMean->setVisible(false);
+                ui->btnClearLinesMax->setVisible(false);
                 ui->labErrorY->setVisible(false);
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
@@ -1028,6 +1031,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->widSymbol->setVisible(false);
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
+                ui->btnAutoX->setVisible(false);
 
                 ui->widErrorStyle->setVisible(false);
                 ui->widFillColor->setVisible(true);
@@ -1048,7 +1052,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->btnAutoX->setVisible(false);
                 ui->cmbLinesXError->setVisible(false);
                 ui->cmbLinesYData->setVisible(false);
-                ui->btnAutoY->setVisible(true);
+                ui->btnAutoY->setVisible(false);
                 ui->cmbLinesYError->setVisible(false);
                 ui->widFunction->setVisible(false);
                 ui->labFuction->setVisible(false);
