@@ -4,6 +4,7 @@
 #include "qffitfunctionfcsmultidiffusion.h"
 #include "qffitfunctionfcsadiff.h"
 #include "qffitfunctionfcsdiff.h"
+#include "qffitfunctionfcsexp.h"
 #include "qffitfunctionfcssimplediff.h"
 #include "qffitfunctionfcsflow.h"
 #include "qffitfunctionfcsrot.h"
@@ -20,7 +21,7 @@
 
 QStringList QFPFitFunctionFCS::getIDs() const {
     QStringList res;
-    res<<"fcs_diff"<<"fcs_diff_d"<<"fcs_diff_d_wz"<<"fcs_diff1"<<"fcs_adiff"<<"fcs_multidiff"<<"fcs_diffflow"<<"fcs_diffflowv"<<"fcs_diffrot"<<"fcs_oscillation"<<"fcs_cs_diff_d"<<"fcs_diff_cs_d_wz";
+    res<<"fcs_exp"<<"fcs_diff"<<"fcs_diff_d"<<"fcs_diff_d_wz"<<"fcs_diff1"<<"fcs_adiff"<<"fcs_multidiff"<<"fcs_diffflow"<<"fcs_diffflowv"<<"fcs_diffrot"<<"fcs_oscillation"<<"fcs_cs_diff_d"<<"fcs_diff_cs_d_wz";
     return res;
 }
 
@@ -29,6 +30,8 @@ QFFitFunction* QFPFitFunctionFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionFCSDiff();
     } else if (id=="fcs_diff_d") {
         return new QFFitFunctionFCSDiffD(true);
+    } else if (id=="fcs_exp") {
+        return new QFFitFunctionFCSExp();
     } else if (id=="fcs_diff_d_wz") {
         return new QFFitFunctionFCSDiffD(false);
     } else if (id=="fcs_diff1") {

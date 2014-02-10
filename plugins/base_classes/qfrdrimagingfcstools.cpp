@@ -388,6 +388,9 @@ bool readEvalSettingsFile(const QString &evalFilename, bool isDCCF, QMap<QString
                         height=value.toInt();
                         paramsReadonly<<"HEIGHT";
                     }
+                } else if (name=="tau factor") {
+                    initParams["TAU_FACTOR"]=value.toDouble();
+                    paramsReadonly<<"TAU_FACTOR";
                 } else if (name=="pixel width") {
                     initParams["PIXEL_WIDTH"]=value.toDouble();
                     paramsReadonly<<"PIXEL_WIDTH";

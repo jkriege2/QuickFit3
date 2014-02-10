@@ -1,0 +1,22 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>Multi-Component Normal 3D Diffusion (with non-fluorescing components)</title></head>
+<body>
+$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+This plugin implements a fit function, which only contains exponential decay terms:
+$$bmath:G(\tau)=G_\infty+\frac{1}{N}\cdot\left(\frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}\right)$$
+
+
+The parameters are:
+<ul>
+<li><img alt="$ G_\infty $" src="./pic/form_800.png"/>: offset of the correlation function</li>
+<li><img alt="$ N $" src="./pic/form_650.png"/>: overall particle number (including currently dark particles, e.g. in triplet state)</li>
+<li><img alt="$ \Theta_{trip}, \Theta_{non} $" src="./pic/form_810.png"/>: fraction of the particles in one of the first two non-fluorescent states (priplet, ...)</li>
+<li><img alt="$ \tau_{trip}, \tau{non} $" src="./pic/form_820.png"/>: decay time of the first two non-fluorescent states (triplet, ...)</li>
+<li><i>b</i>: background intensity, as measured in a sample without fluorescing molecules (e.g. dark counts of the detector and scattering in the buffer contributes to this) </li>
+<li><i>cps</i>: average background corrected intensity during the measurement, i.e. <i>cps=I</i><sub>measured</sub><i>-b</b> </li>
+
+</ul>
+Given the count rate cps and the background count rate <i>b</i>, we can calculate the counts per molecule:
+<blockquote><img  src="./pic/form_416.png"></blockquote>
+
+</body></html>
