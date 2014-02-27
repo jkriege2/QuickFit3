@@ -213,6 +213,34 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::moveStageAbs(const QString
     }
 }
 
+QVariant QFESPIMB040ScriptedAcquisitionInstrumentControl::getStagePos(const QString &stage)
+{
+    QFExtensionLinearStage*  stageE=NULL;
+    int axis=0;
+    if (stage=="x") {
+        stageE=opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageX);
+        axis=opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageX);
+    } else if (stage=="y") {
+        stageE=opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageY);
+        axis=opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageY);
+    } else if (stage=="z") {
+        stageE=opticsSetup->getStage(QFESPIMB040OpticsSetupBase::StageZ);
+        axis=opticsSetup->getStageAxis(QFESPIMB040OpticsSetupBase::StageZ);
+    } else {
+        bool ok=false;
+        int ID=stage.toInt(&ok);
+        if (ok && ID>=0 && ID<opticsSetup->getStageCount()) {
+            stageE=opticsSetup->getStage(ID);
+            axis=opticsSetup->getStageAxis(ID);
+        } else {
+            throwEngineException(QObject::tr("getStagePos('%1'): unknown stage!").arg(stage));
+            return QVariant();
+        }
+    }
+
+    return stageE->getPosition(axis);
+}
+
 void QFESPIMB040ScriptedAcquisitionInstrumentControl::setFilterWheel(const QString &wheel, int filter)
 {
     QFExtensionFilterChanger* changer=NULL;

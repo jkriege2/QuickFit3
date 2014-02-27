@@ -3,6 +3,7 @@
 #include <QtPlugin>
 #include <iostream>
 #include "pimercury863calibrationdialog.h"
+#include <QDebug>
 
 #define LOG_PREFIX "[PI863]: "
 
@@ -89,15 +90,27 @@ void QFExtensionLinearStagePI::initExtension() {
             d.name=axisname;
             d.label=inifile.value(axisname+"/label", tr("PI Mercury 863, axis %1").arg(i)).toString();
             axes.append(d);
+            actCalibrate.append(new QAction(tr("calibrate axis '%1'").arg(d.label), this));
+            connect(actCalibrate.last(), SIGNAL(triggered()), this, SLOT(calibrateAxis()));
         }
     }
 
+    menuStage=new QMenu(tr("PI stage"));
+    menuStage->setIcon(QIcon(":/stage_pi_logo.png"));
     actCalibrateJoysticks=new QAction(QIcon(":/stage_pi/pi_joystick.png"), tr("calibrate PI stage joysticks"), this);
     connect(actCalibrateJoysticks, SIGNAL(triggered()), this, SLOT(calibrateJoysticks()));
+
+
+    menuStage->addAction(actCalibrateJoysticks);
+    menuStage->addSeparator();
+    for (int i=0; i<actCalibrate.size(); i++) {
+        menuStage->addAction(actCalibrate[i]);
+    }
+
     if (services) {
         QMenu* m=services->getMenu("extensions");
         if (m) {
-            m->addAction(actCalibrateJoysticks);
+            m->addAction(menuStage->menuAction());
         }
     }
 }
@@ -264,6 +277,17 @@ void QFExtensionLinearStagePI::calibrateJoysticks() {
     }
 }
 
+void QFExtensionLinearStagePI::calibrateAxis()
+{
+    QMutexLocker lock(mutexSerial);
+    QAction* act=qobject_cast<QAction*>(sender());
+    int idx=actCalibrate.indexOf(act);
+    if (act && idx>=0 && com.isConnectionOpen()) {
+        selectAxis(idx);
+        sendCommand("FE2");
+    }
+}
+
 bool QFExtensionLinearStagePI::checkComConnected() {
     QMutexLocker lock(mutexSerial);
     bool c=com.isConnectionOpen();
@@ -303,6 +327,7 @@ void QFExtensionLinearStagePI::connectDevice(unsigned int axis) {
             sendCommand("SA"+inttostr(acceleration));
             sendCommand("MN");
             sendCommand("DH");
+            sendCommand("DH");
             axes[i].velocity=initVelocity;
             axes[i].joystickEnabled=false;
         }
@@ -340,11 +365,12 @@ void QFExtensionLinearStagePI::setLogging(QFPluginLogService* logService) {
 
 void QFExtensionLinearStagePI::setJoystickActive(unsigned int axis, bool enabled, double maxVelocity) {
     QMutexLocker lock(mutexSerial);
-    if (enabled) {
+    if ((enabled && !axes[axis].joystickEnabled) || (enabled && maxVelocity!=axes[axis].joyVelocity)) {
         selectAxis(axis);
         sendCommand("JN"+inttostr((long)round(maxVelocity/velocityFactor)));
         axes[axis].joystickEnabled=true;
-    } else {
+        axes[axis].joyVelocity=maxVelocity;
+    } else if (!enabled && axes[axis].joystickEnabled) {
         selectAxis(axis);
         sendCommand("JF");
         axes[axis].joystickEnabled=false;
@@ -475,6 +501,7 @@ void QFExtensionLinearStagePI::move(unsigned int axis, double newPosition) {
         if (!com.hasErrorOccured()) {
             selectAxis(axis);
             sendCommand("SV"+inttostr((long)round(axes[axis].velocity/velocityFactor))+",MA"+inttostr(xx));
+            //qDebug()<<"  move("<<axis<<", "<<inttostr(xx).c_str()<<")   SV="<<inttostr((long)round(axes[axis].velocity/velocityFactor)).c_str();
         }
         axes[axis].state=QFExtensionLinearStage::Moving;
     }

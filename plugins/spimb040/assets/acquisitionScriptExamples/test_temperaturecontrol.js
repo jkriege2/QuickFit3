@@ -1,11 +1,11 @@
-fn="/home/kriegerj/temperature_P10_I1_D0_IMAX20_on_off_log.txt";
+fn="/home/kriegerj/temperature_P10_I1_D0_IMAX30_on_off_log.txt";
 dev="meas_b040resheater";
 devid=0;
 params=new Array("TEMP0", "TEMP1", "OUTPUT", "SET_TEMP");
 delay=1000;
-repeats=Math.ceil(30*60/(delay/1000));
-heatingon_after=Math.ceil(2*60/(delay/1000));
-heatingoff_after=Math.ceil(4*repeats/5.0);
+repeats=Math.ceil(60*60/(delay/1000));
+heatingon_after=Math.ceil(1*60/(delay/1000));
+heatingoff_after=Math.ceil(3*repeats/5.0);
 
 instrument.MDConnect(dev, devid);
 cnt=instrument.MDGetParamCount(dev, devid);

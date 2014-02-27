@@ -65,17 +65,28 @@
                 The new stage position is a displacement relative to the current position (<tt>current_position + delta</tt>) and has to be given in micrometers. This function blocks until the stage stops moving.
 		<!-- /func:instrument.moveStageRel -->
 		</li>
-		<li><a name="instrument.moveStageAbs"/><!-- func:instrument.moveStageAbs -->
-		<b><tt><!-- template -->instrument.moveStageAbs("<!--°-->stage<!--°-->", new_position)<!-- /template --></tt> - <i>move the specified stage to the given position </i>:</b><br>
-		These stages are defined:
-		  <ul>
+                <li><a name="instrument.moveStageAbs"/><!-- func:instrument.moveStageAbs -->
+                <b><tt><!-- template -->instrument.moveStageAbs("<!--°-->stage<!--°-->", new_position)<!-- /template --></tt> - <i>move the specified stage to the given position </i>:</b><br>
+                These stages are defined:
+                  <ul>
                     <li>"x": sample translation stage: x-direction</li>
                     <li>"y": sample translation stage: y-direction</li>
                     <li>"z": sample translation stage: z-direction</li>
                   </ul>
                 The stage position is an absolute value and has to be given in micrometers. This function blocks until the stage stops moving.
-		<!-- /func:instrument.moveStageAbs -->
-		</li>
+                <!-- /func:instrument.moveStageAbs -->
+                </li>
+                <li><a name="instrument.getStagePos"/><!-- func:instrument.getStagePos -->
+                <b><tt><!-- template -->instrument.getStagePos("<!--°-->stage<!--°-->")<!-- /template --></tt> - <i>returns the current position of the given stage </i>:</b><br>
+                These stages are defined:
+                  <ul>
+                    <li>"x": sample translation stage: x-direction</li>
+                    <li>"y": sample translation stage: y-direction</li>
+                    <li>"z": sample translation stage: z-direction</li>
+                  </ul>
+                The stage position is an absolute value given in micrometers. 
+                <!-- /func:instrument.getStagePos -->
+                </li>
 	</ul>
 	<h2>Acquisition Control</h2>
 	<ul>

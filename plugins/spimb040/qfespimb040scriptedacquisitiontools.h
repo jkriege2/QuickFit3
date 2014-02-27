@@ -75,6 +75,7 @@ class QFESPIMB040ScriptedAcquisitionInstrumentControl : public QObject, public Q
         void setShutter(const QString& shutter, bool state);
         void moveStageRel(const QString& stage, double delta);
         void moveStageAbs(const QString& stage, double new_position);
+        QVariant getStagePos(const QString& stage);
         void setFilterWheel(const QString& wheel, int filter);
 
         void MDConnect(const QString& device_name, int id);

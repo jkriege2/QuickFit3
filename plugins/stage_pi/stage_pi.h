@@ -135,10 +135,13 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
 
     protected slots:
         void calibrateJoysticks();
+        void calibrateAxis();
 
 	protected:
         QFPluginLogService* logService;
         QAction* actCalibrateJoysticks;
+        QList<QAction*> actCalibrate;
+        QMenu* menuStage;
 
         struct AxisDescription {
             /** \brief ID of the Mercury C-863 controller for the axis
@@ -151,6 +154,7 @@ class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public 
              QFExtensionLinearStage::AxisState state;
              /** \brief indicates whether the joystick is enabled or not */
              bool joystickEnabled;
+             double joyVelocity;
 
              double velocity;
 
