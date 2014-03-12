@@ -426,7 +426,7 @@ int QFExtensionCameraAndor::getCameraImageWidth(unsigned int camera) {
     return (abs(camInfos[camera].subImage_hend-camInfos[camera].subImage_hstart)+1)/camInfos[camera].hbin;
 }
 
-int QFExtensionCameraAndor::getImageCameraHeight(unsigned int camera) {
+int QFExtensionCameraAndor::getCameraImageHeight(unsigned int camera) {
     if (!isCameraConnected(camera)) return 0;
     return (abs(camInfos[camera].subImage_vend-camInfos[camera].subImage_vstart)+1)/camInfos[camera].vbin;
 }
@@ -493,7 +493,7 @@ bool QFExtensionCameraAndor::acquireOnCamera(unsigned int camera, uint32_t* data
     if (time.elapsed()<=timeout)  {
 
 
-        int imagesize=getCameraImageWidth(camera)*getImageCameraHeight(camera);
+        int imagesize=getCameraImageWidth(camera)*getCameraImageHeight(camera);
         at_32* imageData = (at_32*)malloc(imagesize*sizeof(at_32));
         CHECK_ON_ERROR(GetAcquiredData(imageData,imagesize), tr("error while acquiring frame"), free(imageData));
 
@@ -746,7 +746,7 @@ QVariant QFExtensionCameraAndor::getCameraSetting(QSettings& settings, QFExtensi
     return QVariant();
 }
 
-QVariant QFExtensionCameraAndor::getCurrentCameraSetting(int camera, QFExtensionCamera::CameraSetting which) const
+QVariant QFExtensionCameraAndor::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which) const
 {
     if (camera<0 || camera>=getCameraCount()) return QVariant();
 
@@ -803,7 +803,7 @@ bool QFExtensionCameraAndor::prepareCameraAcquisition(unsigned int camera, const
     connect(thread, SIGNAL(log_error(QString)), this, SLOT(tlog_error(QString)));
     connect(thread, SIGNAL(log_warning(QString)), this, SLOT(tlog_warning(QString)));
     connect(thread, SIGNAL(log_text(QString)), this, SLOT(tlog_text(QString)));
-    bool ok=thread->init(camera, filenamePrefix, info.fileformat, info.numKins, getCameraImageWidth(camera), getImageCameraHeight(camera), info.expoTime, LOG_PREFIX);
+    bool ok=thread->init(camera, filenamePrefix, info.fileformat, info.numKins, getCameraImageWidth(camera), getCameraImageHeight(camera), info.expoTime, LOG_PREFIX);
     if (!ok) {
         delete thread;
         return false;
@@ -877,7 +877,7 @@ void QFExtensionCameraAndor::internalGetAcquisitionDescription(unsigned int came
     (*parameters)["roi_ystart"]=info.subImage_vstart;
     (*parameters)["roi_yend"]=info.subImage_vend;
     (*parameters)["image_width"]=getCameraImageWidth(camera);
-    (*parameters)["image_height"]=getImageCameraHeight(camera);
+    (*parameters)["image_height"]=getCameraImageHeight(camera);
     (*parameters)["sensor_temperature"]=getTemperature(camera);
 
     switch(camGlobalSettings[camera].shutterMode) { //0: auto, 1: open, 2: close

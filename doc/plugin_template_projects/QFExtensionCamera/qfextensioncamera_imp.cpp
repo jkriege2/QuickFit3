@@ -53,7 +53,7 @@ void QFExtensionCameraImplementation::storeSettings(ProgramOptions* settingspo) 
 
 	}
 
-unsigned int QFExtensionCameraImplementation::getCameraCount() {
+unsigned int QFExtensionCameraImplementation::getCameraCount() const {
     return 1;
 	/* how man cameras may be accessed by your plugin (e.g. if you use one driver to access several cameras */
 }
@@ -61,7 +61,7 @@ void QFExtensionCameraImplementation::useCameraSettings(unsigned int camera, con
     /* set the camera settings to the values specified in settings parameter, called before acquire() */
 }
 
-bool QFECamTestCamera::prepareAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
+bool QFExtensionCameraImplementation::prepareCameraAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
     /* set the camera settings to the values specified in settings parameter, called before startAcquisition() */
 
     // uncomment this if the code is the same as in useCameraSettings()
@@ -116,19 +116,19 @@ void QFExtensionCameraImplementation::showCameraSettingsDialog(unsigned int came
 	*/
 }
 
-int QFExtensionCameraImplementation::getImageWidth(unsigned int camera) {
+int QFExtensionCameraImplementation::getCameraImageWidth(unsigned int camera) {
     return /* width of the next image from the given camera */;
 }
 
-int QFExtensionCameraImplementation::getImageHeight(unsigned int camera) {
+int QFExtensionCameraImplementation::getCameraImageHeight(unsigned int camera) {
     return /* height of the next image from the given camera */;
 }
 
-double QFExtensionCameraImplementation::getPixelWidth() {
+double QFExtensionCameraImplementation::getCameraPixelWidth(unsigned int camera) {
     return /* width of pixel in microns */;
 }
 
-double QFExtensionCameraImplementation::getPixelHeight() {
+double QFExtensionCameraImplementation::getCameraPixelHeight(unsigned int camera) {
     return /* width of pixel in microns */;
 }
 
@@ -141,11 +141,11 @@ virtual QString QFExtensionCameraImplementation::getCameraSensorName(unsigned in
     return /* name of the camera's sensor */;
 }
 
-bool QFExtensionCameraImplementation::isConnected(unsigned int camera) {
+bool QFExtensionCameraImplementation::isCameraConnected(unsigned int camera) {
     return /* are we connected to the specified camera */;
 }
 
-bool QFExtensionCameraImplementation::acquire(unsigned int camera, uint32_t* data, uint64_t* timestamp) {
+bool QFExtensionCameraImplementation::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant>* parameters) {
     if (timestamp!=NULL) {
         *timestamp=/* store a timestamp information */;
     }
@@ -156,39 +156,39 @@ bool QFExtensionCameraImplementation::acquire(unsigned int camera, uint32_t* dat
 	*/
 }
 
-bool QFExtensionCameraImplementation::connectDevice(unsigned int camera) {
+bool QFExtensionCameraImplementation::connectCameraDevice(unsigned int camera) {
     /* connect to the given camera */
 	return true;
 }
 
-void QFExtensionCameraImplementation::disconnectDevice(unsigned int camera) {
+void QFExtensionCameraImplementation::disconnectCameraDevice(unsigned int camera) {
     /* disconnect from the given camera */
 }
 
-double QFExtensionCameraImplementation::getExposureTime(unsigned int camera) {
+double QFExtensionCameraImplementation::getCameraExposureTime(unsigned int camera) {
     return /* exposure time of the last image */;
 }
 
-bool QFExtensionCameraImplementation::startAcquisition(unsigned int camera) {
+bool QFExtensionCameraImplementation::startCameraAcquisition(unsigned int camera) {
     return false;
 }
 
-void QFExtensionCameraImplementation::cancelAcquisition(unsigned int camera) {
+void QFExtensionCameraImplementation::cancelCameraAcquisition(unsigned int camera) {
 
 }
 
-bool QFExtensionCameraImplementation::isAcquisitionRunning(unsigned int camera, double* percentageDone) {
+bool QFExtensionCameraImplementation::isCameraAcquisitionRunning(unsigned int camera, double* percentageDone) {
     return false;
 }
 
-void QFExtensionCameraImplementation::getAcquisitionDescription(unsigned int camera, QStringList* files, QMap<QString, QVariant>* parameters) {
+void QFExtensionCameraImplementation::getCameraAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::CameraAcquititonFileDescription>* files, QMap<QString, QVariant>* parameters) {
 }
 
-bool QFExtensionCameraImplementation::getAcquisitionPreview(unsigned int camera, uint32_t* data) {
+bool QFExtensionCameraImplementation::getCameraAcquisitionPreview(unsigned int camera, uint32_t* data) {
     return false;
 }
 
-int QFExtensionCameraImplementation::getAcquisitionProgress(unsigned int camera) {
+int QFExtensionCameraImplementation::getCameraAcquisitionProgress(unsigned int camera) {
     return 0; // return a number between 0 and 100 which indicates the progress of a currently running acquisition
 }
 
@@ -201,6 +201,10 @@ void QFExtensionCameraImplementation::changeCameraSetting(QSettings& settings, Q
 }
 
 QVariant QFExtensionCameraImplementation::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const  { 
+	return QVariant(); 
+} 
+
+QVariant QFExtensionCameraImplementation::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which) const  { 
 	return QVariant(); 
 } 
 

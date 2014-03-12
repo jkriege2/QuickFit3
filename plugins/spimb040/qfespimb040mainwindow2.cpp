@@ -320,7 +320,7 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
         QSettings settings(previewSettingsFilename, QSettings::IniFormat);
         ecamera->useCameraSettings(camera, settings);
         width=ecamera->getCameraImageWidth(camera);
-        height=ecamera->getImageCameraHeight(camera);
+        height=ecamera->getCameraImageHeight(camera);
         buffer=(uint32_t*)calloc(width*height, sizeof(uint32_t));
         if (!buffer) {
             ok=false;
@@ -557,7 +557,7 @@ QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension*
     settings.setValue("acquisition/sensor_model", ecamera->getCameraSensorName(camera));
     settings.setValue("acquisition/exposure", ecamera->getCameraExposureTime(camera));
     settings.setValue("acquisition/image_width", ecamera->getCameraImageWidth(camera));
-    settings.setValue("acquisition/image_height", ecamera->getImageCameraHeight(camera));
+    settings.setValue("acquisition/image_height", ecamera->getCameraImageHeight(camera));
     settings.setValue("acquisition/magnification", magnification);
     // OPTICS SETUP
     QMap<QString, QVariant> setup=optSetup->getSetup(use_cam);
@@ -725,7 +725,7 @@ bool QFESPIMB040MainWindow2::prepareCamera(int num, int camera, QFExtensionCamer
     QSettings settings(acquisitionSettingsFilename, QSettings::IniFormat);
     ecamera->useCameraSettings(camera, settings);
     width=ecamera->getCameraImageWidth(camera);
-    height=ecamera->getImageCameraHeight(camera);
+    height=ecamera->getCameraImageHeight(camera);
     *buffer=(uint32_t*)calloc(width*height, sizeof(uint32_t));
     if (!(*buffer)) {
         SPIMACQUISITION_ERROR(tr("could not allocate image buffer for camera 1!\n"), acquisitionTitle);
@@ -795,7 +795,7 @@ bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathF
     if (ok) {
         log_text(tr("  - acquired %1!\n").arg(imageDescription));
         acquisitionDescription1[imageID+"/image_width"]=ecamera1->getCameraImageWidth(camera1);
-        acquisitionDescription1[imageID+"/image_height"]=ecamera1->getImageCameraHeight(camera1);
+        acquisitionDescription1[imageID+"/image_height"]=ecamera1->getCameraImageHeight(camera1);
         acquisitionDescription1[imageID+"/exposure_time"]=ecamera1->getCameraExposureTime(camera1);
         optSetup->saveLightpathConfig(acquisitionDescription1, lightpathName, imageID+"/lightpath/", QList<bool>(), true);
         acquisitionDescription1[imageID+"/dualview_mode"]=optSetup->dualViewMode(ecamera1, camera1);
@@ -1039,7 +1039,7 @@ void QFESPIMB040MainWindow2::getAdditionalCameraSettings(QFExtensionCamera *ecam
     acquisitionDescription[prefix+"/camera_model"]=ecamera->getCameraName(camera);
     acquisitionDescription[prefix+"/sensor_model"]=ecamera->getCameraSensorName(camera);
     acquisitionDescription[prefix+"/image_width"]=ecamera->getCameraImageWidth(camera);
-    acquisitionDescription[prefix+"/image_height"]=ecamera->getImageCameraHeight(camera);
+    acquisitionDescription[prefix+"/image_height"]=ecamera->getCameraImageHeight(camera);
     acquisitionDescription[prefix+"/dualview_mode"]=optSetup->dualViewMode(ecamera, camera);
     optSetup->saveLightpathConfig(acquisitionDescription, "", prefix+"/lightpath/", QList<bool>(), true);
     QMap<QString, QVariant> setup=optSetup->getSetup(optSetup->camNumFromExtension(ecamera, camera));

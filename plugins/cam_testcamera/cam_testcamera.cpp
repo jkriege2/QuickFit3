@@ -229,7 +229,7 @@ int QFECamTestCamera::getCameraImageWidth(unsigned int camera) {
     return width[camera];
 }
 
-int QFECamTestCamera::getImageCameraHeight(unsigned int camera) {
+int QFECamTestCamera::getCameraImageHeight(unsigned int camera) {
     return height[camera];
 }
 
@@ -272,35 +272,35 @@ bool QFECamTestCamera::acquireOnCamera(unsigned int camera, uint32_t* data, uint
     }
 
     if (testpattern[camera]==0) {
-        for (int y=0; y<getImageCameraHeight(camera); y++) {
+        for (int y=0; y<getCameraImageHeight(camera); y++) {
             for (int x=0; x<getCameraImageWidth(camera); x++) {
                 double r=(double)rand()/(double)RAND_MAX;
                 double xx=(double)((double)x-(double)getCameraImageWidth(camera)/2.0)/(double)getCameraImageWidth(camera);
-                double yy=(double)((double)y-(double)getImageCameraHeight(camera)/2.0)/(double)getImageCameraHeight(camera);
+                double yy=(double)((double)y-(double)getCameraImageHeight(camera)/2.0)/(double)getCameraImageHeight(camera);
                 data[y*getCameraImageWidth(camera)+x]=noise[camera]*r*200.0+abs(200.0*sin(sqrt(xx*xx+yy*yy)*20.0*M_PI+(double)counter[camera]/10.0*M_PI));
             }
         }
     } else if (testpattern[camera]==1) {
-        for (int y=0; y<getImageCameraHeight(camera); y++) {
+        for (int y=0; y<getCameraImageHeight(camera); y++) {
             for (int x=0; x<getCameraImageWidth(camera); x++) {
                 double r=(double)rand()/(double)RAND_MAX;
                 double xx=(double)((double)x-(double)getCameraImageWidth(camera)/2.0)/(double)getCameraImageWidth(camera);
-                double yy=(double)((double)y-(double)getImageCameraHeight(camera)/2.0)/(double)getImageCameraHeight(camera);
+                double yy=(double)((double)y-(double)getCameraImageHeight(camera)/2.0)/(double)getCameraImageHeight(camera);
                 data[y*getCameraImageWidth(camera)+x]=noise[camera]*r*200.0+abs(200.0*sin(sqrt(xx*xx+yy*yy)*2.0*M_PI)*sin((double)counter[camera]/10.0*M_PI));
             }
         }
     } else if (testpattern[camera]==2) {
-        for (int y=0; y<getImageCameraHeight(camera); y++) {
+        for (int y=0; y<getCameraImageHeight(camera); y++) {
             for (int x=0; x<getCameraImageWidth(camera); x++) {
                 double r=(double)rand()/(double)RAND_MAX;
                 double xx=(double)((double)x-(double)getCameraImageWidth(camera)/2.0)/(double)getCameraImageWidth(camera);
-                double yy=(double)((double)y-(double)getImageCameraHeight(camera)/2.0)/(double)getImageCameraHeight(camera);
+                double yy=(double)((double)y-(double)getCameraImageHeight(camera)/2.0)/(double)getCameraImageHeight(camera);
                 data[y*getCameraImageWidth(camera)+x]=noise[camera]*r*200.0+abs(200.0*sin(sqrt(xx*xx+yy*yy)*2.0*M_PI+(double)counter[camera]/10.0*M_PI));
             }
         }
     } else if (testpattern[camera]==3) {
         stepParticles(camera);
-        for (int y=0; y<getImageCameraHeight(camera); y++) {
+        for (int y=0; y<getCameraImageHeight(camera); y++) {
             for (int x=0; x<getCameraImageWidth(camera); x++) {
                 double v=particleBackground[camera];
                 for (int i=0; i<particleN[camera]; i++) {
@@ -313,7 +313,7 @@ bool QFECamTestCamera::acquireOnCamera(unsigned int camera, uint32_t* data, uint
         }
     } else if (testpattern[camera]==4) {
         stepParticles(camera);
-        for (int y=0; y<getImageCameraHeight(camera); y++) {
+        for (int y=0; y<getCameraImageHeight(camera); y++) {
             for (int x=0; x<getCameraImageWidth(camera); x++) {
                 double v=particleBackground[camera];
                 for (int i=0; i<particleN[camera]; i++) {
@@ -328,7 +328,7 @@ bool QFECamTestCamera::acquireOnCamera(unsigned int camera, uint32_t* data, uint
             }
         }
     } else {
-        for (int y=0; y<getImageCameraHeight(camera); y++) {
+        for (int y=0; y<getCameraImageHeight(camera); y++) {
             for (int x=0; x<getCameraImageWidth(camera); x++) {
                 bool back=true;
                 if ((x+5)%10<3) back=false;
@@ -341,7 +341,7 @@ bool QFECamTestCamera::acquireOnCamera(unsigned int camera, uint32_t* data, uint
     }
 
     if (dualviewBrightness[camera]!=1) {
-        for (int y=0; y<getImageCameraHeight(camera); y++) {
+        for (int y=0; y<getCameraImageHeight(camera); y++) {
             for (int x=getCameraImageWidth(camera)/2; x<getCameraImageWidth(camera); x++) {
                 data[y*getCameraImageWidth(camera)+x]*=dualviewBrightness[camera];
             }
@@ -484,7 +484,7 @@ void QFECamTestCamera::seriesStep1() {
     uint16 frame_bitspersample=8;
     uint16 frame_sampleformat = SAMPLEFORMAT_UINT;
     uint32 frame_width=getCameraImageWidth(camera);
-    uint32 frame_height=getImageCameraHeight(camera);
+    uint32 frame_height=getCameraImageHeight(camera);
     uint32 rowsperstrip = (uint32)-1;
 
     uint32* frame32 = (uint32*)calloc(frame_width*frame_height, sizeof(uint32));
@@ -566,7 +566,7 @@ void QFECamTestCamera::seriesStep2() {
     uint16 frame_bitspersample=8;
     uint16 frame_sampleformat = SAMPLEFORMAT_UINT;
     uint32 frame_width=getCameraImageWidth(camera);
-    uint32 frame_height=getImageCameraHeight(camera);
+    uint32 frame_height=getCameraImageHeight(camera);
     uint32 rowsperstrip = (uint32)-1;
 
     uint32* frame32 = (uint32*)calloc(frame_width*frame_height, sizeof(uint32));
@@ -663,7 +663,7 @@ QVariant QFECamTestCamera::getCameraSetting(QSettings& settings, QFExtensionCame
     return QVariant();
 }
 
-QVariant QFECamTestCamera::getCurrentCameraSetting(int camera, QFExtensionCamera::CameraSetting which) const
+QVariant QFECamTestCamera::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which) const
 {
     if (which==QFExtensionCamera::CamSetExposureTime) return 1;
     return QVariant();

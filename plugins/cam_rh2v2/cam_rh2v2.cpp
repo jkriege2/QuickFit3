@@ -463,7 +463,7 @@ int QFExtensionCameraRh2v2::getCameraImageWidth(unsigned int camera) {
   return cameraSetting[camera].yRes;
 }
 
-int QFExtensionCameraRh2v2::getImageCameraHeight(unsigned int camera) {
+int QFExtensionCameraRh2v2::getCameraImageHeight(unsigned int camera) {
   return cameraSetting[camera].xRes;
 }
 
@@ -662,7 +662,7 @@ void QFExtensionCameraRh2v2::getCameraAcquisitionDescription(unsigned int camera
 
     (*parameters)["sequence_length"]=cameraSetting[camera].raw.settings->value(we+"/config/duration", "").toInt();
     (*parameters)["image_width"]=getCameraImageWidth(camera);
-    (*parameters)["image_height"]=getImageCameraHeight(camera);
+    (*parameters)["image_height"]=getCameraImageHeight(camera);
     (*parameters)["pixel_width"]=getCameraPixelWidth(camera);
     (*parameters)["pixel_height"]=getCameraPixelHeight(camera);
     (*parameters)["frame_time"]=1e-5;
@@ -697,7 +697,7 @@ QVariant QFExtensionCameraRh2v2::getCameraSetting(QSettings& settings, QFExtensi
     return QVariant();
 }
 
-QVariant QFExtensionCameraRh2v2::getCurrentCameraSetting(int camera, QFExtensionCamera::CameraSetting which) const
+QVariant QFExtensionCameraRh2v2::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which) const
 {
     return QVariant();
 }

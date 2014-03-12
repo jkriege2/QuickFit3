@@ -1,0 +1,679 @@
+#include "qfecamserver.h"
+#include <QtGui>
+#include <QtPlugin>
+#include <iostream>
+
+
+#define LOG_PREFIX QString("cam_server >>> ").toUpper()
+#define CAMSERVER_ACTION_DURATION 1
+#define GLOBAL_CONFIGFILE "cam_server.ini"
+#define CONNECTION_DELAY_MS 200
+
+
+QFECamServer::QFECamServer(QObject* parent):
+    QObject(parent)
+{
+	logService=NULL;
+}
+
+QFECamServer::~QFECamServer() {
+
+}
+
+
+void QFECamServer::projectChanged(QFProject* oldProject, QFProject* project) {
+	/* usually cameras do not have to react to a change of the project in QuickFit .. so you don't need to do anything here
+	   But: possibly you could read config information from the project here
+	 */
+}
+
+void QFECamServer::initExtension() {
+    /* do initializations here but do not yet connect to the camera! */
+    QString ini=services->getGlobalConfigFileDirectory()+QString("/%1").arg(GLOBAL_CONFIGFILE);
+    if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+QString("/%1").arg(GLOBAL_CONFIGFILE);
+    if (!QFile::exists(ini)) ini=services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/%1").arg(GLOBAL_CONFIGFILE);
+    QSettings inifile(ini, QSettings::IniFormat);
+    int count=inifile.value("camera_count", 0).toUInt();
+    for (int i=0; i<count; i++) {
+        DEVICE_CONFIG s;
+        s.lastAction=QTime::currentTime();
+        s.host=inifile.value("camera"+QString::number(i+1)+"/host", "127.0.0.1").toString();
+        s.port=inifile.value("camera"+QString::number(i+1)+"/port", 512341).toInt();
+        s.camera_name=inifile.value("camera"+QString::number(i+1)+"/camera_name", QString("cam_server %1:%2").arg(s.host).arg(s.port)).toString();
+        s.sensor_name=inifile.value("camera"+QString::number(i+1)+"/sensor_name", QString("???")).toString();
+        s.answer_bits=inifile.value("camera"+QString::number(i+1)+"/answer_bits", 16).toInt();
+        s.timeout_connection=inifile.value("camera"+QString::number(i+1)+"/timeout_connection", 10000).toInt();
+        s.timeout_instruction=inifile.value("camera"+QString::number(i+1)+"/timeout_instruction", 5000).toInt();
+        s.pixel_width=inifile.value("camera"+QString::number(i+1)+"/pixel_width", 24).toDouble();
+        s.pixel_height=inifile.value("camera"+QString::number(i+1)+"/pixel_height", 24).toDouble();
+        s.exposure=1;
+
+        s.server=new QTcpSocket();
+        s.mutex=new QMutex(QMutex::Recursive);
+        sources.append(s);
+    }
+}
+
+
+void QFECamServer::deinit() {
+    /* add code for cleanup here */
+    QSettings inifile(services->getGlobalConfigFileDirectory()+QString("/%1").arg(GLOBAL_CONFIGFILE), QSettings::IniFormat);
+    if (inifile.isWritable()) {
+        inifile.setValue("camera_count", getCameraCount());
+        for (unsigned int i=0; i<sources.size(); i++) {
+            inifile.setValue("camera"+QString::number(i+1)+"/host", sources[i].host);
+            inifile.setValue("camera"+QString::number(i+1)+"/port", sources[i].port);
+            inifile.setValue("camera"+QString::number(i+1)+"/camera_name", sources[i].camera_name);
+            inifile.setValue("camera"+QString::number(i+1)+"/sensor_name", sources[i].sensor_name);
+            inifile.setValue("camera"+QString::number(i+1)+"/answer_bits", sources[i].answer_bits);
+            inifile.setValue("camera"+QString::number(i+1)+"/timeout_connection", sources[i].timeout_connection);
+            inifile.setValue("camera"+QString::number(i+1)+"/timeout_instruction", sources[i].timeout_instruction);
+            inifile.setValue("camera"+QString::number(i+1)+"/pixel_width", sources[i].pixel_width);
+            inifile.setValue("camera"+QString::number(i+1)+"/pixel_height", sources[i].pixel_height);
+        }
+    }
+}
+
+void QFECamServer::loadSettings(ProgramOptions* settingspo) {
+	/* here you could read config information from the quickfit.ini file using settings object */
+    if (!settingspo) return;
+	if (settingspo->getQSettings()==NULL) return;
+    QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
+	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
+	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+
+}
+
+void QFECamServer::storeSettings(ProgramOptions* settingspo) {
+	/* here you could write config information to the quickfit.ini file using settings object */
+    if (!settingspo) return;
+	if (settingspo->getQSettings()==NULL) return;
+    QSettings& settings=*(settingspo->getQSettings()); // the QSettings object for quickfit.ini
+
+	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
+	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
+
+	}
+
+unsigned int QFECamServer::getCameraCount() const {
+    return sources.size();
+	/* how man cameras may be accessed by your plugin (e.g. if you use one driver to access several cameras */
+}
+void QFECamServer::useCameraSettings(unsigned int camera, const QSettings& settings) {
+    /* set the camera settings to the values specified in settings parameter, called before acquire() */
+}
+
+
+
+void QFECamServer::showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent) {
+	/* open a dialog that configures the camera.
+
+	   usually you should display a modal QDialog descendent which writes back config when the user clicks OK
+
+	   alternatively you may also display a window which stays open and allows the suer to set settings also
+	   during the measurement.
+	*/
+
+
+	/////////////////////////////////////////////////////////////////////////////////
+	// if you want the settings dialog to be modal, you may uncomment the next lines
+	// and add implementations
+	/////////////////////////////////////////////////////////////////////////////////
+    /*
+	QDialog* dlg=new QDialog(parent);
+
+    QVBoxLayout* lay=new QVBoxLayout(dlg);
+    dlg->setLayout(lay);
+
+    QFormLayout* formlayout=new QFormLayout(dlg);
+
+
+    //  create your widgets here, do not to initialize them with the current settings
+    // QWidget* widget=new QWidget(dlg);
+    // lay->addRow(tr("Name"), widget);
+    // lay->setValue(settings.value(QString("device/name%1").arg(camera), devfaultValue ).toInt());
+
+
+    lay->addLayout(formlayout);
+
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dlg);
+    lay->addWidget(buttonBox);
+
+    connect(buttonBox, SIGNAL(accepted()), dlg, SLOT(accept()));
+    connect(buttonBox, SIGNAL(rejected()), dlg, SLOT(reject()));
+
+    if ( dlg->exec()==QDialog::Accepted ) {
+         //  read back values entered into the widgets and store in settings
+         // settings.setValue(QString("device/name%1").arg(camera), widget->value() );
+    }
+    delete dlg;
+	*/
+}
+
+
+
+bool QFECamServer::connectCameraDevice(unsigned int camera) {
+    if (camera<0 || camera>=getCameraCount()) return false;
+    QTcpSocket* server=sources[camera].server;
+    if (!server) return false;
+
+    QMutex* mutex=sources[camera].mutex;
+    QMutexLocker locker(mutex);
+
+    if (!server->isOpen() ) {
+        log_text(tr("connecting to camera server '%1', port: %2..\n").arg(sources[camera].host).arg(sources[camera].port));
+        server->connectToHost(sources[camera].host, sources[camera].port);
+        if (server->waitForConnected(sources[camera].timeout_connection)) {
+            log_text(tr("TCP/IP connection established!\n"));
+            sources[camera].connected_timer.start();
+            sources[camera].acquiring=false;
+            bool ok=true;
+            QString lastOp=tr("CONNECT TO SENSOR");
+            log_text(tr("connecting to camera!\n"));
+            sendCommand(sources[camera], "CONNECT\n");
+            lastOp=tr("CONNECT TO SENSOR: WAIT ACK");
+            ok=waitForString(sources[camera], "DONE_CONNECT\n");
+            if (ok) {
+                lastOp=tr("START LIVE-VIEW");
+                log_text(tr("starting live-view mode!\n"));
+                sendCommand(sources[camera], "LIVE_START\n");
+                lastOp=tr("START LIVE-VIEW: WAIT ACK");
+                ok=waitForString(sources[camera], "DONE_LIVE_START\n");
+            }
+            if (ok) {
+                log_text(tr("   peer name:     %1\n").arg(server->peerName()));
+                log_text(tr("   peer adress:   %1\n").arg(server->peerAddress().toString()));
+                log_text(tr("   peer port:     %1\n").arg(server->peerPort()));
+                log_text(tr("   local adress:  %1\n").arg(server->localAddress().toString()));
+                log_text(tr("   local port:    %1\n").arg(server->localPort()));
+                log_text(tr("   camera name:   %1\n").arg(getCameraName(camera)));
+                log_text(tr("   sensor name:   %1\n").arg(getCameraSensorName(camera)));
+                log_text(tr("   frame size:    %1 x %2\n").arg(getCameraImageWidth(camera)).arg(getCameraImageHeight(camera)));
+                log_text(tr("   exposure time: %1 ms\n").arg(getCameraExposureTime(camera)*1000.0));
+                log_text(tr("   pixel size:    %1 x %2 micrometer^2\n\n").arg(getCameraPixelWidth(camera)).arg(getCameraPixelHeight(camera)));
+            }
+            if (!ok) {
+                log_error(tr("error connecting (timeout: %3s) during operation %4:\n%1     error description: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_connection)/1000.0).arg(lastOp));
+                server->close();
+            }
+            return ok;
+        } else {
+            log_error(tr("error connecting (timeout: %3s):\n%1     error description: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_connection)/1000.0));
+            server->close();
+            return false;
+        }
+    } else {
+        return true;
+    }
+    return false;
+}
+
+void QFECamServer::disconnectCameraDevice(unsigned int camera) {
+    if (camera<0 || camera>=getCameraCount()) return ;
+    QTcpSocket* server=sources[camera].server;
+    if (!server) return ;
+
+    QMutex* mutex=sources[camera].mutex;
+    QMutexLocker locker(mutex);
+
+    if (server->isOpen() ) {
+        QString lastOp=tr("STOP LIVE-VIEW");
+        log_text(tr("stopping live-view mode!\n"));
+        sendCommand(sources[camera], "LIVE_STOP\n");
+        waitForString(sources[camera], "DONE_LIVE_STOP\n");
+        lastOp=tr("DISCONNECT FROM SENSOR");
+        log_text(tr("disconnecting from camera!\n"));
+        sendCommand(sources[camera], "DISCONNECT\n");
+        waitForString(sources[camera], "DONE_DISCONNECT\n");
+        log_text(tr("disconnecting from camera server '%2', port: %3..\n").arg(sources[camera].host).arg(sources[camera].port));
+        server->disconnectFromHost();
+        server->close();
+        log_text(tr("connection closed!\n"));
+    }
+}
+
+bool QFECamServer::isCameraConnected(unsigned int camera) {
+    if (camera<0 || camera>=getCameraCount()) return false;
+    QTcpSocket* server=sources[camera].server;
+    if (!server) return false;
+
+    QMutex* mutex=sources[camera].mutex;
+    QMutexLocker locker(mutex);
+
+    return server->isOpen();
+}
+
+bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant> *parameters) {
+    if (timestamp!=NULL) {
+        *timestamp=sources[camera].connected_timer.elapsed();
+    }
+
+    if (camera<0 || camera>=getCameraCount()) return 0;
+    QTcpSocket* server=sources[camera].server;
+    if (!server) return 0;
+
+    QMutex* mutex=sources[camera].mutex;
+    QMutexLocker locker(mutex);
+
+    bool ok=false;
+
+    int oldW=sources[camera].width;
+    int oldH=sources[camera].height;
+    int newW=oldW;
+    int newH=oldH;
+    double expos=sources[camera].exposure;
+
+    if (server->isOpen()) {
+        //flushBuffers(sources[camera], true);
+        ok=sendCommand(sources[camera], "IMAGE_NEXT_GET\n");
+        if (ok) {
+            QByteArray answer=readString(sources[camera], "\n", &ok, true);
+            //qDebug()<<"AW: "<<answer<<answer.startsWith("IMAGE");
+            if (answer.startsWith("IMAGE")) {
+                QByteArray answer1=readString(sources[camera], "\n", &ok, true);
+                //qDebug()<<"AW1: "<<answer1<<ok;
+                QByteArray answer2=readString(sources[camera], "\n", &ok, true);
+                //qDebug()<<"AW2: "<<answer2<<ok;
+                QByteArray answer3=readString(sources[camera], "\n", &ok, true);
+                //qDebug()<<"AW3: "<<answer3<<ok;
+                if (ok) {
+                    newW=answer1.toInt(&ok);
+                    if (ok) newH=answer2.toInt(&ok);
+                    if (ok) expos=answer3.toDouble(&ok);
+                    //qDebug()<<"CONV:  "<<ok<<newW<<newH<<expos;
+                    if (ok) {
+                        sources[camera].width=newW;
+                        sources[camera].height=newH;
+                        sources[camera].exposure=expos;
+                        memset(data, 0, oldW*oldH*sizeof(uint32_t));
+                        if (sources[camera].answer_bits==8) {
+                            QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint8_t), &ok);
+                            //qDebug()<<"READ_8BIT:  "<<ok;
+                            if (ok) {
+                                const uint8_t* d=(const uint8_t*)temp.constData();
+                                for (int i=0; i<qMin(oldW*oldH, newW*newH); i++) {
+                                    data[i]=d[i];
+                                }
+                            }
+                        } else if (sources[camera].answer_bits==16) {
+                            QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint16_t), &ok);
+                            //qDebug()<<"READ_16BIT:  "<<ok;
+                            if (ok) {
+                                const uint16_t* d=(const uint16_t*)temp.constData();
+                                for (int i=0; i<qMin(oldW*oldH, newW*newH); i++) {
+                                    data[i]=d[i];
+                                }
+                            }
+                        } else if (sources[camera].answer_bits==32) {
+                            QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint32_t), &ok);
+                            //qDebug()<<"READ_16BIT:  "<<ok;
+                            if (ok) {
+                                const uint32_t* d=(const uint32_t*)temp.constData();
+                                for (int i=0; i<qMin(oldW*oldH, newW*newH); i++) {
+                                    data[i]=d[i];
+                                }
+                            }
+                        } else if (sources[camera].answer_bits==64) {
+                            QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint64_t), &ok);
+                            //qDebug()<<"READ_16BIT:  "<<ok;
+                            if (ok) {
+                                const uint64_t* d=(const uint64_t*)temp.constData();
+                                for (int i=0; i<qMin(oldW*oldH, newW*newH); i++) {
+                                    data[i]=d[i];
+                                }
+                            }
+                        }
+                        waitForString(sources[camera], "\n\n");
+                        //server->flush();
+                        return true;
+                    } else {
+                        log_error(tr("error reading frame (timeout: %3s):\n%1     error description: COULD NOT REEAD COMPLETE RESULT RECORD FROM HOST!\n%1     last error string: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0));
+                    }
+                } else {
+                    log_error(tr("error reading frame (timeout: %3s):\n%1     error description: COULD NOT REEAD COMPLETE RESULT RECORD FROM HOST!\n%1     last error string: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0));
+                }
+            } else {
+                log_error(tr("error reading frame (timeout: %3s):\n%1     error description: DID NOT GET \"IMAGE\" RECORD FROM HOST!\n%1     last error string: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0));
+            }
+        } else {
+            log_error(tr("error reading frame (timeout: %3s):\n%1     error description: COULD NOT SEND COMMAND!\n%1     last error string: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0));
+        }
+    } else {
+        log_error(tr("error reading frame (timeout: %3s):\n%1     error description: NOT CONNECTED!\n\n").arg(LOG_PREFIX));
+    }
+
+    return false;
+}
+
+int QFECamServer::getCameraImageWidth(unsigned int camera) {
+    if (camera<0 || camera>=getCameraCount()) return 0;
+    QTcpSocket* server=sources[camera].server;
+    if (!server) return 0;
+
+    QMutex* mutex=sources[camera].mutex;
+    QMutexLocker locker(mutex);
+
+    bool ok=false;
+    int val=sources[camera].width;
+    QList<QByteArray> bal=queryData(sources[camera], "SIZE_X_GET\n", 1, "\n", &ok, true);
+    if (ok && bal.size()>0) {
+        ok=false;
+        val=bal.first().toInt(&ok);
+        if (val>=0) sources[camera].width=val;
+    }
+
+
+    return sources[camera].width;
+}
+
+int QFECamServer::getCameraImageHeight(unsigned int camera) {
+    if (camera<0 || camera>=getCameraCount()) return 0;
+    QTcpSocket* server=sources[camera].server;
+    if (!server) return 0;
+
+    QMutex* mutex=sources[camera].mutex;
+    QMutexLocker locker(mutex);
+
+    bool ok=false;
+    int val=sources[camera].height;
+    QList<QByteArray> bal=queryData(sources[camera], "SIZE_Y_GET\n", 1, "\n", &ok, true);
+    if (ok && bal.size()>0) {
+        ok=false;
+        val=bal.first().toInt(&ok);
+        if (val>=0) sources[camera].height=val;
+    }
+
+
+    return sources[camera].height;
+}
+
+double QFECamServer::getCameraPixelWidth(unsigned int camera) {
+    if (camera<0 || camera>=getCameraCount()) return 0;
+
+    return sources[camera].pixel_width;
+}
+
+double QFECamServer::getCameraPixelHeight(unsigned int camera) {
+    if (camera<0 || camera>=getCameraCount()) return 0;
+
+    return sources[camera].pixel_height;
+}
+
+
+ QString QFECamServer::getCameraName(unsigned int camera) {
+    if (camera<0 || camera>=getCameraCount()) return "";
+
+    return sources[camera].camera_name;
+}
+
+ QString QFECamServer::getCameraSensorName(unsigned int camera) {
+    if (camera<0 || camera>=getCameraCount()) return "";
+
+    return sources[camera].sensor_name;
+}
+
+double QFECamServer::getCameraExposureTime(unsigned int camera) {
+    if (camera<0 || camera>=getCameraCount()) return 0;
+    /*QTcpSocket* server=sources[camera].server;
+    if (!server) return 0;
+
+    QMutex* mutex=sources[camera].mutex;
+    QMutexLocker locker(mutex);
+
+    bool ok=false;
+    double val=sources[camera].exposure;
+    QList<QByteArray> bal=queryData(sources[camera], "GET_EXPOSURE", 1, "\n", &ok, true);
+    if (ok && bal.size()>0) {
+        ok=false;
+        val=bal.first().toDouble(&ok);
+        if (val>=0) sources[camera].exposure=val;
+    }*/
+
+
+    return sources[camera].exposure;
+}
+
+
+bool QFECamServer::prepareCameraAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
+    if (camera<0 || camera>=getCameraCount()) return 0;
+    sources[camera].last_filenameprefix=filenamePrefix.toLocal8Bit();
+    return true;
+}
+
+bool QFECamServer::startCameraAcquisition(unsigned int camera) {
+    //RECORD\n<filename>\n
+    if (camera<0 || camera>=getCameraCount()) return false;
+    QTcpSocket* server=sources[camera].server;
+    if (!server) return false;
+
+    QMutex* mutex=sources[camera].mutex;
+    QMutexLocker locker(mutex);
+
+    if (sendCommand(sources[camera], QByteArray("RECORD\n"+sources[camera].last_filenameprefix+"\n"))) {
+        if (waitForString(sources[camera], "ACK_RECORD\n" )) {
+            sources[camera].acquiring=true;
+            return true;
+        } else {
+            log_error(tr("error starting acquisiton (timeout: %3s):\n%1     error description: DID NOT GET ACK_RECCORD FROM HOST!\n%1     last error string: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0));
+        }
+    } else {
+        log_error(tr("error starting acquisiton (timeout: %3s):\n%1     error description: COULD NOT SEND RECORD COMMAND TO HOST!\n%1     last error string: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0));
+    }
+
+    return false;
+}
+
+void QFECamServer::cancelCameraAcquisition(unsigned int camera) {
+
+}
+
+bool QFECamServer::isCameraAcquisitionRunning(unsigned int camera, double* percentageDone) {
+    if (camera<0 || camera>=getCameraCount()) return false;
+    QTcpSocket* server=sources[camera].server;
+    if (!server) return false;
+
+    QMutex* mutex=sources[camera].mutex;
+    QMutexLocker locker(mutex);
+
+    if (sources[camera].acquiring) {
+        if (server->bytesAvailable()) {
+            bool ok=true;
+            QByteArray answer=readString(sources[camera], "\n\n", &ok);
+            if (ok && answer.contains("DONE_RECORD")) {
+                sources[camera].acquiring=false;
+            }
+        }
+    }
+    return sources[camera].acquiring;
+}
+
+void QFECamServer::getCameraAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::CameraAcquititonFileDescription> *files, QMap<QString, QVariant> *parameters)
+{
+
+}
+
+
+bool QFECamServer::getCameraAcquisitionPreview(unsigned int camera, uint32_t* data) {
+    return false;
+}
+
+int QFECamServer::getCameraAcquisitionProgress(unsigned int camera) {
+    return 0; // return a number between 0 and 100 which indicates the progress of a currently running acquisition
+}
+
+bool QFECamServer::isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const  { 
+	return false; 
+}
+
+void QFECamServer::changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which, QVariant value)  {  
+
+}
+
+QVariant QFECamServer::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const  {
+    return QVariant();
+}
+
+QVariant QFECamServer::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which) const
+{
+    return QVariant();
+}
+
+void QFECamServer::log_text(QString message) {
+	if (logService) logService->log_text(LOG_PREFIX+message);
+	else if (services) services->log_text(LOG_PREFIX+message);
+}
+
+void QFECamServer::log_warning(QString message) {
+	if (logService) logService->log_warning(LOG_PREFIX+message);
+	else if (services) services->log_warning(LOG_PREFIX+message);
+}
+
+void QFECamServer::log_error(QString message) {
+	if (logService) logService->log_error(LOG_PREFIX+message);
+    else if (services) services->log_error(LOG_PREFIX+message);
+}
+
+bool QFECamServer::flushBuffers(const  QFECamServer::DEVICE_CONFIG& device, bool read_all)
+{
+    if (device.server && device.server->isOpen()) {
+        if (read_all) device.server->readAll();
+        device.server->flush();
+    }
+    return false;
+
+}
+
+bool QFECamServer::sendCommand(const  QFECamServer::DEVICE_CONFIG& device, const QByteArray &command)
+{
+    if (device.server && device.server->isOpen()) {
+        device.server->write(command);
+        return true; //device.server->waitForBytesWritten(device.timeout_instruction);
+    }
+    return false;
+}
+
+QByteArray QFECamServer::readString(const  QFECamServer::DEVICE_CONFIG& device, const QByteArray &end_string, bool *ok_out, bool cleanResult)
+{
+    QByteArray res;
+    bool ok=false;
+    if (device.server && device.server->isOpen()) {
+        //res=device.server->readLine();
+        //ok=res.size()>0;
+        int i=0;
+        ok=true;
+        bool done=false;
+        QElapsedTimer timer;
+        timer.start();
+        while (!done && ok) {
+            ok=(device.server->bytesAvailable()>0) || device.server->waitForReadyRead(device.timeout_instruction);
+            char dat;
+            if (device.server->read(&dat, 1)==1){
+                res.append(dat);
+                done=res.endsWith(end_string);
+                if (done && cleanResult) {
+                    res=res.left(res.size()-end_string.size());
+                }
+                i++;
+            } else {
+                ok=false;
+            }
+            if (timer.elapsed()>device.timeout_instruction) {
+                ok=false;
+            }
+        }
+    }
+    if (ok_out) *ok_out=ok;
+    return res;
+
+}
+
+QByteArray QFECamServer::readData(const  QFECamServer::DEVICE_CONFIG& device, int bytes_to_read, bool *ok_out)
+{
+    QByteArray res;
+    bool ok=false;
+    if (device.server && device.server->isOpen()) {
+        //res=device.server->read(bytes_to_read);
+        //ok=res.size()==bytes_to_read;
+        int i=0;
+        ok=true;
+        QElapsedTimer timer;
+        timer.start();
+        while (i<bytes_to_read && ok) {
+            ok=(device.server->bytesAvailable()>0) || device.server->waitForReadyRead(device.timeout_instruction);
+            char dat;
+            if (device.server->read(&dat, 1)==1){
+                res.append(dat);
+                i++;
+            } else {
+                ok=false;
+            }
+            if (timer.elapsed()>device.timeout_instruction) {
+                ok=false;
+            }
+        }
+    }
+    if (ok_out) *ok_out=ok;
+    return res;
+
+}
+
+bool QFECamServer::waitForString(const QFECamServer::DEVICE_CONFIG &device, const QByteArray &end_string)
+{
+    bool ok=false;
+    if (device.server && device.server->isOpen()) {
+        //res=device.server->read(bytes_to_read);
+        //ok=res.size()==bytes_to_read;
+        int i=0;
+        ok=true;
+        bool done=false;
+        QByteArray res;
+        QElapsedTimer timer;
+        timer.start();
+        while (!done && ok) {
+            ok=(device.server->bytesAvailable()>0) || device.server->waitForReadyRead(device.timeout_instruction);
+            char dat;
+            if (device.server->read(&dat, 1)==1){
+                res.append(dat);
+                done=res.endsWith(end_string);
+                i++;
+            } else {
+                ok=false;
+            }
+            if (timer.elapsed()>device.timeout_instruction) {
+                ok=false;
+            }
+        }
+    }
+    return ok;
+}
+
+QList<QByteArray> QFECamServer::queryData(const  QFECamServer::DEVICE_CONFIG& device, const QByteArray &command, int line_to_read, const QByteArray &end_string, bool *ok_out, bool cleanResult)
+{
+    QList<QByteArray> res;
+    bool ok=false;
+    if (device.server && device.server->isOpen()) {
+        ok=true;
+        if (sendCommand(device, command)) {
+            int i=0;
+            QElapsedTimer timer;
+            timer.start();
+            while (i<line_to_read && ok) {
+                QByteArray r=readString(device, end_string, &ok, cleanResult);
+                if (ok) {
+                    res.append(r);
+                    i++;
+                }
+                if (timer.elapsed()>device.timeout_instruction) {
+                    ok=false;
+                }
+            }
+        } else {
+            ok=false;
+        }
+    }
+    if (ok_out) *ok_out=ok;
+    return res;
+}
+
+
+Q_EXPORT_PLUGIN2(cam_server, QFECamServer)

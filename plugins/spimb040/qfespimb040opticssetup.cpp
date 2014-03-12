@@ -446,34 +446,40 @@ QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam) const {
 
     setup["main_illumination/shutter"]=ui->shutterMainIllumination->getShutterState();
     setup["transmission_illumination/shutter"]=ui->shutterTransmission->getShutterState();
-    setup["transmission_illumination/lightsource_description"]=ui->lsTransmission->getLightSource()->getLightSourceDescription(ui->lsTransmission->getLightSourceID());
-    setup["transmission_illumination/short_name"]=ui->lsTransmission->getLightSource()->getLightSourceShortName(ui->lsTransmission->getLightSourceID());
-    for (int i=0; i<ui->lsTransmission->getLineCount(); i++) {
-        setup[QString("transmission_illumination/line%1/name").arg(i+1)]=ui->lsTransmission->getLineDescription(i);
-        setup[QString("transmission_illumination/line%1/enabled").arg(i+1)]=ui->lsTransmission->isLineEnabled(i);
-        setup[QString("transmission_illumination/line%1/set_power").arg(i+1)]=ui->lsTransmission->getSetPower(i);
-        setup[QString("transmission_illumination/line%1/measured_power").arg(i+1)]=ui->lsTransmission->getMeasuredPower(i);
-        setup[QString("transmission_illumination/line%1/unit").arg(i+1)]=ui->lsTransmission->getLineUnit(i);
+    if (ui->lsTransmission->getLightSource()) {
+        setup["transmission_illumination/lightsource_description"]=ui->lsTransmission->getLightSource()->getLightSourceDescription(ui->lsTransmission->getLightSourceID());
+        setup["transmission_illumination/short_name"]=ui->lsTransmission->getLightSource()->getLightSourceShortName(ui->lsTransmission->getLightSourceID());
+        for (int i=0; i<ui->lsTransmission->getLineCount(); i++) {
+            setup[QString("transmission_illumination/line%1/name").arg(i+1)]=ui->lsTransmission->getLineDescription(i);
+            setup[QString("transmission_illumination/line%1/enabled").arg(i+1)]=ui->lsTransmission->isLineEnabled(i);
+            setup[QString("transmission_illumination/line%1/set_power").arg(i+1)]=ui->lsTransmission->getSetPower(i);
+            setup[QString("transmission_illumination/line%1/measured_power").arg(i+1)]=ui->lsTransmission->getMeasuredPower(i);
+            setup[QString("transmission_illumination/line%1/unit").arg(i+1)]=ui->lsTransmission->getLineUnit(i);
+        }
     }
     setup["laser1/shutter"]=ui->shutterLaser1->getShutterState();
-    setup["laser1/lightsource_description"]=ui->lsLaser1->getLightSource()->getLightSourceDescription(ui->lsLaser1->getLightSourceID());
-    setup["laser1/short_name"]=ui->lsLaser1->getLightSource()->getLightSourceShortName(ui->lsLaser1->getLightSourceID());
-    for (int i=0; i<ui->lsLaser1->getLineCount(); i++) {
-        setup[QString("laser1/line%1/name").arg(i+1)]=ui->lsLaser1->getLineDescription(i);
-        setup[QString("laser1/line%1/enabled").arg(i+1)]=ui->lsLaser1->isLineEnabled(i);
-        setup[QString("laser1/line%1/set_power").arg(i+1)]=ui->lsLaser1->getSetPower(i);
-        setup[QString("laser1/line%1/measured_power").arg(i+1)]=ui->lsLaser1->getMeasuredPower(i);
-        setup[QString("laser1/line%1/unit").arg(i+1)]=ui->lsLaser1->getLineUnit(i);
+    if (ui->lsLaser1->getLightSource()) {
+        setup["laser1/lightsource_description"]=ui->lsLaser1->getLightSource()->getLightSourceDescription(ui->lsLaser1->getLightSourceID());
+        setup["laser1/short_name"]=ui->lsLaser1->getLightSource()->getLightSourceShortName(ui->lsLaser1->getLightSourceID());
+        for (int i=0; i<ui->lsLaser1->getLineCount(); i++) {
+            setup[QString("laser1/line%1/name").arg(i+1)]=ui->lsLaser1->getLineDescription(i);
+            setup[QString("laser1/line%1/enabled").arg(i+1)]=ui->lsLaser1->isLineEnabled(i);
+            setup[QString("laser1/line%1/set_power").arg(i+1)]=ui->lsLaser1->getSetPower(i);
+            setup[QString("laser1/line%1/measured_power").arg(i+1)]=ui->lsLaser1->getMeasuredPower(i);
+            setup[QString("laser1/line%1/unit").arg(i+1)]=ui->lsLaser1->getLineUnit(i);
+        }
     }
     setup["laser2/shutter"]=ui->shutterLaser2->getShutterState();
-    setup["laser2/lightsource_description"]=ui->lsLaser2->getLightSource()->getLightSourceDescription(ui->lsLaser2->getLightSourceID());
-    setup["laser2/short_name"]=ui->lsLaser2->getLightSource()->getLightSourceShortName(ui->lsLaser2->getLightSourceID());
-    for (int i=0; i<ui->lsLaser2->getLineCount(); i++) {
-        setup[QString("laser2/line%1/name").arg(i+1)]=ui->lsLaser2->getLineDescription(i);
-        setup[QString("laser2/line%1/enabled").arg(i+1)]=ui->lsLaser2->isLineEnabled(i);
-        setup[QString("laser2/line%1/set_power").arg(i+1)]=ui->lsLaser2->getSetPower(i);
-        setup[QString("laser2/line%1/measured_power").arg(i+1)]=ui->lsLaser2->getMeasuredPower(i);
-        setup[QString("laser2/line%1/unit").arg(i+1)]=ui->lsLaser2->getLineUnit(i);
+    if (ui->lsLaser2->getLightSource()) {
+        setup["laser2/lightsource_description"]=ui->lsLaser2->getLightSource()->getLightSourceDescription(ui->lsLaser2->getLightSourceID());
+        setup["laser2/short_name"]=ui->lsLaser2->getLightSource()->getLightSourceShortName(ui->lsLaser2->getLightSourceID());
+        for (int i=0; i<ui->lsLaser2->getLineCount(); i++) {
+            setup[QString("laser2/line%1/name").arg(i+1)]=ui->lsLaser2->getLineDescription(i);
+            setup[QString("laser2/line%1/enabled").arg(i+1)]=ui->lsLaser2->isLineEnabled(i);
+            setup[QString("laser2/line%1/set_power").arg(i+1)]=ui->lsLaser2->getSetPower(i);
+            setup[QString("laser2/line%1/measured_power").arg(i+1)]=ui->lsLaser2->getMeasuredPower(i);
+            setup[QString("laser2/line%1/unit").arg(i+1)]=ui->lsLaser2->getLineUnit(i);
+        }
     }
     if (ui->chkDetectionFilterWheel->isChecked()) setup["filterchangers/detection/filter"]=ui->filtcDetection->getFilterChangerState();
 
@@ -1328,12 +1334,18 @@ QFESPIMB040OpticsSetup::measuredValues QFESPIMB040OpticsSetup::getMeasuredValues
         m.data[QString("laser2/line%1/measured_power").arg(i+1)]=ui->lsLaser2->getMeasuredPower(i);
     }
 
-    m.data["stagex/position"]=ui->stageSetup->getXStage()->getPosition(ui->stageSetup->getXStageAxis());
-    m.data["stagex/velocity"]=ui->stageSetup->getXStage()->getSpeed(ui->stageSetup->getXStageAxis());
-    m.data["stagey/position"]=ui->stageSetup->getYStage()->getPosition(ui->stageSetup->getYStageAxis());
-    m.data["stagey/velocity"]=ui->stageSetup->getYStage()->getSpeed(ui->stageSetup->getYStageAxis());
-    m.data["stagez/position"]=ui->stageSetup->getZStage()->getPosition(ui->stageSetup->getZStageAxis());
-    m.data["stagez/velocity"]=ui->stageSetup->getZStage()->getSpeed(ui->stageSetup->getZStageAxis());
+    if (ui->stageSetup->getXStage()) {
+        m.data["stagex/position"]=ui->stageSetup->getXStage()->getPosition(ui->stageSetup->getXStageAxis());
+        m.data["stagex/velocity"]=ui->stageSetup->getXStage()->getSpeed(ui->stageSetup->getXStageAxis());
+    }
+    if (ui->stageSetup->getYStage()) {
+        m.data["stagey/position"]=ui->stageSetup->getYStage()->getPosition(ui->stageSetup->getYStageAxis());
+        m.data["stagey/velocity"]=ui->stageSetup->getYStage()->getSpeed(ui->stageSetup->getYStageAxis());
+    }
+    if (ui->stageSetup->getZStage()) {
+        m.data["stagez/position"]=ui->stageSetup->getZStage()->getPosition(ui->stageSetup->getZStageAxis());
+        m.data["stagez/velocity"]=ui->stageSetup->getZStage()->getSpeed(ui->stageSetup->getZStageAxis());
+    }
 
     ui->camConfig1->storeMeasurements(m.data, "camera1/");
     ui->camConfig2->storeMeasurements(m.data, "camera2/");

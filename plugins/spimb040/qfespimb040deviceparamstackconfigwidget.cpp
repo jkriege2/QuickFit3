@@ -586,7 +586,7 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                             ecamera1->useCameraSettings(camera1, settings);
                             log->log_text(tr("  - prepared camera 1!\n"));
                             width1=ecamera1->getCameraImageWidth(camera1);
-                            height1=ecamera1->getImageCameraHeight(camera1);
+                            height1=ecamera1->getCameraImageHeight(camera1);
                             buffer1=(uint32_t*)realloc(buffer1, width1*height1*sizeof(uint32_t));
                             if (!buffer1) {
                                 ok=false;
@@ -619,7 +619,7 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                             ecamera2->useCameraSettings(camera2, settings);
                             log->log_text(tr("  - prepared camera 2!\n"));
                             width2=ecamera2->getCameraImageWidth(camera2);
-                            height2=ecamera2->getImageCameraHeight(camera2);
+                            height2=ecamera2->getCameraImageHeight(camera2);
                             buffer2=(uint32_t*)realloc(buffer2, width2*height2*sizeof(uint32_t));
                             if (!buffer2) {
                                 ok=false;

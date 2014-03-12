@@ -104,7 +104,7 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         /** \copydoc QFExtensionCamera::getImageWidth() */
         virtual int getCameraImageWidth(unsigned int camera);
         /** \copydoc QFExtensionCamera::getImageHeight() */
-        virtual int getImageCameraHeight(unsigned int camera);
+        virtual int getCameraImageHeight(unsigned int camera);
 				/** \copydoc QFExtensionCamera::getCameraNme() */
 				virtual QString getCameraName(unsigned int camera);
         /** \copydoc QFExtensionCamera::getCameraSensorName() */
@@ -150,7 +150,7 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
         /** \copydoc QFExtensionCamera::getCameraSetting() */
         virtual QVariant getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const;
         /** \copydoc QFExtensionCamera::getCurrentCameraSetting() */
-        virtual QVariant getCurrentCameraSetting(int camera, CameraSetting which) const;
+        virtual QVariant getCameraCurrentSetting(int camera, CameraSetting which) const;
 
         /** \brief log project text message
          *  \param message the message to log

@@ -1726,7 +1726,7 @@ void QFESPIMB040CameraView::saveMultiSeries()
     QFExtensionCamera* camExt=opticsSetup->cameraComboBox(cameraID)->currentExtensionCamera();
     int camID=opticsSetup->cameraComboBox(cameraID)->currentCameraID();
     int w=camExt->getCameraImageWidth(camID);
-    int h=camExt->getImageCameraHeight(camID);
+    int h=camExt->getCameraImageHeight(camID);
     int frames=spinSaveSeriesFrames->value();
     QFESPIMB040AcquisitionTools* acqTools=opticsSetup->getAcquisitionTools();
     rawImage.resize(w, h);

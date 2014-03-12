@@ -68,7 +68,7 @@ class QFExtensionCamera {
          /** \brief return the width of images */
          virtual int getCameraImageWidth(unsigned int camera)=0;
          /** \brief return the height of images */
-         virtual int getImageCameraHeight(unsigned int camera)=0;
+         virtual int getCameraImageHeight(unsigned int camera)=0;
          /** \brief return width of a sensor pixel in microns */
          virtual double getCameraPixelWidth(unsigned int camera)=0;
          /** \brief return hieght of a sensor pixel in microns */
@@ -218,7 +218,7 @@ class QFExtensionCamera {
          /** \brief extract the given CameraSetting from the given QSettings object */
          virtual QVariant getCameraSetting(QSettings& settings, CameraSetting which) const =0;
          /** \brief extract the given CameraSetting from the given camera */
-         virtual QVariant getCurrentCameraSetting(int camera, CameraSetting which) const =0;
+         virtual QVariant getCameraCurrentSetting(int camera, CameraSetting which) const =0;
 
 
 };

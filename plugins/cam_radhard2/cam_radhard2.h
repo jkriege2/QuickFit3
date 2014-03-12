@@ -100,7 +100,7 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
         /** \copydoc QFExtensionCamera::getImageWidth() */
         virtual int getCameraImageWidth(unsigned int camera);
         /** \copydoc QFExtensionCamera::getImageHeight() */
-        virtual int getImageCameraHeight(unsigned int camera);
+        virtual int getCameraImageHeight(unsigned int camera);
         /** \copydoc QFExtensionCamera::isConnected() */
         virtual bool isCameraConnected(unsigned int camera);
         /** \copydoc QFExtensionCamera::acquire() */
@@ -145,7 +145,7 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
         /** \copydoc QFExtensionCamera::getCameraSetting() */
         virtual QVariant getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const;
         /** \copydoc QFExtensionCamera::getCurrentCameraSetting() */
-        virtual QVariant getCurrentCameraSetting(int camera, CameraSetting which) const;
+        virtual QVariant getCameraCurrentSetting(int camera, CameraSetting which) const;
 
         /** \brief log project text message
          *  \param message the message to log

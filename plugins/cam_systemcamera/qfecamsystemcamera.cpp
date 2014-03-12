@@ -225,7 +225,7 @@ int QFECamSystemcamera::getCameraImageWidth(unsigned int camera) {
     return 0;
 }
 
-int QFECamSystemcamera::getImageCameraHeight(unsigned int camera) {
+int QFECamSystemcamera::getCameraImageHeight(unsigned int camera) {
     VideoCapture* vid=vids.value(camera, NULL);
     if (vid) return vid->getVideoHeight();
     return 0;
@@ -261,13 +261,13 @@ bool QFECamSystemcamera::acquireOnCamera(unsigned int camera, uint32_t* data, ui
         *timestamp=(uint64_t)round(timer[camera].elapsed());;
     }
 
-    uint8_t* img=(uint8_t*)calloc(getCameraImageWidth(camera)*getImageCameraHeight(camera)*3, sizeof(uint8_t));
+    uint8_t* img=(uint8_t*)calloc(getCameraImageWidth(camera)*getCameraImageHeight(camera)*3, sizeof(uint8_t));
     int retry=0;
     bool ok=false;
     while (retry<40 && !ok) {
         vids[camera]->captureFrame(img);
         int w=getCameraImageWidth(camera);
-        int h=getImageCameraHeight(camera);
+        int h=getCameraImageHeight(camera);
         RGBToGray(img, data, w, h, toGrayMethod);
         ok=true;
         bool allZero=true;
@@ -341,7 +341,7 @@ QVariant QFECamSystemcamera::getCameraSetting(QSettings& settings, QFExtensionCa
     return QVariant();
 }
 
-QVariant QFECamSystemcamera::getCurrentCameraSetting(int camera, QFExtensionCamera::CameraSetting which) const
+QVariant QFECamSystemcamera::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which) const
 {
     return QVariant();
 }

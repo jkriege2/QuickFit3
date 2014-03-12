@@ -206,7 +206,7 @@ int QFExtensionCameraRadhard2::getCameraImageWidth(unsigned int camera) {
     return 32;
 }
 
-int QFExtensionCameraRadhard2::getImageCameraHeight(unsigned int camera) {
+int QFExtensionCameraRadhard2::getCameraImageHeight(unsigned int camera) {
     return 32;
 }
 
@@ -243,7 +243,7 @@ bool QFExtensionCameraRadhard2::acquireOnCamera(unsigned int camera, uint32_t* d
     radhard2->ReadImage(data);
 
     if (subtractOne) {
-        register int imagesize=getCameraImageWidth(camera)*getImageCameraHeight(camera);
+        register int imagesize=getCameraImageWidth(camera)*getCameraImageHeight(camera);
         for(register int j=0; j<imagesize; j++) {
             data[j] =  data[j]-1;
         }
@@ -397,7 +397,7 @@ QVariant QFExtensionCameraRadhard2::getCameraSetting(QSettings& settings, QFExte
     return QVariant();
 }
 
-QVariant QFExtensionCameraRadhard2::getCurrentCameraSetting(int camera, QFExtensionCamera::CameraSetting which) const
+QVariant QFExtensionCameraRadhard2::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which) const
 {
     return QVariant();
 }

@@ -823,10 +823,12 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             //////////////////////////////////////////////////////////////////////////////////////
             // switch off light
             //////////////////////////////////////////////////////////////////////////////////////
-            log->log_text(tr("  - switch main shutter off!\n"));
-            ok=ok&opticsSetup->setMainIlluminationShutter(false, true);
-            if (!ok) {
-                ACQUISITION_ERROR(tr("  - could not switch main shutter off!\n"));
+            if (opticsSetup->isMainIlluminationShutterAvailable()) {
+                log->log_text(tr("  - switch main shutter off!\n"));
+                ok=ok&opticsSetup->setMainIlluminationShutter(false, true);
+                if (!ok) {
+                    ACQUISITION_ERROR(tr("  - could not switch main shutter off!\n"));
+                }
             }
             //////////////////////////////////////////////////////////////////////////////////////
             // acquire background series

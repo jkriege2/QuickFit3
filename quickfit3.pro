@@ -181,6 +181,10 @@ plg_qfe_dataexportbasics.depends = lib libqf3widgets
     plg_cam_testcamera.subdir=./plugins/cam_testcamera
     plg_cam_testcamera.depends = lib libqf3widgets
 
+    SUBDIRS += plg_cam_server
+    plg_cam_server.subdir=./plugins/cam_server
+    plg_cam_server.depends = lib libqf3widgets
+
     !contains(QF3CONFIG, bits64) {
         SUBDIRS += plg_cam_systemcamera
         plg_cam_systemcamera.subdir=./plugins/cam_systemcamera

@@ -442,7 +442,7 @@ bool QFESPIMB040SimpleCameraConfig::acquireSingle() {
         int usedcam=viewData.usedCamera;
         if (viewData.camera->isCameraConnected(usedcam)) {
             int dw=viewData.camera->getCameraImageWidth(usedcam);
-            int dh=viewData.camera->getImageCameraHeight(usedcam);
+            int dh=viewData.camera->getCameraImageHeight(usedcam);
             uint64_t timestamp=0;
             viewData.rawImage.resize(dw, dh);
             QMap<QString, QVariant> parameters;
