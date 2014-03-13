@@ -170,15 +170,15 @@ bool QFECamServer::connectCameraDevice(unsigned int camera) {
             bool ok=true;
             QString lastOp=tr("CONNECT TO SENSOR");
             log_text(tr("connecting to camera!\n"));
-            sendCommand(sources[camera], "CONNECT\n");
+            sendCommand(sources[camera], "CONNECT\n\n");
             lastOp=tr("CONNECT TO SENSOR: WAIT ACK");
-            ok=waitForString(sources[camera], "DONE_CONNECT\n");
+            ok=waitForString(sources[camera], "ACK_CONNECT\n\n");
             if (ok) {
                 lastOp=tr("START LIVE-VIEW");
                 log_text(tr("starting live-view mode!\n"));
-                sendCommand(sources[camera], "LIVE_START\n");
+                sendCommand(sources[camera], "LIVE_START\n\n");
                 lastOp=tr("START LIVE-VIEW: WAIT ACK");
-                ok=waitForString(sources[camera], "DONE_LIVE_START\n");
+                ok=waitForString(sources[camera], "ACK_LIVE_START\n\n");
             }
             if (ok) {
                 log_text(tr("   peer name:     %1\n").arg(server->peerName()));
@@ -219,12 +219,12 @@ void QFECamServer::disconnectCameraDevice(unsigned int camera) {
     if (server->isOpen() ) {
         QString lastOp=tr("STOP LIVE-VIEW");
         log_text(tr("stopping live-view mode!\n"));
-        sendCommand(sources[camera], "LIVE_STOP\n");
-        waitForString(sources[camera], "DONE_LIVE_STOP\n");
+        sendCommand(sources[camera], "LIVE_STOP\n\n");
+        waitForString(sources[camera], "ACK_LIVE_STOP\n\n");
         lastOp=tr("DISCONNECT FROM SENSOR");
         log_text(tr("disconnecting from camera!\n"));
-        sendCommand(sources[camera], "DISCONNECT\n");
-        waitForString(sources[camera], "DONE_DISCONNECT\n");
+        sendCommand(sources[camera], "DISCONNECT\n\n");
+        waitForString(sources[camera], "ACK_DISCONNECT\n\n");
         log_text(tr("disconnecting from camera server '%2', port: %3..\n").arg(sources[camera].host).arg(sources[camera].port));
         server->disconnectFromHost();
         server->close();
@@ -265,7 +265,7 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
 
     if (server->isOpen()) {
         //flushBuffers(sources[camera], true);
-        ok=sendCommand(sources[camera], "IMAGE_NEXT_GET\n");
+        ok=sendCommand(sources[camera], "IMAGE_NEXT_GET\n\n");
         if (ok) {
             QByteArray answer=readString(sources[camera], "\n", &ok, true);
             //qDebug()<<"AW: "<<answer<<answer.startsWith("IMAGE");
@@ -274,17 +274,16 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
                 //qDebug()<<"AW1: "<<answer1<<ok;
                 QByteArray answer2=readString(sources[camera], "\n", &ok, true);
                 //qDebug()<<"AW2: "<<answer2<<ok;
-                QByteArray answer3=readString(sources[camera], "\n", &ok, true);
+                //QByteArray answer3=readString(sources[camera], "\n", &ok, true);
                 //qDebug()<<"AW3: "<<answer3<<ok;
                 if (ok) {
                     newW=answer1.toInt(&ok);
                     if (ok) newH=answer2.toInt(&ok);
-                    if (ok) expos=answer3.toDouble(&ok);
+                    //if (ok) expos=answer3.toDouble(&ok);
                     //qDebug()<<"CONV:  "<<ok<<newW<<newH<<expos;
                     if (ok) {
                         sources[camera].width=newW;
                         sources[camera].height=newH;
-                        sources[camera].exposure=expos;
                         memset(data, 0, oldW*oldH*sizeof(uint32_t));
                         if (sources[camera].answer_bits==8) {
                             QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint8_t), &ok);
@@ -323,7 +322,38 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
                                 }
                             }
                         }
-                        waitForString(sources[camera], "\n\n");
+                        QByteArray params_in=readString(sources[camera], "\n\n", &ok, true);
+                        QList<QByteArray> params=params_in.split('\n');
+                        for (int i=0; i<params.size(); i++) {
+                            QString p=params[i];
+                            QStringList f=p.split(";");
+                            if (f.size()>=3) {
+                                bool ok=false;
+                                QString n=f[1];
+                                QString d=f[2];
+                                QString desc=f.value(3);
+                                QString t=f[0].toUpper();
+                                QVariant vv;
+                                if (t=="PARAM_FLOAT") {
+                                    vv=QStringToDouble(d);
+                                    if (n.toUpper()=="EXPOSURE") {
+                                        sources[camera].exposure=vv.toDouble();
+                                        if (parameters) (*parameters)["exposure_time"]=vv;
+                                    }
+                                } else if (t=="PARAM_INT") {
+                                    vv=d.toInt(&ok);
+                                } else if (t=="PARAM_BOOL") {
+                                    vv=QStringToBool(d);
+                                } else if (t=="PARAM_STRING") {
+                                    vv=d;
+                                }
+                                if (parameters) (*parameters)[n]=vv;
+                            }
+                        }
+                        if (parameters) {
+                            (*parameters)["image_width"]=newW;
+                            (*parameters)["image_height"]=newH;
+                        }
                         //server->flush();
                         return true;
                     } else {
@@ -355,7 +385,7 @@ int QFECamServer::getCameraImageWidth(unsigned int camera) {
 
     bool ok=false;
     int val=sources[camera].width;
-    QList<QByteArray> bal=queryData(sources[camera], "SIZE_X_GET\n", 1, "\n", &ok, true);
+    QList<QByteArray> bal=queryData(sources[camera], "SIZE_X_GET\n\n", 1, "\n\n", &ok, true);
     if (ok && bal.size()>0) {
         ok=false;
         val=bal.first().toInt(&ok);
@@ -376,7 +406,7 @@ int QFECamServer::getCameraImageHeight(unsigned int camera) {
 
     bool ok=false;
     int val=sources[camera].height;
-    QList<QByteArray> bal=queryData(sources[camera], "SIZE_Y_GET\n", 1, "\n", &ok, true);
+    QList<QByteArray> bal=queryData(sources[camera], "SIZE_Y_GET\n\n", 1, "\n\n", &ok, true);
     if (ok && bal.size()>0) {
         ok=false;
         val=bal.first().toInt(&ok);
@@ -422,7 +452,7 @@ double QFECamServer::getCameraExposureTime(unsigned int camera) {
 
     bool ok=false;
     double val=sources[camera].exposure;
-    QList<QByteArray> bal=queryData(sources[camera], "GET_EXPOSURE", 1, "\n", &ok, true);
+    QList<QByteArray> bal=queryData(sources[camera], "GET_EXPOSURE\n\n", 1, "\n\n", &ok, true);
     if (ok && bal.size()>0) {
         ok=false;
         val=bal.first().toDouble(&ok);
@@ -449,8 +479,8 @@ bool QFECamServer::startCameraAcquisition(unsigned int camera) {
     QMutex* mutex=sources[camera].mutex;
     QMutexLocker locker(mutex);
 
-    if (sendCommand(sources[camera], QByteArray("RECORD\n"+sources[camera].last_filenameprefix+"\n"))) {
-        if (waitForString(sources[camera], "ACK_RECORD\n" )) {
+    if (sendCommand(sources[camera], QByteArray("RECORD\n"+sources[camera].last_filenameprefix+"\n\n"))) {
+        if (waitForString(sources[camera], "ACK_RECORD\n\n" )) {
             sources[camera].acquiring=true;
             return true;
         } else {
