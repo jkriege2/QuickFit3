@@ -749,10 +749,10 @@ void QFRDRImageMaskEditTools::imageRectangleFinished(double x, double y, double 
     if (maskEditing && (!selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0))) {
 
         if (!imagemask) return;
-        int xx1=qBound(0,(int)floor(x), imagemask->maskGetWidth()-1);
-        int yy1=qBound(0,(int)floor(y), imagemask->maskGetHeight()-1);
-        int xx2=qBound(0,(int)floor(x+width), imagemask->maskGetWidth()-1);
-        int yy2=qBound(0,(int)floor(y+height), imagemask->maskGetHeight()-1);
+        int xx1=qBound(0,(int)floor(x), (int)imagemask->maskGetWidth()-1);
+        int yy1=qBound(0,(int)floor(y), (int)imagemask->maskGetHeight()-1);
+        int xx2=qBound(0,(int)floor(x+width), (int)imagemask->maskGetWidth()-1);
+        int yy2=qBound(0,(int)floor(y+height), (int)imagemask->maskGetHeight()-1);
 
         if (xx1>xx2) qSwap(xx1, xx2);
         if (yy1>yy2) qSwap(yy1, yy2);
@@ -831,23 +831,23 @@ void QFRDRImageMaskEditTools::imageLineFinished(double x1, double y1, double x2,
         if (modifiers==Qt::ControlModifier) {
             for (double i=0; i<1.0; i=i+0.5/double(qMax(imagemask->maskGetWidth(), imagemask->maskGetHeight()))) {
                 QPointF p=line.pointAt(i);
-                int xx=qBound(0,(int)floor(p.x()), imagemask->maskGetWidth()-1);
-                int yy=qBound(0,(int)floor(p.y()), imagemask->maskGetHeight()-1);
+                int xx=qBound(0,(int)floor(p.x()), (int)imagemask->maskGetWidth()-1);
+                int yy=qBound(0,(int)floor(p.y()), (int)imagemask->maskGetHeight()-1);
                 imagemask->maskSet(xx,yy);
             }
         } else if (modifiers==Qt::ShiftModifier) {
             for (double i=0; i<1.0; i=i+0.5/double(qMax(imagemask->maskGetWidth(), imagemask->maskGetHeight()))) {
                 QPointF p=line.pointAt(i);
-                int xx=qBound(0,(int)floor(p.x()), imagemask->maskGetWidth()-1);
-                int yy=qBound(0,(int)floor(p.y()), imagemask->maskGetHeight()-1);
+                int xx=qBound(0,(int)floor(p.x()), (int)imagemask->maskGetWidth()-1);
+                int yy=qBound(0,(int)floor(p.y()), (int)imagemask->maskGetHeight()-1);
                 imagemask->maskUnset(xx,yy);
             }
         } else {
             imagemask->maskClear();
             for (double i=0; i<1.0; i=i+0.5/double(qMax(imagemask->maskGetWidth(), imagemask->maskGetHeight()))) {
                 QPointF p=line.pointAt(i);
-                int xx=qBound(0,(int)floor(p.x()), imagemask->maskGetWidth()-1);
-                int yy=qBound(0,(int)floor(p.y()), imagemask->maskGetHeight()-1);
+                int xx=qBound(0,(int)floor(p.x()), (int)imagemask->maskGetWidth()-1);
+                int yy=qBound(0,(int)floor(p.y()), (int)imagemask->maskGetHeight()-1);
                 imagemask->maskSet(xx,yy);
             }
         }
@@ -892,10 +892,10 @@ void QFRDRImageMaskEditTools::imageCircleFinished(double x, double y, double rad
         if (!imagemask) return;
 
 
-        int xx1=qBound(0,(int)floor(x-radius), imagemask->maskGetWidth()-1);
-        int yy1=qBound(0,(int)floor(y-radius), imagemask->maskGetHeight()-1);
-        int xx2=qBound(0,(int)floor(x+radius), imagemask->maskGetWidth()-1);
-        int yy2=qBound(0,(int)floor(y+radius), imagemask->maskGetHeight()-1);
+        int xx1=qBound(0,(int)floor(x-radius), (int)imagemask->maskGetWidth()-1);
+        int yy1=qBound(0,(int)floor(y-radius), (int)imagemask->maskGetHeight()-1);
+        int xx2=qBound(0,(int)floor(x+radius), (int)imagemask->maskGetWidth()-1);
+        int yy2=qBound(0,(int)floor(y+radius), (int)imagemask->maskGetHeight()-1);
 
 
         if (xx1>xx2) qSwap(xx1, xx2);
@@ -964,10 +964,10 @@ void QFRDRImageMaskEditTools::imageEllipseFinished(double x, double y, double ra
     if (maskEditing && (!selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0))) {
         if (!imagemask) return;
 
-        int xx1=qBound(0,(int)floor(x-radiusX), imagemask->maskGetWidth()-1);
-        int yy1=qBound(0,(int)floor(y-radiusY), imagemask->maskGetHeight()-1);
-        int xx2=qBound(0,(int)floor(x+radiusX), imagemask->maskGetWidth()-1);
-        int yy2=qBound(0,(int)floor(y+radiusY), imagemask->maskGetHeight()-1);
+        int xx1=qBound(0,(int)floor(x-radiusX), (int)imagemask->maskGetWidth()-1);
+        int yy1=qBound(0,(int)floor(y-radiusY), (int)imagemask->maskGetHeight()-1);
+        int xx2=qBound(0,(int)floor(x+radiusX), (int)imagemask->maskGetWidth()-1);
+        int yy2=qBound(0,(int)floor(y+radiusY), (int)imagemask->maskGetHeight()-1);
 
         if (xx1>xx2) qSwap(xx1, xx2);
         if (yy1>yy2) qSwap(yy1, yy2);
@@ -1086,7 +1086,7 @@ void QFRDRImageMaskEditTools::setMask(bool *data, int maskSize)
 {
     if (!(maskEditing)) return;
     if (imagemask) {
-        memcpy( imagemask->maskGet(), data, qMin(maskSize, imagemask->maskGetWidth()*imagemask->maskGetHeight())*sizeof(bool));
+        memcpy( imagemask->maskGet(), data, qMin(maskSize, (int)imagemask->maskGetWidth()*(int)imagemask->maskGetHeight())*(int)sizeof(bool));
     } else if (runselection) {
         for (int i=0; i<maskSize; i++) {
             if (data[i]) runselection->leaveoutAddRun(i);

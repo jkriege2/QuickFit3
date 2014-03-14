@@ -111,6 +111,7 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
                 int stack=0;
                 for (int f=0; f<files.size(); f++) {
                     QString ft=files_types.value(f, "image").toLower();
+                    //qDebug()<<"load file "<<f<<files.size()<<ft;
                     if ((ft=="image" || ft=="image_hdualview" || ft=="image_vdualview" ) && (stack<stacks.size())) {
                         getProject()->getServices()->log_text(tr("    * loading image stack %1/%2 (file: '%3') ...\n").arg(stack+1).arg(stacks.size()).arg(files[f]));
                         if (loadImageFile(stacks[stack], files[f], QFRDRImageStackData::lmReadData, 0, qfihAny)) {
@@ -120,11 +121,16 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
                             log_error(tr("error loading image stack %1 (file: '%2')\n").arg(stacks.size()).arg(files[f]));
                             return;
                         }
+                        //qDebug()<<"load file "<<f<<files.size()<<ft<<"OK";
                     }
                 }
+                //qDebug()<<"maskS="<<maskS.size();
                 if (maskS.size()>0) getProject()->getServices()->log_text(tr("    * loading image mask (%1) ...\n").arg(maskS));
+                //qDebug()<<"maskClear;";
                 maskClear();
+                //qDebug()<<"maskLoadFromListString "<<maskS;
                 maskLoadFromListString(maskS,',', ';');
+                //qDebug()<<"OK";
             } else {
                 setError(tr("Error allocating %1 of memory!").arg(bytestostr(memsize).c_str()));
                 log_error(tr("Error allocating %1 of memory!").arg(bytestostr(memsize).c_str()));
@@ -214,6 +220,7 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
                 getProject()->getServices()->log_text(tr("  - allocated %1 of memory\n").arg(bytestostr(memsize).c_str()));
                 for (int f=0; f<files.size(); f++) {
                     QString ft=files_types.value(f, "image").toLower();
+                    //qDebug()<<f<<"/"<<files.size()<<ft;
                     if (ft=="image") {
                         getProject()->getServices()->log_text(tr("    * loading image stack %1 (file: '%2') ...\n").arg(stacks.size()).arg(files[f]));
                         if (loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmReadData, channel)) {
@@ -260,6 +267,7 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
                             return;
                         }
                     }
+                    //qDebug()<<"OK";
                 }
                 if (maskS.size()>0) getProject()->getServices()->log_text(tr("    * loading image mask (%1) ...\n").arg(maskS));
                 maskClear();
@@ -302,6 +310,7 @@ bool QFRDRImageStackData::loadImageFile(QFRDRImageStackData::ImageStack& stack, 
             } else {
                 uint32_t i=0;
                 do {
+                    //qDebug()<<"read frame "<<i<<stack.frames<<stack.dvMode;
                     if (stack.dvMode==dvNone) {
                         double* d=&(stack.data[channel*stack.width*stack.height*stack.frames + i*stack.width*stack.height]);
                         reader->readFrameDouble(d);
@@ -324,6 +333,7 @@ bool QFRDRImageStackData::loadImageFile(QFRDRImageStackData::ImageStack& stack, 
                         }
                         free(tmp);
                     }
+                    //qDebug()<<"read frame "<<i<<" OK";
                     i++;
                 } while (i<stack.frames && reader->nextFrame());
             }

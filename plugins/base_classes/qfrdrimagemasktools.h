@@ -16,21 +16,21 @@ class QFRDRImageMaskTools : public QFRDRImageMaskInterface {
         virtual void maskLoadFromIndexString(const QString& data, QChar separator=QChar(','));
         virtual void maskClear();
         virtual void maskSetAll();
-        virtual void maskUnset(uint16_t x, uint16_t y);
-        virtual void maskSet(uint16_t x, uint16_t y, bool value=true);
-        virtual void maskToggle(uint16_t x, uint16_t y);
+        virtual void maskUnset(uint32_t x, uint32_t y);
+        virtual void maskSet(uint32_t x, uint32_t y, bool value=true);
+        virtual void maskToggle(uint32_t x, uint32_t y);
         virtual void maskInvert();
-        virtual bool maskGet(uint16_t x, uint16_t y) const ;
+        virtual bool maskGet(uint32_t x, uint32_t y) const ;
         virtual bool* maskGet() const;
-        virtual uint16_t maskGetWidth() const;
-        virtual uint16_t maskGetHeight() const;
+        virtual uint32_t maskGetWidth() const;
+        virtual uint32_t maskGetHeight() const;
         virtual long maskGetCount() const;
-        virtual void maskSetIdx(uint16_t idx, bool value=true);
-        virtual bool maskGetIdx(uint16_t idx) const;
+        virtual void maskSetIdx(uint32_t idx, bool value=true);
+        virtual bool maskGetIdx(uint32_t idx) const;
         virtual QList<int> maskToIndexList();
         virtual void maskMaskChangedEvent();
     protected:
-        virtual void maskInit(uint16_t w, uint16_t h);
+        virtual void maskInit(uint32_t w, uint32_t h);
         virtual void maskDelete();
 
         virtual QString maskToListString(const QString& coordinate_separator=QString(", "), const QString& pixel_separator=QString("; ")) const;
@@ -39,8 +39,8 @@ class QFRDRImageMaskTools : public QFRDRImageMaskInterface {
 
     private:
         bool* mask;
-        uint16_t mask_w;
-        uint16_t mask_h;
+        uint32_t mask_w;
+        uint32_t mask_h;
 
 };
 

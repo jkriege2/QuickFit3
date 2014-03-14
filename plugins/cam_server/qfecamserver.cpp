@@ -480,12 +480,12 @@ bool QFECamServer::startCameraAcquisition(unsigned int camera) {
     QMutexLocker locker(mutex);
 
     if (sendCommand(sources[camera], QByteArray("RECORD\n"+sources[camera].last_filenameprefix+"\n\n"))) {
-        if (waitForString(sources[camera], "ACK_RECORD\n\n" )) {
+        //if (waitForString(sources[camera], "ACK_RECORD\n\n" )) {
             sources[camera].acquiring=true;
             return true;
-        } else {
-            log_error(tr("error starting acquisiton (timeout: %3s):\n%1     error description: DID NOT GET ACK_RECCORD FROM HOST!\n%1     last error string: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0));
-        }
+        //} else {
+        //    log_error(tr("error starting acquisiton (timeout: %3s):\n%1     error description: DID NOT GET ACK_RECCORD FROM HOST!\n%1     last error string: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0));
+        //}
     } else {
         log_error(tr("error starting acquisiton (timeout: %3s):\n%1     error description: COULD NOT SEND RECORD COMMAND TO HOST!\n%1     last error string: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0));
     }
@@ -511,6 +511,7 @@ bool QFECamServer::isCameraAcquisitionRunning(unsigned int camera, double* perce
             QByteArray answer=readString(sources[camera], "\n\n", &ok);
             if (ok && answer.contains("DONE_RECORD")) {
                 sources[camera].acquiring=false;
+                sources[camera].lastfiles=answer;
             }
         }
     }
@@ -519,6 +520,53 @@ bool QFECamServer::isCameraAcquisitionRunning(unsigned int camera, double* perce
 
 void QFECamServer::getCameraAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::CameraAcquititonFileDescription> *files, QMap<QString, QVariant> *parameters)
 {
+    if (camera<0 || camera>=getCameraCount()) return ;
+
+    QMutex* mutex=sources[camera].mutex;
+    QMutexLocker locker(mutex);
+
+    if (!sources[camera].lastfiles.isEmpty()) {
+        QList<QByteArray> params=sources[camera].lastfiles.split('\n');
+        for (int i=0; i<params.size(); i++) {
+            QString p=params[i];
+            QStringList f=p.split(";");
+            if (f.size()>=3) {
+                bool ok=false;
+                QString n=f[1];
+                QString d=f[2];
+                QString desc=f.value(3);
+                QString t=f[0].toUpper();
+                QVariant vv;
+                if (t=="PARAM_FLOAT") {
+                    vv=QStringToDouble(d);
+                    if (n.toUpper()=="EXPOSURE") {
+                        sources[camera].exposure=vv.toDouble();
+                        if (parameters) (*parameters)["exposure_time"]=vv;
+                    }
+                } else if (t=="PARAM_INT") {
+                    vv=d.toInt(&ok);
+                } else if (t=="PARAM_BOOL") {
+                    vv=QStringToBool(d);
+                } else if (t=="PARAM_STRING") {
+                    vv=d;
+                } else if (t=="FILE") {
+                    if (files)  {
+                        QFExtensionCamera::CameraAcquititonFileDescription fi;
+                        fi.type=n;
+                        fi.name=d;
+                        fi.description=desc;
+                        files->append(fi);
+                    }
+                    vv=QVariant();
+                }
+                if (vv.isValid() && parameters) (*parameters)[n]=vv;
+            }
+        }
+        if (parameters) {
+            //(*parameters)["image_width"]=newW;
+            //(*parameters)["image_height"]=newH;
+        }
+    }
 
 }
 

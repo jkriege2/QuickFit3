@@ -16,7 +16,7 @@ QFRDRImageMaskTools::~QFRDRImageMaskTools()
     if (mask) free(mask);
 }
 
-void QFRDRImageMaskTools::maskInit(uint16_t w, uint16_t h)
+void QFRDRImageMaskTools::maskInit(uint32_t w, uint32_t h)
 {
     maskDelete();
     if (w*h>0) {
@@ -42,8 +42,8 @@ QString QFRDRImageMaskTools::maskToListString(const QString &coordinate_separato
     QString res="";
     QTextStream str(&res);
     bool first=true;
-    for (uint16_t y=0; y<mask_h; y++) {
-        for (uint16_t x=0; x<mask_w; x++) {
+    for (uint32_t y=0; y<mask_h; y++) {
+        for (uint32_t x=0; x<mask_w; x++) {
             if (mask[y*mask_w+x]) {
                 if (!first) str<<pixel_separator;
                 str<<x<<coordinate_separator<<y;
@@ -105,7 +105,7 @@ QString QFRDRImageMaskTools::maskToIndexString(QChar separator) const
     if (!mask) return "";
     QString res="";
     bool first=true;
-    for (uint16_t i=0; i<mask_w*mask_h; i++) {
+    for (uint32_t i=0; i<mask_w*mask_h; i++) {
         if (mask[i]) {
             if (!first) res+=separator;
             res+=QString::number(i);
@@ -122,7 +122,7 @@ void QFRDRImageMaskTools::maskLoadFromIndexString(const QString &data, QChar sep
 
     for (int i=0; i<sl.size(); i++) {
         bool ok=false;
-        uint16_t idx=sl[i].toUInt(&ok);
+        uint32_t idx=sl[i].toUInt(&ok);
         if (ok) maskSetIdx(idx, true);
     }
 }
@@ -130,32 +130,33 @@ void QFRDRImageMaskTools::maskLoadFromIndexString(const QString &data, QChar sep
 void QFRDRImageMaskTools::maskClear()
 {
     if (!mask) return;
-    for (uint16_t i=0; i<mask_w*mask_h; i++) {
+    for (uint32_t i=0; i<mask_w*mask_h; i++) {
         mask[i]=false;
+        //qDebug()<<i<<mask[i];
     }
 }
 
 void QFRDRImageMaskTools::maskSetAll()
 {
     if (!mask) return;
-    for (uint16_t i=0; i<mask_w*mask_h; i++) {
+    for (uint32_t i=0; i<mask_w*mask_h; i++) {
         mask[i]=true;
     }
 }
 
-void QFRDRImageMaskTools::maskUnset(uint16_t x, uint16_t y)
+void QFRDRImageMaskTools::maskUnset(uint32_t x, uint32_t y)
 {
     if (!mask) return;
     mask[y*mask_w+x]=false;
 }
 
-void QFRDRImageMaskTools::maskSet(uint16_t x, uint16_t y, bool value)
+void QFRDRImageMaskTools::maskSet(uint32_t x, uint32_t y, bool value)
 {
     if (!mask) return;
     mask[y*mask_w+x]=value;
 }
 
-void QFRDRImageMaskTools::maskToggle(uint16_t x, uint16_t y)
+void QFRDRImageMaskTools::maskToggle(uint32_t x, uint32_t y)
 {
     mask[y*mask_w+x]=!mask[y*mask_w+x];
 }
@@ -169,7 +170,7 @@ void QFRDRImageMaskTools::maskInvert()
     //qDebug()<<"maskInverted: "<<maskToString();
 }
 
-bool QFRDRImageMaskTools::maskGet(uint16_t x, uint16_t y) const
+bool QFRDRImageMaskTools::maskGet(uint32_t x, uint32_t y) const
 {
     if (!mask) return false;
     return mask[y*mask_w+x];
@@ -181,12 +182,12 @@ bool *QFRDRImageMaskTools::maskGet() const
     return mask;
 }
 
-uint16_t QFRDRImageMaskTools::maskGetWidth() const
+uint32_t QFRDRImageMaskTools::maskGetWidth() const
 {
     return mask_w;
 }
 
-uint16_t QFRDRImageMaskTools::maskGetHeight() const
+uint32_t QFRDRImageMaskTools::maskGetHeight() const
 {
     return mask_h;
 }
@@ -201,12 +202,12 @@ long QFRDRImageMaskTools::maskGetCount() const
     return result;
 }
 
-void QFRDRImageMaskTools::maskSetIdx(uint16_t idx, bool value)
+void QFRDRImageMaskTools::maskSetIdx(uint32_t idx, bool value)
 {
     if (idx>=0 && idx<mask_w*mask_h) mask[idx]=value;
 }
 
-bool QFRDRImageMaskTools::maskGetIdx(uint16_t idx) const
+bool QFRDRImageMaskTools::maskGetIdx(uint32_t idx) const
 {
     if (idx>=0 && idx<mask_w*mask_h) return mask[idx];
     return false;

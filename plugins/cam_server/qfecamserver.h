@@ -166,6 +166,8 @@ class QFECamServer : public QObject, public QFExtensionBase, public QFExtensionC
             QByteArray last_filenameprefix;
             bool acquiring;
 
+            QByteArray lastfiles;
+
 
             /** \brief Server object to access the device */
             QTcpSocket* server;
