@@ -295,6 +295,10 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief time axis [seconds] */
         double* tau;
 
+        /** \brief temporary storage for overview image */
+        QVector<double> overviewTemp;
+
+
         struct statisticsData {
             /** \brief number of data points in the statistics  */
             uint32_t N;

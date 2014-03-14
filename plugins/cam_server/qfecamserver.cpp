@@ -363,7 +363,7 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
                     log_error(tr("error reading frame (timeout: %3s):\n%1     error description: COULD NOT REEAD COMPLETE RESULT RECORD FROM HOST!\n%1     last error string: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0));
                 }
             } else {
-                log_error(tr("error reading frame (timeout: %3s):\n%1     error description: DID NOT GET \"IMAGE\" RECORD FROM HOST!\n%1     last error string: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0));
+                log_error(tr("error reading frame (timeout: %3s):\n%1     error description: DID NOT GET \"IMAGE\" RECORD FROM HOST!\n%1     last error string: %2!n%1     answer was: \"%4\"!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0).arg(QString(answer)));
             }
         } else {
             log_error(tr("error reading frame (timeout: %3s):\n%1     error description: COULD NOT SEND COMMAND!\n%1     last error string: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0));

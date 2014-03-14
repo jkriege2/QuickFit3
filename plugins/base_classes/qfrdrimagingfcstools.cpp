@@ -127,6 +127,8 @@ void appendCategorizedFilesFromB040SPIMConfig(QSettings& settings, QStringList& 
 QString findB040ExperimentDescriptionForData(const QString& filename) {
     QString filenameDisplayed=QFileInfo(filename).absoluteFilePath();
 
+    //qDebug()<<"findB040ExperimentDescriptionForData("<<filename<<"):  "<<filenameDisplayed;
+
     //////////////////////////////////////////////////////////////////////////////////
     // now we search for a .configuration.ini file describing the selected file
     //////////////////////////////////////////////////////////////////////////////////
@@ -189,6 +191,34 @@ QString findB040ExperimentDescriptionForData(const QString& filename) {
         }
     }
 
+    // if the last step also didn't work, we also try a small modifictaion of the basename
+    if (!hasFirst) {
+        bool ok=true;
+        if (filenameDisplayed.toLower().endsWith("bin.acf.bin")) filenameDisplayed=filenameDisplayed.left(filenameDisplayed.size()-11);
+        else if (filenameDisplayed.toLower().endsWith("bin.ccf.bin")) filenameDisplayed=filenameDisplayed.left(filenameDisplayed.size()-11);
+        else if (filenameDisplayed.toLower().endsWith("bin.fccs.bin")) filenameDisplayed=filenameDisplayed.left(filenameDisplayed.size()-12);
+        else if (filenameDisplayed.toLower().endsWith("bin.dccf.bin")) filenameDisplayed=filenameDisplayed.left(filenameDisplayed.size()-12);
+        else ok=false;
+
+        if (ok) {
+            QString cfgname;
+
+            QStringList newsuffix;
+            newsuffix<<"ini"
+                     <<"configuration.ini"
+                     <<"settings.ini"
+                     <<"settings.txt"
+                     <<"cfg";
+            for (int i=0; i<newsuffix.size(); i++) {
+                cfgname=filenameDisplayed.left(filenameDisplayed.size())+newsuffix[i];
+                if (QFile::exists(cfgname)) {
+                    hasFirst=true;
+                    inputconfigfile=cfgname;
+                }
+            }
+        }
+    }
+    //qDebug()<<"  return: "<<hasFirst<<inputconfigfile;
 
     return inputconfigfile;
 }

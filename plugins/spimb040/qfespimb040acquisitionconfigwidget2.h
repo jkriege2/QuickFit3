@@ -72,8 +72,6 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         bool use2() const;
         bool overview() const;
 
-        bool onlyAcquisition1() const;
-        bool onlyAcquisition2() const;
 
 
         int frames1() const;

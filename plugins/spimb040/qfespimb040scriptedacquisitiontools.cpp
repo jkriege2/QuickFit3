@@ -111,7 +111,7 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::setLaserIntensity(int lase
 
 void QFESPIMB040ScriptedAcquisitionInstrumentControl::setBrightfieldIntensity(int lightsource, int line, double intensity)
 {
-    if (lightsource>0 && lightsource<opticsSetup->getBrightfieldLightSourceCount()) {
+    if (lightsource>=0 && lightsource<opticsSetup->getBrightfieldLightSourceCount()) {
         opticsSetup->getBrightfieldLightSource(lightsource)->setLightSourcePower(opticsSetup->getBrightfieldLightSourceID(lightsource), line, intensity);
     } else {
         throwEngineException(QObject::tr("setBrightfieldIntensity(lightSource=%1, %2, %3): unknown light source!").arg(lightsource).arg(line).arg(intensity));

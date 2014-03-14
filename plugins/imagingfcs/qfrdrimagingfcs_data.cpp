@@ -286,6 +286,7 @@ void QFRDRImagingFCSData::intWriteData(QXmlStreamWriter& w) {
 void QFRDRImagingFCSData::intReadData(QDomElement* e) {
     leaveoutClear();
     clearSelections();
+    overviewTemp.clear();
 	// read data from the project XML file
 
 
@@ -303,6 +304,12 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
     }
     bool dataLoaded=false;
     QString acquisitionSettingsFile=getFileForType("acquisition_settings");
+    if (acquisitionSettingsFile.isEmpty()) {
+        acquisitionSettingsFile=findB040ExperimentDescriptionForData(getFileForType("acf"));
+        if (!QFile::exists(acquisitionSettingsFile)) acquisitionSettingsFile=findB040ExperimentDescriptionForData(getFileForType("ccf"));
+        if (!QFile::exists(acquisitionSettingsFile)) acquisitionSettingsFile=findB040ExperimentDescriptionForData(getFileForType("dccf"));
+        if (QFile::exists(acquisitionSettingsFile) && getFileForType("acquisition_settings").isEmpty()) addFile(acquisitionSettingsFile, "acquisition_settings", "");
+    }
     if (files.size()>0) {
         // now we check whether the experiment config file contains additional files, that may be useful for this object and load them
         // (more overview images ...)
@@ -462,6 +469,13 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
 
         if (!loadRH2Overview.isEmpty()) {
             loadRadhard2File(loadRH2Overview, true);
+        }
+
+        if (overviewTemp.size()==width*height) {
+            double* tmp=(double*)malloc(width*height*sizeof(double));
+            for (int i=0; i<width*height; i++) tmp[i]=overviewTemp.value(i, 0)/tau[0]/1.0e3;
+            splitImage(overviewF, overviewF2, tmp, width, height);
+            free(tmp);
         }
 
 
@@ -1007,6 +1021,8 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
     bool ok=true;
     QString errorDescription="";
 
+    overviewTemp.clear();
+
 #ifdef DEBUG_TIMING
     QElapsedTimer time;
     time.start();
@@ -1039,12 +1055,31 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
             allocateContents(fwidth, fheight, fN);
 
             binfileReadDoubleArray(file, tau, N);
+            bool tauHas0=false;
+            if (N>1 && tau[0]<=0.0) {
+                tauHas0=true;
+                N=N-1;
+                for (int i=0; i<N-1; i++) {
+                    tau[i]=tau[i+1];
+                }
+                //overviewTemp.resize(width*height);
+            }
+
             if (taufactor!=1) for (int i=0; i<N; i++) { tau[i]=tau[i]*taufactor; }
             if (corr_set==0 && fcorrN==1) {
                 for (long long p=0; p<width*height; p++) {
-                    binfileReadDoubleArray(file, &(correlations[p*N]), N);
+                    binfileReadDoubleArray(file, &(correlations[p*N]), fN);
+                    if (tauHas0) {
+                        //overviewTemp[p]=correlations[p*N];
+                        for (int i=0; i<N; i++) {
+                            correlations[p*N+i]=correlations[p*N+i+1];
+                        }
+                    }
                     if (corroffset!=0) for (int i=0; i<N; i++) { correlations[p*N+i]=correlations[p*N+i]-corroffset; }
-                    if (fsets>1) binfileReadDoubleArray(file, &(sigmas[p*N]), N);
+                    if (fsets>1) {
+                        binfileReadDoubleArray(file, &(sigmas[p*N]), fN);
+                        if (tauHas0) { for (int i=0; i<N; i++) { sigmas[p*N+i]=sigmas[p*N+i+1]; } }
+                    }
 
                     bool allZero=true;
                     for (int i=0; i<N; i++) {
@@ -1062,9 +1097,13 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
                 for (long long p=0; p<width*height; p++) {
                     for (uint32_t cf=0; cf<fcorrN; cf++) {
                         if (cf==corr_set) {
-                            binfileReadDoubleArray(file, &(correlations[p*N]), N);
+                            binfileReadDoubleArray(file, &(correlations[p*N]), fN);
+                            if (tauHas0) { for (int i=0; i<N; i++) { correlations[p*N+i]=correlations[p*N+i+1]; } }
                             if (corroffset!=0) for (int i=0; i<N; i++) { correlations[p*N+i]=correlations[p*N+i]-corroffset; }
-                            if (fsets>1) binfileReadDoubleArray(file, &(sigmas[p*N]), N);
+                            if (fsets>1) {
+                                binfileReadDoubleArray(file, &(sigmas[p*N]), fN);
+                                if (tauHas0) { for (int i=0; i<N; i++) { sigmas[p*N+i]=sigmas[p*N+i+1]; } }
+                            }
 
                             bool allZero=true;
                             for (int i=0; i<N; i++) {
@@ -1108,7 +1147,8 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
                             if (segmentUsed(seg)) {
                                 for (uint32_t cf=0; cf<fcorrN; cf++) {
                                     if (cf==corr_set) {
-                                        binfileReadDoubleArray(file, dummy, N); //&(correlations[p*N]), N);
+                                        binfileReadDoubleArray(file, dummy, fN); //&(correlations[p*N]), N);
+                                        if (tauHas0) { for (int i=0; i<N; i++) { dummy[i]=dummy[i+1]; } }
                                         if (corroffset!=0) for (int i=0; i<N; i++) { dummy[i]=dummy[i]-corroffset; }
                                         //QString txt="";
                                         //for (int i=0; i<5; i++) txt=txt+QString("%1, ").arg(dummy[i]);
@@ -1711,6 +1751,27 @@ void QFRDRImagingFCSData::loadQFPropertiesFromB040SPIMSettingsFile(QSettings &se
         if (fabs(cpw/mag-pw)<0.01*fabs(pw) && (mag>1)) setQFProperty("PIXEL_HEIGHT", cpw/mag, true, true);
         else setQFProperty("PIXEL_HEIGHT", pw, true, true);
     }
+
+    if (!propertyExists("EXP_CELL") && settings.contains("experiment/cell")) setQFProperty("EXP_CELL", settings.value("experiment/cell").toInt(), false, true);
+    if (!propertyExists("EXP_PLATE") && settings.contains("experiment/plate")) setQFProperty("EXP_PLATE", settings.value("experiment/plate").toInt(), false, true);
+    if (!propertyExists("EXP_WELL") && settings.contains("experiment/well")) setQFProperty("EXP_WELL", settings.value("experiment/well").toInt(), false, true);
+    if (!propertyExists("EXP_SAMPLENAME") && settings.contains("experiment/samplename")) setQFProperty("EXP_SAMPLENAME", settings.value("experiment/samplename").toString(), false, true);
+    if (!propertyExists("EXP_DATE") && settings.contains("experiment/date")) setQFProperty("EXP_DATE", settings.value("experiment/date").toString(), false, true);
+    if (!propertyExists("EXP_LASER1_MEASURED") && settings.contains("acquisition/acquisition/setup/laser1/line1/measured_power")) setQFProperty("EXP_LASER1_MEASURED", settings.value("acquisition/acquisition/setup/laser1/line1/measured_power").toDouble(), false, true);
+    if (!propertyExists("EXP_LASER1_SET") && settings.contains("acquisition/acquisition/setup/laser1/line1/set_power") && settings.contains("acquisition/acquisition/setup/laser1/line1/enabled")) {
+        if (settings.value("acquisition/acquisition/setup/laser1/line1/enabled").toBool())
+            setQFProperty("EXP_LASER1_SET", settings.value("acquisition/acquisition/setup/laser1/line1/set_power").toDouble(), false, true);
+        else
+            setQFProperty("EXP_LASER1_SET", 0.0, false, true);
+    }
+    if (!propertyExists("EXP_LASER2_MEASURED") && settings.contains("acquisition/acquisition/setup/laser2/line1/measured_power")) setQFProperty("EXP_LASER2_MEASURED", settings.value("acquisition/acquisition/setup/laser2/line1/measured_power").toDouble(), false, true);
+    if (!propertyExists("EXP_LASER2_SET") && settings.contains("acquisition/acquisition/setup/laser2/line1/set_power") && settings.contains("acquisition/acquisition/setup/laser2/line1/enabled")) {
+        if (settings.value("acquisition/acquisition/setup/laser2/line1/enabled").toBool())
+            setQFProperty("EXP_LASER2_SET", settings.value("acquisition/acquisition/setup/laser2/line1/set_power").toDouble(), false, true);
+        else
+            setQFProperty("EXP_LASER2_SET", 0.0, false, true);
+    }
+
 
 }
 

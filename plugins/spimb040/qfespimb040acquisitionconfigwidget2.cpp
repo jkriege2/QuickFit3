@@ -110,8 +110,10 @@ void QFESPIMB040AcquisitionConfigWidget2::loadSettings(QSettings& settings, QStr
     ui->cmbLightpathPreview3->setCurrentIndex(settings.value(prefix+"lightpathidx_preview3", -1).toInt());
     ui->chkLightpathPreview4->setChecked(settings.value(prefix+"lightpath_preview4", false).toBool());
     ui->cmbLightpathPreview4->setCurrentIndex(settings.value(prefix+"lightpathidx_preview4", -1).toInt());
-    ui->chkOnlyAcquisition1->setChecked(settings.value(prefix+"chkOnlyAcquisition1", false).toBool());
-    ui->chkOnlyAcquisition2->setChecked(settings.value(prefix+"chkOnlyAcquisition2", false).toBool());
+    ui->chkNoBackground1->setChecked(settings.value(prefix+"chkNoBackground1", false).toBool());
+    ui->chkNoPreview1->setChecked(settings.value(prefix+"chkNoPreview1", false).toBool());
+    ui->chkNoBackground2->setChecked(settings.value(prefix+"chkNoBackground2", false).toBool());
+    ui->chkNoPreview2->setChecked(settings.value(prefix+"chkNoPreview2", false).toBool());
 
     //qDebug()<<settings.value(prefix+"prevsettings1", "default").toString();
     on_chkUse1_toggled(ui->chkUse1->isChecked());
@@ -149,8 +151,10 @@ void QFESPIMB040AcquisitionConfigWidget2::storeSettings(QSettings& settings, QSt
     settings.setValue(prefix+"lightpath_preview3", ui->chkLightpathPreview3->isChecked());
     settings.setValue(prefix+"lightpathidx_preview4", ui->cmbLightpathPreview4->currentIndex());
     settings.setValue(prefix+"lightpath_preview4", ui->chkLightpathPreview4->isChecked());
-    settings.setValue(prefix+"chkOnlyAcquisition1", ui->chkOnlyAcquisition1->isChecked());
-    settings.setValue(prefix+"chkOnlyAcquisition2", ui->chkOnlyAcquisition2->isChecked());
+    settings.setValue(prefix+"chkNoBackground1", ui->chkNoBackground1->isChecked());
+    settings.setValue(prefix+"chkNoPreview1", ui->chkNoPreview1->isChecked());
+    settings.setValue(prefix+"chkNoBackground2", ui->chkNoBackground2->isChecked());
+    settings.setValue(prefix+"chkNoPreview2", ui->chkNoPreview2->isChecked());
 }
 
 
@@ -182,15 +186,7 @@ bool QFESPIMB040AcquisitionConfigWidget2::overview() const {
     return ui->chkOverview->isChecked();
 }
 
-bool QFESPIMB040AcquisitionConfigWidget2::onlyAcquisition1() const
-{
-    return ui->chkOnlyAcquisition1->isChecked();
-}
 
-bool QFESPIMB040AcquisitionConfigWidget2::onlyAcquisition2() const
-{
-    return ui->chkOnlyAcquisition2->isChecked();
-}
 
 int QFESPIMB040AcquisitionConfigWidget2::frames1() const {
     return ui->spinFrames->value();
@@ -669,8 +665,6 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
     int repeatCnt=0;
     bool userCanceled=false;
 
-    bool doOverviewA1=!onlyAcquisition1();
-    bool doOverviewA2=!onlyAcquisition2();
 
 
     QProgressListDialog progress(tr("Image Series Acquisition"), tr("&Cancel"), 0, 100, this);
@@ -838,7 +832,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             camset2=getCameraSettings2();
             camset1[QFExtensionCamera::CamSetNumberFrames]=currentBackgroundFrames(0);
             camset2[QFExtensionCamera::CamSetNumberFrames]=currentBackgroundFrames(1);
-            ok = acqTools->acquireSeries(lightpathName, "", tr("background image series"), useCam1&&doOverviewA1, extension1, ecamera1, camera1, acquisitionPrefix1+"_background", acquisitionSettingsFilename1, backgroundDescription1, backgroundFiles1, useCam2&&doOverviewA2, extension2, ecamera2, camera2, acquisitionPrefix2+"_background", acquisitionSettingsFilename2, backgroundDescription2, backgroundFiles2, camset1, camset2, NULL, &progress, &userCanceled);
+            ok = acqTools->acquireSeries(lightpathName, "", tr("background image series"), useCam1&&(ui->chkBackground->isChecked())&&(!ui->chkNoBackground1->isChecked()), extension1, ecamera1, camera1, acquisitionPrefix1+"_background", acquisitionSettingsFilename1, backgroundDescription1, backgroundFiles1, useCam2&&(ui->chkBackground->isChecked())&&(!ui->chkNoBackground2->isChecked()), extension2, ecamera2, camera2, acquisitionPrefix2+"_background", acquisitionSettingsFilename2, backgroundDescription2, backgroundFiles2, camset1, camset2, NULL, &progress, &userCanceled);
             if (!ok) {
                 ACQUISITION_ERROR(tr("  - error acquiring background image series!\n"));
             } else {
@@ -850,7 +844,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             for (int ovrImgI=0; ovrImgI<prevs.size(); ovrImgI++) {
                 int ovrImg=prevs[ovrImgI];
                 if (ok && lightpathActivatedPreview(ovrImg)) {
-                    if (ok && useCam1 && doOverviewA1) {
+                    if (ok && useCam1 && (!ui->chkNoBackground1->isChecked())&&(ui->chkBackground->isChecked())&&(!ui->chkNoPreview1->isChecked())) {
                         progress.setLabelText(tr("acquiring overview background image from camera 1, lightpath %1 ...").arg(ovrImg+1));
                         QApplication::processEvents();
                         QString acquisitionPrefix=acquisitionPrefix1+QString("_overview_backgroundlp%1.tif").arg(ovrImg+1);
@@ -867,7 +861,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                         }
 
                     }
-                    if (ok && useCam2 && doOverviewA2) {
+                    if (ok && useCam2 && (!ui->chkNoBackground2->isChecked()) &&(ui->chkBackground->isChecked())&& (!ui->chkNoPreview2->isChecked())) {
                         progress.setLabelText(tr("acquiring overview background image from camera 2, lightpath %1 ...").arg(ovrImg+1));
                         QApplication::processEvents();
                         QString acquisitionPrefix=acquisitionPrefix1+QString("_overview_backgroundlp%1.tif").arg(ovrImg+1);
@@ -911,7 +905,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         for (int ovrImgI=0; ovrImgI<prevs.size(); ovrImgI++) {
             int ovrImg=prevs[ovrImgI];
             if (ok && lightpathActivatedPreview(ovrImg)) {
-                if (ok && useCam1 && doOverviewA1) {
+                if (ok && useCam1 && (!ui->chkNoPreview1->isChecked())) {
                     progress.setLabelText(tr("acquiring overview image from camera 1, lightpath %1 ...").arg(ovrImg+1));
                     QApplication::processEvents();
                     QString acquisitionPrefix=acquisitionPrefix1+QString("_overviewlp%1.tif").arg(ovrImg+1);
@@ -928,7 +922,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                     }
 
                 }
-                if (ok && useCam2 && doOverviewA2) {
+                if (ok && useCam2 && (!ui->chkNoPreview2->isChecked())) {
                     progress.setLabelText(tr("acquiring overview image from camera 2, lightpath %1 ...").arg(ovrImg+1));
                     QApplication::processEvents();
                     QString acquisitionPrefix=acquisitionPrefix1+QString("_overviewlp%1.tif").arg(ovrImg+1);
@@ -1012,7 +1006,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         for (int ovrImgI=0; ovrImgI<prevs.size(); ovrImgI++) {
             int ovrImg=prevs[ovrImgI];
             if (ok && lightpathActivatedPreview(ovrImg)) {
-                if (ok && useCam1 && doOverviewA1) {
+                if (ok && useCam1 && (!ui->chkNoPreview1->isChecked())) {
                     progress.setLabelText(tr("acquiring overview image from camera 1, lightpath %1 ...").arg(ovrImg+1));
                     QApplication::processEvents();
                     QString acquisitionPrefix=acquisitionPrefix1+QString("_overview_afterlp%1.tif").arg(ovrImg+1);
@@ -1029,13 +1023,13 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                     }
 
                 }
-                if (ok && useCam2 && doOverviewA2) {
+                if (ok && useCam2 && (!ui->chkNoPreview2->isChecked())) {
                     progress.setLabelText(tr("acquiring overview image from camera 2, lightpath %1 ...").arg(ovrImg+1));
                     QApplication::processEvents();
-                    QString acquisitionPrefix=acquisitionPrefix1+QString("_overview_afterlp%1.tif").arg(ovrImg+1);
+                    QString acquisitionPrefix=acquisitionPrefix2+QString("_overview_afterlp%1.tif").arg(ovrImg+1);
                     QString prefix=QString("overview_after_lightpath%1").arg(ovrImg+1);
                     if (ovrImg==0) {
-                        acquisitionPrefix=acquisitionPrefix1+QString("_overview_after.tif");
+                        acquisitionPrefix=acquisitionPrefix2+QString("_overview_after.tif");
                         prefix=QString("overview_after");
                     }
                     ok=acqTools->acquireImageWithLightpath(lightpathFilenamePreview(ovrImg), lightpathPreview(ovrImg), extension2, ecamera2, camera2, currentPreviewConfigFilename(1,ovrImg), acquisitionPrefix, prefix, tr("overview after acquisition with lightpath %1 for camera 2").arg(ovrImg+1), moreFiles2, acquisitionDescription2, ui->chkCloseMainShutter->isChecked());
