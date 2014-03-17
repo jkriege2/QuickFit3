@@ -124,47 +124,122 @@
 
 	</ul>
 	
-	<h2>Measurement Devices</h2>
-	<ul>
-		<li><a name="instrument.MDConnect"/><!-- func:instrument.MDConnect -->
-		<b><tt><!-- template -->instrument.MDConnect("<!--°-->device_plugin_name<!--°-->", device)<!-- /template --></tt> - <i>connect to the device-th measurement device managed by the plugin with given ID</i>:</b><br>
-		<!-- /func:instrument.MDConnect -->
-		</li>
-		<li><a name="instrument.MDDisconnect"/><!-- func:instrument.MDDisconnect -->
-		<b><tt><!-- template -->instrument.MDDisconnect("<!--°-->device_plugin_name<!--°-->", device)<!-- /template --></tt> - <i>disconnect from the device-th measurement device managed by the plugin with given ID</i>:</b><br>
-		<!-- /func:instrument.MDDisconnect -->
-		</li>
-		<li><a name="instrument.mMDGetParamCount"/><!-- func:instrument.mMDGetParamCount -->
-		<b><tt><!-- template -->instrument.mMDGetParamCount("<!--°-->device_plugin_name<!--°-->", device)<!-- /template --></tt> - <i>returns the number of accessible parameters in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
-		<!-- /func:instrument.mMDGetParamCount -->
-		</li>
-		
-		<li><a name="instrument.mMDGetParamName"/><!-- func:instrument.mMDGetParamName -->
-		<b><tt><!-- template -->instrument.mMDGetParamName("<!--°-->device_plugin_name<!--°-->", device, parameter)<!-- /template --></tt> - <i>returns the short name of the parameter-th parameter in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
-		<!-- /func:instrument.mMDGetParamName -->
-		</li>
-		
-		<li><a name="instrument.MDGet"/><!-- func:instrument.MDGet -->
-		<b><tt><!-- template -->instrument.MDGet("<!--°-->device_plugin_name<!--°-->", device, parameter)<!-- /template --></tt> - <i>returns the current value of the parameter-th parameter in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
-		<!-- /func:instrument.MDGet -->
-		</li>
+        <h2>Measurement Devices</h2>
+        <ul>
+                <li><a name="instrument.MDConnect"/><!-- func:instrument.MDConnect -->
+                <b><tt><!-- template -->instrument.MDConnect("<!--°-->device_plugin_name<!--°-->", device)<!-- /template --></tt> - <i>connect to the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <!-- /func:instrument.MDConnect -->
+                </li>
+                <li><a name="instrument.MDDisconnect"/><!-- func:instrument.MDDisconnect -->
+                <b><tt><!-- template -->instrument.MDDisconnect("<!--°-->device_plugin_name<!--°-->", device)<!-- /template --></tt> - <i>disconnect from the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <!-- /func:instrument.MDDisconnect -->
+                </li>
+                <li><a name="instrument.mMDGetParamCount"/><!-- func:instrument.mMDGetParamCount -->
+                <b><tt><!-- template -->instrument.mMDGetParamCount("<!--°-->device_plugin_name<!--°-->", device)<!-- /template --></tt> - <i>returns the number of accessible parameters in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <!-- /func:instrument.mMDGetParamCount -->
+                </li>
+                
+                <li><a name="instrument.mMDGetParamName"/><!-- func:instrument.mMDGetParamName -->
+                <b><tt><!-- template -->instrument.mMDGetParamName("<!--°-->device_plugin_name<!--°-->", device, parameter)<!-- /template --></tt> - <i>returns the short name of the parameter-th parameter in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <!-- /func:instrument.mMDGetParamName -->
+                </li>
+                
+                <li><a name="instrument.MDGet"/><!-- func:instrument.MDGet -->
+                <b><tt><!-- template -->instrument.MDGet("<!--°-->device_plugin_name<!--°-->", device, parameter)<!-- /template --></tt> - <i>returns the current value of the parameter-th parameter in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <!-- /func:instrument.MDGet -->
+                </li>
 
-		<li><a name="instrument.MDSet"/><!-- func:instrument.MDSet -->
-		<b><tt><!-- template -->instrument.MDSet("<!--°-->device_plugin_name<!--°-->", device, parameter, value)<!-- /template --></tt> - <i>sets (if possible) the current value of the parameter-th parameter in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
-		<!-- /func:instrument.MDSet -->
-		</li>
-				
-		<li><a name="instrument.MDGetN"/><!-- func:instrument.MDGetN -->
-		<b><tt><!-- template -->instrument.MDGetN("<!--°-->device_plugin_name<!--°-->", device, parameter_name)<!-- /template --></tt> - <i>returns the current value of the parameter named parameter_name in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
-		<!-- /func:instrument.MDGetN -->
-		</li>
+                <li><a name="instrument.MDSet"/><!-- func:instrument.MDSet -->
+                <b><tt><!-- template -->instrument.MDSet("<!--°-->device_plugin_name<!--°-->", device, parameter, value)<!-- /template --></tt> - <i>sets (if possible) the current value of the parameter-th parameter in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <!-- /func:instrument.MDSet -->
+                </li>
+                                
+                <li><a name="instrument.MDGetN"/><!-- func:instrument.MDGetN -->
+                <b><tt><!-- template -->instrument.MDGetN("<!--°-->device_plugin_name<!--°-->", device, parameter_name)<!-- /template --></tt> - <i>returns the current value of the parameter named parameter_name in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <!-- /func:instrument.MDGetN -->
+                </li>
 
-		<li><a name="instrument.MDSetN"/><!-- func:instrument.MDSetN -->
-		<b><tt><!-- template -->instrument.MDSetN("<!--°-->device_plugin_name<!--°-->", device, parameter_name, value)<!-- /template --></tt> - <i>sets (if possible) the current value of the parameter named parameter_name in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
-		<!-- /func:instrument.MDSetN -->
-		</li>
+                <li><a name="instrument.MDSetN"/><!-- func:instrument.MDSetN -->
+                <b><tt><!-- template -->instrument.MDSetN("<!--°-->device_plugin_name<!--°-->", device, parameter_name, value)<!-- /template --></tt> - <i>sets (if possible) the current value of the parameter named parameter_name in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <!-- /func:instrument.MDSetN -->
+                </li>
 
-	</ul>
+        </ul>
+
+        <h2>Acquisition Description</h2>
+        <ul>
+                                
+                <li><a name="instrument.setAcqDescCurrentSample"/><!-- func:instrument.setAcqDescCurrentSample -->
+                <b><tt><!-- template -->instrument.setAcqDescCurrentSample("<!--°-->string<!--°-->")<!-- /template --></tt> - <i>sets the current sample in the acquisition description</i>:</b><br>
+                <!-- /func:instrument.setAcqDescCurrentSample -->
+                </li>
+
+                <li><a name="instrument.getAcqDescCurrentSample"/><!-- func:instrument.getAcqDescCurrentSample -->
+                <b><tt><!-- template -->instrument.getAcqDescCurrentSample()<!-- /template --></tt> - <i>returns the current sample from the acquisition description</i>:</b><br>
+                <!-- /func:instrument.getAcqDescCurrentSample -->
+                </li>
+
+
+
+                <li><a name="instrument.setAcqDescPrefix"/><!-- func:instrument.setAcqDescPrefix -->
+                <b><tt><!-- template -->instrument.setAcqDescPrefix("<!--°-->string<!--°-->")<!-- /template --></tt> - <i>sets the prefix in the acquisition description</i>:</b><br>
+                <!-- /func:instrument.setAcqDescPrefix -->
+                </li>
+
+                <li><a name="instrument.getAcqDescPrefix"/><!-- func:instrument.getAcqDescPrefix -->
+                <b><tt><!-- template -->instrument.getAcqDescPrefix()<!-- /template --></tt> - <i>returns the prefix from the acquisition description</i>:</b><br>
+                <!-- /func:instrument.getAcqDescPrefix -->
+                </li>
+
+
+
+                <li><a name="instrument.setAcqDescComment"/><!-- func:instrument.setAcqDescComment -->
+                <b><tt><!-- template -->instrument.setAcqDescComment("<!--°-->string<!--°-->")<!-- /template --></tt> - <i>sets the comment in the acquisition description</i>:</b><br>
+                <!-- /func:instrument.setAcqDescComment -->
+                </li>
+
+                <li><a name="instrument.getAcqDescComment"/><!-- func:instrument.getAcqDescComment -->
+                <b><tt><!-- template -->instrument.getAcqDescComment()<!-- /template --></tt> - <i>returns the comment from the acquisition description</i>:</b><br>
+                <!-- /func:instrument.getAcqDescComment -->
+                </li>
+
+
+
+                <li><a name="instrument.setAcqDescPlate"/><!-- func:instrument.setAcqDescPlate -->
+                <b><tt><!-- template -->instrument.setAcqDescPlate("<!--°-->int<!--°-->")<!-- /template --></tt> - <i>sets the plate number in the acquisition description</i>:</b><br>
+                <!-- /func:instrument.setAcqDescPlate -->
+                </li>
+
+                <li><a name="instrument.getAcqDescPlate"/><!-- func:instrument.getAcqDescPlate -->
+                <b><tt><!-- template -->instrument.getAcqDescPlate()<!-- /template --></tt> - <i>returns the plate number from the acquisition description</i>:</b><br>
+                <!-- /func:instrument.getAcqDescPlate -->
+                </li>
+
+
+
+                <li><a name="instrument.setAcqDescWell"/><!-- func:instrument.setAcqDescWell -->
+                <b><tt><!-- template -->instrument.setAcqDescWell("<!--°-->int<!--°-->")<!-- /template --></tt> - <i>sets the well number in the acquisition description</i>:</b><br>
+                <!-- /func:instrument.setAcqDescWell -->
+                </li>
+
+                <li><a name="instrument.getAcqDescWell"/><!-- func:instrument.getAcqDescWell -->
+                <b><tt><!-- template -->instrument.getAcqDescWell()<!-- /template --></tt> - <i>returns the well number from the acquisition description</i>:</b><br>
+                <!-- /func:instrument.getAcqDescWell -->
+                </li>
+
+
+
+                <li><a name="instrument.setAcqDescCell"/><!-- func:instrument.setAcqDescCell -->
+                <b><tt><!-- template -->instrument.setAcqDescCell("<!--°-->int<!--°-->")<!-- /template --></tt> - <i>sets the cell number in the acquisition description</i>:</b><br>
+                <!-- /func:instrument.setAcqDescCell -->
+                </li>
+
+                <li><a name="instrument.getAcqDescCell"/><!-- func:instrument.getAcqDescCell -->
+                <b><tt><!-- template -->instrument.getAcqDescCell()<!-- /template --></tt> - <i>returns the cell number from the acquisition description</i>:</b><br>
+                <!-- /func:instrument.getAcqDescCell -->
+                </li>
+
+        </ul>
 	
   </body>
 </html>

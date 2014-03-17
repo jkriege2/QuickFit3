@@ -29,6 +29,14 @@ class QFESPIMB040AcquisitionDescription : public QWidget, public QFESPIMB040File
         QString getSample() const;
         QString getPrefix() const;
 
+        void setCurrentSample(const QString& name);
+        void setPrefix(const QString& name);
+        void setPlate(int p);
+        void setWell(int p);
+        void setCell(int p);
+        void setComment(const QString& name);
+
+
         void setOtherSettingWidgets(QFESPIMB040OpticsSetupBase *setup, QFESPIMB040ExperimentDescription *exp);
     public slots:
         void nextCell();

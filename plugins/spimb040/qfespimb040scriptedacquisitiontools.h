@@ -78,6 +78,20 @@ class QFESPIMB040ScriptedAcquisitionInstrumentControl : public QObject, public Q
         QVariant getStagePos(const QString& stage);
         void setFilterWheel(const QString& wheel, int filter);
 
+        void setAcqDescCurrentSample(const QString& name);
+        void setAcqDescPrefix(const QString& name);
+        void setAcqDescPlate(int p);
+        void setAcqDescWell(int p);
+        void setAcqDescCell(int p);
+        void setAcqDescComment(const QString& name);
+
+        int getAcqDescCell() const;
+        int getAcqDescWell() const;
+        int getAcqDescPlate() const;
+        QString getAcqDescComment() const;
+        QString getAcqDescCurrentSample() const;
+        QString getAcqDescPrefix() const;
+
         void MDConnect(const QString& device_name, int id);
         void MDDisconnect(const QString& device_name, int id);
         QVariant MDGet(const QString& device_name, int id, int parameter);

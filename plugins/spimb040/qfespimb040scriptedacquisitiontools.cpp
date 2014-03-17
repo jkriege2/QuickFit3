@@ -270,6 +270,66 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::setFilterWheel(const QStri
     }
 }
 
+void QFESPIMB040ScriptedAcquisitionInstrumentControl::setAcqDescCurrentSample(const QString &name)
+{
+    acqDescription->setCurrentSample(name);
+}
+
+void QFESPIMB040ScriptedAcquisitionInstrumentControl::setAcqDescPrefix(const QString &name)
+{
+    acqDescription->setPrefix(name);
+}
+
+void QFESPIMB040ScriptedAcquisitionInstrumentControl::setAcqDescPlate(int p)
+{
+    acqDescription->setPlate(p);
+}
+
+void QFESPIMB040ScriptedAcquisitionInstrumentControl::setAcqDescWell(int p)
+{
+    acqDescription->setWell(p);
+}
+
+void QFESPIMB040ScriptedAcquisitionInstrumentControl::setAcqDescCell(int p)
+{
+    acqDescription->setCell(p);
+}
+
+void QFESPIMB040ScriptedAcquisitionInstrumentControl::setAcqDescComment(const QString &name)
+{
+    acqDescription->setComment(name);
+}
+
+int QFESPIMB040ScriptedAcquisitionInstrumentControl::getAcqDescCell() const
+{
+    return acqDescription->getCell();
+}
+
+int QFESPIMB040ScriptedAcquisitionInstrumentControl::getAcqDescWell() const
+{
+    return acqDescription->getWell();
+}
+
+int QFESPIMB040ScriptedAcquisitionInstrumentControl::getAcqDescPlate() const
+{
+    return acqDescription->getPlate();
+}
+
+QString QFESPIMB040ScriptedAcquisitionInstrumentControl::getAcqDescComment() const
+{
+    return acqDescription->getComment();
+}
+
+QString QFESPIMB040ScriptedAcquisitionInstrumentControl::getAcqDescCurrentSample() const
+{
+    return acqDescription->getSample();
+}
+
+QString QFESPIMB040ScriptedAcquisitionInstrumentControl::getAcqDescPrefix() const
+{
+    return acqDescription->getPrefix();
+}
+
 void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDConnect(const QString &device_name, int id)
 {
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);

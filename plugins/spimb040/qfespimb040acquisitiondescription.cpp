@@ -105,6 +105,36 @@ QString QFESPIMB040AcquisitionDescription::getPrefix() const
     return ui->edtPrefix->text();
 }
 
+void QFESPIMB040AcquisitionDescription::setCurrentSample(const QString &name)
+{
+    ui->edtCurrentSampleName->setText(name);
+}
+
+void QFESPIMB040AcquisitionDescription::setPrefix(const QString &name)
+{
+    ui->edtPrefix->setText(name);
+}
+
+void QFESPIMB040AcquisitionDescription::setPlate(int p)
+{
+    ui->spinPlate->setValue(p);
+}
+
+void QFESPIMB040AcquisitionDescription::setWell(int p)
+{
+    ui->spinWell->setValue(p);
+}
+
+void QFESPIMB040AcquisitionDescription::setCell(int p)
+{
+    ui->spinCell->setValue(p);
+}
+
+void QFESPIMB040AcquisitionDescription::setComment(const QString &name)
+{
+    ui->edtComment->setText(name);
+}
+
 void QFESPIMB040AcquisitionDescription::setOtherSettingWidgets(QFESPIMB040OpticsSetupBase *setup, QFESPIMB040ExperimentDescription *exp)
 {
     this->opticsSetup=setup;
