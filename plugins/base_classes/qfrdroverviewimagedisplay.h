@@ -65,6 +65,7 @@ class QFRDROverviewImageDisplay : public QWidget
         QToolBar* toolbar;
         QFHistogramView* histogram;
         QCheckBox* chkHistVideo;
+        QCheckBox* chkRelaxedColorScale;
 
         QTabWidget* tabMain;
 

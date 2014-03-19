@@ -12,6 +12,9 @@
 #include "qffitfunctionfcsdiffD.h"
 #include "qffitfunctionfcsflowv.h"
 #include "qffitfunctioncsfcs.h"
+#include "qffitfunctionfcspowerlaw.h"
+#include "qffitfunctionfcssimpleexp.h"
+#include "qffitfunctionfcsdiffDAfterpulse.h"
 
 
 
@@ -21,7 +24,7 @@
 
 QStringList QFPFitFunctionFCS::getIDs() const {
     QStringList res;
-    res<<"fcs_exp"<<"fcs_diff"<<"fcs_diff_d"<<"fcs_diff_d_wz"<<"fcs_diff1"<<"fcs_adiff"<<"fcs_multidiff"<<"fcs_diffflow"<<"fcs_diffflowv"<<"fcs_diffrot"<<"fcs_oscillation"<<"fcs_cs_diff_d"<<"fcs_diff_cs_d_wz";
+    res<<"fcs_diff"<<"fcs_diff_d"<<"fcs_diff_d_afterpulse"<<"fcs_diff_d_wz"<<"fcs_diff_d_wz_afterpulse"<<"fcs_diff1"<<"fcs_adiff"<<"fcs_multidiff"<<"fcs_diffflow"<<"fcs_diffflowv"<<"fcs_diffrot"<<"fcs_oscillation"<<"fcs_cs_diff_d"<<"fcs_diff_cs_d_wz"<<"fcs_simpleexp"<<"fcs_exp"<<"fcs_powerlaw";
     return res;
 }
 
@@ -52,6 +55,14 @@ QFFitFunction* QFPFitFunctionFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionCSFCSDiffD(true);
     } else if (id=="fcs_diff_cs_d_wz") {
         return new QFFitFunctionCSFCSDiffD(false);
+    } else if (id=="fcs_powerlaw") {
+        return new QFFitFunctionFCSPowerLaw();
+    } else if (id=="fcs_simpleexp") {
+        return new QFFitFunctionFCSSimpleExp();
+    } else if (id=="fcs_diff_d") {
+        return new QFFitFunctionFCSDiffDAfterPulse(true);
+    } else if (id=="fcs_diff_d_wz_afterpulse") {
+        return new QFFitFunctionFCSDiffDAfterPulse(false);
     }
     return NULL;
 }

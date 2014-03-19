@@ -400,17 +400,27 @@ void QFMeasurementDeviceConfigWidget::updateMDWidgets() {
                         connect(w.spinInt, SIGNAL(editingFinished()), this, SLOT(setPowerEditingFinished()));
                     }
                     break;
-                case QFExtensionMeasurementAndControlDevice::mdCheckBox:
-                    if (!w.checkbox){
+                case QFExtensionMeasurementAndControlDevice::mdLineEdit:
+                    if (!w.lineedit){
                         w.removeInputFromLayout(linesLayout);
                         w.deleteInputLater();
 
-                        wadd=w.checkbox=new QCheckBox(this);
-                        w.checkbox->setText("");
+                        wadd=w.lineedit=new QLineEdit(this);
 
-                        connect(w.checkbox, SIGNAL(toggled(bool)), this, SLOT(setPowerEditingFinished()));
+                        connect(w.lineedit, SIGNAL(editingFinished()), this, SLOT(setPowerEditingFinished()));
                     }
                     break;
+            case QFExtensionMeasurementAndControlDevice::mdCheckBox:
+                if (!w.checkbox){
+                    w.removeInputFromLayout(linesLayout);
+                    w.deleteInputLater();
+
+                    wadd=w.checkbox=new QCheckBox(this);
+                    w.checkbox->setText("");
+
+                    connect(w.checkbox, SIGNAL(toggled(bool)), this, SLOT(setPowerEditingFinished()));
+                }
+                break;
                 case QFExtensionMeasurementAndControlDevice::mdIntCombobBox:
                     if (!w.cmbInt){
                         w.removeInputFromLayout(linesLayout);
@@ -455,6 +465,7 @@ int QFMeasurementDeviceConfigWidget::getMDByWidget(QObject *widget) {
     int result=-1;
     for (int i=0; i<mdWidgets.size(); i++){
         if (mdWidgets[i].checkbox==widget) return i;
+        if (mdWidgets[i].lineedit==widget) return i;
         if (mdWidgets[i].cmbInt==widget) return i;
         if (mdWidgets[i].spinInt==widget) return i;
         if (mdWidgets[i].label==widget) return i;
@@ -478,6 +489,7 @@ void QFMeasurementDeviceConfigWidget::displayStates() {
             if (mdWidgets[i].checkbox) disconnect(mdWidgets[i].checkbox, SIGNAL(toggled(bool)), this, SLOT(setPowerEditingFinished()));
             if (mdWidgets[i].spinDouble) disconnect(mdWidgets[i].spinDouble, SIGNAL(editingFinished()), this, SLOT(setPowerEditingFinished()));
             if (mdWidgets[i].spinInt) disconnect(mdWidgets[i].spinInt, SIGNAL(editingFinished()), this, SLOT(setPowerEditingFinished()));
+            if (mdWidgets[i].lineedit) disconnect(mdWidgets[i].lineedit, SIGNAL(editingFinished()), this, SLOT(setPowerEditingFinished()));
             if (mdWidgets[i].cmbInt) disconnect(mdWidgets[i].cmbInt, SIGNAL(currentIndexChanged(int)), this, SLOT(setPowerEditingFinished()));
 
             mdWidgets[i].setTitle(MeasurementDevice->getMeasurementDeviceValueName(MeasurementDeviceID, i));
@@ -486,6 +498,7 @@ void QFMeasurementDeviceConfigWidget::displayStates() {
             if (mdWidgets[i].checkbox) connect(mdWidgets[i].checkbox, SIGNAL(toggled(bool)), this, SLOT(setPowerEditingFinished()));
             if (mdWidgets[i].spinDouble) connect(mdWidgets[i].spinDouble, SIGNAL(editingFinished()), this, SLOT(setPowerEditingFinished()));
             if (mdWidgets[i].spinInt) connect(mdWidgets[i].spinInt, SIGNAL(editingFinished()), this, SLOT(setPowerEditingFinished()));
+            if (mdWidgets[i].lineedit) connect(mdWidgets[i].lineedit, SIGNAL(editingFinished()), this, SLOT(setPowerEditingFinished()));
             if (mdWidgets[i].cmbInt) connect(mdWidgets[i].cmbInt, SIGNAL(currentIndexChanged(int)), this, SLOT(setPowerEditingFinished()));
         }
     }
@@ -536,6 +549,7 @@ void QFMeasurementDeviceConfigWidget::valuesChanged(QTime time, QList<QVariant> 
             if (mdWidgets[i].checkbox) disconnect(mdWidgets[i].checkbox, SIGNAL(toggled(bool)), this, SLOT(setPowerEditingFinished()));
             if (mdWidgets[i].spinDouble) disconnect(mdWidgets[i].spinDouble, SIGNAL(editingFinished()), this, SLOT(setPowerEditingFinished()));
             if (mdWidgets[i].spinInt) disconnect(mdWidgets[i].spinInt, SIGNAL(editingFinished()), this, SLOT(setPowerEditingFinished()));
+            if (mdWidgets[i].lineedit) disconnect(mdWidgets[i].lineedit, SIGNAL(editingFinished()), this, SLOT(setPowerEditingFinished()));
             if (mdWidgets[i].cmbInt) disconnect(mdWidgets[i].cmbInt, SIGNAL(currentIndexChanged(int)), this, SLOT(setPowerEditingFinished()));
 
             mdWidgets[i].setTitle(lineNames.value(i, QString()));
@@ -544,6 +558,7 @@ void QFMeasurementDeviceConfigWidget::valuesChanged(QTime time, QList<QVariant> 
             if (mdWidgets[i].checkbox) connect(mdWidgets[i].checkbox, SIGNAL(toggled(bool)), this, SLOT(setPowerEditingFinished()));
             if (mdWidgets[i].spinDouble) connect(mdWidgets[i].spinDouble, SIGNAL(editingFinished()), this, SLOT(setPowerEditingFinished()));
             if (mdWidgets[i].spinInt) connect(mdWidgets[i].spinInt, SIGNAL(editingFinished()), this, SLOT(setPowerEditingFinished()));
+            if (mdWidgets[i].lineedit) connect(mdWidgets[i].lineedit, SIGNAL(editingFinished()), this, SLOT(setPowerEditingFinished()));
             if (mdWidgets[i].cmbInt) connect(mdWidgets[i].cmbInt, SIGNAL(currentIndexChanged(int)), this, SLOT(setPowerEditingFinished()));
         }
     }
@@ -568,6 +583,12 @@ void QFMeasurementDeviceConfigWidget::setPowerEditingFinished() {
         QCheckBox* spin=qobject_cast<QCheckBox*>(sender());
         if (spin) {
             setValueChanged(spin->isChecked());
+        }
+    }
+    {
+        QLineEdit* spin=qobject_cast<QLineEdit*>(sender());
+        if (spin) {
+            setValueChanged(spin->text());
         }
     }
     {
@@ -606,6 +627,11 @@ void QFMeasurementDeviceConfigWidget::MDWidgets::deleteInputLater()
         checkbox->deleteLater();
         checkbox=NULL;
     }
+    if (lineedit) {
+        lineedit->hide();
+        lineedit->deleteLater();
+        lineedit=NULL;
+    }
     if (spinDouble) {
         spinDouble->hide();
         spinDouble->deleteLater();
@@ -637,6 +663,7 @@ void QFMeasurementDeviceConfigWidget::MDWidgets::removeFromLayout(QGridLayout *l
 void QFMeasurementDeviceConfigWidget::MDWidgets::removeInputFromLayout(QGridLayout *layout)
 {
     if (checkbox) layout->removeWidget(checkbox);
+    if (lineedit) layout->removeWidget(lineedit);
     if (spinDouble) layout->removeWidget(spinDouble);
     if (spinInt) layout->removeWidget(spinInt);
     if (cmbInt) layout->removeWidget(cmbInt);
@@ -648,6 +675,9 @@ void QFMeasurementDeviceConfigWidget::MDWidgets::setValue(const QVariant &value)
 {
     if (checkbox) {
         checkbox->setChecked(value.toBool());
+    }
+    if (lineedit) {
+        lineedit->setText(value.toString());
     }
     if (spinDouble) {
         spinDouble->setValue(value.toDouble());
@@ -669,6 +699,9 @@ void QFMeasurementDeviceConfigWidget::MDWidgets::setValueUpdate(const QVariant &
 {
     if (checkbox) {
         if (value.toBool()!=checkbox->isChecked() && !checkbox->hasFocus()) checkbox->setChecked(value.toBool());
+    }
+    if (lineedit) {
+        if (value.toString()!=lineedit->text() && !lineedit->hasFocus()) lineedit->setText(value.toString());
     }
     if (spinDouble) {
         if (value.toDouble()!=spinDouble->value() && !spinDouble->hasFocus()) spinDouble->setValue(value.toDouble());
@@ -718,6 +751,9 @@ QVariant QFMeasurementDeviceConfigWidget::MDWidgets::getValue()
 {
     if (checkbox) {
         return checkbox->isChecked();
+    }
+    if (lineedit) {
+        return lineedit->text();
     }
     if (spinDouble) {
         return spinDouble->value();

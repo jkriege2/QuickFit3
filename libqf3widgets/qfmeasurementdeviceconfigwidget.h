@@ -41,7 +41,7 @@
 #include "qftools.h"
 #include "qfmanyfilessettings.h"
 #include "qfmeasurementdevicecombobox.h"
-
+#include <QLineEdit>
 
 /*! \brief QWidget with a set of controls that allow to control a MeasurementDevice
     \ingroup qf3ext_spimb040
@@ -144,6 +144,7 @@ class QFWIDLIB_EXPORT QFMeasurementDeviceConfigWidget : public QFrame {
         QTimer timerDisplayUpdate;
 
         struct MDWidgets {
+            QPointer<QLineEdit> lineedit;
             QPointer<QCheckBox> checkbox;
             QPointer<QDoubleSpinBox> spinDouble;
             QPointer<QSpinBox> spinInt;

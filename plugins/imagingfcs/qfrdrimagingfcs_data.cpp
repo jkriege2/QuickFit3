@@ -428,6 +428,14 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
             bool overviewReal;
             bool ok=readEvalSettingsFile(evalsettingsFile, isDCCF, initParams, paramsReadonly, width, height, lfiles, lfiles_types, lfiles_descriptions, filename_settings, filename_acquisition, filename_overview, filename_overviewstd, filename_background, filename_backgroundstddev, role, dccfid, overviewReal);
 
+            if (ok) {
+                QMapIterator<QString, QVariant> it(initParams);
+                while (it.hasNext()) {
+                    it.next();
+                    if (!propertyExists(it.key())) setQFProperty(it.key(), it.value(), paramsReadonly.contains(it.key()));
+                }
+            }
+
             for (int i=0; i<lfiles.size(); i++) {
                 // now we have to do a really thorough check of all files in files, as the file pathes may be a bit
                 // different although they point to the same file.
@@ -499,6 +507,9 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                         facOffset=vidMin;
                     }
                     loadVideo(files[i], &video, &video_width, &video_height, &video_frames, facA, facOffset);
+                    if (!propertyExists("FRAME_COUNT")) {
+                        setQFProperty("FRAME_COUNT", video_frames);
+                    }
                 } else if (ft=="video_uncorrected") {
                     double facOffset=0;
                     double facA=1;
@@ -1360,6 +1371,7 @@ int QFRDRImagingFCSData::leaveoutGetRunCount() const
 }
 
 bool QFRDRImagingFCSData::leaveoutRun(int run) const {
+    if (run<0) return false;
     return maskGet(runToX(run), runToY(run));
 }
 
@@ -1374,6 +1386,7 @@ double* QFRDRImagingFCSData::getCorrelationRunError(int run) const {
 }
 
 QString QFRDRImagingFCSData::getCorrelationRunName(int run) const {
+    if (run<0) return QObject::tr("average");
     int x=runToX(run);
     int y=runToY(run);
     return QString("[%1, %2]").arg(x).arg(y);
@@ -2274,9 +2287,15 @@ QString QFRDRImagingFCSData::getImageStackYName(int stack) const {
 double QFRDRImagingFCSData::getImageStackTUnitFactor(int stack) const {
     if (stack==0) {
         if (video_frames<=0) return 1;
+        if (propertyExists("VIDEO_FRAMETIME")) {
+            return getProperty("VIDEO_FRAMETIME", 1.0).toDouble();
+        }
         return getMeasurementDuration()/double(video_frames);
     } else if (stack==1) {
         if (videoUncorrected_frames<=0) return 1;
+        if (propertyExists("VIDEO_FRAMETIME")) {
+            return getProperty("VIDEO_FRAMETIME", 1.0).toDouble();
+        }
         return getMeasurementDuration()/double(videoUncorrected_frames);
     }
     return 1;

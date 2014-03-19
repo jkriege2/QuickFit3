@@ -98,6 +98,12 @@ void QFRDROverviewImageDisplay::createWidgets() {
     labImageAvg=new QLabel(this);
     majorLay->addWidget(labImageAvg);
 
+    chkRelaxedColorScale=new QCheckBox(tr("relaxed color scaling ( 5%/95% quantiles, not min/max)"), this);
+    chkRelaxedColorScale->setVisible(true);
+    connect(chkRelaxedColorScale, SIGNAL(toggled(bool)), this, SLOT(showFullScreen()));
+    majorLay->addWidget(chkRelaxedColorScale);
+
+
     player=new QFPLayerControls(this);
     player->setVisible(false);
     majorLay->addWidget(player);
@@ -609,7 +615,8 @@ void QFRDROverviewImageDisplay::showFrame(int frame) {
         int idx=cmbImage->currentIndex()-m->getOverviewImageCount();
         int width=mv->getImageStackWidth(idx);
         int height=mv->getImageStackHeight(idx);
-        image->set_data(mv->getImageStack(idx, frame, 0), width, height, JKQTPMathImageBase::DoubleArray);
+        double* data=mv->getImageStack(idx, frame, 0);
+        image->set_data(data, width, height, JKQTPMathImageBase::DoubleArray);
         image->set_visible(true);
         imageRGB->set_visible(false);
         if (mv->getImageStackChannels(idx)<=1) {
@@ -620,6 +627,51 @@ void QFRDROverviewImageDisplay::showFrame(int frame) {
             imageRGB->set_visible(true);
             image->set_visible(false);
         }
+
+        if (chkRelaxedColorScale->isChecked()) {
+            if (mv->getImageStackChannels(idx)>1) {
+                double* datas=duplicateArray(mv->getImageStack(idx, frame, 1), width*height);
+                statisticsSort(datas, width*height);
+                double qmi=statisticsSortedQuantile(datas, width*height, 0.05);
+                double qma=statisticsSortedQuantile(datas, width*height, 0.95);
+                imageRGB->set_autoImageRange(false);
+                imageRGB->set_imageMin(qmi);
+                imageRGB->set_imageMax(qma);
+                free(datas);
+
+                datas=duplicateArray(mv->getImageStack(idx, frame, 0), width*height);
+                statisticsSort(datas, width*height);
+                qmi=statisticsSortedQuantile(datas, width*height, 0.05);
+                qma=statisticsSortedQuantile(datas, width*height, 0.95);
+                imageRGB->set_autoImageRange(false);
+                imageRGB->set_imageMinG(qmi);
+                imageRGB->set_imageMaxG(qma);
+                free(datas);
+
+                datas=duplicateArray(mv->getImageStack(idx, frame, 2), width*height);
+                statisticsSort(datas, width*height);
+                qmi=statisticsSortedQuantile(datas, width*height, 0.05);
+                qma=statisticsSortedQuantile(datas, width*height, 0.95);
+                imageRGB->set_autoImageRange(false);
+                imageRGB->set_imageMinB(qmi);
+                imageRGB->set_imageMaxB(qma);
+                free(datas);
+
+            } else {
+                double* datas=duplicateArray(data, width*height);
+                statisticsSort(datas, width*height);
+                double qmi=statisticsSortedQuantile(datas, width*height, 0.05);
+                double qma=statisticsSortedQuantile(datas, width*height, 0.95);
+                image->set_autoImageRange(false);
+                image->set_imageMin(qmi);
+                image->set_imageMax(qma);
+                free(datas);
+            }
+        } else {
+            image->set_autoImageRange(true);
+            imageRGB->set_autoImageRange(true);
+        }
+
         emit displayedFrame((double)frame*mv->getImageStackTUnitFactor(idx));
 
         if (selected_width!=width || selected_height!=height) {
@@ -758,8 +810,8 @@ void QFRDROverviewImageDisplay::displayImage() {
         pltImage->getDatastore()->addCopiedColumn(mv->getImageStack(idx, 0), width*height, cmbImage->currentText());
         pltImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, selected_width*selected_height, tr("mask"));
 
-        if (chkHistVideo->isChecked()) showHistograms(mv->getImageStack(idx, 0), width*height);
         histogram->setEnabled(chkHistVideo->isChecked());
+        if (chkHistVideo->isChecked()) showHistograms(mv->getImageStack(idx, 0), width*height);
 
         pltImage->get_plotter()->setAbsoluteXY(0,rwidth,0,rheight);
         pltImage->get_plotter()->set_aspectRatio(double(width)/double(height));
@@ -899,6 +951,7 @@ void QFRDROverviewImageDisplay::readSettings(QSettings &settings, const QString 
     player->setReplay(settings.value(prefix+"player_replay", player->getReplay()).toBool());
     histogram->readSettings(settings, prefix+"histogram/");
     chkHistVideo->setChecked(settings.value(prefix+"videohistogram", chkHistVideo->isChecked()).toBool());
+    chkRelaxedColorScale->setChecked(settings.value(prefix+"chkRelaxedColorScale", chkRelaxedColorScale->isChecked()).toBool());
 }
 
 void QFRDROverviewImageDisplay::writeSettings(QSettings &settings, const QString &prefix) {
@@ -906,6 +959,7 @@ void QFRDROverviewImageDisplay::writeSettings(QSettings &settings, const QString
     settings.setValue(prefix+"player_replay", player->getReplay());
     histogram->writeSettings(settings, prefix+"histogram/");
     settings.setValue(prefix+"videohistogram", chkHistVideo->isChecked());
+    settings.setValue(prefix+"chkRelaxedColorScale", false);
 }
 
 void QFRDROverviewImageDisplay::mouseMoved(double x, double y) {

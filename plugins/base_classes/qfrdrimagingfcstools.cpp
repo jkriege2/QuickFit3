@@ -517,7 +517,12 @@ bool readEvalSettingsFile(const QString &evalFilename, bool isDCCF, QMap<QString
                     paramsReadonly<<"UNCORRECTEDVIDEO_MAX";
                 } else if (name=="video sum up") {
                     initParams["VIDEO_AVGFRAMES"]=value.toInt();
-                    paramsReadonly<<"VIDEO_AVGFRAMES";
+                } else if (name=="video frametime (ms)") {
+                    initParams["VIDEO_FRAMETIME"]=value.toDouble()/1000.0;
+                    paramsReadonly<<"VIDEO_FRAMETIME";
+                } else if (name=="video frametime (s)") {
+                    initParams["VIDEO_FRAMETIME"]=value.toDouble();
+                    paramsReadonly<<"VIDEO_FRAMETIME";
                 } else if (name=="video avgmin") {
                     initParams["VIDEO_AVGMIN"]=value.toDouble();
                     paramsReadonly<<"VIDEO_AVGMIN";

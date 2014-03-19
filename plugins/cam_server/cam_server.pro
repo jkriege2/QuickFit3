@@ -12,7 +12,8 @@ DESTDIR = $${QFOUTPUT}/plugins/
 
 # Input
 HEADERS += qfecamserver.h \
-           ../interfaces/qfextensioncamera.h
+           ../interfaces/qfextensioncamera.h \
+    ../interfaces/qfextensionmeasurementdevice.h
 
 SOURCES += qfecamserver.cpp
 

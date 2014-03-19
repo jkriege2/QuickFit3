@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>Multi-Component Normal 3D Diffusion (with non-fluorescing components) + afterpulsing term</title></head>
+<body>
+$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+This plugin implements a 3D diffusion model for the fitting routines in QuickFit. The model may be denoted as: 
+$$bmath:G(\tau)=G_\infty+X_{after}(\tau)+\frac{1}{N}\cdot\left(\frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}\right)\cdot\left[(1-\rho_2-\rho_3)\cdot g_1(\tau)+\rho_2\cdot g_2(\tau)+\rho_3\cdot g_3(\tau)\right]$$
+with
+$$bmath:g_i(\tau)=\left(1+\frac{4D_i\cdot\tau}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{4D_i\cdot\tau}{\gamma^2w_{xy}^2}\right)^{-1/2}$$
+and
+$$bmath:X_{after}(\tau)=a_{after}\cdot\tau^{-b_{after}}$$
+or
+$$bmath:X_{after}(\tau)=a_{after}\cdot\exp\left(-\frac{\tau}{\tau_{after}}\right)$$
+or
+$$bmath:X_{after}(\tau)=0$$
+
+
+The parameters are:
+<ul>
+<li><img alt="$ G_\infty $" src="./pic/form_800.png"/>: offset of the correlation function</li>
+<li><img alt="$ N $" src="./pic/form_650.png"/>: overall particle number (including currently dark particles, e.g. in triplet state)</li>
+<li><img alt="$ \Theta_{trip}, \Theta_{non} $" src="./pic/form_810.png"/>: fraction of the particles in one of the first two non-fluorescent states (priplet, ...)</li>
+<li><img alt="$ \tau_{trip}, \tau{non} $" src="./pic/form_820.png"/>: decay time of the first two non-fluorescent states (triplet, ...)</li>
+<li><img alt="$ \rho_1=1-\rho2-\rho3, \rho_2, \rho_3 $" src="./pic/form_830.png"/>: fractions of the three diffusing components</li>
+<li>$$math:D_i$$: diffusion coefficient time of the i-th diffusing component</li>
+<li>$$math:\gamma=\frac{w_z}{w_{xy}}$$: aspect ratio of the gaussian used to approximate the focus</li>
+<li>$$math:w_{xy}$$: lateral half axis of the focus gaussian</li>
+<li>$$math:w_z$$: longitudinal half axis of the focus gaussian</li>
+<li>$$math:a_{after}$$: afterpulsing amplitude</li>
+<li>$$math:b_{after}$$: afterpulsing exponent for power-law fit</li>
+<li>$$math:\tau_{after}$$: afterpulsing exponential lifetime for exponential fit</li>
+<li><i>b</i>: background intensity, as measured in a sample without fluorescing molecules (e.g. dark counts of the detector and scattering in the buffer contributes to this) </li>
+<li><i>cps</i>: average background corrected intensity during the measurement, i.e. <i>cps=I</i><sub>measured</sub><i>-b</b> </li>
+
+</ul>
+This model also calculates the diffusion time (retention time in the focus), if the width <img alt="$ w_{xy} $" src="./pic/form_300.png"/> of the laser focus (xy plane) is known, as: 
+$$bmath:\tau_D=\frac{w_{xy}^2}{4D}$$
+where $$math:D$$ is the diffusion coefficient. Also the effective focal volume <img alt="$ V_{eff} $" src="./pic/form_600.png"/> is calculated: </p>
+<blockquote><img alt="\[ V_{eff}=\pi^{3/2}\cdot\gamma\cdot w_{xy}^3 \]" src="./pic/form_700.png"/></blockquote>
+
+Given this focal volume, the plugin may also calculate the particle concentration in the sample: </p>
+<blockquote><img alt="\[ C=\frac{N}{V_{eff}} \]" src="./pic/form_870.png"/></blockquote>
+Given the count rate cps and the background count rate <i>b</i>, we can calculate the counts per molecule:
+<blockquote><img  src="./pic/form_416.png"></blockquote>
+
+The plugin also calculates some parameter errors: 
+<blockquote>
+	<img alt="\[ \Delta \left(\frac{1}{N}\right)=\left|\frac{\Delta N}{N^2}\right| \]" src="./pic/form_900.png"/><br>
+        $$math:\Delta\tau_D=\sqrt{\left(\Delta w_{xy}\cdot\frac{w_{xy}}{2D}\right)^2+\left(\Delta D\cdot\frac{w_{xy}^2}{4D^2}\right)^2}$$<br>
+	<img alt="\[ \Delta V_{eff}=\sqrt{\left(\Delta\gamma\cdot\pi^{3/2}\cdot w_{xy}^3\right)^2+\left(\Delta w_{xy}\cdot 3\pi^{3/2}\cdot \gamma\cdot w_{xy}^2\right)^2} \]" src="./pic/form_110.png"/><br>
+	<img alt="\[ \Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^{3}}\right)^2+\left(\Delta\gamma\cdot\frac{N}{\pi^{3/2}\cdot w{xy}^3\cdot\gamma^2}\right)^2+\left(\Delta w_{xy}\cdot\frac{3\cdot N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^4}\right)^2} \]" src="./pic/form_120.png"/><br>
+        <img  src="./pic/form_417.png">
+</blockquote>
+
+</body></html>

@@ -93,7 +93,164 @@ void QFECamServer::storeSettings(ProgramOptions* settingspo) {
 	// ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file
 	// QSettings settings(services->getConfigFileDirectory()+"/plugins/extensions/"+getID()+"/"+getID()+".ini", QSettings::IniFormat);
 
-	}
+}
+
+unsigned int QFECamServer::getMeasurementDeviceCount()
+{
+    return getCameraCount();
+}
+
+void QFECamServer::showMeasurementDeviceSettingsDialog(unsigned int measurementDevice, QWidget *parent)
+{
+    QMessageBox::information(parent, tr("Andor camera driver"), tr("there is no configuration dialog for the camera as measurement device!"));
+}
+
+bool QFECamServer::isMeasurementDeviceConnected(unsigned int measurementDevice)
+{
+    return isCameraConnected(measurementDevice);
+
+}
+
+void QFECamServer::connectMeasurementDevice(unsigned int measurementDevice)
+{
+    connectCameraDevice(measurementDevice);
+}
+
+void QFECamServer::disconnectMeasurementDevice(unsigned int measurementDevice)
+{
+    //disconnectCameraDevice(measurementDevice);
+}
+
+QString QFECamServer::getMeasurementDeviceName(unsigned int measurementDevice)
+{
+    return getCameraName(measurementDevice);
+}
+
+void QFECamServer::setMeasurementDeviceLogging(QFPluginLogService *logService)
+{
+    setCameraLogging(logService);
+}
+
+unsigned int QFECamServer::getMeasurementDeviceValueCount(unsigned int measurementDevice)
+{
+    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        return sources[measurementDevice].params.size();
+    }
+    return 0;
+
+}
+
+QVariant QFECamServer::getMeasurementDeviceValue(unsigned int measurementDevice, unsigned int value)
+{
+    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (value>=0 && value<sources[measurementDevice].params.size()) {
+            QTcpSocket* server=sources[measurementDevice].server;
+            if (!server) return QVariant::Invalid;
+
+            QMutex* mutex=sources[measurementDevice].mutex;
+            QMutexLocker locker(mutex);
+
+            bool ok=false;
+            QList<QByteArray> bal=queryData(sources[measurementDevice], "PARAMETERS_GET\n\n", 1, "\n\n", &ok, true);
+            if (ok && bal.size()>0) {
+                bal=bal[0].split('\n');
+                for (int i=0; i<bal.size(); i++) {
+                    QList<QByteArray> a=bal[i].split(';');
+                    if (a.size()>2) {
+                        if (a[1]==sources[measurementDevice].params[value].id) {
+                            return QVariant(a[2]).convert(sources[measurementDevice].params[value].type);
+                        }
+                    }
+                }
+                log_error(tr("error reading parameter '%2' (timeout: %1s): PARAMETER NOT AVAILABLE IN DEVICE\n\n").arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id));
+            } else  {
+                log_error(tr("error reading parameter '%4' (timeout: %3s):\n%1     error description: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id));
+            }
+        }
+    }
+    return QVariant();
+}
+
+QString QFECamServer::getMeasurementDeviceValueName(unsigned int measurementDevice, unsigned int value)
+{
+    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (value>=0 && value<sources[measurementDevice].params.size()) {
+            return sources[measurementDevice].params[value].description;
+        }
+    }
+    return QString();
+}
+
+QString QFECamServer::getMeasurementDeviceValueShortName(unsigned int measurementDevice, unsigned int value)
+{
+    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (value>=0 && value<sources[measurementDevice].params.size()) {
+            return sources[measurementDevice].params[value].id;
+        }
+    }
+    return QString();
+}
+
+bool QFECamServer::isMeasurementDeviceValueEditable(unsigned int measurementDevice, unsigned int value)
+{
+    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (value>=0 && value<sources[measurementDevice].params.size()) {
+            return sources[measurementDevice].params[value].editable;
+        }
+
+    }
+    return false;
+}
+
+void QFECamServer::setMeasurementDeviceValue(unsigned int measurementDevice, unsigned int value, const QVariant &data)
+{
+    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (value>=0 && value<sources[measurementDevice].params.size()) {
+            QTcpSocket* server=sources[measurementDevice].server;
+            if (!server) return ;
+
+            QMutex* mutex=sources[measurementDevice].mutex;
+            QMutexLocker locker(mutex);
+
+            bool ok=sendCommand(sources[measurementDevice], QByteArray("PARAMETERS_SET\n")+sources[measurementDevice].params[value].id.toAscii()+QByteArray(";")+getQVariantData(data).toAscii()+QByteArray("\n\n"));
+            if (!ok) {
+                log_error(tr("error setting parameter '%4' (timeout: %3s):\n%1     new value:         '%5'!\n%1     error description: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id).arg(getQVariantData(data)));
+            }
+
+        }
+    }
+}
+
+QVariant::Type QFECamServer::getMeasurementDeviceEditableValueType(unsigned int measurementDevice, unsigned int value)
+{
+    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (value>=0 && value<sources[measurementDevice].params.size()) {
+            return sources[measurementDevice].params[value].type;
+        }
+
+    }
+    return QVariant::Invalid;
+}
+
+QFExtensionMeasurementAndControlDevice::WidgetTypes QFECamServer::getMeasurementDeviceValueWidget(unsigned int measurementDevice, unsigned int value, QStringList *comboboxEntries)
+{
+    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (value>=0 && value<sources[measurementDevice].params.size()) {
+            return sources[measurementDevice].params[value].widget;
+        }
+    }
+    return QFExtensionMeasurementAndControlDevice::mdDefault;
+}
+
+void QFECamServer::getMeasurementDeviceEditableValueRange(unsigned int measurementDevice, unsigned int value, double &minimum, double &maximum)
+{
+    if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
+        if (value>=0 && value<sources[measurementDevice].params.size()) {
+            minimum=sources[measurementDevice].params[value].range_min;
+            maximum=sources[measurementDevice].params[value].range_max;
+        }
+    }
+}
 
 unsigned int QFECamServer::getCameraCount() const {
     return sources.size();
@@ -160,7 +317,7 @@ bool QFECamServer::connectCameraDevice(unsigned int camera) {
     QMutex* mutex=sources[camera].mutex;
     QMutexLocker locker(mutex);
 
-    if (!server->isOpen() ) {
+    if (!server->isOpen() || (server->state()!=QAbstractSocket::ConnectedState) ) {
         log_text(tr("connecting to camera server '%1', port: %2..\n").arg(sources[camera].host).arg(sources[camera].port));
         server->connectToHost(sources[camera].host, sources[camera].port);
         if (server->waitForConnected(sources[camera].timeout_connection)) {
@@ -180,6 +337,70 @@ bool QFECamServer::connectCameraDevice(unsigned int camera) {
                 lastOp=tr("START LIVE-VIEW: WAIT ACK");
                 ok=waitForString(sources[camera], "ACK_LIVE_START\n\n");
             }
+            QString pnames;
+            if (ok) {
+                lastOp=tr("GET PARAMETERS");
+                log_text(tr("reading available parameters!\n"));
+                queryData(sources[camera], "PARAMETERS_GET\n\n");
+                lastOp=tr("GET PARAMETERS: WAIT FOR ANSWER");
+                QByteArray res=readString(sources[camera], "\n\n", &ok);
+                if (ok) {
+                    QList<QByteArray> params=res.split('\n');
+
+                    for (int i=0; i<params.size(); i++) {
+                        QList<QByteArray> p= params[i].split(';');
+                        if (p.size()>=7) {
+                            QFECamServer::CAM_PARAM pa;
+                            pa.id=p[1];
+                            pa.description=pa.id;
+                            if (!p[3].isEmpty()) pa.description=pa.description+QString(" (")+p[3]+QString(")");
+                            pa.editable=(p[6].toUpper()=="RW");
+                            pa.range_min=-DBL_MAX;
+                            pa.range_max=DBL_MAX;
+                            pa.type=QVariant::Invalid;
+                            pa.widget=QFExtensionMeasurementAndControlDevice::mdDefault;
+                            bool pok=true;
+
+                            if (p[0].toUpper()=="PARAM_INT") {
+                                pa.type=QVariant::Int;
+                                pa.widget=QFExtensionMeasurementAndControlDevice::mdIntEdit;
+                                bool iok=false;
+                                if (!p[4].isEmpty()) pa.range_min=p[4].toDouble(&iok);
+                                if (!iok) pa.range_min=-INT_MAX;
+                                iok=false;
+                                if (!p[5].isEmpty()) pa.range_max=p[5].toDouble(&iok);
+                                if (!iok) pa.range_min=INT_MAX;
+                            } else if (p[0].toUpper()=="PARAM_FLOAT") {
+                                pa.type=QVariant::Double;
+                                pa.widget=QFExtensionMeasurementAndControlDevice::mdDoubleEdit;
+                                bool iok=false;
+                                if (!p[4].isEmpty()) pa.range_min=p[4].toDouble(&iok);
+                                if (!iok) pa.range_min=-DBL_MAX;
+                                iok=false;
+                                if (!p[5].isEmpty()) pa.range_max=p[5].toDouble(&iok);
+                                if (!iok) pa.range_min=DBL_MAX;
+                            } else if (p[0].toUpper()=="PARAM_BOOL") {
+                                pa.type=QVariant::Bool;
+                                pa.widget=QFExtensionMeasurementAndControlDevice::mdCheckBox;
+                                bool iok=false;
+                                pa.range_min=0;
+                                pa.range_max=1;
+                            } else if (p[0].toUpper()=="PARAM_STRING") {
+                                pa.type=QVariant::String;
+                                pa.widget=QFExtensionMeasurementAndControlDevice::mdLineEdit;
+                            } else {
+                                log_error(tr("      -> unkown parameter type '%1' for parameter '%2' (description: %3").arg(QString(p[0].toUpper())).arg(QString(p[1])).arg(QString(p[3])));
+                                pok=false;
+                            }
+                            if (pok) {
+                                sources[camera].params.append(pa);
+                                if (!pnames.isEmpty()) pnames+=", ";
+                                pnames+=sources[camera].params.last().id;
+                            }
+                        }
+                    }
+                }
+            }
             if (ok) {
                 log_text(tr("   peer name:     %1\n").arg(server->peerName()));
                 log_text(tr("   peer adress:   %1\n").arg(server->peerAddress().toString()));
@@ -190,7 +411,8 @@ bool QFECamServer::connectCameraDevice(unsigned int camera) {
                 log_text(tr("   sensor name:   %1\n").arg(getCameraSensorName(camera)));
                 log_text(tr("   frame size:    %1 x %2\n").arg(getCameraImageWidth(camera)).arg(getCameraImageHeight(camera)));
                 log_text(tr("   exposure time: %1 ms\n").arg(getCameraExposureTime(camera)*1000.0));
-                log_text(tr("   pixel size:    %1 x %2 micrometer^2\n\n").arg(getCameraPixelWidth(camera)).arg(getCameraPixelHeight(camera)));
+                log_text(tr("   pixel size:    %1 x %2 micrometer^2\n").arg(getCameraPixelWidth(camera)).arg(getCameraPixelHeight(camera)));
+                log_text(tr("   Parameters:    %1: %2\n\n").arg(sources[camera].params.size()).arg(pnames));
             }
             if (!ok) {
                 log_error(tr("error connecting (timeout: %3s) during operation %4:\n%1     error description: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_connection)/1000.0).arg(lastOp));
@@ -216,7 +438,7 @@ void QFECamServer::disconnectCameraDevice(unsigned int camera) {
     QMutex* mutex=sources[camera].mutex;
     QMutexLocker locker(mutex);
 
-    if (server->isOpen() ) {
+    if (server->isOpen() && (server->state()==QAbstractSocket::ConnectedState) ) {
         QString lastOp=tr("STOP LIVE-VIEW");
         log_text(tr("stopping live-view mode!\n"));
         sendCommand(sources[camera], "LIVE_STOP\n\n");
@@ -230,6 +452,10 @@ void QFECamServer::disconnectCameraDevice(unsigned int camera) {
         server->close();
         log_text(tr("connection closed!\n"));
     }
+    log_text(tr("disconnecting from camera server '%2', port: %3..\n").arg(sources[camera].host).arg(sources[camera].port));
+    server->disconnectFromHost();
+    server->close();
+    log_text(tr("connection closed!\n"));
 }
 
 bool QFECamServer::isCameraConnected(unsigned int camera) {
@@ -240,7 +466,7 @@ bool QFECamServer::isCameraConnected(unsigned int camera) {
     QMutex* mutex=sources[camera].mutex;
     QMutexLocker locker(mutex);
 
-    return server->isOpen();
+    return server->isOpen() && (server->state()==QAbstractSocket::ConnectedState);
 }
 
 bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t* timestamp, QMap<QString, QVariant> *parameters) {
@@ -263,7 +489,7 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
     int newH=oldH;
     double expos=sources[camera].exposure;
 
-    if (server->isOpen()) {
+    if (server->isOpen() && (server->state()==QAbstractSocket::ConnectedState)) {
         //flushBuffers(sources[camera], true);
         ok=sendCommand(sources[camera], "IMAGE_NEXT_GET\n\n");
         if (ok) {
@@ -339,6 +565,8 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
                                     if (n.toUpper()=="EXPOSURE") {
                                         sources[camera].exposure=vv.toDouble();
                                         if (parameters) (*parameters)["exposure_time"]=vv;
+                                    } else if (n.toUpper()=="DURATION") {
+                                        if (parameters) (*parameters)["duration_milliseconds"]=vv.toDouble()*1000.0;
                                     }
                                 } else if (t=="PARAM_INT") {
                                     vv=d.toInt(&ok);
@@ -353,6 +581,8 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
                         if (parameters) {
                             (*parameters)["image_width"]=newW;
                             (*parameters)["image_height"]=newH;
+                            (*parameters)["pixel_width"]=getCameraPixelWidth(camera);
+                            (*parameters)["pixel_height"]=getCameraPixelWidth(camera);
                         }
                         //server->flush();
                         return true;
@@ -542,6 +772,8 @@ void QFECamServer::getCameraAcquisitionDescription(unsigned int camera, QList<QF
                     if (n.toUpper()=="EXPOSURE") {
                         sources[camera].exposure=vv.toDouble();
                         if (parameters) (*parameters)["exposure_time"]=vv;
+                    } else if (n.toUpper()=="DURATION") {
+                        if (parameters) (*parameters)["duration_milliseconds"]=vv.toDouble()*1000.0;
                     }
                 } else if (t=="PARAM_INT") {
                     vv=d.toInt(&ok);
@@ -563,8 +795,8 @@ void QFECamServer::getCameraAcquisitionDescription(unsigned int camera, QList<QF
             }
         }
         if (parameters) {
-            //(*parameters)["image_width"]=newW;
-            //(*parameters)["image_height"]=newH;
+            (*parameters)["pixel_width"]=getCameraPixelWidth(camera);
+            (*parameters)["pixel_height"]=getCameraPixelWidth(camera);
         }
     }
 
@@ -613,7 +845,7 @@ void QFECamServer::log_error(QString message) {
 
 bool QFECamServer::flushBuffers(const  QFECamServer::DEVICE_CONFIG& device, bool read_all)
 {
-    if (device.server && device.server->isOpen()) {
+    if (device.server && device.server->isOpen() && (device.server->state()==QAbstractSocket::ConnectedState)) {
         if (read_all) device.server->readAll();
         device.server->flush();
     }
@@ -623,7 +855,7 @@ bool QFECamServer::flushBuffers(const  QFECamServer::DEVICE_CONFIG& device, bool
 
 bool QFECamServer::sendCommand(const  QFECamServer::DEVICE_CONFIG& device, const QByteArray &command)
 {
-    if (device.server && device.server->isOpen()) {
+    if (device.server && device.server->isOpen()&& (device.server->state()==QAbstractSocket::ConnectedState)) {
         device.server->write(command);
         return true; //device.server->waitForBytesWritten(device.timeout_instruction);
     }
@@ -634,7 +866,7 @@ QByteArray QFECamServer::readString(const  QFECamServer::DEVICE_CONFIG& device, 
 {
     QByteArray res;
     bool ok=false;
-    if (device.server && device.server->isOpen()) {
+    if (device.server && device.server->isOpen()&& (device.server->state()==QAbstractSocket::ConnectedState)) {
         //res=device.server->readLine();
         //ok=res.size()>0;
         int i=0;
@@ -669,7 +901,7 @@ QByteArray QFECamServer::readData(const  QFECamServer::DEVICE_CONFIG& device, in
 {
     QByteArray res;
     bool ok=false;
-    if (device.server && device.server->isOpen()) {
+    if (device.server && device.server->isOpen()&& (device.server->state()==QAbstractSocket::ConnectedState)) {
         //res=device.server->read(bytes_to_read);
         //ok=res.size()==bytes_to_read;
         int i=0;
@@ -698,7 +930,7 @@ QByteArray QFECamServer::readData(const  QFECamServer::DEVICE_CONFIG& device, in
 bool QFECamServer::waitForString(const QFECamServer::DEVICE_CONFIG &device, const QByteArray &end_string)
 {
     bool ok=false;
-    if (device.server && device.server->isOpen()) {
+    if (device.server && device.server->isOpen()&& (device.server->state()==QAbstractSocket::ConnectedState)) {
         //res=device.server->read(bytes_to_read);
         //ok=res.size()==bytes_to_read;
         int i=0;
@@ -729,7 +961,7 @@ QList<QByteArray> QFECamServer::queryData(const  QFECamServer::DEVICE_CONFIG& de
 {
     QList<QByteArray> res;
     bool ok=false;
-    if (device.server && device.server->isOpen()) {
+    if (device.server && device.server->isOpen()&& (device.server->state()==QAbstractSocket::ConnectedState)) {
         ok=true;
         if (sendCommand(device, command)) {
             int i=0;

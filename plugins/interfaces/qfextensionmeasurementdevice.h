@@ -75,6 +75,7 @@ class QFExtensionMeasurementAndControlDevice {
             mdDoubleSlider,
             mdIntSlider,
             mdLabel,
+            mdLineEdit,
 
 
             mdDefault=mdDoubleEdit

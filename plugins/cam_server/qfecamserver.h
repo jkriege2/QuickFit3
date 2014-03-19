@@ -8,6 +8,7 @@
 #include <QTcpSocket>
 #include <QHostAddress>
 #include "qftools.h"
+#include "qfextensionmeasurementdevice.h"
 /*!
     \defgroup qf3ext_cam_server QFExtensionCamera implementation
     \ingroup qf3extensionplugins
@@ -16,9 +17,9 @@
 /*! \brief QFExtensionCamera implementation
     \ingroup qf3ext_cam_server
  */
-class QFECamServer : public QObject, public QFExtensionBase, public QFExtensionCamera {
+class QFECamServer : public QObject, public QFExtensionBase, public QFExtensionCamera, public QFExtensionMeasurementAndControlDevice {
         Q_OBJECT
-        Q_INTERFACES(QFExtension QFExtensionCamera)
+        Q_INTERFACES(QFExtension QFExtensionCamera QFExtensionMeasurementAndControlDevice)
     public:
         /** Default constructor */
         QFECamServer(QObject* parent=NULL);
@@ -60,6 +61,44 @@ class QFECamServer : public QObject, public QFExtensionBase, public QFExtensionC
         virtual void loadSettings(ProgramOptions* settings);
         /** \copydoc QFExtensionBase::storeSettings() */
         virtual void storeSettings(ProgramOptions* settings);
+
+
+    /////////////////////////////////////////////////////////////////////////////
+    // QFExtensionMeasurementDevice routines
+    /////////////////////////////////////////////////////////////////////////////
+    public:
+        /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceCount() */
+        virtual unsigned int getMeasurementDeviceCount();
+        /** \copydoc QFExtensionMeasurementDevice::showmeasurementDeviceSettingsDialog() */
+        virtual void showMeasurementDeviceSettingsDialog(unsigned int measurementDevice, QWidget* parent=NULL);
+        /** \copydoc QFExtensionMeasurementDevice::ismeasurementDeviceConnected() */
+        virtual bool isMeasurementDeviceConnected(unsigned int measurementDevice);
+        /** \copydoc QFExtensionMeasurementDevice::connectmeasurementDevice() */
+        virtual void connectMeasurementDevice(unsigned int measurementDevice);
+        /** \copydoc QFExtensionMeasurementDevice::disconnectmeasurementDevice() */
+        virtual void disconnectMeasurementDevice(unsigned int measurementDevice);
+        /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceName() */
+        virtual QString getMeasurementDeviceName(unsigned int measurementDevice);
+        /** \copydoc QFExtensionMeasurementDevice::setmeasurementDeviceLogging() */
+        virtual void setMeasurementDeviceLogging(QFPluginLogService* logService);
+        /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceValueCount() */
+        virtual unsigned int getMeasurementDeviceValueCount(unsigned int measurementDevice);
+        /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceValue() */
+        virtual QVariant getMeasurementDeviceValue(unsigned int measurementDevice, unsigned int value);
+        /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceValueName() */
+        virtual QString getMeasurementDeviceValueName(unsigned int measurementDevice, unsigned int value);
+        /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceValueShortName() */
+        virtual QString getMeasurementDeviceValueShortName(unsigned int measurementDevice, unsigned int value);
+        /** \copydoc QFExtensionMeasurementDevice::isMeasurementDeviceValueEditable() */
+        virtual bool isMeasurementDeviceValueEditable(unsigned int measurementDevice, unsigned int value);
+        /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceValue() */
+        virtual void setMeasurementDeviceValue(unsigned int measurementDevice, unsigned int value, const QVariant& data);
+        /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceEditableValueType() */
+        virtual QVariant::Type getMeasurementDeviceEditableValueType(unsigned int measurementDevice, unsigned int value);
+        /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceValueWidget() */
+        virtual WidgetTypes getMeasurementDeviceValueWidget(unsigned int measurementDevice, unsigned int value, QStringList* comboboxEntries=NULL);
+        /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceEditableValueRange() */
+        virtual void getMeasurementDeviceEditableValueRange(unsigned int measurementDevice, unsigned int value, double& minimum, double& maximum);
 
 
     /////////////////////////////////////////////////////////////////////////////
@@ -139,6 +178,16 @@ class QFECamServer : public QObject, public QFExtensionBase, public QFExtensionC
     protected:
         QFPluginLogService* logService;
 
+        struct CAM_PARAM {
+            QString description;
+            QString id;
+            bool editable;
+            QVariant::Type type;
+            QFExtensionMeasurementAndControlDevice::WidgetTypes widget;
+            double range_min;
+            double range_max;
+        };
+
         struct DEVICE_CONFIG {
             QString host;
             quint16 port;
@@ -167,6 +216,8 @@ class QFECamServer : public QObject, public QFExtensionBase, public QFExtensionC
             bool acquiring;
 
             QByteArray lastfiles;
+
+            QList<CAM_PARAM> params;
 
 
             /** \brief Server object to access the device */

@@ -1,5 +1,5 @@
-#ifndef QFFITFUNCTIONFCSEXP_H
-#define QFFITFUNCTIONFCSEXP_H
+#ifndef QFFITFUNCTIONFCSSIMPLEEXP_H
+#define QFFITFUNCTIONFCSSIMPLEEXP_H
 #include "qfpluginfitfunction.h"
 #include "qffitfunction.h"
 
@@ -8,14 +8,14 @@
     \ingroup qf3fitfunp_fcs
 
 */
-class QFFitFunctionFCSExp: public QFFitFunction {
+class QFFitFunctionFCSSimpleExp: public QFFitFunction {
     public:
-        QFFitFunctionFCSExp();
-        virtual ~QFFitFunctionFCSExp() {}
+        QFFitFunctionFCSSimpleExp();
+        virtual ~QFFitFunctionFCSSimpleExp() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS: Reaction Dynamics, No Diffusion"); };
+        virtual QString name() const { return QString("FCS: Sum of Exponential Functions"); };
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("fcs_exp"); };
+        virtual QString id() const { return QString("fcs_simpleexp"); };
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;
@@ -35,4 +35,4 @@ class QFFitFunctionFCSExp: public QFFitFunction {
 
 };
 
-#endif // QFFITFUNCTIONFCSEXP_H
+#endif // QFFITFUNCTIONFCSSIMPLEEXP_H
