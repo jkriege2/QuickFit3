@@ -158,7 +158,14 @@ QVariant QFECamServer::getMeasurementDeviceValue(unsigned int measurementDevice,
                     QList<QByteArray> a=bal[i].split(';');
                     if (a.size()>2) {
                         if (a[1]==sources[measurementDevice].params[value].id) {
-                            return QVariant(a[2]).convert(sources[measurementDevice].params[value].type);
+                            //qDebug()<<QString(bal[i]);
+                            //qDebug()<<value<<": "<<QString(a[1])<<" = "<<QString(a[2]);
+                            QVariant v=a[2];
+                            if (v.convert(sources[measurementDevice].params[value].type)) {
+                                //qDebug()<<"   -> "<<v;
+                                return v;
+                            }
+                            return a[2];
                         }
                     }
                 }
