@@ -271,11 +271,17 @@ void QFECamServer::useCameraSettings(unsigned int camera, const QSettings& setti
     //for (int i=0; i<settings.allKeys().size(); i++) {
     //    qDebug()<<"   "<<settings.allKeys().value(i, "")<<" = "<<settings.value(settings.allKeys().value(i, ""));
     //}
+    if (logService) {
+        logService->log_text(QString("\n         -- useCameraSetings: %1\n").arg(camera));
+    }
     if (camera<0 || camera>=getCameraCount()) return;
     if (isMeasurementDeviceConnected(camera) ) {
         for (int i=0; i<getMeasurementDeviceValueCount(camera); i++) {
             if (sources[camera].params[i].editable && settings.contains(sources[camera].params[i].id)) {
                 //qDebug()<<"set value "<<sources[camera].params[i].id<<"("<<i<<")"<<" = "<<settings.value(sources[camera].params[i].id);
+                if (logService) {
+                    logService->log_text(QString("         -- setValue: %1 (%2) = %3\n").arg(sources[camera].params[i].id).arg(i).arg(settings.value(sources[camera].params[i].id).toString()));
+                }
                 setMeasurementDeviceValue(camera, i, settings.value(sources[camera].params[i].id));
             }
         }
