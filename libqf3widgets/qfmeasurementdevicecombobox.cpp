@@ -118,6 +118,26 @@ int QFMeasurementDeviceComboBox::currentDeviceID() const {
     return shutterIdx;
 }
 
+void QFMeasurementDeviceComboBox::setCurrentItem(QFExtension *extension_in, int device_in)
+{
+    for (int i=0; i<count(); i++) {
+        QPoint p = itemData(i).toPoint();
+        QFExtension* extension=NULL;
+        QFExtensionMeasurementAndControlDevice* device=NULL;
+        int id=p.y();
+        if ((p.x()>=0)&&(p.x()<devices.size())) {
+            extension=qobject_cast<QFExtension*>(devices[p.x()]);
+            device=qobject_cast<QFExtensionMeasurementAndControlDevice*>(devices[p.x()]);
+        } else {
+            id=-1;
+        }
+        if (extension && id>=0 && extension==extension_in && id==device_in) {
+            setCurrentIndex(i);
+            return;
+        }
+    }
+}
+
 int QFMeasurementDeviceComboBox::currentExtensionID() const {
     if (currentIndex()<0) {
         return -1;

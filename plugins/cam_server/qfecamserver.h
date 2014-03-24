@@ -9,6 +9,7 @@
 #include <QHostAddress>
 #include "qftools.h"
 #include "qfextensionmeasurementdevice.h"
+#include "qfmeasurementdeviceconfigwidget.h"
 /*!
     \defgroup qf3ext_cam_server QFExtensionCamera implementation
     \ingroup qf3extensionplugins

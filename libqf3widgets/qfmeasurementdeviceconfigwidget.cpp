@@ -1,11 +1,11 @@
 #include "qfmeasurementdeviceconfigwidget.h"
 
-QFMeasurementDeviceConfigWidget::QFMeasurementDeviceConfigWidget(QWidget *parent) :
+QFMeasurementDeviceConfigWidget::QFMeasurementDeviceConfigWidget(QWidget *parent, bool doUseThread) :
     QFrame(parent)
 {
-    useThread=true;
+    useThread=doUseThread;
     m_thread=new QFMeasurementDeviceConfigWidgetThread(this);
-    connect(m_thread, SIGNAL(valuesChanged(QTime,QList<QVariant>,QStringList,QList<bool>)), this, SLOT(valuesChanged(QTime,QList<QVariant>,QStringList,QList<bool>)));
+    connect(m_thread, SIGNAL(valuesChanged(QTime,QList<QVariant>,QStringList,QList<bool>)), this, SLOT(valuesChanged(QTime,QList<QVariant>,QStringList,QList<bool>)), Qt::QueuedConnection);
     setFrameStyle(QFrame::Panel|QFrame::Raised);
     setLineWidth(1);
     stateUpdateInterval=237;
@@ -16,7 +16,6 @@ QFMeasurementDeviceConfigWidget::QFMeasurementDeviceConfigWidget(QWidget *parent
     m_log=NULL;
     m_pluginServices=NULL;
     locked=false;
-    moving=false;
 
 
     createWidgets();
@@ -189,6 +188,18 @@ QFExtension *QFMeasurementDeviceConfigWidget::getMeasurementDeviceExtension() co
 QObject *QFMeasurementDeviceConfigWidget::getMeasurementDeviceExtensionObject() const
 {
     return cmbMeasurementDevice->currentExtensionObject();
+}
+
+QFMeasurementDeviceComboBox *QFMeasurementDeviceConfigWidget::getMeasurementDeviceComboBox() const
+{
+    return cmbMeasurementDevice;
+}
+
+void QFMeasurementDeviceConfigWidget::disableDeviceCombobox()
+{
+    cmbMeasurementDevice->setVisible(false);
+    actConnect->setVisible(false);
+    actConfigure->setVisible(false);
 }
 
 int QFMeasurementDeviceConfigWidget::getMeasurementDeviceID() const {
@@ -526,16 +537,12 @@ void QFMeasurementDeviceConfigWidget::setValue(int line, const QVariant &power) 
     QFExtensionMeasurementAndControlDevice* MeasurementDevice=getMeasurementDevice();
     int MeasurementDeviceID=getMeasurementDeviceID();
     if (MeasurementDevice) {
+        lockMeasurementDevice();
+        qDebug()<<"set param no. "<<line<<" to "<<power;
         MeasurementDevice->setMeasurementDeviceValue(MeasurementDeviceID, line, power);
-        if (!locked) {
-            /*moving=true;
-            QTime started=QTime::currentTime();
-            while (!MeasurementDevice->isLastMeasurementDeviceActionFinished(MeasurementDeviceID) && (started.elapsed()<20000)) {
-                //qDebug()<<started.elapsed();
-                QApplication::processEvents();
-            }*/
-            moving=false;
-        }
+        qDebug()<<"set param no. "<<line<<" to "<<power<<"   DONE";
+        unlockMeasurementDevice();
+
     }
 }
 

@@ -36,6 +36,7 @@ class QFWIDLIB_EXPORT QFMeasurementDeviceComboBox : public QEnhancedComboBox {
         QFExtensionMeasurementAndControlDevice* currentExtensionDevice() const;
         /** \brief return the ID of the current camera device inside a QFExtensionMeasurementAndControlDevice */
         int currentDeviceID() const;
+        void setCurrentItem(QFExtension* extension_in, int device);
     public slots:
         /** \brief update the filled combobox */
         void findExtensions();

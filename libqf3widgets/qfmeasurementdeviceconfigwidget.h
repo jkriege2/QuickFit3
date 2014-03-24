@@ -51,7 +51,7 @@
 class QFWIDLIB_EXPORT QFMeasurementDeviceConfigWidget : public QFrame {
         Q_OBJECT
     public:
-        explicit QFMeasurementDeviceConfigWidget(QWidget *parent = 0);
+        explicit QFMeasurementDeviceConfigWidget(QWidget *parent = 0, bool doUseThread=true);
         ~QFMeasurementDeviceConfigWidget();
         
 
@@ -85,6 +85,9 @@ class QFWIDLIB_EXPORT QFMeasurementDeviceConfigWidget : public QFrame {
         /** \brief return a pointer to the ahutter QFExtension class */
         QFExtension* getMeasurementDeviceExtension() const;
         QObject* getMeasurementDeviceExtensionObject() const;
+
+        QFMeasurementDeviceComboBox* getMeasurementDeviceComboBox() const;
+        void disableDeviceCombobox();
 
 
         /** \brief get the MeasurementDevice number of the given axis */
@@ -136,7 +139,6 @@ class QFWIDLIB_EXPORT QFMeasurementDeviceConfigWidget : public QFrame {
 
         bool locked;
 
-        bool moving;
 
         double stateUpdateInterval;
 

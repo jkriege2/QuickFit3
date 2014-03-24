@@ -212,7 +212,7 @@ bool QFECamServer::isMeasurementDeviceValueEditable(unsigned int measurementDevi
 void QFECamServer::setMeasurementDeviceValue(unsigned int measurementDevice, unsigned int value, const QVariant &data)
 {
     if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<sources[measurementDevice].params.size()) {
+        if (value>=0 && value<sources[measurementDevice].params.size() && sources[measurementDevice].params[value].editable) {
             QTcpSocket* server=sources[measurementDevice].server;
             if (!server) return ;
 
@@ -224,6 +224,8 @@ void QFECamServer::setMeasurementDeviceValue(unsigned int measurementDevice, uns
                 log_error(tr("error setting parameter '%4' (timeout: %3s):\n%1     new value:         '%5'!\n%1     error description: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id).arg(getQVariantData(data)));
             }
 
+        } else {
+            log_error(tr("error setting parameter '%4' (timeout: %3s):\n%1     new value:         '%5'!\n%1     error description: %2!\n\n").arg(LOG_PREFIX).arg(tr("parameter not writeable or not found")).arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id).arg(getQVariantData(data)));
         }
     }
 }
@@ -265,6 +267,19 @@ unsigned int QFECamServer::getCameraCount() const {
 }
 void QFECamServer::useCameraSettings(unsigned int camera, const QSettings& settings) {
     /* set the camera settings to the values specified in settings parameter, called before acquire() */
+    //qDebug()<<"useCameraSetings: "<<camera;
+    //for (int i=0; i<settings.allKeys().size(); i++) {
+    //    qDebug()<<"   "<<settings.allKeys().value(i, "")<<" = "<<settings.value(settings.allKeys().value(i, ""));
+    //}
+    if (camera<0 || camera>=getCameraCount()) return;
+    if (isMeasurementDeviceConnected(camera) ) {
+        for (int i=0; i<getMeasurementDeviceValueCount(camera); i++) {
+            if (sources[camera].params[i].editable && settings.contains(sources[camera].params[i].id)) {
+                //qDebug()<<"set value "<<sources[camera].params[i].id<<"("<<i<<")"<<" = "<<settings.value(sources[camera].params[i].id);
+                setMeasurementDeviceValue(camera, i, settings.value(sources[camera].params[i].id));
+            }
+        }
+    }
 }
 
 
@@ -278,27 +293,28 @@ void QFECamServer::showCameraSettingsDialog(unsigned int camera, QSettings& sett
 	   during the measurement.
 	*/
 
+    if (camera<0 || camera>=getCameraCount() || !isMeasurementDeviceConnected(camera) ) return;
+
+    useCameraSettings(camera, settings);
 
 	/////////////////////////////////////////////////////////////////////////////////
 	// if you want the settings dialog to be modal, you may uncomment the next lines
 	// and add implementations
 	/////////////////////////////////////////////////////////////////////////////////
-    /*
 	QDialog* dlg=new QDialog(parent);
+    dlg->setWindowTitle(tr("camera settings for %1 (sensor: %2)").arg(getCameraName(camera)).arg(getCameraSensorName(camera)));
 
     QVBoxLayout* lay=new QVBoxLayout(dlg);
     dlg->setLayout(lay);
 
-    QFormLayout* formlayout=new QFormLayout(dlg);
 
+    QFMeasurementDeviceConfigWidget* wid=new  QFMeasurementDeviceConfigWidget(dlg, false);
+    wid->init(logService, QFPluginServices::getInstance());
+    wid->getMeasurementDeviceComboBox()->setCurrentItem(this, camera);
+    wid->connectMeasurementDevice();
+    wid->disableDeviceCombobox();
+    lay->addWidget(wid);
 
-    //  create your widgets here, do not to initialize them with the current settings
-    // QWidget* widget=new QWidget(dlg);
-    // lay->addRow(tr("Name"), widget);
-    // lay->setValue(settings.value(QString("device/name%1").arg(camera), devfaultValue ).toInt());
-
-
-    lay->addLayout(formlayout);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dlg);
     lay->addWidget(buttonBox);
@@ -307,11 +323,13 @@ void QFECamServer::showCameraSettingsDialog(unsigned int camera, QSettings& sett
     connect(buttonBox, SIGNAL(rejected()), dlg, SLOT(reject()));
 
     if ( dlg->exec()==QDialog::Accepted ) {
-         //  read back values entered into the widgets and store in settings
-         // settings.setValue(QString("device/name%1").arg(camera), widget->value() );
+        //  read back values entered into the widgets and store in settings
+        // settings.setValue(QString("device/name%1").arg(camera), widget->value() );
+        for (int i=0; i<getMeasurementDeviceValueCount(camera); i++) {
+            settings.setValue(getMeasurementDeviceValueShortName(camera, i), getMeasurementDeviceValue(camera, i));
+        }
     }
     delete dlg;
-	*/
 }
 
 
@@ -346,6 +364,7 @@ bool QFECamServer::connectCameraDevice(unsigned int camera) {
             }
             QString pnames;
             if (ok) {
+                sources[camera].params.clear();
                 lastOp=tr("GET PARAMETERS");
                 log_text(tr("reading available parameters!\n"));
                 queryData(sources[camera], "PARAMETERS_GET\n\n");
@@ -403,6 +422,7 @@ bool QFECamServer::connectCameraDevice(unsigned int camera) {
                                 sources[camera].params.append(pa);
                                 if (!pnames.isEmpty()) pnames+=", ";
                                 pnames+=sources[camera].params.last().id;
+                                if (!pa.editable) pnames+="[RO]";
                             }
                         }
                     }
