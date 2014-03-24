@@ -276,6 +276,7 @@ void QFECamServer::useCameraSettings(unsigned int camera, const QSettings& setti
     }
     if (camera<0 || camera>=getCameraCount()) return;
     if (isMeasurementDeviceConnected(camera) ) {
+        int cnt=0;
         for (int i=0; i<getMeasurementDeviceValueCount(camera); i++) {
             if (sources[camera].params[i].editable && settings.contains(sources[camera].params[i].id)) {
                 //qDebug()<<"set value "<<sources[camera].params[i].id<<"("<<i<<")"<<" = "<<settings.value(sources[camera].params[i].id);
@@ -283,7 +284,21 @@ void QFECamServer::useCameraSettings(unsigned int camera, const QSettings& setti
                     logService->log_text(QString("         -- setValue: %1 (%2) = %3\n").arg(sources[camera].params[i].id).arg(i).arg(settings.value(sources[camera].params[i].id).toString()));
                 }
                 setMeasurementDeviceValue(camera, i, settings.value(sources[camera].params[i].id));
+                cnt++;
             }
+        }
+        if (cnt>0)  {
+            if (logService) {
+                logService->log_text(QString("\n         -- useCameraSetings: %1: 2s DELAY\n").arg(camera));
+            }
+            QElapsedTimer timer;
+            timer.start();
+            while (timer.elapsed()<2000) {
+                QApplication::processEvents();
+            }
+        }
+        if (logService) {
+            logService->log_text(QString("\n         -- useCameraSetings: %1: DONE!!!\n").arg(camera));
         }
     }
 }
@@ -728,7 +743,8 @@ double QFECamServer::getCameraExposureTime(unsigned int camera) {
 
 
 bool QFECamServer::prepareCameraAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
-    if (camera<0 || camera>=getCameraCount()) return 0;
+    if (camera<0 || camera>=getCameraCount()) return false;
+    useCameraSettings(camera, settings);
     sources[camera].last_filenameprefix=filenamePrefix.toLocal8Bit();
     return true;
 }
