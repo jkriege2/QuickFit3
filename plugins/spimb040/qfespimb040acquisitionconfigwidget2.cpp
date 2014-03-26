@@ -88,6 +88,7 @@ void QFESPIMB040AcquisitionConfigWidget2::loadSettings(QSettings& settings, QStr
     ui->spinBackgroundFrames2->setValue(settings.value(prefix+"background_frames2", 1000).toInt());
     ui->chkUse1->setChecked(settings.value(prefix+"use1", true).toBool());
     ui->chkUse2->setChecked(settings.value(prefix+"use2", true).toBool());
+    ui->chkReadMeasurements->setChecked(settings.value(prefix+"chkReadMeasurements", true).toBool());
     ui->edtPrefix1->setText(settings.value(prefix+"prefix1", "stack_cam1_%counter%").toString());
     ui->edtPrefix2->setText(settings.value(prefix+"prefix2", "stack_cam2_%counter%").toString());
     ui->cmbAcquisitionSettings1->setCurrentConfig(settings.value(prefix+"acqsettings1", "default").toString());
@@ -123,6 +124,7 @@ void QFESPIMB040AcquisitionConfigWidget2::loadSettings(QSettings& settings, QStr
 
 
 void QFESPIMB040AcquisitionConfigWidget2::storeSettings(QSettings& settings, QString prefix) const {
+    settings.setValue(prefix+"chkReadMeasurements", ui->chkReadMeasurements->isChecked());
     settings.setValue(prefix+"use1", ui->chkUse1->isChecked());
     settings.setValue(prefix+"use2", ui->chkUse2->isChecked());
     settings.setValue(prefix+"prefix1", ui->edtPrefix1->text());
@@ -666,6 +668,11 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
     bool userCanceled=false;
 
 
+    bool measureDuringAcquisitions=ui->chkReadMeasurements->isChecked();
+    if (measureDuringAcquisitions)
+        log->log_text(tr("  - saving measurements image series acquisition:\n"));
+    else
+        log->log_text(tr("  - don't save measurements during image series acquisition:\n"));
 
     QProgressListDialog progress(tr("Image Series Acquisition"), tr("&Cancel"), 0, 100, this);
     progress.setWindowModality(Qt::WindowModal);
@@ -832,7 +839,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             camset2=getCameraSettings2();
             camset1[QFExtensionCamera::CamSetNumberFrames]=currentBackgroundFrames(0);
             camset2[QFExtensionCamera::CamSetNumberFrames]=currentBackgroundFrames(1);
-            ok = acqTools->acquireSeries(lightpathName, "", tr("background image series"), useCam1&&(ui->chkBackground->isChecked())&&(!ui->chkNoBackground1->isChecked()), extension1, ecamera1, camera1, acquisitionPrefix1+"_background", acquisitionSettingsFilename1, backgroundDescription1, backgroundFiles1, useCam2&&(ui->chkBackground->isChecked())&&(!ui->chkNoBackground2->isChecked()), extension2, ecamera2, camera2, acquisitionPrefix2+"_background", acquisitionSettingsFilename2, backgroundDescription2, backgroundFiles2, camset1, camset2, NULL, &progress, &userCanceled);
+            ok = acqTools->acquireSeries(lightpathName, "", tr("background image series"), useCam1&&(ui->chkBackground->isChecked())&&(!ui->chkNoBackground1->isChecked()), extension1, ecamera1, camera1, acquisitionPrefix1+"_background", acquisitionSettingsFilename1, backgroundDescription1, backgroundFiles1, useCam2&&(ui->chkBackground->isChecked())&&(!ui->chkNoBackground2->isChecked()), extension2, ecamera2, camera2, acquisitionPrefix2+"_background", acquisitionSettingsFilename2, backgroundDescription2, backgroundFiles2, camset1, camset2, NULL, &progress, &userCanceled, measureDuringAcquisitions);
             if (!ok) {
                 ACQUISITION_ERROR(tr("  - error acquiring background image series!\n"));
             } else {
@@ -982,7 +989,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         QMap<QFExtensionCamera::CameraSetting, QVariant> camset1, camset2;
         camset1=getCameraSettings1();
         camset2=getCameraSettings2();
-        ok = acqTools->acquireSeries(lightpathName, "acquisition", tr("image series"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionSettingsFilename1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionSettingsFilename2, acquisitionDescription2, moreFiles2, camset1, camset2, &measured, &progress, &userCanceled);
+        ok = acqTools->acquireSeries(lightpathName, "acquisition", tr("image series"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionSettingsFilename1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionSettingsFilename2, acquisitionDescription2, moreFiles2, camset1, camset2, &measured, &progress, &userCanceled, measureDuringAcquisitions);
         if (!ok) {
             ACQUISITION_ERROR(tr("  - error acquiring images!\n"));
         } else {
@@ -1084,13 +1091,15 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                 }
             }
 
-            QString MeasurementsFilename=acqTools->saveMeasuredData(acquisitionPrefix1, measured);
-            if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
-                QFExtensionCamera::CameraAcquititonFileDescription d;
-                d.name=MeasurementsFilename;
-                d.description="measureable properties of setup";
-                d.type="CSV";
-                moreFiles1.append(d);
+            if (measureDuringAcquisitions) {
+                QString MeasurementsFilename=acqTools->saveMeasuredData(acquisitionPrefix1, measured);
+                if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
+                    QFExtensionCamera::CameraAcquititonFileDescription d;
+                    d.name=MeasurementsFilename;
+                    d.description="measureable properties of setup";
+                    d.type="CSV";
+                    moreFiles1.append(d);
+                }
             }
 
             acqTools->saveAcquisitionDescription(0, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionDescription1, moreFiles1, startDateTime, false);
@@ -1111,14 +1120,17 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                     acquisitionDescription2["background/"+it.key()]=it.value();
                 }
             }
-            QString MeasurementsFilename=acqTools->saveMeasuredData(acquisitionPrefix2, measured);
-            if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
-                QFExtensionCamera::CameraAcquititonFileDescription d;
-                d.name=MeasurementsFilename;
-                d.description="measureable properties of setup";
-                d.type="CSV";
-                moreFiles2.append(d);
+            if (measureDuringAcquisitions) {
+                QString MeasurementsFilename=acqTools->saveMeasuredData(acquisitionPrefix2, measured);
+                if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
+                    QFExtensionCamera::CameraAcquititonFileDescription d;
+                    d.name=MeasurementsFilename;
+                    d.description="measureable properties of setup";
+                    d.type="CSV";
+                    moreFiles2.append(d);
+                }
             }
+
             acqTools->saveAcquisitionDescription(1, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionDescription2, moreFiles2, startDateTime, false);
             log->log_text(tr(" DONE!\n"));
         }

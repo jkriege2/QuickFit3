@@ -825,7 +825,7 @@ bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathF
     return ok;
 }
 
-bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles2, const QMap<QFExtensionCamera::CameraSetting, QVariant>& camsettings1, const QMap<QFExtensionCamera::CameraSetting, QVariant>& camsettings2, QList<QFESPIMB040OpticsSetupBase::measuredValues>* measured, QProgressListDialog* progress, bool* userCanceled )
+bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles2, const QMap<QFExtensionCamera::CameraSetting, QVariant>& camsettings1, const QMap<QFExtensionCamera::CameraSetting, QVariant>& camsettings2, QList<QFESPIMB040OpticsSetupBase::measuredValues>* measured, QProgressListDialog* progress, bool* userCanceled,bool  measureDuringAcquisitions )
 {
     QString tmpName1=QDir::temp().absoluteFilePath("qf3spimb040_cam1tmpsettings.ini");
 
@@ -882,7 +882,7 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
 
 
 
-    bool result=acquireSeries(lightpathName, imageID, imageDescription, useCam1, extension1, ecamera1, camera1, acquisitionPrefix1, settings1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2, settings2, acquisitionDescription2, moreFiles2, measured, progress, userCanceled);
+    bool result=acquireSeries(lightpathName, imageID, imageDescription, useCam1, extension1, ecamera1, camera1, acquisitionPrefix1, settings1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2, settings2, acquisitionDescription2, moreFiles2, measured, progress, userCanceled, measureDuringAcquisitions);
 
 
     if (QFile::exists(tmpName1)) QFile::remove(tmpName1);
@@ -892,7 +892,7 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
 
 }
 
-bool QFESPIMB040MainWindow2::acquireSeries(const QString &lightpathName, const QString &imageID, const QString &imageDescription, bool useCam1, QFExtension *extension1, QFExtensionCamera *ecamera1, int camera1, const QString &acquisitionPrefix1, QSettings &acquisitionSettings1, QMap<QString, QVariant> &acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription> &moreFiles1, bool useCam2, QFExtension *extension2, QFExtensionCamera *ecamera2, int camera2, const QString &acquisitionPrefix2, QSettings &acquisitionSettings2, QMap<QString, QVariant> &acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription> &moreFiles2, QList<QFESPIMB040OpticsSetupBase::measuredValues> *measured, QProgressListDialog *progress, bool *userCanceled)
+bool QFESPIMB040MainWindow2::acquireSeries(const QString &lightpathName, const QString &imageID, const QString &imageDescription, bool useCam1, QFExtension *extension1, QFExtensionCamera *ecamera1, int camera1, const QString &acquisitionPrefix1, QSettings &acquisitionSettings1, QMap<QString, QVariant> &acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription> &moreFiles1, bool useCam2, QFExtension *extension2, QFExtensionCamera *ecamera2, int camera2, const QString &acquisitionPrefix2, QSettings &acquisitionSettings2, QMap<QString, QVariant> &acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription> &moreFiles2, QList<QFESPIMB040OpticsSetupBase::measuredValues> *measured, QProgressListDialog *progress, bool *userCanceled, bool measureDuringAcquisitions)
 {
 
     bool ok=true;
@@ -974,7 +974,7 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString &lightpathName, const Q
                  estimation=tr("\nest. remaining duration (min:secs): %1:%2 ").arg(mini, 2, 10, QChar('0')).arg(secs, 2, 10, QChar('0'));
                  if (progress) progress->setLabelText(tr("acquiring images ...\n")+estimation);
              }
-             if (measured && time1.elapsed()>200) {
+             if (measureDuringAcquisitions && measured && time1.elapsed()>200) {
                  measured->append(optSetup->getMeasuredValues());
                  time1.start();
              }
