@@ -534,6 +534,7 @@ void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setAcquisitionCamera2Sett
 
 void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setAcquisitionCamera2SettingN(const QString which, QVariant value)
 {
+    qDebug()<<which<<" = "<<value;
     mainWindow->getWidAcquisition()->setCameraSetting2(which, value);
 }
 

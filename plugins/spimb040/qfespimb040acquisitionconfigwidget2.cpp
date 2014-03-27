@@ -832,11 +832,14 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             //backgroundFrames2=currentBackgroundFrames(1);
         }
 
+
         progress.setValue(0);
 
 
         if (ok && useCam1) log->log_text(tr("  - prefix 1: '%1'\n").arg(acquisitionPrefix1));
         if (ok && useCam2) log->log_text(tr("  - prefix 2: '%1'\n").arg(acquisitionPrefix2));
+        if (ok && useCam1) log->log_text(tr("  - acquisition settings 1: '%1'\n").arg(acquisitionSettingsFilename1));
+        if (ok && useCam2) log->log_text(tr("  - acquisition settings 2: '%1'\n").arg(acquisitionSettingsFilename2));
 
         // set order of overview images (basically: lightpath 0 as last image ... so we do not have to reset the lightpath
         QList<int> prevs;
