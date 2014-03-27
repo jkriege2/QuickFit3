@@ -724,6 +724,7 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                 int imageCnt=0;
                 int frames=numImages();
                 QMap<QFExtensionCamera::CameraSetting, QVariant> camset1, camset2;
+                QMap<QString, QVariant> camsetstr1, camsetstr2;
                 camset1[QFExtensionCamera::CamSetNumberFrames]=frames;
                 camset2[QFExtensionCamera::CamSetNumberFrames]=frames;
 
@@ -754,7 +755,7 @@ void QFESPIMB040DeviceParamStackConfigWidget::performStack()
                     //////////////////////////////////////////////////////////////////////////////////////
                     if (useCam1) QDir().mkpath(QFileInfo(acquisitionPrefix1+QString("__sidx%1.txt").arg(stackIdx,4,10,QLatin1Char('0'))).absolutePath());
                     if (useCam2) QDir().mkpath(QFileInfo(acquisitionPrefix2+QString("__sidx%1.txt").arg(stackIdx,4,10,QLatin1Char('0'))).absolutePath());
-                    ok = acqTools->acquireSeries(lightpathName, QString("paramstack%1").arg(stackIdx,4,10,QLatin1Char('0')), tr("device parameter stack"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1+QString("__sidx%1").arg(stackIdx,4,10,QLatin1Char('0')), acquisitionSettingsFilename1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2+QString("__sidx%1").arg(stackIdx,4,10,QLatin1Char('0')), acquisitionSettingsFilename2, acquisitionDescription2, moreFiles2, camset1, camset2, &measured, &progress, NULL);
+                    ok = acqTools->acquireSeries(lightpathName, QString("paramstack%1").arg(stackIdx,4,10,QLatin1Char('0')), tr("device parameter stack"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1+QString("__sidx%1").arg(stackIdx,4,10,QLatin1Char('0')), acquisitionSettingsFilename1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2+QString("__sidx%1").arg(stackIdx,4,10,QLatin1Char('0')), acquisitionSettingsFilename2, acquisitionDescription2, moreFiles2, camset1, camset2, camsetstr1, camsetstr2, &measured, &progress, NULL);
                     if (!ok) {
                         if (frames>1) {
                             CAMPARAMSTACK_ERROR(tr("error acquiring image (%1...%2)/%3 !\n").arg(imageCnt+1).arg(imageCnt+1+frames).arg(images));

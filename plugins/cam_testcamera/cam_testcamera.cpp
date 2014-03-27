@@ -649,7 +649,7 @@ double QFECamTestCamera::getCameraPixelHeight(unsigned int camera) {
     return 10;
 }
 
-bool QFECamTestCamera::isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const  {
+bool QFECamTestCamera::isCameraSettingChangable(QFExtensionCamera::CameraSetting which)   {
     if (which==QFExtensionCamera::CamSetExposureTime)  return true;
     return false;
 }
@@ -658,12 +658,12 @@ void QFECamTestCamera::changeCameraSetting(QSettings& settings, QFExtensionCamer
     if (which==QFExtensionCamera::CamSetExposureTime) settings.setValue(QString("testdevice/particle_brightnes"), value);
 }
 
-QVariant QFECamTestCamera::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const  {
+QVariant QFECamTestCamera::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which)   {
     if (which==QFExtensionCamera::CamSetExposureTime) return settings.value(QString("testdevice/particle_brightnes"), 10).toDouble();
     return QVariant();
 }
 
-QVariant QFECamTestCamera::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which) const
+QVariant QFECamTestCamera::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which)
 {
     if (which==QFExtensionCamera::CamSetExposureTime) return 1;
     return QVariant();

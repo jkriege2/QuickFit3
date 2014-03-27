@@ -144,13 +144,26 @@ class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QF
 
 
         /** \copydoc QFExtensionCamera::isCameraSettingChangable() */
-        virtual bool isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const;
+        virtual bool isCameraSettingChangable(QFExtensionCamera::CameraSetting which) ;
         /** \copydoc QFExtensionCamera::changeCameraSetting() */
         virtual void changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which, QVariant value);
         /** \copydoc QFExtensionCamera::getCameraSetting() */
-        virtual QVariant getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const;
+        virtual QVariant getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) ;
         /** \copydoc QFExtensionCamera::getCurrentCameraSetting() */
-        virtual QVariant getCameraCurrentSetting(int camera, CameraSetting which) const;
+        virtual QVariant getCameraCurrentSetting(int camera, CameraSetting which) ;
+
+        /** \brief returns \c true if the given CameraSetting is changable by changeCameraSetting() */
+        inline virtual bool isCameraSettingChangable(const QString& which)  { return isCameraSettingChangable(QStringToSetting(which)); }
+        /*! \brief change the given CameraSetting in the given QSettings object
+
+            \note <b>this will change the contents of your QSettings object, so possibly this changed version is also written back to the harddisk!!!</b>
+         */
+        inline virtual void changeCameraSetting(QSettings& settings, const QString& which, QVariant value)  {  changeCameraSetting(settings, QStringToSetting(which), value); }
+        /** \brief extract the given CameraSetting from the given QSettings object */
+        inline virtual QVariant getCameraSetting(QSettings& settings, const QString& which)  { return getCameraSetting(settings, QStringToSetting(which)); }
+        /** \brief extract the given CameraSetting from the given camera */
+        inline virtual QVariant getCameraCurrentSetting(int camera, const QString& which)  { return getCameraCurrentSetting(camera, QStringToSetting(which)); }
+
 
         /** \brief log project text message
          *  \param message the message to log

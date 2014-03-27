@@ -98,29 +98,44 @@
 		<b><tt><!-- template -->acquisition.doImageStack()<!-- /template --></tt> - <i>perform an image stack acquisition with the settings currently specified in the <a href="../ext_spimb040_acquisition.html">Acquisition tab</a>. </i>:</b><br>
 		<!-- /func:acquisition.doImageStack -->
 		</li>
-		<li><a name="acquisition.setAcquisitionCamera1Setting"/><!-- func:acquisition.setAcquisitionCamera1Setting -->
-		<b><tt><!-- template -->acquisition.setAcquisitionCamera1Setting("<!--°-->which<!--°-->", value)<!-- /template --></tt> - <i>sets the given setting of camera 1 to the given value.
-		</i>:</b><br> Possible values for which are:$$include:acqwhich.inc$$
-		This function will not have an immediate effect. It rather tells QuickFit to use the given value instead of the predefined value (as given in the selected camera settings) at the next acquisition.
-		<!-- /func:acquisition.setAcquisitionCamera1Setting -->
-		</li>
-		<li><a name="acquisition.setAcquisitionCamera2Setting"/><!-- func:acquisition.setAcquisitionCamera2Setting -->
-		<b><tt><!-- template -->acquisition.setAcquisitionCamera2Setting("<!--°-->which<!--°-->", value)<!-- /template --></tt> - <i>sets the given setting of camera 2 to the given value</i>:</b> <br>
-		Possible values for which are:$$include:acqwhich.inc$$
-		This function will not have an immediate effect. It rather tells QuickFit to use the given value instead of the predefined value (as given in the selected camera settings) at the next acquisition.
-		<!-- /func:acquisition.setAcquisitionCamera2Setting -->
-		</li>
+                <li><a name="acquisition.setAcquisitionCamera1Setting"/><!-- func:acquisition.setAcquisitionCamera1Setting -->
+                <b><tt><!-- template -->acquisition.setAcquisitionCamera1Setting("<!--°-->which<!--°-->", value)<!-- /template --></tt> - <i>sets the given setting of camera 1 to the given value.
+                </i>:</b><br> Possible values for which are:$$include:acqwhich.inc$$
+                This function will not have an immediate effect. It rather tells QuickFit to use the given value instead of the predefined value (as given in the selected camera settings) at the next acquisition. A small set of predefined parameters is possible for which (exposuretime, frames, gain, frametime, emgain, hbinning, vbinning, tbinning)!
+                <!-- /func:acquisition.setAcquisitionCamera1Setting -->
+                </li>
+                <li><a name="acquisition.setAcquisitionCamera2Setting"/><!-- func:acquisition.setAcquisitionCamera2Setting -->
+                <b><tt><!-- template -->acquisition.setAcquisitionCamera2Setting("<!--°-->which<!--°-->", value)<!-- /template --></tt> - <i>sets the given setting of camera 2 to the given value</i>:</b> <br>
+                Possible values for which are:$$include:acqwhich.inc$$
+                This function will not have an immediate effect. It rather tells QuickFit to use the given value instead of the predefined value (as given in the selected camera settings) at the next acquisition. A small set of predefined parameters is possible for which (exposuretime, frames, gain, frametime, emgain, hbinning, vbinning, tbinning)!
+                <!-- /func:acquisition.setAcquisitionCamera2Setting -->
+                </li>
 
-		<li><a name="acquisition.clearAcquisitionCamera1Settings"/><!-- func:acquisition.clearAcquisitionCamera1Settings -->
-		<b><tt><!-- template -->acquisition.clearAcquisitionCamera1Settings()<!-- /template --></tt> - <i>clears all camera settings for this acquisitions, so the default settings (as given in the selected camera settings) are used
-		</i>:</b><br>
-		<!-- /func:acquisition.clearAcquisitionCamera1Settings -->
-		</li>
-		<li><a name="acquisition.clearAcquisitionCamera2Settings"/><!-- func:acquisition.clearAcquisitionCamera2Settings -->
-		<b><tt><!-- template -->acquisition.clearAcquisitionCamera2Settings()<!-- /template --></tt> - <i>clears all camera settings for this acquisitions, so the default settings (as given in the selected camera settings) are used
-		</i>:</b><br>
-		<!-- /func:acquisition.clearAcquisitionCamera2Settings -->
-		</li>
+                <li><a name="acquisition.clearAcquisitionCamera1Settings"/><!-- func:acquisition.clearAcquisitionCamera1Settings -->
+                <b><tt><!-- template -->acquisition.clearAcquisitionCamera1Settings()<!-- /template --></tt> - <i>clears all camera settings for this acquisitions, so the default settings (as given in the selected camera settings) are used
+                </i>:</b><br>
+                <!-- /func:acquisition.clearAcquisitionCamera1Settings -->
+                </li>
+                <li><a name="acquisition.clearAcquisitionCamera2Settings"/><!-- func:acquisition.clearAcquisitionCamera2Settings -->
+                <b><tt><!-- template -->acquisition.clearAcquisitionCamera2Settings()<!-- /template --></tt> - <i>clears all camera settings for this acquisitions, so the default settings (as given in the selected camera settings) are used
+                </i>:</b><br>
+                <!-- /func:acquisition.clearAcquisitionCamera2Settings -->
+                </li>
+
+
+                <li><a name="acquisition.setAcquisitionCamera1SettingN"/><!-- func:acquisition.setAcquisitionCamera1SettingN -->
+                <b><tt><!-- template -->acquisition.setAcquisitionCamera1SettingN("<!--°-->which<!--°-->", value)<!-- /template --></tt> - <i>sets the given setting of camera 1 to the given value.
+                </i>:</b><br> Possible values for which are:$$include:acqwhich.inc$$
+                This function will not have an immediate effect. It rather tells QuickFit to use the given value instead of the predefined value (as given in the selected camera settings) at the next acquisition. The parameter which needs to be known to the camera driver in the exact form as given!
+                <!-- /func:acquisition.setAcquisitionCamera1SettingN -->
+                </li>
+                <li><a name="acquisition.setAcquisitionCamera2SettingN"/><!-- func:acquisition.setAcquisitionCamera2SettingN -->
+                <b><tt><!-- template -->acquisition.setAcquisitionCamera2SettingN("<!--°-->which<!--°-->", value)<!-- /template --></tt> - <i>sets the given setting of camera 2 to the given value</i>:</b> <br>
+                Possible values for which are:$$include:acqwhich.inc$$
+                This function will not have an immediate effect. It rather tells QuickFit to use the given value instead of the predefined value (as given in the selected camera settings) at the next acquisition. The parameter which needs to be known to the camera driver in the exact form as given!
+                <!-- /func:acquisition.setAcquisitionCamera2SettingN -->
+                </li>
+
 
 	</ul>
 	

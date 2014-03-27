@@ -455,10 +455,10 @@ bool readEvalSettingsFile(const QString &evalFilename, bool isDCCF, QMap<QString
                 } else if (name=="correlation segments") {
                     initParams["SEGMENTS"]=value.toInt();
                     paramsReadonly<<"SEGMENTS";
-                } else if (name=="frametime (ms)") {
+                } else if ((name=="frametime (ms)")||(name=="frame time (ms)")) {
                     initParams["FRAMETIME_MS"]=value.toDouble();
                     paramsReadonly<<"FRAMETIME_MS";
-                } else if (name=="frametime (s)") {
+                } else if ((name=="frametime (s)")||(name=="frame time (s)")) {
                     initParams["FRAMETIME"]=value.toDouble();
                     paramsReadonly<<"FRAMETIME";
                 } else if (name=="correlator s") {
@@ -517,12 +517,18 @@ bool readEvalSettingsFile(const QString &evalFilename, bool isDCCF, QMap<QString
                     paramsReadonly<<"UNCORRECTEDVIDEO_MAX";
                 } else if (name=="video sum up") {
                     initParams["VIDEO_AVGFRAMES"]=value.toInt();
-                } else if (name=="video frametime (ms)") {
+                } else if ((name=="video frametime (ms)")||(name=="video frame time (ms)")) {
                     initParams["VIDEO_FRAMETIME"]=value.toDouble()/1000.0;
                     paramsReadonly<<"VIDEO_FRAMETIME";
-                } else if (name=="video frametime (s)") {
+                } else if ((name=="video frametime (s)")||(name=="video frame time (s)")) {
                     initParams["VIDEO_FRAMETIME"]=value.toDouble();
                     paramsReadonly<<"VIDEO_FRAMETIME";
+                } else if ((name=="measurement duration (s)")) {
+                    initParams["MEASUREMENT_DURATION_MS"]=value.toDouble()*1000.0;
+                    paramsReadonly<<"MEASUREMENT_DURATION_MS";
+                } else if ((name=="measurement duration (ms)")) {
+                    initParams["MEASUREMENT_DURATION_MS"]=value.toDouble();
+                    paramsReadonly<<"MEASUREMENT_DURATION_MS";
                 } else if (name=="video avgmin") {
                     initParams["VIDEO_AVGMIN"]=value.toDouble();
                     paramsReadonly<<"VIDEO_AVGMIN";

@@ -192,7 +192,7 @@ int QFExtensionCameraImplementation::getCameraAcquisitionProgress(unsigned int c
     return 0; // return a number between 0 and 100 which indicates the progress of a currently running acquisition
 }
 
-bool QFExtensionCameraImplementation::isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const  { 
+bool QFExtensionCameraImplementation::isCameraSettingChangable(QFExtensionCamera::CameraSetting which)   { 
 	return false; 
 }
 
@@ -200,11 +200,11 @@ void QFExtensionCameraImplementation::changeCameraSetting(QSettings& settings, Q
 
 }
 
-QVariant QFExtensionCameraImplementation::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const  { 
+QVariant QFExtensionCameraImplementation::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which)   { 
 	return QVariant(); 
 } 
 
-QVariant QFExtensionCameraImplementation::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which) const  { 
+QVariant QFExtensionCameraImplementation::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which)   { 
 	return QVariant(); 
 } 
 

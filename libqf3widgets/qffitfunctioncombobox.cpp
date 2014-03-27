@@ -44,8 +44,10 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
     QMapIterator<QString, QFFitFunction*> it(m_fitFunctions);
     while (it.hasNext())  {
         it.next();
-        addItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->shortName(), it.key());
-        delete it.value();
+        if (it.value()) {
+            addItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->shortName(), it.key());
+            delete it.value();
+        }
     }
     setUpdatesEnabled(upd);
 }

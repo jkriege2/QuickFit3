@@ -706,7 +706,7 @@ double QFExtensionCameraAndor::getCameraExposureTime(unsigned int camera) {
 }
 
 
-bool QFExtensionCameraAndor::isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const  {
+bool QFExtensionCameraAndor::isCameraSettingChangable(QFExtensionCamera::CameraSetting which)   {
     if (which==QFExtensionCamera::CamSetExposureTime) return true;
     if (which==QFExtensionCamera::CamSetNumberFrames) return true;
     if (which==QFExtensionCamera::CamSetGain) return true;
@@ -733,7 +733,7 @@ void QFExtensionCameraAndor::changeCameraSetting(QSettings& settings, QFExtensio
     if (which==QFExtensionCamera::CamSetTemporalBinning) settings.setValue(prefix+"accumulate_cycles", value);
 }
 
-QVariant QFExtensionCameraAndor::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const  {
+QVariant QFExtensionCameraAndor::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which)  {
     QString prefix="cam_andor/";
     if (which==QFExtensionCamera::CamSetExposureTime) return settings.value(prefix+"exposure_time");
     if (which==QFExtensionCamera::CamSetNumberFrames) return settings.value(prefix+"kinetic_cycles");
@@ -746,7 +746,7 @@ QVariant QFExtensionCameraAndor::getCameraSetting(QSettings& settings, QFExtensi
     return QVariant();
 }
 
-QVariant QFExtensionCameraAndor::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which) const
+QVariant QFExtensionCameraAndor::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which)
 {
     if (camera<0 || camera>=getCameraCount()) return QVariant();
 

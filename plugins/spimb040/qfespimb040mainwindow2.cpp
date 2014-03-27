@@ -825,7 +825,7 @@ bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathF
     return ok;
 }
 
-bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles2, const QMap<QFExtensionCamera::CameraSetting, QVariant>& camsettings1, const QMap<QFExtensionCamera::CameraSetting, QVariant>& camsettings2, QList<QFESPIMB040OpticsSetupBase::measuredValues>* measured, QProgressListDialog* progress, bool* userCanceled,bool  measureDuringAcquisitions )
+bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles2, const QMap<QFExtensionCamera::CameraSetting, QVariant>& camsettings1, const QMap<QFExtensionCamera::CameraSetting, QVariant>& camsettings2, const QMap<QString, QVariant> &camsettingsstr1, const QMap<QString, QVariant> &camsettingsstr2, QList<QFESPIMB040OpticsSetupBase::measuredValues>* measured, QProgressListDialog* progress, bool* userCanceled, bool  measureDuringAcquisitions )
 {
     QString tmpName1=QDir::temp().absoluteFilePath("qf3spimb040_cam1tmpsettings.ini");
 
@@ -846,6 +846,13 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
             it.next();
             if (it.value().isValid() && ecamera1->isCameraSettingChangable(it.key())) {
                 ecamera1->changeCameraSetting(settings1, it.key(), it.value());
+            }
+        }
+        QMapIterator<QString, QVariant> it2(camsettingsstr1);
+        while (it2.hasNext()) {
+            it2.next();
+            if (it2.value().isValid() && ecamera1->isCameraSettingChangable(it2.key())) {
+                ecamera1->changeCameraSetting(settings1, it2.key(), it2.value());
             }
         }
     }
@@ -875,6 +882,13 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString& lightpathName, const Q
             it.next();
             if (it.value().isValid() && ecamera2->isCameraSettingChangable(it.key())) {
                 ecamera2->changeCameraSetting(settings2, it.key(), it.value());
+            }
+        }
+        QMapIterator<QString, QVariant> it2(camsettingsstr2);
+        while (it2.hasNext()) {
+            it2.next();
+            if (it2.value().isValid() && ecamera2->isCameraSettingChangable(it2.key())) {
+                ecamera2->changeCameraSetting(settings2, it2.key(), it2.value());
             }
         }
     }

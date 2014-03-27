@@ -222,9 +222,35 @@ void QFESPIMB040AcquisitionConfigWidget2::setCameraSetting2(QFExtensionCamera::C
     else camset2[which]=value;
 }
 
+
+
+
+QVariant QFESPIMB040AcquisitionConfigWidget2::getCameraSetting1(const QString& which) const
+{
+    return camsetstr1.value(which, QVariant());
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::setCameraSetting1(const QString& which, QVariant value)
+{
+    camsetstr1[which]=value;
+}
+
+QVariant QFESPIMB040AcquisitionConfigWidget2::getCameraSetting2(const QString& which) const
+{
+    return camsetstr2.value(which, QVariant());
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::setCameraSetting2(const QString& which, QVariant value)
+{
+    camsetstr2[which]=value;
+}
+
+
+
 void QFESPIMB040AcquisitionConfigWidget2::clearCameraSettings1()
 {
     camset1.clear();
+    camsetstr1.clear();
     ui->spinFrames->setValue(ui->spinFrames->minimum());
 }
 
@@ -241,9 +267,19 @@ QMap<QFExtensionCamera::CameraSetting, QVariant> QFESPIMB040AcquisitionConfigWid
     return c;
 }
 
+QMap<QString, QVariant> QFESPIMB040AcquisitionConfigWidget2::getCameraSettingsStr1() const
+{
+    return camsetstr1;
+}
+QMap<QString, QVariant> QFESPIMB040AcquisitionConfigWidget2::getCameraSettingsStr2() const
+{
+    return camsetstr2;
+}
+
 void QFESPIMB040AcquisitionConfigWidget2::clearCameraSettings2()
 {
     camset2.clear();
+    camsetstr2.clear();
     ui->spinFrames2->setValue(ui->spinFrames2->minimum());
 }
 
@@ -837,9 +873,12 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             QMap<QFExtensionCamera::CameraSetting, QVariant> camset1, camset2;
             camset1=getCameraSettings1();
             camset2=getCameraSettings2();
+            QMap<QString, QVariant> camsetstr1, camsetstr2;
+            camsetstr1=getCameraSettingsStr1();
+            camsetstr2=getCameraSettingsStr2();
             camset1[QFExtensionCamera::CamSetNumberFrames]=currentBackgroundFrames(0);
             camset2[QFExtensionCamera::CamSetNumberFrames]=currentBackgroundFrames(1);
-            ok = acqTools->acquireSeries(lightpathName, "", tr("background image series"), useCam1&&(ui->chkBackground->isChecked())&&(!ui->chkNoBackground1->isChecked()), extension1, ecamera1, camera1, acquisitionPrefix1+"_background", acquisitionSettingsFilename1, backgroundDescription1, backgroundFiles1, useCam2&&(ui->chkBackground->isChecked())&&(!ui->chkNoBackground2->isChecked()), extension2, ecamera2, camera2, acquisitionPrefix2+"_background", acquisitionSettingsFilename2, backgroundDescription2, backgroundFiles2, camset1, camset2, NULL, &progress, &userCanceled, measureDuringAcquisitions);
+            ok = acqTools->acquireSeries(lightpathName, "", tr("background image series"), useCam1&&(ui->chkBackground->isChecked())&&(!ui->chkNoBackground1->isChecked()), extension1, ecamera1, camera1, acquisitionPrefix1+"_background", acquisitionSettingsFilename1, backgroundDescription1, backgroundFiles1, useCam2&&(ui->chkBackground->isChecked())&&(!ui->chkNoBackground2->isChecked()), extension2, ecamera2, camera2, acquisitionPrefix2+"_background", acquisitionSettingsFilename2, backgroundDescription2, backgroundFiles2, camset1, camset2, camsetstr1, camsetstr2, NULL, &progress, &userCanceled, measureDuringAcquisitions);
             if (!ok) {
                 ACQUISITION_ERROR(tr("  - error acquiring background image series!\n"));
             } else {
@@ -989,7 +1028,10 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         QMap<QFExtensionCamera::CameraSetting, QVariant> camset1, camset2;
         camset1=getCameraSettings1();
         camset2=getCameraSettings2();
-        ok = acqTools->acquireSeries(lightpathName, "acquisition", tr("image series"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionSettingsFilename1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionSettingsFilename2, acquisitionDescription2, moreFiles2, camset1, camset2, &measured, &progress, &userCanceled, measureDuringAcquisitions);
+        QMap<QString, QVariant> camsetstr1, camsetstr2;
+        camsetstr1=getCameraSettingsStr1();
+        camsetstr2=getCameraSettingsStr2();
+        ok = acqTools->acquireSeries(lightpathName, "acquisition", tr("image series"), useCam1, extension1, ecamera1, camera1, acquisitionPrefix1, acquisitionSettingsFilename1, acquisitionDescription1, moreFiles1, useCam2, extension2, ecamera2, camera2, acquisitionPrefix2, acquisitionSettingsFilename2, acquisitionDescription2, moreFiles2, camset1, camset2, camsetstr1, camsetstr2, &measured, &progress, &userCanceled, measureDuringAcquisitions);
         if (!ok) {
             ACQUISITION_ERROR(tr("  - error acquiring images!\n"));
         } else {

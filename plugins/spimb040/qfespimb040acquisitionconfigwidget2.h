@@ -59,10 +59,16 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         void setCameraSetting1(QFExtensionCamera::CameraSetting which, QVariant value);
         QVariant getCameraSetting2(QFExtensionCamera::CameraSetting which)const;
         void setCameraSetting2(QFExtensionCamera::CameraSetting which, QVariant value);
+        QVariant getCameraSetting1(const QString& which)const;
+        void setCameraSetting1(const QString& which, QVariant value);
+        QVariant getCameraSetting2(const QString& which)const;
+        void setCameraSetting2(const QString& which, QVariant value);
         void clearCameraSettings1();
         void clearCameraSettings2();
         QMap<QFExtensionCamera::CameraSetting, QVariant> getCameraSettings1() const;
         QMap<QFExtensionCamera::CameraSetting, QVariant> getCameraSettings2() const;
+        QMap<QString, QVariant> getCameraSettingsStr1() const;
+        QMap<QString, QVariant> getCameraSettingsStr2() const;
 
     protected:
 
@@ -142,6 +148,7 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         QFESPIMB040AcquisitionDescription* acqDescription;
         QFESPIMB040ExperimentDescription* expDescription;
         QMap<QFExtensionCamera::CameraSetting, QVariant> camset1, camset2;
+        QMap<QString, QVariant> camsetstr1, camsetstr2;
 
         QFPluginLogService* log;
         QFESPIMB040AcquisitionTools* acqTools;

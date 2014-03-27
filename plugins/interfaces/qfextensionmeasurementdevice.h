@@ -22,7 +22,7 @@ class QFExtensionMeasurementAndControlDevice {
 
 
         /** \brief return the number of measurement devices */
-        virtual unsigned int getMeasurementDeviceCount()=0;
+        virtual unsigned int getMeasurementDeviceCount() =0;
 
 
         /*! \brief displays a modal dialog which allows the user to set the configuration options
@@ -35,7 +35,7 @@ class QFExtensionMeasurementAndControlDevice {
          */
          virtual void showMeasurementDeviceSettingsDialog(unsigned int measuremenDevice, QWidget* parent=NULL)=0;
          /** \brief returns \c true if the measuremenDevice is connected */
-         virtual bool isMeasurementDeviceConnected(unsigned int measuremenDevice)=0;
+         virtual bool isMeasurementDeviceConnected(unsigned int measuremenDevice) =0;
          /** \brief connect to the device/activate it */
          virtual void connectMeasurementDevice(unsigned int measuremenDevice)=0;
          /** \brief disconnect from the device/activate it */
@@ -47,25 +47,25 @@ class QFExtensionMeasurementAndControlDevice {
         /** \brief return the number of measured values in a measurement devices */
         virtual unsigned int getMeasurementDeviceValueCount(unsigned int measuremenDevice)=0;
         /** \brief returns the name (or given label) of a measurement devices */
-        virtual QString getMeasurementDeviceName(unsigned int measuremenDevice)=0;
+        virtual QString getMeasurementDeviceName(unsigned int measuremenDevice) =0;
 
         /** \brief return a measured value from a specified measurement devices */
-        virtual QVariant getMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value)=0;
+        virtual QVariant getMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value) =0;
 
         /** \brief return a name for the specified measuremen devices (human-readable)  */
-        virtual QString getMeasurementDeviceValueName(unsigned int measuremenDevice, unsigned int value)=0;
+        virtual QString getMeasurementDeviceValueName(unsigned int measuremenDevice, unsigned int value) =0;
 
         /** \brief return a short name for the specified measuremen devices (for config-files etc. ... i.e. no space etc.)  */
-        virtual QString getMeasurementDeviceValueShortName(unsigned int measuremenDevice, unsigned int value)=0;
+        virtual QString getMeasurementDeviceValueShortName(unsigned int measuremenDevice, unsigned int value) =0;
 
         /** \brief returns \c true, if the value can be changed, using setMeasurementDeviceValue()  */
-        virtual bool isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value)=0;
+        virtual bool isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value) =0;
 
         /** \brief set a value in a specified measurement devices. This method should block, until the value is set/transmitted */
         virtual void setMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value, const QVariant& data)=0;
 
         /** \brief returns the datatype of a measurement device editable value */
-        virtual QVariant::Type getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value)=0;
+        virtual QVariant::Type getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value) =0;
 
         enum WidgetTypes {
             mdDoubleEdit=0,
@@ -82,10 +82,10 @@ class QFExtensionMeasurementAndControlDevice {
         };
 
         /** \brief returns the widget to be used for a measurement device' editable's value value */
-        virtual WidgetTypes getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList* comboboxEntries=NULL)=0;
+        virtual WidgetTypes getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList* comboboxEntries=NULL) =0;
 
         /** \brief returns the range of a measurement device editable value */
-        virtual void getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double& minimum, double& maximum)=0;
+        virtual void getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double& minimum, double& maximum) =0;
 
 };
 

@@ -685,7 +685,7 @@ int QFExtensionCameraRh2v2::getCameraAcquisitionProgress(unsigned int camera) {
     return 0;
 }
 
-bool QFExtensionCameraRh2v2::isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const  {
+bool QFExtensionCameraRh2v2::isCameraSettingChangable(QFExtensionCamera::CameraSetting which)   {
     return false;
 }
 
@@ -693,11 +693,11 @@ void QFExtensionCameraRh2v2::changeCameraSetting(QSettings& settings, QFExtensio
 
 }
 
-QVariant QFExtensionCameraRh2v2::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const  {
+QVariant QFExtensionCameraRh2v2::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which)   {
     return QVariant();
 }
 
-QVariant QFExtensionCameraRh2v2::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which) const
+QVariant QFExtensionCameraRh2v2::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which)
 {
     return QVariant();
 }

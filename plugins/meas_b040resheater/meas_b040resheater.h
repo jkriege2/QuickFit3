@@ -87,14 +87,14 @@ class QFExtensionB040ResistorHeater : public QObject, public QFExtensionBase, pu
         /////////////////////////////////////////////////////////////////////////////
 
         /** \copydoc QFExtensionMeasurementAndControlDevice::getMeasurementDeviceCount() */
-        virtual unsigned int getMeasurementDeviceCount();
+        virtual unsigned int getMeasurementDeviceCount() ;
         /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceName() */
-        virtual QString getMeasurementDeviceName(unsigned int measuremenDevice);
+        virtual QString getMeasurementDeviceName(unsigned int measuremenDevice) ;
 
         /** \copydoc QFExtensionMeasurementAndControlDevice::showMeasurementDeviceSettingsDialog() */
         virtual void showMeasurementDeviceSettingsDialog(unsigned int measuremenDevice, QWidget* parent=NULL);
         /** \copydoc QFExtensionMeasurementAndControlDevice::isMeasurementDeviceConnected() */
-         virtual bool isMeasurementDeviceConnected(unsigned int measuremenDevice);
+         virtual bool isMeasurementDeviceConnected(unsigned int measuremenDevice) ;
         /** \copydoc QFExtensionMeasurementAndControlDevice::connectMeasurementDevice() */
          virtual void connectMeasurementDevice(unsigned int measuremenDevice);
         /** \copydoc QFExtensionMeasurementAndControlDevice::disconnectMeasurementDevice() */
@@ -104,21 +104,21 @@ class QFExtensionB040ResistorHeater : public QObject, public QFExtensionBase, pu
         /** \copydoc QFExtensionMeasurementAndControlDevice::getMeasurementDeviceValueCount() */
         virtual unsigned int getMeasurementDeviceValueCount(unsigned int measuremenDevice);
         /** \copydoc QFExtensionMeasurementAndControlDevice::getMeasurementDeviceValue() */
-        virtual QVariant getMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value);
+        virtual QVariant getMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value) ;
         /** \copydoc QFExtensionMeasurementAndControlDevice::getMeasurementDeviceValueName() */
-        virtual QString getMeasurementDeviceValueName(unsigned int measuremenDevice, unsigned int value);
+        virtual QString getMeasurementDeviceValueName(unsigned int measuremenDevice, unsigned int value) ;
         /** \copydoc QFExtensionMeasurementAndControlDevice::getMeasurementDeviceValueShortName() */
-        virtual QString getMeasurementDeviceValueShortName(unsigned int measuremenDevice, unsigned int value);
+        virtual QString getMeasurementDeviceValueShortName(unsigned int measuremenDevice, unsigned int value) ;
         /** \copydoc QFExtensionMeasurementAndControlDevice::isMeasurementDeviceValueEditable() */
-        virtual bool isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value);
+        virtual bool isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value) ;
         /** \copydoc QFExtensionMeasurementAndControlDevice::setMeasurementDeviceValue() */
         virtual void setMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value, const QVariant& data);
         /** \copydoc QFExtensionMeasurementAndControlDevice::getMeasurementDeviceEditableValueType() */
-        virtual QVariant::Type getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value);
+        virtual QVariant::Type getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value) ;
         /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceValueWidget() */
-        virtual WidgetTypes getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList* comboboxEntries=NULL);
+        virtual WidgetTypes getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList* comboboxEntries=NULL) ;
         /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceEditableValueRange() */
-        virtual void getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double& minimum, double& maximum);
+        virtual void getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double& minimum, double& maximum) ;
 
 	protected:
         QFPluginLogService* logService;

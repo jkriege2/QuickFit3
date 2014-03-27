@@ -816,6 +816,7 @@ void QFECamServer::getCameraAcquisitionDescription(unsigned int camera, QList<QF
                 QString desc=f.value(3);
                 QString t=f[0].toUpper();
                 QVariant vv;
+                //qDebug()<<f<<n<<d<<desc;
                 if (t=="PARAM_FLOAT") {
                     vv=QStringToDouble(d);
                     if (n.toUpper()=="EXPOSURE") {
@@ -826,6 +827,12 @@ void QFECamServer::getCameraAcquisitionDescription(unsigned int camera, QList<QF
                     }
                 } else if (t=="PARAM_INT") {
                     vv=d.toInt(&ok);
+                    if (n.toUpper()=="EXPOSURE") {
+                        sources[camera].exposure=vv.toDouble();
+                        if (parameters) (*parameters)["exposure_time"]=vv;
+                    } else if (n.toUpper()=="DURATION") {
+                        if (parameters) (*parameters)["duration_milliseconds"]=vv.toDouble()*1000.0;
+                    }
                 } else if (t=="PARAM_BOOL") {
                     vv=QStringToBool(d);
                 } else if (t=="PARAM_STRING") {
@@ -860,7 +867,7 @@ int QFECamServer::getCameraAcquisitionProgress(unsigned int camera) {
     return 0; // return a number between 0 and 100 which indicates the progress of a currently running acquisition
 }
 
-bool QFECamServer::isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const  { 
+bool QFECamServer::isCameraSettingChangable(QFExtensionCamera::CameraSetting which)  {
 	return false; 
 }
 
@@ -868,12 +875,45 @@ void QFECamServer::changeCameraSetting(QSettings& settings, QFExtensionCamera::C
 
 }
 
-QVariant QFECamServer::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const  {
+QVariant QFECamServer::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which)   {
     return QVariant();
 }
 
-QVariant QFECamServer::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which) const
+QVariant QFECamServer::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which)
 {
+    return QVariant();
+}
+
+bool QFECamServer::isCameraSettingChangable(const QString &which)
+{
+    int camera=0;
+    if (camera>=0 && camera<sources.size() ) {
+        for (int i=0; i<sources[camera].params.size(); i++) {
+            if (sources[camera].params[i].id==which) return sources[camera].params[i].editable;
+        }
+        logService->log_error(tr("\ndid not find parameter %1\n").arg(which));
+    }
+    return false;
+}
+
+void QFECamServer::changeCameraSetting(QSettings &settings, const QString &which, QVariant value)
+{
+    settings.setValue(which, value);
+}
+
+QVariant QFECamServer::getCameraSetting(QSettings &settings, const QString &which)
+{
+    return settings.value(which);
+}
+
+QVariant QFECamServer::getCameraCurrentSetting(int camera, const QString &which)
+{
+    if (camera>=0 && camera<sources.size() ) {
+        for (int i=0; i<sources[camera].params.size(); i++) {
+            if (sources[camera].params[i].id==which) return getMeasurementDeviceValue(camera, i);
+        }
+        logService->log_error(tr("\ndid not find parameter %1\n").arg(which));
+    }
     return QVariant();
 }
 

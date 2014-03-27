@@ -113,14 +113,23 @@ class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, 
         virtual int getCameraAcquisitionProgress(unsigned int camera);
 
         /** \copydoc QFExtensionCamera::isCameraSettingChangable() */
-        virtual bool isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const;
+        virtual bool isCameraSettingChangable(QFExtensionCamera::CameraSetting which) ;
         /** \copydoc QFExtensionCamera::changeCameraSetting() */
         virtual void changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which, QVariant value);
         /** \copydoc QFExtensionCamera::getCameraSetting() */
-        virtual QVariant getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const ;
+        virtual QVariant getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which)  ;
         /** \copydoc QFExtensionCamera::getCameraSetting() */
-        virtual QVariant getCameraCurrentSetting(int camera, CameraSetting which) const ;
+        virtual QVariant getCameraCurrentSetting(int camera, CameraSetting which)  ;
 
+        /** \copydoc QFExtensionCamera::isCameraSettingChangable() */
+        inline virtual bool isCameraSettingChangable(const QString& which)  { return isCameraSettingChangable(QStringToSetting(which)); }
+        /** \copydoc QFExtensionCamera::changeCameraSetting() */
+        inline virtual void changeCameraSetting(QSettings& settings, const QString& which, QVariant value)  {  changeCameraSetting(settings, QStringToSetting(which), value); }
+        /** \copydoc QFExtensionCamera::getCameraSetting() */
+        inline virtual QVariant getCameraSetting(QSettings& settings, const QString& which)  { return getCameraSetting(settings, QStringToSetting(which)); }
+        /** \copydoc QFExtensionCamera::getCameraSetting() */
+        inline virtual QVariant getCameraCurrentSetting(int camera, const QString& which)  { return getCameraCurrentSetting(camera, QStringToSetting(which)); }
+        
         /** \brief log project text message
          *  \param message the message to log
          */

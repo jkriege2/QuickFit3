@@ -9,6 +9,7 @@
 
 
 
+
 /*! \brief QuickFit QFExtension to control black \& white cameras
     \ingroup qf3extensionplugins
 
@@ -209,21 +210,50 @@ class QFExtensionCamera {
          };
 
          /** \brief returns \c true if the given CameraSetting is changable by changeCameraSetting() */
-         virtual bool isCameraSettingChangable(CameraSetting which) const =0;
+         virtual bool isCameraSettingChangable(CameraSetting which)  =0;
          /*! \brief change the given CameraSetting in the given QSettings object
 
              \note <b>this will change the contents of your QSettings object, so possibly this changed version is also written back to the harddisk!!!</b>
           */
          virtual void changeCameraSetting(QSettings& settings, CameraSetting which, QVariant value) =0;
          /** \brief extract the given CameraSetting from the given QSettings object */
-         virtual QVariant getCameraSetting(QSettings& settings, CameraSetting which) const =0;
+         virtual QVariant getCameraSetting(QSettings& settings, CameraSetting which)  =0;
          /** \brief extract the given CameraSetting from the given camera */
-         virtual QVariant getCameraCurrentSetting(int camera, CameraSetting which) const =0;
+         virtual QVariant getCameraCurrentSetting(int camera, CameraSetting which)  =0;
 
+
+
+         /** \brief returns \c true if the given CameraSetting is changable by changeCameraSetting() */
+         inline virtual bool isCameraSettingChangable(const QString& which) =0;
+         /*! \brief change the given CameraSetting in the given QSettings object
+
+             \note <b>this will change the contents of your QSettings object, so possibly this changed version is also written back to the harddisk!!!</b>
+          */
+         inline virtual void changeCameraSetting(QSettings& settings, const QString& which, QVariant value)=0;
+         /** \brief extract the given CameraSetting from the given QSettings object */
+         inline virtual QVariant getCameraSetting(QSettings& settings, const QString& which) =0;
+         /** \brief extract the given CameraSetting from the given camera */
+         inline virtual QVariant getCameraCurrentSetting(int camera, const QString& which) =0;
 
 };
 
+
+inline QFExtensionCamera::CameraSetting QStringToSetting(const QString& which) {
+    QString whichl=which.toLower().trimmed();
+    if (whichl=="exposuretime") return QFExtensionCamera::CamSetExposureTime;
+    else if (whichl=="frames") return QFExtensionCamera::CamSetNumberFrames;
+    else if (whichl=="gain") return QFExtensionCamera::CamSetGain;
+    else if (whichl=="frametime") return QFExtensionCamera::CamSetFrametime;
+    else if (whichl=="emgain") return QFExtensionCamera::CamSetEMGAIN;
+    else if (whichl=="hbinning") return QFExtensionCamera::CamSetHorizontalBinning;
+    else if (whichl=="vbinning") return QFExtensionCamera::CamSetVerticalBinning;
+    else if (whichl=="tbinning") return QFExtensionCamera::CamSetTemporalBinning;
+    return QFExtensionCamera::CamSetUnknown;
+}
+
+
 Q_DECLARE_INTERFACE( QFExtensionCamera,
                      "www.dkfz.de.b040.quickfit3.extensions.QFExtensionCamera/1.1")
+
 
 #endif // QFEXTENSIONCAMERA_H

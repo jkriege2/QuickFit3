@@ -116,7 +116,7 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
     /////////////////////////////////////////////////////////////////////////////
     public:
         /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceCount() */
-        virtual unsigned int getMeasurementDeviceCount();
+        virtual unsigned int getMeasurementDeviceCount() ;
         /** \copydoc QFExtensionMeasurementDevice::showmeasurementDeviceSettingsDialog() */
         virtual void showMeasurementDeviceSettingsDialog(unsigned int measurementDevice, QWidget* parent=NULL);
         /** \copydoc QFExtensionMeasurementDevice::ismeasurementDeviceConnected() */
@@ -126,7 +126,7 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         /** \copydoc QFExtensionMeasurementDevice::disconnectmeasurementDevice() */
         virtual void disconnectMeasurementDevice(unsigned int measurementDevice);
         /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceName() */
-        virtual QString getMeasurementDeviceName(unsigned int measuremenDevice);
+        virtual QString getMeasurementDeviceName(unsigned int measuremenDevice) ;
         /** \copydoc QFExtensionMeasurementDevice::setmeasurementDeviceLogging() */
         virtual void setMeasurementDeviceLogging(QFPluginLogService* logService);
         /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceValueCount() */
@@ -134,19 +134,19 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceValue() */
         virtual QVariant getMeasurementDeviceValue(unsigned int measurementDevice, unsigned int value);
         /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceValueName() */
-        virtual QString getMeasurementDeviceValueName(unsigned int measurementDevice, unsigned int value);
+        virtual QString getMeasurementDeviceValueName(unsigned int measurementDevice, unsigned int value) ;
         /** \copydoc QFExtensionMeasurementDevice::getmeasurementDeviceValueShortName() */
-        virtual QString getMeasurementDeviceValueShortName(unsigned int measurementDevice, unsigned int value);
+        virtual QString getMeasurementDeviceValueShortName(unsigned int measurementDevice, unsigned int value) ;
         /** \copydoc QFExtensionMeasurementDevice::isMeasurementDeviceValueEditable() */
-        virtual bool isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value);
+        virtual bool isMeasurementDeviceValueEditable(unsigned int measuremenDevice, unsigned int value) ;
         /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceValue() */
         virtual void setMeasurementDeviceValue(unsigned int measuremenDevice, unsigned int value, const QVariant& data);
         /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceEditableValueType() */
-        virtual QVariant::Type getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value);
+        virtual QVariant::Type getMeasurementDeviceEditableValueType(unsigned int measuremenDevice, unsigned int value) ;
         /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceValueWidget() */
-        virtual WidgetTypes getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList* comboboxEntries=NULL);
+        virtual WidgetTypes getMeasurementDeviceValueWidget(unsigned int measuremenDevice, unsigned int value, QStringList* comboboxEntries=NULL) ;
         /** \copydoc QFExtensionMeasurementDevice::getMeasurementDeviceEditableValueRange() */
-        virtual void getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double& minimum, double& maximum);
+        virtual void getMeasurementDeviceEditableValueRange(unsigned int measuremenDevice, unsigned int value, double& minimum, double& maximum) ;
 
 
     /////////////////////////////////////////////////////////////////////////////
@@ -203,13 +203,25 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
 
 
         /** \copydoc QFExtensionCamera::isCameraSettingChangable() */
-        virtual bool isCameraSettingChangable(QFExtensionCamera::CameraSetting which) const;
+        virtual bool isCameraSettingChangable(QFExtensionCamera::CameraSetting which) ;
         /** \copydoc QFExtensionCamera::changeCameraSetting() */
         virtual void changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which, QVariant value);
         /** \copydoc QFExtensionCamera::getCameraSetting() */
-        virtual QVariant getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) const;
+        virtual QVariant getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which) ;
         /** \copydoc QFExtensionCamera::getCurrentCameraSetting() */
-        virtual QVariant getCameraCurrentSetting(int camera, CameraSetting which) const;
+        virtual QVariant getCameraCurrentSetting(int camera, CameraSetting which) ;
+
+        /** \brief returns \c true if the given CameraSetting is changable by changeCameraSetting() */
+        inline virtual bool isCameraSettingChangable(const QString& which)  { return isCameraSettingChangable(QStringToSetting(which)); }
+        /*! \brief change the given CameraSetting in the given QSettings object
+
+            \note <b>this will change the contents of your QSettings object, so possibly this changed version is also written back to the harddisk!!!</b>
+         */
+        inline virtual void changeCameraSetting(QSettings& settings, const QString& which, QVariant value)  {  changeCameraSetting(settings, QStringToSetting(which), value); }
+        /** \brief extract the given CameraSetting from the given QSettings object */
+        inline virtual QVariant getCameraSetting(QSettings& settings, const QString& which)  { return getCameraSetting(settings, QStringToSetting(which)); }
+        /** \brief extract the given CameraSetting from the given camera */
+        inline virtual QVariant getCameraCurrentSetting(int camera, const QString& which)  { return getCameraCurrentSetting(camera, QStringToSetting(which)); }
 
 
         /** \brief log project text message
