@@ -4,7 +4,7 @@
 #include <iostream>
 
 #define LOG_PREFIX "[SPADMeasurement]: "
-#define CONNECTION_DELAY_MS 50
+#define CONNECTION_DELAY_MS 200
 
 QFExtensionB040SPADMeasurement::QFExtensionB040SPADMeasurement(QObject* parent):
     QObject(parent)
@@ -51,7 +51,7 @@ void QFExtensionB040SPADMeasurement::initExtension() {
         s.lastAction=QTime::currentTime();
         s.serial=new QF3SimpleB040SerialProtocolHandler(ports.getCOMPort(s.port), getName());
         //s.serial->setAddToCommand("");
-        s.label=inifile.value("device"+QString::number(i+1)+"/label", tr("B040 Temperature Controller #%1").arg(i+1)).toString();
+        s.label=inifile.value("device"+QString::number(i+1)+"/label", tr("B040 SPAD surveilance #%1").arg(i+1)).toString();
         s.autoconnect=inifile.value("device"+QString::number(i+1)+"/autoconnect", false).toBool();
         for (int j=0; j<3; j++) {
             s.voltage_factor[j]=inifile.value("device"+QString::number(i+1)+"/voltage_factor", 1.0).toDouble();
@@ -59,10 +59,10 @@ void QFExtensionB040SPADMeasurement::initExtension() {
             s.current_factor[j]=inifile.value("device"+QString::number(i+1)+"/current_factor", 1.0).toDouble();
             s.current_offset[j]=inifile.value("device"+QString::number(i+1)+"/current_offset", 0.0).toDouble();
 
-            s.valuelabels[i]=inifile.value("device"+QString::number(i+1)+"/voltage"+QString::number(i)+"_label", tr("voltage %1 [V]").arg(i)).toString();
-            s.valueids[i]=inifile.value("device"+QString::number(i+1)+"/voltage"+QString::number(i)+"_id", QString("VOLTAGE%1").arg(i)).toString();
-            s.valuelabels[3+i]=inifile.value("device"+QString::number(i+1)+"/current"+QString::number(i)+"_label", tr("current %1 [mA]").arg(i)).toString();
-            s.valueids[3+i]=inifile.value("device"+QString::number(i+1)+"/current"+QString::number(i)+"_id", QString("CURRENT%1").arg(i)).toString();
+            s.valuelabels[j]=inifile.value("device"+QString::number(i+1)+"/voltage"+QString::number(j)+"_label", tr("voltage %1 [V]").arg(j)).toString();
+            s.valueids[j]=inifile.value("device"+QString::number(i+1)+"/voltage"+QString::number(j)+"_id", QString("VOLTAGE%1").arg(j)).toString();
+            s.valuelabels[3+j]=inifile.value("device"+QString::number(i+1)+"/current"+QString::number(j)+"_label", tr("current %1 [mA]").arg(j)).toString();
+            s.valueids[3+j]=inifile.value("device"+QString::number(i+1)+"/current"+QString::number(j)+"_id", QString("CURRENT%1").arg(j)).toString();
         }
         s.valuelabels[6]=inifile.value("device"+QString::number(i+1)+"/temperature0_label", tr("temperature 0")).toString();
         s.valuelabels[7]=inifile.value("device"+QString::number(i+1)+"/temperature1_label", tr("temperature 1")).toString();
@@ -223,7 +223,7 @@ QVariant QFExtensionB040SPADMeasurement::getMeasurementDeviceValue(unsigned int 
         bool r=(rs.toInt(&ok)!=0);
         return r;
     } else if (value==12) {
-        QString rs=serial->queryCommand(QString("P"));
+        QString rs=serial->queryCommand(QString("B"));
         bool r=(rs.toInt(&ok)!=0);
         return r;
     }
@@ -274,7 +274,7 @@ QString QFExtensionB040SPADMeasurement::getMeasurementDeviceValueShortName(unsig
     if (measuremenDevice>=0 && measuremenDevice<devices.size()) {
         if (value>=0 && value<8) return devices[measuremenDevice].valueids.value(value, QString("PARAMETER%1").arg(value));
         switch (value) {
-            case 8: return tr("RELAY0");
+            case 8: return tr("RELAY1");
             case 9: return tr("RELAY2");
             case 10: return tr("RELAY3");
             case 11: return tr("RELAY4");

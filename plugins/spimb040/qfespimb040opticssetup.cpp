@@ -1345,6 +1345,7 @@ void QFESPIMB040OpticsSetup::unlockLightpath() {
 }
 
 void saveMeasurementDevice1(QMap<QString, QVariant>& setup, const QString& prefix, const QString& name, QFExtensionMeasurementAndControlDevice* device, int id) {
+    if (!device) return;
     for (int i=0; i<device->getMeasurementDeviceValueCount(id); i++) {
         setup[prefix+QString("%2/%1").arg(device->getMeasurementDeviceValueShortName(id, i)).arg(name)]=device->getMeasurementDeviceValue(id, i);
     }
@@ -1384,7 +1385,7 @@ QFESPIMB040OpticsSetup::measuredValues QFESPIMB040OpticsSetup::getMeasuredValues
     ui->camConfig1->storeMeasurements(m.data, "camera1/");
     ui->camConfig2->storeMeasurements(m.data, "camera2/");
 
-    saveMeasurementDevice1(m.data, "measurement_device1", "", ui->widMD1->getMeasurementDevice(), ui->widMD2->getMeasurementDeviceID());
+    saveMeasurementDevice1(m.data, "measurement_device1", "", ui->widMD1->getMeasurementDevice(), ui->widMD1->getMeasurementDeviceID());
     saveMeasurementDevice1(m.data, "measurement_device2", "", ui->widMD2->getMeasurementDevice(), ui->widMD2->getMeasurementDeviceID());
 
     //qDebug()<<"measuredValues(): "<<m.data;

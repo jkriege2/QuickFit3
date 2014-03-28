@@ -758,7 +758,14 @@ bool QFECamServer::startCameraAcquisition(unsigned int camera) {
     QMutex* mutex=sources[camera].mutex;
     QMutexLocker locker(mutex);
 
-    if (sendCommand(sources[camera], QByteArray("RECORD\n"+sources[camera].last_filenameprefix+"\n\n"))) {
+    //if (sendCommand(sources[camera], QByteArray("RECORD\n"+sources[camera].last_filenameprefix+"\n\n"))) {
+    bool ok=false;
+    QList<QByteArray> answerl=queryData(sources[camera], QByteArray("RECORD\n"+sources[camera].last_filenameprefix+"\n\n"), 1, "\n\n", &ok);
+    QByteArray answer="";
+    if (answerl.size()>0) answer=answerl.first();
+
+    if (ok) {
+        sources[camera].lastfiles=answer;
         //if (waitForString(sources[camera], "ACK_RECORD\n\n" )) {
             sources[camera].acquiring=true;
             return true;
@@ -785,14 +792,25 @@ bool QFECamServer::isCameraAcquisitionRunning(unsigned int camera, double* perce
     QMutexLocker locker(mutex);
 
     if (sources[camera].acquiring) {
-        if (server->bytesAvailable()) {
+        QList<QByteArray> answerl=queryData(sources[camera], "PARAMETER_GET\nACQ_RUNNING\n\n", 1, "\n\n");
+        QByteArray answer="";
+        if (answerl.size()>0) answer=answerl.first();
+        int idx=answer.indexOf("PARAM_BOOL;ACQ_RUNNING;");
+        if (idx>=0) {
+            QByteArray a=answer.mid(idx+QByteArray("PARAM_BOOL;ACQ_RUNNING;").size(), 5).toLower();
+            sources[camera].acquiring=a.contains("true");
+            if (!sources[camera].acquiring)  {
+
+            }
+        }
+        /*if (server->bytesAvailable()) {
             bool ok=true;
             QByteArray answer=readString(sources[camera], "\n\n", &ok);
             if (ok && answer.contains("DONE_RECORD")) {
                 sources[camera].acquiring=false;
                 sources[camera].lastfiles=answer;
             }
-        }
+        }*/
     }
     return sources[camera].acquiring;
 }
