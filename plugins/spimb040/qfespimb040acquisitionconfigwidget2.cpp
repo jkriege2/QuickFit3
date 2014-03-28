@@ -1136,7 +1136,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                 }
             }
 
-            if (measureDuringAcquisitions) {
+            if (measured.size()>0) {
                 QString MeasurementsFilename=acqTools->saveMeasuredData(acquisitionPrefix1, measured);
                 if (!MeasurementsFilename.isEmpty() && QFile::exists(MeasurementsFilename)) {
                     QFExtensionCamera::CameraAcquititonFileDescription d;

@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <!-- RENAME THE ALIAS !!! -->
+    <file alias="meas_spadmeasurement.png">meas_spadmeasurement.png</file>
+</qresource>
+</RCC>

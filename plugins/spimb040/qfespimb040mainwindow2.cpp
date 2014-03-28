@@ -945,6 +945,8 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString &lightpathName, const Q
 
      }
 
+     if (measured) measured->append(optSetup->getMeasuredValues());
+
      //////////////////////////////////////////////////////////////////////////////////////
      // start background acquisition and wait until finished
      //////////////////////////////////////////////////////////////////////////////////////
@@ -1012,7 +1014,7 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString &lightpathName, const Q
      if (progress) progress->setValue(100);
 
      //////////////////////////////////////////////////////////////////////////////////////
-     // retrieve background acquisition description
+     // retrieve acquisition description
      //////////////////////////////////////////////////////////////////////////////////////
      if (ok && useCam1) {
          QMap<QString, QVariant> acquisitionDescription;
@@ -1044,6 +1046,9 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString &lightpathName, const Q
          getAdditionalCameraSettings(ecamera2, camera2, imageID, acquisitionDescription2);
      }
 
+     if (measured) measured->append(optSetup->getMeasuredValues());
+
+
      return ok;
 }
 
@@ -1056,17 +1061,34 @@ void QFESPIMB040MainWindow2::getAdditionalCameraSettings(QFExtensionCamera *ecam
     acquisitionDescription[prefix+"/image_height"]=ecamera->getCameraImageHeight(camera);
     acquisitionDescription[prefix+"/dualview_mode"]=optSetup->dualViewMode(ecamera, camera);
     optSetup->saveLightpathConfig(acquisitionDescription, "", prefix+"/lightpath/", QList<bool>(), true);
-    QMap<QString, QVariant> setup=optSetup->getSetup(optSetup->camNumFromExtension(ecamera, camera));
-    QMapIterator <QString, QVariant> it(setup);
-    while (it.hasNext()) {
-        it.next();
-        if (!it.value().toString().isEmpty()) {
-            if (it.value().type()==QVariant::List) {
-                acquisitionDescription[prefix+"/setup/"+it.key()]=jkVariantListToString(it.value().toList(), "; ");
-            } else {
-                acquisitionDescription[prefix+"/setup/"+it.key()]=it.value().toString();
-            }
+    {
+        QMap<QString, QVariant> setup=optSetup->getSetup(optSetup->camNumFromExtension(ecamera, camera));
+        QMapIterator <QString, QVariant> it(setup);
+        while (it.hasNext()) {
+            it.next();
+            if (!it.value().toString().isEmpty()) {
+                if (it.value().type()==QVariant::List) {
+                    acquisitionDescription[prefix+"/setup/"+it.key()]=jkVariantListToString(it.value().toList(), "; ");
+                } else {
+                    acquisitionDescription[prefix+"/setup/"+it.key()]=it.value().toString();
+                }
 
+            }
+        }
+    }
+    {
+        QMap<QString, QVariant> setup=optSetup->getMeasuredValues().data;
+        QMapIterator <QString, QVariant> it(setup);
+        while (it.hasNext()) {
+            it.next();
+            if (!it.value().toString().isEmpty()) {
+                if (it.value().type()==QVariant::List) {
+                    acquisitionDescription[prefix+"/measured/"+it.key()]=jkVariantListToString(it.value().toList(), "; ");
+                } else {
+                    acquisitionDescription[prefix+"/measured/"+it.key()]=it.value().toString();
+                }
+
+            }
         }
     }
 

@@ -49,6 +49,8 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     ui->lsTransmission->init(m_log, m_pluginServices);
     ui->lsLaser1->init(m_log, m_pluginServices);
     ui->lsLaser2->init(m_log, m_pluginServices);
+    ui->widMD1->init(m_log, m_pluginServices);
+    ui->widMD2->init(m_log, m_pluginServices);
     ui->filtcDetection->init(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini", m_log, m_pluginServices);
     ui->cmbLightpathConfig->init(m_pluginServices->getConfigFileDirectory()+"/plugins/ext_spimb040/", "lpc");
     ui->cmbLightpathConfig->setIcon(QIcon(":/spimb040/lightpath.png"));
@@ -150,6 +152,8 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
     if (updt) setUpdatesEnabled(false);
     ui->camConfig1->loadSettings(settings, prefix+"cam_config1/");
     ui->camConfig2->loadSettings(settings, prefix+"cam_config2/");
+    ui->widMD1->loadSettings(settings, prefix+"measure_device1/");
+    ui->widMD2->loadSettings(settings, prefix+"measure_device2/");
     ui->stageSetup->loadSettings(settings, prefix+"stages/");
     ui->filtDetection11->loadSettings(settings, prefix+"filters/detection11");
     ui->filtDetection21->loadSettings(settings, prefix+"filters/detection21");
@@ -193,6 +197,8 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
 void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) {
     ui->camConfig1->storeSettings(settings, prefix+"cam_config1/");
     ui->camConfig2->storeSettings(settings, prefix+"cam_config2/");
+    ui->widMD1->saveSettings(settings, prefix+"measure_device1/");
+    ui->widMD2->saveSettings(settings, prefix+"measure_device2/");
     ui->stageSetup->saveSettings(settings, prefix+"stages/");
     ui->filtDetection11->saveSettings(settings, prefix+"filters/detection11");
     ui->filtDetection21->saveSettings(settings, prefix+"filters/detection21");
@@ -272,6 +278,8 @@ void QFESPIMB040OpticsSetup::loadPluginGlobalSettings(QSettings &settings, QStri
     loadPluginGlobalSettings(settings, ui->stageSetup->getXStageExtensionObject(), prefix);
     loadPluginGlobalSettings(settings, ui->stageSetup->getYStageExtensionObject(), prefix);
     loadPluginGlobalSettings(settings, ui->stageSetup->getZStageExtensionObject(), prefix);
+    loadPluginGlobalSettings(settings, ui->widMD1->getMeasurementDeviceExtensionObject(), prefix);
+    loadPluginGlobalSettings(settings, ui->widMD2->getMeasurementDeviceExtensionObject(), prefix);
 }
 
 void QFESPIMB040OpticsSetup::storePluginGlobalSettings(QSettings &settings, QString prefix) const {
@@ -288,6 +296,8 @@ void QFESPIMB040OpticsSetup::storePluginGlobalSettings(QSettings &settings, QStr
     storePluginGlobalSettings(settings, ui->stageSetup->getXStageExtensionObject(), prefix);
     storePluginGlobalSettings(settings, ui->stageSetup->getYStageExtensionObject(), prefix);
     storePluginGlobalSettings(settings, ui->stageSetup->getZStageExtensionObject(), prefix);
+    storePluginGlobalSettings(settings, ui->widMD1->getMeasurementDeviceExtensionObject(), prefix);
+    storePluginGlobalSettings(settings, ui->widMD2->getMeasurementDeviceExtensionObject(), prefix);
 }
 
 void QFESPIMB040OpticsSetup::loadPluginGlobalSettings(QSettings &settings, QObject *extensionObject, QString prefix) {
@@ -559,6 +569,9 @@ void QFESPIMB040OpticsSetup::on_btnConnectDevices_clicked() {
     dlg->addItem(tr("lightsource: transmission"));
     dlg->addItem(tr("stage"));
     dlg->addItem(tr("filterwheel: detection"));
+    dlg->addItem(tr("measurement device 1"));
+    dlg->addItem(tr("measurement device 2"));
+
     dlg->setHasCancelButton(true);
     dlg->show();
     dlg->start();
@@ -589,6 +602,13 @@ void QFESPIMB040OpticsSetup::on_btnConnectDevices_clicked() {
     QApplication::processEvents();
     if (!dlg->wasCanceled()) if (ui->chkDetectionFilterWheel->isChecked()) ui->filtcDetection->connectFilterChanger();
     dlg->nextItem((ui->filtcDetection->isFilterChangerConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
+    QApplication::processEvents();
+    if (!dlg->wasCanceled()) ui->widMD1->connectMeasurementDevice();
+    dlg->nextItem((ui->widMD1->isMeasurementDeviceConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
+    QApplication::processEvents();
+    if (!dlg->wasCanceled()) ui->widMD2->connectMeasurementDevice();
+    dlg->nextItem((ui->widMD2->isMeasurementDeviceConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
+
     dlg->close();
     delete dlg;
 }
@@ -607,6 +627,8 @@ void QFESPIMB040OpticsSetup::on_btnDisconnectDevices_clicked() {
     dlg->addItem(tr("lightsource: transmission"));
     dlg->addItem(tr("stage"));
     dlg->addItem(tr("filterwheel: detection"));
+    dlg->addItem(tr("measurement device 1"));
+    dlg->addItem(tr("measurement device 2"));
     dlg->setHasCancelButton(false);
     dlg->show();
     dlg->start();
@@ -636,6 +658,12 @@ void QFESPIMB040OpticsSetup::on_btnDisconnectDevices_clicked() {
     dlg->nextItem();
     QApplication::processEvents();
     if (ui->chkDetectionFilterWheel->isChecked()) ui->filtcDetection->disconnectFilterChanger();
+    dlg->nextItem();
+    QApplication::processEvents();
+    ui->widMD1->disconnectMeasurementDevice();
+    dlg->nextItem();
+    QApplication::processEvents();
+    ui->widMD2->disconnectMeasurementDevice();
     dlg->nextItem();
     QApplication::processEvents();
     dlg->close();
@@ -1316,6 +1344,12 @@ void QFESPIMB040OpticsSetup::unlockLightpath() {
    //qDebug()<<"unlocking lightpath done";
 }
 
+void saveMeasurementDevice1(QMap<QString, QVariant>& setup, const QString& prefix, const QString& name, QFExtensionMeasurementAndControlDevice* device, int id) {
+    for (int i=0; i<device->getMeasurementDeviceValueCount(id); i++) {
+        setup[prefix+QString("%2/%1").arg(device->getMeasurementDeviceValueShortName(id, i)).arg(name)]=device->getMeasurementDeviceValue(id, i);
+    }
+}
+
 
 QFESPIMB040OpticsSetup::measuredValues QFESPIMB040OpticsSetup::getMeasuredValues() {
     QFESPIMB040OpticsSetup::measuredValues m;
@@ -1349,6 +1383,9 @@ QFESPIMB040OpticsSetup::measuredValues QFESPIMB040OpticsSetup::getMeasuredValues
 
     ui->camConfig1->storeMeasurements(m.data, "camera1/");
     ui->camConfig2->storeMeasurements(m.data, "camera2/");
+
+    saveMeasurementDevice1(m.data, "measurement_device1", "", ui->widMD1->getMeasurementDevice(), ui->widMD2->getMeasurementDeviceID());
+    saveMeasurementDevice1(m.data, "measurement_device2", "", ui->widMD2->getMeasurementDevice(), ui->widMD2->getMeasurementDeviceID());
 
     //qDebug()<<"measuredValues(): "<<m.data;
 

@@ -234,6 +234,10 @@ plg_qfe_dataexportbasics.depends = lib libqf3widgets
     plg_meas_b040resheater.subdir=./plugins/meas_b040resheater
     plg_meas_b040resheater.depends = lib libqf3widgets
 
+    SUBDIRS += plg_meas_spadmeasurement
+    plg_meas_spadmeasurement.subdir=./plugins/meas_spadmeasurement
+    plg_meas_spadmeasurement.depends = lib libqf3widgets
+
     SUBDIRS += plg_filterc_test
     plg_filterc_test.subdir=./plugins/filterc_test
     plg_filterc_test.depends = lib libqf3widgets

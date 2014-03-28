@@ -11,9 +11,9 @@
 	 config directory which will show up, if - and only if - you have write access to this file. If the file does not exist, the plugin will load (but not write) to the file <tt>meas_b040resheater.ini</tt> either in
 	 the user config directory, or in the assets directory (<tt>[AssetsDir]/plugins/meas_b040resheater/</tt>) for the plugin.
 	 </p>
-	 <p>In the <tt>meas_b040resheater.ini</tt> you will have to tell the plugin which stages are available and which serial ports they use. This is done inside a <tt>[<b>shutter</b><i>N</i>]</tt> block for each shutter <i>N</i> (default values are <u>underlined</u>):
+	 <p>In the <tt>meas_b040resheater.ini</tt> you will have to tell the plugin which stages are available and which serial ports they use. This is done inside a <tt>[<b>device</b><i>N</i>]</tt> block for each device <i>N</i> (default values are <u>underlined</u>):
 	 <blockquote><tt>
-[<b>shutter</b><i>N</i>]<br>
+[<b>device</b><i>N</i>]<br>
 <b>port</b> = <i>port name (e.g. COM1 or /dev/tty0)</i><br>
 <b>port_speed</b> = <i>port speed (<u>115200</u> | 19200 | 38400 | ...)</i><br>
 <b>port_databits</b> = <i>data bits used for the communication (5 | 6 | 7 | <u>8</u> | 9)</i><br>
@@ -23,15 +23,18 @@
 <b>port_timeout</b> = <i>port timeout in milliseconds (default: <u>500</u>)</i><br>
 <br>
 	 </tt></blockquote> 
-	 The number of shutters is stored in the variable <tt>shutter_count</tt>.
+	 The number of devices is stored in the variable <tt>device_count</tt>.
 	 </p>
 	 <p>Here is an example configuration file for windows and three servos on one controller connected to COM1:
 	 <blockquote><tt>
 device_count=1<br>
 <br>
+<br>
 [device1]<br>
 port=COM1<br>
-port_speed=115200
+port_speed=9600<br>
+
+
 	 </tt></blockquote></p>
 
 <p>See also the help page on <a href="$$mainhelpdir$$ext_usbdevices_linux.html">Linux hardware enumeration with udev</a> for further information</p>

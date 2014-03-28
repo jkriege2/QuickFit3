@@ -145,7 +145,7 @@ void QFExtensionB040ResistorHeater::connectMeasurementDevice(unsigned int measur
             log_error(tr("%1 Could not connect to B040 Temperature Controller [port=%1  baud=%2]!!!\n").arg(com->get_port().c_str()).arg(com->get_baudrate()));
             log_error(tr("%1 reason: received wrong ID string from B040 Temperature Controller: string was '%2'\n").arg(LOG_PREFIX).arg(devices[measuremenDevice].infoMessage));
         } else {
-            log_text(tr("%1 Connected to 040 Temperature Controller [port=%2  baud=%3] \n%1 welcome message:'%4'\n").arg(LOG_PREFIX).arg(com->get_port().c_str()).arg(com->get_baudrate()).arg(devices[measuremenDevice].infoMessage));
+            log_text(tr("%1 Connected to B040 Temperature Controller [port=%2  baud=%3] \n%1 welcome message:'%4'\n").arg(LOG_PREFIX).arg(com->get_port().c_str()).arg(com->get_baudrate()).arg(devices[measuremenDevice].infoMessage));
         }
     } else {
         log_error(tr("%1 Could not connect to B040 Temperature Controller [port=%1  baud=%2]!!!\n").arg(com->get_port().c_str()).arg(com->get_baudrate()));

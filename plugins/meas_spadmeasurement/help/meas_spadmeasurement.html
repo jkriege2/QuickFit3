@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>B040 Resistor Heater Plugin</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+	 <p>This plugin controls a SPAD array surveilance circuit running a custom written C program with a simple protocoll, developed by Jan Krieger (B040, DKFZ).</p>
+	 <p>The controllers are configured by a global configuration file <tt>meas_spadmeasurement.ini</tt>. It is stored in the global configuration directory. You may change some of the configuration options in the associated
+	 config directory which will show up, if - and only if - you have write access to this file. If the file does not exist, the plugin will load (but not write) to the file <tt>meas_spadmeasurement.ini</tt> either in
+	 the user config directory, or in the assets directory (<tt>[AssetsDir]/plugins/meas_spadmeasurement/</tt>) for the plugin.
+	 </p>
+	 <p>In the <tt>meas_spadmeasurement.ini</tt> you will have to tell the plugin which stages are available and which serial ports they use. This is done inside a <tt>[<b>device</b><i>N</i>]</tt> block for each device <i>N</i> (default values are <u>underlined</u>):
+	 <blockquote><tt>
+[<b>device</b><i>N</i>]<br>
+<b>port</b> = <i>port name (e.g. COM1 or /dev/tty0)</i><br>
+<b>port_speed</b> = <i>port speed (<u>115200</u> | 19200 | 38400 | ...)</i><br>
+<b>port_databits</b> = <i>data bits used for the communication (5 | 6 | 7 | <u>8</u> | 9)</i><br>
+<b>port_parity</b> = <i>parity bit (<u>none</u> | odd | even)</i><br>
+<b>port_handshaking</b> = <i>handshaking mode (<u>none</u> | xonxoff | hardware)</i><br>
+<b>port_stopbits</b> = <i>port speed (<u>1</u> | 1.5 | 2)</i><br>
+<b>port_timeout</b> = <i>port timeout in milliseconds (default: <u>500</u>)</i><br>
+<b>autoconnect</b> = <i>autoconnect to device on startup? (default: <u>false</u>)</i><br>
+<b>voltage<i>N</i>_offset</b> = <i>offset value for voltage <i>N</i> (0,1,2) calibration <tt>Uout=(Umeasure-offset)*factor</tt> (default: <u>0</u>)</i><br>
+<b>voltage<i>N</i>_factor</b> = <i>offset value for voltage <i>N</i> (0,1,2) calibration <tt>Uout=(Umeasure-offset)*factor</tt> (default: <u>1</u>)</i><br>
+<b>voltage<i>N</i>_id</b> = <i>value ID for voltage <i>N</i> (0,1,2) (default: <u>VOLTAGE<i>N</i></u>)</i><br>
+<b>voltage<i>N</i>_label</b> = <i>displayed label for voltage <i>N</i> (0,1,2) (default: <u>voltage <i>N</i> [V]</u>)</i><br>
+<b>current<i>N</i>_offset</b> = <i>offset value for current <i>N</i> (0,1,2) calibration <tt>Iout=(Imeasure-offset)*factor</tt> (default: <u>0</u>)</i><br>
+<b>current<i>N</i>_factor</b> = <i>offset value for current <i>N</i> (0,1,2) calibration <tt>Iout=(Imeasure-offset)*factor</tt> (default: <u>1</u>)</i><br>
+<b>current<i>N</i>_id</b> = <i>value ID for current <i>N</i> (0,1,2) (default: <u>CURRENT<i>N</i></u>)</i><br>
+<b>current<i>N</i>_label</b> = <i>displayed label for current <i>N</i> (0,1,2) (default: <u>current <i>N</i> [mA]</u>)</i><br>
+<b>temperature<i>N</i>_id</b> = <i>value ID for temperature <i>N</i> (0,1) (default: <u>TEMP<i>N</i></u>)</i><br>
+<b>temperature<i>N</i>_label</b> = <i>displayed label for temperature <i>N</i> (0,1) (default: <u>temperature <i>N</i> [°C]</u>)</i><br>
+<br>
+	 </tt></blockquote> 
+	 The number of devices is stored in the variable <tt>device_count</tt>.
+	 </p>
+	 <p>Here is an example configuration file for windows and three servos on one controller connected to COM1:
+	 <blockquote><tt>
+device_count=1<br>
+<br>
+
+[device1]<br>
+port=COM1<br>
+port_speed=9600<br>
+autoconnect=true<br>
+<br>
+voltage0_offset=0<br>
+voltage0_factor=1<br>
+voltage0_label="U0 [V]"<br>
+voltage0_id=U0<br>
+<br>
+voltage1_offset=0<br>
+voltage1_factor=1<br>
+voltage1_label="U1 [V]"<br>
+voltage1_id=U0<br>
+<br>
+voltage2_offset=0<br>
+voltage2_factor=1<br>
+voltage2_label="U2 [V]"<br>
+voltage2_id=U0<br>
+<br>
+current0_offset=0<br>
+current0_factor=1<br>
+current0_label="I0 [mA]"<br>
+current0_id=U0<br>
+<br>
+current1_offset=0<br>
+current1_factor=1<br>
+current1_label="I1 [mA]"<br>
+current1_id=U0<br>
+<br>
+current2_offset=0<br>
+current2_factor=1<br>
+current2_label="I2 [mA]"<br>
+current2_id=U0<br>
+<br>
+temperature0_label="---"<br>
+temperature1_label="temperature (Sensor) [°C]"<br>
+temperature1_id="TEMP_SENSOR"<br>
+	 </tt></blockquote></p>
+
+<p>See also the help page on <a href="$$mainhelpdir$$ext_usbdevices_linux.html">Linux hardware enumeration with udev</a> for further information</p>
+
+  </body>
+</html>
