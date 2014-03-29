@@ -412,6 +412,20 @@ void MainWindow::openProject() {
     }
 }
 
+void MainWindow::openExample()
+{
+    if (maybeSave()) {
+        QString fileName = qfGetOpenFileName(this, tr("Open Example Project ..."), settings->getExamplesDirectory(), projectFileFilter);
+        if (!fileName.isEmpty()) {
+            currentProjectDir=QFileInfo(fileName).dir().absolutePath();
+            QApplication::setOverrideCursor(Qt::WaitCursor);
+            loadProject(fileName);
+            QApplication::restoreOverrideCursor();
+        }
+    }
+
+}
+
 void MainWindow::openProjectSubset()
 {
     if (maybeSave()) {
@@ -976,6 +990,10 @@ void MainWindow::createActions() {
     openProjectSubsetAct->setStatusTip(tr("Let the user select a subset of records and evaluations to load from a project"));
     connect(openProjectSubsetAct, SIGNAL(triggered()), this, SLOT(openProjectSubset()));
 
+    openExampleAct = new QAction(tr("&Open Examples Projects ..."), this);
+    openExampleAct->setStatusTip(tr("lets the user open one of the example projects distributed together with the software"));
+    connect(openExampleAct, SIGNAL(triggered()), this, SLOT(openExample()));
+
     actReloadProject = new QAction(QIcon(":/reload_project.png"), tr("&Reload Current Project"), this);
     actReloadProject->setStatusTip(tr("Reload the currently opened project"));
     connect(actReloadProject, SIGNAL(triggered()), this, SLOT(reloadProject()));
@@ -1099,6 +1117,7 @@ void MainWindow::createMenus() {
     fileMenu->addAction(actReloadProject);
     projectSpecialMenu=fileMenu->addMenu(tr("&Special Project Tools ..."));
     projectSpecialMenu->addAction(openProjectSubsetAct);
+    projectSpecialMenu->addAction(openExampleAct);
 
     fileMenu->addAction(saveProjectAct);
     fileMenu->addAction(saveProjectAsAct);
@@ -1921,6 +1940,7 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
     newProjectAct->setEnabled(projectModeEnabled);
     openProjectAct->setEnabled(projectModeEnabled);
     openProjectSubsetAct->setEnabled(projectModeEnabled);
+    openExampleAct->setEnabled(projectModeEnabled);
     saveProjectAct->setEnabled(projectModeEnabled);
     saveProjectAsAct->setEnabled(projectModeEnabled);
     actReloadProject->setEnabled(projectModeEnabled);

@@ -95,6 +95,7 @@ class QFRDRImagingFCSDataEditorCountrate : public QFRawDataEditor {
         QLabel* labDuration;
         /** \brief label for the run options */
         QLabel* labRunOptions;
+        QCheckBox* chkKeepAspect;
 
         /** \brief fast plotter for overview image */
         JKQTFastPlotter* pltOverview;

@@ -104,6 +104,7 @@ class QFRDRImagingFCSDataEditor : public QFRawDataEditor {
         QLabel* labCorrelationPoints;
         /** \brief label for the run options */
         QLabel* labRunOptions;
+        QCheckBox* chkKeepAspect;
 
         /** \brief fast plotter for overview image */
         JKQTFastPlotter* pltOverview;

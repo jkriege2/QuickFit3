@@ -1,5 +1,6 @@
 #include "qftablemodel.h"
 #include <QDebug>
+#include <QMessageBox>
 
 QFTableModel::QFTableModel(QObject * parent):
     QAbstractTableModel(parent)
@@ -220,9 +221,16 @@ void QFTableModel::resize(quint16 rows, quint16 columns) {
     int oldcolumns=this->state.columns;
     int oldrows=this->state.rows;
 
+    int j=0;
+    while (state.columnNames.size()<oldcolumns) {state.columnNames.append(QString::number(j)); j++;}
+
     if (columns>oldcolumns) {
         for (int i=oldcolumns; i<=columns; i++) {
-            state.columnNames.append(QString::number(i));
+            int j=state.columnNames.size();
+            while (i>=state.columnNames.size()) {
+                state.columnNames.append(QString::number(j));
+                j++;
+            }
             emit columnAdded(i);
         }
     } else if (columns<oldcolumns) {
@@ -1133,11 +1141,14 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
         column=0;
     }
 
-    if (!hasTitle && specialHeader.size()>0 && abs(specialHeader.size()-state.columns)<state.columns/10) {
+    //qDebug()<<hasTitle<<specialHeader.size()<<state.columns<<specialHeader;
+
+    if (!hasTitle && specialHeader.size()>0 && specialHeader.size()>=qMax(0,state.columns/10)) {
         QMapIterator<int,QString> it(specialHeader);
         while (it.hasNext()) {
             it.next();
             setColumnTitleCreate(it.key(), it.value());
+            //qDebug()<<"title("<<it.key()<<") = "<<it.value();
         }
     }
 
@@ -1288,21 +1299,21 @@ void QFTableModel::paste(int row_start, int column_start) {
     if (mime && (mime->hasFormat("quickfit3/qfrdrtable")|| mime->hasFormat("application/x-qt-windows-mime;value=\"quickfit3/qfrdrtable\""))) {
         QString data=QString::fromUtf8(mime->data("quickfit3/qfrdrtable").data());
         //qDebug()<<"pasting quickfit3/qfrdrtable";
-        readXML(data, row, column, false, false, false);
+        readXML(data, row, column, false, false, QFTableModel::rhmAskOverwrite);
     } else if (mime && mime->hasFormat("quickfit3/qfrdrtable_template")) {
         QString data=QString::fromUtf8(mime->data("quickfit3/qfrdrtable_template").data());
         //qDebug()<<"pasting quickfit3/qfrdrtable_template";
-        readXML(data, row, column, false, true);
+        readXML(data, row, column, false, true, QFTableModel::rhmAskOverwrite);
     } else if (mime && mime->hasFormat("jkqtplotter/csv")) {
         QString data=QString::fromUtf8(mime->data("jkqtplotter/csv").data());
         //qDebug()<<"pasting jkqtplotter/csv: \n"<<data;
-        readXML(data, row, column, false);
+        //readXML(data, row, column, false);
         QTextStream in(&data);
         readCSV(in, ',', '.', "#!", '#', row, column, false);
     } else if (mime && mime->hasFormat("quickfit/csv")) {
         QString data=QString::fromUtf8(mime->data("quickfit/csv").data());
         //qDebug()<<"pasting quickfit/csv: \n"<<data;
-        readXML(data, row, column, false);
+        //readXML(data, row, column, false);
         QTextStream in(&data);
         readCSV(in, ',', '.', "#!", '#', row, column, false);
     } else if (mime && mime->hasText()) {
@@ -1314,15 +1325,40 @@ void QFTableModel::paste(int row_start, int column_start) {
         QStringList sl=data.split("\n");
         char sep='\t';
         char dec=loc.decimalPoint().toLatin1();
+        char comment='#';
+        QString headercomment="";
         if (sl.size()>0) {
             QString d;
             int i=0;
             int cntl=0;
             while (i<sl.size() && cntl<20) {
-                QChar c0=sl[i].trimmed().at(0);
-                if (c0.isDigit() || c0=='-' || c0=='+' || c0=='#') {
-                    d=d+sl[i]+"\n";
-                    cntl++;
+                QString line=sl[i].trimmed();
+                if (line.size()>0) {
+                    QChar c0=line.at(0);
+                    QChar c1='\0';
+                    if (line.size()>1) c1=line.at(1);
+                    if (c0.isDigit() || c0=='-' || c0=='+' || c0=='#') {
+                        d=d+sl[i]+"\n";
+                        cntl++;
+                    }
+                    if (c0=='#') { comment='#'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='%') { comment='%'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='&') { comment='&'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0==';') { comment=';'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='§') { comment='§'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='!') { comment='!'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='/') { comment='/'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='\\') { comment='\\'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='*') { comment='*'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='~') { comment='~'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='\'' && !line.contains('\'')) { comment='\''; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='\"' && !line.contains('\"')) { comment='\"'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='?') { comment='?'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='!') { comment='!'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='°') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='<') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='>') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                    else if (c0=='=') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
                 }
                 i++;
             }
@@ -1342,6 +1378,8 @@ void QFTableModel::paste(int row_start, int column_start) {
             if (sep!=',' && dec=='.' && icntCom>0 && icntDot==0) dec=',';
             if (dec==',' && icntCom<=0 && icntDot>0 ) dec='.';
             if (icntDot>0 && icntCom>0) { dec='.'; sep=',';}
+            if (sep==';' && comment==';') { comment='#'; headercomment=""; }
+            if (headercomment.size()<=0) { headercomment=comment; headercomment+="!"; }
             //qDebug()<<"icntDot="<<icntDot;
             //qDebug()<<"icntCom="<<icntCom;
             //qDebug()<<"cnt="<<cnt;
@@ -1351,7 +1389,7 @@ void QFTableModel::paste(int row_start, int column_start) {
         }
 
         //qDebug()<<"sep='"<<sep<<"'    dec='"<<dec<<"'";
-        readCSV(in, sep, dec, "#!", '#', row, column, false);
+        readCSV(in, sep, dec, headercomment, comment, row, column);
     }
     doEmitSignals=oldEmit;
     if (doEmitSignals) reset();
@@ -1378,11 +1416,11 @@ void QFTableModel::pasteHeaderTemplate(int row_start, int column_start)
     if (mime && (mime->hasFormat("quickfit3/qfrdrtable")|| mime->hasFormat("application/x-qt-windows-mime;value=\"quickfit3/qfrdrtable\""))) {
         QString data=QString::fromUtf8(mime->data("quickfit3/qfrdrtable").data());
         //qDebug()<<"pasting quickfit3/qfrdrtable";
-        readXML(data, row, column, false, true, false);
+        readXML(data, row, column, false, true, QFTableModel::rhmAskOverwrite);
     } else if (mime && mime->hasFormat("quickfit3/qfrdrtable_template")) {
         QString data=QString::fromUtf8(mime->data("quickfit3/qfrdrtable_template").data());
         //qDebug()<<"pasting quickfit3/qfrdrtable_template";
-        readXML(data, row, column, false, true);
+        readXML(data, row, column, false, true, QFTableModel::rhmAskOverwrite);
 
     }
     doEmitSignals=oldEmit;
@@ -1407,7 +1445,7 @@ void QFTableModel::disableSignals()
 }
 
 
-bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bool clearTable, bool read_template_only, bool alsoReadHeaders) {
+bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bool clearTable, bool read_template_only, QFTableModel::ReadHeaderMode alsoReadHeaders) {
     bool oldEmit=doEmitSignals;
 
     doEmitSignals=false;
@@ -1419,18 +1457,37 @@ bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bo
         clear();
     }
     QDomDocument doc;
+    bool overwriteHeader=false;
+    bool firstOverwrite=true;
     if (doc.setContent(data)) {
         startMultiUndo();
         QDomElement er=doc.firstChildElement("qfrdrtable");
         if (!er.isNull()) {
-            if (clearTable || read_template_only || alsoReadHeaders) {
+            if (clearTable || read_template_only || (alsoReadHeaders!=QFTableModel::rhmDontReadHeader)) {
                 QDomElement e=er.firstChildElement("state.columns");
                 if (!e.isNull()) {
                     e=e.firstChildElement("col");
                     while (!e.isNull()) {
                         int c=scol+e.attribute("col").toInt();
                         QString t=e.attribute("name");
-                        setColumnTitleCreate(c, t);
+                        if (clearTable || read_template_only || alsoReadHeaders==QFTableModel::rhmReadHeader) setColumnTitleCreate(c, t);
+                        else if (alsoReadHeaders==QFTableModel::rhmOverwriteNondefault || alsoReadHeaders==QFTableModel::rhmAskOverwrite) {
+                            QString oldt=state.columnNames.value(c, "");
+                            bool ok=false;
+                            QRegExp rxDefault1("^\\d+\\s*\\:\\s*\\d+$");
+                            QRegExp rxDefault2("^\\s*\\d+\\s*$");
+                            //int ildtn=oldt.toInt(&ok);
+                            ok=((rxDefault1.indexIn(oldt)==0) || (rxDefault2.indexIn(oldt)==0));
+                            //qDebug()<<oldt<<ok<<rxDefault1.indexIn(oldt)<<rxDefault2.indexIn(oldt)<<oldt.isEmpty();
+                            if (alsoReadHeaders==QFTableModel::rhmAskOverwrite && firstOverwrite && !oldt.isEmpty() && !ok) {
+                                //qDebug()<<oldt<<ok;
+                                firstOverwrite=false;
+                                overwriteHeader=QMessageBox::question(NULL, tr("Overwrite Headers?"), tr("Overwrite already existing table headers?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes;
+                            }
+                            if (oldt.isEmpty() || ok || overwriteHeader) {
+                                setColumnTitleCreate(c, t);
+                            }
+                        }
 
                         QDomNamedNodeMap nm=e.attributes();
                         QRegExp rxAtrD("more\\_data(\\d+)");
@@ -1445,7 +1502,17 @@ bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bo
                                     QString typ=e.attribute(QString("more_type%1").arg(rxAtrD.cap(1)));
                                     //qDebug()<< "   type = "<<typ;
                                     QVariant md=getQVariantFromString(typ, atr.value());
-                                    setColumnHeaderData(c, rxAtrD.cap(1).toInt(), md);
+                                    if (clearTable || read_template_only || alsoReadHeaders==QFTableModel::rhmReadHeader) setColumnHeaderData(c, rxAtrD.cap(1).toInt(), md);
+                                    else if (alsoReadHeaders==QFTableModel::rhmOverwriteNondefault || alsoReadHeaders==QFTableModel::rhmAskOverwrite) {
+                                        QVariant hdold=getColumnHeaderData(c, rxAtrD.cap(1).toInt());
+                                        if (alsoReadHeaders==QFTableModel::rhmAskOverwrite && firstOverwrite && hdold.isValid() && !hdold.isNull()) {
+                                            firstOverwrite=false;
+                                            overwriteHeader=QMessageBox::question(NULL, tr("Overwrite Headers?"), tr("Overwrite already existing table headers?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes;
+                                        }
+                                        if (!hdold.isValid() || hdold.isNull() || overwriteHeader)  {
+                                            setColumnHeaderData(c, rxAtrD.cap(1).toInt(), md);
+                                        }
+                                    }
                                 }
                             }
                         }

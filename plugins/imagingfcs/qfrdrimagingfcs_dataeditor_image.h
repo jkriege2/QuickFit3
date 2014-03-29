@@ -266,6 +266,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         void setBackgroundFromMasked();
         void setBackground(bool* mask, bool alsoSetOtherACF);
 
+        void aspectRatioChanged();
+
     protected:
         /** \brief map with all available fit functions */
         QMap<QString, QFFitFunction*> m_fitFunctions;
@@ -279,6 +281,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QCheckBox* chkParamImage2Visible;
         /** \brief indicates whether the mask plot is visible */
         QCheckBox* chkMaskVisible;
+
+        QCheckBox* chkKeepAspect;
 
 
 

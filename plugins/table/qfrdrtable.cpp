@@ -1333,6 +1333,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
         datamodel->readCSV(files[0], column_separator, decimal_separator, header_start, comment_start);
         datamodel->setReadonly(true);
         datamodel->resetChanged();
+        //qDebug()<<datamodel->getColumnTitles();
     } else if (e) {
         QDomElement te=e->firstChildElement("column");
         quint16 rows=0, columns=0;

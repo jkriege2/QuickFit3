@@ -241,12 +241,17 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     glVisPlots->addWidget(chkParamImage2Visible, 0,1);
     glVisPlots->addWidget(chkMaskVisible, 0,2);
 
+    chkKeepAspect=new QCheckBox(this);
+    chkKeepAspect->setChecked(true);
+    glVisPlots->addWidget(new QLabel("keep image aspect:"), 1, 0);
+    glVisPlots->addWidget(chkKeepAspect, 1, 1, 1, 2);
+
     cmbDualView=new QComboBox(this);
     cmbDualView->addItem(QIcon(":/imaging_fcs/dvnone.png"), tr("none"));
     cmbDualView->addItem(QIcon(":/imaging_fcs/dvhor.png"), tr("split horizontal"));
     cmbDualView->addItem(QIcon(":/imaging_fcs/dvver.png"), tr("split vertical"));
-    glVisPlots->addWidget(new QLabel("DualView mode:"), 1, 0);
-    glVisPlots->addWidget(cmbDualView, 1, 1, 1, 2);
+    glVisPlots->addWidget(new QLabel("DualView mode:"), 2, 0);
+    glVisPlots->addWidget(cmbDualView, 2, 1, 1, 2);
     vbl->addWidget(grpVisiblePlots);
 
 
@@ -1968,6 +1973,7 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         }
         cmbOtherFileRole->setCurrentIndex(m->getProperty("imfcs_imed_otherfilegroup",roles.indexOf(current->getRole())).toInt());
         chkOtherFileP2->setChecked(m->getProperty("imfcs_imed_otherfile", false).toBool());
+        chkKeepAspect->setChecked(m->getProperty("imfcs_imed_keepar", true).toBool());
 
         cmbCrosstalkDirection->setEnabled(m->isFCCS());
         cmbCrosstalkMode->setEnabled(m->isFCCS());
@@ -2789,9 +2795,9 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
 
         //qDebug()<<"replotOverview()  w="<<w<<"   h="<<h;
         pltOverview->setAbsoluteXY(0, w, 0, h);
-        pltOverview->get_plotter()->set_maintainAspectRatio(true);
+        pltOverview->get_plotter()->set_maintainAspectRatio(chkKeepAspect->isChecked());
         pltOverview->get_plotter()->set_aspectRatio(w/h);//qMax(0.01, qMin(100.0, w/h)));
-        pltOverview->get_plotter()->set_maintainAxisAspectRatio(true);
+        pltOverview->get_plotter()->set_maintainAxisAspectRatio(chkKeepAspect->isChecked());
         pltOverview->get_plotter()->set_axisAspectRatio(1.0*w/h);
 
         if (w>3*h) {
@@ -2864,9 +2870,9 @@ void QFRDRImagingFCSImageEditor::replotMask() {
         }
 
         pltMask->setAbsoluteXY(0, w, 0, h);
-        pltMask->get_plotter()->set_maintainAspectRatio(true);
+        pltMask->get_plotter()->set_maintainAspectRatio(chkKeepAspect->isChecked());
         pltMask->get_plotter()->set_aspectRatio(w/h);//qMax(0.01, qMin(100.0, w/h)));
-        pltMask->get_plotter()->set_maintainAxisAspectRatio(true);
+        pltMask->get_plotter()->set_maintainAxisAspectRatio(chkKeepAspect->isChecked());
         pltMask->get_plotter()->set_axisAspectRatio(1.0*w/h);
 
         pltMask->setXY(0, w, 0, h);
@@ -3688,6 +3694,7 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
         cmbParameter->clear();
         cmbParameter2->clear();
         chkOtherFileP2->setChecked(false);
+        chkKeepAspect->setChecked(true);
         //cmbParameter->setCurrentIndex(-1);
     } else {
         connectParameterWidgets(false);
@@ -3695,6 +3702,7 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
         m->setQFProperty("imfcs_imed_otherfileevalgroup", cmbOtherFilesResultGroup->currentIndex(), false, false);
         m->setQFProperty("imfcs_imed_otherfilegroup", cmbOtherFileRole->currentIndex(), false, false);
         m->setQFProperty("imfcs_imed_otherfile", chkOtherFileP2->isChecked(), false, false);
+        m->setQFProperty("imfcs_imed_keepar", chkKeepAspect->isChecked(), false, false);
         labParameter->setEnabled(true);
         cmbParameter->setEnabled(true);
         labParameterTransform->setEnabled(true);
@@ -3864,6 +3872,7 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
             grpImage->connectWidgets(true);
             grpImage2->connectWidgets(true);
 
+            connect(chkKeepAspect, SIGNAL(toggled(bool)), this, SLOT(aspectRatioChanged()));
             connect(chkOtherFileP2, SIGNAL(toggled(bool)), this, SLOT(fillParameterSet()));
             connect(cmbOtherFileRole, SIGNAL(currentIndexChanged(int)), this, SLOT(fillParameterSet()));
             connect(cmbResultGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterSetChanged()));
@@ -3906,6 +3915,7 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
         grpImage->connectWidgets(false);
         grpImage2->connectWidgets(false);
 
+        disconnect(chkKeepAspect, SIGNAL(toggled(bool)), this, SLOT(aspectRatioChanged()));
         disconnect(chkOtherFileP2, SIGNAL(toggled(bool)), this, SLOT(fillParameterSet()));
         disconnect(cmbOtherFileRole, SIGNAL(currentIndexChanged(int)), this, SLOT(fillParameterSet()));
         disconnect(cmbResultGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(parameterSetChanged()));
@@ -6028,5 +6038,13 @@ void QFRDRImagingFCSImageEditor::setBackground(bool *msk, bool alsoSetOtherACF)
             }
         }
     }
+}
+
+void QFRDRImagingFCSImageEditor::aspectRatioChanged()
+{
+    replotOverview();
+    replotMask();
+    pltImage->setAspectRatio(chkKeepAspect->isChecked());
+    pltParamImage2->setAspectRatio(chkKeepAspect->isChecked());
 }
 

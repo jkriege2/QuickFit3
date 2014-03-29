@@ -229,6 +229,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         void closeProject();
         /** \brief display an open project dialog and open the selected project */
         void openProject();
+        void openExample();
 
         /** \brief display an open project dialog and open the selected project, but let the user first select a subset of nodes to load */
         void openProjectSubset();
@@ -383,6 +384,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QAction *newProjectAct;
         QAction *openProjectAct;
         QAction *openProjectSubsetAct;
+        QAction *openExampleAct;
         QAction *saveProjectAct;
         QAction *saveProjectAsAct;
         QAction* actReloadProject;

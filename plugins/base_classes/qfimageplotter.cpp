@@ -105,9 +105,9 @@ void QFImagePlotter::updateImage()
             w=h=1;
         }
         setAbsoluteXY(0, w, 0, h);
-        get_plotter()->set_maintainAspectRatio(true);
+        get_plotter()->set_maintainAspectRatio(keepAspect);
         get_plotter()->set_aspectRatio(w/h);//qMax(0.01, qMin(100.0, w/h)));
-        get_plotter()->set_maintainAxisAspectRatio(true);
+        get_plotter()->set_maintainAxisAspectRatio(keepAspect);
         get_plotter()->set_axisAspectRatio(1.0*w/h);
         plteImage->get_colorBarRightAxis()->set_labelFontSize(8);
         plteImage->get_colorBarRightAxis()->set_axisLabel(plteImageLabel);
@@ -191,6 +191,7 @@ void QFImagePlotter::updateOverlays(bool *plteOverviewSelectedData, bool *plteOv
 
 void QFImagePlotter::initImFCSPlotter()
 {
+    keepAspect=true;
     paramGrp=NULL;
     overlayCmb=NULL;
     current=NULL;
@@ -202,9 +203,9 @@ void QFImagePlotter::initImFCSPlotter()
     get_plotter()->set_plotLabelFontSize(10);
     set_displayMousePosition(false);
     set_displayToolbar(true);
-    get_plotter()->set_maintainAspectRatio(true);
+    get_plotter()->set_maintainAspectRatio(keepAspect);
     get_plotter()->set_aspectRatio(1);
-    get_plotter()->set_maintainAxisAspectRatio(true);
+    get_plotter()->set_maintainAxisAspectRatio(keepAspect);
     get_plotter()->set_axisAspectRatio(1);
     setXY(0,0,1,1);
     setAbsoluteXY(0,1,0,1);
@@ -355,6 +356,14 @@ void QFImagePlotter::clearImage()
     plteImageHeight=0;
 
     updatePlot();
+}
+
+void QFImagePlotter::setAspectRatio(bool keepAspect)
+{
+    if (this->keepAspect!=keepAspect) {
+        this->keepAspect=keepAspect;
+        updatePlot();
+    }
 }
 
 void QFImagePlotter::setCopyableData()

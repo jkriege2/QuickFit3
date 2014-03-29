@@ -123,5 +123,7 @@ CONFIG += exceptions rtti stl
 
 ASSETS_TESTDATA.files = ./examples/imfcs_testdata/*.*
 ASSETS_TESTDATA.path = $${QFOUTPUT}/examples/$${TARGET}/imfcs_testdata/
+ASSETS_TESTDATARESULTS.files = ./examples/imfcs_testdata/results/*.*
+ASSETS_TESTDATARESULTS.path = $${QFOUTPUT}/examples/$${TARGET}/imfcs_testdata/results/
 
-INSTALLS += ASSETS_TESTDATA
+INSTALLS += ASSETS_TESTDATA ASSETS_TESTDATARESULTS

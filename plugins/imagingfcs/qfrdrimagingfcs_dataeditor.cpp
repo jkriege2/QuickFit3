@@ -207,6 +207,13 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     connect(chkLogTauAxis, SIGNAL(toggled(bool)), this, SLOT(replotData()));
     row++;
 
+    chkKeepAspect=new QCheckBox("", w);
+    gl->addWidget((l=new QLabel(tr("keep preview aspect ratio:"))), row, 0);
+    l->setTextFormat(Qt::RichText);
+    gl->addWidget(chkKeepAspect, row, 1);
+    connect(chkKeepAspect, SIGNAL(toggled(bool)), this, SLOT(replotData()));
+    row++;
+
     grpInfo=new QGroupBox(tr("Info"), w);
     QGridLayout* ggl=new QGridLayout(grpInfo);
     grpInfo->setLayout(ggl);
@@ -389,6 +396,7 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
         pltOverview->set_xTickDistance(dx);
         pltOverview->set_yTickDistance(dy);
         pltOverview->set_aspectRatio(w/h);
+        pltOverview->set_maintainAspectRatio(chkKeepAspect->isChecked());
         plteOverviewSelected->set_data(NULL, 0, 0);
         plteOverviewExcluded->set_data(NULL, 0, 0);
 
@@ -671,6 +679,7 @@ void QFRDRImagingFCSDataEditor::readSettings() {
     if (!settings) return;
     plotter->loadSettings(*(settings->getQSettings()), QString("imfcsdataeditor/corrplot"));
     chkLogTauAxis->setChecked(settings->getQSettings()->value(QString("imfcsdataeditor/log_tau_axis"), true).toBool());
+    chkKeepAspect->setChecked(settings->getQSettings()->value(QString("imfcsdataeditor/chkKeepAspect"), true).toBool());
     //chkDisplayAverage->setChecked(settings->getQSettings()->value(QString("imfcsdataeditor/display_avg"), true).toBool());
     chkDisplayAverage->setChecked(true);
     cmbAverageStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/avg_style"), 0).toInt());
@@ -686,6 +695,7 @@ void QFRDRImagingFCSDataEditor::readSettings() {
 void QFRDRImagingFCSDataEditor::writeSettings() {
     if (!settings) return;
     settings->getQSettings()->setValue(QString("imfcsdataeditor/log_tau_axis"), chkLogTauAxis->isChecked());
+    settings->getQSettings()->setValue(QString("imfcsdataeditor/chkKeepAspect"), chkKeepAspect->isChecked());
     settings->getQSettings()->setValue(QString("imfcsdataeditor/display_avg"), chkDisplayAverage->isChecked());
     settings->getQSettings()->setValue(QString("imfcsdataeditor/run_display"), cmbRunDisplay->currentIndex());
 

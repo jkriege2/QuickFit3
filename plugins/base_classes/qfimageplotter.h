@@ -44,6 +44,7 @@ class QFImagePlotter : public QFPlotter
         void setDisplayOverlay(bool displayOverlay, double* avgOut=NULL, double* sdOut=NULL);
         void setCurrent(QFRawDataRecord* current);
         void clearImage();
+        void setAspectRatio(bool keepAspect);
     protected slots:
         void updateImage();
         void moveColorbarsAuto();
@@ -71,6 +72,7 @@ class QFImagePlotter : public QFPlotter
 
         bool displayOverlay;
         bool displayMask;
+        bool keepAspect;
 
         QFImageParameterGroupBox* paramGrp;
         QFOverlayStyleCombobox* overlayCmb;

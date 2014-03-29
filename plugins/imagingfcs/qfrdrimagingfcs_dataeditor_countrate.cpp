@@ -160,6 +160,14 @@ void QFRDRImagingFCSDataEditorCountrate::createWidgets() {
     gl->addWidget(btnUse, row, 2);
     row++;
 
+    chkKeepAspect=new QCheckBox("", w);
+    gl->addWidget((l=new QLabel(tr("keep preview aspect ratio:"))), row, 0);
+    l->setTextFormat(Qt::RichText);
+    gl->addWidget(chkKeepAspect, row, 1);
+    connect(chkKeepAspect, SIGNAL(toggled(bool)), this, SLOT(replotData()));
+    row++;
+
+
     grpInfo=new QGroupBox(tr("Info"), w);
     QGridLayout* ggl=new QGridLayout(grpInfo);
     grpInfo->setLayout(ggl);
@@ -298,6 +306,7 @@ void QFRDRImagingFCSDataEditorCountrate::replotOverview() {
         pltOverview->set_xTickDistance(dx);
         pltOverview->set_yTickDistance(dy);
         pltOverview->set_aspectRatio(w/h);
+        pltOverview->set_maintainAspectRatio(chkKeepAspect->isChecked());
         plteOverviewSelected->set_data(NULL, 0, 0);
         plteOverviewExcluded->set_data(NULL, 0, 0);
 
@@ -694,6 +703,7 @@ void QFRDRImagingFCSDataEditorCountrate::readSettings() {
     cmbRunStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/run_style"), 0).toInt());
     cmbRunErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsdataeditor/run_error_style"), 0).toInt());
     loadSplitter(*(settings->getQSettings()), splitter, "imfcsdataeditor/corrsplitterSizes");
+    chkKeepAspect->setChecked(settings->getQSettings()->value(QString("imfcsdataeditor/chkKeepAspect"), true).toBool());
 }
 
 
@@ -702,6 +712,7 @@ void QFRDRImagingFCSDataEditorCountrate::writeSettings() {
     settings->getQSettings()->setValue(QString("imfcsdataeditor/run_style"), cmbRunStyle->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsdataeditor/run_error_style"), cmbRunErrorStyle->currentIndex());
     saveSplitter(*(settings->getQSettings()), splitter, "imfcsdataeditor/corrsplitterSizes");
+    settings->getQSettings()->setValue(QString("imfcsdataeditor/chkKeepAspect"), chkKeepAspect->isChecked());
 }
 
 

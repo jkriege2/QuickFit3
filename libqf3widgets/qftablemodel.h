@@ -354,8 +354,15 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         QString saveXML(QModelIndexList selection=QModelIndexList(), bool createXMLFragment=false, bool template_only=false);
         /** \brief saves the given \a selection as XML into a file \a filename */
         bool saveXML(const QString& filename, QModelIndexList selection=QModelIndexList(), bool createXMLFragment=false, bool template_only=false);
+        enum ReadHeaderMode {
+            rhmReadHeader,
+            rhmDontReadHeader,
+            rhmOverwriteNondefault,
+            rhmAskOverwrite
+        };
+
         /** \brief reads an XML-encoded table (see saveXML() ) from the string \a data and inserts it ito the table, starting at \a start_row, \a start_col */
-        bool readXML(const QString& data, int start_row=0, int start_col=0, bool clearTable=false, bool read_template_only=false, bool alsoReadHeaders=false);
+        bool readXML(const QString& data, int start_row=0, int start_col=0, bool clearTable=false, bool read_template_only=false, ReadHeaderMode alsoReadHeaders=rhmOverwriteNondefault);
         /** \brief reads an XML-encoded table (see saveXML() ) from the file \a filename */
         bool readXMLFile(const QString& filename, int start_row=0, int start_col=0, bool clearTable=true, bool read_template_only=false);
         /** \brief copies the given selection (or all cells, if the selection is empty) to the clipboard in an XML format (see saveXML() ) */
