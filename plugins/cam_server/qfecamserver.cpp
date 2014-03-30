@@ -886,19 +886,29 @@ int QFECamServer::getCameraAcquisitionProgress(unsigned int camera) {
 }
 
 bool QFECamServer::isCameraSettingChangable(QFExtensionCamera::CameraSetting which)  {
-	return false; 
+    return (which==QFExtensionCamera::CamSetNumberFrames);
 }
 
 void QFECamServer::changeCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which, QVariant value)  {  
-
+    if (which==QFExtensionCamera::CamSetNumberFrames) {
+        settings.setValue("FRAMES", value);
+    }
 }
 
 QVariant QFECamServer::getCameraSetting(QSettings& settings, QFExtensionCamera::CameraSetting which)   {
+    if (which==QFExtensionCamera::CamSetNumberFrames) {
+        return settings.value("FRAMES");
+    }
     return QVariant();
 }
 
 QVariant QFECamServer::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which)
 {
+    if (which==QFExtensionCamera::CamSetNumberFrames) {
+        for (int i=0; i<sources[camera].params.size(); i++) {
+            if (sources[camera].params[i].id=="FRAMES") return getMeasurementDeviceValue(camera, i);
+        }
+    }
     return QVariant();
 }
 
