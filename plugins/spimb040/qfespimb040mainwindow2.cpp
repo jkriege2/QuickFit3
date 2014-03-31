@@ -1009,6 +1009,12 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString &lightpathName, const Q
                  if (useCam2) run2=ecamera2->isCameraAcquisitionRunning(camera2);
                  running=run1||run2;
              }
+
+             QElapsedTimer te;
+             te.start();
+             while (te.elapsed()>100) {
+                 QApplication::processEvents();
+             }
          }
      }
      if (progress) progress->setValue(100);
