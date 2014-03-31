@@ -112,6 +112,7 @@ class QFECamServer : public QObject, public QFExtensionBase, public QFExtensionC
         virtual void showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent=NULL);
         /** \copydoc QFExtensionCamera::useCameraSettings() */
         virtual void useCameraSettings(unsigned int camera, const QSettings& settings);
+        void useCameraSettingsInt(unsigned int camera, const QSettings& settings, bool live_view=false);
         /** \copydoc QFExtensionCamera::getCameraImageWidth() */
         virtual int getCameraImageWidth(unsigned int camera);
         /** \copydoc QFExtensionCamera::getCameraImageHeight() */

@@ -265,7 +265,12 @@ unsigned int QFECamServer::getCameraCount() const {
     return sources.size();
 	/* how man cameras may be accessed by your plugin (e.g. if you use one driver to access several cameras */
 }
+
 void QFECamServer::useCameraSettings(unsigned int camera, const QSettings& settings) {
+    useCameraSettingsInt(camera, settings, true);
+}
+
+void QFECamServer::useCameraSettingsInt(unsigned int camera, const QSettings& settings, bool live_view) {
     /* set the camera settings to the values specified in settings parameter, called before acquire() */
     //qDebug()<<"useCameraSetings: "<<camera;
     //for (int i=0; i<settings.allKeys().size(); i++) {
@@ -297,6 +302,12 @@ void QFECamServer::useCameraSettings(unsigned int camera, const QSettings& setti
                 QApplication::processEvents();
             }
         }
+        if (live_view) {
+            log_text(tr("starting live-view mode!\n"));
+            bool ok=sendCommand(sources[camera], "LIVE_START\n\n");
+            ok=waitForString(sources[camera], "ACK_LIVE_START\n\n");
+
+        }
         if (logService) {
             logService->log_text(QString("\n         -- useCameraSetings: %1: DONE!!!\n").arg(camera));
         }
@@ -316,7 +327,7 @@ void QFECamServer::showCameraSettingsDialog(unsigned int camera, QSettings& sett
 
     if (camera<0 || camera>=getCameraCount() || !isMeasurementDeviceConnected(camera) ) return;
 
-    useCameraSettings(camera, settings);
+    useCameraSettingsInt(camera, settings, false);
 
 	/////////////////////////////////////////////////////////////////////////////////
 	// if you want the settings dialog to be modal, you may uncomment the next lines
@@ -744,7 +755,7 @@ double QFECamServer::getCameraExposureTime(unsigned int camera) {
 
 bool QFECamServer::prepareCameraAcquisition(unsigned int camera, const QSettings& settings, QString filenamePrefix) {
     if (camera<0 || camera>=getCameraCount()) return false;
-    useCameraSettings(camera, settings);
+    useCameraSettingsInt(camera, settings, false);
     sources[camera].last_filenameprefix=filenamePrefix.toLocal8Bit();
     return true;
 }
@@ -758,22 +769,34 @@ bool QFECamServer::startCameraAcquisition(unsigned int camera) {
     QMutex* mutex=sources[camera].mutex;
     QMutexLocker locker(mutex);
 
-    //if (sendCommand(sources[camera], QByteArray("RECORD\n"+sources[camera].last_filenameprefix+"\n\n"))) {
-    bool ok=false;
-    QList<QByteArray> answerl=queryData(sources[camera], QByteArray("RECORD\n"+sources[camera].last_filenameprefix+"\n\n"), 1, "\n\n", &ok);
-    QByteArray answer="";
-    if (answerl.size()>0) answer=answerl.first();
-
+    QElapsedTimer timer;
+    timer.start();
+    log_text(tr("stopping live-view mode!\n"));
+    bool ok=sendCommand(sources[camera], "LIVE_STOP\n\n");
+    ok=waitForString(sources[camera], "ACK_LIVE_STOP\n\n");
     if (ok) {
-        sources[camera].lastfiles=answer;
-        //if (waitForString(sources[camera], "ACK_RECORD\n\n" )) {
+        while (timer.elapsed()<5000) {
+            QApplication::processEvents();
+        }
+
+        //if (sendCommand(sources[camera], QByteArray("RECORD\n"+sources[camera].last_filenameprefix+"\n\n"))) {
+        QList<QByteArray> answerl=queryData(sources[camera], QByteArray("RECORD\n"+sources[camera].last_filenameprefix+"\n\n"), 1, "\n\n", &ok);
+        QByteArray answer="";
+        if (answerl.size()>0) answer=answerl.first();
+
+        if (ok) {
+            sources[camera].lastfiles=answer;
+            //if (waitForString(sources[camera], "ACK_RECORD\n\n" )) {
             sources[camera].acquiring=true;
             return true;
-        //} else {
-        //    log_error(tr("error starting acquisiton (timeout: %3s):\n%1     error description: DID NOT GET ACK_RECCORD FROM HOST!\n%1     last error string: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0));
-        //}
+            //} else {
+            //    log_error(tr("error starting acquisiton (timeout: %3s):\n%1     error description: DID NOT GET ACK_RECCORD FROM HOST!\n%1     last error string: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0));
+            //}
+        } else {
+            log_error(tr("error starting acquisiton (timeout: %3s):\n%1     error description: COULD NOT SEND RECORD COMMAND TO HOST!\n%1     last error string: %2!\n%1     answer: %4!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0).arg(QString(answer)));
+        }
     } else {
-        log_error(tr("error starting acquisiton (timeout: %3s):\n%1     error description: COULD NOT SEND RECORD COMMAND TO HOST!\n%1     last error string: %2!\n%1     answer: %4!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0).arg(QString(answer)));
+        log_error(tr("error starting acquisiton (timeout: %3s):\n%1     error description: ERROR WHILE SWITCHING OFF THE LIVE-VIEW!\n%1     last error string: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[camera].timeout_instruction)/1000.0));
     }
 
     return false;

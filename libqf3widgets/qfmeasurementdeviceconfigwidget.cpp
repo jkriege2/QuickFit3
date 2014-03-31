@@ -126,7 +126,7 @@ void QFMeasurementDeviceConfigWidget::createWidgets() {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     widgetLayout=new QGridLayout(this);
     setLayout(widgetLayout);
-    widgetLayout->setContentsMargins(0,0,0,0);
+    widgetLayout->setContentsMargins(4,4,4,4);
     widgetLayout->setHorizontalSpacing(2);
     widgetLayout->setVerticalSpacing(2);
 

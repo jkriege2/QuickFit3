@@ -535,6 +535,12 @@ bool readEvalSettingsFile(const QString &evalFilename, bool isDCCF, QMap<QString
                 } else if (name=="video avgmax") {
                     initParams["VIDEO_AVGMAX"]=value.toDouble();
                     paramsReadonly<<"VIDEO_AVGMAX";
+                } else if (name=="background average value") {
+                    initParams["BACKGROUND_INTENSITY"]=value.toDouble();
+                    paramsReadonly<<"BACKGROUND_INTENSITY";
+                } else if (name=="background stddev value") {
+                    initParams["BACKGROUND_INTENSITY_STDDEV"]=value.toDouble();
+                    paramsReadonly<<"BACKGROUND_INTENSITY_STDDEV";
 
                 /*} else if (name=="") {
                     initParams[""]=value.toInt();

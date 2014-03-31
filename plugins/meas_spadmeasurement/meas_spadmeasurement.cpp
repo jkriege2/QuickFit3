@@ -54,10 +54,10 @@ void QFExtensionB040SPADMeasurement::initExtension() {
         s.label=inifile.value("device"+QString::number(i+1)+"/label", tr("B040 SPAD surveilance #%1").arg(i+1)).toString();
         s.autoconnect=inifile.value("device"+QString::number(i+1)+"/autoconnect", false).toBool();
         for (int j=0; j<3; j++) {
-            s.voltage_factor[j]=inifile.value("device"+QString::number(i+1)+"/voltage_factor", 1.0).toDouble();
-            s.voltage_offset[j]=inifile.value("device"+QString::number(i+1)+"/voltage_offset", 0.0).toDouble();
-            s.current_factor[j]=inifile.value("device"+QString::number(i+1)+"/current_factor", 1.0).toDouble();
-            s.current_offset[j]=inifile.value("device"+QString::number(i+1)+"/current_offset", 0.0).toDouble();
+            s.voltage_factor[j]=inifile.value("device"+QString::number(i+1)+"/voltage"+QString::number(j)+"_factor", 1.0).toDouble();
+            s.voltage_offset[j]=inifile.value("device"+QString::number(i+1)+"/voltage"+QString::number(j)+"_offset", 0.0).toDouble();
+            s.current_factor[j]=inifile.value("device"+QString::number(i+1)+"/current"+QString::number(j)+"_factor", 1.0).toDouble();
+            s.current_offset[j]=inifile.value("device"+QString::number(i+1)+"/current"+QString::number(j)+"_offset", 0.0).toDouble();
 
             s.valuelabels[j]=inifile.value("device"+QString::number(i+1)+"/voltage"+QString::number(j)+"_label", tr("voltage %1 [V]").arg(j)).toString();
             s.valueids[j]=inifile.value("device"+QString::number(i+1)+"/voltage"+QString::number(j)+"_id", QString("VOLTAGE%1").arg(j)).toString();
@@ -209,15 +209,15 @@ QVariant QFExtensionB040SPADMeasurement::getMeasurementDeviceValue(unsigned int 
     if (value>=0 && value<3) {
         QString rs=serial->queryCommand(QString("U%1").arg(value));
         double r=(rs.toDouble(&ok)/100.0-devices[measuremenDevice].voltage_offset[value])*devices[measuremenDevice].voltage_factor[value];
-        if (ok&&r<1000) return r;
+        if (ok&&r<1000) return round(r*100.0)/100.0;
     } else if (value>=3 && value<6) {
         QString rs=serial->queryCommand(QString("I%1").arg(value-3));
         double r=(rs.toDouble(&ok)-devices[measuremenDevice].current_offset[value-3])*devices[measuremenDevice].current_factor[value-3];
-        if (ok&&r<1000) return r;
+        if (ok&&r<1000) return round(r*10.0)/10.0;
     } else if (value==6 || value==7) {
         QString rs=serial->queryCommand(QString("T%1").arg(value-6));
         double r=rs.toDouble(&ok)/10.0;
-        if (ok&&r<1000) return r;
+        if (ok&&r<1000) return round(r*100.0)/100.0;
     } else if (value>=8 && value<12) {
         QString rs=serial->queryCommand(QString("Q%1").arg(value-8));
         bool r=(rs.toInt(&ok)!=0);
