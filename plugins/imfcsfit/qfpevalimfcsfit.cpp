@@ -143,7 +143,7 @@ void QFPEvalIMFCSFit::insertFCSFitForCalibration() {
                 if (i>0) e=project->addEvaluation(getID(), "imFCS Fit");
                 QFImFCSFitEvaluation* eimFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
                 e->setQFProperty("FIT_REPEATS", 2, false, false);
-                e->setQFProperty("PRESET_N_PARTICLE", 10, false, false);
+                e->setQFProperty("PRESET_N_PARTICLE", 1, false, false);
                 e->setQFProperty("PRESET_FOCUS_WIDTH", vals[i], false, false);
                 e->setQFProperty("PRESET_FOCUS_HEIGHT", dlg->getFocusHeight(), false, false);
                 e->setQFProperty("PRESET_FOCUS_HEIGHT_ERROR", dlg->getFocusHeightError(), false, false);
