@@ -482,6 +482,8 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
         double Dcalib=Ds.value(DItem, 0);
         double DcalibE=Ds2.value(DItem, 0);
         QFEvaluationItem* e=project->addEvaluation(getID(), tr("calibration D=%1µm²/s").arg(Dcalib));
+        e->setQFProperty("FIT_REPEATS", 2, false, false);
+        e->setQFProperty("PRESET_N_PARTICLE", 1, false, false);
         e->setQFProperty("PRESET_D1", Dcalib, false, false);
         e->setQFProperty("PRESET_D1_ERROR", DcalibE, false, false);
         e->setQFProperty("PRESET_D1_FIX", true, false, false);
