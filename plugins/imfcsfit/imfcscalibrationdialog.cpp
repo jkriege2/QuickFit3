@@ -66,9 +66,11 @@ bool ImFCSCalibrationDialog::getFixOffset() const
 void ImFCSCalibrationDialog::setFitModels(const QStringList& models, const QString& defaultModel)
 {
     ui->cmbFitModel->clear();
+    if (!QFPluginServices::getInstance()) return;
+    if (!QFPluginServices::getInstance()->getFitFunctionManager()) return;
     for (int i=0; i<models.size(); i++) {
         QFFitFunction* f=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(models[i], NULL);
-        ui->cmbFitModel->addItem(f->name(), models[i]);
+        if (f) ui->cmbFitModel->addItem(f->name(), models[i]);
     }
     ui->cmbFitModel->setCurrentIndex(ui->cmbFitModel->findData(defaultModel));
 }
