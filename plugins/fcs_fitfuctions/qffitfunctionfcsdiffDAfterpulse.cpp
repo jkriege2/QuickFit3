@@ -20,7 +20,7 @@ QFFitFunctionFCSDiffDAfterPulse::QFFitFunctionFCSDiffDAfterPulse(bool hasGamma) 
     #define FCSDiff_afterpulsing 2
     addParameter(FloatNumber,  "afterpulsing_amplitude",  "afterpulsing amplitude",                                "a<sub>pulse</sub>",            "",        "",                          true,      true,         true,              QFFitFunction::DisplayError, false, 1.0,          0,        1e10  );
     #define FCSDiff_pre1 3
-    addParameter(FloatNumber,  "afterpulsing_exponent",   "afterpulsing exponent b",                               "b<sub>pulse</sub>",            "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1.0,          -1e10,        1e10,  1);
+    addParameter(FloatNumber,  "afterpulsing_exponent",   "afterpulsing exponent b",                               "b<sub>pulse</sub>",            "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, true, 1.1,          -1e10,        1e10,  1);
     #define FCSDiff_exp1 4
     addParameter(FloatNumber,  "afterpulsing_tau",        "afterpulsing decay time tau",                           "&tau;<sub>after</sub>",        "us",      "&mu;s",                     true,      true,         true,              QFFitFunction::DisplayError, false, 10.0,          1e10,        1e10,  1);
     #define FCSDiff_tau1 5
@@ -55,16 +55,16 @@ QFFitFunctionFCSDiffDAfterPulse::QFFitFunctionFCSDiffDAfterPulse(bool hasGamma) 
     if (hasGamma) {
         addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                  "",           "",                       true,      true,         true,              QFFitFunction::EditError,    true, 6,            0.01,     100,      0.5  );
         #define FCSDiff_focus_struct_fac 19
-        addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    false, 250,          0,        1e4,      1    );
+        addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 250,          0,        1e4,      1    );
         #define FCSDiff_focus_width 20
-        addParameter(FloatNumber,  "focus_height",            "focus: longitudinal radius",                            "w<sub>z</sub>",          "nm",         "nm",                     false,      false,         false,              QFFitFunction::DisplayError,    false, 6*250,          0,        1e4,      1    );
+        addParameter(FloatNumber,  "focus_height",            "focus: longitudinal radius",                            "w<sub>z</sub>",          "nm",         "nm",                     false,      false,         false,              QFFitFunction::DisplayError,    true, 6*250,          0,        1e4,      1    );
         #define FCSDiff_focus_height 21
     } else {
         addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                  "",           "",                       false,      false,         false,              QFFitFunction::DisplayError,    true, 6,            0.01,     100,      0.5  );
         #define FCSDiff_focus_struct_fac 19
-        addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    false, 250,          0,        1e4,      1    );
+        addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 250,          0,        1e4,      1    );
         #define FCSDiff_focus_width 20
-        addParameter(FloatNumber,  "focus_height",            "focus: longitudinal radius",                            "w<sub>z</sub>",          "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    false, 6*250,          0,        1e4,      1    );
+        addParameter(FloatNumber,  "focus_height",            "focus: longitudinal radius",                            "w<sub>z</sub>",          "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 6*250,          0,        1e4,      1    );
         #define FCSDiff_focus_height 21
     }
 
