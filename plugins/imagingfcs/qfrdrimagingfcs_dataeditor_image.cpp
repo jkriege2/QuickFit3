@@ -1078,6 +1078,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     actCopyPixelCFFromAll=new QAction("copy selected CF from all files to table", this);
     connect(actCopyPixelCFFromAll, SIGNAL(triggered()), this, SLOT(copySelCFFromAll()));
 
+    actCopyPixelAvgCFFromAll=new QAction("copy selected pixels average CF from all files to table", this);
+    connect(actCopyPixelAvgCFFromAll, SIGNAL(triggered()), this, SLOT(copySelAvgCFFromAll()));
+
 
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -1263,6 +1266,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuData->addAction(actCopyGroupACFsToTable);
     menuData->addAction(actCopyMeanCFFromAll);
     menuData->addAction(actCopyPixelCFFromAll);
+    menuData->addAction(actCopyPixelAvgCFFromAll);
 
 
     menuMask=propertyEditor->addMenu("&Mask", 0);
@@ -5746,7 +5750,7 @@ void QFRDRImagingFCSImageEditor::copyGroupACFsToTable() {
             if (plteOverviewSelectedData[i] && !plteOverviewExcludedData[i]) sel<<i;
         }
     }
-    copyCFFromFilesToTable(recs, true, false, true, sel);
+    copyCFFromFilesToTable(recs, true, true, false, true, sel);
 }
 
 void QFRDRImagingFCSImageEditor::recorrelate()
@@ -5928,22 +5932,34 @@ void QFRDRImagingFCSImageEditor::aspectRatioChanged()
 void QFRDRImagingFCSImageEditor::copyMeanCFFromAll()
 {
     QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();//getRDRGroupMembers(current->getGroup());
-    copyCFFromFilesToTable(recs, true, false, false, QList<int>());
+    copyCFFromFilesToTable(recs, true, false, false, false, QList<int>());
 }
 
 void QFRDRImagingFCSImageEditor::copySelCFFromAll()
 {
-    QList<QFRawDataRecord*> recs=current->getProject()->getRDRGroupMembers(current->getGroup());
+    QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();//getRDRGroupMembers(current->getGroup());
     QList<int> sel;
     if (plteOverviewSize>0 && plteOverviewSelectedData) {
         for (int i=0; i<plteOverviewSize; i++) {
             if (plteOverviewSelectedData[i] && !plteOverviewExcludedData[i]) sel<<i;
         }
     }
-    copyCFFromFilesToTable(recs, false, true, false, sel);
+    copyCFFromFilesToTable(recs, false, true, true, false, sel);
 }
 
-void QFRDRImagingFCSImageEditor::copyCFFromFilesToTable(QList<QFRawDataRecord *> &recs, bool copyAvg, bool copySingle, bool roleIsName, QList<int> sel)
+void QFRDRImagingFCSImageEditor::copySelAvgCFFromAll()
+{
+    QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();//getRDRGroupMembers(current->getGroup());
+    QList<int> sel;
+    if (plteOverviewSize>0 && plteOverviewSelectedData) {
+        for (int i=0; i<plteOverviewSize; i++) {
+            if (plteOverviewSelectedData[i] && !plteOverviewExcludedData[i]) sel<<i;
+        }
+    }
+    copyCFFromFilesToTable(recs, true, true, false, false, sel);
+}
+
+void QFRDRImagingFCSImageEditor::copyCFFromFilesToTable(QList<QFRawDataRecord *> &recs, bool copyAvg, bool avgSelected, bool copySingle, bool roleIsName, QList<int> sel)
 {
     QFRDRImagingFCSData* cm=qobject_cast<QFRDRImagingFCSData*>(current);
 
@@ -5952,7 +5968,7 @@ void QFRDRImagingFCSImageEditor::copyCFFromFilesToTable(QList<QFRawDataRecord *>
             bool use=false;
             if (recs[i]->getType()==current->getType()) {
                 QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(recs[i]);
-                if (m) use=true;
+                if (m && (m->getCorrelationRuns()==cm->getCorrelationRuns() || (copyAvg && !copySingle && (!avgSelected || sel.size()<=0)))) use=true;
             }
             if (!use) recs.removeAt(i);
         }
@@ -6009,7 +6025,7 @@ void QFRDRImagingFCSImageEditor::copyCFFromFilesToTable(QList<QFRawDataRecord *>
 
                     for (int n=0; n<m->getCorrelationN(); n++) {
                         tau<<t[n];
-                        if (sel.size()<=0) {
+                        if (!avgSelected || sel.size()<=0) {
                             cf<<(m->getCorrelationMean())[n];
                             cstd<<(m->getCorrelationStdDev())[n];
                         } else if (sel.size()==1){
@@ -6063,7 +6079,7 @@ void QFRDRImagingFCSImageEditor::copyCFFromFilesToTable(QList<QFRawDataRecord *>
                         if (i==5) color=QColor("magenta");
 
                         int plot=cols->colgraphGetGraphCount(graph);
-                        cols->colgraphAddErrorGraph(graph, ctau, -1, ctau+1, ctau+2, QFRDRColumnGraphsInterface::cgtLines, name, QFRDRColumnGraphsInterface::egtPolygons);
+                        cols->colgraphAddErrorGraph(graph, ctau, -1, ctau+1, ctau+2, QFRDRColumnGraphsInterface::cgtLines, QString("\\verb{%1}").arg(name), QFRDRColumnGraphsInterface::egtPolygons);
                         QColor colf=color.lighter();
                         colf.setAlphaF(0.5);
                         QColor cole=color.darker();
@@ -6124,7 +6140,7 @@ void QFRDRImagingFCSImageEditor::copyCFFromFilesToTable(QList<QFRawDataRecord *>
                             if (i==5) color=QColor("magenta");
 
                             int plot=cols->colgraphGetGraphCount(graph);
-                            cols->colgraphAddErrorGraph(graph, ctau, -1, ctau+1, ctau+2, QFRDRColumnGraphsInterface::cgtLines, name, QFRDRColumnGraphsInterface::egtPolygons);
+                            cols->colgraphAddErrorGraph(graph, ctau, -1, ctau+1, ctau+2, QFRDRColumnGraphsInterface::cgtLines, QString("\\verb{%1 - %2}").arg(name).arg(sel[s]), QFRDRColumnGraphsInterface::egtPolygons);
                             QColor colf=color.lighter();
                             colf.setAlphaF(0.5);
                             QColor cole=color.darker();

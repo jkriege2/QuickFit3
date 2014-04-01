@@ -15,7 +15,7 @@ for(var k=0;k<params_gating_length.length;k++){
       }
       acquisition.setAcquisitionCamera2SettingN("GATING_LENGTH", params_gating_length[k]);
       tools.sleepMS(delay);
-      instrument.setAcqDescCurrentSample("LED_24V_" + params_led_brightness[i] + "mA_L" + params_gating_length[k] + comment);
+      instrument.setAcqDescCurrentSample("LED_22V_" + params_led_brightness[i] + "mA_L" + params_gating_length[k] + comment);
       acquisition.doAcquisition();
     }
   }

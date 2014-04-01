@@ -30,6 +30,7 @@ class QFWIDLIB_EXPORT QFPlotterCopyToTableDialog : public QDialog
         void setDescription(const QString& text);
         bool copyOnlyPlotData() const;
         QString getPrefix();
+        void addWidget(const QString& label, QWidget* wid);
 
     protected slots:
         void on_cmbRDR_refilled(bool full);

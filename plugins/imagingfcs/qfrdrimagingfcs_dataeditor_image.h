@@ -269,9 +269,10 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         void aspectRatioChanged();
         void copyMeanCFFromAll();
         void copySelCFFromAll();
+        void copySelAvgCFFromAll();
 
     protected:
-        void copyCFFromFilesToTable(QList<QFRawDataRecord*>& recs, bool copyAvg=true, bool copySingle=false, bool nameFromRole=true, QList<int> sel=QList<int>());
+        void copyCFFromFilesToTable(QList<QFRawDataRecord*>& recs, bool copyAvg=true, bool avgSelected=true, bool copySingle=false, bool nameFromRole=true, QList<int> sel=QList<int>());
 
         /** \brief map with all available fit functions */
         QMap<QString, QFFitFunction*> m_fitFunctions;
@@ -619,6 +620,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QAction* actRecorrelate;
         QAction* actCopyMeanCFFromAll;
         QAction* actCopyPixelCFFromAll;
+        QAction* actCopyPixelAvgCFFromAll;
 
         QMenu* menuData;
         QMenu* menuMask;

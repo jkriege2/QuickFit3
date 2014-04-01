@@ -103,6 +103,12 @@ QString QFPlotterCopyToTableDialog::getPrefix()
     return ui->edtPrefix->text();
 }
 
+void QFPlotterCopyToTableDialog::addWidget(const QString &label, QWidget *wid)
+{
+    wid->setParent(this);
+    ui->formLayout->addRow(label, wid);
+}
+
 void QFPlotterCopyToTableDialog::on_cmbRDR_refilled(bool full)
 {
     //qDebug()<<"on_cmbRDR_refilled(full="<<full<<")";

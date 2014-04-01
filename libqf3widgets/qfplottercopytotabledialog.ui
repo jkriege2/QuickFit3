@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Add plot data to table ...</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,1,2,0,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,1,2,0,0,1,0">
    <item>
     <widget class="QTextBrowser" name="labDescription">
      <property name="sizePolicy">
@@ -172,6 +172,9 @@
       <string>show table editor after insert</string>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QFormLayout" name="formLayout"/>
    </item>
    <item>
     <spacer name="verticalSpacer">
