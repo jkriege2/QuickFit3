@@ -35,10 +35,11 @@ p, li { white-space: pre-wrap; }
    <item>
     <widget class="QPlainTextEdit" name="edtValues">
      <property name="plainText">
-      <string>200
-300
-400
-500</string>
+      <string>400
+600
+800
+1000
+</string>
      </property>
     </widget>
    </item>
@@ -85,7 +86,7 @@ p, li { white-space: pre-wrap; }
            <double>100000.000000000000000</double>
           </property>
           <property name="value">
-           <double>500.000000000000000</double>
+           <double>1200.000000000000000</double>
           </property>
          </widget>
         </item>

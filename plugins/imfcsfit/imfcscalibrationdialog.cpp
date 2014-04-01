@@ -20,6 +20,12 @@ ImFCSCalibrationDialog::ImFCSCalibrationDialog(QWidget *parent) :
 
 ImFCSCalibrationDialog::~ImFCSCalibrationDialog()
 {
+    if (ProgramOptions::getInstance()) {
+        ProgramOptions::setConfigValue("ImFCSCalibrationDialog/values", ui->edtValues->toPlainText());
+        ProgramOptions::setConfigValue("ImFCSCalibrationDialog/focusheight", ui->spinFocusHeight->value());
+        ProgramOptions::setConfigValue("ImFCSCalibrationDialog/focusheight_error", ui->spinFocusHeightError->value());
+        ProgramOptions::setConfigValue("ImFCSCalibrationDialog/fixoffset", ui->chkFixOffset->isChecked());
+    }
     delete ui;
 }
 
