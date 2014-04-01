@@ -89,7 +89,7 @@ bool QFPlotterCopyToTableDialog::getShowEditor() const
 
 void QFPlotterCopyToTableDialog::setDescription(const QString &text)
 {
-    ui->labDescription->setPlainText(text);
+    ui->labDescription->setText(text);
     ui->labDescription->setVisible(!text.isEmpty());
 }
 
